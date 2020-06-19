@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Routines for the Relay Control Server plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Routines for the Relay Control Server
+                                                                               *plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
 
@@ -43,22 +44,21 @@ extern uint8_t emAllowRelay;
 
 bool emberAfRelayControlClusterGetRelayStateCallback(void)
 {
-  emberAfFillCommandRelayControlClusterGetRelayStateResponse(emAllowRelay);
-  emberAfSendResponse();
-  return true;
+    emberAfFillCommandRelayControlClusterGetRelayStateResponse(emAllowRelay);
+    emberAfSendResponse();
+    return true;
 }
 
-bool emberAfRelayControlClusterSetRelayStateCallback(bool isEnabled,
-                                                     uint32_t magicNumber)
+bool emberAfRelayControlClusterSetRelayStateCallback(bool isEnabled, uint32_t magicNumber)
 {
-  EmberAfStatus status = EMBER_ZCL_STATUS_NOT_AUTHORIZED;
+    EmberAfStatus status = EMBER_ZCL_STATUS_NOT_AUTHORIZED;
 
-  if (magicNumber == EMBER_AF_PLUGIN_RELAY_CONTROL_SERVER_MAGIC_NUMBER
-      || EMBER_AF_PLUGIN_RELAY_CONTROL_SERVER_MAGIC_NUMBER == 0) {
-    emAllowRelay = isEnabled;
-    status = EMBER_ZCL_STATUS_SUCCESS;
-  }
+    if (magicNumber == EMBER_AF_PLUGIN_RELAY_CONTROL_SERVER_MAGIC_NUMBER || EMBER_AF_PLUGIN_RELAY_CONTROL_SERVER_MAGIC_NUMBER == 0)
+    {
+        emAllowRelay = isEnabled;
+        status       = EMBER_ZCL_STATUS_SUCCESS;
+    }
 
-  emberAfSendImmediateDefaultResponse(status);
-  return true;
+    emberAfSendImmediateDefaultResponse(status);
+    return true;
 }

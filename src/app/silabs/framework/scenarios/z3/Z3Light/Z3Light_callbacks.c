@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // This callback file is created for your convenience. You may add application
 // code to this file. If you regenerate this file over a previous version, the
@@ -57,35 +57,37 @@ EmberEventControl findingAndBindingEventControl;
 
 void commissioningLedEventHandler(void)
 {
-  emberEventControlSetInactive(commissioningLedEventControl);
+    emberEventControlSetInactive(commissioningLedEventControl);
 
-  if (emberAfNetworkState() == EMBER_JOINED_NETWORK) {
-    uint16_t identifyTime;
-    emberAfReadServerAttribute(LIGHT_ENDPOINT,
-                               ZCL_IDENTIFY_CLUSTER_ID,
-                               ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
-                               (uint8_t *)&identifyTime,
-                               sizeof(identifyTime));
-    if (identifyTime > 0) {
-      halToggleLed(COMMISSIONING_STATUS_LED);
-      emberEventControlSetDelayMS(commissioningLedEventControl,
-                                  LED_BLINK_PERIOD_MS << 1);
-    } else {
-      halSetLed(COMMISSIONING_STATUS_LED);
+    if (emberAfNetworkState() == EMBER_JOINED_NETWORK)
+    {
+        uint16_t identifyTime;
+        emberAfReadServerAttribute(LIGHT_ENDPOINT, ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
+                                   (uint8_t *) &identifyTime, sizeof(identifyTime));
+        if (identifyTime > 0)
+        {
+            halToggleLed(COMMISSIONING_STATUS_LED);
+            emberEventControlSetDelayMS(commissioningLedEventControl, LED_BLINK_PERIOD_MS << 1);
+        }
+        else
+        {
+            halSetLed(COMMISSIONING_STATUS_LED);
+        }
     }
-  } else {
-    EmberStatus status = emberAfPluginNetworkSteeringStart();
-    emberAfCorePrintln("%p network %p: 0x%X", "Join", "start", status);
-  }
+    else
+    {
+        EmberStatus status = emberAfPluginNetworkSteeringStart();
+        emberAfCorePrintln("%p network %p: 0x%X", "Join", "start", status);
+    }
 }
 
 void findingAndBindingEventHandler()
 {
-  if (emberAfNetworkState() == EMBER_JOINED_NETWORK) {
-    emberEventControlSetInactive(findingAndBindingEventControl);
-    emberAfCorePrintln("Find and bind target start: 0x%X",
-                       emberAfPluginFindAndBindTargetStart(LIGHT_ENDPOINT));
-  }
+    if (emberAfNetworkState() == EMBER_JOINED_NETWORK)
+    {
+        emberEventControlSetInactive(findingAndBindingEventControl);
+        emberAfCorePrintln("Find and bind target start: 0x%X", emberAfPluginFindAndBindTargetStart(LIGHT_ENDPOINT));
+    }
 }
 
 /** @brief Stack Status
@@ -100,16 +102,19 @@ void findingAndBindingEventHandler()
  */
 bool emberAfStackStatusCallback(EmberStatus status)
 {
-  // Note, the ZLL state is automatically updated by the stack and the plugin.
-  if (status == EMBER_NETWORK_DOWN) {
-    halClearLed(COMMISSIONING_STATUS_LED);
-  } else if (status == EMBER_NETWORK_UP) {
-    halSetLed(COMMISSIONING_STATUS_LED);
-    emberEventControlSetActive(findingAndBindingEventControl);
-  }
+    // Note, the ZLL state is automatically updated by the stack and the plugin.
+    if (status == EMBER_NETWORK_DOWN)
+    {
+        halClearLed(COMMISSIONING_STATUS_LED);
+    }
+    else if (status == EMBER_NETWORK_UP)
+    {
+        halSetLed(COMMISSIONING_STATUS_LED);
+        emberEventControlSetActive(findingAndBindingEventControl);
+    }
 
-// This value is ignored by the framework.
-  return false;
+    // This value is ignored by the framework.
+    return false;
 }
 
 /** @brief Main Init
@@ -133,7 +138,7 @@ bool emberAfStackStatusCallback(EmberStatus status)
  */
 void emberAfMainInitCallback(void)
 {
-  emberEventControlSetActive(commissioningLedEventControl);
+    emberEventControlSetActive(commissioningLedEventControl);
 }
 
 /** @brief Complete
@@ -151,24 +156,24 @@ void emberAfMainInitCallback(void)
  * this, one is able to tell on which channel mask and with which key the
  * process was complete. Ver.: always
  */
-void emberAfPluginNetworkSteeringCompleteCallback(EmberStatus status,
-                                                  uint8_t totalBeacons,
-                                                  uint8_t joinAttempts,
+void emberAfPluginNetworkSteeringCompleteCallback(EmberStatus status, uint8_t totalBeacons, uint8_t joinAttempts,
                                                   uint8_t finalState)
 {
-  emberAfCorePrintln("%p network %p: 0x%X", "Join", "complete", status);
+    emberAfCorePrintln("%p network %p: 0x%X", "Join", "complete", status);
 
-  if (status != EMBER_SUCCESS) {
-    // Initialize our ZLL security now so that we are ready to be a touchlink
-    // target at any point.
-    status = emberAfZllSetInitialSecurityState();
-    if (status != EMBER_SUCCESS) {
-      emberAfCorePrintln("Error: cannot initialize ZLL security: 0x%X", status);
+    if (status != EMBER_SUCCESS)
+    {
+        // Initialize our ZLL security now so that we are ready to be a touchlink
+        // target at any point.
+        status = emberAfZllSetInitialSecurityState();
+        if (status != EMBER_SUCCESS)
+        {
+            emberAfCorePrintln("Error: cannot initialize ZLL security: 0x%X", status);
+        }
+
+        status = emberAfPluginNetworkCreatorStart(false); // distributed
+        emberAfCorePrintln("%p network %p: 0x%X", "Form", "start", status);
     }
-
-    status = emberAfPluginNetworkCreatorStart(false); // distributed
-    emberAfCorePrintln("%p network %p: 0x%X", "Form", "start", status);
-  }
 }
 
 /** @brief Complete
@@ -181,13 +186,9 @@ void emberAfPluginNetworkSteeringCompleteCallback(EmberStatus status,
  * @param usedSecondaryChannels Whether or not the network creator wants to
  * form a network on the secondary channels Ver.: always
  */
-void emberAfPluginNetworkCreatorCompleteCallback(const EmberNetworkParameters *network,
-                                                 bool usedSecondaryChannels)
+void emberAfPluginNetworkCreatorCompleteCallback(const EmberNetworkParameters * network, bool usedSecondaryChannels)
 {
-  emberAfCorePrintln("%p network %p: 0x%X",
-                     "Form distributed",
-                     "complete",
-                     EMBER_SUCCESS);
+    emberAfCorePrintln("%p network %p: 0x%X", "Form distributed", "complete", EMBER_SUCCESS);
 }
 
 /** @brief On/off Cluster Server Post Init
@@ -199,10 +200,9 @@ void emberAfPluginNetworkCreatorCompleteCallback(const EmberNetworkParameters *n
  */
 void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint)
 {
-  // At startup, trigger a read of the attribute and possibly a toggle of the
-  // LED to make sure they are always in sync.
-  emberAfOnOffClusterServerAttributeChangedCallback(endpoint,
-                                                    ZCL_ON_OFF_ATTRIBUTE_ID);
+    // At startup, trigger a read of the attribute and possibly a toggle of the
+    // LED to make sure they are always in sync.
+    emberAfOnOffClusterServerAttributeChangedCallback(endpoint, ZCL_ON_OFF_ATTRIBUTE_ID);
 }
 
 /** @brief Server Attribute Changed
@@ -212,26 +212,26 @@ void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint)
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfOnOffClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                       EmberAfAttributeId attributeId)
+void emberAfOnOffClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId)
 {
-  // When the on/off attribute changes, set the LED appropriately.  If an error
-  // occurs, ignore it because there's really nothing we can do.
-  if (attributeId == ZCL_ON_OFF_ATTRIBUTE_ID) {
-    bool onOff;
-    if (emberAfReadServerAttribute(endpoint,
-                                   ZCL_ON_OFF_CLUSTER_ID,
-                                   ZCL_ON_OFF_ATTRIBUTE_ID,
-                                   (uint8_t *)&onOff,
-                                   sizeof(onOff))
-        == EMBER_ZCL_STATUS_SUCCESS) {
-      if (onOff) {
-        halSetLed(ON_OFF_LIGHT_LED);
-      } else {
-        halClearLed(ON_OFF_LIGHT_LED);
-      }
+    // When the on/off attribute changes, set the LED appropriately.  If an error
+    // occurs, ignore it because there's really nothing we can do.
+    if (attributeId == ZCL_ON_OFF_ATTRIBUTE_ID)
+    {
+        bool onOff;
+        if (emberAfReadServerAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &onOff,
+                                       sizeof(onOff)) == EMBER_ZCL_STATUS_SUCCESS)
+        {
+            if (onOff)
+            {
+                halSetLed(ON_OFF_LIGHT_LED);
+            }
+            else
+            {
+                halClearLed(ON_OFF_LIGHT_LED);
+            }
+        }
     }
-  }
 }
 
 /** @brief Hal Button Isr
@@ -247,7 +247,8 @@ void emberAfOnOffClusterServerAttributeChangedCallback(uint8_t endpoint,
  */
 void emberAfHalButtonIsrCallback(uint8_t button, uint8_t state)
 {
-  if (state == BUTTON_RELEASED) {
-    emberEventControlSetActive(findingAndBindingEventControl);
-  }
+    if (state == BUTTON_RELEASED)
+    {
+        emberEventControlSetActive(findingAndBindingEventControl);
+    }
 }

@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the Power Consumption Model plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the Power Consumption
+                                                                               *Model plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_LIGHTBULB_MEASUREMENT_SERVER_H
 #define SILABS_LIGHTBULB_MEASUREMENT_SERVER_H

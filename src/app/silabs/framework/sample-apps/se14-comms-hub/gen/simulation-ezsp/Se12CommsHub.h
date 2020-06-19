@@ -983,129 +983,43 @@
 #define EMBER_AF_PRINT_SAMPLE_MFG_SPECIFIC_CLUSTER 0x0E10
 #define EMBER_AF_PRINT_OTA_CONFIGURATION_CLUSTER 0x0E20
 #define EMBER_AF_PRINT_MFGLIB_CLUSTER 0x0E40
-#define EMBER_AF_PRINT_BITS { 0x15, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x9D, 0x12, 0x00, 0x00 }
-#define EMBER_AF_PRINT_NAMES {                              \
-    "Core",                                                 \
-    "Debug",                                                \
-    "Application",                                          \
-    "Security",                                             \
-    "Attributes",                                           \
-    "Reporting",                                            \
-    "Service discovery",                                    \
-    "Registration",                                         \
-    "ZDO (ZigBee Device Object)",                           \
-    "Custom messages (1)",                                  \
-    "Custom messages (2)",                                  \
-    "Custom messages (3)",                                  \
-    "Basic",                                                \
-    "Power Configuration",                                  \
-    "Device Temperature Configuration",                     \
-    "Identify",                                             \
-    "Groups",                                               \
-    "Scenes",                                               \
-    "On/off",                                               \
-    "On/off Switch Configuration",                          \
-    "Level Control",                                        \
-    "Alarms",                                               \
-    "Time",                                                 \
-    "RSSI Location",                                        \
-    "Binary Input (Basic)",                                 \
-    "Commissioning",                                        \
-    "Partition",                                            \
-    "Over the Air Bootloading",                             \
-    "Power Profile",                                        \
-    "Appliance Control",                                    \
-    "Poll Control",                                         \
-    "Green Power",                                          \
-    "Keep-Alive",                                           \
-    "Shade Configuration",                                  \
-    "Door Lock",                                            \
-    "Window Covering",                                      \
-    "Barrier Control",                                      \
-    "Pump Configuration and Control",                       \
-    "Thermostat",                                           \
-    "Fan Control",                                          \
-    "Dehumidification Control",                             \
-    "Thermostat User Interface Configuration",              \
-    "Color Control",                                        \
-    "Ballast Configuration",                                \
-    "Illuminance Measurement",                              \
-    "Illuminance Level Sensing",                            \
-    "Temperature Measurement",                              \
-    "Pressure Measurement",                                 \
-    "Flow Measurement",                                     \
-    "Relative Humidity Measurement",                        \
-    "Occupancy Sensing",                                    \
-    "Carbon Monoxide Concentration Measurement",            \
-    "Carbon Dioxide Concentration Measurement",             \
-    "Ethylene Concentration Measurement",                   \
-    "Ethylene Oxide Concentration Measurement",             \
-    "Hydrogen Concentration Measurement",                   \
-    "Hydrogen Sulphide Concentration Measurement",          \
-    "Nitric Oxide Concentration Measurement",               \
-    "Nitrogen Dioxide Concentration Measurement",           \
-    "Oxygen Concentration Measurement",                     \
-    "Ozone Concentration Measurement",                      \
-    "Sulfur Dioxide Concentration Measurement",             \
-    "Dissolved Oxygen Concentration Measurement",           \
-    "Bromate Concentration Measurement",                    \
-    "Chloramines Concentration Measurement",                \
-    "Chlorine Concentration Measurement",                   \
-    "Fecal coliform and E. Coli Concentration Measurement", \
-    "Fluoride Concentration Measurement",                   \
-    "Haloacetic Acids Concentration Measurement",           \
-    "Total Trihalomethanes Concentration Measurement",      \
-    "Total Coliform Bacteria Concentration Measurement",    \
-    "Turbidity Concentration Measurement",                  \
-    "Copper Concentration Measurement",                     \
-    "Lead Concentration Measurement",                       \
-    "Manganese Concentration Measurement",                  \
-    "Sulfate Concentration Measurement",                    \
-    "Bromodichloromethane Concentration Measurement",       \
-    "Bromoform Concentration Measurement",                  \
-    "Chlorodibromomethane Concentration Measurement",       \
-    "Chloroform Concentration Measurement",                 \
-    "Sodium Concentration Measurement",                     \
-    "IAS Zone",                                             \
-    "IAS ACE",                                              \
-    "IAS WD",                                               \
-    "Generic Tunnel",                                       \
-    "BACnet Protocol Tunnel",                               \
-    "11073 Protocol Tunnel",                                \
-    "ISO 7816 Protocol Tunnel",                             \
-    "Price",                                                \
-    "Demand Response and Load Control",                     \
-    "Simple Metering",                                      \
-    "Messaging",                                            \
-    "Tunneling",                                            \
-    "Prepayment",                                           \
-    "Energy Management",                                    \
-    "Calendar",                                             \
-    "Device Management",                                    \
-    "Events",                                               \
-    "MDU Pairing",                                          \
-    "Sub-GHz",                                              \
-    "Key Establishment",                                    \
-    "Information",                                          \
-    "Data Sharing",                                         \
-    "Gaming",                                               \
-    "Data Rate Control",                                    \
-    "Voice over ZigBee",                                    \
-    "Chatting",                                             \
-    "Payment",                                              \
-    "Billing",                                              \
-    "Appliance Identification",                             \
-    "Meter Identification",                                 \
-    "Appliance Events and Alert",                           \
-    "Appliance Statistics",                                 \
-    "Electrical Measurement",                               \
-    "Diagnostics",                                          \
-    "ZLL Commissioning",                                    \
-    "Sample Mfg Specific Cluster",                          \
-    "Configuration Cluster",                                \
-    "MFGLIB Cluster",                                       \
-    NULL                                                    \
-}
+#define EMBER_AF_PRINT_BITS                                                                                                        \
+    {                                                                                                                              \
+        0x15, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x9D, 0x12, 0x00, 0x00                                   \
+    }
+#define EMBER_AF_PRINT_NAMES                                                                                                       \
+    {                                                                                                                              \
+        "Core", "Debug", "Application", "Security", "Attributes", "Reporting", "Service discovery", "Registration",                \
+            "ZDO (ZigBee Device Object)", "Custom messages (1)", "Custom messages (2)", "Custom messages (3)", "Basic",            \
+            "Power Configuration", "Device Temperature Configuration", "Identify", "Groups", "Scenes", "On/off",                   \
+            "On/off Switch Configuration", "Level Control", "Alarms", "Time", "RSSI Location", "Binary Input (Basic)",             \
+            "Commissioning", "Partition", "Over the Air Bootloading", "Power Profile", "Appliance Control", "Poll Control",        \
+            "Green Power", "Keep-Alive", "Shade Configuration", "Door Lock", "Window Covering", "Barrier Control",                 \
+            "Pump Configuration and Control", "Thermostat", "Fan Control", "Dehumidification Control",                             \
+            "Thermostat User Interface Configuration", "Color Control", "Ballast Configuration", "Illuminance Measurement",        \
+            "Illuminance Level Sensing", "Temperature Measurement", "Pressure Measurement", "Flow Measurement",                    \
+            "Relative Humidity Measurement", "Occupancy Sensing", "Carbon Monoxide Concentration Measurement",                     \
+            "Carbon Dioxide Concentration Measurement", "Ethylene Concentration Measurement",                                      \
+            "Ethylene Oxide Concentration Measurement", "Hydrogen Concentration Measurement",                                      \
+            "Hydrogen Sulphide Concentration Measurement", "Nitric Oxide Concentration Measurement",                               \
+            "Nitrogen Dioxide Concentration Measurement", "Oxygen Concentration Measurement", "Ozone Concentration Measurement",   \
+            "Sulfur Dioxide Concentration Measurement", "Dissolved Oxygen Concentration Measurement",                              \
+            "Bromate Concentration Measurement", "Chloramines Concentration Measurement", "Chlorine Concentration Measurement",    \
+            "Fecal coliform and E. Coli Concentration Measurement", "Fluoride Concentration Measurement",                          \
+            "Haloacetic Acids Concentration Measurement", "Total Trihalomethanes Concentration Measurement",                       \
+            "Total Coliform Bacteria Concentration Measurement", "Turbidity Concentration Measurement",                            \
+            "Copper Concentration Measurement", "Lead Concentration Measurement", "Manganese Concentration Measurement",           \
+            "Sulfate Concentration Measurement", "Bromodichloromethane Concentration Measurement",                                 \
+            "Bromoform Concentration Measurement", "Chlorodibromomethane Concentration Measurement",                               \
+            "Chloroform Concentration Measurement", "Sodium Concentration Measurement", "IAS Zone", "IAS ACE", "IAS WD",           \
+            "Generic Tunnel", "BACnet Protocol Tunnel", "11073 Protocol Tunnel", "ISO 7816 Protocol Tunnel", "Price",              \
+            "Demand Response and Load Control", "Simple Metering", "Messaging", "Tunneling", "Prepayment", "Energy Management",    \
+            "Calendar", "Device Management", "Events", "MDU Pairing", "Sub-GHz", "Key Establishment", "Information",               \
+            "Data Sharing", "Gaming", "Data Rate Control", "Voice over ZigBee", "Chatting", "Payment", "Billing",                  \
+            "Appliance Identification", "Meter Identification", "Appliance Events and Alert", "Appliance Statistics",              \
+            "Electrical Measurement", "Diagnostics", "ZLL Commissioning", "Sample Mfg Specific Cluster", "Configuration Cluster",  \
+            "MFGLIB Cluster", NULL                                                                                                 \
+    }
 #define EMBER_AF_PRINT_NAME_NUMBER 119
 
 #define EMBER_AF_SUPPORT_COMMAND_DISCOVERY
@@ -1203,13 +1117,25 @@
 #define EMBER_AF_PLUGIN_GBCS_DEVICE_LOG
 // User options for plugin GBCS Device Log
 #define EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_DEVICE_LOG_SIZE 16
-#define EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_DEVICE1_EUI { 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
+#define EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_DEVICE1_EUI                                                                                \
+    {                                                                                                                              \
+        0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00                                                                             \
+    }
 #define EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_DEVICE1_TYPE GSME
-#define EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_DEVICE2_EUI { 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
+#define EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_DEVICE2_EUI                                                                                \
+    {                                                                                                                              \
+        0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00                                                                             \
+    }
 #define EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_DEVICE2_TYPE ESME
-#define EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_DEVICE3_EUI { 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
+#define EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_DEVICE3_EUI                                                                                \
+    {                                                                                                                              \
+        0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00                                                                             \
+    }
 #define EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_DEVICE3_TYPE GSME
-#define EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_DEVICE4_EUI { 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
+#define EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_DEVICE4_EUI                                                                                \
+    {                                                                                                                              \
+        0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00                                                                             \
+    }
 #define EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_DEVICE4_TYPE ESME
 
 // Use this macro to check if GBZ Message Controller plugin is included
@@ -1252,7 +1178,10 @@
 // User options for plugin Network Find
 #define EMBER_AF_PLUGIN_NETWORK_FIND_CHANNEL_MASK 0x0318C800
 #define EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_POWER 3
-#define EMBER_AF_PLUGIN_NETWORK_FIND_EXTENDED_PAN_ID { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
+#define EMBER_AF_PLUGIN_NETWORK_FIND_EXTENDED_PAN_ID                                                                               \
+    {                                                                                                                              \
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00                                                                             \
+    }
 #define EMBER_AF_PLUGIN_NETWORK_FIND_DURATION 5
 #define EMBER_AF_PLUGIN_NETWORK_FIND_JOINABLE_SCAN_TIMEOUT_MINUTES 1
 
@@ -1400,9 +1329,10 @@
 #ifdef EMBER_AF_SERIAL_PORT_INIT
 #undef EMBER_AF_SERIAL_PORT_INIT
 #endif
-#define EMBER_AF_SERIAL_PORT_INIT()                  \
-  do {                                               \
-    emberSerialInit(1, BAUD_115200, PARITY_NONE, 1); \
-  } while (0)
+#define EMBER_AF_SERIAL_PORT_INIT()                                                                                                \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        emberSerialInit(1, BAUD_115200, PARITY_NONE, 1);                                                                           \
+    } while (0)
 
 #endif // __APP_SE12COMMSHUB_H__

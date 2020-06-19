@@ -31,12 +31,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Routines for finding and joining any viable network via scanning, rather
- * than joining a specific network.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Routines for finding and joining any viable
+                                                                               *network via scanning, rather than joining a specific
+                                                                               *network.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef NETWORK_FIND_DOT_H_INCLUDED
 #define NETWORK_FIND_DOT_H_INCLUDED

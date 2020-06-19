@@ -31,17 +31,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Definitions for the Trust Center Network Key Update Broadcast plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Definitions for the Trust Center Network Key
+                                                                               *Update Broadcast plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 extern EmberEventControl emberAfPluginTrustCenterNwkKeyUpdateBroadcastMyEventControl;
 void emberAfPluginTrustCenterNwkKeyUpdateBroadcastMyEventHandler(void);
 
-#define TC_KEY_UPDATE_BROADCAST_EVENT \
-  { &emAfTcKeyUpdateBroadcastEvent, emAfTcKeyUpdateBroadcastEventHandler },
+#define TC_KEY_UPDATE_BROADCAST_EVENT { &emAfTcKeyUpdateBroadcastEvent, emAfTcKeyUpdateBroadcastEventHandler },
 
 #if defined(EMBER_AF_PLUGIN_TEST_HARNESS) || defined(EMBER_SCRIPTED_TEST)
 // For testing, we need to support a single application that can do
@@ -56,6 +56,6 @@ EmberStatus emberAfTrustCenterStartBroadcastNetworkKeyUpdate(void);
 // since the code then doesn't need to determine which plugin (unicast or
 // broadcast) is being used and thus which header it should inclued.
 #if !defined(EM_AF_TC_START_NETWORK_KEY_UPDATE_DECLARATION)
-  #define EM_AF_TC_START_NETWORK_KEY_UPDATE_DECLARATION
+#define EM_AF_TC_START_NETWORK_KEY_UPDATE_DECLARATION
 EmberStatus emberAfTrustCenterStartNetworkKeyUpdate(void);
 #endif

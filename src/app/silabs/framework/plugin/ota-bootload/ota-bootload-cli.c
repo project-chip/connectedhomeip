@@ -31,15 +31,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Bootload specific commands
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Bootload specific commands
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
-#include "app/util/serial/command-interpreter2.h"
 #include "app/framework/plugin/ota-common/ota.h"
+#include "app/util/serial/command-interpreter2.h"
 
 #include "hal/micro/bootloader-interface.h"
 
@@ -50,9 +50,8 @@ void printBootloaderInfoCommand(void);
 
 #ifndef EMBER_AF_GENERATE_CLI
 EmberCommandEntry emberAfPluginOtaBootloadCommands[] = {
-  emberCommandEntryAction("info", printBootloaderInfoCommand, "",
-                          "Print information about the installed bootloader."),
-  emberCommandEntryTerminator(),
+    emberCommandEntryAction("info", printBootloaderInfoCommand, "", "Print information about the installed bootloader."),
+    emberCommandEntryTerminator(),
 };
 #endif // EMBER_AF_GENERATE_CLI
 
@@ -61,28 +60,28 @@ EmberCommandEntry emberAfPluginOtaBootloadCommands[] = {
 void printBootloaderInfoCommand(void)
 {
 #if !defined(EZSP_HOST)
-  UNUSED BlExtendedType blExtendedType = halBootloaderGetInstalledType();
-  uint32_t getEmberVersion;
-  uint32_t customVersion;
-  uint8_t keyData[EMBER_ENCRYPTION_KEY_SIZE];
-  halGetExtendedBootloaderVersion(&getEmberVersion, &customVersion);
-  otaPrintln("Installed Type (Base):      0x%X", halBootloaderGetType());
-  otaPrintln("Installed Type (Extended):  0x%2X", blExtendedType);
-  otaPrintln("Bootloader Version:         0x%2X", halGetBootloaderVersion());
-  otaPrintln("Bootloader Version, Ember:  0x%4X", getEmberVersion);
-  otaPrintln("Bootloader Version, Custom: 0x%4X", customVersion);
+    UNUSED BlExtendedType blExtendedType = halBootloaderGetInstalledType();
+    uint32_t getEmberVersion;
+    uint32_t customVersion;
+    uint8_t keyData[EMBER_ENCRYPTION_KEY_SIZE];
+    halGetExtendedBootloaderVersion(&getEmberVersion, &customVersion);
+    otaPrintln("Installed Type (Base):      0x%X", halBootloaderGetType());
+    otaPrintln("Installed Type (Extended):  0x%2X", blExtendedType);
+    otaPrintln("Bootloader Version:         0x%2X", halGetBootloaderVersion());
+    otaPrintln("Bootloader Version, Ember:  0x%4X", getEmberVersion);
+    otaPrintln("Bootloader Version, Custom: 0x%4X", customVersion);
 
 #if defined(EMBER_TEST)
-  MEMSET(keyData, 0xFF, EMBER_ENCRYPTION_KEY_SIZE);
+    MEMSET(keyData, 0xFF, EMBER_ENCRYPTION_KEY_SIZE);
 #else
-  halCommonGetToken(keyData, TOKEN_MFG_SECURE_BOOTLOADER_KEY);
+    halCommonGetToken(keyData, TOKEN_MFG_SECURE_BOOTLOADER_KEY);
 #endif
 
-  otaPrint("Secure Bootloader Key:      ");
-  emberAfPrintZigbeeKey(keyData);
-  otaPrintln("");
+    otaPrint("Secure Bootloader Key:      ");
+    emberAfPrintZigbeeKey(keyData);
+    otaPrintln("");
 
 #else
-  otaPrintln("Unsupported on EZSP Host");
+    otaPrintln("Unsupported on EZSP Host");
 #endif
 }

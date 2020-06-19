@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // This callback file is created for your convenience. You may add application
 // code to this file. If you regenerate this file over a previous version, the
@@ -53,9 +53,7 @@
  *
  * @param success true if registration succeeded, false otherwise.  Ver.: always
  */
-void emberAfRegistrationCallback(bool success)
-{
-}
+void emberAfRegistrationCallback(bool success) {}
 
 /** @brief Price Acknowledgement
  *
@@ -86,12 +84,12 @@ void emberAfRegistrationCallback(bool success)
  *
  * @param price The price that has started.  Ver.: always
  */
-void emberAfPluginPriceClientPriceStartedCallback(EmberAfPluginPriceClientPrice *price)
+void emberAfPluginPriceClientPriceStartedCallback(EmberAfPluginPriceClientPrice * price)
 {
-  emberAfPriceClusterPrint("Price \"");
-  emberAfPriceClusterPrintString(price->rateLabel);
-  emberAfPriceClusterPrintln("\" (0x%4x) has started", price->issuerEventId);
-  emberAfPriceClusterFlush();
+    emberAfPriceClusterPrint("Price \"");
+    emberAfPriceClusterPrintString(price->rateLabel);
+    emberAfPriceClusterPrintln("\" (0x%4x) has started", price->issuerEventId);
+    emberAfPriceClusterFlush();
 }
 
 /** @brief Price Expired
@@ -101,12 +99,12 @@ void emberAfPluginPriceClientPriceStartedCallback(EmberAfPluginPriceClientPrice 
  *
  * @param price The price that has expired.  Ver.: always
  */
-void emberAfPluginPriceClientPriceExpiredCallback(EmberAfPluginPriceClientPrice *price)
+void emberAfPluginPriceClientPriceExpiredCallback(EmberAfPluginPriceClientPrice * price)
 {
-  emberAfPriceClusterPrint("Price \"");
-  emberAfPriceClusterPrintString(price->rateLabel);
-  emberAfPriceClusterPrintln("\" (0x%4x) has expired", price->issuerEventId);
-  emberAfPriceClusterFlush();
+    emberAfPriceClusterPrint("Price \"");
+    emberAfPriceClusterPrintString(price->rateLabel);
+    emberAfPriceClusterPrintln("\" (0x%4x) has expired", price->issuerEventId);
+    emberAfPriceClusterFlush();
 }
 
 /** @brief Trust Center Join
@@ -123,13 +121,9 @@ void emberAfPluginPriceClientPriceExpiredCallback(EmberAfPluginPriceClientPrice 
  * @param status   Ver.: always
  * @param decision   Ver.: always
  */
-void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId,
-                                    EmberEUI64 newNodeEui64,
-                                    EmberNodeId parentOfNewNode,
-                                    EmberDeviceUpdate status,
-                                    EmberJoinDecision decision)
-{
-}
+void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId, EmberEUI64 newNodeEui64, EmberNodeId parentOfNewNode,
+                                    EmberDeviceUpdate status, EmberJoinDecision decision)
+{}
 
 /** @brief Button Event
  *
@@ -142,10 +136,7 @@ void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId,
  * @param buttonPressDurationMs The length of time button was held down before
  * it was released.  Ver.: always
  */
-void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
-                                                   uint32_t buttonPressDurationMs)
-{
-}
+void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber, uint32_t buttonPressDurationMs) {}
 
 /** @brief Broadcast Sent
  *
@@ -153,9 +144,7 @@ void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
  * by the concentrator plugin.
  *
  */
-void emberAfPluginConcentratorBroadcastSentCallback(void)
-{
-}
+void emberAfPluginConcentratorBroadcastSentCallback(void) {}
 
 /** @brief Pre Message Received
  *
@@ -167,11 +156,9 @@ void emberAfPluginConcentratorBroadcastSentCallback(void)
  * @param msgLen   Ver.: always
  * @param message   Ver.: always
  */
-bool emberAfPluginInterpanPreMessageReceivedCallback(const EmberAfInterpanHeader * header,
-                                                     uint8_t msgLen,
-                                                     uint8_t * message)
+bool emberAfPluginInterpanPreMessageReceivedCallback(const EmberAfInterpanHeader * header, uint8_t msgLen, uint8_t * message)
 {
-  return false;
+    return false;
 }
 
 /** @brief Finished
@@ -182,9 +169,7 @@ bool emberAfPluginInterpanPreMessageReceivedCallback(const EmberAfInterpanHeader
  *
  * @param status   Ver.: always
  */
-void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
-{
-}
+void emberAfPluginNetworkFindFinishedCallback(EmberStatus status) {}
 
 /** @brief Get Radio Power For Channel
  *
@@ -196,7 +181,7 @@ void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
  */
 int8_t emberAfPluginNetworkFindGetRadioPowerForChannelCallback(uint8_t channel)
 {
-  return EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_POWER;
+    return EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_POWER;
 }
 
 /** @brief Join
@@ -211,11 +196,9 @@ int8_t emberAfPluginNetworkFindGetRadioPowerForChannelCallback(uint8_t channel)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound,
-                                          uint8_t lqi,
-                                          int8_t rssi)
+bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }
 
 /** @brief Request Mirror Response
@@ -226,13 +209,16 @@ bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound,
  */
 bool emberAfSimpleMeteringClusterRequestMirrorResponseCallback(uint16_t endpointId)
 {
-  if (endpointId == 0xffff) {
-    emberAfCorePrintln("%padd FAILED", "Mirror ");
-  } else {
-    emberAfCorePrintln("%pADDED on %x", "Mirror ", endpointId);
-  }
-  emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-  return true;
+    if (endpointId == 0xffff)
+    {
+        emberAfCorePrintln("%padd FAILED", "Mirror ");
+    }
+    else
+    {
+        emberAfCorePrintln("%pADDED on %x", "Mirror ", endpointId);
+    }
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
 }
 
 /** @brief Mirror Removed
@@ -243,13 +229,16 @@ bool emberAfSimpleMeteringClusterRequestMirrorResponseCallback(uint16_t endpoint
  */
 bool emberAfSimpleMeteringClusterMirrorRemovedCallback(uint16_t endpointId)
 {
-  if (endpointId == 0xffff) {
-    emberAfCorePrintln("%premove FAILED", "Mirror ");
-  } else {
-    emberAfCorePrintln("%pREMOVED from %x", "Mirror ", endpointId);
-  }
-  emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-  return true;
+    if (endpointId == 0xffff)
+    {
+        emberAfCorePrintln("%premove FAILED", "Mirror ");
+    }
+    else
+    {
+        emberAfCorePrintln("%pREMOVED from %x", "Mirror ", endpointId);
+    }
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
 }
 
 /** @brief Process Notification Flags
@@ -261,30 +250,32 @@ bool emberAfSimpleMeteringClusterMirrorRemovedCallback(uint16_t endpointId)
  * @param attributeId   Ver.: always
  * @param attributeValue   Ver.: always
  */
-void emberAfPluginSimpleMeteringServerProcessNotificationFlagsCallback(uint16_t attributeId,
-                                                                       uint32_t attributeValue)
+void emberAfPluginSimpleMeteringServerProcessNotificationFlagsCallback(uint16_t attributeId, uint32_t attributeValue)
 {
-  if (attributeId == ZCL_FUNCTIONAL_NOTIFICATION_FLAGS_ATTRIBUTE_ID) {
-    if (attributeValue & 0x00000004) {
-      uint16_t attributeIds = ZCL_IDENTIFY_TIME_ATTRIBUTE_ID;
-      emberAfSimpleMeteringClusterPrintln("Time cluster info");
-      emberAfFillCommandGlobalClientToServerReadAttributes(ZCL_TIME_CLUSTER_ID,
-                                                           &attributeIds,
-                                                           sizeof(attributeIds));
-      emberAfSendResponse();
+    if (attributeId == ZCL_FUNCTIONAL_NOTIFICATION_FLAGS_ATTRIBUTE_ID)
+    {
+        if (attributeValue & 0x00000004)
+        {
+            uint16_t attributeIds = ZCL_IDENTIFY_TIME_ATTRIBUTE_ID;
+            emberAfSimpleMeteringClusterPrintln("Time cluster info");
+            emberAfFillCommandGlobalClientToServerReadAttributes(ZCL_TIME_CLUSTER_ID, &attributeIds, sizeof(attributeIds));
+            emberAfSendResponse();
+        }
+        if (attributeValue & 0x00040000)
+        {
+            emberAfFillCommandSimpleMeteringClusterGetNotifiedMessage(0x01, ZCL_FUNCTIONAL_NOTIFICATION_FLAGS_ATTRIBUTE_ID,
+                                                                      0x00040000);
+            emberAfSendResponse();
+        }
     }
-    if (attributeValue & 0x00040000) {
-      emberAfFillCommandSimpleMeteringClusterGetNotifiedMessage(0x01,
-                                                                ZCL_FUNCTIONAL_NOTIFICATION_FLAGS_ATTRIBUTE_ID,
-                                                                0x00040000);
-      emberAfSendResponse();
+    else if (attributeId == ZCL_NOTIFICATION_FLAGS_2_ATTRIBUTE_ID)
+    {
+        if (attributeValue & 0x00000001)
+        {
+            emberAfFillCommandPriceClusterGetCurrentPrice(0x00);
+            emberAfSendResponse();
+        }
     }
-  } else if (attributeId == ZCL_NOTIFICATION_FLAGS_2_ATTRIBUTE_ID) {
-    if (attributeValue & 0x00000001) {
-      emberAfFillCommandPriceClusterGetCurrentPrice(0x00);
-      emberAfSendResponse();
-    }
-  }
 }
 
 /** @brief Simple Metering Cluster Get Notified Message
@@ -295,23 +286,20 @@ void emberAfPluginSimpleMeteringServerProcessNotificationFlagsCallback(uint16_t 
  * @param notificationFlagAttributeId   Ver.: always
  * @param notificationFlagsN   Ver.: always
  */
-bool emberAfSimpleMeteringClusterGetNotifiedMessageCallback(uint8_t notificationScheme,
-                                                            uint16_t notificationFlagAttributeId,
+bool emberAfSimpleMeteringClusterGetNotifiedMessageCallback(uint8_t notificationScheme, uint16_t notificationFlagAttributeId,
                                                             uint32_t notificationFlagsN)
 {
-  if (notificationScheme == 0x01) {
-    if (notificationFlagAttributeId == ZCL_FUNCTIONAL_NOTIFICATION_FLAGS_ATTRIBUTE_ID) {
-      if (notificationFlagsN & 0x00040000) {
-        //Send a change supply command.
-        emberAfFillCommandSimpleMeteringClusterChangeSupply(0x44556677,
-                                                            0x12345678,
-                                                            0x00000000,
-                                                            0x00000000,
-                                                            0x02,
-                                                            0x00);
-        emberAfSendResponse();
-      }
+    if (notificationScheme == 0x01)
+    {
+        if (notificationFlagAttributeId == ZCL_FUNCTIONAL_NOTIFICATION_FLAGS_ATTRIBUTE_ID)
+        {
+            if (notificationFlagsN & 0x00040000)
+            {
+                // Send a change supply command.
+                emberAfFillCommandSimpleMeteringClusterChangeSupply(0x44556677, 0x12345678, 0x00000000, 0x00000000, 0x02, 0x00);
+                emberAfSendResponse();
+            }
+        }
     }
-  }
-  return true;
+    return true;
 }

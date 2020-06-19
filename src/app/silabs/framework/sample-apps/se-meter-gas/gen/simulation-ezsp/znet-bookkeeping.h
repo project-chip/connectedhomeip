@@ -49,15 +49,16 @@ void emAfTick(void);
 
 void emAfResetAttributes(uint8_t endpointId);
 
-bool emAfPreCommandReceived(EmberAfClusterCommand* cmd);
+bool emAfPreCommandReceived(EmberAfClusterCommand * cmd);
 
-bool emAfPreZDOMessageReceived(EmberNodeId emberNodeId, EmberApsFrame* apsFrame, uint8_t* message, uint16_t length);
+bool emAfPreZDOMessageReceived(EmberNodeId emberNodeId, EmberApsFrame * apsFrame, uint8_t * message, uint16_t length);
 
-bool emAfRetrieveAttributeAndCraftResponse(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attrId, uint8_t mask, uint16_t maunfacturerCode, uint16_t readLength);
+bool emAfRetrieveAttributeAndCraftResponse(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attrId, uint8_t mask,
+                                           uint16_t maunfacturerCode, uint16_t readLength);
 
 void emAfZigbeeKeyEstablishment(EmberEUI64 partner, EmberKeyStatus status);
 
-bool emAfReadAttributesResponse(EmberAfClusterId clusterId, uint8_t* buffer, uint16_t bufLen);
+bool emAfReadAttributesResponse(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 
 bool emAfReportAttributes(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 

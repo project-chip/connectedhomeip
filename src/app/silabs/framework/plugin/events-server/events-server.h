@@ -31,34 +31,36 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the Events Server plugin, which implements the
- *        server side of the Events cluster.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the Events Server
+                                                                               *plugin, which implements the server side of the
+                                                                               *Events cluster.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
-typedef struct {
-  uint16_t eventId;
-  uint32_t eventTime;
-  uint8_t eventData[EMBER_AF_PLUGIN_EVENTS_SERVER_EVENT_DATA_LENGTH + 1];
+typedef struct
+{
+    uint16_t eventId;
+    uint32_t eventTime;
+    uint8_t eventData[EMBER_AF_PLUGIN_EVENTS_SERVER_EVENT_DATA_LENGTH + 1];
 } EmberAfEvent;
 
 #define ZCL_EVENTS_INVALID_INDEX 0xFF
 
 #if defined(EMBER_AF_PLUGIN_GAS_PROXY_FUNCTION)
 // GBCS Alert Codes
-#define GBCS_ALERT_BILLING_DATA_LOG_UPDATED       (0x800A)
-#define GBCS_EVENT_ID_UNAUTHD_COMM_ACC_ATT        (0x803E)
-#define GBCS_EVENT_ID_EVENT_LOG_CLEARED           (0x8052)
-#define GBCS_EVENT_ID_FAILED_AUTH                 (0x8053)
-#define GBCS_EVENT_ID_IMM_HAN_CMD_RXED_ACTED      (0x8054)
-#define GBCS_EVENT_ID_IMM_HAN_CMD_RXED_NOT_ACTED  (0x8055)
-#define GBCS_EVENT_ID_FUT_HAN_CMD_ACTED           (0x8066)
-#define GBCS_EVENT_ID_FUT_HAN_CMD_NOT_ACTED       (0x8067)
-#define GBCS_EVENT_ID_GPF_DEVICE_LOG_CHGD         (0x8071)
-#define GBCS_EVENT_ID_GSME_CMD_NOT_RETRVD         (0x809D)
-#define GBCS_EVENT_LOG_ID_GSME_EVENT_LOG          (0x6)
+#define GBCS_ALERT_BILLING_DATA_LOG_UPDATED (0x800A)
+#define GBCS_EVENT_ID_UNAUTHD_COMM_ACC_ATT (0x803E)
+#define GBCS_EVENT_ID_EVENT_LOG_CLEARED (0x8052)
+#define GBCS_EVENT_ID_FAILED_AUTH (0x8053)
+#define GBCS_EVENT_ID_IMM_HAN_CMD_RXED_ACTED (0x8054)
+#define GBCS_EVENT_ID_IMM_HAN_CMD_RXED_NOT_ACTED (0x8055)
+#define GBCS_EVENT_ID_FUT_HAN_CMD_ACTED (0x8066)
+#define GBCS_EVENT_ID_FUT_HAN_CMD_NOT_ACTED (0x8067)
+#define GBCS_EVENT_ID_GPF_DEVICE_LOG_CHGD (0x8071)
+#define GBCS_EVENT_ID_GSME_CMD_NOT_RETRVD (0x809D)
+#define GBCS_EVENT_LOG_ID_GSME_EVENT_LOG (0x6)
 #define GBCS_EVENT_LOG_ID_GSME_SECURITY_EVENT_LOG (0x7)
 #endif
 
@@ -69,8 +71,7 @@ typedef struct {
  * @param logId The log to be cleared.
  * @return True if the log was successfully cleared or false if logId is invalid.
  **/
-bool emberAfEventsServerClearEventLog(uint8_t endpoint,
-                                      EmberAfEventLogId logId);
+bool emberAfEventsServerClearEventLog(uint8_t endpoint, EmberAfEventLogId logId);
 
 /**
  * @brief Prints all events in the specified event log.
@@ -78,15 +79,14 @@ bool emberAfEventsServerClearEventLog(uint8_t endpoint,
  * @param endpoint The endpoint for which the event log will be printed.
  * @param logId The log to be printed.
  **/
-void emberAfEventsServerPrintEventLog(uint8_t endpoint,
-                                      EmberAfEventLogId logId);
+void emberAfEventsServerPrintEventLog(uint8_t endpoint, EmberAfEventLogId logId);
 
 /**
  * @brief Prints an event.
  *
  * @param event The event to print.
  **/
-void emberAfEventsServerPrintEvent(const EmberAfEvent *event);
+void emberAfEventsServerPrintEvent(const EmberAfEvent * event);
 
 /**
  * @brief Gets an event from the specified event log.
@@ -100,10 +100,7 @@ void emberAfEventsServerPrintEvent(const EmberAfEvent *event);
  * @param event The ::EmberAfEvent structure describing the event.
  * @return True if the event was found or false if the index is invalid.
  */
-bool emberAfEventsServerGetEvent(uint8_t endpoint,
-                                 EmberAfEventLogId logId,
-                                 uint8_t index,
-                                 EmberAfEvent *event);
+bool emberAfEventsServerGetEvent(uint8_t endpoint, EmberAfEventLogId logId, uint8_t index, EmberAfEvent * event);
 
 /**
  * @brief Stores an event in the specified event log.
@@ -118,10 +115,7 @@ bool emberAfEventsServerGetEvent(uint8_t endpoint,
  * If NULL, the event is removed from the server.
  * @return True if the event was set or removed or false if the index is invalid.
  */
-bool emberAfEventsServerSetEvent(uint8_t endpoint,
-                                 EmberAfEventLogId logId,
-                                 uint8_t index,
-                                 const EmberAfEvent *event);
+bool emberAfEventsServerSetEvent(uint8_t endpoint, EmberAfEventLogId logId, uint8_t index, const EmberAfEvent * event);
 
 /**
  * @brief Adds an event to the specified event log.
@@ -136,9 +130,7 @@ bool emberAfEventsServerSetEvent(uint8_t endpoint,
  * @return the index of the location in the log where the event was added or
  * ZCL_EVENTS_INVALID_INDEX if the specified event log is full.
  */
-uint8_t emberAfEventsServerAddEvent(uint8_t endpoint,
-                                    EmberAfEventLogId logId,
-                                    const EmberAfEvent *event);
+uint8_t emberAfEventsServerAddEvent(uint8_t endpoint, EmberAfEventLogId logId, const EmberAfEvent * event);
 
 /**
  * @brief Publishes an event.
@@ -155,9 +147,5 @@ uint8_t emberAfEventsServerAddEvent(uint8_t endpoint,
  * @param eventControl Actions to be taken regarding this event. For example,
  * Report event to HAN and/or Report event to WAN.
  **/
-void emberAfEventsServerPublishEventMessage(EmberNodeId nodeId,
-                                            uint8_t srcEndpoint,
-                                            uint8_t dstEndpoint,
-                                            EmberAfEventLogId logId,
-                                            uint8_t index,
-                                            uint8_t eventControl);
+void emberAfEventsServerPublishEventMessage(EmberNodeId nodeId, uint8_t srcEndpoint, uint8_t dstEndpoint, EmberAfEventLogId logId,
+                                            uint8_t index, uint8_t eventControl);

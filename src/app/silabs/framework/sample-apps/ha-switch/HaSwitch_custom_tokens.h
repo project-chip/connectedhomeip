@@ -31,22 +31,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // Copyright 2007 - 2011 by Ember Corporation. All rights reserved.
 //
 // This file contains customized application tokens
 
 // Identifier tags for tokens
-#define CREATOR_HALIGHT_NODE      0x1111
-#define CREATOR_HALIGHT_ENDPOINT  0x1112
+#define CREATOR_HALIGHT_NODE 0x1111
+#define CREATOR_HALIGHT_ENDPOINT 0x1112
 
-#define NVM3KEY_HALIGHT_NODE      (NVM3KEY_DOMAIN_USER | 0x1111)
-#define NVM3KEY_HALIGHT_ENDPOINT  (NVM3KEY_DOMAIN_USER | 0x1112)
+#define NVM3KEY_HALIGHT_NODE (NVM3KEY_DOMAIN_USER | 0x1111)
+#define NVM3KEY_HALIGHT_ENDPOINT (NVM3KEY_DOMAIN_USER | 0x1112)
 
 // Types for the tokens
 #ifdef DEFINETYPES

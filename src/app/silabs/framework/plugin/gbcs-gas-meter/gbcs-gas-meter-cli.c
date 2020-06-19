@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief CLI for the GBCS Gas Meter plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief CLI for the GBCS Gas Meter plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
 #include "gbcs-gas-meter.h"
@@ -43,5 +43,5 @@
 // plugin gbcs-gas-meter report-attributes
 void emAfPluginGbcsGasMeterCliReportAttributes(void)
 {
-  emberAfPluginGbcsGasMeterReportAttributes();
+    emberAfPluginGbcsGasMeterReportAttributes();
 }

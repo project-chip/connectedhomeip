@@ -31,37 +31,40 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the Device Table plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the Device Table
+                                                                               *plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_DEVICE_TABLE_H
 #define SILABS_DEVICE_TABLE_H
 
 typedef uint8_t EmberAfPluginDeviceTableDeviceState;
 
-enum {
-  EMBER_AF_PLUGIN_DEVICE_TABLE_STATE_NULL         = 0x00,
-  EMBER_AF_PLUGIN_DEVICE_TABLE_STATE_JOINED       = 0x10,
-  EMBER_AF_PLUGIN_DEVICE_TABLE_STATE_UNRESPONSIVE = 0x11,
-  EMBER_AF_PLUGIN_DEVICE_TABLE_STATE_LEAVE_SENT   = 0x20,
-  EMBER_AF_PLUGIN_DEVICE_TABLE_STATE_LEFT         = 0x30,
-  EMBER_AF_PLUGIN_DEVICE_TABLE_STATE_UNKNOWN      = 0xff
+enum
+{
+    EMBER_AF_PLUGIN_DEVICE_TABLE_STATE_NULL         = 0x00,
+    EMBER_AF_PLUGIN_DEVICE_TABLE_STATE_JOINED       = 0x10,
+    EMBER_AF_PLUGIN_DEVICE_TABLE_STATE_UNRESPONSIVE = 0x11,
+    EMBER_AF_PLUGIN_DEVICE_TABLE_STATE_LEAVE_SENT   = 0x20,
+    EMBER_AF_PLUGIN_DEVICE_TABLE_STATE_LEFT         = 0x30,
+    EMBER_AF_PLUGIN_DEVICE_TABLE_STATE_UNKNOWN      = 0xff
 };
 
 #define EMBER_AF_PLUGIN_DEVICE_TABLE_CLUSTER_SIZE 20
 
-typedef struct {
-  uint8_t     endpoint;
-  uint16_t    deviceId;
-  uint32_t    lastMsgTimestamp;
-  EmberNodeId nodeId;
-  EmberEUI64  eui64;
-  EmberAfPluginDeviceTableDeviceState state;
-  uint16_t clusterIds[EMBER_AF_PLUGIN_DEVICE_TABLE_CLUSTER_SIZE];
-  uint8_t clusterOutStartPosition;
+typedef struct
+{
+    uint8_t endpoint;
+    uint16_t deviceId;
+    uint32_t lastMsgTimestamp;
+    EmberNodeId nodeId;
+    EmberEUI64 eui64;
+    EmberAfPluginDeviceTableDeviceState state;
+    uint16_t clusterIds[EMBER_AF_PLUGIN_DEVICE_TABLE_CLUSTER_SIZE];
+    uint8_t clusterOutStartPosition;
 } EmberAfPluginDeviceTableEntry;
 
 #define EMBER_AF_PLUGIN_DEVICE_TABLE_DEVICE_TABLE_SIZE 250
@@ -95,8 +98,7 @@ void emberAfDeviceTableSend(EmberEUI64 eui64, uint8_t endpoint);
  * @param index  The index of the device to which to send the command.
  * @param endpoint The endpoint of the device to which to send the command.
  */
-void emberAfDeviceTableCliIndexSendWithEndpoint(uint16_t index,
-                                                uint8_t endpoint);
+void emberAfDeviceTableCliIndexSendWithEndpoint(uint16_t index, uint8_t endpoint);
 
 /** @brief Sends an internally-generated command.
  *
@@ -119,8 +121,7 @@ void emberAfDeviceTableCommandIndexSend(uint16_t index);
  * @param eui64  EUI64 of the device to which to send the command.
  * @param endpoint  The endpoint of the device to which to send the command.
  */
-void emberAfDeviceTableCommandSendWithEndpoint(EmberEUI64 eui64,
-                                               uint8_t endpoint);
+void emberAfDeviceTableCommandSendWithEndpoint(EmberEUI64 eui64, uint8_t endpoint);
 
 /** @brief Sends an internally-generated command.
  *
@@ -132,8 +133,7 @@ void emberAfDeviceTableCommandSendWithEndpoint(EmberEUI64 eui64,
  * @param index  The index of the device to which to send the command.
  * @param endpoint  The endpoint of the device to which to send the command.
  */
-void emberAfDeviceTableCommandIndexSendWithEndpoint(uint16_t index,
-                                                    uint8_t endpoint);
+void emberAfDeviceTableCommandIndexSendWithEndpoint(uint16_t index, uint8_t endpoint);
 
 /** @brief Computes the EUI64 from the node ID in the device table.
  *
@@ -145,8 +145,7 @@ void emberAfDeviceTableCommandIndexSendWithEndpoint(uint16_t index,
  *
  * @return bool  True if an EUI can be found, false if not.
  */
-bool emberAfDeviceTableGetEui64FromNodeId(EmberNodeId emberNodeId,
-                                          EmberEUI64 eui64);
+bool emberAfDeviceTableGetEui64FromNodeId(EmberNodeId emberNodeId, EmberEUI64 eui64);
 
 /** @brief Computes the node ID from the device table index.
  *
@@ -169,8 +168,7 @@ uint16_t emberAfDeviceTableGetNodeIdFromIndex(uint16_t index);
  *
  * @return  The index of the device.
  */
-uint16_t emberAfDeviceTableGetEndpointFromNodeIdAndEndpoint(EmberNodeId emberNodeId,
-                                                            uint8_t endpoint);
+uint16_t emberAfDeviceTableGetEndpointFromNodeIdAndEndpoint(EmberNodeId emberNodeId, uint8_t endpoint);
 
 /** @brief Finds the index based on the node ID.
  *
@@ -201,8 +199,7 @@ uint16_t emberAfDeviceTableGetFirstIndexFromEui64(EmberEUI64 eui64);
  *
  * @return  Index that matches the EUI64
  */
-uint16_t emberAfDeviceTableGetIndexFromEui64AndEndpoint(EmberEUI64 eui64,
-                                                        uint8_t endpoint);
+uint16_t emberAfDeviceTableGetIndexFromEui64AndEndpoint(EmberEUI64 eui64, uint8_t endpoint);
 
 /** @brief Finds the node ID based on the EUI64.
  *
@@ -225,10 +222,7 @@ uint16_t emberAfDeviceTableGetNodeIdFromEui64(EmberEUI64 eui64);
  * @param profileId  The profile ID of the last outgoing message.
  * @param clusterId  The cluster ID of the last outgoing message.
  */
-void emberAfPluginDeviceTableMessageSentStatus(EmberNodeId nodeId,
-                                               EmberStatus status,
-                                               uint16_t profileId,
-                                               uint16_t clusterId);
+void emberAfPluginDeviceTableMessageSentStatus(EmberNodeId nodeId, EmberStatus status, uint16_t profileId, uint16_t clusterId);
 
 /** @brief Sends a leave message to a device based on the index.
  *
@@ -268,7 +262,7 @@ void emberAfPluginDeviceTableInitiateRouteRepair(EmberNodeId nodeId);
  *
  * @return  A pointer to the device table structure.
  */
-EmberAfPluginDeviceTableEntry* emberAfDeviceTablePointer(void);
+EmberAfPluginDeviceTableEntry * emberAfDeviceTablePointer(void);
 
 /** @brief Returns a pointer to the device table entry.
  *
@@ -278,7 +272,7 @@ EmberAfPluginDeviceTableEntry* emberAfDeviceTablePointer(void);
  *
  * @return  A pointer to the device table entry.
  */
-EmberAfPluginDeviceTableEntry* emberAfDeviceTableFindDeviceTableEntry(uint16_t index);
+EmberAfPluginDeviceTableEntry * emberAfDeviceTableFindDeviceTableEntry(uint16_t index);
 
 /** @brief Informs the device table that a new device joined.
  *
@@ -293,8 +287,7 @@ EmberAfPluginDeviceTableEntry* emberAfDeviceTableFindDeviceTableEntry(uint16_t i
  *
  * @param newNodeEui64  The EUI64 of the newly joined device.
  */
-void emberAfDeviceTableNewDeviceJoinHandler(EmberNodeId newNodeId,
-                                            EmberEUI64 newNodeEui64);
+void emberAfDeviceTableNewDeviceJoinHandler(EmberNodeId newNodeId, EmberEUI64 newNodeEui64);
 
 /** @brief Calculates time since the device heard the last message.
  *

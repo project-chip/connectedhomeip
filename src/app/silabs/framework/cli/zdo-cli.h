@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief CLI commands for sending ZDO messages.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief CLI commands for sending ZDO messages.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_ZDO_CLI_H
 #define SILABS_ZDO_CLI_H
@@ -43,14 +43,13 @@
 extern EmberCommandEntry zdoCommands[];
 
 #if defined(EMBER_TEST) && !defined(EMBER_AF_ENABLE_TX_ZDO)
-  #define EMBER_AF_ENABLE_TX_ZDO
+#define EMBER_AF_ENABLE_TX_ZDO
 #endif
 
 #ifdef EMBER_AF_ENABLE_TX_ZDO
-  #define ZDO_COMMANDS \
-  { "zdo", NULL, (const char *)zdoCommands },
+#define ZDO_COMMANDS { "zdo", NULL, (const char *) zdoCommands },
 #else
-  #define ZDO_COMMANDS
+#define ZDO_COMMANDS
 #endif
 
 #endif // SILABS_ZDO_CLI_H

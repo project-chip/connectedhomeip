@@ -31,16 +31,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief CLI for the Device Query Service plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief CLI for the Device Query Service plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
-#include "app/framework/util/af-main.h"
-#include "app/framework/plugin/device-query-service/device-query-service.h"
 #include "app/framework/plugin/device-database/device-database.h"
+#include "app/framework/plugin/device-query-service/device-query-service.h"
+#include "app/framework/util/af-main.h"
 
 //============================================================================
 // Globals
@@ -52,21 +52,18 @@
 
 void emAfPluginDeviceQueryServiceEnableDisableCommand(void)
 {
-  emberAfPluginDeviceQueryServiceEnableDisable(emberCommandName()[0] == 'e');
+    emberAfPluginDeviceQueryServiceEnableDisable(emberCommandName()[0] == 'e');
 }
 
 void emAfPluginDeviceQueryServiceStatusCommand(void)
 {
-  EmberEUI64 currentEui64;
-  bool enabled = emberAfPluginDeviceQueryServiceGetEnabledState();
-  emberAfPluginDeviceQueryServiceGetCurrentDiscoveryTargetEui64(currentEui64);
-  emberAfCorePrintln("Enabled: %p", enabled ? "yes" : "no");
-  emberAfCorePrint("Current Discovery Target: ");
-  emberAfPrintBigEndianEui64(currentEui64);
-  emberAfCorePrintln("");
-  const EmberAfDeviceInfo* device = emberAfPluginDeviceDatabaseFindDeviceByEui64(currentEui64);
-  emberAfCorePrintln("Status: %p",
-                     (device == NULL
-                      ? ""
-                      : emberAfPluginDeviceDatabaseGetStatusString(device->status)));
+    EmberEUI64 currentEui64;
+    bool enabled = emberAfPluginDeviceQueryServiceGetEnabledState();
+    emberAfPluginDeviceQueryServiceGetCurrentDiscoveryTargetEui64(currentEui64);
+    emberAfCorePrintln("Enabled: %p", enabled ? "yes" : "no");
+    emberAfCorePrint("Current Discovery Target: ");
+    emberAfPrintBigEndianEui64(currentEui64);
+    emberAfCorePrintln("");
+    const EmberAfDeviceInfo * device = emberAfPluginDeviceDatabaseFindDeviceByEui64(currentEui64);
+    emberAfCorePrintln("Status: %p", (device == NULL ? "" : emberAfPluginDeviceDatabaseGetStatusString(device->status)));
 }

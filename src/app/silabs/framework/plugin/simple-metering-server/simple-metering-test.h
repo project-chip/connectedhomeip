@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Test code for the Simple Metering Server plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Test code for the Simple Metering Server
+                                                                               *plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 void emAfTestMeterTick(uint8_t endpoint);
 void emAfTestMeterInit(uint8_t endpoint);
@@ -49,7 +50,8 @@ void emAfTestMeterInit(uint8_t endpoint);
 #define PROFILE_INTERVAL_PERIOD_IN_SECONDS (PROFILE_INTERVAL_PERIOD_IN_MINUTES * 60)
 #define PROFILE_INTERVAL_PERIOD_IN_MILLISECONDS ((PROFILE_INTERVAL_PERIOD_IN_MINUTES * 60) * 1000)
 #define MAX_PROFILE_INDEX (EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER_TEST_METER_PROFILES - 1)
-#define TOTAL_PROFILE_TIME_SPAN_IN_SECONDS (EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER_TEST_METER_PROFILES * (PROFILE_INTERVAL_PERIOD_IN_MINUTES * 60))
+#define TOTAL_PROFILE_TIME_SPAN_IN_SECONDS                                                                                         \
+    (EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER_TEST_METER_PROFILES * (PROFILE_INTERVAL_PERIOD_IN_MINUTES * 60))
 
 void afTestMeterPrint(void);
 void afTestMeterSetConsumptionRate(uint16_t rate, uint8_t endpoint);
@@ -67,13 +69,9 @@ void afTestMeterRandomError(uint8_t changeIn256);
 
 void afTestMeterEnableProfiles(uint8_t enable);
 
-bool emAfTestMeterGetProfiles(uint8_t intervalChannel,
-                              uint32_t endTime,
-                              uint8_t numberOfPeriods);
+bool emAfTestMeterGetProfiles(uint8_t intervalChannel, uint32_t endTime, uint8_t numberOfPeriods);
 #else
 
-bool emAfTestMeterGetProfiles(uint8_t intervalChannel,
-                              uint32_t endTime,
-                              uint8_t numberOfPeriods);
+bool emAfTestMeterGetProfiles(uint8_t intervalChannel, uint32_t endTime, uint8_t numberOfPeriods);
 
 #endif

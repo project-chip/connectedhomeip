@@ -31,22 +31,24 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the OTA Storage POSIX Filesystem plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the OTA Storage POSIX
+                                                                               *Filesystem plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
-typedef void (EmAfOtaStorageFileAddedHandler)(const EmberAfOtaHeader*);
+typedef void(EmAfOtaStorageFileAddedHandler)(const EmberAfOtaHeader *);
 
-typedef struct {
-  bool memoryDebug;
-  bool fileDebug;
-  bool fieldDebug;
-  bool ignoreFilesWithUnderscorePrefix;
-  bool printFileDiscoveryOrRemoval;
-  EmAfOtaStorageFileAddedHandler* fileAddedHandler;
+typedef struct
+{
+    bool memoryDebug;
+    bool fileDebug;
+    bool fieldDebug;
+    bool ignoreFilesWithUnderscorePrefix;
+    bool printFileDiscoveryOrRemoval;
+    EmAfOtaStorageFileAddedHandler * fileAddedHandler;
 } EmAfOtaStorageLinuxConfig;
 
-void emAfOtaStorageGetConfig(EmAfOtaStorageLinuxConfig* currentConfig);
-void emAfOtaStorageSetConfig(const EmAfOtaStorageLinuxConfig* newConfig);
+void emAfOtaStorageGetConfig(EmAfOtaStorageLinuxConfig * currentConfig);
+void emAfOtaStorageSetConfig(const EmAfOtaStorageLinuxConfig * newConfig);

@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // Copyright 2014 Silicon Laboratories, Inc.
 //
@@ -54,25 +54,30 @@ extern uint8_t emSetNwkUpdateId(uint8_t id);
 // Event control struct declaration
 EmberEventControl identifyEventControl;
 
-static bool onOff = false;
+static bool onOff                  = false;
 static uint32_t identifyDurationMs = 0; // milliseconds
 #define DEFAULT_IDENTIFY_DURATION_MS (3 * MILLISECOND_TICKS_PER_SECOND)
 
 void identifyEventHandler(void)
 {
-  if (identifyDurationMs == 0) {
-    onOff ? halSetLed(BOARDLED1) : halClearLed(BOARDLED1);
-    emberEventControlSetInactive(identifyEventControl);
-  } else {
-    halToggleLed(BOARDLED1);
-    if (identifyDurationMs >= MILLISECOND_TICKS_PER_QUARTERSECOND) {
-      identifyDurationMs -= MILLISECOND_TICKS_PER_QUARTERSECOND;
-    } else {
-      identifyDurationMs = 0;
+    if (identifyDurationMs == 0)
+    {
+        onOff ? halSetLed(BOARDLED1) : halClearLed(BOARDLED1);
+        emberEventControlSetInactive(identifyEventControl);
     }
-    emberEventControlSetDelayMS(identifyEventControl,
-                                MILLISECOND_TICKS_PER_QUARTERSECOND);
-  }
+    else
+    {
+        halToggleLed(BOARDLED1);
+        if (identifyDurationMs >= MILLISECOND_TICKS_PER_QUARTERSECOND)
+        {
+            identifyDurationMs -= MILLISECOND_TICKS_PER_QUARTERSECOND;
+        }
+        else
+        {
+            identifyDurationMs = 0;
+        }
+        emberEventControlSetDelayMS(identifyEventControl, MILLISECOND_TICKS_PER_QUARTERSECOND);
+    }
 }
 
 /**
@@ -82,23 +87,19 @@ void identifyEventHandler(void)
 void customSetNetworkUpdateId(void)
 {
 #ifndef EZSP_HOST
-  uint8_t updateId = (uint8_t)emberUnsignedCommandArgument(0);
-  // Note, we can't use emberSetNwkUpdateId here, since that only sets
-  // the update ID in a variable that is used when forming a network
-  emSetNwkUpdateId(updateId);
-  emberAfCorePrintln("%p: %p: 0x%X",
-                     "Zll Color Light: ",
-                     "Set network update id",
-                     updateId);
+    uint8_t updateId = (uint8_t) emberUnsignedCommandArgument(0);
+    // Note, we can't use emberSetNwkUpdateId here, since that only sets
+    // the update ID in a variable that is used when forming a network
+    emSetNwkUpdateId(updateId);
+    emberAfCorePrintln("%p: %p: 0x%X", "Zll Color Light: ", "Set network update id", updateId);
 #else
-  emberAfCorePrintln("Command not supported");
+    emberAfCorePrintln("Command not supported");
 #endif
 }
 
-EmberCommandEntry emberAfCustomCommands[] = {
-  emberCommandEntryAction("set-network-update-id", customSetNetworkUpdateId, "u", "Set network update id"),
-  emberCommandEntryTerminator()
-};
+EmberCommandEntry emberAfCustomCommands[] = { emberCommandEntryAction("set-network-update-id", customSetNetworkUpdateId, "u",
+                                                                      "Set network update id"),
+                                              emberCommandEntryTerminator() };
 
 /** @brief Server Attribute Changed
  *
@@ -107,30 +108,30 @@ EmberCommandEntry emberAfCustomCommands[] = {
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfOnOffClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                       EmberAfAttributeId attributeId)
+void emberAfOnOffClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId)
 {
-  if (attributeId == ZCL_ON_OFF_ATTRIBUTE_ID) {
-    EmberAfStatus status = emberAfReadAttribute(endpoint,
-                                                ZCL_ON_OFF_CLUSTER_ID,
-                                                ZCL_ON_OFF_ATTRIBUTE_ID,
-                                                CLUSTER_MASK_SERVER,
-                                                (uint8_t *)&onOff,
-                                                sizeof(onOff),
-                                                NULL); // data type
-    if (status != EMBER_ZCL_STATUS_SUCCESS) {
-      emberAfOnOffClusterPrintln("ERR: reading on/off %x", status);
-    } else {
-      emberAfOnOffClusterPrintln("Light on 0x%x is now %p",
-                                 endpoint,
-                                 onOff ? "ON" : "OFF");
-      if (onOff) {
-        halSetLed(BOARDLED1);
-      } else {
-        halClearLed(BOARDLED1);
-      }
+    if (attributeId == ZCL_ON_OFF_ATTRIBUTE_ID)
+    {
+        EmberAfStatus status = emberAfReadAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+                                                    (uint8_t *) &onOff, sizeof(onOff),
+                                                    NULL); // data type
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            emberAfOnOffClusterPrintln("ERR: reading on/off %x", status);
+        }
+        else
+        {
+            emberAfOnOffClusterPrintln("Light on 0x%x is now %p", endpoint, onOff ? "ON" : "OFF");
+            if (onOff)
+            {
+                halSetLed(BOARDLED1);
+            }
+            else
+            {
+                halClearLed(BOARDLED1);
+            }
+        }
     }
-  }
 }
 
 /** @brief Is Color Supported
@@ -141,10 +142,9 @@ void emberAfOnOffClusterServerAttributeChangedCallback(uint8_t endpoint,
  * @param hue   Ver.: always
  * @param saturation   Ver.: always
  */
-bool emberAfPluginColorControlIsColorSupportedCallback(uint8_t hue,
-                                                       uint8_t saturation)
+bool emberAfPluginColorControlIsColorSupportedCallback(uint8_t hue, uint8_t saturation)
 {
-  return true;
+    return true;
 }
 
 /** @brief Ok To Sleep
@@ -157,7 +157,7 @@ bool emberAfPluginColorControlIsColorSupportedCallback(uint8_t hue,
  */
 bool emberAfPluginIdleSleepOkToSleepCallback(uint32_t durationMs)
 {
-  return false;
+    return false;
 }
 
 /** @brief Wake Up
@@ -167,9 +167,7 @@ bool emberAfPluginIdleSleepOkToSleepCallback(uint32_t durationMs)
  * @param durationMs The duration in milliseconds that the device slept.
  * Ver.: always
  */
-void emberAfPluginIdleSleepWakeUpCallback(uint32_t durationMs)
-{
-}
+void emberAfPluginIdleSleepWakeUpCallback(uint32_t durationMs) {}
 
 /** @brief Ok To Idle
  *
@@ -179,7 +177,7 @@ void emberAfPluginIdleSleepWakeUpCallback(uint32_t durationMs)
  */
 bool emberAfPluginIdleSleepOkToIdleCallback(void)
 {
-  return true;
+    return true;
 }
 
 /** @brief Active
@@ -187,9 +185,7 @@ bool emberAfPluginIdleSleepOkToIdleCallback(void)
  * This function is called by the Idle/Sleep plugin after idling.
  *
  */
-void emberAfPluginIdleSleepActiveCallback(void)
-{
-}
+void emberAfPluginIdleSleepActiveCallback(void) {}
 
 /** @brief Initial Security State
  *
@@ -203,12 +199,12 @@ void emberAfPluginIdleSleepActiveCallback(void)
  * @param securityState The security configuration to be populated by the
  * application and ultimately set in the stack.  Ver.: always
  */
-void emberAfPluginZllCommissioningInitialSecurityStateCallback(EmberZllInitialSecurityState *securityState)
+void emberAfPluginZllCommissioningInitialSecurityStateCallback(EmberZllInitialSecurityState * securityState)
 {
-  // By default, the plugin will configure the stack for the certification
-  // encryption algorithm.  Devices that are certified should instead use the
-  // master encryption algorithm and set the appropriate encryption key and
-  // pre-configured link key.
+    // By default, the plugin will configure the stack for the certification
+    // encryption algorithm.  Devices that are certified should instead use the
+    // master encryption algorithm and set the appropriate encryption key and
+    // pre-configured link key.
 }
 
 /** @brief Touch Link Complete
@@ -223,13 +219,13 @@ void emberAfPluginZllCommissioningInitialSecurityStateCallback(EmberZllInitialSe
  * @param deviceInformationRecordList The list of sub-device information
  * records for the target.  Ver.: always
  */
-void emberAfPluginZllCommissioningTouchLinkCompleteCallback(const EmberZllNetwork *networkInfo,
+void emberAfPluginZllCommissioningTouchLinkCompleteCallback(const EmberZllNetwork * networkInfo,
                                                             uint8_t deviceInformationRecordCount,
-                                                            const EmberZllDeviceInfoRecord *deviceInformationRecordList)
+                                                            const EmberZllDeviceInfoRecord * deviceInformationRecordList)
 {
-  emberAfCorePrint("Touch link with 0x%2x (", networkInfo->nodeId);
-  emberAfCoreDebugExec(emberAfPrintBigEndianEui64(networkInfo->eui64));
-  emberAfCorePrintln(") complete");
+    emberAfCorePrint("Touch link with 0x%2x (", networkInfo->nodeId);
+    emberAfCoreDebugExec(emberAfPrintBigEndianEui64(networkInfo->eui64));
+    emberAfCorePrintln(") complete");
 }
 
 /** @brief Touch Link Failed
@@ -241,7 +237,7 @@ void emberAfPluginZllCommissioningTouchLinkCompleteCallback(const EmberZllNetwor
  */
 void emberAfPluginZllCommissioningTouchLinkFailedCallback(EmberAfZllCommissioningStatus status)
 {
-  emberAfCorePrintln("Touch link failed: 0x%x", status);
+    emberAfCorePrintln("Touch link failed: 0x%x", status);
 }
 
 /** @brief Group Identifier Count
@@ -256,10 +252,10 @@ void emberAfPluginZllCommissioningTouchLinkFailedCallback(EmberAfZllCommissionin
  */
 uint8_t emberAfPluginZllCommissioningGroupIdentifierCountCallback(uint8_t endpoint)
 {
-  // Devices with multiple endpoints will have to distribute the group ids
-  // available to the device among the individual endpoints.  This application
-  // has one endpoint, so it uses all available group ids.
-  return EMBER_ZLL_GROUP_ADDRESSES;
+    // Devices with multiple endpoints will have to distribute the group ids
+    // available to the device among the individual endpoints.  This application
+    // has one endpoint, so it uses all available group ids.
+    return EMBER_ZLL_GROUP_ADDRESSES;
 }
 
 /** @brief Group Identifier
@@ -275,18 +271,17 @@ uint8_t emberAfPluginZllCommissioningGroupIdentifierCountCallback(uint8_t endpoi
  * @param index The index of the group on the endpoint.  Ver.: always
  * @param record The group information record.  Ver.: always
  */
-bool emberAfPluginZllCommissioningGroupIdentifierCallback(uint8_t endpoint,
-                                                          uint8_t index,
-                                                          EmberAfPluginZllCommissioningGroupInformationRecord *record)
+bool emberAfPluginZllCommissioningGroupIdentifierCallback(uint8_t endpoint, uint8_t index,
+                                                          EmberAfPluginZllCommissioningGroupInformationRecord * record)
 {
-  // Devices with multiple endpoints will have to distribute the group ids
-  // available to the device among the individual endpoints.  This application
-  // has one endpoint, so it uses all available group ids in order.
-  EmberTokTypeStackZllData token;
-  emberZllGetTokenStackZllData(&token);
-  record->groupId = token.myGroupIdMin + index;
-  record->groupType = 0x00; // fixed at zero
-  return true;
+    // Devices with multiple endpoints will have to distribute the group ids
+    // available to the device among the individual endpoints.  This application
+    // has one endpoint, so it uses all available group ids in order.
+    EmberTokTypeStackZllData token;
+    emberZllGetTokenStackZllData(&token);
+    record->groupId   = token.myGroupIdMin + index;
+    record->groupType = 0x00; // fixed at zero
+    return true;
 }
 
 /** @brief Endpoint Information Count
@@ -300,10 +295,10 @@ bool emberAfPluginZllCommissioningGroupIdentifierCallback(uint8_t endpoint,
  */
 uint8_t emberAfPluginZllCommissioningEndpointInformationCountCallback(uint8_t endpoint)
 {
-  // Devices that control remote endpoints individually will have to maintain
-  // a list of those endpoints.  This application does not control remote
-  // endpoints individually.
-  return 0x00;
+    // Devices that control remote endpoints individually will have to maintain
+    // a list of those endpoints.  This application does not control remote
+    // endpoints individually.
+    return 0x00;
 }
 
 /** @brief Endpoint Information
@@ -321,14 +316,13 @@ uint8_t emberAfPluginZllCommissioningEndpointInformationCountCallback(uint8_t en
  * endpoint.  Ver.: always
  * @param record The endpoint information record.  Ver.: always
  */
-bool emberAfPluginZllCommissioningEndpointInformationCallback(uint8_t endpoint,
-                                                              uint8_t index,
-                                                              EmberAfPluginZllCommissioningEndpointInformationRecord *record)
+bool emberAfPluginZllCommissioningEndpointInformationCallback(uint8_t endpoint, uint8_t index,
+                                                              EmberAfPluginZllCommissioningEndpointInformationRecord * record)
 {
-  // Devices that control remote endpoints individually will have to maintain
-  // a list of those endpoints.  This application does not control remote
-  // endpoints individually.
-  return false;
+    // Devices that control remote endpoints individually will have to maintain
+    // a list of those endpoints.  This application does not control remote
+    // endpoints individually.
+    return false;
 }
 
 /** @brief Identify
@@ -345,13 +339,12 @@ bool emberAfPluginZllCommissioningEndpointInformationCallback(uint8_t endpoint,
  */
 void emberAfPluginZllCommissioningIdentifyCallback(uint16_t durationS)
 {
-  if (durationS != 0) {
-    halStackIndicatePresence();
-  }
-  identifyDurationMs = (durationS == 0xFFFF
-                        ? DEFAULT_IDENTIFY_DURATION_MS
-                        : durationS * MILLISECOND_TICKS_PER_SECOND);
-  emberEventControlSetActive(identifyEventControl);
+    if (durationS != 0)
+    {
+        halStackIndicatePresence();
+    }
+    identifyDurationMs = (durationS == 0xFFFF ? DEFAULT_IDENTIFY_DURATION_MS : durationS * MILLISECOND_TICKS_PER_SECOND);
+    emberEventControlSetActive(identifyEventControl);
 }
 
 /** @brief Reset To Factory New
@@ -364,9 +357,7 @@ void emberAfPluginZllCommissioningIdentifyCallback(uint16_t durationS)
  * externally-stored attributes.
  *
  */
-void emberAfPluginZllCommissioningResetToFactoryNewCallback(void)
-{
-}
+void emberAfPluginZllCommissioningResetToFactoryNewCallback(void) {}
 
 /** @brief Join
  *
@@ -381,11 +372,9 @@ void emberAfPluginZllCommissioningResetToFactoryNewCallback(void)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginZllCommissioningJoinCallback(EmberZigbeeNetwork *networkFound,
-                                               uint8_t lqi,
-                                               int8_t rssi)
+bool emberAfPluginZllCommissioningJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }
 
 /** @brief Off With Effect
@@ -400,14 +389,12 @@ bool emberAfPluginZllCommissioningJoinCallback(EmberZigbeeNetwork *networkFound,
  * @param effectId   Ver.: always
  * @param effectVariant   Ver.: always
  */
-EmberAfStatus emberAfPluginZllOnOffServerOffWithEffectCallback(uint8_t endpoint,
-                                                               uint8_t effectId,
-                                                               uint8_t effectVariant)
+EmberAfStatus emberAfPluginZllOnOffServerOffWithEffectCallback(uint8_t endpoint, uint8_t effectId, uint8_t effectVariant)
 {
-  // This sample application is not capable of implementing the effects and
-  // variants, so it simply returns SUCCESS.  A real device should perform the
-  // requested effect and variant and return an appropriate status.
-  return EMBER_ZCL_STATUS_SUCCESS;
+    // This sample application is not capable of implementing the effects and
+    // variants, so it simply returns SUCCESS.  A real device should perform the
+    // requested effect and variant and return an appropriate status.
+    return EMBER_ZCL_STATUS_SUCCESS;
 }
 
 /** @brief Group Names Supported
@@ -419,7 +406,7 @@ EmberAfStatus emberAfPluginZllOnOffServerOffWithEffectCallback(uint8_t endpoint,
  */
 bool emberAfPluginGroupsServerGroupNamesSupportedCallback(uint8_t endpoint)
 {
-  return false;
+    return false;
 }
 
 /** @brief Get Group Name
@@ -431,11 +418,7 @@ bool emberAfPluginGroupsServerGroupNamesSupportedCallback(uint8_t endpoint)
  * @param groupId  The group ID. Ver.: always
  * @param groupName Pointer to the group name. Ver.: always
  */
-void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint,
-                                                   uint16_t groupId,
-                                                   uint8_t *groupName)
-{
-}
+void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
 
 /** @brief Set Group Name
  *
@@ -446,8 +429,4 @@ void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint,
  * @param groupId  The group ID. Ver.: always
  * @param groupName Pointer to the group name. Ver.: always
  */
-void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint,
-                                                   uint16_t groupId,
-                                                   uint8_t *groupName)
-{
-}
+void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}

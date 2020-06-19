@@ -31,29 +31,30 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs for the Comms Hub Function plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs for the Comms Hub Function plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef COMMS_HUB_FUNCTION_H_INCLUDED
 #define COMMS_HUB_FUNCTION_H_INCLUDED
 
 // Printing macros for plugin: Comms Hub Function
-#define emberAfPluginCommsHubFunctionPrint(...)    emberAfAppPrint(__VA_ARGS__)
-#define emberAfPluginCommsHubFunctionPrintln(...)  emberAfAppPrintln(__VA_ARGS__)
-#define emberAfPluginCommsHubFunctionDebugExec(x)  emberAfAppDebugExec(x)
+#define emberAfPluginCommsHubFunctionPrint(...) emberAfAppPrint(__VA_ARGS__)
+#define emberAfPluginCommsHubFunctionPrintln(...) emberAfAppPrintln(__VA_ARGS__)
+#define emberAfPluginCommsHubFunctionDebugExec(x) emberAfAppDebugExec(x)
 #define emberAfPluginCommsHubFunctionPrintBuffer(buffer, len, withSpace) emberAfAppPrintBuffer(buffer, len, withSpace)
 
-typedef enum {
-  EMBER_AF_CHF_STATUS_SUCCESS                 = 0x00,
-  EMBER_AF_CHF_STATUS_TOO_MANY_PEND_MESSAGES  = 0xFA,
-  EMBER_AF_CHF_STATUS_FNF_ATTR_FAILURE        = 0xFB,
-  EMBER_AF_CHF_STATUS_NO_MIRROR               = 0xFC,
-  EMBER_AF_CHF_STATUS_TUNNEL_FAILURE          = 0xFD,
-  EMBER_AF_CHF_STATUS_NO_ACCESS               = 0xFE,
-  EMBER_AF_CHF_STATUS_SEND_TIMEOUT            = 0xFF,
+typedef enum
+{
+    EMBER_AF_CHF_STATUS_SUCCESS                = 0x00,
+    EMBER_AF_CHF_STATUS_TOO_MANY_PEND_MESSAGES = 0xFA,
+    EMBER_AF_CHF_STATUS_FNF_ATTR_FAILURE       = 0xFB,
+    EMBER_AF_CHF_STATUS_NO_MIRROR              = 0xFC,
+    EMBER_AF_CHF_STATUS_TUNNEL_FAILURE         = 0xFD,
+    EMBER_AF_CHF_STATUS_NO_ACCESS              = 0xFE,
+    EMBER_AF_CHF_STATUS_SEND_TIMEOUT           = 0xFF,
 } EmberAfPluginCommsHubFunctionStatus;
 
 /**
@@ -76,10 +77,8 @@ typedef enum {
  * ::EMBER_AF_CHF_STATUS_TOO_MANY_PEND_MESSAGES There are too many messages currently pending to be delivered.
  * ::EMBER_AF_CHF_STATUS_TUNNEL_FAILURE tunnel cannot be created to non sleepy devices.
  */
-EmberAfPluginCommsHubFunctionStatus emberAfPluginCommsHubFunctionSend(EmberEUI64 destinationDeviceId,
-                                                                      uint16_t length,
-                                                                      uint8_t *payload,
-                                                                      uint16_t messageCode);
+EmberAfPluginCommsHubFunctionStatus emberAfPluginCommsHubFunctionSend(EmberEUI64 destinationDeviceId, uint16_t length,
+                                                                      uint8_t * payload, uint16_t messageCode);
 
 /**
  * @brief Accepts a tunnel.
@@ -104,9 +103,7 @@ bool emAfPluginCommsHubFunctionTunnelAcceptCallback(EmberEUI64 deviceId);
  * @param length The length of the data received
  * @param payload Data received.
  */
-void emAfPluginCommsHubFunctionTunnelDataReceivedCallback(EmberEUI64 senderDeviceId,
-                                                          uint16_t length,
-                                                          uint8_t *payload);
+void emAfPluginCommsHubFunctionTunnelDataReceivedCallback(EmberEUI64 senderDeviceId, uint16_t length, uint8_t * payload);
 
 /**
  * @brief Sets the default remote part message timeout.
@@ -130,8 +127,7 @@ void emAfPluginCommsHubFunctionSetDefaultTimeout(uint32_t timeout);
  * @param setMask Each flag to be set has the corresponding bit set to 1,
  *  all other flags have the corresponding bit set to 0
  */
-EmberAfPluginCommsHubFunctionStatus emAfUpdateFunctionalNotificationFlagsByEui64(EmberEUI64 deviceId,
-                                                                                 uint32_t resetMask,
+EmberAfPluginCommsHubFunctionStatus emAfUpdateFunctionalNotificationFlagsByEui64(EmberEUI64 deviceId, uint32_t resetMask,
                                                                                  uint32_t setMask);
 
 /**
@@ -143,7 +139,6 @@ EmberAfPluginCommsHubFunctionStatus emAfUpdateFunctionalNotificationFlagsByEui64
  * @param setMask Each flag to be set has the corresponding bit set to 1,
  *  all other flags have the corresponding bit set to 0.
  */
-EmberAfPluginCommsHubFunctionStatus emAfUpdateFunctionalNotificationFlagsByEndpoint(uint8_t endpoint,
-                                                                                    uint32_t resetMask,
+EmberAfPluginCommsHubFunctionStatus emAfUpdateFunctionalNotificationFlagsByEndpoint(uint8_t endpoint, uint32_t resetMask,
                                                                                     uint32_t setMask);
 #endif // COMMS_HUB_FUNCTION_SUB_GHZ_H_INCLUDED

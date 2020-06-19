@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief CLI commands for sending various messages.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief CLI commands for sending various messages.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_ZCL_CLI_H
 #define SILABS_ZCL_CLI_H
@@ -51,9 +51,7 @@ void emAfCliRawCommand(void);
 void emAfCliAddReportEntryCommand(void);
 #endif
 
-void zclSimpleCommand(uint8_t frameControl,
-                      uint16_t clusterId,
-                      uint8_t commandId);
+void zclSimpleCommand(uint8_t frameControl, uint16_t clusterId, uint8_t commandId);
 
 extern EmberCommandEntry keysCommands[];
 extern EmberCommandEntry interpanCommands[];
@@ -61,14 +59,10 @@ extern EmberCommandEntry printCommands[];
 extern EmberCommandEntry zclCommands[];
 extern EmberCommandEntry certificationCommands[];
 
-#define zclSimpleClientCommand(clusterId, commandId)                                  \
-  zclSimpleCommand(ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER, \
-                   (clusterId),                                                       \
-                   (commandId))
+#define zclSimpleClientCommand(clusterId, commandId)                                                                               \
+    zclSimpleCommand(ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER, (clusterId), (commandId))
 
-#define zclSimpleServerCommand(clusterId, commandId)                                  \
-  zclSimpleCommand(ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT, \
-                   (clusterId),                                                       \
-                   (commandId))
+#define zclSimpleServerCommand(clusterId, commandId)                                                                               \
+    zclSimpleCommand(ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT, (clusterId), (commandId))
 
 #endif // SILABS_ZCL_CLI_H

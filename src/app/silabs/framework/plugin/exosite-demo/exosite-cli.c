@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief This file provides the CLI for interacting with the Exosite website.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief This file provides the CLI for interacting
+                                                                               *with the Exosite website.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 #include "app/framework/include/af.h"
@@ -48,24 +49,26 @@
 
 void emberAfPluginExositeDemoPrintStatusCommand(void)
 {
-  bool lightOn;
-  EmberStatus status = emberAfPluginExositeDemoGetLightStatus(&lightOn);
-  if (status) {
-    emberAfCorePrintln("Error: Failed to retrieve light status.");
-    return;
-  }
+    bool lightOn;
+    EmberStatus status = emberAfPluginExositeDemoGetLightStatus(&lightOn);
+    if (status)
+    {
+        emberAfCorePrintln("Error: Failed to retrieve light status.");
+        return;
+    }
 
-  emberAfCorePrintln("Light is: %p", (lightOn ? "on" : "off"));
+    emberAfCorePrintln("Light is: %p", (lightOn ? "on" : "off"));
 }
 
 void emberAfPluginExositeDemoSetStatusCommand(void)
 {
-  // Looking for 'on' or 'off' text.
-  bool turnOn = (emberCommandName()[1] == 'n');
+    // Looking for 'on' or 'off' text.
+    bool turnOn = (emberCommandName()[1] == 'n');
 
-  if (emberAfPluginExositeDemoSetLightStatus(turnOn)) {
-    emberAfCorePrintln("Error: Could not set light state.");
-  }
+    if (emberAfPluginExositeDemoSetLightStatus(turnOn))
+    {
+        emberAfCorePrintln("Error: Could not set light state.");
+    }
 }
 
 #endif // DOXYGEN_SHOULD_SKIP_THIS

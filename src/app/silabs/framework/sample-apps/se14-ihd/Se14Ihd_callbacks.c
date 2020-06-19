@@ -31,17 +31,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief This callback file is created for your convenience. You may add
- * application code to this file. If you regenerate this file over a previous
- * version, the previous version will be overwritten and any code you have
- * added will be lost.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief This callback file is created for your
+                                                                               *convenience. You may add application code to this
+                                                                               *file. If you regenerate this file over a previous
+                                                                               * version, the previous version will be overwritten
+                                                                               *and any code you have added will be lost.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
-#include "app/framework/util/util.h"    // emberAfGetPageFrom8bitEncodedChanPg()
+#include "app/framework/util/util.h" // emberAfGetPageFrom8bitEncodedChanPg()
 #include PLATFORM_HEADER
 
 /** @brief Ncp Init
@@ -59,6 +60,4 @@
  *
  * @param memoryAllocation   Ver.: always
  */
-void emberAfNcpInitCallback(boolean memoryAllocation)
-{
-}
+void emberAfNcpInitCallback(boolean memoryAllocation) {}

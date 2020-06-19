@@ -31,13 +31,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief This file integrates a light's status in the network with the Exosite
- * cloud service.  It polls frequenctly to detect a change to the light
- * and then sends that to a connected Zigbee Internet Client.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief This file integrates a light's status in the
+                                                                               *network with the Exosite cloud service.  It polls
+                                                                               *frequenctly to detect a change to the light and then
+                                                                               *sends that to a connected Zigbee Internet Client.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 #include "app/framework/include/af.h"
@@ -48,15 +49,15 @@
 // Globals
 
 // This assumes the program is run from the root of the stack install.
-const char script[] = "app/framework/plugin/exosite-demo/exosite-demo.py";
-const char readOption[] = "--read";
+const char script[]      = "app/framework/plugin/exosite-demo/exosite-demo.py";
+const char readOption[]  = "--read";
 const char writeOption[] = "--write";
 
 //#define DEBUG_ON
 #if defined(DEBUG_ON)
-  #define debugPrintln(...) emberAfCorePrintln(__VA_ARGS__)
+#define debugPrintln(...) emberAfCorePrintln(__VA_ARGS__)
 #else
-  #define debugPrintln(...)
+#define debugPrintln(...)
 #endif
 
 #define EXOSITE_READ_INTERVAL_QS (3 << 2)
@@ -82,116 +83,111 @@ void emberAfPluginExositeDemoCheckInEventHandler(void);
 
 void emberAfPluginExositeDemoInitCallback(void)
 {
-  emberAfPluginExositeDemoCheckInEventHandler();
+    emberAfPluginExositeDemoCheckInEventHandler();
 }
 
-static int runProgramCaptureResult(const char* command,
-                                   char* resultText,
-                                   bool* resultTruncated,
-                                   int maxLength,
-                                   int minLength)
+static int runProgramCaptureResult(const char * command, char * resultText, bool * resultTruncated, int maxLength, int minLength)
 {
-  int pcloseStatus;
-  int statusCode = 0;
-  debugPrintln("Running Commond: %p", command);
-  FILE* resultStream = popen(command, "r");
-  if (resultStream == NULL) {
-    emberAfCorePrintln("FATAL:  Could not open pipe for reading program execution:  %p", strerror(errno));
-    return -1;
-  }
+    int pcloseStatus;
+    int statusCode = 0;
+    debugPrintln("Running Commond: %p", command);
+    FILE * resultStream = popen(command, "r");
+    if (resultStream == NULL)
+    {
+        emberAfCorePrintln("FATAL:  Could not open pipe for reading program execution:  %p", strerror(errno));
+        return -1;
+    }
 
-  MEMSET(resultText, 0, maxLength);
-  int readBytes = fread(resultText, 1, maxLength, resultStream);
-  if (ferror(resultStream)) {
-    emberAfCorePrintln("Error: Cannot read from pipe.");
-    statusCode = -1;
-    goto runProgramCaptureResultDone;
-  }
-  if (!feof(resultStream)) {
-    debugPrintln("<-- Output truncated -->");
-    *resultTruncated = true;
-  }
-  if (readBytes < minLength) {
-    emberAfCorePrintln("Error: Result length too short (%d < %d).", readBytes, minLength);
-    statusCode = -1;
-    goto runProgramCaptureResultDone;
-  }
+    MEMSET(resultText, 0, maxLength);
+    int readBytes = fread(resultText, 1, maxLength, resultStream);
+    if (ferror(resultStream))
+    {
+        emberAfCorePrintln("Error: Cannot read from pipe.");
+        statusCode = -1;
+        goto runProgramCaptureResultDone;
+    }
+    if (!feof(resultStream))
+    {
+        debugPrintln("<-- Output truncated -->");
+        *resultTruncated = true;
+    }
+    if (readBytes < minLength)
+    {
+        emberAfCorePrintln("Error: Result length too short (%d < %d).", readBytes, minLength);
+        statusCode = -1;
+        goto runProgramCaptureResultDone;
+    }
 
-  resultText[maxLength - 1] = '\0';
-  debugPrintln("Results:\n%p", resultText);
+    resultText[maxLength - 1] = '\0';
+    debugPrintln("Results:\n%p", resultText);
 
-  runProgramCaptureResultDone:
-  pcloseStatus = pclose(resultStream);
-  if (statusCode == 0) {
-    statusCode = pcloseStatus;
-  }
-  return statusCode;
+runProgramCaptureResultDone:
+    pcloseStatus = pclose(resultStream);
+    if (statusCode == 0)
+    {
+        statusCode = pcloseStatus;
+    }
+    return statusCode;
 }
 
-EmberStatus emberAfPluginExositeDemoGetLightStatus(bool* lightOn)
+EmberStatus emberAfPluginExositeDemoGetLightStatus(bool * lightOn)
 {
-  bool truncated;
-  char command[MAX_COMMAND_LENGTH];
-  snprintf(command, MAX_COMMAND_LENGTH, "%s %s", script, readOption);
+    bool truncated;
+    char command[MAX_COMMAND_LENGTH];
+    snprintf(command, MAX_COMMAND_LENGTH, "%s %s", script, readOption);
 
-  char resultText[MAX_LINE_LENGTH];
-  if (runProgramCaptureResult(command,
-                              resultText,
-                              &truncated,
-                              MAX_LINE_LENGTH,
-                              MIN_READ_RESULT_LENGTH)) {
-    emberAfCorePrintln("Error:  Script read execution returned error: ", resultText);
-    return EMBER_ERR_FATAL;
-  }
+    char resultText[MAX_LINE_LENGTH];
+    if (runProgramCaptureResult(command, resultText, &truncated, MAX_LINE_LENGTH, MIN_READ_RESULT_LENGTH))
+    {
+        emberAfCorePrintln("Error:  Script read execution returned error: ", resultText);
+        return EMBER_ERR_FATAL;
+    }
 
-  if (0 == strncmp("state=1", resultText, MIN_READ_RESULT_LENGTH)) {
-    *lightOn = true;
-  } else if (0 == strncmp("state=0", resultText, MIN_READ_RESULT_LENGTH)) {
-    *lightOn = false;
-  } else {
-    return EMBER_ERR_FATAL;
-  }
+    if (0 == strncmp("state=1", resultText, MIN_READ_RESULT_LENGTH))
+    {
+        *lightOn = true;
+    }
+    else if (0 == strncmp("state=0", resultText, MIN_READ_RESULT_LENGTH))
+    {
+        *lightOn = false;
+    }
+    else
+    {
+        return EMBER_ERR_FATAL;
+    }
 
-  return EMBER_SUCCESS;
+    return EMBER_SUCCESS;
 }
 
 EmberStatus emberAfPluginExositeDemoSetLightStatus(bool turnLightOn)
 {
-  bool truncated;
-  char command[MAX_COMMAND_LENGTH];
-  snprintf(command,
-           MAX_COMMAND_LENGTH,
-           "%s %s %s",
-           script,
-           writeOption,
-           (turnLightOn
-            ? "on"
-            : "off"));
-  char resultText[MAX_LINE_LENGTH];
-  if (runProgramCaptureResult(command,
-                              resultText,
-                              &truncated,
-                              MAX_LINE_LENGTH,
-                              0)) {  // min write result length
-    emberAfCorePrintln("Error: Script write execution returned error: ", resultText);
-    return EMBER_ERR_FATAL;
-  }
+    bool truncated;
+    char command[MAX_COMMAND_LENGTH];
+    snprintf(command, MAX_COMMAND_LENGTH, "%s %s %s", script, writeOption, (turnLightOn ? "on" : "off"));
+    char resultText[MAX_LINE_LENGTH];
+    if (runProgramCaptureResult(command, resultText, &truncated, MAX_LINE_LENGTH, 0))
+    { // min write result length
+        emberAfCorePrintln("Error: Script write execution returned error: ", resultText);
+        return EMBER_ERR_FATAL;
+    }
 
-  return EMBER_SUCCESS;
+    return EMBER_SUCCESS;
 }
 
 void emberAfPluginExositeDemoCheckInEventHandler(void)
 {
-  bool oldLightState = lightState;
-  emberAfPluginExositeDemoGetLightStatus(&lightState);
-  if (eventEnabled) {
-    emberEventControlSetDelayQS(emberAfPluginExositeDemoCheckInEventControl,
-                                EMBER_AF_PLUGIN_EXOSITE_DEMO_CHECK_IN_TIME_SECONDS << 2);
-  }
+    bool oldLightState = lightState;
+    emberAfPluginExositeDemoGetLightStatus(&lightState);
+    if (eventEnabled)
+    {
+        emberEventControlSetDelayQS(emberAfPluginExositeDemoCheckInEventControl,
+                                    EMBER_AF_PLUGIN_EXOSITE_DEMO_CHECK_IN_TIME_SECONDS << 2);
+    }
 
-  if (oldLightState != lightState) {
-    emberAfCorePrintln("Light state changed to %p", (lightState ? "on" : "off"));
-    emberAfPluginExositeDemoLightChangedStateCallback(lightState);
-  }
+    if (oldLightState != lightState)
+    {
+        emberAfCorePrintln("Light state changed to %p", (lightState ? "on" : "off"));
+        emberAfPluginExositeDemoLightChangedStateCallback(lightState);
+    }
 }
 #endif // DOXYGEN_SHOULD_SKIP_THIS

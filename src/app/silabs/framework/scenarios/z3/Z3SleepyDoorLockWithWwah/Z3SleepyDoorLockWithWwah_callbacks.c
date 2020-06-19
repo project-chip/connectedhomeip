@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // This callback file is created for your convenience. You may add application code
 // to this file. If you regenerate this file over a previous version, the previous
@@ -58,55 +58,66 @@ static uint8_t lastButton;
 
 void commissioningEventHandler(void)
 {
-  EmberStatus status;
+    EmberStatus status;
 
-  emberEventControlSetInactive(commissioningEventControl);
+    emberEventControlSetInactive(commissioningEventControl);
 
-  if (emberAfNetworkState() == EMBER_JOINED_NETWORK) {
-    emberAfGetCommandApsFrame()->sourceEndpoint = SWITCH_ENDPOINT;
-    if (lastButton == BUTTON0) {
-      emberAfFillCommandOnOffClusterToggle();
-    } else if (lastButton == BUTTON1) {
-      uint8_t nextLevel = (uint8_t)(0xFF & emberGetPseudoRandomNumber());
-      emberAfFillCommandLevelControlClusterMoveToLevel(nextLevel, TRANSITION_TIME_DS, 0, 0);
+    if (emberAfNetworkState() == EMBER_JOINED_NETWORK)
+    {
+        emberAfGetCommandApsFrame()->sourceEndpoint = SWITCH_ENDPOINT;
+        if (lastButton == BUTTON0)
+        {
+            emberAfFillCommandOnOffClusterToggle();
+        }
+        else if (lastButton == BUTTON1)
+        {
+            uint8_t nextLevel = (uint8_t)(0xFF & emberGetPseudoRandomNumber());
+            emberAfFillCommandLevelControlClusterMoveToLevel(nextLevel, TRANSITION_TIME_DS, 0, 0);
+        }
+        status = emberAfSendCommandUnicastToBindings();
+        emberAfCorePrintln("%p: 0x%X", "Send to bindings", status);
     }
-    status = emberAfSendCommandUnicastToBindings();
-    emberAfCorePrintln("%p: 0x%X", "Send to bindings", status);
-  } else {
-    status = emberAfPluginNetworkSteeringStart();
-    emberAfCorePrintln("Join network start: 0x%X", status);
-    emberEventControlSetActive(ledEventControl);
-    commissioning = true;
-  }
+    else
+    {
+        status = emberAfPluginNetworkSteeringStart();
+        emberAfCorePrintln("Join network start: 0x%X", status);
+        emberEventControlSetActive(ledEventControl);
+        commissioning = true;
+    }
 }
 
 void ledEventHandler(void)
 {
-  emberEventControlSetInactive(ledEventControl);
+    emberEventControlSetInactive(ledEventControl);
 
-  if (commissioning) {
-    if (emberAfNetworkState() != EMBER_JOINED_NETWORK) {
-      halToggleLed(COMMISSIONING_STATUS_LED);
-      emberEventControlSetDelayMS(ledEventControl, LED_BLINK_PERIOD_MS << 1);
-    } else {
-      halSetLed(COMMISSIONING_STATUS_LED);
+    if (commissioning)
+    {
+        if (emberAfNetworkState() != EMBER_JOINED_NETWORK)
+        {
+            halToggleLed(COMMISSIONING_STATUS_LED);
+            emberEventControlSetDelayMS(ledEventControl, LED_BLINK_PERIOD_MS << 1);
+        }
+        else
+        {
+            halSetLed(COMMISSIONING_STATUS_LED);
+        }
     }
-  } else if (emberAfNetworkState() == EMBER_JOINED_NETWORK) {
-    halSetLed(COMMISSIONING_STATUS_LED);
-  }
+    else if (emberAfNetworkState() == EMBER_JOINED_NETWORK)
+    {
+        halSetLed(COMMISSIONING_STATUS_LED);
+    }
 }
 
 void findingAndBindingEventHandler(void)
 {
-  emberEventControlSetInactive(findingAndBindingEventControl);
-  EmberStatus status = emberAfPluginFindAndBindInitiatorStart(SWITCH_ENDPOINT);
-  emberAfCorePrintln("Find and bind initiator %p: 0x%X", "start", status);
+    emberEventControlSetInactive(findingAndBindingEventControl);
+    EmberStatus status = emberAfPluginFindAndBindInitiatorStart(SWITCH_ENDPOINT);
+    emberAfCorePrintln("Find and bind initiator %p: 0x%X", "start", status);
 }
 
 static void scheduleFindingAndBindingForInitiator(void)
 {
-  emberEventControlSetDelayMS(findingAndBindingEventControl,
-                              FINDING_AND_BINDING_DELAY_MS);
+    emberEventControlSetDelayMS(findingAndBindingEventControl, FINDING_AND_BINDING_DELAY_MS);
 }
 
 /** @brief Stack Status
@@ -121,14 +132,17 @@ static void scheduleFindingAndBindingForInitiator(void)
  */
 bool emberAfStackStatusCallback(EmberStatus status)
 {
-  if (status == EMBER_NETWORK_DOWN) {
-    halClearLed(COMMISSIONING_STATUS_LED);
-  } else if (status == EMBER_NETWORK_UP) {
-    halSetLed(COMMISSIONING_STATUS_LED);
-  }
+    if (status == EMBER_NETWORK_DOWN)
+    {
+        halClearLed(COMMISSIONING_STATUS_LED);
+    }
+    else if (status == EMBER_NETWORK_UP)
+    {
+        halSetLed(COMMISSIONING_STATUS_LED);
+    }
 
-  // This value is ignored by the framework.
-  return false;
+    // This value is ignored by the framework.
+    return false;
 }
 
 /** @brief Hal Button Isr
@@ -142,13 +156,13 @@ bool emberAfStackStatusCallback(EmberStatus status)
  * either ::BUTTON_PRESSED if the button has been pressed or ::BUTTON_RELEASED
  * if the button has been released.  Ver.: always
  */
-void emberAfHalButtonIsrCallback(uint8_t button,
-                                 uint8_t state)
+void emberAfHalButtonIsrCallback(uint8_t button, uint8_t state)
 {
-  if (state == BUTTON_RELEASED) {
-    lastButton = button;
-    emberEventControlSetActive(commissioningEventControl);
-  }
+    if (state == BUTTON_RELEASED)
+    {
+        lastButton = button;
+        emberEventControlSetActive(commissioningEventControl);
+    }
 }
 
 /** @brief Complete
@@ -166,18 +180,19 @@ void emberAfHalButtonIsrCallback(uint8_t button,
  * this, one is able to tell on which channel mask and with which key the
  * process was complete. Ver.: always
  */
-void emberAfPluginNetworkSteeringCompleteCallback(EmberStatus status,
-                                                  uint8_t totalBeacons,
-                                                  uint8_t joinAttempts,
+void emberAfPluginNetworkSteeringCompleteCallback(EmberStatus status, uint8_t totalBeacons, uint8_t joinAttempts,
                                                   uint8_t finalState)
 {
-  emberAfCorePrintln("%p network %p: 0x%X", "Join", "complete", status);
+    emberAfCorePrintln("%p network %p: 0x%X", "Join", "complete", status);
 
-  if (status != EMBER_SUCCESS) {
-    commissioning = false;
-  } else {
-    scheduleFindingAndBindingForInitiator();
-  }
+    if (status != EMBER_SUCCESS)
+    {
+        commissioning = false;
+    }
+    else
+    {
+        scheduleFindingAndBindingForInitiator();
+    }
 }
 
 /** @brief Complete
@@ -190,9 +205,9 @@ void emberAfPluginNetworkSteeringCompleteCallback(EmberStatus status,
  */
 void emberAfPluginFindAndBindInitiatorCompleteCallback(EmberStatus status)
 {
-  emberAfCorePrintln("Find and bind initiator %p: 0x%X", "complete", status);
+    emberAfCorePrintln("Find and bind initiator %p: 0x%X", "complete", status);
 
-  commissioning = false;
+    commissioning = false;
 }
 
 /** @brief External Attribute Write
@@ -214,13 +229,11 @@ void emberAfPluginFindAndBindInitiatorCompleteCallback(EmberStatus status)
  * @param manufacturerCode   Ver.: always
  * @param buffer   Ver.: always
  */
-EmberAfStatus emberAfExternalAttributeWriteCallback(uint8_t endpoint,
-                                                    EmberAfClusterId clusterId,
-                                                    EmberAfAttributeMetadata * attributeMetadata,
-                                                    uint16_t manufacturerCode,
+EmberAfStatus emberAfExternalAttributeWriteCallback(uint8_t endpoint, EmberAfClusterId clusterId,
+                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
                                                     uint8_t * buffer)
 {
-  return EMBER_ZCL_STATUS_FAILURE;
+    return EMBER_ZCL_STATUS_FAILURE;
 }
 
 /** @brief External Attribute Read
@@ -237,19 +250,18 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(uint8_t endpoint,
  * @param manufacturerCode   Ver.: always
  * @param buffer   Ver.: always
  */
-EmberAfStatus emberAfExternalAttributeReadCallback(uint8_t endpoint,
-                                                   EmberAfClusterId clusterId,
-                                                   EmberAfAttributeMetadata * attributeMetadata,
-                                                   uint16_t manufacturerCode,
-                                                   uint8_t * buffer,
-                                                   uint16_t maxReadLength)
+EmberAfStatus emberAfExternalAttributeReadCallback(uint8_t endpoint, EmberAfClusterId clusterId,
+                                                   EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
+                                                   uint8_t * buffer, uint16_t maxReadLength)
 {
-  if (clusterId == ZCL_DIAGNOSTICS_CLUSTER_ID) {
-    if (emberAfReadDiagnosticAttribute(attributeMetadata, buffer)) {
-      return EMBER_ZCL_STATUS_SUCCESS;
+    if (clusterId == ZCL_DIAGNOSTICS_CLUSTER_ID)
+    {
+        if (emberAfReadDiagnosticAttribute(attributeMetadata, buffer))
+        {
+            return EMBER_ZCL_STATUS_SUCCESS;
+        }
     }
-  }
-  return EMBER_ZCL_STATUS_FAILURE;
+    return EMBER_ZCL_STATUS_FAILURE;
 }
 
 /** @brief Ok To Sleep
@@ -262,7 +274,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(uint8_t endpoint,
  */
 bool emberAfPluginIdleSleepOkToSleepCallback(uint32_t durationMs)
 {
-  return true;
+    return true;
 }
 
 /** @brief Wake Up
@@ -272,9 +284,7 @@ bool emberAfPluginIdleSleepOkToSleepCallback(uint32_t durationMs)
  * @param durationMs The duration in milliseconds that the device slept.
  * Ver.: always
  */
-void emberAfPluginIdleSleepWakeUpCallback(uint32_t durationMs)
-{
-}
+void emberAfPluginIdleSleepWakeUpCallback(uint32_t durationMs) {}
 
 /** @brief Ok To Idle
  *
@@ -284,7 +294,7 @@ void emberAfPluginIdleSleepWakeUpCallback(uint32_t durationMs)
  */
 bool emberAfPluginIdleSleepOkToIdleCallback(void)
 {
-  return true;
+    return true;
 }
 
 /** @brief Active
@@ -292,9 +302,7 @@ bool emberAfPluginIdleSleepOkToIdleCallback(void)
  * This function is called by the Idle/Sleep plugin after idling.
  *
  */
-void emberAfPluginIdleSleepActiveCallback(void)
-{
-}
+void emberAfPluginIdleSleepActiveCallback(void) {}
 
 /** @brief Finished
  *
@@ -304,9 +312,7 @@ void emberAfPluginIdleSleepActiveCallback(void)
  *
  * @param status   Ver.: always
  */
-void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
-{
-}
+void emberAfPluginNetworkFindFinishedCallback(EmberStatus status) {}
 
 /** @brief Join
  *
@@ -320,11 +326,9 @@ void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
-                                          uint8_t lqi,
-                                          int8_t rssi)
+bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }
 
 /** @brief Activate Door Lock
@@ -336,7 +340,7 @@ bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
  */
 bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate)
 {
-  return true;
+    return true;
 }
 
 /** @brief Broadcast Sent
@@ -345,9 +349,7 @@ bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate)
  * sent by the concentrator plugin.
  *
  */
-void emberAfPluginConcentratorBroadcastSentCallback(void)
-{
-}
+void emberAfPluginConcentratorBroadcastSentCallback(void) {}
 
 /** @brief Select File Descriptors
  *
@@ -363,10 +365,9 @@ void emberAfPluginConcentratorBroadcastSentCallback(void)
  * @param maxSize The maximum number of elements that the function implementor
  * may add.  Ver.: always
  */
-int emberAfPluginGatewaySelectFileDescriptorsCallback(int* list,
-                                                      int maxSize)
+int emberAfPluginGatewaySelectFileDescriptorsCallback(int * list, int maxSize)
 {
-  return 0;
+    return 0;
 }
 
 /** @brief Group Names Supported
@@ -378,7 +379,7 @@ int emberAfPluginGatewaySelectFileDescriptorsCallback(int* list,
  */
 bool emberAfPluginGroupsServerGroupNamesSupportedCallback(uint8_t endpoint)
 {
-  return false;
+    return false;
 }
 
 /** @brief Get Group Name
@@ -390,11 +391,7 @@ bool emberAfPluginGroupsServerGroupNamesSupportedCallback(uint8_t endpoint)
  * @param groupId  The group ID. Ver.: always
  * @param groupName Pointer to the group name. Ver.: always
  */
-void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint,
-                                                   uint16_t groupId,
-                                                   uint8_t *groupName)
-{
-}
+void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
 
 /** @brief Set Group Name
  *
@@ -405,11 +402,7 @@ void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint,
  * @param groupId  The group ID. Ver.: always
  * @param groupName Pointer to the group name. Ver.: always
  */
-void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint,
-                                                   uint16_t groupId,
-                                                   uint8_t *groupName)
-{
-}
+void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
 
 /** @brief Button Event
  *
@@ -422,10 +415,7 @@ void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint,
  * @param buttonPressDurationMs The length of time button was held down before
  * it was released.  Ver.: always
  */
-void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
-                                                   uint32_t buttonPressDurationMs)
-{
-}
+void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber, uint32_t buttonPressDurationMs) {}
 
 /** @brief Poll Completed
  *
@@ -434,9 +424,7 @@ void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
  *
  * @param status Return status of a completed poll operation  Ver.: always
  */
-void emberAfPluginEndDeviceSupportPollCompletedCallback(EmberStatus status)
-{
-}
+void emberAfPluginEndDeviceSupportPollCompletedCallback(EmberStatus status) {}
 
 /** @brief Counter Rollover
  *
@@ -446,5 +434,5 @@ void emberAfPluginEndDeviceSupportPollCompletedCallback(EmberStatus status)
  */
 void emberAfPluginCountersRolloverCallback(EmberCounterType type)
 {
-  emberAfCorePrintln("Counter %u rolled over", type);
+    emberAfCorePrintln("Counter %u rolled over", type);
 }

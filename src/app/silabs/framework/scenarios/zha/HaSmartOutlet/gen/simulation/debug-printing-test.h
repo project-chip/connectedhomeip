@@ -132,98 +132,29 @@
 
 #define EMBER_AF_PRINT_OUTPUT 1
 
-#define EMBER_AF_PRINT_NAMES {                 \
-    "Basic",                                   \
-    "Power Configuration",                     \
-    "Device Temperature Configuration",        \
-    "Identify",                                \
-    "Groups",                                  \
-    "Scenes",                                  \
-    "On/off",                                  \
-    "On/off Switch Configuration",             \
-    "Level Control",                           \
-    "Alarms",                                  \
-    "Time",                                    \
-    "RSSI Location",                           \
-    "Binary Input (Basic)",                    \
-    "Commissioning",                           \
-    "Partition",                               \
-    "Over the Air Bootloading",                \
-    "Power Profile",                           \
-    "Appliance Control",                       \
-    "Poll Control",                            \
-    "Green Power",                             \
-    "Keep-Alive",                              \
-    "Shade Configuration",                     \
-    "Door Lock",                               \
-    "Window Covering",                         \
-    "Pump Configuration and Control",          \
-    "Thermostat",                              \
-    "Fan Control",                             \
-    "Dehumidification Control",                \
-    "Thermostat User Interface Configuration", \
-    "Color Control",                           \
-    "Ballast Configuration",                   \
-    "Illuminance Measurement",                 \
-    "Illuminance Level Sensing",               \
-    "Temperature Measurement",                 \
-    "Pressure Measurement",                    \
-    "Flow Measurement",                        \
-    "Relative Humidity Measurement",           \
-    "Occupancy Sensing",                       \
-    "IAS Zone",                                \
-    "IAS ACE",                                 \
-    "IAS WD",                                  \
-    "Generic Tunnel",                          \
-    "BACnet Protocol Tunnel",                  \
-    "11073 Protocol Tunnel",                   \
-    "ISO 7816 Protocol Tunnel",                \
-    "Price",                                   \
-    "Demand Response and Load Control",        \
-    "Simple Metering",                         \
-    "Messaging",                               \
-    "Tunneling",                               \
-    "Prepayment",                              \
-    "Energy Management",                       \
-    "Calendar",                                \
-    "Device Management",                       \
-    "Events",                                  \
-    "MDU Pairing",                             \
-    "Sub-GHz",                                 \
-    "Key Establishment",                       \
-    "Information",                             \
-    "Data Sharing",                            \
-    "Gaming",                                  \
-    "Data Rate Control",                       \
-    "Voice over ZigBee",                       \
-    "Chatting",                                \
-    "Payment",                                 \
-    "Billing",                                 \
-    "Appliance Identification",                \
-    "Meter Identification",                    \
-    "Appliance Events and Alert",              \
-    "Appliance Statistics",                    \
-    "Electrical Measurement",                  \
-    "Diagnostics",                             \
-    "ZLL Commissioning",                       \
-    "Sample Mfg Specific Cluster",             \
-    "Configuration Cluster",                   \
-    "MFGLIB Cluster",                          \
-    "Core",                                    \
-    "Debug",                                   \
-    "Application",                             \
-    "Security",                                \
-    "Attributes",                              \
-    "Reporting",                               \
-    "Service discovery",                       \
-    "Registration",                            \
-    "ZDO (ZigBee Device Object)",              \
-    "Custom messages (1)",                     \
-    "Custom messages (2)",                     \
-    "Custom messages (3)"                      \
-}
+#define EMBER_AF_PRINT_NAMES                                                                                                       \
+    {                                                                                                                              \
+        "Basic", "Power Configuration", "Device Temperature Configuration", "Identify", "Groups", "Scenes", "On/off",              \
+            "On/off Switch Configuration", "Level Control", "Alarms", "Time", "RSSI Location", "Binary Input (Basic)",             \
+            "Commissioning", "Partition", "Over the Air Bootloading", "Power Profile", "Appliance Control", "Poll Control",        \
+            "Green Power", "Keep-Alive", "Shade Configuration", "Door Lock", "Window Covering", "Pump Configuration and Control",  \
+            "Thermostat", "Fan Control", "Dehumidification Control", "Thermostat User Interface Configuration", "Color Control",   \
+            "Ballast Configuration", "Illuminance Measurement", "Illuminance Level Sensing", "Temperature Measurement",            \
+            "Pressure Measurement", "Flow Measurement", "Relative Humidity Measurement", "Occupancy Sensing", "IAS Zone",          \
+            "IAS ACE", "IAS WD", "Generic Tunnel", "BACnet Protocol Tunnel", "11073 Protocol Tunnel", "ISO 7816 Protocol Tunnel",  \
+            "Price", "Demand Response and Load Control", "Simple Metering", "Messaging", "Tunneling", "Prepayment",                \
+            "Energy Management", "Calendar", "Device Management", "Events", "MDU Pairing", "Sub-GHz", "Key Establishment",         \
+            "Information", "Data Sharing", "Gaming", "Data Rate Control", "Voice over ZigBee", "Chatting", "Payment", "Billing",   \
+            "Appliance Identification", "Meter Identification", "Appliance Events and Alert", "Appliance Statistics",              \
+            "Electrical Measurement", "Diagnostics", "ZLL Commissioning", "Sample Mfg Specific Cluster", "Configuration Cluster",  \
+            "MFGLIB Cluster", "Core", "Debug", "Application", "Security", "Attributes", "Reporting", "Service discovery",          \
+            "Registration", "ZDO (ZigBee Device Object)", "Custom messages (1)", "Custom messages (2)", "Custom messages (3)"      \
+    }
 
 #define EMBER_AF_PRINT_NAME_NUMBER 88
-#define EMBER_AF_PRINT_BITS { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }
+#define EMBER_AF_PRINT_BITS                                                                                                        \
+    {                                                                                                                              \
+        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF                                                           \
+    }
 
 #endif // __EMBER_AF_PRINTING_TEST__

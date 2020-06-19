@@ -116,17 +116,17 @@
 
 // Types for the tokens
 #ifdef DEFINETYPES
-typedef uint8_t  tokType_version;
-typedef uint8_t  tokType_application_version;
-typedef uint8_t  tokType_stack_version;
-typedef uint8_t  tokType_hw_version;
-typedef uint8_t  tokType_manufacturer_name[33];
-typedef uint8_t  tokType_model_identifier[33];
-typedef uint8_t  tokType_date_code[17];
-typedef uint16_t  tokType_barrier_open_period;
-typedef uint16_t  tokType_barrier_close_period;
-typedef uint8_t  tokType_attribute_two;
-typedef uint16_t  tokType_attribute_four;
+typedef uint8_t tokType_version;
+typedef uint8_t tokType_application_version;
+typedef uint8_t tokType_stack_version;
+typedef uint8_t tokType_hw_version;
+typedef uint8_t tokType_manufacturer_name[33];
+typedef uint8_t tokType_model_identifier[33];
+typedef uint8_t tokType_date_code[17];
+typedef uint16_t tokType_barrier_open_period;
+typedef uint16_t tokType_barrier_close_period;
+typedef uint8_t tokType_attribute_two;
+typedef uint16_t tokType_attribute_four;
 #endif // DEFINETYPES
 
 // Actual token definitions
@@ -135,9 +135,14 @@ DEFINE_BASIC_TOKEN(VERSION_1, tokType_version, 0x03)
 DEFINE_BASIC_TOKEN(APPLICATION_VERSION_1, tokType_application_version, 0x00)
 DEFINE_BASIC_TOKEN(STACK_VERSION_1, tokType_stack_version, 0x00)
 DEFINE_BASIC_TOKEN(HW_VERSION_SINGLETON, tokType_hw_version, 0x00)
-DEFINE_BASIC_TOKEN(MANUFACTURER_NAME_SINGLETON, tokType_manufacturer_name, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 })
-DEFINE_BASIC_TOKEN(MODEL_IDENTIFIER_SINGLETON, tokType_model_identifier, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 })
-DEFINE_BASIC_TOKEN(DATE_CODE_SINGLETON, tokType_date_code, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 })
+DEFINE_BASIC_TOKEN(MANUFACTURER_NAME_SINGLETON, tokType_manufacturer_name,
+                   { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 })
+DEFINE_BASIC_TOKEN(MODEL_IDENTIFIER_SINGLETON, tokType_model_identifier,
+                   { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 })
+DEFINE_BASIC_TOKEN(DATE_CODE_SINGLETON, tokType_date_code,
+                   { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 })
 DEFINE_BASIC_TOKEN(BARRIER_OPEN_PERIOD_1, tokType_barrier_open_period, 0x0000UL)
 DEFINE_BASIC_TOKEN(BARRIER_CLOSE_PERIOD_1, tokType_barrier_close_period, 0x0000UL)
 DEFINE_BASIC_TOKEN(ATTRIBUTE_TWO_1, tokType_attribute_two, 0x00)
@@ -159,142 +164,272 @@ DEFINE_BASIC_TOKEN(ATTRIBUTE_FOUR_3, tokType_attribute_four, 0x0000)
 #endif // DEFINETOKENS
 
 // Macro snippet that loads all the attributes from tokens
-#define GENERATED_TOKEN_LOADER(endpoint) do {                                                                                                                                      \
-    uint8_t ptr[33];                                                                                                                                                               \
-    uint8_t curNetwork = emberGetCurrentNetwork();                                                                                                                                 \
-    uint8_t epNetwork;                                                                                                                                                             \
-    halCommonGetToken((tokType_hw_version *)ptr, TOKEN_HW_VERSION_SINGLETON);                                                                                                      \
-    emberAfWriteServerAttribute(1, ZCL_BASIC_CLUSTER_ID, ZCL_HW_VERSION_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT8U_ATTRIBUTE_TYPE);                                                    \
-    halCommonGetToken((tokType_manufacturer_name *)ptr, TOKEN_MANUFACTURER_NAME_SINGLETON);                                                                                        \
-    emberAfWriteServerAttribute(1, ZCL_BASIC_CLUSTER_ID, ZCL_MANUFACTURER_NAME_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);                                       \
-    halCommonGetToken((tokType_model_identifier *)ptr, TOKEN_MODEL_IDENTIFIER_SINGLETON);                                                                                          \
-    emberAfWriteServerAttribute(1, ZCL_BASIC_CLUSTER_ID, ZCL_MODEL_IDENTIFIER_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);                                        \
-    halCommonGetToken((tokType_date_code *)ptr, TOKEN_DATE_CODE_SINGLETON);                                                                                                        \
-    emberAfWriteServerAttribute(1, ZCL_BASIC_CLUSTER_ID, ZCL_DATE_CODE_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);                                               \
-    epNetwork = emberAfNetworkIndexFromEndpoint(1);                                                                                                                                \
-    if ((endpoint) == 1 || ((endpoint) == EMBER_BROADCAST_ENDPOINT && epNetwork == curNetwork)) {                                                                                  \
-      halCommonGetToken((tokType_version *)ptr, TOKEN_VERSION_1);                                                                                                                  \
-      emberAfWriteServerAttribute(1, ZCL_BASIC_CLUSTER_ID, ZCL_VERSION_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT8U_ATTRIBUTE_TYPE);                                                     \
-      halCommonGetToken((tokType_application_version *)ptr, TOKEN_APPLICATION_VERSION_1);                                                                                          \
-      emberAfWriteServerAttribute(1, ZCL_BASIC_CLUSTER_ID, ZCL_APPLICATION_VERSION_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT8U_ATTRIBUTE_TYPE);                                         \
-      halCommonGetToken((tokType_stack_version *)ptr, TOKEN_STACK_VERSION_1);                                                                                                      \
-      emberAfWriteServerAttribute(1, ZCL_BASIC_CLUSTER_ID, ZCL_STACK_VERSION_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT8U_ATTRIBUTE_TYPE);                                               \
-      halCommonGetToken((tokType_barrier_open_period *)ptr, TOKEN_BARRIER_OPEN_PERIOD_1);                                                                                          \
-      emberAfWriteServerAttribute(1, ZCL_BARRIER_CONTROL_CLUSTER_ID, ZCL_BARRIER_OPEN_PERIOD_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT16U_ATTRIBUTE_TYPE);                              \
-      halCommonGetToken((tokType_barrier_close_period *)ptr, TOKEN_BARRIER_CLOSE_PERIOD_1);                                                                                        \
-      emberAfWriteServerAttribute(1, ZCL_BARRIER_CONTROL_CLUSTER_ID, ZCL_BARRIER_CLOSE_PERIOD_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT16U_ATTRIBUTE_TYPE);                             \
-      halCommonGetToken((tokType_attribute_two *)ptr, TOKEN_ATTRIBUTE_TWO_1);                                                                                                      \
-      emberAfWriteManufacturerSpecificServerAttribute(1, ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID, ZCL_ATTRIBUTE_TWO_ATTRIBUTE_ID, 0x1002, (uint8_t*)ptr, ZCL_INT8U_ATTRIBUTE_TYPE);     \
-      halCommonGetToken((tokType_attribute_four *)ptr, TOKEN_ATTRIBUTE_FOUR_1);                                                                                                    \
-      emberAfWriteManufacturerSpecificServerAttribute(1, ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_2_ID, ZCL_ATTRIBUTE_FOUR_ATTRIBUTE_ID, 0x1049, (uint8_t*)ptr, ZCL_INT16U_ATTRIBUTE_TYPE); \
-    }                                                                                                                                                                              \
-    epNetwork = emberAfNetworkIndexFromEndpoint(2);                                                                                                                                \
-    if ((endpoint) == 2 || ((endpoint) == EMBER_BROADCAST_ENDPOINT && epNetwork == curNetwork)) {                                                                                  \
-      halCommonGetToken((tokType_version *)ptr, TOKEN_VERSION_2);                                                                                                                  \
-      emberAfWriteServerAttribute(2, ZCL_BASIC_CLUSTER_ID, ZCL_VERSION_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT8U_ATTRIBUTE_TYPE);                                                     \
-      halCommonGetToken((tokType_application_version *)ptr, TOKEN_APPLICATION_VERSION_2);                                                                                          \
-      emberAfWriteServerAttribute(2, ZCL_BASIC_CLUSTER_ID, ZCL_APPLICATION_VERSION_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT8U_ATTRIBUTE_TYPE);                                         \
-      halCommonGetToken((tokType_stack_version *)ptr, TOKEN_STACK_VERSION_2);                                                                                                      \
-      emberAfWriteServerAttribute(2, ZCL_BASIC_CLUSTER_ID, ZCL_STACK_VERSION_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT8U_ATTRIBUTE_TYPE);                                               \
-      halCommonGetToken((tokType_barrier_open_period *)ptr, TOKEN_BARRIER_OPEN_PERIOD_2);                                                                                          \
-      emberAfWriteServerAttribute(2, ZCL_BARRIER_CONTROL_CLUSTER_ID, ZCL_BARRIER_OPEN_PERIOD_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT16U_ATTRIBUTE_TYPE);                              \
-      halCommonGetToken((tokType_barrier_close_period *)ptr, TOKEN_BARRIER_CLOSE_PERIOD_2);                                                                                        \
-      emberAfWriteServerAttribute(2, ZCL_BARRIER_CONTROL_CLUSTER_ID, ZCL_BARRIER_CLOSE_PERIOD_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT16U_ATTRIBUTE_TYPE);                             \
-      halCommonGetToken((tokType_attribute_two *)ptr, TOKEN_ATTRIBUTE_TWO_2);                                                                                                      \
-      emberAfWriteManufacturerSpecificServerAttribute(2, ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID, ZCL_ATTRIBUTE_TWO_ATTRIBUTE_ID, 0x1002, (uint8_t*)ptr, ZCL_INT8U_ATTRIBUTE_TYPE);     \
-      halCommonGetToken((tokType_attribute_four *)ptr, TOKEN_ATTRIBUTE_FOUR_2);                                                                                                    \
-      emberAfWriteManufacturerSpecificServerAttribute(2, ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_2_ID, ZCL_ATTRIBUTE_FOUR_ATTRIBUTE_ID, 0x1049, (uint8_t*)ptr, ZCL_INT16U_ATTRIBUTE_TYPE); \
-    }                                                                                                                                                                              \
-    epNetwork = emberAfNetworkIndexFromEndpoint(3);                                                                                                                                \
-    if ((endpoint) == 3 || ((endpoint) == EMBER_BROADCAST_ENDPOINT && epNetwork == curNetwork)) {                                                                                  \
-      halCommonGetToken((tokType_version *)ptr, TOKEN_VERSION_3);                                                                                                                  \
-      emberAfWriteServerAttribute(3, ZCL_BASIC_CLUSTER_ID, ZCL_VERSION_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT8U_ATTRIBUTE_TYPE);                                                     \
-      halCommonGetToken((tokType_application_version *)ptr, TOKEN_APPLICATION_VERSION_3);                                                                                          \
-      emberAfWriteServerAttribute(3, ZCL_BASIC_CLUSTER_ID, ZCL_APPLICATION_VERSION_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT8U_ATTRIBUTE_TYPE);                                         \
-      halCommonGetToken((tokType_stack_version *)ptr, TOKEN_STACK_VERSION_3);                                                                                                      \
-      emberAfWriteServerAttribute(3, ZCL_BASIC_CLUSTER_ID, ZCL_STACK_VERSION_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT8U_ATTRIBUTE_TYPE);                                               \
-      halCommonGetToken((tokType_barrier_open_period *)ptr, TOKEN_BARRIER_OPEN_PERIOD_3);                                                                                          \
-      emberAfWriteServerAttribute(3, ZCL_BARRIER_CONTROL_CLUSTER_ID, ZCL_BARRIER_OPEN_PERIOD_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT16U_ATTRIBUTE_TYPE);                              \
-      halCommonGetToken((tokType_barrier_close_period *)ptr, TOKEN_BARRIER_CLOSE_PERIOD_3);                                                                                        \
-      emberAfWriteServerAttribute(3, ZCL_BARRIER_CONTROL_CLUSTER_ID, ZCL_BARRIER_CLOSE_PERIOD_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT16U_ATTRIBUTE_TYPE);                             \
-      halCommonGetToken((tokType_attribute_two *)ptr, TOKEN_ATTRIBUTE_TWO_3);                                                                                                      \
-      emberAfWriteManufacturerSpecificServerAttribute(3, ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID, ZCL_ATTRIBUTE_TWO_ATTRIBUTE_ID, 0x1002, (uint8_t*)ptr, ZCL_INT8U_ATTRIBUTE_TYPE);     \
-      halCommonGetToken((tokType_attribute_four *)ptr, TOKEN_ATTRIBUTE_FOUR_3);                                                                                                    \
-      emberAfWriteManufacturerSpecificServerAttribute(3, ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_2_ID, ZCL_ATTRIBUTE_FOUR_ATTRIBUTE_ID, 0x1049, (uint8_t*)ptr, ZCL_INT16U_ATTRIBUTE_TYPE); \
-    }                                                                                                                                                                              \
-} while (false)
+#define GENERATED_TOKEN_LOADER(endpoint)                                                                                           \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        uint8_t ptr[33];                                                                                                           \
+        uint8_t curNetwork = emberGetCurrentNetwork();                                                                             \
+        uint8_t epNetwork;                                                                                                         \
+        halCommonGetToken((tokType_hw_version *) ptr, TOKEN_HW_VERSION_SINGLETON);                                                 \
+        emberAfWriteServerAttribute(1, ZCL_BASIC_CLUSTER_ID, ZCL_HW_VERSION_ATTRIBUTE_ID, (uint8_t *) ptr,                         \
+                                    ZCL_INT8U_ATTRIBUTE_TYPE);                                                                     \
+        halCommonGetToken((tokType_manufacturer_name *) ptr, TOKEN_MANUFACTURER_NAME_SINGLETON);                                   \
+        emberAfWriteServerAttribute(1, ZCL_BASIC_CLUSTER_ID, ZCL_MANUFACTURER_NAME_ATTRIBUTE_ID, (uint8_t *) ptr,                  \
+                                    ZCL_CHAR_STRING_ATTRIBUTE_TYPE);                                                               \
+        halCommonGetToken((tokType_model_identifier *) ptr, TOKEN_MODEL_IDENTIFIER_SINGLETON);                                     \
+        emberAfWriteServerAttribute(1, ZCL_BASIC_CLUSTER_ID, ZCL_MODEL_IDENTIFIER_ATTRIBUTE_ID, (uint8_t *) ptr,                   \
+                                    ZCL_CHAR_STRING_ATTRIBUTE_TYPE);                                                               \
+        halCommonGetToken((tokType_date_code *) ptr, TOKEN_DATE_CODE_SINGLETON);                                                   \
+        emberAfWriteServerAttribute(1, ZCL_BASIC_CLUSTER_ID, ZCL_DATE_CODE_ATTRIBUTE_ID, (uint8_t *) ptr,                          \
+                                    ZCL_CHAR_STRING_ATTRIBUTE_TYPE);                                                               \
+        epNetwork = emberAfNetworkIndexFromEndpoint(1);                                                                            \
+        if ((endpoint) == 1 || ((endpoint) == EMBER_BROADCAST_ENDPOINT && epNetwork == curNetwork))                                \
+        {                                                                                                                          \
+            halCommonGetToken((tokType_version *) ptr, TOKEN_VERSION_1);                                                           \
+            emberAfWriteServerAttribute(1, ZCL_BASIC_CLUSTER_ID, ZCL_VERSION_ATTRIBUTE_ID, (uint8_t *) ptr,                        \
+                                        ZCL_INT8U_ATTRIBUTE_TYPE);                                                                 \
+            halCommonGetToken((tokType_application_version *) ptr, TOKEN_APPLICATION_VERSION_1);                                   \
+            emberAfWriteServerAttribute(1, ZCL_BASIC_CLUSTER_ID, ZCL_APPLICATION_VERSION_ATTRIBUTE_ID, (uint8_t *) ptr,            \
+                                        ZCL_INT8U_ATTRIBUTE_TYPE);                                                                 \
+            halCommonGetToken((tokType_stack_version *) ptr, TOKEN_STACK_VERSION_1);                                               \
+            emberAfWriteServerAttribute(1, ZCL_BASIC_CLUSTER_ID, ZCL_STACK_VERSION_ATTRIBUTE_ID, (uint8_t *) ptr,                  \
+                                        ZCL_INT8U_ATTRIBUTE_TYPE);                                                                 \
+            halCommonGetToken((tokType_barrier_open_period *) ptr, TOKEN_BARRIER_OPEN_PERIOD_1);                                   \
+            emberAfWriteServerAttribute(1, ZCL_BARRIER_CONTROL_CLUSTER_ID, ZCL_BARRIER_OPEN_PERIOD_ATTRIBUTE_ID, (uint8_t *) ptr,  \
+                                        ZCL_INT16U_ATTRIBUTE_TYPE);                                                                \
+            halCommonGetToken((tokType_barrier_close_period *) ptr, TOKEN_BARRIER_CLOSE_PERIOD_1);                                 \
+            emberAfWriteServerAttribute(1, ZCL_BARRIER_CONTROL_CLUSTER_ID, ZCL_BARRIER_CLOSE_PERIOD_ATTRIBUTE_ID, (uint8_t *) ptr, \
+                                        ZCL_INT16U_ATTRIBUTE_TYPE);                                                                \
+            halCommonGetToken((tokType_attribute_two *) ptr, TOKEN_ATTRIBUTE_TWO_1);                                               \
+            emberAfWriteManufacturerSpecificServerAttribute(1, ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID, ZCL_ATTRIBUTE_TWO_ATTRIBUTE_ID, \
+                                                            0x1002, (uint8_t *) ptr, ZCL_INT8U_ATTRIBUTE_TYPE);                    \
+            halCommonGetToken((tokType_attribute_four *) ptr, TOKEN_ATTRIBUTE_FOUR_1);                                             \
+            emberAfWriteManufacturerSpecificServerAttribute(1, ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_2_ID,                               \
+                                                            ZCL_ATTRIBUTE_FOUR_ATTRIBUTE_ID, 0x1049, (uint8_t *) ptr,              \
+                                                            ZCL_INT16U_ATTRIBUTE_TYPE);                                            \
+        }                                                                                                                          \
+        epNetwork = emberAfNetworkIndexFromEndpoint(2);                                                                            \
+        if ((endpoint) == 2 || ((endpoint) == EMBER_BROADCAST_ENDPOINT && epNetwork == curNetwork))                                \
+        {                                                                                                                          \
+            halCommonGetToken((tokType_version *) ptr, TOKEN_VERSION_2);                                                           \
+            emberAfWriteServerAttribute(2, ZCL_BASIC_CLUSTER_ID, ZCL_VERSION_ATTRIBUTE_ID, (uint8_t *) ptr,                        \
+                                        ZCL_INT8U_ATTRIBUTE_TYPE);                                                                 \
+            halCommonGetToken((tokType_application_version *) ptr, TOKEN_APPLICATION_VERSION_2);                                   \
+            emberAfWriteServerAttribute(2, ZCL_BASIC_CLUSTER_ID, ZCL_APPLICATION_VERSION_ATTRIBUTE_ID, (uint8_t *) ptr,            \
+                                        ZCL_INT8U_ATTRIBUTE_TYPE);                                                                 \
+            halCommonGetToken((tokType_stack_version *) ptr, TOKEN_STACK_VERSION_2);                                               \
+            emberAfWriteServerAttribute(2, ZCL_BASIC_CLUSTER_ID, ZCL_STACK_VERSION_ATTRIBUTE_ID, (uint8_t *) ptr,                  \
+                                        ZCL_INT8U_ATTRIBUTE_TYPE);                                                                 \
+            halCommonGetToken((tokType_barrier_open_period *) ptr, TOKEN_BARRIER_OPEN_PERIOD_2);                                   \
+            emberAfWriteServerAttribute(2, ZCL_BARRIER_CONTROL_CLUSTER_ID, ZCL_BARRIER_OPEN_PERIOD_ATTRIBUTE_ID, (uint8_t *) ptr,  \
+                                        ZCL_INT16U_ATTRIBUTE_TYPE);                                                                \
+            halCommonGetToken((tokType_barrier_close_period *) ptr, TOKEN_BARRIER_CLOSE_PERIOD_2);                                 \
+            emberAfWriteServerAttribute(2, ZCL_BARRIER_CONTROL_CLUSTER_ID, ZCL_BARRIER_CLOSE_PERIOD_ATTRIBUTE_ID, (uint8_t *) ptr, \
+                                        ZCL_INT16U_ATTRIBUTE_TYPE);                                                                \
+            halCommonGetToken((tokType_attribute_two *) ptr, TOKEN_ATTRIBUTE_TWO_2);                                               \
+            emberAfWriteManufacturerSpecificServerAttribute(2, ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID, ZCL_ATTRIBUTE_TWO_ATTRIBUTE_ID, \
+                                                            0x1002, (uint8_t *) ptr, ZCL_INT8U_ATTRIBUTE_TYPE);                    \
+            halCommonGetToken((tokType_attribute_four *) ptr, TOKEN_ATTRIBUTE_FOUR_2);                                             \
+            emberAfWriteManufacturerSpecificServerAttribute(2, ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_2_ID,                               \
+                                                            ZCL_ATTRIBUTE_FOUR_ATTRIBUTE_ID, 0x1049, (uint8_t *) ptr,              \
+                                                            ZCL_INT16U_ATTRIBUTE_TYPE);                                            \
+        }                                                                                                                          \
+        epNetwork = emberAfNetworkIndexFromEndpoint(3);                                                                            \
+        if ((endpoint) == 3 || ((endpoint) == EMBER_BROADCAST_ENDPOINT && epNetwork == curNetwork))                                \
+        {                                                                                                                          \
+            halCommonGetToken((tokType_version *) ptr, TOKEN_VERSION_3);                                                           \
+            emberAfWriteServerAttribute(3, ZCL_BASIC_CLUSTER_ID, ZCL_VERSION_ATTRIBUTE_ID, (uint8_t *) ptr,                        \
+                                        ZCL_INT8U_ATTRIBUTE_TYPE);                                                                 \
+            halCommonGetToken((tokType_application_version *) ptr, TOKEN_APPLICATION_VERSION_3);                                   \
+            emberAfWriteServerAttribute(3, ZCL_BASIC_CLUSTER_ID, ZCL_APPLICATION_VERSION_ATTRIBUTE_ID, (uint8_t *) ptr,            \
+                                        ZCL_INT8U_ATTRIBUTE_TYPE);                                                                 \
+            halCommonGetToken((tokType_stack_version *) ptr, TOKEN_STACK_VERSION_3);                                               \
+            emberAfWriteServerAttribute(3, ZCL_BASIC_CLUSTER_ID, ZCL_STACK_VERSION_ATTRIBUTE_ID, (uint8_t *) ptr,                  \
+                                        ZCL_INT8U_ATTRIBUTE_TYPE);                                                                 \
+            halCommonGetToken((tokType_barrier_open_period *) ptr, TOKEN_BARRIER_OPEN_PERIOD_3);                                   \
+            emberAfWriteServerAttribute(3, ZCL_BARRIER_CONTROL_CLUSTER_ID, ZCL_BARRIER_OPEN_PERIOD_ATTRIBUTE_ID, (uint8_t *) ptr,  \
+                                        ZCL_INT16U_ATTRIBUTE_TYPE);                                                                \
+            halCommonGetToken((tokType_barrier_close_period *) ptr, TOKEN_BARRIER_CLOSE_PERIOD_3);                                 \
+            emberAfWriteServerAttribute(3, ZCL_BARRIER_CONTROL_CLUSTER_ID, ZCL_BARRIER_CLOSE_PERIOD_ATTRIBUTE_ID, (uint8_t *) ptr, \
+                                        ZCL_INT16U_ATTRIBUTE_TYPE);                                                                \
+            halCommonGetToken((tokType_attribute_two *) ptr, TOKEN_ATTRIBUTE_TWO_3);                                               \
+            emberAfWriteManufacturerSpecificServerAttribute(3, ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID, ZCL_ATTRIBUTE_TWO_ATTRIBUTE_ID, \
+                                                            0x1002, (uint8_t *) ptr, ZCL_INT8U_ATTRIBUTE_TYPE);                    \
+            halCommonGetToken((tokType_attribute_four *) ptr, TOKEN_ATTRIBUTE_FOUR_3);                                             \
+            emberAfWriteManufacturerSpecificServerAttribute(3, ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_2_ID,                               \
+                                                            ZCL_ATTRIBUTE_FOUR_ATTRIBUTE_ID, 0x1049, (uint8_t *) ptr,              \
+                                                            ZCL_INT16U_ATTRIBUTE_TYPE);                                            \
+        }                                                                                                                          \
+    } while (false)
 
 // Macro snippet that saves the attribute to token
-#define GENERATED_TOKEN_SAVER do {                                                                                               \
-    uint8_t allZeroData[33];                                                                                                     \
-    MEMSET(allZeroData, 0, 33);                                                                                                  \
-    if ( data == NULL ) { data = allZeroData; }                                                                                  \
-    if ( clusterId == 0x00 ) {                                                                                                   \
-      if ( metadata->attributeId == 0x0003 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) {   \
-        halCommonSetToken(TOKEN_HW_VERSION_SINGLETON, data); }                                                                   \
-      if ( metadata->attributeId == 0x0004 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) {   \
-        halCommonSetToken(TOKEN_MANUFACTURER_NAME_SINGLETON, data); }                                                            \
-      if ( metadata->attributeId == 0x0005 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) {   \
-        halCommonSetToken(TOKEN_MODEL_IDENTIFIER_SINGLETON, data); }                                                             \
-      if ( metadata->attributeId == 0x0006 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) {   \
-        halCommonSetToken(TOKEN_DATE_CODE_SINGLETON, data); }                                                                    \
-    }                                                                                                                            \
-    if ( endpoint == 1 ) {                                                                                                       \
-      if ( clusterId == 0x00 ) {                                                                                                 \
-        if ( metadata->attributeId == 0x0000 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_VERSION_1, data); }                                                                            \
-        if ( metadata->attributeId == 0x0001 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_APPLICATION_VERSION_1, data); }                                                                \
-        if ( metadata->attributeId == 0x0002 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_STACK_VERSION_1, data); }                                                                      \
-      } else if ( clusterId == 0x0103 ) {                                                                                        \
-        if ( metadata->attributeId == 0x0008 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_BARRIER_OPEN_PERIOD_1, data); }                                                                \
-        if ( metadata->attributeId == 0x0009 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_BARRIER_CLOSE_PERIOD_1, data); }                                                               \
-      } else if ( clusterId == 0xFC00 ) {                                                                                        \
-        if ( metadata->attributeId == 0x0001 && 0x1002 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_ATTRIBUTE_TWO_1, data); }                                                                      \
-        if ( metadata->attributeId == 0x0001 && 0x1049 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_ATTRIBUTE_FOUR_1, data); }                                                                     \
-      }                                                                                                                          \
-    } else if ( endpoint == 2) {                                                                                                 \
-      if ( clusterId == 0x00 ) {                                                                                                 \
-        if ( metadata->attributeId == 0x0000 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_VERSION_2, data); }                                                                            \
-        if ( metadata->attributeId == 0x0001 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_APPLICATION_VERSION_2, data); }                                                                \
-        if ( metadata->attributeId == 0x0002 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_STACK_VERSION_2, data); }                                                                      \
-      } else if ( clusterId == 0x0103 ) {                                                                                        \
-        if ( metadata->attributeId == 0x0008 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_BARRIER_OPEN_PERIOD_2, data); }                                                                \
-        if ( metadata->attributeId == 0x0009 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_BARRIER_CLOSE_PERIOD_2, data); }                                                               \
-      } else if ( clusterId == 0xFC00 ) {                                                                                        \
-        if ( metadata->attributeId == 0x0001 && 0x1002 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_ATTRIBUTE_TWO_2, data); }                                                                      \
-        if ( metadata->attributeId == 0x0001 && 0x1049 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_ATTRIBUTE_FOUR_2, data); }                                                                     \
-      }                                                                                                                          \
-    } else if ( endpoint == 3) {                                                                                                 \
-      if ( clusterId == 0x00 ) {                                                                                                 \
-        if ( metadata->attributeId == 0x0000 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_VERSION_3, data); }                                                                            \
-        if ( metadata->attributeId == 0x0001 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_APPLICATION_VERSION_3, data); }                                                                \
-        if ( metadata->attributeId == 0x0002 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_STACK_VERSION_3, data); }                                                                      \
-      } else if ( clusterId == 0x0103 ) {                                                                                        \
-        if ( metadata->attributeId == 0x0008 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_BARRIER_OPEN_PERIOD_3, data); }                                                                \
-        if ( metadata->attributeId == 0x0009 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_BARRIER_CLOSE_PERIOD_3, data); }                                                               \
-      } else if ( clusterId == 0xFC00 ) {                                                                                        \
-        if ( metadata->attributeId == 0x0001 && 0x1002 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_ATTRIBUTE_TWO_3, data); }                                                                      \
-        if ( metadata->attributeId == 0x0001 && 0x1049 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_ATTRIBUTE_FOUR_3, data); }                                                                     \
-      }                                                                                                                          \
-    }                                                                                                                            \
-} while (false)
+#define GENERATED_TOKEN_SAVER                                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        uint8_t allZeroData[33];                                                                                                   \
+        MEMSET(allZeroData, 0, 33);                                                                                                \
+        if (data == NULL)                                                                                                          \
+        {                                                                                                                          \
+            data = allZeroData;                                                                                                    \
+        }                                                                                                                          \
+        if (clusterId == 0x00)                                                                                                     \
+        {                                                                                                                          \
+            if (metadata->attributeId == 0x0003 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata))   \
+            {                                                                                                                      \
+                halCommonSetToken(TOKEN_HW_VERSION_SINGLETON, data);                                                               \
+            }                                                                                                                      \
+            if (metadata->attributeId == 0x0004 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata))   \
+            {                                                                                                                      \
+                halCommonSetToken(TOKEN_MANUFACTURER_NAME_SINGLETON, data);                                                        \
+            }                                                                                                                      \
+            if (metadata->attributeId == 0x0005 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata))   \
+            {                                                                                                                      \
+                halCommonSetToken(TOKEN_MODEL_IDENTIFIER_SINGLETON, data);                                                         \
+            }                                                                                                                      \
+            if (metadata->attributeId == 0x0006 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata))   \
+            {                                                                                                                      \
+                halCommonSetToken(TOKEN_DATE_CODE_SINGLETON, data);                                                                \
+            }                                                                                                                      \
+        }                                                                                                                          \
+        if (endpoint == 1)                                                                                                         \
+        {                                                                                                                          \
+            if (clusterId == 0x00)                                                                                                 \
+            {                                                                                                                      \
+                if (metadata->attributeId == 0x0000 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_VERSION_1, data);                                                                      \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0001 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_APPLICATION_VERSION_1, data);                                                          \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0002 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_STACK_VERSION_1, data);                                                                \
+                }                                                                                                                  \
+            }                                                                                                                      \
+            else if (clusterId == 0x0103)                                                                                          \
+            {                                                                                                                      \
+                if (metadata->attributeId == 0x0008 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_BARRIER_OPEN_PERIOD_1, data);                                                          \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0009 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_BARRIER_CLOSE_PERIOD_1, data);                                                         \
+                }                                                                                                                  \
+            }                                                                                                                      \
+            else if (clusterId == 0xFC00)                                                                                          \
+            {                                                                                                                      \
+                if (metadata->attributeId == 0x0001 && 0x1002 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_ATTRIBUTE_TWO_1, data);                                                                \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0001 && 0x1049 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_ATTRIBUTE_FOUR_1, data);                                                               \
+                }                                                                                                                  \
+            }                                                                                                                      \
+        }                                                                                                                          \
+        else if (endpoint == 2)                                                                                                    \
+        {                                                                                                                          \
+            if (clusterId == 0x00)                                                                                                 \
+            {                                                                                                                      \
+                if (metadata->attributeId == 0x0000 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_VERSION_2, data);                                                                      \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0001 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_APPLICATION_VERSION_2, data);                                                          \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0002 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_STACK_VERSION_2, data);                                                                \
+                }                                                                                                                  \
+            }                                                                                                                      \
+            else if (clusterId == 0x0103)                                                                                          \
+            {                                                                                                                      \
+                if (metadata->attributeId == 0x0008 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_BARRIER_OPEN_PERIOD_2, data);                                                          \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0009 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_BARRIER_CLOSE_PERIOD_2, data);                                                         \
+                }                                                                                                                  \
+            }                                                                                                                      \
+            else if (clusterId == 0xFC00)                                                                                          \
+            {                                                                                                                      \
+                if (metadata->attributeId == 0x0001 && 0x1002 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_ATTRIBUTE_TWO_2, data);                                                                \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0001 && 0x1049 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_ATTRIBUTE_FOUR_2, data);                                                               \
+                }                                                                                                                  \
+            }                                                                                                                      \
+        }                                                                                                                          \
+        else if (endpoint == 3)                                                                                                    \
+        {                                                                                                                          \
+            if (clusterId == 0x00)                                                                                                 \
+            {                                                                                                                      \
+                if (metadata->attributeId == 0x0000 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_VERSION_3, data);                                                                      \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0001 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_APPLICATION_VERSION_3, data);                                                          \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0002 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_STACK_VERSION_3, data);                                                                \
+                }                                                                                                                  \
+            }                                                                                                                      \
+            else if (clusterId == 0x0103)                                                                                          \
+            {                                                                                                                      \
+                if (metadata->attributeId == 0x0008 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_BARRIER_OPEN_PERIOD_3, data);                                                          \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0009 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_BARRIER_CLOSE_PERIOD_3, data);                                                         \
+                }                                                                                                                  \
+            }                                                                                                                      \
+            else if (clusterId == 0xFC00)                                                                                          \
+            {                                                                                                                      \
+                if (metadata->attributeId == 0x0001 && 0x1002 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_ATTRIBUTE_TWO_3, data);                                                                \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0001 && 0x1049 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_ATTRIBUTE_FOUR_3, data);                                                               \
+                }                                                                                                                  \
+            }                                                                                                                      \
+        }                                                                                                                          \
+    } while (false)

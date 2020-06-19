@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Core CLI commands used by all applications, regardless of profile.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Core CLI commands used by all applications,
+                                                                               *regardless of profile.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_CORE_CLI_H
 #define SILABS_CORE_CLI_H

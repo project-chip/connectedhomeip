@@ -43,15 +43,15 @@
 // the incomming message, and call appropriate command handler.
 
 // Cluster: Identify, server
-EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Poll Control, client
-EmberAfStatus emberAfPollControlClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfPollControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: IAS Zone, client
-EmberAfStatus emberAfIasZoneClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfIasZoneClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: 11073 Protocol Tunnel, server
-EmberAfStatus emberAf11073ProtocolTunnelClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAf11073ProtocolTunnelClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 #endif // SILABS_EMBER_AF_COMMAND_PARSE_HEADER

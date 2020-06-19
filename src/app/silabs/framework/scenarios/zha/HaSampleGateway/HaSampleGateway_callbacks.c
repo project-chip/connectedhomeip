@@ -31,15 +31,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
-#include "app/util/common/form-and-join.h"
 #include "app/framework/plugin/ezmode-commissioning/ez-mode.h"
+#include "app/util/common/form-and-join.h"
 
 #define LED BOARDLED1
 #define PJOIN_DURATION_S 60
@@ -47,51 +47,44 @@
 // Event control struct declarations
 EmberEventControl buttonEventControl;
 
-static uint8_t const happyTune[] = {
-  NOTE_B4, 1,
-  0, 1,
-  NOTE_B5, 1,
-  0, 0
-};
-static uint8_t const sadTune[] = {
-  NOTE_B5, 1,
-  0, 1,
-  NOTE_B4, 5,
-  0, 0
-};
-static uint8_t const waitTune[] = {
-  NOTE_B4, 1,
-  0, 0
-};
+static uint8_t const happyTune[] = { NOTE_B4, 1, 0, 1, NOTE_B5, 1, 0, 0 };
+static uint8_t const sadTune[]   = { NOTE_B5, 1, 0, 1, NOTE_B4, 5, 0, 0 };
+static uint8_t const waitTune[]  = { NOTE_B4, 1, 0, 0 };
 
 static void pjoin(void)
 {
-  if (emberPermitJoining(PJOIN_DURATION_S) == EMBER_SUCCESS) {
-    halPlayTune_P(happyTune, true);
-  } else {
-    halPlayTune_P(sadTune, true);
-  }
+    if (emberPermitJoining(PJOIN_DURATION_S) == EMBER_SUCCESS)
+    {
+        halPlayTune_P(happyTune, true);
+    }
+    else
+    {
+        halPlayTune_P(sadTune, true);
+    }
 }
 
 void buttonEventHandler(void)
 {
-  // On a press-and-hold button event, form a network if we don't have one or
-  // permit joining if we do.  If we form, we'll automatically permit joining
-  // when we come up.
-  emberEventControlSetInactive(buttonEventControl);
-  if (halButtonState(BUTTON0) == BUTTON_PRESSED) {
-    if (emberAfNetworkState() == EMBER_NO_NETWORK) {
-      halPlayTune_P(((emberFormAndJoinIsScanning()
-                      || emberAfFindUnusedPanIdAndForm() == EMBER_SUCCESS)
-                     ? waitTune
-                     : sadTune),
-                    true);
-    } else {
-      pjoin();
+    // On a press-and-hold button event, form a network if we don't have one or
+    // permit joining if we do.  If we form, we'll automatically permit joining
+    // when we come up.
+    emberEventControlSetInactive(buttonEventControl);
+    if (halButtonState(BUTTON0) == BUTTON_PRESSED)
+    {
+        if (emberAfNetworkState() == EMBER_NO_NETWORK)
+        {
+            halPlayTune_P(((emberFormAndJoinIsScanning() || emberAfFindUnusedPanIdAndForm() == EMBER_SUCCESS) ? waitTune : sadTune),
+                          true);
+        }
+        else
+        {
+            pjoin();
+        }
     }
-  } else if (halButtonState(BUTTON1) == BUTTON_PRESSED) {
-    emberAfEzmodeServerCommission(emberAfPrimaryEndpoint());
-  }
+    else if (halButtonState(BUTTON1) == BUTTON_PRESSED)
+    {
+        emberAfEzmodeServerCommission(emberAfPrimaryEndpoint());
+    }
 }
 
 /** @brief Stack Status
@@ -106,14 +99,17 @@ void buttonEventHandler(void)
  */
 bool emberAfStackStatusCallback(EmberStatus status)
 {
-  // Whenever the network comes up, permit joining.  If we go down, let the
-  // user know, although this shouldn't happen.
-  if (status == EMBER_NETWORK_UP) {
-    pjoin();
-  } else if (status == EMBER_NETWORK_DOWN) {
-    halPlayTune_P(sadTune, true);
-  }
-  return false;
+    // Whenever the network comes up, permit joining.  If we go down, let the
+    // user know, although this shouldn't happen.
+    if (status == EMBER_NETWORK_UP)
+    {
+        pjoin();
+    }
+    else if (status == EMBER_NETWORK_DOWN)
+    {
+        halPlayTune_P(sadTune, true);
+    }
+    return false;
 }
 
 /** @brief emberAfHalButtonIsrCallback
@@ -125,9 +121,10 @@ bool emberAfStackStatusCallback(EmberStatus status)
 // device. This callback is called within ISR context.
 void emberAfHalButtonIsrCallback(uint8_t button, uint8_t state)
 {
-  if ((button == BUTTON0 || button == BUTTON1) && state == BUTTON_PRESSED) {
-    emberEventControlSetActive(buttonEventControl);
-  }
+    if ((button == BUTTON0 || button == BUTTON1) && state == BUTTON_PRESSED)
+    {
+        emberEventControlSetActive(buttonEventControl);
+    }
 }
 
 /** @brief Broadcast Sent
@@ -136,9 +133,7 @@ void emberAfHalButtonIsrCallback(uint8_t button, uint8_t state)
  * sent by the concentrator plugin.
  *
  */
-void emberAfPluginConcentratorBroadcastSentCallback(void)
-{
-}
+void emberAfPluginConcentratorBroadcastSentCallback(void) {}
 
 /** @brief Client Complete
  *
@@ -148,9 +143,7 @@ void emberAfPluginConcentratorBroadcastSentCallback(void)
  * @param bindingIndex The binding index that was created or
  * ::EMBER_NULL_BINDING if an error occurred.  Ver.: always
  */
-void emberAfPluginEzmodeCommissioningClientCompleteCallback(uint8_t bindingIndex)
-{
-}
+void emberAfPluginEzmodeCommissioningClientCompleteCallback(uint8_t bindingIndex) {}
 
 /** @brief Finished
  *
@@ -160,9 +153,7 @@ void emberAfPluginEzmodeCommissioningClientCompleteCallback(uint8_t bindingIndex
  *
  * @param status   Ver.: always
  */
-void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
-{
-}
+void emberAfPluginNetworkFindFinishedCallback(EmberStatus status) {}
 
 /** @brief Get Radio Power For Channel
  *
@@ -174,7 +165,7 @@ void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
  */
 int8_t emberAfPluginNetworkFindGetRadioPowerForChannelCallback(uint8_t channel)
 {
-  return EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_POWER;
+    return EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_POWER;
 }
 
 /** @brief Join
@@ -189,11 +180,9 @@ int8_t emberAfPluginNetworkFindGetRadioPowerForChannelCallback(uint8_t channel)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
-                                          uint8_t lqi,
-                                          int8_t rssi)
+bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }
 
 /** @brief Configured
@@ -211,5 +200,5 @@ bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
  */
 EmberAfStatus emberAfPluginReportingConfiguredCallback(const EmberAfPluginReportingEntry * entry)
 {
-  return EMBER_ZCL_STATUS_SUCCESS;
+    return EMBER_ZCL_STATUS_SUCCESS;
 }

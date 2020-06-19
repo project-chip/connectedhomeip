@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // Copyright 2007 - 2011 by Ember Corporation. All rights reserved.
 //
@@ -58,7 +58,7 @@
  */
 void emberAfRegistrationCallback(bool success)
 {
-  emberAfRegistrationPrintln("Registration %p", success ? "complete" : "failed");
+    emberAfRegistrationPrintln("Registration %p", success ? "complete" : "failed");
 }
 
 /** @brief Trust Center Join
@@ -76,13 +76,10 @@ void emberAfRegistrationCallback(bool success)
  * @param status   Ver.: always
  * @param decision   Ver.: always
  */
-void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId,
-                                    EmberEUI64 newNodeEui64,
-                                    EmberNodeId parentOfNewNode,
-                                    EmberDeviceUpdate status,
-                                    EmberJoinDecision decision)
+void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId, EmberEUI64 newNodeEui64, EmberNodeId parentOfNewNode,
+                                    EmberDeviceUpdate status, EmberJoinDecision decision)
 {
-  emberAfRegistrationPrintln("New node joined, shortID=0x%2x", newNodeId);
+    emberAfRegistrationPrintln("New node joined, shortID=0x%2x", newNodeId);
 }
 
 /** @brief Broadcast Sent
@@ -91,9 +88,7 @@ void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId,
  * sent by the concentrator plugin.
  *
  */
-void emberAfPluginConcentratorBroadcastSentCallback(void)
-{
-}
+void emberAfPluginConcentratorBroadcastSentCallback(void) {}
 
 /** @brief Pre Message Received
  *
@@ -105,11 +100,9 @@ void emberAfPluginConcentratorBroadcastSentCallback(void)
  * @param msgLen   Ver.: always
  * @param message   Ver.: always
  */
-bool emberAfPluginInterpanPreMessageReceivedCallback(const EmberAfInterpanHeader *header,
-                                                     uint8_t msgLen,
-                                                     uint8_t *message)
+bool emberAfPluginInterpanPreMessageReceivedCallback(const EmberAfInterpanHeader * header, uint8_t msgLen, uint8_t * message)
 {
-  return false;
+    return false;
 }
 
 /** @brief Finished
@@ -120,9 +113,7 @@ bool emberAfPluginInterpanPreMessageReceivedCallback(const EmberAfInterpanHeader
  *
  * @param status   Ver.: always
  */
-void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
-{
-}
+void emberAfPluginNetworkFindFinishedCallback(EmberStatus status) {}
 
 /** @brief Join
  *
@@ -136,11 +127,9 @@ void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
-                                          uint8_t lqi,
-                                          int8_t rssi)
+bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }
 
 /** @brief Button Event
@@ -154,7 +143,4 @@ bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
  * @param buttonPressDurationMs The length of time button was held down before
  * it was released.  Ver.: always
  */
-void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
-                                                   uint32_t buttonPressDurationMs)
-{
-}
+void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber, uint32_t buttonPressDurationMs) {}

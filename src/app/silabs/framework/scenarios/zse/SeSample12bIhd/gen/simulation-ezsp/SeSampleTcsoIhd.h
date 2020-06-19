@@ -213,17 +213,14 @@
 #define EMBER_AF_PRINT_OTA_BOOTLOAD_CLUSTER 0x0010
 #define EMBER_AF_PRINT_KEEPALIVE_CLUSTER 0x0020
 #define EMBER_AF_PRINT_KEY_ESTABLISHMENT_CLUSTER 0x0040
-#define EMBER_AF_PRINT_BITS { 0x7F }
-#define EMBER_AF_PRINT_NAMES {  \
-    "Core",                     \
-    "Application",              \
-    "Security",                 \
-    "Attributes",               \
-    "Over the Air Bootloading", \
-    "Keep-Alive",               \
-    "Key Establishment",        \
-    NULL                        \
-}
+#define EMBER_AF_PRINT_BITS                                                                                                        \
+    {                                                                                                                              \
+        0x7F                                                                                                                       \
+    }
+#define EMBER_AF_PRINT_NAMES                                                                                                       \
+    {                                                                                                                              \
+        "Core", "Application", "Security", "Attributes", "Over the Air Bootloading", "Keep-Alive", "Key Establishment", NULL       \
+    }
 #define EMBER_AF_PRINT_NAME_NUMBER 7
 
 #define EMBER_AF_SUPPORT_COMMAND_DISCOVERY
@@ -275,7 +272,10 @@
 // User options for plugin Network Find
 #define EMBER_AF_PLUGIN_NETWORK_FIND_CHANNEL_MASK 0x0318C800UL
 #define EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_POWER 3
-#define EMBER_AF_PLUGIN_NETWORK_FIND_EXTENDED_PAN_ID { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
+#define EMBER_AF_PLUGIN_NETWORK_FIND_EXTENDED_PAN_ID                                                                               \
+    {                                                                                                                              \
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00                                                                             \
+    }
 #define EMBER_AF_PLUGIN_NETWORK_FIND_DURATION 5
 #define EMBER_AF_PLUGIN_NETWORK_FIND_JOINABLE_SCAN_TIMEOUT_MINUTES 1
 
@@ -300,9 +300,18 @@
 #define EMBER_AF_PLUGIN_OTA_CLIENT_PAGE_REQUEST_TIMEOUT_SECONDS 5
 #define EMBER_AF_PLUGIN_OTA_CLIENT_SIGNATURE_VERIFICATION_SUPPORT
 #define EMBER_AF_PLUGIN_OTA_CLIENT_VERIFY_DELAY_MS 10
-#define EMBER_AF_PLUGIN_OTA_CLIENT_SIGNER_EUI0 { 0x00, 0x0D, 0x6F, 0x00, 0x00, 0x19, 0x8B, 0x36 }
-#define EMBER_AF_PLUGIN_OTA_CLIENT_SIGNER_EUI1 { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
-#define EMBER_AF_PLUGIN_OTA_CLIENT_SIGNER_EUI2 { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
+#define EMBER_AF_PLUGIN_OTA_CLIENT_SIGNER_EUI0                                                                                     \
+    {                                                                                                                              \
+        0x00, 0x0D, 0x6F, 0x00, 0x00, 0x19, 0x8B, 0x36                                                                             \
+    }
+#define EMBER_AF_PLUGIN_OTA_CLIENT_SIGNER_EUI1                                                                                     \
+    {                                                                                                                              \
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00                                                                             \
+    }
+#define EMBER_AF_PLUGIN_OTA_CLIENT_SIGNER_EUI2                                                                                     \
+    {                                                                                                                              \
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00                                                                             \
+    }
 #define EMBER_AF_PLUGIN_OTA_CLIENT_MIN_BLOCK_PERIOD_UNITS SECONDS
 
 // Use this macro to check if OTA Bootload Cluster Client Policy plugin is included
@@ -463,10 +472,11 @@
 #ifdef EMBER_AF_SERIAL_PORT_INIT
 #undef EMBER_AF_SERIAL_PORT_INIT
 #endif
-#define EMBER_AF_SERIAL_PORT_INIT()                  \
-  do {                                               \
-    emberSerialInit(0, BAUD_115200, PARITY_NONE, 1); \
-    emberSerialInit(1, BAUD_115200, PARITY_NONE, 1); \
-  } while (0)
+#define EMBER_AF_SERIAL_PORT_INIT()                                                                                                \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        emberSerialInit(0, BAUD_115200, PARITY_NONE, 1);                                                                           \
+        emberSerialInit(1, BAUD_115200, PARITY_NONE, 1);                                                                           \
+    } while (0)
 
 #endif // __APP_SESAMPLETCSOIHD_H__

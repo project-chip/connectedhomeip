@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // *******************************************************************
 // * SeMeterGas_callbacks.c
@@ -60,20 +60,14 @@
 // *
 // *
 // *******************************************************************
-void emberAfClusterInitCallback(uint8_t endpointId,
-                                uint16_t clusterId)
+void emberAfClusterInitCallback(uint8_t endpointId, uint16_t clusterId)
 {
-  uint8_t deviceType = EMBER_ZCL_METERING_DEVICE_TYPE_GAS_METERING;
-  if ((endpointId == GAS_METER_ENDPOINT)
-      && (clusterId == ZCL_SIMPLE_METERING_CLUSTER_ID)) {
-    emberAfWriteAttribute(endpointId,
-                          ZCL_SIMPLE_METERING_CLUSTER_ID,
-                          ZCL_METERING_DEVICE_TYPE_ATTRIBUTE_ID,
-                          CLUSTER_MASK_SERVER,
-                          (uint8_t*) &deviceType,
-                          ZCL_INT8U_ATTRIBUTE_TYPE
-                          );
-  }
+    uint8_t deviceType = EMBER_ZCL_METERING_DEVICE_TYPE_GAS_METERING;
+    if ((endpointId == GAS_METER_ENDPOINT) && (clusterId == ZCL_SIMPLE_METERING_CLUSTER_ID))
+    {
+        emberAfWriteAttribute(endpointId, ZCL_SIMPLE_METERING_CLUSTER_ID, ZCL_METERING_DEVICE_TYPE_ATTRIBUTE_ID,
+                              CLUSTER_MASK_SERVER, (uint8_t *) &deviceType, ZCL_INT8U_ATTRIBUTE_TYPE);
+    }
 }
 
 // *******************************************************************
@@ -85,13 +79,16 @@ void emberAfClusterInitCallback(uint8_t endpointId,
 // *******************************************************************
 bool emberAfSimpleMeteringClusterMirrorRemovedCallback(uint16_t endpointId)
 {
-  if (endpointId == 0xffff) {
-    emberAfCorePrintln("%premove FAILED", "Mirror ");
-  } else {
-    emberAfCorePrintln("%pREMOVED from %x", "Mirror ", endpointId);
-  }
-  emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-  return true;
+    if (endpointId == 0xffff)
+    {
+        emberAfCorePrintln("%premove FAILED", "Mirror ");
+    }
+    else
+    {
+        emberAfCorePrintln("%pREMOVED from %x", "Mirror ", endpointId);
+    }
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
 }
 
 // *******************************************************************
@@ -113,13 +110,16 @@ bool emberAfSimpleMeteringClusterMirrorRemovedCallback(uint16_t endpointId)
 // *******************************************************************
 bool emberAfSimpleMeteringClusterRequestMirrorResponseCallback(uint16_t endpointId)
 {
-  if (endpointId == 0xffff) {
-    emberAfCorePrintln("%padd FAILED", "Mirror ");
-  } else {
-    emberAfCorePrintln("%pADDED on %x", "Mirror ", endpointId);
-  }
-  emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-  return true;
+    if (endpointId == 0xffff)
+    {
+        emberAfCorePrintln("%padd FAILED", "Mirror ");
+    }
+    else
+    {
+        emberAfCorePrintln("%pADDED on %x", "Mirror ", endpointId);
+    }
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
 }
 
 /** @brief Finished
@@ -130,9 +130,7 @@ bool emberAfSimpleMeteringClusterRequestMirrorResponseCallback(uint16_t endpoint
  *
  * @param status   Ver.: always
  */
-void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
-{
-}
+void emberAfPluginNetworkFindFinishedCallback(EmberStatus status) {}
 
 /** @brief Join
  *
@@ -146,11 +144,9 @@ void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
-                                          uint8_t lqi,
-                                          int8_t rssi)
+bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }
 
 /** @brief Select File Descriptors
@@ -167,10 +163,9 @@ bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
  * @param maxSize The maximum number of elements that the function implementor
  * may add.  Ver.: always
  */
-int emberAfPluginGatewaySelectFileDescriptorsCallback(int* list,
-                                                      int maxSize)
+int emberAfPluginGatewaySelectFileDescriptorsCallback(int * list, int maxSize)
 {
-  return 0;
+    return 0;
 }
 
 /** @brief Broadcast Sent
@@ -179,9 +174,7 @@ int emberAfPluginGatewaySelectFileDescriptorsCallback(int* list,
  * sent by the concentrator plugin.
  *
  */
-void emberAfPluginConcentratorBroadcastSentCallback(void)
-{
-}
+void emberAfPluginConcentratorBroadcastSentCallback(void) {}
 
 /** @brief Button Event
  *
@@ -194,10 +187,7 @@ void emberAfPluginConcentratorBroadcastSentCallback(void)
  * @param buttonPressDurationMs The length of time button was held down before
  * it was released.  Ver.: always
  */
-void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
-                                                   uint32_t buttonPressDurationMs)
-{
-}
+void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber, uint32_t buttonPressDurationMs) {}
 
 /** @brief Process Notification Flags
  *
@@ -208,7 +198,4 @@ void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
  * @param attributeId   Ver.: always
  * @param attributeValue   Ver.: always
  */
-void emberAfPluginSimpleMeteringServerProcessNotificationFlagsCallback(uint16_t attributeId,
-                                                                       uint32_t attributeValue)
-{
-}
+void emberAfPluginSimpleMeteringServerProcessNotificationFlagsCallback(uint16_t attributeId, uint32_t attributeValue) {}

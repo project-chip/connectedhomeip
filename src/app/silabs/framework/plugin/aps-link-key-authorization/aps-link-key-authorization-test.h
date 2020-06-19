@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Include file for APS link key authorization unit tests
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Include file for APS link key authorization
+                                                                               *unit tests
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_APS_LINK_KEY_AUTHORIZATION_TEST_H
 #define SILABS_APS_LINK_KEY_AUTHORIZATION_TEST_H
@@ -55,11 +56,9 @@ uint16_t exemptClusterList[EMBER_AF_PLUGIN_APS_LINK_KEY_AUTHORIZATION_MAX_EXEMPT
 #define halCommonSetToken(token, data)
 
 #undef halCommonGetIndexedToken
-#define halCommonGetIndexedToken(data, token, index) \
-  *(data) = exemptClusterList[index];
+#define halCommonGetIndexedToken(data, token, index) *(data) = exemptClusterList[index];
 
 #undef halCommonSetIndexedToken
-#define halCommonSetIndexedToken(token, index, data) \
-  exemptClusterList[index] = *(data);
+#define halCommonSetIndexedToken(token, index, data) exemptClusterList[index] = *(data);
 
-#endif //SILABS_APS_LINK_KEY_AUTHORIZATION_TEST_H
+#endif // SILABS_APS_LINK_KEY_AUTHORIZATION_TEST_H

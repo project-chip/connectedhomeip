@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // Copyright 2007 - 2012 by Ember Corporation. All rights reserved.
 //
@@ -55,9 +55,7 @@
  *
  * @param status   Ver.: always
  */
-void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
-{
-}
+void emberAfPluginNetworkFindFinishedCallback(EmberStatus status) {}
 
 /** @brief Join
  *
@@ -71,11 +69,9 @@ void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
-                                          uint8_t lqi,
-                                          int8_t rssi)
+bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }
 
 /** @brief Broadcast Sent
@@ -84,9 +80,7 @@ bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
  * sent by the concentrator plugin.
  *
  */
-void emberAfPluginConcentratorBroadcastSentCallback(void)
-{
-}
+void emberAfPluginConcentratorBroadcastSentCallback(void) {}
 
 /** @brief Button Event
  *
@@ -99,10 +93,7 @@ void emberAfPluginConcentratorBroadcastSentCallback(void)
  * @param buttonPressDurationMs The length of time button was held down before
  * it was released.  Ver.: always
  */
-void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
-                                                   uint32_t buttonPressDurationMs)
-{
-}
+void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber, uint32_t buttonPressDurationMs) {}
 
 /** @brief Main Init
  *
@@ -122,9 +113,7 @@ void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
  * the resource cleanup of the Application Framework itself.
  *
  */
-void emberAfMainInitCallback(void)
-{
-}
+void emberAfMainInitCallback(void) {}
 
 /** @brief Trust Center Join
  *
@@ -140,10 +129,6 @@ void emberAfMainInitCallback(void)
  * @param status   Ver.: always
  * @param decision   Ver.: always
  */
-void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId,
-                                    EmberEUI64 newNodeEui64,
-                                    EmberNodeId parentOfNewNode,
-                                    EmberDeviceUpdate status,
-                                    EmberJoinDecision decision)
-{
-}
+void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId, EmberEUI64 newNodeEui64, EmberNodeId parentOfNewNode,
+                                    EmberDeviceUpdate status, EmberJoinDecision decision)
+{}

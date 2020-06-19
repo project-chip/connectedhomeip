@@ -31,13 +31,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the Exosite plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the Exosite plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-EmberStatus emberAfPluginExositeDemoGetLightStatus(bool* lightOn);
+EmberStatus emberAfPluginExositeDemoGetLightStatus(bool * lightOn);
 EmberStatus emberAfPluginExositeDemoSetLightStatus(bool turnLightOn);
 #endif DOXYGEN_SHOULD_SKIP_THIS

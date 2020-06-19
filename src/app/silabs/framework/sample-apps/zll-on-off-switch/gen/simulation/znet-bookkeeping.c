@@ -40,80 +40,81 @@
 #include "af.h"
 
 // Init function declarations.
-void emberAfMainInitCallback(void);  // Global
-void emberAfInit(void);  // Global
-void emberAfPluginEndDeviceSupportInitCallback(void);  // Plugin: end-device-support
+void emberAfMainInitCallback(void);                   // Global
+void emberAfInit(void);                               // Global
+void emberAfPluginEndDeviceSupportInitCallback(void); // Plugin: end-device-support
 
 void emAfInit(void)
 {
-  emberAfMainInitCallback();  // Global
-  emberAfInit();  // Global
-  emberAfPluginEndDeviceSupportInitCallback();  // Plugin: end-device-support
+    emberAfMainInitCallback();                   // Global
+    emberAfInit();                               // Global
+    emberAfPluginEndDeviceSupportInitCallback(); // Plugin: end-device-support
 }
 
 // Tick function declarations.
-void emberAfMainTickCallback(void);  // Global
-void emberAfTick(void);  // Global
-void emberAfPluginEndDeviceSupportTickCallback(void);  // Plugin: end-device-support
-void emberAfPluginHeartbeatTickCallback(void);  // Plugin: heartbeat
-void emberAfPluginIdleSleepTickCallback(void);  // Plugin: idle-sleep
+void emberAfMainTickCallback(void);                   // Global
+void emberAfTick(void);                               // Global
+void emberAfPluginEndDeviceSupportTickCallback(void); // Plugin: end-device-support
+void emberAfPluginHeartbeatTickCallback(void);        // Plugin: heartbeat
+void emberAfPluginIdleSleepTickCallback(void);        // Plugin: idle-sleep
 
 void emAfTick(void)
 {
-  emberAfMainTickCallback();  // Global
-  emberAfTick();  // Global
-  emberAfPluginEndDeviceSupportTickCallback();  // Plugin: end-device-support
-  emberAfPluginHeartbeatTickCallback();  // Plugin: heartbeat
-  emberAfPluginIdleSleepTickCallback();  // Plugin: idle-sleep
+    emberAfMainTickCallback();                   // Global
+    emberAfTick();                               // Global
+    emberAfPluginEndDeviceSupportTickCallback(); // Plugin: end-device-support
+    emberAfPluginHeartbeatTickCallback();        // Plugin: heartbeat
+    emberAfPluginIdleSleepTickCallback();        // Plugin: idle-sleep
 }
 
-void emAfResetAttributes(uint8_t endpointId)
-{
-}
+void emAfResetAttributes(uint8_t endpointId) {}
 
 // PreCommandReceived function declarations.
-bool emberAfPreCommandReceivedCallback(EmberAfClusterCommand* cmd);  // Global
+bool emberAfPreCommandReceivedCallback(EmberAfClusterCommand * cmd); // Global
 
-bool emAfPreCommandReceived(EmberAfClusterCommand* cmd)
+bool emAfPreCommandReceived(EmberAfClusterCommand * cmd)
 {
-  return emberAfPreCommandReceivedCallback(cmd);  // Global
+    return emberAfPreCommandReceivedCallback(cmd); // Global
 }
 
 // PreZDOMessageReceived function declarations.
-bool emberAfPreZDOMessageReceivedCallback(EmberNodeId emberNodeId, EmberApsFrame* apsFrame, uint8_t* message, uint16_t length);  // Global
+bool emberAfPreZDOMessageReceivedCallback(EmberNodeId emberNodeId, EmberApsFrame * apsFrame, uint8_t * message,
+                                          uint16_t length); // Global
 
-bool emAfPreZDOMessageReceived(EmberNodeId emberNodeId, EmberApsFrame* apsFrame, uint8_t* message, uint16_t length)
+bool emAfPreZDOMessageReceived(EmberNodeId emberNodeId, EmberApsFrame * apsFrame, uint8_t * message, uint16_t length)
 {
-  return emberAfPreZDOMessageReceivedCallback(emberNodeId, apsFrame, message, length);  // Global
+    return emberAfPreZDOMessageReceivedCallback(emberNodeId, apsFrame, message, length); // Global
 }
 
-bool emAfRetrieveAttributeAndCraftResponse(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attrId, uint8_t mask, uint16_t maunfacturerCode, uint16_t readLength)
+bool emAfRetrieveAttributeAndCraftResponse(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attrId, uint8_t mask,
+                                           uint16_t maunfacturerCode, uint16_t readLength)
 {
-  return 0; // false
+    return 0; // false
 }
 
 // ZigbeeKeyEstablishment function declarations.
-void emberAfZigbeeKeyEstablishmentCallback(EmberEUI64 partner, EmberKeyStatus status);  // Global
-void emberAfPluginUpdateTcLinkKeyZigbeeKeyEstablishmentCallback(EmberEUI64 partner, EmberKeyStatus status);  // Plugin: update-tc-link-key
+void emberAfZigbeeKeyEstablishmentCallback(EmberEUI64 partner, EmberKeyStatus status); // Global
+void emberAfPluginUpdateTcLinkKeyZigbeeKeyEstablishmentCallback(EmberEUI64 partner,
+                                                                EmberKeyStatus status); // Plugin: update-tc-link-key
 
 void emAfZigbeeKeyEstablishment(EmberEUI64 partner, EmberKeyStatus status)
 {
-  emberAfZigbeeKeyEstablishmentCallback(partner, status);  // Global
-  emberAfPluginUpdateTcLinkKeyZigbeeKeyEstablishmentCallback(partner, status);  // Plugin: update-tc-link-key
+    emberAfZigbeeKeyEstablishmentCallback(partner, status);                      // Global
+    emberAfPluginUpdateTcLinkKeyZigbeeKeyEstablishmentCallback(partner, status); // Plugin: update-tc-link-key
 }
 
 // ReadAttributesResponse function declarations.
-bool emberAfReadAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t* buffer, uint16_t bufLen);  // Global
+bool emberAfReadAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen); // Global
 
-bool emAfReadAttributesResponse(EmberAfClusterId clusterId, uint8_t* buffer, uint16_t bufLen)
+bool emAfReadAttributesResponse(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
-  return emberAfReadAttributesResponseCallback(clusterId, buffer, bufLen);  // Global
+    return emberAfReadAttributesResponseCallback(clusterId, buffer, bufLen); // Global
 }
 
 // ReportAttributes function declarations.
-bool emberAfReportAttributesCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);  // Global
+bool emberAfReportAttributesCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen); // Global
 
 bool emAfReportAttributes(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
-  return emberAfReportAttributesCallback(clusterId, buffer, bufLen);  // Global
+    return emberAfReportAttributesCallback(clusterId, buffer, bufLen); // Global
 }

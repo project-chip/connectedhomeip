@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // This callback file is created for your convenience. You may add application
 // code to this file. If you regenerate this file over a previous version, the
@@ -69,80 +69,84 @@ void customResetBootloader(void);
 void customAddKnownJoiner(void);
 //  extern void actionFunction(void);
 EmberCommandEntry emberAfCustomCommands[] = {
-  /* Sample Custom CLI commands */
-  // emberCommandEntrySubMenu("sub-menu", customSubMenu, "Sub menu of custom commands"),
-  emberCommandEntryAction("lookup", customLookupNeighbourTable, "b", "Custom command to look up the shortaddress given an IEEE address"),
-  emberCommandEntryAction("resetBootloader", customResetBootloader, "", "Invokes seriel bootloader"),
-  emberCommandEntryAction("addJoiner", customAddKnownJoiner, "bb", "Adds known joiner to TC"),
-  //emberCommandEntryAction("version", customVersion, "b", "Custom command to look up version"),
-  emberCommandEntryTerminator()
+    /* Sample Custom CLI commands */
+    // emberCommandEntrySubMenu("sub-menu", customSubMenu, "Sub menu of custom commands"),
+    emberCommandEntryAction("lookup", customLookupNeighbourTable, "b",
+                            "Custom command to look up the shortaddress given an IEEE address"),
+    emberCommandEntryAction("resetBootloader", customResetBootloader, "", "Invokes seriel bootloader"),
+    emberCommandEntryAction("addJoiner", customAddKnownJoiner, "bb", "Adds known joiner to TC"),
+    // emberCommandEntryAction("version", customVersion, "b", "Custom command to look up version"),
+    emberCommandEntryTerminator()
 };
 #if (defined LOOKUP_DEVICE_ANNCE_LOGIC)
 static EmberEUI64 devAnnacedArray[SIZE_OF_JOINING_LOOKUP];
 static EmberEUI64 joiningNode;
 static uint8_t devAnnceIndex;
-static void storeDevAnnce(EmberNodeId emberNodeId,
-                          EmberApsFrame* apsFrame,
-                          uint8_t* message,
-                          uint16_t length)
+static void storeDevAnnce(EmberNodeId emberNodeId, EmberApsFrame * apsFrame, uint8_t * message, uint16_t length)
 {
-  // Catch device annce and store store eui64
-  // to aid to lookup to rule out false entries
-  if (NULL != apsFrame
-      && END_DEVICE_ANNOUNCE == apsFrame->clusterId
-      && EMBER_ZDO_ENDPOINT == apsFrame->destinationEndpoint
-      && EMBER_ZDO_PROFILE_ID == apsFrame->profileId
-      && NULL != message
-      && length >= 11) {
-    MEMCOPY(devAnnacedArray[devAnnceIndex++], &message[3], EUI64_SIZE);
-    // Roll over the index
-    if (devAnnceIndex >= SIZE_OF_JOINING_LOOKUP) {
-      devAnnceIndex = 0;
+    // Catch device annce and store store eui64
+    // to aid to lookup to rule out false entries
+    if (NULL != apsFrame && END_DEVICE_ANNOUNCE == apsFrame->clusterId && EMBER_ZDO_ENDPOINT == apsFrame->destinationEndpoint &&
+        EMBER_ZDO_PROFILE_ID == apsFrame->profileId && NULL != message && length >= 11)
+    {
+        MEMCOPY(devAnnacedArray[devAnnceIndex++], &message[3], EUI64_SIZE);
+        // Roll over the index
+        if (devAnnceIndex >= SIZE_OF_JOINING_LOOKUP)
+        {
+            devAnnceIndex = 0;
+        }
     }
-  }
 }
 
 static bool checkStoredDeviceAnnce(EmberEUI64 eui64)
 {
-  // This node may have got added to neighbor table during joining,
-  // looking up if it had made a dev annce makes its confirm that the node is
-  // in the network.
-  for (int i = 0; i < SIZE_OF_JOINING_LOOKUP; i++) {
-    if (0 == MEMCOMPARE(devAnnacedArray[i], eui64, EUI64_SIZE)) {
-      return true;
+    // This node may have got added to neighbor table during joining,
+    // looking up if it had made a dev annce makes its confirm that the node is
+    // in the network.
+    for (int i = 0; i < SIZE_OF_JOINING_LOOKUP; i++)
+    {
+        if (0 == MEMCOMPARE(devAnnacedArray[i], eui64, EUI64_SIZE))
+        {
+            return true;
+        }
     }
-  }
-  return false;
+    return false;
 }
 #endif
 
 void customLookupNeighbourTable(void)
 {
-  EmberEUI64 eui64;
-  emberCopyBigEndianEui64Argument(0, eui64);
-  EmberNodeId nodeId = emberLookupNodeIdByEui64(eui64);
+    EmberEUI64 eui64;
+    emberCopyBigEndianEui64Argument(0, eui64);
+    EmberNodeId nodeId = emberLookupNodeIdByEui64(eui64);
 #if (defined LOOKUP_DEVICE_ANNCE_LOGIC)
-  // The node is in neighbor table - added during association hence
-  // check if the node was joining and has made a device annce
-  // - if false, then invalidate nodeId
-  if (EMBER_NULL_NODE_ID != nodeId) {
-    if (0 == MEMCOMPARE(joiningNode, eui64, EUI64_SIZE)) {
-      if (false == checkStoredDeviceAnnce(eui64)) {
-        nodeId = EMBER_NULL_NODE_ID;
-      }
+    // The node is in neighbor table - added during association hence
+    // check if the node was joining and has made a device annce
+    // - if false, then invalidate nodeId
+    if (EMBER_NULL_NODE_ID != nodeId)
+    {
+        if (0 == MEMCOMPARE(joiningNode, eui64, EUI64_SIZE))
+        {
+            if (false == checkStoredDeviceAnnce(eui64))
+            {
+                nodeId = EMBER_NULL_NODE_ID;
+            }
+        }
     }
-  }
 #endif
-  if (EMBER_NULL_NODE_ID == nodeId ) {
-    emberAfAppPrintln("shortaddress:EUI64 unknown");
-  } else {
-    emberAfAppPrintln("shortaddress:0x%2X", nodeId);
-  }
+    if (EMBER_NULL_NODE_ID == nodeId)
+    {
+        emberAfAppPrintln("shortaddress:EUI64 unknown");
+    }
+    else
+    {
+        emberAfAppPrintln("shortaddress:0x%2X", nodeId);
+    }
 }
 
 void customResetBootloader(void)
 {
-  halLaunchStandaloneBootloader(0); //STANDALONE_BOOTLOADER_RECOVERY_MODE
+    halLaunchStandaloneBootloader(0); // STANDALONE_BOOTLOADER_RECOVERY_MODE
 }
 
 /** @brief Pre ZDO Message Received
@@ -157,18 +161,12 @@ void customResetBootloader(void)
  * @param message   Ver.: always
  * @param length   Ver.: always
  */
-bool emberAfPreZDOMessageReceivedCallback(EmberNodeId emberNodeId,
-                                          EmberApsFrame* apsFrame,
-                                          uint8_t* message,
-                                          uint16_t length)
+bool emberAfPreZDOMessageReceivedCallback(EmberNodeId emberNodeId, EmberApsFrame * apsFrame, uint8_t * message, uint16_t length)
 {
 #if (defined LOOKUP_DEVICE_ANNCE_LOGIC)
-  storeDevAnnce(emberNodeId,
-                apsFrame,
-                message,
-                length);
+    storeDevAnnce(emberNodeId, apsFrame, message, length);
 #endif
-  return false;
+    return false;
 }
 
 /** @brief Trust Center Join
@@ -185,20 +183,17 @@ bool emberAfPreZDOMessageReceivedCallback(EmberNodeId emberNodeId,
  * @param status   Ver.: always
  * @param decision   Ver.: always
  */
-void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId,
-                                    EmberEUI64 newNodeEui64,
-                                    EmberNodeId parentOfNewNode,
-                                    EmberDeviceUpdate status,
-                                    EmberJoinDecision decision)
+void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId, EmberEUI64 newNodeEui64, EmberNodeId parentOfNewNode,
+                                    EmberDeviceUpdate status, EmberJoinDecision decision)
 {
-  if (EMBER_STANDARD_SECURITY_SECURED_REJOIN == status
-      || EMBER_STANDARD_SECURITY_UNSECURED_JOIN == status
-      || EMBER_STANDARD_SECURITY_UNSECURED_REJOIN == status) {
-    emberAfAddAddressTableEntry(newNodeEui64, newNodeId);
+    if (EMBER_STANDARD_SECURITY_SECURED_REJOIN == status || EMBER_STANDARD_SECURITY_UNSECURED_JOIN == status ||
+        EMBER_STANDARD_SECURITY_UNSECURED_REJOIN == status)
+    {
+        emberAfAddAddressTableEntry(newNodeEui64, newNodeId);
 #if (defined LOOKUP_DEVICE_ANNCE_LOGIC)
-    MEMCOPY(joiningNode, newNodeEui64, EUI64_SIZE);
+        MEMCOPY(joiningNode, newNodeEui64, EUI64_SIZE);
 #endif
-  }
+    }
 }
 
 /** @brief Alarms Cluster Reset Alarm
@@ -208,10 +203,9 @@ void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId,
  * @param alarmCode   Ver.: always
  * @param clusterId   Ver.: always
  */
-boolean emberAfAlarmClusterResetAlarmCallback(int8u alarmCode,
-                                              int16u clusterId)
+boolean emberAfAlarmClusterResetAlarmCallback(int8u alarmCode, int16u clusterId)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Alarms Cluster Reset All Alarms
@@ -221,7 +215,7 @@ boolean emberAfAlarmClusterResetAlarmCallback(int8u alarmCode,
  */
 boolean emberAfAlarmClusterResetAllAlarmsCallback(void)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Alarms Cluster Alarm
@@ -231,10 +225,9 @@ boolean emberAfAlarmClusterResetAllAlarmsCallback(void)
  * @param alarmCode   Ver.: always
  * @param clusterId   Ver.: always
  */
-boolean emberAfAlarmClusterAlarmCallback(int8u alarmCode,
-                                         int16u clusterId)
+boolean emberAfAlarmClusterAlarmCallback(int8u alarmCode, int16u clusterId)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Groups Cluster Add Group Response
@@ -244,10 +237,9 @@ boolean emberAfAlarmClusterAlarmCallback(int8u alarmCode,
  * @param status   Ver.: always
  * @param groupId   Ver.: always
  */
-boolean emberAfGroupsClusterAddGroupResponseCallback(int8u status,
-                                                     int16u groupId)
+boolean emberAfGroupsClusterAddGroupResponseCallback(int8u status, int16u groupId)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Groups Cluster View Group Response
@@ -258,11 +250,9 @@ boolean emberAfGroupsClusterAddGroupResponseCallback(int8u status,
  * @param groupId   Ver.: always
  * @param groupName   Ver.: always
  */
-boolean emberAfGroupsClusterViewGroupResponseCallback(int8u status,
-                                                      int16u groupId,
-                                                      int8u* groupName)
+boolean emberAfGroupsClusterViewGroupResponseCallback(int8u status, int16u groupId, int8u * groupName)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Groups Cluster Get Group Membership Response
@@ -273,11 +263,9 @@ boolean emberAfGroupsClusterViewGroupResponseCallback(int8u status,
  * @param groupCount   Ver.: always
  * @param groupList   Ver.: always
  */
-boolean emberAfGroupsClusterGetGroupMembershipResponseCallback(int8u capacity,
-                                                               int8u groupCount,
-                                                               int8u* groupList)
+boolean emberAfGroupsClusterGetGroupMembershipResponseCallback(int8u capacity, int8u groupCount, int8u * groupList)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Groups Cluster Remove Group Response
@@ -287,10 +275,9 @@ boolean emberAfGroupsClusterGetGroupMembershipResponseCallback(int8u capacity,
  * @param status   Ver.: always
  * @param groupId   Ver.: always
  */
-boolean emberAfGroupsClusterRemoveGroupResponseCallback(int8u status,
-                                                        int16u groupId)
+boolean emberAfGroupsClusterRemoveGroupResponseCallback(int8u status, int16u groupId)
 {
-  return FALSE;
+    return FALSE;
 }
 
 /** @brief Scenes Cluster Add Scene Response
@@ -301,11 +288,9 @@ boolean emberAfGroupsClusterRemoveGroupResponseCallback(int8u status,
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-boolean emberAfScenesClusterAddSceneResponseCallback(int8u status,
-                                                     int16u groupId,
-                                                     int8u sceneId)
+boolean emberAfScenesClusterAddSceneResponseCallback(int8u status, int16u groupId, int8u sceneId)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Scenes Cluster View Scene Response
@@ -319,14 +304,10 @@ boolean emberAfScenesClusterAddSceneResponseCallback(int8u status,
  * @param sceneName   Ver.: always
  * @param extensionFieldSets   Ver.: always
  */
-boolean emberAfScenesClusterViewSceneResponseCallback(int8u status,
-                                                      int16u groupId,
-                                                      int8u sceneId,
-                                                      int16u transitionTime,
-                                                      int8u* sceneName,
-                                                      int8u* extensionFieldSets)
+boolean emberAfScenesClusterViewSceneResponseCallback(int8u status, int16u groupId, int8u sceneId, int16u transitionTime,
+                                                      int8u * sceneName, int8u * extensionFieldSets)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Scenes Cluster Remove Scene Response
@@ -337,11 +318,9 @@ boolean emberAfScenesClusterViewSceneResponseCallback(int8u status,
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-boolean emberAfScenesClusterRemoveSceneResponseCallback(int8u status,
-                                                        int16u groupId,
-                                                        int8u sceneId)
+boolean emberAfScenesClusterRemoveSceneResponseCallback(int8u status, int16u groupId, int8u sceneId)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Scenes Cluster Remove All Scenes Response
@@ -351,10 +330,9 @@ boolean emberAfScenesClusterRemoveSceneResponseCallback(int8u status,
  * @param status   Ver.: always
  * @param groupId   Ver.: always
  */
-boolean emberAfScenesClusterRemoveAllScenesResponseCallback(int8u status,
-                                                            int16u groupId)
+boolean emberAfScenesClusterRemoveAllScenesResponseCallback(int8u status, int16u groupId)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Scenes Cluster Store Scene Response
@@ -365,11 +343,9 @@ boolean emberAfScenesClusterRemoveAllScenesResponseCallback(int8u status,
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-boolean emberAfScenesClusterStoreSceneResponseCallback(int8u status,
-                                                       int16u groupId,
-                                                       int8u sceneId)
+boolean emberAfScenesClusterStoreSceneResponseCallback(int8u status, int16u groupId, int8u sceneId)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Scenes Cluster Get Scene Membership Response
@@ -382,13 +358,10 @@ boolean emberAfScenesClusterStoreSceneResponseCallback(int8u status,
  * @param sceneCount   Ver.: always
  * @param sceneList   Ver.: always
  */
-boolean emberAfScenesClusterGetSceneMembershipResponseCallback(int8u status,
-                                                               int8u capacity,
-                                                               int16u groupId,
-                                                               int8u sceneCount,
-                                                               int8u* sceneList)
+boolean emberAfScenesClusterGetSceneMembershipResponseCallback(int8u status, int8u capacity, int16u groupId, int8u sceneCount,
+                                                               int8u * sceneList)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Thermostat Cluster Current Weekly Schedule
@@ -400,12 +373,10 @@ boolean emberAfScenesClusterGetSceneMembershipResponseCallback(int8u status,
  * @param modeForSequence   Ver.: always
  * @param payload   Ver.: always
  */
-boolean emberAfThermostatClusterCurrentWeeklyScheduleCallback(int8u numberOfTransitionsForSequence,
-                                                              int8u dayOfWeekForSequence,
-                                                              int8u modeForSequence,
-                                                              int8u* payload)
+boolean emberAfThermostatClusterCurrentWeeklyScheduleCallback(int8u numberOfTransitionsForSequence, int8u dayOfWeekForSequence,
+                                                              int8u modeForSequence, int8u * payload)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Thermostat Cluster Relay Status Log
@@ -419,14 +390,10 @@ boolean emberAfThermostatClusterCurrentWeeklyScheduleCallback(int8u numberOfTran
  * @param setpoint   Ver.: always
  * @param unreadEntries   Ver.: always
  */
-boolean emberAfThermostatClusterRelayStatusLogCallback(int16u timeOfDay,
-                                                       int16u relayStatus,
-                                                       int16s localTemperature,
-                                                       int8u humidityInPercentage,
-                                                       int16s setpoint,
-                                                       int16u unreadEntries)
+boolean emberAfThermostatClusterRelayStatusLogCallback(int16u timeOfDay, int16u relayStatus, int16s localTemperature,
+                                                       int8u humidityInPercentage, int16s setpoint, int16u unreadEntries)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Thermostat Cluster Setpoint Raise Lower
@@ -436,10 +403,9 @@ boolean emberAfThermostatClusterRelayStatusLogCallback(int16u timeOfDay,
  * @param mode   Ver.: always
  * @param amount   Ver.: always
  */
-boolean emberAfThermostatClusterSetpointRaiseLowerCallback(int8u mode,
-                                                           int8s amount)
+boolean emberAfThermostatClusterSetpointRaiseLowerCallback(int8u mode, int8s amount)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Thermostat Cluster Set Weekly Schedule
@@ -451,12 +417,10 @@ boolean emberAfThermostatClusterSetpointRaiseLowerCallback(int8u mode,
  * @param modeForSequence   Ver.: always
  * @param payload   Ver.: always
  */
-boolean emberAfThermostatClusterSetWeeklyScheduleCallback(int8u numberOfTransitionsForSequence,
-                                                          int8u dayOfWeekForSequence,
-                                                          int8u modeForSequence,
-                                                          int8u* payload)
+boolean emberAfThermostatClusterSetWeeklyScheduleCallback(int8u numberOfTransitionsForSequence, int8u dayOfWeekForSequence,
+                                                          int8u modeForSequence, int8u * payload)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Thermostat Cluster Get Weekly Schedule
@@ -466,10 +430,9 @@ boolean emberAfThermostatClusterSetWeeklyScheduleCallback(int8u numberOfTransiti
  * @param daysToReturn   Ver.: always
  * @param modeToReturn   Ver.: always
  */
-boolean emberAfThermostatClusterGetWeeklyScheduleCallback(int8u daysToReturn,
-                                                          int8u modeToReturn)
+boolean emberAfThermostatClusterGetWeeklyScheduleCallback(int8u daysToReturn, int8u modeToReturn)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Thermostat Cluster Clear Weekly Schedule
@@ -479,7 +442,7 @@ boolean emberAfThermostatClusterGetWeeklyScheduleCallback(int8u daysToReturn,
  */
 boolean emberAfThermostatClusterClearWeeklyScheduleCallback(void)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Thermostat Cluster Get Relay Status Log
@@ -489,7 +452,7 @@ boolean emberAfThermostatClusterClearWeeklyScheduleCallback(void)
  */
 boolean emberAfThermostatClusterGetRelayStatusLogCallback(void)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief IAS Zone Cluster Zone Status Change Notification
@@ -501,12 +464,10 @@ boolean emberAfThermostatClusterGetRelayStatusLogCallback(void)
  * @param zoneId   Ver.: since ha-1.2-05-3520-29
  * @param delay   Ver.: since ha-1.2-05-3520-29
  */
-boolean emberAfIasZoneClusterZoneStatusChangeNotificationCallback(int16u zoneStatus,
-                                                                  int8u extendedStatus,
-                                                                  int8u zoneId,
+boolean emberAfIasZoneClusterZoneStatusChangeNotificationCallback(int16u zoneStatus, int8u extendedStatus, int8u zoneId,
                                                                   int16u delay)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief IAS Zone Cluster Zone Enroll Request
@@ -516,10 +477,9 @@ boolean emberAfIasZoneClusterZoneStatusChangeNotificationCallback(int16u zoneSta
  * @param zoneType   Ver.: always
  * @param manufacturerCode   Ver.: always
  */
-boolean emberAfIasZoneClusterZoneEnrollRequestCallback(int16u zoneType,
-                                                       int16u manufacturerCode)
+boolean emberAfIasZoneClusterZoneEnrollRequestCallback(int16u zoneType, int16u manufacturerCode)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief IAS Zone Cluster Zone Enroll Response
@@ -529,10 +489,9 @@ boolean emberAfIasZoneClusterZoneEnrollRequestCallback(int16u zoneType,
  * @param enrollResponseCode   Ver.: always
  * @param zoneId   Ver.: always
  */
-boolean emberAfIasZoneClusterZoneEnrollResponseCallback(int8u enrollResponseCode,
-                                                        int8u zoneId)
+boolean emberAfIasZoneClusterZoneEnrollResponseCallback(int8u enrollResponseCode, int8u zoneId)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Commissioning Cluster Restart Device Response
@@ -543,7 +502,7 @@ boolean emberAfIasZoneClusterZoneEnrollResponseCallback(int8u enrollResponseCode
  */
 boolean emberAfCommissioningClusterRestartDeviceResponseCallback(int8u status)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Commissioning Cluster Save Startup Parameters Response
@@ -554,7 +513,7 @@ boolean emberAfCommissioningClusterRestartDeviceResponseCallback(int8u status)
  */
 boolean emberAfCommissioningClusterSaveStartupParametersResponseCallback(int8u status)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Commissioning Cluster Restore Startup Parameters Response
@@ -565,7 +524,7 @@ boolean emberAfCommissioningClusterSaveStartupParametersResponseCallback(int8u s
  */
 boolean emberAfCommissioningClusterRestoreStartupParametersResponseCallback(int8u status)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Commissioning Cluster Reset Startup Parameters Response
@@ -576,7 +535,7 @@ boolean emberAfCommissioningClusterRestoreStartupParametersResponseCallback(int8
  */
 boolean emberAfCommissioningClusterResetStartupParametersResponseCallback(int8u status)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Commissioning Cluster Restart Device
@@ -587,11 +546,9 @@ boolean emberAfCommissioningClusterResetStartupParametersResponseCallback(int8u 
  * @param delay   Ver.: always
  * @param jitter   Ver.: always
  */
-boolean emberAfCommissioningClusterRestartDeviceCallback(int8u options,
-                                                         int8u delay,
-                                                         int8u jitter)
+boolean emberAfCommissioningClusterRestartDeviceCallback(int8u options, int8u delay, int8u jitter)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Commissioning Cluster Reset Startup Parameters
@@ -601,10 +558,9 @@ boolean emberAfCommissioningClusterRestartDeviceCallback(int8u options,
  * @param options   Ver.: always
  * @param index   Ver.: always
  */
-boolean emberAfCommissioningClusterResetStartupParametersCallback(int8u options,
-                                                                  int8u index)
+boolean emberAfCommissioningClusterResetStartupParametersCallback(int8u options, int8u index)
 {
-  return TRUE;
+    return TRUE;
 }
 
 // The following block of code is only used to perform tests for a SoC TC with
@@ -614,38 +570,42 @@ boolean emberAfCommissioningClusterResetStartupParametersCallback(int8u options,
 // emberAfPluginNetworkCreatorSecurityGetInstallcodeCallback to let the
 // application take decision.
 #define MAX_NUMBER_OF_KNOWN_JOINER 4
-typedef struct {
-  EmberEUI64 eui64;
-  uint8_t installCode[16 + 2]; // 6, 8, 12, or 16 bytes plus two-byte CRC
+typedef struct
+{
+    EmberEUI64 eui64;
+    uint8_t installCode[16 + 2]; // 6, 8, 12, or 16 bytes plus two-byte CRC
 } knownJoinerType;
 
 static knownJoinerType knownJoiner[MAX_NUMBER_OF_KNOWN_JOINER] = { 0 };
-static uint8_t joinerIndex = 0;
+static uint8_t joinerIndex                                     = 0;
 
 void customAddKnownJoiner(void)
 {
-  //EmberEUI64 eui64;
-  //uint8_t installCode[16 + 2]; // 6, 8, 12, or 16 bytes plus two-byte CRC
-  //uint8_t length;
-  emberCopyBigEndianEui64Argument(0, knownJoiner[joinerIndex].eui64);
-  emberCopyStringArgument(1, knownJoiner[joinerIndex].installCode, 18, false);
-  if (joinerIndex >= MAX_NUMBER_OF_KNOWN_JOINER) {
-    joinerIndex = 0;
-  } else {
-    joinerIndex++;
-  }
+    // EmberEUI64 eui64;
+    // uint8_t installCode[16 + 2]; // 6, 8, 12, or 16 bytes plus two-byte CRC
+    // uint8_t length;
+    emberCopyBigEndianEui64Argument(0, knownJoiner[joinerIndex].eui64);
+    emberCopyStringArgument(1, knownJoiner[joinerIndex].installCode, 18, false);
+    if (joinerIndex >= MAX_NUMBER_OF_KNOWN_JOINER)
+    {
+        joinerIndex = 0;
+    }
+    else
+    {
+        joinerIndex++;
+    }
 }
 
-bool emberAfPluginNetworkCreatorSecurityGetInstallCodeCallback(EmberEUI64 newNodeEui64,
-                                                               uint8_t *installCode,
-                                                               uint8_t *length)
+bool emberAfPluginNetworkCreatorSecurityGetInstallCodeCallback(EmberEUI64 newNodeEui64, uint8_t * installCode, uint8_t * length)
 {
-  for (int i = 0; i < MAX_NUMBER_OF_KNOWN_JOINER; i++) {
-    if (0 == MEMCOMPARE(newNodeEui64, knownJoiner[i].eui64, 8)) {
-      MEMCOPY(installCode, knownJoiner[i].installCode, 18);
-      *length = 18;
-      return true;
+    for (int i = 0; i < MAX_NUMBER_OF_KNOWN_JOINER; i++)
+    {
+        if (0 == MEMCOMPARE(newNodeEui64, knownJoiner[i].eui64, 8))
+        {
+            MEMCOPY(installCode, knownJoiner[i].installCode, 18);
+            *length = 18;
+            return true;
+        }
     }
-  }
-  return false;
+    return false;
 }

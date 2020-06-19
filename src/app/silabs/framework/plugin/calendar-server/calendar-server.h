@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs for the Calendar Server plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs for the Calendar Server plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 /**
  * @brief Publishes a calendar.
@@ -48,9 +48,7 @@
  * @param dstEndpoint The destination endpoint.
  * @param calendarIndex The index in the calendar table.
  **/
-void emberAfCalendarServerPublishCalendarMessage(EmberNodeId nodeId,
-                                                 uint8_t srcEndpoint,
-                                                 uint8_t dstEndpoint,
+void emberAfCalendarServerPublishCalendarMessage(EmberNodeId nodeId, uint8_t srcEndpoint, uint8_t dstEndpoint,
                                                  uint8_t calendarIndex);
 
 /**
@@ -65,11 +63,8 @@ void emberAfCalendarServerPublishCalendarMessage(EmberNodeId nodeId,
  * @param calendarIndex The index in the calendar table.
  * @param dayIndex The index of the day in the calendar.
  **/
-void emberAfCalendarServerPublishDayProfilesMessage(EmberNodeId nodeId,
-                                                    uint8_t srcEndpoint,
-                                                    uint8_t dstEndpoint,
-                                                    uint8_t calendarIndex,
-                                                    uint8_t dayIndex);
+void emberAfCalendarServerPublishDayProfilesMessage(EmberNodeId nodeId, uint8_t srcEndpoint, uint8_t dstEndpoint,
+                                                    uint8_t calendarIndex, uint8_t dayIndex);
 
 /**
  * @brief Publish the week profile of the specified week in the specified calendar.
@@ -83,11 +78,8 @@ void emberAfCalendarServerPublishDayProfilesMessage(EmberNodeId nodeId,
  * @param calendarIndex The index in the calendar table.
  * @param weekIndex The index of the week in the calendar.
  **/
-void emberAfCalendarServerPublishWeekProfileMessage(EmberNodeId nodeId,
-                                                    uint8_t srcEndpoint,
-                                                    uint8_t dstEndpoint,
-                                                    uint8_t calendarIndex,
-                                                    uint8_t weekIndex);
+void emberAfCalendarServerPublishWeekProfileMessage(EmberNodeId nodeId, uint8_t srcEndpoint, uint8_t dstEndpoint,
+                                                    uint8_t calendarIndex, uint8_t weekIndex);
 
 /**
  * @brief Publish the seasons in the specified calendar.
@@ -100,9 +92,7 @@ void emberAfCalendarServerPublishWeekProfileMessage(EmberNodeId nodeId,
  * @param dstEndpoint The destination endpoint.
  * @param calendarIndex The index in the calendar table.
  **/
-void emberAfCalendarServerPublishSeasonsMessage(EmberNodeId nodeId,
-                                                uint8_t srcEndpoint,
-                                                uint8_t dstEndpoint,
+void emberAfCalendarServerPublishSeasonsMessage(EmberNodeId nodeId, uint8_t srcEndpoint, uint8_t dstEndpoint,
                                                 uint8_t calendarIndex);
 
 /**
@@ -116,9 +106,7 @@ void emberAfCalendarServerPublishSeasonsMessage(EmberNodeId nodeId,
  * @param dstEndpoint The destination endpoint.
  * @param calendarIndex The index in the calendar table.
  **/
-void emberAfCalendarServerPublishSpecialDaysMessage(EmberNodeId nodeId,
-                                                    uint8_t srcEndpoint,
-                                                    uint8_t dstEndpoint,
+void emberAfCalendarServerPublishSpecialDaysMessage(EmberNodeId nodeId, uint8_t srcEndpoint, uint8_t dstEndpoint,
                                                     uint8_t calendarIndex);
 
 /**
@@ -133,7 +121,5 @@ void emberAfCalendarServerPublishSpecialDaysMessage(EmberNodeId nodeId,
  * @param dstEndpoint The destination endpoint.
  * @param calendarIndex The index in the calendar table.
  **/
-void emberAfCalendarServerCancelCalendarMessage(EmberNodeId nodeId,
-                                                uint8_t srcEndpoint,
-                                                uint8_t dstEndpoint,
+void emberAfCalendarServerCancelCalendarMessage(EmberNodeId nodeId, uint8_t srcEndpoint, uint8_t dstEndpoint,
                                                 uint8_t calendarIndex);

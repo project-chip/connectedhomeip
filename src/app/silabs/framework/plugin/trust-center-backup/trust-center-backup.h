@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Definitions for the Trust Center Backup plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Definitions for the Trust Center Backup
+                                                                               *plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // *****************************************************************************
 // * trust-center-backup.h
@@ -45,11 +46,11 @@
 // * Copyright 2011 by Ember Corporation. All rights reserved.              *80*
 // *****************************************************************************
 
-EmberStatus emberTrustCenterExportBackupData(EmberAfTrustCenterBackupData* backup);
-EmberStatus emberTrustCenterImportBackupAndStartNetwork(const EmberAfTrustCenterBackupData* backup);
+EmberStatus emberTrustCenterExportBackupData(EmberAfTrustCenterBackupData * backup);
+EmberStatus emberTrustCenterImportBackupAndStartNetwork(const EmberAfTrustCenterBackupData * backup);
 
 // Available only for EMBER_AF_PLUGIN_TRUST_CENTER_BACKUP_POSIX_FILE_BACKUP_SUPPORT
 void emAfTcExportCommand(void);
 void emAfTcImportCommand(void);
-EmberStatus emberAfTrustCenterImportBackupFromFile(const char* filepath);
-EmberStatus emberAfTrustCenterExportBackupToFile(const char* filepath);
+EmberStatus emberAfTrustCenterImportBackupFromFile(const char * filepath);
+EmberStatus emberAfTrustCenterExportBackupToFile(const char * filepath);

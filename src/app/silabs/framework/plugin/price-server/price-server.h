@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the Price Server plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the Price Server
+                                                                               *plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_PRICE_SERVER_H
 #define SILABS_PRICE_SERVER_H
@@ -43,56 +44,55 @@
 #include "app/framework/plugin/price-common/price-common.h"
 
 #ifndef EMBER_AF_PLUGIN_PRICE_SERVER_PRICE_TABLE_SIZE
-  #define EMBER_AF_PLUGIN_PRICE_SERVER_PRICE_TABLE_SIZE (5)
+#define EMBER_AF_PLUGIN_PRICE_SERVER_PRICE_TABLE_SIZE (5)
 #endif
 
 #ifndef EMBER_AF_PLUGIN_PRICE_SERVER_TARIFF_TABLE_SIZE
-  #define EMBER_AF_PLUGIN_PRICE_SERVER_TARIFF_TABLE_SIZE (2)
+#define EMBER_AF_PLUGIN_PRICE_SERVER_TARIFF_TABLE_SIZE (2)
 #endif
 
 #ifndef EMBER_AF_PLUGIN_PRICE_SERVER_BILLING_PERIOD_TABLE_SIZE
-  #define EMBER_AF_PLUGIN_PRICE_SERVER_BILLING_PERIOD_TABLE_SIZE (2)
+#define EMBER_AF_PLUGIN_PRICE_SERVER_BILLING_PERIOD_TABLE_SIZE (2)
 #endif
 
 #ifndef EMBER_AF_PLUGIN_PRICE_SERVER_MAX_TIERS_PER_TARIFF
-  #define EMBER_AF_PLUGIN_PRICE_SERVER_MAX_TIERS_PER_TARIFF (2)
+#define EMBER_AF_PLUGIN_PRICE_SERVER_MAX_TIERS_PER_TARIFF (2)
 #endif
 
 #ifndef EMBER_AF_PLUGIN_PRICE_SERVER_TIER_LABELS_TABLE_SIZE
-  #define EMBER_AF_PLUGIN_PRICE_SERVER_TIER_LABELS_TABLE_SIZE (2)
+#define EMBER_AF_PLUGIN_PRICE_SERVER_TIER_LABELS_TABLE_SIZE (2)
 #endif
 
 #ifndef EMBER_AF_PLUGIN_PRICE_SERVER_BLOCK_PERIOD_TABLE_SIZE
-  #define EMBER_AF_PLUGIN_PRICE_SERVER_BLOCK_PERIOD_TABLE_SIZE (2)
+#define EMBER_AF_PLUGIN_PRICE_SERVER_BLOCK_PERIOD_TABLE_SIZE (2)
 #endif
 
 #ifndef EMBER_AF_PLUGIN_PRICE_SERVER_CONSOLIDATED_BILL_TABLE_SIZE
-  #define EMBER_AF_PLUGIN_PRICE_SERVER_CONSOLIDATED_BILL_TABLE_SIZE (5)
+#define EMBER_AF_PLUGIN_PRICE_SERVER_CONSOLIDATED_BILL_TABLE_SIZE (5)
 #endif
 
 #ifndef EMBER_AF_PLUGIN_PRICE_SERVER_CREDIT_PAYMENT_TABLE_SIZE
-  #define EMBER_AF_PLUGIN_PRICE_SERVER_CREDIT_PAYMENT_TABLE_SIZE (5)
+#define EMBER_AF_PLUGIN_PRICE_SERVER_CREDIT_PAYMENT_TABLE_SIZE (5)
 #endif
 
 #ifndef EMBER_AF_PLUGIN_PRICE_SERVER_CALORIFIC_VALUE_TABLE_SIZE
-  #define EMBER_AF_PLUGIN_PRICE_SERVER_CALORIFIC_VALUE_TABLE_SIZE (2)
+#define EMBER_AF_PLUGIN_PRICE_SERVER_CALORIFIC_VALUE_TABLE_SIZE (2)
 #endif
 
 #ifndef EMBER_AF_PLUGIN_PRICE_SERVER_CO2_VALUE_TABLE_SIZE
-  #define EMBER_AF_PLUGIN_PRICE_SERVER_CO2_VALUE_TABLE_SIZE (2)
+#define EMBER_AF_PLUGIN_PRICE_SERVER_CO2_VALUE_TABLE_SIZE (2)
 #endif
 
 #ifndef EMBER_AF_PLUGIN_PRICE_SERVER_CONVERSION_FACTOR_TABLE_SIZE
-  #define EMBER_AF_PLUGIN_PRICE_SERVER_CONVERSION_FACTOR_TABLE_SIZE (2)
+#define EMBER_AF_PLUGIN_PRICE_SERVER_CONVERSION_FACTOR_TABLE_SIZE (2)
 #endif
 
 #define ZCL_PRICE_CLUSTER_PRICE_ACKNOWLEDGEMENT_MASK 0x01
-#define ZCL_PRICE_CLUSTER_RESERVED_MASK              0xFE
+#define ZCL_PRICE_CLUSTER_RESERVED_MASK 0xFE
 #define ZCL_PRICE_CLUSTER_BLOCK_THRESHOLDS_PAYLOAD_SIZE (6)
-#define ZCL_PRICE_CLUSTER_PRICE_MATRIX_SUBPAYLOAD_BLOCK_SIZE     (5)
+#define ZCL_PRICE_CLUSTER_PRICE_MATRIX_SUBPAYLOAD_BLOCK_SIZE (5)
 
-#define fieldLength(field) \
-  (emberAfCurrentCommand()->bufLen - (field - emberAfCurrentCommand()->buffer));
+#define fieldLength(field) (emberAfCurrentCommand()->bufLen - (field - emberAfCurrentCommand()->buffer));
 
 #define ZCL_PRICE_CLUSTER_MAX_TOU_BLOCKS 15
 #define ZCL_PRICE_CLUSTER_MAX_TOU_BLOCK_TIERS 15
@@ -101,16 +101,16 @@
 
 // To help keep track of the status of the tariffs in the table
 // (also, corresponding price matrices).
-#define CURRENT       BIT(1)
-#define FUTURE        BIT(2)
-#define PUBLISHED     BIT(3)
+#define CURRENT BIT(1)
+#define FUTURE BIT(2)
+#define PUBLISHED BIT(3)
 
 #define TARIFF_TYPE_MASK (0x0F)
 #define CHARGING_SCHEME_MASK (0xF0)
 
 #define tariffIsCurrent(tariff) ((tariff)->status & CURRENT)
-#define tariffIsFuture(tariff)  ((tariff)->status & FUTURE)
-#define tariffIsPublished(tariff)  ((tariff)->status & PUBLISHED)
+#define tariffIsFuture(tariff) ((tariff)->status & FUTURE)
+#define tariffIsPublished(tariff) ((tariff)->status & PUBLISHED)
 #define priceMatrixIsCurrent(pm) ((pm)->status & CURRENT)
 #define priceMatrixIsFuture(pm) ((pm)->status & FUTURE)
 #define priceMatrixIsPublished(pm) ((pm)->status & PUBLISHED)
@@ -131,256 +131,308 @@
  *
  */
 
-typedef struct {
-  uint32_t providerId;
-  uint32_t rawBlockPeriodStartTime;
-  uint32_t blockPeriodDuration;
-  // The "thresholdMultiplier" and "threadholdDivisor" are included in this stucture
-  // since these should be specified with the block period.
-  // These values are stored as the "Threshold Multiplier" and "Threshold Divisor"
-  // attributes in the Block Period (Delivered) attribute set (D.4.2.2.3).
-  uint32_t thresholdMultiplier;
-  uint32_t thresholdDivisor;
-  uint8_t  blockPeriodControl;
-  uint8_t  blockPeriodDurationType;
-  uint8_t  tariffType;
-  uint8_t  tariffResolutionPeriod;
+typedef struct
+{
+    uint32_t providerId;
+    uint32_t rawBlockPeriodStartTime;
+    uint32_t blockPeriodDuration;
+    // The "thresholdMultiplier" and "threadholdDivisor" are included in this stucture
+    // since these should be specified with the block period.
+    // These values are stored as the "Threshold Multiplier" and "Threshold Divisor"
+    // attributes in the Block Period (Delivered) attribute set (D.4.2.2.3).
+    uint32_t thresholdMultiplier;
+    uint32_t thresholdDivisor;
+    uint8_t blockPeriodControl;
+    uint8_t blockPeriodDurationType;
+    uint8_t tariffType;
+    uint8_t tariffResolutionPeriod;
 } EmberAfPriceBlockPeriod;
 
-typedef struct {
-  uint32_t providerId;
-  uint32_t rawBillingPeriodStartTime;
-  uint32_t billingPeriodDuration;
-  uint8_t billingPeriodDurationType;
-  uint8_t tariffType;
+typedef struct
+{
+    uint32_t providerId;
+    uint32_t rawBillingPeriodStartTime;
+    uint32_t billingPeriodDuration;
+    uint8_t billingPeriodDurationType;
+    uint8_t tariffType;
 } EmberAfPriceBillingPeriod;
 
-typedef struct {
-  uint32_t providerId;
-  uint32_t durationInMinutes;
-  uint8_t  tariffType;
-  uint8_t  cppPriceTier;
-  uint8_t  cppAuth;
+typedef struct
+{
+    uint32_t providerId;
+    uint32_t durationInMinutes;
+    uint8_t tariffType;
+    uint8_t cppPriceTier;
+    uint8_t cppAuth;
 } EmberAfPriceCppEvent;
 
-typedef struct {
-  uint32_t providerId;
-  uint32_t rawStartTimeUtc;   // start time as received from caller, prior to any adjustments
-  uint32_t billingPeriodDuration;
-  uint32_t consolidatedBill;
-  uint16_t currency;
-  uint8_t  billingPeriodDurationType;
-  uint8_t  tariffType;
-  uint8_t  billTrailingDigit;
+typedef struct
+{
+    uint32_t providerId;
+    uint32_t rawStartTimeUtc; // start time as received from caller, prior to any adjustments
+    uint32_t billingPeriodDuration;
+    uint32_t consolidatedBill;
+    uint16_t currency;
+    uint8_t billingPeriodDurationType;
+    uint8_t tariffType;
+    uint8_t billTrailingDigit;
 } EmberAfPriceConsolidatedBills;
 
 #define CREDIT_PAYMENT_REF_STRING_LEN 20
-typedef struct {
-  uint32_t providerId;
-  uint32_t creditPaymentDueDate;
-  uint32_t creditPaymentAmountOverdue;
-  uint32_t creditPayment;
-  uint32_t creditPaymentDate;
-  uint8_t  creditPaymentStatus;
-  uint8_t  creditPaymentRef[CREDIT_PAYMENT_REF_STRING_LEN + 1];
+typedef struct
+{
+    uint32_t providerId;
+    uint32_t creditPaymentDueDate;
+    uint32_t creditPaymentAmountOverdue;
+    uint32_t creditPayment;
+    uint32_t creditPaymentDate;
+    uint8_t creditPaymentStatus;
+    uint8_t creditPaymentRef[CREDIT_PAYMENT_REF_STRING_LEN + 1];
 } EmberAfPriceCreditPayment;
 
-typedef struct {
-  uint32_t conversionFactor;
-  uint8_t conversionFactorTrailingDigit;
+typedef struct
+{
+    uint32_t conversionFactor;
+    uint8_t conversionFactorTrailingDigit;
 } EmberAfPriceConversionFactor;
 
-typedef struct {
-  uint32_t calorificValue;
-  uint8_t calorificValueUnit;
-  uint8_t calorificValueTrailingDigit;
+typedef struct
+{
+    uint32_t calorificValue;
+    uint8_t calorificValueUnit;
+    uint8_t calorificValueTrailingDigit;
 } EmberAfPriceCalorificValue;
 
-typedef struct {
-  uint32_t providerId;
-  uint32_t issuerTariffId;
-  uint8_t  tariffType;
-  bool valid;
+typedef struct
+{
+    uint32_t providerId;
+    uint32_t issuerTariffId;
+    uint8_t tariffType;
+    bool valid;
 } EmberAfPriceCancelTariff;
 
-typedef struct {
-  uint32_t providerId;
-  uint32_t co2Value;
-  uint8_t tariffType;
-  uint8_t co2ValueUnit;
-  uint8_t co2ValueTrailingDigit;
+typedef struct
+{
+    uint32_t providerId;
+    uint32_t co2Value;
+    uint8_t tariffType;
+    uint8_t co2ValueUnit;
+    uint8_t co2ValueTrailingDigit;
 } EmberAfPriceCo2Value;
 
-typedef struct {
-  uint32_t providerId;
-  uint16_t oldCurrency;
-  uint16_t newCurrency;
-  uint32_t conversionFactor;
-  uint8_t  conversionFactorTrailingDigit;
-  uint32_t currencyChangeControlFlags;
+typedef struct
+{
+    uint32_t providerId;
+    uint16_t oldCurrency;
+    uint16_t newCurrency;
+    uint32_t conversionFactor;
+    uint8_t conversionFactorTrailingDigit;
+    uint32_t currencyChangeControlFlags;
 } EmberAfPriceCurrencyConversion;
 
-#define TIER_LABEL_SIZE  12
-typedef struct {
-  uint32_t providerId;
-  uint32_t issuerEventId;
-  uint32_t issuerTariffId;
-  uint8_t  valid;
-  uint8_t  numberOfTiers;
-  uint8_t  tierIds[EMBER_AF_PLUGIN_PRICE_SERVER_MAX_TIERS_PER_TARIFF];
-  uint8_t  tierLabels[EMBER_AF_PLUGIN_PRICE_SERVER_MAX_TIERS_PER_TARIFF][TIER_LABEL_SIZE + 1];
+#define TIER_LABEL_SIZE 12
+typedef struct
+{
+    uint32_t providerId;
+    uint32_t issuerEventId;
+    uint32_t issuerTariffId;
+    uint8_t valid;
+    uint8_t numberOfTiers;
+    uint8_t tierIds[EMBER_AF_PLUGIN_PRICE_SERVER_MAX_TIERS_PER_TARIFF];
+    uint8_t tierLabels[EMBER_AF_PLUGIN_PRICE_SERVER_MAX_TIERS_PER_TARIFF][TIER_LABEL_SIZE + 1];
 } EmberAfPriceTierLabelValue;
 
-typedef struct {
-  EmberAfPriceTierLabelValue entry[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_TIER_LABELS_TABLE_SIZE];
-//  uint8_t valid[EMBER_AF_PLUGIN_PRICE_SERVER_TIER_LABELS_TABLE_SIZE];
-//  uint32_t providerId[EMBER_AF_PLUGIN_PRICE_SERVER_TIER_LABELS_TABLE_SIZE];
-//  uint32_t issuerEventId[EMBER_AF_PLUGIN_PRICE_SERVER_TIER_LABELS_TABLE_SIZE];
-//  uint32_t issuerTariffId[EMBER_AF_PLUGIN_PRICE_SERVER_TIER_LABELS_TABLE_SIZE];
-//  uint8_t tierId[EMBER_AF_PLUGIN_PRICE_SERVER_TIER_LABELS_TABLE_SIZE];
-//  uint8_t tierLabel[EMBER_AF_PLUGIN_PRICE_SERVER_TIER_LABELS_TABLE_SIZE][13];
+typedef struct
+{
+    EmberAfPriceTierLabelValue entry[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                    [EMBER_AF_PLUGIN_PRICE_SERVER_TIER_LABELS_TABLE_SIZE];
+    //  uint8_t valid[EMBER_AF_PLUGIN_PRICE_SERVER_TIER_LABELS_TABLE_SIZE];
+    //  uint32_t providerId[EMBER_AF_PLUGIN_PRICE_SERVER_TIER_LABELS_TABLE_SIZE];
+    //  uint32_t issuerEventId[EMBER_AF_PLUGIN_PRICE_SERVER_TIER_LABELS_TABLE_SIZE];
+    //  uint32_t issuerTariffId[EMBER_AF_PLUGIN_PRICE_SERVER_TIER_LABELS_TABLE_SIZE];
+    //  uint8_t tierId[EMBER_AF_PLUGIN_PRICE_SERVER_TIER_LABELS_TABLE_SIZE];
+    //  uint8_t tierLabel[EMBER_AF_PLUGIN_PRICE_SERVER_TIER_LABELS_TABLE_SIZE][13];
 } EmberAfPriceTierLabelTable;
 
-typedef struct {
-  EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_BLOCK_PERIOD_TABLE_SIZE];
-  EmberAfPriceBlockPeriod blockPeriods[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_BLOCK_PERIOD_TABLE_SIZE];
+typedef struct
+{
+    EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                      [EMBER_AF_PLUGIN_PRICE_SERVER_BLOCK_PERIOD_TABLE_SIZE];
+    EmberAfPriceBlockPeriod blockPeriods[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                        [EMBER_AF_PLUGIN_PRICE_SERVER_BLOCK_PERIOD_TABLE_SIZE];
 } EmberAfPriceBlockPeriodTable;
 
-typedef struct {
-  EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_BILLING_PERIOD_TABLE_SIZE];
-  EmberAfPriceBillingPeriod billingPeriods[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_BILLING_PERIOD_TABLE_SIZE];
+typedef struct
+{
+    EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                      [EMBER_AF_PLUGIN_PRICE_SERVER_BILLING_PERIOD_TABLE_SIZE];
+    EmberAfPriceBillingPeriod billingPeriods[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                            [EMBER_AF_PLUGIN_PRICE_SERVER_BILLING_PERIOD_TABLE_SIZE];
 } EmberAfPriceBillingPeriodTable;
 
-typedef struct {
-  EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT];
-  EmberAfPriceCppEvent cppEvent[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT];
+typedef struct
+{
+    EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT];
+    EmberAfPriceCppEvent cppEvent[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT];
 } EmberAfPriceCppTable;
 
-typedef struct {
-  EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_CONSOLIDATED_BILL_TABLE_SIZE];
-  EmberAfPriceConsolidatedBills consolidatedBills[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_CONSOLIDATED_BILL_TABLE_SIZE];
+typedef struct
+{
+    EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                      [EMBER_AF_PLUGIN_PRICE_SERVER_CONSOLIDATED_BILL_TABLE_SIZE];
+    EmberAfPriceConsolidatedBills consolidatedBills[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                                   [EMBER_AF_PLUGIN_PRICE_SERVER_CONSOLIDATED_BILL_TABLE_SIZE];
 } EmberAfPriceConsolidatedBillsTable;
 
-typedef struct {
-  EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_CREDIT_PAYMENT_TABLE_SIZE];
-  EmberAfPriceCreditPayment creditPayment[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_CREDIT_PAYMENT_TABLE_SIZE];
+typedef struct
+{
+    EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                      [EMBER_AF_PLUGIN_PRICE_SERVER_CREDIT_PAYMENT_TABLE_SIZE];
+    EmberAfPriceCreditPayment creditPayment[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                           [EMBER_AF_PLUGIN_PRICE_SERVER_CREDIT_PAYMENT_TABLE_SIZE];
 } EmberAfPriceCreditPaymentTable;
 
-typedef struct {
-  EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_CONVERSION_FACTOR_TABLE_SIZE];
-  EmberAfPriceConversionFactor priceConversionFactors[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_CONVERSION_FACTOR_TABLE_SIZE];
+typedef struct
+{
+    EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                      [EMBER_AF_PLUGIN_PRICE_SERVER_CONVERSION_FACTOR_TABLE_SIZE];
+    EmberAfPriceConversionFactor priceConversionFactors[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                                       [EMBER_AF_PLUGIN_PRICE_SERVER_CONVERSION_FACTOR_TABLE_SIZE];
 } EmberAfPriceConversionFactorTable;
 
-typedef struct {
-  EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_CALORIFIC_VALUE_TABLE_SIZE];
-  EmberAfPriceCalorificValue calorificValues[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_CALORIFIC_VALUE_TABLE_SIZE];
+typedef struct
+{
+    EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                      [EMBER_AF_PLUGIN_PRICE_SERVER_CALORIFIC_VALUE_TABLE_SIZE];
+    EmberAfPriceCalorificValue calorificValues[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                              [EMBER_AF_PLUGIN_PRICE_SERVER_CALORIFIC_VALUE_TABLE_SIZE];
 } EmberAfPriceCalorificValueTable;
 
-typedef struct {
-  EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_CO2_VALUE_TABLE_SIZE];
-  EmberAfPriceCo2Value co2Values[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_CO2_VALUE_TABLE_SIZE];
+typedef struct
+{
+    EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                      [EMBER_AF_PLUGIN_PRICE_SERVER_CO2_VALUE_TABLE_SIZE];
+    EmberAfPriceCo2Value co2Values[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_CO2_VALUE_TABLE_SIZE];
 } EmberAfPriceCO2Table;
 
-typedef struct {
-  EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT];
-  EmberAfPriceCurrencyConversion currencyConversion[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT];
+typedef struct
+{
+    EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT];
+    EmberAfPriceCurrencyConversion currencyConversion[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT];
 } EmberAfPriceCurrencyConversionTable;
 
-typedef struct {
-  EmberAfPriceCancelTariff cancelTariff[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT];
+typedef struct
+{
+    EmberAfPriceCancelTariff cancelTariff[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT];
 } EmberAfPriceCancelTariffTable;
 
-typedef struct {
-  uint8_t   rateLabel[ZCL_PRICE_CLUSTER_MAXIMUM_RATE_LABEL_LENGTH + 1];
-  uint32_t  providerId;
-  uint32_t  issuerEventID;
-  uint32_t  startTime;
-  uint32_t  price;
-  uint32_t  generationPrice;
-  uint32_t  alternateCostDelivered;
-  uint16_t  currency;
-  uint16_t  duration; // in minutes
-  uint8_t   unitOfMeasure;
-  uint8_t   priceTrailingDigitAndTier;
-  uint8_t   numberOfPriceTiersAndTier; // added later in errata
-  uint8_t   priceRatio;
-  uint8_t   generationPriceRatio;
-  uint8_t   alternateCostUnit;
-  uint8_t   alternateCostTrailingDigit;
-  uint8_t   numberOfBlockThresholds;
-  uint8_t   priceControl;
+typedef struct
+{
+    uint8_t rateLabel[ZCL_PRICE_CLUSTER_MAXIMUM_RATE_LABEL_LENGTH + 1];
+    uint32_t providerId;
+    uint32_t issuerEventID;
+    uint32_t startTime;
+    uint32_t price;
+    uint32_t generationPrice;
+    uint32_t alternateCostDelivered;
+    uint16_t currency;
+    uint16_t duration; // in minutes
+    uint8_t unitOfMeasure;
+    uint8_t priceTrailingDigitAndTier;
+    uint8_t numberOfPriceTiersAndTier; // added later in errata
+    uint8_t priceRatio;
+    uint8_t generationPriceRatio;
+    uint8_t alternateCostUnit;
+    uint8_t alternateCostTrailingDigit;
+    uint8_t numberOfBlockThresholds;
+    uint8_t priceControl;
 } EmberAfScheduledPrice;
 
 typedef uint8_t emAfPriceBlockThreshold[ZCL_PRICE_CLUSTER_BLOCK_THRESHOLDS_PAYLOAD_SIZE];
-typedef struct {
-  union {
-    emAfPriceBlockThreshold blockAndTier[ZCL_PRICE_CLUSTER_MAX_TOU_BLOCK_TIERS][ZCL_PRICE_CLUSTER_MAX_TOU_BLOCKS - 1];
-    emAfPriceBlockThreshold block[ZCL_PRICE_CLUSTER_MAX_TOU_BLOCKS - 1];
-  } thresholds;
-  uint32_t providerId;
-  uint32_t issuerTariffId;
-  uint8_t status;
+typedef struct
+{
+    union
+    {
+        emAfPriceBlockThreshold blockAndTier[ZCL_PRICE_CLUSTER_MAX_TOU_BLOCK_TIERS][ZCL_PRICE_CLUSTER_MAX_TOU_BLOCKS - 1];
+        emAfPriceBlockThreshold block[ZCL_PRICE_CLUSTER_MAX_TOU_BLOCKS - 1];
+    } thresholds;
+    uint32_t providerId;
+    uint32_t issuerTariffId;
+    uint8_t status;
 } EmberAfScheduledBlockThresholds;
 
-typedef struct {
-  EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_TARIFF_TABLE_SIZE];
-  EmberAfScheduledBlockThresholds scheduledBlockThresholds[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_TARIFF_TABLE_SIZE];
+typedef struct
+{
+    EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                      [EMBER_AF_PLUGIN_PRICE_SERVER_TARIFF_TABLE_SIZE];
+    EmberAfScheduledBlockThresholds scheduledBlockThresholds[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                                            [EMBER_AF_PLUGIN_PRICE_SERVER_TARIFF_TABLE_SIZE];
 } EmberAfScheduledBlockThresholdsTable;
 
-typedef struct {
-  uint32_t providerId;
-  uint32_t issuerTariffId;
-  uint8_t status;
-  uint8_t tariffTypeChargingScheme;
+typedef struct
+{
+    uint32_t providerId;
+    uint32_t issuerTariffId;
+    uint8_t status;
+    uint8_t tariffTypeChargingScheme;
 
-  // below fields have corresponding zcl attributes.
-  uint8_t  tariffLabel[ZCL_PRICE_CLUSTER_MAXIMUM_RATE_LABEL_LENGTH + 1];
-  uint8_t  numberOfPriceTiersInUse;
-  uint8_t  numberOfBlockThresholdsInUse;
-  uint8_t  tierBlockMode;
-  uint8_t  unitOfMeasure;
-  uint16_t currency;
-  uint8_t  priceTrailingDigit;
-  uint32_t standingCharge;
-  uint32_t blockThresholdMultiplier;
-  uint32_t blockThresholdDivisor;
+    // below fields have corresponding zcl attributes.
+    uint8_t tariffLabel[ZCL_PRICE_CLUSTER_MAXIMUM_RATE_LABEL_LENGTH + 1];
+    uint8_t numberOfPriceTiersInUse;
+    uint8_t numberOfBlockThresholdsInUse;
+    uint8_t tierBlockMode;
+    uint8_t unitOfMeasure;
+    uint16_t currency;
+    uint8_t priceTrailingDigit;
+    uint32_t standingCharge;
+    uint32_t blockThresholdMultiplier;
+    uint32_t blockThresholdDivisor;
 } EmberAfScheduledTariff;
 
-typedef struct {
-  EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_TARIFF_TABLE_SIZE];
-  EmberAfScheduledTariff scheduledTariffs[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_TARIFF_TABLE_SIZE];
+typedef struct
+{
+    EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                      [EMBER_AF_PLUGIN_PRICE_SERVER_TARIFF_TABLE_SIZE];
+    EmberAfScheduledTariff scheduledTariffs[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                           [EMBER_AF_PLUGIN_PRICE_SERVER_TARIFF_TABLE_SIZE];
 } EmberAfScheduledTariffTable;
 
-typedef struct {
-  union {
-    uint32_t blockAndTier[ZCL_PRICE_CLUSTER_MAX_TOU_BLOCK_TIERS][ZCL_PRICE_CLUSTER_MAX_TOU_BLOCKS];
-    uint32_t tier[ZCL_PRICE_CLUSTER_MAX_TOU_TIERS];
-  } matrix;
-  uint32_t providerId;
-  uint32_t issuerTariffId;
-  uint8_t status;
+typedef struct
+{
+    union
+    {
+        uint32_t blockAndTier[ZCL_PRICE_CLUSTER_MAX_TOU_BLOCK_TIERS][ZCL_PRICE_CLUSTER_MAX_TOU_BLOCKS];
+        uint32_t tier[ZCL_PRICE_CLUSTER_MAX_TOU_TIERS];
+    } matrix;
+    uint32_t providerId;
+    uint32_t issuerTariffId;
+    uint8_t status;
 } EmberAfScheduledPriceMatrix;
 
-typedef struct {
-  EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_TARIFF_TABLE_SIZE];
-  EmberAfScheduledPriceMatrix scheduledPriceMatrix[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT][EMBER_AF_PLUGIN_PRICE_SERVER_TARIFF_TABLE_SIZE];
+typedef struct
+{
+    EmberAfPriceCommonInfo commonInfos[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                      [EMBER_AF_PLUGIN_PRICE_SERVER_TARIFF_TABLE_SIZE];
+    EmberAfScheduledPriceMatrix scheduledPriceMatrix[EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT]
+                                                    [EMBER_AF_PLUGIN_PRICE_SERVER_TARIFF_TABLE_SIZE];
 } EmberAfScheduledPriceMatrixTable;
 
-typedef struct {
-  EmberAfPriceBlockPeriodTable blockPeriodTable;
-  EmberAfPriceConversionFactorTable conversionFactorTable;
-  EmberAfPriceCalorificValueTable calorificValueTable;
-  EmberAfPriceCO2Table co2ValueTable;
-  EmberAfPriceTierLabelTable tierLabelTable;
-  EmberAfPriceBillingPeriodTable billingPeriodTable;
-  EmberAfPriceConsolidatedBillsTable consolidatedBillsTable;
-  EmberAfPriceCppTable cppTable;
-  EmberAfPriceCreditPaymentTable creditPaymentTable;
-  EmberAfPriceCurrencyConversionTable currencyConversionTable;
-  EmberAfPriceCancelTariffTable cancelTariffTable;
-  EmberAfScheduledTariffTable scheduledTariffTable;
-  EmberAfScheduledBlockThresholdsTable scheduledBlockThresholdsTable;
-  EmberAfScheduledPriceMatrixTable  scheduledPriceMatrixTable;
+typedef struct
+{
+    EmberAfPriceBlockPeriodTable blockPeriodTable;
+    EmberAfPriceConversionFactorTable conversionFactorTable;
+    EmberAfPriceCalorificValueTable calorificValueTable;
+    EmberAfPriceCO2Table co2ValueTable;
+    EmberAfPriceTierLabelTable tierLabelTable;
+    EmberAfPriceBillingPeriodTable billingPeriodTable;
+    EmberAfPriceConsolidatedBillsTable consolidatedBillsTable;
+    EmberAfPriceCppTable cppTable;
+    EmberAfPriceCreditPaymentTable creditPaymentTable;
+    EmberAfPriceCurrencyConversionTable currencyConversionTable;
+    EmberAfPriceCancelTariffTable cancelTariffTable;
+    EmberAfScheduledTariffTable scheduledTariffTable;
+    EmberAfScheduledBlockThresholdsTable scheduledBlockThresholdsTable;
+    EmberAfScheduledPriceMatrixTable scheduledPriceMatrixTable;
 } EmberAfPriceServerInfo;
 
 extern EmberAfPriceServerInfo priceServerInfo;
@@ -443,9 +495,7 @@ void emberAfPriceClearBlockThresholdsTable(uint8_t endpoint);
  * @param price The ::EmberAfScheduledPrice structure describing the price.
  * @return True if the price was found or false is the index is invalid.
  */
-bool emberAfPriceGetPriceTableEntry(uint8_t endpoint,
-                                    uint8_t index,
-                                    EmberAfScheduledPrice *price);
+bool emberAfPriceGetPriceTableEntry(uint8_t endpoint, uint8_t index, EmberAfScheduledPrice * price);
 
 /**
  * @brief Sets values in the Block Period table.
@@ -462,10 +512,9 @@ bool emberAfPriceGetPriceTableEntry(uint8_t endpoint,
  *
  **/
 void emberAfPluginPriceServerBlockPeriodAdd(uint8_t endpoint, uint32_t providerId, uint32_t issuerEventId,
-                                            uint32_t blockPeriodStartTime, uint32_t blockPeriodDuration,
-                                            uint8_t  blockPeriodControl, uint8_t blockPeriodDurationType,
-                                            uint32_t thresholdMultiplier, uint32_t thresholdDivisor,
-                                            uint8_t  tariffType, uint8_t tariffResolutionPeriod);
+                                            uint32_t blockPeriodStartTime, uint32_t blockPeriodDuration, uint8_t blockPeriodControl,
+                                            uint8_t blockPeriodDurationType, uint32_t thresholdMultiplier,
+                                            uint32_t thresholdDivisor, uint8_t tariffType, uint8_t tariffResolutionPeriod);
 
 /**
  * @brief Sends a Publish Block Period command.
@@ -519,10 +568,8 @@ void emberAfPriceServerRefreshBlockPeriod(uint8_t endpoint, bool repeat);
  * @param tariff   The ::EmberAfScheduledTariff structure describing the tariff.
  * @return         True if the tariff was found.
  */
-bool emberAfPriceGetTariffTableEntry(uint8_t endpoint,
-                                     uint8_t index,
-                                     EmberAfPriceCommonInfo *info,
-                                     EmberAfScheduledTariff *tariff);
+bool emberAfPriceGetTariffTableEntry(uint8_t endpoint, uint8_t index, EmberAfPriceCommonInfo * info,
+                                     EmberAfScheduledTariff * tariff);
 
 /**
  * @brief Retrieves a price matrix entry by index.
@@ -535,10 +582,7 @@ bool emberAfPriceGetTariffTableEntry(uint8_t endpoint,
  * @param pm       The ::EmberAfScheduledPriceMatrix structure describing the price matrix.
  * @return         True if the price matrix was found.
  */
-bool emberAfPriceGetPriceMatrix(uint8_t endpoint,
-                                uint8_t index,
-                                EmberAfPriceCommonInfo *info,
-                                EmberAfScheduledPriceMatrix *pm);
+bool emberAfPriceGetPriceMatrix(uint8_t endpoint, uint8_t index, EmberAfPriceCommonInfo * info, EmberAfScheduledPriceMatrix * pm);
 
 /**
  * @brief Gets the block thresholds used by the Price server plugin.
@@ -551,9 +595,7 @@ bool emberAfPriceGetPriceMatrix(uint8_t endpoint,
  * @param bt       The ::EmberAfScheduledBlockThresholds structure describing the block thresholds.
  * @return         True if the block thresholds was found.
  */
-bool emberAfPriceGetBlockThresholdsTableEntry(uint8_t endpoint,
-                                              uint8_t index,
-                                              EmberAfScheduledBlockThresholds *bt);
+bool emberAfPriceGetBlockThresholdsTableEntry(uint8_t endpoint, uint8_t index, EmberAfScheduledBlockThresholds * bt);
 
 /**
  * @brief Gets a tariff by issuer tariff ID and endpoint.
@@ -564,10 +606,8 @@ bool emberAfPriceGetBlockThresholdsTableEntry(uint8_t endpoint,
  * @param tariff          The ::EmberAfScheduledTariff structure describing the tariff.
  * @return                True if the tariff was found.
  */
-bool emberAfPriceGetTariffByIssuerTariffId(uint8_t endpoint,
-                                           uint32_t issuerTariffId,
-                                           EmberAfPriceCommonInfo *info,
-                                           EmberAfScheduledTariff *tariff);
+bool emberAfPriceGetTariffByIssuerTariffId(uint8_t endpoint, uint32_t issuerTariffId, EmberAfPriceCommonInfo * info,
+                                           EmberAfScheduledTariff * tariff);
 
 /**
  * @brief Gets a price matrix by issuer tariff ID and endpoint.
@@ -577,10 +617,8 @@ bool emberAfPriceGetTariffByIssuerTariffId(uint8_t endpoint,
  * @param pm       The ::EmberAfScheduledPriceMatrix structure describing the price matrix.
  * @return         True if the price matrix was found.
  */
-bool emberAfPriceGetPriceMatrixByIssuerTariffId(uint8_t endpoint,
-                                                uint32_t issuerTariffId,
-                                                EmberAfPriceCommonInfo *info,
-                                                EmberAfScheduledPriceMatrix *pm);
+bool emberAfPriceGetPriceMatrixByIssuerTariffId(uint8_t endpoint, uint32_t issuerTariffId, EmberAfPriceCommonInfo * info,
+                                                EmberAfScheduledPriceMatrix * pm);
 
 /**
  * @brief Gets the block thresholds by issuer tariff ID and endpoint.
@@ -590,10 +628,8 @@ bool emberAfPriceGetPriceMatrixByIssuerTariffId(uint8_t endpoint,
  * @param bt       The ::EmberAfScheduledBlockThresholds structure describing the block thresholds.
  * @return         True if the block thresholds were found.
  */
-bool emberAfPriceGetBlockThresholdsByIssuerTariffId(uint8_t endpoint,
-                                                    uint32_t issuerTariffId,
-                                                    EmberAfPriceCommonInfo *info,
-                                                    EmberAfScheduledBlockThresholds *bt);
+bool emberAfPriceGetBlockThresholdsByIssuerTariffId(uint8_t endpoint, uint32_t issuerTariffId, EmberAfPriceCommonInfo * info,
+                                                    EmberAfScheduledBlockThresholds * bt);
 /**
  * @brief Sets a price used by the Price server plugin.
  *
@@ -610,9 +646,7 @@ bool emberAfPriceGetBlockThresholdsByIssuerTariffId(uint8_t endpoint,
  * @return True if the price was set or removed or false is the index is
  * invalid.
  */
-bool emberAfPriceSetPriceTableEntry(uint8_t endpoint,
-                                    uint8_t index,
-                                    const EmberAfScheduledPrice *price);
+bool emberAfPriceSetPriceTableEntry(uint8_t endpoint, uint8_t index, const EmberAfScheduledPrice * price);
 
 /**
  * @brief Sets a tariff used by the Price server plugin.
@@ -627,10 +661,8 @@ bool emberAfPriceSetPriceTableEntry(uint8_t endpoint,
  * @return         True if the tariff was set or removed, or false if the
  *                 index is invalid.
  */
-bool emberAfPriceSetTariffTableEntry(uint8_t endpoint,
-                                     uint8_t index,
-                                     EmberAfPriceCommonInfo *info,
-                                     const EmberAfScheduledTariff *tariff);
+bool emberAfPriceSetTariffTableEntry(uint8_t endpoint, uint8_t index, EmberAfPriceCommonInfo * info,
+                                     const EmberAfScheduledTariff * tariff);
 
 /**
  * @brief Sets a price matrix entry by index.
@@ -646,10 +678,8 @@ bool emberAfPriceSetTariffTableEntry(uint8_t endpoint,
  * @return         True if the price matrix was set or removed, or false if the
  *                 index is invalid.
  */
-bool emberAfPriceSetPriceMatrix(uint8_t endpoint,
-                                uint8_t index,
-                                EmberAfPriceCommonInfo *info,
-                                const EmberAfScheduledPriceMatrix *pm);
+bool emberAfPriceSetPriceMatrix(uint8_t endpoint, uint8_t index, EmberAfPriceCommonInfo * info,
+                                const EmberAfScheduledPriceMatrix * pm);
 
 /**
  * @brief Sets the block thresholds used by the price server plugin.
@@ -665,10 +695,8 @@ bool emberAfPriceSetPriceMatrix(uint8_t endpoint,
  * @return         True if the block thresholds was set or removed, or false if the
  *                 index is invalid.
  */
-bool emberAfPriceSetBlockThresholdsTableEntry(uint8_t endpoint,
-                                              uint8_t index,
-                                              const EmberAfPriceCommonInfo *info,
-                                              const EmberAfScheduledBlockThresholds *bt);
+bool emberAfPriceSetBlockThresholdsTableEntry(uint8_t endpoint, uint8_t index, const EmberAfPriceCommonInfo * info,
+                                              const EmberAfScheduledBlockThresholds * bt);
 
 /**
  * @brief Gets the current price used by the price server plugin.
@@ -683,7 +711,7 @@ bool emberAfPriceSetBlockThresholdsTableEntry(uint8_t endpoint,
  * @return True if the current price was found or false is there is no current
  * price.
  */
-bool emberAfGetCurrentPrice(uint8_t endpoint, EmberAfScheduledPrice *price);
+bool emberAfGetCurrentPrice(uint8_t endpoint, EmberAfScheduledPrice * price);
 
 /**
  * @brief Finds the first free index in the price table.
@@ -700,23 +728,16 @@ bool emberAfGetCurrentPrice(uint8_t endpoint, EmberAfScheduledPrice *price);
  */
 uint8_t emberAfPriceFindFreePriceIndex(uint8_t endpoint);
 
-void emberAfPricePrint(const EmberAfScheduledPrice *price);
+void emberAfPricePrint(const EmberAfScheduledPrice * price);
 void emberAfPricePrintPriceTable(uint8_t endpoint);
-void emberAfPricePrintTariff(const EmberAfPriceCommonInfo *info,
-                             const EmberAfScheduledTariff *tariff);
+void emberAfPricePrintTariff(const EmberAfPriceCommonInfo * info, const EmberAfScheduledTariff * tariff);
 void emberAfPricePrintTariffTable(uint8_t endpoint);
-void emberAfPricePrintPriceMatrix(uint8_t endpoint,
-                                  const EmberAfPriceCommonInfo *info,
-                                  const EmberAfScheduledPriceMatrix *pm);
+void emberAfPricePrintPriceMatrix(uint8_t endpoint, const EmberAfPriceCommonInfo * info, const EmberAfScheduledPriceMatrix * pm);
 void emberAfPricePrintPriceMatrixTable(uint8_t endpoint);
-void emberAfPricePrintBlockThresholds(uint8_t endpoint,
-                                      const EmberAfPriceCommonInfo *info,
-                                      const EmberAfScheduledBlockThresholds *bt);
+void emberAfPricePrintBlockThresholds(uint8_t endpoint, const EmberAfPriceCommonInfo * info,
+                                      const EmberAfScheduledBlockThresholds * bt);
 void emberAfPricePrintBlockThresholdsTable(uint8_t endpoint);
-void emberAfPluginPriceServerPublishPriceMessage(EmberNodeId nodeId,
-                                                 uint8_t srcEndpoint,
-                                                 uint8_t dstEndpoint,
-                                                 uint8_t priceIndex);
+void emberAfPluginPriceServerPublishPriceMessage(EmberNodeId nodeId, uint8_t srcEndpoint, uint8_t dstEndpoint, uint8_t priceIndex);
 
 /**
  * @brief Sets parameters in the conversion factors table.
@@ -729,11 +750,8 @@ void emberAfPluginPriceServerPublishPriceMessage(EmberNodeId nodeId,
  * @param conversionFactorTrailingDigit Determines where the decimal
  * point is located in the conversion factor.
  **/
-EmberAfStatus emberAfPluginPriceServerConversionFactorAdd(uint8_t endpoint,
-                                                          uint32_t issuerEventId,
-                                                          uint32_t startTime,
-                                                          uint32_t conversionFactor,
-                                                          uint8_t conversionFactorTrailingDigit);
+EmberAfStatus emberAfPluginPriceServerConversionFactorAdd(uint8_t endpoint, uint32_t issuerEventId, uint32_t startTime,
+                                                          uint32_t conversionFactor, uint8_t conversionFactorTrailingDigit);
 /**
  * @brief Clears the conversion factors table and invalidates all entries.
  *
@@ -753,10 +771,7 @@ void emberAfPluginPriceServerConversionFactorClear(uint8_t endpoint);
  * @param dstEp The destination endpoint used in the transmission.
  *
  **/
-void emberAfPluginPriceServerConversionFactorPub(uint8_t tableIndex,
-                                                 EmberNodeId dstAddr,
-                                                 uint8_t srcEndpoint,
-                                                 uint8_t dstEndpoint);
+void emberAfPluginPriceServerConversionFactorPub(uint8_t tableIndex, EmberNodeId dstAddr, uint8_t srcEndpoint, uint8_t dstEndpoint);
 
 /**
  * @brief Returns the number of seconds until the next conversion factor
@@ -791,11 +806,8 @@ void emberAfPriceServerRefreshConversionFactor(uint8_t endpoint);
  * is located in the calorific value.
  *
  **/
-EmberAfStatus emberAfPluginPriceServerCalorificValueAdd(uint8_t endpoint,
-                                                        uint32_t issuerEventId,
-                                                        uint32_t startTime,
-                                                        uint32_t calorificValue,
-                                                        uint8_t calorificValueUnit,
+EmberAfStatus emberAfPluginPriceServerCalorificValueAdd(uint8_t endpoint, uint32_t issuerEventId, uint32_t startTime,
+                                                        uint32_t calorificValue, uint8_t calorificValueUnit,
                                                         uint8_t calorificValueTrailingDigit);
 
 /**
@@ -835,9 +847,7 @@ void emberAfPluginPriceServerCalorificValueClear(uint8_t endpoint);
  * be used in the Publish Tariff Information command.
  *
  **/
-void emberAfPluginPriceServerPublishTariffMessage(EmberNodeId nodeId,
-                                                  uint8_t srcEndpoint,
-                                                  uint8_t dstEndpoint,
+void emberAfPluginPriceServerPublishTariffMessage(EmberNodeId nodeId, uint8_t srcEndpoint, uint8_t dstEndpoint,
                                                   uint8_t tariffIndex);
 
 /**
@@ -893,13 +903,8 @@ void emberAfPriceServerRefreshCO2Value(uint8_t endpoint);
  * is located in the co2Value.
  *
  **/
-void emberAfPluginPriceServerCo2ValueAdd(uint8_t endpoint,
-                                         uint32_t issuerEventId,
-                                         uint32_t startTime,
-                                         uint32_t providerId,
-                                         uint8_t tariffType,
-                                         uint32_t co2Value,
-                                         uint8_t co2ValueUnit,
+void emberAfPluginPriceServerCo2ValueAdd(uint8_t endpoint, uint32_t issuerEventId, uint32_t startTime, uint32_t providerId,
+                                         uint8_t tariffType, uint32_t co2Value, uint8_t co2ValueUnit,
                                          uint8_t co2ValueTrailingDigit);
 
 /**
@@ -927,10 +932,7 @@ void emberAfPrintCo2ValuesTable(uint8_t endpoint);
  * @param index The index of the CO2 values table whose data will be used in the command.
  *
  **/
-void emberAfPluginPriceServerCo2LabelPub(uint16_t nodeId,
-                                         uint8_t srcEndpoint,
-                                         uint8_t dstEndpoint,
-                                         uint8_t index);
+void emberAfPluginPriceServerCo2LabelPub(uint16_t nodeId, uint8_t srcEndpoint, uint8_t dstEndpoint, uint8_t index);
 
 /**
  * @brief Sets values in the Tier Label table.
@@ -945,14 +947,8 @@ void emberAfPluginPriceServerCo2LabelPub(uint16_t nodeId,
  * @param tierLabel A character string descriptor for this tier.
  *
  **/
-void emberAfPluginPriceServerTierLabelSet(uint8_t  endpoint,
-                                          uint8_t  index,
-                                          uint8_t  valid,
-                                          uint32_t providerId,
-                                          uint32_t issuerEventId,
-                                          uint32_t issuerTariffId,
-                                          uint8_t tierId,
-                                          uint8_t* tierLabel);
+void emberAfPluginPriceServerTierLabelSet(uint8_t endpoint, uint8_t index, uint8_t valid, uint32_t providerId,
+                                          uint32_t issuerEventId, uint32_t issuerTariffId, uint8_t tierId, uint8_t * tierLabel);
 void emberAfPrintPrintTierLabelsTable(void);
 
 /**
@@ -964,10 +960,7 @@ void emberAfPrintPrintTierLabelsTable(void);
  * @param tierLabel Character string descriptor for this tier.
  *
  **/
-void emberAfPluginPriceServerTierLabelAddLabel(uint8_t endpoint,
-                                               uint32_t issuerTariffId,
-                                               uint8_t tierId,
-                                               uint8_t *tierLabel);
+void emberAfPluginPriceServerTierLabelAddLabel(uint8_t endpoint, uint32_t issuerTariffId, uint8_t tierId, uint8_t * tierLabel);
 
 /**
  * @brief Prints the tier labels table.
@@ -1025,13 +1018,9 @@ void emberAfPriceServerRefreshBillingPeriod(uint8_t endpoint, bool force);
  * @param tariffType Bitmap identifying the type of tariff published in this command.
  *
  **/
-EmberStatus emberAfPluginPriceServerBillingPeriodAdd(uint8_t endpoint,
-                                                     uint32_t startTime,
-                                                     uint32_t issuerEventId,
-                                                     uint32_t providerId,
-                                                     uint32_t billingPeriodDuration,
-                                                     uint8_t billingPeriodDurationType,
-                                                     uint8_t tariffType);
+EmberStatus emberAfPluginPriceServerBillingPeriodAdd(uint8_t endpoint, uint32_t startTime, uint32_t issuerEventId,
+                                                     uint32_t providerId, uint32_t billingPeriodDuration,
+                                                     uint8_t billingPeriodDurationType, uint8_t tariffType);
 /**
  * @brief Sends a Publish Billing Period command.
  *
@@ -1041,8 +1030,7 @@ EmberStatus emberAfPluginPriceServerBillingPeriodAdd(uint8_t endpoint,
  * @param index The index of the table whose data will be used in the command.
  *
  **/
-void emberAfPluginPriceServerBillingPeriodPub(uint16_t nodeId, uint8_t srcEndpoint,
-                                              uint8_t dstEndpoint, uint8_t index);
+void emberAfPluginPriceServerBillingPeriodPub(uint16_t nodeId, uint8_t srcEndpoint, uint8_t dstEndpoint, uint8_t index);
 
 /**
  * @brief Prints the data in the billing period table for the specified endpoint.
@@ -1078,11 +1066,10 @@ void emberAfPrintConsolidatedBillTableEntry(uint8_t endpoint, uint8_t index);
  * in the consolidatedBill field.
  *
  **/
-void emberAfPluginPriceServerConsolidatedBillAdd(uint8_t endpoint, uint32_t startTime,
-                                                 uint32_t issuerEventId, uint32_t providerId,
+void emberAfPluginPriceServerConsolidatedBillAdd(uint8_t endpoint, uint32_t startTime, uint32_t issuerEventId, uint32_t providerId,
                                                  uint32_t billingPeriodDuration, uint8_t billingPeriodDurationType,
-                                                 uint8_t tariffType, uint32_t consolidatedBill,
-                                                 uint16_t currency, uint8_t billTrailingDigit);
+                                                 uint8_t tariffType, uint32_t consolidatedBill, uint16_t currency,
+                                                 uint8_t billTrailingDigit);
 
 /**
  * @brief Sends a Publish Consolidated Bill command.
@@ -1109,8 +1096,9 @@ void emberAfPluginPriceServerConsolidatedBillPub(uint16_t nodeId, uint8_t srcEnd
  * @param cppAuth The status of the CPP event.
  *
  **/
-void emberAfPluginPriceServerCppEventSet(uint8_t endpoint, uint8_t valid, uint32_t providerId, uint32_t issuerEventId, uint32_t startTime,
-                                         uint16_t durationInMinutes, uint8_t tariffType, uint8_t cppPriceTier, uint8_t cppAuth);
+void emberAfPluginPriceServerCppEventSet(uint8_t endpoint, uint8_t valid, uint32_t providerId, uint32_t issuerEventId,
+                                         uint32_t startTime, uint16_t durationInMinutes, uint8_t tariffType, uint8_t cppPriceTier,
+                                         uint8_t cppAuth);
 
 /**
  * @brief Sends a Publish CPP Event command.
@@ -1158,13 +1146,12 @@ void emberAfPluginPriceServerCreditPaymentPub(uint16_t nodeId, uint8_t srcEndpoi
  * reference used by the energy supplier.
  *
  **/
-void emberAfPluginPriceServerCreditPaymentSet(uint8_t endpoint, uint8_t index, uint8_t valid,
-                                              uint32_t providerId, uint32_t issuerEventId,
-                                              uint32_t creditPaymentDueDate, uint32_t creditPaymentOverdueAmount,
-                                              uint8_t creditPaymentStatus, uint32_t creditPayment,
-                                              uint32_t creditPaymentDate, uint8_t *creditPaymentRef);
+void emberAfPluginPriceServerCreditPaymentSet(uint8_t endpoint, uint8_t index, uint8_t valid, uint32_t providerId,
+                                              uint32_t issuerEventId, uint32_t creditPaymentDueDate,
+                                              uint32_t creditPaymentOverdueAmount, uint8_t creditPaymentStatus,
+                                              uint32_t creditPayment, uint32_t creditPaymentDate, uint8_t * creditPaymentRef);
 
-//void emberAfPluginPriceServerCreditPaymentPrint( void );
+// void emberAfPluginPriceServerCreditPaymentPrint( void );
 
 /**
  * @brief Sends a Publish Currency Conversion command.
@@ -1191,8 +1178,7 @@ void emberAfPluginPriceServerCurrencyConversionPub(uint16_t nodeId, uint8_t srcE
  * @param currencyChangeControlFlags Denotes functions that are required to be carried out by the client.
  *
  **/
-void emberAfPluginPriceServerCurrencyConversionSet(uint8_t endpoint, uint8_t valid,
-                                                   uint32_t providerId, uint32_t issuerEventId,
+void emberAfPluginPriceServerCurrencyConversionSet(uint8_t endpoint, uint8_t valid, uint32_t providerId, uint32_t issuerEventId,
                                                    uint32_t startTime, uint16_t oldCurrency, uint16_t newCurrency,
                                                    uint32_t conversionFactor, uint8_t conversionFactorTrailingDigit,
                                                    uint32_t currencyChangeControlFlags);
@@ -1207,8 +1193,8 @@ void emberAfPluginPriceServerCurrencyConversionSet(uint8_t endpoint, uint8_t val
  * @param tariffType A bitmap identifying the type of tariff to be canceled.
  *
  **/
-void emberAfPluginPriceServerTariffCancellationSet(uint8_t endpoint, uint8_t valid, uint32_t providerId,
-                                                   uint32_t issuerTariffId, uint8_t tariffType);
+void emberAfPluginPriceServerTariffCancellationSet(uint8_t endpoint, uint8_t valid, uint32_t providerId, uint32_t issuerTariffId,
+                                                   uint8_t tariffType);
 
 /**
  * @brief Sends a Cancel Tariff command.
@@ -1224,39 +1210,20 @@ uint32_t emberAfPriceServerSecondsUntilTariffInfoEvent(uint8_t endpoint);
 
 void emberAfPriceServerRefreshTariffInformation(uint8_t endpoint);
 
-bool emberAfPriceAddTariffTableEntry(uint8_t endpoint,
-                                     EmberAfPriceCommonInfo *info,
-                                     const EmberAfScheduledTariff *curTariff);
+bool emberAfPriceAddTariffTableEntry(uint8_t endpoint, EmberAfPriceCommonInfo * info, const EmberAfScheduledTariff * curTariff);
 
-bool emberAfPriceAddPriceMatrixRaw(uint8_t endpoint,
-                                   uint32_t providerId,
-                                   uint32_t issuerEventId,
-                                   uint32_t startTime,
-                                   uint32_t issuerTariffId,
-                                   uint8_t commandIndex,
-                                   uint8_t numberOfCommands,
-                                   uint8_t subPayloadControl,
-                                   uint8_t* payload);
+bool emberAfPriceAddPriceMatrixRaw(uint8_t endpoint, uint32_t providerId, uint32_t issuerEventId, uint32_t startTime,
+                                   uint32_t issuerTariffId, uint8_t commandIndex, uint8_t numberOfCommands,
+                                   uint8_t subPayloadControl, uint8_t * payload);
 
-bool emberAfPriceAddPriceMatrix(uint8_t endpoint,
-                                EmberAfPriceCommonInfo *info,
-                                EmberAfScheduledPriceMatrix * pm);
+bool emberAfPriceAddPriceMatrix(uint8_t endpoint, EmberAfPriceCommonInfo * info, EmberAfScheduledPriceMatrix * pm);
 
-bool emberAfPriceAddBlockThresholdsTableEntry(uint8_t endpoint,
-                                              uint32_t providerId,
-                                              uint32_t issuerEventId,
-                                              uint32_t startTime,
-                                              uint32_t issuerTariffId,
-                                              uint8_t commandIndex,
-                                              uint8_t numberOfCommands,
-                                              uint8_t subpayloadControl,
-                                              uint8_t* payload);
+bool emberAfPriceAddBlockThresholdsTableEntry(uint8_t endpoint, uint32_t providerId, uint32_t issuerEventId, uint32_t startTime,
+                                              uint32_t issuerTariffId, uint8_t commandIndex, uint8_t numberOfCommands,
+                                              uint8_t subpayloadControl, uint8_t * payload);
 
 void emberAfPriceClearBlockPeriodTable(uint8_t endpoint);
-void sendValidCmdEntries(uint8_t cmdId,
-                         uint8_t endpoint,
-                         uint8_t* validEntries,
-                         uint8_t validEntryCount);
+void sendValidCmdEntries(uint8_t cmdId, uint8_t endpoint, uint8_t * validEntries, uint8_t validEntryCount);
 void emberAfPluginPriceServerPriceUpdateBindings(void);
 
 uint32_t emberAfPriceServerSecondsUntilActivePriceMatrixEvent(uint8_t endpoint);
@@ -1264,4 +1231,4 @@ void emberAfPriceServerRefreshPriceMatrixInformation(uint8_t endpoint);
 uint32_t emberAfPriceServerSecondsUntilActiveBlockThresholdsEvent(uint8_t endpoint);
 void emberAfPriceServerRefreshBlockThresholdsInformation(uint8_t endpoint);
 
-#endif  // #ifndef _PRICE_SERVER_H_
+#endif // #ifndef _PRICE_SERVER_H_

@@ -31,15 +31,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Host routines for the Network Steering plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Host routines for the Network Steering
+                                                                               *plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
-#include "app/framework/plugin/network-steering/network-steering.h"
 #include "app/framework/plugin/network-steering/network-steering-internal.h"
+#include "app/framework/plugin/network-steering/network-steering.h"
 
 //============================================================================
 // Globals
@@ -56,22 +57,24 @@ static bool memoryCleared = false;
 
 uint8_t emAfPluginNetworkSteeringGetMaxPossiblePanIds(void)
 {
-  return MAX_NETWORKS;
+    return MAX_NETWORKS;
 }
 
 void emAfPluginNetworkSteeringClearStoredPanIds(void)
 {
-  memoryCleared = false;
+    memoryCleared = false;
 }
 
-uint16_t* emAfPluginNetworkSteeringGetStoredPanIdPointer(uint8_t index)
+uint16_t * emAfPluginNetworkSteeringGetStoredPanIdPointer(uint8_t index)
 {
-  if (index >= MAX_NETWORKS) {
-    return NULL;
-  }
-  if (!memoryCleared) {
-    MEMSET(storedNetworks, 0xFF, sizeof(uint16_t) * MAX_NETWORKS);
-    memoryCleared = true;
-  }
-  return &(storedNetworks[index]);
+    if (index >= MAX_NETWORKS)
+    {
+        return NULL;
+    }
+    if (!memoryCleared)
+    {
+        MEMSET(storedNetworks, 0xFF, sizeof(uint16_t) * MAX_NETWORKS);
+        memoryCleared = true;
+    }
+    return &(storedNetworks[index]);
 }

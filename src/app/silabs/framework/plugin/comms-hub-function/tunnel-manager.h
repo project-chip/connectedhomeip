@@ -31,25 +31,29 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief  The Tunnel Manager is responsible for establishing and maintaining tunnels
- * to all devices.  There are four APIs exposed by the tunnel manager. The
- * init function is called at startup and initializes internal data structures.
- * The create function is called after the CBKE with the device, the sendData
- * function is called whenever data is to be sent to the device, and the
- * destroy function is called whenever the tunnel to the device should
- * be torn down. There are also 1 callback that the tunnel manager will call.
- * It is emAfPluginCommsHubFunctionTunnelDataReceivedCallback which is
- * called when data is received from a tunnel.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief  The Tunnel Manager is responsible for
+                                                                               *establishing and maintaining tunnels to all devices.
+                                                                               *There are four APIs exposed by the tunnel manager.
+                                                                               *The init function is called at startup and
+                                                                               *initializes internal data structures. The create
+                                                                               *function is called after the CBKE with the device,
+                                                                               *the sendData function is called whenever data is to
+                                                                               *be sent to the device, and the destroy function is
+                                                                               *called whenever the tunnel to the device should be
+                                                                               *torn down. There are also 1 callback that the tunnel
+                                                                               *manager will call. It is
+                                                                               *emAfPluginCommsHubFunctionTunnelDataReceivedCallback
+                                                                               *which is called when data is received from a tunnel.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef TUNNEL_MANAGER_H_
 #define TUNNEL_MANAGER_H_
 
-#define EMBER_AF_PLUGIN_COMMS_HUB_FUNCTION_TUNNEL_LIMIT \
-  (EMBER_AF_PLUGIN_TUNNELING_CLIENT_TUNNEL_LIMIT + EMBER_AF_PLUGIN_TUNNELING_SERVER_TUNNEL_LIMIT)
+#define EMBER_AF_PLUGIN_COMMS_HUB_FUNCTION_TUNNEL_LIMIT                                                                            \
+    (EMBER_AF_PLUGIN_TUNNELING_CLIENT_TUNNEL_LIMIT + EMBER_AF_PLUGIN_TUNNELING_SERVER_TUNNEL_LIMIT)
 #define EM_AF_PLUGIN_COMMS_HUB_FUNCTION_NULL_TUNNEL_INDEX 0xFF
 
 /**
@@ -96,8 +100,7 @@ void emAfPluginCommsHubFunctionTunnelInit(uint8_t localEndpoint);
  * @param remoteEndpoint The remote endpoint to which the tunnel is to be created
  * @return true if successful or false if an error occurred
  */
-bool emAfPluginCommsHubFunctionTunnelCreate(EmberEUI64 remoteDeviceId,
-                                            uint8_t remoteEndpoint);
+bool emAfPluginCommsHubFunctionTunnelCreate(EmberEUI64 remoteDeviceId, uint8_t remoteEndpoint);
 
 /**
  * @brief Transfers data to a server through a tunnel.
@@ -111,11 +114,8 @@ bool emAfPluginCommsHubFunctionTunnelCreate(EmberEUI64 remoteDeviceId,
  * @param data The buffer containing the raw octets of data.
  * @return True if successful or false if an error occurred.
  */
-bool emAfPluginCommsHubFunctionTunnelSendData(EmberEUI64 remoteDeviceId,
-                                              uint16_t headerLen,
-                                              uint8_t *header,
-                                              uint16_t dataLen,
-                                              uint8_t *data);
+bool emAfPluginCommsHubFunctionTunnelSendData(EmberEUI64 remoteDeviceId, uint16_t headerLen, uint8_t * header, uint16_t dataLen,
+                                              uint8_t * data);
 
 /**
  * @brief Closes a tunnel.

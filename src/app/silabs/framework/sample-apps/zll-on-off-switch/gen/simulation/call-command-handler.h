@@ -43,9 +43,9 @@
 // the incomming message, and call appropriate command handler.
 
 // Cluster: Groups, client
-EmberAfStatus emberAfGroupsClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfGroupsClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: ZLL Commissioning, client
-EmberAfStatus emberAfZllCommissioningClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfZllCommissioningClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 #endif // SILABS_EMBER_AF_COMMAND_PARSE_HEADER

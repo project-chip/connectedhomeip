@@ -31,25 +31,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Definitions for the Standalone Bootloader Client plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Definitions for the Standalone Bootloader
+                                                                               *Client plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 void emAfStandaloneBootloaderClientPrintStatus(void);
 
-void emAfStandaloneBootloaderClientGetInfo(uint16_t* bootloaderVersion,
-                                           uint8_t* platformId,
-                                           uint8_t* microId,
-                                           uint8_t* phyId);
+void emAfStandaloneBootloaderClientGetInfo(uint16_t * bootloaderVersion, uint8_t * platformId, uint8_t * microId, uint8_t * phyId);
 
 EmberStatus emAfStandaloneBootloaderClientLaunch(void);
 
-void emAfStandaloneBootloaderClientGetMfgInfo(uint16_t* mfgIdReturnValue,
-                                              uint8_t* boardNameReturnValue);
+void emAfStandaloneBootloaderClientGetMfgInfo(uint16_t * mfgIdReturnValue, uint8_t * boardNameReturnValue);
 
-void emAfStandaloneBootloaderClientGetKey(uint8_t* returnData);
+void emAfStandaloneBootloaderClientGetKey(uint8_t * returnData);
 
 uint32_t emAfStandaloneBootloaderClientGetRandomNumber(void);
 

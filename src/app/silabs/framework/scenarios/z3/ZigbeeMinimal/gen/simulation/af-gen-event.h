@@ -40,26 +40,22 @@
 #define __AF_GEN_EVENT__
 
 // Code used to configure the cluster event mechanism
-#define EMBER_AF_GENERATED_EVENT_CODE                                                    \
-  extern EmberEventControl emberAfPluginNetworkSteeringFinishSteeringEventControl;       \
-  extern EmberEventControl emberAfPluginScanDispatchScanEventControl;                    \
-  extern EmberEventControl emberAfPluginUpdateTcLinkKeyBeginTcLinkKeyUpdateEventControl; \
-  extern void emberAfPluginNetworkSteeringFinishSteeringEventHandler(void);              \
-  extern void emberAfPluginScanDispatchScanEventHandler(void);                           \
-  extern void emberAfPluginUpdateTcLinkKeyBeginTcLinkKeyUpdateEventHandler(void);        \
-
+#define EMBER_AF_GENERATED_EVENT_CODE                                                                                              \
+    extern EmberEventControl emberAfPluginNetworkSteeringFinishSteeringEventControl;                                               \
+    extern EmberEventControl emberAfPluginScanDispatchScanEventControl;                                                            \
+    extern EmberEventControl emberAfPluginUpdateTcLinkKeyBeginTcLinkKeyUpdateEventControl;                                         \
+    extern void emberAfPluginNetworkSteeringFinishSteeringEventHandler(void);                                                      \
+    extern void emberAfPluginScanDispatchScanEventHandler(void);                                                                   \
+    extern void emberAfPluginUpdateTcLinkKeyBeginTcLinkKeyUpdateEventHandler(void);
 
 // EmberEventData structs used to populate the EmberEventData table
 #define EMBER_AF_GENERATED_EVENTS                                                                                                  \
-  { &emberAfPluginNetworkSteeringFinishSteeringEventControl, emberAfPluginNetworkSteeringFinishSteeringEventHandler },             \
-  { &emberAfPluginScanDispatchScanEventControl, emberAfPluginScanDispatchScanEventHandler },                                       \
-  { &emberAfPluginUpdateTcLinkKeyBeginTcLinkKeyUpdateEventControl, emberAfPluginUpdateTcLinkKeyBeginTcLinkKeyUpdateEventHandler }, \
+    { &emberAfPluginNetworkSteeringFinishSteeringEventControl, emberAfPluginNetworkSteeringFinishSteeringEventHandler },           \
+        { &emberAfPluginScanDispatchScanEventControl, emberAfPluginScanDispatchScanEventHandler },                                 \
+        { &emberAfPluginUpdateTcLinkKeyBeginTcLinkKeyUpdateEventControl,                                                           \
+          emberAfPluginUpdateTcLinkKeyBeginTcLinkKeyUpdateEventHandler },
 
-
-#define EMBER_AF_GENERATED_EVENT_STRINGS            \
-  "Network Steering Plugin FinishSteering",         \
-  "Scan Dispatch Plugin Scan",                      \
-  "Update TC Link Key Plugin BeginTcLinkKeyUpdate", \
-
+#define EMBER_AF_GENERATED_EVENT_STRINGS                                                                                           \
+    "Network Steering Plugin FinishSteering", "Scan Dispatch Plugin Scan", "Update TC Link Key Plugin BeginTcLinkKeyUpdate",
 
 #endif // __AF_GEN_EVENT__

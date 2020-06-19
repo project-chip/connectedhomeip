@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the Device Management Client plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the Device Management
+                                                                               *Client plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/plugin/device-management-server/device-management-common.h"
 

@@ -31,25 +31,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Definitions for the Simple Metering Server plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Definitions for the Simple Metering Server
+                                                                               *plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SIMPLE_METERING_SERVER_H_
 #define SIMPLE_METERING_SERVER_H_
 
 void emAfToggleFastPolling(uint8_t enableFastPolling);
-void emberAfPluginSimpleMeteringClusterReadAttributesResponseCallback(EmberAfClusterId clusterId,
-                                                                      uint8_t *buffer,
+void emberAfPluginSimpleMeteringClusterReadAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer,
                                                                       uint16_t bufLen);
-uint16_t emberAfPluginSimpleMeteringServerStartSampling(uint16_t requestedSampleId,
-                                                        uint32_t issuerEventId,
-                                                        uint32_t startSamplingTime,
-                                                        uint8_t sampleType,
-                                                        uint16_t sampleRequestInterval,
-                                                        uint16_t maxNumberOfSamples,
+uint16_t emberAfPluginSimpleMeteringServerStartSampling(uint16_t requestedSampleId, uint32_t issuerEventId,
+                                                        uint32_t startSamplingTime, uint8_t sampleType,
+                                                        uint16_t sampleRequestInterval, uint16_t maxNumberOfSamples,
                                                         uint8_t endpoint);
 
 #endif /* SIMPLE_METERING_SERVER_H_ */

@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // This callback file is created for your convenience. You may add application
 // code to this file. If you regenerate this file over a previous version, the
@@ -63,10 +63,9 @@
 void emberAfNcpInitCallback(boolean memoryAllocation)
 {
 #ifdef EZSP_HOST
-  if (memoryAllocation) {
-    emberAfSetEzspConfigValue(EZSP_CONFIG_RETRY_QUEUE_SIZE,
-                              EMBER_RETRY_QUEUE_SIZE,
-                              "retry size");
-  }
-#endif  // EZSP_HOST
+    if (memoryAllocation)
+    {
+        emberAfSetEzspConfigValue(EZSP_CONFIG_RETRY_QUEUE_SIZE, EMBER_RETRY_QUEUE_SIZE, "retry size");
+    }
+#endif // EZSP_HOST
 }

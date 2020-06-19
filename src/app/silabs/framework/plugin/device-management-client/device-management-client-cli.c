@@ -31,22 +31,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief CLI for the Device Management Client plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief CLI for the Device Management Client plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
-#include "device-management-client.h"
 #include "app/framework/plugin/device-management-server/device-management-common.h"
+#include "device-management-client.h"
 #ifndef EMBER_AF_GENERATE_CLI
-  #error The Device Management Client plugin is not compatible with the legacy CLI.
+#error The Device Management Client plugin is not compatible with the legacy CLI.
 #endif
 
 void emAfDeviceManagementClientCliPrint(void);
 
 void emAfDeviceManagementClientCliPrint(void)
 {
-  emberAfDeviceManagementClientPrint();
+    emberAfDeviceManagementClientPrint();
 }

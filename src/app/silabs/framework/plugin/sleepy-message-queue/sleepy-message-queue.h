@@ -31,22 +31,24 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Definitions for the Sleepy Message Queue plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Definitions for the Sleepy Message Queue
+                                                                               *plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_SLEEPY_MESSAGE_QUEUE_H
 #define SILABS_SLEEPY_MESSAGE_QUEUE_H
 
 typedef uint8_t EmberAfSleepyMessageId;
 
-typedef struct {
-  uint8_t *payload;
-  uint16_t length;
-  uint16_t payloadId;
-  EmberEUI64 dstEui64;
+typedef struct
+{
+    uint8_t * payload;
+    uint16_t length;
+    uint16_t payloadId;
+    EmberEUI64 dstEui64;
 } EmberAfSleepyMessage;
 
 #define EMBER_AF_PLUGIN_SLEEPY_MESSAGE_INVALID_ID 0xFF
@@ -55,7 +57,7 @@ typedef struct {
  * @brief Initializes the sleepy message queue.
  *
  **/
-void  emberAfPluginSleepyMessageQueueInitCallback(void);
+void emberAfPluginSleepyMessageQueueInitCallback(void);
 
 /**
  * @brief Returns the number of unused entries in the sleepy message queue.
@@ -71,7 +73,7 @@ uint8_t emberAfPluginSleepyMessageQueueGetNumUnusedEntries(void);
  * or EMBER_AF_PLUGING_SLEEPY_MESSAGE_INVALID_ID if the message could not be stored to the queue.
  * The message may not be stored if the queue is full, or the time duration exceeds the maximum duration.
  **/
-EmberAfSleepyMessageId emberAfPluginSleepyMessageQueueStoreMessage(EmberAfSleepyMessage *pmsg, uint32_t timeoutSec);
+EmberAfSleepyMessageId emberAfPluginSleepyMessageQueueStoreMessage(EmberAfSleepyMessage * pmsg, uint32_t timeoutSec);
 
 /**
  * @brief Returns the number of milliseconds remaining until the sleepy message expires.
@@ -101,7 +103,7 @@ EmberAfSleepyMessageId emberAfPluginSleepyMessageQueueGetPendingMessageId(EmberE
  *  it will be copied to this structure.
  * @return true if a matching message was found or false if a match was not found.
  **/
-bool emberAfPluginSleepyMessageQueueGetPendingMessage(EmberAfSleepyMessageId sleepyMsgId, EmberAfSleepyMessage *pmsg);
+bool emberAfPluginSleepyMessageQueueGetPendingMessage(EmberAfSleepyMessageId sleepyMsgId, EmberAfSleepyMessage * pmsg);
 
 /**
  * @brief Returns the time in milliseconds until the next message in the sleepy message queue will timeout.
@@ -121,7 +123,7 @@ uint8_t emberAfPluginSleepyMessageQueueGetNumMessages(EmberEUI64 dstEui64);
  * @param sleepyMsgId The EmberAfSleepyMessageId that should be removed from the sleepy message queue.
  * @return true if a matching EmberAfSleepyMessageId was found and removed from the sleepy message queue, or false if not.
  **/
-bool emberAfPluginSleepyMessageQueueRemoveMessage(EmberAfSleepyMessageId  sleepyMsgId);
+bool emberAfPluginSleepyMessageQueueRemoveMessage(EmberAfSleepyMessageId sleepyMsgId);
 
 /**
  * @brief Removes all messages from the sleepy message queue whose destination address matches the specified EmberEUI64.
@@ -130,4 +132,4 @@ bool emberAfPluginSleepyMessageQueueRemoveMessage(EmberAfSleepyMessageId  sleepy
  **/
 void emberAfPluginSleepyMessageQueueRemoveAllMessages(EmberEUI64 dstEui64);
 
-#endif  // #ifndef _SLEEPY_MESSAGE_QUEUE_H_
+#endif // #ifndef _SLEEPY_MESSAGE_QUEUE_H_

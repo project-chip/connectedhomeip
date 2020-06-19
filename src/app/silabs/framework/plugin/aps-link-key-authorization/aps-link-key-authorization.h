@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs for the APS Link Key Authorization feature.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs for the APS Link Key Authorization
+                                                                               *feature.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_APS_LINK_KEY_AUTHORIZATION_H
 #define SILABS_APS_LINK_KEY_AUTHORIZATION_H
@@ -43,21 +44,20 @@
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 #endif
 
-#define emberAfApsLinkKeyAuthorizationIsRequiredOnCluster(clusterId)                     \
-  /* If APS level security is enabled, the exempt list serves as a security disabler, */ \
-  /* whereas, if security is disabled, the exempt list serves as a security enabler */   \
-  (emberAfApsLinkKeyAuthorizationIsEnabled()                                             \
-   != emberAfApsLinkKeyAuthorizationIsClusterExempted(clusterId))
+#define emberAfApsLinkKeyAuthorizationIsRequiredOnCluster(clusterId)                                                               \
+    /* If APS level security is enabled, the exempt list serves as a security disabler, */                                         \
+    /* whereas, if security is disabled, the exempt list serves as a security enabler */                                           \
+    (emberAfApsLinkKeyAuthorizationIsEnabled() != emberAfApsLinkKeyAuthorizationIsClusterExempted(clusterId))
 
 bool emberAfApsLinkKeyAuthorizationIsEnabled(void);
 bool emberAfApsLinkKeyAuthorizationIsClusterExempted(uint16_t clusterId);
 bool emberAfApsLinkKeyAuthorizationIsExemptClusterListFull(void);
 uint8_t emberAfApsLinkKeyAuthorizationExemptClusterListCount(void);
-void emberAfApsLinkKeyAuthorizationGetExemptClusterList(uint8_t *exemptListCount, uint16_t *exemptClusterList);
+void emberAfApsLinkKeyAuthorizationGetExemptClusterList(uint8_t * exemptListCount, uint16_t * exemptClusterList);
 void emberAfApsLinkKeyAuthorizationClearExemptClusterList(void);
 void emberAfApsLinkKeyAuthorizationEnable(bool enable);
 EmberStatus emberAfApsLinkKeyAuthorizationAddClusterExempted(uint16_t clusterId);
-EmberStatus emberAfApsLinkKeyAuthorizationEnableWithExemptClusterList(uint8_t numberExemptClusters, uint8_t *exemptClusterList);
-EmberStatus emberAfApsLinkKeyAuthorizationDisableWithExemptClusterList(uint8_t numberExemptClusters, uint8_t *exemptClusterList);
+EmberStatus emberAfApsLinkKeyAuthorizationEnableWithExemptClusterList(uint8_t numberExemptClusters, uint8_t * exemptClusterList);
+EmberStatus emberAfApsLinkKeyAuthorizationDisableWithExemptClusterList(uint8_t numberExemptClusters, uint8_t * exemptClusterList);
 
 #endif // SILABS_APS_LINK_KEY_AUTHORIZATION_H

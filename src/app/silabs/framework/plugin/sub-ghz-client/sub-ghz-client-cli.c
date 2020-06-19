@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief CLI for the Sub-Ghz Client plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief CLI for the Sub-Ghz Client plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
 #include "app/util/serial/command-interpreter2.h"
@@ -51,11 +51,14 @@
  */
 static void printSuccessOrError(EmberStatus status)
 {
-  if (status == EMBER_SUCCESS) {
-    emberAfCorePrintln("OK");
-  } else {
-    emberAfCorePrintln("Error %d (0x%x)", status, status);
-  }
+    if (status == EMBER_SUCCESS)
+    {
+        emberAfCorePrintln("OK");
+    }
+    else
+    {
+        emberAfCorePrintln("Error %d (0x%x)", status, status);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -68,13 +71,13 @@ static void printSuccessOrError(EmberStatus status)
  */
 void emAfSubGhzClientCliGetSuspendStatus(void)
 {
-  EmberStatus status;
+    EmberStatus status;
 
-  EmberNodeId nodeId = (EmberNodeId)emberUnsignedCommandArgument(0);
-  uint8_t endpoint = (uint8_t)emberUnsignedCommandArgument(1);
+    EmberNodeId nodeId = (EmberNodeId) emberUnsignedCommandArgument(0);
+    uint8_t endpoint   = (uint8_t) emberUnsignedCommandArgument(1);
 
-  status = emberAfPluginSubGhzClientSendGetSuspendZclMessagesStatusCommand(nodeId, endpoint);
-  printSuccessOrError(status);
+    status = emberAfPluginSubGhzClientSendGetSuspendZclMessagesStatusCommand(nodeId, endpoint);
+    printSuccessOrError(status);
 }
 
 /** @brief Ignore the SuspendZclMessages command.
@@ -87,8 +90,8 @@ void emAfSubGhzClientCliGetSuspendStatus(void)
  */
 void emAfSubGhzClientCliIgnoreSuspendStatus(void)
 {
-  bool ignore = (bool)emberUnsignedCommandArgument(0);
-  emberAfPluginSubGhzClientIgnoreSuspendZclMessagesCommand(ignore);
+    bool ignore = (bool) emberUnsignedCommandArgument(0);
+    emberAfPluginSubGhzClientIgnoreSuspendZclMessagesCommand(ignore);
 }
 
 /** @brief Broadcasts a request to change the channel by means of the
@@ -104,22 +107,17 @@ void emAfSubGhzClientCliIgnoreSuspendStatus(void)
  */
 void emAfSubGhzClientCliRequestChannelChange(void)
 {
-  EmberStatus status;
+    EmberStatus status;
 
-  EmberNodeId nodeId = (EmberNodeId)emberUnsignedCommandArgument(0);
-  uint8_t page = (uint8_t)emberUnsignedCommandArgument(1);
-  uint8_t channel = (uint8_t)emberUnsignedCommandArgument(2);
-  uint16_t macTxUcastTotal = (uint16_t)emberUnsignedCommandArgument(3);
-  uint16_t macTxUcastFailures = (uint16_t)emberUnsignedCommandArgument(4);
-  uint16_t macTxUcastRetries = (uint16_t)emberUnsignedCommandArgument(5);
-  uint8_t period = (uint8_t)emberUnsignedCommandArgument(6);
+    EmberNodeId nodeId          = (EmberNodeId) emberUnsignedCommandArgument(0);
+    uint8_t page                = (uint8_t) emberUnsignedCommandArgument(1);
+    uint8_t channel             = (uint8_t) emberUnsignedCommandArgument(2);
+    uint16_t macTxUcastTotal    = (uint16_t) emberUnsignedCommandArgument(3);
+    uint16_t macTxUcastFailures = (uint16_t) emberUnsignedCommandArgument(4);
+    uint16_t macTxUcastRetries  = (uint16_t) emberUnsignedCommandArgument(5);
+    uint8_t period              = (uint8_t) emberUnsignedCommandArgument(6);
 
-  status = emberAfPluginSubGhzClientSendUnsolicitedEnhancedUpdateNotify(nodeId,
-                                                                        page,
-                                                                        channel,
-                                                                        macTxUcastTotal,
-                                                                        macTxUcastFailures,
-                                                                        macTxUcastRetries,
-                                                                        period);
-  printSuccessOrError(status);
+    status = emberAfPluginSubGhzClientSendUnsolicitedEnhancedUpdateNotify(nodeId, page, channel, macTxUcastTotal,
+                                                                          macTxUcastFailures, macTxUcastRetries, period);
+    printSuccessOrError(status);
 }

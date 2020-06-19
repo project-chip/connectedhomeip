@@ -31,16 +31,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Definitions for the Simple Clock plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Definitions for the Simple Clock plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
-typedef enum {
-  EMBER_AF_SIMPLE_CLOCK_NEVER_UTC_SYNC = 0,
-  EMBER_AF_SIMPLE_CLOCK_STALE_UTC_SYNC = 1,
-  EMBER_AF_SIMPLE_CLOCK_UTC_SYNCED = 2,
+typedef enum
+{
+    EMBER_AF_SIMPLE_CLOCK_NEVER_UTC_SYNC = 0,
+    EMBER_AF_SIMPLE_CLOCK_STALE_UTC_SYNC = 1,
+    EMBER_AF_SIMPLE_CLOCK_UTC_SYNCED     = 2,
 } EmberAfPluginSimpleClockTimeSyncStatus;
 
 // This function sets the time and notes it as synchronized with UTC.  The
@@ -53,4 +54,4 @@ EmberAfPluginSimpleClockTimeSyncStatus emberAfPluginSimpleClockGetTimeSyncStatus
 
 // This retrieves the current time in seconds, and any millisecond remainder is returned
 // in the passed pointer to the milliseconds value.
-uint32_t emberAfGetCurrentTimeSecondsWithMsPrecision(uint16_t* millisecondsRemainderReturn);
+uint32_t emberAfGetCurrentTimeSecondsWithMsPrecision(uint16_t * millisecondsRemainderReturn);

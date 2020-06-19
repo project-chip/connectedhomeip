@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // Copyright 2014 Silicon Laboratories, Inc.
 //
@@ -51,37 +51,32 @@
 // Event control struct declarations
 EmberEventControl identifyEventControl;
 
-static uint8_t const happyTune[] = {
-  NOTE_B4, 1,
-  0, 1,
-  NOTE_B5, 1,
-  0, 0
-};
-static uint8_t const sadTune[] = {
-  NOTE_B5, 1,
-  0, 1,
-  NOTE_B4, 5,
-  0, 0
-};
+static uint8_t const happyTune[] = { NOTE_B4, 1, 0, 1, NOTE_B5, 1, 0, 0 };
+static uint8_t const sadTune[]   = { NOTE_B5, 1, 0, 1, NOTE_B4, 5, 0, 0 };
 
 static uint32_t identifyDurationMs = 0; // milliseconds
 #define DEFAULT_IDENTIFY_DURATION_MS (3 * MILLISECOND_TICKS_PER_SECOND)
 
 void identifyEventHandler(void)
 {
-  if (identifyDurationMs == 0) {
-    halClearLed(BOARDLED1);
-    emberEventControlSetInactive(identifyEventControl);
-  } else {
-    halToggleLed(BOARDLED1);
-    if (identifyDurationMs >= MILLISECOND_TICKS_PER_QUARTERSECOND) {
-      identifyDurationMs -= MILLISECOND_TICKS_PER_QUARTERSECOND;
-    } else {
-      identifyDurationMs = 0;
+    if (identifyDurationMs == 0)
+    {
+        halClearLed(BOARDLED1);
+        emberEventControlSetInactive(identifyEventControl);
     }
-    emberEventControlSetDelayMS(identifyEventControl,
-                                MILLISECOND_TICKS_PER_QUARTERSECOND);
-  }
+    else
+    {
+        halToggleLed(BOARDLED1);
+        if (identifyDurationMs >= MILLISECOND_TICKS_PER_QUARTERSECOND)
+        {
+            identifyDurationMs -= MILLISECOND_TICKS_PER_QUARTERSECOND;
+        }
+        else
+        {
+            identifyDurationMs = 0;
+        }
+        emberEventControlSetDelayMS(identifyEventControl, MILLISECOND_TICKS_PER_QUARTERSECOND);
+    }
 }
 
 /** @brief Ok To Sleep
@@ -94,7 +89,7 @@ void identifyEventHandler(void)
  */
 bool emberAfPluginIdleSleepOkToSleepCallback(uint32_t durationMs)
 {
-  return false;
+    return false;
 }
 
 /** @brief Wake Up
@@ -104,9 +99,7 @@ bool emberAfPluginIdleSleepOkToSleepCallback(uint32_t durationMs)
  * @param durationMs The duration in milliseconds that the device slept.
  * Ver.: always
  */
-void emberAfPluginIdleSleepWakeUpCallback(uint32_t durationMs)
-{
-}
+void emberAfPluginIdleSleepWakeUpCallback(uint32_t durationMs) {}
 
 /** @brief Ok To Idle
  *
@@ -116,7 +109,7 @@ void emberAfPluginIdleSleepWakeUpCallback(uint32_t durationMs)
  */
 bool emberAfPluginIdleSleepOkToIdleCallback(void)
 {
-  return true;
+    return true;
 }
 
 /** @brief Active
@@ -124,9 +117,7 @@ bool emberAfPluginIdleSleepOkToIdleCallback(void)
  * This function is called by the Idle/Sleep plugin after idling.
  *
  */
-void emberAfPluginIdleSleepActiveCallback(void)
-{
-}
+void emberAfPluginIdleSleepActiveCallback(void) {}
 
 /** @brief Initial Security State
  *
@@ -140,12 +131,12 @@ void emberAfPluginIdleSleepActiveCallback(void)
  * @param securityState The security configuration to be populated by the
  * application and ultimately set in the stack.  Ver.: always
  */
-void emberAfPluginZllCommissioningInitialSecurityStateCallback(EmberZllInitialSecurityState *securityState)
+void emberAfPluginZllCommissioningInitialSecurityStateCallback(EmberZllInitialSecurityState * securityState)
 {
-  // By default, the plugin will configure the stack for the certification
-  // encryption algorithm.  Devices that are certified should instead use the
-  // master encryption algorithm and set the appropriate encryption key and
-  // pre-configured link key.
+    // By default, the plugin will configure the stack for the certification
+    // encryption algorithm.  Devices that are certified should instead use the
+    // master encryption algorithm and set the appropriate encryption key and
+    // pre-configured link key.
 }
 
 /** @brief Touch Link Complete
@@ -160,26 +151,23 @@ void emberAfPluginZllCommissioningInitialSecurityStateCallback(EmberZllInitialSe
  * @param deviceInformationRecordList The list of sub-device information
  * records for the target.  Ver.: always
  */
-void emberAfPluginZllCommissioningTouchLinkCompleteCallback(const EmberZllNetwork *networkInfo,
+void emberAfPluginZllCommissioningTouchLinkCompleteCallback(const EmberZllNetwork * networkInfo,
                                                             uint8_t deviceInformationRecordCount,
-                                                            const EmberZllDeviceInfoRecord *deviceInformationRecordList)
+                                                            const EmberZllDeviceInfoRecord * deviceInformationRecordList)
 {
-  uint8_t i;
-  emberAfCorePrint("Touch link with 0x%2x (", networkInfo->nodeId);
-  emberAfCoreDebugExec(emberAfPrintBigEndianEui64(networkInfo->eui64));
-  emberAfCorePrintln(") complete");
-  emberAfCoreFlush();
-  for (i = 0; i < deviceInformationRecordCount; i++) {
-    emberAfCorePrintln("sub device %d: 0x%x 0x%2x 0x%2x 0x%x 0x%x",
-                       i,
-                       deviceInformationRecordList[i].endpointId,
-                       deviceInformationRecordList[i].profileId,
-                       deviceInformationRecordList[i].deviceId,
-                       deviceInformationRecordList[i].version,
-                       deviceInformationRecordList[i].groupIdCount);
+    uint8_t i;
+    emberAfCorePrint("Touch link with 0x%2x (", networkInfo->nodeId);
+    emberAfCoreDebugExec(emberAfPrintBigEndianEui64(networkInfo->eui64));
+    emberAfCorePrintln(") complete");
     emberAfCoreFlush();
-  }
-  halPlayTune_P(happyTune, true);
+    for (i = 0; i < deviceInformationRecordCount; i++)
+    {
+        emberAfCorePrintln("sub device %d: 0x%x 0x%2x 0x%2x 0x%x 0x%x", i, deviceInformationRecordList[i].endpointId,
+                           deviceInformationRecordList[i].profileId, deviceInformationRecordList[i].deviceId,
+                           deviceInformationRecordList[i].version, deviceInformationRecordList[i].groupIdCount);
+        emberAfCoreFlush();
+    }
+    halPlayTune_P(happyTune, true);
 }
 
 /** @brief Touch Link Failed
@@ -191,8 +179,8 @@ void emberAfPluginZllCommissioningTouchLinkCompleteCallback(const EmberZllNetwor
  */
 void emberAfPluginZllCommissioningTouchLinkFailedCallback(EmberAfZllCommissioningStatus status)
 {
-  emberAfCorePrintln("Touch link failed: 0x%x", status);
-  halPlayTune_P(sadTune, true);
+    emberAfCorePrintln("Touch link failed: 0x%x", status);
+    halPlayTune_P(sadTune, true);
 }
 
 /** @brief Group Identifier Count
@@ -207,10 +195,10 @@ void emberAfPluginZllCommissioningTouchLinkFailedCallback(EmberAfZllCommissionin
  */
 uint8_t emberAfPluginZllCommissioningGroupIdentifierCountCallback(uint8_t endpoint)
 {
-  // Devices with multiple endpoints will have to distribute the group ids
-  // available to the device among the individual endpoints.  This application
-  // has one endpoint, so it uses all available group ids.
-  return EMBER_ZLL_GROUP_ADDRESSES;
+    // Devices with multiple endpoints will have to distribute the group ids
+    // available to the device among the individual endpoints.  This application
+    // has one endpoint, so it uses all available group ids.
+    return EMBER_ZLL_GROUP_ADDRESSES;
 }
 
 /** @brief Group Identifier
@@ -226,18 +214,17 @@ uint8_t emberAfPluginZllCommissioningGroupIdentifierCountCallback(uint8_t endpoi
  * @param index The index of the group on the endpoint.  Ver.: always
  * @param record The group information record.  Ver.: always
  */
-bool emberAfPluginZllCommissioningGroupIdentifierCallback(uint8_t endpoint,
-                                                          uint8_t index,
-                                                          EmberAfPluginZllCommissioningGroupInformationRecord *record)
+bool emberAfPluginZllCommissioningGroupIdentifierCallback(uint8_t endpoint, uint8_t index,
+                                                          EmberAfPluginZllCommissioningGroupInformationRecord * record)
 {
-  // Devices with multiple endpoints will have to distribute the group ids
-  // available to the device among the individual endpoints.  This application
-  // has one endpoint, so it uses all available group ids in order.
-  EmberTokTypeStackZllData token;
-  emberZllGetTokenStackZllData(&token);
-  record->groupId = token.myGroupIdMin + index;
-  record->groupType = 0x00; // fixed at zero
-  return true;
+    // Devices with multiple endpoints will have to distribute the group ids
+    // available to the device among the individual endpoints.  This application
+    // has one endpoint, so it uses all available group ids in order.
+    EmberTokTypeStackZllData token;
+    emberZllGetTokenStackZllData(&token);
+    record->groupId   = token.myGroupIdMin + index;
+    record->groupType = 0x00; // fixed at zero
+    return true;
 }
 
 /** @brief Endpoint Information Count
@@ -251,10 +238,10 @@ bool emberAfPluginZllCommissioningGroupIdentifierCallback(uint8_t endpoint,
  */
 uint8_t emberAfPluginZllCommissioningEndpointInformationCountCallback(uint8_t endpoint)
 {
-  // Devices that control remote endpoints individually will have to maintain
-  // a list of those endpoints.  This application does not control remote
-  // endpoints individually.
-  return 0x00;
+    // Devices that control remote endpoints individually will have to maintain
+    // a list of those endpoints.  This application does not control remote
+    // endpoints individually.
+    return 0x00;
 }
 
 /** @brief Endpoint Information
@@ -272,14 +259,13 @@ uint8_t emberAfPluginZllCommissioningEndpointInformationCountCallback(uint8_t en
  * endpoint.  Ver.: always
  * @param record The endpoint information record.  Ver.: always
  */
-bool emberAfPluginZllCommissioningEndpointInformationCallback(uint8_t endpoint,
-                                                              uint8_t index,
-                                                              EmberAfPluginZllCommissioningEndpointInformationRecord *record)
+bool emberAfPluginZllCommissioningEndpointInformationCallback(uint8_t endpoint, uint8_t index,
+                                                              EmberAfPluginZllCommissioningEndpointInformationRecord * record)
 {
-  // Devices that control remote endpoints individually will have to maintain
-  // a list of those endpoints.  This application does not control remote
-  // endpoints individually.
-  return false;
+    // Devices that control remote endpoints individually will have to maintain
+    // a list of those endpoints.  This application does not control remote
+    // endpoints individually.
+    return false;
 }
 
 /** @brief Identify
@@ -296,13 +282,12 @@ bool emberAfPluginZllCommissioningEndpointInformationCallback(uint8_t endpoint,
  */
 void emberAfPluginZllCommissioningIdentifyCallback(uint16_t durationS)
 {
-  if (durationS != 0) {
-    halStackIndicatePresence();
-  }
-  identifyDurationMs = (durationS == 0xFFFF
-                        ? DEFAULT_IDENTIFY_DURATION_MS
-                        : durationS * MILLISECOND_TICKS_PER_SECOND);
-  emberEventControlSetActive(identifyEventControl);
+    if (durationS != 0)
+    {
+        halStackIndicatePresence();
+    }
+    identifyDurationMs = (durationS == 0xFFFF ? DEFAULT_IDENTIFY_DURATION_MS : durationS * MILLISECOND_TICKS_PER_SECOND);
+    emberEventControlSetActive(identifyEventControl);
 }
 
 /** @brief Reset To Factory New
@@ -315,9 +300,7 @@ void emberAfPluginZllCommissioningIdentifyCallback(uint16_t durationS)
  * externally-stored attributes.
  *
  */
-void emberAfPluginZllCommissioningResetToFactoryNewCallback(void)
-{
-}
+void emberAfPluginZllCommissioningResetToFactoryNewCallback(void) {}
 
 /** @brief Join
  *
@@ -332,11 +315,9 @@ void emberAfPluginZllCommissioningResetToFactoryNewCallback(void)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginZllCommissioningJoinCallback(EmberZigbeeNetwork *networkFound,
-                                               uint8_t lqi,
-                                               int8_t rssi)
+bool emberAfPluginZllCommissioningJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }
 
 /** @brief Complete
@@ -349,7 +330,4 @@ bool emberAfPluginZllCommissioningJoinCallback(EmberZigbeeNetwork *networkFound,
  * @param usedSecondaryChannels Whether or not the network creator wants to
  * form a network on the secondary channels Ver.: always
  */
-void emberAfPluginNetworkCreatorCompleteCallback(const EmberNetworkParameters *network,
-                                                 bool usedSecondaryChannels)
-{
-}
+void emberAfPluginNetworkCreatorCompleteCallback(const EmberNetworkParameters * network, bool usedSecondaryChannels) {}

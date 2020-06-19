@@ -31,13 +31,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Zigbee Over-the-air bootload cluster for upgrading firmware and
- * downloading specific file.  This is the CLI to interact with the
- * main cluster code.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Zigbee Over-the-air bootload cluster for
+                                                                               *upgrading firmware and downloading specific file.
+                                                                               *This is the CLI to interact with the main cluster
+                                                                               *code.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // Common CLI interface
 
@@ -45,18 +46,16 @@ void emAfOtaPrintAllImages(void);
 EmberAfOtaImageId emAfOtaFindImageIdByIndex(uint8_t index);
 void emAfOtaReloadStorageDevice(void);
 
-#define OTA_COMMON_COMMANDS                                                      \
-  emberCommandEntryAction("printImages", emAfOtaPrintAllImages, "", ""),         \
-  emberCommandEntryAction("delete", (CommandAction)emAfOtaImageDelete, "u", ""), \
-  emberCommandEntryAction("reload", emAfOtaReloadStorageDevice, "", ""),         \
-  emberCommandEntryAction("storage-info", emAfOtaStorageInfoPrint, "", ""),      \
-  emberCommandEntryTerminator(),                                                 \
-
+#define OTA_COMMON_COMMANDS                                                                                                        \
+    emberCommandEntryAction("printImages", emAfOtaPrintAllImages, "", ""),                                                         \
+        emberCommandEntryAction("delete", (CommandAction) emAfOtaImageDelete, "u", ""),                                            \
+        emberCommandEntryAction("reload", emAfOtaReloadStorageDevice, "", ""),                                                     \
+        emberCommandEntryAction("storage-info", emAfOtaStorageInfoPrint, "", ""), emberCommandEntryTerminator(),
 
 // Client CLI interface
 
-#if !defined (EMBER_AF_PLUGIN_OTA_CLIENT)
-  #define OTA_CLIENT_COMMANDS
+#if !defined(EMBER_AF_PLUGIN_OTA_CLIENT)
+#define OTA_CLIENT_COMMANDS
 #endif
 
 void otaFindServerCommand(void);
@@ -68,8 +67,8 @@ void emAfOtaImageDelete(void);
 
 // Server CLI interface
 
-#if !defined (EMBER_AF_PLUGIN_OTA_SERVER)
-  #define OTA_SERVER_COMMANDS
+#if !defined(EMBER_AF_PLUGIN_OTA_SERVER)
+#define OTA_SERVER_COMMANDS
 #endif
 
 void otaImageNotifyCommand(void);

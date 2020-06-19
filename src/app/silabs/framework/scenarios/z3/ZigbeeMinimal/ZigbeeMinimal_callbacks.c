@@ -31,10 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Callback implementation for ZigbeeMinimal sample application.
- ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Callback implementation for ZigbeeMinimal
+                                                                               *sample application.
+                                                                               ******************************************************************************/
 
 // This callback file is created for your convenience. You may add application
 // code to this file. If you regenerate this file over a previous version, the
@@ -55,8 +56,8 @@
  */
 bool emberAfStackStatusCallback(EmberStatus status)
 {
-  // This value is ignored by the framework.
-  return false;
+    // This value is ignored by the framework.
+    return false;
 }
 
 /** @brief Complete
@@ -74,10 +75,8 @@ bool emberAfStackStatusCallback(EmberStatus status)
  * this, one is able to tell on which channel mask and with which key the
  * process was complete. Ver.: always
  */
-void emberAfPluginNetworkSteeringCompleteCallback(EmberStatus status,
-                                                  uint8_t totalBeacons,
-                                                  uint8_t joinAttempts,
+void emberAfPluginNetworkSteeringCompleteCallback(EmberStatus status, uint8_t totalBeacons, uint8_t joinAttempts,
                                                   uint8_t finalState)
 {
-  emberAfCorePrintln("%p network %p: 0x%X", "Join", "complete", status);
+    emberAfCorePrintln("%p network %p: 0x%X", "Join", "complete", status);
 }

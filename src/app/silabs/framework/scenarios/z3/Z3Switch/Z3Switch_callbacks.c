@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // This callback file is created for your convenience. You may add application
 // code to this file. If you regenerate this file over a previous version, the
@@ -59,61 +59,67 @@ static uint8_t lastButton;
 
 void commissioningEventHandler(void)
 {
-  EmberStatus status;
+    EmberStatus status;
 
-  emberEventControlSetInactive(commissioningEventControl);
+    emberEventControlSetInactive(commissioningEventControl);
 
-  if (emberAfNetworkState() == EMBER_JOINED_NETWORK) {
-    emberAfGetCommandApsFrame()->sourceEndpoint = SWITCH_ENDPOINT;
-    if (lastButton == BUTTON0) {
-      emberAfFillCommandOnOffClusterToggle();
-    } else if (lastButton == BUTTON1) {
-      uint8_t nextLevel = (uint8_t)(0xFF & emberGetPseudoRandomNumber());
-      emberAfFillCommandLevelControlClusterMoveToLevel(nextLevel, TRANSITION_TIME_DS, 0, 0);
+    if (emberAfNetworkState() == EMBER_JOINED_NETWORK)
+    {
+        emberAfGetCommandApsFrame()->sourceEndpoint = SWITCH_ENDPOINT;
+        if (lastButton == BUTTON0)
+        {
+            emberAfFillCommandOnOffClusterToggle();
+        }
+        else if (lastButton == BUTTON1)
+        {
+            uint8_t nextLevel = (uint8_t)(0xFF & emberGetPseudoRandomNumber());
+            emberAfFillCommandLevelControlClusterMoveToLevel(nextLevel, TRANSITION_TIME_DS, 0, 0);
+        }
+        status = emberAfSendCommandUnicastToBindings();
+        emberAfCorePrintln("%p: 0x%X", "Send to bindings", status);
     }
-    status = emberAfSendCommandUnicastToBindings();
-    emberAfCorePrintln("%p: 0x%X", "Send to bindings", status);
-  } else {
-    bool touchlink = (lastButton == BUTTON1);
-    status = (touchlink
-              ? emberAfZllInitiateTouchLink()
-              : emberAfPluginNetworkSteeringStart());
-    emberAfCorePrintln("%p network %p: 0x%X",
-                       (touchlink ? "Touchlink" : "Join"),
-                       "start",
-                       status);
-    emberEventControlSetActive(ledEventControl);
-    commissioning = true;
-  }
+    else
+    {
+        bool touchlink = (lastButton == BUTTON1);
+        status         = (touchlink ? emberAfZllInitiateTouchLink() : emberAfPluginNetworkSteeringStart());
+        emberAfCorePrintln("%p network %p: 0x%X", (touchlink ? "Touchlink" : "Join"), "start", status);
+        emberEventControlSetActive(ledEventControl);
+        commissioning = true;
+    }
 }
 
 void ledEventHandler(void)
 {
-  emberEventControlSetInactive(ledEventControl);
+    emberEventControlSetInactive(ledEventControl);
 
-  if (commissioning) {
-    if (emberAfNetworkState() != EMBER_JOINED_NETWORK) {
-      halToggleLed(COMMISSIONING_STATUS_LED);
-      emberEventControlSetDelayMS(ledEventControl, LED_BLINK_PERIOD_MS << 1);
-    } else {
-      halSetLed(COMMISSIONING_STATUS_LED);
+    if (commissioning)
+    {
+        if (emberAfNetworkState() != EMBER_JOINED_NETWORK)
+        {
+            halToggleLed(COMMISSIONING_STATUS_LED);
+            emberEventControlSetDelayMS(ledEventControl, LED_BLINK_PERIOD_MS << 1);
+        }
+        else
+        {
+            halSetLed(COMMISSIONING_STATUS_LED);
+        }
     }
-  } else if (emberAfNetworkState() == EMBER_JOINED_NETWORK) {
-    halSetLed(COMMISSIONING_STATUS_LED);
-  }
+    else if (emberAfNetworkState() == EMBER_JOINED_NETWORK)
+    {
+        halSetLed(COMMISSIONING_STATUS_LED);
+    }
 }
 
 void findingAndBindingEventHandler(void)
 {
-  emberEventControlSetInactive(findingAndBindingEventControl);
-  EmberStatus status = emberAfPluginFindAndBindInitiatorStart(SWITCH_ENDPOINT);
-  emberAfCorePrintln("Find and bind initiator %p: 0x%X", "start", status);
+    emberEventControlSetInactive(findingAndBindingEventControl);
+    EmberStatus status = emberAfPluginFindAndBindInitiatorStart(SWITCH_ENDPOINT);
+    emberAfCorePrintln("Find and bind initiator %p: 0x%X", "start", status);
 }
 
 static void scheduleFindingAndBindingForInitiator(void)
 {
-  emberEventControlSetDelayMS(findingAndBindingEventControl,
-                              FINDING_AND_BINDING_DELAY_MS);
+    emberEventControlSetDelayMS(findingAndBindingEventControl, FINDING_AND_BINDING_DELAY_MS);
 }
 
 /** @brief Stack Status
@@ -128,14 +134,17 @@ static void scheduleFindingAndBindingForInitiator(void)
  */
 bool emberAfStackStatusCallback(EmberStatus status)
 {
-  if (status == EMBER_NETWORK_DOWN) {
-    halClearLed(COMMISSIONING_STATUS_LED);
-  } else if (status == EMBER_NETWORK_UP) {
-    halSetLed(COMMISSIONING_STATUS_LED);
-  }
+    if (status == EMBER_NETWORK_DOWN)
+    {
+        halClearLed(COMMISSIONING_STATUS_LED);
+    }
+    else if (status == EMBER_NETWORK_UP)
+    {
+        halSetLed(COMMISSIONING_STATUS_LED);
+    }
 
-  // This value is ignored by the framework.
-  return false;
+    // This value is ignored by the framework.
+    return false;
 }
 
 /** @brief Hal Button Isr
@@ -149,13 +158,13 @@ bool emberAfStackStatusCallback(EmberStatus status)
  * either ::BUTTON_PRESSED if the button has been pressed or ::BUTTON_RELEASED
  * if the button has been released.  Ver.: always
  */
-void emberAfHalButtonIsrCallback(uint8_t button,
-                                 uint8_t state)
+void emberAfHalButtonIsrCallback(uint8_t button, uint8_t state)
 {
-  if (state == BUTTON_RELEASED) {
-    lastButton = button;
-    emberEventControlSetActive(commissioningEventControl);
-  }
+    if (state == BUTTON_RELEASED)
+    {
+        lastButton = button;
+        emberEventControlSetActive(commissioningEventControl);
+    }
 }
 
 /** @brief Complete
@@ -173,18 +182,19 @@ void emberAfHalButtonIsrCallback(uint8_t button,
  * this, one is able to tell on which channel mask and with which key the
  * process was complete. Ver.: always
  */
-void emberAfPluginNetworkSteeringCompleteCallback(EmberStatus status,
-                                                  uint8_t totalBeacons,
-                                                  uint8_t joinAttempts,
+void emberAfPluginNetworkSteeringCompleteCallback(EmberStatus status, uint8_t totalBeacons, uint8_t joinAttempts,
                                                   uint8_t finalState)
 {
-  emberAfCorePrintln("%p network %p: 0x%X", "Join", "complete", status);
+    emberAfCorePrintln("%p network %p: 0x%X", "Join", "complete", status);
 
-  if (status != EMBER_SUCCESS) {
-    commissioning = false;
-  } else {
-    scheduleFindingAndBindingForInitiator();
-  }
+    if (status != EMBER_SUCCESS)
+    {
+        commissioning = false;
+    }
+    else
+    {
+        scheduleFindingAndBindingForInitiator();
+    }
 }
 
 /** @brief Touch Link Complete
@@ -199,16 +209,13 @@ void emberAfPluginNetworkSteeringCompleteCallback(EmberStatus status,
  * @param deviceInformationRecordList The list of sub-device information
  * records for the target. Ver.: always
  */
-void emberAfPluginZllCommissioningCommonTouchLinkCompleteCallback(const EmberZllNetwork *networkInfo,
+void emberAfPluginZllCommissioningCommonTouchLinkCompleteCallback(const EmberZllNetwork * networkInfo,
                                                                   uint8_t deviceInformationRecordCount,
-                                                                  const EmberZllDeviceInfoRecord *deviceInformationRecordList)
+                                                                  const EmberZllDeviceInfoRecord * deviceInformationRecordList)
 {
-  emberAfCorePrintln("%p network %p: 0x%X",
-                     "Touchlink",
-                     "complete",
-                     EMBER_SUCCESS);
+    emberAfCorePrintln("%p network %p: 0x%X", "Touchlink", "complete", EMBER_SUCCESS);
 
-  scheduleFindingAndBindingForInitiator();
+    scheduleFindingAndBindingForInitiator();
 }
 
 /** @brief Touch Link Failed
@@ -220,12 +227,9 @@ void emberAfPluginZllCommissioningCommonTouchLinkCompleteCallback(const EmberZll
  */
 void emberAfPluginZllCommissioningClientTouchLinkFailedCallback(EmberAfZllCommissioningStatus status)
 {
-  emberAfCorePrintln("%p network %p: 0x%X",
-                     "Touchlink",
-                     "complete",
-                     EMBER_ERR_FATAL);
+    emberAfCorePrintln("%p network %p: 0x%X", "Touchlink", "complete", EMBER_ERR_FATAL);
 
-  commissioning = false;
+    commissioning = false;
 }
 
 /** @brief Complete
@@ -238,7 +242,7 @@ void emberAfPluginZllCommissioningClientTouchLinkFailedCallback(EmberAfZllCommis
  */
 void emberAfPluginFindAndBindInitiatorCompleteCallback(EmberStatus status)
 {
-  emberAfCorePrintln("Find and bind initiator %p: 0x%X", "complete", status);
+    emberAfCorePrintln("Find and bind initiator %p: 0x%X", "complete", status);
 
-  commissioning = false;
+    commissioning = false;
 }

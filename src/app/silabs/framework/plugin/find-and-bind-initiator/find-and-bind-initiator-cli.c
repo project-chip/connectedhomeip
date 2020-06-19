@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief CLI for the Find and Bind Initiator plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief CLI for the Find and Bind Initiator plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
 
@@ -46,7 +46,7 @@
 
 void emberAfPluginFindAndBindInitiatorStartCommand(void)
 {
-  uint8_t endpoint = (uint8_t)emberUnsignedCommandArgument(0);
+    uint8_t endpoint = (uint8_t) emberUnsignedCommandArgument(0);
 
-  emberAfPluginFindAndBindInitiatorStart(endpoint);
+    emberAfPluginFindAndBindInitiatorStart(endpoint);
 }

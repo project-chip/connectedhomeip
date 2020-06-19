@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief CLI for the Throughtput Legacy plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief CLI for the Throughtput Legacy plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
 #include "app/util/serial/command-interpreter2.h"
@@ -43,11 +43,12 @@
 
 #if !defined(EMBER_AF_GENERATE_CLI)
 EmberCommandEntry emberAfPluginThroughputLegacyCommands[] = {
-  emberCommandEntryAction("inflight", emAfPluginThroughputSetInFlightCount, "u", "Set the number of packets in flight during the test."),
-  emberCommandEntryAction("duration", emAfPluginThroughputSetDuration, "w", "Set the duration in ms for the test."),
-  emberCommandEntryAction("start", emAfPluginThroughputStartTest, "", "Start the throughput test."),
-  emberCommandEntryAction("end", emAfPluginThroughputEndTest, "", "Abort the test while running."),
-  emberCommandEntryAction("result", emAfPluginThroughputPrintResult, "", "Show the results of the last test."),
-  emberCommandEntryTerminator(),
+    emberCommandEntryAction("inflight", emAfPluginThroughputSetInFlightCount, "u",
+                            "Set the number of packets in flight during the test."),
+    emberCommandEntryAction("duration", emAfPluginThroughputSetDuration, "w", "Set the duration in ms for the test."),
+    emberCommandEntryAction("start", emAfPluginThroughputStartTest, "", "Start the throughput test."),
+    emberCommandEntryAction("end", emAfPluginThroughputEndTest, "", "Abort the test while running."),
+    emberCommandEntryAction("result", emAfPluginThroughputPrintResult, "", "Show the results of the last test."),
+    emberCommandEntryTerminator(),
 };
 #endif // EMBER_AF_GENERATE_CLI

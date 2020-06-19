@@ -31,22 +31,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Entry point for CLI commands contributed by plugins.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Entry point for CLI commands contributed by
+                                                                               *plugins.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
+#include "plugin-cli.h"
 #include "app/framework/include/af.h"
 #include "app/util/serial/command-interpreter2.h"
-#include "plugin-cli.h"
 
 #ifndef EMBER_AF_GENERATE_CLI
 
 #ifdef EMBER_AF_GENERATED_PLUGIN_COMMAND_ENTRIES
 EmberCommandEntry emberAfPluginCommands[] = {
-  EMBER_AF_GENERATED_PLUGIN_COMMAND_ENTRIES
-  emberCommandEntryTerminator(),
+    EMBER_AF_GENERATED_PLUGIN_COMMAND_ENTRIES emberCommandEntryTerminator(),
 };
 #endif
 

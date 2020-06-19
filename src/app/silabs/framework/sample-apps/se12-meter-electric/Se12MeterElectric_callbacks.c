@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // *******************************************************************
 // * SeMeterElectric_callbacks.c
@@ -48,8 +48,8 @@
 // * Copyright 2007 by Ember Corporation. All rights reserved.              *80*
 // *******************************************************************
 
-#include "app/framework/util/common.h"
 #include "app/framework/plugin/tunneling-server/tunneling-server.h"
+#include "app/framework/util/common.h"
 
 // *******************************************************************
 // * simpleMeteringClusterMirrorRemovedCallback
@@ -60,13 +60,16 @@
 // *******************************************************************
 bool emberAfSimpleMeteringClusterMirrorRemovedCallback(uint16_t endpointId)
 {
-  if (endpointId == 0xffff) {
-    emberAfCorePrintln("%premove FAILED", "Mirror ");
-  } else {
-    emberAfCorePrintln("%pREMOVED from %x", "Mirror ", endpointId);
-  }
-  emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-  return true;
+    if (endpointId == 0xffff)
+    {
+        emberAfCorePrintln("%premove FAILED", "Mirror ");
+    }
+    else
+    {
+        emberAfCorePrintln("%pREMOVED from %x", "Mirror ", endpointId);
+    }
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
 }
 
 // *******************************************************************
@@ -88,13 +91,16 @@ bool emberAfSimpleMeteringClusterMirrorRemovedCallback(uint16_t endpointId)
 // *******************************************************************
 bool emberAfSimpleMeteringClusterRequestMirrorResponseCallback(uint16_t endpointId)
 {
-  if (endpointId == 0xffff) {
-    emberAfCorePrintln("%padd FAILED", "Mirror ");
-  } else {
-    emberAfCorePrintln("%pADDED on %x", "Mirror ", endpointId);
-  }
-  emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-  return true;
+    if (endpointId == 0xffff)
+    {
+        emberAfCorePrintln("%padd FAILED", "Mirror ");
+    }
+    else
+    {
+        emberAfCorePrintln("%pADDED on %x", "Mirror ", endpointId);
+    }
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
 }
 
 /** @brief Finished
@@ -105,9 +111,7 @@ bool emberAfSimpleMeteringClusterRequestMirrorResponseCallback(uint16_t endpoint
  *
  * @param status   Ver.: always
  */
-void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
-{
-}
+void emberAfPluginNetworkFindFinishedCallback(EmberStatus status) {}
 
 /** @brief Join
  *
@@ -121,11 +125,9 @@ void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
-                                          uint8_t lqi,
-                                          int8_t rssi)
+bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }
 
 /** @brief Select File Descriptors
@@ -142,10 +144,9 @@ bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
  * @param maxSize The maximum number of elements that the function implementor
  * may add.  Ver.: always
  */
-int emberAfPluginGatewaySelectFileDescriptorsCallback(int* list,
-                                                      int maxSize)
+int emberAfPluginGatewaySelectFileDescriptorsCallback(int * list, int maxSize)
 {
-  return 0;
+    return 0;
 }
 
 /** @brief Broadcast Sent
@@ -154,9 +155,7 @@ int emberAfPluginGatewaySelectFileDescriptorsCallback(int* list,
  * sent by the concentrator plugin.
  *
  */
-void emberAfPluginConcentratorBroadcastSentCallback(void)
-{
-}
+void emberAfPluginConcentratorBroadcastSentCallback(void) {}
 
 /** @brief Button Event
  *
@@ -169,10 +168,7 @@ void emberAfPluginConcentratorBroadcastSentCallback(void)
  * @param buttonPressDurationMs The length of time button was held down before
  * it was released.  Ver.: always
  */
-void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
-                                                   uint32_t buttonPressDurationMs)
-{
-}
+void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber, uint32_t buttonPressDurationMs) {}
 
 /** @brief Data Received
  *
@@ -184,20 +180,17 @@ void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
  * @param data Buffer containing the raw octets of the data.  Ver.: always
  * @param dataLen The length in octets of the data.  Ver.: always
  */
-void emberAfPluginTunnelingServerDataReceivedCallback(uint16_t tunnelId,
-                                                      uint8_t * data,
-                                                      uint16_t dataLen)
+void emberAfPluginTunnelingServerDataReceivedCallback(uint16_t tunnelId, uint8_t * data, uint16_t dataLen)
 {
-  emberAfTunnelingClusterPrint("ServerDataReceived:%x,[", tunnelId);
-  emberAfTunnelingClusterPrintBuffer(data, dataLen, false);
-  emberAfTunnelingClusterPrintln("]");
+    emberAfTunnelingClusterPrint("ServerDataReceived:%x,[", tunnelId);
+    emberAfTunnelingClusterPrintBuffer(data, dataLen, false);
+    emberAfTunnelingClusterPrintln("]");
 
-  EmberAfStatus status = emberAfPluginTunnelingServerTransferData(tunnelId,
-                                                                  data,
-                                                                  dataLen);
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfTunnelingClusterPrintln("%p 0x%x", "Unable to send tunneling message", status);
-  }
+    EmberAfStatus status = emberAfPluginTunnelingServerTransferData(tunnelId, data, dataLen);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        emberAfTunnelingClusterPrintln("%p 0x%x", "Unable to send tunneling message", status);
+    }
 }
 
 /** @brief Is Protocol Supported
@@ -211,13 +204,15 @@ void emberAfPluginTunnelingServerDataReceivedCallback(uint16_t tunnelId,
  * @param manufacturerCode The manufacturer code for manufacturer-defined
  * protocols or 0xFFFF in unused.  Ver.: always
  */
-bool emberAfPluginTunnelingServerIsProtocolSupportedCallback(uint8_t protocolId,
-                                                             uint16_t manufacturerCode)
+bool emberAfPluginTunnelingServerIsProtocolSupportedCallback(uint8_t protocolId, uint16_t manufacturerCode)
 {
-  uint8_t GB_HGRP = 6;
-  if (protocolId == GB_HGRP && manufacturerCode == 0xFFFF) {
-    return true;
-  } else {
-    return false;
-  }
+    uint8_t GB_HGRP = 6;
+    if (protocolId == GB_HGRP && manufacturerCode == 0xFFFF)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }

@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Definitions for the Tunneling Client plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Definitions for the Tunneling Client plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #define EMBER_AF_PLUGIN_TUNNELING_CLIENT_NULL_INDEX 0xFF
 
@@ -63,12 +63,9 @@
  * @return ::EMBER_AF_PLUGIN_TUNNELING_CLIENT_SUCCESS if the request is in
  * process or another ::EmberAfPluginTunnelingClientStatus otherwise.
  */
-EmberAfPluginTunnelingClientStatus emberAfPluginTunnelingClientRequestTunnel(EmberNodeId server,
-                                                                             uint8_t clientEndpoint,
-                                                                             uint8_t serverEndpoint,
-                                                                             uint8_t protocolId,
-                                                                             uint16_t manufacturerCode,
-                                                                             bool flowControlSupport);
+EmberAfPluginTunnelingClientStatus emberAfPluginTunnelingClientRequestTunnel(EmberNodeId server, uint8_t clientEndpoint,
+                                                                             uint8_t serverEndpoint, uint8_t protocolId,
+                                                                             uint16_t manufacturerCode, bool flowControlSupport);
 
 /**
  * @brief Transfers data to a server through a tunneling cluster tunnel.
@@ -84,9 +81,7 @@ EmberAfPluginTunnelingClientStatus emberAfPluginTunnelingClientRequestTunnel(Emb
  * ::EMBER_ZCL_STATUS_FAILURE if an error occurred, or
  * ::EMBER_ZCL_STATUS_NOT_FOUND if the tunnel does not exist.
  */
-EmberAfStatus emberAfPluginTunnelingClientTransferData(uint8_t tunnelIndex,
-                                                       uint8_t *data,
-                                                       uint16_t dataLen);
+EmberAfStatus emberAfPluginTunnelingClientTransferData(uint8_t tunnelIndex, uint8_t * data, uint16_t dataLen);
 
 /**
  * @brief Closes a tunneling cluster tunnel.

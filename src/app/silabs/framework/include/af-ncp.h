@@ -31,17 +31,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief This file is used to define includes and declarations to adapt
- * afv2 plugins on afv6 framework.
- * This file can be extended to make more afv2 plugins adapt to afv6.
- ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief This file is used to define includes and
+                                                                               *declarations to adapt afv2 plugins on afv6
+                                                                               *framework. This file can be extended to make more
+                                                                               *afv2 plugins adapt to afv6.
+                                                                               ******************************************************************************/
 
-#include "ncp-callbacks.h"
-#include "hal/plugin/serial/serial.h"
-#include "stack/include/ember.h"
 #include "hal/hal.h"
+#include "hal/plugin/serial/serial.h"
+#include "ncp-callbacks.h"
+#include "stack/include/ember.h"
 #include "stack/include/event.h"
 
 // Renaming afv2 application events to afv6.
@@ -54,13 +55,14 @@ extern EmberTaskId emAfTaskId;
 #define emberAfDebugPrintln(...)
 
 // This is being used by idle-sleep plugin
-typedef enum {
-  EMBER_AF_OK_TO_SLEEP,
-  /** @deprecated. */
-  EMBER_AF_OK_TO_HIBERNATE = EMBER_AF_OK_TO_SLEEP,
-  /** @deprecated. */
-  EMBER_AF_OK_TO_NAP,
-  EMBER_AF_STAY_AWAKE,
+typedef enum
+{
+    EMBER_AF_OK_TO_SLEEP,
+    /** @deprecated. */
+    EMBER_AF_OK_TO_HIBERNATE = EMBER_AF_OK_TO_SLEEP,
+    /** @deprecated. */
+    EMBER_AF_OK_TO_NAP,
+    EMBER_AF_STAY_AWAKE,
 } EmberAfEventSleepControl;
 
 // Get length of data in a callback queue.

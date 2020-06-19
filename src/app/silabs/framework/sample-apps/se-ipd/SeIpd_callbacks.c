@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // Copyright 2007 - 2011 by Ember Corporation. All rights reserved.
 //
@@ -59,7 +59,7 @@
  */
 void emberAfRegistrationCallback(bool success)
 {
-  emberAfRegistrationPrintln("Registration %p", success ? "complete" : "failed");
+    emberAfRegistrationPrintln("Registration %p", success ? "complete" : "failed");
 }
 
 /** @brief Event Action
@@ -89,11 +89,10 @@ void emberAfRegistrationCallback(bool success)
  * @param eventStatus Status of event  Ver.: always
  * @param sequenceNumber Sequence number  Ver.: always
  */
-bool emberAfPluginDrlcEventActionCallback(EmberAfLoadControlEvent *loadControlEvent,
-                                          EmberAfAmiEventStatus eventStatus,
+bool emberAfPluginDrlcEventActionCallback(EmberAfLoadControlEvent * loadControlEvent, EmberAfAmiEventStatus eventStatus,
                                           uint8_t sequenceNumber)
 {
-  return true;
+    return true;
 }
 
 /** @brief Display Message
@@ -103,11 +102,11 @@ bool emberAfPluginDrlcEventActionCallback(EmberAfLoadControlEvent *loadControlEv
  *
  * @param message The message that should be displayed.  Ver.: always
  */
-void emberAfPluginMessagingClientDisplayMessageCallback(EmberAfPluginMessagingClientMessage *message)
+void emberAfPluginMessagingClientDisplayMessageCallback(EmberAfPluginMessagingClientMessage * message)
 {
-  emberAfMessagingClusterPrint("MSG DISPLAY: ");
-  emberAfMessagingClusterPrintString(message->message);
-  emberAfMessagingClusterPrintln("");
+    emberAfMessagingClusterPrint("MSG DISPLAY: ");
+    emberAfMessagingClusterPrintString(message->message);
+    emberAfMessagingClusterPrintln("");
 }
 
 /** @brief Cancel Message
@@ -118,11 +117,11 @@ void emberAfPluginMessagingClientDisplayMessageCallback(EmberAfPluginMessagingCl
  * @param message The message that should no longer be displayed.  Ver.:
  * always
  */
-void emberAfPluginMessagingClientCancelMessageCallback(EmberAfPluginMessagingClientMessage *message)
+void emberAfPluginMessagingClientCancelMessageCallback(EmberAfPluginMessagingClientMessage * message)
 {
-  emberAfMessagingClusterPrint("MSG CANCEL: ");
-  emberAfMessagingClusterPrintString(message->message);
-  emberAfMessagingClusterPrintln("");
+    emberAfMessagingClusterPrint("MSG CANCEL: ");
+    emberAfMessagingClusterPrintString(message->message);
+    emberAfMessagingClusterPrintln("");
 }
 
 /** @brief Price Started
@@ -131,12 +130,12 @@ void emberAfPluginMessagingClientCancelMessageCallback(EmberAfPluginMessagingCli
  *
  * @param price The price that has started.  Ver.: always
  */
-void emberAfPluginPriceClientPriceStartedCallback(EmberAfPluginPriceClientPrice *price)
+void emberAfPluginPriceClientPriceStartedCallback(EmberAfPluginPriceClientPrice * price)
 {
-  emberAfPriceClusterPrint("Price \"");
-  emberAfPriceClusterPrintString(price->rateLabel);
-  emberAfPriceClusterPrintln("\" (0x%4x) has started", price->issuerEventId);
-  emberAfPriceClusterFlush();
+    emberAfPriceClusterPrint("Price \"");
+    emberAfPriceClusterPrintString(price->rateLabel);
+    emberAfPriceClusterPrintln("\" (0x%4x) has started", price->issuerEventId);
+    emberAfPriceClusterFlush();
 }
 
 /** @brief Price Expired
@@ -146,12 +145,12 @@ void emberAfPluginPriceClientPriceStartedCallback(EmberAfPluginPriceClientPrice 
  *
  * @param price The price that has expired.  Ver.: always
  */
-void emberAfPluginPriceClientPriceExpiredCallback(EmberAfPluginPriceClientPrice *price)
+void emberAfPluginPriceClientPriceExpiredCallback(EmberAfPluginPriceClientPrice * price)
 {
-  emberAfPriceClusterPrint("Price \"");
-  emberAfPriceClusterPrintString(price->rateLabel);
-  emberAfPriceClusterPrintln("\" (0x%4x) has expired", price->issuerEventId);
-  emberAfPriceClusterFlush();
+    emberAfPriceClusterPrint("Price \"");
+    emberAfPriceClusterPrintString(price->rateLabel);
+    emberAfPriceClusterPrintln("\" (0x%4x) has expired", price->issuerEventId);
+    emberAfPriceClusterFlush();
 }
 
 /** @brief Request Mirror
@@ -165,7 +164,7 @@ void emberAfPluginPriceClientPriceExpiredCallback(EmberAfPluginPriceClientPrice 
  */
 uint16_t emberAfPluginSimpleMeteringClientRequestMirrorCallback(EmberEUI64 requestingDeviceIeeeAddress)
 {
-  return 0xFFFF;
+    return 0xFFFF;
 }
 
 /** @brief Remove Mirror
@@ -179,7 +178,7 @@ uint16_t emberAfPluginSimpleMeteringClientRequestMirrorCallback(EmberEUI64 reque
  */
 uint16_t emberAfPluginSimpleMeteringClientRemoveMirrorCallback(EmberEUI64 requestingDeviceIeeeAddress)
 {
-  return 0xFFFF;
+    return 0xFFFF;
 }
 
 /** @brief Finished
@@ -190,9 +189,7 @@ uint16_t emberAfPluginSimpleMeteringClientRemoveMirrorCallback(EmberEUI64 reques
  *
  * @param status   Ver.: always
  */
-void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
-{
-}
+void emberAfPluginNetworkFindFinishedCallback(EmberStatus status) {}
 
 /** @brief Join
  *
@@ -206,11 +203,9 @@ void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
-                                          uint8_t lqi,
-                                          int8_t rssi)
+bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }
 
 /** @brief Pre Message Received
@@ -223,11 +218,9 @@ bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
  * @param msgLen   Ver.: always
  * @param message   Ver.: always
  */
-bool emberAfPluginInterpanPreMessageReceivedCallback(const EmberAfInterpanHeader * header,
-                                                     uint8_t msgLen,
-                                                     uint8_t * message)
+bool emberAfPluginInterpanPreMessageReceivedCallback(const EmberAfInterpanHeader * header, uint8_t msgLen, uint8_t * message)
 {
-  return false;
+    return false;
 }
 
 /** @brief Button Event
@@ -241,10 +234,7 @@ bool emberAfPluginInterpanPreMessageReceivedCallback(const EmberAfInterpanHeader
  * @param buttonPressDurationMs The length of time button was held down before
  * it was released.  Ver.: always
  */
-void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
-                                                   uint32_t buttonPressDurationMs)
-{
-}
+void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber, uint32_t buttonPressDurationMs) {}
 
 /** @brief Poll Completed
  *
@@ -255,5 +245,5 @@ void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
  */
 void emberAfPluginEndDeviceSupportPollCompletedCallback(EmberStatus status)
 {
-  emberAfCorePrintln("Poll Completed Callback");
+    emberAfCorePrintln("Poll Completed Callback");
 }

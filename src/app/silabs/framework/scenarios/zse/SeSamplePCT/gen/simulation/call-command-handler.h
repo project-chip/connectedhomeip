@@ -43,15 +43,15 @@
 // the incomming message, and call appropriate command handler.
 
 // Cluster: Price, client
-EmberAfStatus emberAfPriceClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfPriceClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Demand Response and Load Control, client
-EmberAfStatus emberAfDemandResponseLoadControlClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfDemandResponseLoadControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Key Establishment, client
-EmberAfStatus emberAfKeyEstablishmentClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfKeyEstablishmentClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Key Establishment, server
-EmberAfStatus emberAfKeyEstablishmentClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfKeyEstablishmentClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 #endif // SILABS_EMBER_AF_COMMAND_PARSE_HEADER

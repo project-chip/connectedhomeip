@@ -43,9 +43,9 @@
 // the incomming message, and call appropriate command handler.
 
 // Cluster: Identify, client
-EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Identify, server
-EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 #endif // SILABS_EMBER_AF_COMMAND_PARSE_HEADER

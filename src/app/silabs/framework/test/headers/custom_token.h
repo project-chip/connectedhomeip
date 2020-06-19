@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief This file is used as an example of custom token.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief This file is used as an example of custom
+                                                                               *token.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // Identifier tags for tokens
 // Creator for attribute: CUSTOM
@@ -45,7 +46,7 @@
 
 // Types for the tokens
 #ifdef DEFINETYPES
-typedef uint8_t  tokType_custom_token;
+typedef uint8_t tokType_custom_token;
 #endif // DEFINETYPES
 
 // Actual token definitions

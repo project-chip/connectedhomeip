@@ -31,16 +31,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Definitions for the Throughtput Legacy plugin, which provides a means
- *        of measuring network throughput.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Definitions for the Throughtput Legacy
+                                                                               *plugin, which provides a means of measuring network
+                                                                               *throughput.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
+#include "throughput-legacy.h"
 #include "../../include/af.h"
 #include "../../util/common.h"
-#include "throughput-legacy.h"
 
 static uint8_t inflight_count = 1;
 
@@ -50,8 +51,8 @@ static uint32_t packets_recd = 0;
 static bool is_test_running = false;
 
 static uint32_t start_time = 0;
-static uint32_t end_time = 8000000;
-static uint32_t run_time = 0;
+static uint32_t end_time   = 8000000;
+static uint32_t run_time   = 0;
 
 void calc_run_time(void);
 
@@ -60,18 +61,22 @@ void calc_run_time(void);
  */
 void emAfPluginThroughputSetInFlightCount(void)
 {
-  //Is the test running already?
-  if (is_test_running) {
-    emberAfCorePrintln("ERROR: Packets in flight cannot be changed while the test is running.");
-    return;
-  }
-  inflight_count = (uint8_t)emberUnsignedCommandArgument(0);
-  if (inflight_count > 4) {
-    inflight_count = 4;
-  } else if (inflight_count == 0) {
-    inflight_count = 1;
-  }
-  emberAfCorePrintln("Packets in flight for next test: %d", inflight_count);
+    // Is the test running already?
+    if (is_test_running)
+    {
+        emberAfCorePrintln("ERROR: Packets in flight cannot be changed while the test is running.");
+        return;
+    }
+    inflight_count = (uint8_t) emberUnsignedCommandArgument(0);
+    if (inflight_count > 4)
+    {
+        inflight_count = 4;
+    }
+    else if (inflight_count == 0)
+    {
+        inflight_count = 1;
+    }
+    emberAfCorePrintln("Packets in flight for next test: %d", inflight_count);
 }
 
 /**
@@ -79,13 +84,14 @@ void emAfPluginThroughputSetInFlightCount(void)
  */
 void emAfPluginThroughputSetDuration(void)
 {
-  //Is the test running already?
-  if (is_test_running) {
-    emberAfCorePrintln("ERROR: Test duration cannot be changed while the test is running.");
-    return;
-  }
-  end_time = (uint32_t)emberUnsignedCommandArgument(0);
-  emberAfCorePrintln("Duration for next test: %d ms", end_time);
+    // Is the test running already?
+    if (is_test_running)
+    {
+        emberAfCorePrintln("ERROR: Test duration cannot be changed while the test is running.");
+        return;
+    }
+    end_time = (uint32_t) emberUnsignedCommandArgument(0);
+    emberAfCorePrintln("Duration for next test: %d ms", end_time);
 }
 
 /**
@@ -93,14 +99,15 @@ void emAfPluginThroughputSetDuration(void)
  */
 void emAfPluginThroughputStartTest(void)
 {
-  //Is the test already running?
-  if (is_test_running) {
-    return;
-  }
-  is_test_running = true;
-  packets_sent = 0;
-  packets_recd = 0;
-  start_time = halCommonGetInt32uMillisecondTick();
+    // Is the test already running?
+    if (is_test_running)
+    {
+        return;
+    }
+    is_test_running = true;
+    packets_sent    = 0;
+    packets_recd    = 0;
+    start_time      = halCommonGetInt32uMillisecondTick();
 }
 
 /**
@@ -109,10 +116,11 @@ void emAfPluginThroughputStartTest(void)
  */
 void emAfPluginThroughputEndTest(void)
 {
-  if (is_test_running) {
-    is_test_running = false;
-    emberAfCorePrintln("Test ended at %d ms: %d packets sent, %d packets received", run_time, packets_sent, packets_recd);
-  }
+    if (is_test_running)
+    {
+        is_test_running = false;
+        emberAfCorePrintln("Test ended at %d ms: %d packets sent, %d packets received", run_time, packets_sent, packets_recd);
+    }
 }
 
 /**
@@ -122,9 +130,10 @@ void emAfPluginThroughputEndTest(void)
  */
 void emAfPluginThroughputPrintResult(void)
 {
-  if (!is_test_running) {
-    emberAfCorePrintln("Test ended at %d ms: %d packets sent, %d packets received", run_time, packets_sent, packets_recd);
-  }
+    if (!is_test_running)
+    {
+        emberAfCorePrintln("Test ended at %d ms: %d packets sent, %d packets received", run_time, packets_sent, packets_recd);
+    }
 }
 
 /**
@@ -133,9 +142,10 @@ void emAfPluginThroughputPrintResult(void)
  */
 void emAfPluginThroughputNotifyPacketReceived(void)
 {
-  if (is_test_running) {
-    packets_recd++;
-  }
+    if (is_test_running)
+    {
+        packets_recd++;
+    }
 }
 
 /**
@@ -143,30 +153,36 @@ void emAfPluginThroughputNotifyPacketReceived(void)
  */
 void calc_run_time(void)
 {
-  uint32_t current_time = halCommonGetInt32uMillisecondTick();
-  //Check if the timer overflowed since starting
-  if ( start_time > current_time ) {
-    run_time = (0xffffffff - (start_time - current_time));
-  } else {
-    run_time = (current_time - start_time);
-  }
+    uint32_t current_time = halCommonGetInt32uMillisecondTick();
+    // Check if the timer overflowed since starting
+    if (start_time > current_time)
+    {
+        run_time = (0xffffffff - (start_time - current_time));
+    }
+    else
+    {
+        run_time = (current_time - start_time);
+    }
 }
 
 void emberAfMainTickCallback(void)
 {
-  //Is the test running?
-  if (is_test_running) {
-    //Should the test keep going?
-    calc_run_time();
-    if (run_time >= end_time) {
-      emAfPluginThroughputEndTest();
-      return;
+    // Is the test running?
+    if (is_test_running)
+    {
+        // Should the test keep going?
+        calc_run_time();
+        if (run_time >= end_time)
+        {
+            emAfPluginThroughputEndTest();
+            return;
+        }
+        // Should there be more packets in flight?
+        if ((packets_sent - packets_recd) < inflight_count)
+        {
+            // Try to send one more.
+            emberAfPluginThroughputSendPacketCallback();
+            packets_sent++;
+        }
     }
-    //Should there be more packets in flight?
-    if ((packets_sent - packets_recd) < inflight_count) {
-      //Try to send one more.
-      emberAfPluginThroughputSendPacketCallback();
-      packets_sent++;
-    }
-  }
 }

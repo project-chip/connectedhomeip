@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // Copyright 2014 Silicon Laboratories, Inc.
 //
@@ -53,18 +53,8 @@ EmberEventControl button0EventControl;
 EmberEventControl button1EventControl;
 EmberEventControl identifyEventControl;
 
-static uint8_t const happyTune[] = {
-  NOTE_B4, 1,
-  0, 1,
-  NOTE_B5, 1,
-  0, 0
-};
-static uint8_t const sadTune[] = {
-  NOTE_B5, 1,
-  0, 1,
-  NOTE_B4, 5,
-  0, 0
-};
+static uint8_t const happyTune[] = { NOTE_B4, 1, 0, 1, NOTE_B5, 1, 0, 0 };
+static uint8_t const sadTune[]   = { NOTE_B5, 1, 0, 1, NOTE_B4, 5, 0, 0 };
 
 static bool holdingButton0 = false;
 static bool holdingButton1 = false;
@@ -75,104 +65,123 @@ static uint32_t identifyDurationMs = 0; // milliseconds
 // Repair declarations
 #define BUTTON_PRESS_NETWORK_REPAIR_DELAY 10
 #define MS_ALLOWED_FOR_REPAIR (MILLISECOND_TICKS_PER_SECOND << 1)
-enum {
-  REPAIR_SUCCESS,
-  REPAIR_IN_PROGRESS,
-  REPAIR_FAILED
+enum
+{
+    REPAIR_SUCCESS,
+    REPAIR_IN_PROGRESS,
+    REPAIR_FAILED
 };
 typedef uint8_t RepairStatus;
 static uint16_t buttonPressTime = 0;
-RepairStatus repairConnection(EmberEventControl *eventControl);
+RepairStatus repairConnection(EmberEventControl * eventControl);
 
 void button0EventHandler(void)
 {
-  emberEventControlSetInactive(button0EventControl);
+    emberEventControlSetInactive(button0EventControl);
 
-  // If the button is being held down > 1/4 second we perform hold
-  // behavior, resetting to factory new.
-  if (halButtonState(BUTTON0) == BUTTON_PRESSED) {
-    emberAfCorePrintln("Resetting to factory new");
-    emberAfZllResetToFactoryNew();
-    halPlayTune_P(sadTune, true);
-    holdingButton0 = true;
+    // If the button is being held down > 1/4 second we perform hold
+    // behavior, resetting to factory new.
+    if (halButtonState(BUTTON0) == BUTTON_PRESSED)
+    {
+        emberAfCorePrintln("Resetting to factory new");
+        emberAfZllResetToFactoryNew();
+        halPlayTune_P(sadTune, true);
+        holdingButton0 = true;
 
-    // If the button HAD been held down, we don't really do anything for
-    // this button, just reset the holding flag.
-  } else if (holdingButton0) {
-    holdingButton0 = false;
-
-    // Otherwise, we react to a quick press and release by repairing the
-    // connection and then sending a broadcast off command.
-  } else {
-    RepairStatus status = repairConnection(&button0EventControl);
-    if (status == REPAIR_SUCCESS) {
-      EmberStatus status;
-      emberAfCorePrintln("Broadcasting \"off\" command");
-      emberAfFillCommandOnOffClusterOff();
-      emberAfSetCommandEndpoints(emberAfEndpointFromIndex(0),
-                                 EMBER_BROADCAST_ENDPOINT);
-      status = emberAfSendCommandBroadcast(EMBER_SLEEPY_BROADCAST_ADDRESS);
-      if (status != EMBER_SUCCESS) {
-        emberAfCorePrintln("ERR: Broadcasting \"off\" command failed 0x%x", status);
-      }
+        // If the button HAD been held down, we don't really do anything for
+        // this button, just reset the holding flag.
     }
-  }
+    else if (holdingButton0)
+    {
+        holdingButton0 = false;
+
+        // Otherwise, we react to a quick press and release by repairing the
+        // connection and then sending a broadcast off command.
+    }
+    else
+    {
+        RepairStatus status = repairConnection(&button0EventControl);
+        if (status == REPAIR_SUCCESS)
+        {
+            EmberStatus status;
+            emberAfCorePrintln("Broadcasting \"off\" command");
+            emberAfFillCommandOnOffClusterOff();
+            emberAfSetCommandEndpoints(emberAfEndpointFromIndex(0), EMBER_BROADCAST_ENDPOINT);
+            status = emberAfSendCommandBroadcast(EMBER_SLEEPY_BROADCAST_ADDRESS);
+            if (status != EMBER_SUCCESS)
+            {
+                emberAfCorePrintln("ERR: Broadcasting \"off\" command failed 0x%x", status);
+            }
+        }
+    }
 }
 
 void button1EventHandler(void)
 {
-  emberEventControlSetInactive(button1EventControl);
+    emberEventControlSetInactive(button1EventControl);
 
-  // If the button is pressed when this event fires, we know it
-  // was held down for > 1/4 second and perform hold behavior, initiating
-  // a touch link.
-  if (halButtonState(BUTTON1) == BUTTON_PRESSED) {
-    emberAfCorePrintln("Initiating touch link");
-    emberAfZllInitiateTouchLink();
-    holdingButton1 = true;
+    // If the button is pressed when this event fires, we know it
+    // was held down for > 1/4 second and perform hold behavior, initiating
+    // a touch link.
+    if (halButtonState(BUTTON1) == BUTTON_PRESSED)
+    {
+        emberAfCorePrintln("Initiating touch link");
+        emberAfZllInitiateTouchLink();
+        holdingButton1 = true;
 
-    // If the button HAD been held down, we know it was released following a hold
-    // If the touchlink is still in progress, we abort.
-  } else if (holdingButton1) {
-    if (emberAfZllTouchLinkInProgress()) {
-      emberAfCorePrintln("Aborting touch link");
-      emberAfZllAbortTouchLink();
+        // If the button HAD been held down, we know it was released following a hold
+        // If the touchlink is still in progress, we abort.
     }
-    holdingButton1 = false;
+    else if (holdingButton1)
+    {
+        if (emberAfZllTouchLinkInProgress())
+        {
+            emberAfCorePrintln("Aborting touch link");
+            emberAfZllAbortTouchLink();
+        }
+        holdingButton1 = false;
 
-    // Otherwise, we know this was a quick press and release inside 1/4 second.
-    // So we repair the connection and send an on broadcast.
-  } else {
-    RepairStatus status = repairConnection(&button1EventControl);
-    if (status == REPAIR_SUCCESS) {
-      EmberStatus status;
-      emberAfCorePrintln("Broadcasting \"on\" command");
-      emberAfFillCommandOnOffClusterOn();
-      emberAfSetCommandEndpoints(emberAfEndpointFromIndex(0),
-                                 EMBER_BROADCAST_ENDPOINT);
-      status = emberAfSendCommandBroadcast(EMBER_SLEEPY_BROADCAST_ADDRESS);
-      if (status != EMBER_SUCCESS) {
-        emberAfCorePrintln("ERR: Broadcasting \"on\" command failed 0x%x", status);
-      }
+        // Otherwise, we know this was a quick press and release inside 1/4 second.
+        // So we repair the connection and send an on broadcast.
     }
-  }
+    else
+    {
+        RepairStatus status = repairConnection(&button1EventControl);
+        if (status == REPAIR_SUCCESS)
+        {
+            EmberStatus status;
+            emberAfCorePrintln("Broadcasting \"on\" command");
+            emberAfFillCommandOnOffClusterOn();
+            emberAfSetCommandEndpoints(emberAfEndpointFromIndex(0), EMBER_BROADCAST_ENDPOINT);
+            status = emberAfSendCommandBroadcast(EMBER_SLEEPY_BROADCAST_ADDRESS);
+            if (status != EMBER_SUCCESS)
+            {
+                emberAfCorePrintln("ERR: Broadcasting \"on\" command failed 0x%x", status);
+            }
+        }
+    }
 }
 
 void identifyEventHandler(void)
 {
-  if (identifyDurationMs == 0) {
-    halClearLed(BOARDLED1);
-    emberEventControlSetInactive(identifyEventControl);
-  } else {
-    halToggleLed(BOARDLED1);
-    if (identifyDurationMs >= MILLISECOND_TICKS_PER_QUARTERSECOND) {
-      identifyDurationMs -= MILLISECOND_TICKS_PER_QUARTERSECOND;
-    } else {
-      identifyDurationMs = 0;
+    if (identifyDurationMs == 0)
+    {
+        halClearLed(BOARDLED1);
+        emberEventControlSetInactive(identifyEventControl);
     }
-    emberEventControlSetDelayMS(identifyEventControl,
-                                MILLISECOND_TICKS_PER_QUARTERSECOND);
-  }
+    else
+    {
+        halToggleLed(BOARDLED1);
+        if (identifyDurationMs >= MILLISECOND_TICKS_PER_QUARTERSECOND)
+        {
+            identifyDurationMs -= MILLISECOND_TICKS_PER_QUARTERSECOND;
+        }
+        else
+        {
+            identifyDurationMs = 0;
+        }
+        emberEventControlSetDelayMS(identifyEventControl, MILLISECOND_TICKS_PER_QUARTERSECOND);
+    }
 }
 
 // This isr is called twice, once when the button is pressed
@@ -184,15 +193,16 @@ void identifyEventHandler(void)
 // press and release.
 void emberAfHalButtonIsrCallback(uint8_t button, uint8_t state)
 {
-  EmberEventControl *event = (button == BUTTON0
-                              ? &button0EventControl
-                              : &button1EventControl);
-  buttonPressTime = halCommonGetInt16uMillisecondTick();
-  if (state == BUTTON_PRESSED) {
-    emberEventControlSetDelayMS(*event, MILLISECOND_TICKS_PER_QUARTERSECOND);
-  } else {
-    emberEventControlSetActive(*event);
-  }
+    EmberEventControl * event = (button == BUTTON0 ? &button0EventControl : &button1EventControl);
+    buttonPressTime           = halCommonGetInt16uMillisecondTick();
+    if (state == BUTTON_PRESSED)
+    {
+        emberEventControlSetDelayMS(*event, MILLISECOND_TICKS_PER_QUARTERSECOND);
+    }
+    else
+    {
+        emberEventControlSetActive(*event);
+    }
 }
 
 extern bool tuneDone; // declared in buzzer.c
@@ -207,7 +217,7 @@ extern bool tuneDone; // declared in buzzer.c
  */
 bool emberAfPluginIdleSleepOkToSleepCallback(uint32_t durationMs)
 {
-  return tuneDone;
+    return tuneDone;
 }
 
 /** @brief Wake Up
@@ -217,9 +227,7 @@ bool emberAfPluginIdleSleepOkToSleepCallback(uint32_t durationMs)
  * @param durationMs The duration in milliseconds that the device slept.
  * Ver.: always
  */
-void emberAfPluginIdleSleepWakeUpCallback(uint32_t durationMs)
-{
-}
+void emberAfPluginIdleSleepWakeUpCallback(uint32_t durationMs) {}
 
 /** @brief Ok To Idle
  *
@@ -229,7 +237,7 @@ void emberAfPluginIdleSleepWakeUpCallback(uint32_t durationMs)
  */
 bool emberAfPluginIdleSleepOkToIdleCallback(void)
 {
-  return tuneDone;
+    return tuneDone;
 }
 
 /** @brief Active
@@ -237,9 +245,7 @@ bool emberAfPluginIdleSleepOkToIdleCallback(void)
  * This function is called by the Idle/Sleep plugin after idling.
  *
  */
-void emberAfPluginIdleSleepActiveCallback(void)
-{
-}
+void emberAfPluginIdleSleepActiveCallback(void) {}
 
 /** @brief Initial Security State
  *
@@ -253,12 +259,12 @@ void emberAfPluginIdleSleepActiveCallback(void)
  * @param securityState The security configuration to be populated by the
  * application and ultimately set in the stack.  Ver.: always
  */
-void emberAfPluginZllCommissioningInitialSecurityStateCallback(EmberZllInitialSecurityState *securityState)
+void emberAfPluginZllCommissioningInitialSecurityStateCallback(EmberZllInitialSecurityState * securityState)
 {
-  // By default, the plugin will configure the stack for the certification
-  // encryption algorithm.  Devices that are certified should instead use the
-  // master encryption algorithm and set the appropriate encryption key and
-  // pre-configured link key.
+    // By default, the plugin will configure the stack for the certification
+    // encryption algorithm.  Devices that are certified should instead use the
+    // master encryption algorithm and set the appropriate encryption key and
+    // pre-configured link key.
 }
 
 /** @brief Touch Link Complete
@@ -273,26 +279,23 @@ void emberAfPluginZllCommissioningInitialSecurityStateCallback(EmberZllInitialSe
  * @param deviceInformationRecordList The list of sub-device information
  * records for the target.  Ver.: always
  */
-void emberAfPluginZllCommissioningTouchLinkCompleteCallback(const EmberZllNetwork *networkInfo,
+void emberAfPluginZllCommissioningTouchLinkCompleteCallback(const EmberZllNetwork * networkInfo,
                                                             uint8_t deviceInformationRecordCount,
-                                                            const EmberZllDeviceInfoRecord *deviceInformationRecordList)
+                                                            const EmberZllDeviceInfoRecord * deviceInformationRecordList)
 {
-  uint8_t i;
-  emberAfCorePrint("Touch link with 0x%2x (", networkInfo->nodeId);
-  emberAfCoreDebugExec(emberAfPrintBigEndianEui64(networkInfo->eui64));
-  emberAfCorePrintln(") complete");
-  emberAfCoreFlush();
-  for (i = 0; i < deviceInformationRecordCount; i++) {
-    emberAfCorePrintln("sub device %d: 0x%x 0x%2x 0x%2x 0x%x 0x%x",
-                       i,
-                       deviceInformationRecordList[i].endpointId,
-                       deviceInformationRecordList[i].profileId,
-                       deviceInformationRecordList[i].deviceId,
-                       deviceInformationRecordList[i].version,
-                       deviceInformationRecordList[i].groupIdCount);
+    uint8_t i;
+    emberAfCorePrint("Touch link with 0x%2x (", networkInfo->nodeId);
+    emberAfCoreDebugExec(emberAfPrintBigEndianEui64(networkInfo->eui64));
+    emberAfCorePrintln(") complete");
     emberAfCoreFlush();
-  }
-  halPlayTune_P(happyTune, true);
+    for (i = 0; i < deviceInformationRecordCount; i++)
+    {
+        emberAfCorePrintln("sub device %d: 0x%x 0x%2x 0x%2x 0x%x 0x%x", i, deviceInformationRecordList[i].endpointId,
+                           deviceInformationRecordList[i].profileId, deviceInformationRecordList[i].deviceId,
+                           deviceInformationRecordList[i].version, deviceInformationRecordList[i].groupIdCount);
+        emberAfCoreFlush();
+    }
+    halPlayTune_P(happyTune, true);
 }
 
 /** @brief Touch Link Failed
@@ -304,8 +307,8 @@ void emberAfPluginZllCommissioningTouchLinkCompleteCallback(const EmberZllNetwor
  */
 void emberAfPluginZllCommissioningTouchLinkFailedCallback(EmberAfZllCommissioningStatus status)
 {
-  emberAfCorePrintln("Touch link failed: 0x%x", status);
-  halPlayTune_P(sadTune, true);
+    emberAfCorePrintln("Touch link failed: 0x%x", status);
+    halPlayTune_P(sadTune, true);
 }
 
 /** @brief Group Identifier Count
@@ -320,10 +323,10 @@ void emberAfPluginZllCommissioningTouchLinkFailedCallback(EmberAfZllCommissionin
  */
 uint8_t emberAfPluginZllCommissioningGroupIdentifierCountCallback(uint8_t endpoint)
 {
-  // Devices with multiple endpoints will have to distribute the group ids
-  // available to the device among the individual endpoints.  This application
-  // has one endpoint, so it uses all available group ids.
-  return EMBER_ZLL_GROUP_ADDRESSES;
+    // Devices with multiple endpoints will have to distribute the group ids
+    // available to the device among the individual endpoints.  This application
+    // has one endpoint, so it uses all available group ids.
+    return EMBER_ZLL_GROUP_ADDRESSES;
 }
 
 /** @brief Group Identifier
@@ -339,18 +342,17 @@ uint8_t emberAfPluginZllCommissioningGroupIdentifierCountCallback(uint8_t endpoi
  * @param index The index of the group on the endpoint.  Ver.: always
  * @param record The group information record.  Ver.: always
  */
-bool emberAfPluginZllCommissioningGroupIdentifierCallback(uint8_t endpoint,
-                                                          uint8_t index,
-                                                          EmberAfPluginZllCommissioningGroupInformationRecord *record)
+bool emberAfPluginZllCommissioningGroupIdentifierCallback(uint8_t endpoint, uint8_t index,
+                                                          EmberAfPluginZllCommissioningGroupInformationRecord * record)
 {
-  // Devices with multiple endpoints will have to distribute the group ids
-  // available to the device among the individual endpoints.  This application
-  // has one endpoint, so it uses all available group ids in order.
-  EmberTokTypeStackZllData token;
-  emberZllGetTokenStackZllData(&token);
-  record->groupId = token.myGroupIdMin + index;
-  record->groupType = 0x00; // fixed at zero
-  return true;
+    // Devices with multiple endpoints will have to distribute the group ids
+    // available to the device among the individual endpoints.  This application
+    // has one endpoint, so it uses all available group ids in order.
+    EmberTokTypeStackZllData token;
+    emberZllGetTokenStackZllData(&token);
+    record->groupId   = token.myGroupIdMin + index;
+    record->groupType = 0x00; // fixed at zero
+    return true;
 }
 
 /** @brief Endpoint Information Count
@@ -364,10 +366,10 @@ bool emberAfPluginZllCommissioningGroupIdentifierCallback(uint8_t endpoint,
  */
 uint8_t emberAfPluginZllCommissioningEndpointInformationCountCallback(uint8_t endpoint)
 {
-  // Devices that control remote endpoints individually will have to maintain
-  // a list of those endpoints.  This application does not control remote
-  // endpoints individually.
-  return 0x00;
+    // Devices that control remote endpoints individually will have to maintain
+    // a list of those endpoints.  This application does not control remote
+    // endpoints individually.
+    return 0x00;
 }
 
 /** @brief Endpoint Information
@@ -385,14 +387,13 @@ uint8_t emberAfPluginZllCommissioningEndpointInformationCountCallback(uint8_t en
  * endpoint.  Ver.: always
  * @param record The endpoint information record.  Ver.: always
  */
-bool emberAfPluginZllCommissioningEndpointInformationCallback(uint8_t endpoint,
-                                                              uint8_t index,
-                                                              EmberAfPluginZllCommissioningEndpointInformationRecord *record)
+bool emberAfPluginZllCommissioningEndpointInformationCallback(uint8_t endpoint, uint8_t index,
+                                                              EmberAfPluginZllCommissioningEndpointInformationRecord * record)
 {
-  // Devices that control remote endpoints individually will have to maintain
-  // a list of those endpoints.  This application does not control remote
-  // endpoints individually.
-  return false;
+    // Devices that control remote endpoints individually will have to maintain
+    // a list of those endpoints.  This application does not control remote
+    // endpoints individually.
+    return false;
 }
 
 /** @brief Identify
@@ -409,13 +410,12 @@ bool emberAfPluginZllCommissioningEndpointInformationCallback(uint8_t endpoint,
  */
 void emberAfPluginZllCommissioningIdentifyCallback(uint16_t durationS)
 {
-  if (durationS != 0) {
-    halStackIndicatePresence();
-  }
-  identifyDurationMs = (durationS == 0xFFFF
-                        ? DEFAULT_IDENTIFY_DURATION_MS
-                        : durationS * MILLISECOND_TICKS_PER_SECOND);
-  emberEventControlSetActive(identifyEventControl);
+    if (durationS != 0)
+    {
+        halStackIndicatePresence();
+    }
+    identifyDurationMs = (durationS == 0xFFFF ? DEFAULT_IDENTIFY_DURATION_MS : durationS * MILLISECOND_TICKS_PER_SECOND);
+    emberEventControlSetActive(identifyEventControl);
 }
 
 /** @brief Reset To Factory New
@@ -428,9 +428,7 @@ void emberAfPluginZllCommissioningIdentifyCallback(uint16_t durationS)
  * externally-stored attributes.
  *
  */
-void emberAfPluginZllCommissioningResetToFactoryNewCallback(void)
-{
-}
+void emberAfPluginZllCommissioningResetToFactoryNewCallback(void) {}
 
 /** @brief Join
  *
@@ -445,11 +443,9 @@ void emberAfPluginZllCommissioningResetToFactoryNewCallback(void)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginZllCommissioningJoinCallback(EmberZigbeeNetwork *networkFound,
-                                               uint8_t lqi,
-                                               int8_t rssi)
+bool emberAfPluginZllCommissioningJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }
 
 /** @brief repairConnection
@@ -461,49 +457,56 @@ bool emberAfPluginZllCommissioningJoinCallback(EmberZigbeeNetwork *networkFound,
  * @return RepairStatus, one of REPAIR_SUCCESS, REPAIR_IN_PROGRESS,
  * REPAIR_FAILED
  */
-RepairStatus repairConnection(EmberEventControl *eventControl)
+RepairStatus repairConnection(EmberEventControl * eventControl)
 {
-  uint16_t currentTime = halCommonGetInt16uMillisecondTick();
-  uint16_t elapsedTime = elapsedTimeInt16u(buttonPressTime, currentTime);
-  EmberNetworkStatus status = emberAfNetworkState();
-  RepairStatus repairStatus = REPAIR_FAILED;
+    uint16_t currentTime      = halCommonGetInt16uMillisecondTick();
+    uint16_t elapsedTime      = elapsedTimeInt16u(buttonPressTime, currentTime);
+    EmberNetworkStatus status = emberAfNetworkState();
+    RepairStatus repairStatus = REPAIR_FAILED;
 
-  switch (status) {
-    case EMBER_NO_NETWORK:
-      repairStatus = REPAIR_FAILED;
-      break;
-    case EMBER_JOINED_NETWORK:
-      repairStatus = REPAIR_SUCCESS;
-      break;
-    default:
+    switch (status)
     {
-      if (elapsedTime > MS_ALLOWED_FOR_REPAIR) {
+    case EMBER_NO_NETWORK:
         repairStatus = REPAIR_FAILED;
-      } else {
-        if ((emberAfNetworkState() == EMBER_JOINED_NETWORK_NO_PARENT)
-            && (!emberStackIsPerformingRejoin())) {
-          emberFindAndRejoinNetwork(true, // secure rejoin
-                                    0);   // current channel
+        break;
+    case EMBER_JOINED_NETWORK:
+        repairStatus = REPAIR_SUCCESS;
+        break;
+    default: {
+        if (elapsedTime > MS_ALLOWED_FOR_REPAIR)
+        {
+            repairStatus = REPAIR_FAILED;
         }
-        emberEventControlSetDelayMS(*eventControl, BUTTON_PRESS_NETWORK_REPAIR_DELAY);
-        repairStatus = REPAIR_IN_PROGRESS;
-      }
+        else
+        {
+            if ((emberAfNetworkState() == EMBER_JOINED_NETWORK_NO_PARENT) && (!emberStackIsPerformingRejoin()))
+            {
+                emberFindAndRejoinNetwork(true, // secure rejoin
+                                          0);   // current channel
+            }
+            emberEventControlSetDelayMS(*eventControl, BUTTON_PRESS_NETWORK_REPAIR_DELAY);
+            repairStatus = REPAIR_IN_PROGRESS;
+        }
     }
     break;
-  }
+    }
 
-  // DEBUG PRINT
-  if (repairStatus == REPAIR_FAILED) {
-    emberAfCorePrintln("repair failed! %x", emberAfNetworkState());
-    halPlayTune_P(sadTune, false);
-  } else if (repairStatus == REPAIR_SUCCESS) {
-    emberAfCorePrintln("ms to repair %d ms",
-                       elapsedTime);
-  } else {
-    emberAfCorePrintln("repair in progress...");
-  }
+    // DEBUG PRINT
+    if (repairStatus == REPAIR_FAILED)
+    {
+        emberAfCorePrintln("repair failed! %x", emberAfNetworkState());
+        halPlayTune_P(sadTune, false);
+    }
+    else if (repairStatus == REPAIR_SUCCESS)
+    {
+        emberAfCorePrintln("ms to repair %d ms", elapsedTime);
+    }
+    else
+    {
+        emberAfCorePrintln("repair in progress...");
+    }
 
-  return repairStatus;
+    return repairStatus;
 }
 
 /** @brief Poll Completed
@@ -513,6 +516,4 @@ RepairStatus repairConnection(EmberEventControl *eventControl)
  *
  * @param status Return status of a completed poll operation  Ver.: always
  */
-void emberAfPluginEndDeviceSupportPollCompletedCallback(EmberStatus status)
-{
-}
+void emberAfPluginEndDeviceSupportPollCompletedCallback(EmberStatus status) {}

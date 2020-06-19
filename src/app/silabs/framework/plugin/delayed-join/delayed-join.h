@@ -31,10 +31,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Definitions for the Delayed Join plugin.
- ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Definitions for the Delayed Join plugin.
+                                                                               ******************************************************************************/
 
 #ifndef DELAYED_JOIN_H
 #define DELAYED_JOIN_H

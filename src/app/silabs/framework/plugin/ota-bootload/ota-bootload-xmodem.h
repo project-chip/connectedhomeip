@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Routines for sending data via xmodem
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Routines for sending data via xmodem
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // Initialize xmodem state machine for a new transfer
 // If startImmediately is set, will not wait for an initial 'C' character
@@ -49,4 +49,4 @@ void emAfInitXmodemState(bool startImmediately);
 //   the data that is passed in.
 // The "finished" flag should be set when called with the final chunk to be
 //   transferred to terminate the transfer properly
-bool emAfSendXmodemData(const uint8_t *data, uint16_t length, bool finished);
+bool emAfSendXmodemData(const uint8_t * data, uint16_t length, bool finished);

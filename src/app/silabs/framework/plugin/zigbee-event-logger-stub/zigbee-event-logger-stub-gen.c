@@ -41,74 +41,41 @@
 
 #include PLATFORM_HEADER
 
-void emberAfPluginZigBeeEventLoggerAddBootEvent(uint32_t bootCount, uint16_t resetType)
-{
-}
+void emberAfPluginZigBeeEventLoggerAddBootEvent(uint32_t bootCount, uint16_t resetType) {}
 
-void emberAfPluginZigBeeEventLoggerAddJoinNetwork(EmberPanId panId, uint8_t channelNumber, uint8_t page, uint8_t *extendedPanId)
-{
-}
+void emberAfPluginZigBeeEventLoggerAddJoinNetwork(EmberPanId panId, uint8_t channelNumber, uint8_t page, uint8_t * extendedPanId) {}
 
-void emberAfPluginZigBeeEventLoggerAddTrustCenterRejoin(uint32_t channelMask, EmberRejoinReason reason)
-{
-}
+void emberAfPluginZigBeeEventLoggerAddTrustCenterRejoin(uint32_t channelMask, EmberRejoinReason reason) {}
 
-void emberAfPluginZigBeeEventLoggerAddSecureRejoin(uint32_t channelMask, EmberRejoinReason reason)
-{
-}
+void emberAfPluginZigBeeEventLoggerAddSecureRejoin(uint32_t channelMask, EmberRejoinReason reason) {}
 
-void emberAfPluginZigBeeEventLoggerAddLeaveWithoutRejoin(EmberNodeId sourceNode, EmberLeaveReason reason)
-{
-}
+void emberAfPluginZigBeeEventLoggerAddLeaveWithoutRejoin(EmberNodeId sourceNode, EmberLeaveReason reason) {}
 
-void emberAfPluginZigBeeEventLoggerAddLeaveWithRejoin(EmberNodeId sourceNode, EmberLeaveReason reason)
-{
-}
+void emberAfPluginZigBeeEventLoggerAddLeaveWithRejoin(EmberNodeId sourceNode, EmberLeaveReason reason) {}
 
-void emberAfPluginZigBeeEventLoggerAddTrustCenterLinkKeyChange(void)
-{
-}
+void emberAfPluginZigBeeEventLoggerAddTrustCenterLinkKeyChange(void) {}
 
-void emberAfPluginZigBeeEventLoggerAddNetworkKeySequenceChange(uint8_t sequence)
-{
-}
+void emberAfPluginZigBeeEventLoggerAddNetworkKeySequenceChange(uint8_t sequence) {}
 
-void emberAfPluginZigBeeEventLoggerAddReset(uint8_t resetCode, uint8_t extendedReason)
-{
-}
+void emberAfPluginZigBeeEventLoggerAddReset(uint8_t resetCode, uint8_t extendedReason) {}
 
-void emberAfPluginZigBeeEventLoggerAddChannelChange(uint8_t page, uint8_t channel)
-{
-}
+void emberAfPluginZigBeeEventLoggerAddChannelChange(uint8_t page, uint8_t channel) {}
 
-void emberAfPluginZigBeeEventLoggerAddParentChange(EmberNodeId parentNodeId, EmberEUI64 parentEui64)
-{
-}
+void emberAfPluginZigBeeEventLoggerAddParentChange(EmberNodeId parentNodeId, EmberEUI64 parentEui64) {}
 
-void emberAfPluginZigBeeEventLoggerAddDutyCycleChange(EmberDutyCycleState state, EmberDutyCycleHectoPct limitThreshold, EmberDutyCycleHectoPct criticalThreshold, EmberDutyCycleHectoPct suspendedLimit)
-{
-}
+void emberAfPluginZigBeeEventLoggerAddDutyCycleChange(EmberDutyCycleState state, EmberDutyCycleHectoPct limitThreshold,
+                                                      EmberDutyCycleHectoPct criticalThreshold,
+                                                      EmberDutyCycleHectoPct suspendedLimit)
+{}
 
-void emberAfPluginZigBeeEventLoggerAddChildAdded(EmberNodeId childNodeId, EmberEUI64 childEui64)
-{
-}
+void emberAfPluginZigBeeEventLoggerAddChildAdded(EmberNodeId childNodeId, EmberEUI64 childEui64) {}
 
-void emberAfPluginZigBeeEventLoggerAddChildRemoved(EmberNodeId childNodeId, EmberEUI64 childEui64)
-{
-}
+void emberAfPluginZigBeeEventLoggerAddChildRemoved(EmberNodeId childNodeId, EmberEUI64 childEui64) {}
 
-void emberAfPluginZigBeeEventLoggerAddChildTimedOut(EmberNodeId childNodeId, EmberEUI64 childEui64)
-{
-}
+void emberAfPluginZigBeeEventLoggerAddChildTimedOut(EmberNodeId childNodeId, EmberEUI64 childEui64) {}
 
-void emberAfPluginZigBeeEventLoggerAddStackStatus(EmberStatus status)
-{
-}
+void emberAfPluginZigBeeEventLoggerAddStackStatus(EmberStatus status) {}
 
-void emberAfPluginZigBeeEventLoggerAddTimeSync(uint32_t utcTime, uint32_t secondsSinceBoot)
-{
-}
+void emberAfPluginZigBeeEventLoggerAddTimeSync(uint32_t utcTime, uint32_t secondsSinceBoot) {}
 
-void emberAfPluginZigBeeEventLoggerAddTrustCenterJoinDecision(EmberNodeId nodeId, uint8_t decision)
-{
-}
+void emberAfPluginZigBeeEventLoggerAddTrustCenterJoinDecision(EmberNodeId nodeId, uint8_t decision) {}

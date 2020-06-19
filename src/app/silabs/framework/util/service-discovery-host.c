@@ -31,41 +31,36 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Host specific routines for performing service discovery.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Host specific routines for performing
+                                                                               *service discovery.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
 #include "app/util/zigbee-framework/zigbee-device-host.h"
 
 //------------------------------------------------------------------------------
 
-EmberStatus emAfSendMatchDescriptor(EmberNodeId target,
-                                    EmberAfProfileId profileId,
-                                    EmberAfClusterId clusterId,
-                                    bool serverCluster)
+EmberStatus emAfSendMatchDescriptor(EmberNodeId target, EmberAfProfileId profileId, EmberAfClusterId clusterId, bool serverCluster)
 {
-  uint8_t inCount = 0;
-  uint8_t outCount = 0;
-  EmberAfClusterId inCluster, outCluster;
+    uint8_t inCount  = 0;
+    uint8_t outCount = 0;
+    EmberAfClusterId inCluster, outCluster;
 
-  if (serverCluster) {
-    inCount = 1;
-    inCluster = clusterId;
-    outCluster = 0x0000;
-  } else {
-    outCount = 1;
-    outCluster = clusterId;
-    inCluster = 0x0000;
-  }
+    if (serverCluster)
+    {
+        inCount    = 1;
+        inCluster  = clusterId;
+        outCluster = 0x0000;
+    }
+    else
+    {
+        outCount   = 1;
+        outCluster = clusterId;
+        inCluster  = 0x0000;
+    }
 
-  return ezspMatchDescriptorsRequest(target,
-                                     profileId,
-                                     inCount,
-                                     outCount,
-                                     &inCluster,
-                                     &outCluster,
-                                     EMBER_AF_DEFAULT_APS_OPTIONS);
+    return ezspMatchDescriptorsRequest(target, profileId, inCount, outCount, &inCluster, &outCluster, EMBER_AF_DEFAULT_APS_OPTIONS);
 }

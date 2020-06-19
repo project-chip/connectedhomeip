@@ -36,7 +36,7 @@
 //
 
 #ifdef CONFIGURATION_HEADER
-  #include CONFIGURATION_HEADER
+#include CONFIGURATION_HEADER
 #endif
 
 // Token header for the token.properties.
@@ -46,5 +46,5 @@
 #include "../../../../plugin/scenes/scenes-tokens.h"
 
 #ifdef CUSTOM_TOKEN_HEADER
-  #include CUSTOM_TOKEN_HEADER
+#include CUSTOM_TOKEN_HEADER
 #endif

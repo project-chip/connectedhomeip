@@ -31,19 +31,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // This callback file is created for your convenience. You may add application
 // code to this file. If you regenerate this file over a previous version, the
 // previous version will be overwritten and any code you have added will be
 // lost.
 
-#include <stdlib.h>     // malloc, free
 #include "app/framework/include/af.h"
+#include <stdlib.h> // malloc, free
 
 /** @brief Broadcast Sent
  *
@@ -51,9 +51,7 @@
  * by the concentrator plugin.
  *
  */
-void emberAfPluginConcentratorBroadcastSentCallback(void)
-{
-}
+void emberAfPluginConcentratorBroadcastSentCallback(void) {}
 
 /** @brief Finished
  *
@@ -63,9 +61,7 @@ void emberAfPluginConcentratorBroadcastSentCallback(void)
  *
  * @param status   Ver.: always
  */
-void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
-{
-}
+void emberAfPluginNetworkFindFinishedCallback(EmberStatus status) {}
 
 /** @brief Get Radio Power For Channel
  *
@@ -77,7 +73,7 @@ void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
  */
 int8_t emberAfPluginNetworkFindGetRadioPowerForChannelCallback(uint8_t channel)
 {
-  return EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_POWER;
+    return EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_POWER;
 }
 
 /** @brief Join
@@ -92,11 +88,9 @@ int8_t emberAfPluginNetworkFindGetRadioPowerForChannelCallback(uint8_t channel)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound,
-                                          uint8_t lqi,
-                                          int8_t rssi)
+bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }
 
 /** @brief Received
@@ -108,15 +102,13 @@ bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound,
  * @param dataLen The length in octets of the data  Ver.: always
  * @param data Buffer containing the raw octets of the data  Ver.: always
  */
-void emberAfPluginCommsHubFunctionReceivedCallback(EmberEUI64 senderDeviceId,
-                                                   uint16_t dataLen,
-                                                   uint8_t * data)
+void emberAfPluginCommsHubFunctionReceivedCallback(EmberEUI64 senderDeviceId, uint16_t dataLen, uint8_t * data)
 {
-  emberAfAppPrint("GBCS emberAfPluginCommsHubFunctionDataReceivedCallback: senderDeviceId=");
-  emberAfAppDebugExec(emberAfPrintBigEndianEui64(senderDeviceId));
-  emberAfAppPrint(", dataLen=0x%2x, data=0x", dataLen);
-  emberAfAppPrintBuffer(data, dataLen, false);
-  emberAfAppPrintln("");
+    emberAfAppPrint("GBCS emberAfPluginCommsHubFunctionDataReceivedCallback: senderDeviceId=");
+    emberAfAppDebugExec(emberAfPrintBigEndianEui64(senderDeviceId));
+    emberAfAppPrint(", dataLen=0x%2x, data=0x", dataLen);
+    emberAfAppPrintBuffer(data, dataLen, false);
+    emberAfAppPrintln("");
 }
 
 /** @brief Send
@@ -131,14 +123,11 @@ void emberAfPluginCommsHubFunctionReceivedCallback(EmberEUI64 senderDeviceId,
  * @param data Buffer containing the raw octets of the data that was sent  Ver.:
  * always
  */
-void emberAfPluginCommsHubFunctionSendCallback(uint8_t status,
-                                               EmberEUI64 destinationDeviceId,
-                                               uint16_t dataLen,
-                                               uint8_t * data)
+void emberAfPluginCommsHubFunctionSendCallback(uint8_t status, EmberEUI64 destinationDeviceId, uint16_t dataLen, uint8_t * data)
 {
-  emberAfAppPrint("GBCS emberAfPluginCommsHubFunctionSendCallback: status=0x%x, destinationDeviceId=", status);
-  emberAfAppDebugExec(emberAfPrintBigEndianEui64(destinationDeviceId));
-  emberAfAppPrintln(" dataLen=0x%2x, data=0x%4x", dataLen, data);
+    emberAfAppPrint("GBCS emberAfPluginCommsHubFunctionSendCallback: status=0x%x, destinationDeviceId=", status);
+    emberAfAppDebugExec(emberAfPrintBigEndianEui64(destinationDeviceId));
+    emberAfAppPrintln(" dataLen=0x%2x, data=0x%4x", dataLen, data);
 }
 
 /** @brief Encrypt Data
@@ -152,15 +141,15 @@ void emberAfPluginCommsHubFunctionSendCallback(uint8_t status,
  *
  * @param data   Ver.: always
  */
-void emberAfPluginGbzMessageControllerEncryptDataCallback(EmberAfGbzMessageData *data)
+void emberAfPluginGbzMessageControllerEncryptDataCallback(EmberAfGbzMessageData * data)
 {
-  uint8_t * moo = (uint8_t *) malloc(sizeof(uint8_t) * data->plainPayloadLength + 2);
-  MEMCOPY(moo, data->plainPayload, data->plainPayloadLength);
-  moo[data->plainPayloadLength] = 0xDE;
-  moo[data->plainPayloadLength + 1] = 0xAD;
-  data->encryption = true;
-  data->encryptedPayload = moo;
-  data->encryptedPayloadLength = data->plainPayloadLength + 2;
+    uint8_t * moo = (uint8_t *) malloc(sizeof(uint8_t) * data->plainPayloadLength + 2);
+    MEMCOPY(moo, data->plainPayload, data->plainPayloadLength);
+    moo[data->plainPayloadLength]     = 0xDE;
+    moo[data->plainPayloadLength + 1] = 0xAD;
+    data->encryption                  = true;
+    data->encryptedPayload            = moo;
+    data->encryptedPayloadLength      = data->plainPayloadLength + 2;
 }
 
 /** @brief Log Data Updated
@@ -172,9 +161,9 @@ void emberAfPluginGbzMessageControllerEncryptDataCallback(EmberAfGbzMessageData 
  *
  * @param cmd ZCL command  Ver.: always
  */
-void emberAfPluginEventsServerLogDataUpdatedCallback(const EmberAfClusterCommand *cmd)
+void emberAfPluginEventsServerLogDataUpdatedCallback(const EmberAfClusterCommand * cmd)
 {
-  emberAfAppPrintln("emberAfPluginEventsServerLogDataUpdatedCallback: cmdAddr=0x%4X", cmd);
+    emberAfAppPrintln("emberAfPluginEventsServerLogDataUpdatedCallback: cmdAddr=0x%4X", cmd);
 }
 
 /** @brief Data Log Access Request
@@ -193,9 +182,9 @@ void emberAfPluginEventsServerLogDataUpdatedCallback(const EmberAfClusterCommand
  * @param gpfMessage   Ver.: always
  * @param zclClusterCommand   Ver.: always
  */
-bool emberAfPluginGasProxyFunctionDataLogAccessRequestCallback(const EmberAfGpfMessage *  gpfMessage,
-                                                               const EmberAfClusterCommand *  zclClusterCommand)
+bool emberAfPluginGasProxyFunctionDataLogAccessRequestCallback(const EmberAfGpfMessage * gpfMessage,
+                                                               const EmberAfClusterCommand * zclClusterCommand)
 {
-  // allow access at at all times.
-  return true;
+    // allow access at at all times.
+    return true;
 }

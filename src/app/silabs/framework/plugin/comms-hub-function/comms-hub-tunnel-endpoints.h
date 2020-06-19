@@ -31,16 +31,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs for handling endpoints the Comms Hub Function plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs for handling endpoints the Comms Hub
+                                                                               *Function plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_COMMS_HUB_TUNNEL_ENDPOINTS_H
 #define SILABS_COMMS_HUB_TUNNEL_ENDPOINTS_H
 
-#define INVALID_TUNNELING_ENDPOINT  0xFF
+#define INVALID_TUNNELING_ENDPOINT 0xFF
 
 /**
  * @brief Initializes tunneling endpoints.
@@ -60,7 +61,7 @@ void emberAfPluginTunnelingEndpointInit(void);
  * @param numEndpoints The number of tunneling endpoints on the device.
  *
  */
-void emberAfPluginAddTunnelingEndpoint(uint16_t nodeId, uint8_t *endpointList, uint8_t numEndpoints);
+void emberAfPluginAddTunnelingEndpoint(uint16_t nodeId, uint8_t * endpointList, uint8_t numEndpoints);
 
 /**
  * @brief Gets a tunneling endpoint.
@@ -73,4 +74,4 @@ void emberAfPluginAddTunnelingEndpoint(uint16_t nodeId, uint8_t *endpointList, u
  */
 uint8_t emberAfPluginGetDeviceTunnelingEndpoint(uint16_t nodeId);
 
-#endif  // #ifndef _COMMS_HUB_TUNNEL_ENDPOINTS_H_
+#endif // #ifndef _COMMS_HUB_TUNNEL_ENDPOINTS_H_

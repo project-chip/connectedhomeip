@@ -41,43 +41,47 @@
 // version will be overwritten and any code you have added will be lost.
 
 #include "app/framework/include/af.h"
-#include "hal/hal.h"
 #include "app/framework/plugin/ezmode-commissioning/ez-mode.h"
+#include "hal/hal.h"
 
-static bool foundLight = false;
+static bool foundLight      = false;
 static bool lookingForLight = false;
-static EmberNodeId lightId = EMBER_NULL_NODE_ID;
+static EmberNodeId lightId  = EMBER_NULL_NODE_ID;
 
-static void lightDiscoveryCallback(const EmberAfServiceDiscoveryResult* result)
+static void lightDiscoveryCallback(const EmberAfServiceDiscoveryResult * result)
 {
-  uint8_t i;
+    uint8_t i;
 
-  if (emberAfHaveDiscoveryResponseStatus(result->status)) {
-    const EmberAfEndpointList* epList
-      = (const EmberAfEndpointList*)result->responseData;
-    emberAfCorePrintln("found light: 0x%2x", result->matchAddress);
-    for (i = 0; i < epList->count; i++) {
-      emberAfCorePrintln("  ept: 0x%x", epList->list[i]);
-    }
-    // store information of the first light we found
-    if (!foundLight) {
-      // We must copy the data locally because the HAL routine wants
-      // a non-const pointer.
-      EmberNodeId nodeId = result->matchAddress;
+    if (emberAfHaveDiscoveryResponseStatus(result->status))
+    {
+        const EmberAfEndpointList * epList = (const EmberAfEndpointList *) result->responseData;
+        emberAfCorePrintln("found light: 0x%2x", result->matchAddress);
+        for (i = 0; i < epList->count; i++)
+        {
+            emberAfCorePrintln("  ept: 0x%x", epList->list[i]);
+        }
+        // store information of the first light we found
+        if (!foundLight)
+        {
+            // We must copy the data locally because the HAL routine wants
+            // a non-const pointer.
+            EmberNodeId nodeId = result->matchAddress;
 
-      // we store the values in token for SoC platform and store the values
-      // in RAM for host platform.
+            // we store the values in token for SoC platform and store the values
+            // in RAM for host platform.
 #ifndef EZSP_HOST
-      halCommonSetToken(TOKEN_HALIGHT_NODE, &nodeId);
+            halCommonSetToken(TOKEN_HALIGHT_NODE, &nodeId);
 #else
-      lightId = nodeId;
+            lightId = nodeId;
 #endif // EZSP_HOST
-      foundLight = true;
+            foundLight = true;
+        }
     }
-  } else if (result->status == EMBER_AF_BROADCAST_SERVICE_DISCOVERY_COMPLETE) {
-    emberAfCorePrintln("This is all the lights found.");
-    lookingForLight = false;
-  }
+    else if (result->status == EMBER_AF_BROADCAST_SERVICE_DISCOVERY_COMPLETE)
+    {
+        emberAfCorePrintln("This is all the lights found.");
+        lookingForLight = false;
+    }
 }
 
 /** @brief Main Tick
@@ -88,46 +92,49 @@ static void lightDiscoveryCallback(const EmberAfServiceDiscoveryResult* result)
  */
 void emberAfMainTickCallback(void)
 {
-  EmberStatus status;
+    EmberStatus status;
 
 #ifndef EZSP_HOST
-  halCommonGetToken(&lightId, TOKEN_HALIGHT_NODE);
+    halCommonGetToken(&lightId, TOKEN_HALIGHT_NODE);
 #endif
 
-  // if we are not part of the network, clear the tokens associated with
-  // HALight; if not already done so.
-  if (emberAfNetworkState() != EMBER_JOINED_NETWORK
-      && !emberStackIsPerformingRejoin()) {
-    if (lightId != EMBER_NULL_NODE_ID) {
-      emberAfCorePrintln("Clearing known light ID.");
-      lightId = EMBER_NULL_NODE_ID;
-      foundLight = false;
+    // if we are not part of the network, clear the tokens associated with
+    // HALight; if not already done so.
+    if (emberAfNetworkState() != EMBER_JOINED_NETWORK && !emberStackIsPerformingRejoin())
+    {
+        if (lightId != EMBER_NULL_NODE_ID)
+        {
+            emberAfCorePrintln("Clearing known light ID.");
+            lightId    = EMBER_NULL_NODE_ID;
+            foundLight = false;
 #ifndef EZSP_HOST
-      halCommonSetToken(TOKEN_HALIGHT_NODE, &lightId);
+            halCommonSetToken(TOKEN_HALIGHT_NODE, &lightId);
 #endif
+        }
     }
-  } else {
-    // if we are on the network, discover the light if we have not done it
-    // already.
-    if (lightId == EMBER_NULL_NODE_ID && !foundLight && !lookingForLight) {
-      emberAfCorePrintln("Find a light");
-      status
-        = emberAfFindDevicesByProfileAndCluster(
-        EMBER_RX_ON_WHEN_IDLE_BROADCAST_ADDRESS,
-        HA_PROFILE_ID,
-        ZCL_ON_OFF_CLUSTER_ID,
-        EMBER_AF_SERVER_CLUSTER_DISCOVERY,
-        lightDiscoveryCallback);
-      if (status != EMBER_SUCCESS) { // server cluster
-        emberAfDebugPrintln("Cannot find light, error 0x%x", status);
-      } else {
-        // the bool is used so we do not keep sending match descriptor
-        // request everytime mainTick is call while waiting for match
-        // descriptor response.
-        lookingForLight = true;
-      }
-    } // check lightId value
-  }
+    else
+    {
+        // if we are on the network, discover the light if we have not done it
+        // already.
+        if (lightId == EMBER_NULL_NODE_ID && !foundLight && !lookingForLight)
+        {
+            emberAfCorePrintln("Find a light");
+            status =
+                emberAfFindDevicesByProfileAndCluster(EMBER_RX_ON_WHEN_IDLE_BROADCAST_ADDRESS, HA_PROFILE_ID, ZCL_ON_OFF_CLUSTER_ID,
+                                                      EMBER_AF_SERVER_CLUSTER_DISCOVERY, lightDiscoveryCallback);
+            if (status != EMBER_SUCCESS)
+            { // server cluster
+                emberAfDebugPrintln("Cannot find light, error 0x%x", status);
+            }
+            else
+            {
+                // the bool is used so we do not keep sending match descriptor
+                // request everytime mainTick is call while waiting for match
+                // descriptor response.
+                lookingForLight = true;
+            }
+        } // check lightId value
+    }
 }
 
 /** @brief Finished
@@ -138,9 +145,7 @@ void emberAfMainTickCallback(void)
  *
  * @param status   Ver.: always
  */
-void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
-{
-}
+void emberAfPluginNetworkFindFinishedCallback(EmberStatus status) {}
 
 /** @brief Join
  *
@@ -154,11 +159,9 @@ void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
-                                          uint8_t lqi,
-                                          int8_t rssi)
+bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }
 
 /** @brief Broadcast Sent
@@ -167,9 +170,7 @@ bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
  * sent by the concentrator plugin.
  *
  */
-void emberAfPluginConcentratorBroadcastSentCallback(void)
-{
-}
+void emberAfPluginConcentratorBroadcastSentCallback(void) {}
 
 /** @brief Client Complete
  *
@@ -179,9 +180,7 @@ void emberAfPluginConcentratorBroadcastSentCallback(void)
  * @param bindingIndex The binding index that was created or
  * ::EMBER_NULL_BINDING if an error occurred.  Ver.: always
  */
-void emberAfPluginEzmodeCommissioningClientCompleteCallback(uint8_t bindingIndex)
-{
-}
+void emberAfPluginEzmodeCommissioningClientCompleteCallback(uint8_t bindingIndex) {}
 
 /** @brief Select File Descriptors
  *
@@ -197,10 +196,9 @@ void emberAfPluginEzmodeCommissioningClientCompleteCallback(uint8_t bindingIndex
  * @param maxSize The maximum number of elements that the function implementor
  * may add.  Ver.: always
  */
-int emberAfPluginGatewaySelectFileDescriptorsCallback(int* list,
-                                                      int maxSize)
+int emberAfPluginGatewaySelectFileDescriptorsCallback(int * list, int maxSize)
 {
-  return 0;
+    return 0;
 }
 
 /** @brief Button Event
@@ -214,13 +212,12 @@ int emberAfPluginGatewaySelectFileDescriptorsCallback(int* list,
  * @param buttonPressDurationMs The length of time button was held down before
  * it was released.  Ver.: always
  */
-void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
-                                                   uint32_t buttonPressDurationMs)
+void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber, uint32_t buttonPressDurationMs)
 {
-  // We assume the first endpoint (0) is the one to use for end-device bind / EZ-Mode
-  uint8_t endpoint = emberAfEndpointFromIndex(0);
-  emberAfCorePrintln("EZ-Mode Commission:%x", endpoint);
-  emberAfEzmodeServerCommission(endpoint);
+    // We assume the first endpoint (0) is the one to use for end-device bind / EZ-Mode
+    uint8_t endpoint = emberAfEndpointFromIndex(0);
+    emberAfCorePrintln("EZ-Mode Commission:%x", endpoint);
+    emberAfEzmodeServerCommission(endpoint);
 }
 
 /**
@@ -243,10 +240,9 @@ void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
  * @param errorCode  uint8_t
  * @param target  The short ID of the remote node.
  */
-void emberIncomingNetworkStatusHandler(uint8_t errorCode,
-                                       EmberNodeId target)
+void emberIncomingNetworkStatusHandler(uint8_t errorCode, EmberNodeId target)
 {
-  emberAfPushCallbackNetworkIndex();
-  emberAfCorePrintln("ErrorCode : 0x%1X, Target : 0x%2X ", errorCode, target);
-  emberAfPopNetworkIndex();
+    emberAfPushCallbackNetworkIndex();
+    emberAfCorePrintln("ErrorCode : 0x%1X, Target : 0x%2X ", errorCode, target);
+    emberAfPopNetworkIndex();
 }

@@ -36,7 +36,7 @@
 //
 
 #ifdef CONFIGURATION_HEADER
-  #include CONFIGURATION_HEADER
+#include CONFIGURATION_HEADER
 #endif
 
 // Token header for the token.properties.
@@ -55,5 +55,5 @@
 #include "../../../../../plugin/reporting/reporting-tokens.h"
 
 #ifdef CUSTOM_TOKEN_HEADER
-  #include CUSTOM_TOKEN_HEADER
+#include CUSTOM_TOKEN_HEADER
 #endif

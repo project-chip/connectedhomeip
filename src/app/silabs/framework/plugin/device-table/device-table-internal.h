@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Internal APIs and defines for the Device Table plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Internal APIs and defines for the Device
+                                                                               *Table plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_DEVICE_TABLE_INTERNAL_H
 #define SILABS_DEVICE_TABLE_INTERNAL_H
@@ -45,8 +46,8 @@ uint8_t emAfDeviceTableGetFirstEndpointFromIndex(uint16_t index);
 // Internal APIs for printing device information to the CLI
 void emAfDeviceTableSave(void);
 void emAfDeviceTableLoad(void);
-void emAfDeviceTablePrintEUI64(uint8_t *eui64);
-void emAfDeviceTablePrintBuffer(uint8_t *buffer, uint16_t bufLen);
+void emAfDeviceTablePrintEUI64(uint8_t * eui64);
+void emAfDeviceTablePrintBuffer(uint8_t * buffer, uint16_t bufLen);
 
 // Internal APIs for route repair
 void emAfDeviceTableInitiateRouteRepair(EmberNodeId nodeId);

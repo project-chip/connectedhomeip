@@ -31,12 +31,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief ZigBee 3.0 zdo test harness functionality
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief ZigBee 3.0 zdo test harness functionality
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
-EmberStatus emAfPluginTestHarnessZ3ZdoCommandResponseHandler(uint8_t *requestBuffer,
-                                                             uint8_t length,
-                                                             EmberApsFrame *apsFrame);
+EmberStatus emAfPluginTestHarnessZ3ZdoCommandResponseHandler(uint8_t * requestBuffer, uint8_t length, EmberApsFrame * apsFrame);

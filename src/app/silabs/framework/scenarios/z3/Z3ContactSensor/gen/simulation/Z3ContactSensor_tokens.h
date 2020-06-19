@@ -56,11 +56,11 @@
 
 // Types for the tokens
 #ifdef DEFINETYPES
-typedef uint8_t  tokType_zone_id;
-typedef uint8_t  tokType_ias_cie_address[8];
-typedef uint8_t  tokType_zone_state;
-typedef uint16_t  tokType_zone_type;
-typedef int16_t  tokType_temp_measured_value;
+typedef uint8_t tokType_zone_id;
+typedef uint8_t tokType_ias_cie_address[8];
+typedef uint8_t tokType_zone_state;
+typedef uint16_t tokType_zone_type;
+typedef int16_t tokType_temp_measured_value;
 #endif // DEFINETYPES
 
 // Actual token definitions
@@ -73,43 +73,75 @@ DEFINE_BASIC_TOKEN(ZONE_ID_1, tokType_zone_id, 0xFF)
 #endif // DEFINETOKENS
 
 // Macro snippet that loads all the attributes from tokens
-#define GENERATED_TOKEN_LOADER(endpoint) do {                                                                                                          \
-    uint8_t ptr[8];                                                                                                                                    \
-    uint8_t curNetwork = emberGetCurrentNetwork();                                                                                                     \
-    uint8_t epNetwork;                                                                                                                                 \
-    epNetwork = emberAfNetworkIndexFromEndpoint(1);                                                                                                    \
-    if ((endpoint) == 1 || ((endpoint) == EMBER_BROADCAST_ENDPOINT && epNetwork == curNetwork)) {                                                      \
-      halCommonGetToken((tokType_temp_measured_value *)ptr, TOKEN_TEMP_MEASURED_VALUE_1);                                                              \
-      emberAfWriteServerAttribute(1, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT16S_ATTRIBUTE_TYPE); \
-      halCommonGetToken((tokType_zone_state *)ptr, TOKEN_ZONE_STATE_1);                                                                                \
-      emberAfWriteServerAttribute(1, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_STATE_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_ENUM8_ATTRIBUTE_TYPE);                   \
-      halCommonGetToken((tokType_zone_type *)ptr, TOKEN_ZONE_TYPE_1);                                                                                  \
-      emberAfWriteServerAttribute(1, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_TYPE_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_ENUM16_ATTRIBUTE_TYPE);                   \
-      halCommonGetToken((tokType_ias_cie_address *)ptr, TOKEN_IAS_CIE_ADDRESS_1);                                                                      \
-      emberAfWriteServerAttribute(1, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_IEEE_ADDRESS_ATTRIBUTE_TYPE);       \
-      halCommonGetToken((tokType_zone_id *)ptr, TOKEN_ZONE_ID_1);                                                                                      \
-      emberAfWriteServerAttribute(1, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_ID_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT8U_ATTRIBUTE_TYPE);                      \
-    }                                                                                                                                                  \
-} while (false)
+#define GENERATED_TOKEN_LOADER(endpoint)                                                                                           \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        uint8_t ptr[8];                                                                                                            \
+        uint8_t curNetwork = emberGetCurrentNetwork();                                                                             \
+        uint8_t epNetwork;                                                                                                         \
+        epNetwork = emberAfNetworkIndexFromEndpoint(1);                                                                            \
+        if ((endpoint) == 1 || ((endpoint) == EMBER_BROADCAST_ENDPOINT && epNetwork == curNetwork))                                \
+        {                                                                                                                          \
+            halCommonGetToken((tokType_temp_measured_value *) ptr, TOKEN_TEMP_MEASURED_VALUE_1);                                   \
+            emberAfWriteServerAttribute(1, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID, (uint8_t *) ptr, \
+                                        ZCL_INT16S_ATTRIBUTE_TYPE);                                                                \
+            halCommonGetToken((tokType_zone_state *) ptr, TOKEN_ZONE_STATE_1);                                                     \
+            emberAfWriteServerAttribute(1, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_STATE_ATTRIBUTE_ID, (uint8_t *) ptr,                  \
+                                        ZCL_ENUM8_ATTRIBUTE_TYPE);                                                                 \
+            halCommonGetToken((tokType_zone_type *) ptr, TOKEN_ZONE_TYPE_1);                                                       \
+            emberAfWriteServerAttribute(1, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_TYPE_ATTRIBUTE_ID, (uint8_t *) ptr,                   \
+                                        ZCL_ENUM16_ATTRIBUTE_TYPE);                                                                \
+            halCommonGetToken((tokType_ias_cie_address *) ptr, TOKEN_IAS_CIE_ADDRESS_1);                                           \
+            emberAfWriteServerAttribute(1, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID, (uint8_t *) ptr,             \
+                                        ZCL_IEEE_ADDRESS_ATTRIBUTE_TYPE);                                                          \
+            halCommonGetToken((tokType_zone_id *) ptr, TOKEN_ZONE_ID_1);                                                           \
+            emberAfWriteServerAttribute(1, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_ID_ATTRIBUTE_ID, (uint8_t *) ptr,                     \
+                                        ZCL_INT8U_ATTRIBUTE_TYPE);                                                                 \
+        }                                                                                                                          \
+    } while (false)
 
 // Macro snippet that saves the attribute to token
-#define GENERATED_TOKEN_SAVER do {                                                                                               \
-    uint8_t allZeroData[8];                                                                                                      \
-    MEMSET(allZeroData, 0, 8);                                                                                                   \
-    if ( data == NULL ) { data = allZeroData; }                                                                                  \
-    if ( endpoint == 1 ) {                                                                                                       \
-      if ( clusterId == 0x0402 ) {                                                                                               \
-        if ( metadata->attributeId == 0x0000 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_TEMP_MEASURED_VALUE_1, data); }                                                                \
-      } else if ( clusterId == 0x0500 ) {                                                                                        \
-        if ( metadata->attributeId == 0x0000 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_ZONE_STATE_1, data); }                                                                         \
-        if ( metadata->attributeId == 0x0001 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_ZONE_TYPE_1, data); }                                                                          \
-        if ( metadata->attributeId == 0x0010 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_IAS_CIE_ADDRESS_1, data); }                                                                    \
-        if ( metadata->attributeId == 0x0011 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_ZONE_ID_1, data); }                                                                            \
-      }                                                                                                                          \
-    }                                                                                                                            \
-} while (false)
+#define GENERATED_TOKEN_SAVER                                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        uint8_t allZeroData[8];                                                                                                    \
+        MEMSET(allZeroData, 0, 8);                                                                                                 \
+        if (data == NULL)                                                                                                          \
+        {                                                                                                                          \
+            data = allZeroData;                                                                                                    \
+        }                                                                                                                          \
+        if (endpoint == 1)                                                                                                         \
+        {                                                                                                                          \
+            if (clusterId == 0x0402)                                                                                               \
+            {                                                                                                                      \
+                if (metadata->attributeId == 0x0000 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_TEMP_MEASURED_VALUE_1, data);                                                          \
+                }                                                                                                                  \
+            }                                                                                                                      \
+            else if (clusterId == 0x0500)                                                                                          \
+            {                                                                                                                      \
+                if (metadata->attributeId == 0x0000 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_ZONE_STATE_1, data);                                                                   \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0001 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_ZONE_TYPE_1, data);                                                                    \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0010 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_IAS_CIE_ADDRESS_1, data);                                                              \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0011 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_ZONE_ID_1, data);                                                                      \
+                }                                                                                                                  \
+            }                                                                                                                      \
+        }                                                                                                                          \
+    } while (false)

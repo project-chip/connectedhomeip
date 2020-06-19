@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief The master include file for the Ember ApplicationFramework  API.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief The master include file for the Ember
+                                                                               *ApplicationFramework  API.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 /**
  * @addtogroup af Zigbee Application Framework API Reference
@@ -53,36 +54,37 @@
 #include PLATFORM_HEADER
 
 #ifndef CONFIGURATION_HEADER
-  #define CONFIGURATION_HEADER "app/framework/util/config.h"
+#define CONFIGURATION_HEADER "app/framework/util/config.h"
 #endif
 #include CONFIGURATION_HEADER
 
 #ifdef EZSP_HOST
 // Includes needed for ember related functions for the EZSP host
-  #include "stack/include/error.h"
-  #include "stack/include/ember-types.h"
-  #include "stack/include/ember-random-api.h"
-  #include "app/util/ezsp/ezsp-protocol.h"
-  #include "app/util/ezsp/ezsp.h"
-  #include "app/util/ezsp/ezsp-utils.h"
-  #include "app/util/ezsp/serial-interface.h"
+#include "app/util/ezsp/ezsp-protocol.h"
+#include "app/util/ezsp/ezsp-utils.h"
+#include "app/util/ezsp/ezsp.h"
+#include "app/util/ezsp/serial-interface.h"
+#include "stack/include/ember-random-api.h"
+#include "stack/include/ember-types.h"
+#include "stack/include/error.h"
 #else
 // Includes needed for ember related functions for the SoC
-  #include "stack/include/ember.h"
+#include "stack/include/ember.h"
 #endif // EZSP_HOST
 
 // HAL - hardware abstraction layer
 #include "hal/hal.h"
-#include "plugin/serial/serial.h"  // Serial utility APIs
+#include "plugin/serial/serial.h" // Serial utility APIs
 
-#include "stack/include/event.h"
-#include "stack/include/error.h"
+#include "af-structs.h"
 #include "af-types.h"
+#include "app/framework/cli/zcl-cli.h"
+#include "app/framework/util/client-api.h"
 #include "app/framework/util/print.h"
 #include "app/framework/util/time-util.h"
-#include "af-structs.h"
-#include "attribute-id.h"
+#include "app/util/serial/command-interpreter2.h"
 #include "att-storage.h"
+#include "attribute-id.h"
 #include "attribute-type.h"
 #include "call-command-handler.h"
 #include "callback.h"
@@ -92,9 +94,8 @@
 #include "debug-printing.h"
 #include "enums.h"
 #include "print-cluster.h"
-#include "app/framework/util/client-api.h"
-#include "app/util/serial/command-interpreter2.h"
-#include "app/framework/cli/zcl-cli.h"
+#include "stack/include/error.h"
+#include "stack/include/event.h"
 
 /** @name Attribute Storage */
 // @{
@@ -112,22 +113,16 @@
  *
  * @return Returns pointer to the attribute metadata location.
  */
-EmberAfAttributeMetadata *emberAfLocateAttributeMetadata(uint8_t endpoint,
-                                                         EmberAfClusterId clusterId,
-                                                         EmberAfAttributeId attributeId,
-                                                         uint8_t mask,
-                                                         uint16_t manufacturerCode);
+EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(uint8_t endpoint, EmberAfClusterId clusterId,
+                                                          EmberAfAttributeId attributeId, uint8_t mask, uint16_t manufacturerCode);
 
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 /** @brief Returns true if the attribute exists. */
-bool emberAfContainsAttribute(uint8_t endpoint,
-                              EmberAfClusterId clusterId,
-                              EmberAfAttributeId attributeId,
-                              uint8_t mask,
+bool emberAfContainsAttribute(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
                               uint16_t manufacturerCode);
 #else
-  #define emberAfContainsAttribute(endpoint, clusterId, attributeId, mask, manufacturerCode) \
-  (emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId, mask, manufacturerCode) != NULL)
+#define emberAfContainsAttribute(endpoint, clusterId, attributeId, mask, manufacturerCode)                                         \
+    (emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId, mask, manufacturerCode) != NULL)
 #endif
 
 /**
@@ -217,12 +212,8 @@ bool emberAfContainsClient(uint8_t endpoint, EmberAfClusterId clusterId);
  *      emberAfWriteManufacturerSpecificClientAttribute,
  *      emberAfWriteManufacturerSpecificServerAttribute
  */
-EmberAfStatus emberAfWriteAttribute(uint8_t endpoint,
-                                    EmberAfClusterId cluster,
-                                    EmberAfAttributeId attributeID,
-                                    uint8_t mask,
-                                    uint8_t* dataPtr,
-                                    EmberAfAttributeType dataType);
+EmberAfStatus emberAfWriteAttribute(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
+                                    uint8_t * dataPtr, EmberAfAttributeType dataType);
 
 /**
  * @brief write a cluster server attribute.
@@ -236,11 +227,8 @@ EmberAfStatus emberAfWriteAttribute(uint8_t endpoint,
  *      emberAfWriteManufacturerSpecificClientAttribute,
  *      emberAfWriteManufacturerSpecificServerAttribute
  */
-EmberAfStatus emberAfWriteServerAttribute(uint8_t endpoint,
-                                          EmberAfClusterId cluster,
-                                          EmberAfAttributeId attributeID,
-                                          uint8_t* dataPtr,
-                                          EmberAfAttributeType dataType);
+EmberAfStatus emberAfWriteServerAttribute(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
+                                          uint8_t * dataPtr, EmberAfAttributeType dataType);
 
 /**
  * @brief write a cluster client attribute.
@@ -254,11 +242,8 @@ EmberAfStatus emberAfWriteServerAttribute(uint8_t endpoint,
  *      emberAfWriteManufacturerSpecificClientAttribute,
  *      emberAfWriteManufacturerSpecificServerAttribute
  */
-EmberAfStatus emberAfWriteClientAttribute(uint8_t endpoint,
-                                          EmberAfClusterId cluster,
-                                          EmberAfAttributeId attributeID,
-                                          uint8_t* dataPtr,
-                                          EmberAfAttributeType dataType);
+EmberAfStatus emberAfWriteClientAttribute(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
+                                          uint8_t * dataPtr, EmberAfAttributeType dataType);
 
 /**
  * @brief write a manufacturer specific server attribute.
@@ -272,12 +257,9 @@ EmberAfStatus emberAfWriteClientAttribute(uint8_t endpoint,
  * @see emberAfWriteClientAttribute, emberAfWriteServerAttribute,
  *      emberAfWriteManufacturerSpecificClientAttribute
  */
-EmberAfStatus emberAfWriteManufacturerSpecificServerAttribute(uint8_t endpoint,
-                                                              EmberAfClusterId cluster,
-                                                              EmberAfAttributeId attributeID,
-                                                              uint16_t manufacturerCode,
-                                                              uint8_t* dataPtr,
-                                                              EmberAfAttributeType dataType);
+EmberAfStatus emberAfWriteManufacturerSpecificServerAttribute(uint8_t endpoint, EmberAfClusterId cluster,
+                                                              EmberAfAttributeId attributeID, uint16_t manufacturerCode,
+                                                              uint8_t * dataPtr, EmberAfAttributeType dataType);
 
 /**
  * @brief write a manufacturer specific client attribute.
@@ -291,12 +273,9 @@ EmberAfStatus emberAfWriteManufacturerSpecificServerAttribute(uint8_t endpoint,
  * @see emberAfWriteClientAttribute, emberAfWriteServerAttribute,
  *      emberAfWriteManufacturerSpecificServerAttribute
  */
-EmberAfStatus emberAfWriteManufacturerSpecificClientAttribute(uint8_t endpoint,
-                                                              EmberAfClusterId cluster,
-                                                              EmberAfAttributeId attributeID,
-                                                              uint16_t manufacturerCode,
-                                                              uint8_t* dataPtr,
-                                                              EmberAfAttributeType dataType);
+EmberAfStatus emberAfWriteManufacturerSpecificClientAttribute(uint8_t endpoint, EmberAfClusterId cluster,
+                                                              EmberAfAttributeId attributeID, uint16_t manufacturerCode,
+                                                              uint8_t * dataPtr, EmberAfAttributeType dataType);
 
 /**
  * @brief Function that test the success of attribute write.
@@ -312,13 +291,8 @@ EmberAfStatus emberAfWriteManufacturerSpecificClientAttribute(uint8_t endpoint,
  * @param buffer Location where attribute will be written from.
  * @param dataType ZCL attribute type.
  */
-EmberAfStatus emberAfVerifyAttributeWrite(uint8_t endpoint,
-                                          EmberAfClusterId cluster,
-                                          EmberAfAttributeId attributeID,
-                                          uint8_t mask,
-                                          uint16_t manufacturerCode,
-                                          uint8_t* dataPtr,
-                                          EmberAfAttributeType dataType);
+EmberAfStatus emberAfVerifyAttributeWrite(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
+                                          uint16_t manufacturerCode, uint8_t * dataPtr, EmberAfAttributeType dataType);
 
 /**
  * @brief Read the attribute value, performing all the checks.
@@ -332,13 +306,8 @@ EmberAfStatus emberAfVerifyAttributeWrite(uint8_t endpoint,
  *      emberAfReadManufacturerSpecificClientAttribute,
  *      emberAfReadManufacturerSpecificServerAttribute
  */
-EmberAfStatus emberAfReadAttribute(uint8_t endpoint,
-                                   EmberAfClusterId cluster,
-                                   EmberAfAttributeId attributeID,
-                                   uint8_t mask,
-                                   uint8_t* dataPtr,
-                                   uint8_t readLength,
-                                   EmberAfAttributeType* dataType);
+EmberAfStatus emberAfReadAttribute(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
+                                   uint8_t * dataPtr, uint8_t readLength, EmberAfAttributeType * dataType);
 
 /**
  * @brief Read the server attribute value, performing all the checks.
@@ -352,11 +321,8 @@ EmberAfStatus emberAfReadAttribute(uint8_t endpoint,
  *      emberAfReadManufacturerSpecificClientAttribute,
  *      emberAfReadManufacturerSpecificServerAttribute
  */
-EmberAfStatus emberAfReadServerAttribute(uint8_t endpoint,
-                                         EmberAfClusterId cluster,
-                                         EmberAfAttributeId attributeID,
-                                         uint8_t* dataPtr,
-                                         uint8_t readLength);
+EmberAfStatus emberAfReadServerAttribute(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
+                                         uint8_t * dataPtr, uint8_t readLength);
 
 /**
  * @brief Read the client attribute value, performing all the checks.
@@ -370,11 +336,8 @@ EmberAfStatus emberAfReadServerAttribute(uint8_t endpoint,
  *      emberAfReadManufacturerSpecificClientAttribute,
  *      emberAfReadManufacturerSpecificServerAttribute
  */
-EmberAfStatus emberAfReadClientAttribute(uint8_t endpoint,
-                                         EmberAfClusterId cluster,
-                                         EmberAfAttributeId attributeID,
-                                         uint8_t* dataPtr,
-                                         uint8_t readLength);
+EmberAfStatus emberAfReadClientAttribute(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
+                                         uint8_t * dataPtr, uint8_t readLength);
 
 /**
  * @brief Read the manufacturer-specific server attribute value, performing all checks.
@@ -387,12 +350,9 @@ EmberAfStatus emberAfReadClientAttribute(uint8_t endpoint,
  * @see emberAfReadClientAttribute, emberAfReadServerAttribute,
  *      emberAfReadManufacturerSpecificClientAttribute
  */
-EmberAfStatus emberAfReadManufacturerSpecificServerAttribute(uint8_t endpoint,
-                                                             EmberAfClusterId cluster,
-                                                             EmberAfAttributeId attributeID,
-                                                             uint16_t manufacturerCode,
-                                                             uint8_t* dataPtr,
-                                                             uint8_t readLength);
+EmberAfStatus emberAfReadManufacturerSpecificServerAttribute(uint8_t endpoint, EmberAfClusterId cluster,
+                                                             EmberAfAttributeId attributeID, uint16_t manufacturerCode,
+                                                             uint8_t * dataPtr, uint8_t readLength);
 
 /**
  * @brief Read the manufacturer-specific client attribute value, performing all checks.
@@ -405,12 +365,9 @@ EmberAfStatus emberAfReadManufacturerSpecificServerAttribute(uint8_t endpoint,
  * @see emberAfReadClientAttribute, emberAfReadServerAttribute,
  *      emberAfReadManufacturerSpecificServerAttribute
  */
-EmberAfStatus emberAfReadManufacturerSpecificClientAttribute(uint8_t endpoint,
-                                                             EmberAfClusterId cluster,
-                                                             EmberAfAttributeId attributeID,
-                                                             uint16_t manufacturerCode,
-                                                             uint8_t* dataPtr,
-                                                             uint8_t readLength);
+EmberAfStatus emberAfReadManufacturerSpecificClientAttribute(uint8_t endpoint, EmberAfClusterId cluster,
+                                                             EmberAfAttributeId attributeID, uint16_t manufacturerCode,
+                                                             uint8_t * dataPtr, uint8_t readLength);
 
 /**
  * @brief this function returns the size of the ZCL data in bytes.
@@ -484,7 +441,7 @@ extern EmberAfDefinedEndpoint emAfEndpoints[];
 extern const EmAfZigbeeProNetwork emAfZigbeeProNetworks[];
 
 // The current zigbee PRO network or NULL.
-extern const EmAfZigbeeProNetwork *emAfCurrentZigbeeProNetwork;
+extern const EmAfZigbeeProNetwork * emAfCurrentZigbeeProNetwork;
 
 // true if the current network is a zigbee PRO network.
 #define emAfProIsCurrentNetwork() (emAfCurrentZigbeeProNetwork != NULL)
@@ -548,7 +505,7 @@ uint8_t emberAfNetworkIndexFromEndpoint(uint8_t endpoint);
  * Primary profile is the profile of a primary endpoint as defined
  * in AppBuilder.
  */
-#define emberAfPrimaryProfileId()       emberAfProfileIdFromIndex(0)
+#define emberAfPrimaryProfileId() emberAfProfileIdFromIndex(0)
 
 /**
  * @brief Macro that returns the primary endpoint.
@@ -569,10 +526,11 @@ uint8_t emberAfFixedEndpointCount(void);
  * Data types are either analog or discrete. This makes a difference for
  * some of the ZCL global commands
  */
-enum {
-  EMBER_AF_DATA_TYPE_ANALOG     = 0,
-  EMBER_AF_DATA_TYPE_DISCRETE   = 1,
-  EMBER_AF_DATA_TYPE_NONE       = 2
+enum
+{
+    EMBER_AF_DATA_TYPE_ANALOG   = 0,
+    EMBER_AF_DATA_TYPE_DISCRETE = 1,
+    EMBER_AF_DATA_TYPE_NONE     = 2
 };
 
 /**
@@ -588,30 +546,30 @@ bool emberAfIsTypeSigned(EmberAfAttributeType dataType);
 /**
  * @brief Function that extracts a 32-bit integer from the message buffer
  */
-uint32_t emberAfGetInt32u(const uint8_t* message, uint16_t currentIndex, uint16_t msgLen);
+uint32_t emberAfGetInt32u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
 
 /**
  * @brief Function that extracts a 24-bit integer from the message buffer
  */
-uint32_t emberAfGetInt24u(const uint8_t* message, uint16_t currentIndex, uint16_t msgLen);
+uint32_t emberAfGetInt24u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
 
 /**
  * @brief Function that extracts a 16-bit integer from the message buffer
  */
-uint16_t emberAfGetInt16u(const uint8_t* message, uint16_t currentIndex, uint16_t msgLen);
+uint16_t emberAfGetInt16u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
 /**
  * @brief Function that extracts a ZCL string from the message buffer
  */
-uint8_t* emberAfGetString(uint8_t* message, uint16_t currentIndex, uint16_t msgLen);
+uint8_t * emberAfGetString(uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
 /**
  * @brief Function that extracts a ZCL long string from the message buffer
  */
-uint8_t* emberAfGetLongString(uint8_t* message, uint16_t currentIndex, uint16_t msgLen);
+uint8_t * emberAfGetLongString(uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
 /*
  * @brief Function that extracts a ZCL Date from the message buffer and returns it
  * in the given destination. Returns the number of bytes copied.
  */
-uint8_t emberAfGetDate(uint8_t* message, uint16_t currentIndex, uint16_t msgLen, EmberAfDate *destination);
+uint8_t emberAfGetDate(uint8_t * message, uint16_t currentIndex, uint16_t msgLen, EmberAfDate * destination);
 
 /**
  * @brief Macro for consistency, that extracts single byte out of the message
@@ -625,37 +583,37 @@ uint8_t emberAfGetDate(uint8_t* message, uint16_t currentIndex, uint16_t msgLen,
 /**
  * @brief function that copies a uint16_t value into a buffer
  */
-void emberAfCopyInt16u(uint8_t *data, uint16_t index, uint16_t x);
+void emberAfCopyInt16u(uint8_t * data, uint16_t index, uint16_t x);
 /**
  * @brief function that copies a uint24_t value into a buffer
  */
-void emberAfCopyInt24u(uint8_t *data, uint16_t index, uint32_t x);
+void emberAfCopyInt24u(uint8_t * data, uint16_t index, uint32_t x);
 /**
  * @brief function that copies a uint32_t value into a buffer
  */
-void emberAfCopyInt32u(uint8_t *data, uint16_t index, uint32_t x);
+void emberAfCopyInt32u(uint8_t * data, uint16_t index, uint32_t x);
 /*
  * @brief Function that copies a ZCL string type into a buffer.  The size
  * parameter should indicate the maximum number of characters to copy to the
  * destination buffer not including the length byte.
  */
-void emberAfCopyString(uint8_t *dest, uint8_t *src, uint8_t size);
+void emberAfCopyString(uint8_t * dest, uint8_t * src, uint8_t size);
 /*
  * @brief Function that copies a ZCL long string into a buffer.  The size
  * parameter should indicate the maximum number of characters to copy to the
  * destination buffer not including the length bytes.
  */
-void emberAfCopyLongString(uint8_t *dest, uint8_t *src, uint16_t size);
+void emberAfCopyLongString(uint8_t * dest, uint8_t * src, uint16_t size);
 /*
  * @brief Function that determines the length of a zigbee Cluster Library string
  *   (where the first byte is assumed to be the length).
  */
-uint8_t emberAfStringLength(const uint8_t *buffer);
+uint8_t emberAfStringLength(const uint8_t * buffer);
 /*
  * @brief Function that determines the length of a zigbee Cluster Library long string.
  *   (where the first two bytes are assumed to be the length).
  */
-uint16_t emberAfLongStringLength(const uint8_t *buffer);
+uint16_t emberAfLongStringLength(const uint8_t * buffer);
 
 /*
  * @brief Function that determines the size of a zigbee Cluster Library
@@ -663,8 +621,7 @@ uint16_t emberAfLongStringLength(const uint8_t *buffer);
  * string). For strings, the size includes the length of the string plus the
  * number of the string's length prefix byte(s).
  */
-uint16_t emberAfAttributeValueSize(EmberAfAttributeType dataType,
-                                   const uint8_t *buffer);
+uint16_t emberAfAttributeValueSize(EmberAfAttributeType dataType, const uint8_t * buffer);
 
 /** @} END Attribute Storage */
 
@@ -725,7 +682,7 @@ bool emberAfEndpointIndexIsEnabled(uint8_t index);
  * @brief This indicates the continuation of an image verification already
  * in progress.
  */
-#define EMBER_AF_CONTINUE_IMAGE_VERIFY  false
+#define EMBER_AF_CONTINUE_IMAGE_VERIFY false
 
 /**
  * @brief This variable defines an invalid image id.  It is used
@@ -796,7 +753,7 @@ uint8_t emberAfGetLastSequenceNumber(void);
  *          greater than 4 is being compared
  *          1, if val2 is smaller.
  */
-int8_t emberAfCompareValues(uint8_t* val1, uint8_t* val2, uint8_t len, bool signedNumber);
+int8_t emberAfCompareValues(uint8_t * val1, uint8_t * val2, uint8_t len, bool signedNumber);
 
 /**
  * @brief populates the passed EUI64 with the local EUI64 MAC address.
@@ -806,7 +763,7 @@ void emberAfGetEui64(EmberEUI64 returnEui64);
 #ifdef EZSP_HOST
 // Normally this is provided by the stack code, but on the host
 // it is provided by the application code.
-void emberReverseMemCopy(uint8_t* dest, const uint8_t* src, uint16_t length);
+void emberReverseMemCopy(uint8_t * dest, const uint8_t * src, uint16_t length);
 #endif
 
 /**
@@ -818,9 +775,9 @@ EmberNodeId emberAfGetNodeId(void);
 /**
  * @brief Generates a random key (link, network, or master).
  */
-EmberStatus emberAfGenerateRandomKey(EmberKeyData *result);
+EmberStatus emberAfGenerateRandomKey(EmberKeyData * result);
 #else
-  #define emberAfGenerateRandomKey(result) emberGenerateRandomKey(result)
+#define emberAfGenerateRandomKey(result) emberGenerateRandomKey(result)
 #endif
 
 /**
@@ -859,23 +816,22 @@ uint8_t emberAfGetRadioChannel(void);
 /**
  * @brief Returns the current network parameters.
  */
-EmberStatus emberAfGetNetworkParameters(EmberNodeType *nodeType,
-                                        EmberNetworkParameters *parameters);
+EmberStatus emberAfGetNetworkParameters(EmberNodeType * nodeType, EmberNetworkParameters * parameters);
 
 /**
  * @brief Returns the current node type.
  */
-EmberStatus emberAfGetNodeType(EmberNodeType *nodeType);
+EmberStatus emberAfGetNodeType(EmberNodeType * nodeType);
 
 /**
  */
-#define EMBER_AF_REJOIN_DUE_TO_END_DEVICE_MOVE            0xA0
-#define EMBER_AF_REJOIN_DUE_TO_TC_KEEPALIVE_FAILURE       0xA1
-#define EMBER_AF_REJOIN_DUE_TO_CLI_COMMAND                0xA2
-#define EMBER_AF_REJOIN_DUE_TO_WWAH_CONNECTIVITY_MANAGER  0xA3
+#define EMBER_AF_REJOIN_DUE_TO_END_DEVICE_MOVE 0xA0
+#define EMBER_AF_REJOIN_DUE_TO_TC_KEEPALIVE_FAILURE 0xA1
+#define EMBER_AF_REJOIN_DUE_TO_CLI_COMMAND 0xA2
+#define EMBER_AF_REJOIN_DUE_TO_WWAH_CONNECTIVITY_MANAGER 0xA3
 
-#define EMBER_AF_REJOIN_FIRST_REASON                EMBER_AF_REJOIN_DUE_TO_END_DEVICE_MOVE
-#define EMBER_AF_REJOIN_LAST_REASON                 EMBER_AF_REJOIN_DUE_TO_END_DEVICE_MOVE
+#define EMBER_AF_REJOIN_FIRST_REASON EMBER_AF_REJOIN_DUE_TO_END_DEVICE_MOVE
+#define EMBER_AF_REJOIN_LAST_REASON EMBER_AF_REJOIN_DUE_TO_END_DEVICE_MOVE
 
 /**
  * @brief Enables local permit join and optionally broadcasts the ZDO
@@ -890,8 +846,7 @@ EmberStatus emberAfGetNodeType(EmberNodeType *nodeType);
  *
  * @returns status of whether or not permit join was enabled.
  */
-EmberStatus emberAfPermitJoin(uint8_t duration,
-                              bool broadcastMgmtPermitJoin);
+EmberStatus emberAfPermitJoin(uint8_t duration, bool broadcastMgmtPermitJoin);
 
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 /**
@@ -907,8 +862,7 @@ EmberStatus emberAfPermitJoin(uint8_t duration,
  */
 EmberStatus emberAfBroadcastPermitJoin(uint8_t duration);
 #else
-  #define emberAfBroadcastPermitJoin(duration) \
-  emberAfPermitJoin((duration), true)
+#define emberAfBroadcastPermitJoin(duration) emberAfPermitJoin((duration), true)
 #endif
 
 /** @} END Miscellaneous */
@@ -919,14 +873,12 @@ EmberStatus emberAfBroadcastPermitJoin(uint8_t duration);
 /**
  * @brief A function used to add a task to the task register.
  */
-#define emberAfAddToCurrentAppTasks(x) \
-  emberAfAddToCurrentAppTasksCallback(x)
+#define emberAfAddToCurrentAppTasks(x) emberAfAddToCurrentAppTasksCallback(x)
 
 /**
  * @brief A function used to remove a task from the task register.
  */
-#define emberAfRemoveFromCurrentAppTasks(x) \
-  emberAfRemoveFromCurrentAppTasksCallback(x)
+#define emberAfRemoveFromCurrentAppTasks(x) emberAfRemoveFromCurrentAppTasksCallback(x)
 
 /**
  * @brief A macro used to retrieve the bitmask of all application
@@ -977,12 +929,8 @@ void emberAfRunEvents(void);
  *
  * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
  */
-EmberStatus emberAfScheduleTickExtended(uint8_t endpoint,
-                                        EmberAfClusterId clusterId,
-                                        bool isClient,
-                                        uint32_t delayMs,
-                                        EmberAfEventPollControl pollControl,
-                                        EmberAfEventSleepControl sleepControl);
+EmberStatus emberAfScheduleTickExtended(uint8_t endpoint, EmberAfClusterId clusterId, bool isClient, uint32_t delayMs,
+                                        EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl);
 
 /**
  * @brief This function is used to schedule a cluster-related event inside the
@@ -1003,10 +951,7 @@ EmberStatus emberAfScheduleTickExtended(uint8_t endpoint,
  *
  * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
  */
-EmberStatus emberAfScheduleClusterTick(uint8_t endpoint,
-                                       EmberAfClusterId clusterId,
-                                       bool isClient,
-                                       uint32_t delayMs,
+EmberStatus emberAfScheduleClusterTick(uint8_t endpoint, EmberAfClusterId clusterId, bool isClient, uint32_t delayMs,
                                        EmberAfEventSleepControl sleepControl);
 
 /**
@@ -1023,11 +968,8 @@ EmberStatus emberAfScheduleClusterTick(uint8_t endpoint,
  *
  * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
  */
-EmberStatus emberAfScheduleClientTickExtended(uint8_t endpoint,
-                                              EmberAfClusterId clusterId,
-                                              uint32_t delayMs,
-                                              EmberAfEventPollControl pollControl,
-                                              EmberAfEventSleepControl sleepControl);
+EmberStatus emberAfScheduleClientTickExtended(uint8_t endpoint, EmberAfClusterId clusterId, uint32_t delayMs,
+                                              EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl);
 
 /**
  * @brief A function used to schedule a cluster client event.  This function
@@ -1040,9 +982,7 @@ EmberStatus emberAfScheduleClientTickExtended(uint8_t endpoint,
  *
  * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
  */
-EmberStatus emberAfScheduleClientTick(uint8_t endpoint,
-                                      EmberAfClusterId clusterId,
-                                      uint32_t delayMs);
+EmberStatus emberAfScheduleClientTick(uint8_t endpoint, EmberAfClusterId clusterId, uint32_t delayMs);
 
 /**
  * @brief A function used to schedule a cluster server event.  This function
@@ -1058,11 +998,8 @@ EmberStatus emberAfScheduleClientTick(uint8_t endpoint,
  *
  * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
  */
-EmberStatus emberAfScheduleServerTickExtended(uint8_t endpoint,
-                                              EmberAfClusterId clusterId,
-                                              uint32_t delayMs,
-                                              EmberAfEventPollControl pollControl,
-                                              EmberAfEventSleepControl sleepControl);
+EmberStatus emberAfScheduleServerTickExtended(uint8_t endpoint, EmberAfClusterId clusterId, uint32_t delayMs,
+                                              EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl);
 
 /**
  * @brief A function used to schedule a cluster server event.  This function
@@ -1075,9 +1012,7 @@ EmberStatus emberAfScheduleServerTickExtended(uint8_t endpoint,
  *
  * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
  */
-EmberStatus emberAfScheduleServerTick(uint8_t endpoint,
-                                      EmberAfClusterId clusterId,
-                                      uint32_t delayMs);
+EmberStatus emberAfScheduleServerTick(uint8_t endpoint, EmberAfClusterId clusterId, uint32_t delayMs);
 
 /**
  * @brief A function used to deactivate a cluster-related event.  This function
@@ -1093,9 +1028,7 @@ EmberStatus emberAfScheduleServerTick(uint8_t endpoint,
  *
  * @return EMBER_SUCCESS if the event was deactivated or an error otherwise.
  */
-EmberStatus emberAfDeactivateClusterTick(uint8_t endpoint,
-                                         EmberAfClusterId clusterId,
-                                         bool isClient);
+EmberStatus emberAfDeactivateClusterTick(uint8_t endpoint, EmberAfClusterId clusterId, bool isClient);
 
 /**
  * @brief A function used to deactivate a cluster client event.  This function
@@ -1106,8 +1039,7 @@ EmberStatus emberAfDeactivateClusterTick(uint8_t endpoint,
  *
  * @return EMBER_SUCCESS if the event was deactivated or an error otherwise.
  */
-EmberStatus emberAfDeactivateClientTick(uint8_t endpoint,
-                                        EmberAfClusterId clusterId);
+EmberStatus emberAfDeactivateClientTick(uint8_t endpoint, EmberAfClusterId clusterId);
 
 /**
  * @brief A function used to deactivate a cluster server event.  This function
@@ -1118,8 +1050,7 @@ EmberStatus emberAfDeactivateClientTick(uint8_t endpoint,
  *
  * @return EMBER_SUCCESS if the event was deactivated or an error otherwise.
  */
-EmberStatus emberAfDeactivateServerTick(uint8_t endpoint,
-                                        EmberAfClusterId clusterId);
+EmberStatus emberAfDeactivateServerTick(uint8_t endpoint, EmberAfClusterId clusterId);
 
 /**
  * @brief Sets the ::EmberEventControl to run "delayMs" milliseconds in the
@@ -1134,19 +1065,16 @@ EmberStatus emberAfDeactivateServerTick(uint8_t endpoint,
            event and return ::EMBER_SUCCESS.  Otherwise it will return
            ::EMBER_BAD_ARGUMENT.
  */
-EmberStatus emberAfEventControlSetDelayMS(EmberEventControl *control,
-                                          uint32_t delayMs);
+EmberStatus emberAfEventControlSetDelayMS(EmberEventControl * control, uint32_t delayMs);
 
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 /**
  * @brief Sets the ::EmberEventControl to run "delayMs" milliseconds in the
  * future.  See ::emberAfEventControlSetDelayMS.
  */
-EmberStatus emberAfEventControlSetDelay(EmberEventControl *eventControl,
-                                        uint32_t delayMs);
+EmberStatus emberAfEventControlSetDelay(EmberEventControl * eventControl, uint32_t delayMs);
 #else
-#define emberAfEventControlSetDelay(control, delayMs) \
-  emberAfEventControlSetDelayMS(control, delayMs)
+#define emberAfEventControlSetDelay(control, delayMs) emberAfEventControlSetDelayMS(control, delayMs)
 #endif
 
 /**
@@ -1163,8 +1091,7 @@ EmberStatus emberAfEventControlSetDelay(EmberEventControl *eventControl,
            event and return ::EMBER_SUCCESS.  Otherwise it will return
            ::EMBER_BAD_ARGUMENT.
  */
-EmberStatus emberAfEventControlSetDelayQS(EmberEventControl *control,
-                                          uint32_t delayQs);
+EmberStatus emberAfEventControlSetDelayQS(EmberEventControl * control, uint32_t delayQs);
 
 /**
  * @brief Sets the ::EmberEventControl to run "delayM" minutes in the future.
@@ -1180,111 +1107,94 @@ EmberStatus emberAfEventControlSetDelayQS(EmberEventControl *control,
            the event and return ::EMBER_SUCCESS.  Otherwise it will return
            ::EMBER_BAD_ARGUMENT.
  */
-EmberStatus emberAfEventControlSetDelayMinutes(EmberEventControl *control,
-                                               uint16_t delayM);
+EmberStatus emberAfEventControlSetDelayMinutes(EmberEventControl * control, uint16_t delayM);
 
 /**
  * @brief Sets the ::EmberEventControl for the current network, and only
  * the current network, as inactive.  See ::emberEventControlSetInactive.
  */
-void emberAfNetworkEventControlSetInactive(EmberEventControl *controls);
+void emberAfNetworkEventControlSetInactive(EmberEventControl * controls);
 /**
  * @brief Returns true if the event for the current network, and only the
  * current network, is active.  See ::emberEventControlGetActive.
  */
-bool emberAfNetworkEventControlGetActive(EmberEventControl *controls);
+bool emberAfNetworkEventControlGetActive(EmberEventControl * controls);
 /**
  * @brief Sets the ::EmberEventControl for the current network, and only
  * current network, to run at the next available opportunity.  See
  * ::emberEventControlSetActive.
  */
-void emberAfNetworkEventControlSetActive(EmberEventControl *controls);
+void emberAfNetworkEventControlSetActive(EmberEventControl * controls);
 /**
  * @brief Sets the ::EmberEventControl for the current network, and only the
  * current network, to run "delayMs" milliseconds in the future.  See
  * ::emberAfEventControlSetDelayMS.
  */
-EmberStatus emberAfNetworkEventControlSetDelayMS(EmberEventControl *controls,
-                                                 uint32_t delayMs);
+EmberStatus emberAfNetworkEventControlSetDelayMS(EmberEventControl * controls, uint32_t delayMs);
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 /**
  * @brief Sets the ::EmberEventControl for the current network, and only the
  * current network, to run "delayMs" milliseconds in the future.  See
  * ::emberAfEventControlSetDelayMS.
  */
-EmberStatus emberAfNetworkEventControlSetDelay(EmberEventControl *controls,
-                                               uint32_t delayMs);
+EmberStatus emberAfNetworkEventControlSetDelay(EmberEventControl * controls, uint32_t delayMs);
 #else
-#define emberAfNetworkEventControlSetDelay(controls, delayMs) \
-  emberAfNetworkEventControlSetDelayMS(controls, delayMs);
+#define emberAfNetworkEventControlSetDelay(controls, delayMs) emberAfNetworkEventControlSetDelayMS(controls, delayMs);
 #endif
 /**
  * @brief Sets the ::EmberEventControl for the current network, and only the
  * current network, to run "delayQs" quarter seconds in the future.  See
  * ::emberAfEventControlSetDelayQS.
  */
-EmberStatus emberAfNetworkEventControlSetDelayQS(EmberEventControl *controls,
-                                                 uint32_t delayQs);
+EmberStatus emberAfNetworkEventControlSetDelayQS(EmberEventControl * controls, uint32_t delayQs);
 /**
  * @brief Sets the ::EmberEventControl for the current network, and only the
  * current network, to run "delayM" minutes in the future.  See
  * ::emberAfEventControlSetDelayMinutes.
  */
-EmberStatus emberAfNetworkEventControlSetDelayMinutes(EmberEventControl *controls,
-                                                      uint16_t delayM);
+EmberStatus emberAfNetworkEventControlSetDelayMinutes(EmberEventControl * controls, uint16_t delayM);
 
 /**
  * @brief Sets the ::EmberEventControl for the specified endpoint as inactive.
  * See ::emberEventControlSetInactive.
  */
-EmberStatus emberAfEndpointEventControlSetInactive(EmberEventControl *controls,
-                                                   uint8_t endpoint);
+EmberStatus emberAfEndpointEventControlSetInactive(EmberEventControl * controls, uint8_t endpoint);
 /**
  * @brief Returns true if the event for the current number is active.  See
  * ::emberEventControlGetActive.
  */
-bool emberAfEndpointEventControlGetActive(EmberEventControl *controls,
-                                          uint8_t endpoint);
+bool emberAfEndpointEventControlGetActive(EmberEventControl * controls, uint8_t endpoint);
 /**
  * @brief Sets the ::EmberEventControl for the specified endpoint to run at the
  * next available opportunity.  See ::emberEventControlSetActive.
  */
-EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl *controls,
-                                                 uint8_t endpoint);
+EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl * controls, uint8_t endpoint);
 /**
  * @brief Sets the ::EmberEventControl for the specified endpoint to run
  * "delayMs" milliseconds in the future.  See ::emberAfEventControlSetDelayMS.
  */
-EmberStatus emberAfEndpointEventControlSetDelayMS(EmberEventControl *controls,
-                                                  uint8_t endpoint,
-                                                  uint32_t delayMs);
+EmberStatus emberAfEndpointEventControlSetDelayMS(EmberEventControl * controls, uint8_t endpoint, uint32_t delayMs);
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 /**
  * @brief Sets the ::EmberEventControl for the specified endpoint to run
  * "delayMs" milliseconds in the future.  See ::emberAfEventControlSetDelayMS.
  */
-EmberStatus emberAfEndpointEventControlSetDelay(EmberEventControl *controls,
-                                                uint8_t endpoint,
-                                                uint32_t delayMs);
+EmberStatus emberAfEndpointEventControlSetDelay(EmberEventControl * controls, uint8_t endpoint, uint32_t delayMs);
 #else
-#define emberAfEndpointEventControlSetDelay(controls, endpoint, delayMs) \
-  emberAfEndpointEventControlSetDelayMS(controls, endpoint, delayMs);
+#define emberAfEndpointEventControlSetDelay(controls, endpoint, delayMs)                                                           \
+    emberAfEndpointEventControlSetDelayMS(controls, endpoint, delayMs);
 #endif
 /**
  * @brief Sets the ::EmberEventControl for the specified endpoint to run
  * "delayQs" quarter seconds in the future.  See
  * ::emberAfEventControlSetDelayQS.
  */
-EmberStatus emberAfEndpointEventControlSetDelayQS(EmberEventControl *controls,
-                                                  uint8_t endpoint,
-                                                  uint32_t delayQs);
+EmberStatus emberAfEndpointEventControlSetDelayQS(EmberEventControl * controls, uint8_t endpoint, uint32_t delayQs);
 /**
  * @brief Sets the ::EmberEventControl for the specified endpoint to run
  * "delayM" minutes in the future.  See ::emberAfEventControlSetDelayMinutes.
  */
-EmberStatus emberAfEndpointEventControlSetDelayMinutes(EmberEventControl *controls,
-                                                       uint8_t endpoint,
-                                                       uint16_t delayM);
+EmberStatus emberAfEndpointEventControlSetDelayMinutes(EmberEventControl * controls, uint8_t endpoint, uint16_t delayM);
 
 /**
  * @brief A function used to retrieve the number of milliseconds until
@@ -1301,7 +1211,7 @@ uint32_t emberAfMsToNextEvent(uint32_t maxMs);
  *  following addition.  If returnIndex is non-NULL it returns the index
  *  of the event that is ready to fire next.
  */
-uint32_t emberAfMsToNextEventExtended(uint32_t maxMs, uint8_t* returnIndex);
+uint32_t emberAfMsToNextEventExtended(uint32_t maxMs, uint8_t * returnIndex);
 
 /**
  * @brief A function used to retrieve the number of quarter seconds until
@@ -1313,9 +1223,8 @@ uint32_t emberAfMsToNextEventExtended(uint32_t maxMs, uint8_t* returnIndex);
  * @return The number of quarter seconds until the next event or
  * maxQS if no event is scheduled before then.
  */
-#define emberAfQSToNextEvent(maxQS)                                  \
-  (emberAfMsToNextEvent(maxQS * MILLISECOND_TICKS_PER_QUARTERSECOND) \
-   / MILLISECOND_TICKS_PER_QUARTERSECOND)
+#define emberAfQSToNextEvent(maxQS)                                                                                                \
+    (emberAfMsToNextEvent(maxQS * MILLISECOND_TICKS_PER_QUARTERSECOND) / MILLISECOND_TICKS_PER_QUARTERSECOND)
 
 /**
  * @brief A function for retrieving the most restrictive sleep
@@ -1331,8 +1240,7 @@ uint32_t emberAfMsToNextEventExtended(uint32_t maxMs, uint8_t* returnIndex);
  *         EMBER_AF_OK_TO_HIBERNATE but can be changed at any
  *         time using the emberAfSetDefaultSleepControl() function.
  */
-#define emberAfGetCurrentSleepControl() \
-  emberAfGetCurrentSleepControlCallback()
+#define emberAfGetCurrentSleepControl() emberAfGetCurrentSleepControlCallback()
 
 /**
  * @brief A function for setting the default sleep control
@@ -1343,8 +1251,7 @@ uint32_t emberAfMsToNextEventExtended(uint32_t maxMs, uint8_t* returnIndex);
  *        the value to EMBER_AF_OK_TO_HIBERNATE once the wake
  *        period is complete.
  */
-#define  emberAfSetDefaultSleepControl(x) \
-  emberAfSetDefaultSleepControlCallback(x)
+#define emberAfSetDefaultSleepControl(x) emberAfSetDefaultSleepControlCallback(x)
 
 /**
  * @brief A function used to retrieve the default sleep control against
@@ -1354,8 +1261,7 @@ uint32_t emberAfMsToNextEventExtended(uint32_t maxMs, uint8_t* returnIndex);
  *        at any time using the emberAfSetDefaultSleepControl() function.
  * @return The current default sleep control value.
  */
-#define emberAfGetDefaultSleepControl() \
-  emberAfGetDefaultSleepControlCallback()
+#define emberAfGetDefaultSleepControl() emberAfGetDefaultSleepControlCallback()
 
 /** @} END Sleep Control */
 
@@ -1384,10 +1290,7 @@ EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback)
 /**
  * @brief Sends multicast.
  */
-EmberStatus emberAfSendMulticast(EmberMulticastId multicastId,
-                                 EmberApsFrame *apsFrame,
-                                 uint16_t messageLength,
-                                 uint8_t* message);
+EmberStatus emberAfSendMulticast(EmberMulticastId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message);
 
 /**
  * @brief Multicasts the message to the group in the binding table that
@@ -1396,76 +1299,50 @@ EmberStatus emberAfSendMulticast(EmberMulticastId multicastId,
  * significant amount of network traffic. Care should be taken when considering
  * the effects of broadcasts in a network.
  */
-EmberStatus emberAfSendMulticastToBindings(EmberApsFrame *apsFrame,
-                                           uint16_t messageLength,
-                                           uint8_t* message);
+EmberStatus emberAfSendMulticastToBindings(EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message);
 
 /**
  * @brief Sends Multicast with alias with attached message sent callback
  */
-EmberStatus emberAfSendMulticastWithAliasWithCallback(EmberMulticastId multicastId,
-                                                      EmberApsFrame *apsFrame,
-                                                      uint16_t messageLength,
-                                                      uint8_t *message,
-                                                      EmberNodeId alias,
-                                                      uint8_t sequence,
-                                                      EmberAfMessageSentFunction callback);
+EmberStatus emberAfSendMulticastWithAliasWithCallback(EmberMulticastId multicastId, EmberApsFrame * apsFrame,
+                                                      uint16_t messageLength, uint8_t * message, EmberNodeId alias,
+                                                      uint8_t sequence, EmberAfMessageSentFunction callback);
 
 /**
  * @brief Sends multicast with attached message sent callback.
  */
-EmberStatus emberAfSendMulticastWithCallback(EmberMulticastId multicastId,
-                                             EmberApsFrame *apsFrame,
-                                             uint16_t messageLength,
-                                             uint8_t* message,
-                                             EmberAfMessageSentFunction callback);
+EmberStatus emberAfSendMulticastWithCallback(EmberMulticastId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength,
+                                             uint8_t * message, EmberAfMessageSentFunction callback);
 
 /**
  * @brief Sends broadcast.
  */
-EmberStatus emberAfSendBroadcast(EmberNodeId destination,
-                                 EmberApsFrame *apsFrame,
-                                 uint16_t messageLength,
-                                 uint8_t* message);
+EmberStatus emberAfSendBroadcast(EmberNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message);
 
 /**
  * @brief Sends broadcast with attached message sent callback.
  */
-EmberStatus emberAfSendBroadcastWithCallback(EmberNodeId destination,
-                                             EmberApsFrame *apsFrame,
-                                             uint16_t messageLength,
-                                             uint8_t* message,
-                                             EmberAfMessageSentFunction callback);
+EmberStatus emberAfSendBroadcastWithCallback(EmberNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength,
+                                             uint8_t * message, EmberAfMessageSentFunction callback);
 
 /**
  * @brief Sends broadcast with alias with attached message sent callback.
  */
-EmberStatus emberAfSendBroadcastWithAliasWithCallback(EmberNodeId destination,
-                                                      EmberApsFrame *apsFrame,
-                                                      uint16_t messageLength,
-                                                      uint8_t *message,
-                                                      EmberNodeId alias,
-                                                      uint8_t sequence,
+EmberStatus emberAfSendBroadcastWithAliasWithCallback(EmberNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength,
+                                                      uint8_t * message, EmberNodeId alias, uint8_t sequence,
                                                       EmberAfMessageSentFunction callback);
 
 /**
  * @brief Sends unicast.
  */
-EmberStatus emberAfSendUnicast(EmberOutgoingMessageType type,
-                               uint16_t indexOrDestination,
-                               EmberApsFrame *apsFrame,
-                               uint16_t messageLength,
-                               uint8_t* message);
+EmberStatus emberAfSendUnicast(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame,
+                               uint16_t messageLength, uint8_t * message);
 
 /**
  * @brief Sends unicast with attached message sent callback.
  */
-EmberStatus emberAfSendUnicastWithCallback(EmberOutgoingMessageType type,
-                                           uint16_t indexOrDestination,
-                                           EmberApsFrame *apsFrame,
-                                           uint16_t messageLength,
-                                           uint8_t* message,
-                                           EmberAfMessageSentFunction callback);
+EmberStatus emberAfSendUnicastWithCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame,
+                                           uint16_t messageLength, uint8_t * message, EmberAfMessageSentFunction callback);
 
 /**
  * @brief Unicasts the message to each remote node in the binding table that
@@ -1473,29 +1350,20 @@ EmberStatus emberAfSendUnicastWithCallback(EmberOutgoingMessageType type,
  * binding table contains many matching entries, calling this API cause a
  * significant amount of network traffic.
  */
-EmberStatus emberAfSendUnicastToBindings(EmberApsFrame *apsFrame,
-                                         uint16_t messageLength,
-                                         uint8_t* message);
+EmberStatus emberAfSendUnicastToBindings(EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message);
 
 /**
  * @brief emberAfSendUnicastToBindings with attached message sent callback.
  */
-EmberStatus emberAfSendUnicastToBindingsWithCallback(EmberApsFrame *apsFrame,
-                                                     uint16_t messageLength,
-                                                     uint8_t* message,
+EmberStatus emberAfSendUnicastToBindingsWithCallback(EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message,
                                                      EmberAfMessageSentFunction callback);
 
 /**
  * @brief Sends interpan message.
  */
-EmberStatus emberAfSendInterPan(EmberPanId panId,
-                                const EmberEUI64 destinationLongId,
-                                EmberNodeId destinationShortId,
-                                EmberMulticastId multicastId,
-                                EmberAfClusterId clusterId,
-                                EmberAfProfileId profileId,
-                                uint16_t messageLength,
-                                uint8_t* messageBytes);
+EmberStatus emberAfSendInterPan(EmberPanId panId, const EmberEUI64 destinationLongId, EmberNodeId destinationShortId,
+                                EmberMulticastId multicastId, EmberAfClusterId clusterId, EmberAfProfileId profileId,
+                                uint16_t messageLength, uint8_t * messageBytes);
 
 /**
  * @brief Sends end device binding request.
@@ -1540,8 +1408,7 @@ EmberStatus emberAfSendCommandMulticastWithAlias(EmberMulticastId multicastId, E
 /**
  * @brief emberAfSendCommandMulticast with attached message sent callback.
  */
-EmberStatus emberAfSendCommandMulticastWithCallback(EmberMulticastId multicastId,
-                                                    EmberAfMessageSentFunction callback);
+EmberStatus emberAfSendCommandMulticastWithCallback(EmberMulticastId multicastId, EmberAfMessageSentFunction callback);
 
 /**
  * @brief Sends the command prepared with emberAfFill.... macro.
@@ -1561,14 +1428,12 @@ EmberStatus emberAfSendCommandMulticastToBindings(void);
  * using the emberAfFill... macros from the client command API.
  * It will be sent as unicast.
  */
-EmberStatus emberAfSendCommandUnicast(EmberOutgoingMessageType type,
-                                      uint16_t indexOrDestination);
+EmberStatus emberAfSendCommandUnicast(EmberOutgoingMessageType type, uint16_t indexOrDestination);
 
 /**
  * @brief emberAfSendCommandUnicast with attached message sent callback.
  */
-EmberStatus emberAfSendCommandUnicastWithCallback(EmberOutgoingMessageType type,
-                                                  uint16_t indexOrDestination,
+EmberStatus emberAfSendCommandUnicastWithCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination,
                                                   EmberAfMessageSentFunction callback);
 
 /**
@@ -1582,15 +1447,12 @@ EmberStatus emberAfSendCommandBroadcast(EmberNodeId destination);
 /**
  * @brief emberAfSendCommandBroadcast with attached message sent callback.
  */
-EmberStatus emberAfSendCommandBroadcastWithCallback(EmberNodeId destination,
-                                                    EmberAfMessageSentFunction callback);
+EmberStatus emberAfSendCommandBroadcastWithCallback(EmberNodeId destination, EmberAfMessageSentFunction callback);
 
 /**
  * @brief emberAfSendCommandBroadcast from alias with attached message sent callback.
  */
-EmberStatus emberAfSendCommandBroadcastWithAliasWithCallback(EmberNodeId destination,
-                                                             EmberNodeId alias,
-                                                             uint8_t sequence,
+EmberStatus emberAfSendCommandBroadcastWithAliasWithCallback(EmberNodeId destination, EmberNodeId alias, uint8_t sequence,
                                                              EmberAfMessageSentFunction callback);
 
 /**
@@ -1599,9 +1461,7 @@ EmberStatus emberAfSendCommandBroadcastWithAliasWithCallback(EmberNodeId destina
  * This function is used to send a command that was previously prepared
  * using the emberAfFill... macros from the client command API.
  */
-EmberStatus emberAfSendCommandBroadcastWithAlias(EmberNodeId destination,
-                                                 EmberNodeId alias,
-                                                 uint8_t sequence);
+EmberStatus emberAfSendCommandBroadcastWithAlias(EmberNodeId destination, EmberNodeId alias, uint8_t sequence);
 /**
  * @brief Sends the command prepared with emberAfFill.... macro.
  *
@@ -1612,11 +1472,8 @@ EmberStatus emberAfSendCommandBroadcastWithAlias(EmberNodeId destination,
  * message will be sent to destinationShortId using short address mode.  IF
  * multicastId is not zero, the message will be sent using multicast mode.
  */
-EmberStatus emberAfSendCommandInterPan(EmberPanId panId,
-                                       const EmberEUI64 destinationLongId,
-                                       EmberNodeId destinationShortId,
-                                       EmberMulticastId multicastId,
-                                       EmberAfProfileId profileId);
+EmberStatus emberAfSendCommandInterPan(EmberPanId panId, const EmberEUI64 destinationLongId, EmberNodeId destinationShortId,
+                                       EmberMulticastId multicastId, EmberAfProfileId profileId);
 
 /**
  * @brief Sends a default response to a cluster command.
@@ -1629,14 +1486,12 @@ EmberStatus emberAfSendCommandInterPan(EmberPanId panId,
  * @return An ::EmberStatus value that indicates the success or failure of
  * sending the response.
  */
-EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand *cmd,
-                                       EmberAfStatus status);
+EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberAfStatus status);
 
 /**
  * @brief emberAfSendDefaultResponse with attached message sent callback.
  */
-EmberStatus emberAfSendDefaultResponseWithCallback(const EmberAfClusterCommand *cmd,
-                                                   EmberAfStatus status,
+EmberStatus emberAfSendDefaultResponseWithCallback(const EmberAfClusterCommand * cmd, EmberAfStatus status,
                                                    EmberAfMessageSentFunction callback);
 
 /**
@@ -1655,8 +1510,7 @@ EmberStatus emberAfSendImmediateDefaultResponse(EmberAfStatus status);
 /**
  * @brief emberAfSendImmediateDefaultResponse with attached message sent callback.
  */
-EmberStatus emberAfSendImmediateDefaultResponseWithCallback(EmberAfStatus status,
-                                                            EmberAfMessageSentFunction callback);
+EmberStatus emberAfSendImmediateDefaultResponseWithCallback(EmberAfStatus status, EmberAfMessageSentFunction callback);
 
 /**
  * @brief Returns the maximum size of the payload that the Application
@@ -1674,14 +1528,12 @@ EmberStatus emberAfSendImmediateDefaultResponseWithCallback(EmberAfStatus status
  * @param apsFrame The APS frame for the message.
  * @return The maximum APS payload length for the given message.
  */
-uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type,
-                                       uint16_t indexOrDestination,
-                                       EmberApsFrame *apsFrame);
+uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame);
 
 /**
  * @brief Access to client API APS frame.
  */
-EmberApsFrame *emberAfGetCommandApsFrame(void);
+EmberApsFrame * emberAfGetCommandApsFrame(void);
 
 /**
  * @brief Set the source and destination endpoints in the client API APS frame.
@@ -1725,11 +1577,8 @@ void emberAfSetCommandEndpoints(uint8_t sourceEndpoint, uint8_t destinationEndpo
  *  a match is discovered.  (For broadcast discoveries, this is called once per
  *  matching node, even if a node has multiple matching endpoints.)
  */
-EmberStatus emberAfFindDevicesByProfileAndCluster(EmberNodeId target,
-                                                  EmberAfProfileId profileId,
-                                                  EmberAfClusterId clusterId,
-                                                  bool serverCluster,
-                                                  EmberAfServiceDiscoveryCallback *callback);
+EmberStatus emberAfFindDevicesByProfileAndCluster(EmberNodeId target, EmberAfProfileId profileId, EmberAfClusterId clusterId,
+                                                  bool serverCluster, EmberAfServiceDiscoveryCallback * callback);
 
 /**
  * @brief Use this function to find all of the given in and out clusters
@@ -1745,31 +1594,27 @@ EmberStatus emberAfFindDevicesByProfileAndCluster(EmberNodeId target,
  * @param callback Function pointer for the callback function triggered when
  *  the discovery is returned.
  */
-EmberStatus emberAfFindClustersByDeviceAndEndpoint(EmberNodeId target,
-                                                   uint8_t targetEndpoint,
-                                                   EmberAfServiceDiscoveryCallback *callback);
+EmberStatus emberAfFindClustersByDeviceAndEndpoint(EmberNodeId target, uint8_t targetEndpoint,
+                                                   EmberAfServiceDiscoveryCallback * callback);
 
 /**
  * @brief Use this function to initiate a discovery for the IEEE address
  *   of the specified node id.  This will send a unicast sent to the target
  *   node ID.
  */
-EmberStatus emberAfFindIeeeAddress(EmberNodeId shortAddress,
-                                   EmberAfServiceDiscoveryCallback *callback);
+EmberStatus emberAfFindIeeeAddress(EmberNodeId shortAddress, EmberAfServiceDiscoveryCallback * callback);
 
 /**
  * @brief Use this function to initiate a discovery for the short ID of the
  *   specified long address.  This will send a broadcast to all
  *   rx-on-when-idle devices (non-sleepies).
  */
-EmberStatus emberAfFindNodeId(EmberEUI64 longAddress,
-                              EmberAfServiceDiscoveryCallback *callback);
+EmberStatus emberAfFindNodeId(EmberEUI64 longAddress, EmberAfServiceDiscoveryCallback * callback);
 
 /**
  * @brief Initiate an Active Endpoint request ZDO message to the target node ID.
  */
-EmberStatus emberAfFindActiveEndpoints(EmberNodeId target,
-                                       EmberAfServiceDiscoveryCallback *callback);
+EmberStatus emberAfFindActiveEndpoints(EmberNodeId target, EmberAfServiceDiscoveryCallback * callback);
 
 /**
  * @brief Use this function to add an entry for a remote device to the address
@@ -1811,9 +1656,7 @@ uint8_t emberAfAddAddressTableEntry(EmberEUI64 longId, EmberNodeId shortId);
  * framework, or ::EMBER_ADDRESS_TABLE_INDEX_OUT_OF_RANGE if the index is out
  * of range.
  */
-EmberStatus emberAfSetAddressTableEntry(uint8_t index,
-                                        EmberEUI64 longId,
-                                        EmberNodeId shortId);
+EmberStatus emberAfSetAddressTableEntry(uint8_t index, EmberEUI64 longId, EmberNodeId shortId);
 
 /**
  * @brief Use this function to remove a specific entry from the address table.
@@ -1838,7 +1681,7 @@ EmberStatus emberAfRemoveAddressTableEntry(uint8_t index);
  * will be null.
  */
 #define emberAfCurrentCommand() (emAfCurrentCommand)
-extern EmberAfClusterCommand *emAfCurrentCommand;
+extern EmberAfClusterCommand * emAfCurrentCommand;
 #endif
 
 /**
@@ -1868,8 +1711,7 @@ EmberStatus emberAfInitiateKeyEstablishment(EmberNodeId nodeId, uint8_t endpoint
  * @param eui64 The EUI64 of the remote device.
  * @return ::EMBER_SUCCESS if key establishment was initiated successfully
  */
-EmberStatus emberAfInitiateInterPanKeyEstablishment(EmberPanId panId,
-                                                    const EmberEUI64 eui64);
+EmberStatus emberAfInitiateInterPanKeyEstablishment(EmberPanId panId, const EmberEUI64 eui64);
 
 /** @brief Use this function to tell if the device is in the process of
  * performing key establishment.
@@ -1888,18 +1730,14 @@ bool emberAfPerformingKeyEstablishment(void);
  * @return ::EMBER_SUCCESS if the partner link key exchange was initiated
  * successfully.
  */
-EmberStatus emberAfInitiatePartnerLinkKeyExchange(EmberNodeId target,
-                                                  uint8_t endpoint,
-                                                  EmberAfPartnerLinkKeyExchangeCallback *callback);
+EmberStatus emberAfInitiatePartnerLinkKeyExchange(EmberNodeId target, uint8_t endpoint,
+                                                  EmberAfPartnerLinkKeyExchangeCallback * callback);
 #else
-  #define emberAfInitiateKeyEstablishment(nodeId, endpoint) \
-  emberAfInitiateKeyEstablishmentCallback(nodeId, endpoint)
-  #define emberAfInitiateInterPanKeyEstablishment(panId, eui64) \
-  emberAfInitiateInterPanKeyEstablishmentCallback(panId, eui64)
-  #define emberAfPerformingKeyEstablishment() \
-  emberAfPerformingKeyEstablishmentCallback()
-  #define emberAfInitiatePartnerLinkKeyExchange(target, endpoint, callback) \
-  emberAfInitiatePartnerLinkKeyExchangeCallback(target, endpoint, callback)
+#define emberAfInitiateKeyEstablishment(nodeId, endpoint) emberAfInitiateKeyEstablishmentCallback(nodeId, endpoint)
+#define emberAfInitiateInterPanKeyEstablishment(panId, eui64) emberAfInitiateInterPanKeyEstablishmentCallback(panId, eui64)
+#define emberAfPerformingKeyEstablishment() emberAfPerformingKeyEstablishmentCallback()
+#define emberAfInitiatePartnerLinkKeyExchange(target, endpoint, callback)                                                          \
+    emberAfInitiatePartnerLinkKeyExchangeCallback(target, endpoint, callback)
 #endif
 
 /** @brief Use this function to determine if the security profile of the
@@ -1915,18 +1753,18 @@ bool emberAfIsCurrentSecurityProfileSmartEnergy(void);
 // @{
 // Frame control fields (8 bits total)
 // Bits 0 and 1 are Frame Type Sub-field
-#define ZCL_FRAME_CONTROL_FRAME_TYPE_MASK     (BIT(0) | BIT(1))
-#define ZCL_CLUSTER_SPECIFIC_COMMAND          BIT(0)
-#define ZCL_PROFILE_WIDE_COMMAND              0
-#define ZCL_GLOBAL_COMMAND                    (ZCL_PROFILE_WIDE_COMMAND)
+#define ZCL_FRAME_CONTROL_FRAME_TYPE_MASK (BIT(0) | BIT(1))
+#define ZCL_CLUSTER_SPECIFIC_COMMAND BIT(0)
+#define ZCL_PROFILE_WIDE_COMMAND 0
+#define ZCL_GLOBAL_COMMAND (ZCL_PROFILE_WIDE_COMMAND)
 // Bit 2 is Manufacturer Specific Sub-field
-#define ZCL_MANUFACTURER_SPECIFIC_MASK        BIT(2)
+#define ZCL_MANUFACTURER_SPECIFIC_MASK BIT(2)
 // Bit 3 is Direction Sub-field
-#define ZCL_FRAME_CONTROL_DIRECTION_MASK      BIT(3)
-#define ZCL_FRAME_CONTROL_SERVER_TO_CLIENT    BIT(3)
-#define ZCL_FRAME_CONTROL_CLIENT_TO_SERVER    0
+#define ZCL_FRAME_CONTROL_DIRECTION_MASK BIT(3)
+#define ZCL_FRAME_CONTROL_SERVER_TO_CLIENT BIT(3)
+#define ZCL_FRAME_CONTROL_CLIENT_TO_SERVER 0
 // Bit 4 is Disable Default Response Sub-field
-#define ZCL_DISABLE_DEFAULT_RESPONSE_MASK     BIT(4)
+#define ZCL_DISABLE_DEFAULT_RESPONSE_MASK BIT(4)
 // Bits 5 to 7 are reserved
 
 #define ZCL_DIRECTION_CLIENT_TO_SERVER 0
@@ -1936,13 +1774,13 @@ bool emberAfIsCurrentSecurityProfileSmartEnergy(void);
 //   Frame Control (1-byte)
 //   Sequence Number (1-byte)
 //   Command Id (1-byte)
-#define EMBER_AF_ZCL_OVERHEAD                       3
+#define EMBER_AF_ZCL_OVERHEAD 3
 #define EMBER_AF_ZCL_MANUFACTURER_SPECIFIC_OVERHEAD 5
 
 // Permitted values for emberAfSetFormAndJoinMode
-#define FIND_AND_JOIN_MODE_ALLOW_2_4_GHZ        BIT(0)
-#define FIND_AND_JOIN_MODE_ALLOW_SUB_GHZ        BIT(1)
-#define FIND_AND_JOIN_MODE_ALLOW_BOTH           (FIND_AND_JOIN_MODE_ALLOW_2_4_GHZ | FIND_AND_JOIN_MODE_ALLOW_SUB_GHZ)
+#define FIND_AND_JOIN_MODE_ALLOW_2_4_GHZ BIT(0)
+#define FIND_AND_JOIN_MODE_ALLOW_SUB_GHZ BIT(1)
+#define FIND_AND_JOIN_MODE_ALLOW_BOTH (FIND_AND_JOIN_MODE_ALLOW_2_4_GHZ | FIND_AND_JOIN_MODE_ALLOW_SUB_GHZ)
 
 /** @} END ZCL macros */
 
@@ -1956,7 +1794,7 @@ bool emberAfIsCurrentSecurityProfileSmartEnergy(void);
  * @return An ::EmberStatus value that indicates either the successful formation
  * of the new network or the reason that the network formation failed.
  */
-EmberStatus emberAfFormNetwork(EmberNetworkParameters *parameters);
+EmberStatus emberAfFormNetwork(EmberNetworkParameters * parameters);
 
 /** @brief Use this function to associate with the network using the specified
  * network parameters.
@@ -1966,7 +1804,7 @@ EmberStatus emberAfFormNetwork(EmberNetworkParameters *parameters);
  * @return An ::EmberStatus value that indicates either that the association
  * process began successfully or the reason for failure.
  */
-EmberStatus emberAfJoinNetwork(EmberNetworkParameters *parameters);
+EmberStatus emberAfJoinNetwork(EmberNetworkParameters * parameters);
 
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 /** @brief Use this function to find an unused PAN id and form a new network.
@@ -1982,8 +1820,8 @@ EmberStatus emberAfFindUnusedPanIdAndForm(void);
  */
 EmberStatus emberAfStartSearchForJoinableNetwork(void);
 #else
-  #define emberAfFindUnusedPanIdAndForm()        emberAfFindUnusedPanIdAndFormCallback()
-  #define emberAfStartSearchForJoinableNetwork() emberAfStartSearchForJoinableNetworkCallback()
+#define emberAfFindUnusedPanIdAndForm() emberAfFindUnusedPanIdAndFormCallback()
+#define emberAfStartSearchForJoinableNetwork() emberAfStartSearchForJoinableNetworkCallback()
 #endif
 
 /** @brief Sets the current network to that of the given index and adds it to
@@ -2046,11 +1884,11 @@ int emberAfMain(MAIN_FUNCTION_PARAMETERS);
 /** @} END addtogroup */
 
 #if !defined(DOXYGEN_SHOULD_SKIP_THIS)
-  #if defined(EMBER_TEST)
-    #define EMBER_TEST_ASSERT(x) assert(x)
-  #else
-    #define EMBER_TEST_ASSERT(x)
-  #endif
+#if defined(EMBER_TEST)
+#define EMBER_TEST_ASSERT(x) assert(x)
+#else
+#define EMBER_TEST_ASSERT(x)
+#endif
 #endif
 
 /** @brief The maximum power level that can be used by the chip.

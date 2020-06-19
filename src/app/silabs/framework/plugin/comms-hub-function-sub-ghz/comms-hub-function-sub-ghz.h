@@ -31,17 +31,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs for the Comms Hub Function Sub Ghz plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs for the Comms Hub Function Sub Ghz
+                                                                               *plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef COMMS_HUB_FUNCTION_SUB_GHZ_H_INCLUDED
 #define COMMS_HUB_FUNCTION_SUB_GHZ_H_INCLUDED
 
-#include "app/framework//include/af-types.h"            // EmberNodeId, EmberAfClusterId, etc.
-#include "../comms-hub-function/comms-hub-function.h"   // EmberAfPluginCommsHubFunctionStatus
+#include "../comms-hub-function/comms-hub-function.h" // EmberAfPluginCommsHubFunctionStatus
+#include "app/framework//include/af-types.h"          // EmberNodeId, EmberAfClusterId, etc.
 
 /** @brief Triggers the sub-GHz channel change sequence.
  *
@@ -92,8 +93,6 @@ EmberAfPluginCommsHubFunctionStatus emberAfCommsHubFunctionSubGhzCompleteChannel
  * notification flags and waiting for the remote client to read them.
  * This function lets the the CHF know when the ReadAttributes command arrives.
  */
-void emAfCommsHubFunctionSubGhzReadAttributeNotification(EmberNodeId source,
-                                                         EmberAfClusterId clusterId,
-                                                         uint16_t attrId);
+void emAfCommsHubFunctionSubGhzReadAttributeNotification(EmberNodeId source, EmberAfClusterId clusterId, uint16_t attrId);
 
 #endif // COMMS_HUB_FUNCTION_SUB_GHZ_H_INCLUDED

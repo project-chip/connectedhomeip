@@ -43,27 +43,27 @@
 // the incomming message, and call appropriate command handler.
 
 // Cluster: Basic, server
-EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Identify, server
-EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Groups, server
-EmberAfStatus emberAfGroupsClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfGroupsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Scenes, server
-EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: On/off, server
-EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Level Control, server
-EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Configuration Cluster, server
-EmberAfStatus emberAfOtaConfigurationClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfOtaConfigurationClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: MFGLIB Cluster, server
-EmberAfStatus emberAfMfglibClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfMfglibClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 #endif // SILABS_EMBER_AF_COMMAND_PARSE_HEADER

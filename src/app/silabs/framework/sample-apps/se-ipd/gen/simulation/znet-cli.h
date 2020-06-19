@@ -83,7 +83,8 @@
  */
 
 /** @brief <b>bsend [srcEndpoint:1] </b>
- *   - <i>Send using a binding based on the clusterId in the globalApsFrame and the srcEndpoint specified (if the src endpoint is zero it only sends based on the clusterId)</i>
+ *   - <i>Send using a binding based on the clusterId in the globalApsFrame and the srcEndpoint specified (if the src endpoint is
+ * zero it only sends based on the clusterId)</i>
  *     - srcEndpoint - INT8U - Source endpoint to send a binding based message from
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_BUILD_SEND_MSG_BSEND
@@ -114,7 +115,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_BUILD_SEND_MSG_INTERPAN_SHORT
 
 /** @brief <b>raw [clusterId:2] [data:-1] </b>
- *   - <i>Creates a message by specifying the raw bytes. Use "send" to send the message once it has been created. Ex: raw 0x000F {00 0A 00 11 22 33 44 55} sends a message to cluster 15 (0x000F) of length 8 which includes the ZCL header.</i>
+ *   - <i>Creates a message by specifying the raw bytes. Use "send" to send the message once it has been created. Ex: raw 0x000F {00
+ * 0A 00 11 22 33 44 55} sends a message to cluster 15 (0x000F) of length 8 which includes the ZCL header.</i>
  *     - clusterId - INT16U - two byte cluster id
  *     - data - OCTET_STRING - ZCL message, including ZCL header and payload
  */
@@ -142,7 +144,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_BUILD_SEND_MSG_SEND_MULTICAST
 
 /** @brief <b>timesync [id:2] [srcEndpoint:1] [destEndpoint:1] </b>
- *   - <i>This sends a read attr for the time of the device specified. It sets a flag so when it gets the response it writes the time to its own time attr</i>
+ *   - <i>This sends a read attr for the time of the device specified. It sets a flag so when it gets the response it writes the
+ * time to its own time attr</i>
  *     - id - INT16U - two byte short id of the time server
  *     - srcEndpoint - INT8U - source endpoint to send time sync from
  *     - destEndpoint - INT8U - destination endpoint to expect response on
@@ -215,7 +218,8 @@
 
 /** @brief <b>zcl use-next-sequence [useNextSequence:1] </b>
  *   - <i>Sets the flag to use the incremented sequence number from the framework for the next raw command.</i>
- *     - useNextSequence - BOOLEAN - bool value indicating whether raw command will use the incremented seq number from framework, set(1) or not(0).
+ *     - useNextSequence - BOOLEAN - bool value indicating whether raw command will use the incremented seq number from framework,
+ * set(1) or not(0).
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_GENERAL_ZCL_USE_NEXT_SEQUENCE
 
@@ -308,7 +312,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_ZCL_GLOBAL_ZCL_GLOBAL_REPORT_READ
 
-/** @brief <b>zcl global send-me-a-report [cluster:2] [attributeId:2] [dataType:1] [minReportTime:2] [maxReportTime:2] [reportableChange:-1] </b>
+/** @brief <b>zcl global send-me-a-report [cluster:2] [attributeId:2] [dataType:1] [minReportTime:2] [maxReportTime:2]
+ * [reportableChange:-1] </b>
  *   - <i>Creates a global send me a report command for the associated values.</i>
  *     - cluster - INT16U - The cluster id of the requested report.
  *     - attributeId - INT16U - The attribute id for requested report.
@@ -359,13 +364,15 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_INFO_DEBUGPRINT_ALL_ON
 
 /** @brief <b>debugprint off [area:1] </b>
- *   - <i>Turns off compiled in debug printing for a specific debug printing area. Debug print areas are defined in the generated <application>.h header file.</i>
+ *   - <i>Turns off compiled in debug printing for a specific debug printing area. Debug print areas are defined in the generated
+ * <application>.h header file.</i>
  *     - area - INT8U - The debug area mask listed in the <application>.h file
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_INFO_DEBUGPRINT_OFF
 
 /** @brief <b>debugprint on [area:1] </b>
- *   - <i>Turns on compiled in debug printing for a specific debug printing area. Debug print areas are defined in the generated <application>.h header file.</i>
+ *   - <i>Turns on compiled in debug printing for a specific debug printing area. Debug print areas are defined in the generated
+ * <application>.h header file.</i>
  *     - area - INT8U - The debug area mask listed in the <application>.h file
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_INFO_DEBUGPRINT_ON
@@ -437,8 +444,10 @@
  */
 
 /** @brief <b>network broad-pjoin [seconds:1] </b>
- *   - <i>Permit joining on the network for a given number of seconds AND broadcast a ZDO Mgmt Permit Joining request to all routers.</i>
- *     - seconds - INT8U - Number of seconds during which devices will be allowed to join the network. A value of 0xff turns permit joining on permanently
+ *   - <i>Permit joining on the network for a given number of seconds AND broadcast a ZDO Mgmt Permit Joining request to all
+ * routers.</i>
+ *     - seconds - INT8U - Number of seconds during which devices will be allowed to join the network. A value of 0xff turns permit
+ * joining on permanently
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_NETWORK_BROAD_PJOIN
 
@@ -466,7 +475,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_NETWORK_FIND_JOINABLE
 
 /** @brief <b>network find unused </b>
- *   - <i>Begin a search for an unused Channel and Pan Id. Will automatically form a network on the first unused Channel and Pan Id it finds.</i>
+ *   - <i>Begin a search for an unused Channel and Pan Id. Will automatically form a network on the first unused Channel and Pan Id
+ * it finds.</i>
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_NETWORK_FIND_UNUSED
 
@@ -502,7 +512,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_NETWORK_LEAVE
 
 /** @brief <b>network multi-phy-start [page:1] [channel:1] [power:1] </b>
- *   - <i>To start multi phy interface other than native and form the network. The stack uses same PanId as native radio network.</i>
+ *   - <i>To start multi phy interface other than native and form the network. The stack uses same PanId as native radio
+ * network.</i>
  *     - page - INT8U - The page on which to form the network.
  *     - channel - INT8U - The channel on which to form the network.
  *     - power - INT8S - One byte signed value indicating the TX power that the radio should be set to
@@ -516,27 +527,33 @@
 
 /** @brief <b>network pjoin [seconds:1] </b>
  *   - <i>Permit joining on the network for a given number of seconds</i>
- *     - seconds - INT8U - Number of seconds during which devices will be allowed to join the network. A value of 0xff turns permit joining on permanently
+ *     - seconds - INT8U - Number of seconds during which devices will be allowed to join the network. A value of 0xff turns permit
+ * joining on permanently
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_NETWORK_PJOIN
 
 /** @brief <b>network rejoin [haveCurrentNetworkKey:1] [channelMask:4] </b>
  *   - <i>Rejoin an existing network in a secure or insecure manner.</i>
- *     - haveCurrentNetworkKey - INT8U - Boolean indicating whether the device can rejoin secure or not. 1=rejoin with encryption, 0=rejoin without encryption
+ *     - haveCurrentNetworkKey - INT8U - Boolean indicating whether the device can rejoin secure or not. 1=rejoin with encryption,
+ * 0=rejoin without encryption
  *     - channelMask - INT32U - 4 byte channel mask which should be used to search for the network to rejoin.
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_NETWORK_REJOIN
 
 /** @brief <b>network rejoin-diff-device-type [haveCurrentNetworkKey:1] [channelMask:4] [nodeType:1] </b>
  *   - <i>Rejoin an existing network in a secure or insecure manner with a different device type.</i>
- *     - haveCurrentNetworkKey - INT8U - Boolean indicating whether the device can rejoin secure or not. 1=rejoin with encryption, 0=rejoin without encryption
+ *     - haveCurrentNetworkKey - INT8U - Boolean indicating whether the device can rejoin secure or not. 1=rejoin with encryption,
+ * 0=rejoin without encryption
  *     - channelMask - INT32U - 4 byte channel mask which should be used to search for the network to rejoin.
- *     - nodeType - INT8U - An enumeration indicating the device type to rejoin as.The stack only accepts EMBER_END_DEVICE and EMBER_SLEEPY_END_DEVICE.
+ *     - nodeType - INT8U - An enumeration indicating the device type to rejoin as.The stack only accepts EMBER_END_DEVICE and
+ * EMBER_SLEEPY_END_DEVICE.
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_NETWORK_REJOIN_DIFF_DEVICE_TYPE
 
 /** @brief <b>network set [networkIndex:1] </b>
- *   - <i>Set the network index used by all future CLI commands.  Before executing a CLI command, the framework will switch to this network.  After the command finishes executing, the framework will switch back to the previous network.  The CLI uses the same network index until the device resets or it is changed through this command.</i>
+ *   - <i>Set the network index used by all future CLI commands.  Before executing a CLI command, the framework will switch to this
+ * network.  After the command finishes executing, the framework will switch back to the previous network.  The CLI uses the same
+ * network index until the device resets or it is changed through this command.</i>
  *     - networkIndex - INT8U - The network index to use for CLI commands
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_NETWORK_SET
@@ -548,17 +565,21 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_NETWORK_TIMEOUT_OPTION_MASK
 
 /** @brief <b>option apsretry default </b>
- *   - <i>Forces the AppFramework to set/clear the APS Retry option (in APS Frame options mask) for all subsequent outgoing messages; a value of "default" allows the AppFramework to use its own default logic to determine when the APS Retry option should be used.</i>
+ *   - <i>Forces the AppFramework to set/clear the APS Retry option (in APS Frame options mask) for all subsequent outgoing
+ * messages; a value of "default" allows the AppFramework to use its own default logic to determine when the APS Retry option should
+ * be used.</i>
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_OPTION_APSRETRY_DEFAULT
 
 /** @brief <b>option apsretry off </b>
- *   - <i>Forces the AppFramework to set/clear the APS Retry option (in APS Frame options mask) for all subsequent outgoing messages; Turns APS retry off</i>
+ *   - <i>Forces the AppFramework to set/clear the APS Retry option (in APS Frame options mask) for all subsequent outgoing
+ * messages; Turns APS retry off</i>
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_OPTION_APSRETRY_OFF
 
 /** @brief <b>option apsretry on </b>
- *   - <i>Forces the AppFramework to set/clear the APS Retry option (in APS Frame options mask) for all subsequent outgoing messages; Turns APS retry on.</i>
+ *   - <i>Forces the AppFramework to set/clear the APS Retry option (in APS Frame options mask) for all subsequent outgoing
+ * messages; Turns APS retry on.</i>
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_OPTION_APSRETRY_ON
 
@@ -578,7 +599,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_OPTION_BINDING_TABLE_SET
 
 /** @brief <b>option disc [profileId:2] [clusterId:2] </b>
- *   - <i>Sends a ZDO Match Descriptor Request for the server side of the specified cluster from the specified application profile. Match Descriptor Responses received are printed to the serial output.</i>
+ *   - <i>Sends a ZDO Match Descriptor Request for the server side of the specified cluster from the specified application profile.
+ * Match Descriptor Responses received are printed to the serial output.</i>
  *     - profileId - INT16U - the profile id to send with the discovery message
  *     - clusterId - INT16U - cluster id to send with the discovery message
  */
@@ -629,7 +651,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SECURITY_KEYS_PRINT
 
 /** @brief <b>option install-code [keyTableIndex:1] [ieeeAddress:8] [installCode:-1] </b>
- *   - <i>Derives a link key from an install code, sets it in the transient key table for Z3 applications or sets it in the link key table for SE applications.</i>
+ *   - <i>Derives a link key from an install code, sets it in the transient key table for Z3 applications or sets it in the link key
+ * table for SE applications.</i>
  *     - keyTableIndex - INT8U - index into the link key table
  *     - ieeeAddress - IEEE_ADDRESS - IEEE address to enter into the link key table
  *     - installCode - OCTET_STRING - install code including two-byte, little-endian CRC
@@ -637,7 +660,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SECURITY_OPTION_INSTALL_CODE
 
 /** @brief <b>option link [keyTableIndex:1] [ieeeAddress:8] [linkKey:-1] </b>
- *   - <i>Sets a link key in the link key table. Example: option link 0x00 { 06 00 ab 41 64 30 00 0a } {aa bb cc dd ee ff aa bb cc dd ee ff aa bb cc dd}</i>
+ *   - <i>Sets a link key in the link key table. Example: option link 0x00 { 06 00 ab 41 64 30 00 0a } {aa bb cc dd ee ff aa bb cc
+ * dd ee ff aa bb cc dd}</i>
  *     - keyTableIndex - INT8U - index into the link key table
  *     - ieeeAddress - IEEE_ADDRESS - IEEE address to enter into the link key table
  *     - linkKey - OCTET_STRING - link key to enter into the table
@@ -645,7 +669,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SECURITY_OPTION_LINK
 
 /** @brief <b>option register </b>
- *   - <i>Initiates Smart Energy Registration including Key Establishment. This command expects that the device has already joined a smart energy network.</i>
+ *   - <i>Initiates Smart Energy Registration including Key Establishment. This command expects that the device has already joined a
+ * smart energy network.</i>
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SECURITY_OPTION_REGISTER
 
@@ -661,18 +686,24 @@
 
 /** @brief <b>option security set-allow-trust-center-rejoin-using-well-known-key [allowTrustCenterRejoinUsingWellKnownKey:1] </b>
  *   - <i>Set whether or not a Trust Center application will allow trust center rejoins for devices using the well-known key.</i>
- *     - allowTrustCenterRejoinUsingWellKnownKey - BOOLEAN - Whether or not the Trust Center should allow trust center rejoins for devices using the well-known key.
+ *     - allowTrustCenterRejoinUsingWellKnownKey - BOOLEAN - Whether or not the Trust Center should allow trust center rejoins for
+ * devices using the well-known key.
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SECURITY_OPTION_SECURITY_SET_ALLOW_TRUST_CENTER_REJOIN_USING_WELL_KNOWN_KEY
 
-/** @brief <b>option security set-allow-trust-center-rejoin-using-well-known-key-timeout [trustCenterRejoinUsingWellKnownKeyTimeout:2] </b>
- *   - <i>Sets the number of seconds to allow trust center rejoins for devices using the well-known key. A value of 0 means the policy should not be changed after a timeout. This must be called prior to forming or joining a network.</i>
- *     - trustCenterRejoinUsingWellKnownKeyTimeout - INT16U - The number of seconds that trust center rejoins will be responded to using the well-known link key.
+/** @brief <b>option security set-allow-trust-center-rejoin-using-well-known-key-timeout
+ * [trustCenterRejoinUsingWellKnownKeyTimeout:2] </b>
+ *   - <i>Sets the number of seconds to allow trust center rejoins for devices using the well-known key. A value of 0 means the
+ * policy should not be changed after a timeout. This must be called prior to forming or joining a network.</i>
+ *     - trustCenterRejoinUsingWellKnownKeyTimeout - INT16U - The number of seconds that trust center rejoins will be responded to
+ * using the well-known link key.
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SECURITY_OPTION_SECURITY_SET_ALLOW_TRUST_CENTER_REJOIN_USING_WELL_KNOWN_KEY_TIMEOUT
 
 /** @brief <b>option security set-key-request-policy [tcLinkKeyRequestPolicy:1] [appLinkKeyRequestPolicy:1] </b>
- *   - <i>Sets the local policy for handling TC link key requests and application link key requests. This command sets the emberTrustCenterLinkKeyRequestPolicy and emberAppLinkKeyRequestPolicy attributes. This command should only be entered on the trust center.</i>
+ *   - <i>Sets the local policy for handling TC link key requests and application link key requests. This command sets the
+ * emberTrustCenterLinkKeyRequestPolicy and emberAppLinkKeyRequestPolicy attributes. This command should only be entered on the
+ * trust center.</i>
  *     - tcLinkKeyRequestPolicy - INT8U - The value to assign to emberTrustCenterLinkKeyRequestPolicy
  *     - appLinkKeyRequestPolicy - INT8U - The value to assign to emberAppLinkKeyRequestPolicy
  */
@@ -816,7 +847,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_ZDO_ZDO_NWK_UPD_SCAN
 
 /** @brief <b>zdo nwk-upd scan-chan-mask [targetNodeId:2] [scanDuration:1] [scanCount:2] [channelMask:4] </b>
- *   - <i>Performs an energy scan on given channel mask. This can be used to perform scanning with page number embedded in channel mask, it mainly used for subghz network. The stack shall send network enhanced update request if page is non-zero.</i>
+ *   - <i>Performs an energy scan on given channel mask. This can be used to perform scanning with page number embedded in channel
+ * mask, it mainly used for subghz network. The stack shall send network enhanced update request if page is non-zero.</i>
  *     - targetNodeId - INT16U - Two byte short id of the target device
  *     - scanDuration - INT8U - One byte scan duration. Must be in range 0 - 5
  *     - scanCount - INT16U - Number of scans to perform. Must be in range 1 - 8
@@ -872,7 +904,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_ZDO_ZDO_UNBIND_GROUP
 
-/** @brief <b>zdo unbind unicast [target:2] [source eui64:8] [source endpoint:1] [clusterID:2] [destinationEUI64:8] [destEndpoint:1] </b>
+/** @brief <b>zdo unbind unicast [target:2] [source eui64:8] [source endpoint:1] [clusterID:2] [destinationEUI64:8] [destEndpoint:1]
+ * </b>
  *   - <i>Sends an unbind request for a unicast binding to the target device.</i>
  *     - target - INT16U - Target node ID
  *     - source eui64 - IEEE_ADDRESS - The source EUI64 of the binding (the remote device's EUI64)
@@ -1059,7 +1092,8 @@
 
 /** @brief <b>plugin end-device-support poll-completed-callback [pollCompletedCallbackCommand:1] </b>
  *   - <i>Sets whether the device's poll completed callback function is enabled.</i>
- *     - pollCompletedCallbackCommand - BOOLEAN - The value indicating whether the device's poll completed callback function is enabled.
+ *     - pollCompletedCallbackCommand - BOOLEAN - The value indicating whether the device's poll completed callback function is
+ * enabled.
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_END_DEVICE_SUPPORT_PLUGIN_END_DEVICE_SUPPORT_POLL_COMPLETED_CALLBACK
 
@@ -1086,7 +1120,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_FRAGMENTATION_PLUGIN_FRAGMENTATION_ARTIFICIAL_BLOCK_DROP
 
 /** @brief <b>plugin fragmentation set-rx-window-size [window-size:1] </b>
- *   - <i>Sets the receive window size.  By definition in the Smart Energy profile it must be set to 1 but this allows to be changed.</i>
+ *   - <i>Sets the receive window size.  By definition in the Smart Energy profile it must be set to 1 but this allows to be
+ * changed.</i>
  *     - window-size - INT8U - The max number of the blocks received before an APS ack is generated.
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_FRAGMENTATION_PLUGIN_FRAGMENTATION_SET_RX_WINDOW_SIZE
@@ -1104,7 +1139,8 @@
 
 /** @brief <b>plugin idle-sleep awake-when-not-joined [stayAwakeWhenNotJoined:1] </b>
  *   - <i>Sets whether the device stays awake when not joined to a ZigBee network.</i>
- *     - stayAwakeWhenNotJoined - BOOLEAN - The value indicating whether the device should stay awake when not joined to a ZigBee network.
+ *     - stayAwakeWhenNotJoined - BOOLEAN - The value indicating whether the device should stay awake when not joined to a ZigBee
+ * network.
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_IDLE_SLEEP_PLUGIN_IDLE_SLEEP_AWAKE_WHEN_NOT_JOINED
 
@@ -1399,7 +1435,8 @@
  * @{
  */
 
-/** @brief <b>plugin simple-metering-client get-sampled-data [server:2] [clientEndpoint:1] [serverEndpoint:1] [sampleId:2] [startTime:4] [sampleType:1] [numberOfSamples:2] </b>
+/** @brief <b>plugin simple-metering-client get-sampled-data [server:2] [clientEndpoint:1] [serverEndpoint:1] [sampleId:2]
+ * [startTime:4] [sampleType:1] [numberOfSamples:2] </b>
  *   - <i>Send a start sampling command to a metering server.</i>
  *     - server - INT16U - The network address of the server to which the request will be sent.
  *     - clientEndpoint - INT8U - The local endpoint from which the request will be sent.
@@ -1411,7 +1448,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_SIMPLE_METERING_CLIENT_PLUGIN_SIMPLE_METERING_CLIENT_GET_SAMPLED_DATA
 
-/** @brief <b>plugin simple-metering-client local-change-supply [server:2] [clientEndpoint:1] [serverEndpoint:1] [proposedSupplyStatus:1] </b>
+/** @brief <b>plugin simple-metering-client local-change-supply [server:2] [clientEndpoint:1] [serverEndpoint:1]
+ * [proposedSupplyStatus:1] </b>
  *   - <i>Send a start sampling command to a metering server.</i>
  *     - server - INT16U - The network address of the server to which the request will be sent.
  *     - clientEndpoint - INT8U - The local endpoint from which the request will be sent.
@@ -1420,7 +1458,9 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_SIMPLE_METERING_CLIENT_PLUGIN_SIMPLE_METERING_CLIENT_LOCAL_CHANGE_SUPPLY
 
-/** @brief <b>plugin simple-metering-client sch-snapshot [server:2] [clientEndpoint:1] [serverEndpoint:1] [issuerId:4] [commandIndex:1] [numberofCommands:1] [snapshotScheduleId:1] [snapshotStartDate:4] [snapshotSchedule:4] [snapshotType:1] [snapshotCause:4] </b>
+/** @brief <b>plugin simple-metering-client sch-snapshot [server:2] [clientEndpoint:1] [serverEndpoint:1] [issuerId:4]
+ * [commandIndex:1] [numberofCommands:1] [snapshotScheduleId:1] [snapshotStartDate:4] [snapshotSchedule:4] [snapshotType:1]
+ * [snapshotCause:4] </b>
  *   - <i>Schedule a snapshot.</i>
  *     - server - INT16U - The network address of the server to which the request will be sent.
  *     - clientEndpoint - INT8U - The local endpoint from which the request will be sent.
@@ -1436,7 +1476,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_SIMPLE_METERING_CLIENT_PLUGIN_SIMPLE_METERING_CLIENT_SCH_SNAPSHOT
 
-/** @brief <b>plugin simple-metering-client start-sampling [server:2] [clientEndpoint:1] [serverEndpoint:1] [issuerId:4] [startTime:4] [sampleType:1] [SampleRequestInterval:2] [maxNumberOfSamples:2] </b>
+/** @brief <b>plugin simple-metering-client start-sampling [server:2] [clientEndpoint:1] [serverEndpoint:1] [issuerId:4]
+ * [startTime:4] [sampleType:1] [SampleRequestInterval:2] [maxNumberOfSamples:2] </b>
  *   - <i>Send a start sampling command to a metering server.</i>
  *     - server - INT16U - The network address of the server to which the request will be sent.
  *     - clientEndpoint - INT8U - The local endpoint from which the request will be sent.
@@ -1613,7 +1654,8 @@
  * @{
  */
 
-/** @brief <b>zcl msg disp [messageId:4] [messageControl:1] [startTime:4] [durationInMinutes:2] [message:-1] [optionalExtendedMessageControl:1] </b>
+/** @brief <b>zcl msg disp [messageId:4] [messageControl:1] [startTime:4] [durationInMinutes:2] [message:-1]
+ * [optionalExtendedMessageControl:1] </b>
  *   - <i>Command description for DisplayMessage</i>
  *     - messageId - INT32U
  *     - messageControl - MessagingControlMask [BITMAP8]
@@ -1631,7 +1673,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_MESSAGING_CANCEL
 
-/** @brief <b>zcl msg disp-protd [messageId:4] [messageControl:1] [startTime:4] [durationInMinutes:2] [message:-1] [optionalExtendedMessageControl:1] </b>
+/** @brief <b>zcl msg disp-protd [messageId:4] [messageControl:1] [startTime:4] [durationInMinutes:2] [message:-1]
+ * [optionalExtendedMessageControl:1] </b>
  *   - <i>The DisplayProtected Message command is for use with messages that are protected by a password or PIN.</i>
  *     - messageId - INT32U
  *     - messageControl - MessagingControlMask [BITMAP8]
@@ -1643,7 +1686,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_MESSAGING_DISP_PROTD
 
 /** @brief <b>zcl msg x-all [implementationDateTime:4] </b>
- *   - <i>The CancelAllMessages command indicates to a client device that it should cancel all display messages currently held by it.</i>
+ *   - <i>The CancelAllMessages command indicates to a client device that it should cancel all display messages currently held by
+ * it.</i>
  *     - implementationDateTime - UTC_TIME
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_MESSAGING_X_ALL
@@ -1654,7 +1698,9 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_MESSAGING_GET
 
 /** @brief <b>zcl msg confirm [messageId:4] [confirmationTime:4] [messageConfirmationControl:1] [messageResponse:-1] </b>
- *   - <i>The Message Confirmation command provides an indication that a Utility Customer has acknowledged and/or accepted the contents of a previously sent message.  Enhanced Message Confirmation commands shall contain an answer of 'NO', 'YES' and/or a message confirmation string.</i>
+ *   - <i>The Message Confirmation command provides an indication that a Utility Customer has acknowledged and/or accepted the
+ * contents of a previously sent message.  Enhanced Message Confirmation commands shall contain an answer of 'NO', 'YES' and/or a
+ * message confirmation string.</i>
  *     - messageId - INT32U
  *     - confirmationTime - UTC_TIME
  *     - messageConfirmationControl - BITMAP8
@@ -1663,7 +1709,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_MESSAGING_CONFIRM
 
 /** @brief <b>zcl msg get-msg-x [earliestImplementationTime:4] </b>
- *   - <i>This command initiates the return of the first (and maybe only) Cancel All Messages command held on the associated server, and which has an implementation time equal to or later than the value indicated in the payload.</i>
+ *   - <i>This command initiates the return of the first (and maybe only) Cancel All Messages command held on the associated server,
+ * and which has an implementation time equal to or later than the value indicated in the payload.</i>
  *     - earliestImplementationTime - UTC_TIME
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_MESSAGING_GET_MSG_X
@@ -1680,8 +1727,14 @@
  * @{
  */
 
-/** @brief <b>zcl price pub-price [providerId:4] [rateLabel:-1] [issuerEventId:4] [currentTime:4] [unitOfMeasure:1] [currency:2] [priceTrailingDigitAndPriceTier:1] [numberOfPriceTiersAndRegisterTier:1] [startTime:4] [durationInMinutes:2] [price:4] [priceRatio:1] [generationPrice:4] [generationPriceRatio:1] [alternateCostDelivered:4] [alternateCostUnit:1] [alternateCostTrailingDigit:1] [numberOfBlockThresholds:1] [priceControl:1] [numberOfGenerationTiers:1] [generationTier:1] [extendedNumberOfPriceTiers:1] [extendedPriceTier:1] [extendedRegisterTier:1] </b>
- *   - <i>The PublishPrice command is generated in response to receiving a Get Current Price command, in response to a Get Scheduled Prices command, and when an update to the pricing information is available from the commodity provider, either before or when a TOU price becomes active.</i>
+/** @brief <b>zcl price pub-price [providerId:4] [rateLabel:-1] [issuerEventId:4] [currentTime:4] [unitOfMeasure:1] [currency:2]
+ * [priceTrailingDigitAndPriceTier:1] [numberOfPriceTiersAndRegisterTier:1] [startTime:4] [durationInMinutes:2] [price:4]
+ * [priceRatio:1] [generationPrice:4] [generationPriceRatio:1] [alternateCostDelivered:4] [alternateCostUnit:1]
+ * [alternateCostTrailingDigit:1] [numberOfBlockThresholds:1] [priceControl:1] [numberOfGenerationTiers:1] [generationTier:1]
+ * [extendedNumberOfPriceTiers:1] [extendedPriceTier:1] [extendedRegisterTier:1] </b>
+ *   - <i>The PublishPrice command is generated in response to receiving a Get Current Price command, in response to a Get Scheduled
+ * Prices command, and when an update to the pricing information is available from the commodity provider, either before or when a
+ * TOU price becomes active.</i>
  *     - providerId - INT32U
  *     - rateLabel - OCTET_STRING
  *     - issuerEventId - INT32U
@@ -1716,8 +1769,11 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_PUB_PRICE
 
-/** @brief <b>zcl price pub-block-period [providerId:4] [issuerEventId:4] [blockPeriodStartTime:4] [blockPeriodDuration:3] [numberOfPriceTiersAndNumberOfBlockThresholds:1] [blockPeriodControl:1] [blockPeriodDurationType:1] [tariffType:1] [tariffResolutionPeriod:1] </b>
- *   - <i>The PublishBlockPeriod command is generated in response to receiving a GetBlockPeriod(s) command or when an update to the block tariff schedule is available from the commodity provider.</i>
+/** @brief <b>zcl price pub-block-period [providerId:4] [issuerEventId:4] [blockPeriodStartTime:4] [blockPeriodDuration:3]
+ * [numberOfPriceTiersAndNumberOfBlockThresholds:1] [blockPeriodControl:1] [blockPeriodDurationType:1] [tariffType:1]
+ * [tariffResolutionPeriod:1] </b>
+ *   - <i>The PublishBlockPeriod command is generated in response to receiving a GetBlockPeriod(s) command or when an update to the
+ * block tariff schedule is available from the commodity provider.</i>
  *     - providerId - INT32U
  *     - issuerEventId - INT32U
  *     - blockPeriodStartTime - UTC_TIME
@@ -1734,7 +1790,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_PUB_BLOCK_PERIOD
 
 /** @brief <b>zcl price pub-x-factor [issuerEventId:4] [startTime:4] [conversionFactor:4] [conversionFactorTrailingDigit:1] </b>
- *   - <i>The PublishConversionFactor command is sent in response to a GetConversionFactor command or if a new Conversion factor is available.</i>
+ *   - <i>The PublishConversionFactor command is sent in response to a GetConversionFactor command or if a new Conversion factor is
+ * available.</i>
  *     - issuerEventId - INT32U
  *     - startTime - UTC_TIME
  *     - conversionFactor - INT32U
@@ -1742,8 +1799,10 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_PUB_X_FACTOR
 
-/** @brief <b>zcl price pub-cal-val [issuerEventId:4] [startTime:4] [calorificValue:4] [calorificValueUnit:1] [calorificValueTrailingDigit:1] </b>
- *   - <i>The PublishCalorificValue command is sent in response to a GetCalorificValue command or if a new calorific value is available.</i>
+/** @brief <b>zcl price pub-cal-val [issuerEventId:4] [startTime:4] [calorificValue:4] [calorificValueUnit:1]
+ * [calorificValueTrailingDigit:1] </b>
+ *   - <i>The PublishCalorificValue command is sent in response to a GetCalorificValue command or if a new calorific value is
+ * available.</i>
  *     - issuerEventId - INT32U
  *     - startTime - UTC_TIME
  *     - calorificValue - INT32U
@@ -1754,8 +1813,12 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_PUB_CAL_VAL
 
-/** @brief <b>zcl price pub-tariff-info [providerId:4] [issuerEventId:4] [issuerTariffId:4] [startTime:4] [tariffTypeChargingScheme:1] [tariffLabel:-1] [numberOfPriceTiersInUse:1] [numberOfBlockThresholdsInUse:1] [unitOfMeasure:1] [currency:2] [priceTrailingDigit:1] [standingCharge:4] [tierBlockMode:1] [blockThresholdMultiplier:3] [blockThresholdDivisor:3] </b>
- *   - <i>The PublishTariffInformation command is sent in response to a GetTariffInformation command or if new tariff information is available (including price matrix and block thresholds).</i>
+/** @brief <b>zcl price pub-tariff-info [providerId:4] [issuerEventId:4] [issuerTariffId:4] [startTime:4]
+ * [tariffTypeChargingScheme:1] [tariffLabel:-1] [numberOfPriceTiersInUse:1] [numberOfBlockThresholdsInUse:1] [unitOfMeasure:1]
+ * [currency:2] [priceTrailingDigit:1] [standingCharge:4] [tierBlockMode:1] [blockThresholdMultiplier:3] [blockThresholdDivisor:3]
+ * </b>
+ *   - <i>The PublishTariffInformation command is sent in response to a GetTariffInformation command or if new tariff information is
+ * available (including price matrix and block thresholds).</i>
  *     - providerId - INT32U
  *     - issuerEventId - INT32U
  *     - issuerTariffId - INT32U
@@ -1777,8 +1840,11 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_PUB_TARIFF_INFO
 
-/** @brief <b>zcl price pub-price-matrix [providerId:4] [issuerEventId:4] [startTime:4] [issuerTariffId:4] [commandIndex:1] [numberOfCommands:1] [subPayloadControl:1] [payload:5] </b>
- *   - <i>PublishPriceMatrix command is used to publish the Block Price Information Set (up to 15 tiers x 15 blocks) and the Extended Price Information Set (up to 48 tiers).  The PublishPriceMatrix command is sent in response to a GetPriceMatrix command.</i>
+/** @brief <b>zcl price pub-price-matrix [providerId:4] [issuerEventId:4] [startTime:4] [issuerTariffId:4] [commandIndex:1]
+ * [numberOfCommands:1] [subPayloadControl:1] [payload:5] </b>
+ *   - <i>PublishPriceMatrix command is used to publish the Block Price Information Set (up to 15 tiers x 15 blocks) and the
+ * Extended Price Information Set (up to 48 tiers).  The PublishPriceMatrix command is sent in response to a GetPriceMatrix
+ * command.</i>
  *     - providerId - INT32U
  *     - issuerEventId - INT32U
  *     - startTime - UTC_TIME
@@ -1790,7 +1856,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_PUB_PRICE_MATRIX
 
-/** @brief <b>zcl price pub-block-threshold [providerId:4] [issuerEventId:4] [startTime:4] [issuerTariffId:4] [commandIndex:1] [numberOfCommands:1] [subPayloadControl:1] [payload:7] </b>
+/** @brief <b>zcl price pub-block-threshold [providerId:4] [issuerEventId:4] [startTime:4] [issuerTariffId:4] [commandIndex:1]
+ * [numberOfCommands:1] [subPayloadControl:1] [payload:7] </b>
  *   - <i>The PublishBlockThreshold command is sent in response to a GetBlockThreshold command.</i>
  *     - providerId - INT32U
  *     - issuerEventId - INT32U
@@ -1803,8 +1870,10 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_PUB_BLOCK_THRESHOLD
 
-/** @brief <b>zcl price pub-co2-val [providerId:4] [issuerEventId:4] [startTime:4] [tariffType:1] [cO2Value:4] [cO2ValueUnit:1] [cO2ValueTrailingDigit:1] </b>
- *   - <i>The PublishCO2Value command is sent in response to a GetCO2Value command or if a new CO2 conversion factor is available.</i>
+/** @brief <b>zcl price pub-co2-val [providerId:4] [issuerEventId:4] [startTime:4] [tariffType:1] [cO2Value:4] [cO2ValueUnit:1]
+ * [cO2ValueTrailingDigit:1] </b>
+ *   - <i>The PublishCO2Value command is sent in response to a GetCO2Value command or if a new CO2 conversion factor is
+ * available.</i>
  *     - providerId - INT32U
  *     - issuerEventId - INT32U
  *     - startTime - UTC_TIME
@@ -1818,8 +1887,10 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_PUB_CO2_VAL
 
-/** @brief <b>zcl price pub-tier-labels [providerId:4] [issuerEventId:4] [issuerTariffId:4] [commandIndex:1] [numberOfCommands:1] [numberOfLabels:1] [tierLabelsPayload:1] </b>
- *   - <i>The PublishTierLabels command is generated in response to receiving a GetTierLabels command or when there is a tier label change.</i>
+/** @brief <b>zcl price pub-tier-labels [providerId:4] [issuerEventId:4] [issuerTariffId:4] [commandIndex:1] [numberOfCommands:1]
+ * [numberOfLabels:1] [tierLabelsPayload:1] </b>
+ *   - <i>The PublishTierLabels command is generated in response to receiving a GetTierLabels command or when there is a tier label
+ * change.</i>
  *     - providerId - INT32U
  *     - issuerEventId - INT32U
  *     - issuerTariffId - INT32U
@@ -1830,8 +1901,10 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_PUB_TIER_LABELS
 
-/** @brief <b>zcl price pub-billing-period [providerId:4] [issuerEventId:4] [billingPeriodStartTime:4] [billingPeriodDuration:3] [billingPeriodDurationType:1] [tariffType:1] </b>
- *   - <i>The PublishBillingPeriod command is generated in response to receiving a GetBillingPeriod(s) command or when an update to the Billing schedule is available from the commodity Supplier.</i>
+/** @brief <b>zcl price pub-billing-period [providerId:4] [issuerEventId:4] [billingPeriodStartTime:4] [billingPeriodDuration:3]
+ * [billingPeriodDurationType:1] [tariffType:1] </b>
+ *   - <i>The PublishBillingPeriod command is generated in response to receiving a GetBillingPeriod(s) command or when an update to
+ * the Billing schedule is available from the commodity Supplier.</i>
  *     - providerId - INT32U
  *     - issuerEventId - INT32U
  *     - billingPeriodStartTime - UTC_TIME
@@ -1843,8 +1916,11 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_PUB_BILLING_PERIOD
 
-/** @brief <b>zcl price pub-consolidated-bill [providerId:4] [issuerEventId:4] [billingPeriodStartTime:4] [billingPeriodDuration:3] [billingPeriodDurationType:1] [tariffType:1] [consolidatedBill:4] [currency:2] [billTrailingDigit:1] </b>
- *   - <i>The PublishConsolidatedBill command is used to make consolidated billing information of previous billing periods available to other end devices.  This command is issued in response to a GetConsolidatedBill command or if new billing information is available.</i>
+/** @brief <b>zcl price pub-consolidated-bill [providerId:4] [issuerEventId:4] [billingPeriodStartTime:4] [billingPeriodDuration:3]
+ * [billingPeriodDurationType:1] [tariffType:1] [consolidatedBill:4] [currency:2] [billTrailingDigit:1] </b>
+ *   - <i>The PublishConsolidatedBill command is used to make consolidated billing information of previous billing periods available
+ * to other end devices.  This command is issued in response to a GetConsolidatedBill command or if new billing information is
+ * available.</i>
  *     - providerId - INT32U
  *     - issuerEventId - INT32U
  *     - billingPeriodStartTime - UTC_TIME
@@ -1859,7 +1935,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_PUB_CONSOLIDATED_BILL
 
-/** @brief <b>zcl price pub-cpp-event [providerId:4] [issuerEventId:4] [startTime:4] [durationInMinutes:2] [tariffType:1] [cppPriceTier:1] [cppAuth:1] </b>
+/** @brief <b>zcl price pub-cpp-event [providerId:4] [issuerEventId:4] [startTime:4] [durationInMinutes:2] [tariffType:1]
+ * [cppPriceTier:1] [cppAuth:1] </b>
  *   - <i>The PublishCPPEvent command is sent from an ESI to its price clients to notify them of a Critical Peak Pricing event.</i>
  *     - providerId - INT32U
  *     - issuerEventId - INT32U
@@ -1875,7 +1952,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_PUB_CPP_EVENT
 
-/** @brief <b>zcl price pub-credit-payment [providerId:4] [issuerEventId:4] [creditPaymentDueDate:4] [creditPaymentOverDueAmount:4] [creditPaymentStatus:1] [creditPayment:4] [creditPaymentDate:4] [creditPaymentRef:-1] </b>
+/** @brief <b>zcl price pub-credit-payment [providerId:4] [issuerEventId:4] [creditPaymentDueDate:4] [creditPaymentOverDueAmount:4]
+ * [creditPaymentStatus:1] [creditPayment:4] [creditPaymentDate:4] [creditPaymentRef:-1] </b>
  *   - <i>The PublishCreditPayment command is used to update the credit payment information is available.</i>
  *     - providerId - INT32U
  *     - issuerEventId - INT32U
@@ -1890,8 +1968,10 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_PUB_CREDIT_PAYMENT
 
-/** @brief <b>zcl price pub-currency-conversion [providerId:4] [issuerEventId:4] [startTime:4] [oldCurrency:2] [newCurrency:2] [conversionFactor:4] [conversionFactorTrailingDigit:1] [currencyChangeControlFlags:4] </b>
- *   - <i>The PublishCurrencyConversion command is sent in response to a GetCurrencyConversion command or when a new currency becomes available.</i>
+/** @brief <b>zcl price pub-currency-conversion [providerId:4] [issuerEventId:4] [startTime:4] [oldCurrency:2] [newCurrency:2]
+ * [conversionFactor:4] [conversionFactorTrailingDigit:1] [currencyChangeControlFlags:4] </b>
+ *   - <i>The PublishCurrencyConversion command is sent in response to a GetCurrencyConversion command or when a new currency
+ * becomes available.</i>
  *     - providerId - INT32U
  *     - issuerEventId - INT32U
  *     - startTime - UTC_TIME
@@ -1946,7 +2026,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_GET_BLOCK_PERIODS
 
 /** @brief <b>zcl price get-conversion-factor [earliestStartTime:4] [minIssuerEventId:4] [numberOfCommands:1] </b>
- *   - <i>The GetConversionFactor command initiates a PublishConversionFactor command for the scheduled conversion factor updates.</i>
+ *   - <i>The GetConversionFactor command initiates a PublishConversionFactor command for the scheduled conversion factor
+ * updates.</i>
  *     - earliestStartTime - UTC_TIME
  *     - minIssuerEventId - INT32U
  *     - numberOfCommands - INT8U
@@ -1996,13 +2077,15 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_GET_CO2_VALUE
 
 /** @brief <b>zcl price get-tier-labels [issuerTariffId:4] </b>
- *   - <i>The GetTierLabels command allows a client to retrieve the tier labels associated with a given tariff; this command initiates a PublishTierLabels command from the server.</i>
+ *   - <i>The GetTierLabels command allows a client to retrieve the tier labels associated with a given tariff; this command
+ * initiates a PublishTierLabels command from the server.</i>
  *     - issuerTariffId - INT32U
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_GET_TIER_LABELS
 
 /** @brief <b>zcl price get-billing-period [earliestStartTime:4] [minIssuerEventId:4] [numberOfCommands:1] [tariffType:1] </b>
- *   - <i>The GetBillingPeriod command initiates one or more PublishBillingPeriod commands for the currently scheduled billing periods.</i>
+ *   - <i>The GetBillingPeriod command initiates one or more PublishBillingPeriod commands for the currently scheduled billing
+ * periods.</i>
  *     - earliestStartTime - UTC_TIME
  *     - minIssuerEventId - INT32U
  *     - numberOfCommands - INT8U
@@ -2013,7 +2096,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_GET_BILLING_PERIOD
 
 /** @brief <b>zcl price get-con-bill [earliestStartTime:4] [minIssuerEventId:4] [numberOfCommands:1] [tariffType:1] </b>
- *   - <i>The GetConsolidatedBill command initiates one or more PublishConsolidatedBill commands with the requested billing information.</i>
+ *   - <i>The GetConsolidatedBill command initiates one or more PublishConsolidatedBill commands with the requested billing
+ * information.</i>
  *     - earliestStartTime - UTC_TIME
  *     - minIssuerEventId - INT32U
  *     - numberOfCommands - INT8U
@@ -2024,7 +2108,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_GET_CON_BILL
 
 /** @brief <b>zcl price cpp-event-resp [issuerEventId:4] [cppAuth:1] </b>
- *   - <i>The CPPEventResponse command is sent from a Client (IHD) to the ESI to notify it of a Critical Peak Pricing event authorization.</i>
+ *   - <i>The CPPEventResponse command is sent from a Client (IHD) to the ESI to notify it of a Critical Peak Pricing event
+ * authorization.</i>
  *     - issuerEventId - INT32U
  *     - cppAuth - CppEventResponseCppAuth [ENUM8]
  * @sa
@@ -2040,7 +2125,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_GET_CREDIT_PAYMENT
 
 /** @brief <b>zcl price get-cur-conv-cmd </b>
- *   - <i>The GetCurrencyConversionCommand command initiates a PublishCurrencyConversion command for the currency conversion factor updates. A server shall be capable of storing both the old and the new currencies.</i>
+ *   - <i>The GetCurrencyConversionCommand command initiates a PublishCurrencyConversion command for the currency conversion factor
+ * updates. A server shall be capable of storing both the old and the new currencies.</i>
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PRICE_GET_CUR_CONV_CMD
 
@@ -2072,14 +2158,16 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SIMPLE_METERING_REMOVE_MIRROR
 
 /** @brief <b>zcl metering sch-snapshot-resp [issuerEventId:4] [snapshotResponsePayload:2] </b>
- *   - <i>This command is generated in response to a ScheduleSnapshot command, and is sent to confirm whether the requested snapshot schedule has been set up.</i>
+ *   - <i>This command is generated in response to a ScheduleSnapshot command, and is sent to confirm whether the requested snapshot
+ * schedule has been set up.</i>
  *     - issuerEventId - INT32U
  *     - snapshotResponsePayload - struct SnapshotResponsePayload
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SIMPLE_METERING_SCH_SNAPSHOT_RESP
 
 /** @brief <b>zcl metering take-snapshot-resp [snapshotId:4] [snapshotConfirmation:1] </b>
- *   - <i>This command is generated in response to a TakeSnapshot command, and is sent to confirm whether the requested snapshot has been accepted and successfully taken.</i>
+ *   - <i>This command is generated in response to a TakeSnapshot command, and is sent to confirm whether the requested snapshot has
+ * been accepted and successfully taken.</i>
  *     - snapshotId - INT32U
  *     - snapshotConfirmation - SnapshotConfirmation [ENUM8]
  * @sa
@@ -2087,7 +2175,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SIMPLE_METERING_TAKE_SNAPSHOT_RESP
 
-/** @brief <b>zcl metering pub-ss [snapshotId:4] [snapshotTime:4] [totalSnapshotsFound:1] [commandIndex:1] [totalCommands:1] [snapshotCause:4] [snapshotPayloadType:1] [snapshotPayload:1] </b>
+/** @brief <b>zcl metering pub-ss [snapshotId:4] [snapshotTime:4] [totalSnapshotsFound:1] [commandIndex:1] [totalCommands:1]
+ * [snapshotCause:4] [snapshotPayloadType:1] [snapshotPayload:1] </b>
  *   - <i>This command is generated in response to a GetSnapshot command. It is used to return a single snapshot to the client.</i>
  *     - snapshotId - INT32U
  *     - snapshotTime - UTC_TIME
@@ -2102,8 +2191,10 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SIMPLE_METERING_PUB_SS
 
-/** @brief <b>zcl metering cfg-mirror [issuerEventId:4] [reportingInterval:3] [mirrorNotificationReporting:1] [notificationScheme:1] </b>
- *   - <i>ConfigureMirror is sent to the mirror once the mirror has been created. The command deals with the operational configuration of the Mirror.</i>
+/** @brief <b>zcl metering cfg-mirror [issuerEventId:4] [reportingInterval:3] [mirrorNotificationReporting:1] [notificationScheme:1]
+ * </b>
+ *   - <i>ConfigureMirror is sent to the mirror once the mirror has been created. The command deals with the operational
+ * configuration of the Mirror.</i>
  *     - issuerEventId - INT32U
  *     - reportingInterval - INT24U
  *     - mirrorNotificationReporting - BOOLEAN
@@ -2112,15 +2203,19 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SIMPLE_METERING_CFG_MIRROR
 
 /** @brief <b>zcl metering cfg-nft-scheme [issuerEventId:4] [notificationScheme:1] [notificationFlagOrder:4] </b>
- *   - <i>The ConfigureNotificationScheme is sent to the mirror once the mirror has been created. The command deals with the operational configuration of the Mirror and the device that reports to the mirror. No default schemes are allowed to be overwritten.</i>
+ *   - <i>The ConfigureNotificationScheme is sent to the mirror once the mirror has been created. The command deals with the
+ * operational configuration of the Mirror and the device that reports to the mirror. No default schemes are allowed to be
+ * overwritten.</i>
  *     - issuerEventId - INT32U
  *     - notificationScheme - INT8U
  *     - notificationFlagOrder - BITMAP32
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SIMPLE_METERING_CFG_NFT_SCHEME
 
-/** @brief <b>zcl metering cfg-nft-flags [issuerEventId:4] [notificationScheme:1] [notificationFlagAttributeId:2] [clusterId:2] [manufacturerCode:2] [numberOfCommands:1] [commandIds:1] </b>
- *   - <i>The ConfigureNotificationFlags command is used to set the commands relating to the bit value for each NotificationFlags attribute that the scheme is proposing to use.</i>
+/** @brief <b>zcl metering cfg-nft-flags [issuerEventId:4] [notificationScheme:1] [notificationFlagAttributeId:2] [clusterId:2]
+ * [manufacturerCode:2] [numberOfCommands:1] [commandIds:1] </b>
+ *   - <i>The ConfigureNotificationFlags command is used to set the commands relating to the bit value for each NotificationFlags
+ * attribute that the scheme is proposing to use.</i>
  *     - issuerEventId - INT32U
  *     - notificationScheme - INT8U
  *     - notificationFlagAttributeId - INT16U
@@ -2132,7 +2227,9 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SIMPLE_METERING_CFG_NFT_FLAGS
 
 /** @brief <b>zcl metering get-ntfy-msg [notificationScheme:1] [notificationFlagAttributeId:2] [notificationFlagsN:4] </b>
- *   - <i>The GetNotifiedMessage command is used only when a BOMD is being mirrored. This command provides a method for the BOMD to notify the Mirror message queue that it wants to receive commands that the Mirror has queued. The Notification flags set within the command shall inform the mirror of the commands that the BOMD is requesting.</i>
+ *   - <i>The GetNotifiedMessage command is used only when a BOMD is being mirrored. This command provides a method for the BOMD to
+ * notify the Mirror message queue that it wants to receive commands that the Mirror has queued. The Notification flags set within
+ * the command shall inform the mirror of the commands that the BOMD is requesting.</i>
  *     - notificationScheme - INT8U
  *     - notificationFlagAttributeId - INT16U
  *     - notificationFlagsN - BITMAP32
@@ -2157,7 +2254,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SIMPLE_METERING_START_SAMP_RSP
 
 /** @brief <b>zcl metering get-profile [intervalChannel:1] [endTime:4] [numberOfPeriods:1] </b>
- *   - <i>The GetProfile command is generated when a client device wishes to retrieve a list of captured Energy, Gas or water consumption for profiling purposes.</i>
+ *   - <i>The GetProfile command is generated when a client device wishes to retrieve a list of captured Energy, Gas or water
+ * consumption for profiling purposes.</i>
  *     - intervalChannel - AmiIntervalChannel [ENUM8]
  *     - endTime - UTC_TIME
  *     - numberOfPeriods - INT8U
@@ -2167,13 +2265,15 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SIMPLE_METERING_GET_PROFILE
 
 /** @brief <b>zcl metering mirror-removed [endpointId:2] </b>
- *   - <i>The Mirror Removed Command allows the ESI to inform a sleepy Metering Device mirroring support has been removed or halted.</i>
+ *   - <i>The Mirror Removed Command allows the ESI to inform a sleepy Metering Device mirroring support has been removed or
+ * halted.</i>
  *     - endpointId - INT16U
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SIMPLE_METERING_MIRROR_REMOVED
 
 /** @brief <b>zcl metering req-fast-poll-mode [fastPollUpdatePeriod:1] [duration:1] </b>
- *   - <i>The Request Fast Poll Mode command is generated when the metering client wishes to receive near real-time updates of InstantaneousDemand.</i>
+ *   - <i>The Request Fast Poll Mode command is generated when the metering client wishes to receive near real-time updates of
+ * InstantaneousDemand.</i>
  *     - fastPollUpdatePeriod - INT8U
  *     - duration - INT8U
  */
@@ -2203,8 +2303,11 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SIMPLE_METERING_GET_SNAPSHOT
 
-/** @brief <b>zcl metering start-sampling [issuerEventId:4] [startSamplingTime:4] [sampleType:1] [sampleRequestInterval:2] [maxNumberOfSamples:2] </b>
- *   - <i>The sampling mechanism allows a set of samples of the specified type of data to be taken, commencing at the stipulated start time. This mechanism may run concurrently with the capturing of profile data, and may refer the same parameters, albeit possibly at a different sampling rate.</i>
+/** @brief <b>zcl metering start-sampling [issuerEventId:4] [startSamplingTime:4] [sampleType:1] [sampleRequestInterval:2]
+ * [maxNumberOfSamples:2] </b>
+ *   - <i>The sampling mechanism allows a set of samples of the specified type of data to be taken, commencing at the stipulated
+ * start time. This mechanism may run concurrently with the capturing of profile data, and may refer the same parameters, albeit
+ * possibly at a different sampling rate.</i>
  *     - issuerEventId - INT32U
  *     - startSamplingTime - UTC_TIME
  *     - sampleType - SampleType [ENUM8]
@@ -2216,7 +2319,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SIMPLE_METERING_START_SAMPLING
 
 /** @brief <b>zcl metering get-sampled-data [sampleId:2] [earliestSampleTime:4] [sampleType:1] [numberOfSamples:2] </b>
- *   - <i>This command is used to request sampled data from the server. Note that it is the responsibility of the client to ensure that it does not request more samples than can be held in a single command payload.</i>
+ *   - <i>This command is used to request sampled data from the server. Note that it is the responsibility of the client to ensure
+ * that it does not request more samples than can be held in a single command payload.</i>
  *     - sampleId - INT16U
  *     - earliestSampleTime - UTC_TIME
  *     - sampleType - SampleType [ENUM8]
@@ -2233,8 +2337,10 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SIMPLE_METERING_RST_LOAD_LIMIT_CTR
 
-/** @brief <b>zcl metering chg-supply [providerId:4] [issuerEventId:4] [requestDateTime:4] [implementationDateTime:4] [proposedSupplyStatus:1] [supplyControlBits:1] </b>
- *   - <i>This command is sent from the Head-end or ESI to the Metering Device to instruct it to change the status of the valve or load switch, i.e. the supply.</i>
+/** @brief <b>zcl metering chg-supply [providerId:4] [issuerEventId:4] [requestDateTime:4] [implementationDateTime:4]
+ * [proposedSupplyStatus:1] [supplyControlBits:1] </b>
+ *   - <i>This command is sent from the Head-end or ESI to the Metering Device to instruct it to change the status of the valve or
+ * load switch, i.e. the supply.</i>
  *     - providerId - INT32U
  *     - issuerEventId - INT32U
  *     - requestDateTime - UTC_TIME
@@ -2247,15 +2353,19 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SIMPLE_METERING_CHG_SUPPLY
 
 /** @brief <b>zcl metering local-chg-supply [proposedSupplyStatus:1] </b>
- *   - <i>This command is a simplified version of the ChangeSupply command, intended to be sent from an IHD to a meter as the consequence of a user action on the IHD. Its purpose is to provide a local disconnection/reconnection button on the IHD in addition to the one on the meter.</i>
+ *   - <i>This command is a simplified version of the ChangeSupply command, intended to be sent from an IHD to a meter as the
+ * consequence of a user action on the IHD. Its purpose is to provide a local disconnection/reconnection button on the IHD in
+ * addition to the one on the meter.</i>
  *     - proposedSupplyStatus - ProposedSupplyStatus [ENUM8]
  * @sa
  * EmberAfProposedSupplyStatus
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SIMPLE_METERING_LOCAL_CHG_SUPPLY
 
-/** @brief <b>zcl metering set-supply-status [issuerEventId:4] [supplyTamperState:1] [supplyDepletionState:1] [supplyUncontrolledFlowState:1] [loadLimitSupplyState:1] </b>
- *   - <i>This command is used to specify the required status of the supply following the occurance of certain events on the meter.</i>
+/** @brief <b>zcl metering set-supply-status [issuerEventId:4] [supplyTamperState:1] [supplyDepletionState:1]
+ * [supplyUncontrolledFlowState:1] [loadLimitSupplyState:1] </b>
+ *   - <i>This command is used to specify the required status of the supply following the occurance of certain events on the
+ * meter.</i>
  *     - issuerEventId - INT32U
  *     - supplyTamperState - SupplyStatus [ENUM8]
  *     - supplyDepletionState - SupplyStatus [ENUM8]
@@ -2269,7 +2379,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SIMPLE_METERING_SET_SUPPLY_STATUS
 
-/** @brief <b>zcl metering set-uncntrl-flow-threshold [providerId:4] [issuerEventId:4] [uncontrolledFlowThreshold:2] [unitOfMeasure:1] [multiplier:2] [divisor:2] [stabilisationPeriod:1] [measurementPeriod:2] </b>
+/** @brief <b>zcl metering set-uncntrl-flow-threshold [providerId:4] [issuerEventId:4] [uncontrolledFlowThreshold:2]
+ * [unitOfMeasure:1] [multiplier:2] [divisor:2] [stabilisationPeriod:1] [measurementPeriod:2] </b>
  *   - <i>This command is used to update the 'Uncontrolled Flow Rate' configuration data used by flow meters.</i>
  *     - providerId - INT32U
  *     - issuerEventId - INT32U

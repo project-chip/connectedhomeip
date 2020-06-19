@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief SPI/UART Interface to bootloading the NCP from a connected host.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief SPI/UART Interface to bootloading the NCP
+                                                                               *from a connected host.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 bool emAfStartNcpBootloaderCommunications(void);
 void emAfPostNcpBootload(bool success);
@@ -43,6 +44,6 @@ bool emAfRebootNcpAfterBootload(void);
 
 // These primitives are called by the Xmodem code to pass data via
 // the specific mechanism (UART or SPI).
-bool emAfBootloadSendData(const uint8_t *data, uint16_t length);
+bool emAfBootloadSendData(const uint8_t * data, uint16_t length);
 bool emAfBootloadSendByte(uint8_t byte);
-bool emAfBootloadWaitChar(uint8_t *data, bool expect, uint8_t expected);
+bool emAfBootloadWaitChar(uint8_t * data, bool expect, uint8_t expected);

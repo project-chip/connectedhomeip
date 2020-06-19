@@ -31,25 +31,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief This file provides a definition for main() for non-RTOS applications.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief This file provides a definition for main()
+                                                                               *for non-RTOS applications.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include "app/framework/include/af.h"
 
 // Our entry point is typically main(), except during testing.
 #ifdef EMBER_TEST
-  #define MAIN nodeMain
+#define MAIN nodeMain
 #else
-  #define MAIN main
+#define MAIN main
 #endif
 
 int MAIN(MAIN_FUNCTION_PARAMETERS)
 {
-  halInit();
-  emberAfMainInit();
-  return emberAfMain(MAIN_FUNCTION_ARGUMENTS);
+    halInit();
+    emberAfMainInit();
+    return emberAfMain(MAIN_FUNCTION_ARGUMENTS);
 }

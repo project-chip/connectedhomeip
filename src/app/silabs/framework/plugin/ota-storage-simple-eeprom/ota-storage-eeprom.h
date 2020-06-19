@@ -31,12 +31,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the OTA Storage Simple EEPROM plugin, which
- *        manages storing an OTA file in the EEPROM.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the OTA Storage Simple
+                                                                               *EEPROM plugin, which manages storing an OTA file in
+                                                                               *the EEPROM.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // Layout of the EEPROM data for OTA is dependent upon whether SOC Bootloading support is
 // enabled.  When it is NOT enabled, the layout of data is pretty
@@ -121,65 +122,64 @@
 // different applications, but that can be more easily done by passing
 // in -D parameters globally.
 
-  #if defined(EMBER_TEST_OTA_EEPROM_PAGE_ERASE)
-    #undef EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_READ_MODIFY_WRITE_SUPPORT
-    #define EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_READ_MODIFY_WRITE_SUPPORT FALSE
-  #endif
+#if defined(EMBER_TEST_OTA_EEPROM_PAGE_ERASE)
+#undef EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_READ_MODIFY_WRITE_SUPPORT
+#define EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_READ_MODIFY_WRITE_SUPPORT FALSE
+#endif
 
-  #if defined(EMBER_TEST_OTA_EEPROM_SOC_BOOTLOAD)
-    #define EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_SOC_BOOTLOADING_SUPPORT
-  #endif
+#if defined(EMBER_TEST_OTA_EEPROM_SOC_BOOTLOAD)
+#define EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_SOC_BOOTLOADING_SUPPORT
+#endif
 
-  #if defined EMBER_TEST_OTA_EEPROM_NONZERO_START_OFFSET
-    #undef EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_STORAGE_START
+#if defined EMBER_TEST_OTA_EEPROM_NONZERO_START_OFFSET
+#undef EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_STORAGE_START
 // This is just one page size offset
-    #define EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_STORAGE_START   2048
-  #endif // EMBER_TEST_OTA_EEPROM_NONZERO_OFFSETS
+#define EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_STORAGE_START 2048
+#endif // EMBER_TEST_OTA_EEPROM_NONZERO_OFFSETS
 #endif
 
 #if defined(EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_SOC_BOOTLOADING_SUPPORT)
-  #define SOC_BOOTLOADING_SUPPORT
-  #define SOC_BOOTLOADING_SUPPORT_ENABLED true
-  #define SOC_BOOTLOADING_SUPPORT_TEXT "yes"
+#define SOC_BOOTLOADING_SUPPORT
+#define SOC_BOOTLOADING_SUPPORT_ENABLED true
+#define SOC_BOOTLOADING_SUPPORT_TEXT "yes"
 #else
-  #define SOC_BOOTLOADING_SUPPORT_ENABLED false
-  #define SOC_BOOTLOADING_SUPPORT_TEXT "no"
+#define SOC_BOOTLOADING_SUPPORT_ENABLED false
+#define SOC_BOOTLOADING_SUPPORT_TEXT "no"
 #endif
 
 #if (EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_READ_MODIFY_WRITE_SUPPORT == TRUE)
-  #define READ_MODIFY_WRITE_SUPPORT_TEXT "yes"
+#define READ_MODIFY_WRITE_SUPPORT_TEXT "yes"
 #else
-  #define READ_MODIFY_WRITE_SUPPORT_TEXT "no"
+#define READ_MODIFY_WRITE_SUPPORT_TEXT "no"
 #endif
 
 // I like shorter names, so redefine the App. Builder names.
 #define EEPROM_START EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_STORAGE_START
-#define EEPROM_END   EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_STORAGE_END
-#define SAVE_RATE    EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_DOWNLOAD_OFFSET_SAVE_RATE
+#define EEPROM_END EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_STORAGE_END
+#define SAVE_RATE EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_DOWNLOAD_OFFSET_SAVE_RATE
 
-#define DEFAULT_SLOT      0
-#define USE_FIRST_SLOT    0
-#define USE_LAST_SLOT     1
+#define DEFAULT_SLOT 0
+#define USE_FIRST_SLOT 0
+#define USE_LAST_SLOT 1
 #define USE_SPECIFIC_SLOT 2
-#define DO_NOT_USE_SLOTS  3
-#define SLOT_STRATEGY \
-  EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_GECKO_BOOTLOADER_STORAGE_SUPPORT
+#define DO_NOT_USE_SLOTS 3
+#define SLOT_STRATEGY EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_GECKO_BOOTLOADER_STORAGE_SUPPORT
 
-#define MAX_IMAGE_INFO_AND_OTA_HEADER_SIZE  2048 // bytes
+#define MAX_IMAGE_INFO_AND_OTA_HEADER_SIZE 2048 // bytes
 
 #define MAX_WORD_SIZE 4
 
 // The following indexes are all relative to the start of the Image Info section
 
-#define MAGIC_NUMBER_INDEX   0
-#define MAGIC_NUMBER_SIZE    8
+#define MAGIC_NUMBER_INDEX 0
+#define MAGIC_NUMBER_SIZE 8
 #define VERSION_NUMBER_INDEX (MAGIC_NUMBER_INDEX + MAGIC_NUMBER_SIZE)
-#define VERSION_NUMBER_SIZE  4
+#define VERSION_NUMBER_SIZE 4
 
 // Magic number to indicate that the stored download meta-data is valid.
 // Magic Number = 1-951-0200 (Ember's main phone number in hex)
 // Version = 0x00 0x01 (big endian).
-#define MAGIC_NUMBER   0x01, 0x09, 0x05, 0x01, 0x00, 0x02, 0x00, 0x00
+#define MAGIC_NUMBER 0x01, 0x09, 0x05, 0x01, 0x00, 0x02, 0x00, 0x00
 
 // Version number information
 //   0x00000001 - Addition of the Page-erase required support
@@ -195,8 +195,8 @@
 // must keep track of how big the header is.
 // This #define is actually the LOCATION where that offset is stored,
 // not the actual offset.
-#define EBL_START_OFFSET_INDEX      (VERSION_NUMBER_INDEX + VERSION_NUMBER_SIZE)
-#define EBL_START_OFFSET_SIZE       4
+#define EBL_START_OFFSET_INDEX (VERSION_NUMBER_INDEX + VERSION_NUMBER_SIZE)
+#define EBL_START_OFFSET_SIZE 4
 
 // The last recorded offset we downloaded.  This may not be the same as the
 // value stored in RAM by the OTA cluster itself.  This value will be
@@ -229,8 +229,7 @@ void emAfOtaStorageWriteInt32uToEeprom(uint32_t value, uint32_t realOffset);
 uint32_t emAfOtaStorageReadInt32uFromEeprom(uint32_t realOffset);
 void emAfStorageEepromUpdateDownloadOffset(uint32_t offset, bool finalOffset);
 
-bool emAfOtaStorageDriverGetRealOffset(uint32_t* offset,
-                                       uint32_t* length);
+bool emAfOtaStorageDriverGetRealOffset(uint32_t * offset, uint32_t * length);
 
 extern EmberEventControl emberAfPluginOtaStorageSimpleEepromPageEraseEventControl;
 
@@ -250,9 +249,9 @@ uint32_t otaStorageEepromGetImageInfoStartAddress();
 // Very very verbose debug printing.
 //#define DEBUG_PRINT
 #if defined(DEBUG_PRINT)
-  #define debugPrint(...) otaPrintln(__VA_ARGS__)
-  #define debugFlush()    emberAfCoreFlush()
+#define debugPrint(...) otaPrintln(__VA_ARGS__)
+#define debugFlush() emberAfCoreFlush()
 #else
-  #define debugPrint(...)
-  #define debugFlush()
+#define debugPrint(...)
+#define debugFlush()
 #endif

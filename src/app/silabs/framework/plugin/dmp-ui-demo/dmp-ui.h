@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief UI interface for DMP demo
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief UI interface for DMP demo
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef DMP_UI_H
 #define DMP_UI_H
@@ -51,41 +51,45 @@
  *
  ******************************************************************************/
 
-#define DMP_UI_PJOIN_EVENT_DURATION           (500)
+#define DMP_UI_PJOIN_EVENT_DURATION (500)
 
 /*******************************************************************************
  ********************************   ENUMS   ************************************
  ******************************************************************************/
 
-typedef enum {
-  DMP_UI_LIGHT_ON,
-  DMP_UI_LIGHT_OFF,
-  DMP_UI_LIGHT_UNCHANGED
+typedef enum
+{
+    DMP_UI_LIGHT_ON,
+    DMP_UI_LIGHT_OFF,
+    DMP_UI_LIGHT_UNCHANGED
 } DmpUiLightState_t;
 
-typedef enum {
-  DMP_UI_DIRECTION_BLUETOOTH,
-  DMP_UI_DIRECTION_ZIGBEE,
-  DMP_UI_DIRECTION_SWITCH,
-  DMP_UI_DIRECTION_INVALID
-}DmpUiLightDirection_t;
+typedef enum
+{
+    DMP_UI_DIRECTION_BLUETOOTH,
+    DMP_UI_DIRECTION_ZIGBEE,
+    DMP_UI_DIRECTION_SWITCH,
+    DMP_UI_DIRECTION_INVALID
+} DmpUiLightDirection_t;
 
-typedef enum {
-  DMP_UI_NO_NETWORK,
-  DMP_UI_SCANNING,
-  DMP_UI_JOINING,
-  DMP_UI_FORMING,
-  DMP_UI_NETWORK_UP,
-  DMP_UI_LOST_NETWORK,
-  DMP_UI_DISCOVERING,
-  DMP_UI_STATE_UNKNOWN
-}DmpUiZigBeeNetworkState_t;
+typedef enum
+{
+    DMP_UI_NO_NETWORK,
+    DMP_UI_SCANNING,
+    DMP_UI_JOINING,
+    DMP_UI_FORMING,
+    DMP_UI_NETWORK_UP,
+    DMP_UI_LOST_NETWORK,
+    DMP_UI_DISCOVERING,
+    DMP_UI_STATE_UNKNOWN
+} DmpUiZigBeeNetworkState_t;
 
-typedef enum {
-  DMP_UI_DEVICE_TYPE_LIGHT,
-  DMP_UI_DEVICE_TYPE_SWITCH,
-  DMP_UI_DEVICE_TYPE_LIGHT_SED,
-  DMP_UI_DEVICE_TYPE_UNKNOWN
+typedef enum
+{
+    DMP_UI_DEVICE_TYPE_LIGHT,
+    DMP_UI_DEVICE_TYPE_SWITCH,
+    DMP_UI_DEVICE_TYPE_LIGHT_SED,
+    DMP_UI_DEVICE_TYPE_UNKNOWN
 } DmpUiDeviceType_t;
 
 /*******************************************************************************
@@ -102,7 +106,7 @@ typedef enum {
  *      void
  */
 
-void dmpUiInit (void);
+void dmpUiInit(void);
 
 /**
  * @brief
@@ -214,7 +218,7 @@ void dmpUiClrLcdDisplayMainScreen(void);
  * @return
  *      void
  */
-void dmpUiSetBleDeviceName(char *devName);
+void dmpUiSetBleDeviceName(char * devName);
 
 /**
  * @brief
@@ -250,4 +254,4 @@ uint8_t dmpUiGetNumLightsDiscovered(void);
  */
 
 void dmpUiLightUpdateLight(DmpUiLightState_t updateLight1, DmpUiLightState_t updateLight2);
-#endif //DMP_UI_H
+#endif // DMP_UI_H

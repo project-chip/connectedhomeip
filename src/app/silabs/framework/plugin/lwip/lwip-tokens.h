@@ -31,26 +31,27 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Tokens for the LWIP plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Tokens for the LWIP plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifdef DEFINETYPES
 
-typedef struct {
-  // bit 0 = reserved
-  // bit 1 = Use DHCP (1) or Use Static (0)
-  uint32_t flags;
+typedef struct
+{
+    // bit 0 = reserved
+    // bit 1 = Use DHCP (1) or Use Static (0)
+    uint32_t flags;
 
-  uint32_t hostOrderIpv4Address;
-  uint32_t hostOrderIpv4Netmask;
-  uint32_t hostOrderIpv4Gateway;
+    uint32_t hostOrderIpv4Address;
+    uint32_t hostOrderIpv4Netmask;
+    uint32_t hostOrderIpv4Gateway;
 } EmberAfPluginLwipIpv4TokenStruct;
 
-#define EMBER_AF_PLUGIN_LWIP_TOKEN_DHCP_MASK   0x0002
-#define EMBER_AF_PLUGIN_LWIP_TOKEN_DHCP_VALUE  0x0002
+#define EMBER_AF_PLUGIN_LWIP_TOKEN_DHCP_MASK 0x0002
+#define EMBER_AF_PLUGIN_LWIP_TOKEN_DHCP_VALUE 0x0002
 
 #endif // DEFINETYPES
 
@@ -61,8 +62,6 @@ typedef struct {
 
 #define NVM3KEY_AFV2_PLUGIN_LWIP_IPV4 (NVM3KEY_DOMAIN_ZIGBEE | 0xF333)
 
-DEFINE_BASIC_TOKEN(AFV2_PLUGIN_LWIP_IPV4,
-                   EmberAfPluginLwipIpv4TokenStruct,
-                   { 0xFFFFFFFF })
+DEFINE_BASIC_TOKEN(AFV2_PLUGIN_LWIP_IPV4, EmberAfPluginLwipIpv4TokenStruct, { 0xFFFFFFFF })
 
 #endif // DEFINETOKENS

@@ -40,78 +40,80 @@
 #include "af.h"
 
 // Init function declarations.
-void emberAfMainInitCallback(void);  // Global
-void emberAfInit(void);  // Global
+void emberAfMainInitCallback(void); // Global
+void emberAfInit(void);             // Global
 
 void emAfInit(void)
 {
-  emberAfMainInitCallback();  // Global
-  emberAfInit();  // Global
+    emberAfMainInitCallback(); // Global
+    emberAfInit();             // Global
 }
 
 // Tick function declarations.
-void emberAfMainTickCallback(void);  // Global
-void emberAfTick(void);  // Global
-void emberAfPluginHeartbeatTickCallback(void);  // Plugin: heartbeat
-void emberAfPluginIdleSleepTickCallback(void);  // Plugin: idle-sleep
-void emberAfOtaServerTick(void);  // Plugin: ota-server
+void emberAfMainTickCallback(void);            // Global
+void emberAfTick(void);                        // Global
+void emberAfPluginHeartbeatTickCallback(void); // Plugin: heartbeat
+void emberAfPluginIdleSleepTickCallback(void); // Plugin: idle-sleep
+void emberAfOtaServerTick(void);               // Plugin: ota-server
 
 void emAfTick(void)
 {
-  emberAfMainTickCallback();  // Global
-  emberAfTick();  // Global
-  emberAfPluginHeartbeatTickCallback();  // Plugin: heartbeat
-  emberAfPluginIdleSleepTickCallback();  // Plugin: idle-sleep
-  emberAfOtaServerTick();  // Plugin: ota-server
+    emberAfMainTickCallback();            // Global
+    emberAfTick();                        // Global
+    emberAfPluginHeartbeatTickCallback(); // Plugin: heartbeat
+    emberAfPluginIdleSleepTickCallback(); // Plugin: idle-sleep
+    emberAfOtaServerTick();               // Plugin: ota-server
 }
 
-void emAfResetAttributes(uint8_t endpointId)
-{
-}
+void emAfResetAttributes(uint8_t endpointId) {}
 
 // PreCommandReceived function declarations.
-bool emberAfPreCommandReceivedCallback(EmberAfClusterCommand* cmd);  // Global
+bool emberAfPreCommandReceivedCallback(EmberAfClusterCommand * cmd); // Global
 
-bool emAfPreCommandReceived(EmberAfClusterCommand* cmd)
+bool emAfPreCommandReceived(EmberAfClusterCommand * cmd)
 {
-  return emberAfPreCommandReceivedCallback(cmd);  // Global
+    return emberAfPreCommandReceivedCallback(cmd); // Global
 }
 
 // PreZDOMessageReceived function declarations.
-bool emberAfPreZDOMessageReceivedCallback(EmberNodeId emberNodeId, EmberApsFrame* apsFrame, uint8_t* message, uint16_t length);  // Global
-bool emAfPluginDeviceQueryPreZDOMessageReceived(EmberNodeId emberNodeId, EmberApsFrame* apsFrame, uint8_t* message, uint16_t length);  // Plugin: device-query-service
+bool emberAfPreZDOMessageReceivedCallback(EmberNodeId emberNodeId, EmberApsFrame * apsFrame, uint8_t * message,
+                                          uint16_t length); // Global
+bool emAfPluginDeviceQueryPreZDOMessageReceived(EmberNodeId emberNodeId, EmberApsFrame * apsFrame, uint8_t * message,
+                                                uint16_t length); // Plugin: device-query-service
 
-bool emAfPreZDOMessageReceived(EmberNodeId emberNodeId, EmberApsFrame* apsFrame, uint8_t* message, uint16_t length)
+bool emAfPreZDOMessageReceived(EmberNodeId emberNodeId, EmberApsFrame * apsFrame, uint8_t * message, uint16_t length)
 {
-  return (emberAfPreZDOMessageReceivedCallback(emberNodeId, apsFrame, message, length)  /* Global */
-          || emAfPluginDeviceQueryPreZDOMessageReceived(emberNodeId, apsFrame, message, length) /* Plugin: device-query-service */);
+    return (emberAfPreZDOMessageReceivedCallback(emberNodeId, apsFrame, message, length) /* Global */
+            ||
+            emAfPluginDeviceQueryPreZDOMessageReceived(emberNodeId, apsFrame, message, length) /* Plugin: device-query-service */);
 }
 
-bool emAfRetrieveAttributeAndCraftResponse(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attrId, uint8_t mask, uint16_t maunfacturerCode, uint16_t readLength)
+bool emAfRetrieveAttributeAndCraftResponse(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attrId, uint8_t mask,
+                                           uint16_t maunfacturerCode, uint16_t readLength)
 {
-  return 0; // false
+    return 0; // false
 }
 
 // ZigbeeKeyEstablishment function declarations.
-void emberAfZigbeeKeyEstablishmentCallback(EmberEUI64 partner, EmberKeyStatus status);  // Global
+void emberAfZigbeeKeyEstablishmentCallback(EmberEUI64 partner, EmberKeyStatus status); // Global
 
 void emAfZigbeeKeyEstablishment(EmberEUI64 partner, EmberKeyStatus status)
 {
-  emberAfZigbeeKeyEstablishmentCallback(partner, status);  // Global
+    emberAfZigbeeKeyEstablishmentCallback(partner, status); // Global
 }
 
 // ReadAttributesResponse function declarations.
-bool emberAfReadAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t* buffer, uint16_t bufLen);  // Global
+bool emberAfReadAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen); // Global
 
-bool emAfReadAttributesResponse(EmberAfClusterId clusterId, uint8_t* buffer, uint16_t bufLen)
+bool emAfReadAttributesResponse(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
-  return emberAfReadAttributesResponseCallback(clusterId, buffer, bufLen);  // Global
+    return emberAfReadAttributesResponseCallback(clusterId, buffer, bufLen); // Global
 }
 
 // ReportAttributes function declarations.
-bool emberAfReportAttributesCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);  // Global
+bool emberAfReportAttributesCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen); // Global
 
 bool emAfReportAttributes(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
-  return emberAfReportAttributesCallback(clusterId, buffer, bufLen);  // Global
+    return emberAfReportAttributesCallback(clusterId, buffer, bufLen); // Global
 }

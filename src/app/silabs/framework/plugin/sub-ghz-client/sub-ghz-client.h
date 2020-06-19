@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Definitions for the Sub-Ghz Client plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Definitions for the Sub-Ghz Client plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SUB_GHZ_CLIENT_H_INCLUDED
 #define SUB_GHZ_CLIENT_H_INCLUDED
@@ -48,8 +48,7 @@
  * @param nodeId The server's node ID.
  * @param endpoint The server's endpoint.
  */
-EmberStatus emberAfPluginSubGhzClientSendGetSuspendZclMessagesStatusCommand(EmberNodeId nodeId,
-                                                                            uint8_t endpoint);
+EmberStatus emberAfPluginSubGhzClientSendGetSuspendZclMessagesStatusCommand(EmberNodeId nodeId, uint8_t endpoint);
 
 /** @brief Sends a request to change the channel to the server by
  * Mgmt_NWK_Unsolicited_Enhanced_Update_notify command.
@@ -70,12 +69,9 @@ EmberStatus emberAfPluginSubGhzClientSendGetSuspendZclMessagesStatusCommand(Embe
  * - ::EMBER_NETWORK_DOWN
  * - ::EMBER_NETWORK_BUSY
  */
-EmberStatus emberAfPluginSubGhzClientSendUnsolicitedEnhancedUpdateNotify(EmberNodeId destination,
-                                                                         uint8_t channelPage,
-                                                                         uint8_t channel,
-                                                                         uint16_t macTxUcastTotal,
-                                                                         uint16_t macTxUcastFailures,
-                                                                         uint16_t macTxUcastRetries,
+EmberStatus emberAfPluginSubGhzClientSendUnsolicitedEnhancedUpdateNotify(EmberNodeId destination, uint8_t channelPage,
+                                                                         uint8_t channel, uint16_t macTxUcastTotal,
+                                                                         uint16_t macTxUcastFailures, uint16_t macTxUcastRetries,
                                                                          uint8_t period);
 
 /** @brief Returns the current suspend status.

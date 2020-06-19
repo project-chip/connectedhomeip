@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief CLI for the GBCS Message Controller plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief CLI for the GBCS Message Controller plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
 #include "app/util/serial/command-interpreter2.h"
@@ -44,18 +44,12 @@
 // Functions
 
 // plugin gbz-message-controller clear
-void emAfPluginGbzMessageControllerCliClear(void)
-{
-}
+void emAfPluginGbzMessageControllerCliClear(void) {}
 
 // plugin gbz-message-controller append
 // This function will "look" into the ZCL buffer and copy over the current
 // filled command into the GBZ command payload buffer.
-void emAfPluginGbzMessageControllerCliAppend(void)
-{
-}
+void emAfPluginGbzMessageControllerCliAppend(void) {}
 
 // plugin gbz-message-controller encryption <encryptionEnabled:1>
-void emAfPluginGbzMessageControllerCliEncryption(void)
-{
-}
+void emAfPluginGbzMessageControllerCliEncryption(void) {}

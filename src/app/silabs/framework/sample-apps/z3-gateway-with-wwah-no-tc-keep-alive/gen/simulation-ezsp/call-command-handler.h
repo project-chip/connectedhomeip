@@ -43,36 +43,36 @@
 // the incomming message, and call appropriate command handler.
 
 // Cluster: Basic, server
-EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Identify, client
-EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Identify, server
-EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: On/off, server
-EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Level Control, server
-EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Poll Control, client
-EmberAfStatus emberAfPollControlClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfPollControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Green Power, client
-EmberAfStatus emberAfGreenPowerClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfGreenPowerClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Color Control, server
-EmberAfStatus emberAfColorControlClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfColorControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: IAS Zone, client
-EmberAfStatus emberAfIasZoneClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfIasZoneClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Simple Metering, client
-EmberAfStatus emberAfSimpleMeteringClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfSimpleMeteringClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: SL Works With All Hubs, client
-EmberAfStatus emberAfSlWwahClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfSlWwahClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 #endif // SILABS_EMBER_AF_COMMAND_PARSE_HEADER

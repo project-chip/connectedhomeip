@@ -31,24 +31,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Tokens for the Manufacturing Library CLI plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Tokens for the Manufacturing Library CLI
+                                                                               *plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 /**
  * Custom Application Tokens
  */
-#define CREATOR_MFG_LIB_ENABLED  (0x000d)
-#define NVM3KEY_MFG_LIB_ENABLED  (NVM3KEY_DOMAIN_USER | 0x000d)
+#define CREATOR_MFG_LIB_ENABLED (0x000d)
+#define NVM3KEY_MFG_LIB_ENABLED (NVM3KEY_DOMAIN_USER | 0x000d)
 
 #ifdef DEFINETYPES
 // Include or define any typedef for tokens here
-#endif //DEFINETYPES
+#endif // DEFINETYPES
 #ifdef DEFINETOKENS
 // Define the actual token storage information here
 
 DEFINE_BASIC_TOKEN(MFG_LIB_ENABLED, uint8_t, 0)
 
-#endif //DEFINETOKENS
+#endif // DEFINETOKENS

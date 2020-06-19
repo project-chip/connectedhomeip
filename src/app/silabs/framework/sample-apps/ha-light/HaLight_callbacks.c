@@ -41,8 +41,8 @@
 // version will be overwritten and any code you have added will be lost.
 
 #include "app/framework/include/af.h"
-#include "app/framework/plugin/reporting/reporting.h"
 #include "app/framework/plugin/ezmode-commissioning/ez-mode.h"
+#include "app/framework/plugin/reporting/reporting.h"
 
 #include "app/framework/util/af-main.h"
 
@@ -60,32 +60,32 @@ static uint16_t clusterIds[] = { ZCL_ON_OFF_CLUSTER_ID };
  * @param endpoint Endpoint that is being initialized
  * @param attributeId Attribute that changed
  */
-void emberAfOnOffClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                       EmberAfAttributeId attributeId)
+void emberAfOnOffClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId)
 {
-  if (attributeId == ZCL_ON_OFF_ATTRIBUTE_ID) {
-    bool onOff;
-    EmberAfStatus status = emberAfReadAttribute(endpoint,
-                                                ZCL_ON_OFF_CLUSTER_ID,
-                                                ZCL_ON_OFF_ATTRIBUTE_ID,
-                                                CLUSTER_MASK_SERVER,
-                                                (uint8_t *)&onOff,
-                                                sizeof(onOff),
-                                                NULL); // data type
-    if (status != EMBER_ZCL_STATUS_SUCCESS) {
-      emberAfCorePrintln("ERR: reading on/off %x", status);
-    } else {
-      emberAfCorePrintln("Light on 0x%x is now %p",
-                         endpoint,
-                         onOff ? "ON" : "OFF");
-      emberAfCoreFlush();
-      if ( onOff ) {
-        halSetLed(BOARDLED1);
-      } else {
-        halClearLed(BOARDLED1);
-      }
+    if (attributeId == ZCL_ON_OFF_ATTRIBUTE_ID)
+    {
+        bool onOff;
+        EmberAfStatus status = emberAfReadAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+                                                    (uint8_t *) &onOff, sizeof(onOff),
+                                                    NULL); // data type
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            emberAfCorePrintln("ERR: reading on/off %x", status);
+        }
+        else
+        {
+            emberAfCorePrintln("Light on 0x%x is now %p", endpoint, onOff ? "ON" : "OFF");
+            emberAfCoreFlush();
+            if (onOff)
+            {
+                halSetLed(BOARDLED1);
+            }
+            else
+            {
+                halClearLed(BOARDLED1);
+            }
+        }
     }
-  }
 }
 
 /** @brief Client Complete
@@ -96,9 +96,7 @@ void emberAfOnOffClusterServerAttributeChangedCallback(uint8_t endpoint,
  * @param bindingIndex The binding index that was created or
  * ::EMBER_NULL_BINDING if an error occurred.  Ver.: always
  */
-void emberAfPluginEzmodeCommissioningClientCompleteCallback(uint8_t bindingIndex)
-{
-}
+void emberAfPluginEzmodeCommissioningClientCompleteCallback(uint8_t bindingIndex) {}
 
 /** @brief Configured
  *
@@ -115,7 +113,7 @@ void emberAfPluginEzmodeCommissioningClientCompleteCallback(uint8_t bindingIndex
  */
 EmberAfStatus emberAfPluginReportingConfiguredCallback(const EmberAfPluginReportingEntry * entry)
 {
-  return EMBER_ZCL_STATUS_SUCCESS;
+    return EMBER_ZCL_STATUS_SUCCESS;
 }
 
 /** @brief Finished
@@ -126,9 +124,7 @@ EmberAfStatus emberAfPluginReportingConfiguredCallback(const EmberAfPluginReport
  *
  * @param status   Ver.: always
  */
-void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
-{
-}
+void emberAfPluginNetworkFindFinishedCallback(EmberStatus status) {}
 
 /** @brief Join
  *
@@ -142,11 +138,9 @@ void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
-                                          uint8_t lqi,
-                                          int8_t rssi)
+bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }
 
 /** @brief Broadcast Sent
@@ -155,9 +149,7 @@ bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
  * sent by the concentrator plugin.
  *
  */
-void emberAfPluginConcentratorBroadcastSentCallback(void)
-{
-}
+void emberAfPluginConcentratorBroadcastSentCallback(void) {}
 
 /** @brief Select File Descriptors
  *
@@ -173,10 +165,9 @@ void emberAfPluginConcentratorBroadcastSentCallback(void)
  * @param maxSize The maximum number of elements that the function implementor
  * may add.  Ver.: always
  */
-int emberAfPluginGatewaySelectFileDescriptorsCallback(int* list,
-                                                      int maxSize)
+int emberAfPluginGatewaySelectFileDescriptorsCallback(int * list, int maxSize)
 {
-  return 0;
+    return 0;
 }
 
 /** @brief Group Names Supported
@@ -188,7 +179,7 @@ int emberAfPluginGatewaySelectFileDescriptorsCallback(int* list,
  */
 bool emberAfPluginGroupsServerGroupNamesSupportedCallback(uint8_t endpoint)
 {
-  return false;
+    return false;
 }
 
 /** @brief Get Group Name
@@ -200,11 +191,7 @@ bool emberAfPluginGroupsServerGroupNamesSupportedCallback(uint8_t endpoint)
  * @param groupId  The group ID. Ver.: always
  * @param groupName Pointer to the group name. Ver.: always
  */
-void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint,
-                                                   uint16_t groupId,
-                                                   uint8_t *groupName)
-{
-}
+void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
 
 /** @brief Set Group Name
  *
@@ -215,11 +202,7 @@ void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint,
  * @param groupId  The group ID. Ver.: always
  * @param groupName Pointer to the group name. Ver.: always
  */
-void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint,
-                                                   uint16_t groupId,
-                                                   uint8_t *groupName)
-{
-}
+void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
 
 /** @brief Button Event
  *
@@ -232,86 +215,72 @@ void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint,
  * @param buttonPressDurationMs The length of time button was held down before
  * it was released.  Ver.: always
  */
-void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
-                                                   uint32_t buttonPressDurationMs)
+void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber, uint32_t buttonPressDurationMs)
 {
-  // We assume the first endpoint (0) is the one to use for client or server
-  uint8_t endpoint = emberAfPrimaryEndpoint();
-  if (buttonPressDurationMs < SHORT_PRESS_DURATION_MS) {
-    emberAfCorePrintln("EZ-Mode Commission %p:%x", "Client", endpoint);
-    emberAfEzmodeClientCommission(endpoint,
-                                  EMBER_AF_EZMODE_COMMISSIONING_SERVER_TO_CLIENT,
-                                  clusterIds,
-                                  COUNTOF(clusterIds));
-  } else {
-    emberAfCorePrintln("EZ-Mode Commission %p:%x", "Server", endpoint);
-    emberAfEzmodeServerCommission(endpoint);
-  }
+    // We assume the first endpoint (0) is the one to use for client or server
+    uint8_t endpoint = emberAfPrimaryEndpoint();
+    if (buttonPressDurationMs < SHORT_PRESS_DURATION_MS)
+    {
+        emberAfCorePrintln("EZ-Mode Commission %p:%x", "Client", endpoint);
+        emberAfEzmodeClientCommission(endpoint, EMBER_AF_EZMODE_COMMISSIONING_SERVER_TO_CLIENT, clusterIds, COUNTOF(clusterIds));
+    }
+    else
+    {
+        emberAfCorePrintln("EZ-Mode Commission %p:%x", "Server", endpoint);
+        emberAfEzmodeServerCommission(endpoint);
+    }
 }
 
 static void setUnsecuredRejoinPolicy(void)
 {
-  bool set;
-  EmberStatus status = EMBER_SUCCESS;
+    bool set;
+    EmberStatus status = EMBER_SUCCESS;
 
-  set = (emberUnsignedCommandArgument(0) ? true : false);
+    set = (emberUnsignedCommandArgument(0) ? true : false);
 
 #ifdef EZSP_HOST
-  EzspDecisionBitmask policy = (EZSP_DECISION_ALLOW_JOINS | EZSP_DECISION_ALLOW_UNSECURED_REJOINS);
-  status = emberAfSetEzspPolicy(EZSP_TRUST_CENTER_POLICY,
-                                (set
-                                 ? policy
-                                 : (policy | EZSP_DECISION_IGNORE_UNSECURED_REJOINS)),
-                                "Trust Center Policy",
-                                (set
-                                 ? "Allow preconfigured key joins"
-                                 : "Ignore trust center rejoins"));
+    EzspDecisionBitmask policy = (EZSP_DECISION_ALLOW_JOINS | EZSP_DECISION_ALLOW_UNSECURED_REJOINS);
+    status = emberAfSetEzspPolicy(EZSP_TRUST_CENTER_POLICY, (set ? policy : (policy | EZSP_DECISION_IGNORE_UNSECURED_REJOINS)),
+                                  "Trust Center Policy", (set ? "Allow preconfigured key joins" : "Ignore trust center rejoins"));
 #endif
 
-  emberAfCorePrintln("allow trust center rejoins: 0x%X", status);
+    emberAfCorePrintln("allow trust center rejoins: 0x%X", status);
 }
 
 static void setStackComplianceRevision(void)
 {
 #ifndef EZSP_HOST
-  // This guy is declared in stack/zigbee/zigbee-device.c when we build for
-  // EMBER_TEST.
-  extern uint8_t emTestStackComplianceRevision;
+    // This guy is declared in stack/zigbee/zigbee-device.c when we build for
+    // EMBER_TEST.
+    extern uint8_t emTestStackComplianceRevision;
 
-  uint8_t revision = (uint8_t)emberUnsignedCommandArgument(0);
-  emTestStackComplianceRevision = revision;
-  emberAfCorePrintln("Set stack compliance revision to %d",
-                     emTestStackComplianceRevision);
+    uint8_t revision              = (uint8_t) emberUnsignedCommandArgument(0);
+    emTestStackComplianceRevision = revision;
+    emberAfCorePrintln("Set stack compliance revision to %d", emTestStackComplianceRevision);
 #else
-  emberAfCorePrintln("This command is only available on SoC!");
+    emberAfCorePrintln("This command is only available on SoC!");
 #endif
 }
 
 EmberCommandEntry emberAfCustomCommands[] = {
-  emberCommandEntryAction("set-unsecured-rejoin-policy",
-                          setUnsecuredRejoinPolicy,
-                          "u",
-                          "Set the trust center policy on whether or not to allow unsecured rejoins."),
-  emberCommandEntryAction("set-stack-compliance-revision",
-                          setStackComplianceRevision,
-                          "u",
-                          "Set the stack compliance revision used by the stack (only available on SoC)."),
-  emberCommandEntryTerminator(),
+    emberCommandEntryAction("set-unsecured-rejoin-policy", setUnsecuredRejoinPolicy, "u",
+                            "Set the trust center policy on whether or not to allow unsecured rejoins."),
+    emberCommandEntryAction("set-stack-compliance-revision", setStackComplianceRevision, "u",
+                            "Set the stack compliance revision used by the stack (only available on SoC)."),
+    emberCommandEntryTerminator(),
 };
 #ifndef EZSP_HOST
-void emberIncomingNetworkStatusHandler(uint8_t errorCode,
-                                       EmberNodeId target)
+void emberIncomingNetworkStatusHandler(uint8_t errorCode, EmberNodeId target)
 {
-  emberAfPushCallbackNetworkIndex();
-  emberAfCorePrintln("ErrorCode : 0x%1X, Target : 0x%2X ", errorCode, target);
-  emberAfPopNetworkIndex();
+    emberAfPushCallbackNetworkIndex();
+    emberAfCorePrintln("ErrorCode : 0x%1X, Target : 0x%2X ", errorCode, target);
+    emberAfPopNetworkIndex();
 }
 #else
-void ezspIncomingNetworkStatusHandler(uint8_t errorCode,
-                                      EmberNodeId target)
+void ezspIncomingNetworkStatusHandler(uint8_t errorCode, EmberNodeId target)
 {
-  emberAfPushCallbackNetworkIndex();
-  emberAfCorePrintln("ErrorCode : 0x%1X, Target : 0x%2X ", errorCode, target);
-  emberAfPopNetworkIndex();
+    emberAfPushCallbackNetworkIndex();
+    emberAfCorePrintln("ErrorCode : 0x%1X, Target : 0x%2X ", errorCode, target);
+    emberAfPopNetworkIndex();
 }
-#endif //EZSP_HOST
+#endif // EZSP_HOST

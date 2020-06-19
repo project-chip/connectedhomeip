@@ -40,38 +40,31 @@
 #define __AF_GEN_EVENT__
 
 // Code used to configure the cluster event mechanism
-#define EMBER_AF_GENERATED_EVENT_CODE                                                \
-  extern EmberEventControl emberAfPluginFormAndJoinCleanupEventControl;              \
-  extern EmberEventControl emberAfPluginInterpanFragmentReceiveEventControl;         \
-  extern EmberEventControl emberAfPluginInterpanFragmentTransmitEventControl;        \
-  extern EmberEventControl emberAfPluginZllCommissioningClientTouchLinkEventControl; \
-  extern EmberEventControl emberAfPluginZllCommissioningNetworkNetworkEventControl;  \
-  extern EmberEventControl identifyEventControl;                                     \
-  extern void emberAfPluginFormAndJoinCleanupEventHandler(void);                     \
-  extern void emberAfPluginInterpanFragmentReceiveEventHandler(void);                \
-  extern void emberAfPluginInterpanFragmentTransmitEventHandler(void);               \
-  extern void emberAfPluginZllCommissioningClientTouchLinkEventHandler(void);        \
-  extern void emberAfPluginZllCommissioningNetworkNetworkEventHandler(void);         \
-  extern void identifyEventHandler(void);                                            \
-
+#define EMBER_AF_GENERATED_EVENT_CODE                                                                                              \
+    extern EmberEventControl emberAfPluginFormAndJoinCleanupEventControl;                                                          \
+    extern EmberEventControl emberAfPluginInterpanFragmentReceiveEventControl;                                                     \
+    extern EmberEventControl emberAfPluginInterpanFragmentTransmitEventControl;                                                    \
+    extern EmberEventControl emberAfPluginZllCommissioningClientTouchLinkEventControl;                                             \
+    extern EmberEventControl emberAfPluginZllCommissioningNetworkNetworkEventControl;                                              \
+    extern EmberEventControl identifyEventControl;                                                                                 \
+    extern void emberAfPluginFormAndJoinCleanupEventHandler(void);                                                                 \
+    extern void emberAfPluginInterpanFragmentReceiveEventHandler(void);                                                            \
+    extern void emberAfPluginInterpanFragmentTransmitEventHandler(void);                                                           \
+    extern void emberAfPluginZllCommissioningClientTouchLinkEventHandler(void);                                                    \
+    extern void emberAfPluginZllCommissioningNetworkNetworkEventHandler(void);                                                     \
+    extern void identifyEventHandler(void);
 
 // EmberEventData structs used to populate the EmberEventData table
-#define EMBER_AF_GENERATED_EVENTS                                                                                          \
-  { &emberAfPluginFormAndJoinCleanupEventControl, emberAfPluginFormAndJoinCleanupEventHandler },                           \
-  { &emberAfPluginInterpanFragmentReceiveEventControl, emberAfPluginInterpanFragmentReceiveEventHandler },                 \
-  { &emberAfPluginInterpanFragmentTransmitEventControl, emberAfPluginInterpanFragmentTransmitEventHandler },               \
-  { &emberAfPluginZllCommissioningClientTouchLinkEventControl, emberAfPluginZllCommissioningClientTouchLinkEventHandler }, \
-  { &emberAfPluginZllCommissioningNetworkNetworkEventControl, emberAfPluginZllCommissioningNetworkNetworkEventHandler },   \
-  { &identifyEventControl, identifyEventHandler },                                                                         \
+#define EMBER_AF_GENERATED_EVENTS                                                                                                  \
+    { &emberAfPluginFormAndJoinCleanupEventControl, emberAfPluginFormAndJoinCleanupEventHandler },                                 \
+        { &emberAfPluginInterpanFragmentReceiveEventControl, emberAfPluginInterpanFragmentReceiveEventHandler },                   \
+        { &emberAfPluginInterpanFragmentTransmitEventControl, emberAfPluginInterpanFragmentTransmitEventHandler },                 \
+        { &emberAfPluginZllCommissioningClientTouchLinkEventControl, emberAfPluginZllCommissioningClientTouchLinkEventHandler },   \
+        { &emberAfPluginZllCommissioningNetworkNetworkEventControl, emberAfPluginZllCommissioningNetworkNetworkEventHandler },     \
+        { &identifyEventControl, identifyEventHandler },
 
-
-#define EMBER_AF_GENERATED_EVENT_STRINGS       \
-  "Form and Join Library Plugin Cleanup",      \
-  "Interpan Plugin FragmentReceive",           \
-  "Interpan Plugin FragmentTransmit",          \
-  "ZLL Commissioning Client Plugin TouchLink", \
-  "ZLL Commissioning Network Plugin Network",  \
-  "Identify event control",                    \
-
+#define EMBER_AF_GENERATED_EVENT_STRINGS                                                                                           \
+    "Form and Join Library Plugin Cleanup", "Interpan Plugin FragmentReceive", "Interpan Plugin FragmentTransmit",                 \
+        "ZLL Commissioning Client Plugin TouchLink", "ZLL Commissioning Network Plugin Network", "Identify event control",
 
 #endif // __AF_GEN_EVENT__

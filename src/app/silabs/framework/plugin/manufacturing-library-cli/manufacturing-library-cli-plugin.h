@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the Manufacturing Library CLI plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the Manufacturing
+                                                                               *Library CLI plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_MANUFACTURING_LIBRARY_CLI_PLUGIN_H
 #define SILABS_MANUFACTURING_LIBRARY_CLI_PLUGIN_H
@@ -94,8 +95,6 @@ void emberAfMfglibStop(void);
  * @param savedLqiReturn LQI from the first received packet.
  *
  */
-void emberAfMfglibRxStatistics(uint16_t* packetsReceived,
-                               int8_t* savedRssiReturn,
-                               uint8_t* savedLqiReturn);
+void emberAfMfglibRxStatistics(uint16_t * packetsReceived, int8_t * savedRssiReturn, uint8_t * savedLqiReturn);
 
 #endif

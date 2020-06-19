@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // This callback file is created for your convenience. You may add application
 // code to this file. If you regenerate this file over a previous version, the
@@ -50,18 +50,17 @@
 // receiving a reset to factory defaults command during an identify operation.
 void emberAfPluginBasicResetToFactoryDefaultsCallback(uint8_t endpoint)
 {
-  emberAfPluginIdentifyStopFeedbackCallback(endpoint);
+    emberAfPluginIdentifyStopFeedbackCallback(endpoint);
 }
 
 // identify plugin support
-void emberAfPluginIdentifyStartFeedbackCallback(uint8_t endpoint,
-                                                uint16_t identifyTime)
+void emberAfPluginIdentifyStartFeedbackCallback(uint8_t endpoint, uint16_t identifyTime)
 {
-  halBulbPwmDriverLedBlink(HAL_BULB_PWM_DRIVER_BLINK_FOREVER, 1000);
+    halBulbPwmDriverLedBlink(HAL_BULB_PWM_DRIVER_BLINK_FOREVER, 1000);
 }
 
 void emberAfPluginIdentifyStopFeedbackCallback(uint8_t endpoint)
 {
-  halBulbPwmDriverLedOn(0);
-  halBulbPwmDriverBlinkStopCallback( );
+    halBulbPwmDriverLedOn(0);
+    halBulbPwmDriverBlinkStopCallback();
 }

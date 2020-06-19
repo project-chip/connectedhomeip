@@ -31,35 +31,36 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Macros for functional area and per-cluster debug printing
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Macros for functional area and per-cluster
+                                                                               *debug printing
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef __AF_DEBUG_PRINT__
 #define __AF_DEBUG_PRINT__
 
-#if defined (EMBER_TEST) && !defined(EMBER_AF_PRINT_NAMES)
+#if defined(EMBER_TEST) && !defined(EMBER_AF_PRINT_NAMES)
 #include "debug-printing-test.h"
 #else
 #include "debug-printing.h"
 #endif
 
 #if !defined(EMBER_AF_PRINT_OUTPUT) && defined(APP_SERIAL)
-  #define EMBER_AF_PRINT_OUTPUT APP_SERIAL
+#define EMBER_AF_PRINT_OUTPUT APP_SERIAL
 #endif
 
 extern uint16_t emberAfPrintActiveArea;
 
 // These print functions are required by the CBKE crypto engine.
 #define emberAfPrintZigbeeKey printZigbeeKey
-#define emberAfPrintCert      printCert
-#define emberAfPrintKey       printKey
-#define emberAfPrintIeeeLine  printIeeeLine
-#define emberAfPrintTextLine  printTextLine
+#define emberAfPrintCert printCert
+#define emberAfPrintKey printKey
+#define emberAfPrintIeeeLine printIeeeLine
+#define emberAfPrintTextLine printTextLine
 
-#define emberAfPrintPublicKey(key)  printKey(true, key)
+#define emberAfPrintPublicKey(key) printKey(true, key)
 #define emberAfPrintPrivateKey(key) printKey(false, key)
 
 /** @name Printing */
@@ -70,7 +71,7 @@ extern uint16_t emberAfPrintActiveArea;
  * @brief Print that can't be turned off.
  *
  */
-#define emberAfGuaranteedPrint(...)   emberAfPrint(0xFFFF, __VA_ARGS__)
+#define emberAfGuaranteedPrint(...) emberAfPrint(0xFFFF, __VA_ARGS__)
 
 /**
  * @brief Println that can't be turned off.
@@ -100,19 +101,19 @@ bool emberAfPrintEnabled(uint16_t functionality);
 /**
  * @brief Useful function to print a buffer
  */
-void emberAfPrintBuffer(uint16_t area, const uint8_t *buffer, uint16_t bufferLen, bool withSpaces);
+void emberAfPrintBuffer(uint16_t area, const uint8_t * buffer, uint16_t bufferLen, bool withSpaces);
 
 /**
  * @brief Useful function to print character strings.  The first byte of the
  * buffer specifies the length of the string.
  */
-void emberAfPrintString(uint16_t area, const uint8_t *buffer);
+void emberAfPrintString(uint16_t area, const uint8_t * buffer);
 
 /**
  * @brief Useful function to print long character strings.  The first two bytes
  * of the buffer specify the length of the string.
  */
-void emberAfPrintLongString(uint16_t area, const uint8_t *buffer);
+void emberAfPrintLongString(uint16_t area, const uint8_t * buffer);
 
 /**
  * @brief prints the specified text if certain debug are is enabled
@@ -168,22 +169,20 @@ void emberAfPrintBigEndianEui64(const EmberEUI64 eui64);
 /**
  * @brief prints all message data in message format
  */
-void emberAfPrintMessageData(uint8_t* data, uint16_t length);
+void emberAfPrintMessageData(uint8_t * data, uint16_t length);
 
 /** @} END Printing */
 
-void emberAfPrintZigbeeKey(const uint8_t *key);
-void emberAfPrintCert(const uint8_t *cert);
-void emberAfPrintCert283k1(const uint8_t *cert);
-void emberAfPrintKey(bool publicKey, const uint8_t *key);
-void emberAfPrintKey283k1(bool publickKey, const uint8_t *key);
+void emberAfPrintZigbeeKey(const uint8_t * key);
+void emberAfPrintCert(const uint8_t * cert);
+void emberAfPrintCert283k1(const uint8_t * cert);
+void emberAfPrintKey(bool publicKey, const uint8_t * key);
+void emberAfPrintKey283k1(bool publickKey, const uint8_t * key);
 void emberAfPrintIeeeLine(const EmberEUI64 ieee);
 void emberAfPrintTextLine(const char * text);
 
-void emberAfPrint8ByteBlocks(uint8_t numBlocks,
-                             const uint8_t *block,
-                             bool crBetweenBlocks);
-void emberAfPrintIssuer(const uint8_t *issuer);
+void emberAfPrint8ByteBlocks(uint8_t numBlocks, const uint8_t * block, bool crBetweenBlocks);
+void emberAfPrintIssuer(const uint8_t * issuer);
 
 void emberAfPrintChannelListFromMask(uint32_t channelMask);
 

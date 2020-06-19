@@ -31,25 +31,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Host specific code related to the event table.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Host specific code related to the event
+                                                                               *table.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
-#include "load-control-event-table.h"
 #include "app/framework/security/crypto-state.h"
+#include "load-control-event-table.h"
 
-void ezspDsaSignHandler(EmberStatus status, uint8_t messageLength, uint8_t* message)
+void ezspDsaSignHandler(EmberStatus status, uint8_t messageLength, uint8_t * message)
 {
-  // Message has been queued by the stack for sending.  Nothing more to do.
-  emAfCryptoOperationComplete();
+    // Message has been queued by the stack for sending.  Nothing more to do.
+    emAfCryptoOperationComplete();
 
-  if (status != EMBER_SUCCESS) {
-    emAfNoteSignatureFailure();
-  }
+    if (status != EMBER_SUCCESS)
+    {
+        emAfNoteSignatureFailure();
+    }
 
-  emberAfDemandResponseLoadControlClusterPrintln("ezspDsaSignHandler() returned 0x%x",
-                                                 status);
+    emberAfDemandResponseLoadControlClusterPrintln("ezspDsaSignHandler() returned 0x%x", status);
 }

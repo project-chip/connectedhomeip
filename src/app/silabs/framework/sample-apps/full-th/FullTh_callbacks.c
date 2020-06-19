@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // Copyright 2007 - 2011 by Ember Corporation. All rights reserved.
 //
@@ -65,15 +65,11 @@ void resetSystemTokens(void); // This is a HAL function that we will use.
  * @param value   Ver.: always
  * @param type   Ver.: always
  */
-EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(uint8_t endpoint,
-                                                                          EmberAfClusterId clusterId,
-                                                                          EmberAfAttributeId attributeId,
-                                                                          uint8_t mask,
-                                                                          uint16_t manufacturerCode,
-                                                                          uint8_t* value,
-                                                                          uint8_t type)
+EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(uint8_t endpoint, EmberAfClusterId clusterId,
+                                                                          EmberAfAttributeId attributeId, uint8_t mask,
+                                                                          uint16_t manufacturerCode, uint8_t * value, uint8_t type)
 {
-  return EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_NORMAL; // Default
+    return EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_NORMAL; // Default
 }
 
 /** @brief Pre Attribute Change
@@ -90,16 +86,11 @@ EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(uint8_
  * @param size   Ver.: always
  * @param value   Ver.: always
  */
-EmberAfStatus emberAfPreAttributeChangeCallback(uint8_t endpoint,
-                                                EmberAfClusterId clusterId,
-                                                EmberAfAttributeId attributeId,
-                                                uint8_t mask,
-                                                uint16_t manufacturerCode,
-                                                uint8_t type,
-                                                uint8_t size,
-                                                uint8_t* value)
+EmberAfStatus emberAfPreAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
+                                                uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
+                                                uint8_t * value)
 {
-  return EMBER_ZCL_STATUS_SUCCESS;
+    return EMBER_ZCL_STATUS_SUCCESS;
 }
 
 /** @brief Post Attribute Change
@@ -116,57 +107,49 @@ EmberAfStatus emberAfPreAttributeChangeCallback(uint8_t endpoint,
  * @param size   Ver.: always
  * @param value   Ver.: always
  */
-void emberAfPostAttributeChangeCallback(uint8_t endpoint,
-                                        EmberAfClusterId clusterId,
-                                        EmberAfAttributeId attributeId,
-                                        uint8_t mask,
-                                        uint16_t manufacturerCode,
-                                        uint8_t type,
-                                        uint8_t size,
-                                        uint8_t* value)
+void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
+                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
-  // This is a special unit test for the manufacturer name,
-  // see bug 12029
-  if (endpoint == 1
-      && clusterId == ZCL_BASIC_CLUSTER_ID
-      && attributeId == ZCL_MANUFACTURER_NAME_ATTRIBUTE_ID
-      && mask == CLUSTER_MASK_SERVER
-      && manufacturerCode == EMBER_AF_NULL_MANUFACTURER_CODE) {
-    uint8_t status = AFV2_MACRO_TEST;
-    uint8_t targetShort[6]; // This should contain "Hello"
-    uint8_t targetLong[33]; // This contains whole attribute
-    // Manufacturer name attribute
-    emberAfCustom1Print("Manufacturer name changed to:");
-    emberAfCustom1PrintString(value);
-    emberAfCustom1Println("");
-    emberAfCustom1Flush();
+    // This is a special unit test for the manufacturer name,
+    // see bug 12029
+    if (endpoint == 1 && clusterId == ZCL_BASIC_CLUSTER_ID && attributeId == ZCL_MANUFACTURER_NAME_ATTRIBUTE_ID &&
+        mask == CLUSTER_MASK_SERVER && manufacturerCode == EMBER_AF_NULL_MANUFACTURER_CODE)
+    {
+        uint8_t status = AFV2_MACRO_TEST;
+        uint8_t targetShort[6]; // This should contain "Hello"
+        uint8_t targetLong[33]; // This contains whole attribute
+        // Manufacturer name attribute
+        emberAfCustom1Print("Manufacturer name changed to:");
+        emberAfCustom1PrintString(value);
+        emberAfCustom1Println("");
+        emberAfCustom1Flush();
 
-    status = emberAfReadServerAttribute(1,
-                                        ZCL_BASIC_CLUSTER_ID,
-                                        ZCL_MANUFACTURER_NAME_ATTRIBUTE_ID,
-                                        targetShort,
-                                        sizeof(targetShort));
-    emberAfCustom1Print("Read attribute,short buffer,status=%x:", status);
-    if ( status == EMBER_ZCL_STATUS_SUCCESS ) {
-      emberAfCustom1PrintString(targetShort);
-      emberAfCustom1Println("");
-    } else {
-      emberAfCustom1Println("---ERROR---");
-    }
+        status = emberAfReadServerAttribute(1, ZCL_BASIC_CLUSTER_ID, ZCL_MANUFACTURER_NAME_ATTRIBUTE_ID, targetShort,
+                                            sizeof(targetShort));
+        emberAfCustom1Print("Read attribute,short buffer,status=%x:", status);
+        if (status == EMBER_ZCL_STATUS_SUCCESS)
+        {
+            emberAfCustom1PrintString(targetShort);
+            emberAfCustom1Println("");
+        }
+        else
+        {
+            emberAfCustom1Println("---ERROR---");
+        }
 
-    status = emberAfReadServerAttribute(1,
-                                        ZCL_BASIC_CLUSTER_ID,
-                                        ZCL_MANUFACTURER_NAME_ATTRIBUTE_ID,
-                                        targetLong,
-                                        sizeof(targetLong));
-    emberAfCustom1Print("Read attribute,long buffer,status=%x:", status);
-    if ( status == EMBER_ZCL_STATUS_SUCCESS ) {
-      emberAfCustom1PrintString(targetLong);
-      emberAfCustom1Println("");
-    } else {
-      emberAfCustom1Println("---ERROR---");
+        status =
+            emberAfReadServerAttribute(1, ZCL_BASIC_CLUSTER_ID, ZCL_MANUFACTURER_NAME_ATTRIBUTE_ID, targetLong, sizeof(targetLong));
+        emberAfCustom1Print("Read attribute,long buffer,status=%x:", status);
+        if (status == EMBER_ZCL_STATUS_SUCCESS)
+        {
+            emberAfCustom1PrintString(targetLong);
+            emberAfCustom1Println("");
+        }
+        else
+        {
+            emberAfCustom1Println("---ERROR---");
+        }
     }
-  }
 }
 
 /** @brief Pre Message Received
@@ -183,9 +166,9 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint,
  *
  * @param incomingMessage   Ver.: always
  */
-bool emberAfPreMessageReceivedCallback(EmberAfIncomingMessage* incomingMessage)
+bool emberAfPreMessageReceivedCallback(EmberAfIncomingMessage * incomingMessage)
 {
-  return false;
+    return false;
 }
 
 /** @brief Pre Command Received
@@ -199,9 +182,9 @@ bool emberAfPreMessageReceivedCallback(EmberAfIncomingMessage* incomingMessage)
  *
  * @param cmd   Ver.: always
  */
-bool emberAfPreCommandReceivedCallback(EmberAfClusterCommand* cmd)
+bool emberAfPreCommandReceivedCallback(EmberAfClusterCommand * cmd)
 {
-  return false;
+    return false;
 }
 
 /** @brief Cluster Init
@@ -214,10 +197,7 @@ bool emberAfPreCommandReceivedCallback(EmberAfClusterCommand* cmd)
  * @param endpoint   Ver.: always
  * @param clusterId   Ver.: always
  */
-void emberAfClusterInitCallback(uint8_t endpoint,
-                                EmberAfClusterId clusterId)
-{
-}
+void emberAfClusterInitCallback(uint8_t endpoint, EmberAfClusterId clusterId) {}
 
 /** @brief Main Tick
  *
@@ -225,9 +205,7 @@ void emberAfClusterInitCallback(uint8_t endpoint,
  * the end of the main tick execution.
  *
  */
-void emberAfMainTickCallback(void)
-{
-}
+void emberAfMainTickCallback(void) {}
 
 /** @brief External Attribute Write
  *
@@ -247,13 +225,11 @@ void emberAfMainTickCallback(void)
  * @param attributeMetadata   Ver.: always
  * @param buffer   Ver.: always
  */
-EmberAfStatus emberAfExternalAttributeWriteCallback(uint8_t endpoint,
-                                                    EmberAfClusterId clusterId,
-                                                    EmberAfAttributeMetadata * attributeMetadata,
-                                                    uint16_t manufacturerCode,
+EmberAfStatus emberAfExternalAttributeWriteCallback(uint8_t endpoint, EmberAfClusterId clusterId,
+                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
                                                     uint8_t * buffer)
 {
-  return EMBER_ZCL_STATUS_FAILURE;
+    return EMBER_ZCL_STATUS_FAILURE;
 }
 
 /** @brief External Attribute Read
@@ -269,14 +245,11 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(uint8_t endpoint,
  * @param attributeMetadata   Ver.: always
  * @param buffer   Ver.: always
  */
-EmberAfStatus emberAfExternalAttributeReadCallback(uint8_t endpoint,
-                                                   EmberAfClusterId clusterId,
-                                                   EmberAfAttributeMetadata * attributeMetadata,
-                                                   uint16_t manufacturerCode,
-                                                   uint8_t * buffer,
-                                                   uint16_t maxReadLength)
+EmberAfStatus emberAfExternalAttributeReadCallback(uint8_t endpoint, EmberAfClusterId clusterId,
+                                                   EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
+                                                   uint8_t * buffer, uint16_t maxReadLength)
 {
-  return EMBER_ZCL_STATUS_FAILURE;
+    return EMBER_ZCL_STATUS_FAILURE;
 }
 
 /** @brief Trust Center Join
@@ -294,13 +267,9 @@ EmberAfStatus emberAfExternalAttributeReadCallback(uint8_t endpoint,
  * @param status   Ver.: always
  * @param decision   Ver.: always
  */
-void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId,
-                                    EmberEUI64 newNodeEui64,
-                                    EmberNodeId parentOfNewNode,
-                                    EmberDeviceUpdate status,
-                                    EmberJoinDecision decision)
-{
-}
+void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId, EmberEUI64 newNodeEui64, EmberNodeId parentOfNewNode,
+                                    EmberDeviceUpdate status, EmberJoinDecision decision)
+{}
 
 /** @brief Request Mirror Response
  *
@@ -309,7 +278,7 @@ void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId,
  */
 bool emberAfSimpleMeteringClusterRequestMirrorResponseCallback(uint16_t endpointId)
 {
-  return false;
+    return false;
 }
 
 /** @brief Mirror Removed
@@ -319,7 +288,7 @@ bool emberAfSimpleMeteringClusterRequestMirrorResponseCallback(uint16_t endpoint
  */
 bool emberAfSimpleMeteringClusterMirrorRemovedCallback(uint16_t endpointId)
 {
-  return false;
+    return false;
 }
 
 /** @brief Identify Query Response
@@ -329,7 +298,7 @@ bool emberAfSimpleMeteringClusterMirrorRemovedCallback(uint16_t endpointId)
  */
 bool emberAfIdentifyClusterIdentifyQueryResponseCallback(uint16_t timeout)
 {
-  return false;
+    return false;
 }
 
 /** @brief Zone Status Change Notification
@@ -340,12 +309,10 @@ bool emberAfIdentifyClusterIdentifyQueryResponseCallback(uint16_t timeout)
  * @param zoneId   Ver.: since ha-1.2-11-5474-19
  * @param delay   Ver.: since ha-1.2-11-5474-19
  */
-bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(uint16_t zoneStatus,
-                                                               uint8_t extendedStatus,
-                                                               uint8_t zoneId,
+bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(uint16_t zoneStatus, uint8_t extendedStatus, uint8_t zoneId,
                                                                uint16_t delay)
 {
-  return false;
+    return false;
 }
 
 /** @brief Lock Door Response
@@ -355,7 +322,7 @@ bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(uint16_t zoneStat
  */
 bool emberAfDoorLockClusterLockDoorResponseCallback(uint8_t status)
 {
-  return false;
+    return false;
 }
 
 /** @brief Unlock Door Response
@@ -365,7 +332,7 @@ bool emberAfDoorLockClusterLockDoorResponseCallback(uint8_t status)
  */
 bool emberAfDoorLockClusterUnlockDoorResponseCallback(uint8_t status)
 {
-  return false;
+    return false;
 }
 
 /** @brief Window Covering Up Open
@@ -374,7 +341,7 @@ bool emberAfDoorLockClusterUnlockDoorResponseCallback(uint8_t status)
  */
 bool emberAfWindowCoveringClusterWindowCoveringUpOpenCallback(void)
 {
-  return false;
+    return false;
 }
 
 /** @brief Window Covering Down Close
@@ -383,7 +350,7 @@ bool emberAfWindowCoveringClusterWindowCoveringUpOpenCallback(void)
  */
 bool emberAfWindowCoveringClusterWindowCoveringDownCloseCallback(void)
 {
-  return false;
+    return false;
 }
 
 /** @brief Window Covering Stop
@@ -392,7 +359,7 @@ bool emberAfWindowCoveringClusterWindowCoveringDownCloseCallback(void)
  */
 bool emberAfWindowCoveringClusterWindowCoveringStopCallback(void)
 {
-  return false;
+    return false;
 }
 
 /** @brief Window Covering Go To Lift Setpoint
@@ -402,7 +369,7 @@ bool emberAfWindowCoveringClusterWindowCoveringStopCallback(void)
  */
 bool emberAfWindowCoveringClusterWindowCoveringGoToLiftSetpointCallback(uint8_t indexOfLiftSetpoint)
 {
-  return false;
+    return false;
 }
 
 /** @brief Window Covering Go To Lift Value
@@ -412,7 +379,7 @@ bool emberAfWindowCoveringClusterWindowCoveringGoToLiftSetpointCallback(uint8_t 
  */
 bool emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(uint16_t liftValue)
 {
-  return false;
+    return false;
 }
 
 /** @brief Window Covering Go To Lift Percentage
@@ -422,7 +389,7 @@ bool emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(uint16_t li
  */
 bool emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(uint8_t percentageLiftValue)
 {
-  return false;
+    return false;
 }
 
 /** @brief Window Covering Go To Tilt Setpoint
@@ -432,7 +399,7 @@ bool emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(uint8_
  */
 bool emberAfWindowCoveringClusterWindowCoveringGoToTiltSetpointCallback(uint8_t indexOfTiltSetpoint)
 {
-  return false;
+    return false;
 }
 
 /** @brief Window Covering Go To Tilt Value
@@ -442,7 +409,7 @@ bool emberAfWindowCoveringClusterWindowCoveringGoToTiltSetpointCallback(uint8_t 
  */
 bool emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(uint16_t tiltValue)
 {
-  return false;
+    return false;
 }
 
 /** @brief Window Covering Go To Tilt Percentage
@@ -452,7 +419,7 @@ bool emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(uint16_t ti
  */
 bool emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(uint8_t percentageTiltValue)
 {
-  return false;
+    return false;
 }
 
 /** @brief Window Covering Go To Program Setpoint
@@ -462,11 +429,10 @@ bool emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(uint8_
  * @param setpointIndex   Ver.: always
  * @param setpointValue   Ver.: always
  */
-bool emberAfWindowCoveringClusterWindowCoveringGoToProgramSetpointCallback(uint8_t setpointType,
-                                                                           uint8_t setpointIndex,
+bool emberAfWindowCoveringClusterWindowCoveringGoToProgramSetpointCallback(uint8_t setpointType, uint8_t setpointIndex,
                                                                            uint16_t setpointValue)
 {
-  return false;
+    return false;
 }
 
 /** @brief Match Protocol Address Response
@@ -475,10 +441,9 @@ bool emberAfWindowCoveringClusterWindowCoveringGoToProgramSetpointCallback(uint8
  * @param deviceIeeeAddress   Ver.: always
  * @param protocolAddress   Ver.: always
  */
-bool emberAfGenericTunnelClusterMatchProtocolAddressResponseCallback(uint8_t* deviceIeeeAddress,
-                                                                     uint8_t* protocolAddress)
+bool emberAfGenericTunnelClusterMatchProtocolAddressResponseCallback(uint8_t * deviceIeeeAddress, uint8_t * protocolAddress)
 {
-  return false;
+    return false;
 }
 
 /** @brief Client Attribute Changed
@@ -488,12 +453,9 @@ bool emberAfGenericTunnelClusterMatchProtocolAddressResponseCallback(uint8_t* de
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfColorControlClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                              EmberAfAttributeId attributeId)
+void emberAfColorControlClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId)
 {
-  emberAfColorControlClusterPrintln("ColorControlClientAttributeChange:%x,%2x",
-                                    endpoint,
-                                    attributeId);
+    emberAfColorControlClusterPrintln("ColorControlClientAttributeChange:%x,%2x", endpoint, attributeId);
 }
 
 /** @brief Server Attribute Changed
@@ -503,13 +465,10 @@ void emberAfColorControlClusterClientAttributeChangedCallback(uint8_t endpoint,
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfColorControlClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                              EmberAfAttributeId attributeId)
+void emberAfColorControlClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId)
 {
-  emberAfColorControlClusterPrintln("ColorControlAttributeChange:%x,%2x",
-                                    endpoint,
-                                    attributeId);
-  emberAfColorControlClusterFlush();
+    emberAfColorControlClusterPrintln("ColorControlAttributeChange:%x,%2x", endpoint, attributeId);
+    emberAfColorControlClusterFlush();
 }
 
 /** @brief Main Init
@@ -521,56 +480,49 @@ void emberAfColorControlClusterServerAttributeChangedCallback(uint8_t endpoint,
  */
 void emberAfMainInitCallback(void)
 {
-  EmberAfStatus status;
-  uint8_t shortString[] = { 5, 'A', 'B', 'C', 'D', 'E' };
-  uint8_t longString[] = { 40, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
-                           '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
-                           '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
-                           '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' };
-  emberAfCorePrintln("Main init called.");
-  // Now check the custom token if it works.
+    EmberAfStatus status;
+    uint8_t shortString[] = { 5, 'A', 'B', 'C', 'D', 'E' };
+    uint8_t longString[]  = { 40,  '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3',
+                             '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7',
+                             '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' };
+    emberAfCorePrintln("Main init called.");
+    // Now check the custom token if it works.
 
 #ifndef EZSP_HOST
-  // No tokens on host
-  {
-    uint8_t value;
+    // No tokens on host
+    {
+        uint8_t value;
 #ifdef EMBER_TEST
 //    In order to test that mfg-specific tokens are preserved across
 //.   reboots in simulation, the following was commented out.
 //    resetSystemTokens();
 #endif
-    halCommonGetToken((tokType_custom_token *)&value, TOKEN_CUSTOM_TOKEN);
-    emberAfCorePrintln("Default custom token value:%x\n", value);
+        halCommonGetToken((tokType_custom_token *) &value, TOKEN_CUSTOM_TOKEN);
+        emberAfCorePrintln("Default custom token value:%x\n", value);
 
-    value = 0x13;
-    halCommonSetToken(TOKEN_CUSTOM_TOKEN, &value);
-    halCommonGetToken((tokType_custom_token *)&value, TOKEN_CUSTOM_TOKEN);
-    emberAfCorePrintln("Changed custom token value:%x\n", value);
-  }
+        value = 0x13;
+        halCommonSetToken(TOKEN_CUSTOM_TOKEN, &value);
+        halCommonGetToken((tokType_custom_token *) &value, TOKEN_CUSTOM_TOKEN);
+        emberAfCorePrintln("Changed custom token value:%x\n", value);
+    }
 #endif // EZSP_HOST
 
-  emberAfCoreFlush();
-  // Bug 12081 said that trying to write a string that is too long should fail,
-  // but it is more natural (to strncpy users, at least) to copy as much data
-  // as will fit in the destination.  This change is documented as bug 14684.
-  emberAfCorePrintln("Testing emberWriteAttribute for Strings");
+    emberAfCoreFlush();
+    // Bug 12081 said that trying to write a string that is too long should fail,
+    // but it is more natural (to strncpy users, at least) to copy as much data
+    // as will fit in the destination.  This change is documented as bug 14684.
+    emberAfCorePrintln("Testing emberWriteAttribute for Strings");
 
-  emberAfCoreFlush();
-  status = emberAfWriteServerAttribute(1,
-                                       ZCL_BASIC_CLUSTER_ID,
-                                       ZCL_MANUFACTURER_NAME_ATTRIBUTE_ID,
-                                       shortString,
-                                       ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
-  emberAfCorePrintln("Short string status: %x", status);
+    emberAfCoreFlush();
+    status = emberAfWriteServerAttribute(1, ZCL_BASIC_CLUSTER_ID, ZCL_MANUFACTURER_NAME_ATTRIBUTE_ID, shortString,
+                                         ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    emberAfCorePrintln("Short string status: %x", status);
 
-  emberAfCoreFlush();
-  status = emberAfWriteServerAttribute(1,
-                                       ZCL_BASIC_CLUSTER_ID,
-                                       ZCL_MANUFACTURER_NAME_ATTRIBUTE_ID,
-                                       longString,
-                                       ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
-  emberAfCorePrintln("Long string status: %x", status);
-  emberAfCoreFlush();
+    emberAfCoreFlush();
+    status = emberAfWriteServerAttribute(1, ZCL_BASIC_CLUSTER_ID, ZCL_MANUFACTURER_NAME_ATTRIBUTE_ID, longString,
+                                         ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    emberAfCorePrintln("Long string status: %x", status);
+    emberAfCoreFlush();
 }
 
 /** @brief Tunnel Opened
@@ -584,15 +536,11 @@ void emberAfMainInitCallback(void)
  * @param maximumIncomingTransferSize The maximum incoming transfer size of
  * the server.  Ver.: always
  */
-void emberAfPluginTunnelingClientTunnelOpenedCallback(uint8_t tunnelIndex,
-                                                      EmberAfPluginTunnelingClientStatus tunnelStatus,
+void emberAfPluginTunnelingClientTunnelOpenedCallback(uint8_t tunnelIndex, EmberAfPluginTunnelingClientStatus tunnelStatus,
                                                       uint16_t maximumIncomingTransferSize)
 {
-  emberAfTunnelingClusterFlush();
-  emberAfTunnelingClusterPrintln("ClientTunnelOpened:%x,%x,%2x",
-                                 tunnelIndex,
-                                 tunnelStatus,
-                                 maximumIncomingTransferSize);
+    emberAfTunnelingClusterFlush();
+    emberAfTunnelingClusterPrintln("ClientTunnelOpened:%x,%x,%2x", tunnelIndex, tunnelStatus, maximumIncomingTransferSize);
 }
 
 /** @brief Data Received
@@ -605,14 +553,12 @@ void emberAfPluginTunnelingClientTunnelOpenedCallback(uint8_t tunnelIndex,
  * @param data Buffer containing the raw octets of the data.  Ver.: always
  * @param dataLen The length in octets of the data.  Ver.: always
  */
-void emberAfPluginTunnelingClientDataReceivedCallback(uint8_t tunnelIndex,
-                                                      uint8_t * data,
-                                                      uint16_t dataLen)
+void emberAfPluginTunnelingClientDataReceivedCallback(uint8_t tunnelIndex, uint8_t * data, uint16_t dataLen)
 {
-  emberAfTunnelingClusterFlush();
-  emberAfTunnelingClusterPrint("ClientDataReceived:%x,[", tunnelIndex);
-  emberAfTunnelingClusterPrintBuffer(data, dataLen, false);
-  emberAfTunnelingClusterPrintln("]");
+    emberAfTunnelingClusterFlush();
+    emberAfTunnelingClusterPrint("ClientDataReceived:%x,[", tunnelIndex);
+    emberAfTunnelingClusterPrintBuffer(data, dataLen, false);
+    emberAfTunnelingClusterPrintln("]");
 }
 
 /** @brief Data Error
@@ -626,13 +572,10 @@ void emberAfPluginTunnelingClientDataReceivedCallback(uint8_t tunnelIndex,
  * occurred.  Ver.: always
  * @param transferDataStatus The error that occurred.  Ver.: always
  */
-void emberAfPluginTunnelingClientDataErrorCallback(uint8_t tunnelIndex,
-                                                   EmberAfTunnelingTransferDataStatus transferDataStatus)
+void emberAfPluginTunnelingClientDataErrorCallback(uint8_t tunnelIndex, EmberAfTunnelingTransferDataStatus transferDataStatus)
 {
-  emberAfTunnelingClusterFlush();
-  emberAfTunnelingClusterPrintln("ClientDataError:%x,%x",
-                                 tunnelIndex,
-                                 transferDataStatus);
+    emberAfTunnelingClusterFlush();
+    emberAfTunnelingClusterPrintln("ClientDataError:%x,%x", tunnelIndex, transferDataStatus);
 }
 
 /** @brief Tunnel Closed
@@ -647,8 +590,8 @@ void emberAfPluginTunnelingClientDataErrorCallback(uint8_t tunnelIndex,
  */
 void emberAfPluginTunnelingClientTunnelClosedCallback(uint8_t tunnelIndex)
 {
-  emberAfTunnelingClusterFlush();
-  emberAfTunnelingClusterPrintln("ClientTunnelClosed:%x", tunnelIndex);
+    emberAfTunnelingClusterFlush();
+    emberAfTunnelingClusterPrintln("ClientTunnelClosed:%x", tunnelIndex);
 }
 
 /** @brief Is Protocol Supported
@@ -662,24 +605,22 @@ void emberAfPluginTunnelingClientTunnelClosedCallback(uint8_t tunnelIndex)
  * @param manufacturerCode The manufacturer code for manufacturer-defined
  * protocols or 0xFFFF in unused.  Ver.: always
  */
-bool emberAfPluginTunnelingServerIsProtocolSupportedCallback(uint8_t protocolId,
-                                                             uint16_t manufacturerCode)
+bool emberAfPluginTunnelingServerIsProtocolSupportedCallback(uint8_t protocolId, uint16_t manufacturerCode)
 {
-  emberAfTunnelingClusterFlush();
-  emberAfTunnelingClusterPrintln("IsProtocolSupported:%x,%2x",
-                                 protocolId,
-                                 manufacturerCode);
-  switch (protocolId) {
+    emberAfTunnelingClusterFlush();
+    emberAfTunnelingClusterPrintln("IsProtocolSupported:%x,%2x", protocolId, manufacturerCode);
+    switch (protocolId)
+    {
     case EMBER_ZCL_TUNNELING_PROTOCOL_ID_DLMS_COSEM:
     case EMBER_ZCL_TUNNELING_PROTOCOL_ID_IEC_61107:
     case EMBER_ZCL_TUNNELING_PROTOCOL_ID_ANSI_C12:
     case EMBER_ZCL_TUNNELING_PROTOCOL_ID_M_BUS:
     case EMBER_ZCL_TUNNELING_PROTOCOL_ID_SML:
     case EMBER_ZCL_TUNNELING_PROTOCOL_ID_CLIMATE_TALK:
-      return true;
+        return true;
     default:
-      return (protocolId >= 200 && manufacturerCode == EMBER_AF_MANUFACTURER_CODE);
-  }
+        return (protocolId >= 200 && manufacturerCode == EMBER_AF_MANUFACTURER_CODE);
+    }
 }
 
 /** @brief Tunnel Opened
@@ -698,19 +639,12 @@ bool emberAfPluginTunnelingServerIsProtocolSupportedCallback(uint8_t protocolId,
  * @param maximumIncomingTransferSize The maximum incoming transfer size of
  * the client.  Ver.: always
  */
-void emberAfPluginTunnelingServerTunnelOpenedCallback(uint16_t tunnelId,
-                                                      uint8_t protocolId,
-                                                      uint16_t manufacturerCode,
-                                                      bool flowControlSupport,
-                                                      uint16_t maximumIncomingTransferSize)
+void emberAfPluginTunnelingServerTunnelOpenedCallback(uint16_t tunnelId, uint8_t protocolId, uint16_t manufacturerCode,
+                                                      bool flowControlSupport, uint16_t maximumIncomingTransferSize)
 {
-  emberAfTunnelingClusterFlush();
-  emberAfTunnelingClusterPrintln("ServerTunnelOpened:%2x,%x,%2x,%x,%2x",
-                                 tunnelId,
-                                 protocolId,
-                                 manufacturerCode,
-                                 flowControlSupport,
-                                 maximumIncomingTransferSize);
+    emberAfTunnelingClusterFlush();
+    emberAfTunnelingClusterPrintln("ServerTunnelOpened:%2x,%x,%2x,%x,%2x", tunnelId, protocolId, manufacturerCode,
+                                   flowControlSupport, maximumIncomingTransferSize);
 }
 
 /** @brief Data Received
@@ -723,14 +657,12 @@ void emberAfPluginTunnelingServerTunnelOpenedCallback(uint16_t tunnelId,
  * @param data Buffer containing the raw octets of the data.  Ver.: always
  * @param dataLen The length in octets of the data.  Ver.: always
  */
-void emberAfPluginTunnelingServerDataReceivedCallback(uint16_t tunnelId,
-                                                      uint8_t * data,
-                                                      uint16_t dataLen)
+void emberAfPluginTunnelingServerDataReceivedCallback(uint16_t tunnelId, uint8_t * data, uint16_t dataLen)
 {
-  emberAfTunnelingClusterFlush();
-  emberAfTunnelingClusterPrint("ServerDataReceived:%2x,[", tunnelId);
-  emberAfTunnelingClusterPrintBuffer(data, dataLen, false);
-  emberAfTunnelingClusterPrintln("]");
+    emberAfTunnelingClusterFlush();
+    emberAfTunnelingClusterPrint("ServerDataReceived:%2x,[", tunnelId);
+    emberAfTunnelingClusterPrintBuffer(data, dataLen, false);
+    emberAfTunnelingClusterPrintln("]");
 }
 
 /** @brief Data Error
@@ -744,13 +676,10 @@ void emberAfPluginTunnelingServerDataReceivedCallback(uint16_t tunnelId,
  * occurred.  Ver.: always
  * @param transferDataStatus The error that occurred.  Ver.: always
  */
-void emberAfPluginTunnelingServerDataErrorCallback(uint16_t tunnelId,
-                                                   EmberAfTunnelingTransferDataStatus transferDataStatus)
+void emberAfPluginTunnelingServerDataErrorCallback(uint16_t tunnelId, EmberAfTunnelingTransferDataStatus transferDataStatus)
 {
-  emberAfTunnelingClusterFlush();
-  emberAfTunnelingClusterPrintln("ServerDataError:%2x,%x",
-                                 tunnelId,
-                                 transferDataStatus);
+    emberAfTunnelingClusterFlush();
+    emberAfTunnelingClusterPrintln("ServerDataError:%2x,%x", tunnelId, transferDataStatus);
 }
 
 /** @brief Tunnel Closed
@@ -765,13 +694,10 @@ void emberAfPluginTunnelingServerDataErrorCallback(uint16_t tunnelId,
  * tunnel or false if the server closed the tunnel due to inactivity.  Ver.:
  * always
  */
-void emberAfPluginTunnelingServerTunnelClosedCallback(uint16_t tunnelId,
-                                                      bool clientInitiated)
+void emberAfPluginTunnelingServerTunnelClosedCallback(uint16_t tunnelId, bool clientInitiated)
 {
-  emberAfTunnelingClusterFlush();
-  emberAfTunnelingClusterPrintln("ServerTunnelClosed:%2x,%p",
-                                 tunnelId,
-                                 (clientInitiated ? "CLIENT" : "SERVER"));
+    emberAfTunnelingClusterFlush();
+    emberAfTunnelingClusterPrintln("ServerTunnelClosed:%2x,%p", tunnelId, (clientInitiated ? "CLIENT" : "SERVER"));
 }
 
 /** @brief Request Mirror
@@ -785,7 +711,7 @@ void emberAfPluginTunnelingServerTunnelClosedCallback(uint16_t tunnelId,
  */
 uint16_t emberAfPluginSimpleMeteringClientRequestMirrorCallback(EmberEUI64 requestingDeviceIeeeAddress)
 {
-  return 0xFFFF;
+    return 0xFFFF;
 }
 
 /** @brief Remove Mirror
@@ -799,7 +725,7 @@ uint16_t emberAfPluginSimpleMeteringClientRequestMirrorCallback(EmberEUI64 reque
  */
 uint16_t emberAfPluginSimpleMeteringClientRemoveMirrorCallback(EmberEUI64 requestingDeviceIeeeAddress)
 {
-  return 0xFFFF;
+    return 0xFFFF;
 }
 
 /** @brief Display Message
@@ -809,9 +735,7 @@ uint16_t emberAfPluginSimpleMeteringClientRemoveMirrorCallback(EmberEUI64 reques
  *
  * @param message The message that should be displayed.  Ver.: always
  */
-void emberAfPluginMessagingClientDisplayMessageCallback(EmberAfPluginMessagingClientMessage * message)
-{
-}
+void emberAfPluginMessagingClientDisplayMessageCallback(EmberAfPluginMessagingClientMessage * message) {}
 
 /** @brief Cancel Message
  *
@@ -821,9 +745,7 @@ void emberAfPluginMessagingClientDisplayMessageCallback(EmberAfPluginMessagingCl
  * @param message The message that should no longer be displayed.  Ver.:
  * always
  */
-void emberAfPluginMessagingClientCancelMessageCallback(EmberAfPluginMessagingClientMessage * message)
-{
-}
+void emberAfPluginMessagingClientCancelMessageCallback(EmberAfPluginMessagingClientMessage * message) {}
 
 /** @brief Price Started
  *
@@ -831,9 +753,7 @@ void emberAfPluginMessagingClientCancelMessageCallback(EmberAfPluginMessagingCli
  *
  * @param price The price that has started.  Ver.: always
  */
-void emberAfPluginPriceClientPriceStartedCallback(EmberAfPluginPriceClientPrice * price)
-{
-}
+void emberAfPluginPriceClientPriceStartedCallback(EmberAfPluginPriceClientPrice * price) {}
 
 /** @brief Price Expired
  *
@@ -842,9 +762,7 @@ void emberAfPluginPriceClientPriceStartedCallback(EmberAfPluginPriceClientPrice 
  *
  * @param price The price that has expired.  Ver.: always
  */
-void emberAfPluginPriceClientPriceExpiredCallback(EmberAfPluginPriceClientPrice * price)
-{
-}
+void emberAfPluginPriceClientPriceExpiredCallback(EmberAfPluginPriceClientPrice * price) {}
 
 /** @brief Configured
  *
@@ -861,7 +779,7 @@ void emberAfPluginPriceClientPriceExpiredCallback(EmberAfPluginPriceClientPrice 
  */
 EmberAfStatus emberAfPluginReportingConfiguredCallback(const EmberAfPluginReportingEntry * entry)
 {
-  return EMBER_ZCL_STATUS_SUCCESS;
+    return EMBER_ZCL_STATUS_SUCCESS;
 }
 
 /** @brief Registration
@@ -876,7 +794,7 @@ EmberAfStatus emberAfPluginReportingConfiguredCallback(const EmberAfPluginReport
  */
 void emberAfRegistrationCallback(bool success)
 {
-  emberAfRegistrationPrintln("Registration %p", success ? "complete" : "failed");
+    emberAfRegistrationPrintln("Registration %p", success ? "complete" : "failed");
 }
 
 /** @brief Client Default Response
@@ -887,11 +805,9 @@ void emberAfRegistrationCallback(bool success)
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfColorControlClusterClientDefaultResponseCallback(uint8_t endpoint,
-                                                             uint8_t commandId,
-                                                             EmberAfStatus status)
+void emberAfColorControlClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status)
 {
-  emberAfCorePrintln("ColorControlClientDefaultResponse:%x,%x,%x", endpoint, commandId, status);
+    emberAfCorePrintln("ColorControlClientDefaultResponse:%x,%x,%x", endpoint, commandId, status);
 }
 
 /** @brief Server Default Response
@@ -902,11 +818,9 @@ void emberAfColorControlClusterClientDefaultResponseCallback(uint8_t endpoint,
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfColorControlClusterServerDefaultResponseCallback(uint8_t endpoint,
-                                                             uint8_t commandId,
-                                                             EmberAfStatus status)
+void emberAfColorControlClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status)
 {
-  emberAfCorePrintln("ColorControlServerDefaultResponse:%x,%x,%x", endpoint, commandId, status);
+    emberAfCorePrintln("ColorControlServerDefaultResponse:%x,%x,%x", endpoint, commandId, status);
 }
 
 /** @brief Event Action
@@ -936,11 +850,10 @@ void emberAfColorControlClusterServerDefaultResponseCallback(uint8_t endpoint,
  * @param eventStatus Status of event  Ver.: always
  * @param sequenceNumber Sequence number  Ver.: always
  */
-bool emberAfPluginDrlcEventActionCallback(EmberAfLoadControlEvent * loadControlEvent,
-                                          EmberAfAmiEventStatus eventStatus,
+bool emberAfPluginDrlcEventActionCallback(EmberAfLoadControlEvent * loadControlEvent, EmberAfAmiEventStatus eventStatus,
                                           uint8_t sequenceNumber)
 {
-  return true;
+    return true;
 }
 
 /** @brief Command One
@@ -950,10 +863,10 @@ bool emberAfPluginDrlcEventActionCallback(EmberAfLoadControlEvent * loadControlE
  */
 bool emberAfSampleMfgSpecificClusterCommandOneCallback(uint8_t argOne)
 {
-  emberAfCustom1Println("Rx Sample Mfg Specific Cluster Custom One Command: %x", argOne);
-  emberAfCustom1Flush();
-  emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-  return true;
+    emberAfCustom1Println("Rx Sample Mfg Specific Cluster Custom One Command: %x", argOne);
+    emberAfCustom1Flush();
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
 }
 
 /** @brief Command One
@@ -963,10 +876,10 @@ bool emberAfSampleMfgSpecificClusterCommandOneCallback(uint8_t argOne)
  */
 bool emberAfSampleMfgSpecificCluster2CommandTwoCallback(uint8_t argOne)
 {
-  emberAfCustom1Println("Rx Sample Mfg Specific Cluster Custom Two Command: %x,%x", argOne, argOne);
-  emberAfCustom1Flush();
-  emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-  return true;
+    emberAfCustom1Println("Rx Sample Mfg Specific Cluster Custom Two Command: %x,%x", argOne, argOne);
+    emberAfCustom1Flush();
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
 }
 
 /** @brief Server Manufacturer Specific Attribute Changed
@@ -982,8 +895,7 @@ bool emberAfSampleMfgSpecificCluster2CommandTwoCallback(uint8_t argOne)
 void emberAfSampleMfgSpecificClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
                                                                                        EmberAfAttributeId attributeId,
                                                                                        uint16_t manufacturerCode)
-{
-}
+{}
 
 /** @brief Sample Mfg Specific Off With Transition
  *
@@ -991,10 +903,10 @@ void emberAfSampleMfgSpecificClusterServerManufacturerSpecificAttributeChangedCa
  */
 bool emberAfOnOffClusterSampleMfgSpecificOffWithTransitionCallback(void)
 {
-  emberAfCustom1Println("Rx Sample Mfg Specific Off With Transition");
-  emberAfCustom1Flush();
-  emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-  return true;
+    emberAfCustom1Println("Rx Sample Mfg Specific Off With Transition");
+    emberAfCustom1Flush();
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
 }
 
 /** @brief Sample Mfg Specific On With Transition
@@ -1003,10 +915,10 @@ bool emberAfOnOffClusterSampleMfgSpecificOffWithTransitionCallback(void)
  */
 bool emberAfOnOffClusterSampleMfgSpecificOnWithTransitionCallback(void)
 {
-  emberAfCustom1Println("Rx Sample Mfg Specific On With Transition");
-  emberAfCustom1Flush();
-  emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-  return true;
+    emberAfCustom1Println("Rx Sample Mfg Specific On With Transition");
+    emberAfCustom1Flush();
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
 }
 
 /** @brief Sample Mfg Specific On With Transition
@@ -1015,10 +927,10 @@ bool emberAfOnOffClusterSampleMfgSpecificOnWithTransitionCallback(void)
  */
 bool emberAfOnOffClusterSampleMfgSpecificOnWithTransition2Callback(void)
 {
-  emberAfCustom1Println("Rx Sample Mfg Specific 2 On With Transition");
-  emberAfCustom1Flush();
-  emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-  return true;
+    emberAfCustom1Println("Rx Sample Mfg Specific 2 On With Transition");
+    emberAfCustom1Flush();
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
 }
 
 /** @brief Sample Mfg Specific Toggle With Transition
@@ -1027,10 +939,10 @@ bool emberAfOnOffClusterSampleMfgSpecificOnWithTransition2Callback(void)
  */
 bool emberAfOnOffClusterSampleMfgSpecificToggleWithTransitionCallback(void)
 {
-  emberAfCustom1Println("Rx Sample Mfg Specific Toggle With Transition");
-  emberAfCustom1Flush();
-  emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-  return true;
+    emberAfCustom1Println("Rx Sample Mfg Specific Toggle With Transition");
+    emberAfCustom1Flush();
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
 }
 
 /** @brief Server Manufacturer Specific Attribute Changed
@@ -1042,13 +954,12 @@ bool emberAfOnOffClusterSampleMfgSpecificToggleWithTransitionCallback(void)
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfOnOffClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                           EmberAfAttributeId attributeId,
+void emberAfOnOffClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
                                                                            uint16_t manufacturerCode)
 {
-  emberAfCustom1Println("Rx On/Off Cluster Mfg Specific attribute changed callback, endpt:%x, attId:%2x, mfgCode:%2x",
-                        endpoint, attributeId, manufacturerCode);
-  emberAfCustom1Flush();
+    emberAfCustom1Println("Rx On/Off Cluster Mfg Specific attribute changed callback, endpt:%x, attId:%2x, mfgCode:%2x", endpoint,
+                          attributeId, manufacturerCode);
+    emberAfCustom1Flush();
 }
 
 /** @brief Reset To Factory Defaults
@@ -1062,9 +973,7 @@ void emberAfOnOffClusterServerManufacturerSpecificAttributeChangedCallback(uint8
  * @param endpoint Specific endpoint on which to operate; EMBER_BROADCAST_ENDPOINT for all endpoints
  *
  */
-void emberAfPluginBasicResetToFactoryDefaultsCallback(uint8_t endpoint)
-{
-}
+void emberAfPluginBasicResetToFactoryDefaultsCallback(uint8_t endpoint) {}
 
 /** @brief Is Color Supported
  *
@@ -1074,10 +983,9 @@ void emberAfPluginBasicResetToFactoryDefaultsCallback(uint8_t endpoint)
  * @param hue   Ver.: always
  * @param saturation   Ver.: always
  */
-bool emberAfPluginColorControlIsColorSupportedCallback(uint8_t hue,
-                                                       uint8_t saturation)
+bool emberAfPluginColorControlIsColorSupportedCallback(uint8_t hue, uint8_t saturation)
 {
-  return true;
+    return true;
 }
 
 /** @brief Pre Message Received
@@ -1090,11 +998,9 @@ bool emberAfPluginColorControlIsColorSupportedCallback(uint8_t hue,
  * @param msgLen   Ver.: always
  * @param message   Ver.: always
  */
-bool emberAfPluginInterpanPreMessageReceivedCallback(const EmberAfInterpanHeader * header,
-                                                     uint8_t msgLen,
-                                                     uint8_t * message)
+bool emberAfPluginInterpanPreMessageReceivedCallback(const EmberAfInterpanHeader * header, uint8_t msgLen, uint8_t * message)
 {
-  return false;
+    return false;
 }
 
 /** @brief Finished
@@ -1105,9 +1011,7 @@ bool emberAfPluginInterpanPreMessageReceivedCallback(const EmberAfInterpanHeader
  *
  * @param status   Ver.: always
  */
-void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
-{
-}
+void emberAfPluginNetworkFindFinishedCallback(EmberStatus status) {}
 
 /** @brief Join
  *
@@ -1121,11 +1025,9 @@ void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
-                                          uint8_t lqi,
-                                          int8_t rssi)
+bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }
 
 /** @brief Activate Door Lock
@@ -1137,7 +1039,7 @@ bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
  */
 bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate)
 {
-  return true;
+    return true;
 }
 
 /** @brief Broadcast Sent
@@ -1146,9 +1048,7 @@ bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate)
  * sent by the concentrator plugin.
  *
  */
-void emberAfPluginConcentratorBroadcastSentCallback(void)
-{
-}
+void emberAfPluginConcentratorBroadcastSentCallback(void) {}
 
 /** @brief Group Names Supported
  *
@@ -1159,7 +1059,7 @@ void emberAfPluginConcentratorBroadcastSentCallback(void)
  */
 bool emberAfPluginGroupsServerGroupNamesSupportedCallback(uint8_t endpoint)
 {
-  return false;
+    return false;
 }
 
 /** @brief Get Group Name
@@ -1171,11 +1071,7 @@ bool emberAfPluginGroupsServerGroupNamesSupportedCallback(uint8_t endpoint)
  * @param groupId  The group ID. Ver.: always
  * @param groupName Pointer to the group name. Ver.: always
  */
-void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint,
-                                                   uint16_t groupId,
-                                                   uint8_t *groupName)
-{
-}
+void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
 
 /** @brief Set Group Name
  *
@@ -1186,11 +1082,7 @@ void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint,
  * @param groupId  The group ID. Ver.: always
  * @param groupName Pointer to the group name. Ver.: always
  */
-void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint,
-                                                   uint16_t groupId,
-                                                   uint8_t *groupName)
-{
-}
+void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
 
 /** @brief Button Event
  *
@@ -1203,10 +1095,7 @@ void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint,
  * @param buttonPressDurationMs The length of time button was held down before
  * it was released.  Ver.: always
  */
-void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
-                                                   uint32_t buttonPressDurationMs)
-{
-}
+void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber, uint32_t buttonPressDurationMs) {}
 /** @brief Counter Rollover
  *
  * This function is called every time a counter exceeds its threshold.
@@ -1215,12 +1104,10 @@ void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
  */
 void emberAfPluginCountersRolloverCallback(EmberCounterType type)
 {
-  emberAfCorePrintln("Counter %u rolled over", type);
+    emberAfCorePrintln("Counter %u rolled over", type);
 }
 
-bool emberAfIasAceClusterBypassCallback(uint8_t numberOfZones,
-                                        uint8_t* zoneIds,
-                                        uint8_t* armDisarmCode)
+bool emberAfIasAceClusterBypassCallback(uint8_t numberOfZones, uint8_t * zoneIds, uint8_t * armDisarmCode)
 {
-  return true;
+    return true;
 }

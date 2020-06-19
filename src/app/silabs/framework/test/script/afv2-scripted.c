@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Stubs for AFV2 scripted unit tests.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Stubs for AFV2 scripted unit tests.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "afv2-scripted.h"
 
@@ -53,55 +53,40 @@ static uint32_t systemTick = 0;
 
 uint32_t scriptTime(void)
 {
-  return systemTick;
+    return systemTick;
 }
 
 void scriptTick(void)
 {
-  systemTick += 1;
-  microSetSystemTime(systemTick);
-  scriptTickCallback();
+    systemTick += 1;
+    microSetSystemTime(systemTick);
+    scriptTickCallback();
 }
 
 // -----------------------------------------------------------------------------
 // STUBS.
 
-EmberStatus halCommonIdleForMilliseconds(uint32_t *duration)
+EmberStatus halCommonIdleForMilliseconds(uint32_t * duration)
 {
-  return EMBER_SUCCESS;
+    return EMBER_SUCCESS;
 }
-void emCallCounterHandler(EmberCounterType type, uint8_t data)
-{
-}
-void emBuildAndSendCounterInfo(EmberCounterType counter, EmberNodeId dst, uint8_t data)
-{
-}
+void emCallCounterHandler(EmberCounterType type, uint8_t data) {}
+void emBuildAndSendCounterInfo(EmberCounterType counter, EmberNodeId dst, uint8_t data) {}
 
 // -----------------------------------------------------------------------------
 // PRINT.
 
 // These can be implemented like in test-framework.c if we want to.
 
-void emberAfPrint(uint16_t functionality, const char * formatString, ...)
-{
-}
+void emberAfPrint(uint16_t functionality, const char * formatString, ...) {}
 
-void emberAfPrintln(uint16_t functionality, const char * formatString, ...)
-{
-}
+void emberAfPrintln(uint16_t functionality, const char * formatString, ...) {}
 
-void emberAfPrintBuffer(uint16_t area,
-                        const uint8_t *buffer,
-                        uint16_t bufferLen,
-                        bool withSpace)
-{
-}
+void emberAfPrintBuffer(uint16_t area, const uint8_t * buffer, uint16_t bufferLen, bool withSpace) {}
 
 bool emberAfPrintEnabled(uint16_t area)
 {
-  return true;
+    return true;
 }
 
-void emberAfPrintBigEndianEui64(const EmberEUI64 eui64)
-{
-}
+void emberAfPrintBigEndianEui64(const EmberEUI64 eui64) {}

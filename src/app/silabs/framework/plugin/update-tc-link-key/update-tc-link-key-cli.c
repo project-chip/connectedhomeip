@@ -31,23 +31,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief CLI for the Update TC Link Key plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief CLI for the Update TC Link Key plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
+#include "app/framework/plugin/network-steering/network-steering-internal.h"
+#include "app/framework/plugin/network-steering/network-steering.h"
 #include "app/util/zigbee-framework/zigbee-device-common.h"
 #include "update-tc-link-key.h"
-#include "app/framework/plugin/network-steering/network-steering.h"
-#include "app/framework/plugin/network-steering/network-steering-internal.h"
 
 // -----------------------------------------------------------------------------
 // Helper macros and functions
 
 void emberAfPluginSetTCLinkKeyUpdateTimerCommand(void)
 {
-  uint32_t timeInMilliseconds = (uint32_t)emberUnsignedCommandArgument(0);
-  emberAfPluginSetTCLinkKeyUpdateTimerMilliSeconds(timeInMilliseconds);
+    uint32_t timeInMilliseconds = (uint32_t) emberUnsignedCommandArgument(0);
+    emberAfPluginSetTCLinkKeyUpdateTimerMilliSeconds(timeInMilliseconds);
 }

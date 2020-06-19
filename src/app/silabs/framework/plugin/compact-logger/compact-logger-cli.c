@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief CLI for the Compact Logger plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief CLI for the Compact Logger plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "af.h"
 #include "compact-logger.h"
@@ -43,22 +43,22 @@
 // plugin compact-logger clear
 void emAfCompactLoggerClearLog(void)
 {
-  emberAfPluginCompactLoggerInit();
+    emberAfPluginCompactLoggerInit();
 }
 
 // plugin compact-logger set-severity
 void emAfCompactLoggerSetSeverity(void)
 {
-  EmberStatus status;
-  uint8_t severity = (uint8_t)emberUnsignedCommandArgument(0);
-  status = emberAfPluginCompactLoggerSetSeverity(severity);
-  emberAfCorePrintln("Set severity to %d, status=0x%x", severity, status);
+    EmberStatus status;
+    uint8_t severity = (uint8_t) emberUnsignedCommandArgument(0);
+    status           = emberAfPluginCompactLoggerSetSeverity(severity);
+    emberAfCorePrintln("Set severity to %d, status=0x%x", severity, status);
 }
 
 // plugin compact-logger set-facility
 void emAfCompactLoggerSetFacility(void)
 {
-  uint16_t facility = (uint16_t)emberUnsignedCommandArgument(0);
-  emberAfPluginCompactLoggerSetFacility(facility);
-  emberAfCorePrintln("Set facility to 0x%2x", facility);
+    uint16_t facility = (uint16_t) emberUnsignedCommandArgument(0);
+    emberAfPluginCompactLoggerSetFacility(facility);
+    emberAfCorePrintln("Set facility to 0x%2x", facility);
 }

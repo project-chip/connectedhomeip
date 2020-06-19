@@ -80,19 +80,19 @@
 
 // Types for the tokens
 #ifdef DEFINETYPES
-typedef uint8_t  tokType_color_control_current_hue;
-typedef uint8_t  tokType_color_control_current_saturation;
-typedef uint16_t  tokType_color_control_current_x;
-typedef uint16_t  tokType_color_control_current_y;
-typedef uint16_t  tokType_color_control_color_temperature;
-typedef uint8_t  tokType_color_control_color_mode;
-typedef uint16_t  tokType_start_up_color_temperature_mireds;
-typedef uint8_t  tokType_on_off;
-typedef uint8_t  tokType_current_level;
-typedef uint8_t  tokType_on_level;
-typedef uint8_t  tokType_options;
-typedef uint8_t  tokType_start_up_on_off;
-typedef uint8_t  tokType_start_up_current_level;
+typedef uint8_t tokType_color_control_current_hue;
+typedef uint8_t tokType_color_control_current_saturation;
+typedef uint16_t tokType_color_control_current_x;
+typedef uint16_t tokType_color_control_current_y;
+typedef uint16_t tokType_color_control_color_temperature;
+typedef uint8_t tokType_color_control_color_mode;
+typedef uint16_t tokType_start_up_color_temperature_mireds;
+typedef uint8_t tokType_on_off;
+typedef uint8_t tokType_current_level;
+typedef uint8_t tokType_on_level;
+typedef uint8_t tokType_options;
+typedef uint8_t tokType_start_up_on_off;
+typedef uint8_t tokType_start_up_current_level;
 #endif // DEFINETYPES
 
 // Actual token definitions
@@ -113,76 +113,142 @@ DEFINE_BASIC_TOKEN(START_UP_COLOR_TEMPERATURE_MIREDS_1, tokType_start_up_color_t
 #endif // DEFINETOKENS
 
 // Macro snippet that loads all the attributes from tokens
-#define GENERATED_TOKEN_LOADER(endpoint) do {                                                                                                                     \
-    uint8_t ptr[2];                                                                                                                                               \
-    uint8_t curNetwork = emberGetCurrentNetwork();                                                                                                                \
-    uint8_t epNetwork;                                                                                                                                            \
-    epNetwork = emberAfNetworkIndexFromEndpoint(1);                                                                                                               \
-    if ((endpoint) == 1 || ((endpoint) == EMBER_BROADCAST_ENDPOINT && epNetwork == curNetwork)) {                                                                 \
-      halCommonGetToken((tokType_on_off *)ptr, TOKEN_ON_OFF_1);                                                                                                   \
-      emberAfWriteServerAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_BOOLEAN_ATTRIBUTE_TYPE);                                  \
-      halCommonGetToken((tokType_start_up_on_off *)ptr, TOKEN_START_UP_ON_OFF_1);                                                                                 \
-      emberAfWriteServerAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_START_UP_ON_OFF_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_ENUM8_ATTRIBUTE_TYPE);                           \
-      halCommonGetToken((tokType_current_level *)ptr, TOKEN_CURRENT_LEVEL_1);                                                                                     \
-      emberAfWriteServerAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT8U_ATTRIBUTE_TYPE);                      \
-      halCommonGetToken((tokType_options *)ptr, TOKEN_OPTIONS_1);                                                                                                 \
-      emberAfWriteServerAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_OPTIONS_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_BITMAP8_ATTRIBUTE_TYPE);                          \
-      halCommonGetToken((tokType_on_level *)ptr, TOKEN_ON_LEVEL_1);                                                                                               \
-      emberAfWriteServerAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_ON_LEVEL_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT8U_ATTRIBUTE_TYPE);                           \
-      halCommonGetToken((tokType_start_up_current_level *)ptr, TOKEN_START_UP_CURRENT_LEVEL_1);                                                                   \
-      emberAfWriteServerAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_START_UP_CURRENT_LEVEL_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT8U_ATTRIBUTE_TYPE);             \
-      halCommonGetToken((tokType_color_control_current_hue *)ptr, TOKEN_COLOR_CONTROL_CURRENT_HUE_1);                                                             \
-      emberAfWriteServerAttribute(1, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT8U_ATTRIBUTE_TYPE);          \
-      halCommonGetToken((tokType_color_control_current_saturation *)ptr, TOKEN_COLOR_CONTROL_CURRENT_SATURATION_1);                                               \
-      emberAfWriteServerAttribute(1, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT8U_ATTRIBUTE_TYPE);   \
-      halCommonGetToken((tokType_color_control_current_x *)ptr, TOKEN_COLOR_CONTROL_CURRENT_X_1);                                                                 \
-      emberAfWriteServerAttribute(1, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT16U_ATTRIBUTE_TYPE);           \
-      halCommonGetToken((tokType_color_control_current_y *)ptr, TOKEN_COLOR_CONTROL_CURRENT_Y_1);                                                                 \
-      emberAfWriteServerAttribute(1, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT16U_ATTRIBUTE_TYPE);           \
-      halCommonGetToken((tokType_color_control_color_temperature *)ptr, TOKEN_COLOR_CONTROL_COLOR_TEMPERATURE_1);                                                 \
-      emberAfWriteServerAttribute(1, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT16U_ATTRIBUTE_TYPE);   \
-      halCommonGetToken((tokType_color_control_color_mode *)ptr, TOKEN_COLOR_CONTROL_COLOR_MODE_1);                                                               \
-      emberAfWriteServerAttribute(1, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_MODE_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_ENUM8_ATTRIBUTE_TYPE);           \
-      halCommonGetToken((tokType_start_up_color_temperature_mireds *)ptr, TOKEN_START_UP_COLOR_TEMPERATURE_MIREDS_1);                                             \
-      emberAfWriteServerAttribute(1, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_START_UP_COLOR_TEMPERATURE_MIREDS_ATTRIBUTE_ID, (uint8_t*)ptr, ZCL_INT16U_ATTRIBUTE_TYPE); \
-    }                                                                                                                                                             \
-} while (false)
+#define GENERATED_TOKEN_LOADER(endpoint)                                                                                           \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        uint8_t ptr[2];                                                                                                            \
+        uint8_t curNetwork = emberGetCurrentNetwork();                                                                             \
+        uint8_t epNetwork;                                                                                                         \
+        epNetwork = emberAfNetworkIndexFromEndpoint(1);                                                                            \
+        if ((endpoint) == 1 || ((endpoint) == EMBER_BROADCAST_ENDPOINT && epNetwork == curNetwork))                                \
+        {                                                                                                                          \
+            halCommonGetToken((tokType_on_off *) ptr, TOKEN_ON_OFF_1);                                                             \
+            emberAfWriteServerAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) ptr,                        \
+                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);                                                               \
+            halCommonGetToken((tokType_start_up_on_off *) ptr, TOKEN_START_UP_ON_OFF_1);                                           \
+            emberAfWriteServerAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_START_UP_ON_OFF_ATTRIBUTE_ID, (uint8_t *) ptr,               \
+                                        ZCL_ENUM8_ATTRIBUTE_TYPE);                                                                 \
+            halCommonGetToken((tokType_current_level *) ptr, TOKEN_CURRENT_LEVEL_1);                                               \
+            emberAfWriteServerAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, (uint8_t *) ptr,          \
+                                        ZCL_INT8U_ATTRIBUTE_TYPE);                                                                 \
+            halCommonGetToken((tokType_options *) ptr, TOKEN_OPTIONS_1);                                                           \
+            emberAfWriteServerAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_OPTIONS_ATTRIBUTE_ID, (uint8_t *) ptr,                \
+                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);                                                               \
+            halCommonGetToken((tokType_on_level *) ptr, TOKEN_ON_LEVEL_1);                                                         \
+            emberAfWriteServerAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_ON_LEVEL_ATTRIBUTE_ID, (uint8_t *) ptr,               \
+                                        ZCL_INT8U_ATTRIBUTE_TYPE);                                                                 \
+            halCommonGetToken((tokType_start_up_current_level *) ptr, TOKEN_START_UP_CURRENT_LEVEL_1);                             \
+            emberAfWriteServerAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_START_UP_CURRENT_LEVEL_ATTRIBUTE_ID, (uint8_t *) ptr, \
+                                        ZCL_INT8U_ATTRIBUTE_TYPE);                                                                 \
+            halCommonGetToken((tokType_color_control_current_hue *) ptr, TOKEN_COLOR_CONTROL_CURRENT_HUE_1);                       \
+            emberAfWriteServerAttribute(1, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID,               \
+                                        (uint8_t *) ptr, ZCL_INT8U_ATTRIBUTE_TYPE);                                                \
+            halCommonGetToken((tokType_color_control_current_saturation *) ptr, TOKEN_COLOR_CONTROL_CURRENT_SATURATION_1);         \
+            emberAfWriteServerAttribute(1, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,        \
+                                        (uint8_t *) ptr, ZCL_INT8U_ATTRIBUTE_TYPE);                                                \
+            halCommonGetToken((tokType_color_control_current_x *) ptr, TOKEN_COLOR_CONTROL_CURRENT_X_1);                           \
+            emberAfWriteServerAttribute(1, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID,                 \
+                                        (uint8_t *) ptr, ZCL_INT16U_ATTRIBUTE_TYPE);                                               \
+            halCommonGetToken((tokType_color_control_current_y *) ptr, TOKEN_COLOR_CONTROL_CURRENT_Y_1);                           \
+            emberAfWriteServerAttribute(1, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID,                 \
+                                        (uint8_t *) ptr, ZCL_INT16U_ATTRIBUTE_TYPE);                                               \
+            halCommonGetToken((tokType_color_control_color_temperature *) ptr, TOKEN_COLOR_CONTROL_COLOR_TEMPERATURE_1);           \
+            emberAfWriteServerAttribute(1, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID,         \
+                                        (uint8_t *) ptr, ZCL_INT16U_ATTRIBUTE_TYPE);                                               \
+            halCommonGetToken((tokType_color_control_color_mode *) ptr, TOKEN_COLOR_CONTROL_COLOR_MODE_1);                         \
+            emberAfWriteServerAttribute(1, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_MODE_ATTRIBUTE_ID,                \
+                                        (uint8_t *) ptr, ZCL_ENUM8_ATTRIBUTE_TYPE);                                                \
+            halCommonGetToken((tokType_start_up_color_temperature_mireds *) ptr, TOKEN_START_UP_COLOR_TEMPERATURE_MIREDS_1);       \
+            emberAfWriteServerAttribute(1, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_START_UP_COLOR_TEMPERATURE_MIREDS_ATTRIBUTE_ID,       \
+                                        (uint8_t *) ptr, ZCL_INT16U_ATTRIBUTE_TYPE);                                               \
+        }                                                                                                                          \
+    } while (false)
 
 // Macro snippet that saves the attribute to token
-#define GENERATED_TOKEN_SAVER do {                                                                                               \
-    uint8_t allZeroData[2];                                                                                                      \
-    MEMSET(allZeroData, 0, 2);                                                                                                   \
-    if ( data == NULL ) { data = allZeroData; }                                                                                  \
-    if ( endpoint == 1 ) {                                                                                                       \
-      if ( clusterId == 0x06 ) {                                                                                                 \
-        if ( metadata->attributeId == 0x0000 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_ON_OFF_1, data); }                                                                             \
-        if ( metadata->attributeId == 0x4003 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_START_UP_ON_OFF_1, data); }                                                                    \
-      } else if ( clusterId == 0x08 ) {                                                                                          \
-        if ( metadata->attributeId == 0x0000 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_CURRENT_LEVEL_1, data); }                                                                      \
-        if ( metadata->attributeId == 0x000F && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_OPTIONS_1, data); }                                                                            \
-        if ( metadata->attributeId == 0x0011 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_ON_LEVEL_1, data); }                                                                           \
-        if ( metadata->attributeId == 0x4000 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_START_UP_CURRENT_LEVEL_1, data); }                                                             \
-      } else if ( clusterId == 0x0300 ) {                                                                                        \
-        if ( metadata->attributeId == 0x0000 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_COLOR_CONTROL_CURRENT_HUE_1, data); }                                                          \
-        if ( metadata->attributeId == 0x0001 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_COLOR_CONTROL_CURRENT_SATURATION_1, data); }                                                   \
-        if ( metadata->attributeId == 0x0003 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_COLOR_CONTROL_CURRENT_X_1, data); }                                                            \
-        if ( metadata->attributeId == 0x0004 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_COLOR_CONTROL_CURRENT_Y_1, data); }                                                            \
-        if ( metadata->attributeId == 0x0007 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_COLOR_CONTROL_COLOR_TEMPERATURE_1, data); }                                                    \
-        if ( metadata->attributeId == 0x0008 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_COLOR_CONTROL_COLOR_MODE_1, data); }                                                           \
-        if ( metadata->attributeId == 0x4010 && 0x0000 == emberAfGetMfgCode(metadata) && !emberAfAttributeIsClient(metadata) ) { \
-          halCommonSetToken(TOKEN_START_UP_COLOR_TEMPERATURE_MIREDS_1, data); }                                                  \
-      }                                                                                                                          \
-    }                                                                                                                            \
-} while (false)
+#define GENERATED_TOKEN_SAVER                                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        uint8_t allZeroData[2];                                                                                                    \
+        MEMSET(allZeroData, 0, 2);                                                                                                 \
+        if (data == NULL)                                                                                                          \
+        {                                                                                                                          \
+            data = allZeroData;                                                                                                    \
+        }                                                                                                                          \
+        if (endpoint == 1)                                                                                                         \
+        {                                                                                                                          \
+            if (clusterId == 0x06)                                                                                                 \
+            {                                                                                                                      \
+                if (metadata->attributeId == 0x0000 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_ON_OFF_1, data);                                                                       \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x4003 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_START_UP_ON_OFF_1, data);                                                              \
+                }                                                                                                                  \
+            }                                                                                                                      \
+            else if (clusterId == 0x08)                                                                                            \
+            {                                                                                                                      \
+                if (metadata->attributeId == 0x0000 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_CURRENT_LEVEL_1, data);                                                                \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x000F && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_OPTIONS_1, data);                                                                      \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0011 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_ON_LEVEL_1, data);                                                                     \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x4000 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_START_UP_CURRENT_LEVEL_1, data);                                                       \
+                }                                                                                                                  \
+            }                                                                                                                      \
+            else if (clusterId == 0x0300)                                                                                          \
+            {                                                                                                                      \
+                if (metadata->attributeId == 0x0000 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_COLOR_CONTROL_CURRENT_HUE_1, data);                                                    \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0001 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_COLOR_CONTROL_CURRENT_SATURATION_1, data);                                             \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0003 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_COLOR_CONTROL_CURRENT_X_1, data);                                                      \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0004 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_COLOR_CONTROL_CURRENT_Y_1, data);                                                      \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0007 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_COLOR_CONTROL_COLOR_TEMPERATURE_1, data);                                              \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x0008 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_COLOR_CONTROL_COLOR_MODE_1, data);                                                     \
+                }                                                                                                                  \
+                if (metadata->attributeId == 0x4010 && 0x0000 == emberAfGetMfgCode(metadata) &&                                    \
+                    !emberAfAttributeIsClient(metadata))                                                                           \
+                {                                                                                                                  \
+                    halCommonSetToken(TOKEN_START_UP_COLOR_TEMPERATURE_MIREDS_1, data);                                            \
+                }                                                                                                                  \
+            }                                                                                                                      \
+        }                                                                                                                          \
+    } while (false)

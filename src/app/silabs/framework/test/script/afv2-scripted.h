@@ -31,16 +31,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief A header for AFV2 scripted unit tests.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief A header for AFV2 scripted unit tests.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include PLATFORM_HEADER
 
-#include "stack/core/ember-stack.h"
 #include "hal/hal.h"
+#include "stack/core/ember-stack.h"
 #include "stack/core/parcel.h"
 #include "stack/core/scripted-stub.h"
 
@@ -49,16 +49,16 @@
 // -----------------------------------------------------------------------------
 // MAGIC.
 
-#define ACTION(name, params, ...)          \
-  static ActionType name ## ActionType = { \
-    # name "ActionType",                   \
-    # params,                              \
-    name ## ActionPrinter,                 \
-    name ## ActionPerformer,               \
-  }
+#define ACTION(name, params, ...)                                                                                                  \
+    static ActionType name##ActionType = {                                                                                         \
+        #name "ActionType",                                                                                                        \
+        #params,                                                                                                                   \
+        name##ActionPrinter,                                                                                                       \
+        name##ActionPerformer,                                                                                                     \
+    }
 
-#define PRINTER(name)   static void name ## ActionPrinter(Action * action)
-#define PERFORMER(name) static void name ## ActionPerformer(Action * action)
+#define PRINTER(name) static void name##ActionPrinter(Action * action)
+#define PERFORMER(name) static void name##ActionPerformer(Action * action)
 
 // -----------------------------------------------------------------------------
 // CALLBACKS.

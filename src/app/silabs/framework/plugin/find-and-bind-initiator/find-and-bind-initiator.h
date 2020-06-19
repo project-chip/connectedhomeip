@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Initiator APIs and defines for the Find and Bind Initiator plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Initiator APIs and defines for the Find and
+                                                                               *Bind Initiator plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_FIND_AND_BIND_INITIATOR_H
 #define SILABS_FIND_AND_BIND_INITIATOR_H

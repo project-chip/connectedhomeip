@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Simulation for the OTA Storage POSIX Filesystem plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Simulation for the OTA Storage POSIX
+                                                                               *Filesystem plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
 #include "app/framework/plugin/ota-common/ota.h"
@@ -43,24 +44,25 @@
 #include "app/util/serial/command-interpreter2.h"
 
 #include <errno.h>
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 //------------------------------------------------------------------------------
 // Globals
 
-#define INVALID_MANUFACTURER_ID  0xFFFF
-#define INVALID_DEVICE_ID        0xFFFF
+#define INVALID_MANUFACTURER_ID 0xFFFF
+#define INVALID_DEVICE_ID 0xFFFF
 #define INVALID_FIRMWARE_VERSION 0xFFFFFFFFL
-#define INVALID_EUI64 { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
+#define INVALID_EUI64                                                                                                              \
+    {                                                                                                                              \
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00                                                                             \
+    }
 
-#define INVALID_OTA_IMAGE_ID  \
-  { INVALID_MANUFACTURER_ID,  \
-    INVALID_DEVICE_ID,        \
-    INVALID_FIRMWARE_VERSION, \
-    INVALID_EUI64,            \
-  }
+#define INVALID_OTA_IMAGE_ID                                                                                                       \
+    {                                                                                                                              \
+        INVALID_MANUFACTURER_ID, INVALID_DEVICE_ID, INVALID_FIRMWARE_VERSION, INVALID_EUI64,                                       \
+    }
 
 EmberAfOtaImageId emberInvalidImageId = INVALID_OTA_IMAGE_ID;
 
@@ -69,78 +71,66 @@ EmberAfOtaImageId emberInvalidImageId = INVALID_OTA_IMAGE_ID;
 
 //------------------------------------------------------------------------------
 
-void emAfOtaStorageClose(void)
-{
-}
+void emAfOtaStorageClose(void) {}
 
-void emAfOtaStorageInfoPrint(void)
-{
-}
+void emAfOtaStorageInfoPrint(void) {}
 
-EmberAfOtaStorageStatus emberAfOtaStorageCheckTempDataCallback(uint32_t* returnOffset,
-                                                               uint32_t* returnTotalSize,
-                                                               EmberAfOtaImageId* returnOtaImageId)
+EmberAfOtaStorageStatus emberAfOtaStorageCheckTempDataCallback(uint32_t * returnOffset, uint32_t * returnTotalSize,
+                                                               EmberAfOtaImageId * returnOtaImageId)
 {
-  return EMBER_AF_OTA_STORAGE_SUCCESS;
+    return EMBER_AF_OTA_STORAGE_SUCCESS;
 }
 
 EmberAfOtaStorageStatus emberAfOtaStorageClearTempDataCallback(void)
 {
-  return EMBER_AF_OTA_STORAGE_SUCCESS;
+    return EMBER_AF_OTA_STORAGE_SUCCESS;
 }
 
-void emAfOtaLoadFileCommand(void)
-{
-}
+void emAfOtaLoadFileCommand(void) {}
 
-EmberAfOtaStorageStatus emberAfOtaStorageDeleteImageCallback(const EmberAfOtaImageId* id)
+EmberAfOtaStorageStatus emberAfOtaStorageDeleteImageCallback(const EmberAfOtaImageId * id)
 {
-  return EMBER_AF_OTA_STORAGE_ERROR;
+    return EMBER_AF_OTA_STORAGE_ERROR;
 }
 
 uint8_t emberAfOtaStorageGetCountCallback(void)
 {
-  return 0;
+    return 0;
 }
 
-EmberAfOtaStorageStatus emberAfOtaStorageGetFullHeaderCallback(const EmberAfOtaImageId* id,
-                                                               EmberAfOtaHeader* returnData)
+EmberAfOtaStorageStatus emberAfOtaStorageGetFullHeaderCallback(const EmberAfOtaImageId * id, EmberAfOtaHeader * returnData)
 {
-  return EMBER_AF_OTA_STORAGE_ERROR;
+    return EMBER_AF_OTA_STORAGE_ERROR;
 }
 
-uint32_t emberAfOtaStorageGetTotalImageSizeCallback(const EmberAfOtaImageId* id)
+uint32_t emberAfOtaStorageGetTotalImageSizeCallback(const EmberAfOtaImageId * id)
 {
-  return 0;
+    return 0;
 }
 
 EmberAfOtaStorageStatus emberAfOtaStorageInitCallback(void)
 {
-  return EMBER_AF_OTA_STORAGE_SUCCESS;
+    return EMBER_AF_OTA_STORAGE_SUCCESS;
 }
 
 EmberAfOtaImageId emberAfOtaStorageIteratorFirstCallback(void)
 {
-  return emberInvalidImageId;
+    return emberInvalidImageId;
 }
 
 EmberAfOtaImageId emberAfOtaStorageIteratorNextCallback(void)
 {
-  return emberInvalidImageId;
+    return emberInvalidImageId;
 }
 
-EmberAfOtaStorageStatus emberAfOtaStorageReadImageDataCallback(const EmberAfOtaImageId* id,
-                                                               uint32_t offset,
-                                                               uint32_t length,
-                                                               uint8_t* returnData,
-                                                               uint32_t* returnedLength)
+EmberAfOtaStorageStatus emberAfOtaStorageReadImageDataCallback(const EmberAfOtaImageId * id, uint32_t offset, uint32_t length,
+                                                               uint8_t * returnData, uint32_t * returnedLength)
 {
-  return EMBER_AF_OTA_STORAGE_ERROR;
+    return EMBER_AF_OTA_STORAGE_ERROR;
 }
 
-EmberAfOtaImageId emberAfOtaStorageSearchCallback(uint16_t manufacturerId,
-                                                  uint16_t manufacturerDeviceId,
-                                                  const uint16_t* hardwareVersion)
+EmberAfOtaImageId emberAfOtaStorageSearchCallback(uint16_t manufacturerId, uint16_t manufacturerDeviceId,
+                                                  const uint16_t * hardwareVersion)
 {
-  return emberInvalidImageId;
+    return emberInvalidImageId;
 }

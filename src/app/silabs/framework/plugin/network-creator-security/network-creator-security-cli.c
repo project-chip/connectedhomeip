@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief CLI for the Network Creator Security plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief CLI for the Network Creator Security plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
 
@@ -45,62 +45,51 @@ extern EmberKeyData distributedKey;
 
 void emAfPluginNetworkCreatorSecuritySetJoiningLinkKeyCommand(void)
 {
-  EmberEUI64 eui64;
-  EmberKeyData keyData;
-  EmberStatus status;
+    EmberEUI64 eui64;
+    EmberKeyData keyData;
+    EmberStatus status;
 
-  emberCopyBigEndianEui64Argument(0, eui64);
-  emberCopyKeyArgument(1, &keyData);
+    emberCopyBigEndianEui64Argument(0, eui64);
+    emberCopyKeyArgument(1, &keyData);
 
-  status = emberAddTransientLinkKey(eui64, &keyData);
+    status = emberAddTransientLinkKey(eui64, &keyData);
 
-  emberAfCorePrintln("%p: %p: 0x%X",
-                     EMBER_AF_PLUGIN_NETWORK_CREATOR_SECURITY_PLUGIN_NAME,
-                     "Set joining link key",
-                     status);
+    emberAfCorePrintln("%p: %p: 0x%X", EMBER_AF_PLUGIN_NETWORK_CREATOR_SECURITY_PLUGIN_NAME, "Set joining link key", status);
 }
 
 void emAfPluginNetworkCreatorSecurityClearJoiningLinkKeyCommand(void)
 {
-  emberClearTransientLinkKeys();
+    emberClearTransientLinkKeys();
 
-  emberAfCorePrintln("%p: %p: 0x%X",
-                     EMBER_AF_PLUGIN_NETWORK_CREATOR_SECURITY_PLUGIN_NAME,
-                     "Clear joining link keys",
-                     EMBER_SUCCESS);
+    emberAfCorePrintln("%p: %p: 0x%X", EMBER_AF_PLUGIN_NETWORK_CREATOR_SECURITY_PLUGIN_NAME, "Clear joining link keys",
+                       EMBER_SUCCESS);
 }
 
 void emAfPluginNetworkCreatorSecurityOpenOrCloseNetworkCommand(void)
 {
-  EmberStatus status;
-  bool open = (emberStringCommandArgument(-1, NULL)[0] == 'o');
+    EmberStatus status;
+    bool open = (emberStringCommandArgument(-1, NULL)[0] == 'o');
 
-  status = (open
-            ? emberAfPluginNetworkCreatorSecurityOpenNetwork()
-            : emberAfPluginNetworkCreatorSecurityCloseNetwork());
+    status = (open ? emberAfPluginNetworkCreatorSecurityOpenNetwork() : emberAfPluginNetworkCreatorSecurityCloseNetwork());
 
-  emberAfCorePrintln("%p: %p network: 0x%X",
-                     EMBER_AF_PLUGIN_NETWORK_CREATOR_SECURITY_PLUGIN_NAME,
-                     (open ? "Open" : "Close"),
-                     status);
+    emberAfCorePrintln("%p: %p network: 0x%X", EMBER_AF_PLUGIN_NETWORK_CREATOR_SECURITY_PLUGIN_NAME, (open ? "Open" : "Close"),
+                       status);
 }
 
 void emAfPluginNetworkCreatorSecurityOpenNetworkWithKeyCommand(void)
 {
-  EmberEUI64 eui64;
-  EmberKeyData keyData;
-  EmberStatus status;
+    EmberEUI64 eui64;
+    EmberKeyData keyData;
+    EmberStatus status;
 
-  emberCopyBigEndianEui64Argument(0, eui64);
-  emberCopyKeyArgument(1, &keyData);
-  status = emberAfPluginNetworkCreatorSecurityOpenNetworkWithKeyPair(eui64, keyData);
+    emberCopyBigEndianEui64Argument(0, eui64);
+    emberCopyKeyArgument(1, &keyData);
+    status = emberAfPluginNetworkCreatorSecurityOpenNetworkWithKeyPair(eui64, keyData);
 
-  emberAfCorePrintln("%p: Open network: 0x%X",
-                     EMBER_AF_PLUGIN_NETWORK_CREATOR_SECURITY_PLUGIN_NAME,
-                     status);
+    emberAfCorePrintln("%p: Open network: 0x%X", EMBER_AF_PLUGIN_NETWORK_CREATOR_SECURITY_PLUGIN_NAME, status);
 }
 
 void emAfPluginNetworkCreatorSecurityConfigureDistributedKey(void)
 {
-  emberCopyKeyArgument(0, &distributedKey);
+    emberCopyKeyArgument(0, &distributedKey);
 }

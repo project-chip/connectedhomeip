@@ -31,15 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs for the Relay Control Client plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs for the Relay Control Client plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // Convenience method to send a set message to the server
-void emberAfPluginRelayControlClientSendSetRelayState(EmberNodeId nodeId,
-                                                      uint8_t srcEndpoint,
-                                                      uint8_t dstEndpoint,
-                                                      bool isEnabled,
+void emberAfPluginRelayControlClientSendSetRelayState(EmberNodeId nodeId, uint8_t srcEndpoint, uint8_t dstEndpoint, bool isEnabled,
                                                       uint32_t magicNumber);

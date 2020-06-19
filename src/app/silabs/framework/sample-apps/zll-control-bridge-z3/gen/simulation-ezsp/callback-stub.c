@@ -52,9 +52,7 @@
  *
  * @param tasks   Ver.: always
  */
-void emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks)
-{
-}
+void emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
 
 /** @brief Allow Network Write Attribute
  *
@@ -89,15 +87,11 @@ void emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks)
  * @param value   Ver.: always
  * @param type   Ver.: always
  */
-EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(uint8_t endpoint,
-                                                                          EmberAfClusterId clusterId,
-                                                                          EmberAfAttributeId attributeId,
-                                                                          uint8_t mask,
-                                                                          uint16_t manufacturerCode,
-                                                                          uint8_t* value,
-                                                                          uint8_t type)
+EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(uint8_t endpoint, EmberAfClusterId clusterId,
+                                                                          EmberAfAttributeId attributeId, uint8_t mask,
+                                                                          uint16_t manufacturerCode, uint8_t * value, uint8_t type)
 {
-  return EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_NORMAL; // Default
+    return EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_NORMAL; // Default
 }
 
 /** @brief Attribute Read Access
@@ -110,12 +104,10 @@ EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(uint8_
  * @param manufacturerCode   Ver.: always
  * @param attributeId   Ver.: always
  */
-bool emberAfAttributeReadAccessCallback(uint8_t endpoint,
-                                        EmberAfClusterId clusterId,
-                                        uint16_t manufacturerCode,
+bool emberAfAttributeReadAccessCallback(uint8_t endpoint, EmberAfClusterId clusterId, uint16_t manufacturerCode,
                                         uint16_t attributeId)
 {
-  return true;
+    return true;
 }
 
 /** @brief Attribute Write Access
@@ -128,12 +120,10 @@ bool emberAfAttributeReadAccessCallback(uint8_t endpoint,
  * @param manufacturerCode   Ver.: always
  * @param attributeId   Ver.: always
  */
-bool emberAfAttributeWriteAccessCallback(uint8_t endpoint,
-                                         EmberAfClusterId clusterId,
-                                         uint16_t manufacturerCode,
+bool emberAfAttributeWriteAccessCallback(uint8_t endpoint, EmberAfClusterId clusterId, uint16_t manufacturerCode,
                                          uint16_t attributeId)
 {
-  return true;
+    return true;
 }
 
 /** @brief Groups Cluster Clear Group Table
@@ -143,9 +133,7 @@ bool emberAfAttributeWriteAccessCallback(uint8_t endpoint,
  *
  * @param endpoint The endpoint.  Ver.: always
  */
-void emberAfGroupsClusterClearGroupTableCallback(uint8_t endpoint)
-{
-}
+void emberAfGroupsClusterClearGroupTableCallback(uint8_t endpoint) {}
 
 /** @brief Clear Report Table
  *
@@ -155,7 +143,7 @@ void emberAfGroupsClusterClearGroupTableCallback(uint8_t endpoint)
  */
 EmberStatus emberAfClearReportTableCallback(void)
 {
-  return EMBER_LIBRARY_NOT_PRESENT;
+    return EMBER_LIBRARY_NOT_PRESENT;
 }
 
 /** @brief Scenes Cluster ClearSceneTable
@@ -165,9 +153,7 @@ EmberStatus emberAfClearReportTableCallback(void)
  *
  * @param endpoint The endpoint.  Ver.: always
  */
-void emberAfScenesClusterClearSceneTableCallback(uint8_t endpoint)
-{
-}
+void emberAfScenesClusterClearSceneTableCallback(uint8_t endpoint) {}
 
 /** @brief Key Establishment Cluster Client Command Received
  *
@@ -179,9 +165,9 @@ void emberAfScenesClusterClearSceneTableCallback(uint8_t endpoint)
  *
  * @param cmd   Ver.: always
  */
-bool emberAfKeyEstablishmentClusterClientCommandReceivedCallback(EmberAfClusterCommand *cmd)
+bool emberAfKeyEstablishmentClusterClientCommandReceivedCallback(EmberAfClusterCommand * cmd)
 {
-  return false;
+    return false;
 }
 
 /** @brief Cluster Init
@@ -193,10 +179,7 @@ bool emberAfKeyEstablishmentClusterClientCommandReceivedCallback(EmberAfClusterC
  * @param endpoint   Ver.: always
  * @param clusterId   Ver.: always
  */
-void emberAfClusterInitCallback(uint8_t endpoint,
-                                EmberAfClusterId clusterId)
-{
-}
+void emberAfClusterInitCallback(uint8_t endpoint, EmberAfClusterId clusterId) {}
 
 /** @brief Cluster Security Custom
  *
@@ -211,13 +194,10 @@ void emberAfClusterInitCallback(uint8_t endpoint,
  * always
  * @param commandId The ZCL command ID being sent/received.  Ver.: always
  */
-bool emberAfClusterSecurityCustomCallback(EmberAfProfileId profileId,
-                                          EmberAfClusterId clusterId,
-                                          bool incoming,
-                                          uint8_t commandId)
+bool emberAfClusterSecurityCustomCallback(EmberAfProfileId profileId, EmberAfClusterId clusterId, bool incoming, uint8_t commandId)
 {
-  // By default, assume APS encryption is not required.
-  return false;
+    // By default, assume APS encryption is not required.
+    return false;
 }
 
 /** @brief Configure Reporting Command
@@ -230,9 +210,9 @@ bool emberAfClusterSecurityCustomCallback(EmberAfProfileId profileId,
  *
  * @param cmd   Ver.: always
  */
-bool emberAfConfigureReportingCommandCallback(const EmberAfClusterCommand *cmd)
+bool emberAfConfigureReportingCommandCallback(const EmberAfClusterCommand * cmd)
 {
-  return false;
+    return false;
 }
 
 /** @brief Discover Commands Generated Response
@@ -249,13 +229,10 @@ bool emberAfConfigureReportingCommandCallback(const EmberAfClusterCommand *cmd)
  * @param commandIdCount The length of bytes of the list, whish is the same as
  * the number of identifiers.  Ver.: always
  */
-bool emberAfDiscoverCommandsGeneratedResponseCallback(EmberAfClusterId clusterId,
-                                                      uint16_t manufacturerCode,
-                                                      bool discoveryComplete,
-                                                      uint8_t *commandIds,
-                                                      uint16_t commandIdCount)
+bool emberAfDiscoverCommandsGeneratedResponseCallback(EmberAfClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
+                                                      uint8_t * commandIds, uint16_t commandIdCount)
 {
-  return false;
+    return false;
 }
 
 /** @brief Discover Commands Received Response
@@ -272,13 +249,10 @@ bool emberAfDiscoverCommandsGeneratedResponseCallback(EmberAfClusterId clusterId
  * @param commandIdCount The length of bytes of the list, whish is the same as
  * the number of identifiers.  Ver.: always
  */
-bool emberAfDiscoverCommandsReceivedResponseCallback(EmberAfClusterId clusterId,
-                                                     uint16_t manufacturerCode,
-                                                     bool discoveryComplete,
-                                                     uint8_t *commandIds,
-                                                     uint16_t commandIdCount)
+bool emberAfDiscoverCommandsReceivedResponseCallback(EmberAfClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
+                                                     uint8_t * commandIds, uint16_t commandIdCount)
 {
-  return false;
+    return false;
 }
 
 /** @brief Eeprom Init
@@ -286,9 +260,7 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(EmberAfClusterId clusterId,
  * Tells the system to initialize the EEPROM if it is not already initialized.
  *
  */
-void emberAfEepromInitCallback(void)
-{
-}
+void emberAfEepromInitCallback(void) {}
 
 /** @brief Eeprom Note Initialized State
  *
@@ -298,18 +270,14 @@ void emberAfEepromInitCallback(void)
  * @param state The state of the EEPROM, false=re-initalization needed,
  * true=no-re-init needed  Ver.: always
  */
-void emberAfEepromNoteInitializedStateCallback(bool state)
-{
-}
+void emberAfEepromNoteInitializedStateCallback(bool state) {}
 
 /** @brief Eeprom Shutdown
  *
  * Tells the system to shutdown the EEPROM if it is not already shutdown.
  *
  */
-void emberAfEepromShutdownCallback(void)
-{
-}
+void emberAfEepromShutdownCallback(void) {}
 
 /** @brief Groups Cluster Endpoint In Group
  *
@@ -320,10 +288,9 @@ void emberAfEepromShutdownCallback(void)
  * @param endpoint The endpoint.  Ver.: always
  * @param groupId The group identifier.  Ver.: always
  */
-bool emberAfGroupsClusterEndpointInGroupCallback(uint8_t endpoint,
-                                                 uint16_t groupId)
+bool emberAfGroupsClusterEndpointInGroupCallback(uint8_t endpoint, uint16_t groupId)
 {
-  return false;
+    return false;
 }
 
 /** @brief External Attribute Read
@@ -362,14 +329,11 @@ bool emberAfGroupsClusterEndpointInGroupCallback(uint8_t endpoint,
  * @param buffer   Ver.: always
  * @param maxReadLength   Ver.: always
  */
-EmberAfStatus emberAfExternalAttributeReadCallback(uint8_t endpoint,
-                                                   EmberAfClusterId clusterId,
-                                                   EmberAfAttributeMetadata *attributeMetadata,
-                                                   uint16_t manufacturerCode,
-                                                   uint8_t *buffer,
-                                                   uint16_t maxReadLength)
+EmberAfStatus emberAfExternalAttributeReadCallback(uint8_t endpoint, EmberAfClusterId clusterId,
+                                                   EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
+                                                   uint8_t * buffer, uint16_t maxReadLength)
 {
-  return EMBER_ZCL_STATUS_FAILURE;
+    return EMBER_ZCL_STATUS_FAILURE;
 }
 
 /** @brief External Attribute Write
@@ -418,13 +382,11 @@ EmberAfStatus emberAfExternalAttributeReadCallback(uint8_t endpoint,
  * @param manufacturerCode   Ver.: always
  * @param buffer   Ver.: always
  */
-EmberAfStatus emberAfExternalAttributeWriteCallback(uint8_t endpoint,
-                                                    EmberAfClusterId clusterId,
-                                                    EmberAfAttributeMetadata *attributeMetadata,
-                                                    uint16_t manufacturerCode,
-                                                    uint8_t *buffer)
+EmberAfStatus emberAfExternalAttributeWriteCallback(uint8_t endpoint, EmberAfClusterId clusterId,
+                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
+                                                    uint8_t * buffer)
 {
-  return EMBER_ZCL_STATUS_FAILURE;
+    return EMBER_ZCL_STATUS_FAILURE;
 }
 
 /** @brief Generates random data for the specified size
@@ -434,9 +396,9 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(uint8_t endpoint,
  * @param result: key pointer to be filled with random data Ver.: always
  * @param result: size of the array to be filled with random data Ver.: always
  */
-EmberStatus emberAfGenerateRandomData(uint8_t* result, uint8_t size)
+EmberStatus emberAfGenerateRandomData(uint8_t * result, uint8_t size)
 {
-  return EMBER_LIBRARY_NOT_PRESENT;
+    return EMBER_LIBRARY_NOT_PRESENT;
 }
 
 /** @brief Generates a random key
@@ -445,28 +407,30 @@ EmberStatus emberAfGenerateRandomData(uint8_t* result, uint8_t size)
  *
  * @param result: key pointer to be filled with random data Ver.: always
  */
-EmberStatus emberAfGenerateRandomKey(EmberKeyData* result)
+EmberStatus emberAfGenerateRandomKey(EmberKeyData * result)
 {
-  uint16_t data;
-  uint8_t* keyPtr = emberKeyContents(result);
-  uint8_t i;
+    uint16_t data;
+    uint8_t * keyPtr = emberKeyContents(result);
+    uint8_t i;
 
-  // Since our EZSP command only generates a random 16-bit number,
-  // we must call it repeatedly to get a 128-bit random number.
+    // Since our EZSP command only generates a random 16-bit number,
+    // we must call it repeatedly to get a 128-bit random number.
 
-  for ( i = 0; i < 8; i++ ) {
-    EmberStatus status = ezspGetRandomNumber(&data);
+    for (i = 0; i < 8; i++)
+    {
+        EmberStatus status = ezspGetRandomNumber(&data);
 
-    if ( status != EMBER_SUCCESS ) {
-      return status;
+        if (status != EMBER_SUCCESS)
+        {
+            return status;
+        }
+
+        keyPtr[0] = LOW_BYTE(data);
+        keyPtr[1] = HIGH_BYTE(data);
+        keyPtr += 2;
     }
 
-    keyPtr[0] = LOW_BYTE(data);
-    keyPtr[1] = HIGH_BYTE(data);
-    keyPtr += 2;
-  }
-
-  return EMBER_SUCCESS;
+    return EMBER_SUCCESS;
 }
 
 /** @brief Get Current App Tasks
@@ -478,7 +442,7 @@ EmberStatus emberAfGenerateRandomKey(EmberKeyData* result)
  */
 EmberAfApplicationTask emberAfGetCurrentAppTasksCallback(void)
 {
-  return 0;
+    return 0;
 }
 
 /** @brief Get Current Poll Control
@@ -492,7 +456,7 @@ EmberAfApplicationTask emberAfGetCurrentAppTasksCallback(void)
  */
 EmberAfEventPollControl emberAfGetCurrentPollControlCallback(void)
 {
-  return EMBER_AF_LONG_POLL;
+    return EMBER_AF_LONG_POLL;
 }
 
 /** @brief Get Current Poll Interval Ms
@@ -505,7 +469,7 @@ EmberAfEventPollControl emberAfGetCurrentPollControlCallback(void)
  */
 uint32_t emberAfGetCurrentPollIntervalMsCallback(void)
 {
-  return 0;
+    return 0;
 }
 
 /** @brief Get Current Poll Interval Qs
@@ -518,7 +482,7 @@ uint32_t emberAfGetCurrentPollIntervalMsCallback(void)
  */
 uint32_t emberAfGetCurrentPollIntervalQsCallback(void)
 {
-  return 0;
+    return 0;
 }
 
 /** @brief Get Current Sleep Control
@@ -532,7 +496,7 @@ uint32_t emberAfGetCurrentPollIntervalQsCallback(void)
  */
 EmberAfEventSleepControl emberAfGetCurrentSleepControlCallback(void)
 {
-  return EMBER_AF_OK_TO_SLEEP;
+    return EMBER_AF_OK_TO_SLEEP;
 }
 
 /** @brief Get Current Time
@@ -546,7 +510,7 @@ EmberAfEventSleepControl emberAfGetCurrentSleepControlCallback(void)
  */
 uint32_t emberAfGetCurrentTimeCallback(void)
 {
-  return 0;
+    return 0;
 }
 
 /** @brief Get Default Poll Control
@@ -558,7 +522,7 @@ uint32_t emberAfGetCurrentTimeCallback(void)
  */
 EmberAfEventPollControl emberAfGetDefaultPollControlCallback(void)
 {
-  return EMBER_AF_LONG_POLL;
+    return EMBER_AF_LONG_POLL;
 }
 
 /** @brief Get Default Sleep Control
@@ -570,7 +534,7 @@ EmberAfEventPollControl emberAfGetDefaultPollControlCallback(void)
  */
 EmberAfEventSleepControl emberAfGetDefaultSleepControlCallback(void)
 {
-  return EMBER_AF_OK_TO_SLEEP;
+    return EMBER_AF_OK_TO_SLEEP;
 }
 
 /** @brief Get Endpoint By Index
@@ -589,10 +553,9 @@ EmberAfEventSleepControl emberAfGetDefaultSleepControlCallback(void)
  * @param index The index of the endpoint.  Ver.: always
  * @param endpointReturn The value of endpoint.  Ver.: always
  */
-bool emberAfGetEndpointByIndexCallback(uint8_t index,
-                                       uint8_t* endpointReturn)
+bool emberAfGetEndpointByIndexCallback(uint8_t index, uint8_t * endpointReturn)
 {
-  return false;
+    return false;
 }
 
 /** @brief Get Endpoint Description
@@ -611,10 +574,9 @@ bool emberAfGetEndpointByIndexCallback(uint8_t index,
  * information is written if the callback is providing the information.  Ver.:
  * always
  */
-bool emberAfGetEndpointDescriptionCallback(uint8_t endpoint,
-                                           EmberEndpointDescription* result)
+bool emberAfGetEndpointDescriptionCallback(uint8_t endpoint, EmberEndpointDescription * result)
 {
-  return false;
+    return false;
 }
 
 /** @brief Get Endpoint Info
@@ -634,11 +596,9 @@ bool emberAfGetEndpointDescriptionCallback(uint8_t endpoint,
  * @param returnEndpointInfo A pointer to a data struct that will be written
  * with information about the endpoint.  Ver.: always
  */
-bool emberAfGetEndpointInfoCallback(uint8_t endpoint,
-                                    uint8_t* returnNetworkIndex,
-                                    EmberAfEndpointInfoStruct* returnEndpointInfo)
+bool emberAfGetEndpointInfoCallback(uint8_t endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo)
 {
-  return false;
+    return false;
 }
 
 /** @brief Get Long Poll Interval Ms
@@ -651,7 +611,7 @@ bool emberAfGetEndpointInfoCallback(uint8_t endpoint,
  */
 uint32_t emberAfGetLongPollIntervalMsCallback(void)
 {
-  return 0;
+    return 0;
 }
 
 /** @brief Get Long Poll Interval Qs
@@ -664,7 +624,7 @@ uint32_t emberAfGetLongPollIntervalMsCallback(void)
  */
 uint32_t emberAfGetLongPollIntervalQsCallback(void)
 {
-  return 0;
+    return 0;
 }
 
 /** @brief Get Short Poll Interval Ms
@@ -677,7 +637,7 @@ uint32_t emberAfGetLongPollIntervalQsCallback(void)
  */
 uint16_t emberAfGetShortPollIntervalMsCallback(void)
 {
-  return 0;
+    return 0;
 }
 
 /** @brief Get Short Poll Interval Qs
@@ -690,7 +650,7 @@ uint16_t emberAfGetShortPollIntervalMsCallback(void)
  */
 uint16_t emberAfGetShortPollIntervalQsCallback(void)
 {
-  return 0;
+    return 0;
 }
 
 /** @brief Get Wake Timeout Bitmask
@@ -703,7 +663,7 @@ uint16_t emberAfGetShortPollIntervalQsCallback(void)
  */
 EmberAfApplicationTask emberAfGetWakeTimeoutBitmaskCallback(void)
 {
-  return 0;
+    return 0;
 }
 
 /** @brief Get Wake Timeout Ms
@@ -716,7 +676,7 @@ EmberAfApplicationTask emberAfGetWakeTimeoutBitmaskCallback(void)
  */
 uint16_t emberAfGetWakeTimeoutMsCallback(void)
 {
-  return 0;
+    return 0;
 }
 
 /** @brief Get Wake Timeout Qs
@@ -729,7 +689,7 @@ uint16_t emberAfGetWakeTimeoutMsCallback(void)
  */
 uint16_t emberAfGetWakeTimeoutQsCallback(void)
 {
-  return 0;
+    return 0;
 }
 
 /** @brief Hal Button Isr
@@ -743,10 +703,7 @@ uint16_t emberAfGetWakeTimeoutQsCallback(void)
  * either ::BUTTON_PRESSED if the button has been pressed or ::BUTTON_RELEASED
  * if the button has been released.  Ver.: always
  */
-void emberAfHalButtonIsrCallback(uint8_t button,
-                                 uint8_t state)
-{
-}
+void emberAfHalButtonIsrCallback(uint8_t button, uint8_t state) {}
 
 /** @brief Incoming Packet Filter
  *
@@ -773,12 +730,10 @@ void emberAfHalButtonIsrCallback(uint8_t button,
  * @param size_p a pointer containing the size value of the packet  Ver.: always
  * @param data auxillary data included with the packet  Ver.: always
  */
-EmberPacketAction emberAfIncomingPacketFilterCallback(EmberZigbeePacketType packetType,
-                                                      uint8_t* packetData,
-                                                      uint8_t* size_p,
-                                                      void* data)
+EmberPacketAction emberAfIncomingPacketFilterCallback(EmberZigbeePacketType packetType, uint8_t * packetData, uint8_t * size_p,
+                                                      void * data)
 {
-  return EMBER_ACCEPT_PACKET;
+    return EMBER_ACCEPT_PACKET;
 }
 
 /** @brief Initiate Inter Pan Key Establishment
@@ -792,10 +747,9 @@ EmberPacketAction emberAfIncomingPacketFilterCallback(EmberZigbeePacketType pack
  * @param panId The PAN id of the remote device.  Ver.: always
  * @param eui64 The EUI64 of the remote device.  Ver.: always
  */
-EmberStatus emberAfInitiateInterPanKeyEstablishmentCallback(EmberPanId panId,
-                                                            const EmberEUI64 eui64)
+EmberStatus emberAfInitiateInterPanKeyEstablishmentCallback(EmberPanId panId, const EmberEUI64 eui64)
 {
-  return EMBER_LIBRARY_NOT_PRESENT;
+    return EMBER_LIBRARY_NOT_PRESENT;
 }
 
 /** @brief Initiate Key Establishment
@@ -808,10 +762,9 @@ EmberStatus emberAfInitiateInterPanKeyEstablishmentCallback(EmberPanId panId,
  * @param nodeId The node id of the remote device.  Ver.: always
  * @param endpoint The endpoint on the remote device.  Ver.: always
  */
-EmberStatus emberAfInitiateKeyEstablishmentCallback(EmberNodeId nodeId,
-                                                    uint8_t endpoint)
+EmberStatus emberAfInitiateKeyEstablishmentCallback(EmberNodeId nodeId, uint8_t endpoint)
 {
-  return EMBER_LIBRARY_NOT_PRESENT;
+    return EMBER_LIBRARY_NOT_PRESENT;
 }
 
 /** @brief Initiate Partner Link Key Exchange
@@ -828,11 +781,10 @@ EmberStatus emberAfInitiateKeyEstablishmentCallback(EmberNodeId nodeId,
  * @param callback The callback that should be called when the partner link key
  * exchange completse.  Ver.: always
  */
-EmberStatus emberAfInitiatePartnerLinkKeyExchangeCallback(EmberNodeId target,
-                                                          uint8_t endpoint,
-                                                          EmberAfPartnerLinkKeyExchangeCallback *callback)
+EmberStatus emberAfInitiatePartnerLinkKeyExchangeCallback(EmberNodeId target, uint8_t endpoint,
+                                                          EmberAfPartnerLinkKeyExchangeCallback * callback)
 {
-  return EMBER_LIBRARY_NOT_PRESENT;
+    return EMBER_LIBRARY_NOT_PRESENT;
 }
 
 /** @brief Inter Pan Key Establishment
@@ -850,13 +802,10 @@ EmberStatus emberAfInitiatePartnerLinkKeyExchangeCallback(EmberNodeId target,
  * @param eui64   Ver.: always
  * @param delayInSeconds   Ver.: always
  */
-bool emberAfInterPanKeyEstablishmentCallback(EmberAfKeyEstablishmentNotifyMessage status,
-                                             bool amInitiator,
-                                             EmberPanId panId,
-                                             const EmberEUI64 eui64,
-                                             uint8_t delayInSeconds)
+bool emberAfInterPanKeyEstablishmentCallback(EmberAfKeyEstablishmentNotifyMessage status, bool amInitiator, EmberPanId panId,
+                                             const EmberEUI64 eui64, uint8_t delayInSeconds)
 {
-  return true;
+    return true;
 }
 
 /** @brief Key Establishment
@@ -873,12 +822,10 @@ bool emberAfInterPanKeyEstablishmentCallback(EmberAfKeyEstablishmentNotifyMessag
  * @param partnerShortId   Ver.: always
  * @param delayInSeconds   Ver.: always
  */
-bool emberAfKeyEstablishmentCallback(EmberAfKeyEstablishmentNotifyMessage status,
-                                     bool amInitiator,
-                                     EmberNodeId partnerShortId,
+bool emberAfKeyEstablishmentCallback(EmberAfKeyEstablishmentNotifyMessage status, bool amInitiator, EmberNodeId partnerShortId,
                                      uint8_t delayInSeconds)
 {
-  return true;
+    return true;
 }
 
 /** @brief On/off Cluster Level Control Effect
@@ -890,10 +837,7 @@ bool emberAfKeyEstablishmentCallback(EmberAfKeyEstablishmentNotifyMessage status
  * @param endpoint   Ver.: always
  * @param newValue   Ver.: always
  */
-void emberAfOnOffClusterLevelControlEffectCallback(uint8_t endpoint,
-                                                   bool newValue)
-{
-}
+void emberAfOnOffClusterLevelControlEffectCallback(uint8_t endpoint, bool newValue) {}
 
 /** @brief Main Init
  *
@@ -915,9 +859,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(uint8_t endpoint,
  * Application Framework itself.
  *
  */
-void emberAfMainInitCallback(void)
-{
-}
+void emberAfMainInitCallback(void) {}
 
 /** @brief Main Start
  *
@@ -934,15 +876,13 @@ void emberAfMainInitCallback(void)
  * @param argc   Ver.: always
  * @param argv   Ver.: always
  */
-bool emberAfMainStartCallback(int* returnCode,
-                              int argc,
-                              char** argv)
+bool emberAfMainStartCallback(int * returnCode, int argc, char ** argv)
 {
-  // NOTE:  argc and argv may not be supported on all platforms, so argv MUST be
-  // checked for NULL before referencing it.  On those platforms without argc
-  // and argv "0" and "NULL" are passed respectively.
+    // NOTE:  argc and argv may not be supported on all platforms, so argv MUST be
+    // checked for NULL before referencing it.  On those platforms without argc
+    // and argv "0" and "NULL" are passed respectively.
 
-  return false;  // exit?
+    return false; // exit?
 }
 
 /** @brief Main Tick
@@ -951,9 +891,7 @@ bool emberAfMainStartCallback(int* returnCode,
  * end of the main tick execution.
  *
  */
-void emberAfMainTickCallback(void)
-{
-}
+void emberAfMainTickCallback(void) {}
 
 /** @brief Scenes Cluster Make Invalid
  *
@@ -964,7 +902,7 @@ void emberAfMainTickCallback(void)
  */
 EmberAfStatus emberAfScenesClusterMakeInvalidCallback(uint8_t endpoint)
 {
-  return EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND;
+    return EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND;
 }
 
 /** @brief Message Sent
@@ -985,14 +923,10 @@ EmberAfStatus emberAfScenesClusterMakeInvalidCallback(uint8_t endpoint)
  * @param message   Ver.: always
  * @param status   Ver.: always
  */
-bool emberAfMessageSentCallback(EmberOutgoingMessageType type,
-                                uint16_t indexOrDestination,
-                                EmberApsFrame* apsFrame,
-                                uint16_t msgLen,
-                                uint8_t* message,
-                                EmberStatus status)
+bool emberAfMessageSentCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame,
+                                uint16_t msgLen, uint8_t * message, EmberStatus status)
 {
-  return false;
+    return false;
 }
 
 /** @brief Ncp Init
@@ -1010,9 +944,7 @@ bool emberAfMessageSentCallback(EmberOutgoingMessageType type,
  *
  * @param memoryAllocation   Ver.: always
  */
-void emberAfNcpInitCallback(bool memoryAllocation)
-{
-}
+void emberAfNcpInitCallback(bool memoryAllocation) {}
 
 /** @brief Ncp Is Awake Isr
  *
@@ -1021,9 +953,7 @@ void emberAfNcpInitCallback(bool memoryAllocation)
  * function.
  *
  */
-void emberAfNcpIsAwakeIsrCallback(void)
-{
-}
+void emberAfNcpIsAwakeIsrCallback(void) {}
 
 /** @brief Network Key Update Complete
  *
@@ -1032,9 +962,7 @@ void emberAfNcpIsAwakeIsrCallback(void)
  *
  * @param status   Ver.: always
  */
-void emberAfNetworkKeyUpdateCompleteCallback(EmberStatus status)
-{
-}
+void emberAfNetworkKeyUpdateCompleteCallback(EmberStatus status) {}
 
 /** @brief Ota Bootload
  *
@@ -1046,12 +974,11 @@ void emberAfNetworkKeyUpdateCompleteCallback(EmberStatus status)
  * @param ncpUpgradeTagId The tag ID of the upgrade data that will be used to
  * bootload the device.  Ver.: always
  */
-uint8_t emberAfOtaBootloadCallback(const EmberAfOtaImageId* id,
-                                   uint16_t ncpUpgradeTagId)
+uint8_t emberAfOtaBootloadCallback(const EmberAfOtaImageId * id, uint16_t ncpUpgradeTagId)
 {
-  // Please implement me
-  emberAfCorePrintln("Not supported.");
-  return 1;
+    // Please implement me
+    emberAfCorePrintln("Not supported.");
+    return 1;
 }
 
 /** @brief Ota Client Bootload
@@ -1063,11 +990,11 @@ uint8_t emberAfOtaBootloadCallback(const EmberAfOtaImageId* id,
  * @param id This is the identifier relating to the image that has been
  * downloaded and is ready for bootload.  Ver.: always
  */
-void emberAfOtaClientBootloadCallback(const EmberAfOtaImageId* id)
+void emberAfOtaClientBootloadCallback(const EmberAfOtaImageId * id)
 {
-  // Any final preperation prior to the bootload should be done here.
-  // It is assumed that the device will reset in most all cases.
-  // Please implement me.
+    // Any final preperation prior to the bootload should be done here.
+    // It is assumed that the device will reset in most all cases.
+    // Please implement me.
 }
 
 /** @brief Ota Client Custom Verify
@@ -1080,22 +1007,21 @@ void emberAfOtaClientBootloadCallback(const EmberAfOtaImageId* id)
  * started.  Ver.: always
  * @param id This is ID of the image to be verified.  Ver.: always
  */
-EmberAfImageVerifyStatus emberAfOtaClientCustomVerifyCallback(bool newVerification,
-                                                              const EmberAfOtaImageId* id)
+EmberAfImageVerifyStatus emberAfOtaClientCustomVerifyCallback(bool newVerification, const EmberAfOtaImageId * id)
 {
-  // Manufacturing specific checks can be made to the image in this function to
-  // determine if it is valid.  This function is called AFTER cryptographic
-  // checks have passed.  If the cryptographic checks failed, this function will
-  // never be called.
+    // Manufacturing specific checks can be made to the image in this function to
+    // determine if it is valid.  This function is called AFTER cryptographic
+    // checks have passed.  If the cryptographic checks failed, this function will
+    // never be called.
 
-  // The function shall return one of the following based on its own
-  // verification process.
-  // 1) EMBER_AF_IMAGE_GOOD - the image has passed all checks
-  // 2) EMBER_AF_IMAGE_BAD  - the image is not valid
-  // 3) EMBER_AF_IMAGE_VERIFY_IN_PROGRESS - the image is valid so far, but more
-  //      checks are needed.  This callback shall be re-executed later to
-  //      continue verification.  This allows other code in the framework to run.
-  return EMBER_AF_IMAGE_GOOD;
+    // The function shall return one of the following based on its own
+    // verification process.
+    // 1) EMBER_AF_IMAGE_GOOD - the image has passed all checks
+    // 2) EMBER_AF_IMAGE_BAD  - the image is not valid
+    // 3) EMBER_AF_IMAGE_VERIFY_IN_PROGRESS - the image is valid so far, but more
+    //      checks are needed.  This callback shall be re-executed later to
+    //      continue verification.  This allows other code in the framework to run.
+    return EMBER_AF_IMAGE_GOOD;
 }
 
 /** @brief Ota Client Download Complete
@@ -1113,23 +1039,23 @@ EmberAfImageVerifyStatus emberAfOtaClientCustomVerifyCallback(bool newVerificati
  * @param id This is the image identifier information that corresponds to the
  * download result.  Ver.: always
  */
-bool emberAfOtaClientDownloadCompleteCallback(EmberAfOtaDownloadResult success,
-                                              const EmberAfOtaImageId* id)
+bool emberAfOtaClientDownloadCompleteCallback(EmberAfOtaDownloadResult success, const EmberAfOtaImageId * id)
 {
-  // At this point the image has been completely downloaded and cryptographic
-  // checks (if applicable) have been performed.
+    // At this point the image has been completely downloaded and cryptographic
+    // checks (if applicable) have been performed.
 
-  if (!success) {
-    emberAfOtaBootloadClusterPrintln("Download failed.");
-    return true;   // return value is ignored
-  }
+    if (!success)
+    {
+        emberAfOtaBootloadClusterPrintln("Download failed.");
+        return true; // return value is ignored
+    }
 
-  // This is for any additional validation that needs to be performed
-  // on the image by the application.
+    // This is for any additional validation that needs to be performed
+    // on the image by the application.
 
-  // The results of checks here will be returned back to the OTA server
-  // in the Upgrade End request.
-  return true;
+    // The results of checks here will be returned back to the OTA server
+    // in the Upgrade End request.
+    return true;
 }
 
 /** @brief Ota Client Incoming Message Raw
@@ -1141,9 +1067,9 @@ bool emberAfOtaClientDownloadCompleteCallback(EmberAfOtaDownloadResult success,
  * @param message A pointer to the structure containing the message buffer and
  * other information about it.  Ver.: always
  */
-bool emberAfOtaClientIncomingMessageRawCallback(EmberAfClusterCommand *message)
+bool emberAfOtaClientIncomingMessageRawCallback(EmberAfClusterCommand * message)
 {
-  return false;
+    return false;
 }
 
 /** @brief Ota Client Start
@@ -1154,9 +1080,7 @@ bool emberAfOtaClientIncomingMessageRawCallback(EmberAfClusterCommand *message)
  * for the bootload message, and kick off the bootload.
  *
  */
-void emberAfOtaClientStartCallback(void)
-{
-}
+void emberAfOtaClientStartCallback(void) {}
 
 /** @brief Ota Client Version Info
  *
@@ -1173,34 +1097,33 @@ void emberAfOtaClientStartCallback(void)
  * the query.  If no hardware version should be used, then
  * EMBER_AF_INVALID_HARDWARE_VERSION should be used.  Ver.: always
  */
-void emberAfOtaClientVersionInfoCallback(EmberAfOtaImageId* currentImageInfo,
-                                         uint16_t* hardwareVersion)
+void emberAfOtaClientVersionInfoCallback(EmberAfOtaImageId * currentImageInfo, uint16_t * hardwareVersion)
 {
-  // Customer will fill in the image info with their manufacturer ID,
-  // image type ID, and current software version number.
-  // The deviceSpecificFileEui64 can be ignored.
+    // Customer will fill in the image info with their manufacturer ID,
+    // image type ID, and current software version number.
+    // The deviceSpecificFileEui64 can be ignored.
 
-  // It may be necessary to dynamically determine this by talking to
-  // another device, as is the case with a host talking to an NCP device.
+    // It may be necessary to dynamically determine this by talking to
+    // another device, as is the case with a host talking to an NCP device.
 
-  // However, this routine will be called repeatedly so it may be wise
-  // to cache the data!
+    // However, this routine will be called repeatedly so it may be wise
+    // to cache the data!
 
-/* This is commented out since the #defines below are not defined.
+    /* This is commented out since the #defines below are not defined.
 
-   if (currentImageInfo != NULL) {
-    MEMSET(currentImageInfo, 0, sizeof(EmberAfOtaImageId));
-    currentImageInfo->manufacturerId  = EMBER_AF_MANUFACTURER_CODE;
-    currentImageInfo->imageTypeId     = EMBER_AF_IMAGE_TYPE_ID;
-    currentImageInfo->firmwareVersion = EMBER_AF_CUSTOM_FIRMWARE_VERSION;
-   }
+       if (currentImageInfo != NULL) {
+        MEMSET(currentImageInfo, 0, sizeof(EmberAfOtaImageId));
+        currentImageInfo->manufacturerId  = EMBER_AF_MANUFACTURER_CODE;
+        currentImageInfo->imageTypeId     = EMBER_AF_IMAGE_TYPE_ID;
+        currentImageInfo->firmwareVersion = EMBER_AF_CUSTOM_FIRMWARE_VERSION;
+       }
 
-   if (hardwareVersion != NULL) {
- * hardwareVersion = EMBER_AF_INVALID_HARDWARE_VERSION;
-   }
+       if (hardwareVersion != NULL) {
+     * hardwareVersion = EMBER_AF_INVALID_HARDWARE_VERSION;
+       }
 
-   assert(false);
- */
+       assert(false);
+     */
 }
 
 /** @brief Ota Page Request Server Policy
@@ -1214,7 +1137,7 @@ void emberAfOtaClientVersionInfoCallback(EmberAfOtaImageId* currentImageInfo,
  */
 uint8_t emberAfOtaPageRequestServerPolicyCallback(void)
 {
-  return EMBER_ZCL_STATUS_SUCCESS;
+    return EMBER_ZCL_STATUS_SUCCESS;
 }
 
 /** @brief Ota Server Block Size
@@ -1227,34 +1150,33 @@ uint8_t emberAfOtaPageRequestServerPolicyCallback(void)
  */
 uint8_t emberAfOtaServerBlockSizeCallback(EmberNodeId clientNodeId)
 {
-  // This function provides a way for the server to potentially
-  // adjust the block size based on the client who is requesting.
-  // In other words if we are using source routing we will limit
-  // data returned by enough to put a source route into the message.
+    // This function provides a way for the server to potentially
+    // adjust the block size based on the client who is requesting.
+    // In other words if we are using source routing we will limit
+    // data returned by enough to put a source route into the message.
 
-  // Image Block Response Message Format
-  // Status Code: 1-byte
-  // Manuf Code:  2-bytes
-  // Image Type:  2-bytes
-  // File Ver:    4-bytes
-  // File Offset: 4-bytes
-  // Data Size:   1-byte
-  // Data:        variable
-  const uint8_t IMAGE_BLOCK_RESPONSE_OVERHEAD = (EMBER_AF_ZCL_OVERHEAD + 14);
+    // Image Block Response Message Format
+    // Status Code: 1-byte
+    // Manuf Code:  2-bytes
+    // Image Type:  2-bytes
+    // File Ver:    4-bytes
+    // File Offset: 4-bytes
+    // Data Size:   1-byte
+    // Data:        variable
+    const uint8_t IMAGE_BLOCK_RESPONSE_OVERHEAD = (EMBER_AF_ZCL_OVERHEAD + 14);
 
-  EmberApsFrame apsFrame;
-  uint8_t maxSize;
-  apsFrame.options = EMBER_APS_OPTION_NONE;
+    EmberApsFrame apsFrame;
+    uint8_t maxSize;
+    apsFrame.options = EMBER_APS_OPTION_NONE;
 
-  if (emberAfIsCurrentSecurityProfileSmartEnergy()) {
-    apsFrame.options |= EMBER_APS_OPTION_ENCRYPTION;
-  }
+    if (emberAfIsCurrentSecurityProfileSmartEnergy())
+    {
+        apsFrame.options |= EMBER_APS_OPTION_ENCRYPTION;
+    }
 
-  maxSize = emberAfMaximumApsPayloadLength(EMBER_OUTGOING_DIRECT,
-                                           clientNodeId,
-                                           &apsFrame);
-  maxSize -= IMAGE_BLOCK_RESPONSE_OVERHEAD;
-  return maxSize;
+    maxSize = emberAfMaximumApsPayloadLength(EMBER_OUTGOING_DIRECT, clientNodeId, &apsFrame);
+    maxSize -= IMAGE_BLOCK_RESPONSE_OVERHEAD;
+    return maxSize;
 }
 
 /** @brief Ota Server Incoming Message Raw
@@ -1266,9 +1188,9 @@ uint8_t emberAfOtaServerBlockSizeCallback(EmberNodeId clientNodeId)
  * @param message A pointer to the structure containing the message buffer and
  * other information about it.  Ver.: always
  */
-bool emberAfOtaServerIncomingMessageRawCallback(EmberAfClusterCommand *message)
+bool emberAfOtaServerIncomingMessageRawCallback(EmberAfClusterCommand * message)
 {
-  return false;
+    return false;
 }
 
 /** @brief Ota Server Query
@@ -1286,15 +1208,14 @@ bool emberAfOtaServerIncomingMessageRawCallback(EmberAfClusterCommand *message)
  * @param nextUpgradeImageId This is a pointer to a data structure containing
  * the 'next' software version for the client to download.  Ver.: always
  */
-uint8_t emberAfOtaServerQueryCallback(const EmberAfOtaImageId* currentImageId,
-                                      uint16_t* hardwareVersion,
-                                      EmberAfOtaImageId* nextUpgradeImageId)
+uint8_t emberAfOtaServerQueryCallback(const EmberAfOtaImageId * currentImageId, uint16_t * hardwareVersion,
+                                      EmberAfOtaImageId * nextUpgradeImageId)
 {
-  // If a new software image is available, this function should return EMBER_ZCL_STATUS_SUCCESS
-  // and populate the 'nextUpgradeImageId' structure with the appropriate values.
-  // If no new software image is available (i.e. the client should not download a firmware image)
-  // then the server should return EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE.
-  return EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE;
+    // If a new software image is available, this function should return EMBER_ZCL_STATUS_SUCCESS
+    // and populate the 'nextUpgradeImageId' structure with the appropriate values.
+    // If no new software image is available (i.e. the client should not download a firmware image)
+    // then the server should return EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE.
+    return EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE;
 }
 
 /** @brief Ota Server Send Image Notify
@@ -1317,13 +1238,10 @@ uint8_t emberAfOtaServerQueryCallback(const EmberAfOtaImageId* currentImageId,
  * within this struct that will be appended to the message is determined by the
  * previous 'payloadType' argument.  Ver.: always
  */
-bool emberAfOtaServerSendImageNotifyCallback(EmberNodeId dest,
-                                             uint8_t endpoint,
-                                             uint8_t payloadType,
-                                             uint8_t queryJitter,
-                                             const EmberAfOtaImageId* id)
+bool emberAfOtaServerSendImageNotifyCallback(EmberNodeId dest, uint8_t endpoint, uint8_t payloadType, uint8_t queryJitter,
+                                             const EmberAfOtaImageId * id)
 {
-  return false;
+    return false;
 }
 
 /** @brief Ota Server Upgrade End Request
@@ -1344,23 +1262,21 @@ bool emberAfOtaServerSendImageNotifyCallback(EmberNodeId dest,
  * @param imageId This variable indicates the software version that the client
  * successfully downloaded and is asking to upgrade to.  Ver.: always
  */
-bool emberAfOtaServerUpgradeEndRequestCallback(EmberNodeId source,
-                                               uint8_t status,
-                                               uint32_t* returnValue,
-                                               const EmberAfOtaImageId* imageId)
+bool emberAfOtaServerUpgradeEndRequestCallback(EmberNodeId source, uint8_t status, uint32_t * returnValue,
+                                               const EmberAfOtaImageId * imageId)
 {
-  // If the status value is not EMBER_ZCL_STATUS_SUCCESS, then this callback is
-  // merely informative and no response message will be generated by the server.
-  // If the server wants the client to NOT apply the upgrade, then it should
-  // return false.
-  // If the server wants the client to apply the upgrade, it should return true
-  // and set the 'returnValue' parameter to when it wants the client to
-  // apply the upgrade.  There are three possible values:
-  //   0               =  Apply the upgrade now
-  //   0xFFFFFFFF      =  Don't apply yet, ask again later.
-  //   (anything-else) =  Apply the upgrade X minutes from now.
-  *returnValue = 0;
-  return true;
+    // If the status value is not EMBER_ZCL_STATUS_SUCCESS, then this callback is
+    // merely informative and no response message will be generated by the server.
+    // If the server wants the client to NOT apply the upgrade, then it should
+    // return false.
+    // If the server wants the client to apply the upgrade, it should return true
+    // and set the 'returnValue' parameter to when it wants the client to
+    // apply the upgrade.  There are three possible values:
+    //   0               =  Apply the upgrade now
+    //   0xFFFFFFFF      =  Don't apply yet, ask again later.
+    //   (anything-else) =  Apply the upgrade X minutes from now.
+    *returnValue = 0;
+    return true;
 }
 
 /** @brief Ota Storage Check Temp Data
@@ -1384,12 +1300,11 @@ bool emberAfOtaServerUpgradeEndRequestCallback(EmberNodeId source,
  * @param newFileInfo This is the image id of the temporary file data stored in
  * the storage device.  Ver.: always
  */
-EmberAfOtaStorageStatus emberAfOtaStorageCheckTempDataCallback(uint32_t* currentOffset,
-                                                               uint32_t* totalImageSize,
-                                                               EmberAfOtaImageId* newFileInfo)
+EmberAfOtaStorageStatus emberAfOtaStorageCheckTempDataCallback(uint32_t * currentOffset, uint32_t * totalImageSize,
+                                                               EmberAfOtaImageId * newFileInfo)
 {
-  // If the image data cannot be successfully verified, an error should be returned.
-  return EMBER_AF_OTA_STORAGE_ERROR;
+    // If the image data cannot be successfully verified, an error should be returned.
+    return EMBER_AF_OTA_STORAGE_ERROR;
 }
 
 /** @brief Ota Storage Clear Temp Data
@@ -1400,8 +1315,8 @@ EmberAfOtaStorageStatus emberAfOtaStorageCheckTempDataCallback(uint32_t* current
  */
 EmberAfOtaStorageStatus emberAfOtaStorageClearTempDataCallback(void)
 {
-  // If the image data cannot be stored, an error should be returned.
-  return EMBER_AF_OTA_STORAGE_ERROR;
+    // If the image data cannot be stored, an error should be returned.
+    return EMBER_AF_OTA_STORAGE_ERROR;
 }
 
 /** @brief Ota Storage Close
@@ -1411,8 +1326,8 @@ EmberAfOtaStorageStatus emberAfOtaStorageClearTempDataCallback(void)
  */
 void emberAfOtaStorageCloseCallback(void)
 {
-  // Please implement me.
-  assert(false);
+    // Please implement me.
+    assert(false);
 }
 
 /** @brief Ota Storage Driver Download Finish
@@ -1425,9 +1340,9 @@ void emberAfOtaStorageCloseCallback(void)
  */
 void emberAfOtaStorageDriverDownloadFinishCallback(uint32_t offset)
 {
-  // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
-  // Please implement me.
-  assert(false);
+    // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
+    // Please implement me.
+    assert(false);
 }
 
 /** @brief Ota Storage Driver Init
@@ -1437,10 +1352,10 @@ void emberAfOtaStorageDriverDownloadFinishCallback(uint32_t offset)
  */
 bool emberAfOtaStorageDriverInitCallback(void)
 {
-  // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
-  // Please implement me.
-  assert(false);
-  return false;
+    // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
+    // Please implement me.
+    assert(false);
+    return false;
 }
 
 /** @brief Ota Storage Driver Invalidate Image
@@ -1452,10 +1367,10 @@ bool emberAfOtaStorageDriverInitCallback(void)
  */
 EmberAfOtaStorageStatus emberAfOtaStorageDriverInvalidateImageCallback(void)
 {
-  // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
-  // Please implement me.
-  assert(false);
-  return EMBER_AF_OTA_STORAGE_ERROR;
+    // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
+    // Please implement me.
+    assert(false);
+    return EMBER_AF_OTA_STORAGE_ERROR;
 }
 
 /** @brief Ota Storage Driver Prepare To Resume Download
@@ -1467,8 +1382,8 @@ EmberAfOtaStorageStatus emberAfOtaStorageDriverInvalidateImageCallback(void)
  */
 EmberAfOtaStorageStatus emberAfOtaStorageDriverPrepareToResumeDownloadCallback(void)
 {
-  assert(false);
-  return EMBER_AF_OTA_STORAGE_ERROR;
+    assert(false);
+    return EMBER_AF_OTA_STORAGE_ERROR;
 }
 
 /** @brief Ota Storage Driver Read
@@ -1483,14 +1398,12 @@ EmberAfOtaStorageStatus emberAfOtaStorageDriverPrepareToResumeDownloadCallback(v
  * @param returnData A pointer where the data read from the device should be
  * written to.  Ver.: always
  */
-bool emberAfOtaStorageDriverReadCallback(uint32_t offset,
-                                         uint32_t length,
-                                         uint8_t* returnData)
+bool emberAfOtaStorageDriverReadCallback(uint32_t offset, uint32_t length, uint8_t * returnData)
 {
-  // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
-  // Please implement me.
-  assert(false);
-  return false;
+    // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
+    // Please implement me.
+    assert(false);
+    return false;
 }
 
 /** @brief Ota Storage Driver Retrieve Last Stored Offset
@@ -1502,10 +1415,10 @@ bool emberAfOtaStorageDriverReadCallback(uint32_t offset,
  */
 uint32_t emberAfOtaStorageDriverRetrieveLastStoredOffsetCallback(void)
 {
-  // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
-  // Please implement me.
-  assert(false);
-  return 0;
+    // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
+    // Please implement me.
+    assert(false);
+    return 0;
 }
 
 /** @brief Ota Storage Driver Write
@@ -1520,14 +1433,12 @@ uint32_t emberAfOtaStorageDriverRetrieveLastStoredOffsetCallback(void)
  * @param length The length of the data to be written to the storage device.
  * Ver.: always
  */
-bool emberAfOtaStorageDriverWriteCallback(const uint8_t* dataToWrite,
-                                          uint32_t offset,
-                                          uint32_t length)
+bool emberAfOtaStorageDriverWriteCallback(const uint8_t * dataToWrite, uint32_t offset, uint32_t length)
 {
-  // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
-  // Please implement me.
-  assert(false);
-  return false;
+    // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
+    // Please implement me.
+    assert(false);
+    return false;
 }
 
 /** @brief Ota Storage Finish Download
@@ -1539,7 +1450,7 @@ bool emberAfOtaStorageDriverWriteCallback(const uint8_t* dataToWrite,
  */
 EmberAfOtaStorageStatus emberAfOtaStorageFinishDownloadCallback(uint32_t offset)
 {
-  return EMBER_AF_OTA_STORAGE_SUCCESS;
+    return EMBER_AF_OTA_STORAGE_SUCCESS;
 }
 
 /** @brief Ota Storage Get Count
@@ -1550,7 +1461,7 @@ EmberAfOtaStorageStatus emberAfOtaStorageFinishDownloadCallback(uint32_t offset)
  */
 uint8_t emberAfOtaStorageGetCountCallback(void)
 {
-  return 0;
+    return 0;
 }
 
 /** @brief Ota Storage Get Full Header
@@ -1563,11 +1474,10 @@ uint8_t emberAfOtaStorageGetCountCallback(void)
  * @param returnData This is a pointer to the location of the structure that
  * will be populated with data.  Ver.: always
  */
-EmberAfOtaStorageStatus emberAfOtaStorageGetFullHeaderCallback(const EmberAfOtaImageId* id,
-                                                               EmberAfOtaHeader* returnData)
+EmberAfOtaStorageStatus emberAfOtaStorageGetFullHeaderCallback(const EmberAfOtaImageId * id, EmberAfOtaHeader * returnData)
 {
-  // If the requested image cannot be found, then an error shouldb e returned.
-  return EMBER_AF_OTA_STORAGE_ERROR;
+    // If the requested image cannot be found, then an error shouldb e returned.
+    return EMBER_AF_OTA_STORAGE_ERROR;
 }
 
 /** @brief Ota Storage Get Total Image Size
@@ -1578,10 +1488,10 @@ EmberAfOtaStorageStatus emberAfOtaStorageGetFullHeaderCallback(const EmberAfOtaI
  * @param id A pointer to the image identifier for the OTA file to retrieve
  * information for.  Ver.: always
  */
-uint32_t emberAfOtaStorageGetTotalImageSizeCallback(const EmberAfOtaImageId* id)
+uint32_t emberAfOtaStorageGetTotalImageSizeCallback(const EmberAfOtaImageId * id)
 {
-  // On failure this should return an image size of zero.
-  return 0;
+    // On failure this should return an image size of zero.
+    return 0;
 }
 
 /** @brief Ota Storage Init
@@ -1591,7 +1501,7 @@ uint32_t emberAfOtaStorageGetTotalImageSizeCallback(const EmberAfOtaImageId* id)
  */
 EmberAfOtaStorageStatus emberAfOtaStorageInitCallback(void)
 {
-  return EMBER_AF_OTA_STORAGE_SUCCESS;
+    return EMBER_AF_OTA_STORAGE_SUCCESS;
 }
 
 /** @brief Ota Storage Iterator First
@@ -1603,10 +1513,11 @@ EmberAfOtaStorageStatus emberAfOtaStorageInitCallback(void)
  */
 EmberAfOtaImageId emberAfOtaStorageIteratorFirstCallback(void)
 {
-  // It is expected that the storage module maintain its own internal iterator that the 'first' and 'next' functions will manipulate.
+    // It is expected that the storage module maintain its own internal iterator that the 'first' and 'next' functions will
+    // manipulate.
 
-  // If there are no images at all, this function should return the invalid image id.
-  return emberAfInvalidImageId;
+    // If there are no images at all, this function should return the invalid image id.
+    return emberAfInvalidImageId;
 }
 
 /** @brief Ota Storage Iterator Next
@@ -1618,10 +1529,11 @@ EmberAfOtaImageId emberAfOtaStorageIteratorFirstCallback(void)
  */
 EmberAfOtaImageId emberAfOtaStorageIteratorNextCallback(void)
 {
-  // It is expected that the storage module maintain its own internal iterator that the 'first' and 'next' functions will manipulate.
+    // It is expected that the storage module maintain its own internal iterator that the 'first' and 'next' functions will
+    // manipulate.
 
-  // If there are no more images, this function should return the invalid image id.
-  return emberAfInvalidImageId;
+    // If there are no more images, this function should return the invalid image id.
+    return emberAfInvalidImageId;
 }
 
 /** @brief Ota Storage Read Image Data
@@ -1640,14 +1552,11 @@ EmberAfOtaImageId emberAfOtaStorageIteratorNextCallback(void)
  * of data read will be written to.  A short read may occur if the end of file
  * was reached.  Ver.: always
  */
-EmberAfOtaStorageStatus emberAfOtaStorageReadImageDataCallback(const EmberAfOtaImageId* id,
-                                                               uint32_t offset,
-                                                               uint32_t length,
-                                                               uint8_t* returnData,
-                                                               uint32_t* returnedLength)
+EmberAfOtaStorageStatus emberAfOtaStorageReadImageDataCallback(const EmberAfOtaImageId * id, uint32_t offset, uint32_t length,
+                                                               uint8_t * returnData, uint32_t * returnedLength)
 {
-  // If the requested image cannot be found, then an error should be returned.
-  return EMBER_AF_OTA_STORAGE_ERROR;
+    // If the requested image cannot be found, then an error should be returned.
+    return EMBER_AF_OTA_STORAGE_ERROR;
 }
 
 /** @brief Ota Storage Search
@@ -1668,12 +1577,10 @@ EmberAfOtaStorageStatus emberAfOtaStorageReadImageDataCallback(const EmberAfOtaI
  * version is present in an OTA file but the other parameters match, the file
  * will be considered a match  Ver.: always
  */
-EmberAfOtaImageId emberAfOtaStorageSearchCallback(uint16_t manufacturerId,
-                                                  uint16_t imageTypeId,
-                                                  const uint16_t* hardwareVersion)
+EmberAfOtaImageId emberAfOtaStorageSearchCallback(uint16_t manufacturerId, uint16_t imageTypeId, const uint16_t * hardwareVersion)
 {
-  // If no image is found that matches the search criteria, this function should return the invalid image id.
-  return emberAfInvalidImageId;
+    // If no image is found that matches the search criteria, this function should return the invalid image id.
+    return emberAfInvalidImageId;
 }
 
 /** @brief Ota Storage Write Temp Data
@@ -1687,12 +1594,10 @@ EmberAfOtaImageId emberAfOtaStorageSearchCallback(uint16_t manufacturerId,
  * @param data A pointer to the temporary data that will be written to the
  * storage device.  Ver.: always
  */
-EmberAfOtaStorageStatus emberAfOtaStorageWriteTempDataCallback(uint32_t offset,
-                                                               uint32_t length,
-                                                               const uint8_t* data)
+EmberAfOtaStorageStatus emberAfOtaStorageWriteTempDataCallback(uint32_t offset, uint32_t length, const uint8_t * data)
 {
-  // If the image data cannot be stored, an error should be returned.
-  return EMBER_AF_OTA_STORAGE_ERROR;
+    // If the image data cannot be stored, an error should be returned.
+    return EMBER_AF_OTA_STORAGE_ERROR;
 }
 
 /** @brief Outgoing Packet Filter
@@ -1720,12 +1625,10 @@ EmberAfOtaStorageStatus emberAfOtaStorageWriteTempDataCallback(uint32_t offset,
  * @param size_p a pointer containing the size value of the packet  Ver.: always
  * @param data auxillary data included with the packet  Ver.: always
  */
-EmberPacketAction emberAfOutgoingPacketFilterCallback(EmberZigbeePacketType packetType,
-                                                      uint8_t* packetData,
-                                                      uint8_t* size_p,
-                                                      void* data)
+EmberPacketAction emberAfOutgoingPacketFilterCallback(EmberZigbeePacketType packetType, uint8_t * packetData, uint8_t * size_p,
+                                                      void * data)
 {
-  return EMBER_ACCEPT_PACKET;
+    return EMBER_ACCEPT_PACKET;
 }
 
 /** @brief Partner Link Key Exchange Request
@@ -1740,7 +1643,7 @@ EmberPacketAction emberAfOutgoingPacketFilterCallback(EmberZigbeePacketType pack
  */
 EmberZdoStatus emberAfPartnerLinkKeyExchangeRequestCallback(EmberEUI64 partner)
 {
-  return EMBER_ZDP_NOT_SUPPORTED;
+    return EMBER_ZDP_NOT_SUPPORTED;
 }
 
 /** @brief Partner Link Key Exchange Response
@@ -1754,10 +1657,7 @@ EmberZdoStatus emberAfPartnerLinkKeyExchangeRequestCallback(EmberEUI64 partner)
  * @param sender The EUI of the remote node.  Ver.: always
  * @param status The ZDO response status.  Ver.: always
  */
-void emberAfPartnerLinkKeyExchangeResponseCallback(EmberNodeId sender,
-                                                   EmberZdoStatus status)
-{
-}
+void emberAfPartnerLinkKeyExchangeResponseCallback(EmberNodeId sender, EmberZdoStatus status) {}
 
 /** @brief Performing Key Establishment
  *
@@ -1768,7 +1668,7 @@ void emberAfPartnerLinkKeyExchangeResponseCallback(EmberNodeId sender,
  */
 bool emberAfPerformingKeyEstablishmentCallback(void)
 {
-  return false;
+    return false;
 }
 
 /** @brief Broadcast Sent
@@ -1777,9 +1677,7 @@ bool emberAfPerformingKeyEstablishmentCallback(void)
  * sent by the concentrator plugin.
  *
  */
-void emberAfPluginConcentratorBroadcastSentCallback(void)
-{
-}
+void emberAfPluginConcentratorBroadcastSentCallback(void) {}
 
 /** @brief Pre Message Received
  *
@@ -1791,11 +1689,9 @@ void emberAfPluginConcentratorBroadcastSentCallback(void)
  * @param msgLen The message payload length Ver.: always
  * @param message The message payload Ver.: always
  */
-bool emberAfPluginInterpanPreMessageReceivedCallback(const EmberAfInterpanHeader *header,
-                                                     uint8_t msgLen,
-                                                     uint8_t *message)
+bool emberAfPluginInterpanPreMessageReceivedCallback(const EmberAfInterpanHeader * header, uint8_t msgLen, uint8_t * message)
 {
-  return false;
+    return false;
 }
 
 /** @brief Complete
@@ -1813,16 +1709,12 @@ bool emberAfPluginInterpanPreMessageReceivedCallback(const EmberAfInterpanHeader
  * this, one is able to tell on which channel mask and with which key the
  * process was complete. Ver.: always
  */
-void emberAfPluginNetworkSteeringCompleteCallback(EmberStatus status,
-                                                  uint8_t totalBeacons,
-                                                  uint8_t joinAttempts,
+void emberAfPluginNetworkSteeringCompleteCallback(EmberStatus status, uint8_t totalBeacons, uint8_t joinAttempts,
                                                   uint8_t finalState)
 {
-  emberAfCorePrintln("Network Steering Completed: %p (0x%X)",
-                     (status == EMBER_SUCCESS ? "Join Success" : "FAILED"),
-                     status);
-  emberAfCorePrintln("Finishing state: 0x%X", finalState);
-  emberAfCorePrintln("Beacons heard: %d\nJoin Attempts: %d", totalBeacons, joinAttempts);
+    emberAfCorePrintln("Network Steering Completed: %p (0x%X)", (status == EMBER_SUCCESS ? "Join Success" : "FAILED"), status);
+    emberAfCorePrintln("Finishing state: 0x%X", finalState);
+    emberAfCorePrintln("Beacons heard: %d\nJoin Attempts: %d", totalBeacons, joinAttempts);
 }
 
 /** @brief Get Distributed Key
@@ -1837,7 +1729,7 @@ void emberAfPluginNetworkSteeringCompleteCallback(EmberStatus status,
  */
 bool emberAfPluginNetworkSteeringGetDistributedKeyCallback(EmberKeyData * key)
 {
-  return false;
+    return false;
 }
 
 /** @brief Get Node Type
@@ -1852,9 +1744,7 @@ bool emberAfPluginNetworkSteeringGetDistributedKeyCallback(EmberKeyData * key)
  */
 EmberNodeType emberAfPluginNetworkSteeringGetNodeTypeCallback(EmberAfPluginNetworkSteeringJoiningState state)
 {
-  return ((emAfCurrentZigbeeProNetwork->nodeType == EMBER_COORDINATOR)
-          ? EMBER_ROUTER
-          : emAfCurrentZigbeeProNetwork->nodeType);
+    return ((emAfCurrentZigbeeProNetwork->nodeType == EMBER_COORDINATOR) ? EMBER_ROUTER : emAfCurrentZigbeeProNetwork->nodeType);
 }
 
 /** @brief Get Power For Radio Channel
@@ -1868,7 +1758,7 @@ EmberNodeType emberAfPluginNetworkSteeringGetNodeTypeCallback(EmberAfPluginNetwo
  */
 int8_t emberAfPluginNetworkSteeringGetPowerForRadioChannelCallback(uint8_t channel)
 {
-  return emberAfMaxPowerLevel();
+    return emberAfMaxPowerLevel();
 }
 
 /** @brief Post Attribute Change
@@ -1886,16 +1776,9 @@ int8_t emberAfPluginNetworkSteeringGetPowerForRadioChannelCallback(uint8_t chann
  * @param size   Ver.: always
  * @param value   Ver.: always
  */
-void emberAfPostAttributeChangeCallback(uint8_t endpoint,
-                                        EmberAfClusterId clusterId,
-                                        EmberAfAttributeId attributeId,
-                                        uint8_t mask,
-                                        uint16_t manufacturerCode,
-                                        uint8_t type,
-                                        uint8_t size,
-                                        uint8_t* value)
-{
-}
+void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
+                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+{}
 
 /** @brief Post Em4 Reset
  *
@@ -1904,7 +1787,7 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint,
  */
 void emberAfPostEm4ResetCallback(void)
 {
-  return;
+    return;
 }
 
 /** @brief Pre Attribute Change
@@ -1924,16 +1807,11 @@ void emberAfPostEm4ResetCallback(void)
  * @param size   Ver.: always
  * @param value   Ver.: always
  */
-EmberAfStatus emberAfPreAttributeChangeCallback(uint8_t endpoint,
-                                                EmberAfClusterId clusterId,
-                                                EmberAfAttributeId attributeId,
-                                                uint8_t mask,
-                                                uint16_t manufacturerCode,
-                                                uint8_t type,
-                                                uint8_t size,
-                                                uint8_t* value)
+EmberAfStatus emberAfPreAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
+                                                uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
+                                                uint8_t * value)
 {
-  return EMBER_ZCL_STATUS_SUCCESS;
+    return EMBER_ZCL_STATUS_SUCCESS;
 }
 
 /** @brief Pre Cli Send
@@ -1953,13 +1831,10 @@ EmberAfStatus emberAfPreAttributeChangeCallback(uint8_t endpoint,
  * @param message Pointer to the message payload  Ver.: always
  * @param messageLength Length of the message payload  Ver.: always
  */
-bool emberAfPreCliSendCallback(EmberApsFrame* apsFrame,
-                               EmberNodeId source,
-                               EmberNodeId destination,
-                               uint8_t* message,
+bool emberAfPreCliSendCallback(EmberApsFrame * apsFrame, EmberNodeId source, EmberNodeId destination, uint8_t * message,
                                uint16_t messageLength)
 {
-  return false;
+    return false;
 }
 
 /** @brief Pre Command Received
@@ -1975,9 +1850,9 @@ bool emberAfPreCliSendCallback(EmberApsFrame* apsFrame,
  *
  * @param cmd   Ver.: always
  */
-bool emberAfPreCommandReceivedCallback(EmberAfClusterCommand* cmd)
+bool emberAfPreCommandReceivedCallback(EmberAfClusterCommand * cmd)
 {
-  return false;
+    return false;
 }
 
 /** @brief Pre Message Received
@@ -2003,9 +1878,9 @@ bool emberAfPreCommandReceivedCallback(EmberAfClusterCommand* cmd)
  *
  * @param incomingMessage   Ver.: always
  */
-bool emberAfPreMessageReceivedCallback(EmberAfIncomingMessage* incomingMessage)
+bool emberAfPreMessageReceivedCallback(EmberAfIncomingMessage * incomingMessage)
 {
-  return false;
+    return false;
 }
 
 /** @brief Pre Message Send
@@ -2027,10 +1902,9 @@ bool emberAfPreMessageReceivedCallback(EmberAfIncomingMessage* incomingMessage)
  * @param status A pointer to the status code value that will be returned to the
  * caller.  Ver.: always
  */
-bool emberAfPreMessageSendCallback(EmberAfMessageStruct* messageStruct,
-                                   EmberStatus* status)
+bool emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberStatus * status)
 {
-  return false;
+    return false;
 }
 
 /** @brief Pre Ncp Reset
@@ -2038,9 +1912,7 @@ bool emberAfPreMessageSendCallback(EmberAfMessageStruct* messageStruct,
  * This function will be called prior to the reset of the NCP by the host.
  *
  */
-void emberAfPreNcpResetCallback(void)
-{
-}
+void emberAfPreNcpResetCallback(void) {}
 
 /** @brief Pre ZDO Message Received
  *
@@ -2054,12 +1926,9 @@ void emberAfPreNcpResetCallback(void)
  * @param message   Ver.: always
  * @param length   Ver.: always
  */
-bool emberAfPreZDOMessageReceivedCallback(EmberNodeId emberNodeId,
-                                          EmberApsFrame* apsFrame,
-                                          uint8_t* message,
-                                          uint16_t length)
+bool emberAfPreZDOMessageReceivedCallback(EmberNodeId emberNodeId, EmberApsFrame * apsFrame, uint8_t * message, uint16_t length)
 {
-  return false;
+    return false;
 }
 
 /** @brief Read Reporting Configuration Command
@@ -2070,9 +1939,9 @@ bool emberAfPreZDOMessageReceivedCallback(EmberNodeId emberNodeId,
  *
  * @param cmd   Ver.: always
  */
-bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterCommand *cmd)
+bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterCommand * cmd)
 {
-  return false;
+    return false;
 }
 
 /** @brief Scenes Cluster Recall Saved Scene
@@ -2084,11 +1953,9 @@ bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterComman
  * @param groupId The group identifier.  Ver.: always
  * @param sceneId The scene identifier.  Ver.: always
  */
-EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(uint8_t endpoint,
-                                                           uint16_t groupId,
-                                                           uint8_t sceneId)
+EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(uint8_t endpoint, uint16_t groupId, uint8_t sceneId)
 {
-  return EMBER_ZCL_STATUS_FAILURE;
+    return EMBER_ZCL_STATUS_FAILURE;
 }
 
 /** @brief Registration Abort
@@ -2097,9 +1964,7 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(uint8_t endpoint,
  * process.
  *
  */
-void emberAfRegistrationAbortCallback(void)
-{
-}
+void emberAfRegistrationAbortCallback(void) {}
 
 /** @brief Registration
  *
@@ -2110,9 +1975,7 @@ void emberAfRegistrationAbortCallback(void)
  *
  * @param success true if registration succeeded, false otherwise.  Ver.: always
  */
-void emberAfRegistrationCallback(bool success)
-{
-}
+void emberAfRegistrationCallback(bool success) {}
 
 /** @brief Registration Start
  *
@@ -2125,7 +1988,7 @@ void emberAfRegistrationCallback(bool success)
  */
 EmberStatus emberAfRegistrationStartCallback(void)
 {
-  return EMBER_LIBRARY_NOT_PRESENT;
+    return EMBER_LIBRARY_NOT_PRESENT;
 }
 
 /** @brief Remote Delete Binding Permission
@@ -2138,7 +2001,7 @@ EmberStatus emberAfRegistrationStartCallback(void)
  */
 EmberStatus emberAfRemoteDeleteBindingPermissionCallback(uint8_t index)
 {
-  return EMBER_SUCCESS; // default
+    return EMBER_SUCCESS; // default
 }
 
 /** @brief Remote Set Binding Permission
@@ -2149,9 +2012,9 @@ EmberStatus emberAfRemoteDeleteBindingPermissionCallback(uint8_t index)
  *
  * @param entry Ember Binding Tablet Entry  Ver.: always
  */
-EmberStatus emberAfRemoteSetBindingPermissionCallback(const EmberBindingTableEntry *entry)
+EmberStatus emberAfRemoteSetBindingPermissionCallback(const EmberBindingTableEntry * entry)
 {
-  return EMBER_SUCCESS; // default
+    return EMBER_SUCCESS; // default
 }
 
 /** @brief Remove From Current App Tasks
@@ -2166,9 +2029,7 @@ EmberStatus emberAfRemoteSetBindingPermissionCallback(const EmberBindingTableEnt
  *
  * @param tasks   Ver.: always
  */
-void emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks)
-{
-}
+void emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
 
 /** @brief Scenes Cluster Remove Scenes In Group
  *
@@ -2177,10 +2038,7 @@ void emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks)
  * @param endpoint Endpoint  Ver.: always
  * @param groupId Group ID  Ver.: always
  */
-void emberAfScenesClusterRemoveScenesInGroupCallback(uint8_t endpoint,
-                                                     uint16_t groupId)
-{
-}
+void emberAfScenesClusterRemoveScenesInGroupCallback(uint8_t endpoint, uint16_t groupId) {}
 
 /** @brief Reporting Attribute Change
  *
@@ -2197,15 +2055,9 @@ void emberAfScenesClusterRemoveScenesInGroupCallback(uint8_t endpoint,
  * @param type   Ver.: always
  * @param data   Ver.: always
  */
-void emberAfReportingAttributeChangeCallback(uint8_t endpoint,
-                                             EmberAfClusterId clusterId,
-                                             EmberAfAttributeId attributeId,
-                                             uint8_t mask,
-                                             uint16_t manufacturerCode,
-                                             EmberAfAttributeType type,
-                                             uint8_t *data)
-{
-}
+void emberAfReportingAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
+                                             uint8_t mask, uint16_t manufacturerCode, EmberAfAttributeType type, uint8_t * data)
+{}
 
 /** @brief Security Init
  *
@@ -2219,11 +2071,7 @@ void emberAfReportingAttributeChangeCallback(uint8_t endpoint,
  * @param extended   Ver.: always
  * @param trustCenter   Ver.: always
  */
-void emberAfSecurityInitCallback(EmberInitialSecurityState *state,
-                                 EmberExtendedSecurityBitmask *extended,
-                                 bool trustCenter)
-{
-}
+void emberAfSecurityInitCallback(EmberInitialSecurityState * state, EmberExtendedSecurityBitmask * extended, bool trustCenter) {}
 
 /** @brief Key Establishment Cluster Server Command Received
  *
@@ -2235,9 +2083,9 @@ void emberAfSecurityInitCallback(EmberInitialSecurityState *state,
  *
  * @param cmd   Ver.: always
  */
-bool emberAfKeyEstablishmentClusterServerCommandReceivedCallback(EmberAfClusterCommand *cmd)
+bool emberAfKeyEstablishmentClusterServerCommandReceivedCallback(EmberAfClusterCommand * cmd)
 {
-  return false;
+    return false;
 }
 
 /** @brief Set Default Poll Control
@@ -2247,9 +2095,7 @@ bool emberAfKeyEstablishmentClusterServerCommandReceivedCallback(EmberAfClusterC
  *
  * @param control   Ver.: always
  */
-void emberAfSetDefaultPollControlCallback(EmberAfEventPollControl control)
-{
-}
+void emberAfSetDefaultPollControlCallback(EmberAfEventPollControl control) {}
 
 /** @brief Set Default Sleep Control
  *
@@ -2259,9 +2105,7 @@ void emberAfSetDefaultPollControlCallback(EmberAfEventPollControl control)
  *
  * @param control   Ver.: always
  */
-void emberAfSetDefaultSleepControlCallback(EmberAfEventSleepControl control)
-{
-}
+void emberAfSetDefaultSleepControlCallback(EmberAfEventSleepControl control) {}
 
 /** @brief Set Long Poll Interval Ms
  *
@@ -2272,9 +2116,7 @@ void emberAfSetDefaultSleepControlCallback(EmberAfEventSleepControl control)
  *
  * @param longPollIntervalMs   Ver.: always
  */
-void emberAfSetLongPollIntervalMsCallback(uint32_t longPollIntervalMs)
-{
-}
+void emberAfSetLongPollIntervalMsCallback(uint32_t longPollIntervalMs) {}
 
 /** @brief Set Long Poll Interval Qs
  *
@@ -2285,9 +2127,7 @@ void emberAfSetLongPollIntervalMsCallback(uint32_t longPollIntervalMs)
  *
  * @param longPollIntervalQs   Ver.: always
  */
-void emberAfSetLongPollIntervalQsCallback(uint32_t longPollIntervalQs)
-{
-}
+void emberAfSetLongPollIntervalQsCallback(uint32_t longPollIntervalQs) {}
 
 /** @brief Set Short Poll Interval Ms
  *
@@ -2298,9 +2138,7 @@ void emberAfSetLongPollIntervalQsCallback(uint32_t longPollIntervalQs)
  *
  * @param shortPollIntervalMs   Ver.: always
  */
-void emberAfSetShortPollIntervalMsCallback(uint16_t shortPollIntervalMs)
-{
-}
+void emberAfSetShortPollIntervalMsCallback(uint16_t shortPollIntervalMs) {}
 
 /** @brief Set Short Poll Interval Qs
  *
@@ -2311,9 +2149,7 @@ void emberAfSetShortPollIntervalMsCallback(uint16_t shortPollIntervalMs)
  *
  * @param shortPollIntervalQs   Ver.: always
  */
-void emberAfSetShortPollIntervalQsCallback(uint16_t shortPollIntervalQs)
-{
-}
+void emberAfSetShortPollIntervalQsCallback(uint16_t shortPollIntervalQs) {}
 
 /** @brief Set Time
  *
@@ -2326,9 +2162,7 @@ void emberAfSetShortPollIntervalQsCallback(uint16_t shortPollIntervalQs)
  *
  * @param utcTime   Ver.: always
  */
-void emberAfSetTimeCallback(uint32_t utcTime)
-{
-}
+void emberAfSetTimeCallback(uint32_t utcTime) {}
 
 /** @brief On/off Cluster Set Value
  *
@@ -2339,11 +2173,9 @@ void emberAfSetTimeCallback(uint32_t utcTime)
  * @param command   Ver.: always
  * @param initiatedByLevelChange   Ver.: always
  */
-EmberAfStatus emberAfOnOffClusterSetValueCallback(uint8_t endpoint,
-                                                  uint8_t command,
-                                                  bool initiatedByLevelChange)
+EmberAfStatus emberAfOnOffClusterSetValueCallback(uint8_t endpoint, uint8_t command, bool initiatedByLevelChange)
 {
-  return EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND;
+    return EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND;
 }
 
 /** @brief Set Wake Timeout Bitmask
@@ -2355,9 +2187,7 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(uint8_t endpoint,
  *
  * @param tasks   Ver.: always
  */
-void emberAfSetWakeTimeoutBitmaskCallback(EmberAfApplicationTask tasks)
-{
-}
+void emberAfSetWakeTimeoutBitmaskCallback(EmberAfApplicationTask tasks) {}
 
 /** @brief Set Wake Timeout Ms
  *
@@ -2368,9 +2198,7 @@ void emberAfSetWakeTimeoutBitmaskCallback(EmberAfApplicationTask tasks)
  *
  * @param wakeTimeoutMs   Ver.: always
  */
-void emberAfSetWakeTimeoutMsCallback(uint16_t wakeTimeoutMs)
-{
-}
+void emberAfSetWakeTimeoutMsCallback(uint16_t wakeTimeoutMs) {}
 
 /** @brief Set Wake Timeout Qs
  *
@@ -2381,9 +2209,7 @@ void emberAfSetWakeTimeoutMsCallback(uint16_t wakeTimeoutMs)
  *
  * @param wakeTimeoutQs   Ver.: always
  */
-void emberAfSetWakeTimeoutQsCallback(uint16_t wakeTimeoutQs)
-{
-}
+void emberAfSetWakeTimeoutQsCallback(uint16_t wakeTimeoutQs) {}
 
 /** @brief Stack Status
  *
@@ -2397,7 +2223,7 @@ void emberAfSetWakeTimeoutQsCallback(uint16_t wakeTimeoutQs)
  */
 bool emberAfStackStatusCallback(EmberStatus status)
 {
-  return false;
+    return false;
 }
 
 /** @brief Start Move
@@ -2408,7 +2234,7 @@ bool emberAfStackStatusCallback(EmberStatus status)
  */
 bool emberAfStartMoveCallback(void)
 {
-  return false;
+    return false;
 }
 
 /** @brief Stop Move
@@ -2417,9 +2243,7 @@ bool emberAfStartMoveCallback(void)
  * new parent.
  *
  */
-void emberAfStopMoveCallback(void)
-{
-}
+void emberAfStopMoveCallback(void) {}
 
 /** @brief Scenes Cluster Store Current Scene
  *
@@ -2433,11 +2257,9 @@ void emberAfStopMoveCallback(void)
  * @param groupId The group identifier.  Ver.: always
  * @param sceneId The scene identifier.  Ver.: always
  */
-EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(uint8_t endpoint,
-                                                            uint16_t groupId,
-                                                            uint8_t sceneId)
+EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(uint8_t endpoint, uint16_t groupId, uint8_t sceneId)
 {
-  return EMBER_ZCL_STATUS_FAILURE;
+    return EMBER_ZCL_STATUS_FAILURE;
 }
 
 /** @brief Trust Center Join
@@ -2454,13 +2276,9 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(uint8_t endpoint,
  * @param status   Ver.: always
  * @param decision   Ver.: always
  */
-void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId,
-                                    EmberEUI64 newNodeEui64,
-                                    EmberNodeId parentOfNewNode,
-                                    EmberDeviceUpdate status,
-                                    EmberJoinDecision decision)
-{
-}
+void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId, EmberEUI64 newNodeEui64, EmberNodeId parentOfNewNode,
+                                    EmberDeviceUpdate status, EmberJoinDecision decision)
+{}
 
 /** @brief Trust Center Keepalive Abort
  *
@@ -2468,9 +2286,7 @@ void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId,
  * keepalive process.
  *
  */
-void emberAfTrustCenterKeepaliveAbortCallback(void)
-{
-}
+void emberAfTrustCenterKeepaliveAbortCallback(void) {}
 
 /** @brief Trust Center Keepalive Update
  *
@@ -2482,9 +2298,7 @@ void emberAfTrustCenterKeepaliveAbortCallback(void)
  *
  * @param registrationComplete   Ver.: always
  */
-void emberAfTrustCenterKeepaliveUpdateCallback(bool registrationComplete)
-{
-}
+void emberAfTrustCenterKeepaliveUpdateCallback(bool registrationComplete) {}
 
 /** @brief Zigbee Key Establishment
  *
@@ -2495,7 +2309,4 @@ void emberAfTrustCenterKeepaliveUpdateCallback(bool registrationComplete)
  * if the Key establishment failed.  Ver.: always
  * @param status The status of the key establishment.  Ver.: always
  */
-void emberAfZigbeeKeyEstablishmentCallback(EmberEUI64 partner,
-                                           EmberKeyStatus status)
-{
-}
+void emberAfZigbeeKeyEstablishmentCallback(EmberEUI64 partner, EmberKeyStatus status) {}

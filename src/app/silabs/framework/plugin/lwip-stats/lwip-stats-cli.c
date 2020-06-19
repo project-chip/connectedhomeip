@@ -31,27 +31,27 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief This file provides CLI commands to manipulate the network interface.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief This file provides CLI commands to
+                                                                               *manipulate the network interface.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 #include PLATFORM_HEADER
 #include "app/framework/include/af.h"
-#include "rtos/rtos.h"
-#include "lwip/netif.h"
-#include "lwip/sockets.h"
-#include "lwip/tcpip.h"
-#include "lwip/err.h"
+#include "app/framework/plugin/lwip/lwip-plugin.h"
+#include "lwip/debug.h"
 #include "lwip/def.h"
-#include "lwip/sys.h"
+#include "lwip/err.h"
 #include "lwip/ip_addr.h"
 #include "lwip/netif.h"
+#include "lwip/sockets.h"
 #include "lwip/stats.h"
-#include "lwip/debug.h"
-#include "app/framework/plugin/lwip/lwip-plugin.h"
+#include "lwip/sys.h"
+#include "lwip/tcpip.h"
+#include "rtos/rtos.h"
 #include <stdio.h>
 //=============================================================================
 
@@ -61,12 +61,11 @@
 #define LWIP_STATS_MACRO_ARG1(X, Y) X(Y)
 #define LWIP_OPTION_ENABLED(X) emberAfCorePrintln("LWIP Option: %p (Enabled)", X)
 
-#define COMMAND_DISPLAY_LWIP_STATS_STUB(X) void emberAfPluginLwip##X##StatsCommand(void) { emberAfCorePrintln("Option not available."); }
+#define COMMAND_DISPLAY_LWIP_STATS_STUB(X)                                                                                         \
+    void emberAfPluginLwip##X##StatsCommand(void) { emberAfCorePrintln("Option not available."); }
 
-#define COMMAND_DISPLAY_LWIP_STATS(X) void emberAfPluginLwip##X##StatsCommand(void) \
-  {                                                                                 \
-    LWIP_STATS_MACRO(X##_STATS_DISPLAY);                                            \
-  }
+#define COMMAND_DISPLAY_LWIP_STATS(X)                                                                                              \
+    void emberAfPluginLwip##X##StatsCommand(void) { LWIP_STATS_MACRO(X##_STATS_DISPLAY); }
 
 #if defined(LWIP_STATS_DISPLAY) && defined(LWIP_STATS)
 #if LINK_STATS
@@ -128,17 +127,17 @@ COMMAND_DISPLAY_LWIP_STATS_STUB(MEM)
  */
 static void memp_display_stats(char * poolname)
 {
-  for (uint8_t i = 0; i < MEMP_MAX; i++) {
-    if (strcmp(lwip_stats.memp[i].name, poolname) == 0) {
-      LWIP_STATS_MACRO_ARG1(MEMP_STATS_DISPLAY, i);
-      break;
+    for (uint8_t i = 0; i < MEMP_MAX; i++)
+    {
+        if (strcmp(lwip_stats.memp[i].name, poolname) == 0)
+        {
+            LWIP_STATS_MACRO_ARG1(MEMP_STATS_DISPLAY, i);
+            break;
+        }
     }
-  }
 }
-#define COMMAND_DISPLAY_LWIP_STATS_MEMP(X, NAME) void emberAfPluginLwipMEMP##X##StatsCommand(void) \
-  {                                                                                                \
-    memp_display_stats(NAME);                                                                      \
-  }
+#define COMMAND_DISPLAY_LWIP_STATS_MEMP(X, NAME)                                                                                   \
+    void emberAfPluginLwipMEMP##X##StatsCommand(void) { memp_display_stats(NAME); }
 
 #if MEMP_STATS
 COMMAND_DISPLAY_LWIP_STATS_MEMP(1, "ARP_QUEUE");
@@ -166,4 +165,4 @@ COMMAND_DISPLAY_LWIP_STATS_STUB(SYS)
 COMMAND_DISPLAY_LWIP_STATS_STUB(LINK)
 #endif
 
-#endif //DOXYGEN_SHOULD_SKIP_THIS
+#endif // DOXYGEN_SHOULD_SKIP_THIS

@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // Copyright 2013 Silicon Laboratories, Inc.
 //
@@ -53,37 +53,37 @@
 static const uint8_t normalPriceLabel[] = "Normal Price";
 static const uint8_t salePriceLabel[]   = "SALE! Buy now to save!";
 
-static const uint32_t normalPrice = 40;  // $0.40
-static const uint32_t salePrice = 3;    // $0.13
+static const uint32_t normalPrice = 40; // $0.40
+static const uint32_t salePrice   = 3;  // $0.13
 
 static EmberAfScheduledPrice myPrice = {
-  "",         // price label (filled in later)
-  0xABCD,     // provider Id     (made-up)
-  0x1234,     // issuer event ID (made-up)
-  0,          // Start time (0 = now)
-  0,          // Price according to Current and trailing digit (set later)
-  0xFFFFFFFFU,// Generation price (all F's = unused)
-  0xFFFFFFFFU,// Alternate cost delivered (e.g. cost in CO2 emissions)
-              //   (all F's = unused)
-  840,        // Currency: US Dollar See ISO 4217: http://en.wikipedia.org/wiki/ISO_4217
-  0xFFFF,     // Duration (0xFFFF = until changed)
-  0x00,       // unit of measure (kwh in pure binary format, see Table D.22 in 07-5356-17
-  0x20,       // Price Trailing Digit and Price Tier:
-              //   High nibble = digits to the right of decimal point
-              //   Low nibble = Price Tier (0 = no tier)
-  0,          // Number of price tiers and tier
-              //   High nibble = maximum number of tiers (0 = no tiers)
-              //   Low nibble = Price Tier (0 = no tier)
-  0xFF,       // Price ratio to the "normal" price.  0xFF = unused
-  0xFF,       // Generation price ratio (0xFF = unused)
-  0xFF,       // Alternate cost unit
-  0xFF,       // Alternate cost trailing digit
-  0,          // Number of block threshholds
-  0,          // Price control (i.e. Price Ack or Repeating Block)
+    "",          // price label (filled in later)
+    0xABCD,      // provider Id     (made-up)
+    0x1234,      // issuer event ID (made-up)
+    0,           // Start time (0 = now)
+    0,           // Price according to Current and trailing digit (set later)
+    0xFFFFFFFFU, // Generation price (all F's = unused)
+    0xFFFFFFFFU, // Alternate cost delivered (e.g. cost in CO2 emissions)
+                 //   (all F's = unused)
+    840,         // Currency: US Dollar See ISO 4217: http://en.wikipedia.org/wiki/ISO_4217
+    0xFFFF,      // Duration (0xFFFF = until changed)
+    0x00,        // unit of measure (kwh in pure binary format, see Table D.22 in 07-5356-17
+    0x20,        // Price Trailing Digit and Price Tier:
+                 //   High nibble = digits to the right of decimal point
+                 //   Low nibble = Price Tier (0 = no tier)
+    0,           // Number of price tiers and tier
+                 //   High nibble = maximum number of tiers (0 = no tiers)
+                 //   Low nibble = Price Tier (0 = no tier)
+    0xFF,        // Price ratio to the "normal" price.  0xFF = unused
+    0xFF,        // Generation price ratio (0xFF = unused)
+    0xFF,        // Alternate cost unit
+    0xFF,        // Alternate cost trailing digit
+    0,           // Number of block threshholds
+    0,           // Price control (i.e. Price Ack or Repeating Block)
 };
 
 #define NORMAL_PRICE false
-#define SALE_PRICE   true
+#define SALE_PRICE true
 
 #define PRICE_CHANGE_DELAY_MINUTES 1
 
@@ -99,24 +99,24 @@ static void setupPrice(bool onSale);
 
 void priceEventChange(void)
 {
-  setupPrice(normalPrice == myPrice.price);
-  emberEventControlSetDelayMinutes(priceEvent, PRICE_CHANGE_DELAY_MINUTES);
+    setupPrice(normalPrice == myPrice.price);
+    emberEventControlSetDelayMinutes(priceEvent, PRICE_CHANGE_DELAY_MINUTES);
 }
 
 static void setupPrice(bool onSale)
 {
-  const uint8_t* label = (onSale ? salePriceLabel : normalPriceLabel);
-  uint8_t labelSize = (onSale ? sizeof(salePriceLabel) : sizeof(normalPriceLabel));
-  MEMSET(myPrice.rateLabel, 0, ZCL_PRICE_CLUSTER_MAXIMUM_RATE_LABEL_LENGTH + 1);
-  MEMMOVE(myPrice.rateLabel, label, labelSize);
-  myPrice.price = (onSale ? salePrice : normalPrice);
+    const uint8_t * label = (onSale ? salePriceLabel : normalPriceLabel);
+    uint8_t labelSize     = (onSale ? sizeof(salePriceLabel) : sizeof(normalPriceLabel));
+    MEMSET(myPrice.rateLabel, 0, ZCL_PRICE_CLUSTER_MAXIMUM_RATE_LABEL_LENGTH + 1);
+    MEMMOVE(myPrice.rateLabel, label, labelSize);
+    myPrice.price = (onSale ? salePrice : normalPrice);
 
-  // One of the few times '%s' is appropriate.  We are using a RAM string
-  // %p is used for all CONST strings (which is the norm)
-  emberAfCorePrintln("%s", myPrice.rateLabel);
+    // One of the few times '%s' is appropriate.  We are using a RAM string
+    // %p is used for all CONST strings (which is the norm)
+    emberAfCorePrintln("%s", myPrice.rateLabel);
 
-  // This print assumes 2 digit prices less than 1 dollar
-  emberAfCorePrintln("Price: $0.%d/kwh\n", myPrice.price);
+    // This print assumes 2 digit prices less than 1 dollar
+    emberAfCorePrintln("Price: $0.%d/kwh\n", myPrice.price);
 }
 
 /** @brief Stack Status
@@ -131,11 +131,12 @@ static void setupPrice(bool onSale)
  */
 bool emberAfStackStatusCallback(EmberStatus status)
 {
-  if (status == EMBER_NETWORK_UP) {
-    priceEventChange();
-  }
+    if (status == EMBER_NETWORK_UP)
+    {
+        priceEventChange();
+    }
 
-  return false;
+    return false;
 }
 
 /** @brief Broadcast Sent
@@ -144,9 +145,7 @@ bool emberAfStackStatusCallback(EmberStatus status)
  * sent by the concentrator plugin.
  *
  */
-void emberAfPluginConcentratorBroadcastSentCallback(void)
-{
-}
+void emberAfPluginConcentratorBroadcastSentCallback(void) {}
 
 /** @brief Finished
  *
@@ -156,9 +155,7 @@ void emberAfPluginConcentratorBroadcastSentCallback(void)
  *
  * @param status   Ver.: always
  */
-void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
-{
-}
+void emberAfPluginNetworkFindFinishedCallback(EmberStatus status) {}
 
 /** @brief Get Radio Power For Channel
  *
@@ -170,7 +167,7 @@ void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
  */
 int8_t emberAfPluginNetworkFindGetRadioPowerForChannelCallback(uint8_t channel)
 {
-  return EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_POWER;
+    return EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_POWER;
 }
 
 /** @brief Join
@@ -185,11 +182,9 @@ int8_t emberAfPluginNetworkFindGetRadioPowerForChannelCallback(uint8_t channel)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound,
-                                          uint8_t lqi,
-                                          int8_t rssi)
+bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }
 
 /** @brief Button Event
@@ -202,12 +197,12 @@ bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound,
  *
  * @param buttonNumber The button number that was pressed.  Ver.: always
  */
-void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
-                                                   uint32_t buttonPressDurationMs)
+void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber, uint32_t buttonPressDurationMs)
 {
-  if (buttonNumber == 1) {
-    priceEventChange();
-  }
+    if (buttonNumber == 1)
+    {
+        priceEventChange();
+    }
 }
 
 /** @brief Main Tick
@@ -218,24 +213,25 @@ void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
  */
 void emberAfMainTickCallback(void)
 {
-  static bool executedAlready = false;
-  EmberNodeType nodeType;
-  EmberNetworkParameters parameters;
+    static bool executedAlready = false;
+    EmberNodeType nodeType;
+    EmberNetworkParameters parameters;
 
-  if (executedAlready) {
-    return;
-  }
+    if (executedAlready)
+    {
+        return;
+    }
 
-  if (EMBER_SUCCESS != emberAfGetNetworkParameters(&nodeType,
-                                                   &parameters)) {
-    // Form a network for the first time on one of the preferred
-    // Smart Energy Channels.  Scan for an unused short pan ID.
-    // Long PAN ID is randomly generated.
-    emberAfFindUnusedPanIdAndFormCallback();
+    if (EMBER_SUCCESS != emberAfGetNetworkParameters(&nodeType, &parameters))
+    {
+        // Form a network for the first time on one of the preferred
+        // Smart Energy Channels.  Scan for an unused short pan ID.
+        // Long PAN ID is randomly generated.
+        emberAfFindUnusedPanIdAndFormCallback();
 
-    // Subsequent reboots will cause the device to re-initalize
-    // the previous network parameters and start running again.
-  }
+        // Subsequent reboots will cause the device to re-initalize
+        // the previous network parameters and start running again.
+    }
 
-  executedAlready = true;
+    executedAlready = true;
 }

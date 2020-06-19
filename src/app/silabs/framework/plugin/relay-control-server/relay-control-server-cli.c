@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief CLI for the Relay Control Server plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief CLI for the Relay Control Server plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
 #include "app/util/serial/command-interpreter2.h"
@@ -45,36 +45,33 @@ static void set(void);
 
 #ifndef EMBER_AF_GENERATE_CLI
 EmberCommandEntry emberAfPluginRelayControlServerCommands[] = {
-  emberCommandEntryAction("get", get, "vuu", "Get the relay state"),
-  emberCommandEntryAction("set", set, "vuuu", "Set the relay state"),
-  emberCommandEntryTerminator(),
+    emberCommandEntryAction("get", get, "vuu", "Get the relay state"),
+    emberCommandEntryAction("set", set, "vuuu", "Set the relay state"),
+    emberCommandEntryTerminator(),
 };
 #endif // EMBER_AF_GENERATE_CLI
 
 // plugin relay-control-server get <nodeId:2> <srcEndpoint:1> <dstEndpoint:1>
 static void get(void)
 {
-  EmberNodeId nodeId = (EmberNodeId)emberUnsignedCommandArgument(0);
-  uint8_t srcEndpoint = (uint8_t)emberUnsignedCommandArgument(1);
-  uint8_t dstEndpoint = (uint8_t)emberUnsignedCommandArgument(2);
+    EmberNodeId nodeId  = (EmberNodeId) emberUnsignedCommandArgument(0);
+    uint8_t srcEndpoint = (uint8_t) emberUnsignedCommandArgument(1);
+    uint8_t dstEndpoint = (uint8_t) emberUnsignedCommandArgument(2);
 
-  emberAfFillCommandRelayControlClusterGetRelayState();
-  emberAfSetCommandEndpoints(srcEndpoint,
-                             dstEndpoint);
-  emberAfSendCommandUnicast(EMBER_OUTGOING_DIRECT, nodeId);
+    emberAfFillCommandRelayControlClusterGetRelayState();
+    emberAfSetCommandEndpoints(srcEndpoint, dstEndpoint);
+    emberAfSendCommandUnicast(EMBER_OUTGOING_DIRECT, nodeId);
 }
 
 // plugin relay-control-server set <nodeId:2> <srcEndpoint:1> <dstEndpoint:1> <isEnabled:1>
 static void set(void)
 {
-  EmberNodeId nodeId = (EmberNodeId)emberUnsignedCommandArgument(0);
-  uint8_t srcEndpoint = (uint8_t)emberUnsignedCommandArgument(1);
-  uint8_t dstEndpoint = (uint8_t)emberUnsignedCommandArgument(2);
-  bool isEnabled = (bool)emberUnsignedCommandArgument(3);
+    EmberNodeId nodeId  = (EmberNodeId) emberUnsignedCommandArgument(0);
+    uint8_t srcEndpoint = (uint8_t) emberUnsignedCommandArgument(1);
+    uint8_t dstEndpoint = (uint8_t) emberUnsignedCommandArgument(2);
+    bool isEnabled      = (bool) emberUnsignedCommandArgument(3);
 
-  emberAfFillCommandRelayControlClusterSetRelayState(isEnabled,
-                                                     EMBER_AF_PLUGIN_RELAY_CONTROL_SERVER_MAGIC_NUMBER);
-  emberAfSetCommandEndpoints(srcEndpoint,
-                             dstEndpoint);
-  emberAfSendCommandUnicast(EMBER_OUTGOING_DIRECT, nodeId);
+    emberAfFillCommandRelayControlClusterSetRelayState(isEnabled, EMBER_AF_PLUGIN_RELAY_CONTROL_SERVER_MAGIC_NUMBER);
+    emberAfSetCommandEndpoints(srcEndpoint, dstEndpoint);
+    emberAfSendCommandUnicast(EMBER_OUTGOING_DIRECT, nodeId);
 }

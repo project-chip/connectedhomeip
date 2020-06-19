@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the Price Common plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the Price Common
+                                                                               *plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_PRICE_COMMON_H
 #define SILABS_PRICE_COMMON_H
@@ -43,37 +44,38 @@
 #include "price-common-time.h"
 
 #ifndef EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT
-  #define EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_PRICE_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #endif
 
-#define EVENT_ID_UNSPECIFIED                          (0xFFFFFFFFUL)
-#define TARIFF_TYPE_UNSPECIFIED                       (0xFF)
-#define ZCL_PRICE_CLUSTER_DURATION16_UNTIL_CHANGED    (0xFFFF)
-#define ZCL_PRICE_CLUSTER_DURATION_SEC_UNTIL_CHANGED  (0xFFFFFFFFUL)
-#define ZCL_PRICE_CLUSTER_END_TIME_NEVER              (0xFFFFFFFFUL)
-#define ZCL_PRICE_CLUSTER_NUMBER_OF_EVENTS_ALL        (0x00)
-#define ZCL_PRICE_CLUSTER_START_TIME_NOW              (0x00000000UL)
-#define ZCL_PRICE_CLUSTER_WILDCARD_ISSUER_ID          (0xFFFFFFFFUL)
-#define ZCL_PRICE_INVALID_ENDPOINT_INDEX              (0xFF)
-#define ZCL_PRICE_INVALID_INDEX                       (0xFF)
+#define EVENT_ID_UNSPECIFIED (0xFFFFFFFFUL)
+#define TARIFF_TYPE_UNSPECIFIED (0xFF)
+#define ZCL_PRICE_CLUSTER_DURATION16_UNTIL_CHANGED (0xFFFF)
+#define ZCL_PRICE_CLUSTER_DURATION_SEC_UNTIL_CHANGED (0xFFFFFFFFUL)
+#define ZCL_PRICE_CLUSTER_END_TIME_NEVER (0xFFFFFFFFUL)
+#define ZCL_PRICE_CLUSTER_NUMBER_OF_EVENTS_ALL (0x00)
+#define ZCL_PRICE_CLUSTER_START_TIME_NOW (0x00000000UL)
+#define ZCL_PRICE_CLUSTER_WILDCARD_ISSUER_ID (0xFFFFFFFFUL)
+#define ZCL_PRICE_INVALID_ENDPOINT_INDEX (0xFF)
+#define ZCL_PRICE_INVALID_INDEX (0xFF)
 
-typedef struct {
-  uint32_t startTime;
+typedef struct
+{
+    uint32_t startTime;
 
-  /* Using uint32_t since int24u doesn't exist.  MEASURED IN SECONDS.
-   * FOREVER or UNTIL_CHANGED should set this to ZCL_PRICE_CLUSTER_DURATION_SEC_UNTIL_CHANGED.
-   * Some commands might not use this field.
-   */
-  uint32_t durationSec;
+    /* Using uint32_t since int24u doesn't exist.  MEASURED IN SECONDS.
+     * FOREVER or UNTIL_CHANGED should set this to ZCL_PRICE_CLUSTER_DURATION_SEC_UNTIL_CHANGED.
+     * Some commands might not use this field.
+     */
+    uint32_t durationSec;
 
-  uint32_t issuerEventId;
-  bool valid;
+    uint32_t issuerEventId;
+    bool valid;
 
-  /* Flag showing if actions are required by the current entry, such
-   * as updating attributes and etc, are still pending. Usage of this flag is
-   * optional.
-   */
-  bool actionsPending;
+    /* Flag showing if actions are required by the current entry, such
+     * as updating attributes and etc, are still pending. Usage of this flag is
+     * optional.
+     */
+    bool actionsPending;
 } EmberAfPriceCommonInfo;
 
 /**
@@ -88,10 +90,8 @@ typedef struct {
  * @return The best index - either a matching index, if found, or an invalid or timed out index.
  *
  **/
-uint8_t emberAfPluginPriceCommonGetCommonMatchingOrUnusedIndex(EmberAfPriceCommonInfo *commonInfos,
-                                                               uint8_t  numberOfEntries,
-                                                               uint32_t newIssuerEventId,
-                                                               uint32_t newStartTime,
+uint8_t emberAfPluginPriceCommonGetCommonMatchingOrUnusedIndex(EmberAfPriceCommonInfo * commonInfos, uint8_t numberOfEntries,
+                                                               uint32_t newIssuerEventId, uint32_t newStartTime,
                                                                bool expireTimedOut);
 
 /**
@@ -106,9 +106,7 @@ uint8_t emberAfPluginPriceCommonGetCommonMatchingOrUnusedIndex(EmberAfPriceCommo
  * @param dataArraySize The source endpoint used in the transmission.
  *
  **/
-void emberAfPluginPriceCommonSort(EmberAfPriceCommonInfo * commonInfos,
-                                  uint8_t * dataArray,
-                                  uint16_t dataArrayBlockSizeInByte,
+void emberAfPluginPriceCommonSort(EmberAfPriceCommonInfo * commonInfos, uint8_t * dataArray, uint16_t dataArrayBlockSizeInByte,
                                   uint16_t dataArraySize);
 
 /**
@@ -118,8 +116,7 @@ void emberAfPluginPriceCommonSort(EmberAfPriceCommonInfo * commonInfos,
  * @param numberOfEntries The number of entries in the EmberAfPriceCommonInfo array.
  *
  **/
-void emberAfPluginPriceCommonUpdateDurationForOverlappingEvents(EmberAfPriceCommonInfo *commonInfos,
-                                                                uint8_t numberOfEntries);
+void emberAfPluginPriceCommonUpdateDurationForOverlappingEvents(EmberAfPriceCommonInfo * commonInfos, uint8_t numberOfEntries);
 
 /**
  * @brief Determines the time until the next index becomes active.
@@ -130,8 +127,7 @@ void emberAfPluginPriceCommonUpdateDurationForOverlappingEvents(EmberAfPriceComm
  * @param numberOfEntries The number of entries in the EmberAfPriceCommonInfo array.
  *
  **/
-uint32_t emberAfPluginPriceCommonSecondsUntilSecondIndexActive(EmberAfPriceCommonInfo *commonInfos,
-                                                               uint8_t numberOfEntries);
+uint32_t emberAfPluginPriceCommonSecondsUntilSecondIndexActive(EmberAfPriceCommonInfo * commonInfos, uint8_t numberOfEntries);
 
 /**
  * @brief Find valid entries in the EmberAfPriceCommonInfo structure array.
@@ -148,12 +144,9 @@ uint32_t emberAfPluginPriceCommonSecondsUntilSecondIndexActive(EmberAfPriceCommo
  * @return The number of valid commands found in the commonInfos array.
  *
  **/
-uint8_t emberAfPluginPriceCommonFindValidEntries(uint8_t* validEntries,
-                                                 uint8_t numberOfEntries,
-                                                 EmberAfPriceCommonInfo* commonInfos,
-                                                 uint32_t earliestStartTime,
-                                                 uint32_t minIssuerEventId,
-                                                 uint8_t numberOfCommands);
+uint8_t emberAfPluginPriceCommonFindValidEntries(uint8_t * validEntries, uint8_t numberOfEntries,
+                                                 EmberAfPriceCommonInfo * commonInfos, uint32_t earliestStartTime,
+                                                 uint32_t minIssuerEventId, uint8_t numberOfCommands);
 
 /**
  * @brief Returns the index of the active entry in the EmberAfPriceCommonInfo array.
@@ -166,8 +159,7 @@ uint8_t emberAfPluginPriceCommonFindValidEntries(uint8_t* validEntries,
  * @return The index of the active entry, or 0xFF if an active entry is not found.
  *
  **/
-uint8_t emberAfPluginPriceCommonServerGetActiveIndex(EmberAfPriceCommonInfo *commonInfos,
-                                                     uint8_t numberOfEntries);
+uint8_t emberAfPluginPriceCommonServerGetActiveIndex(EmberAfPriceCommonInfo * commonInfos, uint8_t numberOfEntries);
 
 /**
  * @brief Returns the index to the most recent entry that will become active in the future.
@@ -180,7 +172,6 @@ uint8_t emberAfPluginPriceCommonServerGetActiveIndex(EmberAfPriceCommonInfo *com
  * @return The index of the next-active entry, or 0xFF if an active entry is not found.
  *
  **/
-uint8_t emberAfPluginPriceCommonServerGetFutureIndex(EmberAfPriceCommonInfo *commonInfos,
-                                                     uint8_t numberOfEntries,
+uint8_t emberAfPluginPriceCommonServerGetFutureIndex(EmberAfPriceCommonInfo * commonInfos, uint8_t numberOfEntries,
                                                      uint32_t * secUntilFutureEvent);
-#endif  // #ifndef _PRICE_COMMON_H_
+#endif // #ifndef _PRICE_COMMON_H_

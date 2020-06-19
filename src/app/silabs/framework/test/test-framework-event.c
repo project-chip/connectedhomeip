@@ -31,21 +31,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Event stubs for AFV2 tests.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Event stubs for AFV2 tests.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
 
-void emEventControlSetDelayMS(EmberEventControl *event, uint32_t delay)
+void emEventControlSetDelayMS(EmberEventControl * event, uint32_t delay)
 {
-  event->status = EMBER_EVENT_MS_TIME;
-  event->timeToExecute = delay;
+    event->status        = EMBER_EVENT_MS_TIME;
+    event->timeToExecute = delay;
 }
 
-void emEventControlSetActive(EmberEventControl *event)
+void emEventControlSetActive(EmberEventControl * event)
 {
-  event->status = EMBER_EVENT_ZERO_DELAY;
+    event->status = EMBER_EVENT_ZERO_DELAY;
 }

@@ -31,18 +31,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the DIDO plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the DIDO plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef _DIDO_H_
 #define _DIDO_H_
 
 // Used to send a debug report to the specified nodeId.
-EmberStatus emberAfDidoClusterSendDebugReport(uint8_t debugReportId,
-                                              EmberNodeId nodeId,
-                                              uint8_t endpoint);
+EmberStatus emberAfDidoClusterSendDebugReport(uint8_t debugReportId, EmberNodeId nodeId, uint8_t endpoint);
 
-#endif  // #ifndef _DIDO_H_
+#endif // #ifndef _DIDO_H_

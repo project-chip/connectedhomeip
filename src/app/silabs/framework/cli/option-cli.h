@@ -31,17 +31,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief CLI commands various options.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief CLI commands various options.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #if !defined(OPTION_CLI_H)
 #define OPTION_CLI_H
 
 extern EmberCommandEntry emAfOptionCommands[];
 
-void emAfCliServiceDiscoveryCallback(const EmberAfServiceDiscoveryResult* result);
+void emAfCliServiceDiscoveryCallback(const EmberAfServiceDiscoveryResult * result);
 
 #endif

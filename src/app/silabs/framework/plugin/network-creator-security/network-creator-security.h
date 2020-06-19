@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the Network Creator Security plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the Network Creator
+                                                                               *Security plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -104,8 +105,7 @@ EmberStatus emberAfPluginNetworkCreatorSecurityCloseNetwork(void);
  * network opening procedure. If this node is not currently on a network,
  * this will return ::EMBER_ERR_FATAL.
  */
-EmberStatus emberAfPluginNetworkCreatorSecurityOpenNetworkWithKeyPair(EmberEUI64 eui64,
-                                                                      EmberKeyData keyData);
+EmberStatus emberAfPluginNetworkCreatorSecurityOpenNetworkWithKeyPair(EmberEUI64 eui64, EmberKeyData keyData);
 
 /** @brief Sets the insecure rejoin policy for devices using the well-known key.
  *

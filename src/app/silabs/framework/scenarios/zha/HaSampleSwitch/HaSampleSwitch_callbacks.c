@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
 #include "app/framework/plugin/ezmode-commissioning/ez-mode.h"
@@ -43,22 +43,9 @@
 // Event control struct declarations
 EmberEventControl buttonEventControl;
 
-static uint8_t const happyTune[] = {
-  NOTE_B4, 1,
-  0, 1,
-  NOTE_B5, 1,
-  0, 0
-};
-static uint8_t const sadTune[] = {
-  NOTE_B5, 1,
-  0, 1,
-  NOTE_B4, 5,
-  0, 0
-};
-static uint8_t const waitTune[] = {
-  NOTE_B4, 1,
-  0, 0
-};
+static uint8_t const happyTune[] = { NOTE_B4, 1, 0, 1, NOTE_B5, 1, 0, 0 };
+static uint8_t const sadTune[]   = { NOTE_B5, 1, 0, 1, NOTE_B4, 5, 0, 0 };
+static uint8_t const waitTune[]  = { NOTE_B4, 1, 0, 0 };
 
 #define REPAIR_DELAY_MS 10
 #define REPAIR_LIMIT_MS (MILLISECOND_TICKS_PER_SECOND << 1)
@@ -71,50 +58,51 @@ extern bool tuneDone;
 
 void buttonEventHandler(void)
 {
-  emberEventControlSetInactive(buttonEventControl);
-  if (halButtonState(BUTTON0) == BUTTON_PRESSED) {
-    EmberNetworkStatus state = emberAfNetworkState();
-    if (state == EMBER_JOINED_NETWORK) {
-      emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND
-                                 | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER),
-                                ZCL_ON_OFF_CLUSTER_ID,
-                                (on ? ZCL_OFF_COMMAND_ID : ZCL_ON_COMMAND_ID),
-                                "");
-      emberAfGetCommandApsFrame()->profileId           = emberAfPrimaryProfileId();
-      emberAfGetCommandApsFrame()->sourceEndpoint      = emberAfPrimaryEndpoint();
-      emberAfGetCommandApsFrame()->destinationEndpoint = EMBER_BROADCAST_ENDPOINT;
-      if (emberAfSendCommandUnicastToBindings() == EMBER_SUCCESS) {
-        on = !on;
-      } else {
-        halPlayTune_P(sadTune, true);
-      }
-    } else if (state == EMBER_NO_NETWORK) {
-      halPlayTune_P((emberAfStartSearchForJoinableNetwork() == EMBER_SUCCESS
-                     ? waitTune
-                     : sadTune),
-                    true);
-    } else {
-      if (REPAIR_LIMIT_MS
-          < elapsedTimeInt16u(buttonPressTime,
-                              halCommonGetInt16uMillisecondTick())) {
-        halPlayTune_P(sadTune, true);
-      } else {
-        if (state == EMBER_JOINED_NETWORK_NO_PARENT
-            && !emberStackIsPerformingRejoin()) {
-          halPlayTune_P((emberFindAndRejoinNetwork(true, 0) == EMBER_SUCCESS
-                         ? waitTune
-                         : sadTune),
-                        true);
+    emberEventControlSetInactive(buttonEventControl);
+    if (halButtonState(BUTTON0) == BUTTON_PRESSED)
+    {
+        EmberNetworkStatus state = emberAfNetworkState();
+        if (state == EMBER_JOINED_NETWORK)
+        {
+            emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), ZCL_ON_OFF_CLUSTER_ID,
+                                      (on ? ZCL_OFF_COMMAND_ID : ZCL_ON_COMMAND_ID), "");
+            emberAfGetCommandApsFrame()->profileId           = emberAfPrimaryProfileId();
+            emberAfGetCommandApsFrame()->sourceEndpoint      = emberAfPrimaryEndpoint();
+            emberAfGetCommandApsFrame()->destinationEndpoint = EMBER_BROADCAST_ENDPOINT;
+            if (emberAfSendCommandUnicastToBindings() == EMBER_SUCCESS)
+            {
+                on = !on;
+            }
+            else
+            {
+                halPlayTune_P(sadTune, true);
+            }
         }
-        emberEventControlSetDelayMS(buttonEventControl, REPAIR_DELAY_MS);
-      }
+        else if (state == EMBER_NO_NETWORK)
+        {
+            halPlayTune_P((emberAfStartSearchForJoinableNetwork() == EMBER_SUCCESS ? waitTune : sadTune), true);
+        }
+        else
+        {
+            if (REPAIR_LIMIT_MS < elapsedTimeInt16u(buttonPressTime, halCommonGetInt16uMillisecondTick()))
+            {
+                halPlayTune_P(sadTune, true);
+            }
+            else
+            {
+                if (state == EMBER_JOINED_NETWORK_NO_PARENT && !emberStackIsPerformingRejoin())
+                {
+                    halPlayTune_P((emberFindAndRejoinNetwork(true, 0) == EMBER_SUCCESS ? waitTune : sadTune), true);
+                }
+                emberEventControlSetDelayMS(buttonEventControl, REPAIR_DELAY_MS);
+            }
+        }
     }
-  } else if (halButtonState(BUTTON1) == BUTTON_PRESSED) {
-    emberAfEzmodeClientCommission(emberAfPrimaryEndpoint(),
-                                  EMBER_AF_EZMODE_COMMISSIONING_CLIENT_TO_SERVER,
-                                  clusterIds,
-                                  COUNTOF(clusterIds));
-  }
+    else if (halButtonState(BUTTON1) == BUTTON_PRESSED)
+    {
+        emberAfEzmodeClientCommission(emberAfPrimaryEndpoint(), EMBER_AF_EZMODE_COMMISSIONING_CLIENT_TO_SERVER, clusterIds,
+                                      COUNTOF(clusterIds));
+    }
 }
 
 /** @brief Stack Status
@@ -129,12 +117,15 @@ void buttonEventHandler(void)
  */
 bool emberAfStackStatusCallback(EmberStatus status)
 {
-  if (status == EMBER_NETWORK_UP) {
-    halPlayTune_P(happyTune, true);
-  } else if (status == EMBER_NETWORK_DOWN) {
-    halPlayTune_P(sadTune, true);
-  }
-  return false;
+    if (status == EMBER_NETWORK_UP)
+    {
+        halPlayTune_P(happyTune, true);
+    }
+    else if (status == EMBER_NETWORK_DOWN)
+    {
+        halPlayTune_P(sadTune, true);
+    }
+    return false;
 }
 
 /** @brief emberAfHalButtonIsrCallback
@@ -146,12 +137,11 @@ bool emberAfStackStatusCallback(EmberStatus status)
 // device. This callback is called within ISR context.
 void emberAfHalButtonIsrCallback(uint8_t button, uint8_t state)
 {
-  if ((button == BUTTON0 || button == BUTTON1)
-      && state == BUTTON_PRESSED
-      && !emberEventControlGetActive(buttonEventControl)) {
-    buttonPressTime = halCommonGetInt16uMillisecondTick();
-    emberEventControlSetActive(buttonEventControl);
-  }
+    if ((button == BUTTON0 || button == BUTTON1) && state == BUTTON_PRESSED && !emberEventControlGetActive(buttonEventControl))
+    {
+        buttonPressTime = halCommonGetInt16uMillisecondTick();
+        emberEventControlSetActive(buttonEventControl);
+    }
 }
 
 /** @brief Poll Completed
@@ -161,9 +151,7 @@ void emberAfHalButtonIsrCallback(uint8_t button, uint8_t state)
  *
  * @param status Return status of a completed poll operation  Ver.: always
  */
-void emberAfPluginEndDeviceSupportPollCompletedCallback(EmberStatus status)
-{
-}
+void emberAfPluginEndDeviceSupportPollCompletedCallback(EmberStatus status) {}
 
 /** @brief Client Complete
  *
@@ -173,9 +161,7 @@ void emberAfPluginEndDeviceSupportPollCompletedCallback(EmberStatus status)
  * @param bindingIndex The binding index that was created or
  * ::EMBER_NULL_BINDING if an error occurred.  Ver.: always
  */
-void emberAfPluginEzmodeCommissioningClientCompleteCallback(uint8_t bindingIndex)
-{
-}
+void emberAfPluginEzmodeCommissioningClientCompleteCallback(uint8_t bindingIndex) {}
 
 /** @brief Ok To Sleep
  *
@@ -187,7 +173,7 @@ void emberAfPluginEzmodeCommissioningClientCompleteCallback(uint8_t bindingIndex
  */
 bool emberAfPluginIdleSleepOkToSleepCallback(uint32_t durationMs)
 {
-  return tuneDone;
+    return tuneDone;
 }
 
 /** @brief Wake Up
@@ -197,9 +183,7 @@ bool emberAfPluginIdleSleepOkToSleepCallback(uint32_t durationMs)
  * @param durationMs The duration in milliseconds that the device slept.
  * Ver.: always
  */
-void emberAfPluginIdleSleepWakeUpCallback(uint32_t durationMs)
-{
-}
+void emberAfPluginIdleSleepWakeUpCallback(uint32_t durationMs) {}
 
 /** @brief Ok To Idle
  *
@@ -209,7 +193,7 @@ void emberAfPluginIdleSleepWakeUpCallback(uint32_t durationMs)
  */
 bool emberAfPluginIdleSleepOkToIdleCallback(void)
 {
-  return tuneDone;
+    return tuneDone;
 }
 
 /** @brief Active
@@ -217,9 +201,7 @@ bool emberAfPluginIdleSleepOkToIdleCallback(void)
  * This function is called by the Idle/Sleep plugin after idling.
  *
  */
-void emberAfPluginIdleSleepActiveCallback(void)
-{
-}
+void emberAfPluginIdleSleepActiveCallback(void) {}
 
 /** @brief Finished
  *
@@ -229,9 +211,7 @@ void emberAfPluginIdleSleepActiveCallback(void)
  *
  * @param status   Ver.: always
  */
-void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
-{
-}
+void emberAfPluginNetworkFindFinishedCallback(EmberStatus status) {}
 
 /** @brief Get Radio Power For Channel
  *
@@ -243,7 +223,7 @@ void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
  */
 int8_t emberAfPluginNetworkFindGetRadioPowerForChannelCallback(uint8_t channel)
 {
-  return EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_POWER;
+    return EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_POWER;
 }
 
 /** @brief Join
@@ -258,9 +238,7 @@ int8_t emberAfPluginNetworkFindGetRadioPowerForChannelCallback(uint8_t channel)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
-                                          uint8_t lqi,
-                                          int8_t rssi)
+bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }

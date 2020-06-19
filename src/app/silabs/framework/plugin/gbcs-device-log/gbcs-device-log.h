@@ -31,32 +31,35 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the GBCS Device Log plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the GBCS Device Log
+                                                                               *plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef GBCS_DEVICE_LOG_H_
 #define GBCS_DEVICE_LOG_H_
 
 // Printing macros for plugin: GBCS Device Log
-#define emberAfPluginGbcsDeviceLogPrint(...)    emberAfAppPrint(__VA_ARGS__)
-#define emberAfPluginGbcsDeviceLogPrintln(...)  emberAfAppPrintln(__VA_ARGS__)
-#define emberAfPluginGbcsDeviceLogDebugExec(x)  emberAfAppDebugExec(x)
+#define emberAfPluginGbcsDeviceLogPrint(...) emberAfAppPrint(__VA_ARGS__)
+#define emberAfPluginGbcsDeviceLogPrintln(...) emberAfAppPrintln(__VA_ARGS__)
+#define emberAfPluginGbcsDeviceLogDebugExec(x) emberAfAppDebugExec(x)
 
-typedef enum {
-  EMBER_AF_GBCS_GSME_DEVICE_TYPE   = 0x00,
-  EMBER_AF_GBCS_ESME_DEVICE_TYPE   = 0x01,
-  EMBER_AF_GBCS_CHF_DEVICE_TYPE    = 0x02,
-  EMBER_AF_GBCS_GPF_DEVICE_TYPE    = 0x03,
-  EMBER_AF_GBCS_HCALCS_DEVICE_TYPE = 0x04,
-  EMBER_AF_GBCS_PPMID_DEVICE_TYPE  = 0x05,
-  EMBER_AF_GBCS_TYPE2_DEVICE_TYPE  = 0x06,
+typedef enum
+{
+    EMBER_AF_GBCS_GSME_DEVICE_TYPE   = 0x00,
+    EMBER_AF_GBCS_ESME_DEVICE_TYPE   = 0x01,
+    EMBER_AF_GBCS_CHF_DEVICE_TYPE    = 0x02,
+    EMBER_AF_GBCS_GPF_DEVICE_TYPE    = 0x03,
+    EMBER_AF_GBCS_HCALCS_DEVICE_TYPE = 0x04,
+    EMBER_AF_GBCS_PPMID_DEVICE_TYPE  = 0x05,
+    EMBER_AF_GBCS_TYPE2_DEVICE_TYPE  = 0x06,
 } EmberAfGBCSDeviceType;
 
-typedef struct {
-  EmberAfGBCSDeviceType deviceType;
+typedef struct
+{
+    EmberAfGBCSDeviceType deviceType;
 } EmberAfGBCSDeviceLogInfo;
 
 /**
@@ -91,8 +94,7 @@ uint8_t emberAfPluginGbcsDeviceLogCount(void);
  * room in the device log to add the new entry. The size of the device log is
  * controlled by the "Device Log Size" plugin configuration parameter.
  */
-bool emberAfPluginGbcsDeviceLogStore(EmberEUI64 deviceId,
-                                     EmberAfGBCSDeviceLogInfo *deviceInfo);
+bool emberAfPluginGbcsDeviceLogStore(EmberEUI64 deviceId, EmberAfGBCSDeviceLogInfo * deviceInfo);
 
 /**
  * @brief Removes an entry from the GBCS Device Log.
@@ -117,8 +119,7 @@ bool emberAfPluginGbcsDeviceLogRemove(EmberEUI64 deviceId);
  * @return True if device is in the device log, false otherwise. The contents of
  * the deviceInfo structure will be populated when true is returned.
  */
-bool emberAfPluginGbcsDeviceLogGet(EmberEUI64 deviceId,
-                                   EmberAfGBCSDeviceLogInfo *deviceInfo);
+bool emberAfPluginGbcsDeviceLogGet(EmberEUI64 deviceId, EmberAfGBCSDeviceLogInfo * deviceInfo);
 
 /**
  * @brief Checks to see if the given device exists within the GBCS Device Log.
@@ -130,8 +131,7 @@ bool emberAfPluginGbcsDeviceLogGet(EmberEUI64 deviceId,
  * @param deviceType The device type of the device in question.
  * @return True if device is in the device log, false otherwise.
  */
-bool emberAfPluginGbcsDeviceLogExists(EmberEUI64 deviceId,
-                                      EmberAfGBCSDeviceType deviceType);
+bool emberAfPluginGbcsDeviceLogExists(EmberEUI64 deviceId, EmberAfGBCSDeviceType deviceType);
 
 /**
  * @brief Prints all entries in the GBCS Device Log.
@@ -155,9 +155,8 @@ void emberAfPluginGbcsDeviceLogPrintEntries(void);
  * @return True if the index has a valid entry.
  *   false otherwise.
  */
-bool emberAfPluginGbcsDeviceLogRetrieveByIndex(uint8_t index,
-                                               EmberEUI64 returnDeviceId,
-                                               EmberAfGBCSDeviceLogInfo* returnDeviceInfo);
+bool emberAfPluginGbcsDeviceLogRetrieveByIndex(uint8_t index, EmberEUI64 returnDeviceId,
+                                               EmberAfGBCSDeviceLogInfo * returnDeviceInfo);
 
 /**
  * @ brief Returns the maximum size of the device log, including currently empty entries.

@@ -41,7 +41,7 @@
 
 // Types for the tokens
 #ifdef DEFINETYPES
-typedef uint8_t  tokType_ias_cie_address[8];
+typedef uint8_t tokType_ias_cie_address[8];
 #endif // DEFINETYPES
 
 // Actual token definitions
@@ -49,9 +49,13 @@ typedef uint8_t  tokType_ias_cie_address[8];
 #endif // DEFINETOKENS
 
 // Macro snippet that loads all the attributes from tokens
-#define GENERATED_TOKEN_LOADER(endpoint) do { \
-} while (false)
+#define GENERATED_TOKEN_LOADER(endpoint)                                                                                           \
+    do                                                                                                                             \
+    {                                                                                                                              \
+    } while (false)
 
 // Macro snippet that saves the attribute to token
-#define GENERATED_TOKEN_SAVER do { \
-} while (false)
+#define GENERATED_TOKEN_SAVER                                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+    } while (false)

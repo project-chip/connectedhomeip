@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Attribute storage configuration for unit test
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Attribute storage configuration for unit
+                                                                               *test
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef __ATTRIBUTE_STORAGE_TEST__
 #define __ATTRIBUTE_STORAGE_TEST__
@@ -49,52 +50,65 @@
 #define FIXED_ENDPOINT_COUNT 10
 
 // This is defined if we have attributes of more than 2 bytes
-#define GENERATED_DEFAULTS {                       \
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 \
-}
+#define GENERATED_DEFAULTS                                                                                                         \
+    {                                                                                                                              \
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00                                                                             \
+    }
 
 // These are all the EmberAfAttributeMetadata objects that
 // this application supports on any cluster.
-#define GENERATED_ATTRIBUTES   {                             \
-    { 101, 1, 1, 0, { (uint8_t*)(generatedDefaults + 0) } }, \
-    { 102, 1, 2, 0, { (uint8_t*)1 } },                       \
-    { 103, 1, 3, 0, { (uint8_t*)1 } },                       \
-    { 104, 1, 4, 0, { (uint8_t*)1 } },                       \
-    { 105, 1, 5, 0, { (uint8_t*)1 } }                        \
-}
+#define GENERATED_ATTRIBUTES                                                                                                       \
+    {                                                                                                                              \
+        { 101, 1, 1, 0, { (uint8_t *) (generatedDefaults + 0) } }, { 102, 1, 2, 0, { (uint8_t *) 1 } },                            \
+            { 103, 1, 3, 0, { (uint8_t *) 1 } }, { 104, 1, 4, 0, { (uint8_t *) 1 } },                                              \
+        {                                                                                                                          \
+            105, 1, 5, 0, { (uint8_t *) 1 }                                                                                        \
+        }                                                                                                                          \
+    }
 
 // These are the EmberAfCluster structures that the application
 // supports. These clusters can be organized to any endpoints.
-#define GENERATED_CLUSTERS {                                                 \
-    { 1, (EmberAfAttributeMetadata*)generatedAttributes, 5, 5 * 5, 0, NULL } \
-}
+#define GENERATED_CLUSTERS                                                                                                         \
+    {                                                                                                                              \
+        {                                                                                                                          \
+            1, (EmberAfAttributeMetadata *) generatedAttributes, 5, 5 * 5, 0, NULL                                                 \
+        }                                                                                                                          \
+    }
 
 // These are the EmberAfEndpointType structs that the application supports.
 // Each endpoint can be one of these endpoint types.
-#define GENERATED_ENDPOINT_TYPES {                    \
-    { (EmberAfCluster*)&generatedClusters, 1, 5 * 5 } \
-}
+#define GENERATED_ENDPOINT_TYPES                                                                                                   \
+    {                                                                                                                              \
+        {                                                                                                                          \
+            (EmberAfCluster *) &generatedClusters, 1, 5 * 5                                                                        \
+        }                                                                                                                          \
+    }
 
 // These are the networks that the application supports.
-#define EM_AF_GENERATED_NETWORK_TYPES { \
-    EM_AF_NETWORK_TYPE_ZIGBEE_PRO,      \
-}
-#define EM_AF_GENERATED_ZIGBEE_PRO_NETWORKS { \
-    {                                         \
-      ZA_COORDINATOR,                         \
-      EMBER_AF_SECURITY_PROFILE_HA,           \
-    },                                        \
-}
+#define EM_AF_GENERATED_NETWORK_TYPES                                                                                              \
+    {                                                                                                                              \
+        EM_AF_NETWORK_TYPE_ZIGBEE_PRO,                                                                                             \
+    }
+#define EM_AF_GENERATED_ZIGBEE_PRO_NETWORKS                                                                                        \
+    {                                                                                                                              \
+        {                                                                                                                          \
+            ZA_COORDINATOR,                                                                                                        \
+            EMBER_AF_SECURITY_PROFILE_HA,                                                                                          \
+        },                                                                                                                         \
+    }
 
 // Manufacturer codes for mf specific attributes and clusters
-#define GENERATED_CLUSTER_MANUFACTURER_CODES { \
-    { 1, 0xbeef }                              \
-}
+#define GENERATED_CLUSTER_MANUFACTURER_CODES                                                                                       \
+    {                                                                                                                              \
+        {                                                                                                                          \
+            1, 0xbeef                                                                                                              \
+        }                                                                                                                          \
+    }
 #define GENERATED_CLUSTER_MANUFACTURER_CODE_COUNT 1
-#define GENERATED_ATTRIBUTE_MANUFACTURER_CODES { \
-    { 8, 0xabba },                               \
-    { 9, 0xfeed }                                \
-}
+#define GENERATED_ATTRIBUTE_MANUFACTURER_CODES                                                                                     \
+    {                                                                                                                              \
+        { 8, 0xabba }, { 9, 0xfeed }                                                                                               \
+    }
 #define GENERATED_ATTRIBUTE_MANUFACTURER_CODE_COUNT 2
 
 // There are 2 ways to configure endpoints
@@ -120,10 +134,10 @@
 // be more complex than these examples below. They may call an actual
 // C function that would look at registers and GPIO configuration.
 #define endpointNumber(index) (50 + index)
-#define endpointTypeMacro(index)   ((EmberAfEndpointType*)&(generatedEmberAfEndpointTypes[0]))
+#define endpointTypeMacro(index) ((EmberAfEndpointType *) &(generatedEmberAfEndpointTypes[0]))
 #define endpointNetworkIndex(index) (0)
 #define endpointProfileId(index) (0xABBA)
-#define endpointDeviceId(index)  (0xBEEF)
+#define endpointDeviceId(index) (0xBEEF)
 #define endpointDeviceVersion(index) (0xBA)
 
 // Just to get the defaults

@@ -31,21 +31,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the EZ-Mode plugin, which implements EZ-mode
- *        commissioning.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the EZ-Mode plugin,
+                                                                               *which implements EZ-mode commissioning.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
-typedef enum {
-  /* Allows the creation of bindings from
-   * an attribute server to an attribute client. */
-  EMBER_AF_EZMODE_COMMISSIONING_SERVER_TO_CLIENT = 0,
+typedef enum
+{
+    /* Allows the creation of bindings from
+     * an attribute server to an attribute client. */
+    EMBER_AF_EZMODE_COMMISSIONING_SERVER_TO_CLIENT = 0,
 
-  /* Allows the creation of bindings from
-   * an attribute client to an attribute server. */
-  EMBER_AF_EZMODE_COMMISSIONING_CLIENT_TO_SERVER = 1,
+    /* Allows the creation of bindings from
+     * an attribute client to an attribute server. */
+    EMBER_AF_EZMODE_COMMISSIONING_CLIENT_TO_SERVER = 1,
 } EmberAfEzModeCommissioningDirection;
 
 /**
@@ -64,10 +65,8 @@ typedef enum {
  *        EZ-Mode-commissioning calls.
  * @param clusterIdsLength The number of cluster IDs passed for the match.
  */
-EmberStatus emberAfEzmodeClientCommission(uint8_t endpoint,
-                                          EmberAfEzModeCommissioningDirection direction,
-                                          const uint16_t *clusterIds,
-                                          uint8_t clusterIdsLength);
+EmberStatus emberAfEzmodeClientCommission(uint8_t endpoint, EmberAfEzModeCommissioningDirection direction,
+                                          const uint16_t * clusterIds, uint8_t clusterIdsLength);
 
 /**
  * @brief Begins EZ-Mode server commissioning.
@@ -89,5 +88,4 @@ EmberStatus emberAfEzmodeServerCommission(uint8_t endpoint);
  * @param identifyTimeoutSeconds The number of seconds to identify for before
  *                               stopping identify mode.
  */
-EmberStatus emberAfEzmodeServerCommissionWithTimeout(uint8_t endpoint,
-                                                     uint16_t identifyTimeoutSeconds);
+EmberStatus emberAfEzmodeServerCommissionWithTimeout(uint8_t endpoint, uint16_t identifyTimeoutSeconds);

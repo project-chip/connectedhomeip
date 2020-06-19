@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Definitions for the Trust Center Keepalive plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Definitions for the Trust Center Keepalive
+                                                                               *plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_TRUST_CENTER_KEEPALIVE_H
 #define SILABS_TRUST_CENTER_KEEPALIVE_H
@@ -44,16 +45,15 @@
 // period shall be between five and 20 minutes, according to section 5.4.2.2.3.4
 // of 105638r09.  The plugin option, specified in minutes, is converted here to
 // milliseconds.
-#define EMBER_AF_PLUGIN_TRUST_CENTER_KEEPALIVE_DELAY_INTERVAL \
-  (EMBER_AF_PLUGIN_TRUST_CENTER_KEEPALIVE_INTERVAL * MILLISECOND_TICKS_PER_MINUTE)
+#define EMBER_AF_PLUGIN_TRUST_CENTER_KEEPALIVE_DELAY_INTERVAL                                                                      \
+    (EMBER_AF_PLUGIN_TRUST_CENTER_KEEPALIVE_INTERVAL * MILLISECOND_TICKS_PER_MINUTE)
 
 // The number of unacknowledged keepalives permitted before declaring that the
 // trust center is inaccessible and initiating a search for it.  Section
 // 5.4.2.2.3.4 of 105638r09 specifies that this value shall be three.
 #define EMBER_AF_PLUGIN_TRUST_CENTER_KEEPALIVE_FAILURE_LIMIT 3
 
-void emAfPluginTrustCenterKeepaliveReadAttributesResponseCallback(uint8_t *buffer,
-                                                                  uint16_t bufLen);
+void emAfPluginTrustCenterKeepaliveReadAttributesResponseCallback(uint8_t * buffer, uint16_t bufLen);
 
 void emAfSendKeepaliveSignal(void);
 
@@ -79,7 +79,6 @@ uint16_t emAfPluginTrustCenterKeepaliveGetJitterTimeSeconds(void);
 
 bool emAfPluginTrustCenterKeepaliveTcHasServerCluster(void);
 
-bool emberAfTrustCenterKeepaliveOverwriteDefaultTimingCallback(uint16_t *baseTimeSeconds,
-                                                               uint16_t *jitterTimeSeconds);
+bool emberAfTrustCenterKeepaliveOverwriteDefaultTimingCallback(uint16_t * baseTimeSeconds, uint16_t * jitterTimeSeconds);
 
 #endif // SILABS_TRUST_CENTER_KEEPALIVE_H

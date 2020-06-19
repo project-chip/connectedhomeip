@@ -31,17 +31,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the Prepayment Client plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the Prepayment Client
+                                                                               *plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_PREPAYMENT_CLIENT_H
 #define SILABS_PREPAYMENT_CLIENT_H
 
-void emberAfPluginPrepaymentClientChangePaymentMode(EmberNodeId nodeId, uint8_t srcEndpoint, uint8_t dstEndpoint, uint32_t providerId, uint32_t issuerEventId, uint32_t implementationDateTime, uint16_t proposedPaymentControlConfiguration, uint32_t cutOffValue);
+void emberAfPluginPrepaymentClientChangePaymentMode(EmberNodeId nodeId, uint8_t srcEndpoint, uint8_t dstEndpoint,
+                                                    uint32_t providerId, uint32_t issuerEventId, uint32_t implementationDateTime,
+                                                    uint16_t proposedPaymentControlConfiguration, uint32_t cutOffValue);
 
-bool emberAfPluginPrepaymentClusterChangePaymentModeResponseCallback(uint8_t friendlyCredit, uint32_t friendlyCreditCalendarId, uint32_t emergencyCreditLimit, uint32_t emergencyCreditThreshold);
+bool emberAfPluginPrepaymentClusterChangePaymentModeResponseCallback(uint8_t friendlyCredit, uint32_t friendlyCreditCalendarId,
+                                                                     uint32_t emergencyCreditLimit,
+                                                                     uint32_t emergencyCreditThreshold);
 
-#endif  // #ifndef _PREPAYMENT_CLIENT_H_
+#endif // #ifndef _PREPAYMENT_CLIENT_H_

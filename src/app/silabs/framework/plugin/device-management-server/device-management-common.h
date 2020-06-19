@@ -31,15 +31,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Common defines for the Device Management Server plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Common defines for the Device Management
+                                                                               *Server plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_DEVICE_MANAGEMENT_COMMON
 #define SILABS_DEVICE_MANAGEMENT_COMMON
 
-#define EMBER_AF_DEVICE_MANAGEMENT_SUPPLY_CONTROL_ACK_MASK            0x01
+#define EMBER_AF_DEVICE_MANAGEMENT_SUPPLY_CONTROL_ACK_MASK 0x01
 
 #endif // SILABS_DEVICE_MANAGEMENT_COMMON

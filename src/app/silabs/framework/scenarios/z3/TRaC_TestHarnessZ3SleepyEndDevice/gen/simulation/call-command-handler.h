@@ -43,60 +43,60 @@
 // the incomming message, and call appropriate command handler.
 
 // Cluster: Identify, client
-EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Identify, server
-EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Groups, client
-EmberAfStatus emberAfGroupsClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfGroupsClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Groups, server
-EmberAfStatus emberAfGroupsClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfGroupsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Scenes, client
-EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Scenes, server
-EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: On/off, server
-EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Level Control, server
-EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Alarms, client
-EmberAfStatus emberAfAlarmClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfAlarmClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Alarms, server
-EmberAfStatus emberAfAlarmClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfAlarmClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Commissioning, client
-EmberAfStatus emberAfCommissioningClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfCommissioningClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Commissioning, server
-EmberAfStatus emberAfCommissioningClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfCommissioningClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Poll Control, client
-EmberAfStatus emberAfPollControlClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfPollControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Poll Control, server
-EmberAfStatus emberAfPollControlClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfPollControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Thermostat, client
-EmberAfStatus emberAfThermostatClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfThermostatClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Thermostat, server
-EmberAfStatus emberAfThermostatClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfThermostatClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: IAS Zone, client
-EmberAfStatus emberAfIasZoneClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfIasZoneClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: IAS Zone, server
-EmberAfStatus emberAfIasZoneClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfIasZoneClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: ZLL Commissioning, client
-EmberAfStatus emberAfZllCommissioningClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfZllCommissioningClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 #endif // SILABS_EMBER_AF_COMMAND_PARSE_HEADER

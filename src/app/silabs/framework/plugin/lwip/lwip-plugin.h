@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the LWIP plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the LWIP plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 void emberAfPluginLwipSetIpv4AddressCommand(void);
 void emberAfPluginLwipStatusCommand(void);

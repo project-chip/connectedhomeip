@@ -43,24 +43,24 @@
 // the incomming message, and call appropriate command handler.
 
 // Cluster: Basic, server
-EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Identify, client
-EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Identify, server
-EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Groups, server
-EmberAfStatus emberAfGroupsClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfGroupsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Scenes, server
-EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Door Lock, server
-EmberAfStatus emberAfDoorLockClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfDoorLockClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: SL Works With All Hubs, server
-EmberAfStatus emberAfSlWwahClusterServerCommandParse(EmberAfClusterCommand *cmd);
+EmberAfStatus emberAfSlWwahClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 #endif // SILABS_EMBER_AF_COMMAND_PARSE_HEADER

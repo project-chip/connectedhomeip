@@ -31,19 +31,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Definitions for the Standalone Bootloader Server plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Definitions for the Standalone Bootloader
+                                                                               *Server plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 void emAfStandaloneBootloaderServerPrintTargetClientInfoCommand(void);
 void emAfStandaloneBootloaderServerPrintStatus(void);
 
 // Public API
 EmberStatus emberAfPluginStandaloneBootloaderServerBroadcastQuery(void);
-EmberStatus emberAfPluginStandaloneBootloaderServerStartClientBootload(EmberEUI64 longId,
-                                                                       const EmberAfOtaImageId* id,
+EmberStatus emberAfPluginStandaloneBootloaderServerStartClientBootload(EmberEUI64 longId, const EmberAfOtaImageId * id,
                                                                        uint16_t tag);
-EmberStatus emberAfPluginStandaloneBootloaderServerStartClientBootloadWithCurrentTarget(const EmberAfOtaImageId* id,
-                                                                                        uint16_t tag);
+EmberStatus emberAfPluginStandaloneBootloaderServerStartClientBootloadWithCurrentTarget(const EmberAfOtaImageId * id, uint16_t tag);

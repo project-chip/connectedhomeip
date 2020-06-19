@@ -31,12 +31,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the HC 11073 Tunnel plugin, which implements the
- *        tunneling of 11073 data over zigbee.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the HC 11073 Tunnel
+                                                                               *plugin, which implements the tunneling of 11073 data
+                                                                               *over zigbee.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // These are statically defined by the spec. Defines provided here
 // to improve plugin readability.
@@ -50,5 +51,5 @@
 // These are variable and should be defined by the application using
 // this plugin.
 #ifndef HC_11073_TUNNEL_ENDPOINT
-  #define HC_11073_TUNNEL_ENDPOINT 1
+#define HC_11073_TUNNEL_ENDPOINT 1
 #endif

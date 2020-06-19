@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the DMP UI Stub plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the DMP UI Stub plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef DMP_UI_STUB_H
 #define DMP_UI_STUB_H
@@ -53,7 +53,7 @@
 #define DMP_UI_DIRECTION_INVALID 0
 #define DMP_UI_DIRECTION_BLUETOOTH 1
 #define DMP_UI_DIRECTION_SWITCH 2
-#define DMP_UI_DIRECTION_ZIGBEE  3
-#define DmpUiLightDirection_t  uint8_t
+#define DMP_UI_DIRECTION_ZIGBEE 3
+#define DmpUiLightDirection_t uint8_t
 
-#endif //DMP_UI_STUB_H
+#endif // DMP_UI_STUB_H

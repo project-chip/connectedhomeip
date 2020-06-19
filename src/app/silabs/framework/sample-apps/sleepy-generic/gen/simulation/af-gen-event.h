@@ -40,88 +40,113 @@
 #define __AF_GEN_EVENT__
 
 // Code used to configure the cluster event mechanism
-#define EMBER_AF_GENERATED_EVENT_CODE                                                                                                                                                                                                      \
-  EmberEventControl emberAfSimpleMeteringClusterServerTickCallbackControl1;                                                                                                                                                                \
-  EmberEventControl emberAfMessagingClusterClientTickCallbackControl1;                                                                                                                                                                     \
-  EmberEventControl emberAfKeyEstablishmentClusterServerTickCallbackControl1;                                                                                                                                                              \
-  extern EmberEventControl emberAfPluginFormAndJoinCleanupEventControl;                                                                                                                                                                    \
-  extern EmberEventControl emberAfPluginKeyEstablishmentApsDuplicateDetectionEventControl;                                                                                                                                                 \
-  extern EmberEventControl emberAfPluginNetworkFindTickEventControl;                                                                                                                                                                       \
-  extern EmberEventControl emberAfPluginSimpleMeteringServerSamplingEventControl;                                                                                                                                                          \
-  extern EmberEventControl emberAfPluginSimpleMeteringServerSupplyEventControl;                                                                                                                                                            \
-  extern void emberAfPluginFormAndJoinCleanupEventHandler(void);                                                                                                                                                                           \
-  extern void emberAfPluginKeyEstablishmentApsDuplicateDetectionEventHandler(void);                                                                                                                                                        \
-  extern void emberAfPluginNetworkFindTickEventHandler(void);                                                                                                                                                                              \
-  extern void emberAfPluginSimpleMeteringServerSamplingEventHandler(void);                                                                                                                                                                 \
-  extern void emberAfPluginSimpleMeteringServerSupplyEventHandler(void);                                                                                                                                                                   \
-  static void networkEventWrapper(EmberEventControl * control, EmberAfNetworkEventHandler handler, uint8_t networkIndex)                                                                                                                   \
-  {                                                                                                                                                                                                                                        \
-    emberAfPushNetworkIndex(networkIndex);                                                                                                                                                                                                 \
-    emberEventControlSetInactive(*control);                                                                                                                                                                                                \
-    (*handler)();                                                                                                                                                                                                                          \
-    emberAfPopNetworkIndex();                                                                                                                                                                                                              \
-  }                                                                                                                                                                                                                                        \
-  EmberEventControl emberAfPluginEndDeviceSupportMoveNetworkEventControls[1];                                                                                                                                                              \
-  extern void emberAfPluginEndDeviceSupportMoveNetworkEventHandler(void);                                                                                                                                                                  \
-  void emberAfPluginEndDeviceSupportMoveNetworkEventWrapper0(void) { networkEventWrapper(&emberAfPluginEndDeviceSupportMoveNetworkEventControls[0], emberAfPluginEndDeviceSupportMoveNetworkEventHandler, 0); }                            \
-  EmberEventControl emberAfPluginEndDeviceSupportPollingNetworkEventControls[1];                                                                                                                                                           \
-  extern void emberAfPluginEndDeviceSupportPollingNetworkEventHandler(void);                                                                                                                                                               \
-  void emberAfPluginEndDeviceSupportPollingNetworkEventWrapper0(void) { networkEventWrapper(&emberAfPluginEndDeviceSupportPollingNetworkEventControls[0], emberAfPluginEndDeviceSupportPollingNetworkEventHandler, 0); }                   \
-  EmberEventControl emberAfPluginPartnerLinkKeyExchangeTimeoutNetworkEventControls[1];                                                                                                                                                     \
-  extern void emberAfPluginPartnerLinkKeyExchangeTimeoutNetworkEventHandler(void);                                                                                                                                                         \
-  void emberAfPluginPartnerLinkKeyExchangeTimeoutNetworkEventWrapper0(void) { networkEventWrapper(&emberAfPluginPartnerLinkKeyExchangeTimeoutNetworkEventControls[0], emberAfPluginPartnerLinkKeyExchangeTimeoutNetworkEventHandler, 0); } \
-  EmberEventControl emberAfPluginSmartEnergyRegistrationTickNetworkEventControls[1];                                                                                                                                                       \
-  extern void emberAfPluginSmartEnergyRegistrationTickNetworkEventHandler(void);                                                                                                                                                           \
-  void emberAfPluginSmartEnergyRegistrationTickNetworkEventWrapper0(void) { networkEventWrapper(&emberAfPluginSmartEnergyRegistrationTickNetworkEventControls[0], emberAfPluginSmartEnergyRegistrationTickNetworkEventHandler, 0); }       \
-  static void clusterTickWrapper(EmberEventControl * control, EmberAfTickFunction callback, uint8_t endpoint)                                                                                                                              \
-  {                                                                                                                                                                                                                                        \
-    emberAfPushEndpointNetworkIndex(endpoint);                                                                                                                                                                                             \
-    emberEventControlSetInactive(*control);                                                                                                                                                                                                \
-    (*callback)(endpoint);                                                                                                                                                                                                                 \
-    emberAfPopNetworkIndex();                                                                                                                                                                                                              \
-  }                                                                                                                                                                                                                                        \
-  void emberAfSimpleMeteringClusterServerTickCallbackWrapperFunction1(void) { clusterTickWrapper(&emberAfSimpleMeteringClusterServerTickCallbackControl1, emberAfSimpleMeteringClusterServerTickCallback, 1); }                            \
-  void emberAfMessagingClusterClientTickCallbackWrapperFunction1(void) { clusterTickWrapper(&emberAfMessagingClusterClientTickCallbackControl1, emberAfMessagingClusterClientTickCallback, 1); }                                           \
-  void emberAfKeyEstablishmentClusterServerTickCallbackWrapperFunction1(void) { clusterTickWrapper(&emberAfKeyEstablishmentClusterServerTickCallbackControl1, emberAfKeyEstablishmentClusterServerTickCallback, 1); }                      \
-
+#define EMBER_AF_GENERATED_EVENT_CODE                                                                                              \
+    EmberEventControl emberAfSimpleMeteringClusterServerTickCallbackControl1;                                                      \
+    EmberEventControl emberAfMessagingClusterClientTickCallbackControl1;                                                           \
+    EmberEventControl emberAfKeyEstablishmentClusterServerTickCallbackControl1;                                                    \
+    extern EmberEventControl emberAfPluginFormAndJoinCleanupEventControl;                                                          \
+    extern EmberEventControl emberAfPluginKeyEstablishmentApsDuplicateDetectionEventControl;                                       \
+    extern EmberEventControl emberAfPluginNetworkFindTickEventControl;                                                             \
+    extern EmberEventControl emberAfPluginSimpleMeteringServerSamplingEventControl;                                                \
+    extern EmberEventControl emberAfPluginSimpleMeteringServerSupplyEventControl;                                                  \
+    extern void emberAfPluginFormAndJoinCleanupEventHandler(void);                                                                 \
+    extern void emberAfPluginKeyEstablishmentApsDuplicateDetectionEventHandler(void);                                              \
+    extern void emberAfPluginNetworkFindTickEventHandler(void);                                                                    \
+    extern void emberAfPluginSimpleMeteringServerSamplingEventHandler(void);                                                       \
+    extern void emberAfPluginSimpleMeteringServerSupplyEventHandler(void);                                                         \
+    static void networkEventWrapper(EmberEventControl * control, EmberAfNetworkEventHandler handler, uint8_t networkIndex)         \
+    {                                                                                                                              \
+        emberAfPushNetworkIndex(networkIndex);                                                                                     \
+        emberEventControlSetInactive(*control);                                                                                    \
+        (*handler)();                                                                                                              \
+        emberAfPopNetworkIndex();                                                                                                  \
+    }                                                                                                                              \
+    EmberEventControl emberAfPluginEndDeviceSupportMoveNetworkEventControls[1];                                                    \
+    extern void emberAfPluginEndDeviceSupportMoveNetworkEventHandler(void);                                                        \
+    void emberAfPluginEndDeviceSupportMoveNetworkEventWrapper0(void)                                                               \
+    {                                                                                                                              \
+        networkEventWrapper(&emberAfPluginEndDeviceSupportMoveNetworkEventControls[0],                                             \
+                            emberAfPluginEndDeviceSupportMoveNetworkEventHandler, 0);                                              \
+    }                                                                                                                              \
+    EmberEventControl emberAfPluginEndDeviceSupportPollingNetworkEventControls[1];                                                 \
+    extern void emberAfPluginEndDeviceSupportPollingNetworkEventHandler(void);                                                     \
+    void emberAfPluginEndDeviceSupportPollingNetworkEventWrapper0(void)                                                            \
+    {                                                                                                                              \
+        networkEventWrapper(&emberAfPluginEndDeviceSupportPollingNetworkEventControls[0],                                          \
+                            emberAfPluginEndDeviceSupportPollingNetworkEventHandler, 0);                                           \
+    }                                                                                                                              \
+    EmberEventControl emberAfPluginPartnerLinkKeyExchangeTimeoutNetworkEventControls[1];                                           \
+    extern void emberAfPluginPartnerLinkKeyExchangeTimeoutNetworkEventHandler(void);                                               \
+    void emberAfPluginPartnerLinkKeyExchangeTimeoutNetworkEventWrapper0(void)                                                      \
+    {                                                                                                                              \
+        networkEventWrapper(&emberAfPluginPartnerLinkKeyExchangeTimeoutNetworkEventControls[0],                                    \
+                            emberAfPluginPartnerLinkKeyExchangeTimeoutNetworkEventHandler, 0);                                     \
+    }                                                                                                                              \
+    EmberEventControl emberAfPluginSmartEnergyRegistrationTickNetworkEventControls[1];                                             \
+    extern void emberAfPluginSmartEnergyRegistrationTickNetworkEventHandler(void);                                                 \
+    void emberAfPluginSmartEnergyRegistrationTickNetworkEventWrapper0(void)                                                        \
+    {                                                                                                                              \
+        networkEventWrapper(&emberAfPluginSmartEnergyRegistrationTickNetworkEventControls[0],                                      \
+                            emberAfPluginSmartEnergyRegistrationTickNetworkEventHandler, 0);                                       \
+    }                                                                                                                              \
+    static void clusterTickWrapper(EmberEventControl * control, EmberAfTickFunction callback, uint8_t endpoint)                    \
+    {                                                                                                                              \
+        emberAfPushEndpointNetworkIndex(endpoint);                                                                                 \
+        emberEventControlSetInactive(*control);                                                                                    \
+        (*callback)(endpoint);                                                                                                     \
+        emberAfPopNetworkIndex();                                                                                                  \
+    }                                                                                                                              \
+    void emberAfSimpleMeteringClusterServerTickCallbackWrapperFunction1(void)                                                      \
+    {                                                                                                                              \
+        clusterTickWrapper(&emberAfSimpleMeteringClusterServerTickCallbackControl1,                                                \
+                           emberAfSimpleMeteringClusterServerTickCallback, 1);                                                     \
+    }                                                                                                                              \
+    void emberAfMessagingClusterClientTickCallbackWrapperFunction1(void)                                                           \
+    {                                                                                                                              \
+        clusterTickWrapper(&emberAfMessagingClusterClientTickCallbackControl1, emberAfMessagingClusterClientTickCallback, 1);      \
+    }                                                                                                                              \
+    void emberAfKeyEstablishmentClusterServerTickCallbackWrapperFunction1(void)                                                    \
+    {                                                                                                                              \
+        clusterTickWrapper(&emberAfKeyEstablishmentClusterServerTickCallbackControl1,                                              \
+                           emberAfKeyEstablishmentClusterServerTickCallback, 1);                                                   \
+    }
 
 // EmberEventData structs used to populate the EmberEventData table
-#define EMBER_AF_GENERATED_EVENTS                                                                                                         \
-  { &emberAfSimpleMeteringClusterServerTickCallbackControl1, emberAfSimpleMeteringClusterServerTickCallbackWrapperFunction1 },            \
-  { &emberAfMessagingClusterClientTickCallbackControl1, emberAfMessagingClusterClientTickCallbackWrapperFunction1 },                      \
-  { &emberAfKeyEstablishmentClusterServerTickCallbackControl1, emberAfKeyEstablishmentClusterServerTickCallbackWrapperFunction1 },        \
-  { &emberAfPluginFormAndJoinCleanupEventControl, emberAfPluginFormAndJoinCleanupEventHandler },                                          \
-  { &emberAfPluginKeyEstablishmentApsDuplicateDetectionEventControl, emberAfPluginKeyEstablishmentApsDuplicateDetectionEventHandler },    \
-  { &emberAfPluginNetworkFindTickEventControl, emberAfPluginNetworkFindTickEventHandler },                                                \
-  { &emberAfPluginSimpleMeteringServerSamplingEventControl, emberAfPluginSimpleMeteringServerSamplingEventHandler },                      \
-  { &emberAfPluginSimpleMeteringServerSupplyEventControl, emberAfPluginSimpleMeteringServerSupplyEventHandler },                          \
-  { &emberAfPluginEndDeviceSupportMoveNetworkEventControls[0], emberAfPluginEndDeviceSupportMoveNetworkEventWrapper0 },                   \
-  { &emberAfPluginEndDeviceSupportPollingNetworkEventControls[0], emberAfPluginEndDeviceSupportPollingNetworkEventWrapper0 },             \
-  { &emberAfPluginPartnerLinkKeyExchangeTimeoutNetworkEventControls[0], emberAfPluginPartnerLinkKeyExchangeTimeoutNetworkEventWrapper0 }, \
-  { &emberAfPluginSmartEnergyRegistrationTickNetworkEventControls[0], emberAfPluginSmartEnergyRegistrationTickNetworkEventWrapper0 },     \
+#define EMBER_AF_GENERATED_EVENTS                                                                                                  \
+    { &emberAfSimpleMeteringClusterServerTickCallbackControl1, emberAfSimpleMeteringClusterServerTickCallbackWrapperFunction1 },   \
+        { &emberAfMessagingClusterClientTickCallbackControl1, emberAfMessagingClusterClientTickCallbackWrapperFunction1 },         \
+        { &emberAfKeyEstablishmentClusterServerTickCallbackControl1,                                                               \
+          emberAfKeyEstablishmentClusterServerTickCallbackWrapperFunction1 },                                                      \
+        { &emberAfPluginFormAndJoinCleanupEventControl, emberAfPluginFormAndJoinCleanupEventHandler },                             \
+        { &emberAfPluginKeyEstablishmentApsDuplicateDetectionEventControl,                                                         \
+          emberAfPluginKeyEstablishmentApsDuplicateDetectionEventHandler },                                                        \
+        { &emberAfPluginNetworkFindTickEventControl, emberAfPluginNetworkFindTickEventHandler },                                   \
+        { &emberAfPluginSimpleMeteringServerSamplingEventControl, emberAfPluginSimpleMeteringServerSamplingEventHandler },         \
+        { &emberAfPluginSimpleMeteringServerSupplyEventControl, emberAfPluginSimpleMeteringServerSupplyEventHandler },             \
+        { &emberAfPluginEndDeviceSupportMoveNetworkEventControls[0], emberAfPluginEndDeviceSupportMoveNetworkEventWrapper0 },      \
+        { &emberAfPluginEndDeviceSupportPollingNetworkEventControls[0],                                                            \
+          emberAfPluginEndDeviceSupportPollingNetworkEventWrapper0 },                                                              \
+        { &emberAfPluginPartnerLinkKeyExchangeTimeoutNetworkEventControls[0],                                                      \
+          emberAfPluginPartnerLinkKeyExchangeTimeoutNetworkEventWrapper0 },                                                        \
+        { &emberAfPluginSmartEnergyRegistrationTickNetworkEventControls[0],                                                        \
+          emberAfPluginSmartEnergyRegistrationTickNetworkEventWrapper0 },
 
-
-#define EMBER_AF_GENERATED_EVENT_STRINGS            \
-  "Simple Metering Cluster Server EP 1",            \
-  "Messaging Cluster Client EP 1",                  \
-  "Key Establishment Cluster Server EP 1",          \
-  "Form and Join Library Plugin Cleanup",           \
-  "Key Establishment Plugin ApsDuplicateDetection", \
-  "Network Find Plugin Tick",                       \
-  "Simple Metering Server Plugin Sampling",         \
-  "Simple Metering Server Plugin Supply",           \
-  "End Device Support Plugin Move NWK 0",           \
-  "End Device Support Plugin Polling NWK 0",        \
-  "Partner Link Key Exchange Plugin Timeout NWK 0", \
-  "Smart Energy Registration Plugin Tick NWK 0",    \
-
+#define EMBER_AF_GENERATED_EVENT_STRINGS                                                                                           \
+    "Simple Metering Cluster Server EP 1", "Messaging Cluster Client EP 1", "Key Establishment Cluster Server EP 1",               \
+        "Form and Join Library Plugin Cleanup", "Key Establishment Plugin ApsDuplicateDetection", "Network Find Plugin Tick",      \
+        "Simple Metering Server Plugin Sampling", "Simple Metering Server Plugin Supply", "End Device Support Plugin Move NWK 0",  \
+        "End Device Support Plugin Polling NWK 0", "Partner Link Key Exchange Plugin Timeout NWK 0",                               \
+        "Smart Energy Registration Plugin Tick NWK 0",
 
 // The length of the event context table used to track and retrieve cluster events
 #define EMBER_AF_EVENT_CONTEXT_LENGTH 3
 
 // EmberAfEventContext structs used to populate the EmberAfEventContext table
-#define EMBER_AF_GENERATED_EVENT_CONTEXT { 0x1, 0x702, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfSimpleMeteringClusterServerTickCallbackControl1 }, \
-  { 0x1, 0x703, true, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfMessagingClusterClientTickCallbackControl1 },                                              \
-  { 0x1, 0x800, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfKeyEstablishmentClusterServerTickCallbackControl1 }
+#define EMBER_AF_GENERATED_EVENT_CONTEXT                                                                                           \
+    { 0x1, 0x702, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfSimpleMeteringClusterServerTickCallbackControl1 },      \
+        { 0x1, 0x703, true, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfMessagingClusterClientTickCallbackControl1 },        \
+    {                                                                                                                              \
+        0x1, 0x800, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfKeyEstablishmentClusterServerTickCallbackControl1     \
+    }
 
 #endif // __AF_GEN_EVENT__

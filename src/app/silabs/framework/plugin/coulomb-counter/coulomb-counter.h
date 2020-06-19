@@ -31,51 +31,52 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs for the Coulomb Counter plugin.
- ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs for the Coulomb Counter plugin.
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_COULOMB_COUNTER_H
 #define SILABS_COULOMB_COUNTER_H
 
-#define COULOMB_COUNTER_MAX_NB_USER_DEFINED_ADDITIVE_STATES   (16U)
-typedef enum {
-  EMBER_AF_PLUGIN_COULOMB_COUNTER_RADIO_MODE_RX_SHIFT = 0,
-  EMBER_AF_PLUGIN_COULOMB_COUNTER_RADIO_MODE_TX_SHIFT = 1,
-  EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_SLEEP_SHIFT = 2,
-  EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_IDLE_SHIFT = 3,
-  EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_AWAKE_SHIFT = 4,
-  EMBER_AF_PLUGIN_COULOMB_COUNTER_EEPROM_STATE_SHIFT = 5, //Bits 5-8 reserved for EEPROM states
-  // Maximum value allowed for core mode
-  EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_MAX = 32
+#define COULOMB_COUNTER_MAX_NB_USER_DEFINED_ADDITIVE_STATES (16U)
+typedef enum
+{
+    EMBER_AF_PLUGIN_COULOMB_COUNTER_RADIO_MODE_RX_SHIFT   = 0,
+    EMBER_AF_PLUGIN_COULOMB_COUNTER_RADIO_MODE_TX_SHIFT   = 1,
+    EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_SLEEP_SHIFT = 2,
+    EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_IDLE_SHIFT  = 3,
+    EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_AWAKE_SHIFT = 4,
+    EMBER_AF_PLUGIN_COULOMB_COUNTER_EEPROM_STATE_SHIFT = 5, // Bits 5-8 reserved for EEPROM states
+    // Maximum value allowed for core mode
+    EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_MAX = 32
 } EmberAfPluginCoulombCounterCoreMode;
 
 /** Radio in Idle state */
 
 /** Radio in Receive state */
-#define EMBER_AF_PLUGIN_COULOMB_COUNTER_RADIO_MODE_RX                (1U << EMBER_AF_PLUGIN_COULOMB_COUNTER_RADIO_MODE_RX_SHIFT)
+#define EMBER_AF_PLUGIN_COULOMB_COUNTER_RADIO_MODE_RX (1U << EMBER_AF_PLUGIN_COULOMB_COUNTER_RADIO_MODE_RX_SHIFT)
 /** Radio in Transmit state */
-#define EMBER_AF_PLUGIN_COULOMB_COUNTER_RADIO_MODE_TX                (1U << EMBER_AF_PLUGIN_COULOMB_COUNTER_RADIO_MODE_TX_SHIFT)
+#define EMBER_AF_PLUGIN_COULOMB_COUNTER_RADIO_MODE_TX (1U << EMBER_AF_PLUGIN_COULOMB_COUNTER_RADIO_MODE_TX_SHIFT)
 
-#define EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_SLEEP              (1U << EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_SLEEP_SHIFT)
+#define EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_SLEEP (1U << EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_SLEEP_SHIFT)
 
-#define EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_IDLE               (1U << EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_IDLE_SHIFT)
+#define EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_IDLE (1U << EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_IDLE_SHIFT)
 
-#define EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_AWAKE              (1U << EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_AWAKE_SHIFT)
+#define EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_AWAKE (1U << EMBER_AF_PLUGIN_COULOMB_COUNTER_CORE_MODE_AWAKE_SHIFT)
 
 /** A mask representing all Radio state options <bit1:bit0>*/
-#define EMBER_AF_PLUGIN_COULOMB_COUNTER_RADIO_EVENT_MASK             (0x03U)
+#define EMBER_AF_PLUGIN_COULOMB_COUNTER_RADIO_EVENT_MASK (0x03U)
 
 /** A mask representing all EM mode options <bit4:bit2>*/
-#define EMBER_AF_PLUGIN_COULOMB_COUNTER_EM_MODE_MASK                 (0x1CU)
+#define EMBER_AF_PLUGIN_COULOMB_COUNTER_EM_MODE_MASK (0x1CU)
 
 /** A mask representing all EEPROM mode options <bit8:bit5>*/
-#define EMBER_AF_PLUGIN_COULOMB_COUNTER_EEPROM_MODE_MASK             (0x1E0U)
+#define EMBER_AF_PLUGIN_COULOMB_COUNTER_EEPROM_MODE_MASK (0x1E0U)
 
-#define EMBER_AF_PLUGIN_COULOMB_COUNTER_MASK                         (0xFFFFU)
-#define EMBER_AF_PLUGIN_COULOMB_COUNTER_USER_DEF_STATES              (EMBER_AF_PLUGIN_COULOMB_COUNTER_MASK \
-                                                                      << COULOMB_COUNTER_MAX_NB_USER_DEFINED_ADDITIVE_STATES)
+#define EMBER_AF_PLUGIN_COULOMB_COUNTER_MASK (0xFFFFU)
+#define EMBER_AF_PLUGIN_COULOMB_COUNTER_USER_DEF_STATES                                                                            \
+    (EMBER_AF_PLUGIN_COULOMB_COUNTER_MASK << COULOMB_COUNTER_MAX_NB_USER_DEFINED_ADDITIVE_STATES)
 
 /** @brief Updates the state of all tracked additive modes.
  *
@@ -133,4 +134,4 @@ void emberAfPluginCommandCoulombCounterResetEnergyUsage(void);
  */
 void emberAfPluginCoulombCounterTick(void);
 
-#endif //SILABS_COULOMB_COUNTER_H
+#endif // SILABS_COULOMB_COUNTER_H

@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // *******************************************************************
 // * SeMeterGas_callbacks.c
@@ -58,9 +58,7 @@
  *
  * @param status   Ver.: always
  */
-void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
-{
-}
+void emberAfPluginNetworkFindFinishedCallback(EmberStatus status) {}
 
 /** @brief Join
  *
@@ -74,11 +72,9 @@ void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
-                                          uint8_t lqi,
-                                          int8_t rssi)
+bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }
 
 /** @brief Select File Descriptors
@@ -95,10 +91,9 @@ bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
  * @param maxSize The maximum number of elements that the function implementor
  * may add.  Ver.: always
  */
-int emberAfPluginGatewaySelectFileDescriptorsCallback(int* list,
-                                                      int maxSize)
+int emberAfPluginGatewaySelectFileDescriptorsCallback(int * list, int maxSize)
 {
-  return 0;
+    return 0;
 }
 
 /** @brief Broadcast Sent
@@ -107,9 +102,7 @@ int emberAfPluginGatewaySelectFileDescriptorsCallback(int* list,
  * sent by the concentrator plugin.
  *
  */
-void emberAfPluginConcentratorBroadcastSentCallback(void)
-{
-}
+void emberAfPluginConcentratorBroadcastSentCallback(void) {}
 
 /** @brief Button Event
  *
@@ -122,10 +115,7 @@ void emberAfPluginConcentratorBroadcastSentCallback(void)
  * @param buttonPressDurationMs The length of time button was held down before
  * it was released.  Ver.: always
  */
-void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
-                                                   uint32_t buttonPressDurationMs)
-{
-}
+void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber, uint32_t buttonPressDurationMs) {}
 
 /** @brief Price Started
  *
@@ -133,12 +123,12 @@ void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
  *
  * @param price The price that has started.  Ver.: always
  */
-void emberAfPluginPriceClientPriceStartedCallback(EmberAfPluginPriceClientPrice *price)
+void emberAfPluginPriceClientPriceStartedCallback(EmberAfPluginPriceClientPrice * price)
 {
-  emberAfPriceClusterPrint("Price \"");
-  emberAfPriceClusterPrintString(price->rateLabel);
-  emberAfPriceClusterPrintln("\" (0x%4x) has started", price->issuerEventId);
-  emberAfPriceClusterFlush();
+    emberAfPriceClusterPrint("Price \"");
+    emberAfPriceClusterPrintString(price->rateLabel);
+    emberAfPriceClusterPrintln("\" (0x%4x) has started", price->issuerEventId);
+    emberAfPriceClusterFlush();
 }
 
 /** @brief Price Expired
@@ -148,10 +138,10 @@ void emberAfPluginPriceClientPriceStartedCallback(EmberAfPluginPriceClientPrice 
  *
  * @param price The price that has expired.  Ver.: always
  */
-void emberAfPluginPriceClientPriceExpiredCallback(EmberAfPluginPriceClientPrice *price)
+void emberAfPluginPriceClientPriceExpiredCallback(EmberAfPluginPriceClientPrice * price)
 {
-  emberAfPriceClusterPrint("Price \"");
-  emberAfPriceClusterPrintString(price->rateLabel);
-  emberAfPriceClusterPrintln("\" (0x%4x) has expired", price->issuerEventId);
-  emberAfPriceClusterFlush();
+    emberAfPriceClusterPrint("Price \"");
+    emberAfPriceClusterPrintString(price->rateLabel);
+    emberAfPriceClusterPrintln("\" (0x%4x) has expired", price->issuerEventId);
+    emberAfPriceClusterFlush();
 }

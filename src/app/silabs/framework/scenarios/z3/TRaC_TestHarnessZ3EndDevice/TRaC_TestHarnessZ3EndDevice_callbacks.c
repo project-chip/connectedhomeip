@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // This callback file is created for your convenience. You may add application
 // code to this file. If you regenerate this file over a previous version, the
@@ -60,29 +60,33 @@ void customLookupNeighbourTable(void);
 void customResetBootloader(void);
 //  extern void actionFunction(void);
 EmberCommandEntry emberAfCustomCommands[] = {
-  /* Sample Custom CLI commands */
-  // emberCommandEntrySubMenu("sub-menu", customSubMenu, "Sub menu of custom commands"),
-  emberCommandEntryAction("lookup", customLookupNeighbourTable, "b", "Custom command to look up the shortaddress given an IEEE address"),
-  emberCommandEntryAction("resetBootloader", customResetBootloader, "", "Invokes seriel bootloader"),
-  //emberCommandEntryAction("version", customVersion, "b", "Custom command to look up version"),
-  emberCommandEntryTerminator()
+    /* Sample Custom CLI commands */
+    // emberCommandEntrySubMenu("sub-menu", customSubMenu, "Sub menu of custom commands"),
+    emberCommandEntryAction("lookup", customLookupNeighbourTable, "b",
+                            "Custom command to look up the shortaddress given an IEEE address"),
+    emberCommandEntryAction("resetBootloader", customResetBootloader, "", "Invokes seriel bootloader"),
+    // emberCommandEntryAction("version", customVersion, "b", "Custom command to look up version"),
+    emberCommandEntryTerminator()
 };
 
 void customLookupNeighbourTable(void)
 {
-  EmberEUI64 eui64;
-  emberCopyBigEndianEui64Argument(0, eui64);
-  EmberNodeId nodeId = emberLookupNodeIdByEui64(eui64);
-  if (EMBER_NULL_NODE_ID == nodeId ) {
-    emberAfAppPrintln("shortaddress:EUI64 unknown");
-  } else {
-    emberAfAppPrintln("shortaddress:0x%2X", nodeId);
-  }
+    EmberEUI64 eui64;
+    emberCopyBigEndianEui64Argument(0, eui64);
+    EmberNodeId nodeId = emberLookupNodeIdByEui64(eui64);
+    if (EMBER_NULL_NODE_ID == nodeId)
+    {
+        emberAfAppPrintln("shortaddress:EUI64 unknown");
+    }
+    else
+    {
+        emberAfAppPrintln("shortaddress:0x%2X", nodeId);
+    }
 }
 
 void customResetBootloader(void)
 {
-  halLaunchStandaloneBootloader(0); //STANDALONE_BOOTLOADER_RECOVERY_MODE
+    halLaunchStandaloneBootloader(0); // STANDALONE_BOOTLOADER_RECOVERY_MODE
 }
 
 /** @brief Alarms Cluster Reset Alarm
@@ -92,10 +96,9 @@ void customResetBootloader(void)
  * @param alarmCode   Ver.: always
  * @param clusterId   Ver.: always
  */
-boolean emberAfAlarmClusterResetAlarmCallback(int8u alarmCode,
-                                              int16u clusterId)
+boolean emberAfAlarmClusterResetAlarmCallback(int8u alarmCode, int16u clusterId)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Alarms Cluster Reset All Alarms
@@ -105,7 +108,7 @@ boolean emberAfAlarmClusterResetAlarmCallback(int8u alarmCode,
  */
 boolean emberAfAlarmClusterResetAllAlarmsCallback(void)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Alarms Cluster Alarm
@@ -115,10 +118,9 @@ boolean emberAfAlarmClusterResetAllAlarmsCallback(void)
  * @param alarmCode   Ver.: always
  * @param clusterId   Ver.: always
  */
-boolean emberAfAlarmClusterAlarmCallback(int8u alarmCode,
-                                         int16u clusterId)
+boolean emberAfAlarmClusterAlarmCallback(int8u alarmCode, int16u clusterId)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Groups Cluster Add Group Response
@@ -128,10 +130,9 @@ boolean emberAfAlarmClusterAlarmCallback(int8u alarmCode,
  * @param status   Ver.: always
  * @param groupId   Ver.: always
  */
-boolean emberAfGroupsClusterAddGroupResponseCallback(int8u status,
-                                                     int16u groupId)
+boolean emberAfGroupsClusterAddGroupResponseCallback(int8u status, int16u groupId)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Groups Cluster View Group Response
@@ -142,11 +143,9 @@ boolean emberAfGroupsClusterAddGroupResponseCallback(int8u status,
  * @param groupId   Ver.: always
  * @param groupName   Ver.: always
  */
-boolean emberAfGroupsClusterViewGroupResponseCallback(int8u status,
-                                                      int16u groupId,
-                                                      int8u* groupName)
+boolean emberAfGroupsClusterViewGroupResponseCallback(int8u status, int16u groupId, int8u * groupName)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Groups Cluster Get Group Membership Response
@@ -157,11 +156,9 @@ boolean emberAfGroupsClusterViewGroupResponseCallback(int8u status,
  * @param groupCount   Ver.: always
  * @param groupList   Ver.: always
  */
-boolean emberAfGroupsClusterGetGroupMembershipResponseCallback(int8u capacity,
-                                                               int8u groupCount,
-                                                               int8u* groupList)
+boolean emberAfGroupsClusterGetGroupMembershipResponseCallback(int8u capacity, int8u groupCount, int8u * groupList)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Groups Cluster Remove Group Response
@@ -171,10 +168,9 @@ boolean emberAfGroupsClusterGetGroupMembershipResponseCallback(int8u capacity,
  * @param status   Ver.: always
  * @param groupId   Ver.: always
  */
-boolean emberAfGroupsClusterRemoveGroupResponseCallback(int8u status,
-                                                        int16u groupId)
+boolean emberAfGroupsClusterRemoveGroupResponseCallback(int8u status, int16u groupId)
 {
-  return FALSE;
+    return FALSE;
 }
 
 /** @brief Scenes Cluster Add Scene Response
@@ -185,11 +181,9 @@ boolean emberAfGroupsClusterRemoveGroupResponseCallback(int8u status,
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-boolean emberAfScenesClusterAddSceneResponseCallback(int8u status,
-                                                     int16u groupId,
-                                                     int8u sceneId)
+boolean emberAfScenesClusterAddSceneResponseCallback(int8u status, int16u groupId, int8u sceneId)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Scenes Cluster View Scene Response
@@ -203,14 +197,10 @@ boolean emberAfScenesClusterAddSceneResponseCallback(int8u status,
  * @param sceneName   Ver.: always
  * @param extensionFieldSets   Ver.: always
  */
-boolean emberAfScenesClusterViewSceneResponseCallback(int8u status,
-                                                      int16u groupId,
-                                                      int8u sceneId,
-                                                      int16u transitionTime,
-                                                      int8u* sceneName,
-                                                      int8u* extensionFieldSets)
+boolean emberAfScenesClusterViewSceneResponseCallback(int8u status, int16u groupId, int8u sceneId, int16u transitionTime,
+                                                      int8u * sceneName, int8u * extensionFieldSets)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Scenes Cluster Remove Scene Response
@@ -221,11 +211,9 @@ boolean emberAfScenesClusterViewSceneResponseCallback(int8u status,
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-boolean emberAfScenesClusterRemoveSceneResponseCallback(int8u status,
-                                                        int16u groupId,
-                                                        int8u sceneId)
+boolean emberAfScenesClusterRemoveSceneResponseCallback(int8u status, int16u groupId, int8u sceneId)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Scenes Cluster Remove All Scenes Response
@@ -235,10 +223,9 @@ boolean emberAfScenesClusterRemoveSceneResponseCallback(int8u status,
  * @param status   Ver.: always
  * @param groupId   Ver.: always
  */
-boolean emberAfScenesClusterRemoveAllScenesResponseCallback(int8u status,
-                                                            int16u groupId)
+boolean emberAfScenesClusterRemoveAllScenesResponseCallback(int8u status, int16u groupId)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Scenes Cluster Store Scene Response
@@ -249,11 +236,9 @@ boolean emberAfScenesClusterRemoveAllScenesResponseCallback(int8u status,
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-boolean emberAfScenesClusterStoreSceneResponseCallback(int8u status,
-                                                       int16u groupId,
-                                                       int8u sceneId)
+boolean emberAfScenesClusterStoreSceneResponseCallback(int8u status, int16u groupId, int8u sceneId)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Scenes Cluster Get Scene Membership Response
@@ -266,13 +251,10 @@ boolean emberAfScenesClusterStoreSceneResponseCallback(int8u status,
  * @param sceneCount   Ver.: always
  * @param sceneList   Ver.: always
  */
-boolean emberAfScenesClusterGetSceneMembershipResponseCallback(int8u status,
-                                                               int8u capacity,
-                                                               int16u groupId,
-                                                               int8u sceneCount,
-                                                               int8u* sceneList)
+boolean emberAfScenesClusterGetSceneMembershipResponseCallback(int8u status, int8u capacity, int16u groupId, int8u sceneCount,
+                                                               int8u * sceneList)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Thermostat Cluster Current Weekly Schedule
@@ -284,12 +266,10 @@ boolean emberAfScenesClusterGetSceneMembershipResponseCallback(int8u status,
  * @param modeForSequence   Ver.: always
  * @param payload   Ver.: always
  */
-boolean emberAfThermostatClusterCurrentWeeklyScheduleCallback(int8u numberOfTransitionsForSequence,
-                                                              int8u dayOfWeekForSequence,
-                                                              int8u modeForSequence,
-                                                              int8u* payload)
+boolean emberAfThermostatClusterCurrentWeeklyScheduleCallback(int8u numberOfTransitionsForSequence, int8u dayOfWeekForSequence,
+                                                              int8u modeForSequence, int8u * payload)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Thermostat Cluster Relay Status Log
@@ -303,14 +283,10 @@ boolean emberAfThermostatClusterCurrentWeeklyScheduleCallback(int8u numberOfTran
  * @param setpoint   Ver.: always
  * @param unreadEntries   Ver.: always
  */
-boolean emberAfThermostatClusterRelayStatusLogCallback(int16u timeOfDay,
-                                                       int16u relayStatus,
-                                                       int16s localTemperature,
-                                                       int8u humidityInPercentage,
-                                                       int16s setpoint,
-                                                       int16u unreadEntries)
+boolean emberAfThermostatClusterRelayStatusLogCallback(int16u timeOfDay, int16u relayStatus, int16s localTemperature,
+                                                       int8u humidityInPercentage, int16s setpoint, int16u unreadEntries)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Thermostat Cluster Setpoint Raise Lower
@@ -320,10 +296,9 @@ boolean emberAfThermostatClusterRelayStatusLogCallback(int16u timeOfDay,
  * @param mode   Ver.: always
  * @param amount   Ver.: always
  */
-boolean emberAfThermostatClusterSetpointRaiseLowerCallback(int8u mode,
-                                                           int8s amount)
+boolean emberAfThermostatClusterSetpointRaiseLowerCallback(int8u mode, int8s amount)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Thermostat Cluster Set Weekly Schedule
@@ -335,12 +310,10 @@ boolean emberAfThermostatClusterSetpointRaiseLowerCallback(int8u mode,
  * @param modeForSequence   Ver.: always
  * @param payload   Ver.: always
  */
-boolean emberAfThermostatClusterSetWeeklyScheduleCallback(int8u numberOfTransitionsForSequence,
-                                                          int8u dayOfWeekForSequence,
-                                                          int8u modeForSequence,
-                                                          int8u* payload)
+boolean emberAfThermostatClusterSetWeeklyScheduleCallback(int8u numberOfTransitionsForSequence, int8u dayOfWeekForSequence,
+                                                          int8u modeForSequence, int8u * payload)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Thermostat Cluster Get Weekly Schedule
@@ -350,10 +323,9 @@ boolean emberAfThermostatClusterSetWeeklyScheduleCallback(int8u numberOfTransiti
  * @param daysToReturn   Ver.: always
  * @param modeToReturn   Ver.: always
  */
-boolean emberAfThermostatClusterGetWeeklyScheduleCallback(int8u daysToReturn,
-                                                          int8u modeToReturn)
+boolean emberAfThermostatClusterGetWeeklyScheduleCallback(int8u daysToReturn, int8u modeToReturn)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Thermostat Cluster Clear Weekly Schedule
@@ -363,7 +335,7 @@ boolean emberAfThermostatClusterGetWeeklyScheduleCallback(int8u daysToReturn,
  */
 boolean emberAfThermostatClusterClearWeeklyScheduleCallback(void)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Thermostat Cluster Get Relay Status Log
@@ -373,7 +345,7 @@ boolean emberAfThermostatClusterClearWeeklyScheduleCallback(void)
  */
 boolean emberAfThermostatClusterGetRelayStatusLogCallback(void)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief IAS Zone Cluster Zone Status Change Notification
@@ -385,12 +357,10 @@ boolean emberAfThermostatClusterGetRelayStatusLogCallback(void)
  * @param zoneId   Ver.: since ha-1.2-05-3520-29
  * @param delay   Ver.: since ha-1.2-05-3520-29
  */
-boolean emberAfIasZoneClusterZoneStatusChangeNotificationCallback(int16u zoneStatus,
-                                                                  int8u extendedStatus,
-                                                                  int8u zoneId,
+boolean emberAfIasZoneClusterZoneStatusChangeNotificationCallback(int16u zoneStatus, int8u extendedStatus, int8u zoneId,
                                                                   int16u delay)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief IAS Zone Cluster Zone Enroll Request
@@ -400,10 +370,9 @@ boolean emberAfIasZoneClusterZoneStatusChangeNotificationCallback(int16u zoneSta
  * @param zoneType   Ver.: always
  * @param manufacturerCode   Ver.: always
  */
-boolean emberAfIasZoneClusterZoneEnrollRequestCallback(int16u zoneType,
-                                                       int16u manufacturerCode)
+boolean emberAfIasZoneClusterZoneEnrollRequestCallback(int16u zoneType, int16u manufacturerCode)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief IAS Zone Cluster Zone Enroll Response
@@ -413,10 +382,9 @@ boolean emberAfIasZoneClusterZoneEnrollRequestCallback(int16u zoneType,
  * @param enrollResponseCode   Ver.: always
  * @param zoneId   Ver.: always
  */
-boolean emberAfIasZoneClusterZoneEnrollResponseCallback(int8u enrollResponseCode,
-                                                        int8u zoneId)
+boolean emberAfIasZoneClusterZoneEnrollResponseCallback(int8u enrollResponseCode, int8u zoneId)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Commissioning Cluster Restart Device Response
@@ -427,7 +395,7 @@ boolean emberAfIasZoneClusterZoneEnrollResponseCallback(int8u enrollResponseCode
  */
 boolean emberAfCommissioningClusterRestartDeviceResponseCallback(int8u status)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Commissioning Cluster Save Startup Parameters Response
@@ -438,7 +406,7 @@ boolean emberAfCommissioningClusterRestartDeviceResponseCallback(int8u status)
  */
 boolean emberAfCommissioningClusterSaveStartupParametersResponseCallback(int8u status)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Commissioning Cluster Restore Startup Parameters Response
@@ -449,7 +417,7 @@ boolean emberAfCommissioningClusterSaveStartupParametersResponseCallback(int8u s
  */
 boolean emberAfCommissioningClusterRestoreStartupParametersResponseCallback(int8u status)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Commissioning Cluster Reset Startup Parameters Response
@@ -460,7 +428,7 @@ boolean emberAfCommissioningClusterRestoreStartupParametersResponseCallback(int8
  */
 boolean emberAfCommissioningClusterResetStartupParametersResponseCallback(int8u status)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Commissioning Cluster Restart Device
@@ -471,11 +439,9 @@ boolean emberAfCommissioningClusterResetStartupParametersResponseCallback(int8u 
  * @param delay   Ver.: always
  * @param jitter   Ver.: always
  */
-boolean emberAfCommissioningClusterRestartDeviceCallback(int8u options,
-                                                         int8u delay,
-                                                         int8u jitter)
+boolean emberAfCommissioningClusterRestartDeviceCallback(int8u options, int8u delay, int8u jitter)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Commissioning Cluster Reset Startup Parameters
@@ -485,10 +451,9 @@ boolean emberAfCommissioningClusterRestartDeviceCallback(int8u options,
  * @param options   Ver.: always
  * @param index   Ver.: always
  */
-boolean emberAfCommissioningClusterResetStartupParametersCallback(int8u options,
-                                                                  int8u index)
+boolean emberAfCommissioningClusterResetStartupParametersCallback(int8u options, int8u index)
 {
-  return TRUE;
+    return TRUE;
 }
 
 /** @brief Trust Center Join
@@ -505,15 +470,12 @@ boolean emberAfCommissioningClusterResetStartupParametersCallback(int8u options,
  * @param status   Ver.: always
  * @param decision   Ver.: always
  */
-void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId,
-                                    EmberEUI64 newNodeEui64,
-                                    EmberNodeId parentOfNewNode,
-                                    EmberDeviceUpdate status,
-                                    EmberJoinDecision decision)
+void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId, EmberEUI64 newNodeEui64, EmberNodeId parentOfNewNode,
+                                    EmberDeviceUpdate status, EmberJoinDecision decision)
 {
-  if (EMBER_STANDARD_SECURITY_SECURED_REJOIN == status
-      || EMBER_STANDARD_SECURITY_UNSECURED_JOIN == status
-      || EMBER_STANDARD_SECURITY_UNSECURED_REJOIN == status) {
-    emberAfAddAddressTableEntry(newNodeEui64, newNodeId);
-  }
+    if (EMBER_STANDARD_SECURITY_SECURED_REJOIN == status || EMBER_STANDARD_SECURITY_UNSECURED_JOIN == status ||
+        EMBER_STANDARD_SECURITY_UNSECURED_REJOIN == status)
+    {
+        emberAfAddAddressTableEntry(newNodeEui64, newNodeId);
+    }
 }

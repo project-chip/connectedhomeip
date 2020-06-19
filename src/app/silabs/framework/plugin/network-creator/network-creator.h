@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the Network Creator plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the Network Creator
+                                                                               *plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_NETWORK_CREATOR_H
 #define SILABS_NETWORK_CREATOR_H
@@ -86,8 +87,5 @@ void emberAfPluginNetworkCreatorStop(void);
  *
  *  @return Status of the commencement of the network creator process.
  */
-EmberStatus emberAfPluginNetworkCreatorNetworkForm(bool centralizedNetwork,
-                                                   EmberPanId panId,
-                                                   int8_t radioTxPower,
-                                                   uint8_t channel);
+EmberStatus emberAfPluginNetworkCreatorNetworkForm(bool centralizedNetwork, EmberPanId panId, int8_t radioTxPower, uint8_t channel);
 #endif /* __NETWORK_CREATOR_H__ */

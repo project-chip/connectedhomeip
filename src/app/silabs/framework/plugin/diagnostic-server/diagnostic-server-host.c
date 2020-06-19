@@ -31,24 +31,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Host routines for the Diagnostic Server plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Host routines for the Diagnostic Server
+                                                                               *plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
 #include "diagnostic-server.h"
 
 // This is just a stub for the host processor
-bool emberAfReadDiagnosticAttribute(
-  EmberAfAttributeMetadata *attributeMetadata,
-  uint8_t *buffer)
+bool emberAfReadDiagnosticAttribute(EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
-  return false;
+    return false;
 }
 
-bool emberAfPreMessageReceivedCallback(EmberAfIncomingMessage* incomingMessage)
+bool emberAfPreMessageReceivedCallback(EmberAfIncomingMessage * incomingMessage)
 {
-  return false;
+    return false;
 }

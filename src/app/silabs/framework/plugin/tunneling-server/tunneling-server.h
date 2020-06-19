@@ -31,13 +31,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Definitions for the Tunneling Server plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Definitions for the Tunneling Server plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
-#define ZCL_TUNNELING_CLUSTER_INVALID_TUNNEL_ID        0xFFFF
+#define ZCL_TUNNELING_CLUSTER_INVALID_TUNNEL_ID 0xFFFF
 #define ZCL_TUNNELING_CLUSTER_UNUSED_MANUFACTURER_CODE 0xFFFF
 #define CLOSE_INITIATED_BY_CLIENT true
 #define CLOSE_INITIATED_BY_SERVER false
@@ -56,9 +56,7 @@
  * ::EMBER_ZCL_STATUS_FAILURE if an error occurred, or
  * ::EMBER_ZCL_STATUS_NOT_FOUND if the tunnel does not exist.
  */
-EmberAfStatus emberAfPluginTunnelingServerTransferData(uint16_t tunnelIndex,
-                                                       uint8_t *data,
-                                                       uint16_t dataLen);
+EmberAfStatus emberAfPluginTunnelingServerTransferData(uint16_t tunnelIndex, uint8_t * data, uint16_t dataLen);
 
 /**
  * @brief Toggles a "server busy" status for running as a test harness.

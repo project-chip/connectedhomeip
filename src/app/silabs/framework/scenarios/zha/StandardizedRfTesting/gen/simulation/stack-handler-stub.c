@@ -42,5 +42,5 @@
 // Stubs required for implemented stack handlers.
 
 #ifdef EZSP_HOST
-#else // ! EZSP_HOST
+#else  // ! EZSP_HOST
 #endif // EZSP_HOST

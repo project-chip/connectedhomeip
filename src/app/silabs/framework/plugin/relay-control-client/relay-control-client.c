@@ -31,36 +31,34 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Routines for the Relay Control Client plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Routines for the Relay Control Client
+                                                                               *plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // this file contains all the common includes for clusters in the util
-#include "app/framework/include/af.h"
 #include "app/framework/plugin/relay-control-client/relay-control-client.h"
+#include "app/framework/include/af.h"
 
 bool emberAfRelayControlClusterGetRelayStateResponseCallback(bool isEnabled)
 {
-  emberAfRelayControlClusterPrintln("Relay: %p", (isEnabled ? "on" : "off"));
+    emberAfRelayControlClusterPrintln("Relay: %p", (isEnabled ? "on" : "off"));
 
-  emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-  return true;
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
 }
 
-void emberAfPluginRelayControlClientSendSetRelayState(EmberNodeId nodeId,
-                                                      uint8_t srcEndpoint,
-                                                      uint8_t dstEndpoint,
-                                                      bool isEnabled,
+void emberAfPluginRelayControlClientSendSetRelayState(EmberNodeId nodeId, uint8_t srcEndpoint, uint8_t dstEndpoint, bool isEnabled,
                                                       uint32_t magicNumber)
 {
-  EmberStatus status;
-  emberAfFillCommandRelayControlClusterSetRelayState(isEnabled,
-                                                     magicNumber);
-  emberAfSetCommandEndpoints(srcEndpoint, dstEndpoint);
-  status = emberAfSendCommandUnicast(EMBER_OUTGOING_DIRECT, nodeId);
-  if (status != EMBER_SUCCESS) {
-    emberAfRelayControlClusterPrintln("Error in send set relay state %x", status);
-  }
+    EmberStatus status;
+    emberAfFillCommandRelayControlClusterSetRelayState(isEnabled, magicNumber);
+    emberAfSetCommandEndpoints(srcEndpoint, dstEndpoint);
+    status = emberAfSendCommandUnicast(EMBER_OUTGOING_DIRECT, nodeId);
+    if (status != EMBER_SUCCESS)
+    {
+        emberAfRelayControlClusterPrintln("Error in send set relay state %x", status);
+    }
 }

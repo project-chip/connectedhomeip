@@ -31,26 +31,28 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief This is an lwIP network interface that will connect to
- * the Ember ZigbeePro stack.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief This is an lwIP network interface that will
+                                                                               *connect to the Ember ZigbeePro stack.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "lwip/netif.h"
 
 #define EMBER_ETHERNET_ADDRESS_SIZE 6
 #define EMBER_MAX_LWIP_STATE_CALLBACK_REGISTRATIONS 4
 
-typedef struct {
-  uint8_t contents[EMBER_ETHERNET_ADDRESS_SIZE];
+typedef struct
+{
+    uint8_t contents[EMBER_ETHERNET_ADDRESS_SIZE];
 } EmberEthernetAddress;
 
-typedef struct {
-  netif_status_callback_fn handler;
-  uint16_t handlerID;
-}EmberLwipStateCallbackFunc;
+typedef struct
+{
+    netif_status_callback_fn handler;
+    uint16_t handlerID;
+} EmberLwipStateCallbackFunc;
 
 /*
  * Sends a pbuf to the Ember ZigbeePro stack.
@@ -60,21 +62,19 @@ typedef struct {
  * @param ipaddr The IP address to send the packet to.
  * @return Always returns ERR_OK.
  */
-err_t emberAfPluginLwipOutput(struct netif *netif, struct pbuf *p, ip_addr_t *ipaddr);
+err_t emberAfPluginLwipOutput(struct netif * netif, struct pbuf * p, ip_addr_t * ipaddr);
 
 void emberAfPluginLwipSetIpv4AddressFromToken(void);
 
-void emberAfPluginLwipPrintIpv4Token(const EmberAfPluginLwipIpv4TokenStruct* ipv4Token);
+void emberAfPluginLwipPrintIpv4Token(const EmberAfPluginLwipIpv4TokenStruct * ipv4Token);
 
-struct netif  *emberAfPluginLwipGetNetIf(void);
+struct netif * emberAfPluginLwipGetNetIf(void);
 
-void emberAfPluginLwipPrintBigEndianEthernetAddress(const EmberEthernetAddress* ethernetAddress);
+void emberAfPluginLwipPrintBigEndianEthernetAddress(const EmberEthernetAddress * ethernetAddress);
 
 void emberAfPluginLwipPrintHostOrderIpv4Address(uint32_t hostOrderIpv4Address);
 
-void emberAfPluginLwipPrintIpv4Parameters(uint32_t hostOrderIpv4Address,
-                                          uint32_t hostOrderNetmask,
-                                          uint32_t hostOrderGateway);
+void emberAfPluginLwipPrintIpv4Parameters(uint32_t hostOrderIpv4Address, uint32_t hostOrderNetmask, uint32_t hostOrderGateway);
 
 void emberAfPluginLwipTickCallback(void);
 

@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief SoC specific code related to the event table.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief SoC specific code related to the event
+                                                                               *table.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "../../include/af.h"
 #include "../../util/common.h"
@@ -48,13 +49,13 @@
 
 void emberDsaSignHandler(EmberStatus status, EmberMessageBuffer message)
 {
-  // Message has been queued by the stack for sending.  Nothing more to do.
-  emAfCryptoOperationComplete();
+    // Message has been queued by the stack for sending.  Nothing more to do.
+    emAfCryptoOperationComplete();
 
-  if (status != EMBER_SUCCESS) {
-    emAfNoteSignatureFailure();
-  }
+    if (status != EMBER_SUCCESS)
+    {
+        emAfNoteSignatureFailure();
+    }
 
-  emberAfDemandResponseLoadControlClusterPrintln("emberDsaSignHandler() returned 0x%x",
-                                                 status);
+    emberAfDemandResponseLoadControlClusterPrintln("emberDsaSignHandler() returned 0x%x", status);
 }

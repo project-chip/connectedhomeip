@@ -31,19 +31,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the GBCS Gas Meter plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the GBCS Gas Meter
+                                                                               *plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef GBCS_GAS_METER_H_
 #define GBCS_GAS_METER_H_
 
 // Printing macros for plugin: GBCS Gas Meter
-#define emberAfPluginGbcsGasMeterPrint(...)    emberAfAppPrint(__VA_ARGS__)
-#define emberAfPluginGbcsGasMeterPrintln(...)  emberAfAppPrintln(__VA_ARGS__)
-#define emberAfPluginGbcsGasMeterDebugExec(x)  emberAfAppDebugExec(x)
+#define emberAfPluginGbcsGasMeterPrint(...) emberAfAppPrint(__VA_ARGS__)
+#define emberAfPluginGbcsGasMeterPrintln(...) emberAfAppPrintln(__VA_ARGS__)
+#define emberAfPluginGbcsGasMeterDebugExec(x) emberAfAppDebugExec(x)
 #define emberAfPluginGbcsGasMeterPrintBuffer(buffer, len, withSpace) emberAfAppPrintBuffer(buffer, len, withSpace)
 
 /** @brief Reports attributes.

@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Dispatching 802.15.4 scan results to interested parties.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Dispatching 802.15.4 scan results to
+                                                                               *interested parties.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef SILABS_SCAN_DISPATCH_H
 #define SILABS_SCAN_DISPATCH_H
@@ -52,57 +53,58 @@
  * @brief The size of the dispatch queue.
  */
 #ifndef EMBER_AF_PLUGIN_SCAN_DISPATCH_SCAN_QUEUE_SIZE
-  #define EMBER_AF_PLUGIN_SCAN_DISPATCH_SCAN_QUEUE_SIZE 10
+#define EMBER_AF_PLUGIN_SCAN_DISPATCH_SCAN_QUEUE_SIZE 10
 #endif
 
 /**
  * @brief The information regarding scan results.
  */
-typedef struct {
-  /** The status indicating the success or failure of a scan.
-   *
-   * This member is only valid when
-   * ::emberAfPluginScanDispatchScanResultsAreComplete returns true.
-   */
-  EmberStatus status;
+typedef struct
+{
+    /** The status indicating the success or failure of a scan.
+     *
+     * This member is only valid when
+     * ::emberAfPluginScanDispatchScanResultsAreComplete returns true.
+     */
+    EmberStatus status;
 
-  /** The RSSI found during a scan.
-   *
-   * This member is only valid when
-   * ::emberAfPluginScanDispatchScanResultsAreComplete returns false.
-   */
-  int8_t rssi;
+    /** The RSSI found during a scan.
+     *
+     * This member is only valid when
+     * ::emberAfPluginScanDispatchScanResultsAreComplete returns false.
+     */
+    int8_t rssi;
 
-  /** The channel on which the scan is taking place.
-   *
-   * This member is only valid when the results are for an energy scan or
-   * ::emberAfPluginScanDispatchScanResultsAreComplete returns true and
-   * ::emberAfPluginScanDispatchScanResultsAreFailure returns false. Note
-   * that in active scan results, users can find the channel on which the network
-   * was found using the network member of this structure.
-   */
-  uint8_t channel;
+    /** The channel on which the scan is taking place.
+     *
+     * This member is only valid when the results are for an energy scan or
+     * ::emberAfPluginScanDispatchScanResultsAreComplete returns true and
+     * ::emberAfPluginScanDispatchScanResultsAreFailure returns false. Note
+     * that in active scan results, users can find the channel on which the network
+     * was found using the network member of this structure.
+     */
+    uint8_t channel;
 
-  /** The LQI found during the scan.
-   *
-   * This member is only valid when the result are for an active scan.
-   */
-  uint8_t lqi;
+    /** The LQI found during the scan.
+     *
+     * This member is only valid when the result are for an active scan.
+     */
+    uint8_t lqi;
 
-  /** The Zigbee network found in the scan.
-   *
-   * This member is only valid when the result are for an active scan.
-   */
-  EmberZigbeeNetwork *network;
+    /** The Zigbee network found in the scan.
+     *
+     * This member is only valid when the result are for an active scan.
+     */
+    EmberZigbeeNetwork * network;
 
-  /** A mask containing information about the scan. */
-  uint16_t mask;
+    /** A mask containing information about the scan. */
+    uint16_t mask;
 } EmberAfPluginScanDispatchScanResults;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  #define EM_AF_PLUGIN_SCAN_DISPATCH_SCAN_RESULTS_MASK_SCAN_TYPE (0x00FF)
-  #define EM_AF_PLUGIN_SCAN_DISPATCH_SCAN_RESULTS_MASK_COMPLETE  (0x0100)
-  #define EM_AF_PLUGIN_SCAN_DISPATCH_SCAN_RESULTS_MASK_FAILURE   (0x0200)
+#define EM_AF_PLUGIN_SCAN_DISPATCH_SCAN_RESULTS_MASK_SCAN_TYPE (0x00FF)
+#define EM_AF_PLUGIN_SCAN_DISPATCH_SCAN_RESULTS_MASK_COMPLETE (0x0100)
+#define EM_AF_PLUGIN_SCAN_DISPATCH_SCAN_RESULTS_MASK_FAILURE (0x0200)
 #endif
 
 /** @brief Gets the scan type.
@@ -116,12 +118,10 @@ typedef struct {
  * @return The ::EmberNetworkScanType of the scan results.
  */
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-EmberNetworkScanType
-emberAfPluginScanDispatchScanResultsGetScanType(EmberAfPluginScanDispatchScanResults *results);
+EmberNetworkScanType emberAfPluginScanDispatchScanResultsGetScanType(EmberAfPluginScanDispatchScanResults * results);
 #else
-  #define emberAfPluginScanDispatchScanResultsGetScanType(results) \
-  ((EmberNetworkScanType)((results)->mask                          \
-                          & EM_AF_PLUGIN_SCAN_DISPATCH_SCAN_RESULTS_MASK_SCAN_TYPE))
+#define emberAfPluginScanDispatchScanResultsGetScanType(results)                                                                   \
+    ((EmberNetworkScanType)((results)->mask & EM_AF_PLUGIN_SCAN_DISPATCH_SCAN_RESULTS_MASK_SCAN_TYPE))
 #endif
 
 /** @brief Results are complete.
@@ -138,12 +138,10 @@ emberAfPluginScanDispatchScanResultsGetScanType(EmberAfPluginScanDispatchScanRes
  * @return Indicates whether or not the scan for the scan results is complete.
  */
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-bool
-emberAfPluginScanDispatchScanResultsAreComplete(EmberAfPluginScanDispatchScanResults *results);
+bool emberAfPluginScanDispatchScanResultsAreComplete(EmberAfPluginScanDispatchScanResults * results);
 #else
-  #define emberAfPluginScanDispatchScanResultsAreComplete(results) \
-  HIGH_BYTE(((results)->mask                                       \
-             & EM_AF_PLUGIN_SCAN_DISPATCH_SCAN_RESULTS_MASK_COMPLETE))
+#define emberAfPluginScanDispatchScanResultsAreComplete(results)                                                                   \
+    HIGH_BYTE(((results)->mask & EM_AF_PLUGIN_SCAN_DISPATCH_SCAN_RESULTS_MASK_COMPLETE))
 #endif
 
 /** @brief Results in a failure.
@@ -158,31 +156,30 @@ emberAfPluginScanDispatchScanResultsAreComplete(EmberAfPluginScanDispatchScanRes
  * results.
  */
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-bool
-emberAfPluginScanDispatchScanResultsAreFailure(EmberAfPluginScanDispatchScanResults *results);
+bool emberAfPluginScanDispatchScanResultsAreFailure(EmberAfPluginScanDispatchScanResults * results);
 #else
-  #define emberAfPluginScanDispatchScanResultsAreFailure(results) \
-  HIGH_BYTE(((results)->mask                                      \
-             & EM_AF_PLUGIN_SCAN_DISPATCH_SCAN_RESULTS_MASK_FAILURE))
+#define emberAfPluginScanDispatchScanResultsAreFailure(results)                                                                    \
+    HIGH_BYTE(((results)->mask & EM_AF_PLUGIN_SCAN_DISPATCH_SCAN_RESULTS_MASK_FAILURE))
 #endif
 
 /**
  * @brief Handles scan results.
  */
-typedef void (*EmberAfPluginScanDispatchScanResultsHandler)(EmberAfPluginScanDispatchScanResults *results);
+typedef void (*EmberAfPluginScanDispatchScanResultsHandler)(EmberAfPluginScanDispatchScanResults * results);
 
 /**
  * @brief A structure containing data for scheduling a scan.
  */
-typedef struct {
-  /** The 802.15.4 scan type to be scheduled. */
-  EmberNetworkScanType scanType;
-  /** The channel mask to be scanned. */
-  uint32_t channelMask;
-  /** The duration of the scan period, as an exponent. */
-  uint8_t duration;
-  /** The handler to be called with the scan results. */
-  EmberAfPluginScanDispatchScanResultsHandler handler;
+typedef struct
+{
+    /** The 802.15.4 scan type to be scheduled. */
+    EmberNetworkScanType scanType;
+    /** The channel mask to be scanned. */
+    uint32_t channelMask;
+    /** The duration of the scan period, as an exponent. */
+    uint8_t duration;
+    /** The handler to be called with the scan results. */
+    EmberAfPluginScanDispatchScanResultsHandler handler;
 } EmberAfPluginScanDispatchScanData;
 
 /** @brief Schedules a scan.
@@ -197,7 +194,7 @@ typedef struct {
  * @return An ::EmberStatus value describing the result of the scheduling of
  * a scan.
  */
-EmberStatus emberAfPluginScanDispatchScheduleScan(EmberAfPluginScanDispatchScanData *data);
+EmberStatus emberAfPluginScanDispatchScheduleScan(EmberAfPluginScanDispatchScanData * data);
 
 /** @brief Removes all consumers in the queue.
  *

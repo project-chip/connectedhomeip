@@ -31,36 +31,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
-#include "app/util/common/form-and-join.h"
 #include "app/framework/plugin/ezmode-commissioning/ez-mode.h"
 #include "app/framework/plugin/reporting/reporting.h"
+#include "app/util/common/form-and-join.h"
 
 // Event control struct declarations
 EmberEventControl buttonEventControl;
 
-static uint8_t const happyTune[] = {
-  NOTE_B4, 1,
-  0, 1,
-  NOTE_B5, 1,
-  0, 0
-};
-static uint8_t const sadTune[] = {
-  NOTE_B5, 1,
-  0, 1,
-  NOTE_B4, 5,
-  0, 0
-};
-static uint8_t const waitTune[] = {
-  NOTE_B4, 1,
-  0, 0
-};
+static uint8_t const happyTune[] = { NOTE_B4, 1, 0, 1, NOTE_B5, 1, 0, 0 };
+static uint8_t const sadTune[]   = { NOTE_B5, 1, 0, 1, NOTE_B4, 5, 0, 0 };
+static uint8_t const waitTune[]  = { NOTE_B4, 1, 0, 0 };
 
 #define LED BOARDLED1
 
@@ -80,25 +67,26 @@ static uint16_t clusterIds[] = { ZCL_ON_OFF_CLUSTER_ID };
 
 void buttonEventHandler(void)
 {
-  emberEventControlSetInactive(buttonEventControl);
-  if (halButtonState(BUTTON0) == BUTTON_PRESSED) {
-    EmberNetworkStatus state = emberAfNetworkState();
-    if (state == EMBER_JOINED_NETWORK) {
-      emberAfEzmodeClientCommission(emberAfPrimaryEndpoint(),
-                                    EMBER_AF_EZMODE_COMMISSIONING_SERVER_TO_CLIENT,
-                                    clusterIds,
-                                    COUNTOF(clusterIds));
-    } else if (state == EMBER_NO_NETWORK) {
-      halPlayTune_P(((emberFormAndJoinIsScanning()
-                      || (emberAfStartSearchForJoinableNetwork()
-                          == EMBER_SUCCESS))
-                     ? waitTune
-                     : sadTune),
-                    true);
+    emberEventControlSetInactive(buttonEventControl);
+    if (halButtonState(BUTTON0) == BUTTON_PRESSED)
+    {
+        EmberNetworkStatus state = emberAfNetworkState();
+        if (state == EMBER_JOINED_NETWORK)
+        {
+            emberAfEzmodeClientCommission(emberAfPrimaryEndpoint(), EMBER_AF_EZMODE_COMMISSIONING_SERVER_TO_CLIENT, clusterIds,
+                                          COUNTOF(clusterIds));
+        }
+        else if (state == EMBER_NO_NETWORK)
+        {
+            halPlayTune_P(
+                ((emberFormAndJoinIsScanning() || (emberAfStartSearchForJoinableNetwork() == EMBER_SUCCESS)) ? waitTune : sadTune),
+                true);
+        }
     }
-  } else if (halButtonState(BUTTON1) == BUTTON_PRESSED) {
-    emberAfEzmodeServerCommission(emberAfPrimaryEndpoint());
-  }
+    else if (halButtonState(BUTTON1) == BUTTON_PRESSED)
+    {
+        emberAfEzmodeServerCommission(emberAfPrimaryEndpoint());
+    }
 }
 
 /** @brief Stack Status
@@ -113,14 +101,17 @@ void buttonEventHandler(void)
  */
 bool emberAfStackStatusCallback(EmberStatus status)
 {
-  // If we go up or down, let the user know, although the down case shouldn't
-  // happen.
-  if (status == EMBER_NETWORK_UP) {
-    halPlayTune_P(happyTune, true);
-  } else if (status == EMBER_NETWORK_DOWN) {
-    halPlayTune_P(sadTune, true);
-  }
-  return false;
+    // If we go up or down, let the user know, although the down case shouldn't
+    // happen.
+    if (status == EMBER_NETWORK_UP)
+    {
+        halPlayTune_P(happyTune, true);
+    }
+    else if (status == EMBER_NETWORK_DOWN)
+    {
+        halPlayTune_P(sadTune, true);
+    }
+    return false;
 }
 
 /** @brief Main Init
@@ -144,17 +135,17 @@ bool emberAfStackStatusCallback(EmberStatus status)
  */
 void emberAfMainInitCallback(void)
 {
-  EmberAfPluginReportingEntry reportingEntry;
-  reportingEntry.direction = EMBER_ZCL_REPORTING_DIRECTION_REPORTED;
-  reportingEntry.endpoint = emberAfPrimaryEndpoint();
-  reportingEntry.clusterId = ZCL_ON_OFF_CLUSTER_ID;
-  reportingEntry.attributeId = ZCL_ON_OFF_ATTRIBUTE_ID;
-  reportingEntry.mask = CLUSTER_MASK_SERVER;
-  reportingEntry.manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE;
-  reportingEntry.data.reported.minInterval = MIN_INTERVAL_S;
-  reportingEntry.data.reported.maxInterval = MAX_INTERVAL_S;
-  reportingEntry.data.reported.reportableChange = 0; // unused
-  emberAfPluginReportingConfigureReportedAttribute(&reportingEntry);
+    EmberAfPluginReportingEntry reportingEntry;
+    reportingEntry.direction                      = EMBER_ZCL_REPORTING_DIRECTION_REPORTED;
+    reportingEntry.endpoint                       = emberAfPrimaryEndpoint();
+    reportingEntry.clusterId                      = ZCL_ON_OFF_CLUSTER_ID;
+    reportingEntry.attributeId                    = ZCL_ON_OFF_ATTRIBUTE_ID;
+    reportingEntry.mask                           = CLUSTER_MASK_SERVER;
+    reportingEntry.manufacturerCode               = EMBER_AF_NULL_MANUFACTURER_CODE;
+    reportingEntry.data.reported.minInterval      = MIN_INTERVAL_S;
+    reportingEntry.data.reported.maxInterval      = MAX_INTERVAL_S;
+    reportingEntry.data.reported.reportableChange = 0; // unused
+    emberAfPluginReportingConfigureReportedAttribute(&reportingEntry);
 }
 
 /** @brief emberAfHalButtonIsrCallback
@@ -166,9 +157,10 @@ void emberAfMainInitCallback(void)
 // device. This callback is called within ISR context.
 void emberAfHalButtonIsrCallback(uint8_t button, uint8_t state)
 {
-  if ((button == BUTTON0 || button == BUTTON1) && state == BUTTON_PRESSED) {
-    emberEventControlSetActive(buttonEventControl);
-  }
+    if ((button == BUTTON0 || button == BUTTON1) && state == BUTTON_PRESSED)
+    {
+        emberEventControlSetActive(buttonEventControl);
+    }
 }
 
 /** @brief On/off Cluster Server Post Init
@@ -180,10 +172,9 @@ void emberAfHalButtonIsrCallback(uint8_t button, uint8_t state)
  */
 void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint)
 {
-  // At startup, trigger a read of the attribute and possibly a toggle of the
-  // LED to make sure they are always in sync.
-  emberAfOnOffClusterServerAttributeChangedCallback(endpoint,
-                                                    ZCL_ON_OFF_ATTRIBUTE_ID);
+    // At startup, trigger a read of the attribute and possibly a toggle of the
+    // LED to make sure they are always in sync.
+    emberAfOnOffClusterServerAttributeChangedCallback(endpoint, ZCL_ON_OFF_ATTRIBUTE_ID);
 }
 
 /** @brief Server Attribute Changed
@@ -193,26 +184,26 @@ void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint)
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfOnOffClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                       EmberAfAttributeId attributeId)
+void emberAfOnOffClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId)
 {
-  // When the on/off attribute changes, set the LED appropriately.  If an error
-  // occurs, ignore it because there's really nothing we can do.
-  if (attributeId == ZCL_ON_OFF_ATTRIBUTE_ID) {
-    bool onOff;
-    if (emberAfReadServerAttribute(endpoint,
-                                   ZCL_ON_OFF_CLUSTER_ID,
-                                   ZCL_ON_OFF_ATTRIBUTE_ID,
-                                   (uint8_t *)&onOff,
-                                   sizeof(onOff))
-        == EMBER_ZCL_STATUS_SUCCESS) {
-      if (onOff) {
-        halSetLed(LED);
-      } else {
-        halClearLed(LED);
-      }
+    // When the on/off attribute changes, set the LED appropriately.  If an error
+    // occurs, ignore it because there's really nothing we can do.
+    if (attributeId == ZCL_ON_OFF_ATTRIBUTE_ID)
+    {
+        bool onOff;
+        if (emberAfReadServerAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &onOff,
+                                       sizeof(onOff)) == EMBER_ZCL_STATUS_SUCCESS)
+        {
+            if (onOff)
+            {
+                halSetLed(LED);
+            }
+            else
+            {
+                halClearLed(LED);
+            }
+        }
     }
-  }
 }
 
 /** @brief Client Complete
@@ -223,9 +214,7 @@ void emberAfOnOffClusterServerAttributeChangedCallback(uint8_t endpoint,
  * @param bindingIndex The binding index that was created or
  * ::EMBER_NULL_BINDING if an error occurred.  Ver.: always
  */
-void emberAfPluginEzmodeCommissioningClientCompleteCallback(uint8_t bindingIndex)
-{
-}
+void emberAfPluginEzmodeCommissioningClientCompleteCallback(uint8_t bindingIndex) {}
 
 /** @brief Get Group Name
  *
@@ -236,11 +225,7 @@ void emberAfPluginEzmodeCommissioningClientCompleteCallback(uint8_t bindingIndex
  * @param groupId Group ID  Ver.: always
  * @param groupName Group Name  Ver.: always
  */
-void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint,
-                                                   uint16_t groupId,
-                                                   uint8_t * groupName)
-{
-}
+void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
 
 /** @brief Set Group Name
  *
@@ -250,11 +235,7 @@ void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint,
  * @param groupId Group ID  Ver.: always
  * @param groupName Group Name  Ver.: always
  */
-void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint,
-                                                   uint16_t groupId,
-                                                   uint8_t * groupName)
-{
-}
+void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
 
 /** @brief Group Names Supported
  *
@@ -264,7 +245,7 @@ void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint,
  */
 bool emberAfPluginGroupsServerGroupNamesSupportedCallback(uint8_t endpoint)
 {
-  return false;
+    return false;
 }
 
 /** @brief Finished
@@ -275,9 +256,7 @@ bool emberAfPluginGroupsServerGroupNamesSupportedCallback(uint8_t endpoint)
  *
  * @param status   Ver.: always
  */
-void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
-{
-}
+void emberAfPluginNetworkFindFinishedCallback(EmberStatus status) {}
 
 /** @brief Get Radio Power For Channel
  *
@@ -289,7 +268,7 @@ void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
  */
 int8_t emberAfPluginNetworkFindGetRadioPowerForChannelCallback(uint8_t channel)
 {
-  return EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_POWER;
+    return EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_POWER;
 }
 
 /** @brief Join
@@ -304,11 +283,9 @@ int8_t emberAfPluginNetworkFindGetRadioPowerForChannelCallback(uint8_t channel)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
-                                          uint8_t lqi,
-                                          int8_t rssi)
+bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }
 
 /** @brief Configured
@@ -326,5 +303,5 @@ bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
  */
 EmberAfStatus emberAfPluginReportingConfiguredCallback(const EmberAfPluginReportingEntry * entry)
 {
-  return EMBER_ZCL_STATUS_SUCCESS;
+    return EMBER_ZCL_STATUS_SUCCESS;
 }

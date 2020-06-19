@@ -40,55 +40,54 @@
 #define __AF_GEN_EVENT__
 
 // Code used to configure the cluster event mechanism
-#define EMBER_AF_GENERATED_EVENT_CODE                                                                                                                                                         \
-  EmberEventControl emberAfIdentifyClusterServerTickCallbackControl1;                                                                                                                         \
-  extern EmberEventControl buttonEventControl;                                                                                                                                                \
-  extern EmberEventControl emberAfPluginEzmodeCommissioningStateEventControl;                                                                                                                 \
-  extern EmberEventControl emberAfPluginFormAndJoinCleanupEventControl;                                                                                                                       \
-  extern EmberEventControl emberAfPluginIdentifyFeedbackProvideFeedbackEventControl;                                                                                                          \
-  extern EmberEventControl emberAfPluginNetworkFindTickEventControl;                                                                                                                          \
-  extern EmberEventControl emberAfPluginReportingTickEventControl;                                                                                                                            \
-  extern void buttonEventHandler(void);                                                                                                                                                       \
-  extern void emberAfPluginEzmodeCommissioningStateEventHandler(void);                                                                                                                        \
-  extern void emberAfPluginFormAndJoinCleanupEventHandler(void);                                                                                                                              \
-  extern void emberAfPluginIdentifyFeedbackProvideFeedbackEventHandler(void);                                                                                                                 \
-  extern void emberAfPluginNetworkFindTickEventHandler(void);                                                                                                                                 \
-  extern void emberAfPluginReportingTickEventHandler(void);                                                                                                                                   \
-  static void clusterTickWrapper(EmberEventControl * control, EmberAfTickFunction callback, uint8_t endpoint)                                                                                 \
-  {                                                                                                                                                                                           \
-    emberAfPushEndpointNetworkIndex(endpoint);                                                                                                                                                \
-    emberEventControlSetInactive(*control);                                                                                                                                                   \
-    (*callback)(endpoint);                                                                                                                                                                    \
-    emberAfPopNetworkIndex();                                                                                                                                                                 \
-  }                                                                                                                                                                                           \
-  void emberAfIdentifyClusterServerTickCallbackWrapperFunction1(void) { clusterTickWrapper(&emberAfIdentifyClusterServerTickCallbackControl1, emberAfIdentifyClusterServerTickCallback, 1); } \
-
+#define EMBER_AF_GENERATED_EVENT_CODE                                                                                              \
+    EmberEventControl emberAfIdentifyClusterServerTickCallbackControl1;                                                            \
+    extern EmberEventControl buttonEventControl;                                                                                   \
+    extern EmberEventControl emberAfPluginEzmodeCommissioningStateEventControl;                                                    \
+    extern EmberEventControl emberAfPluginFormAndJoinCleanupEventControl;                                                          \
+    extern EmberEventControl emberAfPluginIdentifyFeedbackProvideFeedbackEventControl;                                             \
+    extern EmberEventControl emberAfPluginNetworkFindTickEventControl;                                                             \
+    extern EmberEventControl emberAfPluginReportingTickEventControl;                                                               \
+    extern void buttonEventHandler(void);                                                                                          \
+    extern void emberAfPluginEzmodeCommissioningStateEventHandler(void);                                                           \
+    extern void emberAfPluginFormAndJoinCleanupEventHandler(void);                                                                 \
+    extern void emberAfPluginIdentifyFeedbackProvideFeedbackEventHandler(void);                                                    \
+    extern void emberAfPluginNetworkFindTickEventHandler(void);                                                                    \
+    extern void emberAfPluginReportingTickEventHandler(void);                                                                      \
+    static void clusterTickWrapper(EmberEventControl * control, EmberAfTickFunction callback, uint8_t endpoint)                    \
+    {                                                                                                                              \
+        emberAfPushEndpointNetworkIndex(endpoint);                                                                                 \
+        emberEventControlSetInactive(*control);                                                                                    \
+        (*callback)(endpoint);                                                                                                     \
+        emberAfPopNetworkIndex();                                                                                                  \
+    }                                                                                                                              \
+    void emberAfIdentifyClusterServerTickCallbackWrapperFunction1(void)                                                            \
+    {                                                                                                                              \
+        clusterTickWrapper(&emberAfIdentifyClusterServerTickCallbackControl1, emberAfIdentifyClusterServerTickCallback, 1);        \
+    }
 
 // EmberEventData structs used to populate the EmberEventData table
-#define EMBER_AF_GENERATED_EVENTS                                                                                          \
-  { &emberAfIdentifyClusterServerTickCallbackControl1, emberAfIdentifyClusterServerTickCallbackWrapperFunction1 },         \
-  { &buttonEventControl, buttonEventHandler },                                                                             \
-  { &emberAfPluginEzmodeCommissioningStateEventControl, emberAfPluginEzmodeCommissioningStateEventHandler },               \
-  { &emberAfPluginFormAndJoinCleanupEventControl, emberAfPluginFormAndJoinCleanupEventHandler },                           \
-  { &emberAfPluginIdentifyFeedbackProvideFeedbackEventControl, emberAfPluginIdentifyFeedbackProvideFeedbackEventHandler }, \
-  { &emberAfPluginNetworkFindTickEventControl, emberAfPluginNetworkFindTickEventHandler },                                 \
-  { &emberAfPluginReportingTickEventControl, emberAfPluginReportingTickEventHandler },                                     \
+#define EMBER_AF_GENERATED_EVENTS                                                                                                  \
+    { &emberAfIdentifyClusterServerTickCallbackControl1, emberAfIdentifyClusterServerTickCallbackWrapperFunction1 },               \
+        { &buttonEventControl, buttonEventHandler },                                                                               \
+        { &emberAfPluginEzmodeCommissioningStateEventControl, emberAfPluginEzmodeCommissioningStateEventHandler },                 \
+        { &emberAfPluginFormAndJoinCleanupEventControl, emberAfPluginFormAndJoinCleanupEventHandler },                             \
+        { &emberAfPluginIdentifyFeedbackProvideFeedbackEventControl, emberAfPluginIdentifyFeedbackProvideFeedbackEventHandler },   \
+        { &emberAfPluginNetworkFindTickEventControl, emberAfPluginNetworkFindTickEventHandler },                                   \
+        { &emberAfPluginReportingTickEventControl, emberAfPluginReportingTickEventHandler },
 
-
-#define EMBER_AF_GENERATED_EVENT_STRINGS      \
-  "Identify Cluster Server EP 1",             \
-  "Button event control",                     \
-  "EZ-Mode Commissioning Plugin State",       \
-  "Form and Join Library Plugin Cleanup",     \
-  "Identify Feedback Plugin ProvideFeedback", \
-  "Network Find Plugin Tick",                 \
-  "Reporting Plugin Tick",                    \
-
+#define EMBER_AF_GENERATED_EVENT_STRINGS                                                                                           \
+    "Identify Cluster Server EP 1", "Button event control", "EZ-Mode Commissioning Plugin State",                                  \
+        "Form and Join Library Plugin Cleanup", "Identify Feedback Plugin ProvideFeedback", "Network Find Plugin Tick",            \
+        "Reporting Plugin Tick",
 
 // The length of the event context table used to track and retrieve cluster events
 #define EMBER_AF_EVENT_CONTEXT_LENGTH 1
 
 // EmberAfEventContext structs used to populate the EmberAfEventContext table
-#define EMBER_AF_GENERATED_EVENT_CONTEXT { 0x1, 0x3, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfIdentifyClusterServerTickCallbackControl1 }
+#define EMBER_AF_GENERATED_EVENT_CONTEXT                                                                                           \
+    {                                                                                                                              \
+        0x1, 0x3, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfIdentifyClusterServerTickCallbackControl1               \
+    }
 
 #endif // __AF_GEN_EVENT__

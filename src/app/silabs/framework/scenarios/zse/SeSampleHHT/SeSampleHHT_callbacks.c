@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // This callback file is created for your convenience. You may add application
 // code to this file. If you regenerate this file over a previous version, the
@@ -43,9 +43,9 @@
 // lost.
 
 #include "app/framework/include/af.h"
-#include <stdlib.h>
 #include "app/framework/plugin/gas-proxy-function/gas-proxy-function.h"
 #include "app/framework/plugin/gbz-message-controller/gbz-message-controller.h"
+#include <stdlib.h>
 
 /** @brief Fragment Transmission Failed
  *
@@ -57,10 +57,7 @@
  * @param fragmentNum The fragment number that encountered the failure  Ver.:
  * always
  */
-void emberAfPluginInterpanFragmentTransmissionFailedCallback(int8u interpanFragmentationStatus,
-                                                             int8u fragmentNum)
-{
-}
+void emberAfPluginInterpanFragmentTransmissionFailedCallback(int8u interpanFragmentationStatus, int8u fragmentNum) {}
 
 /** @brief Message Received Over Fragments
  *
@@ -71,8 +68,5 @@ void emberAfPluginInterpanFragmentTransmissionFailedCallback(int8u interpanFragm
  * @param msgLen The message payload length  Ver.: always
  * @param message The message payload  Ver.: always
  */
-void emberAfPluginInterpanMessageReceivedOverFragmentsCallback(const EmberAfInterpanHeader *header,
-                                                               int8u msgLen,
-                                                               int8u *message)
-{
-}
+void emberAfPluginInterpanMessageReceivedOverFragmentsCallback(const EmberAfInterpanHeader * header, int8u msgLen, int8u * message)
+{}

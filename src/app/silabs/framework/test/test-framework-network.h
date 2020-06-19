@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Network stubs for AFV2 tests.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Network stubs for AFV2 tests.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 extern EmberEUI64 localEui64;
 extern EmberNodeId testFrameworkNodeId;
@@ -43,8 +43,7 @@ extern EmberNetworkStatus testFrameworkNetworkState;
 
 void setLocalEui64(EmberEUI64 eui64);
 
-void setNetworkParameters(EmberNodeType *nodeType,
-                          EmberNetworkParameters *parameters);
+void setNetworkParameters(EmberNodeType * nodeType, EmberNetworkParameters * parameters);
 
 #define EM_AF_MAX_SUPPORTED_NETWORKS_FOR_UNIT_TESTS 2
 #define EM_AF_DEFAULT_NETWORK_INDEX_FOR_UNIT_TESTS (EM_AF_MAX_SUPPORTED_NETWORKS_FOR_UNIT_TESTS - 1)

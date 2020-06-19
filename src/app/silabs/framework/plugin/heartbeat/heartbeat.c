@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Simple code to blink a light to simulate a heartbeat.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Simple code to blink a light to simulate a
+                                                                               *heartbeat.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
 #include PLATFORM_HEADER
@@ -43,11 +44,11 @@
 
 void emberAfPluginHeartbeatTickCallback(void)
 {
-  static uint32_t lastMs = 0;
-  uint32_t nowMs = halCommonGetInt32uMillisecondTick();
-  if (EMBER_AF_PLUGIN_HEARTBEAT_PERIOD_QS * MILLISECOND_TICKS_PER_QUARTERSECOND
-      < elapsedTimeInt32u(lastMs, nowMs)) {
-    halToggleLed(BOARD_HEARTBEAT_LED);
-    lastMs = nowMs;
-  }
+    static uint32_t lastMs = 0;
+    uint32_t nowMs         = halCommonGetInt32uMillisecondTick();
+    if (EMBER_AF_PLUGIN_HEARTBEAT_PERIOD_QS * MILLISECOND_TICKS_PER_QUARTERSECOND < elapsedTimeInt32u(lastMs, nowMs))
+    {
+        halToggleLed(BOARD_HEARTBEAT_LED);
+        lastMs = nowMs;
+    }
 }

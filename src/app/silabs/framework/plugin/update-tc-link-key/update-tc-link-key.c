@@ -31,16 +31,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Definitions for the Update TC Link Key plugin, which provides a way
- *        for joining devices to request a new link key after joining a Zigbee
- *        3.0 network.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Definitions for the Update TC Link Key
+                                                                               *plugin, which provides a way for joining devices to
+                                                                               *request a new link key after joining a Zigbee 3.0
+                                                                               *network.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
-#include "app/framework/include/af.h"
 #include "update-tc-link-key.h"
+#include "app/framework/include/af.h"
 
 static bool inRequest = false;
 
@@ -55,58 +56,62 @@ static uint32_t LinkKeyUpdateTimerMilliseconds = MILLISECOND_TICKS_PER_DAY;
 
 EmberStatus emberAfPluginUpdateTcLinkKeyStart(void)
 {
-  EmberStatus status;
+    EmberStatus status;
 
-  status = emberUpdateTcLinkKey(EMBER_AF_PLUGIN_UPDATE_TC_LINK_KEY_MAX_ATTEMPTS);
-  if (status == EMBER_SUCCESS) {
-    inRequest = true;
-  }
+    status = emberUpdateTcLinkKey(EMBER_AF_PLUGIN_UPDATE_TC_LINK_KEY_MAX_ATTEMPTS);
+    if (status == EMBER_SUCCESS)
+    {
+        inRequest = true;
+    }
 
-  return status;
+    return status;
 }
 
 bool emberAfPluginUpdateTcLinkKeyStop(void)
 {
-  bool wasInRequest = inRequest;
-  inRequest = false;
-  return wasInRequest;
+    bool wasInRequest = inRequest;
+    inRequest         = false;
+    return wasInRequest;
 }
 
 void emberAfPluginUpdateTcLinkKeySetDelay(uint32_t delayMs)
 {
-  emberEventControlSetDelayMS(beginTcLinkKeyUpdateEvent, delayMs);
+    emberEventControlSetDelayMS(beginTcLinkKeyUpdateEvent, delayMs);
 }
 
 void emberAfPluginUpdateTcLinkKeySetInactive(void)
 {
-  emberEventControlSetInactive(beginTcLinkKeyUpdateEvent);
+    emberEventControlSetInactive(beginTcLinkKeyUpdateEvent);
 }
 
-void emberAfPluginUpdateTcLinkKeyZigbeeKeyEstablishmentCallback(EmberEUI64 partner,
-                                                                EmberKeyStatus status)
+void emberAfPluginUpdateTcLinkKeyZigbeeKeyEstablishmentCallback(EmberEUI64 partner, EmberKeyStatus status)
 {
-  if (inRequest) {
-    emberAfCorePrint("%p:", EMBER_AF_PLUGIN_UPDATE_TC_LINK_KEY_PLUGIN_NAME);
+    if (inRequest)
+    {
+        emberAfCorePrint("%p:", EMBER_AF_PLUGIN_UPDATE_TC_LINK_KEY_PLUGIN_NAME);
 
-    if ((status == EMBER_TRUST_CENTER_LINK_KEY_ESTABLISHED)
-        || (status == EMBER_VERIFY_LINK_KEY_SUCCESS)) {
-      emberAfCorePrint(" New key established:");
-    } else if (status != EMBER_APP_LINK_KEY_ESTABLISHED) {
-      emberAfCorePrint(" Error:");
+        if ((status == EMBER_TRUST_CENTER_LINK_KEY_ESTABLISHED) || (status == EMBER_VERIFY_LINK_KEY_SUCCESS))
+        {
+            emberAfCorePrint(" New key established:");
+        }
+        else if (status != EMBER_APP_LINK_KEY_ESTABLISHED)
+        {
+            emberAfCorePrint(" Error:");
+        }
+        emberAfCorePrintln(" 0x%X", status);
+        emberAfCorePrint("Partner: ");
+        emberAfCorePrintBuffer(partner, EUI64_SIZE, true); // withSpace?
+        emberAfCorePrintln("");
+
+        // Anything greater than EMBER_TRUST_CENTER_LINK_KEY_ESTABLISHED is the
+        // final state for a joining device
+        if (status > EMBER_TRUST_CENTER_LINK_KEY_ESTABLISHED)
+        {
+            inRequest = false;
+        }
+
+        emberAfPluginUpdateTcLinkKeyStatusCallback(status);
     }
-    emberAfCorePrintln(" 0x%X", status);
-    emberAfCorePrint("Partner: ");
-    emberAfCorePrintBuffer(partner, EUI64_SIZE, true); // withSpace?
-    emberAfCorePrintln("");
-
-    // Anything greater than EMBER_TRUST_CENTER_LINK_KEY_ESTABLISHED is the
-    // final state for a joining device
-    if (status > EMBER_TRUST_CENTER_LINK_KEY_ESTABLISHED) {
-      inRequest = false;
-    }
-
-    emberAfPluginUpdateTcLinkKeyStatusCallback(status);
-  }
 }
 
 // =============================================================================
@@ -122,22 +127,22 @@ void emberAfPluginUpdateTcLinkKeyZigbeeKeyEstablishmentCallback(EmberEUI64 partn
 
 void emberAfPluginUpdateTcLinkKeyBeginTcLinkKeyUpdateEventHandler(void)
 {
-  if (!inRequest) {
-    emberEventControlSetInactive(beginTcLinkKeyUpdateEvent);
-    EmberStatus status = emberAfPluginUpdateTcLinkKeyStart();
-    emberAfCorePrintln("%p: %p: 0x%X",
-                       EMBER_AF_PLUGIN_UPDATE_TC_LINK_KEY_PLUGIN_NAME,
-                       "Starting update trust center link key process",
-                       status);
-    if (status != EMBER_SUCCESS) {
-      emberLeaveNetwork();
-      emAfPluginNetworkSteeringCleanup(status);
+    if (!inRequest)
+    {
+        emberEventControlSetInactive(beginTcLinkKeyUpdateEvent);
+        EmberStatus status = emberAfPluginUpdateTcLinkKeyStart();
+        emberAfCorePrintln("%p: %p: 0x%X", EMBER_AF_PLUGIN_UPDATE_TC_LINK_KEY_PLUGIN_NAME,
+                           "Starting update trust center link key process", status);
+        if (status != EMBER_SUCCESS)
+        {
+            emberLeaveNetwork();
+            emAfPluginNetworkSteeringCleanup(status);
+        }
     }
-  }
-  emberAfPluginUpdateTcLinkKeySetDelay(LinkKeyUpdateTimerMilliseconds);
+    emberAfPluginUpdateTcLinkKeySetDelay(LinkKeyUpdateTimerMilliseconds);
 }
 
 void emberAfPluginSetTCLinkKeyUpdateTimerMilliSeconds(uint32_t timeInMilliseconds)
 {
-  LinkKeyUpdateTimerMilliseconds = timeInMilliseconds;
+    LinkKeyUpdateTimerMilliseconds = timeInMilliseconds;
 }

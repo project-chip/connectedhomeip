@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // This callback file is created for your convenience. You may add application code
 // to this file. If you regenerate this file over a previous version, the previous
@@ -55,7 +55,7 @@ EmberEventControl priceQueryControl;
 
 // Assume we have at least one index in the ESI Table but we only care about
 // a single ESI.
-#define ESI_INDEX  0
+#define ESI_INDEX 0
 
 #define PRICE_QUERY_DELAY_MINUTES 1
 
@@ -66,32 +66,36 @@ EmberEventControl priceQueryControl;
 
 void priceQuery(void)
 {
-  // Send a get current price query
+    // Send a get current price query
 
-  EmberAfPluginEsiManagementEsiEntry* esi = emberAfPluginEsiManagementEsiLookUpByIndex(ESI_INDEX);
-  if (esi == NULL) {
-    emberAfCorePrintln("Error: No ESI's exist in table that can be queried for Price!");
-  } else {
-    EmberNodeType nodeType;
-    EmberNetworkParameters parameters;
-    EmberStatus status = emberAfGetNetworkParameters(&nodeType,
-                                                     &parameters);
-    if (status != EMBER_SUCCESS) {
-      emberAfCorePrintln("Error: Could not determine node type.");
-    } else {
-      // The parameter to this macro is 'command options'.
-      // This is defined in the spec with only 1 bit, indicating
-      // whether the receiver is an RxOnWhenIdle=true device.
-      emberAfFillCommandPriceClusterGetCurrentPrice(nodeType
-                                                    != EMBER_SLEEPY_END_DEVICE);
-      emberAfSetCommandEndpoints(MY_ENDPOINT, esi->endpoint);
-      if (status != emberAfSendCommandUnicast(EMBER_OUTGOING_DIRECT,
-                                              esi->nodeId)) {
-        emberAfCorePrintln("Failed to send price query.");
-      }
+    EmberAfPluginEsiManagementEsiEntry * esi = emberAfPluginEsiManagementEsiLookUpByIndex(ESI_INDEX);
+    if (esi == NULL)
+    {
+        emberAfCorePrintln("Error: No ESI's exist in table that can be queried for Price!");
     }
-  }
-  emberEventControlSetDelayMinutes(priceQueryControl, PRICE_QUERY_DELAY_MINUTES);
+    else
+    {
+        EmberNodeType nodeType;
+        EmberNetworkParameters parameters;
+        EmberStatus status = emberAfGetNetworkParameters(&nodeType, &parameters);
+        if (status != EMBER_SUCCESS)
+        {
+            emberAfCorePrintln("Error: Could not determine node type.");
+        }
+        else
+        {
+            // The parameter to this macro is 'command options'.
+            // This is defined in the spec with only 1 bit, indicating
+            // whether the receiver is an RxOnWhenIdle=true device.
+            emberAfFillCommandPriceClusterGetCurrentPrice(nodeType != EMBER_SLEEPY_END_DEVICE);
+            emberAfSetCommandEndpoints(MY_ENDPOINT, esi->endpoint);
+            if (status != emberAfSendCommandUnicast(EMBER_OUTGOING_DIRECT, esi->nodeId))
+            {
+                emberAfCorePrintln("Failed to send price query.");
+            }
+        }
+    }
+    emberEventControlSetDelayMinutes(priceQueryControl, PRICE_QUERY_DELAY_MINUTES);
 }
 
 /** @brief Stack Status
@@ -106,7 +110,7 @@ void priceQuery(void)
  */
 bool emberAfStackStatusCallback(EmberStatus status)
 {
-  return false;
+    return false;
 }
 
 /** @brief Registration
@@ -121,7 +125,7 @@ bool emberAfStackStatusCallback(EmberStatus status)
  */
 void emberAfRegistrationCallback(bool success)
 {
-  priceQuery();
+    priceQuery();
 }
 
 /** @brief Finished
@@ -132,9 +136,7 @@ void emberAfRegistrationCallback(bool success)
  *
  * @param status   Ver.: always
  */
-void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
-{
-}
+void emberAfPluginNetworkFindFinishedCallback(EmberStatus status) {}
 
 /** @brief Get Radio Power For Channel
  *
@@ -146,7 +148,7 @@ void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
  */
 int8_t emberAfPluginNetworkFindGetRadioPowerForChannelCallback(uint8_t channel)
 {
-  return EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_POWER;
+    return EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_POWER;
 }
 
 /** @brief Join
@@ -161,11 +163,9 @@ int8_t emberAfPluginNetworkFindGetRadioPowerForChannelCallback(uint8_t channel)
  * @param lqi   Ver.: always
  * @param rssi   Ver.: always
  */
-bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound,
-                                          uint8_t lqi,
-                                          int8_t rssi)
+bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound, uint8_t lqi, int8_t rssi)
 {
-  return true;
+    return true;
 }
 
 /** @brief Event Action
@@ -195,11 +195,10 @@ bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork * networkFound,
  * @param eventStatus Status of event  Ver.: always
  * @param sequenceNumber Sequence number  Ver.: always
  */
-bool emberAfPluginDrlcEventActionCallback(EmberAfLoadControlEvent * loadControlEvent,
-                                          EmberAfAmiEventStatus eventStatus,
+bool emberAfPluginDrlcEventActionCallback(EmberAfLoadControlEvent * loadControlEvent, EmberAfAmiEventStatus eventStatus,
                                           uint8_t sequenceNumber)
 {
-  return true;
+    return true;
 }
 
 /** @brief Price Started
@@ -210,13 +209,10 @@ bool emberAfPluginDrlcEventActionCallback(EmberAfLoadControlEvent * loadControlE
  */
 void emberAfPluginPriceClientPriceStartedCallback(EmberAfPluginPriceClientPrice * price)
 {
-  // Assume US dollars, kwh, and less than $1 price.
-  // In theory we could decode that from the price entry.
-  emberAfCorePrint("Current Price: $0.%d/kwh. Duration:", price->price);
-  emberAfCorePrintln((price->durationInMinutes == 0xFFFF
-                      ? " forever"
-                      : " %d minutes"),
-                     price->durationInMinutes);
+    // Assume US dollars, kwh, and less than $1 price.
+    // In theory we could decode that from the price entry.
+    emberAfCorePrint("Current Price: $0.%d/kwh. Duration:", price->price);
+    emberAfCorePrintln((price->durationInMinutes == 0xFFFF ? " forever" : " %d minutes"), price->durationInMinutes);
 }
 
 /** @brief Price Expired
@@ -228,7 +224,7 @@ void emberAfPluginPriceClientPriceStartedCallback(EmberAfPluginPriceClientPrice 
  */
 void emberAfPluginPriceClientPriceExpiredCallback(EmberAfPluginPriceClientPrice * price)
 {
-  emberAfCorePrintln("Price expired.");
+    emberAfCorePrintln("Price expired.");
 }
 
 /** @brief Button Event
@@ -242,7 +238,4 @@ void emberAfPluginPriceClientPriceExpiredCallback(EmberAfPluginPriceClientPrice 
  * @param buttonNumber The button number that was pressed.  Ver.: always
  * @param buttonPressDurationMs The number of milliseconds the button was pressed.
  */
-void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
-                                                   uint32_t buttonPressDurationMs)
-{
-}
+void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber, uint32_t buttonPressDurationMs) {}

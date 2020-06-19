@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief Routines for bootloading an SOC.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief Routines for bootloading an SOC.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
 
@@ -44,13 +44,12 @@
 
 //------------------------------------------------------------------------------
 
-uint8_t emberAfOtaBootloadCallback(const EmberAfOtaImageId* id,
-                                   uint16_t ncpUpgradeTagId)
+uint8_t emberAfOtaBootloadCallback(const EmberAfOtaImageId * id, uint16_t ncpUpgradeTagId)
 {
-  halAppBootloaderInstallNewImage();
+    halAppBootloaderInstallNewImage();
 
-  emberAfCorePrintln("Bootloading failed!");
+    emberAfCorePrintln("Bootloading failed!");
 
-  // If we got here, it is a failure.
-  return 1;
+    // If we got here, it is a failure.
+    return 1;
 }

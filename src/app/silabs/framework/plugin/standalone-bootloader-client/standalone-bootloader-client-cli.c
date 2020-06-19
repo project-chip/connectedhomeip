@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief This file defines the standalone bootloader client CLI.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief This file defines the standalone bootloader
+                                                                               *client CLI.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #include "app/framework/include/af.h"
 #include "app/framework/plugin/standalone-bootloader-common/bootloader-protocol.h"
@@ -51,9 +52,8 @@
 
 #ifndef EMBER_AF_GENERATE_CLI
 EmberCommandEntry emberAfPluginStandaloneBootloaderClientCommands[] = {
-  emberCommandEntryAction("status", emAfStandaloneBootloaderClientPrintStatus, "",
-                          "Prints the current status of the client"),
-  emberCommandEntryTerminator(),
+    emberCommandEntryAction("status", emAfStandaloneBootloaderClientPrintStatus, "", "Prints the current status of the client"),
+    emberCommandEntryTerminator(),
 };
 #endif // EMBER_AF_GENERATE_CLI
 //------------------------------------------------------------------------------

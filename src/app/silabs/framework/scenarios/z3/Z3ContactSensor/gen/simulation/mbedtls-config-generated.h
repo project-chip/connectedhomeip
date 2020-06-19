@@ -31,12 +31,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file mbedtls-config-generated.h
- * @brief mbed TLS configuration file. This file is generated do not modify it directly. Please use the mbed TLS setup instead.
- *
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file mbedtls-config-generated.h
+                                                                               * @brief mbed TLS configuration file. This file is
+                                                                               *generated do not modify it directly. Please use the
+                                                                               *mbed TLS setup instead.
+                                                                               *
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 #ifndef MBEDTLS_CONFIG_GENERATED_H
 #define MBEDTLS_CONFIG_GENERATED_H

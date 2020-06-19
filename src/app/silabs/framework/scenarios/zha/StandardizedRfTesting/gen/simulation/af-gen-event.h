@@ -40,138 +40,104 @@
 #define __AF_GEN_EVENT__
 
 // Code used to configure the cluster event mechanism
-#define EMBER_AF_GENERATED_EVENT_CODE                                   \
-  extern EmberEventControl changeChannelWithPingEventControl;           \
-  extern EmberEventControl custom1EventControl;                         \
-  extern EmberEventControl custom2EventControl;                         \
-  extern EmberEventControl custom3EventControl;                         \
-  extern EmberEventControl custom4EventControl;                         \
-  extern EmberEventControl custom5EventControl;                         \
-  extern EmberEventControl custom6EventControl;                         \
-  extern EmberEventControl emberAfPluginFormAndJoinCleanupEventControl; \
-  extern EmberEventControl findWithPingEventControl;                    \
-  extern EmberEventControl initEventControl;                            \
-  extern EmberEventControl pingTimerEventControl;                       \
-  extern EmberEventControl rebootWithPingEventControl;                  \
-  extern EmberEventControl sendAckEventControl;                         \
-  extern EmberEventControl sendEndRxTestEventControl;                   \
-  extern EmberEventControl sendGetChannelResponseEventControl;          \
-  extern EmberEventControl sendGetHardwareVersionEventControl;          \
-  extern EmberEventControl sendGetHardwareVersionResponseEventControl;  \
-  extern EmberEventControl sendGetPowerEventControl;                    \
-  extern EmberEventControl sendGetPowerResponseEventControl;            \
-  extern EmberEventControl sendGetRebootByteResponseEventControl;       \
-  extern EmberEventControl sendGetSoftwareVersionEventControl;          \
-  extern EmberEventControl sendGetSoftwareVersionResponseEventControl;  \
-  extern EmberEventControl sendPingEventControl;                        \
-  extern EmberEventControl sendRebootEventControl;                      \
-  extern EmberEventControl sendReportEventControl;                      \
-  extern EmberEventControl sendSetChannelEventControl;                  \
-  extern EmberEventControl sendSetPowerEventControl;                    \
-  extern EmberEventControl sendStartRxTestEventControl;                 \
-  extern EmberEventControl sendStreamEventControl;                      \
-  extern EmberEventControl setChannelEventControl;                      \
-  extern EmberEventControl streamTimerEventControl;                     \
-  extern void changeChannelWithPingEventFunction(void);                 \
-  extern void custom1EventFunction(void);                               \
-  extern void custom2EventFunction(void);                               \
-  extern void custom3EventFunction(void);                               \
-  extern void custom4EventFunction(void);                               \
-  extern void custom5EventFunction(void);                               \
-  extern void custom6EventFunction(void);                               \
-  extern void emberAfPluginFormAndJoinCleanupEventHandler(void);        \
-  extern void findWithPingEventFunction(void);                          \
-  extern void initEventFunction(void);                                  \
-  extern void pingTimerEventFunction(void);                             \
-  extern void rebootWithPingEventFunction(void);                        \
-  extern void sendAckEventFunction(void);                               \
-  extern void sendEndRxTestEventFunction(void);                         \
-  extern void sendGetChannelResponseEventFunction(void);                \
-  extern void sendGetHardwareVersionEventFunction(void);                \
-  extern void sendGetHardwareVersionResponseEventFunction(void);        \
-  extern void sendGetPowerEventFunction(void);                          \
-  extern void sendGetPowerResponseEventFunction(void);                  \
-  extern void sendGetRebootByteResponseEventFunction(void);             \
-  extern void sendGetSoftwareVersionEventFunction(void);                \
-  extern void sendGetSoftwareVersionResponseEventFunction(void);        \
-  extern void sendPingEventFunction(void);                              \
-  extern void sendRebootEventFunction(void);                            \
-  extern void sendReportEventFunction(void);                            \
-  extern void sendSetChannelEventFunction(void);                        \
-  extern void sendSetPowerEventFunction(void);                          \
-  extern void sendStartRxTestEventFunction(void);                       \
-  extern void sendStreamEventFunction(void);                            \
-  extern void setChannelEventFunction(void);                            \
-  extern void streamTimerEventFunction(void);                           \
-
+#define EMBER_AF_GENERATED_EVENT_CODE                                                                                              \
+    extern EmberEventControl changeChannelWithPingEventControl;                                                                    \
+    extern EmberEventControl custom1EventControl;                                                                                  \
+    extern EmberEventControl custom2EventControl;                                                                                  \
+    extern EmberEventControl custom3EventControl;                                                                                  \
+    extern EmberEventControl custom4EventControl;                                                                                  \
+    extern EmberEventControl custom5EventControl;                                                                                  \
+    extern EmberEventControl custom6EventControl;                                                                                  \
+    extern EmberEventControl emberAfPluginFormAndJoinCleanupEventControl;                                                          \
+    extern EmberEventControl findWithPingEventControl;                                                                             \
+    extern EmberEventControl initEventControl;                                                                                     \
+    extern EmberEventControl pingTimerEventControl;                                                                                \
+    extern EmberEventControl rebootWithPingEventControl;                                                                           \
+    extern EmberEventControl sendAckEventControl;                                                                                  \
+    extern EmberEventControl sendEndRxTestEventControl;                                                                            \
+    extern EmberEventControl sendGetChannelResponseEventControl;                                                                   \
+    extern EmberEventControl sendGetHardwareVersionEventControl;                                                                   \
+    extern EmberEventControl sendGetHardwareVersionResponseEventControl;                                                           \
+    extern EmberEventControl sendGetPowerEventControl;                                                                             \
+    extern EmberEventControl sendGetPowerResponseEventControl;                                                                     \
+    extern EmberEventControl sendGetRebootByteResponseEventControl;                                                                \
+    extern EmberEventControl sendGetSoftwareVersionEventControl;                                                                   \
+    extern EmberEventControl sendGetSoftwareVersionResponseEventControl;                                                           \
+    extern EmberEventControl sendPingEventControl;                                                                                 \
+    extern EmberEventControl sendRebootEventControl;                                                                               \
+    extern EmberEventControl sendReportEventControl;                                                                               \
+    extern EmberEventControl sendSetChannelEventControl;                                                                           \
+    extern EmberEventControl sendSetPowerEventControl;                                                                             \
+    extern EmberEventControl sendStartRxTestEventControl;                                                                          \
+    extern EmberEventControl sendStreamEventControl;                                                                               \
+    extern EmberEventControl setChannelEventControl;                                                                               \
+    extern EmberEventControl streamTimerEventControl;                                                                              \
+    extern void changeChannelWithPingEventFunction(void);                                                                          \
+    extern void custom1EventFunction(void);                                                                                        \
+    extern void custom2EventFunction(void);                                                                                        \
+    extern void custom3EventFunction(void);                                                                                        \
+    extern void custom4EventFunction(void);                                                                                        \
+    extern void custom5EventFunction(void);                                                                                        \
+    extern void custom6EventFunction(void);                                                                                        \
+    extern void emberAfPluginFormAndJoinCleanupEventHandler(void);                                                                 \
+    extern void findWithPingEventFunction(void);                                                                                   \
+    extern void initEventFunction(void);                                                                                           \
+    extern void pingTimerEventFunction(void);                                                                                      \
+    extern void rebootWithPingEventFunction(void);                                                                                 \
+    extern void sendAckEventFunction(void);                                                                                        \
+    extern void sendEndRxTestEventFunction(void);                                                                                  \
+    extern void sendGetChannelResponseEventFunction(void);                                                                         \
+    extern void sendGetHardwareVersionEventFunction(void);                                                                         \
+    extern void sendGetHardwareVersionResponseEventFunction(void);                                                                 \
+    extern void sendGetPowerEventFunction(void);                                                                                   \
+    extern void sendGetPowerResponseEventFunction(void);                                                                           \
+    extern void sendGetRebootByteResponseEventFunction(void);                                                                      \
+    extern void sendGetSoftwareVersionEventFunction(void);                                                                         \
+    extern void sendGetSoftwareVersionResponseEventFunction(void);                                                                 \
+    extern void sendPingEventFunction(void);                                                                                       \
+    extern void sendRebootEventFunction(void);                                                                                     \
+    extern void sendReportEventFunction(void);                                                                                     \
+    extern void sendSetChannelEventFunction(void);                                                                                 \
+    extern void sendSetPowerEventFunction(void);                                                                                   \
+    extern void sendStartRxTestEventFunction(void);                                                                                \
+    extern void sendStreamEventFunction(void);                                                                                     \
+    extern void setChannelEventFunction(void);                                                                                     \
+    extern void streamTimerEventFunction(void);
 
 // EmberEventData structs used to populate the EmberEventData table
-#define EMBER_AF_GENERATED_EVENTS                                                                \
-  { &changeChannelWithPingEventControl, changeChannelWithPingEventFunction },                    \
-  { &custom1EventControl, custom1EventFunction },                                                \
-  { &custom2EventControl, custom2EventFunction },                                                \
-  { &custom3EventControl, custom3EventFunction },                                                \
-  { &custom4EventControl, custom4EventFunction },                                                \
-  { &custom5EventControl, custom5EventFunction },                                                \
-  { &custom6EventControl, custom6EventFunction },                                                \
-  { &emberAfPluginFormAndJoinCleanupEventControl, emberAfPluginFormAndJoinCleanupEventHandler }, \
-  { &findWithPingEventControl, findWithPingEventFunction },                                      \
-  { &initEventControl, initEventFunction },                                                      \
-  { &pingTimerEventControl, pingTimerEventFunction },                                            \
-  { &rebootWithPingEventControl, rebootWithPingEventFunction },                                  \
-  { &sendAckEventControl, sendAckEventFunction },                                                \
-  { &sendEndRxTestEventControl, sendEndRxTestEventFunction },                                    \
-  { &sendGetChannelResponseEventControl, sendGetChannelResponseEventFunction },                  \
-  { &sendGetHardwareVersionEventControl, sendGetHardwareVersionEventFunction },                  \
-  { &sendGetHardwareVersionResponseEventControl, sendGetHardwareVersionResponseEventFunction },  \
-  { &sendGetPowerEventControl, sendGetPowerEventFunction },                                      \
-  { &sendGetPowerResponseEventControl, sendGetPowerResponseEventFunction },                      \
-  { &sendGetRebootByteResponseEventControl, sendGetRebootByteResponseEventFunction },            \
-  { &sendGetSoftwareVersionEventControl, sendGetSoftwareVersionEventFunction },                  \
-  { &sendGetSoftwareVersionResponseEventControl, sendGetSoftwareVersionResponseEventFunction },  \
-  { &sendPingEventControl, sendPingEventFunction },                                              \
-  { &sendRebootEventControl, sendRebootEventFunction },                                          \
-  { &sendReportEventControl, sendReportEventFunction },                                          \
-  { &sendSetChannelEventControl, sendSetChannelEventFunction },                                  \
-  { &sendSetPowerEventControl, sendSetPowerEventFunction },                                      \
-  { &sendStartRxTestEventControl, sendStartRxTestEventFunction },                                \
-  { &sendStreamEventControl, sendStreamEventFunction },                                          \
-  { &setChannelEventControl, setChannelEventFunction },                                          \
-  { &streamTimerEventControl, streamTimerEventFunction },                                        \
+#define EMBER_AF_GENERATED_EVENTS                                                                                                  \
+    { &changeChannelWithPingEventControl, changeChannelWithPingEventFunction }, { &custom1EventControl, custom1EventFunction },    \
+        { &custom2EventControl, custom2EventFunction }, { &custom3EventControl, custom3EventFunction },                            \
+        { &custom4EventControl, custom4EventFunction }, { &custom5EventControl, custom5EventFunction },                            \
+        { &custom6EventControl, custom6EventFunction },                                                                            \
+        { &emberAfPluginFormAndJoinCleanupEventControl, emberAfPluginFormAndJoinCleanupEventHandler },                             \
+        { &findWithPingEventControl, findWithPingEventFunction }, { &initEventControl, initEventFunction },                        \
+        { &pingTimerEventControl, pingTimerEventFunction }, { &rebootWithPingEventControl, rebootWithPingEventFunction },          \
+        { &sendAckEventControl, sendAckEventFunction }, { &sendEndRxTestEventControl, sendEndRxTestEventFunction },                \
+        { &sendGetChannelResponseEventControl, sendGetChannelResponseEventFunction },                                              \
+        { &sendGetHardwareVersionEventControl, sendGetHardwareVersionEventFunction },                                              \
+        { &sendGetHardwareVersionResponseEventControl, sendGetHardwareVersionResponseEventFunction },                              \
+        { &sendGetPowerEventControl, sendGetPowerEventFunction },                                                                  \
+        { &sendGetPowerResponseEventControl, sendGetPowerResponseEventFunction },                                                  \
+        { &sendGetRebootByteResponseEventControl, sendGetRebootByteResponseEventFunction },                                        \
+        { &sendGetSoftwareVersionEventControl, sendGetSoftwareVersionEventFunction },                                              \
+        { &sendGetSoftwareVersionResponseEventControl, sendGetSoftwareVersionResponseEventFunction },                              \
+        { &sendPingEventControl, sendPingEventFunction }, { &sendRebootEventControl, sendRebootEventFunction },                    \
+        { &sendReportEventControl, sendReportEventFunction }, { &sendSetChannelEventControl, sendSetChannelEventFunction },        \
+        { &sendSetPowerEventControl, sendSetPowerEventFunction }, { &sendStartRxTestEventControl, sendStartRxTestEventFunction },  \
+        { &sendStreamEventControl, sendStreamEventFunction }, { &setChannelEventControl, setChannelEventFunction },                \
+        { &streamTimerEventControl, streamTimerEventFunction },
 
-
-#define EMBER_AF_GENERATED_EVENT_STRINGS              \
-  "Change channel with ping event control",           \
-  "Custom1 event control",                            \
-  "Custom2 event control",                            \
-  "Custom3 event control",                            \
-  "Custom4 event control",                            \
-  "Custom5 event control",                            \
-  "Custom6 event control",                            \
-  "Form and Join Library Plugin Cleanup",             \
-  "Find with ping event control",                     \
-  "Init event control",                               \
-  "Ping timer event control",                         \
-  "Reboot with ping event control",                   \
-  "Send ack event control",                           \
-  "Send end rx test event control",                   \
-  "Send get channel response event control",          \
-  "Send get hardware version event control",          \
-  "Send get hardware version response event control", \
-  "Send get power event control",                     \
-  "Send get power response event control",            \
-  "Send get reboot byte response event control",      \
-  "Send get software version event control",          \
-  "Send get software version response event control", \
-  "Send ping event control",                          \
-  "Send reboot event control",                        \
-  "Send report event control",                        \
-  "Send set channel event control",                   \
-  "Send set power event control",                     \
-  "Send start rx test event control",                 \
-  "Send stream event control",                        \
-  "Set channel event control",                        \
-  "Stream timer event control",                       \
-
+#define EMBER_AF_GENERATED_EVENT_STRINGS                                                                                           \
+    "Change channel with ping event control", "Custom1 event control", "Custom2 event control", "Custom3 event control",           \
+        "Custom4 event control", "Custom5 event control", "Custom6 event control", "Form and Join Library Plugin Cleanup",         \
+        "Find with ping event control", "Init event control", "Ping timer event control", "Reboot with ping event control",        \
+        "Send ack event control", "Send end rx test event control", "Send get channel response event control",                     \
+        "Send get hardware version event control", "Send get hardware version response event control",                             \
+        "Send get power event control", "Send get power response event control", "Send get reboot byte response event control",    \
+        "Send get software version event control", "Send get software version response event control", "Send ping event control",  \
+        "Send reboot event control", "Send report event control", "Send set channel event control",                                \
+        "Send set power event control", "Send start rx test event control", "Send stream event control",                           \
+        "Set channel event control", "Stream timer event control",
 
 #endif // __AF_GEN_EVENT__

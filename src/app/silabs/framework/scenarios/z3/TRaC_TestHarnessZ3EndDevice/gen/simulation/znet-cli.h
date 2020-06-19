@@ -83,7 +83,8 @@
  */
 
 /** @brief <b>bsend [srcEndpoint:1] </b>
- *   - <i>Send using a binding based on the clusterId in the globalApsFrame and the srcEndpoint specified (if the src endpoint is zero it only sends based on the clusterId)</i>
+ *   - <i>Send using a binding based on the clusterId in the globalApsFrame and the srcEndpoint specified (if the src endpoint is
+ * zero it only sends based on the clusterId)</i>
  *     - srcEndpoint - INT8U - Source endpoint to send a binding based message from
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_BUILD_SEND_MSG_BSEND
@@ -114,7 +115,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_BUILD_SEND_MSG_INTERPAN_SHORT
 
 /** @brief <b>raw [clusterId:2] [data:-1] </b>
- *   - <i>Creates a message by specifying the raw bytes. Use "send" to send the message once it has been created. Ex: raw 0x000F {00 0A 00 11 22 33 44 55} sends a message to cluster 15 (0x000F) of length 8 which includes the ZCL header.</i>
+ *   - <i>Creates a message by specifying the raw bytes. Use "send" to send the message once it has been created. Ex: raw 0x000F {00
+ * 0A 00 11 22 33 44 55} sends a message to cluster 15 (0x000F) of length 8 which includes the ZCL header.</i>
  *     - clusterId - INT16U - two byte cluster id
  *     - data - OCTET_STRING - ZCL message, including ZCL header and payload
  */
@@ -142,7 +144,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_BUILD_SEND_MSG_SEND_MULTICAST
 
 /** @brief <b>timesync [id:2] [srcEndpoint:1] [destEndpoint:1] </b>
- *   - <i>This sends a read attr for the time of the device specified. It sets a flag so when it gets the response it writes the time to its own time attr</i>
+ *   - <i>This sends a read attr for the time of the device specified. It sets a flag so when it gets the response it writes the
+ * time to its own time attr</i>
  *     - id - INT16U - two byte short id of the time server
  *     - srcEndpoint - INT8U - source endpoint to send time sync from
  *     - destEndpoint - INT8U - destination endpoint to expect response on
@@ -215,7 +218,8 @@
 
 /** @brief <b>zcl use-next-sequence [useNextSequence:1] </b>
  *   - <i>Sets the flag to use the incremented sequence number from the framework for the next raw command.</i>
- *     - useNextSequence - BOOLEAN - bool value indicating whether raw command will use the incremented seq number from framework, set(1) or not(0).
+ *     - useNextSequence - BOOLEAN - bool value indicating whether raw command will use the incremented seq number from framework,
+ * set(1) or not(0).
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_GENERAL_ZCL_USE_NEXT_SEQUENCE
 
@@ -308,7 +312,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_ZCL_GLOBAL_ZCL_GLOBAL_REPORT_READ
 
-/** @brief <b>zcl global send-me-a-report [cluster:2] [attributeId:2] [dataType:1] [minReportTime:2] [maxReportTime:2] [reportableChange:-1] </b>
+/** @brief <b>zcl global send-me-a-report [cluster:2] [attributeId:2] [dataType:1] [minReportTime:2] [maxReportTime:2]
+ * [reportableChange:-1] </b>
  *   - <i>Creates a global send me a report command for the associated values.</i>
  *     - cluster - INT16U - The cluster id of the requested report.
  *     - attributeId - INT16U - The attribute id for requested report.
@@ -359,13 +364,15 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_INFO_DEBUGPRINT_ALL_ON
 
 /** @brief <b>debugprint off [area:1] </b>
- *   - <i>Turns off compiled in debug printing for a specific debug printing area. Debug print areas are defined in the generated <application>.h header file.</i>
+ *   - <i>Turns off compiled in debug printing for a specific debug printing area. Debug print areas are defined in the generated
+ * <application>.h header file.</i>
  *     - area - INT8U - The debug area mask listed in the <application>.h file
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_INFO_DEBUGPRINT_OFF
 
 /** @brief <b>debugprint on [area:1] </b>
- *   - <i>Turns on compiled in debug printing for a specific debug printing area. Debug print areas are defined in the generated <application>.h header file.</i>
+ *   - <i>Turns on compiled in debug printing for a specific debug printing area. Debug print areas are defined in the generated
+ * <application>.h header file.</i>
  *     - area - INT8U - The debug area mask listed in the <application>.h file
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_INFO_DEBUGPRINT_ON
@@ -437,8 +444,10 @@
  */
 
 /** @brief <b>network broad-pjoin [seconds:1] </b>
- *   - <i>Permit joining on the network for a given number of seconds AND broadcast a ZDO Mgmt Permit Joining request to all routers.</i>
- *     - seconds - INT8U - Number of seconds during which devices will be allowed to join the network. A value of 0xff turns permit joining on permanently
+ *   - <i>Permit joining on the network for a given number of seconds AND broadcast a ZDO Mgmt Permit Joining request to all
+ * routers.</i>
+ *     - seconds - INT8U - Number of seconds during which devices will be allowed to join the network. A value of 0xff turns permit
+ * joining on permanently
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_NETWORK_BROAD_PJOIN
 
@@ -466,7 +475,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_NETWORK_FIND_JOINABLE
 
 /** @brief <b>network find unused </b>
- *   - <i>Begin a search for an unused Channel and Pan Id. Will automatically form a network on the first unused Channel and Pan Id it finds.</i>
+ *   - <i>Begin a search for an unused Channel and Pan Id. Will automatically form a network on the first unused Channel and Pan Id
+ * it finds.</i>
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_NETWORK_FIND_UNUSED
 
@@ -502,7 +512,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_NETWORK_LEAVE
 
 /** @brief <b>network multi-phy-start [page:1] [channel:1] [power:1] </b>
- *   - <i>To start multi phy interface other than native and form the network. The stack uses same PanId as native radio network.</i>
+ *   - <i>To start multi phy interface other than native and form the network. The stack uses same PanId as native radio
+ * network.</i>
  *     - page - INT8U - The page on which to form the network.
  *     - channel - INT8U - The channel on which to form the network.
  *     - power - INT8S - One byte signed value indicating the TX power that the radio should be set to
@@ -516,27 +527,33 @@
 
 /** @brief <b>network pjoin [seconds:1] </b>
  *   - <i>Permit joining on the network for a given number of seconds</i>
- *     - seconds - INT8U - Number of seconds during which devices will be allowed to join the network. A value of 0xff turns permit joining on permanently
+ *     - seconds - INT8U - Number of seconds during which devices will be allowed to join the network. A value of 0xff turns permit
+ * joining on permanently
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_NETWORK_PJOIN
 
 /** @brief <b>network rejoin [haveCurrentNetworkKey:1] [channelMask:4] </b>
  *   - <i>Rejoin an existing network in a secure or insecure manner.</i>
- *     - haveCurrentNetworkKey - INT8U - Boolean indicating whether the device can rejoin secure or not. 1=rejoin with encryption, 0=rejoin without encryption
+ *     - haveCurrentNetworkKey - INT8U - Boolean indicating whether the device can rejoin secure or not. 1=rejoin with encryption,
+ * 0=rejoin without encryption
  *     - channelMask - INT32U - 4 byte channel mask which should be used to search for the network to rejoin.
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_NETWORK_REJOIN
 
 /** @brief <b>network rejoin-diff-device-type [haveCurrentNetworkKey:1] [channelMask:4] [nodeType:1] </b>
  *   - <i>Rejoin an existing network in a secure or insecure manner with a different device type.</i>
- *     - haveCurrentNetworkKey - INT8U - Boolean indicating whether the device can rejoin secure or not. 1=rejoin with encryption, 0=rejoin without encryption
+ *     - haveCurrentNetworkKey - INT8U - Boolean indicating whether the device can rejoin secure or not. 1=rejoin with encryption,
+ * 0=rejoin without encryption
  *     - channelMask - INT32U - 4 byte channel mask which should be used to search for the network to rejoin.
- *     - nodeType - INT8U - An enumeration indicating the device type to rejoin as.The stack only accepts EMBER_END_DEVICE and EMBER_SLEEPY_END_DEVICE.
+ *     - nodeType - INT8U - An enumeration indicating the device type to rejoin as.The stack only accepts EMBER_END_DEVICE and
+ * EMBER_SLEEPY_END_DEVICE.
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_NETWORK_REJOIN_DIFF_DEVICE_TYPE
 
 /** @brief <b>network set [networkIndex:1] </b>
- *   - <i>Set the network index used by all future CLI commands.  Before executing a CLI command, the framework will switch to this network.  After the command finishes executing, the framework will switch back to the previous network.  The CLI uses the same network index until the device resets or it is changed through this command.</i>
+ *   - <i>Set the network index used by all future CLI commands.  Before executing a CLI command, the framework will switch to this
+ * network.  After the command finishes executing, the framework will switch back to the previous network.  The CLI uses the same
+ * network index until the device resets or it is changed through this command.</i>
  *     - networkIndex - INT8U - The network index to use for CLI commands
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_NETWORK_SET
@@ -548,17 +565,21 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_NETWORK_TIMEOUT_OPTION_MASK
 
 /** @brief <b>option apsretry default </b>
- *   - <i>Forces the AppFramework to set/clear the APS Retry option (in APS Frame options mask) for all subsequent outgoing messages; a value of "default" allows the AppFramework to use its own default logic to determine when the APS Retry option should be used.</i>
+ *   - <i>Forces the AppFramework to set/clear the APS Retry option (in APS Frame options mask) for all subsequent outgoing
+ * messages; a value of "default" allows the AppFramework to use its own default logic to determine when the APS Retry option should
+ * be used.</i>
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_OPTION_APSRETRY_DEFAULT
 
 /** @brief <b>option apsretry off </b>
- *   - <i>Forces the AppFramework to set/clear the APS Retry option (in APS Frame options mask) for all subsequent outgoing messages; Turns APS retry off</i>
+ *   - <i>Forces the AppFramework to set/clear the APS Retry option (in APS Frame options mask) for all subsequent outgoing
+ * messages; Turns APS retry off</i>
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_OPTION_APSRETRY_OFF
 
 /** @brief <b>option apsretry on </b>
- *   - <i>Forces the AppFramework to set/clear the APS Retry option (in APS Frame options mask) for all subsequent outgoing messages; Turns APS retry on.</i>
+ *   - <i>Forces the AppFramework to set/clear the APS Retry option (in APS Frame options mask) for all subsequent outgoing
+ * messages; Turns APS retry on.</i>
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_OPTION_APSRETRY_ON
 
@@ -578,7 +599,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_NETWORK_OPTION_BINDING_TABLE_SET
 
 /** @brief <b>option disc [profileId:2] [clusterId:2] </b>
- *   - <i>Sends a ZDO Match Descriptor Request for the server side of the specified cluster from the specified application profile. Match Descriptor Responses received are printed to the serial output.</i>
+ *   - <i>Sends a ZDO Match Descriptor Request for the server side of the specified cluster from the specified application profile.
+ * Match Descriptor Responses received are printed to the serial output.</i>
  *     - profileId - INT16U - the profile id to send with the discovery message
  *     - clusterId - INT16U - cluster id to send with the discovery message
  */
@@ -629,7 +651,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SECURITY_KEYS_PRINT
 
 /** @brief <b>option install-code [keyTableIndex:1] [ieeeAddress:8] [installCode:-1] </b>
- *   - <i>Derives a link key from an install code, sets it in the transient key table for Z3 applications or sets it in the link key table for SE applications.</i>
+ *   - <i>Derives a link key from an install code, sets it in the transient key table for Z3 applications or sets it in the link key
+ * table for SE applications.</i>
  *     - keyTableIndex - INT8U - index into the link key table
  *     - ieeeAddress - IEEE_ADDRESS - IEEE address to enter into the link key table
  *     - installCode - OCTET_STRING - install code including two-byte, little-endian CRC
@@ -637,7 +660,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SECURITY_OPTION_INSTALL_CODE
 
 /** @brief <b>option link [keyTableIndex:1] [ieeeAddress:8] [linkKey:-1] </b>
- *   - <i>Sets a link key in the link key table. Example: option link 0x00 { 06 00 ab 41 64 30 00 0a } {aa bb cc dd ee ff aa bb cc dd ee ff aa bb cc dd}</i>
+ *   - <i>Sets a link key in the link key table. Example: option link 0x00 { 06 00 ab 41 64 30 00 0a } {aa bb cc dd ee ff aa bb cc
+ * dd ee ff aa bb cc dd}</i>
  *     - keyTableIndex - INT8U - index into the link key table
  *     - ieeeAddress - IEEE_ADDRESS - IEEE address to enter into the link key table
  *     - linkKey - OCTET_STRING - link key to enter into the table
@@ -645,7 +669,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SECURITY_OPTION_LINK
 
 /** @brief <b>option register </b>
- *   - <i>Initiates Smart Energy Registration including Key Establishment. This command expects that the device has already joined a smart energy network.</i>
+ *   - <i>Initiates Smart Energy Registration including Key Establishment. This command expects that the device has already joined a
+ * smart energy network.</i>
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SECURITY_OPTION_REGISTER
 
@@ -661,18 +686,24 @@
 
 /** @brief <b>option security set-allow-trust-center-rejoin-using-well-known-key [allowTrustCenterRejoinUsingWellKnownKey:1] </b>
  *   - <i>Set whether or not a Trust Center application will allow trust center rejoins for devices using the well-known key.</i>
- *     - allowTrustCenterRejoinUsingWellKnownKey - BOOLEAN - Whether or not the Trust Center should allow trust center rejoins for devices using the well-known key.
+ *     - allowTrustCenterRejoinUsingWellKnownKey - BOOLEAN - Whether or not the Trust Center should allow trust center rejoins for
+ * devices using the well-known key.
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SECURITY_OPTION_SECURITY_SET_ALLOW_TRUST_CENTER_REJOIN_USING_WELL_KNOWN_KEY
 
-/** @brief <b>option security set-allow-trust-center-rejoin-using-well-known-key-timeout [trustCenterRejoinUsingWellKnownKeyTimeout:2] </b>
- *   - <i>Sets the number of seconds to allow trust center rejoins for devices using the well-known key. A value of 0 means the policy should not be changed after a timeout. This must be called prior to forming or joining a network.</i>
- *     - trustCenterRejoinUsingWellKnownKeyTimeout - INT16U - The number of seconds that trust center rejoins will be responded to using the well-known link key.
+/** @brief <b>option security set-allow-trust-center-rejoin-using-well-known-key-timeout
+ * [trustCenterRejoinUsingWellKnownKeyTimeout:2] </b>
+ *   - <i>Sets the number of seconds to allow trust center rejoins for devices using the well-known key. A value of 0 means the
+ * policy should not be changed after a timeout. This must be called prior to forming or joining a network.</i>
+ *     - trustCenterRejoinUsingWellKnownKeyTimeout - INT16U - The number of seconds that trust center rejoins will be responded to
+ * using the well-known link key.
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_SECURITY_OPTION_SECURITY_SET_ALLOW_TRUST_CENTER_REJOIN_USING_WELL_KNOWN_KEY_TIMEOUT
 
 /** @brief <b>option security set-key-request-policy [tcLinkKeyRequestPolicy:1] [appLinkKeyRequestPolicy:1] </b>
- *   - <i>Sets the local policy for handling TC link key requests and application link key requests. This command sets the emberTrustCenterLinkKeyRequestPolicy and emberAppLinkKeyRequestPolicy attributes. This command should only be entered on the trust center.</i>
+ *   - <i>Sets the local policy for handling TC link key requests and application link key requests. This command sets the
+ * emberTrustCenterLinkKeyRequestPolicy and emberAppLinkKeyRequestPolicy attributes. This command should only be entered on the
+ * trust center.</i>
  *     - tcLinkKeyRequestPolicy - INT8U - The value to assign to emberTrustCenterLinkKeyRequestPolicy
  *     - appLinkKeyRequestPolicy - INT8U - The value to assign to emberAppLinkKeyRequestPolicy
  */
@@ -816,7 +847,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_ZDO_ZDO_NWK_UPD_SCAN
 
 /** @brief <b>zdo nwk-upd scan-chan-mask [targetNodeId:2] [scanDuration:1] [scanCount:2] [channelMask:4] </b>
- *   - <i>Performs an energy scan on given channel mask. This can be used to perform scanning with page number embedded in channel mask, it mainly used for subghz network. The stack shall send network enhanced update request if page is non-zero.</i>
+ *   - <i>Performs an energy scan on given channel mask. This can be used to perform scanning with page number embedded in channel
+ * mask, it mainly used for subghz network. The stack shall send network enhanced update request if page is non-zero.</i>
  *     - targetNodeId - INT16U - Two byte short id of the target device
  *     - scanDuration - INT8U - One byte scan duration. Must be in range 0 - 5
  *     - scanCount - INT16U - Number of scans to perform. Must be in range 1 - 8
@@ -872,7 +904,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_ZDO_ZDO_UNBIND_GROUP
 
-/** @brief <b>zdo unbind unicast [target:2] [source eui64:8] [source endpoint:1] [clusterID:2] [destinationEUI64:8] [destEndpoint:1] </b>
+/** @brief <b>zdo unbind unicast [target:2] [source eui64:8] [source endpoint:1] [clusterID:2] [destinationEUI64:8] [destEndpoint:1]
+ * </b>
  *   - <i>Sends an unbind request for a unicast binding to the target device.</i>
  *     - target - INT16U - Target node ID
  *     - source eui64 - IEEE_ADDRESS - The source EUI64 of the binding (the remote device's EUI64)
@@ -1155,7 +1188,8 @@
 
 /** @brief <b>plugin end-device-support poll-completed-callback [pollCompletedCallbackCommand:1] </b>
  *   - <i>Sets whether the device's poll completed callback function is enabled.</i>
- *     - pollCompletedCallbackCommand - BOOLEAN - The value indicating whether the device's poll completed callback function is enabled.
+ *     - pollCompletedCallbackCommand - BOOLEAN - The value indicating whether the device's poll completed callback function is
+ * enabled.
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_END_DEVICE_SUPPORT_PLUGIN_END_DEVICE_SUPPORT_POLL_COMPLETED_CALLBACK
 
@@ -1244,7 +1278,8 @@
 
 /** @brief <b>plugin idle-sleep awake-when-not-joined [stayAwakeWhenNotJoined:1] </b>
  *   - <i>Sets whether the device stays awake when not joined to a ZigBee network.</i>
- *     - stayAwakeWhenNotJoined - BOOLEAN - The value indicating whether the device should stay awake when not joined to a ZigBee network.
+ *     - stayAwakeWhenNotJoined - BOOLEAN - The value indicating whether the device should stay awake when not joined to a ZigBee
+ * network.
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_IDLE_SLEEP_PLUGIN_IDLE_SLEEP_AWAKE_WHEN_NOT_JOINED
 
@@ -1363,26 +1398,35 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_OTA_SERVER_PLUGIN_OTA_SERVER_LOAD_FILE
 
-/** @brief <b>plugin ota-server notify [destination:2] [endpoint:1] [payloadType:1] [jitter:1] [manuf-id:2] [imageTypeId:2] [version:4] </b>
- *   - <i>Sends an OTA Image Notify message to the specified destination indicating a new version of an image is available for download.</i>
+/** @brief <b>plugin ota-server notify [destination:2] [endpoint:1] [payloadType:1] [jitter:1] [manuf-id:2] [imageTypeId:2]
+ * [version:4] </b>
+ *   - <i>Sends an OTA Image Notify message to the specified destination indicating a new version of an image is available for
+ * download.</i>
  *     - destination - INT16U - The node ID (can be a broadcast address) to which this OTA Notify message should be sent
- *     - endpoint - INT8U - Target endpoint for the OTA Notify message (only really meaningful for non-broadcast target destination).
- *     - payloadType - INT8U - Used to specify which parameters you want included in the OTA Notify cluster command payload (0 = jitter value only; 1 = jitter and manufacturer id; 2 = jitter, mfr id, and device id; 3 = jitter, mfr id, device id, and firmware version)
- *     - jitter - INT8U - Corresponds to QueryJitter parameter in the OTA Upgrade cluster specification. The parameter indicates whether the client receiving Image Notify Command should send in Query Next Image Request command or not.
+ *     - endpoint - INT8U - Target endpoint for the OTA Notify message (only really meaningful for non-broadcast target
+ * destination).
+ *     - payloadType - INT8U - Used to specify which parameters you want included in the OTA Notify cluster command payload (0 =
+ * jitter value only; 1 = jitter and manufacturer id; 2 = jitter, mfr id, and device id; 3 = jitter, mfr id, device id, and firmware
+ * version)
+ *     - jitter - INT8U - Corresponds to QueryJitter parameter in the OTA Upgrade cluster specification. The parameter indicates
+ * whether the client receiving Image Notify Command should send in Query Next Image Request command or not.
  *     - manuf-id - INT16U - Manufacturer ID for the image being advertised (should match the mfr ID in the OTA file's header)
- *     - imageTypeId - INT16U - Image type ID for the image being advertised (should match the image type ID from the OTA file's header)
+ *     - imageTypeId - INT16U - Image type ID for the image being advertised (should match the image type ID from the OTA file's
+ * header)
  *     - version - INT32U - Firmware version of the image being advertised (should match the version from the OTA file's header)
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_OTA_SERVER_PLUGIN_OTA_SERVER_NOTIFY
 
 /** @brief <b>plugin ota-server policy block-request [policyValue:1] </b>
  *   - <i>Sets the policy used by the ota-server Policy Plugin when it receives an image block request.</i>
- *     - policyValue - INT8U - 0: Send block (default), 1: Delay download once for 2 minutes, 2: Always abort download after first block
+ *     - policyValue - INT8U - 0: Send block (default), 1: Delay download once for 2 minutes, 2: Always abort download after first
+ * block
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_OTA_SERVER_PLUGIN_OTA_SERVER_POLICY_BLOCK_REQUEST
 
 /** @brief <b>plugin ota-server policy client-delay-units [clientDelayUnits:1] </b>
- *   - <i>For testing, force the server to treat the Minimum Block Period in a certain unit (see ota-server-policy.h for values).</i>
+ *   - <i>For testing, force the server to treat the Minimum Block Period in a certain unit (see ota-server-policy.h for
+ * values).</i>
  *     - clientDelayUnits - INT8U - The unit to treat the minimum block period field.
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_OTA_SERVER_PLUGIN_OTA_SERVER_POLICY_CLIENT_DELAY_UNITS
@@ -1394,8 +1438,10 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_OTA_SERVER_PLUGIN_OTA_SERVER_POLICY_IMAGE_REQ_MIN_PERIOD
 
 /** @brief <b>plugin ota-server policy page-req-miss [modulus:1] </b>
- *   - <i>Sets the modulus number of blocks to not respond to. This is used in testing to simulate a device that fails to receive certain blocks from an Image Page Request message.</i>
- *     - modulus - INT8U - The block modulus number to skip sending when responding to an Image Page Request. E.g. if 2, every other block will not be sent. 0 turns the feature off.
+ *   - <i>Sets the modulus number of blocks to not respond to. This is used in testing to simulate a device that fails to receive
+ * certain blocks from an Image Page Request message.</i>
+ *     - modulus - INT8U - The block modulus number to skip sending when responding to an Image Page Request. E.g. if 2, every other
+ * block will not be sent. 0 turns the feature off.
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_OTA_SERVER_PLUGIN_OTA_SERVER_POLICY_PAGE_REQ_MISS
 
@@ -1412,13 +1458,15 @@
 
 /** @brief <b>plugin ota-server policy query [policyValue:1] </b>
  *   - <i>Sets the policy used by the OTA Server Policy Plugin when it receives a query request from the client.</i>
- *     - policyValue - INT8U - 0: Upgrade if server has newer (default), 1: Downgrade if server has older, 2:       Reinstall if server has same, 3: No next version (no next image is available for download)
+ *     - policyValue - INT8U - 0: Upgrade if server has newer (default), 1: Downgrade if server has older, 2:       Reinstall if
+ * server has same, 3: No next version (no next image is available for download)
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_OTA_SERVER_PLUGIN_OTA_SERVER_POLICY_QUERY
 
 /** @brief <b>plugin ota-server policy upgrade [policyValue:1] </b>
  *   - <i>Sets the policy used by the OTA Server Policy Plugin when it receives an upgrade end request</i>
- *     - policyValue - INT8U - 0: Upgrade Now (default), 1: Upgrade in 2       minutes, 2: Ask me later to upgrade, 3: Abort Upgrade (send default response)
+ *     - policyValue - INT8U - 0: Upgrade Now (default), 1: Upgrade in 2       minutes, 2: Ask me later to upgrade, 3: Abort Upgrade
+ * (send default response)
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_OTA_SERVER_PLUGIN_OTA_SERVER_POLICY_UPGRADE
 
@@ -1742,13 +1790,17 @@
 
 /** @brief <b>plugin test-harness key-establishment set-available-suite [suite:2] </b>
  *   - <i>Selects between the CBKE 163k1 and 283k1 suites.</i>
- *     - suite - INT16U - This field holds the type        of key establishment suite. It can be EMBER_AF_CBKE_KEY_ESTABLISHMENT_SUITE_163K1,        EMBER_AF_CBKE_KEY_ESTABLISHMENT_SUITE_283K1, or        EMBER_AF_INVALID_KEY_ESTABLISHMENT_SUITE
+ *     - suite - INT16U - This field holds the type        of key establishment suite. It can be
+ * EMBER_AF_CBKE_KEY_ESTABLISHMENT_SUITE_163K1,        EMBER_AF_CBKE_KEY_ESTABLISHMENT_SUITE_283K1, or
+ * EMBER_AF_INVALID_KEY_ESTABLISHMENT_SUITE
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_TEST_HARNESS_PLUGIN_TEST_HARNESS_KEY_ESTABLISHMENT_SET_AVAILABLE_SUITE
 
 /** @brief <b>plugin test-harness key-establishment suite [suite:2] </b>
  *   - <i>Selects between the CBKE 163k1 and 283k1 suites.</i>
- *     - suite - INT16U - This field holds the type        of key establishment suite. It can be EMBER_AF_CBKE_KEY_ESTABLISHMENT_SUITE_163K1,        EMBER_AF_CBKE_KEY_ESTABLISHMENT_SUITE_283K1, or        EMBER_AF_INVALID_KEY_ESTABLISHMENT_SUITE
+ *     - suite - INT16U - This field holds the type        of key establishment suite. It can be
+ * EMBER_AF_CBKE_KEY_ESTABLISHMENT_SUITE_163K1,        EMBER_AF_CBKE_KEY_ESTABLISHMENT_SUITE_283K1, or
+ * EMBER_AF_INVALID_KEY_ESTABLISHMENT_SUITE
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_TEST_HARNESS_PLUGIN_TEST_HARNESS_KEY_ESTABLISHMENT_SUITE
 
@@ -1811,7 +1863,10 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_TEST_HARNESS_PLUGIN_TEST_HARNESS_REGISTRATION_ON
 
 /** @brief <b>plugin test-harness set-compliance-revision [version:1] </b>
- *   - <i>Setting a compliance revision for a device such that the device can act as pre-R21 or R21+ for testing purposes. The reason for doing this is because the end device may send a node descriptor request and the hub will respond with the node descriptor response which will include the hub's compliance revision. If the compliance revision of the hub is R21+, only then will the TC link key request be made by the end device.</i>
+ *   - <i>Setting a compliance revision for a device such that the device can act as pre-R21 or R21+ for testing purposes. The
+ * reason for doing this is because the end device may send a node descriptor request and the hub will respond with the node
+ * descriptor response which will include the hub's compliance revision. If the compliance revision of the hub is R21+, only then
+ * will the TC link key request be made by the end device.</i>
  *     - version - INT8U - The compliance version
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_TEST_HARNESS_PLUGIN_TEST_HARNESS_SET_COMPLIANCE_REVISION
@@ -1999,7 +2054,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_TEST_HARNESS_Z3_PLUGIN_TEST_HARNESS_Z3_MGMT_LEAVE
 
-/** @brief <b>plugin test-harness z3 mgmt nwk-update-request [scanChannel:2] [scanDuration:2] [scanCount:1] [destination:2] [options:4] </b>
+/** @brief <b>plugin test-harness z3 mgmt nwk-update-request [scanChannel:2] [scanDuration:2] [scanCount:1] [destination:2]
+ * [options:4] </b>
  *   - <i>Unicast a network update command.</i>
  *     - scanChannel - INT16U - The scan channel for the command.
  *     - scanDuration - INT16U - The scan duration for the command.
@@ -2087,7 +2143,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_TEST_HARNESS_Z3_PLUGIN_TEST_HARNESS_Z3_NWK_SET_NETWORK_UPDATE_ID
 
-/** @brief <b>plugin test-harness z3 ota-server activate [shortAddress:2] [destinationEndpoint:1] [manufacturerCode:2] [imageType:2] [fileVersion:4] [fileSize:4] </b>
+/** @brief <b>plugin test-harness z3 ota-server activate [shortAddress:2] [destinationEndpoint:1] [manufacturerCode:2] [imageType:2]
+ * [fileVersion:4] [fileSize:4] </b>
  *   - <i>Configuration command to set up OTA server.</i>
  *     - shortAddress - INT16U - Short Address
  *     - destinationEndpoint - INT8U - Destination Endpoint
@@ -2109,7 +2166,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_TEST_HARNESS_Z3_PLUGIN_TEST_HARNESS_Z3_PLATFORM
 
 /** @brief <b>plugin test-harness z3 reset </b>
- *   - <i>Resets the device to a factory new state (empty tables, attributes at default values, no events queued etc) without resetting the any of the physical hardware that could cause the device to not operate on the same serial connection.</i>
+ *   - <i>Resets the device to a factory new state (empty tables, attributes at default values, no events queued etc) without
+ * resetting the any of the physical hardware that could cause the device to not operate on the same serial connection.</i>
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_TEST_HARNESS_Z3_PLUGIN_TEST_HARNESS_Z3_RESET
 
@@ -2176,7 +2234,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_TEST_HARNESS_Z3_PLUGIN_TEST_HARNESS_Z3_TOUCHLINK_IS_SCANNING
 
-/** @brief <b>plugin test-harness z3 touchlink network-join-end-device-request [networkAddress:2] [freeAddrBegin:2] [freeAddrEnd:2] [freeGroupBegin:2] [freeGroupEnd:2] [options:4] </b>
+/** @brief <b>plugin test-harness z3 touchlink network-join-end-device-request [networkAddress:2] [freeAddrBegin:2] [freeAddrEnd:2]
+ * [freeGroupBegin:2] [freeGroupEnd:2] [options:4] </b>
  *   - <i>Send a network end device join request to the target found in the scan request process.</i>
  *     - networkAddress - INT16U - The designated node ID for the target node.
  *     - freeAddrBegin - INT16U - The free address range begin.
@@ -2187,7 +2246,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_TEST_HARNESS_Z3_PLUGIN_TEST_HARNESS_Z3_TOUCHLINK_NETWORK_JOIN_END_DEVICE_REQUEST
 
-/** @brief <b>plugin test-harness z3 touchlink network-join-router-request [networkAddress:2] [freeAddrBegin:2] [freeAddrEnd:2] [freeGroupBegin:2] [freeGroupEnd:2] [options:4] </b>
+/** @brief <b>plugin test-harness z3 touchlink network-join-router-request [networkAddress:2] [freeAddrBegin:2] [freeAddrEnd:2]
+ * [freeGroupBegin:2] [freeGroupEnd:2] [options:4] </b>
  *   - <i>Send a network router join request to the target found in the scan request process.</i>
  *     - networkAddress - INT16U - The designated node ID for the target node.
  *     - freeAddrBegin - INT16U - The free address range begin.
@@ -2204,7 +2264,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_TEST_HARNESS_Z3_PLUGIN_TEST_HARNESS_Z3_TOUCHLINK_NETWORK_JOIN_ROUTER_RESPONSE_CONFIG
 
-/** @brief <b>plugin test-harness z3 touchlink network-start-request [networkAddress:2] [freeAddrBegin:2] [freeAddrEnd:2] [freeGroupBegin:2] [freeGroupEnd:2] [options:4] </b>
+/** @brief <b>plugin test-harness z3 touchlink network-start-request [networkAddress:2] [freeAddrBegin:2] [freeAddrEnd:2]
+ * [freeGroupBegin:2] [freeGroupEnd:2] [options:4] </b>
  *   - <i>Send a network start request to the target found in the scan request process.</i>
  *     - networkAddress - INT16U - The designated node ID for the target node.
  *     - freeAddrBegin - INT16U - The free address range begin.
@@ -2254,7 +2315,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_TEST_HARNESS_Z3_PLUGIN_TEST_HARNESS_Z3_TOUCHLINK_START_AS_ROUTER
 
-/** @brief <b>plugin test-harness z3 zcl read [clusterId:2] [attributeId:2] [destination:2] [srcEndpoint:1] [dstEndpoint:1] [profileId:2] </b>
+/** @brief <b>plugin test-harness z3 zcl read [clusterId:2] [attributeId:2] [destination:2] [srcEndpoint:1] [dstEndpoint:1]
+ * [profileId:2] </b>
  *   - <i>Send a ZCL ReadAttribute command.</i>
  *     - clusterId - INT16U - The cluster ID in the command.
  *     - attributeId - INT16U - The attribute ID in the command.
@@ -2274,13 +2336,15 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_TEST_HARNESS_Z3_PLUGIN_TEST_HARNESS_Z3_ZDO_ACTIVE_ENDPOINT_REQUEST
 
 /** @brief <b>plugin test-harness z3 zdo bc-device-announce [shortAddress:2] [ieeeAddress:8] </b>
- *   - <i>Rebroadcast a "fake" ZDO device announce. The device sets random frame counter values to appear as though the DeviceAnnounce has been rebroadcasted from another device on the network out of range of the DUT.</i>
+ *   - <i>Rebroadcast a "fake" ZDO device announce. The device sets random frame counter values to appear as though the
+ * DeviceAnnounce has been rebroadcasted from another device on the network out of range of the DUT.</i>
  *     - shortAddress - INT16U - Short address of the fake device announce
  *     - ieeeAddress - IEEE_ADDRESS - IEEE address of the fake device announce
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_TEST_HARNESS_Z3_PLUGIN_TEST_HARNESS_Z3_ZDO_BC_DEVICE_ANNOUNCE
 
-/** @brief <b>plugin test-harness z3 zdo bind [destination:2] [source Endpoint:1] [destEndpoint:1] [cluster:2] [remoteEUI64:8] [destEUI64:8] </b>
+/** @brief <b>plugin test-harness z3 zdo bind [destination:2] [source Endpoint:1] [destEndpoint:1] [cluster:2] [remoteEUI64:8]
+ * [destEUI64:8] </b>
  *   - <i>Send a ZDO Bind command to a device specified in the command arguments.</i>
  *     - destination - INT16U - Two byte destination node id
  *     - source Endpoint - INT8U - Remote device's source endpoint to bind
@@ -2291,7 +2355,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_TEST_HARNESS_Z3_PLUGIN_TEST_HARNESS_Z3_ZDO_BIND
 
-/** @brief <b>plugin test-harness z3 zdo bind-group [shortAddress:2] [sourceEndpoint:1] [destEndpoint:1] [destination:2] [cluster:2] [srcAddress:8] </b>
+/** @brief <b>plugin test-harness z3 zdo bind-group [shortAddress:2] [sourceEndpoint:1] [destEndpoint:1] [destination:2] [cluster:2]
+ * [srcAddress:8] </b>
  *   - <i>Send a ZDO bind command to a device specified to create a groupcast binding.</i>
  *     - shortAddress - INT16U - The destination of the ZDO command
  *     - sourceEndpoint - INT8U - Remote device's source endpoint to bind
@@ -2306,7 +2371,8 @@
  *   - <i>Send an IEEE address request.</i>
  *     - addrOfInterest - INT16U - The short address of interest
  *     - type - INT8U - The request type.
- *     - startIndex - INT8U - The start index for the requested elements of the associated devices list if the type of this command is Extended response.
+ *     - startIndex - INT8U - The start index for the requested elements of the associated devices list if the type of this command
+ * is Extended response.
  *     - destination - INT16U - The destination address of the command.
  *     - options - INT32U - The negative behavior options for this command.
  */
@@ -2378,7 +2444,8 @@
  *   - <i>Send a ZDO address request.</i>
  *     - ieeeAddress - IEEE_ADDRESS - The long address of the destination.
  *     - type - INT8U - The type of the rejoin request.
- *     - startIndex - INT8U - The start index for the requested elements of the associated devices list if the type of this command is Extended response.
+ *     - startIndex - INT8U - The start index for the requested elements of the associated devices list if the type of this command
+ * is Extended response.
  *     - destination - INT16U - The destination address of the command.
  *     - options - INT32U - The negative behavior options for this command.
  */
@@ -2426,7 +2493,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_TEST_HARNESS_Z3_PLUGIN_TEST_HARNESS_Z3_ZDO_SIMPLE_DESC_RSP_CONFIG
 
-/** @brief <b>plugin test-harness z3 zdo unbind group [target:2] [source eui64:8] [source endpoint:1] [clusterID:2] [groupAddress:2] </b>
+/** @brief <b>plugin test-harness z3 zdo unbind group [target:2] [source eui64:8] [source endpoint:1] [clusterID:2] [groupAddress:2]
+ * </b>
  *   - <i>Sends an unbind request for a multicast binding to the target device.</i>
  *     - target - INT16U - Target node ID
  *     - source eui64 - IEEE_ADDRESS - The source EUI64 of the binding (the remote device's EUI64)
@@ -2436,7 +2504,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_PLUGIN_TEST_HARNESS_Z3_PLUGIN_TEST_HARNESS_Z3_ZDO_UNBIND_GROUP
 
-/** @brief <b>plugin test-harness z3 zdo unbind unicast [target:2] [source eui64:8] [source endpoint:1] [clusterID:2] [destinationEUI64:8] [destEndpoint:1] </b>
+/** @brief <b>plugin test-harness z3 zdo unbind unicast [target:2] [source eui64:8] [source endpoint:1] [clusterID:2]
+ * [destinationEUI64:8] [destEndpoint:1] </b>
  *   - <i>Sends an unbind request for a unicast binding to the target device.</i>
  *     - target - INT16U - Target node ID
  *     - source eui64 - IEEE_ADDRESS - The source EUI64 of the binding (the remote device's EUI64)
@@ -2583,7 +2652,8 @@
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_BASIC_GLS
 
 /** @brief <b>zcl basic glsr [discoveryComplete:1] [localeSupported:-1] </b>
- *   - <i>The locales supported response command is sent in response to a get locales supported command, and is used to discover which locales the device supports.</i>
+ *   - <i>The locales supported response command is sent in response to a get locales supported command, and is used to discover
+ * which locales the device supports.</i>
  *     - discoveryComplete - INT8U
  *     - localeSupported - CHAR_STRING
  */
@@ -2772,7 +2842,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_COLOR_CONTROL_STOPMOVESTEP
 
-/** @brief <b>zcl color-control movecolortemp [moveMode:1] [rate:2] [colorTemperatureMinimum:2] [colorTemperatureMaximum:2] [optionsMask:1] [optionsOverride:1] </b>
+/** @brief <b>zcl color-control movecolortemp [moveMode:1] [rate:2] [colorTemperatureMinimum:2] [colorTemperatureMaximum:2]
+ * [optionsMask:1] [optionsOverride:1] </b>
  *   - <i>Command description for MoveColorTemperature</i>
  *     - moveMode - HueMoveMode [ENUM8]
  *     - rate - INT16U
@@ -2785,7 +2856,8 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_COLOR_CONTROL_MOVECOLORTEMP
 
-/** @brief <b>zcl color-control stepcolortemp [stepMode:1] [stepSize:2] [transitionTime:2] [colorTemperatureMinimum:2] [colorTemperatureMaximum:2] [optionsMask:1] [optionsOverride:1] </b>
+/** @brief <b>zcl color-control stepcolortemp [stepMode:1] [stepSize:2] [transitionTime:2] [colorTemperatureMinimum:2]
+ * [colorTemperatureMaximum:2] [optionsMask:1] [optionsOverride:1] </b>
  *   - <i>Command description for StepColorTemperature</i>
  *     - stepMode - HueStepMode [ENUM8]
  *     - stepSize - INT16U
@@ -2859,8 +2931,10 @@
  */
 #define EMBER_AF_DOXYGEN_CLI_COMMAND_DOOR_LOCK_CLEAR_PIN
 
-/** @brief <b>zcl lock set-weekday-schedule [scheduleId:1] [userId:2] [daysMask:1] [startHour:1] [startMinute:1] [endHour:1] [endMinute:1] </b>
- *   - <i>Set the schedule of days during the week that the associated user based on the user ID will have access to the lock and will be able to operate it.</i>
+/** @brief <b>zcl lock set-weekday-schedule [scheduleId:1] [userId:2] [daysMask:1] [startHour:1] [startMinute:1] [endHour:1]
+ * [endMinute:1] </b>
+ *   - <i>Set the schedule of days during the week that the associated user based on the user ID will have access to the lock and
+ * will be able to operate it.</i>
  *     - scheduleId - INT8U
  *     - userId - INT16U
  *     - daysMask - DoorLockDayOfWeek [BITMAP8]
@@ -3240,17 +3314,17 @@
 /** @brief <b>zcl on-off off </b>
  *   - <i>Command description for Off</i>
  */
-#define EMBER_AF_DOXYGEN_CLI_COMMAND_ON/ OFF_OFF
+#define EMBER_AF_DOXYGEN_CLI_COMMAND_ON / OFF_OFF
 
 /** @brief <b>zcl on-off on </b>
  *   - <i>Command description for On</i>
  */
-#define EMBER_AF_DOXYGEN_CLI_COMMAND_ON/ OFF_ON
+#define EMBER_AF_DOXYGEN_CLI_COMMAND_ON / OFF_ON
 
 /** @brief <b>zcl on-off toggle </b>
  *   - <i>Command description for Toggle</i>
  */
-#define EMBER_AF_DOXYGEN_CLI_COMMAND_ON/ OFF_TOGGLE
+#define EMBER_AF_DOXYGEN_CLI_COMMAND_ON / OFF_TOGGLE
 
 /** @brief <b>zcl on-off offeffect [effectId:1] [effectVariant:1] </b>
  *   - <i>Command description for OffWithEffect</i>
@@ -3259,12 +3333,12 @@
  * @sa
  * EmberAfOnOffEffectIdentifier
  */
-#define EMBER_AF_DOXYGEN_CLI_COMMAND_ON/ OFF_OFFEFFECT
+#define EMBER_AF_DOXYGEN_CLI_COMMAND_ON / OFF_OFFEFFECT
 
 /** @brief <b>zcl on-off onrecall </b>
  *   - <i>Command description for OnWithRecallGlobalScene</i>
  */
-#define EMBER_AF_DOXYGEN_CLI_COMMAND_ON/ OFF_ONRECALL
+#define EMBER_AF_DOXYGEN_CLI_COMMAND_ON / OFF_ONRECALL
 
 /** @brief <b>zcl on-off ontimedoff [onOffControl:1] [onTime:2] [offWaitTime:2] </b>
  *   - <i>Command description for OnWithTimedOff</i>
@@ -3272,7 +3346,7 @@
  *     - onTime - INT16U
  *     - offWaitTime - INT16U
  */
-#define EMBER_AF_DOXYGEN_CLI_COMMAND_ON/ OFF_ONTIMEDOFF
+#define EMBER_AF_DOXYGEN_CLI_COMMAND_ON / OFF_ONTIMEDOFF
 
 /** @} */ // end group on-off
 
@@ -3316,7 +3390,8 @@
  */
 
 /** @brief <b>zcl scenes add [groupId:2] [sceneId:1] [transitionTime:2] [sceneName:-1] [extensionFieldSets:4] </b>
- *   - <i>Add a scene to the scene table. Extension field sets are supported, and are inputed as arrays of the form [[cluster ID] [length] [value0...n] ...]</i>
+ *   - <i>Add a scene to the scene table. Extension field sets are supported, and are inputed as arrays of the form [[cluster ID]
+ * [length] [value0...n] ...]</i>
  *     - groupId - INT16U
  *     - sceneId - INT8U
  *     - transitionTime - INT16U
