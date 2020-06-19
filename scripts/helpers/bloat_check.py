@@ -9,7 +9,7 @@ import logging
 import os
 import stat
 import subprocess
-import StringIo
+import StringIO
 
 import ci_fetch_artifacts
 
