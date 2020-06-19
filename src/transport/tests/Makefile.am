@@ -87,7 +87,10 @@ COMMON_LDADD                                          = \
 
 check_PROGRAMS             = \
     TestMessageHeader        \
+<<<<<<< HEAD
     TestPeerConnections      \
+=======
+>>>>>>> Address review comments
     TestSecureSessionMgr     \
     TestSecureSession        \
     TestUDP                  \
@@ -110,9 +113,6 @@ TESTS_ENVIRONMENT             = \
 
 TestMessageHeader_SOURCES     = TestMessageHeaderDriver.cpp
 TestMessageHeader_LDADD       = $(COMMON_LDADD)
-
-TestSecurityHeader_SOURCES    = TestSecurityHeaderDriver.cpp
-TestSecurityHeader_LDADD      = $(COMMON_LDADD)
 
 TestSecureSessionMgr_SOURCES  = TestSecureSessionMgrDriver.cpp
 TestSecureSessionMgr_LDADD    = $(COMMON_LDADD)

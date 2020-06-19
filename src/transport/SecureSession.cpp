@@ -26,7 +26,6 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <support/CodeUtils.h>
 #include <transport/SecureSession.h>
-#include <transport/SecurityHeader.h>
 
 #include <string.h>
 
@@ -76,73 +75,44 @@ void SecureSession::Close(void)
     mNextIV       = 0;
 }
 
-CHIP_ERROR SecureSession::Encrypt(const unsigned char * input, size_t input_length, unsigned char * output, size_t & output_length)
+CHIP_ERROR SecureSession::Encrypt(const unsigned char * input, size_t input_length, unsigned char * output, MessageHeader & header)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    size_t overhead  = EncryptionOverhead();
     uint64_t tag     = 0;
-    SecurityHeader header;
 
     VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     VerifyOrExit(input != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(input_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(output_length >= overhead + input_length, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    error = AES_CCM_encrypt(input, input_length, NULL, 0, mKey, sizeof(mKey), (const unsigned char *) &mNextIV, sizeof(mNextIV),
+                            output, (unsigned char *) &tag, sizeof(tag));
+    SuccessOrExit(error);
 
     header.SetIV(mNextIV).SetTag(tag);
-    error =
-        AES_CCM_encrypt(input, input_length, header.RawHeader(), SecurityHeader::RawHeaderLen(), mKey, sizeof(mKey),
-                        (const unsigned char *) &mNextIV, sizeof(mNextIV), &output[overhead], (unsigned char *) &tag, sizeof(tag));
-    SuccessOrExit(error);
-
-    header.SetTag(tag);
-    error = header.Serialize(output, overhead);
-    SuccessOrExit(error);
 
     mNextIV++;
-    output_length = overhead + input_length;
 
 exit:
     return error;
 }
 
-CHIP_ERROR SecureSession::Decrypt(const unsigned char * input, size_t input_length, unsigned char * output, size_t & output_length)
+CHIP_ERROR SecureSession::Decrypt(const unsigned char * input, size_t input_length, unsigned char * output,
+                                  const MessageHeader & header)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    size_t overhead  = EncryptionOverhead();
-    uint64_t length  = input_length - overhead;
-    uint64_t tag     = 0;
-    uint64_t IV      = 0;
-    SecurityHeader header;
+    uint64_t tag     = header.GetTag();
+    uint64_t IV      = header.GetIV();
 
     VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     VerifyOrExit(input != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(input_length > overhead, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(output_length >= length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(input_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = header.Deserialize(input, overhead);
-    SuccessOrExit(error);
-
-    tag = header.Tag();
-    IV  = header.IV();
-
-    // The tag is not used in the AAD buffer. So 0 it out.
-    header.SetTag(0);
-
-    error =
-        AES_CCM_decrypt(&input[overhead], length, header.RawHeader(), SecurityHeader::RawHeaderLen(), (const unsigned char *) &tag,
-                        sizeof(tag), mKey, sizeof(mKey), (const unsigned char *) &IV, sizeof(IV), output);
-    SuccessOrExit(error);
-    output_length = length;
-
+    error = AES_CCM_decrypt(input, input_length, NULL, 0, (const unsigned char *) &tag, sizeof(tag), mKey, sizeof(mKey),
+                            (const unsigned char *) &IV, sizeof(IV), output);
 exit:
     return error;
-}
-
-size_t SecureSession::EncryptionOverhead(void)
-{
-    return SecurityHeader::RawHeaderLen();
 }
 
 } // namespace chip
