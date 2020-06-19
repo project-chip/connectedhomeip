@@ -43,7 +43,7 @@ def writeFileBloatReport(f, baselineName, buildName) -> ComparisonResult:
     logging.warning('Bloaty execution failed: %d', result.returncode)
     f.write('BLOAT EXECUTION FAILED WITH CODE %d:\n' % result.returncode)
   
-  content = result.stdout.decode('utf8'))
+  content = result.stdout.decode('utf8')
 
   f.write(content)
   f.write('\n')
