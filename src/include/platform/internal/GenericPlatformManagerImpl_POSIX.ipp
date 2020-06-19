@@ -58,6 +58,14 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack(void)
 
     mChipStackLock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
 
+    // Initialize the Configuration Manager object.
+    err = ConfigurationMgr().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Configuration Manager initialization failed: %s", ErrorStr(err));
+    }
+    SuccessOrExit(err);
+
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
     SuccessOrExit(err);

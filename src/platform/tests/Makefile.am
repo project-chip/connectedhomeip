@@ -90,6 +90,7 @@ COMMON_LDADD                                          = \
 check_PROGRAMS                                 = \
     TestPlatformTime                             \
     TestPlatformMgr                              \
+    TestConfigurationMgr                         \
     $(NULL)
 
 # TODO Add TestConfigurationMgr to check_PROGRAMS when dependent core profile are merged 
