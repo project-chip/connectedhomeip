@@ -13,14 +13,6 @@
 # limitations under the License.
 
 declare_args() {
+  # Root directory for CHIP.
   chip_root = "//"
-  nrf5_lock_app_root = "//examples/lock-app/nrf5"
 }
-
-import("lwip.gni")
-import("mbedtls.gni")
-import("nlassert.gni")
-import("nlfaultinjection.gni")
-import("nlio.gni")
-import("nlunit_test.gni")
-import("pigweed.gni")
