@@ -99,28 +99,17 @@ CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBuffer
     VerifyOrExit(StateAllowsSend(), err = CHIP_ERROR_INCORRECT_STATE);
 
     VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msgBuf->Next() == NULL, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrExit(msgBuf->TotalLength() < kMax_SecureSDU_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     {
-        uint8_t * plainText = msgBuf->Start();
-        size_t plainTextlen = msgBuf->TotalLength();
+        uint8_t * data = msgBuf->Start();
+        MessageHeader header;
 
-        uint8_t * encryptedText = plainText - CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
-        size_t encryptedLen     = plainTextlen + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
-
-        err = mSecureChannel.Encrypt(plainText, plainTextlen, encryptedText, encryptedLen);
+        err = mSecureChannel.Encrypt(data, msgBuf->TotalLength(), data, header);
         SuccessOrExit(err);
 
-        msgBuf->SetStart(encryptedText);
-
         ChipLogProgress(Inet, "Secure transport transmitting msg %u after encryption", mConnectionState.GetSendMessageIndex());
-    }
-
-    {
-        MessageHeader header;
 
         header
             .SetSourceNodeId(mLocalNodeId)    //
@@ -149,7 +138,7 @@ exit:
 void SecureSessionMgr::HandleDataReceived(const MessageHeader & header, const IPPacketInfo & pktInfo, System::PacketBuffer * msg,
                                           SecureSessionMgr * connection)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
     System::PacketBuffer * origMsg = nullptr;
 
@@ -160,37 +149,31 @@ void SecureSessionMgr::HandleDataReceived(const MessageHeader & header, const IP
         {
             connection->OnNewConnection(header, pktInfo, connection->mNewConnectionArgument);
         }
+        err = CHIP_NO_ERROR;
         ExitNow(ChipLogProgress(Inet, "Secure transport failed: state does not allow receive"));
     }
 
-    err = CHIP_ERROR_INVALID_ARGUMENT;
     VerifyOrExit(msg != nullptr, ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
     // TODO this is where messages should be decoded
     {
-        uint8_t * encryptedText = msg->Start();
-        uint16_t encryptedLen   = msg->TotalLength();
-        uint8_t * plainText     = nullptr;
-        size_t plainTextlen     = encryptedLen - CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
-
-        VerifyOrExit(encryptedLen >= CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE,
-                     ChipLogError(Inet, "Secure transport received smaller than encryption header, discarding"));
-
+        uint8_t * data      = msg->Start();
+        uint8_t * plainText = nullptr;
+        uint16_t len        = msg->TotalLength();
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         /* This is a workaround for the case where PacketBuffer payload is not allocated
            as an inline buffer to PacketBuffer structure */
         origMsg = msg;
-        msg     = PacketBuffer::NewWithAvailableSize(encryptedLen);
-        msg->SetDataLength(encryptedLen, msg);
+        msg     = PacketBuffer::NewWithAvailableSize(len);
+        msg->SetDataLength(len, msg);
 #endif
+        plainText = msg->Start();
 
-        plainText = msg->Start() + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
-        err       = connection->mSecureChannel.Decrypt(encryptedText, encryptedLen, plainText, plainTextlen);
+        err = connection->mSecureChannel.Decrypt(data, len, plainText, header);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Inet, "Secure transport failed to decrypt msg: err %d", err));
 
         if (connection->OnMessageReceived)
         {
-            msg->Consume(CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE);
             connection->OnMessageReceived(header, pktInfo, msg, connection->mMessageReceivedArgument);
             msg = nullptr;
         }

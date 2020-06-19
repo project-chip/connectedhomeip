@@ -27,6 +27,7 @@
 #define __SECURESESSION_H__
 
 #include <core/CHIPCore.h>
+#include <transport/MessageHeader.h>
 
 namespace chip {
 
@@ -55,10 +56,10 @@ public:
      * @param input Unencrypted input data
      * @param input_length Length of the input data
      * @param output Output buffer for encrypted data
-     * @param output_length Length of the output buffer
+     * @param header message header structure
      * @return CHIP_ERROR The result of encryption
      */
-    CHIP_ERROR Encrypt(const unsigned char * input, size_t input_length, unsigned char * output, size_t output_length);
+    CHIP_ERROR Encrypt(const unsigned char * input, size_t input_length, unsigned char * output, MessageHeader & header);
 
     /**
      * @brief
@@ -67,10 +68,10 @@ public:
      * @param input Encrypted input data
      * @param input_length Length of the input data
      * @param output Output buffer for decrypted data
-     * @param output_length Length of the output buffer
+     * @param header message header structure
      * @return CHIP_ERROR The result of decryption
      */
-    CHIP_ERROR Decrypt(const unsigned char * input, size_t input_length, unsigned char * output, size_t & output_length);
+    CHIP_ERROR Decrypt(const unsigned char * input, size_t input_length, unsigned char * output, const MessageHeader & header);
 
     /**
      * @brief

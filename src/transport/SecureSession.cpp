@@ -33,13 +33,6 @@ namespace chip {
 
 using namespace Crypto;
 
-typedef struct
-{
-    uint64_t payload_length;
-    uint64_t IV;
-    uint64_t tag;
-} security_header_t;
-
 SecureSession::SecureSession() : mKeyAvailable(false), mNextIV(0) {}
 
 CHIP_ERROR SecureSession::Init(const unsigned char * remote_public_key, const size_t public_key_length,
@@ -82,77 +75,44 @@ void SecureSession::Close(void)
     mNextIV       = 0;
 }
 
-CHIP_ERROR SecureSession::Encrypt(const unsigned char * input, size_t input_length, unsigned char * output, size_t output_length)
+CHIP_ERROR SecureSession::Encrypt(const unsigned char * input, size_t input_length, unsigned char * output, MessageHeader & header)
 {
-    security_header_t header;
-
     CHIP_ERROR error = CHIP_NO_ERROR;
     uint64_t tag     = 0;
-    size_t overhead  = EncryptionOverhead();
 
     VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     VerifyOrExit(input != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(input_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(output_length >= overhead + input_length, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    chip::Encoding::LittleEndian::Put64((uint8_t *) &header.payload_length, input_length);
+    error = AES_CCM_encrypt(input, input_length, NULL, 0, mKey, sizeof(mKey), (const unsigned char *) &mNextIV, sizeof(mNextIV),
+                            output, (unsigned char *) &tag, sizeof(tag));
+    SuccessOrExit(error);
 
-    // Tag and IV values are byte buffers, and are not byteorder specific.
-    header.IV  = mNextIV;
-    header.tag = 0;
+    header.SetIV(mNextIV).SetTag(tag);
 
-    error = AES_CCM_encrypt(input, input_length, (const unsigned char *) &header, sizeof(header), mKey, sizeof(mKey),
-                            (const unsigned char *) &header.IV, sizeof(header.IV), &output[overhead], (unsigned char *) &tag,
-                            sizeof(tag));
-    if (error == CHIP_NO_ERROR)
-    {
-        header.tag = tag;
-        memcpy(output, &header, sizeof(header));
-        mNextIV++;
-    }
+    mNextIV++;
 
 exit:
     return error;
 }
 
-CHIP_ERROR SecureSession::Decrypt(const unsigned char * input, size_t input_length, unsigned char * output, size_t & output_length)
+CHIP_ERROR SecureSession::Decrypt(const unsigned char * input, size_t input_length, unsigned char * output,
+                                  const MessageHeader & header)
 {
-    security_header_t header;
-
     CHIP_ERROR error = CHIP_NO_ERROR;
-    uint64_t tag     = 0;
-    size_t overhead  = EncryptionOverhead();
-    uint64_t length  = 0;
+    uint64_t tag     = header.GetTag();
+    uint64_t IV      = header.GetIV();
 
     VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     VerifyOrExit(input != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(input_length > overhead, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(input_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    memcpy(&header, input, sizeof(header));
-    length = chip::Encoding::LittleEndian::Get64((const uint8_t *) &header.payload_length);
-    tag    = header.tag;
-
-    // The tag is not used in the AAD buffer. So 0 it out.
-    header.tag = 0;
-
-    VerifyOrExit(output_length >= length, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(input_length >= length + overhead, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    error = AES_CCM_decrypt(&input[overhead], length, (const unsigned char *) &header, sizeof(header), (const unsigned char *) &tag,
-                            sizeof(tag), mKey, sizeof(mKey), (const unsigned char *) &header.IV, sizeof(header.IV), output);
-    if (error == CHIP_NO_ERROR)
-    {
-        output_length = length;
-    }
+    error = AES_CCM_decrypt(input, input_length, NULL, 0, (const unsigned char *) &tag, sizeof(tag), mKey, sizeof(mKey),
+                            (const unsigned char *) &IV, sizeof(IV), output);
 exit:
     return error;
-}
-
-size_t SecureSession::EncryptionOverhead(void)
-{
-    return sizeof(security_header_t);
 }
 
 } // namespace chip

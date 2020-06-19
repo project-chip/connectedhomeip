@@ -31,7 +31,11 @@
  * Header format (little endian):
  *
  *  16 bit: | VERSION: 4 bit | FLAGS: 4 bit | RESERVED: 8 bit |
+ *  16 bit: | Secure message type                             |
  *  32 bit: | MESSAGE_ID                                      |
+ *  32 bit: | Secure Session ID                               |
+ *  64 bit: | Encryption Initialization Vector (nonce)        |
+ *  64 bit: | Message Authentication Tag                      |
  *  64 bit: | SOURCE_NODE_ID (iff source node flag is set)    |
  *  64 bit: | DEST_NODE_ID (iff destination node flag is set) |
  *
@@ -43,7 +47,7 @@ namespace {
 using namespace chip::Encoding;
 
 /// size of the fixed portion of the header
-constexpr size_t kFixedHeaderSizeBytes = 6;
+constexpr size_t kFixedHeaderSizeBytes = 28;
 
 /// size of a serialized node id inside a header
 constexpr size_t kNodeIdSizeBytes = 8;
@@ -90,7 +94,11 @@ CHIP_ERROR MessageHeader::Decode(const uint8_t * data, size_t size, size_t * dec
     version = ((header & kVersionMask) >> kVersionShift);
     VerifyOrExit(version == kHeaderVersion, err = CHIP_ERROR_VERSION_MISMATCH);
 
-    mMessageId = LittleEndian::Read32(p);
+    mSecureMsgType   = LittleEndian::Read16(p);
+    mMessageId       = LittleEndian::Read32(p);
+    mSecureSessionID = LittleEndian::Read32(p);
+    mIV              = LittleEndian::Read64(p);
+    mTag             = LittleEndian::Read64(p);
 
     assert(p - data == kFixedHeaderSizeBytes);
     size -= kFixedHeaderSizeBytes;
@@ -99,7 +107,7 @@ CHIP_ERROR MessageHeader::Decode(const uint8_t * data, size_t size, size_t * dec
     {
         VerifyOrExit(size >= kNodeIdSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
         mSourceNodeId.SetValue(LittleEndian::Read64(p));
-        size -= kFixedHeaderSizeBytes;
+        size -= kNodeIdSizeBytes;
     }
     else
     {
@@ -110,7 +118,7 @@ CHIP_ERROR MessageHeader::Decode(const uint8_t * data, size_t size, size_t * dec
     {
         VerifyOrExit(size >= kNodeIdSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
         mDestinationNodeId.SetValue(LittleEndian::Read64(p));
-        size -= kFixedHeaderSizeBytes;
+        size -= kNodeIdSizeBytes;
     }
     else
     {
@@ -142,7 +150,11 @@ CHIP_ERROR MessageHeader::Encode(uint8_t * data, size_t size, size_t * encode_si
     }
 
     LittleEndian::Write16(p, header);
+    LittleEndian::Write16(p, mSecureMsgType);
     LittleEndian::Write32(p, mMessageId);
+    LittleEndian::Write32(p, mSecureSessionID);
+    LittleEndian::Write64(p, mIV);
+    LittleEndian::Write64(p, mTag);
     if (mSourceNodeId.HasValue())
     {
         LittleEndian::Write64(p, mSourceNodeId.Value());
