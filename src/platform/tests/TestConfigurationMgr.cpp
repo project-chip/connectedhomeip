@@ -53,6 +53,7 @@ static void TestPlatformMgr_Init(nlTestSuite * inSuite, void * inContext)
 
 static void TestConfigurationMgr_FabricId(nlTestSuite * inSuite, void * inContext)
 {
+#if CHIP_CONFIG_ENABLE_FABRIC_STATE
     CHIP_ERROR err    = CHIP_NO_ERROR;
     uint64_t fabricId = 0;
 
@@ -63,6 +64,7 @@ static void TestConfigurationMgr_FabricId(nlTestSuite * inSuite, void * inContex
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, fabricId == 2006255910626445ULL);
+#endif
 }
 
 static void TestConfigurationMgr_ServiceConfig(nlTestSuite * inSuite, void * inContext)

@@ -41,6 +41,8 @@ class ConfigurationManagerImpl;
 namespace Internal {
 template <class>
 class GenericPlatformManagerImpl;
+template <class>
+class GenericPlatformManagerImpl_POSIX;
 }
 
 /**
@@ -129,6 +131,8 @@ private:
     friend class ::chip::DeviceLayer::PlatformManagerImpl;
     template <class>
     friend class ::chip::DeviceLayer::Internal::GenericPlatformManagerImpl;
+    template <class>
+    friend class ::chip::DeviceLayer::Internal::GenericPlatformManagerImpl_POSIX;
     // Parentheses used to fix clang parsing issue with these declarations
     friend CHIP_ERROR ::chip::Platform::PersistedStorage::Read(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
     friend CHIP_ERROR ::chip::Platform::PersistedStorage::Write(::chip::Platform::PersistedStorage::Key key, uint32_t value);
