@@ -32,10 +32,9 @@ static uint32_t shortPayloadRepresentation(SetupPayload payload)
 {
     int offset      = 1;
     uint32_t result = payload.requiresCustomFlow ? 1 : 0;
-    result |= payload.setUpPINCode << offset;
-    offset += kSetupPINCodeFieldLengthInBits;
-
     result |= payload.discriminator << offset;
+    offset += kManualSetupDiscriminatorFieldLengthInBits;
+    result |= payload.setUpPINCode << offset;
     return result;
 }
 
