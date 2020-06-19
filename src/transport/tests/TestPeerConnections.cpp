@@ -51,11 +51,26 @@ const NodeId kPeer1NodeId = 123;
 const NodeId kPeer2NodeId = 6;
 const NodeId kPeer3NodeId = 81;
 
+/// A Peer connections that supports exactly 2 connections and a test time source.
+class TestPeerConnections : public PeerConnectionsBase
+{
+public:
+    TestPeerConnections() : PeerConnectionsBase(mState, ArraySize(mState)) {}
+    Time::TimeSource<Time::Source::kTest> & GetTimeSource() { return mTimeSource; }
+
+protected:
+    uint64_t GetCurrentMonotonicTimeMs() override { return mTimeSource.GetCurrentMonotonicTimeMs(); }
+
+private:
+    PeerConnectionState mState[2];
+    Time::TimeSource<Time::Source::kTest> mTimeSource;
+};
+
 void TestBasicFunctionality(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
     PeerConnectionState * statePtr;
-    PeerConnections<2, Time::Source::kTest> connections;
+    TestPeerConnections connections;
     connections.GetTimeSource().SetCurrentMonotonicTimeMs(100);
 
     err = connections.CreateNewPeerConnectionState(kPeer1Addr, nullptr);
@@ -76,7 +91,7 @@ void TestFindByAddress(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
     PeerConnectionState * statePtr;
-    PeerConnections<2, Time::Source::kTest> connections;
+    TestPeerConnections connections;
 
     err = connections.CreateNewPeerConnectionState(kPeer1Addr, nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -97,7 +112,7 @@ void TestFindByNodeId(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
     PeerConnectionState * statePtr;
-    PeerConnections<2, Time::Source::kTest> connections;
+    TestPeerConnections connections;
 
     err = connections.CreateNewPeerConnectionState(kPeer1Addr, &statePtr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -138,7 +153,7 @@ void TestExpireConnections(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err;
     ExpiredCallInfo callInfo;
     PeerConnectionState * statePtr;
-    PeerConnections<2, Time::Source::kTest> connections;
+    TestPeerConnections connections;
 
     connections.SetConnectionExpiredHandler(OnConnectionExpired, &callInfo);
 

@@ -2271,6 +2271,18 @@
 #endif // CHIP_CONFIG_ENABLE_IFJ_SERVICE_FABRIC_JOIN
 
 /**
+ * @def CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
+ *
+ * @brief Define the size of the pool used for tracking CHIP
+ * Peer connections. This defines maximum number of concurrent
+ * device connections across all supported transports.
+ */
+#ifndef CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
+#define CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE                   16
+#endif // CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
+
+
+/**
  * @def CHIP_NON_PRODUCTION_MARKER
  *
  * @brief Defines the name of a mark symbol whose presence signals that the chip code
