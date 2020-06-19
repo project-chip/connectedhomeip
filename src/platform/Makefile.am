@@ -132,6 +132,7 @@ libDeviceLayer_a_CPPFLAGS              += \
 
 libDeviceLayer_a_SOURCES               += \
     Linux/BLEManagerImpl.cpp              \
+    Linux/ConfigurationManagerImpl.cpp    \
     Linux/ConnectivityManagerImpl.cpp     \
     Linux/Logging.cpp                     \
     Linux/PosixConfig.cpp                 \
