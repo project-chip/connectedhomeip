@@ -65,12 +65,6 @@ public:
     uint64_t GetLastActivityTimeMs() const { return mLastActityTimeMs; }
     void SetLastActivityTimeMs(uint64_t value) { mLastActityTimeMs = value; }
 
-    template <class TimeSource>
-    void SetLastActivityTimeMs(TimeSource source)
-    {
-        mLastActityTimeMs = source.GetCurrentMonotonicTimeMs();
-    }
-
 private:
     PeerAddress mPeerAddress;
     NodeId mPeerNodeId         = kUndefinedNodeId;
