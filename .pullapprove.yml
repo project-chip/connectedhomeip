@@ -1,5 +1,6 @@
 version: 3
 
+# https://developer.github.com/v3/previews/#draft-pull-requests
 github_api_version: "shadow-cat-preview"
 
 ############################################################
@@ -18,18 +19,18 @@ pullapprove_conditions:
     #  Draft PRs
     ############################################################
     - condition: "'WIP' not in title"
-      unmet_status: pending
+      unmet_status: "pending"
       explanation: "Work in progress"
 
     - condition: "not draft"
-      unmet_status: pending
+      unmet_status: "pending"
       explanation: "Work in progress"
 
     ############################################################
     #  Conditions to Skip Review
     ############################################################
     - condition: "base.ref == 'master'"
-      unmet_status: success
+      unmet_status: "success"
       explanation: "Review not required unless merging to master"
 
     ############################################################
@@ -65,6 +66,8 @@ groups:
             - files.include('*')
         reviews:
             required: 3
+            request: -1
+            request_order: shuffle
         reviewers:
             teams:
                 - reviewers-amazon
