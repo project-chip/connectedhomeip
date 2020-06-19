@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/nlassert.gni")
 
 import("crypto.gni")
 
@@ -37,6 +38,8 @@ if (chip_crypto == "openssl") {
       "crypto",
     ]
   }
+} else {
+  import("//build_overrides/mbedtls.gni")
 }
 
 source_set("crypto") {
