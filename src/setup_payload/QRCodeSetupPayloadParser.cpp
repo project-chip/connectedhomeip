@@ -50,8 +50,8 @@ static CHIP_ERROR readBits(vector<uint8_t> buf, int & index, uint64_t & dest, si
     dest = 0;
     if (index + numberOfBitsToRead > buf.size() * 8 || numberOfBitsToRead > sizeof(uint64_t) * 8)
     {
-        fprintf(stderr, "Error parsing QR code. startIndex %d numberOfBitsToLoad %zu buf_len %zu ", index, numberOfBitsToRead,
-                buf.size());
+        ChipLogError(SetupPayload, "Error parsing QR code. startIndex %d numberOfBitsToLoad %zu buf_len %zu ", index,
+                     numberOfBitsToRead, buf.size());
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
