@@ -179,9 +179,9 @@ void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
 // clang-format off
 static const nlTest sTests[] =
 {
-    NL_TEST_DEF("Init",     SecureChannelInitTest),
-    NL_TEST_DEF("Encrypt",  SecureChannelEncryptTest),
-    NL_TEST_DEF("Decrypt",  SecureChannelDecryptTest),
+    NL_TEST_DEF("Init",    SecureChannelInitTest),
+    NL_TEST_DEF("Encrypt", SecureChannelEncryptTest),
+    NL_TEST_DEF("Decrypt", SecureChannelDecryptTest),
 
     NL_TEST_SENTINEL()
 };
