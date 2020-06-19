@@ -3,19 +3,36 @@
 import argparse
 import attr
 import coloredlogs
+import csv
 import github
 import logging
 import os
 import stat
 import subprocess
+import StringIo
 
 import ci_fetch_artifacts
 
+class SectionChange:
+  """Describes delta changes to a specific section"""
+  def __init__(self, section, fileChange, vmChange):
+    self.section = section
+    self.fileChange = fileChange
+    self.vmChange = vmChange
+
 class ComparisonResult:
+  """Comparison results for an entire file"""
   def __init__(self, name):
     self.fileName = name
-    self.fileSizeChange = 'UNKNOWN'
-    self.vmSizeChange = 'UNKNOWN'
+    self.sectionChanges = []
+
+
+SECTIONS_TO_WATCH = set(
+  '.rodata',
+  '.text',
+  'flash.rodata',
+  'flash.text',
+)
 
 
 def filesInDirectory(dirName):
@@ -47,10 +64,13 @@ def writeFileBloatReport(f, baselineName, buildName):
   f.write('\n')
 
   result = ComparisonResult(os.path.basename(buildName))
-  result.fileSizeChange = 'UNKNOWN'
-  result.fileSizeChange = 'UNKNOWN'
   try:
-    totalLine = next(filter(lambda l: l.endswith(',TOTAL'), a.split('\n')))
+    reader = csv.reader(StringIO.StringIO(content))
+
+    for row in reader:
+      section, vm, f = row
+      if section in SECTIONS_TO_WATCH:
+        result.sectionChanges.append(SectionChange(section, int(f), int(vm)))
   except:
     pass
 
@@ -86,12 +106,13 @@ def generateBloatReport(outputFileName,
       f.write('\n    %s'.join(outputOnly))
       f.write('\n\n')
 
+    results = []
     for name in (baselineNames & outputNames):
-      writeFileBloatReport(f, os.path.join(baselineDir, name),
-                           os.path.join(buildOutputDir, name))
+      results.append(writeFileBloatReport(f, os.path.join(baselineDir, name), os.path.join(buildOutputDir, name)))
+    return results
 
 
-def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number):
+def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number, compare_results):
   """Generates a PR comment conaining the specified file content."""
 
   logging.info('Uploading report to "%s", PR %d' % (gh_repo, gh_pr_number))
@@ -112,11 +133,15 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number):
 
      comment.delete()
 
-  # TODO: 
-  #   - Add a clear summary of size increase, by parsing the rawReportText
+  compareTable='File | Section | File | VM\n---- | ---- | ----- | ---- \n'
+  for file in compare_results:
+    for change in file.sectionChanges:
+      compareTable += '{0} | {1} | {2} | {3}' % (file.fileName, change.section, change.fileChange, change.vmChange)
 
   # NOTE: PRs are issues with attached patches, hence the API naming
   pull.create_issue_comment('''{title}
+
+  {table}
 
 <details>
   <summary>Full report output</summary>
@@ -126,7 +151,7 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number):
 ```
 
 </details>
-'''.format(title=titleHeading, jobName=job_name, rawReportText=rawText))
+'''.format(title=titleHeading, table=compareTable jobName=job_name, rawReportText=rawText))
 
 
 def main():
@@ -185,11 +210,7 @@ def main():
   except Exception as e:
     logging.warning('Failed to fetch artifacts: %r' % e)
 
-  generateBloatReport(
-      args.report_file,
-      args.artifact_download_dir,
-      args.build_output_dir,
-      title="Bloat report for job '%s'" % args.job)
+  compareResults = generateBloatReport( args.report_file, args.artifact_download_dir, args.build_output_dir, title="Bloat report for job '%s'" % args.job)
 
   if args.github_api_token and args.github_repository and args.github_comment_pr_number:
     sendFileAsPrComment(
@@ -198,6 +219,7 @@ def main():
        args.github_api_token,
        args.github_repository,
        int(args.github_comment_pr_number),
+       compareResults
     )
 
 if __name__ == '__main__':
