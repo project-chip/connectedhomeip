@@ -20,6 +20,7 @@
 #include "AES_CCM_128_test_vectors.h"
 #include "AES_CCM_256_test_vectors.h"
 #include "ECDH_P256_test_vectors.h"
+#include "Hash_SHA256_test_vectors.h"
 #include "HKDF_SHA256_test_vectors.h"
 
 #include <CHIPCryptoPAL.h>
@@ -480,6 +481,22 @@ static void TestAES_CCM_128DecryptInvalidIVLen(nlTestSuite * inSuite, void * inC
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
+static void TestHash_SHA256(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestCases     = ArraySize(hash_sha256_test_vectors);
+    int numOfTestsExecuted = 0;
+
+    for (numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
+    {
+        hash_sha256_vector v = hash_sha256_test_vectors[numOfTestsExecuted];
+        unsigned char out_buffer[kSHA256_Hash_Length];
+        Hash_SHA256(v.data, v.data_length, out_buffer);
+        bool success = memcmp(v.hash, out_buffer, sizeof(out_buffer)) == 0;
+        NL_TEST_ASSERT(inSuite, success);
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsExecuted == ArraySize(hash_sha256_test_vectors));
+}
+
 static void TestHKDF_SHA256(nlTestSuite * inSuite, void * inContext)
 {
     int numOfTestCases     = ArraySize(hkdf_sha256_test_vectors);
@@ -822,6 +839,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ECDSA signature validation fail - Different signature", TestECDSA_ValidationFailIncorrectSignature),
     NL_TEST_DEF("Test ECDSA sign msg invalid parameters", TestECDSA_SigningInvalidParams),
     NL_TEST_DEF("Test ECDSA signature validation invalid parameters", TestECDSA_ValidationInvalidParam),
+    NL_TEST_DEF("Test Hash SHA 256", TestHash_SHA256),
     NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
     NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
     NL_TEST_DEF("Test DRBG output", TestDRBG_Output),

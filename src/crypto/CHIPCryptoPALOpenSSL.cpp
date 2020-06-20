@@ -26,6 +26,7 @@
 #include <openssl/ecdsa.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
+#include <openssl/sha.h>
 #include <openssl/kdf.h>
 #include <openssl/ossl_typ.h>
 #include <openssl/rand.h>
@@ -255,6 +256,20 @@ exit:
         context = NULL;
     }
 
+    return error;
+}
+
+CHIP_ERROR chip::Crypto::Hash_SHA256(const unsigned char * data, const size_t data_length, unsigned char * out_buffer)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    // zero data length hash is supported.
+
+    VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    SHA256(data, data_length, out_buffer);
+
+exit:
     return error;
 }
 
