@@ -56,7 +56,7 @@ static void TestPlatformMgr_RunUnitTest(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err            = ConfigurationMgr().RunUnitTests();
+    err = ConfigurationMgr().RunUnitTests();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 #endif
