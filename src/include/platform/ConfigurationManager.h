@@ -113,7 +113,9 @@ public:
 
     CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo);
 
-    CHIP_ERROR RunPrimitiveUnitTest();
+#if defined(DEBUG)
+    CHIP_ERROR RunUnitTests();
+#endif
 
     bool IsServiceProvisioned();
     bool IsPairedToAccount();
@@ -468,10 +470,12 @@ inline void ConfigurationManager::InitiateFactoryReset()
     static_cast<ImplClass *>(this)->_InitiateFactoryReset();
 }
 
-inline CHIP_ERROR ConfigurationManager::RunPrimitiveUnitTest()
+#if defined(DEBUG)
+inline CHIP_ERROR ConfigurationManager::RunUnitTests()
 {
-    return static_cast<ImplClass *>(this)->_RunPrimitiveUnitTest();
+    return static_cast<ImplClass *>(this)->_RunUnitTests();
 }
+#endif
 
 inline CHIP_ERROR ConfigurationManager::ComputeProvisioningHash(uint8_t * hashBuf, size_t hashBufSize)
 {

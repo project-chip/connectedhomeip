@@ -951,14 +951,16 @@ exit:
     return err;
 }
 
+#if defined(DEBUG)
 template<class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_RunPrimitiveUnitTest()
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_RunUnitTests()
 {
     ChipLogProgress(DeviceLayer, "Running configuration unit test");
     Impl()->RunConfigUnitTest();
 
     return CHIP_NO_ERROR;
 }
+#endif
 
 #if CHIP_PROGRESS_LOGGING
 
