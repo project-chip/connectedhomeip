@@ -31,7 +31,7 @@ class ComparisonResult:
     self.sectionChanges = []
 
 
-SECTIONS_TO_WATCH = set(['.rodata', '.text', '.flash.rodata', '.flash.text'])
+SECTIONS_TO_WATCH = set(['.rodata', '.text', '.flash.rodata', '.flash.text', '.bss', '.data'])
 
 
 def filesInDirectory(dirName):
