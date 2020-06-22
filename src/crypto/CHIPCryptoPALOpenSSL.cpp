@@ -26,10 +26,10 @@
 #include <openssl/ecdsa.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
-#include <openssl/sha.h>
 #include <openssl/kdf.h>
 #include <openssl/ossl_typ.h>
 #include <openssl/rand.h>
+#include <openssl/sha.h>
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
