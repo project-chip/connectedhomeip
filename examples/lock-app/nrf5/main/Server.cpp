@@ -63,17 +63,17 @@ void newConnectionHandler(PeerConnectionState * state, SecureSessionMgr * transp
 {
     CHIP_ERROR err;
 
-    ESP_LOGI(TAG, "Received a new connection.");
+    NRF_LOG_INFO("Received a new connection.");
 
     err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key,
                                                                sizeof(local_private_key));
-    VerifyOrExit(err == CHIP_NO_ERROR, ESP_LOGE(TAG, "Failed to setup encryption"));
+    VerifyOrExit(err == CHIP_NO_ERROR, NRF_LOG_INFO("Failed to setup encryption"));
 
 exit:
     return;
 }
 
-static void OnRecv(const MessageHeader & header, const IPPacketInfo & packet_info, System::PacketBuffer * buffer,
+static void OnRecv(const MessageHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
                    SecureSessionMgr * transport)
 {
     const size_t data_len = buffer->DataLength();
