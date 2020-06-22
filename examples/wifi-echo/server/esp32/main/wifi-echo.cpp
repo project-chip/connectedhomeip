@@ -35,11 +35,12 @@
 
 #include <platform/CHIPDeviceLayer.h>
 #include <support/ErrorStr.h>
+#include <transport/SecureSessionMgr.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-extern void startServer(UDPEndPoint *& endpoint);
+extern void startServer(SecureSessionMgr * transportIPv4, SecureSessionMgr * transportIPv6);
 extern void startClient(void);
 
 #if CONFIG_DEVICE_TYPE_M5STACK
@@ -68,11 +69,14 @@ extern void startClient(void);
 
 static QRCodeWidget sQRCodeWidget;
 
+// Where to draw the connection status message
+#define CONNECTION_MESSAGE 75
+// Where to draw the IPv6 information
+#define IPV6_INFO 85
 #endif // CONFIG_HAVE_DISPLAY
 
 LEDWidget statusLED;
 static Button attentionButton;
-static volatile ConnectivityChange sConnectionState = kConnectivity_NoChange;
 
 const char * TAG = "wifi-echo-demo";
 
@@ -166,8 +170,8 @@ extern "C" void app_main()
 
     // Start the Echo Server
     InitDataModelHandler();
-    UDPEndPoint * sEndpoint = NULL;
-    startServer(sEndpoint);
+    SecureSessionMgr sTransportIPv4, sTransportIPv6;
+    startServer(&sTransportIPv4, &sTransportIPv6);
 #if CONFIG_USE_ECHO_CLIENT
     startClient();
 #endif
@@ -193,6 +197,7 @@ extern "C" void app_main()
     // Display the UI widgets.
     ClearDisplay();
     sQRCodeWidget.Display();
+    statusLED.Display();
 
 #endif // CONFIG_HAVE_DISPLAY
 
@@ -209,37 +214,6 @@ extern "C" void app_main()
             WakeDisplay();
         }
 
-        switch (sConnectionState)
-        {
-        case kConnectivity_Established:
-            // Show the currently connected state
-            tcpip_adapter_ip_info_t ipInfo;
-            if (tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ipInfo) == ESP_OK)
-            {
-                char ipAddrStr[INET_ADDRSTRLEN];
-                IPAddress::FromIPv4(ipInfo.ip).ToString(ipAddrStr, sizeof(ipAddrStr));
-                wifi_ap_record_t apInfo;
-                if (esp_wifi_sta_get_ap_info(&apInfo) == ESP_OK)
-                {
-                    char message[256];
-                    snprintf(message, sizeof(message), "WiFi Connected: %s\nEcho Server at %s:%d", (char *) apInfo.ssid, ipAddrStr,
-                             CONFIG_ECHO_PORT);
-                    // place it close to the bottom of the screen
-                    DisplayStatusMessage(message, 85);
-                }
-            }
-            sConnectionState = kConnectivity_NoChange;
-            break;
-        case kConnectivity_Lost:
-            // Hide the currently connected state
-            sConnectionState = kConnectivity_NoChange;
-            ClearDisplay();
-            sQRCodeWidget.Display();
-            break;
-        case kConnectivity_NoChange:
-        default:
-            break;
-        }
 #endif // CONFIG_HAVE_DISPLAY
 
         vTaskDelay(50 / portTICK_PERIOD_MS);
@@ -261,14 +235,20 @@ void DeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
             {
                 char ipAddrStr[INET_ADDRSTRLEN];
                 IPAddress::FromIPv4(ipInfo.ip).ToString(ipAddrStr, sizeof(ipAddrStr));
-                ESP_LOGI(TAG, "Server ready at: %s:%d", ipAddrStr, CONFIG_ECHO_PORT);
-                sConnectionState = kConnectivity_Established;
+                ESP_LOGI(TAG, "Server ready at: %s:%d", ipAddrStr, CHIP_PORT);
             }
         }
         else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
         {
-            ESP_LOGE(TAG, "Lost IPv4 address...");
-            sConnectionState = kConnectivity_Lost;
+            ESP_LOGE(TAG, "Lost IPv4 connectivity...");
+        }
+        if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
+        {
+            ESP_LOGI(TAG, "IPv6 Server ready...");
+        }
+        else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
+        {
+            ESP_LOGE(TAG, "Lost IPv6 connectivity...");
         }
     }
     if (event->Type == DeviceEventType::kSessionEstablished && event->SessionEstablished.IsCommissioner)

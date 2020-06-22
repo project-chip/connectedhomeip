@@ -8,7 +8,6 @@ The CHIP src directory is structured as follows:
 | ------------- | -------------------------------------------------- |
 | app           | Application Layer -- Zigbee Cluster Library (ZCL)  |
 | ble           | BLE Layer -- Bluetooth Transport Protocol (BTP)    |
-| chipcli       | QR code tool CLI                                   |
 | controller    | Controller API                                     |
 | crypto        | Cryptography libraries                             |
 | darwin        | Darwin Framework (iOS and MacOS)                   |

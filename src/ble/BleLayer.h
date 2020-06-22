@@ -63,10 +63,6 @@
 #include <ble/BlePlatformDelegate.h>
 #include <ble/BleUUID.h>
 
-#if BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#include <inet/InetLayer.h>
-#endif // BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
 namespace chip {
 namespace Ble {
 
@@ -252,11 +248,6 @@ public:
     BleLayer(void);
 
     BLE_ERROR Init(BlePlatformDelegate * platformDelegate, BleApplicationDelegate * appDelegate, chip::System::Layer * systemLayer);
-
-#if BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-    BLE_ERROR Init(BlePlatformDelegate * platformDelegate, BleApplicationDelegate * appDelegate, Inet::InetLayer * inetLayer);
-#endif // BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
     BLE_ERROR Shutdown(void);
 
     BLE_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
@@ -355,14 +346,6 @@ private:
 
     static BleTransportProtocolVersion GetHighestSupportedProtocolVersion(const BleTransportCapabilitiesRequestMessage & reqMsg);
 };
-
-#if BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-inline BLE_ERROR BleLayer::Init(BlePlatformDelegate * aPlatformDelegate, BleApplicationDelegate * aAppDelegate,
-                                Inet::InetLayer * aInetLayer)
-{
-    return Init(aPlatformDelegate, aAppDelegate, aInetLayer->SystemLayer());
-}
-#endif // BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 } /* namespace Ble */
 } /* namespace chip */

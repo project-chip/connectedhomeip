@@ -139,6 +139,8 @@ STD_LIBS += \
     -lnlfaultinjection \
     -lSystemLayer
 
+STD_LIBS += $(shell pkg-config --libs openssl)
+
 # Add the appropriate CHIP target as a prerequisite to all application
 # compilation targets to ensure that CHIP gets built and its header
 # files installed prior to compiling any dependent source files.

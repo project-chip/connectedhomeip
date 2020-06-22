@@ -63,26 +63,6 @@
 
 // clang-format off
 
-/**
- *  @def BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
- *
- *  @brief
- *    This boolean configuration option is (1) if the obsolescent interfaces
- *    of the BLE layer that now reside elsewhere, for example, in the chip System
- *    Layer or the INET layer, are aliased for transitional purposes.
- *
- */
-#ifndef BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#define BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES          0
-#endif // BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
-#if BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#if !CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#error "REQUIRED: if BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES then CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES!"
-#endif // !CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
-#include <InetLayer/InetBuffer.h>
-#endif // BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 /**
  *  @def BLE_LAYER_NUM_BLE_ENDPOINTS

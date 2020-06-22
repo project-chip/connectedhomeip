@@ -29,9 +29,10 @@
 #include "lwip/err.h"
 #include "lwip/sockets.h"
 #include "lwip/sys.h"
+#include <core/CHIPConfig.h>
 #include <lwip/netdb.h>
 
-#define PORT CONFIG_ECHO_PORT
+#define PORT CHIP_PORT
 #define RX_LEN 128
 #define ADDR_LEN 128
 

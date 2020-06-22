@@ -49,8 +49,9 @@ libSetupPayloadTests_a_SOURCES                 = \
 libSetupPayloadTests_adir                      = $(includedir)/setup_payload
 
 dist_libSetupPayloadTests_a_HEADERS            = \
-    TestQRCode.h                                 \
+    TestHelpers.h                                \
     TestManualCode.h                             \
+    TestQRCode.h                                 \
     TestQRCodeTLV.h                              \
     $(NULL)
 
@@ -86,7 +87,7 @@ COMMON_LDADD                                           = \
     $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                   \
     $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                    \
     $(NULL)
-    
+
 # Test applications that should be run when the 'check' target is run.
 
 check_PROGRAMS                                 = \

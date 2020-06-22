@@ -38,7 +38,7 @@ namespace chip {
 namespace Logging {
 
     /*
-     *  void Log()
+     *  void LogV()
      *
      *  Description:
      *    This routine writes to the Foundation log stream, the
@@ -52,7 +52,7 @@ namespace Logging {
      *                the message is associated with.
      *    aMsg      - A NULL-terminated C string containing the message,
      *                with C Standard I/O-style format specifiers, to log.
-     *    ...       - A variable argument list, corresponding to format
+     *    aV        - A variable argument list, corresponding to format
      *                specifiers in the message.
      *
      *  Output(s):
@@ -61,13 +61,12 @@ namespace Logging {
      *  Returns:
      *    N/A
      *
+     * @note There is a function called Log(), which takes a varargs intead of a
+     * va_list and will call this function as needed.  It's declared and
+     * implemented in the core CHIP library.
      */
-    void Log(uint8_t aModule, uint8_t aCategory, const char * aMsg, ...)
+    void LogV(uint8_t aModule, uint8_t aCategory, const char * aMsg, va_list aV)
     {
-        va_list v;
-
-        va_start(v, aMsg);
-
         if (IsCategoryEnabled(aCategory)) {
             char formattedMsg[512];
             size_t prefixLen;
@@ -80,12 +79,10 @@ namespace Logging {
             if (prefixLen >= sizeof(formattedMsg))
                 prefixLen = sizeof(formattedMsg) - 1;
 
-            vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, aMsg, v);
+            vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, aMsg, aV);
 
             os_log(OS_LOG_DEFAULT, "%s", formattedMsg);
         }
-
-        va_end(v);
     }
 
 } // namespace Logging

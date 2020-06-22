@@ -23,56 +23,26 @@
  */
 
 #include "TestQRCode.h"
+#include "TestHelpers.h"
+
 #include <iostream>
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
-
-#include "Base41.cpp"
-#include "QRCodeSetupPayloadGenerator.cpp"
-#include "QRCodeSetupPayloadParser.cpp"
-#include "SetupPayload.cpp"
-
-#include <assert.h>
-#include <iostream>
-#include <stdio.h>
-#include <unistd.h>
 
 using namespace chip;
 using namespace std;
 
 void TestPayloadByteArrayRep(nlTestSuite * inSuite, void * inContext)
 {
-    SetupPayload payload;
+    SetupPayload payload = GetDefaultPayload();
 
-    payload.version               = 5;
-    payload.vendorID              = 12;
-    payload.productID             = 1;
-    payload.requiresCustomFlow    = 0;
-    payload.rendezvousInformation = 1;
-    payload.discriminator         = 128;
-    payload.setUpPINCode          = 2048;
-
-    QRCodeSetupPayloadGenerator generator(payload);
-    string result;
-    CHIP_ERROR err  = generator.payloadBinaryRepresentation(result);
-    bool didSucceed = err == CHIP_NO_ERROR;
-    NL_TEST_ASSERT(inSuite, didSucceed == true);
-
-    string expected = "00000000000000001000000000001000000000000001000000000000000010000000000001100101";
-    NL_TEST_ASSERT(inSuite, result == expected);
+    string expected = " 00000 000000000000000100000000000 000010000000 00000001 0 0000000000000001 0000000000001100 101";
+    NL_TEST_ASSERT(inSuite, CompareBinary(payload, expected));
 }
 
 void TestPayloadBase41Rep(nlTestSuite * inSuite, void * inContext)
 {
-    SetupPayload payload;
-
-    payload.version               = 5;
-    payload.vendorID              = 12;
-    payload.productID             = 1;
-    payload.requiresCustomFlow    = 0;
-    payload.rendezvousInformation = 1;
-    payload.discriminator         = 128;
-    payload.setUpPINCode          = 2048;
+    SetupPayload payload = GetDefaultPayload();
 
     QRCodeSetupPayloadGenerator generator(payload);
     string result;
@@ -80,7 +50,7 @@ void TestPayloadBase41Rep(nlTestSuite * inSuite, void * inContext)
     bool didSucceed = err == CHIP_NO_ERROR;
     NL_TEST_ASSERT(inSuite, didSucceed == true);
 
-    string expected = "CH:J20800G00HKJ000";
+    string expected = "CH:J20800G008008000";
     NL_TEST_ASSERT(inSuite, result == expected);
 }
 
@@ -88,14 +58,41 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t input[] = { 10, 10, 10 };
 
+    // basic stuff
     NL_TEST_ASSERT(inSuite, base41Encode(input, 0).compare("") == 0);
-
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 1).compare("A0") == 0);
-
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 1).compare("A") == 0);
     NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("SL1") == 0);
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 3).compare("SL1A") == 0);
 
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 3).compare("SL1A0") == 0);
+    // test single odd byte corner conditions
+    input[2] = 0;
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 3).compare("SL10") == 0);
+    input[2] = 40;
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 3).compare("SL1.") == 0);
+    input[2] = 41;
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 3).compare("SL101") == 0);
+    input[2] = 255;
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 3).compare("SL196") == 0);
 
+    // testing optimized encoding
+    // verify that we can't optimize a low value, need 3 chars
+    input[0] = 255;
+    input[1] = 0;
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("960") == 0);
+    // smallest optimized encoding, 256
+    input[0] = 256 % 256;
+    input[1] = 256 / 256;
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("A6") == 0);
+    // largest optimizated encoding value
+    input[0] = ((kRadix * kRadix) - 1) % 256;
+    input[1] = ((kRadix * kRadix) - 1) / 256;
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("..") == 0);
+    // can't optimize
+    input[0] = ((kRadix * kRadix)) % 256;
+    input[1] = ((kRadix * kRadix)) / 256;
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("001") == 0);
+
+    // fun with strings
     NL_TEST_ASSERT(inSuite,
                    base41Encode((uint8_t *) "Hello World!", sizeof("Hello World!") - 1).compare("GHF.KGL+48-G5LGK35") == 0);
 
@@ -111,13 +108,16 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
 
     // short input
     NL_TEST_ASSERT(inSuite, base41Decode("A0", decoded) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, decoded.size() == 2);
+    NL_TEST_ASSERT(inSuite, decoded.size() == 1);
 
     // empty == empty
     NL_TEST_ASSERT(inSuite, base41Decode("", decoded) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, decoded.size() == 0);
-    // too short
-    NL_TEST_ASSERT(inSuite, base41Decode("A", decoded) == CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+    // single base41 means one byte of output
+    NL_TEST_ASSERT(inSuite, base41Decode("A", decoded) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, decoded.size() == 1);
+    NL_TEST_ASSERT(inSuite, decoded[0] == 10);
 
     // outside valid chars
     NL_TEST_ASSERT(inSuite, base41Decode("0\001", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
@@ -139,6 +139,14 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, base41Decode("=0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
     NL_TEST_ASSERT(inSuite, base41Decode(">0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
     NL_TEST_ASSERT(inSuite, base41Decode("@0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    // odd byte(s) cases
+    NL_TEST_ASSERT(inSuite, base41Decode("96", decoded) == CHIP_NO_ERROR); // this is 255
+    NL_TEST_ASSERT(inSuite, decoded.size() == 1 && decoded[0] == 255);
+    NL_TEST_ASSERT(inSuite, base41Decode("A6", decoded) == CHIP_NO_ERROR); // this is 256, needs 2 output bytes
+    NL_TEST_ASSERT(inSuite, decoded.size() == 2 && decoded[0] + decoded[1] * 256 == 256);
+    NL_TEST_ASSERT(inSuite, base41Decode("..", decoded) == CHIP_NO_ERROR); // this is (41*41)-1, or 1680, needs 2 output bytes
+    NL_TEST_ASSERT(inSuite, decoded.size() == 2 && decoded[0] + decoded[1] * 256 == (kRadix * kRadix) - 1);
 }
 
 void TestBitsetLen(nlTestSuite * inSuite, void * inContext)
@@ -148,35 +156,32 @@ void TestBitsetLen(nlTestSuite * inSuite, void * inContext)
 
 void TestSetupPayloadVerify(nlTestSuite * inSuite, void * inContext)
 {
-    SetupPayload payload;
-
-    payload.version               = 5;
-    payload.vendorID              = 12;
-    payload.productID             = 1;
-    payload.requiresCustomFlow    = 0;
-    payload.rendezvousInformation = 1;
-    payload.discriminator         = 128;
-    payload.setUpPINCode          = 2048;
+    SetupPayload payload = GetDefaultPayload();
     NL_TEST_ASSERT(inSuite, payload.isValidQRCodePayload() == true);
 
     // test invalid version
     SetupPayload test_payload = payload;
-    test_payload.version      = 2 << kVersionFieldLengthInBits;
+    test_payload.version      = 1 << kVersionFieldLengthInBits;
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid rendezvousInformation
     test_payload                       = payload;
-    test_payload.rendezvousInformation = 512;
+    test_payload.rendezvousInformation = 1 << kRendezvousInfoFieldLengthInBits;
+    NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
+
+    // test invalid rendezvousInformation
+    test_payload                       = payload;
+    test_payload.rendezvousInformation = 1 << (kRendezvousInfoFieldLengthInBits - kRendezvousInfoReservedFieldLengthInBits);
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid discriminator
     test_payload               = payload;
-    test_payload.discriminator = 2 << kPayloadDiscriminatorFieldLengthInBits;
+    test_payload.discriminator = 1 << kPayloadDiscriminatorFieldLengthInBits;
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid stetup PIN
     test_payload              = payload;
-    test_payload.setUpPINCode = 2 << kSetupPINCodeFieldLengthInBits;
+    test_payload.setUpPINCode = 1 << kSetupPINCodeFieldLengthInBits;
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 }
 
@@ -205,24 +210,8 @@ void TestInvalidQRCodePayload_WrongLength(nlTestSuite * inSuite, void * inContex
 
 void TestPayloadEquality(nlTestSuite * inSuite, void * inContext)
 {
-    SetupPayload payload;
-
-    payload.version               = 5;
-    payload.vendorID              = 12;
-    payload.productID             = 1;
-    payload.requiresCustomFlow    = 0;
-    payload.rendezvousInformation = 1;
-    payload.discriminator         = 128;
-    payload.setUpPINCode          = 2048;
-
-    SetupPayload equalPayload;
-    equalPayload.version               = 5;
-    equalPayload.vendorID              = 12;
-    equalPayload.productID             = 1;
-    equalPayload.requiresCustomFlow    = 0;
-    equalPayload.rendezvousInformation = 1;
-    equalPayload.discriminator         = 128;
-    equalPayload.setUpPINCode          = 2048;
+    SetupPayload payload      = GetDefaultPayload();
+    SetupPayload equalPayload = GetDefaultPayload();
 
     bool result = payload == equalPayload;
     NL_TEST_ASSERT(inSuite, result == true);
@@ -230,24 +219,11 @@ void TestPayloadEquality(nlTestSuite * inSuite, void * inContext)
 
 void TestPayloadInEquality(nlTestSuite * inSuite, void * inContext)
 {
-    SetupPayload payload;
+    SetupPayload payload = GetDefaultPayload();
 
-    payload.version               = 5;
-    payload.vendorID              = 12;
-    payload.productID             = 1;
-    payload.requiresCustomFlow    = 0;
-    payload.rendezvousInformation = 1;
-    payload.discriminator         = 128;
-    payload.setUpPINCode          = 2048;
-
-    SetupPayload unequalPayload;
-    unequalPayload.version               = 5;
-    unequalPayload.vendorID              = 12;
-    unequalPayload.productID             = 1;
-    unequalPayload.requiresCustomFlow    = 0;
-    unequalPayload.rendezvousInformation = 1;
-    unequalPayload.discriminator         = 28;
-    unequalPayload.setUpPINCode          = 121233;
+    SetupPayload unequalPayload  = GetDefaultPayload();
+    unequalPayload.discriminator = 28;
+    unequalPayload.setUpPINCode  = 121233;
 
     bool result = payload == unequalPayload;
     NL_TEST_ASSERT(inSuite, result == false);
@@ -255,14 +231,7 @@ void TestPayloadInEquality(nlTestSuite * inSuite, void * inContext)
 
 void TestQRCodeToPayloadGeneration(nlTestSuite * inSuite, void * inContext)
 {
-    SetupPayload payload;
-    payload.version               = 3;
-    payload.vendorID              = 100;
-    payload.productID             = 12;
-    payload.requiresCustomFlow    = 1;
-    payload.rendezvousInformation = 4;
-    payload.discriminator         = 233;
-    payload.setUpPINCode          = 5221133;
+    SetupPayload payload = GetDefaultPayload();
 
     QRCodeSetupPayloadGenerator generator(payload);
     string base41Rep;
@@ -311,10 +280,11 @@ void TestExtractPayload(nlTestSuite * inSuite, void * inContext)
 // clang-format off
 static const nlTest sTests[] =
 {
+
+    NL_TEST_DEF("Test Base 41",                                                     TestBase41),
     NL_TEST_DEF("Test Bitset Length",                                               TestBitsetLen),
     NL_TEST_DEF("Test Payload Byte Array Representation",                           TestPayloadByteArrayRep),
     NL_TEST_DEF("Test Payload Base 41 Representation",                              TestPayloadBase41Rep),
-    NL_TEST_DEF("Test Payload Base 41",                                             TestBase41),
     NL_TEST_DEF("Test Setup Payload Verify",                                        TestSetupPayloadVerify),
     NL_TEST_DEF("Test Payload Equality",                                            TestPayloadEquality),
     NL_TEST_DEF("Test Payload Inequality",                                          TestPayloadInEquality),

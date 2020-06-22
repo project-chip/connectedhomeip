@@ -30,6 +30,7 @@
 #include <core/CHIPTLVData.hpp>
 #include <core/CHIPTLVDebug.hpp>
 #include <core/CHIPTLVUtilities.hpp>
+#include <profiles/CHIPProfiles.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 
@@ -87,29 +88,25 @@ static void addCHIPInfoToOptionalData(SetupPayload & outPayload)
     {
         OptionalQRCodeInfo info;
         info.type = optionalQRCodeInfoTypeString;
-        info.tag  = ContextTag(kSerialNumberTag);
+        info.tag  = kSerialNumberTag;
         info.data = outPayload.serialNumber;
-        outPayload.addOptionalData(info);
+        outPayload.addCHIPOptionalData(info);
     }
 }
 
-CHIP_ERROR writeOptionaData(TLVWriter & writer, vector<OptionalQRCodeInfo> optionalData)
+CHIP_ERROR writeTag(TLVWriter & writer, uint64_t tag, OptionalQRCodeInfo & info)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    for (OptionalQRCodeInfo info : optionalData)
+
+    if (info.type == optionalQRCodeInfoTypeString)
     {
-        if (info.type == optionalQRCodeInfoTypeString)
-        {
-            err = writer.PutString(info.tag, info.data.c_str());
-            SuccessOrExit(err);
-        }
-        else if (info.type == optionalQRCodeInfoTypeInt)
-        {
-            err = writer.Put(info.tag, static_cast<int64_t>(info.integer));
-            SuccessOrExit(err);
-        }
+        err = writer.PutString(tag, info.data.c_str());
     }
-exit:
+    else if (info.type == optionalQRCodeInfoTypeInt)
+    {
+        err = writer.Put(tag, static_cast<int64_t>(info.integer));
+    }
+
     return err;
 }
 
@@ -123,19 +120,35 @@ CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvD
 
     TLVWriter rootWriter;
     rootWriter.Init(tlvDataStart, maxLen);
+    rootWriter.ImplicitProfileId = chip::Profiles::kChipProfile_ServiceProvisioning;
 
-    TLVWriter innerStructureWritter;
+    // The cost (in bytes) of the top-level container is amortized as soon as there is at least 4 optionals elements.
+    if (optionalData.size() >= 4)
+    {
 
-    err = rootWriter.OpenContainer(ProfileTag(2, 1), kTLVType_Structure,
-                                   innerStructureWritter); // TODO: Remove outer nest of QR code TLV encoding #728
-    SuccessOrExit(err);
+        TLVWriter innerStructureWriter;
 
-    err = writeOptionaData(innerStructureWritter, optionalData);
-    SuccessOrExit(err);
+        err = rootWriter.OpenContainer(ProfileTag(rootWriter.ImplicitProfileId, kTag_QRCodeExensionDescriptor), kTLVType_Structure,
+                                       innerStructureWriter);
+        SuccessOrExit(err);
 
-    err = rootWriter.CloseContainer(innerStructureWritter);
-    SuccessOrExit(err);
+        for (OptionalQRCodeInfo info : optionalData)
+        {
+            err = writeTag(innerStructureWriter, ContextTag(info.tag), info);
+            SuccessOrExit(err);
+        }
 
+        err = rootWriter.CloseContainer(innerStructureWriter);
+        SuccessOrExit(err);
+    }
+    else
+    {
+        for (OptionalQRCodeInfo info : optionalData)
+        {
+            err = writeTag(rootWriter, ProfileTag(rootWriter.ImplicitProfileId, info.tag), info);
+            SuccessOrExit(err);
+        }
+    }
     err = rootWriter.Finalize();
     SuccessOrExit(err);
 
@@ -157,54 +170,8 @@ static CHIP_ERROR generateBitSet(SetupPayload & payload, uint8_t * bits, uint8_t
     err = populateBits(bits, offset, payload.rendezvousInformation, kRendezvousInfoFieldLengthInBits, kTotalPayloadDataSizeInBits);
     err = populateBits(bits, offset, payload.discriminator, kPayloadDiscriminatorFieldLengthInBits, kTotalPayloadDataSizeInBits);
     err = populateBits(bits, offset, payload.setUpPINCode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    err = populateBits(bits, offset, 0, kReservedFieldLengthInBits, kTotalPayloadDataSizeInBits);
+    err = populateBits(bits, offset, 0, kPaddingFieldLengthInBits, kTotalPayloadDataSizeInBits);
     err = populateTLVBits(bits, offset, tlvDataStart, tlvDataLengthInBytes, totalPayloadSizeInBits);
-    return err;
-}
-
-static CHIP_ERROR payloadBinaryRepresentationWithTLV(SetupPayload & setupPayload, string & binaryRepresentation, size_t bitsetSize,
-                                                     uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    string binary;
-    uint8_t bits[bitsetSize];
-    memset(bits, 0, bitsetSize);
-    err = generateBitSet(setupPayload, bits, tlvDataStart, tlvDataLengthInBytes);
-    SuccessOrExit(err);
-
-    for (int i = ArraySize(bits) - 1; i >= 0; i--)
-    {
-        for (unsigned j = 1 << 7; j != 0;)
-        {
-            binary += bits[i] & j ? "1" : "0";
-            j >>= 1;
-        }
-    }
-    binaryRepresentation = binary;
-exit:
-    return err;
-}
-
-CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBinaryRepresentation(string & binaryRepresentation)
-{
-    return payloadBinaryRepresentation(binaryRepresentation, NULL, 0);
-}
-
-CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBinaryRepresentation(string & binaryRepresentation, uint8_t * tlvDataStart,
-                                                                    size_t tlvDataStartSize)
-{
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    uint32_t tlvDataLengthInBytes = 0;
-
-    VerifyOrExit(mPayload.isValidQRCodePayload(), err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    err = generateTLVFromOptionalData(mPayload, tlvDataStart, tlvDataStartSize, tlvDataLengthInBytes);
-    SuccessOrExit(err);
-
-    err = payloadBinaryRepresentationWithTLV(mPayload, binaryRepresentation, kTotalPayloadDataSizeInBytes + tlvDataLengthInBytes,
-                                             tlvDataStart, tlvDataLengthInBytes);
-    SuccessOrExit(err);
-exit:
     return err;
 }
 

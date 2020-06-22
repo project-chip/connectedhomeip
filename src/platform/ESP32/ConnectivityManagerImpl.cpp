@@ -981,7 +981,14 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                 {
                     if (ip6_addr_isglobal(netif_ip6_addr(netif, i)) && ip6_addr_isvalid(netif_ip6_addr_state(netif, i)))
                     {
-                        // TODO Determine if there is a default IPv6 router that is currently reachable
+                        // Determine if there is a default IPv6 router that is currently reachable
+                        // via the station interface.  If so, presume for now that the device has
+                        // IPv6 connectivity.
+                        struct netif * found_if = nd6_find_route(IP6_ADDR_ANY6);
+                        if (found_if && netif->num == found_if->num)
+                        {
+                            haveIPv6Conn = true;
+                        }
                     }
                 }
             }

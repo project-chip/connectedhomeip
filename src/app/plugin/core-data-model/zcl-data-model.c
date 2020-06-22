@@ -95,7 +95,7 @@ void chipZclCopyString(uint8_t * dest, uint8_t * src, uint8_t size)
         {
             length = size;
         }
-        MEMMOVE(dest + 1, src + 1, length);
+        memmove(dest + 1, src + 1, length);
         dest[0] = length;
     }
 }
@@ -133,11 +133,20 @@ void chipZclCopyLongString(uint8_t * dest, uint8_t * src, uint16_t size)
         {
             length = size;
         }
-        MEMMOVE(dest + 2, src + 2, length);
-        dest[0] = LOW_BYTE(length);
-        dest[1] = HIGH_BYTE(length);
+        memmove(dest + 2, src + 2, length);
+        dest[0] = (uint8_t)(length & 0xFF);        // LOW_BYTE(length);
+        dest[1] = (uint8_t)((length >> 8) & 0xff); // HIGH_BYTE(length);
     }
 }
+
+#if defined(__LITTLE_ENDIAN) || defined(__LITTLE_ENDIAN__) || (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#define BIGENDIAN_CPU 0
+#elif defined(__BIG_ENDIAN) || defined(__BIG_ENDIAN__) || (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+#define BIGENDIAN_CPU 1
+#else
+#error "cannot determine whether BIGENDIAN_CPU or not"
+#endif
+
 // You can pass in val1 as NULL, which will assume that it is
 // pointing to an array of all zeroes. This is used so that
 // default value of NULL is treated as all zeroes.
@@ -154,10 +163,10 @@ int8_t chipZclCompareValues(uint8_t * val1, uint8_t * val2, uint8_t len, bool si
 
             for (i = 0; i < len; i++)
             {
-                j = (val1 == NULL ? 0 : (IS_BIG_ENDIAN() ? val1[i] : val1[(len - 1) - i]));
+                j = (val1 == NULL ? 0 : (BIGENDIAN_CPU ? val1[i] : val1[(len - 1) - i]));
                 accum1 |= j << (8 * (len - 1 - i));
 
-                k = (IS_BIG_ENDIAN() ? val2[i] : val2[(len - 1) - i]);
+                k = (BIGENDIAN_CPU ? val2[i] : val2[(len - 1) - i]);
                 accum2 |= k << (8 * (len - 1 - i));
             }
 
@@ -196,8 +205,8 @@ int8_t chipZclCompareValues(uint8_t * val1, uint8_t * val2, uint8_t len, bool si
     { // regular unsigned number comparison
         for (i = 0; i < len; i++)
         {
-            j = (val1 == NULL ? 0 : (IS_BIG_ENDIAN() ? val1[i] : val1[(len - 1) - i]));
-            k = (IS_BIG_ENDIAN() ? val2[i] : val2[(len - 1) - i]);
+            j = (val1 == NULL ? 0 : (BIGENDIAN_CPU ? val1[i] : val1[(len - 1) - i]));
+            k = (BIGENDIAN_CPU ? val2[i] : val2[(len - 1) - i]);
 
             if (j > k)
             {
@@ -256,11 +265,11 @@ static ChipZclStatus_t chipZclTypeSensitiveMemCopy(uint8_t * dest, uint8_t * src
         }
         if (src == NULL)
         {
-            MEMSET(dest, 0, size);
+            memset(dest, 0, size);
         }
         else
         {
-            MEMMOVE(dest, src, size);
+            memmove(dest, src, size);
         }
     }
     return CHIP_ZCL_STATUS_SUCCESS;
@@ -573,7 +582,7 @@ static ChipZclStatus_t chipZclInternalWriteAttribute(ChipZclEndpointId_t endpoin
             uint8_t * minI = (uint8_t *) &(minv.defaultValue);
             uint8_t * maxI = (uint8_t *) &(maxv.defaultValue);
 // On big endian cpu with length 1 only the second byte counts
-#if (BIGENDIAN_CPU)
+#if BIGENDIAN_CPU
             if (dataLen == 1)
             {
                 minI++;
@@ -700,12 +709,12 @@ void chipZclEndpointInit(void)
 {
     uint8_t ep;
 
-    uint8_t fixedEndpoints[]            = FIXED_ENDPOINT_ARRAY;
-    uint16_t fixedProfileIds[]          = FIXED_PROFILE_IDS;
-    uint16_t fixedDeviceIds[]           = FIXED_DEVICE_IDS;
-    uint8_t fixedDeviceVersions[]       = FIXED_DEVICE_VERSIONS;
-    uint8_t fixedChipZclEndpointTypes[] = FIXED_ENDPOINT_TYPES;
-    uint8_t fixedNetworks[]             = FIXED_NETWORKS;
+    static const uint8_t fixedEndpoints[]            = FIXED_ENDPOINT_ARRAY;
+    static const uint16_t fixedProfileIds[]          = FIXED_PROFILE_IDS;
+    static const uint16_t fixedDeviceIds[]           = FIXED_DEVICE_IDS;
+    static const uint8_t fixedDeviceVersions[]       = FIXED_DEVICE_VERSIONS;
+    static const uint8_t fixedChipZclEndpointTypes[] = FIXED_ENDPOINT_TYPES;
+    static const uint8_t fixedNetworks[]             = FIXED_NETWORKS;
 
     chipZclEndpointCounter = FIXED_ENDPOINT_COUNT;
     for (ep = 0; ep < FIXED_ENDPOINT_COUNT; ep++)

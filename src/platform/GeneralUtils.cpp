@@ -125,5 +125,22 @@ bool FormatDeviceLayerError(char * buf, uint16_t bufSize, int32_t err)
     return true;
 }
 
+const char * CharacterizeIPv6Address(const IPAddress & ipAddr)
+{
+    if (ipAddr.IsIPv6LinkLocal())
+    {
+        return "IPv6 link-local address";
+    }
+    else if (ipAddr.IsIPv6ULA())
+    {
+        return "IPv6 unique local address";
+    }
+    else if (ipAddr.IsIPv6GlobalUnicast())
+    {
+        return "IPv6 global unicast address";
+    }
+    return "IPv6 address";
+}
+
 } // namespace DeviceLayer
 } // namespace chip

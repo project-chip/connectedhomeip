@@ -29,18 +29,18 @@ CHIP_BUILD_BLE_LAYER_SOURCE_FILES                         = \
     @top_builddir@/src/ble/BleLayer.cpp                     \
     @top_builddir@/src/ble/BleUUID.cpp                      \
     @top_builddir@/src/ble/BLEEndPoint.cpp                  \
-    @top_builddir@/src/ble/BtpEngine.cpp                     \
+    @top_builddir@/src/ble/BtpEngine.cpp                    \
     $(NULL)
 
 CHIP_BUILD_BLE_LAYER_HEADER_FILES                         = \
-    CHIPBleServiceData.h                                    \
-    BLEEndPoint.h                                           \
-    Ble.h                                                   \
-    BleApplicationDelegate.h                                \
-    BleConfig.h                                             \
-    BleError.h                                              \
-    BleLayer.h                                              \
-    BlePlatformDelegate.h                                   \
-    BleUUID.h                                               \
-    BtpEngine.h                                              \
+    @top_builddir@/src/ble/CHIPBleServiceData.h             \
+    @top_builddir@/src/ble/BLEEndPoint.h                    \
+    @top_builddir@/src/ble/Ble.h                            \
+    @top_builddir@/src/ble/BleApplicationDelegate.h         \
+    @top_builddir@/src/ble/BleConfig.h                      \
+    @top_builddir@/src/ble/BleError.h                       \
+    @top_builddir@/src/ble/BleLayer.h                       \
+    @top_builddir@/src/ble/BlePlatformDelegate.h            \
+    @top_builddir@/src/ble/BleUUID.h                        \
+    @top_builddir@/src/ble/BtpEngine.h                      \
     $(NULL)

@@ -32,7 +32,8 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/DLLUtil.h>
-#include <transport/UdpTransport.h>
+#include <transport/SecureSessionMgr.h>
+#include <transport/UDP.h>
 
 namespace chip {
 namespace DeviceController {
@@ -43,7 +44,7 @@ extern "C" {
 typedef void (*CompleteHandler)(ChipDeviceController * deviceController, void * appReqState);
 typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err,
                              const IPPacketInfo * pktInfo);
-typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, PacketBuffer * payload,
+typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload,
                                       const IPPacketInfo * pktInfo);
 };
 
@@ -54,7 +55,7 @@ public:
 
     void * AppState;
 
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(NodeId localDeviceId);
     CHIP_ERROR Shutdown();
 
     // ----- Connection Management -----
@@ -62,7 +63,7 @@ public:
      * @brief
      *   Connect to a CHIP device at a given address and an optional port
      *
-     * @param[in] deviceId              A device identifier. Currently unused and can be set to any value
+     * @param[in] remoteDeviceId        The remote device Id.
      * @param[in] deviceAddr            The IPAddress of the requested Device
      * @param[in] appReqState           Application specific context to be passed back when a message is received or on error
      * @param[in] onMessageReceived     Callback for when a message is received
@@ -70,18 +71,32 @@ public:
      * @param[in] devicePort            [Optional] The CHIP Device's port, defaults to CHIP_PORT
      * @return CHIP_ERROR           The connection status
      */
-    CHIP_ERROR ConnectDevice(uint64_t deviceId, IPAddress deviceAddr, void * appReqState, MessageReceiveHandler onMessageReceived,
-                             ErrorHandler onError, uint16_t devicePort = CHIP_PORT);
+    CHIP_ERROR ConnectDevice(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
+                             MessageReceiveHandler onMessageReceived, ErrorHandler onError, uint16_t devicePort = CHIP_PORT);
 
     /**
      * @brief
-     *   Get the address and port of a connected device
+     *   The keypair for the secure channel. This is a utility function that will be used
+     *   until we have automatic key exchange in place. The function is useful only for
+     *   example applications for now. It will eventually be removed.
      *
-     * @param[out] deviceAddr   The IPAddress of the connected device
-     * @param[out] devicePort   The port of the econnected device
+     * @param remote_public_key  A pointer to peer's public key
+     * @param public_key_length  Length of remote_public_key
+     * @param local_private_key  A pointer to local private key
+     * @param private_key_length Length of local_private_key
+     * @return CHIP_ERROR        The result of key derivation
+     */
+    CHIP_ERROR ManualKeyExchange(const unsigned char * remote_public_key, const size_t public_key_length,
+                                 const unsigned char * local_private_key, const size_t private_key_length);
+
+    /**
+     * @brief
+     *   Get the PeerAddress of a connected peer
+     *
+     * @param[inout] peerAddress  The PeerAddress object which will be populated with the details of the connected peer
      * @return CHIP_ERROR   An error if there's no active connection
      */
-    CHIP_ERROR GetDeviceAddress(IPAddress * deviceAddr, uint16_t * devicePort);
+    CHIP_ERROR PopulatePeerAddress(Transport::PeerAddress & peerAddress);
 
     /**
      * @brief
@@ -99,6 +114,14 @@ public:
      */
     bool IsConnected();
 
+    /**
+     * @brief
+     *   Check if the connection is active and security context is established
+     *
+     * @return bool   If the connection is active and security context is established
+     */
+    bool IsSecurelyConnected();
+
     // ----- Messaging -----
     /**
      * @brief
@@ -108,7 +131,7 @@ public:
      * @param[in] buffer        The Data Buffer to trasmit to the deviec
      * @return CHIP_ERROR   The return status
      */
-    CHIP_ERROR SendMessage(void * appReqState, PacketBuffer * buffer);
+    CHIP_ERROR SendMessage(void * appReqState, System::PacketBuffer * buffer);
 
     // ----- IO -----
     /**
@@ -130,8 +153,6 @@ public:
     CHIP_ERROR GetLayers(Layer ** systemLayer, InetLayer ** inetLayer);
 
 private:
-    using StatefulTransport = StatefulUdpTransport<ChipDeviceController *>;
-
     enum
     {
         kState_NotInitialized = 0,
@@ -140,13 +161,14 @@ private:
 
     enum ConnectionState
     {
-        kConnectionState_NotConnected = 0,
-        kConnectionState_Connected    = 1,
+        kConnectionState_NotConnected    = 0,
+        kConnectionState_Connected       = 1,
+        kConnectionState_SecureConnected = 2,
     };
 
     System::Layer * mSystemLayer;
     Inet::InetLayer * mInetLayer;
-    StatefulTransport * mDeviceCon;
+    SecureSessionMgr * mDeviceCon;
 
     ConnectionState mConState;
     void * mAppReqState;
@@ -158,17 +180,19 @@ private:
     } mOnComplete;
 
     ErrorHandler mOnError;
-    PacketBuffer * mCurReqMsg;
+    System::PacketBuffer * mCurReqMsg;
 
-    uint64_t mDeviceId;
+    NodeId mLocalDeviceId;
     IPAddress mDeviceAddr;
     uint16_t mDevicePort;
+    Optional<NodeId> mRemoteDeviceId;
+    uint32_t mMessageNumber = 0;
 
     void ClearRequestState();
     void ClearOpState();
 
-    static void OnReceiveMessage(StatefulTransport * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo);
-    static void OnReceiveError(StatefulTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
+    static void OnReceiveMessage(const MessageHeader & header, const IPPacketInfo & pktInfo, System::PacketBuffer * msgBuf,
+                                 ChipDeviceController * controller);
 };
 
 } // namespace DeviceController

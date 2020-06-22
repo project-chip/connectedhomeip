@@ -41,24 +41,34 @@ const int kVendorIDFieldLengthInBits                 = 16;
 const int kProductIDFieldLengthInBits                = 16;
 const int kCustomFlowRequiredFieldLengthInBits       = 1;
 const int kRendezvousInfoFieldLengthInBits           = 8;
-const int kPayloadDiscriminatorFieldLengthInBits     = 8;
+const int kPayloadDiscriminatorFieldLengthInBits     = 12;
 const int kManualSetupDiscriminatorFieldLengthInBits = 4;
 const int kSetupPINCodeFieldLengthInBits             = 27;
-const int kReservedFieldLengthInBits                 = 1;
+const int kPaddingFieldLengthInBits                  = 5;
 
-const int kRawVendorTagLengthInBits = 7;
-const uint16_t kSerialNumberTag     = 128;
+const int kRendezvousInfoReservedFieldLengthInBits = 4;
+const int kRawVendorTagLengthInBits                = 7;
+const uint16_t kSerialNumberTag                    = 128;
+const uint32_t kTag_QRCodeExensionDescriptor       = 0x00;
 
 const int kManualSetupShortCodeCharLength = 10;
 const int kManualSetupLongCodeCharLength  = 20;
 const int kManualSetupVendorIdCharLength  = 5;
 const int kManualSetupProductIdCharLength = 5;
 
+// clang-format off
 const int kTotalPayloadDataSizeInBits =
-    (kVersionFieldLengthInBits + kVendorIDFieldLengthInBits + kProductIDFieldLengthInBits + kCustomFlowRequiredFieldLengthInBits +
-     kRendezvousInfoFieldLengthInBits + kPayloadDiscriminatorFieldLengthInBits + kSetupPINCodeFieldLengthInBits +
-     kReservedFieldLengthInBits);
-const int kTotalPayloadDataSizeInBytes = (kTotalPayloadDataSizeInBits + 7) / 8;
+    kVersionFieldLengthInBits +
+    kVendorIDFieldLengthInBits +
+    kProductIDFieldLengthInBits +
+    kCustomFlowRequiredFieldLengthInBits +
+    kRendezvousInfoFieldLengthInBits +
+    kPayloadDiscriminatorFieldLengthInBits +
+    kSetupPINCodeFieldLengthInBits +
+    kPaddingFieldLengthInBits;
+// clang-format on
+
+const int kTotalPayloadDataSizeInBytes = kTotalPayloadDataSizeInBits / 8;
 
 const char * const kQRCodePrefix = "CH:";
 
@@ -81,20 +91,11 @@ enum optionalQRCodeInfoType
  **/
 struct OptionalQRCodeInfo
 {
-    uint64_t tag;
+    uint8_t tag;
     enum optionalQRCodeInfoType type;
     int integer;
     string data;
 };
-
-/**
- * @brief A function to retrieve a vendor tag
- * @param tagNumber Tag number is 7 bits long
- * @param outVendorTag A 64-bit integer representing the tag
- *                     to use in OptionalQRCodeInfo
- * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
- **/
-CHIP_ERROR VendorTag(uint16_t tagNumber, uint64_t & outVendorTag);
 
 class SetupPayload
 {
@@ -114,18 +115,24 @@ public:
      **/
     vector<OptionalQRCodeInfo> getAllOptionalData();
 
-    /** @brief A function to add an optional QR Code info object
+    /** @brief A function to add an optional QR Code info vendor object
      * @param info Optional QR code info object to add
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR addOptionalData(OptionalQRCodeInfo info);
+    CHIP_ERROR addVendorOptionalData(OptionalQRCodeInfo info);
+
+    /** @brief A function to add an optional QR Code info CHIP object
+     * @param info Optional QR code info object to add
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR addCHIPOptionalData(OptionalQRCodeInfo info);
 
     /** @brief A function to remove an optional QR Code info object
      * @param tag Optional QR code info tag number to remove
      * @return Returns CHIP_ERROR_KEY_NOT_FOUND if info could not be found in existing optional data structs,
      *                 CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR removeOptionalData(uint64_t tag);
+    CHIP_ERROR removeOptionalData(uint8_t tag);
 
     // Test that the Setup Payload is within expected value ranges
     SetupPayload() :

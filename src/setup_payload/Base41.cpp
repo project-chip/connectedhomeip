@@ -40,7 +40,7 @@ static const char codes[]        = { '0', '1', '2', '3', '4', '5', '6', '7', '8'
                               'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', '*', '+', '-', '.' };
 static const int kBase41ChunkLen = 3;
 static const int kBytesChunkLen  = 2;
-static const int radix           = sizeof(codes) / sizeof(codes[0]);
+static const int kRadix          = sizeof(codes) / sizeof(codes[0]);
 
 string base41Encode(const uint8_t * buf, size_t buf_len)
 {
@@ -51,24 +51,62 @@ string base41Encode(const uint8_t * buf, size_t buf_len)
 
     while (buf_len >= kBytesChunkLen)
     {
-        int next = buf[0] + buf[1] * 256;
-
-        for (int _ = 0; _ < kBase41ChunkLen; _++)
+        int value = 0;
+        for (int i = kBytesChunkLen - 1; i >= 0; i--)
         {
-            result += codes[next % radix];
-            next /= radix;
+            value *= 256;
+            value += buf[i];
         }
-        buf += kBytesChunkLen;
         buf_len -= kBytesChunkLen;
+        buf += kBytesChunkLen;
+
+        // This code needs to correctly convey to the decoder
+        //  the length of data encoded, so normally emits 3 chars for
+        //  2 bytes.
+        // But there's a special case possible where the last
+        //  two bytes would fit in exactly 2 chars.
+        // The following conditions must be met:
+        //   1. this must be the last value
+        //   2. the value doesn't fit in a single byte, if we encode a
+        //        small value at the end of the encoded string with a
+        //        shortened chunk, the decoder will think only one byte
+        //        was encoded
+        //   3. the value can be encoded in 2 base41 chars
+        //
+        int encodeLen = kBase41ChunkLen;
+        if (buf_len == 0 &&            // the very last value, i.e. not an odd byte
+            (value > UINT8_MAX) &&     // the value wouldn't fit in one byte
+            (value < kRadix * kRadix)) // the value can be encoded with 2 base41 chars
+        {
+            encodeLen--;
+        }
+        for (int _ = 0; _ < encodeLen; _++)
+        {
+            result += codes[value % kRadix];
+            value /= kRadix;
+        }
     }
-    // handle leftover byte, if any
+
+    // handle leftover bytes, if any
     if (buf_len != 0)
     {
-        int next = buf[0];
-        for (int _ = 0; _ < kBase41ChunkLen - 1; _++)
+        int value = 0;
+
+        for (int i = buf_len - 1; i >= 0; i--)
         {
-            result += codes[next % radix];
-            next /= radix;
+            value *= 256;
+            value += buf[i];
+        }
+
+        // need to indicate there are leftover bytes, so append at least one encoding char
+        result += codes[value % kRadix];
+        value /= kRadix;
+
+        // if there's still value, encode with more chars
+        while (value != 0)
+        {
+            result += codes[value % kRadix];
+            value /= kRadix;
         }
     }
     return result;
@@ -155,12 +193,6 @@ static inline CHIP_ERROR decodeChar(char c, uint8_t & value)
 
 CHIP_ERROR base41Decode(string base41, vector<uint8_t> & result)
 {
-    // not long enough, there are always at least 2
-    //  base41 characters
-    if (base41.length() % kBase41ChunkLen == 1)
-    {
-        return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
-    }
     result.clear();
 
     for (int i = 0; base41.length() - i >= kBase41ChunkLen; i += kBase41ChunkLen)
@@ -177,19 +209,21 @@ CHIP_ERROR base41Decode(string base41, vector<uint8_t> & result)
                 return err;
             }
 
-            value *= radix;
+            value *= kRadix;
             value += v;
         }
 
         result.push_back(value % 256);
         result.push_back(value / 256);
     }
-    if (base41.length() % kBase41ChunkLen == kBase41ChunkLen - 1)
+
+    if (base41.length() % kBase41ChunkLen != 0) // only 1 or 2 chars left
     {
-        int i          = base41.length() - (kBase41ChunkLen - 1);
+        int tail       = (base41.length() % kBase41ChunkLen);
+        int i          = base41.length() - tail;
         uint16_t value = 0;
 
-        for (int iv = i + (kBase41ChunkLen - 2); iv >= i; iv--)
+        for (int iv = base41.length() - 1; iv >= i; iv--)
         {
             uint8_t v;
             CHIP_ERROR err = decodeChar(base41[iv], v);
@@ -199,12 +233,15 @@ CHIP_ERROR base41Decode(string base41, vector<uint8_t> & result)
                 return err;
             }
 
-            value *= radix;
+            value *= kRadix;
             value += v;
         }
-
         result.push_back(value % 256);
-        result.push_back(value / 256);
+        value /= 256;
+        if (value != 0)
+        {
+            result.push_back(value);
+        }
     }
     return CHIP_NO_ERROR;
 }

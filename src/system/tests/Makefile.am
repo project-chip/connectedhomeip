@@ -47,6 +47,7 @@ libSystemLayerTests_a_SOURCES                         = \
     TestSystemObject.cpp                                \
     TestSystemPacketBuffer.cpp                          \
     TestSystemTimer.cpp                                 \
+    TestTimeSource.cpp                                  \
     $(NULL)
 
 libSystemLayerTests_adir                              = $(includedir)/system
@@ -89,23 +90,46 @@ COMMON_LDADD                                           = \
 # Test applications that should be run when the 'check' target is run.
 
 check_PROGRAMS                                        = \
+    $(NULL)
+
+check_SCRIPTS                                         = \
+    $(NULL)
+
+# The additional environment variables and their values that will be
+# made available to all programs and scripts in TESTS.
+TESTS_ENVIRONMENT                                      = \
+    $(NULL)
+
+if CHIP_DEVICE_LAYER_TARGET_ESP32
+
+check_SCRIPTS                                         += \
+    qemu_system_tests.sh                                 \
+    $(NULL)
+
+TESTS_ENVIRONMENT                                     += \
+    abs_top_srcdir='$(abs_top_srcdir)'                   \
+    abs_top_builddir='$(abs_top_builddir)'               \
+    QEMU_TEST_TARGET=libSystemLayerTests.a               \
+    $(NULL)
+
+else # CHIP_DEVICE_LAYER_TARGET_ESP32
+
+check_PROGRAMS                                       += \
     TestSystemErrorStr                                  \
     TestSystemObject                                    \
     TestSystemPacketBuffer                              \
     TestSystemTimer                                     \
+    TestTimeSource                                      \
     $(NULL)
+
+endif # CHIP_DEVICE_LAYER_TARGET_ESP32
 
 # Test applications and scripts that should be built and run when the
 # 'check' target is run.
 
 TESTS                                                 = \
     $(check_PROGRAMS)                                   \
-    $(NULL)
-
-# The additional environment variables and their values that will be
-# made available to all programs and scripts in TESTS.
-
-TESTS_ENVIRONMENT                                     = \
+    $(check_SCRIPTS)                                    \
     $(NULL)
 
 # Source, compiler, and linker options for test programs.
@@ -121,6 +145,9 @@ TestSystemPacketBuffer_LDADD                          = $(COMMON_LDADD)
 
 TestSystemTimer_SOURCES                               = TestSystemTimerDriver.cpp
 TestSystemTimer_LDADD                                 = $(COMMON_LDADD)
+
+TestTimeSource_SOURCES                               = TestTimeSourceDriver.cpp
+TestTimeSource_LDADD                                 = $(COMMON_LDADD)
 
 #
 # Foreign make dependencies

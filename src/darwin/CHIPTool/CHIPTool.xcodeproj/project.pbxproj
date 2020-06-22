@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C47BE4424885B97005E97F6 /* CHIPViewControllerBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 0C47BE4324885B97005E97F6 /* CHIPViewControllerBase.m */; };
+		0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0CA0E0CE248599BB009087B9 /* OnOffViewController.m */; };
 		991DC091247747F500C13860 /* EchoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 991DC090247747F500C13860 /* EchoViewController.m */; };
 		B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A620244E1D0600C7C0E1 /* AppDelegate.m */; };
 		B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A623244E1D0600C7C0E1 /* SceneDelegate.m */; };
@@ -44,15 +46,19 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		991DC08F247747F500C13860 /* EchoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = EchoViewController.h; path = UI/EchoViewController.h; sourceTree = "<group>"; };
-		991DC090247747F500C13860 /* EchoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = EchoViewController.m; path = UI/EchoViewController.m; sourceTree = "<group>"; };
+		0C47BE4324885B97005E97F6 /* CHIPViewControllerBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHIPViewControllerBase.m; sourceTree = "<group>"; };
+		0CA0E0CD248599BB009087B9 /* OnOffViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OnOffViewController.h; sourceTree = "<group>"; };
+		0CA0E0CE248599BB009087B9 /* OnOffViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OnOffViewController.m; sourceTree = "<group>"; };
+		515C401824868BF0004C4DB3 /* CHIPViewControllerBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPViewControllerBase.h; sourceTree = "<group>"; };
+		991DC08F247747F500C13860 /* EchoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EchoViewController.h; sourceTree = "<group>"; };
+		991DC090247747F500C13860 /* EchoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EchoViewController.m; sourceTree = "<group>"; };
 		B204A61C244E1D0600C7C0E1 /* CHIPTool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CHIPTool.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B204A61F244E1D0600C7C0E1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = UI/AppDelegate.h; sourceTree = "<group>"; };
 		B204A620244E1D0600C7C0E1 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = UI/AppDelegate.m; sourceTree = "<group>"; };
 		B204A622244E1D0600C7C0E1 /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SceneDelegate.h; path = UI/SceneDelegate.h; sourceTree = "<group>"; };
 		B204A623244E1D0600C7C0E1 /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SceneDelegate.m; path = UI/SceneDelegate.m; sourceTree = "<group>"; };
-		B204A625244E1D0600C7C0E1 /* QRCodeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = QRCodeViewController.h; path = UI/QRCodeViewController.h; sourceTree = "<group>"; };
-		B204A626244E1D0600C7C0E1 /* QRCodeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = QRCodeViewController.m; path = UI/QRCodeViewController.m; sourceTree = "<group>"; };
+		B204A625244E1D0600C7C0E1 /* QRCodeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QRCodeViewController.h; sourceTree = "<group>"; };
+		B204A626244E1D0600C7C0E1 /* QRCodeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QRCodeViewController.m; sourceTree = "<group>"; };
 		B204A62B244E1D0700C7C0E1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B204A630244E1D0700C7C0E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B204A631244E1D0700C7C0E1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -82,6 +88,33 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0C79937824858B3B0047A373 /* QRCode */ = {
+			isa = PBXGroup;
+			children = (
+				B204A625244E1D0600C7C0E1 /* QRCodeViewController.h */,
+				B204A626244E1D0600C7C0E1 /* QRCodeViewController.m */,
+			);
+			path = QRCode;
+			sourceTree = "<group>";
+		};
+		0C79937924858B4F0047A373 /* Echo client */ = {
+			isa = PBXGroup;
+			children = (
+				991DC08F247747F500C13860 /* EchoViewController.h */,
+				991DC090247747F500C13860 /* EchoViewController.m */,
+			);
+			path = "Echo client";
+			sourceTree = "<group>";
+		};
+		0CA0E0D0248599C4009087B9 /* OnOffCluster */ = {
+			isa = PBXGroup;
+			children = (
+				0CA0E0CD248599BB009087B9 /* OnOffViewController.h */,
+				0CA0E0CE248599BB009087B9 /* OnOffViewController.m */,
+			);
+			path = OnOffCluster;
+			sourceTree = "<group>";
+		};
 		B20252DE2459EC7600F97062 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -112,19 +145,20 @@
 		B204A61E244E1D0600C7C0E1 /* CHIPTool */ = {
 			isa = PBXGroup;
 			children = (
+				B204A62B244E1D0700C7C0E1 /* Assets.xcassets */,
 				B2F53AEC245B0D190010745E /* Main.storyboard */,
 				B2F53AE9245B0D140010745E /* LaunchScreen.storyboard */,
 				B204A630244E1D0700C7C0E1 /* Info.plist */,
-				B204A631244E1D0700C7C0E1 /* main.m */,
-				B204A61F244E1D0600C7C0E1 /* AppDelegate.h */,
+				515C401824868BF0004C4DB3 /* CHIPViewControllerBase.h */,
+				0C47BE4324885B97005E97F6 /* CHIPViewControllerBase.m */,
 				B204A620244E1D0600C7C0E1 /* AppDelegate.m */,
+				B204A631244E1D0700C7C0E1 /* main.m */,
 				B204A622244E1D0600C7C0E1 /* SceneDelegate.h */,
 				B204A623244E1D0600C7C0E1 /* SceneDelegate.m */,
-				B204A625244E1D0600C7C0E1 /* QRCodeViewController.h */,
-				B204A626244E1D0600C7C0E1 /* QRCodeViewController.m */,
-				B204A62B244E1D0700C7C0E1 /* Assets.xcassets */,
-				991DC08F247747F500C13860 /* EchoViewController.h */,
-				991DC090247747F500C13860 /* EchoViewController.m */,
+				B204A61F244E1D0600C7C0E1 /* AppDelegate.h */,
+				0C79937824858B3B0047A373 /* QRCode */,
+				0C79937924858B4F0047A373 /* Echo client */,
+				0CA0E0D0248599C4009087B9 /* OnOffCluster */,
 			);
 			path = CHIPTool;
 			sourceTree = "<group>";
@@ -243,6 +277,8 @@
 				B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */,
 				B204A632244E1D0700C7C0E1 /* main.m in Sources */,
 				B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */,
+				0C47BE4424885B97005E97F6 /* CHIPViewControllerBase.m in Sources */,
+				0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -315,8 +351,10 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -374,8 +412,10 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -398,8 +438,9 @@
 		B204A64C244E1D0700C7C0E1 /* Debug iOS */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
@@ -408,18 +449,22 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPTool;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 armv4t armv5 armv6 armv6m armv7 armv7em armv7f armv7k armv7m armv7s xscale";
 			};
 			name = "Debug iOS";
 		};
 		B204A64D244E1D0700C7C0E1 /* Release iOS */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
@@ -428,10 +473,13 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPTool;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 armv4t armv5 armv6 armv6m armv7 armv7em armv7f armv7k armv7m armv7s xscale";
 			};
 			name = "Release iOS";
 		};

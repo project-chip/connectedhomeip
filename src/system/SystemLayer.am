@@ -38,16 +38,17 @@ CHIP_BUILD_SYSTEM_LAYER_SOURCE_FILES += @top_builddir@/src/system/SystemFaultInj
 endif # CHIP_WITH_NLFAULTINJECTION
 
 CHIP_BUILD_SYSTEM_LAYER_HEADER_FILES                  = \
-    SystemAlignSize.h                                   \
-    SystemClock.h                                       \
-    SystemConfig.h                                      \
-    SystemError.h                                       \
-    SystemEvent.h                                       \
-    SystemFaultInjection.h                              \
-    SystemStats.h                                       \
-    SystemLayer.h                                       \
-    SystemMutex.h                                       \
-    SystemObject.h                                      \
-    SystemTimer.h                                       \
-    SystemPacketBuffer.h                                \
+    @top_builddir@/src/system/SystemAlignSize.h         \
+    @top_builddir@/src/system/SystemClock.h             \
+    @top_builddir@/src/system/SystemConfig.h            \
+    @top_builddir@/src/system/SystemError.h             \
+    @top_builddir@/src/system/SystemEvent.h             \
+    @top_builddir@/src/system/SystemFaultInjection.h    \
+    @top_builddir@/src/system/SystemStats.h             \
+    @top_builddir@/src/system/SystemLayer.h             \
+    @top_builddir@/src/system/SystemMutex.h             \
+    @top_builddir@/src/system/SystemObject.h            \
+    @top_builddir@/src/system/SystemTimer.h             \
+    @top_builddir@/src/system/SystemPacketBuffer.h      \
+    @top_builddir@/src/system/TimeSource.h              \
     $(NULL)

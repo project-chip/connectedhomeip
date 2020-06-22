@@ -1,6 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-make -f Makefile-bootstrap repos
+set -x
+env
+
+make -j -f Makefile-bootstrap repos
 source examples/wifi-echo/server/esp32/idf.sh
-idf make -C examples/wifi-echo/server/esp32 defconfig
-idf make -C examples/wifi-echo/server/esp32
+idf make -j V=1 -C examples/wifi-echo/server/esp32 defconfig
+idf make -j V=1 -C examples/wifi-echo/server/esp32

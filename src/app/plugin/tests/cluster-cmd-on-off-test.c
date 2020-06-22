@@ -99,11 +99,9 @@ int testClusterCmdOnOff(void)
         return 1;
     }
 
-    uint8_t * rawBuffer   = chipZclBufferPointer(buffer);
-    uint16_t bufferLength = chipZclBufferDataLength(buffer);
     bool onOff;
 
-    printf("Buffer for processing is ready, length: %d\n", bufferLength);
+    printf("Buffer for processing is ready, length: %d\n", chipZclBufferDataLength(buffer));
 
     // Make sure initial value of the attribute is false.
     status = chipZclReadAttribute(1, &chipZclClusterOnOffServerSpec, CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF, &onOff,
@@ -116,7 +114,7 @@ int testClusterCmdOnOff(void)
 
     // At this point, we have a buffer encoded with the command context that contains the command.
     // So we will be testing top-level entry API.
-    status = chipZclProcessIncoming(rawBuffer, bufferLength);
+    status = chipZclProcessIncoming(buffer);
 
     if (status == CHIP_ZCL_STATUS_SUCCESS)
     {

@@ -27,6 +27,7 @@
 #include <core/CHIPTLV.h>
 #include <core/CHIPTLVData.hpp>
 #include <core/CHIPTLVUtilities.hpp>
+#include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 
 using namespace chip;
@@ -45,14 +46,18 @@ bool SetupPayload::isValidQRCodePayload()
     {
         return false;
     }
-    if (rendezvousInformation >= 1 << kRendezvousInfoFieldLengthInBits)
+
+    size_t rendezvousInfoAllowedFieldLengthInBits = kRendezvousInfoFieldLengthInBits - kRendezvousInfoReservedFieldLengthInBits;
+    if (rendezvousInformation >= 1 << rendezvousInfoAllowedFieldLengthInBits)
     {
         return false;
     }
+
     if (discriminator >= 1 << kPayloadDiscriminatorFieldLengthInBits)
     {
         return false;
     }
+
     if (setUpPINCode >= 1 << kSetupPINCodeFieldLengthInBits)
     {
         return false;
@@ -85,10 +90,22 @@ bool SetupPayload::isValidManualCode()
     return true;
 }
 
-CHIP_ERROR SetupPayload::addOptionalData(OptionalQRCodeInfo info)
+CHIP_ERROR SetupPayload::addVendorOptionalData(OptionalQRCodeInfo info)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrExit(info.tag < 1 << kRawVendorTagLengthInBits, err = CHIP_ERROR_INVALID_ARGUMENT);
     optionalData[info.tag] = info;
-    return CHIP_NO_ERROR;
+exit:
+    return err;
+}
+
+CHIP_ERROR SetupPayload::addCHIPOptionalData(OptionalQRCodeInfo info)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrExit(info.tag >= 1 << kRawVendorTagLengthInBits, err = CHIP_ERROR_INVALID_ARGUMENT);
+    optionalData[info.tag] = info;
+exit:
+    return err;
 }
 
 vector<OptionalQRCodeInfo> SetupPayload::getAllOptionalData()
@@ -101,23 +118,13 @@ vector<OptionalQRCodeInfo> SetupPayload::getAllOptionalData()
     return returnedOptionalInfo;
 }
 
-CHIP_ERROR SetupPayload::removeOptionalData(uint64_t tag)
+CHIP_ERROR SetupPayload::removeOptionalData(uint8_t tag)
 {
     if (optionalData.find(tag) == optionalData.end())
     {
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
     optionalData.erase(tag);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR VendorTag(uint16_t tagNumber, uint64_t & outVendorTag)
-{
-    if (tagNumber >= 1 << kRawVendorTagLengthInBits)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    outVendorTag = ContextTag(tagNumber);
     return CHIP_NO_ERROR;
 }
 

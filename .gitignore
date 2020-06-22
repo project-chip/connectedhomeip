@@ -28,7 +28,7 @@ third_party/nlio/
 third_party/nlunit-test/
 third_party/mbedtls/
 examples/common/m5stack-tft/
-examples/common/QRCode/repo
+examples/common/QRCode/repo/
 
 # Example specific rules
 examples/**/sdkconfig
@@ -40,7 +40,7 @@ src/test_driver/esp32/build
 # Temporary Directories
 .tmp/
 
-# Xcode
+# Xcode, other development environment stuff
 *.pbxuser
 *.mode1v3
 *.mode2v3
@@ -50,3 +50,4 @@ project.xcworkspace/
 xcuserdata/
 *.xcodeproj/*
 *.xcworkspace/*
+TAGS

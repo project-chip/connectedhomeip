@@ -26,6 +26,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* #ifdef __cplusplus */
+
 /**
  * Structure that describes the buffers passed between the CHIP layers and
  * the Zap layer.
@@ -37,24 +41,7 @@
  * from, currentPosition represents the current read position and dataLength is
  * the total length of the data that can be read.
  */
-typedef struct
-{
-    /**
-     * The data storage for our buffer.
-     */
-    uint8_t * buffer;
-
-    /**
-     * The size of our buffer above.
-     */
-    uint16_t bufferLength;
-
-    /**
-     * The length of the data that can be read from this buffer; nonzero only
-     * when it's ready to be read from.
-     */
-    uint16_t dataLength;
-} ChipZclBuffer_t;
+typedef struct ChipZclBuffer_t ChipZclBuffer_t;
 
 /**
  * Function that allocates a buffer.
@@ -83,14 +70,6 @@ uint8_t * chipZclBufferPointer(ChipZclBuffer_t * buffer);
 void chipZclBufferFree(ChipZclBuffer_t * buffer);
 
 /**
- * Function that resets a buffer to have its entire allocated length
- *  available for writing.
- *
- * @param[in] buffer the buffer to reset.
- */
-void chipZclBufferReset(ChipZclBuffer_t * buffer);
-
-/**
  * Function that returns the size of the used portion of the buffer, in octets,
  * when the buffer is ready for reading.  Always returns 0 for buffers that are
  * being written to.
@@ -117,4 +96,7 @@ void chipZclBufferSetDataLength(ChipZclBuffer_t * buffer, uint16_t newLength);
  */
 uint16_t chipZclBufferAvailableLength(ChipZclBuffer_t * buffer);
 
+#ifdef __cplusplus
+}
+#endif /* #ifdef __cplusplus */
 #endif // CHIP_ZCL_BUFFER

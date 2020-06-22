@@ -579,33 +579,11 @@ void ServiceEvents(struct ::timeval & aSleepTime)
 
     if (gInet.State == InetLayer::kState_Initialized)
     {
-#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES && CHIP_SYSTEM_CONFIG_USE_LWIP
-        static uint32_t sRemainingInetLayerEventDelay = 0;
-#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES && CHIP_SYSTEM_CONFIG_USE_LWIP
-
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
         gInet.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES && CHIP_SYSTEM_CONFIG_USE_LWIP
-        if (gInet.State == InetLayer::kState_Initialized)
-        {
-            if (sRemainingInetLayerEventDelay == 0)
-            {
-                gInet.DispatchEvents();
-                sRemainingInetLayerEventDelay = gNetworkOptions.EventDelay;
-            }
-            else
-                sRemainingInetLayerEventDelay--;
-
-            // TODO: Currently timers are delayed by aSleepTime above. A improved solution would have a mechanism to reduce
-            // aSleepTime according to the next timer.
-
-            gInet.HandlePlatformTimer();
-        }
-#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES && CHIP_SYSTEM_CONFIG_USE_LWIP
     }
 }
 

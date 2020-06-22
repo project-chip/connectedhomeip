@@ -17,6 +17,8 @@
 
 #import "AppDelegate.h"
 
+static NSString * const ipKey = @"ipk";
+
 @interface AppDelegate ()
 
 @end
@@ -26,6 +28,8 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:ipKey];
     return YES;
 }
 

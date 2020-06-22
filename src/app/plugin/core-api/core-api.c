@@ -18,53 +18,16 @@
 #include <memory.h>
 
 #include "chip-zcl.h"
+#include "gen-global-command-handler.h"
 
 ChipZclStatus_t chipZclClusterCommandParse(ChipZclCommandContext_t * context);
 
-ChipZclStatus_t chipZclProcessIncoming(uint8_t * rawBuffer, uint16_t rawBufferLength)
+ChipZclStatus_t chipZclProcessIncoming(ChipZclBuffer_t * message)
 {
-    ChipZclBuffer_t buffer = { rawBuffer, rawBufferLength, rawBufferLength };
-
     ChipZclCommandContext_t context = { 0 };
 
-    chipZclDecodeZclHeader(&buffer, &context);
+    chipZclDecodeZclHeader(message, &context);
 
-    return chipZclClusterCommandParse(&context);
-}
-
-/**
- * Function that returns a pointer to the raw buffer.
- */
-uint8_t * chipZclBufferPointer(ChipZclBuffer_t * buffer)
-{
-    return buffer->buffer;
-}
-
-/**
- * Function that returns the size of the used portion of the buffer.
- */
-uint16_t chipZclBufferDataLength(ChipZclBuffer_t * buffer)
-{
-    return buffer->dataLength;
-}
-
-/**
- * returns space available for writing after any data already in the buffer
- */
-uint16_t chipZclBufferAvailableLength(ChipZclBuffer_t * buffer)
-{
-    return buffer->bufferLength - buffer->dataLength;
-}
-
-/**
- *  sets data length for a buffer that's being written to
- */
-void chipZclBufferSetDataLength(ChipZclBuffer_t * buffer, uint16_t newLength)
-{
-    buffer->dataLength = newLength;
-}
-
-void chipZclBufferReset(ChipZclBuffer_t * buffer)
-{
-    buffer->dataLength = 0;
+    // Should this just use chipZclCommandParse?
+    return context.clusterSpecific ? chipZclClusterCommandParse(&context) : chipZclGeneralCommandParse(&context);
 }

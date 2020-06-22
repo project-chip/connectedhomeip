@@ -45,7 +45,6 @@ typedef NS_ENUM(NSUInteger, OptionalQRCodeInfoType) { kOptionalQRCodeInfoTypeStr
 
 @property (nonatomic, strong) NSString * serialNumber;
 - (NSArray<CHIPOptionalQRCodeInfo *> *)getAllOptionalData:(NSError * __autoreleasing *)error;
-+ (NSNumber *)vendorTag:(NSNumber *)tagNumber error:(NSError * __autoreleasing *)error;
 
 #ifdef __cplusplus
 - (id)initWithSetupPayload:(chip::SetupPayload)setupPayload;

@@ -65,7 +65,7 @@ static const char ModuleNames[] = "-\0\0" // None
                                   "TLV"   // TLV
                                   "ASN"   // ASN1
                                   "CR\0"  // Crypto
-                                  "CTL\0" // Controller
+                                  "CTL"   // Controller
                                   "AL\0"  // Alarm
                                   "BDX"   // BulkDataTransfer
                                   "DMG"   // DataManagement
@@ -79,11 +79,16 @@ static const char ModuleNames[] = "-\0\0" // None
                                   "SWU"   // SoftwareUpdate
                                   "TP\0"  // TokenPairing
                                   "TS\0"  // TimeServices
-                                  "WT\0"  // chipTunnel
+                                  "TUN"   // chipTunnel
                                   "HB\0"  // Heartbeat
-                                  "WSL"   // chipSystemLayer
+                                  "CSL"   // chipSystemLayer
                                   "EVL"   // Event Logging
                                   "SPT"   // Support
+                                  "TOO"   // chipTool
+                                  "ZCL"   // Zcl
+                                  "SH\0"  // Shell
+                                  "DL\0"  // DeviceLayer
+                                  "SPL"   // SetupPayload
     ;
 
 #define ModuleNamesCount ((sizeof(ModuleNames) - 1) / ChipLoggingModuleNameLen)
@@ -150,17 +155,6 @@ uint8_t gLogFilter = kLogCategory_Max;
 
 #endif // CHIP_LOG_FILTERING
 
-#if !CHIP_LOGGING_STYLE_EXTERNAL
-/*
- * Only enable an in-package implementation of the logging interface
- * if external logging was not requested. Within that, the package
- * supports either Android-style or C Standard I/O-style logging.
- *
- * In the event a "weak" variant is specified, i.e
- * CHIP_LOGGING_STYLE_STDIO_WEAK, the in-package implementation will
- * be provided but with "weak" linkage
- */
-
 /**
  * Log, to the platform-specified mechanism, the specified log
  * message, @a msg, for the specified module, @a module, in the
@@ -183,47 +177,16 @@ uint8_t gLogFilter = kLogCategory_Max;
  *                      correspond to the format specifiers in @a msg.
  *
  */
-
-#if CHIP_LOGGING_STYLE_STDIO_WEAK
-#define __CHIP_LOGGING_LINK_ATTRIBUTE __attribute__((weak))
-#else
-#define __CHIP_LOGGING_LINK_ATTRIBUTE
-#endif
-
-DLL_EXPORT __CHIP_LOGGING_LINK_ATTRIBUTE void Log(uint8_t module, uint8_t category, const char * msg, ...)
+DLL_EXPORT void Log(uint8_t module, uint8_t category, const char * msg, ...)
 {
     va_list v;
 
     va_start(v, msg);
 
-    if (IsCategoryEnabled(category))
-    {
-
-#if CHIP_LOGGING_STYLE_ANDROID
-
-        char moduleName[ChipLoggingModuleNameLen + 1];
-        GetModuleName(moduleName, module);
-
-        int priority = (category == kLogCategory_Error) ? ANDROID_LOG_ERROR : ANDROID_LOG_DEBUG;
-
-        __android_log_vprint(priority, moduleName, msg, v);
-
-#elif CHIP_LOGGING_STYLE_STDIO || CHIP_LOGGING_STYLE_STDIO_WEAK
-
-        PrintMessagePrefix(module);
-        vprintf(msg, v);
-        printf("\n");
-
-#else
-
-#error "Undefined platform-specific implementation for non-externnal chip logging style!"
-
-#endif /* CHIP_LOGGING_STYLE_ANDROID */
-    }
+    LogV(module, category, msg, v);
 
     va_end(v);
 }
-#endif /* !CHIP_LOGGING_STYLE_EXTERNAL */
 
 DLL_EXPORT uint8_t GetLogFilter()
 {

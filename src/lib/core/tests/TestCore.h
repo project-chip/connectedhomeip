@@ -31,7 +31,6 @@ extern "C" {
 
 int TestCHIPErrorStr(void);
 int TestCHIPTLV(void);
-int TestCHIPSecureChannel(void);
 
 #ifdef __cplusplus
 }

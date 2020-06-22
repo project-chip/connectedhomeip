@@ -42,7 +42,10 @@ lib_LIBRARIES                                         = \
 
 libTransportLayerTests_a_SOURCES                      = \
     TestMessageHeader.cpp                               \
-    TestUdpTransport.cpp                                \
+    TestPeerConnections.cpp                             \
+    TestSecureSession.cpp                               \
+    TestSecureSessionMgr.cpp                            \
+    TestUDP.cpp                                         \
     $(NULL)
 
 libTransportLayerTests_adir                           = $(includedir)/transport
@@ -67,7 +70,6 @@ AM_CPPFLAGS                                           = \
 
 CHIP_LDADD                                            = \
     $(top_builddir)/src/lib/libCHIP.a                   \
-    $(top_builddir)/src/crypto/libChipCrypto.a          \
     $(NULL)
 
 COMMON_LDADD                                          = \
@@ -85,7 +87,10 @@ COMMON_LDADD                                          = \
 
 check_PROGRAMS             = \
     TestMessageHeader        \
-    TestUdpTransport         \
+    TestPeerConnections      \
+    TestSecureSessionMgr     \
+    TestSecureSession        \
+    TestUDP                  \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -106,8 +111,17 @@ TESTS_ENVIRONMENT             = \
 TestMessageHeader_SOURCES     = TestMessageHeaderDriver.cpp
 TestMessageHeader_LDADD       = $(COMMON_LDADD)
 
-TestUdpTransport_SOURCES     = TestUdpTransportDriver.cpp
-TestUdpTransport_LDADD       = $(COMMON_LDADD)
+TestSecureSessionMgr_SOURCES  = TestSecureSessionMgrDriver.cpp
+TestSecureSessionMgr_LDADD    = $(COMMON_LDADD)
+
+TestSecureSession_SOURCES     = TestSecureSessionDriver.cpp
+TestSecureSession_LDADD       = $(COMMON_LDADD)
+
+TestUDP_SOURCES               = TestUDPDriver.cpp
+TestUDP_LDADD                 = $(COMMON_LDADD)
+
+TestPeerConnections_SOURCES   = TestPeerConnectionsDriver.cpp
+TestPeerConnections_LDADD     = $(COMMON_LDADD)
 
 #
 # Foreign make dependencies
@@ -119,6 +133,7 @@ NLFOREIGN_FILE_DEPENDENCIES                           = \
 
 NLFOREIGN_SUBDIR_DEPENDENCIES                         = \
    $(LWIP_FOREIGN_SUBDIR_DEPENDENCY)                    \
+   $(NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY)        \
    $(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY)             \
    $(NULL)
 

@@ -35,7 +35,6 @@ CHIP_BUILD_INET_LAYER_SOURCE_FILES                         = \
     @top_builddir@/src/inet/InetInterface.cpp                \
     @top_builddir@/src/inet/InetLayer.cpp                    \
     @top_builddir@/src/inet/InetLayerBasis.cpp               \
-    @top_builddir@/src/inet/InetTimer.cpp                    \
     @top_builddir@/src/inet/InetUtils.cpp                    \
     $(NULL)
 
@@ -50,7 +49,6 @@ CHIP_BUILD_INET_LAYER_HEADER_FILES                         = \
     @top_builddir@/src/inet/IPPrefix.h                       \
     @top_builddir@/src/inet/Inet.h                           \
     @top_builddir@/src/inet/InetArgParser.h                  \
-    @top_builddir@/src/inet/InetBuffer.h                     \
     @top_builddir@/src/inet/InetConfig.h                     \
     @top_builddir@/src/inet/InetError.h                      \
     @top_builddir@/src/inet/InetFaultInjection.h             \
@@ -58,7 +56,6 @@ CHIP_BUILD_INET_LAYER_HEADER_FILES                         = \
     @top_builddir@/src/inet/InetLayer.h                      \
     @top_builddir@/src/inet/InetLayerBasis.h                 \
     @top_builddir@/src/inet/InetLayerEvents.h                \
-    @top_builddir@/src/inet/InetTimer.h                      \
     @top_builddir@/src/inet/RawEndPoint.h                    \
     @top_builddir@/src/inet/TCPEndPoint.h                    \
     @top_builddir@/src/inet/TunEndPoint.h                    \

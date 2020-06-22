@@ -8,7 +8,7 @@ PR
 | [chrisdecenzo](https://github.com/chrisdecenzo)       | Amazon, Inc.        |
 | [hawk248](https://github.com/hawk248)                 | Comcast, Inc.       |
 | [jelderton](https://github.com/jelderton)             | Comcast, Inc.       |
-| [gerickson](https://github.com/gerickson)             | Google, Inc.        |
+| [andy31415](https://github.com/andy31415)             | Google, Inc.        |
 | [robszewczyk](https://github.com/robszewczyk)         | Google, Inc.        |
 | [saurabhst](https://github.com/saurabhst)             | Samsung SmartThings |
 | [woody-apple](https://github.com/woody-apple)         | Apple, Inc.         |
