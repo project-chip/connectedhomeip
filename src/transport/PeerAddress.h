@@ -107,7 +107,7 @@ public:
 
     void ToString(char * buf, size_t bufSize)
     {
-        char ip_addr[INET_ADDRSTRLEN];
+        char ip_addr[kInetMaxAddrLen];
 
         switch (mTransportType)
         {
