@@ -2087,10 +2087,18 @@ if test "${ac_no_link}" != "yes"; then
     # CLOCK_BOOTTIME is available in later versions of linux and Android
 
     AC_CHECK_DECLS([CLOCK_MONOTONIC, CLOCK_BOOTTIME], [], [], [[#include <time.h>]])
+
+    # Check for presence of pipe. If it's unavailable, like in Zephyr RTOS,
+    # the implementation must use alternative primitives.
+    AC_CHECK_FUNCS([pipe], [CONFIG_HAVE_PIPE=1], [CONFIG_HAVE_PIPE=0])
 fi
 
 AC_SUBST(CONFIG_HAVE_HEAP)
 AM_CONDITIONAL([CONFIG_HAVE_HEAP], [test "${CONFIG_HAVE_HEAP}" = "1"])
+
+AC_SUBST(CONFIG_HAVE_PIPE)
+AM_CONDITIONAL([CONFIG_HAVE_PIPE], [test "${CONFIG_HAVE_PIPE}" = "1"])
+AC_DEFINE_UNQUOTED([CONFIG_HAVE_PIPE], [${CONFIG_HAVE_PIPE}], [pipe function exists])
 
 #
 # Check for POSIX thread (pthread) support

@@ -38,6 +38,8 @@
 
 // Include dependent headers
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#include <system/SystemPipe.h>
+
 #include <sys/select.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -188,9 +190,7 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    int mWakePipeIn;
-    int mWakePipeOut;
-
+    Pipe mWakePipe;
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     pthread_t mHandleSelectThread;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
