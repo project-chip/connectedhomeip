@@ -190,22 +190,23 @@ exit:
 
 static CHIPEntropyContext * get_entropy_context()
 {
-    if (gsEntropyContext.initialized)
-    {
-        return &gsEntropyContext;
-    }
+    CHIPEntropyContext * context = NULL;
+    int status                   = 0;
+
+    VerifyOrExit(!gsEntropyContext.initialized, context = &gsEntropyContext);
 
     mbedtls_entropy_init(&gsEntropyContext.entropy);
     mbedtls_ctr_drbg_init(&gsEntropyContext.drbg_ctxt);
 
-    int status = mbedtls_ctr_drbg_seed(&gsEntropyContext.drbg_ctxt, mbedtls_entropy_func, &gsEntropyContext.entropy, NULL, 0);
+    status = mbedtls_ctr_drbg_seed(&gsEntropyContext.drbg_ctxt, mbedtls_entropy_func, &gsEntropyContext.entropy, NULL, 0);
     VerifyOrExit(status == 0, _log_mbedTLS_error(status));
 
     gsEntropyContext.initialized = true;
 
-    return &gsEntropyContext;
+    context = &gsEntropyContext;
+
 exit:
-    return NULL;
+    return context;
 }
 
 CHIP_ERROR chip::Crypto::add_entropy_source(CHIP_entropy_source fn_source, void * p_source, size_t threshold)
