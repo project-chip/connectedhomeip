@@ -81,8 +81,7 @@ CHIP_ERROR SecureSessionMgr::ManualKeyExchange(const unsigned char * remote_publ
     CHIP_ERROR err  = CHIP_NO_ERROR;
     size_t info_len = strlen(kManualKeyExchangeChannelInfo);
 
-    VerifyOrExit(mState == State::kConnected, err = CHIP_ERROR_INCORRECT_STATE);
-
+    VerifyOrExit(mState == State::kConnected || mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
     err = mConnectionState.GetSecureSession().Init(remote_public_key, public_key_length, local_private_key, private_key_length,
                                                    NULL, 0, (const unsigned char *) kManualKeyExchangeChannelInfo, info_len);
     SuccessOrExit(err);
