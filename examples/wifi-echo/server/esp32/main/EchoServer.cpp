@@ -118,7 +118,7 @@ void echo(const MessageHeader & header, Transport::PeerConnectionState * state, 
     VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ESP_LOGE(TAG, "Unknown source for received message"));
 
     {
-        char src_addr[128];
+        char src_addr[Transport::PeerAddress::kMaxToStringSize];
 
         state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
 

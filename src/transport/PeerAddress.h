@@ -88,6 +88,21 @@ public:
         return (mTransportType == other.mTransportType) && (mIPAddress == other.mIPAddress) && (mPort == other.mPort);
     }
 
+    /// Maximum size of an Inet address ToString format, that can hold both IPV6 and IPV4 addresses.
+#ifdef INET6_ADDRSTRLEN
+    static constexpr size_t kInetMaxAddrLen = INET6_ADDRSTRLEN;
+#else
+    static constexpr size_t kInetMaxAddrLen = INET_ADDRSTRLEN;
+#endif
+
+    /// Maximum size of the string outputes by ToString. Format is of the form:
+    /// "UDP:<ip>:<port>"
+    static constexpr size_t kMaxToStringSize = //
+        3 /* UDP/TCP/BLE */ + 1 /* : */        //
+        + kInetMaxAddrLen + 1 /* : */          //
+        + 5 /* 16 bit interger */              //
+        + 1 /* NullTerminator */;
+
     void ToString(char * buf, size_t bufSize)
     {
         char ip_addr[INET_ADDRSTRLEN];

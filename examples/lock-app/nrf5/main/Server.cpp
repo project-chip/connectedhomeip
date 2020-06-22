@@ -77,17 +77,17 @@ static void OnRecv(const MessageHeader & header, const IPPacketInfo & packet_inf
                    SecureSessionMgr * transport)
 {
     const size_t data_len = buffer->DataLength();
-    char src_addr[128];
+    char src_addr[Transport::PeerAddress::kMaxToStringSize];
 
     // as soon as a client connects, assume it is connected
     VerifyOrExit(transport != NULL && buffer != NULL, NRF_LOG_INFO("Received data but couldn't process it..."));
     VerifyOrExit(header.GetSourceNodeId().HasValue(), NRF_LOG_INFO("Unknown source for received message"));
 
-    VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ESP_LOGE(TAG, "Unknown source for received message"));
+    VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, NRF_LOG_INFO("Unknown source for received message"));
 
     state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
 
-    NRF_LOG_INFO("Packet received from %s (%zu bytes)", src_addr, static_cast<size_t>(data_len));
+    NRF_LOG_INFO("Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
 
     HandleDataModelMessage(buffer);
     buffer = NULL;
