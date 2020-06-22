@@ -115,7 +115,8 @@
  * to be injected into a device at boot time and automatically stored in persistent storage.
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-#define CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING 1
+// We don't have platform/internal/FactoryProvisioning.ipp for now, so set it to 0 by default.
+#define CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING 0
 #endif
 
 /**

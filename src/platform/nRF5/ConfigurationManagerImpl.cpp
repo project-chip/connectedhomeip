@@ -45,7 +45,8 @@ using namespace ::chip::DeviceLayer::Internal;
 namespace {
 
 // Singleton instance of CHIP Group Key Store.
-GroupKeyStoreImpl gGroupKeyStore;
+// Note: GroupKeyStore is not ready yet
+// GroupKeyStoreImpl gGroupKeyStore;
 
 } // unnamed namespace
 
@@ -63,8 +64,9 @@ CHIP_ERROR ConfigurationManagerImpl::_Init()
     SuccessOrExit(err);
 
     // Initialize the global GroupKeyStore object.
-    err = gGroupKeyStore.Init();
-    SuccessOrExit(err);
+    // GroupKeyStore is not ready yet
+    // err = gGroupKeyStore.Init();
+    // SuccessOrExit(err);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 
