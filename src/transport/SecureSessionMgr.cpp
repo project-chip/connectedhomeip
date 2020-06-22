@@ -175,11 +175,6 @@ void SecureSessionMgr::HandleUdpDataReceived(const MessageHeader & header, const
         }
     }
 
-    if (!connection->StateAllowsReceive())
-    {
-        ExitNow(ChipLogProgress(Inet, "Secure transport failed: state does not allow receive"));
-    }
-
     // TODO this is where messages should be decoded
     {
         uint8_t * data      = msg->Start();
