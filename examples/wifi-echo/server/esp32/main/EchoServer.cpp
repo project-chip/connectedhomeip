@@ -101,9 +101,6 @@ void newConnectionHandler(const MessageHeader & header, const IPPacketInfo & pac
     VerifyOrExit(header.GetSourceNodeId().HasValue(), ESP_LOGE(TAG, "Unknown source for received message"));
     VerifyOrExit(transport->GetPeerNodeId() != header.GetSourceNodeId().Value(), ESP_LOGI(TAG, "Node already known."));
 
-    err = transport->Connect(header.GetSourceNodeId().Value(), PeerAddress::UDP(packet_info.SrcAddress, packet_info.SrcPort));
-    VerifyOrExit(err == CHIP_NO_ERROR, ESP_LOGE(TAG, "Failed to connect transport"));
-
     err = transport->ManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key, sizeof(local_private_key));
     VerifyOrExit(err == CHIP_NO_ERROR, ESP_LOGE(TAG, "Failed to setup encryption"));
 
