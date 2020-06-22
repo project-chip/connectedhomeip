@@ -24,6 +24,8 @@
 #ifndef PEER_ADDRESS_H_
 #define PEER_ADDRESS_H_
 
+#include <stdio.h>
+
 #include <inet/IPAddress.h>
 
 namespace chip {
