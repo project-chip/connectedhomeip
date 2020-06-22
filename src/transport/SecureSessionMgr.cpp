@@ -83,8 +83,8 @@ CHIP_ERROR SecureSessionMgr::ManualKeyExchange(const unsigned char * remote_publ
 
     VerifyOrExit(mState == State::kConnected, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = mSecureChannel.Init(remote_public_key, public_key_length, local_private_key, private_key_length, NULL, 0,
-                              (const unsigned char *) kManualKeyExchangeChannelInfo, info_len);
+    err = mConnectionState.GetSecureSession().Init(remote_public_key, public_key_length, local_private_key, private_key_length,
+                                                   NULL, 0, (const unsigned char *) kManualKeyExchangeChannelInfo, info_len);
     SuccessOrExit(err);
     mState = State::kSecureConnected;
 
@@ -106,7 +106,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBuffer
         uint8_t * data = msgBuf->Start();
         MessageHeader header;
 
-        err = mSecureChannel.Encrypt(data, msgBuf->TotalLength(), data, header);
+        err = mConnectionState.GetSecureSession().Encrypt(data, msgBuf->TotalLength(), data, header);
         SuccessOrExit(err);
 
         ChipLogProgress(Inet, "Secure transport transmitting msg %u after encryption", mConnectionState.GetSendMessageIndex());
@@ -169,7 +169,7 @@ void SecureSessionMgr::HandleDataReceived(const MessageHeader & header, const IP
 #endif
         plainText = msg->Start();
 
-        err = connection->mSecureChannel.Decrypt(data, len, plainText, header);
+        err = connection->mConnectionState.GetSecureSession().Decrypt(data, len, plainText, header);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Inet, "Secure transport failed to decrypt msg: err %d", err));
 
         if (connection->OnMessageReceived)

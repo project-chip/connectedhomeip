@@ -69,10 +69,11 @@ exit:
     return error;
 }
 
-void SecureSession::Close(void)
+void SecureSession::Reset(void)
 {
     mKeyAvailable = false;
     mNextIV       = 0;
+    memset(mKey, 0, sizeof(mKey));
 }
 
 CHIP_ERROR SecureSession::Encrypt(const unsigned char * input, size_t input_length, unsigned char * output, MessageHeader & header)

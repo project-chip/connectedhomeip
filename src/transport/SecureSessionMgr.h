@@ -163,7 +163,6 @@ private:
     Transport::PeerConnectionState mConnectionState;
     NodeId mLocalNodeId;
     State mState;
-    SecureSession mSecureChannel;
 
     bool StateAllowsSend(void) const { return mState != State::kNotReady; }
     bool StateAllowsReceive(void) const { return mState == State::kSecureConnected; }
