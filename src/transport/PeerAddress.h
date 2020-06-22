@@ -88,6 +88,25 @@ public:
         return (mTransportType == other.mTransportType) && (mIPAddress == other.mIPAddress) && (mPort == other.mPort);
     }
 
+    void ToString(char * buf, size_t bufSize)
+    {
+        char ip_addr[INET_ADDRSTRLEN];
+
+        switch (mTransportType)
+        {
+        case Type::kUndefined:
+            snprintf(buf, bufSize, "UNDEFINED");
+            break;
+        case Type::kUdp:
+            mIPAddress.ToString(ip_addr, sizeof(ip_addr));
+            snprintf(buf, bufSize, "UDP:%s:%d", ip_addr, mPort);
+            break;
+        default:
+            snprintf(buf, bufSize, "ERROR");
+            break;
+        }
+    }
+
     /****** Factory methods for convenience ******/
 
     static PeerAddress Uninitialized() { return PeerAddress(Inet::IPAddress::Any, Type::kUndefined); }
