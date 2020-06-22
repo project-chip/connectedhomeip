@@ -122,7 +122,7 @@ void echo(const MessageHeader & header, Transport::PeerConnectionState * state, 
 
         state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
 
-        ESP_LOGI(TAG, "UDP packet received from %s (%zu bytes)", src_addr, static_cast<size_t>(data_len));
+        ESP_LOGI(TAG, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
     }
 
     // FIXME: Long-term we shouldn't be guessing what sort of message this is
