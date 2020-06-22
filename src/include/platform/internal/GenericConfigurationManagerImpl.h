@@ -101,7 +101,9 @@ public:
     CHIP_ERROR _GetWiFiAPSSID(char * buf, size_t bufSize);
     CHIP_ERROR _GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo);
     CHIP_ERROR _ConfigureChipStack();
-    CHIP_ERROR _RunPrimitiveUnitTest(void);
+#if defined(DEBUG)
+    CHIP_ERROR _RunUnitTests(void);
+#endif
     bool _IsServiceProvisioned();
     bool _IsMemberOfFabric();
     bool _IsPairedToAccount();

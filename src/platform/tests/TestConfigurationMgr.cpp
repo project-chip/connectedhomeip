@@ -51,12 +51,15 @@ static void TestPlatformMgr_Init(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-static void TestPlatformMgr_PrimitiveTest(nlTestSuite * inSuite, void * inContext)
+#if defined(DEBUG)
+static void TestPlatformMgr_RunUnitTest(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = ConfigurationMgr().RunPrimitiveUnitTest();
+
+    err            = ConfigurationMgr().RunUnitTests();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
+#endif
 
 static void TestConfigurationMgr_SerialNumber(nlTestSuite * inSuite, void * inContext)
 {
@@ -418,7 +421,9 @@ static void TestConfigurationMgr_ClearServiceProvisioningData(nlTestSuite * inSu
 static const nlTest sTests[] = {
 
     NL_TEST_DEF("Test PlatformMgr::Init", TestPlatformMgr_Init),
-    NL_TEST_DEF("Test PlatformMgr::PrimitiveTest", TestPlatformMgr_PrimitiveTest),
+#if defined(DEBUG)
+    NL_TEST_DEF("Test PlatformMgr::RunUnitTest", TestPlatformMgr_RunUnitTest),
+#endif
     NL_TEST_DEF("Test ConfigurationMgr::SerialNumber", TestConfigurationMgr_SerialNumber),
     NL_TEST_DEF("Test ConfigurationMgr::ManufacturingDate", TestConfigurationMgr_ManufacturingDate),
     NL_TEST_DEF("Test ConfigurationMgr::ProductRevision", TestConfigurationMgr_ProductRevision),
