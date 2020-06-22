@@ -41,10 +41,7 @@ using Transport::PeerConnectionState;
 // This limit would need additional reviews once we have formalized Secure Transport header.
 static const size_t kMax_SecureSDU_Length = 1024;
 
-SecureSessionMgr::SecureSessionMgr() : mState(State::kNotReady)
-{
-    OnMessageReceived = NULL;
-}
+SecureSessionMgr::SecureSessionMgr() : mState(State::kNotReady) {}
 
 CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, Inet::InetLayer * inet, const Transport::UdpListenParameters & listenParams)
 {

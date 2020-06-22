@@ -82,6 +82,14 @@ const char * TAG = "wifi-echo-demo";
 
 static void DeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg);
 
+namespace {
+
+// Globals as these are large and will not fit onto the stack
+SecureSessionMgr sTransportIPv4;
+SecureSessionMgr sTransportIPv6;
+
+} // namespace
+
 extern "C" void app_main()
 {
     ESP_LOGI(TAG, "WiFi Echo Demo!");
@@ -170,7 +178,6 @@ extern "C" void app_main()
 
     // Start the Echo Server
     InitDataModelHandler();
-    SecureSessionMgr sTransportIPv4, sTransportIPv6;
     startServer(&sTransportIPv4, &sTransportIPv6);
 #if CONFIG_USE_ECHO_CLIENT
     startClient();
