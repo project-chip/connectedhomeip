@@ -150,10 +150,6 @@ int main(void)
     {
     }
 
-    // Required before using ConfigurationMgr
-    ret = nrf_mem_init();
-    APP_ERROR_CHECK(ret);
-
 #if NRF_LOG_ENABLED
 
     // Initialize logging component
