@@ -150,6 +150,10 @@ void SecureSessionMgr::HandleDataReceived(const MessageHeader & header, const IP
             connection->OnNewConnection(header, pktInfo, connection->mNewConnectionArgument);
         }
         err = CHIP_NO_ERROR;
+    }
+
+    if (!connection->StateAllowsReceive())
+    {
         ExitNow(ChipLogProgress(Inet, "Secure transport failed: state does not allow receive"));
     }
 
