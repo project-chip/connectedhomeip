@@ -40,7 +40,7 @@ namespace Transport {
  *     last used. Inactive connections can expire.
  *   - SecureSession contains the encryption context of a connection
  *
- * TODO: to add  any message ACK information
+ * TODO: to add any message ACK information
  */
 class PeerConnectionState
 {
