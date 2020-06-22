@@ -812,7 +812,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::AdjustPollingInt
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_FactoryReset(void)
 {
-    ChipLogProgress(DeviceLayer, "About to factory resetting..");
+    ChipLogProgress(DeviceLayer, "About to factory reset ...");
     Impl()->LockThreadStack();
     otInstanceFactoryReset(mOTInst);
     Impl()->UnlockThreadStack();
