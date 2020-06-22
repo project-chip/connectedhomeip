@@ -40,6 +40,16 @@
 
 #define MAX_ERROR_STR_LEN 128
 #define NUM_BYTES_IN_SHA256_HASH 32
+
+typedef struct
+{
+    bool initialized;
+    mbedtls_ctr_drbg_context drbg_ctxt;
+    mbedtls_entropy_context entropy;
+} CHIPEntropyContext;
+
+static CHIPEntropyContext gsEntropyContext;
+
 static void _log_mbedTLS_error(int error_code)
 {
     if (error_code != 0)
@@ -178,46 +188,56 @@ exit:
     return error;
 }
 
-static mbedtls_ctr_drbg_context * get_mbedtls_drbg_context()
+static CHIPEntropyContext * get_entropy_context()
 {
-    static mbedtls_ctr_drbg_context drbg_ctxt;
-    static bool initialized = false;
-
-    if (initialized)
+    if (gsEntropyContext.initialized)
     {
-        return &drbg_ctxt;
+        return &gsEntropyContext;
     }
 
-    static mbedtls_entropy_context entropy;
-    mbedtls_entropy_init(&entropy);
+    mbedtls_entropy_init(&gsEntropyContext.entropy);
+    mbedtls_ctr_drbg_init(&gsEntropyContext.drbg_ctxt);
 
-    mbedtls_ctr_drbg_context * ctxt = NULL;
-    mbedtls_ctr_drbg_init(&drbg_ctxt);
+    int status = mbedtls_ctr_drbg_seed(&gsEntropyContext.drbg_ctxt, mbedtls_entropy_func, &gsEntropyContext.entropy, NULL, 0);
+    VerifyOrExit(status == 0, _log_mbedTLS_error(status));
 
-    int status = mbedtls_ctr_drbg_seed(&drbg_ctxt, mbedtls_entropy_func, &entropy, NULL, 0);
-    if (status == 0)
-    {
-        initialized = true;
-        ctxt        = &drbg_ctxt;
-    }
-    _log_mbedTLS_error(status);
+    gsEntropyContext.initialized = true;
 
-    return ctxt;
+    return &gsEntropyContext;
+exit:
+    return NULL;
+}
+
+CHIP_ERROR chip::Crypto::add_entropy_source(CHIPEntropySource fn_source, void * p_source, size_t threshold)
+{
+    CHIP_ERROR error                  = CHIP_NO_ERROR;
+    int result                        = 0;
+    CHIPEntropyContext * entropy_ctxt = NULL;
+
+    VerifyOrExit(fn_source != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    entropy_ctxt = get_entropy_context();
+    VerifyOrExit(entropy_ctxt != NULL, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_entropy_add_source(&entropy_ctxt->entropy, fn_source, p_source, threshold, MBEDTLS_ENTROPY_SOURCE_STRONG);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+exit:
+    return error;
 }
 
 CHIP_ERROR chip::Crypto::DRBG_get_bytes(unsigned char * out_buffer, const size_t out_length)
 {
-    CHIP_ERROR error                     = CHIP_NO_ERROR;
-    int result                           = 0;
-    mbedtls_ctr_drbg_context * drbg_ctxt = NULL;
+    CHIP_ERROR error                  = CHIP_NO_ERROR;
+    int result                        = 0;
+    CHIPEntropyContext * entropy_ctxt = NULL;
 
     VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    drbg_ctxt = get_mbedtls_drbg_context();
-    VerifyOrExit(drbg_ctxt != NULL, error = CHIP_ERROR_INTERNAL);
+    entropy_ctxt = get_entropy_context();
+    VerifyOrExit(entropy_ctxt != NULL, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_ctr_drbg_random(drbg_ctxt, out_buffer, out_length);
+    result = mbedtls_ctr_drbg_random(&entropy_ctxt->drbg_ctxt, out_buffer, out_length);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:

@@ -142,6 +142,23 @@ CHIP_ERROR ECDSA_validate_msg_signature(const unsigned char * msg, const size_t 
 CHIP_ERROR ECDH_derive_secret(const unsigned char * remote_public_key, const size_t remote_public_key_length,
                               const unsigned char * local_private_key, const size_t local_private_key_length,
                               unsigned char * out_secret, size_t & out_secret_length);
+
+/** @brief Entropy callback function
+ * @param data Callback-specific data pointer
+ * @param output Output data to fill
+ * @param len Length of output buffer
+ * @param olen The actual amount of data that was written to output buffer
+ * @return 0 if success
+ */
+typedef int (*CHIPEntropySource)(void * data, unsigned char * output, size_t len, size_t * olen);
+
+/** @brief A function to add entropy sources to crypto library
+ * @param fn_source Function pointer to the entropy source
+ * @param p_source  Data that should be provided when fn_source is called
+ * @param threshold Minimum required from source before entropy is released
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR add_entropy_source(CHIPEntropySource fn_source, void * p_source, size_t threshold);
 } // namespace Crypto
 } // namespace chip
 
