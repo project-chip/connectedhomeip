@@ -32,3 +32,4 @@ source "$chip_dir"/src/test_driver/esp32/idf.sh
 idf make V=1 -C "$chip_dir"/src/test_driver/esp32/build/chip/src/crypto check
 idf make V=1 -C "$chip_dir"/src/test_driver/esp32/build/chip/src/inet check
 idf make V=1 -C "$chip_dir"/src/test_driver/esp32/build/chip/src/system check
+idf make V=1 -C "$chip_dir"/src/test_driver/esp32/build/chip/src/transport check
