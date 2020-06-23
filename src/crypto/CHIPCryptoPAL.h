@@ -31,6 +31,7 @@ namespace Crypto {
 
 const size_t kMax_ECDSA_Signature_Length = 72;
 const size_t kMax_ECDH_Secret_Length     = 32;
+const size_t kSHA256_Hash_Length         = 32;
 
 /**
  * @brief A function that implements AES-CCM encryption
@@ -70,6 +71,16 @@ CHIP_ERROR AES_CCM_encrypt(const unsigned char * plaintext, size_t plaintext_len
 CHIP_ERROR AES_CCM_decrypt(const unsigned char * ciphertext, size_t ciphertext_length, const unsigned char * aad, size_t aad_length,
                            const unsigned char * tag, size_t tag_length, const unsigned char * key, size_t key_length,
                            const unsigned char * iv, size_t iv_length, unsigned char * plaintext);
+
+/**
+ * @brief A function that implements SHA-256 hash
+ * @param data The data to hash
+ * @param data_length Length of the data
+ * @param out_buffer Pointer to buffer to write output into
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+
+CHIP_ERROR Hash_SHA256(const unsigned char * data, const size_t data_length, unsigned char * out_buffer);
 
 /**
  * @brief A function that implements SHA-256 based HKDF

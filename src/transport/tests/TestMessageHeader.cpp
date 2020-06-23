@@ -24,7 +24,9 @@
  */
 #include "TestTransportLayer.h"
 
+#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/TestUtils.h>
 #include <transport/MessageHeader.h>
 
 #include <nlunit-test.h>
@@ -147,4 +149,9 @@ int TestMessageHeader(void)
     nlTestSuite theSuite = { "Transport-MessageHeader", &sTests[0], NULL, NULL };
     nlTestRunner(&theSuite, NULL);
     return nlTestRunnerStats(&theSuite);
+}
+
+static void __attribute__((constructor)) TestMessageHeaderCtor(void)
+{
+    VerifyOrDie(RegisterUnitTests(&TestMessageHeader) == CHIP_NO_ERROR);
 }

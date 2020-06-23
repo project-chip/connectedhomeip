@@ -24,7 +24,9 @@
  */
 #include "TestTransportLayer.h"
 
+#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/TestUtils.h>
 #include <transport/PeerConnections.h>
 
 #include <nlunit-test.h>
@@ -236,9 +238,14 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestPeerConnections(void)
+int TestPeerConnectionsFn(void)
 {
     nlTestSuite theSuite = { "Transport-PeerConnections", &sTests[0], NULL, NULL };
     nlTestRunner(&theSuite, NULL);
     return nlTestRunnerStats(&theSuite);
+}
+
+static void __attribute__((constructor)) TestPeerConnectionsCtor(void)
+{
+    VerifyOrDie(RegisterUnitTests(&TestPeerConnectionsFn) == CHIP_NO_ERROR);
 }

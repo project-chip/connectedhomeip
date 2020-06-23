@@ -145,6 +145,22 @@ exit:
     return error;
 }
 
+CHIP_ERROR chip::Crypto::Hash_SHA256(const unsigned char * data, const size_t data_length, unsigned char * out_buffer)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 1;
+
+    // zero data length hash is supported.
+
+    VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_sha256_ret(data, data_length, out_buffer, 0);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    return error;
+}
+
 CHIP_ERROR chip::Crypto::HKDF_SHA256(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
                                      const size_t salt_length, const unsigned char * info, const size_t info_length,
                                      unsigned char * out_buffer, size_t out_length)
