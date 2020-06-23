@@ -20,3 +20,4 @@ Java_com_google_chip_chiptool_CHIPNativeBridge_base41Encode(JNIEnv* env, jobject
     std::string s = base41Encode();
     return env->NewStringUTF(s.c_str());
 }
+
