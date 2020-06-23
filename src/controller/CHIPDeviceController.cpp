@@ -153,13 +153,15 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress 
     mSessionManager->SetMessageReceiveHandler(OnReceiveMessage, this);
     mSessionManager->SetNewConnectionHandler(OnNewConnection, this);
 
+    // connected state before 'OnConnect' so that key exchange is accepted
+    mConState = kConnectionState_Connected;
+
     err = mSessionManager->Connect(remoteDeviceId, Transport::PeerAddress::UDP(deviceAddr, devicePort));
     SuccessOrExit(err);
 
     mOnComplete.Response = onMessageReceived;
     mOnError             = onError;
 
-    mConState      = kConnectionState_Connected;
     mMessageNumber = 1;
 
 exit:
@@ -171,6 +173,7 @@ exit:
             delete mSessionManager;
             mSessionManager = NULL;
         }
+        mConState = kConnectionState_NotConnected;
     }
     return err;
 }
