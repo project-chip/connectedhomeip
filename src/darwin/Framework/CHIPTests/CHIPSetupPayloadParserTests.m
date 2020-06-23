@@ -95,8 +95,8 @@
 - (void)testQRCodeParserWithOptionalData
 {
     NSError * error;
-    CHIPQRCodeSetupPayloadParser * parser = [[CHIPQRCodeSetupPayloadParser alloc]
-        initWithBase41Representation:@"CH:J20800G008008006DL200UOGMHARTHOMJ300IDL530.I7"];
+    CHIPQRCodeSetupPayloadParser * parser =
+        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:@"CH:J20800G008008006DL200UOGMHARTHOMJ300IDL530.I7"];
     CHIPSetupPayload * payload = [parser populatePayload:&error];
 
     XCTAssertNotNil(payload);

@@ -25,9 +25,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSUInteger, OptionalQRCodeInfoType) {
-  kOptionalQRCodeInfoTypeUnknown,
-  kOptionalQRCodeInfoTypeString,
-  kOptionalQRCodeInfoTypeInt32
+    kOptionalQRCodeInfoTypeUnknown,
+    kOptionalQRCodeInfoTypeString,
+    kOptionalQRCodeInfoTypeInt32
 };
 
 @interface CHIPOptionalQRCodeInfo : NSObject
