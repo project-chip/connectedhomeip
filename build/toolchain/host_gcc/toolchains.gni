@@ -41,6 +41,17 @@ pw_toolchain_host_gcc = {
     }
   }
 
+  mbedtls = {
+    name = "${host_os}_${host_cpu}_gcc_mbedtls"
+    forward_variables_from(_host_gcc_toolchain, "*")
+    defaults = {
+      default_configs_extra = _configs
+      current_os = host_os
+      is_clang = false
+      chip_crypto = "mbedtls"
+    }
+  }
+
   debug = {
     name = "${host_os}_${host_cpu}_gcc_debug"
     forward_variables_from(_host_gcc_toolchain, "*")
@@ -80,6 +91,7 @@ pw_toolchain_host_gcc = {
 # Describes host Linux GCC toolchains.
 pw_toolchain_host_gcc_list = [
   pw_toolchain_host_gcc.default,
+  pw_toolchain_host_gcc.mbedtls,
   pw_toolchain_host_gcc.debug,
   pw_toolchain_host_gcc.speed_optimized,
   pw_toolchain_host_gcc.size_optimized,
