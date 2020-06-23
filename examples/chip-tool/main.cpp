@@ -67,11 +67,9 @@ static void EchoKeyExchange(chip::DeviceController::ChipDeviceController * contr
 static void EchoResponse(chip::DeviceController::ChipDeviceController * deviceController, void * appReqState,
                          System::PacketBuffer * buffer)
 {
-    char src_addr[INET_ADDRSTRLEN];
-    char dest_addr[INET_ADDRSTRLEN];
     size_t data_len = buffer->DataLength();
 
-    printf("UDP packet received from :%zu bytes)\n", static_cast<size_t>(buffer->DataLength()));
+    printf("UDP packet received: %zu bytes\n", static_cast<size_t>(buffer->DataLength()));
 
     // attempt to print the incoming message
     char msg_buffer[data_len];
