@@ -47,7 +47,7 @@
     XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 2345);
     XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 1);
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
-    XCTAssertFalse(payload.requiresCustomFlow);
+    XCTAssertTrue(payload.requiresCustomFlow);
     XCTAssertEqual(payload.version.unsignedIntegerValue, 0);
     XCTAssertEqual(payload.rendezvousInformation.unsignedIntegerValue, 0);
 }
