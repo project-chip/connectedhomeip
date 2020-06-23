@@ -319,7 +319,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR chip::Crypto::add_entropy_source(CHIP_entropy_source fn_source, void * p_source, size_t threshold)
+CHIP_ERROR chip::Crypto::add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

@@ -46,9 +46,9 @@ typedef struct
     bool initialized;
     mbedtls_ctr_drbg_context drbg_ctxt;
     mbedtls_entropy_context entropy;
-} CHIPEntropyContext;
+} EntropyContext;
 
-static CHIPEntropyContext gsEntropyContext;
+static EntropyContext gsEntropyContext;
 
 static void _log_mbedTLS_error(int error_code)
 {
@@ -188,10 +188,10 @@ exit:
     return error;
 }
 
-static CHIPEntropyContext * get_entropy_context()
+static EntropyContext * get_entropy_context()
 {
-    CHIPEntropyContext * context = NULL;
-    int status                   = 0;
+    EntropyContext * context = NULL;
+    int status               = 0;
 
     VerifyOrExit(!gsEntropyContext.initialized, context = &gsEntropyContext);
 
@@ -209,11 +209,11 @@ exit:
     return context;
 }
 
-CHIP_ERROR chip::Crypto::add_entropy_source(CHIP_entropy_source fn_source, void * p_source, size_t threshold)
+CHIP_ERROR chip::Crypto::add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold)
 {
-    CHIP_ERROR error                  = CHIP_NO_ERROR;
-    int result                        = 0;
-    CHIPEntropyContext * entropy_ctxt = NULL;
+    CHIP_ERROR error              = CHIP_NO_ERROR;
+    int result                    = 0;
+    EntropyContext * entropy_ctxt = NULL;
 
     VerifyOrExit(fn_source != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -228,9 +228,9 @@ exit:
 
 CHIP_ERROR chip::Crypto::DRBG_get_bytes(unsigned char * out_buffer, const size_t out_length)
 {
-    CHIP_ERROR error                  = CHIP_NO_ERROR;
-    int result                        = 0;
-    CHIPEntropyContext * entropy_ctxt = NULL;
+    CHIP_ERROR error              = CHIP_NO_ERROR;
+    int result                    = 0;
+    EntropyContext * entropy_ctxt = NULL;
 
     VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
