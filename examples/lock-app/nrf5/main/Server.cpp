@@ -73,11 +73,11 @@ exit:
     return;
 }
 
-static void OnRecv(const MessageHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
+static void OnRecv(const MessageHeader & header, PeerConnectionState * state, System::PacketBuffer * buffer,
                    SecureSessionMgr * transport)
 {
     const size_t data_len = buffer->DataLength();
-    char src_addr[Transport::PeerAddress::kMaxToStringSize];
+    char src_addr[PeerAddress::kMaxToStringSize];
 
     // as soon as a client connects, assume it is connected
     VerifyOrExit(transport != NULL && buffer != NULL, NRF_LOG_INFO("Received data but couldn't process it..."));
