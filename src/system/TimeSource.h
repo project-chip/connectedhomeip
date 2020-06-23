@@ -22,8 +22,8 @@
 #ifndef TIME_SOURCE_H_
 #define TIME_SOURCE_H_
 
-#include <system/SystemClock.h>
 #include <stdlib.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace Time {
@@ -77,7 +77,8 @@ public:
 
     void SetCurrentMonotonicTimeMs(uint64_t value)
     {
-        if (value < mCurrentTimeMs) {
+        if (value < mCurrentTimeMs)
+        {
             abort();
         }
         mCurrentTimeMs = value;
