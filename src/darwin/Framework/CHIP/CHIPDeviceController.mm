@@ -62,8 +62,8 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
 @property (readwrite) ControllerOnMessageBlock onMessageHandler;
 @property (readwrite) ControllerOnErrorBlock onErrorHandler;
 @property (readonly) chip::DeviceController::ChipDeviceController * cppController;
-@property (readwrite) NSData* localKey;
-@property (readwrite) NSData* peerKey;
+@property (readwrite) NSData * localKey;
+@property (readwrite) NSData * peerKey;
 
 @end
 
@@ -107,16 +107,15 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
     return self;
 }
 
-static void doKeyExchange(chip::DeviceController::ChipDeviceController * cppController, chip::Transport::PeerConnectionState * state,
-                            void * appReqState)
+static void doKeyExchange(
+    chip::DeviceController::ChipDeviceController * cppController, chip::Transport::PeerConnectionState * state, void * appReqState)
 {
     CHIPDeviceController * controller = (__bridge CHIPDeviceController *) appReqState;
     [controller _manualKeyExchange:state];
 }
 
-
-static void onMessageReceived(chip::DeviceController::ChipDeviceController * deviceController, void * appReqState,
-    chip::System::PacketBuffer * buffer)
+static void onMessageReceived(
+    chip::DeviceController::ChipDeviceController * deviceController, void * appReqState, chip::System::PacketBuffer * buffer)
 {
     CHIPDeviceController * controller = (__bridge CHIPDeviceController *) appReqState;
 
@@ -167,13 +166,14 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     });
 }
 
-- (void)_manualKeyExchange:(chip::Transport::PeerConnectionState *)state {
+- (void)_manualKeyExchange:(chip::Transport::PeerConnectionState *)state
+{
     [self.lock lock];
     const unsigned char * local_key_bytes = (const unsigned char *) [self.localKey bytes];
     const unsigned char * peer_key_bytes = (const unsigned char *) [self.peerKey bytes];
 
-    CHIP_ERROR err = self.cppController->ManualKeyExchange(state, peer_key_bytes, self.peerKey.length, local_key_bytes,
-                                                           self.localKey.length);
+    CHIP_ERROR err
+        = self.cppController->ManualKeyExchange(state, peer_key_bytes, self.peerKey.length, local_key_bytes, self.localKey.length);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
@@ -196,7 +196,8 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     [self.lock lock];
     chip::Inet::IPAddress addr;
     chip::Inet::IPAddress::FromString([ipAddress UTF8String], addr);
-    err = self.cppController->ConnectDevice(kRemoteDeviceId, addr, (__bridge void *) self, doKeyExchange, onMessageReceived, onInternalError, CHIP_PORT);
+    err = self.cppController->ConnectDevice(
+        kRemoteDeviceId, addr, (__bridge void *) self, doKeyExchange, onMessageReceived, onInternalError, CHIP_PORT);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
