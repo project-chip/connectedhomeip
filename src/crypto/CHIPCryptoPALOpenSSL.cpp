@@ -334,6 +334,11 @@ exit:
     return error;
 }
 
+CHIP_ERROR chip::Crypto::add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 CHIP_ERROR chip::Crypto::DRBG_get_bytes(unsigned char * out_buffer, const size_t out_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
