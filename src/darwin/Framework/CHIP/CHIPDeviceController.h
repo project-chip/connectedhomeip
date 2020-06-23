@@ -23,7 +23,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^ControllerOnMessageBlock)(NSData * message, NSString * ipAddress, UInt16 port);
+typedef void (^ControllerOnMessageBlock)(NSData * message);
 typedef void (^ControllerOnErrorBlock)(NSError * error);
 
 @interface AddressInfo : NSObject

@@ -62,6 +62,8 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
 @property (readwrite) ControllerOnMessageBlock onMessageHandler;
 @property (readwrite) ControllerOnErrorBlock onErrorHandler;
 @property (readonly) chip::DeviceController::ChipDeviceController * cppController;
+@property (readwrite) NSData* localKey;
+@property (readwrite) NSData* peerKey;
 
 @end
 
@@ -105,17 +107,20 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
     return self;
 }
 
+static void doKeyExchange(chip::DeviceController::ChipDeviceController * cppController, chip::Transport::PeerConnectionState * state,
+                            void * appReqState)
+{
+    CHIPDeviceController * controller = (__bridge CHIPDeviceController *) appReqState;
+    [controller _manualKeyExchange:state];
+}
+
+
 static void onMessageReceived(chip::DeviceController::ChipDeviceController * deviceController, void * appReqState,
-    chip::System::PacketBuffer * buffer, const chip::IPPacketInfo * packet_info)
+    chip::System::PacketBuffer * buffer)
 {
     CHIPDeviceController * controller = (__bridge CHIPDeviceController *) appReqState;
 
-    char src_addr[INET_ADDRSTRLEN];
     size_t data_len = buffer->DataLength();
-
-    packet_info->SrcAddress.ToString(src_addr, sizeof(src_addr));
-    NSString * ipAddress = [[NSString alloc] initWithUTF8String:src_addr];
-
     // convert to NSData and pass back to the application
     NSMutableData * dataBuffer = [[NSMutableData alloc] initWithBytes:buffer->Start() length:data_len];
     buffer = buffer->Next();
@@ -126,7 +131,7 @@ static void onMessageReceived(chip::DeviceController::ChipDeviceController * dev
         buffer = buffer->Next();
     }
 
-    [controller _dispatchAsyncMessageBlock:dataBuffer ipAddress:ipAddress port:packet_info->SrcPort];
+    [controller _dispatchAsyncMessageBlock:dataBuffer];
 
     // ignore unused variable
     (void) deviceController;
@@ -151,15 +156,30 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     });
 }
 
-- (void)_dispatchAsyncMessageBlock:(NSData *)data ipAddress:(NSString *)ipAddress port:(UInt16)port
+- (void)_dispatchAsyncMessageBlock:(NSData *)data
 {
     CHIP_LOG_METHOD_ENTRY();
     // to avoid retaining "self"
     ControllerOnMessageBlock onMessageHandler = self.onMessageHandler;
 
     dispatch_async(_appCallbackQueue, ^() {
-        onMessageHandler(data, ipAddress, port);
+        onMessageHandler(data);
     });
+}
+
+- (void)_manualKeyExchange:(chip::Transport::PeerConnectionState *)state {
+    [self.lock lock];
+    const unsigned char * local_key_bytes = (const unsigned char *) [self.localKey bytes];
+    const unsigned char * peer_key_bytes = (const unsigned char *) [self.peerKey bytes];
+
+    CHIP_ERROR err = self.cppController->ManualKeyExchange(state, peer_key_bytes, self.peerKey.length, local_key_bytes,
+                                                           self.localKey.length);
+    [self.lock unlock];
+
+    if (err != CHIP_NO_ERROR) {
+        CHIP_LOG_ERROR("Failed to exchange keys");
+        [self _dispatchAsyncErrorBlock:[CHIPError errorForCHIPErrorCode:err]];
+    }
 }
 
 - (BOOL)connect:(NSString *)ipAddress
@@ -169,33 +189,18 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO maybe refactor
-    // the work queue is being used for atomic access to chip's cpp controller
-    // this could be done async but the error we care about is sync. However, I think this could be restructured such that
-    // the request is fired async and that Block can then return an error to the caller. This function would then never error out.
-    // the only drawback is that it complicates the api where the user must handle async errors on every function
+    // cache the keys before calling connect (because connect invokes the manual key exchange)
+    self.localKey = local_key.copy;
+    self.peerKey = peer_key.copy;
 
     [self.lock lock];
     chip::Inet::IPAddress addr;
     chip::Inet::IPAddress::FromString([ipAddress UTF8String], addr);
-    err = self.cppController->ConnectDevice(0, addr, NULL, onMessageReceived, onInternalError, CHIP_PORT);
+    err = self.cppController->ConnectDevice(kRemoteDeviceId, addr, (__bridge void *) self, doKeyExchange, onMessageReceived, onInternalError, CHIP_PORT);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error(%d): %@, connect failed", err, [CHIPError errorForCHIPErrorCode:err]);
-        if (error) {
-            *error = [CHIPError errorForCHIPErrorCode:err];
-        }
-        return NO;
-    }
-    [self.lock lock];
-    const unsigned char * local_key_bytes = (const unsigned char *) [local_key bytes];
-    const unsigned char * peer_key_bytes = (const unsigned char *) [peer_key bytes];
-    err = self.cppController->ManualKeyExchange(peer_key_bytes, peer_key.length, local_key_bytes, local_key.length);
-    [self.lock unlock];
-
-    if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error(%d): %@, key exchange failed", err, [CHIPError errorForCHIPErrorCode:err]);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:err];
         }
