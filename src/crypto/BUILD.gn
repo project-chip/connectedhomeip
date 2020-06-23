@@ -32,11 +32,10 @@ config("crypto_config") {
 }
 
 if (chip_crypto == "openssl") {
-  config("openssl_config") {
-    libs = [
-      "ssl",
-      "crypto",
-    ]
+  import("//build/config/linux/pkg_config.gni")
+
+  pkg_config("openssl_config") {
+    packages = [ "openssl" ]
   }
 } else {
   import("//build_overrides/mbedtls.gni")
