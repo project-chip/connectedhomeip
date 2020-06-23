@@ -30,5 +30,5 @@
 int main(void)
 {
     nlTestSetOutputStyle(OUTPUT_CSV);
-    return TestPeerConnections();
+    return TestPeerConnectionsFn();
 }

@@ -117,7 +117,7 @@ static void DriveIO(TestContext & ctx)
 #endif
 }
 
-CHIP_ERROR InitLayers(System::Layer & systemLayer, InetLayer & inetLayer)
+static CHIP_ERROR InitLayers(System::Layer & systemLayer, InetLayer & inetLayer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Initialize the CHIP System Layer.

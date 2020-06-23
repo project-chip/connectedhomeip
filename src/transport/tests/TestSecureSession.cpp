@@ -31,6 +31,7 @@
 
 #include <stdarg.h>
 #include <support/CodeUtils.h>
+#include <support/TestUtils.h>
 
 using namespace chip;
 
@@ -206,6 +207,11 @@ int TestSecureSession()
     nlTestRunner(&sSuite, NULL);
 
     return (nlTestRunnerStats(&sSuite));
+}
+
+static void __attribute__((constructor)) TestSecureSessionCtor(void)
+{
+    VerifyOrDie(RegisterUnitTests(&TestSecureSession) == CHIP_NO_ERROR);
 }
 
 namespace chip {
