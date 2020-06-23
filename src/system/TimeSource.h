@@ -23,6 +23,7 @@
 #define TIME_SOURCE_H_
 
 #include <system/SystemClock.h>
+#include <stdlib.h>
 
 namespace chip {
 namespace Time {
@@ -76,7 +77,9 @@ public:
 
     void SetCurrentMonotonicTimeMs(uint64_t value)
     {
-        VerifyOrDie(value >= mCurrentTimeMs); // required contract
+        if (value < mCurrentTimeMs) {
+            abort();
+        }
         mCurrentTimeMs = value;
     }
 
