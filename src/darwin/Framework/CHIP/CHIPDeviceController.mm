@@ -189,12 +189,6 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO maybe refactor
-    // the work queue is being used for atomic access to chip's cpp controller
-    // this could be done async but the error we care about is sync. However, I think this could be restructured such that
-    // the request is fired async and that Block can then return an error to the caller. This function would then never error out.
-    // the only drawback is that it complicates the api where the user must handle async errors on every function
-
     [self.lock lock];
     chip::Inet::IPAddress addr;
     chip::Inet::IPAddress::FromString([ipAddress UTF8String], addr);
@@ -203,14 +197,6 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error(%d): %@, connect failed", err, [CHIPError errorForCHIPErrorCode:err]);
-        if (error) {
-            *error = [CHIPError errorForCHIPErrorCode:err];
-        }
-        return NO;
-    }
-
-    if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error(%d): %@, key exchange failed", err, [CHIPError errorForCHIPErrorCode:err]);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:err];
         }
