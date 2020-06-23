@@ -34,6 +34,12 @@ namespace chip {
 class DLL_EXPORT SecureSession
 {
 public:
+    SecureSession(void);
+    SecureSession(SecureSession &&)      = default;
+    SecureSession(const SecureSession &) = default;
+    SecureSession & operator=(const SecureSession &) = default;
+    SecureSession & operator=(SecureSession &&) = default;
+
     /**
      * @brief
      *   Derive a shared key. The derived key will be used for encryting/decrypting
@@ -82,12 +88,13 @@ public:
      */
     size_t EncryptionOverhead(void);
 
-    void Close(void);
-
-    SecureSession(void);
+    /**
+     * Clears the internal state of secure session back to the state of a new object.
+     */
+    void Reset(void);
 
 private:
-    static const size_t kAES_CCM128_Key_Length = 16;
+    static constexpr size_t kAES_CCM128_Key_Length = 16;
 
     bool mKeyAvailable;
     uint64_t mNextIV;

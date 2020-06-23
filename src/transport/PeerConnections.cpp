@@ -104,7 +104,7 @@ void PeerConnectionsBase::ExpireInactiveConnections(uint64_t maxIdleTimeMs)
         }
 
         // Connection is assumed expired, marking it as invalid
-        mConnectionStateArray[i] = PeerConnectionState(PeerAddress::Uninitialized());
+        mConnectionStateArray[i].Reset();
     }
 }
 
