@@ -189,6 +189,10 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    // cache the keys before calling connect (because connect invokes the manual key exchange)
+    self.localKey = local_key.copy;
+    self.peerKey = peer_key.copy;
+
     [self.lock lock];
     chip::Inet::IPAddress addr;
     chip::Inet::IPAddress::FromString([ipAddress UTF8String], addr);
@@ -202,10 +206,6 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
         }
         return NO;
     }
-
-    // cache the keys
-    self.localKey = local_key.copy;
-    self.peerKey = peer_key.copy;
 
     // Start the IO pump
     [self _serviceEvents];
