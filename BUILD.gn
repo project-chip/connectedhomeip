@@ -100,6 +100,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     # Enable building chip with gcc.
     enable_host_gcc_build = enable_default_builds
 
+    # Build building chip with gcc & mbedtls.
+    enable_host_gcc_mbdtls_build = enable_default_builds
+
     # Build the nRF5 lock app example.
     enable_nrf5_lock_app_build = false
   }
@@ -118,6 +121,10 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     toolchain = "//build/toolchain/host_gcc:${host_os}_${host_cpu}_gcc"
   }
 
+  chip_build("host_gcc_mbedtls") {
+    toolchain = "//build/toolchain/host_gcc:${host_os}_${host_cpu}_gcc_mbedtls"
+  }
+
   group("default") {
     deps = []
     if (enable_host_clang_build) {
@@ -125,6 +132,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
     if (enable_host_gcc_build) {
       deps += [ ":all_host_gcc" ]
+    }
+    if (enable_host_gcc_mbdtls_build) {
+      deps += [ ":all_host_gcc_mbedtls" ]
     }
     if (enable_nrf5_lock_app_build) {
       deps += [ "${nrf5_lock_app_root}:nrf5(${nrf5_lock_app_root}/toolchain:nrf5_lock_app)" ]
@@ -139,6 +149,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       }
       if (enable_host_gcc_build) {
         deps += [ ":check_host_gcc" ]
+      }
+      if (enable_host_gcc_mbdtls_build) {
+        deps += [ ":check_host_gcc_mbedtls" ]
       }
       if (enable_nrf5_lock_app_build) {
         deps += [ ":default" ]
