@@ -192,7 +192,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     [self.lock lock];
     chip::Inet::IPAddress addr;
     chip::Inet::IPAddress::FromString([ipAddress UTF8String], addr);
-    err = self.cppController->ConnectDevice(kRemoteDeviceId, addr, NULL, doKeyExchange, onMessageReceived, onInternalError, CHIP_PORT);
+    err = self.cppController->ConnectDevice(kRemoteDeviceId, addr, (__bridge void *) self, doKeyExchange, onMessageReceived, onInternalError, CHIP_PORT);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
