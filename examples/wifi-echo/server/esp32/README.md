@@ -1,15 +1,18 @@
 # CHIP WiFi Echo Server Example
 
 A prototype appplication that uses CHIP to setup WiFi on the ESP32 and runs an
-Echo Server on a configured port. This example will evolve as more complex
-messaging is supported in CHIP.
+Echo Server. This example will evolve as more complex messaging is supported in
+CHIP.
 
 ---
 
--   [CHIP WiFi Echo Server Example](#chip-wifi-echo-server-example)
--   [Supported Devices](#supported-devices)
--   [Building the Example Application](#building-the-example-application)
--   [Using the Echo Server](#using-the-echo-server)
+- [CHIP WiFi Echo Server Example](#chip-wifi-echo-server-example)
+  - [Supported Devices](#supported-devices)
+  - [Building the Example Application](#building-the-example-application)
+    - [To build the application, follow these steps:](#to-build-the-application-follow-these-steps)
+  - [Using the Echo Server](#using-the-echo-server)
+    - [Connect the ESP32 to a 2.4GHz Network of your choice](#connect-the-esp32-to-a-24ghz-network-of-your-choice)
+    - [Use the ESP32's Network](#use-the-esp32s-network)
 
 ---
 
@@ -119,14 +122,13 @@ There are two ways to use the Echo Server running on the device.
                 I (5524) chip[DL]: IPv4 address changed on WiFi station interface: <IP_ADDRESS>...
 
     Note: If you are using the M5Stack, the screen will display the server's IP
-    Address and Port if it successfully conencts to the configured 2.4GHz
-    Network.
+    Address if it successfully conencts to the configured 2.4GHz Network.
 
-5.  Then running the following command will ping the ESP32 and cause it to echo.
-    If necessary replace the `<IP_ADDRESS>` with the address printed by the
-    device in the monitor.
-
-                $ echo "Hello over IP" | nc -w1 -u 192.168.4.1 8000
+5.  Use
+    [standalone chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
+    or
+    [iOS chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/darwin)
+    to communicate with the device.
 
 Note: The ESP32 does not support 5GHz networks. Also, the Device will persist
 your network configuration. To erase it, simply run.
@@ -142,11 +144,10 @@ Alternatively, you can connect to the ESP32's Soft-AP directly.
     QRCode on screen. It's usually something like `CHIP_DEMO-XXXX` where the
     last 4 digits are from the device's MAC address.
 
-2.  Once you're connected, the server's IP can be found at the gateway address
-    and at the listed port number(Default: `8000`).
+2.  Once you're connected, the server's IP can be found at the gateway address.
 
-3.  Then running the following command will ping the ESP32 and cause it to echo.
-    If necessary replace the `192.168.4.1` with the address printed by the
-    device in the monitor.
-
-              $ echo "Hello over IP" | nc -w1 -u 192.168.4.1 8000
+3.  Use
+    [standalone chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
+    or
+    [iOS chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/darwin)
+    to communicate with the device.
