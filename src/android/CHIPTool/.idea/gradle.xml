@@ -10,8 +10,8 @@
         <option name="gradleJvm" value="1.8" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/app" />
+            <option value="$USER_HOME$/src/connectedhomeip/src/android/CHIPTool" />
+            <option value="$USER_HOME$/src/connectedhomeip/src/android/CHIPTool/app" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

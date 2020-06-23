@@ -141,6 +141,10 @@ public class BarcodeReaderActivity extends AppCompatActivity {
             // TODO(randy.rossi): Put the raw bytes through the CHIP qr code parser
             //barcodes.get(0).rawBytes;
 
+            // Just a test for now...
+            String result = CHIPNativeBridge.getInstance().base41Encode();
+            Log.e(TAG, "Called into native bridge: got " + result);
+
             // Display CHIP qr code info to user for manual connect to soft AP
         }
 
@@ -154,6 +158,5 @@ public class BarcodeReaderActivity extends AppCompatActivity {
         public void onViewCreated(View view, Bundle savedInstanceState) {
             super.onViewCreated(view, savedInstanceState);
         }
-
     }
 }
