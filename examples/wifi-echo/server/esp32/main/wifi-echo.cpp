@@ -98,7 +98,6 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
     return 0;
 }
 
-
 extern "C" void app_main()
 {
     ESP_LOGI(TAG, "WiFi Echo Demo!");
