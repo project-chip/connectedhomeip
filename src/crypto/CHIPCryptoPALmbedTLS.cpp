@@ -158,7 +158,7 @@ exit:
 CHIP_ERROR chip::Crypto::Hash_SHA256(const unsigned char * data, const size_t data_length, unsigned char * out_buffer)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 1;
+    int result       = 0;
 
     // zero data length hash is supported.
 
@@ -169,6 +169,55 @@ CHIP_ERROR chip::Crypto::Hash_SHA256(const unsigned char * data, const size_t da
 
 exit:
     return error;
+}
+
+Hash_SHA256_stream::Hash_SHA256_stream(void)
+{
+}
+
+Hash_SHA256_stream::~Hash_SHA256_stream(void)
+{
+}
+
+CHIP_ERROR Hash_SHA256_stream::Begin(void)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    result = mbedtls_sha256_starts_ret(&context, 0);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    return error;
+}
+
+CHIP_ERROR Hash_SHA256_stream::AddData(const unsigned char * data, const size_t data_length)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    result = mbedtls_sha256_update_ret(&context, data, data_length);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    return error;
+}
+
+CHIP_ERROR Hash_SHA256_stream::Finish(unsigned char * out_buffer)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    result = mbedtls_sha256_finish_ret(&context, out_buffer);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    return error;
+}
+
+void Hash_SHA256_stream::Clear(void)
+{
+    memset(this, 0, sizeof(*this));
 }
 
 CHIP_ERROR chip::Crypto::HKDF_SHA256(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,

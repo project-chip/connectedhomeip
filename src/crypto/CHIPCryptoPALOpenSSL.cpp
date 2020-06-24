@@ -273,6 +273,55 @@ exit:
     return error;
 }
 
+Hash_SHA256_stream::Hash_SHA256_stream(void)
+{
+}
+
+Hash_SHA256_stream::~Hash_SHA256_stream(void)
+{
+}
+
+CHIP_ERROR Hash_SHA256_stream::Begin(void)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 1;
+
+    result = SHA256_Init(&context);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    return error;
+}
+
+CHIP_ERROR Hash_SHA256_stream::AddData(const unsigned char * data, const size_t data_length)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 1;
+
+    result = SHA256_Update(&context, data, data_length);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    return error;
+}
+
+CHIP_ERROR Hash_SHA256_stream::Finish(unsigned char * out_buffer)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 1;
+
+    result = SHA256_Final(out_buffer, &context);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    return error;
+}
+
+void Hash_SHA256_stream::Clear(void)
+{
+    memset(this, 0, sizeof(*this));
+}
+
 CHIP_ERROR chip::Crypto::HKDF_SHA256(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
                                      const size_t salt_length, const unsigned char * info, const size_t info_length,
                                      unsigned char * out_buffer, size_t out_length)
