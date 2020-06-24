@@ -17,8 +17,8 @@
 #ifndef PEER_CONNECTIONS_H_
 #define PEER_CONNECTIONS_H_
 
-#include <core/CHIPConfig.h>
 #include <core/CHIPError.h>
+#include <support/CodeUtils.h>
 #include <system/TimeSource.h>
 #include <transport/PeerConnectionState.h>
 
@@ -32,17 +32,10 @@ namespace Transport {
  *   - handle connection active time and expiration
  *   - allocate and free space for connection states.
  */
-class PeerConnectionsBase
+template <size_t kMaxConnectionCount, Time::Source kTimeSource = Time::Source::kSystem>
+class PeerConnections
 {
 public:
-    /**
-     * Construct a PeerConnectionsBase object using a preallocated array used for connection state  storage.
-     */
-    PeerConnectionsBase(PeerConnectionState * storageArray, size_t arraySize) :
-        mConnectionStateArray(storageArray), mConnectionStateArraySize(arraySize)
-    {}
-    virtual ~PeerConnectionsBase() {}
-
     /**
      * Allocates a new peer connection state state object out of the internal resource pool.
      *
@@ -54,17 +47,58 @@ public:
      * @returns CHIP_NO_ERROR if state could be initialized. May fail if maximum connection count
      *          has been reached (with CHIP_ERROR_NO_MEMORY).
      */
-    CHIP_ERROR CreateNewPeerConnectionState(const PeerAddress & address, PeerConnectionState ** state);
+    CHECK_RETURN_VALUE
+    CHIP_ERROR CreateNewPeerConnectionState(const PeerAddress & address, PeerConnectionState ** state)
+    {
+        CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
+
+        if (state)
+        {
+            *state = nullptr;
+        }
+
+        for (size_t i = 0; i < kMaxConnectionCount; i++)
+        {
+            if (!mStates[i].GetPeerAddress().IsInitialized())
+            {
+                mStates[i] = PeerConnectionState(address);
+                mStates[i].SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs());
+
+                if (state)
+                {
+                    *state = &mStates[i];
+                }
+
+                err = CHIP_NO_ERROR;
+                break;
+            }
+        }
+
+        return err;
+    }
 
     /**
-     * Get a peer connection state given a peer address.
+     * Get a peer connection state given a Peer address.
      *
      * @param address is the connection to find (based on address)
      * @param state [out] the connection if found, null otherwise. MUST not be null.
      *
      * @return true if a corresponding state was found.
      */
-    bool FindPeerConnectionState(const PeerAddress & address, PeerConnectionState ** state);
+    CHECK_RETURN_VALUE
+    bool FindPeerConnectionState(const PeerAddress & address, PeerConnectionState ** state)
+    {
+        *state = nullptr;
+        for (size_t i = 0; i < kMaxConnectionCount; i++)
+        {
+            if (mStates[i].GetPeerAddress() == address)
+            {
+                *state = &mStates[i];
+                break;
+            }
+        }
+        return *state != nullptr;
+    }
 
     /**
      * Get a peer connection state given a Node Id.
@@ -75,10 +109,27 @@ public:
      *
      * @return true if a corresponding state was found.
      */
-    bool FindPeerConnectionState(NodeId nodeId, PeerConnectionState ** state);
+    CHECK_RETURN_VALUE
+    bool FindPeerConnectionState(NodeId nodeId, PeerConnectionState ** state)
+    {
+        *state = nullptr;
+        for (size_t i = 0; i < kMaxConnectionCount; i++)
+        {
+            if (!mStates[i].GetPeerAddress().IsInitialized())
+            {
+                continue;
+            }
+            if (mStates[i].GetPeerNodeId() == nodeId)
+            {
+                *state = &mStates[i];
+                break;
+            }
+        }
+        return *state != nullptr;
+    }
 
     /// Convenience method to mark a peer connection state as active
-    void MarkConnectionActive(PeerConnectionState * state) { state->SetLastActivityTimeMs(GetCurrentMonotonicTimeMs()); }
+    void MarkConnectionActive(PeerConnectionState * state) { state->SetLastActivityTimeMs(mTimeSource); }
 
     /**
      * Iterates through all active connections and expires any connection with an idle time
@@ -86,7 +137,35 @@ public:
      *
      * Expiring a connection involves callback execution and then clearing the internal state.
      */
-    void ExpireInactiveConnections(uint64_t maxIdleTimeMs);
+    void ExpireInactiveConnections(uint64_t maxIdleTimeMs)
+    {
+        const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
+
+        for (size_t i = 0; i < kMaxConnectionCount; i++)
+        {
+            if (!mStates[i].GetPeerAddress().IsInitialized())
+            {
+                continue; // not an active connection
+            }
+
+            uint64_t connectionActiveTime = mStates[i].GetLastActivityTimeMs();
+            if (connectionActiveTime + maxIdleTimeMs >= currentTime)
+            {
+                continue; // not expired
+            }
+
+            if (OnConnectionExpired)
+            {
+                OnConnectionExpired(mStates[i], mConnectionExpiredArgument);
+            }
+
+            // Connection is assumed expired, marking it as invalid
+            mStates[i] = PeerConnectionState(PeerAddress::Uninitialized());
+        }
+    }
+
+    /// Allows access to the underlying time source used for keeping track of connection active time
+    Time::TimeSource<kTimeSource> & GetTimeSource() { return mTimeSource; }
 
     /**
      * Sets the handler for expired connections
@@ -102,34 +181,14 @@ public:
         OnConnectionExpired        = reinterpret_cast<ConnectionExpiredHandler>(handler);
     }
 
-protected:
-    /// Get the current time from a Time::TimeSource or equivalent
-    virtual uint64_t GetCurrentMonotonicTimeMs() = 0;
-
 private:
-    PeerConnectionState * mConnectionStateArray;
-    const size_t mConnectionStateArraySize;
+    Time::TimeSource<kTimeSource> mTimeSource;
+    PeerConnectionState mStates[kMaxConnectionCount];
 
     typedef void (*ConnectionExpiredHandler)(const PeerConnectionState & state, void * param);
 
     ConnectionExpiredHandler OnConnectionExpired = nullptr; ///< Callback for when a connection expires
     void * mConnectionExpiredArgument            = nullptr; ///< Argument for callback
-};
-
-/**
- * Concrete peer connections implementation based on system sizes and timers.
- */
-class PeerConnections : public PeerConnectionsBase
-{
-public:
-    PeerConnections() : PeerConnectionsBase(mState, sizeof(mState) / sizeof((mState)[0])) {}
-
-protected:
-    uint64_t GetCurrentMonotonicTimeMs() override { return mTimeSource.GetCurrentMonotonicTimeMs(); }
-
-private:
-    PeerConnectionState mState[CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE];
-    Time::TimeSource<Time::Source::kSystem> mTimeSource;
 };
 
 } // namespace Transport
