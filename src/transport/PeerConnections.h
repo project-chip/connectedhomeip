@@ -129,7 +129,10 @@ public:
     }
 
     /// Convenience method to mark a peer connection state as active
-    void MarkConnectionActive(PeerConnectionState * state) { state->SetLastActivityTimeMs(mTimeSource); }
+    void MarkConnectionActive(PeerConnectionState * state)
+    {
+        state->SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs());
+    }
 
     /**
      * Iterates through all active connections and expires any connection with an idle time
