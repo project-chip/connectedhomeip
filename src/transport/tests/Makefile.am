@@ -52,6 +52,7 @@ libTransportLayerTests_a_SOURCES                      = \
 libTransportLayerTests_adir                           = $(includedir)/transport
 
 dist_libTransportLayerTests_a_HEADERS                 = \
+    NetworkTestHelpers.h                                \
     TestTransportLayer.h                                \
     $(NULL)
 
