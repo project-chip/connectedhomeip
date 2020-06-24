@@ -513,9 +513,9 @@ static void TestHash_SHA256_Stream(nlTestSuite * inSuite, void * inContext)
 
     for (numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
     {
-        hash_sha256_vector v = hash_sha256_test_vectors[numOfTestsExecuted];
+        hash_sha256_vector v       = hash_sha256_test_vectors[numOfTestsExecuted];
         const unsigned char * data = v.data;
-        size_t data_length = v.data_length;
+        size_t data_length         = v.data_length;
         unsigned char out_buffer[kSHA256_Hash_Length];
 
         Hash_SHA256_stream sha256;

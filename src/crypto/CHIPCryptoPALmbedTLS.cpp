@@ -171,13 +171,9 @@ exit:
     return error;
 }
 
-Hash_SHA256_stream::Hash_SHA256_stream(void)
-{
-}
+Hash_SHA256_stream::Hash_SHA256_stream(void) {}
 
-Hash_SHA256_stream::~Hash_SHA256_stream(void)
-{
-}
+Hash_SHA256_stream::~Hash_SHA256_stream(void) {}
 
 CHIP_ERROR Hash_SHA256_stream::Begin(void)
 {
