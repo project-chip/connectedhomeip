@@ -44,6 +44,14 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
     return 0;
 }
 
+static void tester_task(void * pvParameters)
+{
+    ESP_LOGI(TAG, "Starting CHIP tests!");
+    int status = RunRegisteredUnitTests();
+    ESP_LOGI(TAG, "CHIP test status: %d", status);
+    exit(status);
+}
+
 extern "C" void app_main()
 {
     esp_chip_info_t chip_info;
@@ -99,8 +107,10 @@ extern "C" void app_main()
         exit(err);
     }
 
-    ESP_LOGI(TAG, "Starting CHIP tests!");
-    int status = RunRegisteredUnitTests();
-    ESP_LOGI(TAG, "CHIP test status: %d", status);
-    exit(status);
+    xTaskCreate(tester_task, "tester", 8192, (void *) NULL, tskIDLE_PRIORITY+10, NULL);
+
+    while(1)
+    {
+        vTaskDelay(50 / portTICK_PERIOD_MS);
+    }
 }
