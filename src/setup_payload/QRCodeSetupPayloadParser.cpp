@@ -384,7 +384,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 
     err = readBits(buf, indexToReadFrom, dest, kRendezvousInfoFieldLengthInBits);
     SuccessOrExit(err);
-    outPayload.rendezvousInformation = dest;
+    outPayload.rendezvousInformation = (RendezvousInformationFlags) dest;
 
     err = readBits(buf, indexToReadFrom, dest, kPayloadDiscriminatorFieldLengthInBits);
     SuccessOrExit(err);
