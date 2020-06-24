@@ -48,13 +48,13 @@ public:
     void DriveIOUntil(unsigned maxWaitMs, std::function<bool(void)> completionFunction);
 
     nlTestSuite * GetTestSuite() { return mSuite; }
-    System::Layer & GetSystemLayer() { return mSystemLayer; }
-    Inet::InetLayer & GetInetLayer() { return mInetLayer; }
+    System::Layer & GetSystemLayer() { return *mSystemLayer; }
+    Inet::InetLayer & GetInetLayer() { return *mInetLayer; }
 
 private:
-    nlTestSuite * mSuite = nullptr;
-    System::Layer mSystemLayer;
-    Inet::InetLayer mInetLayer;
+    nlTestSuite * mSuite         = nullptr;
+    System::Layer * mSystemLayer = nullptr;
+    Inet::InetLayer * mInetLayer = nullptr;
 };
 
 } // namespace Test

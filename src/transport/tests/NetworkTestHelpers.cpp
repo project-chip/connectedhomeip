@@ -17,6 +17,8 @@
 
 #include "NetworkTestHelpers.h"
 
+#include "TestInetCommon.h"
+
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 
@@ -27,17 +29,12 @@ CHIP_ERROR IOContext::Init(nlTestSuite * suite)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    mSuite = suite;
+    InitNetwork();
 
-    // Initialize the CHIP System Layer.
-    err = mSystemLayer.Init(NULL);
-    SuccessOrExit(err);
+    mSuite       = suite;
+    mSystemLayer = &gSystemLayer;
+    mInetLayer   = &gInet;
 
-    // Initialize the CHIP Inet layer.
-    err = mInetLayer.Init(mSystemLayer, NULL);
-    SuccessOrExit(err);
-
-exit:
     return err;
 }
 
@@ -45,61 +42,31 @@ exit:
 CHIP_ERROR IOContext::Shutdown()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    mSuite         = NULL;
 
-    err = mSystemLayer.Shutdown();
-    SuccessOrExit(err);
+    ShutdownNetwork();
 
-    err = mInetLayer.Shutdown();
-    SuccessOrExit(err);
-
-exit:
     return err;
 }
 
 void IOContext::DriveIO()
 {
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    NL_TEST_ASSERT(mSuite, mSystemLayer.State() == System::kLayerState_Initialized);
-    NL_TEST_ASSERT(mSuite, mInetLayer.State == Inet::InetLayer::kState_Initialized);
-
     // Set the select timeout to 100ms
     struct timeval aSleepTime;
     aSleepTime.tv_sec  = 0;
     aSleepTime.tv_usec = 100 * 1000;
 
-    fd_set readFDs, writeFDs, exceptFDs;
-    int numFDs = 0;
-
-    FD_ZERO(&readFDs);
-    FD_ZERO(&writeFDs);
-    FD_ZERO(&exceptFDs);
-
-    mSystemLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
-    mInetLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
-
-    int selectRes = select(numFDs, &readFDs, &writeFDs, &exceptFDs, &aSleepTime);
-    if (selectRes < 0)
-    {
-        printf("select failed: %s\n", ErrorStr(System::MapErrorPOSIX(errno)));
-        NL_TEST_ASSERT(mSuite, false);
-        return;
-    }
-
-    mSystemLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
-    mInetLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
-#endif
+    ServiceEvents(aSleepTime);
 }
 
 void IOContext::DriveIOUntil(unsigned maxWaitMs, std::function<bool(void)> completionFunction)
 {
-    uint64_t mStartTime = mSystemLayer.GetClock_MonotonicMS();
+    uint64_t mStartTime = mSystemLayer->GetClock_MonotonicMS();
 
     while (true)
     {
         DriveIO(); // at least one IO loop is guaranteed
 
-        if (completionFunction() || ((mSystemLayer.GetClock_MonotonicMS() - mStartTime) >= maxWaitMs))
+        if (completionFunction() || ((mSystemLayer->GetClock_MonotonicMS() - mStartTime) >= maxWaitMs))
         {
             break;
         }
