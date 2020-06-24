@@ -1551,7 +1551,6 @@ if test "${with_crypto}" = "mbedtls"; then
 	    # variables and trust all will be well.
 
 	    MBEDTLS_CPPFLAGS="-I\${abs_top_srcdir}/third_party/mbedtls/repo/include"
-	    MBEDTLS_CPPFLAGS+=" -DMBEDTLS_NO_PLATFORM_ENTROPY -DMBEDTLS_TEST_NULL_ENTROPY -DMBEDTLS_NO_DEFAULT_ENTROPY_SOURCES"
 	    MBEDTLS_LDFLAGS="-L${ac_pwd}/third_party/mbedtls"
 	    MBEDTLS_LIBS="-lmbedtls"
 	],
