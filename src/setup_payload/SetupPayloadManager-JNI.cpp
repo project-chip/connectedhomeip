@@ -17,7 +17,7 @@ JNI_METHOD(jlong, newQrCodeSetupPayloadParser)(JNIEnv *env, jobject self, jstrin
 {
     const char *qrString = NULL;
     QRCodeSetupPayloadParser *qrPayloadParser = NULL;
-    
+
     qrString = env->GetStringUTFChars(qrCodeObj, 0);
     qrPayloadParser = new QRCodeSetupPayloadParser(qrString);
     return (long)qrPayloadParser;
