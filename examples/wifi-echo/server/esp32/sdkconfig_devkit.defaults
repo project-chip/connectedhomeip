@@ -16,9 +16,10 @@
 #    limitations under the License.
 #
 #    Description:
-#      Some useful defaults for the demo app configuration.
+#      CI uses this to select the ESP32-DevKitC.
 #
 
+CONFIG_DEVICE_TYPE_ESP32_DEVKITC=y
 
 # Default to 921600 baud when flashing and monitoring device
 CONFIG_ESPTOOLPY_BAUD_921600B=y
@@ -33,4 +34,3 @@ CONFIG_LWIP_IPV6_AUTOCONFIG=y
 # Use a custom partition table
 CONFIG_PARTITION_TABLE_CUSTOM=y
 CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
-
