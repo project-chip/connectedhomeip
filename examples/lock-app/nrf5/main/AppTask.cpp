@@ -233,6 +233,7 @@ void AppTask::HandleBLEMessageReceived(chip::Ble::BLEEndPoint * endPoint, chip::
 
 void SendUDPBroadCast()
 {
+#if CHIP_ENABLE_OPENTHREAD
     // TODO: change to CHIP inet layer
     const char * domainName = "LockDemo._chip._udp.local.";
     chip::Inet::IPAddress addr;
@@ -276,6 +277,9 @@ void SendUDPBroadCast()
         NRF_LOG_INFO("Failed to otUdpSend: %d", error);
     }
     ThreadStackMgrImpl().UnlockThreadStack();
+#else
+    NRF_LOG_INFO("OpenThread disabled, not sending UDP broadcasts");
+#endif
 }
 
 void AppTask::AppTaskMain(void * pvParameter)
