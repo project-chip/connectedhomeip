@@ -62,11 +62,12 @@ constexpr NodeId kDestinationNodeId = 111222333;
 
 int ReceiveHandlerCallCount = 0;
 
-static void MessageReceiveHandler(const MessageHeader & header, const Inet::IPPacketInfo & source, System::PacketBuffer * msgBuf,
-                                  nlTestSuite * inSuite)
+static void MessageReceiveHandler(const MessageHeader & header, Transport::PeerConnectionState * state,
+                                  System::PacketBuffer * msgBuf, nlTestSuite * inSuite)
 {
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
     NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
+    NL_TEST_ASSERT(inSuite, state->GetPeerNodeId() == kDestinationNodeId);
 
     size_t data_len = msgBuf->DataLength();
 
@@ -74,7 +75,19 @@ static void MessageReceiveHandler(const MessageHeader & header, const Inet::IPPa
     NL_TEST_ASSERT(inSuite, compare == 0);
 
     ReceiveHandlerCallCount++;
-};
+}
+
+int NewConnectionHandlerCallCount = 0;
+static void NewConnectionHandler(Transport::PeerConnectionState * state, nlTestSuite * inSuite)
+{
+    CHIP_ERROR err;
+
+    NewConnectionHandlerCallCount++;
+
+    err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key,
+                                                               sizeof(local_private_key));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+}
 
 static void DriveIO(TestContext & ctx)
 {
@@ -117,7 +130,7 @@ static void DriveIO(TestContext & ctx)
 #endif
 }
 
-CHIP_ERROR InitLayers(System::Layer & systemLayer, InetLayer & inetLayer)
+static CHIP_ERROR InitLayers(System::Layer & systemLayer, InetLayer & inetLayer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Initialize the CHIP System Layer.
@@ -162,13 +175,13 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     err = conn.Init(kSourceNodeId, &ctx.mInetLayer, Transport::UdpListenParameters().SetAddressType(addr.Type()));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = conn.Connect(kDestinationNodeId, Transport::PeerAddress::UDP(addr));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = conn.ManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key, sizeof(local_private_key));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
+    conn.SetNewConnectionHandler(NewConnectionHandler, inSuite);
     conn.SetMessageReceiveHandler(MessageReceiveHandler, inSuite);
+
+    NewConnectionHandlerCallCount = 0;
+    err                           = conn.Connect(kDestinationNodeId, Transport::PeerAddress::UDP(addr));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, NewConnectionHandlerCallCount == 1);
 
     // Should be able to send a message to itself by just calling send.
     ReceiveHandlerCallCount = 0;

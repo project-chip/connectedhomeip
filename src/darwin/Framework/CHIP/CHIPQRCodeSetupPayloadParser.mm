@@ -22,15 +22,15 @@
 #import <setup_payload/SetupPayload.h>
 
 @implementation CHIPQRCodeSetupPayloadParser {
-    NSString * _base45Representation;
+    NSString * _base41Representation;
     chip::QRCodeSetupPayloadParser * _chipQRCodeSetupPayloadParser;
 }
 
-- (id)initWithBase45Representation:(NSString *)base45Representation
+- (id)initWithBase41Representation:(NSString *)base41Representation
 {
     if (self = [super init]) {
-        _base45Representation = base45Representation;
-        _chipQRCodeSetupPayloadParser = new chip::QRCodeSetupPayloadParser(std::string([base45Representation UTF8String]));
+        _base41Representation = base41Representation;
+        _chipQRCodeSetupPayloadParser = new chip::QRCodeSetupPayloadParser(std::string([base41Representation UTF8String]));
     }
     return self;
 }

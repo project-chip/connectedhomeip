@@ -37,6 +37,14 @@
 using namespace chip;
 using namespace chip::Crypto;
 
+static uint32_t gs_test_entropy_source_called = 0;
+static int test_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
+{
+    *olen = len;
+    gs_test_entropy_source_called++;
+    return 0;
+}
+
 static void TestAES_CCM_256EncryptTestVectors(nlTestSuite * inSuite, void * inContext)
 {
     int numOfTestVectors = ArraySize(ccm_test_vectors);
@@ -799,6 +807,22 @@ static void TestECDH_SampleInputVectors(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, numOfTestsExecuted > 0);
 }
 
+static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR error = add_entropy_source(test_entropy_source, NULL, 10);
+    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    unsigned char buffer[5];
+    uint32_t test_entropy_source_call_count = gs_test_entropy_source_called;
+    NL_TEST_ASSERT(inSuite, DRBG_get_bytes(buffer, sizeof(buffer)) == CHIP_NO_ERROR);
+#if CHIP_CRYPTO_MBEDTLS
+    for (int i = 0; i < 5000 * 2; i++)
+    {
+        (void) DRBG_get_bytes(buffer, sizeof(buffer));
+    }
+    NL_TEST_ASSERT(inSuite, gs_test_entropy_source_called > test_entropy_source_call_count);
+#endif
+}
+
 namespace chip {
 namespace Logging {
 void LogV(uint8_t module, uint8_t category, const char * format, va_list argptr)
@@ -846,6 +870,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ECDH derive shared secret", TestECDH_EstablishSecret),
     NL_TEST_DEF("Test ECDH invalid params", TestECDH_InvalidParams),
     NL_TEST_DEF("Test ECDH sample vectors", TestECDH_SampleInputVectors),
+    NL_TEST_DEF("Test adding entropy sources", TestAddEntropySources),
 
     NL_TEST_SENTINEL()
 };
@@ -864,6 +889,7 @@ int TestCHIPCryptoPAL(void)
     // Run test suit againt one context.
     nlTestRunner(&theSuite, NULL);
 
+    add_entropy_source(test_entropy_source, NULL, 16);
     return (nlTestRunnerStats(&theSuite));
 }
 

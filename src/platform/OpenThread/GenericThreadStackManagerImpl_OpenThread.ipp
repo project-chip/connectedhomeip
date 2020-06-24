@@ -809,6 +809,15 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::AdjustPollingInt
     return err;
 }
 
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_FactoryReset(void)
+{
+    ChipLogProgress(DeviceLayer, "About to factory reset ...");
+    Impl()->LockThreadStack();
+    otInstanceFactoryReset(mOTInst);
+    Impl()->UnlockThreadStack();
+}
+
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

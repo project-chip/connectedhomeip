@@ -57,7 +57,7 @@ static NSString * const ipKey = @"ipk";
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.example.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = [CHIPDeviceController sharedController];
     [self.chipController registerCallbacks:callbackQueue
-        onMessage:^(NSData * _Nonnull message, NSString * _Nonnull ipAddress, UInt16 port) {
+        onMessage:^(NSData * _Nonnull message) {
             typeof(self) strongSelf = weakSelf;
             NSString * strMessage = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
             [strongSelf postResult:[@"Echo Response: " stringByAppendingFormat:@"%@", strMessage]];

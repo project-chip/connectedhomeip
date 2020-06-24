@@ -34,6 +34,12 @@ namespace chip {
 class DLL_EXPORT SecureSession
 {
 public:
+    SecureSession(void);
+    SecureSession(SecureSession &&)      = default;
+    SecureSession(const SecureSession &) = default;
+    SecureSession & operator=(const SecureSession &) = default;
+    SecureSession & operator=(SecureSession &&) = default;
+
     /**
      * @brief
      *   Derive a shared key. The derived key will be used for encryting/decrypting
@@ -82,12 +88,29 @@ public:
      */
     size_t EncryptionOverhead(void);
 
-    void Close(void);
+    /**
+     * Clears the internal state of secure session back to the state of a new object.
+     */
+    void Reset(void);
 
-    SecureSession(void);
+    /**
+     * @brief
+     *   The keypair for the secure channel. This is a utility function that will be used
+     *   until we have automatic key exchange in place. The function is useful only for
+     *   example applications for now. It will eventually be removed.
+     *
+     * @param remote_public_key  A pointer to peer's public key
+     * @param public_key_length  Length of remote_public_key
+     * @param local_private_key  A pointer to local private key
+     * @param private_key_length Length of local_private_key
+     * @return CHIP_ERROR        The result of key derivation
+     */
+    [[deprecated("Available until actual key exchange is implemented")]] CHIP_ERROR
+    TemporaryManualKeyExchange(const unsigned char * remote_public_key, const size_t public_key_length,
+                               const unsigned char * local_private_key, const size_t private_key_length);
 
 private:
-    static const size_t kAES_CCM128_Key_Length = 16;
+    static constexpr size_t kAES_CCM128_Key_Length = 16;
 
     bool mKeyAvailable;
     uint64_t mNextIV;

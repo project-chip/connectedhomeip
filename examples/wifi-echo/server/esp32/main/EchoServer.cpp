@@ -92,19 +92,14 @@ exit:
     return maybeDataModelMessage;
 }
 
-void newConnectionHandler(const MessageHeader & header, const IPPacketInfo & packet_info, SecureSessionMgr * transport)
+void newConnectionHandler(PeerConnectionState * state, SecureSessionMgr * transport)
 {
     CHIP_ERROR err;
 
     ESP_LOGI(TAG, "Received a new connection.");
 
-    VerifyOrExit(header.GetSourceNodeId().HasValue(), ESP_LOGE(TAG, "Unknown source for received message"));
-    VerifyOrExit(transport->GetPeerNodeId() != header.GetSourceNodeId().Value(), ESP_LOGI(TAG, "Node already known."));
-
-    err = transport->Connect(header.GetSourceNodeId().Value(), PeerAddress::UDP(packet_info.SrcAddress, packet_info.SrcPort));
-    VerifyOrExit(err == CHIP_NO_ERROR, ESP_LOGE(TAG, "Failed to connect transport"));
-
-    err = transport->ManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key, sizeof(local_private_key));
+    err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key,
+                                                               sizeof(local_private_key));
     VerifyOrExit(err == CHIP_NO_ERROR, ESP_LOGE(TAG, "Failed to setup encryption"));
 
 exit:
@@ -112,7 +107,7 @@ exit:
 }
 
 // Transport Callbacks
-void echo(const MessageHeader & header, const IPPacketInfo & packet_info, System::PacketBuffer * buffer,
+void echo(const MessageHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
           SecureSessionMgr * transport)
 {
     CHIP_ERROR err;
@@ -120,17 +115,14 @@ void echo(const MessageHeader & header, const IPPacketInfo & packet_info, System
 
     // as soon as a client connects, assume it is connected
     VerifyOrExit(transport != NULL && buffer != NULL, ESP_LOGE(TAG, "Received data but couldn't process it..."));
-
-    VerifyOrExit(header.GetSourceNodeId().HasValue(), ESP_LOGE(TAG, "Unknown source for received message"));
+    VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ESP_LOGE(TAG, "Unknown source for received message"));
 
     {
-        char src_addr[INET_ADDRSTRLEN];
-        char dest_addr[INET_ADDRSTRLEN];
-        packet_info.SrcAddress.ToString(src_addr, sizeof(src_addr));
-        packet_info.DestAddress.ToString(dest_addr, sizeof(dest_addr));
+        char src_addr[Transport::PeerAddress::kMaxToStringSize];
 
-        ESP_LOGI(TAG, "UDP packet received from %s:%u to %s:%u (%zu bytes)", src_addr, packet_info.SrcPort, dest_addr,
-                 packet_info.DestPort, static_cast<size_t>(data_len));
+        state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
+
+        ESP_LOGI(TAG, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
     }
 
     // FIXME: Long-term we shouldn't be guessing what sort of message this is

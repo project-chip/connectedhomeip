@@ -19,7 +19,6 @@
 
 #include <core/CHIPConfig.h>
 #include <core/CHIPError.h>
-#include <support/CodeUtils.h>
 #include <system/TimeSource.h>
 #include <transport/PeerConnectionState.h>
 
@@ -55,7 +54,6 @@ public:
      * @returns CHIP_NO_ERROR if state could be initialized. May fail if maximum connection count
      *          has been reached (with CHIP_ERROR_NO_MEMORY).
      */
-    CHECK_RETURN_VALUE
     CHIP_ERROR CreateNewPeerConnectionState(const PeerAddress & address, PeerConnectionState ** state);
 
     /**
@@ -66,7 +64,6 @@ public:
      *
      * @return true if a corresponding state was found.
      */
-    CHECK_RETURN_VALUE
     bool FindPeerConnectionState(const PeerAddress & address, PeerConnectionState ** state);
 
     /**
@@ -78,7 +75,6 @@ public:
      *
      * @return true if a corresponding state was found.
      */
-    CHECK_RETURN_VALUE
     bool FindPeerConnectionState(NodeId nodeId, PeerConnectionState ** state);
 
     /// Convenience method to mark a peer connection state as active
@@ -126,7 +122,7 @@ private:
 class PeerConnections : public PeerConnectionsBase
 {
 public:
-    PeerConnections() : PeerConnectionsBase(mState, ArraySize(mState)) {}
+    PeerConnections() : PeerConnectionsBase(mState, sizeof(mState) / sizeof((mState)[0])) {}
 
 protected:
     uint64_t GetCurrentMonotonicTimeMs() override { return mTimeSource.GetCurrentMonotonicTimeMs(); }

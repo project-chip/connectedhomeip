@@ -256,6 +256,35 @@ void TestPayloadParser_PartialPayload(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
+void TestShortCodeReadWrite(nlTestSuite * inSuite, void * context)
+{
+    SetupPayload inPayload = GetDefaultPayload();
+    SetupPayload outPayload;
+
+    string result;
+    ManualSetupPayloadGenerator generator(inPayload);
+    generator.payloadDecimalStringRepresentation(result);
+    ManualSetupPayloadParser(result).populatePayload(outPayload);
+
+    NL_TEST_ASSERT(inSuite, inPayload == outPayload);
+}
+
+void TestLongCodeReadWrite(nlTestSuite * inSuite, void * context)
+{
+    SetupPayload inPayload       = GetDefaultPayload();
+    inPayload.requiresCustomFlow = true;
+    inPayload.vendorID           = 1;
+    inPayload.productID          = 1;
+    SetupPayload outPayload;
+
+    string result;
+    ManualSetupPayloadGenerator generator(inPayload);
+    generator.payloadDecimalStringRepresentation(result);
+    ManualSetupPayloadParser(result).populatePayload(outPayload);
+
+    NL_TEST_ASSERT(inSuite, inPayload == outPayload);
+}
+
 void TestExtractBits(nlTestSuite * inSuite, void * inContext)
 {
     uint64_t dest;
@@ -479,6 +508,8 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Parse from Partial Payload",                                           TestPayloadParser_PartialPayload),
     NL_TEST_DEF("Parse from Full Payload",                                              TestPayloadParser_FullPayload),
     NL_TEST_DEF("Test Invalid Entry To QR Code Parser",                                 TestPayloadParser_InvalidEntry),
+    NL_TEST_DEF("Test Short Read Write",                                                TestShortCodeReadWrite),
+    NL_TEST_DEF("Test Long Read Write",                                                 TestLongCodeReadWrite),
     NL_TEST_DEF("Test Extract Bits",                                                    TestExtractBits),
     NL_TEST_DEF("Check Decimal String Validity",                                        TestCheckDecimalStringValidity),
     NL_TEST_DEF("Check QR Code Length Validity",                                        TestCheckCodeLengthValidity),

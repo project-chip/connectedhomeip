@@ -37,17 +37,17 @@
 {
     NSError * error;
     CHIPManualSetupPayloadParser * parser =
-        [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:@"34896656190000100001"];
+        [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:@"000003949100001000011"];
     CHIPSetupPayload * payload = [parser populatePayload:&error];
 
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
 
-    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 13);
-    XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 2345);
+    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 1);
+    XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 1234);
     XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 1);
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
-    XCTAssertFalse(payload.requiresCustomFlow);
+    XCTAssertTrue(payload.requiresCustomFlow);
     XCTAssertEqual(payload.version.unsignedIntegerValue, 0);
     XCTAssertEqual(payload.rendezvousInformation.unsignedIntegerValue, 0);
 }
@@ -65,18 +65,19 @@
 - (void)testQRCodeParser_Error
 {
     NSError * error;
-    CHIPManualSetupPayloadParser * parser =
-        [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:@"B20800G.0G8G000"];
+    CHIPQRCodeSetupPayloadParser * parser =
+        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:@"CH:B20800G.0G8G000"];
     CHIPSetupPayload * payload = [parser populatePayload:&error];
 
     XCTAssertNil(payload);
-    XCTAssertEqual(error.code, CHIPErrorCodeInvalidIntegerValue);
+    XCTAssertEqual(error.code, CHIPErrorCodeInvalidArgument);
 }
 
 - (void)testQRCodeParser
 {
     NSError * error;
-    CHIPQRCodeSetupPayloadParser * parser = [[CHIPQRCodeSetupPayloadParser alloc] initWithBase45Representation:@"B20800G00G8G000"];
+    CHIPQRCodeSetupPayloadParser * parser =
+        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:@"CH:J20800G008008000"];
     CHIPSetupPayload * payload = [parser populatePayload:&error];
 
     XCTAssertNotNil(payload);
@@ -89,6 +90,39 @@
     XCTAssertFalse(payload.requiresCustomFlow);
     XCTAssertEqual(payload.version.unsignedIntegerValue, 5);
     XCTAssertEqual(payload.rendezvousInformation.unsignedIntegerValue, 1);
+}
+
+- (void)testQRCodeParserWithOptionalData
+{
+    NSError * error;
+    CHIPQRCodeSetupPayloadParser * parser =
+        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:@"CH:J20800G008008006DL200UOGMHARTHOMJ300IDL530.I7"];
+    CHIPSetupPayload * payload = [parser populatePayload:&error];
+
+    XCTAssertNotNil(payload);
+    XCTAssertNil(error);
+
+    XCTAssertEqual(payload.version.unsignedIntegerValue, 5);
+    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 128);
+    XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 2048);
+    XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 12);
+    XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
+    XCTAssertFalse(payload.requiresCustomFlow);
+    XCTAssertEqual(payload.rendezvousInformation.unsignedIntegerValue, 1);
+    XCTAssertTrue([payload.serialNumber isEqualToString:@"1"]);
+
+    NSArray<CHIPOptionalQRCodeInfo *> * vendorOptionalInfo = [payload getAllOptionalVendorData:&error];
+    XCTAssertNil(error);
+    XCTAssertEqual([vendorOptionalInfo count], 2);
+    for (CHIPOptionalQRCodeInfo * info in vendorOptionalInfo) {
+        if (info.tag.intValue == 2) {
+            XCTAssertEqual(info.infoType.intValue, kOptionalQRCodeInfoTypeString);
+            XCTAssertTrue([info.stringValue isEqualToString:@"myData"]);
+        } else if (info.tag.intValue == 3) {
+            XCTAssertEqual(info.infoType.intValue, kOptionalQRCodeInfoTypeInt32);
+            XCTAssertEqual(info.integerValue.intValue, 12);
+        }
+    }
 }
 
 @end
