@@ -126,6 +126,7 @@
 
 #define SYSTEM_STATE_LED BSP_LED_0
 #define LOCK_STATE_LED BSP_LED_1
+#define LOCK_STATE_LED_GPIO 3
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.
