@@ -70,6 +70,16 @@ restylers:
           - "**/*.json"
           - "**/*.m"
           - "**/*.mm"
+    - name: google-java-format
+      enabled: true
+      image: restyled/restyler-google-java-format:v1.6
+      command:
+          - google-java-format
+          - "--replace"
+      arguments: []
+      include:
+          - "**/*.java"
+      interpreters: []
     - name: clang-format
       enabled: true
       image: restyled/restyler-clang-format:v9.0.0
@@ -91,7 +101,6 @@ restylers:
           - "**/*.hxx"
           - "**/*.h++"
           - "**/*.H"
-          - "**/*.java"
           - "**/*.js"
           - "**/*.m"
           - "**/*.mm"

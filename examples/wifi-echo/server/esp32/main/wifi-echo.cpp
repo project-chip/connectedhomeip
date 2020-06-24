@@ -33,6 +33,7 @@
 #include "tcpip_adapter.h"
 #include <stdio.h>
 
+#include <crypto/CHIPCryptoPAL.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/ErrorStr.h>
 #include <transport/SecureSessionMgr.h>
@@ -89,6 +90,14 @@ SecureSessionMgr sTransportIPv4;
 SecureSessionMgr sTransportIPv6;
 
 } // namespace
+
+static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
+{
+    esp_fill_random(output, len);
+    *olen = len;
+    return 0;
+}
+
 
 extern "C" void app_main()
 {
@@ -165,6 +174,13 @@ extern "C" void app_main()
     // Register a function to receive events from the CHIP device layer.  Note that calls to
     // this function will happen on the CHIP event loop thread, not the app_main thread.
     PlatformMgr().AddEventHandler(DeviceEventHandler, 0);
+
+    err = Crypto::add_entropy_source(app_entropy_source, NULL, 16);
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "add_entropy_source() failed: %s", ErrorStr(err));
+        return;
+    }
 
     // Start a task to run the CHIP Device event loop.
     err = PlatformMgr().StartEventLoopTask();
