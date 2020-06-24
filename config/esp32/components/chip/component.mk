@@ -153,7 +153,8 @@ COMPONENT_ADD_LDFLAGS        = -L$(OUTPUT_DIR)/lib/ \
                                -lSystemLayer \
                                -lDeviceLayer \
                                -lChipCrypto \
-                               -lSetupPayload
+                               -lSetupPayload \
+                               -lnlfaultinjection
 
 # Tell the ESP-IDF build system that the CHIP component defines its own build
 # and clean targets.
