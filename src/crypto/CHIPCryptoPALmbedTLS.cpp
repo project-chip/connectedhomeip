@@ -82,9 +82,9 @@ static bool _isValidKeyLength(size_t length)
     return false;
 }
 
-CHIP_ERROR AES_CCM_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
-                           size_t aad_length, const unsigned char * key, size_t key_length, const unsigned char * iv,
-                           size_t iv_length, unsigned char * ciphertext, unsigned char * tag, size_t tag_length)
+CHIP_ERROR AES_CCM_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad, size_t aad_length,
+                           const unsigned char * key, size_t key_length, const unsigned char * iv, size_t iv_length,
+                           unsigned char * ciphertext, unsigned char * tag, size_t tag_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 1;
@@ -120,9 +120,9 @@ exit:
     return error;
 }
 
-CHIP_ERROR AES_CCM_decrypt(const unsigned char * ciphertext, size_t ciphertext_len, const unsigned char * aad,
-                           size_t aad_len, const unsigned char * tag, size_t tag_length, const unsigned char * key,
-                           size_t key_length, const unsigned char * iv, size_t iv_length, unsigned char * plaintext)
+CHIP_ERROR AES_CCM_decrypt(const unsigned char * ciphertext, size_t ciphertext_len, const unsigned char * aad, size_t aad_len,
+                           const unsigned char * tag, size_t tag_length, const unsigned char * key, size_t key_length,
+                           const unsigned char * iv, size_t iv_length, unsigned char * plaintext)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 1;
@@ -220,8 +220,8 @@ void Hash_SHA256_stream::Clear(void)
 }
 
 CHIP_ERROR HKDF_SHA256(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
-                       const size_t salt_length, const unsigned char * info, const size_t info_length,
-                       unsigned char * out_buffer, size_t out_length)
+                       const size_t salt_length, const unsigned char * info, const size_t info_length, unsigned char * out_buffer,
+                       size_t out_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 1;
@@ -315,8 +315,7 @@ static int ECDSA_sign_rng(void * ctxt, unsigned char * out_buffer, size_t out_le
 }
 
 CHIP_ERROR ECDSA_sign_msg(const unsigned char * msg, const size_t msg_length, const unsigned char * private_key,
-                          const size_t private_key_length, unsigned char * out_signature,
-                          size_t & out_signature_length)
+                          const size_t private_key_length, unsigned char * out_signature, size_t & out_signature_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -358,9 +357,9 @@ exit:
     return error;
 }
 
-CHIP_ERROR ECDSA_validate_msg_signature(const unsigned char * msg, const size_t msg_length,
-                                        const unsigned char * public_key, const size_t public_key_length,
-                                        const unsigned char * signature, const size_t signature_length)
+CHIP_ERROR ECDSA_validate_msg_signature(const unsigned char * msg, const size_t msg_length, const unsigned char * public_key,
+                                        const size_t public_key_length, const unsigned char * signature,
+                                        const size_t signature_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
