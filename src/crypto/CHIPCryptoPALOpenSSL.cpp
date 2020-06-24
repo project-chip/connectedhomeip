@@ -36,6 +36,9 @@
 
 #include <string.h>
 
+namespace chip {
+namespace Crypto {
+
 #define kKeyLengthInBits 256
 
 enum class DigestType
@@ -47,8 +50,6 @@ enum class ECName
 {
     P256v1
 };
-
-using namespace chip::Crypto;
 
 static_assert(kMax_ECDH_Secret_Length >= 32, "ECDH shared secret is too short");
 static_assert(kMax_ECDSA_Signature_Length >= 72, "ECDSA signature buffer length is too short");
@@ -116,9 +117,9 @@ static const EVP_MD * _digestForType(DigestType digestType)
     }
 }
 
-CHIP_ERROR chip::Crypto::AES_CCM_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
-                                         size_t aad_length, const unsigned char * key, size_t key_length, const unsigned char * iv,
-                                         size_t iv_length, unsigned char * ciphertext, unsigned char * tag, size_t tag_length)
+CHIP_ERROR AES_CCM_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
+                           size_t aad_length, const unsigned char * key, size_t key_length, const unsigned char * iv,
+                           size_t iv_length, unsigned char * ciphertext, unsigned char * tag, size_t tag_length)
 {
     EVP_CIPHER_CTX * context = NULL;
     int bytesWritten         = 0;
@@ -193,9 +194,9 @@ exit:
     return error;
 }
 
-CHIP_ERROR chip::Crypto::AES_CCM_decrypt(const unsigned char * ciphertext, size_t ciphertext_length, const unsigned char * aad,
-                                         size_t aad_length, const unsigned char * tag, size_t tag_length, const unsigned char * key,
-                                         size_t key_length, const unsigned char * iv, size_t iv_length, unsigned char * plaintext)
+CHIP_ERROR AES_CCM_decrypt(const unsigned char * ciphertext, size_t ciphertext_length, const unsigned char * aad,
+                           size_t aad_length, const unsigned char * tag, size_t tag_length, const unsigned char * key,
+                           size_t key_length, const unsigned char * iv, size_t iv_length, unsigned char * plaintext)
 {
     EVP_CIPHER_CTX * context = NULL;
     CHIP_ERROR error         = CHIP_NO_ERROR;
@@ -259,7 +260,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR chip::Crypto::Hash_SHA256(const unsigned char * data, const size_t data_length, unsigned char * out_buffer)
+CHIP_ERROR Hash_SHA256(const unsigned char * data, const size_t data_length, unsigned char * out_buffer)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
@@ -318,9 +319,9 @@ void Hash_SHA256_stream::Clear(void)
     memset(this, 0, sizeof(*this));
 }
 
-CHIP_ERROR chip::Crypto::HKDF_SHA256(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
-                                     const size_t salt_length, const unsigned char * info, const size_t info_length,
-                                     unsigned char * out_buffer, size_t out_length)
+CHIP_ERROR HKDF_SHA256(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
+                       const size_t salt_length, const unsigned char * info, const size_t info_length,
+                       unsigned char * out_buffer, size_t out_length)
 {
     EVP_PKEY_CTX * context;
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -379,12 +380,12 @@ exit:
     return error;
 }
 
-CHIP_ERROR chip::Crypto::add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold)
+CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold)
 {
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR chip::Crypto::DRBG_get_bytes(unsigned char * out_buffer, const size_t out_length)
+CHIP_ERROR DRBG_get_bytes(unsigned char * out_buffer, const size_t out_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -399,9 +400,9 @@ exit:
     return error;
 }
 
-CHIP_ERROR chip::Crypto::ECDSA_sign_msg(const unsigned char * msg, const size_t msg_length, const unsigned char * private_key,
-                                        const size_t private_key_length, unsigned char * out_signature,
-                                        size_t & out_signature_length)
+CHIP_ERROR ECDSA_sign_msg(const unsigned char * msg, const size_t msg_length, const unsigned char * private_key,
+                          const size_t private_key_length, unsigned char * out_signature,
+                          size_t & out_signature_length)
 {
     ERR_clear_error();
 
@@ -500,9 +501,9 @@ exit:
     return error;
 }
 
-CHIP_ERROR chip::Crypto::ECDSA_validate_msg_signature(const unsigned char * msg, const size_t msg_length,
-                                                      const unsigned char * public_key, const size_t public_key_length,
-                                                      const unsigned char * signature, const size_t signature_length)
+CHIP_ERROR ECDSA_validate_msg_signature(const unsigned char * msg, const size_t msg_length,
+                                        const unsigned char * public_key, const size_t public_key_length,
+                                        const unsigned char * signature, const size_t signature_length)
 {
     ERR_clear_error();
     CHIP_ERROR error            = CHIP_ERROR_INTERNAL;
@@ -682,9 +683,9 @@ exit:
     return error;
 }
 
-CHIP_ERROR chip::Crypto::ECDH_derive_secret(const unsigned char * remote_public_key, const size_t remote_public_key_length,
-                                            const unsigned char * local_private_key, const size_t local_private_key_length,
-                                            unsigned char * out_secret, size_t & out_secret_length)
+CHIP_ERROR ECDH_derive_secret(const unsigned char * remote_public_key, const size_t remote_public_key_length,
+                              const unsigned char * local_private_key, const size_t local_private_key_length,
+                              unsigned char * out_secret, size_t & out_secret_length)
 {
     ERR_clear_error();
     CHIP_ERROR error      = CHIP_NO_ERROR;
@@ -745,3 +746,6 @@ exit:
     _logSSLError();
     return error;
 }
+
+} // namespace Crypto
+} // namespace chip
