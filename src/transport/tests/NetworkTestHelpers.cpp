@@ -59,6 +59,7 @@ exit:
 
 void IOContext::DriveIO()
 {
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     NL_TEST_ASSERT(mSuite, mSystemLayer.State() == System::kLayerState_Initialized);
     NL_TEST_ASSERT(mSuite, mInetLayer.State == Inet::InetLayer::kState_Initialized);
 
@@ -87,6 +88,7 @@ void IOContext::DriveIO()
 
     mSystemLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
     mInetLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
+#endif
 }
 
 void IOContext::DriveIOUntil(unsigned maxWaitMs, std::function<bool(void)> completionFunction)
