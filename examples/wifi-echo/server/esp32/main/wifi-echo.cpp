@@ -83,6 +83,14 @@ const char * TAG = "wifi-echo-demo";
 
 static void DeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg);
 
+namespace {
+
+// Globals as these are large and will not fit onto the stack
+SecureSessionMgr sTransportIPv4;
+SecureSessionMgr sTransportIPv6;
+
+} // namespace
+
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
     esp_fill_random(output, len);
@@ -185,7 +193,6 @@ extern "C" void app_main()
 
     // Start the Echo Server
     InitDataModelHandler();
-    SecureSessionMgr sTransportIPv4, sTransportIPv6;
     startServer(&sTransportIPv4, &sTransportIPv6);
 #if CONFIG_USE_ECHO_CLIENT
     startClient();
