@@ -1,8 +1,8 @@
 //
 // Created by Vidhi Shah on 6/17/20.
 //
-#include "QRCodeSetupPayloadParser.h"
 #include "Base41.h"
+#include "QRCodeSetupPayloadParser.h"
 
 #include <jni.h>
 
@@ -10,41 +10,40 @@
 
 using namespace chip;
 
-#define JNI_METHOD(RETURN, METHOD_NAME) \
-    extern "C" JNIEXPORT RETURN JNICALL Java_com_package_##METHOD_NAME
+#define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_com_package_##METHOD_NAME
 
-JNI_METHOD(jlong, newQrCodeSetupPayloadParser)(JNIEnv *env, jobject self, jstring qrCodeObj)
+JNI_METHOD(jlong, newQrCodeSetupPayloadParser)(JNIEnv * env, jobject self, jstring qrCodeObj)
 {
-    const char *qrString = NULL;
-    QRCodeSetupPayloadParser *qrPayloadParser = NULL;
+    const char * qrString                      = NULL;
+    QRCodeSetupPayloadParser * qrPayloadParser = NULL;
 
-    qrString = env->GetStringUTFChars(qrCodeObj, 0);
+    qrString        = env->GetStringUTFChars(qrCodeObj, 0);
     qrPayloadParser = new QRCodeSetupPayloadParser(qrString);
-    return (long)qrPayloadParser;
+    return (long) qrPayloadParser;
 }
 
-JNI_METHOD(jobject, populatePayload)(JNIEnv *env, jobject self, jlong qrPayloadParserPtr)
+JNI_METHOD(jobject, populatePayload)(JNIEnv * env, jobject self, jlong qrPayloadParserPtr)
 {
     CHIP_ERROR err;
-    QRCodeSetupPayloadParser *qrPayloadParser = (QRCodeSetupPayloadParser *)qrPayloadParserPtr;
+    QRCodeSetupPayloadParser * qrPayloadParser = (QRCodeSetupPayloadParser *) qrPayloadParserPtr;
     SetupPayload payload;
 
     err = qrPayloadParser->populatePayload(payload);
 
-    //if (err != CHIP_NO_ERROR)
-      //  env->Throw(err)
+    // if (err != CHIP_NO_ERROR)
+    //  env->Throw(err)
 
     jclass setupPayloadClass = env->FindClass("com/chip/setuppayload/SetupPayload");
-    jobject setupPayload = env->AllocObject(setupPayloadClass);
+    jobject setupPayload     = env->AllocObject(setupPayloadClass);
 
-    jfieldID version = env->GetFieldID(setupPayloadClass, "version", "I");
-    jfieldID vendorId = env->GetFieldID(setupPayloadClass, "vendorId", "I");
-    jfieldID productId = env->GetFieldID(setupPayloadClass, "productId", "I");
+    jfieldID version            = env->GetFieldID(setupPayloadClass, "version", "I");
+    jfieldID vendorId           = env->GetFieldID(setupPayloadClass, "vendorId", "I");
+    jfieldID productId          = env->GetFieldID(setupPayloadClass, "productId", "I");
     jfieldID requiresCustomFlow = env->GetFieldID(setupPayloadClass, "requiresCustomFlow", "Z");
-    jfieldID rendezvousInfo = env->GetFieldID(setupPayloadClass, "rendezvousInformation", "I");
-    jfieldID discriminator = env->GetFieldID(setupPayloadClass, "discriminator", "I");
-    jfieldID setUpPinCode = env->GetFieldID(setupPayloadClass, "setUpPinCode", "J");
-    jfieldID serialNumber = env->GetFieldID(setupPayloadClass, "serialNumber", "Ljava/lang/String;");
+    jfieldID rendezvousInfo     = env->GetFieldID(setupPayloadClass, "rendezvousInformation", "I");
+    jfieldID discriminator      = env->GetFieldID(setupPayloadClass, "discriminator", "I");
+    jfieldID setUpPinCode       = env->GetFieldID(setupPayloadClass, "setUpPinCode", "J");
+    jfieldID serialNumber       = env->GetFieldID(setupPayloadClass, "serialNumber", "Ljava/lang/String;");
 
     env->SetIntField(setupPayload, version, payload.version);
     env->SetIntField(setupPayload, vendorId, payload.vendorID);
