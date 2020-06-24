@@ -26,6 +26,12 @@
 #include <core/CHIPError.h>
 #include <stddef.h>
 
+#if CHIP_CRYPTO_OPENSSL
+#include <openssl/sha.h>
+#elif CHIP_CRYPTO_MBEDTLS
+#include <mbedtls/sha256.h>
+#endif
+
 namespace chip {
 namespace Crypto {
 
@@ -81,6 +87,31 @@ CHIP_ERROR AES_CCM_decrypt(const unsigned char * ciphertext, size_t ciphertext_l
  **/
 
 CHIP_ERROR Hash_SHA256(const unsigned char * data, const size_t data_length, unsigned char * out_buffer);
+
+/**
+ * @brief A class that defines stream based implementation of SHA-256 hash
+ **/
+
+class Hash_SHA256_stream
+{
+public:
+    Hash_SHA256_stream(void);
+    ~Hash_SHA256_stream(void);
+
+    CHIP_ERROR Begin(void);
+    CHIP_ERROR AddData(const unsigned char * data, const size_t data_length);
+    CHIP_ERROR Finish(unsigned char * out_buffer);
+    void Clear(void);
+
+private:
+#if CHIP_CRYPTO_OPENSSL
+    SHA256_CTX context;
+#elif CHIP_CRYPTO_MBEDTLS
+    mbedtls_sha256_context context;
+#else
+    SHA256_CTX_PLATFORM context; // To be defined by the platform specific implementation of sha256.
+#endif
+};
 
 /**
  * @brief A function that implements SHA-256 based HKDF
