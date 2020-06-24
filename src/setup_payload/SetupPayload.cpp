@@ -57,8 +57,7 @@ bool SetupPayload::isValidQRCodePayload()
         return false;
     }
 
-    size_t rendezvousInfoAllowedFieldLengthInBits = kRendezvousInfoFieldLengthInBits - kRendezvousInfoReservedFieldLengthInBits;
-    if (rendezvousInformation >= 1 << rendezvousInfoAllowedFieldLengthInBits)
+    if (rendezvousInformation > RendezvousInformationFlags::kAllMask)
     {
         return false;
     }
@@ -73,7 +72,7 @@ bool SetupPayload::isValidQRCodePayload()
         return false;
     }
 
-    if (version == 0 && rendezvousInformation == 0 && discriminator == 0 && setUpPINCode == 0)
+    if (version == 0 && rendezvousInformation == RendezvousInformationFlags::kNone && discriminator == 0 && setUpPINCode == 0)
     {
         return false;
     }

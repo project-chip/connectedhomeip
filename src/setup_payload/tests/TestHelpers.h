@@ -42,7 +42,7 @@ SetupPayload GetDefaultPayload()
     payload.vendorID              = 12;
     payload.productID             = 1;
     payload.requiresCustomFlow    = 0;
-    payload.rendezvousInformation = 1;
+    payload.rendezvousInformation = RendezvousInformationFlags::kSoftAP;
     payload.discriminator         = 128;
     payload.setUpPINCode          = 2048;
 
@@ -141,4 +141,19 @@ bool CompareBinaryLength(SetupPayload & payload, size_t expectedTLVLengthInBytes
     string resultBinary           = toBinaryRepresentation(result);
     size_t resultTLVLengthInBytes = (resultBinary.size() - baseBinary.size()) / 8;
     return (expectedTLVLengthInBytes == resultTLVLengthInBytes);
+}
+
+bool CheckWriteRead(SetupPayload & inPayload)
+{
+    SetupPayload outPayload;
+    string result;
+
+    QRCodeSetupPayloadGenerator generator(inPayload);
+    uint8_t optionalInfo[kDefaultBufferSizeInBytes];
+    generator.payloadBase41Representation(result, optionalInfo, sizeof(optionalInfo));
+
+    QRCodeSetupPayloadParser parser = QRCodeSetupPayloadParser(result);
+    parser.populatePayload(outPayload);
+
+    return inPayload == outPayload;
 }
