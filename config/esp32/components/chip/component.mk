@@ -115,7 +115,7 @@ CONFIGURE_OPTIONS       	:= -C AR="$(AR)" CC="$(CC)" CXX="$(CXX)" LD="$(LD)" OBJ
                                --disable-device-manager
 
 ifneq (,$(findstring CHIP_SUPPORT_FOREIGN_TEST_DRIVERS,$(CXXFLAGS)))
-CONFIGURE_OPTIONS           += --enable-tests
+CONFIGURE_OPTIONS           += --enable-tests --enable-nlfaultinjection
 else
 CONFIGURE_OPTIONS           += --disable-tests
 endif

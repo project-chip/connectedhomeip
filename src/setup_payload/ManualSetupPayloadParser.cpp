@@ -23,6 +23,7 @@
 
 #include "ManualSetupPayloadParser.h"
 
+#include <support/logging/CHIPLogging.h>
 #include <support/verhoeff/Verhoeff.h>
 
 #include <iostream>
@@ -37,7 +38,7 @@ static CHIP_ERROR checkDecimalStringValidity(string decimalString, string & deci
 {
     if (decimalString.length() < 2)
     {
-        fprintf(stderr, "\nFailed decoding base10. Input was empty. %zu\n", decimalString.length());
+        ChipLogError(SetupPayload, "Failed decoding base10. Input was empty. %zu", decimalString.length());
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
     string repWithoutCheckChar = decimalString.substr(0, decimalString.length() - 1);
@@ -56,8 +57,8 @@ static CHIP_ERROR checkCodeLengthValidity(string decimalString, bool isLongCode)
     size_t expectedCharLength = isLongCode ? kManualSetupLongCodeCharLength : kManualSetupShortCodeCharLength;
     if (decimalString.length() != expectedCharLength)
     {
-        fprintf(stderr, "\nFailed decoding base10. Input length %zu was not expected length %zu\n", decimalString.length(),
-                expectedCharLength);
+        ChipLogError(SetupPayload, "Failed decoding base10. Input length %zu was not expected length %zu", decimalString.length(),
+                     expectedCharLength);
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
     return CHIP_NO_ERROR;
@@ -68,7 +69,7 @@ static CHIP_ERROR extractBits(uint32_t number, uint64_t & dest, int index, int n
 {
     if ((index + numberBits) > maxBits)
     {
-        fprintf(stderr, "\nNumber %u maxBits %d index %d n %d\n", number, maxBits, index, numberBits);
+        ChipLogError(SetupPayload, "Number %u maxBits %d index %d n %d", number, maxBits, index, numberBits);
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
     dest = (((1 << numberBits) - 1) & (number >> index));
@@ -82,7 +83,7 @@ static CHIP_ERROR toNumber(string decimalString, uint64_t & dest)
     {
         if (!isdigit(decimalString[i]))
         {
-            fprintf(stderr, "\nFailed decoding base10. Character was invalid %c\n", decimalString[i]);
+            ChipLogError(SetupPayload, "Failed decoding base10. Character was invalid %c", decimalString[i]);
             return CHIP_ERROR_INVALID_INTEGER_VALUE;
         }
         number *= 10;
@@ -97,12 +98,12 @@ static CHIP_ERROR readDigitsFromDecimalString(string decimalString, int & index,
 {
     if (decimalString.length() < numberOfCharsToRead || (numberOfCharsToRead + index > decimalString.length()))
     {
-        fprintf(stderr, "\nFailed decoding base10. Input was too short. %zu\n", decimalString.length());
+        ChipLogError(SetupPayload, "Failed decoding base10. Input was too short. %zu", decimalString.length());
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
     else if (index < 0)
     {
-        fprintf(stderr, "\nFailed decoding base10. Index was negative. %d\n", index);
+        ChipLogError(SetupPayload, "Failed decoding base10. Index was negative. %d", index);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -156,16 +157,6 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     int numberOffset = 1;
     uint64_t setUpPINCode;
     size_t maxShortCodeBitsLength = 1 + kSetupPINCodeFieldLengthInBits + kManualSetupDiscriminatorFieldLengthInBits;
-    result = readBitsFromNumber(shortCode, numberOffset, setUpPINCode, kSetupPINCodeFieldLengthInBits, maxShortCodeBitsLength);
-    if (result != CHIP_NO_ERROR)
-    {
-        return result;
-    }
-    else if (setUpPINCode == 0)
-    {
-        fprintf(stderr, "\nFailed decoding base10. SetUpPINCode was 0.\n");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
 
     uint64_t discriminator;
     result = readBitsFromNumber(shortCode, numberOffset, discriminator, kManualSetupDiscriminatorFieldLengthInBits,
@@ -173,6 +164,17 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     if (result != CHIP_NO_ERROR)
     {
         return result;
+    }
+
+    result = readBitsFromNumber(shortCode, numberOffset, setUpPINCode, kSetupPINCodeFieldLengthInBits, maxShortCodeBitsLength);
+    if (result != CHIP_NO_ERROR)
+    {
+        return result;
+    }
+    else if (setUpPINCode == 0)
+    {
+        ChipLogError(SetupPayload, "Failed decoding base10. SetUpPINCode was 0.");
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     if (isLongCode)
@@ -195,8 +197,9 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
         outPayload.vendorID  = vendorID;
         outPayload.productID = productID;
     }
-    outPayload.setUpPINCode  = setUpPINCode;
-    outPayload.discriminator = discriminator;
+    outPayload.requiresCustomFlow = isLongCode ? 1 : 0;
+    outPayload.setUpPINCode       = setUpPINCode;
+    outPayload.discriminator      = discriminator;
 
     return result;
 }

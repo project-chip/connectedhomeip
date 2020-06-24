@@ -61,11 +61,14 @@ public:
     /** Checks if the optional contains a value or not */
     bool HasValue() const { return mHasValue; }
 
-    /** Comparison operator, hadling missing values. */
+    /** Comparison operator, handling missing values. */
     bool operator==(const Optional & other) const
     {
-        return (mHasValue == other.mHasValue) && (!mHasValue || (mValue == other.mValue));
+        return (mHasValue == other.mHasValue) && (!other.mHasValue || (mValue == other.mValue));
     }
+
+    /** Comparison operator, handling missing values. */
+    bool operator!=(const Optional & other) const { return !(*this == other); }
 
     /** Convenience method to create an optional without a valid value. */
     static Optional<T> Missing(void) { return Optional<T>(); }

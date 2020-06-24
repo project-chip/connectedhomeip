@@ -33,6 +33,12 @@ extern "C" {
 using namespace ::chip;
 using namespace ::chip::Inet;
 
+// NOTE: Remote device ID is in sync with the echo server device id
+//       At some point, we may want to add an option to connect to a device without
+//       knowing its id, because the ID can be learned on the first response that is received.
+constexpr NodeId kLocalDeviceId  = 112233;
+constexpr NodeId kRemoteDeviceId = 12344321;
+
 static const char * PAYLOAD = "Message from Standalone CHIP echo client!";
 
 // Device Manager Callbacks
@@ -77,7 +83,12 @@ void ShowUsage(const char * executable)
 {
     fprintf(stderr,
             "Usage: \n"
-            "  %s device-ip-address device-port echo|off|on|toggle\n",
+            "  %s device-ip-address device-port command [params]\n"
+            "  Supported commands and their parameters:\n"
+            "    echo\n"
+            "    off endpoint-id\n"
+            "    on endpoint-id\n"
+            "    toggle endpoint-id\n",
             executable);
 }
 
@@ -155,10 +166,49 @@ bool DetermineCommand(int argc, char * argv[], Command * command)
     return false;
 }
 
+union CommandArgs
+{
+    ChipZclEndpointId_t endpointId;
+};
+
+bool DetermineCommandArgs(int argc, char * argv[], Command command, CommandArgs * commandArgs)
+{
+    if (command == Command::Echo)
+    {
+        // No args.
+        return true;
+    }
+
+    if (command != Command::On && command != Command::Off && command != Command::Toggle)
+    {
+        fprintf(stderr, "Need to define arg handling for command '%d'\n", int(command));
+        return false;
+    }
+
+    if (argc < 5)
+    {
+        return false;
+    }
+
+    std::string endpoint_str(argv[4]);
+    std::stringstream ss(endpoint_str);
+    // stringstream treats uint8_t as char, which is not what we want here.
+    uint16_t endpoint;
+    ss >> endpoint;
+    if (ss.fail() || !ss.eof() || endpoint > UINT8_MAX)
+    {
+        fprintf(stderr, "Error: Invalid endpoint id '%s'", argv[4]);
+        return false;
+    }
+    commandArgs->endpointId = endpoint;
+
+    return true;
+}
+
 // Handle the echo case, where we just send a string and expect to get it back.
 void DoEcho(DeviceController::ChipDeviceController * controller, const IPAddress & host_addr, uint16_t port)
 {
-    size_t payload_len = strlen(PAYLOAD) + 1;
+    size_t payload_len = strlen(PAYLOAD);
 
     // Run the client
     char host_ip_str[40];
@@ -168,7 +218,7 @@ void DoEcho(DeviceController::ChipDeviceController * controller, const IPAddress
         // Reallocate buffer on each run, as the secure transport encrypts and
         // overwrites the buffer from previous iteration.
         auto * buffer = System::PacketBuffer::NewWithAvailableSize(payload_len);
-        snprintf((char *) buffer->Start(), payload_len, "%s", PAYLOAD);
+        memcpy(buffer->Start(), PAYLOAD, payload_len);
         buffer->SetDataLength(payload_len);
 
         controller->SendMessage(NULL, buffer);
@@ -182,7 +232,7 @@ void DoEcho(DeviceController::ChipDeviceController * controller, const IPAddress
 
 // Handle the on/off/toggle case, where we are sending a ZCL command and not
 // expecting a response at all.
-void DoOnOff(DeviceController::ChipDeviceController * controller, Command command)
+void DoOnOff(DeviceController::ChipDeviceController * controller, Command command, ChipZclEndpointId_t endpoint)
 {
     ChipZclCommandId_t zclCommand;
     switch (command)
@@ -207,7 +257,7 @@ void DoOnOff(DeviceController::ChipDeviceController * controller, Command comman
 
     ChipZclBuffer_t * zcl_buffer = (ChipZclBuffer_t *) buffer;
     ChipZclCommandContext_t ctx  = {
-        1,                              // endpointId
+        endpoint,                       // endpointId
         CHIP_ZCL_CLUSTER_ON_OFF,        // clusterId
         true,                           // clusterSpecific
         false,                          // mfgSpecific
@@ -253,17 +303,24 @@ int main(int argc, char * argv[])
     IPAddress host_addr;
     uint16_t port;
     Command command;
-    if (!DetermineAddress(argc, argv, &host_addr, &port) || !DetermineCommand(argc, argv, &command))
+    CHIP_ERROR err;
+    CommandArgs commandArgs;
+    if (!DetermineAddress(argc, argv, &host_addr, &port) || !DetermineCommand(argc, argv, &command) ||
+        !DetermineCommandArgs(argc, argv, command, &commandArgs))
     {
         ShowUsage(argv[0]);
         return -1;
     }
 
     auto * controller = new DeviceController::ChipDeviceController();
-    controller->Init();
+    err               = controller->Init(kLocalDeviceId);
+    VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to initialize the device controller"));
 
-    controller->ConnectDevice(1, host_addr, NULL, EchoResponse, ReceiveError, port);
-    controller->ManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key, sizeof(local_private_key));
+    err = controller->ConnectDevice(kRemoteDeviceId, host_addr, NULL, EchoResponse, ReceiveError, port);
+    VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to connect to the device"));
+
+    err = controller->ManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key, sizeof(local_private_key));
+    VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to exchange keys"));
 
     if (command == Command::Echo)
     {
@@ -271,13 +328,18 @@ int main(int argc, char * argv[])
     }
     else
     {
-        DoOnOff(controller, command);
+        DoOnOff(controller, command, commandArgs.endpointId);
     }
 
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        fprintf(stderr, "ERROR: %s\n", ErrorStr(err));
+    }
     controller->Shutdown();
     delete controller;
 
-    return 0;
+    return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 extern "C" {

@@ -29,6 +29,7 @@
 #include <openssl/kdf.h>
 #include <openssl/ossl_typ.h>
 #include <openssl/rand.h>
+#include <openssl/sha.h>
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -258,6 +259,20 @@ exit:
     return error;
 }
 
+CHIP_ERROR chip::Crypto::Hash_SHA256(const unsigned char * data, const size_t data_length, unsigned char * out_buffer)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    // zero data length hash is supported.
+
+    VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    SHA256(data, data_length, out_buffer);
+
+exit:
+    return error;
+}
+
 CHIP_ERROR chip::Crypto::HKDF_SHA256(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
                                      const size_t salt_length, const unsigned char * info, const size_t info_length,
                                      unsigned char * out_buffer, size_t out_length)
@@ -317,6 +332,11 @@ exit:
         EVP_PKEY_CTX_free(context);
     }
     return error;
+}
+
+CHIP_ERROR chip::Crypto::add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold)
+{
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR chip::Crypto::DRBG_get_bytes(unsigned char * out_buffer, const size_t out_length)

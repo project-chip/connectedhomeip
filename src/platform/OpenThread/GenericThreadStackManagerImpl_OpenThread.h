@@ -89,6 +89,7 @@ protected:
     CHIP_ERROR DoInit(otInstance * otInst);
     bool IsThreadAttachedNoLock(void);
     CHIP_ERROR AdjustPollingInterval(void);
+    void _FactoryReset(void);
 
 private:
     // ===== Private members for use by this class only.

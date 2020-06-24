@@ -123,7 +123,7 @@ check_SCRIPTS                                         = \
 TESTS_ENVIRONMENT                                     = \
     $(NULL)
 
-if CHIP_TARGET_STYLE_EMBEDDED
+if CHIP_DEVICE_LAYER_TARGET_ESP32
 
 check_SCRIPTS                                        += \
     qemu_inet_tests.sh                                  \
@@ -135,7 +135,7 @@ TESTS_ENVIRONMENT                                    += \
     QEMU_TEST_TARGET=libInetLayerTests.a                \
     $(NULL)
 
-else # CHIP_TARGET_STYLE_EMBEDDED
+else # CHIP_DEVICE_LAYER_TARGET_ESP32
 
 # Test executables that should be built but not installed and should
 # always be built to ensure overall "build sanity".
@@ -163,7 +163,7 @@ check_PROGRAMS                                       += \
     TestInetErrorStr                                    \
     $(NULL)
 
-endif # CHIP_TARGET_STYLE_EMBEDDED
+endif # CHIP_DEVICE_LAYER_TARGET_ESP32
 
 # Test applications and scripts that should be built and run when the
 # 'check' target is run.

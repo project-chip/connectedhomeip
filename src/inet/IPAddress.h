@@ -29,6 +29,7 @@
 #ifndef IPADDRESS_H
 #define IPADDRESS_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include <support/DLLUtil.h>
@@ -46,8 +47,13 @@
 #include <lwip/inet.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#include <ifaddrs.h>
+#include <net/if.h>
 #include <netinet/in.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <sys/socket.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -531,7 +537,7 @@ public:
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
     struct in6_addr ToIPv6(void) const;
     static IPAddress FromIPv6(const struct in6_addr & addr);
@@ -552,7 +558,7 @@ public:
      */
     static IPAddress FromSockAddr(const struct sockaddr & sockaddr);
 
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_USE_NETWORK_FRAMEWORK
 
     /**
      * @brief   Construct an IPv6 unique-local address (ULA) from its parts.

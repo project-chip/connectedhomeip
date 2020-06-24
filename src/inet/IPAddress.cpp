@@ -180,7 +180,7 @@ IPAddress IPAddress::FromIPv6(const ip6_addr_t & ipv6Addr)
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if INET_CONFIG_ENABLE_IPV4
 struct in_addr IPAddress::ToIPv4() const
@@ -231,7 +231,7 @@ IPAddress IPAddress::FromSockAddr(const struct sockaddr & sockaddr)
     return Any;
 }
 
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 // Is address an IPv4 address encoded in IPv6 format?
 bool IPAddress::IsIPv4() const

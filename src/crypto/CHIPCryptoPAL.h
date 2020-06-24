@@ -31,6 +31,7 @@ namespace Crypto {
 
 const size_t kMax_ECDSA_Signature_Length = 72;
 const size_t kMax_ECDH_Secret_Length     = 32;
+const size_t kSHA256_Hash_Length         = 32;
 
 /**
  * @brief A function that implements AES-CCM encryption
@@ -70,6 +71,16 @@ CHIP_ERROR AES_CCM_encrypt(const unsigned char * plaintext, size_t plaintext_len
 CHIP_ERROR AES_CCM_decrypt(const unsigned char * ciphertext, size_t ciphertext_length, const unsigned char * aad, size_t aad_length,
                            const unsigned char * tag, size_t tag_length, const unsigned char * key, size_t key_length,
                            const unsigned char * iv, size_t iv_length, unsigned char * plaintext);
+
+/**
+ * @brief A function that implements SHA-256 hash
+ * @param data The data to hash
+ * @param data_length Length of the data
+ * @param out_buffer Pointer to buffer to write output into
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+
+CHIP_ERROR Hash_SHA256(const unsigned char * data, const size_t data_length, unsigned char * out_buffer);
 
 /**
  * @brief A function that implements SHA-256 based HKDF
@@ -142,6 +153,23 @@ CHIP_ERROR ECDSA_validate_msg_signature(const unsigned char * msg, const size_t 
 CHIP_ERROR ECDH_derive_secret(const unsigned char * remote_public_key, const size_t remote_public_key_length,
                               const unsigned char * local_private_key, const size_t local_private_key_length,
                               unsigned char * out_secret, size_t & out_secret_length);
+
+/** @brief Entropy callback function
+ * @param data Callback-specific data pointer
+ * @param output Output data to fill
+ * @param len Length of output buffer
+ * @param olen The actual amount of data that was written to output buffer
+ * @return 0 if success
+ */
+typedef int (*entropy_source)(void * data, unsigned char * output, size_t len, size_t * olen);
+
+/** @brief A function to add entropy sources to crypto library
+ * @param fn_source Function pointer to the entropy source
+ * @param p_source  Data that should be provided when fn_source is called
+ * @param threshold Minimum required from source before entropy is released
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold);
 } // namespace Crypto
 } // namespace chip
 

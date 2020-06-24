@@ -92,11 +92,6 @@ inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
     return ConfigurationManagerImpl::sInstance;
 }
 
-inline CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
 } // namespace DeviceLayer
 } // namespace chip
 

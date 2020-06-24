@@ -50,4 +50,5 @@ CHIP_BUILD_SYSTEM_LAYER_HEADER_FILES                  = \
     @top_builddir@/src/system/SystemObject.h            \
     @top_builddir@/src/system/SystemTimer.h             \
     @top_builddir@/src/system/SystemPacketBuffer.h      \
+    @top_builddir@/src/system/TimeSource.h              \
     $(NULL)

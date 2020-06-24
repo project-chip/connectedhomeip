@@ -18,21 +18,28 @@
 
 /**
  *    @file
- *      This file defines the CHIP Secure Channel object that provides
+ *      This file defines the CHIP Secure Session object that provides
  *      APIs for encrypting/decryting data using cryptographic keys.
  *
  */
 
-#ifndef __CHIPSECURECHANNEL_H__
-#define __CHIPSECURECHANNEL_H__
+#ifndef __SECURESESSION_H__
+#define __SECURESESSION_H__
 
 #include <core/CHIPCore.h>
+#include <transport/MessageHeader.h>
 
 namespace chip {
 
-class DLL_EXPORT ChipSecureChannel
+class DLL_EXPORT SecureSession
 {
 public:
+    SecureSession(void);
+    SecureSession(SecureSession &&)      = default;
+    SecureSession(const SecureSession &) = default;
+    SecureSession & operator=(const SecureSession &) = default;
+    SecureSession & operator=(SecureSession &&) = default;
+
     /**
      * @brief
      *   Derive a shared key. The derived key will be used for encryting/decrypting
@@ -55,10 +62,10 @@ public:
      * @param input Unencrypted input data
      * @param input_length Length of the input data
      * @param output Output buffer for encrypted data
-     * @param output_length Length of the output buffer
+     * @param header message header structure
      * @return CHIP_ERROR The result of encryption
      */
-    CHIP_ERROR Encrypt(const unsigned char * input, size_t input_length, unsigned char * output, size_t output_length);
+    CHIP_ERROR Encrypt(const unsigned char * input, size_t input_length, unsigned char * output, MessageHeader & header);
 
     /**
      * @brief
@@ -67,10 +74,10 @@ public:
      * @param input Encrypted input data
      * @param input_length Length of the input data
      * @param output Output buffer for decrypted data
-     * @param output_length Length of the output buffer
+     * @param header message header structure
      * @return CHIP_ERROR The result of decryption
      */
-    CHIP_ERROR Decrypt(const unsigned char * input, size_t input_length, unsigned char * output, size_t & output_length);
+    CHIP_ERROR Decrypt(const unsigned char * input, size_t input_length, unsigned char * output, const MessageHeader & header);
 
     /**
      * @brief
@@ -81,12 +88,13 @@ public:
      */
     size_t EncryptionOverhead(void);
 
-    void Close(void);
-
-    ChipSecureChannel(void);
+    /**
+     * Clears the internal state of secure session back to the state of a new object.
+     */
+    void Reset(void);
 
 private:
-    static const size_t kAES_CCM128_Key_Length = 16;
+    static constexpr size_t kAES_CCM128_Key_Length = 16;
 
     bool mKeyAvailable;
     uint64_t mNextIV;
@@ -95,4 +103,4 @@ private:
 
 } // namespace chip
 
-#endif // __CHIPSECURECHANNEL_H__
+#endif // __SECURESESSION_H__

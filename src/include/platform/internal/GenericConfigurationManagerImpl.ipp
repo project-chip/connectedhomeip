@@ -30,6 +30,7 @@
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <ble/CHIPBleServiceData.h>
 #include <support/Base64.h>
+#include <support/CodeUtils.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
@@ -65,6 +66,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ConfigureChipStack()
 
     static char sPairingCodeBuf[ConfigurationManager::kMaxPairingCodeLength + 1];
 
+#if CHIP_CONFIG_ENABLE_FABRIC_STATE
     // Configure the CHIP FabricState object with the local node id.
     err = Impl()->_GetDeviceId(FabricState.LocalNodeId);
     SuccessOrExit(err);
@@ -85,6 +87,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ConfigureChipStack()
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
+#endif // CHIP_CONFIG_ENABLE_FABRIC_STATE
 
 #if CHIP_PROGRESS_LOGGING
 
@@ -187,7 +190,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSerialNumber(char * b
         VerifyOrExit(sizeof(CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER) <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(buf, CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER, sizeof(CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER));
         serialNumLen = sizeof(CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER) - 1;
-        ChipProgress(DeviceLayer, "Serial Number not found; using default: %s", CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER);
+        ChipLogProgress(DeviceLayer, "Serial Number not found; using default: %s", CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER);
         err = CHIP_NO_ERROR;
     }
 #endif // CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER
@@ -569,6 +572,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreFabricId(uint64_t f
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#if CHIP_CONFIG_ENABLE_FABRIC_STATE
     if (fabricId != kFabricIdNotSpecified)
     {
         err = Impl()->WriteConfigValue(ImplClass::kConfigKey_FabricId, fabricId);
@@ -583,6 +587,8 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreFabricId(uint64_t f
     }
 
 exit:
+#endif
+
     return err;
 }
 
@@ -752,7 +758,9 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetBLEDeviceIdentificati
     SuccessOrExit(err);
     deviceIdInfo.SetProductId(id);
 
+#if CHIP_CONFIG_ENABLE_FABRIC_STATE
     deviceIdInfo.SetDeviceId(FabricState.LocalNodeId);
+#endif
 
     deviceIdInfo.PairingStatus = Impl()->_IsPairedToAccount()
         ? Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Paired
@@ -802,6 +810,9 @@ bool GenericConfigurationManagerImpl<ImplClass>::_IsFullyProvisioned()
 template<class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(uint8_t * hashBuf, size_t hashBufSize)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+#if CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
     using HashAlgo = Platform::Security::SHA256;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -935,6 +946,8 @@ exit:
         Crypto::ClearSecretData(dataBuf, dataBufSize);
         Platform::Security::MemoryFree(dataBuf);
     }
+#endif // CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
+
     return err;
 }
 
@@ -947,7 +960,9 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
 
     ChipLogProgress(DeviceLayer, "Device Configuration:");
 
+#if CHIP_CONFIG_ENABLE_FABRIC_STATE
     ChipLogProgress(DeviceLayer, "  Device Id: %016" PRIX64, FabricState.LocalNodeId);
+#endif
 
     {
         char serialNum[ConfigurationManager::kMaxSerialNumberLength + 1];
@@ -962,8 +977,7 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
         {
             vendorId = 0;
         }
-        ChipLogProgress(DeviceLayer, "  Vendor Id: %" PRIu16 " (0x%" PRIX16 ")%s",
-                vendorId, vendorId, (vendorId == kChipVendor_CHIPLabs) ? " (CHIP)" : "");
+        ChipLogProgress(DeviceLayer, "  Vendor Id: %" PRIu16 " (0x%" PRIX16 ")", vendorId, vendorId);
     }
 
     {
@@ -998,6 +1012,7 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
         }
     }
 
+#if CHIP_CONFIG_ENABLE_FABRIC_STATE
     if (FabricState.FabricId != kFabricIdNotSpecified)
     {
         ChipLogProgress(DeviceLayer, "  Fabric Id: %016" PRIX64, FabricState.FabricId);
@@ -1008,6 +1023,7 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
     }
 
     ChipLogProgress(DeviceLayer, "  Pairing Code: %s", (FabricState.PairingCode != NULL) ? FabricState.PairingCode : "(none)");
+#endif // CHIP_CONFIG_ENABLE_FABRIC_STATE
 }
 
 #endif // CHIP_PROGRESS_LOGGING

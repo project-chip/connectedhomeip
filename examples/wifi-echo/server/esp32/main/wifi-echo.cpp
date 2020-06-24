@@ -33,14 +33,15 @@
 #include "tcpip_adapter.h"
 #include <stdio.h>
 
+#include <crypto/CHIPCryptoPAL.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/ErrorStr.h>
-#include <transport/SecureTransport.h>
+#include <transport/SecureSessionMgr.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-extern void startServer(SecureTransport * transportIPv4, SecureTransport * transportIPv6);
+extern void startServer(SecureSessionMgr * transportIPv4, SecureSessionMgr * transportIPv6);
 extern void startClient(void);
 
 #if CONFIG_DEVICE_TYPE_M5STACK
@@ -81,6 +82,13 @@ static Button attentionButton;
 const char * TAG = "wifi-echo-demo";
 
 static void DeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg);
+
+static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
+{
+    esp_fill_random(output, len);
+    *olen = len;
+    return 0;
+}
 
 extern "C" void app_main()
 {
@@ -158,6 +166,13 @@ extern "C" void app_main()
     // this function will happen on the CHIP event loop thread, not the app_main thread.
     PlatformMgr().AddEventHandler(DeviceEventHandler, 0);
 
+    err = Crypto::add_entropy_source(app_entropy_source, NULL, 16);
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "add_entropy_source() failed: %s", ErrorStr(err));
+        return;
+    }
+
     // Start a task to run the CHIP Device event loop.
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
@@ -170,7 +185,7 @@ extern "C" void app_main()
 
     // Start the Echo Server
     InitDataModelHandler();
-    SecureTransport sTransportIPv4, sTransportIPv6;
+    SecureSessionMgr sTransportIPv4, sTransportIPv6;
     startServer(&sTransportIPv4, &sTransportIPv6);
 #if CONFIG_USE_ECHO_CLIENT
     startClient();

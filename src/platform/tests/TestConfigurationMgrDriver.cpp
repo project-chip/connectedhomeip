@@ -18,18 +18,13 @@
 /**
  *    @file
  *      This file implements a standalone/native program executable
- *      test driver for the CHIP core library CHIP Secure Channel tests.
+ *      test driver for the Configuration Manager code code unit tests.
  *
  */
 
-#include "TestTransportLayer.h"
-
-#include <nlunit-test.h>
+#include "TestConfigurationMgr.h"
 
 int main(void)
 {
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
-
-    return (TestCHIPSecureChannel());
+    return (TestConfigurationMgr());
 }

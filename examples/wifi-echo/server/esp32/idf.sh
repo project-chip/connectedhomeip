@@ -29,9 +29,11 @@ idf() {
         error "can't find IDF's export.sh, please set IDF_PATH"
         return 1
     }
-    . "$IDF_PATH/export.sh"
-    export IDF_PATH
-    "$@"
+    (
+        . "$IDF_PATH/export.sh"
+        export IDF_PATH
+        "$@"
+    )
 }
 if [[ ${0} == ${BASH_SOURCE[0]} ]]; then
     me=${0##*/}

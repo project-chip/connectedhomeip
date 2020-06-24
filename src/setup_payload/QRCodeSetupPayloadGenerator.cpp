@@ -30,6 +30,7 @@
 #include <core/CHIPTLVData.hpp>
 #include <core/CHIPTLVDebug.hpp>
 #include <core/CHIPTLVUtilities.hpp>
+#include <profiles/CHIPProfiles.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 
@@ -81,61 +82,105 @@ static CHIP_ERROR populateTLVBits(uint8_t * bits, int & offset, uint8_t * tlvBuf
     return err;
 }
 
-static void addCHIPInfoToOptionalData(SetupPayload & outPayload)
-{
-    if (outPayload.serialNumber.length() > 0)
-    {
-        OptionalQRCodeInfo info;
-        info.type = optionalQRCodeInfoTypeString;
-        info.tag  = kSerialNumberTag;
-        info.data = outPayload.serialNumber;
-        outPayload.addCHIPOptionalData(info);
-    }
-}
-
-CHIP_ERROR writeOptionaData(TLVWriter & writer, vector<OptionalQRCodeInfo> optionalData)
+CHIP_ERROR writeTag(TLVWriter & writer, uint64_t tag, OptionalQRCodeInfo & info)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    for (OptionalQRCodeInfo info : optionalData)
+
+    if (info.type == optionalQRCodeInfoTypeString)
     {
-        if (info.type == optionalQRCodeInfoTypeString)
-        {
-            err = writer.PutString(ContextTag(info.tag), info.data.c_str());
-            SuccessOrExit(err);
-        }
-        else if (info.type == optionalQRCodeInfoTypeInt)
-        {
-            err = writer.Put(ContextTag(info.tag), static_cast<int64_t>(info.integer));
-            SuccessOrExit(err);
-        }
+        err = writer.PutString(tag, info.data.c_str());
     }
-exit:
+    else if (info.type == optionalQRCodeInfoTypeInt32)
+    {
+        err = writer.Put(tag, info.int32);
+    }
+    else
+    {
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     return err;
 }
 
-CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t maxLen,
-                                       uint32_t & tlvDataLengthInBytes)
+CHIP_ERROR writeTag(TLVWriter & writer, uint64_t tag, OptionalQRCodeInfoExtension & info)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    addCHIPInfoToOptionalData(outPayload);
-    vector<OptionalQRCodeInfo> optionalData = outPayload.getAllOptionalData();
-    VerifyOrExit(optionalData.size() != 0, err = CHIP_NO_ERROR);
+
+    if (info.type == optionalQRCodeInfoTypeString || info.type == optionalQRCodeInfoTypeInt32)
+    {
+        err = writeTag(writer, tag, static_cast<OptionalQRCodeInfo &>(info));
+    }
+    else if (info.type == optionalQRCodeInfoTypeInt64)
+    {
+        err = writer.Put(tag, info.int64);
+    }
+    else if (info.type == optionalQRCodeInfoTypeUInt32)
+    {
+        err = writer.Put(tag, info.uint32);
+    }
+    else if (info.type == optionalQRCodeInfoTypeUInt64)
+    {
+        err = writer.Put(tag, info.uint64);
+    }
+    else
+    {
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return err;
+}
+
+CHIP_ERROR QRCodeSetupPayloadGenerator::generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart,
+                                                                    uint32_t maxLen, uint32_t & tlvDataLengthInBytes)
+{
+    CHIP_ERROR err                                            = CHIP_NO_ERROR;
+    vector<OptionalQRCodeInfo> optionalData                   = outPayload.getAllOptionalVendorData();
+    vector<OptionalQRCodeInfoExtension> optionalExtensionData = outPayload.getAllOptionalExtensionData();
+    VerifyOrExit(optionalData.size() != 0 || optionalExtensionData.size() != 0, err = CHIP_NO_ERROR);
 
     TLVWriter rootWriter;
     rootWriter.Init(tlvDataStart, maxLen);
+    rootWriter.ImplicitProfileId = chip::Profiles::kChipProfile_ServiceProvisioning;
 
-    TLVWriter innerStructureWritter;
+    // The cost (in bytes) of the top-level container is amortized as soon as there is at least 4 optionals elements.
+    if ((optionalData.size() + optionalExtensionData.size()) >= 4)
+    {
 
-    err = rootWriter.OpenContainer(ProfileTag(2, 1), kTLVType_Structure,
-                                   innerStructureWritter); // TODO: Remove outer nest of QR code TLV encoding #728
-    SuccessOrExit(err);
+        TLVWriter innerStructureWriter;
 
-    err = writeOptionaData(innerStructureWritter, optionalData);
-    SuccessOrExit(err);
+        err = rootWriter.OpenContainer(ProfileTag(rootWriter.ImplicitProfileId, kTag_QRCodeExensionDescriptor), kTLVType_Structure,
+                                       innerStructureWriter);
+        SuccessOrExit(err);
 
-    err = rootWriter.CloseContainer(innerStructureWritter);
-    SuccessOrExit(err);
+        for (OptionalQRCodeInfo info : optionalData)
+        {
+            err = writeTag(innerStructureWriter, ContextTag(info.tag), info);
+            SuccessOrExit(err);
+        }
 
+        for (OptionalQRCodeInfoExtension info : optionalExtensionData)
+        {
+            err = writeTag(innerStructureWriter, ContextTag(info.tag), info);
+            SuccessOrExit(err);
+        }
+
+        err = rootWriter.CloseContainer(innerStructureWriter);
+        SuccessOrExit(err);
+    }
+    else
+    {
+        for (OptionalQRCodeInfo info : optionalData)
+        {
+            err = writeTag(rootWriter, ProfileTag(rootWriter.ImplicitProfileId, info.tag), info);
+            SuccessOrExit(err);
+        }
+
+        for (OptionalQRCodeInfoExtension info : optionalExtensionData)
+        {
+            err = writeTag(rootWriter, ProfileTag(rootWriter.ImplicitProfileId, info.tag), info);
+            SuccessOrExit(err);
+        }
+    }
     err = rootWriter.Finalize();
     SuccessOrExit(err);
 

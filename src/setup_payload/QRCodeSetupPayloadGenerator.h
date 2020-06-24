@@ -83,6 +83,10 @@ public:
      *               producing the requested string.
      */
     CHIP_ERROR payloadBase41Representation(string & base41Representation, uint8_t * tlvDataStart, size_t tlvDataStartSize);
+
+private:
+    CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t maxLen,
+                                           uint32_t & tlvDataLengthInBytes);
 };
 
 }; // namespace chip

@@ -42,8 +42,10 @@ lib_LIBRARIES                                         = \
 
 libTransportLayerTests_a_SOURCES                      = \
     TestMessageHeader.cpp                               \
-    TestSecureTransport.cpp                             \
-    TestCHIPSecureChannel.cpp                           \
+    TestPeerConnections.cpp                             \
+    TestSecureSession.cpp                               \
+    TestSecureSessionMgr.cpp                            \
+    TestUDP.cpp                                         \
     $(NULL)
 
 libTransportLayerTests_adir                           = $(includedir)/transport
@@ -74,32 +76,58 @@ COMMON_LDADD                                          = \
     libTransportLayerTests.a                            \
     $(COMMON_LDFLAGS)                                   \
     $(CHIP_LDADD)                                       \
-    $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS) \
+    $(NLFAULTINJECTION_LDFLAGS)                         \
+    $(NLFAULTINJECTION_LIBS)                            \
     $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)          \
     $(LWIP_LDFLAGS) $(LWIP_LIBS)                        \
     $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                  \
     $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                   \
     $(NULL)
 
+# The additional environment variables and their values that will be
+# made available to all programs and scripts in TESTS.
+
+TESTS_ENVIRONMENT                                     = \
+    $(NULL)
+
 # Test applications that should be run when the 'check' target is run.
 
-check_PROGRAMS             = \
-    TestMessageHeader        \
-    TestSecureTransport      \
-    TestCHIPSecureChannel    \
+check_PROGRAMS                                        = \
     $(NULL)
+
+check_SCRIPTS                                         = \
+    $(NULL)
+
+if CHIP_DEVICE_LAYER_TARGET_ESP32
+
+check_SCRIPTS                                        += \
+    qemu_transport_tests.sh                             \
+    $(NULL)
+
+TESTS_ENVIRONMENT                                    += \
+    abs_top_srcdir='$(abs_top_srcdir)'                  \
+    abs_top_builddir='$(abs_top_builddir)'              \
+    QEMU_TEST_TARGET=libTransportLayerTests.a           \
+    $(NULL)
+
+else # CHIP_DEVICE_LAYER_TARGET_ESP32
+
+check_PROGRAMS                                       += \
+    TestMessageHeader                                   \
+    TestPeerConnections                                 \
+    TestSecureSessionMgr                                \
+    TestSecureSession                                   \
+    TestUDP                                             \
+    $(NULL)
+
+endif # CHIP_DEVICE_LAYER_TARGET_ESP32
 
 # Test applications and scripts that should be built and run when the
 # 'check' target is run.
 
-TESTS                       = \
-    $(check_PROGRAMS)         \
-    $(NULL)
-
-# The additional environment variables and their values that will be
-# made available to all programs and scripts in TESTS.
-
-TESTS_ENVIRONMENT             = \
+TESTS                                                 = \
+    $(check_PROGRAMS)                                   \
+    $(check_SCRIPTS)                                    \
     $(NULL)
 
 # Source, compiler, and linker options for test programs.
@@ -107,11 +135,17 @@ TESTS_ENVIRONMENT             = \
 TestMessageHeader_SOURCES     = TestMessageHeaderDriver.cpp
 TestMessageHeader_LDADD       = $(COMMON_LDADD)
 
-TestSecureTransport_SOURCES   = TestSecureTransportDriver.cpp
-TestSecureTransport_LDADD     = $(COMMON_LDADD)
+TestSecureSessionMgr_SOURCES  = TestSecureSessionMgrDriver.cpp
+TestSecureSessionMgr_LDADD    = $(COMMON_LDADD)
 
-TestCHIPSecureChannel_SOURCES                         = TestCHIPSecureChannelDriver.cpp
-TestCHIPSecureChannel_LDADD                           = $(COMMON_LDADD)
+TestSecureSession_SOURCES     = TestSecureSessionDriver.cpp
+TestSecureSession_LDADD       = $(COMMON_LDADD)
+
+TestUDP_SOURCES               = TestUDPDriver.cpp
+TestUDP_LDADD                 = $(COMMON_LDADD)
+
+TestPeerConnections_SOURCES   = TestPeerConnectionsDriver.cpp
+TestPeerConnections_LDADD     = $(COMMON_LDADD)
 
 #
 # Foreign make dependencies

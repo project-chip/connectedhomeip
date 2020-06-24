@@ -18,7 +18,7 @@
 /**
  *    @file
  *      This file implements a standalone/native program executable
- *      test driver for the CHIP core library CHIP Connection tests.
+ *      test driver for the CHIP core library CHIP Secure Channel tests.
  *
  */
 
@@ -31,5 +31,5 @@ int main(void)
     // Generate machine-readable, comma-separated value (CSV) output.
     nlTestSetOutputStyle(OUTPUT_CSV);
 
-    return (TestSecureTransport());
+    return (TestSecureSession());
 }

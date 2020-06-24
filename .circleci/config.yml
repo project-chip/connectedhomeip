@@ -149,6 +149,12 @@ jobs:
     - run:
         command: scripts/tests/esp32_qemu_tests.sh
         name: Build ESP32 QEMU and Run Tests
+    - run:
+        command: scripts/tests/save_logs.sh /tmp/test_logs
+        name: Save test log files
+        when: on_fail
+    - store_artifacts:
+        path: /tmp/test_logs
   Build CHIP [mbedtls-build]:
     docker:
     - image: connectedhomeip/chip-build:0.2.14
