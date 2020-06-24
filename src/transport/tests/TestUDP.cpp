@@ -23,6 +23,8 @@
 
 #include "TestTransportLayer.h"
 
+#include "NetworkTestHelpers.h"
+
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
 #include <transport/UDP.h>
@@ -43,14 +45,8 @@ constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
 constexpr uint32_t kMessageId       = 18;
 
-struct TestContext
-{
-    nlTestSuite * mSuite;
-    System::Layer mSystemLayer;
-    InetLayer mInetLayer;
-};
-
-struct TestContext sContext;
+using TestContext = chip::Test::IOContext;
+TestContext sContext;
 
 const char PAYLOAD[]        = "Hello!";
 int ReceiveHandlerCallCount = 0;
@@ -69,63 +65,7 @@ void MessageReceiveHandler(const MessageHeader & header, const Inet::IPPacketInf
     ReceiveHandlerCallCount++;
 }
 
-void DriveIO(TestContext & ctx)
-{
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    // Set the select timeout to 100ms
-    struct timeval aSleepTime;
-    aSleepTime.tv_sec  = 0;
-    aSleepTime.tv_usec = 100 * 1000;
-
-    fd_set readFDs, writeFDs, exceptFDs;
-    int numFDs = 0;
-
-    FD_ZERO(&readFDs);
-    FD_ZERO(&writeFDs);
-    FD_ZERO(&exceptFDs);
-
-    if (ctx.mSystemLayer.State() == System::kLayerState_Initialized)
-        ctx.mSystemLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
-
-    if (ctx.mInetLayer.State == Inet::InetLayer::kState_Initialized)
-        ctx.mInetLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
-
-    int selectRes = select(numFDs, &readFDs, &writeFDs, &exceptFDs, &aSleepTime);
-    if (selectRes < 0)
-    {
-        printf("select failed: %s\n", ErrorStr(System::MapErrorPOSIX(errno)));
-        NL_TEST_ASSERT(ctx.mSuite, false);
-        return;
-    }
-
-    if (ctx.mSystemLayer.State() == System::kLayerState_Initialized)
-    {
-        ctx.mSystemLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
-    }
-
-    if (ctx.mInetLayer.State == Inet::InetLayer::kState_Initialized)
-    {
-        ctx.mInetLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
-    }
-#endif
-}
-
 } // namespace
-
-static CHIP_ERROR InitLayers(System::Layer & systemLayer, InetLayer & inetLayer)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    // Initialize the CHIP System Layer.
-    err = systemLayer.Init(NULL);
-    SuccessOrExit(err);
-
-    // Initialize the CHIP Inet layer.
-    err = inetLayer.Init(systemLayer, NULL);
-    SuccessOrExit(err);
-
-exit:
-    return err;
-}
 
 /////////////////////////// Init test
 
@@ -135,7 +75,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
 
     Transport::UDP udp;
 
-    CHIP_ERROR err = udp.Init(&ctx.mInetLayer, Transport::UdpListenParameters().SetAddressType(type));
+    CHIP_ERROR err = udp.Init(&ctx.GetInetLayer(), Transport::UdpListenParameters().SetAddressType(type));
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
@@ -166,7 +106,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
 
     Transport::UDP udp;
 
-    err = udp.Init(&ctx.mInetLayer, Transport::UdpListenParameters().SetAddressType(addr.Type()));
+    err = udp.Init(&ctx.GetInetLayer(), Transport::UdpListenParameters().SetAddressType(addr.Type()));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     udp.SetMessageReceiveHandler(MessageReceiveHandler, inSuite);
@@ -187,10 +127,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    // allow the send and recv enough time
-    DriveIO(ctx);
-    sleep(1);
-    DriveIO(ctx);
+    ctx.DriveIOUntil(1000 /* ms */, []() { return ReceiveHandlerCallCount != 0; });
 
     NL_TEST_ASSERT(inSuite, ReceiveHandlerCallCount == 1);
 }
@@ -242,16 +179,8 @@ static nlTestSuite sSuite =
  */
 static int Initialize(void * aContext)
 {
-    TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
-
-    CHIP_ERROR err = InitLayers(lContext.mSystemLayer, lContext.mInetLayer);
-    if (err != CHIP_NO_ERROR)
-    {
-        return FAILURE;
-    }
-    lContext.mSuite = &sSuite;
-
-    return SUCCESS;
+    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Init(&sSuite);
+    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }
 
 /**
@@ -259,23 +188,8 @@ static int Initialize(void * aContext)
  */
 static int Finalize(void * aContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
-
-    lContext.mSuite = NULL;
-
-    err = lContext.mSystemLayer.Shutdown();
-    if (err != CHIP_NO_ERROR)
-    {
-        return FAILURE;
-    }
-    err = lContext.mInetLayer.Shutdown();
-    if (err != CHIP_NO_ERROR)
-    {
-        return FAILURE;
-    }
-    return SUCCESS;
+    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
+    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }
 
 /**

@@ -41,6 +41,7 @@ lib_LIBRARIES                                         = \
     $(NULL)
 
 libTransportLayerTests_a_SOURCES                      = \
+    NetworkTestHelpers.cpp                              \
     TestMessageHeader.cpp                               \
     TestPeerConnections.cpp                             \
     TestSecureSession.cpp                               \
