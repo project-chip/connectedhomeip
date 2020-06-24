@@ -228,6 +228,8 @@ AMFILES =                               \
     src/ble/Makefile.am                 \
     src/lwip/Makefile.am                \
     src/Makefile.am                     \
+    src/setup_payload/Makefile.am       \
+    src/setup_payload/java/Makefile.am  \
     third_party/Makefile.am             \
     Makefile.am                         \
     configure.ac                        \

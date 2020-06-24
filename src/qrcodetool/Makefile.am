@@ -21,11 +21,13 @@ qrcodetool_LDADD = \
     $(top_builddir)/src/setup_payload/libSetupPayload.a     \
     $(top_builddir)/src/lib/libCHIP.a                       \
     $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS)    \
+	-llog													\
     $(NULL)
 
 NLFOREIGN_FILE_DEPENDENCIES = \
       $(top_builddir)/src/setup_payload/libSetupPayload.a   \
       $(top_builddir)/src/lib/libCHIP.a                     \
+	  -llog													\
       $(NULL)
 
 NLFOREIGN_SUBDIR_DEPENDENCIES = \

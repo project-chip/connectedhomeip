@@ -63,6 +63,7 @@ libCHIP_a_CPPFLAGS                  =                         \
     -I$(top_srcdir)/src/lib                                   \
     -I$(top_srcdir)/src/lib/core                              \
     -I$(top_srcdir)/src/lib/support                           \
+    -I$(top_srcdir)/src/setup_payload                         \
     -I$(top_srcdir)/src/system                                \
     -I$(top_srcdir)/src/app/chip-zcl                          \
     -I$(top_srcdir)/src/app/gen                               \
@@ -77,6 +78,7 @@ libCHIP_a_CPPFLAGS                  =                         \
 libCHIP_a_SOURCES                   = $(CHIP_BUILD_SYSTEM_LAYER_SOURCE_FILES)
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_INET_LAYER_SOURCE_FILES)
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_CORE_LAYER_SOURCE_FILES)
+libCHIP_a_SOURCES                  += $(CHIP_BUILD_SETUP_PAYLOAD_SOURCE_FILES)
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES)
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_DEVICE_CONTROLLER_SOURCE_FILES)
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_DATA_MODEL_SOURCE_FILES)

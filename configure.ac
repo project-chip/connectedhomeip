@@ -2164,6 +2164,7 @@ src/lwip/tests/Makefile
 src/system/Makefile
 src/system/tests/Makefile
 src/setup_payload/Makefile
+src/setup_payload/java/Makefile
 src/setup_payload/tests/Makefile
 src/inet/Makefile
 src/inet/tests/Makefile

@@ -25,11 +25,13 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
 SUBDIRS                    = tests
 
+# include SetupPayloadManager.am
+
 lib_LIBRARIES              = libSetupPayload.a
 
 libSetupPayload_adir             = $(includedir)/setup_payload
 
-libSetupPayload_a_CPPFLAGS                                      = \
+libSetupPayload_a_CPPFLAGS                                = \
     -I$(top_srcdir)/src                                     \
     -I$(top_srcdir)/src/lib                                 \
     -I$(top_srcdir)/src/lib/core                            \
@@ -49,6 +51,7 @@ libSetupPayload_a_SOURCES                                       = \
     Base41.cpp                                              \
     QRCodeSetupPayloadParser.cpp                            \
     SetupPayloadHelper.cpp                                  \
+	SetupPayloadManager-JNI.cpp                             \
    $(NULL)
 
 dist_libSetupPayload_a_HEADERS                                  = \

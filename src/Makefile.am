@@ -55,6 +55,13 @@ MAYBE_QRCODETOOL_SUBDIR           = \
     qrcodetool                      \
     $(NULL)
 endif
+  
+SETUP_PAYLOAD_SUBDIRS             = \
+    setup_payload/java              \
+	$(NULL)
+    
+MAYBE_SETUP_PAYLOAD_SUBDIRS       = \
+    $(NULL)
 
 # Always package (e.g. for 'make dist') these subdirectories.
 
@@ -66,7 +73,8 @@ DIST_SUBDIRS                      = \
     $(BLE_SUBDIRS)                  \
     inet                            \
     lib                             \
-    setup_payload                   \
+	setup_payload					\
+    $(SETUP_PAYLOAD_SUBDIRS)        \
     crypto                          \
     platform                        \
     qrcodetool                      \
@@ -82,7 +90,8 @@ SUBDIRS                           = \
     system                          \
     inet                            \
     lib                             \
-    setup_payload                   \
+	setup_payload					\
+    $(MAYBE_SETUP_PAYLOAD_SUBDIRS)	\
     crypto                          \
     transport                       \
     $(MAYBE_BLE_SUBDIRS)            \
