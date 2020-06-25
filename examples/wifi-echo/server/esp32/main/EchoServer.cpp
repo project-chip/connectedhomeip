@@ -108,7 +108,9 @@ exit:
 }
 
 /**
- * @brief implements something like "od -c", changes an arbitrary byte string into a printable string
+ * @brief implements something like "od -c", changes an arbitrary byte string
+ *   into a single-line of ascii.  Destroys any byte-wise encoding that
+ *   might be present, e.g. utf-8.
  *
  * @param bytes     potentially unprintable buffer
  * @param bytes_len length of bytes
