@@ -285,7 +285,7 @@ CHIP_ERROR NRF5Config::WriteConfigValueStr(Key key, const char * str, size_t str
     {
         uint32_t storedValWords = FDSWords(strLen + 1);
 
-        storedVal = (uint8_t *) nrf_malloc(storedValWords * kFDSWordSize);
+        storedVal = (uint8_t *) pvPortMalloc(storedValWords * kFDSWordSize);
         VerifyOrExit(storedVal != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         memcpy(storedVal, str, strLen);
@@ -313,7 +313,7 @@ CHIP_ERROR NRF5Config::WriteConfigValueStr(Key key, const char * str, size_t str
 exit:
     if (storedVal != NULL)
     {
-        nrf_free(storedVal);
+        vPortFree(storedVal);
     }
     return err;
 }
@@ -327,7 +327,7 @@ CHIP_ERROR NRF5Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t
     {
         uint32_t storedValWords = FDSWords(dataLen + 2);
 
-        storedVal = (uint8_t *) nrf_malloc(storedValWords * kFDSWordSize);
+        storedVal = (uint8_t *) pvPortMalloc(storedValWords * kFDSWordSize);
         VerifyOrExit(storedVal != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         // First two bytes encode the length.
@@ -357,7 +357,7 @@ CHIP_ERROR NRF5Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t
 exit:
     if (storedVal != NULL)
     {
-        nrf_free(storedVal);
+        vPortFree(storedVal);
     }
     return err;
 }

@@ -91,7 +91,7 @@ CHIP_ERROR GroupKeyStoreImpl::StoreGroupKey(const ChipGroupKey & key)
     SuccessOrExit(err);
 
     // Allocate a buffer to hold the encoded key.
-    storedVal = (uint8_t *) nrf_malloc(storedValLen);
+    storedVal = (uint8_t *) pvPortMalloc(storedValLen);
     VerifyOrExit(storedVal != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     // Encode the key for storage in an FDS record.
@@ -142,7 +142,7 @@ exit:
     if (storedVal != NULL)
     {
         ClearSecretData(storedVal, storedValLen);
-        nrf_free(storedVal);
+        vPortFree(storedVal);
     }
     return err;
 }
