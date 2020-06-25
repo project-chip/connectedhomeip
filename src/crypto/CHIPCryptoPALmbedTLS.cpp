@@ -264,13 +264,8 @@ CHIP_ERROR pbkdf2_hmac(const unsigned char * password, size_t plen, const unsign
 
     VerifyOrExit(password != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(plen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Salt is optional
-    if (slen > 0)
-    {
-        VerifyOrExit(salt != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
+    VerifyOrExit(salt != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(slen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 

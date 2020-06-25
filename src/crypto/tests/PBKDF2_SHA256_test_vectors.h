@@ -151,6 +151,16 @@ static const struct pbkdf2_test_vector chiptest_test_vector_10 = { .password = (
                                                                    .tcId     = 10,
                                                                    .result   = CHIP_ERROR_INVALID_ARGUMENT };
 
+static const struct pbkdf2_test_vector chiptest_test_vector_11 = { .password = (const unsigned char *) "password",
+                                                                   .plen     = 8,
+                                                                   .salt     = (const unsigned char *) NULL,
+                                                                   .slen     = 0,
+                                                                   .iter     = 16777216,
+                                                                   .key_len  = 20,
+                                                                   .key      = chiptest_key4,
+                                                                   .tcId     = 8,
+                                                                   .result   = CHIP_ERROR_INVALID_ARGUMENT };
+
 static const struct pbkdf2_test_vector * pbkdf2_sha256_test_vectors[] = {
     &chiptest_test_vector_1, &chiptest_test_vector_2, &chiptest_test_vector_3,
 #if !CHIP_TARGET_STYLE_EMBEDDED
@@ -158,7 +168,7 @@ static const struct pbkdf2_test_vector * pbkdf2_sha256_test_vectors[] = {
     &chiptest_test_vector_4,
 #endif
     &chiptest_test_vector_5, &chiptest_test_vector_6, &chiptest_test_vector_7, &chiptest_test_vector_8, &chiptest_test_vector_9,
-    &chiptest_test_vector_10
+    &chiptest_test_vector_10, &chiptest_test_vector_11
 };
 
 #endif // _PBKDF2_SHA256_TEST_VECTORS_H_
