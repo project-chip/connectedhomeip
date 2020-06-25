@@ -50,7 +50,7 @@
 // Used to have an initial shared secret
 #define EXAMPLE_SETUP_CODE 123456789
 // Used to indicate that the device supports both Soft-AP and BLE for rendezvous
-#define EXAMPLE_RENDEZVOUS_INFO 3
+#define EXAMPLE_RENDEZVOUS_INFO RendezvousInformationFlags::kBLE
 // Used to indicate that an SSID has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_SSID 1
 // Used to indicate that an IP address has been added to the QRCode

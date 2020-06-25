@@ -25,6 +25,32 @@
     chip::SetupPayload _chipSetupPayload;
 }
 
+- (RendezvousInformationFlags)valueOf:(chip::RendezvousInformationFlags)value
+{
+    RendezvousInformationFlags rv = kRendezvousInformationNone;
+    switch (value) {
+    case chip::RendezvousInformationFlags::kNone:
+        rv = kRendezvousInformationNone;
+        break;
+    case chip::RendezvousInformationFlags::kSoftAP:
+        rv = kRendezvousInformationSoftAP;
+        break;
+    case chip::RendezvousInformationFlags::kBLE:
+        rv = kRendezvousInformationBLE;
+        break;
+    case chip::RendezvousInformationFlags::kThread:
+        rv = kRendezvousInformationThread;
+        break;
+    case chip::RendezvousInformationFlags::kEthernet:
+        rv = kRendezvousInformationEthernet;
+        break;
+    case chip::RendezvousInformationFlags::kAllMask:
+        rv = kRendezvousInformationAllMask;
+        break;
+    }
+    return rv;
+}
+
 - (id)initWithSetupPayload:(chip::SetupPayload)setupPayload
 {
     if (self = [super init]) {
@@ -33,7 +59,7 @@
         _vendorID = [NSNumber numberWithUnsignedShort:setupPayload.vendorID];
         _productID = [NSNumber numberWithUnsignedShort:setupPayload.productID];
         _requiresCustomFlow = setupPayload.requiresCustomFlow == 1;
-        _rendezvousInformation = [NSNumber numberWithUnsignedShort:setupPayload.rendezvousInformation];
+        _rendezvousInformation = [self valueOf:setupPayload.rendezvousInformation];
         _discriminator = [NSNumber numberWithUnsignedShort:setupPayload.discriminator];
         _setUpPINCode = [NSNumber numberWithUnsignedLong:setupPayload.setUpPINCode];
 
