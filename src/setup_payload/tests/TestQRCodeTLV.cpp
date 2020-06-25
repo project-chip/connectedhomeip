@@ -24,22 +24,6 @@
 using namespace chip;
 using namespace std;
 
-void CompareWriteRead(nlTestSuite * inSuite, void * inContext, SetupPayload & inPayload)
-{
-    SetupPayload outPayload;
-
-    QRCodeSetupPayloadGenerator generator(inPayload);
-    string result;
-    uint8_t optionalInfo[kDefaultBufferSizeInBytes];
-    CHIP_ERROR err = generator.payloadBase41Representation(result, optionalInfo, sizeof(optionalInfo));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    QRCodeSetupPayloadParser parser = QRCodeSetupPayloadParser(result);
-    err                             = parser.populatePayload(outPayload);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, inPayload == outPayload);
-}
-
 void TestOptionalDataAddRemove(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload payload = GetDefaultPayload();
@@ -188,10 +172,10 @@ void TestOptionalDataReadSerial(nlTestSuite * inSuite, void * inContext)
     SetupPayload inPayload = GetDefaultPayload();
 
     inPayload.addSerialNumber(kSerialNumberDefaultStringValue);
-    CompareWriteRead(inSuite, inContext, inPayload);
+    NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
     inPayload.addSerialNumber(kSerialNumberDefaultUInt32Value);
-    CompareWriteRead(inSuite, inContext, inPayload);
+    NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 }
 
 void TestOptionalDataReadVendorInt(nlTestSuite * inSuite, void * inContext)
@@ -199,7 +183,7 @@ void TestOptionalDataReadVendorInt(nlTestSuite * inSuite, void * inContext)
     SetupPayload inPayload = GetDefaultPayload();
     inPayload.addOptionalVendorData(kOptionalDefaultIntTag, kOptionalDefaultIntValue);
 
-    CompareWriteRead(inSuite, inContext, inPayload);
+    NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 }
 
 void TestOptionalDataReadVendorString(nlTestSuite * inSuite, void * inContext)
@@ -207,14 +191,14 @@ void TestOptionalDataReadVendorString(nlTestSuite * inSuite, void * inContext)
     SetupPayload inPayload = GetDefaultPayload();
     inPayload.addOptionalVendorData(kOptionalDefaultStringTag, kOptionalDefaultStringValue);
 
-    CompareWriteRead(inSuite, inContext, inPayload);
+    NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 }
 
 void TestOptionalDataRead(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload inPayload = GetDefaultPayloadWithOptionalDefaults();
 
-    CompareWriteRead(inSuite, inContext, inPayload);
+    NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 }
 
 void TestOptionalDataWriteNoBuffer(nlTestSuite * inSuite, void * inContext)

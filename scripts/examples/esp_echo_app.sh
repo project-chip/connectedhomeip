@@ -3,7 +3,19 @@
 set -x
 env
 
+root=examples/wifi-echo/server/esp32/
+
 make -j -f Makefile-bootstrap repos
-source examples/wifi-echo/server/esp32/idf.sh
-idf make -j V=1 -C examples/wifi-echo/server/esp32 defconfig
-idf make -j V=1 -C examples/wifi-echo/server/esp32
+source "$root"/idf.sh
+
+SDKCONFIG_DEFAULTS=$root/sdkconfig_devkit.defaults idf make -j V=1 -C "$root" defconfig
+idf make -j V=1 -C "$root" || {
+    echo 'build DevKit-C failed'
+    exit 1
+}
+
+SDKCONFIG_DEFAULTS=$root/sdkconfig_m5stack.defaults idf make -j V=1 -C "$root" defconfig
+idf make -j V=1 -C "$root" || {
+    echo 'build M5Stack failed'
+    exit 1
+}

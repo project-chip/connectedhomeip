@@ -59,38 +59,35 @@ const uint8_t remote_public_key[] = { 0x04, 0x30, 0x77, 0x2c, 0xe7, 0xd4, 0x0a, 
                                       0x44, 0x72, 0x1b, 0xcd, 0xb9, 0x02, 0x53, 0xd9, 0xaf, 0xcc, 0x1a, 0xcd, 0xae,
                                       0xe8, 0x87, 0x2e, 0x52, 0x3b, 0x98, 0xf0, 0xa1, 0x88, 0x4a, 0xe3, 0x03, 0x75 };
 
-void newConnectionHandler(const MessageHeader & header, const IPPacketInfo & packet_info, SecureSessionMgr * transport)
+void newConnectionHandler(PeerConnectionState * state, SecureSessionMgr * transport)
 {
     CHIP_ERROR err;
 
     NRF_LOG_INFO("Received a new connection.");
 
-    VerifyOrExit(header.GetSourceNodeId().HasValue(), NRF_LOG_INFO("Unknown source for received message"));
-    VerifyOrExit(transport->GetPeerNodeId() != header.GetSourceNodeId().Value(), NRF_LOG_INFO("Node already known."));
-
-    err = transport->ManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key, sizeof(local_private_key));
+    err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key,
+                                                               sizeof(local_private_key));
     VerifyOrExit(err == CHIP_NO_ERROR, NRF_LOG_INFO("Failed to setup encryption"));
 
 exit:
     return;
 }
 
-static void OnRecv(const MessageHeader & header, const IPPacketInfo & packet_info, System::PacketBuffer * buffer,
+static void OnRecv(const MessageHeader & header, PeerConnectionState * state, System::PacketBuffer * buffer,
                    SecureSessionMgr * transport)
 {
     const size_t data_len = buffer->DataLength();
-    char src_addr[INET6_ADDRSTRLEN];
-    char dest_addr[INET6_ADDRSTRLEN];
+    char src_addr[PeerAddress::kMaxToStringSize];
 
     // as soon as a client connects, assume it is connected
     VerifyOrExit(transport != NULL && buffer != NULL, NRF_LOG_INFO("Received data but couldn't process it..."));
     VerifyOrExit(header.GetSourceNodeId().HasValue(), NRF_LOG_INFO("Unknown source for received message"));
 
-    packet_info.SrcAddress.ToString(src_addr, sizeof(src_addr));
-    packet_info.DestAddress.ToString(dest_addr, sizeof(dest_addr));
+    VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, NRF_LOG_INFO("Unknown source for received message"));
 
-    NRF_LOG_INFO("UDP packet received from %s:%u to %s:%u (%zu bytes)", src_addr, packet_info.SrcPort, dest_addr,
-                 packet_info.DestPort, static_cast<size_t>(data_len));
+    state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
+
+    NRF_LOG_INFO("Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
 
     HandleDataModelMessage(buffer);
     buffer = NULL;

@@ -31,6 +31,12 @@
 
 namespace chip {
 
+namespace {
+
+const char * kManualKeyExchangeChannelInfo = "Manual Key Exchanged Channel";
+
+} // namespace
+
 using namespace Crypto;
 
 SecureSession::SecureSession() : mKeyAvailable(false), mNextIV(0) {}
@@ -114,6 +120,20 @@ CHIP_ERROR SecureSession::Decrypt(const unsigned char * input, size_t input_leng
                             (const unsigned char *) &IV, sizeof(IV), output);
 exit:
     return error;
+}
+
+CHIP_ERROR SecureSession::TemporaryManualKeyExchange(const unsigned char * remote_public_key, const size_t public_key_length,
+                                                     const unsigned char * local_private_key, const size_t private_key_length)
+{
+    CHIP_ERROR err  = CHIP_NO_ERROR;
+    size_t info_len = strlen(kManualKeyExchangeChannelInfo);
+
+    err = Init(remote_public_key, public_key_length, local_private_key, private_key_length, NULL, 0,
+               (const unsigned char *) kManualKeyExchangeChannelInfo, info_len);
+    SuccessOrExit(err);
+
+exit:
+    return err;
 }
 
 } // namespace chip

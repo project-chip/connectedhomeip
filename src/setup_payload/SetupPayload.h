@@ -46,8 +46,7 @@ const int kManualSetupDiscriminatorFieldLengthInBits = 4;
 const int kSetupPINCodeFieldLengthInBits             = 27;
 const int kPaddingFieldLengthInBits                  = 5;
 
-const int kRendezvousInfoReservedFieldLengthInBits = 4;
-const int kRawVendorTagLengthInBits                = 7;
+const int kRawVendorTagLengthInBits = 7;
 
 const int kManualSetupShortCodeCharLength = 10;
 const int kManualSetupLongCodeCharLength  = 20;
@@ -72,6 +71,17 @@ const int kTotalPayloadDataSizeInBits =
 const int kTotalPayloadDataSizeInBytes = kTotalPayloadDataSizeInBits / 8;
 
 const char * const kQRCodePrefix = "CH:";
+
+enum class RendezvousInformationFlags : uint16_t
+{
+    kNone     = 0,      // Device does not support any method for rendezvous
+    kSoftAP   = 1 << 0, // Device supports hosting a SoftAP
+    kBLE      = 1 << 1, // Device supports BLE
+    kThread   = 1 << 2, // Device supports Thread
+    kEthernet = 1 << 3, // Device MAY be attached to a wired 802." connection"
+
+    kAllMask = kSoftAP | kBLE | kThread | kEthernet,
+};
 
 enum optionalQRCodeInfoType
 {
@@ -121,7 +131,6 @@ struct OptionalQRCodeInfoExtension : OptionalQRCodeInfo
 
 bool IsCHIPTag(uint8_t tag);
 bool IsVendorTag(uint8_t tag);
-;
 
 class SetupPayload
 {
@@ -134,7 +143,7 @@ public:
     uint16_t vendorID;
     uint16_t productID;
     uint8_t requiresCustomFlow;
-    uint16_t rendezvousInformation;
+    RendezvousInformationFlags rendezvousInformation;
     uint16_t discriminator;
     uint32_t setUpPINCode;
 
@@ -188,7 +197,8 @@ public:
 
     // Test that the Setup Payload is within expected value ranges
     SetupPayload() :
-        version(0), vendorID(0), productID(0), requiresCustomFlow(0), rendezvousInformation(0), discriminator(0), setUpPINCode(0){};
+        version(0), vendorID(0), productID(0), requiresCustomFlow(0), rendezvousInformation(RendezvousInformationFlags::kNone),
+        discriminator(0), setUpPINCode(0){};
 
     bool isValidQRCodePayload();
     bool isValidManualCode();
