@@ -170,6 +170,20 @@ typedef int (*entropy_source)(void * data, unsigned char * output, size_t len, s
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold);
+
+/** @brief Function to derive key using password. SHA256 hashing algorithm is used for calculating hmac.
+ * @param password password used for key derivation
+ * @param plen length of buffer containing password
+ * @param salt salt to use as input to the KDF
+ * @param slen length of salt
+ * @param iteration_count number of iterations to run
+ * @param key_length length of output key
+ * @param output output buffer where the key will be written
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR pbkdf2_hmac(const unsigned char * password, size_t plen, const unsigned char * salt, size_t slen,
+                       unsigned int iteration_count, uint32_t key_length, unsigned char * output);
+
 } // namespace Crypto
 } // namespace chip
 
