@@ -22,13 +22,6 @@ src/include/BuildConfig.h.in~
 
 # Repos stuff
 .repos-warning-stamp
-third_party/nlassert/
-third_party/nlfaultinjection/
-third_party/nlio/
-third_party/nlunit-test/
-third_party/mbedtls/
-examples/common/m5stack-tft/
-examples/common/QRCode/repo/
 
 # Example specific rules
 examples/**/sdkconfig
