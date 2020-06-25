@@ -19,9 +19,6 @@ add_subdirectory(tests)
 
 add_library(TransportLayer)
 
-target_compile_definitions(TransportLayer PRIVATE)
-target_compile_options(TransportLayer PRIVATE)
-
 set(COMMON_INCLUDES
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/src/include
@@ -40,8 +37,9 @@ set(COMMON_SOURCES
     UDP.cpp
 )
 
+target_compile_definitions(TransportLayer PRIVATE)
+target_compile_options(TransportLayer PRIVATE)
 target_include_directories(TransportLayer PRIVATE ${COMMON_INCLUDES})
-
 target_sources(TransportLayer PRIVATE ${COMMON_SOURCES})
 
 target_link_libraries(TransportLayer PRIVATE chip-config)

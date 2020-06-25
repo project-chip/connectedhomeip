@@ -17,13 +17,6 @@
 
 add_library(nlfaultinjection)
 
-set_target_properties(
-    nlfaultinjection
-    PROPERTIES
-        C_STANDARD 99
-        CXX_STANDARD 11
-)
-
 set(COMMON_SOURCES
     repo/src/nlfaultinjection.cpp
 )
@@ -37,6 +30,8 @@ target_include_directories(nlfaultinjection PRIVATE ${COMMON_INCLUDES})
 target_sources(nlfaultinjection PRIVATE ${COMMON_SOURCES})
 target_compile_definitions(nlfaultinjection PRIVATE)
 target_compile_options(nlfaultinjection PRIVATE)
+
+target_link_libraries(nlfaultinjection PRIVATE chip-config)
 
 #### tests common
 

@@ -19,19 +19,6 @@
 # Configure toolchain for standalone platform.
 #
 
-if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-
-   ## TODO: Make toolchain selection configurable
-   #set(CMAKE_C_COMPILER /usr/bin/gcc)
-   #set(CMAKE_CXX_COMPILER /usr/bin/g++)
-
-   #set(CMAKE_C_COMPILER clang)
-   #set(CMAKE_CXX_COMPILER clang++)
-   #set(CMAKE_C_COMPILER_TARGET ${triple})
-   #set(CMAKE_CXX_COMPILER_TARGET ${triple})
-
-endif ()
-
 set(CMAKE_C_FLAGS "-g" CACHE INTERNAL "C Compiler options")
 set(CMAKE_CXX_FLAGS "-g" CACHE INTERNAL "C++ Compiler options")
 

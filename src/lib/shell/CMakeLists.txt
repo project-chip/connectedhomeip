@@ -17,9 +17,6 @@
 
 add_library(ChipShell)
 
-target_compile_definitions(ChipShell PRIVATE)
-target_compile_options(ChipShell PRIVATE)
-
 set(COMMON_INCLUDES
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/src/include
@@ -47,8 +44,9 @@ set(COMMON_SOURCES ${COMMON_SOURCES}
 )
 endif(CHIP_TARGET_STYLE_UNIX)
 
+target_compile_definitions(ChipShell PRIVATE)
+target_compile_options(ChipShell PRIVATE)
 target_include_directories(ChipShell PRIVATE ${COMMON_INCLUDES})
-
 target_sources(ChipShell PRIVATE ${COMMON_SOURCES})
 
 target_link_libraries(ChipShell PRIVATE chip-config)

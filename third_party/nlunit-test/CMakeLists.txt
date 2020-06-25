@@ -32,10 +32,9 @@ set(COMMON_INCLUDES
     repo/src
 )
 
+target_compile_definitions(nlunit-test PRIVATE)
+target_compile_options(nlunit-test PRIVATE)
 target_include_directories(nlunit-test PRIVATE ${COMMON_INCLUDES})
-
 target_sources(nlunit-test PRIVATE ${COMMON_SOURCES})
 
-target_compile_definitions(nlunit-test PRIVATE)
-
-target_compile_options(nlunit-test PRIVATE)
+target_link_libraries(nlunit-test PRIVATE chip-config)
