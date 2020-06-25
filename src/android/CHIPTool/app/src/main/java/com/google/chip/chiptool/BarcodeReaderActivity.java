@@ -2,7 +2,6 @@ package com.google.chip.chiptool;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,9 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
-
 import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -173,7 +170,7 @@ public class BarcodeReaderActivity extends AppCompatActivity {
       TableLayout tableLayout = (TableLayout) inflated.findViewById(R.id.qrcode_table);
 
       // TODO : Extract vendor tags for IP and SOFT AP SSID and display them here
-      int vendorTags[] = { 1, 2 };
+      int vendorTags[] = {1, 2};
       for (int i : vendorTags) {
         View row = inflater.inflate(R.xml.barcode_vendor_tag, tableLayout, false);
         textView = (TextView) row.findViewById(R.id.label);
@@ -183,7 +180,9 @@ public class BarcodeReaderActivity extends AppCompatActivity {
         tableLayout.addView(row);
       }
 
-      inflated.findViewById(R.id.back).setOnClickListener(
+      inflated
+          .findViewById(R.id.back)
+          .setOnClickListener(
               new View.OnClickListener() {
                 public void onClick(View v) {
                   activity.finish();
