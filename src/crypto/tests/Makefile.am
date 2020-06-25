@@ -32,6 +32,7 @@ noinst_HEADERS                                 = \
     Hash_SHA256_test_vectors.h                   \
     HKDF_SHA256_test_vectors.h                   \
     ECDH_P256_test_vectors.h                     \
+    PBKDF2_SHA256_test_vectors.h                 \
     $(NULL)
 
 #
