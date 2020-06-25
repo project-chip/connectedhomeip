@@ -19,14 +19,6 @@ add_subdirectory(tests)
 
 add_library(SupportLayer)
 
-target_compile_definitions(SupportLayer PRIVATE
-    ${CHIP_BLE_PRIVATE_DEFINES}
-)
-
-target_compile_options(SupportLayer PRIVATE
-    ${CHIP_BLE_CFLAGS}
-)
-
 set(COMMON_INCLUDES
     ${PROJECT_SOURCE_DIR}/src/
     ${PROJECT_SOURCE_DIR}/src/include
@@ -54,8 +46,9 @@ set(COMMON_SOURCES
     verhoeff/Verhoeff36.cpp
 )
 
+target_compile_definitions(SupportLayer PRIVATE)
+target_compile_options(SupportLayer PRIVATE)
 target_include_directories(SupportLayer PRIVATE ${COMMON_INCLUDES})
-
 target_sources(SupportLayer PRIVATE ${COMMON_SOURCES})
 
 target_link_libraries(SupportLayer PRIVATE chip-config)

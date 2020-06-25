@@ -15,10 +15,6 @@
 #    limitations under the License.
 #
 
-#add_subdirectory(gen)
-#add_subdirectory(chip-zcl)
-#add_subdirectory(plugin)
-
 add_library(ChipDataModel
     gen/gen-callback-stubs.c
     gen/gen-command-handler.c

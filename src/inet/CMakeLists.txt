@@ -21,10 +21,6 @@ endif(CHIP_TARGET_STYLE_UNIX)
 
 add_library(InetLayer)
 
-target_compile_definitions(InetLayer PRIVATE)
-
-target_compile_options(InetLayer PRIVATE)
-
 set(COMMON_INCLUDES
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/src/include
@@ -58,8 +54,9 @@ set(COMMON_SOURCES
     InetFaultInjection.cpp
 )
 
+target_compile_definitions(InetLayer PRIVATE)
+target_compile_options(InetLayer PRIVATE)
 target_include_directories(InetLayer PRIVATE ${COMMON_INCLUDES})
-
 target_sources(InetLayer PRIVATE ${COMMON_SOURCES})
 
 target_link_libraries(InetLayer PRIVATE chip-config)

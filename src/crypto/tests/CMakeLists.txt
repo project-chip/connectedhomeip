@@ -23,9 +23,6 @@ set(COMMON_INCLUDES
     ${PROJECT_SOURCE_DIR}/third_party/nlunit-test/repo/src
 )
 
-
-#    -L/usr/local/lib
-
 set(COMMON_LIBS
     ChipCrypto
     SupportLayer
