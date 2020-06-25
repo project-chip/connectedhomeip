@@ -59,74 +59,24 @@ else()
     set(CHIP_PROJECT_CONFIG "")
 endif()
 
-set(CHIP_INCLUDE_DIRS
-    -I${CMAKE_CURRENT_SOURCE_DIR}/main/include
-    -I${CHIP_ROOT}/src/include
-    -I${CHIP_ROOT}/third_party/lwip/repo/lwip/src/include
-    -I${CHIP_ROOT}/src/lwip
-    -I${CHIP_ROOT}/src/lwip/nrf5
-    -I${CHIP_ROOT}/src/lwip/freertos)
-
-# TODO: get rid of NRF5_SDK dependency when NCS platform layer is finished
-set(NRF5_SDK_INCLUDE_DIRS
-    -I$ENV{NRF5_SDK_ROOT}/components
-    -I$ENV{NRF5_SDK_ROOT}/components/boards
-    -I$ENV{NRF5_SDK_ROOT}/components/ble/ble_advertising
-    -I$ENV{NRF5_SDK_ROOT}/components/ble/common
-    -I$ENV{NRF5_SDK_ROOT}/components/ble/nrf_ble_gatt
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/atomic
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/atomic_fifo
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/balloc
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/bsp
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/button
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/crc16
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/delay
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/experimental_section_vars
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/fds
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/fstorage
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/log
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/log/src
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/memobj
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/mem_manager
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/mutex
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/queue
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/ringbuf
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/stack_info
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/strerror
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/timer
-    -I$ENV{NRF5_SDK_ROOT}/components/libraries/util
-    -I$ENV{NRF5_SDK_ROOT}/components/softdevice/common
-    -I$ENV{NRF5_SDK_ROOT}/components/softdevice/s140/headers
-    -I$ENV{NRF5_SDK_ROOT}/components/softdevice/s140/headers/nrf52
-    -I$ENV{NRF5_SDK_ROOT}/components/softdevice/mbr/nrf52840/headers
-    -I$ENV{NRF5_SDK_ROOT}/components/thread/freertos_mbedtls_mutex
-    -I$ENV{NRF5_SDK_ROOT}/components/toolchain/cmsis/include
-    -I$ENV{NRF5_SDK_ROOT}/external/openthread/nrf_security/config
-    -I$ENV{NRF5_SDK_ROOT}/external/openthread/nrf_security/mbedtls_plat_config
-    -I$ENV{NRF5_SDK_ROOT}/external/openthread/nrf_security/nrf_cc310_plat/include
-    -I$ENV{NRF5_SDK_ROOT}/external/openthread/project/config
-    -I$ENV{NRF5_SDK_ROOT}/external/openthread/project/nrf52840
-    -I$ENV{NRF5_SDK_ROOT}/config/nrf52840/config
-    -I$ENV{NRF5_SDK_ROOT}/external/fprintf
-    -I$ENV{NRF5_SDK_ROOT}/external/freertos/config
-    -I$ENV{NRF5_SDK_ROOT}/external/freertos/portable/CMSIS/nrf52
-    -I$ENV{NRF5_SDK_ROOT}/external/freertos/portable/GCC/nrf52
-    -I$ENV{NRF5_SDK_ROOT}/external/freertos/source/include
-    -I$ENV{NRF5_SDK_ROOT}/external/openthread/include
-    -I$ENV{NRF5_SDK_ROOT}/external/segger_rtt
-    -I$ENV{NRF5_SDK_ROOT}/integration/nrfx
-    -I$ENV{NRF5_SDK_ROOT}/integration/nrfx/legacy
-    -I$ENV{NRF5_SDK_ROOT}/modules/nrfx
-    -I$ENV{NRF5_SDK_ROOT}/modules/nrfx/drivers/include
-    -I$ENV{NRF5_SDK_ROOT}/modules/nrfx/hal
-    -I$ENV{NRF5_SDK_ROOT}/modules/nrfx/mdk)
+zephyr_include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/main/include
+    ${CHIP_ROOT}/src
+    ${CHIP_ROOT}/src/lib
+    ${CHIP_ROOT}/src/lib/core
+    ${CHIP_ROOT}/src/include
+    ${CHIP_OUTPUT_DIR}/src/include
+)
 
 set(CHIP_OUTPUT_LIBRARIES
     ${CHIP_OUTPUT_DIR}/lib/libDeviceLayer.a
     ${CHIP_OUTPUT_DIR}/lib/libCHIP.a
     ${CHIP_OUTPUT_DIR}/lib/libInetLayer.a
     ${CHIP_OUTPUT_DIR}/lib/libSystemLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/liblwip.a)
+    ${CHIP_OUTPUT_DIR}/lib/libSupportLayer.a
+    ${CHIP_OUTPUT_DIR}/lib/libBleLayer.a
+    ${CHIP_OUTPUT_DIR}/lib/libDeviceLayer.a
+    )
 
 # ==================================================
 # Setup CHIP build
@@ -159,6 +109,8 @@ set(CHIP_CXXFLAGS ${CHIP_CXXFLAGS} ${CHIP_COMMON_FLAGS})
 convert_list_of_flags_to_string_of_flags(CHIP_CFLAGS CHIP_CFLAGS)
 convert_list_of_flags_to_string_of_flags(CHIP_CXXFLAGS CHIP_CXXFLAGS)
 
+zephyr_link_libraries(${CHIP_OUTPUT_LIBRARIES})
+
 # Prepare command line arguments passed to the CHIP's ./configure script
 set(CHIP_CONFIGURE_ARGS
     AR=${CMAKE_AR}
@@ -187,12 +139,15 @@ set(CHIP_CONFIGURE_ARGS
     --with-chip-ble-project-includes=${CHIP_PROJECT_CONFIG}
     --with-chip-warm-project-includes=${CHIP_PROJECT_CONFIG}
     --with-chip-device-project-includes=${CHIP_PROJECT_CONFIG}
+    --enable-debug
+    --enable-optimization=no
     --disable-ipv4
     --disable-tests
     --disable-tools
     --disable-docs
     --disable-java
     --disable-device-manager
+    --with-openthread=${ZEPHYR_BASE}/../modules/lib/openthread
     --with-mbedtls=${ZEPHYR_BASE}/../mbedtls
     --with-crypto=mbedtls
     )

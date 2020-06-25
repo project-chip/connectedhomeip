@@ -219,6 +219,12 @@ libDeviceLayer_a_SOURCES               +=       \
     Zephyr/SystemTimeSupport.cpp                \
     $(NULL)
 
+if CHIP_ENABLE_OPENTHREAD
+libDeviceLayer_a_SOURCES               +=       \
+    nrfconnect/ThreadStackManagerImpl.cpp       \
+    $(NULL)
+endif
+
 endif # CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 
 endif # CONFIG_DEVICE_LAYER

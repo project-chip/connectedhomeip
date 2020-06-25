@@ -17,10 +17,10 @@
  *    limitations under the License.
  */
 
-#include "include/AppTask.h"
-#include "include/BoltLockManager.h"
-#include "include/LEDWidget.h"
-#include "include/app_config.h"
+#include "AppTask.h"
+#include "BoltLockManager.h"
+#include "LEDWidget.h"
+#include "app_config.h"
 
 // TODO: #include <platform/CHIPDeviceLayer.h>
 
@@ -113,7 +113,7 @@ int AppTask::StartApp()
         // while these values are queried.  However we use a non-blocking lock request
         // (TryLockChipStack()) to avoid blocking other UI activities when the CHIP
         // task is busy (e.g. with a long crypto operation).
-        
+
         if (PlatformMgr().TryLockChipStack())
         {
             sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
