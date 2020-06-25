@@ -27,7 +27,6 @@
 CHIP_BUILD_TRANSPORT_LAYER_SOURCE_FILES                  = \
     @top_builddir@/src/transport/SecureSession.cpp         \
     @top_builddir@/src/transport/MessageHeader.cpp         \
-    @top_builddir@/src/transport/PeerConnections.cpp       \
     @top_builddir@/src/transport/SecureSessionMgr.cpp      \
     @top_builddir@/src/transport/UDP.cpp                   \
     $(NULL)

@@ -130,9 +130,9 @@ private:
     // TODO: add support for multiple transports (TCP, BLE to be added)
     Transport::UDP mTransport;
 
-    NodeId mLocalNodeId;                         //< Id of the current node
-    Transport::PeerConnections mPeerConnections; //< Active connections to other peers
-    State mState;                                //< Initialization state of the object
+    NodeId mLocalNodeId;                                                                //< Id of the current node
+    Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; //< Active connections to other peers
+    State mState;                                                                       //< Initialization state of the object
 
     /**
      * This function is the application callback that is invoked when a message is received over a
