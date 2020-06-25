@@ -17,10 +17,10 @@
  *    limitations under the License.
  */
 
-#include "include/BoltLockManager.h"
+#include "BoltLockManager.h"
 
-#include "include/AppTask.h"
-#include "include/app_config.h"
+#include "AppTask.h"
+#include "app_config.h"
 
 #include <logging/log.h>
 #include <zephyr.h>

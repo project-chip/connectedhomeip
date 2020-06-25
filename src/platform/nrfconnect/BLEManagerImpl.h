@@ -37,7 +37,7 @@ using namespace chip::Ble;
 /**
  * Concrete implementation of the NetworkProvisioningServer singleton object for the Zephyr platforms.
  */
-class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
+class BLEManagerImpl final : public BLEManager
 {
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -68,22 +68,19 @@ private:
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
-    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId) override;
-    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId) override;
-    bool CloseConnection(BLE_CONNECTION_OBJECT conId) override;
-    uint16_t GetMTU(BLE_CONNECTION_OBJECT conId) const override;
-    bool SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                        PacketBuffer * pBuf) override;
-    bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                          PacketBuffer * pBuf) override;
-    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                         PacketBuffer * pBuf) override;
+    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId);
+    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId);
+    bool CloseConnection(BLE_CONNECTION_OBJECT conId);
+    uint16_t GetMTU(BLE_CONNECTION_OBJECT conId) const;
+    bool SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId, PacketBuffer * pBuf);
+    bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId, PacketBuffer * pBuf);
+    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId, PacketBuffer * pBuf);
     bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,
-                          const ChipBleUUID * charId) override;
+                          const ChipBleUUID * charId);
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
-    void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
+    void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId);
 
     // ===== Members for internal use by the following friends.
 
@@ -106,14 +103,13 @@ private:
 
     enum
     {
-        kMaxConnections             = MIN(BLE_LAYER_NUM_BLE_ENDPOINTS, NRF_SDH_BLE_PERIPHERAL_LINK_COUNT),
+        kMaxConnections             = 1,
         kMaxDeviceNameLength        = 20, // TODO: right-size this
         kMaxAdvertismentDataSetSize = 31  // TODO: verify this
     };
 
     void DriveBLEState(void);
     CHIP_ERROR ConfigureAdvertising(void);
-    CHIP_ERROR EncodeAdvertisingData(ble_gap_adv_data_t & gapAdvData);
     CHIP_ERROR StartAdvertising(void);
     CHIP_ERROR StopAdvertising(void);
     void HandleSoftDeviceBLEEvent(const ChipDeviceEvent * event);
@@ -127,7 +123,6 @@ private:
     bool IsSubscribed(uint16_t conId);
 
     static void DriveBLEState(intptr_t arg);
-    static void SoftDeviceBLEEventCallback(const ble_evt_t * bleEvent, void * context);
 };
 
 /**
@@ -171,7 +166,7 @@ inline BleLayer * BLEManagerImpl::_GetBleLayer() const
 inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
 {
     ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return kCHIPoBLEServiceMode_NotSupported;
+    return CHIPoBLEServiceMode::kCHIPoBLEServiceMode_NotSupported;
 }
 
 inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)
@@ -183,13 +178,13 @@ inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 inline bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
 {
     ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return false
+    return false;
 }
 
 inline bool BLEManagerImpl::_IsAdvertising(void)
 {
     ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return false
+    return false;
 }
 
 } // namespace Internal

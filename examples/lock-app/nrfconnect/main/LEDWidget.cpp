@@ -17,7 +17,7 @@
  *    limitations under the License.
  */
 
-#include "include/LEDWidget.h"
+#include "LEDWidget.h"
 
 #include <dk_buttons_and_leds.h>
 #include <zephyr.h>
