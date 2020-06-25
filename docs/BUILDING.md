@@ -258,9 +258,9 @@ git clean -fdx
 
 Install XCode and XQuarz.
 
-```
-make -f Makefile-iOS
-```
+Open src/darwin with XCode
+Select `Product > Scheme > CHIP Tool App iOS`
+Build and run in simulator.
 
 ### Build Android
 
