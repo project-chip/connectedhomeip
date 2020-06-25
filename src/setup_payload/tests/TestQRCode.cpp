@@ -189,12 +189,13 @@ void TestSetupPayloadVerify(nlTestSuite * inSuite, void * inContext)
 
     // test invalid rendezvousInformation
     test_payload                       = payload;
-    test_payload.rendezvousInformation = (RendezvousInformationFlags)(1 << kRendezvousInfoFieldLengthInBits);
+    test_payload.rendezvousInformation = static_cast<RendezvousInformationFlags>(1 << kRendezvousInfoFieldLengthInBits);
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid rendezvousInformation
-    test_payload                       = payload;
-    test_payload.rendezvousInformation = (RendezvousInformationFlags)((uint16_t) RendezvousInformationFlags::kAllMask + 1);
+    test_payload = payload;
+    test_payload.rendezvousInformation =
+        static_cast<RendezvousInformationFlags>(static_cast<uint16_t>(RendezvousInformationFlags::kAllMask) + 1);
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid discriminator
