@@ -505,6 +505,48 @@ static void TestHash_SHA256(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, numOfTestsExecuted == ArraySize(hash_sha256_test_vectors));
 }
 
+static void TestHash_SHA256_Stream(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestCases     = ArraySize(hash_sha256_test_vectors);
+    int numOfTestsExecuted = 0;
+    CHIP_ERROR error       = CHIP_NO_ERROR;
+
+    for (numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
+    {
+        hash_sha256_vector v       = hash_sha256_test_vectors[numOfTestsExecuted];
+        const unsigned char * data = v.data;
+        size_t data_length         = v.data_length;
+        unsigned char out_buffer[kSHA256_Hash_Length];
+
+        Hash_SHA256_stream sha256;
+
+        error = sha256.Begin();
+        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+
+        // Split data into 3 random streams.
+        for (int i = 0; i < 2; ++i)
+        {
+            size_t rand_data_length = rand() % (data_length + 1);
+
+            error = sha256.AddData(data, rand_data_length);
+            NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+
+            data += rand_data_length;
+            data_length -= rand_data_length;
+        }
+
+        error = sha256.AddData(data, data_length);
+        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+
+        error = sha256.Finish(out_buffer);
+        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+
+        bool success = memcmp(v.hash, out_buffer, sizeof(out_buffer)) == 0;
+        NL_TEST_ASSERT(inSuite, success);
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsExecuted == ArraySize(hash_sha256_test_vectors));
+}
+
 static void TestHKDF_SHA256(nlTestSuite * inSuite, void * inContext)
 {
     int numOfTestCases     = ArraySize(hkdf_sha256_test_vectors);
@@ -864,6 +906,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ECDSA sign msg invalid parameters", TestECDSA_SigningInvalidParams),
     NL_TEST_DEF("Test ECDSA signature validation invalid parameters", TestECDSA_ValidationInvalidParam),
     NL_TEST_DEF("Test Hash SHA 256", TestHash_SHA256),
+    NL_TEST_DEF("Test Hash SHA 256 Stream", TestHash_SHA256_Stream),
     NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
     NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
     NL_TEST_DEF("Test DRBG output", TestDRBG_Output),
