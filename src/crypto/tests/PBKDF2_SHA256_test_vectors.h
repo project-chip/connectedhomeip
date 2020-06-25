@@ -151,14 +151,14 @@ static const struct pbkdf2_test_vector chiptest_test_vector_10 = { .password = (
                                                                    .tcId     = 10,
                                                                    .result   = CHIP_ERROR_INVALID_ARGUMENT };
 
-static const struct pbkdf2_test_vector * pbkdf2_sha256_test_vectors[] = { &chiptest_test_vector_1, &chiptest_test_vector_2,
-                                                                          &chiptest_test_vector_3,
+static const struct pbkdf2_test_vector * pbkdf2_sha256_test_vectors[] = {
+    &chiptest_test_vector_1, &chiptest_test_vector_2, &chiptest_test_vector_3,
 #if !CHIP_TARGET_STYLE_EMBEDDED
-// The following test vector takes excessive time to run on an embedded target
-                                                                          &chiptest_test_vector_4,
+    // The following test vector takes excessive time to run on an embedded target
+    &chiptest_test_vector_4,
 #endif
-                                                                          &chiptest_test_vector_5, &chiptest_test_vector_6,
-                                                                          &chiptest_test_vector_7, &chiptest_test_vector_8,
-                                                                          &chiptest_test_vector_9, &chiptest_test_vector_10 };
+    &chiptest_test_vector_5, &chiptest_test_vector_6, &chiptest_test_vector_7, &chiptest_test_vector_8, &chiptest_test_vector_9,
+    &chiptest_test_vector_10
+};
 
 #endif // _PBKDF2_SHA256_TEST_VECTORS_H_
