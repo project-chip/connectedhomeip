@@ -32,6 +32,29 @@
 using namespace chip;
 using namespace std;
 
+void TestRendezvousFlags(nlTestSuite * inSuite, void * inContext)
+{
+    SetupPayload inPayload = GetDefaultPayload();
+
+    inPayload.rendezvousInformation = RendezvousInformationFlags::kNone;
+    NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
+
+    inPayload.rendezvousInformation = RendezvousInformationFlags::kSoftAP;
+    NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
+
+    inPayload.rendezvousInformation = RendezvousInformationFlags::kBLE;
+    NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
+
+    inPayload.rendezvousInformation = RendezvousInformationFlags::kThread;
+    NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
+
+    inPayload.rendezvousInformation = RendezvousInformationFlags::kEthernet;
+    NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
+
+    inPayload.rendezvousInformation = RendezvousInformationFlags::kAllMask;
+    NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
+}
+
 void TestPayloadByteArrayRep(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload payload = GetDefaultPayload();
@@ -166,12 +189,12 @@ void TestSetupPayloadVerify(nlTestSuite * inSuite, void * inContext)
 
     // test invalid rendezvousInformation
     test_payload                       = payload;
-    test_payload.rendezvousInformation = 1 << kRendezvousInfoFieldLengthInBits;
+    test_payload.rendezvousInformation = (RendezvousInformationFlags)(1 << kRendezvousInfoFieldLengthInBits);
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid rendezvousInformation
     test_payload                       = payload;
-    test_payload.rendezvousInformation = 1 << (kRendezvousInfoFieldLengthInBits - kRendezvousInfoReservedFieldLengthInBits);
+    test_payload.rendezvousInformation = (RendezvousInformationFlags)((uint16_t) RendezvousInformationFlags::kAllMask + 1);
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid discriminator
@@ -280,7 +303,7 @@ void TestExtractPayload(nlTestSuite * inSuite, void * inContext)
 // clang-format off
 static const nlTest sTests[] =
 {
-
+    NL_TEST_DEF("Test Rendezvous Flags",                                            TestRendezvousFlags),
     NL_TEST_DEF("Test Base 41",                                                     TestBase41),
     NL_TEST_DEF("Test Bitset Length",                                               TestBitsetLen),
     NL_TEST_DEF("Test Payload Byte Array Representation",                           TestPayloadByteArrayRep),
