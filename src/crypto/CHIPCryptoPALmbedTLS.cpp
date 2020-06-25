@@ -31,6 +31,7 @@
 #include <mbedtls/error.h>
 #include <mbedtls/hkdf.h>
 #include <mbedtls/md.h>
+#include <mbedtls/pkcs5.h>
 #include <mbedtls/sha256.h>
 
 #include <support/CodeUtils.h>
@@ -249,6 +250,44 @@ CHIP_ERROR HKDF_SHA256(const unsigned char * secret, const size_t secret_length,
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
+    return error;
+}
+
+CHIP_ERROR pbkdf2_hmac(const unsigned char * password, size_t plen, const unsigned char * salt, size_t slen,
+                       unsigned int iteration_count, uint32_t key_length, unsigned char * output)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+    const mbedtls_md_info_t * md_info;
+    mbedtls_md_context_t md_ctxt;
+    constexpr int use_hmac = 1;
+
+    VerifyOrExit(password != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(plen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Salt is optional
+    if (slen > 0)
+    {
+        VerifyOrExit(salt != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    VerifyOrExit(key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(output != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    md_info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
+    VerifyOrExit(md_info != NULL, error = CHIP_ERROR_INTERNAL);
+
+    mbedtls_md_init(&md_ctxt);
+
+    result = mbedtls_md_setup(&md_ctxt, md_info, use_hmac);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_pkcs5_pbkdf2_hmac(&md_ctxt, password, plen, salt, slen, iteration_count, key_length, output);
+
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    _log_mbedTLS_error(result);
     return error;
 }
 

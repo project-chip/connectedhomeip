@@ -380,6 +380,41 @@ exit:
     return error;
 }
 
+CHIP_ERROR pbkdf2_hmac(const unsigned char * password, size_t plen, const unsigned char * salt, size_t slen,
+                       unsigned int iteration_count, uint32_t key_length, unsigned char * output)
+{
+    CHIP_ERROR error  = CHIP_NO_ERROR;
+    int result        = 1;
+    const EVP_MD * md = NULL;
+
+    VerifyOrExit(password != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(plen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Salt is optional
+    if (slen > 0)
+    {
+        VerifyOrExit(salt != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    VerifyOrExit(key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(output != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    md = _digestForType(DigestType::SHA256);
+    VerifyOrExit(md != NULL, error = CHIP_ERROR_INTERNAL);
+
+    result = PKCS5_PBKDF2_HMAC((const char *) password, plen, salt, slen, iteration_count, md, key_length, output);
+
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    if (error != CHIP_NO_ERROR)
+    {
+        _logSSLError();
+    }
+
+    return error;
+}
+
 CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold)
 {
     return CHIP_NO_ERROR;

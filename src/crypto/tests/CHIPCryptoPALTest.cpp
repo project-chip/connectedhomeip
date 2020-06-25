@@ -22,6 +22,7 @@
 #include "ECDH_P256_test_vectors.h"
 #include "HKDF_SHA256_test_vectors.h"
 #include "Hash_SHA256_test_vectors.h"
+#include "PBKDF2_SHA256_test_vectors.h"
 
 #include <CHIPCryptoPAL.h>
 #include <nlunit-test.h>
@@ -865,6 +866,31 @@ static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
 #endif
 }
 
+static void TestPBKDF2_SHA256_TestVectors(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(pbkdf2_sha256_test_vectors);
+    int numOfTestsRan    = 0;
+    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
+    {
+        const pbkdf2_test_vector * vector = pbkdf2_sha256_test_vectors[vectorIndex];
+        if (vector->plen > 0)
+        {
+            numOfTestsRan++;
+            unsigned char out_key[vector->key_len];
+
+            CHIP_ERROR err =
+                pbkdf2_hmac(vector->password, vector->plen, vector->salt, vector->slen, vector->iter, vector->key_len, out_key);
+            NL_TEST_ASSERT(inSuite, err == vector->result);
+
+            if (vector->result == CHIP_NO_ERROR)
+            {
+                NL_TEST_ASSERT(inSuite, memcmp(out_key, vector->key, vector->key_len) == 0);
+            }
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
 namespace chip {
 namespace Logging {
 void LogV(uint8_t module, uint8_t category, const char * format, va_list argptr)
@@ -914,6 +940,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ECDH invalid params", TestECDH_InvalidParams),
     NL_TEST_DEF("Test ECDH sample vectors", TestECDH_SampleInputVectors),
     NL_TEST_DEF("Test adding entropy sources", TestAddEntropySources),
+    NL_TEST_DEF("Test PBKDF2 SHA56", TestPBKDF2_SHA256_TestVectors),
 
     NL_TEST_SENTINEL()
 };
