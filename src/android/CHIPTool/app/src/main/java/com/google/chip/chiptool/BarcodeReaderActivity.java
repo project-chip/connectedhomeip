@@ -2,6 +2,7 @@ package com.google.chip.chiptool;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,7 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
+
 import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -34,9 +37,9 @@ public class BarcodeReaderActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.barcode_activity);
     getSupportFragmentManager()
-        .beginTransaction()
-        .replace(R.id.barcode_frame, new BarcodeFragment(this))
-        .commit();
+            .beginTransaction()
+            .replace(R.id.barcode_frame, new BarcodeFragment(this))
+            .commit();
 
     initializeBarcodeDetectorAndCamera();
   }
@@ -46,29 +49,29 @@ public class BarcodeReaderActivity extends AppCompatActivity {
     BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(context).build();
 
     barcodeDetector.setProcessor(
-        new Detector.Processor<Barcode>() {
-          @Override
-          public void release() {}
+            new Detector.Processor<Barcode>() {
+              @Override
+              public void release() {}
 
-          @Override
-          public void receiveDetections(Detector.Detections<Barcode> detections) {
-            final SparseArray<Barcode> barcodes = detections.getDetectedItems();
-            if (barcodes.size() > 0) {
-              getSupportFragmentManager()
-                  .beginTransaction()
-                  .replace(
-                      R.id.barcode_frame,
-                      new BarcodeResultsFragment(BarcodeReaderActivity.this, barcodes))
-                  .commit();
-            }
-          }
-        });
+              @Override
+              public void receiveDetections(Detector.Detections<Barcode> detections) {
+                final SparseArray<Barcode> barcodes = detections.getDetectedItems();
+                if (barcodes.size() > 0) {
+                  getSupportFragmentManager()
+                          .beginTransaction()
+                          .replace(
+                                  R.id.barcode_frame,
+                                  new BarcodeResultsFragment(BarcodeReaderActivity.this, barcodes))
+                          .commit();
+                }
+              }
+            });
 
     CameraSource.Builder builder =
-        new CameraSource.Builder(context, barcodeDetector)
-            .setFacing(CameraSource.CAMERA_FACING_BACK)
-            .setAutoFocusEnabled(true)
-            .setRequestedFps(30.0f);
+            new CameraSource.Builder(context, barcodeDetector)
+                    .setFacing(CameraSource.CAMERA_FACING_BACK)
+                    .setAutoFocusEnabled(true)
+                    .setRequestedFps(30.0f);
 
     cameraSource = builder.build();
   }
@@ -82,7 +85,7 @@ public class BarcodeReaderActivity extends AppCompatActivity {
 
     @Override
     public View onCreateView(
-        LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
       return inflater.inflate(R.xml.barcode_fragment, container, false);
     }
 
@@ -122,10 +125,10 @@ public class BarcodeReaderActivity extends AppCompatActivity {
 
   @Override
   public void onRequestPermissionsResult(
-      int requestCode, String[] permissions, int[] grantResults) {
+          int requestCode, String[] permissions, int[] grantResults) {
     if (requestCode == REQUEST_CAMERA_PERMISSION) {
       if (permissions[0].equals(Manifest.permission.CAMERA)
-          && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+              && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         initializeBarcodeDetectorAndCamera();
       }
     }
@@ -149,7 +152,7 @@ public class BarcodeReaderActivity extends AppCompatActivity {
 
     @Override
     public View onCreateView(
-        LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
       View inflated = inflater.inflate(R.xml.barcode_results_fragment, container, false);
 
       // Display CHIP qr code info to user for manual connect to soft AP
@@ -170,7 +173,7 @@ public class BarcodeReaderActivity extends AppCompatActivity {
       TableLayout tableLayout = (TableLayout) inflated.findViewById(R.id.qrcode_table);
 
       // TODO : Extract vendor tags for IP and SOFT AP SSID and display them here
-      int vendorTags[] = {1, 2};
+      int vendorTags[] = { 1, 2 };
       for (int i : vendorTags) {
         View row = inflater.inflate(R.xml.barcode_vendor_tag, tableLayout, false);
         textView = (TextView) row.findViewById(R.id.label);
@@ -180,9 +183,7 @@ public class BarcodeReaderActivity extends AppCompatActivity {
         tableLayout.addView(row);
       }
 
-      inflated
-          .findViewById(R.id.back)
-          .setOnClickListener(
+      inflated.findViewById(R.id.back).setOnClickListener(
               new View.OnClickListener() {
                 public void onClick(View v) {
                   activity.finish();
