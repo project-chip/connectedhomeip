@@ -19,10 +19,6 @@ add_subdirectory(tests)
 
 add_library(ChipCrypto)
 
-target_compile_definitions(ChipCrypto PRIVATE)
-
-target_compile_options(ChipCrypto PRIVATE)
-
 set(COMMON_INCLUDES
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/src/include
@@ -39,8 +35,9 @@ if (CHIP_CRYPTO_OPENSSL)
 set(COMMON_SOURCES CHIPCryptoPALOpenSSL.cpp)
 endif ()
 
+target_compile_definitions(ChipCrypto PRIVATE)
+target_compile_options(ChipCrypto PRIVATE)
 target_include_directories(ChipCrypto PRIVATE ${COMMON_INCLUDES})
-
 target_sources(ChipCrypto PRIVATE ${COMMON_SOURCES})
 
 target_link_libraries(ChipCrypto PRIVATE chip-config)

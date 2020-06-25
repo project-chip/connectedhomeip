@@ -17,9 +17,6 @@
 
 add_library(lwip)
 
-target_compile_definitions(lwip PRIVATE)
-target_compile_options(lwip PRIVATE)
-
 set(COMMON_INCLUDES
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/src/include
@@ -87,8 +84,10 @@ set(COMMON_SOURCES
     ${LWIP_NETIF_SOURCES}
 )
 
-target_include_directories(lwip PRIVATE ${COMMON_INCLUDES})
 
+target_compile_definitions(lwip PRIVATE)
+target_compile_options(lwip PRIVATE)
+target_include_directories(lwip PRIVATE ${COMMON_INCLUDES})
 target_sources(lwip PRIVATE ${COMMON_SOURCES})
 
 target_link_libraries(lwip PRIVATE

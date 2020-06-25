@@ -19,10 +19,6 @@ add_subdirectory(tests)
 
 add_library(SetupPayload)
 
-target_compile_definitions(SetupPayload PRIVATE)
-
-target_compile_options(SetupPayload PRIVATE)
-
 set(COMMON_INCLUDES
     ${PROJECT_SOURCE_DIR}/src/
     ${PROJECT_SOURCE_DIR}/src/include
@@ -41,8 +37,9 @@ set(COMMON_SOURCES
     SetupPayloadHelper.cpp
 )
 
+target_compile_definitions(SetupPayload PRIVATE)
+target_compile_options(SetupPayload PRIVATE)
 target_include_directories(SetupPayload PRIVATE ${COMMON_INCLUDES})
-
 target_sources(SetupPayload PRIVATE ${COMMON_SOURCES})
 
 target_link_libraries(SetupPayload PRIVATE chip-config)

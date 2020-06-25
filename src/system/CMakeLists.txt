@@ -19,9 +19,6 @@ add_subdirectory(tests)
 
 add_library(SystemLayer)
 
-target_compile_definitions(SystemLayer PRIVATE)
-target_compile_options(SystemLayer PRIVATE)
-
 set(COMMON_INCLUDES
     ${PROJECT_SOURCE_DIR}/src/
     ${PROJECT_SOURCE_DIR}/src/include
@@ -44,8 +41,9 @@ set(COMMON_SOURCES
     SystemFaultInjection.cpp
 )
 
+target_compile_definitions(SystemLayer PRIVATE)
+target_compile_options(SystemLayer PRIVATE)
 target_include_directories(SystemLayer PRIVATE ${COMMON_INCLUDES})
-
 target_sources(SystemLayer PRIVATE ${COMMON_SOURCES})
 
 target_link_libraries(SystemLayer PRIVATE chip-config)

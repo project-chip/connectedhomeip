@@ -24,13 +24,13 @@ set(COMMON_INCLUDES
 )
 
 set(COMMON_LIBS
-#    -Wl,--start-group
+    ${PLATFORM_LINK_START}
     ChipShell
     ChipCore
     SupportLayer
     nlunit-test
     ${CHIP_PLATFORM_LIBS}
-#    -Wl,--end-group
+    ${PLATFORM_LINK_END}
     chip-config
 )
 
