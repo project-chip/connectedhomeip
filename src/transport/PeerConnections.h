@@ -190,7 +190,7 @@ private:
 
     typedef void (*ConnectionExpiredHandler)(const PeerConnectionState & state, void * param);
 
-    ConnectionExpiredHandler OnConnectionExpired = nullptr; ///< Callback for when a connection expires
+    ConnectionExpiredHandler OnConnectionExpired = nullptr; ///< Callback for connection expiry
     void * mConnectionExpiredArgument            = nullptr; ///< Argument for callback
 };
 
