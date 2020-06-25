@@ -31,7 +31,7 @@
 
 #include <core/CHIPTunnelConfig.h>
 
-#include <InetLayer.h>
+#include <inet/InetLayer.h>
 
 #include <core/CHIPEncoding.h>
 #include <support/CodeUtils.h>

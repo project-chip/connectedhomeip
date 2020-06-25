@@ -23,9 +23,9 @@
  *
  */
 
-#include <CHIPCore.h>
-#include <CHIPEncoding.h>
-#include <CHIPTLV.h>
+#include <core/CHIPCore.h>
+#include <core/CHIPEncoding.h>
+#include <core/CHIPTLV.h>
 #include <support/CodeUtils.h>
 
 namespace chip {

@@ -31,9 +31,9 @@
 
 #include <string.h>
 
-#include <EndPointBasis.h>
-#include <InetInterface.h>
-#include <InetLayer.h>
+#include <inet/EndPointBasis.h>
+#include <inet/InetInterface.h>
+#include <inet/InetLayer.h>
 
 #include <support/CodeUtils.h>
 

@@ -59,14 +59,9 @@ lib_LIBRARIES                       = libCHIP.a
 libCHIP_a_CPPFLAGS                  =                         \
     -I$(top_srcdir)/src                                       \
     -I$(top_srcdir)/src/include                               \
-    -I$(top_srcdir)/src/inet                                  \
     -I$(top_srcdir)/src/lib                                   \
-    -I$(top_srcdir)/src/lib/core                              \
-    -I$(top_srcdir)/src/lib/support                           \
-    -I$(top_srcdir)/src/system                                \
     -I$(top_srcdir)/src/app/chip-zcl                          \
     -I$(top_srcdir)/src/app/gen                               \
-    -I$(top_srcdir)/src/transport                             \
     $(NLASSERT_CPPFLAGS)                                      \
     $(NLFAULTINJECTION_CPPFLAGS)                              \
     $(NLIO_CPPFLAGS)                                          \
