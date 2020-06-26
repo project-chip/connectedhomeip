@@ -38,6 +38,8 @@
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 
+#include <string.h>
+
 using namespace chip;
 using namespace chip::TLV;
 
@@ -375,16 +377,17 @@ void WriteEncoding1(nlTestSuite * inSuite, TLVWriter & writer)
         err = writer2.OpenContainer(ContextTag(0), kTLVType_Array, writer3);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = writer3.Put(AnonymousTag, 42);
+        // TODO(#1306): expand coverage of inttype encoding tests.
+        err = writer3.Put(AnonymousTag, static_cast<int32_t>(42));
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = writer3.Put(AnonymousTag, -17);
+        err = writer3.Put(AnonymousTag, static_cast<int32_t>(-17));
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = writer3.Put(AnonymousTag, -170000);
+        err = writer3.Put(AnonymousTag, static_cast<int32_t>(-170000));
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = writer3.Put(AnonymousTag, (uint64_t) 40000000000ULL);
+        err = writer3.Put(AnonymousTag, static_cast<uint64_t>(40000000000ULL));
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         {
