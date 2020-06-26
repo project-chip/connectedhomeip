@@ -2,4 +2,4 @@
 
 build_dir=build/default
 
-(cd $build_dir && ninja clean)
+(cd "$build_dir" && ninja clean)
