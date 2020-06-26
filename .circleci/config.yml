@@ -198,6 +198,9 @@ jobs:
     steps:
     - checkout
     - run:
+        command: make -f Makefile-bootstrap repos
+        name: Prepare third_party repos
+    - run:
         command: |
           cmake -B build/standalone -GNinja
           ninja -C build/standalone

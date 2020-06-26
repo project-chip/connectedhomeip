@@ -4,6 +4,9 @@ executor: cmake-ninja
 steps:
     - checkout
     - run:
+        name: Prepare third_party repos
+        command: make -f Makefile-bootstrap repos
+    - run:
         name: Cmake/ninja build of standalone host build
         command: |
             cmake -B build/standalone -GNinja
