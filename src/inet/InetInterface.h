@@ -35,10 +35,16 @@
 #include <lwip/netif.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 struct if_nameindex;
 struct ifaddrs;
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+struct net_if;
+struct net_if_ipv4;
+struct net_if_ipv6;
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
 #include <stddef.h>
 #include <stdint.h>
@@ -68,9 +74,13 @@ class IPPrefix;
 typedef struct netif * InterfaceId;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 typedef unsigned InterfaceId;
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_USE_NETWORK_FRAMEWORK
+#endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+typedef int InterfaceId;
+#endif
 
 /**
  * @def     INET_NULL_INTERFACEID
@@ -88,9 +98,9 @@ typedef unsigned InterfaceId;
 #define INET_NULL_INTERFACEID NULL
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS || CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 #define INET_NULL_INTERFACEID 0
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_USE_NETWORK_FRAMEWORK
+#endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS || CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
 /**
  * @brief   Test \c ID for inequivalence with \c INET_NULL_INTERFACEID
@@ -146,14 +156,19 @@ protected:
     struct netif * mCurNetif;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
     struct if_nameindex * mIntfArray;
     size_t mCurIntf;
     short mIntfFlags;
     bool mIntfFlagsCached;
 
     short GetFlags(void);
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+    InterfaceId mCurrentId     = 1;
+    net_if * mCurrentInterface = nullptr;
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 };
 
 /**
@@ -208,10 +223,16 @@ private:
     int mCurAddrIndex;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
     struct ifaddrs * mAddrsList;
     struct ifaddrs * mCurAddr;
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+    InterfaceIterator mIntfIter;
+    net_if_ipv6 * mIpv6 = nullptr;
+    int mCurAddrIndex   = -1;
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 };
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -241,6 +262,11 @@ inline InterfaceAddressIterator::InterfaceAddressIterator(void)
 inline InterfaceAddressIterator::~InterfaceAddressIterator(void) {}
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+inline InterfaceIterator::~InterfaceIterator()               = default;
+inline InterfaceAddressIterator::~InterfaceAddressIterator() = default;
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
 /**
  * @brief    Deprecated alias for \c GetInterfaceId(void)

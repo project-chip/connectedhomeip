@@ -60,6 +60,7 @@ CHIP_BUILD_INET_LAYER_HEADER_FILES                         = \
     @top_builddir@/src/inet/TCPEndPoint.h                    \
     @top_builddir@/src/inet/TunEndPoint.h                    \
     @top_builddir@/src/inet/UDPEndPoint.h                    \
+    @top_builddir@/src/inet/ZephyrSocketHacks.h              \
     $(NULL)
 
 if INET_WANT_ENDPOINT_DNS

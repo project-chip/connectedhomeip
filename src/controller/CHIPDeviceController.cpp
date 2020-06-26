@@ -283,6 +283,7 @@ void ChipDeviceController::ServiceEvents()
     aSleepTime.tv_sec  = 0;
     aSleepTime.tv_usec = 100 * 1000;
 
+#if !__ZEPHYR__
     static bool printed = false;
 
     if (!printed)
@@ -292,6 +293,7 @@ void ChipDeviceController::ServiceEvents()
             printed = true;
         }
     }
+#endif // !__ZEPHYR__
     fd_set readFDs, writeFDs, exceptFDs;
     int numFDs = 0;
 
