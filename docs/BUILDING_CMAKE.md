@@ -148,4 +148,5 @@ To build other platforms, pass the CHIP_PLATFORM parameter.
   ninja -C build/nrf
 ```
 
-Currently supported platforms are `standalone` (default), `linux`, and `nrf52840`.
+Currently supported platforms are `standalone` (default), `linux`, and
+`nrf52840`.
