@@ -167,7 +167,7 @@ static NSString * const ipKey = @"ipk";
         self->_versionLabel.text = [NSString stringWithFormat:@"%@", payload.version];
         self->_discriminatorLabel.text = [NSString stringWithFormat:@"%@", payload.discriminator];
         self->_setupPinCodeLabel.text = [NSString stringWithFormat:@"%@", payload.setUpPINCode];
-        self->_rendezVousInformation.text = [NSString stringWithFormat:@"%@", payload.rendezvousInformation];
+        self->_rendezVousInformation.text = [NSString stringWithFormat:@"%lu", payload.rendezvousInformation];
         if ([payload.serialNumber length] > 0) {
             self->_serialNumber.text = payload.serialNumber;
         } else {
