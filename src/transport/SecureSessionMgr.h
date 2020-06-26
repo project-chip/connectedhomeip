@@ -68,7 +68,7 @@ public:
      *   Called when received message processing resulted in error
      *
      * @param error error code
-     * @param source network entity that sent the message 
+     * @param source network entity that sent the message
      */
     virtual void OnReceiveError(CHIP_ERROR error, const Inet::IPPacketInfo & source) {}
 
@@ -141,7 +141,7 @@ public:
      * @details
      *   Release if there was an existing callback object
      */
-    void AssignCallbackObject(SecureSessionMgrCallback * cb)
+    void SetDelegate(SecureSessionMgrCallback * cb)
     {
         if (mCB != nullptr)
         {

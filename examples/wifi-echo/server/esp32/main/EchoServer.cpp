@@ -259,7 +259,7 @@ void setupTransport(IPAddressType type, SecureSessionMgr * transport, EchoServer
 
     cb->mTransport = transport;
 
-    transport->AssignCallbackObject(cb);
+    transport->SetDelegate(cb);
 
 exit:
     if (err != CHIP_NO_ERROR)
