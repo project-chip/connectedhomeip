@@ -103,11 +103,9 @@ INET_ERROR DNSResolver::Resolve(const char * hostName, uint16_t hostNameLen, uin
     // Check that the supplied options are valid.
     if ((addrFamilyOption != kDNSOption_AddrFamily_Any &&
 #if INET_CONFIG_ENABLE_IPV4
-         addrFamilyOption != kDNSOption_AddrFamily_IPv4Only &&
-         addrFamilyOption != kDNSOption_AddrFamily_IPv4Preferred &&
+         addrFamilyOption != kDNSOption_AddrFamily_IPv4Only && addrFamilyOption != kDNSOption_AddrFamily_IPv4Preferred &&
 #endif
-	 addrFamilyOption != kDNSOption_AddrFamily_IPv6Only &&
-         addrFamilyOption != kDNSOption_AddrFamily_IPv6Preferred) ||
+         addrFamilyOption != kDNSOption_AddrFamily_IPv6Only && addrFamilyOption != kDNSOption_AddrFamily_IPv6Preferred) ||
         (optionFlags & ~kDNSOption_ValidFlags) != 0)
     {
         Release();
