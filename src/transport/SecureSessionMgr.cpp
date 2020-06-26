@@ -57,6 +57,8 @@ CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, Inet::InetLayer * inet, co
     SuccessOrExit(err);
 
     mTransport.SetMessageReceiveHandler(HandleUdpDataReceived, this);
+    mPeerConnections.SetConnectionExpiredHandler(HandleConnectionExpired, this);
+
     mState       = State::kInitialized;
     mLocalNodeId = localNodeId;
     mSystemLayer = inet->SystemLayer();
@@ -195,6 +197,10 @@ void SecureSessionMgr::HandleUdpDataReceived(const MessageHeader & header, const
             err = connection->AllocateNewConnection(header, peerAddress, &state);
             SuccessOrExit(err);
         }
+        else
+        {
+            connection->mPeerConnections.MarkConnectionActive(state);
+        }
     }
 
     // TODO this is where messages should be decoded
@@ -239,6 +245,14 @@ exit:
             connection->OnReceiveError(err, pktInfo);
         }
     }
+}
+
+void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionState & state, SecureSessionMgr * mgr)
+{
+    char addr[Transport::PeerAddress::kMaxToStringSize];
+    state.GetPeerAddress().ToString(addr, sizeof(addr));
+
+    ChipLogProgress(Inet, "Connection from '%s' expired", addr);
 }
 
 void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error)

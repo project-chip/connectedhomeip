@@ -182,6 +182,11 @@ private:
                                       System::PacketBuffer * msgBuf, SecureSessionMgr * transport);
 
     /**
+     * Called when a specific connection expires.
+     */
+    static void HandleConnectionExpired(const Transport::PeerConnectionState & state, SecureSessionMgr * mgr);
+
+    /**
      * Callback for timer expiry check
      */
     static void ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error);
