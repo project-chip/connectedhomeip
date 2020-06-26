@@ -231,8 +231,8 @@ static int TestSetup(void * aContext)
 
     sys_mbox_new(sLwIPEventQueue, 100);
     lLayerContext = &sLwIPEventQueue;
-#endif
     tcpip_init(NULL, NULL);
+#endif
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     sLayer.Init(lLayerContext);
