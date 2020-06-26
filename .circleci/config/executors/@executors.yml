@@ -27,4 +27,4 @@ clang-build:
         - image: connectedhomeip/chip-build:0.2.14
 cmake-ninja:
     docker:
-        - image: connectedhomeip/chip-build-nrf-platform:0.2.14
+        - image: connectedhomeip/chip-build-nrf-platform:0.2.16
