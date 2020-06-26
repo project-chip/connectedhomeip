@@ -72,6 +72,7 @@ CHIP_LDADD                                      = \
     $(top_builddir)/src/platform/libDeviceLayer.a \
     $(top_builddir)/src/inet/libInetLayer.a       \
     $(top_builddir)/src/system/libSystemLayer.a   \
+    $(top_builddir)/src/crypto/libChipCrypto.a    \
     $(top_builddir)/src/lib/support/libSupportLayer.a   \
     $(NULL)
 
