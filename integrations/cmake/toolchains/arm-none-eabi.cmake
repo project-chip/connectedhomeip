@@ -6,11 +6,12 @@ set(CMAKE_SYSTEM_NAME Generic)
 # Set processor type
 set(CMAKE_SYSTEM_PROCESSOR arm)
 
-SET(CMAKE_CROSSCOMPILING 1)
+set(CMAKE_CROSSCOMPILING 1)
 
-set(CMAKE_ASM_COMPILER "arm-none-eabi-gcc")   # Pass: -x assembler-with-cpp
-set(CMAKE_C_COMPILER "arm-none-eabi-gcc")
-set(CMAKE_CXX_COMPILER "arm-none-eabi-g++")
-set(CMAKE_LINKER "arm-none-eabi-g++")         # Always link C++ with g++
+set(ARM_GCC_INSTALL_ROOT $ENV{ARM_GCC_INSTALL_ROOT})
+set(CROSSCOMPILE_PREFIX "${ARM_GCC_INSTALL_ROOT}/arm-none-eabi-")
 
-# -ffunction-sections -fdata-sections -fno-strict-aliasing -fshort-enums --specs=nosys.specs
+set(CMAKE_ASM_COMPILER "${CROSSCOMPILE_PREFIX}gcc")   # Pass: -x assembler-with-cpp
+set(CMAKE_C_COMPILER "${CROSSCOMPILE_PREFIX}gcc")
+set(CMAKE_CXX_COMPILER "${CROSSCOMPILE_PREFIX}g++")
+set(CMAKE_LINKER "${CROSSCOMPILE_PREFIX}g++")         # Always link C++ with g++ rather than gcc or ld
