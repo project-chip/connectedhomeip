@@ -199,19 +199,19 @@ jobs:
     - checkout
     - run:
         command: |
-          cmake -B build/standalone
+          cmake -B build/standalone -GNinja
           ninja -C build/standalone
           ninja -C build/standalone test
         name: Cmake/ninja build of standalone host build
     - run:
         command: |
-          cmake -B build/linux -DCHIP_PLATFORM=linux
+          cmake -B build/linux -GNinja -DCHIP_PLATFORM=linux
           ninja -C build/linux
           ninja -C build/linux test
         name: Cmake/ninja build of Linux embedded (x86)
     - run:
         command: |
-          cmake -B build/nrf52840 -DCHIP_PLATFORM=nrf52840
+          cmake -B build/nrf52840 -GNinja -DCHIP_PLATFORM=nrf52840
           ninja -C build/nrf52840
         name: Cmake/ninja build of Nordic nRF52840
   Run Tests [linux-embedded]:
