@@ -24,6 +24,7 @@
 #ifndef REFERENCE_COUNTED_H_
 #define REFERENCE_COUNTED_H_
 
+#include <limits>
 #include <stdlib.h>
 
 namespace chip {
@@ -38,10 +39,12 @@ class ReferenceCounted
 public:
     virtual ~ReferenceCounted() {}
 
+    typedef uint32_t count_type;
+
     /** Adds one to the usage count of this class */
     SUBCLASS * Retain(void)
     {
-        if (mRefCount == UINT8_MAX)
+        if (mRefCount == std::numeric_limits<count_type>::max())
         {
             abort();
         }
@@ -65,10 +68,10 @@ public:
     }
 
     /** Get the current reference counter value */
-    uint8_t GetReferenceCount() const { return mRefCount; }
+    count_type GetReferenceCount() const { return mRefCount; }
 
 private:
-    uint8_t mRefCount = 1;
+    count_type mRefCount = 1;
 };
 
 } // namespace chip

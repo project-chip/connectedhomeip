@@ -75,9 +75,9 @@ CHIP_ERROR SecureSessionMgr::Connect(NodeId peerNodeId, const Transport::PeerAdd
     //   - on new connection for other transports may not be inline.
     //   - determine if logic is required to prevent multiple connections to the
     //     same node or if some connection reuse is required.
-    if (OnNewConnection)
+    if (mCB != nullptr)
     {
-        OnNewConnection(state, mNewConnectionArgument);
+        mCB->OnNewConnection(state);
     }
 
 exit:
@@ -142,14 +142,15 @@ CHIP_ERROR SecureSessionMgr::AllocateNewConnection(const MessageHeader & header,
         (*state)->SetPeerNodeId(header.GetSourceNodeId().Value());
     }
 
-    if (OnNewConnection)
+    if (mCB != nullptr)
     {
-        OnNewConnection(*state, mNewConnectionArgument);
+        mCB->OnNewConnection(*state);
     }
 
 exit:
     return err;
 }
+
 void SecureSessionMgr::HandleUdpDataReceived(const MessageHeader & header, const IPPacketInfo & pktInfo, System::PacketBuffer * msg,
                                              SecureSessionMgr * connection)
 
@@ -189,9 +190,9 @@ void SecureSessionMgr::HandleUdpDataReceived(const MessageHeader & header, const
         err = state->GetSecureSession().Decrypt(data, len, plainText, header);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Inet, "Secure transport failed to decrypt msg: err %d", err));
 
-        if (connection->OnMessageReceived)
+        if (connection->mCB != nullptr)
         {
-            connection->OnMessageReceived(header, state, msg, connection->mMessageReceivedArgument);
+            connection->mCB->OnMessageReceived(header, state, msg);
             msg = nullptr;
         }
     }
@@ -207,12 +208,9 @@ exit:
         PacketBuffer::Free(msg);
     }
 
-    if (err != CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR && connection->mCB != nullptr)
     {
-        if (connection->OnReceiveError)
-        {
-            connection->OnReceiveError(err, pktInfo);
-        }
+        connection->mCB->OnReceiveError(err, pktInfo);
     }
 }
 

@@ -59,46 +59,51 @@ const uint8_t remote_public_key[] = { 0x04, 0x30, 0x77, 0x2c, 0xe7, 0xd4, 0x0a, 
                                       0x44, 0x72, 0x1b, 0xcd, 0xb9, 0x02, 0x53, 0xd9, 0xaf, 0xcc, 0x1a, 0xcd, 0xae,
                                       0xe8, 0x87, 0x2e, 0x52, 0x3b, 0x98, 0xf0, 0xa1, 0x88, 0x4a, 0xe3, 0x03, 0x75 };
 
-void newConnectionHandler(PeerConnectionState * state, SecureSessionMgr * transport)
+class ServerCallback : public SecureSessionMgrCallback
 {
-    CHIP_ERROR err;
-
-    NRF_LOG_INFO("Received a new connection.");
-
-    err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key,
-                                                               sizeof(local_private_key));
-    VerifyOrExit(err == CHIP_NO_ERROR, NRF_LOG_INFO("Failed to setup encryption"));
-
-exit:
-    return;
-}
-
-static void OnRecv(const MessageHeader & header, PeerConnectionState * state, System::PacketBuffer * buffer,
-                   SecureSessionMgr * transport)
-{
-    const size_t data_len = buffer->DataLength();
-    char src_addr[PeerAddress::kMaxToStringSize];
-
-    // as soon as a client connects, assume it is connected
-    VerifyOrExit(transport != NULL && buffer != NULL, NRF_LOG_INFO("Received data but couldn't process it..."));
-    VerifyOrExit(header.GetSourceNodeId().HasValue(), NRF_LOG_INFO("Unknown source for received message"));
-
-    VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, NRF_LOG_INFO("Unknown source for received message"));
-
-    state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
-
-    NRF_LOG_INFO("Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
-
-    HandleDataModelMessage(buffer);
-    buffer = NULL;
-
-exit:
-    // SendTo calls Free on the buffer without an AddRef, if SendTo was not called, free the buffer.
-    if (buffer != NULL)
+public:
+    virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
+                          System::PacketBuffer * buffer)
     {
-        System::PacketBuffer::Free(buffer);
+        const size_t data_len = buffer->DataLength();
+        char src_addr[PeerAddress::kMaxToStringSize];
+
+        // as soon as a client connects, assume it is connected
+        VerifyOrExit(buffer != NULL, NRF_LOG_INFO("Received data but couldn't process it..."));
+        VerifyOrExit(header.GetSourceNodeId().HasValue(), NRF_LOG_INFO("Unknown source for received message"));
+
+        VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, NRF_LOG_INFO("Unknown source for received message"));
+
+        state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
+
+        NRF_LOG_INFO("Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
+
+        HandleDataModelMessage(buffer);
+        buffer = NULL;
+
+    exit:
+        // SendTo calls Free on the buffer without an AddRef, if SendTo was not called, free the buffer.
+        if (buffer != NULL)
+        {
+            System::PacketBuffer::Free(buffer);
+        }
     }
-}
+
+    virtual void OnNewConnection(Transport::PeerConnectionState * state) {
+        CHIP_ERROR err;
+
+        NRF_LOG_INFO("Received a new connection.");
+
+        err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key,
+                                                                sizeof(local_private_key));
+        VerifyOrExit(err == CHIP_NO_ERROR, NRF_LOG_INFO("Failed to setup encryption"));
+
+    exit:
+        return;
+    }
+};
+
+static ServerCallback gCallbacks;
 
 } // namespace
 
@@ -106,12 +111,12 @@ exit:
 void SetupTransport(IPAddressType type, SecureSessionMgr * transport)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    
 
     err = transport->Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::InetLayer, UdpListenParameters().SetAddressType(type));
     SuccessOrExit(err);
 
-    transport->SetMessageReceiveHandler(OnRecv, transport);
-    transport->SetNewConnectionHandler(newConnectionHandler, transport);
+    transport->AssignCallbackObject(&gCallbacks);
 
 exit:
     if (err != CHIP_NO_ERROR)
