@@ -160,7 +160,7 @@ static NSString * const ipKey = @"ipk";
     }
     self->_setupPayloadView.hidden = NO;
     self->_resetButton.hidden = NO;
-    
+
     [self updateUIFields:payload decimalString:decimalString];
     [self parseOptionalData:payload];
     [self handleRendezVous:payload];
@@ -184,7 +184,7 @@ static NSString * const ipKey = @"ipk";
             self->_serialNumber.text = NOT_APPLICABLE_STRING;
         }
     }
-    
+
     _discriminatorLabel.text = [NSString stringWithFormat:@"%@", payload.discriminator];
     _setupPinCodeLabel.text = [NSString stringWithFormat:@"%@", payload.setUpPINCode];
     // TODO: Only display vid and pid if present
@@ -199,7 +199,7 @@ static NSString * const ipKey = @"ipk";
     if (!isSameVendorID) {
         return;
     }
-    
+
     NSArray * optionalInfo = [payload getAllOptionalVendorData:nil];
     for (CHIPOptionalQRCodeInfo * info in optionalInfo) {
         NSNumber * tag = info.tag;
@@ -223,7 +223,7 @@ static NSString * const ipKey = @"ipk";
                 _ssidKey = infoValue;
             }
             break;
-                    
+
         case EXAMPLE_VENDOR_TAG_IP:
             if ([infoValue length] > MAX_IP_LEN) {
                 NSLog(@"Unexpected IP String... %@", infoValue);
@@ -271,7 +271,7 @@ static NSString * const ipKey = @"ipk";
         NSLog(@"Can not retrieved SSID");
         return;
     }
-    
+
     NSString * message = [NSString stringWithFormat:@"SSID: %@\n\nUse WiFi Settings to connect to it.", ssid];
     UIAlertController * alert = [UIAlertController alertControllerWithTitle:@"SoftAP Detected"
                                                                     message:message
