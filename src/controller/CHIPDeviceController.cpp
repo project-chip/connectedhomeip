@@ -151,6 +151,8 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress 
     err = mSessionManager->Init(mLocalDeviceId, mInetLayer, Transport::UdpListenParameters().SetAddressType(deviceAddr.Type()));
     SuccessOrExit(err);
 
+    mSessionManager->SetDelegate(&mCallback);
+
     // connected state before 'OnConnect' so that key exchange is accepted
     mConState = kConnectionState_Connected;
 
