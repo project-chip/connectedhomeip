@@ -213,8 +213,7 @@ static NSString * const ipKey = @"ipk";
         }
 
         NSString * infoValue = info.stringValue;
-        switch (tag.unsignedCharValue)
-        {
+        switch (tag.unsignedCharValue) {
         case EXAMPLE_VENDOR_TAG_SSID:
             if ([infoValue length] > MAX_SSID_LEN) {
                 NSLog(@"Unexpected SSID String...");
@@ -238,8 +237,7 @@ static NSString * const ipKey = @"ipk";
 
 - (void)handleRendezVous:(CHIPSetupPayload *)payload
 {
-    switch (payload.rendezvousInformation)
-    {
+    switch (payload.rendezvousInformation) {
     case kRendezvousInformationNone:
     case kRendezvousInformationThread:
     case kRendezvousInformationEthernet:
