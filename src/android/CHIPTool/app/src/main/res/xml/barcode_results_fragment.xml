@@ -13,11 +13,12 @@
         android:layout_marginBottom="10dp"/>
 
     <TextView
-        android:text="Please manually pair with this device's soft AP using the information below."
+        android:text="Please manually connect to this device's soft AP using the information below."
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"/>
 
     <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
