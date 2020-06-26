@@ -116,7 +116,7 @@ void SetupTransport(IPAddressType type, SecureSessionMgr * transport)
     err = transport->Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::InetLayer, UdpListenParameters().SetAddressType(type));
     SuccessOrExit(err);
 
-    transport->AssignCallbackObject(&gCallbacks);
+    transport->SetDelegate(&gCallbacks);
 
 exit:
     if (err != CHIP_NO_ERROR)

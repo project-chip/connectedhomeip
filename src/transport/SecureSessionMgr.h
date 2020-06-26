@@ -125,7 +125,7 @@ public:
      * @details
      *   Release if there was an existing callback object
      */
-    void AssignCallbackObject(SecureSessionMgrCallback * cb)
+    void SetDelegate(SecureSessionMgrCallback * cb)
     {
         if (mCB != nullptr)
         {

@@ -183,7 +183,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     TestSessMgrCallback cb;
     cb.mSuite = inSuite;
 
-    conn.AssignCallbackObject(&cb);
+    conn.SetDelegate(&cb);
 
     cb.NewConnectionHandlerCallCount = 0;
     err                              = conn.Connect(kDestinationNodeId, Transport::PeerAddress::UDP(addr));
