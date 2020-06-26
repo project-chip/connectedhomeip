@@ -41,7 +41,7 @@ public:
     /** Adds one to the usage count of this class */
     SUBCLASS * Retain(void)
     {
-        if (mRefCount < UINT8_MAX)
+        if (mRefCount == UINT8_MAX)
         {
             abort();
         }
@@ -53,7 +53,7 @@ public:
     /** Release usage of this class */
     void Release(void)
     {
-        if (mRefCount != 0)
+        if (mRefCount == 0)
         {
             abort();
         }
