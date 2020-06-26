@@ -192,7 +192,7 @@ jobs:
         - build/downloads
   Build and Test [Cmake Ninja]:
     docker:
-    - image: connectedhomeip/chip-build-nrf-platform:0.2.14
+    - image: connectedhomeip/chip-build-nrf-platform:0.2.16
     environment:
     - BUILD_TYPE: cmake-ninja
     steps:
