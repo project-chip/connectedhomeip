@@ -190,6 +190,30 @@ jobs:
         key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-mbedtls-build-built
         paths:
         - build/downloads
+  Build and Test [Cmake Ninja]:
+    docker:
+    - image: connectedhomeip/chip-build-nrf-platform:0.2.14
+    environment:
+    - BUILD_TYPE: cmake-ninja
+    steps:
+    - checkout
+    - run:
+        command: |
+          cmake -B build/standalone
+          ninja -C build/standalone
+          ninja -C build/standalone test
+        name: Cmake/ninja build of standalone host build
+    - run:
+        command: |
+          cmake -B build/linux -DCHIP_PLATFORM=linux
+          ninja -C build/linux
+          ninja -C build/linux test
+        name: Cmake/ninja build of Linux embedded (x86)
+    - run:
+        command: |
+          cmake -B build/nrf52840 -DCHIP_PLATFORM=nrf52840
+          ninja -C build/nrf52840
+        name: Cmake/ninja build of Nordic nRF52840
   Run Tests [linux-embedded]:
     docker:
     - image: connectedhomeip/chip-build:0.2.14
@@ -509,6 +533,11 @@ workflows:
             - /restyled.*/
         requires:
         - Run Tests [main-build]
+    - Build and Test [Cmake Ninja]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
     - Build Examples [nRF]:
         filters:
           branches:
