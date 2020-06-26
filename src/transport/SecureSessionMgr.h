@@ -40,6 +40,49 @@ namespace chip {
 
 using namespace System;
 
+/**
+ * @brief
+ *   This class provides a skeleton for the callback functions. The functions will be
+ *   called by SecureSssionMgr object on specific events. If the user of SecureSessionMgr
+ *   is interested in receiving these callbacks, they can specialize this class and handle
+ *   each trigger in their implementation of this class.
+ */
+class DLL_EXPORT SecureSessionMgrCallback : public ReferenceCounted<SecureSessionMgrCallback>
+{
+public:
+    /**
+     * @brief
+     *   Called when a new message is received. The function must internally release the
+     *   msgBuf after processing it.
+     *
+     * @param header  messageheader
+     * @param state connection state
+     * @param msgBuf received message
+     */
+    virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
+                                   System::PacketBuffer * msgBuf)
+    {}
+
+    /**
+     * @brief
+     *   Called when received message processing resulted in error
+     *
+     * @param error error code
+     * @param source network entity that sent the message 
+     */
+    virtual void OnReceiveError(CHIP_ERROR error, const Inet::IPPacketInfo & source) {}
+
+    /**
+     * @brief
+     *   Called when a new connection is being established
+     *
+     * @param state connection state
+     */
+    virtual void OnNewConnection(Transport::PeerConnectionState * state) {}
+
+    virtual ~SecureSessionMgrCallback() {}
+};
+
 class DLL_EXPORT SecureSessionMgr : public ReferenceCounted<SecureSessionMgr>
 {
 public:
@@ -83,47 +126,28 @@ public:
     CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf);
 
     SecureSessionMgr();
-    virtual ~SecureSessionMgr();
-
-    /**
-     * Sets the message receive handler and associated argument
-     *
-     * @param[in] handler The callback to call when a message is received
-     * @param[in] param   The argument to pass in to the handler function
-     *
-     */
-    template <class T>
-    void SetMessageReceiveHandler(void (*handler)(const MessageHeader &, Transport::PeerConnectionState *, System::PacketBuffer *,
-                                                  T *),
-                                  T * param)
+    virtual ~SecureSessionMgr()
     {
-        mMessageReceivedArgument = param;
-        OnMessageReceived        = reinterpret_cast<MessageReceiveHandler>(handler);
+        if (mCB != nullptr)
+        {
+            mCB->Release();
+        }
     }
 
     /**
-     * Sets the receive error handler and associated argument
+     * @brief
+     *   Set the callback object.
      *
-     * @param[in] handler The callback to call on receive error
-     *
+     * @details
+     *   Release if there was an existing callback object
      */
-    void SetReceiveErrorHandler(void (*handler)(CHIP_ERROR, const Inet::IPPacketInfo &))
+    void AssignCallbackObject(SecureSessionMgrCallback * cb)
     {
-        OnReceiveError = reinterpret_cast<ReceiveErrorHandler>(handler);
-    }
-
-    /**
-     * Sets the new connection handler and associated argument
-     *
-     * @param[in] handler The callback to call when a message is received
-     * @param[in] param   The argument to pass in to the handler function
-     *
-     */
-    template <class T>
-    void SetNewConnectionHandler(void (*handler)(Transport::PeerConnectionState *, T *), T * param)
-    {
-        mNewConnectionArgument = param;
-        OnNewConnection        = reinterpret_cast<NewConnectionHandler>(handler);
+        if (mCB != nullptr)
+        {
+            mCB->Release();
+        }
+        mCB = cb->Retain();
     }
 
 private:
@@ -135,26 +159,7 @@ private:
     Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; //< Active connections to other peers
     State mState;                                                                       //< Initialization state of the object
 
-    /**
-     * This function is the application callback that is invoked when a message is received over a
-     * Chip connection.
-     *
-     * @param[in]    msgBuf        A pointer to the PacketBuffer object holding the message.
-     */
-    typedef void (*MessageReceiveHandler)(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                          System::PacketBuffer * msgBuf, void * param);
-
-    MessageReceiveHandler OnMessageReceived = nullptr; ///< Callback on message receiving
-    void * mMessageReceivedArgument         = nullptr; ///< Argument for callback
-
-    typedef void (*ReceiveErrorHandler)(CHIP_ERROR error, const Inet::IPPacketInfo & source);
-
-    ReceiveErrorHandler OnReceiveError = nullptr; ///< Callback on error in message receiving
-
-    typedef void (*NewConnectionHandler)(Transport::PeerConnectionState * state, void * param);
-
-    NewConnectionHandler OnNewConnection = nullptr; ///< Callback for new connection received
-    void * mNewConnectionArgument        = nullptr; ///< Argument for callback
+    SecureSessionMgrCallback * mCB = nullptr;
 
     /** Schedules a new oneshot timer for checking connection expiry. */
     void ScheduleExpiryTimer(void);
