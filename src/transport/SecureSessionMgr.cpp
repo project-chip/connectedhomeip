@@ -108,6 +108,9 @@ CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBuffer
     // Find an active connection to the specified peer node
     VerifyOrExit(mPeerConnections.FindPeerConnectionState(peerNodeId, &state), err = CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
 
+    // This marks any connection where we send data to as 'active'
+    mPeerConnections.MarkConnectionActive(state);
+
     {
         uint8_t * data = msgBuf->Start();
         MessageHeader header;
