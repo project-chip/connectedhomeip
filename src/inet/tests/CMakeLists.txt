@@ -72,7 +72,9 @@ add_executable(TestInetEndPoint
 target_include_directories(TestInetEndPoint PRIVATE ${COMMON_INCLUDES})
 target_link_libraries(TestInetEndPoint PRIVATE ${COMMON_LIBS})
 target_link_directories(TestInetEndPoint PRIVATE ${COMMON_LDPATH})
-add_test(NAME TestInetEndPoint COMMAND TestInetEndPoint)
+
+# Disable based on #500 -- ipv6 support not working in CircleCI Docker
+# add_test(NAME TestInetEndPoint COMMAND TestInetEndPoint)
 
 
 #### TestInetErrorStr
@@ -98,5 +100,7 @@ add_executable(TestInetLayerDNS
 target_include_directories(TestInetLayerDNS PRIVATE ${COMMON_INCLUDES})
 target_link_libraries(TestInetLayerDNS PRIVATE ${COMMON_LIBS})
 target_link_directories(TestInetLayerDNS PRIVATE ${COMMON_LDPATH})
-add_test(NAME TestInetLayerDNS COMMAND TestInetLayerDNS)
+
+# Disable based on #500 -- ipv6 support not working in CircleCI Docker
+# add_test(NAME TestInetLayerDNS COMMAND TestInetLayerDNS)
 endif()
