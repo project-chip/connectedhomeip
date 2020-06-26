@@ -3,17 +3,17 @@
 CHIP_ROOT="$(dirname "$0")"
 
 _chip_red() {
-  echo -e "\033[0;31m$*\033[0m"
+    echo -e "\033[0;31m$*\033[0m"
 }
 
 _chip_yellow() {
-  echo -e "\033[0;33m$*\033[0m"
+    echo -e "\033[0;33m$*\033[0m"
 }
 
 _chip_banner() {
-  _chip_yellow '.--------------------------------'
-  _chip_yellow "-- $1"
-  _chip_yellow "'--------------------------------"
+    _chip_yellow '.--------------------------------'
+    _chip_yellow "-- $1"
+    _chip_yellow "'--------------------------------"
 }
 
 _chip_banner "Environment bringup"
