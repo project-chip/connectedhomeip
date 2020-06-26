@@ -2285,7 +2285,7 @@
  * @def CHIP_PEER_CONNECTION_TIMEOUT_MS
  *
  * @brief After what period of inactivity is a peer connection considered
- * expired. 
+ * expired.
  */
 #ifndef CHIP_PEER_CONNECTION_TIMEOUT_MS
 #define CHIP_PEER_CONNECTION_TIMEOUT_MS      120000
