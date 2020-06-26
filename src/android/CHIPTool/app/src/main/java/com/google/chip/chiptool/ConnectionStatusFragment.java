@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
@@ -13,15 +12,14 @@ import androidx.fragment.app.Fragment;
 // with the CHIP device.
 public class ConnectionStatusFragment extends Fragment {
 
-  public ConnectionStatusFragment() { }
+  public ConnectionStatusFragment() {}
 
   @Override
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     View inflated = inflater.inflate(R.xml.connection_status_fragment, container, false);
 
-    TextView statusView = (TextView) inflated
-            .findViewById(R.id.connection_status);
+    TextView statusView = (TextView) inflated.findViewById(R.id.connection_status);
     statusView.setText(CHIPNativeBridge.getInstance().getConnectionInfo());
 
     return inflated;
@@ -40,7 +38,8 @@ public class ConnectionStatusFragment extends Fragment {
   // Should be called by an activity after status connection has changed or when the
   // activity's view is created.
   public static void updateStatus(AppCompatActivity activity) {
-    ConnectionStatusFragment statusFragment = (ConnectionStatusFragment)
+    ConnectionStatusFragment statusFragment =
+        (ConnectionStatusFragment)
             activity.getSupportFragmentManager().findFragmentById(R.id.connection_status_fragment);
     statusFragment.updateStatusInternal();
   }

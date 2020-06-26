@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
@@ -35,18 +34,16 @@ public class EchoClientActivity extends AppCompatActivity implements View.OnClic
         LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
       View inflated = inflater.inflate(R.xml.echo_client_fragment, container, false);
 
-      inflated
-              .findViewById(R.id.send_echo_request)
-              .setOnClickListener(activity);
+      inflated.findViewById(R.id.send_echo_request).setOnClickListener(activity);
 
       inflated
-              .findViewById(R.id.back)
-              .setOnClickListener(
-                      new View.OnClickListener() {
-                        public void onClick(View v) {
-                          activity.finish();
-                        }
-                      });
+          .findViewById(R.id.back)
+          .setOnClickListener(
+              new View.OnClickListener() {
+                public void onClick(View v) {
+                  activity.finish();
+                }
+              });
 
       ConnectionStatusFragment.updateStatus(activity);
       return inflated;
@@ -64,5 +61,4 @@ public class EchoClientActivity extends AppCompatActivity implements View.OnClic
       ConnectionStatusFragment.updateStatus(this);
     }
   }
-
 }
