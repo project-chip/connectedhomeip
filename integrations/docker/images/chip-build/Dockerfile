@@ -15,8 +15,6 @@ RUN set -x \
     automake \
     libtool \
     pkg-config \
-    cmake \
-    ninja-build \
     g++ \
     clang-9 \
     clang-format-9 \
