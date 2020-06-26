@@ -144,10 +144,8 @@ This command fixes any style violations:
 To build other platforms, pass the CHIP_PLATFORM parameter.
 
 ```
-  mkdir -p build/nrf5
-  cd build/nrf5
-  cmake -GNinja ../.. -DCHIP_PLATFORM=nrf52840
-  ninja
+  cmake -B build/nrf -GNinja -DCHIP_PLATFORM=nrf52840
+  ninja -C build/nrf
 ```
 
 Currently supported platforms are `standalone` (default), `linux`, and `nrf52840`.
