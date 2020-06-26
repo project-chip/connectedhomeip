@@ -609,4 +609,48 @@ struct LwIPEvent;
 #define CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD 946684800
 #endif // CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD
 
+/**
+ *  @def CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_HACKS
+ *
+ *  @brief
+ *      Include missing functions for Zephyr sockets
+ *
+ *  Zephyr socket API lacks some of the functions required by CHIP, e.g. getsockname, recvmsg.
+ *
+ *  By default, provide the necessary functions on Zephyr platforms using sockets
+ */
+#ifndef CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_HACKS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && __ZEPHYR__
+#define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_HACKS 1
+#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_HACKS
+
+/**
+ *  @def CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+ *
+ *  @brief
+ *      Use Zephyr net_if API to enumerate available network interfaces
+ *
+ *  Defaults to enabled on Zephyr platforms using sockets
+ */
+#ifndef CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && __ZEPHYR__
+#define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF 1
+#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+
+/**
+ *  @def CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+ *
+ *  @brief
+ *      Use BSD ifaddrs.h API to enumerate available network interfaces
+ *
+ *  Defaults to enabled on Unix/Linux platforms using sockets
+ */
+#ifndef CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+#if (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK) && !__ZEPHYR__
+#define CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS 1
+#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+
 #endif // defined(SYSTEMCONFIG_H)

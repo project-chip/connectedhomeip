@@ -67,28 +67,32 @@
  * parallelism with IPv4 and create the alias to the availabile
  * definitions.
  */
-#if !defined(IPV6_ADD_MEMBERSHIP) && defined(IPV6_JOIN_GROUP)
-#define INET_IPV6_ADD_MEMBERSHIP IPV6_JOIN_GROUP
-#elif defined(IPV6_ADD_MEMBERSHIP)
+#if defined(IPV6_ADD_MEMBERSHIP)
 #define INET_IPV6_ADD_MEMBERSHIP IPV6_ADD_MEMBERSHIP
-#else
+#elif defined(IPV6_JOIN_GROUP)
+#define INET_IPV6_ADD_MEMBERSHIP IPV6_JOIN_GROUP
+#elif !__ZEPHYR__
 #error                                                                                                                             \
     "Neither IPV6_ADD_MEMBERSHIP nor IPV6_JOIN_GROUP are defined which are required for generalized IPv6 multicast group support."
-#endif // !defined(IPV6_ADD_MEMBERSHIP) && defined(IPV6_JOIN_GROUP)
+#endif // IPV6_ADD_MEMBERSHIP
 
-#if !defined(IPV6_DROP_MEMBERSHIP) && defined(IPV6_LEAVE_GROUP)
-#define INET_IPV6_DROP_MEMBERSHIP IPV6_LEAVE_GROUP
-#elif defined(IPV6_DROP_MEMBERSHIP)
+#if defined(IPV6_DROP_MEMBERSHIP)
 #define INET_IPV6_DROP_MEMBERSHIP IPV6_DROP_MEMBERSHIP
-#else
+#elif defined(IPV6_LEAVE_GROUP)
+#define INET_IPV6_DROP_MEMBERSHIP IPV6_LEAVE_GROUP
+#elif !__ZEPHYR__
 #error                                                                                                                             \
     "Neither IPV6_DROP_MEMBERSHIP nor IPV6_LEAVE_GROUP are defined which are required for generalized IPv6 multicast group support."
-#endif // !defined(IPV6_DROP_MEMBERSHIP) && defined(IPV6_LEAVE_GROUP)
+#endif // IPV6_DROP_MEMBERSHIP
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #define INET_PORTSTRLEN 6
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_HACKS
+#include "ZephyrSocketHacks.h"
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_HACKS
 
 namespace chip {
 namespace Inet {
@@ -209,6 +213,7 @@ exit:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if IP_MULTICAST_LOOP || IPV6_MULTICAST_LOOP
 static INET_ERROR SocketsSetMulticastLoopback(int aSocket, bool aLoopback, int aProtocol, int aOption)
 {
     INET_ERROR lRetval = INET_NO_ERROR;
@@ -221,9 +226,11 @@ static INET_ERROR SocketsSetMulticastLoopback(int aSocket, bool aLoopback, int a
 exit:
     return (lRetval);
 }
+#endif // IP_MULTICAST_LOOP || IPV6_MULTICAST_LOOP
 
 static INET_ERROR SocketsSetMulticastLoopback(int aSocket, IPVersion aIPVersion, bool aLoopback)
 {
+#ifdef IPV6_MULTICAST_LOOP
     INET_ERROR lRetval;
 
     switch (aIPVersion)
@@ -245,6 +252,9 @@ static INET_ERROR SocketsSetMulticastLoopback(int aSocket, IPVersion aIPVersion,
     }
 
     return (lRetval);
+#else  // IPV6_MULTICAST_LOOP
+    return INET_ERROR_NOT_SUPPORTED;
+#endif // IPV6_MULTICAST_LOOP
 }
 
 #if INET_CONFIG_ENABLE_IPV4
@@ -285,6 +295,7 @@ exit:
 }
 #endif // INET_CONFIG_ENABLE_IPV4
 
+#if INET_IPV6_ADD_MEMBERSHIP || INET_IPV6_DROP_MEMBERSHIP
 static INET_ERROR SocketsIPv6JoinLeaveMulticastGroup(int aSocket, InterfaceId aInterfaceId, const IPAddress & aAddress,
                                                      int aCommand)
 {
@@ -302,6 +313,26 @@ static INET_ERROR SocketsIPv6JoinLeaveMulticastGroup(int aSocket, InterfaceId aI
 exit:
     return (lRetval);
 }
+#endif // INET_IPV6_ADD_MEMBERSHIP || INET_IPV6_DROP_MEMBERSHIP
+
+static INET_ERROR SocketsIPv6JoinMulticastGroup(int aSocket, InterfaceId aInterfaceId, const IPAddress & aAddress)
+{
+#if INET_IPV6_ADD_MEMBERSHIP
+    return SocketsIPv6JoinLeaveMulticastGroup(aSocket, aInterfaceId, aAddress, INET_IPV6_ADD_MEMBERSHIP);
+#else
+    return INET_ERROR_NOT_SUPPORTED;
+#endif
+}
+
+static INET_ERROR SocketsIPv6LeaveMulticastGroup(int aSocket, InterfaceId aInterfaceId, const IPAddress & aAddress)
+{
+#if INET_IPV6_DROP_MEMBERSHIP
+    return SocketsIPv6JoinLeaveMulticastGroup(aSocket, aInterfaceId, aAddress, INET_IPV6_DROP_MEMBERSHIP);
+#else
+    return INET_ERROR_NOT_SUPPORTED;
+#endif
+}
+
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 /**
@@ -458,7 +489,7 @@ INET_ERROR IPEndPointBasis::JoinMulticastGroup(InterfaceId aInterfaceId, const I
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-        lRetval = SocketsIPv6JoinLeaveMulticastGroup(mSocket, aInterfaceId, aAddress, INET_IPV6_ADD_MEMBERSHIP);
+        lRetval = SocketsIPv6JoinMulticastGroup(mSocket, aInterfaceId, aAddress);
         SuccessOrExit(lRetval);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
     }
@@ -543,7 +574,7 @@ INET_ERROR IPEndPointBasis::LeaveMulticastGroup(InterfaceId aInterfaceId, const 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-        lRetval = SocketsIPv6JoinLeaveMulticastGroup(mSocket, aInterfaceId, aAddress, INET_IPV6_DROP_MEMBERSHIP);
+        lRetval = SocketsIPv6LeaveMulticastGroup(mSocket, aInterfaceId, aAddress);
         SuccessOrExit(lRetval);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
     }
@@ -654,7 +685,6 @@ INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress,
 
         sa.sin6_family   = AF_INET6;
         sa.sin6_port     = htons(aPort);
-        sa.sin6_flowinfo = 0;
         sa.sin6_addr     = aAddress.ToIPv6();
         sa.sin6_scope_id = aInterfaceId;
 
@@ -784,7 +814,6 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     {
         peerSockAddr.in6.sin6_family   = AF_INET6;
         peerSockAddr.in6.sin6_port     = htons(aPktInfo->DestPort);
-        peerSockAddr.in6.sin6_flowinfo = 0;
         peerSockAddr.in6.sin6_addr     = aPktInfo->DestAddress.ToIPv6();
         peerSockAddr.in6.sin6_scope_id = aPktInfo->Interface;
         msgHeader.msg_namelen          = sizeof(sockaddr_in6);
@@ -859,10 +888,9 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
 #endif // !defined(IPV6_PKTINFO)
         }
 
-#else // !(defined(IP_PKTINFO) && defined(IPV6_PKTINFO))
-
+#else  // !(defined(IP_PKTINFO) && defined(IPV6_PKTINFO))
+        IgnoreUnusedVariable(controlData);
         ExitNow(res = INET_ERROR_NOT_SUPPORTED);
-
 #endif // !(defined(IP_PKTINFO) && defined(IPV6_PKTINFO))
     }
 

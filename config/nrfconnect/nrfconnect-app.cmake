@@ -69,7 +69,6 @@ zephyr_include_directories(
 )
 
 set(CHIP_OUTPUT_LIBRARIES
-    ${CHIP_OUTPUT_DIR}/lib/libDeviceLayer.a
     ${CHIP_OUTPUT_DIR}/lib/libCHIP.a
     ${CHIP_OUTPUT_DIR}/lib/libInetLayer.a
     ${CHIP_OUTPUT_DIR}/lib/libSystemLayer.a
@@ -101,7 +100,7 @@ set(CHIP_COMMON_FLAGS
     ${NRF5_SDK_INCLUDE_DIRS}
     -DUSE_APP_CONFIG
     -D_SYS__PTHREADTYPES_H_
-    "-I${ZEPHYR_BASE}/include/posix")
+    "-isystem${ZEPHYR_BASE}/include/posix")
 
 set(CHIP_CFLAGS ${CHIP_CFLAGS} ${CHIP_COMMON_FLAGS} --specs=nosys.specs)
 set(CHIP_CXXFLAGS ${CHIP_CXXFLAGS} ${CHIP_COMMON_FLAGS})
@@ -128,9 +127,7 @@ set(CHIP_CONFIGURE_ARGS
     --with-device-layer=nrfconnect
     --with-network-layer=all
     --with-target-network=sockets
-    --with-lwip=internal
-    --with-lwip-target=nrf5
-    --with-inet-endpoint=tcp,udp
+    --with-inet-endpoint=udp
     --with-logging-style=external
     --with-target-style=embedded
     --with-chip-project-includes=${CHIP_PROJECT_CONFIG}
@@ -160,8 +157,7 @@ ExternalProject_Add(
     SOURCE_DIR          ${CHIP_ROOT}
     BINARY_DIR          ${CHIP_OUTPUT_DIR}
     CONFIGURE_COMMAND   ${CHIP_ROOT}/configure ${CHIP_CONFIGURE_ARGS}
-    BUILD_COMMAND       make --no-print-directory all V=${CMAKE_AUTOGEN_VERBOSE}
-    INSTALL_COMMAND     make --no-print-directory install V=${CMAKE_AUTOGEN_VERBOSE}
+    BUILD_COMMAND       make --no-print-directory all install V=${CMAKE_AUTOGEN_VERBOSE}
     BUILD_BYPRODUCTS    ${CHIP_OUTPUT_LIBRARIES}
     BUILD_ALWAYS        TRUE
 )
