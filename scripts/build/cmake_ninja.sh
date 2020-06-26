@@ -8,6 +8,6 @@ if [[ ! -f $build_dir/build.ninja ]]; then
         cmake -GNinja ../.. "$@" &&
         ninja)
 else
-    (cd $build_dir && 
+    (cd $build_dir &&
         ninja)
 fi
