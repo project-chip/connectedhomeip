@@ -134,7 +134,7 @@ class EchoServerCallback : public SecureSessionMgrCallback
 {
 public:
     virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                          System::PacketBuffer * buffer)
+                                   System::PacketBuffer * buffer)
     {
         CHIP_ERROR err;
         const size_t data_len = buffer->DataLength();
@@ -197,13 +197,14 @@ public:
         statusLED.BlinkOnError();
     }
 
-    virtual void OnNewConnection(Transport::PeerConnectionState * state) {
+    virtual void OnNewConnection(Transport::PeerConnectionState * state)
+    {
         CHIP_ERROR err;
 
         ESP_LOGI(TAG, "Received a new connection.");
 
         err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key,
-                                                                sizeof(local_private_key));
+                                                                   sizeof(local_private_key));
         VerifyOrExit(err == CHIP_NO_ERROR, ESP_LOGE(TAG, "Failed to setup encryption"));
 
     exit:
@@ -211,6 +212,7 @@ public:
     }
 
     SecureSessionMgr * mTransport = nullptr;
+
 private:
     /**
      * A data model message has nonzero length and always has a first byte whose
@@ -242,7 +244,7 @@ static EchoServerCallback gCallbacks_v4, gCallbacks_v6;
 } // namespace
 
 // The echo server assumes the platform's networking has been setup already
-void setupTransport(IPAddressType type, SecureSessionMgr * transport, EchoServerCallback* cb)
+void setupTransport(IPAddressType type, SecureSessionMgr * transport, EchoServerCallback * cb)
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
     struct netif * netif = NULL;

@@ -63,7 +63,7 @@ class ServerCallback : public SecureSessionMgrCallback
 {
 public:
     virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                          System::PacketBuffer * buffer)
+                                   System::PacketBuffer * buffer)
     {
         const size_t data_len = buffer->DataLength();
         char src_addr[PeerAddress::kMaxToStringSize];
@@ -89,13 +89,14 @@ public:
         }
     }
 
-    virtual void OnNewConnection(Transport::PeerConnectionState * state) {
+    virtual void OnNewConnection(Transport::PeerConnectionState * state)
+    {
         CHIP_ERROR err;
 
         NRF_LOG_INFO("Received a new connection.");
 
         err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key,
-                                                                sizeof(local_private_key));
+                                                                   sizeof(local_private_key));
         VerifyOrExit(err == CHIP_NO_ERROR, NRF_LOG_INFO("Failed to setup encryption"));
 
     exit:
@@ -111,7 +112,6 @@ static ServerCallback gCallbacks;
 void SetupTransport(IPAddressType type, SecureSessionMgr * transport)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    
 
     err = transport->Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::InetLayer, UdpListenParameters().SetAddressType(type));
     SuccessOrExit(err);
