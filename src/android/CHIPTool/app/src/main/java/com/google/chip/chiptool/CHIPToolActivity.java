@@ -6,9 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+
+import java.io.IOException;
 
 public class CHIPToolActivity extends AppCompatActivity {
   @Override
@@ -49,6 +52,31 @@ public class CHIPToolActivity extends AppCompatActivity {
               startActivityForResult(intent, BarcodeReaderActivity.BARCODE_READER_ACTIVITY_REQUEST);
             }
           });
+
+      button = (Button) view.findViewById(R.id.echo_client_button);
+      button.setOnClickListener(
+              new View.OnClickListener() {
+                public void onClick(View v) {
+                  Intent intent = new Intent(activity, EchoClientActivity.class);
+                  startActivityForResult(intent, EchoClientActivity.ECHO_CLIENT_ACTIVITY_REQUEST);
+                }
+              });
+
+      button = (Button) view.findViewById(R.id.on_off_cluster_button);
+      button.setOnClickListener(
+              new View.OnClickListener() {
+                public void onClick(View v) {
+                  Intent intent = new Intent(activity, OnOffActivity.class);
+                  startActivityForResult(intent, OnOffActivity.ON_OFF_ACTIVITY_REQUEST);
+                }
+              });
     }
+
   }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ConnectionStatusFragment.updateStatus(this);
+    }
 }
