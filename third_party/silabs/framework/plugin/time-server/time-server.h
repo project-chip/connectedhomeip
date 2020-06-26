@@ -31,3 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+/***************************************************************************//**
+ * @file
+ * @brief Definitions for the Time Server plugin.
+ *******************************************************************************
+   ******************************************************************************/
+
+uint32_t emAfTimeClusterServerGetCurrentTime(void);
+void emAfTimeClusterServerSetCurrentTime(uint32_t utcTime);

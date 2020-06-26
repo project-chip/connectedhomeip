@@ -31,3 +31,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+/***************************************************************************//**
+ * @file
+ * @brief APIs and defines for the Critical Message Queue plugin.
+ *******************************************************************************
+   ******************************************************************************/
+
+#ifndef SILABS_CRITICAL_MESSAGE_QUEUE_H
+#include "af-types.h"
+
+// To send a message using the critical message queue functionality,
+// pass this callback to any of the emberAfSendUnicastWithCallback functions
+extern const EmberAfMessageSentFunction emberAfPluginCriticalMessageQueueEnqueueCallback;
+
+// The retry callback is exposed for af-main-common.c; it is not to be used by
+// a typical application
+extern const EmberAfMessageSentFunction emAfPluginCriticalMessageQueueRetryCallback;
+
+void emberAfPluginCriticalMessageQueuePrintQueue(void);
+void emberAfPluginCriticalMessageQueuePrintConfig(void);
+void emberAfPluginCriticalMessageQueueInit(void);
+
+#endif

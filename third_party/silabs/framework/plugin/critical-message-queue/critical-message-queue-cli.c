@@ -31,3 +31,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+/***************************************************************************//**
+ * @file
+ * @brief CLI for the Critical Message Queue plugin.
+ *******************************************************************************
+   ******************************************************************************/
+
+#include "app/framework/include/af.h"
+#include "critical-message-queue.h"
+
+void printQueue(void)
+{
+  emberAfPluginCriticalMessageQueuePrintQueue();
+}
+
+void printConfig(void)
+{
+  emberAfPluginCriticalMessageQueuePrintConfig();
+}

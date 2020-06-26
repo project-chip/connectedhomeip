@@ -31,3 +31,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+/***************************************************************************//**
+ * @file
+ * @brief APIs for the Button Form/Join plugin.
+ *******************************************************************************
+   ******************************************************************************/
+
+void emberAfPluginButtonJoiningPressButton(uint8_t button);

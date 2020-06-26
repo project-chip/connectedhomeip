@@ -31,3 +31,61 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+/***************************************************************************//**
+ * @file
+ * @brief Critical Message Queue Unit tests
+ *******************************************************************************
+   ******************************************************************************/
+
+#include "app/framework/include/af.h"
+#include "critical-message-queue.h"
+
+#include "app/framework/test/test-framework.h"
+
+//------------------------------------------------------------------------------
+// Globals
+
+#define MILLISECOND_TICKS_SINCE_BOOT \
+  (MILLISECOND_TICKS_PER_SECOND      \
+   * 60 /* seconds */                \
+   * 60 /* minutes */                \
+   * 3) /* hours */
+
+// Forward Declarations
+
+//------------------------------------------------------------------------------
+// Stubs
+uint16_t emberAfLongStringLength(const uint8_t *buffer)
+{
+  // Should not be called during unit testing
+  assert(0);
+  return 0;
+}
+
+uint8_t emberAfStringLength(const uint8_t *buffer)
+{
+  // Should not be called during unit testing
+  assert(0);
+  return 0;
+}
+
+//------------------------------------------------------------------------------
+// Implementation
+
+void runAllTests(void)
+{
+  emberAfPluginCriticalMessageQueueInit();
+}
+
+int main(int argc, char* argv[])
+{
+  const TestCase allTests[] = {
+    { "all-tests", runAllTests },
+    { NULL },
+  };
+
+  return parseCommandLineAndExecuteTest(argc,
+                                        argv,
+                                        "af-plugin-critical-message-queue-test",
+                                        allTests);
+}

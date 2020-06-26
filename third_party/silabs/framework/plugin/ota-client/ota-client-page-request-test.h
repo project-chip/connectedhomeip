@@ -31,3 +31,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+/***************************************************************************//**
+ * @file
+ * @brief Page request test APIs for the OTA Client plugin.
+ *******************************************************************************
+   ******************************************************************************/
+
+void pageRequestTest(void);

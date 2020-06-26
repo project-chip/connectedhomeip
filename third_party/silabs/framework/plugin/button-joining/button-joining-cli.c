@@ -31,3 +31,40 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+/***************************************************************************//**
+ * @file
+ * @brief CLI commands for forming/joining using the hardware buttons.
+ *******************************************************************************
+   ******************************************************************************/
+
+#include "app/framework/include/af.h"
+#include "app/util/serial/command-interpreter2.h"
+
+void emberAfPluginButtonJoiningButton0Command(void);
+void emberAfPluginButtonJoiningButton1Command(void);
+
+extern void emberAfPluginButtonJoiningPressButton(uint8_t button);
+
+#if !defined(EMBER_AF_GENERATE_CLI)
+EmberCommandEntry emberAfPluginButtonJoiningCommands[] = {
+  emberCommandEntryAction("button0",
+                          emberAfPluginButtonJoiningButton0Command,
+                          "",
+                          "Press button 0"),
+  emberCommandEntryAction("button1",
+                          emberAfPluginButtonJoiningButton1Command,
+                          "",
+                          "Press button 1"),
+  emberCommandEntryTerminator(),
+};
+#endif // EMBER_AF_GENERATE_CLI
+
+void emberAfPluginButtonJoiningButton0Command(void)
+{
+  emberAfPluginButtonJoiningPressButton(BUTTON0);
+}
+
+void emberAfPluginButtonJoiningButton1Command(void)
+{
+  emberAfPluginButtonJoiningPressButton(BUTTON1);
+}

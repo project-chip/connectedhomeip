@@ -31,3 +31,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+/***************************************************************************//**
+ * @file
+ * @brief APIs and defines for the Polling plugin.
+ *******************************************************************************
+   ******************************************************************************/
+
+extern bool emAfEnablePollCompletedCallback;
+
+typedef struct {
+  uint32_t pollIntervalMs;
+  uint8_t numPollsFailing;
+} EmAfPollingState;
+extern EmAfPollingState emAfPollingStates[];
+void emAfPollCompleteHandler(EmberStatus status, uint8_t limit);
+
+void emberAfPluginEndDeviceSupportMoveNetworkEventHandler(void);
