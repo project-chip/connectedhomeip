@@ -1,0 +1,22 @@
+environment:
+    BUILD_TYPE: cmake-ninja
+executor: cmake-ninja
+steps:
+    - checkout
+    - run:
+        name: Cmake/ninja build of standalone host build
+        command: |
+            cmake -B build/standalone
+            ninja -C build/standalone
+            ninja -C build/standalone test
+    - run:
+        name: Cmake/ninja build of Linux embedded (x86)
+        command: |
+            cmake -B build/linux -DCHIP_PLATFORM=linux
+            ninja -C build/linux
+            ninja -C build/linux test
+    - run:
+        name: Cmake/ninja build of Nordic nRF52840
+        command: |
+            cmake -B build/nrf52840 -DCHIP_PLATFORM=nrf52840
+            ninja -C build/nrf52840

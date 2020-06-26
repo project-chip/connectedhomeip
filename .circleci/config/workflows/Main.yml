@@ -47,6 +47,12 @@ jobs:
               branches:
                   ignore:
                       - /restyled.*/
+    - cmake_ninja:
+          name: Build and Test [Cmake Ninja]
+          filters:
+              branches:
+                  ignore:
+                      - /restyled.*/
     - examples_nrf:
           name: Build Examples [nRF]
           filters:
