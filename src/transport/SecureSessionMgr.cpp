@@ -43,6 +43,14 @@ static const size_t kMax_SecureSDU_Length = 1024;
 
 SecureSessionMgr::SecureSessionMgr() : mState(State::kNotReady) {}
 
+SecureSessionMgr::~SecureSessionMgr()
+{
+    if (mState != State::kNotReady)
+    {
+        CancelExpiryTimer();
+    }
+}
+
 CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, Inet::InetLayer * inet, const Transport::UdpListenParameters & listenParams)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -54,6 +62,9 @@ CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, Inet::InetLayer * inet, co
     mTransport.SetMessageReceiveHandler(HandleUdpDataReceived, this);
     mState       = State::kInitialized;
     mLocalNodeId = localNodeId;
+    mSystemLayer = inet->SystemLayer();
+
+    ScheduleExpiryTimer();
 
 exit:
     return err;
@@ -150,6 +161,17 @@ CHIP_ERROR SecureSessionMgr::AllocateNewConnection(const MessageHeader & header,
 exit:
     return err;
 }
+
+void SecureSessionMgr::ScheduleExpiryTimer(void)
+{
+    mSystemLayer->StartTimer(CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS, SecureSessionMgr::ExpiryTimerCallback, this);
+}
+
+void SecureSessionMgr::CancelExpiryTimer(void)
+{
+    mSystemLayer->CancelTimer(SecureSessionMgr::ExpiryTimerCallback, this);
+}
+
 void SecureSessionMgr::HandleUdpDataReceived(const MessageHeader & header, const IPPacketInfo & pktInfo, System::PacketBuffer * msg,
                                              SecureSessionMgr * connection)
 
@@ -214,6 +236,15 @@ exit:
             connection->OnReceiveError(err, pktInfo);
         }
     }
+}
+
+void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error)
+{
+    ChipLogProgress(Inet, "Checking for expired connections");
+
+    SecureSessionMgr * mgr = reinterpret_cast<SecureSessionMgr *>(param);
+    mgr->mPeerConnections.ExpireInactiveConnections(CHIP_PEER_CONNECTION_TIMEOUT_MS);
+    mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
 }
 
 } // namespace chip
