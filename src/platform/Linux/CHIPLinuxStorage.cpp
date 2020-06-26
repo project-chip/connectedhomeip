@@ -25,6 +25,7 @@
 
 #include <errno.h>
 #include <fstream>
+#include <inttypes.h>
 #include <libgen.h>
 #include <string>
 #include <unistd.h>
@@ -172,7 +173,7 @@ CHIP_ERROR ChipLinuxStorage::WriteValue(const char * key, uint64_t val)
 {
     char buf[64];
 
-    snprintf(buf, sizeof(buf), "%llu", val);
+    snprintf(buf, sizeof(buf), "%" PRIu64, val);
 
     return WriteValueStr(key, buf);
 }
