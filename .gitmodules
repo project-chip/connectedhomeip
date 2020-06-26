@@ -19,3 +19,6 @@
 [submodule "examples/common/m5stack-tft/repo"]
 	path = examples/common/m5stack-tft/repo
 	url = https://github.com/jeremyjh/ESP32_TFT_library.git
+[submodule "third_party/pigweed"]
+	path = third_party/pigweed
+	url = https://pigweed.googlesource.com/pigweed/pigweed
