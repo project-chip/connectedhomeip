@@ -45,10 +45,7 @@ SecureSessionMgr::SecureSessionMgr() : mState(State::kNotReady) {}
 
 SecureSessionMgr::~SecureSessionMgr()
 {
-    if (mState != State::kNotReady)
-    {
-        CancelExpiryTimer();
-    }
+    CancelExpiryTimer();
 }
 
 CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, Inet::InetLayer * inet, const Transport::UdpListenParameters & listenParams)
@@ -164,12 +161,18 @@ exit:
 
 void SecureSessionMgr::ScheduleExpiryTimer(void)
 {
-    mSystemLayer->StartTimer(CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS, SecureSessionMgr::ExpiryTimerCallback, this);
+    CHIP_ERROR err =
+        mSystemLayer->StartTimer(CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS, SecureSessionMgr::ExpiryTimerCallback, this);
+
+    VerifyOrDie(err == CHIP_NO_ERROR);
 }
 
 void SecureSessionMgr::CancelExpiryTimer(void)
 {
-    mSystemLayer->CancelTimer(SecureSessionMgr::ExpiryTimerCallback, this);
+    if (mSystemLayer != nullptr)
+    {
+        mSystemLayer->CancelTimer(SecureSessionMgr::ExpiryTimerCallback, this);
+    }
 }
 
 void SecureSessionMgr::HandleUdpDataReceived(const MessageHeader & header, const IPPacketInfo & pktInfo, System::PacketBuffer * msg,
