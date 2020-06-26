@@ -57,7 +57,6 @@ public:
      *   Initialize a Secure Transport
      *
      * @param inet    Inet layer to use
-     * @param system  System layer to use
      * @param listenParams  Listen settings for the transport
      *
      * @note This is not a final API as it is UDP specific. Class will be updated to support
