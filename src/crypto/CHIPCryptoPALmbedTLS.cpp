@@ -253,14 +253,16 @@ exit:
     return error;
 }
 
-CHIP_ERROR pbkdf2_hmac(const unsigned char * password, size_t plen, const unsigned char * salt, size_t slen,
-                       unsigned int iteration_count, uint32_t key_length, unsigned char * output)
+CHIP_ERROR pbkdf2_sha256(const unsigned char * password, size_t plen, const unsigned char * salt, size_t slen,
+                         unsigned int iteration_count, uint32_t key_length, unsigned char * output)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
     const mbedtls_md_info_t * md_info;
     mbedtls_md_context_t md_ctxt;
     constexpr int use_hmac = 1;
+
+    bool free_md_ctxt = false;
 
     VerifyOrExit(password != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(plen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -273,6 +275,7 @@ CHIP_ERROR pbkdf2_hmac(const unsigned char * password, size_t plen, const unsign
     VerifyOrExit(md_info != NULL, error = CHIP_ERROR_INTERNAL);
 
     mbedtls_md_init(&md_ctxt);
+    free_md_ctxt = true;
 
     result = mbedtls_md_setup(&md_ctxt, md_info, use_hmac);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
@@ -283,6 +286,12 @@ CHIP_ERROR pbkdf2_hmac(const unsigned char * password, size_t plen, const unsign
 
 exit:
     _log_mbedTLS_error(result);
+
+    if (free_md_ctxt)
+    {
+        mbedtls_md_free(&md_ctxt);
+    }
+
     return error;
 }
 
