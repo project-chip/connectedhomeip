@@ -20,8 +20,40 @@
             ]
         },
         {
-            "label": "Ninja",
-            "command": "ninja -C out/standalone -v",
+            "label": "Cmake Ninja",
+            "command": "scripts/build/cmake_ninja.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "isBackground": false,
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Cmake Ninja Test",
+            "command": "scripts/build/cmake_ninja_test.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "isBackground": false,
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Cmake Ninja Clean",
+            "command": "scripts/build/cmake_ninja_clean.sh",
             "group": {
                 "kind": "build",
                 "isDefault": true
