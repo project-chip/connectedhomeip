@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the CHIP SDK QR code code.
+#
+
 add_subdirectory(tests)
 
 add_library(SetupPayload)

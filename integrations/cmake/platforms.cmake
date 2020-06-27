@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CHIP SDK CMake template for defining platform-specific build parameters.
+#
+
 set(CHIP_PLATFORM "standalone" CACHE STRING "Target platform chosen by the user at configure time")
 
 # Get a list of the available platforms and output as a list to the 'arg_platforms' argument

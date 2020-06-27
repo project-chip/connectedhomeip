@@ -15,6 +15,12 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CHIP SDK CMake template for adding the `pretty`
+#      and `pretty-check` targets for enforcing code style guidelines.
+#
+
 option(BUILD_PRETTY "Pretty and pretty-check code styling with clang-format" ON)
 
 if ( BUILD_PRETTY )

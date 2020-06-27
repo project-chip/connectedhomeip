@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the CHIP SDK core library tests.
+#
+
 set(COMMON_INCLUDES
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/src/lib

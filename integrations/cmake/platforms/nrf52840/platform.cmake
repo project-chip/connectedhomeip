@@ -16,7 +16,8 @@
 #
 
 #
-# CMake configuration for the Nordic nRF5 (nRF52840) platform.
+#    Description:
+#      CMake configuration for the Nordic nRF5 (nRF52840) platform.
 #
 
 include("${PROJECT_SOURCE_DIR}/integrations/cmake/toolchains/arm-none-eabi.cmake")

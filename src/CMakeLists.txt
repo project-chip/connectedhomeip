@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the CHIP SDK source code.
+#
+
 add_subdirectory(include)
 
 add_subdirectory(app)

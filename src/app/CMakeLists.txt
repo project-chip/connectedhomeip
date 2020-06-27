@@ -15,6 +15,12 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the CHIP SDK application layer,
+#      data model, and ZigBee Cluster Library (ZCL) code.
+#
+
 add_library(ChipDataModel
     gen/gen-callback-stubs.c
     gen/gen-command-handler.c

@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the CHIP SDK Cryptography library.
+#
+
 add_subdirectory(tests)
 
 add_library(ChipCrypto)

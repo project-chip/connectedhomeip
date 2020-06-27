@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the CHIP SDK network layer library.
+#
+
 if(CHIP_TARGET_STYLE_UNIX)
 add_subdirectory(tests)
 endif(CHIP_TARGET_STYLE_UNIX)

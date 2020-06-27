@@ -15,6 +15,10 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the CHIP SDK LWIP portability layer code.
+#
 
 if (CHIP_WITH_LWIP_INTERNAL)
 

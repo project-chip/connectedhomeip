@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for defining global build options for the CHIP SDK.
+#
+
 option(CHIP_BUILD_EXECUTABLES "Build executables" ON)
 
 option(CHIP_BUILD_NLFRIENDS_WITH_AUTOTOOLS

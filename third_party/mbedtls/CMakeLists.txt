@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the mbedtls library.
+#
+
 add_library(mbedtls)
 
 set(COMMON_INCLUDES
