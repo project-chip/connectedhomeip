@@ -16,7 +16,7 @@
 #
 
 #
-# CMake configuration for the esp32 platform.
+# CMake configuration for the Espressif ESP32 platform.
 # 
 
 add_library(chip-config INTERFACE)

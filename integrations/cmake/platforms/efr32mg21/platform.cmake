@@ -16,7 +16,7 @@
 #
 
 #
-# CMake configuration for the efr32 platform.
+# CMake configuration for the Silicon Labs EFR32MG12 platform.
 # 
 
 include("${PROJECT_SOURCE_DIR}/integrations/cmake/toolchains/arm-none-eabi.cmake")

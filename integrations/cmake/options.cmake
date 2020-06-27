@@ -15,11 +15,6 @@
 #    limitations under the License.
 #
 
-option(CHIP_BIG_ENDIAN "host platform uses big-endian byte order")
-if(CHIP_BIG_ENDIAN)
-    list(APPEND CHIP_PRIVATE_DEFINES "BYTE_ORDER_BIG_ENDIAN=1")
-endif()
-
 option(CHIP_BUILD_NLFRIENDS_WITH_AUTOTOOLS
     "Use autotools to build third_party/nlfriends. Otherwise, use native cmake."
     OFF

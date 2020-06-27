@@ -112,6 +112,7 @@ set(NDK5_LIBS
 )
 
 set(COMMON_LIBS
+    ${PLATFORM_LINK_START}
     -Wl,--start-group
     ChipCore
     ChipDataModel
@@ -124,8 +125,8 @@ set(COMMON_LIBS
     TransportLayer
     nlfaultinjection
     ${CHIP_PLATFORM_LIBS}
-#    ${NDK5_LIBS}
-    -Wl,--end-group
+#   ${NDK5_LIBS}
+    ${PLATFORM_LINK_END}
     chip-config
 )
 

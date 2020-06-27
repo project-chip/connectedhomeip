@@ -35,6 +35,7 @@ include("${PROJECT_SOURCE_DIR}/integrations/cmake/platforms.cmake")
 endif ()
 
 ## TODO: Enable testing only on simulation platform
+set(CTEST_TEST_TARGET_ALIAS check)
 include(CTest)
 enable_testing()
 
@@ -64,15 +65,13 @@ list(APPEND CHIP_PRIVATE_DEFINES
 )
 
 # CHIP_CONFIG allows users to specify the path to ProjectChip project core
-# config header file. The default value of this parameter is empty string.
+# config header file. The default value of this parameter is an empty string.
 # When not specified by user (value is ""), a platform cmake file may
 # choose to change this variable to provide its own core config header
 # file instead.
 
 set(CHIP_CONFIG "" CACHE STRING "CHIP project-specific config header file chosen by user at configure time")
 
-list(APPEND CHIP_PUBLIC_INCLUDES ${PROJECT_BINARY_DIR}/integrations/cmake)
-list(APPEND CHIP_PUBLIC_INCLUDES ${PROJECT_SOURCE_DIR}/integrations/cmake)
 list(APPEND CHIP_PUBLIC_INCLUDES ${PROJECT_SOURCE_DIR}/src/include)
 
 if(CHIP_CONFIG)
