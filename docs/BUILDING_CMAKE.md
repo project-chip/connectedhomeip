@@ -37,7 +37,8 @@ To setup the cmake/ninja environment, run the following:
   cmake -GNinja ../..
 ```
 
-To setup a cmake/make environment, remove the `-GNinja` flag in the last command:
+To setup a cmake/make environment, remove the `-GNinja` flag in the last
+command:
 
 ```
   cmake ../..
@@ -61,36 +62,29 @@ requirements sections are given here.
 
 CMake can generate build files for multiple build systems:
 
-| Build System | Command    |
-| cmake / ninja | `cmake -GNinja ..` |
-| cmake / make  | `cmake ..` |
+| Build System | Command | | cmake / ninja | `cmake -GNinja ..` | | cmake / make
+| `cmake ..` |
 
 #### Basic build
 
-| Build System | Command    |
-| cmake / ninja | `ninja` |
-| cmake / make  | `make` |
-
+| Build System | Command | | cmake / ninja | `ninja` | | cmake / make | `make` |
 
 #### Run tests and build them if needed
 
-| Build System | Command |
-| cmake / ninja | `ninja test` or `ninja check` |
-| cmake / make | `make test` or `make check` |
+| Build System | Command | | cmake / ninja | `ninja test` or `ninja check` | |
+cmake / make | `make test` or `make check` |
 
 #### Build documentation
 
-| Build System | Command |
-| cmake / ninja | `ninja doc` |
-| cmake / make | `make doc` |
+| Build System | Command | | cmake / ninja | `ninja doc` | | cmake / make |
+`make doc` |
 
 #### Clean tree
 
 This command cleans the tree from the top-level.
 
-| Build System | Command |
-| cmake / ninja | `ninja clean` |
-| cmake / make | `make clean` |
+| Build System | Command | | cmake / ninja | `ninja clean` | | cmake / make |
+`make clean` |
 
 #### Coverage
 
