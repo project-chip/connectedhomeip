@@ -16,7 +16,8 @@
 #
 
 #
-# CMake configuration for the Linux embedded platform.
+#    Description:
+#      CMake configuration for the Linux embedded platform.
 #
 
 #

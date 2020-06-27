@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the nlfaultinjection library.
+#
+
 add_library(nlfaultinjection)
 
 set(COMMON_SOURCES

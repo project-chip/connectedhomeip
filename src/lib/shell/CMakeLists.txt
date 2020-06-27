@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the CHIP SDK shell library code.
+#
+
 add_library(ChipShell)
 
 set(COMMON_INCLUDES

@@ -16,7 +16,8 @@
 #
 
 #
-# CMake configuration for the Silicon Labs EFR32MG21 platform.
+#    Description:
+#      CMake configuration for the Silicon Labs EFR32MG21 platform.
 # 
 
 include("${PROJECT_SOURCE_DIR}/integrations/cmake/toolchains/arm-none-eabi.cmake")

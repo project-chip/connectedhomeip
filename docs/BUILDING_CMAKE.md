@@ -4,9 +4,9 @@ The cmake build system in CHIP is used as follows:
 
 ### Building cmake
 
-The version of cmake from apt-get (version 3.16.3) can have issues with the
-commands to build autoconf packages in third_party/nl\*. To use cmake in CHIP,
-build a local copy of cmake from source:
+The version of cmake from apt-get (version 3.16.3) has issues handling
+`ExternalProject_Add` commands to build autoconf packages in third_party/nl\*.
+Therefore, to use cmake in CHIP, build a local copy of cmake from source:
 
 ```
   cd ~/tools
@@ -37,7 +37,8 @@ To setup the cmake/ninja environment, run the following:
   cmake -GNinja ../..
 ```
 
-To setup a cmake/make environment, replace the last command with:
+To setup a cmake/make environment, remove the `-GNinja` flag in the last
+command:
 
 ```
   cmake ../..
@@ -57,61 +58,33 @@ following gui:
 Details of the various build operations used in the performance and target
 requirements sections are given here.
 
-#### First configure and build
+#### First configure
 
-| Build System | Command | | autotools | (./bootstrap && ./configure && make) |
-| cmake / ninja | (cmake -GNinja . && ninja) | | cmake / make | (cmake . &&
-make) |
+CMake can generate build files for multiple build systems:
 
-#### Full build from clean
+| Build System | Command | | cmake / ninja | `cmake -GNinja ..` | | cmake / make
+| `cmake ..` |
 
-| Build System | Command | autotools | make | | cmake / ninja | ninja | | cmake
-/ make | make |
+#### Basic build
 
-#### One line rebuild
+| Build System | Command | | cmake / ninja | `ninja` | | cmake / make | `make` |
 
-This operation measures the build time on a completely built tree after changing
-one line of code. The command is the same as 5.3.2 Full build from clean from
-top of tree. This is a very common case in practical developer flows, and
-provides a good litmus test on the dependency system within the build
-environment. This operation is expected to be very fast, ideally operating only
-on the file that has changed and generating all dependent artifacts. Any
-evaluation of non-related portions of the tree are assessed as a distracting
-waste of developer time and resources.
+#### Run tests and build them if needed
 
-#### Zero change rebuild
+| Build System | Command | | cmake / ninja | `ninja test` or `ninja check` | |
+cmake / make | `make test` or `make check` |
 
-This operation measures the build time on a completely built tree after running
-the build command again with no changes. The command is the same as 5.3.2 Full
-build from clean from top of tree. This operation is not uncommon in practical
-developer flows. A developer may take a break, or come back to a project the
-next business day and want to confirm their tree is built to the latest version.
-Affirmation that no changes have taken place is important and should occur in
-near zero time.
+#### Build documentation
 
-#### Build and run tests
-
-In the case of autotools, this is equivalent of running `make check` for the
-first time on a tree that has already been bootstrapped, configured, and cleaned
-with `make clean`. This command is expected to be similar to 5.3.2 Full build
-from clean but will additionally build additional test-specific executables and
-run all such tests in an automated fashion.
-
-| Build System | Command | | autotools | make check | | cmake / ninja | ninja
-test | | cmake / make | make test |
-
-#### Run tests
-
-This operation is similar to 5.3.5 Build and run tests but is run after the
-tests have all been built already and will simply retrigger the last step of
-executing all the automated tests again.
+| Build System | Command | | cmake / ninja | `ninja doc` | | cmake / make |
+`make doc` |
 
 #### Clean tree
 
 This command cleans the tree from the top-level.
 
-| Build System | Command | | autotools | make clean | | cmake / ninja | ninja
-clean | | cmake / make | make clean |
+| Build System | Command | | cmake / ninja | `ninja clean` | | cmake / make |
+`make clean` |
 
 #### Coverage
 

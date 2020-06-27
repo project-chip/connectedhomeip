@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the nlassert library.
+#
+
 add_library(nlassert INTERFACE)     # Tag header-only library as INTERFACE
 
 target_include_directories(nlassert INTERFACE repo/include)

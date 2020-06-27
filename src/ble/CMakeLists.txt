@@ -15,6 +15,12 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the CHIP SDK Bluetooth Low Energy (BLE) layer,
+#      and Bluetooth Transport Protocol (BTP) code.
+#
+
 add_subdirectory(tests)
 
 add_library(BleLayer)

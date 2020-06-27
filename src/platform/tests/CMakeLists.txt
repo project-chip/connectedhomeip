@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the CHIP SDK Device Layer tests.
+#
+
 add_library(DeviceLayerTests
     TestPlatformMgr.cpp
     TestPlatformTime.cpp

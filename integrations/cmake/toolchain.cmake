@@ -15,6 +15,12 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CHIP SDK CMake template for defining toolchain-specific build parameters
+#      and activating modular build system extension modules.
+#
+
 if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 include("${PROJECT_SOURCE_DIR}/integrations/cmake/platforms.cmake")
 endif ()

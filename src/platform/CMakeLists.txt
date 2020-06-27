@@ -15,6 +15,12 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the CHIP SDK Device Layer code.
+#      The Device Layer defines and implements platform abstractions to port a platform to CHIP.
+#
+
 add_library(DeviceLayer)
 
 set(COMMON_INCLUDES

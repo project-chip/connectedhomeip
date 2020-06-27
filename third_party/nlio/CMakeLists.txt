@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the nlio library.
+#
+
 add_library(nlio INTERFACE)     # Tag header-only library as INTERFACE
 
 target_include_directories(nlio INTERFACE repo/include)

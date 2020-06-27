@@ -15,6 +15,12 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CHIP SDK CMake template for adding the `doc` target
+#      for building Doxygen documentaion.
+#
+
 option(BUILD_DOC "Build documentation" ON)
 
 if (BUILD_DOC)

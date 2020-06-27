@@ -26,7 +26,7 @@
 cmake_minimum_required(VERSION 3.17.2)
 
 #
-# Specify the top-level project name and the languages used
+# Specify the top-level project name and the languages used.
 #
 project(Chip 
     LANGUAGES C CXX ASM
@@ -43,7 +43,7 @@ include("${PROJECT_SOURCE_DIR}/integrations/cmake/options.cmake")
 include("${PROJECT_SOURCE_DIR}/integrations/cmake/toolchain.cmake")
 
 #
-# Enable cmake test framework and enable 'test' and 'check' as synonymous targets
+# Enable cmake test framework and enable 'test' and 'check' as synonymous targets.
 #
 set(CTEST_TEST_TARGET_ALIAS check)
 include(CTest)

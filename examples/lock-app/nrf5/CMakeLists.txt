@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for building CHIP SDK lock-app example for Nordic nRF52840.
+#
+
 # include("${PROJECT_SOURCE_DIR}/third_party/connectedhomeip/CMakeLists.txt")
 
 set(COMMON_INCLUDES

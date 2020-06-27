@@ -15,6 +15,12 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CHIP SDK CMake template for adding the `coverage` target 
+#      for building test coverage reports.
+#
+
 # - Enable Code Coverage
 #
 #

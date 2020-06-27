@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the CHIP SDK public headers.
+#
+
 add_custom_command(
     OUTPUT OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/CHIPVersion.h
     COMMAND ${PROJECT_SOURCE_DIR}/scripts/gen-chip-version.sh -o CHIPVersion.h `cat ${PROJECT_SOURCE_DIR}/.default-version`

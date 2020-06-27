@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the CHIP SDK network library tests.
+#
+
 add_library(InetLayerTests
     TestInetAddress.cpp
     TestInetCommon.cpp

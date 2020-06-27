@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the Lightweight Internet Protocol (LwIP) library.
+#
+
 add_library(lwip)
 
 set(COMMON_INCLUDES

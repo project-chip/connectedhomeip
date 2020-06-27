@@ -16,7 +16,9 @@
 #
 
 #
-# Configure toolchain for standalone platform.
+#
+#    Description:
+#      Configure toolchain for standalone (host) platforms.
 #
 
 set(CMAKE_C_FLAGS "-g" CACHE INTERNAL "C Compiler options")

@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the nlunit-test library.
+#
+
 add_library(nlunit-test)
 
 set_target_properties(

@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for building CHIP SDK examples from the top-level.
+#
+
 if(CHIP_TARGET_STYLE_UNIX)
 add_subdirectory(shell)
 endif(CHIP_TARGET_STYLE_UNIX)
