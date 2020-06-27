@@ -23,17 +23,17 @@ if (BUILD_DOC)
   find_package(Doxygen)
   if (DOXYGEN_FOUND)
       # set input and output files
-      set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/../docs/Doxyfile.in)
-      set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+      set(DOXYGEN_IN ${PROJECT_SOURCE_DIR}/docs/Doxyfile.cmake.in)
+      set(DOXYGEN_OUT ${PROJECT_BINARY_DIR}/docs/Doxyfile)
 
       # request to configure the file
-      configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+      configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT})
       message("Doxygen build started")
 
       # note the option ALL which allows to build the docs together with the application
-      add_custom_target( doc ALL
+      add_custom_target( doc
         COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR/docs}
         COMMENT "Generating API documentation with Doxygen"
         VERBATIM )
   else (DOXYGEN_FOUND)
