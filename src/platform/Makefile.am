@@ -184,6 +184,7 @@ if CHIP_DEVICE_LAYER_TARGET_ESP32
 
 libDeviceLayer_a_SOURCES               +=       \
     ESP32/BLEManagerImpl.cpp                    \
+    ESP32/ConfigurationManagerImpl.cpp          \
     ESP32/PlatformManagerImpl.cpp               \
     ESP32/ConnectivityManagerImpl.cpp           \
     ESP32/ESP32Config.cpp                       \

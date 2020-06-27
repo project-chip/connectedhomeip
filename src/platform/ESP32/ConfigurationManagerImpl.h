@@ -26,7 +26,13 @@
 #ifndef CONFIGURATION_MANAGER_IMPL_H
 #define CONFIGURATION_MANAGER_IMPL_H
 
+#include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
+#else
+#include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
+#endif
 
 #include <platform/ESP32/ESP32Config.h>
 
@@ -42,6 +48,11 @@ class NetworkProvisioningServerImpl;
  */
 class ConfigurationManagerImpl final : public ConfigurationManager,
                                        public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+                                       public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
+#else
+                                       public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>,
+#endif
                                        private Internal::ESP32Config
 {
     // Allow the ConfigurationManager interface class to delegate method calls to

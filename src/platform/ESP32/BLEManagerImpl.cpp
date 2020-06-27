@@ -29,6 +29,8 @@
 
 #include <ble/CHIPBleServiceData.h>
 #include <platform/internal/BLEManager.h>
+#include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
 #include "esp_bt.h"
 #include "esp_bt_main.h"
@@ -620,10 +622,12 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     // If a custom device name has not been specified, generate a CHIP-standard name based on the
     // bottom digits of the Chip device id.
+
+    // TODO Get a real device id
+    uint16_t deviceId = 0x0F00;
     if (!GetFlag(mFlags, kFlag_UseCustomDeviceName))
     {
-        snprintf(mDeviceName, sizeof(mDeviceName), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX,
-                 (uint32_t) FabricState.LocalNodeId);
+        snprintf(mDeviceName, sizeof(mDeviceName), "%s%04" PRIX16, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, deviceId);
         mDeviceName[kMaxDeviceNameLength] = 0;
     }
 

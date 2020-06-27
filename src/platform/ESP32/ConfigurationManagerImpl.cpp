@@ -25,18 +25,11 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/ConfigurationManager.h>
-#include <platform/internal/GenericConfigurationManagerImpl.ipp>
-
 #include <core/CHIPKeyIds.h>
-#include <core/CHIPVendorIdentifiers.hpp>
-// #include <Profiles/security/ChipApplicationKeys.h>
+#include <platform/ConfigurationManager.h>
 #include <platform/ESP32/ESP32Config.h>
-#include <platform/ESP32/GroupKeyStoreImpl.h>
-
-#if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-#include <platform/internal/FactoryProvisioning.ipp>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
+#include <support/CodeUtils.h>
 
 #include "esp_wifi.h"
 #include "nvs.h"
@@ -44,11 +37,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-using namespace ::chip::Profiles::Security::AppKeys;
-using namespace ::chip::Profiles::DeviceDescription;
 using namespace ::chip::DeviceLayer::Internal;
-
-using ::chip::kChipVendor_Common;
 
 namespace {
 
@@ -57,15 +46,9 @@ enum
     kChipProduct_Connect = 0x0016
 };
 
-// Singleton instance of Chip Group Key Store for the ESP32
-//
-// NOTE: This is declared as a private global variable, rather than a static
-// member of ConfigurationManagerImpl, to reduce the number of headers that
-// must be included by the application when using the ConfigurationManager API.
-//
-GroupKeyStoreImpl gGroupKeyStore;
-
 } // unnamed namespace
+
+// TODO: Define a Singleton instance of CHIP Group Key Store here (#1266)
 
 /** Singleton instance of the ConfigurationManager implementation object for the ESP32.
  */
@@ -88,9 +71,7 @@ CHIP_ERROR ConfigurationManagerImpl::_Init()
     err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_Init();
     SuccessOrExit(err);
 
-    // Initialize the global GroupKeyStore object.
-    err = gGroupKeyStore.Init();
-    SuccessOrExit(err);
+    // TODO: Initialize the global GroupKeyStore object here (#1266)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 
@@ -124,32 +105,6 @@ CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
     return esp_wifi_get_mac(ESP_IF_WIFI_STA, buf);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_GetDeviceDescriptor(::chip::Profiles::DeviceDescription::ChipDeviceDescriptor & deviceDesc)
-{
-    CHIP_ERROR err;
-
-    // Call the generic version of _GetDeviceDescriptor() supplied by the base class.
-    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_GetDeviceDescriptor(deviceDesc);
-    SuccessOrExit(err);
-
-    // If we're pretending to be a CHIP Connect, fake the presence of a 805.15.4 radio by returning
-    // the Chip device id as the Primary 802.15.4 MAC address field.  This is necessary to fool
-    // the CHIP mobile app into believing we are indeed a Connect.
-    if (CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == kChipVendor_Common && CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID == kChipProduct_Connect)
-    {
-        Encoding::BigEndian::Put64(deviceDesc.Primary802154MACAddress, deviceDesc.DeviceId);
-        deviceDesc.DeviceId = kNodeIdNotSpecified;
-    }
-
-exit:
-    return err;
-}
-
-::chip::Profiles::Security::AppKeys::GroupKeyStoreBase * ConfigurationManagerImpl::_GetGroupKeyStore()
-{
-    return &gGroupKeyStore;
-}
-
 bool ConfigurationManagerImpl::_CanFactoryReset()
 {
     // TODO: query the application to determine if factory reset is allowed.
@@ -177,44 +132,6 @@ CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platfor
 {
     ESP32Config::Key configKey{ kConfigNamespace_ChipCounters, key };
     return WriteConfigValue(configKey, value);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetWiFiStationSecurityType(Profiles::NetworkProvisioning::WiFiSecurityType & secType)
-{
-    CHIP_ERROR err;
-    uint32_t secTypeInt;
-
-    err = ReadConfigValue(kConfigKey_WiFiStationSecType, secTypeInt);
-    if (err == CHIP_NO_ERROR)
-    {
-        secType = (Profiles::NetworkProvisioning::WiFiSecurityType) secTypeInt;
-    }
-    return err;
-}
-
-CHIP_ERROR ConfigurationManagerImpl::UpdateWiFiStationSecurityType(Profiles::NetworkProvisioning::WiFiSecurityType secType)
-{
-    CHIP_ERROR err;
-    Profiles::NetworkProvisioning::WiFiSecurityType curSecType;
-
-    if (secType != Profiles::NetworkProvisioning::kWiFiSecurityType_NotSpecified)
-    {
-        err = GetWiFiStationSecurityType(curSecType);
-        if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || (err == CHIP_NO_ERROR && secType != curSecType))
-        {
-            uint32_t secTypeInt = secType;
-            err                 = WriteConfigValue(kConfigKey_WiFiStationSecType, secTypeInt);
-        }
-        SuccessOrExit(err);
-    }
-    else
-    {
-        err = ClearConfigValue(kConfigKey_WiFiStationSecType);
-        SuccessOrExit(err);
-    }
-
-exit:
-    return err;
 }
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
