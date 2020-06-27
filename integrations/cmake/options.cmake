@@ -15,6 +15,8 @@
 #    limitations under the License.
 #
 
+option(CHIP_BUILD_EXECUTABLES "Build executables" ON)
+
 option(CHIP_BUILD_NLFRIENDS_WITH_AUTOTOOLS
     "Use autotools to build third_party/nlfriends. Otherwise, use native cmake."
     OFF
