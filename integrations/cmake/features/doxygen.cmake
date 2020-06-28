@@ -25,11 +25,19 @@ option(BUILD_DOC "Build documentation" ON)
 
 if (BUILD_DOC)
 
+  # Map cmake variables to names used by Doxyfile.in
+  set(PACKAGE_NAME ${PROJECT_NAME})
+  set(PACKAGE_VERSION ${PROJECT_VERSION})
+  set(abs_srcdir ${PROJECT_SOURCE_DIR}/docs)
+  set(abs_builddir ${PROJECT_BINARY_DIR}/docs)
+  set(abs_top_srcdir ${PROJECT_SOURCE_DIR})
+  set(abs_top_builddir ${PROJECT_BINARY_DIR})
+
   # check if Doxygen is installed
   find_package(Doxygen)
   if (DOXYGEN_FOUND)
       # set input and output files
-      set(DOXYGEN_IN ${PROJECT_SOURCE_DIR}/docs/Doxyfile.cmake.in)
+      set(DOXYGEN_IN ${PROJECT_SOURCE_DIR}/docs/Doxyfile.in)
       set(DOXYGEN_OUT ${PROJECT_BINARY_DIR}/docs/Doxyfile)
 
       # request to configure the file
