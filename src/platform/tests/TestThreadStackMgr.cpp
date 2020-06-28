@@ -16,19 +16,18 @@
  */
 
 #include <assert.h>
-#include <memory>
 #include <dbus/dbus.h>
+#include <memory>
 
 #include "platform/internal/CHIPDeviceLayerInternal.h"
 
-#include "platform/ThreadStackManager.h"
 #include "platform/PlatformManager.h"
-
+#include "platform/ThreadStackManager.h"
 
 #if CHIP_DEVICE_LAYER_TARGET == LINUX
 struct DBusConnectionDeleter
 {
-    void operator()(DBusConnection *aConnection) { dbus_connection_unref(aConnection); }
+    void operator()(DBusConnection * aConnection) { dbus_connection_unref(aConnection); }
 };
 
 using UniqueDBusConnection = std::unique_ptr<DBusConnection, DBusConnectionDeleter>;
@@ -37,8 +36,8 @@ using UniqueDBusConnection = std::unique_ptr<DBusConnection, DBusConnectionDelet
 int TestThreadStackManager(void)
 {
 #if CHIP_DEVICE_LAYER_TARGET == LINUX
-    DBusError                      error;
-    UniqueDBusConnection           connection;
+    DBusError error;
+    UniqueDBusConnection connection;
 
     dbus_error_init(&error);
     connection = UniqueDBusConnection(dbus_bus_get(DBUS_BUS_SYSTEM, &error));
@@ -67,7 +66,7 @@ int TestThreadStackManager(void)
 
     printf("Start Thread task done\n");
 
-    //chip::DeviceLayer::PlatformMgrImpl().RunEventLoop();
+    // chip::DeviceLayer::PlatformMgrImpl().RunEventLoop();
 
     return 0;
 }

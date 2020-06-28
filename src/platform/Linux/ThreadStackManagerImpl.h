@@ -31,7 +31,7 @@ namespace DeviceLayer {
 class ThreadStackManagerImpl : public ThreadStackManager
 {
 public:
-    ThreadStackManagerImpl(DBusConnection *aConnection);
+    ThreadStackManagerImpl(DBusConnection * aConnection);
 
     CHIP_ERROR _InitThreadStack();
     CHIP_ERROR _ProcessThreadActivity();

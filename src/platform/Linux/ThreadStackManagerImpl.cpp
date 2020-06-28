@@ -55,8 +55,9 @@ using otbr::DBus::NeighborInfo;
 namespace chip {
 namespace DeviceLayer {
 
-ThreadStackManagerImpl::ThreadStackManagerImpl(DBusConnection *aConnection) :
-  mThreadApi(nullptr), mConnection(aConnection), mNetworkInfo(), mAttached(false) {}
+ThreadStackManagerImpl::ThreadStackManagerImpl(DBusConnection * aConnection) :
+    mThreadApi(nullptr), mConnection(aConnection), mNetworkInfo(), mAttached(false)
+{}
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
