@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the CHIP SDK QR code library tests.
+#
+
 add_library(SetupPayloadTests
     TestManualCode.cpp
     TestQRCode.cpp

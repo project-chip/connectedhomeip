@@ -17,7 +17,7 @@
 
 #
 #    Description:
-#      This file is the CMake template for the CHIP SDK QR code code.
+#      This file is the CMake template for the CHIP SDK QR code library.
 #
 
 add_subdirectory(tests)

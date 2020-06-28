@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the CHIP SDK transport layer library tests.
+#
+
 add_library(TransportLayerTests
     TestMessageHeader.cpp
     TestPeerConnections.cpp

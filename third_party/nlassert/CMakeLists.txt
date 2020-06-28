@@ -34,7 +34,7 @@ set(COMMON_INCLUDES
 set(COMMON_LIBS
     nlassert
     nlunit-test
-    PlatformBsp
+    ${CHIP_PLATFORM_LIBS}
     chip-config
 )
 

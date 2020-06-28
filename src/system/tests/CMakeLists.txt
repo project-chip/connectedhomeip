@@ -15,6 +15,11 @@
 #    limitations under the License.
 #
 
+#
+#    Description:
+#      This file is the CMake template for the CHIP SDK system layer library tests.
+#
+
 add_library(SystemLayerTests
     TestSystemErrorStr.cpp
     TestSystemObject.cpp
