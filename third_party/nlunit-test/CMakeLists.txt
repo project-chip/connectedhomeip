@@ -20,26 +20,12 @@
 #      This file is the CMake template for the nlunit-test library.
 #
 
-add_library(nlunit-test)
-
-set_target_properties(
-    nlunit-test
-    PROPERTIES
-        C_STANDARD 99
-        CXX_STANDARD 11
-)
-
-set(COMMON_SOURCES
+add_library(nlunit-test
     repo/src/nlunit-test.c
 )
 
-set(COMMON_INCLUDES
+target_include_directories(nlunit-test PUBLIC
     repo/src
 )
-
-target_compile_definitions(nlunit-test PRIVATE)
-target_compile_options(nlunit-test PRIVATE)
-target_include_directories(nlunit-test PRIVATE ${COMMON_INCLUDES})
-target_sources(nlunit-test PRIVATE ${COMMON_SOURCES})
 
 target_link_libraries(nlunit-test PRIVATE chip-config)

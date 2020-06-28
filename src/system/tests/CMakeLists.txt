@@ -15,17 +15,23 @@
 #    limitations under the License.
 #
 
-set(COMMON_INCLUDES
+add_library(SystemLayerTests
+    TestSystemErrorStr.cpp
+    TestSystemObject.cpp
+    TestSystemPacketBuffer.cpp
+    TestSystemTimer.cpp
+)
+
+target_include_directories(SystemLayerTests PUBLIC
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/src/include
     ${PROJECT_SOURCE_DIR}/src/lib
     ${PROJECT_SOURCE_DIR}/src/lib/core
     ${PROJECT_SOURCE_DIR}/src/system
-    ${PROJECT_SOURCE_DIR}/third_party/nlunit-test/repo/src
     ${PROJECT_SOURCE_DIR}/third_party/lwip/repo/lwip/src/include
 )
 
-set(COMMON_LIBS
+target_link_libraries(SystemLayerTests PUBLIC
     ${PLATFORM_LINK_START}
     BleLayer
     InetLayer
@@ -38,58 +44,22 @@ set(COMMON_LIBS
     chip-config
 )
 
-set(COMMON_LDPATH)
-
 #### TestSystemErrorStr
-
-add_executable(TestSystemErrorStr
-    TestSystemErrorStr.cpp
-    TestSystemErrorStrDriver.cpp
-)
-
-target_include_directories(TestSystemErrorStr PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestSystemErrorStr PRIVATE ${COMMON_LIBS})
-target_link_directories(TestSystemErrorStr PRIVATE ${COMMON_LDPATH})
-
+add_executable(TestSystemErrorStr TestSystemErrorStrDriver.cpp)
+target_link_libraries(TestSystemErrorStr PRIVATE SystemLayerTests)
 add_test(NAME TestSystemErrorStr COMMAND TestSystemErrorStr)
 
 #### TestSystemObject
-
-add_executable(TestSystemObject
-    TestSystemObject.cpp
-    TestSystemObjectDriver.cpp
-)
-
-target_include_directories(TestSystemObject PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestSystemObject PRIVATE ${COMMON_LIBS})
-target_link_directories(TestSystemObject PRIVATE ${COMMON_LDPATH})
-
+add_executable(TestSystemObject TestSystemObjectDriver.cpp)
+target_link_libraries(TestSystemObject PRIVATE SystemLayerTests)
 add_test(NAME TestSystemObject COMMAND TestSystemObject)
 
-
 #### TestSystemPacketBuffer
-
-add_executable(TestSystemPacketBuffer
-    TestSystemPacketBuffer.cpp
-    TestSystemPacketBufferDriver.cpp
-)
-
-target_include_directories(TestSystemPacketBuffer PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestSystemPacketBuffer PRIVATE ${COMMON_LIBS})
-target_link_directories(TestSystemPacketBuffer PRIVATE ${COMMON_LDPATH})
-
+add_executable(TestSystemPacketBuffer TestSystemPacketBufferDriver.cpp)
+target_link_libraries(TestSystemPacketBuffer PRIVATE SystemLayerTests)
 add_test(NAME TestSystemPacketBuffer COMMAND TestSystemPacketBuffer)
 
-
 #### TestSystemTimer
-
-add_executable(TestSystemTimer
-    TestSystemTimer.cpp
-    TestSystemTimerDriver.cpp
-)
-
-target_include_directories(TestSystemTimer PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestSystemTimer PRIVATE ${COMMON_LIBS})
-target_link_directories(TestSystemTimer PRIVATE ${COMMON_LDPATH})
-
+add_executable(TestSystemTimer TestSystemTimerDriver.cpp)
+target_link_libraries(TestSystemTimer PRIVATE SystemLayerTests)
 add_test(NAME TestSystemTimer COMMAND TestSystemTimer)

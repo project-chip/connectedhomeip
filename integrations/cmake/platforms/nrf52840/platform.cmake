@@ -26,7 +26,7 @@ set(NRF5_SDK_ROOT $ENV{NRF5_SDK_ROOT})
 
 if(NOT DEFINED LINKER_SCRIPT)
     set(LINKER_SCRIPT "${PROJECT_SOURCE_DIR}/examples/lock-app/nrf5/main/ldscripts/chip-nrf52840-lock-example.ld")
-    message(WARNING "No linker script defined -- using default.")
+    message("Warning: No linker script defined -- using default.")
 endif(NOT DEFINED LINKER_SCRIPT)
 message("Linker script: ${LINKER_SCRIPT}")
 
@@ -37,7 +37,6 @@ set(CMAKE_C_FLAGS "${PLATFORM_MACH_FLAGS}" CACHE INTERNAL "C Compiler options")
 set(CMAKE_CXX_FLAGS "${PLATFORM_MACH_FLAGS}" CACHE INTERNAL "C++ Compiler options")
 set(CMAKE_ASM_FLAGS "${PLATFORM_MACH_FLAGS} -x assembler-with-cpp" CACHE INTERNAL "ASM Compiler options")
 set(CMAKE_EXE_LINKER_FLAGS "${PLATFORM_MACH_FLAGS} -T${LINKER_SCRIPT} -L${NRF5_SDK_ROOT}/modules/nrfx/mdk" CACHE INTERNAL "Linker options")
-#  -lc -lstdc++ -lnosys -lm
 
 set(PLATFORM_LINK_START "-Wl,--start-group")
 set(PLATFORM_LINK_END "-Wl,--end-group")
@@ -77,11 +76,11 @@ target_compile_definitions(chip-config INTERFACE
     CONFIG_DEVICE_LAYER=1
     CHIP_DEVICE_LAYER_TARGET_NRF5=1
     CHIP_DEVICE_LAYER_TARGET=nRF5
-    "BLE_PLATFORM_CONFIG_INCLUDE=<platform/nRF5/BlePlatformConfig.h>"
-    "INET_PLATFORM_CONFIG_INCLUDE=<platform/nRF5/InetPlatformConfig.h>"
-    "SYSTEM_PLATFORM_CONFIG_INCLUDE=<platform/nRF5/SystemPlatformConfig.h>"
-    "CHIP_PLATFORM_CONFIG_INCLUDE=<platform/nRF5/CHIPPlatformConfig.h>"
-    "CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE=<platform/nRF5/CHIPDevicePlatformConfig.h>"
+    BLE_PLATFORM_CONFIG_INCLUDE=<platform/nRF5/BlePlatformConfig.h>
+    INET_PLATFORM_CONFIG_INCLUDE=<platform/nRF5/InetPlatformConfig.h>
+    SYSTEM_PLATFORM_CONFIG_INCLUDE=<platform/nRF5/SystemPlatformConfig.h>
+    CHIP_PLATFORM_CONFIG_INCLUDE=<platform/nRF5/CHIPPlatformConfig.h>
+    CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE=<platform/nRF5/CHIPDevicePlatformConfig.h>
 
     NRF52840_XXAA
     BOARD_PCA10056

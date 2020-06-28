@@ -20,15 +20,18 @@
 #      This file is the CMake template for the CHIP SDK crypto library tests.
 #
 
-set(COMMON_INCLUDES
+add_library(CryptoLayerTests
+    CHIPCryptoPALTest.cpp
+)
+
+target_include_directories(CryptoLayerTests PUBLIC
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/src/include
     ${PROJECT_SOURCE_DIR}/src/lib
     ${PROJECT_SOURCE_DIR}/src/crypto
-    ${PROJECT_SOURCE_DIR}/third_party/nlunit-test/repo/src
 )
 
-set(COMMON_LIBS
+target_link_libraries(CryptoLayerTests PUBLIC
     ChipCrypto
     SupportLayer
     nlunit-test
@@ -36,20 +39,11 @@ set(COMMON_LIBS
     chip-config
 )
 
-set(COMMON_LDPATH)
-
 #### TestCryptoPAL
 if(NOT CHIP_TARGET_STYLE_EMBEDDED)
 
-add_executable(TestCryptoPAL
-    CHIPCryptoPALTest.cpp
-    CHIPCryptoPALTestDriver.cpp
-)
-
-target_include_directories(TestCryptoPAL PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestCryptoPAL PRIVATE ${COMMON_LIBS})
-target_link_directories(TestCryptoPAL PRIVATE ${COMMON_LDPATH})
-
+add_executable(TestCryptoPAL CHIPCryptoPALTestDriver.cpp)
+target_link_libraries(TestCryptoPAL PRIVATE CryptoLayerTests)
 add_test(NAME TestCryptoPAL COMMAND TestCryptoPAL)
 
 endif()

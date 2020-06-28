@@ -20,60 +20,36 @@
 #      This file is the CMake template for the CHIP SDK support library tests.
 #
 
-set(COMMON_INCLUDES
-    ${PROJECT_SOURCE_DIR}/src
-    ${PROJECT_SOURCE_DIR}/src/include
-    ${PROJECT_SOURCE_DIR}/src/lib
-    ${PROJECT_SOURCE_DIR}/third_party/nlunit-test/repo/src
+add_library(SupportLayerTests
+    TestErrorStr.cpp
+    TestTimeUtils.cpp
+    TestCHIPArgParser.cpp
 )
 
-set(COMMON_LIBS
+target_include_directories(SupportLayerTests PUBLIC
+    ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_SOURCE_DIR}/src/lib
+    ${PROJECT_SOURCE_DIR}/src/include
+)
+
+target_link_libraries(SupportLayerTests PUBLIC 
     SupportLayer
     nlunit-test
     ${CHIP_PLATFORM_LIBS}
     chip-config
 )
 
-set(COMMON_LDPATH)
-
-
 #### TestSupportErrorStr
-
-add_executable(TestSupportErrorStr
-    TestErrorStr.cpp
-    TestErrorStrDriver.cpp
-)
-
-target_include_directories(TestSupportErrorStr PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestSupportErrorStr PRIVATE ${COMMON_LIBS})
-target_link_directories(TestSupportErrorStr PRIVATE ${COMMON_LDPATH})
-
+add_executable(TestSupportErrorStr TestErrorStrDriver.cpp)
+target_link_libraries(TestSupportErrorStr PRIVATE SupportLayerTests)
 add_test(NAME TestSupportErrorStr COMMAND TestSupportErrorStr)
 
-
 #### TestSupportTimeUtils
-
-add_executable(TestSupportTimeUtils
-    TestTimeUtils.cpp
-    TestTimeUtilsDriver.cpp
-)
-
-target_include_directories(TestSupportTimeUtils PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestSupportTimeUtils PRIVATE ${COMMON_LIBS})
-target_link_directories(TestSupportTimeUtils PRIVATE ${COMMON_LDPATH})
-
+add_executable(TestSupportTimeUtils TestTimeUtilsDriver.cpp)
+target_link_libraries(TestSupportTimeUtils PRIVATE SupportLayerTests)
 add_test(NAME TestSupportTimeUtils COMMAND TestSupportTimeUtils)
 
-
 #### TestSupportCHIPArgParser
-
-add_executable(TestSupportCHIPArgParser
-    TestCHIPArgParser.cpp
-    TestCHIPArgParserDriver.cpp
-)
-
-target_include_directories(TestSupportCHIPArgParser PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestSupportCHIPArgParser PRIVATE ${COMMON_LIBS})
-target_link_directories(TestSupportCHIPArgParser PRIVATE ${COMMON_LDPATH})
-
+add_executable(TestSupportCHIPArgParser TestCHIPArgParserDriver.cpp)
+target_link_libraries(TestSupportCHIPArgParser PRIVATE SupportLayerTests)
 add_test(NAME TestSupportCHIPArgParser COMMAND TestSupportCHIPArgParser)

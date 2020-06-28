@@ -23,7 +23,7 @@ add_library(TransportLayerTests
     TestUDP.cpp
 )
 
-set(COMMON_INCLUDES
+target_include_directories(TransportLayerTests PUBLIC
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/src/include
     ${PROJECT_SOURCE_DIR}/src/lib
@@ -33,9 +33,8 @@ set(COMMON_INCLUDES
     ${PROJECT_SOURCE_DIR}/third_party/lwip/repo/lwip/src/include
 )
 
-set(COMMON_LIBS
+target_link_libraries(TransportLayerTests PUBLIC
     ${PLATFORM_LINK_START}
-    TransportLayerTests
     TransportLayer
     BleLayer
     ChipCrypto
@@ -49,39 +48,26 @@ set(COMMON_LIBS
     chip-config
 )
 
-set(COMMON_LDPATH)
-
-target_include_directories(TransportLayerTests PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TransportLayerTests PRIVATE chip-config)
-
 add_executable(TestTransportMessageHeader TestMessageHeaderDriver.cpp)
-target_include_directories(TestTransportMessageHeader PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestTransportMessageHeader PRIVATE ${COMMON_LIBS})
-target_link_directories(TestTransportMessageHeader PRIVATE ${COMMON_LDPATH})
+target_link_libraries(TestTransportMessageHeader PRIVATE TransportLayerTests)
 add_test(NAME TestTransportMessageHeader COMMAND TestTransportMessageHeader)
 
 add_executable(TestTransportPeerConnections TestPeerConnectionsDriver.cpp)
-target_include_directories(TestTransportPeerConnections PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestTransportPeerConnections PRIVATE ${COMMON_LIBS})
-target_link_directories(TestTransportPeerConnections PRIVATE ${COMMON_LDPATH})
+target_link_libraries(TestTransportPeerConnections PRIVATE TransportLayerTests)
 add_test(NAME TestTransportPeerConnections COMMAND TestTransportPeerConnections)
 
 if(CHIP_TARGET_STYLE_UNIX)
+
 add_executable(TestTransportSecureSession TestSecureSessionDriver.cpp)
-target_include_directories(TestTransportSecureSession PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestTransportSecureSession PRIVATE ${COMMON_LIBS})
-target_link_directories(TestTransportSecureSession PRIVATE ${COMMON_LDPATH})
+target_link_libraries(TestTransportSecureSession PRIVATE TransportLayerTests)
 add_test(NAME TestTransportSecureSession COMMAND TestTransportSecureSession)
 
 add_executable(TestTransportSecureSessionMgr TestSecureSessionMgrDriver.cpp)
-target_include_directories(TestTransportSecureSessionMgr PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestTransportSecureSessionMgr PRIVATE ${COMMON_LIBS})
-target_link_directories(TestTransportSecureSessionMgr PRIVATE ${COMMON_LDPATH})
+target_link_libraries(TestTransportSecureSessionMgr PRIVATE TransportLayerTests)
 add_test(NAME TestTransportSecureSessionMgr COMMAND TestTransportSecureSessionMgr)
 
 add_executable(TestTransportUDP TestUDPDriver.cpp)
-target_include_directories(TestTransportUDP PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestTransportUDP PRIVATE ${COMMON_LIBS})
-target_link_directories(TestTransportUDP PRIVATE ${COMMON_LDPATH})
+target_link_libraries(TestTransportUDP PRIVATE TransportLayerTests)
 add_test(NAME TestTransportUDP COMMAND TestTransportUDP)
+
 endif(CHIP_TARGET_STYLE_UNIX)

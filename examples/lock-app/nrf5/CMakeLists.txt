@@ -118,7 +118,6 @@ set(NDK5_LIBS
 
 set(COMMON_LIBS
     ${PLATFORM_LINK_START}
-    -Wl,--start-group
     ChipCore
     ChipDataModel
     ChipCrypto

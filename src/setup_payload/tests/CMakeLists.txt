@@ -21,17 +21,15 @@ add_library(SetupPayloadTests
     TestQRCodeTLV.cpp
 )
 
-set(COMMON_INCLUDES
+target_include_directories(SetupPayloadTests PUBLIC
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/src/include
     ${PROJECT_SOURCE_DIR}/src/lib
     ${PROJECT_SOURCE_DIR}/src/system
     ${PROJECT_SOURCE_DIR}/src/setup_payload
-    ${PROJECT_SOURCE_DIR}/third_party/nlunit-test/repo/src
 )
 
-set(COMMON_LIBS
-    SetupPayloadTests
+target_link_libraries(SetupPayloadTests PUBLIC
     ChipCore
     SystemLayer
     SupportLayer
@@ -41,29 +39,17 @@ set(COMMON_LIBS
     chip-config
 )
 
-set(COMMON_LDPATH)
-
-target_include_directories(SetupPayloadTests PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(SetupPayloadTests PRIVATE chip-config)
-
-
 #### TestManualCode
 add_executable(TestManualCode TestManualCodeDriver.cpp)
-target_include_directories(TestManualCode PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestManualCode PRIVATE ${COMMON_LIBS})
-target_link_directories(TestManualCode PRIVATE ${COMMON_LDPATH})
+target_link_libraries(TestManualCode PRIVATE SetupPayloadTests)
 add_test(NAME TestManualCode COMMAND TestManualCode)
 
 #### TestQRCode
 add_executable(TestQRCode TestQRCodeDriver.cpp)
-target_include_directories(TestQRCode PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestQRCode PRIVATE ${COMMON_LIBS})
-target_link_directories(TestQRCode PRIVATE ${COMMON_LDPATH})
+target_link_libraries(TestQRCode PRIVATE SetupPayloadTests)
 add_test(NAME TestQRCode COMMAND TestQRCode)
 
 #### TestQRCodeTLV
 add_executable(TestQRCodeTLV TestQRCodeTLVDriver.cpp)
-target_include_directories(TestQRCodeTLV PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestQRCodeTLV PRIVATE ${COMMON_LIBS})
-target_link_directories(TestQRCodeTLV PRIVATE ${COMMON_LDPATH})
+target_link_libraries(TestQRCodeTLV PRIVATE SetupPayloadTests)
 add_test(NAME TestQRCodeTLV COMMAND TestQRCodeTLV)

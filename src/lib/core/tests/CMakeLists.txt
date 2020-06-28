@@ -20,14 +20,18 @@
 #      This file is the CMake template for the CHIP SDK core library tests.
 #
 
-set(COMMON_INCLUDES
+add_library(ChipCoreTests
+    TestCHIPErrorStr.cpp
+    TestCHIPTLV.cpp
+)
+
+target_include_directories(ChipCoreTests PUBLIC
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/src/lib
     ${PROJECT_SOURCE_DIR}/src/include
-    ${PROJECT_SOURCE_DIR}/third_party/nlunit-test/repo/src
 )
 
-set(COMMON_LIBS
+target_link_libraries(ChipCoreTests PUBLIC 
     SystemLayer
     SupportLayer
     ChipCore
@@ -37,32 +41,12 @@ set(COMMON_LIBS
     chip-config
 )
 
-set(COMMON_LDPATH)
-
-
 #### TestCHIPErrorStr
-
-add_executable(TestCHIPErrorStr
-    TestCHIPErrorStr.cpp
-    TestCHIPErrorStrDriver.cpp
-)
-
-target_include_directories(TestCHIPErrorStr PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestCHIPErrorStr PRIVATE ${COMMON_LIBS})
-target_link_directories(TestCHIPErrorStr PRIVATE ${COMMON_LDPATH})
-
+add_executable(TestCHIPErrorStr TestCHIPErrorStrDriver.cpp)
+target_link_libraries(TestCHIPErrorStr PRIVATE ChipCoreTests)
 add_test(NAME TestCHIPErrorStr COMMAND TestCHIPErrorStr)
 
-
 #### TestCHIPTLV
-
-add_executable(TestCHIPTLV
-    TestCHIPTLV.cpp
-    TestCHIPTLVDriver.cpp
-)
-
-target_include_directories(TestCHIPTLV PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestCHIPTLV PRIVATE ${COMMON_LIBS})
-target_link_directories(TestCHIPTLV PRIVATE ${COMMON_LDPATH})
-
+add_executable(TestCHIPTLV TestCHIPTLVDriver.cpp)
+target_link_libraries(TestCHIPTLV PRIVATE ChipCoreTests)
 add_test(NAME TestCHIPTLV COMMAND TestCHIPTLV)

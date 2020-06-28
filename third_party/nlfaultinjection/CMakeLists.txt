@@ -20,21 +20,15 @@
 #      This file is the CMake template for the nlfaultinjection library.
 #
 
-add_library(nlfaultinjection)
-
-set(COMMON_SOURCES
+add_library(nlfaultinjection
     repo/src/nlfaultinjection.cpp
 )
 
-set(COMMON_INCLUDES
+target_include_directories(nlfaultinjection
+  PUBLIC
     repo/include
     ${PROJECT_SOURCE_DIR}/third_party/nlassert/repo/include
 )
-
-target_include_directories(nlfaultinjection PRIVATE ${COMMON_INCLUDES})
-target_sources(nlfaultinjection PRIVATE ${COMMON_SOURCES})
-target_compile_definitions(nlfaultinjection PRIVATE)
-target_compile_options(nlfaultinjection PRIVATE)
 
 target_link_libraries(nlfaultinjection PRIVATE chip-config)
 

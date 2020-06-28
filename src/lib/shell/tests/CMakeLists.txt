@@ -20,15 +20,19 @@
 #      This file is the CMake template for the CHIP SDK shell library tests.
 #
 
-set(COMMON_INCLUDES
+add_library(ChipShellTests
+    TestStreamerStdio.cpp
+    TestShell.cpp
+)
+
+target_include_directories(ChipShellTests PUBLIC
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/src/include
     ${PROJECT_SOURCE_DIR}/src/lib
     ${PROJECT_SOURCE_DIR}/src/crypto
-    ${PROJECT_SOURCE_DIR}/third_party/nlunit-test/repo/src
 )
 
-set(COMMON_LIBS
+target_link_libraries(ChipShellTests PUBLIC
     ${PLATFORM_LINK_START}
     ChipShell
     ChipCore
@@ -39,27 +43,10 @@ set(COMMON_LIBS
     chip-config
 )
 
-set(COMMON_LDPATH)
-
-add_executable(TestShellStreamerStdio
-    TestStreamerStdio.cpp
-    TestStreamerStdioDriver.cpp
-)
-
-target_include_directories(TestShellStreamerStdio PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestShellStreamerStdio PRIVATE ${COMMON_LIBS})
-target_link_directories(TestShellStreamerStdio PRIVATE ${COMMON_LDPATH})
-
+add_executable(TestShellStreamerStdio TestStreamerStdioDriver.cpp)
+target_link_libraries(TestShellStreamerStdio PRIVATE ChipShellTests)
 add_test(NAME TestShellStreamerStdio COMMAND TestShellStreamerStdio)
 
-
-add_executable(TestShell
-    TestShell.cpp
-    TestShellDriver.cpp
-)
-
-target_include_directories(TestShell PRIVATE ${COMMON_INCLUDES})
-target_link_libraries(TestShell PRIVATE ${COMMON_LIBS})
-target_link_directories(TestShell PRIVATE ${COMMON_LDPATH})
-
+add_executable(TestShell TestShellDriver.cpp)
+target_link_libraries(TestShell PRIVATE ChipShellTests)
 add_test(NAME TestShell COMMAND TestShell)

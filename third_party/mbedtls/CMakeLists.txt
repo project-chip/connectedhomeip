@@ -103,7 +103,7 @@ endif ()
 
 target_compile_definitions(mbedtls PRIVATE)
 target_compile_options(mbedtls PRIVATE)
-target_include_directories(mbedtls PRIVATE ${COMMON_INCLUDES})
+target_include_directories(mbedtls PUBLIC ${COMMON_INCLUDES})
 target_sources(mbedtls PRIVATE ${COMMON_SOURCES})
 
 target_link_libraries(mbedtls PRIVATE chip-config)
