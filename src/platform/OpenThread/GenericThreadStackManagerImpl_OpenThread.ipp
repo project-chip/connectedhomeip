@@ -818,6 +818,16 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_FactoryReset(void)
     Impl()->UnlockThreadStack();
 }
 
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ClearThreadProvision(void)
+{
+    ChipLogProgress(DeviceLayer, "About to clear thread provision...");
+    Impl()->LockThreadStack();
+    otThreadSetEnabled(mOTInst, false);
+    otInstanceErasePersistentInfo(mOTInst);
+    Impl()->UnlockThreadStack();
+}
+
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
