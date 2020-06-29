@@ -46,36 +46,37 @@ There are numerous avenues for Project CHIP support:
 
 The Project CHIP repository is structured as follows:
 
-| File / Folder                 | Contents                                                                                                      |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `.default-version`            | Default Project CHIP version if none is available via source code control tags, `.dist-version`, or `.local-version`  |
-| `bootstrap`                   | GNU autotools bootstrap script for the Project CHIP build system                                                      |
-| `bootstrap-configure`         | Convenience script that will bootstrap the Project CHIP build system, via `bootstrap`, and invoke `configure`         |
-| `build/`                      | Build system support content and build output directories                                                     |
-| `BUILDING.md`                 | More detailed information on configuring and building Project CHIP for different targets                              |
-| `CODE_OF_CONDUCT.md`          | Code of Conduct for Project CHIP, and contributions to it                                                             |
-| `CONTRIBUTING.md`             | Guidelines for contributing to Project CHIP                                                                           |
-| `CONTRIBUTORS.md`             | Contributors to Project CHIP                                                                                          |
-| `docs/`                       | Documentation                                                                                                 |
-| `examples/`                   | Example firmware applications that demonstrate use of Project CHIP technology                                         |
-| `integrations/`               | Third party integrations related to this project                                                              |
-| `integrations/github/`        | GitHub integrations related to this project                                                                   |
-| `integrations/github/actions` | GitHub actions related to this project                                                                        |
-| `integrations/docker/`        | Docker scripts and Dockerfiles                                                                                |
-| `images/`                     | Images                                                                                                        |
-| `LICENSE`                     | Project CHIP License file (Apache 2.0)                                                                                |
-| `Makefile-Android`            | Convenience makefile for building Project CHIP against Android                                                        |
-| `Makefile-iOS`                | Convenience makefile for building Project CHIP against iOS                                                            |
-| `Makefile-Standalone`         | Convenience makefile for building Project CHIP as a standalone package on desktop and server systems                  |
-| `README.md`                   | This file                                                                                                      |
-| `src/`                        | Implementation of Project CHIP                                                                                        |
-| `tests/`                      | Tests for Project CHIP                                                                                                |
-| `third_party/`                | Third-party code used by Project CHIP                                                                                 |
-| `tools/`                      | Tools needed to work with the Project CHIP repo, as well as develop in the repository                                 |
+| File / Folder                 | Contents                                                                                                             |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `.default-version`            | Default Project CHIP version if none is available via source code control tags, `.dist-version`, or `.local-version` |
+| `bootstrap`                   | GNU autotools bootstrap script for the Project CHIP build system                                                     |
+| `bootstrap-configure`         | Convenience script that will bootstrap the Project CHIP build system, via `bootstrap`, and invoke `configure`        |
+| `build/`                      | Build system support content and build output directories                                                            |
+| `BUILDING.md`                 | More detailed information on configuring and building Project CHIP for different targets                             |
+| `CODE_OF_CONDUCT.md`          | Code of Conduct for Project CHIP, and contributions to it                                                            |
+| `CONTRIBUTING.md`             | Guidelines for contributing to Project CHIP                                                                          |
+| `CONTRIBUTORS.md`             | Contributors to Project CHIP                                                                                         |
+| `docs/`                       | Documentation                                                                                                        |
+| `examples/`                   | Example firmware applications that demonstrate use of Project CHIP technology                                        |
+| `integrations/`               | Third party integrations related to this project                                                                     |
+| `integrations/github/`        | GitHub integrations related to this project                                                                          |
+| `integrations/github/actions` | GitHub actions related to this project                                                                               |
+| `integrations/docker/`        | Docker scripts and Dockerfiles                                                                                       |
+| `images/`                     | Images                                                                                                               |
+| `LICENSE`                     | Project CHIP License file (Apache 2.0)                                                                               |
+| `Makefile-Android`            | Convenience makefile for building Project CHIP against Android                                                       |
+| `Makefile-iOS`                | Convenience makefile for building Project CHIP against iOS                                                           |
+| `Makefile-Standalone`         | Convenience makefile for building Project CHIP as a standalone package on desktop and server systems                 |
+| `README.md`                   | This file                                                                                                            |
+| `src/`                        | Implementation of Project CHIP                                                                                       |
+| `tests/`                      | Tests for Project CHIP                                                                                               |
+| `third_party/`                | Third-party code used by Project CHIP                                                                                |
+| `tools/`                      | Tools needed to work with the Project CHIP repo, as well as develop in the repository                                |
 
 # Contributing
 
-We would love for you to contribute to Project CHIP. Read our contribution guidelines [here](./CONTRIBUTING.md).
+We would love for you to contribute to Project CHIP. Read our contribution
+guidelines [here](./CONTRIBUTING.md).
 
 # License
 
