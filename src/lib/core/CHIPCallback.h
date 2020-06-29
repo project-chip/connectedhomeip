@@ -132,7 +132,8 @@ public:
     Callback(T call, void * context) : mContext(context), mCall(call) { Inner(); };
 
     /**
-     * TODO: type-safety?
+     * TODO: type-safety? It'd be nice if Inners that aren't Callbacks returned null
+     *    here.  https://github.com/project-chip/connectedhomeip/issues/1350
      */
     static Callback * FromInner(Inner * inner) { return static_cast<Callback *>(inner); }
 };
