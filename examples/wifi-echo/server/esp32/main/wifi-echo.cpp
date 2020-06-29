@@ -147,7 +147,6 @@ extern "C" void app_main()
     // this function will happen on the CHIP event loop thread, not the app_main thread.
     PlatformMgr().AddEventHandler(DeviceEventHandler, 0);
 
-
     // Start a task to run the CHIP Device event loop.
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
