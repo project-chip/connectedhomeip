@@ -22,7 +22,6 @@
 
 set -e
 
-
 die() {
     echo "${me:?}: *** ERROR: " "${*}"
     exit 1
