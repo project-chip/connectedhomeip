@@ -26,18 +26,16 @@
 #ifndef ECHO_DEVICE_CALLBACKS_H
 #define ECHO_DEVICE_CALLBACKS_H
 
-#include <platform/CHIPDeviceLayer.h>
 #include <core/CHIPDevice.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip::DeviceLayer;
 class EchoDeviceCallbacks : public DeviceCallbacks
 {
 public:
     virtual void DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg);
-    virtual void PostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId,
-                                             ChipZclAttributeId attributeId, uint8_t mask,
-                                             uint16_t manufacturerCode, uint8_t type, uint8_t size,
-                                             uint8_t * value);
+    virtual void PostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId,
+                                             uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value);
 };
 
 #endif // ECHO_DEVICE_CALLBACKS_H

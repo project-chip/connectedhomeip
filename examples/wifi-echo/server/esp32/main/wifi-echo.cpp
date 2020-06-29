@@ -17,8 +17,8 @@
 
 #include "Button.h"
 #include "DataModelHandler.h"
-#include "EchoDeviceCallbacks.h"
 #include "Display.h"
+#include "EchoDeviceCallbacks.h"
 #include "LEDWidget.h"
 #include "QRCodeWidget.h"
 #include "esp_event_loop.h"
@@ -34,12 +34,11 @@
 #include "tcpip_adapter.h"
 #include <stdio.h>
 
+#include <core/CHIPDevice.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/ErrorStr.h>
 #include <transport/SecureSessionMgr.h>
-#include <core/CHIPDevice.h>
-
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
@@ -51,13 +50,13 @@ extern void startClient(void);
 
 #if CONFIG_DEVICE_TYPE_M5STACK
 
-#define ATTENTION_BUTTON_GPIO_NUM GPIO_NUM_37        // Use the right button (button "C") as the attention button on M5Stack
-#define STATUS_LED_GPIO_NUM GPIO_NUM_MAX             // No status LED on M5Stack
+#define ATTENTION_BUTTON_GPIO_NUM GPIO_NUM_37 // Use the right button (button "C") as the attention button on M5Stack
+#define STATUS_LED_GPIO_NUM GPIO_NUM_MAX      // No status LED on M5Stack
 
 #elif CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
-#define ATTENTION_BUTTON_GPIO_NUM GPIO_NUM_0         // Use the IO0 button as the attention button on ESP32-DevKitC and compatibles
-#define STATUS_LED_GPIO_NUM GPIO_NUM_2               // Use LED1 (blue LED) as status LED on DevKitC
+#define ATTENTION_BUTTON_GPIO_NUM GPIO_NUM_0 // Use the IO0 button as the attention button on ESP32-DevKitC and compatibles
+#define STATUS_LED_GPIO_NUM GPIO_NUM_2       // Use LED1 (blue LED) as status LED on DevKitC
 
 #else // !CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
@@ -121,7 +120,7 @@ extern "C" void app_main()
         return;
     }
 
-    Device &device = Device::GetInstance();
+    Device & device = Device::GetInstance();
 
     err = device.Init(&EchoCallbacks);
     if (err != CHIP_NO_ERROR)

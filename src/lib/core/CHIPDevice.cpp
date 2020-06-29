@@ -26,8 +26,8 @@
 
 #if 1
 #include <core/CHIPDevice.h>
-#include <support/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
+#include <support/ErrorStr.h>
 
 namespace chip {
 
@@ -35,8 +35,9 @@ namespace DeviceLayer {
 
 void Device::CommonDeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
-    DeviceCallbacks *cb = reinterpret_cast<DeviceCallbacks *>(arg);
-    if (cb != nullptr) {
+    DeviceCallbacks * cb = reinterpret_cast<DeviceCallbacks *>(arg);
+    if (cb != nullptr)
+    {
         cb->DeviceEventCallback(event, reinterpret_cast<intptr_t>(cb));
     }
 }
@@ -44,7 +45,7 @@ void Device::CommonDeviceEventHandler(const ChipDeviceEvent * event, intptr_t ar
 /**
  *
  */
-CHIP_ERROR Device::Init(DeviceCallbacks *cb)
+CHIP_ERROR Device::Init(DeviceCallbacks * cb)
 {
     CHIP_ERROR err;
     mCB = cb;
@@ -70,7 +71,7 @@ CHIP_ERROR Device::Init(DeviceCallbacks *cb)
     err = PlatformMgr().StartEventLoopTask();
     SuccessOrExit(err);
 
- exit:
+exit:
     return err;
 }
 
@@ -78,10 +79,10 @@ extern "C" {
 void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
-    DeviceCallbacks *cb = Device::GetInstance().GetDeviceCallbacks();
-    if (cb != nullptr) {
-        cb->PostAttributeChangeCallback(endpoint, clusterId, attributeId, mask,
-                                        manufacturerCode, type, size, value);
+    DeviceCallbacks * cb = Device::GetInstance().GetDeviceCallbacks();
+    if (cb != nullptr)
+    {
+        cb->PostAttributeChangeCallback(endpoint, clusterId, attributeId, mask, manufacturerCode, type, size, value);
     }
 }
 } // extern "C"
