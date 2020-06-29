@@ -24,9 +24,9 @@ qrcodetool_LDADD = \
     $(NULL)
 
 if CHIP_WITH_ANDROID
-qrcodetool_LDADD																				 += \
-		-llog																										\
-		$(NULL)
+qrcodetool_LDADD                                         += \
+    -llog                                                   \
+	$(NULL)
 endif #CHIP_WITH_ANDROID
 
 NLFOREIGN_FILE_DEPENDENCIES = \

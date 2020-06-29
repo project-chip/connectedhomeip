@@ -61,31 +61,31 @@ libSetupPayloadParser_la_SOURCES               				  = \
     SetupPayloadParser-JNI.cpp                   				\
     $(NULL)
 
-libSetupPayloadParser_la_LIBADD                				= \
-    -L$(top_builddir)/src/setup_payload -lSetupPayload		  \
-    -L$(top_builddir)/src/lib -lCHIP                     	  \
-    $(LWIP_LDFLAGS) $(LWIP_LIBS)                  			  \
-    $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)          	  		  \
+libSetupPayloadParser_la_LIBADD                               = \
+    -L$(top_builddir)/src/setup_payload -lSetupPayload          \
+    -L$(top_builddir)/src/lib -lCHIP                            \
+    $(LWIP_LDFLAGS) $(LWIP_LIBS)                                \
+    $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                          \
     $(NULL)
 
 if CHIP_WITH_ANDROID
-libSetupPayloadParser_la_LIBADD               			   += \
-    -llog                                     			      \
+libSetupPayloadParser_la_LIBADD                              += \
+    -llog                                                       \
     $(NULL)
 endif # CHIP_WITH_ANDROID
 
-libSetupPayloadParser_la_DEPENDENCIES 				        = \
-    $(top_builddir)/src/setup_payload/libSetupPayload.a		  \
-	$(top_builddir)/src/lib/libCHIP.a                         \
+libSetupPayloadParser_la_DEPENDENCIES                         = \
+    $(top_builddir)/src/setup_payload/libSetupPayload.a         \
+    $(top_builddir)/src/lib/libCHIP.a                           \
     $(NULL)
 
-JARS                                              			= \
-    SetupPayloadParser.jar									  \
+JARS                                                          = \
+    SetupPayloadParser.jar                                      \
     $(NULL)
 
-SetupPayloadParser_jar_JAVA_SRCS                 			= \
-    chip/setuppayload/SetupPayload.java						  \
-    chip/setuppayload/SetupPayloadParser.java				  \
+SetupPayloadParser_jar_JAVA_SRCS                              = \
+    chip/setuppayload/SetupPayload.java                         \
+    chip/setuppayload/SetupPayloadParser.java                   \
     $(NULL)
 
 SetupPayloadParser_jar_JFLAGS                      = -source 8 -target 8

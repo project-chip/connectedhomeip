@@ -58,14 +58,14 @@ endif
 
 SETUP_PAYLOAD_SUBDIRS             = \
     setup_payload/java              \
-		$(NULL)
+    $(NULL)
 
 MAYBE_SETUP_PAYLOAD_SUBDIRS       = \
-		$(NULL)
+    $(NULL)
 
 if CHIP_WITH_ANDROID
 MAYBE_SETUP_PAYLOAD_SUBDIRS      += \
-		$(SETUP_PAYLOAD_SUBDIRS)        \
+    $(SETUP_PAYLOAD_SUBDIRS)        \
     $(NULL)
 endif # CHIP_WITH_ANDROID
 
@@ -80,7 +80,7 @@ DIST_SUBDIRS                      = \
     inet                            \
     lib                             \
     setup_payload                   \
-		$(SETUP_PAYLOAD_SUBDIRS)        \
+    $(SETUP_PAYLOAD_SUBDIRS)        \
     crypto                          \
     platform                        \
     qrcodetool                      \
@@ -97,7 +97,7 @@ SUBDIRS                           = \
     inet                            \
     lib                             \
     setup_payload                   \
-		$(MAYBE_SETUP_PAYLOAD_SUBDIRS)	\
+    $(MAYBE_SETUP_PAYLOAD_SUBDIRS)  \
     crypto                          \
     transport                       \
     $(MAYBE_BLE_SUBDIRS)            \
