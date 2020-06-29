@@ -809,6 +809,16 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::AdjustPollingInt
     return err;
 }
 
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo(void)
+{
+    ChipLogProgress(DeviceLayer, "Erasing Thread persistent info...");
+    Impl()->LockThreadStack();
+    otThreadSetEnabled(mOTInst, false);
+    otInstanceErasePersistentInfo(mOTInst);
+    Impl()->UnlockThreadStack();
+}
+
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

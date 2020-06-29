@@ -19,7 +19,9 @@
 
 #include "AppTask.h"
 #include "AppEvent.h"
+#include "DataModelHandler.h"
 #include "LEDWidget.h"
+#include "Server.h"
 
 #include "app_button.h"
 #include "app_config.h"
@@ -60,6 +62,7 @@ static bool sHaveServiceConnectivity = false;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
+chip::SecureSessionMgr sTransportIPv6;
 
 int AppTask::StartAppTask()
 {
@@ -146,6 +149,10 @@ int AppTask::Init()
         NRF_LOG_INFO("xSemaphoreCreateMutex() failed");
         APP_ERROR_HANDLER(NRF_ERROR_NULL);
     }
+
+    // Init ZCL Data Model
+    InitDataModelHandler();
+    StartServer(&sTransportIPv6);
 
     return ret;
 }
@@ -331,7 +338,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = kFunction_NoneSelected;
-        NRF_LOG_INFO("Factory reset is not implemented");
+        ConfigurationMgr().InitiateFactoryReset();
     }
 }
 

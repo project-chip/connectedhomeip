@@ -45,6 +45,15 @@ ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
 CHIP_ERROR ConfigurationManagerImpl::_Init()
 {
     CHIP_ERROR err;
+    bool failSafeArmed;
+
+    // Force initialization of NVS namespaces if they doesn't already exist.
+    err = EnsureNamespace(kConfigNamespace_ChipFactory);
+    SuccessOrExit(err);
+    err = EnsureNamespace(kConfigNamespace_ChipConfig);
+    SuccessOrExit(err);
+    err = EnsureNamespace(kConfigNamespace_ChipCounters);
+    SuccessOrExit(err);
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_Init();
@@ -63,36 +72,10 @@ exit:
     return err;
 }
 
-void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
-{
-    // Forward the event to the generic base classes as needed.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_OnPlatformEvent(event);
-#endif
-}
-
 CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
     // TODO(#739): add WiFi support
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-CHIP_ERROR
-ConfigurationManagerImpl::_GetDeviceDescriptor(::chip::Profiles::DeviceDescription::ChipDeviceDescriptor & deviceDesc)
-{
-    CHIP_ERROR err;
-
-    // Call the generic version of _GetDeviceDescriptor() supplied by the base class.
-    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_GetDeviceDescriptor(deviceDesc);
-    SuccessOrExit(err);
-
-exit:
-    return err;
-}
-
-::chip::Profiles::Security::AppKeys::GroupKeyStoreBase * ConfigurationManagerImpl::_GetGroupKeyStore()
-{
-    return &gGroupKeyStore;
 }
 
 bool ConfigurationManagerImpl::_CanFactoryReset()
@@ -124,6 +107,7 @@ CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platfor
     return WriteConfigValue(configKey, value);
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 CHIP_ERROR ConfigurationManagerImpl::GetWiFiStationSecurityType(Profiles::NetworkProvisioning::WiFiSecurityType & secType)
 {
     CHIP_ERROR err;
@@ -161,6 +145,7 @@ CHIP_ERROR ConfigurationManagerImpl::UpdateWiFiStationSecurityType(Profiles::Net
 exit:
     return err;
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
@@ -177,7 +162,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     ChipLogProgress(DeviceLayer, "Clearing Thread provision");
-    ThreadStackMgr().ClearThreadProvision();
+    ThreadStackMgr().ErasePersistentInfo();
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 

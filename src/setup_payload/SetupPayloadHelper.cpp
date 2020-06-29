@@ -22,6 +22,7 @@
 #include <fstream>
 
 #include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
 using namespace chip;
 
@@ -105,31 +106,31 @@ static CHIP_ERROR addParameter(SetupPayload & setupPayload, SetupPayloadParamete
     switch (parameter.key)
     {
     case SetupPayloadKey_Version:
-        printf("Loaded version: %u\n", (uint8_t) parameter.uintValue);
+        ChipLogDetail(SetupPayload, "Loaded version: %u", (uint8_t) parameter.uintValue);
         setupPayload.version = (uint8_t) parameter.uintValue;
         break;
     case SetupPayloadKey_VendorID:
-        printf("Loaded vendorID: %u\n", (uint16_t) parameter.uintValue);
+        ChipLogDetail(SetupPayload, "Loaded vendorID: %u", (uint16_t) parameter.uintValue);
         setupPayload.vendorID = (uint16_t) parameter.uintValue;
         break;
     case SetupPayloadKey_ProductID:
-        printf("Loaded productID: %u\n", (uint16_t) parameter.uintValue);
+        ChipLogDetail(SetupPayload, "Loaded productID: %u", (uint16_t) parameter.uintValue);
         setupPayload.productID = (uint16_t) parameter.uintValue;
         break;
     case SetupPayloadKey_RequiresCustomFlowTrue:
-        printf("Requires custom flow was set to true\n");
+        ChipLogDetail(SetupPayload, "Requires custom flow was set to true");
         setupPayload.requiresCustomFlow = true;
         break;
     case SetupPayloadKey_RendezVousInformation:
-        printf("Loaded rendezvousInfo: %u\n", (uint16_t) parameter.uintValue);
-        setupPayload.rendezvousInformation = (uint16_t) parameter.uintValue;
+        ChipLogDetail(SetupPayload, "Loaded rendezvousInfo: %u", (uint16_t) parameter.uintValue);
+        setupPayload.rendezvousInformation = static_cast<RendezvousInformationFlags>(parameter.uintValue);
         break;
     case SetupPayloadKey_Discriminator:
-        printf("Loaded discriminator: %u\n", (uint16_t) parameter.uintValue);
+        ChipLogDetail(SetupPayload, "Loaded discriminator: %u", (uint16_t) parameter.uintValue);
         setupPayload.discriminator = (uint16_t) parameter.uintValue;
         break;
     case SetupPayloadKey_SetupPINCode:
-        printf("Loaded setupPinCode: %lu\n", (unsigned long) parameter.uintValue);
+        ChipLogDetail(SetupPayload, "Loaded setupPinCode: %lu", (unsigned long) parameter.uintValue);
         setupPayload.setUpPINCode = (uint32_t) parameter.uintValue;
         break;
     default:

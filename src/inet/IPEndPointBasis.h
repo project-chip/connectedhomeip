@@ -151,6 +151,29 @@ protected:
     void HandlePendingIO(uint16_t aPort);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+protected:
+    nw_listener_t mListener;
+    dispatch_semaphore_t mListenerSemaphore;
+    dispatch_queue_t mListenerQueue;
+    nw_connection_t mConnection;
+    dispatch_semaphore_t mConnectionSemaphore;
+    dispatch_queue_t mDispatchQueue;
+
+    INET_ERROR Bind(IPAddressType aAddressType, IPAddress aAddress, uint16_t aPort, nw_parameters_t aParameters);
+    INET_ERROR ConfigureProtocol(IPAddressType aAddressType, nw_parameters_t aParameters);
+    INET_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBuffer * aBuffer, uint16_t aSendFlags);
+    INET_ERROR StartListener();
+    INET_ERROR GetConnection(const IPPacketInfo * aPktInfo);
+    INET_ERROR GetEndPoint(nw_endpoint_t & aEndpoint, const IPAddress aAddress, uint16_t aPort);
+    INET_ERROR StartConnection(nw_connection_t & aConnection);
+    void GetPacketInfo(nw_connection_t aConnection, IPPacketInfo & aPacketInfo);
+    void HandleDataReceived(nw_connection_t aConnection);
+    INET_ERROR ReleaseListener();
+    INET_ERROR ReleaseConnection();
+    void ReleaseAll();
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
 private:
     IPEndPointBasis(void);                    // not defined
     IPEndPointBasis(const IPEndPointBasis &); // not defined

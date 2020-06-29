@@ -31,6 +31,7 @@
 
 #include <stdarg.h>
 #include <support/CodeUtils.h>
+#include <support/TestUtils.h>
 
 using namespace chip;
 
@@ -108,10 +109,11 @@ void SecureChannelEncryptTest(nlTestSuite * inSuite, void * inContext)
     const unsigned char plain_text[] = { 0x86, 0x74, 0x64, 0xe5, 0x0b, 0xd4, 0x0d, 0x90,
                                          0xe1, 0x17, 0xa3, 0x2d, 0x4b, 0xd4, 0xe1, 0xe6 };
     unsigned char output[128];
+    MessageHeader header;
 
     // Test uninitialized channel
-    NL_TEST_ASSERT(
-        inSuite, channel.Encrypt(plain_text, sizeof(plain_text), output, sizeof(output)) == CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
+    NL_TEST_ASSERT(inSuite,
+                   channel.Encrypt(plain_text, sizeof(plain_text), output, header) == CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
 
     const char * info = "Test Info";
     const char * salt = "Test Salt";
@@ -122,24 +124,12 @@ void SecureChannelEncryptTest(nlTestSuite * inSuite, void * inContext)
                                 sizeof(info)) == CHIP_NO_ERROR);
 
     // Test initialized channel, but invalid arguments
-    NL_TEST_ASSERT(inSuite, channel.Encrypt(NULL, 0, NULL, 0) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, 0, NULL, 0) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, sizeof(plain_text), NULL, 0) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, sizeof(plain_text), output, 0) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite,
-                   channel.Encrypt(plain_text, sizeof(plain_text), output, sizeof(plain_text)) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, channel.EncryptionOverhead() <= sizeof(output) - sizeof(plain_text));
-    NL_TEST_ASSERT(inSuite,
-                   channel.Encrypt(plain_text, sizeof(plain_text), output, sizeof(plain_text) + channel.EncryptionOverhead() - 1) ==
-                       CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, channel.Encrypt(NULL, 0, NULL, header) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, 0, NULL, header) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, sizeof(plain_text), NULL, header) == CHIP_ERROR_INVALID_ARGUMENT);
 
     // Valid arguments
-    NL_TEST_ASSERT(inSuite,
-                   channel.Encrypt(plain_text, sizeof(plain_text), output, sizeof(plain_text) + channel.EncryptionOverhead()) ==
-                       CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite,
-                   channel.Encrypt(plain_text, sizeof(plain_text), output, sizeof(plain_text) + channel.EncryptionOverhead() + 1) ==
-                       CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, sizeof(plain_text), output, header) == CHIP_NO_ERROR);
 }
 
 void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
@@ -148,6 +138,7 @@ void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
     const unsigned char plain_text[] = { 0x86, 0x74, 0x64, 0xe5, 0x0b, 0xd4, 0x0d, 0x90,
                                          0xe1, 0x17, 0xa3, 0x2d, 0x4b, 0xd4, 0xe1, 0xe6 };
     unsigned char encrypted[128];
+    MessageHeader header;
 
     const char * info = "Test Info";
     const char * salt = "Test Salt";
@@ -157,17 +148,13 @@ void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
                                 secure_channel_test_private_key2, sizeof(secure_channel_test_private_key2),
                                 (const unsigned char *) salt, sizeof(salt), (const unsigned char *) info,
                                 sizeof(info)) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite,
-                   channel.Encrypt(plain_text, sizeof(plain_text), encrypted, sizeof(plain_text) + channel.EncryptionOverhead()) ==
-                       CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, sizeof(plain_text), encrypted, header) == CHIP_NO_ERROR);
 
     SecureSession channel2;
     unsigned char output[128];
-    size_t output_length = sizeof(output);
     // Uninitialized channel
     NL_TEST_ASSERT(inSuite,
-                   channel2.Decrypt(encrypted, sizeof(plain_text) + channel.EncryptionOverhead(), output, output_length) ==
-                       CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
+                   channel2.Decrypt(encrypted, sizeof(plain_text), output, header) == CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     NL_TEST_ASSERT(inSuite,
                    channel2.Init(secure_channel_test_public_key2, sizeof(secure_channel_test_public_key2),
                                  secure_channel_test_private_key1, sizeof(secure_channel_test_private_key1),
@@ -175,24 +162,13 @@ void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
                                  sizeof(info)) == CHIP_NO_ERROR);
 
     // Channel initialized, but invalid arguments to decrypt
-    output_length = 0;
-    NL_TEST_ASSERT(inSuite, channel2.Decrypt(NULL, 0, NULL, output_length) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, channel2.Decrypt(encrypted, 0, NULL, output_length) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, channel2.Decrypt(encrypted, sizeof(encrypted), NULL, output_length) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, channel2.Decrypt(encrypted, sizeof(encrypted), output, output_length) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, channel2.Decrypt(NULL, 0, NULL, header) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, channel2.Decrypt(encrypted, 0, NULL, header) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, channel2.Decrypt(encrypted, sizeof(encrypted), NULL, header) == CHIP_ERROR_INVALID_ARGUMENT);
 
     // Valid arguments
-    output_length = sizeof(output);
-    NL_TEST_ASSERT(inSuite,
-                   channel2.Decrypt(encrypted, sizeof(plain_text) + channel.EncryptionOverhead(), output, output_length) ==
-                       CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, channel2.Decrypt(encrypted, sizeof(plain_text), output, header) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, output_length == sizeof(plain_text));
-    NL_TEST_ASSERT(inSuite, memcmp(plain_text, output, sizeof(plain_text)) == 0);
-
-    NL_TEST_ASSERT(inSuite, channel2.Decrypt(encrypted, sizeof(encrypted), output, output_length) == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, output_length == sizeof(plain_text));
     NL_TEST_ASSERT(inSuite, memcmp(plain_text, output, sizeof(plain_text)) == 0);
 }
 
@@ -231,6 +207,11 @@ int TestSecureSession()
     nlTestRunner(&sSuite, NULL);
 
     return (nlTestRunnerStats(&sSuite));
+}
+
+static void __attribute__((constructor)) TestSecureSessionCtor(void)
+{
+    VerifyOrDie(RegisterUnitTests(&TestSecureSession) == CHIP_NO_ERROR);
 }
 
 namespace chip {

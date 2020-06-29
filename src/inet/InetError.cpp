@@ -23,8 +23,8 @@
 
 #include <stddef.h>
 
-#include <Inet.h>
-#include <InetError.h>
+#include <inet/Inet.h>
+#include <inet/InetError.h>
 
 #include <support/ErrorStr.h>
 

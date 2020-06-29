@@ -25,6 +25,32 @@
     chip::SetupPayload _chipSetupPayload;
 }
 
+- (RendezvousInformationFlags)valueOf:(chip::RendezvousInformationFlags)value
+{
+    RendezvousInformationFlags rv = kRendezvousInformationNone;
+    switch (value) {
+    case chip::RendezvousInformationFlags::kNone:
+        rv = kRendezvousInformationNone;
+        break;
+    case chip::RendezvousInformationFlags::kSoftAP:
+        rv = kRendezvousInformationSoftAP;
+        break;
+    case chip::RendezvousInformationFlags::kBLE:
+        rv = kRendezvousInformationBLE;
+        break;
+    case chip::RendezvousInformationFlags::kThread:
+        rv = kRendezvousInformationThread;
+        break;
+    case chip::RendezvousInformationFlags::kEthernet:
+        rv = kRendezvousInformationEthernet;
+        break;
+    case chip::RendezvousInformationFlags::kAllMask:
+        rv = kRendezvousInformationAllMask;
+        break;
+    }
+    return rv;
+}
+
 - (id)initWithSetupPayload:(chip::SetupPayload)setupPayload
 {
     if (self = [super init]) {
@@ -33,18 +59,28 @@
         _vendorID = [NSNumber numberWithUnsignedShort:setupPayload.vendorID];
         _productID = [NSNumber numberWithUnsignedShort:setupPayload.productID];
         _requiresCustomFlow = setupPayload.requiresCustomFlow == 1;
-        _rendezvousInformation = [NSNumber numberWithUnsignedShort:setupPayload.rendezvousInformation];
+        _rendezvousInformation = [self valueOf:setupPayload.rendezvousInformation];
         _discriminator = [NSNumber numberWithUnsignedShort:setupPayload.discriminator];
         _setUpPINCode = [NSNumber numberWithUnsignedLong:setupPayload.setUpPINCode];
-        _serialNumber = [NSString stringWithUTF8String:setupPayload.serialNumber.c_str()];
+
+        [self getSerialNumber:setupPayload];
     }
     return self;
 }
 
-- (NSArray<CHIPOptionalQRCodeInfo *> *)getAllOptionalData:(NSError * __autoreleasing *)error
+- (void)getSerialNumber:(chip::SetupPayload)setupPayload
+{
+    std::string serialNumberC;
+    CHIP_ERROR err = setupPayload.getSerialNumber(serialNumberC);
+    if (err == CHIP_NO_ERROR) {
+        _serialNumber = [NSString stringWithUTF8String:serialNumberC.c_str()];
+    }
+}
+
+- (NSArray<CHIPOptionalQRCodeInfo *> *)getAllOptionalVendorData:(NSError * __autoreleasing *)error
 {
     NSMutableArray<CHIPOptionalQRCodeInfo *> * allOptionalData = [NSMutableArray new];
-    vector<chip::OptionalQRCodeInfo> chipOptionalData = _chipSetupPayload.getAllOptionalData();
+    vector<chip::OptionalQRCodeInfo> chipOptionalData = _chipSetupPayload.getAllOptionalVendorData();
     for (chip::OptionalQRCodeInfo chipInfo : chipOptionalData) {
         CHIPOptionalQRCodeInfo * info = [CHIPOptionalQRCodeInfo new];
         info.tag = [NSNumber numberWithUnsignedChar:chipInfo.tag];
@@ -53,9 +89,9 @@
             info.infoType = [NSNumber numberWithInt:kOptionalQRCodeInfoTypeString];
             info.stringValue = [NSString stringWithUTF8String:chipInfo.data.c_str()];
             break;
-        case chip::optionalQRCodeInfoTypeInt:
-            info.infoType = [NSNumber numberWithInt:kOptionalQRCodeInfoTypeInt];
-            info.integerValue = [NSNumber numberWithInt:chipInfo.integer];
+        case chip::optionalQRCodeInfoTypeInt32:
+            info.infoType = [NSNumber numberWithInt:kOptionalQRCodeInfoTypeInt32];
+            info.integerValue = [NSNumber numberWithInt:chipInfo.int32];
             break;
         default:
             if (error) {

@@ -35,6 +35,7 @@ DEBUG                          ?= 0
 TIMESTAMP                      ?= 0
 TUNNEL_FAILOVER                ?= 0
 USE_LWIP                       ?= 0
+USE_NW                         ?= 0
 NO_OPENSSL                     ?= 0
 BLUEZ                          ?= 0
 USE_FUZZING                    ?= 0
@@ -176,6 +177,11 @@ endif
 ifeq ($(USE_LWIP),1)
 configure_OPTIONS               += --with-target-network=lwip --with-lwip=internal --disable-java
 TargetTuple                     := $(TargetTuple)-lwip
+endif
+
+ifeq ($(USE_NW),1)
+configure_OPTIONS               += --with-target-network=Network.framework
+TargetTuple                     := $(TargetTuple)-nw
 endif
 
 ifeq ($(LONG_TESTS),1)

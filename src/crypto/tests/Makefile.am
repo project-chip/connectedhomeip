@@ -29,8 +29,10 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 noinst_HEADERS                                 = \
     AES_CCM_128_test_vectors.h                   \
     AES_CCM_256_test_vectors.h                   \
+    Hash_SHA256_test_vectors.h                   \
     HKDF_SHA256_test_vectors.h                   \
     ECDH_P256_test_vectors.h                     \
+    PBKDF2_SHA256_test_vectors.h                 \
     $(NULL)
 
 #

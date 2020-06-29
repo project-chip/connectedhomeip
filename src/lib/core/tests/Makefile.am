@@ -43,6 +43,7 @@ lib_LIBRARIES                                         = \
 libCoreTests_a_SOURCES                                = \
     TestCHIPErrorStr.cpp                                \
     TestCHIPTLV.cpp                                     \
+    TestReferenceCounted.cpp                            \
     $(NULL)
 
 libCoreTests_adir                                     = $(includedir)/core
@@ -87,6 +88,7 @@ COMMON_LDADD                                          =  \
 check_PROGRAMS                                        = \
     TestCHIPErrorStr                                    \
     TestCHIPTLV                                         \
+    TestReferenceCounted                                \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -109,6 +111,9 @@ TestCHIPErrorStr_LDADD                                = $(COMMON_LDADD)
 
 TestCHIPTLV_SOURCES                                   = TestCHIPTLVDriver.cpp
 TestCHIPTLV_LDADD                                     = $(COMMON_LDADD)
+
+TestReferenceCounted_SOURCES                          = TestReferenceCountedDriver.cpp
+TestReferenceCounted_LDADD                            = $(COMMON_LDADD)
 
 #
 # Foreign make dependencies

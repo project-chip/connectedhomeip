@@ -31,7 +31,7 @@
 #include "UDPEndPoint.h"
 
 #include "InetFaultInjection.h"
-#include <InetLayer.h>
+#include <inet/InetLayer.h>
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -151,6 +151,13 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
 {
     INET_ERROR res = INET_NO_ERROR;
 
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
+    nw_parameters_configure_protocol_block_t configure_tls;
+    nw_parameters_t parameters;
+
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
     if (mState != kState_Ready && mState != kState_Bound)
     {
         res = INET_ERROR_INCORRECT_STATE;
@@ -249,6 +256,24 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
+    if (intfId != INET_NULL_INTERFACEID)
+    {
+        res = INET_ERROR_NOT_IMPLEMENTED;
+        goto exit;
+    }
+
+    configure_tls = NW_PARAMETERS_DISABLE_PROTOCOL;
+    parameters    = nw_parameters_create_secure_udp(configure_tls, NW_PARAMETERS_DEFAULT_CONFIGURATION);
+
+    res = IPEndPointBasis::Bind(addrType, addr, port, parameters);
+    SuccessOrExit(res);
+
+    mParameters = parameters;
+
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
     if (res == INET_NO_ERROR)
     {
         mState = kState_Bound;
@@ -319,6 +344,13 @@ INET_ERROR UDPEndPoint::Listen(void)
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
+    res = StartListener();
+    SuccessOrExit(res);
+
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
     if (res == INET_NO_ERROR)
     {
         mState = kState_Listening;
@@ -378,6 +410,10 @@ void UDPEndPoint::Close(void)
         mPendingIO.Clear();
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+        IPEndPointBasis::ReleaseAll();
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
         mState = kState_Closed;
     }
@@ -657,6 +693,13 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, PacketBuffer * msg
         PacketBuffer::Free(msg);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    res = IPEndPointBasis::SendMsg(pktInfo, msg, sendFlags);
+
+    if ((sendFlags & kSendFlag_RetainBuffer) == 0)
+        PacketBuffer::Free(msg);
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
 exit:
     CHIP_SYSTEM_FAULT_INJECT_ASYNC_EVENT();
 
@@ -720,11 +763,15 @@ INET_ERROR UDPEndPoint::BindInterface(IPAddressType addrType, InterfaceId intfId
     SuccessOrExit(err);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    err = INET_ERROR_UNKNOWN_INTERFACE;
+    SuccessOrExit(err);
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
     if (err == INET_NO_ERROR)
     {
         mState = kState_Bound;
     }
-
 exit:
     return err;
 }
@@ -752,6 +799,10 @@ InterfaceId UDPEndPoint::GetBoundInterface(void)
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     return mBoundIntfId;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    return INET_NULL_INTERFACEID;
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 }
 
 uint16_t UDPEndPoint::GetBoundPort(void)
@@ -763,6 +814,11 @@ uint16_t UDPEndPoint::GetBoundPort(void)
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     return mBoundPort;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    nw_endpoint_t endpoint = nw_parameters_copy_local_endpoint(mParameters);
+    return nw_endpoint_get_port(endpoint);
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

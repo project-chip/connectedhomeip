@@ -2271,6 +2271,36 @@
 #endif // CHIP_CONFIG_ENABLE_IFJ_SERVICE_FABRIC_JOIN
 
 /**
+ * @def CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
+ *
+ * @brief Define the size of the pool used for tracking CHIP
+ * Peer connections. This defines maximum number of concurrent
+ * device connections across all supported transports.
+ */
+#ifndef CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
+#define CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE                   16
+#endif // CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
+
+/**
+ * @def CHIP_PEER_CONNECTION_TIMEOUT_MS
+ *
+ * @brief After what period of inactivity is a peer connection considered
+ * expired.
+ */
+#ifndef CHIP_PEER_CONNECTION_TIMEOUT_MS
+#define CHIP_PEER_CONNECTION_TIMEOUT_MS      120000
+#endif // CHIP_PEER_CONNECTION_TIMEOUT_MS
+
+/**
+ * @def CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS
+ *
+ * @brief How frequent are peer connections checked for timeouts.
+ */
+#ifndef CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS
+#define CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS      5000
+#endif // CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS
+
+/**
  * @def CHIP_NON_PRODUCTION_MARKER
  *
  * @brief Defines the name of a mark symbol whose presence signals that the chip code

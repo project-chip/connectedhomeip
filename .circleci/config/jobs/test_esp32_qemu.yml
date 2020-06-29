@@ -6,3 +6,9 @@ steps:
     - run:
           name: Build ESP32 QEMU and Run Tests
           command: scripts/tests/esp32_qemu_tests.sh
+    - run:
+          name: Save test log files
+          command: scripts/tests/save_logs.sh /tmp/test_logs
+          when: on_fail
+    - store_artifacts:
+          path: /tmp/test_logs

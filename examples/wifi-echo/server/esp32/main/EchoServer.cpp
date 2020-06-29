@@ -24,10 +24,11 @@
 #include "nvs_flash.h"
 #include "tcpip_adapter.h"
 
+#include <algorithm>
+#include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>
-
-#include <algorithm>
 
 #include "lwip/err.h"
 #include "lwip/sockets.h"
@@ -92,45 +93,98 @@ exit:
     return maybeDataModelMessage;
 }
 
-void newConnectionHandler(const MessageHeader & header, const IPPacketInfo & packet_info, SecureSessionMgr * transport)
+void newConnectionHandler(PeerConnectionState * state, SecureSessionMgr * transport)
 {
     CHIP_ERROR err;
 
     ESP_LOGI(TAG, "Received a new connection.");
 
-    VerifyOrExit(header.GetSourceNodeId().HasValue(), ESP_LOGE(TAG, "Unknown source for received message"));
-    VerifyOrExit(transport->GetPeerNodeId() != header.GetSourceNodeId().Value(), ESP_LOGI(TAG, "Node already known."));
-
-    err = transport->Connect(header.GetSourceNodeId().Value(), PeerAddress::UDP(packet_info.SrcAddress, packet_info.SrcPort));
-    VerifyOrExit(err == CHIP_NO_ERROR, ESP_LOGE(TAG, "Failed to connect transport"));
-
-    err = transport->ManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key, sizeof(local_private_key));
+    err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key,
+                                                               sizeof(local_private_key));
     VerifyOrExit(err == CHIP_NO_ERROR, ESP_LOGE(TAG, "Failed to setup encryption"));
 
 exit:
     return;
 }
 
+/**
+ * @brief implements something like "od -c", changes an arbitrary byte string
+ *   into a single-line of ascii.  Destroys any byte-wise encoding that
+ *   might be present, e.g. utf-8.
+ *
+ * @param bytes     potentially unprintable buffer
+ * @param bytes_len length of bytes
+ * @param out       where to put the printable string
+ * @param out_len   length of out
+ * @return size_t required size of output buffer, including null-termination
+ */
+static size_t odc(const uint8_t * bytes, size_t bytes_len, char * out, size_t out_len)
+{
+    size_t required = 1; // always need null termination
+    memset(out, 0, out_len);
+    // count and print
+    for (; bytes_len > 0; bytes_len--, bytes++)
+    {
+        uint8_t byte = *bytes;
+
+        if ((byte >= '\t' && byte <= '\r') || byte == '\\')
+        {
+            static const char * kCodes = "tnvfr";
+            char code                  = (byte == '\\') ? '\\' : kCodes[byte - '\t'];
+            required += 2;
+            if (out_len > 2)
+            {
+                *out++ = '\\';
+                *out++ = code;
+                out_len -= 2;
+            }
+        }
+        else if (byte >= ' ' && byte <= '~')
+        {
+            required += 1;
+            if (out_len > 1)
+            {
+                *out++ = byte;
+                out_len--;
+            }
+        }
+        else
+        {
+            static const size_t kBinCodeLen = sizeof("\\xFF") - 1;
+            static const char * kCodes      = "0123456789ABCDEF";
+
+            required += kBinCodeLen;
+            if (out_len > kBinCodeLen)
+            {
+                *out++ = '\\';
+                *out++ = 'x';
+                *out++ = kCodes[(byte & 0xf0) >> 4];
+                *out++ = kCodes[byte & 0xf];
+                out_len -= kBinCodeLen;
+            }
+        }
+    }
+
+    return required;
+}
+
 // Transport Callbacks
-void echo(const MessageHeader & header, const IPPacketInfo & packet_info, System::PacketBuffer * buffer,
-          SecureSessionMgr * transport)
+void receiveHandler(const MessageHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
+                    SecureSessionMgr * transport)
 {
     CHIP_ERROR err;
     const size_t data_len = buffer->DataLength();
 
     // as soon as a client connects, assume it is connected
     VerifyOrExit(transport != NULL && buffer != NULL, ESP_LOGE(TAG, "Received data but couldn't process it..."));
-
-    VerifyOrExit(header.GetSourceNodeId().HasValue(), ESP_LOGE(TAG, "Unknown source for received message"));
+    VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ESP_LOGE(TAG, "Unknown source for received message"));
 
     {
-        char src_addr[INET_ADDRSTRLEN];
-        char dest_addr[INET_ADDRSTRLEN];
-        packet_info.SrcAddress.ToString(src_addr, sizeof(src_addr));
-        packet_info.DestAddress.ToString(dest_addr, sizeof(dest_addr));
+        char src_addr[Transport::PeerAddress::kMaxToStringSize];
 
-        ESP_LOGI(TAG, "UDP packet received from %s:%u to %s:%u (%zu bytes)", src_addr, packet_info.SrcPort, dest_addr,
-                 packet_info.DestPort, static_cast<size_t>(data_len));
+        state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
+
+        ESP_LOGI(TAG, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
     }
 
     // FIXME: Long-term we shouldn't be guessing what sort of message this is
@@ -145,8 +199,11 @@ void echo(const MessageHeader & header, const IPPacketInfo & packet_info, System
     }
     else
     {
+        char logmsg[512];
 
-        ESP_LOGI(TAG, "Client sent: \"%.*s\"", data_len, buffer->Start());
+        odc(buffer->Start(), data_len, logmsg, sizeof(logmsg));
+
+        ESP_LOGI(TAG, "Client sent: %s", logmsg);
 
         // Attempt to echo back
         err    = transport->SendMessage(header.GetSourceNodeId().Value(), buffer);
@@ -192,7 +249,7 @@ void setupTransport(IPAddressType type, SecureSessionMgr * transport)
     err = transport->Init(kLocalNodeId, &DeviceLayer::InetLayer, UdpListenParameters().SetAddressType(type).SetInterfaceId(netif));
     SuccessOrExit(err);
 
-    transport->SetMessageReceiveHandler(echo, transport);
+    transport->SetMessageReceiveHandler(receiveHandler, transport);
     transport->SetReceiveErrorHandler(error);
     transport->SetNewConnectionHandler(newConnectionHandler, transport);
 

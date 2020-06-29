@@ -31,6 +31,7 @@
 #include <mbedtls/error.h>
 #include <mbedtls/hkdf.h>
 #include <mbedtls/md.h>
+#include <mbedtls/pkcs5.h>
 #include <mbedtls/sha256.h>
 
 #include <support/CodeUtils.h>
@@ -38,8 +39,21 @@
 
 #include <string.h>
 
+namespace chip {
+namespace Crypto {
+
 #define MAX_ERROR_STR_LEN 128
 #define NUM_BYTES_IN_SHA256_HASH 32
+
+typedef struct
+{
+    bool initialized;
+    mbedtls_ctr_drbg_context drbg_ctxt;
+    mbedtls_entropy_context entropy;
+} EntropyContext;
+
+static EntropyContext gsEntropyContext;
+
 static void _log_mbedTLS_error(int error_code)
 {
     if (error_code != 0)
@@ -69,9 +83,9 @@ static bool _isValidKeyLength(size_t length)
     return false;
 }
 
-CHIP_ERROR chip::Crypto::AES_CCM_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
-                                         size_t aad_length, const unsigned char * key, size_t key_length, const unsigned char * iv,
-                                         size_t iv_length, unsigned char * ciphertext, unsigned char * tag, size_t tag_length)
+CHIP_ERROR AES_CCM_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad, size_t aad_length,
+                           const unsigned char * key, size_t key_length, const unsigned char * iv, size_t iv_length,
+                           unsigned char * ciphertext, unsigned char * tag, size_t tag_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 1;
@@ -107,9 +121,9 @@ exit:
     return error;
 }
 
-CHIP_ERROR chip::Crypto::AES_CCM_decrypt(const unsigned char * ciphertext, size_t ciphertext_len, const unsigned char * aad,
-                                         size_t aad_len, const unsigned char * tag, size_t tag_length, const unsigned char * key,
-                                         size_t key_length, const unsigned char * iv, size_t iv_length, unsigned char * plaintext)
+CHIP_ERROR AES_CCM_decrypt(const unsigned char * ciphertext, size_t ciphertext_len, const unsigned char * aad, size_t aad_len,
+                           const unsigned char * tag, size_t tag_length, const unsigned char * key, size_t key_length,
+                           const unsigned char * iv, size_t iv_length, unsigned char * plaintext)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 1;
@@ -145,9 +159,70 @@ exit:
     return error;
 }
 
-CHIP_ERROR chip::Crypto::HKDF_SHA256(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
-                                     const size_t salt_length, const unsigned char * info, const size_t info_length,
-                                     unsigned char * out_buffer, size_t out_length)
+CHIP_ERROR Hash_SHA256(const unsigned char * data, const size_t data_length, unsigned char * out_buffer)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    // zero data length hash is supported.
+
+    VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_sha256_ret(data, data_length, out_buffer, 0);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    return error;
+}
+
+Hash_SHA256_stream::Hash_SHA256_stream(void) {}
+
+Hash_SHA256_stream::~Hash_SHA256_stream(void) {}
+
+CHIP_ERROR Hash_SHA256_stream::Begin(void)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    result = mbedtls_sha256_starts_ret(&context, 0);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    return error;
+}
+
+CHIP_ERROR Hash_SHA256_stream::AddData(const unsigned char * data, const size_t data_length)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    result = mbedtls_sha256_update_ret(&context, data, data_length);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    return error;
+}
+
+CHIP_ERROR Hash_SHA256_stream::Finish(unsigned char * out_buffer)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    result = mbedtls_sha256_finish_ret(&context, out_buffer);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    return error;
+}
+
+void Hash_SHA256_stream::Clear(void)
+{
+    memset(this, 0, sizeof(*this));
+}
+
+CHIP_ERROR HKDF_SHA256(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
+                       const size_t salt_length, const unsigned char * info, const size_t info_length, unsigned char * out_buffer,
+                       size_t out_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 1;
@@ -178,46 +253,99 @@ exit:
     return error;
 }
 
-static mbedtls_ctr_drbg_context * get_mbedtls_drbg_context()
+CHIP_ERROR pbkdf2_sha256(const unsigned char * password, size_t plen, const unsigned char * salt, size_t slen,
+                         unsigned int iteration_count, uint32_t key_length, unsigned char * output)
 {
-    static mbedtls_ctr_drbg_context drbg_ctxt;
-    static bool initialized = false;
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+    const mbedtls_md_info_t * md_info;
+    mbedtls_md_context_t md_ctxt;
+    constexpr int use_hmac = 1;
 
-    if (initialized)
+    bool free_md_ctxt = false;
+
+    VerifyOrExit(password != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(plen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(salt != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(slen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(output != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    md_info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
+    VerifyOrExit(md_info != NULL, error = CHIP_ERROR_INTERNAL);
+
+    mbedtls_md_init(&md_ctxt);
+    free_md_ctxt = true;
+
+    result = mbedtls_md_setup(&md_ctxt, md_info, use_hmac);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_pkcs5_pbkdf2_hmac(&md_ctxt, password, plen, salt, slen, iteration_count, key_length, output);
+
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    _log_mbedTLS_error(result);
+
+    if (free_md_ctxt)
     {
-        return &drbg_ctxt;
+        mbedtls_md_free(&md_ctxt);
     }
 
-    static mbedtls_entropy_context entropy;
-    mbedtls_entropy_init(&entropy);
-
-    mbedtls_ctr_drbg_context * ctxt = NULL;
-    mbedtls_ctr_drbg_init(&drbg_ctxt);
-
-    int status = mbedtls_ctr_drbg_seed(&drbg_ctxt, mbedtls_entropy_func, &entropy, NULL, 0);
-    if (status == 0)
-    {
-        initialized = true;
-        ctxt        = &drbg_ctxt;
-    }
-    _log_mbedTLS_error(status);
-
-    return ctxt;
+    return error;
 }
 
-CHIP_ERROR chip::Crypto::DRBG_get_bytes(unsigned char * out_buffer, const size_t out_length)
+static EntropyContext * get_entropy_context()
 {
-    CHIP_ERROR error                     = CHIP_NO_ERROR;
-    int result                           = 0;
-    mbedtls_ctr_drbg_context * drbg_ctxt = NULL;
+    EntropyContext * context = NULL;
+    int status               = 0;
+
+    VerifyOrExit(!gsEntropyContext.initialized, context = &gsEntropyContext);
+
+    mbedtls_entropy_init(&gsEntropyContext.entropy);
+    mbedtls_ctr_drbg_init(&gsEntropyContext.drbg_ctxt);
+
+    status = mbedtls_ctr_drbg_seed(&gsEntropyContext.drbg_ctxt, mbedtls_entropy_func, &gsEntropyContext.entropy, NULL, 0);
+    VerifyOrExit(status == 0, _log_mbedTLS_error(status));
+
+    gsEntropyContext.initialized = true;
+
+    context = &gsEntropyContext;
+
+exit:
+    return context;
+}
+
+CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold)
+{
+    CHIP_ERROR error              = CHIP_NO_ERROR;
+    int result                    = 0;
+    EntropyContext * entropy_ctxt = NULL;
+
+    VerifyOrExit(fn_source != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    entropy_ctxt = get_entropy_context();
+    VerifyOrExit(entropy_ctxt != NULL, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_entropy_add_source(&entropy_ctxt->entropy, fn_source, p_source, threshold, MBEDTLS_ENTROPY_SOURCE_STRONG);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+exit:
+    return error;
+}
+
+CHIP_ERROR DRBG_get_bytes(unsigned char * out_buffer, const size_t out_length)
+{
+    CHIP_ERROR error              = CHIP_NO_ERROR;
+    int result                    = 0;
+    EntropyContext * entropy_ctxt = NULL;
 
     VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    drbg_ctxt = get_mbedtls_drbg_context();
-    VerifyOrExit(drbg_ctxt != NULL, error = CHIP_ERROR_INTERNAL);
+    entropy_ctxt = get_entropy_context();
+    VerifyOrExit(entropy_ctxt != NULL, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_ctr_drbg_random(drbg_ctxt, out_buffer, out_length);
+    result = mbedtls_ctr_drbg_random(&entropy_ctxt->drbg_ctxt, out_buffer, out_length);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -229,9 +357,8 @@ static int ECDSA_sign_rng(void * ctxt, unsigned char * out_buffer, size_t out_le
     return (chip::Crypto::DRBG_get_bytes(out_buffer, out_length) == CHIP_NO_ERROR) ? 0 : 1;
 }
 
-CHIP_ERROR chip::Crypto::ECDSA_sign_msg(const unsigned char * msg, const size_t msg_length, const unsigned char * private_key,
-                                        const size_t private_key_length, unsigned char * out_signature,
-                                        size_t & out_signature_length)
+CHIP_ERROR ECDSA_sign_msg(const unsigned char * msg, const size_t msg_length, const unsigned char * private_key,
+                          const size_t private_key_length, unsigned char * out_signature, size_t & out_signature_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -273,9 +400,9 @@ exit:
     return error;
 }
 
-CHIP_ERROR chip::Crypto::ECDSA_validate_msg_signature(const unsigned char * msg, const size_t msg_length,
-                                                      const unsigned char * public_key, const size_t public_key_length,
-                                                      const unsigned char * signature, const size_t signature_length)
+CHIP_ERROR ECDSA_validate_msg_signature(const unsigned char * msg, const size_t msg_length, const unsigned char * public_key,
+                                        const size_t public_key_length, const unsigned char * signature,
+                                        const size_t signature_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -316,9 +443,9 @@ exit:
     return error;
 }
 
-CHIP_ERROR chip::Crypto::ECDH_derive_secret(const unsigned char * remote_public_key, const size_t remote_public_key_length,
-                                            const unsigned char * local_private_key, const size_t local_private_key_length,
-                                            unsigned char * out_secret, size_t & out_secret_length)
+CHIP_ERROR ECDH_derive_secret(const unsigned char * remote_public_key, const size_t remote_public_key_length,
+                              const unsigned char * local_private_key, const size_t local_private_key_length,
+                              unsigned char * out_secret, size_t & out_secret_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -369,3 +496,6 @@ exit:
     _log_mbedTLS_error(result);
     return error;
 }
+
+} // namespace Crypto
+} // namespace chip

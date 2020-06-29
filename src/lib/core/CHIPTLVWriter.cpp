@@ -25,10 +25,10 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
-#include <CHIPTLV.h>
+#include <core/CHIPTLV.h>
 
-#include <CHIPCore.h>
-#include <CHIPEncoding.h>
+#include <core/CHIPCore.h>
+#include <core/CHIPEncoding.h>
 
 #include <support/CodeUtils.h>
 #include <system/SystemPacketBuffer.h>

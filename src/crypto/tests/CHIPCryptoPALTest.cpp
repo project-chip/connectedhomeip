@@ -21,6 +21,8 @@
 #include "AES_CCM_256_test_vectors.h"
 #include "ECDH_P256_test_vectors.h"
 #include "HKDF_SHA256_test_vectors.h"
+#include "Hash_SHA256_test_vectors.h"
+#include "PBKDF2_SHA256_test_vectors.h"
 
 #include <CHIPCryptoPAL.h>
 #include <nlunit-test.h>
@@ -35,6 +37,14 @@
 
 using namespace chip;
 using namespace chip::Crypto;
+
+static uint32_t gs_test_entropy_source_called = 0;
+static int test_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
+{
+    *olen = len;
+    gs_test_entropy_source_called++;
+    return 0;
+}
 
 static void TestAES_CCM_256EncryptTestVectors(nlTestSuite * inSuite, void * inContext)
 {
@@ -480,6 +490,64 @@ static void TestAES_CCM_128DecryptInvalidIVLen(nlTestSuite * inSuite, void * inC
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
+static void TestHash_SHA256(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestCases     = ArraySize(hash_sha256_test_vectors);
+    int numOfTestsExecuted = 0;
+
+    for (numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
+    {
+        hash_sha256_vector v = hash_sha256_test_vectors[numOfTestsExecuted];
+        unsigned char out_buffer[kSHA256_Hash_Length];
+        Hash_SHA256(v.data, v.data_length, out_buffer);
+        bool success = memcmp(v.hash, out_buffer, sizeof(out_buffer)) == 0;
+        NL_TEST_ASSERT(inSuite, success);
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsExecuted == ArraySize(hash_sha256_test_vectors));
+}
+
+static void TestHash_SHA256_Stream(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestCases     = ArraySize(hash_sha256_test_vectors);
+    int numOfTestsExecuted = 0;
+    CHIP_ERROR error       = CHIP_NO_ERROR;
+
+    for (numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
+    {
+        hash_sha256_vector v       = hash_sha256_test_vectors[numOfTestsExecuted];
+        const unsigned char * data = v.data;
+        size_t data_length         = v.data_length;
+        unsigned char out_buffer[kSHA256_Hash_Length];
+
+        Hash_SHA256_stream sha256;
+
+        error = sha256.Begin();
+        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+
+        // Split data into 3 random streams.
+        for (int i = 0; i < 2; ++i)
+        {
+            size_t rand_data_length = rand() % (data_length + 1);
+
+            error = sha256.AddData(data, rand_data_length);
+            NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+
+            data += rand_data_length;
+            data_length -= rand_data_length;
+        }
+
+        error = sha256.AddData(data, data_length);
+        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+
+        error = sha256.Finish(out_buffer);
+        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+
+        bool success = memcmp(v.hash, out_buffer, sizeof(out_buffer)) == 0;
+        NL_TEST_ASSERT(inSuite, success);
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsExecuted == ArraySize(hash_sha256_test_vectors));
+}
+
 static void TestHKDF_SHA256(nlTestSuite * inSuite, void * inContext)
 {
     int numOfTestCases     = ArraySize(hkdf_sha256_test_vectors);
@@ -782,6 +850,47 @@ static void TestECDH_SampleInputVectors(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, numOfTestsExecuted > 0);
 }
 
+static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR error = add_entropy_source(test_entropy_source, NULL, 10);
+    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    unsigned char buffer[5];
+    uint32_t test_entropy_source_call_count = gs_test_entropy_source_called;
+    NL_TEST_ASSERT(inSuite, DRBG_get_bytes(buffer, sizeof(buffer)) == CHIP_NO_ERROR);
+#if CHIP_CRYPTO_MBEDTLS
+    for (int i = 0; i < 5000 * 2; i++)
+    {
+        (void) DRBG_get_bytes(buffer, sizeof(buffer));
+    }
+    NL_TEST_ASSERT(inSuite, gs_test_entropy_source_called > test_entropy_source_call_count);
+#endif
+}
+
+static void TestPBKDF2_SHA256_TestVectors(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(pbkdf2_sha256_test_vectors);
+    int numOfTestsRan    = 0;
+    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
+    {
+        const pbkdf2_test_vector * vector = pbkdf2_sha256_test_vectors[vectorIndex];
+        if (vector->plen > 0)
+        {
+            numOfTestsRan++;
+            unsigned char out_key[vector->key_len];
+
+            CHIP_ERROR err =
+                pbkdf2_sha256(vector->password, vector->plen, vector->salt, vector->slen, vector->iter, vector->key_len, out_key);
+            NL_TEST_ASSERT(inSuite, err == vector->result);
+
+            if (vector->result == CHIP_NO_ERROR)
+            {
+                NL_TEST_ASSERT(inSuite, memcmp(out_key, vector->key, vector->key_len) == 0);
+            }
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
 namespace chip {
 namespace Logging {
 void LogV(uint8_t module, uint8_t category, const char * format, va_list argptr)
@@ -822,12 +931,16 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ECDSA signature validation fail - Different signature", TestECDSA_ValidationFailIncorrectSignature),
     NL_TEST_DEF("Test ECDSA sign msg invalid parameters", TestECDSA_SigningInvalidParams),
     NL_TEST_DEF("Test ECDSA signature validation invalid parameters", TestECDSA_ValidationInvalidParam),
+    NL_TEST_DEF("Test Hash SHA 256", TestHash_SHA256),
+    NL_TEST_DEF("Test Hash SHA 256 Stream", TestHash_SHA256_Stream),
     NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
     NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
     NL_TEST_DEF("Test DRBG output", TestDRBG_Output),
     NL_TEST_DEF("Test ECDH derive shared secret", TestECDH_EstablishSecret),
     NL_TEST_DEF("Test ECDH invalid params", TestECDH_InvalidParams),
     NL_TEST_DEF("Test ECDH sample vectors", TestECDH_SampleInputVectors),
+    NL_TEST_DEF("Test adding entropy sources", TestAddEntropySources),
+    NL_TEST_DEF("Test PBKDF2 SHA256", TestPBKDF2_SHA256_TestVectors),
 
     NL_TEST_SENTINEL()
 };
@@ -846,6 +959,7 @@ int TestCHIPCryptoPAL(void)
     // Run test suit againt one context.
     nlTestRunner(&theSuite, NULL);
 
+    add_entropy_source(test_entropy_source, NULL, 16);
     return (nlTestRunnerStats(&theSuite));
 }
 

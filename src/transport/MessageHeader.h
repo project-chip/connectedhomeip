@@ -61,6 +61,18 @@ public:
      */
     uint32_t GetMessageId() const { return mMessageId; }
 
+    /** Get the secure msg type from this header. */
+    uint16_t GetSecureMsgType(void) const { return mSecureMsgType; }
+
+    /** Get the Session ID from this header. */
+    uint32_t GetSecureSessionID(void) const { return mSecureSessionID; }
+
+    /** Get the initialization vector from this header. */
+    uint64_t GetIV(void) const { return mIV; }
+
+    /** Get the message auth tag from this header. */
+    uint64_t GetTag(void) const { return mTag; }
+
     /** Set the message id for this header. */
     MessageHeader & SetMessageId(uint32_t id)
     {
@@ -116,6 +128,34 @@ public:
         return *this;
     }
 
+    /** Set the secure message type for this header. */
+    MessageHeader & SetSecureMsgType(uint16_t type)
+    {
+        mSecureMsgType = type;
+        return *this;
+    }
+
+    /** Set the security session ID for this header. */
+    MessageHeader & SetSessionID(uint32_t id)
+    {
+        mSecureSessionID = id;
+        return *this;
+    }
+
+    /** Set the initialization vector for this header. */
+    MessageHeader & SetIV(uint64_t IV)
+    {
+        mIV = IV;
+        return *this;
+    }
+
+    /** Set the message auth tag for this header. */
+    MessageHeader & SetTag(uint64_t tag)
+    {
+        mTag = tag;
+        return *this;
+    }
+
     /**
      * A call to `Encode` will require at least this many bytes on the current
      * object to be successful.
@@ -166,6 +206,18 @@ private:
 
     /// Intended recipient of the message.
     Optional<NodeId> mDestinationNodeId;
+
+    /// Packet type (application data, security control packets, e.g. pairing, configuration, rekey etc)
+    uint16_t mSecureMsgType = 0;
+
+    /// Security session identifier
+    uint32_t mSecureSessionID = 0;
+
+    /// Initialization vector used for encryption of the message.
+    uint64_t mIV = 0;
+
+    /// Message authentication tag generated at encryption of the message.
+    uint64_t mTag = 0;
 };
 
 } // namespace chip

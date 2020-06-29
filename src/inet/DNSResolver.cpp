@@ -23,10 +23,10 @@
  *
  */
 
-#include <DNSResolver.h>
+#include <inet/DNSResolver.h>
 
-#include <InetLayer.h>
-#include <InetLayerEvents.h>
+#include <inet/InetLayer.h>
+#include <inet/InetLayerEvents.h>
 
 #include <support/CodeUtils.h>
 

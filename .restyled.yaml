@@ -1,3 +1,19 @@
+#
+#    Copyright (c) 2020 Project CHIP Authors
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
 # Do anything at all
 enabled: true
 
@@ -70,6 +86,16 @@ restylers:
           - "**/*.json"
           - "**/*.m"
           - "**/*.mm"
+    - name: google-java-format
+      enabled: true
+      image: restyled/restyler-google-java-format:v1.6
+      command:
+          - google-java-format
+          - "--replace"
+      arguments: []
+      include:
+          - "**/*.java"
+      interpreters: []
     - name: clang-format
       enabled: true
       image: restyled/restyler-clang-format:v9.0.0
@@ -91,7 +117,6 @@ restylers:
           - "**/*.hxx"
           - "**/*.h++"
           - "**/*.H"
-          - "**/*.java"
           - "**/*.js"
           - "**/*.m"
           - "**/*.mm"

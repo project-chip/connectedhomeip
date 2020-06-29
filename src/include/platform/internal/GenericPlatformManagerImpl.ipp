@@ -78,7 +78,15 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
 
     // TODO Perform dynamic configuration of the core CHIP objects based on stored settings.
 
-    // TODO Initialize the BLE manager.
+    // Initialize the CHIP BLE manager.
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    err = BLEMgr().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "BLEManager initialization failed: %s", ErrorStr(err));
+    }
+    SuccessOrExit(err);
+#endif
 
     // Initialize the Connectivity Manager object.
     err = ConnectivityMgr().Init();

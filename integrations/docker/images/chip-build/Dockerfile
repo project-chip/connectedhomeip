@@ -39,12 +39,25 @@ RUN set -x \
     zlib1g-dev \
     libglib2.0-dev \
     libpixman-1-dev \
-    cmake \
+    ninja-build \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
 RUN set -x \
     && pip3 install circleci attrs coloredlogs PyGithub \
+    && : # last line
+
+# Install newer cmake toolchain
+RUN set -x \
+    && wget https://cmake.org/files/v3.17/cmake-3.17.2.tar.gz \
+    && tar xzf cmake-3.17.2.tar.gz \
+    && cd cmake-3.17.2 \
+    && ./bootstrap \
+    && make \
+    && make install \
+    && cd .. \
+    && rm -rf cmake-3.17.2 \
+    && rm cmake-3.17.2.tar.gz \
     && : # last line
 
 # Install bloat comparison tools

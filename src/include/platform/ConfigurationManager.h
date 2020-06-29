@@ -41,7 +41,9 @@ class ConfigurationManagerImpl;
 namespace Internal {
 template <class>
 class GenericPlatformManagerImpl;
-}
+template <class>
+class GenericPlatformManagerImpl_POSIX;
+} // namespace Internal
 
 /**
  * Provides access to runtime and build-time configuration information for a chip device.
@@ -111,6 +113,10 @@ public:
 
     CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo);
 
+#if defined(DEBUG)
+    CHIP_ERROR RunUnitTests();
+#endif
+
     bool IsServiceProvisioned();
     bool IsPairedToAccount();
     bool IsMemberOfFabric();
@@ -129,6 +135,8 @@ private:
     friend class ::chip::DeviceLayer::PlatformManagerImpl;
     template <class>
     friend class ::chip::DeviceLayer::Internal::GenericPlatformManagerImpl;
+    template <class>
+    friend class ::chip::DeviceLayer::Internal::GenericPlatformManagerImpl_POSIX;
     // Parentheses used to fix clang parsing issue with these declarations
     friend CHIP_ERROR ::chip::Platform::PersistedStorage::Read(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
     friend CHIP_ERROR ::chip::Platform::PersistedStorage::Write(::chip::Platform::PersistedStorage::Key key, uint32_t value);
@@ -461,6 +469,13 @@ inline void ConfigurationManager::InitiateFactoryReset()
 {
     static_cast<ImplClass *>(this)->_InitiateFactoryReset();
 }
+
+#if defined(DEBUG)
+inline CHIP_ERROR ConfigurationManager::RunUnitTests()
+{
+    return static_cast<ImplClass *>(this)->_RunUnitTests();
+}
+#endif
 
 inline CHIP_ERROR ConfigurationManager::ComputeProvisioningHash(uint8_t * hashBuf, size_t hashBufSize)
 {

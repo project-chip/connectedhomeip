@@ -31,9 +31,9 @@
 
 #include <string.h>
 
-#include <EndPointBasis.h>
-#include <InetInterface.h>
-#include <InetLayer.h>
+#include <inet/EndPointBasis.h>
+#include <inet/InetInterface.h>
+#include <inet/InetLayer.h>
 
 #include <support/CodeUtils.h>
 
@@ -85,6 +85,10 @@
     "Neither IPV6_DROP_MEMBERSHIP nor IPV6_LEAVE_GROUP are defined which are required for generalized IPv6 multicast group support."
 #endif // !defined(IPV6_DROP_MEMBERSHIP) && defined(IPV6_LEAVE_GROUP)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#define INET_PORTSTRLEN 6
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 namespace chip {
 namespace Inet {
@@ -1116,6 +1120,424 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
     return;
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+INET_ERROR IPEndPointBasis::ConfigureProtocol(IPAddressType aAddressType, nw_parameters_t aParameters)
+{
+    INET_ERROR res = INET_NO_ERROR;
+
+    nw_protocol_stack_t protocolStack = nw_parameters_copy_default_protocol_stack(aParameters);
+    nw_protocol_options_t ipOptions   = nw_protocol_stack_copy_internet_protocol(protocolStack);
+
+    switch (aAddressType)
+    {
+
+    case kIPAddressType_IPv6:
+        nw_ip_options_set_version(ipOptions, nw_ip_version_6);
+        break;
+
+#if INET_CONFIG_ENABLE_IPV4
+    case kIPAddressType_IPv4:
+        nw_ip_options_set_version(ipOptions, nw_ip_version_4);
+        break;
+#endif // INET_CONFIG_ENABLE_IPV4
+
+    default:
+        res = INET_ERROR_WRONG_ADDRESS_TYPE;
+        break;
+    }
+    nw_release(ipOptions);
+    nw_release(protocolStack);
+
+    return res;
+}
+
+INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress, uint16_t aPort, nw_parameters_t aParameters)
+{
+    INET_ERROR res         = INET_NO_ERROR;
+    nw_endpoint_t endpoint = nullptr;
+
+    VerifyOrExit(aParameters != NULL, res = INET_ERROR_BAD_ARGS);
+
+    res = ConfigureProtocol(aAddressType, aParameters);
+    SuccessOrExit(res);
+
+    res = GetEndPoint(endpoint, aAddress, aPort);
+    SuccessOrExit(res);
+
+    nw_parameters_set_local_endpoint(aParameters, endpoint);
+    nw_release(endpoint);
+
+    mDispatchQueue = dispatch_queue_create("inet_dispatch_global", DISPATCH_QUEUE_CONCURRENT);
+    VerifyOrExit(mDispatchQueue != NULL, res = INET_ERROR_NO_MEMORY);
+    dispatch_retain(mDispatchQueue);
+
+    mConnectionSemaphore = dispatch_semaphore_create(0);
+    VerifyOrExit(mConnectionSemaphore != NULL, res = INET_ERROR_NO_MEMORY);
+    dispatch_retain(mConnectionSemaphore);
+
+    mAddrType   = aAddressType;
+    mConnection = NULL;
+
+exit:
+    return res;
+}
+
+INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBuffer * aBuffer, uint16_t aSendFlags)
+{
+    __block INET_ERROR res = INET_NO_ERROR;
+    dispatch_data_t content;
+    dispatch_semaphore_t send_semaphore;
+
+    // Ensure the destination address type is compatible with the endpoint address type.
+    VerifyOrExit(mAddrType == aPktInfo->DestAddress.Type(), res = INET_ERROR_BAD_ARGS);
+
+    // For now the entire message must fit within a single buffer.
+    VerifyOrExit(aBuffer->Next() == NULL, res = INET_ERROR_MESSAGE_TOO_LONG);
+
+    res = GetConnection(aPktInfo);
+    SuccessOrExit(res);
+
+    // Send a message, and wait for it to be dispatched.
+    send_semaphore = dispatch_semaphore_create(0);
+    content = dispatch_data_create(aBuffer->Start(), aBuffer->DataLength(), mDispatchQueue, DISPATCH_DATA_DESTRUCTOR_DEFAULT);
+    nw_connection_send(mConnection, content, NW_CONNECTION_DEFAULT_MESSAGE_CONTEXT, true, ^(nw_error_t error) {
+        res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
+        dispatch_semaphore_signal(send_semaphore);
+    });
+    dispatch_release(content);
+
+    dispatch_semaphore_wait(send_semaphore, DISPATCH_TIME_FOREVER);
+    dispatch_release(send_semaphore);
+
+exit:
+    return res;
+}
+
+void IPEndPointBasis::HandleDataReceived(nw_connection_t aConnection)
+{
+
+    nw_connection_receive_completion_t handler =
+        ^(dispatch_data_t content, nw_content_context_t context, bool is_complete, nw_error_t receive_error) {
+            dispatch_block_t schedule_next_receive = ^{
+                if (receive_error == NULL)
+                {
+                    HandleDataReceived(aConnection);
+                }
+                else if (OnReceiveError != NULL)
+                {
+                    nw_error_domain_t error_domain = nw_error_get_error_domain(receive_error);
+                    errno                          = nw_error_get_error_code(receive_error);
+                    if (!(error_domain == nw_error_domain_posix && errno == ECANCELED))
+                    {
+                        INET_ERROR error = chip::System::MapErrorPOSIX(errno);
+                        IPPacketInfo packetInfo;
+                        GetPacketInfo(aConnection, packetInfo);
+                        dispatch_async(mDispatchQueue, ^{
+                            OnReceiveError((IPEndPointBasis *) this, error, &packetInfo);
+                        });
+                    }
+                }
+            };
+
+            if (content != NULL && OnMessageReceived != NULL)
+            {
+                size_t count                        = dispatch_data_get_size(content);
+                System::PacketBuffer * packetBuffer = PacketBuffer::NewWithAvailableSize(count);
+                dispatch_data_apply(content, ^(dispatch_data_t data, size_t offset, const void * buffer, size_t size) {
+                    memmove(packetBuffer->Start() + offset, buffer, size);
+                    return true;
+                });
+                packetBuffer->SetDataLength(count);
+
+                IPPacketInfo packetInfo;
+                GetPacketInfo(aConnection, packetInfo);
+                dispatch_async(mDispatchQueue, ^{
+                    OnMessageReceived((IPEndPointBasis *) this, packetBuffer, &packetInfo);
+                });
+            }
+
+            schedule_next_receive();
+        };
+
+    nw_connection_receive_message(aConnection, handler);
+}
+
+void IPEndPointBasis::GetPacketInfo(nw_connection_t aConnection, IPPacketInfo & aPacketInfo)
+{
+    nw_parameters_t parameters    = nw_connection_copy_parameters(aConnection);
+    nw_endpoint_t local_endpoint  = nw_parameters_copy_local_endpoint(parameters);
+    nw_endpoint_t remote_endpoint = nw_connection_copy_endpoint(aConnection);
+
+    aPacketInfo.Clear();
+    aPacketInfo.SrcAddress  = IPAddress::FromSockAddr(*nw_endpoint_get_address(remote_endpoint));
+    aPacketInfo.DestAddress = IPAddress::FromSockAddr(*nw_endpoint_get_address(local_endpoint));
+    aPacketInfo.SrcPort     = nw_endpoint_get_port(remote_endpoint);
+    aPacketInfo.DestPort    = nw_endpoint_get_port(local_endpoint);
+}
+
+INET_ERROR IPEndPointBasis::GetEndPoint(nw_endpoint_t & aEndPoint, const IPAddress aAddress, uint16_t aPort)
+{
+    INET_ERROR res = INET_NO_ERROR;
+
+    char addrStr[INET6_ADDRSTRLEN];
+    aAddress.ToString(addrStr, sizeof(addrStr));
+
+    char portStr[INET_PORTSTRLEN];
+    snprintf(portStr, sizeof(portStr), "%u", aPort);
+
+    nw_endpoint_t endpoint = nw_endpoint_create_host(addrStr, portStr);
+    VerifyOrExit(endpoint != NULL, res = INET_ERROR_BAD_ARGS);
+
+    aEndPoint = endpoint;
+
+exit:
+    return res;
+}
+
+INET_ERROR IPEndPointBasis::GetConnection(const IPPacketInfo * aPktInfo)
+{
+    INET_ERROR res             = INET_NO_ERROR;
+    nw_endpoint_t endpoint     = NULL;
+    nw_connection_t connection = NULL;
+
+    VerifyOrExit(mParameters != NULL, res = INET_ERROR_INCORRECT_STATE);
+
+    if (mConnection)
+    {
+        nw_endpoint_t remote_endpoint  = nw_connection_copy_endpoint(mConnection);
+        const IPAddress remote_address = IPAddress::FromSockAddr(*nw_endpoint_get_address(remote_endpoint));
+        const uint16_t remote_port     = nw_endpoint_get_port(remote_endpoint);
+        const bool isDifferentEndPoint = aPktInfo->DestPort != remote_port || aPktInfo->DestAddress != remote_address;
+        VerifyOrExit(isDifferentEndPoint, res = INET_NO_ERROR);
+
+        res = ReleaseConnection();
+    }
+    SuccessOrExit(res);
+
+    res = GetEndPoint(endpoint, aPktInfo->DestAddress, aPktInfo->DestPort);
+    SuccessOrExit(res);
+
+    connection = nw_connection_create(endpoint, mParameters);
+    nw_release(endpoint);
+
+    VerifyOrExit(connection != NULL, res = INET_ERROR_INCORRECT_STATE);
+
+    res = StartConnection(connection);
+
+exit:
+    return res;
+}
+
+INET_ERROR IPEndPointBasis::StartListener()
+{
+    __block INET_ERROR res = INET_NO_ERROR;
+    nw_listener_t listener;
+
+    VerifyOrExit(mListener == NULL, res = INET_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mListenerSemaphore == NULL, res = INET_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mListenerQueue == NULL, res = INET_ERROR_INCORRECT_STATE);
+
+    listener = nw_listener_create(mParameters);
+    VerifyOrExit(listener != NULL, res = INET_ERROR_INCORRECT_STATE);
+
+    mListenerSemaphore = dispatch_semaphore_create(0);
+    VerifyOrExit(mListenerSemaphore != NULL, res = INET_ERROR_NO_MEMORY);
+    dispatch_retain(mListenerSemaphore);
+
+    mListenerQueue = dispatch_queue_create("inet_dispatch_listener", DISPATCH_QUEUE_CONCURRENT);
+    VerifyOrExit(mListenerQueue != NULL, res = INET_ERROR_NO_MEMORY);
+    dispatch_retain(mListenerQueue);
+
+    nw_listener_set_queue(listener, mListenerQueue);
+
+    nw_listener_set_new_connection_handler(listener, ^(nw_connection_t connection) {
+        ReleaseConnection();
+        StartConnection(connection);
+    });
+
+    nw_listener_set_state_changed_handler(listener, ^(nw_listener_state_t state, nw_error_t error) {
+        switch (state)
+        {
+
+        case nw_listener_state_invalid:
+            ChipLogDetail(Inet, "Listener: Invalid");
+            res = INET_ERROR_INCORRECT_STATE;
+            nw_listener_cancel(listener);
+            break;
+
+        case nw_listener_state_waiting:
+            ChipLogDetail(Inet, "Listener: Waiting");
+            break;
+
+        case nw_listener_state_failed:
+            ChipLogDetail(Inet, "Listener: Failed");
+            res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
+            nw_listener_cancel(listener);
+            break;
+
+        case nw_listener_state_ready:
+            ChipLogDetail(Inet, "Listener: Ready");
+            res = INET_NO_ERROR;
+            dispatch_semaphore_signal(mListenerSemaphore);
+            break;
+
+        case nw_listener_state_cancelled:
+            ChipLogDetail(Inet, "Listener: Cancelled");
+            if (res == INET_NO_ERROR)
+                res = INET_ERROR_CONNECTION_ABORTED;
+
+            dispatch_semaphore_signal(mListenerSemaphore);
+            break;
+        }
+    });
+
+    nw_listener_start(listener);
+    dispatch_semaphore_wait(mListenerSemaphore, DISPATCH_TIME_FOREVER);
+    SuccessOrExit(res);
+
+    mListener = listener;
+    nw_retain(mListener);
+exit:
+    return res;
+}
+
+INET_ERROR IPEndPointBasis::StartConnection(nw_connection_t & aConnection)
+{
+    __block INET_ERROR res = INET_NO_ERROR;
+
+    nw_connection_set_queue(aConnection, mDispatchQueue);
+
+    nw_connection_set_state_changed_handler(aConnection, ^(nw_connection_state_t state, nw_error_t error) {
+        switch (state)
+        {
+
+        case nw_connection_state_invalid:
+            ChipLogDetail(Inet, "Connection: Invalid");
+            res = INET_ERROR_INCORRECT_STATE;
+            nw_connection_cancel(aConnection);
+            break;
+
+        case nw_connection_state_preparing:
+            ChipLogDetail(Inet, "Connection: Preparing");
+            res = INET_ERROR_INCORRECT_STATE;
+            break;
+
+        case nw_connection_state_waiting:
+            ChipLogDetail(Inet, "Connection: Waiting");
+            nw_connection_cancel(aConnection);
+            break;
+
+        case nw_connection_state_failed:
+            ChipLogDetail(Inet, "Connection: Failed");
+            res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
+            nw_connection_cancel(aConnection);
+            break;
+
+        case nw_connection_state_ready:
+            ChipLogDetail(Inet, "Connection: Ready");
+            res = INET_NO_ERROR;
+            dispatch_semaphore_signal(mConnectionSemaphore);
+            break;
+
+        case nw_connection_state_cancelled:
+            ChipLogDetail(Inet, "Connection: Cancelled");
+            if (res == INET_NO_ERROR)
+                res = INET_ERROR_CONNECTION_ABORTED;
+
+            dispatch_semaphore_signal(mConnectionSemaphore);
+            break;
+        }
+    });
+
+    nw_connection_start(aConnection);
+    dispatch_semaphore_wait(mConnectionSemaphore, DISPATCH_TIME_FOREVER);
+    SuccessOrExit(res);
+
+    mConnection = aConnection;
+    nw_retain(mConnection);
+    HandleDataReceived(mConnection);
+
+exit:
+    return res;
+}
+
+void IPEndPointBasis::ReleaseAll()
+{
+
+    OnMessageReceived = NULL;
+    OnReceiveError    = NULL;
+
+    ReleaseConnection();
+    ReleaseListener();
+
+    if (mParameters)
+    {
+        nw_release(mParameters);
+        mParameters = NULL;
+    }
+
+    if (mDispatchQueue)
+    {
+        dispatch_suspend(mDispatchQueue);
+        dispatch_release(mDispatchQueue);
+        mDispatchQueue = NULL;
+    }
+
+    if (mConnectionSemaphore)
+    {
+        dispatch_release(mConnectionSemaphore);
+        mConnectionSemaphore = NULL;
+    }
+
+    if (mListenerQueue)
+    {
+        dispatch_suspend(mListenerQueue);
+        dispatch_release(mListenerQueue);
+        mListenerQueue = NULL;
+    }
+
+    if (mListenerSemaphore)
+    {
+        dispatch_release(mListenerSemaphore);
+        mListenerSemaphore = NULL;
+    }
+}
+
+INET_ERROR IPEndPointBasis::ReleaseListener()
+{
+    INET_ERROR res = INET_NO_ERROR;
+
+    VerifyOrExit(mListener, res = INET_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mDispatchQueue, res = INET_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mConnectionSemaphore, res = INET_ERROR_INCORRECT_STATE);
+
+    nw_listener_cancel(mListener);
+    dispatch_semaphore_wait(mListenerSemaphore, DISPATCH_TIME_FOREVER);
+    nw_release(mListener);
+    mListener = NULL;
+
+exit:
+    return res;
+}
+
+INET_ERROR IPEndPointBasis::ReleaseConnection()
+{
+    INET_ERROR res = INET_NO_ERROR;
+    VerifyOrExit(mConnection, res = INET_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mDispatchQueue, res = INET_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mConnectionSemaphore, res = INET_ERROR_INCORRECT_STATE);
+
+    nw_connection_cancel(mConnection);
+    dispatch_semaphore_wait(mConnectionSemaphore, DISPATCH_TIME_FOREVER);
+    nw_release(mConnection);
+    mConnection = NULL;
+
+exit:
+    return res;
+}
+
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 } // namespace Inet
 } // namespace chip

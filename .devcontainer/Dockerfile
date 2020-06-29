@@ -30,13 +30,13 @@ RUN ln -s /usr/bin/clang-format-9 /usr/local/bin/clang-format
 RUN mkdir -p /var/downloads
 RUN cd /var/downloads
 RUN curl -JL https://github.com/microsoft/vscode-cpptools/releases/download/0.27.0/cpptools-linux.vsix | bsdtar -xvf - extension
-RUN mkdir -p /home/vscode/.vscode-server/extensions
-RUN mv extension /home/vscode/.vscode-server/extensions/ms-vscode.cpptools-0.27.0
-RUN mkdir -p /home/vscode/bin
-RUN curl https://raw.githubusercontent.com/restyled-io/restyler/master/bin/restyle-path -o /home/vscode/bin/restyle-path
-RUN chmod +x /home/vscode/bin/restyle-path
-RUN chown -R vscode:vscode /home/vscode
-RUN echo "PATH=/home/vscode/bin:${PATH}" >> /home/vscode/.bashrc
-# vscode needs to own the esp-idf and tools for the examples to build
-RUN chown -R vscode:vscode /var/esp-idf
-RUN chown -R vscode:vscode /var/.espressif
+RUN mkdir -p /home/$USERNAME/.vscode-server/extensions
+RUN mv extension /home/$USERNAME/.vscode-server/extensions/ms-vscode.cpptools-0.27.0
+RUN mkdir -p /home/$USERNAME/bin
+RUN curl https://raw.githubusercontent.com/restyled-io/restyler/master/bin/restyle-path -o /home/$USERNAME/bin/restyle-path
+RUN chmod +x /home/$USERNAME/bin/restyle-path
+RUN chown -R $USERNAME:$USERNAME /home/$USERNAME
+RUN echo "PATH=/home/$USERNAME/bin:${PATH}" >> /home/$USERNAME/.bashrc
+# $USERNAME needs to own the esp-idf and tools for the examples to build
+RUN chown -R $USERNAME:$USERNAME /var/esp-idf
+RUN chown -R $USERNAME:$USERNAME /var/.espressif

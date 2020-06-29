@@ -41,15 +41,18 @@ lib_LIBRARIES                                         = \
     $(NULL)
 
 libTransportLayerTests_a_SOURCES                      = \
+    NetworkTestHelpers.cpp                              \
     TestMessageHeader.cpp                               \
+    TestPeerConnections.cpp                             \
+    TestSecureSession.cpp                               \
     TestSecureSessionMgr.cpp                            \
     TestUDP.cpp                                         \
-    TestSecureSession.cpp                               \
     $(NULL)
 
 libTransportLayerTests_adir                           = $(includedir)/transport
 
 dist_libTransportLayerTests_a_HEADERS                 = \
+    NetworkTestHelpers.h                                \
     TestTransportLayer.h                                \
     $(NULL)
 
@@ -59,7 +62,9 @@ dist_libTransportLayerTests_a_HEADERS                 = \
 AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
     -I$(top_srcdir)/src/lib                             \
+    -I$(top_srcdir)/src/inet/tests                      \
     $(NLASSERT_CPPFLAGS)                                \
+    $(NLFAULTINJECTION_CPPFLAGS)                        \
     $(NLIO_CPPFLAGS)                                    \
     $(NLUNIT_TEST_CPPFLAGS)                             \
     $(LWIP_CPPFLAGS)                                    \
@@ -73,35 +78,61 @@ CHIP_LDADD                                            = \
 
 COMMON_LDADD                                          = \
     libTransportLayerTests.a                            \
+    $(top_builddir)/src/inet/tests/libTestInetCommon.a  \
     $(COMMON_LDFLAGS)                                   \
     $(CHIP_LDADD)                                       \
-    $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS) \
+    $(NLFAULTINJECTION_LDFLAGS)                         \
+    $(NLFAULTINJECTION_LIBS)                            \
     $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)          \
     $(LWIP_LDFLAGS) $(LWIP_LIBS)                        \
     $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                  \
     $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                   \
     $(NULL)
 
+# The additional environment variables and their values that will be
+# made available to all programs and scripts in TESTS.
+
+TESTS_ENVIRONMENT                                     = \
+    $(NULL)
+
 # Test applications that should be run when the 'check' target is run.
 
-check_PROGRAMS             = \
-    TestMessageHeader        \
-    TestSecureSessionMgr     \
-    TestSecureSession        \
-    TestUDP                  \
+check_PROGRAMS                                        = \
     $(NULL)
+
+check_SCRIPTS                                         = \
+    $(NULL)
+
+if CHIP_DEVICE_LAYER_TARGET_ESP32
+
+check_SCRIPTS                                        += \
+    qemu_transport_tests.sh                             \
+    $(NULL)
+
+TESTS_ENVIRONMENT                                    += \
+    abs_top_srcdir='$(abs_top_srcdir)'                  \
+    abs_top_builddir='$(abs_top_builddir)'              \
+    QEMU_TEST_TARGET=libTransportLayerTests.a           \
+    $(NULL)
+
+else # CHIP_DEVICE_LAYER_TARGET_ESP32
+
+check_PROGRAMS                                       += \
+    TestMessageHeader                                   \
+    TestPeerConnections                                 \
+    TestSecureSessionMgr                                \
+    TestSecureSession                                   \
+    TestUDP                                             \
+    $(NULL)
+
+endif # CHIP_DEVICE_LAYER_TARGET_ESP32
 
 # Test applications and scripts that should be built and run when the
 # 'check' target is run.
 
-TESTS                       = \
-    $(check_PROGRAMS)         \
-    $(NULL)
-
-# The additional environment variables and their values that will be
-# made available to all programs and scripts in TESTS.
-
-TESTS_ENVIRONMENT             = \
+TESTS                                                 = \
+    $(check_PROGRAMS)                                   \
+    $(check_SCRIPTS)                                    \
     $(NULL)
 
 # Source, compiler, and linker options for test programs.
@@ -117,6 +148,9 @@ TestSecureSession_LDADD       = $(COMMON_LDADD)
 
 TestUDP_SOURCES               = TestUDPDriver.cpp
 TestUDP_LDADD                 = $(COMMON_LDADD)
+
+TestPeerConnections_SOURCES   = TestPeerConnectionsDriver.cpp
+TestPeerConnections_LDADD     = $(COMMON_LDADD)
 
 #
 # Foreign make dependencies

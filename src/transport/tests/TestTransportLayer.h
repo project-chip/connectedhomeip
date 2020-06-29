@@ -30,8 +30,9 @@ extern "C" {
 #endif
 
 int TestMessageHeader(void);
-int TestSecureSessionMgr(void);
+int TestPeerConnectionsFn(void);
 int TestSecureSession(void);
+int TestSecureSessionMgr(void);
 int TestUDP(void);
 
 #ifdef __cplusplus

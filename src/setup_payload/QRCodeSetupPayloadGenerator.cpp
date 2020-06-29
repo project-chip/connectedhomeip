@@ -82,18 +82,6 @@ static CHIP_ERROR populateTLVBits(uint8_t * bits, int & offset, uint8_t * tlvBuf
     return err;
 }
 
-static void addCHIPInfoToOptionalData(SetupPayload & outPayload)
-{
-    if (outPayload.serialNumber.length() > 0)
-    {
-        OptionalQRCodeInfo info;
-        info.type = optionalQRCodeInfoTypeString;
-        info.tag  = kSerialNumberTag;
-        info.data = outPayload.serialNumber;
-        outPayload.addCHIPOptionalData(info);
-    }
-}
-
 CHIP_ERROR writeTag(TLVWriter & writer, uint64_t tag, OptionalQRCodeInfo & info)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -102,28 +90,60 @@ CHIP_ERROR writeTag(TLVWriter & writer, uint64_t tag, OptionalQRCodeInfo & info)
     {
         err = writer.PutString(tag, info.data.c_str());
     }
-    else if (info.type == optionalQRCodeInfoTypeInt)
+    else if (info.type == optionalQRCodeInfoTypeInt32)
     {
-        err = writer.Put(tag, static_cast<int64_t>(info.integer));
+        err = writer.Put(tag, info.int32);
+    }
+    else
+    {
+        err = CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     return err;
 }
 
-CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t maxLen,
-                                       uint32_t & tlvDataLengthInBytes)
+CHIP_ERROR writeTag(TLVWriter & writer, uint64_t tag, OptionalQRCodeInfoExtension & info)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    addCHIPInfoToOptionalData(outPayload);
-    vector<OptionalQRCodeInfo> optionalData = outPayload.getAllOptionalData();
-    VerifyOrExit(optionalData.size() != 0, err = CHIP_NO_ERROR);
+
+    if (info.type == optionalQRCodeInfoTypeString || info.type == optionalQRCodeInfoTypeInt32)
+    {
+        err = writeTag(writer, tag, static_cast<OptionalQRCodeInfo &>(info));
+    }
+    else if (info.type == optionalQRCodeInfoTypeInt64)
+    {
+        err = writer.Put(tag, info.int64);
+    }
+    else if (info.type == optionalQRCodeInfoTypeUInt32)
+    {
+        err = writer.Put(tag, info.uint32);
+    }
+    else if (info.type == optionalQRCodeInfoTypeUInt64)
+    {
+        err = writer.Put(tag, info.uint64);
+    }
+    else
+    {
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return err;
+}
+
+CHIP_ERROR QRCodeSetupPayloadGenerator::generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart,
+                                                                    uint32_t maxLen, uint32_t & tlvDataLengthInBytes)
+{
+    CHIP_ERROR err                                            = CHIP_NO_ERROR;
+    vector<OptionalQRCodeInfo> optionalData                   = outPayload.getAllOptionalVendorData();
+    vector<OptionalQRCodeInfoExtension> optionalExtensionData = outPayload.getAllOptionalExtensionData();
+    VerifyOrExit(optionalData.size() != 0 || optionalExtensionData.size() != 0, err = CHIP_NO_ERROR);
 
     TLVWriter rootWriter;
     rootWriter.Init(tlvDataStart, maxLen);
     rootWriter.ImplicitProfileId = chip::Profiles::kChipProfile_ServiceProvisioning;
 
     // The cost (in bytes) of the top-level container is amortized as soon as there is at least 4 optionals elements.
-    if (optionalData.size() >= 4)
+    if ((optionalData.size() + optionalExtensionData.size()) >= 4)
     {
 
         TLVWriter innerStructureWriter;
@@ -138,12 +158,24 @@ CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvD
             SuccessOrExit(err);
         }
 
+        for (OptionalQRCodeInfoExtension info : optionalExtensionData)
+        {
+            err = writeTag(innerStructureWriter, ContextTag(info.tag), info);
+            SuccessOrExit(err);
+        }
+
         err = rootWriter.CloseContainer(innerStructureWriter);
         SuccessOrExit(err);
     }
     else
     {
         for (OptionalQRCodeInfo info : optionalData)
+        {
+            err = writeTag(rootWriter, ProfileTag(rootWriter.ImplicitProfileId, info.tag), info);
+            SuccessOrExit(err);
+        }
+
+        for (OptionalQRCodeInfoExtension info : optionalExtensionData)
         {
             err = writeTag(rootWriter, ProfileTag(rootWriter.ImplicitProfileId, info.tag), info);
             SuccessOrExit(err);
@@ -167,7 +199,8 @@ static CHIP_ERROR generateBitSet(SetupPayload & payload, uint8_t * bits, uint8_t
     err = populateBits(bits, offset, payload.vendorID, kVendorIDFieldLengthInBits, kTotalPayloadDataSizeInBits);
     err = populateBits(bits, offset, payload.productID, kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits);
     err = populateBits(bits, offset, payload.requiresCustomFlow, kCustomFlowRequiredFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    err = populateBits(bits, offset, payload.rendezvousInformation, kRendezvousInfoFieldLengthInBits, kTotalPayloadDataSizeInBits);
+    err = populateBits(bits, offset, (uint16_t) payload.rendezvousInformation, kRendezvousInfoFieldLengthInBits,
+                       kTotalPayloadDataSizeInBits);
     err = populateBits(bits, offset, payload.discriminator, kPayloadDiscriminatorFieldLengthInBits, kTotalPayloadDataSizeInBits);
     err = populateBits(bits, offset, payload.setUpPINCode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits);
     err = populateBits(bits, offset, 0, kPaddingFieldLengthInBits, kTotalPayloadDataSizeInBits);

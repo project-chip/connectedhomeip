@@ -265,14 +265,14 @@ InterfaceIterator::~InterfaceIterator(void)
  *          \c false if positioned beyond the end of the interface list.
  */
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 bool InterfaceIterator::HasCurrent(void)
 {
     return (mIntfArray != NULL) ? mIntfArray[mCurIntf].if_index != 0 : Next();
 }
 
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 /**
  * @fn      bool InterfaceIterator::Next(void)
@@ -492,7 +492,7 @@ short InterfaceIterator::GetFlags(void)
  *     this constructor may allocate resources recycled by the destructor.
  */
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 InterfaceAddressIterator::InterfaceAddressIterator(void)
 {
@@ -500,7 +500,7 @@ InterfaceAddressIterator::InterfaceAddressIterator(void)
     mCurAddr   = NULL;
 }
 
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 /**
  * @fn      InterfaceAddressIterator::~InterfaceAddressIterator(void)
@@ -511,7 +511,7 @@ InterfaceAddressIterator::InterfaceAddressIterator(void)
  *  Recycles any resources allocated by the constructor.
  */
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 InterfaceAddressIterator::~InterfaceAddressIterator(void)
 {
@@ -522,7 +522,7 @@ InterfaceAddressIterator::~InterfaceAddressIterator(void)
     }
 }
 
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 /**
  * @fn      bool InterfaceIterator::HasCurrent(void)
@@ -534,11 +534,11 @@ InterfaceAddressIterator::~InterfaceAddressIterator(void)
  */
 bool InterfaceAddressIterator::HasCurrent(void)
 {
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
     return (mAddrsList != NULL) ? (mCurAddr != NULL) : Next();
 
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 

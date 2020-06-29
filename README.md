@@ -40,7 +40,6 @@ The CHIP repository is structured as follows:
 | `integrations/github/`        | GitHub integrations related to this project                                                                   |
 | `integrations/github/actions` | GitHub actions related to this project                                                                        |
 | `integrations/docker/`        | Docker scripts and Dockerfiles                                                                                |
-| `images/`                     | Images                                                                                                        |
 | `LICENSE`                     | CHIP License file (Apache 2.0)                                                                                |
 | `Makefile-Android`            | Convenience makefile for building CHIP against Android.                                                       |
 | `Makefile-iOS`                | Convenience makefile for building CHIP against iOS.                                                           |

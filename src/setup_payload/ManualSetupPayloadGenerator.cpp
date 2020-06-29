@@ -23,6 +23,7 @@
 
 #include "ManualSetupPayloadGenerator.h"
 
+#include <support/logging/CHIPLogging.h>
 #include <support/verhoeff/Verhoeff.h>
 
 using namespace chip;
@@ -31,10 +32,9 @@ static uint32_t shortPayloadRepresentation(SetupPayload payload)
 {
     int offset      = 1;
     uint32_t result = payload.requiresCustomFlow ? 1 : 0;
-    result |= payload.setUpPINCode << offset;
-    offset += kSetupPINCodeFieldLengthInBits;
-
     result |= payload.discriminator << offset;
+    offset += kManualSetupDiscriminatorFieldLengthInBits;
+    result |= payload.setUpPINCode << offset;
     return result;
 }
 
@@ -49,7 +49,7 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(strin
 {
     if (!mSetupPayload.isValidManualCode())
     {
-        fprintf(stderr, "\nFailed encoding invalid payload\n");
+        ChipLogError(SetupPayload, "Failed encoding invalid payload");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 

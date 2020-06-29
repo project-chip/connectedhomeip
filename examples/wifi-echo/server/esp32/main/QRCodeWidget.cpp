@@ -44,7 +44,13 @@
 #define MAX_SSID_LEN 32
 // A temporary value assigned for this example's QRCode
 // Spells CHIP on a dialer
-#define EXAMPLE_VENDOR_ID 3447
+#define EXAMPLE_VENDOR_ID 2447
+// Spells ESP32 on a dialer
+#define EXAMPLE_PRODUCT_ID 37732
+// Used to have an initial shared secret
+#define EXAMPLE_SETUP_CODE 123456789
+// Used to indicate that the device supports both Soft-AP and BLE for rendezvous
+#define EXAMPLE_RENDEZVOUS_INFO RendezvousInformationFlags::kBLE
 // Used to indicate that an SSID has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_SSID 1
 // Used to indicate that an IP address has been added to the QRCode
@@ -88,26 +94,24 @@ void GetGatewayIP(char * ip_buf, size_t ip_len)
 
 string createSetupPayload()
 {
+    // The discriminator is generated randomly so different devices can be turned on at the same time for testing.
+    uint16_t discriminator = (esp_random() * 1.0 / UINT32_MAX * ((1 << kPayloadDiscriminatorFieldLengthInBits) + 1));
+
+    SetupPayload payload;
+    payload.version               = 1;
+    payload.discriminator         = discriminator;
+    payload.setUpPINCode          = EXAMPLE_SETUP_CODE;
+    payload.rendezvousInformation = EXAMPLE_RENDEZVOUS_INFO;
+    payload.vendorID              = EXAMPLE_VENDOR_ID;
+    payload.productID             = EXAMPLE_PRODUCT_ID;
+
     char ap_ssid[MAX_SSID_LEN];
     GetAPName(ap_ssid, sizeof(ap_ssid));
-    SetupPayload payload;
-    payload.version   = 1;
-    payload.vendorID  = EXAMPLE_VENDOR_ID;
-    payload.productID = 1;
-
-    OptionalQRCodeInfo ssidInfo;
-    ssidInfo.tag  = EXAMPLE_VENDOR_TAG_SSID;
-    ssidInfo.type = optionalQRCodeInfoTypeString;
-    ssidInfo.data = ap_ssid;
-    payload.addVendorOptionalData(ssidInfo);
+    payload.addOptionalVendorData(EXAMPLE_VENDOR_TAG_SSID, ap_ssid);
 
     char gw_ip[INET6_ADDRSTRLEN];
     GetGatewayIP(gw_ip, sizeof(gw_ip));
-    OptionalQRCodeInfo ipInfo;
-    ipInfo.tag  = EXAMPLE_VENDOR_TAG_IP;
-    ipInfo.type = optionalQRCodeInfoTypeString;
-    ipInfo.data = gw_ip;
-    payload.addVendorOptionalData(ipInfo);
+    payload.addOptionalVendorData(EXAMPLE_VENDOR_TAG_IP, gw_ip);
 
     QRCodeSetupPayloadGenerator generator(payload);
     string result;

@@ -73,6 +73,8 @@ public:
     CHIP_ERROR GetAndLogThreadTopologyFull(void);
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
 
+    void FactoryReset(void);
+
 private:
     // ===== Members for internal use by the following friends.
 
@@ -104,7 +106,7 @@ private:
     bool IsThreadAttached(void);
     CHIP_ERROR GetThreadProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials);
     CHIP_ERROR SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo);
-    void ClearThreadProvision(void);
+    void ErasePersistentInfo(void);
     ConnectivityManager::ThreadDeviceType GetThreadDeviceType(void);
     CHIP_ERROR SetThreadDeviceType(ConnectivityManager::ThreadDeviceType threadRole);
     void GetThreadPollingConfig(ConnectivityManager::ThreadPollingConfig & pollingConfig);
@@ -230,9 +232,9 @@ inline CHIP_ERROR ThreadStackManager::SetThreadProvision(const Internal::DeviceN
     return static_cast<ImplClass *>(this)->_SetThreadProvision(netInfo);
 }
 
-inline void ThreadStackManager::ClearThreadProvision(void)
+inline void ThreadStackManager::ErasePersistentInfo(void)
 {
-    static_cast<ImplClass *>(this)->_ClearThreadProvision();
+    static_cast<ImplClass *>(this)->_ErasePersistentInfo();
 }
 
 inline ConnectivityManager::ThreadDeviceType ThreadStackManager::GetThreadDeviceType(void)

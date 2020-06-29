@@ -133,13 +133,14 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AM_SILENT_RULES([yes])
 
 #
-# Enable maintainer mode to prevent the package from constantly trying
-# to rebuild configure, Makefile.in, etc. Rebuilding such files rarely,
-# if ever, needs to be done "in the field".
+# Disable maintainer mode to enable the package to automatically rebuild
+# configure, Makefile.in, etc. when the files on which they depend change (for
+# example, configure.ac, Makefile.am, etc).
 #
-# Use the included 'bootstrap' script instead when necessary.
+# For those that do not desire this behavior, run configure with
+# `--enable-maintainer-mode` and run the top-level `bootstrap` script manually.
 #
-AM_MAINTAINER_MODE
+AM_MAINTAINER_MODE([disable])
 
 #
 # Check for the target style
@@ -1100,14 +1101,14 @@ CONFIG_TARGET_NETWORKS=sockets
 AC_MSG_CHECKING([target network])
 AC_ARG_WITH(target-network,
     [AS_HELP_STRING([--with-target-network=NETWORK],
-        [Specify the target network stack from one or more of, separated by commas: sockets or lwip @<:@default=sockets@:>@.])],
+        [Specify the target network stack from one or more of, separated by commas: sockets, lwip or Network.framework @<:@default=sockets@:>@.])],
     [
         CONFIG_TARGET_NETWORKS=`echo ${with_target_network} | sed -e 's/,/ /g'`
 
         for target_network in ${CONFIG_TARGET_NETWORKS}; do
             case "${target_network}" in
 
-            lwip|sockets)
+            lwip|sockets|Network.framework)
                 ;;
 
             *)
@@ -1124,6 +1125,7 @@ AC_DEFINE_UNQUOTED([CONFIG_TARGET_NETWORKS], "${CONFIG_TARGET_NETWORKS}", [CHIP 
 
 CHIP_SYSTEM_CONFIG_USE_LWIP=0
 CHIP_SYSTEM_CONFIG_USE_SOCKETS=0
+CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK=0
 
 for target_network in ${CONFIG_TARGET_NETWORKS}; do
     case ${target_network} in
@@ -1134,6 +1136,10 @@ for target_network in ${CONFIG_TARGET_NETWORKS}; do
 
     sockets)
         CHIP_SYSTEM_CONFIG_USE_SOCKETS=1
+        ;;
+
+    Network.framework)
+        CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK=1
         ;;
 
     esac
@@ -1149,6 +1155,12 @@ AM_CONDITIONAL([CHIP_SYSTEM_CONFIG_USE_SOCKETS], [test "${CHIP_SYSTEM_CONFIG_USE
 AC_DEFINE_UNQUOTED([CHIP_SYSTEM_CONFIG_USE_SOCKETS], [${CHIP_SYSTEM_CONFIG_USE_SOCKETS}],
     [Define to 1 if you want to use BSD sockets with CHIP System Layer.])
 
+AC_SUBST(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
+AM_CONDITIONAL([CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK], [test "${CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK}" = 1])
+AC_DEFINE_UNQUOTED([CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK], [${CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK}],
+    [Define to 1 if you want to use Network.framework with CHIP System Layer.])
+
+#
 #
 # Internet Protocol Network Endpoints
 #
@@ -1539,7 +1551,6 @@ if test "${with_crypto}" = "mbedtls"; then
 	    # variables and trust all will be well.
 
 	    MBEDTLS_CPPFLAGS="-I\${abs_top_srcdir}/third_party/mbedtls/repo/include"
-	    MBEDTLS_CPPFLAGS+=" -DMBEDTLS_NO_PLATFORM_ENTROPY -DMBEDTLS_TEST_NULL_ENTROPY -DMBEDTLS_NO_DEFAULT_ENTROPY_SOURCES"
 	    MBEDTLS_LDFLAGS="-L${ac_pwd}/third_party/mbedtls"
 	    MBEDTLS_LIBS="-lmbedtls"
 	],
@@ -1829,6 +1840,32 @@ AC_SUBST(NLUNIT_TEST_SUBDIRS, [${maybe_nlunit_test_dirstem}])
 AM_CONDITIONAL([CHIP_WITH_NLUNIT_TEST_INTERNAL], [test "${nl_with_nlunit_test}" = "internal"])
 
 #
+#
+# IniPP
+#
+
+if test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1; then
+    NL_WITH_PACKAGE(
+        [IniPP],
+        [INIPP],
+        [],
+        [],
+        [
+            INIPP_CPPFLAGS="-I\${abs_top_srcdir}/third_party/inipp/repo/inipp"
+        ],
+        [
+            # Check for required IniPP headers.
+
+            AC_CHECK_HEADERS([inipp.h],
+            [],
+            [
+                AC_MSG_ERROR(The IniPP header "inipp.h" is required but cannot be found.)
+            ])
+        ]
+    )
+fi
+
+#
 # Sockets
 #
 
@@ -2001,6 +2038,14 @@ AX_PTHREAD([], [])
 
 AC_CHECK_DECL([PTHREAD_NULL], [], [AC_DEFINE([PTHREAD_NULL],[0], [Approximation of PTHREAD_NULL since pthread.h does not define one])],
               [[#include <pthread.h>]])
+
+#
+# Check for Network.framework
+#
+if test "${CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK}" = "1"; then
+    AC_CHECK_HEADER([Network/Network.h])
+    LDFLAGS="${LDFLAGS} -lnetwork"
+fi
 
 #
 # Check for <new>
@@ -2242,6 +2287,7 @@ AC_MSG_NOTICE([
   Sockets link libraries                           : ${SOCKETS_LIBS:--}
   PThreads compile flags                           : ${PTHREAD_CFLAGS:--}
   PThreads link libraries                          : ${PTHREAD_LIBS:--}
+  IniPP compile flags                              : ${INIPP_CPPFLAGS:--}
   C Preprocessor                                   : ${CPP}
   C Compiler                                       : ${CC}
   C++ Preprocessor                                 : ${CXXCPP}

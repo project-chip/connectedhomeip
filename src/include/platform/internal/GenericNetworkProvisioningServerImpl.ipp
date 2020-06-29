@@ -27,8 +27,8 @@
 #define GENERIC_NETWORK_PROVISIONING_SERVER_IMPL_IPP
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/internal/NetworkProvisioningServer.h>
 #include <platform/internal/GenericNetworkProvisioningServerImpl.h>
+#include <platform/internal/NetworkProvisioningServer.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -431,7 +431,7 @@ CHIP_ERROR GenericNetworkProvisioningServerImpl<ImplClass>::HandleRemoveNetwork(
         }
 
         // Clear the Thread provision.
-        ThreadStackMgr().ClearThreadProvision();
+        ThreadStackMgr().ErasePersistentInfo();
 
         break;
 
