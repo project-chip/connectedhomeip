@@ -46,11 +46,11 @@ extra_args=""
 
 if [[ -d "$NRF5_SDK_ROOT/components/libraries" ]]; then
   nrf5_sdk_args+="nrf5_sdk_root=\"$NRF5_SDK_ROOT\""
-  extra_args+=" ${nrf5_sdk_args} enable_nrf5_lock_app_build=true"
+  extra_args+=" $nrf5_sdk_args enable_nrf5_lock_app_build=true"
 fi
 
-gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/debug" --args='target_os="all"'"${extra_args}"
-gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"${extra_args}"
+gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args"
+gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"$extra_args"
 
 _chip_banner "Build: Ninja build"
 
@@ -66,7 +66,7 @@ echo source "$CHIP_ROOT/activate.sh"
 
 echo
 echo 'To build a debug build:'
-echo gn gen "$CHIP_ROOT/out/debug" --args=\''target_os="all"'"${extra_args}"\'
+echo gn gen "$CHIP_ROOT/out/debug" --args=\''target_os="all"'"$extra_args"\'
 echo ninja -C "$CHIP_ROOT/out/debug"
 
 echo
@@ -75,7 +75,7 @@ echo ninja -C "$CHIP_ROOT/out/debug" check
 
 echo
 echo 'To build & test an optimized build:'
-echo gn gen "$CHIP_ROOT/out/release" --args=\''target_os="all" is_debug=false'"${extra_args}"\'
+echo gn gen "$CHIP_ROOT/out/release" --args=\''target_os="all" is_debug=false'"$extra_args"\'
 echo ninja -C "$CHIP_ROOT/out/release" check
 
 echo
