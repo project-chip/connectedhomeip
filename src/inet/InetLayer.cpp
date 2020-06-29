@@ -65,11 +65,7 @@
 #include <fcntl.h>
 #include <net/if.h>
 #include <unistd.h>
-#ifdef __ANDROID__
-#include <ifaddrs-android.h>
-#else
 #include <ifaddrs.h>
-#endif // __ANDROID__
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace chip {
