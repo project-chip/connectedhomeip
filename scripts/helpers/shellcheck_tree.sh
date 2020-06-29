@@ -56,5 +56,5 @@ else
         pattern_args+=(-o -name "$pattern")
     done
 
-    find . "${exclude_args[@]}" '(' "${pattern_args[@]:1}" ')' -exec shellcheck -f gcc {} +
+    find . "${exclude_args[@]}" '(' "${pattern_args[@]:1}" ')' -type f -exec shellcheck -f gcc {} +
 fi
