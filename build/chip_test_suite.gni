@@ -28,6 +28,7 @@ template("chip_test_suite") {
                            [
                              "deps",
                              "public_deps",
+                             "public_configs",
                            ])
     if (defined(invoker.common_sources)) {
       sources = invoker.common_sources
