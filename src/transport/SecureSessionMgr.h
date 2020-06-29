@@ -56,7 +56,7 @@ public:
      * @brief
      *   Initialize a Secure Transport
      *
-     * @param inet  Inet layer to use
+     * @param inet    Inet layer to use
      * @param listenParams  Listen settings for the transport
      *
      * @note This is not a final API as it is UDP specific. Class will be updated to support
@@ -83,7 +83,7 @@ public:
     CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf);
 
     SecureSessionMgr();
-    virtual ~SecureSessionMgr() {}
+    virtual ~SecureSessionMgr();
 
     /**
      * Sets the message receive handler and associated argument
@@ -130,6 +130,7 @@ private:
     // TODO: add support for multiple transports (TCP, BLE to be added)
     Transport::UDP mTransport;
 
+    System::Layer * mSystemLayer = nullptr;
     NodeId mLocalNodeId;                                                                //< Id of the current node
     Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; //< Active connections to other peers
     State mState;                                                                       //< Initialization state of the object
@@ -155,6 +156,12 @@ private:
     NewConnectionHandler OnNewConnection = nullptr; ///< Callback for new connection received
     void * mNewConnectionArgument        = nullptr; ///< Argument for callback
 
+    /** Schedules a new oneshot timer for checking connection expiry. */
+    void ScheduleExpiryTimer(void);
+
+    /** Cancels any active timers for connection expiry checks. */
+    void CancelExpiryTimer(void);
+
     /**
      * Allocates a new connection for the given source.
      *
@@ -172,6 +179,16 @@ private:
      */
     static void HandleUdpDataReceived(const MessageHeader & header, const Inet::IPPacketInfo & source,
                                       System::PacketBuffer * msgBuf, SecureSessionMgr * transport);
+
+    /**
+     * Called when a specific connection expires.
+     */
+    static void HandleConnectionExpired(const Transport::PeerConnectionState & state, SecureSessionMgr * mgr);
+
+    /**
+     * Callback for timer expiry check
+     */
+    static void ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error);
 };
 
 } // namespace chip

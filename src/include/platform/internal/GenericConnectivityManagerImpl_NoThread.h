@@ -53,7 +53,7 @@ protected:
     CHIP_ERROR _SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig);
     bool _IsThreadAttached(void);
     bool _IsThreadProvisioned(void);
-    void _ClearThreadProvision(void);
+    void _ErasePersistentInfo(void);
     bool _HaveServiceConnectivityViaThread(void);
 
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
@@ -96,7 +96,7 @@ inline bool GenericConnectivityManagerImpl_NoThread<ImplClass>::_IsThreadProvisi
 }
 
 template <class ImplClass>
-inline void GenericConnectivityManagerImpl_NoThread<ImplClass>::_ClearThreadProvision(void)
+inline void GenericConnectivityManagerImpl_NoThread<ImplClass>::_ErasePersistentInfo(void)
 {}
 
 template <class ImplClass>
