@@ -34,7 +34,7 @@ target_include_directories(TransportLayerTests PUBLIC
     ${PROJECT_SOURCE_DIR}/src/lib
     ${PROJECT_SOURCE_DIR}/src/lib/core
     ${PROJECT_SOURCE_DIR}/src/system
-    ${PROJECT_SOURCE_DIR}/third_party/nlunit-test/repo/src
+    ${NLUNIT_TEST_INCLUDES}
     ${PROJECT_SOURCE_DIR}/third_party/lwip/repo/lwip/src/include
 )
 
@@ -51,6 +51,11 @@ target_link_libraries(TransportLayerTests PUBLIC
     ${CHIP_PLATFORM_LIBS}
     ${PLATFORM_LINK_END}
     chip-config
+)
+
+target_link_directories(TransportLayerTests PUBLIC
+    ${NLUNIT_TEST_LDPATH}
+    ${NLFAULT_INJECTION_LDPATH}
 )
 
 add_executable(TestTransportMessageHeader TestMessageHeaderDriver.cpp)

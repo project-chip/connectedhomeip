@@ -28,6 +28,7 @@ target_include_directories(BleLayerTests PUBLIC
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/src/include
     ${PROJECT_SOURCE_DIR}/src/lib
+    ${NLUNIT_TEST_INCLUDES}
 )
 
 target_link_libraries(BleLayerTests PUBLIC 
@@ -36,6 +37,10 @@ target_link_libraries(BleLayerTests PUBLIC
     nlunit-test
     ${CHIP_PLATFORM_LIBS}
     chip-config
+)
+
+target_link_directories(BleLayerTests PUBLIC
+    ${NLUNIT_TEST_LDPATH}
 )
 
 #### TestBleErrorStr

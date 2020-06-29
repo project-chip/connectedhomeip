@@ -20,6 +20,8 @@
 #      This file is the CMake template for the nlfaultinjection library.
 #
 
+if (BUILD_EXTERNALS_WITH_CMAKE)
+
 add_library(nlfaultinjection
     repo/src/nlfaultinjection.cpp
 )
@@ -57,3 +59,25 @@ target_link_libraries(TestFaultInjection PRIVATE ${TEST_COMMON_LIBS})
 target_link_directories(TestFaultInjection PRIVATE ${COMMON_LDPATH})
 
 add_test(NAME TestFaultInjection COMMAND TestFaultInjection)
+
+else (BUILD_EXTERNALS_WITH_CMAKE)
+
+include(ExternalProject)
+
+project(nlfaultinjection)
+ExternalProject_Add(nlfaultinjection
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repo
+    CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/repo/configure --prefix=<INSTALL_DIR>
+    BUILD_COMMAND make
+)
+add_test(NAME nlfaultinjection-check
+    COMMAND make check
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/third_party/nlfaultinjection/nlfaultinjection-prefix/src/nlfaultinjection-build
+)
+
+set(NLFAULT_INJECTION_INCLUDES "${CMAKE_BINARY_DIR}/third_party/nlfaultinjection/nlfaultinjection-prefix/include" 
+    CACHE PATH "Module nlfaultinjection include paths")
+set(NLFAULT_INJECTION_LDPATH "${CMAKE_BINARY_DIR}/third_party/nlfaultinjection/nlfaultinjection-prefix/lib" 
+    CACHE PATH "Module nlfaultinjection library paths")
+
+endif (BUILD_EXTERNALS_WITH_CMAKE)

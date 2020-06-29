@@ -32,6 +32,7 @@ target_include_directories(SetupPayloadTests PUBLIC
     ${PROJECT_SOURCE_DIR}/src/lib
     ${PROJECT_SOURCE_DIR}/src/system
     ${PROJECT_SOURCE_DIR}/src/setup_payload
+    ${NLUNIT_TEST_INCLUDES}
 )
 
 target_link_libraries(SetupPayloadTests PUBLIC
@@ -42,6 +43,11 @@ target_link_libraries(SetupPayloadTests PUBLIC
     nlunit-test
     ${CHIP_PLATFORM_LIBS}
     chip-config
+)
+
+target_link_directories(SetupPayloadTests PUBLIC
+    ${NLUNIT_TEST_LDPATH}
+    ${NLFAULT_INJECTION_LDPATH}
 )
 
 #### TestManualCode

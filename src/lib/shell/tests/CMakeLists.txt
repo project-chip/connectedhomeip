@@ -30,6 +30,7 @@ target_include_directories(ChipShellTests PUBLIC
     ${PROJECT_SOURCE_DIR}/src/include
     ${PROJECT_SOURCE_DIR}/src/lib
     ${PROJECT_SOURCE_DIR}/src/crypto
+    ${NLUNIT_TEST_INCLUDES}
 )
 
 target_link_libraries(ChipShellTests PUBLIC
@@ -41,6 +42,10 @@ target_link_libraries(ChipShellTests PUBLIC
     ${CHIP_PLATFORM_LIBS}
     ${PLATFORM_LINK_END}
     chip-config
+)
+
+target_link_directories(ChipShellTests PUBLIC
+    ${NLUNIT_TEST_LDPATH}
 )
 
 add_executable(TestShellStreamerStdio TestStreamerStdioDriver.cpp)

@@ -29,6 +29,7 @@ target_include_directories(CryptoLayerTests PUBLIC
     ${PROJECT_SOURCE_DIR}/src/include
     ${PROJECT_SOURCE_DIR}/src/lib
     ${PROJECT_SOURCE_DIR}/src/crypto
+    ${NLUNIT_TEST_INCLUDES}
 )
 
 target_link_libraries(CryptoLayerTests PUBLIC
@@ -37,6 +38,10 @@ target_link_libraries(CryptoLayerTests PUBLIC
     nlunit-test
     ${CHIP_PLATFORM_LIBS}
     chip-config
+)
+
+target_link_directories(CryptoLayerTests PUBLIC
+    ${NLUNIT_TEST_LDPATH}
 )
 
 #### TestCryptoPAL

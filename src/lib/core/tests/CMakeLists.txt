@@ -29,6 +29,7 @@ target_include_directories(ChipCoreTests PUBLIC
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/src/lib
     ${PROJECT_SOURCE_DIR}/src/include
+    ${NLUNIT_TEST_INCLUDES}
 )
 
 target_link_libraries(ChipCoreTests PUBLIC 
@@ -39,6 +40,11 @@ target_link_libraries(ChipCoreTests PUBLIC
     nlfaultinjection
     ${CHIP_PLATFORM_LIBS}
     chip-config
+)
+
+target_link_directories(ChipCoreTests PUBLIC
+    ${NLUNIT_TEST_LDPATH}
+    ${NLFAULT_INJECTION_LDPATH}
 )
 
 #### TestCHIPErrorStr

@@ -22,7 +22,17 @@
 
 option(CHIP_BUILD_EXECUTABLES "Build executables" ON)
 
-option(CHIP_BUILD_NLFRIENDS_WITH_AUTOTOOLS
-    "Use autotools to build third_party/nlfriends. Otherwise, use native cmake."
-    OFF
+#
+# This option chooses whether to optimize builds of third_party packages:
+#
+#   ON: If available, use optimized cmake scripts specified by the CHIP project.
+#       This option will result in faster builds, but require updates when upstream
+#       diverges. The optimization is applied for libs that don't change often and
+#       can provide a measurable benefit from recasting the build using cmake.
+#
+#   OFF: Use the native build system provided the third_party project (autotools or other).
+#
+option(BUILD_EXTERNALS_WITH_CMAKE
+    "Builds third_party packages with optimized cmake. Otherwise, use the native build system provided by the package."
+    ON
 )

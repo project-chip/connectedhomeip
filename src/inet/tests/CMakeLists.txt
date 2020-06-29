@@ -36,6 +36,8 @@ target_include_directories(InetLayerTests
     ${PROJECT_SOURCE_DIR}/src/lib
     ${PROJECT_SOURCE_DIR}/src/lib/core
     ${PROJECT_SOURCE_DIR}/src/system
+    ${NLFAULT_INJECTION_INCLUDES}
+    ${NLUNIT_TEST_INCLUDES}
 )
 
 target_link_libraries(InetLayerTests 
@@ -47,6 +49,11 @@ target_link_libraries(InetLayerTests
     nlfaultinjection
     ${CHIP_PLATFORM_LIBS}
     chip-config
+)
+
+target_link_directories(InetLayerTests PUBLIC
+    ${NLUNIT_TEST_LDPATH}
+    ${NLFAULT_INJECTION_LDPATH}
 )
 
 #### TestInetAddress

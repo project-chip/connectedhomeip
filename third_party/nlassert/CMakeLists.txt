@@ -20,6 +20,8 @@
 #      This file is the CMake template for the nlassert library.
 #
 
+if (BUILD_EXTERNALS_WITH_CMAKE)
+
 add_library(nlassert INTERFACE)     # Tag header-only library as INTERFACE
 
 target_include_directories(nlassert INTERFACE repo/include)
@@ -58,3 +60,20 @@ target_include_directories(nlassert-test PRIVATE ${COMMON_INCLUDES})
 target_link_libraries(nlassert-test PRIVATE ${COMMON_LIBS})
 target_link_directories(nlassert-test PRIVATE ${COMMON_LDPATH})
 add_test(NAME nlassert-test COMMAND nlassert-test)
+
+else (BUILD_EXTERNALS_WITH_CMAKE)
+
+include(ExternalProject)
+
+project(nlassert)
+ExternalProject_Add(nlassert
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repo
+    CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/repo/configure --prefix=<INSTALL_DIR>
+    BUILD_COMMAND make
+)
+add_test(NAME nlassert-check
+    COMMAND make check
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/third_party/nlassert/nlassert-prefix/src/nlassert-build
+)
+
+endif (BUILD_EXTERNALS_WITH_CMAKE)

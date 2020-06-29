@@ -30,6 +30,7 @@ target_include_directories(SupportLayerTests PUBLIC
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/src/lib
     ${PROJECT_SOURCE_DIR}/src/include
+    ${NLUNIT_TEST_INCLUDE}
 )
 
 target_link_libraries(SupportLayerTests PUBLIC 
@@ -37,6 +38,10 @@ target_link_libraries(SupportLayerTests PUBLIC
     nlunit-test
     ${CHIP_PLATFORM_LIBS}
     chip-config
+)
+
+target_link_directories(SupportLayerTests PUBLIC
+    ${NLUNIT_TEST_LDPATH}
 )
 
 #### TestSupportErrorStr

@@ -34,6 +34,7 @@ target_include_directories(SystemLayerTests PUBLIC
     ${PROJECT_SOURCE_DIR}/src/lib/core
     ${PROJECT_SOURCE_DIR}/src/system
     ${PROJECT_SOURCE_DIR}/third_party/lwip/repo/lwip/src/include
+    ${NLUNIT_TEST_INCLUDES}
 )
 
 target_link_libraries(SystemLayerTests PUBLIC
@@ -47,6 +48,11 @@ target_link_libraries(SystemLayerTests PUBLIC
     ${CHIP_PLATFORM_LIBS}
     ${PLATFORM_LINK_END}
     chip-config
+)
+
+target_link_directories(SystemLayerTests PUBLIC
+    ${NLUNIT_TEST_LDPATH}
+    ${NLFAULT_INJECTION_LDPATH}
 )
 
 #### TestSystemErrorStr
