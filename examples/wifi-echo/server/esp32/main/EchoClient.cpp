@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#ifdef CONFIG_ECHO_USE_CLIENT
+
 #include "esp_event.h"
 #include "esp_log.h"
 #include "esp_system.h"
@@ -43,7 +45,6 @@ static const char * PAYLOAD = "Message from echo client!";
 
 static void udp_client_task(void * pvParameters)
 {
-#if CONFIG_USE_ECHO_CLIENT
     char rx_buffer[RX_LEN];
     char host_ip[]  = HOST_IP_ADDR;
     int addr_family = 0;
@@ -108,13 +109,12 @@ static void udp_client_task(void * pvParameters)
         }
     }
     vTaskDelete(NULL);
-#endif
 }
 
 // The echo client assumes the platform's networking has been setup already
 void startClient(void)
 {
-#if CONFIG_USE_ECHO_CLIENT
     xTaskCreate(udp_client_task, "udp_client", 4096, (void *) AF_INET, 5, NULL);
-#endif
 }
+
+#endif // CONFIG_USE_ECHO_CLIENT
