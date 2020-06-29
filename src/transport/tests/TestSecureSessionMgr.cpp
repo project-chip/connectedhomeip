@@ -90,6 +90,8 @@ public:
     int NewConnectionHandlerCallCount = 0;
 };
 
+TestSessMgrCallback callback;
+
 void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
@@ -120,24 +122,25 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     err = conn.Init(kSourceNodeId, &ctx.GetInetLayer(), Transport::UdpListenParameters().SetAddressType(addr.Type()));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    TestSessMgrCallback cb;
-    cb.mSuite = inSuite;
+    callback.mSuite = inSuite;
 
-    conn.SetDelegate(&cb);
+    conn.SetDelegate(&callback);
 
-    cb.NewConnectionHandlerCallCount = 0;
-    err                              = conn.Connect(kDestinationNodeId, Transport::PeerAddress::UDP(addr));
+    callback.NewConnectionHandlerCallCount = 0;
+
+    err = conn.Connect(kDestinationNodeId, Transport::PeerAddress::UDP(addr));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, cb.NewConnectionHandlerCallCount == 1);
+    NL_TEST_ASSERT(inSuite, callback.NewConnectionHandlerCallCount == 1);
 
     // Should be able to send a message to itself by just calling send.
-    cb.ReceiveHandlerCallCount = 0;
-    err                        = conn.SendMessage(kDestinationNodeId, buffer);
+    callback.ReceiveHandlerCallCount = 0;
+
+    err = conn.SendMessage(kDestinationNodeId, buffer);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ctx.DriveIOUntil(1000 /* ms */, []() { return ReceiveHandlerCallCount != 0; });
+    ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
 
-    NL_TEST_ASSERT(inSuite, cb.ReceiveHandlerCallCount == 1);
+    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 }
 
 // Test Suite
