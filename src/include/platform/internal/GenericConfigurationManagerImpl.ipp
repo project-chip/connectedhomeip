@@ -26,9 +26,9 @@
 #ifndef GENERIC_CONFIGURATION_MANAGER_IMPL_IPP
 #define GENERIC_CONFIGURATION_MANAGER_IMPL_IPP
 
+#include <ble/CHIPBleServiceData.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
-#include <ble/CHIPBleServiceData.h>
 #include <support/Base64.h>
 #include <support/CodeUtils.h>
 
@@ -43,7 +43,7 @@ namespace Internal {
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_Init()
 {
     mFlags = 0;
@@ -53,20 +53,22 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_Init()
     SetFlag(mFlags, kFlag_IsServiceProvisioned, Impl()->ConfigValueExists(ImplClass::kConfigKey_ServiceConfig));
     SetFlag(mFlags, kFlag_IsMemberOfFabric, Impl()->ConfigValueExists(ImplClass::kConfigKey_FabricId));
     SetFlag(mFlags, kFlag_IsPairedToAccount, Impl()->ConfigValueExists(ImplClass::kConfigKey_PairedAccountId));
-    SetFlag(mFlags, kFlag_OperationalDeviceCredentialsProvisioned, Impl()->ConfigValueExists(ImplClass::kConfigKey_OperationalDeviceCert));
+    SetFlag(mFlags, kFlag_OperationalDeviceCredentialsProvisioned,
+            Impl()->ConfigValueExists(ImplClass::kConfigKey_OperationalDeviceCert));
 
     return CHIP_NO_ERROR;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ConfigureChipStack()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+#if CHIP_CONFIG_ENABLE_FABRIC_STATE
     size_t pairingCodeLen;
 
     static char sPairingCodeBuf[ConfigurationManager::kMaxPairingCodeLength + 1];
 
-#if CHIP_CONFIG_ENABLE_FABRIC_STATE
     // Configure the CHIP FabricState object with the local node id.
     err = Impl()->_GetDeviceId(FabricState.LocalNodeId);
     SuccessOrExit(err);
@@ -114,11 +116,13 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ConfigureChipStack()
 
 #endif // CHIP_PROGRESS_LOGGING
 
+    SuccessOrExit(err);
+
 exit:
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareRevision(char * buf, size_t bufSize, size_t & outLen)
 {
 #ifdef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
@@ -136,9 +140,9 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareRevision(char
     }
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth,
-        uint8_t & hour, uint8_t & minute, uint8_t & second)
+                                                                             uint8_t & hour, uint8_t & minute, uint8_t & second)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -154,7 +158,7 @@ exit:
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDeviceId(uint64_t & deviceId)
 {
     CHIP_ERROR err;
@@ -165,20 +169,20 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDeviceId(
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         deviceId = TestDeviceId;
-        err = CHIP_NO_ERROR;
+        err      = CHIP_NO_ERROR;
     }
 #endif
 
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreManufacturerDeviceId(uint64_t deviceId)
 {
     return Impl()->WriteConfigValue(ImplClass::kConfigKey_MfrDeviceId, deviceId);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen)
 {
     CHIP_ERROR err;
@@ -200,25 +204,25 @@ exit:
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreSerialNumber(const char * serialNum, size_t serialNumLen)
 {
     return Impl()->WriteConfigValueStr(ImplClass::kConfigKey_SerialNum, serialNum, serialNumLen);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
     return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePrimaryWiFiMACAddress(const uint8_t * buf)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPrimary802154MACAddress(uint8_t * buf)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -228,13 +232,13 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPrimary802154MACAddre
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePrimary802154MACAddress(const uint8_t * buf)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductRevision(uint16_t & productRev)
 {
     CHIP_ERROR err;
@@ -243,33 +247,34 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductRevisio
     err = Impl()->ReadConfigValue(ImplClass::kConfigKey_ProductRevision, val);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        productRev = (uint16_t)CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION;
-        err = CHIP_NO_ERROR;
+        productRev = (uint16_t) CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION;
+        err        = CHIP_NO_ERROR;
     }
     else
     {
-        productRev = (uint16_t)val;
+        productRev = (uint16_t) val;
     }
 
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreProductRevision(uint16_t productRev)
 {
-    return Impl()->WriteConfigValue(ImplClass::kConfigKey_ProductRevision, (uint32_t)productRev);
+    return Impl()->WriteConfigValue(ImplClass::kConfigKey_ProductRevision, (uint32_t) productRev);
 }
 
-template<class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturingDate(uint16_t& year, uint8_t& month, uint8_t& dayOfMonth)
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth)
 {
     CHIP_ERROR err;
-    enum {
+    enum
+    {
         kDateStringLength = 10 // YYYY-MM-DD
     };
     char dateStr[kDateStringLength + 1];
     size_t dateLen;
-    char *parseEnd;
+    char * parseEnd;
 
     err = Impl()->ReadConfigValueStr(ImplClass::kConfigKey_ManufacturingDate, dateStr, sizeof(dateStr), dateLen);
     SuccessOrExit(err);
@@ -293,14 +298,15 @@ exit:
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen)
 {
     return Impl()->WriteConfigValueStr(ImplClass::kConfigKey_ManufacturingDate, mfgDate, mfgDateLen);
 }
 
-template<class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen)
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDeviceCertificate(uint8_t * buf, size_t bufSize,
+                                                                                         size_t & certLen)
 {
     CHIP_ERROR err;
 
@@ -326,14 +332,15 @@ exit:
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreManufacturerDeviceCertificate(const uint8_t * cert, size_t certLen)
 {
     return Impl()->WriteConfigValueBin(ImplClass::kConfigKey_MfrDeviceCert, cert, certLen);
 }
 
-template<class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen)
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize,
+                                                                                                 size_t & certsLen)
 {
     CHIP_ERROR err;
 
@@ -359,14 +366,16 @@ exit:
     return err;
 }
 
-template<class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreManufacturerDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen)
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreManufacturerDeviceIntermediateCACerts(const uint8_t * certs,
+                                                                                                   size_t certsLen)
 {
     return Impl()->WriteConfigValueBin(ImplClass::kConfigKey_MfrDeviceICACerts, certs, certsLen);
 }
 
-template<class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen)
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDevicePrivateKey(uint8_t * buf, size_t bufSize,
+                                                                                        size_t & keyLen)
 {
     CHIP_ERROR err;
 
@@ -392,13 +401,13 @@ exit:
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreManufacturerDevicePrivateKey(const uint8_t * key, size_t keyLen)
 {
     return Impl()->WriteConfigValueBin(ImplClass::kConfigKey_MfrDevicePrivateKey, key, keyLen);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceId(uint64_t & deviceId)
 {
     CHIP_ERROR err;
@@ -417,7 +426,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceId(uint64_t & d
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen)
 {
     CHIP_ERROR err;
@@ -436,8 +445,9 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceCertificate(uin
     return err;
 }
 
-template<class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen)
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize,
+                                                                                     size_t & certsLen)
 {
     CHIP_ERROR err;
 
@@ -455,7 +465,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceIntermediateCAC
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen)
 {
     CHIP_ERROR err;
@@ -476,31 +486,31 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDevicePrivateKey(uint
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreDeviceId(uint64_t deviceId)
 {
     return Impl()->WriteConfigValue(ImplClass::kConfigKey_OperationalDeviceId, deviceId);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreDeviceCertificate(const uint8_t * cert, size_t certLen)
 {
     return Impl()->WriteConfigValueBin(ImplClass::kConfigKey_OperationalDeviceCert, cert, certLen);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen)
 {
     return Impl()->WriteConfigValueBin(ImplClass::kConfigKey_OperationalDeviceICACerts, certs, certsLen);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreDevicePrivateKey(const uint8_t * key, size_t keyLen)
 {
     return Impl()->WriteConfigValueBin(ImplClass::kConfigKey_OperationalDevicePrivateKey, key, keyLen);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearOperationalDeviceCredentials(void)
 {
     Impl()->ClearConfigValue(ImplClass::kConfigKey_OperationalDeviceId);
@@ -513,19 +523,19 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearOperationalDeviceCr
     return CHIP_NO_ERROR;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_OperationalDeviceCredentialsProvisioned()
 {
     return ::chip::GetFlag(mFlags, kFlag_OperationalDeviceCredentialsProvisioned);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::UseManufacturerCredentialsAsOperational()
 {
     return ::chip::GetFlag(mFlags, kFlag_UseManufacturerCredentialsAsOperational);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericConfigurationManagerImpl<ImplClass>::_UseManufacturerCredentialsAsOperational(bool val)
 {
     SetFlag(mFlags, kFlag_UseManufacturerCredentialsAsOperational, val);
@@ -533,7 +543,7 @@ void GenericConfigurationManagerImpl<ImplClass>::_UseManufacturerCredentialsAsOp
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPairingCode(char * buf, size_t bufSize, size_t & pairingCodeLen)
 {
     CHIP_ERROR err;
@@ -555,19 +565,19 @@ exit:
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePairingCode(const char * pairingCode, size_t pairingCodeLen)
 {
     return Impl()->WriteConfigValueStr(ImplClass::kConfigKey_PairingCode, pairingCode, pairingCodeLen);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFabricId(uint64_t & fabricId)
 {
     return Impl()->ReadConfigValue(ImplClass::kConfigKey_FabricId, fabricId);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreFabricId(uint64_t fabricId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -592,31 +602,31 @@ exit:
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetServiceId(uint64_t & serviceId)
 {
     return Impl()->ReadConfigValue(ImplClass::kConfigKey_ServiceId, serviceId);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetServiceConfig(uint8_t * buf, size_t bufSize, size_t & serviceConfigLen)
 {
     return Impl()->ReadConfigValueBin(ImplClass::kConfigKey_ServiceConfig, buf, bufSize, serviceConfigLen);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen)
 {
     return Impl()->WriteConfigValueBin(ImplClass::kConfigKey_ServiceConfig, serviceConfig, serviceConfigLen);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPairedAccountId(char * buf, size_t bufSize, size_t & accountIdLen)
 {
     return Impl()->ReadConfigValueStr(ImplClass::kConfigKey_PairedAccountId, buf, bufSize, accountIdLen);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePairedAccountId(const char * accountId, size_t accountIdLen)
 {
     CHIP_ERROR err;
@@ -630,10 +640,11 @@ exit:
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreServiceProvisioningData(uint64_t serviceId,
-        const uint8_t * serviceConfig, size_t serviceConfigLen,
-        const char * accountId, size_t accountIdLen)
+                                                                                     const uint8_t * serviceConfig,
+                                                                                     size_t serviceConfigLen,
+                                                                                     const char * accountId, size_t accountIdLen)
 {
     CHIP_ERROR err;
 
@@ -661,7 +672,7 @@ exit:
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearServiceProvisioningData()
 {
     Impl()->ClearConfigValue(ImplClass::kConfigKey_ServiceId);
@@ -675,7 +686,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearServiceProvisioning
     if (_IsPairedToAccount())
     {
         ChipDeviceEvent event;
-        event.Type = DeviceEventType::kAccountPairingChange;
+        event.Type                                   = DeviceEventType::kAccountPairingChange;
         event.AccountPairingChange.IsPairedToAccount = false;
         PlatformMgr().PostEvent(&event);
     }
@@ -685,7 +696,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearServiceProvisioning
     if (_IsServiceProvisioned())
     {
         ChipDeviceEvent event;
-        event.Type = DeviceEventType::kServiceProvisioningChange;
+        event.Type                                           = DeviceEventType::kServiceProvisioningChange;
         event.ServiceProvisioningChange.IsServiceProvisioned = false;
         event.ServiceProvisioningChange.ServiceConfigUpdated = false;
         PlatformMgr().PostEvent(&event);
@@ -697,25 +708,25 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearServiceProvisioning
     return CHIP_NO_ERROR;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFailSafeArmed(bool & val)
 {
     return Impl()->ReadConfigValue(ImplClass::kConfigKey_FailSafeArmed, val);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_SetFailSafeArmed(bool val)
 {
     return Impl()->WriteConfigValue(ImplClass::kConfigKey_FailSafeArmed, val);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetQRCodeString(char * buf, size_t bufSize)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetWiFiAPSSID(char * buf, size_t bufSize)
 {
     CHIP_ERROR err;
@@ -742,8 +753,9 @@ exit:
     return err;
 }
 
-template<class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo)
+template <class ImplClass>
+CHIP_ERROR
+GenericConfigurationManagerImpl<ImplClass>::_GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo)
 {
     CHIP_ERROR err;
     uint16_t id;
@@ -762,52 +774,51 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetBLEDeviceIdentificati
     deviceIdInfo.SetDeviceId(FabricState.LocalNodeId);
 #endif
 
-    deviceIdInfo.PairingStatus = Impl()->_IsPairedToAccount()
-        ? Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Paired
-        : Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Unpaired;
+    deviceIdInfo.PairingStatus = Impl()->_IsPairedToAccount() ? Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Paired
+                                                              : Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Unpaired;
 
 exit:
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_IsServiceProvisioned()
 {
     return ::chip::GetFlag(mFlags, kFlag_IsServiceProvisioned);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_IsMemberOfFabric()
 {
     return ::chip::GetFlag(mFlags, kFlag_IsMemberOfFabric);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_IsPairedToAccount()
 {
     return ::chip::GetFlag(mFlags, kFlag_IsPairedToAccount);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_IsFullyProvisioned()
 {
     return
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-            ConnectivityMgr().IsWiFiStationProvisioned() &&
+        ConnectivityMgr().IsWiFiStationProvisioned() &&
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-            ConnectivityMgr().IsThreadProvisioned() &&
+        ConnectivityMgr().IsThreadProvisioned() &&
 #endif
 #if !CHIP_DEVICE_CONFIG_DISABLE_ACCOUNT_PAIRING
-            Impl()->IsPairedToAccount() &&
+        Impl()->IsPairedToAccount() &&
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
-            (!UseManufacturerCredentialsAsOperational() && _OperationalDeviceCredentialsProvisioned()) &&
+        (!UseManufacturerCredentialsAsOperational() && _OperationalDeviceCredentialsProvisioned()) &&
 #endif
-            Impl()->IsMemberOfFabric();
+        Impl()->IsMemberOfFabric();
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(uint8_t * hashBuf, size_t hashBufSize)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -839,16 +850,16 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
     //     DDDD is the length of the dddddddddddddddd field (the device id), represented as 4 uppercase hex digits.
     //         Because the device id is always the same size, this field is always '0010'.
     //     CCCC is the length of the cccc…cccc field (the device certificate), represented as 4 uppercase hex digits.
-    //     IIII is the length of the iiii…iiii field (the device intermediate CA certificates), represented as 4 uppercase hex digits.
-    //     KKKK is the length of the kkkk…kkkk field (the device private key), represented as 4 uppercase hex digits.
-    //     PPPP is the length of the pppppp field (the device pairing code), represented as 4 uppercase hex digits.
+    //     IIII is the length of the iiii…iiii field (the device intermediate CA certificates), represented as 4 uppercase hex
+    //     digits. KKKK is the length of the kkkk…kkkk field (the device private key), represented as 4 uppercase hex digits. PPPP
+    //     is the length of the pppppp field (the device pairing code), represented as 4 uppercase hex digits.
 
     hash.Begin();
 
     // Hash the device id
     {
         uint64_t deviceId;
-        constexpr uint16_t kDeviceIdLen = 16; // 16 hex characters
+        constexpr uint16_t kDeviceIdLen = 16;           // 16 hex characters
         char inputBuf[kLenFieldLen + kDeviceIdLen + 1]; // +1 for terminator
 
         err = Impl()->_GetManufacturerDeviceId(deviceId);
@@ -856,7 +867,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
 
         snprintf(inputBuf, sizeof(inputBuf), "0010%016" PRIX64, deviceId);
 
-        hash.AddData((uint8_t *)inputBuf, kLenFieldLen + kDeviceIdLen);
+        hash.AddData((uint8_t *) inputBuf, kLenFieldLen + kDeviceIdLen);
     }
 
     // Hash the device certificate
@@ -864,13 +875,13 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
         size_t certLen;
 
         // Determine the length of the device certificate.
-        err = Impl()->_GetManufacturerDeviceCertificate((uint8_t *)NULL, 0, certLen);
+        err = Impl()->_GetManufacturerDeviceCertificate((uint8_t *) NULL, 0, certLen);
         SuccessOrExit(err);
 
         // Create a temporary buffer to hold the certificate.  (This will also be used for
         // the private key).
         dataBufSize = certLen;
-        dataBuf = (uint8_t *)Platform::Security::MemoryAlloc(dataBufSize);
+        dataBuf     = (uint8_t *) Platform::Security::MemoryAlloc(dataBufSize);
         VerifyOrExit(dataBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         // Read the certificate.
@@ -884,7 +895,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
         size_t certsLen;
 
         // Determine the length of the device intermediate CA certificates.
-        err = Impl()->_GetManufacturerDeviceIntermediateCACerts((uint8_t *)NULL, 0, certsLen);
+        err = Impl()->_GetManufacturerDeviceIntermediateCACerts((uint8_t *) NULL, 0, certsLen);
         SuccessOrExit(err);
 
         // Allocate larger buffer to hold the intermediate CA certificates.
@@ -894,7 +905,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
             Platform::Security::MemoryFree(dataBuf);
 
             dataBufSize = certsLen;
-            dataBuf = (uint8_t *)Platform::Security::MemoryAlloc(dataBufSize);
+            dataBuf     = (uint8_t *) Platform::Security::MemoryAlloc(dataBufSize);
             VerifyOrExit(dataBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
         }
 
@@ -908,7 +919,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
         size_t keyLen;
 
         // Determine the length of the device private key.
-        err = Impl()->_GetManufacturerDevicePrivateKey((uint8_t *)NULL, 0, keyLen);
+        err = Impl()->_GetManufacturerDevicePrivateKey((uint8_t *) NULL, 0, keyLen);
         SuccessOrExit(err);
 
         // Read the private key.  (Note that we presume the buffer allocated to hold the certificate
@@ -921,21 +932,21 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
     // Hash the device pairing code.  If the device does not have a pairing code, hash a zero-length value.
     {
         char pairingCode[ConfigurationManager::kMaxPairingCodeLength + 1]; // +1 for terminator
-        char lenStr[kLenFieldLen + 1]; // +1 for terminator
+        char lenStr[kLenFieldLen + 1];                                     // +1 for terminator
         size_t pairingCodeLen;
 
         err = Impl()->_GetPairingCode(pairingCode, sizeof(pairingCode), pairingCodeLen);
         if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
         {
             pairingCodeLen = 0;
-            err = CHIP_NO_ERROR;
+            err            = CHIP_NO_ERROR;
         }
         SuccessOrExit(err);
 
-        snprintf(lenStr, sizeof(lenStr), "%04" PRIX16, (uint16_t)pairingCodeLen);
+        snprintf(lenStr, sizeof(lenStr), "%04" PRIX16, (uint16_t) pairingCodeLen);
 
-        hash.AddData((uint8_t *)lenStr, kLenFieldLen);
-        hash.AddData((uint8_t *)pairingCode, pairingCodeLen);
+        hash.AddData((uint8_t *) lenStr, kLenFieldLen);
+        hash.AddData((uint8_t *) pairingCode, pairingCodeLen);
     }
 
     hash.Finish(hashBuf);
@@ -964,7 +975,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_RunUnitTests()
 
 #if CHIP_PROGRESS_LOGGING
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
 {
     CHIP_ERROR err;

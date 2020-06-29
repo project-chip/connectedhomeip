@@ -41,6 +41,7 @@ lib_LIBRARIES                                         = \
     $(NULL)
 
 libTransportLayerTests_a_SOURCES                      = \
+    NetworkTestHelpers.cpp                              \
     TestMessageHeader.cpp                               \
     TestPeerConnections.cpp                             \
     TestSecureSession.cpp                               \
@@ -51,6 +52,7 @@ libTransportLayerTests_a_SOURCES                      = \
 libTransportLayerTests_adir                           = $(includedir)/transport
 
 dist_libTransportLayerTests_a_HEADERS                 = \
+    NetworkTestHelpers.h                                \
     TestTransportLayer.h                                \
     $(NULL)
 
@@ -60,7 +62,9 @@ dist_libTransportLayerTests_a_HEADERS                 = \
 AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
     -I$(top_srcdir)/src/lib                             \
+    -I$(top_srcdir)/src/inet/tests                      \
     $(NLASSERT_CPPFLAGS)                                \
+    $(NLFAULTINJECTION_CPPFLAGS)                        \
     $(NLIO_CPPFLAGS)                                    \
     $(NLUNIT_TEST_CPPFLAGS)                             \
     $(LWIP_CPPFLAGS)                                    \
@@ -74,6 +78,7 @@ CHIP_LDADD                                            = \
 
 COMMON_LDADD                                          = \
     libTransportLayerTests.a                            \
+    $(top_builddir)/src/inet/tests/libTestInetCommon.a  \
     $(COMMON_LDFLAGS)                                   \
     $(CHIP_LDADD)                                       \
     $(NLFAULTINJECTION_LDFLAGS)                         \

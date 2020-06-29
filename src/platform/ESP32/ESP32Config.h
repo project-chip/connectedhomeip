@@ -96,6 +96,8 @@ public:
     // NVS Namespace helper functions.
     static CHIP_ERROR EnsureNamespace(const char * ns);
     static CHIP_ERROR ClearNamespace(const char * ns);
+
+    static void RunConfigUnitTest(void);
 };
 
 struct ESP32Config::Key
