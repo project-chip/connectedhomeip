@@ -37,6 +37,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <support/ErrorStr.h>
 #include <transport/SecureSessionMgr.h>
+#include <core/CHIPDevice.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
@@ -122,36 +123,12 @@ extern "C" void app_main()
         return;
     }
 
-    // Initialize the LwIP core lock.  This must be done before the ESP
-    // tcpip_adapter layer is initialized.
-    err = PlatformMgrImpl().InitLwIPCoreLock();
+    Device &device = Device::GetInstance();
+
+    err = device.Init(DeviceEventHandler);
     if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "PlatformMgr().InitLocks() failed: %s", ErrorStr(err));
-        return;
-    }
-
-    // Initialize the CHIP stack.
-    err = PlatformMgr().InitChipStack();
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "PlatformMgr().InitChipStack() failed: %s", ErrorStr(err));
-        return;
-    }
-
-    // Configure the CHIP Connectivity Manager to always enable the AP. The Station interface
-    // will be enabled automatically if the required configuration is set.
-    ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
-
-    // Register a function to receive events from the CHIP device layer.  Note that calls to
-    // this function will happen on the CHIP event loop thread, not the app_main thread.
-    PlatformMgr().AddEventHandler(DeviceEventHandler, 0);
-
-    // Start a task to run the CHIP Device event loop.
-    err = PlatformMgr().StartEventLoopTask();
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "PlatformMgr().StartEventLoopTask() failed: %s", ErrorStr(err));
+        ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(err));
         return;
     }
 
