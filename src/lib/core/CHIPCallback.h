@@ -92,8 +92,12 @@ public:
  *     in order to take ownership of Inner members next, prev, info_ptr, and info_scalar.
  *    This template class also defines a default notification function prototype.
  *
- *   One-shot semantics can be accomplished by calling Cancel() on
+ *   One-shot semantics can be accomplished by calling Cancel() before calling mCall.
+ *     Persistent registration semantics would skip that.
  *
+ *   There is no provision for queueing data passed as arguments to a Callback's mCall
+ *     function.  If such a thing is required, the normal pattern is to take an output
+ *     parameter at Callback registration time.
  *
  */
 template <class T = void (*)(void *)>
