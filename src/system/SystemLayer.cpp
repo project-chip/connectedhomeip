@@ -65,6 +65,8 @@
 namespace chip {
 namespace System {
 
+using namespace ::chip::Callback;
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 bool LwIPEventHandlerDelegate::IsInitialized() const
 {
@@ -235,6 +237,56 @@ Error Layer::NewTimer(Timer *& aTimerPtr)
     }
 
     return CHIP_SYSTEM_NO_ERROR;
+}
+
+static bool TimerReady(void * p, const Inner * timer)
+{
+    const Timer::Epoch * kCurrentEpoch = static_cast<const Timer::Epoch *>(p);
+    return !Timer::IsEarlierEpoch(*kCurrentEpoch, timer->mInfoScalar);
+}
+
+static int TimerCompare(void * p, const Inner * a, const Inner * b)
+{
+    (void) p;
+    return (a->mInfoScalar > b->mInfoScalar) ? 1 : (a->mInfoScalar < b->mInfoScalar) ? -1 : 0;
+}
+
+/**
+ * @brief
+ *   This method starts a one-shot timer.
+ *
+ *   @note
+ *       Only a single timer is allowed to be started with the same @a aComplete and @a aAppState
+ *       arguments. If called with @a aComplete and @a aAppState identical to an existing timer,
+ *       the currently-running timer will first be cancelled.
+ *
+ *   @param[in]  aMilliseconds Expiration time in milliseconds.
+ *   @param[in]  aCallback     A pointer to the Callback that fires when the timer expires
+ *
+ *   @return CHIP_SYSTEM_NO_ERROR On success.
+ *   @return Other Value indicating timer failed to start.
+ *
+ */
+void Layer::StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * cb)
+{
+    Inner * inner = cb->Cancel();
+
+    inner->mInfoScalar = Timer::GetCurrentEpoch() + aMilliseconds;
+
+    mTimerCallbacks.InsertBy(inner, TimerCompare, nullptr);
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    if (mTimerCallbacks.first() == inner)
+    {
+        // this is the new eariest timer and so the timer needs (re-)starting provided that
+        // the system is not currently processing expired timers, in which case it is left to
+        // HandleExpiredTimers() to re-start the timer.
+        if (!lLayer.mTimerComplete)
+        {
+            lLayer.StartPlatformTimer(aDelayMilliseconds);
+        }
+    }
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 /**
@@ -571,6 +623,16 @@ void Layer::PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet,
         }
     }
 
+    // check for an earlier callback timer, too
+    if (lAwakenEpoch != kCurrentEpoch)
+    {
+        Inner * inner = mTimerCallbacks.First();
+        if (inner != nullptr && !Timer::IsEarlierEpoch(kCurrentEpoch, inner->mInfoScalar))
+        {
+            lAwakenEpoch = inner->mInfoScalar;
+        }
+    }
+
     const Timer::Epoch kSleepTime = lAwakenEpoch - kCurrentEpoch;
     aSleepTime.tv_sec             = kSleepTime / 1000;
     aSleepTime.tv_usec            = (kSleepTime % 1000) * 1000;
@@ -582,10 +644,11 @@ void Layer::PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet,
  *
  * @note
  *  It is important to set the pending I/O fields for all endpoints *before* making any callbacks. This avoids the case where an
- *  endpoint is closed and then re-opened within the callback for another endpoint. When this happens the new endpoint is likely to
- *  be assigned the same file descriptor as the old endpoint. However, any pending I/O for that file descriptor number represents
- *  I/O related to the old incarnation of the endpoint, not the current one. Saving the pending I/O state in each endpoint before
- *  acting on it allows the endpoint code to clear the I/O flags in the event of a close, thus avoiding any confusion.
+ *  endpoint is closed and then re-opened within the callback for another endpoint. When this happens the new endpoint is likely
+ * to be assigned the same file descriptor as the old endpoint. However, any pending I/O for that file descriptor number
+ * represents I/O related to the old incarnation of the endpoint, not the current one. Saving the pending I/O state in each
+ * endpoint before acting on it allows the endpoint code to clear the I/O flags in the event of a close, thus avoiding any
+ * confusion.
  *
  *  @param[in]    aSetSize          The return value of the select call.
  *  @param[in]    aReadSet          A pointer to the set of read file descriptors.
@@ -638,6 +701,16 @@ void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteS
         }
     }
 
+    // dispatch TimerCallbacks
+    Inner ready = mTimerCallbacks.DequeueBy(TimerReady, (void *) &kCurrentEpoch);
+    while (ready.mNext != &ready)
+    {
+        // one-shot
+        chip::Callback::Callback<> * cb = chip::Callback::Callback<>::FromInner(ready.mNext);
+        cb->Cancel();
+        cb->mCall(cb->mContext);
+    }
+
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     this->mHandleSelectThread = PTHREAD_NULL;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
@@ -647,8 +720,8 @@ void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteS
  * Wake up the I/O thread that monitors the file descriptors using select() by writing a single byte to the wake pipe.
  *
  *  @note
- *      If @p WakeSelect() is being called from within @p HandleSelectResult(), then writing to the wake pipe can be skipped, since
- *      the I/O thread is already awake.
+ *      If @p WakeSelect() is being called from within @p HandleSelectResult(), then writing to the wake pipe can be skipped,
+ * since the I/O thread is already awake.
  *
  *      Furthermore, we don't care if this write fails as the only reasonably likely failure is that the pipe is full, in which
  *      case the select calling thread is going to wake up anyway.
@@ -728,7 +801,8 @@ exit:
 }
 
 /**
- * This posts an event / message of the specified type with the provided argument to this instance's platform-specific event queue.
+ * This posts an event / message of the specified type with the provided argument to this instance's platform-specific event
+ * queue.
  *
  *  @param[in,out]  aTarget     A pointer to the CHIP System Layer object making the post request.
  *  @param[in]      aEventType  The type of event to post.
@@ -780,8 +854,8 @@ exit:
 /**
  * This dispatches the specified event for handling by this instance.
  *
- *  The unmarshalling of the type and arguments from the event is handled by a platform-specific hook which should then call back
- *  to Layer::HandleEvent for the actual dispatch.
+ *  The unmarshalling of the type and arguments from the event is handled by a platform-specific hook which should then call
+ * back to Layer::HandleEvent for the actual dispatch.
  *
  *  @param[in]  aEvent  The platform-specific event object to dispatch for handling.
  *

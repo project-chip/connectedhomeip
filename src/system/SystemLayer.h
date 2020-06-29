@@ -29,6 +29,8 @@
 // Include configuration headers
 #include <system/SystemConfig.h>
 
+#include <core/CHIPCallback.h>
+
 #include <support/DLLUtil.h>
 #include <system/SystemError.h>
 #include <system/SystemEvent.h>
@@ -135,6 +137,8 @@ public:
 
     Error NewTimer(Timer *& aTimerPtr);
 
+    void StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * cb);
+
     typedef void (*TimerCompleteFunct)(Layer * aLayer, void * aAppState, Error aError);
     Error StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aComplete, void * aAppState);
     void CancelTimer(TimerCompleteFunct aOnComplete, void * aAppState);
@@ -172,6 +176,7 @@ private:
     LayerState mLayerState;
     void * mContext;
     void * mPlatformData;
+    chip::Callback::CallbackDeque mTimerCallbacks;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     static LwIPEventHandlerDelegate sSystemEventHandlerDelegate;
