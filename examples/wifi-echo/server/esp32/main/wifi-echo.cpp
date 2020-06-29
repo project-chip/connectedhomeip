@@ -45,7 +45,9 @@ using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
 extern void startServer(SecureSessionMgr * transportIPv4, SecureSessionMgr * transportIPv6);
+#if CONFIG_USE_ECHO_CLIENT
 extern void startClient(void);
+#endif // CONFIG_USE_ECHO_CLIENT
 
 #if CONFIG_DEVICE_TYPE_M5STACK
 

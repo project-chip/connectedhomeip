@@ -29,6 +29,8 @@ CHIP_ERROR IOContext::Init(nlTestSuite * suite)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    gSystemLayer.Init(NULL);
+
     InitNetwork();
 
     mSuite       = suite;

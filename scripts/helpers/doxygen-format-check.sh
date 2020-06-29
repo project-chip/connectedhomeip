@@ -23,7 +23,6 @@
 # those macros via Doxygen's PREDEFINED directives.  Instead, we
 # process the incoming files via this script file.
 
-SED=/bin/sed
 FILENAME=${1}
 # clang format has difficulty recognizing the
 # ChipMakeManagedNamespaceIdentifier() macro as a valid namespace;
