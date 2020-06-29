@@ -61,7 +61,6 @@ The Connected Home over IP repository is structured as follows:
 | `Makefile-Standalone`  | Convenience makefile for building Project CHIP as a standalone package on desktop and server systems.                 |
 | `README.md`            | This file                                                                                                             |
 | `src/`                 | Implementation of Project CHIP                                                                                        |
-| `tests/`               | Tests for Project CHIP                                                                                                |
 | `third_party/`         | Third-party code used by Project CHIP.                                                                                |
 | `tools/`               | Tools needed to work with the Project CHIP repo, as well as develop in the repository                                 |
 
