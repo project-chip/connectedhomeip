@@ -1,0 +1,38 @@
+# Set convenience vars for the start and end of the .text section
+set $FLASH_START=&__isr_vector
+set $FLASH_END=&__etext
+
+# Search for the signature string indicating that the app was built with support
+# for J-Link monitor mode debugging.
+set logging file /dev/null
+set logging redirect on
+set logging on
+find /b1 $FLASH_START, $FLASH_END, 'J', 'L', 'I', 'N', 'K', 'M', 'O', 'N', 'H', 'A', 'N', 'D', 'L', 'E', 'R'
+set logging off
+set logging redirect off
+
+# Tell the user which type of debugging will being used.
+if $numfound != 0
+    echo J-LINK monitor handler detected: Enabling monitor mode debugging\n
+else
+    echo J-LINK monitor handler NOT detected: Using standard 'HALT' mode debugging\n
+end
+
+# Connect to the GDB server
+echo Connecting to local GDB server\n
+target remote localhost:2331
+
+# Enable monitor mode debugging if available.
+set logging file /dev/null
+set logging redirect on
+set logging on
+if $numfound != 0
+    mon exec SetMonModeDebug=1
+    eval "mon exec SetMonModeVTableAddr=%p", $FLASH_START
+else
+    mon exec SetMonModeDebug=0
+end
+set logging off
+set logging redirect off
+
+
