@@ -35,8 +35,25 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
+extern "C" {
+#include "chip-zcl/chip-zcl.h"
+#include "gen/gen-cluster-id.h"
+#include "gen/gen-types.h"
+}
+
 namespace chip {
 namespace DeviceLayer {
+
+class DLL_EXPORT DeviceCallbacks
+{
+ public:
+    virtual void DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg);
+    virtual void PostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId,
+                                             ChipZclAttributeId attributeId, uint8_t mask,
+                                             uint16_t manufacturerCode, uint8_t type, uint8_t size,
+                                             uint8_t * value) {}
+    virtual ~DeviceCallbacks() {}
+};
 
 class DLL_EXPORT Device
 {
@@ -53,31 +70,37 @@ public:
 
     Device& SetVendorID(uint16_t VID)
     {
-        vendorID = VID;
+        mVendorID = VID;
         return *this;
     }
 
     uint16_t GetVendorID()
     {
-        return vendorID;
+        return mVendorID;
     }
 
     Device& SetProductID(uint16_t PID)
     {
-        productID = PID;
+        mProductID = PID;
         return *this;
     }
 
     uint16_t SetProductID()
     {
-        return productID;
+        return mProductID;
     }
 
-    CHIP_ERROR Init(PlatformManager::EventHandlerFunct handler);
+    DeviceCallbacks *GetDeviceCallbacks()
+    {
+        return mCB;
+    }
 
+    CHIP_ERROR Init(DeviceCallbacks *cb);
+    static void CommonDeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg);
  private:
-    uint16_t vendorID;
-    uint16_t productID;
+    uint16_t mVendorID;
+    uint16_t mProductID;
+    DeviceCallbacks *mCB = nullptr;
     Device() {}
 };
 

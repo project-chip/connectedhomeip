@@ -32,13 +32,23 @@
 namespace chip {
 
 namespace DeviceLayer {
+
+void Device::CommonDeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
+{
+    DeviceCallbacks *cb = reinterpret_cast<DeviceCallbacks *>(arg);
+    if (cb != nullptr) {
+        cb->DeviceEventCallback(event, reinterpret_cast<intptr_t>(cb));
+    }
+}
+
 /**
  *
  */
-CHIP_ERROR Device::Init(PlatformManager::EventHandlerFunct handler)
+CHIP_ERROR Device::Init(DeviceCallbacks *cb)
 {
     CHIP_ERROR err;
-    
+    mCB = cb;
+
     // Initialize the LwIP core lock.  This must be done before the ESP
     // tcpip_adapter layer is initialized.
     err = PlatformMgrImpl().InitLwIPCoreLock();
@@ -54,7 +64,7 @@ CHIP_ERROR Device::Init(PlatformManager::EventHandlerFunct handler)
 
     // Register a function to receive events from the CHIP device layer.  Note that calls to
     // this function will happen on the CHIP event loop thread, not the app_main thread.
-    PlatformMgr().AddEventHandler(handler, 0);
+    PlatformMgr().AddEventHandler(Device::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
 
     // Start a task to run the CHIP Device event loop.
     err = PlatformMgr().StartEventLoopTask();
@@ -63,6 +73,19 @@ CHIP_ERROR Device::Init(PlatformManager::EventHandlerFunct handler)
  exit:
     return err;
 }
+
+extern "C" {
+void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId, uint8_t mask,
+                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+{
+    DeviceCallbacks *cb = Device::GetInstance().GetDeviceCallbacks();
+    if (cb != nullptr) {
+        cb->PostAttributeChangeCallback(endpoint, clusterId, attributeId, mask,
+                                        manufacturerCode, type, size, value);
+    }
+}
+} // extern "C"
+
 } // namespace DeviceLayer
 } // namespace chip
 #endif /* #if 0 */
