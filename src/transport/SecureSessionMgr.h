@@ -126,13 +126,7 @@ public:
     CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf);
 
     SecureSessionMgr();
-    virtual ~SecureSessionMgr()
-    {
-        if (mCB != nullptr)
-        {
-            mCB->Release();
-        }
-    }
+    virtual ~SecureSessionMgr();
 
     /**
      * @brief

@@ -46,6 +46,10 @@ SecureSessionMgr::SecureSessionMgr() : mState(State::kNotReady) {}
 SecureSessionMgr::~SecureSessionMgr()
 {
     CancelExpiryTimer();
+    if (mCB != nullptr)
+    {
+        mCB->Release();
+    }
 }
 
 CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, Inet::InetLayer * inet, const Transport::UdpListenParameters & listenParams)
