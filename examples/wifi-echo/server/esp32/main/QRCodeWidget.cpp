@@ -49,8 +49,6 @@
 #define EXAMPLE_SETUP_CODE 123456789
 // Used to discriminate the device
 #define EXAMPLE_DISCRIMINATOR 0X0F00
-// Used to indicate that the device supports both Soft-AP and BLE for rendezvous
-#define EXAMPLE_RENDEZVOUS_INFO RendezvousInformationFlags::kSoftAP
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
@@ -83,7 +81,7 @@ string createSetupPayload()
     payload.version               = 1;
     payload.discriminator         = EXAMPLE_DISCRIMINATOR;
     payload.setUpPINCode          = EXAMPLE_SETUP_CODE;
-    payload.rendezvousInformation = EXAMPLE_RENDEZVOUS_INFO;
+    payload.rendezvousInformation = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
     payload.vendorID              = EXAMPLE_VENDOR_ID;
     payload.productID             = EXAMPLE_PRODUCT_ID;
 
