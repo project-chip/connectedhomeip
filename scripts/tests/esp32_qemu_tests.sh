@@ -26,6 +26,11 @@ chip_dir="$here"/../..
 source "$chip_dir"/src/test_driver/esp32/idf.sh
 "$chip_dir"/src/test_driver/esp32/qemu_setup.sh
 
+if [ $? -ne 0 ]; then
+    echo "Setup failure"
+    exit 1
+fi
+
 # Currently only crypto, inet, and system tests are configured to run on QEMU.
 # The specific qualifiers will be removed, once all CHIP unit tests are
 # updated to run on QEMU.
