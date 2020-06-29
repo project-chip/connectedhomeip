@@ -13,43 +13,38 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/nlio.gni")
 import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip_test_suite.gni")
 
-config("tests_config") {
-  include_dirs = [ "." ]
-}
-
+# Transport tests need to be serialized due to use of common port.
 chip_test_suite("tests") {
   common_sources = [
-    "TapAddrAutoconf.cpp",
-    "TapAddrAutoconf.h",
-    "TestInetAddress.cpp",
-    "TestInetCommon.cpp",
-    "TestInetCommon.h",
-    "TestInetCommonOptions.cpp",
-    "TestInetCommonOptions.h",
-    "TestInetEndPoint.cpp",
-    "TestInetErrorStr.cpp",
-    "TestInetLayer.cpp",
-    "TestInetLayer.h",
-    "TestInetLayerCommon.cpp",
-    "TestInetLayerDNS.cpp",
-    "TestInetLayerMulticast.cpp",
-    "TestLwIPDNS.cpp",
+    "NetworkTestHelpers.cpp",
+    "NetworkTestHelpers.h",
+    "TestMessageHeader.cpp",
+    "TestPeerConnections.cpp",
+    "TestSecureSession.cpp",
+    "TestSecureSessionMgr.cpp",
+    "TestTransportLayer.h",
+    "TestUDP.cpp",
+    "TestUDPDriver.cpp",
   ]
 
-  public_configs = [ ":tests_config" ]
-
   public_deps = [
-    "${chip_root}/src/inet",
+    "${chip_root}/src/inet/tests:tests_common",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/transport",
+    "${nlio_root}:nlio",
     "${nlunit_test_root}:nlunit-test",
   ]
 
   tests = [
-    "TestInetAddress",
-    "TestInetErrorStr",
+    "TestMessageHeader",
+    "TestPeerConnections",
+    "TestSecureSession",
+    "TestSecureSessionMgr",
   ]
 }
