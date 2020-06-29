@@ -36,7 +36,6 @@ target_include_directories(DeviceLayerTests PUBLIC
 )
 
 target_link_libraries(DeviceLayerTests PUBLIC
-    DeviceLayerTests
     DeviceLayer
     InetLayer
     SystemLayer

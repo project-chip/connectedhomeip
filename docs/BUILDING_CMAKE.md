@@ -76,6 +76,8 @@ cmake / make | `make test` or `make check` |
 
 #### Build documentation
 
+This command build the Doxygen documentation from the top-level.
+
 | Build System | Command | | cmake / ninja | `ninja doc` | | cmake / make |
 `make doc` |
 
