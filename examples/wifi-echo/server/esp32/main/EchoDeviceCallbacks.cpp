@@ -23,15 +23,15 @@
  *
  **/
 
+#include "EchoDeviceCallbacks.h"
 #include "esp_log.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
-#include "EchoDeviceCallbacks.h"
 
 #include "LEDWidget.h"
 #include <inet/IPAddress.h>
 
-static const char *TAG = "echo-devicecallbacks";
+static const char * TAG = "echo-devicecallbacks";
 using namespace ::chip::Inet;
 
 extern LEDWidget statusLED; // In wifi-echo.cpp
@@ -44,11 +44,11 @@ void EchoDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, int
         {
             tcpip_adapter_ip_info_t ipInfo;
             if (tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ipInfo) == ESP_OK)
-             {
-                 char ipAddrStr[INET_ADDRSTRLEN];
-                 IPAddress::FromIPv4(ipInfo.ip).ToString(ipAddrStr, sizeof(ipAddrStr));
-                 ESP_LOGI(TAG, "Server ready at: %s:%d", ipAddrStr, CHIP_PORT);
-             }
+            {
+                char ipAddrStr[INET_ADDRSTRLEN];
+                IPAddress::FromIPv4(ipInfo.ip).ToString(ipAddrStr, sizeof(ipAddrStr));
+                ESP_LOGI(TAG, "Server ready at: %s:%d", ipAddrStr, CHIP_PORT);
+            }
         }
         else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
         {
@@ -69,10 +69,9 @@ void EchoDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, int
     }
 }
 
-void EchoDeviceCallbacks::PostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId,
-                                             ChipZclAttributeId attributeId, uint8_t mask,
-                                             uint16_t manufacturerCode, uint8_t type, uint8_t size,
-                                             uint8_t * value)
+void EchoDeviceCallbacks::PostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId,
+                                                      uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
+                                                      uint8_t * value)
 {
     if (clusterId != CHIP_ZCL_CLUSTER_ON_OFF)
     {
