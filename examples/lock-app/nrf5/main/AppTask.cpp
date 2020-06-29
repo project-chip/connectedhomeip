@@ -338,7 +338,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = kFunction_NoneSelected;
-        ThreadStackMgr().FactoryReset();
+        ConfigurationMgr().InitiateFactoryReset();
     }
 }
 
