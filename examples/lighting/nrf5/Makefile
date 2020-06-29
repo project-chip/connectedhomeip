@@ -30,13 +30,13 @@ BUILD_SUPPORT_DIR = $(CHIP_ROOT)/config/nrf5
 include $(BUILD_SUPPORT_DIR)/nrf5-app.mk
 include $(BUILD_SUPPORT_DIR)/nrf5-chip.mk
 
-APP = chip-nrf52840-lock-example
+APP = chip-nrf52840-lighting-example
 
 SRCS = \
     $(PROJECT_ROOT)/main/main.cpp \
     $(PROJECT_ROOT)/main/AppTask.cpp \
     $(PROJECT_ROOT)/main/LEDWidget.cpp \
-    $(PROJECT_ROOT)/main/BoltLockManager.cpp \
+    $(PROJECT_ROOT)/main/LightingManager.cpp \
     $(PROJECT_ROOT)/main/Server.cpp \
     $(PROJECT_ROOT)/main/DataModelHandler.cpp \
     $(PROJECT_ROOT)/main/support/CXXExceptionStubs.cpp \
@@ -274,6 +274,6 @@ endif
 
 CHIP_PROJECT_CONFIG = $(PROJECT_ROOT)/main/include/CHIPProjectConfig.h
 
-LINKER_SCRIPT = $(PROJECT_ROOT)/main/ldscripts/chip-nrf52840-lock-example.ld
+LINKER_SCRIPT = $(PROJECT_ROOT)/main/ldscripts/chip-nrf52840-lighting-example.ld
 
 $(call GenerateBuildRules)

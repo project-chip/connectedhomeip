@@ -21,6 +21,7 @@
 #include "AppEvent.h"
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
+#include "LightingManager.h"
 #include "Server.h"
 
 #include "app_button.h"
@@ -48,7 +49,6 @@ static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
 
 static LEDWidget sStatusLED;
-static LEDWidget sLockLED;
 static LEDWidget sUnusedLED;
 static LEDWidget sUnusedLED_1;
 
@@ -93,15 +93,12 @@ int AppTask::Init()
     // Initialize LEDs
     sStatusLED.Init(SYSTEM_STATE_LED);
 
-    sLockLED.Init(LOCK_STATE_LED);
-    sLockLED.Set(!BoltLockMgr().IsUnlocked());
-
     sUnusedLED.Init(BSP_LED_2);
     sUnusedLED_1.Init(BSP_LED_3);
 
     // Initialize buttons
     static app_button_cfg_t sButtons[] = {
-        { LOCK_BUTTON, APP_BUTTON_ACTIVE_LOW, BUTTON_PULL, ButtonEventHandler },
+        { LIGHTING_BUTTON, APP_BUTTON_ACTIVE_LOW, BUTTON_PULL, ButtonEventHandler },
         { FUNCTION_BUTTON, APP_BUTTON_ACTIVE_LOW, BUTTON_PULL, ButtonEventHandler },
     };
 
@@ -134,14 +131,14 @@ int AppTask::Init()
         APP_ERROR_HANDLER(ret);
     }
 
-    ret = BoltLockMgr().Init();
+    ret = LightingMgr().Init(1);
     if (ret != NRF_SUCCESS)
     {
-        NRF_LOG_INFO("BoltLockMgr().Init() failed");
+        NRF_LOG_INFO("LightingMgr().Init() failed");
         APP_ERROR_HANDLER(ret);
     }
 
-    BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+    LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     sCHIPEventLock = xSemaphoreCreateMutex();
     if (sCHIPEventLock == NULL)
@@ -230,33 +227,30 @@ void AppTask::AppTaskMain(void * pvParameter)
         }
 
         sStatusLED.Animate();
-        sLockLED.Animate();
         sUnusedLED.Animate();
         sUnusedLED_1.Animate();
     }
 }
 
-void AppTask::LockActionEventHandler(AppEvent * aEvent)
+void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 {
     bool initiated = false;
-    BoltLockManager::Action_t action;
-    int32_t actor  = 0;
+    LightingManager::Action_t action;
     ret_code_t ret = NRF_SUCCESS;
 
-    if (aEvent->Type == AppEvent::kEventType_Lock)
+    if (aEvent->Type == AppEvent::kEventType_Lighting)
     {
-        action = static_cast<BoltLockManager::Action_t>(aEvent->LockEvent.Action);
-        actor  = aEvent->LockEvent.Actor;
+        action = static_cast<LightingManager::Action_t>(aEvent->LightingEvent.Action);
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        if (BoltLockMgr().IsUnlocked())
+        if (LightingMgr().IsTurnedOn())
         {
-            action = BoltLockManager::LOCK_ACTION;
+            action = LightingManager::OFF_ACTION;
         }
         else
         {
-            action = BoltLockManager::UNLOCK_ACTION;
+            action = LightingManager::ON_ACTION;
         }
     }
     else
@@ -266,7 +260,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
 
     if (ret == NRF_SUCCESS)
     {
-        initiated = BoltLockMgr().InitiateAction(actor, action);
+        initiated = LightingMgr().InitiateAction(action);
 
         if (!initiated)
         {
@@ -277,7 +271,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
 
 void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 {
-    if (pin_no != LOCK_BUTTON && pin_no != FUNCTION_BUTTON)
+    if (pin_no != LIGHTING_BUTTON && pin_no != FUNCTION_BUTTON)
     {
         return;
     }
@@ -287,9 +281,9 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
     button_event.ButtonEvent.PinNo  = pin_no;
     button_event.ButtonEvent.Action = button_action;
 
-    if (pin_no == LOCK_BUTTON && button_action == APP_BUTTON_PUSH)
+    if (pin_no == LIGHTING_BUTTON && button_action == APP_BUTTON_PUSH)
     {
-        button_event.Handler = LockActionEventHandler;
+        button_event.Handler = LightingActionEventHandler;
     }
     else if (pin_no == FUNCTION_BUTTON)
     {
@@ -325,12 +319,10 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
         // Turn off all LEDs before starting blink to make sure blink is co-ordinated.
         sStatusLED.Set(false);
-        sLockLED.Set(false);
         sUnusedLED_1.Set(false);
         sUnusedLED.Set(false);
 
         sStatusLED.Blink(500);
-        sLockLED.Blink(500);
         sUnusedLED.Blink(500);
         sUnusedLED_1.Blink(500);
     }
@@ -375,9 +367,6 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             sUnusedLED.Set(false);
             sUnusedLED_1.Set(false);
 
-            // Set lock status LED back to show state of lock.
-            sLockLED.Set(!BoltLockMgr().IsUnlocked());
-
             sAppTask.CancelTimer();
 
             // Change the function to none selected since factory reset has been canceled.
@@ -416,48 +405,41 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     mFunctionTimerActive = true;
 }
 
-void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
+void AppTask::ActionInitiated(LightingManager::Action_t aAction)
 {
     // If the action has been initiated by the lock, update the bolt lock trait
     // and start flashing the LEDs rapidly to indicate action initiation.
-    if (aAction == BoltLockManager::LOCK_ACTION)
+    if (aAction == LightingManager::ON_ACTION)
     {
-        NRF_LOG_INFO("Lock Action has been initiated")
+        NRF_LOG_INFO("Turn On Action has been initiated")
     }
-    else if (aAction == BoltLockManager::UNLOCK_ACTION)
+    else if (aAction == LightingManager::OFF_ACTION)
     {
-        NRF_LOG_INFO("Unlock Action has been initiated")
+        NRF_LOG_INFO("Turn Off Action has been initiated")
     }
-
-    sLockLED.Blink(50, 50);
 }
 
-void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
+void AppTask::ActionCompleted(LightingManager::Action_t aAction)
 {
     // if the action has been completed by the lock, update the bolt lock trait.
     // Turn on the lock LED if in a LOCKED state OR
     // Turn off the lock LED if in an UNLOCKED state.
-    if (aAction == BoltLockManager::LOCK_ACTION)
+    if (aAction == LightingManager::ON_ACTION)
     {
-        NRF_LOG_INFO("Lock Action has been completed")
-
-        sLockLED.Set(true);
+        NRF_LOG_INFO("Turn On Action has been completed")
     }
-    else if (aAction == BoltLockManager::UNLOCK_ACTION)
+    else if (aAction == LightingManager::OFF_ACTION)
     {
-        NRF_LOG_INFO("Unlock Action has been completed")
-
-        sLockLED.Set(false);
+        NRF_LOG_INFO("Turn Off Action has been completed")
     }
 }
 
-void AppTask::PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction)
+void AppTask::PostLightingActionRequest(LightingManager::Action_t aAction)
 {
     AppEvent event;
-    event.Type             = AppEvent::kEventType_Lock;
-    event.LockEvent.Actor  = aActor;
-    event.LockEvent.Action = aAction;
-    event.Handler          = LockActionEventHandler;
+    event.Type                 = AppEvent::kEventType_Lighting;
+    event.LightingEvent.Action = aAction;
+    event.Handler              = LightingActionEventHandler;
     PostEvent(&event);
 }
 

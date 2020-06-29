@@ -22,6 +22,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <functional>
+
 #include "AppEvent.h"
 
 class LightingManager
@@ -41,34 +43,30 @@ public:
         kState_Off,
     } State;
 
-    int Init();
+    int Init(uint32_t gpioNum);
     bool IsTurnedOn();
-    bool InitiateAction(int32_t aActor, Action_t aAction);
+    bool InitiateAction(Action_t aAction);
 
-    typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
-    typedef void (*Callback_fn_completed)(Action_t);
-    void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
+    using LightingCallback_fn = std::function<void(Action_t)>;
+
+    void SetCallbacks(LightingCallback_fn aActionInitiated_CB, LightingCallback_fn aActionCompleted_CB);
 
 private:
     friend LightingManager & LightingMgr(void);
     State_t mState;
+    uint32_t mGPIONum;
 
-    Callback_fn_initiated mActionInitiated_CB;
-    Callback_fn_completed mActionCompleted_CB;
+    LightingCallback_fn mActionInitiated_CB;
+    LightingCallback_fn mActionCompleted_CB;
 
-    void CancelTimer(void);
-    void StartTimer(uint32_t aTimeoutMs);
+    void Set(bool aOn);
 
-    static void TimerEventHandler(void * p_context);
-    static void AutoReLockTimerEventHandler(AppEvent * aEvent);
-    static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
-
-    static LightingManager sLock;
+    static LightingManager sLight;
 };
 
 inline LightingManager & LightingMgr(void)
 {
-    return LightingManager::sLock;
+    return LightingManager::sLight;
 }
 
 #endif // LIGHTING_MANAGER_H
