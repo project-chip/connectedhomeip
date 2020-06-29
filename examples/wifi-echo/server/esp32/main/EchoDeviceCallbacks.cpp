@@ -89,4 +89,3 @@ void EchoDeviceCallbacks::PostAttributeChangeCallback(uint8_t endpoint, ChipZclC
     // At this point we can assume that value points to a boolean value.
     statusLED.Set(*value);
 }
-
