@@ -29,7 +29,7 @@
 
 // The expected Vendor ID for CHIP demos
 // Spells CHIP on a dialer
-#define EXAMPLE_VENDOR_ID 3447
+#define EXAMPLE_VENDOR_ID 2447
 #define EXAMPLE_VENDOR_TAG_SSID 1
 #define MAX_SSID_LEN 32
 
