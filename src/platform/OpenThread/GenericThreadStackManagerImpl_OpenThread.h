@@ -70,7 +70,7 @@ protected:
     bool _IsThreadAttached(void);
     CHIP_ERROR _GetThreadProvision(DeviceNetworkInfo & netInfo, bool includeCredentials);
     CHIP_ERROR _SetThreadProvision(const DeviceNetworkInfo & netInfo);
-    void _ClearThreadProvision(void);
+    void _ErasePersistentInfo(void);
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType(void);
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
     void _GetThreadPollingConfig(ConnectivityManager::ThreadPollingConfig & pollingConfig);
@@ -89,7 +89,6 @@ protected:
     CHIP_ERROR DoInit(otInstance * otInst);
     bool IsThreadAttachedNoLock(void);
     CHIP_ERROR AdjustPollingInterval(void);
-    void _FactoryReset(void);
 
 private:
     // ===== Private members for use by this class only.
