@@ -5,4 +5,5 @@ export PW_BRANDING_BANNER_COLOR="bold_white"
 
 git submodule update --init
 
+# shellcheck source=/dev/null
 source "$CHIP_ROOT/third_party/pigweed/bootstrap.sh"

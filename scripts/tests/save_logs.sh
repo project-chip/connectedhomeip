@@ -3,8 +3,6 @@
 set -x
 env
 
-TARGET_DIR=$1
-
 mkdir -p "$1"
 
 for name in $(find . -name test-suite.log); do

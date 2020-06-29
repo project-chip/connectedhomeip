@@ -22,7 +22,7 @@
 # This file can also be used as an executable
 
 error() {
-    echo "$me: *** ERROR: " "${*}"
+    echo "${me:?}: *** ERROR: " "${*}"
 }
 idf() {
     [[ -d $IDF_PATH && -r $IDF_PATH/export.sh ]] || {
@@ -30,12 +30,13 @@ idf() {
         return 1
     }
     (
+        # shellcheck source=/dev/null
         . "$IDF_PATH/export.sh"
         export IDF_PATH
         "$@"
     )
 }
-if [[ ${0} == ${BASH_SOURCE[0]} ]]; then
+if [[ ${0} == "${BASH_SOURCE[0]}" ]]; then
     me=${0##*/}
     idf "${@}"
 else

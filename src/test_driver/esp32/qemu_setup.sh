@@ -26,13 +26,14 @@ here=$(cd "$(dirname "$0")" && pwd)
 set -e
 
 die() {
-    echo "$me: *** ERROR: " "${*}"
+    echo "${me:?}: *** ERROR: " "${*}"
     exit 1
 }
 
 # move to the example folder, I don't work anywhere else
 cd "$here" || die 'ack!, where am I?!?'
 
+# shellcheck source=/dev/null
 source idf.sh
 rm -f ./build/sdkconfig
 SDKCONFIG=./build/sdkconfig SDKCONFIG_DEFAULTS=sdkconfig_qemu.defaults idf make defconfig
