@@ -1,24 +1,42 @@
 # Connected Home over IP
 
+[![project-chip](https://circleci.com/gh/project-chip/connectedhomeip.svg?style=svg)](https://app.circleci.com/pipelines/github/project-chip/connectedhomeip?branch=master)
+
 [![Build Status](https://travis-ci.com/project-chip/connectedhomeip.svg?token=hBypqqXx6Ha9n3zZgyp7&branch=master)](https://travis-ci.com/project-chip/connectedhomeip)
 
-[![codecov](https://codecov.io/gh/project-chip/connectedhomeip/branch/master/graph/badge.svg?token=KP9791CN9W)](https://codecov.io/gh/project-chip/connectedhomeip)
+# What is Project Connected Home over IP?
 
-# Getting started with CHIP
+Visit connectedhomeip.com to learn more.
 
-All documentation is inside of the [docs section](./docs/README.md)
+# Current Status of Project Connected Home over IP
 
-Instructions about how to build and develop CHIP can be found
+The Zigbee Alliance officially opened the Project Connected Home over IP
+(Project CHIP) Working Group on January 17 and is in the process of drafting the
+specification.
+
+The Project’s design and technical processes are intended to be open and
+transparent to the general public, including to Work Group non-members wherever
+possible. The availability of this GitHub repository and its source code under
+an Apache v2 license is an important and demonstrable step to achieving this
+commitment.
+
+The Project endeavors to bring together the best aspects of market-tested
+technologies and to redeploy them as a unified and cohesive whole-system
+solution. The overall goal of this approach is to bring the benefits of the
+Project to consumers and manufacturers as quickly as possible. As a result, what
+you observe in this repository is an implementation-first approach to the
+technical specification, vetting integrations in practice.
+
+# How to Contribute
+
+We would love for you to contribute to Project Connected Home over IP. Read our
+contribution guidelines
+[here](https://github.com/project-chip/connectedhomeip/blob/master/CONTRIBUTING.md).
+
+# Building and Developing in Project
+
+Instructions about how to build Project Connected Home over IP can be found
 [here](./docs/README.md#building-and-developing).
-
-# Need help?
-
-There are numerous avenues for CHIP support:
-
--   Bugs and feature requests
-    [submit to the Issue Tracker](https://github.com/project-chip/connectedhomeip/issues)
--   Stack Overflow
-    [post questions using the chip tag](http://stackoverflow.com/questions/tagged/chip)
 
 # Directory Structure
 
@@ -49,12 +67,6 @@ The CHIP repository is structured as follows:
 | `tests/`                      | Tests for CHIP                                                                                                |
 | `third_party/`                | Third-party code used by CHIP.                                                                                |
 | `tools/`                      | Tools needed to work with the CHIP repo, as well as develop in the repository                                 |
-
-# Contributing
-
-We would love for you to contribute to CHIP and help make it even better than it
-is today! See the [CONTRIBUTING.md](./CONTRIBUTING.md) file for more
-information.
 
 # License
 
