@@ -54,4 +54,3 @@ void HandleDataModelMessage(System::PacketBuffer * buffer)
     }
     System::PacketBuffer::Free(buffer);
 }
-
