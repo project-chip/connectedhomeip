@@ -23,6 +23,7 @@
 here=$(cd "$(dirname "$0")" && pwd)
 chip_dir="$here"/../..
 
+# shellcheck source=/dev/null
 source "$chip_dir"/src/test_driver/esp32/idf.sh
 "$chip_dir"/src/test_driver/esp32/qemu_setup.sh
 
