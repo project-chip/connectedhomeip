@@ -162,7 +162,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     ChipLogProgress(DeviceLayer, "Clearing Thread provision");
-    ThreadStackMgr().ClearThreadProvision();
+    ThreadStackMgr().ErasePersistentInfo();
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 

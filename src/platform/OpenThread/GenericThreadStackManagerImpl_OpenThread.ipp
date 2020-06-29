@@ -810,18 +810,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::AdjustPollingInt
 }
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_FactoryReset(void)
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo(void)
 {
-    ChipLogProgress(DeviceLayer, "About to factory reset ...");
-    Impl()->LockThreadStack();
-    otInstanceFactoryReset(mOTInst);
-    Impl()->UnlockThreadStack();
-}
-
-template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ClearThreadProvision(void)
-{
-    ChipLogProgress(DeviceLayer, "About to clear thread provision...");
+    ChipLogProgress(DeviceLayer, "Erasing Thread persistent info...");
     Impl()->LockThreadStack();
     otThreadSetEnabled(mOTInst, false);
     otInstanceErasePersistentInfo(mOTInst);
