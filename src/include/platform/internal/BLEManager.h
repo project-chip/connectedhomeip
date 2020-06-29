@@ -164,7 +164,10 @@ inline uint16_t BLEManager::NumConnections(void)
     return static_cast<ImplClass *>(this)->_NumConnections();
 }
 
-inline void BLEManager::OnPlatformEvent(const ChipDeviceEvent * event) {}
+inline void BLEManager::OnPlatformEvent(const ChipDeviceEvent * event)
+{
+    return static_cast<ImplClass *>(this)->_OnPlatformEvent(event);
+}
 
 inline chip::Ble::BleLayer * BLEManager::GetBleLayer(void) const
 {

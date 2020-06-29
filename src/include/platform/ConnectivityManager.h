@@ -136,7 +136,7 @@ public:
     CHIP_ERROR SetThreadPollingConfig(const ThreadPollingConfig & pollingConfig);
     bool IsThreadAttached(void);
     bool IsThreadProvisioned(void);
-    void ClearThreadProvision(void);
+    void ErasePersistentInfo(void);
     bool HaveServiceConnectivityViaThread(void);
 
     // Internet connectivity methods
@@ -441,9 +441,9 @@ inline bool ConnectivityManager::IsThreadProvisioned(void)
     return static_cast<ImplClass *>(this)->_IsThreadProvisioned();
 }
 
-inline void ConnectivityManager::ClearThreadProvision(void)
+inline void ConnectivityManager::ErasePersistentInfo(void)
 {
-    static_cast<ImplClass *>(this)->_ClearThreadProvision();
+    static_cast<ImplClass *>(this)->_ErasePersistentInfo();
 }
 
 inline bool ConnectivityManager::HaveServiceConnectivityViaThread(void)

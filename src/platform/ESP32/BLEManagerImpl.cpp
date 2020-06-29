@@ -231,9 +231,9 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     case DeviceEventType::kCHIPoBLESubscribe:
         HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
         {
-            ChipDeviceEvent event;
-            event.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-            PlatformMgr().PostEvent(&event);
+            ChipDeviceEvent connectionEvent;
+            connectionEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
+            PlatformMgr().PostEvent(&connectionEvent);
         }
         break;
 
