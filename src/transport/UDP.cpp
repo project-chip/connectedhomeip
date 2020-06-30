@@ -68,8 +68,6 @@ CHIP_ERROR UDP::Init(UdpListenParameters & params)
 
     mState = State::kInitialized;
 
-    ChipLogError(Inet, "Transport bound and ready");
-
 exit:
     if (err != CHIP_NO_ERROR)
     {
