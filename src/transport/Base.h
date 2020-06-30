@@ -100,8 +100,6 @@ protected:
 
     MessageReceiveHandler OnMessageReceived = nullptr; ///< Callback on message receiving
     void * mMessageReceivedArgument         = nullptr; ///< Argument for callback
-
-    uint8_t mRefCount = 0;
 };
 
 } // namespace Transport
