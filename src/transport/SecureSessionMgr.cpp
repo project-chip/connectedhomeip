@@ -60,7 +60,7 @@ CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, Inet::InetLayer * inet, co
     err = mTransport.Init(inet, listenParams);
     SuccessOrExit(err);
 
-    mTransport.SetMessageReceiveHandler(HandleUdpDataReceived, this);
+    mTransport.SetMessageReceiveHandler(HandleDataReceived, this);
     mPeerConnections.SetConnectionExpiredHandler(HandleConnectionExpired, this);
 
     mState       = State::kInitialized;
@@ -184,8 +184,8 @@ void SecureSessionMgr::CancelExpiryTimer(void)
     }
 }
 
-void SecureSessionMgr::HandleUdpDataReceived(const MessageHeader & header, const IPPacketInfo & pktInfo, System::PacketBuffer * msg,
-                                             SecureSessionMgr * connection)
+void SecureSessionMgr::HandleDataReceived(const MessageHeader & header, const PeerAddress & peerAddress, System::PacketBuffer * msg,
+                                          SecureSessionMgr * connection)
 
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
@@ -195,8 +195,6 @@ void SecureSessionMgr::HandleUdpDataReceived(const MessageHeader & header, const
     VerifyOrExit(msg != nullptr, ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
     {
-        PeerAddress peerAddress = PeerAddress::UDP(pktInfo.SrcAddress, pktInfo.SrcPort);
-
         if (!connection->mPeerConnections.FindPeerConnectionState(peerAddress, &state))
         {
             ChipLogProgress(Inet, "New peer connection received.");
@@ -247,7 +245,7 @@ exit:
 
     if (err != CHIP_NO_ERROR && connection->mCB != nullptr)
     {
-        connection->mCB->OnReceiveError(err, pktInfo, connection);
+        connection->mCB->OnReceiveError(err, peerAddress, connection);
     }
 }
 
