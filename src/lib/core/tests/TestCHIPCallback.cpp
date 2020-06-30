@@ -45,11 +45,11 @@ public:
 
     void Dispatch()
     {
-        Inner ready = DequeueAll();
+        Cancelable ready = DequeueAll();
         // runs the ready list
         while (ready.mNext != &ready)
         {
-            Callback<> * cb = Callback<>::FromInner(ready.mNext);
+            Callback<> * cb = Callback<>::FromCancelable(ready.mNext);
 
             // one-shot semantics
             cb->Cancel();
@@ -74,9 +74,9 @@ static void resume(struct Resume * me)
     me->resumer->Resume(me->cb);
 }
 
-static void canceler(Inner * inner)
+static void canceler(Cancelable * ca)
 {
-    inner->Cancel();
+    ca->Cancel();
 }
 
 static void ResumerTest(nlTestSuite * inSuite, void * inContext)
@@ -152,11 +152,11 @@ public:
      */
     void Notify(int v)
     {
-        for (Inner * inner = mNext; inner != this; inner = inner->mNext)
+        for (Cancelable * ca = mNext; ca != this; ca = ca->mNext)
         {
             // persistent registration semantics, with data
 
-            Callback<NotifyFn> * cb = Callback<NotifyFn>::FromInner(inner);
+            Callback<NotifyFn> * cb = Callback<NotifyFn>::FromCancelable(ca);
             cb->mCall(cb->mContext, v);
         }
     }
@@ -164,7 +164,7 @@ public:
     /**
      * @brief example
      */
-    static void Cancel(Inner * cb)
+    static void Cancel(Cancelable * cb)
     {
         Dequeue(cb); // take off ready list
     }
