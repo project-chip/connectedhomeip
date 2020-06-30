@@ -40,6 +40,8 @@ namespace Callback {
  */
 class Cancelable
 {
+    typedef void (*CancelFn)(Cancelable *);
+
 public:
     /**
      *  @brief for use by Callback callees, i.e. those that accept callbacks for
@@ -57,7 +59,7 @@ public:
      *   a subsystem and that Cancelable members belong to
      *   that subsystem
      */
-    void (*mCancel)(Cancelable *);
+    CancelFn mCancel;
 
     Cancelable()
     {
@@ -74,8 +76,8 @@ public:
     {
         if (mCancel != nullptr)
         {
-            void (*cancel)(Cancelable *) = mCancel;
-            mCancel                      = nullptr;
+            CancelFn cancel = mCancel;
+            mCancel         = nullptr;
             cancel(this);
         }
         return this;
@@ -105,7 +107,8 @@ public:
  *     parameter at Callback registration time.
  *
  */
-template <class T = void (*)(void *)>
+typedef void (*CallFn)(void *);
+template <class T = CallFn>
 class Callback : private Cancelable
 {
 public:

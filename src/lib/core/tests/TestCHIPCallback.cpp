@@ -88,8 +88,8 @@ static void canceler(Cancelable * ca)
 static void ResumerTest(nlTestSuite * inSuite, void * inContext)
 {
     int n = 1;
-    Callback<> cb((void (*)(void *)) increment, &n);
-    Callback<> cancelcb((void (*)(void *)) canceler, cb.Cancel());
+    Callback<> cb(reinterpret_cast<CallFn>(increment), &n);
+    Callback<> cancelcb(reinterpret_cast<CallFn>(canceler), cb.Cancel());
     Resumer resumer;
 
     // Resume() works
@@ -124,7 +124,7 @@ static void ResumerTest(nlTestSuite * inSuite, void * inContext)
     n = 1;
     // Resume() during Dispatch() runs only once, but enqueues for next dispatch
     struct Resume res = { .cb = &cb, .resumer = &resumer };
-    Callback<> resumecb((void (*)(void *)) resume, &res);
+    Callback<> resumecb(reinterpret_cast<CallFn>(resume), &res);
     resumer.Resume(&cb);
     resumer.Resume(&resumecb);
     resumer.Dispatch();
@@ -132,7 +132,7 @@ static void ResumerTest(nlTestSuite * inSuite, void * inContext)
     resumer.Dispatch();
     NL_TEST_ASSERT(inSuite, n == 3);
 
-    Callback<> * pcb = new Callback<>((void (*)(void *)) increment, &n);
+    Callback<> * pcb = new Callback<>(reinterpret_cast<CallFn>(increment), &n);
 
     n = 1;
     // cancel on destruct
@@ -191,8 +191,8 @@ static void increment_by(int * n, int by)
 static void NotifierTest(nlTestSuite * inSuite, void * inContext)
 {
     int n = 1;
-    Callback<Notifier::NotifyFn> cb((Notifier::NotifyFn) increment_by, &n);
-    Callback<Notifier::NotifyFn> cancelcb((Notifier::NotifyFn) canceler, cb.Cancel());
+    Callback<Notifier::NotifyFn> cb(reinterpret_cast<Notifier::NotifyFn>(increment_by), &n);
+    Callback<Notifier::NotifyFn> cancelcb(reinterpret_cast<Notifier::NotifyFn>(canceler), cb.Cancel());
 
     // safe to call anytime
     cb.Cancel();
