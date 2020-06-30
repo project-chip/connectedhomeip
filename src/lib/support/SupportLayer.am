@@ -60,6 +60,10 @@ CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES                        = \
     @top_builddir@/src/lib/support/TimeUtils.h                 \
     $(NULL)
 
+CHIP_BUILD_SUPPORT_LAYER_LOGGING_HEADER_FILES                = \
+    @top_builddir@/src/lib/support/logging/CHIPLogging.h       \
+    $(NULL)
+
 CHIP_BUILD_SUPPORT_LAYER_VERHOEFF_HEADER_FILES               = \
     @top_builddir@/src/lib/support/verhoeff/Verhoeff.h         \
     $(NULL)
