@@ -21,6 +21,7 @@
 #
 
 add_library(TransportLayerTests
+    NetworkTestHelpers.cpp
     TestMessageHeader.cpp
     TestPeerConnections.cpp
     TestSecureSessionMgr.cpp
@@ -34,20 +35,23 @@ target_include_directories(TransportLayerTests PUBLIC
     ${PROJECT_SOURCE_DIR}/src/lib
     ${PROJECT_SOURCE_DIR}/src/lib/core
     ${PROJECT_SOURCE_DIR}/src/system
+    ${PROJECT_SOURCE_DIR}/src/inet/tests
+    ${PROJECT_SOURCE_DIR}/src/transport/tests
     ${NLUNIT_TEST_INCLUDES}
     ${PROJECT_SOURCE_DIR}/third_party/lwip/repo/lwip/src/include
 )
 
 target_link_libraries(TransportLayerTests PUBLIC
     ${PLATFORM_LINK_START}
+    InetLayerTests
     TransportLayer
     BleLayer
     ChipCrypto
     InetLayer
     SystemLayer
     SupportLayer
-    nlunit-test
     nlfaultinjection
+    nlunit-test
     ${CHIP_PLATFORM_LIBS}
     ${PLATFORM_LINK_END}
     chip-config

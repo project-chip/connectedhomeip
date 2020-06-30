@@ -38,6 +38,8 @@ set(COMMON_SOURCES
     Globals.cpp
 )
 
+set(COMMON_LIBS)
+
 if(${CHIP_PLATFORM} STREQUAL "nrf52840")
 set(COMMON_INCLUDES ${COMMON_INCLUDES}
     # DeviceLayer BSP
@@ -49,6 +51,7 @@ set(COMMON_INCLUDES ${COMMON_INCLUDES}
 
 set(COMMON_SOURCES ${COMMON_SOURCES}
     nRF5/BLEManagerImpl.cpp
+    nRF5/ConfigurationManagerImpl.cpp
     nRF5/ConnectivityManagerImpl.cpp
     nRF5/PlatformManagerImpl.cpp
     nRF5/nRF5Config.cpp
@@ -57,6 +60,10 @@ set(COMMON_SOURCES ${COMMON_SOURCES}
     nRF5/ThreadStackManagerImpl.cpp
     FreeRTOS/SystemTimeSupport.cpp
     OpenThread/OpenThreadUtils.cpp
+)
+
+set(COMMON_LIBS ${COMMON_LIBS}
+    BleLayer
 )
 endif()
 
@@ -81,4 +88,4 @@ target_include_directories(DeviceLayer PRIVATE ${COMMON_INCLUDES})
 
 target_sources(DeviceLayer PRIVATE ${COMMON_SOURCES})
 
-target_link_libraries(DeviceLayer PRIVATE chip-config)
+target_link_libraries(DeviceLayer PRIVATE ${COMMON_LIBS} chip-config)
