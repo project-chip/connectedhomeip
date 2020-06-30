@@ -33,7 +33,6 @@
 @property (weak, nonatomic) IBOutlet UILabel * errorLabel;
 
 @property (strong, nonatomic) BLEConnectionController * ble;
-@property (strong, nonatomic) NSString * ssidKey;
 
 @property (weak, nonatomic) IBOutlet UIView * setupPayloadView;
 @property (weak, nonatomic) IBOutlet UILabel * manualCodeLabel;

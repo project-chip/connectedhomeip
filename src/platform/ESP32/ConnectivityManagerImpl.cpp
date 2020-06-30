@@ -908,7 +908,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
     memset(&wifiConfig, 0, sizeof(wifiConfig));
 
     // TODO Pull this from the configuration manager
-    uint16_t discriminator = 0x0F00;
+    const uint16_t discriminator = 0x0F00;
 
     snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s%03" PRIX16, CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX,
              discriminator);
