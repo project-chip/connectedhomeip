@@ -450,7 +450,7 @@ jobs:
     machine:
       image: ubuntu-1604:201903-01
     environment:
-    - BUILD_TYPE: vm-exec-build
+    - BUILD_TYPE: ipv6-tests
     steps:
     - checkout
     - run:

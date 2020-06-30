@@ -2,8 +2,8 @@ parameters:
       builder:
             type: string
 environment:
-    BUILD_TYPE: vm-exec-build
-executor: vm-exec-build
+    BUILD_TYPE: ipv6-tests
+executor: ipv6-tests
 steps:
     - checkout
     - run:
