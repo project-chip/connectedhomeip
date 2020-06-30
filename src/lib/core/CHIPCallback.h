@@ -21,8 +21,8 @@
  *     Clusters and the Device
  */
 
-#ifndef CHIP_ZCL_CALLBACK_H_
-#define CHIP_ZCL_CALLBACK_H_
+#ifndef CHIP_CALLBACK_H_
+#define CHIP_CALLBACK_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -121,8 +121,24 @@ public:
 
     /**
      * Cancel, i.e. de-register interest in the event,
-     *  this is the only way to get access to the Cancelable, to enqueue,
-     *  store any per-registration state
+     * This is the only way to get access to the Cancelable, to enqueue,
+     *  store any per-registration state.
+     * There are 3 primary use cases for this API:
+     *   1. For the owner of the Callback, Cancel() means "where-ever this Callback
+     *       was put in a list or registered for an event, gimme back, remove interest".
+     *   2. To a new registrar, during a registration call, it means "hey cleanup any
+     *       current registrations, let me use the internal fields of Cancelable
+     *       to keep track of what the owner is interested in.
+     *   3. To any current registrar (i.e. when mCancel is non-null), Cancel() means:
+     *       "remove this Callback from any internal lists and free any resources
+     *        you've allocated to track the interest".
+     *
+     *  For example: a sockets library with an API like Socket::Readable(Callback<> *cb)
+     *    using an underlying persistent registration API with the OS (like epoll())
+     *    might store the file descriptor and interest mask in the scalar, put the
+     *    Callback in a list.  Cancel() would dequeue the callback and remove
+     *    the socket from the interest set
+     *
      */
     Cancelable * Cancel() { return Cancelable::Cancel(); };
 
@@ -273,4 +289,4 @@ private:
 } // namespace Callback
 } // namespace chip
 
-#endif /* CHIP_ZCL_CALLBACK_H_ */
+#endif /* CHIP_CALLBACK_H_ */
