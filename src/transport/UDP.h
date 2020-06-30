@@ -42,9 +42,11 @@ namespace Transport {
 class UdpListenParameters
 {
 public:
-    UdpListenParameters() {}
+    explicit UdpListenParameters(Inet::InetLayer * layer) : mLayer(layer) {}
     UdpListenParameters(const UdpListenParameters &) = default;
     UdpListenParameters(UdpListenParameters &&)      = default;
+
+    Inet::InetLayer * GetInetLayer() { return mLayer; }
 
     Inet::IPAddressType GetAddressType() const { return mAddressType; }
     UdpListenParameters & SetAddressType(Inet::IPAddressType type)
@@ -79,6 +81,7 @@ public:
     }
 
 private:
+    Inet::InetLayer * mLayer         = nullptr;               ///< Associated inet layer
     Inet::IPAddressType mAddressType = kIPAddressType_IPv6;   ///< type of listening socket
     uint16_t mMessageSendPort        = CHIP_PORT;             ///< over what port to send requests
     uint16_t mListenPort             = CHIP_PORT;             ///< UDP listen port
@@ -104,7 +107,6 @@ public:
     /**
      * Initialize a UDP transport on a given port.
      *
-     * @param inetLayer    underlying communication channel
      * @param parms        UDP configuration parameters for this transport
      *
      * @details
@@ -112,12 +114,7 @@ public:
      *   The class allows separate definitions to allow local execution of several
      *   Nodes.
      */
-    CHIP_ERROR Init(Inet::InetLayer * inetLayer, const UdpListenParameters & params);
-
-    /**
-     * Convenience method to listen on IPv6 on chip standard ports
-     */
-    CHIP_ERROR Init(Inet::InetLayer * inetLayer) { return Init(inetLayer, UdpListenParameters()); }
+    CHIP_ERROR Init(UdpListenParameters & params);
 
     CHIP_ERROR SendMessage(const MessageHeader & header, const Transport::PeerAddress & address,
                            System::PacketBuffer * msgBuf) override;

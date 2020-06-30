@@ -41,7 +41,7 @@
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-extern void startServer(SecureSessionMgr * transportIPv4, SecureSessionMgr * transportIPv6);
+extern void startServer(SecureSessionMgr * sessions);
 #if CONFIG_USE_ECHO_CLIENT
 extern void startClient(void);
 #endif // CONFIG_USE_ECHO_CLIENT
@@ -88,8 +88,7 @@ static void DeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg);
 namespace {
 
 // Globals as these are large and will not fit onto the stack
-SecureSessionMgr sTransportIPv4;
-SecureSessionMgr sTransportIPv6;
+SecureSessionMgr sSessionsManager;
 
 } // namespace
 
@@ -152,7 +151,7 @@ extern "C" void app_main()
 
     // Start the Echo Server
     InitDataModelHandler();
-    startServer(&sTransportIPv4, &sTransportIPv6);
+    startServer(&sSessionsManager);
 #if CONFIG_USE_ECHO_CLIENT
     startClient();
 #endif

@@ -43,6 +43,7 @@
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/Tuple.h>
 #include <transport/UDP.h>
 
 #include "DataModelHandler.h"
@@ -241,21 +242,24 @@ static EchoServerCallback gCallbacks;
 
 } // namespace
 
+static Transport::Tuple<Transport::UDP, // IPV6
+                        Transport::UDP  // IPV4
+                        >
+    transportTuple;
+
 // The echo server assumes the platform's networking has been setup already
-void setupTransport(IPAddressType type, SecureSessionMgr * sessions, Transport::UDP * transport)
+void startServer(SecureSessionMgr * sessions)
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
-    struct netif * netif = NULL;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    struct netif * ipV6NetIf = NULL;
+    tcpip_adapter_get_netif(TCPIP_ADAPTER_IF_AP, (void **) &ipV6NetIf);
 
-    if (type == kIPAddressType_IPv6)
-    {
-        tcpip_adapter_get_netif(TCPIP_ADAPTER_IF_AP, (void **) &netif);
-    }
-
-    err = transport->Init(&DeviceLayer::InetLayer, UdpListenParameters().SetAddressType(type).SetInterfaceId(netif));
+    err = transportTuple.Init(
+        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6).SetInterfaceId(ipV6NetIf),
+        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv4));
     SuccessOrExit(err);
 
-    err = sessions->Init(kLocalNodeId, &DeviceLayer::SystemLayer, transport);
+    err = sessions->Init(kLocalNodeId, &DeviceLayer::SystemLayer, &transportTuple);
     SuccessOrExit(err);
 
     sessions->SetDelegate(&gCallbacks);
@@ -269,14 +273,4 @@ exit:
     {
         ESP_LOGI(TAG, "Echo Server Listening...");
     }
-}
-
-static Transport::UDP transportIPv6;
-static Transport::UDP transportIPv4;
-
-// The echo server assumes the platform's networking has been setup already
-void startServer(SecureSessionMgr * sessionsIpV4, SecureSessionMgr * sessionsIpV6)
-{
-    setupTransport(kIPAddressType_IPv6, sessionsIpV6, &transportIPv6);
-    setupTransport(kIPAddressType_IPv4, sessionsIpV4, &transportIPv4);
 }

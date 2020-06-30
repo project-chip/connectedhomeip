@@ -114,7 +114,7 @@ void SetupTransport(IPAddressType type, SecureSessionMgr * sessions, Transport::
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = transport->Init(&DeviceLayer::InetLayer, UdpListenParameters().SetAddressType(type));
+    err = transport->Init(UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(type));
     SuccessOrExit(err);
 
     err = sessions->Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::SystemLayer, transport);
