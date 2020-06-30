@@ -30,6 +30,12 @@
 
 using namespace chip::Callback;
 
+/**
+ * An example Callback registrar. Resumer::Resume() accepts Callbacks
+ *   to be run during the next call to Resumer::Dispatch().  In an environment
+ *   completely driven by callbacks, an application's main() would just call
+ *   something like Resumer::Dispatch() in a loop.
+ */
 class Resumer : private CallbackDeque
 {
 public:
@@ -102,23 +108,15 @@ static void ResumerTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, n == 1);
 
     n = 1;
-    // Resume() twice runs only once per
+    // Resume() twice runs only once per Dispatch
     resumer.Resume(&cb);
     resumer.Resume(&cb);
     resumer.Dispatch();
-    resumer.Dispatch();
+    resumer.Dispatch(); // runs an empty list
     NL_TEST_ASSERT(inSuite, n == 2);
 
     n = 1;
-    // Resume() twice runs only once per
-    resumer.Resume(&cb);
-    resumer.Dispatch();
-    resumer.Resume(&cb);
-    resumer.Dispatch();
-    NL_TEST_ASSERT(inSuite, n == 3);
-
-    n = 1;
-    // Resume() during Dispatch() runs only once, but does enqueue for next dispatch
+    // Resume() during Dispatch() runs only once, but enqueues for next dispatch
     struct Resume res = { .cb = &cb, .resumer = &resumer };
     Callback<> resumecb((void (*)(void *)) resume, &res);
     resumer.Resume(&cb);
@@ -142,6 +140,10 @@ static void ResumerTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, n == 2);
 }
 
+/**
+ * An example Callback registrar. Notifier implements persistently-registered
+ *  semantics, and uses Callbacks with a non-default signature.
+ */
 class Notifier : private CallbackDeque
 {
 public:
