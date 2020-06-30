@@ -34,16 +34,16 @@ namespace Callback {
 /**
  *  @class Cancelable
  *
- *    "Private" members of a Callback used by subsystems while a callback is
- *     registered with them.
+ *    Private members of a Callback for use by subsystems that accept
+ *     Callbacks for event registration/notification.
  *
  */
 class Cancelable
 {
 public:
     /**
-     *  @brief for use by callees, i.e. those that accept callbacks for
-     *   event registration.  The names suggest how to use them, but
+     *  @brief for use by Callback callees, i.e. those that accept callbacks for
+     *   event registration.  The names suggest how to use these members, but
      *   implementations can choose.
      */
     Cancelable * mNext;
@@ -67,7 +67,8 @@ public:
 
     /**
      * @brief run whatever function the callee/registrar has specified in order
-     *  to cleanup resources and surrender ownership of the Cancelable's fields
+     *  to clean up any resource allocation associated with the registration,
+     *  and surrender ownership of the Cancelable's fields
      */
     Cancelable * Cancel()
     {
