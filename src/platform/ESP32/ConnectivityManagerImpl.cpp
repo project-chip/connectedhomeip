@@ -908,15 +908,9 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
     memset(&wifiConfig, 0, sizeof(wifiConfig));
 
     // TODO Pull this from the configuration manager
-    uint8_t mac[6];
-    err = esp_wifi_get_mac(ESP_IF_WIFI_STA, mac);
-    if (err != ESP_OK)
-    {
-        ChipLogError(DeviceLayer, "esp_wifi_get_mac(ESP_IF_WIFI_STA) failed: %s", chip::ErrorStr(err));
-    }
-    SuccessOrExit(err);
+    uint16_t discriminator = 0x0F00;
 
-    snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s%02X%02X", "CHIP_DEMO-", mac[4], mac[5]);
+    snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s%03" PRIX16, CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX, discriminator);
     wifiConfig.ap.channel         = CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL;
     wifiConfig.ap.authmode        = WIFI_AUTH_OPEN;
     wifiConfig.ap.max_connection  = CHIP_DEVICE_CONFIG_WIFI_AP_MAX_STATIONS;
