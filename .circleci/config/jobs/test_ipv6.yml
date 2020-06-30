@@ -1,3 +1,6 @@
+parameters:
+      builder:
+            type: string
 environment:
     BUILD_TYPE: vm-exec-build
 executor: vm-exec-build

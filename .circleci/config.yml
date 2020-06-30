@@ -526,6 +526,8 @@ workflows:
           branches:
             ignore:
             - /restyled.*/
+        requires:
+        - Build CHIP [main-build]
     - Deploy [main-build]:
         filters:
           branches:
