@@ -44,3 +44,6 @@ xcuserdata/
 *.xcodeproj/*
 *.xcworkspace/*
 TAGS
+
+# Text editors
+.*.sw[a-z]

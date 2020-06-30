@@ -21,6 +21,14 @@
             android:name=".BarcodeReaderActivity"
             android:exported="false"
             android:screenOrientation="portrait"/>
+        <activity
+            android:name=".EchoClientActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".OnOffActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

@@ -42,7 +42,9 @@ using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
 extern void startServer(SecureSessionMgr * transportIPv4, SecureSessionMgr * transportIPv6);
+#if CONFIG_USE_ECHO_CLIENT
 extern void startClient(void);
+#endif // CONFIG_USE_ECHO_CLIENT
 
 #if CONFIG_DEVICE_TYPE_M5STACK
 
@@ -91,13 +93,6 @@ SecureSessionMgr sTransportIPv6;
 
 } // namespace
 
-static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
-{
-    esp_fill_random(output, len);
-    *olen = len;
-    return 0;
-}
-
 extern "C" void app_main()
 {
     ESP_LOGI(TAG, "WiFi Echo Demo!");
@@ -138,26 +133,6 @@ extern "C" void app_main()
         return;
     }
 
-    // Initialize the ESP tcpip adapter.
-    tcpip_adapter_init();
-
-    // Arrange for the ESP event loop to deliver events into the CHIP Device layer.
-    err = esp_event_loop_init(PlatformManagerImpl::HandleESPSystemEvent, NULL);
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "esp_event_loop_init() failed: %s", ErrorStr(err));
-        return;
-    }
-
-    // Initialize the ESP WiFi layer.
-    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    err                    = esp_wifi_init(&cfg);
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "esp_event_loop_init() failed: %s", ErrorStr(err));
-        return;
-    }
-
     // Initialize the CHIP stack.
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
@@ -173,13 +148,6 @@ extern "C" void app_main()
     // Register a function to receive events from the CHIP device layer.  Note that calls to
     // this function will happen on the CHIP event loop thread, not the app_main thread.
     PlatformMgr().AddEventHandler(DeviceEventHandler, 0);
-
-    err = Crypto::add_entropy_source(app_entropy_source, NULL, 16);
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "add_entropy_source() failed: %s", ErrorStr(err));
-        return;
-    }
 
     // Start a task to run the CHIP Device event loop.
     err = PlatformMgr().StartEventLoopTask();

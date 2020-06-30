@@ -879,7 +879,7 @@ static void TestPBKDF2_SHA256_TestVectors(nlTestSuite * inSuite, void * inContex
             unsigned char out_key[vector->key_len];
 
             CHIP_ERROR err =
-                pbkdf2_hmac(vector->password, vector->plen, vector->salt, vector->slen, vector->iter, vector->key_len, out_key);
+                pbkdf2_sha256(vector->password, vector->plen, vector->salt, vector->slen, vector->iter, vector->key_len, out_key);
             NL_TEST_ASSERT(inSuite, err == vector->result);
 
             if (vector->result == CHIP_NO_ERROR)
@@ -940,7 +940,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ECDH invalid params", TestECDH_InvalidParams),
     NL_TEST_DEF("Test ECDH sample vectors", TestECDH_SampleInputVectors),
     NL_TEST_DEF("Test adding entropy sources", TestAddEntropySources),
-    NL_TEST_DEF("Test PBKDF2 SHA56", TestPBKDF2_SHA256_TestVectors),
+    NL_TEST_DEF("Test PBKDF2 SHA256", TestPBKDF2_SHA256_TestVectors),
 
     NL_TEST_SENTINEL()
 };

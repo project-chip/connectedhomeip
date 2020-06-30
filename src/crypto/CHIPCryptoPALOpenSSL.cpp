@@ -380,8 +380,8 @@ exit:
     return error;
 }
 
-CHIP_ERROR pbkdf2_hmac(const unsigned char * password, size_t plen, const unsigned char * salt, size_t slen,
-                       unsigned int iteration_count, uint32_t key_length, unsigned char * output)
+CHIP_ERROR pbkdf2_sha256(const unsigned char * password, size_t plen, const unsigned char * salt, size_t slen,
+                         unsigned int iteration_count, uint32_t key_length, unsigned char * output)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     int result        = 1;

@@ -584,6 +584,8 @@ exit:
     return err;
 }
 
+void ESP32Config::RunConfigUnitTest() {}
+
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

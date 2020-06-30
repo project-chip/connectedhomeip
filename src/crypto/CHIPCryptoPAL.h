@@ -212,8 +212,8 @@ CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t 
  * @param output output buffer where the key will be written
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR pbkdf2_hmac(const unsigned char * password, size_t plen, const unsigned char * salt, size_t slen,
-                       unsigned int iteration_count, uint32_t key_length, unsigned char * output);
+CHIP_ERROR pbkdf2_sha256(const unsigned char * password, size_t plen, const unsigned char * salt, size_t slen,
+                         unsigned int iteration_count, uint32_t key_length, unsigned char * output);
 
 } // namespace Crypto
 } // namespace chip

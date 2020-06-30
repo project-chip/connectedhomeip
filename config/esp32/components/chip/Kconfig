@@ -487,8 +487,8 @@ menu "CHIP Device Layer"
 
     menu "BLE Options"
 
-        config ENABLE_WOBLE
-            bool "Enable CHIP-over-BLE (WoBLE) Support"
+        config ENABLE_CHIPOBLE
+            bool "Enable CHIP-over-BLE (CHIPoBLE) Support"
             default y
             help
                 Enables support for sending and receiving CHIP messages over a BLE connection.
@@ -500,7 +500,7 @@ menu "CHIP Device Layer"
         config BLE_DEVICE_NAME_PREFIX
             string "BLE Device Name Prefix"
             default "CHIP-"
-            depends on ENABLE_WOBLE
+            depends on ENABLE_CHIPOBLE
             help
                 A prefix string used in forming the BLE device name.  The remainder of the name
                 consists of the final two bytes of the device's CHIP node id in hex.
@@ -512,7 +512,7 @@ menu "CHIP Device Layer"
         config BLE_FAST_ADVERTISING_INTERVAL
             int "Fast Advertising Interval"
             default 800
-            depends on ENABLE_WOBLE
+            depends on ENABLE_CHIPOBLE
             help
                 The interval (in units of 0.625ms) at which the device will send BLE advertisements while
                 in fast advertising mode.
@@ -520,24 +520,24 @@ menu "CHIP Device Layer"
         config BLE_SLOW_ADVERTISING_INTERVAL
             int "Slow Advertising Interval"
             default 3200
-            depends on ENABLE_WOBLE
+            depends on ENABLE_CHIPOBLE
             help
                 The interval (in units of 0.625ms) at which the device will send BLE advertisements while
                 in slow advertising mode.
 
-        config WOBLE_SINGLE_CONNECTION
+        config CHIPOBLE_SINGLE_CONNECTION
             bool "Single Connection Mode"
             default n
-            depends on ENABLE_WOBLE
+            depends on ENABLE_CHIPOBLE
             help
                 Limit support for CHIP-over-BLE (WoBLE) to a single inbound connection.
 
                 When set, WoBLE advertisements will stop while a WoBLE connection is active.
 
-        config WOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
+        config CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
             bool "Disable Advertising when Provisioned"
             default n
-            depends on ENABLE_WOBLE
+            depends on ENABLE_CHIPOBLE
             help
                 Automatically disable CHIP-over-BLE (WoBLE) advertising when the device transitions
                 to a fully provisioned state.

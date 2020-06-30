@@ -31,6 +31,7 @@ extern "C" {
 
 int TestCHIPErrorStr(void);
 int TestCHIPTLV(void);
+int TestReferenceCounted(void);
 
 #ifdef __cplusplus
 }
