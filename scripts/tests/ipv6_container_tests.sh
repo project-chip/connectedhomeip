@@ -23,5 +23,6 @@ here=$(cd "$(dirname "$0")" && pwd)
 CHIPDIR="$here"/../..
 cd "$CHIPDIR"
 
-docker run --rm -v "$PWD":/workspaces/connectedhomeip connectedhomeip/chip-build:0.2.14 \
+dockerfile_version=$(cat "$CHIPDIR"/integrations/docker/images/chip-build/version)
+docker run --rm -v "$PWD":/workspaces/connectedhomeip connectedhomeip/chip-build:"$dockerfile_version" \
     /workspaces/connectedhomeip/scripts/tests/inet_tests.sh
