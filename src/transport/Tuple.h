@@ -36,13 +36,10 @@ public:
     CHIP_ERROR SendMessage(const MessageHeader & header, const Transport::PeerAddress & address,
                            System::PacketBuffer * msgBuf) override
     {
-        return SendMessageImpl<sizeof...(TransportTypes)>(header, address, msgBuf);
+        return SendMessageImpl<0>(header, address, msgBuf);
     }
 
-    bool CanSendToPeer(const Transport::PeerAddress & address) override
-    {
-        return CanSendToPeerImpl<sizeof...(TransportTypes)>(address);
-    }
+    bool CanSendToPeer(const Transport::PeerAddress & address) override { return CanSendToPeerImpl<0>(address); }
 
     /**
      * Initialization method that forwards arguments for initialization to each of the underlying
@@ -56,33 +53,33 @@ public:
 
 private:
     /// Recursive cansend implementation iterating through transport members
-    template <size_t N, typename std::enable_if<(N > 0)>::type * = nullptr>
+    template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
     bool CanSendToPeerImpl(const Transport::PeerAddress & address)
     {
-        return std::get<N - 1>(mTransports).CanSendToPeer(address) || CanSendToPeerImpl<N - 1>(address);
+        return std::get<N>(mTransports).CanSendToPeer(address) || CanSendToPeerImpl<N + 1>(address);
     }
 
     /// Final can send check , where message cannot be sent through any transport
-    template <size_t N, typename std::enable_if<(N == 0)>::type * = nullptr>
+    template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
     bool CanSendToPeerImpl(const Transport::PeerAddress & address)
     {
         return false;
     }
 
     /// Recursive sendmessage implementation iterating through transport members
-    template <size_t N, typename std::enable_if<(N > 0)>::type * = nullptr>
+    template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
     CHIP_ERROR SendMessageImpl(const MessageHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgBuf)
     {
-        Base * base = &std::get<N - 1>(mTransports);
+        Base * base = &std::get<N>(mTransports);
         if (base->CanSendToPeer(address))
         {
             return base->SendMessage(header, address, msgBuf);
         }
-        return SendMessageImpl<N - 1>(header, address, msgBuf);
+        return SendMessageImpl<N + 1>(header, address, msgBuf);
     }
 
     /// Final send message, where message cannot be sent through any transport
-    template <size_t N, typename std::enable_if<(N == 0)>::type * = nullptr>
+    template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
     CHIP_ERROR SendMessageImpl(const MessageHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgBuf)
     {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
@@ -92,17 +89,27 @@ private:
     template <typename InitArg, typename... Rest>
     CHIP_ERROR InitImpl(InitArg && arg, Rest &&... rest)
     {
-        CHIP_ERROR err = std::get<sizeof...(TransportTypes) - sizeof...(Rest) - 1>(mTransports).Init(std::forward<InitArg>(arg));
-        if (err == CHIP_NO_ERROR)
+        auto transport = &std::get<sizeof...(TransportTypes) - sizeof...(Rest) - 1>(mTransports);
+
+        CHIP_ERROR err = transport->Init(std::forward<InitArg>(arg));
+        if (err != CHIP_NO_ERROR)
         {
             return err;
         }
+
+        transport->SetMessageReceiveHandler(&OnMessageReceive, this);
 
         return InitImpl(std::forward<Rest>(rest)...);
     }
 
     /// Base case where initialization finishes.
     CHIP_ERROR InitImpl() { return CHIP_NO_ERROR; }
+
+    /// Handler passed to all underlying transports at init time.
+    static void OnMessageReceive(const MessageHeader & header, const PeerAddress & source, System::PacketBuffer * msg, Tuple * t)
+    {
+        t->HandleMessageReceived(header, source, msg);
+    }
 
     std::tuple<TransportTypes...> mTransports;
 };
