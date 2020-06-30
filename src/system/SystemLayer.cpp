@@ -239,13 +239,13 @@ Error Layer::NewTimer(Timer *& aTimerPtr)
     return CHIP_SYSTEM_NO_ERROR;
 }
 
-static bool TimerReady(void * p, const Inner * timer)
+static bool TimerReady(void * p, const Cancelable * timer)
 {
     const Timer::Epoch * kCurrentEpoch = static_cast<const Timer::Epoch *>(p);
     return !Timer::IsEarlierEpoch(*kCurrentEpoch, timer->mInfoScalar);
 }
 
-static int TimerCompare(void * p, const Inner * a, const Inner * b)
+static int TimerCompare(void * p, const Cancelable * a, const Cancelable * b)
 {
     (void) p;
     return (a->mInfoScalar > b->mInfoScalar) ? 1 : (a->mInfoScalar < b->mInfoScalar) ? -1 : 0;
@@ -269,7 +269,7 @@ static int TimerCompare(void * p, const Inner * a, const Inner * b)
  */
 void Layer::StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * cb)
 {
-    Inner * inner = cb->Cancel();
+    Cancelable * inner = cb->Cancel();
 
     inner->mInfoScalar = Timer::GetCurrentEpoch() + aMilliseconds;
 
@@ -588,11 +588,11 @@ Error Layer::SetClock_RealTime(uint64_t newCurTime)
 void Layer::DispatchTimerCallbacks(const uint64_t kCurrentEpoch)
 {
     // dispatch TimerCallbacks
-    Inner ready = mTimerCallbacks.DequeueBy(TimerReady, (void *) &kCurrentEpoch);
+    Cancelable ready = mTimerCallbacks.DequeueBy(TimerReady, (void *) &kCurrentEpoch);
     while (ready.mNext != &ready)
     {
         // one-shot
-        chip::Callback::Callback<> * cb = chip::Callback::Callback<>::FromInner(ready.mNext);
+        chip::Callback::Callback<> * cb = chip::Callback::Callback<>::FromCancelable(ready.mNext);
         cb->Cancel();
         cb->mCall(cb->mContext);
     }
@@ -643,7 +643,7 @@ void Layer::PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet,
     // check for an earlier callback timer, too
     if (lAwakenEpoch != kCurrentEpoch)
     {
-        Inner * inner = mTimerCallbacks.First();
+        Cancelable * inner = mTimerCallbacks.First();
         if (inner != nullptr && !Timer::IsEarlierEpoch(kCurrentEpoch, inner->mInfoScalar))
         {
             lAwakenEpoch = inner->mInfoScalar;
