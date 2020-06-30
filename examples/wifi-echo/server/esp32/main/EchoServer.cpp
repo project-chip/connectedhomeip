@@ -70,44 +70,6 @@ const unsigned char remote_public_key[] = { 0x04, 0x30, 0x77, 0x2c, 0xe7, 0xd4, 
                                             0xe8, 0x87, 0x2e, 0x52, 0x3b, 0x98, 0xf0, 0xa1, 0x88, 0x4a, 0xe3, 0x03, 0x75 };
 
 /**
- * A data model message has nonzero length and always has a first byte whose
- * value is one of: 0x00, 0x01, 0x02, 0x03.  See chipZclEncodeZclHeader for the
- * construction of the message and in particular the first byte.
- *
- * Echo messages should generally not have a first byte with those values, so we
- * can use that to try to distinguish between the two.
- */
-static bool ContentMayBeADataModelMessage(System::PacketBuffer * buffer)
-{
-    const size_t data_len      = buffer->DataLength();
-    const uint8_t * data       = buffer->Start();
-    bool maybeDataModelMessage = true;
-
-    // Has to have nonzero length.
-    VerifyOrExit(data_len > 0, maybeDataModelMessage = false);
-
-    // Has to have a valid first byte value.
-    VerifyOrExit(data[0] < 0x04, maybeDataModelMessage = false);
-
-exit:
-    return maybeDataModelMessage;
-}
-
-void newConnectionHandler(PeerConnectionState * state, SecureSessionMgr * transport)
-{
-    CHIP_ERROR err;
-
-    ESP_LOGI(TAG, "Received a new connection.");
-
-    err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key,
-                                                               sizeof(local_private_key));
-    VerifyOrExit(err == CHIP_NO_ERROR, ESP_LOGE(TAG, "Failed to setup encryption"));
-
-exit:
-    return;
-}
-
-/**
  * @brief implements something like "od -c", changes an arbitrary byte string
  *   into a single-line of ascii.  Destroys any byte-wise encoding that
  *   might be present, e.g. utf-8.
@@ -168,70 +130,114 @@ static size_t odc(const uint8_t * bytes, size_t bytes_len, char * out, size_t ou
     return required;
 }
 
-// Transport Callbacks
-void receiveHandler(const MessageHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
-                    SecureSessionMgr * transport)
+class EchoServerCallback : public SecureSessionMgrCallback
 {
-    CHIP_ERROR err;
-    const size_t data_len = buffer->DataLength();
-
-    // as soon as a client connects, assume it is connected
-    VerifyOrExit(transport != NULL && buffer != NULL, ESP_LOGE(TAG, "Received data but couldn't process it..."));
-    VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ESP_LOGE(TAG, "Unknown source for received message"));
-
+public:
+    virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
+                                   System::PacketBuffer * buffer, SecureSessionMgr * mgr)
     {
-        char src_addr[Transport::PeerAddress::kMaxToStringSize];
+        CHIP_ERROR err;
+        const size_t data_len = buffer->DataLength();
 
-        state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
+        // as soon as a client connects, assume it is connected
+        VerifyOrExit(mgr != NULL && buffer != NULL, ESP_LOGE(TAG, "Received data but couldn't process it..."));
+        VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ESP_LOGE(TAG, "Unknown source for received message"));
 
-        ESP_LOGI(TAG, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
-    }
-
-    // FIXME: Long-term we shouldn't be guessing what sort of message this is
-    // based on the message bytes.  We're doing this for now to support both
-    // data model messages and text echo messages, but in the long term we
-    // should either do echo via a data model command or do echo on a separate
-    // port from data model processing.
-    if (ContentMayBeADataModelMessage(buffer))
-    {
-        HandleDataModelMessage(buffer);
-        buffer = NULL;
-    }
-    else
-    {
-        char logmsg[512];
-
-        odc(buffer->Start(), data_len, logmsg, sizeof(logmsg));
-
-        ESP_LOGI(TAG, "Client sent: %s", logmsg);
-
-        // Attempt to echo back
-        err    = transport->SendMessage(header.GetSourceNodeId().Value(), buffer);
-        buffer = NULL;
-        if (err != CHIP_NO_ERROR)
         {
-            ESP_LOGE(TAG, "Unable to echo back to client: %s", ErrorStr(err));
+            char src_addr[Transport::PeerAddress::kMaxToStringSize];
+
+            state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
+
+            ESP_LOGI(TAG, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
+        }
+
+        // FIXME: Long-term we shouldn't be guessing what sort of message this is
+        // based on the message bytes.  We're doing this for now to support both
+        // data model messages and text echo messages, but in the long term we
+        // should either do echo via a data model command or do echo on a separate
+        // port from data model processing.
+        if (ContentMayBeADataModelMessage(buffer))
+        {
+            HandleDataModelMessage(buffer);
+            buffer = NULL;
         }
         else
         {
-            ESP_LOGI(TAG, "Echo sent");
+            char logmsg[512];
+
+            odc(buffer->Start(), data_len, logmsg, sizeof(logmsg));
+
+            ESP_LOGI(TAG, "Client sent: %s", logmsg);
+
+            // Attempt to echo back
+            err    = mgr->SendMessage(header.GetSourceNodeId().Value(), buffer);
+            buffer = NULL;
+            if (err != CHIP_NO_ERROR)
+            {
+                ESP_LOGE(TAG, "Unable to echo back to client: %s", ErrorStr(err));
+            }
+            else
+            {
+                ESP_LOGI(TAG, "Echo sent");
+            }
+        }
+
+    exit:
+
+        // SendTo calls Free on the buffer without an AddRef, if SendTo was not called, free the buffer.
+        if (buffer != NULL)
+        {
+            System::PacketBuffer::Free(buffer);
         }
     }
 
-exit:
-
-    // SendTo calls Free on the buffer without an AddRef, if SendTo was not called, free the buffer.
-    if (buffer != NULL)
+    virtual void OnReceiveError(CHIP_ERROR error, const IPPacketInfo & source, SecureSessionMgr * mgr)
     {
-        System::PacketBuffer::Free(buffer);
+        ESP_LOGE(TAG, "ERROR: %s\n Got UDP error", ErrorStr(error));
+        statusLED.BlinkOnError();
     }
-}
 
-void error(CHIP_ERROR error, const IPPacketInfo & pi)
-{
-    ESP_LOGE(TAG, "ERROR: %s\n Got UDP error", ErrorStr(error));
-    statusLED.BlinkOnError();
-}
+    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr)
+    {
+        CHIP_ERROR err;
+
+        ESP_LOGI(TAG, "Received a new connection.");
+
+        err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key,
+                                                                   sizeof(local_private_key));
+        VerifyOrExit(err == CHIP_NO_ERROR, ESP_LOGE(TAG, "Failed to setup encryption"));
+
+    exit:
+        return;
+    }
+
+private:
+    /**
+     * A data model message has nonzero length and always has a first byte whose
+     * value is one of: 0x00, 0x01, 0x02, 0x03.  See chipZclEncodeZclHeader for the
+     * construction of the message and in particular the first byte.
+     *
+     * Echo messages should generally not have a first byte with those values, so we
+     * can use that to try to distinguish between the two.
+     */
+    bool ContentMayBeADataModelMessage(System::PacketBuffer * buffer)
+    {
+        const size_t data_len      = buffer->DataLength();
+        const uint8_t * data       = buffer->Start();
+        bool maybeDataModelMessage = true;
+
+        // Has to have nonzero length.
+        VerifyOrExit(data_len > 0, maybeDataModelMessage = false);
+
+        // Has to have a valid first byte value.
+        VerifyOrExit(data[0] < 0x04, maybeDataModelMessage = false);
+
+    exit:
+        return maybeDataModelMessage;
+    }
+};
+
+static EchoServerCallback gCallbacks;
 
 } // namespace
 
@@ -249,9 +255,7 @@ void setupTransport(IPAddressType type, SecureSessionMgr * transport)
     err = transport->Init(kLocalNodeId, &DeviceLayer::InetLayer, UdpListenParameters().SetAddressType(type).SetInterfaceId(netif));
     SuccessOrExit(err);
 
-    transport->SetMessageReceiveHandler(receiveHandler, transport);
-    transport->SetReceiveErrorHandler(error);
-    transport->SetNewConnectionHandler(newConnectionHandler, transport);
+    transport->SetDelegate(&gCallbacks);
 
 exit:
     if (err != CHIP_NO_ERROR)

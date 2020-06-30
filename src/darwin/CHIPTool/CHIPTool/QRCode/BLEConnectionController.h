@@ -1,4 +1,4 @@
-/*
+/**
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *
@@ -15,27 +15,17 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file declares test entry points for CHIP core library
- *      unit tests.
- *
- */
+#import <CoreBluetooth/CoreBluetooth.h>
+#import <UIKit/UIKit.h>
 
-#ifndef TESTCORE_H
-#define TESTCORE_H
+@interface BLEConnectionController : NSObject <CBCentralManagerDelegate>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+@property (strong, nonatomic) CBCentralManager * centralManager;
+@property (strong, nonatomic) NSString * peripheralName;
+@property (strong, nonatomic) CBPeripheral * peripheral;
 
-int TestCHIPCallback(void);
-int TestCHIPErrorStr(void);
-int TestCHIPTLV(void);
-int TestReferenceCounted(void);
+- (id)initWithName:(NSString *)peripheralName;
+- (void)start;
+- (void)stop;
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif // TESTCORE_H
+@end

@@ -44,3 +44,10 @@ xcuserdata/
 *.xcodeproj/*
 *.xcworkspace/*
 TAGS
+
+# Text editors
+.*.sw[a-z]
+
+# Patch files
+*.rej
+*.orig
