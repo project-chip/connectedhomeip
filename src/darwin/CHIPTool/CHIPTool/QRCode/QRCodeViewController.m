@@ -30,13 +30,11 @@
 // The expected Vendor ID for CHIP demos
 // Spells CHIP on a dialer
 #define EXAMPLE_VENDOR_ID 2447
-#define EXAMPLE_VENDOR_TAG_SSID 1
-#define MAX_SSID_LEN 32
 
-#define EXAMPLE_VENDOR_TAG_IP 2
+#define EXAMPLE_VENDOR_TAG_IP 1
 #define MAX_IP_LEN 46
 
-#define BLE_CHIP_PREFIX @"CHIP-"
+#define NETWORK_CHIP_PREFIX @"CHIP-"
 
 #define NOT_APPLICABLE_STRING @"N/A"
 
@@ -214,15 +212,6 @@ static NSString * const ipKey = @"ipk";
 
         NSString * infoValue = info.stringValue;
         switch (tag.unsignedCharValue) {
-        case EXAMPLE_VENDOR_TAG_SSID:
-            if ([infoValue length] > MAX_SSID_LEN) {
-                NSLog(@"Unexpected SSID String...");
-            } else {
-                NSLog(@"Got SSID String... %@", infoValue);
-                _ssidKey = infoValue;
-            }
-            break;
-
         case EXAMPLE_VENDOR_TAG_IP:
             if ([infoValue length] > MAX_IP_LEN) {
                 NSLog(@"Unexpected IP String... %@", infoValue);
@@ -246,31 +235,31 @@ static NSString * const ipKey = @"ipk";
         break;
     case kRendezvousInformationSoftAP:
         NSLog(@"Rendezvous SoftAP");
-        [self handleRendezVousSoftAP:_ssidKey];
+        [self handleRendezVousSoftAP:[self getNetworkName:payload.discriminator]];
         break;
     case kRendezvousInformationBLE:
         NSLog(@"Rendezvous BLE");
-        [self handleRendezVousBLE:payload.discriminator];
+        [self handleRendezVousBLE:[self getNetworkName:payload.discriminator]];
         break;
     }
 }
 
-- (void)handleRendezVousBLE:(NSNumber *)discriminator
+- (NSString *)getNetworkName:(NSNumber *)discriminator
 {
-    NSString * peripheralDiscriminator = [NSString stringWithFormat:@"0%hX", discriminator.unsignedShortValue];
-    NSString * peripheralFullName = [NSString stringWithFormat:@"%@%@", BLE_CHIP_PREFIX, peripheralDiscriminator];
-    _ble = [[BLEConnectionController alloc] initWithName:peripheralFullName];
+    NSString * peripheralDiscriminator = [NSString stringWithFormat:@"%hX", discriminator.unsignedShortValue];
+    NSString * peripheralFullName = [NSString stringWithFormat:@"%@%@", NETWORK_CHIP_PREFIX, peripheralDiscriminator];
+    return peripheralFullName;
+}
+
+- (void)handleRendezVousBLE:(NSString *)name
+{
+    _ble = [[BLEConnectionController alloc] initWithName:name];
     [_ble start];
 }
 
-- (void)handleRendezVousSoftAP:(NSString *)ssid
+- (void)handleRendezVousSoftAP:(NSString *)name
 {
-    if (!ssid) {
-        NSLog(@"Can not retrieved SSID");
-        return;
-    }
-
-    NSString * message = [NSString stringWithFormat:@"SSID: %@\n\nUse WiFi Settings to connect to it.", ssid];
+    NSString * message = [NSString stringWithFormat:@"SSID: %@\n\nUse WiFi Settings to connect to it.", name];
     UIAlertController * alert = [UIAlertController alertControllerWithTitle:@"SoftAP Detected"
                                                                     message:message
                                                              preferredStyle:UIAlertControllerStyleActionSheet];

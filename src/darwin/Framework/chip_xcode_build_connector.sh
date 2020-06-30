@@ -104,12 +104,12 @@ configure_OPTIONS+=(
     if [[ ! -x config.status || ${here}/${me} -nt config.status ]]; then
         "$CHIP_ROOT"/bootstrap-configure -C "${configure_OPTIONS[@]}"
     else
-        for makefile_am in "$(find "$CHIP_ROOT" -name Makefile.am)"; do
+        while IFS= read -r -d '' makefile_am; do
             [[ ${makefile_am} -ot ${makefile_am/.am/.in} ]] || {
                 "$CHIP_ROOT"/bootstrap -w make
                 break
             }
-        done
+        done < <(find "$CHIP_ROOT" -name Makefile.am)
     fi
 
     make V=1 install-data                   # all the headers

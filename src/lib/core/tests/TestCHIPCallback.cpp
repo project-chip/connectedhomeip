@@ -30,6 +30,12 @@
 
 using namespace chip::Callback;
 
+/**
+ * An example Callback registrar. Resumer::Resume() accepts Callbacks
+ *   to be run during the next call to Resumer::Dispatch().  In an environment
+ *   completely driven by callbacks, an application's main() would just call
+ *   something like Resumer::Dispatch() in a loop.
+ */
 class Resumer : private CallbackDeque
 {
 public:
@@ -81,10 +87,9 @@ static void canceler(Cancelable * ca)
 
 static void ResumerTest(nlTestSuite * inSuite, void * inContext)
 {
-
     int n = 1;
-    Callback<> cb((void (*)(void *)) increment, &n);
-    Callback<> cancelcb((void (*)(void *)) canceler, cb.Cancel());
+    Callback<> cb(reinterpret_cast<CallFn>(increment), &n);
+    Callback<> cancelcb(reinterpret_cast<CallFn>(canceler), cb.Cancel());
     Resumer resumer;
 
     // Resume() works
@@ -95,6 +100,13 @@ static void ResumerTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, n == 3);
 
     n = 1;
+    // test cb->Cancel() cancels
+    resumer.Resume(&cb);
+    cb.Cancel();
+    resumer.Dispatch();
+    NL_TEST_ASSERT(inSuite, n == 1);
+
+    n = 1;
     // Cancel cb before Dispatch() gets around to us (tests FIFO *and* cancel() from readylist)
     resumer.Resume(&cancelcb);
     resumer.Resume(&cb);
@@ -102,25 +114,17 @@ static void ResumerTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, n == 1);
 
     n = 1;
-    // Resume() twice runs only once per
+    // 2nd Resume() cancels first registration
     resumer.Resume(&cb);
-    resumer.Resume(&cb);
-    resumer.Dispatch();
-    resumer.Dispatch();
+    resumer.Resume(&cb); // cancels previous registration
+    resumer.Dispatch();  // runs the list
+    resumer.Dispatch();  // runs an empty list
     NL_TEST_ASSERT(inSuite, n == 2);
 
     n = 1;
-    // Resume() twice runs only once per
-    resumer.Resume(&cb);
-    resumer.Dispatch();
-    resumer.Resume(&cb);
-    resumer.Dispatch();
-    NL_TEST_ASSERT(inSuite, n == 3);
-
-    n = 1;
-    // Resume() during Dispatch() runs only once, but does enqueue for next dispatch
+    // Resume() during Dispatch() runs only once, but enqueues for next dispatch
     struct Resume res = { .cb = &cb, .resumer = &resumer };
-    Callback<> resumecb((void (*)(void *)) resume, &res);
+    Callback<> resumecb(reinterpret_cast<CallFn>(resume), &res);
     resumer.Resume(&cb);
     resumer.Resume(&resumecb);
     resumer.Dispatch();
@@ -128,7 +132,7 @@ static void ResumerTest(nlTestSuite * inSuite, void * inContext)
     resumer.Dispatch();
     NL_TEST_ASSERT(inSuite, n == 3);
 
-    Callback<> * pcb = new Callback<>((void (*)(void *)) increment, &n);
+    Callback<> * pcb = new Callback<>(reinterpret_cast<CallFn>(increment), &n);
 
     n = 1;
     // cancel on destruct
@@ -142,6 +146,10 @@ static void ResumerTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, n == 2);
 }
 
+/**
+ * An example Callback registrar. Notifier implements persistently-registered
+ *  semantics, and uses Callbacks with a non-default signature.
+ */
 class Notifier : private CallbackDeque
 {
 public:
@@ -183,8 +191,8 @@ static void increment_by(int * n, int by)
 static void NotifierTest(nlTestSuite * inSuite, void * inContext)
 {
     int n = 1;
-    Callback<Notifier::NotifyFn> cb((Notifier::NotifyFn) increment_by, &n);
-    Callback<Notifier::NotifyFn> cancelcb((Notifier::NotifyFn) canceler, cb.Cancel());
+    Callback<Notifier::NotifyFn> cb(reinterpret_cast<Notifier::NotifyFn>(increment_by), &n);
+    Callback<Notifier::NotifyFn> cancelcb(reinterpret_cast<Notifier::NotifyFn>(canceler), cb.Cancel());
 
     // safe to call anytime
     cb.Cancel();
