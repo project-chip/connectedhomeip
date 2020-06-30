@@ -41,6 +41,7 @@ lib_LIBRARIES                                         = \
     $(NULL)
 
 libCoreTests_a_SOURCES                                = \
+    TestCHIPCallback.cpp                                \
     TestCHIPErrorStr.cpp                                \
     TestCHIPTLV.cpp                                     \
     TestReferenceCounted.cpp                            \
@@ -86,6 +87,7 @@ COMMON_LDADD                                          =  \
 # Test applications that should be run when the 'check' target is run.
 
 check_PROGRAMS                                        = \
+    TestCHIPCallback                                    \
     TestCHIPErrorStr                                    \
     TestCHIPTLV                                         \
     TestReferenceCounted                                \
@@ -105,6 +107,9 @@ TESTS_ENVIRONMENT                                     = \
     $(NULL)
 
 # Source, compiler, and linker options for test programs.
+
+TestCHIPCallback_SOURCES                              = TestCHIPCallbackDriver.cpp
+TestCHIPCallback_LDADD                                = $(COMMON_LDADD)
 
 TestCHIPErrorStr_SOURCES                              = TestCHIPErrorStrDriver.cpp
 TestCHIPErrorStr_LDADD                                = $(COMMON_LDADD)
