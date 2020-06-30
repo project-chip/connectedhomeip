@@ -19,21 +19,21 @@
 /**
  * @file EchoDeviceCallbacks.h
  *
- * Implementations for the Device callbacks for this application
+ * Implementations for the DeviceManager callbacks for this application
  *
  **/
 
 #ifndef ECHO_DEVICE_CALLBACKS_H
 #define ECHO_DEVICE_CALLBACKS_H
 
-#include <core/CHIPDevice.h>
+#include <core/CHIPDeviceManager.h>
 #include <platform/CHIPDeviceLayer.h>
 
-using namespace chip::DeviceLayer;
-class EchoDeviceCallbacks : public DeviceCallbacks
+using namespace chip::DeviceManager;
+class EchoDeviceCallbacks : public CHIPDeviceManagerCallbacks
 {
 public:
-    virtual void DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg);
+    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     virtual void PostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId,
                                              uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value);
 };

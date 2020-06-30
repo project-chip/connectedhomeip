@@ -24,17 +24,19 @@
 
 #include <stdlib.h>
 
-#include <core/CHIPDevice.h>
+#include <core/CHIPDeviceManager.h>
 #include <lib/support/CodeUtils.h>
 #include <support/ErrorStr.h>
 
 namespace chip {
 
-namespace DeviceLayer {
+namespace DeviceManager {
 
-void Device::CommonDeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
+using namespace ::chip::DeviceLayer;
+
+void CHIPDeviceManager::CommonDeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
-    DeviceCallbacks * cb = reinterpret_cast<DeviceCallbacks *>(arg);
+    CHIPDeviceManagerCallbacks * cb = reinterpret_cast<CHIPDeviceManagerCallbacks *>(arg);
     if (cb != nullptr)
     {
         cb->DeviceEventCallback(event, reinterpret_cast<intptr_t>(cb));
@@ -44,7 +46,7 @@ void Device::CommonDeviceEventHandler(const ChipDeviceEvent * event, intptr_t ar
 /**
  *
  */
-CHIP_ERROR Device::Init(DeviceCallbacks * cb)
+CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 {
     CHIP_ERROR err;
     mCB = cb;
@@ -64,7 +66,7 @@ CHIP_ERROR Device::Init(DeviceCallbacks * cb)
 
     // Register a function to receive events from the CHIP device layer.  Note that calls to
     // this function will happen on the CHIP event loop thread, not the app_main thread.
-    PlatformMgr().AddEventHandler(Device::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
+    PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
 
     // Start a task to run the CHIP Device event loop.
     err = PlatformMgr().StartEventLoopTask();
@@ -78,7 +80,7 @@ extern "C" {
 void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
-    DeviceCallbacks * cb = Device::GetInstance().GetDeviceCallbacks();
+    CHIPDeviceManagerCallbacks * cb = CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
     if (cb != nullptr)
     {
         cb->PostAttributeChangeCallback(endpoint, clusterId, attributeId, mask, manufacturerCode, type, size, value);
@@ -86,6 +88,6 @@ void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clust
 }
 } // extern "C"
 
-} // namespace DeviceLayer
+} // namespace DeviceManager
 } // namespace chip
 
