@@ -22,7 +22,8 @@ The requirements to become an open source contributor of the
 
 -   Agree to the [Code of Conduct](./CODE_OF_CONDUCT.md)
 -   Agree to the [License](./LICENSE)
--   Have signed the Zigbee Project CHIP Working Group CLA \*\*\*\* FIX
+-   Have signed the
+    [Zigbee Project CHIP Working Group CLA](https://gist.github.com/clapre/65aa9fc63981da765039e0bb7e8701be)
 
 # Contributing as a Zigbee Alliance Project CHIP Working Group Member
 
