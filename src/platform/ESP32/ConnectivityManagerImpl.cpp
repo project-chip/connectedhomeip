@@ -910,7 +910,8 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
     // TODO Pull this from the configuration manager
     uint16_t discriminator = 0x0F00;
 
-    snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s%03" PRIX16, CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX, discriminator);
+    snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s%03" PRIX16, CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX,
+             discriminator);
     wifiConfig.ap.channel         = CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL;
     wifiConfig.ap.authmode        = WIFI_AUTH_OPEN;
     wifiConfig.ap.max_connection  = CHIP_DEVICE_CONFIG_WIFI_AP_MAX_STATIONS;
