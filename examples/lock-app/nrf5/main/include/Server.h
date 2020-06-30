@@ -25,7 +25,6 @@
 
 #include "DataModelHandler.h"
 
-void SetupTransport(chip::Inet::IPAddressType type, chip::SecureSessionMgr * transport);
 void StartServer(chip::SecureSessionMgr * transport_ipv6);
 
 #endif // SERVER_H

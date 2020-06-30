@@ -63,6 +63,9 @@ private:
     ChipDeviceController * mController;
 };
 
+/**
+ * Handles a connection to a single device over UDP.
+ */
 class DLL_EXPORT ChipDeviceController
 {
     friend class ChipDeviceControllerCallback;
@@ -186,6 +189,7 @@ private:
         kConnectionState_SecureConnected = 2,
     };
 
+    Transport::UDP mUdpTransport;
     System::Layer * mSystemLayer;
     Inet::InetLayer * mInetLayer;
 

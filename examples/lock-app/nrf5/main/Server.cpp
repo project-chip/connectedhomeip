@@ -109,14 +109,17 @@ static ServerCallback gCallbacks;
 } // namespace
 
 // The echo server assumes the platform's networking has been setup already
-void SetupTransport(IPAddressType type, SecureSessionMgr * transport)
+void SetupTransport(IPAddressType type, SecureSessionMgr * sessions, Transport::UDP * transport)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = transport->Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::InetLayer, UdpListenParameters().SetAddressType(type));
+    err = transport->Init(&DeviceLayer::InetLayer, UdpListenParameters().SetAddressType(type));
     SuccessOrExit(err);
 
-    transport->SetDelegate(&gCallbacks);
+    err = sessions->Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::SystemLayer, transport);
+    SuccessOrExit(err);
+
+    sessions->SetDelegate(&gCallbacks);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -129,8 +132,10 @@ exit:
     }
 }
 
+static Transport::UDP transport;
+
 // The echo server assumes the platform's networking has been setup already
-void StartServer(SecureSessionMgr * transport_ipv6)
+void StartServer(SecureSessionMgr * sessions)
 {
-    SetupTransport(kIPAddressType_IPv6, transport_ipv6);
+    SetupTransport(kIPAddressType_IPv6, sessions, &transport);
 }

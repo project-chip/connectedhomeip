@@ -242,7 +242,7 @@ static EchoServerCallback gCallbacks;
 } // namespace
 
 // The echo server assumes the platform's networking has been setup already
-void setupTransport(IPAddressType type, SecureSessionMgr * transport)
+void setupTransport(IPAddressType type, SecureSessionMgr * sessions, Transport::UDP * transport)
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
     struct netif * netif = NULL;
@@ -252,10 +252,13 @@ void setupTransport(IPAddressType type, SecureSessionMgr * transport)
         tcpip_adapter_get_netif(TCPIP_ADAPTER_IF_AP, (void **) &netif);
     }
 
-    err = transport->Init(kLocalNodeId, &DeviceLayer::InetLayer, UdpListenParameters().SetAddressType(type).SetInterfaceId(netif));
+    err = transport->Init(&DeviceLayer::InetLayer, UdpListenParameters().SetAddressType(type).SetInterfaceId(netif));
     SuccessOrExit(err);
 
-    transport->SetDelegate(&gCallbacks);
+    err = sessions->Init(kLocalNodeId, &DeviceLayer::SystemLayer, transport);
+    SuccessOrExit(err);
+
+    sessions->SetDelegate(&gCallbacks);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -268,9 +271,12 @@ exit:
     }
 }
 
+static Transport::UDP transportIPv6;
+static Transport::UDP transportIPv4;
+
 // The echo server assumes the platform's networking has been setup already
-void startServer(SecureSessionMgr * transport_ipv4, SecureSessionMgr * transport_ipv6)
+void startServer(SecureSessionMgr * sessionsIpV4, SecureSessionMgr * sessionsIpV6)
 {
-    setupTransport(kIPAddressType_IPv6, transport_ipv6);
-    setupTransport(kIPAddressType_IPv4, transport_ipv4);
+    setupTransport(kIPAddressType_IPv6, sessionsIpV6, &transportIPv6);
+    setupTransport(kIPAddressType_IPv4, sessionsIpV4, &transportIPv4);
 }

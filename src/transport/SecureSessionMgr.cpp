@@ -39,6 +39,8 @@ using Transport::PeerConnectionState;
 // Maximum length of application data that can be encrypted as one block.
 // The limit is derived from IPv6 MTU (1280 bytes) - expected header overheads.
 // This limit would need additional reviews once we have formalized Secure Transport header.
+//
+// TODO: this should be checked within the transport message sending instead of the session management layer.
 static const size_t kMax_SecureSDU_Length = 1024;
 
 SecureSessionMgr::SecureSessionMgr() : mState(State::kNotReady) {}
@@ -46,26 +48,36 @@ SecureSessionMgr::SecureSessionMgr() : mState(State::kNotReady) {}
 SecureSessionMgr::~SecureSessionMgr()
 {
     CancelExpiryTimer();
+
     if (mCB != nullptr)
     {
         mCB->Release();
     }
+
+    if (mTransport)
+    {
+        mTransport->Release();
+    }
 }
 
-CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, Inet::InetLayer * inet, const Transport::UdpListenParameters & listenParams)
+CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLayer, Transport::Base * transport)
 {
+    if (mTransport)
+    {
+        mTransport->Release();
+        mTransport = nullptr;
+    }
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = mTransport.Init(inet, listenParams);
-    SuccessOrExit(err);
-
-    mTransport.SetMessageReceiveHandler(HandleDataReceived, this);
-    mPeerConnections.SetConnectionExpiredHandler(HandleConnectionExpired, this);
-
     mState       = State::kInitialized;
     mLocalNodeId = localNodeId;
-    mSystemLayer = inet->SystemLayer();
+    mSystemLayer = systemLayer;
+    mTransport   = transport->Retain();
+
+    mTransport->SetMessageReceiveHandler(HandleDataReceived, this);
+    mPeerConnections.SetConnectionExpiredHandler(HandleConnectionExpired, this);
 
     ScheduleExpiryTimer();
 
@@ -85,10 +97,6 @@ CHIP_ERROR SecureSessionMgr::Connect(NodeId peerNodeId, const Transport::PeerAdd
 
     state->SetPeerNodeId(peerNodeId);
 
-    // TODO:
-    //   - on new connection for other transports may not be inline.
-    //   - determine if logic is required to prevent multiple connections to the
-    //     same node or if some connection reuse is required.
     if (mCB != nullptr)
     {
         mCB->OnNewConnection(state, this);
@@ -129,7 +137,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBuffer
             .SetDestinationNodeId(peerNodeId) //
             .SetMessageId(state->GetSendMessageIndex());
 
-        err    = mTransport.SendMessage(header, state->GetPeerAddress(), msgBuf);
+        err    = mTransport->SendMessage(header, state->GetPeerAddress(), msgBuf);
         msgBuf = NULL;
     }
     SuccessOrExit(err);

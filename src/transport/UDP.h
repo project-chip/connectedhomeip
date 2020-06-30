@@ -119,17 +119,23 @@ public:
      */
     CHIP_ERROR Init(Inet::InetLayer * inetLayer) { return Init(inetLayer, UdpListenParameters()); }
 
-    Type GetType() override { return Type::kUdp; }
     CHIP_ERROR SendMessage(const MessageHeader & header, const Transport::PeerAddress & address,
                            System::PacketBuffer * msgBuf) override;
+
+    bool CanSendToPeer(const Transport::PeerAddress & address) override
+    {
+        return (mState == State::kInitialized) && (address.GetTransportType() == Type::kUdp) &&
+            (address.GetIPAddress().Type() == mUDPEndpointType);
+    }
 
 private:
     // UDP message receive handler.
     static void OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * buffer, const IPPacketInfo * pktInfo);
 
-    Inet::UDPEndPoint * mUDPEndPoint = nullptr;          ///< UDP socket used by the transport
-    State mState                     = State::kNotReady; ///< State of the UDP transport
-    uint16_t mSendPort               = 0;                ///< Port where packets are sent by default
+    Inet::UDPEndPoint * mUDPEndPoint     = nullptr;                                     ///< UDP socket used by the transport
+    Inet::IPAddressType mUDPEndpointType = Inet::IPAddressType::kIPAddressType_Unknown; ///< Socket listening type
+    State mState                         = State::kNotReady;                            ///< State of the UDP transport
+    uint16_t mSendPort                   = 0;                                           ///< Port where packets are sent by default
 };
 
 } // namespace Transport

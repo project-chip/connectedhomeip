@@ -64,6 +64,7 @@ CHIP_ERROR UDP::Init(Inet::InetLayer * inetLayer, const UdpListenParameters & pa
 
     mUDPEndPoint->AppState          = reinterpret_cast<void *>(this);
     mUDPEndPoint->OnMessageReceived = OnUdpReceive;
+    mUDPEndpointType                = params.GetAddressType();
 
     mState = State::kInitialized;
 

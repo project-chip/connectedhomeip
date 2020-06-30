@@ -32,9 +32,9 @@
 #include <core/ReferenceCounted.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
+#include <transport/Base.h>
 #include <transport/PeerConnections.h>
 #include <transport/SecureSession.h>
-#include <transport/UDP.h>
 
 namespace chip {
 
@@ -99,16 +99,12 @@ public:
 
     /**
      * @brief
-     *   Initialize a Secure Transport
+     *   Initialize a Secure Session Manager
      *
-     * @param inet    Inet layer to use
-     * @param listenParams  Listen settings for the transport
-     *
-     * @note This is not a final API as it is UDP specific. Class will be updated to support
-     * separate Transports (UDP, BLE, TCP, optional ipv4 for testing etc.). This API is currently
-     * UDP-specific and that will change.
+     * @param systemLayer    System, layer to use
+     * @param transport Underlying Transport to use
      */
-    CHIP_ERROR Init(NodeId localNodeId, Inet::InetLayer * inet, const Transport::UdpListenParameters & listenParams);
+    CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, Transport::Base * transport);
 
     /**
      * Establishes a connection to the given peer node.
@@ -147,9 +143,7 @@ public:
     }
 
 private:
-    // TODO: add support for multiple transports (TCP, BLE to be added)
-    Transport::UDP mTransport;
-
+    Transport::Base * mTransport = nullptr;
     System::Layer * mSystemLayer = nullptr;
     NodeId mLocalNodeId;                                                                //< Id of the current node
     Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; //< Active connections to other peers
