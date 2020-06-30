@@ -66,5 +66,4 @@ The Connected Home over IP repository is structured as follows:
 
 # License
 
-CHIP is released under the [Apache 2.0 license](./LICENSE) Please read more
-details therein
+Project CHIP is released under the [Apache 2.0 license](./LICENSE).
