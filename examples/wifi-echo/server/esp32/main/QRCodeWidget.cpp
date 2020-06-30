@@ -57,6 +57,8 @@
 #define EXAMPLE_VENDOR_TAG_SSID 1
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 2
+// Used to discriminate the device if there are many of them
+#define EXAMPLE_DISCRIMINATOR 0x0F00
 
 #if CONFIG_HAVE_DISPLAY
 
@@ -76,13 +78,7 @@ enum
 // TODO Pull this from the configuration manager
 void GetAPName(char * ssid, size_t ssid_len)
 {
-    uint8_t mac[6];
-    CHIP_ERROR err = esp_wifi_get_mac(ESP_IF_WIFI_STA, mac);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "esp_wifi_get_mac(ESP_IF_WIFI_STA) failed: %s", chip::ErrorStr(err));
-    }
-    snprintf(ssid, ssid_len, "%s%02X%02X", "CHIP_DEMO-", mac[4], mac[5]);
+    snprintf(ssid, ssid_len, "%s%03" PRIX16, "CHIP-", EXAMPLE_DISCRIMINATOR);
 }
 
 void GetGatewayIP(char * ip_buf, size_t ip_len)
