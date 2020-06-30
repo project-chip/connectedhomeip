@@ -276,7 +276,7 @@ void Layer::StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * cb)
     mTimerCallbacks.InsertBy(inner, TimerCompare, nullptr);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    if (mTimerCallbacks.first() == inner)
+    if (mTimerCallbacks.First() == inner)
     {
         // this is the new eariest timer and so the timer needs (re-)starting provided that
         // the system is not currently processing expired timers, in which case it is left to
@@ -581,6 +581,23 @@ Error Layer::SetClock_RealTime(uint64_t newCurTime)
     return Platform::Layer::SetClock_RealTime(newCurTime);
 }
 
+/**
+ * @brief
+ *   Run any timers that are due based on input current time
+ */
+void Layer::DispatchTimerCallbacks(const uint64_t kCurrentEpoch)
+{
+    // dispatch TimerCallbacks
+    Inner ready = mTimerCallbacks.DequeueBy(TimerReady, (void *) &kCurrentEpoch);
+    while (ready.mNext != &ready)
+    {
+        // one-shot
+        chip::Callback::Callback<> * cb = chip::Callback::Callback<>::FromInner(ready.mNext);
+        cb->Cancel();
+        cb->mCall(cb->mContext);
+    }
+}
+
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 /**
@@ -701,15 +718,7 @@ void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteS
         }
     }
 
-    // dispatch TimerCallbacks
-    Inner ready = mTimerCallbacks.DequeueBy(TimerReady, (void *) &kCurrentEpoch);
-    while (ready.mNext != &ready)
-    {
-        // one-shot
-        chip::Callback::Callback<> * cb = chip::Callback::Callback<>::FromInner(ready.mNext);
-        cb->Cancel();
-        cb->mCall(cb->mContext);
-    }
+    DispatchTimerCallbacks(kCurrentEpoch);
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     this->mHandleSelectThread = PTHREAD_NULL;
@@ -961,6 +970,9 @@ Error Layer::HandlePlatformTimer()
     VerifyOrExit(this->State() == kLayerState_Initialized, lReturn = CHIP_SYSTEM_ERROR_UNEXPECTED_STATE);
 
     lReturn = Timer::HandleExpiredTimers(*this);
+
+    DispatchTimerCallbacks(Timer::GetCurrentEpoch());
+
     SuccessOrExit(lReturn);
 
 exit:
