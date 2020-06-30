@@ -49,9 +49,9 @@
 #ifdef HAVE_SYS_SOCKIO_H
 #include <sys/sockio.h>
 #endif /* HAVE_SYS_SOCKIO_H */
+#include <ifaddrs.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
-#include <ifaddrs.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #include <stdio.h>

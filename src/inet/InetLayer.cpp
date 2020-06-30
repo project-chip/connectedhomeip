@@ -63,9 +63,9 @@
 #include <lwip/sys.h>
 #else // !CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <fcntl.h>
+#include <ifaddrs.h>
 #include <net/if.h>
 #include <unistd.h>
-#include <ifaddrs.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace chip {
