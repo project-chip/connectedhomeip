@@ -40,6 +40,8 @@ namespace chip {
 
 using namespace System;
 
+class SecureSessionMgr;
+
 /**
  * @brief
  *   This class provides a skeleton for the callback functions. The functions will be
@@ -60,7 +62,7 @@ public:
      * @param msgBuf received message
      */
     virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                   System::PacketBuffer * msgBuf)
+                                   System::PacketBuffer * msgBuf, SecureSessionMgr * mgr)
     {}
 
     /**
@@ -70,7 +72,7 @@ public:
      * @param error error code
      * @param source network entity that sent the message
      */
-    virtual void OnReceiveError(CHIP_ERROR error, const Inet::IPPacketInfo & source) {}
+    virtual void OnReceiveError(CHIP_ERROR error, const Inet::IPPacketInfo & source, SecureSessionMgr * mgr) {}
 
     /**
      * @brief
@@ -78,7 +80,7 @@ public:
      *
      * @param state connection state
      */
-    virtual void OnNewConnection(Transport::PeerConnectionState * state) {}
+    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr) {}
 
     virtual ~SecureSessionMgrCallback() {}
 };

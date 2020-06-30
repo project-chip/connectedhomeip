@@ -91,7 +91,7 @@ CHIP_ERROR SecureSessionMgr::Connect(NodeId peerNodeId, const Transport::PeerAdd
     //     same node or if some connection reuse is required.
     if (mCB != nullptr)
     {
-        mCB->OnNewConnection(state);
+        mCB->OnNewConnection(state, this);
     }
 
 exit:
@@ -161,7 +161,7 @@ CHIP_ERROR SecureSessionMgr::AllocateNewConnection(const MessageHeader & header,
 
     if (mCB != nullptr)
     {
-        mCB->OnNewConnection(*state);
+        mCB->OnNewConnection(*state, this);
     }
 
 exit:
@@ -229,7 +229,7 @@ void SecureSessionMgr::HandleUdpDataReceived(const MessageHeader & header, const
 
         if (connection->mCB != nullptr)
         {
-            connection->mCB->OnMessageReceived(header, state, msg);
+            connection->mCB->OnMessageReceived(header, state, msg, connection);
             msg = nullptr;
         }
     }
@@ -247,7 +247,7 @@ exit:
 
     if (err != CHIP_NO_ERROR && connection->mCB != nullptr)
     {
-        connection->mCB->OnReceiveError(err, pktInfo);
+        connection->mCB->OnReceiveError(err, pktInfo, connection);
     }
 }
 

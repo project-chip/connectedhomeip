@@ -53,9 +53,9 @@ class ChipDeviceControllerCallback : public SecureSessionMgrCallback
 {
 public:
     virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                   System::PacketBuffer * msgBuf);
+                                   System::PacketBuffer * msgBuf, SecureSessionMgr * mgr);
 
-    virtual void OnNewConnection(Transport::PeerConnectionState * state);
+    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr);
 
     void SetController(ChipDeviceController * controller) { mController = controller; }
 

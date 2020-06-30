@@ -333,7 +333,7 @@ void ChipDeviceController::ClearRequestState()
     }
 }
 
-void ChipDeviceControllerCallback::OnNewConnection(Transport::PeerConnectionState * state)
+void ChipDeviceControllerCallback::OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr)
 {
     if (mController->mOnNewConnection)
     {
@@ -342,7 +342,7 @@ void ChipDeviceControllerCallback::OnNewConnection(Transport::PeerConnectionStat
 }
 
 void ChipDeviceControllerCallback::OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                                     System::PacketBuffer * msgBuf)
+                                                     System::PacketBuffer * msgBuf, SecureSessionMgr * mgr)
 {
     if (header.GetSourceNodeId().HasValue())
     {

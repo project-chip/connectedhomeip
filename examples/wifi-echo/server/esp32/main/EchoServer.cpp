@@ -134,13 +134,13 @@ class EchoServerCallback : public SecureSessionMgrCallback
 {
 public:
     virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                   System::PacketBuffer * buffer)
+                                   System::PacketBuffer * buffer, SecureSessionMgr* mgr)
     {
         CHIP_ERROR err;
         const size_t data_len = buffer->DataLength();
 
         // as soon as a client connects, assume it is connected
-        VerifyOrExit(mTransport != NULL && buffer != NULL, ESP_LOGE(TAG, "Received data but couldn't process it..."));
+        VerifyOrExit(mgr != NULL && buffer != NULL, ESP_LOGE(TAG, "Received data but couldn't process it..."));
         VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ESP_LOGE(TAG, "Unknown source for received message"));
 
         {
@@ -170,7 +170,7 @@ public:
             ESP_LOGI(TAG, "Client sent: %s", logmsg);
 
             // Attempt to echo back
-            err    = mTransport->SendMessage(header.GetSourceNodeId().Value(), buffer);
+            err    = mgr->SendMessage(header.GetSourceNodeId().Value(), buffer);
             buffer = NULL;
             if (err != CHIP_NO_ERROR)
             {
@@ -191,13 +191,13 @@ public:
         }
     }
 
-    virtual void OnReceiveError(CHIP_ERROR error, const IPPacketInfo & source)
+    virtual void OnReceiveError(CHIP_ERROR error, const IPPacketInfo & source, SecureSessionMgr* mgr)
     {
         ESP_LOGE(TAG, "ERROR: %s\n Got UDP error", ErrorStr(error));
         statusLED.BlinkOnError();
     }
 
-    virtual void OnNewConnection(Transport::PeerConnectionState * state)
+    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr* mgr)
     {
         CHIP_ERROR err;
 
@@ -210,8 +210,6 @@ public:
     exit:
         return;
     }
-
-    SecureSessionMgr * mTransport = nullptr;
 
 private:
     /**
@@ -239,12 +237,12 @@ private:
     }
 };
 
-static EchoServerCallback gCallbacks_v4, gCallbacks_v6;
+static EchoServerCallback gCallbacks;
 
 } // namespace
 
 // The echo server assumes the platform's networking has been setup already
-void setupTransport(IPAddressType type, SecureSessionMgr * transport, EchoServerCallback * cb)
+void setupTransport(IPAddressType type, SecureSessionMgr * transport)
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
     struct netif * netif = NULL;
@@ -257,9 +255,7 @@ void setupTransport(IPAddressType type, SecureSessionMgr * transport, EchoServer
     err = transport->Init(kLocalNodeId, &DeviceLayer::InetLayer, UdpListenParameters().SetAddressType(type).SetInterfaceId(netif));
     SuccessOrExit(err);
 
-    cb->mTransport = transport;
-
-    transport->SetDelegate(cb);
+    transport->SetDelegate(&gCallbacks);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -275,6 +271,6 @@ exit:
 // The echo server assumes the platform's networking has been setup already
 void startServer(SecureSessionMgr * transport_ipv4, SecureSessionMgr * transport_ipv6)
 {
-    setupTransport(kIPAddressType_IPv6, transport_ipv6, &gCallbacks_v6);
-    setupTransport(kIPAddressType_IPv4, transport_ipv4, &gCallbacks_v4);
+    setupTransport(kIPAddressType_IPv6, transport_ipv6);
+    setupTransport(kIPAddressType_IPv4, transport_ipv4);
 }
