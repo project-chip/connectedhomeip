@@ -24,7 +24,6 @@
 
 #include <stdlib.h>
 
-#if 1
 #include <core/CHIPDevice.h>
 #include <lib/support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -89,4 +88,4 @@ void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clust
 
 } // namespace DeviceLayer
 } // namespace chip
-#endif /* #if 0 */
+
