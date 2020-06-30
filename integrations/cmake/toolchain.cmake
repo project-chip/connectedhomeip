@@ -40,6 +40,7 @@ endif()
 #
 # Enable modular feature extensions to the cmake build system
 #
+include("${PROJECT_SOURCE_DIR}/integrations/cmake/features/check.cmake")
 include("${PROJECT_SOURCE_DIR}/integrations/cmake/features/coverage.cmake")
 include("${PROJECT_SOURCE_DIR}/integrations/cmake/features/doxygen.cmake")
 include("${PROJECT_SOURCE_DIR}/integrations/cmake/features/pretty.cmake")

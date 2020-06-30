@@ -65,23 +65,28 @@ target_link_directories(TransportLayerTests PUBLIC
 add_executable(TestTransportMessageHeader TestMessageHeaderDriver.cpp)
 target_link_libraries(TestTransportMessageHeader PRIVATE TransportLayerTests)
 add_test(NAME TestTransportMessageHeader COMMAND TestTransportMessageHeader)
+add_dependencies(check TestTransportMessageHeader)
 
 add_executable(TestTransportPeerConnections TestPeerConnectionsDriver.cpp)
 target_link_libraries(TestTransportPeerConnections PRIVATE TransportLayerTests)
 add_test(NAME TestTransportPeerConnections COMMAND TestTransportPeerConnections)
+add_dependencies(check TestTransportPeerConnections)
 
 if(CHIP_TARGET_STYLE_UNIX)
 
 add_executable(TestTransportSecureSession TestSecureSessionDriver.cpp)
 target_link_libraries(TestTransportSecureSession PRIVATE TransportLayerTests)
 add_test(NAME TestTransportSecureSession COMMAND TestTransportSecureSession)
+add_dependencies(check TestTransportSecureSession)
 
 add_executable(TestTransportSecureSessionMgr TestSecureSessionMgrDriver.cpp)
 target_link_libraries(TestTransportSecureSessionMgr PRIVATE TransportLayerTests)
 add_test(NAME TestTransportSecureSessionMgr COMMAND TestTransportSecureSessionMgr)
+add_dependencies(check TestTransportSecureSessionMgr)
 
 add_executable(TestTransportUDP TestUDPDriver.cpp)
 target_link_libraries(TestTransportUDP PRIVATE TransportLayerTests)
 add_test(NAME TestTransportUDP COMMAND TestTransportUDP)
+add_dependencies(check TestTransportUDP)
 
 endif(CHIP_TARGET_STYLE_UNIX)

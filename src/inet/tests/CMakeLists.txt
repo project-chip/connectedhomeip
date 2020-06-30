@@ -60,17 +60,20 @@ target_link_directories(InetLayerTests PUBLIC
 add_executable(TestInetAddress TestInetAddressDriver.cpp)
 target_link_libraries(TestInetAddress PRIVATE InetLayerTests)
 add_test(NAME TestInetAddress COMMAND TestInetAddress)
+add_dependencies(check TestInetAddress)
 
 #### TestInetEndPoint
 add_executable(TestInetEndPoint TestInetEndPoint.cpp)
 target_link_libraries(TestInetEndPoint PRIVATE InetLayerTests)
 # Disable based on #500 -- ipv6 support not working in CircleCI Docker
 # add_test(NAME TestInetEndPoint COMMAND TestInetEndPoint)
+# add_dependencies(check TestInetEndPoint)
 
 #### TestInetErrorStr
 add_executable(TestInetErrorStr TestInetErrorStrDriver.cpp)
 target_link_libraries(TestInetErrorStr PRIVATE InetLayerTests)
 add_test(NAME TestInetErrorStr COMMAND TestInetErrorStr)
+add_dependencies(check TestInetErrorStr)
 
 if(NOT CONFIG_DEVICE_LAYER)
 
@@ -79,5 +82,6 @@ add_executable(TestInetLayerDNS TestInetLayerDNS.cpp)
 target_link_libraries(TestInetLayerDNS PRIVATE InetLayerTests)
 # Disable based on #500 -- ipv6 support not working in CircleCI Docker
 # add_test(NAME TestInetLayerDNS COMMAND TestInetLayerDNS)
+# add_dependencies(check TestInetLayerDNS)
 
 endif(NOT CONFIG_DEVICE_LAYER)

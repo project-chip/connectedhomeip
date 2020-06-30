@@ -10,14 +10,12 @@ steps:
         name: Cmake/ninja build of standalone host build
         command: |
             cmake -B build/standalone -GNinja
-            ninja -C build/standalone
-            ninja -C build/standalone test
+            ninja -C build/standalone check
     - run:
         name: Cmake/ninja build of Linux embedded (x86)
         command: |
             cmake -B build/linux -GNinja -DCHIP_PLATFORM=linux
-            ninja -C build/linux
-            ninja -C build/linux test
+            ninja -C build/linux check
     - run:
         name: Cmake/ninja build of Nordic nRF52840
         command: |

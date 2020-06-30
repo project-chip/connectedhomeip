@@ -46,6 +46,7 @@ target_include_directories(nlassert-static-test-cxx PRIVATE ${COMMON_INCLUDES})
 target_link_libraries(nlassert-static-test-cxx PRIVATE ${COMMON_LIBS})
 target_link_directories(nlassert-static-test-cxx PRIVATE ${COMMON_LDPATH})
 add_test(NAME nlassert-static-test-cxx COMMAND nlassert-static-test-cxx)
+add_dependencies(check nlassert-static-test-cxx)
 
 #### nlassert-static-test
 add_executable(nlassert-static-test repo/tests/nlassert-static-test.c)
@@ -53,6 +54,7 @@ target_include_directories(nlassert-static-test PRIVATE ${COMMON_INCLUDES})
 target_link_libraries(nlassert-static-test PRIVATE ${COMMON_LIBS})
 target_link_directories(nlassert-static-test PRIVATE ${COMMON_LDPATH})
 add_test(NAME nlassert-static-test COMMAND nlassert-static-test)
+add_dependencies(check nlassert-static-test)
 
 #### nlassert-test
 add_executable(nlassert-test repo/tests/nlassert-test.c)
@@ -60,6 +62,7 @@ target_include_directories(nlassert-test PRIVATE ${COMMON_INCLUDES})
 target_link_libraries(nlassert-test PRIVATE ${COMMON_LIBS})
 target_link_directories(nlassert-test PRIVATE ${COMMON_LDPATH})
 add_test(NAME nlassert-test COMMAND nlassert-test)
+add_dependencies(check nlassert-test)
 
 else (BUILD_EXTERNALS_WITH_CMAKE)
 

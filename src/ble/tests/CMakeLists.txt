@@ -51,3 +51,4 @@ add_executable(TestBleErrorStr
 
 target_link_libraries(TestBleErrorStr PRIVATE BleLayerTests)
 add_test(NAME TestBleErrorStr COMMAND TestBleErrorStr)
+add_dependencies(check TestBleErrorStr)

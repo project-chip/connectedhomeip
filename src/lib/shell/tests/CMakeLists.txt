@@ -51,7 +51,9 @@ target_link_directories(ChipShellTests PUBLIC
 add_executable(TestShellStreamerStdio TestStreamerStdioDriver.cpp)
 target_link_libraries(TestShellStreamerStdio PRIVATE ChipShellTests)
 add_test(NAME TestShellStreamerStdio COMMAND TestShellStreamerStdio)
+add_dependencies(check TestShellStreamerStdio)
 
 add_executable(TestShell TestShellDriver.cpp)
 target_link_libraries(TestShell PRIVATE ChipShellTests)
 add_test(NAME TestShell COMMAND TestShell)
+add_dependencies(check TestShell)

@@ -49,11 +49,14 @@ target_link_libraries(DeviceLayerTests PUBLIC
 add_executable(TestPlatformTime TestPlatformTimeDriver.cpp)
 target_link_libraries(TestPlatformTime PRIVATE DeviceLayerTests)
 add_test(NAME TestPlatformTime COMMAND TestPlatformTime)
+add_dependencies(check TestPlatformTime)
 
 add_executable(TestPlatformMgr TestPlatformMgrDriver.cpp)
 target_link_libraries(TestPlatformMgr PRIVATE DeviceLayerTests)
 add_test(NAME TestPlatformMgr COMMAND TestPlatformMgr)
+add_dependencies(check TestPlatformMgr)
 
 add_executable(TestPlatformConfigurationMgr TestConfigurationMgrDriver.cpp)
 target_link_libraries(TestPlatformConfigurationMgr PRIVATE DeviceLayerTests)
 add_test(NAME TestPlatformConfigurationMgr COMMAND TestPlatformConfigurationMgr)
+add_dependencies(check TestPlatformConfigurationMgr)

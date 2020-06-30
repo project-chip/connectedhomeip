@@ -57,8 +57,8 @@ add_executable(TestFaultInjection
 target_include_directories(TestFaultInjection PRIVATE ${TEST_COMMON_INCLUDES})
 target_link_libraries(TestFaultInjection PRIVATE ${TEST_COMMON_LIBS})
 target_link_directories(TestFaultInjection PRIVATE ${COMMON_LDPATH})
-
 add_test(NAME TestFaultInjection COMMAND TestFaultInjection)
+add_dependencies(check TestFaultInjection)
 
 else (BUILD_EXTERNALS_WITH_CMAKE)
 

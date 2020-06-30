@@ -54,13 +54,16 @@ target_link_directories(SetupPayloadTests PUBLIC
 add_executable(TestManualCode TestManualCodeDriver.cpp)
 target_link_libraries(TestManualCode PRIVATE SetupPayloadTests)
 add_test(NAME TestManualCode COMMAND TestManualCode)
+add_dependencies(check TestManualCode)
 
 #### TestQRCode
 add_executable(TestQRCode TestQRCodeDriver.cpp)
 target_link_libraries(TestQRCode PRIVATE SetupPayloadTests)
 add_test(NAME TestQRCode COMMAND TestQRCode)
+add_dependencies(check TestQRCode)
 
 #### TestQRCodeTLV
 add_executable(TestQRCodeTLV TestQRCodeTLVDriver.cpp)
 target_link_libraries(TestQRCodeTLV PRIVATE SetupPayloadTests)
 add_test(NAME TestQRCodeTLV COMMAND TestQRCodeTLV)
+add_dependencies(check TestQRCodeTLV)

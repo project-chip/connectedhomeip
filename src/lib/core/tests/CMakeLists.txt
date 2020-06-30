@@ -51,8 +51,10 @@ target_link_directories(ChipCoreTests PUBLIC
 add_executable(TestCHIPErrorStr TestCHIPErrorStrDriver.cpp)
 target_link_libraries(TestCHIPErrorStr PRIVATE ChipCoreTests)
 add_test(NAME TestCHIPErrorStr COMMAND TestCHIPErrorStr)
+add_dependencies(check TestCHIPErrorStr)
 
 #### TestCHIPTLV
 add_executable(TestCHIPTLV TestCHIPTLVDriver.cpp)
 target_link_libraries(TestCHIPTLV PRIVATE ChipCoreTests)
 add_test(NAME TestCHIPTLV COMMAND TestCHIPTLV)
+add_dependencies(check TestCHIPTLV)

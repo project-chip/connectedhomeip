@@ -29,7 +29,7 @@ To setup the cmake/ninja environment, run the following:
   cd connectedhomeip
 
   # Pull in third_party repos
-  make -f Makefile-bootstrap repos
+  git submodule update --init
 
   # Configure tree
   mkdir -p build/default
@@ -71,8 +71,13 @@ CMake can generate build files for multiple build systems:
 
 #### Run tests and build them if needed
 
-| Build System | Command | | cmake / ninja | `ninja test` or `ninja check` | |
-cmake / make | `make test` or `make check` |
+| Build System | Command | | cmake / ninja | `ninja check` | |
+cmake / make | `make check` |
+
+#### Run pre-built tests
+
+| Build System | Command | | cmake / ninja | `ninja test` | |
+cmake / make | `make test` |
 
 #### Build documentation
 

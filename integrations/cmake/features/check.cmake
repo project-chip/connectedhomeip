@@ -17,31 +17,14 @@
 
 #
 #    Description:
-#      This file is the top-level CMake template for the CHIP SDK.
+#      This file is the CMake template for defining the `check` target for building and running tests.
 #
 
 #
-# Declare cmake version requirements
+# Enable cmake test framework: 
+#   Adds 'check' target to build and run tests.
+#   Enables default 'test' target that runs pre-built tests.
 #
-cmake_minimum_required(VERSION 3.17.2)
-
-#
-# Specify the top-level project name and the languages used.
-#
-project(Chip 
-    LANGUAGES C CXX ASM
-)
-
-#
-# Specifies the exact version of the C and C++ standard assumed by the codebase.
-#
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-include("${PROJECT_SOURCE_DIR}/integrations/cmake/options.cmake")
-include("${PROJECT_SOURCE_DIR}/integrations/cmake/toolchain.cmake")
-
-add_subdirectory(examples)
-add_subdirectory(src)
-add_subdirectory(third_party)
+include(CTest)
+enable_testing()
+add_custom_target(check ${CMAKE_CTEST_COMMAND} -V)

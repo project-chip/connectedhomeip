@@ -50,5 +50,6 @@ if(NOT CHIP_TARGET_STYLE_EMBEDDED)
 add_executable(TestCryptoPAL CHIPCryptoPALTestDriver.cpp)
 target_link_libraries(TestCryptoPAL PRIVATE CryptoLayerTests)
 add_test(NAME TestCryptoPAL COMMAND TestCryptoPAL)
+add_dependencies(check TestCryptoPAL)
 
 endif()

@@ -203,14 +203,12 @@ jobs:
     - run:
         command: |
           cmake -B build/standalone -GNinja
-          ninja -C build/standalone
-          ninja -C build/standalone test
+          ninja -C build/standalone check
         name: Cmake/ninja build of standalone host build
     - run:
         command: |
           cmake -B build/linux -GNinja -DCHIP_PLATFORM=linux
-          ninja -C build/linux
-          ninja -C build/linux test
+          ninja -C build/linux check
         name: Cmake/ninja build of Linux embedded (x86)
     - run:
         command: |

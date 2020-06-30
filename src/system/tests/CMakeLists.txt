@@ -59,18 +59,22 @@ target_link_directories(SystemLayerTests PUBLIC
 add_executable(TestSystemErrorStr TestSystemErrorStrDriver.cpp)
 target_link_libraries(TestSystemErrorStr PRIVATE SystemLayerTests)
 add_test(NAME TestSystemErrorStr COMMAND TestSystemErrorStr)
+add_dependencies(check TestSystemErrorStr)
 
 #### TestSystemObject
 add_executable(TestSystemObject TestSystemObjectDriver.cpp)
 target_link_libraries(TestSystemObject PRIVATE SystemLayerTests)
 add_test(NAME TestSystemObject COMMAND TestSystemObject)
+add_dependencies(check TestSystemObject)
 
 #### TestSystemPacketBuffer
 add_executable(TestSystemPacketBuffer TestSystemPacketBufferDriver.cpp)
 target_link_libraries(TestSystemPacketBuffer PRIVATE SystemLayerTests)
 add_test(NAME TestSystemPacketBuffer COMMAND TestSystemPacketBuffer)
+add_dependencies(check TestSystemPacketBuffer)
 
 #### TestSystemTimer
 add_executable(TestSystemTimer TestSystemTimerDriver.cpp)
 target_link_libraries(TestSystemTimer PRIVATE SystemLayerTests)
 add_test(NAME TestSystemTimer COMMAND TestSystemTimer)
+add_dependencies(check TestSystemTimer)

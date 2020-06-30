@@ -48,13 +48,16 @@ target_link_directories(SupportLayerTests PUBLIC
 add_executable(TestSupportErrorStr TestErrorStrDriver.cpp)
 target_link_libraries(TestSupportErrorStr PRIVATE SupportLayerTests)
 add_test(NAME TestSupportErrorStr COMMAND TestSupportErrorStr)
+add_dependencies(check TestSupportErrorStr)
 
 #### TestSupportTimeUtils
 add_executable(TestSupportTimeUtils TestTimeUtilsDriver.cpp)
 target_link_libraries(TestSupportTimeUtils PRIVATE SupportLayerTests)
 add_test(NAME TestSupportTimeUtils COMMAND TestSupportTimeUtils)
+add_dependencies(check TestSupportTimeUtils)
 
 #### TestSupportCHIPArgParser
 add_executable(TestSupportCHIPArgParser TestCHIPArgParserDriver.cpp)
 target_link_libraries(TestSupportCHIPArgParser PRIVATE SupportLayerTests)
 add_test(NAME TestSupportCHIPArgParser COMMAND TestSupportCHIPArgParser)
+add_dependencies(check TestSupportCHIPArgParser)
