@@ -87,7 +87,6 @@ static void canceler(Cancelable * ca)
 
 static void ResumerTest(nlTestSuite * inSuite, void * inContext)
 {
-
     int n = 1;
     Callback<> cb((void (*)(void *)) increment, &n);
     Callback<> cancelcb((void (*)(void *)) canceler, cb.Cancel());
@@ -101,6 +100,13 @@ static void ResumerTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, n == 3);
 
     n = 1;
+    // test cb->Cancel() cancels
+    resumer.Resume(&cb);
+    cb.Cancel();
+    resumer.Dispatch();
+    NL_TEST_ASSERT(inSuite, n == 1);
+
+    n = 1;
     // Cancel cb before Dispatch() gets around to us (tests FIFO *and* cancel() from readylist)
     resumer.Resume(&cancelcb);
     resumer.Resume(&cb);
@@ -108,11 +114,11 @@ static void ResumerTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, n == 1);
 
     n = 1;
-    // Resume() twice runs only once per Dispatch
+    // 2nd Resume() cancels first registration
     resumer.Resume(&cb);
-    resumer.Resume(&cb);
-    resumer.Dispatch();
-    resumer.Dispatch(); // runs an empty list
+    resumer.Resume(&cb); // cancels previous registration
+    resumer.Dispatch();  // runs the list
+    resumer.Dispatch();  // runs an empty list
     NL_TEST_ASSERT(inSuite, n == 2);
 
     n = 1;
