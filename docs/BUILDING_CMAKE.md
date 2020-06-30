@@ -100,8 +100,6 @@ all tests.
 
 ```
   cmake -GNinja -DBUILD_COVERAGE=1 ../..
-  ninja
-  ninja test
   ninja coverage
 ```
 
