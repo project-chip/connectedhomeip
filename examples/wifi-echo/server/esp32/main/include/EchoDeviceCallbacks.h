@@ -26,7 +26,7 @@
 #ifndef ECHO_DEVICE_CALLBACKS_H
 #define ECHO_DEVICE_CALLBACKS_H
 
-#include <core/CHIPDeviceManager.h>
+#include "CHIPDeviceManager.h"
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip::DeviceManager;

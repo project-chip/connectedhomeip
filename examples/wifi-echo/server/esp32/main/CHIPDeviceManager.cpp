@@ -24,7 +24,7 @@
 
 #include <stdlib.h>
 
-#include <core/CHIPDeviceManager.h>
+#include "CHIPDeviceManager.h"
 #include <lib/support/CodeUtils.h>
 #include <support/ErrorStr.h>
 

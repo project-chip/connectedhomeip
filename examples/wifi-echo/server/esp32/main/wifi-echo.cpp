@@ -16,6 +16,7 @@
  */
 
 #include "Button.h"
+#include "CHIPDeviceManager.h"
 #include "DataModelHandler.h"
 #include "Display.h"
 #include "EchoDeviceCallbacks.h"
@@ -34,7 +35,6 @@
 #include "tcpip_adapter.h"
 #include <stdio.h>
 
-#include <core/CHIPDeviceManager.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/ErrorStr.h>
