@@ -269,14 +269,14 @@ static int TimerCompare(void * p, const Cancelable * a, const Cancelable * b)
  */
 void Layer::StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * cb)
 {
-    Cancelable * inner = cb->Cancel();
+    Cancelable * ca = cb->Cancel();
 
-    inner->mInfoScalar = Timer::GetCurrentEpoch() + aMilliseconds;
+    ca->mInfoScalar = Timer::GetCurrentEpoch() + aMilliseconds;
 
-    mTimerCallbacks.InsertBy(inner, TimerCompare, nullptr);
+    mTimerCallbacks.InsertBy(ca, TimerCompare, nullptr);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    if (mTimerCallbacks.First() == inner)
+    if (mTimerCallbacks.First() == ca)
     {
         // this is the new earliest timer and so the timer needs (re-)starting provided that
         // the system is not currently processing expired timers, in which case it is left to
@@ -643,10 +643,10 @@ void Layer::PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet,
     // check for an earlier callback timer, too
     if (lAwakenEpoch != kCurrentEpoch)
     {
-        Cancelable * inner = mTimerCallbacks.First();
-        if (inner != nullptr && !Timer::IsEarlierEpoch(kCurrentEpoch, inner->mInfoScalar))
+        Cancelable * ca = mTimerCallbacks.First();
+        if (ca != nullptr && !Timer::IsEarlierEpoch(kCurrentEpoch, ca->mInfoScalar))
         {
-            lAwakenEpoch = inner->mInfoScalar;
+            lAwakenEpoch = ca->mInfoScalar;
         }
     }
 
