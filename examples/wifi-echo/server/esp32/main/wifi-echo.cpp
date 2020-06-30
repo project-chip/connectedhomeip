@@ -34,7 +34,7 @@
 #include "tcpip_adapter.h"
 #include <stdio.h>
 
-#include <core/CHIPDevice.h>
+#include <core/CHIPDeviceManager.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/ErrorStr.h>
@@ -120,9 +120,9 @@ extern "C" void app_main()
         return;
     }
 
-    Device & device = Device::GetInstance();
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
-    err = device.Init(&EchoCallbacks);
+    err = deviceMgr.Init(&EchoCallbacks);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(err));

@@ -23,8 +23,8 @@
  *      the CHIP Stack. This is a singleton object.
  */
 
-#ifndef CHIP_DEVICE_H_
-#define CHIP_DEVICE_H_
+#ifndef CHIP_DEVICEMANAGER_H_
+#define CHIP_DEVICEMANAGER_H_
 
 #include <core/CHIPCore.h>
 #include <core/CHIPError.h>
@@ -42,32 +42,32 @@ extern "C" {
 }
 
 namespace chip {
-namespace DeviceLayer {
+namespace DeviceManager {
 
-class DLL_EXPORT DeviceCallbacks
+class DLL_EXPORT CHIPDeviceManagerCallbacks
 {
 public:
-    virtual void DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg);
+    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     virtual void PostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId,
                                              uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
     {}
-    virtual ~DeviceCallbacks() {}
+    virtual ~CHIPDeviceManagerCallbacks() {}
 };
 
-class DLL_EXPORT Device
+class DLL_EXPORT CHIPDeviceManager
 {
 public:
-    Device(const Device &)  = delete;
-    Device(const Device &&) = delete;
-    Device & operator=(const Device &) = delete;
+    CHIPDeviceManager(const CHIPDeviceManager &)  = delete;
+    CHIPDeviceManager(const CHIPDeviceManager &&) = delete;
+    CHIPDeviceManager & operator=(const CHIPDeviceManager &) = delete;
 
-    static Device & GetInstance()
+    static CHIPDeviceManager & GetInstance()
     {
-        static Device instance;
+        static CHIPDeviceManager instance;
         return instance;
     }
 
-    Device & SetVendorID(uint16_t VID)
+    CHIPDeviceManager & SetVendorID(uint16_t VID)
     {
         mVendorID = VID;
         return *this;
@@ -75,7 +75,7 @@ public:
 
     uint16_t GetVendorID() { return mVendorID; }
 
-    Device & SetProductID(uint16_t PID)
+    CHIPDeviceManager & SetProductID(uint16_t PID)
     {
         mProductID = PID;
         return *this;
@@ -83,19 +83,19 @@ public:
 
     uint16_t SetProductID() { return mProductID; }
 
-    DeviceCallbacks * GetDeviceCallbacks() { return mCB; }
+    CHIPDeviceManagerCallbacks * GetCHIPDeviceManagerCallbacks() { return mCB; }
 
-    CHIP_ERROR Init(DeviceCallbacks * cb);
-    static void CommonDeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg);
+    CHIP_ERROR Init(CHIPDeviceManagerCallbacks * cb);
+    static void CommonDeviceEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
 private:
     uint16_t mVendorID;
     uint16_t mProductID;
-    DeviceCallbacks * mCB = nullptr;
-    Device() {}
+    CHIPDeviceManagerCallbacks * mCB = nullptr;
+    CHIPDeviceManager() {}
 };
 
-} // namespace DeviceLayer
+} // namespace DeviceManager
 } // namespace chip
 
-#endif /* CHIP_DEVICE_H_ */
+#endif /* CHIP_DEVICEMANAGER_H_ */
