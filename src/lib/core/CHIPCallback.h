@@ -53,9 +53,9 @@ public:
     uint64_t mInfoScalar;
 
     /**
-     * when non-null, indicates the Callback is registered with
-     *        a subsystem and that Cancelable members belong to
-     *        that subsystem
+     * @brief when non-null, indicates the Callback is registered with
+     *   a subsystem and that Cancelable members belong to
+     *   that subsystem
      */
     void (*mCancel)(Cancelable *);
 
@@ -65,6 +65,10 @@ public:
         mCancel       = nullptr;
     };
 
+    /**
+     * @brief run whatever function the callee/registrar has specified in order
+     *  to cleanup resources and surrender ownership of the Cancelable's fields
+     */
     Cancelable * Cancel()
     {
         if (mCancel != nullptr)
@@ -283,8 +287,7 @@ private:
         where->mPrev        = ca;
         ca->mNext           = where;
     }
-
-}; // namespace Callback
+};
 
 } // namespace Callback
 } // namespace chip
