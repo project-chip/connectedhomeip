@@ -8,7 +8,13 @@ public class SetupPayloadParser {
         return fetchPayloadFromQrCode(qrCodeString);
     }
 
+    /** Returns {@link SetupPayload} parsed from the manual entry code string. */
+    public SetupPayload parseManualEntryCode(String entryCodeString) {
+        return fetchPayloadFromManualEntryCode(entryCodeString);
+    }
+
     private native SetupPayload fetchPayloadFromQrCode(String qrCodeString);
+    private native SetupPayload fetchPayloadFromManualEntryCode(String entryCodeString);
 
     static {
         System.loadLibrary("SetupPayloadParser");
