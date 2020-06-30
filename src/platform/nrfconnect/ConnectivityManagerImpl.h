@@ -86,20 +86,17 @@ private:
 
 inline bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
 {
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
     return false;
 }
 
 inline bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
 {
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
     return false;
 }
 
 inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
 {
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return false;
+    return _HaveServiceConnectivityViaThread();
 }
 
 /**

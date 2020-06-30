@@ -108,7 +108,7 @@ set(CHIP_CXXFLAGS ${CHIP_CXXFLAGS} ${CHIP_COMMON_FLAGS})
 convert_list_of_flags_to_string_of_flags(CHIP_CFLAGS CHIP_CFLAGS)
 convert_list_of_flags_to_string_of_flags(CHIP_CXXFLAGS CHIP_CXXFLAGS)
 
-zephyr_link_libraries(${CHIP_OUTPUT_LIBRARIES})
+target_link_libraries(app PRIVATE -Wl,--start-group ${CHIP_OUTPUT_LIBRARIES} -Wl,--end-group)
 
 # Prepare command line arguments passed to the CHIP's ./configure script
 set(CHIP_CONFIGURE_ARGS
@@ -161,3 +161,5 @@ ExternalProject_Add(
     BUILD_BYPRODUCTS    ${CHIP_OUTPUT_LIBRARIES}
     BUILD_ALWAYS        TRUE
 )
+
+add_dependencies(app chip_project)

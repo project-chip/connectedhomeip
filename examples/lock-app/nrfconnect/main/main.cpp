@@ -21,9 +21,47 @@
 
 #include <logging/log.h>
 
+#include <BuildConfig.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <support/logging/CHIPLogging.h>
+
 LOG_MODULE_REGISTER(app);
+
+using namespace ::chip;
+using namespace ::chip::Inet;
+using namespace ::chip::DeviceLayer;
 
 int main()
 {
-    return GetAppTask().StartApp();
+    int ret = 0;
+
+    LOG_INF("Init CHIP stack");
+    ret = PlatformMgr().InitChipStack();
+    if (ret != CHIP_NO_ERROR)
+    {
+        LOG_ERR("PlatformMgr().InitChipStack() failed");
+        goto exit;
+    }
+
+    LOG_INF("Starting CHIP task");
+    ret = PlatformMgr().StartEventLoopTask();
+    if (ret != CHIP_NO_ERROR)
+    {
+        LOG_ERR("PlatformMgr().StartEventLoopTask() failed");
+        goto exit;
+    }
+
+    LOG_INF("Init Thread stack");
+    ret = ThreadStackMgr().InitThreadStack();
+    if (ret != CHIP_NO_ERROR)
+    {
+        LOG_ERR("ThreadStackMgr().InitThreadStack() failed");
+        goto exit;
+    }
+
+    ret = GetAppTask().StartApp();
+
+exit:
+    LOG_ERR("Exited with code %d", ret);
+    return ret;
 }
