@@ -281,9 +281,9 @@ void Layer::StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * cb)
         // this is the new earliest timer and so the timer needs (re-)starting provided that
         // the system is not currently processing expired timers, in which case it is left to
         // HandleExpiredTimers() to re-start the timer.
-        if (!lLayer.mTimerComplete)
+        if (!mTimerComplete)
         {
-            lLayer.StartPlatformTimer(aDelayMilliseconds);
+            StartPlatformTimer(aMilliseconds);
         }
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
