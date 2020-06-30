@@ -29,6 +29,7 @@
 extern "C" {
 #endif
 
+int TestCHIPCallback(void);
 int TestCHIPErrorStr(void);
 int TestCHIPTLV(void);
 int TestReferenceCounted(void);

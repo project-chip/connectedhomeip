@@ -52,6 +52,8 @@ class GenericConnectivityManagerImpl_BLE
 public:
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
+    void _AddCHIPoBLEConnectionHandler(ConnectivityManager::BleConnectionReceivedFunct handler);
+    void _RemoveCHIPoBLEConnectionHandler(void);
     ConnectivityManager::CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
     CHIP_ERROR _SetCHIPoBLEServiceMode(ConnectivityManager::CHIPoBLEServiceMode val);
     bool _IsBLEAdvertisingEnabled(void);
@@ -70,6 +72,21 @@ private:
 
 // Instruct the compiler to instantiate the template only when explicitly told to do so.
 extern template class GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>;
+
+template <class ImplClass>
+inline void GenericConnectivityManagerImpl_BLE<ImplClass>::_AddCHIPoBLEConnectionHandler(
+    ConnectivityManager::BleConnectionReceivedFunct handler)
+{
+    BleLayer * bleLayer                = BLEMgr().GetBleLayer();
+    bleLayer->OnChipBleConnectReceived = handler;
+}
+
+template <class ImplClass>
+inline void GenericConnectivityManagerImpl_BLE<ImplClass>::_RemoveCHIPoBLEConnectionHandler(void)
+{
+    BleLayer * bleLayer                = BLEMgr().GetBleLayer();
+    bleLayer->OnChipBleConnectReceived = NULL;
+}
 
 template <class ImplClass>
 inline ConnectivityManager::CHIPoBLEServiceMode GenericConnectivityManagerImpl_BLE<ImplClass>::_GetCHIPoBLEServiceMode(void)

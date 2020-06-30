@@ -25,8 +25,16 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <crypto/CHIPCryptoPAL.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
+
+#include "esp_event_loop.h"
+#include "esp_heap_caps_init.h"
+#include "esp_log.h"
+#include "esp_spi_flash.h"
+#include "esp_system.h"
+#include "esp_wifi.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -37,17 +45,40 @@ extern CHIP_ERROR InitLwIPCoreLock(void);
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
+static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
+{
+    esp_fill_random(output, len);
+    *olen = len;
+    return 0;
+}
+
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
+    wifi_init_config_t cfg;
 
     // Make sure the LwIP core lock has been initialized
     err = Internal::InitLwIPCoreLock();
     SuccessOrExit(err);
 
+    // Initialize the ESP tcpip adapter.
+    tcpip_adapter_init();
+
+    // Arrange for the ESP event loop to deliver events into the CHIP Device layer.
+    err = esp_event_loop_init(PlatformManagerImpl::HandleESPSystemEvent, NULL);
+    SuccessOrExit(err);
+
+    // Initialize the ESP WiFi layer.
+    cfg = WIFI_INIT_CONFIG_DEFAULT();
+    err = esp_wifi_init(&cfg);
+    SuccessOrExit(err);
+
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
+    SuccessOrExit(err);
+
+    err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16);
     SuccessOrExit(err);
 
 exit:

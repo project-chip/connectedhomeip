@@ -810,11 +810,12 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::AdjustPollingInt
 }
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_FactoryReset(void)
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo(void)
 {
-    ChipLogProgress(DeviceLayer, "About to factory reset ...");
+    ChipLogProgress(DeviceLayer, "Erasing Thread persistent info...");
     Impl()->LockThreadStack();
-    otInstanceFactoryReset(mOTInst);
+    otThreadSetEnabled(mOTInst, false);
+    otInstanceErasePersistentInfo(mOTInst);
     Impl()->UnlockThreadStack();
 }
 

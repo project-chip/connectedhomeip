@@ -20,6 +20,8 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Used to connect to the peripheral</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Used to scan QR code</string>
 	<key>UIApplicationSceneManifest</key>
