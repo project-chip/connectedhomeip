@@ -36,6 +36,8 @@
 #define EXAMPLE_VENDOR_TAG_IP 2
 #define MAX_IP_LEN 46
 
+#define BLE_CHIP_PREFIX @"CHIP-"
+
 #define NOT_APPLICABLE_STRING @"N/A"
 
 static NSString * const ipKey = @"ipk";
@@ -66,6 +68,12 @@ static NSString * const ipKey = @"ipk";
 
     [self manualCodeInitialState];
     [self qrCodeInitialState];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [_ble stop];
 }
 
 - (void)dismissKeyboard
@@ -150,74 +158,119 @@ static NSString * const ipKey = @"ipk";
     if ([self hasScannedConnectionInfo]) {
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:ipKey];
     }
+    self->_setupPayloadView.hidden = NO;
+    self->_resetButton.hidden = NO;
 
+    [self updateUIFields:payload decimalString:decimalString];
+    [self parseOptionalData:payload];
+    [self handleRendezVous:payload];
+}
+
+- (void)updateUIFields:(CHIPSetupPayload *)payload decimalString:(nullable NSString *)decimalString
+{
     if (decimalString) {
-        self->_manualCodeLabel.hidden = NO;
-        self->_manualCodeLabel.text = decimalString;
-        self->_versionLabel.text = NOT_APPLICABLE_STRING;
-        self->_discriminatorLabel.text = [NSString stringWithFormat:@"%@", payload.discriminator];
-        self->_setupPinCodeLabel.text = [NSString stringWithFormat:@"%@", payload.setUpPINCode];
-        self->_rendezVousInformation.text = NOT_APPLICABLE_STRING;
-        self->_serialNumber.text = NOT_APPLICABLE_STRING;
-        // TODO: Only display vid and pid if present
-        self->_vendorID.text = [NSString stringWithFormat:@"%@", payload.vendorID];
-        self->_productID.text = [NSString stringWithFormat:@"%@", payload.productID];
+        _manualCodeLabel.hidden = NO;
+        _manualCodeLabel.text = decimalString;
+        _versionLabel.text = NOT_APPLICABLE_STRING;
+        _rendezVousInformation.text = NOT_APPLICABLE_STRING;
+        _serialNumber.text = NOT_APPLICABLE_STRING;
     } else {
-        self->_manualCodeLabel.hidden = YES;
-        self->_versionLabel.text = [NSString stringWithFormat:@"%@", payload.version];
-        self->_discriminatorLabel.text = [NSString stringWithFormat:@"%@", payload.discriminator];
-        self->_setupPinCodeLabel.text = [NSString stringWithFormat:@"%@", payload.setUpPINCode];
-        self->_rendezVousInformation.text = [NSString stringWithFormat:@"%lu", payload.rendezvousInformation];
+        _manualCodeLabel.hidden = YES;
+        _versionLabel.text = [NSString stringWithFormat:@"%@", payload.version];
+        _rendezVousInformation.text = [NSString stringWithFormat:@"%lu", payload.rendezvousInformation];
         if ([payload.serialNumber length] > 0) {
             self->_serialNumber.text = payload.serialNumber;
         } else {
             self->_serialNumber.text = NOT_APPLICABLE_STRING;
         }
-        // TODO: Only display vid and pid if present
-        self->_vendorID.text = [NSString stringWithFormat:@"%@", payload.vendorID];
-        self->_productID.text = [NSString stringWithFormat:@"%@", payload.productID];
     }
-    self->_setupPayloadView.hidden = NO;
-    self->_resetButton.hidden = NO;
 
+    _discriminatorLabel.text = [NSString stringWithFormat:@"%@", payload.discriminator];
+    _setupPinCodeLabel.text = [NSString stringWithFormat:@"%@", payload.setUpPINCode];
+    // TODO: Only display vid and pid if present
+    _vendorID.text = [NSString stringWithFormat:@"%@", payload.vendorID];
+    _productID.text = [NSString stringWithFormat:@"%@", payload.productID];
+}
+
+- (void)parseOptionalData:(CHIPSetupPayload *)payload
+{
     NSLog(@"Payload vendorID %@", payload.vendorID);
-    if ([payload.vendorID isEqualToNumber:[NSNumber numberWithInt:EXAMPLE_VENDOR_ID]]) {
-        NSArray * optionalInfo = [payload getAllOptionalVendorData:nil];
-        NSLog(@"Count of payload info %@", @(optionalInfo.count));
-        for (CHIPOptionalQRCodeInfo * info in optionalInfo) {
-            NSNumber * tag = info.tag;
-            if (tag) {
-                switch (tag.unsignedCharValue) {
-                case EXAMPLE_VENDOR_TAG_SSID:
-                    if ([info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeString]]) {
-                        if ([info.stringValue length] > MAX_SSID_LEN) {
-                            NSLog(@"Unexpected SSID String...");
-                        } else {
-                            // show SoftAP detection
-                            [self RequestConnectSoftAPWithSSID:info.stringValue];
-                        }
-                    }
-                    break;
-                case EXAMPLE_VENDOR_TAG_IP:
-                    if ([info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeString]]) {
-                        if ([info.stringValue length] > MAX_IP_LEN) {
-                            NSLog(@"Unexpected IP String... %@", info.stringValue);
-                        } else {
-                            NSLog(@"Got IP String... %@", info.stringValue);
-                            [[NSUserDefaults standardUserDefaults] setObject:info.stringValue forKey:ipKey];
-                        }
-                    }
-                    break;
-                }
+    BOOL isSameVendorID = [payload.vendorID isEqualToNumber:[NSNumber numberWithInt:EXAMPLE_VENDOR_ID]];
+    if (!isSameVendorID) {
+        return;
+    }
+
+    NSArray * optionalInfo = [payload getAllOptionalVendorData:nil];
+    for (CHIPOptionalQRCodeInfo * info in optionalInfo) {
+        NSNumber * tag = info.tag;
+        if (!tag) {
+            continue;
+        }
+
+        BOOL isTypeString = [info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeString]];
+        if (!isTypeString) {
+            return;
+        }
+
+        NSString * infoValue = info.stringValue;
+        switch (tag.unsignedCharValue) {
+        case EXAMPLE_VENDOR_TAG_SSID:
+            if ([infoValue length] > MAX_SSID_LEN) {
+                NSLog(@"Unexpected SSID String...");
+            } else {
+                NSLog(@"Got SSID String... %@", infoValue);
+                _ssidKey = infoValue;
             }
+            break;
+
+        case EXAMPLE_VENDOR_TAG_IP:
+            if ([infoValue length] > MAX_IP_LEN) {
+                NSLog(@"Unexpected IP String... %@", infoValue);
+            } else {
+                NSLog(@"Got IP String... %@", infoValue);
+                [[NSUserDefaults standardUserDefaults] setObject:infoValue forKey:ipKey];
+            }
+            break;
         }
     }
 }
 
-- (void)RequestConnectSoftAPWithSSID:(NSString *)ssid
+- (void)handleRendezVous:(CHIPSetupPayload *)payload
 {
-    NSString * message = [NSString
-        stringWithFormat:@"The scanned CHIP accessory supports a SoftAP.\n\nSSID: %@\n\nUse WiFi Settings to connect to it.", ssid];
+    switch (payload.rendezvousInformation) {
+    case kRendezvousInformationNone:
+    case kRendezvousInformationThread:
+    case kRendezvousInformationEthernet:
+    case kRendezvousInformationAllMask:
+        NSLog(@"Rendezvous Unknown");
+        break;
+    case kRendezvousInformationSoftAP:
+        NSLog(@"Rendezvous SoftAP");
+        [self handleRendezVousSoftAP:_ssidKey];
+        break;
+    case kRendezvousInformationBLE:
+        NSLog(@"Rendezvous BLE");
+        [self handleRendezVousBLE:payload.discriminator];
+        break;
+    }
+}
+
+- (void)handleRendezVousBLE:(NSNumber *)discriminator
+{
+    NSString * peripheralDiscriminator = [NSString stringWithFormat:@"0%hX", discriminator.unsignedShortValue];
+    NSString * peripheralFullName = [NSString stringWithFormat:@"%@%@", BLE_CHIP_PREFIX, peripheralDiscriminator];
+    _ble = [[BLEConnectionController alloc] initWithName:peripheralFullName];
+    [_ble start];
+}
+
+- (void)handleRendezVousSoftAP:(NSString *)ssid
+{
+    if (!ssid) {
+        NSLog(@"Can not retrieved SSID");
+        return;
+    }
+
+    NSString * message = [NSString stringWithFormat:@"SSID: %@\n\nUse WiFi Settings to connect to it.", ssid];
     UIAlertController * alert = [UIAlertController alertControllerWithTitle:@"SoftAP Detected"
                                                                     message:message
                                                              preferredStyle:UIAlertControllerStyleActionSheet];
