@@ -30,3 +30,7 @@
         path = third_party/pigweed
         url = https://pigweed.googlesource.com/pigweed/pigweed
         ignore = dirty
+[submodule "third_party/openthread/repo"]
+        path = third_party/openthread/repo
+        url = https://github.com/openthread/openthread
+        ignore = dirty

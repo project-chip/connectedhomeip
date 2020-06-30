@@ -105,7 +105,7 @@ public:
         + 5 /* 16 bit interger */              //
         + 1 /* NullTerminator */;
 
-    void ToString(char * buf, size_t bufSize)
+    void ToString(char * buf, size_t bufSize) const
     {
         char ip_addr[kInetMaxAddrLen];
 
