@@ -53,6 +53,17 @@ following gui:
   ccmake ../..
 ```
 
+#### Debug vs. Release build configurations
+
+The build defaults to a Debug build.  To explicitly set the build type pass the following flag to cmake:
+
+```
+  cmake -GNinja ../.. -DCMAKE_BUILD_TYPE=Debug
+  cmake -GNinja ../.. -DCMAKE_BUILD_TYPE=Release
+```
+
+NOTE: The -D option to cmake will respond to tab completion with available options on many systems.
+
 ### Build operations
 
 Details of the various build operations used in the performance and target

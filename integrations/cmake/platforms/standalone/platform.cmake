@@ -21,9 +21,6 @@
 #      Configure toolchain for standalone (host) platforms.
 #
 
-set(CMAKE_C_FLAGS "-g" CACHE INTERNAL "C Compiler options")
-set(CMAKE_CXX_FLAGS "-g" CACHE INTERNAL "C++ Compiler options")
-
 #
 # Configure defines and include paths for platform
 #

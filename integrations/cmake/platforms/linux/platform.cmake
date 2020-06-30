@@ -30,16 +30,6 @@ add_library(chip-config INTERFACE)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(OPENSSL REQUIRED openssl)
 
-set(CMAKE_C_FLAGS 
-    "-g" 
-    CACHE INTERNAL "C Compiler options"
-)
-
-set(CMAKE_CXX_FLAGS 
-    "-g" 
-    CACHE INTERNAL "C++ Compiler options"
-)
-
 target_compile_definitions(chip-config INTERFACE
     HAVE_MALLOC=1
     HAVE_FREE=1

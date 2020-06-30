@@ -25,6 +25,15 @@ if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 include("${PROJECT_SOURCE_DIR}/integrations/cmake/platforms.cmake")
 endif ()
 
+set(default_build_type "Debug")
+
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
+  set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE STRING "Choose the type of build." FORCE)
+  # Set the possible values of build type for cmake-gui
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
+endif()
+
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "(Apple)?[Cc]lang")
     option(CHIP_COMPILE_WARNING_AS_ERROR "whether to include -Werror with gcc-compatible compilers")
     if (CHIP_COMPILE_WARNING_AS_ERROR)
@@ -35,6 +44,14 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "(Apple)?[Cc]lang")
         $<$<COMPILE_LANGUAGE:C>:${CHIP_CFLAGS} -Wall -Wextra -Wshadow -Werror -pedantic-errors>
         $<$<COMPILE_LANGUAGE:CXX>:${CHIP_FLAGS} -Wall -Wextra -Wshadow -Wno-c++14-compat -fno-exceptions>
     )
+
+    set(CMAKE_C_FLAGS_DEBUG            "-g -Og")
+    set(CMAKE_CXX_FLAGS_DEBUG          "-g -Og")
+    set(CMAKE_ASM_FLAGS_DEBUG          "-g")
+
+    set(CMAKE_C_FLAGS_RELEASE          "-Os")
+    set(CMAKE_CXX_FLAGS_RELEASE        "-Os")
+    set(CMAKE_ASM_FLAGS_RELEASE        "")
 endif()
 
 #
