@@ -152,15 +152,15 @@ else # CHIP_DEVICE_LAYER_TARGET_ESP32
 # Build and run these test targets only on standalone device targets
 noinst_PROGRAMS                                       = \
     TestLwIPDNS                                         \
-    TestInetEndPoint                                    \
     TestInetLayer                                       \
-    TestInetLayerDNS                                    \
     TestInetLayerMulticast                              \
     $(NULL)
 
 check_PROGRAMS                                       += \
     TestInetAddress                                     \
+    TestInetEndPoint                                    \
     TestInetErrorStr                                    \
+    TestInetLayerDNS                                    \
     $(NULL)
 
 endif # CHIP_DEVICE_LAYER_TARGET_ESP32
