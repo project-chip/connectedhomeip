@@ -214,23 +214,23 @@ on occasion.
 CHIP considers there to be a few different types of pull requests:
 
 -   Trivial bug fix
--   -   Decription 1
--   -   Decription 2
+-   -   Description 1
+-   -   Description 2
 -   Small Bug fix
--   -   Decription 1
--   -   Decription 2
+-   -   Description 1
+-   -   Description 2
 -   Bug Fix
--   -   Decription 1
--   -   Decription 2
--   Significiant Change
--   -   Decription 1
--   -   Decription 2
+-   -   Description 1
+-   -   Description 2
+-   Significant Change
+-   -   Description 1
+-   -   Description 2
 -   Feature
--   -   Decription 1
--   -   Decription 2
+-   -   Description 1
+-   -   Description 2
 -   Architecture Change
--   -   Decription 1
--   -   Decription 2
+-   -   Description 1
+-   -   Description 2
 
 ### Prior to review, all changes require:
 
@@ -250,7 +250,7 @@ Each type of change has unique additional requirements, here's a table of those:
 | Trivial bug fix     | 3 [approved reviewers](./REVIEWERS.md) |                |                         |                |                       |
 | Small Bug fix       | 3 [approved reviewers](./REVIEWERS.md) |                |                         |                |                       |
 | Bug Fix             | 3 [approved reviewers](./REVIEWERS.md) |                |                         |                |                       |
-| Significiant Change | 3 [approved reviewers](./REVIEWERS.md) |                |                         |                |                       |
+| Significant Change  | 3 [approved reviewers](./REVIEWERS.md) |                |                         |                |                       |
 | Feature             | 3 [approved reviewers](./REVIEWERS.md) |                |                         |                |                       |
 | Architecture Change | 3 [approved reviewers](./REVIEWERS.md) |                |                         |                |                       |
 
