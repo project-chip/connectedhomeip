@@ -44,13 +44,19 @@ ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
+#endif
+
     return CHIP_NO_ERROR;
 }
 
 void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
+    // Forward the event to the generic base classes as needed.
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_OnPlatformEvent(event);
+#endif
 }
 
 } // namespace DeviceLayer

@@ -63,7 +63,6 @@ protected:
     // ===== Methods that override the GenericThreadStackManagerImpl_OpenThread abstract interface.
 
     void _ProcessThreadActivity(void);
-    void _OnPlatformEvent(const ChipDeviceEvent * event);
     void _OnCHIPoBLEAdvertisingStart(void);
     void _OnCHIPoBLEAdvertisingStop(void);
 
@@ -120,12 +119,6 @@ void GenericThreadStackManagerImpl_Zephyr<ImplClass>::_UnlockThreadStack(void)
 
 template <class ImplClass>
 void GenericThreadStackManagerImpl_Zephyr<ImplClass>::_ProcessThreadActivity(void)
-{
-    // Intentionally empty.
-}
-
-template <class ImplClass>
-void GenericThreadStackManagerImpl_Zephyr<ImplClass>::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
     // Intentionally empty.
 }
