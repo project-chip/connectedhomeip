@@ -55,14 +55,16 @@ following gui:
 
 #### Debug vs. Release build configurations
 
-The build defaults to a Debug build.  To explicitly set the build type pass the following flag to cmake:
+The build defaults to a Debug build. To explicitly set the build type pass the
+following flag to cmake:
 
 ```
   cmake -GNinja ../.. -DCMAKE_BUILD_TYPE=Debug
   cmake -GNinja ../.. -DCMAKE_BUILD_TYPE=Release
 ```
 
-NOTE: The -D option to cmake will respond to tab completion with available options on many systems.
+NOTE: The -D option to cmake will respond to tab completion with available
+options on many systems.
 
 ### Build operations
 
@@ -82,13 +84,13 @@ CMake can generate build files for multiple build systems:
 
 #### Run tests and build them if needed
 
-| Build System | Command | | cmake / ninja | `ninja check` | |
-cmake / make | `make check` |
+| Build System | Command | | cmake / ninja | `ninja check` | | cmake / make |
+`make check` |
 
 #### Run pre-built tests
 
-| Build System | Command | | cmake / ninja | `ninja test` | |
-cmake / make | `make test` |
+| Build System | Command | | cmake / ninja | `ninja test` | | cmake / make |
+`make test` |
 
 #### Build documentation
 
