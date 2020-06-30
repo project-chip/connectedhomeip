@@ -152,7 +152,7 @@ public:
      */
     void Notify(int v)
     {
-        for (Inner * inner = mHead.mNext; inner != &mHead; inner = inner->mNext)
+        for (Inner * inner = mNext; inner != this; inner = inner->mNext)
         {
             // persistent registration semantics, with data
 

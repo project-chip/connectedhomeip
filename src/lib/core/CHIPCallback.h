@@ -142,14 +142,9 @@ public:
  * @brief core of a simple doubly-linked list Callback keeper-tracker-of
  *
  */
-class CallbackDeque
+class CallbackDeque : public Inner
 {
 public:
-    /**
-     * @brief appends
-     */
-    void Enqueue(Inner * inner) { Enqueue(inner, Dequeue); };
-
     /**
      * @brief appends with overridden cancel function, in case the
      *   list change requires some other state update.
@@ -157,46 +152,122 @@ public:
     void Enqueue(Inner * inner, void (*cancel)(Inner *))
     {
         // add to a doubly-linked list, set cancel function
-        inner->Cancel(); // make doubly-sure we're not corrupting another list somewhere
-        inner->mPrev       = mHead.mPrev;
-        mHead.mPrev->mNext = inner;
-        mHead.mPrev        = inner;
-        inner->mNext       = &mHead;
-        inner->mCancel     = cancel;
+        InsertBefore(inner, this, cancel);
     };
-
-    CallbackDeque() : mHead() { mHead.mNext = mHead.mPrev = &mHead; };
+    /**
+     * @brief appends
+     */
+    void Enqueue(Inner * inner) { Enqueue(inner, Dequeue); };
 
     /**
-     * Dequeue all, return in a stub. does not cancel the inners, as the list
+     * @brief dequeue, but don't cancel, all inners that match the by()
+     */
+    Inner DequeueBy(bool (*by)(void *, const Inner *), void * p)
+    {
+        Inner dequeued;
+
+        for (Inner * inner = mNext; inner != this;)
+        {
+            Inner * next = inner->mNext;
+            if (by(p, inner))
+            {
+                _Dequeue(inner);
+                _InsertBefore(inner, &dequeued);
+            }
+            inner = next;
+        }
+        return dequeued;
+    }
+
+    /**
+     * @brief insert the node in a queue in order, sorted by "sortby(a, b)"
+     *   sortby(a, b) should return 1 if a > b, -1 if a < b and 0 if a == b
+     */
+    void InsertBy(Inner * inner, int (*sortby)(void *, const Inner *, const Inner *), void * p, void (*cancel)(Inner *))
+    {
+        Inner * where; // node before which we need to insert
+        for (where = mNext; where != this; where = where->mNext)
+        {
+            if (sortby(p, inner, where) <= 0)
+            {
+                break;
+            }
+        }
+        InsertBefore(inner, where, cancel);
+    };
+
+    void InsertBy(Inner * inner, int (*sortby)(void *, const Inner *, const Inner *), void * p)
+    {
+        InsertBy(inner, sortby, p, Dequeue);
+    };
+
+    /**
+     * @brief insert the node in a the list at a specific point
+     */
+    void InsertBefore(Inner * inner, Inner * where, void (*cancel)(Inner *))
+    {
+        inner->Cancel(); // make doubly-sure we're not corrupting another list somewhere
+        inner->mCancel = cancel;
+        _InsertBefore(inner, where);
+    };
+    void InsertBefore(Inner * inner, Inner * where) { InsertBefore(inner, where, Dequeue); };
+
+    /**
+     * @brief returns first item unless list is empty, otherwise returns NULL
+     */
+    Inner * First() { return (mNext != this) ? mNext : nullptr; }
+
+    /**
+     * @brief Dequeue all, return in a stub. does not cancel the inners, as the list
      *   members are still in use
      */
     Inner DequeueAll()
     {
         Inner ready;
 
-        if (mHead.mNext != &mHead)
+        if (mNext != this)
         {
-            ready.mNext        = mHead.mNext;
-            ready.mPrev        = mHead.mPrev;
+            ready.mNext        = mNext;
+            ready.mPrev        = mPrev;
             ready.mPrev->mNext = &ready;
             ready.mNext->mPrev = &ready;
 
-            mHead.mNext = mHead.mPrev = &mHead;
+            mNext = mPrev = this;
         }
         return ready;
     }
 
+    /**
+     * @brief dequeue but don't cancel, useful if
+     *     immediately putting on another list
+     */
     static void Dequeue(Inner * inner)
+    {
+        _Dequeue(inner);
+        inner->mCancel = nullptr;
+    }
+
+    /**
+     * @brief empty?
+     */
+    bool IsEmpty() { return mNext == this; }
+
+private:
+    static void _Dequeue(Inner * inner)
     {
         inner->mNext->mPrev = inner->mPrev;
         inner->mPrev->mNext = inner->mNext;
         inner->mNext = inner->mPrev = inner;
-        inner->mCancel              = nullptr;
+    }
+    void _InsertBefore(Inner * inner, Inner * where)
+    {
+        inner->mPrev        = where->mPrev;
+        where->mPrev->mNext = inner;
+        where->mPrev        = inner;
+        inner->mNext        = where;
     }
 
-    Inner mHead;
-};
+}; // namespace Callback
 
 } // namespace Callback
 } // namespace chip
