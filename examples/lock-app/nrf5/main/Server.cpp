@@ -63,7 +63,7 @@ class ServerCallback : public SecureSessionMgrCallback
 {
 public:
     virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                   System::PacketBuffer * buffer, SecureSessionMgr* mgr)
+                                   System::PacketBuffer * buffer, SecureSessionMgr * mgr)
     {
         const size_t data_len = buffer->DataLength();
         char src_addr[PeerAddress::kMaxToStringSize];
@@ -89,7 +89,7 @@ public:
         }
     }
 
-    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr* mgr)
+    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr)
     {
         CHIP_ERROR err;
 
