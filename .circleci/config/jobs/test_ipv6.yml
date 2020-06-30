@@ -1,0 +1,17 @@
+environment:
+    BUILD_TYPE: vm-exec-build
+executor: vm-exec-build
+steps:
+    - checkout
+    - run:
+          name: Config Docker container
+          command: scripts/tools/ipv6_container_setup.sh
+    - run:
+          name: Run tests in the Docker container
+          command: scripts/tests/ipv6_container_tests.sh
+    - run:
+          name: Save test log files
+          command: scripts/tests/save_logs.sh /tmp/test_logs
+          when: on_fail
+    - store_artifacts:
+          path: /tmp/test_logs

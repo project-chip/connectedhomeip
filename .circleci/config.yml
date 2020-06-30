@@ -446,6 +446,25 @@ jobs:
         when: on_fail
     - store_artifacts:
         path: /tmp/test_logs
+  Run Tests [IPv6]:
+    machine:
+      image: ubuntu-1604:201903-01
+    environment:
+    - BUILD_TYPE: vm-exec-build
+    steps:
+    - checkout
+    - run:
+        command: scripts/tools/ipv6_container_setup.sh
+        name: Config Docker container
+    - run:
+        command: scripts/tests/ipv6_container_tests.sh
+        name: Run tests in the Docker container
+    - run:
+        command: scripts/tests/save_logs.sh /tmp/test_logs
+        name: Save test log files
+        when: on_fail
+    - store_artifacts:
+        path: /tmp/test_logs
 workflows:
   Main:
     jobs:
@@ -498,6 +517,11 @@ workflows:
         requires:
         - Build CHIP [linux-embedded]
     - Run Tests [ESP32-QEMU]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
+    - Run Tests [IPv6]:
         filters:
           branches:
             ignore:
