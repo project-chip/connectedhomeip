@@ -624,7 +624,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     // bottom digits of the Chip device id.
 
     // TODO Pull this from the configuration manager
-    uint16_t discriminator = 0x0F00;
+    const uint16_t discriminator = 0x0F00;
     if (!GetFlag(mFlags, kFlag_UseCustomDeviceName))
     {
         snprintf(mDeviceName, sizeof(mDeviceName), "%s%03" PRIX16, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, discriminator);
