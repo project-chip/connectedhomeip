@@ -90,4 +90,3 @@ void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clust
 
 } // namespace DeviceManager
 } // namespace chip
-
