@@ -33,6 +33,7 @@
 
 static const char * TAG = "echo-devicecallbacks";
 using namespace ::chip::Inet;
+using namespace ::chip::DeviceLayer;
 
 extern LEDWidget statusLED; // In wifi-echo.cpp
 
