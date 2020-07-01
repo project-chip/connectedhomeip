@@ -1176,6 +1176,10 @@ INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress,
     VerifyOrExit(mConnectionSemaphore != NULL, res = INET_ERROR_NO_MEMORY);
     dispatch_retain(mConnectionSemaphore);
 
+    mSendSemaphore = dispatch_semaphore_create(0);
+    VerifyOrExit(mSendSemaphore != NULL, res = INET_ERROR_NO_MEMORY);
+    dispatch_retain(mSendSemaphore);
+
     mAddrType   = aAddressType;
     mConnection = NULL;
 
@@ -1187,7 +1191,6 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
 {
     __block INET_ERROR res = INET_NO_ERROR;
     dispatch_data_t content;
-    dispatch_semaphore_t send_semaphore;
 
     // Ensure the destination address type is compatible with the endpoint address type.
     VerifyOrExit(mAddrType == aPktInfo->DestAddress.Type(), res = INET_ERROR_BAD_ARGS);
@@ -1199,16 +1202,25 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     SuccessOrExit(res);
 
     // Send a message, and wait for it to be dispatched.
-    send_semaphore = dispatch_semaphore_create(0);
     content = dispatch_data_create(aBuffer->Start(), aBuffer->DataLength(), mDispatchQueue, DISPATCH_DATA_DESTRUCTOR_DEFAULT);
+
+    // Assume the method will return an error unless the completion handler is called since it may never
+    // be called if the connection fails.
+    res = INET_ERROR_UNEXPECTED_EVENT;
     nw_connection_send(mConnection, content, NW_CONNECTION_DEFAULT_MESSAGE_CONTEXT, true, ^(nw_error_t error) {
-        res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
-        dispatch_semaphore_signal(send_semaphore);
+        if (error)
+        {
+            res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
+        }
+        else
+        {
+            res = INET_NO_ERROR;
+        }
+        dispatch_semaphore_signal(mSendSemaphore);
     });
     dispatch_release(content);
 
-    dispatch_semaphore_wait(send_semaphore, DISPATCH_TIME_FOREVER);
-    dispatch_release(send_semaphore);
+    dispatch_semaphore_wait(mSendSemaphore, DISPATCH_TIME_FOREVER);
 
 exit:
     return res;
@@ -1373,7 +1385,6 @@ INET_ERROR IPEndPointBasis::StartListener()
         case nw_listener_state_failed:
             ChipLogDetail(Inet, "Listener: Failed");
             res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
-            nw_listener_cancel(listener);
             break;
 
         case nw_listener_state_ready:
@@ -1431,7 +1442,6 @@ INET_ERROR IPEndPointBasis::StartConnection(nw_connection_t & aConnection)
         case nw_connection_state_failed:
             ChipLogDetail(Inet, "Connection: Failed");
             res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
-            nw_connection_cancel(aConnection);
             break;
 
         case nw_connection_state_ready:
@@ -1501,6 +1511,12 @@ void IPEndPointBasis::ReleaseAll()
     {
         dispatch_release(mListenerSemaphore);
         mListenerSemaphore = NULL;
+    }
+
+    if (mSendSemaphore)
+    {
+        dispatch_release(mSendSemaphore);
+        mSendSemaphore = NULL;
     }
 }
 
