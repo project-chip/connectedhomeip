@@ -127,8 +127,8 @@ Error Layer::Init(void * aContext)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    // Create a pipe to allow an arbitrary thread to wake the thread in the select loop.
-    lReturn = this->mWakePipe.Open();
+    // Create an event to allow an arbitrary thread to wake the thread in the select loop.
+    lReturn = this->mWakeEvent.Open();
     SuccessOrExit(lReturn);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
@@ -153,7 +153,7 @@ Error Layer::Shutdown()
     SuccessOrExit(lReturn);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    mWakePipe.Close();
+    mWakeEvent.Close();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
     for (size_t i = 0; i < Timer::sPool.Size(); ++i)
@@ -591,11 +591,11 @@ void Layer::PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet,
     if (this->State() != kLayerState_Initialized)
         return;
 
-    const int wakePipeFd = this->mWakePipe.GetReadFD();
-    FD_SET(wakePipeFd, aReadSet);
+    const int wakeEventFd = this->mWakeEvent.GetNotifFD();
+    FD_SET(wakeEventFd, aReadSet);
 
-    if (wakePipeFd + 1 > aSetSize)
-        aSetSize = wakePipeFd + 1;
+    if (wakeEventFd + 1 > aSetSize)
+        aSetSize = wakeEventFd + 1;
 
     const Timer::Epoch kCurrentEpoch = Timer::GetCurrentEpoch();
     Timer::Epoch lAwakenEpoch = kCurrentEpoch + static_cast<Timer::Epoch>(aSleepTime.tv_sec) * 1000 + aSleepTime.tv_usec / 1000;
@@ -666,9 +666,9 @@ void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteS
 
     if (aSetSize > 0)
     {
-        // If we woke because of someone writing to the wake pipe, clear the contents of the pipe before returning.
-        if (FD_ISSET(this->mWakePipe.GetReadFD(), aReadSet))
-            this->mWakePipe.ClearContent();
+        // If we woke because of someone writing to the wake event, clear the event before returning.
+        if (FD_ISSET(this->mWakeEvent.GetNotifFD(), aReadSet))
+            this->mWakeEvent.Confirm();
     }
 
     const Timer::Epoch kCurrentEpoch = Timer::GetCurrentEpoch();
@@ -716,8 +716,8 @@ void Layer::WakeSelect()
     }
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-    // Write a single byte to the wake pipe to wake up the select call.
-    this->mWakePipe.WriteByte(0);
+    // Send notification to wake up the select call.
+    this->mWakeEvent.Notify();
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK

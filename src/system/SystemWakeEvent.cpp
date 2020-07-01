@@ -21,7 +21,7 @@
  *      data stream built on top of two file descriptors.
  */
 
-#include <system/SystemPipe.h>
+#include <system/SystemWakeEvent.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -34,11 +34,13 @@
 #include <unistd.h>
 
 #if !CONFIG_HAVE_PIPE
-#include <sys/socket.h>
+#include <sys/eventfd.h>
 #endif
 
 namespace chip {
 namespace System {
+
+#if CONFIG_HAVE_PIPE
 
 namespace {
 inline int SetNonBlockingMode(int fd)
@@ -48,19 +50,7 @@ inline int SetNonBlockingMode(int fd)
 }
 } // anonymous namespace
 
-void Pipe::Close()
-{
-    if (mFDs[FD_WRITE] > 0)
-    {
-        ::close(mFDs[FD_WRITE]);
-        ::close(mFDs[FD_READ]);
-        mFDs[FD_READ] = mFDs[FD_WRITE] = -1;
-    }
-}
-
-#if CONFIG_HAVE_PIPE
-
-Error Pipe::Open()
+Error SystemWakeEvent::Open()
 {
     mFDs[FD_READ] = mFDs[FD_WRITE] = -1;
 
@@ -76,7 +66,14 @@ Error Pipe::Open()
     return CHIP_SYSTEM_NO_ERROR;
 }
 
-void Pipe::ClearContent()
+void SystemWakeEvent::Close()
+{
+    ::close(mFDs[FD_WRITE]);
+    ::close(mFDs[FD_READ]);
+    mFDs[FD_READ] = mFDs[FD_WRITE] = -1;
+}
+
+void SystemWakeEvent::Confirm()
 {
     uint8_t buffer[128];
 
@@ -84,40 +81,42 @@ void Pipe::ClearContent()
         continue;
 }
 
-void Pipe::WriteByte(const uint8_t byte)
+void SystemWakeEvent::Notify()
 {
+    char byte = 1;
     ::write(mFDs[FD_WRITE], &byte, 1);
 }
 
 #else // CONFIG_HAVE_PIPE
 
-Error Pipe::Open()
+Error SystemWakeEvent::Open()
 {
-    mFDs[FD_READ] = mFDs[FD_WRITE] = 0;
+    mFD = eventfd(0, 0);
 
-    if (::socketpair(AF_UNIX, SOCK_STREAM, 0, mFDs) < 0)
+    if (mFD == -1)
+    {
         return chip::System::MapErrorPOSIX(errno);
-
-    if (SetNonBlockingMode(mFDs[FD_READ]) < 0)
-        return chip::System::MapErrorPOSIX(errno);
-
-    if (SetNonBlockingMode(mFDs[FD_WRITE]) < 0)
-        return chip::System::MapErrorPOSIX(errno);
+    }
 
     return CHIP_SYSTEM_NO_ERROR;
 }
 
-void Pipe::ClearContent()
+void SystemWakeEvent::Close()
 {
-    uint8_t buffer[128];
-
-    while (::recv(mFDs[FD_READ], buffer, sizeof(buffer), 0) > 0)
-        continue;
+    ::close(mFD);
+    mFD = -1;
 }
 
-void Pipe::WriteByte(const uint8_t byte)
+void SystemWakeEvent::Confirm()
 {
-    ::send(mFDs[FD_WRITE], &byte, 1, 0);
+    uint64_t value;
+    ::read(mFD, &value, sizeof(value));
+}
+
+void SystemWakeEvent::Notify()
+{
+    uint64_t value = 1;
+    ::write(mFD, &value, sizeof(value));
 }
 
 #endif // CONFIG_HAVE_PIPE
