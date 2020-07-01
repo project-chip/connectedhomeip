@@ -159,6 +159,7 @@ protected:
     nw_connection_t mConnection;
     dispatch_semaphore_t mConnectionSemaphore;
     dispatch_queue_t mDispatchQueue;
+    dispatch_semaphore_t mSendSemaphore;
 
     INET_ERROR Bind(IPAddressType aAddressType, IPAddress aAddress, uint16_t aPort, nw_parameters_t aParameters);
     INET_ERROR ConfigureProtocol(IPAddressType aAddressType, nw_parameters_t aParameters);
