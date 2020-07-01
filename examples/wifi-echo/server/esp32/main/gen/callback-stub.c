@@ -38,9 +38,9 @@
 // This c file provides stubs for all callbacks. These stubs
 // will be used in the case where user defined implementations
 // of the callbacks have not been provided.
-#include "app/framework/include/af.h"
-#include "hal/hal.h"
-#include EMBER_AF_API_NETWORK_STEERING
+#include "../af.h"
+//#include "hal/hal.h"
+//#include EMBER_AF_API_NETWORK_STEERING
 
 
 

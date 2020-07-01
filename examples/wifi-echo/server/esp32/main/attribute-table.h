@@ -41,7 +41,7 @@
 #ifndef ZCL_UTIL_ATTRIBUTE_TABLE_H
 #define ZCL_UTIL_ATTRIBUTE_TABLE_H
 
-#include "../include/af.h"
+#include "af.h"
 
 #define ZCL_NULL_ATTRIBUTE_TABLE_INDEX 0xFFFF
 

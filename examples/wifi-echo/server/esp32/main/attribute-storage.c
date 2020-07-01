@@ -37,11 +37,11 @@
  *******************************************************************************
    ******************************************************************************/
 
-#include "app/framework/include/af.h"
+#include "af.h"
 #include "attribute-storage.h"
 #include "common.h"
 
-#include "znet-bookkeeping.h"
+#include "gen/znet-bookkeeping.h"
 
 //------------------------------------------------------------------------------
 // Globals

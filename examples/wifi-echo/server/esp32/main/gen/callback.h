@@ -48,9 +48,9 @@
  */
 
 
-#include "app/framework/include/af-types.h"
-#include "hal/hal.h"
-#include EMBER_AF_API_NETWORK_STEERING
+#include "../af-types.h"
+//#include "hal/hal.h"
+//#include EMBER_AF_API_NETWORK_STEERING
 
 
 

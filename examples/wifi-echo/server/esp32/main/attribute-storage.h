@@ -40,11 +40,11 @@
 #ifndef __AF_ATTRIBUTE_STORAGE__
 #define __AF_ATTRIBUTE_STORAGE__
 
-#include PLATFORM_HEADER
-#include "../include/af.h"
+//#include PLATFORM_HEADER
+#include "af.h"
 
 #if !defined (EMBER_SCRIPTED_TEST)
-  #include "att-storage.h"
+  #include "gen/att-storage.h"
 #endif
 
 #if !defined(ATTRIBUTE_STORAGE_CONFIGURATION) && defined(EMBER_TEST)
@@ -56,7 +56,8 @@
 // attribute data structures. If it is missing
 // we use the provider sample.
 #ifndef ATTRIBUTE_STORAGE_CONFIGURATION
-  #error "Must define ATTRIBUTE_STORAGE_CONFIGURATION to specify the App. Builder default attributes file."
+//  #error "Must define ATTRIBUTE_STORAGE_CONFIGURATION to specify the App. Builder default attributes file."
+  #include "gen/endpoint_config.h"
 #else
   #include ATTRIBUTE_STORAGE_CONFIGURATION
 #endif

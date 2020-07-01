@@ -37,18 +37,18 @@
  *******************************************************************************
    ******************************************************************************/
 
-#include "../include/af.h"
+#include "af.h"
 #include "common.h"
-#include "../plugin/ias-zone-client/ias-zone-client.h"
-#include "../plugin/key-establishment/key-establishment.h"
-#include "../plugin/smart-energy-registration/smart-energy-registration.h"
-#include "../plugin/trust-center-keepalive/trust-center-keepalive.h"
-#include "../plugin/test-harness/test-harness.h"
-#ifdef EMBER_AF_PLUGIN_WWAH_SERVER_SILABS
-  #include "../plugin/wwah-server-silabs/wwah-server-silabs.h"
-#endif
-#include "../plugin/simple-metering-server/simple-metering-server.h"
-#include "znet-bookkeeping.h" // emAfRetrieveAttributeAndCraftResponse
+//#include "../plugin/ias-zone-client/ias-zone-client.h"
+//#include "../plugin/key-establishment/key-establishment.h"
+//#include "../plugin/smart-energy-registration/smart-energy-registration.h"
+//#include "../plugin/trust-center-keepalive/trust-center-keepalive.h"
+//#include "../plugin/test-harness/test-harness.h"
+//#ifdef EMBER_AF_PLUGIN_WWAH_SERVER_SILABS
+//  #include "../plugin/wwah-server-silabs/wwah-server-silabs.h"
+//#endif
+//#include "../plugin/simple-metering-server/simple-metering-server.h"
+#include "gen/znet-bookkeeping.h" // emAfRetrieveAttributeAndCraftResponse
 
 #ifdef EMBER_AF_PLUGIN_COMMS_HUB_FUNCTION_SUB_GHZ
   #include "app/framework/plugin/comms-hub-function-sub-ghz/comms-hub-function-sub-ghz.h"

@@ -40,9 +40,9 @@
 #define SILABS_ZNET_BOOKKEEPING_H
 
 
-#include PLATFORM_HEADER
-#include CONFIGURATION_HEADER
-#include "af.h"
+//#include PLATFORM_HEADER
+//#include CONFIGURATION_HEADER
+#include "../af.h"
 
 void emAfInit(void);
 

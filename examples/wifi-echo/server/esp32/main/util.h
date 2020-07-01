@@ -81,7 +81,7 @@ extern const EmberAfClusterName zclClusterNames[];
 
 #define ZCL_NULL_CLUSTER_ID 0xFFFF
 
-#include "../include/af.h"
+#include "af.h"
 
 // Override APS retry: 0 - don't touch, 1 - always set, 2 - always unset
 typedef enum {

@@ -47,7 +47,7 @@
 // for pulling in defines dealing with EITHER server or client
 #include "af-main.h"
 
-#include "enums.h"
+#include "gen/enums.h"
 
 //------------------------------------------------------------------------------
 

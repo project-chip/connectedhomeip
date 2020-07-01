@@ -66,10 +66,14 @@
 // ZA_GENERATED_HEADER is defined in the project file
 #ifdef ZA_GENERATED_HEADER
   #include ZA_GENERATED_HEADER
+#else
+  #include "gen/gen_config.h"
 #endif
 
 #ifdef ATTRIBUTE_STORAGE_CONFIGURATION
   #include ATTRIBUTE_STORAGE_CONFIGURATION
+#else
+  #include "gen/endpoint_config.h"
 #endif
 // *******************************************************************
 // pre-defined Devices
@@ -100,7 +104,7 @@
 
 // This file determines the security profile used, and from that various
 // other security parameters.
-#include "app/framework/security/security-config.h"
+// #include "app/framework/security/security-config.h"
 
 // *******************************************************************
 // Application configuration of RAM for cluster usage

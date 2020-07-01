@@ -42,11 +42,11 @@
 #define SILABS_COMMON_H
 
 // App framework
-#include "app/framework/include/af.h"
-#include "app/framework/util/util.h"
-#include "app/framework/util/time-util.h"
-#include "app/framework/util/attribute-table.h"
-#include "app/framework/util/attribute-storage.h"
+#include "af.h"
+#include "util.h"
+#include "time-util.h"
+#include "attribute-table.h"
+#include "attribute-storage.h"
 
 // the variables used to setup and send responses to cluster messages
 extern EmberApsFrame emberAfResponseApsFrame;

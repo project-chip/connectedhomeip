@@ -38,14 +38,14 @@
  *******************************************************************************
    ******************************************************************************/
 
-#include "../include/af.h"
+#include "af.h"
 #include "af-main.h"
 #include "common.h"
-#include "../plugin/time-server/time-server.h"
-#include "app/framework/util/af-event.h"
-#include "app/framework/util/time-util.h"
-#include "znet-bookkeeping.h"
-#include "hal/micro/crc.h"
+//#include "../plugin/time-server/time-server.h"
+//#include "app/framework/util/af-event.h"
+//#include "app/framework/util/time-util.h"
+#include "gen/znet-bookkeeping.h"
+//#include "hal/micro/crc.h"
 
 //------------------------------------------------------------------------------
 // Forward Declarations

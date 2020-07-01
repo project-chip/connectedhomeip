@@ -46,7 +46,7 @@
 #ifndef SILABS_AF_API_TYPES
 #define SILABS_AF_API_TYPES
 
-#include "enums.h"
+#include "gen/enums.h"
 
 #ifdef EZSP_HOST
 #include "app/util/ezsp/ezsp-enum.h"

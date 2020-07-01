@@ -50,10 +50,10 @@
 #define SILABS_AF_API
 
 // Micro and compiler specific typedefs and macros
-#include PLATFORM_HEADER
+//#include PLATFORM_HEADER
 
 #ifndef CONFIGURATION_HEADER
-  #define CONFIGURATION_HEADER "app/framework/util/config.h"
+  #define CONFIGURATION_HEADER "config.h"
 #endif
 #include CONFIGURATION_HEADER
 
@@ -68,33 +68,33 @@
   #include "app/util/ezsp/serial-interface.h"
 #else
 // Includes needed for ember related functions for the SoC
-  #include "stack/include/ember.h"
+//  #include "stack/include/ember.h"
 #endif // EZSP_HOST
 
 // HAL - hardware abstraction layer
-#include "hal/hal.h"
-#include "plugin/serial/serial.h"  // Serial utility APIs
+//#include "hal/hal.h"
+//#include "plugin/serial/serial.h"  // Serial utility APIs
 
-#include "stack/include/event.h"
-#include "stack/include/error.h"
+//#include "stack/include/event.h"
+//#include "stack/include/error.h"
 #include "af-types.h"
-#include "app/framework/util/print.h"
-#include "app/framework/util/time-util.h"
-#include "af-structs.h"
-#include "attribute-id.h"
-#include "att-storage.h"
-#include "attribute-type.h"
-#include "call-command-handler.h"
-#include "callback.h"
-#include "client-command-macro.h"
-#include "cluster-id.h"
-#include "command-id.h"
-#include "debug-printing.h"
-#include "enums.h"
-#include "print-cluster.h"
-#include "app/framework/util/client-api.h"
-#include "app/util/serial/command-interpreter2.h"
-#include "app/framework/cli/zcl-cli.h"
+//#include "app/framework/util/print.h"
+//#include "app/framework/util/time-util.h"
+#include "gen/af-structs.h"
+#include "gen/attribute-id.h"
+#include "gen/att-storage.h"
+#include "gen/attribute-type.h"
+#include "gen/call-command-handler.h"
+#include "gen/callback.h"
+#include "gen/client-command-macro.h"
+#include "gen/cluster-id.h"
+#include "gen/command-id.h"
+#include "gen/debug-printing.h"
+#include "gen/enums.h"
+#include "gen/print-cluster.h"
+#include "client-api.h"
+//#include "app/util/serial/command-interpreter2.h"
+//#include "app/framework/cli/zcl-cli.h"
 
 /** @name Attribute Storage */
 // @{

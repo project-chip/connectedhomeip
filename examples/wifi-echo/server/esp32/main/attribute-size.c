@@ -37,13 +37,13 @@
  *******************************************************************************
    ******************************************************************************/
 
-#include PLATFORM_HEADER
+//#include PLATFORM_HEADER
 
 #include "af.h"
 
 static const uint8_t attributeSizes[] =
 {
-#include "attribute-size.h"
+#include "gen/attribute-size.h"
 };
 
 uint8_t emberAfGetDataSize(uint8_t dataType)

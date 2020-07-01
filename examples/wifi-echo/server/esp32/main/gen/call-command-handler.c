@@ -40,7 +40,7 @@
 
 
 
-#include PLATFORM_HEADER
+// #include PLATFORM_HEADER
 #ifdef EZSP_HOST
 // Includes needed for ember related functions for the EZSP host
 #include "stack/include/error.h"
@@ -51,10 +51,12 @@
 #include "app/util/ezsp/serial-interface.h"
 #else
 // Includes needed for ember related functions for the EM250
-#include "stack/include/ember.h"
+// #include "stack/include/ember.h"
 #endif // EZSP_HOST
 
-#include "app/framework/util/util.h"
+#include <stdint.h>
+
+#include "../util.h"
 #include "af-structs.h"
 #include "call-command-handler.h"
 #include "command-id.h"
