@@ -20,6 +20,7 @@
 #define MBEDTLS_ECP_C
 #define MBEDTLS_ECDH_C
 #define MBEDTLS_HKDF_C
+#define MBEDTLS_BIGNUM_C
 
 // Define mbedtls_error()
 #define MBEDTLS_ERROR_C
