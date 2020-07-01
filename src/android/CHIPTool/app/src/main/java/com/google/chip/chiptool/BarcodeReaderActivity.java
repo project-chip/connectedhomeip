@@ -38,9 +38,6 @@ import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 import java.io.IOException;
 
-import chip.setuppayload.SetupPayload;
-import chip.setuppayload.SetupPayloadParser;
-
 public class BarcodeReaderActivity extends AppCompatActivity {
   private static final String TAG = BarcodeReaderActivity.class.getSimpleName();
 
@@ -162,9 +159,6 @@ public class BarcodeReaderActivity extends AppCompatActivity {
 
       // TODO(randy.rossi): Put the raw bytes through the CHIP qr code parser
       // barcodes.get(0).rawBytes;
-
-      // TODO: Uncomment following line once we have a scanned QR code string.
-      // SetupPayload setupPayload = new SetupPayloadParser().parseQrCode(qrCodeString);
     }
 
     @Override
