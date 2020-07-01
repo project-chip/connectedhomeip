@@ -105,7 +105,7 @@ public:
      * Initialize a UDP transport on a given port.
      *
      * @param inetLayer    underlying communication channel
-     * @param parms        UDP configuration parameters for this transport
+     * @param params        UDP configuration parameters for this transport
      *
      * @details
      *   Generally send and receive ports should be the same and equal to CHIP_PORT.
