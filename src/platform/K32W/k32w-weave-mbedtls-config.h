@@ -1,4 +1,5 @@
 /*
+*   Copyright (c) 2020 Project CHIP Authors
  *  Copyright (c) 2020, The OpenThread Authors.
  *  All rights reserved.
  *

@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -22,28 +23,29 @@
  *          for K32W platforms using the NXP SDK.
  */
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/DeviceLayer/ConfigurationManager.h>
-#include <Weave/Core/WeaveKeyIds.h>
-#include <Weave/Core/WeaveVendorIdentifiers.hpp>
-#include <Weave/Profiles/security/WeaveApplicationKeys.h>
-#include <Weave/DeviceLayer/K32W/GroupKeyStoreImpl.h>
-#include <Weave/DeviceLayer/K32W/K32WConfig.h>
-#include <Weave/DeviceLayer/internal/GenericConfigurationManagerImpl.ipp>
+/* this file behaves like a config.h, comes first */
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
+
+#include <platform/ConfigurationManager.h>
+#include <platform/K32W/K32WConfig.h>
+#include <platform/K32W/GroupKeyStoreImpl.h>
+#include <platform/Profiles/security/CHIPApplicationKeys.h>
+
 
 #include "fsl_reset.h"
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
-using namespace ::nl::Weave::Profiles::Security::AppKeys;
-using namespace ::nl::Weave::Profiles::DeviceDescription;
-using namespace ::nl::Weave::DeviceLayer::Internal;
+using namespace ::chip::Profiles::Security::AppKeys;
+using namespace ::chip::Profiles::DeviceDescription;
+using namespace ::chip::DeviceLayer::Internal;
 
 namespace {
 
-// Singleton instance of Weave Group Key Store.
+// Singleton instance of CHIP Group Key Store.
 GroupKeyStoreImpl gGroupKeyStore;
 
 } // unnamed namespace
@@ -52,9 +54,9 @@ GroupKeyStoreImpl gGroupKeyStore;
  */
 ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
 
-WEAVE_ERROR ConfigurationManagerImpl::_Init()
+CHIP_ERROR ConfigurationManagerImpl::_Init()
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     bool        failSafeArmed;
 
     // Initialize the generic implementation base class.
@@ -66,12 +68,12 @@ WEAVE_ERROR ConfigurationManagerImpl::_Init()
     SuccessOrExit(err);
 
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (_GetFailSafeArmed(failSafeArmed) == WEAVE_NO_ERROR && failSafeArmed)
+    if (_GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
     {
-        WeaveLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
+        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
         _InitiateFactoryReset();
     }
-    err = WEAVE_NO_ERROR;
+    err = CHIP_NO_ERROR;
 
 exit:
     return err;
@@ -90,7 +92,7 @@ exit:
     return err;
 }
 
-::nl::Weave::Profiles::Security::AppKeys::GroupKeyStoreBase *ConfigurationManagerImpl::_GetGroupKeyStore()
+::chip::Profiles::Security::AppKeys::GroupKeyStoreBase * ConfigurationManagerImpl::_GetGroupKeyStore()
 {
     return &gGroupKeyStore;
 }
@@ -106,16 +108,15 @@ void ConfigurationManagerImpl::_InitiateFactoryReset()
     PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
-WEAVE_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(
-    ::nl::Weave::Platform::PersistedStorage::Key persistedStorageKey,
-    uint32_t & value)
+CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
+                                                                uint32_t & value)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     err = ReadConfigValueCounter(persistedStorageKey, value);
-    if (err == WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        err = WEAVE_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
     SuccessOrExit(err);
 
@@ -123,18 +124,17 @@ exit:
     return err;
 }
 
-WEAVE_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(
-    ::nl::Weave::Platform::PersistedStorage::Key persistedStorageKey,
-    uint32_t                                     value)
+CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
+                                                                 uint32_t value)
 {
-    // This method reads Weave Persisted Counter type nvm3 objects.
+    // This method reads Chip Persisted Counter type nvm3 objects.
     // (where persistedStorageKey represents an index to the counter).
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     err = WriteConfigValueCounter(persistedStorageKey, value);
-    if (err == WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        err = WEAVE_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
     SuccessOrExit(err);
 
@@ -144,28 +144,27 @@ exit:
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
-    WeaveLogProgress(DeviceLayer, "Performing factory reset");
+    ChipLogProgress(DeviceLayer, "Performing factory reset");
 
     err = FactoryResetConfig();
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
-        WeaveLogError(DeviceLayer, "FactoryResetConfig() failed: %s", nl::ErrorStr(err));
+        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", nl::ErrorStr(err));
     }
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-    WeaveLogProgress(DeviceLayer, "Clearing Thread provision");
+    ChipLogProgress(DeviceLayer, "Clearing Thread provision");
     ThreadStackMgr().ClearThreadProvision();
 
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     // Restart the system.
-    WeaveLogProgress(DeviceLayer, "System restarting");
+    ChipLogProgress(DeviceLayer, "System restarting");
     RESET_SystemReset();
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip

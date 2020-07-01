@@ -1,7 +1,7 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,48 +18,48 @@
 
 /**
  *    @file
- *          Provides implementations for the OpenWeave and LwIP logging
+ *          Provides implementations for the CHIP and LwIP logging
  *          functions on NXP K32W platforms.
  */
 
-#define K32W_LOG_MODULE_NAME weave
+#define K32W_LOG_MODULE_NAME chip
 #define EOL_CHARS "\r\n"   /* End of Line Characters */
 #define EOL_CHARS_LEN 2    /* Length of EOL */
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/Support/logging/WeaveLogging.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <support/logging/CHIPLogging.h>
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread/platform/logging.h>
 #include <openthread/platform/uart.h>
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 extern "C" void K32WWriteBlocking(const uint8_t *aBuf, uint32_t len);
 
-using namespace ::nl::Weave;
-using namespace ::nl::Weave::DeviceLayer;
-using namespace ::nl::Weave::DeviceLayer::Internal;
-using namespace ::nl::Weave::Logging;
+using namespace ::chip;
+using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Internal;
+using namespace ::chip::Logging;
 
 namespace {
 
 void GetModuleName(char *buf, uint8_t module)
 {
-    if (module == ::nl::Weave::Logging::kLogModule_DeviceLayer)
+    if (module == ::chip::Logging::kLogModule_DeviceLayer)
     {
         memcpy(buf, "DL", 3);
     }
     else
     {
-        ::nl::Weave::Logging::GetModuleName(buf, module);
+        ::chip::Logging::GetModuleName(buf, module);
     }
 }
 
-void GetMessageString(char *buf, uint8_t weaveCategory, uint8_t otLogLevel)
+void GetMessageString(char *buf, uint8_t chipCategory, uint8_t otLogLevel)
 {
-    if (weaveCategory != kLogCategory_None)
+    if (chipCategory != kLogCategory_None)
     {
-        switch (weaveCategory) {
+        switch (chipCategory) {
             case kLogCategory_Error:
                 memcpy(buf, "[Error]", 7);
                 break;
@@ -95,17 +95,17 @@ void GetMessageString(char *buf, uint8_t weaveCategory, uint8_t otLogLevel)
     }
 }
 
-void FillPrefix(char* buf, uint8_t bufLen, uint8_t weaveCategory, uint8_t otLogLevel, uint8_t module)
+void FillPrefix(char* buf, uint8_t bufLen, uint8_t chipCategory, uint8_t otLogLevel, uint8_t module)
 {
     size_t prefixLen;
 
     /* add the error string */
-    assert(bufLen > nlWeaveLoggingWeavePrefixLen);
-    ::GetMessageString(buf, weaveCategory, otLogLevel);
+    assert(bufLen > nlChipLoggingChipPrefixLen);
+    ::GetMessageString(buf, chipCategory, otLogLevel);
 
     /* add the module name string */
     prefixLen = strlen(buf);
-    assert(bufLen > (prefixLen + nlWeaveLoggingModuleNameLen + 3));
+    assert(bufLen > (prefixLen + nlChipLoggingModuleNameLen + 3));
     buf[prefixLen++] = '[';
     GetModuleName(buf + prefixLen, module);
     prefixLen = strlen(buf);
@@ -115,12 +115,11 @@ void FillPrefix(char* buf, uint8_t bufLen, uint8_t weaveCategory, uint8_t otLogL
 
 } // unnamed namespace
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 /**
- * Called whenever a log message is emitted by Weave or LwIP.
+ * Called whenever a log message is emitted by CHIP or LwIP.
  *
  * This function is intended be overridden by the application to, e.g.,
  * schedule output of queued log entries.
@@ -130,35 +129,29 @@ void __attribute__((weak)) OnLogOutput(void)
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace Logging {
 
 /**
- * OpenWeave log output function.
+ * CHIP log output function.
  */
-void Log(uint8_t module, uint8_t category, const char *msg, ...)
+void LogV(uint8_t module, uint8_t category, const char *msg, va_list v)
 {
-    va_list v;
-
     (void)module;
     (void)category;
-
-    va_start(v, msg);
 
 #if K32W_LOG_ENABLED
 
     if (IsCategoryEnabled(category))
     {
         {
-            char formattedMsg[WEAVE_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1] = {0};
+            char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1] = {0};
             size_t prefixLen, writtenLen;
 
             /* Prefix is composed of [Debug String][MOdule Name String] */
-            FillPrefix(formattedMsg, WEAVE_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, category, OT_LOG_LEVEL_NONE, module);
+            FillPrefix(formattedMsg, CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, category, OT_LOG_LEVEL_NONE, module);
             prefixLen = strlen(formattedMsg);
 
             // Append the log message.
@@ -174,13 +167,10 @@ void Log(uint8_t module, uint8_t category, const char *msg, ...)
     DeviceLayer::OnLogOutput();
 
 #endif // NRF_LOG_ENABLED
-
-    va_end(v);
 }
 
 } // namespace Logging
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 
 #undef K32W_LOG_MODULE_NAME
@@ -198,7 +188,7 @@ void LwIPLog(const char *msg, ...)
 
 #if K32W_LOG_ENABLED
     {
-        char formattedMsg[WEAVE_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1];
+        char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1];
 
         // Append the log message.
         size_t len = vsnprintf(formattedMsg, sizeof(formattedMsg), msg, v);
@@ -220,7 +210,7 @@ void LwIPLog(const char *msg, ...)
     va_end(v);
 }
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #undef K32W_LOG_MODULE_NAME
 #define K32W_LOG_MODULE_NAME thread
@@ -236,11 +226,11 @@ void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat
     va_start(v, aFormat);
 
 #if K32W_LOG_ENABLED
-	char formattedMsg[WEAVE_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1] = {0};
+	char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1] = {0};
 	size_t prefixLen, writtenLen;
 
 	/* Prefix is composed of [Debug String][MOdule Name String] */
-	FillPrefix(formattedMsg, WEAVE_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, kLogCategory_None, aLogLevel, (uint8_t)kLogModule_NotSpecified);
+	FillPrefix(formattedMsg, CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, kLogCategory_None, aLogLevel, (uint8_t)kLogModule_NotSpecified);
 	prefixLen = strlen(formattedMsg);
 
 	// Append the log message.
@@ -257,4 +247,4 @@ void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat
     va_end(v);
 }
 
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD

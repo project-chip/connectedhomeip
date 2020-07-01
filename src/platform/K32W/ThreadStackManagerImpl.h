@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -25,15 +26,14 @@
 #ifndef THREAD_STACK_MANAGER_IMPL_H
 #define THREAD_STACK_MANAGER_IMPL_H
 
-#include <Weave/DeviceLayer/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.h>
-#include <Weave/DeviceLayer/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.h>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.h>
+#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.h>
 #include <openthread/thread.h>
 #include <openthread/tasklet.h>
 
 extern "C" void otSysEventSignalPending(void);
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 class ThreadStackManager;
@@ -70,17 +70,17 @@ public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
     using ThreadStackManager::InitThreadStack;
-    WEAVE_ERROR InitThreadStack(otInstance *otInst);
+    CHIP_ERROR InitThreadStack(otInstance *otInst);
 
 private:
     // ===== Methods that implement the ThreadStackManager abstract interface.
 
-    WEAVE_ERROR _InitThreadStack(void);
+    CHIP_ERROR _InitThreadStack(void);
 
     // ===== Members for internal use by the following friends.
 
-    friend ThreadStackManager & ::nl::Weave::DeviceLayer::ThreadStackMgr(void);
-    friend ThreadStackManagerImpl & ::nl::Weave::DeviceLayer::ThreadStackMgrImpl(void);
+    friend ThreadStackManager & ::chip::DeviceLayer::ThreadStackMgr(void);
+    friend ThreadStackManagerImpl & ::chip::DeviceLayer::ThreadStackMgrImpl(void);
     friend int Internal::GetEntropy_K32W(uint8_t *buf, size_t bufSize);
 
     static ThreadStackManagerImpl sInstance;
@@ -95,7 +95,7 @@ private:
 /**
  * Returns the public interface of the ThreadStackManager singleton object.
  *
- * Weave applications should use this to access features of the ThreadStackManager object
+ * chip applications should use this to access features of the ThreadStackManager object
  * that are common to all platforms.
  */
 inline ThreadStackManager &ThreadStackMgr(void)
@@ -106,7 +106,7 @@ inline ThreadStackManager &ThreadStackMgr(void)
 /**
  * Returns the platform-specific implementation of the ThreadStackManager singleton object.
  *
- * Weave applications can use this to gain access to features of the ThreadStackManager
+ * chip applications can use this to gain access to features of the ThreadStackManager
  * that are specific to K32W platforms.
  */
 inline ThreadStackManagerImpl &ThreadStackMgrImpl(void)
@@ -115,7 +115,6 @@ inline ThreadStackManagerImpl &ThreadStackMgrImpl(void)
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // THREAD_STACK_MANAGER_IMPL_H

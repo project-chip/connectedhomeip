@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -18,25 +19,22 @@
 
 /**
  *    @file
- *          Defines platform-specific event types and data for the Weave
+ *          Defines platform-specific event types and data for the chip
  *          Device Layer on K32W061 platforms using the NXP SDK.
  */
 
-#ifndef WEAVE_DEVICE_PLATFORM_EVENT_H
-#define WEAVE_DEVICE_PLATFORM_EVENT_H
+#ifndef CHIP_DEVICE_PLATFORM_EVENT_H
+#define CHIP_DEVICE_PLATFORM_EVENT_H
 
-#include <Weave/DeviceLayer/WeaveDeviceEvent.h>
+#include <platform/CHIPDeviceEvent.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 class PacketBuffer;
 }
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 namespace DeviceEventType {
@@ -50,7 +48,7 @@ enum PublicPlatformSpecificEventTypes
 };
 
 /**
- * Enumerates K32W061 platform-specific event types that are internal to the Weave Device Layer.
+ * Enumerates K32W061 platform-specific event types that are internal to the chip Device Layer.
  */
 enum InternalPlatformSpecificEventTypes
 {
@@ -63,7 +61,7 @@ enum InternalPlatformSpecificEventTypes
  * Represents platform-specific event information for NXP K32W061 platforms.
  */
 
-struct WeaveDevicePlatformEvent final
+struct ChipDevicePlatformEvent final
 {
     union
     {
@@ -72,7 +70,6 @@ struct WeaveDevicePlatformEvent final
 };
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif // WEAVE_DEVICE_PLATFORM_EVENT_H
+#endif // CHIP_DEVICE_PLATFORM_EVENT_H

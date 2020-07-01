@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -19,21 +20,21 @@
 #ifndef CONNECTIVITY_MANAGER_IMPL_H
 #define CONNECTIVITY_MANAGER_IMPL_H
 
-#include <Weave/DeviceLayer/ConnectivityManager.h>
-#include <Weave/DeviceLayer/internal/GenericConnectivityManagerImpl.h>
-#if WEAVE_DEVICE_CONFIG_ENABLE_WOBLE
-#include <Weave/DeviceLayer/internal/GenericConnectivityManagerImpl_BLE.h>
+#include <platform/ConnectivityManager.h>
+#include <platform/internal/GenericConnectivityManagerImpl.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
 #else
-#include <Weave/DeviceLayer/internal/GenericConnectivityManagerImpl_NoBLE.h>
+#include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
 #endif
-#if WEAVE_DEVICE_CONFIG_ENABLE_THREAD
-#include <Weave/DeviceLayer/internal/GenericConnectivityManagerImpl_Thread.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <platform/internal/GenericConnectivityManagerImpl_Thread.h>
 #else
-#include <Weave/DeviceLayer/internal/GenericConnectivityManagerImpl_NoThread.h>
+#include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
-#include <Weave/DeviceLayer/internal/GenericConnectivityManagerImpl_NoWiFi.h>
-#include <Weave/DeviceLayer/internal/GenericConnectivityManagerImpl_NoTunnel.h>
-#include <Weave/Support/FlagUtils.hpp>
+#include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
+#include <platform/internal/GenericConnectivityManagerImpl_NoTunnel.h>
+#include <support/FlagUtils.hpp>
 
 namespace nl {
 namespace Inet {
@@ -41,8 +42,7 @@ class IPAddress;
 } // namespace Inet
 } // namespace nl
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 /**
@@ -50,12 +50,12 @@ namespace DeviceLayer {
  */
 class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
-#if WEAVE_DEVICE_CONFIG_ENABLE_WOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
                                       public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
 #else
                                       public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>,
 #endif
-#if WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
                                       public Internal::GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>,
 #else
                                       public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>,
@@ -73,8 +73,8 @@ private:
     bool        _HaveIPv4InternetConnectivity(void);
     bool        _HaveIPv6InternetConnectivity(void);
     bool        _HaveServiceConnectivity(void);
-    WEAVE_ERROR _Init(void);
-    void        _OnPlatformEvent(const WeaveDeviceEvent *event);
+    CHIP_ERROR _Init(void);
+    void        _OnPlatformEvent(const ChipDeviceEvent *event);
 
     // ===== Members for internal use by the following friends.
 
@@ -102,7 +102,7 @@ inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
 /**
  * Returns the public interface of the ConnectivityManager singleton object.
  *
- * Weave applications should use this to access features of the ConnectivityManager object
+ * Chip applications should use this to access features of the ConnectivityManager object
  * that are common to all platforms.
  */
 inline ConnectivityManager &ConnectivityMgr(void)
@@ -113,7 +113,7 @@ inline ConnectivityManager &ConnectivityMgr(void)
 /**
  * Returns the platform-specific implementation of the ConnectivityManager singleton object.
  *
- * Weave applications can use this to gain access to features of the ConnectivityManager
+ * Chip applications can use this to gain access to features of the ConnectivityManager
  * that are specific to the ESP32 platform.
  */
 inline ConnectivityManagerImpl &ConnectivityMgrImpl(void)
@@ -122,7 +122,6 @@ inline ConnectivityManagerImpl &ConnectivityMgrImpl(void)
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // CONNECTIVITY_MANAGER_IMPL_H

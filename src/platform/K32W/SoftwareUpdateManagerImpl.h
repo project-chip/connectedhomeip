@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Google LLC.
  *    All rights reserved.
  *
@@ -19,13 +20,12 @@
 #ifndef SOFTWARE_UPDATE_MANAGER_IMPL_H
 #define SOFTWARE_UPDATE_MANAGER_IMPL_H
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
+#if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
-#include <Weave/DeviceLayer/internal/GenericSoftwareUpdateManagerImpl.h>
-#include <Weave/DeviceLayer/internal/GenericSoftwareUpdateManagerImpl_BDX.h>
+#include <platform/internal/GenericSoftwareUpdateManagerImpl.h>
+#include <platform/internal/GenericSoftwareUpdateManagerImpl_BDX.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 /**
@@ -51,7 +51,7 @@ class SoftwareUpdateManagerImpl final : public SoftwareUpdateManager,
 public:
     // ===== Members for internal use by the following friends.
 
-    friend ::nl::Weave::DeviceLayer::SoftwareUpdateManager &SoftwareUpdateMgr(void);
+    friend ::chip::DeviceLayer::SoftwareUpdateManager &SoftwareUpdateMgr(void);
     friend SoftwareUpdateManagerImpl &                      SoftwareUpdateMgrImpl(void);
 
     static SoftwareUpdateManagerImpl sInstance;
@@ -59,7 +59,7 @@ public:
 private:
     // ===== Members that implement the SoftwareUpdateManager abstract interface.
 
-    WEAVE_ERROR _Init(void);
+    CHIP_ERROR _Init(void);
 };
 
 /**
@@ -85,8 +85,7 @@ inline SoftwareUpdateManagerImpl &SoftwareUpdateMgrImpl(void)
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 #endif // SOFTWARE_UPDATE_MANAGER_IMPL_H

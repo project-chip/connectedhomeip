@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -19,10 +20,9 @@
 #ifndef NETWORK_PROVISIONING_SERVER_IMPL_H
 #define NETWORK_PROVISIONING_SERVER_IMPL_H
 
-#include <Weave/DeviceLayer/internal/GenericNetworkProvisioningServerImpl.h>
+#include <platform/internal/GenericNetworkProvisioningServerImpl.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
@@ -36,20 +36,20 @@ class NetworkProvisioningServerImpl final
 {
     // Allow the NetworkProvisioningServer interface class to delegate method calls to
     // the implementation methods provided by this class.
-    friend class Internal::NetworkProvisioningServer;
+    friend class ::chip::DeviceLayer::Internal::NetworkProvisioningServer;
 
     // Allow the GenericNetworkProvisioningServerImpl base class to access helper methods
     // and types defined on this class.
-    friend class Internal::GenericNetworkProvisioningServerImpl<NetworkProvisioningServerImpl>;
+    friend class GenericNetworkProvisioningServerImpl<NetworkProvisioningServerImpl>;
 
 private:
     // ===== Members that implement the NetworkProvisioningServer public interface.
 
-    WEAVE_ERROR _Init(void);
+    CHIP_ERROR _Init(void);
 
     // ===== Members for internal use by the following friends.
 
-    friend ::nl::Weave::DeviceLayer::Internal::NetworkProvisioningServer &NetworkProvisioningSvr(void);
+    friend ::chip::DeviceLayer::Internal::NetworkProvisioningServer &NetworkProvisioningSvr(void);
     friend NetworkProvisioningServerImpl &                                NetworkProvisioningSvrImpl(void);
 
     static NetworkProvisioningServerImpl sInstance;
@@ -79,7 +79,6 @@ inline NetworkProvisioningServerImpl &NetworkProvisioningSvrImpl(void)
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // NETWORK_PROVISIONING_SERVER_IMPL_H

@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Google LLC.
  *    All rights reserved.
  *
@@ -15,33 +16,31 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+/* this file behaves like a config.h, comes first */
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
+#include <Profiles/CHIPProfiles.h>
+#include <Profiles/common/CommonProfile.h>
 
-#include <Weave/Profiles/WeaveProfiles.h>
-#include <Weave/Profiles/common/CommonProfile.h>
+#include <DeviceLayer/internal/GenericSoftwareUpdateManagerImpl.ipp>
+#include <DeviceLayer/internal/GenericSoftwareUpdateManagerImpl_BDX.ipp>
 
-#include <Weave/DeviceLayer/internal/GenericSoftwareUpdateManagerImpl_BDX.ipp>
-#include <Weave/DeviceLayer/internal/GenericSoftwareUpdateManagerImpl.ipp>
-
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 SoftwareUpdateManagerImpl SoftwareUpdateManagerImpl::sInstance;
 
-WEAVE_ERROR SoftwareUpdateManagerImpl::_Init(void)
+CHIP_ERROR SoftwareUpdateManagerImpl::_Init(void)
 {
     Internal::GenericSoftwareUpdateManagerImpl_BDX<SoftwareUpdateManagerImpl>::DoInit();
     Internal::GenericSoftwareUpdateManagerImpl<SoftwareUpdateManagerImpl>::DoInit();
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER

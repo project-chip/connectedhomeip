@@ -1,8 +1,8 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,22 +22,23 @@
  *          Utilities for accessing persisted device configuration on
  *          platforms based on the NXP K32W SDK.
  */
+/* this file behaves like a config.h, comes first */
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/DeviceLayer/K32W/K32WConfig.h>
-#include <Weave/Core/WeaveEncoding.h>
-#include <Weave/DeviceLayer/internal/testing/ConfigUnitTest.h>
+#include <platform/K32W/K32WConfig.h>
+
+#include <core/CHIPEncoding.h>
+#include <platform/internal/testing/ConfigUnitTest.h>
 
 #include "FreeRTOS.h"
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-WEAVE_ERROR K32WConfig::Init()
+CHIP_ERROR K32WConfig::Init()
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     int pdmStatus;
 
     /* Initialise the Persistent Data Manager */
@@ -48,14 +49,14 @@ exit:
     return err;
 }
 
-WEAVE_ERROR K32WConfig::ReadConfigValue(Key key, bool & val)
+CHIP_ERROR K32WConfig::ReadConfigValue(Key key, bool & val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     bool tempVal;
     uint16_t bytesRead;
     PDM_teStatus pdmStatus;
 
-    VerifyOrExit(ValidConfigKey(key), err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     pdmStatus = PDM_eReadDataFromRecord((uint16_t)key, &tempVal, sizeof(bool), &bytesRead);
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
     val = tempVal;
@@ -64,15 +65,15 @@ exit:
     return err;
 }
 
-WEAVE_ERROR K32WConfig::ReadConfigValue(Key key, uint32_t & val)
+CHIP_ERROR K32WConfig::ReadConfigValue(Key key, uint32_t & val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     uint32_t tempVal;
     uint16_t bytesRead;
     uint16_t recordSize;
     PDM_teStatus pdmStatus;
 
-    VerifyOrExit(ValidConfigKey(key), err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     if (PDM_bDoesDataExist((uint16_t)key, &recordSize))
     {
         pdmStatus = PDM_eReadDataFromRecord((uint16_t)key, &tempVal, sizeof(uint32_t), &bytesRead);
@@ -81,7 +82,7 @@ WEAVE_ERROR K32WConfig::ReadConfigValue(Key key, uint32_t & val)
     }
     else
     {
-        err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
         goto exit;
     }
 
@@ -89,15 +90,15 @@ exit:
     return err;
 }
 
-WEAVE_ERROR K32WConfig::ReadConfigValue(Key key, uint64_t & val)
+CHIP_ERROR K32WConfig::ReadConfigValue(Key key, uint64_t & val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     uint64_t tempVal;
     uint16_t bytesRead;
     uint16_t recordSize;
     PDM_teStatus pdmStatus;
 
-    VerifyOrExit(ValidConfigKey(key), err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
     if (PDM_bDoesDataExist((uint16_t)key, &recordSize))
     {
@@ -107,7 +108,7 @@ WEAVE_ERROR K32WConfig::ReadConfigValue(Key key, uint64_t & val)
     }
     else
     {
-        err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
         goto exit;
     }
 
@@ -115,9 +116,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR K32WConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR K32WConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     const uint8_t *strEnd;
     char *pData = NULL;
     uint16_t bytesRead;
@@ -126,18 +127,18 @@ WEAVE_ERROR K32WConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
 
     outLen = 0;
 
-    VerifyOrExit(ValidConfigKey(key), err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
     if (PDM_bDoesDataExist((uint16_t)key, &recordSize))
     {
         pData = (char *)pvPortMalloc(recordSize);
-        VerifyOrExit((pData != NULL), err = WEAVE_ERROR_NO_MEMORY);
+        VerifyOrExit((pData != NULL), err = CHIP_ERROR_NO_MEMORY);
 
         pdmStatus = PDM_eReadDataFromRecord((uint16_t)key, pData, recordSize, &bytesRead);
         SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
         strEnd = (const uint8_t *)memchr(pData, 0, bytesRead);
-        VerifyOrExit(strEnd != NULL, err = WEAVE_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(strEnd != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         outLen = strEnd - (const uint8_t *)pData;
 
@@ -145,14 +146,14 @@ WEAVE_ERROR K32WConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
 
         if (buf != NULL)
         {
-            VerifyOrExit(bufSize > outLen, err = WEAVE_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrExit(bufSize > outLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
             memcpy(buf, pData, outLen + 1);
         }
     }
     else
     {
-        err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
         goto exit;
     }
 
@@ -164,9 +165,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR K32WConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR K32WConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     uint8_t *pData = NULL;
     uint16_t bytesRead;
     uint16_t recordSize;
@@ -174,26 +175,26 @@ WEAVE_ERROR K32WConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSiz
 
     outLen = 0;
 
-    VerifyOrExit(ValidConfigKey(key), err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
     if (PDM_bDoesDataExist((uint16_t)key, &recordSize))
     {
         pData = (uint8_t *)pvPortMalloc(recordSize);
-        VerifyOrExit((pData != NULL), err = WEAVE_ERROR_NO_MEMORY);
+        VerifyOrExit((pData != NULL), err = CHIP_ERROR_NO_MEMORY);
 
         pdmStatus = PDM_eReadDataFromRecord((uint16_t)key, pData, recordSize, &bytesRead);
         SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
         if (buf != NULL)
         {
-            VerifyOrExit((bufSize >= bytesRead), err = WEAVE_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrExit((bufSize >= bytesRead), err = CHIP_ERROR_BUFFER_TOO_SMALL);
             memcpy(buf, pData, bytesRead);
         }
         outLen = bytesRead;
     }
     else
     {
-        err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
         goto exit;
     }
 
@@ -206,16 +207,16 @@ exit:
     return err;
 }
 
-WEAVE_ERROR K32WConfig::ReadConfigValueCounter(uint8_t counterIdx, uint32_t &val)
+CHIP_ERROR K32WConfig::ReadConfigValueCounter(uint8_t counterIdx, uint32_t &val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     uint32_t    tempVal;
     uint16_t bytesRead;
     uint16_t recordSize;
     PDM_teStatus pdmStatus;
 
-    Key key = kMinConfigKey_WeaveCounter + counterIdx;
-    VerifyOrExit(ValidConfigKey(key), err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    Key key = kMinConfigKey_ChipCounter + counterIdx;
+    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
     if (PDM_bDoesDataExist((uint16_t)key, &recordSize))
     {
@@ -225,7 +226,7 @@ WEAVE_ERROR K32WConfig::ReadConfigValueCounter(uint8_t counterIdx, uint32_t &val
     }
     else
     {
-        err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
         goto exit;
     }
 
@@ -233,12 +234,12 @@ exit:
     return err;
 }
 
-WEAVE_ERROR K32WConfig::WriteConfigValue(Key key, bool val)
+CHIP_ERROR K32WConfig::WriteConfigValue(Key key, bool val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     PDM_teStatus pdmStatus;
 
-    VerifyOrExit(ValidConfigKey(key), err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     pdmStatus = PDM_eSaveRecordData((uint16_t)key, &val, sizeof(bool));
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
@@ -246,12 +247,12 @@ exit:
     return err;
 }
 
-WEAVE_ERROR K32WConfig::WriteConfigValue(Key key, uint32_t val)
+CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint32_t val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     PDM_teStatus pdmStatus;
 
-    VerifyOrExit(ValidConfigKey(key), err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     pdmStatus = PDM_eSaveRecordData((uint16_t)key, &val, sizeof(uint32_t));
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
@@ -259,12 +260,12 @@ exit:
     return err;
 }
 
-WEAVE_ERROR K32WConfig::WriteConfigValue(Key key, uint64_t val)
+CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint64_t val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     PDM_teStatus pdmStatus;
 
-    VerifyOrExit(ValidConfigKey(key), err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     pdmStatus = PDM_eSaveRecordData((uint16_t)key, &val, sizeof(uint64_t));
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
@@ -272,17 +273,17 @@ exit:
     return err;
 }
 
-WEAVE_ERROR K32WConfig::WriteConfigValueStr(Key key, const char * str)
+CHIP_ERROR K32WConfig::WriteConfigValueStr(Key key, const char * str)
 {
     return WriteConfigValueStr(key, str, (str != NULL) ? strlen(str) : 0);
 }
 
-WEAVE_ERROR K32WConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
+CHIP_ERROR K32WConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     PDM_teStatus pdmStatus;
 
-    VerifyOrExit(ValidConfigKey(key), err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
     if (str != NULL)
     {
@@ -299,12 +300,12 @@ exit:
     return err;
 }
 
-WEAVE_ERROR K32WConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
+CHIP_ERROR K32WConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     PDM_teStatus pdmStatus;
 
-    VerifyOrExit(ValidConfigKey(key), err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
     if ((data != NULL) && (dataLen > 0))
     {
@@ -321,13 +322,13 @@ exit:
     return err;
 }
 
-WEAVE_ERROR K32WConfig::WriteConfigValueCounter(uint8_t counterIdx, uint32_t val)
+CHIP_ERROR K32WConfig::WriteConfigValueCounter(uint8_t counterIdx, uint32_t val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     PDM_teStatus pdmStatus;
 
-    Key key = kMinConfigKey_WeaveCounter + counterIdx;
-    VerifyOrExit(ValidConfigKey(key), err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    Key key = kMinConfigKey_ChipCounter + counterIdx;
+    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     pdmStatus = PDM_eSaveRecordData((uint16_t)key, &val, sizeof(uint32_t));
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
@@ -335,11 +336,11 @@ exit:
     return err;
 }
 
-WEAVE_ERROR K32WConfig::ClearConfigValue(Key key)
+CHIP_ERROR K32WConfig::ClearConfigValue(Key key)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(ValidConfigKey(key), err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     PDM_vDeleteDataRecord((uint16_t)key);
 
     SuccessOrExit(err);
@@ -350,25 +351,25 @@ exit:
 
 bool K32WConfig::ConfigValueExists(Key key)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     uint16_t size = 0;
 
-    VerifyOrExit(ValidConfigKey(key), err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-    VerifyOrExit(PDM_bDoesDataExist((uint16_t)key, &size), err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND);
+    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrExit(PDM_bDoesDataExist((uint16_t)key, &size), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
 exit:
     // Return true if the record was found.
-    return (err == WEAVE_NO_ERROR);
+    return (err == CHIP_NO_ERROR);
 }
 
-WEAVE_ERROR K32WConfig::FactoryResetConfig(void)
+CHIP_ERROR K32WConfig::FactoryResetConfig(void)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
-    // Iterate over all the Weave Config PDM ID records and delete each one
-    err = ForEachRecord(kMinConfigKey_WeaveConfig, kMaxConfigKey_WeaveConfig, false,
-                        [](const Key &pdmKey, const size_t &length) -> WEAVE_ERROR {
-                            WEAVE_ERROR err2;
+    // Iterate over all the CHIP Config PDM ID records and delete each one
+    err = ForEachRecord(kMinConfigKey_ChipConfig, kMaxConfigKey_ChipConfig, false,
+                        [](const Key &pdmKey, const size_t &length) -> CHIP_ERROR {
+                            CHIP_ERROR err2;
 
                             err2 = ClearConfigValue(pdmKey);
                             SuccessOrExit(err2);
@@ -378,41 +379,41 @@ WEAVE_ERROR K32WConfig::FactoryResetConfig(void)
                         });
 
     // Return success at end of iterations.
-    if (err == WEAVE_END_OF_INPUT)
+    if (err == CHIP_END_OF_INPUT)
     {
-        err = WEAVE_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
 
     return err;
 }
 
-WEAVE_ERROR K32WConfig::MapPdmStatus(PDM_teStatus pdmStatus)
+CHIP_ERROR K32WConfig::MapPdmStatus(PDM_teStatus pdmStatus)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     switch (pdmStatus)
     {
         case PDM_E_STATUS_OK:
-            err = WEAVE_NO_ERROR;
+            err = CHIP_NO_ERROR;
             break;
         default:
-            err = WEAVE_CONFIG_ERROR_MIN + pdmStatus;
+            err = CHIP_CONFIG_ERROR_MIN + pdmStatus;
             break;
     }
 
     return err;
 }
 
-WEAVE_ERROR K32WConfig::MapPdmInitStatus(int pdmStatus)
+CHIP_ERROR K32WConfig::MapPdmInitStatus(int pdmStatus)
 {
-    return (pdmStatus == 0) ? WEAVE_NO_ERROR : WEAVE_CONFIG_ERROR_MIN + pdmStatus;
+    return (pdmStatus == 0) ? CHIP_NO_ERROR : CHIP_CONFIG_ERROR_MIN + pdmStatus;
 }
 
 bool K32WConfig::ValidConfigKey(Key key)
 {
-    // Returns true if the key is in the valid Weave Config PDM key range.
+    // Returns true if the key is in the valid CHIP Config PDM key range.
 
-    if ((key >= kMinConfigKey_WeaveFactory) && (key <= kMaxConfigKey_WeaveCounter))
+    if ((key >= kMinConfigKey_ChipFactory) && (key <= kMaxConfigKey_ChipCounter))
     {
         return true;
     }
@@ -420,9 +421,9 @@ bool K32WConfig::ValidConfigKey(Key key)
     return false;
 }
 
-WEAVE_ERROR K32WConfig::ForEachRecord(Key firstKey, Key lastKey, bool addNewRecord, ForEachRecordFunct funct)
+CHIP_ERROR K32WConfig::ForEachRecord(Key firstKey, Key lastKey, bool addNewRecord, ForEachRecordFunct funct)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     for (Key pdmKey = firstKey; pdmKey <= lastKey; pdmKey++)
     {
@@ -456,5 +457,4 @@ exit:
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip

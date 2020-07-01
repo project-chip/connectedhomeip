@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -21,22 +22,22 @@
  *          Provides an implementation of the PlatformManager object
  *          for K32W platforms using the NXP K32W SDK.
  */
+/* this file behaves like a config.h, comes first */
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/DeviceLayer/PlatformManager.h>
-#include <Weave/DeviceLayer/FreeRTOS/GenericPlatformManagerImpl_FreeRTOS.ipp>
+#include <platform/PlatformManager.h>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 #include <lwip/tcpip.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
-WEAVE_ERROR PlatformManagerImpl::_InitWeaveStack(void)
+CHIP_ERROR PlatformManagerImpl::_InitChiptack(void)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     // Initialize the configuration system.
     err = Internal::K32WConfig::Init();
@@ -45,9 +46,9 @@ WEAVE_ERROR PlatformManagerImpl::_InitWeaveStack(void)
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
 
-    // Call _InitWeaveStack() on the generic implementation base class
+    // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitWeaveStack();
+    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
 exit:
@@ -55,5 +56,4 @@ exit:
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip

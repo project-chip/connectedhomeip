@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -24,29 +25,30 @@
  *
  */
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/DeviceLayer/ThreadStackManager.h>
-#include <Weave/DeviceLayer/OpenThread/OpenThreadUtils.h>
+/* this file behaves like a config.h, comes first */
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <Weave/DeviceLayer/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.ipp>
-#include <Weave/DeviceLayer/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.ipp>
+#include <platform/ThreadStackManager.h>
+#include <platform/OpenThread/OpenThreadUtils.h>
 
-namespace nl {
-namespace Weave {
+#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.ipp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.ipp>
+
+namespace chip {
 namespace DeviceLayer {
 
-using namespace ::nl::Weave::DeviceLayer::Internal;
+using namespace ::chip::DeviceLayer::Internal;
 
 ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
-WEAVE_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
+CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
 {
     return InitThreadStack(NULL);
 }
 
-WEAVE_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance *otInst)
+CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance *otInst)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Initialize the generic implementation base classes.
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
@@ -66,10 +68,9 @@ bool ThreadStackManagerImpl::IsInitialized()
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-using namespace ::nl::Weave::DeviceLayer;
+using namespace ::chip::DeviceLayer;
 
 /**
  * Glue function called directly by the OpenThread stack when tasklet processing work

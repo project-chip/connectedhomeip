@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -25,12 +26,13 @@
 #ifndef BLE_MANAGER_IMPL_H
 #define BLE_MANAGER_IMPL_H
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_WOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+using namespace chip::Ble;
 
 /**
  * Concrete implementation of the NetworkProvisioningServer singleton object for the K32W platforms.
@@ -56,34 +58,39 @@ private:
 
     // ===== Members that implement the BLEManager internal interface.
 
-    WEAVE_ERROR _Init(void);
-    WoBLEServiceMode _GetWoBLEServiceMode(void);
-    WEAVE_ERROR _SetWoBLEServiceMode(WoBLEServiceMode val);
+    CHIP_ERROR _Init(void);
+    CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
+    CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
-    WEAVE_ERROR _SetAdvertisingEnabled(bool val);
+    CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsFastAdvertisingEnabled(void);
-    WEAVE_ERROR _SetFastAdvertisingEnabled(bool val);
+    CHIP_ERROR _SetFastAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
-    WEAVE_ERROR _GetDeviceName(char * buf, size_t bufSize);
-    WEAVE_ERROR _SetDeviceName(const char * deviceName);
+    CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);
+    CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections(void);
-    void _OnPlatformEvent(const WeaveDeviceEvent * event);
-    ::nl::Ble::BleLayer * _GetBleLayer(void) const;
+    void _OnPlatformEvent(const ChipDeviceEvent * event);
+    BleLayer * _GetBleLayer(void) const;
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
-    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const WeaveBleUUID * svcId, const WeaveBleUUID * charId) override;
-    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const WeaveBleUUID * svcId, const WeaveBleUUID * charId) override;
+    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId) override;
+    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId) override;
     bool CloseConnection(BLE_CONNECTION_OBJECT conId) override;
     uint16_t GetMTU(BLE_CONNECTION_OBJECT conId) const override;
-    bool SendIndication(BLE_CONNECTION_OBJECT conId, const WeaveBleUUID * svcId, const WeaveBleUUID * charId, PacketBuffer * pBuf) override;
-    bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const WeaveBleUUID * svcId, const WeaveBleUUID * charId, PacketBuffer * pBuf) override;
-    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const WeaveBleUUID * svcId, const WeaveBleUUID * charId, PacketBuffer * pBuf) override;
-    bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const WeaveBleUUID * svcId, const WeaveBleUUID * charId) override;
+    bool SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                        PacketBuffer * pBuf) override;
+    bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                          PacketBuffer * pBuf) override;
+    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                         PacketBuffer * pBuf) override;
+    bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,
+                          const ChipBleUUID * charId) override;
+
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
-    void NotifyWeaveConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
+    void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
 
     // ===== Members for internal use by the following friends.
 
@@ -117,17 +124,17 @@ private:
     uint8_t mAdvHandle;
 
     void DriveBLEState(void);
-    WEAVE_ERROR ConfigureAdvertising(void);
-    //WEAVE_ERROR EncodeAdvertisingData(ble_gap_adv_data_t & gapAdvData);
-    WEAVE_ERROR StartAdvertising(void);
-    WEAVE_ERROR StopAdvertising(void);
-    void HandleSoftDeviceBLEEvent(const WeaveDeviceEvent * event);
-    WEAVE_ERROR HandleGAPConnect(const WeaveDeviceEvent * event);
-    WEAVE_ERROR HandleGAPDisconnect(const WeaveDeviceEvent * event);
-    WEAVE_ERROR HandleRXCharWrite(const WeaveDeviceEvent * event);
-    WEAVE_ERROR HandleTXCharCCCDWrite(const WeaveDeviceEvent * event);
-    WEAVE_ERROR HandleTXComplete(const WeaveDeviceEvent * event);
-    WEAVE_ERROR SetSubscribed(uint16_t conId);
+    CHIP_ERROR ConfigureAdvertising(void);
+    CHIP_ERROR EncodeAdvertisingData(ble_gap_adv_data_t & gapAdvData);
+    CHIP_ERROR StartAdvertising(void);
+    CHIP_ERROR StopAdvertising(void);
+    void HandleSoftDeviceBLEEvent(const ChipDeviceEvent * event);
+    CHIP_ERROR HandleGAPConnect(const ChipDeviceEvent * event);
+    CHIP_ERROR HandleGAPDisconnect(const ChipDeviceEvent * event);
+    CHIP_ERROR HandleRXCharWrite(const ChipDeviceEvent * event);
+    CHIP_ERROR HandleTXCharCCCDWrite(const ChipDeviceEvent * event);
+    CHIP_ERROR HandleTXComplete(const ChipDeviceEvent * event);
+    CHIP_ERROR SetSubscribed(uint16_t conId);
     bool UnsetSubscribed(uint16_t conId);
     bool IsSubscribed(uint16_t conId);
 
@@ -162,7 +169,7 @@ inline ::nl::Ble::BleLayer * BLEManagerImpl::_GetBleLayer() const
     return (BleLayer *)(this);
 }
 
-inline BLEManager::WoBLEServiceMode BLEManagerImpl::_GetWoBLEServiceMode(void)
+inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
 {
     return mServiceMode;
 }
@@ -179,9 +186,8 @@ inline bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_WOBLE
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #endif // BLE_MANAGER_IMPL_H

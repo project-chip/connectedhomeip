@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -15,73 +16,58 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+ /* this file behaves like a config.h, comes first */
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/DeviceLayer/ConnectivityManager.h>
-#include <Weave/DeviceLayer/internal/NetworkProvisioningServer.h>
-#include <Weave/DeviceLayer/internal/DeviceNetworkInfo.h>
-#include <Weave/DeviceLayer/internal/ServiceTunnelAgent.h>
-#include <Weave/DeviceLayer/internal/BLEManager.h>
-#include <Weave/Profiles/WeaveProfiles.h>
-#include <Weave/Profiles/common/CommonProfile.h>
-#include <Warm/Warm.h>
+#include <platform/ConnectivityManager.h>
+#include <platform/internal/BLEManager.h>
+#include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
 #include <lwip/ip_addr.h>
 #include <lwip/netif.h>
 #include <lwip/nd6.h>
 #include <lwip/dns.h>
 
-#include <new>
-
-#if WEAVE_DEVICE_CONFIG_ENABLE_WOBLE
-#include <Weave/DeviceLayer/internal/GenericConnectivityManagerImpl_BLE.ipp>
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_THREAD
-#include <Weave/DeviceLayer/internal/GenericConnectivityManagerImpl_Thread.ipp>
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <DeviceLayer/internal/GenericConnectivityManagerImpl_Thread.ipp>
 #endif
 
-using namespace ::nl;
-using namespace ::nl::Weave;
-using namespace ::nl::Weave::TLV;
-using namespace ::nl::Weave::Profiles::Common;
-using namespace ::nl::Weave::Profiles::NetworkProvisioning;
-using namespace ::nl::Weave::DeviceLayer::Internal;
+using namespace ::chip;
+using namespace ::chip::TLV;
+using namespace ::chip::DeviceLayer::Internal;
 
-using Profiles::kWeaveProfile_Common;
-using Profiles::kWeaveProfile_NetworkProvisioning;
-
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
-WEAVE_ERROR ConnectivityManagerImpl::_Init()
+CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Initialize the generic base classes that require it.
-#if WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
 #endif
 
-    // Initialize the Weave Addressing and Routing Module.
-    err = Warm::Init(FabricState);
     SuccessOrExit(err);
 
 exit:
     return err;
 }
 
-void ConnectivityManagerImpl::_OnPlatformEvent(const WeaveDeviceEvent *event)
+void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent *event)
 {
     // Forward the event to the generic base classes as needed.
-#if WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_OnPlatformEvent(event);
 #endif
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip

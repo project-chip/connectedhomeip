@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -15,29 +16,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+/* this file behaves like a config.h, comes first */
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/DeviceLayer/internal/NetworkProvisioningServer.h>
-#include <Weave/DeviceLayer/internal/DeviceNetworkInfo.h>
-#include <Weave/Core/WeaveTLV.h>
-#include <Weave/Profiles/WeaveProfiles.h>
-#include <Weave/Profiles/common/CommonProfile.h>
+#include <platform/internal/GenericNetworkProvisioningServerImpl.ipp>
+#include <platform/internal/NetworkProvisioningServer.h>
 
-#include <Weave/DeviceLayer/internal/GenericNetworkProvisioningServerImpl.ipp>
+#include <core/CHIPTLV.h>
+#include <platform/internal/DeviceNetworkInfo.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
 NetworkProvisioningServerImpl NetworkProvisioningServerImpl::sInstance;
 
-WEAVE_ERROR NetworkProvisioningServerImpl::_Init(void)
+CHIP_ERROR NetworkProvisioningServerImpl::_Init(void)
 {
     return GenericNetworkProvisioningServerImpl<NetworkProvisioningServerImpl>::DoInit();
 }
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip

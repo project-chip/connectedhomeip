@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Google LLC.
  *    All rights reserved.
  *
@@ -18,8 +19,8 @@
 
 /**
  *    @file
- *          Platform-specific configuration overrides for the OpenWeave BLE
- *          Layer on nRF52 platforms using the Nordic nRF5 SDK.
+ *          Platform-specific configuration overrides for the CHIP BLE
+ *          Layer on K32W platforms using the NXP SDK.
  *
  */
 

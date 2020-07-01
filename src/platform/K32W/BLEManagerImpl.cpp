@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -22,19 +23,16 @@
  *          for the K32W platforms.
  */
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/DeviceLayer/internal/BLEManager.h>
-#include <BleLayer/WeaveBleServiceData.h>
-#include <new>
+/* this file behaves like a config.h, comes first */
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_WOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 
 using namespace ::nl;
 using namespace ::nl::Ble;
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
@@ -45,6 +43,5 @@ namespace {
 }
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_WOBLE
+} // namespace chip
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
