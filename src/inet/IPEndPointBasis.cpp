@@ -421,11 +421,11 @@ exit:
  */
 INET_ERROR IPEndPointBasis::JoinMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress)
 {
-    INET_ERROR lRetval            = INET_ERROR_NOT_IMPLEMENTED;
+    INET_ERROR lRetval = INET_ERROR_NOT_IMPLEMENTED;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
     const IPAddressType lAddrType = aAddress.Type();
-    lRetval = CheckMulticastGroupArgs(aInterfaceId, aAddress);
+    lRetval                       = CheckMulticastGroupArgs(aInterfaceId, aAddress);
     SuccessOrExit(lRetval);
 
     switch (lAddrType)
@@ -510,11 +510,11 @@ exit:
  */
 INET_ERROR IPEndPointBasis::LeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress)
 {
-    INET_ERROR lRetval            = INET_ERROR_NOT_IMPLEMENTED;
+    INET_ERROR lRetval = INET_ERROR_NOT_IMPLEMENTED;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
     const IPAddressType lAddrType = aAddress.Type();
-    lRetval = CheckMulticastGroupArgs(aInterfaceId, aAddress);
+    lRetval                       = CheckMulticastGroupArgs(aInterfaceId, aAddress);
     SuccessOrExit(lRetval);
 
     switch (lAddrType)
