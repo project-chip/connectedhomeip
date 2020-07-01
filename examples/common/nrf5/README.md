@@ -2,14 +2,15 @@
 
 This directory contains common code for several example apps.
 
-* `common`
+-   `common`
 
-  This directory contains common code for bringing up a nRF52840 example app.
+    This directory contains common code for bringing up a nRF52840 example app.
 
-* `util`
+-   `util`
 
-  This directory contains some usful classes for example apps.
+    This directory contains some usful classes for example apps.
 
-* `gdb`
+-   `gdb`
 
-  This directory contains some shell scripts for setting up debugging environment.
+    This directory contains some shell scripts for setting up debugging
+    environment.
