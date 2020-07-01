@@ -19,7 +19,7 @@ pullapprove_conditions:
     #  License Checks
     ############################################################
     - condition: "'*license/cla*' in statuses.successful"
-      unmet_status: "failure"
+      unmet_status: "pending"
       explanation: "CLA must be agreed to by all contributors"
 
     ############################################################
