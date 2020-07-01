@@ -17,12 +17,12 @@
 
 /**
  *    @file
- *      This file declares the abstraction of one-directional, anonymous
- *      data stream built on top of two file descriptors.
+ *      This file declares the abstraction of system wake event used for
+ *      resuming task from select system call.
  */
 
-#ifndef SYSTEMPIPE_H
-#define SYSTEMPIPE_H
+#ifndef SYSTEMWAKEEVENT_H
+#define SYSTEMWAKEEVENT_H
 
 // Include configuration headers
 #include <system/SystemConfig.h>
@@ -34,18 +34,23 @@ namespace System {
 
 using ::chip::System::Error;
 
-class Pipe
+class SystemWakeEvent
 {
 public:
     Error Open(); /**< Initialize the pipeline */
     void Close(); /**< Close both ends of the pipeline. */
 
-    int GetReadFD() const { return mFDs[FD_READ]; }
+#if CONFIG_HAVE_PIPE
+    int GetNotifFD() const { return mFDs[FD_READ]; }
+#else
+    int GetNotifFD() const { return mFD; }
+#endif
 
-    void WriteByte(uint8_t byte); /**< Put a single byte in the pipeline */
-    void ClearContent();          /**< Clear the pipeline by reading all its contents */
+    void Notify();  /**< Set the event. */
+    void Confirm(); /**< Clear the event. */
 
 private:
+#if CONFIG_HAVE_PIPE
     enum
     {
         FD_READ  = 0,
@@ -53,9 +58,12 @@ private:
     };
 
     int mFDs[2];
+#else
+    int mFD;
+#endif
 };
 
 } // namespace System
 } // namespace chip
 
-#endif // SYSTEMPIPE_H
+#endif // SYSTEMWAKEEVENT_H
