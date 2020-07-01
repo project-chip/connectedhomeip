@@ -1163,10 +1163,8 @@ INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress,
     SuccessOrExit(res);
 
     res = GetEndPoint(endpoint, aAddress, aPort);
-    SuccessOrExit(res);
-
-    nw_parameters_set_local_endpoint(aParameters, endpoint);
     nw_release(endpoint);
+    SuccessOrExit(res);
 
     mDispatchQueue = dispatch_queue_create("inet_dispatch_global", DISPATCH_QUEUE_CONCURRENT);
     VerifyOrExit(mDispatchQueue != NULL, res = INET_ERROR_NO_MEMORY);
@@ -1265,15 +1263,15 @@ void IPEndPointBasis::HandleDataReceived(nw_connection_t aConnection)
 
 void IPEndPointBasis::GetPacketInfo(nw_connection_t aConnection, IPPacketInfo & aPacketInfo)
 {
-    nw_parameters_t parameters    = nw_connection_copy_parameters(aConnection);
-    nw_endpoint_t local_endpoint  = nw_parameters_copy_local_endpoint(parameters);
-    nw_endpoint_t remote_endpoint = nw_connection_copy_endpoint(aConnection);
+    nw_path_t path              = nw_connection_copy_current_path(aConnection);
+    nw_endpoint_t dest_endpoint = nw_path_copy_effective_local_endpoint(path);
+    nw_endpoint_t src_endpoint  = nw_path_copy_effective_remote_endpoint(path);
 
     aPacketInfo.Clear();
-    aPacketInfo.SrcAddress  = IPAddress::FromSockAddr(*nw_endpoint_get_address(remote_endpoint));
-    aPacketInfo.DestAddress = IPAddress::FromSockAddr(*nw_endpoint_get_address(local_endpoint));
-    aPacketInfo.SrcPort     = nw_endpoint_get_port(remote_endpoint);
-    aPacketInfo.DestPort    = nw_endpoint_get_port(local_endpoint);
+    aPacketInfo.SrcAddress  = IPAddress::FromSockAddr(*nw_endpoint_get_address(src_endpoint));
+    aPacketInfo.DestAddress = IPAddress::FromSockAddr(*nw_endpoint_get_address(dest_endpoint));
+    aPacketInfo.SrcPort     = nw_endpoint_get_port(src_endpoint);
+    aPacketInfo.DestPort    = nw_endpoint_get_port(dest_endpoint);
 }
 
 INET_ERROR IPEndPointBasis::GetEndPoint(nw_endpoint_t & aEndPoint, const IPAddress aAddress, uint16_t aPort)
