@@ -276,6 +276,7 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
     case DeviceRole::OTBR_DEVICE_ROLE_LEADER:
         type = ConnectivityManager::ThreadDeviceType::kThreadDeviceType_Router;
     default:
+        ChipLogError(DeviceLayer, "Unknown Thread role: %d", static_cast<int>(role));
         break;
     }
 
