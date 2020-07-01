@@ -121,6 +121,7 @@ union PeerSockAddr
        // !defined(raw_set_flags) || !defined(udp_clear_flags) || !defined(udp_set_flags)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 static INET_ERROR CheckMulticastGroupArgs(InterfaceId aInterfaceId, const IPAddress & aAddress)
 {
     INET_ERROR lRetval = INET_NO_ERROR;
@@ -135,6 +136,7 @@ static INET_ERROR CheckMulticastGroupArgs(InterfaceId aInterfaceId, const IPAddr
 exit:
     return (lRetval);
 }
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if INET_CONFIG_ENABLE_IPV4
@@ -419,10 +421,10 @@ exit:
  */
 INET_ERROR IPEndPointBasis::JoinMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress)
 {
-    const IPAddressType lAddrType = aAddress.Type();
     INET_ERROR lRetval            = INET_ERROR_NOT_IMPLEMENTED;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    const IPAddressType lAddrType = aAddress.Type();
     lRetval = CheckMulticastGroupArgs(aInterfaceId, aAddress);
     SuccessOrExit(lRetval);
 
@@ -508,10 +510,10 @@ exit:
  */
 INET_ERROR IPEndPointBasis::LeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress)
 {
-    const IPAddressType lAddrType = aAddress.Type();
     INET_ERROR lRetval            = INET_ERROR_NOT_IMPLEMENTED;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    const IPAddressType lAddrType = aAddress.Type();
     lRetval = CheckMulticastGroupArgs(aInterfaceId, aAddress);
     SuccessOrExit(lRetval);
 
