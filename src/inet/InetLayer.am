@@ -91,3 +91,17 @@ endif # CHIP_SYSTEM_CONFIG_USE_SOCKETS
 if CHIP_WITH_NLFAULTINJECTION
 CHIP_BUILD_INET_LAYER_SOURCE_FILES += @top_builddir@/src/inet/InetFaultInjection.cpp
 endif # CHIP_WITH_NLFAULTINJECTION
+
+if CHIP_WITH_ANDROID
+# Some Android platforms (bionic) don't have the
+# getifaddrs(3)/freeifaddrs(3) interfaces. This Android library
+# provides an inline compatibility implementation.
+
+android_platform_libcore_dir                               = \
+    $(top_srcdir)/third_party/android/platform-libcore/android-platform-libcore
+
+chip_InetLayer_CPPFLAGS                                    = \
+    -I$(android_platform_libcore_dir)/luni/src/main/native   \
+    -I$(android_platform_libcore_dir)/include                \
+    $(NULL)
+endif # CHIP_WITH_ANDROID
