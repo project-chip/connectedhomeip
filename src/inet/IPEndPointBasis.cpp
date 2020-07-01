@@ -1202,7 +1202,10 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     send_semaphore = dispatch_semaphore_create(0);
     content = dispatch_data_create(aBuffer->Start(), aBuffer->DataLength(), mDispatchQueue, DISPATCH_DATA_DESTRUCTOR_DEFAULT);
     nw_connection_send(mConnection, content, NW_CONNECTION_DEFAULT_MESSAGE_CONTEXT, true, ^(nw_error_t error) {
-        res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
+        if (error)
+        {
+            res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
+        }
         dispatch_semaphore_signal(send_semaphore);
     });
     dispatch_release(content);
