@@ -45,6 +45,10 @@ libSupportLayer_adir                = $(includedir)/support
 
 dist_libSupportLayer_a_HEADERS      = $(CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES)
 
+Loggingdir                          = $(includedir)/support/logging
+
+dist_Logging_HEADERS                = $(CHIP_BUILD_SUPPORT_LAYER_LOGGING_HEADER_FILES)
+
 EXTRA_DIST                          = $(CHIP_BUILD_SUPPORT_LAYER_VERHOEFF_HEADER_FILES)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

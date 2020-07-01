@@ -18,6 +18,8 @@
 #import <AVFoundation/AVFoundation.h>
 #import <UIKit/UIKit.h>
 
+#import "BLEConnectionController.h"
+
 @interface QRCodeViewController : UIViewController <AVCaptureMetadataOutputObjectsDelegate>
 
 @property (weak, nonatomic) IBOutlet UIView * qrCodeViewPreview;
@@ -29,6 +31,8 @@
 
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView * activityIndicator;
 @property (weak, nonatomic) IBOutlet UILabel * errorLabel;
+
+@property (strong, nonatomic) BLEConnectionController * ble;
 
 @property (weak, nonatomic) IBOutlet UIView * setupPayloadView;
 @property (weak, nonatomic) IBOutlet UILabel * manualCodeLabel;

@@ -64,7 +64,9 @@ uint16_t DisplayWidth  = 0;
 TimerHandle_t displayTimer = NULL;
 #endif
 
+#if CONFIG_DISPLAY_AUTO_OFF
 static void TimerCallback(TimerHandle_t xTimer);
+#endif
 static void SetupBrightnessControl();
 static void SetBrightness(uint16_t brightness_percent);
 

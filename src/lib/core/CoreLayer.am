@@ -35,6 +35,7 @@ CHIP_BUILD_CORE_LAYER_SOURCE_FILES                        = \
     $(NULL)
 
 CHIP_BUILD_CORE_LAYER_HEADER_FILES                        = \
+    @top_builddir@/src/lib/core/CHIPCallback.h              \
     @top_builddir@/src/lib/core/CHIPCircularTLVBuffer.h     \
     @top_builddir@/src/lib/core/CHIPConfig.h                \
     @top_builddir@/src/lib/core/CHIPCore.h                  \
