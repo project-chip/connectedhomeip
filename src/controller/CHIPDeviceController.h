@@ -49,24 +49,8 @@ typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * app
 typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
 };
 
-class ChipDeviceControllerCallback : public SecureSessionMgrCallback
+class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback
 {
-public:
-    virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                   System::PacketBuffer * msgBuf, SecureSessionMgr * mgr);
-
-    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr);
-
-    void SetController(ChipDeviceController * controller) { mController = controller; }
-
-private:
-    ChipDeviceController * mController;
-};
-
-class DLL_EXPORT ChipDeviceController
-{
-    friend class ChipDeviceControllerCallback;
-
 public:
     ChipDeviceController();
 
@@ -172,6 +156,11 @@ public:
      */
     CHIP_ERROR GetLayers(Layer ** systemLayer, InetLayer ** inetLayer);
 
+    virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
+                                   System::PacketBuffer * msgBuf, SecureSessionMgr * mgr);
+
+    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr);
+
 private:
     enum
     {
@@ -206,8 +195,6 @@ private:
     ErrorHandler mOnError;
     NewConnectionHandler mOnNewConnection;
     System::PacketBuffer * mCurReqMsg;
-
-    ChipDeviceControllerCallback mCallback;
 
     NodeId mLocalDeviceId;
     IPAddress mDeviceAddr;
