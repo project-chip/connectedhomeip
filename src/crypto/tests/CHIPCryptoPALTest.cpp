@@ -850,6 +850,17 @@ static void TestECDH_SampleInputVectors(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, numOfTestsExecuted > 0);
 }
 
+#if CHIP_CRYPTO_OPENSSL
+static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR error = add_entropy_source(test_entropy_source, NULL, 10);
+    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    unsigned char buffer[5];
+    NL_TEST_ASSERT(inSuite, DRBG_get_bytes(buffer, sizeof(buffer)) == CHIP_NO_ERROR);
+}
+#endif
+
+#if CHIP_CRYPTO_MBEDTLS
 static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR error = add_entropy_source(test_entropy_source, NULL, 10);
@@ -857,14 +868,13 @@ static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
     unsigned char buffer[5];
     uint32_t test_entropy_source_call_count = gs_test_entropy_source_called;
     NL_TEST_ASSERT(inSuite, DRBG_get_bytes(buffer, sizeof(buffer)) == CHIP_NO_ERROR);
-#if CHIP_CRYPTO_MBEDTLS
     for (int i = 0; i < 5000 * 2; i++)
     {
         (void) DRBG_get_bytes(buffer, sizeof(buffer));
     }
     NL_TEST_ASSERT(inSuite, gs_test_entropy_source_called > test_entropy_source_call_count);
-#endif
 }
+#endif
 
 static void TestPBKDF2_SHA256_TestVectors(nlTestSuite * inSuite, void * inContext)
 {
