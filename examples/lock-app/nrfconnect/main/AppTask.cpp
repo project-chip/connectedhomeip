@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,9 +19,10 @@
 #include "AppTask.h"
 #include "BoltLockManager.h"
 #include "LEDWidget.h"
+#include "Server.h"
 #include "app_config.h"
 
-// TODO: #include <platform/CHIPDeviceLayer.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include <dk_buttons_and_leds.h>
 #include <logging/log.h>
@@ -51,9 +51,10 @@ static bool sHaveServiceConnectivity = false;
 
 static k_timer sFunctionTimer;
 
-// TODO: using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
+DemoSessionManager sSessions;
 
 int AppTask::Init()
 {
@@ -81,6 +82,10 @@ int AppTask::Init()
 
     BoltLockMgr().Init();
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+
+    // Init ZCL Data Model
+    InitDataModelHandler();
+    StartServer(&sSessions);
     return 0;
 }
 
@@ -106,8 +111,6 @@ int AppTask::StartApp()
             ret = k_msgq_get(&sAppEventQueue, &event, K_NO_WAIT);
         }
 
-// TODO: enable the code below
-#if 0
         // Collect connectivity and configuration state from the CHIP stack.  Because the
         // CHIP event loop is being run in a separate task, the stack must be locked
         // while these values are queried.  However we use a non-blocking lock request
@@ -116,14 +119,13 @@ int AppTask::StartApp()
 
         if (PlatformMgr().TryLockChipStack())
         {
-            sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
-            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
+            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
+            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+            sIsThreadAttached    = ConnectivityMgr().IsThreadAttached();
+            // sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
+            // sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
-#endif
 
         // Consider the system to be "fully connected" if it has service
         // connectivity and it is able to interact with the service on a regular basis.
@@ -247,7 +249,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = kFunction_NoneSelected;
-        LOG_INF("Factory reset is not implemented");
+        // TODO: ConfigurationMgr().InitiateFactoryReset();
     }
 }
 

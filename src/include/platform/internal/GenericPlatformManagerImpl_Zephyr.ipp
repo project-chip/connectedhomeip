@@ -87,6 +87,12 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartChipTimer(uint32_
 }
 
 template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_Shutdown(void)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+template <class ImplClass>
 void GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
     // For some reasons mentioned in https://github.com/zephyrproject-rtos/zephyr/issues/22301
@@ -181,10 +187,12 @@ template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartEventLoopTask(void)
 {
     const auto tid = k_thread_create(&mChipThread, mChipThreadStack, K_THREAD_STACK_SIZEOF(mChipThreadStack), EventLoopTaskMain,
-                                     this, nullptr, nullptr, K_PRIO_PREEMPT(CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY), 0, K_NO_WAIT);
+                                     this, nullptr, nullptr, CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY, 0, K_NO_WAIT);
 
 #ifdef CONFIG_THREAD_NAME
     k_thread_name_set(tid, CHIP_DEVICE_CONFIG_CHIP_TASK_NAME);
+#else
+    IgnoreUnusedVariable(tid);
 #endif
 
     return CHIP_NO_ERROR;

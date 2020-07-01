@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,20 +15,18 @@
  *    limitations under the License.
  */
 
-#ifndef APP_CONFIG_H
-#define APP_CONFIG_H
+#ifndef NRFCONNECT_SERVER_H
+#define NRFCONNECT_SERVER_H
 
-// ---- Lock Example App Config ----
+#include <inet/IPAddress.h>
+#include <inet/InetLayer.h>
+#include <system/SystemPacketBuffer.h>
+#include <transport/SecureSessionMgr.h>
+#include <transport/UDP.h>
 
-#define LOCK_BUTTON DK_BTN2
-#define LOCK_BUTTON_MASK DK_BTN2_MSK
-#define FUNCTION_BUTTON DK_BTN1
-#define FUNCTION_BUTTON_MASK DK_BTN1_MSK
+using DemoSessionManager = chip::SecureSessionMgr<chip::Transport::UDP>;
 
-#define SYSTEM_STATE_LED DK_LED1
-#define LOCK_STATE_LED DK_LED2
+void StartServer(DemoSessionManager * sessions);
+void InitDataModelHandler();
 
-// Time it takes in ms for the simulated actuator to move from one state to another.
-#define ACTUATOR_MOVEMENT_PERIOS_MS 2000
-
-#endif // APP_CONFIG_H
+#endif // NRFCONNECT_SERVER_H

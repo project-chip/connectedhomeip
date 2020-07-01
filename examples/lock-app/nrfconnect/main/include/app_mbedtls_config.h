@@ -16,20 +16,14 @@
  *    limitations under the License.
  */
 
-#ifndef APP_CONFIG_H
-#define APP_CONFIG_H
+// Enable cryptographic functions needed by CHIP which can't be enabled via Kconfig
+#define MBEDTLS_ECP_C
+#define MBEDTLS_ECDH_C
+#define MBEDTLS_HKDF_C
 
-// ---- Lock Example App Config ----
+// Define mbedtls_error()
+#define MBEDTLS_ERROR_C
 
-#define LOCK_BUTTON DK_BTN2
-#define LOCK_BUTTON_MASK DK_BTN2_MSK
-#define FUNCTION_BUTTON DK_BTN1
-#define FUNCTION_BUTTON_MASK DK_BTN1_MSK
-
-#define SYSTEM_STATE_LED DK_LED1
-#define LOCK_STATE_LED DK_LED2
-
-// Time it takes in ms for the simulated actuator to move from one state to another.
-#define ACTUATOR_MOVEMENT_PERIOS_MS 2000
-
-#endif // APP_CONFIG_H
+// Use hardware entropy generator
+#define MBEDTLS_ENTROPY_HARDWARE_ALT
+#undef MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
