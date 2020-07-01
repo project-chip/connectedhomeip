@@ -16,6 +16,13 @@ pullapprove_conditions:
       explanation: "Style must be inline before reviewing can be complete"
 
     ############################################################
+    #  License Checks
+    ############################################################
+    - condition: "'*license/cla*' in statuses.successful"
+      unmet_status: "failure"
+      explanation: "CLA must be agreed to by all contributors"
+
+    ############################################################
     #  Draft PRs
     ############################################################
     - condition: "'WIP' not in title"
