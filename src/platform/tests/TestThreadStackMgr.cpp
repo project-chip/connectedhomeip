@@ -25,6 +25,8 @@
 #include "platform/ThreadStackManager.h"
 
 #if CHIP_DEVICE_LAYER_TARGET == LINUX
+#include <thread>
+
 struct DBusConnectionDeleter
 {
     void operator()(DBusConnection * aConnection) { dbus_connection_unref(aConnection); }
@@ -32,6 +34,18 @@ struct DBusConnectionDeleter
 
 using UniqueDBusConnection = std::unique_ptr<DBusConnection, DBusConnectionDeleter>;
 #endif
+
+void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    (void) arg;
+    if (event->Type == chip::DeviceLayer::DeviceEventType::kThreadConnectivityChange)
+    {
+        if (event->ThreadConnectivityChange.Result == chip::DeviceLayer::ConnectivityChange::kConnectivity_Established)
+        {
+            exit(0);
+        }
+    }
+}
 
 int TestThreadStackManager(void)
 {
@@ -58,6 +72,7 @@ int TestThreadStackManager(void)
     memcpy(&info.ThreadNetworkKey, &masterKey, sizeof(masterKey));
 
     chip::DeviceLayer::PlatformMgrImpl().InitChipStack();
+    chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 
     impl.InitThreadStack();
     impl.StartThreadTask();
@@ -66,7 +81,18 @@ int TestThreadStackManager(void)
 
     printf("Start Thread task done\n");
 
-    // chip::DeviceLayer::PlatformMgrImpl().RunEventLoop();
+    // FIXME: Remove the dbus message loop after integration into PlatforManager
+#if CHIP_DEVICE_LAYER_TARGET == LINUX
+    DBusConnection * dispatchConnection = connection.get();
+    std::thread t([dispatchConnection]() {
+        while (true)
+        {
+            dbus_connection_read_write_dispatch(dispatchConnection, -1);
+        }
+    });
+#endif
 
-    return 0;
+    chip::DeviceLayer::PlatformMgrImpl().RunEventLoop();
+
+    return -1;
 }
