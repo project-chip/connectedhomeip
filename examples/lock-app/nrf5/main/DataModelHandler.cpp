@@ -35,25 +35,6 @@ extern "C" {
 
 using namespace ::chip;
 
-void InitDataModelHandler()
-{
-    chipZclEndpointInit();
-}
-
-void HandleDataModelMessage(System::PacketBuffer * buffer)
-{
-    ChipZclStatus_t zclStatus = chipZclProcessIncoming((ChipZclBuffer_t *) buffer);
-    if (zclStatus == CHIP_ZCL_STATUS_SUCCESS)
-    {
-        NRF_LOG_INFO("Data model processing success!");
-    }
-    else
-    {
-        NRF_LOG_INFO("Data model processing failure: %d", zclStatus);
-    }
-    System::PacketBuffer::Free(buffer);
-}
-
 extern "C" void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId,
                                                    uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
                                                    uint8_t * value)

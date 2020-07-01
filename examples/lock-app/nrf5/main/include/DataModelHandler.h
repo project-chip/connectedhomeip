@@ -29,19 +29,4 @@ class PacketBuffer;
 } // namespace System
 } // namespace chip
 
-/**
- * Initialize the data model handler.  This must be called once, and before any
- * HandleDataModelMessage calls happen.
- */
-void InitDataModelHandler();
-
-/**
- * Handle a message that should be processed via our data model processing
- * codepath.
- *
- * @param [in] buffer The buffer holding the message.  This function guarantees
- *                    that it will free the buffer before returning.
- */
-void HandleDataModelMessage(chip::System::PacketBuffer * buffer);
-
 #endif // DATA_MODEL_HANDLER_H
