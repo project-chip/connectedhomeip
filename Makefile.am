@@ -34,7 +34,6 @@ SUBDIRS                                  = \
     examples                               \
     third_party                            \
     src                                    \
-    tests                                  \
     docs                                   \
     $(NULL)
 
