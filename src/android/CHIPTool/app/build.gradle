@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 30
@@ -15,7 +17,7 @@ android {
 
         // NOTE: This build assumes CHIP was configured and built for armeabi-v7a. Deal with
         // other archs later when build is sane.
-        ndk {abiFilters 'armeabi-v7a'}
+//        ndk {abiFilters 'armeabi-v7a'}
     }
 
     buildTypes {
@@ -52,5 +54,10 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation "androidx.core:core-ktx:1.3.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }
 
