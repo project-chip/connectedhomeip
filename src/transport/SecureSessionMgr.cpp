@@ -138,7 +138,15 @@ CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBuffer
 exit:
     if (msgBuf != NULL)
     {
-        ChipLogProgress(Inet, "Secure transport failed to encrypt msg %u: %s", state->GetSendMessageIndex(), ErrorStr(err));
+        const char * errStr = ErrorStr(err);
+        if (state == nullptr)
+        {
+            ChipLogProgress(Inet, "Secure transport could not find a valid PeerConnection: %s", errStr);
+        }
+        else
+        {
+            ChipLogProgress(Inet, "Secure transport failed to encrypt msg %u: %s", state->GetSendMessageIndex(), errStr);
+        }
         PacketBuffer::Free(msgBuf);
         msgBuf = NULL;
     }
