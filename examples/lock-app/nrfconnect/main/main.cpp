@@ -23,7 +23,6 @@
 
 #include <BuildConfig.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/logging/CHIPLogging.h>
 
 LOG_MODULE_REGISTER(app);
 
@@ -34,6 +33,8 @@ using namespace ::chip::DeviceLayer;
 int main()
 {
     int ret = 0;
+
+    k_thread_priority_set(k_current_get(), K_PRIO_COOP(CONFIG_NUM_COOP_PRIORITIES - 1));
 
     LOG_INF("Init CHIP stack");
     ret = PlatformMgr().InitChipStack();

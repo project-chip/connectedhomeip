@@ -94,6 +94,7 @@ void GenericThreadStackManagerImpl_Zephyr<ImplClass>::_LockThreadStack(void)
     if (k_thread_priority_get(k_current_get()) >= 0 || CONFIG_MP_NUM_CPUS != 1)
     {
         ChipLogError(DeviceLayer, "No locking is available. All calls to ThreadStackManager must come from a cooperative task.");
+        ChipLogError(DeviceLayer, "Offending task: %s", k_thread_name_get(k_current_get()));
     }
 }
 
@@ -103,6 +104,7 @@ bool GenericThreadStackManagerImpl_Zephyr<ImplClass>::_TryLockThreadStack(void)
     if (k_thread_priority_get(k_current_get()) >= 0 || CONFIG_MP_NUM_CPUS != 1)
     {
         ChipLogError(DeviceLayer, "No locking is available. All calls to ThreadStackManager must come from a cooperative task.");
+        ChipLogError(DeviceLayer, "Offending task: %s", k_thread_name_get(k_current_get()));
     }
 
     return true;
@@ -114,6 +116,7 @@ void GenericThreadStackManagerImpl_Zephyr<ImplClass>::_UnlockThreadStack(void)
     if (k_thread_priority_get(k_current_get()) >= 0 || CONFIG_MP_NUM_CPUS != 1)
     {
         ChipLogError(DeviceLayer, "No locking is available. All calls to ThreadStackManager must come from a cooperative task.");
+        ChipLogError(DeviceLayer, "Offending task: %s", k_thread_name_get(k_current_get()));
     }
 }
 

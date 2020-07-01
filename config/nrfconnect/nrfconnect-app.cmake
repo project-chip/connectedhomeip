@@ -28,13 +28,12 @@
 #
 #   set(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip)
 #   get_filename_component(CHIP_ROOT ${CHIP_ROOT} REALPATH)
-#   set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHIP_ROOT}/config/nrf5_ncs/)
+#   set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHIP_ROOT}/config/nrfconnect/)
 #
-#   include(nrf5-app)
+#   include(nrfconnect-app)
 #
 #   project(chip-nrf52840-lock-example)
 #   target_sources(app PRIVATE main/main.cpp ...)
-#   target_link_libraries(app PRIVATE ${CHIP_OUTPUT_DIR}/lib/libCHIP.a ...)
 #
 
 # ==================================================
@@ -65,6 +64,7 @@ zephyr_include_directories(
     ${CHIP_ROOT}/src/lib
     ${CHIP_ROOT}/src/lib/core
     ${CHIP_ROOT}/src/include
+    ${CHIP_OUTPUT_DIR}/include
     ${CHIP_OUTPUT_DIR}/src/include
 )
 
@@ -95,20 +95,17 @@ get_zephyr_compilation_flags(CHIP_CFLAGS C)
 get_zephyr_compilation_flags(CHIP_CXXFLAGS CXX)
 list(FILTER CHIP_CXXFLAGS EXCLUDE REGEX -std.*) # CHIP adds gnu++11 anyway...
 
-set(CHIP_COMMON_FLAGS
-    ${CHIP_INCLUDE_DIRS}
-    ${NRF5_SDK_INCLUDE_DIRS}
-    -DUSE_APP_CONFIG
-    -D_SYS__PTHREADTYPES_H_
-    "-isystem${ZEPHYR_BASE}/include/posix")
+set(CHIP_COMMON_FLAGS 
+    -D_SYS__PTHREADTYPES_H_ 
+    -isystem${ZEPHYR_BASE}/include/posix
+    -DMBEDTLS_CONFIG_FILE=CONFIG_MBEDTLS_CFG_FILE
+    -isystem${ZEPHYR_BASE}/../modules/crypto/mbedtls/configs)
 
 set(CHIP_CFLAGS ${CHIP_CFLAGS} ${CHIP_COMMON_FLAGS} --specs=nosys.specs)
 set(CHIP_CXXFLAGS ${CHIP_CXXFLAGS} ${CHIP_COMMON_FLAGS})
 
 convert_list_of_flags_to_string_of_flags(CHIP_CFLAGS CHIP_CFLAGS)
 convert_list_of_flags_to_string_of_flags(CHIP_CXXFLAGS CHIP_CXXFLAGS)
-
-target_link_libraries(app PRIVATE -Wl,--start-group ${CHIP_OUTPUT_LIBRARIES} -Wl,--end-group)
 
 # Prepare command line arguments passed to the CHIP's ./configure script
 set(CHIP_CONFIGURE_ARGS
@@ -145,7 +142,7 @@ set(CHIP_CONFIGURE_ARGS
     --disable-java
     --disable-device-manager
     --with-openthread=${ZEPHYR_BASE}/../modules/lib/openthread
-    --with-mbedtls=${ZEPHYR_BASE}/../mbedtls
+    --with-mbedtls=${ZEPHYR_BASE}/../modules/crypto/mbedtls
     --with-crypto=mbedtls
     )
 
@@ -162,4 +159,9 @@ ExternalProject_Add(
     BUILD_ALWAYS        TRUE
 )
 
+# ==================================================
+# Configure application
+# ==================================================
+target_compile_definitions(app PRIVATE HAVE_CONFIG_H)
+target_link_libraries(app PRIVATE -Wl,--start-group ${CHIP_OUTPUT_LIBRARIES} -Wl,--end-group)
 add_dependencies(app chip_project)
