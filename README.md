@@ -4,7 +4,7 @@
 
 # What is Project Connected Home over IP?
 
-Visit connectedhomeip.com to learn more.
+Visit [connectedhomeip.com](https://connectedhomeip.com) to learn more.
 
 # Current Status of Project Connected Home over IP
 
