@@ -61,7 +61,7 @@ class LoopbackTransport : public Transport::Base
 {
 public:
     /// Transports are required to have a constructor that takes exactly one argument
-    CHIP_ERROR Init(const char * unused) {}
+    CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
 
     CHIP_ERROR SendMessage(const MessageHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) override
     {
