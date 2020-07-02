@@ -35,8 +35,8 @@
 #include <core/CHIPTLVDebug.hpp>
 #include <core/CHIPTLVUtilities.hpp>
 
-#include <support/CodeUtils.h>
 #include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 
 #include <string.h>

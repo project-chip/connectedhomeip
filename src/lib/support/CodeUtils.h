@@ -28,8 +28,8 @@
 #define CODEUTILS_H_
 
 #include <core/CHIPError.h>
-#include <support/ErrorStr.h>
 #include <support/CHIPMem.h>
+#include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
 
 /**

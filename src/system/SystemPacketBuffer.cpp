@@ -35,8 +35,8 @@
 #include "SystemLayerPrivate.h"
 
 // Include local headers
-#include <support/CodeUtils.h>
 #include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemMutex.h>

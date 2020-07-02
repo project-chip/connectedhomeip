@@ -30,8 +30,8 @@
 #include <platform/Linux/CHIPLinuxStorageIni.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <support/Base64.h>
-#include <support/CodeUtils.h>
 #include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
