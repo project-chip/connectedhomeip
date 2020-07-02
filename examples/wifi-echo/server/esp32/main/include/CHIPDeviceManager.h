@@ -83,7 +83,6 @@ public:
     virtual ~CHIPDeviceManagerCallbacks() {}
 };
 
-
 /**
  * @brief
  *   A common class that drives other components of the CHIP stack
