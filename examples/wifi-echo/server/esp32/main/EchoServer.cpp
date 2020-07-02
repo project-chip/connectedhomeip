@@ -133,8 +133,8 @@ static size_t odc(const uint8_t * bytes, size_t bytes_len, char * out, size_t ou
 class EchoServerCallback : public SecureSessionMgrCallback
 {
 public:
-    virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                   System::PacketBuffer * buffer, SecureSessionMgr * mgr)
+    void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
+                           SecureSessionMgr * mgr) override
     {
         CHIP_ERROR err;
         const size_t data_len = buffer->DataLength();
@@ -191,13 +191,13 @@ public:
         }
     }
 
-    virtual void OnReceiveError(CHIP_ERROR error, const IPPacketInfo & source, SecureSessionMgr * mgr)
+    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * mgr) override
     {
         ESP_LOGE(TAG, "ERROR: %s\n Got UDP error", ErrorStr(error));
         statusLED.BlinkOnError();
     }
 
-    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr)
+    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override
     {
         CHIP_ERROR err;
 

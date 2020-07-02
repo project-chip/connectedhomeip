@@ -25,3 +25,6 @@ clang-build:
         BOOTSTRAP_ARGUMENTS: " CC=clang-9 CXX=clang++-9"
     docker:
         - image: connectedhomeip/chip-build:0.2.14
+ipv6-tests:
+    machine:
+        image: ubuntu-1604:201903-01

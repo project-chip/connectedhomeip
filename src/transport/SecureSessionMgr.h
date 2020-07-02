@@ -72,7 +72,7 @@ public:
      * @param error error code
      * @param source network entity that sent the message
      */
-    virtual void OnReceiveError(CHIP_ERROR error, const Inet::IPPacketInfo & source, SecureSessionMgr * mgr) {}
+    virtual void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * mgr) {}
 
     /**
      * @brief
@@ -151,9 +151,9 @@ private:
     Transport::UDP mTransport;
 
     System::Layer * mSystemLayer = nullptr;
-    NodeId mLocalNodeId;                                                                //< Id of the current node
-    Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; //< Active connections to other peers
-    State mState;                                                                       //< Initialization state of the object
+    NodeId mLocalNodeId;                                                                // < Id of the current node
+    Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
+    State mState;                                                                       // < Initialization state of the object
 
     SecureSessionMgrCallback * mCB = nullptr;
 
@@ -173,13 +173,8 @@ private:
     CHIP_ERROR AllocateNewConnection(const MessageHeader & header, const Transport::PeerAddress & address,
                                      Transport::PeerConnectionState ** state);
 
-    /**
-     * Handle UDP data receiving. Each transport has separate data receiving as active sessions
-     * follow data receiving channels.
-     *
-     */
-    static void HandleUdpDataReceived(const MessageHeader & header, const Inet::IPPacketInfo & source,
-                                      System::PacketBuffer * msgBuf, SecureSessionMgr * transport);
+    static void HandleDataReceived(const MessageHeader & header, const Transport::PeerAddress & source,
+                                   System::PacketBuffer * msgBuf, SecureSessionMgr * transport);
 
     /**
      * Called when a specific connection expires.

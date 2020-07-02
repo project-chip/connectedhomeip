@@ -25,6 +25,17 @@ jobs:
               branches:
                   ignore:
                       - /restyled.*/
+    - test_ipv6:
+          name: Run Tests [IPv6]
+          matrix:
+              parameters:
+                  builder: ["main-build"]
+          requires:
+              - Build CHIP [<< matrix.builder >>]
+          filters:
+              branches:
+                  ignore:
+                      - /restyled.*/
     # - code-coverage:
     #       name: Code Coverage [<< matrix.builder >>]
     #       matrix:

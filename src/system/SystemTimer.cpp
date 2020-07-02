@@ -142,7 +142,7 @@ Error Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, voi
         this->mNextTimer  = lLayer.mTimerList;
         lLayer.mTimerList = this;
 
-        // this is the new eariest timer and so the timer needs (re-)starting provided that
+        // this is the new earliest timer and so the timer needs (re-)starting provided that
         // the system is not currently processing expired timers, in which case it is left to
         // HandleExpiredTimers() to re-start the timer.
         if (!lLayer.mTimerComplete)

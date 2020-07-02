@@ -96,31 +96,52 @@ static void ServiceEvents(Layer & aLayer, ::timeval & aSleepTime)
 }
 
 // Test input vector format.
+static const uint32_t MAX_NUM_TIMERS = 1000;
 
-struct TestContext
+class TestContext
 {
+public:
     Layer * mLayer;
     nlTestSuite * mTestSuite;
+    chip::Callback::Callback<> mGreedyTimer; // for greedy timer
+    uint32_t mNumTimersHandled;
+
+    void GreedyTimer()
+    {
+        NL_TEST_ASSERT(mTestSuite, mNumTimersHandled < MAX_NUM_TIMERS);
+
+        if (mNumTimersHandled >= MAX_NUM_TIMERS)
+        {
+            return;
+        }
+
+        mLayer->StartTimer(0, &mGreedyTimer);
+        mNumTimersHandled++;
+    }
+    static void GreedyTimer(void * p)
+    {
+        TestContext * lContext = static_cast<TestContext *>(p);
+        lContext->GreedyTimer();
+    };
+
+    TestContext() : mGreedyTimer(GreedyTimer, this), mNumTimersHandled(0){};
 };
 
 // Test input data.
 
-static struct TestContext sContext;
-
 static volatile bool sOverflowTestDone;
 
-void HandleTimer0Failed(Layer * inetLayer, void * aState, Error aError)
+void TimerFailed(void * aState)
 {
-    TestContext & lContext = *static_cast<TestContext *>(aState);
-    NL_TEST_ASSERT(lContext.mTestSuite, false);
+    TestContext * lContext = static_cast<TestContext *>(aState);
+    NL_TEST_ASSERT(lContext->mTestSuite, false);
     sOverflowTestDone = true;
 }
 
-void HandleTimer1Failed(Layer * inetLayer, void * aState, Error aError)
+void HandleTimerFailed(Layer * inetLayer, void * aState, Error aError)
 {
-    TestContext & lContext = *static_cast<TestContext *>(aState);
-    NL_TEST_ASSERT(lContext.mTestSuite, false);
-    sOverflowTestDone = true;
+    (void) inetLayer, (void) aError;
+    TimerFailed(aState);
 }
 
 void HandleTimer10Success(Layer * inetLayer, void * aState, Error aError)
@@ -141,8 +162,9 @@ static void CheckOverflow(nlTestSuite * inSuite, void * aContext)
 
     sOverflowTestDone = false;
 
-    lSys.StartTimer(timeout_overflow_0ms, HandleTimer0Failed, aContext);
-    lSys.StartTimer(timeout_overflow_1ms, HandleTimer1Failed, aContext);
+    lSys.StartTimer(timeout_overflow_0ms, HandleTimerFailed, aContext);
+    chip::Callback::Callback<> cb(TimerFailed, aContext);
+    lSys.StartTimer(timeout_overflow_1ms, &cb);
     lSys.StartTimer(timeout_10ms, HandleTimer10Success, aContext);
 
     while (!sOverflowTestDone)
@@ -153,17 +175,15 @@ static void CheckOverflow(nlTestSuite * inSuite, void * aContext)
         ServiceEvents(lSys, sleepTime);
     }
 
-    lSys.CancelTimer(HandleTimer0Failed, aContext);
-    lSys.CancelTimer(HandleTimer1Failed, aContext);
+    lSys.CancelTimer(HandleTimerFailed, aContext);
+    // cb  timer is cancelled by destructor
     lSys.CancelTimer(HandleTimer10Success, aContext);
 }
 
-static uint32_t sNumTimersHandled    = 0;
-static const uint32_t MAX_NUM_TIMERS = 1000;
-
 void HandleGreedyTimer(Layer * aLayer, void * aState, Error aError)
 {
-    TestContext & lContext = *static_cast<TestContext *>(aState);
+    static uint32_t sNumTimersHandled = 0;
+    TestContext & lContext            = *static_cast<TestContext *>(aState);
     NL_TEST_ASSERT(lContext.mTestSuite, sNumTimersHandled < MAX_NUM_TIMERS);
 
     if (sNumTimersHandled >= MAX_NUM_TIMERS)
@@ -182,6 +202,7 @@ static void CheckStarvation(nlTestSuite * inSuite, void * aContext)
     struct timeval sleepTime;
 
     lSys.StartTimer(0, HandleGreedyTimer, aContext);
+    lSys.StartTimer(0, &lContext.mGreedyTimer);
 
     sleepTime.tv_sec  = 0;
     sleepTime.tv_usec = 1000; // 1 ms tick
@@ -264,8 +285,10 @@ static int TestTeardown(void * aContext)
 
 int TestSystemTimer(void)
 {
+    TestContext context;
+
     // Run test suit againt one lContext.
-    nlTestRunner(&kTheSuite, &sContext);
+    nlTestRunner(&kTheSuite, &context);
 
     return nlTestRunnerStats(&kTheSuite);
 }
