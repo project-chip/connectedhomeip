@@ -26,8 +26,8 @@
 #ifndef CONFIGURATION_MANAGER_IMPL_H
 #define CONFIGURATION_MANAGER_IMPL_H
 
-#include <platform/internal/GenericConfigurationManagerImpl.h>
 #include "K32WConfig.h"
+#include <platform/internal/GenericConfigurationManagerImpl.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -82,7 +82,7 @@ private:
  * Chip applications should use this to access features of the ConfigurationManager object
  * that are common to all platforms.
  */
-inline ConfigurationManager &ConfigurationMgr(void)
+inline ConfigurationManager & ConfigurationMgr(void)
 {
     return ConfigurationManagerImpl::sInstance;
 }
@@ -93,12 +93,12 @@ inline ConfigurationManager &ConfigurationMgr(void)
  * Chio applications can use this to gain access to features of the ConfigurationManager
  * that are specific to the K32W platform.
  */
-inline ConfigurationManagerImpl &ConfigurationMgrImpl(void)
+inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
 {
     return ConfigurationManagerImpl::sInstance;
 }
 
-inline CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t *buf)
+inline CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

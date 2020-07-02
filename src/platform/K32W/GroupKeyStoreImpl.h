@@ -53,12 +53,11 @@ public:
     CHIP_ERROR StoreLastUsedEpochKeyId(void) override;
 
 private:
+    static constexpr size_t kFixedEncodedKeySize = 4U + // key id
+        4U +                                            // start time / global id
+        1U;                                             // key data length
 
-    static constexpr size_t kFixedEncodedKeySize =  4U +    // key id
-                                                    4U +    // start time / global id
-                                                    1U;     // key data length
-
-    static constexpr size_t kMaxEncodedKeySize =    kFixedEncodedKeySize + ChipGroupKey::MaxKeySize;
+    static constexpr size_t kMaxEncodedKeySize = kFixedEncodedKeySize + ChipGroupKey::MaxKeySize;
 
     /* Not used
     static constexpr uint16_t kGroupKeyFileId =     GetFileId(kConfigKey_GroupKey);

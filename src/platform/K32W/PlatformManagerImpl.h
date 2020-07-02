@@ -34,8 +34,7 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the PlatformManager singleton object for the K32W platform.
  */
-class PlatformManagerImpl final : public PlatformManager,
-                                  public Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>
+class PlatformManagerImpl final : public PlatformManager, public Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>
 {
     // Allow the PlatformManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -57,8 +56,8 @@ private:
 
     // ===== Members for internal use by the following friends.
 
-    friend PlatformManager &    PlatformMgr(void);
-    friend PlatformManagerImpl &PlatformMgrImpl(void);
+    friend PlatformManager & PlatformMgr(void);
+    friend PlatformManagerImpl & PlatformMgrImpl(void);
     friend class Internal::BLEManagerImpl;
 
     static PlatformManagerImpl sInstance;
@@ -72,7 +71,7 @@ private:
  * chip applications should use this to access features of the PlatformManager object
  * that are common to all platforms.
  */
-inline PlatformManager &PlatformMgr(void)
+inline PlatformManager & PlatformMgr(void)
 {
     return PlatformManagerImpl::sInstance;
 }
@@ -83,7 +82,7 @@ inline PlatformManager &PlatformMgr(void)
  * chip applications can use this to gain access to features of the PlatformManager
  * that are specific to the K32W platform.
  */
-inline PlatformManagerImpl &PlatformMgrImpl(void)
+inline PlatformManagerImpl & PlatformMgrImpl(void)
 {
     return PlatformManagerImpl::sInstance;
 }

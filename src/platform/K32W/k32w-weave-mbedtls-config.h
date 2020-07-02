@@ -1,5 +1,5 @@
 /*
-*   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2020 Project CHIP Authors
  *  Copyright (c) 2020, The OpenThread Authors.
  *  All rights reserved.
  *
@@ -32,12 +32,12 @@
 
 #if defined(MBEDTLS_ECP_WINDOW_SIZE)
 #undef MBEDTLS_ECP_WINDOW_SIZE
-#define MBEDTLS_ECP_WINDOW_SIZE            4 /**< Maximum window size used */
+#define MBEDTLS_ECP_WINDOW_SIZE 4 /**< Maximum window size used */
 #endif
 
 #if defined(MBEDTLS_ECP_FIXED_POINT_OPTIM)
 #undef MBEDTLS_ECP_FIXED_POINT_OPTIM
-#define MBEDTLS_ECP_FIXED_POINT_OPTIM     1 /**< Enable fixed-point speed-up */
+#define MBEDTLS_ECP_FIXED_POINT_OPTIM 1 /**< Enable fixed-point speed-up */
 #endif
 
 /**
@@ -89,8 +89,8 @@
 
 /* Enable CAU3 use in library if there is CAU3 on chip. */
 #if defined(FSL_FEATURE_SOC_CAU3_COUNT) && (FSL_FEATURE_SOC_CAU3_COUNT > 0)
-#include "fsl_cau3.h"
 #include "cau3_pkha.h"
+#include "fsl_cau3.h"
 
 #define MBEDTLS_CAU3_COMPLETION_SIGNAL CAU3_CC_CMD_EVT
 #define MBEDTLS_SHA256_ALT_NO_224
@@ -134,7 +134,7 @@
 #include "fsl_sha.h"
 
 //#define SHA_INSTANCE SHA0            /* AES base register.*/
-#define MBEDTLS_FREESCALE_LPC_SHA1   /* Enable use of LPC SHA.*/
+#define MBEDTLS_FREESCALE_LPC_SHA1 /* Enable use of LPC SHA.*/
 //#define MBEDTLS_FREESCALE_LPC_SHA256 /* Enable use of LPC SHA256.*/
 
 #endif
@@ -150,7 +150,8 @@
 #define MBEDTLS_DES_CRYPT_CBC_ALT
 #define MBEDTLS_DES3_CRYPT_CBC_ALT
 #endif
-#if defined(MBEDTLS_FREESCALE_LTC_AES) || defined(MBEDTLS_FREESCALE_MMCAU_AES) || defined(MBEDTLS_FREESCALE_LPC_AES) || defined(MBEDTLS_FREESCALE_CAU3_AES)
+#if defined(MBEDTLS_FREESCALE_LTC_AES) || defined(MBEDTLS_FREESCALE_MMCAU_AES) || defined(MBEDTLS_FREESCALE_LPC_AES) ||            \
+    defined(MBEDTLS_FREESCALE_CAU3_AES)
 #define MBEDTLS_AES_SETKEY_ENC_ALT
 #define MBEDTLS_AES_SETKEY_DEC_ALT
 #define MBEDTLS_AES_ENCRYPT_ALT
@@ -235,7 +236,7 @@
 #if USE_RTOS && defined(FSL_RTOS_FREE_RTOS)
 #include "FreeRTOS.h"
 
-void *pvPortCalloc(size_t num, size_t size); /*Calloc for HEAP3.*/
+void * pvPortCalloc(size_t num, size_t size); /*Calloc for HEAP3.*/
 
 #define MBEDTLS_PLATFORM_MEMORY
 #define MBEDTLS_PLATFORM_STD_CALLOC pvPortCalloc

@@ -23,14 +23,13 @@
  *          on K32W platforms using the NXP SDK.
  */
 
-
 #ifndef CHIP_DEVICE_PLATFORM_CONFIG_H
 #define CHIP_DEVICE_PLATFORM_CONFIG_H
 
 // ==================== Platform Adaptations ====================
 
-#define K32W_NO_ERRORS          0
-#define K32W_ENTRY_NOT_FOUND    1
+#define K32W_NO_ERRORS 0
+#define K32W_ENTRY_NOT_FOUND 1
 
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 0
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0

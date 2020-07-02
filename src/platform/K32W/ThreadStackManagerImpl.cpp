@@ -28,8 +28,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/ThreadStackManager.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
+#include <platform/ThreadStackManager.h>
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.ipp>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.ipp>
@@ -46,7 +46,7 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
     return InitThreadStack(NULL);
 }
 
-CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance *otInst)
+CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -76,7 +76,7 @@ using namespace ::chip::DeviceLayer;
  * Glue function called directly by the OpenThread stack when tasklet processing work
  * is pending.
  */
-extern "C" void otTaskletsSignalPending(otInstance *p_instance)
+extern "C" void otTaskletsSignalPending(otInstance * p_instance)
 {
     ThreadStackMgrImpl().SignalThreadActivityPending();
 }

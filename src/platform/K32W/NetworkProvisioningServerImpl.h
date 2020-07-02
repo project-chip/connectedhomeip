@@ -30,9 +30,8 @@ namespace Internal {
  * Concrete implementation of the NetworkProvisioningServer singleton object for the
  * NXP K32W platforms.
  */
-class NetworkProvisioningServerImpl final
-    : public NetworkProvisioningServer,
-      public Internal::GenericNetworkProvisioningServerImpl<NetworkProvisioningServerImpl>
+class NetworkProvisioningServerImpl final : public NetworkProvisioningServer,
+                                            public Internal::GenericNetworkProvisioningServerImpl<NetworkProvisioningServerImpl>
 {
     // Allow the NetworkProvisioningServer interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -49,8 +48,8 @@ private:
 
     // ===== Members for internal use by the following friends.
 
-    friend ::chip::DeviceLayer::Internal::NetworkProvisioningServer &NetworkProvisioningSvr(void);
-    friend NetworkProvisioningServerImpl &                                NetworkProvisioningSvrImpl(void);
+    friend ::chip::DeviceLayer::Internal::NetworkProvisioningServer & NetworkProvisioningSvr(void);
+    friend NetworkProvisioningServerImpl & NetworkProvisioningSvrImpl(void);
 
     static NetworkProvisioningServerImpl sInstance;
 };
@@ -61,7 +60,7 @@ private:
  * Internal components should use this to access features of the NetworkProvisioningServer object
  * that are common to all platforms.
  */
-inline NetworkProvisioningServer &NetworkProvisioningSvr(void)
+inline NetworkProvisioningServer & NetworkProvisioningSvr(void)
 {
     return NetworkProvisioningServerImpl::sInstance;
 }
@@ -72,7 +71,7 @@ inline NetworkProvisioningServer &NetworkProvisioningSvr(void)
  * Internal components can use this to gain access to features of the NetworkProvisioningServer
  * that are specific to the K32W platform.
  */
-inline NetworkProvisioningServerImpl &NetworkProvisioningSvrImpl(void)
+inline NetworkProvisioningServerImpl & NetworkProvisioningSvrImpl(void)
 {
     return NetworkProvisioningServerImpl::sInstance;
 }
