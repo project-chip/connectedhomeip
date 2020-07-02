@@ -30,6 +30,7 @@
 #include <platform/Linux/CHIPLinuxStorageIni.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <support/Base64.h>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -238,7 +239,7 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobDataAndLengths(const char * key, ch
             {
                 size_t len = value.size();
 
-                encodedData                 = (char *) malloc(len + 1);
+                encodedData                 = (char *) MemoryAlloc(len + 1);
                 encodedDataLen              = value.copy(encodedData, len);
                 encodedData[encodedDataLen] = '\0';
 
@@ -295,7 +296,7 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobValue(const char * key, uint8_t * d
 
         if (encodedData)
         {
-            free(encodedData);
+            MemoryFree(encodedData);
         }
     }
 

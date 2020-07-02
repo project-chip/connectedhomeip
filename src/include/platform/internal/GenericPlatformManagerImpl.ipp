@@ -33,6 +33,7 @@
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
 #include <support/CodeUtils.h>
+#include <support/CHIPMem.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -120,7 +121,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_AddEventHandler(PlatformManag
         }
     }
 
-    eventHandler = (AppEventHandler *) malloc(sizeof(AppEventHandler));
+    eventHandler = (AppEventHandler *) MemoryAlloc(sizeof(AppEventHandler));
     VerifyOrExit(eventHandler != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     eventHandler->Next    = mAppEventHandlerList;
@@ -145,7 +146,7 @@ void GenericPlatformManagerImpl<ImplClass>::_RemoveEventHandler(PlatformManager:
         if (eventHandler->Handler == handler && eventHandler->Arg == arg)
         {
             *eventHandlerIndirectPtr = eventHandler->Next;
-            free(eventHandler);
+            MemoryFree(eventHandler);
         }
         else
         {
