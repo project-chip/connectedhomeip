@@ -29,22 +29,22 @@
 
 namespace chip {
 
-void *MemoryAlloc(size_t size)
+void * MemoryAlloc(size_t size)
 {
     return malloc(size);
 }
 
-void *MemoryCalloc(size_t num, size_t size)
+void * MemoryCalloc(size_t num, size_t size)
 {
     return calloc(num, size);
 }
 
-void *MemoryRealloc(void *p, size_t size)
+void * MemoryRealloc(void * p, size_t size)
 {
     return realloc(p, size);
 }
 
-void MemoryFree(void *p)
+void MemoryFree(void * p)
 {
     free(p);
 }

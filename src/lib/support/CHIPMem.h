@@ -38,7 +38,7 @@ namespace chip {
  * @retval  NULL-pointer if memory allocation fails.
  *
  */
-extern void *MemoryAlloc(size_t size);
+extern void * MemoryAlloc(size_t size);
 
 /**
  * This function is called by the CHIP layer to allocate a block of memory for an array of num
@@ -52,7 +52,7 @@ extern void *MemoryAlloc(size_t size);
  * @retval  NULL-pointer if memory allocation fails.
  *
  */
-extern void *MemoryCalloc(size_t num, size_t size);
+extern void * MemoryCalloc(size_t num, size_t size);
 
 /**
  * This function is called by the Chip layer to change the size of the memory block pointed to by p.
@@ -72,7 +72,7 @@ extern void *MemoryCalloc(size_t num, size_t size);
  * @retval  NULL-pointer if memory allocation fails.
  *
  */
-extern void *MemoryRealloc(void *p, size_t size);
+extern void * MemoryRealloc(void * p, size_t size);
 
 /**
  * This function is called by the Chip layer to release a memory block allocated by
@@ -80,7 +80,7 @@ extern void *MemoryRealloc(void *p, size_t size);
  * @param[in]  p                Pointer to a memory block that should be released.
  *
  */
-extern void MemoryFree(void *p);
+extern void MemoryFree(void * p);
 
 } // namespace chip
 
