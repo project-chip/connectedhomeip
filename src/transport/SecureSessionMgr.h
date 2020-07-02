@@ -46,7 +46,7 @@ class SecureSessionMgrBase;
 /**
  * @brief
  *   This class provides a skeleton for the callback functions. The functions will be
- *   called by SecureSssionMgr object on specific events. If the user of SecureSessionMgrBase
+ *   called by SecureSssionMgrBase object on specific events. If the user of SecureSessionMgrBase
  *   is interested in receiving these callbacks, they can specialize this class and handle
  *   each trigger in their implementation of this class.
  */
