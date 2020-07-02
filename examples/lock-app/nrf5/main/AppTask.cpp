@@ -62,7 +62,7 @@ static bool sHaveServiceConnectivity = false;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
-chip::SecureSessionMgr sTransportIPv6;
+DemoSessionManager sessions;
 
 int AppTask::StartAppTask()
 {
@@ -152,7 +152,7 @@ int AppTask::Init()
 
     // Init ZCL Data Model
     InitDataModelHandler();
-    StartServer(&sTransportIPv6);
+    StartServer(&sessions);
 
     return ret;
 }

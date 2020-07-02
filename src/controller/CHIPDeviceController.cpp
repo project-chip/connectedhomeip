@@ -145,12 +145,10 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress 
     mAppReqState     = appReqState;
     mOnNewConnection = onConnected;
 
-    mSessionManager = new SecureSessionMgr();
+    mSessionManager = new SecureSessionMgr<Transport::UDP>();
 
-    err = mUdpTransport.Init(Transport::UdpListenParameters(mInetLayer).SetAddressType(deviceAddr.Type()));
-    SuccessOrExit(err);
-
-    err = mSessionManager->Init(mLocalDeviceId, mSystemLayer, &mUdpTransport);
+    err = mSessionManager->Init(mLocalDeviceId, mSystemLayer,
+                                Transport::UdpListenParameters(mInetLayer).SetAddressType(deviceAddr.Type()));
     SuccessOrExit(err);
 
     mSessionManager->SetDelegate(this);
@@ -335,13 +333,13 @@ void ChipDeviceController::ClearRequestState()
     }
 }
 
-void ChipDeviceController::OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr)
+void ChipDeviceController::OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
 {
     mOnNewConnection(this, state, mAppReqState);
 }
 
 void ChipDeviceController::OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                             System::PacketBuffer * msgBuf, SecureSessionMgr * mgr)
+                                             System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr)
 {
     if (header.GetSourceNodeId().HasValue())
     {

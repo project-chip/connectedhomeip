@@ -15,6 +15,12 @@
  *    limitations under the License.
  */
 
+/**
+ * @file
+ *
+ * Defines a compound transport type (tuple) that can merge several transports
+ * to look like a single one.
+ */
 #ifndef TRANSPORT_TUPLE_H_
 #define TRANSPORT_TUPLE_H_
 
@@ -28,6 +34,28 @@ namespace Transport {
 
 /**
  * Groups together several transports of different types and presents them as a unified transport.
+ *
+ * The usage intent is to be able to group several distinct transport types and make them look
+ * as a single transport.
+ *
+ * Having an example class definition of:
+ *    Tuple<UDP, UDP, TCP>
+ *
+ * Is be equivalent to:
+ *    class TupleOfUdpUdpTcp : public BASE {
+ *       private:
+ *          UDP mUdp1;
+ *          UDP mUdp2;
+ *          TCP mTcp2;
+ *       public:
+ *          Init(UDPListenParameters &, UDPListenParameters&, TCPListenParameters) {...}
+ *          CHIP_ERROR SendMessage(...) override;
+ *          bool CanSendToPeer(...) override;
+ *    }
+ *
+ * The intent of this is to allow applications to use any transport types without CHIP pre-defining
+ * popular mappings (like UDP only, UDP and BLE, BLE only etc.) and without using #ifdefs to create
+ * a single 'standard transport'.
  */
 template <typename... TransportTypes>
 class Tuple : public Base

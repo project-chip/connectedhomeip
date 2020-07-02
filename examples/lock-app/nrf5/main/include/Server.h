@@ -22,9 +22,12 @@
 #include <inet/InetLayer.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/UDP.h>
 
 #include "DataModelHandler.h"
 
-void StartServer(chip::SecureSessionMgr * transport_ipv6);
+using DemoSessionManager = chip::SecureSessionMgr<chip::Transport::UDP>;
+
+void StartServer(DemoSessionManager * transport_ipv6);
 
 #endif // SERVER_H

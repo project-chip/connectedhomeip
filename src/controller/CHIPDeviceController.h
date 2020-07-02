@@ -51,23 +51,6 @@ typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, v
 
 class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback
 {
-public:
-    virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                   System::PacketBuffer * msgBuf, SecureSessionMgr * mgr);
-
-    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr);
-
-    void SetController(ChipDeviceController * controller) { mController = controller; }
-
-private:
-    ChipDeviceController * mController;
-};
-
-/**
- * Handles a connection to a single device over UDP.
- */
-class DLL_EXPORT ChipDeviceController
-{
     friend class ChipDeviceControllerCallback;
 
 public:
@@ -176,9 +159,9 @@ public:
     CHIP_ERROR GetLayers(Layer ** systemLayer, InetLayer ** inetLayer);
 
     virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                   System::PacketBuffer * msgBuf, SecureSessionMgr * mgr);
+                                   System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr);
 
-    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr);
+    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr);
 
 private:
     enum
@@ -194,14 +177,10 @@ private:
         kConnectionState_SecureConnected = 2,
     };
 
-    Transport::UDP mUdpTransport;
     System::Layer * mSystemLayer;
     Inet::InetLayer * mInetLayer;
 
-    // TODO: CHIPDeviceController assumes a single device connection, where as
-    //       session manager handles multiple connections. Need to finalize design on this
-    //       as otherwise a single connection may end up processing data from other peers.
-    SecureSessionMgr * mSessionManager;
+    SecureSessionMgr<Transport::UDP> * mSessionManager;
 
     ConnectionState mConState;
     void * mAppReqState;

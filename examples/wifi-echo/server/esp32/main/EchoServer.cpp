@@ -192,13 +192,13 @@ public:
         }
     }
 
-    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * mgr) override
+    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgrBase * mgr) override
     {
         ESP_LOGE(TAG, "ERROR: %s\n Got UDP error", ErrorStr(error));
         statusLED.BlinkOnError();
     }
 
-    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override
+    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override
     {
         CHIP_ERROR err;
 
@@ -240,29 +240,28 @@ private:
 
 static EchoServerCallback gCallbacks;
 
+static SecureSessionMger<Transport::UDP, // IPV6
+                         Transport::UDP  // IPV4
+                         >
+    sessions;
+
 } // namespace
 
-static Transport::Tuple<Transport::UDP, // IPV6
-                        Transport::UDP  // IPV4
-                        >
-    transportTuple;
+transportTuple;
 
 // The echo server assumes the platform's networking has been setup already
-void startServer(SecureSessionMgr * sessions)
+void startServer()
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     struct netif * ipV6NetIf = NULL;
     tcpip_adapter_get_netif(TCPIP_ADAPTER_IF_AP, (void **) &ipV6NetIf);
 
-    err = transportTuple.Init(
-        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6).SetInterfaceId(ipV6NetIf),
-        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv4));
+    err = sessions.Init(kLocalNodeId, &DeviceLayer::SystemLayer,
+                        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6).SetInterfaceId(ipV6NetIf),
+                        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv4));
     SuccessOrExit(err);
 
-    err = sessions->Init(kLocalNodeId, &DeviceLayer::SystemLayer, &transportTuple);
-    SuccessOrExit(err);
-
-    sessions->SetDelegate(&gCallbacks);
+    sessions.SetDelegate(&gCallbacks);
 
 exit:
     if (err != CHIP_NO_ERROR)

@@ -60,6 +60,9 @@ constexpr NodeId kDestinationNodeId = 111222333;
 class LoopbackTransport : public Transport::Base
 {
 public:
+    /// Transports are required to have a constructor that takes exactly one argument
+    CHIP_ERROR Init(const char * unused) {}
+
     CHIP_ERROR SendMessage(const MessageHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) override
     {
         HandleMessageReceived(header, address, msgBuf);
@@ -73,7 +76,7 @@ class TestSessMgrCallback : public SecureSessionMgrCallback
 {
 public:
     virtual void OnMessageReceived(const MessageHeader & header, PeerConnectionState * state, System::PacketBuffer * msgBuf,
-                                   SecureSessionMgr * mgr)
+                                   SecureSessionMgrBase * mgr)
     {
         NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
         NL_TEST_ASSERT(mSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
@@ -87,7 +90,7 @@ public:
         ReceiveHandlerCallCount++;
     }
 
-    virtual void OnNewConnection(PeerConnectionState * state, SecureSessionMgr * mgr)
+    virtual void OnNewConnection(PeerConnectionState * state, SecureSessionMgrBase * mgr)
     {
         CHIP_ERROR err;
 
@@ -109,13 +112,12 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    LoopbackTransport transport;
-    SecureSessionMgr conn;
+    SecureSessionMgr<LoopbackTransport> conn;
     CHIP_ERROR err;
 
     ctx.GetInetLayer().SystemLayer()->Init(NULL);
 
-    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transport);
+    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), "LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -135,10 +137,9 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("127.0.0.1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    LoopbackTransport transport;
-    SecureSessionMgr conn;
+    SecureSessionMgr<LoopbackTransport> conn;
 
-    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transport);
+    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), "LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;

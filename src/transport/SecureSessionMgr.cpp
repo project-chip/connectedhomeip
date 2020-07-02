@@ -43,9 +43,9 @@ using Transport::PeerConnectionState;
 // TODO: this should be checked within the transport message sending instead of the session management layer.
 static const size_t kMax_SecureSDU_Length = 1024;
 
-SecureSessionMgr::SecureSessionMgr() : mState(State::kNotReady) {}
+SecureSessionMgrBase::SecureSessionMgrBase() : mState(State::kNotReady) {}
 
-SecureSessionMgr::~SecureSessionMgr()
+SecureSessionMgrBase::~SecureSessionMgrBase()
 {
     CancelExpiryTimer();
 
@@ -60,7 +60,7 @@ SecureSessionMgr::~SecureSessionMgr()
     }
 }
 
-CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLayer, Transport::Base * transport)
+CHIP_ERROR SecureSessionMgrBase::InitInternal(NodeId localNodeId, System::Layer * systemLayer, Transport::Base * transport)
 {
     if (mTransport)
     {
@@ -85,7 +85,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureSessionMgr::Connect(NodeId peerNodeId, const Transport::PeerAddress & peerAddress)
+CHIP_ERROR SecureSessionMgrBase::Connect(NodeId peerNodeId, const Transport::PeerAddress & peerAddress)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = nullptr;
@@ -106,7 +106,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf)
+CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = nullptr;
@@ -162,8 +162,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureSessionMgr::AllocateNewConnection(const MessageHeader & header, const PeerAddress & address,
-                                                   Transport::PeerConnectionState ** state)
+CHIP_ERROR SecureSessionMgrBase::AllocateNewConnection(const MessageHeader & header, const PeerAddress & address,
+                                                       Transport::PeerConnectionState ** state)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -184,24 +184,24 @@ exit:
     return err;
 }
 
-void SecureSessionMgr::ScheduleExpiryTimer(void)
+void SecureSessionMgrBase::ScheduleExpiryTimer(void)
 {
     CHIP_ERROR err =
-        mSystemLayer->StartTimer(CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS, SecureSessionMgr::ExpiryTimerCallback, this);
+        mSystemLayer->StartTimer(CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS, SecureSessionMgrBase::ExpiryTimerCallback, this);
 
     VerifyOrDie(err == CHIP_NO_ERROR);
 }
 
-void SecureSessionMgr::CancelExpiryTimer(void)
+void SecureSessionMgrBase::CancelExpiryTimer(void)
 {
     if (mSystemLayer != nullptr)
     {
-        mSystemLayer->CancelTimer(SecureSessionMgr::ExpiryTimerCallback, this);
+        mSystemLayer->CancelTimer(SecureSessionMgrBase::ExpiryTimerCallback, this);
     }
 }
 
-void SecureSessionMgr::HandleDataReceived(const MessageHeader & header, const PeerAddress & peerAddress, System::PacketBuffer * msg,
-                                          SecureSessionMgr * connection)
+void SecureSessionMgrBase::HandleDataReceived(const MessageHeader & header, const PeerAddress & peerAddress,
+                                              System::PacketBuffer * msg, SecureSessionMgrBase * connection)
 
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
@@ -265,7 +265,7 @@ exit:
     }
 }
 
-void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionState & state, SecureSessionMgr * mgr)
+void SecureSessionMgrBase::HandleConnectionExpired(const Transport::PeerConnectionState & state, SecureSessionMgrBase * mgr)
 {
     char addr[Transport::PeerAddress::kMaxToStringSize];
     state.GetPeerAddress().ToString(addr, sizeof(addr));
@@ -273,11 +273,11 @@ void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionSt
     ChipLogProgress(Inet, "Connection from '%s' expired", addr);
 }
 
-void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error)
+void SecureSessionMgrBase::ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error)
 {
     ChipLogProgress(Inet, "Checking for expired connections");
 
-    SecureSessionMgr * mgr = reinterpret_cast<SecureSessionMgr *>(param);
+    SecureSessionMgrBase * mgr = reinterpret_cast<SecureSessionMgrBase *>(param);
     mgr->mPeerConnections.ExpireInactiveConnections(CHIP_PEER_CONNECTION_TIMEOUT_MS);
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
 }

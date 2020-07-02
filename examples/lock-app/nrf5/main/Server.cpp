@@ -64,7 +64,7 @@ class ServerCallback : public SecureSessionMgrCallback
 {
 public:
     virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                   System::PacketBuffer * buffer, SecureSessionMgr * mgr)
+                                   System::PacketBuffer * buffer, SecureSessionMgrBase * mgr)
     {
         const size_t data_len = buffer->DataLength();
         char src_addr[PeerAddress::kMaxToStringSize];
@@ -90,7 +90,7 @@ public:
         }
     }
 
-    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr)
+    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgerBase * mgr)
     {
         CHIP_ERROR err;
 
@@ -110,14 +110,17 @@ static ServerCallback gCallbacks;
 } // namespace
 
 // The echo server assumes the platform's networking has been setup already
-void SetupTransport(IPAddressType type, SecureSessionMgr * sessions, Transport::UDP * transport)
+void SetupTransport(IPAddressType type, SecureSessionMgerBase * sessions, Transport::UDP * transport) {}
+
+static Transport::UDP transport;
+
+// The echo server assumes the platform's networking has been setup already
+void StartServer(DemoSessionManager * sessions)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = transport->Init(UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(type));
-    SuccessOrExit(err);
-
-    err = sessions->Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::SystemLayer, transport);
+    err = sessions->Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::SystemLayer,
+                         UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
     SuccessOrExit(err);
 
     sessions->SetDelegate(&gCallbacks);
@@ -131,12 +134,4 @@ exit:
     {
         NRF_LOG_INFO("Lock Server Listening...");
     }
-}
-
-static Transport::UDP transport;
-
-// The echo server assumes the platform's networking has been setup already
-void StartServer(SecureSessionMgr * sessions)
-{
-    SetupTransport(kIPAddressType_IPv6, sessions, &transport);
 }

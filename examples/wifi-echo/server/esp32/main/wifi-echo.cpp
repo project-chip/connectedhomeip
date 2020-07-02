@@ -43,7 +43,8 @@
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-extern void startServer(SecureSessionMgr * sessions);
+extern void startServer();
+
 #if CONFIG_USE_ECHO_CLIENT
 extern void startClient(void);
 #endif // CONFIG_USE_ECHO_CLIENT
@@ -80,13 +81,6 @@ static Button attentionButton;
 const char * TAG = "wifi-echo-demo";
 
 static EchoDeviceCallbacks EchoCallbacks;
-
-namespace {
-
-// Globals as these are large and will not fit onto the stack
-SecureSessionMgr sSessionsManager;
-
-} // namespace
 
 extern "C" void app_main()
 {
@@ -132,7 +126,7 @@ extern "C" void app_main()
 
     // Start the Echo Server
     InitDataModelHandler();
-    startServer(&sSessionsManager);
+    startServer();
 #if CONFIG_USE_ECHO_CLIENT
     startClient();
 #endif
