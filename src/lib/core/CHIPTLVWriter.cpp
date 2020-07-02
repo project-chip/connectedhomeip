@@ -30,6 +30,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -937,7 +938,7 @@ CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char * fmt, va_list ap)
 
 #elif HAVE_MALLOC
 
-    tmpBuf = static_cast<char *>(malloc(dataLen + 1));
+    tmpBuf = static_cast<char *>(MemoryAlloc(dataLen + 1));
     VerifyOrExit(tmpBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     va_copy(aq, ap);
@@ -947,7 +948,7 @@ CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char * fmt, va_list ap)
     va_end(aq);
 
     err = WriteData(reinterpret_cast<uint8_t *>(tmpBuf), dataLen);
-    free(tmpBuf);
+    MemoryFree(tmpBuf);
 
 #else // CONFIG_HAVE_VSNPRINTF_EX
 
