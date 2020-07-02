@@ -17,10 +17,11 @@
 
 /**
  *    @file
- *      This file contains definitions for the CHIP Device Interface
+ *      This file contains definitions for the CHIP DeviceManager Interface
  *
- *      Applications will typically use this class to communicate with
- *      the CHIP Stack. This is a singleton object.
+ *      This object will co-ordinate multiple activities such as
+ *      initialisation, rendezvous, session mgmt and other such
+ *      activities within the CHIP stack. This is a singleton object.
  */
 
 #ifndef CHIP_DEVICEMANAGER_H_
@@ -44,16 +45,48 @@ extern "C" {
 namespace chip {
 namespace DeviceManager {
 
+/**
+ * @brief
+ *   This class provides a skeleton for all the callback functions. The functions will be
+ *   called by other objects within the CHIP stack for specific events.
+ *   Applications interested in receiving specific callbacks can specialize this class and handle
+ *   these events in their implementation of this class.
+ */
 class DLL_EXPORT CHIPDeviceManagerCallbacks
 {
 public:
+    /**
+     * @brief
+     *   Called when CHIP Device events (PublicEventTypes) are triggered.
+     *
+     * @param event   ChipDeviceEvent that occurred
+     * @param arg     arguments specific to the event, if any
+     */
     virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
+    /**
+     * @brief
+     *   Called after an attribute has been changed
+     *
+     * @param endpoint           endpoint id
+     * @param clusterID          cluster id
+     * @param attributeId        attribute id that was changed
+     * @param mask               mask of the attribute
+     * @param manufacturerCode   manufacturer code
+     * @param type               attribute type
+     * @param size               size of the attribute
+     * @param value              pointer to the new value
+     */
     virtual void PostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId,
                                              uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
     {}
     virtual ~CHIPDeviceManagerCallbacks() {}
 };
 
+/**
+ * @brief
+ *   A common class that drives other components of the CHIP stack
+ */
 class DLL_EXPORT CHIPDeviceManager
 {
 public:
@@ -67,30 +100,27 @@ public:
         return instance;
     }
 
-    CHIPDeviceManager & SetVendorID(uint16_t VID)
-    {
-        mVendorID = VID;
-        return *this;
-    }
+    /**
+     * @brief
+     *   Initialise CHIPDeviceManager
+     *
+     * @param cb Application's instance of the CHIPDeviceManagerCallbacks for consuming events
+     */
+    CHIP_ERROR Init(CHIPDeviceManagerCallbacks * cb);
 
-    uint16_t GetVendorID() { return mVendorID; }
-
-    CHIPDeviceManager & SetProductID(uint16_t PID)
-    {
-        mProductID = PID;
-        return *this;
-    }
-
-    uint16_t SetProductID() { return mProductID; }
-
+    /**
+     * @brief
+     *   Fetch a pointer to the registered CHIPDeviceManagerCallbacks object.
+     *
+     */
     CHIPDeviceManagerCallbacks * GetCHIPDeviceManagerCallbacks() { return mCB; }
 
-    CHIP_ERROR Init(CHIPDeviceManagerCallbacks * cb);
+    /**
+     * Use internally for registration of the ChipDeviceEvents
+     */
     static void CommonDeviceEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
 private:
-    uint16_t mVendorID;
-    uint16_t mProductID;
     CHIPDeviceManagerCallbacks * mCB = nullptr;
     CHIPDeviceManager() {}
 };
