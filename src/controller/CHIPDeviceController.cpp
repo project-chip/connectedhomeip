@@ -62,7 +62,6 @@ ChipDeviceController::ChipDeviceController()
     mDevicePort      = CHIP_PORT;
     mLocalDeviceId   = 0;
     memset(&mOnComplete, 0, sizeof(mOnComplete));
-    mCallback.SetController(this);
 }
 
 CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId)
@@ -154,7 +153,7 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress 
     err = mSessionManager->Init(mLocalDeviceId, mSystemLayer, &mUdpTransport);
     SuccessOrExit(err);
 
-    mSessionManager->SetDelegate(&mCallback);
+    mSessionManager->SetDelegate(this);
 
     // connected state before 'OnConnect' so that key exchange is accepted
     mConState = kConnectionState_Connected;
@@ -336,32 +335,29 @@ void ChipDeviceController::ClearRequestState()
     }
 }
 
-void ChipDeviceControllerCallback::OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr)
+void ChipDeviceController::OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr)
 {
-    if (mController->mOnNewConnection)
-    {
-        mController->mOnNewConnection(mController, state, mController->mAppReqState);
-    }
+    mOnNewConnection(this, state, mAppReqState);
 }
 
-void ChipDeviceControllerCallback::OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                                     System::PacketBuffer * msgBuf, SecureSessionMgr * mgr)
+void ChipDeviceController::OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
+                                             System::PacketBuffer * msgBuf, SecureSessionMgr * mgr)
 {
     if (header.GetSourceNodeId().HasValue())
     {
-        if (!mController->mRemoteDeviceId.HasValue())
+        if (!mRemoteDeviceId.HasValue())
         {
             ChipLogProgress(Controller, "Learned remote device id");
-            mController->mRemoteDeviceId = header.GetSourceNodeId();
+            mRemoteDeviceId = header.GetSourceNodeId();
         }
-        else if (mController->mRemoteDeviceId != header.GetSourceNodeId())
+        else if (mRemoteDeviceId != header.GetSourceNodeId())
         {
             ChipLogError(Controller, "Received message from an unexpected source node id.");
         }
     }
-    if (mController->IsSecurelyConnected() && mController->mOnComplete.Response != NULL)
+    if (IsSecurelyConnected() && mOnComplete.Response != NULL)
     {
-        mController->mOnComplete.Response(mController, mController->mAppReqState, msgBuf);
+        mOnComplete.Response(this, mAppReqState, msgBuf);
     }
 }
 

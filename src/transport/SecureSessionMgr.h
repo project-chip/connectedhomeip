@@ -145,9 +145,9 @@ public:
 private:
     Transport::Base * mTransport = nullptr;
     System::Layer * mSystemLayer = nullptr;
-    NodeId mLocalNodeId;                                                                //< Id of the current node
-    Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; //< Active connections to other peers
-    State mState;                                                                       //< Initialization state of the object
+    NodeId mLocalNodeId;                                                                // < Id of the current node
+    Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
+    State mState;                                                                       // < Initialization state of the object
 
     SecureSessionMgrCallback * mCB = nullptr;
 

@@ -31,7 +31,6 @@ extern "C" {
 #include <inet/IPAddress.h>
 #include <system/SystemPacketBuffer.h>
 
-static const char * const CHIP_WORK_QUEUE = "com.zigbee.chip.work";
 static const char * const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
 
 // NOTE: Remote device ID is in sync with the echo server device id
@@ -338,52 +337,17 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
             return;
         }
 
-        __block fd_set readFDs, writeFDs, exceptFDs;
-        struct timeval aSleepTime;
-        int numFDs = 0;
-        aSleepTime.tv_sec = 5;
-
-        FD_ZERO(&readFDs);
-        FD_ZERO(&writeFDs);
-        FD_ZERO(&exceptFDs);
-
-        chip::System::Layer * systemLayer = NULL;
-        chip::Inet::InetLayer * inetLayer = NULL;
-        // ask for the system and inet layers
-
         [self.lock lock];
-        self.cppController->GetLayers(&systemLayer, &inetLayer);
 
-        if (systemLayer != NULL && systemLayer->State() == chip::System::kLayerState_Initialized) {
-            systemLayer->PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
-        }
-
-        if (inetLayer != NULL && inetLayer->State == chip::Inet::InetLayer::kState_Initialized) {
-            inetLayer->PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
-        }
-
-        [self.lock unlock];
-
-        int selectRes = select(numFDs, &readFDs, &writeFDs, &exceptFDs, const_cast<struct timeval *>(&aSleepTime));
-
-        [self.lock lock];
         if (!self.cppController->IsConnected()) {
             [self.lock unlock];
             // cancel the loop, it'll restart the next time a connection is established
             return;
         }
-        systemLayer = NULL;
-        inetLayer = NULL;
-        self.cppController->GetLayers(&systemLayer, &inetLayer);
 
-        if (systemLayer != NULL && systemLayer->State() == chip::System::kLayerState_Initialized) {
-            systemLayer->HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
-        }
-
-        if (inetLayer != NULL && inetLayer->State == chip::Inet::InetLayer::kState_Initialized) {
-            inetLayer->HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
-        }
+        self.cppController->ServiceEvents();
         [self.lock unlock];
+
         [self _serviceEvents];
     });
 }

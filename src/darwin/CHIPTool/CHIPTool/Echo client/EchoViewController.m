@@ -48,9 +48,9 @@
 
 - (IBAction)sendAction:(id)sender
 {
-    if (self.messageTextField.text.length == 0) {
-        [self postResult:@"Error: Message cannot be empty"];
-        return;
+    NSString * msg = [self.messageTextField text];
+    if (msg.length == 0) {
+        msg = [self.messageTextField placeholder];
     }
 
     [self reconnectIfNeeded];
@@ -58,8 +58,7 @@
     // send message
     if ([self.chipController isConnected]) {
         NSError * error;
-        BOOL didSend = [self.chipController sendMessage:[self.messageTextField.text dataUsingEncoding:NSUTF8StringEncoding]
-                                                  error:&error];
+        BOOL didSend = [self.chipController sendMessage:[msg dataUsingEncoding:NSUTF8StringEncoding] error:&error];
         if (!didSend) {
             [self postResult:[@"Error: " stringByAppendingString:error.localizedDescription]];
         } else {

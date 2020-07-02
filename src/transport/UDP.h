@@ -107,7 +107,7 @@ public:
     /**
      * Initialize a UDP transport on a given port.
      *
-     * @param parms        UDP configuration parameters for this transport
+     * @param params        UDP configuration parameters for this transport
      *
      * @details
      *   Generally send and receive ports should be the same and equal to CHIP_PORT.
