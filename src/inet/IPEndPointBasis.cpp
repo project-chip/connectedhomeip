@@ -1124,7 +1124,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-INET_ERROR IPEndPointBasis::ConfigureProtocol(IPAddressType aAddressType, nw_parameters_t aParameters)
+INET_ERROR IPEndPointBasis::ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters)
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -1154,7 +1154,8 @@ INET_ERROR IPEndPointBasis::ConfigureProtocol(IPAddressType aAddressType, nw_par
     return res;
 }
 
-INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress, uint16_t aPort, nw_parameters_t aParameters)
+INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort,
+                                 const nw_parameters_t & aParameters)
 {
     INET_ERROR res         = INET_NO_ERROR;
     nw_endpoint_t endpoint = nullptr;
@@ -1164,7 +1165,8 @@ INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress,
     res = ConfigureProtocol(aAddressType, aParameters);
     SuccessOrExit(res);
 
-    res = GetEndPoint(endpoint, aAddress, aPort);
+    res = GetEndPoint(endpoint, aAddressType, aAddress, aPort);
+    nw_parameters_set_local_endpoint(aParameters, endpoint);
     nw_release(endpoint);
     SuccessOrExit(res);
 
@@ -1230,7 +1232,7 @@ exit:
     return res;
 }
 
-void IPEndPointBasis::HandleDataReceived(nw_connection_t aConnection)
+void IPEndPointBasis::HandleDataReceived(const nw_connection_t & aConnection)
 {
 
     nw_connection_receive_completion_t handler =
@@ -1279,7 +1281,7 @@ void IPEndPointBasis::HandleDataReceived(nw_connection_t aConnection)
     nw_connection_receive_message(aConnection, handler);
 }
 
-void IPEndPointBasis::GetPacketInfo(nw_connection_t aConnection, IPPacketInfo & aPacketInfo)
+void IPEndPointBasis::GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo)
 {
     nw_path_t path              = nw_connection_copy_current_path(aConnection);
     nw_endpoint_t dest_endpoint = nw_path_copy_effective_local_endpoint(path);
@@ -1292,20 +1294,28 @@ void IPEndPointBasis::GetPacketInfo(nw_connection_t aConnection, IPPacketInfo & 
     aPacketInfo.DestPort    = nw_endpoint_get_port(dest_endpoint);
 }
 
-INET_ERROR IPEndPointBasis::GetEndPoint(nw_endpoint_t & aEndPoint, const IPAddress aAddress, uint16_t aPort)
+INET_ERROR IPEndPointBasis::GetEndPoint(nw_endpoint_t & aEndPoint, const IPAddressType aAddressType, const IPAddress & aAddress,
+                                        uint16_t aPort)
 {
     INET_ERROR res = INET_NO_ERROR;
-
     char addrStr[INET6_ADDRSTRLEN];
-    aAddress.ToString(addrStr, sizeof(addrStr));
-
     char portStr[INET_PORTSTRLEN];
+
+    // Note: aAddress.ToString will return the IPv6 Any address if the address type is Any, but that's not what
+    // we want if the locale endpoint is IPv4.
+    if (aAddressType == kIPAddressType_IPv4 && aAddress.Type() == kIPAddressType_Any)
+    {
+        snprintf(addrStr, sizeof(addrStr), "0.0.0.0");
+    }
+    else
+    {
+        aAddress.ToString(addrStr, sizeof(addrStr));
+    }
+
     snprintf(portStr, sizeof(portStr), "%u", aPort);
 
-    nw_endpoint_t endpoint = nw_endpoint_create_host(addrStr, portStr);
-    VerifyOrExit(endpoint != NULL, res = INET_ERROR_BAD_ARGS);
-
-    aEndPoint = endpoint;
+    aEndPoint = nw_endpoint_create_host(addrStr, portStr);
+    VerifyOrExit(aEndPoint != NULL, res = INET_ERROR_BAD_ARGS);
 
 exit:
     return res;
@@ -1321,7 +1331,8 @@ INET_ERROR IPEndPointBasis::GetConnection(const IPPacketInfo * aPktInfo)
 
     if (mConnection)
     {
-        nw_endpoint_t remote_endpoint  = nw_connection_copy_endpoint(mConnection);
+        nw_path_t path                 = nw_connection_copy_current_path(mConnection);
+        nw_endpoint_t remote_endpoint  = nw_path_copy_effective_remote_endpoint(path);
         const IPAddress remote_address = IPAddress::FromSockAddr(*nw_endpoint_get_address(remote_endpoint));
         const uint16_t remote_port     = nw_endpoint_get_port(remote_endpoint);
         const bool isDifferentEndPoint = aPktInfo->DestPort != remote_port || aPktInfo->DestAddress != remote_address;
@@ -1331,7 +1342,7 @@ INET_ERROR IPEndPointBasis::GetConnection(const IPPacketInfo * aPktInfo)
     }
     SuccessOrExit(res);
 
-    res = GetEndPoint(endpoint, aPktInfo->DestAddress, aPktInfo->DestPort);
+    res = GetEndPoint(endpoint, mAddrType, aPktInfo->DestAddress, aPktInfo->DestPort);
     SuccessOrExit(res);
 
     connection = nw_connection_create(endpoint, mParameters);
