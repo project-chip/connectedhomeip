@@ -75,6 +75,9 @@
 #else
   #include "gen/endpoint_config.h"
 #endif
+
+#include "gen/gen_tokens.h" // For GENERATED_TOKEN_LOADER/SAVER macros
+
 // *******************************************************************
 // pre-defined Devices
 //

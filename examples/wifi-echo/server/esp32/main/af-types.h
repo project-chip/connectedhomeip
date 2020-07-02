@@ -46,7 +46,12 @@
 #ifndef SILABS_AF_API_TYPES
 #define SILABS_AF_API_TYPES
 
+#include <stdbool.h>  // For bool
+#include <stdint.h>   // For various uint*_t types
+#include <stddef.h>   // For NULL.
+
 #include "gen/enums.h"
+#include "types_stub.h" // For various types.
 
 #ifdef EZSP_HOST
 #include "app/util/ezsp/ezsp-enum.h"

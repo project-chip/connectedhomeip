@@ -40,6 +40,8 @@
 #ifndef SILABS_AF_MAIN_H
 #define SILABS_AF_MAIN_H
 
+#include "af-types.h"
+
 //#include CONFIGURATION_HEADER
 //#include PLATFORM_HEADER     // Micro and compiler specific typedefs and macros
 //#include "stack/include/ember-types.h"
