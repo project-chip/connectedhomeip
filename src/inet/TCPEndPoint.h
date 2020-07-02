@@ -374,7 +374,7 @@ public:
     /**
      * @brief   Set timer event for idle activity.
      *
-     * @param[in]   timeoutMS
+     * @param[in]   timeoutMS The timeout in milliseconds
      *
      * @details
      *  Set the idle timer interval to \c timeoutMS milliseconds. A zero

@@ -185,7 +185,7 @@ public:
      *
      * @param data - the buffer to write to
      * @param size - space available in the buffer (in bytes)
-     * @param decode_size - number of bytes written to the buffer.
+     * @param encode_size - number of bytes written to the buffer.
      *
      * @return CHIP_NO_ERROR on success.
      *
