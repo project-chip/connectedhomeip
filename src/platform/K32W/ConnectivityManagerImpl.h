@@ -32,8 +32,8 @@
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
-#include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 #include <platform/internal/GenericConnectivityManagerImpl_NoTunnel.h>
+#include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 #include <support/FlagUtils.hpp>
 
 namespace nl {
@@ -70,16 +70,16 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
 
-    bool        _HaveIPv4InternetConnectivity(void);
-    bool        _HaveIPv6InternetConnectivity(void);
-    bool        _HaveServiceConnectivity(void);
+    bool _HaveIPv4InternetConnectivity(void);
+    bool _HaveIPv6InternetConnectivity(void);
+    bool _HaveServiceConnectivity(void);
     CHIP_ERROR _Init(void);
-    void        _OnPlatformEvent(const ChipDeviceEvent *event);
+    void _OnPlatformEvent(const ChipDeviceEvent * event);
 
     // ===== Members for internal use by the following friends.
 
-    friend ConnectivityManager &    ConnectivityMgr(void);
-    friend ConnectivityManagerImpl &ConnectivityMgrImpl(void);
+    friend ConnectivityManager & ConnectivityMgr(void);
+    friend ConnectivityManagerImpl & ConnectivityMgrImpl(void);
 
     static ConnectivityManagerImpl sInstance;
 };
@@ -105,7 +105,7 @@ inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
  * Chip applications should use this to access features of the ConnectivityManager object
  * that are common to all platforms.
  */
-inline ConnectivityManager &ConnectivityMgr(void)
+inline ConnectivityManager & ConnectivityMgr(void)
 {
     return ConnectivityManagerImpl::sInstance;
 }
@@ -116,7 +116,7 @@ inline ConnectivityManager &ConnectivityMgr(void)
  * Chip applications can use this to gain access to features of the ConnectivityManager
  * that are specific to the ESP32 platform.
  */
-inline ConnectivityManagerImpl &ConnectivityMgrImpl(void)
+inline ConnectivityManagerImpl & ConnectivityMgrImpl(void)
 {
     return ConnectivityManagerImpl::sInstance;
 }

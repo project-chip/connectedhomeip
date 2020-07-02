@@ -37,25 +37,22 @@ using namespace chip::Ble;
 /**
  * Concrete implementation of the NetworkProvisioningServer singleton object for the K32W platforms.
  */
-class BLEManagerImpl final
-    : public BLEManager,
-      private ::nl::Ble::BleLayer,
-      private BlePlatformDelegate,
-      private BleApplicationDelegate
+class BLEManagerImpl final : public BLEManager,
+                             private ::nl::Ble::BleLayer,
+                             private BlePlatformDelegate,
+                             private BleApplicationDelegate
 {
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend BLEManager;
 
 public:
-
     // ===== Platform-specific members available for use by the application.
 
     uint8_t GetAdvertisingHandle(void);
     void SetAdvertisingHandle(uint8_t handle);
 
 private:
-
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
@@ -86,7 +83,6 @@ private:
                          PacketBuffer * pBuf) override;
     bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,
                           const ChipBleUUID * charId) override;
-
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
@@ -166,7 +162,7 @@ inline BLEManagerImpl & BLEMgrImpl(void)
 
 inline ::nl::Ble::BleLayer * BLEManagerImpl::_GetBleLayer() const
 {
-    return (BleLayer *)(this);
+    return (BleLayer *) (this);
 }
 
 inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)

@@ -23,8 +23,8 @@
  */
 
 #define K32W_LOG_MODULE_NAME chip
-#define EOL_CHARS "\r\n"   /* End of Line Characters */
-#define EOL_CHARS_LEN 2    /* Length of EOL */
+#define EOL_CHARS "\r\n" /* End of Line Characters */
+#define EOL_CHARS_LEN 2  /* Length of EOL */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <support/logging/CHIPLogging.h>
@@ -34,7 +34,7 @@
 #include <openthread/platform/uart.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-extern "C" void K32WWriteBlocking(const uint8_t *aBuf, uint32_t len);
+extern "C" void K32WWriteBlocking(const uint8_t * aBuf, uint32_t len);
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
@@ -43,7 +43,7 @@ using namespace ::chip::Logging;
 
 namespace {
 
-void GetModuleName(char *buf, uint8_t module)
+void GetModuleName(char * buf, uint8_t module)
 {
     if (module == ::chip::Logging::kLogModule_DeviceLayer)
     {
@@ -55,47 +55,49 @@ void GetModuleName(char *buf, uint8_t module)
     }
 }
 
-void GetMessageString(char *buf, uint8_t chipCategory, uint8_t otLogLevel)
+void GetMessageString(char * buf, uint8_t chipCategory, uint8_t otLogLevel)
 {
     if (chipCategory != kLogCategory_None)
     {
-        switch (chipCategory) {
-            case kLogCategory_Error:
-                memcpy(buf, "[Error]", 7);
-                break;
-            case kLogCategory_Progress:
-            case kLogCategory_Retain:
-            default:
-                memcpy(buf, "[Progress]", 10);
-                break;
-            case kLogCategory_Detail:
-                memcpy(buf, "[Debug]", 7);
-                break;
+        switch (chipCategory)
+        {
+        case kLogCategory_Error:
+            memcpy(buf, "[Error]", 7);
+            break;
+        case kLogCategory_Progress:
+        case kLogCategory_Retain:
+        default:
+            memcpy(buf, "[Progress]", 10);
+            break;
+        case kLogCategory_Detail:
+            memcpy(buf, "[Debug]", 7);
+            break;
         }
     }
 
     if (otLogLevel != OT_LOG_LEVEL_NONE)
     {
-        switch (otLogLevel) {
-            case OT_LOG_LEVEL_CRIT:
-                memcpy(buf, "[Error]", 7);
-                break;
-            case OT_LOG_LEVEL_WARN:
-                memcpy(buf, "[Warn]", 6);
-                break;
-            case OT_LOG_LEVEL_NOTE:
-            case OT_LOG_LEVEL_INFO:
-            default:
-                memcpy(buf, "[Info]", 6);
-                break;
-            case OT_LOG_LEVEL_DEBG:
-                memcpy(buf, "[Debug]", 7);
-                break;
+        switch (otLogLevel)
+        {
+        case OT_LOG_LEVEL_CRIT:
+            memcpy(buf, "[Error]", 7);
+            break;
+        case OT_LOG_LEVEL_WARN:
+            memcpy(buf, "[Warn]", 6);
+            break;
+        case OT_LOG_LEVEL_NOTE:
+        case OT_LOG_LEVEL_INFO:
+        default:
+            memcpy(buf, "[Info]", 6);
+            break;
+        case OT_LOG_LEVEL_DEBG:
+            memcpy(buf, "[Debug]", 7);
+            break;
         }
     }
 }
 
-void FillPrefix(char* buf, uint8_t bufLen, uint8_t chipCategory, uint8_t otLogLevel, uint8_t module)
+void FillPrefix(char * buf, uint8_t bufLen, uint8_t chipCategory, uint8_t otLogLevel, uint8_t module)
 {
     size_t prefixLen;
 
@@ -108,7 +110,7 @@ void FillPrefix(char* buf, uint8_t bufLen, uint8_t chipCategory, uint8_t otLogLe
     assert(bufLen > (prefixLen + nlChipLoggingModuleNameLen + 3));
     buf[prefixLen++] = '[';
     GetModuleName(buf + prefixLen, module);
-    prefixLen = strlen(buf);
+    prefixLen        = strlen(buf);
     buf[prefixLen++] = ']';
     buf[prefixLen++] = ' ';
 }
@@ -124,9 +126,7 @@ namespace DeviceLayer {
  * This function is intended be overridden by the application to, e.g.,
  * schedule output of queued log entries.
  */
-void __attribute__((weak)) OnLogOutput(void)
-{
-}
+void __attribute__((weak)) OnLogOutput(void) {}
 
 } // namespace DeviceLayer
 } // namespace chip
@@ -137,17 +137,17 @@ namespace Logging {
 /**
  * CHIP log output function.
  */
-void LogV(uint8_t module, uint8_t category, const char *msg, va_list v)
+void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
 {
-    (void)module;
-    (void)category;
+    (void) module;
+    (void) category;
 
 #if K32W_LOG_ENABLED
 
     if (IsCategoryEnabled(category))
     {
         {
-            char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1] = {0};
+            char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1] = { 0 };
             size_t prefixLen, writtenLen;
 
             /* Prefix is composed of [Debug String][MOdule Name String] */
@@ -156,10 +156,10 @@ void LogV(uint8_t module, uint8_t category, const char *msg, va_list v)
 
             // Append the log message.
             writtenLen = vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen - EOL_CHARS_LEN, msg, v);
-            assert (writtenLen > 0);
+            assert(writtenLen > 0);
             memcpy(formattedMsg + prefixLen + writtenLen, EOL_CHARS, EOL_CHARS_LEN);
 
-            K32WWriteBlocking((const uint8_t *)formattedMsg, strlen(formattedMsg));
+            K32WWriteBlocking((const uint8_t *) formattedMsg, strlen(formattedMsg));
         }
     }
 
@@ -172,15 +172,13 @@ void LogV(uint8_t module, uint8_t category, const char *msg, va_list v)
 } // namespace Logging
 } // namespace chip
 
-
 #undef K32W_LOG_MODULE_NAME
 #define K32W_LOG_MODULE_NAME lwip
 
 /**
  * LwIP log output function.
  */
-extern "C"
-void LwIPLog(const char *msg, ...)
+extern "C" void LwIPLog(const char * msg, ...)
 {
     va_list v;
 
@@ -193,13 +191,13 @@ void LwIPLog(const char *msg, ...)
         // Append the log message.
         size_t len = vsnprintf(formattedMsg, sizeof(formattedMsg), msg, v);
 
-        while (len > 0 && isspace(formattedMsg[len-1]))
+        while (len > 0 && isspace(formattedMsg[len - 1]))
         {
             len--;
             formattedMsg[len] = 0;
         }
 
-        K32WWriteBlocking((const uint8_t *)formattedMsg, strlen(formattedMsg));
+        K32WWriteBlocking((const uint8_t *) formattedMsg, strlen(formattedMsg));
     }
 
     // Let the application know that a log message has been emitted.
@@ -215,30 +213,30 @@ void LwIPLog(const char *msg, ...)
 #undef K32W_LOG_MODULE_NAME
 #define K32W_LOG_MODULE_NAME thread
 
-extern "C"
-void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat, ...)
+extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
 {
     va_list v;
 
-    (void)aLogLevel;
-    (void)aLogRegion;
+    (void) aLogLevel;
+    (void) aLogRegion;
 
     va_start(v, aFormat);
 
 #if K32W_LOG_ENABLED
-	char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1] = {0};
-	size_t prefixLen, writtenLen;
+    char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1] = { 0 };
+    size_t prefixLen, writtenLen;
 
-	/* Prefix is composed of [Debug String][MOdule Name String] */
-	FillPrefix(formattedMsg, CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, kLogCategory_None, aLogLevel, (uint8_t)kLogModule_NotSpecified);
-	prefixLen = strlen(formattedMsg);
+    /* Prefix is composed of [Debug String][MOdule Name String] */
+    FillPrefix(formattedMsg, CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, kLogCategory_None, aLogLevel,
+               (uint8_t) kLogModule_NotSpecified);
+    prefixLen = strlen(formattedMsg);
 
-	// Append the log message.
-	writtenLen = vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen - EOL_CHARS_LEN, aFormat, v);
-	assert (writtenLen > 0);
-	memcpy(formattedMsg + prefixLen + writtenLen, EOL_CHARS, EOL_CHARS_LEN);
+    // Append the log message.
+    writtenLen = vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen - EOL_CHARS_LEN, aFormat, v);
+    assert(writtenLen > 0);
+    memcpy(formattedMsg + prefixLen + writtenLen, EOL_CHARS, EOL_CHARS_LEN);
 
-    K32WWriteBlocking((const uint8_t *)formattedMsg, strlen(formattedMsg));
+    K32WWriteBlocking((const uint8_t *) formattedMsg, strlen(formattedMsg));
 
     // Let the application know that a log message has been emitted.
     DeviceLayer::OnLogOutput();

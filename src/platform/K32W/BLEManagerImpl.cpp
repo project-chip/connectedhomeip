@@ -28,7 +28,6 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-
 using namespace ::nl;
 using namespace ::nl::Ble;
 
@@ -37,8 +36,6 @@ namespace DeviceLayer {
 namespace Internal {
 
 namespace {
-
-
 
 }
 } // namespace Internal

@@ -21,7 +21,7 @@
  *          Provides an implementation of the Chip GroupKeyStore interface
  *          for platforms based on the NXP SDK.
  */
- /* this file behaves like a config.h, comes first */
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/K32W/GroupKeyStoreImpl.h>
@@ -39,11 +39,11 @@ CHIP_ERROR GroupKeyStoreImpl::RetrieveGroupKey(uint32_t keyId, ChipGroupKey & ke
 
     // Iterate over all the GroupKey PDM records looking for a matching key...
     err = ForEachRecord(kConfigKey_GroupKeyBase, kConfigKey_GroupKeyMax, false,
-                        [keyId, &key](const Key &nvmIdKey, const size_t &length) -> CHIP_ERROR {
+                        [keyId, &key](const Key & nvmIdKey, const size_t & length) -> CHIP_ERROR {
                             CHIP_ERROR err2;
-                            size_t      keyLen;
-                            uint8_t     buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
-                            uint32_t    curKeyId;
+                            size_t keyLen;
+                            uint8_t buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
+                            uint32_t curKeyId;
 
                             // Read the PDM obj binary data data into the buffer.
                             err2 = ReadConfigValueBin(nvmIdKey, buf, sizeof(buf), keyLen);
@@ -93,10 +93,10 @@ CHIP_ERROR GroupKeyStoreImpl::StoreGroupKey(const ChipGroupKey & key)
     // Iterate over all the GroupKey PDM records looking for the first
     // empty PDM key where we can store the data. (Note- use arg addNewrecord=true)
     err = ForEachRecord(kConfigKey_GroupKeyBase, kConfigKey_GroupKeyMax, true,
-                        [&key](const Key &pdmKey, const size_t &length) -> CHIP_ERROR {
+                        [&key](const Key & pdmKey, const size_t & length) -> CHIP_ERROR {
                             CHIP_ERROR err2;
-                            size_t      keyLen;
-                            uint8_t     buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
+                            size_t keyLen;
+                            uint8_t buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
 
                             // Encode the key for storage in an PDM record.
                             err2 = EncodeGroupKey(key, buf, sizeof(buf), keyLen);
@@ -146,12 +146,11 @@ CHIP_ERROR GroupKeyStoreImpl::StoreGroupKey(const ChipGroupKey & key)
 
 #if CHIP_CONFIG_SECURITY_TEST_MODE
             ChipLogProgress(SecurityManager,
-                             "GroupKeyStore: storing key 0x%08" PRIX32 " (%s), len %" PRId8 ", data 0x%02" PRIX8
-                             "...%s",
-                             key.KeyId, ChipKeyId::DescribeKey(key.KeyId), key.KeyLen, key.Key[0], extraKeyInfo);
+                            "GroupKeyStore: storing key 0x%08" PRIX32 " (%s), len %" PRId8 ", data 0x%02" PRIX8 "...%s", key.KeyId,
+                            ChipKeyId::DescribeKey(key.KeyId), key.KeyLen, key.Key[0], extraKeyInfo);
 #else
-            ChipLogProgress(SecurityManager, "GroupKeyStore: storing key 0x%08" PRIX32 " (%s), len %" PRId8 "%s",
-                             key.KeyId, ChipKeyId::DescribeKey(key.KeyId), key.KeyLen, extraKeyInfo);
+            ChipLogProgress(SecurityManager, "GroupKeyStore: storing key 0x%08" PRIX32 " (%s), len %" PRId8 "%s", key.KeyId,
+                            ChipKeyId::DescribeKey(key.KeyId), key.KeyLen, extraKeyInfo);
 #endif
         }
     }
@@ -165,11 +164,11 @@ CHIP_ERROR GroupKeyStoreImpl::DeleteGroupKey(uint32_t keyId)
 
     // Iterate over all the GroupKey PDM records looking for a matching key...
     err = ForEachRecord(kConfigKey_GroupKeyBase, kConfigKey_GroupKeyMax, false,
-                        [keyId](const Key &pdmKey, const size_t &length) -> CHIP_ERROR {
+                        [keyId](const Key & pdmKey, const size_t & length) -> CHIP_ERROR {
                             CHIP_ERROR err2;
-                            size_t      keyLen;
-                            uint8_t     buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
-                            uint32_t    curKeyId;
+                            size_t keyLen;
+                            uint8_t buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
+                            uint32_t curKeyId;
 
                             // Read the PDM obj binary data data into the buffer.
                             err2 = ReadConfigValueBin(pdmKey, buf, sizeof(buf), keyLen);
@@ -215,11 +214,11 @@ CHIP_ERROR GroupKeyStoreImpl::DeleteGroupKeysOfAType(uint32_t keyType)
 
     // Iterate over all the GroupKey PDM records looking for a matching key...
     err = ForEachRecord(kConfigKey_GroupKeyBase, kConfigKey_GroupKeyMax, false,
-                        [keyType](const Key &pdmKey, const size_t &length) -> CHIP_ERROR {
+                        [keyType](const Key & pdmKey, const size_t & length) -> CHIP_ERROR {
                             CHIP_ERROR err2;
-                            size_t      keyLen;
-                            uint8_t     buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
-                            uint32_t    curKeyId;
+                            size_t keyLen;
+                            uint8_t buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
+                            uint32_t curKeyId;
 
                             // Read the PDM obj binary data data into the buffer.
                             err2 = ReadConfigValueBin(pdmKey, buf, sizeof(buf), keyLen);
@@ -243,44 +242,40 @@ CHIP_ERROR GroupKeyStoreImpl::DeleteGroupKeysOfAType(uint32_t keyType)
     return err;
 }
 
-CHIP_ERROR GroupKeyStoreImpl::EnumerateGroupKeys(uint32_t  keyType,
-                                                  uint32_t *keyIds,
-                                                  uint8_t   keyIdsArraySize,
-                                                  uint8_t & keyCount)
+CHIP_ERROR GroupKeyStoreImpl::EnumerateGroupKeys(uint32_t keyType, uint32_t * keyIds, uint8_t keyIdsArraySize, uint8_t & keyCount)
 {
     CHIP_ERROR err;
 
     keyCount = 0;
 
     // Iterate over all the GroupKey records looking for keys of the specified type...
-    err = ForEachRecord(
-        kConfigKey_GroupKeyBase, kConfigKey_GroupKeyMax, false,
-        [keyType, keyIds, keyIdsArraySize, &keyCount](const Key &pdmKey, const size_t &length) -> CHIP_ERROR {
-            CHIP_ERROR err2;
-            size_t      keyLen;
-            uint8_t     buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
-            uint32_t    curKeyId;
+    err = ForEachRecord(kConfigKey_GroupKeyBase, kConfigKey_GroupKeyMax, false,
+                        [keyType, keyIds, keyIdsArraySize, &keyCount](const Key & pdmKey, const size_t & length) -> CHIP_ERROR {
+                            CHIP_ERROR err2;
+                            size_t keyLen;
+                            uint8_t buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
+                            uint32_t curKeyId;
 
-            // Read the PDM obj binary data data into the buffer.
-            err2 = ReadConfigValueBin(pdmKey, buf, sizeof(buf), keyLen);
-            SuccessOrExit(err2);
+                            // Read the PDM obj binary data data into the buffer.
+                            err2 = ReadConfigValueBin(pdmKey, buf, sizeof(buf), keyLen);
+                            SuccessOrExit(err2);
 
-            // Decode the CHIP key id for the current group key.
-            err2 = DecodeGroupKeyId(buf, keyLen, curKeyId);
-            SuccessOrExit(err2);
+                            // Decode the CHIP key id for the current group key.
+                            err2 = DecodeGroupKeyId(buf, keyLen, curKeyId);
+                            SuccessOrExit(err2);
 
-            // If the current key matches the type we're looking for, add it to the keyIds array.
-            if ((keyType == ChipKeyId::kType_None) || (ChipKeyId::GetType(curKeyId) == keyType))
-            {
-                keyIds[keyCount++] = curKeyId;
+                            // If the current key matches the type we're looking for, add it to the keyIds array.
+                            if ((keyType == ChipKeyId::kType_None) || (ChipKeyId::GetType(curKeyId) == keyType))
+                            {
+                                keyIds[keyCount++] = curKeyId;
 
-                // Stop iterating if there's no more room in the keyIds array.
-                VerifyOrExit(keyCount < keyIdsArraySize, err2 = CHIP_ERROR_BUFFER_TOO_SMALL);
-            }
+                                // Stop iterating if there's no more room in the keyIds array.
+                                VerifyOrExit(keyCount < keyIdsArraySize, err2 = CHIP_ERROR_BUFFER_TOO_SMALL);
+                            }
 
-        exit:
-            return err2;
-        });
+                        exit:
+                            return err2;
+                        });
 
     // Simply return a truncated list if there are more matching keys than will fit in the array.
     if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
@@ -297,7 +292,7 @@ CHIP_ERROR GroupKeyStoreImpl::Clear(void)
 
     // Iterate over all the GroupKey PDM records deleting each one...
     err = ForEachRecord(kConfigKey_GroupKeyBase, kConfigKey_GroupKeyMax, false,
-                        [](const Key &pdmKey, const size_t &length) -> CHIP_ERROR {
+                        [](const Key & pdmKey, const size_t & length) -> CHIP_ERROR {
                             CHIP_ERROR err2;
 
                             err2 = ClearConfigValue(pdmKey);
@@ -337,7 +332,7 @@ CHIP_ERROR GroupKeyStoreImpl::Init()
 CHIP_ERROR GroupKeyStoreImpl::EncodeGroupKey(const ChipGroupKey & key, uint8_t * buf, size_t bufSize, size_t & encodedKeyLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t *   p   = buf;
+    uint8_t * p    = buf;
 
     VerifyOrExit(bufSize >= kFixedEncodedKeySize + key.KeyLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
@@ -353,7 +348,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR GroupKeyStoreImpl::DecodeGroupKeyId(const uint8_t *encodedKey, size_t encodedKeyLen, uint32_t &keyId)
+CHIP_ERROR GroupKeyStoreImpl::DecodeGroupKeyId(const uint8_t * encodedKey, size_t encodedKeyLen, uint32_t & keyId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -365,10 +360,10 @@ exit:
     return err;
 }
 
-CHIP_ERROR GroupKeyStoreImpl::DecodeGroupKey(const uint8_t *encodedKey, size_t encodedKeyLen, ChipGroupKey &key)
+CHIP_ERROR GroupKeyStoreImpl::DecodeGroupKey(const uint8_t * encodedKey, size_t encodedKeyLen, ChipGroupKey & key)
 {
-    CHIP_ERROR    err = CHIP_NO_ERROR;
-    const uint8_t *p   = encodedKey;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    const uint8_t * p = encodedKey;
 
     VerifyOrExit(encodedKeyLen >= kFixedEncodedKeySize, err = CHIP_ERROR_INVALID_ARGUMENT);
 

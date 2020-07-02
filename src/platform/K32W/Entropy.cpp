@@ -21,7 +21,7 @@
  *          Provides implementations for the Chip entropy sourcing functions
  *          on the NXP K32W platforms.
  */
- /* this file behaves like a config.h, comes first */
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <support/crypto/CHIPRNG.h>
@@ -44,9 +44,9 @@ namespace Internal {
  *
  * This function is called by the CHIP DRBG to acquire entropy.
  */
-int GetEntropy_K32W(uint8_t *buf, size_t count)
+int GetEntropy_K32W(uint8_t * buf, size_t count)
 {
-    int    res         = 0;
+    int res = 0;
 
     VerifyOrDie(count <= UINT16_MAX);
 
@@ -57,10 +57,10 @@ int GetEntropy_K32W(uint8_t *buf, size_t count)
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-    otError otErr = otPlatEntropyGet(buf, (uint16_t)count);
+    otError otErr = otPlatEntropyGet(buf, (uint16_t) count);
     if (otErr != OT_ERROR_NONE)
     {
-      res = CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED;
+        res = CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED;
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -84,7 +84,7 @@ CHIP_ERROR InitEntropy()
     // Seed the standard rand() pseudo-random generator with data from the secure random source.
     {
         unsigned int seed;
-        err = Platform::Security::GetSecureRandomData((uint8_t *)&seed, sizeof(seed));
+        err = Platform::Security::GetSecureRandomData((uint8_t *) &seed, sizeof(seed));
         SuccessOrExit(err);
         srand(seed);
     }

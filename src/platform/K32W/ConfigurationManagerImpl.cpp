@@ -29,10 +29,9 @@
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include <platform/ConfigurationManager.h>
-#include <platform/K32W/K32WConfig.h>
 #include <platform/K32W/GroupKeyStoreImpl.h>
+#include <platform/K32W/K32WConfig.h>
 #include <platform/Profiles/security/CHIPApplicationKeys.h>
-
 
 #include "fsl_reset.h"
 
@@ -57,7 +56,7 @@ ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
 CHIP_ERROR ConfigurationManagerImpl::_Init()
 {
     CHIP_ERROR err;
-    bool        failSafeArmed;
+    bool failSafeArmed;
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_Init();
@@ -79,8 +78,8 @@ exit:
     return err;
 }
 
-WEAVE_ERROR ConfigurationManagerImpl::_GetDeviceDescriptor(
-    ::nl::Weave::Profiles::DeviceDescription::WeaveDeviceDescriptor &deviceDesc)
+WEAVE_ERROR
+ConfigurationManagerImpl::_GetDeviceDescriptor(::nl::Weave::Profiles::DeviceDescription::WeaveDeviceDescriptor & deviceDesc)
 {
     WEAVE_ERROR err;
 

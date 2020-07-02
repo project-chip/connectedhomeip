@@ -16,7 +16,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
- /* this file behaves like a config.h, comes first */
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConnectivityManager.h>
@@ -24,10 +24,10 @@
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
-#include <lwip/ip_addr.h>
-#include <lwip/netif.h>
-#include <lwip/nd6.h>
 #include <lwip/dns.h>
+#include <lwip/ip_addr.h>
+#include <lwip/nd6.h>
+#include <lwip/netif.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
@@ -61,7 +61,7 @@ exit:
     return err;
 }
 
-void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent *event)
+void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
     // Forward the event to the generic base classes as needed.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
