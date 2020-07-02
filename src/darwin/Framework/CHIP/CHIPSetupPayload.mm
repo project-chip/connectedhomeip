@@ -32,8 +32,8 @@
     case chip::RendezvousInformationFlags::kNone:
         rv = kRendezvousInformationNone;
         break;
-    case chip::RendezvousInformationFlags::kSoftAP:
-        rv = kRendezvousInformationSoftAP;
+    case chip::RendezvousInformationFlags::kWiFi:
+        rv = kRendezvousInformationWiFi;
         break;
     case chip::RendezvousInformationFlags::kBLE:
         rv = kRendezvousInformationBLE;

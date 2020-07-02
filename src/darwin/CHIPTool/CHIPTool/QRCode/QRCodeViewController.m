@@ -233,9 +233,9 @@ static NSString * const ipKey = @"ipk";
     case kRendezvousInformationAllMask:
         NSLog(@"Rendezvous Unknown");
         break;
-    case kRendezvousInformationSoftAP:
-        NSLog(@"Rendezvous SoftAP");
-        [self handleRendezVousSoftAP:[self getNetworkName:payload.discriminator]];
+    case kRendezvousInformationWiFi:
+        NSLog(@"Rendezvous Wi-Fi");
+        [self handleRendezVousWiFi:[self getNetworkName:payload.discriminator]];
         break;
     case kRendezvousInformationBLE:
         NSLog(@"Rendezvous BLE");
@@ -257,7 +257,7 @@ static NSString * const ipKey = @"ipk";
     [_ble start];
 }
 
-- (void)handleRendezVousSoftAP:(NSString *)name
+- (void)handleRendezVousWiFi:(NSString *)name
 {
     NSString * message = [NSString stringWithFormat:@"SSID: %@\n\nUse WiFi Settings to connect to it.", name];
     UIAlertController * alert = [UIAlertController alertControllerWithTitle:@"SoftAP Detected"
