@@ -1305,7 +1305,8 @@ INET_ERROR IPEndPointBasis::GetEndPoint(nw_endpoint_t & aEndPoint, const IPAddre
     // we want if the locale endpoint is IPv4.
     if (aAddressType == kIPAddressType_IPv4 && aAddress.Type() == kIPAddressType_Any)
     {
-        snprintf(addrStr, sizeof(addrStr), "0.0.0.0");
+        const IPAddress anyAddr = IPAddress::FromIPv4(aAddress.ToIPv4());
+        anyAddr.ToString(addrStr, sizeof(addrStr));
     }
     else
     {
