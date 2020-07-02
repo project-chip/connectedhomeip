@@ -38,6 +38,8 @@ CHIP_BUILD_DATA_MODEL_SOURCE_FILES                                              
     @top_builddir@/src/app/plugin/core-api/core-api.c                                 \
     @top_builddir@/src/app/plugin/core-data-model/zcl-data-model.c                    \
     @top_builddir@/src/app/plugin/core-message-dispatch/dispatch.c                    \
+    @top_builddir@/src/app/chip-zcl-zpro/command-encoder/encoder.c                    \
+    @top_builddir@/src/app/chip-zcl-zpro/command-encoder/decoder.c                    \
     $(NULL)
 
 # Excluding this one for now because it has #include syntax that does

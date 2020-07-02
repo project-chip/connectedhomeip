@@ -2304,6 +2304,7 @@ src/Makefile
 src/include/Makefile
 src/app/Makefile
 src/app/chip-zcl/Makefile
+src/app/chip-zcl-zpro/Makefile
 src/app/gen/Makefile
 src/app/plugin/Makefile
 src/app/plugin/tests/Makefile
