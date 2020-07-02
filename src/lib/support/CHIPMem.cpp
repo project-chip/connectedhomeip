@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file implements heap memory allocation APIs for CHIP. These functions are platform 
+ *      This file implements heap memory allocation APIs for CHIP. These functions are platform
  *      specific and might be C Standard Library heap functions re-direction in most of cases.
  *
  */

@@ -57,7 +57,7 @@ extern void *MemoryCalloc(size_t num, size_t size);
 /**
  * This function is called by the Chip layer to change the size of the memory block pointed to by p.
  * The function may move the memory block to a new location (whose address is returned by the function).
- * The content of the memory block is preserved up to the lesser of the new and old sizes, even if the 
+ * The content of the memory block is preserved up to the lesser of the new and old sizes, even if the
  * block is moved to a new location. If the new size is larger, the value of the newly allocated portion
  * is indeterminate.
 
@@ -85,4 +85,3 @@ extern void MemoryFree(void *p);
 } // namespace chip
 
 #endif // CHIP_MEM_H
-
