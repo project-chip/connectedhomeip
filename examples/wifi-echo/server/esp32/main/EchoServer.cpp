@@ -135,7 +135,7 @@ class EchoServerCallback : public SecureSessionMgrCallback
 {
 public:
     void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
-                           SecureSessionMgr * mgr) override
+                           SecureSessionMgrBase * mgr) override
     {
         CHIP_ERROR err;
         const size_t data_len = buffer->DataLength();
@@ -240,14 +240,12 @@ private:
 
 static EchoServerCallback gCallbacks;
 
-static SecureSessionMger<Transport::UDP, // IPV6
-                         Transport::UDP  // IPV4
-                         >
+static SecureSessionMgr<Transport::UDP, // IPV6
+                        Transport::UDP  // IPV4
+                        >
     sessions;
 
 } // namespace
-
-transportTuple;
 
 // The echo server assumes the platform's networking has been setup already
 void startServer()
