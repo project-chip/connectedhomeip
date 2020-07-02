@@ -1,10 +1,8 @@
 #ifndef NRF5_CHIPINIT_H
 #define NRF5_CHIPINIT_H
 
-#include <core/CHIPError.h>
+#include "sdk_common.h"
 
-extern "C" {
-CHIP_ERROR ChipInit();
-}
+ret_code_t ChipInit();
 
 #endif // NRF5_CHIPINIT_H

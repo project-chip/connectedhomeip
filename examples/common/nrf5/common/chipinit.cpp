@@ -72,9 +72,9 @@ static void ot_free(void * p_ptr)
     vPortFree(p_ptr);
 }
 
-CHIP_ERROR ChipInit()
+ret_code_t ChipInit()
 {
-    CHIP_ERROR ret = CHIP_NO_ERROR;
+    ret_code_t ret = CHIP_NO_ERROR;
 
     NRF_LOG_INFO("Init CHIP stack");
     ret = PlatformMgr().InitChipStack();
