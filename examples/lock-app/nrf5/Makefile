@@ -17,7 +17,7 @@
 #   limitations under the License.
 #
 
-# 
+#
 #   @file
 #         Makefile for building the CHIP nRF52840 Lock Example Application.
 #
@@ -26,7 +26,7 @@ PROJECT_ROOT := $(realpath .)
 
 CHIP_ROOT ?= $(realpath $(PROJECT_ROOT)/third_party/connectedhomeip)
 BUILD_SUPPORT_DIR = $(CHIP_ROOT)/config/nrf5
-NRF5_COMMON_DIR = $(CHIP_ROOT)/examples/common/nrf5
+NRF5_PLATFORM_DIR = $(CHIP_ROOT)/examples/platform/nrf528xx
 
 include $(BUILD_SUPPORT_DIR)/nrf5-app.mk
 include $(BUILD_SUPPORT_DIR)/nrf5-chip.mk
@@ -38,12 +38,12 @@ SRCS = \
     $(PROJECT_ROOT)/main/AppTask.cpp \
     $(PROJECT_ROOT)/main/BoltLockManager.cpp \
     $(PROJECT_ROOT)/main/DataModelHandler.cpp \
-    $(NRF5_COMMON_DIR)/common/support/CXXExceptionStubs.cpp \
-    $(NRF5_COMMON_DIR)/common/support/nRF5Sbrk.c \
-    $(NRF5_COMMON_DIR)/common/support/FreeRTOSNewlibLockSupport.c \
-    $(NRF5_COMMON_DIR)/common/Server.cpp \
-    $(NRF5_COMMON_DIR)/common/chipinit.cpp \
-    $(NRF5_COMMON_DIR)/util/LEDWidget.cpp \
+    $(NRF5_PLATFORM_DIR)/app/support/CXXExceptionStubs.cpp \
+    $(NRF5_PLATFORM_DIR)/app/support/nRF5Sbrk.c \
+    $(NRF5_PLATFORM_DIR)/app/support/FreeRTOSNewlibLockSupport.c \
+    $(NRF5_PLATFORM_DIR)/app/Server.cpp \
+    $(NRF5_PLATFORM_DIR)/app/chipinit.cpp \
+    $(NRF5_PLATFORM_DIR)/util/LEDWidget.cpp \
     $(NRF5_SDK_ROOT)/components/ble/common/ble_advdata.c \
     $(NRF5_SDK_ROOT)/components/ble/common/ble_srv_common.c \
     $(NRF5_SDK_ROOT)/components/ble/nrf_ble_gatt/nrf_ble_gatt.c \
@@ -117,9 +117,9 @@ INC_DIRS = \
     $(CHIP_ROOT)/src/lib \
     $(CHIP_ROOT)/src/ \
     $(CHIP_ROOT)/src/system \
-    $(NRF5_COMMON_DIR)/common/include \
-    $(NRF5_COMMON_DIR)/common/project_include \
-    $(NRF5_COMMON_DIR)/util/include \
+    $(NRF5_PLATFORM_DIR)/app/include \
+    $(NRF5_PLATFORM_DIR)/app/project_include \
+    $(NRF5_PLATFORM_DIR)/util/include \
     $(NRF5_SDK_ROOT)/components \
     $(NRF5_SDK_ROOT)/components/boards \
     $(NRF5_SDK_ROOT)/components/ble/ble_advertising \
@@ -277,8 +277,8 @@ else
     CHIP_DEFINES += CHIP_CONFIG_LOG_LEVEL=OT_LOG_LEVEL_INFO
 endif
 
-CHIP_PROJECT_CONFIG = $(NRF5_COMMON_DIR)/common/project_include/CHIPProjectConfig.h
+CHIP_PROJECT_CONFIG = $(NRF5_PLATFORM_DIR)/app/project_include/CHIPProjectConfig.h
 
-LINKER_SCRIPT = $(NRF5_COMMON_DIR)/common/ldscripts/chip-nrf52840-example.ld
+LINKER_SCRIPT = $(NRF5_PLATFORM_DIR)/app/ldscripts/chip-nrf52840-example.ld
 
 $(call GenerateBuildRules)
