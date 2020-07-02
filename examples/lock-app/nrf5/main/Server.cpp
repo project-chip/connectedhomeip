@@ -37,6 +37,7 @@
 #include <transport/UDP.h>
 
 #include "DataModelHandler.h"
+#include "Server.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
