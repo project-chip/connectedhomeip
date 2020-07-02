@@ -19,9 +19,6 @@
 set -x
 env
 
-ls -la /var/
-ls -la /var/esp-idf/
-
 root=examples/wifi-echo/server/esp32/
 
 make -j -f Makefile-bootstrap repos
