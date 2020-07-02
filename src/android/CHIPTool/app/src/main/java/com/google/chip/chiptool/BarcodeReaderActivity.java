@@ -159,10 +159,6 @@ public class BarcodeReaderActivity extends AppCompatActivity {
 
       // TODO(randy.rossi): Put the raw bytes through the CHIP qr code parser
       // barcodes.get(0).rawBytes;
-
-      // Just a test for now...
-      String result = CHIPNativeBridge.getInstance().base41Encode();
-      Log.e(TAG, "Called into native bridge: got " + result);
     }
 
     @Override

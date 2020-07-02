@@ -24,11 +24,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    externalNativeBuild {
-        cmake {
-            path file('CMakeLists.txt')
-        }
-    }
     ndkVersion '21.3.6528147'
 
     configurations.all {
@@ -44,7 +39,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation fileTree(dir: "libs", include: ["*.jar", "*.so"])
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.preference:preference:1.1.1'
     implementation "com.google.android.gms:play-services-vision:20.1.0"
