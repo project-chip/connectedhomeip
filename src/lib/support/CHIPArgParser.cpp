@@ -44,6 +44,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <support/CHIPMem.h>
+
 /*
  * TODO: Revisit these if and when fabric ID and node ID support has
  *       been integrated into the stack.
@@ -423,9 +425,9 @@ bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSe
 done:
 
     if (shortOpts != NULL)
-        free(shortOpts);
+        MemoryFree(shortOpts);
     if (longOpts != NULL)
-        free(longOpts);
+        MemoryFree(longOpts);
 
     gActiveOptionSets = NULL;
 
@@ -504,14 +506,14 @@ bool ParseArgsFromString(const char * progName, const char * argStr, OptionSet *
     if (argc < 0)
     {
         PrintArgError("%s: Memory allocation failure\n", progName);
-        free(argStrCopy);
+        MemoryFree(argStrCopy);
         return false;
     }
 
     res = ParseArgs(progName, argc, argv, optSets, nonOptArgHandler, ignoreUnknown);
 
-    free(argStrCopy);
-    free(argv);
+    MemoryFree(argStrCopy);
+    MemoryFree(argv);
 
     return res;
 }
@@ -608,7 +610,7 @@ void PrintOptionHelp(OptionSet * optSets[], FILE * s)
             }
     }
 
-    free(helpGroupNames);
+    MemoryFree(helpGroupNames);
 }
 
 /**
@@ -1177,7 +1179,7 @@ static char * MakeShortOptions(OptionSet ** optSets)
     // The buffer needs to be big enough to hold up to 3 characters per short option plus an initial
     // ":" and a terminating null.
     size_t arraySize = 2 + (totalOptions * 3);
-    char * shortOpts = (char *) malloc(arraySize);
+    char * shortOpts = (char *) MemoryAlloc(arraySize);
     if (shortOpts == NULL)
         return NULL;
 
@@ -1217,7 +1219,7 @@ static struct option * MakeLongOptions(OptionSet ** optSets)
 
     // Allocate an array to hold the list of long options.
     size_t arraySize         = (sizeof(struct option) * (totalOptions + 1));
-    struct option * longOpts = (struct option *) malloc(arraySize);
+    struct option * longOpts = (struct option *) MemoryAlloc(arraySize);
     if (longOpts == NULL)
         return NULL;
 
@@ -1252,7 +1254,7 @@ static int32_t SplitArgs(char * argStr, char **& argList, char * initialArg)
     int32_t argCount    = 0;
 
     // Allocate an array to hold pointers to the arguments.
-    argList = (char **) malloc(sizeof(char *) * InitialArgListSize);
+    argList = (char **) MemoryAlloc(sizeof(char *) * InitialArgListSize);
     if (argList == NULL)
         return -1;
     argListSize = InitialArgListSize;
@@ -1278,7 +1280,7 @@ static int32_t SplitArgs(char * argStr, char **& argList, char * initialArg)
         if (argListSize == argCount + 1)
         {
             argListSize *= 2;
-            argList = (char **) realloc(argList, argListSize);
+            argList = (char **) MemoryRealloc(argList, argListSize);
             if (argList == NULL)
                 return -1;
         }
@@ -1403,7 +1405,7 @@ static const char ** MakeUniqueHelpGroupNamesList(OptionSet * optSets[])
     size_t numOptSets = CountOptionSets(optSets);
     size_t numGroups  = 0;
 
-    const char ** groupNames = (const char **) malloc(sizeof(const char *) * (numOptSets + 1));
+    const char ** groupNames = (const char **) MemoryAlloc(sizeof(const char *) * (numOptSets + 1));
     if (groupNames == NULL)
         return NULL;
 
