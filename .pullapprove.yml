@@ -16,6 +16,13 @@ pullapprove_conditions:
       explanation: "Style must be inline before reviewing can be complete"
 
     ############################################################
+    #  Builds
+    ############################################################
+    - condition: "'Build (clang)' in statuses.successful"
+      unmet_status: "failure"
+      explanation: "Clang build needs to pass"
+
+    ############################################################
     #  License Checks
     ############################################################
     - condition: "'*license/cla*' in statuses.successful"
