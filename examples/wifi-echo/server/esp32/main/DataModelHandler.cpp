@@ -34,8 +34,6 @@ extern "C" {
 
 using namespace ::chip;
 
-extern LEDWidget statusLED; // In wifi-echo.cpp
-
 static const char * TAG = "data_model_server";
 
 void InitDataModelHandler()
@@ -56,24 +54,3 @@ void HandleDataModelMessage(System::PacketBuffer * buffer)
     }
     System::PacketBuffer::Free(buffer);
 }
-
-extern "C" {
-void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
-{
-    if (clusterId != CHIP_ZCL_CLUSTER_ON_OFF)
-    {
-        ESP_LOGI(TAG, "Unknown cluster ID: %d", clusterId);
-        return;
-    }
-
-    if (attributeId != CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF)
-    {
-        ESP_LOGI(TAG, "Unknown attribute ID: %d", attributeId);
-        return;
-    }
-
-    // At this point we can assume that value points to a boolean value.
-    statusLED.Set(*value);
-}
-} // extern "C"
