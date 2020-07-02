@@ -90,7 +90,7 @@ public:
         }
     }
 
-    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgerBase * mgr)
+    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
     {
         CHIP_ERROR err;
 
@@ -110,7 +110,7 @@ static ServerCallback gCallbacks;
 } // namespace
 
 // The echo server assumes the platform's networking has been setup already
-void SetupTransport(IPAddressType type, SecureSessionMgerBase * sessions, Transport::UDP * transport) {}
+void SetupTransport(IPAddressType type, SecureSessionMgrBase * sessions, Transport::UDP * transport) {}
 
 static Transport::UDP transport;
 
