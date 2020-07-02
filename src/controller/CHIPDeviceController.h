@@ -49,24 +49,8 @@ typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * app
 typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
 };
 
-class ChipDeviceControllerCallback : public SecureSessionMgrCallback
+class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback
 {
-public:
-    virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                   System::PacketBuffer * msgBuf, SecureSessionMgr * mgr);
-
-    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr);
-
-    void SetController(ChipDeviceController * controller) { mController = controller; }
-
-private:
-    ChipDeviceController * mController;
-};
-
-class DLL_EXPORT ChipDeviceController
-{
-    friend class ChipDeviceControllerCallback;
-
 public:
     ChipDeviceController();
 
@@ -113,7 +97,7 @@ public:
      * @brief
      *   Get the PeerAddress of a connected peer
      *
-     * @param[inout] peerAddress  The PeerAddress object which will be populated with the details of the connected peer
+     * @param[in,out] peerAddress  The PeerAddress object which will be populated with the details of the connected peer
      * @return CHIP_ERROR   An error if there's no active connection
      */
     CHIP_ERROR PopulatePeerAddress(Transport::PeerAddress & peerAddress);
@@ -166,11 +150,16 @@ public:
      * @brief
      *   Get pointers to the Layers ownerd by the controller
      *
-     * @param systemLayer[out]   A pointer to the SystemLayer object
-     * @param inetLayer[out]     A pointer to the InetLayer object
+     * @param[out] systemLayer   A pointer to the SystemLayer object
+     * @param[out] inetLayer     A pointer to the InetLayer object
      * @return CHIP_ERROR   Indicates whether the layers were populated correctly
      */
     CHIP_ERROR GetLayers(Layer ** systemLayer, InetLayer ** inetLayer);
+
+    virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
+                                   System::PacketBuffer * msgBuf, SecureSessionMgr * mgr);
+
+    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr);
 
 private:
     enum
@@ -206,8 +195,6 @@ private:
     ErrorHandler mOnError;
     NewConnectionHandler mOnNewConnection;
     System::PacketBuffer * mCurReqMsg;
-
-    ChipDeviceControllerCallback mCallback;
 
     NodeId mLocalDeviceId;
     IPAddress mDeviceAddr;

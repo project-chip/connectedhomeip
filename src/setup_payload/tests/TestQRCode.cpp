@@ -39,7 +39,7 @@ void TestRendezvousFlags(nlTestSuite * inSuite, void * inContext)
     inPayload.rendezvousInformation = RendezvousInformationFlags::kNone;
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kSoftAP;
+    inPayload.rendezvousInformation = RendezvousInformationFlags::kWiFi;
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
     inPayload.rendezvousInformation = RendezvousInformationFlags::kBLE;
