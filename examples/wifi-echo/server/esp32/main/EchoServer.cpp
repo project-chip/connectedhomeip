@@ -238,11 +238,11 @@ private:
     }
 };
 
-static EchoServerCallback gCallbacks;
+EchoServerCallback gCallbacks;
 
-static SecureSessionMgr<Transport::UDP, // IPV6
-                        Transport::UDP  // IPV4
-                        >
+SecureSessionMgr<Transport::UDP, // IPV6
+                 Transport::UDP  // IPV4
+                 >
     sessions;
 
 } // namespace
