@@ -36,6 +36,7 @@
 
 // Include local headers
 #include <support/CodeUtils.h>
+#include <support/CHIPMem.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemMutex.h>
@@ -484,7 +485,7 @@ PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t
 
 #else // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
-    lPacket = reinterpret_cast<PacketBuffer *>(malloc(lBlockSize));
+    lPacket = reinterpret_cast<PacketBuffer *>(MemoryAlloc(lBlockSize));
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
 
 #endif // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
@@ -600,7 +601,7 @@ void PacketBuffer::Free(PacketBuffer * aPacket)
             aPacket->next = sFreeList;
             sFreeList     = aPacket;
 #else  // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
-            free(aPacket);
+            MemoryFree(aPacket);
 #endif // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
             aPacket       = lNextPacket;
         }

@@ -34,6 +34,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <support/Base64.h>
 #include <support/CodeUtils.h>
+#include <support/CHIPMem.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -212,7 +213,7 @@ CHIP_ERROR ChipLinuxStorage::WriteValueBin(const char * key, const uint8_t * dat
     // Allocate just enough space for the encoded data, and the NULL terminator
     if (retval == CHIP_NO_ERROR)
     {
-        encodedData = (char *) malloc(expectedEncodedLen + 1);
+        encodedData = (char *) MemoryAlloc(expectedEncodedLen + 1);
         if (encodedData == NULL)
         {
             retval = CHIP_ERROR_NO_MEMORY;
@@ -235,7 +236,7 @@ CHIP_ERROR ChipLinuxStorage::WriteValueBin(const char * key, const uint8_t * dat
     // Free memory
     if (encodedData)
     {
-        free(encodedData);
+        MemoryFree(encodedData);
     }
 
     return retval;
