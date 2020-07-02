@@ -111,11 +111,6 @@ static ServerCallback gCallbacks;
 } // namespace
 
 // The echo server assumes the platform's networking has been setup already
-void SetupTransport(IPAddressType type, SecureSessionMgrBase * sessions, Transport::UDP * transport) {}
-
-static Transport::UDP transport;
-
-// The echo server assumes the platform's networking has been setup already
 void StartServer(DemoSessionManager * sessions)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
