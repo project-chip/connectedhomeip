@@ -39,7 +39,7 @@ jobs:
                      --github-api-token "${{ secrets.GITHUB_TOKEN }}"                              \
                      --github-repository "${{ github.repository }}"                                \
                      --github-ref "${{ github.ref }}"                                              \
-                     --git-master-ref "${{ github.head_ref }}"
+                     --git-master-ref "${{ github.base_ref }}"
             - name: Copy aside bloat report & binaries
               run: |
                   cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
