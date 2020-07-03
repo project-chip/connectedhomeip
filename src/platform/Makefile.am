@@ -142,17 +142,16 @@ libDeviceLayer_a_SOURCES               += \
     Linux/SystemTimeSupport.cpp           \
     $(NULL)
 
-if CHIP_WITH_OTBR_CLIENT
+if CHIP_WITH_OT_BR_POSIX
 libDeviceLayer_a_SOURCES               += \
     Linux/ThreadStackManagerImpl.cpp      \
     $(NULL)
-endif
 
 libDeviceLayer_a_CPPFLAGS              += \
-    -I$(top_srcdir)/third_party/ot-br-posix/repo/include    \
-    -I$(top_srcdir)/third_party/ot-br-posix/repo/src        \
-    $(DBUS_CFLAGS)                                          \
+    $(OT_BR_POSIX_CPPFLAGS)              \
+    $(DBUS_CFLAGS)                        \
     $(NULL)
+endif
 
 endif # CHIP_DEVICE_LAYER_TARGET_LINUX
 

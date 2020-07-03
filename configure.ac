@@ -1788,48 +1788,51 @@ fi
 # otbr-client
 #
 
-AC_ARG_ENABLE(otbr-client,
-    [AS_HELP_STRING([--enable-otbr-client], [Enable OpenThread Linux client])],
+NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
+    [ot_br_posix],
+    [OT_BR_POSIX],
+    [ot_br_posix],
+    [-lot_br_client],
     [
-        case "${enableval}" in
-
-        no|yes)
-            enable_otbr_client=${enableval}
-            ;;
-
-        *)
-            AC_MSG_ERROR([Invalid value ${enableval} for --enable-java])
-            ;;
-
-        esac
+        OT_BR_POSIX_CPPFLAGS="-I\${abs_top_srcdir}/third_party/ot-br-posix/repo/include/ -I\${abs_top_srcdir}/third_party/ot-br-posix/repo/src/"
+        OT_BR_POSIX_LDFLAGS="-L${ac_pwd}/third_party/ot-br-posix/"
+        OT_BR_POSIX_LIBS="-lot_br_client"
     ],
-    [ enable_otbr_client="no" ]
+    [
+        # Check for required nlfaultinjection headers.
+        AC_LANG_PUSH([C++])
+        AC_CHECK_HEADERS([dbus/client/thread_api_dbus.hpp],
+        [],
+        [
+            AC_MSG_ERROR(The OpenThread border router header "$ac_header" is required but cannot be found.)
+        ])
+        AC_LANG_POP([C++])
+    ]
 )
 
-AC_MSG_NOTICE("enable_otbr_client=${enable_otbr_client}")
+AC_MSG_NOTICE("nl_with_ot_br_posix=${nl_with_ot_br_posix}")
 
-if test "${enable_otbr_client}" = "yes"; then
-    maybe_otbr_client_dirstem="ot-br-posix"
-    otbr_client_dirstem="third_party/${maybe_otbr_client_dirstem}/repo"
+if test "${nl_with_ot_br_posix}" = "internal" && test "${with_device_layer}" = "linux"; then
+    maybe_ot_br_posix_dirstem="ot-br-posix"
+    ot_br_posix_dirstem="third_party/${maybe_ot_br_posix_dirstem}/repo"
 
-    AC_MSG_NOTICE([attempting to create internal ${otbrclient_dirstem}])
+    AC_MSG_NOTICE([attempting to create internal ${ot_br_posix_dirstem}])
 
-    ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${otbr_client_dirstem}
+    ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${ot_br_posix_dirstem}
 
     if test $? -ne 0; then
-        AC_MSG_ERROR([failed to create ${otbr_client_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
+        AC_MSG_ERROR([failed to create ${ot_br_posix_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
     fi
 
-    # otbrclient requires dbus
     PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.4)
     AC_SUBST([DBUS_CFLAGS])
     AC_SUBST([DBUS_LIBS])
 else
-    maybe_otbr_client_dirstem=
+    maybe_ot_br_posix_dirstem=
 fi
 
-AC_SUBST(OTBR_CLIENT_SUBDIRS, [${maybe_otbr_client_dirstem}])
-AM_CONDITIONAL([CHIP_WITH_OTBR_CLIENT], [test "${enable_otbr_client}" != "no"])
+AC_SUBST(OT_BR_POSIX_SUBDIRS, [${maybe_ot_br_posix_dirstem}])
+AM_CONDITIONAL([CHIP_WITH_OT_BR_POSIX], [test "${nl_with_ot_br_posix}" != "no"])
 
 #
 # Nlunit-test

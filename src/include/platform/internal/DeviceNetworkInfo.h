@@ -20,6 +20,7 @@
 #ifndef DEVICE_NETWORK_INFO_H
 #define DEVICE_NETWORK_INFO_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 namespace chip {
@@ -29,18 +30,13 @@ namespace Internal {
 /**
  * Ids for well-known network provision types.
  */
-enum
-{
-    kThreadNetworkId            = 1,
-    kWiFiStationNetworkId       = 2,
-    kMaxThreadNetworkNameLength = 16,
-    kThreadExtendedPANIdLength  = 8,
-    kThreadMeshPrefixLength     = 8,
-    kThreadNetworkKeyLength     = 16,
-    kThreadPSKcLength           = 16,
-    kThreadChannel_NotSpecified = UINT8_MAX,
-    kThreadPANId_NotSpecified   = UINT16_MAX,
-};
+constexpr size_t kMaxThreadNetworkNameLength = 16;
+constexpr size_t kThreadExtendedPANIdLength  = 8;
+constexpr size_t kThreadMeshPrefixLength     = 8;
+constexpr size_t kThreadNetworkKeyLength     = 16;
+constexpr size_t kThreadPSKcLength           = 16;
+constexpr size_t kThreadChannel_NotSpecified = UINT8_MAX;
+constexpr size_t kThreadPANId_NotSpecified   = UINT16_MAX;
 
 class DeviceNetworkInfo
 {

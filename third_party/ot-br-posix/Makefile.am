@@ -24,11 +24,11 @@
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
-if CHIP_WITH_OTBR_CLIENT
+if CHIP_WITH_OT_BR_POSIX
 
-lib_LIBRARIES = libotbrclient.a
+lib_LIBRARIES = libot_br_client.a
 
-nodist_libotbrclient_a_SOURCES                            = \
+nodist_libot_br_client_a_SOURCES                          = \
     repo/src/dbus/client/client_error.cpp                   \
     repo/src/dbus/client/thread_api_dbus.cpp                \
     repo/src/dbus/common/error.cpp                          \
@@ -36,13 +36,12 @@ nodist_libotbrclient_a_SOURCES                            = \
     repo/src/dbus/common/dbus_message_helper_openthread.cpp \
     $(NULL)
 
-libotbrclient_a_CPPFLAGS                                  = \
-    -I$(top_srcdir)/third_party/ot-br-posix/repo/include    \
-    -I$(top_srcdir)/third_party/ot-br-posix/repo/src        \
+libot_br_client_a_CPPFLAGS                                = \
+    $(OT_BR_POSIX_CPPFLAGS)                                 \
     $(DBUS_CFLAGS)                                          \
     $(NULL)
 
-endif # CHIP_WITH_OTBR_CLIENT
+endif # CHIP_WITH_OT_BR_POSIX
 endif # CHIP_DEVICE_LAYER_TARGET_LINUX
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
