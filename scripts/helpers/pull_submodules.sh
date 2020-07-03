@@ -20,9 +20,9 @@ set -e
 
 CHIP_ROOT="$(dirname "$0")/../.."
 
-if ! git -C "$CHIP_ROOT"  diff-index --cached HEAD; then
-  echo >&2 "Staged changes, please reset or commit first."
-  exit 1
+if ! git -C "$CHIP_ROOT" diff-index --cached HEAD; then
+    echo >&2 "Staged changes, please reset or commit first."
+    exit 1
 fi
 
 UPDATES=$(git -C "$CHIP_ROOT" submodule --quiet foreach "bash \$toplevel/scripts/helpers/pull_submodule.sh")
