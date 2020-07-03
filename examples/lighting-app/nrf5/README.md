@@ -25,16 +25,15 @@ An example application showing the use
 
 The nRF52840 lighting example application provides a working demonstration of a
 connected lighting device, built using CHIP, and the Nordic nRF5 SDK. The
-example supports remote access and control of a lighting over a
-low-power, 802.15.4 Thread network. It is capable of being paired into an
-existing CHIP network along with other CHIP-enabled devices. The example targets
-the
+example supports remote access and control of a lighting over a low-power,
+802.15.4 Thread network. It is capable of being paired into an existing CHIP
+network along with other CHIP-enabled devices. The example targets the
 [Nordic nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)
 development kit, but is readily adaptable to other nRF52840-based hardware.
 
-The lighting example is intended to serve both as a means to explore the workings of
-CHIP, as well as a template for creating real products based on the Nordic
-platform.
+The lighting example is intended to serve both as a means to explore the
+workings of CHIP, as well as a template for creating real products based on the
+Nordic platform.
 
 The example application builds upon the CHIP. A top-level Makefile orchestrates
 the entire build process, including building CHIP, and select files from the
