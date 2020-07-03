@@ -119,12 +119,11 @@
 
 // ---- Lock Example App Config ----
 
-#define LOCK_BUTTON BUTTON_2
+#define LIGHTING_BUTTON BUTTON_2
 #define FUNCTION_BUTTON BUTTON_1
 #define FUNCTION_BUTTON_DEBOUNCE_PERIOD_MS 50
 
 #define SYSTEM_STATE_LED BSP_LED_0
-#define LOCK_STATE_LED BSP_LED_1
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.

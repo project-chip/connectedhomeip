@@ -22,8 +22,8 @@
 
 #include <system/SystemPacketBuffer.h>
 
-#include "BoltLockManager.h"
 #include "DataModelHandler.h"
+#include "LightingManager.h"
 #include "nrf_log.h"
 
 #include "chip-zcl/chip-zcl.h"
@@ -53,10 +53,10 @@ extern "C" void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClus
 
     if (*value)
     {
-        BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
+        LightingMgr().InitiateAction(LightingManager::ON_ACTION);
     }
     else
     {
-        BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
+        LightingMgr().InitiateAction(LightingManager::OFF_ACTION);
     }
 }

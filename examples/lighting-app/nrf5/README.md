@@ -5,7 +5,7 @@ An example application showing the use
 
 <hr>
 
--   [CHIP nRF52840 Lock Example Application](#chip-nrf52840-lock-example-application)
+-   [CHIP nRF52840 Lighting Example Application](#chip-nrf52840-lock-example-application)
     -   [Introduction](#introduction)
     -   [Device UI](#device-ui)
     -   [Building](#building)
@@ -23,16 +23,16 @@ An example application showing the use
 
 ![nrf52840 DK](doc/images/nrf52840-dk.jpg)
 
-The nRF52840 lock example application provides a working demonstration of a
-connected door lock device, built using CHIP, and the Nordic nRF5 SDK. The
-example supports remote access and control of a simulated door lock over a
+The nRF52840 lighting example application provides a working demonstration of a
+connected lighting device, built using CHIP, and the Nordic nRF5 SDK. The
+example supports remote access and control of a lighting over a
 low-power, 802.15.4 Thread network. It is capable of being paired into an
 existing CHIP network along with other CHIP-enabled devices. The example targets
 the
 [Nordic nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)
 development kit, but is readily adaptable to other nRF52840-based hardware.
 
-The lock example is intended to serve both as a means to explore the workings of
+The lighting example is intended to serve both as a means to explore the workings of
 CHIP, as well as a template for creating real products based on the Nordic
 platform.
 

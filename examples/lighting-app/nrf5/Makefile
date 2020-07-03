@@ -17,7 +17,7 @@
 #   limitations under the License.
 #
 
-#
+# 
 #   @file
 #         Makefile for building the CHIP nRF52840 Lock Example Application.
 #
@@ -31,12 +31,12 @@ NRF5_PLATFORM_DIR = $(CHIP_ROOT)/examples/platform/nrf528xx
 include $(BUILD_SUPPORT_DIR)/nrf5-app.mk
 include $(BUILD_SUPPORT_DIR)/nrf5-chip.mk
 
-APP = chip-nrf52840-lock-example
+APP = chip-nrf52840-lighting-example
 
 SRCS = \
     $(PROJECT_ROOT)/main/main.cpp \
     $(PROJECT_ROOT)/main/AppTask.cpp \
-    $(PROJECT_ROOT)/main/BoltLockManager.cpp \
+    $(PROJECT_ROOT)/main/LightingManager.cpp \
     $(PROJECT_ROOT)/main/DataModelHandler.cpp \
     $(NRF5_PLATFORM_DIR)/app/support/CXXExceptionStubs.cpp \
     $(NRF5_PLATFORM_DIR)/app/support/nRF5Sbrk.c \
