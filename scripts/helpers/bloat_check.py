@@ -230,9 +230,12 @@ def main():
       format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
   coloredlogs.install()
 
-  if not args.token or not args.job:
-    logging.error(
-        'Required arguments missing. Please specify at least job and token.')
+  if not args.token:
+    logging.error('Required arguments missing: token is required.')
+    return
+
+  if not args.job:
+    logging.error('Required arguments missing: job is required.')
     return
 
   comment_pr_number = extractPrNumberFromRef(args.github_ref)
