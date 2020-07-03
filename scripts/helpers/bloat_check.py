@@ -17,13 +17,13 @@
 #
 
 import argparse
-import attr
 import coloredlogs
 import csv
 import github
 import io
 import logging
 import os
+import re
 import stat
 import subprocess
 
@@ -45,7 +45,8 @@ class ComparisonResult:
     self.sectionChanges = []
 
 
-SECTIONS_TO_WATCH = set(['.rodata', '.text', '.flash.rodata', '.flash.text', '.bss', '.data'])
+SECTIONS_TO_WATCH = set(
+    ['.rodata', '.text', '.flash.rodata', '.flash.text', '.bss', '.data'])
 
 
 def filesInDirectory(dirName):
@@ -151,8 +152,10 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
   compareTable = 'File | Section | File | VM\n---- | ---- | ----- | ---- \n'
   for file in compare_results:
     for change in file.sectionChanges:
-      compareTable += '{0} | {1} | {2} | {3}\n'.format(
-          file.fileName, change.section, change.fileChange, change.vmChange)
+      compareTable += '{0} | {1} | {2} | {3}\n'.format(file.fileName,
+                                                       change.section,
+                                                       change.fileChange,
+                                                       change.vmChange)
 
   # NOTE: PRs are issues with attached patches, hence the API naming
   pull.create_issue_comment("""{title}
@@ -167,10 +170,19 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
 ```
 
 </details>
-""".format(
-    title=titleHeading,
-    table=compareTable,
-    rawReportText=rawText))
+""".format(title=titleHeading, table=compareTable, rawReportText=rawText))
+
+
+def extractPrNumberFromRef(refStr):
+  logging.info('EXTRACTING REF FROM "%s"', refStr)
+  match = re.compile('^refs/pull/(\\d*)/merge').match(refStr)
+
+  if pattern:
+    return int(pattern.groups(1))
+
+  logging.warning('Cannot extract PR number from ref: "%s"', refStr)
+
+  return None
 
 
 def main():
@@ -201,7 +213,7 @@ def main():
   parser.add_argument(
       '--github-repository', type=str, help='Repository to use for PR comments')
   parser.add_argument(
-      '--github_ref', 
+      '--github_ref',
       type=str,
       default=None,
       help='Github action ref, of format refs/pull/:prNumber/merge')
@@ -244,6 +256,7 @@ def main():
   #                       int(args.github_comment_pr_number), compareResults)
 
   logging.warning('NOT YET PORTED OVER/IMPLEMENTED')
+
 
 if __name__ == '__main__':
   # execute only if run as a script
