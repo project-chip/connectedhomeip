@@ -29,18 +29,40 @@
 namespace chip {
 namespace DataModel {
 
-template <typename ValueType, typename BaseValueType>
+
 class CHIPAttribute
 {
 public:
-    ValueType mValue;
-    CHIPAttribute() {}
-    CHIPAttribute(BaseValueType value) : mValue(value) {}
-    CHIPAttribute(BaseValueType value, BaseValueType min, BaseValueType max) : mValue(value, min, max) {}
+    CHIPAttribute(uint16_t attrId, CHIPValueTypes type) : mAttrId(attrId), mValue(type), mMin(type), mMax(type) {}
+    CHIPAttribute(uint16_t attrId, CHIPValue min, CHIPValue max) : mAttrId(attrId), mValue(min.mType), mMin(min), mMax(max) {}
+
+    int Set(CHIPValue newValue)
+    {
+        if (mValue.mType != newValue.mType)
+        {
+            return FAIL;
+        }
+        if (newValue < mMin ||
+            newValue > mMax)
+        {
+            return FAIL;
+        }
+        mValue = newValue;
+        return SUCCESS;
+    }
+
+    CHIPValue Get()
+    {
+        return mValue;
+    }
+
+private:
+    uint16_t         mAttrId;
+    CHIPValue        mValue;
+    CHIPValue        mMin;
+    CHIPValue        mMax;
 };
 
-typedef class CHIPAttribute<CHIPValue_UInt32_t, uint32_t> CHIPAttribute_UInt32_t;
-typedef class CHIPAttribute<CHIPValue_Bool_t, bool> CHIPAttribute_Bool_t;
 
 } // namespace DataModel
 } // namespace chip
