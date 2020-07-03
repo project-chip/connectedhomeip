@@ -40,9 +40,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
-
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_Init()
 {
@@ -1049,6 +1046,9 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
 }
 
 #endif // CHIP_PROGRESS_LOGGING
+
+// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
+template class GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer

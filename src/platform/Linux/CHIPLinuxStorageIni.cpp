@@ -74,7 +74,7 @@ CHIP_ERROR ChipLinuxStorageIni::AddConfig(const std::string & configFile)
     }
     else
     {
-        ChipLogError(DeviceLayer, "Failed to open config file: %s", configFile);
+        ChipLogError(DeviceLayer, "Failed to open config file: %s", configFile.c_str());
         retval = CHIP_ERROR_PERSISTED_STORAGE_FAIL;
     }
 
