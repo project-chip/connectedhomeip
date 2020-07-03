@@ -69,11 +69,10 @@ AM_CPPFLAGS                                    = \
     $(NULL)
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
-if CHIP_WITH_OTBR_CLIENT
+if CHIP_WITH_OT_BR_POSIX
 AM_CPPFLAGS                                   += \
     $(DBUS_CFLAGS)                               \
-    -I$(top_srcdir)/third_party/ot-br-posix/repo/include    \
-    -I$(top_srcdir)/third_party/ot-br-posix/repo/src        \
+    $(OT_BR_POSIX_CPPFLAGS)                     \
     $(NULL)
 libPlatformTests_a_SOURCES += TestThreadStackMgr.cpp
 endif
@@ -87,10 +86,12 @@ CHIP_LDADD                                      = \
     $(NULL)
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
+if CHIP_WITH_OT_BR_POSIX
 CHIP_LDADD                                    += \
     $(DBUS_LIBS)                                 \
-    $(top_builddir)/third_party/ot-br-posix/libotbrclient.a \
+    $(OT_BR_POSIX_LDFLAGS) $(OT_BR_POSIX_LIBS) \
     $(NULL)
+endif
 endif
 
 COMMON_LDADD                                          = \
@@ -112,7 +113,7 @@ check_PROGRAMS                                 = \
     $(NULL)
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
-if CHIP_WITH_OTBR_CLIENT
+if CHIP_WITH_OT_BR_POSIX
 check_PROGRAMS += TestThreadStackMgr
 
 TestThreadStackMgr_LDADD                       = $(COMMON_LDADD)
@@ -125,8 +126,11 @@ endif
 # Test applications and scripts that should be built and run when the
 # 'check' target is run.
 
+# TestThreadStackMgr requires additional daemon to be launched
 TESTS                                          = \
-    $(check_PROGRAMS)                            \
+    TestPlatformTime                             \
+    TestPlatformMgr                              \
+    TestConfigurationMgr                         \
     $(NULL)
 
 # The additional environment variables and their values that will be

@@ -57,7 +57,7 @@ SUBDIRS                                      = \
     $(NLIO_SUBDIRS)                            \
     $(NLUNIT_TEST_SUBDIRS)                     \
     $(MBEDTLS_SUBDIRS)                         \
-    $(OTBR_CLIENT_SUBDIRS)                      \
+    $(OT_BR_POSIX_SUBDIRS)                     \
     $(NULL)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

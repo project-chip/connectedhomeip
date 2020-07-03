@@ -51,21 +51,7 @@ extern "C" {
 
 #include "chipinit.h"
 #include <AppTask.h>
-#if CHIP_ENABLE_OPENTHREAD
-#include <mbedtls/platform.h>
-#include <openthread/cli.h>
-#include <openthread/dataset.h>
-#include <openthread/error.h>
-#include <openthread/heap.h>
-#include <openthread/icmp6.h>
-#include <openthread/instance.h>
-#include <openthread/link.h>
-#include <openthread/platform/openthread-system.h>
-#include <openthread/tasklet.h>
-#include <openthread/thread.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/logging/CHIPLogging.h>
-#endif // CHIP_ENABLE_OPENTHREAD
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -214,148 +200,12 @@ int main(void)
 
 #endif // defined(SOFTDEVICE_PRESENT) && SOFTDEVICE_PRESENT
 
-<<<<<<< HEAD
     ret = ChipInit();
     if (ret != NRF_SUCCESS)
-||||||| parent of d9660a4... new configure logic
-    NRF_LOG_INFO("Init CHIP stack");
-    ret = PlatformMgr().InitChipStack();
-    if (ret != CHIP_NO_ERROR)
-    {
-        NRF_LOG_INFO("PlatformMgr().InitChipStack() failed");
-        APP_ERROR_HANDLER(ret);
-    }
-
-#if CHIP_ENABLE_OPENTHREAD
-    NRF_LOG_INFO("Initializing OpenThread stack");
-
-    mbedtls_platform_set_calloc_free(calloc, free);
-    nrf_cc310_platform_abort_init();
-    nrf_cc310_platform_mutex_init();
-    mbedtls_platform_setup(NULL);
-    otHeapSetCAllocFree(calloc, free);
-
-    otSysInit(0, NULL);
-
-    // Configure multiprotocol to work with BLE.
-    {
-        uint32_t retval = multiprotocol_802154_mode_set(MULTIPROTOCOL_802154_MODE_FAST_SWITCHING_TIMES);
-
-        if (retval != NRF_SUCCESS)
-        {
-            NRF_LOG_INFO("multiprotocol 15.4 failed");
-            APP_ERROR_HANDLER(CHIP_ERROR_INTERNAL);
-        }
-    }
-
-    ret = ThreadStackMgr().InitThreadStack();
-    if (ret != CHIP_NO_ERROR)
-    {
-        NRF_LOG_INFO("ThreadStackMgr().InitThreadStack() failed");
-        APP_ERROR_HANDLER(ret);
-    }
-
-    // Configure device to operate as a Thread sleepy end-device.
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
-    if (ret != CHIP_NO_ERROR)
-    {
-        NRF_LOG_INFO("ConnectivityMgr().SetThreadDeviceType() failed");
-        APP_ERROR_HANDLER(ret);
-    }
-#endif // CHIP_ENABLE_OPENTHREAD
-
-    NRF_LOG_INFO("Starting CHIP task");
-    ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        NRF_LOG_INFO("PlatformMgr().StartEventLoopTask() failed");
-        APP_ERROR_HANDLER(ret);
-    }
-
-#if CHIP_ENABLE_OPENTHREAD
-    NRF_LOG_INFO("Starting OpenThread task");
-
-    // Start OpenThread task
-    ret = ThreadStackMgrImpl().StartThreadTask();
-    if (ret != CHIP_NO_ERROR)
-=======
-    NRF_LOG_INFO("Init CHIP stack");
-    ret = PlatformMgr().InitChipStack();
-    if (ret != CHIP_NO_ERROR)
-    {
-        NRF_LOG_INFO("PlatformMgr().InitChipStack() failed");
-        APP_ERROR_HANDLER(ret);
-    }
-
-#if CHIP_ENABLE_OPENTHREAD
-    NRF_LOG_INFO("Initializing OpenThread stack");
-
-    mbedtls_platform_set_calloc_free(calloc, free);
-    nrf_cc310_platform_abort_init();
-    nrf_cc310_platform_mutex_init();
-    mbedtls_platform_setup(NULL);
-    otHeapSetCAllocFree(calloc, free);
-
-    otSysInit(0, NULL);
-
-    // Configure multiprotocol to work with BLE.
-    {
-        uint32_t retval = multiprotocol_802154_mode_set(MULTIPROTOCOL_802154_MODE_FAST_SWITCHING_TIMES);
-
-        if (retval != NRF_SUCCESS)
-        {
-            NRF_LOG_INFO("multiprotocol 15.4 failed");
-            APP_ERROR_HANDLER(CHIP_ERROR_INTERNAL);
-        }
-    }
-
-    ret = ThreadStackMgr().InitThreadStack();
-    if (ret != CHIP_NO_ERROR)
-    {
-        NRF_LOG_INFO("ThreadStackMgr().InitThreadStack() failed");
-        APP_ERROR_HANDLER(ret);
-    }
-
-    // Configure device to operate as a Thread sleepy end-device.
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
-    if (ret != CHIP_NO_ERROR)
-    {
-        NRF_LOG_INFO("ConnectivityMgr().SetThreadDeviceType() failed");
-        APP_ERROR_HANDLER(ret);
-    }
-#endif // CHIP_ENABLE_OPENTHREAD
-
-    NRF_LOG_INFO("Starting CHIP task");
-    ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        NRF_LOG_INFO("PlatformMgr().StartEventLoopTask() failed");
-        APP_ERROR_HANDLER(ret);
-    }
-
-#if CHIP_ENABLE_OPENTHREAD
-    NRF_LOG_INFO("Starting OpenThread task");
-
-    // Start OpenThread task
-    ret = ThreadStackMgrImpl().StartThreadTask();
-    if (ret != CHIP_NO_ERROR)
->>>>>>> d9660a4... new configure logic
     {
         NRF_LOG_INFO("ChipInit() failed");
         APP_ERROR_HANDLER(ret);
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-||||||| parent of d9660a4... new configure logic
-#endif // CHIP_ENABLE_OPENTHREAD
-=======
-#endif // CHIP_WITH_OPENTHREAD
->>>>>>> d9660a4... new configure logic
-||||||| parent of 062c503... Revert "new configure logic"
-#endif // CHIP_WITH_OPENTHREAD
-=======
-#endif // CHIP_ENABLE_OPENTHREAD
->>>>>>> 062c503... Revert "new configure logic"
 
     ret = GetAppTask().StartAppTask();
     if (ret != NRF_SUCCESS)
