@@ -35,7 +35,7 @@ jobs:
               run: |
                   mkdir -p "master_binaries/esp32-build"
                   scripts/helpers/bloat_check.py                                                   \
-                     --job "ESP32 Examples"                                                        \
+                     --job "${{ env.BUILD_TYPE }} Examples"                                        \
                      --artifact-download-dir "master_binaries/$BUILD_TYPE-build"                   \
                      --build-output-dir "example_binaries/$BUILD_TYPE-build"                       \
                      --report-file bloat_report.txt                                                \
@@ -54,7 +54,7 @@ jobs:
             - name: Uploading Binaries
               uses: actions/upload-artifact@v1
               with:
-                  name: ${{ env.BUILD_TYPE }}-example-build
+                  name: ${{ env.BUILD_TYPE }}-example-build-${{ github.sha }}
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
 
     nrf:
