@@ -69,28 +69,36 @@ class ArtifactFetcher(github.GithubObject.NonCompletableGithubObject):
     )
 
 
-def fetchMasterMergeCommitSHA():
-  result = subprocess.run(
-      'git merge-base --fork-point master'.split(),
-      stdout=subprocess.PIPE,
-      stderr=subprocess.STDOUT,
-  ).stdout.decode('utf8')
+def fetchMasterMergeCommitSHA(revStr):
+  if revStr:
+    result = subprocess.run(
+        ['git', 'rev-parse', revStr],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    ).stdout.decode('utf8')
 
-  logging.info('Merge base result: "%r"' % result)
+    logging.info('Parsed revision %r base result: %r' % (revStr, result))
+  else:
+    result = subprocess.run(
+        'git merge-base --fork-point master'.split(),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    ).stdout.decode('utf8')
+
+    logging.info('Merge base result: %r' % result)
 
   return result.split()[0]
 
 
-def fetchArtifactsForJob(jobName, githubToken, githubRepo, downloadDir, compareRefSHA):
-  if not compareRefSHA:
-    compareRefSHA = fetchMasterMergeCommitSHA()
+def fetchArtifactsForJob(jobName, githubToken, githubRepo, downloadDir, compareRev):
+  masterMergeSha = fetchMasterMergeCommitSHA(compareRev)
 
-  logging.info('Master merge commit: "%s"', compareRefSHA)
+  logging.info('Master merge commit: "%s"', masterMergeSha)
 
   api = github.Github(githubToken)
   repo = api.get_repo(githubRepo)
 
-  commit = repo.get_commit(compareRefSHA)
+  commit = repo.get_commit(masterMergeSha)
 
   # We generally expect a single pull request in master for every such commit
   for p in commit.get_pulls():
