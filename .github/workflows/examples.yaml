@@ -40,8 +40,8 @@ jobs:
                      --build-output-dir "example_binaries/$BUILD_TYPE-build"                       \
                      --report-file bloat_report.txt                                                \
                      --github-api-token "${{ secrets.GITHUB_TOKEN }}"                              \
-                     --github-repository "$GITHUB_REPOSITORY"                                      \
-                     --github-ref "$GITHUB_REF"
+                     --github-repository "${{ github.repository }}"                                \
+                     --github-ref "${{ github.ref }}"
             - name: Copy aside bloat report & binaries
               run: |
                   cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
