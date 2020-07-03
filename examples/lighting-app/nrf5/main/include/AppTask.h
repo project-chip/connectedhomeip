@@ -27,7 +27,7 @@
 #include "task.h"
 
 #include "AppEvent.h"
-#include "BoltLockManager.h"
+#include "LightingManager.h"
 
 class AppTask
 {
@@ -35,7 +35,7 @@ public:
     int StartAppTask();
     static void AppTaskMain(void * pvParameter);
 
-    void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);
+    void PostLightingActionRequest(LightingManager::Action_t aAction);
     void PostEvent(const AppEvent * event);
 
 private:
@@ -43,8 +43,8 @@ private:
 
     int Init();
 
-    static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(BoltLockManager::Action_t aAction);
+    static void ActionInitiated(LightingManager::Action_t aAction);
+    static void ActionCompleted(LightingManager::Action_t aAction);
 
     void CancelTimer(void);
 
@@ -52,7 +52,7 @@ private:
 
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
-    static void LockActionEventHandler(AppEvent * aEvent);
+    static void LightingActionEventHandler(AppEvent * aEvent);
 
     static void ButtonEventHandler(uint8_t pin_no, uint8_t button_action);
     static void TimerEventHandler(void * p_context);
