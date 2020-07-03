@@ -31,18 +31,17 @@ jobs:
               run:
                   mkdir -p example_binaries/$BUILD_TYPE-build; cp
                   examples/wifi-echo/server/esp32/build/chip-wifi-echo.elf  example_binaries/$BUILD_TYPE-build/chip-wifi-echo.elf
-
-            # - name: Generate bloat report
-            #   run: |
-            #       mkdir -p "master_binaries/esp32-build"
-            #       scripts/helpers/bloat_check.py                                                   \
-            #          --token "$GITHUB_TOKEN"                                                       \
-            #          --job "$GITHUB_WORKFLOW"                                                      \
-            #          --artifact-download-dir "master_binaries/$BUILD_TYPE-build"                   \
-            #          --build-output-dir "example_binaries/$BUILD_TYPE-build"                       \
-            #          --report-file bloat_report.txt                                                \
-            #          --github-repository "$GITHUB_REPOSITORY"                                      \
-            #          --github-comment-pr-number "$CIRCLE_PR_NUMBER"
+            - name: Generate bloat report
+              run: |
+                  mkdir -p "master_binaries/esp32-build"
+                  scripts/helpers/bloat_check.py                                                   \
+                     --token "$GITHUB_TOKEN"                                                       \
+                     --job "$GITHUB_WORKFLOW"                                                      \
+                     --artifact-download-dir "master_binaries/$BUILD_TYPE-build"                   \
+                     --build-output-dir "example_binaries/$BUILD_TYPE-build"                       \
+                     --report-file bloat_report.txt                                                \
+                     --github-repository "$GITHUB_REPOSITORY"                                      \
+                     --github-ref "$GITHUB_REF"
             - name: Copy aside bloat report & binaries
               run: |
                   cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/

@@ -27,8 +27,6 @@ import os
 import stat
 import subprocess
 
-import ci_fetch_artifacts
-
 
 class SectionChange:
   """Describes delta changes to a specific section"""
@@ -203,10 +201,10 @@ def main():
   parser.add_argument(
       '--github-repository', type=str, help='Repository to use for PR comments')
   parser.add_argument(
-      '--github-comment-pr-number',
+      '--github_ref', 
       type=str,
       default=None,
-      help='To what PR to comment in github')
+      help='Github action ref, of format refs/pull/:prNumber/merge')
   parser.add_argument(
       '--log-level',
       default=logging.INFO,
@@ -225,23 +223,27 @@ def main():
         'Required arguments missing. Please specify at least job and token.')
     return
 
-  try:
-    ci_fetch_artifacts.fetchArtifactsForJob(args.token, args.job,
-                                            args.artifact_download_dir)
-  except Exception as e:
-    logging.warning('Failed to fetch artifacts: %r', e)
+  # TODO(andreilitvin): this needs refactoring and cleanup to fetch artifacts
+  # and process as needed
+  #
+  # try:
+  #   ci_fetch_artifacts.fetchArtifactsForJob(args.token, args.job,
+  #                                           args.artifact_download_dir)
+  # except Exception as e:
+  #   logging.warning('Failed to fetch artifacts: %r', e)
+  #
+  # compareResults = generateBloatReport(
+  #     args.report_file,
+  #     args.artifact_download_dir,
+  #     args.build_output_dir,
+  #     title="Bloat report for job '%s'" % args.job)
+  #
+  # if args.github_api_token and args.github_repository and args.github_comment_pr_number:
+  #   sendFileAsPrComment(args.job, args.report_file, args.github_api_token,
+  #                       args.github_repository,
+  #                       int(args.github_comment_pr_number), compareResults)
 
-  compareResults = generateBloatReport(
-      args.report_file,
-      args.artifact_download_dir,
-      args.build_output_dir,
-      title="Bloat report for job '%s'" % args.job)
-
-  if args.github_api_token and args.github_repository and args.github_comment_pr_number:
-    sendFileAsPrComment(args.job, args.report_file, args.github_api_token,
-                        args.github_repository,
-                        int(args.github_comment_pr_number), compareResults)
-
+  logging.warning('NOT YET PORTED OVER/IMPLEMENTED')
 
 if __name__ == '__main__':
   # execute only if run as a script
