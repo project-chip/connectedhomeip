@@ -7,7 +7,6 @@ VOLUME "/var/source"
 RUN set -x \
     && apt-get update \
     && apt-get install -fy \
-    git \
     curl \
     jq \
     make \
@@ -24,6 +23,7 @@ RUN set -x \
     libssl-dev \
     unzip \
     wget \
+    libcurl4-openssl-dev \
     libmbedtls-dev \
     python-pip \
     python3 \
@@ -33,6 +33,7 @@ RUN set -x \
     libncursesw5-dev \
     libnspr4-dev \
     libxml2-dev \
+    gettext \
     flex \
     bison \
     gperf \
@@ -44,7 +45,7 @@ RUN set -x \
     && : # last line
 
 RUN set -x \
-    && pip3 install circleci attrs coloredlogs PyGithub \
+    && pip3 install circleci attrs coloredlogs PyGithub pygit \
     && : # last line
 
 # Install newer cmake toolchain
@@ -60,6 +61,19 @@ RUN set -x \
     && rm cmake-3.17.2.tar.gz \
     && : # last line
 
+# Install newer git version, to allow for github workflow checkout
+RUN set -x \
+    && wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.27.0.tar.gz \
+    && tar xzf git-2.27.0.tar.gz \
+    && cd git-2.27.0 \
+    && ./configure --prefix=/usr \
+    && make -j \
+    && make install \
+    && cd .. \
+    && rm -rf git-2.27.0 \
+    && rm git-2.27.0.tar.gz \
+    && : # last line
+
 # Install bloat comparison tools
 RUN set -x \
     && git clone https://github.com/google/bloaty.git \
@@ -71,3 +85,4 @@ RUN set -x \
     && cd ../.. \
     && rm -rf bloaty \
     && : # last line
+
