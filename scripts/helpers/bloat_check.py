@@ -188,7 +188,6 @@ def extractPrNumberFromRef(refStr):
 def main():
   """Main task if executed standalone."""
   parser = argparse.ArgumentParser(description='Fetch master build artifacts.')
-  parser.add_argument('--token', type=str, help='API token to use')
   parser.add_argument(
       '--job', type=str, help='Name of the job generating the report')
   parser.add_argument(
@@ -230,18 +229,28 @@ def main():
       format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
   coloredlogs.install()
 
-  if not args.token:
-    logging.error('Required arguments missing: token is required.')
+  if not args.github_api_token:
+    logging.error('Required arguments missing: github api token is required.')
     return
 
   if not args.job:
     logging.error('Required arguments missing: job is required.')
     return
 
+  if not args.github_ref:
+    logging.error('Required arguments missing: github_ref is required.')
+    return
+
   comment_pr_number = extractPrNumberFromRef(args.github_ref)
 
   # TODO(andreilitvin): this needs refactoring and cleanup to fetch artifacts
   # and process as needed
+  ############################# DEBUG ###############################
+  for n in filter(lambda s: not s.startswith('_'), dir(args)):
+    if 'token' in n:
+      print("Keeping argument '%s' secret..." % (n, ))
+    else:
+      print("Received arg '%s': %r" % (n, getattr(args, n))) 
 
   #
   # try:
