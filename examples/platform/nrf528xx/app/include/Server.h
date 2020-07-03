@@ -15,17 +15,17 @@
  *    limitations under the License.
  */
 
-#ifndef SERVER_H
-#define SERVER_H
+#ifndef NRF5_COMMON_SERVER_H
+#define NRF5_COMMON_SERVER_H
 
 #include <inet/IPAddress.h>
 #include <inet/InetLayer.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
 
-#include "DataModelHandler.h"
-
 void SetupTransport(chip::Inet::IPAddressType type, chip::SecureSessionMgr * transport);
 void StartServer(chip::SecureSessionMgr * transport_ipv6);
 
-#endif // SERVER_H
+void InitDataModelHandler();
+
+#endif // NRF5_COMMON_SERVER_H

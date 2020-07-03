@@ -35,7 +35,12 @@
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
 
-#include "DataModelHandler.h"
+#include "chip-zcl/chip-zcl.h"
+
+extern "C" {
+#include "gen/gen-cluster-id.h"
+#include "gen/gen-types.h"
+}
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -45,8 +50,8 @@ using namespace ::chip::Transport;
 namespace {
 
 #ifndef EXAMPLE_SERVER_NODEID
-// "lock"
-#define EXAMPLE_SERVER_NODEID 0x6c6f636b
+// "nRF5"
+#define EXAMPLE_SERVER_NODEID 0x3546526e
 #endif // EXAMPLE_SERVER_NODEID
 
 const uint8_t local_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f,
@@ -102,6 +107,28 @@ public:
     exit:
         return;
     }
+
+private:
+    /**
+     * Handle a message that should be processed via our data model processing
+     * codepath.
+     *
+     * @param [in] buffer The buffer holding the message.  This function guarantees
+     *                    that it will free the buffer before returning.
+     */
+    void HandleDataModelMessage(System::PacketBuffer * buffer)
+    {
+        ChipZclStatus_t zclStatus = chipZclProcessIncoming((ChipZclBuffer_t *) buffer);
+        if (zclStatus == CHIP_ZCL_STATUS_SUCCESS)
+        {
+            NRF_LOG_INFO("Data model processing success!");
+        }
+        else
+        {
+            NRF_LOG_INFO("Data model processing failure: %d", zclStatus);
+        }
+        System::PacketBuffer::Free(buffer);
+    }
 };
 
 static ServerCallback gCallbacks;
@@ -133,4 +160,9 @@ exit:
 void StartServer(SecureSessionMgr * transport_ipv6)
 {
     SetupTransport(kIPAddressType_IPv6, transport_ipv6);
+}
+
+void InitDataModelHandler()
+{
+    chipZclEndpointInit();
 }
