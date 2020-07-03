@@ -110,3 +110,4 @@ jobs:
                   mkdir -p example_binaries/$BUILD_TYPE
                   cp examples/chip-tool/build/chip-standalone-demo.out \
                      example_binaries/$BUILD_TYPE/chip-standalone-demo.out
+
