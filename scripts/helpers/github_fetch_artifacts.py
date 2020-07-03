@@ -16,17 +16,30 @@
 # limitations under the License.
 #
 
-import logging
 import github
+import logging
+import subprocess
+
+
+def fetchMasterMergeCommitSHA():
+  return subprocess.run(
+      'git merge-base --fork-point master'.split(),
+      stdout=subprocess.PIPE,
+      stderr=subprocess.STDOUT,
+  ).stdout.decode('utf8').split()[0]
+
 
 def fetchArtifactsForJob(jobName, githubToken, githubRepo, downloadDir):
+    masterCommitSHA = fetchMasterMergeCommitSHA()
+
+    logging.info('Master merge commit: "%s"' % masterCommitSHA)
 
     api = github.Github(githubToken)
     repo = api.get_repo(githubRepo)
 
-    logging.info('Fetching commits')
-    for c in repo.get_commits():
-      logging.info('COMMIT: %r' % c)
+    commit = repo.get_commit(masterCommitSHA)
+
+    logging.info('COMMIT: %r' % commit)
 
     logging.error('NOT YET IMPLEMENTED')
     pass
