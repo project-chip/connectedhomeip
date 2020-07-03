@@ -24,7 +24,7 @@
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
-if CHIP_WITH_OT_BR_CLIENT
+if CHIP_WITH_OTBR_CLIENT
 
 lib_LIBRARIES = libotbrclient.a
 
@@ -42,7 +42,7 @@ libotbrclient_a_CPPFLAGS                                  = \
     $(DBUS_CFLAGS)                                          \
     $(NULL)
 
-endif # CHIP_WITH_OT_BR_CLIENT
+endif # CHIP_WITH_OTBR_CLIENT
 endif # CHIP_DEVICE_LAYER_TARGET_LINUX
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

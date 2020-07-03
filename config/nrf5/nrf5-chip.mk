@@ -109,7 +109,7 @@ CHIP_CONFIGURE_OPTIONS = \
     --with-chip-ble-project-includes=$(CHIP_PROJECT_CONFIG) \
     --with-chip-warm-project-includes=$(CHIP_PROJECT_CONFIG) \
     --with-chip-device-project-includes=$(CHIP_PROJECT_CONFIG) \
-    --enable-openthread \
+    --with-openthread=$(NRF5_SDK_ROOT)/external/openthread \
     --disable-ipv4 \
     --disable-tests \
     --disable-tools \

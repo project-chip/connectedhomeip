@@ -31,7 +31,7 @@ namespace DeviceLayer {
 class ThreadStackManagerImpl : public ThreadStackManager
 {
 public:
-    ThreadStackManagerImpl(DBusConnection * aConnection);
+    ThreadStackManagerImpl(DBusConnection *aConnection);
 
     CHIP_ERROR _InitThreadStack();
     CHIP_ERROR _ProcessThreadActivity();
@@ -49,7 +49,7 @@ public:
 
     CHIP_ERROR _SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo);
 
-    void _ErasePersistentInfo();
+    void _ClearThreadProvision();
 
     bool _IsThreadProvisioned();
 
