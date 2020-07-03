@@ -60,14 +60,11 @@ jobs:
 
         env:
             BUILD_TYPE: nrf
-            BUILD_VERSION: 0.2.14
-            BUILD_IMAGE: chip-build-nrf-platform
-            BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.2.14 # $BUILD_IMAGE/$BUILD_ORG:$BUILD_VERSION
+            image: connectedhomeip/chip-build-nrf-platform:0.2.17
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -87,14 +84,11 @@ jobs:
 
         env:
             BUILD_TYPE: linux
-            BUILD_VERSION: 0.2.14
-            BUILD_IMAGE: chip-build
-            BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.2.14 # $BUILD_IMAGE/$BUILD_ORG:$BUILD_VERSION
+            image: connectedhomeip/chip-build:0.2.17
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
