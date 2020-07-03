@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#ifndef SERVER_H
-#define SERVER_H
+#ifndef NRF5_COMMON_SERVER_H
+#define NRF5_COMMON_SERVER_H
 
 #include <inet/IPAddress.h>
 #include <inet/InetLayer.h>
@@ -24,10 +24,9 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/UDP.h>
 
-#include "DataModelHandler.h"
-
 using DemoSessionManager = chip::SecureSessionMgr<chip::Transport::UDP>;
 
-void StartServer(DemoSessionManager * transport_ipv6);
+void StartServer(DemoSessionManager * sessions);
+void InitDataModelHandler();
 
-#endif // SERVER_H
+#endif // NRF5_COMMON_SERVER_H
