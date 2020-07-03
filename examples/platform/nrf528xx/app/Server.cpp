@@ -36,6 +36,7 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/UDP.h>
 
+#include "Server.h"
 #include "chip-zcl/chip-zcl.h"
 
 extern "C" {
