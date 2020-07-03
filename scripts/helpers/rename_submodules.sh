@@ -31,7 +31,7 @@ fi
 
 # Remove renamed submodules from config
 git -C "$CHIP_ROOT" config --get-regexp "$OLD_SUBMODULE_KEYS" | while read key value; do
-  git -C "$CHP_ROOT" config --unset $key
+  git -C "$CHP_ROOT" config --unset "$key"
 done
 
 # Re-init with new submodule names.
