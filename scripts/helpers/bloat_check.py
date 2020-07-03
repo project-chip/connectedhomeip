@@ -177,8 +177,8 @@ def extractPrNumberFromRef(refStr):
   logging.info('EXTRACTING REF FROM "%s"', refStr)
   match = re.compile('^refs/pull/(\\d*)/merge').match(refStr)
 
-  if pattern:
-    return int(pattern.groups(1))
+  if match:
+    return int(match.group(1))
 
   logging.warning('Cannot extract PR number from ref: "%s"', refStr)
 
@@ -235,8 +235,11 @@ def main():
         'Required arguments missing. Please specify at least job and token.')
     return
 
+  comment_pr_number = extractPrNumberFromRef(args.github_ref)
+
   # TODO(andreilitvin): this needs refactoring and cleanup to fetch artifacts
   # and process as needed
+
   #
   # try:
   #   ci_fetch_artifacts.fetchArtifactsForJob(args.token, args.job,
@@ -250,10 +253,11 @@ def main():
   #     args.build_output_dir,
   #     title="Bloat report for job '%s'" % args.job)
   #
-  # if args.github_api_token and args.github_repository and args.github_comment_pr_number:
+  if args.github_api_token and args.github_repository and comment_pr_number:
+    logging.warning('SEND REPORT DISABLED FOR NOW.')
   #   sendFileAsPrComment(args.job, args.report_file, args.github_api_token,
   #                       args.github_repository,
-  #                       int(args.github_comment_pr_number), compareResults)
+  #                       comment_pr_number, compareResults)
 
   logging.warning('NOT YET PORTED OVER/IMPLEMENTED')
 
