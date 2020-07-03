@@ -20,6 +20,54 @@ import github
 import logging
 import subprocess
 
+# Artifacts can be fetched using:
+#   curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/project-chip/connectedhomeip/actions/artifacts
+
+
+class ArtifactInfo(github.GithubObject.NonCompletableGithubObject):
+
+  def _initAttributes(self):
+    pass
+
+  def _useAttributes(self, attr):
+    if 'id' in attr:
+      self.id = self._makeIntAttribute(attr['id']).value
+    if 'node_id' in attr:
+      self.node_id = self._makeStringAttribute(attr['node_id']).value
+    if 'name' in attr:
+      self.name = self._makeStringAttribute(attr['name']).value
+    if 'size_in_bytes' in attr:
+      self.size_in_bytes = self._makeIntAttribute(attr['size_in_bytes']).value
+    if 'url' in attr:
+      self.url = self._makeStringAttribute(attr['url']).value
+    if 'archive_download_url' in attr:
+      self.url = self._makeStringAttribute(attr['archive_download_url']).value
+    if 'expired' in attr:
+      self.expired = self._makeBoolAttribute(attr['expired']).value
+    if 'created_at' in attr:
+      self.created_at = self._makeDatetimeAttribute(attr['created_at']).value
+    if 'updated_at' in attr:
+      self.expires_at = self._makeDatetimeAttribute(attr['updated_at']).value
+
+
+class ArtifactFetcher(github.GithubObject.NonCompletableGithubObject):
+
+  def __init__(self, repo):
+    self.url = repo.url + '/actions/artifacts'
+    self._requester = repo._requester
+
+    logging.info('FETCHER: %r, %r', self.url, repo)
+
+  def get_artifacts(self):
+    return github.PaginatedList.PaginatedList(
+        ArtifactInfo,
+        self._requester,
+        self.url,
+        None,
+        headers={'Accept': 'application/vnd.github.v3+json'},
+        list_item='artifacts',
+    )
+
 
 def fetchMasterMergeCommitSHA():
   return subprocess.run(
@@ -30,16 +78,22 @@ def fetchMasterMergeCommitSHA():
 
 
 def fetchArtifactsForJob(jobName, githubToken, githubRepo, downloadDir):
-    masterCommitSHA = fetchMasterMergeCommitSHA()
+  masterCommitSHA = fetchMasterMergeCommitSHA()
 
-    logging.info('Master merge commit: "%s"' % masterCommitSHA)
+  logging.info('Master merge commit: "%s"', masterCommitSHA)
 
-    api = github.Github(githubToken)
-    repo = api.get_repo(githubRepo)
+  api = github.Github(githubToken)
+  repo = api.get_repo(githubRepo)
 
-    commit = repo.get_commit(masterCommitSHA)
+  commit = repo.get_commit(masterCommitSHA)
 
-    logging.info('COMMIT: %r' % commit)
+  # We generally expect a single pull request in master for every such commit
+  for p in commit.get_pulls():
+    logging.info('PULL: %r', p)
 
-    logging.error('NOT YET IMPLEMENTED')
-    pass
+  fetcher = ArtifactFetcher(repo)
+  for idx, a in enumerate(fetcher.get_artifacts()):
+    logging.info('%d: Found artifact: %s from %r', idx, a.name, a.created_at)
+
+  logging.error('NOT YET IMPLEMENTED')
+  pass
