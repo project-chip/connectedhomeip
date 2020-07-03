@@ -70,11 +70,15 @@ class ArtifactFetcher(github.GithubObject.NonCompletableGithubObject):
 
 
 def fetchMasterMergeCommitSHA():
-  return subprocess.run(
+  result = subprocess.run(
       'git merge-base --fork-point master'.split(),
       stdout=subprocess.PIPE,
       stderr=subprocess.STDOUT,
-  ).stdout.decode('utf8').split()[0]
+  ).stdout.decode('utf8')
+
+  logging.info('Merge base result: "%r"' % result)
+
+  return result.split()[0]
 
 
 def fetchArtifactsForJob(jobName, githubToken, githubRepo, downloadDir):
