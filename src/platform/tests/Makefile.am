@@ -69,7 +69,7 @@ AM_CPPFLAGS                                    = \
     $(NULL)
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
-if CHIP_WITH_OT_BR_CLIENT
+if CHIP_WITH_OTBR_CLIENT
 AM_CPPFLAGS                                   += \
     $(DBUS_CFLAGS)                               \
     -I$(top_srcdir)/third_party/ot-br-posix/repo/include    \
@@ -87,12 +87,10 @@ CHIP_LDADD                                      = \
     $(NULL)
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
-if CHIP_WITH_OT_BR_CLIENT
 CHIP_LDADD                                    += \
     $(DBUS_LIBS)                                 \
     $(top_builddir)/third_party/ot-br-posix/libotbrclient.a \
     $(NULL)
-endif
 endif
 
 COMMON_LDADD                                          = \
@@ -114,7 +112,7 @@ check_PROGRAMS                                 = \
     $(NULL)
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
-if CHIP_WITH_OT_BR_CLIENT
+if CHIP_WITH_OTBR_CLIENT
 check_PROGRAMS += TestThreadStackMgr
 
 TestThreadStackMgr_LDADD                       = $(COMMON_LDADD)

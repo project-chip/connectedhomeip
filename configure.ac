@@ -905,6 +905,36 @@ NL_ENABLE_DOCS([auto],[NO])
 AM_CONDITIONAL(CHIP_BUILD_DOCS, [test "${nl_cv_build_docs}" = "yes"])
 
 #
+# OpenThread
+#
+
+NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
+    [OpenThread],
+    [OPENTHREAD],
+    [openthread],
+    [],
+    [
+        AC_MSG_NOTICE([No internal OpenThread support yet!])
+        with_openthread=no
+    ],
+    [
+        # Check for required OpenThread headers.
+        AC_CHECK_HEADERS([openthread/dataset.h] [openthread/dataset_ftd.h] [openthread/error.h] [openthread/icmp6.h] [openthread/instance.h] [openthread/ip6.h] [openthread/link.h] [openthread/message.h] [openthread/netdata.h] [openthread/tasklet.h] [openthread/thread.h],
+        [],
+        [
+            AC_MSG_ERROR(The nlio header "$ac_header" is required but cannot be found.)
+        ])
+    ]
+)
+AM_CONDITIONAL([CHIP_ENABLE_OPENTHREAD], [test "${with_openthread}" != "no"])
+if test "${with_openthread}" != "no"; then
+    CHIP_ENABLE_OPENTHREAD=1
+else
+    CHIP_ENABLE_OPENTHREAD=0
+fi
+AC_DEFINE_UNQUOTED([CHIP_ENABLE_OPENTHREAD],[${CHIP_ENABLE_OPENTHREAD}],[Define to 1 if you want to enable OpenThread.])
+
+#
 # Network Technology Layer
 #
 AC_MSG_CHECKING([network layer])
@@ -1755,16 +1785,16 @@ if test "${nl_cv_build_tests}" = "yes"; then
 fi
 
 #
-# openthread
+# otbr-client
 #
 
-AC_ARG_ENABLE(openthread,
-    [AS_HELP_STRING([--enable-openthread], [Enable OpenThread])],
+AC_ARG_ENABLE(otbr-client,
+    [AS_HELP_STRING([--enable-otbr-client], [Enable OpenThread Linux client])],
     [
         case "${enableval}" in
 
         no|yes)
-            enable_openthread=${enableval}
+            enable_otbr_client=${enableval}
             ;;
 
         *)
@@ -1773,42 +1803,33 @@ AC_ARG_ENABLE(openthread,
 
         esac
     ],
-    [ enable_openthread="no" ]
+    [ enable_otbr_client="no" ]
 )
 
-AC_MSG_NOTICE("enable_openthread=${enable_openthread}")
+AC_MSG_NOTICE("enable_otbr_client=${enable_otbr_client}")
 
-if test "${enable_openthread}" = "yes"; then
-    if test "${with_device_layer}" = "linux"; then
-        maybe_ot_br_client_dirstem="ot-br-posix"
-        ot_br_client_dirstem="third_party/${maybe_ot_br_client_dirstem}/repo"
+if test "${enable_otbr_client}" = "yes"; then
+    maybe_otbr_client_dirstem="ot-br-posix"
+    otbr_client_dirstem="third_party/${maybe_otbr_client_dirstem}/repo"
 
-        AC_MSG_NOTICE([attempting to create internal ${ot_brclient_dirstem}])
-        ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${ot_br_client_dirstem}
+    AC_MSG_NOTICE([attempting to create internal ${otbrclient_dirstem}])
 
-        if test $? -ne 0; then
-            AC_MSG_ERROR([failed to create ${ot_br_client_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
-        fi
+    ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${otbr_client_dirstem}
 
-        PKG_CHECK_MODULES([DBUS], dbus-1 >= 1.4)
-        AC_SUBST([DBUS_CFLAGS])
-        AC_SUBST([DBUS_LIBS])
-        AC_SUBST(OTBR_CLIENT_SUBDIRS, [${maybe_ot_br_client_dirstem}])
-    else
-        openthread_dirstem="third_party/openthread/repo"
-
-        AC_MSG_NOTICE([attempting to create internal ${openthread_dirstem}])
-        ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${openthread_dirstem}
-        if test $? -ne 0; then
-            AC_MSG_ERROR([failed to create ${ot_br_client_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
-        fi
+    if test $? -ne 0; then
+        AC_MSG_ERROR([failed to create ${otbr_client_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
     fi
+
+    # otbrclient requires dbus
+    PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.4)
+    AC_SUBST([DBUS_CFLAGS])
+    AC_SUBST([DBUS_LIBS])
 else
-    maybe_ot_br_client_dirstem=
+    maybe_otbr_client_dirstem=
 fi
 
-AM_CONDITIONAL([CHIP_WITH_OT_BR_CLIENT], [test "${enable_openthread}" != "no" && test "${with_device_layer}" == "linux"])
-AM_CONDITIONAL([CHIP_WITH_OPENTHREAD], [test "${enable_openthread}" != "no" && test "${with_device_layer}" != "linux"])
+AC_SUBST(OTBR_CLIENT_SUBDIRS, [${maybe_otbr_client_dirstem}])
+AM_CONDITIONAL([CHIP_WITH_OTBR_CLIENT], [test "${enable_otbr_client}" != "no"])
 
 #
 # Nlunit-test

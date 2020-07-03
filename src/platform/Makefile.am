@@ -116,7 +116,7 @@ libDeviceLayer_a_SOURCES                = \
     Globals.cpp                           \
     $(NULL)
 
-if CHIP_WITH_OPENTHREAD
+if CHIP_ENABLE_OPENTHREAD
 libDeviceLayer_a_SOURCES               += \
     OpenThread/OpenThreadUtils.cpp        \
     $(NULL)
@@ -142,7 +142,7 @@ libDeviceLayer_a_SOURCES               += \
     Linux/SystemTimeSupport.cpp           \
     $(NULL)
 
-if CHIP_WITH_OT_BR_CLIENT
+if CHIP_WITH_OTBR_CLIENT
 libDeviceLayer_a_SOURCES               += \
     Linux/ThreadStackManagerImpl.cpp      \
     $(NULL)
@@ -169,7 +169,7 @@ libDeviceLayer_a_SOURCES               +=       \
     FreeRTOS/SystemTimeSupport.cpp              \
     $(NULL)
 
-if CHIP_WITH_OPENTHREAD
+if CHIP_ENABLE_OPENTHREAD
 libDeviceLayer_a_SOURCES               +=       \
     nRF5/ThreadStackManagerImpl.cpp             \
     $(NULL)
