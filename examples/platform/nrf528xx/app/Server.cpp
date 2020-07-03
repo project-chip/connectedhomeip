@@ -137,6 +137,11 @@ static ServerCallback gCallbacks;
 
 } // namespace
 
+void InitDataModelHandler()
+{
+    chipZclEndpointInit();
+}
+
 // The echo server assumes the platform's networking has been setup already
 void StartServer(DemoSessionManager * sessions)
 {
