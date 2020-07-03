@@ -100,4 +100,3 @@ def fetchArtifactsForJob(jobName, githubToken, githubRepo, downloadDir):
     logging.info('%d: Found artifact: %s from %r', idx, a.name, a.created_at)
 
   logging.error('NOT YET IMPLEMENTED')
-  pass
