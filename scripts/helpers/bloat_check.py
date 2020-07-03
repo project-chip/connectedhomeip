@@ -213,7 +213,7 @@ def main():
   parser.add_argument(
       '--github-repository', type=str, help='Repository to use for PR comments')
   parser.add_argument(
-      '--github_ref',
+      '--github-ref',
       type=str,
       default=None,
       help='Github action ref, of format refs/pull/:prNumber/merge')
