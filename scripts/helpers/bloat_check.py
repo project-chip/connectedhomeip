@@ -20,6 +20,7 @@ import argparse
 import coloredlogs
 import csv
 import github
+import github_fetch_artifacts
 import io
 import logging
 import os
@@ -252,19 +253,18 @@ def main():
     else:
       print("Received arg '%s': %r" % (n, getattr(args, n))) 
 
-  #
-  # try:
-  #   ci_fetch_artifacts.fetchArtifactsForJob(args.token, args.job,
-  #                                           args.artifact_download_dir)
-  # except Exception as e:
-  #   logging.warning('Failed to fetch artifacts: %r', e)
-  #
-  # compareResults = generateBloatReport(
-  #     args.report_file,
-  #     args.artifact_download_dir,
-  #     args.build_output_dir,
-  #     title="Bloat report for job '%s'" % args.job)
-  #
+  try:
+    github_fetch_artifacts.fetchArtifactsForJob(args.job, args.github_api_token, args.github_repository,
+                                                args.artifact_download_dir)
+  except Exception as e:
+    logging.warning('Failed to fetch artifacts: %r', e)
+  
+  compareResults = generateBloatReport(
+      args.report_file,
+      args.artifact_download_dir,
+      args.build_output_dir,
+      title="Bloat report for job '%s'" % args.job)
+  
   if args.github_api_token and args.github_repository and comment_pr_number:
     logging.warning('SEND REPORT DISABLED FOR NOW.')
   #   sendFileAsPrComment(args.job, args.report_file, args.github_api_token,
