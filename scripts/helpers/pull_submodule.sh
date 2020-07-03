@@ -21,16 +21,16 @@ set -e
 CHIP_ROOT="$(dirname "$0")/../.."
 
 if [[ -z "$name" || -z "$toplevel" ]]; then
-  echo >&2 "This script should be run via update_submodules.sh"
-  exit 1
+    echo >&2 "This script should be run via update_submodules.sh"
+    exit 1
 fi
 
 get_submodule_config() {
-  git config --file "$toplevel/.gitmodules" "submodule.$name.$1"
+    git config --file "$toplevel/.gitmodules" "submodule.$name.$1"
 }
 
 set_submodule_config() {
-  git config --file "$toplevel/.gitmodules" "submodule.$name.$1" "$2"
+    git config --file "$toplevel/.gitmodules" "submodule.$name.$1" "$2"
 }
 
 SUBMODULE_URL=$(get_submodule_config url)
@@ -44,7 +44,7 @@ HEAD_COMMIT=$(git -C "$toplevel" rev-parse HEAD:"$SUBMODULE_PATH")
 FETCH_COMMIT="$(git rev-parse FETCH_HEAD)"
 
 if [[ "$HEAD_COMMIT" == "$FETCH_COMMIT" && "$REPOS_COMMIT" == "$FETCH_COMMIT" ]]; then
-  exit 0
+    exit 0
 fi
 
 git checkout --quiet "$FETCH_COMMIT"
