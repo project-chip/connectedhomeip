@@ -39,7 +39,7 @@ request_review: none
 
 # Patterns to exclude from all Restylers
 exclude:
-    - ".github/workflows/*" # https://github.com/restyled-io/restyler/issues/73
+    - ".github/workflows/**/*" # https://github.com/restyled-io/restyler/issues/73
     - "third_party/**/*"
     - "third_party/**"
     - "third_party/*"
@@ -66,6 +66,7 @@ restylers:
       include:
           - "**/Dockerfile"
           - "**/*.yml"
+          - "**/*.yaml"
           - "**/*.sh"
           - "**/*.c"
           - "**/*.cc"
@@ -140,6 +141,12 @@ restylers:
       include:
           - "**/*.md"
           - "**/*.markdown"
+    - name: prettier-yaml
+      image: restyled/restyler-prettier:v1.19.1-2
+      enabled: true
+      include:
+          - "**/*.yml"
+          - "**/*.yaml"
     - name: shellharden
       image: restyled/restyler-shellharden:v4.1.1-2
       enabled: true
