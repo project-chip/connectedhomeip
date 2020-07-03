@@ -54,7 +54,7 @@ extern "C" {
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-chip::SecureSessionMgr sTransportIPv6;
+DemoSessionManager sTransportIPv6;
 
 static void * ot_calloc(size_t n, size_t size)
 {
