@@ -27,6 +27,10 @@
 namespace chip {
 namespace DataModel {
 
+/* XXX Remove later*/
+#define SUCCESS 0
+#define FAIL    -1
+
 enum CHIPValueTypes
 {
     kCHIPValueType_NotSpecified           = -1,
@@ -53,25 +57,104 @@ enum CHIPValueTypes
     kCHIPValueType_EndOfContainer,
 };
 
-template <enum CHIPValueTypes EnumType, typename ValueType>
 class CHIPValue
 {
 public:
     CHIPValueTypes mType;
-    ValueType mValue;
-    ValueType mMin;
-    ValueType mMax;
-    
-    CHIPValue() : mType(EnumType) {}
-    CHIPValue(ValueType value) : mType(EnumType), mValue(value) {}
-    CHIPValue(ValueType value, ValueType min, ValueType max) : mType(EnumType),
-                                                               mValue(value),
-                                                               mMin(min),
-                                                               mMax(max) {}
+    union {
+        uint64_t Int64;
+    };
+    CHIPValue(CHIPValueTypes type) : mType(type) {}
+    CHIPValue(uint32_t value) : mType(kCHIPValueType_UInt32), Int64((uint64_t)value) {}
+    CHIPValue(bool value) : mType(kCHIPValueType_Bool), Int64((uint64_t)value) {}
+
+    int Set(uint32_t &value)
+    {
+        if (mType != kCHIPValueType_UInt32)
+            return FAIL;
+        Int64 = (uint64_t)value;
+        return SUCCESS;
+    }
+
+    int Set(bool &value)
+    {
+        if (mType != kCHIPValueType_Bool)
+            return FAIL;
+        Int64 = (uint64_t)value;
+        return SUCCESS;
+    }
+
+    int Get(uint32_t &value)
+    {
+        if (mType != kCHIPValueType_UInt32)
+            return FAIL;
+        value = (uint32_t)Int64;
+        return SUCCESS;
+    }
+
+    int Get(bool &value)
+    {
+        if (mType != kCHIPValueType_Bool)
+            return FAIL;
+        value = (bool)Int64;
+        return SUCCESS;
+    }
+
+    bool operator <(const CHIPValue& value)
+    {
+        if (mType != value.mType)
+        {
+            return false;
+        }
+        switch (mType)
+        {
+        case kCHIPValueType_Int8:
+        case kCHIPValueType_Int16:
+        case kCHIPValueType_Int32:
+        case kCHIPValueType_Int64:
+        case kCHIPValueType_UInt8:
+        case kCHIPValueType_UInt16:
+        case kCHIPValueType_UInt32:
+        case kCHIPValueType_UInt64:
+        case kCHIPValueType_Bool:
+            return Int64 < value.Int64;
+            break;
+        default:
+            return false;
+        }
+        return false;
+    }
+
+    bool operator >(const CHIPValue& value)
+    {
+        if (mType != value.mType)
+        {
+            return false;
+        }
+        switch (mType)
+        {
+        case kCHIPValueType_Int8:
+        case kCHIPValueType_Int16:
+        case kCHIPValueType_Int32:
+        case kCHIPValueType_Int64:
+        case kCHIPValueType_UInt8:
+        case kCHIPValueType_UInt16:
+        case kCHIPValueType_UInt32:
+        case kCHIPValueType_UInt64:
+        case kCHIPValueType_Bool:
+            return Int64 > value.Int64;
+            break;
+        default:
+            return false;
+        }
+        return false;
+    }
+
+private:
+    CHIPValue() {}
+
 };
 
-typedef class CHIPValue<kCHIPValueType_UInt32, uint32_t> CHIPValue_UInt32_t;
-typedef class CHIPValue<kCHIPValueType_Bool, bool> CHIPValue_Bool_t;
 } // namespace DataModel
 } // namespace chip
 
