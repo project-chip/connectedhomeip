@@ -35,7 +35,7 @@ jobs:
               run: |
                   mkdir -p "master_binaries/esp32-build"
                   scripts/helpers/bloat_check.py                                                   \
-                     --token "$GITHUB_TOKEN"                                                       \
+                     --token "${{ secrets.GITHUB_TOKEN }}"                                         \
                      --job "ESP32 Examples"                                                        \
                      --artifact-download-dir "master_binaries/$BUILD_TYPE-build"                   \
                      --build-output-dir "example_binaries/$BUILD_TYPE-build"                       \
