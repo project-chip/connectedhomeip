@@ -67,13 +67,6 @@ ifndef GNU_INSTALL_ROOT
 $(error ENVIRONMENT ERROR: GNU_INSTALL_ROOT not set)
 endif
 
-# OpenWeave Family Target
-OPENWEAVE_FAMILY_TARGET = k32w
-
-# Target for which OpenWeave will be built.
-OPENWEAVE_TARGET = k32w061
-
-
 # ==================================================
 # General definitions
 # ==================================================
@@ -141,9 +134,7 @@ STD_INC_DIRS += \
     $(K32W061_SDK_ROOT)/devices/K32W061/utilities                                           \
     $(K32W061_SDK_ROOT)/devices/K32W061/utilities/debug_console                             \
     $(K32W061_SDK_ROOT)/devices/K32W061/utilities/str                                       \
-    $(OPENWEAVE_ROOT)/src/adaptations/device-layer/include/Weave/DeviceLayer/K32W           \
-    $(OPENTHREAD_ROOT)/examples/platforms/$(OPENWEAVE_FAMILY_TARGET)/                       \
-    $(OPENTHREAD_ROOT)/examples/platforms/$(OPENWEAVE_FAMILY_TARGET)/$(OPENWEAVE_TARGET)
+    $(CHIP_ROOT)/src/platform/K32W
 
 STD_DEFINES =
 
