@@ -190,7 +190,7 @@ def main():
   parser = argparse.ArgumentParser(description='Fetch master build artifacts.')
   parser.add_argument('--token', type=str, help='API token to use')
   parser.add_argument(
-      '--job', type=str, help='From what job to fetch artifacts from')
+      '--job', type=str, help='Name of the job generating the report')
   parser.add_argument(
       '--artifact-download-dir',
       type=str,
@@ -204,8 +204,8 @@ def main():
   parser.add_argument(
       '--report-file',
       type=str,
-      default='report.txt',
-      help='From what job to fetch artifacts from')
+      default='report.csv',
+      help='Report file output name')
   parser.add_argument(
       '--github-api-token',
       type=str,
