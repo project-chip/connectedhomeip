@@ -1,36 +1,54 @@
-[submodule "third_party/nlunit-test/repo"]
-        path = third_party/nlunit-test/repo
-        url = https://github.com/nestlabs/nlunit-test.git
-        ignore = dirty
-[submodule "third_party/nlio/repo"]
-        path = third_party/nlio/repo
-        url = https://github.com/nestlabs/nlio.git
-        ignore = dirty
-[submodule "third_party/nlfaultinjection/repo"]
-        path = third_party/nlfaultinjection/repo
-        url = https://github.com/nestlabs/nlfaultinjection.git
-        ignore = dirty
-[submodule "third_party/nlassert/repo"]
-        path = third_party/nlassert/repo
-        url = https://github.com/nestlabs/nlassert.git
-        ignore = dirty
-[submodule "third_party/mbedtls/repo"]
-        path = third_party/mbedtls/repo
-        url = https://github.com/ARMmbed/mbedtls.git
-        ignore = dirty
-[submodule "examples/common/QRCode/repo"]
-        path = examples/common/QRCode/repo
-        url = https://github.com/nayuki/QR-Code-generator.git
-        ignore = dirty
-[submodule "examples/common/m5stack-tft/repo"]
-        path = examples/common/m5stack-tft/repo
-        url = https://github.com/jeremyjh/ESP32_TFT_library.git
-        ignore = dirty
-[submodule "third_party/pigweed"]
-        path = third_party/pigweed
-        url = https://pigweed.googlesource.com/pigweed/pigweed
-        ignore = dirty
-[submodule "third_party/openthread/repo"]
-        path = third_party/openthread/repo
-        url = https://github.com/openthread/openthread
-        ignore = dirty
+[submodule "nlassert"]
+	path = third_party/nlassert/repo
+	url = https://github.com/nestlabs/nlassert.git
+	branch = master
+	ignore = dirty
+	commit = bd2f082102d4456ca750189ee853fa8c7443af59
+[submodule "nlfaultinjection"]
+	path = third_party/nlfaultinjection/repo
+	url = https://github.com/nestlabs/nlfaultinjection.git
+	branch = master
+	ignore = dirty
+	commit = 79f92f309de58c4591f53a9b492600550b473c84
+[submodule "nlio"]
+	path = third_party/nlio/repo
+	url = https://github.com/nestlabs/nlio.git
+	branch = master
+	ignore = dirty
+	commit = dbb78fb4f188bb09ba51626341e1dffa636aa0da
+[submodule "nlunit-test"]
+	path = third_party/nlunit-test/repo
+	url = https://github.com/nestlabs/nlunit-test.git
+	branch = master
+	ignore = dirty
+	commit = ef5a2b9a8b71ad592fcf3681968fd63c844e3d81
+[submodule "mbedtls"]
+	path = third_party/mbedtls/repo
+	url = https://github.com/ARMmbed/mbedtls.git
+	branch = mbedtls-2.18
+	ignore = dirty
+	commit = ca933c7e0c9e84738b168b6b0feb89af4183a60a
+[submodule "qrcode"]
+	path = examples/common/QRCode/repo
+	url = https://github.com/nayuki/QR-Code-generator.git
+	branch = master
+	ignore = dirty
+	commit = 08ac806145aa6ab5d3e9df61d023092bb6cfe761
+[submodule "m5stack-tft"]
+	path = examples/common/m5stack-tft/repo
+	url = https://github.com/jeremyjh/ESP32_TFT_library.git
+	branch = master
+	ignore = dirty
+	commit = 3a841faacb218dbdba2f54edb251d3a64d9833fb
+[submodule "pigweed"]
+	path = third_party/pigweed
+	url = https://pigweed.googlesource.com/pigweed/pigweed
+	branch = master
+	ignore = dirty
+	commit = 16bde6b17e0fabdf4b6877f0d62bd49d3110ee7f
+[submodule "openthread"]
+	path = third_party/openthread/repo
+	url = https://github.com/openthread/openthread.git
+	branch = master
+	ignore = dirty
+	commit = 9e291e62ed92d1132467489c4483330c46c0bce4

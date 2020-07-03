@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #
 # Copyright (c) 2020 Project CHIP Authors
 #
@@ -14,16 +16,23 @@
 # limitations under the License.
 #
 
-CHIP_ROOT="$(dirname "$0")"
+CHIP_ROOT="$(dirname "$0")/../.."
 
-export PW_BRANDING_BANNER="$CHIP_ROOT/.chip-banner.txt"
-export PW_BRANDING_BANNER_COLOR="bold_white"
-
-if test -f "$CHIP_ROOT/scripts/helpers/rename_submodules.sh"; then
-    "$CHIP_ROOT/scripts/helpers/rename_submodules.sh"
+if [[ ! -e "$CHIP_ROOT/.git" ]]; then
+    exit 0
 fi
 
-git submodule update --init
+# Transitional: Remove keys for submodules with mismatched names
+OLD_SUBMODULE_KEYS='submodule\.third_party/.*|submodule\.examples/.*'
 
-# shellcheck source=/dev/null
-source "$CHIP_ROOT/third_party/pigweed/bootstrap.sh"
+if ! git -C "$CHIP_ROOT" config --get-regexp "$OLD_SUBMODULE_KEYS" >&/dev/null; then
+    exit 0
+fi
+
+# Remove renamed submodules from config
+git -C "$CHIP_ROOT" config --get-regexp "$OLD_SUBMODULE_KEYS" | while read key value; do
+    git -C "$CHP_ROOT" config --unset "$key"
+done
+
+# Re-init with new submodule names.
+git submodule update --init
