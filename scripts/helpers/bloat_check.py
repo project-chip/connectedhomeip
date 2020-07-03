@@ -222,6 +222,11 @@ def main():
       default=logging.INFO,
       type=lambda x: getattr(logging, x),
       help='Configure the logging level.')
+  parser.add_argument(
+      '--git-master-ref',
+      type=str,
+      default=None,
+      help='Ref for fetching artifacts for the bloat report')
   args = parser.parse_args()
 
   # Ensures somewhat pretty logging of what is going on
@@ -255,7 +260,7 @@ def main():
 
   try:
     github_fetch_artifacts.fetchArtifactsForJob(args.job, args.github_api_token, args.github_repository,
-                                                args.artifact_download_dir)
+                                                args.artifact_download_dir, args.git_master_ref)
   except Exception as e:
     logging.warning('Failed to fetch artifacts: %r', e)
   

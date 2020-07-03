@@ -70,12 +70,6 @@ class ArtifactFetcher(github.GithubObject.NonCompletableGithubObject):
 
 
 def fetchMasterMergeCommitSHA():
-  logging.info('Available branches: %s' % subprocess.run(
-      'git branch -la'.split(),
-      stdout=subprocess.PIPE,
-      stderr=subprocess.STDOUT,
-  ).stdout.decode('utf8'))
-
   result = subprocess.run(
       'git merge-base --fork-point master'.split(),
       stdout=subprocess.PIPE,
@@ -87,15 +81,16 @@ def fetchMasterMergeCommitSHA():
   return result.split()[0]
 
 
-def fetchArtifactsForJob(jobName, githubToken, githubRepo, downloadDir):
-  masterCommitSHA = fetchMasterMergeCommitSHA()
+def fetchArtifactsForJob(jobName, githubToken, githubRepo, downloadDir, compareRefSHA):
+  if not compareRefSHA:
+    compareRefSHA = fetchMasterMergeCommitSHA()
 
-  logging.info('Master merge commit: "%s"', masterCommitSHA)
+  logging.info('Master merge commit: "%s"', compareRefSHA)
 
   api = github.Github(githubToken)
   repo = api.get_repo(githubRepo)
 
-  commit = repo.get_commit(masterCommitSHA)
+  commit = repo.get_commit(compareRefSHA)
 
   # We generally expect a single pull request in master for every such commit
   for p in commit.get_pulls():
