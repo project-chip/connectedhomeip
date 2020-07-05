@@ -46,9 +46,11 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/ErrorStr.h>
 #include <transport/SecureSessionMgr.h>
+#include <lib/core/CHIPClusterServer.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DataModel;
 
 extern void startServer();
 
@@ -352,6 +354,42 @@ std::string createSetupPayload()
 
 } // namespace
 
+void PrintDataModel(CHIPClusterServer & server)
+{
+    printf("Server:\n");
+    for (int i = 0; i < kMaxEndPointPerServer; i++)
+    {
+        /* EndPoints */
+        if (server.mEndPoints[i])
+        {
+            auto endpoint = server.mEndPoints[i];
+            printf("  EndPoint: %d\n", i);
+            for (int j = 0; j < kMaxClustersPerEndPoint; j++)
+            {
+                /* Clusters */
+                if (endpoint->mClusters[j])
+                {
+                    auto cluster = endpoint->mClusters[j];
+                    printf("    ClusterId: 0x%04x\n", cluster->mClusterId);
+                    for (int k = 0; k < kMaxAttributesPerCluster; k++)
+                    {
+                        /* Attributes */
+                        if (cluster->mAttrs[k])
+                        {
+                            auto attr = cluster->mAttrs[k];
+                            printf("      Attribute: 0x%04x\n", attr->mAttrId);
+                            char printstr[20];
+                            attr->mValue.ValueToStr(printstr, sizeof(printstr));
+                            printf("              Value: %s\n", printstr);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 extern "C" void app_main()
 {
     ESP_LOGI(TAG, "WiFi Echo Demo!");
@@ -395,6 +433,17 @@ extern "C" void app_main()
     SetupPretendDevices();
 
     statusLED.Init(STATUS_LED_GPIO_NUM);
+
+    uint8_t ZCLVersion = 10;
+    uint8_t applicationVersion = 20;
+    uint8_t stackVersion = 1;
+    uint8_t HWVersion = 1;
+    CHIPClusterServer server(ZCLVersion,
+                             applicationVersion,
+                             stackVersion,
+                             HWVersion);
+    /* Add a cluster to the primary endpoint of our cluster server */
+    server.AddCluster(CHIPClusterOnOffNew());
 
     // Start the Echo Server
     InitDataModelHandler();
