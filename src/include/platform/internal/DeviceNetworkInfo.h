@@ -28,7 +28,7 @@ namespace DeviceLayer {
 namespace Internal {
 
 /**
- * Ids for well-known network provision types.
+ * Constants for common network metadata entries
  */
 constexpr size_t kMaxThreadNetworkNameLength = 16;
 constexpr size_t kThreadExtendedPANIdLength  = 8;
