@@ -21,8 +21,7 @@
  * @file QRCodeWidget.cpp
  *
  * This file implements the QRCodeWidget that displays a QRCode centered on the screen
- * It generates a CHIP SetupPayload containing the device's Soft-AP SSID and then
- * encodes that into a QRCode.
+ * It generates a CHIP SetupPayload for onboarding.
  *
  */
 
@@ -41,7 +40,6 @@
 #include "Display.h"
 #include "QRCodeWidget.h"
 
-#define MAX_SSID_LEN 32
 // A temporary value assigned for this example's QRCode
 // Spells CHIP on a dialer
 #define EXAMPLE_VENDOR_ID 2447
@@ -49,12 +47,10 @@
 #define EXAMPLE_PRODUCT_ID 37732
 // Used to have an initial shared secret
 #define EXAMPLE_SETUP_CODE 123456789
-// Used to indicate that the device supports both Soft-AP and BLE for rendezvous
-#define EXAMPLE_RENDEZVOUS_INFO RendezvousInformationFlags::kBLE
-// Used to indicate that an SSID has been added to the QRCode
-#define EXAMPLE_VENDOR_TAG_SSID 1
+// Used to discriminate the device
+#define EXAMPLE_DISCRIMINATOR 0X0F00
 // Used to indicate that an IP address has been added to the QRCode
-#define EXAMPLE_VENDOR_TAG_IP 2
+#define EXAMPLE_VENDOR_TAG_IP 1
 
 #if CONFIG_HAVE_DISPLAY
 
@@ -71,21 +67,8 @@ enum
     kQRCodePadding       = 2
 };
 
-// TODO Pull this from the configuration manager
-void GetAPName(char * ssid, size_t ssid_len)
-{
-    uint8_t mac[6];
-    CHIP_ERROR err = esp_wifi_get_mac(ESP_IF_WIFI_STA, mac);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "esp_wifi_get_mac(ESP_IF_WIFI_STA) failed: %s", chip::ErrorStr(err));
-    }
-    snprintf(ssid, ssid_len, "%s%02X%02X", "CHIP_DEMO-", mac[4], mac[5]);
-}
-
 void GetGatewayIP(char * ip_buf, size_t ip_len)
 {
-
     tcpip_adapter_ip_info_t ip;
     tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_AP, &ip);
     IPAddress::FromIPv4(ip.ip).ToString(ip_buf, ip_len);
@@ -94,20 +77,13 @@ void GetGatewayIP(char * ip_buf, size_t ip_len)
 
 string createSetupPayload()
 {
-    // The discriminator is generated randomly so different devices can be turned on at the same time for testing.
-    uint16_t discriminator = (esp_random() * 1.0 / UINT32_MAX * ((1 << kPayloadDiscriminatorFieldLengthInBits) + 1));
-
     SetupPayload payload;
     payload.version               = 1;
-    payload.discriminator         = discriminator;
+    payload.discriminator         = EXAMPLE_DISCRIMINATOR;
     payload.setUpPINCode          = EXAMPLE_SETUP_CODE;
-    payload.rendezvousInformation = EXAMPLE_RENDEZVOUS_INFO;
+    payload.rendezvousInformation = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
     payload.vendorID              = EXAMPLE_VENDOR_ID;
     payload.productID             = EXAMPLE_PRODUCT_ID;
-
-    char ap_ssid[MAX_SSID_LEN];
-    GetAPName(ap_ssid, sizeof(ap_ssid));
-    payload.addOptionalVendorData(EXAMPLE_VENDOR_TAG_SSID, ap_ssid);
 
     char gw_ip[INET6_ADDRSTRLEN];
     GetGatewayIP(gw_ip, sizeof(gw_ip));
@@ -115,7 +91,7 @@ string createSetupPayload()
 
     QRCodeSetupPayloadGenerator generator(payload);
     string result;
-    size_t tlvDataLen = sizeof(ap_ssid) + sizeof(gw_ip);
+    size_t tlvDataLen = sizeof(gw_ip);
     uint8_t tlvDataStart[tlvDataLen];
     CHIP_ERROR err = generator.payloadBase41Representation(result, tlvDataStart, tlvDataLen);
     if (err != CHIP_NO_ERROR)

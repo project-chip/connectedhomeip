@@ -121,6 +121,7 @@ union PeerSockAddr
        // !defined(raw_set_flags) || !defined(udp_clear_flags) || !defined(udp_set_flags)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 static INET_ERROR CheckMulticastGroupArgs(InterfaceId aInterfaceId, const IPAddress & aAddress)
 {
     INET_ERROR lRetval = INET_NO_ERROR;
@@ -135,6 +136,7 @@ static INET_ERROR CheckMulticastGroupArgs(InterfaceId aInterfaceId, const IPAddr
 exit:
     return (lRetval);
 }
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if INET_CONFIG_ENABLE_IPV4
@@ -326,6 +328,9 @@ INET_ERROR IPEndPointBasis::SetMulticastLoopback(IPVersion aIPVersion, bool aLoo
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if !HAVE_LWIP_MULTICAST_LOOP
+#pragma message "\n \
+The version of LwIP appears older than that required for multicast loopback support.\n \
+Please upgrade your version of LwIP for SetMulticastLoopback support."
     lRetval = INET_ERROR_NOT_SUPPORTED;
 #else
     if (aLoopback)
@@ -416,11 +421,11 @@ exit:
  */
 INET_ERROR IPEndPointBasis::JoinMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress)
 {
-    const IPAddressType lAddrType = aAddress.Type();
-    INET_ERROR lRetval            = INET_ERROR_NOT_IMPLEMENTED;
+    INET_ERROR lRetval = INET_ERROR_NOT_IMPLEMENTED;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    lRetval = CheckMulticastGroupArgs(aInterfaceId, aAddress);
+    const IPAddressType lAddrType = aAddress.Type();
+    lRetval                       = CheckMulticastGroupArgs(aInterfaceId, aAddress);
     SuccessOrExit(lRetval);
 
     switch (lAddrType)
@@ -431,7 +436,9 @@ INET_ERROR IPEndPointBasis::JoinMulticastGroup(InterfaceId aInterfaceId, const I
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_IPV4 && LWIP_IGMP
         lRetval = LwIPIPv4JoinLeaveMulticastGroup(aInterfaceId, aAddress, igmp_joingroup_netif);
-#else  // LWIP_IPV4 && LWIP_IGMP
+#else // LWIP_IPV4 && LWIP_IGMP
+#pragma message "\n \
+Please enable LWIP_IPV4 and LWIP_IGMP for IPv4 JoinMulticastGroup and LeaveMulticastGroup support."
         lRetval = INET_ERROR_NOT_SUPPORTED;
 #endif // LWIP_IPV4 && LWIP_IGMP
         SuccessOrExit(lRetval);
@@ -449,7 +456,9 @@ INET_ERROR IPEndPointBasis::JoinMulticastGroup(InterfaceId aInterfaceId, const I
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
         lRetval = LwIPIPv6JoinLeaveMulticastGroup(aInterfaceId, aAddress, mld6_joingroup_netif);
-#else  // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
+#else // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
+#pragma message "\n \
+Please enable LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6 for IPv6 JoinMulticastGroup and LeaveMulticastGroup support."
         lRetval = INET_ERROR_NOT_SUPPORTED;
 #endif // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
         SuccessOrExit(lRetval);
@@ -501,11 +510,11 @@ exit:
  */
 INET_ERROR IPEndPointBasis::LeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress)
 {
-    const IPAddressType lAddrType = aAddress.Type();
-    INET_ERROR lRetval            = INET_ERROR_NOT_IMPLEMENTED;
+    INET_ERROR lRetval = INET_ERROR_NOT_IMPLEMENTED;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    lRetval = CheckMulticastGroupArgs(aInterfaceId, aAddress);
+    const IPAddressType lAddrType = aAddress.Type();
+    lRetval                       = CheckMulticastGroupArgs(aInterfaceId, aAddress);
     SuccessOrExit(lRetval);
 
     switch (lAddrType)
@@ -516,7 +525,9 @@ INET_ERROR IPEndPointBasis::LeaveMulticastGroup(InterfaceId aInterfaceId, const 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_IPV4 && LWIP_IGMP
         lRetval = LwIPIPv4JoinLeaveMulticastGroup(aInterfaceId, aAddress, igmp_leavegroup_netif);
-#else  // LWIP_IPV4 && LWIP_IGMP
+#else // LWIP_IPV4 && LWIP_IGMP
+#pragma message "\n \
+Please enable LWIP_IPV4 and LWIP_IGMP for IPv4 JoinMulticastGroup and LeaveMulticastGroup support."
         lRetval = INET_ERROR_NOT_SUPPORTED;
 #endif // LWIP_IPV4 && LWIP_IGMP
         SuccessOrExit(lRetval);
@@ -534,7 +545,9 @@ INET_ERROR IPEndPointBasis::LeaveMulticastGroup(InterfaceId aInterfaceId, const 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
         lRetval = LwIPIPv6JoinLeaveMulticastGroup(aInterfaceId, aAddress, mld6_leavegroup_netif);
-#else  // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
+#else // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
+#pragma message "\n \
+Please enable LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6 for IPv6 JoinMulticastGroup and LeaveMulticastGroup support."
         lRetval = INET_ERROR_NOT_SUPPORTED;
 #endif // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
         SuccessOrExit(lRetval);
@@ -1111,7 +1124,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-INET_ERROR IPEndPointBasis::ConfigureProtocol(IPAddressType aAddressType, nw_parameters_t aParameters)
+INET_ERROR IPEndPointBasis::ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters)
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -1141,7 +1154,8 @@ INET_ERROR IPEndPointBasis::ConfigureProtocol(IPAddressType aAddressType, nw_par
     return res;
 }
 
-INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress, uint16_t aPort, nw_parameters_t aParameters)
+INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort,
+                                 const nw_parameters_t & aParameters)
 {
     INET_ERROR res         = INET_NO_ERROR;
     nw_endpoint_t endpoint = nullptr;
@@ -1151,11 +1165,10 @@ INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress,
     res = ConfigureProtocol(aAddressType, aParameters);
     SuccessOrExit(res);
 
-    res = GetEndPoint(endpoint, aAddress, aPort);
-    SuccessOrExit(res);
-
+    res = GetEndPoint(endpoint, aAddressType, aAddress, aPort);
     nw_parameters_set_local_endpoint(aParameters, endpoint);
     nw_release(endpoint);
+    SuccessOrExit(res);
 
     mDispatchQueue = dispatch_queue_create("inet_dispatch_global", DISPATCH_QUEUE_CONCURRENT);
     VerifyOrExit(mDispatchQueue != NULL, res = INET_ERROR_NO_MEMORY);
@@ -1164,6 +1177,10 @@ INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress,
     mConnectionSemaphore = dispatch_semaphore_create(0);
     VerifyOrExit(mConnectionSemaphore != NULL, res = INET_ERROR_NO_MEMORY);
     dispatch_retain(mConnectionSemaphore);
+
+    mSendSemaphore = dispatch_semaphore_create(0);
+    VerifyOrExit(mSendSemaphore != NULL, res = INET_ERROR_NO_MEMORY);
+    dispatch_retain(mSendSemaphore);
 
     mAddrType   = aAddressType;
     mConnection = NULL;
@@ -1176,7 +1193,6 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
 {
     __block INET_ERROR res = INET_NO_ERROR;
     dispatch_data_t content;
-    dispatch_semaphore_t send_semaphore;
 
     // Ensure the destination address type is compatible with the endpoint address type.
     VerifyOrExit(mAddrType == aPktInfo->DestAddress.Type(), res = INET_ERROR_BAD_ARGS);
@@ -1188,22 +1204,35 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     SuccessOrExit(res);
 
     // Send a message, and wait for it to be dispatched.
-    send_semaphore = dispatch_semaphore_create(0);
     content = dispatch_data_create(aBuffer->Start(), aBuffer->DataLength(), mDispatchQueue, DISPATCH_DATA_DESTRUCTOR_DEFAULT);
+
+    // If there is a current message pending and the state of the network connection change (e.g switch to a
+    // different network) the connection will enter a nw_connection_state_failed state and the completion handler
+    // will never be called. In such cases a signal is sent from the connection state change handler to release
+    // the semaphore. In this case the INET_ERROR will not update with the result of the completion handler.
+    // To make sure caller knows that sending a message has failed the following code consider there is an error
+    // _unless_ the completion handler says otherwise.
+    res = INET_ERROR_UNEXPECTED_EVENT;
     nw_connection_send(mConnection, content, NW_CONNECTION_DEFAULT_MESSAGE_CONTEXT, true, ^(nw_error_t error) {
-        res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
-        dispatch_semaphore_signal(send_semaphore);
+        if (error)
+        {
+            res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
+        }
+        else
+        {
+            res = INET_NO_ERROR;
+        }
+        dispatch_semaphore_signal(mSendSemaphore);
     });
     dispatch_release(content);
 
-    dispatch_semaphore_wait(send_semaphore, DISPATCH_TIME_FOREVER);
-    dispatch_release(send_semaphore);
+    dispatch_semaphore_wait(mSendSemaphore, DISPATCH_TIME_FOREVER);
 
 exit:
     return res;
 }
 
-void IPEndPointBasis::HandleDataReceived(nw_connection_t aConnection)
+void IPEndPointBasis::HandleDataReceived(const nw_connection_t & aConnection)
 {
 
     nw_connection_receive_completion_t handler =
@@ -1252,33 +1281,42 @@ void IPEndPointBasis::HandleDataReceived(nw_connection_t aConnection)
     nw_connection_receive_message(aConnection, handler);
 }
 
-void IPEndPointBasis::GetPacketInfo(nw_connection_t aConnection, IPPacketInfo & aPacketInfo)
+void IPEndPointBasis::GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo)
 {
-    nw_parameters_t parameters    = nw_connection_copy_parameters(aConnection);
-    nw_endpoint_t local_endpoint  = nw_parameters_copy_local_endpoint(parameters);
-    nw_endpoint_t remote_endpoint = nw_connection_copy_endpoint(aConnection);
+    nw_path_t path              = nw_connection_copy_current_path(aConnection);
+    nw_endpoint_t dest_endpoint = nw_path_copy_effective_local_endpoint(path);
+    nw_endpoint_t src_endpoint  = nw_path_copy_effective_remote_endpoint(path);
 
     aPacketInfo.Clear();
-    aPacketInfo.SrcAddress  = IPAddress::FromSockAddr(*nw_endpoint_get_address(remote_endpoint));
-    aPacketInfo.DestAddress = IPAddress::FromSockAddr(*nw_endpoint_get_address(local_endpoint));
-    aPacketInfo.SrcPort     = nw_endpoint_get_port(remote_endpoint);
-    aPacketInfo.DestPort    = nw_endpoint_get_port(local_endpoint);
+    aPacketInfo.SrcAddress  = IPAddress::FromSockAddr(*nw_endpoint_get_address(src_endpoint));
+    aPacketInfo.DestAddress = IPAddress::FromSockAddr(*nw_endpoint_get_address(dest_endpoint));
+    aPacketInfo.SrcPort     = nw_endpoint_get_port(src_endpoint);
+    aPacketInfo.DestPort    = nw_endpoint_get_port(dest_endpoint);
 }
 
-INET_ERROR IPEndPointBasis::GetEndPoint(nw_endpoint_t & aEndPoint, const IPAddress aAddress, uint16_t aPort)
+INET_ERROR IPEndPointBasis::GetEndPoint(nw_endpoint_t & aEndPoint, const IPAddressType aAddressType, const IPAddress & aAddress,
+                                        uint16_t aPort)
 {
     INET_ERROR res = INET_NO_ERROR;
-
     char addrStr[INET6_ADDRSTRLEN];
-    aAddress.ToString(addrStr, sizeof(addrStr));
-
     char portStr[INET_PORTSTRLEN];
+
+    // Note: aAddress.ToString will return the IPv6 Any address if the address type is Any, but that's not what
+    // we want if the locale endpoint is IPv4.
+    if (aAddressType == kIPAddressType_IPv4 && aAddress.Type() == kIPAddressType_Any)
+    {
+        const IPAddress anyAddr = IPAddress::FromIPv4(aAddress.ToIPv4());
+        anyAddr.ToString(addrStr, sizeof(addrStr));
+    }
+    else
+    {
+        aAddress.ToString(addrStr, sizeof(addrStr));
+    }
+
     snprintf(portStr, sizeof(portStr), "%u", aPort);
 
-    nw_endpoint_t endpoint = nw_endpoint_create_host(addrStr, portStr);
-    VerifyOrExit(endpoint != NULL, res = INET_ERROR_BAD_ARGS);
-
-    aEndPoint = endpoint;
+    aEndPoint = nw_endpoint_create_host(addrStr, portStr);
+    VerifyOrExit(aEndPoint != NULL, res = INET_ERROR_BAD_ARGS);
 
 exit:
     return res;
@@ -1294,7 +1332,8 @@ INET_ERROR IPEndPointBasis::GetConnection(const IPPacketInfo * aPktInfo)
 
     if (mConnection)
     {
-        nw_endpoint_t remote_endpoint  = nw_connection_copy_endpoint(mConnection);
+        nw_path_t path                 = nw_connection_copy_current_path(mConnection);
+        nw_endpoint_t remote_endpoint  = nw_path_copy_effective_remote_endpoint(path);
         const IPAddress remote_address = IPAddress::FromSockAddr(*nw_endpoint_get_address(remote_endpoint));
         const uint16_t remote_port     = nw_endpoint_get_port(remote_endpoint);
         const bool isDifferentEndPoint = aPktInfo->DestPort != remote_port || aPktInfo->DestAddress != remote_address;
@@ -1304,7 +1343,7 @@ INET_ERROR IPEndPointBasis::GetConnection(const IPPacketInfo * aPktInfo)
     }
     SuccessOrExit(res);
 
-    res = GetEndPoint(endpoint, aPktInfo->DestAddress, aPktInfo->DestPort);
+    res = GetEndPoint(endpoint, mAddrType, aPktInfo->DestAddress, aPktInfo->DestPort);
     SuccessOrExit(res);
 
     connection = nw_connection_create(endpoint, mParameters);
@@ -1362,7 +1401,6 @@ INET_ERROR IPEndPointBasis::StartListener()
         case nw_listener_state_failed:
             ChipLogDetail(Inet, "Listener: Failed");
             res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
-            nw_listener_cancel(listener);
             break;
 
         case nw_listener_state_ready:
@@ -1420,7 +1458,6 @@ INET_ERROR IPEndPointBasis::StartConnection(nw_connection_t & aConnection)
         case nw_connection_state_failed:
             ChipLogDetail(Inet, "Connection: Failed");
             res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
-            nw_connection_cancel(aConnection);
             break;
 
         case nw_connection_state_ready:
@@ -1490,6 +1527,12 @@ void IPEndPointBasis::ReleaseAll()
     {
         dispatch_release(mListenerSemaphore);
         mListenerSemaphore = NULL;
+    }
+
+    if (mSendSemaphore)
+    {
+        dispatch_release(mSendSemaphore);
+        mSendSemaphore = NULL;
     }
 }
 

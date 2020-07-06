@@ -29,6 +29,8 @@
 // Include configuration headers
 #include <system/SystemConfig.h>
 
+#include <core/CHIPCallback.h>
+
 #include <support/DLLUtil.h>
 #include <system/SystemError.h>
 #include <system/SystemEvent.h>
@@ -135,17 +137,20 @@ public:
 
     Error NewTimer(Timer *& aTimerPtr);
 
+    void StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * cb);
+    void DispatchTimerCallbacks(const uint64_t kCurrentEpoch);
+
     typedef void (*TimerCompleteFunct)(Layer * aLayer, void * aAppState, Error aError);
     Error StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aComplete, void * aAppState);
     void CancelTimer(TimerCompleteFunct aOnComplete, void * aAppState);
 
     Error ScheduleWork(TimerCompleteFunct aComplete, void * aAppState);
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     void PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet, fd_set * aExceptionSet, struct timeval & aSleepTime);
     void HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteSet, fd_set * aExceptionSet);
     void WakeSelect(void);
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     typedef Error (*EventHandler)(Object & aTarget, EventType aEventType, uintptr_t aArgument);
@@ -172,6 +177,7 @@ private:
     LayerState mLayerState;
     void * mContext;
     void * mPlatformData;
+    chip::Callback::CallbackDeque mTimerCallbacks;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     static LwIPEventHandlerDelegate sSystemEventHandlerDelegate;
@@ -181,14 +187,14 @@ private:
     bool mTimerComplete;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     int mWakePipeIn;
     int mWakePipeOut;
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     pthread_t mHandleSelectThread;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     static Error HandleSystemLayerEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument);

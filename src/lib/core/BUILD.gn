@@ -112,6 +112,7 @@ source_set("chip_config_header") {
 
 source_set("core") {
   sources = [
+    "CHIPCallback.h",
     "CHIPCircularTLVBuffer.cpp",
     "CHIPCircularTLVBuffer.h",
     "CHIPCore.h",
@@ -145,5 +146,6 @@ source_set("core") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/inet",
     "${chip_root}/src/platform",
+    "${chip_root}/src/system",
   ]
 }

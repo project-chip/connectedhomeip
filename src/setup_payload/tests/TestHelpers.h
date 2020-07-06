@@ -42,7 +42,7 @@ SetupPayload GetDefaultPayload()
     payload.vendorID              = 12;
     payload.productID             = 1;
     payload.requiresCustomFlow    = 0;
-    payload.rendezvousInformation = RendezvousInformationFlags::kSoftAP;
+    payload.rendezvousInformation = RendezvousInformationFlags::kWiFi;
     payload.discriminator         = 128;
     payload.setUpPINCode          = 2048;
 

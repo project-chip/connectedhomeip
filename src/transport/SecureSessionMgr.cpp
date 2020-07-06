@@ -46,6 +46,10 @@ SecureSessionMgr::SecureSessionMgr() : mState(State::kNotReady) {}
 SecureSessionMgr::~SecureSessionMgr()
 {
     CancelExpiryTimer();
+    if (mCB != nullptr)
+    {
+        mCB->Release();
+    }
 }
 
 CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, Inet::InetLayer * inet, const Transport::UdpListenParameters & listenParams)
@@ -56,7 +60,7 @@ CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, Inet::InetLayer * inet, co
     err = mTransport.Init(inet, listenParams);
     SuccessOrExit(err);
 
-    mTransport.SetMessageReceiveHandler(HandleUdpDataReceived, this);
+    mTransport.SetMessageReceiveHandler(HandleDataReceived, this);
     mPeerConnections.SetConnectionExpiredHandler(HandleConnectionExpired, this);
 
     mState       = State::kInitialized;
@@ -85,9 +89,9 @@ CHIP_ERROR SecureSessionMgr::Connect(NodeId peerNodeId, const Transport::PeerAdd
     //   - on new connection for other transports may not be inline.
     //   - determine if logic is required to prevent multiple connections to the
     //     same node or if some connection reuse is required.
-    if (OnNewConnection)
+    if (mCB != nullptr)
     {
-        OnNewConnection(state, mNewConnectionArgument);
+        mCB->OnNewConnection(state, this);
     }
 
 exit:
@@ -134,7 +138,15 @@ CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBuffer
 exit:
     if (msgBuf != NULL)
     {
-        ChipLogProgress(Inet, "Secure transport failed to encrypt msg %u: %s", state->GetSendMessageIndex(), ErrorStr(err));
+        const char * errStr = ErrorStr(err);
+        if (state == nullptr)
+        {
+            ChipLogProgress(Inet, "Secure transport could not find a valid PeerConnection: %s", errStr);
+        }
+        else
+        {
+            ChipLogProgress(Inet, "Secure transport failed to encrypt msg %u: %s", state->GetSendMessageIndex(), errStr);
+        }
         PacketBuffer::Free(msgBuf);
         msgBuf = NULL;
     }
@@ -155,9 +167,9 @@ CHIP_ERROR SecureSessionMgr::AllocateNewConnection(const MessageHeader & header,
         (*state)->SetPeerNodeId(header.GetSourceNodeId().Value());
     }
 
-    if (OnNewConnection)
+    if (mCB != nullptr)
     {
-        OnNewConnection(*state, mNewConnectionArgument);
+        mCB->OnNewConnection(*state, this);
     }
 
 exit:
@@ -180,8 +192,8 @@ void SecureSessionMgr::CancelExpiryTimer(void)
     }
 }
 
-void SecureSessionMgr::HandleUdpDataReceived(const MessageHeader & header, const IPPacketInfo & pktInfo, System::PacketBuffer * msg,
-                                             SecureSessionMgr * connection)
+void SecureSessionMgr::HandleDataReceived(const MessageHeader & header, const PeerAddress & peerAddress, System::PacketBuffer * msg,
+                                          SecureSessionMgr * connection)
 
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
@@ -191,8 +203,6 @@ void SecureSessionMgr::HandleUdpDataReceived(const MessageHeader & header, const
     VerifyOrExit(msg != nullptr, ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
     {
-        PeerAddress peerAddress = PeerAddress::UDP(pktInfo.SrcAddress, pktInfo.SrcPort);
-
         if (!connection->mPeerConnections.FindPeerConnectionState(peerAddress, &state))
         {
             ChipLogProgress(Inet, "New peer connection received.");
@@ -223,9 +233,9 @@ void SecureSessionMgr::HandleUdpDataReceived(const MessageHeader & header, const
         err = state->GetSecureSession().Decrypt(data, len, plainText, header);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Inet, "Secure transport failed to decrypt msg: err %d", err));
 
-        if (connection->OnMessageReceived)
+        if (connection->mCB != nullptr)
         {
-            connection->OnMessageReceived(header, state, msg, connection->mMessageReceivedArgument);
+            connection->mCB->OnMessageReceived(header, state, msg, connection);
             msg = nullptr;
         }
     }
@@ -241,12 +251,9 @@ exit:
         PacketBuffer::Free(msg);
     }
 
-    if (err != CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR && connection->mCB != nullptr)
     {
-        if (connection->OnReceiveError)
-        {
-            connection->OnReceiveError(err, pktInfo);
-        }
+        connection->mCB->OnReceiveError(err, peerAddress, connection);
     }
 }
 

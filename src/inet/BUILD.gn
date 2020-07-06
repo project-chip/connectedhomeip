@@ -93,8 +93,6 @@ source_set("inet") {
   sources = [
     "AsyncDNSResolverSockets.cpp",
     "AsyncDNSResolverSockets.h",
-    "DNSResolver.cpp",
-    "DNSResolver.h",
     "EndPointBasis.cpp",
     "EndPointBasis.h",
     "IANAConstants.h",
@@ -134,6 +132,13 @@ source_set("inet") {
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
   ]
+
+  if (inet_config_enable_dns_resolver) {
+    sources += [
+      "DNSResolver.cpp",
+      "DNSResolver.h",
+    ]
+  }
 
   if (current_os == "linux") {
     sources += [

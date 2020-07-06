@@ -62,7 +62,6 @@ static bool sHaveServiceConnectivity = false;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
-chip::SecureSessionMgr sTransportIPv6;
 
 int AppTask::StartAppTask()
 {
@@ -149,10 +148,6 @@ int AppTask::Init()
         NRF_LOG_INFO("xSemaphoreCreateMutex() failed");
         APP_ERROR_HANDLER(NRF_ERROR_NULL);
     }
-
-    // Init ZCL Data Model
-    InitDataModelHandler();
-    StartServer(&sTransportIPv6);
 
     return ret;
 }

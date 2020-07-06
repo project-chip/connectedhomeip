@@ -24,18 +24,20 @@
 error() {
     echo "$me: *** ERROR: " "${*}"
 }
+
 idf() {
     [[ -d $IDF_PATH && -r $IDF_PATH/export.sh ]] || {
         error "can't find IDF's export.sh, please set IDF_PATH"
         return 1
     }
     (
+        # shellcheck source=/dev/null
         . "$IDF_PATH/export.sh"
         export IDF_PATH
         "$@"
     )
 }
-if [[ ${0} == ${BASH_SOURCE[0]} ]]; then
+if [[ ${0} == "${BASH_SOURCE[0]}" ]]; then
     me=${0##*/}
     idf "${@}"
 else

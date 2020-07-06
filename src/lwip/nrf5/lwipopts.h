@@ -127,8 +127,6 @@
 #define DEFAULT_UDP_RECVMBOX_SIZE 6
 #define DEFAULT_TCP_RECVMBOX_SIZE 6
 
-// TODO: make LWIP_DEBUG conditional on build type
-
 #ifndef LWIP_DEBUG
 #define LWIP_DEBUG 1
 #endif

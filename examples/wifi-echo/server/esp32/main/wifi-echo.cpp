@@ -16,8 +16,10 @@
  */
 
 #include "Button.h"
+#include "CHIPDeviceManager.h"
 #include "DataModelHandler.h"
 #include "Display.h"
+#include "EchoDeviceCallbacks.h"
 #include "LEDWidget.h"
 #include "QRCodeWidget.h"
 #include "esp_event_loop.h"
@@ -42,23 +44,19 @@ using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
 extern void startServer(SecureSessionMgr * transportIPv4, SecureSessionMgr * transportIPv6);
+#if CONFIG_USE_ECHO_CLIENT
 extern void startClient(void);
+#endif // CONFIG_USE_ECHO_CLIENT
 
 #if CONFIG_DEVICE_TYPE_M5STACK
 
-#define ATTENTION_BUTTON_GPIO_NUM GPIO_NUM_37        // Use the right button (button "C") as the attention button on M5Stack
-#define STATUS_LED_GPIO_NUM GPIO_NUM_MAX             // No status LED on M5Stack
-#define LIGHT_SWITCH_ON_BUTTON_GPIO_NUM GPIO_NUM_39  // Use the left button (button "A") as the light switch ON button on M5Stack
-#define LIGHT_SWITCH_OFF_BUTTON_GPIO_NUM GPIO_NUM_38 // Use the middle button (button "B") as the light switch OFF button on M5Stack
-#define LIGHT_CONTROLLER_OUTPUT_GPIO_NUM GPIO_NUM_2  // Use GPIO2 as the light controller output on M5Stack
+#define ATTENTION_BUTTON_GPIO_NUM GPIO_NUM_37 // Use the right button (button "C") as the attention button on M5Stack
+#define STATUS_LED_GPIO_NUM GPIO_NUM_MAX      // No status LED on M5Stack
 
 #elif CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
-#define ATTENTION_BUTTON_GPIO_NUM GPIO_NUM_0         // Use the IO0 button as the attention button on ESP32-DevKitC and compatibles
-#define STATUS_LED_GPIO_NUM GPIO_NUM_2               // Use LED1 (blue LED) as status LED on DevKitC
-#define LIGHT_SWITCH_ON_BUTTON_GPIO_NUM GPIO_NUM_34  // Use GPIO34 as the light switch ON button input on DevKitC
-#define LIGHT_SWITCH_OFF_BUTTON_GPIO_NUM GPIO_NUM_35 // Use GPIO35 as the light switch OFF button input on DevKitC
-#define LIGHT_CONTROLLER_OUTPUT_GPIO_NUM GPIO_NUM_33 // Use GPIO33 as the light controller output on DevKitC
+#define ATTENTION_BUTTON_GPIO_NUM GPIO_NUM_0 // Use the IO0 button as the attention button on ESP32-DevKitC and compatibles
+#define STATUS_LED_GPIO_NUM GPIO_NUM_2       // Use LED1 (blue LED) as status LED on DevKitC
 
 #else // !CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
@@ -81,7 +79,7 @@ static Button attentionButton;
 
 const char * TAG = "wifi-echo-demo";
 
-static void DeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg);
+static EchoDeviceCallbacks EchoCallbacks;
 
 namespace {
 
@@ -122,36 +120,12 @@ extern "C" void app_main()
         return;
     }
 
-    // Initialize the LwIP core lock.  This must be done before the ESP
-    // tcpip_adapter layer is initialized.
-    err = PlatformMgrImpl().InitLwIPCoreLock();
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+
+    err = deviceMgr.Init(&EchoCallbacks);
     if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "PlatformMgr().InitLocks() failed: %s", ErrorStr(err));
-        return;
-    }
-
-    // Initialize the CHIP stack.
-    err = PlatformMgr().InitChipStack();
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "PlatformMgr().InitChipStack() failed: %s", ErrorStr(err));
-        return;
-    }
-
-    // Configure the CHIP Connectivity Manager to always enable the AP. The Station interface
-    // will be enabled automatically if the required configuration is set.
-    ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
-
-    // Register a function to receive events from the CHIP device layer.  Note that calls to
-    // this function will happen on the CHIP event loop thread, not the app_main thread.
-    PlatformMgr().AddEventHandler(DeviceEventHandler, 0);
-
-    // Start a task to run the CHIP Device event loop.
-    err = PlatformMgr().StartEventLoopTask();
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "PlatformMgr().StartEventLoopTask() failed: %s", ErrorStr(err));
+        ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(err));
         return;
     }
 
@@ -205,42 +179,5 @@ extern "C" void app_main()
 #endif // CONFIG_HAVE_DISPLAY
 
         vTaskDelay(50 / portTICK_PERIOD_MS);
-    }
-}
-
-/* Handle events from the CHIP Device layer.
- *
- * NOTE: This function runs on the CHIP event loop task.
- */
-void DeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
-{
-    if (event->Type == DeviceEventType::kInternetConnectivityChange)
-    {
-        if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
-        {
-            tcpip_adapter_ip_info_t ipInfo;
-            if (tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ipInfo) == ESP_OK)
-            {
-                char ipAddrStr[INET_ADDRSTRLEN];
-                IPAddress::FromIPv4(ipInfo.ip).ToString(ipAddrStr, sizeof(ipAddrStr));
-                ESP_LOGI(TAG, "Server ready at: %s:%d", ipAddrStr, CHIP_PORT);
-            }
-        }
-        else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
-        {
-            ESP_LOGE(TAG, "Lost IPv4 connectivity...");
-        }
-        if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
-        {
-            ESP_LOGI(TAG, "IPv6 Server ready...");
-        }
-        else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
-        {
-            ESP_LOGE(TAG, "Lost IPv6 connectivity...");
-        }
-    }
-    if (event->Type == DeviceEventType::kSessionEstablished && event->SessionEstablished.IsCommissioner)
-    {
-        ESP_LOGI(TAG, "Commissioner detected!");
     }
 }

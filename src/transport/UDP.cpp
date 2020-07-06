@@ -122,16 +122,17 @@ exit:
 
 void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * buffer, const IPPacketInfo * pktInfo)
 {
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    UDP * udp         = reinterpret_cast<UDP *>(endPoint->AppState);
-    size_t headerSize = 0;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    UDP * udp               = reinterpret_cast<UDP *>(endPoint->AppState);
+    size_t headerSize       = 0;
+    PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort);
 
     MessageHeader header;
     err = header.Decode(buffer->Start(), buffer->DataLength(), &headerSize);
     SuccessOrExit(err);
 
     buffer->ConsumeHead(headerSize);
-    udp->HandleMessageReceived(header, *pktInfo, buffer);
+    udp->HandleMessageReceived(header, peerAddress, buffer);
 
 exit:
     if (err != CHIP_NO_ERROR)

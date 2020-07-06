@@ -281,7 +281,7 @@ void DoOnOff(DeviceController::ChipDeviceController * controller, Command comman
         zclCommand = CHIP_ZCL_CLUSTER_ON_OFF_SERVER_COMMAND_TOGGLE;
         break;
     default:
-        fprintf(stderr, "Unknown command: %d\n", static_cast<int>(command));
+        fprintf(stderr, "Unknown command: %d\n", command);
         return;
     }
 

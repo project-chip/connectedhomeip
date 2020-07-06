@@ -159,16 +159,17 @@ protected:
     nw_connection_t mConnection;
     dispatch_semaphore_t mConnectionSemaphore;
     dispatch_queue_t mDispatchQueue;
+    dispatch_semaphore_t mSendSemaphore;
 
-    INET_ERROR Bind(IPAddressType aAddressType, IPAddress aAddress, uint16_t aPort, nw_parameters_t aParameters);
-    INET_ERROR ConfigureProtocol(IPAddressType aAddressType, nw_parameters_t aParameters);
+    INET_ERROR Bind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort, const nw_parameters_t & aParameters);
+    INET_ERROR ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters);
     INET_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBuffer * aBuffer, uint16_t aSendFlags);
     INET_ERROR StartListener();
     INET_ERROR GetConnection(const IPPacketInfo * aPktInfo);
-    INET_ERROR GetEndPoint(nw_endpoint_t & aEndpoint, const IPAddress aAddress, uint16_t aPort);
+    INET_ERROR GetEndPoint(nw_endpoint_t & aEndpoint, const IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort);
     INET_ERROR StartConnection(nw_connection_t & aConnection);
-    void GetPacketInfo(nw_connection_t aConnection, IPPacketInfo & aPacketInfo);
-    void HandleDataReceived(nw_connection_t aConnection);
+    void GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo);
+    void HandleDataReceived(const nw_connection_t & aConnection);
     INET_ERROR ReleaseListener();
     INET_ERROR ReleaseConnection();
     void ReleaseAll();

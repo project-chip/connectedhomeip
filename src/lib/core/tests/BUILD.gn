@@ -19,6 +19,7 @@ import("${chip_root}/build/chip_test_suite.gni")
 
 chip_test_suite("tests") {
   common_sources = [
+    "TestCHIPCallback.cpp",
     "TestCHIPErrorStr.cpp",
     "TestCHIPTLV.cpp",
     "TestCore.h",
@@ -34,5 +35,6 @@ chip_test_suite("tests") {
     "TestCHIPErrorStr",
     "TestReferenceCounted",
     "TestCHIPTLV",
+    "TestCHIPCallback",
   ]
 }

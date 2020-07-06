@@ -150,8 +150,7 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress 
     err = mSessionManager->Init(mLocalDeviceId, mInetLayer, Transport::UdpListenParameters().SetAddressType(deviceAddr.Type()));
     SuccessOrExit(err);
 
-    mSessionManager->SetMessageReceiveHandler(OnReceiveMessage, this);
-    mSessionManager->SetNewConnectionHandler(OnNewConnection, this);
+    mSessionManager->SetDelegate(this);
 
     // connected state before 'OnConnect' so that key exchange is accepted
     mConState = kConnectionState_Connected;
@@ -272,12 +271,12 @@ CHIP_ERROR ChipDeviceController::GetLayers(Layer ** systemLayer, InetLayer ** in
 
 void ChipDeviceController::ServiceEvents()
 {
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     if (mState != kState_Initialized)
     {
         return;
     }
+
     // Set the select timeout to 100ms
     struct timeval aSleepTime;
     aSleepTime.tv_sec  = 0;
@@ -300,10 +299,16 @@ void ChipDeviceController::ServiceEvents()
     FD_ZERO(&exceptFDs);
 
     if (mSystemLayer->State() == System::kLayerState_Initialized)
+    {
         mSystemLayer->PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
+    }
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     if (mInetLayer->State == Inet::InetLayer::kState_Initialized)
+    {
         mInetLayer->PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
+    }
+#endif
 
     int selectRes = select(numFDs, &readFDs, &writeFDs, &exceptFDs, &aSleepTime);
     if (selectRes < 0)
@@ -317,11 +322,14 @@ void ChipDeviceController::ServiceEvents()
         mSystemLayer->HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
     }
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     if (mInetLayer->State == Inet::InetLayer::kState_Initialized)
     {
         mInetLayer->HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
     }
 #endif
+
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 }
 
 void ChipDeviceController::ClearRequestState()
@@ -333,32 +341,29 @@ void ChipDeviceController::ClearRequestState()
     }
 }
 
-void ChipDeviceController::OnNewConnection(Transport::PeerConnectionState * state, ChipDeviceController * mgr)
+void ChipDeviceController::OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr)
 {
-    if (mgr->mOnNewConnection)
-    {
-        mgr->mOnNewConnection(mgr, state, mgr->mAppReqState);
-    }
+    mOnNewConnection(this, state, mAppReqState);
 }
 
-void ChipDeviceController::OnReceiveMessage(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                            System::PacketBuffer * msgBuf, ChipDeviceController * mgr)
+void ChipDeviceController::OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
+                                             System::PacketBuffer * msgBuf, SecureSessionMgr * mgr)
 {
     if (header.GetSourceNodeId().HasValue())
     {
-        if (!mgr->mRemoteDeviceId.HasValue())
+        if (!mRemoteDeviceId.HasValue())
         {
             ChipLogProgress(Controller, "Learned remote device id");
-            mgr->mRemoteDeviceId = header.GetSourceNodeId();
+            mRemoteDeviceId = header.GetSourceNodeId();
         }
-        else if (mgr->mRemoteDeviceId != header.GetSourceNodeId())
+        else if (mRemoteDeviceId != header.GetSourceNodeId())
         {
             ChipLogError(Controller, "Received message from an unexpected source node id.");
         }
     }
-    if (mgr->IsSecurelyConnected() && mgr->mOnComplete.Response != NULL)
+    if (IsSecurelyConnected() && mOnComplete.Response != NULL)
     {
-        mgr->mOnComplete.Response(mgr, mgr->mAppReqState, msgBuf);
+        mOnComplete.Response(this, mAppReqState, msgBuf);
     }
 }
 

@@ -154,6 +154,9 @@ public:
     bool HaveServiceConnectivity(void);
 
     // CHIPoBLE service methods
+    typedef void (*BleConnectionReceivedFunct)(BLEEndPoint * endpoint);
+    void AddCHIPoBLEConnectionHandler(BleConnectionReceivedFunct handler);
+    void RemoveCHIPoBLEConnectionHandler(void);
     CHIPoBLEServiceMode GetCHIPoBLEServiceMode(void);
     CHIP_ERROR SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool IsBLEAdvertisingEnabled(void);
@@ -449,6 +452,16 @@ inline void ConnectivityManager::ErasePersistentInfo(void)
 inline bool ConnectivityManager::HaveServiceConnectivityViaThread(void)
 {
     return static_cast<ImplClass *>(this)->_HaveServiceConnectivityViaThread();
+}
+
+inline void ConnectivityManager::AddCHIPoBLEConnectionHandler(BleConnectionReceivedFunct handler)
+{
+    return static_cast<ImplClass *>(this)->_AddCHIPoBLEConnectionHandler(handler);
+}
+
+inline void ConnectivityManager::RemoveCHIPoBLEConnectionHandler(void)
+{
+    return static_cast<ImplClass *>(this)->_RemoveCHIPoBLEConnectionHandler();
 }
 
 inline ConnectivityManager::CHIPoBLEServiceMode ConnectivityManager::GetCHIPoBLEServiceMode(void)
