@@ -267,9 +267,12 @@ def main():
   
   comment_pr_number = extractPrNumberFromRef(args.github_ref)
   if args.github_api_token and args.github_repository and comment_pr_number:
-    sendFileAsPrComment(args.job, args.report_file, args.github_api_token,
-                        args.github_repository,
-                        comment_pr_number, compareResults)
+    try:
+      sendFileAsPrComment(args.job, args.report_file, args.github_api_token,
+                          args.github_repository,
+                          comment_pr_number, compareResults)
+    except Exception as e:
+      logging.warning('Failed to send PR comment: %r', e)
 
 
 if __name__ == '__main__':
