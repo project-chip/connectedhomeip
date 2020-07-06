@@ -29,12 +29,13 @@ jobs:
               run: scripts/examples/esp_echo_app.sh
             - name: Copy aside build products
               run:
-                  mkdir -p example_binaries/$BUILD_TYPE-build; cp
-                  examples/wifi-echo/server/esp32/build/chip-wifi-echo.elf  example_binaries/$BUILD_TYPE-build/chip-wifi-echo.elf
+                  mkdir -p example_binaries/$BUILD_TYPE-build
+                  cp examples/wifi-echo/server/esp32/build/chip-wifi-echo.elf \
+                     example_binaries/$BUILD_TYPE-build/chip-wifi-echo.elf
             - name: Generate bloat report
               # job name MUST match prefix of artifact uploading (sans SHA)
               run: |
-                  mkdir -p "master_binaries/esp32-build"
+                  mkdir -p "master_binaries/$BUILD_TYPE-build"
                   scripts/helpers/bloat_check.py                                                   \
                      --job "${{ env.BUILD_TYPE }}-example-build"                                   \
                      --artifact-download-dir "master_binaries/$BUILD_TYPE-build"                   \
@@ -47,12 +48,6 @@ jobs:
             - name: Copy aside bloat report & binaries
               run: |
                   cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
-                  # cp bloat_report.txt /tmp/bloat_reports/
-            # - name: Uploading Bloat Report
-            #   uses: actions/upload-artifact@v1
-            #   with:
-            #       name: ${{ env.BUILD_TYPE }}-bloat-report
-            #       path: /tmp/bloat_reports/bloat_report.txt
             - name: Uploading Binaries
               uses: actions/upload-artifact@v1
               with:
@@ -81,10 +76,32 @@ jobs:
                   fetch-depth: 0
             - name: Build example nRF5 Lock App
               run: scripts/examples/nrf_lock_app.sh
-            - name: Preserve artifacts
+            - name: Copy aside build products
               run:
-                  mkdir -p example_binaries/nrf-build ; cp
-                  examples/lock-app/nrf5/build/chip-nrf52840-lock-example.out  example_binaries/nrf-build/chip-nrf52840-lock-example.out
+                  mkdir -p example_binaries/nrf-build
+                  cp examples/lock-app/nrf5/build/chip-nrf52840-lock-example.out       \
+                     example_binaries/$BUILD_TYPE-build/chip-nrf52840-lock-example.out
+            - name: Generate bloat report
+              # job name MUST match prefix of artifact uploading (sans SHA)
+              run: |
+                  mkdir -p "master_binaries/$BUILD_TYPE-build"
+                  scripts/helpers/bloat_check.py                                                   \
+                     --job "${{ env.BUILD_TYPE }}-example-build"                                   \
+                     --artifact-download-dir "master_binaries/$BUILD_TYPE-build"                   \
+                     --build-output-dir "example_binaries/$BUILD_TYPE-build"                       \
+                     --report-file bloat_report.txt                                                \
+                     --github-api-token "${{ secrets.GITHUB_TOKEN }}"                              \
+                     --github-repository "${{ github.repository }}"                                \
+                     --github-ref "${{ github.ref }}"                                              \
+                     --git-fork-poin "remotes/origin/${{ github.base_ref }}"
+            - name: Copy aside bloat report & binaries
+              run: |
+                  cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
+            - name: Uploading Binaries
+              uses: actions/upload-artifact@v1
+              with:
+                  name: ${{ env.BUILD_TYPE }}-example-build-${{ github.sha }}
+                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
 
     linux-standalone:
         name: Linux Standalone
@@ -114,5 +131,26 @@ jobs:
               run: |
                   mkdir -p example_binaries/$BUILD_TYPE
                   cp examples/chip-tool/build/chip-standalone-demo.out \
-                     example_binaries/$BUILD_TYPE/chip-standalone-demo.out
+                     example_binaries/$BUILD_TYPE-build/chip-standalone-demo.out
+            - name: Generate bloat report
+              # job name MUST match prefix of artifact uploading (sans SHA)
+              run: |
+                  mkdir -p "master_binaries/$BUILD_TYPE-build"
+                  scripts/helpers/bloat_check.py                                                   \
+                     --job "${{ env.BUILD_TYPE }}-example-build"                                   \
+                     --artifact-download-dir "master_binaries/$BUILD_TYPE-build"                   \
+                     --build-output-dir "example_binaries/$BUILD_TYPE-build"                       \
+                     --report-file bloat_report.txt                                                \
+                     --github-api-token "${{ secrets.GITHUB_TOKEN }}"                              \
+                     --github-repository "${{ github.repository }}"                                \
+                     --github-ref "${{ github.ref }}"                                              \
+                     --git-fork-poin "remotes/origin/${{ github.base_ref }}"
+            - name: Copy aside bloat report & binaries
+              run: |
+                  cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
+            - name: Uploading Binaries
+              uses: actions/upload-artifact@v1
+              with:
+                  name: ${{ env.BUILD_TYPE }}-example-build-${{ github.sha }}
+                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
 
