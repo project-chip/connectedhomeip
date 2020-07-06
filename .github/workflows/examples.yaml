@@ -41,7 +41,7 @@ jobs:
                      --artifact-download-dir "master_binaries/$BUILD_TYPE-build"                   \
                      --build-output-dir "example_binaries/$BUILD_TYPE-build"                       \
                      --report-file bloat_report.txt                                                \
-                     --github-api-token "${{ secrets.GITHUB_TOKEN }}"                              \
+                     --github-api-token "${{ secrets.BLOAT_REPORT }}"                              \
                      --github-repository "${{ github.repository }}"                                \
                      --github-ref "${{ github.ref }}"                                              \
                      --git-fork-poin "remotes/origin/${{ github.base_ref }}"
@@ -90,7 +90,7 @@ jobs:
                      --artifact-download-dir "master_binaries/$BUILD_TYPE-build"                   \
                      --build-output-dir "example_binaries/$BUILD_TYPE-build"                       \
                      --report-file bloat_report.txt                                                \
-                     --github-api-token "${{ secrets.GITHUB_TOKEN }}"                              \
+                     --github-api-token "${{ secrets.BLOAT_REPORT }}"                              \
                      --github-repository "${{ github.repository }}"                                \
                      --github-ref "${{ github.ref }}"                                              \
                      --git-fork-poin "remotes/origin/${{ github.base_ref }}"
@@ -141,7 +141,7 @@ jobs:
                      --artifact-download-dir "master_binaries/$BUILD_TYPE-build"                   \
                      --build-output-dir "example_binaries/$BUILD_TYPE-build"                       \
                      --report-file bloat_report.txt                                                \
-                     --github-api-token "${{ secrets.GITHUB_TOKEN }}"                              \
+                     --github-api-token "${{ secrets.BLOAT_REPORT }}"                              \
                      --github-repository "${{ github.repository }}"                                \
                      --github-ref "${{ github.ref }}"                                              \
                      --git-fork-poin "remotes/origin/${{ github.base_ref }}"
