@@ -32,10 +32,11 @@ jobs:
                   mkdir -p example_binaries/$BUILD_TYPE-build; cp
                   examples/wifi-echo/server/esp32/build/chip-wifi-echo.elf  example_binaries/$BUILD_TYPE-build/chip-wifi-echo.elf
             - name: Generate bloat report
+              # job name MUST match prefix of artifact uploading (sans SHA)
               run: |
                   mkdir -p "master_binaries/esp32-build"
                   scripts/helpers/bloat_check.py                                                   \
-                     --job "${{ env.BUILD_TYPE }} Examples"                                        \
+                     --job "${{ env.BUILD_TYPE }}-example-build"                                   \
                      --artifact-download-dir "master_binaries/$BUILD_TYPE-build"                   \
                      --build-output-dir "example_binaries/$BUILD_TYPE-build"                       \
                      --report-file bloat_report.txt                                                \

@@ -17,8 +17,11 @@
 #
 
 import github
+import io
 import logging
+import requests
 import subprocess
+import zipfile
 
 # Artifacts can be fetched using:
 #   curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/project-chip/connectedhomeip/actions/artifacts
@@ -41,7 +44,7 @@ class ArtifactInfo(github.GithubObject.NonCompletableGithubObject):
     if 'url' in attr:
       self.url = self._makeStringAttribute(attr['url']).value
     if 'archive_download_url' in attr:
-      self.url = self._makeStringAttribute(attr['archive_download_url']).value
+      self.archive_download_url = self._makeStringAttribute(attr['archive_download_url']).value
     if 'expired' in attr:
       self.expired = self._makeBoolAttribute(attr['expired']).value
     if 'created_at' in attr:
@@ -49,14 +52,25 @@ class ArtifactInfo(github.GithubObject.NonCompletableGithubObject):
     if 'updated_at' in attr:
       self.expires_at = self._makeDatetimeAttribute(attr['updated_at']).value
 
+  def downloadBlob(self):
+    url = self.archive_download_url
+    logging.info('Fetching: %r' % url)
+
+    headers, _ = self._requester.requestBlobAndCheck('GET', url)
+
+    if headers['status'] != '302 Found':
+        raise Exception('Expected a redirect during blob download.')
+
+    response = requests.get(headers['location'])
+    response.raise_for_status()
+
+    return response.content
 
 class ArtifactFetcher(github.GithubObject.NonCompletableGithubObject):
 
   def __init__(self, repo):
     self.url = repo.url + '/actions/artifacts'
     self._requester = repo._requester
-
-    logging.info('FETCHER: %r, %r', self.url, repo)
 
   def get_artifacts(self):
     return github.PaginatedList.PaginatedList(
@@ -99,14 +113,23 @@ def fetchArtifactsForJob(jobName, githubToken, githubRepo, downloadDir, forkPoin
   api = github.Github(githubToken)
   repo = api.get_repo(githubRepo)
 
-  commit = repo.get_commit(masterMergeSha)
+  masterArtifactName = '%s-%s' % (jobName, masterMergeSha)
+  logging.info('Searching for artifact: %s' % masterArtifactName)
 
-  # We generally expect a single pull request in master for every such commit
-  for p in commit.get_pulls():
-    logging.info('PULL: %r', p)
-
+  artifact = None
   fetcher = ArtifactFetcher(repo)
   for idx, a in enumerate(fetcher.get_artifacts()):
-    logging.info('%d: Found artifact: %s from %r', idx, a.name, a.created_at)
+    logging.debug('%d: Found artifact: %s from %r', idx, a.name, a.created_at)
 
-  logging.error('NOT YET IMPLEMENTED')
+    if a.name == masterArtifactName:
+        artifact = a
+        break
+
+  if not artifact:
+    logging.error('Artifact not found')
+    return
+
+  zipFile = zipfile.ZipFile(io.BytesIO(artifact.downloadBlob()), 'r')
+
+  logging.info('Extracting zip file to %r' % downloadDir)
+  zipFile.extractall(downloadDir)

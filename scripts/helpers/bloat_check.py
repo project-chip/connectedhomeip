@@ -252,17 +252,6 @@ def main():
     logging.error('Required arguments missing: github_ref is required.')
     return
 
-  comment_pr_number = extractPrNumberFromRef(args.github_ref)
-
-  # TODO(andreilitvin): this needs refactoring and cleanup to fetch artifacts
-  # and process as needed
-  ############################# DEBUG ###############################
-  for n in filter(lambda s: not s.startswith('_'), dir(args)):
-    if 'token' in n:
-      print("Keeping argument '%s' secret..." % (n, ))
-    else:
-      print("Received arg '%s': %r" % (n, getattr(args, n))) 
-
   try:
     github_fetch_artifacts.fetchArtifactsForJob(args.job, args.github_api_token, args.github_repository,
                                                 args.artifact_download_dir, 
@@ -276,13 +265,11 @@ def main():
       args.build_output_dir,
       title="Bloat report for job '%s'" % args.job)
   
+  comment_pr_number = extractPrNumberFromRef(args.github_ref)
   if args.github_api_token and args.github_repository and comment_pr_number:
-    logging.warning('SEND REPORT DISABLED FOR NOW.')
-  #   sendFileAsPrComment(args.job, args.report_file, args.github_api_token,
-  #                       args.github_repository,
-  #                       comment_pr_number, compareResults)
-
-  logging.warning('NOT YET PORTED OVER/IMPLEMENTED')
+    sendFileAsPrComment(args.job, args.report_file, args.github_api_token,
+                        args.github_repository,
+                        comment_pr_number, compareResults)
 
 
 if __name__ == '__main__':
