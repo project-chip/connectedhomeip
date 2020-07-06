@@ -129,7 +129,7 @@ jobs:
               run: scripts/examples/standalone_shell.sh
             - name: Preserve artifacts
               run: |
-                  mkdir -p example_binaries/$BUILD_TYPE
+                  mkdir -p example_binaries/$BUILD_TYPE-build
                   cp examples/chip-tool/build/chip-standalone-demo.out \
                      example_binaries/$BUILD_TYPE-build/chip-standalone-demo.out
             - name: Generate bloat report
