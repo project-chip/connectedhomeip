@@ -29,7 +29,7 @@ jobs:
             - name: DEBUG OUTPUT
               run: git log --oneline -n 20
             - name: DEBUG OUTPUT
-              run: git merge-base --fork-point refs/heads/master
+              run: git merge-base --fork-point remotes/origin/master
             - name: Build example Echo App
               run: scripts/examples/esp_echo_app.sh
             - name: Copy aside build products
