@@ -19,6 +19,8 @@
 #define CHIP_DEVICE_CONTROLLER_H
 
 #import "CHIPError.h"
+#import "ChipBleDelegate.h"
+#import <CoreBluetooth/CoreBluetooth.h>
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -46,6 +48,13 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
 - (BOOL)sendCHIPCommand:(uint16_t)cluster command:(uint16_t)command;
 - (BOOL)disconnect:(NSError * __autoreleasing *)error;
 - (BOOL)isConnected;
+
+@property (strong) PreparationCompleteHandler BleConnectionPreparationCompleteHandler;
+@property (readonly) CBPeripheral * blePeripheral;
+@property (atomic, readonly) dispatch_queue_t WorkQueue;
+@property (atomic, strong, readonly) ChipBleDelegate * mBleDelegate;
+
+- (void)connectBle:(CBPeripheral *)peripheral;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;

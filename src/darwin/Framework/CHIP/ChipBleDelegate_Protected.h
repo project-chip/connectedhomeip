@@ -1,6 +1,8 @@
 /**
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2015-2017 Nest Labs, Inc.
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,20 +17,26 @@
  *    limitations under the License.
  */
 
-// pull together CHIP headers
-#import <CHIP/CHIPDeviceController.h>
-#import <CHIP/CHIPError.h>
-#import <CHIP/CHIPManualSetupPayloadParser.h>
-#import <CHIP/CHIPOnOff.h>
-#import <CHIP/CHIPQRCodeSetupPayloadParser.h>
-#import <CHIP/CHIPSetupPayload.h>
-#import <CHIP/ChipBleDelegate.h>
+/**
+ *    @file
+ *      This file defines the protected part of NLWeaveBleDelegate interface
+ *
+ */
 
-#import <Foundation/Foundation.h>
-//! Project version number for CHIP.
-FOUNDATION_EXPORT double CHIPVersionNumber;
+#import "ChipBleDelegate.h"
 
-//! Project version string for CHIP.
-FOUNDATION_EXPORT const unsigned char CHIPVersionString[];
+namespace chip {
+namespace Ble {
+    class BleLayer;
+    class BlePlatformDelegate;
+    class BleApplicationDelegate;
+}
+}
 
-// In this header, you should import all the public headers of your framework using statements like #import <CHIP/PublicHeader.h>
+@interface ChipBleDelegate ()
+
+- (chip::Ble::BlePlatformDelegate *)GetPlatformDelegate;
+- (chip::Ble::BleApplicationDelegate *)GetApplicationDelegate;
+- (void)SetBleLayer:(chip::Ble::BleLayer *)BleLayer;
+
+@end

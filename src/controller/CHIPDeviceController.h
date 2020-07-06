@@ -47,6 +47,11 @@ typedef void (*CompleteHandler)(ChipDeviceController * deviceController, void * 
 typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err,
                              const IPPacketInfo * pktInfo);
 typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
+#if CONFIG_NETWORK_LAYER_BLE
+typedef void (*BleMessageReceiveHandler)(ChipDeviceController * deviceController, System::PacketBuffer * payload);
+typedef void (*BleNewConnectionHandler)(ChipDeviceController * deviceController);
+typedef void (*BleErrorHandler)(ChipDeviceController * deviceController, BLE_ERROR err);
+#endif // CONFIG_NETWORK_LAYER_BLE
 };
 
 class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback
@@ -161,6 +166,14 @@ public:
 
     virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr);
 
+#if CONFIG_NETWORK_LAYER_BLE
+    CHIP_ERROR InitBle(BlePlatformDelegate * platformDelegate, BleApplicationDelegate * applicationDelegate);
+    CHIP_ERROR ConnectBle(BLE_CONNECTION_OBJECT connObj, BleNewConnectionHandler onBleConnection,
+                          BleMessageReceiveHandler onBleMessage, BleErrorHandler onBleError);
+    CHIP_ERROR DisconnectBle(BLE_CONNECTION_OBJECT connObj);
+    CHIP_ERROR SendBleMessage(PacketBuffer * buffer);
+#endif // CONFIG_NETWORK_LAYER_BLE
+
 private:
     enum
     {
@@ -204,6 +217,18 @@ private:
 
     void ClearRequestState();
     void ClearOpState();
+
+#if CONFIG_NETWORK_LAYER_BLE
+    BleLayer mBleLayer;
+    BLEEndPoint * mBleEndPoint;
+    BleErrorHandler mOnBleError;
+    BleNewConnectionHandler mOnBleConnection;
+    BleMessageReceiveHandler mOnBleMessage;
+
+    static void HandleBleConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err);
+    static void HandleBleConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err);
+    static void HandleBleMessageReceived(BLEEndPoint * endPoint, PacketBuffer * data);
+#endif // CONFIG_NETWORK_LAYER_BLE
 };
 
 } // namespace DeviceController

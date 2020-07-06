@@ -27,10 +27,12 @@ extern "C" {
 #import "CHIPError.h"
 #import "CHIPLogging.h"
 
+#import "ChipBleDelegate_Protected.h"
 #include <controller/CHIPDeviceController.h>
 #include <inet/IPAddress.h>
 #include <system/SystemPacketBuffer.h>
 
+static const char * const CHIP_WORK_QUEUE = "com.zigbee.chip.work";
 static const char * const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
 
 // NOTE: Remote device ID is in sync with the echo server device id
@@ -85,6 +87,11 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
 
         _lock = [[NSRecursiveLock alloc] init];
 
+        _WorkQueue = dispatch_queue_create(CHIP_WORK_QUEUE, DISPATCH_QUEUE_SERIAL);
+        if (!_WorkQueue) {
+            return nil;
+        }
+
         _chipSelectQueue = dispatch_queue_create(CHIP_SELECT_QUEUE, DISPATCH_QUEUE_SERIAL);
         if (!_chipSelectQueue) {
             return nil;
@@ -102,6 +109,12 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
             _cppController = NULL;
             return nil;
         }
+
+        _mBleDelegate = [[ChipBleDelegate alloc] init:dispatch_get_main_queue()];
+        if (!_mBleDelegate) {
+            CHIP_LOG_ERROR("Error: couldn't initialize BLE");
+        }
+        _cppController->InitBle([_mBleDelegate GetPlatformDelegate], [_mBleDelegate GetApplicationDelegate]);
     }
     return self;
 }
@@ -357,6 +370,60 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     self.appCallbackQueue = appCallbackQueue;
     self.onMessageHandler = onMessage;
     self.onErrorHandler = onError;
+}
+
+// TODO Get this code one level up, so it is easily accessible from the application
+static void onBleError(chip::DeviceController::ChipDeviceController * deviceController, BLE_ERROR err)
+{
+    CHIP_LOG_DEBUG("BleConnection: Error (%d)", err);
+}
+
+// TODO Get this code one level up, so it is easily accessible from the application
+static void onBleConnection(chip::DeviceController::ChipDeviceController * deviceController)
+{
+    CHIP_LOG_DEBUG("BleConnection: Success");
+
+    const char * str = "ping";
+    chip::System::PacketBuffer * buffer = chip::System::PacketBuffer::NewWithAvailableSize(strlen(str));
+    snprintf((char *) buffer->Start(), strlen(str) + 1, "%s", str);
+    buffer->SetDataLength(strlen(str));
+
+    deviceController->SendBleMessage(buffer);
+}
+
+// TODO Get this code one level up, so it is easily accessible from the application
+static void onBleMessage(chip::DeviceController::ChipDeviceController * deviceController, chip::System::PacketBuffer * buffer)
+{
+    size_t data_len = buffer->DataLength();
+    NSMutableData * dataBuffer = [[NSMutableData alloc] initWithBytes:buffer->Start() length:data_len];
+    buffer = buffer->Next();
+
+    while (buffer != NULL) {
+        data_len = buffer->DataLength();
+        [dataBuffer appendBytes:buffer->Start() length:data_len];
+        buffer = buffer->Next();
+    }
+
+    NSString * strData = [[NSString alloc] initWithData:dataBuffer encoding:NSUTF8StringEncoding];
+    CHIP_LOG_DEBUG("BleConnection: Message (%@)", strData);
+}
+
+- (void)connectBle:(CBPeripheral *)peripheral
+{
+    _blePeripheral = peripheral;
+
+    // this will be called when the preparation completes one CHIP work queue
+    _BleConnectionPreparationCompleteHandler = ^(CHIPDeviceController * dm, CHIP_ERROR err) {
+        if (CHIP_NO_ERROR == err) {
+            _cppController->ConnectBle((__bridge void *) peripheral, onBleConnection, onBleMessage, onBleError);
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            CHIP_LOG_ERROR("Error while setting up BLE connection");
+        }
+    };
+
+    [_mBleDelegate prepareNewBleConnection:self];
 }
 
 @end

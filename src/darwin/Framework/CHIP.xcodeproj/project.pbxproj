@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1E42A3FD24B3422E00E2BAD0 /* ChipBleDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1E42A3FC24B3422D00E2BAD0 /* ChipBleDelegate.mm */; };
+		1E42A40224B367C200E2BAD0 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E42A40124B367C200E2BAD0 /* CoreBluetooth.framework */; };
+		1E42A40524B369E800E2BAD0 /* ChipBleDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 1E42A3F524B33D1100E2BAD0 /* ChipBleDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C4DF09E248B2C60009307CB /* libmbedtls.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C4DF09D248B2C60009307CB /* libmbedtls.a */; };
 		515C401C2486BF43004C4DB3 /* CHIPOnOff.mm in Sources */ = {isa = PBXBuildFile; fileRef = 515C401A2486BF43004C4DB3 /* CHIPOnOff.mm */; };
 		515C401D2486BF43004C4DB3 /* CHIPOnOff.h in Headers */ = {isa = PBXBuildFile; fileRef = 515C401B2486BF43004C4DB3 /* CHIPOnOff.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -41,6 +44,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1E42A3F524B33D1100E2BAD0 /* ChipBleDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ChipBleDelegate.h; sourceTree = "<group>"; };
+		1E42A3FC24B3422D00E2BAD0 /* ChipBleDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ChipBleDelegate.mm; sourceTree = "<group>"; };
+		1E42A3FE24B342FE00E2BAD0 /* ChipBleDelegate_Protected.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ChipBleDelegate_Protected.h; sourceTree = "<group>"; };
+		1E42A40124B367C200E2BAD0 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		2C4DF09D248B2C60009307CB /* libmbedtls.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedtls.a; path = lib/libmbedtls.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		515C401A2486BF43004C4DB3 /* CHIPOnOff.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPOnOff.mm; sourceTree = "<group>"; };
 		515C401B2486BF43004C4DB3 /* CHIPOnOff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPOnOff.h; sourceTree = "<group>"; };
@@ -72,6 +79,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1E42A40224B367C200E2BAD0 /* CoreBluetooth.framework in Frameworks */,
 				BA09EB43247477BA00605257 /* libCHIP.a in Frameworks */,
 				2C4DF09E248B2C60009307CB /* libmbedtls.a in Frameworks */,
 				BA09EB44247477BC00605257 /* libSetupPayload.a in Frameworks */,
@@ -128,6 +136,9 @@
 				515C401B2486BF43004C4DB3 /* CHIPOnOff.h */,
 				515C401A2486BF43004C4DB3 /* CHIPOnOff.mm */,
 				B20252912459E34F00F97062 /* Info.plist */,
+				1E42A3F524B33D1100E2BAD0 /* ChipBleDelegate.h */,
+				1E42A3FC24B3422D00E2BAD0 /* ChipBleDelegate.mm */,
+				1E42A3FE24B342FE00E2BAD0 /* ChipBleDelegate_Protected.h */,
 			);
 			path = CHIP;
 			sourceTree = "<group>";
@@ -144,6 +155,7 @@
 		BA09EB3E2474762900605257 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1E42A40124B367C200E2BAD0 /* CoreBluetooth.framework */,
 				2C4DF09D248B2C60009307CB /* libmbedtls.a */,
 				BA09EB3F2474762900605257 /* libCHIP.a */,
 				BA09EB402474762900605257 /* libSetupPayload.a */,
@@ -163,6 +175,7 @@
 				B2E0D7B1245B0B5C003C5B48 /* CHIP.h in Headers */,
 				B2E0D7B8245B0B5C003C5B48 /* CHIPSetupPayload.h in Headers */,
 				B2E0D7B5245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.h in Headers */,
+				1E42A40524B369E800E2BAD0 /* ChipBleDelegate.h in Headers */,
 				515C401D2486BF43004C4DB3 /* CHIPOnOff.h in Headers */,
 				991DC08B247704DC00C13860 /* CHIPLogging.h in Headers */,
 				B2E0D7B4245B0B5C003C5B48 /* CHIPError.h in Headers */,
@@ -292,6 +305,7 @@
 			files = (
 				515C401C2486BF43004C4DB3 /* CHIPOnOff.mm in Sources */,
 				991DC0892475F47D00C13860 /* CHIPDeviceController.mm in Sources */,
+				1E42A3FD24B3422E00E2BAD0 /* ChipBleDelegate.mm in Sources */,
 				B2E0D7B7245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.mm in Sources */,
 				C4C222C02475A38700984173 /* CHIPLogging.mm in Sources */,
 				B2E0D7B3245B0B5C003C5B48 /* CHIPError.mm in Sources */,

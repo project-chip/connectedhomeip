@@ -50,6 +50,7 @@
 		0C47BE4324885B97005E97F6 /* CHIPViewControllerBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHIPViewControllerBase.m; sourceTree = "<group>"; };
 		0CA0E0CD248599BB009087B9 /* OnOffViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OnOffViewController.h; sourceTree = "<group>"; };
 		0CA0E0CE248599BB009087B9 /* OnOffViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OnOffViewController.m; sourceTree = "<group>"; };
+		1E42A3FF24B3679400E2BAD0 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		1E87C7B424A5E57100457C90 /* BLEConnectionController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLEConnectionController.h; sourceTree = "<group>"; };
 		1E87C7B524A5E74E00457C90 /* BLEConnectionController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLEConnectionController.m; sourceTree = "<group>"; };
 		515C401824868BF0004C4DB3 /* CHIPViewControllerBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPViewControllerBase.h; sourceTree = "<group>"; };
@@ -123,6 +124,7 @@
 		B20252DE2459EC7600F97062 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1E42A3FF24B3679400E2BAD0 /* CoreBluetooth.framework */,
 				B2E0D7BE245B0C59003C5B48 /* CHIP.framework */,
 			);
 			name = Frameworks;

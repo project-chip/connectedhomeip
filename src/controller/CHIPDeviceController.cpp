@@ -31,6 +31,9 @@
 // module header, comes first
 #include <controller/CHIPDeviceController.h>
 
+#if CONFIG_NETWORK_LAYER_BLE
+#include <ble/BleLayer.h>
+#endif // CONFIG_NETWORK_LAYER_BLE
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <support/Base64.h>
@@ -62,6 +65,11 @@ ChipDeviceController::ChipDeviceController()
     mDevicePort      = CHIP_PORT;
     mLocalDeviceId   = 0;
     memset(&mOnComplete, 0, sizeof(mOnComplete));
+#if CONFIG_NETWORK_LAYER_BLE
+    mOnBleError      = NULL;
+    mOnBleConnection = NULL;
+    mOnBleMessage    = NULL;
+#endif // CONFIG_NETWORK_LAYER_BLE
 }
 
 CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId)
@@ -124,6 +132,18 @@ CHIP_ERROR ChipDeviceController::Shutdown()
     mOnNewConnection = NULL;
     mMessageNumber   = 0;
     mRemoteDeviceId.ClearValue();
+
+#if CONFIG_NETWORK_LAYER_BLE
+    if (mBleEndPoint != NULL)
+    {
+        mBleEndPoint->Close();
+        mBleEndPoint = NULL;
+    }
+
+    mOnBleError      = NULL;
+    mOnBleConnection = NULL;
+    mOnBleMessage    = NULL;
+#endif // CONFIG_NETWORK_LAYER_BLE
 
     return err;
 }
@@ -366,6 +386,97 @@ void ChipDeviceController::OnMessageReceived(const MessageHeader & header, Trans
         mOnComplete.Response(this, mAppReqState, msgBuf);
     }
 }
+
+#if CONFIG_NETWORK_LAYER_BLE
+
+CHIP_ERROR ChipDeviceController::InitBle(BlePlatformDelegate * platformDelegate, BleApplicationDelegate * applicationDelegate)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = mBleLayer.Init(platformDelegate, applicationDelegate, mSystemLayer);
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
+
+CHIP_ERROR ChipDeviceController::ConnectBle(BLE_CONNECTION_OBJECT connObj, BleNewConnectionHandler onBleConnection,
+                                            BleMessageReceiveHandler onBleMessage, BleErrorHandler onBleError)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    err            = mBleLayer.NewBleEndPoint(&mBleEndPoint, connObj, kBleRole_Central, true);
+    SuccessOrExit(err);
+
+    // Set up callbacks we need to negotiate CHIPoBle connection.
+    mBleEndPoint->mAppState          = this;
+    mBleEndPoint->OnConnectComplete  = HandleBleConnectComplete;
+    mBleEndPoint->OnConnectionClosed = HandleBleConnectionClosed;
+    mBleEndPoint->OnMessageReceived  = HandleBleMessageReceived;
+
+    // Initiate CHIP over BLE protocol connection.
+    err = mBleEndPoint->StartConnect();
+    SuccessOrExit(err);
+
+    mOnBleConnection = onBleConnection;
+    mOnBleMessage    = onBleMessage;
+    mOnBleError      = onBleError;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR ChipDeviceController::DisconnectBle(BLE_CONNECTION_OBJECT connObj)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
+
+CHIP_ERROR ChipDeviceController::SendBleMessage(PacketBuffer * buffer)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(mBleEndPoint, err = CHIP_ERROR_INCORRECT_STATE);
+
+    mBleEndPoint->Send(buffer);
+
+exit:
+    return err;
+}
+
+void ChipDeviceController::HandleBleConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err)
+{
+    ChipDeviceController * dc = (ChipDeviceController *) endPoint->mAppState;
+    if (dc && dc->mOnBleConnection != NULL)
+    {
+        dc->mOnBleConnection(dc);
+    }
+}
+
+void ChipDeviceController::HandleBleConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)
+{
+    ChipDeviceController * dc = (ChipDeviceController *) endPoint->mAppState;
+    if (dc && dc->mOnBleError != NULL)
+    {
+        dc->mOnBleError(dc, err);
+    }
+}
+
+void ChipDeviceController::HandleBleMessageReceived(BLEEndPoint * endPoint, PacketBuffer * data)
+{
+
+    ChipDeviceController * dc = (ChipDeviceController *) endPoint->mAppState;
+    if (dc && dc->mOnBleMessage != NULL)
+    {
+        dc->mOnBleMessage(dc, data);
+    }
+}
+
+#endif // CONFIG_NETWORK_LAYER_BLE
 
 } // namespace DeviceController
 } // namespace chip

@@ -16,6 +16,7 @@
  */
 
 #import "BLEConnectionController.h"
+#import <CHIP/CHIP.h>
 
 @interface BLEConnectionController ()
 
@@ -72,6 +73,14 @@
         [self connect:peripheral];
         [self stopScanning];
     }
+}
+
+- (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
+{
+    NSLog(@"Did connect to peripheral: %@", peripheral);
+
+    [peripheral setDelegate:[[CHIPDeviceController sharedController] mBleDelegate]];
+    [[CHIPDeviceController sharedController] connectBle:peripheral];
 }
 
 - (void)start
