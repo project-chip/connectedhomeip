@@ -194,15 +194,9 @@ DEFINES = \
     NRF52840_XXAA \
     NRFX_PRS_ENABLED=0 \
     NRF_SD_BLE_API_VERSION=7 \
-    OPENTHREAD_CONFIG_COAP_API_ENABLE \
-    OPENTHREAD_CONFIG_ENABLE_BUILTIN_MBEDTLS=0 \
-    OPENTHREAD_CONFIG_FILE=\"openthread-config-wrap.h\" \
-    OPENTHREAD_FTD=1 \
     PRINTF_DISABLE_SUPPORT_EXPONENTIAL \
     S140 \
     SOFTDEVICE_PRESENT \
-    THREAD_EXAMPLE_COAP_SERVER=1 \
-    THREAD_EXAMPLE_FREERTOS=1 \
     UART0_ENABLED=0 \
     UART1_ENABLED=1 \
     USE_APP_CONFIG \
@@ -210,9 +204,12 @@ DEFINES = \
     __STACK_SIZE=8192 \
 
 LIBS = \
-    $(NRF5_SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-cli-ftd.a \
-    $(NRF5_SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-ftd.a \
-    $(NRF5_SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-platform-utils.a \
+    -lopenthread-cli-ftd \
+    -lopenthread-ftd \
+    -lopenthread-platform-utils \
+    -lopenthread-nrf52840-transport \
+    -lopenthread-nrf52840-softdevice-sdk \
+    -lnordicsemi-nrf52840-radio-driver-softdevice \
     $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_glue.a \
     $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_glue_cc310.a \
     $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_glue_vanilla.a \
@@ -222,19 +219,6 @@ LIBS = \
     $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedtls_tls_vanilla.a \
     $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedtls_x509_vanilla.a \
     $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libnrf_cc310_platform_0.9.1.a \
-    $(NRF5_SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-nrf52840-softdevice-sdk.a \
-    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_glue.a \
-    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_glue_cc310.a \
-    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_glue_vanilla.a \
-    $(NRF5_SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libnordicsemi-nrf52840-radio-driver-softdevice.a \
-    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_cc310_backend.a \
-    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_vanilla_backend.a \
-    $(NRF5_SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-platform-utils.a \
-    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedtls_base_vanilla.a \
-    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedtls_tls_vanilla.a \
-    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedtls_x509_vanilla.a \
-    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libnrf_cc310_platform_0.9.1.a \
-    $(NRF5_SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-ftd.a \
 
 CFLAGS = \
     --specs=nano.specs
