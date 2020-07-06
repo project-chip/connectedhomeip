@@ -20,7 +20,7 @@
 #      This file is the CMake template for building CHIP SDK lock-app example for Nordic nRF52840.
 #
 
-# include("${PROJECT_SOURCE_DIR}/third_party/connectedhomeip/CMakeLists.txt")
+set(NRF5_PLATFORM_DIR ${PROJECT_SOURCE_DIR}/examples/platform/nrf528xx)
 
 set(COMMON_INCLUDES
     ${PROJECT_SOURCE_DIR}/src
@@ -34,6 +34,10 @@ set(COMMON_INCLUDES
     ${PROJECT_SOURCE_DIR}/src/inet
     ${PROJECT_SOURCE_DIR}/src/platform
     ${PROJECT_SOURCE_DIR}/examples/lock-app/nrf5/main/include
+
+    ${NRF5_PLATFORM_DIR}/app/include
+    ${NRF5_PLATFORM_DIR}/app/project_include
+    ${NRF5_PLATFORM_DIR}/util/include
 
     ${NRF5_SDK_ROOT}/components
     ${NRF5_SDK_ROOT}/components/boards
@@ -173,13 +177,14 @@ add_executable(lock-app
     main/AppTask.cpp
     main/BoltLockManager.cpp
     main/DataModelHandler.cpp
-    main/LEDWidget.cpp
     main/main.cpp
-    main/Server.cpp
-#    main/support/AltPrintf.c
-#    main/support/CXXExceptionStubs.cpp
-    main/support/FreeRTOSNewlibLockSupport.c
-    main/support/nRF5Sbrk.c
+
+    ${NRF5_PLATFORM_DIR}/app/support/CXXExceptionStubs.cpp
+    ${NRF5_PLATFORM_DIR}/app/support/nRF5Sbrk.c
+    ${NRF5_PLATFORM_DIR}/app/support/FreeRTOSNewlibLockSupport.c
+    ${NRF5_PLATFORM_DIR}/app/Server.cpp
+    ${NRF5_PLATFORM_DIR}/app/chipinit.cpp
+    ${NRF5_PLATFORM_DIR}/util/LEDWidget.cpp
 
     ${NRF5_SDK_ROOT}/components/ble/common/ble_advdata.c
     ${NRF5_SDK_ROOT}/components/ble/common/ble_srv_common.c

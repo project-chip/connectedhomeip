@@ -25,7 +25,7 @@ include("${PROJECT_SOURCE_DIR}/integrations/cmake/toolchains/arm-none-eabi.cmake
 set(NRF5_SDK_ROOT $ENV{NRF5_SDK_ROOT})
 
 if(NOT DEFINED LINKER_SCRIPT)
-    set(LINKER_SCRIPT "${PROJECT_SOURCE_DIR}/examples/lock-app/nrf5/main/ldscripts/chip-nrf52840-lock-example.ld")
+    set(LINKER_SCRIPT "${PROJECT_SOURCE_DIR}/examples/platform/nrf528xx/app/ldscripts/chip-nrf52840-example.ld")
     message("Warning: No linker script defined -- using default.")
 endif(NOT DEFINED LINKER_SCRIPT)
 message("Linker script: ${LINKER_SCRIPT}")
