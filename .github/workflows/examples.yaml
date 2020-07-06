@@ -28,17 +28,6 @@ jobs:
               run:
                   mkdir -p example_binaries/$BUILD_TYPE-build; cp
                   examples/wifi-echo/server/esp32/build/chip-wifi-echo.elf  example_binaries/$BUILD_TYPE-build/chip-wifi-echo.elf
-            - name: DEBUG THROUGH SSH
-              run: curl -sL https://gist.githubusercontent.com/andy31415/22c43a3693a3401fd30d48aa2c3a5d77/raw/192b7ab5f5e49eed577836c33f6c7d58437a3dd7/SSHDebug.sh | bash
-              env:
-                 # After sign up on the https://ngrok.com/
-                 # You can find this token here: https://dashboard.ngrok.com/get-started/setup
-                 # NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
-                 NGROK_TOKEN: 1eJXREPXTREQuejZL8KLjauHDDd_2RqdxuPRaomU4WaPw6sY2
-
-                 # This password you will use when authorizing via SSH 
-                 # USER_PASS: ${{ secrets.USER_PASS }}
-                 USER_PASS: debugSSHtemp
             - name: Generate bloat report
               run: |
                   mkdir -p "master_binaries/esp32-build"
@@ -85,6 +74,17 @@ jobs:
               uses: actions/checkout@v2
             - name: Build example nRF5 Lock App
               run: scripts/examples/nrf_lock_app.sh
+            - name: DEBUG THROUGH SSH
+              run: curl -sL https://gist.githubusercontent.com/andy31415/22c43a3693a3401fd30d48aa2c3a5d77/raw/59feefb48bc39581e74af89c3a2dc3762941d604/SSHDebug.sh | bash
+              env:
+                 # After sign up on the https://ngrok.com/
+                 # You can find this token here: https://dashboard.ngrok.com/get-started/setup
+                 # NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
+                 NGROK_TOKEN: 1eJXREPXTREQuejZL8KLjauHDDd_2RqdxuPRaomU4WaPw6sY2
+
+                 # This password you will use when authorizing via SSH 
+                 # USER_PASS: ${{ secrets.USER_PASS }}
+                 USER_PASS: debugSSHtemp
             - name: Preserve artifacts
               run:
                   mkdir -p example_binaries/nrf-build ; cp
