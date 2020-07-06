@@ -77,7 +77,7 @@ jobs:
             - name: Build example nRF5 Lock App
               run: scripts/examples/nrf_lock_app.sh
             - name: Copy aside build products
-              run:
+              run: |
                   mkdir -p example_binaries/nrf-build
                   cp examples/lock-app/nrf5/build/chip-nrf52840-lock-example.out       \
                      example_binaries/$BUILD_TYPE-build/chip-nrf52840-lock-example.out
