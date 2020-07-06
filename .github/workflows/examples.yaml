@@ -28,7 +28,7 @@ jobs:
             - name: Build example Echo App
               run: scripts/examples/esp_echo_app.sh
             - name: Copy aside build products
-              run:
+              run: |
                   mkdir -p example_binaries/$BUILD_TYPE-build
                   cp examples/wifi-echo/server/esp32/build/chip-wifi-echo.elf \
                      example_binaries/$BUILD_TYPE-build/chip-wifi-echo.elf
