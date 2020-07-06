@@ -39,11 +39,13 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <support/ErrorStr.h>
 #include <transport/SecureSessionMgr.h>
+#include <setup_payload/SetupPayload.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
 extern void startServer(SecureSessionMgr * transportIPv4, SecureSessionMgr * transportIPv6);
+extern void startBle();
 #if CONFIG_USE_ECHO_CLIENT
 extern void startClient(void);
 #endif // CONFIG_USE_ECHO_CLIENT
@@ -134,6 +136,12 @@ extern "C" void app_main()
     // Start the Echo Server
     InitDataModelHandler();
     startServer(&sTransportIPv4, &sTransportIPv6);
+
+    if (static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kBLE)
+    {
+        startBle();
+    }
+
 #if CONFIG_USE_ECHO_CLIENT
     startClient();
 #endif
