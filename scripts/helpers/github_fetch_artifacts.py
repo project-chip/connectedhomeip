@@ -80,7 +80,7 @@ def fetchMasterMergeCommitSHA(revStr):
     logging.info('Parsed revision %r base result: %r' % (revStr, result))
   else:
     result = subprocess.run(
-        'git merge-base --fork-point master'.split(),
+        'git merge-base --fork-point refs/heads/master'.split(),
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
     ).stdout.decode('utf8')
