@@ -28,8 +28,8 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-using namespace ::nl;
-using namespace ::nl::Ble;
+using namespace ::chip;
+using namespace ::chip::Ble;
 
 namespace chip {
 namespace DeviceLayer {

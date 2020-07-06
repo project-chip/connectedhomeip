@@ -78,24 +78,6 @@ exit:
     return err;
 }
 
-WEAVE_ERROR
-ConfigurationManagerImpl::_GetDeviceDescriptor(::nl::Weave::Profiles::DeviceDescription::WeaveDeviceDescriptor & deviceDesc)
-{
-    WEAVE_ERROR err;
-
-    // Call the generic version of _GetDeviceDescriptor() supplied by the base class.
-    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_GetDeviceDescriptor(deviceDesc);
-    SuccessOrExit(err);
-
-exit:
-    return err;
-}
-
-::chip::Profiles::Security::AppKeys::GroupKeyStoreBase * ConfigurationManagerImpl::_GetGroupKeyStore()
-{
-    return &gGroupKeyStore;
-}
-
 bool ConfigurationManagerImpl::_CanFactoryReset()
 {
     // TODO: query the application to determine if factory reset is allowed.
