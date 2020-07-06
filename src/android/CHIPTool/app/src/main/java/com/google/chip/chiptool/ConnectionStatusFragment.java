@@ -35,10 +35,10 @@ public class ConnectionStatusFragment extends Fragment {
   @Override
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    View inflated = inflater.inflate(R.xml.connection_status_fragment, container, false);
+    View inflated = inflater.inflate(R.layout.connection_status_fragment, container, false);
 
     TextView statusView = (TextView) inflated.findViewById(R.id.connection_status);
-    statusView.setText(CHIPNativeBridge.getInstance().getConnectionInfo());
+    // statusView.setText(CHIPNativeBridge.getInstance().getConnectionInfo());
 
     return inflated;
   }
@@ -50,7 +50,7 @@ public class ConnectionStatusFragment extends Fragment {
 
   private void updateStatusInternal() {
     TextView statusView = (TextView) getView().findViewById(R.id.connection_status);
-    statusView.setText(CHIPNativeBridge.getInstance().getConnectionInfo());
+    // statusView.setText(CHIPNativeBridge.getInstance().getConnectionInfo());
   }
 
   // Should be called by an activity after status connection has changed or when the

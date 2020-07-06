@@ -16,7 +16,7 @@
  *
  */
 
-package com.google.chip.chiptool;
+package com.google.chip.chiptool.setuppayloadscanner;
 
 import android.Manifest;
 import android.content.Context;
