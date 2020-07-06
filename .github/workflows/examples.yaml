@@ -27,7 +27,7 @@ jobs:
             - name: DEBUG OUTPUT
               run: git branch -la
             - name: DEBUG OUTPUT
-              run: git log --oneline -n 20
+              run: git log --oneline -n 100
             - name: DEBUG OUTPUT
               run: git merge-base --fork-point remotes/origin/master
             - name: Build example Echo App
