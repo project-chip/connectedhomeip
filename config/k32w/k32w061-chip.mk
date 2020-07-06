@@ -1,6 +1,5 @@
 #
-#   Copyright (c) 2020 Google LLC.
-#   All rights reserved.
+#   Copyright (c) 2020 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -17,24 +16,24 @@
 
 #
 #   @file
-#         Component makefile for incorporating OpenWeave into a k32w061
+#         Component makefile for incorporating CHIP into a k32w061
 #         application.
 #
 #   This makefile is intended to work in conjunction with the k32w061-app.mk
-#   makefile to build the OpenWeave example applications on NXP platforms.
+#   makefile to build the CHIP example applications on NXP platforms.
 #   k32w061 applications should include this file in their top level Makefile
 #   after including k32w061-app.mk.  E.g.:
 #
 #       PROJECT_ROOT = $(realpath .)
 #
-#       BUILD_SUPPORT_DIR = $(PROJECT_ROOT)/third_party/openweave-core/build/k32w061
+#       BUILD_SUPPORT_DIR = $(PROJECT_ROOT)/third_party/connectedhomeip/config/k32w
 #
 #       include $(BUILD_SUPPORT_DIR)/k32w061-app.mk
-#       include $(BUILD_SUPPORT_DIR)/k32w061-openweave.mk
+#       include $(BUILD_SUPPORT_DIR)/k32w061-chip.mk
 #
 #       PROJECT_ROOT := $(realpath .)
 #
-#       APP := openweave-k32w061-bringup
+#       APP := chip-k32w061-bringup
 #
 #       SRCS = \
 #           $(PROJECT_ROOT)/main.cpp \
@@ -46,46 +45,45 @@
 # General settings
 # ==================================================
 
-# Location of OpenWeave source tree
-OPENWEAVE_ROOT ?= $(PROJECT_ROOT)/third_party/openweave-core
+# Location of CHIP source tree
+CHIP_ROOT ?= $(PROJECT_ROOT)/third_party/connectedhomeip
 
-# Archtecture for which OpenWeave will be built.
-OPENWEAVE_HOST_ARCH := armv7-unknown-linux-gnu
+# Archtecture for which CHIP will be built.
+CHIP_HOST_ARCH := armv7-unknown-linux-gnu
 
-# Directory into which the OpenWeave build system will place its output.
-OPENWEAVE_OUTPUT_DIR = $(OUTPUT_DIR)/openweave
+# Directory into which the CHIP build system will place its output.
+CHIP_OUTPUT_DIR = $(OUTPUT_DIR)/chip
 
 # An optional file containing application-specific configuration overrides.
-OPENWEAVE_PROJECT_CONFIG = $(wildcard $(PROJECT_ROOT)/WeaveProjectConfig.h)
+CHIP_PROJECT_CONFIG = $(wildcard $(PROJECT_ROOT)/include/CHIPProjectConfig.h)
 
-# Architcture on which OpenWeave is being built.
-OPENWEAVE_BUILD_ARCH = $(shell $(OPENWEAVE_ROOT)/third_party/nlbuild-autotools/repo/third_party/autoconf/config.guess | sed -e 's/[[:digit:].]*$$//g')
-
+# Architcture on which CHIP is being built.
+CHIP_BUILD_ARCH = $(shell $(CHIP_ROOT)/third_party/nlbuild-autotools/repo/third_party/autoconf/config.guess | sed -e 's/[[:digit:].]*$$//g')
 
 # ==================================================
-# Compilation flags specific to building OpenWeave
+# Compilation flags specific to building CHIP
 # ==================================================
 
-OPENWEAVE_DEFINES += \
+CHIP_DEFINES += \
     NEW_OPENTHREAD_API
 
-OPENWEAVE_DEFINE_FLAGS = $(foreach def,$(OPENWEAVE_DEFINES),-D$(def))
-OPENWEAVE_CPPFLAGS = $(STD_CFLAGS) $(CFLAGS) $(DEBUG_FLAGS) $(OPT_FLAGS) $(DEFINE_FLAGS) $(OPENWEAVE_DEFINE_FLAGS) $(INC_FLAGS)
-OPENWEAVE_CXXFLAGS = $(STD_CXXFLAGS) $(CXXFLAGS)
+CHIP_DEFINE_FLAGS = $(foreach def,$(CHIP_DEFINES),-D$(def))
+CHIP_CPPFLAGS = $(STD_CFLAGS) $(CFLAGS) $(DEBUG_FLAGS) $(OPT_FLAGS) $(DEFINE_FLAGS) $(CHIP_DEFINE_FLAGS) $(INC_FLAGS)
+CHIP_CXXFLAGS = $(STD_CXXFLAGS) $(CXXFLAGS)
 
 # ==================================================
-# OpenWeave configuration options
+# CHIP configuration options
 # ==================================================
 
-OPENWEAVE_CONFIGURE_OPTIONS = \
-    AR="$(AR)" AS="$(AS)" CC="$(CCACHE) $(CC)" CXX="$(CCACHE) $(CXX)" \
+CHIP_CONFIGURE_OPTIONS = \
+    -C AR="$(AR)" AS="$(AS)" CC="$(CCACHE) $(CC)" CXX="$(CCACHE) $(CXX)" \
     LD="$(LD)" OBJCOPY="$(OBJCOPY)" RANLIB="$(RANLIB)" INSTALL="$(INSTALL) $(INSTALLFLAGS)" \
-    CPPFLAGS="$(OPENWEAVE_CPPFLAGS)" \
-    CXXFLAGS="$(OPENWEAVE_CXXFLAGS)" \
-    --prefix=$(OPENWEAVE_OUTPUT_DIR) \
-    --exec-prefix=$(OPENWEAVE_OUTPUT_DIR) \
-    --host=$(OPENWEAVE_HOST_ARCH) \
-    --build=$(OPENWEAVE_BUILD_ARCH) \
+    CPPFLAGS="$(CHIP_CPPFLAGS)" \
+    CXXFLAGS="$(CHIP_CXXFLAGS)" \
+    --prefix=$(CHIP_OUTPUT_DIR) \
+    --exec-prefix=$(CHIP_OUTPUT_DIR) \
+    --host=$(CHIP_HOST_ARCH) \
+    --build=$(CHIP_BUILD_ARCH) \
     --with-target-style=embedded \
     --with-device-layer=k32w \
     --with-network-layer=all \
@@ -95,43 +93,44 @@ OPENWEAVE_CONFIGURE_OPTIONS = \
     --with-inet-endpoint="tcp udp" \
     --with-openssl=no \
     --with-logging-style=external \
-    --with-weave-project-includes=$(OPENWEAVE_PROJECT_CONFIG) \
-    --with-weave-system-project-includes=$(OPENWEAVE_PROJECT_CONFIG) \
-    --with-weave-inet-project-includes=$(OPENWEAVE_PROJECT_CONFIG) \
-    --with-weave-ble-project-includes=$(OPENWEAVE_PROJECT_CONFIG) \
-    --with-weave-warm-project-includes=$(OPENWEAVE_PROJECT_CONFIG) \
-    --with-weave-device-project-includes=$(OPENWEAVE_PROJECT_CONFIG) \
+    --with-chip-project-includes=$(CHIP_PROJECT_CONFIG) \
+    --with-chip-system-project-includes=$(CHIP_PROJECT_CONFIG) \
+    --with-chip-inet-project-includes=$(CHIP_PROJECT_CONFIG) \
+    --with-chip-ble-project-includes=$(CHIP_PROJECT_CONFIG) \
+    --with-chip-warm-project-includes=$(CHIP_PROJECT_CONFIG) \
+    --with-chip-device-project-includes=$(CHIP_PROJECT_CONFIG) \
     --disable-ipv4 \
     --disable-tests \
     --disable-tools \
     --disable-docs \
     --disable-java \
-    --disable-device-manager
+    --disable-device-manager \
+    --with-crypto=mbedtls
 
 # Enable / disable optimization.
 ifeq ($(OPT),1)
-OPENWEAVE_CONFIGURE_OPTIONS += --enable-optimization=yes
+CHIP_CONFIGURE_OPTIONS += --enable-optimization=yes
 else
-OPENWEAVE_CONFIGURE_OPTIONS += --enable-optimization=no
+CHIP_CONFIGURE_OPTIONS += --enable-optimization=no
 endif
 
 ifeq ($(DEBUG),1)
-OPENWEAVE_CONFIGURE_OPTIONS += --enable-debug
+CHIP_CONFIGURE_OPTIONS += --enable-debug
 endif
 # ==================================================
 # Adjustments to standard build settings to
-#   incorporate OpenWeave
+#   incorporate CHIP
 # ==================================================
 
-# Add OpenWeave-specific paths to the standard include directories.
+# Add CHIP-specific paths to the standard include directories.
 STD_INC_DIRS += \
-    $(OPENWEAVE_OUTPUT_DIR)/include \
-    $(OPENWEAVE_OUTPUT_DIR)/src/include \
-    $(OPENWEAVE_ROOT)/src/adaptations/device-layer/trait-support \
-    $(OPENWEAVE_ROOT)/third_party/lwip/repo/lwip/src/include \
-    $(OPENWEAVE_ROOT)/src/lwip \
-    $(OPENWEAVE_ROOT)/src/lwip/k32w \
-    $(OPENWEAVE_ROOT)/src/lwip/freertos \
+    $(CHIP_OUTPUT_DIR)/include \
+    $(CHIP_OUTPUT_DIR)/src/include \
+    $(CHIP_ROOT)/src/adaptations/device-layer/trait-support \
+    $(CHIP_ROOT)/third_party/lwip/repo/lwip/src/include \
+    $(CHIP_ROOT)/src/lwip \
+    $(CHIP_ROOT)/src/lwip/k32w \
+    $(CHIP_ROOT)/src/lwip/freertos \
     $(K32W061_SDK_ROOT)/CMSIS/Include \
     $(K32W061_SDK_ROOT)/devices/K32W061 \
     $(K32W061_SDK_ROOT)/devices/K32W061/drivers \
@@ -143,102 +142,95 @@ STD_INC_DIRS += \
     $(K32W061_SDK_ROOT)/middleware/wireless/framework/PDM/Include \
     $(K32W061_SDK_ROOT)/middleware/wireless/framework/MemManager/Interface
 
-# Add the location of OpenWeave libraries to application link action.
-STD_LDFLAGS += -L$(OPENWEAVE_OUTPUT_DIR)/lib
+# Add the location of CHIP libraries to application link action.
+STD_LDFLAGS += -L$(CHIP_OUTPUT_DIR)/lib
 
-# Add OpenWeave libraries to standard libraries list.
+# Add CHIP libraries to standard libraries list.
 STD_LIBS += \
     -lDeviceLayer \
-	-lWeave \
-	-lWarm \
-	-lInetLayer \
-	-lmincrypt \
-	-lnlfaultinjection \
-	-lSystemLayer \
-	-luECC \
-	-llwip
+    -lCHIP \
+    -lInetLayer \
+    -lSystemLayer \
+    -llwip \
+    -lmbedtls
 
-# Add the appropriate OpenWeave target as a prerequisite to all application
-# compilation targets to ensure that OpenWeave gets built and its header
+# Add the appropriate CHIP target as a prerequisite to all application
+# compilation targets to ensure that CHIP gets built and its header
 # files installed prior to compiling any dependent source files.
-STD_COMPILE_PREREQUISITES += install-weave
+STD_COMPILE_PREREQUISITES += install-chip
 
-# Add the OpenWeave libraries as prerequisites for linking the application.
+# Add the CHIP libraries as prerequisites for linking the application.
 STD_LINK_PREREQUISITES += \
-    $(OPENWEAVE_OUTPUT_DIR)/lib/libDeviceLayer.a \
-	$(OPENWEAVE_OUTPUT_DIR)/lib/libWeave.a \
-	$(OPENWEAVE_OUTPUT_DIR)/lib/libWarm.a \
-	$(OPENWEAVE_OUTPUT_DIR)/lib/libInetLayer.a \
-	$(OPENWEAVE_OUTPUT_DIR)/lib/libmincrypt.a \
-	$(OPENWEAVE_OUTPUT_DIR)/lib/libnlfaultinjection.a \
-	$(OPENWEAVE_OUTPUT_DIR)/lib/libSystemLayer.a \
-	$(OPENWEAVE_OUTPUT_DIR)/lib/libuECC.a \
-	$(OPENWEAVE_OUTPUT_DIR)/lib/liblwip.a
-
+    $(CHIP_OUTPUT_DIR)/lib/libDeviceLayer.a \
+    $(CHIP_OUTPUT_DIR)/lib/libCHIP.a \
+    $(CHIP_OUTPUT_DIR)/lib/libInetLayer.a \
+    $(CHIP_OUTPUT_DIR)/lib/libSystemLayer.a \
+    $(CHIP_OUTPUT_DIR)/lib/liblwip.a \
+    $(CHIP_OUTPUT_DIR)/lib/libmbedtls.a \
 
 # ==================================================
-# Late-bound build rules for OpenWeave
+# Late-bound build rules for CHIP
 # ==================================================
 
-# Add OpenWeaveBuildRules to the list of late-bound build rules that
+# Add CHIPBuildRules to the list of late-bound build rules that
 # will be evaluated when GenerateBuildRules is called.
-LATE_BOUND_RULES += OpenWeaveBuildRules
+LATE_BOUND_RULES += CHIPBuildRules
 
-# Rules for configuring, building and installing OpenWeave.
-define OpenWeaveBuildRules
+# Rules for configuring, building and installing CHIP.
+define CHIPBuildRules
 
-.PHONY : config-weave .check-config-weave build-weave install-weave clean-weave
+.PHONY : config-chip .check-config-chip build-chip install-chip clean-chip
 
-.check-config-weave : | $(OPENWEAVE_OUTPUT_DIR)
-	$(NO_ECHO)echo $(OPENWEAVE_ROOT)/configure $(OPENWEAVE_CONFIGURE_OPTIONS) > $(OPENWEAVE_OUTPUT_DIR)/config.args.tmp; \
-	(test -r $(OPENWEAVE_OUTPUT_DIR)/config.args && cmp -s $(OPENWEAVE_OUTPUT_DIR)/config.args.tmp $(OPENWEAVE_OUTPUT_DIR)/config.args) || \
-	    mv $(OPENWEAVE_OUTPUT_DIR)/config.args.tmp $(OPENWEAVE_OUTPUT_DIR)/config.args; \
-	 rm -f $(OPENWEAVE_OUTPUT_DIR)/config.args.tmp;
+.check-config-chip : | $(CHIP_OUTPUT_DIR)
+	$(NO_ECHO)echo $(CHIP_ROOT)/configure $(CHIP_CONFIGURE_OPTIONS) > $(CHIP_OUTPUT_DIR)/config.args.tmp; \
+	(test -r $(CHIP_OUTPUT_DIR)/config.args && cmp -s $(CHIP_OUTPUT_DIR)/config.args.tmp $(CHIP_OUTPUT_DIR)/config.args) || \
+	    mv $(CHIP_OUTPUT_DIR)/config.args.tmp $(CHIP_OUTPUT_DIR)/config.args; \
+	 rm -f $(CHIP_OUTPUT_DIR)/config.args.tmp;
 
-$(OPENWEAVE_OUTPUT_DIR)/config.args : .check-config-weave
+$(CHIP_OUTPUT_DIR)/config.args : .check-config-chip
 	@: # Null action required to work around make's crazy timestamp caching behavior.
 
-$(OPENWEAVE_ROOT)/configure : $(OPENWEAVE_ROOT)/configure.ac
-	@echo "$(HDR_PREFIX)BOOTSTRAP OPENWEAVE..."
-	$(NO_ECHO)(cd $(OPENWEAVE_ROOT) && ./bootstrap)
+$(CHIP_ROOT)/configure : $(CHIP_ROOT)/configure.ac
+	@echo "$(HDR_PREFIX)BOOTSTRAP CHIP..."
+	$(NO_ECHO)(cd $(CHIP_ROOT) && ./bootstrap)
 
-$(OPENWEAVE_OUTPUT_DIR)/config.status : $(OPENWEAVE_ROOT)/configure $(OPENWEAVE_OUTPUT_DIR)/config.args
-	@echo "$(HDR_PREFIX)CONFIGURE OPENWEAVE..."
-	$(NO_ECHO)(cd $(OPENWEAVE_OUTPUT_DIR) && $(OPENWEAVE_ROOT)/configure $(OPENWEAVE_CONFIGURE_OPTIONS))
+$(CHIP_OUTPUT_DIR)/config.status : $(CHIP_ROOT)/configure $(CHIP_OUTPUT_DIR)/config.args
+	@echo "$(HDR_PREFIX)CONFIGURE CHIP..."
+	$(NO_ECHO)(cd $(CHIP_OUTPUT_DIR) && $(CHIP_ROOT)/configure $(CHIP_CONFIGURE_OPTIONS))
 
-config-weave : $(OPENWEAVE_OUTPUT_DIR)/config.status | $(OPENTHREAD_PREREQUISITE)
+config-chip : $(CHIP_OUTPUT_DIR)/config.status | $(OPENTHREAD_PREREQUISITE)
 
-build-weave : config-weave
-	@echo "$(HDR_PREFIX)BUILD OPENWEAVE..."
-	$(NO_ECHO)MAKEFLAGS= make -C $(OPENWEAVE_OUTPUT_DIR) --no-print-directory all V=$(VERBOSE)
+build-chip : config-chip
+	@echo "$(HDR_PREFIX)BUILD CHIP..."
+	$(NO_ECHO)MAKEFLAGS= make -C $(CHIP_OUTPUT_DIR) --no-print-directory all V=$(VERBOSE)
 
-install-weave : | build-weave
-	@echo "$(HDR_PREFIX)INSTALL OPENWEAVE..."
-	$(NO_ECHO)MAKEFLAGS= make -C $(OPENWEAVE_OUTPUT_DIR) --no-print-directory install V=$(VERBOSE)
+install-chip : | build-chip
+	@echo "$(HDR_PREFIX)INSTALL CHIP..."
+	$(NO_ECHO)MAKEFLAGS= make -C $(CHIP_OUTPUT_DIR) --no-print-directory install V=$(VERBOSE)
 
-clean-weave:
-	@echo "$(HDR_PREFIX)RM $(OPENWEAVE_OUTPUT_DIR)"
-	$(NO_ECHO)rm -rf $(OPENWEAVE_OUTPUT_DIR)
+clean-chip:
+	@echo "$(HDR_PREFIX)RM $(CHIP_OUTPUT_DIR)"
+	$(NO_ECHO)rm -rf $(CHIP_OUTPUT_DIR)
 
-$(OPENWEAVE_OUTPUT_DIR) :
+$(CHIP_OUTPUT_DIR) :
 	@echo "$(HDR_PREFIX)MKDIR $$@"
 	$(NO_ECHO)mkdir -p "$$@"
 
 endef
 # ==================================================
-# OpenWeave-specific help definitions
+# CHIP-specific help definitions
 # ==================================================
 
 define TargetHelp +=
 
 
-  config-weave          Run the OpenWeave configure script.
+  config-chip          Run the CHIP configure script.
 
-  build-weave           Build the OpenWeave libraries.
+  build-chip           Build the CHIP libraries.
 
-  install-weave         Install OpenWeave libraries and headers in
+  install-chip         Install CHIP libraries and headers in
                         build output directory for use by application.
 
-  clean-weave           Clean all build outputs produced by the OpenWeave
+  clean-chip           Clean all build outputs produced by the CHIP
                         build process.
 endef
