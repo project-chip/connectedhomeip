@@ -223,10 +223,15 @@ def main():
       type=lambda x: getattr(logging, x),
       help='Configure the logging level.')
   parser.add_argument(
+      '--git-fork-point',
+      type=str,
+      default='refs/heads/master',
+      help='What forkpoint to get')
+  parser.add_argument(
       '--git-master-ref',
       type=str,
       default=None,
-      help='Ref for fetching artifacts for the bloat report')
+      help='Ref for fetching artifacts for the bloat report (for debug purposes)')
   args = parser.parse_args()
 
   # Ensures somewhat pretty logging of what is going on
@@ -260,7 +265,8 @@ def main():
 
   try:
     github_fetch_artifacts.fetchArtifactsForJob(args.job, args.github_api_token, args.github_repository,
-                                                args.artifact_download_dir, args.git_master_ref)
+                                                args.artifact_download_dir, 
+                                                args.git_fork_point, args.git_master_ref)
   except Exception as e:
     logging.warning('Failed to fetch artifacts: %r', e)
   

@@ -69,7 +69,7 @@ class ArtifactFetcher(github.GithubObject.NonCompletableGithubObject):
     )
 
 
-def fetchMasterMergeCommitSHA(revStr):
+def fetchMasterMergeCommitSHA(forkPointRef, revStr):
   if revStr:
     result = subprocess.run(
         ['git', 'rev-parse', revStr],
@@ -79,8 +79,9 @@ def fetchMasterMergeCommitSHA(revStr):
 
     logging.info('Parsed revision %r base result: %r' % (revStr, result))
   else:
+    logging.info('Finding merge point from %s' % forkPointRef)
     result = subprocess.run(
-        'git merge-base --fork-point refs/heads/master'.split(),
+        ('git merge-base --fork-point %s' % forkPointRef).split(),
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
     ).stdout.decode('utf8')
@@ -90,8 +91,8 @@ def fetchMasterMergeCommitSHA(revStr):
   return result.split()[0]
 
 
-def fetchArtifactsForJob(jobName, githubToken, githubRepo, downloadDir, compareRev):
-  masterMergeSha = fetchMasterMergeCommitSHA(compareRev)
+def fetchArtifactsForJob(jobName, githubToken, githubRepo, downloadDir, forkPointRef, compareRev):
+  masterMergeSha = fetchMasterMergeCommitSHA(forkPointRef, compareRev)
 
   logging.info('Master merge commit: "%s"', masterMergeSha)
 
