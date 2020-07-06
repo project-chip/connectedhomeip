@@ -22,17 +22,10 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-            - name: DEBUG THROUGH SSH
-              run: curl -sL https://gist.githubusercontent.com/andy31415/22c43a3693a3401fd30d48aa2c3a5d77/raw/59feefb48bc39581e74af89c3a2dc3762941d604/SSHDebug.sh | bash
-              env:
-                 # After sign up on the https://ngrok.com/
-                 # You can find this token here: https://dashboard.ngrok.com/get-started/setup
-                 # NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
-                 NGROK_TOKEN: 1eJXREPXTREQuejZL8KLjauHDDd_2RqdxuPRaomU4WaPw6sY2
-
-                 # This password you will use when authorizing via SSH 
-                 # USER_PASS: ${{ secrets.USER_PASS }}
-                 USER_PASS: debugSSHtemp
+            - name: DEBUG OUTPUT
+              run: git branch -la
+            - name: DEBUG OUTPUT
+              run: git log --oneline -n 20
             - name: Build example Echo App
               run: scripts/examples/esp_echo_app.sh
             - name: Copy aside build products
