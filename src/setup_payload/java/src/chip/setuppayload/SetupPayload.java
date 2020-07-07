@@ -1,5 +1,8 @@
 package chip.setuppayload;
 
+import java.util.Map;
+import java.util.HashMap;
+
 /** Class to hold the data from the scanned QR code or manual entry code. */
 public class SetupPayload {
     /** Version info of the SetupPayload */
@@ -17,7 +20,11 @@ public class SetupPayload {
     /** The CHIP device manual setup code */
     public long setupPinCode;
 
-    public SetupPayload() {}
+    public Map<Integer, OptionalQRCodeInfo> optionalQRCodeInfo;
+
+    public SetupPayload() {
+        this.optionalQRCodeInfo = new HashMap<Integer, OptionalQRCodeInfo>();
+    }
 
     public SetupPayload(int version, int vendorId, int productId, boolean requiresCustomFlow,
                         int rendezvousInfo, int discriminator, long setupPinCode) {
@@ -28,5 +35,10 @@ public class SetupPayload {
         this.rendezvousInformation = rendezvousInfo;
         this.discriminator = discriminator;
         this.setupPinCode = setupPinCode;
+        this.optionalQRCodeInfo = new HashMap<Integer, OptionalQRCodeInfo>();
     }
+
+    void addOptionalQRCodeInfo(OptionalQRCodeInfo info) {
+        optionalQRCodeInfo.put(info.tag, info);
+   }
 }

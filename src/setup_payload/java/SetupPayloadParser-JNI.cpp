@@ -1,6 +1,7 @@
 #include "QRCodeSetupPayloadParser.h"
 #include "ManualSetupPayloadParser.h"
 
+#include <map>
 #include <jni.h>
 
 using namespace chip;
@@ -8,7 +9,7 @@ using namespace chip;
 #define JNI_METHOD(RETURN, METHOD_NAME) \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_setuppayload_SetupPayloadParser_##METHOD_NAME
 
-static jobject TransformSetupPayload(JNIEnv *env, SetupPayload payload);
+static jobject TransformSetupPayload(JNIEnv * env, SetupPayload& payload);
 
 JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv *env, jobject self, jstring qrCodeObj)
 {
@@ -40,10 +41,11 @@ JNI_METHOD(jobject, fetchPayloadFromManualEntryCode)(JNIEnv *env, jobject self, 
     return TransformSetupPayload(env, payload);
   }
 
-jobject TransformSetupPayload(JNIEnv *env, SetupPayload payload)
+jobject TransformSetupPayload(JNIEnv * env, SetupPayload& payload)
 {
     jclass setupPayloadClass = env->FindClass("chip/setuppayload/SetupPayload");
-    jobject setupPayload = env->AllocObject(setupPayloadClass);
+    jmethodID setupConstr    = env->GetMethodID(setupPayloadClass, "<init>", "()V");
+    jobject setupPayload     = env->NewObject(setupPayloadClass, setupConstr);
 
     jfieldID version = env->GetFieldID(setupPayloadClass, "version", "I");
     jfieldID vendorId = env->GetFieldID(setupPayloadClass, "vendorId", "I");
@@ -58,6 +60,61 @@ jobject TransformSetupPayload(JNIEnv *env, SetupPayload payload)
     env->SetBooleanField(setupPayload, requiresCustomFlow, payload.requiresCustomFlow);
     env->SetIntField(setupPayload, discriminator, payload.discriminator);
     env->SetLongField(setupPayload, setUpPinCode, payload.setUpPINCode);
+
+    jmethodID addOptionalInfoMid = env->GetMethodID(setupPayloadClass, "addOptionalQRCodeInfo", "(Lchip/setuppayload/OptionalQRCodeInfo;)V");
+
+    vector<OptionalQRCodeInfo> optional_info = payload.getAllOptionalVendorData();
+    for (OptionalQRCodeInfo& info : optional_info) {
+
+       jclass optionalInfoClass = env->FindClass("chip/setuppayload/OptionalQRCodeInfo");
+       jobject optionalInfo     = env->AllocObject(optionalInfoClass);
+       jfieldID tag             = env->GetFieldID(optionalInfoClass, "tag", "I");
+       jfieldID type            = env->GetFieldID(optionalInfoClass, "type", "Lchip/setuppayload/OptionalQRCodeInfo$optionalQRCodeInfoType;");
+       jfieldID data            = env->GetFieldID(optionalInfoClass, "data", "Ljava/lang/String;");
+       jfieldID int32           = env->GetFieldID(optionalInfoClass, "int32", "I");
+
+       env->SetIntField(optionalInfo, tag, info.tag);
+
+       jclass enumClass = env->FindClass("chip/setuppayload/OptionalQRCodeInfo$optionalQRCodeInfoType");
+       jfieldID enumType = nullptr;
+
+       switch (info.tag) {
+         case optionalQRCodeInfoTypeUnknown:
+            enumType = env->GetStaticFieldID(enumClass, "optionalQRCodeInfoTypeUnknown",
+               "Lchip/setuppayload/OptionalQRCodeInfo$optionalQRCodeInfoType;");
+            break;
+         case optionalQRCodeInfoTypeString:
+            enumType = env->GetStaticFieldID(enumClass, "optionalQRCodeInfoTypeString",
+                "Lchip/setuppayload/OptionalQRCodeInfo$optionalQRCodeInfoType;");
+            break;
+         case optionalQRCodeInfoTypeInt32:
+            enumType = env->GetStaticFieldID(enumClass, "optionalQRCodeInfoTypeInt32",
+                "Lchip/setuppayload/OptionalQRCodeInfo$optionalQRCodeInfoType;");
+            break;
+         case optionalQRCodeInfoTypeInt64:
+            enumType = env->GetStaticFieldID(enumClass, "optionalQRCodeInfoTypeInt64",
+                "Lchip/setuppayload/OptionalQRCodeInfo$optionalQRCodeInfoType;");
+            break;
+         case optionalQRCodeInfoTypeUInt32:
+            enumType = env->GetStaticFieldID(enumClass, "optionalQRCodeInfoTypeUInt32",
+                 "Lchip/setuppayload/OptionalQRCodeInfo$optionalQRCodeInfoType;");
+            break;
+         case optionalQRCodeInfoTypeUInt64:
+            enumType = env->GetStaticFieldID(enumClass, "optionalQRCodeInfoTypeUInt64",
+                 "Lchip/setuppayload/OptionalQRCodeInfo$optionalQRCodeInfoType;");
+            break;
+         default:
+            break;
+       }
+
+       jobject enumObj = env->GetStaticObjectField(enumClass, enumType);
+       env->SetObjectField(optionalInfo, type, enumObj);
+
+       env->SetObjectField(optionalInfo, data, env->NewStringUTF(info.data.c_str()));
+       env->SetIntField(optionalInfo, int32, info.int32);
+
+       env->CallVoidMethod(setupPayload, addOptionalInfoMid, optionalInfo);
+    }
 
     return setupPayload;
 }

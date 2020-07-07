@@ -86,6 +86,7 @@ JARS                                                          = \
 SetupPayloadParser_jar_JAVA_SRCS                              = \
     chip/setuppayload/SetupPayload.java                         \
     chip/setuppayload/SetupPayloadParser.java                   \
+    chip/setuppayload/OptionalQRCodeInfo.java                   \
     $(NULL)
 
 SetupPayloadParser_jar_JFLAGS                      = -source 8 -target 8
