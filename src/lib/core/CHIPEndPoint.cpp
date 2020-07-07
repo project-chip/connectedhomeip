@@ -26,7 +26,7 @@
 namespace chip {
 namespace DataModel {
 
-CHIPBaseCluster *CHIPEndPoint::mBasicCluster = nullptr;
+CHIPBaseCluster * CHIPEndPoint::mBasicCluster = nullptr;
 
 } // namespace DataModel
 } // namespace chip

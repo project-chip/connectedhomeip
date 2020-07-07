@@ -25,8 +25,8 @@
 #define CHIPVALUES_H_
 
 #include <inttypes.h>
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 
 namespace chip {
@@ -34,11 +34,11 @@ namespace DataModel {
 
 /* XXX Remove later*/
 #define SUCCESS 0
-#define FAIL    -1
+#define FAIL -1
 
 enum CHIPValueTypes
 {
-    kCHIPValueType_NotSpecified           = -1,
+    kCHIPValueType_NotSpecified = -1,
     kCHIPValueType_Int8,
     kCHIPValueType_Int16,
     kCHIPValueType_Int32,
@@ -66,14 +66,15 @@ class CHIPValue
 {
 public:
     CHIPValueTypes mType;
-    union {
+    union
+    {
         uint64_t Int64;
     };
     CHIPValue() {}
-    CHIPValue(CHIPValueTypes type) : mType(type),Int64() {}
+    CHIPValue(CHIPValueTypes type) : mType(type), Int64() {}
     CHIPValue(CHIPValueTypes type, uint64_t int64Value) : mType(type), Int64(int64Value) {}
 
-    void ValueToStr(char *buf, int maxlen)
+    void ValueToStr(char * buf, int maxlen)
     {
         switch (mType)
         {
@@ -98,28 +99,26 @@ public:
         buf[0] = '\0';
         return;
     }
-
 };
-
 
 static inline CHIPValue CHIPValueBool(bool b)
 {
-    return CHIPValue(kCHIPValueType_Bool, (uint64_t)b);
+    return CHIPValue(kCHIPValueType_Bool, (uint64_t) b);
 }
 
 static inline bool CHIPValueToBool(CHIPValue v)
 {
-    return (bool)v.Int64;
+    return (bool) v.Int64;
 }
 
 static inline CHIPValue CHIPValueUInt8(uint8_t b)
 {
-    return CHIPValue(kCHIPValueType_UInt8, (uint64_t)b);
+    return CHIPValue(kCHIPValueType_UInt8, (uint64_t) b);
 }
 
 static inline uint8_t CHIPValueToUInt8(CHIPValue v)
 {
-    return (uint8_t)v.Int64;
+    return (uint8_t) v.Int64;
 }
 
 } // namespace DataModel
