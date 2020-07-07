@@ -24,8 +24,8 @@
 #ifndef GENERIC_PLATFORM_MANAGER_IMPL_POSIX_IPP
 #define GENERIC_PLATFORM_MANAGER_IMPL_POSIX_IPP
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/PlatformManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
 
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
@@ -34,13 +34,13 @@
 
 #include <system/SystemLayer.h>
 
-#include <poll.h>
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <poll.h>
 #include <sched.h>
-#include <unistd.h>
 #include <sys/select.h>
+#include <unistd.h>
 
 #define DEFAULT_MIN_SLEEP_PERIOD (60 * 60 * 24 * 30) // Month [sec]
 
@@ -139,10 +139,12 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::SysUpdate()
         SystemLayer.PrepareSelect(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet, mNextTimeout);
     }
 
+#if !(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
     if (InetLayer.State == InetLayer::kState_Initialized)
     {
         InetLayer.PrepareSelect(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet, mNextTimeout);
     }
+#endif // !(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 }
 
 template <class ImplClass>
@@ -170,10 +172,12 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::SysProcess()
         SystemLayer.HandleSelectResult(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet);
     }
 
+#if !(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
     if (InetLayer.State == InetLayer::kState_Initialized)
     {
         InetLayer.HandleSelectResult(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet);
     }
+#endif // !(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 
     ProcessDeviceEvents();
 }
