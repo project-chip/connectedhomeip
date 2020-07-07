@@ -67,8 +67,8 @@ namespace Transport {
  *     - BLE transports only support BLE. TCP/UDP support IP addresses
  *     - Multicasts only supported by UDP
  *
- * @param TransporTypes the ORDERED list of transport types grouped together. Order matters in
- *        determining what transport is used when multiple transports can reach a Peer.
+ * @tparam TransportTypes the ORDERED list of transport types grouped together. Order matters in
+ *         determining what transport is used when multiple transports can reach a Peer.
  *
  * Transports (TransportTypes) are assumed to have an Init call with EXACTLY one argument and returning
  * a CHIP_ERROR, with a signature like:
