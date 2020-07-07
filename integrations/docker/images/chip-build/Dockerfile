@@ -86,4 +86,3 @@ RUN set -x \
     && cd ../.. \
     && rm -rf bloaty \
     && : # last line
-
