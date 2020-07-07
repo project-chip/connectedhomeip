@@ -25,7 +25,6 @@
 #ifndef CHIPCLUSTERSERVER_H_
 #define CHIPCLUSTERSERVER_H_
 
-
 #include <lib/core/CHIPEndPoint.h>
 
 namespace chip {
@@ -36,12 +35,9 @@ static const uint8_t kMaxEndPointPerServer = 5;
 class CHIPClusterServer
 {
 public:
-    CHIPEndPoint *mEndPoints[kMaxEndPointPerServer];
+    CHIPEndPoint * mEndPoints[kMaxEndPointPerServer];
 
-    CHIPClusterServer(uint8_t ZCLVersion,
-                      uint8_t applicationVersion,
-                      uint8_t stackVersion,
-                      uint8_t HWVersion) : mEndPoints()
+    CHIPClusterServer(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) : mEndPoints()
     {
         mEndPoints[0] = new CHIPEndPoint(ZCLVersion, applicationVersion, stackVersion, HWVersion);
     }
@@ -59,7 +55,7 @@ public:
     }
 
     /* By default always add to the 0th endpoint, for simplicity */
-    int AddCluster(CHIPBaseCluster *cluster)
+    int AddCluster(CHIPBaseCluster * cluster)
     {
         if (!cluster)
         {
@@ -69,7 +65,7 @@ public:
         return mEndPoints[0]->AddCluster(cluster);
     }
 
-    int AddEndPoint(CHIPEndPoint *endPoint)
+    int AddEndPoint(CHIPEndPoint * endPoint)
     {
         for (int i = 0; i < kMaxEndPointPerServer; i++)
         {
@@ -82,7 +78,6 @@ public:
         return FAIL;
     }
 };
-
 
 } // namespace DataModel
 } // namespace chip

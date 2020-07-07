@@ -29,27 +29,19 @@
 namespace chip {
 namespace DataModel {
 
-
 class CHIPBaseAttribute
 {
 public:
-    uint16_t         mAttrId;
-    CHIPValue        mValue;
-    CHIPValue        mMin;
-    CHIPValue        mMax;
+    uint16_t mAttrId;
+    CHIPValue mValue;
+    CHIPValue mMin;
+    CHIPValue mMax;
 
-    CHIPBaseAttribute(uint16_t attrId, CHIPValueTypes type) : mAttrId(attrId),
-        mValue(type),
-        mMin(type),
-        mMax(type) {}
-    CHIPBaseAttribute(uint16_t attrId, CHIPValue value) : mAttrId(attrId),
-        mValue(value),
-        mMin(value.mType),
-        mMax(value.mType) {}
-    CHIPBaseAttribute(uint16_t attrId, CHIPValueTypes type, uint64_t min, uint64_t max) : mAttrId(attrId),
-        mValue(type),
-        mMin(type, min),
-        mMax(type, max) {}
+    CHIPBaseAttribute(uint16_t attrId, CHIPValueTypes type) : mAttrId(attrId), mValue(type), mMin(type), mMax(type) {}
+    CHIPBaseAttribute(uint16_t attrId, CHIPValue value) : mAttrId(attrId), mValue(value), mMin(value.mType), mMax(value.mType) {}
+    CHIPBaseAttribute(uint16_t attrId, CHIPValueTypes type, uint64_t min, uint64_t max) :
+        mAttrId(attrId), mValue(type), mMin(type, min), mMax(type, max)
+    {}
 
     /* An attribute is typically set in either of the following 2 ways:
      *
@@ -62,7 +54,7 @@ public:
      *   with a Set() call on the base-ptr. In this case the argument
      *   will be CHIPValue.
      */
-    int Set(const CHIPValue &newValue)
+    int Set(const CHIPValue & newValue)
     {
         /* We have to check the element type match in this case */
         if (mValue.mType != newValue.mType)
@@ -80,17 +72,10 @@ public:
     /* Need to define the behaviour when CHIPValue contains pointers
      * to allocated data
      */
-    CHIPValue Get()
-    {
-        return mValue;
-    }
+    CHIPValue Get() { return mValue; }
 
 protected:
-    bool withinRange(const uint64_t &value)
-    {
-        return (value >= mMin.Int64) &&
-            (value <= mMax.Int64);
-    }
+    bool withinRange(const uint64_t & value) { return (value >= mMin.Int64) && (value <= mMax.Int64); }
 
     bool withinRange(const CHIPValue value)
     {
@@ -113,9 +98,7 @@ protected:
         }
         return false;
     }
-
 };
-
 
 } // namespace DataModel
 } // namespace chip

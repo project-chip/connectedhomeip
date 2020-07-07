@@ -25,9 +25,9 @@
 
 #include "EchoDeviceCallbacks.h"
 #include "esp_log.h"
+#include <lib/core/CHIPClusterServer.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
-#include <lib/core/CHIPClusterServer.h>
 
 #include "LEDWidget.h"
 #include <inet/IPAddress.h>
@@ -83,13 +83,12 @@ void EchoDeviceCallbacks::PostAttributeChangeCallback(uint8_t endpoint, ChipZclC
     printf("endpoint: %d, clusterId: %d, attrId: %d type: %d\n", endpoint, clusterId, attributeId, type);
     for (int i = 0; i < kMaxClustersPerEndPoint; i++)
     {
-        if(server.mEndPoints[endpoint] &&
-           server.mEndPoints[endpoint]->mClusters[i] &&
-           server.mEndPoints[endpoint]->mClusters[i]->mClusterId == clusterId)
+        if (server.mEndPoints[endpoint] && server.mEndPoints[endpoint]->mClusters[i] &&
+            server.mEndPoints[endpoint]->mClusters[i]->mClusterId == clusterId)
         {
             // At this point we can assume that value points to a boolean value.
             CHIPValue cValue(kCHIPValueType_Bool);
-            memcpy((void *)&cValue.Int64, (void *)value, size);
+            memcpy((void *) &cValue.Int64, (void *) value, size);
             printf("Value is %lld type is %d\n", cValue.Int64, type);
             server.mEndPoints[endpoint]->mClusters[i]->Set(attributeId, cValue);
         }

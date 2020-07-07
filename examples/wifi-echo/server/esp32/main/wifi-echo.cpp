@@ -42,11 +42,11 @@
 #include <vector>
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPClusterServer.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/ErrorStr.h>
 #include <transport/SecureSessionMgr.h>
-#include <lib/core/CHIPClusterServer.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
@@ -106,14 +106,11 @@ LEDWidget statusLED;
 const char * TAG = "wifi-echo-demo";
 
 static EchoDeviceCallbacks EchoCallbacks;
-const uint8_t ZCLVersion = 10;
+const uint8_t ZCLVersion         = 10;
 const uint8_t applicationVersion = 20;
-const uint8_t stackVersion = 1;
-const uint8_t HWVersion = 1;
-CHIPClusterServer server(ZCLVersion,
-                         applicationVersion,
-                         stackVersion,
-                         HWVersion);
+const uint8_t stackVersion       = 1;
+const uint8_t HWVersion          = 1;
+CHIPClusterServer server(ZCLVersion, applicationVersion, stackVersion, HWVersion);
 
 namespace {
 
@@ -396,7 +393,6 @@ void PrintDataModel(CHIPClusterServer & server)
         }
     }
 }
-
 
 extern "C" void app_main()
 {

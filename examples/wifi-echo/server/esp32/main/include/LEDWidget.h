@@ -34,7 +34,7 @@ class LEDWidget : public chip::DataModel::CHIPClusterOnOff
 public:
     void Init(gpio_num_t gpioNum);
     void Set(bool state);
-    int Set(uint8_t attrId, const chip::DataModel::CHIPValue &value);
+    int Set(uint8_t attrId, const chip::DataModel::CHIPValue & value);
     void Blink(uint32_t changeRateMS);
     void Blink(uint32_t onTimeMS, uint32_t offTimeMS);
     void BlinkOnError();

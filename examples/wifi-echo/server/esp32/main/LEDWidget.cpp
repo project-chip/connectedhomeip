@@ -75,7 +75,7 @@ void LEDWidget::Set(bool state)
     CHIPBaseCluster::Set(kAttributeIdOnOff, CHIPValueBool(state));
 }
 
-int LEDWidget::Set(uint8_t attrId, const CHIPValue &value)
+int LEDWidget::Set(uint8_t attrId, const CHIPValue & value)
 {
     if (attrId == kAttributeIdOnOff)
     {
