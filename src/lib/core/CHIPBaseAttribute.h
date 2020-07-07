@@ -62,7 +62,7 @@ public:
      *   with a Set() call on the base-ptr. In this case the argument
      *   will be CHIPValue.
      */
-    int Set(CHIPValue newValue)
+    int Set(const CHIPValue &newValue)
     {
         /* We have to check the element type match in this case */
         if (mValue.mType != newValue.mType)
