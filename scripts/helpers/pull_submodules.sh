@@ -16,6 +16,9 @@
 # limitations under the License.
 #
 
+# Helper script to update all initialized submodules to the current tip of the
+# branch specified in .gitmodules.
+
 set -e
 
 CHIP_ROOT="$(dirname "$0")/../.."
