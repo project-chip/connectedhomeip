@@ -377,9 +377,9 @@ InterfaceIterator::~InterfaceIterator(void)
     if (mIntfArray != NULL)
     {
 #if __ANDROID__ && __ANDROID_API__ < 24
-      backport_if_freenameindex(mIntfArray);
+        backport_if_freenameindex(mIntfArray);
 #else
-      if_freenameindex(mIntfArray);
+        if_freenameindex(mIntfArray);
 #endif
         mIntfArray = NULL;
     }
@@ -432,9 +432,9 @@ bool InterfaceIterator::Next(void)
     if (mIntfArray == NULL)
     {
 #if __ANDROID__ && __ANDROID_API__ < 24
-      mIntfArray = backport_if_nameindex();
+        mIntfArray = backport_if_nameindex();
 #else
-      mIntfArray = if_nameindex();
+        mIntfArray = if_nameindex();
 #endif
     }
     else if (mIntfArray[mCurIntf].if_index != 0)
