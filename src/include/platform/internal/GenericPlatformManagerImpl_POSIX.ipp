@@ -142,10 +142,12 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::SysUpdate()
         SystemLayer.PrepareSelect(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet, mNextTimeout);
     }
 
+#if !(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
     if (InetLayer.State == InetLayer::kState_Initialized)
     {
         InetLayer.PrepareSelect(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet, mNextTimeout);
     }
+#endif // !(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 }
 
 template <class ImplClass>
@@ -173,10 +175,12 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::SysProcess()
         SystemLayer.HandleSelectResult(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet);
     }
 
+#if !(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
     if (InetLayer.State == InetLayer::kState_Initialized)
     {
         InetLayer.HandleSelectResult(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet);
     }
+#endif // !(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 
     ProcessDeviceEvents();
 }
