@@ -53,8 +53,7 @@ nrf5_sdk("sdk") {
 executable("lock_app") {
   public_deps = [
     ":sdk",
-    "${chip_root}/src:chip",
-    "${chip_root}/src/platform",
+    "${chip_root}/src/lib",
   ]
 
   sources = [

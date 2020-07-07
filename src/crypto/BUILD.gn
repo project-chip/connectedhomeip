@@ -41,7 +41,9 @@ if (chip_crypto == "openssl") {
   import("//build_overrides/mbedtls.gni")
 }
 
-source_set("crypto") {
+static_library("crypto") {
+  output_name = "libChipCrypto"
+
   sources = [ "CHIPCryptoPAL.h" ]
 
   public_deps = [

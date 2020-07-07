@@ -21,7 +21,7 @@ assert(chip_build_tools)
 executable("chip-standalone-demo") {
   sources = [ "main.cpp" ]
 
-  public_deps = [ "${chip_root}/src:chip" ]
+  public_deps = [ "${chip_root}/src/lib" ]
 
   output_dir = "${root_out_dir}/bin"
 }

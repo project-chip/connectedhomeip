@@ -18,7 +18,9 @@ import("//build_overrides/nlunit_test.gni")
 import("${chip_root}/build/chip_test_suite.gni")
 
 chip_test_suite("tests") {
-  common_sources = [
+  output_name = "libCoreTests"
+
+  sources = [
     "TestCHIPCallback.cpp",
     "TestCHIPErrorStr.cpp",
     "TestCHIPTLV.cpp",

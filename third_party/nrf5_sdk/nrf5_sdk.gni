@@ -113,7 +113,7 @@ template("nrf5_sdk") {
   }
 
   # TODO - Break up this monolith and make it configurable.
-  source_set(sdk_target_name) {
+  static_library(sdk_target_name) {
     sources = [
       "${nrf5_sdk_root}/components/ble/common/ble_advdata.c",
       "${nrf5_sdk_root}/components/ble/common/ble_srv_common.c",

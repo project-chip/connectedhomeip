@@ -18,7 +18,9 @@ import("//build_overrides/nlunit_test.gni")
 import("${chip_root}/build/chip_test_suite.gni")
 
 chip_test_suite("tests") {
-  common_sources = [
+  output_name = "libChipZclUnitTests"
+
+  sources = [
     "ChipZclUnitTests.h",
     "cluster-cmd-on-off-test.c",
     "cluster-server-basic-test.c",
@@ -31,11 +33,13 @@ chip_test_suite("tests") {
   ]
 
   public_deps = [
-    "${chip_root}/src/app/plugin:mock",
+    "${chip_root}/src/app:mock",
     "${chip_root}/src/inet",
     "${chip_root}/src/system",
     "${nlunit_test_root}:nlunit-test",
   ]
+
+  public_configs = [ "${chip_root}/src/app:app_config" ]
 
   c_tests = [ "ChipZclUnitTests" ]
 }

@@ -66,6 +66,8 @@ support_headers = [
 ]
 
 static_library("support") {
+  output_name = "libSupportLayer"
+
   sources = [
     "Base64.cpp",
     "CHIPArgParser.cpp",

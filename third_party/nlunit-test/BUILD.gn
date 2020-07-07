@@ -16,7 +16,9 @@ config("nlunit-test_config") {
   include_dirs = [ "repo/src" ]
 }
 
-source_set("nlunit-test") {
+static_library("nlunit-test") {
+  output_name = "libnlunit-test"
+
   sources = [
     "repo/src/nlunit-test.c",
     "repo/src/nlunit-test.h",

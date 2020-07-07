@@ -89,7 +89,9 @@ source_set("inet_config_header") {
   public_deps = [ "${chip_root}/src/system:system_config_header" ]
 }
 
-source_set("inet") {
+static_library("inet") {
+  output_name = "libInetLayer"
+
   sources = [
     "AsyncDNSResolverSockets.cpp",
     "AsyncDNSResolverSockets.h",

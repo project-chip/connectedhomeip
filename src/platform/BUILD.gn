@@ -47,7 +47,9 @@ if (device_platform != "none") {
     }
   }
 
-  source_set("platform") {
+  static_library("platform") {
+    output_name = "libDeviceLayer"
+
     sources = [
       "GeneralUtils.cpp",
       "Globals.cpp",

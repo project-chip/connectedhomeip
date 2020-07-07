@@ -18,7 +18,9 @@ import("//build_overrides/nlunit_test.gni")
 import("${chip_root}/build/chip_test_suite.gni")
 
 chip_test_suite("tests") {
-  common_sources = [
+  output_name = "libChipCrypto"
+
+  sources = [
     "AES_CCM_128_test_vectors.h",
     "AES_CCM_256_test_vectors.h",
     "CHIPCryptoPALTest.cpp",

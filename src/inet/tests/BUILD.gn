@@ -22,7 +22,9 @@ config("tests_config") {
 }
 
 chip_test_suite("tests") {
-  common_sources = [
+  output_name = "libTestInetCommon"
+
+  sources = [
     "TapAddrAutoconf.cpp",
     "TapAddrAutoconf.h",
     "TestInetAddress.cpp",

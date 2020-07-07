@@ -110,7 +110,9 @@ source_set("chip_config_header") {
   public_deps = [ "${chip_root}/src/system:system_config_header" ]
 }
 
-source_set("core") {
+static_library("core") {
+  output_name = "libChipCore"
+
   sources = [
     "CHIPCallback.h",
     "CHIPCircularTLVBuffer.cpp",

@@ -25,14 +25,11 @@ template("chip_test_suite") {
 
   static_library("${_suite_name}_common") {
     forward_variables_from(invoker,
+                           "*",
                            [
-                             "deps",
-                             "public_deps",
-                             "public_configs",
+                             "tests",
+                             "c_tests",
                            ])
-    if (defined(invoker.common_sources)) {
-      sources = invoker.common_sources
-    }
   }
 
   tests = []

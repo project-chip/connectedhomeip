@@ -50,7 +50,9 @@ source_set("ble_config_header") {
   public_deps = [ "${chip_root}/src/system:system_config_header" ]
 }
 
-source_set("ble") {
+static_library("ble") {
+  output_name = "libBleLayer"
+
   sources = [
     "BLEEndPoint.cpp",
     "BLEEndPoint.h",
