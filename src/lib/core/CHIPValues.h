@@ -69,6 +69,7 @@ public:
     union {
         uint64_t Int64;
     };
+    CHIPValue() {}
     CHIPValue(CHIPValueTypes type) : mType(type),Int64() {}
     CHIPValue(CHIPValueTypes type, uint64_t int64Value) : mType(type), Int64(int64Value) {}
 
@@ -97,8 +98,6 @@ public:
         buf[0] = '\0';
         return;
     }
-private:
-    CHIPValue() {}
 
 };
 

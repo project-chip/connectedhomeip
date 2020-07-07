@@ -63,6 +63,30 @@ public:
         }
         return FAIL;
     }
+
+    CHIPBaseAttribute *GetAttribute(uint8_t attrId)
+    {
+        for (int i = 0; i < kMaxAttributesPerCluster; i++)
+        {
+            if (mAttrs[i] &&
+                (mAttrs[i]->mAttrId == attrId))
+            {
+                return mAttrs[i];
+            }
+        }
+        return nullptr;
+    }
+
+    virtual int Set(uint8_t attrId, const CHIPValue &value)
+    {
+        /* Just hand-off to update the value internally */
+        auto attr = GetAttribute(attrId);
+        if (attr)
+        {
+            return attr->Set(value);
+        }
+        return FAIL;
+    }
 };
 
 

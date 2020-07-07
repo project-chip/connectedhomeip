@@ -28,67 +28,28 @@
 
 namespace chip {
 namespace DataModel {
-#if 0
-template <typename AttrId, typename CHIPTypeName, typename TypeName>
-class CHIPSimpleAttribute : public CHIPBaseAttribute
-{
- public:
- CHIPSimpleAttribute() : CHIPBaseAttribute(AttrId, CHIPTypeName) {}
-
- int Set(const TypeName newValue)
- {
-     return CHIPBaseAttribute::Set(newValue);
- }
- bool Get()
- {
-     TypeName value;
-     CHIPBaseAttribute::Get(value);
-     return value;
- }
-};
-
-template <typename AttrId, typename CHIPTypeName, typename TypeName, typename MinRange, typename MaxRange>
-class CHIPRangeAttribute : public CHIPBaseAttribute
-{
- public:
- CHIPSimpleAttribute() : CHIPBaseAttribute(AttrId, CHIPTypeName, MinRange, MaxRange) {}
-
- int Set(const TypeName newValue)
- {
-     return CHIPBaseAttribute::Set(newValue);
- }
- bool Get()
- {
-     TypeName value;
-     CHIPBaseAttribute::Get(value);
-     return value;
- }
-};
-
-/* This will mostly be auto-generated */
-using CHIPAttributeOnOff = class CHIPSimpleAttribute<0x0000, kCHIPValueType_Bool, bool>;
-using CHIPAttributeGlobalSceneControl = class CHIPSimpleAttribute<0x4000, kCHIPValueType_Bool, bool>;
-using CHIPAttributeOnTime = class CHIPSimpleAttribute<0x4001, kCHIPValueType_UInt16, uint16_t>;
-using CHIPAttributeOffWaitTime = class CHIPSimpleAttribute<0x4002, kCHIPValueType_UInt16, uint16_t>;
-#endif
 
 /* TODO: It would be nice to use a pool allocator here once we have one */
 /* Base Cluster */
+static const uint16_t kAttributeIdZCLVersion = 0x0000;
 static inline CHIPBaseAttribute *CHIPAttributeZCLVersionNew(uint8_t ZCLVersion)
 {
-    return new CHIPBaseAttribute(0x0000, CHIPValueUInt8(ZCLVersion));
+    return new CHIPBaseAttribute(kAttributeIdZCLVersion, CHIPValueUInt8(ZCLVersion));
 }
 
+static const uint16_t kAttributeIdApplicationVersion = 0x0001;
 static inline CHIPBaseAttribute *CHIPAttributeApplicationVersionNew(uint8_t applicationVersion)
 {
-    return new CHIPBaseAttribute(0x0001, CHIPValueUInt8(applicationVersion));
+    return new CHIPBaseAttribute(kAttributeIdApplicationVersion, CHIPValueUInt8(applicationVersion));
 }
 
+static const uint16_t kAttributeIdStackVersion = 0x0002;
 static inline CHIPBaseAttribute *CHIPAttributeStackVersionNew(uint8_t stackVersion)
 {
-    return new CHIPBaseAttribute(0x0002, CHIPValueUInt8(stackVersion));
+    return new CHIPBaseAttribute(kAttributeIdStackVersion, CHIPValueUInt8(stackVersion));
 }
 
+static const uint16_t kAttributeIdHWVersion = 0x0003;
 static inline CHIPBaseAttribute *CHIPAttributeHWVersionNew(uint8_t HWVersion)
 {
     return new CHIPBaseAttribute(0x0003, CHIPValueUInt8(HWVersion));
@@ -96,21 +57,25 @@ static inline CHIPBaseAttribute *CHIPAttributeHWVersionNew(uint8_t HWVersion)
 
 
 /* On/Off Cluster */
+static const uint16_t kAttributeIdOnOff = 0x0000;
 static inline CHIPBaseAttribute *CHIPAttributeOnOffNew(void)
 {
-    return new CHIPBaseAttribute(0x0000, kCHIPValueType_Bool);
+    return new CHIPBaseAttribute(kAttributeIdOnOff, kCHIPValueType_Bool);
 }
 
+static const uint16_t kAttributeIdGlobalSceneControl = 0x4000;
 static inline CHIPBaseAttribute *CHIPAttributeGlobalSceneControlNew(void)
 {
-    return new CHIPBaseAttribute(0x4000, kCHIPValueType_Bool);
+    return new CHIPBaseAttribute(kAttributeIdGlobalSceneControl, kCHIPValueType_Bool);
 }
 
+static const uint16_t kAttributeIdOnTime = 0x4001;
 static inline CHIPBaseAttribute *CHIPAttributeOnTimeNew(void)
 {
     return new CHIPBaseAttribute(0x4001, kCHIPValueType_UInt16);
 }
 
+static const uint16_t kAttributeIdOffWaitTime = 0x4002;
 static inline CHIPBaseAttribute *CHIPAttributeOffWaitTimeNew(void)
 {
     return new CHIPBaseAttribute(0x4002, kCHIPValueType_UInt16);
