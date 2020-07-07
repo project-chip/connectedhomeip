@@ -56,47 +56,90 @@ namespace Transport {
  * The intent of this is to allow applications to use any transport types without CHIP pre-defining
  * popular mappings (like UDP only, UDP and BLE, BLE only etc.) and without using #ifdefs to create
  * a single 'standard transport'.
+ *
+ * Transport logic:
+ *   - Every transport can decide if a 'PeerAddress' can be sent over 'self'
+ *
+ *   - Within a mixed tuple, if several transports support a peer address (e.g. TCP and UDP both
+ *     support IP), the first one found wins.
+ *
+ *   - Expected message sending logic:
+ *     - BLE transports only support BLE. TCP/UDP support IP addresses
+ *     - Multicasts only supported by UDP
+ *
+ * @param TransporTypes the ORDERED list of transport types grouped together. Order matters in
+ *        determining what transport is used when multiple transports can reach a Peer.
+ *
+ * Transports (TransportTypes) are assumed to have an Init call with EXACTLY one argument and returning
+ * a CHIP_ERROR, with a signature like:
+ *
+ *    CHIP_ERROR Init(AnyType);
+ *
  */
 template <typename... TransportTypes>
 class Tuple : public Base
 {
 public:
-    CHIP_ERROR SendMessage(const MessageHeader & header, const Transport::PeerAddress & address,
-                           System::PacketBuffer * msgBuf) override
+    CHIP_ERROR SendMessage(const MessageHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) override
     {
         return SendMessageImpl<0>(header, address, msgBuf);
     }
 
-    bool CanSendToPeer(const Transport::PeerAddress & address) override { return CanSendToPeerImpl<0>(address); }
+    bool CanSendToPeer(const PeerAddress & address) override { return CanSendToPeerImpl<0>(address); }
 
     /**
      * Initialization method that forwards arguments for initialization to each of the underlying
      * transports.
+     *
+     * Transports are assumed to have an Init call with EXACTLY one argument. This method MUST initialize
+     * all underlying transports.
+     *
+     * @param args initialization arguments, forwarded as-is to the underlying transports.
      */
-    template <typename... Args>
+    template <typename... Args, typename std::enable_if<(sizeof...(Args) == sizeof...(TransportTypes))>::type * = nullptr>
     CHIP_ERROR Init(Args &&... args)
     {
         return InitImpl(std::forward<Args>(args)...);
     }
 
 private:
-    /// Recursive cansend implementation iterating through transport members
+    /**
+     * Recursive cansend implementation iterating through transport members.
+     *
+     * Will return true if any transport with index N and up can CanSendToPeer(address);
+     *
+     * @param N the index of the underlying transport to check for CanSendToPeer
+     *
+     * @param address what address to check.
+     */
     template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
-    bool CanSendToPeerImpl(const Transport::PeerAddress & address)
+    bool CanSendToPeerImpl(const PeerAddress & address)
     {
         return std::get<N>(mTransports).CanSendToPeer(address) || CanSendToPeerImpl<N + 1>(address);
     }
 
-    /// Final can send check , where message cannot be sent through any transport
+    /**
+     * CanSend template for out of range N. Always returns false.
+     */
     template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
-    bool CanSendToPeerImpl(const Transport::PeerAddress & address)
+    bool CanSendToPeerImpl(const PeerAddress & address)
     {
         return false;
     }
 
-    /// Recursive sendmessage implementation iterating through transport members
+    /**
+     * Recursive sendmessage implementation iterating through transport members.
+     *
+     * Message is sent through the first transport from index N or above, which returns 'CanSendToPeer'
+     *
+     * @param N the index of the underlying transport to run SendMessage throug.
+     *
+     * @param header the message header to send
+     * @param address where to send the message
+     * @param msgBuf the data to send.
+     */
     template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
-    CHIP_ERROR SendMessageImpl(const MessageHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgBuf)
+    CHIP_ERROR SendMessageImpl(const MessageHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf)
     {
         Base * base = &std::get<N>(mTransports);
         if (base->CanSendToPeer(address))
@@ -106,14 +149,27 @@ private:
         return SendMessageImpl<N + 1>(header, address, msgBuf);
     }
 
-    /// Final send message, where message cannot be sent through any transport
+    /**
+     * SendMessageImpl when N is out of range. Always returns an error code.
+     */
     template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
-    CHIP_ERROR SendMessageImpl(const MessageHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgBuf)
+    CHIP_ERROR SendMessageImpl(const MessageHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf)
     {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
 
-    /// Recursive init implementation iterating through transport members
+    /**
+     * Recursive init implementation iterating through transport members
+     *
+     * Given a set of arguments 'a1, a2, a3, ... aN' will call an Init method on the last N
+     * transports.
+     *
+     * Method is expected to be called initially with exactly sizeof(TransportTypes) to initialize
+     * all transports.
+     *
+     * @param arg the next initialize argument to pass to the transport Init method
+     * @param rest tail arguments to be passed to the rest of transport Init methods.
+     */
     template <typename InitArg, typename... Rest>
     CHIP_ERROR InitImpl(InitArg && arg, Rest &&... rest)
     {
@@ -130,10 +186,19 @@ private:
         return InitImpl(std::forward<Rest>(rest)...);
     }
 
-    /// Base case where initialization finishes.
+    /**
+     * Base case where initialization finishes.
+     *
+     * Provided to ensure that recursive InitImpl finishes compiling.
+     */
     CHIP_ERROR InitImpl() { return CHIP_NO_ERROR; }
 
-    /// Handler passed to all underlying transports at init time.
+    /**
+     * Handler passed to all underlying transports at init time.
+     *
+     * Calls the underlying Base message receive handler whenever any of the underlying transports
+     * receives a message.
+     */
     static void OnMessageReceive(const MessageHeader & header, const PeerAddress & source, System::PacketBuffer * msg, Tuple * t)
     {
         t->HandleMessageReceived(header, source, msg);
