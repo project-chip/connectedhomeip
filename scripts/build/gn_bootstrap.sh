@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #
 # Copyright (c) 2020 Project CHIP Authors
 #
@@ -14,12 +16,6 @@
 # limitations under the License.
 #
 
-if [[ ! -d "${CHIP_ROOT}" ]]; then
-  CHIP_ROOT="$(dirname "$0")"
-fi
+CHIP_ROOT="$(dirname "$0")/../.."
 
-export PW_BRANDING_BANNER="$CHIP_ROOT/.chip-banner.txt"
-export PW_BRANDING_BANNER_COLOR="bold_white"
-
-# shellcheck source=/dev/null
-source "$CHIP_ROOT/third_party/pigweed/activate.sh"
+source "$CHIP_ROOT/activate.sh"
