@@ -20,7 +20,11 @@ public class SetupPayload {
   /** The CHIP device manual setup code */
   public long setupPinCode;
 
-    public Map<Integer, OptionalQRCodeInfo> optionalQRCodeInfo;
+  public Map<Integer, OptionalQRCodeInfo> optionalQRCodeInfo;
+
+  public SetupPayload() {
+    this.optionalQRCodeInfo = new HashMap<Integer, OptionalQRCodeInfo>();
+  }
 
   public SetupPayload(
       int version,
