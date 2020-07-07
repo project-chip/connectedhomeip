@@ -239,7 +239,7 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobDataAndLengths(const char * key, ch
             {
                 size_t len = value.size();
 
-                encodedData                 = (char *) MemoryAlloc(len + 1);
+                encodedData                 = (char *) chip::Platform::MemoryAlloc(len + 1);
                 encodedDataLen              = value.copy(encodedData, len);
                 encodedData[encodedDataLen] = '\0';
 
@@ -296,7 +296,7 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobValue(const char * key, uint8_t * d
 
         if (encodedData)
         {
-            MemoryFree(encodedData);
+            chip::Platform::MemoryFree(encodedData);
         }
     }
 

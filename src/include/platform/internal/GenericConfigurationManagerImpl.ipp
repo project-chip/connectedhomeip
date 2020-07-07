@@ -878,7 +878,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
         // Create a temporary buffer to hold the certificate.  (This will also be used for
         // the private key).
         dataBufSize = certLen;
-        dataBuf     = (uint8_t *) MemoryAlloc(dataBufSize);
+        dataBuf     = (uint8_t *) chip::Platform::MemoryAlloc(dataBufSize);
         VerifyOrExit(dataBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         // Read the certificate.
@@ -899,7 +899,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
         // (This will also be used for the private key).
         if (certsLen > dataBufSize)
         {
-            MemoryFree(dataBuf);
+            chip::Platform::MemoryFree(dataBuf);
 
             dataBufSize = certsLen;
             dataBuf     = (uint8_t *) Platform::Security::MemoryAlloc(dataBufSize);

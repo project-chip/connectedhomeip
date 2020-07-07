@@ -32,6 +32,7 @@ extern "C" {
 int TestCHIPArgParser(void);
 int TestErrorStr(void);
 int TestTimeUtils(void);
+int TestMemAlloc(void);
 
 #ifdef __cplusplus
 }
