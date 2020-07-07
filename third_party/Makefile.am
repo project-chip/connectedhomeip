@@ -25,6 +25,7 @@
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
 EXTRA_DIST                                   = \
+    android/platform-libcore                   \
     nlbuild-autotools                          \
     $(NULL)
 

@@ -62,6 +62,7 @@ libCHIP_a_CPPFLAGS                  =                         \
     -I$(top_srcdir)/src/lib                                   \
     -I$(top_srcdir)/src/app/chip-zcl                          \
     -I$(top_srcdir)/src/app/gen                               \
+    $(chip_InetLayer_CPPFLAGS)                                \
     $(NLASSERT_CPPFLAGS)                                      \
     $(NLFAULTINJECTION_CPPFLAGS)                              \
     $(NLIO_CPPFLAGS)                                          \
