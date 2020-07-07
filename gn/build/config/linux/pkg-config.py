@@ -177,7 +177,7 @@ def main():
     cmd = [options.pkg_config, "--modversion"] + args
     try:
       version_string = subprocess.check_output(cmd).decode('utf-8')
-    except:
+    except Exception:
       sys.stderr.write('Error from pkg-config.\n')
       return 1
     print(json.dumps(list(map(int, version_string.strip().split(".")))))
@@ -190,7 +190,7 @@ def main():
       sys.stderr.write('Running: %s\n' % cmd)
     try:
       libdir = subprocess.check_output(cmd).decode('utf-8')
-    except:
+    except Exception:
       print("Error from pkg-config.")
       return 1
     sys.stdout.write(libdir.strip())
@@ -202,7 +202,7 @@ def main():
       sys.stderr.write('Running: %s\n' % cmd)
     try:
       dridriverdir = subprocess.check_output(cmd).decode('utf-8')
-    except:
+    except Exception:
       print("Error from pkg-config.")
       return 1
     sys.stdout.write(dridriverdir.strip())
@@ -214,7 +214,7 @@ def main():
 
   try:
     flag_string = subprocess.check_output(cmd).decode('utf-8')
-  except:
+  except Exception:
     sys.stderr.write('Could not run pkg-config.\n')
     return 1
 
