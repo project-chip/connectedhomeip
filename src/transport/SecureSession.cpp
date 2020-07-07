@@ -81,7 +81,10 @@ void SecureSession::Reset(void)
 
 uint64_t SecureSession::GetIV(const MessageHeader & header)
 {
-    uint64_t IV = header.GetMessageId();
+    // The message ID is a 4 byte value. It's assumed that the security
+    // session will be rekeyed before (or on) message ID rollover.
+    uint64_t IV = header.GetMessageId() & 0xffffffff;
+
     if (header.GetSourceNodeId().HasValue())
     {
         uint64_t nodeID = header.GetSourceNodeId().Value();
