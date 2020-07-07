@@ -14,5 +14,6 @@
 
 declare_args() {
   # Root directory for nlfaultinjection.
-  nlfaultinjection_root = "//third_party/connectedhomeip/third_party/nlfaultinjection"
+  nlfaultinjection_root =
+      "//third_party/connectedhomeip/third_party/nlfaultinjection"
 }
