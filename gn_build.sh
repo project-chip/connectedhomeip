@@ -85,8 +85,8 @@ echo ninja -C "$CHIP_ROOT/out/custom"
 
 echo
 if [[ ! -d "$NRF5_SDK_ROOT/components/libraries" ]]; then
-  echo "Hint: Set \$NRF5_SDK_ROOT to enable building for nRF5"
+    echo "Hint: Set \$NRF5_SDK_ROOT to enable building for nRF5"
 else
-  echo 'To build the nRF5 lock sample as a standalone project':
-  echo "(cd $CHIP_ROOT/examples/lock-app/nrf5; gn gen out/debug --args='$nrf5_sdk_args'; ninja -C out/debug)"
+    echo 'To build the nRF5 lock sample as a standalone project':
+    echo "(cd $CHIP_ROOT/examples/lock-app/nrf5; gn gen out/debug --args='$nrf5_sdk_args'; ninja -C out/debug)"
 fi
