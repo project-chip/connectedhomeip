@@ -64,7 +64,7 @@ public:
         return FAIL;
     }
 
-    CHIPBaseAttribute * GetAttribute(uint8_t attrId)
+    CHIPBaseAttribute * GetAttribute(uint16_t attrId)
     {
         for (int i = 0; i < kMaxAttributesPerCluster; i++)
         {
@@ -76,7 +76,7 @@ public:
         return nullptr;
     }
 
-    virtual int Set(uint8_t attrId, const CHIPValue & value)
+    virtual int Set(uint16_t attrId, const CHIPValue & value)
     {
         /* Just hand-off to update the value internally */
         auto attr = GetAttribute(attrId);

@@ -42,7 +42,7 @@ public:
     {
         if (mBasicCluster == nullptr)
         {
-            mBasicCluster = CHIPClusterBasicNew(ZCLVersion, applicationVersion, stackVersion, HWVersion);
+            mBasicCluster = new CHIPClusterBasic(ZCLVersion, applicationVersion, stackVersion, HWVersion);
             /* TODO: allocation failure? */
         }
         mClusters[0] = mBasicCluster;
