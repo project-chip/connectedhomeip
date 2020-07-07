@@ -16,9 +16,9 @@
  */
 
 #include <platform/CHIPDeviceLayer.h>
+#include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
-#include <support/ErrorStr.h>
 
 using namespace ::chip;
 using namespace ::chip::Ble;

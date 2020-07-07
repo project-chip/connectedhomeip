@@ -37,9 +37,9 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/SetupPayload.h>
 #include <support/ErrorStr.h>
 #include <transport/SecureSessionMgr.h>
-#include <setup_payload/SetupPayload.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
