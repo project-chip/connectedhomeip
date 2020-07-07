@@ -35,13 +35,10 @@ static const uint8_t kMaxClustersPerEndPoint = 5;
 class CHIPEndPoint
 {
 public:
-    static CHIPBaseCluster *mBasicCluster;
-    CHIPBaseCluster        *mClusters[kMaxClustersPerEndPoint];
+    static CHIPBaseCluster * mBasicCluster;
+    CHIPBaseCluster * mClusters[kMaxClustersPerEndPoint];
 
-    CHIPEndPoint(uint8_t ZCLVersion,
-                 uint8_t applicationVersion,
-                 uint8_t stackVersion,
-                 uint8_t HWVersion) : mClusters()
+    CHIPEndPoint(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) : mClusters()
     {
         if (mBasicCluster == nullptr)
         {
@@ -63,7 +60,7 @@ public:
         }
     }
 
-    int AddCluster(CHIPBaseCluster *cluster)
+    int AddCluster(CHIPBaseCluster * cluster)
     {
         for (int i = 0; i < kMaxClustersPerEndPoint; i++)
         {
@@ -76,12 +73,11 @@ public:
         return FAIL;
     }
 
-    CHIPBaseCluster *GetCluster(uint8_t clusterId)
+    CHIPBaseCluster * GetCluster(uint8_t clusterId)
     {
         for (int i = 0; i < kMaxClustersPerEndPoint; i++)
         {
-            if (mClusters[i] &&
-                mClusters[i]->mClusterId == clusterId)
+            if (mClusters[i] && mClusters[i]->mClusterId == clusterId)
             {
                 return mClusters[i];
             }
@@ -89,7 +85,6 @@ public:
         return nullptr;
     }
 };
-
 
 } // namespace DataModel
 } // namespace chip
