@@ -50,7 +50,7 @@ public class EchoClientActivity extends AppCompatActivity implements View.OnClic
     @Override
     public View onCreateView(
         LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-      View inflated = inflater.inflate(R.xml.echo_client_fragment, container, false);
+      View inflated = inflater.inflate(R.layout.echo_client_fragment, container, false);
 
       inflated.findViewById(R.id.send_echo_request).setOnClickListener(activity);
 

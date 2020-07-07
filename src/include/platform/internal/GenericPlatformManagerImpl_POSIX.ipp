@@ -24,8 +24,8 @@
 #ifndef GENERIC_PLATFORM_MANAGER_IMPL_POSIX_IPP
 #define GENERIC_PLATFORM_MANAGER_IMPL_POSIX_IPP
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/PlatformManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
 
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
@@ -34,13 +34,13 @@
 
 #include <system/SystemLayer.h>
 
-#include <poll.h>
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <poll.h>
 #include <sched.h>
-#include <unistd.h>
 #include <sys/select.h>
+#include <unistd.h>
 
 #define DEFAULT_MIN_SLEEP_PERIOD (60 * 60 * 24 * 30) // Month [sec]
 
@@ -48,15 +48,18 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>;
-
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#if defined(PTHREAD_RECURSIVE_MUTEX_INITIALIZER)
+    mChipStackLock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
+#elif defined(PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP)
     mChipStackLock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
+#else
+#error "No defined static initializer for POSIX Threads recursive mutex!"
+#endif // defined(PTHREAD_RECURSIVE_MUTEX_INITIALIZER)
 
     // Initialize the Configuration Manager object.
     err = ConfigurationMgr().Init();
@@ -216,6 +219,9 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartEventLoopTask(void
 exit:
     return System::MapErrorPOSIX(err);
 }
+
+// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
+template class GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer

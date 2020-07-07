@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">CHIPTool</string>
- </resources>
+    <string name="barcode_scanner_activity_toolbar_title">QR Scan</string>
+    <string name="chip_device_info_title">CHIP Device Info:</string>
+    <string name="chip_device_info_subtitle">Please manually connect to this device\'s soft AP using the information below.</string>
+    <string name="chip_device_info_version_label">Version:</string>
+    <string name="chip_device_info_vendor_id_label">Vendor ID:</string>
+    <string name="chip_device_info_product_id_label">Product ID:</string>
+    <string name="chip_device_info_setup_code_label">Setup PIN Code:</string>
+    <string name="camera_permission_missing_alert_title">Camera permission missing</string>
+    <string name="camera_permission_missing_alert_subtitle">Camera permission required to be able to scan the QR code.</string>
+    <string name="camera_permission_missing_alert_try_again">Try again</string>
+    <string name="camera_unavailable_alert_title">Camera unavailable</string>
+    <string name="camera_unavailable_alert_subtitle">Error launching camera to scan the QR code.</string>
+    <string name="camera_unavailable_alert_exit">Exit</string>
+</resources>

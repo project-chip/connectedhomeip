@@ -39,16 +39,16 @@
 	url = https://github.com/jeremyjh/ESP32_TFT_library.git
 	branch = master
 	ignore = dirty
-	commit = 3a841faacb218dbdba2f54edb251d3a64d9833fb
+	commit = 35be9760b4edf485287f78c0cf652beb19c047f0
 [submodule "pigweed"]
 	path = third_party/pigweed
 	url = https://pigweed.googlesource.com/pigweed/pigweed
 	branch = master
 	ignore = dirty
-	commit = 16bde6b17e0fabdf4b6877f0d62bd49d3110ee7f
+	commit = 023f35bab59c73c498377d1be1b4e60534ce7b20
 [submodule "openthread"]
 	path = third_party/openthread/repo
 	url = https://github.com/openthread/openthread.git
 	branch = master
 	ignore = dirty
-	commit = 9e291e62ed92d1132467489c4483330c46c0bce4
+	commit = 5f0e36eeb236a507631e9c822e43f742b7b6738a

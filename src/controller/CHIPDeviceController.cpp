@@ -272,12 +272,12 @@ CHIP_ERROR ChipDeviceController::GetLayers(Layer ** systemLayer, InetLayer ** in
 
 void ChipDeviceController::ServiceEvents()
 {
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     if (mState != kState_Initialized)
     {
         return;
     }
+
     // Set the select timeout to 100ms
     struct timeval aSleepTime;
     aSleepTime.tv_sec  = 0;
@@ -300,10 +300,16 @@ void ChipDeviceController::ServiceEvents()
     FD_ZERO(&exceptFDs);
 
     if (mSystemLayer->State() == System::kLayerState_Initialized)
+    {
         mSystemLayer->PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
+    }
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     if (mInetLayer->State == Inet::InetLayer::kState_Initialized)
+    {
         mInetLayer->PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
+    }
+#endif
 
     int selectRes = select(numFDs, &readFDs, &writeFDs, &exceptFDs, &aSleepTime);
     if (selectRes < 0)
@@ -317,11 +323,14 @@ void ChipDeviceController::ServiceEvents()
         mSystemLayer->HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
     }
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     if (mInetLayer->State == Inet::InetLayer::kState_Initialized)
     {
         mInetLayer->HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
     }
 #endif
+
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 }
 
 void ChipDeviceController::ClearRequestState()

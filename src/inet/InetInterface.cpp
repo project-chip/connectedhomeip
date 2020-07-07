@@ -224,6 +224,143 @@ void CloseIOCTLSocket(void)
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+#if __ANDROID__ && __ANDROID_API__ < 24
+
+static struct if_nameindex * backport_if_nameindex(void);
+static void backport_if_freenameindex(struct if_nameindex *);
+
+static void backport_if_freenameindex(struct if_nameindex * inArray)
+{
+    if (inArray == NULL)
+    {
+        return;
+    }
+
+    for (size_t i = 0; inArray[i].if_index != 0; i++)
+    {
+        if (inArray[i].if_name != NULL)
+        {
+            free(inArray[i].if_name);
+        }
+    }
+
+    free(inArray);
+}
+
+static struct if_nameindex * backport_if_nameindex(void)
+{
+    int err;
+    unsigned index;
+    size_t intfIter              = 0;
+    size_t maxIntfNum            = 0;
+    size_t numIntf               = 0;
+    size_t numAddrs              = 0;
+    struct if_nameindex * retval = NULL;
+    struct if_nameindex * tmpval = NULL;
+    struct ifaddrs * addrList    = NULL;
+    struct ifaddrs * addrIter    = NULL;
+    const char * lastIntfName    = "";
+
+    err = getifaddrs(&addrList);
+    VerifyOrExit(err >= 0, );
+
+    // coalesce on consecutive interface names
+    for (addrIter = addrList; addrIter != NULL; addrIter = addrIter->ifa_next)
+    {
+        numAddrs++;
+        if (strcmp(addrIter->ifa_name, lastIntfName) == 0)
+        {
+            continue;
+        }
+        numIntf++;
+        lastIntfName = addrIter->ifa_name;
+    }
+
+    tmpval = (struct if_nameindex *) malloc((numIntf + 1) * sizeof(struct if_nameindex));
+    VerifyOrExit(tmpval != NULL, );
+    memset(tmpval, 0, (numIntf + 1) * sizeof(struct if_nameindex));
+
+    lastIntfName = "";
+    for (addrIter = addrList; addrIter != NULL; addrIter = addrIter->ifa_next)
+    {
+        if (strcmp(addrIter->ifa_name, lastIntfName) == 0)
+        {
+            continue;
+        }
+
+        index = if_nametoindex(addrIter->ifa_name);
+        if (index != 0)
+        {
+            tmpval[intfIter].if_index = index;
+            tmpval[intfIter].if_name  = strdup(addrIter->ifa_name);
+            intfIter++;
+        }
+        lastIntfName = addrIter->ifa_name;
+    }
+
+    // coalesce on interface index
+    maxIntfNum = 0;
+    for (size_t i = 0; tmpval[i].if_index != 0; i++)
+    {
+        if (maxIntfNum < tmpval[i].if_index)
+        {
+            maxIntfNum = tmpval[i].if_index;
+        }
+    }
+
+    retval = (struct if_nameindex *) malloc((maxIntfNum + 1) * sizeof(struct if_nameindex));
+    VerifyOrExit(retval != NULL, );
+    memset(retval, 0, (maxIntfNum + 1) * sizeof(struct if_nameindex));
+
+    for (size_t i = 0; tmpval[i].if_index != 0; i++)
+    {
+        struct if_nameindex * intf = &tmpval[i];
+        if (retval[intf->if_index - 1].if_index == 0)
+        {
+            retval[intf->if_index - 1] = *intf;
+        }
+        else
+        {
+            free(intf->if_name);
+            intf->if_index = 0;
+            intf->if_name  = 0;
+        }
+    }
+
+    intfIter = 0;
+
+    // coalesce potential gaps between indeces
+    for (size_t i = 0; i < maxIntfNum; i++)
+    {
+        if (retval[i].if_index != 0)
+        {
+            retval[intfIter] = retval[i];
+            intfIter++;
+        }
+    }
+
+    for (size_t i = intfIter; i < maxIntfNum; i++)
+    {
+        retval[i].if_index = 0;
+        retval[i].if_name  = NULL;
+    }
+
+exit:
+    if (tmpval != NULL)
+    {
+        free(tmpval);
+    }
+
+    if (addrList != NULL)
+    {
+        freeifaddrs(addrList);
+    }
+
+    return retval;
+}
+
+#endif // __ANDROID__ && __ANDROID_API__ < 24
+
 InterfaceIterator::InterfaceIterator(void)
 {
     mIntfArray       = NULL;
@@ -249,7 +386,11 @@ InterfaceIterator::~InterfaceIterator(void)
 {
     if (mIntfArray != NULL)
     {
+#if __ANDROID__ && __ANDROID_API__ < 24
+        backport_if_freenameindex(mIntfArray);
+#else
         if_freenameindex(mIntfArray);
+#endif
         mIntfArray = NULL;
     }
 }
@@ -300,7 +441,11 @@ bool InterfaceIterator::Next(void)
 
     if (mIntfArray == NULL)
     {
+#if __ANDROID__ && __ANDROID_API__ < 24
+        mIntfArray = backport_if_nameindex();
+#else
         mIntfArray = if_nameindex();
+#endif
     }
     else if (mIntfArray[mCurIntf].if_index != 0)
     {
