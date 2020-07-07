@@ -20,7 +20,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: "connectedhomeip/chip-build-openssl:0.2.14"
+            image: "connectedhomeip/chip-build-openssl:0.2.18"
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -32,10 +32,7 @@ jobs:
                   case $BUILD_TYPE in
                      "main") export BOOTSTRAP_ARGUMENTS="";;
                      "clang") export BOOTSTRAP_ARGUMENTS="CC=clang-9 CXX=clang++-9";;
-                     "linux-embedded")
-                          apt-get update
-                          apt-get install -y libdbus-1-dev
-                          export BOOTSTRAP_ARGUMENTS="--with-device-layer=linux";;
+                     "linux-embedded") export BOOTSTRAP_ARGUMENTS="--with-device-layer=linux";;
                      "mbedtls") export BOOTSTRAP_ARGUMENTS="--with-crypto=mbedtls";;
                      *) ;;
                   esac

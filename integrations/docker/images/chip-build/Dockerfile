@@ -40,7 +40,6 @@ RUN set -x \
     libglib2.0-dev \
     libpixman-1-dev \
     ninja-build \
-    libdbus-1-dev \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
