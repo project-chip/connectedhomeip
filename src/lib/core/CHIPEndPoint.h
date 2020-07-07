@@ -75,6 +75,19 @@ public:
         }
         return FAIL;
     }
+
+    CHIPBaseCluster *GetCluster(uint8_t clusterId)
+    {
+        for (int i = 0; i < kMaxClustersPerEndPoint; i++)
+        {
+            if (mClusters[i] &&
+                mClusters[i]->mClusterId == clusterId)
+            {
+                return mClusters[i];
+            }
+        }
+        return nullptr;
+    }
 };
 
 
