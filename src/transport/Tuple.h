@@ -80,11 +80,13 @@ template <typename... TransportTypes>
 class Tuple : public Base
 {
 public:
+    /** @overload */
     CHIP_ERROR SendMessage(const MessageHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) override
     {
         return SendMessageImpl<0>(header, address, msgBuf);
     }
 
+    /** @overload */
     bool CanSendToPeer(const PeerAddress & address) override { return CanSendToPeerImpl<0>(address); }
 
     /**
