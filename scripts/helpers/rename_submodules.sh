@@ -16,6 +16,9 @@
 # limitations under the License.
 #
 
+# Temporary transition script to remove submodules added with previous names
+# and re-add them with the new names.
+
 CHIP_ROOT="$(dirname "$0")/../.."
 
 if [[ ! -e "$CHIP_ROOT/.git" ]]; then
