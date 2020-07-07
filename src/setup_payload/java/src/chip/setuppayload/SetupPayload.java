@@ -1,7 +1,7 @@
 package chip.setuppayload;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /** Class to hold the data from the scanned QR code or manual entry code. */
 public class SetupPayload {
