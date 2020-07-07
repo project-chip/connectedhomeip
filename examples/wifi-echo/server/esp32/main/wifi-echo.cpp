@@ -82,6 +82,14 @@ static Button attentionButton;
 const char * TAG = "wifi-echo-demo";
 
 static EchoDeviceCallbacks EchoCallbacks;
+const uint8_t ZCLVersion = 10;
+const uint8_t applicationVersion = 20;
+const uint8_t stackVersion = 1;
+const uint8_t HWVersion = 1;
+CHIPClusterServer server(ZCLVersion,
+                         applicationVersion,
+                         stackVersion,
+                         HWVersion);
 
 namespace {
 
@@ -169,16 +177,8 @@ extern "C" void app_main()
 
     statusLED.Init(STATUS_LED_GPIO_NUM);
 
-    uint8_t ZCLVersion = 10;
-    uint8_t applicationVersion = 20;
-    uint8_t stackVersion = 1;
-    uint8_t HWVersion = 1;
-    CHIPClusterServer server(ZCLVersion,
-                             applicationVersion,
-                             stackVersion,
-                             HWVersion);
     /* Add a cluster to the primary endpoint of our cluster server */
-    server.AddCluster(CHIPClusterOnOffNew());
+    server.AddCluster(&statusLED);
 
     // Start the Echo Server
     InitDataModelHandler();

@@ -27,6 +27,7 @@
 #include "esp_log.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
+#include <lib/core/CHIPClusterServer.h>
 
 #include "LEDWidget.h"
 #include <inet/IPAddress.h>
@@ -34,6 +35,7 @@
 static const char * TAG = "echo-devicecallbacks";
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DataModel;
 
 extern LEDWidget statusLED; // In wifi-echo.cpp
 
@@ -70,22 +72,26 @@ void EchoDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, int
     }
 }
 
+extern CHIPClusterServer server;
+/* This function can be eliminated, and instead its contents will get executed */
 void EchoDeviceCallbacks::PostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId,
                                                       uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
                                                       uint8_t * value)
 {
-    if (clusterId != CHIP_ZCL_CLUSTER_ON_OFF)
+    /* TODO: For some reason, the first endpoint is 1 instead of 0 */
+    endpoint--;
+    printf("endpoint: %d, clusterId: %d, attrId: %d type: %d\n", endpoint, clusterId, attributeId, type);
+    for (int i = 0; i < kMaxClustersPerEndPoint; i++)
     {
-        ESP_LOGI(TAG, "Unknown cluster ID: %d", clusterId);
-        return;
+        if(server.mEndPoints[endpoint] &&
+           server.mEndPoints[endpoint]->mClusters[i] &&
+           server.mEndPoints[endpoint]->mClusters[i]->mClusterId == clusterId)
+        {
+            // At this point we can assume that value points to a boolean value.
+            CHIPValue cValue(kCHIPValueType_Bool);
+            memcpy((void *)&cValue.Int64, (void *)value, size);
+            printf("Value is %lld type is %d\n", cValue.Int64, type);
+            server.mEndPoints[endpoint]->mClusters[i]->Set(attributeId, cValue);
+        }
     }
-
-    if (attributeId != CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF)
-    {
-        ESP_LOGI(TAG, "Unknown attribute ID: %d", attributeId);
-        return;
-    }
-    ESP_LOGI(TAG, "Got the post attribute callback");
-    // At this point we can assume that value points to a boolean value.
-    statusLED.Set(*value);
 }

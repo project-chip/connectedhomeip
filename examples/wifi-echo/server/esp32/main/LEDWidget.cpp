@@ -30,6 +30,7 @@
 #include "esp_log.h"
 #include "esp_system.h"
 #include "esp_timer.h"
+#include <lib/core/CHIPStandardAttributes.h>
 
 #if CONFIG_HAVE_DISPLAY
 // The Y position of the LED Status message on screen as a
@@ -45,7 +46,7 @@ static const char * onMsg  = "LIGHT: ON";
 static const char * offMsg = "LIGHT: OFF";
 
 #endif
-
+using namespace ::chip::DataModel;
 extern const char * TAG;
 
 void LEDWidget::Init(gpio_num_t gpioNum)
@@ -68,6 +69,19 @@ void LEDWidget::Set(bool state)
 {
     mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
     DoSet(state);
+    CHIPBaseCluster::Set(kAttributeIdOnOff, CHIPValueBool(state));
+}
+
+int LEDWidget::Set(uint8_t attrId, const CHIPValue &value)
+{
+    if (attrId == kAttributeIdOnOff)
+    {
+        printf("Setting value to %d\n", CHIPValueToBool(value));
+        DoSet(CHIPValueToBool(value));
+        /* Update our internal data model as well */
+        CHIPBaseCluster::Set(attrId, value);
+    }
+    return SUCCESS;
 }
 
 void LEDWidget::Blink(uint32_t changeRateMS)

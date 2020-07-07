@@ -30,30 +30,37 @@
 namespace chip {
 namespace DataModel {
 
-/* Base Cluster */
-    static inline CHIPBaseCluster *CHIPClusterBasicNew(uint8_t ZCLVersion,
-                                                       uint8_t applicationVersion,
-                                                       uint8_t stackVersion,
-                                                       uint8_t HWVersion)
+static const uint16_t kClusterIdBase = 0x0000;
+class CHIPClusterBasic : public CHIPBaseCluster
 {
-    CHIPBaseCluster *cluster = new CHIPBaseCluster(0x0000);
-    cluster->AddAttribute(CHIPAttributeZCLVersionNew(ZCLVersion));
-    cluster->AddAttribute(CHIPAttributeApplicationVersionNew(applicationVersion));
-    cluster->AddAttribute(CHIPAttributeStackVersionNew(stackVersion));
-    cluster->AddAttribute(CHIPAttributeHWVersionNew(HWVersion));
-    return cluster;
-}
+public:
+    CHIPClusterBasic(uint8_t ZCLVersion,
+                     uint8_t applicationVersion,
+                     uint8_t stackVersion,
+                     uint8_t HWVersion) :
+        CHIPBaseCluster(kClusterIdBase)
+    {
+        AddAttribute(CHIPAttributeZCLVersionNew(ZCLVersion));
+        AddAttribute(CHIPAttributeApplicationVersionNew(applicationVersion));
+        AddAttribute(CHIPAttributeStackVersionNew(stackVersion));
+        AddAttribute(CHIPAttributeHWVersionNew(HWVersion));
+    }
+};
 
-/* On/Off Cluster */
-static inline CHIPBaseCluster *CHIPClusterOnOffNew(void)
+static const uint16_t kClusterIdOnOff = 0x0006;
+class CHIPClusterOnOff : public CHIPBaseCluster
 {
-    CHIPBaseCluster *cluster = new CHIPBaseCluster(0x0006);
-    cluster->AddAttribute(CHIPAttributeOnOffNew());
-    cluster->AddAttribute(CHIPAttributeGlobalSceneControlNew());
-    cluster->AddAttribute(CHIPAttributeOnTimeNew());
-    cluster->AddAttribute(CHIPAttributeOffWaitTimeNew());
-    return cluster;
-}
+public:
+    CHIPClusterOnOff() :
+        CHIPBaseCluster(kClusterIdOnOff)
+    {
+        AddAttribute(CHIPAttributeOnOffNew());
+        AddAttribute(CHIPAttributeGlobalSceneControlNew());
+        AddAttribute(CHIPAttributeOnTimeNew());
+        AddAttribute(CHIPAttributeOffWaitTimeNew());
+    }
+};
+
 
 } // namespace DataModel
 } // namespace chip
