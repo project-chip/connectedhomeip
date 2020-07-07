@@ -117,13 +117,13 @@ private:
     friend class Internal::GenericConfigurationManagerImpl;
     // Parentheses used to fix clang parsing issue with these declarations
     friend ::chip::System::Error(::chip::System::Platform::Layer::PostEvent)(::chip::System::Layer & aLayer, void * aContext,
-                                                                            ::chip::System::Object & aTarget,
-                                                                            ::chip::System::EventType aType, uintptr_t aArgument);
+                                                                             ::chip::System::Object & aTarget,
+                                                                             ::chip::System::EventType aType, uintptr_t aArgument);
     friend ::chip::System::Error(::chip::System::Platform::Layer::DispatchEvents)(::chip::System::Layer & aLayer, void * aContext);
     friend ::chip::System::Error(::chip::System::Platform::Layer::DispatchEvent)(::chip::System::Layer & aLayer, void * aContext,
-                                                                                ::chip::System::Event aEvent);
+                                                                                 ::chip::System::Event aEvent);
     friend ::chip::System::Error(::chip::System::Platform::Layer::StartTimer)(::chip::System::Layer & aLayer, void * aContext,
-                                                                             uint32_t aMilliseconds);
+                                                                              uint32_t aMilliseconds);
 
     void PostEvent(const ChipDeviceEvent * event);
     void DispatchEvent(const ChipDeviceEvent * event);
