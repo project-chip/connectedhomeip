@@ -119,15 +119,15 @@ CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBuffer
         uint8_t * data = msgBuf->Start();
         MessageHeader header;
 
-        err = state->GetSecureSession().Encrypt(data, msgBuf->TotalLength(), data, header);
-        SuccessOrExit(err);
-
-        ChipLogProgress(Inet, "Secure transport transmitting msg %u after encryption", state->GetSendMessageIndex());
-
         header
             .SetSourceNodeId(mLocalNodeId)    //
             .SetDestinationNodeId(peerNodeId) //
             .SetMessageId(state->GetSendMessageIndex());
+
+        err = state->GetSecureSession().Encrypt(data, msgBuf->TotalLength(), data, header);
+        SuccessOrExit(err);
+
+        ChipLogProgress(Inet, "Secure transport transmitting msg %u after encryption", state->GetSendMessageIndex());
 
         err    = mTransport.SendMessage(header, state->GetPeerAddress(), msgBuf);
         msgBuf = NULL;

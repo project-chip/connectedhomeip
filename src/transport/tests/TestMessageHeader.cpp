@@ -41,7 +41,6 @@ void TestHeaderInitialState(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, header.GetSecureMsgType() == 0);
     NL_TEST_ASSERT(inSuite, header.GetSecureSessionID() == 0);
-    NL_TEST_ASSERT(inSuite, header.GetIV() == 0);
     NL_TEST_ASSERT(inSuite, header.GetTag() == 0);
     NL_TEST_ASSERT(inSuite, header.GetMessageId() == 0);
     NL_TEST_ASSERT(inSuite, !header.GetDestinationNodeId().HasValue());
@@ -102,12 +101,12 @@ void TestHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(77));
 
     header.SetMessageId(234).SetSourceNodeId(77).SetDestinationNodeId(88);
-    header.SetSecureMsgType(1122).SetSessionID(2233).SetIV(334455).SetTag(12345);
+    header.SetSecureMsgType(1122).SetSessionID(2233).SetTag(12345);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, sizeof(buffer), &encodeLen) == CHIP_NO_ERROR);
 
     // change it to verify decoding
     header.SetMessageId(222).SetSourceNodeId(1).SetDestinationNodeId(2);
-    header.SetSecureMsgType(2211).SetSessionID(3322).SetIV(554433).SetTag(54321);
+    header.SetSecureMsgType(2211).SetSessionID(3322).SetTag(54321);
     NL_TEST_ASSERT(inSuite, header.Decode(buffer, encodeLen, &decodeLen) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, encodeLen == decodeLen);
     NL_TEST_ASSERT(inSuite, header.GetMessageId() == 234);
@@ -115,7 +114,6 @@ void TestHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(77));
     NL_TEST_ASSERT(inSuite, header.GetSecureMsgType() == 1122);
     NL_TEST_ASSERT(inSuite, header.GetSecureSessionID() == 2233);
-    NL_TEST_ASSERT(inSuite, header.GetIV() == 334455);
     NL_TEST_ASSERT(inSuite, header.GetTag() == 12345);
 }
 
