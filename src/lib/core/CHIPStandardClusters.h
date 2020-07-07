@@ -34,10 +34,7 @@ static const uint16_t kClusterIdBase = 0x0000;
 class CHIPClusterBasic : public CHIPBaseCluster
 {
 public:
-    CHIPClusterBasic(uint8_t ZCLVersion,
-                     uint8_t applicationVersion,
-                     uint8_t stackVersion,
-                     uint8_t HWVersion) :
+    CHIPClusterBasic(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) :
         CHIPBaseCluster(kClusterIdBase)
     {
         AddAttribute(CHIPAttributeZCLVersionNew(ZCLVersion));
@@ -51,8 +48,7 @@ static const uint16_t kClusterIdOnOff = 0x0006;
 class CHIPClusterOnOff : public CHIPBaseCluster
 {
 public:
-    CHIPClusterOnOff() :
-        CHIPBaseCluster(kClusterIdOnOff)
+    CHIPClusterOnOff() : CHIPBaseCluster(kClusterIdOnOff)
     {
         AddAttribute(CHIPAttributeOnOffNew());
         AddAttribute(CHIPAttributeGlobalSceneControlNew());
@@ -60,7 +56,6 @@ public:
         AddAttribute(CHIPAttributeOffWaitTimeNew());
     }
 };
-
 
 } // namespace DataModel
 } // namespace chip

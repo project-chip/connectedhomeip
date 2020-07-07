@@ -34,8 +34,8 @@ static const uint8_t kMaxAttributesPerCluster = 10;
 class CHIPBaseCluster
 {
 public:
-    uint16_t           mClusterId;
-    CHIPBaseAttribute *mAttrs[kMaxAttributesPerCluster];
+    uint16_t mClusterId;
+    CHIPBaseAttribute * mAttrs[kMaxAttributesPerCluster];
 
     CHIPBaseCluster(uint16_t clusterId) : mClusterId(clusterId), mAttrs() {}
 
@@ -51,7 +51,7 @@ public:
         }
     }
 
-    int AddAttribute(CHIPBaseAttribute *attr)
+    int AddAttribute(CHIPBaseAttribute * attr)
     {
         for (int i = 0; i < kMaxAttributesPerCluster; i++)
         {
@@ -64,12 +64,11 @@ public:
         return FAIL;
     }
 
-    CHIPBaseAttribute *GetAttribute(uint8_t attrId)
+    CHIPBaseAttribute * GetAttribute(uint8_t attrId)
     {
         for (int i = 0; i < kMaxAttributesPerCluster; i++)
         {
-            if (mAttrs[i] &&
-                (mAttrs[i]->mAttrId == attrId))
+            if (mAttrs[i] && (mAttrs[i]->mAttrId == attrId))
             {
                 return mAttrs[i];
             }
@@ -77,7 +76,7 @@ public:
         return nullptr;
     }
 
-    virtual int Set(uint8_t attrId, const CHIPValue &value)
+    virtual int Set(uint8_t attrId, const CHIPValue & value)
     {
         /* Just hand-off to update the value internally */
         auto attr = GetAttribute(attrId);
@@ -88,7 +87,6 @@ public:
         return FAIL;
     }
 };
-
 
 } // namespace DataModel
 } // namespace chip
