@@ -57,12 +57,12 @@ _chip_banner "Build: Ninja build"
 time ninja -C "$CHIP_ROOT/out/debug" check
 
 echo
-echo 'To re-bootstrap build environment in your shell, run:'
-echo source "$CHIP_ROOT/bootstrap.sh"
-echo
-
 echo 'To activate existing build environment in your shell, run (do this first):'
 echo source "$CHIP_ROOT/activate.sh"
+
+echo
+echo 'To re-create the build environment from scratch, run:'
+echo source "$CHIP_ROOT/bootstrap.sh"
 
 echo
 echo 'To build a debug build:'
