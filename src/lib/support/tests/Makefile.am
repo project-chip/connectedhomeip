@@ -43,6 +43,7 @@ lib_LIBRARIES                                         = \
 
 libSupportTests_a_SOURCES                             = \
     TestCHIPArgParser.cpp                               \
+    TestCHIPMem.cpp                                     \
     TestErrorStr.cpp                                    \
     TestTimeUtils.cpp                                   \
     $(NULL)
@@ -69,6 +70,7 @@ AM_CPPFLAGS                                           = \
 
 CHIP_LDADD                                            = \
     $(top_builddir)/src/lib/support/libSupportLayer.a   \
+    $(top_builddir)/src/platform/libDeviceLayer.a       \
     $(NULL)
 
 COMMON_LDADD                                          = \
@@ -87,6 +89,7 @@ check_PROGRAMS                                        = \
     TestErrorStr                                        \
     TestTimeUtils                                       \
     TestCHIPCounter                                     \
+    TestCHIPMem                                         \
     TestPersistedCounter                                \
     $(NULL)
 
@@ -116,6 +119,9 @@ TestErrorStr_LDADD                                    = $(COMMON_LDADD)
 
 TestCHIPCounter_SOURCES                               = TestCHIPCounter.cpp
 TestCHIPCounter_LDADD                                 = $(COMMON_LDADD)
+
+TestCHIPMem_SOURCES                                   = TestCHIPMemDriver.cpp
+TestCHIPMem_LDADD                                     = $(COMMON_LDADD)
 
 TestPersistedCounter_SOURCES                          = \
     TestPersistedCounter.cpp                            \

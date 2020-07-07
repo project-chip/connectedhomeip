@@ -124,7 +124,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_AddEventHandler(PlatformManag
         }
     }
 
-    eventHandler = (AppEventHandler *) MemoryAlloc(sizeof(AppEventHandler));
+    eventHandler = (AppEventHandler *) chip::Platform::MemoryAlloc(sizeof(AppEventHandler));
     VerifyOrExit(eventHandler != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     eventHandler->Next    = mAppEventHandlerList;
@@ -149,7 +149,7 @@ void GenericPlatformManagerImpl<ImplClass>::_RemoveEventHandler(PlatformManager:
         if (eventHandler->Handler == handler && eventHandler->Arg == arg)
         {
             *eventHandlerIndirectPtr = eventHandler->Next;
-            MemoryFree(eventHandler);
+            chip::Platform::MemoryFree(eventHandler);
         }
         else
         {
