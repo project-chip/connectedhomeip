@@ -41,7 +41,7 @@ namespace Transport {
  * Having an example class definition of:
  *    Tuple<UDP, UDP, TCP>
  *
- * Is be equivalent to:
+ * Is equivalent to:
  *    class TupleOfUdpUdpTcp : public BASE {
  *       private:
  *          UDP mUdp1;
