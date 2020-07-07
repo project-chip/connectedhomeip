@@ -28,7 +28,7 @@
 #define CODEUTILS_H_
 
 #include <core/CHIPError.h>
-#include <support/CHIPMem.h>
+#include <platform/CHIPMem.h>
 #include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -204,7 +204,7 @@ inline const _T & max(const _T & a, const _T & b)
  *  {
  *      CHIP_ERROR err = CHIP_NO_ERROR;
  *
- *      buf = (uint8_t *)MemoryAlloc(1024);
+ *      buf = (uint8_t *)chip::Platform::MemoryAlloc(1024);
  *      VerifyOrExit(buf != NULL, err = CHIP_ERROR_NO_MEMORY);
  *
  *      memset(buf, 0, 1024);
@@ -309,7 +309,7 @@ inline void chipDie(void)
  *  void FreeBuffer(const uint8_t *buf)
  *  {
  *      VerifyOrDie(buf != NULL);
- *      MemoryFree(buf);
+ *      chip::Platform::MemoryFree(buf);
  *  }
  *  @endcode
  *
@@ -335,7 +335,7 @@ inline void chipDie(void)
  *  void FreeBuffer(const uint8_t *buf)
  *  {
  *      VerifyOrDieWithMsg(buf != NULL, MemoryManagement, "Invalid pointer passed to FreeBuffer");
- *      MemoryFree(buf);
+ *      chip::Platform::MemoryFree(buf);
  *  }
  *  @endcode
  *

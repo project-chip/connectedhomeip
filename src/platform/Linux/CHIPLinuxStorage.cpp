@@ -30,10 +30,10 @@
 #include <string>
 #include <unistd.h>
 
+#include <platform/CHIPMem.h>
 #include <platform/Linux/CHIPLinuxStorage.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <support/Base64.h>
-#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -213,7 +213,7 @@ CHIP_ERROR ChipLinuxStorage::WriteValueBin(const char * key, const uint8_t * dat
     // Allocate just enough space for the encoded data, and the NULL terminator
     if (retval == CHIP_NO_ERROR)
     {
-        encodedData = (char *) MemoryAlloc(expectedEncodedLen + 1);
+        encodedData = (char *) chip::Platform::MemoryAlloc(expectedEncodedLen + 1);
         if (encodedData == NULL)
         {
             retval = CHIP_ERROR_NO_MEMORY;
@@ -236,7 +236,7 @@ CHIP_ERROR ChipLinuxStorage::WriteValueBin(const char * key, const uint8_t * dat
     // Free memory
     if (encodedData)
     {
-        MemoryFree(encodedData);
+        chip::Platform::MemoryFree(encodedData);
     }
 
     return retval;

@@ -41,6 +41,7 @@ lib_LIBRARIES                                  = \
     $(NULL)
 
 libPlatformTests_a_SOURCES                     = \
+    TestMemAlloc.cpp                             \
     TestPlatformMgr.cpp                          \
     TestPlatformTime.cpp                         \
     TestConfigurationMgr.cpp                     \
@@ -49,6 +50,7 @@ libPlatformTests_a_SOURCES                     = \
 libPlatformTests_adir                          = $(includedir)/platform
 
 dist_libPlatformTests_a_HEADERS                = \
+    TestMemAlloc.h                               \
     TestPlatformMgr.h                            \
     TestPlatformTime.h                           \
     TestConfigurationMgr.h                       \
@@ -88,6 +90,7 @@ COMMON_LDADD                                          = \
 # Test applications that should be run when the 'check' target is run.
 
 check_PROGRAMS                                 = \
+    TestMemAlloc                                 \
     TestPlatformTime                             \
     TestPlatformMgr                              \
     TestConfigurationMgr                         \
@@ -109,6 +112,9 @@ TESTS_ENVIRONMENT                              = \
     $(NULL)
 
 # Source, compiler, and linker options for test programs.
+
+TestMemAlloc_LDADD                             = $(COMMON_LDADD)
+TestMemAlloc_SOURCES                           = TestMemAllocDriver.cpp
 
 TestPlatformTime_LDADD                         = $(COMMON_LDADD)
 TestPlatformTime_SOURCES                       = TestPlatformTimeDriver.cpp

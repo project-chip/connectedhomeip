@@ -35,7 +35,6 @@
 #include <core/CHIPTLVDebug.hpp>
 #include <core/CHIPTLVUtilities.hpp>
 
-#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 
@@ -216,14 +215,14 @@ void TestString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const c
     uint32_t expectedLen = strlen(expectedVal);
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    char * val = (char *) MemoryAlloc(expectedLen + 1);
+    char * val = (char *) malloc(expectedLen + 1);
 
     CHIP_ERROR err = reader.GetString(val, expectedLen + 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen + 1) == 0);
 
-    MemoryFree(val);
+    free(val);
 }
 
 void TestDupString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const char * expectedVal)
@@ -234,7 +233,7 @@ void TestDupString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, cons
     uint32_t expectedLen = strlen(expectedVal);
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    char * val = (char *) MemoryAlloc(expectedLen + 1);
+    char * val = (char *) malloc(expectedLen + 1);
 
     CHIP_ERROR err = reader.DupString(val);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -251,13 +250,13 @@ void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const
 
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    uint8_t * val  = (uint8_t *) MemoryAlloc(expectedLen);
+    uint8_t * val  = (uint8_t *) malloc(expectedLen);
     CHIP_ERROR err = reader.DupBytes(val, expectedLen);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen) == 0);
 
-    MemoryFree(val);
+    free(val);
 }
 
 void TestBufferContents(nlTestSuite * inSuite, PacketBuffer * buf, const uint8_t * expectedVal, uint32_t expectedLen)
@@ -3030,16 +3029,16 @@ void TestCHIPTLVReaderErrorHandling(nlTestSuite * inSuite)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     // DupString()
-    char * str = (char *) MemoryAlloc(16);
+    char * str = (char *) malloc(16);
     err        = reader.DupString(str);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
-    MemoryFree(str);
+    free(str);
 
     // GetDataPtr()
-    const uint8_t * data = (uint8_t *) MemoryAlloc(16);
+    const uint8_t * data = (uint8_t *) malloc(16);
     err                  = reader.GetDataPtr(data);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
-    MemoryFree((void *) data);
+    free((void *) data);
 }
 /**
  *  Test CHIP TLV Reader in a use case

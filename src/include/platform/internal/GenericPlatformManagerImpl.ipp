@@ -26,6 +26,7 @@
 #define GENERIC_PLATFORM_MANAGER_IMPL_IPP
 
 #include <new>
+#include <platform/CHIPMem.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/BLEManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -33,7 +34,6 @@
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
 #include <support/CodeUtils.h>
-#include <support/CHIPMem.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -124,7 +124,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_AddEventHandler(PlatformManag
         }
     }
 
-    eventHandler = (AppEventHandler *) MemoryAlloc(sizeof(AppEventHandler));
+    eventHandler = (AppEventHandler *) chip::Platform::MemoryAlloc(sizeof(AppEventHandler));
     VerifyOrExit(eventHandler != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     eventHandler->Next    = mAppEventHandlerList;
@@ -149,7 +149,7 @@ void GenericPlatformManagerImpl<ImplClass>::_RemoveEventHandler(PlatformManager:
         if (eventHandler->Handler == handler && eventHandler->Arg == arg)
         {
             *eventHandlerIndirectPtr = eventHandler->Next;
-            MemoryFree(eventHandler);
+            chip::Platform::MemoryFree(eventHandler);
         }
         else
         {

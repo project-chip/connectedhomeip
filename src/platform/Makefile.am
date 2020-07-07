@@ -42,6 +42,7 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/include/platform/PersistedStorage.h \
     @top_srcdir@/src/include/platform/SoftwareUpdateManager.h \
     @top_srcdir@/src/include/platform/TimeSyncManager.h \
+    @top_srcdir@/src/include/platform/CHIPMem.h \
     @top_srcdir@/src/include/platform/CHIPDeviceConfig.h \
     @top_srcdir@/src/include/platform/CHIPDeviceError.h \
     @top_srcdir@/src/include/platform/CHIPDeviceEvent.h \
@@ -109,6 +110,8 @@ libDeviceLayer_a_CPPFLAGS               = \
     $(NULL)
 
 libDeviceLayer_a_SOURCES                = \
+    CHIPMem-Malloc.cpp                    \
+    CHIPMem-SimpleAlloc.cpp               \
     PersistedStorage.cpp                  \
     SystemEventSupport.cpp                \
     SystemTimerSupport.cpp                \

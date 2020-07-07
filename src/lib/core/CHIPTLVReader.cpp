@@ -27,7 +27,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPTLV.h>
-#include <support/CHIPMem.h>
+#include <platform/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -689,14 +689,14 @@ CHIP_ERROR TLVReader::DupBytes(uint8_t *& buf, uint32_t & dataLen)
     if (!TLVTypeIsString(ElementType()))
         return CHIP_ERROR_WRONG_TLV_TYPE;
 
-    buf = (uint8_t *) MemoryAlloc(mElemLenOrVal);
+    buf = (uint8_t *) chip::Platform::MemoryAlloc(mElemLenOrVal);
     if (buf == NULL)
         return CHIP_ERROR_NO_MEMORY;
 
     CHIP_ERROR err = ReadData(buf, (uint32_t) mElemLenOrVal);
     if (err != CHIP_NO_ERROR)
     {
-        MemoryFree(buf);
+        chip::Platform::MemoryFree(buf);
         return err;
     }
 
@@ -738,14 +738,14 @@ CHIP_ERROR TLVReader::DupString(char *& buf)
     if (!TLVTypeIsString(ElementType()))
         return CHIP_ERROR_WRONG_TLV_TYPE;
 
-    buf = (char *) MemoryAlloc(mElemLenOrVal + 1);
+    buf = (char *) chip::Platform::MemoryAlloc(mElemLenOrVal + 1);
     if (buf == NULL)
         return CHIP_ERROR_NO_MEMORY;
 
     CHIP_ERROR err = ReadData((uint8_t *) buf, (uint32_t) mElemLenOrVal);
     if (err != CHIP_NO_ERROR)
     {
-        MemoryFree(buf);
+        chip::Platform::MemoryFree(buf);
         return err;
     }
 

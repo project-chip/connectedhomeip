@@ -26,7 +26,6 @@
 CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES                        = \
     @top_builddir@/src/lib/support/Base64.cpp                  \
     @top_builddir@/src/lib/support/CHIPArgParser.cpp           \
-    @top_builddir@/src/lib/support/CHIPMem.cpp                 \
     @top_builddir@/src/lib/support/CHIPCounter.cpp             \
     @top_builddir@/src/lib/support/CHIPFaultInjection.cpp      \
     @top_builddir@/src/lib/support/ErrorStr.cpp                \
@@ -46,7 +45,6 @@ CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES                        = \
 
 CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES                        = \
     @top_builddir@/src/lib/support/CHIPArgParser.hpp           \
-    @top_builddir@/src/lib/support/CHIPMem.h                   \
     @top_builddir@/src/lib/support/CHIPCounter.h               \
     @top_builddir@/src/lib/support/CHIPFaultInjection.h        \
     @top_builddir@/src/lib/support/CodeUtils.h                 \

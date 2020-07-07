@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,35 +17,13 @@
 
 /**
  *    @file
- *      This file implements heap memory allocation APIs for CHIP. These functions are platform
- *      specific and might be C Standard Library heap functions re-direction in most of cases.
+ *      This file declares test entry point for CHIP Memory Management code unit tests.
  *
  */
 
-#include <support/CHIPMem.h>
+#ifndef TESTMEMALLOC_H
+#define TESTMEMALLOC_H
 
-#include <string.h>
+int TestMemAlloc(void);
 
-namespace chip {
-
-void * MemoryAlloc(size_t size)
-{
-    return malloc(size);
-}
-
-void * MemoryCalloc(size_t num, size_t size)
-{
-    return calloc(num, size);
-}
-
-void * MemoryRealloc(void * p, size_t size)
-{
-    return realloc(p, size);
-}
-
-void MemoryFree(void * p)
-{
-    free(p);
-}
-
-} // namespace chip
+#endif // TESTMEMALLOC_H
