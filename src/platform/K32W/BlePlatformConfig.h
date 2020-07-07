@@ -1,6 +1,8 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020 Google LLC.
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,17 +18,21 @@
  */
 
 /**
- * @file
- *   This file defines the API for the handler for data model messages.
+ *    @file
+ *          Platform-specific configuration overrides for the CHIP BLE
+ *          Layer on K32W platforms using the NXP SDK.
+ *
  */
 
-#ifndef DATA_MODEL_HANDLER_H
-#define DATA_MODEL_HANDLER_H
+#ifndef BLE_PLATFORM_CONFIG_H
+#define BLE_PLATFORM_CONFIG_H
 
-namespace chip {
-namespace System {
-class PacketBuffer;
-} // namespace System
-} // namespace chip
+// ==================== Platform Adaptations ====================
 
-#endif // DATA_MODEL_HANDLER_H
+// TODO
+
+// ========== Platform-specific Configuration Overrides =========
+
+/* none so far */
+
+#endif // BLE_PLATFORM_CONFIG_H

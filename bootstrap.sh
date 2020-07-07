@@ -19,6 +19,10 @@ CHIP_ROOT="$(dirname "$0")"
 export PW_BRANDING_BANNER="$CHIP_ROOT/.chip-banner.txt"
 export PW_BRANDING_BANNER_COLOR="bold_white"
 
+if test -f "$CHIP_ROOT/scripts/helpers/rename_submodules.sh"; then
+    "$CHIP_ROOT/scripts/helpers/rename_submodules.sh"
+fi
+
 git submodule update --init
 
 # shellcheck source=/dev/null

@@ -62,9 +62,7 @@ dist_libCryptoLayerTests_a_HEADERS             = \
 AM_CPPFLAGS                                    = \
     -I$(top_srcdir)/src/                         \
     -I$(top_srcdir)/src/lib                      \
-    -I$(top_srcdir)/src/system                   \
     -I$(top_srcdir)/src/include/                 \
-    -I$(top_srcdir)/src/crypto                   \
     $(LWIP_CPPFLAGS)                             \
     $(NLASSERT_CPPFLAGS)                         \
     $(NLUNIT_TEST_CPPFLAGS)                      \

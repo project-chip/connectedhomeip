@@ -1,6 +1,8 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020 Nest Labs, Inc.
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,17 +18,27 @@
  */
 
 /**
- * @file
- *   This file defines the API for the handler for data model messages.
+ *    @file
+ *          Provides an implementation of the BLEManager singleton object
+ *          for the K32W platforms.
  */
 
-#ifndef DATA_MODEL_HANDLER_H
-#define DATA_MODEL_HANDLER_H
+/* this file behaves like a config.h, comes first */
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+
+using namespace ::nl;
+using namespace ::nl::Ble;
 
 namespace chip {
-namespace System {
-class PacketBuffer;
-} // namespace System
-} // namespace chip
+namespace DeviceLayer {
+namespace Internal {
 
-#endif // DATA_MODEL_HANDLER_H
+namespace {
+
+}
+} // namespace Internal
+} // namespace DeviceLayer
+} // namespace chip
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

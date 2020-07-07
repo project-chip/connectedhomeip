@@ -15,18 +15,17 @@
  *    limitations under the License.
  */
 
-/**
- * @file
- *   This file defines the API for the handler for data model messages.
- */
+#ifndef NRF5_COMMON_SERVER_H
+#define NRF5_COMMON_SERVER_H
 
-#ifndef DATA_MODEL_HANDLER_H
-#define DATA_MODEL_HANDLER_H
+#include <inet/IPAddress.h>
+#include <inet/InetLayer.h>
+#include <system/SystemPacketBuffer.h>
+#include <transport/SecureSessionMgr.h>
 
-namespace chip {
-namespace System {
-class PacketBuffer;
-} // namespace System
-} // namespace chip
+void SetupTransport(chip::Inet::IPAddressType type, chip::SecureSessionMgr * transport);
+void StartServer(chip::SecureSessionMgr * transport_ipv6);
 
-#endif // DATA_MODEL_HANDLER_H
+void InitDataModelHandler();
+
+#endif // NRF5_COMMON_SERVER_H

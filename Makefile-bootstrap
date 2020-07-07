@@ -113,5 +113,13 @@ repos-hook:
 #
 clean-repos-hook:
 
+# Transition submodule names.
+repos: rename-submodules
+clean-repos: rename-submodules
+rename-submodules:
+	@if test -f $(top_srcdir)/scripts/helpers/rename_submodules.sh; then \
+		$(top_srcdir)/scripts/helpers/rename_submodules.sh; \
+	fi
+
 include $(abs_top_nlbuild_autotools_dir)/make/post.mak
 include $(abs_top_nlbuild_autotools_dir)/make/post/rules/bootstrap.mak
