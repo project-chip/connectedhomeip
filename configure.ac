@@ -996,11 +996,11 @@ AC_DEFINE_UNQUOTED([CONFIG_NETWORK_LAYER_INET],[${CONFIG_NETWORK_LAYER_INET}],[D
 AC_MSG_CHECKING([device layer])
 AC_ARG_WITH(device-layer,
     [AS_HELP_STRING([--with-device-layer=LAYER],
-        [Specify the target environment for the CHIP Device Layer.  Choose one of: efr32, esp32, nrf5, linux, or none @<:@default=none@:>@.])],
+        [Specify the target environment for the CHIP Device Layer.  Choose one of: darwin, efr32, esp32, nrf5, linux, or none @<:@default=none@:>@.])],
     [
         case "${with_device_layer}" in
 
-        efr32|esp32|nrf5|linux|none)
+        darwin|efr32|esp32|nrf5|linux|none)
             ;;
 
         *)
@@ -1013,16 +1013,24 @@ AC_ARG_WITH(device-layer,
 AC_MSG_RESULT(${with_device_layer})
 
 # Disable all device layer targets by default
-CHIP_DEVICE_LAYER_TARGET_LINUX=0
+CHIP_DEVICE_LAYER_TARGET_DARWIN=0
+CHIP_DEVICE_LAYER_TARGET_EFR32=0
 CHIP_DEVICE_LAYER_TARGET_ESP32=0
 CHIP_DEVICE_LAYER_TARGET_NRF5=0
-CHIP_DEVICE_LAYER_TARGET_EFR32=0
+CHIP_DEVICE_LAYER_TARGET_LINUX=0
 
 case "${with_device_layer}" in
-linux)
+
+darwin)
       CONFIG_DEVICE_LAYER=1
-      CHIP_DEVICE_LAYER_TARGET=Linux
-      CHIP_DEVICE_LAYER_TARGET_LINUX=1
+      CHIP_DEVICE_LAYER_TARGET=Darwin
+      CHIP_DEVICE_LAYER_TARGET_DARWIN=1
+      ;;
+
+efr32)
+      CONFIG_DEVICE_LAYER=1
+      CHIP_DEVICE_LAYER_TARGET=EFR32
+      CHIP_DEVICE_LAYER_TARGET_EFR32=1
       ;;
 
 esp32)
@@ -1037,10 +1045,10 @@ nrf5)
       CHIP_DEVICE_LAYER_TARGET_NRF5=1
       ;;
 
-efr32)
+linux)
       CONFIG_DEVICE_LAYER=1
-      CHIP_DEVICE_LAYER_TARGET=EFR32
-      CHIP_DEVICE_LAYER_TARGET_EFR32=1
+      CHIP_DEVICE_LAYER_TARGET=Linux
+      CHIP_DEVICE_LAYER_TARGET_LINUX=1
       ;;
 
 none)
@@ -1055,6 +1063,10 @@ AC_DEFINE_UNQUOTED([CONFIG_DEVICE_LAYER],[${CONFIG_DEVICE_LAYER}],[Define to 1 i
 
 AC_SUBST(CHIP_DEVICE_LAYER_TARGET)
 AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET],[${CHIP_DEVICE_LAYER_TARGET}],[Target platform name for CHIP Device Layer.])
+
+AC_SUBST(CHIP_DEVICE_LAYER_TARGET_DARWIN)
+AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_DARWIN],    [test "${CHIP_DEVICE_LAYER_TARGET_DARWIN}" = 1])
+AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_DARWIN],[${CHIP_DEVICE_LAYER_TARGET_DARWIN}],[Define to 1 if you want to build the CHIP Device Layer for Darwin platforms.])
 
 AC_SUBST(CHIP_DEVICE_LAYER_TARGET_EFR32)
 AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_EFR32],    [test "${CHIP_DEVICE_LAYER_TARGET_EFR32}" = 1])
