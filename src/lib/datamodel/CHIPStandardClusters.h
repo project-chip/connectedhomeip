@@ -34,13 +34,24 @@ static const uint16_t kClusterIdBase = 0x0000;
 class ClusterBasic : public BaseCluster
 {
 public:
+    ClusterBasic() : BaseCluster(kClusterIdBase) {}
+
+    int Init(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion)
+    {
+        if (mAttrs[0] == nullptr)
+        {
+            AddAttribute(CHIPAttributeZCLVersionNew(ZCLVersion));
+            AddAttribute(CHIPAttributeApplicationVersionNew(applicationVersion));
+            AddAttribute(CHIPAttributeStackVersionNew(stackVersion));
+            AddAttribute(CHIPAttributeHWVersionNew(HWVersion));
+        }
+        return SUCCESS;
+    }
+    
     ClusterBasic(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) :
         BaseCluster(kClusterIdBase)
     {
-        AddAttribute(CHIPAttributeZCLVersionNew(ZCLVersion));
-        AddAttribute(CHIPAttributeApplicationVersionNew(applicationVersion));
-        AddAttribute(CHIPAttributeStackVersionNew(stackVersion));
-        AddAttribute(CHIPAttributeHWVersionNew(HWVersion));
+        Init(ZCLVersion, applicationVersion, stackVersion, HWVersion);
     }
 };
 

@@ -35,21 +35,18 @@ static const uint8_t kMaxClustersPerEndPoint = 5;
 class EndPoint
 {
 public:
-    static BaseCluster * mBasicCluster;
+    static ClusterBasic mBasicCluster;
     BaseCluster * mClusters[kMaxClustersPerEndPoint];
 
     EndPoint(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) : mClusters()
     {
-        if (mBasicCluster == nullptr)
-        {
-            mBasicCluster = new ClusterBasic(ZCLVersion, applicationVersion, stackVersion, HWVersion);
-            /* TODO: allocation failure? */
-        }
-        mClusters[0] = mBasicCluster;
+        mBasicCluster.Init(ZCLVersion, applicationVersion, stackVersion, HWVersion);
+        mClusters[0] = &mBasicCluster;
     }
 
     virtual ~EndPoint()
     {
+        /* The 0th index is not dynamically allocated */
         for (int i = 1; i < kMaxClustersPerEndPoint; i++)
         {
             if (mClusters[i] != nullptr)
