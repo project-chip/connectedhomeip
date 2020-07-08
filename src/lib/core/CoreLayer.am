@@ -32,7 +32,6 @@ CHIP_BUILD_CORE_LAYER_SOURCE_FILES                        = \
     @top_builddir@/src/lib/core/CHIPTLVWriter.cpp           \
     @top_builddir@/src/lib/core/CHIPTLVUpdater.cpp          \
     @top_builddir@/src/lib/core/CHIPKeyIds.cpp              \
-    @top_builddir@/src/lib/core/CHIPEndPoint.cpp            \
     $(NULL)
 
 CHIP_BUILD_CORE_LAYER_HEADER_FILES                        = \
@@ -55,11 +54,4 @@ CHIP_BUILD_CORE_LAYER_HEADER_FILES                        = \
     @top_builddir@/src/lib/core/Optional.h                  \
     @top_builddir@/src/lib/core/ReferenceCounted.h          \
     @top_builddir@/src/lib/core/CHIPVendorIdentifiers.hpp   \
-    @top_builddir@/src/lib/core/CHIPBaseAttribute.h   \
-    @top_builddir@/src/lib/core/CHIPBaseCluster.h   \
-    @top_builddir@/src/lib/core/CHIPClusterServer.h   \
-    @top_builddir@/src/lib/core/CHIPEndPoint.h   \
-    @top_builddir@/src/lib/core/CHIPStandardAttributes.h   \
-    @top_builddir@/src/lib/core/CHIPStandardClusters.h   \
-    @top_builddir@/src/lib/core/CHIPValues.h   \
     $(NULL)
