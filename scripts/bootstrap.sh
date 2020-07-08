@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-CHIP_ROOT="$(dirname "$0")"
+CHIP_ROOT="$(dirname "$0")/.."
 
 export PW_BRANDING_BANNER="$CHIP_ROOT/.chip-banner.txt"
 export PW_BRANDING_BANNER_COLOR="bold_white"
