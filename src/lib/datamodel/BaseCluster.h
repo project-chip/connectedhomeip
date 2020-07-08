@@ -24,7 +24,7 @@
 #ifndef CHIPBASECLUSTER_H_
 #define CHIPBASECLUSTER_H_
 
-#include <datamodel/CHIPBaseAttribute.h>
+#include <datamodel/BaseAttribute.h>
 
 namespace chip {
 namespace DataModel {

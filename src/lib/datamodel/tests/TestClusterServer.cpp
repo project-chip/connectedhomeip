@@ -24,7 +24,7 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include <datamodel/CHIPClusterServer.h>
+#include <datamodel/ClusterServer.h>
 #include <nlassert.h>
 #include <nlunit-test.h>
 #include <support/TestUtils.h>
