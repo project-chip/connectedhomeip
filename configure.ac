@@ -2303,6 +2303,8 @@ src/inet/Makefile
 src/inet/tests/Makefile
 src/lib/Makefile
 src/lib/core/tests/Makefile
+src/lib/datamodel/Makefile
+src/lib/datamodel/tests/Makefile
 src/lib/shell/Makefile
 src/lib/shell/tests/Makefile
 src/lib/support/Makefile

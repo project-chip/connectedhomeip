@@ -17,16 +17,20 @@
 
 /**
  *    @file
- *      This file implements the EndPoint class
+ *      This file implements a standalone/native program executable
+ *      test driver for the CHIP app layer library attribute storage unit
+ *      tests.
  *
  */
 
-#include <datamodel/CHIPEndPoint.h>
+#include <support/TestUtils.h>
 
-namespace chip {
-namespace DataModel {
+#include <nlunit-test.h>
 
-ClusterBasic EndPoint::mBasicCluster;
+int main(void)
+{
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nlTestSetOutputStyle(OUTPUT_CSV);
 
-} // namespace DataModel
-} // namespace chip
+    return chip::RunRegisteredUnitTests();
+}
