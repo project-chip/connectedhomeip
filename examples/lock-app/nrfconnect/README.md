@@ -35,9 +35,9 @@ The lock example is intended to serve both as a means to explore the workings of
 CHIP, as well as a template for creating real products based on the Nordic
 platform.
 
-The example makes use of the CMake build system to generate the ninja build script.
-The build system takes care of invoking the CHIP library build with all necessary
-flags exported from the Zephyr environment.
+The example makes use of the CMake build system to generate the ninja build
+script. The build system takes care of invoking the CHIP library build with all
+necessary flags exported from the Zephyr environment.
 
 <a name="device-ui"></a>
 
@@ -88,20 +88,27 @@ The remaining two LEDs and buttons (#3 and #4) are unused.
 
 ## Building
 
-Before building the example, [download the nRF Connect SDK and install all requirements](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html).
+Before building the example,
+[download the nRF Connect SDK and install all requirements](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html).
 
-If you don't want to use SEGGER Embedded Studio, you may skip the part about installing and configuring it.
+If you don't want to use SEGGER Embedded Studio, you may skip the part about
+installing and configuring it.
 
-Download and install the [nRF Command Line Tools](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Command-Line-Tools).
+Download and install the
+[nRF Command Line Tools](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Command-Line-Tools).
 
 Make sure that you source the following file:
 
         $ source <ncs-dir>/zephyr/zephyr-env.sh
 
-> **Note:** Ensure that `$ZEPHYR_BASE`, `$GNUARMEMB_TOOLCHAIN_PATH`, and `$ZEPHYR_TOOLCHAIN_VARIANT` environment variables are set in your current terminal before building. `$GNUARMEMB_TOOLCHAIN_PATH` and `$ZEPHYR_TOOLCHAIN_VARIANT` must be set manually.
+> **Note:** Ensure that `$ZEPHYR_BASE`, `$GNUARMEMB_TOOLCHAIN_PATH`, and
+> `$ZEPHYR_TOOLCHAIN_VARIANT` environment variables are set in your current
+> terminal before building. `$GNUARMEMB_TOOLCHAIN_PATH` and
+> `$ZEPHYR_TOOLCHAIN_VARIANT` must be set manually.
 
-After your environment is set up, you are ready to build the example.
-The recommended tool for building and flashing the device is [west](https://docs.zephyrproject.org/latest/guides/west/).
+After your environment is set up, you are ready to build the example. The
+recommended tool for building and flashing the device is
+[west](https://docs.zephyrproject.org/latest/guides/west/).
 
 The following commands will build the `lock-app` example:
 
@@ -115,13 +122,16 @@ The following commands will build the `lock-app` example:
         # Any subsequent build
         $ west build
 
-After a successful build, the binary will be available under `<example-dir>/build/zephyr/zephyr.hex`
+After a successful build, the binary will be available under
+`<example-dir>/build/zephyr/zephyr.hex`
 
 <a name="configuring"></a>
+
 ## Configuring the example
 
-The Zephyr ecosystem is higly configurable and allows the user to modify many aspects of the
-application. The configuration system is based on `Kconfig` and the settings can be modified using the `menuconfig` utility.
+The Zephyr ecosystem is higly configurable and allows the user to modify many
+aspects of the application. The configuration system is based on `Kconfig` and
+the settings can be modified using the `menuconfig` utility.
 
 To open the configuration menu, do the following:
 
@@ -136,8 +146,9 @@ To open the configuration menu, do the following:
         $ cd <example-dir>/build
         $ ninja menuconfig
 
-Changes done with `menuconfig` will be lost, if the `build` directory is deleted.
-To make them persistent, save the configuration options in `prj.conf` file.
+Changes done with `menuconfig` will be lost, if the `build` directory is
+deleted. To make them persistent, save the configuration options in `prj.conf`
+file.
 
 <a name="flashing"></a>
 
@@ -152,7 +163,8 @@ To flash the application to the device, use the `west` tool:
         $ cd <example-dir>
         $ west flash
 
-If you have multiple nRF52840 DK boards connected, `west` will prompt you to pick the correct one.
+If you have multiple nRF52840 DK boards connected, `west` will prompt you to
+pick the correct one.
 
 To debug the application on target:
 
@@ -163,13 +175,16 @@ To debug the application on target:
 
 ## Accessing the command line
 
-The application includes a command line interface with support for logs and the OpenThread commands.
+The application includes a command line interface with support for logs and the
+OpenThread commands.
 
-To access it, use any serial terminal program you like, for example `minicom` or `GNU screen`.
+To access it, use any serial terminal program you like, for example `minicom` or
+`GNU screen`.
 
 The UART interface is configured for `115200` baud rate.
 
-All OpenThread commands must be prefixed with `ot`, for example `ot thread start`.
+All OpenThread commands must be prefixed with `ot`, for example
+`ot thread start`.
 
 ## Viewing Logging Output
 
