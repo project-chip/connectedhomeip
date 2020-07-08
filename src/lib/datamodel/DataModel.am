@@ -28,11 +28,11 @@ CHIP_BUILD_DATAMODEL_SOURCE_FILES                         = \
     $(NULL)
 
 CHIP_BUILD_DATAMODEL_HEADER_FILES                              = \
-    @top_builddir@/src/lib/datamodel/BaseAttribute.h         \
-    @top_builddir@/src/lib/datamodel/BaseCluster.h           \
+    @top_builddir@/src/lib/datamodel/Attribute.h         \
+    @top_builddir@/src/lib/datamodel/Cluster.h           \
     @top_builddir@/src/lib/datamodel/ClusterServer.h         \
     @top_builddir@/src/lib/datamodel/EndPoint.h              \
     @top_builddir@/src/lib/datamodel/StandardAttributes.h    \
     @top_builddir@/src/lib/datamodel/StandardClusters.h      \
-    @top_builddir@/src/lib/datamodel/Values.h                \
+    @top_builddir@/src/lib/datamodel/Value.h                \
     $(NULL)

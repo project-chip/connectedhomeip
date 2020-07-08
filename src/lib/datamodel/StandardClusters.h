@@ -24,17 +24,17 @@
 #ifndef CHIPSTANDARDCLUSTERS_H_
 #define CHIPSTANDARDCLUSTERS_H_
 
-#include <datamodel/BaseCluster.h>
+#include <datamodel/Cluster.h>
 #include <datamodel/StandardAttributes.h>
 
 namespace chip {
 namespace DataModel {
 
 static const uint16_t kClusterIdBase = 0x0000;
-class ClusterBasic : public BaseCluster
+class ClusterBasic : public Cluster
 {
 public:
-    ClusterBasic() : BaseCluster(kClusterIdBase) {}
+    ClusterBasic() : Cluster(kClusterIdBase) {}
 
     int Init(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion)
     {
@@ -49,17 +49,17 @@ public:
     }
 
     ClusterBasic(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) :
-        BaseCluster(kClusterIdBase)
+        Cluster(kClusterIdBase)
     {
         Init(ZCLVersion, applicationVersion, stackVersion, HWVersion);
     }
 };
 
 static const uint16_t kClusterIdOnOff = 0x0006;
-class ClusterOnOff : public BaseCluster
+class ClusterOnOff : public Cluster
 {
 public:
-    ClusterOnOff() : BaseCluster(kClusterIdOnOff)
+    ClusterOnOff() : Cluster(kClusterIdOnOff)
     {
         AddAttribute(CHIPAttributeOnOffNew());
         AddAttribute(CHIPAttributeGlobalSceneControlNew());

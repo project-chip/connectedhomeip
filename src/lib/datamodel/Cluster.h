@@ -24,22 +24,22 @@
 #ifndef CHIPBASECLUSTER_H_
 #define CHIPBASECLUSTER_H_
 
-#include <datamodel/BaseAttribute.h>
+#include <datamodel/Attribute.h>
 
 namespace chip {
 namespace DataModel {
 
 /* TODO: To be converted to a template version or Kconfig later on */
 static const uint8_t kMaxAttributesPerCluster = 10;
-class BaseCluster
+class Cluster
 {
 public:
     uint16_t mClusterId;
-    BaseAttribute * mAttrs[kMaxAttributesPerCluster];
+    Attribute * mAttrs[kMaxAttributesPerCluster];
 
-    BaseCluster(uint16_t clusterId) : mClusterId(clusterId), mAttrs() {}
+    Cluster(uint16_t clusterId) : mClusterId(clusterId), mAttrs() {}
 
-    virtual ~BaseCluster()
+    virtual ~Cluster()
     {
         for (int i = 0; i < kMaxAttributesPerCluster; i++)
         {
@@ -51,7 +51,7 @@ public:
         }
     }
 
-    int AddAttribute(BaseAttribute * attr)
+    int AddAttribute(Attribute * attr)
     {
         for (int i = 0; i < kMaxAttributesPerCluster; i++)
         {
@@ -64,7 +64,7 @@ public:
         return FAIL;
     }
 
-    BaseAttribute * GetAttribute(uint16_t attrId)
+    Attribute * GetAttribute(uint16_t attrId)
     {
         for (int i = 0; i < kMaxAttributesPerCluster; i++)
         {
