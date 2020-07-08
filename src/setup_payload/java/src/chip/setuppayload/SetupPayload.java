@@ -19,7 +19,7 @@ public class SetupPayload {
   public int discriminator;
   /** The CHIP device manual setup code */
   public long setupPinCode;
-
+  /** The CHIP device optional QR code info map */
   public Map<Integer, OptionalQRCodeInfo> optionalQRCodeInfo;
 
   public SetupPayload() {
@@ -42,5 +42,9 @@ public class SetupPayload {
     this.discriminator = discriminator;
     this.setupPinCode = setupPinCode;
     this.optionalQRCodeInfo = new HashMap<Integer, OptionalQRCodeInfo>();
+  }
+
+  public void addOptionalQRCodeInfo(OptionalQRCodeInfo info) {
+    this.optionalQRCodeInfo.put(info.tag, info);
   }
 }

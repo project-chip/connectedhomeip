@@ -24,9 +24,9 @@ public class CHIPNativeBridge {
 
   // TODO: Add instance ref for CHIPDeviceController here
 
-  static {
-    System.loadLibrary("native-lib");
-  }
+  // static {
+  //  System.loadLibrary("native-lib");
+  // }
 
   private static CHIPNativeBridge instance = null;
 
