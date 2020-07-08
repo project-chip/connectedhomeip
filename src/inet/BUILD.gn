@@ -17,7 +17,7 @@ import("//build_overrides/nlassert.gni")
 import("//build_overrides/nlfaultinjection.gni")
 import("//build_overrides/nlio.gni")
 
-import("//build/tests.gni")
+import("${chip_root}/gn/chip/tests.gni")
 import("inet.gni")
 
 declare_args() {
