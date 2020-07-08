@@ -115,6 +115,13 @@ nodist_libmbedtls_a_SOURCES                                                   +=
     $(NULL)
 endif
 
+if CHIP_DEVICE_LAYER_TARGET_DARWIN
+nodist_libmbedtls_a_SOURCES                                                   += \
+    repo/library/entropy_poll.c             \
+    repo/library/timing.c                   \
+    $(NULL)
+endif
+
 libmbedtls_a_CPPFLAGS                                                          = \
     -I$(top_srcdir)/third_party/mbedtls/repo/include                             \
     $(MBEDTLS_CPPFLAGS)                                                          \

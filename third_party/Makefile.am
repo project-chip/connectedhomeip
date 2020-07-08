@@ -25,6 +25,7 @@
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
 EXTRA_DIST                                   = \
+    android/platform-libcore                   \
     nlbuild-autotools                          \
     $(NULL)
 
@@ -33,6 +34,7 @@ EXTRA_DIST                                   = \
 DIST_SUBDIRS                                 = \
     lwip                                       \
     mbedtls                                    \
+    ot-br-posix                                \
     $(NULL)
 
 # <any of the third-party packages listed in repos.conf>_SUBDIRS are
@@ -42,7 +44,7 @@ DIST_SUBDIRS                                 = \
 # of the 'distclean' target. Consequently, we conditionally include
 # them in DIST_SUBDIRS on invocation of 'distclean-recursive'
 
-distclean-recursive: DIST_SUBDIRS += $(NLASSERT_SUBDIRS) $(NLFAULTINJECTION_SUBDIRS) $(NLIO_SUBDIRS) $(NLUNIT_TEST_SUBDIRS) $(MBEDTLS_SUBDIRS)
+distclean-recursive: DIST_SUBDIRS += $(NLASSERT_SUBDIRS) $(NLFAULTINJECTION_SUBDIRS) $(NLIO_SUBDIRS) $(NLUNIT_TEST_SUBDIRS) $(MBEDTLS_SUBDIRS) $(OTBR_CLIENT_SUBDIRS)
 
 # Always build (e.g. for 'make all') these subdirectories.
 #
@@ -56,6 +58,7 @@ SUBDIRS                                      = \
     $(NLIO_SUBDIRS)                            \
     $(NLUNIT_TEST_SUBDIRS)                     \
     $(MBEDTLS_SUBDIRS)                         \
+    $(OT_BR_POSIX_SUBDIRS)                     \
     $(NULL)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

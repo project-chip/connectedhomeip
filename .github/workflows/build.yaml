@@ -20,14 +20,14 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: "connectedhomeip/chip-build-openssl:0.2.14"
+            image: "connectedhomeip/chip-build-openssl:0.2.18"
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-            - name: Setup Build Type
+            - name: Bootstrap
               run: |
                   case $BUILD_TYPE in
                      "main") export BOOTSTRAP_ARGUMENTS="";;
@@ -37,8 +37,7 @@ jobs:
                      *) ;;
                   esac
 
-            - name: Bootstrap
-              run: scripts/build/bootstrap.sh $BOOTSTRAP_ARGUMENTS
+                  scripts/build/bootstrap.sh $BOOTSTRAP_ARGUMENTS
             - name: Run Build
               run: scripts/build/default.sh
             - name: Run mbedTLS Tests

@@ -21,7 +21,9 @@
 #include "Display.h"
 #include "EchoDeviceCallbacks.h"
 #include "LEDWidget.h"
-#include "QRCodeWidget.h"
+#include "ListScreen.h"
+#include "QRCodeScreen.h"
+#include "ScreenManager.h"
 #include "esp_event_loop.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
@@ -33,10 +35,15 @@
 #include "nvs_flash.h"
 
 #include "tcpip_adapter.h"
-#include <stdio.h>
+
+#include <cmath>
+#include <cstdio>
+#include <string>
+#include <vector>
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/ErrorStr.h>
 #include <transport/SecureSessionMgr.h>
 
@@ -50,13 +57,19 @@ extern void startClient(void);
 
 #if CONFIG_DEVICE_TYPE_M5STACK
 
-#define ATTENTION_BUTTON_GPIO_NUM GPIO_NUM_37 // Use the right button (button "C") as the attention button on M5Stack
-#define STATUS_LED_GPIO_NUM GPIO_NUM_MAX      // No status LED on M5Stack
+#define BUTTON_1_GPIO_NUM GPIO_NUM_39               // Left button on M5Stack
+#define BUTTON_2_GPIO_NUM GPIO_NUM_38               // Middle button on M5Stack
+#define BUTTON_3_GPIO_NUM GPIO_NUM_37               // Right button on M5Stack
+#define STATUS_LED_GPIO_NUM GPIO_NUM_MAX            // No status LED on M5Stack
+#define LIGHT_CONTROLLER_OUTPUT_GPIO_NUM GPIO_NUM_2 // Use GPIO2 as the light controller output on M5Stack
 
 #elif CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
-#define ATTENTION_BUTTON_GPIO_NUM GPIO_NUM_0 // Use the IO0 button as the attention button on ESP32-DevKitC and compatibles
-#define STATUS_LED_GPIO_NUM GPIO_NUM_2       // Use LED1 (blue LED) as status LED on DevKitC
+#define BUTTON_1_GPIO_NUM GPIO_NUM_34                // Button 1 on DevKitC
+#define BUTTON_2_GPIO_NUM GPIO_NUM_35                // Button 2 on DevKitC
+#define BUTTON_3_GPIO_NUM GPIO_NUM_0                 // Button 3 on DevKitC
+#define STATUS_LED_GPIO_NUM GPIO_NUM_2               // Use LED1 (blue LED) as status LED on DevKitC
+#define LIGHT_CONTROLLER_OUTPUT_GPIO_NUM GPIO_NUM_33 // Use GPIO33 as the light controller output on DevKitC
 
 #else // !CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
@@ -64,18 +77,28 @@ extern void startClient(void);
 
 #endif // !CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
-#if CONFIG_HAVE_DISPLAY
+// A temporary value assigned for this example's QRCode
+// Spells CHIP on a dialer
+#define EXAMPLE_VENDOR_ID 2447
+// Spells ESP32 on a dialer
+#define EXAMPLE_PRODUCT_ID 37732
+// Used to have an initial shared secret
+#define EXAMPLE_SETUP_CODE 123456789
+// Used to discriminate the device
+#define EXAMPLE_DISCRIMINATOR 0X0F00
+// Used to indicate that an IP address has been added to the QRCode
+#define EXAMPLE_VENDOR_TAG_IP 1
 
-static QRCodeWidget sQRCodeWidget;
+#if CONFIG_HAVE_DISPLAY
 
 // Where to draw the connection status message
 #define CONNECTION_MESSAGE 75
 // Where to draw the IPv6 information
 #define IPV6_INFO 85
+
 #endif // CONFIG_HAVE_DISPLAY
 
 LEDWidget statusLED;
-static Button attentionButton;
 
 const char * TAG = "wifi-echo-demo";
 
@@ -86,6 +109,249 @@ namespace {
 // Globals as these are large and will not fit onto the stack
 SecureSessionMgr sTransportIPv4;
 SecureSessionMgr sTransportIPv6;
+
+std::vector<Button> buttons          = { Button(), Button(), Button() };
+std::vector<gpio_num_t> button_gpios = { BUTTON_1_GPIO_NUM, BUTTON_2_GPIO_NUM, BUTTON_3_GPIO_NUM };
+
+// Pretend these are devices with endpoints with clusters with attributes
+typedef std::tuple<std::string, std::string> Attribute;
+typedef std::vector<Attribute> Attributes;
+typedef std::tuple<std::string, Attributes> Cluster;
+typedef std::vector<Cluster> Clusters;
+typedef std::tuple<std::string, Clusters> Endpoint;
+typedef std::vector<Endpoint> Endpoints;
+typedef std::tuple<std::string, Endpoints> Device;
+typedef std::vector<Device> Devices;
+Devices devices;
+
+void AddAttribute(std::string name, std::string value)
+{
+    Attribute attribute = std::make_tuple(std::move(name), std::move(value));
+    std::get<1>(std::get<1>(std::get<1>(devices.back()).back()).back()).emplace_back(std::move(attribute));
+}
+
+void AddCluster(std::string name)
+{
+    Cluster cluster = std::make_tuple(std::move(name), std::move(Attributes()));
+    std::get<1>(std::get<1>(devices.back()).back()).emplace_back(std::move(cluster));
+}
+
+void AddEndpoint(std::string name)
+{
+    Endpoint endpoint = std::make_tuple(std::move(name), std::move(Clusters()));
+    std::get<1>(devices.back()).emplace_back(std::move(endpoint));
+}
+
+void AddDevice(std::string name)
+{
+    Device device = std::make_tuple(std::move(name), std::move(Endpoints()));
+    devices.emplace_back(std::move(device));
+}
+
+#if CONFIG_HAVE_DISPLAY
+
+class EditAttributeListModel : public ListScreen::Model
+{
+    int d;
+    int e;
+    int c;
+    int a;
+
+public:
+    EditAttributeListModel(int d, int e, int c, int a) : d(d), e(e), c(c), a(a) {}
+    virtual std::string GetTitle()
+    {
+        auto & attribute = std::get<1>(std::get<1>(std::get<1>(devices[d])[e])[c])[a];
+        auto & name      = std::get<0>(attribute);
+        auto & value     = std::get<1>(attribute);
+        char buffer[64];
+        snprintf(buffer, sizeof(buffer), "%s : %s", name.c_str(), value.c_str());
+        return buffer;
+    }
+    virtual int GetItemCount() { return 2; }
+    virtual std::string GetItemText(int i) { return i == 0 ? "+" : "-"; }
+    virtual void ItemAction(int i)
+    {
+        auto & attribute = std::get<1>(std::get<1>(std::get<1>(devices[d])[e])[c])[a];
+        auto & value     = std::get<1>(attribute);
+        int n;
+        if (sscanf(value.c_str(), "%d", &n) == 1)
+        {
+            ESP_LOGI(TAG, "editing attribute as integer: %d (%s)", n, i == 0 ? "+" : "-");
+            n += (i == 0) ? 1 : -1;
+            char buffer[32];
+            sprintf(buffer, "%d", n);
+            value = buffer;
+        }
+        else
+        {
+            ESP_LOGI(TAG, "editing attribute as string: '%s' (%s)", value.c_str(), i == 0 ? "+" : "-");
+            value = (value == "Closed") ? "Open" : "Closed";
+        }
+    }
+};
+
+class AttributeListModel : public ListScreen::Model
+{
+    int d;
+    int e;
+    int c;
+
+public:
+    AttributeListModel(int d, int e, int c) : d(d), e(e), c(c) {}
+    virtual std::string GetTitle() { return "Attributes"; }
+    virtual int GetItemCount() { return std::get<1>(std::get<1>(std::get<1>(devices[d])[e])[c]).size(); }
+    virtual std::string GetItemText(int i)
+    {
+        auto & attribute = std::get<1>(std::get<1>(std::get<1>(devices[d])[e])[c])[i];
+        auto & name      = std::get<0>(attribute);
+        auto & value     = std::get<1>(attribute);
+        char buffer[64];
+        snprintf(buffer, sizeof(buffer), "%s : %s", name.c_str(), value.c_str());
+        return buffer;
+    }
+    virtual void ItemAction(int i)
+    {
+        ESP_LOGI(TAG, "Opening attribute %d", i);
+        ScreenManager::PushScreen(new ListScreen(new EditAttributeListModel(d, e, c, i)));
+    }
+};
+
+class ClusterListModel : public ListScreen::Model
+{
+    int d;
+    int e;
+
+public:
+    ClusterListModel(int d, int e) : d(d), e(e) {}
+    virtual std::string GetTitle() { return "Clusters"; }
+    virtual int GetItemCount() { return std::get<1>(std::get<1>(devices[d])[e]).size(); }
+    virtual std::string GetItemText(int i) { return std::get<0>(std::get<1>(std::get<1>(devices[d])[e])[i]); }
+    virtual void ItemAction(int i)
+    {
+        ESP_LOGI(TAG, "Opening cluster %d", i);
+        ScreenManager::PushScreen(new ListScreen(new AttributeListModel(d, e, i)));
+    }
+};
+
+class EndpointListModel : public ListScreen::Model
+{
+    int d;
+
+public:
+    EndpointListModel(int d) : d(d) {}
+    virtual std::string GetTitle() { return "Endpoints"; }
+    virtual int GetItemCount() { return std::get<1>(devices[d]).size(); }
+    virtual std::string GetItemText(int i) { return std::get<0>(std::get<1>(devices[d])[i]); }
+    virtual void ItemAction(int i)
+    {
+        ESP_LOGI(TAG, "Opening endpoint %d", i);
+        ScreenManager::PushScreen(new ListScreen(new ClusterListModel(d, i)));
+    }
+};
+
+class DeviceListModel : public ListScreen::Model
+{
+public:
+    virtual std::string GetTitle() { return "Devices"; }
+    virtual int GetItemCount() { return devices.size(); }
+    virtual std::string GetItemText(int i) { return std::get<0>(devices[i]); }
+    virtual void ItemAction(int i)
+    {
+        ESP_LOGI(TAG, "Opening device %d", i);
+        ScreenManager::PushScreen(new ListScreen(new EndpointListModel(i)));
+    }
+};
+
+class CustomScreen : public Screen
+{
+public:
+    virtual void Display()
+    {
+        TFT_drawCircle(0.3 * DisplayWidth, 0.3 * DisplayHeight, 8, TFT_BLUE);
+        TFT_drawCircle(0.7 * DisplayWidth, 0.3 * DisplayHeight, 8, TFT_BLUE);
+        TFT_drawLine(0.2 * DisplayWidth, 0.6 * DisplayHeight, 0.3 * DisplayWidth, 0.7 * DisplayHeight, TFT_BLUE);
+        TFT_drawLine(0.3 * DisplayWidth, 0.7 * DisplayHeight, 0.7 * DisplayWidth, 0.7 * DisplayHeight, TFT_BLUE);
+        TFT_drawLine(0.7 * DisplayWidth, 0.7 * DisplayHeight, 0.8 * DisplayWidth, 0.6 * DisplayHeight, TFT_BLUE);
+    }
+};
+
+#endif // CONFIG_HAVE_DISPLAY
+
+void SetupPretendDevices()
+{
+    AddDevice("Watch");
+    AddEndpoint("Default");
+    AddCluster("Battery");
+    AddAttribute("Level", "89");
+    AddAttribute("Voltage", "490");
+    AddAttribute("Amperage", "501");
+    AddCluster("Heart Monitor");
+    AddAttribute("BPM", "72");
+    AddCluster("Step Counter");
+    AddAttribute("Steps", "9876");
+
+    AddDevice("Thermometer");
+    AddEndpoint("External");
+    AddCluster("Thermometer");
+    AddAttribute("Temperature", "21");
+    AddEndpoint("Internal");
+    AddCluster("Thermometer");
+    AddAttribute("Temperature", "42");
+
+    AddDevice("Garage 1");
+    AddEndpoint("Door 1");
+    AddCluster("Door");
+    AddAttribute("State", "Closed");
+    AddEndpoint("Door 2");
+    AddCluster("Door");
+    AddAttribute("State", "Closed");
+    AddEndpoint("Door 3");
+    AddCluster("Door");
+    AddAttribute("State", "Open");
+
+    AddDevice("Garage 2");
+    AddEndpoint("Door 1");
+    AddCluster("Door");
+    AddAttribute("State", "Open");
+    AddEndpoint("Door 2");
+    AddCluster("Door");
+    AddAttribute("State", "Closed");
+}
+
+void GetGatewayIP(char * ip_buf, size_t ip_len)
+{
+    tcpip_adapter_ip_info_t ip;
+    tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_AP, &ip);
+    IPAddress::FromIPv4(ip.ip).ToString(ip_buf, ip_len);
+    ESP_LOGE(TAG, "Got gateway ip %s", ip_buf);
+}
+
+std::string createSetupPayload()
+{
+    SetupPayload payload;
+    payload.version               = 1;
+    payload.discriminator         = EXAMPLE_DISCRIMINATOR;
+    payload.setUpPINCode          = EXAMPLE_SETUP_CODE;
+    payload.rendezvousInformation = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
+    payload.vendorID              = EXAMPLE_VENDOR_ID;
+    payload.productID             = EXAMPLE_PRODUCT_ID;
+
+    char gw_ip[INET6_ADDRSTRLEN];
+    GetGatewayIP(gw_ip, sizeof(gw_ip));
+    payload.addOptionalVendorData(EXAMPLE_VENDOR_TAG_IP, gw_ip);
+
+    QRCodeSetupPayloadGenerator generator(payload);
+    string result;
+    size_t tlvDataLen = sizeof(gw_ip);
+    uint8_t tlvDataStart[tlvDataLen];
+    CHIP_ERROR err = generator.payloadBase41Representation(result, tlvDataStart, tlvDataLen);
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Couldn't get payload string %d", generator.payloadBase41Representation(result));
+    }
+    return result;
+};
 
 } // namespace
 
@@ -129,6 +395,8 @@ extern "C" void app_main()
         return;
     }
 
+    SetupPretendDevices();
+
     statusLED.Init(STATUS_LED_GPIO_NUM);
 
     // Start the Echo Server
@@ -138,14 +406,20 @@ extern "C" void app_main()
     startClient();
 #endif
 
+    std::string qrCodeText = createSetupPayload();
+    ESP_LOGI(TAG, "QR CODE: '%s'", qrCodeText.c_str());
+
 #if CONFIG_HAVE_DISPLAY
 
-    // Only set up the button for the M5Stack since it's only being used to wake the display right now
-    err = attentionButton.Init(ATTENTION_BUTTON_GPIO_NUM, 50);
-    if (err != CHIP_NO_ERROR)
+    // Initialize the buttons.
+    for (int i = 0; i < buttons.size(); ++i)
     {
-        ESP_LOGE(TAG, "Button.Init() failed: %s", ErrorStr(err));
-        return;
+        err = buttons[i].Init(button_gpios[i], 50);
+        if (err != CHIP_NO_ERROR)
+        {
+            ESP_LOGE(TAG, "Button.Init() failed: %s", ErrorStr(err));
+            return;
+        }
     }
 
     // Initialize the display device.
@@ -156,10 +430,38 @@ extern "C" void app_main()
         return;
     }
 
-    // Display the UI widgets.
-    ClearDisplay();
-    sQRCodeWidget.Display();
-    statusLED.Display();
+    // Initialize the screen manager and push a rudimentary user interface.
+    ScreenManager::Init();
+    ScreenManager::PushScreen(new ListScreen((new SimpleListModel())
+                                                 ->Title("CHIP")
+                                                 ->Action([](int i) { ESP_LOGI(TAG, "action on item %d", i); })
+                                                 ->Item("Devices",
+                                                        []() {
+                                                            ESP_LOGI(TAG, "Opening device list");
+                                                            ScreenManager::PushScreen(new ListScreen(new DeviceListModel()));
+                                                        })
+                                                 ->Item("Custom",
+                                                        []() {
+                                                            ESP_LOGI(TAG, "Opening custom screen");
+                                                            ScreenManager::PushScreen(new CustomScreen());
+                                                        })
+                                                 ->Item("QR Code",
+                                                        [=]() {
+                                                            ESP_LOGI(TAG, "Opening QR code screen");
+                                                            ScreenManager::PushScreen(new QRCodeScreen(qrCodeText));
+                                                        })
+                                                 ->Item("Setup")
+                                                 ->Item("More")
+                                                 ->Item("Items")
+                                                 ->Item("For")
+                                                 ->Item("Demo")));
+
+    // Connect the status LED to VLEDs.
+    {
+        int vled1 = ScreenManager::AddVLED(TFT_GREEN);
+        int vled2 = ScreenManager::AddVLED(TFT_RED);
+        statusLED.SetVLED(vled1, vled2);
+    }
 
 #endif // CONFIG_HAVE_DISPLAY
 
@@ -167,13 +469,28 @@ extern "C" void app_main()
     while (true)
     {
 #if CONFIG_HAVE_DISPLAY
-
         // TODO consider refactoring this example to use FreeRTOS tasks
-        // Poll the attention button.  Whenever we detect a *release* of the button
-        // reset the display timer
-        if (attentionButton.Poll() && !attentionButton.IsPressed())
+
+        bool woken = false;
+
+        // Poll buttons, possibly wake screen.
+        for (int i = 0; i < buttons.size(); ++i)
         {
-            WakeDisplay();
+            if (buttons[i].Poll())
+            {
+                if (!woken)
+                {
+                    woken = WakeDisplay();
+                }
+                if (woken)
+                {
+                    continue;
+                }
+                if (buttons[i].IsPressed())
+                {
+                    ScreenManager::ButtonPressed(1 + i);
+                }
+            }
         }
 
 #endif // CONFIG_HAVE_DISPLAY

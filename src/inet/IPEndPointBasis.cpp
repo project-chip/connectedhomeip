@@ -328,9 +328,6 @@ INET_ERROR IPEndPointBasis::SetMulticastLoopback(IPVersion aIPVersion, bool aLoo
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if !HAVE_LWIP_MULTICAST_LOOP
-#pragma message "\n \
-The version of LwIP appears older than that required for multicast loopback support.\n \
-Please upgrade your version of LwIP for SetMulticastLoopback support."
     lRetval = INET_ERROR_NOT_SUPPORTED;
 #else
     if (aLoopback)
@@ -436,9 +433,7 @@ INET_ERROR IPEndPointBasis::JoinMulticastGroup(InterfaceId aInterfaceId, const I
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_IPV4 && LWIP_IGMP
         lRetval = LwIPIPv4JoinLeaveMulticastGroup(aInterfaceId, aAddress, igmp_joingroup_netif);
-#else // LWIP_IPV4 && LWIP_IGMP
-#pragma message "\n \
-Please enable LWIP_IPV4 and LWIP_IGMP for IPv4 JoinMulticastGroup and LeaveMulticastGroup support."
+#else  // LWIP_IPV4 && LWIP_IGMP
         lRetval = INET_ERROR_NOT_SUPPORTED;
 #endif // LWIP_IPV4 && LWIP_IGMP
         SuccessOrExit(lRetval);
@@ -456,9 +451,7 @@ Please enable LWIP_IPV4 and LWIP_IGMP for IPv4 JoinMulticastGroup and LeaveMulti
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
         lRetval = LwIPIPv6JoinLeaveMulticastGroup(aInterfaceId, aAddress, mld6_joingroup_netif);
-#else // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
-#pragma message "\n \
-Please enable LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6 for IPv6 JoinMulticastGroup and LeaveMulticastGroup support."
+#else  // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
         lRetval = INET_ERROR_NOT_SUPPORTED;
 #endif // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
         SuccessOrExit(lRetval);
@@ -525,9 +518,7 @@ INET_ERROR IPEndPointBasis::LeaveMulticastGroup(InterfaceId aInterfaceId, const 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_IPV4 && LWIP_IGMP
         lRetval = LwIPIPv4JoinLeaveMulticastGroup(aInterfaceId, aAddress, igmp_leavegroup_netif);
-#else // LWIP_IPV4 && LWIP_IGMP
-#pragma message "\n \
-Please enable LWIP_IPV4 and LWIP_IGMP for IPv4 JoinMulticastGroup and LeaveMulticastGroup support."
+#else  // LWIP_IPV4 && LWIP_IGMP
         lRetval = INET_ERROR_NOT_SUPPORTED;
 #endif // LWIP_IPV4 && LWIP_IGMP
         SuccessOrExit(lRetval);
@@ -545,9 +536,7 @@ Please enable LWIP_IPV4 and LWIP_IGMP for IPv4 JoinMulticastGroup and LeaveMulti
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
         lRetval = LwIPIPv6JoinLeaveMulticastGroup(aInterfaceId, aAddress, mld6_leavegroup_netif);
-#else // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
-#pragma message "\n \
-Please enable LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6 for IPv6 JoinMulticastGroup and LeaveMulticastGroup support."
+#else  // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
         lRetval = INET_ERROR_NOT_SUPPORTED;
 #endif // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
         SuccessOrExit(lRetval);

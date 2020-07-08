@@ -119,15 +119,15 @@ CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBuffer
         uint8_t * data = msgBuf->Start();
         MessageHeader header;
 
-        err = state->GetSecureSession().Encrypt(data, msgBuf->TotalLength(), data, header);
-        SuccessOrExit(err);
-
-        ChipLogProgress(Inet, "Secure transport transmitting msg %u after encryption", state->GetSendMessageIndex());
-
         header
             .SetSourceNodeId(mLocalNodeId)    //
             .SetDestinationNodeId(peerNodeId) //
             .SetMessageId(state->GetSendMessageIndex());
+
+        err = state->GetSecureSession().Encrypt(data, msgBuf->TotalLength(), data, header);
+        SuccessOrExit(err);
+
+        ChipLogProgress(Inet, "Secure transport transmitting msg %u after encryption", state->GetSendMessageIndex());
 
         err    = mTransport.SendMessage(header, state->GetPeerAddress(), msgBuf);
         msgBuf = NULL;
@@ -205,6 +205,16 @@ void SecureSessionMgr::HandleDataReceived(const MessageHeader & header, const Pe
     {
         if (!connection->mPeerConnections.FindPeerConnectionState(peerAddress, &state))
         {
+            if (header.GetSourceNodeId().HasValue())
+            {
+                // If the data is from a new address BUT the node id is the same as a previous
+                // connection, mark the previous connection invalid in order to not have duplicate node ids.
+                if (connection->mPeerConnections.FindPeerConnectionState(header.GetSourceNodeId().Value(), &state))
+                {
+                    connection->mPeerConnections.MarkConnectionExpired(state);
+                }
+            }
+
             ChipLogProgress(Inet, "New peer connection received.");
 
             err = connection->AllocateNewConnection(header, peerAddress, &state);

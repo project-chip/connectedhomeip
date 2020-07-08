@@ -24,7 +24,8 @@
  */
 
 #include "LEDWidget.h"
-#include "Display.h"
+
+#include "ScreenManager.h"
 
 #include "driver/gpio.h"
 #include "esp_log.h"
@@ -54,6 +55,8 @@ void LEDWidget::Init(gpio_num_t gpioNum)
     mBlinkOnTimeMS    = 0;
     mBlinkOffTimeMS   = 0;
     mGPIONum          = gpioNum;
+    mVLED1            = -1;
+    mVLED2            = -1;
     mState            = false;
     mError            = false;
     errorTimer        = NULL;
@@ -87,9 +90,10 @@ void ClearErrorState(TimerHandle_t handle)
 #if CONFIG_HAVE_DISPLAY
     LEDWidget * pWidget = (LEDWidget *) pvTimerGetTimerID(handle);
     pWidget->mError     = false;
-    pWidget->Display();
-    // If a status change occured, wake the display
-    WakeDisplay();
+    if (pWidget->mVLED2 != -1)
+    {
+        ScreenManager::SetVLED(pWidget->mVLED2, false);
+    }
 #endif
 }
 
@@ -103,9 +107,10 @@ void LEDWidget::BlinkOnError()
     }
     errorTimer = xTimerCreate("ErrorTimer", pdMS_TO_TICKS(2000), false, this, ClearErrorState);
     xTimerStart(errorTimer, 0);
-    Display();
-    // If a status change occured, wake the display
-    WakeDisplay();
+    if (mVLED2 != -1)
+    {
+        ScreenManager::SetVLED(mVLED2, true);
+    }
 #endif
 }
 
@@ -136,49 +141,26 @@ void LEDWidget::DoSet(bool state)
     if (stateChange)
     {
 #if CONFIG_HAVE_DISPLAY
-
-        Display();
-        // If a status change occured, wake the display
-        WakeDisplay();
+        if (mVLED1 != -1)
+        {
+            ScreenManager::SetVLED(mVLED1, mState);
+        }
 #endif
     }
 }
 
 #if CONFIG_HAVE_DISPLAY
-void LEDWidget::Display()
+void LEDWidget::SetVLED(int id1, int id2)
 {
-    uint16_t msgX    = 0;
-    uint16_t msgY    = (DisplayHeight * LED_STATUS_POSITION) / 100;
-    uint16_t circleX = (LED_INDICATOR_X * DisplayWidth) / 100;
-    uint16_t circleY = (LED_INDICATOR_Y * DisplayHeight) / 100;
-
-    // Wipe the Light Status Area
-    ClearRect(0, LED_STATUS_POSITION);
-    // Wipe the status circle
-    TFT_fillCircle(circleX, circleY, LED_INDICATOR_R_PX, TFT_BLACK);
-    // Display the Light Status on screen
-    TFT_setFont(DEJAVU24_FONT, NULL);
-    // Draw the default "Off" indicator
-    TFT_drawCircle(circleX, circleY, LED_INDICATOR_R_PX, TFT_DARKGREY);
-
-    if (mError)
+    mVLED1 = id1;
+    if (mVLED1 != -1)
     {
-        TFT_print((char *) "Recv Error", msgX, msgY);
-        // Draw the "Error" indicator
-        TFT_fillCircle(circleX, circleY, LED_INDICATOR_R_PX, TFT_RED);
+        ScreenManager::SetVLED(mVLED1, mState);
     }
-    else
+    mVLED2 = id2;
+    if (mVLED2 != -1)
     {
-        if (mState)
-        {
-            TFT_print((char *) onMsg, msgX, msgY);
-            // Draw the "ON" indicator
-            TFT_fillCircle(circleX, circleY, LED_INDICATOR_R_PX, TFT_GREEN);
-        }
-        else
-        {
-            TFT_print((char *) offMsg, msgX, msgY);
-        }
+        ScreenManager::SetVLED(mVLED2, mError);
     }
 }
 #endif

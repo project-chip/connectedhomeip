@@ -46,6 +46,7 @@ class PlatformManagerImpl;
 class ConnectivityManagerImpl;
 class ConfigurationManagerImpl;
 class TraitManager;
+class ThreadStackManagerImpl;
 class TimeSyncManager;
 namespace Internal {
 class FabricProvisioningServer;
@@ -97,6 +98,7 @@ private:
     friend class ConnectivityManagerImpl;
     friend class ConfigurationManagerImpl;
     friend class TraitManager;
+    friend class ThreadStackManagerImpl;
     friend class TimeSyncManager;
     friend class Internal::FabricProvisioningServer;
     friend class Internal::ServiceProvisioningServer;
@@ -116,14 +118,14 @@ private:
     template <class>
     friend class Internal::GenericConfigurationManagerImpl;
     // Parentheses used to fix clang parsing issue with these declarations
-    friend ::chip::System::Error ::chip::System::Platform::Layer::PostEvent(::chip::System::Layer & aLayer, void * aContext,
-                                                                            ::chip::System::Object & aTarget,
-                                                                            ::chip::System::EventType aType, uintptr_t aArgument);
-    friend ::chip::System::Error ::chip::System::Platform::Layer::DispatchEvents(::chip::System::Layer & aLayer, void * aContext);
-    friend ::chip::System::Error ::chip::System::Platform::Layer::DispatchEvent(::chip::System::Layer & aLayer, void * aContext,
-                                                                                ::chip::System::Event aEvent);
-    friend ::chip::System::Error ::chip::System::Platform::Layer::StartTimer(::chip::System::Layer & aLayer, void * aContext,
-                                                                             uint32_t aMilliseconds);
+    friend ::chip::System::Error(::chip::System::Platform::Layer::PostEvent)(::chip::System::Layer & aLayer, void * aContext,
+                                                                             ::chip::System::Object & aTarget,
+                                                                             ::chip::System::EventType aType, uintptr_t aArgument);
+    friend ::chip::System::Error(::chip::System::Platform::Layer::DispatchEvents)(::chip::System::Layer & aLayer, void * aContext);
+    friend ::chip::System::Error(::chip::System::Platform::Layer::DispatchEvent)(::chip::System::Layer & aLayer, void * aContext,
+                                                                                 ::chip::System::Event aEvent);
+    friend ::chip::System::Error(::chip::System::Platform::Layer::StartTimer)(::chip::System::Layer & aLayer, void * aContext,
+                                                                              uint32_t aMilliseconds);
 
     void PostEvent(const ChipDeviceEvent * event);
     void DispatchEvent(const ChipDeviceEvent * event);
