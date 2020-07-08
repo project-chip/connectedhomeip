@@ -16,6 +16,11 @@
 # limitations under the License.
 #
 
+# Bootstrap script for GN build GitHub workflow.
+
+# This is used to account bootstrap time in a dedicated workflow step; there's
+# no need to use this script locally.
+
 CHIP_ROOT="$(dirname "$0")/../.."
 
 source "$CHIP_ROOT/activate.sh"

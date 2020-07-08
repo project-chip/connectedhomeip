@@ -16,6 +16,8 @@
 # limitations under the License.
 #
 
+# GN gen script for GN build GitHub workflow.
+
 CHIP_ROOT="$(dirname "$0")/../.."
 
 source "$CHIP_ROOT/activate.sh"
