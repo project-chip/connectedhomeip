@@ -16,8 +16,8 @@ RUN set -x \
     && (mkdir /var/nRF5_tools && cd /var/nRF5_tools \
     && curl https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-7-0/nRFCommandLineTools1070Linuxamd64tar.gz \
     | tar zxvf - \
-    && dpkg -i JLink_Linux_*.deb \
-    && dpkg -i nRF-Command-Line-Tools_*.deb \
+    && dpkg -i --force-depends JLink_Linux_*.deb \
+    && dpkg -i --force-depends nRF-Command-Line-Tools_*.deb \
     && tar zxvf nRF-Command-Line-Tools_*.tar.gz) \
     && rm -rf /var/nRF5_tools/*.tar.gz \
     && rm -rf /var/nRF5_tools/*.deb \

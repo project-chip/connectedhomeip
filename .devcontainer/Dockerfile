@@ -25,8 +25,6 @@ RUN useradd -s /bin/bash -u $USER_UID -g $USER_GID -G docker -m $USERNAME
 RUN echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME
 RUN chmod 0440 /etc/sudoers.d/$USERNAME
 
-RUN ln -s /usr/bin/clang-format-9 /usr/local/bin/clang-format
-
 RUN mkdir -p /var/downloads
 RUN cd /var/downloads
 RUN curl -JL https://github.com/microsoft/vscode-cpptools/releases/download/0.27.0/cpptools-linux.vsix | bsdtar -xvf - extension
