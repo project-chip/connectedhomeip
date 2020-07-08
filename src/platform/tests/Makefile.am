@@ -68,12 +68,31 @@ AM_CPPFLAGS                                    = \
     $(NLUNIT_TEST_CPPFLAGS)                      \
     $(NULL)
 
+if CHIP_DEVICE_LAYER_TARGET_LINUX
+if CHIP_WITH_OT_BR_POSIX
+AM_CPPFLAGS                                   += \
+    $(DBUS_CFLAGS)                               \
+    $(OT_BR_POSIX_CPPFLAGS)                     \
+    $(NULL)
+libPlatformTests_a_SOURCES += TestThreadStackMgr.cpp
+endif
+endif
+
 CHIP_LDADD                                      = \
     $(top_builddir)/src/platform/libDeviceLayer.a \
     $(top_builddir)/src/inet/libInetLayer.a       \
     $(top_builddir)/src/system/libSystemLayer.a   \
     $(top_builddir)/src/lib/support/libSupportLayer.a   \
     $(NULL)
+
+if CHIP_DEVICE_LAYER_TARGET_LINUX
+if CHIP_WITH_OT_BR_POSIX
+CHIP_LDADD                                    += \
+    $(DBUS_LIBS)                                 \
+    $(OT_BR_POSIX_LDFLAGS) $(OT_BR_POSIX_LIBS) \
+    $(NULL)
+endif
+endif
 
 COMMON_LDADD                                          = \
     libPlatformTests.a                                  \
@@ -93,13 +112,25 @@ check_PROGRAMS                                 = \
     TestConfigurationMgr                         \
     $(NULL)
 
+if CHIP_DEVICE_LAYER_TARGET_LINUX
+if CHIP_WITH_OT_BR_POSIX
+check_PROGRAMS += TestThreadStackMgr
+
+TestThreadStackMgr_LDADD                       = $(COMMON_LDADD)
+TestThreadStackMgr_SOURCES                     = TestThreadStackMgrDriver.cpp
+endif
+endif
+
 # TODO Add TestConfigurationMgr to check_PROGRAMS when dependent core profile are merged 
 
 # Test applications and scripts that should be built and run when the
 # 'check' target is run.
 
+# TestThreadStackMgr requires additional daemon to be launched
 TESTS                                          = \
-    $(check_PROGRAMS)                            \
+    TestPlatformTime                             \
+    TestPlatformMgr                              \
+    TestConfigurationMgr                         \
     $(NULL)
 
 # The additional environment variables and their values that will be

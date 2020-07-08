@@ -26,6 +26,7 @@
 
 #include "CHIPDeviceManager.h"
 #include <lib/support/CodeUtils.h>
+#include <setup_payload/SetupPayload.h>
 #include <support/ErrorStr.h>
 
 namespace chip {
@@ -55,9 +56,21 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     err = PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
-    // Configure the CHIP Connectivity Manager to always enable the AP. The Station interface
-    // will be enabled automatically if the required configuration is set.
-    ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
+    switch (static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE))
+    {
+    case RendezvousInformationFlags::kBLE:
+        ConnectivityMgr().SetBLEAdvertisingEnabled(ConnectivityManager::kCHIPoBLEServiceMode_Enabled);
+        ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Disabled);
+        break;
+
+    case RendezvousInformationFlags::kWiFi:
+        ConnectivityMgr().SetBLEAdvertisingEnabled(ConnectivityManager::kCHIPoBLEServiceMode_Disabled);
+        ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
+        break;
+
+    default:
+        break;
+    }
 
     // Register a function to receive events from the CHIP device layer.  Note that calls to
     // this function will happen on the CHIP event loop thread, not the app_main thread.
