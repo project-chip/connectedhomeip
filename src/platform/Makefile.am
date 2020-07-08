@@ -142,6 +142,17 @@ libDeviceLayer_a_SOURCES               += \
     Linux/SystemTimeSupport.cpp           \
     $(NULL)
 
+if CHIP_WITH_OT_BR_POSIX
+libDeviceLayer_a_SOURCES               += \
+    Linux/ThreadStackManagerImpl.cpp      \
+    $(NULL)
+
+libDeviceLayer_a_CPPFLAGS              += \
+    $(OT_BR_POSIX_CPPFLAGS)              \
+    $(DBUS_CFLAGS)                        \
+    $(NULL)
+endif
+
 endif # CHIP_DEVICE_LAYER_TARGET_LINUX
 
 if CHIP_DEVICE_LAYER_TARGET_NRF5
