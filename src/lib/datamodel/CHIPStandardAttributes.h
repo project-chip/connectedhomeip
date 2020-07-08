@@ -24,7 +24,7 @@
 #ifndef CHIPSTANDARDATTRIBUTES_H_
 #define CHIPSTANDARDATTRIBUTES_H_
 
-#include <lib/core/CHIPBaseAttribute.h>
+#include <lib/datamodel/CHIPBaseAttribute.h>
 
 namespace chip {
 namespace DataModel {
