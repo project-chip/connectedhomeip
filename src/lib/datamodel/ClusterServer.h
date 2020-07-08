@@ -58,7 +58,7 @@ public:
     }
 
     /* By default always add to the kEndPointIdStartth endpoint, for simplicity */
-    int AddCluster(BaseCluster * cluster)
+    int AddCluster(Cluster * cluster)
     {
         if (!cluster)
         {

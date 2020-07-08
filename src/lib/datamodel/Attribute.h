@@ -21,15 +21,15 @@
  *
  */
 
-#ifndef CHIPATTRIBUTES_H_
-#define CHIPATTRIBUTES_H_
+#ifndef CHIP_ATTRIBUTE_H_
+#define CHIP_ATTRIBUTE_H_
 
-#include <datamodel/Values.h>
+#include <datamodel/Value.h>
 
 namespace chip {
 namespace DataModel {
 
-class BaseAttribute
+class Attribute
 {
 public:
     uint16_t mAttrId;
@@ -37,9 +37,9 @@ public:
     Value mMin;
     Value mMax;
 
-    BaseAttribute(uint16_t attrId, ValueTypes type) : mAttrId(attrId), mValue(type), mMin(type), mMax(type) {}
-    BaseAttribute(uint16_t attrId, Value value) : mAttrId(attrId), mValue(value), mMin(value.mType), mMax(value.mType) {}
-    BaseAttribute(uint16_t attrId, ValueTypes type, uint64_t min, uint64_t max) :
+    Attribute(uint16_t attrId, ValueTypes type) : mAttrId(attrId), mValue(type), mMin(type), mMax(type) {}
+    Attribute(uint16_t attrId, Value value) : mAttrId(attrId), mValue(value), mMin(value.mType), mMax(value.mType) {}
+    Attribute(uint16_t attrId, ValueTypes type, uint64_t min, uint64_t max) :
         mAttrId(attrId), mValue(type), mMin(type, min), mMax(type, max)
     {}
 
@@ -103,4 +103,4 @@ protected:
 } // namespace DataModel
 } // namespace chip
 
-#endif /* CHIPATTRIBUTES_H_ */
+#endif /* CHIP_ATTRIBUTE_H_ */
