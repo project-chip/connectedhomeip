@@ -24,7 +24,7 @@
 #ifndef CHIPATTRIBUTES_H_
 #define CHIPATTRIBUTES_H_
 
-#include <lib/datamodel/CHIPValues.h>
+#include <datamodel/CHIPValues.h>
 
 namespace chip {
 namespace DataModel {

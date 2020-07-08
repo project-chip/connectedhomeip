@@ -23,11 +23,11 @@
 #      must be anchored relative to the top build directory.
 #
 
-CHIP_BUILD_DATAMODEL_LAYER_SOURCE_FILES                   = \
+CHIP_BUILD_DATAMODEL_SOURCE_FILES                         = \
     @top_builddir@/src/lib/datamodel/CHIPEndPoint.cpp       \
     $(NULL)
 
-CHIP_BUILD_DATAMODEL_LAYER_HEADER_FILES                   = \
+CHIP_BUILD_DATAMODEL_HEADER_FILES                              = \
     @top_builddir@/src/lib/datamodel/CHIPBaseAttribute.h         \
     @top_builddir@/src/lib/datamodel/CHIPBaseCluster.h           \
     @top_builddir@/src/lib/datamodel/CHIPClusterServer.h         \

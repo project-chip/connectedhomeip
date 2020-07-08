@@ -27,6 +27,7 @@ SUBDIRS                             =                         \
     shell                                                     \
     support                                                   \
     core/tests                                                \
+    datamodel                                                 \
     $(NULL)
 
 # Pull in the sources that comprise the CHIP library.
@@ -49,7 +50,8 @@ dist_CoreLayer__HEADERS=$(CHIP_BUILD_CORE_LAYER_HEADER_FILES)
 
 # install headers for datamodel layer
 DataModel_dir=$(includedir)/datamodel
-dist_DataModel__HEADERS=$(CHIP_BUILD_DATAMODEL_LAYER_HEADER_FILES)
+dist_DataModel__HEADERS=$(CHIP_BUILD_DATAMODEL_HEADER_FILES)
+
 # install headers for DeviceController
 Controller_dir=$(includedir)/controller
 dist_Controller__HEADERS=$(CHIP_BUILD_DEVICE_CONTROLLER_HEADER_FILES)
@@ -77,7 +79,7 @@ libCHIP_a_CPPFLAGS                  =                         \
 libCHIP_a_SOURCES                   = $(CHIP_BUILD_SYSTEM_LAYER_SOURCE_FILES)
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_INET_LAYER_SOURCE_FILES)
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_CORE_LAYER_SOURCE_FILES)
-libCHIP_a_SOURCES                  += $(CHIP_BUILD_DATAMODEL_LAYER_SOURCE_FILES)
+libCHIP_a_SOURCES                  += $(CHIP_BUILD_DATAMODEL_SOURCE_FILES)
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES)
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_DEVICE_CONTROLLER_SOURCE_FILES)
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_DATA_MODEL_SOURCE_FILES)

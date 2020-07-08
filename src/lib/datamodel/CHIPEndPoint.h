@@ -24,8 +24,8 @@
 #ifndef CHIPENDPOINT_H_
 #define CHIPENDPOINT_H_
 
-#include <lib/datamodel/CHIPBaseAttribute.h>
-#include <lib/datamodel/CHIPStandardClusters.h>
+#include <datamodel/CHIPBaseAttribute.h>
+#include <datamodel/CHIPStandardClusters.h>
 
 namespace chip {
 namespace DataModel {
