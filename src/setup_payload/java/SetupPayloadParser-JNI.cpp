@@ -69,40 +69,40 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
         jclass optionalInfoClass = env->FindClass("chip/setuppayload/OptionalQRCodeInfo");
         jobject optionalInfo     = env->AllocObject(optionalInfoClass);
         jfieldID tag             = env->GetFieldID(optionalInfoClass, "tag", "I");
-        jfieldID type = env->GetFieldID(optionalInfoClass, "type", "Lchip/setuppayload/OptionalQRCodeInfo$optionalQRCodeInfoType;");
+        jfieldID type = env->GetFieldID(optionalInfoClass, "type", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
         jfieldID data = env->GetFieldID(optionalInfoClass, "data", "Ljava/lang/String;");
         jfieldID int32 = env->GetFieldID(optionalInfoClass, "int32", "I");
 
         env->SetIntField(optionalInfo, tag, info.tag);
 
-        jclass enumClass  = env->FindClass("chip/setuppayload/OptionalQRCodeInfo$optionalQRCodeInfoType");
+        jclass enumClass  = env->FindClass("chip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType");
         jfieldID enumType = nullptr;
 
         switch (info.tag)
         {
         case optionalQRCodeInfoTypeUnknown:
-            enumType = env->GetStaticFieldID(enumClass, "optionalQRCodeInfoTypeUnknown",
-                                             "Lchip/setuppayload/OptionalQRCodeInfo$optionalQRCodeInfoType;");
+            enumType =
+                env->GetStaticFieldID(enumClass, "TYPE_UNKNOWN", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         case optionalQRCodeInfoTypeString:
-            enumType = env->GetStaticFieldID(enumClass, "optionalQRCodeInfoTypeString",
-                                             "Lchip/setuppayload/OptionalQRCodeInfo$optionalQRCodeInfoType;");
+            enumType =
+                env->GetStaticFieldID(enumClass, "TYPE_STRING", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         case optionalQRCodeInfoTypeInt32:
-            enumType = env->GetStaticFieldID(enumClass, "optionalQRCodeInfoTypeInt32",
-                                             "Lchip/setuppayload/OptionalQRCodeInfo$optionalQRCodeInfoType;");
+            enumType =
+                env->GetStaticFieldID(enumClass, "TYPE_INT32", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         case optionalQRCodeInfoTypeInt64:
-            enumType = env->GetStaticFieldID(enumClass, "optionalQRCodeInfoTypeInt64",
-                                             "Lchip/setuppayload/OptionalQRCodeInfo$optionalQRCodeInfoType;");
+            enumType =
+                env->GetStaticFieldID(enumClass, "TYPE_INT64", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         case optionalQRCodeInfoTypeUInt32:
-            enumType = env->GetStaticFieldID(enumClass, "optionalQRCodeInfoTypeUInt32",
-                                             "Lchip/setuppayload/OptionalQRCodeInfo$optionalQRCodeInfoType;");
+            enumType =
+                env->GetStaticFieldID(enumClass, "TYPE_UINT32", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         case optionalQRCodeInfoTypeUInt64:
-            enumType = env->GetStaticFieldID(enumClass, "optionalQRCodeInfoTypeUInt64",
-                                             "Lchip/setuppayload/OptionalQRCodeInfo$optionalQRCodeInfoType;");
+            enumType =
+                env->GetStaticFieldID(enumClass, "TYPE_UINT64", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         default:
             break;
