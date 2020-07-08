@@ -19,6 +19,7 @@
 #define CHIP_PLATFORM_LINUX_THREAD_STACK_MANAGER_IMPL_H
 
 #include <memory>
+#include <thread>
 
 #include "platform/internal/CHIPDeviceLayerInternal.h"
 
@@ -31,7 +32,7 @@ namespace DeviceLayer {
 class ThreadStackManagerImpl : public ThreadStackManager
 {
 public:
-    ThreadStackManagerImpl(DBusConnection * aConnection);
+    ThreadStackManagerImpl();
 
     CHIP_ERROR _InitThreadStack();
     CHIP_ERROR _ProcessThreadActivity();
@@ -88,12 +89,20 @@ public:
     ~ThreadStackManagerImpl() = default;
 
 private:
+    struct DBusConnectionDeleter
+    {
+        void operator()(DBusConnection * aConnection) { dbus_connection_unref(aConnection); }
+    };
+
+    using UniqueDBusConnection = std::unique_ptr<DBusConnection, DBusConnectionDeleter>;
+
     void _ThreadDevcieRoleChangedHandler(otbr::DBus::DeviceRole role);
 
     std::unique_ptr<otbr::DBus::ThreadApiDBus> mThreadApi;
-    DBusConnection * mConnection;
+    UniqueDBusConnection mConnection;
     Internal::DeviceNetworkInfo mNetworkInfo;
     bool mAttached;
+    std::thread mDBusEventLoop;
 };
 
 } // namespace DeviceLayer

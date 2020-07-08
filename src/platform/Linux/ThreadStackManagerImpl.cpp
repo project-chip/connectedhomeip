@@ -55,23 +55,37 @@ using otbr::DBus::NeighborInfo;
 namespace chip {
 namespace DeviceLayer {
 
-ThreadStackManagerImpl::ThreadStackManagerImpl(DBusConnection * aConnection) :
-    mThreadApi(nullptr), mConnection(aConnection), mNetworkInfo(), mAttached(false)
-{}
+ThreadStackManagerImpl::ThreadStackManagerImpl() : mThreadApi(nullptr), mConnection(nullptr), mNetworkInfo(), mAttached(false) {}
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
     ClientError error;
     DeviceRole role;
+    DBusError dbusError;
+    DBusConnection * dispatchConnection;
+
+    dbus_error_init(&dbusError);
+    mConnection = UniqueDBusConnection(dbus_bus_get(DBUS_BUS_SYSTEM, &dbusError));
+    VerifyOrExit(dbus_bus_register(mConnection.get(), &dbusError), error = ClientError::ERROR_DBUS);
 
     VerifyOrExit(mConnection != nullptr, error = ClientError::ERROR_DBUS);
-    mThreadApi = std::unique_ptr<otbr::DBus::ThreadApiDBus>(new otbr::DBus::ThreadApiDBus(mConnection));
+    mThreadApi = std::unique_ptr<otbr::DBus::ThreadApiDBus>(new otbr::DBus::ThreadApiDBus(mConnection.get()));
     mThreadApi->AddDeviceRoleHandler([this](DeviceRole newRole) { this->_ThreadDevcieRoleChangedHandler(newRole); });
 
     SuccessOrExit(error = mThreadApi->GetDeviceRole(role));
     _ThreadDevcieRoleChangedHandler(role);
     mAttached = (role != DeviceRole::OTBR_DEVICE_ROLE_DETACHED && role != DeviceRole::OTBR_DEVICE_ROLE_DISABLED);
+
+    dispatchConnection = mConnection.get();
+    mDBusEventLoop     = std::thread([dispatchConnection]() {
+        while (true)
+        {
+            dbus_connection_read_write_dispatch(dispatchConnection, -1);
+        }
+    });
+    mDBusEventLoop.detach();
 exit:
+    dbus_error_free(&dbusError);
     LogClientError(error);
     return OTBR_TO_CHIP_ERROR(error);
 }

@@ -49,17 +49,7 @@ void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg
 
 int TestThreadStackManager(void)
 {
-#if CHIP_DEVICE_LAYER_TARGET == LINUX
-    DBusError error;
-    UniqueDBusConnection connection;
-
-    dbus_error_init(&error);
-    connection = UniqueDBusConnection(dbus_bus_get(DBUS_BUS_SYSTEM, &error));
-    assert(dbus_bus_register(connection.get(), &error) == true);
-    chip::DeviceLayer::ThreadStackManagerImpl impl(connection.get());
-#else
     chip::DeviceLayer::ThreadStackManagerImpl impl;
-#endif // CHIP_DEVICE_LAYER_TARGET == LINUX
     chip::DeviceLayer::Internal::DeviceNetworkInfo info;
     uint16_t masterKey[16] = { 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 
@@ -80,17 +70,6 @@ int TestThreadStackManager(void)
     impl._SetThreadEnabled(true);
 
     printf("Start Thread task done\n");
-
-    // FIXME: Remove the dbus message loop after integration into PlatforManager
-#if CHIP_DEVICE_LAYER_TARGET == LINUX
-    DBusConnection * dispatchConnection = connection.get();
-    std::thread t([dispatchConnection]() {
-        while (true)
-        {
-            dbus_connection_read_write_dispatch(dispatchConnection, -1);
-        }
-    });
-#endif
 
     chip::DeviceLayer::PlatformMgrImpl().RunEventLoop();
 
