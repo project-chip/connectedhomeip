@@ -29,12 +29,12 @@
 #include "freertos/timers.h"
 #include <lib/core/CHIPStandardClusters.h>
 
-class LEDWidget : public chip::DataModel::CHIPClusterOnOff
+class LEDWidget : public chip::DataModel::ClusterOnOff
 {
 public:
     void Init(gpio_num_t gpioNum);
     void Set(bool state);
-    int Set(uint16_t attrId, const chip::DataModel::CHIPValue & value);
+    int Set(uint16_t attrId, const chip::DataModel::Value & value);
     void Blink(uint32_t changeRateMS);
     void Blink(uint32_t onTimeMS, uint32_t offTimeMS);
     void BlinkOnError();

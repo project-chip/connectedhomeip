@@ -72,17 +72,17 @@ void LEDWidget::Set(bool state)
 {
     mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
     DoSet(state);
-    CHIPBaseCluster::Set(kAttributeIdOnOff, CHIPValueBool(state));
+    BaseCluster::Set(kAttributeIdOnOff, ValueBool(state));
 }
 
-int LEDWidget::Set(uint16_t attrId, const CHIPValue & value)
+int LEDWidget::Set(uint16_t attrId, const Value & value)
 {
     if (attrId == kAttributeIdOnOff)
     {
-        printf("Setting value to %d\n", CHIPValueToBool(value));
-        DoSet(CHIPValueToBool(value));
+        printf("Setting value to %d\n", ValueToBool(value));
+        DoSet(ValueToBool(value));
         /* Update our internal data model as well */
-        CHIPBaseCluster::Set(attrId, value);
+        BaseCluster::Set(attrId, value);
     }
     return SUCCESS;
 }

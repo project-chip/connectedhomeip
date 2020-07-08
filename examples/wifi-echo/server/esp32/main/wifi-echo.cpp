@@ -110,7 +110,7 @@ const uint8_t ZCLVersion         = 10;
 const uint8_t applicationVersion = 20;
 const uint8_t stackVersion       = 1;
 const uint8_t HWVersion          = 1;
-CHIPClusterServer server(ZCLVersion, applicationVersion, stackVersion, HWVersion);
+ClusterServer server(ZCLVersion, applicationVersion, stackVersion, HWVersion);
 
 namespace {
 
@@ -359,7 +359,7 @@ std::string createSetupPayload()
 
 } // namespace
 
-void PrintDataModel(CHIPClusterServer & server)
+void PrintDataModel(ClusterServer & server)
 {
     printf("Server:\n");
     for (int i = 0; i < kMaxEndPointPerServer; i++)

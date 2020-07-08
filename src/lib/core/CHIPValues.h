@@ -36,7 +36,7 @@ namespace DataModel {
 #define SUCCESS 0
 #define FAIL -1
 
-enum CHIPValueTypes
+enum ValueTypes
 {
     kCHIPValueType_NotSpecified = -1,
     kCHIPValueType_Int8,
@@ -62,17 +62,17 @@ enum CHIPValueTypes
     kCHIPValueType_EndOfContainer,
 };
 
-class CHIPValue
+class Value
 {
 public:
-    CHIPValueTypes mType;
+    ValueTypes mType;
     union
     {
         uint64_t Int64;
     };
-    CHIPValue() {}
-    CHIPValue(CHIPValueTypes type) : mType(type), Int64() {}
-    CHIPValue(CHIPValueTypes type, uint64_t int64Value) : mType(type), Int64(int64Value) {}
+    Value() {}
+    Value(ValueTypes type) : mType(type), Int64() {}
+    Value(ValueTypes type, uint64_t int64Value) : mType(type), Int64(int64Value) {}
 
     void ValueToStr(char * buf, int maxlen)
     {
@@ -101,22 +101,22 @@ public:
     }
 };
 
-static inline CHIPValue CHIPValueBool(bool b)
+static inline Value ValueBool(bool b)
 {
-    return CHIPValue(kCHIPValueType_Bool, (uint64_t) b);
+    return Value(kCHIPValueType_Bool, (uint64_t) b);
 }
 
-static inline bool CHIPValueToBool(CHIPValue v)
+static inline bool ValueToBool(Value v)
 {
     return (bool) v.Int64;
 }
 
-static inline CHIPValue CHIPValueUInt8(uint8_t b)
+static inline Value ValueUInt8(uint8_t b)
 {
-    return CHIPValue(kCHIPValueType_UInt8, (uint64_t) b);
+    return Value(kCHIPValueType_UInt8, (uint64_t) b);
 }
 
-static inline uint8_t CHIPValueToUInt8(CHIPValue v)
+static inline uint8_t ValueToUInt8(Value v)
 {
     return (uint8_t) v.Int64;
 }
