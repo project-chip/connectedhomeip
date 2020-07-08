@@ -38,19 +38,13 @@ void TestClusterServer(nlTestSuite * inSuite, void * inContext)
 
 } // namespace
 
-/**
- *   Test Suite. It lists all the test functions.
- */
-// clang-format off
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("TestClusterServer", TestClusterServer),
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
 int TestClusterServer(void)
 {
+    /**
+     *   Test Suite. It lists all the test functions.
+     */
+    static const nlTest sTests[] = { NL_TEST_DEF("TestClusterServer", TestClusterServer), NL_TEST_SENTINEL() };
+
     nlTestSuite theSuite = {
         "TestClusterServer", &sTests[0], NULL /* setup */, NULL /* teardown */
     };
@@ -61,7 +55,7 @@ int TestClusterServer(void)
     return (nlTestRunnerStats(&theSuite));
 }
 
-static void __attribute__((constructor)) TestTimeSourceCtor(void)
+static void __attribute__((constructor)) Ctor(void)
 {
     nlABORT(chip::RegisterUnitTests(&TestClusterServer) == CHIP_NO_ERROR);
 }
