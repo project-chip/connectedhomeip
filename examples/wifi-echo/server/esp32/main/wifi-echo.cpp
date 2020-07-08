@@ -42,7 +42,7 @@
 #include <vector>
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <lib/datamodel/CHIPClusterServer.h>
+#include <lib/datamodel/ClusterServer.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/ErrorStr.h>

@@ -24,15 +24,15 @@
 #
 
 CHIP_BUILD_DATAMODEL_SOURCE_FILES                         = \
-    @top_builddir@/src/lib/datamodel/CHIPEndPoint.cpp       \
+    @top_builddir@/src/lib/datamodel/EndPoint.cpp       \
     $(NULL)
 
 CHIP_BUILD_DATAMODEL_HEADER_FILES                              = \
-    @top_builddir@/src/lib/datamodel/CHIPBaseAttribute.h         \
-    @top_builddir@/src/lib/datamodel/CHIPBaseCluster.h           \
-    @top_builddir@/src/lib/datamodel/CHIPClusterServer.h         \
-    @top_builddir@/src/lib/datamodel/CHIPEndPoint.h              \
-    @top_builddir@/src/lib/datamodel/CHIPStandardAttributes.h    \
-    @top_builddir@/src/lib/datamodel/CHIPStandardClusters.h      \
-    @top_builddir@/src/lib/datamodel/CHIPValues.h                \
+    @top_builddir@/src/lib/datamodel/BaseAttribute.h         \
+    @top_builddir@/src/lib/datamodel/BaseCluster.h           \
+    @top_builddir@/src/lib/datamodel/ClusterServer.h         \
+    @top_builddir@/src/lib/datamodel/EndPoint.h              \
+    @top_builddir@/src/lib/datamodel/StandardAttributes.h    \
+    @top_builddir@/src/lib/datamodel/StandardClusters.h      \
+    @top_builddir@/src/lib/datamodel/Values.h                \
     $(NULL)

@@ -24,8 +24,8 @@
 #ifndef CHIPSTANDARDCLUSTERS_H_
 #define CHIPSTANDARDCLUSTERS_H_
 
-#include <datamodel/CHIPBaseCluster.h>
-#include <datamodel/CHIPStandardAttributes.h>
+#include <datamodel/BaseCluster.h>
+#include <datamodel/StandardAttributes.h>
 
 namespace chip {
 namespace DataModel {

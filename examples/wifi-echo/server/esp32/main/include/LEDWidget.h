@@ -27,7 +27,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/timers.h"
-#include <lib/datamodel/CHIPStandardClusters.h>
+#include <lib/datamodel/StandardClusters.h>
 
 class LEDWidget : public chip::DataModel::ClusterOnOff
 {
