@@ -35,15 +35,15 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#define FACTORY_RESET_TRIGGER_TIMEOUT 3000
-#define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE (4096)
-#define APP_TASK_PRIORITY 2
-#define APP_EVENT_QUEUE_SIZE 10
-
 APP_TIMER_DEF(sFunctionTimer);
 
 namespace {
+
+constexpr int kFactoryResetTriggerTimeout      = 3000;
+constexpr int kFactoryResetCancelWindowTimeout = 3000;
+constexpr size_t kAppTaskStackSize             = 4096;
+constexpr int kAppTaskPriority                 = 2;
+constexpr int kAppEventQueueSize               = 10;
 
 SemaphoreHandle_t sCHIPEventLock;
 
@@ -71,7 +71,7 @@ int AppTask::StartAppTask()
 {
     ret_code_t ret = NRF_SUCCESS;
 
-    sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
+    sAppEventQueue = xQueueCreate(kAppEventQueueSize, sizeof(AppEvent));
     if (sAppEventQueue == NULL)
     {
         NRF_LOG_INFO("Failed to allocate app event queue");
@@ -80,8 +80,7 @@ int AppTask::StartAppTask()
     }
 
     // Start App task.
-    if (xTaskCreate(AppTaskMain, "APP", APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, APP_TASK_PRIORITY, &sAppTaskHandle) !=
-        pdPASS)
+    if (xTaskCreate(AppTaskMain, "APP", kAppTaskStackSize / sizeof(StackType_t), NULL, kAppTaskPriority, &sAppTaskHandle) != pdPASS)
     {
         ret = NRF_ERROR_NULL;
     }
@@ -306,13 +305,13 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     if (aEvent->Type != AppEvent::kEventType_Timer)
         return;
 
-    // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT, initiate factory reset
+    // If we reached here, the button was held past kFactoryResetTriggerTimeout, initiate factory reset
     if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
     {
-        NRF_LOG_INFO("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_TRIGGER_TIMEOUT);
+        NRF_LOG_INFO("Factory Reset Triggered. Release button within %ums to cancel.", kFactoryResetTriggerTimeout);
 
-        // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to cancel, if required.
-        sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+        // Start timer for kFactoryResetCancelWindowTimeout to allow user to cancel, if required.
+        sAppTask.StartTimer(kFactoryResetCancelWindowTimeout);
 
         sAppTask.mFunction = kFunction_FactoryReset;
 
@@ -338,16 +337,16 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != FUNCTION_BUTTON)
         return;
 
-    // To trigger software update: press the FUNCTION_BUTTON button briefly (< FACTORY_RESET_TRIGGER_TIMEOUT)
-    // To initiate factory reset: press the FUNCTION_BUTTON for FACTORY_RESET_TRIGGER_TIMEOUT + FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
-    // All LEDs start blinking after FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
+    // To trigger software update: press the FUNCTION_BUTTON button briefly (< kFactoryResetTriggerTimeout)
+    // To initiate factory reset: press the FUNCTION_BUTTON for kFactoryResetTriggerTimeout + kFactoryResetCancelWindowTimeout
+    // All LEDs start blinking after kFactoryResetTriggerTimeout to signal factory reset has been initiated.
     // To cancel factory reset: release the FUNCTION_BUTTON once all LEDs start blinking within the
-    // FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
+    // kFactoryResetCancelWindowTimeout
     if (aEvent->ButtonEvent.Action == APP_BUTTON_PUSH)
     {
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
         {
-            sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
+            sAppTask.StartTimer(kFactoryResetTriggerTimeout);
 
             sAppTask.mFunction = kFunction_SoftwareUpdate;
         }
