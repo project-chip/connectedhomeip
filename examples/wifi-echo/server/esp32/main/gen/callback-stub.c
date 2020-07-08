@@ -1794,6 +1794,9 @@ int8_t emberAfPluginNetworkSteeringGetPowerForRadioChannelCallback(uint8_t chann
     return emberAfMaxPowerLevel();
 }
 
+// Ifdef out the attribute change callback, since we implement it in
+// DataModelHandler
+#if 0
 /** @brief Post Attribute Change
  *
  * This function is called by the application framework after it changes an
@@ -1812,6 +1815,7 @@ int8_t emberAfPluginNetworkSteeringGetPowerForRadioChannelCallback(uint8_t chann
 void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {}
+#endif
 
 /** @brief Post Em4 Reset
  *
@@ -2278,6 +2282,9 @@ void emberAfSetSourceRouteOverheadCallback(EmberNodeId destination, uint8_t over
  */
 void emberAfSetTimeCallback(uint32_t utcTime) {}
 
+// Ifdef out emberAfOnOffClusterSetValueCallback, since it's implemented by
+// on-off.c
+#if 0
 /** @brief On/off Cluster Set Value
  *
  * This function is called when the on/off value needs to be set, either through
@@ -2291,6 +2298,7 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(uint8_t endpoint, uint8_t comm
 {
     return EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND;
 }
+#endif
 
 /** @brief Set Wake Timeout Bitmask
  *

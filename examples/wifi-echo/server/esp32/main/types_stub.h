@@ -44,6 +44,8 @@
 
 #include <string.h> // For mem* functions.
 
+#include "chip-zcl/chip-zcl-zpro-codec.h" // For EmberApsFrame
+
 /**
  * @brief Defines binding types.
  */
@@ -237,28 +239,6 @@ enum
         of fragments in the message. */
     EMBER_APS_OPTION_FRAGMENT = 0x8000
 };
-
-/** @brief An in-memory representation of a ZigBee APS frame
- * of an incoming or outgoing message.
- */
-typedef struct
-{
-    /** The application profile ID that describes the format of the message. */
-    uint16_t profileId;
-    /** The cluster ID for this message. */
-    uint16_t clusterId;
-    /** The source endpoint. */
-    uint8_t sourceEndpoint;
-    /** The destination endpoint. */
-    uint8_t destinationEndpoint;
-    /** A bitmask of options from the enumeration above. */
-    EmberApsOption options;
-    /** The group ID for this message, if it is multicast mode. */
-    uint16_t groupId;
-    /** The sequence number. */
-    uint8_t sequence;
-    uint8_t radius;
-} EmberApsFrame;
 
 /**
  * @brief Size of EUI64 (an IEEE address) in bytes (8).
