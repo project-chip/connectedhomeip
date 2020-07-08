@@ -26,4 +26,4 @@ fi
 git submodule update --init
 
 # shellcheck source=/dev/null
-source "$CHIP_ROOT/third_party/pigweed/bootstrap.sh"
+source "$CHIP_ROOT/third_party/pigweed/repo/bootstrap.sh"
