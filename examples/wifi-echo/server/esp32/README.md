@@ -49,10 +49,10 @@ step. To install these components manually, follow these steps:
 Currently building in VSCode _and_ deploying from native is not supported, so
 make sure the IDF_PATH has been exported(See the manual setup steps above).
 
--   In the root of the example directory, sync the dependencies and source
-    `idf.sh`. Note: This does not have to be repeated for incremental builds.
+-   In the root of the example directory, sync the CHIP tree's submodules and
+    source `idf.sh`. Note: This does not have to be repeated for incremental
+    builds.
 
-          $ make -C third_party/connectedhomeip -f Makefile-bootstrap repos
           $ source idf.sh
 
 -   Next, if you want to use the M5Stack with its display and show a QRCode run

@@ -1596,8 +1596,6 @@ if test "${nl_with_mbedtls}" = "internal"; then
 
     AC_MSG_NOTICE([attempting to create internal ${mbedtls_dirstem}])
 
-    ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${mbedtls_dirstem}
-
     if test $? -ne 0; then
         AC_MSG_ERROR([failed to create ${mbedtls_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
     fi
@@ -1663,8 +1661,6 @@ if test "${nl_with_nlio}" = "internal"; then
 
     AC_MSG_NOTICE([attempting to create internal ${nlio_dirstem}])
 
-    ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${nlio_dirstem}
-
     if test $? -ne 0; then
         AC_MSG_ERROR([failed to create ${nlio_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
     fi
@@ -1715,8 +1711,6 @@ if test "${nl_with_nlassert}" = "internal"; then
     nlassert_dirstem="third_party/${maybe_nlassert_dirstem}"
 
     AC_MSG_NOTICE([attempting to create internal ${nlassert_dirstem}])
-
-    ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${nlassert_dirstem}
 
     if test $? -ne 0; then
         AC_MSG_ERROR([failed to create ${nlassert_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
@@ -1770,8 +1764,6 @@ if test "${nl_with_nlfaultinjection}" = "internal"; then
     nlfaultinjection_dirstem="third_party/${maybe_nlfaultinjection_dirstem}"
 
     AC_MSG_NOTICE([attempting to create internal ${nlfaultinjection_dirstem}])
-
-    ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${nlfaultinjection_dirstem}
 
     if test $? -ne 0; then
         AC_MSG_ERROR([failed to create ${nlfaultinjection_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
@@ -1830,8 +1822,6 @@ if test "${nl_with_ot_br_posix}" = "internal" && test "${with_device_layer}" = "
 
     AC_MSG_NOTICE([attempting to create internal ${ot_br_posix_dirstem}])
 
-    ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${ot_br_posix_dirstem}
-
     if test $? -ne 0; then
         AC_MSG_ERROR([failed to create ${ot_br_posix_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
     fi
@@ -1887,8 +1877,6 @@ if test "${nl_with_nlunit_test}" = "internal"; then
     nlunit_test_dirstem="third_party/${maybe_nlunit_test_dirstem}"
 
     AC_MSG_NOTICE([attempting to create internal ${nlunit_test_dirstem}])
-
-    ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${nlunit_test_dirstem}
 
     if test $? -ne 0; then
         AC_MSG_ERROR([failed to create ${nlunit_test_dirstem}. Please check your network connection or the correctness of 'repos.conf'])

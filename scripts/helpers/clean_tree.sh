@@ -19,4 +19,4 @@
 set -x
 env
 
-make -f Makefile-bootstrap clean-repos && git clean -Xdf
+git clean -Xdf
