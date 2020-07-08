@@ -110,7 +110,8 @@ clean-local:
 
 else
 
-$(error "Documentation support is disabled. Please explicitly enable documentation with `--enable-docs` via `configure` and/or ensure that Doxygen is installed")
+doc docdist:
+	$(error "Documentation support is disabled. Please explicitly enable documentation with `--enable-docs` via `configure` and/or ensure that Doxygen is installed")
 
 endif # CHIP_BUILD_DOCS
 
