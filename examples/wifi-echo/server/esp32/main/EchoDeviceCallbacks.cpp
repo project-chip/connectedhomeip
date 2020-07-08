@@ -78,8 +78,6 @@ void EchoDeviceCallbacks::PostAttributeChangeCallback(uint8_t endpoint, ChipZclC
                                                       uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
                                                       uint8_t * value)
 {
-    /* TODO: For some reason, the first endpoint is 1 instead of 0 */
-    endpoint--;
     printf("endpoint: %d, clusterId: %d, attrId: %d type: %d\n", endpoint, clusterId, attributeId, type);
     for (int i = 0; i < kMaxClustersPerEndPoint; i++)
     {
