@@ -36,7 +36,7 @@ _chip_banner "Environment bringup"
 git -C "$CHIP_ROOT" submodule update --init
 
 set +e
-source "$CHIP_ROOT/activate.sh"
+source "$CHIP_ROOT/scripts/activate.sh"
 set -e
 
 _chip_banner "Build: GN configure"
@@ -58,11 +58,11 @@ time ninja -C "$CHIP_ROOT/out/debug" check
 
 echo
 echo 'To activate existing build environment in your shell, run (do this first):'
-echo source "$CHIP_ROOT/activate.sh"
+echo source "$CHIP_ROOT/scripts/activate.sh"
 
 echo
 echo 'To re-create the build environment from scratch, run:'
-echo source "$CHIP_ROOT/bootstrap.sh"
+echo source "$CHIP_ROOT/scripts/bootstrap.sh"
 
 echo
 echo 'To build a debug build:'

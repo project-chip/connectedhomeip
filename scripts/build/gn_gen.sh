@@ -20,7 +20,7 @@
 
 CHIP_ROOT="$(dirname "$0")/../.."
 
-source "$CHIP_ROOT/activate.sh"
+source "$CHIP_ROOT/scripts/activate.sh"
 
 set -e
 set -x
