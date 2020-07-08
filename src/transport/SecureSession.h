@@ -113,8 +113,9 @@ private:
     static constexpr size_t kAES_CCM128_Key_Length = 16;
 
     bool mKeyAvailable;
-    uint64_t mNextIV;
     uint8_t mKey[kAES_CCM128_Key_Length];
+
+    static uint64_t GetIV(const MessageHeader & header);
 };
 
 } // namespace chip
