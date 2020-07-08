@@ -61,8 +61,8 @@ public:
      */
     uint32_t GetMessageId() const { return mMessageId; }
 
-    /** Get the secure msg type from this header. */
-    uint16_t GetSecureMsgType(void) const { return mSecureMsgType; }
+    /** Check if it's a secure session control message. */
+    bool IsSecureSessionControlMsg(void) const { return mSecureSessionControlMsg; }
 
     /** Get the Session ID from this header. */
     uint32_t GetSecureSessionID(void) const { return mSecureSessionID; }
@@ -126,9 +126,9 @@ public:
     }
 
     /** Set the secure message type for this header. */
-    MessageHeader & SetSecureMsgType(uint16_t type)
+    MessageHeader & SetSecureSessionControlMsg()
     {
-        mSecureMsgType = type;
+        mSecureSessionControlMsg = true;
         return *this;
     }
 
@@ -198,7 +198,7 @@ private:
     Optional<NodeId> mDestinationNodeId;
 
     /// Packet type (application data, security control packets, e.g. pairing, configuration, rekey etc)
-    uint16_t mSecureMsgType = 0;
+    bool mSecureSessionControlMsg = false;
 
     /// Security session identifier
     uint32_t mSecureSessionID = 0;

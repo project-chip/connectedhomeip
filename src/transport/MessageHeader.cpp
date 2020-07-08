@@ -31,7 +31,6 @@
  * Header format (little endian):
  *
  *  16 bit: | VERSION: 4 bit | FLAGS: 4 bit | RESERVED: 8 bit |
- *  16 bit: | Secure message type                             |
  *  32 bit: | MESSAGE_ID                                      |
  *  32 bit: | Secure Session ID                               |
  *  64 bit: | Message Authentication Tag                      |
@@ -46,7 +45,7 @@ namespace {
 using namespace chip::Encoding;
 
 /// size of the fixed portion of the header
-constexpr size_t kFixedHeaderSizeBytes = 20;
+constexpr size_t kFixedHeaderSizeBytes = 18;
 
 /// size of a serialized node id inside a header
 constexpr size_t kNodeIdSizeBytes = 8;
@@ -55,6 +54,8 @@ constexpr size_t kNodeIdSizeBytes = 8;
 constexpr uint16_t kFlagDestinationNodeIdPresent = 0x0100;
 /// Header flag specifying that a source node id is included in the header.
 constexpr uint16_t kFlagSourceNodeIdPresent = 0x0200;
+/// Header flag specifying that it is a control message for secure session.
+constexpr uint16_t kFlagSecureSessionControlMessage = 0x0400;
 
 /// Mask to extract just the version part from a 16bit header prefix.
 constexpr uint16_t kVersionMask = 0xF000;
@@ -93,7 +94,6 @@ CHIP_ERROR MessageHeader::Decode(const uint8_t * data, size_t size, size_t * dec
     version = ((header & kVersionMask) >> kVersionShift);
     VerifyOrExit(version == kHeaderVersion, err = CHIP_ERROR_VERSION_MISMATCH);
 
-    mSecureMsgType   = LittleEndian::Read16(p);
     mMessageId       = LittleEndian::Read32(p);
     mSecureSessionID = LittleEndian::Read32(p);
     mTag             = LittleEndian::Read64(p);
@@ -123,6 +123,8 @@ CHIP_ERROR MessageHeader::Decode(const uint8_t * data, size_t size, size_t * dec
         mDestinationNodeId.ClearValue();
     }
 
+    mSecureSessionControlMsg = header & kFlagSecureSessionControlMessage;
+
     *decode_len = p - data;
 
 exit:
@@ -146,9 +148,12 @@ CHIP_ERROR MessageHeader::Encode(uint8_t * data, size_t size, size_t * encode_si
     {
         header |= kFlagDestinationNodeIdPresent;
     }
+    if (mSecureSessionControlMsg)
+    {
+        header |= kFlagSecureSessionControlMessage;
+    }
 
     LittleEndian::Write16(p, header);
-    LittleEndian::Write16(p, mSecureMsgType);
     LittleEndian::Write32(p, mMessageId);
     LittleEndian::Write32(p, mSecureSessionID);
     LittleEndian::Write64(p, mTag);
