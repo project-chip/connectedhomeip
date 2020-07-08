@@ -124,6 +124,7 @@
 #define FUNCTION_BUTTON_DEBOUNCE_PERIOD_MS 50
 
 #define SYSTEM_STATE_LED BSP_LED_0
+#define LIGHTING_GPIO NRF_GPIO_PIN_MAP(0, 14)
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.

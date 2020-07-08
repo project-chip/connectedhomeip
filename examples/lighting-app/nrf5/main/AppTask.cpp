@@ -43,21 +43,25 @@
 
 APP_TIMER_DEF(sFunctionTimer);
 
-static SemaphoreHandle_t sCHIPEventLock;
+namespace {
 
-static TaskHandle_t sAppTaskHandle;
-static QueueHandle_t sAppEventQueue;
+SemaphoreHandle_t sCHIPEventLock;
 
-static LEDWidget sStatusLED;
-static LEDWidget sUnusedLED;
-static LEDWidget sUnusedLED_1;
+TaskHandle_t sAppTaskHandle;
+QueueHandle_t sAppEventQueue;
 
-static bool sIsThreadProvisioned     = false;
-static bool sIsThreadEnabled         = false;
-static bool sIsThreadAttached        = false;
-static bool sIsPairedToAccount       = false;
-static bool sHaveBLEConnections      = false;
-static bool sHaveServiceConnectivity = false;
+LEDWidget sStatusLED;
+LEDWidget sUnusedLED;
+LEDWidget sUnusedLED_1;
+
+bool sIsThreadProvisioned     = false;
+bool sIsThreadEnabled         = false;
+bool sIsThreadAttached        = false;
+bool sIsPairedToAccount       = false;
+bool sHaveBLEConnections      = false;
+bool sHaveServiceConnectivity = false;
+
+} // namespace
 
 using namespace ::chip::DeviceLayer;
 
@@ -130,7 +134,7 @@ int AppTask::Init()
         APP_ERROR_HANDLER(ret);
     }
 
-    ret = LightingMgr().Init(1);
+    ret = LightingMgr().Init(LIGHTING_GPIO);
     if (ret != NRF_SUCCESS)
     {
         NRF_LOG_INFO("LightingMgr().Init() failed");
