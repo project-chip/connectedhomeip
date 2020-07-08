@@ -399,7 +399,7 @@ void emberAfPrintAttributeTable(void)
         // Depending on user config, this loop can take a very long time to
         // run and watchdog reset will  kick in. As a workaround, we'll
         // manually reset the watchdog.
-        halResetWatchdog();
+        //        halResetWatchdog();
 
         emberAfAttributesPrint("%2x / %p / %2x / ",
                                cluster->clusterId,

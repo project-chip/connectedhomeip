@@ -254,21 +254,26 @@ void emberAfInit(void)
 #endif
 
   for (i = 0; i < EMBER_SUPPORTED_NETWORKS; i++) {
-    emberAfPushNetworkIndex(i);
+    // FIXME: Do we need to support more than one network?
+    //emberAfPushNetworkIndex(i);
     emberAfInitializeAttributes(EMBER_BROADCAST_ENDPOINT);
-    emberAfPopNetworkIndex();
+    //emberAfPopNetworkIndex();
   }
 
   MEMSET(afDeviceEnabled, true, emberAfEndpointCount());
 
   // Set up client API buffer.
+  // FIXME: Is this needed?  appResponseData seems unused in the code we pulled
+  // in so far.
+#if 0
   emberAfSetExternalBuffer(appResponseData,
                            EMBER_AF_RESPONSE_BUFFER_LEN,
                            &appResponseLength,
                            &emberAfResponseApsFrame);
+#endif
 
   // initialize event management system
-  emAfInitEvents();
+  //emAfInitEvents();
 
 #ifdef EMBER_AF_GENERATED_PLUGIN_INIT_FUNCTION_CALLS
   EMBER_AF_GENERATED_PLUGIN_INIT_FUNCTION_CALLS
@@ -300,8 +305,10 @@ void emberAfStackDown(void)
   // (Issue 77101) Also don't clear the table if the stack has gone down as a
   // a result of losing its parent or some other transient state where a future
   // rejoin is expected to get us back online.
-  if (emberStackIsPerformingRejoin() == false
-      && emberNetworkState() == EMBER_NO_NETWORK) {
+  if (false
+      // emberStackIsPerformingRejoin() == false
+      // && emberNetworkState() == EMBER_NO_NETWORK
+      ) {
     // the report table should be cleared when the stack comes down.
     // going to a new network means new report devices should be discovered.
     // if the table isnt cleared the device keeps trying to send messages.
@@ -498,7 +505,7 @@ bool emberAfProcessMessageIntoZclCmd(EmberApsFrame* apsFrame,
     return false;
   }
   returnCmd->interPanHeader = interPanHeader;
-  returnCmd->networkIndex   = emberGetCurrentNetwork();
+  // returnCmd->networkIndex   = emberGetCurrentNetwork();
   return true;
 }
 
@@ -730,19 +737,27 @@ EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback)
     emberAfResponseType &= ~ZCL_UTIL_RESP_INTERPAN;
   } else if (emberAfResponseDestination < EMBER_BROADCAST_ADDRESS) {
     label = 'U';
+#if 0
     status = emberAfSendUnicastWithCallback(EMBER_OUTGOING_DIRECT,
                                             emberAfResponseDestination,
                                             &emberAfResponseApsFrame,
                                             appResponseLength,
                                             appResponseData,
                                             callback);
+#else
+    status = EMBER_SUCCESS;
+#endif
   } else {
     label = 'B';
+#if 0
     status = emberAfSendBroadcastWithCallback(emberAfResponseDestination,
                                               &emberAfResponseApsFrame,
                                               appResponseLength,
                                               appResponseData,
                                               callback);
+#else
+    status = EMBER_SUCCESS;
+#endif
   }
   UNUSED_VAR(label);
   emberAfDebugPrintln("T%4x:TX (%p) %ccast 0x%x%p",
@@ -958,10 +973,10 @@ uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type,
       destination = indexOrDestination;
       break;
     case EMBER_OUTGOING_VIA_ADDRESS_TABLE:
-      destination = emberGetAddressTableRemoteNodeId(indexOrDestination);
+      // destination = emberGetAddressTableRemoteNodeId(indexOrDestination);
       break;
     case EMBER_OUTGOING_VIA_BINDING:
-      destination = emberGetBindingRemoteNodeId(indexOrDestination);
+      // destination = emberGetBindingRemoteNodeId(indexOrDestination);
       break;
     case EMBER_OUTGOING_MULTICAST:
       // APS multicast messages include the two-byte group id and exclude the
@@ -1149,7 +1164,7 @@ EmberStatus emberAfEndpointEventControlSetInactive(EmberEventControl *controls,
   if (index == 0xFF) {
     return EMBER_INVALID_ENDPOINT;
   }
-  emberEventControlSetInactive(controls[index]);
+  //emberEventControlSetInactive(controls[index]);
   return EMBER_SUCCESS;
 }
 
@@ -1157,7 +1172,7 @@ bool emberAfEndpointEventControlGetActive(EmberEventControl *controls,
                                           uint8_t endpoint)
 {
   uint8_t index = emberAfIndexFromEndpoint(endpoint);
-  return (index != 0xFF && emberEventControlGetActive(controls[index]));
+  return (index != 0xFF && false /*emberEventControlGetActive(controls[index])*/);
 }
 
 EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl *controls,
@@ -1167,7 +1182,7 @@ EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl *controls,
   if (index == 0xFF) {
     return EMBER_INVALID_ENDPOINT;
   }
-  emberEventControlSetActive(controls[index]);
+  //emberEventControlSetActive(controls[index]);
   return EMBER_SUCCESS;
 }
 
@@ -1251,7 +1266,9 @@ uint32_t emberAfGetBufferCrc(uint8_t *pbuffer, uint16_t length, uint32_t initial
   uint16_t i;
   uint32_t crc32 = initialValue;
   for (i = 0; i < length; i++) {
-    crc32 = halCommonCrc32(pbuffer[i], crc32);
+      // Crash so we don't reach this code by accident.
+      *(int*)0 = 5;
+      // crc32 = halCommonCrc32(pbuffer[i], crc32);
   }
   return crc32;
 }

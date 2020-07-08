@@ -69,7 +69,7 @@ void emberAfClearResponseData(void)
   emberAfResponseType = ZCL_UTIL_RESP_NORMAL;
   // To prevent accidentally sending to someone else,
   // set the destination to ourselves.
-  emberAfResponseDestination = emberAfGetNodeId();
+  emberAfResponseDestination = 0 /* emberAfGetNodeId() */;
   MEMSET(appResponseData, 0, EMBER_AF_RESPONSE_BUFFER_LEN);
   appResponseLength = 0;
   MEMSET(&emberAfResponseApsFrame, 0, sizeof(EmberApsFrame));

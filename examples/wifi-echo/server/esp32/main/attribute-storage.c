@@ -200,9 +200,9 @@ void emberAfClusterDefaultResponseWithMfgCodeCallback(uint8_t endpoint,
       emberAfFindClusterFunction(cluster,
                                  CLUSTER_MASK_DEFAULT_RESPONSE_FUNCTION);
     if (f != NULL) {
-      emberAfPushEndpointNetworkIndex(endpoint);
+      //emberAfPushEndpointNetworkIndex(endpoint);
       ((EmberAfDefaultResponseFunction)f)(endpoint, commandId, status);
-      emberAfPopNetworkIndex();
+      //emberAfPopNetworkIndex();
     }
   }
 }
@@ -247,14 +247,14 @@ void emberAfClusterMessageSentWithMfgCodeCallback(EmberOutgoingMessageType type,
         emberAfFindClusterFunction(cluster,
                                    CLUSTER_MASK_MESSAGE_SENT_FUNCTION);
       if (f != NULL) {
-        emberAfPushEndpointNetworkIndex(apsFrame->sourceEndpoint);
+        //emberAfPushEndpointNetworkIndex(apsFrame->sourceEndpoint);
         ((EmberAfMessageSentFunction)f)(type,
                                         indexOrDestination,
                                         apsFrame,
                                         msgLen,
                                         message,
                                         status);
-        emberAfPopNetworkIndex();
+        //emberAfPopNetworkIndex();
       }
     }
   }
@@ -296,20 +296,20 @@ void emAfClusterAttributeChangedCallback(uint8_t endpoint,
         emberAfFindClusterFunction(cluster,
                                    CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION);
       if (f != NULL) {
-        emberAfPushEndpointNetworkIndex(endpoint);
+        //emberAfPushEndpointNetworkIndex(endpoint);
         ((EmberAfClusterAttributeChangedCallback)f)(endpoint, attributeId);
-        emberAfPopNetworkIndex();
+        //emberAfPopNetworkIndex();
       }
     } else {
       EmberAfGenericClusterFunction f =
         emberAfFindClusterFunction(cluster,
                                    CLUSTER_MASK_MANUFACTURER_SPECIFIC_ATTRIBUTE_CHANGED_FUNCTION);
       if (f != NULL) {
-        emberAfPushEndpointNetworkIndex(endpoint);
+        //emberAfPushEndpointNetworkIndex(endpoint);
         ((EmberAfManufacturerSpecificClusterAttributeChangedCallback)f)(endpoint,
                                                                         attributeId,
                                                                         manufacturerCode);
-        emberAfPopNetworkIndex();
+        //emberAfPopNetworkIndex();
       }
     }
   }
@@ -338,13 +338,13 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(uint8_t endpoint,
         emberAfFindClusterFunction(cluster,
                                    CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION);
       if (f != NULL) {
-        emberAfPushEndpointNetworkIndex(endpoint);
+        //emberAfPushEndpointNetworkIndex(endpoint);
         status = ((EmberAfClusterPreAttributeChangedCallback)f)(endpoint,
                                                                 attributeId,
                                                                 attributeType,
                                                                 size,
                                                                 value);
-        emberAfPopNetworkIndex();
+        //emberAfPopNetworkIndex();
       }
     }
     return status;
@@ -355,7 +355,7 @@ static void initializeEndpoint(EmberAfDefinedEndpoint* definedEndpoint)
 {
   uint8_t clusterIndex;
   EmberAfEndpointType* epType = definedEndpoint->endpointType;
-  emberAfPushEndpointNetworkIndex(definedEndpoint->endpoint);
+  //emberAfPushEndpointNetworkIndex(definedEndpoint->endpoint);
   for ( clusterIndex = 0;
         clusterIndex < epType->clusterCount;
         clusterIndex++ ) {
@@ -367,7 +367,7 @@ static void initializeEndpoint(EmberAfDefinedEndpoint* definedEndpoint)
       ((EmberAfInitFunction)f)(definedEndpoint->endpoint);
     }
   }
-  emberAfPopNetworkIndex();
+  //emberAfPopNetworkIndex();
 }
 
 // Calls the init functions.
@@ -1073,7 +1073,7 @@ void emberAfResetAttributes(uint8_t endpoint)
 
 void emAfLoadAttributeDefaults(uint8_t endpoint, bool writeTokens)
 {
-  uint8_t ep, clusterI, curNetwork = emberGetCurrentNetwork();
+  uint8_t ep, clusterI, curNetwork = 0 /* emberGetCurrentNetwork() */;
   uint16_t attr;
   uint8_t *ptr;
   uint8_t epCount = emberAfEndpointCount();
@@ -1101,7 +1101,7 @@ void emAfLoadAttributeDefaults(uint8_t endpoint, bool writeTokens)
       // conditionally manually reset the watchdog. 300 sounds like a good
       // magic number for now.
       if (cluster->attributeCount > 300) {
-        halResetWatchdog();
+        // halResetWatchdog();
       }
       for ( attr = 0; attr < cluster->attributeCount; attr++) {
         EmberAfAttributeMetadata *am = &(cluster->attributes[attr]);
