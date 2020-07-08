@@ -21,7 +21,7 @@
  *
  */
 
-#include <lib/core/CHIPEndPoint.h>
+#include <lib/datamodel/CHIPEndPoint.h>
 
 namespace chip {
 namespace DataModel {

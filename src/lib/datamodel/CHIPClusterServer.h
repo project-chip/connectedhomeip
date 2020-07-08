@@ -25,7 +25,7 @@
 #ifndef CHIPCLUSTERSERVER_H_
 #define CHIPCLUSTERSERVER_H_
 
-#include <lib/core/CHIPEndPoint.h>
+#include <lib/datamodel/CHIPEndPoint.h>
 
 namespace chip {
 namespace DataModel {
