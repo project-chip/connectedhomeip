@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef CHIPVALUES_H_
-#define CHIPVALUES_H_
+#ifndef CHIP_VALUE_H_
+#define CHIP_VALUE_H_
 
 #include <inttypes.h>
 #include <stdbool.h>
@@ -124,4 +124,4 @@ static inline uint8_t ValueToUInt8(Value v)
 } // namespace DataModel
 } // namespace chip
 
-#endif /* CHIPVALUES_H_ */
+#endif /* CHIP_VALUE_H */

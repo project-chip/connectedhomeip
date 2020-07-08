@@ -72,7 +72,7 @@ void LEDWidget::Set(bool state)
 {
     mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
     DoSet(state);
-    BaseCluster::Set(kAttributeIdOnOff, ValueBool(state));
+    Cluster::Set(kAttributeIdOnOff, ValueBool(state));
 }
 
 int LEDWidget::Set(uint16_t attrId, const Value & value)
@@ -82,7 +82,7 @@ int LEDWidget::Set(uint16_t attrId, const Value & value)
         printf("Setting value to %d\n", ValueToBool(value));
         DoSet(ValueToBool(value));
         /* Update our internal data model as well */
-        BaseCluster::Set(attrId, value);
+        Cluster::Set(attrId, value);
     }
     return SUCCESS;
 }

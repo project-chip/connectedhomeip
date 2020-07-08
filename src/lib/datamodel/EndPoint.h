@@ -24,7 +24,7 @@
 #ifndef CHIPENDPOINT_H_
 #define CHIPENDPOINT_H_
 
-#include <datamodel/BaseAttribute.h>
+#include <datamodel/Attribute.h>
 #include <datamodel/StandardClusters.h>
 
 namespace chip {
@@ -36,7 +36,7 @@ class EndPoint
 {
 public:
     static ClusterBasic mBasicCluster;
-    BaseCluster * mClusters[kMaxClustersPerEndPoint];
+    Cluster * mClusters[kMaxClustersPerEndPoint];
 
     EndPoint(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) : mClusters()
     {
@@ -57,7 +57,7 @@ public:
         }
     }
 
-    int AddCluster(BaseCluster * cluster)
+    int AddCluster(Cluster * cluster)
     {
         for (int i = 0; i < kMaxClustersPerEndPoint; i++)
         {
@@ -70,7 +70,7 @@ public:
         return FAIL;
     }
 
-    BaseCluster * GetCluster(uint8_t clusterId)
+    Cluster * GetCluster(uint8_t clusterId)
     {
         for (int i = 0; i < kMaxClustersPerEndPoint; i++)
         {
