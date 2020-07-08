@@ -32,6 +32,9 @@ namespace DataModel {
 
 /* TODO: To be converted to a template version or Kconfig later on */
 static const uint8_t kMaxEndPointPerServer = 5;
+/* TODO: If endpoint numbers range up to 256, it may be better not to use array index as the endpoint id */
+/* Skip the reserved endPointId */
+static const uint8_t kEndPointIdStart = 1;
 class CHIPClusterServer
 {
 public:
@@ -39,12 +42,12 @@ public:
 
     CHIPClusterServer(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) : mEndPoints()
     {
-        mEndPoints[0] = new CHIPEndPoint(ZCLVersion, applicationVersion, stackVersion, HWVersion);
+        mEndPoints[kEndPointIdStart] = new CHIPEndPoint(ZCLVersion, applicationVersion, stackVersion, HWVersion);
     }
 
     virtual ~CHIPClusterServer()
     {
-        for (int i = 1; i < kMaxEndPointPerServer; i++)
+        for (int i = kEndPointIdStart; i < kMaxEndPointPerServer; i++)
         {
             if (mEndPoints[i] != nullptr)
             {
@@ -54,7 +57,7 @@ public:
         }
     }
 
-    /* By default always add to the 0th endpoint, for simplicity */
+    /* By default always add to the kEndPointIdStartth endpoint, for simplicity */
     int AddCluster(CHIPBaseCluster * cluster)
     {
         if (!cluster)
@@ -62,12 +65,12 @@ public:
             return FAIL;
         }
 
-        return mEndPoints[0]->AddCluster(cluster);
+        return mEndPoints[kEndPointIdStart]->AddCluster(cluster);
     }
 
     int AddEndPoint(CHIPEndPoint * endPoint)
     {
-        for (int i = 0; i < kMaxEndPointPerServer; i++)
+        for (int i = kEndPointIdStart; i < kMaxEndPointPerServer; i++)
         {
             if (mEndPoints[i] == nullptr)
             {
