@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This file implements the CHIPEndPoint class
+ *      This file implements the EndPoint class
  *
  */
 
@@ -26,7 +26,7 @@
 namespace chip {
 namespace DataModel {
 
-CHIPBaseCluster * CHIPEndPoint::mBasicCluster = nullptr;
+BaseCluster * EndPoint::mBasicCluster = nullptr;
 
 } // namespace DataModel
 } // namespace chip

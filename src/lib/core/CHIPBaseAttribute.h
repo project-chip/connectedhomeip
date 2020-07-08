@@ -29,17 +29,17 @@
 namespace chip {
 namespace DataModel {
 
-class CHIPBaseAttribute
+class BaseAttribute
 {
 public:
     uint16_t mAttrId;
-    CHIPValue mValue;
-    CHIPValue mMin;
-    CHIPValue mMax;
+    Value mValue;
+    Value mMin;
+    Value mMax;
 
-    CHIPBaseAttribute(uint16_t attrId, CHIPValueTypes type) : mAttrId(attrId), mValue(type), mMin(type), mMax(type) {}
-    CHIPBaseAttribute(uint16_t attrId, CHIPValue value) : mAttrId(attrId), mValue(value), mMin(value.mType), mMax(value.mType) {}
-    CHIPBaseAttribute(uint16_t attrId, CHIPValueTypes type, uint64_t min, uint64_t max) :
+    BaseAttribute(uint16_t attrId, ValueTypes type) : mAttrId(attrId), mValue(type), mMin(type), mMax(type) {}
+    BaseAttribute(uint16_t attrId, Value value) : mAttrId(attrId), mValue(value), mMin(value.mType), mMax(value.mType) {}
+    BaseAttribute(uint16_t attrId, ValueTypes type, uint64_t min, uint64_t max) :
         mAttrId(attrId), mValue(type), mMin(type, min), mMax(type, max)
     {}
 
@@ -52,9 +52,9 @@ public:
      * - From the bottom of the stack when the stack receives a schema
      *   with just a list of values. This will typically get called
      *   with a Set() call on the base-ptr. In this case the argument
-     *   will be CHIPValue.
+     *   will be Value.
      */
-    int Set(const CHIPValue & newValue)
+    int Set(const Value & newValue)
     {
         /* We have to check the element type match in this case */
         if (mValue.mType != newValue.mType)
@@ -69,15 +69,15 @@ public:
         return FAIL;
     }
 
-    /* Need to define the behaviour when CHIPValue contains pointers
+    /* Need to define the behaviour when Value contains pointers
      * to allocated data
      */
-    CHIPValue Get() { return mValue; }
+    Value Get() { return mValue; }
 
 protected:
     bool withinRange(const uint64_t & value) { return (value >= mMin.Int64) && (value <= mMax.Int64); }
 
-    bool withinRange(const CHIPValue value)
+    bool withinRange(const Value value)
     {
         switch (mValue.mType)
         {

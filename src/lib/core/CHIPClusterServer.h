@@ -35,17 +35,17 @@ static const uint8_t kMaxEndPointPerServer = 5;
 /* TODO: If endpoint numbers range up to 256, it may be better not to use array index as the endpoint id */
 /* Skip the reserved endPointId */
 static const uint8_t kEndPointIdStart = 1;
-class CHIPClusterServer
+class ClusterServer
 {
 public:
-    CHIPEndPoint * mEndPoints[kMaxEndPointPerServer];
+    EndPoint * mEndPoints[kMaxEndPointPerServer];
 
-    CHIPClusterServer(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) : mEndPoints()
+    ClusterServer(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) : mEndPoints()
     {
-        mEndPoints[kEndPointIdStart] = new CHIPEndPoint(ZCLVersion, applicationVersion, stackVersion, HWVersion);
+        mEndPoints[kEndPointIdStart] = new EndPoint(ZCLVersion, applicationVersion, stackVersion, HWVersion);
     }
 
-    virtual ~CHIPClusterServer()
+    virtual ~ClusterServer()
     {
         for (int i = kEndPointIdStart; i < kMaxEndPointPerServer; i++)
         {
@@ -58,7 +58,7 @@ public:
     }
 
     /* By default always add to the kEndPointIdStartth endpoint, for simplicity */
-    int AddCluster(CHIPBaseCluster * cluster)
+    int AddCluster(BaseCluster * cluster)
     {
         if (!cluster)
         {
@@ -68,7 +68,7 @@ public:
         return mEndPoints[kEndPointIdStart]->AddCluster(cluster);
     }
 
-    int AddEndPoint(CHIPEndPoint * endPoint)
+    int AddEndPoint(EndPoint * endPoint)
     {
         for (int i = kEndPointIdStart; i < kMaxEndPointPerServer; i++)
         {

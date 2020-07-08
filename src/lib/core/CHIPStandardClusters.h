@@ -31,11 +31,11 @@ namespace chip {
 namespace DataModel {
 
 static const uint16_t kClusterIdBase = 0x0000;
-class CHIPClusterBasic : public CHIPBaseCluster
+class ClusterBasic : public BaseCluster
 {
 public:
-    CHIPClusterBasic(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) :
-        CHIPBaseCluster(kClusterIdBase)
+    ClusterBasic(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) :
+        BaseCluster(kClusterIdBase)
     {
         AddAttribute(CHIPAttributeZCLVersionNew(ZCLVersion));
         AddAttribute(CHIPAttributeApplicationVersionNew(applicationVersion));
@@ -45,10 +45,10 @@ public:
 };
 
 static const uint16_t kClusterIdOnOff = 0x0006;
-class CHIPClusterOnOff : public CHIPBaseCluster
+class ClusterOnOff : public BaseCluster
 {
 public:
-    CHIPClusterOnOff() : CHIPBaseCluster(kClusterIdOnOff)
+    ClusterOnOff() : BaseCluster(kClusterIdOnOff)
     {
         AddAttribute(CHIPAttributeOnOffNew());
         AddAttribute(CHIPAttributeGlobalSceneControlNew());
