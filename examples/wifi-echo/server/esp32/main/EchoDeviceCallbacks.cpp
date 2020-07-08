@@ -72,7 +72,7 @@ void EchoDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, int
     }
 }
 
-extern CHIPClusterServer server;
+extern ClusterServer server;
 /* This function can be eliminated, and instead its contents will get executed */
 void EchoDeviceCallbacks::PostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId,
                                                       uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
@@ -85,7 +85,7 @@ void EchoDeviceCallbacks::PostAttributeChangeCallback(uint8_t endpoint, ChipZclC
             server.mEndPoints[endpoint]->mClusters[i]->mClusterId == clusterId)
         {
             // At this point we can assume that value points to a boolean value.
-            CHIPValue cValue(kCHIPValueType_Bool);
+            Value cValue(kCHIPValueType_Bool);
             memcpy((void *) &cValue.Int64, (void *) value, size);
             printf("Value is %lld type is %d\n", cValue.Int64, type);
             server.mEndPoints[endpoint]->mClusters[i]->Set(attributeId, cValue);

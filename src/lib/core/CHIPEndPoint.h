@@ -32,23 +32,23 @@ namespace DataModel {
 
 /* TODO: To be converted to a template version or Kconfig later on */
 static const uint8_t kMaxClustersPerEndPoint = 5;
-class CHIPEndPoint
+class EndPoint
 {
 public:
-    static CHIPBaseCluster * mBasicCluster;
-    CHIPBaseCluster * mClusters[kMaxClustersPerEndPoint];
+    static BaseCluster * mBasicCluster;
+    BaseCluster * mClusters[kMaxClustersPerEndPoint];
 
-    CHIPEndPoint(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) : mClusters()
+    EndPoint(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) : mClusters()
     {
         if (mBasicCluster == nullptr)
         {
-            mBasicCluster = new CHIPClusterBasic(ZCLVersion, applicationVersion, stackVersion, HWVersion);
+            mBasicCluster = new ClusterBasic(ZCLVersion, applicationVersion, stackVersion, HWVersion);
             /* TODO: allocation failure? */
         }
         mClusters[0] = mBasicCluster;
     }
 
-    virtual ~CHIPEndPoint()
+    virtual ~EndPoint()
     {
         for (int i = 1; i < kMaxClustersPerEndPoint; i++)
         {
@@ -60,7 +60,7 @@ public:
         }
     }
 
-    int AddCluster(CHIPBaseCluster * cluster)
+    int AddCluster(BaseCluster * cluster)
     {
         for (int i = 0; i < kMaxClustersPerEndPoint; i++)
         {
@@ -73,7 +73,7 @@ public:
         return FAIL;
     }
 
-    CHIPBaseCluster * GetCluster(uint8_t clusterId)
+    BaseCluster * GetCluster(uint8_t clusterId)
     {
         for (int i = 0; i < kMaxClustersPerEndPoint; i++)
         {

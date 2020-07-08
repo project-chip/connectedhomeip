@@ -31,15 +31,15 @@ namespace DataModel {
 
 /* TODO: To be converted to a template version or Kconfig later on */
 static const uint8_t kMaxAttributesPerCluster = 10;
-class CHIPBaseCluster
+class BaseCluster
 {
 public:
     uint16_t mClusterId;
-    CHIPBaseAttribute * mAttrs[kMaxAttributesPerCluster];
+    BaseAttribute * mAttrs[kMaxAttributesPerCluster];
 
-    CHIPBaseCluster(uint16_t clusterId) : mClusterId(clusterId), mAttrs() {}
+    BaseCluster(uint16_t clusterId) : mClusterId(clusterId), mAttrs() {}
 
-    virtual ~CHIPBaseCluster()
+    virtual ~BaseCluster()
     {
         for (int i = 0; i < kMaxAttributesPerCluster; i++)
         {
@@ -51,7 +51,7 @@ public:
         }
     }
 
-    int AddAttribute(CHIPBaseAttribute * attr)
+    int AddAttribute(BaseAttribute * attr)
     {
         for (int i = 0; i < kMaxAttributesPerCluster; i++)
         {
@@ -64,7 +64,7 @@ public:
         return FAIL;
     }
 
-    CHIPBaseAttribute * GetAttribute(uint16_t attrId)
+    BaseAttribute * GetAttribute(uint16_t attrId)
     {
         for (int i = 0; i < kMaxAttributesPerCluster; i++)
         {
@@ -76,7 +76,7 @@ public:
         return nullptr;
     }
 
-    virtual int Set(uint16_t attrId, const CHIPValue & value)
+    virtual int Set(uint16_t attrId, const Value & value)
     {
         /* Just hand-off to update the value internally */
         auto attr = GetAttribute(attrId);
