@@ -24,6 +24,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
+              with:
+                 submodules: true
             - name: Build example Echo App
               run: scripts/examples/esp_echo_app.sh
             - name: Build ESP32 QEMU and Run Tests

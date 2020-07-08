@@ -25,6 +25,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
+              with:
+                 submodules: true
             - name: Build example Echo App
               run: scripts/examples/esp_echo_app.sh
             - name: Copy aside build products
@@ -78,6 +80,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
+              with:
+                 submodules: true
             - name: Build example nRF5 Lock App
               run: scripts/examples/nrf_lock_app.sh
             - name: Preserve artifacts
@@ -105,6 +109,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
+              with:
+                 submodules: true
             - name: Build example Standalone Echo Client
               run: scripts/examples/standalone_echo_client.sh
             - name: Build example Standalone Shell

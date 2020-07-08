@@ -27,6 +27,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
+              with:
+                 submodules: true
             - name: Bootstrap
               run: |
                   case $BUILD_TYPE in
