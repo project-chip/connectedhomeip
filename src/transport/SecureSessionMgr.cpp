@@ -205,6 +205,16 @@ void SecureSessionMgr::HandleDataReceived(const MessageHeader & header, const Pe
     {
         if (!connection->mPeerConnections.FindPeerConnectionState(peerAddress, &state))
         {
+            if (header.GetSourceNodeId().HasValue())
+            {
+                // If the data is from a new address BUT the node id is the same as a previous
+                // connection, mark the previous connection invalid in order to not have duplicate node ids.
+                if (connection->mPeerConnections.FindPeerConnectionState(header.GetSourceNodeId().Value(), &state))
+                {
+                    connection->mPeerConnections.MarkConnectionExpired(state);
+                }
+            }
+
             ChipLogProgress(Inet, "New peer connection received.");
 
             err = connection->AllocateNewConnection(header, peerAddress, &state);

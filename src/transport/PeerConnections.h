@@ -134,6 +134,17 @@ public:
         state->SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs());
     }
 
+    /// Convenience method to expired a peer connection state and fired the related callback
+    void MarkConnectionExpired(PeerConnectionState * state)
+    {
+        if (OnConnectionExpired)
+        {
+            OnConnectionExpired(*state, mConnectionExpiredArgument);
+        }
+
+        *state = PeerConnectionState(PeerAddress::Uninitialized());
+    }
+
     /**
      * Iterates through all active connections and expires any connection with an idle time
      * larger than the given amount.
@@ -157,13 +168,7 @@ public:
                 continue; // not expired
             }
 
-            if (OnConnectionExpired)
-            {
-                OnConnectionExpired(mStates[i], mConnectionExpiredArgument);
-            }
-
-            // Connection is assumed expired, marking it as invalid
-            mStates[i] = PeerConnectionState(PeerAddress::Uninitialized());
+            MarkConnectionExpired(&mStates[i]);
         }
     }
 
