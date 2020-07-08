@@ -24,8 +24,8 @@
 #ifndef CHIPSTANDARDCLUSTERS_H_
 #define CHIPSTANDARDCLUSTERS_H_
 
-#include <lib/datamodel/CHIPBaseCluster.h>
-#include <lib/datamodel/CHIPStandardAttributes.h>
+#include <datamodel/CHIPBaseCluster.h>
+#include <datamodel/CHIPStandardAttributes.h>
 
 namespace chip {
 namespace DataModel {
@@ -47,7 +47,7 @@ public:
         }
         return SUCCESS;
     }
-    
+
     ClusterBasic(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) :
         BaseCluster(kClusterIdBase)
     {
