@@ -34,12 +34,13 @@
 
 #include <errno.h>
 
-using namespace chip;
+namespace {
 
-static int Initialize(void * aContext);
-static int Finalize(void * aContext);
+using namespace chip;
+using namespace chip::Transport;
 
 using TestContext = chip::Test::IOContext;
+
 TestContext sContext;
 
 static const unsigned char local_private_key[] = { 0x00, 0xd1, 0x90, 0xd9, 0xb3, 0x95, 0x1c, 0x5f, 0xa4, 0xe7, 0x47,
@@ -56,11 +57,26 @@ static const char PAYLOAD[]         = "Hello!";
 constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
 
+class LoopbackTransport : public Transport::Base
+{
+public:
+    /// Transports are required to have a constructor that takes exactly one argument
+    CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
+
+    CHIP_ERROR SendMessage(const MessageHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) override
+    {
+        HandleMessageReceived(header, address, msgBuf);
+        return CHIP_NO_ERROR;
+    }
+
+    bool CanSendToPeer(const PeerAddress & address) override { return true; }
+};
+
 class TestSessMgrCallback : public SecureSessionMgrCallback
 {
 public:
-    virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                   System::PacketBuffer * msgBuf, SecureSessionMgr * mgr)
+    virtual void OnMessageReceived(const MessageHeader & header, PeerConnectionState * state, System::PacketBuffer * msgBuf,
+                                   SecureSessionMgrBase * mgr)
     {
         NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
         NL_TEST_ASSERT(mSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
@@ -74,7 +90,7 @@ public:
         ReceiveHandlerCallCount++;
     }
 
-    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr)
+    virtual void OnNewConnection(PeerConnectionState * state, SecureSessionMgrBase * mgr)
     {
         CHIP_ERROR err;
 
@@ -96,12 +112,12 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    SecureSessionMgr conn;
+    SecureSessionMgr<LoopbackTransport> conn;
     CHIP_ERROR err;
 
     ctx.GetInetLayer().SystemLayer()->Init(NULL);
 
-    err = conn.Init(kSourceNodeId, &ctx.GetInetLayer(), Transport::UdpListenParameters());
+    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), "LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -121,9 +137,9 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("127.0.0.1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    SecureSessionMgr conn;
+    SecureSessionMgr<LoopbackTransport> conn;
 
-    err = conn.Init(kSourceNodeId, &ctx.GetInetLayer(), Transport::UdpListenParameters().SetAddressType(addr.Type()));
+    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), "LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -132,7 +148,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     callback.NewConnectionHandlerCallCount = 0;
 
-    err = conn.Connect(kDestinationNodeId, Transport::PeerAddress::UDP(addr));
+    err = conn.Connect(kDestinationNodeId, PeerAddress::UDP(addr));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, callback.NewConnectionHandlerCallCount == 1);
 
@@ -153,7 +169,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
  *  Test Suite that lists all the test functions.
  */
 // clang-format off
-static const nlTest sTests[] =
+const nlTest sTests[] =
 {
     NL_TEST_DEF("Simple Init Test",              CheckSimpleInitTest),
     NL_TEST_DEF("Message Self Test",             CheckMessageTest),
@@ -162,8 +178,11 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
+int Initialize(void * aContext);
+int Finalize(void * aContext);
+
 // clang-format off
-static nlTestSuite sSuite =
+nlTestSuite sSuite =
 {
     "Test-CHIP-Connection",
     &sTests[0],
@@ -175,7 +194,7 @@ static nlTestSuite sSuite =
 /**
  *  Initialize the test suite.
  */
-static int Initialize(void * aContext)
+int Initialize(void * aContext)
 {
     CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Init(&sSuite);
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
@@ -184,11 +203,13 @@ static int Initialize(void * aContext)
 /**
  *  Finalize the test suite.
  */
-static int Finalize(void * aContext)
+int Finalize(void * aContext)
 {
     CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }
+
+} // namespace
 
 /**
  *  Main

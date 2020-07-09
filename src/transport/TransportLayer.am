@@ -39,5 +39,6 @@ CHIP_BUILD_TRANSPORT_LAYER_HEADER_FILES              = \
     @top_builddir@/src/transport/PeerConnectionState.h \
     @top_builddir@/src/transport/PeerConnections.h     \
     @top_builddir@/src/transport/SecureSessionMgr.h    \
+    @top_builddir@/src/transport/Tuple.h               \
     @top_builddir@/src/transport/UDP.h                 \
     $(NULL)

@@ -54,7 +54,7 @@ extern "C" {
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-chip::SecureSessionMgr sTransportIPv6;
+DemoSessionManager sessions;
 
 static void * ot_calloc(size_t n, size_t size)
 {
@@ -144,7 +144,7 @@ ret_code_t ChipInit()
 
     // Init ZCL Data Model
     InitDataModelHandler();
-    StartServer(&sTransportIPv6);
+    StartServer(&sessions);
 
     return ret;
 }
