@@ -41,8 +41,8 @@
  */
 
 #include <core/CHIPConfig.h>
-#include <system/SystemPacketBuffer.h>
 #include <support/CHIPMem.h>
+#include <system/SystemPacketBuffer.h>
 
 #include <string.h>
 
