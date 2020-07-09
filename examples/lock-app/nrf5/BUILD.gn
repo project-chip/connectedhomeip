@@ -51,6 +51,8 @@ nrf5_sdk("sdk") {
 }
 
 executable("lock_app") {
+  output_name = "chip-nrf52840-lock-example"
+
   public_deps = [
     ":sdk",
     "${chip_root}/src/lib",

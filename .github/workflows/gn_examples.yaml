@@ -1,0 +1,76 @@
+name: GN Examples
+
+on:
+    push:
+    pull_request:
+
+jobs:
+    nrf:
+        name: nRF
+
+        env:
+            BUILD_TYPE: nrf
+            BUILD_VERSION: 0.2.14
+            BUILD_IMAGE: chip-build-nrf-platform
+            BUILD_ORG: connectedhomeip
+
+        runs-on: ubuntu-latest
+
+        container:
+            image: connectedhomeip/chip-build-nrf-platform:0.2.14 # $BUILD_IMAGE/$BUILD_ORG:$BUILD_VERSION
+            volumes:
+                - "/tmp/bloat_reports:/tmp/bloat_reports"
+                - "/tmp/output_binaries:/tmp/output_binaries"
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: Checkout Submodules
+              run: make -f Makefile-bootstrap repos
+            - name: Bootstrap
+              run: scripts/build/gn_bootstrap.sh
+            - name: Build example nRF5 Lock App
+              run: scripts/examples/gn_nrf_example.sh examples/lock-app/nrf5 out/lock_app_debug
+            - name: Build example nRF5 Lighting App
+              run: scripts/examples/gn_nrf_example.sh examples/lighting-app/nrf5 out/lighting_app_debug
+            - name: Preserve artifacts
+              run: |
+                  mkdir -p example_binaries/nrf-build
+                  cp out/lock_app_debug/chip-nrf52840-lock-example \
+                     out/lighting_app_debug/chip-nrf52840-lighting-example \
+                     example_binaries/nrf-build/
+
+    linux-standalone:
+        name: Linux Standalone
+
+        env:
+            BUILD_TYPE: linux
+            BUILD_VERSION: 0.2.14
+            BUILD_IMAGE: chip-build
+            BUILD_ORG: connectedhomeip
+
+        runs-on: ubuntu-latest
+
+        container:
+            image: connectedhomeip/chip-build:0.2.14 # $BUILD_IMAGE/$BUILD_ORG:$BUILD_VERSION
+            volumes:
+                - "/tmp/bloat_reports:/tmp/bloat_reports"
+                - "/tmp/output_binaries:/tmp/output_binaries"
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: Checkout Submodules
+              run: make -f Makefile-bootstrap repos
+            - name: Bootstrap
+              run: scripts/build/gn_bootstrap.sh
+            - name: Build example Standalone Echo Client
+              run: scripts/examples/gn_build_example.sh examples/chip-tool out/chip_tool_debug
+            - name: Build example Standalone Shell
+              run: scripts/examples/gn_build_example.sh examples/shell out/shell_debug
+            - name: Preserve artifacts
+              run: |
+                  mkdir -p example_binaries/$BUILD_TYPE
+                  cp out/chip_tool_debug/bin/chip-standalone-demo \
+                     out/shell_debug/bin/chip-shell \
+                     example_binaries/$BUILD_TYPE/

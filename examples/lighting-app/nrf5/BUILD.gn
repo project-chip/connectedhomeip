@@ -51,7 +51,7 @@ nrf5_sdk("sdk") {
 }
 
 executable("lighting_app") {
-  output_name = "chip-nrf52840-lighting-example.out"
+  output_name = "chip-nrf52840-lighting-example"
 
   public_deps = [
     ":sdk",
