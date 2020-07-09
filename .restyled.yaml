@@ -40,6 +40,9 @@ request_review: none
 # Patterns to exclude from all Restylers
 exclude:
     - ".github/workflows/**/*" # https://github.com/restyled-io/restyler/issues/73
+    - ".github/workflows/*" # https://github.com/restyled-io/restyler/issues/73
+    - ".github/**/*" # https://github.com/restyled-io/restyler/issues/73
+    - ".github/*" # https://github.com/restyled-io/restyler/issues/73
     - "third_party/**/*"
     - "third_party/**"
     - "third_party/*"
