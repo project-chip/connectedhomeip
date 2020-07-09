@@ -59,12 +59,10 @@ set -ex
 [[ -n $VERSION ]] || die "version cannot be empty"
 
 # go find and build any CHIP images this image is "FROM"
-deps=( $(awk -F/ '/^FROM connectedhomeip/ {print $2}' Dockerfile) )
-for dep in "${deps[@]}"; do
+awk -F/ '/^FROM connectedhomeip/ {print $2}' Dockerfile | while read -r dep; do
     dep=${dep%:*}
     (cd "../$dep" && ./build.sh "$@")
 done
-
 
 BUILD_ARGS=()
 if [[ ${*/--no-cache//} != "${*}" ]]; then
