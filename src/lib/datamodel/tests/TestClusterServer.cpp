@@ -25,6 +25,7 @@
 #endif
 
 #include <datamodel/ClusterServer.h>
+#include <datamodel/ClusterOnOff.h>
 #include <nlassert.h>
 #include <nlunit-test.h>
 #include <support/TestUtils.h>
