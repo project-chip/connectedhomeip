@@ -19,7 +19,6 @@
 import github
 import logging
 import requests
-import subprocess
 
 # Artifacts can be fetched using:
 #   curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/project-chip/connectedhomeip/actions/artifacts
