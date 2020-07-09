@@ -139,7 +139,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       deps += [ ":all_host_gcc_mbedtls" ]
     }
     if (enable_nrf5_lock_app_build) {
-      deps += [ "${nrf5_lock_app_root}:nrf5(${nrf5_lock_app_root}/toolchain:nrf5_lock_app)" ]
+      deps += [ "${nrf5_lock_app_root}:nrf5(${chip_root}/examples/lock-app/nrf5/toolchain:nrf5_lock_app)" ]
     }
   }
 

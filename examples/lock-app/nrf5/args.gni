@@ -12,13 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/nrf5_lock_app.gni")
-import("${nrf5_lock_app_root}/common_args.gni")
+import("//build_overrides/chip.gni")
 
-# These values help set up the default toolchain in standalone sample app
-# builds. They must be in a separate file to avoid namespace conflicts in
-# multi target builds.
-custom_toolchain = "${nrf5_lock_app_root}/toolchain:nrf5_lock_app"
-target_cpu = "arm"
-target_os = "freertos"
-# Don't add more args here, add them to common_args.gni.
+import("${chip_root}/src/platform/nRF5/args.gni")
+
+# SDK target. This is overriden to add our SDK app_config.h & defines.
+nrf5_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+
+arm_arch = "armv7e-m"
+arm_float_abi = "hard"
+arm_cpu = "cortex-m4"
+arm_fpu = "fpv4-sp-d16"
+
+ble_project_config_include = "<CHIPProjectConfig.h>"
+chip_device_project_config_include = "<CHIPProjectConfig.h>"
+chip_project_config_include = "<CHIPProjectConfig.h>"
+inet_project_config_include = "<CHIPProjectConfig.h>"
+system_project_config_include = "<CHIPProjectConfig.h>"

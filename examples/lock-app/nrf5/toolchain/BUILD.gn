@@ -17,6 +17,6 @@ import("//build_overrides/nrf5_lock_app.gni")
 import("//build/toolchain/arm_gcc/arm_toolchain.gni")
 
 arm_toolchain("nrf5_lock_app") {
-  toolchain_args_file = "${nrf5_lock_app_root}/common_args.gni"
+  toolchain_args_file = "${nrf5_lock_app_root}/args.gni"
   current_os = "freertos"
 }
