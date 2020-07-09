@@ -30,7 +30,7 @@ want:
 -   GNU make (versions prior to 4.1 may produce spurious warnings/errors)
 -   automake, autoconf, libtool
 -   C and C++ compilers
--   clang-format-9
+-   clang-format (at least version 9)
 -   gcov
 -   pkg-config
 
