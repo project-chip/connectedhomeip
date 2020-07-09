@@ -18,6 +18,21 @@
             "problemMatcher": ["$gcc"]
         },
         {
+            "label": "GN Build",
+            "type": "shell",
+            "command": "./gn_build.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "isBackground": false,
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": ["$gcc"]
+        },
+        {
             "label": "Auto-enforce coding style",
             "type": "shell",
             "command": "scripts/helpers/auto_enforce_code_style.sh",

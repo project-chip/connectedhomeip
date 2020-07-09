@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
 #
 # Copyright (c) 2020 Project CHIP Authors
 #
@@ -40,22 +40,7 @@ set +e
 source "$CHIP_ROOT/scripts/activate.sh"
 set -e
 
-_chip_banner "Build: GN configure"
-
-nrf5_sdk_args=""
-extra_args=""
-
-if [[ -d "$NRF5_SDK_ROOT/components/libraries" ]]; then
-    nrf5_sdk_args+="nrf5_sdk_root=\"$NRF5_SDK_ROOT\""
-    extra_args+=" $nrf5_sdk_args enable_nrf5_builds=true"
-fi
-
-gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args"
-gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"$extra_args"
-
-_chip_banner "Build: Ninja build"
-
-time ninja -C "$CHIP_ROOT/out/debug" all check
+_chip_banner "Instructions"
 
 echo
 echo 'To activate existing build environment in your shell, run (do this first):'
@@ -91,3 +76,21 @@ else
     echo 'To build the nRF5 lock sample as a standalone project':
     echo "(cd $CHIP_ROOT/examples/lock-app/nrf5; gn gen out/debug --args='$nrf5_sdk_args'; ninja -C out/debug)"
 fi
+echo
+
+_chip_banner "Build: GN configure"
+
+nrf5_sdk_args=""
+extra_args=""
+
+if [[ -d "$NRF5_SDK_ROOT/components/libraries" ]]; then
+    nrf5_sdk_args+="nrf5_sdk_root=\"$NRF5_SDK_ROOT\""
+    extra_args+=" $nrf5_sdk_args enable_nrf5_lock_app_build=true"
+fi
+
+gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args"
+gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"$extra_args"
+
+_chip_banner "Build: Ninja build"
+
+time ninja -C "$CHIP_ROOT/out/debug" check
