@@ -66,6 +66,11 @@ class ArtifactInfo(github.GithubObject.NonCompletableGithubObject):
 
     return response.content
 
+  def delete(self):
+    """Delete this artifact."""
+    logging.warning('DELETING artifact ' + self.url)
+    self._requester.requestJsonAndCheck('DELETE', self.url)
+
 class ArtifactFetcher(github.GithubObject.NonCompletableGithubObject):
 
   def __init__(self, repo):
@@ -81,29 +86,6 @@ class ArtifactFetcher(github.GithubObject.NonCompletableGithubObject):
         headers={'Accept': 'application/vnd.github.v3+json'},
         list_item='artifacts',
     )
-
-
-def fetchMasterMergeCommitSHA(forkPointRef, revStr):
-  if revStr:
-    result = subprocess.run(
-        ['git', 'rev-parse', revStr],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    ).stdout.decode('utf8')
-
-    logging.info('Parsed revision %r base result: %r' % (revStr, result))
-  else:
-    logging.info('Finding merge point from %s' % forkPointRef)
-    result = subprocess.run(
-        ('git merge-base --fork-point %s' % forkPointRef).split(),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    ).stdout.decode('utf8')
-
-    logging.info('Merge base result: %r' % result)
-
-  return result.split()[0]
-
 
 
 def getAllArtifacts(githubToken, githubRepo):

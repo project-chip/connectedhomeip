@@ -19,6 +19,7 @@
 import argparse
 import coloredlogs
 import csv
+import datetime
 import github
 import github_fetch_artifacts
 import io
@@ -27,6 +28,7 @@ import os
 import re
 import stat
 import subprocess
+import zipfile
 
 
 class SectionChange:
@@ -182,21 +184,31 @@ def getPullRequestBaseSha(githubToken,  githubRepo, pullRequestNumber):
 
   return pull.base.sha
 
+def cleanDir(name):
+  """Ensures a clean directory with the given name exists. Only handles files"""
+  if os.path.exists(name):
+    for fname in os.listdir(name):
+      path = os.path.join(name, fname)
+      if os.path.isfile(path):
+        os.unlink(path)
+  else:
+    os.mkdir(name)
 
+
+def downloadArtifact(artifact, dirName):
+  """Extract an artifact into a directory."""
+  zipFile = zipfile.ZipFile(io.BytesIO(artifact.downloadBlob()), 'r')	
+  logging.info('Extracting zip file to %r' % dirName)	
+  zipFile.extractall(dirName)
 
 def main():
   """Main task if executed standalone."""
   parser = argparse.ArgumentParser(description='Fetch master build artifacts.')
   parser.add_argument(
-      '--artifact-download-dir',
+      '--output-dir',
       type=str,
       default='.',
       help='Where to download the artifacts')
-  parser.add_argument(
-      '--build-output-dir',
-      type=str,
-      default='.',
-      help='Generated build files directory to use to compare for bloat')
   parser.add_argument(
       '--github-api-token',
       type=str,
@@ -220,16 +232,42 @@ def main():
     logging.error('Required arguments missing: github api token is required.')
     return
 
+  # all known artifacts
+  artifacts = [a for a in github_fetch_artifacts.getAllArtifacts(args.github_api_token, args.github_repository)]
 
+  # process newest artifacts first
+  artifacts.sort(key = lambda x: x.created_at, reverse=True)
+
+  current_time = datetime.datetime.now()
+  seen_names = set()
   pull_artifact_re = re.compile('^(.*)-pull-(\\d+)$')
-  for a in github_fetch_artifacts.getAllArtifacts(args.github_api_token, args.github_repository):
-    m = pull_artifact_re.match(a.name)
+  for a in artifacts:
+    # logs cleanup after 3 days
+    is_log = a.name.endswith('-logs')
 
-    if not m:
-      logging.info('Non-PR artifact found: %r' % a.name)
+    if (current_time - a.created_at).days > 30 or (is_log and (current_time - a.created_at).days > 3):
+      logging.info('Old artifact: %s' % a.name)
+      a.delete()
       continue
 
-    prefix = int(m.group(2))
+    if a.name.endswith('-logs'):
+      # logs names are duplicate, however that is fine
+      continue
+
+
+    if a.name in seen_names:
+      logging.info('Artifact name already seen before: %s' % a.name)
+      a.delete()
+      continue
+
+    seen_names.add(a.name)
+
+    m = pull_artifact_re.match(a.name)
+    if not m:
+      logging.info('Non-PR artifact found: %r from %r' % (a.name, a.created_at))
+      continue
+
+    prefix = m.group(1)
     pull_number = int(m.group(2))
 
     logging.info('Processing PR %s via artifact %r' % (pull_number, a.name))
@@ -237,13 +275,38 @@ def main():
     try:
       base_sha = getPullRequestBaseSha(args.github_api_token, args.github_repository, pull_number)
 
-      logging.info('Diff is based on %r' % base_sha)
+      base_artifact_name = '%s-%s' % (prefix, base_sha)
 
-      # FIXME:
-      #   - grab main artifact (IFF exists)
-      #   - clean output directories
-      #   - extract artifacts
-      #   - bloat report
+      base_artifacts = [v for v in artifacts if v.name == base_artifact_name]
+      if len(base_artifacts) != 1:
+        raise Exception('Did not find exactly one artifact for %s: %r' % (base_artifact_name, [v.name for v in base_artifacts]))
+
+      b = base_artifacts[0]
+
+      logging.info('Diff will be against artifact %r' % b.name)
+
+      aOutput = os.path.join(args.output_dir, 'pull_artifact')
+      bOutput = os.path.join(args.output_dir, 'master_artifact')
+
+      cleanDir(aOutput)
+      cleanDir(bOutput)
+
+      downloadArtifact(a, aOutput)
+      downloadArtifact(b, bOutput)
+
+      report_name = os.path.join(aOutput, 'report.csv')
+
+      results = generateBloatReport(report_name, bOutput, aOutput)
+
+      sendFileAsPrComment(prefix, report_name, args.github_api_token,
+                          args.github_repository,	pull_number, results)
+
+      # If running over a top level directory, ensure git sees no output
+      cleanDir(aOutput)
+      cleanDir(bOutput)
+
+      # Output processed.
+      a.delete()
 
     except Exception as e:
       logging.warning('Failed to process bloat report: %r', e)
