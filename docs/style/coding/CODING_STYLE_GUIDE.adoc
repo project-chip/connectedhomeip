@@ -13,11 +13,11 @@
 == Best Practices, Coding Conventions, and Style
 
 [.text-center]
-_Revision 1_ +
-_2020-07-08_
+_Revision 2_ +
+_2020-07-09_
 
 [.text-center]
-*Status:* [red]*Draft* / [red]*Active*
+*Status:* [red]*Approved* / [red]*Active*
 
 toc::[]
 
@@ -237,6 +237,28 @@ counsel of others in the group to find out what the right thing to do
 is. Never just start changing code wholesale for personal reasons
 without consulting others first.
 
+==== Language-independent
+
+===== Commenting Out or Disabling Code
+
+Unused code shall not be disabled by commenting it out with C- or
+C{plusplus}-style comments or with preprocessor `#if 0 ... #endif` semantics.
+
+====== Motivation and Rationale
+
+Code should either be actively maintained and "in" the source base for a
+purpose or removed entirely. Code that is disabled in this way is
+generally sloppy and does not convey a sense of certainty and direction
+in the code.
+
+Anyone who is interested in the history of a particular source code file
+should use the source code control system to browse it.
+
+Code that is debug- or test-only should be moved to a conditionally
+compiled test source file or conditionalized with an appropriate
+`WITH_DEBUG`, `WANT_DEBUG`, `WITH_TESTS`, `WANT_TESTS`, or some similar such
+preprocessor mnemonic that can be asserted from the build system.
+
 :sectnums!:
 
 == Recommended Reading
@@ -269,6 +291,7 @@ Use of the C{plusplus} Language in Critical Systems. June 2008.
 [cols="^1,^1,<2,<3",options="header"]
 |===
 |Revision |Date |Modified By |Description
+|2 |2020-07-09 |Grant Erickson |Added Common > Language-independent > Commenting Out or Disabling Code
 |1 |2020-07-08 |Grant Erickson |Initial revision.
 |===
 
