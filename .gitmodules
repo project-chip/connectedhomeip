@@ -41,7 +41,7 @@
 	ignore = dirty
 	commit = 35be9760b4edf485287f78c0cf652beb19c047f0
 [submodule "pigweed"]
-	path = third_party/pigweed
+	path = third_party/pigweed/repo
 	url = https://pigweed.googlesource.com/pigweed/pigweed
 	branch = master
 	ignore = dirty

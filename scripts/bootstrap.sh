@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-CHIP_ROOT="$(dirname "$0")/.."
+CHIP_ROOT=$(cd "$(dirname "$0")/.." && pwd)
 
 export PW_BRANDING_BANNER="$CHIP_ROOT/.chip-banner.txt"
 export PW_BRANDING_BANNER_COLOR="bold_white"
@@ -26,4 +26,4 @@ fi
 git submodule update --init
 
 # shellcheck source=/dev/null
-source "$CHIP_ROOT/third_party/pigweed/bootstrap.sh"
+source "$CHIP_ROOT/third_party/pigweed/repo/bootstrap.sh"
