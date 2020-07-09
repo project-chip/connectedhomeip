@@ -52,6 +52,7 @@ EXTRA_DIST                               = \
     bootstrap                              \
     bootstrap-configure                    \
     repos.conf                             \
+    .gitmodules                            \
     $(srcdir)/build/autoconf               \
     $(srcdir)/config                       \
     $(srcdir)/config/efr32                 \
