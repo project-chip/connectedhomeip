@@ -14,6 +14,8 @@
 
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/src/lib/core/core.gni")
+
 static_library("shell") {
   output_name = "libCHIPShell"
 
@@ -24,8 +26,11 @@ static_library("shell") {
     "shell.h",
     "streamer.cpp",
     "streamer.h",
-    "streamer_stdio.cpp",
   ]
+
+  if (chip_target_style == "unix") {
+    sources += [ "streamer_stdio.cpp" ]
+  }
 
   public_deps = [
     "${chip_root}/src/lib/core",

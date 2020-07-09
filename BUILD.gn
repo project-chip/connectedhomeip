@@ -40,6 +40,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       "${chip_root}/src/inet",
       "${chip_root}/src/lib",
       "${chip_root}/src/lib/core",
+      "${chip_root}/src/lib/shell",
       "${chip_root}/src/lib/support",
       "${chip_root}/src/lwip:all",
       "${chip_root}/src/system",
@@ -58,7 +59,6 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       deps += [
         "${chip_root}/examples/chip-tool",
         "${chip_root}/examples/shell",
-        "${chip_root}/src/lib/shell",
         "${chip_root}/src/qrcodetool",
         "${chip_root}/src/setup_payload",
       ]
