@@ -38,10 +38,11 @@ namespace Transport {
  * The usage intent is to be able to group several distinct transport types and make them look
  * as a single transport.
  *
- * Having an example class definition of:
- *    Tuple<UDP, UDP, TCP>
+ * Having an example class definition of `Tuple<UDP, UDP, TCP>`
  *
  * Is equivalent to:
+ *
+ * ~~~~~~~~~
  *    class TupleOfUdpUdpTcp : public BASE {
  *       private:
  *          UDP mUdp1;
@@ -52,6 +53,7 @@ namespace Transport {
  *          CHIP_ERROR SendMessage(...) override;
  *          bool CanSendToPeer(...) override;
  *    }
+ * ~~~~~~~~~
  *
  * The intent of this is to allow applications to use any transport types without CHIP pre-defining
  * popular mappings (like UDP only, UDP and BLE, BLE only etc.) and without using #ifdefs to create
@@ -80,13 +82,11 @@ template <typename... TransportTypes>
 class Tuple : public Base
 {
 public:
-    /** @overload */
     CHIP_ERROR SendMessage(const MessageHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) override
     {
         return SendMessageImpl<0>(header, address, msgBuf);
     }
 
-    /** @overload */
     bool CanSendToPeer(const PeerAddress & address) override { return CanSendToPeerImpl<0>(address); }
 
     /**
