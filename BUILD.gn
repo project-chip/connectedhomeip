@@ -92,6 +92,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
   declare_args() {
     # Set this to false to disable all builds by default.
     enable_default_builds = true
+
+    # Set this to false to disable all builds by default.
+    enable_nrf5_builds = false
   }
 
   declare_args() {
@@ -111,7 +114,10 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     enable_standalone_shell_build = enable_default_builds
 
     # Build the nRF5 lock app example.
-    enable_nrf5_lock_app_build = false
+    enable_nrf5_lock_app_build = enable_nrf5_builds
+
+    # Build the nRF5 lighting app example.
+    enable_nrf5_lighting_app_build = enable_nrf5_builds
   }
 
   chip_build("host_clang") {
@@ -143,6 +149,12 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
   }
 
+  if (enable_nrf5_lighting_app_build) {
+    group("nrf5_lighting_app") {
+      deps = [ "${chip_root}/examples/lighting-app/nrf5(${chip_root}/config/toolchain:nrf5_lighting_app)" ]
+    }
+  }
+
   group("default") {
     deps = []
     if (enable_host_clang_build) {
@@ -162,6 +174,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
     if (enable_nrf5_lock_app_build) {
       deps += [ ":nrf5_lock_app" ]
+    }
+    if (enable_nrf5_lighting_app_build) {
+      deps += [ ":nrf5_lighting_app" ]
     }
   }
 
