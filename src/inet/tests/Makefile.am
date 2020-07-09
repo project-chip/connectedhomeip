@@ -142,25 +142,25 @@ else # CHIP_DEVICE_LAYER_TARGET_ESP32
 #
 # These will NOT be part of the externally-consumable binary SDK.
 #
-# XXX - At this point TestInetEndPoint and TestInetLayerDNS are stranded
-#       here until a solution for enabling IPv6 on Linux containers for
-#       Docker on macOS can be resolved as that test involves
-#       executing APIs that exercise bind, listen, connect, accept,
-#       etc. on IPv4 and IPv6 IP end points. When that issue has been
-#       resolved, move these tests to check_PROGRAMS.
+# XXX - At this point TestInetEndPoint is stranded here until a
+#       solution for enabling IPv6 on Linux containers for Docker
+#       on macOS can be resolved as that test involves executing
+#       APIs that exercise bind, listen, connect, accept, etc. on
+#       IPv4 and IPv6 IP end points. When that issue has been
+#       resolved, move this test to check_PROGRAMS.
 
 # Build and run these test targets only on standalone device targets
 noinst_PROGRAMS                                       = \
     TestLwIPDNS                                         \
     TestInetEndPoint                                    \
     TestInetLayer                                       \
-    TestInetLayerDNS                                    \
     TestInetLayerMulticast                              \
     $(NULL)
 
 check_PROGRAMS                                       += \
     TestInetAddress                                     \
     TestInetErrorStr                                    \
+    TestInetLayerDNS                                    \
     $(NULL)
 
 endif # CHIP_DEVICE_LAYER_TARGET_ESP32
