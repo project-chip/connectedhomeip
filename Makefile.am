@@ -50,7 +50,6 @@ EXTRA_DIST                               = \
     .default-version                       \
     bootstrap                              \
     bootstrap-configure                    \
-    repos.conf                             \
     $(srcdir)/build/autoconf               \
     $(srcdir)/config                       \
     $(srcdir)/config/efr32                 \
