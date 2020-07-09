@@ -47,7 +47,7 @@ namespace Transport {
  *       private:
  *          UDP mUdp1;
  *          UDP mUdp2;
- *          TCP mTcp2;
+ *          TCP mTcp3;
  *       public:
  *          Init(UDPListenParameters &, UDPListenParameters&, TCPListenParameters) {...}
  *          CHIP_ERROR SendMessage(...) override;
