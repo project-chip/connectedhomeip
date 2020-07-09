@@ -17,70 +17,75 @@
 
 /**
  *    @file
- *      This file contains definitions for standard CHIP Attributes
+ *      This file contains definitions for CHIP Cluster Basic
  *
  */
 
-#ifndef CHIPSTANDARDATTRIBUTES_H_
-#define CHIPSTANDARDATTRIBUTES_H_
+#ifndef CHIPCLUSTERBASIC_H_
+#define CHIPCLUSTERBASIC_H_
 
-#include <datamodel/Attribute.h>
+#include <datamodel/Cluster.h>
 
 namespace chip {
 namespace DataModel {
 
-/* TODO: It would be nice to use a pool allocator here once we have one */
-/* Base Cluster */
+/* Cluster ID */
+static const uint16_t kClusterIdBase = 0x0000;
+
+/* Attribute IDs */
 static const uint16_t kAttributeIdZCLVersion = 0x0000;
+static const uint16_t kAttributeIdApplicationVersion = 0x0001;
+static const uint16_t kAttributeIdStackVersion = 0x0002;
+static const uint16_t kAttributeIdHWVersion = 0x0003;
+
+/* Attributes */
 static inline Attribute * CHIPAttributeZCLVersionNew(uint8_t ZCLVersion)
 {
     return new Attribute(kAttributeIdZCLVersion, ValueUInt8(ZCLVersion));
 }
 
-static const uint16_t kAttributeIdApplicationVersion = 0x0001;
 static inline Attribute * CHIPAttributeApplicationVersionNew(uint8_t applicationVersion)
 {
     return new Attribute(kAttributeIdApplicationVersion, ValueUInt8(applicationVersion));
 }
 
-static const uint16_t kAttributeIdStackVersion = 0x0002;
 static inline Attribute * CHIPAttributeStackVersionNew(uint8_t stackVersion)
 {
     return new Attribute(kAttributeIdStackVersion, ValueUInt8(stackVersion));
 }
 
-static const uint16_t kAttributeIdHWVersion = 0x0003;
 static inline Attribute * CHIPAttributeHWVersionNew(uint8_t HWVersion)
 {
     return new Attribute(0x0003, ValueUInt8(HWVersion));
 }
 
-/* On/Off Cluster */
-static const uint16_t kAttributeIdOnOff = 0x0000;
-static inline Attribute * CHIPAttributeOnOffNew(void)
+/* The Cluster Basic class */
+class ClusterBasic : public Cluster
 {
-    return new Attribute(kAttributeIdOnOff, kCHIPValueType_Bool);
-}
+public:
+    ClusterBasic() : Cluster(kClusterIdBase) {}
 
-static const uint16_t kAttributeIdGlobalSceneControl = 0x4000;
-static inline Attribute * CHIPAttributeGlobalSceneControlNew(void)
-{
-    return new Attribute(kAttributeIdGlobalSceneControl, kCHIPValueType_Bool);
-}
+    CHIP_ERROR Init(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion)
+    {
+        if (mAttrs[0] == nullptr)
+        {
+            AddAttribute(CHIPAttributeZCLVersionNew(ZCLVersion));
+            AddAttribute(CHIPAttributeApplicationVersionNew(applicationVersion));
+            AddAttribute(CHIPAttributeStackVersionNew(stackVersion));
+            AddAttribute(CHIPAttributeHWVersionNew(HWVersion));
+        }
+        return CHIP_NO_ERROR;
+    }
 
-static const uint16_t kAttributeIdOnTime = 0x4001;
-static inline Attribute * CHIPAttributeOnTimeNew(void)
-{
-    return new Attribute(0x4001, kCHIPValueType_UInt16);
-}
+    ClusterBasic(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) :
+        Cluster(kClusterIdBase)
+    {
+        Init(ZCLVersion, applicationVersion, stackVersion, HWVersion);
+    }
+};
 
-static const uint16_t kAttributeIdOffWaitTime = 0x4002;
-static inline Attribute * CHIPAttributeOffWaitTimeNew(void)
-{
-    return new Attribute(0x4002, kCHIPValueType_UInt16);
-}
 
 } // namespace DataModel
 } // namespace chip
 
-#endif /* CHIPSTANDARDATTRIBUTES_H_ */
+#endif /* CHIPCLUSTERBASIC_H_ */
