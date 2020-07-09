@@ -157,6 +157,7 @@ private:
     template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
     CHIP_ERROR SendMessageImpl(const MessageHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf)
     {
+        msgBuf->Free();
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
 
