@@ -31,7 +31,7 @@
 #include "esp_log.h"
 #include "esp_system.h"
 #include "esp_timer.h"
-#include <lib/datamodel/StandardAttributes.h>
+#include <lib/datamodel/ClusterOnOff.h>
 
 #if CONFIG_HAVE_DISPLAY
 // The Y position of the LED Status message on screen as a
