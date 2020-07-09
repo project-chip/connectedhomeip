@@ -36,7 +36,7 @@ class ClusterBasic : public Cluster
 public:
     ClusterBasic() : Cluster(kClusterIdBase) {}
 
-    int Init(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion)
+    CHIP_ERROR Init(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion)
     {
         if (mAttrs[0] == nullptr)
         {
@@ -45,7 +45,7 @@ public:
             AddAttribute(CHIPAttributeStackVersionNew(stackVersion));
             AddAttribute(CHIPAttributeHWVersionNew(HWVersion));
         }
-        return SUCCESS;
+        return CHIP_NO_ERROR;
     }
 
     ClusterBasic(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) :

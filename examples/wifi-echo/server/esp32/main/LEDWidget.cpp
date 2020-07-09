@@ -75,7 +75,7 @@ void LEDWidget::Set(bool state)
     Cluster::Set(kAttributeIdOnOff, ValueBool(state));
 }
 
-int LEDWidget::Set(uint16_t attrId, const Value & value)
+CHIP_ERROR LEDWidget::Set(uint16_t attrId, const Value & value)
 {
     if (attrId == kAttributeIdOnOff)
     {
@@ -84,7 +84,7 @@ int LEDWidget::Set(uint16_t attrId, const Value & value)
         /* Update our internal data model as well */
         Cluster::Set(attrId, value);
     }
-    return SUCCESS;
+    return CHIP_NO_ERROR;
 }
 
 void LEDWidget::Blink(uint32_t changeRateMS)
