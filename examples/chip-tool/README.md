@@ -39,10 +39,11 @@ Stop the Client at any time with `Ctrl + C`.
 ## Using the Client to Send CHIP Commands
 
 To use the Client to send a CHIP comands, run the built executable and pass it
-the IP address and port of the server to talk to, as well as the name of the
-command to send. Right now the "off", "on", and "toggle" commands are supported,
-from the On/Off cluster.
+the IP address and port of the server to talk to, the name of the command to
+send, as well as an enpoint id. Right now the "off", "on", and "toggle" commands
+are supported, from the On/Off cluster. The endpoint id must be between 1
+and 240.
 
-          $ ./build/chip-standalone-demo.out 192.168.0.30 8000 on
+          $ ./build/chip-standalone-demo.out 192.168.0.30 8000 on 1
 
 The client will send a single command packet and then exit.
