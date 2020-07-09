@@ -13,14 +13,11 @@ jobs:
                 type: [main, clang, linux-embedded, mbedtls]
         env:
             BUILD_TYPE: ${{ matrix.type }}
-            BUILD_VERSION: 0.3.0
-            BUILD_IMAGE: chip-build
-            BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
 
         container:
-            image: "connectedhomeip/chip-build:0.3.0"
+            image: connectedhomeip/chip-build:0.3.0
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -78,3 +75,4 @@ jobs:
             # - name: Upload Code Coverage
             #   if: ${{ contains('main', env.BUILD_TYPE) }}
             #   run: bash <(curl -s https://codecov.io/bash)
+

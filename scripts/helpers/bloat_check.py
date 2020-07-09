@@ -17,17 +17,16 @@
 #
 
 import argparse
-import attr
 import coloredlogs
 import csv
 import github
+import github_fetch_artifacts
 import io
 import logging
 import os
+import re
 import stat
 import subprocess
-
-import ci_fetch_artifacts
 
 
 class SectionChange:
@@ -47,7 +46,8 @@ class ComparisonResult:
     self.sectionChanges = []
 
 
-SECTIONS_TO_WATCH = set(['.rodata', '.text', '.flash.rodata', '.flash.text', '.bss', '.data'])
+SECTIONS_TO_WATCH = set(
+    ['.rodata', '.text', '.flash.rodata', '.flash.text', '.bss', '.data'])
 
 
 def filesInDirectory(dirName):
@@ -153,8 +153,10 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
   compareTable = 'File | Section | File | VM\n---- | ---- | ----- | ---- \n'
   for file in compare_results:
     for change in file.sectionChanges:
-      compareTable += '{0} | {1} | {2} | {3}\n'.format(
-          file.fileName, change.section, change.fileChange, change.vmChange)
+      compareTable += '{0} | {1} | {2} | {3}\n'.format(file.fileName,
+                                                       change.section,
+                                                       change.fileChange,
+                                                       change.vmChange)
 
   # NOTE: PRs are issues with attached patches, hence the API naming
   pull.create_issue_comment("""{title}
@@ -169,19 +171,26 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
 ```
 
 </details>
-""".format(
-    title=titleHeading,
-    table=compareTable,
-    jobName=job_name,
-    rawReportText=rawText))
+""".format(title=titleHeading, table=compareTable, rawReportText=rawText))
+
+
+def extractPrNumberFromRef(refStr):
+  logging.info('EXTRACTING REF FROM "%s"', refStr)
+  match = re.compile('^refs/pull/(\\d*)/merge').match(refStr)
+
+  if match:
+    return int(match.group(1))
+
+  logging.warning('Cannot extract PR number from ref: "%s"', refStr)
+
+  return None
 
 
 def main():
   """Main task if executed standalone."""
   parser = argparse.ArgumentParser(description='Fetch master build artifacts.')
-  parser.add_argument('--token', type=str, help='API token to use')
   parser.add_argument(
-      '--job', type=str, help='From what job to fetch artifacts from')
+      '--job', type=str, help='Name of the job generating the report')
   parser.add_argument(
       '--artifact-download-dir',
       type=str,
@@ -195,8 +204,8 @@ def main():
   parser.add_argument(
       '--report-file',
       type=str,
-      default='report.txt',
-      help='From what job to fetch artifacts from')
+      default='report.csv',
+      help='Report file output name')
   parser.add_argument(
       '--github-api-token',
       type=str,
@@ -204,15 +213,25 @@ def main():
   parser.add_argument(
       '--github-repository', type=str, help='Repository to use for PR comments')
   parser.add_argument(
-      '--github-comment-pr-number',
+      '--github-ref',
       type=str,
       default=None,
-      help='To what PR to comment in github')
+      help='Github action ref, of format refs/pull/:prNumber/merge')
   parser.add_argument(
       '--log-level',
       default=logging.INFO,
       type=lambda x: getattr(logging, x),
       help='Configure the logging level.')
+  parser.add_argument(
+      '--git-fork-point',
+      type=str,
+      default='refs/heads/master',
+      help='What forkpoint to get')
+  parser.add_argument(
+      '--git-master-ref',
+      type=str,
+      default=None,
+      help='Ref for fetching artifacts for the bloat report (for debug purposes)')
   args = parser.parse_args()
 
   # Ensures somewhat pretty logging of what is going on
@@ -221,27 +240,39 @@ def main():
       format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
   coloredlogs.install()
 
-  if not args.token or not args.job:
-    logging.error(
-        'Required arguments missing. Please specify at least job and token.')
+  if not args.github_api_token:
+    logging.error('Required arguments missing: github api token is required.')
+    return
+
+  if not args.job:
+    logging.error('Required arguments missing: job is required.')
+    return
+
+  if not args.github_ref:
+    logging.error('Required arguments missing: github_ref is required.')
     return
 
   try:
-    ci_fetch_artifacts.fetchArtifactsForJob(args.token, args.job,
-                                            args.artifact_download_dir)
+    github_fetch_artifacts.fetchArtifactsForJob(args.job, args.github_api_token, args.github_repository,
+                                                args.artifact_download_dir, 
+                                                args.git_fork_point, args.git_master_ref)
   except Exception as e:
     logging.warning('Failed to fetch artifacts: %r', e)
-
+  
   compareResults = generateBloatReport(
       args.report_file,
       args.artifact_download_dir,
       args.build_output_dir,
       title="Bloat report for job '%s'" % args.job)
-
-  if args.github_api_token and args.github_repository and args.github_comment_pr_number:
-    sendFileAsPrComment(args.job, args.report_file, args.github_api_token,
-                        args.github_repository,
-                        int(args.github_comment_pr_number), compareResults)
+  
+  comment_pr_number = extractPrNumberFromRef(args.github_ref)
+  if args.github_api_token and args.github_repository and comment_pr_number:
+    try:
+      sendFileAsPrComment(args.job, args.report_file, args.github_api_token,
+                          args.github_repository,
+                          comment_pr_number, compareResults)
+    except Exception as e:
+      logging.warning('Failed to send PR comment: %r', e)
 
 
 if __name__ == '__main__':

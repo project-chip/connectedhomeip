@@ -10,14 +10,11 @@ jobs:
 
         env:
             BUILD_TYPE: esp32
-            BUILD_VERSION: 0.3.0
-            BUILD_IMAGE: chip-build-esp32
-            BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.3.0 # $BUILD_IMAGE/$BUILD_ORG:$BUILD_VERSION
+            image: connectedhomeip/chip-build-esp32:0.3.0
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -25,39 +22,37 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
+              # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
               with:
+                 fetch-depth: 0
                  submodules: true
             - name: Build example Echo App
               run: scripts/examples/esp_echo_app.sh
             - name: Copy aside build products
-              run:
-                  mkdir -p example_binaries/$BUILD_TYPE-build; cp
-                  examples/wifi-echo/server/esp32/build/chip-wifi-echo.elf  example_binaries/$BUILD_TYPE-build/chip-wifi-echo.elf
-
-            # - name: Generate bloat report
-            #   run: |
-            #       mkdir -p "master_binaries/esp32-build"
-            #       scripts/helpers/bloat_check.py                                                   \
-            #          --token "$GITHUB_TOKEN"                                                       \
-            #          --job "$GITHUB_WORKFLOW"                                                      \
-            #          --artifact-download-dir "master_binaries/$BUILD_TYPE-build"                   \
-            #          --build-output-dir "example_binaries/$BUILD_TYPE-build"                       \
-            #          --report-file bloat_report.txt                                                \
-            #          --github-repository "$GITHUB_REPOSITORY"                                      \
-            #          --github-comment-pr-number "$CIRCLE_PR_NUMBER"
+              run: |
+                  mkdir -p example_binaries/$BUILD_TYPE-build
+                  cp examples/wifi-echo/server/esp32/build/chip-wifi-echo.elf \
+                     example_binaries/$BUILD_TYPE-build/chip-wifi-echo.elf
+            - name: Generate bloat report
+              # job name MUST match prefix of artifact uploading (sans SHA)
+              run: |
+                  mkdir -p "master_binaries/$BUILD_TYPE-build"
+                  scripts/helpers/bloat_check.py                                                   \
+                     --job "${{ env.BUILD_TYPE }}-example-build"                                   \
+                     --artifact-download-dir "master_binaries/$BUILD_TYPE-build"                   \
+                     --build-output-dir "example_binaries/$BUILD_TYPE-build"                       \
+                     --report-file bloat_report.txt                                                \
+                     --github-api-token "${{ secrets.GITHUB_TOKEN }}"                              \
+                     --github-repository "${{ github.repository }}"                                \
+                     --github-ref "${{ github.ref }}"                                              \
+                     --git-fork-poin "remotes/origin/${{ github.base_ref }}"
             - name: Copy aside bloat report & binaries
               run: |
                   cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
-                  # cp bloat_report.txt /tmp/bloat_reports/
-            # - name: Uploading Bloat Report
-            #   uses: actions/upload-artifact@v1
-            #   with:
-            #       name: ${{ env.BUILD_TYPE }}-bloat-report
-            #       path: /tmp/bloat_reports/bloat_report.txt
             - name: Uploading Binaries
               uses: actions/upload-artifact@v1
               with:
-                  name: ${{ env.BUILD_TYPE }}-example-build
+                  name: ${{ env.BUILD_TYPE }}-example-build-${{ github.sha }}
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
 
     nrf:
@@ -65,14 +60,11 @@ jobs:
 
         env:
             BUILD_TYPE: nrf
-            BUILD_VERSION: 0.3.0
-            BUILD_IMAGE: chip-build-nrf-platform
-            BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.3.0 # $BUILD_IMAGE/$BUILD_ORG:$BUILD_VERSION
+            image: connectedhomeip/chip-build-nrf-platform:0.3.0
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -80,28 +72,49 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
+              # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
               with:
+                 fetch-depth: 0
                  submodules: true
             - name: Build example nRF5 Lock App
               run: scripts/examples/nrf_lock_app.sh
-            - name: Preserve artifacts
-              run:
-                  mkdir -p example_binaries/nrf-build ; cp
-                  examples/lock-app/nrf5/build/chip-nrf52840-lock-example.out  example_binaries/nrf-build/chip-nrf52840-lock-example.out
+            - name: Copy aside build products
+              run: |
+                  mkdir -p example_binaries/nrf-build
+                  cp examples/lock-app/nrf5/build/chip-nrf52840-lock-example.out       \
+                     example_binaries/$BUILD_TYPE-build/chip-nrf52840-lock-example.out
+            - name: Generate bloat report
+              # job name MUST match prefix of artifact uploading (sans SHA)
+              run: |
+                  mkdir -p "master_binaries/$BUILD_TYPE-build"
+                  scripts/helpers/bloat_check.py                                                   \
+                     --job "${{ env.BUILD_TYPE }}-example-build"                                   \
+                     --artifact-download-dir "master_binaries/$BUILD_TYPE-build"                   \
+                     --build-output-dir "example_binaries/$BUILD_TYPE-build"                       \
+                     --report-file bloat_report.txt                                                \
+                     --github-api-token "${{ secrets.GITHUB_TOKEN }}"                              \
+                     --github-repository "${{ github.repository }}"                                \
+                     --github-ref "${{ github.ref }}"                                              \
+                     --git-fork-poin "remotes/origin/${{ github.base_ref }}"
+            - name: Copy aside bloat report & binaries
+              run: |
+                  cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
+            - name: Uploading Binaries
+              uses: actions/upload-artifact@v1
+              with:
+                  name: ${{ env.BUILD_TYPE }}-example-build-${{ github.sha }}
+                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
 
     linux-standalone:
         name: Linux Standalone
 
         env:
             BUILD_TYPE: linux
-            BUILD_VERSION: 0.3.0
-            BUILD_IMAGE: chip-build
-            BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.3.0 # $BUILD_IMAGE/$BUILD_ORG:$BUILD_VERSION
+            image: connectedhomeip/chip-build:0.3.0
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -109,7 +122,9 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
+              # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
               with:
+                 fetch-depth: 0
                  submodules: true
             - name: Build example Standalone Echo Client
               run: scripts/examples/standalone_echo_client.sh
@@ -117,6 +132,28 @@ jobs:
               run: scripts/examples/standalone_shell.sh
             - name: Preserve artifacts
               run: |
-                  mkdir -p example_binaries/$BUILD_TYPE
+                  mkdir -p example_binaries/$BUILD_TYPE-build
                   cp examples/chip-tool/build/chip-standalone-demo.out \
-                     example_binaries/$BUILD_TYPE/chip-standalone-demo.out
+                     example_binaries/$BUILD_TYPE-build/chip-standalone-demo.out
+            - name: Generate bloat report
+              # job name MUST match prefix of artifact uploading (sans SHA)
+              run: |
+                  mkdir -p "master_binaries/$BUILD_TYPE-build"
+                  scripts/helpers/bloat_check.py                                                   \
+                     --job "${{ env.BUILD_TYPE }}-example-build"                                   \
+                     --artifact-download-dir "master_binaries/$BUILD_TYPE-build"                   \
+                     --build-output-dir "example_binaries/$BUILD_TYPE-build"                       \
+                     --report-file bloat_report.txt                                                \
+                     --github-api-token "${{ secrets.GITHUB_TOKEN }}"                              \
+                     --github-repository "${{ github.repository }}"                                \
+                     --github-ref "${{ github.ref }}"                                              \
+                     --git-fork-poin "remotes/origin/${{ github.base_ref }}"
+            - name: Copy aside bloat report & binaries
+              run: |
+                  cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
+            - name: Uploading Binaries
+              uses: actions/upload-artifact@v1
+              with:
+                  name: ${{ env.BUILD_TYPE }}-example-build-${{ github.sha }}
+                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
+

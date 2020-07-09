@@ -10,14 +10,11 @@ jobs:
 
         env:
             BUILD_TYPE: esp32-qemu
-            BUILD_VERSION: 0.3.0
-            BUILD_IMAGE: chip-build-esp32-qemu
-            BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-esp32-qemu:0.3.0 # $BUILD_IMAGE/$BUILD_ORG:$BUILD_VERSION
+            image: connectedhomeip/chip-build-esp32-qemu:0.3.0
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -37,3 +34,4 @@ jobs:
               with:
                   name: qemu-esp32-logs
                   path: /tmp/log_output
+
