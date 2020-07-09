@@ -29,6 +29,14 @@ EXTRA_DIST                                   = \
     nlbuild-autotools                          \
     $(NULL)
 
+if CHIP_DEVICE_LAYER_TARGET_LINUX
+if CHIP_WITH_OT_BR_POSIX
+EXTRA_DIST                                   += \
+    inipp                                       \
+    $(NULL)
+endif # CHIP_WITH_OT_BR_POSIX
+endif # CHIP_DEVICE_LAYER_TARGET_LINUX
+
 # Always package (e.g. for 'make dist') these subdirectories.
 
 DIST_SUBDIRS                                 = \

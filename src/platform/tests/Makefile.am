@@ -76,9 +76,15 @@ AM_CPPFLAGS                                   += \
 if CHIP_WITH_OT_BR_POSIX
 AM_CPPFLAGS                                   += \
     $(DBUS_CFLAGS)                               \
-    $(OT_BR_POSIX_CPPFLAGS)                     \
+    $(OT_BR_POSIX_CPPFLAGS)                      \
     $(NULL)
+
 libPlatformTests_a_SOURCES += TestThreadStackMgr.cpp
+
+dist_libPlatformTests_a_HEADERS                += \
+    TestThreadStackMgr.h                          \
+    $(NULL)
+
 endif # CHIP_WITH_OT_BR_POSIX
 endif # CHIP_DEVICE_LAYER_TARGET_LINUX
 
@@ -91,27 +97,25 @@ CHIP_LDADD                                      = \
     $(NULL)
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
-CHIP_LDADD                                    += \
-    $(GIO_CFLAGS) $(GIO_LIBS)                    \
-    $(NULL)
-
-if CHIP_WITH_OT_BR_POSIX
-CHIP_LDADD                                    += \
-    $(DBUS_LIBS)                                 \
-    $(OT_BR_POSIX_LDFLAGS) $(OT_BR_POSIX_LIBS) \
-    $(NULL)
-endif # CHIP_WITH_OT_BR_POSIX
-endif # CHIP_DEVICE_LAYER_TARGET_LINUX
 
 COMMON_LDADD                                          = \
     libPlatformTests.a                                  \
     $(CHIP_LDADD)                                       \
+    $(GIO_CFLAGS) $(GIO_LIBS)                           \
     $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS)\
     $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)          \
     $(LWIP_LDFLAGS) $(LWIP_LIBS)                        \
     $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                  \
     $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                   \
     $(NULL)
+
+if CHIP_WITH_OT_BR_POSIX
+COMMON_LDADD                                   += \
+    $(DBUS_LIBS)                                  \
+    $(OT_BR_POSIX_LDFLAGS) $(OT_BR_POSIX_LIBS)    \
+    $(NULL)
+endif # CHIP_WITH_OT_BR_POSIX
+endif # CHIP_DEVICE_LAYER_TARGET_LINUX
 
 # Test applications that should be run when the 'check' target is run.
 

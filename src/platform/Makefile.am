@@ -42,14 +42,26 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/include/platform/PersistedStorage.h \
     @top_srcdir@/src/include/platform/SoftwareUpdateManager.h \
     @top_srcdir@/src/include/platform/TimeSyncManager.h \
+    @top_srcdir@/src/include/platform/ThreadStackManager.h \
     @top_srcdir@/src/include/platform/CHIPDeviceConfig.h \
     @top_srcdir@/src/include/platform/CHIPDeviceError.h \
     @top_srcdir@/src/include/platform/CHIPDeviceEvent.h \
     @top_srcdir@/src/include/platform/CHIPDeviceLayer.h \
     @top_srcdir@/src/include/platform/internal/BLEManager.h \
+    @top_srcdir@/src/include/platform/internal/CHIPDeviceLayerInternal.h \
+    @top_srcdir@/src/include/platform/internal/DeviceNetworkInfo.h \
     @top_srcdir@/src/include/platform/internal/EventLogging.h \
     @top_srcdir@/src/include/platform/internal/GenericConfigurationManagerImpl.h \
     @top_srcdir@/src/include/platform/internal/GenericConfigurationManagerImpl.ipp \
+    @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl.h \
+    @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_BLE.h \
+    @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_BLE.ipp \
+    @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_NoBLE.h \
+    @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_NoThread.h \
+    @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_NoTunnel.h \
+    @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_NoWiFi.h \
+    @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_Thread.h \
+    @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_Thread.ipp \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl.h \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl.ipp \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_POSIX.h \
@@ -58,11 +70,16 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/include/platform/internal/GenericSoftwareUpdateManagerImpl.ipp \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp \
-    @top_srcdir@/src/include/platform/internal/CHIPDeviceLayerInternal.h \
+    @top_srcdir@/src/platform/Darwin/BlePlatformConfig.h \
     @top_srcdir@/src/platform/Darwin/CHIPDevicePlatformConfig.h \
     @top_srcdir@/src/platform/Darwin/CHIPDevicePlatformEvent.h \
+    @top_srcdir@/src/platform/Darwin/CHIPPlatformConfig.h \
     @top_srcdir@/src/platform/Darwin/ConfigurationManagerImpl.h \
+    @top_srcdir@/src/platform/Darwin/ConnectivityManagerImpl.h \
+    @top_srcdir@/src/platform/Darwin/InetPlatformConfig.h \
     @top_srcdir@/src/platform/Darwin/PlatformManagerImpl.h \
+    @top_srcdir@/src/platform/Darwin/PosixConfig.h \
+    @top_srcdir@/src/platform/Darwin/SystemPlatformConfig.h \
     @top_srcdir@/src/platform/nRF5/ConnectivityManagerImpl.h \
     @top_srcdir@/src/platform/nRF5/nRF5Config.h \
     @top_srcdir@/src/platform/nRF5/CHIPDevicePlatformConfig.h \
@@ -91,10 +108,21 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/platform/ESP32/NetworkProvisioningServerImpl.h \
     @top_srcdir@/src/platform/ESP32/ESP32Utils.h \
     @top_srcdir@/src/platform/ESP32/ESP32Config.h \
+    @top_srcdir@/src/platform/Linux/BLEManagerImpl.h \
+    @top_srcdir@/src/platform/Linux/BlePlatformConfig.h \
+    @top_srcdir@/src/platform/Linux/CHIPLinuxStorage.h \
+    @top_srcdir@/src/platform/Linux/CHIPLinuxStorageIni.h \
     @top_srcdir@/src/platform/Linux/CHIPDevicePlatformConfig.h \
     @top_srcdir@/src/platform/Linux/CHIPDevicePlatformEvent.h \
+    @top_srcdir@/src/platform/Linux/CHIPPlatformConfig.h \
     @top_srcdir@/src/platform/Linux/ConfigurationManagerImpl.h \
+    @top_srcdir@/src/platform/Linux/ConnectivityManagerImpl.h \
+    @top_srcdir@/src/platform/Linux/InetPlatformConfig.h \
     @top_srcdir@/src/platform/Linux/PlatformManagerImpl.h \
+    @top_srcdir@/src/platform/Linux/PosixConfig.h \
+    @top_srcdir@/src/platform/Linux/SystemPlatformConfig.h \
+    @top_srcdir@/src/platform/Linux/ThreadStackManagerImpl.h \
+    @top_srcdir@/src/include/platform/internal/testing/ConfigUnitTest.h \
     $(NULL)
 
 if CONFIG_DEVICE_LAYER
