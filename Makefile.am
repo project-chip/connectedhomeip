@@ -45,11 +45,14 @@ EXTRA_DIST                               = \
     CODE_OF_CONDUCT.md                     \
     CONTRIBUTING.md                        \
     Makefile-Android                       \
+    Makefile-bootstrap                     \
     Makefile-Standalone                    \
     README.md                              \
     .default-version                       \
     bootstrap                              \
     bootstrap-configure                    \
+    repos.conf                             \
+    .gitmodules                            \
     $(srcdir)/build/autoconf               \
     $(srcdir)/config                       \
     $(srcdir)/config/efr32                 \
@@ -197,6 +200,13 @@ dist-hook: $(distdir)/.dist-version
 # to 'third_party', uncomment and adapt or delete this, as needed. If you choose
 # to use this, please also take a look at Makefile.am and third_party/Makefile.am
 # and uncomment the appropriate sections there.
+
+#
+# Ensure any locally synchronized repositories defined by 'repos.conf'
+# are cleaned up.
+#
+distclean-local:
+	$(MAKE) -C $(srcdir) -f Makefile-bootstrap clean-repos
 
 #
 # Top-level convenience target for making a documentation-only

@@ -52,7 +52,7 @@
 	branch = master
 	ignore = dirty
 	commit = 5f0e36eeb236a507631e9c822e43f742b7b6738a
-[submodule "third_party/ot-br-posix/repo"]
+[submodule "ot-br-posix"]
 	path = third_party/ot-br-posix/repo
 	url = https://github.com/openthread/ot-br-posix.git
 	branch = master
