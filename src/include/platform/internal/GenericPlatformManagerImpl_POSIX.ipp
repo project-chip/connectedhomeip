@@ -73,6 +73,8 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack(void)
     err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
     SuccessOrExit(err);
 
+    mShouldRunEventLoop = true;
+
 exit:
     return err;
 }
@@ -190,20 +192,22 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop(void)
 {
     Impl()->LockChipStack();
 
-    // TODO(#742): add exit condition
-    while (true)
+    do
     {
         SysUpdate();
         SysProcess();
-    }
+    } while (mShouldRunEventLoop);
 
     Impl()->UnlockChipStack();
+
+    pthread_exit(0);
 }
 
 template <class ImplClass>
 void * GenericPlatformManagerImpl_POSIX<ImplClass>::EventLoopTaskMain(void * arg)
 {
     ChipLogDetail(DeviceLayer, "CHIP task running");
+
     static_cast<GenericPlatformManagerImpl_POSIX<ImplClass> *>(arg)->Impl()->RunEventLoop();
     return NULL;
 }
@@ -220,6 +224,18 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartEventLoopTask(void
     SuccessOrExit(err);
     err = pthread_create(&mChipTask, &mChipTaskAttr, EventLoopTaskMain, this);
     SuccessOrExit(err);
+exit:
+    return System::MapErrorPOSIX(err);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown(void)
+{
+    int err;
+    mShouldRunEventLoop = false;
+    err                 = pthread_join(mChipTask, NULL);
+    SuccessOrExit(err);
+
 exit:
     return System::MapErrorPOSIX(err);
 }
