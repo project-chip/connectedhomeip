@@ -93,7 +93,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     # Set this to false to disable all builds by default.
     enable_default_builds = true
 
-    # Set this to false to disable all builds by default.
+    # Set this to true to enable nRF5 builds by default.
     enable_nrf5_builds = false
   }
 
