@@ -39,9 +39,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericPlatformManagerImpl<PlatformManagerImpl>;
-
 extern CHIP_ERROR InitEntropy();
 
 template <class ImplClass>
@@ -269,6 +266,9 @@ void GenericPlatformManagerImpl<ImplClass>::HandleMessageLayerActivityChanged(bo
 #endif
     }
 }
+
+// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
+template class GenericPlatformManagerImpl<PlatformManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer

@@ -45,7 +45,7 @@ UDP::~UDP()
     }
 }
 
-CHIP_ERROR UDP::Init(Inet::InetLayer * inetLayer, const UdpListenParameters & params)
+CHIP_ERROR UDP::Init(UdpListenParameters & params)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -53,7 +53,7 @@ CHIP_ERROR UDP::Init(Inet::InetLayer * inetLayer, const UdpListenParameters & pa
 
     mSendPort = params.GetMessageSendPort();
 
-    err = inetLayer->NewUDPEndPoint(&mUDPEndPoint);
+    err = params.GetInetLayer()->NewUDPEndPoint(&mUDPEndPoint);
     SuccessOrExit(err);
 
     err = mUDPEndPoint->Bind(params.GetAddressType(), IPAddress::Any, params.GetListenPort(), params.GetInterfaceId());
@@ -64,6 +64,7 @@ CHIP_ERROR UDP::Init(Inet::InetLayer * inetLayer, const UdpListenParameters & pa
 
     mUDPEndPoint->AppState          = reinterpret_cast<void *>(this);
     mUDPEndPoint->OnMessageReceived = OnUdpReceive;
+    mUDPEndpointType                = params.GetAddressType();
 
     mState = State::kInitialized;
 

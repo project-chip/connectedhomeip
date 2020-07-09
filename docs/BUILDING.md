@@ -30,7 +30,7 @@ want:
 -   GNU make (versions prior to 4.1 may produce spurious warnings/errors)
 -   automake, autoconf, libtool
 -   C and C++ compilers
--   clang-format-9
+-   clang-format (at least version 9)
 -   gcov
 -   pkg-config
 
@@ -178,7 +178,7 @@ make pretty
 
 -   [x] **Build documentation distribution from code headers**
 
-To build the documentation bundle using doxygen, run the following:
+To build the documentation bundle using Doxygen, run the following:
 
 ```
 make docdist
@@ -273,6 +273,30 @@ export ANDROID_HOME=~/Library/Android/sdk
 export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/21.0.6113669
 
 make -f Makefile-Android
+```
+
+### Generate the documentation
+
+The Doxygen documentation is generated automatically if Doxygen is detected on
+the system. The generated documentation can be found into
+`${top_builddir}/docs/html` where `${top_builddir}` varies depending on how the
+project was built.
+
+#### How to install Doxygen on Linux
+
+On Debian-based Linux distributions such as Ubuntu, Doxygen can be installed
+with the following:
+
+```
+sudo apt-get install doxygen
+```
+
+#### How to install Doxygen on macOS
+
+On macOS, Doxygen can be installed and satisfied using [Brew](https://brew.sh/):
+
+```
+brew install doxygen
 ```
 
 ## Maintaining CHIP

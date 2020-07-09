@@ -14,7 +14,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.2.17
+            image: connectedhomeip/chip-build-esp32:0.3.0
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -24,7 +24,8 @@ jobs:
               uses: actions/checkout@v2
               # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
               with:
-                  fetch-depth: 0
+                 fetch-depth: 0
+                 submodules: true
             - name: Build example Echo App
               run: scripts/examples/esp_echo_app.sh
             - name: Copy aside build products
@@ -63,7 +64,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.2.17
+            image: connectedhomeip/chip-build-nrf-platform:0.3.0
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -73,7 +74,8 @@ jobs:
               uses: actions/checkout@v2
               # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
               with:
-                  fetch-depth: 0
+                 fetch-depth: 0
+                 submodules: true
             - name: Build example nRF5 Lock App
               run: scripts/examples/nrf_lock_app.sh
             - name: Copy aside build products
@@ -112,7 +114,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.2.17
+            image: connectedhomeip/chip-build:0.3.0
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -122,7 +124,8 @@ jobs:
               uses: actions/checkout@v2
               # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
               with:
-                  fetch-depth: 0
+                 fetch-depth: 0
+                 submodules: true
             - name: Build example Standalone Echo Client
               run: scripts/examples/standalone_echo_client.sh
             - name: Build example Standalone Shell

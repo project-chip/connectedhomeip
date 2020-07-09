@@ -92,8 +92,10 @@ extern void DisplayStatusMessage(char * msg, uint16_t vpos);
 /**
  * @brief
  *  Reset the display timeout and set the brightness back up to default values
+ *
+ * @return true     If the display was woken
  */
-extern void WakeDisplay();
+extern bool WakeDisplay();
 
 #endif // #if CONFIG_HAVE_DISPLAY
 

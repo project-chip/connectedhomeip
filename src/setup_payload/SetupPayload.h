@@ -72,16 +72,14 @@ const int kTotalPayloadDataSizeInBytes = kTotalPayloadDataSizeInBits / 8;
 
 const char * const kQRCodePrefix = "CH:";
 
-/**
- * The rendezvous type this device supports.
- */
+/// The rendezvous type this device supports.
 enum class RendezvousInformationFlags : uint16_t
 {
-    kNone     = 0,      //< Device does not support any method for rendezvous
-    kWiFi     = 1 << 0, //< Device supports Wi-Fi
-    kBLE      = 1 << 1, //< Device supports BLE
-    kThread   = 1 << 2, //< Device supports Thread
-    kEthernet = 1 << 3, //< Device MAY be attached to a wired 802.3 connection
+    kNone     = 0,      ///< Device does not support any method for rendezvous
+    kWiFi     = 1 << 0, ///< Device supports Wi-Fi
+    kBLE      = 1 << 1, ///< Device supports BLE
+    kThread   = 1 << 2, ///< Device supports Thread
+    kEthernet = 1 << 3, ///< Device MAY be attached to a wired 802.3 connection
 
     kAllMask = kWiFi | kBLE | kThread | kEthernet,
 };

@@ -1,0 +1,183 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/nrf5_sdk.gni")
+
+declare_args() {
+  # Location of the nRF5 SDK.
+  nrf5_sdk_root = ""
+}
+
+if (nrf5_sdk_root == "") {
+  nrf5_sdk_root = getenv("NRF5_SDK_ROOT")
+}
+
+assert(nrf5_sdk_root != "", "nrf5_sdk_root must be specified")
+
+# Defines an nRF SDK build target.
+#
+# Parameters:
+#   nrf5_sdk_root - The location of the nRF SDK.
+#   sources - The sources files to build.
+template("nrf5_sdk") {
+  if (defined(invoker.nrf5_sdk_root)) {
+    nrf5_sdk_root = invoker.nrf5_sdk_root
+  }
+
+  assert(nrf5_sdk_root != "", "nrf5_sdk_root must be specified")
+
+  sdk_target_name = target_name
+
+  config("${sdk_target_name}_config") {
+    include_dirs = []
+    if (defined(invoker.include_dirs)) {
+      include_dirs += invoker.include_dirs
+    }
+    include_dirs += [
+      "${nrf5_sdk_root}/components",
+      "${nrf5_sdk_root}/components/boards",
+      "${nrf5_sdk_root}/components/ble/ble_advertising",
+      "${nrf5_sdk_root}/components/ble/common",
+      "${nrf5_sdk_root}/components/ble/nrf_ble_gatt",
+      "${nrf5_sdk_root}/components/libraries/atomic",
+      "${nrf5_sdk_root}/components/libraries/atomic_fifo",
+      "${nrf5_sdk_root}/components/libraries/balloc",
+      "${nrf5_sdk_root}/components/libraries/bsp",
+      "${nrf5_sdk_root}/components/libraries/button",
+      "${nrf5_sdk_root}/components/libraries/crc16",
+      "${nrf5_sdk_root}/components/libraries/delay",
+      "${nrf5_sdk_root}/components/libraries/experimental_section_vars",
+      "${nrf5_sdk_root}/components/libraries/fds",
+      "${nrf5_sdk_root}/components/libraries/fstorage",
+      "${nrf5_sdk_root}/components/libraries/log",
+      "${nrf5_sdk_root}/components/libraries/log/src",
+      "${nrf5_sdk_root}/components/libraries/memobj",
+      "${nrf5_sdk_root}/components/libraries/mem_manager",
+      "${nrf5_sdk_root}/components/libraries/mutex",
+      "${nrf5_sdk_root}/components/libraries/queue",
+      "${nrf5_sdk_root}/components/libraries/ringbuf",
+      "${nrf5_sdk_root}/components/libraries/stack_info",
+      "${nrf5_sdk_root}/components/libraries/strerror",
+      "${nrf5_sdk_root}/components/libraries/timer",
+      "${nrf5_sdk_root}/components/libraries/util",
+      "${nrf5_sdk_root}/components/softdevice/common",
+      "${nrf5_sdk_root}/components/softdevice/s140/headers",
+      "${nrf5_sdk_root}/components/softdevice/s140/headers/nrf52",
+      "${nrf5_sdk_root}/components/softdevice/mbr/nrf52840/headers",
+      "${nrf5_sdk_root}/components/thread/freertos_mbedtls_mutex",
+      "${nrf5_sdk_root}/components/toolchain/cmsis/include",
+      "${nrf5_sdk_root}/config/nrf52840/config",
+      "${nrf5_sdk_root}/external/fprintf",
+      "${nrf5_sdk_root}/external/freertos/config",
+      "${nrf5_sdk_root}/external/freertos/portable/CMSIS/nrf52",
+      "${nrf5_sdk_root}/external/freertos/portable/GCC/nrf52",
+      "${nrf5_sdk_root}/external/freertos/source/include",
+      "${nrf5_sdk_root}/external/segger_rtt",
+      "${nrf5_sdk_root}/integration/nrfx",
+      "${nrf5_sdk_root}/integration/nrfx/legacy",
+      "${nrf5_sdk_root}/modules/nrfx",
+      "${nrf5_sdk_root}/modules/nrfx/drivers/include",
+      "${nrf5_sdk_root}/modules/nrfx/hal",
+      "${nrf5_sdk_root}/modules/nrfx/mdk",
+    ]
+
+    lib_dirs = [ "${nrf5_sdk_root}/modules/nrfx/mdk" ]
+
+    defines = [
+      "NRF52840_XXAA",
+      "BOARD_PCA10056",
+      "BSP_DEFINES_ONLY",
+      "CONFIG_GPIO_AS_PINRESET",
+      "FLOAT_ABI_HARD",
+      "__HEAP_SIZE=40960",
+      "__STACK_SIZE=8192",
+      "SOFTDEVICE_PRESENT",
+      "PRINTF_DISABLE_SUPPORT_EXPONENTIAL",
+      "S140",
+    ]
+    if (defined(invoker.defines)) {
+      defines += invoker.defines
+    }
+    cflags = [ "-Wno-array-bounds" ]
+  }
+
+  # TODO - Break up this monolith and make it configurable.
+  static_library(sdk_target_name) {
+    sources = [
+      "${nrf5_sdk_root}/components/ble/common/ble_advdata.c",
+      "${nrf5_sdk_root}/components/ble/common/ble_srv_common.c",
+      "${nrf5_sdk_root}/components/ble/nrf_ble_gatt/nrf_ble_gatt.c",
+      "${nrf5_sdk_root}/components/boards/boards.c",
+      "${nrf5_sdk_root}/components/libraries/atomic/nrf_atomic.c",
+      "${nrf5_sdk_root}/components/libraries/atomic_fifo/nrf_atfifo.c",
+      "${nrf5_sdk_root}/components/libraries/balloc/nrf_balloc.c",
+      "${nrf5_sdk_root}/components/libraries/button/app_button.c",
+      "${nrf5_sdk_root}/components/libraries/crc16/crc16.c",
+      "${nrf5_sdk_root}/components/libraries/experimental_section_vars/nrf_section_iter.c",
+      "${nrf5_sdk_root}/components/libraries/fds/fds.c",
+      "${nrf5_sdk_root}/components/libraries/fstorage/nrf_fstorage.c",
+      "${nrf5_sdk_root}/components/libraries/fstorage/nrf_fstorage_sd.c",
+      "${nrf5_sdk_root}/components/libraries/log/src/nrf_log_backend_rtt.c",
+      "${nrf5_sdk_root}/components/libraries/log/src/nrf_log_backend_serial.c",
+      "${nrf5_sdk_root}/components/libraries/log/src/nrf_log_default_backends.c",
+      "${nrf5_sdk_root}/components/libraries/log/src/nrf_log_frontend.c",
+      "${nrf5_sdk_root}/components/libraries/log/src/nrf_log_str_formatter.c",
+      "${nrf5_sdk_root}/components/libraries/mem_manager/mem_manager.c",
+      "${nrf5_sdk_root}/components/libraries/memobj/nrf_memobj.c",
+      "${nrf5_sdk_root}/components/libraries/queue/nrf_queue.c",
+      "${nrf5_sdk_root}/components/libraries/ringbuf/nrf_ringbuf.c",
+      "${nrf5_sdk_root}/components/libraries/strerror/nrf_strerror.c",
+      "${nrf5_sdk_root}/components/libraries/timer/app_timer_freertos.c",
+      "${nrf5_sdk_root}/components/libraries/uart/retarget.c",
+      "${nrf5_sdk_root}/components/libraries/util/app_error.c",
+      "${nrf5_sdk_root}/components/libraries/util/app_error_handler_gcc.c",
+      "${nrf5_sdk_root}/components/libraries/util/app_error_weak.c",
+      "${nrf5_sdk_root}/components/libraries/util/app_util_platform.c",
+      "${nrf5_sdk_root}/components/libraries/util/nrf_assert.c",
+      "${nrf5_sdk_root}/components/softdevice/common/nrf_sdh.c",
+      "${nrf5_sdk_root}/components/softdevice/common/nrf_sdh_ble.c",
+      "${nrf5_sdk_root}/components/softdevice/common/nrf_sdh_soc.c",
+      "${nrf5_sdk_root}/external/fprintf/nrf_fprintf.c",
+      "${nrf5_sdk_root}/external/fprintf/nrf_fprintf_format.c",
+      "${nrf5_sdk_root}/external/freertos/portable/CMSIS/nrf52/port_cmsis.c",
+      "${nrf5_sdk_root}/external/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c",
+      "${nrf5_sdk_root}/external/freertos/portable/GCC/nrf52/port.c",
+      "${nrf5_sdk_root}/external/freertos/source/croutine.c",
+      "${nrf5_sdk_root}/external/freertos/source/event_groups.c",
+      "${nrf5_sdk_root}/external/freertos/source/list.c",
+      "${nrf5_sdk_root}/external/freertos/source/portable/MemMang/heap_3.c",
+      "${nrf5_sdk_root}/external/freertos/source/queue.c",
+      "${nrf5_sdk_root}/external/freertos/source/stream_buffer.c",
+      "${nrf5_sdk_root}/external/freertos/source/tasks.c",
+      "${nrf5_sdk_root}/external/freertos/source/timers.c",
+      "${nrf5_sdk_root}/external/segger_rtt/SEGGER_RTT.c",
+      "${nrf5_sdk_root}/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c",
+      "${nrf5_sdk_root}/external/segger_rtt/SEGGER_RTT_printf.c",
+      "${nrf5_sdk_root}/integration/nrfx/legacy/nrf_drv_clock.c",
+      "${nrf5_sdk_root}/integration/nrfx/legacy/nrf_drv_rng.c",
+      "${nrf5_sdk_root}/modules/nrfx/drivers/src/nrfx_clock.c",
+      "${nrf5_sdk_root}/modules/nrfx/drivers/src/nrfx_gpiote.c",
+      "${nrf5_sdk_root}/modules/nrfx/drivers/src/nrfx_uart.c",
+      "${nrf5_sdk_root}/modules/nrfx/drivers/src/nrfx_uarte.c",
+      "${nrf5_sdk_root}/modules/nrfx/drivers/src/prs/nrfx_prs.c",
+      "${nrf5_sdk_root}/modules/nrfx/mdk/gcc_startup_nrf52840.S",
+      "${nrf5_sdk_root}/modules/nrfx/mdk/system_nrf52840.c",
+    ]
+    if (defined(invoker.sources)) {
+      sources += invoker.sources
+    }
+
+    public_configs = [ ":${sdk_target_name}_config" ]
+  }
+}

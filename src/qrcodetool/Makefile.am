@@ -23,6 +23,12 @@ qrcodetool_LDADD = \
     $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS)    \
     $(NULL)
 
+if CHIP_WITH_ANDROID
+qrcodetool_LDADD                                         += \
+    -llog                                                   \
+    $(NULL)
+endif #CHIP_WITH_ANDROID
+
 NLFOREIGN_FILE_DEPENDENCIES = \
       $(top_builddir)/src/setup_payload/libSetupPayload.a   \
       $(top_builddir)/src/lib/libCHIP.a                     \

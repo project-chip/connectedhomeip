@@ -17,25 +17,26 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-openssl:0.2.17
+            image: connectedhomeip/chip-build:0.3.0
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-            - name: Setup Build Type
+              with:
+                 submodules: true
+            - name: Bootstrap
               run: |
                   case $BUILD_TYPE in
                      "main") export BOOTSTRAP_ARGUMENTS="";;
-                     "clang") export BOOTSTRAP_ARGUMENTS="CC=clang-9 CXX=clang++-9";;
+                     "clang") export BOOTSTRAP_ARGUMENTS="CC=clang CXX=clang++";;
                      "linux-embedded") export BOOTSTRAP_ARGUMENTS="--with-device-layer=linux";;
                      "mbedtls") export BOOTSTRAP_ARGUMENTS="--with-crypto=mbedtls";;
                      *) ;;
                   esac
 
-            - name: Bootstrap
-              run: scripts/build/bootstrap.sh $BOOTSTRAP_ARGUMENTS
+                  scripts/build/bootstrap.sh $BOOTSTRAP_ARGUMENTS
             - name: Run Build
               run: scripts/build/default.sh
             - name: Run mbedTLS Tests

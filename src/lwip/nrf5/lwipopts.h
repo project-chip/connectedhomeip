@@ -129,7 +129,10 @@
 
 // TODO: make LWIP_DEBUG conditional on build type
 
+#ifndef LWIP_DEBUG
 #define LWIP_DEBUG 1
+#endif
+
 #define MEMP_OVERFLOW_CHECK (0)
 #define MEMP_SANITY_CHECK (0)
 #define MEM_DEBUG (LWIP_DBG_OFF)

@@ -1,0 +1,98 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/nlio.gni")
+
+import("${chip_root}/gn/chip/device.gni")
+
+if (device_platform != "none") {
+  declare_args() {
+    # Extra header to include in CHIPDeviceConfig.h for project.
+    chip_device_project_config_include = ""
+
+    # Extra header to include in CHIPDeviceConfig.h for platform.
+    chip_device_platform_config_include = ""
+  }
+
+  config("platform_config") {
+    configs = [ "${chip_root}/src:includes" ]
+
+    defines = []
+    if (chip_device_project_config_include != "") {
+      defines += [ "CHIP_DEVICE_PROJECT_CONFIG_INCLUDE=${chip_device_project_config_include}" ]
+    }
+    if (chip_device_platform_config_include != "") {
+      defines += [ "CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE=${chip_device_platform_config_include}" ]
+    }
+
+    if (device_platform == "nrf5") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_NRF5=1",
+        "CHIP_DEVICE_LAYER_TARGET=nRF5",
+      ]
+    } else {
+      defines += [ "CHIP_DEVICE_LAYER_TARGET_NRF5=0" ]
+    }
+  }
+
+  static_library("platform") {
+    output_name = "libDeviceLayer"
+
+    sources = [
+      "GeneralUtils.cpp",
+      "Globals.cpp",
+      "PersistedStorage.cpp",
+      "SystemEventSupport.cpp",
+      "SystemTimerSupport.cpp",
+    ]
+
+    public_deps = [
+      "${chip_root}/src/ble",
+      "${chip_root}/src/lib/core:chip_config_header",
+      "${chip_root}/src/lib/support",
+      "${nlio_root}:nlio",
+    ]
+
+    public_configs = [ ":platform_config" ]
+
+    if (device_platform == "nrf5") {
+      sources += [
+        "FreeRTOS/SystemTimeSupport.cpp",
+        "nRF5/BLEManagerImpl.cpp",
+        "nRF5/BLEManagerImpl.h",
+        "nRF5/BlePlatformConfig.h",
+        "nRF5/CHIPDevicePlatformConfig.h",
+        "nRF5/CHIPDevicePlatformEvent.h",
+        "nRF5/CHIPPlatformConfig.h",
+        "nRF5/ConfigurationManagerImpl.cpp",
+        "nRF5/ConfigurationManagerImpl.h",
+        "nRF5/ConnectivityManagerImpl.cpp",
+        "nRF5/ConnectivityManagerImpl.h",
+        "nRF5/InetPlatformConfig.h",
+        "nRF5/Logging.cpp",
+        "nRF5/PlatformManagerImpl.cpp",
+        "nRF5/PlatformManagerImpl.h",
+        "nRF5/SystemPlatformConfig.h",
+        "nRF5/nRF5Config.cpp",
+        "nRF5/nRF5Config.h",
+        "nRF5/nRF5Utils.cpp",
+        "nRF5/nRF5Utils.h",
+      ]
+    }
+  }
+} else {
+  group("platform") {
+  }
+}

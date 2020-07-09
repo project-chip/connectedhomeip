@@ -16,6 +16,8 @@
 # limitations under the License.
 #
 
+# Internal script for pull_submodules.sh. Not intended to be used directly.
+
 set -e
 
 CHIP_ROOT="$(dirname "$0")/../.."

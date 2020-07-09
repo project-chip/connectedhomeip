@@ -43,6 +43,7 @@
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/Tuple.h>
 #include <transport/UDP.h>
 
 #include "DataModelHandler.h"
@@ -134,7 +135,7 @@ class EchoServerCallback : public SecureSessionMgrCallback
 {
 public:
     void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
-                           SecureSessionMgr * mgr) override
+                           SecureSessionMgrBase * mgr) override
     {
         CHIP_ERROR err;
         const size_t data_len = buffer->DataLength();
@@ -191,13 +192,13 @@ public:
         }
     }
 
-    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * mgr) override
+    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgrBase * mgr) override
     {
         ESP_LOGE(TAG, "ERROR: %s\n Got UDP error", ErrorStr(error));
         statusLED.BlinkOnError();
     }
 
-    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override
+    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override
     {
         CHIP_ERROR err;
 
@@ -237,25 +238,28 @@ private:
     }
 };
 
-static EchoServerCallback gCallbacks;
+EchoServerCallback gCallbacks;
+
+SecureSessionMgr<Transport::UDP, // IPV6
+                 Transport::UDP  // IPV4
+                 >
+    sessions;
 
 } // namespace
 
 // The echo server assumes the platform's networking has been setup already
-void setupTransport(IPAddressType type, SecureSessionMgr * transport)
+void startServer()
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
-    struct netif * netif = NULL;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    struct netif * ipV6NetIf = NULL;
+    tcpip_adapter_get_netif(TCPIP_ADAPTER_IF_AP, (void **) &ipV6NetIf);
 
-    if (type == kIPAddressType_IPv6)
-    {
-        tcpip_adapter_get_netif(TCPIP_ADAPTER_IF_AP, (void **) &netif);
-    }
-
-    err = transport->Init(kLocalNodeId, &DeviceLayer::InetLayer, UdpListenParameters().SetAddressType(type).SetInterfaceId(netif));
+    err = sessions.Init(kLocalNodeId, &DeviceLayer::SystemLayer,
+                        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6).SetInterfaceId(ipV6NetIf),
+                        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv4));
     SuccessOrExit(err);
 
-    transport->SetDelegate(&gCallbacks);
+    sessions.SetDelegate(&gCallbacks);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -266,11 +270,4 @@ exit:
     {
         ESP_LOGI(TAG, "Echo Server Listening...");
     }
-}
-
-// The echo server assumes the platform's networking has been setup already
-void startServer(SecureSessionMgr * transport_ipv4, SecureSessionMgr * transport_ipv6)
-{
-    setupTransport(kIPAddressType_IPv6, transport_ipv6);
-    setupTransport(kIPAddressType_IPv4, transport_ipv4);
 }

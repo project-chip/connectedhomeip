@@ -34,14 +34,8 @@
 	branch = master
 	ignore = dirty
 	commit = 08ac806145aa6ab5d3e9df61d023092bb6cfe761
-[submodule "m5stack-tft"]
-	path = examples/common/m5stack-tft/repo
-	url = https://github.com/jeremyjh/ESP32_TFT_library.git
-	branch = master
-	ignore = dirty
-	commit = 35be9760b4edf485287f78c0cf652beb19c047f0
 [submodule "pigweed"]
-	path = third_party/pigweed
+	path = third_party/pigweed/repo
 	url = https://pigweed.googlesource.com/pigweed/pigweed
 	branch = master
 	ignore = dirty
@@ -52,3 +46,9 @@
 	branch = master
 	ignore = dirty
 	commit = 5f0e36eeb236a507631e9c822e43f742b7b6738a
+[submodule "ot-br-posix"]
+	path = third_party/ot-br-posix/repo
+	url = https://github.com/openthread/ot-br-posix.git
+	branch = master
+	ignore = dirty
+	commit = 38e91052d1fb12a55c4e34073f9e399471650b4b
