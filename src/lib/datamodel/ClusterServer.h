@@ -17,8 +17,8 @@
 
 /**
  *    @file
- *      This file contains the ClusterServer class. The ClusterServer
- *      maintains all the cluster servers that this devices exposes.
+ *      This file contains the Cluster Server class. The Cluster Server maintains all the cluster
+ *      servers that this devices exposes.
  *
  */
 
@@ -35,6 +35,12 @@ static const uint8_t kMaxEndPointPerServer = 5;
 /* TODO: If endpoint numbers range up to 256, it may be better not to use array index as the endpoint id */
 /* Skip the reserved endPointId */
 static const uint8_t kEndPointIdStart = 1;
+
+/**
+ * @brief
+ *   This class implements the Cluster Server that maintains all the server endpoints of this
+ *   device.
+ */
 class ClusterServer
 {
 public:
@@ -57,7 +63,12 @@ public:
         }
     }
 
-    /* By default always add to the kEndPointIdStartth endpoint, for simplicity */
+    /**
+     * @brief
+     *   Add clusters to endpointId 1 of this Cluster Server
+     *
+     * @param cluster Pointer to the cluster object being added
+     */
     CHIP_ERROR AddCluster(Cluster * cluster)
     {
         if (!cluster)
@@ -68,6 +79,12 @@ public:
         return mEndPoints[kEndPointIdStart]->AddCluster(cluster);
     }
 
+    /**
+     * @brief
+     *   Add a new endpoint to this Cluster Server
+     *
+     * @param cluster Pointer to the endpoint object being added
+     */
     CHIP_ERROR AddEndPoint(EndPoint * endPoint)
     {
         for (int i = kEndPointIdStart; i < kMaxEndPointPerServer; i++)

@@ -59,7 +59,10 @@ static inline Attribute * CHIPAttributeHWVersionNew(uint8_t HWVersion)
     return new Attribute(0x0003, ValueUInt8(HWVersion));
 }
 
-/* The Cluster Basic class */
+/**
+ * @brief
+ *   This class implements the Base cluster as defined in the CHIP specification.
+ */
 class ClusterBasic : public Cluster
 {
 public:
