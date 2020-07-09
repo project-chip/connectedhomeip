@@ -32,6 +32,11 @@ namespace DataModel {
 
 /* TODO: To be converted to a template version or Kconfig later on */
 static const uint8_t kMaxClustersPerEndPoint = 5;
+
+/**
+ * @brief
+ *   This class implements the endpoint that maintains all the clusters supported by this endpoint.
+ */
 class EndPoint
 {
 public:
@@ -57,6 +62,12 @@ public:
         }
     }
 
+    /**
+     * @brief
+     *   Add clusters to this endpoint
+     *
+     * @param cluster Pointer to the cluster object being added
+     */
     CHIP_ERROR AddCluster(Cluster * cluster)
     {
         for (int i = 0; i < kMaxClustersPerEndPoint; i++)
@@ -70,6 +81,12 @@ public:
         return CHIP_ERROR_INTERNAL;
     }
 
+    /**
+     * @brief
+     *   Get pointer to the cluster object
+     *
+     * @param clusterId the cluster identifer that we are looking for
+     */
     Cluster * GetCluster(uint8_t clusterId)
     {
         for (int i = 0; i < kMaxClustersPerEndPoint; i++)
