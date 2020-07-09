@@ -1,17 +1,17 @@
 package chip.setuppayload;
 
 public class OptionalQRCodeInfo {
-  enum optionalQRCodeInfoType {
-    optionalQRCodeInfoTypeUnknown,
-    optionalQRCodeInfoTypeString,
-    optionalQRCodeInfoTypeInt32,
-    optionalQRCodeInfoTypeInt64,
-    optionalQRCodeInfoTypeUInt32,
-    optionalQRCodeInfoTypeUInt64
+  public enum OptionalQRCodeInfoType {
+    TYPE_UNKNOWN,
+    TYPE_STRING,
+    TYPE_INT32,
+    TYPE_INT64,
+    TYPE_UINT32,
+    TYPE_UINT64
   };
 
   public int tag;
-  public optionalQRCodeInfoType type;
+  public OptionalQRCodeInfoType type;
   public String data;
   public int int32;
 };

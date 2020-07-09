@@ -1,0 +1,153 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/nlio.gni")
+
+import("${chip_root}/gn/chip/tests.gni")
+import("${chip_root}/src/inet/inet.gni")
+import("core.gni")
+
+config("chip_config") {
+  # TODO - Move CHIP_PROJECT_CONFIG_INCLUDE, CHIP_PLATFORM_CONFIG_INCLUDE here.
+  # Currently those are also used from src/system.
+  defines = []
+
+  if (chip_build_tests) {
+    defines += [ "CHIP_CONFIG_TEST=1" ]
+  } else {
+    defines += [ "CHIP_CONFIG_TEST=0" ]
+  }
+  if (chip_error_logging) {
+    defines += [ "CHIP_ERROR_LOGGING=1" ]
+  } else {
+    defines += [ "CHIP_ERROR_LOGGING=0" ]
+  }
+  if (chip_progress_logging) {
+    defines += [ "CHIP_PROGRESS_LOGGING=1" ]
+  } else {
+    defines += [ "CHIP_PROGRESS_LOGGING=0" ]
+  }
+  if (chip_detail_logging) {
+    defines += [ "CHIP_DETAIL_LOGGING=1" ]
+  } else {
+    defines += [ "CHIP_DETAIL_LOGGING=0" ]
+  }
+
+  if (chip_config_short_error_str) {
+    defines += [ "CHIP_CONFIG_SHORT_ERROR_STR=1" ]
+  } else {
+    defines += [ "CHIP_CONFIG_SHORT_ERROR_STR=0" ]
+  }
+
+  if (chip_config_enable_arg_parser) {
+    defines += [ "CHIP_CONFIG_ENABLE_ARG_PARSER=1" ]
+  } else {
+    defines += [ "CHIP_CONFIG_ENABLE_ARG_PARSER=0" ]
+  }
+
+  if (chip_target_style == "unix") {
+    defines += [ "CHIP_TARGET_STYLE_UNIX=1" ]
+  } else {
+    defines += [ "CHIP_TARGET_STYLE_UNIX=0" ]
+  }
+  if (chip_target_style == "embedded") {
+    defines += [ "CHIP_TARGET_STYLE_EMBEDDED=1" ]
+  } else {
+    defines += [ "CHIP_TARGET_STYLE_EMBEDDED=0" ]
+  }
+
+  if (chip_logging_style == "android") {
+    defines += [ "CHIP_LOGGING_STYLE_ANDROID=1" ]
+  } else {
+    defines += [ "CHIP_LOGGING_STYLE_ANDROID=0" ]
+  }
+  if (chip_logging_style == "external") {
+    defines += [ "CHIP_LOGGING_STYLE_EXTERNAL=1" ]
+  } else {
+    defines += [ "CHIP_LOGGING_STYLE_EXTERNAL=0" ]
+  }
+  if (chip_logging_style == "stdio") {
+    defines += [ "CHIP_LOGGING_STYLE_STDIO=1" ]
+  } else {
+    defines += [ "CHIP_LOGGING_STYLE_STDIO=0" ]
+  }
+  if (chip_logging_style == "stdio_weak") {
+    defines += [ "CHIP_LOGGING_STYLE_STDIO_WEAK=1" ]
+  } else {
+    defines += [ "CHIP_LOGGING_STYLE_STDIO_WEAK=0" ]
+  }
+
+  include_dirs = [ target_gen_dir ]
+
+  configs = [
+    "${chip_root}/src:includes",
+    "${chip_root}/src/lib:includes",
+  ]
+}
+
+source_set("chip_config_header") {
+  sources = [
+    "CHIPConfig.h",
+    "CHIPEventLoggingConfig.h",
+    "CHIPTimeConfig.h",
+    "CHIPTunnelConfig.h",
+  ]
+
+  public_configs = [ ":chip_config" ]
+
+  public_deps = [ "${chip_root}/src/system:system_config_header" ]
+}
+
+static_library("core") {
+  output_name = "libChipCore"
+
+  sources = [
+    "CHIPCallback.h",
+    "CHIPCircularTLVBuffer.cpp",
+    "CHIPCircularTLVBuffer.h",
+    "CHIPCore.h",
+    "CHIPEncoding.h",
+    "CHIPError.cpp",
+    "CHIPError.h",
+    "CHIPKeyIds.cpp",
+    "CHIPKeyIds.h",
+    "CHIPTLV.h",
+    "CHIPTLVDebug.cpp",
+    "CHIPTLVReader.cpp",
+    "CHIPTLVTags.h",
+    "CHIPTLVTypes.h",
+    "CHIPTLVUpdater.cpp",
+    "CHIPTLVUtilities.cpp",
+    "CHIPTLVWriter.cpp",
+  ]
+
+  public_deps = [
+    ":chip_config_header",
+    "${chip_root}/src/ble",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/system",
+    "${nlio_root}:nlio",
+  ]
+
+  allow_circular_includes_from = [
+    "${chip_root}/src/ble",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/system",
+  ]
+}

@@ -1,0 +1,88 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+config("app_config") {
+  include_dirs = [
+    "gen",
+    "chip-zcl",
+    ".",
+  ]
+}
+
+static_library("common") {
+  output_name = "libCHIPDataModelCommon"
+
+  sources = [
+    "chip-zcl/chip-zcl-buffer.h",
+    "chip-zcl/chip-zcl-codec.h",
+    "chip-zcl/chip-zcl-struct.h",
+    "chip-zcl/chip-zcl.h",
+    "gen/gen-attribute-storage.h",
+    "gen/gen-attribute-type.h",
+    "gen/gen-callback-stubs.c",
+    "gen/gen-callbacks.h",
+    "gen/gen-cluster-id.h",
+    "gen/gen-command-handler.c",
+    "gen/gen-command-handler.h",
+    "gen/gen-command-id.h",
+    "gen/gen-endpoint-config.h",
+    "gen/gen-global-command-handler.c",
+    "gen/gen-global-command-handler.h",
+    "gen/gen-specs.c",
+    "gen/gen-types.h",
+    "gen/gen.h",
+    "plugin/cluster-server-basic/basic-server.c",
+    "plugin/cluster-server-identify/identify-server.c",
+    "plugin/cluster-server-level-control/level-control-server-tokens.h",
+    "plugin/cluster-server-level-control/level-control-server.c",
+    "plugin/cluster-server-level-control/level-control-server.h",
+    "plugin/cluster-server-on-off/on-off-server-tokens.h",
+    "plugin/cluster-server-on-off/on-off-server.c",
+    "plugin/cluster-server-on-off/on-off-server.h",
+    "plugin/codec-simple/codec-simple.c",
+    "plugin/core-api/core-api.c",
+    "plugin/core-data-model/zcl-data-model.c",
+    "plugin/core-message-dispatch/dispatch.c",
+    "plugin/core-message-dispatch/dispatch.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/system",
+  ]
+
+  public_configs = [ ":app_config" ]
+}
+
+static_library("chip") {
+  output_name = "libCHIPDataModel"
+
+  sources = [ "plugin/binding-chip/chip.cpp" ]
+
+  public_deps = [ ":common" ]
+}
+
+static_library("mock") {
+  output_name = "libCHIPDataModelMock"
+
+  sources = [ "plugin/binding-mock/mock.c" ]
+
+  public_deps = [ ":common" ]
+}
+
+group("app") {
+  public_deps = [ ":chip" ]
+}

@@ -89,6 +89,7 @@ configure_OPTIONS+=(
     --disable-shared
     --disable-tests
     --disable-tools
+    --with-device-layer=darwin
     --with-logging-style=external
     --with-chip-system-project-includes=no
     --with-chip-inet-project-includes=no
@@ -114,6 +115,7 @@ configure_OPTIONS+=(
 
     make V=1 install-data                   # all the headers
     make V=1 -C src/lib install             # libCHIP.a
+    make V=1 -C src/platform install        # libDeviceLayer.a
     make V=1 -C src/setup_payload install   # libSetupPayload.a
     make V=1 -C third_party/mbedtls install # libmbedtls.a
 )
