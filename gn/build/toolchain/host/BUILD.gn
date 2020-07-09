@@ -13,11 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# gn-format disable
-import("//build_overrides/pigweed.gni")
+import("//build/toolchain/gcc_toolchain.gni")
 
-import("$dir_pw_toolchain/generate_toolchain.gni")
-import("toolchains.gni")
-generate_toolchains("host_toolchains") {
-  toolchains = pw_toolchain_host_clang_list
+gcc_toolchain("${host_os}_${host_cpu}_gcc") {
+  toolchain_args = {
+    current_os = host_os
+    current_cpu = host_cpu
+    is_clang = false
+  }
+}
+
+gcc_toolchain("${host_os}_${host_cpu}_clang") {
+  toolchain_args = {
+    current_os = host_os
+    current_cpu = host_cpu
+    is_clang = true
+  }
 }

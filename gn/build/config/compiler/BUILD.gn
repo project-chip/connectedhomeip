@@ -104,6 +104,7 @@ config("disabled_warnings") {
   ]
   if (!is_clang) {
     cflags += [
+      "-Wno-psabi",
       "-Wno-cast-function-type",
       "-Wno-maybe-uninitialized",
       "-Wno-unknown-warning-option",

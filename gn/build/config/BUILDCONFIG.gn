@@ -51,9 +51,9 @@ declare_args() {
 
 if (host_toolchain == "") {
   if (_chip_defaults.is_clang) {
-    host_toolchain = "${_chip_overrides.chip_root}/build/toolchain/host_clang:${host_os}_${host_cpu}_clang"
+    host_toolchain = "//build/toolchain/host:${host_os}_${host_cpu}_clang"
   } else {
-    host_toolchain = "${_chip_overrides.chip_root}/build/toolchain/host_gcc:${host_os}_${host_cpu}_gcc"
+    host_toolchain = "//build/toolchain/host:${host_os}_${host_cpu}_gcc"
   }
 }
 

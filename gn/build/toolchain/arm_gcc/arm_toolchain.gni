@@ -12,33 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/pigweed.gni")
-import("$dir_pw_toolchain/generate_toolchain.gni")
+import("//build/toolchain/gcc_toolchain.gni")
 
 template("arm_toolchain") {
-  _arm_gcc_toolchain_tools = {
+  gcc_toolchain(target_name) {
     _tool_name_root = "arm-none-eabi-"
     ar = _tool_name_root + "ar"
     cc = _tool_name_root + "gcc"
     cxx = _tool_name_root + "g++"
-  }
 
-  _toolchain = {
-    name = target_name
-    forward_variables_from(_arm_gcc_toolchain_tools, "*")
-    defaults = {
+    toolchain_args = {
       current_cpu = "arm"
       current_os = invoker.current_os
+      is_clang = false
 
-      if (defined(invoker.toolchain_args_file)) {
-        import(invoker.toolchain_args_file)
-      } else if (defined(invoker.defaults)) {
-        forward_variables_from(invoker.defaults, "*")
-      }
+      forward_variables_from(invoker.toolchain_args, "*")
     }
-  }
-
-  generate_toolchains("host_toolchains") {
-    toolchains = [ _toolchain ]
   }
 }

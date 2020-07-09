@@ -16,4 +16,6 @@
 import("arm_toolchain.gni")
 
 arm_toolchain("arm_gcc") {
+  toolchain_args = {
+  }
 }

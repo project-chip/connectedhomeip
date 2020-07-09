@@ -12,11 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/nrf5_lock_app.gni")
+import("//build_overrides/chip.gni")
 
 import("//build/toolchain/arm_gcc/arm_toolchain.gni")
+import("//build/toolchain/gcc_toolchain.gni")
+
+gcc_toolchain("${host_os}_${host_cpu}_gcc_mbedtls") {
+  toolchain_args = {
+    current_os = host_os
+    current_cpu = host_cpu
+    is_clang = false
+    chip_crypto = "mbedtls"
+  }
+}
 
 arm_toolchain("nrf5_lock_app") {
-  toolchain_args_file = "${nrf5_lock_app_root}/args.gni"
-  current_os = "freertos"
+  toolchain_args = {
+    current_os = "freertos"
+    import("${chip_root}/examples/lock-app/nrf5/args.gni")
+  }
 }
