@@ -12,20 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Device platform layer: freertos, nrf5, none.
-  device_platform = ""
-
-  # Enable openthread support.
-  chip_enable_openthread = false
+config("inipp_config") {
+  include_dirs = [ "repo/inipp" ]
 }
 
-if (device_platform == "") {
-  if (current_os != "freertos") {
-    device_platform = "none"
-  }
-}
+source_set("inipp") {
+  sources = [ "repo/inipp/inipp/inipp.h" ]
 
-assert((current_os != "freertos" && device_platform == "none") ||
-           device_platform == "nrf5" || device_platform == "linux",
-       "Please select a valid value for device_platform")
+  public_configs = [ ":inipp_config" ]
+}

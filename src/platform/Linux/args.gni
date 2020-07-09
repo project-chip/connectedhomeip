@@ -12,20 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Device platform layer: freertos, nrf5, none.
-  device_platform = ""
+device_platform = "linux"
 
-  # Enable openthread support.
-  chip_enable_openthread = false
-}
-
-if (device_platform == "") {
-  if (current_os != "freertos") {
-    device_platform = "none"
-  }
-}
-
-assert((current_os != "freertos" && device_platform == "none") ||
-           device_platform == "nrf5" || device_platform == "linux",
-       "Please select a valid value for device_platform")
+ble_platform_config_include = "<platform/Linux/BlePlatformConfig.h>"
+chip_device_platform_config_include =
+    "<platform/Linux/CHIPDevicePlatformConfig.h>"
+chip_platform_config_include = "<platform/Linux/CHIPPlatformConfig.h>"
+inet_platform_config_include = "<platform/Linux/InetPlatformConfig.h>"
+system_platform_config_include = "<platform/Linux/SystemPlatformConfig.h>"

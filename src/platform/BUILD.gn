@@ -37,6 +37,14 @@ if (device_platform != "none") {
       defines += [ "CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE=${chip_device_platform_config_include}" ]
     }
 
+    if (device_platform == "linux") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_LINUX=1",
+        "CHIP_DEVICE_LAYER_TARGET=Linux",
+      ]
+    } else {
+      defines += [ "CHIP_DEVICE_LAYER_TARGET_LINUX=0" ]
+    }
     if (device_platform == "nrf5") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_NRF5=1",
@@ -67,7 +75,45 @@ if (device_platform != "none") {
 
     public_configs = [ ":platform_config" ]
 
-    if (device_platform == "nrf5") {
+    if (chip_enable_openthread) {
+      sources += [ "OpenThread/OpenThreadUtils.cpp" ]
+    }
+
+    if (device_platform == "linux") {
+      sources += [
+        "Linux/BLEManagerImpl.cpp",
+        "Linux/BLEManagerImpl.h",
+        "Linux/BlePlatformConfig.h",
+        "Linux/CHIPDevicePlatformConfig.h",
+        "Linux/CHIPDevicePlatformEvent.h",
+        "Linux/CHIPLinuxStorage.cpp",
+        "Linux/CHIPLinuxStorage.h",
+        "Linux/CHIPLinuxStorageIni.cpp",
+        "Linux/CHIPLinuxStorageIni.h",
+        "Linux/CHIPPlatformConfig.h",
+        "Linux/ConfigurationManagerImpl.cpp",
+        "Linux/ConfigurationManagerImpl.h",
+        "Linux/ConnectivityManagerImpl.cpp",
+        "Linux/ConnectivityManagerImpl.h",
+        "Linux/InetPlatformConfig.h",
+        "Linux/Logging.cpp",
+        "Linux/PlatformManagerImpl.cpp",
+        "Linux/PlatformManagerImpl.h",
+        "Linux/PosixConfig.cpp",
+        "Linux/PosixConfig.h",
+        "Linux/SystemPlatformConfig.h",
+        "Linux/SystemTimeSupport.cpp",
+      ]
+
+      if (chip_enable_openthread) {
+        sources += [
+          "Linux/ThreadStackManagerImpl.cpp",
+          "Linux/ThreadStackManagerImpl.h",
+        ]
+      }
+
+      public_deps += [ "${chip_root}/third_party/inipp" ]
+    } else if (device_platform == "nrf5") {
       sources += [
         "FreeRTOS/SystemTimeSupport.cpp",
         "nRF5/BLEManagerImpl.cpp",
@@ -90,6 +136,13 @@ if (device_platform != "none") {
         "nRF5/nRF5Utils.cpp",
         "nRF5/nRF5Utils.h",
       ]
+
+      if (chip_enable_openthread) {
+        sources += [
+          "nRF5/ThreadStackManagerImpl.cpp",
+          "nRF5/ThreadStackManagerImpl.h",
+        ]
+      }
     }
   }
 } else {
