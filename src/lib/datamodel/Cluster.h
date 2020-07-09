@@ -31,6 +31,11 @@ namespace DataModel {
 
 /* TODO: To be converted to a template version or Kconfig later on */
 static const uint8_t kMaxAttributesPerCluster = 10;
+/**
+ * @brief
+ *   This class implements the cluster object that maintains its attributes. Typically specific
+ *   cluster definitions will derive from this class and implement their functionality.
+ */
 class Cluster
 {
 public:
@@ -51,6 +56,12 @@ public:
         }
     }
 
+    /**
+     * @brief
+     *   Add attributes to this cluster
+     *
+     * @param attr Pointer to the attribute object being added
+     */
     CHIP_ERROR AddAttribute(Attribute * attr)
     {
         for (int i = 0; i < kMaxAttributesPerCluster; i++)
@@ -64,6 +75,12 @@ public:
         return CHIP_ERROR_INTERNAL;
     }
 
+    /**
+     * @brief
+     *   Get pointer to the attribute object
+     *
+     * @param attrId the attribute identifer that we are looking for
+     */
     Attribute * GetAttribute(uint16_t attrId)
     {
         for (int i = 0; i < kMaxAttributesPerCluster; i++)
@@ -76,6 +93,13 @@ public:
         return nullptr;
     }
 
+    /**
+     * @brief
+     *   Set an attribute to a value
+     *
+     * @param attrId the attribute identifer that should be set
+     * @param value  the new value that the attribute should be updated with
+     */
     virtual CHIP_ERROR Set(uint16_t attrId, const Value & value)
     {
         /* Just hand-off to update the value internally */

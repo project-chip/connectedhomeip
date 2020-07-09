@@ -61,7 +61,10 @@ static inline Attribute * CHIPAttributeOffWaitTimeNew(void)
     return new Attribute(0x4002, kCHIPValueType_UInt16);
 }
 
-/* The Cluster OnOff class */
+/**
+ * @brief
+ *   This class implements the OnOff cluster as defined in the CHIP specification.
+ */
 class ClusterOnOff : public Cluster
 {
 public:

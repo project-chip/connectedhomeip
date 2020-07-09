@@ -30,6 +30,10 @@
 namespace chip {
 namespace DataModel {
 
+/**
+ * @brief
+ *   This class implements a single attribute.
+ */
 class Attribute
 {
 public:
@@ -44,16 +48,11 @@ public:
         mAttrId(attrId), mValue(type), mMin(type, min), mMax(type, max)
     {}
 
-    /* An attribute is typically set in either of the following 2 ways:
+    /**
+     * @brief
+     *   Set this attribute to a value
      *
-     * - From the top of the stack or the most derived class, like
-     *   brightness.Set(45). This is handled through the derived
-     *   class's Set method.
-     *
-     * - From the bottom of the stack when the stack receives a schema
-     *   with just a list of values. This will typically get called
-     *   with a Set() call on the base-ptr. In this case the argument
-     *   will be Value.
+     * @param value  the new value that this attribute should be updated with
      */
     CHIP_ERROR Set(const Value & newValue)
     {
@@ -72,6 +71,11 @@ public:
 
     /* Need to define the behaviour when Value contains pointers
      * to allocated data
+     */
+    /**
+     * @brief
+     *   Get the value of this attribute
+     *
      */
     Value Get() { return mValue; }
 
