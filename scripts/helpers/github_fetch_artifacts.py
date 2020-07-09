@@ -17,11 +17,8 @@
 #
 
 import github
-import io
 import logging
 import requests
-import subprocess
-import zipfile
 
 # Artifacts can be fetched using:
 #   curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/project-chip/connectedhomeip/actions/artifacts
@@ -66,6 +63,11 @@ class ArtifactInfo(github.GithubObject.NonCompletableGithubObject):
 
     return response.content
 
+  def delete(self):
+    """Delete this artifact."""
+    logging.warning('DELETING artifact ' + self.url)
+    self._requester.requestJsonAndCheck('DELETE', self.url)
+
 class ArtifactFetcher(github.GithubObject.NonCompletableGithubObject):
 
   def __init__(self, repo):
@@ -83,53 +85,9 @@ class ArtifactFetcher(github.GithubObject.NonCompletableGithubObject):
     )
 
 
-def fetchMasterMergeCommitSHA(forkPointRef, revStr):
-  if revStr:
-    result = subprocess.run(
-        ['git', 'rev-parse', revStr],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    ).stdout.decode('utf8')
-
-    logging.info('Parsed revision %r base result: %r' % (revStr, result))
-  else:
-    logging.info('Finding merge point from %s' % forkPointRef)
-    result = subprocess.run(
-        ('git merge-base --fork-point %s' % forkPointRef).split(),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    ).stdout.decode('utf8')
-
-    logging.info('Merge base result: %r' % result)
-
-  return result.split()[0]
-
-
-def fetchArtifactsForJob(jobName, githubToken, githubRepo, downloadDir, forkPointRef, compareRev):
-  masterMergeSha = fetchMasterMergeCommitSHA(forkPointRef, compareRev)
-
-  logging.info('Master merge commit: "%s"', masterMergeSha)
-
+def getAllArtifacts(githubToken, githubRepo):
+  """Get all artifacts visible in the given repo."""
   api = github.Github(githubToken)
   repo = api.get_repo(githubRepo)
 
-  masterArtifactName = '%s-%s' % (jobName, masterMergeSha)
-  logging.info('Searching for artifact: %s' % masterArtifactName)
-
-  artifact = None
-  fetcher = ArtifactFetcher(repo)
-  for idx, a in enumerate(fetcher.get_artifacts()):
-    logging.debug('%d: Found artifact: %s from %r', idx, a.name, a.created_at)
-
-    if a.name == masterArtifactName:
-        artifact = a
-        break
-
-  if not artifact:
-    logging.error('Artifact not found')
-    return
-
-  zipFile = zipfile.ZipFile(io.BytesIO(artifact.downloadBlob()), 'r')
-
-  logging.info('Extracting zip file to %r' % downloadDir)
-  zipFile.extractall(downloadDir)
+  return ArtifactFetcher(repo).get_artifacts()
