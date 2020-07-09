@@ -15,7 +15,9 @@
 declare_args() {
   # Enable building tests.
   chip_build_tests = current_os != "freertos"
+}
 
+declare_args() {
   # Enable use of nlfaultinjection.
-  chip_with_nlfaultinjection = true
+  chip_with_nlfaultinjection = chip_build_tests
 }

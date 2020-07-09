@@ -158,7 +158,7 @@ static_library("system") {
     "${nlassert_root}:nlassert",
   ]
 
-  if (chip_with_nlfaultinjection) {
+  if (chip_build_tests && chip_with_nlfaultinjection) {
     sources += [ "SystemFaultInjection.cpp" ]
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
   }

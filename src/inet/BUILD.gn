@@ -93,8 +93,6 @@ static_library("inet") {
   output_name = "libInetLayer"
 
   sources = [
-    "AsyncDNSResolverSockets.cpp",
-    "AsyncDNSResolverSockets.h",
     "EndPointBasis.cpp",
     "EndPointBasis.h",
     "IANAConstants.h",
@@ -139,6 +137,13 @@ static_library("inet") {
     sources += [
       "DNSResolver.cpp",
       "DNSResolver.h",
+    ]
+  }
+
+  if (inet_config_enable_async_dns_sockets) {
+    sources += [
+      "AsyncDNSResolverSockets.cpp",
+      "AsyncDNSResolverSockets.h",
     ]
   }
 
