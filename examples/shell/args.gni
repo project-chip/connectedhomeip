@@ -14,30 +14,4 @@
 
 import("//build_overrides/chip.gni")
 
-import("//build/toolchain/arm_gcc/arm_toolchain.gni")
-import("//build/toolchain/gcc_toolchain.gni")
-
-gcc_toolchain("${host_os}_${host_cpu}_gcc_mbedtls") {
-  toolchain_args = {
-    current_os = host_os
-    current_cpu = host_cpu
-    is_clang = false
-    chip_crypto = "mbedtls"
-  }
-}
-
-gcc_toolchain("standalone") {
-  toolchain_args = {
-    current_os = host_os
-    current_cpu = host_cpu
-    is_clang = false
-    import("${chip_root}/config/standalone/args.gni")
-  }
-}
-
-arm_toolchain("nrf5_lock_app") {
-  toolchain_args = {
-    current_os = "freertos"
-    import("${chip_root}/examples/lock-app/nrf5/args.gni")
-  }
-}
+import("${chip_root}/config/standalone/args.gni")

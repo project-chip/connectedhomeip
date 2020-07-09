@@ -57,8 +57,6 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
     if (chip_build_tools) {
       deps += [
-        "${chip_root}/examples/chip-tool",
-        "${chip_root}/examples/shell",
         "${chip_root}/src/qrcodetool",
         "${chip_root}/src/setup_payload",
       ]
@@ -105,6 +103,12 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     # Build building chip with gcc & mbedtls.
     enable_host_gcc_mbdtls_build = enable_default_builds
 
+    # Build the chip-tool example.
+    enable_standalone_chip_tool_build = enable_default_builds
+
+    # Build the shell example.
+    enable_standalone_shell_build = enable_default_builds
+
     # Build the nRF5 lock app example.
     enable_nrf5_lock_app_build = false
   }
@@ -122,6 +126,22 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
         "${chip_root}/config/toolchain:${host_os}_${host_cpu}_gcc_mbedtls"
   }
 
+  group("standalone_chip_tool") {
+    deps = [ "${chip_root}/examples/chip-tool(${chip_root}/config/toolchain:standalone)" ]
+  }
+
+  group("standalone_shell") {
+    deps = [
+      "${chip_root}/examples/shell(${chip_root}/config/toolchain:standalone)",
+    ]
+  }
+
+  if (enable_nrf5_lock_app_build) {
+    group("nrf5_lock_app") {
+      deps = [ "${chip_root}/examples/lock-app/nrf5(${chip_root}/config/toolchain:nrf5_lock_app)" ]
+    }
+  }
+
   group("default") {
     deps = []
     if (enable_host_clang_build) {
@@ -133,8 +153,14 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     if (enable_host_gcc_mbdtls_build) {
       deps += [ ":all_host_gcc_mbedtls" ]
     }
+    if (enable_standalone_chip_tool_build) {
+      deps += [ ":standalone_chip_tool" ]
+    }
+    if (enable_standalone_shell_build) {
+      deps += [ ":standalone_shell" ]
+    }
     if (enable_nrf5_lock_app_build) {
-      deps += [ "${chip_root}/examples/lock-app/nrf5(${chip_root}/config/toolchain:nrf5_lock_app)" ]
+      deps += [ ":nrf5_lock_app" ]
     }
   }
 
