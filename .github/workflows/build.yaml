@@ -33,7 +33,7 @@ jobs:
               run: |
                   case $BUILD_TYPE in
                      "main") export BOOTSTRAP_ARGUMENTS="";;
-                     "clang") export BOOTSTRAP_ARGUMENTS="CC=clang-9 CXX=clang++-9";;
+                     "clang") export BOOTSTRAP_ARGUMENTS="CC=clang CXX=clang++";;
                      "linux-embedded") export BOOTSTRAP_ARGUMENTS="--with-device-layer=linux";;
                      "mbedtls") export BOOTSTRAP_ARGUMENTS="--with-crypto=mbedtls";;
                      *) ;;
