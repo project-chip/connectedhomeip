@@ -58,27 +58,27 @@ public:
     }
 
     /* By default always add to the kEndPointIdStartth endpoint, for simplicity */
-    int AddCluster(Cluster * cluster)
+    CHIP_ERROR AddCluster(Cluster * cluster)
     {
         if (!cluster)
         {
-            return FAIL;
+            return CHIP_ERROR_INTERNAL;
         }
 
         return mEndPoints[kEndPointIdStart]->AddCluster(cluster);
     }
 
-    int AddEndPoint(EndPoint * endPoint)
+    CHIP_ERROR AddEndPoint(EndPoint * endPoint)
     {
         for (int i = kEndPointIdStart; i < kMaxEndPointPerServer; i++)
         {
             if (mEndPoints[i] == nullptr)
             {
                 mEndPoints[i] = endPoint;
-                return SUCCESS;
+                return CHIP_NO_ERROR;
             }
         }
-        return FAIL;
+        return CHIP_ERROR_INTERNAL;
     }
 };
 

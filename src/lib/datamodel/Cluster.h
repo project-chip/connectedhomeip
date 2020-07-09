@@ -51,17 +51,17 @@ public:
         }
     }
 
-    int AddAttribute(Attribute * attr)
+    CHIP_ERROR AddAttribute(Attribute * attr)
     {
         for (int i = 0; i < kMaxAttributesPerCluster; i++)
         {
             if (mAttrs[i] == nullptr)
             {
                 mAttrs[i] = attr;
-                return SUCCESS;
+                return CHIP_NO_ERROR;
             }
         }
-        return FAIL;
+        return CHIP_ERROR_INTERNAL;
     }
 
     Attribute * GetAttribute(uint16_t attrId)
@@ -76,7 +76,7 @@ public:
         return nullptr;
     }
 
-    virtual int Set(uint16_t attrId, const Value & value)
+    virtual CHIP_ERROR Set(uint16_t attrId, const Value & value)
     {
         /* Just hand-off to update the value internally */
         auto attr = GetAttribute(attrId);
@@ -84,7 +84,7 @@ public:
         {
             return attr->Set(value);
         }
-        return FAIL;
+        return CHIP_ERROR_INTERNAL;
     }
 };
 

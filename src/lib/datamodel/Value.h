@@ -32,10 +32,6 @@
 namespace chip {
 namespace DataModel {
 
-/* XXX Remove later*/
-#define SUCCESS 0
-#define FAIL -1
-
 enum ValueTypes
 {
     kCHIPValueType_NotSpecified = -1,

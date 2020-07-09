@@ -88,7 +88,7 @@ public:
     bool mTestVector;
     testSwitch(uint8_t gpio_no) : mGpioNum(gpio_no),mTestVector(false) {}
 
-    int Set(uint16_t attrId, const Value &value)
+    CHIP_ERROR Set(uint16_t attrId, const Value &value)
     {
         switch (attrId)
         {
