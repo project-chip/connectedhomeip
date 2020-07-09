@@ -1,0 +1,45 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/nrf5_lock_app.gni")
+
+device_platform = "nrf5"
+
+arm_arch = "armv7e-m"
+arm_float_abi = "hard"
+arm_cpu = "cortex-m4"
+arm_fpu = "fpv4-sp-d16"
+
+lwip_platform = "nrf5"
+lwip_ipv6 = true
+lwip_ipv4 = false
+lwip_api = true
+
+inet_config_enable_ipv4 = false
+inet_config_enable_dns_resolver = false
+
+chip_build_tests = false
+nrf5_sdk_target = "${nrf5_lock_app_root}:sdk"
+
+ble_platform_config_include = "<platform/nRF5/BlePlatformConfig.h>"
+ble_project_config_include = "<CHIPProjectConfig.h>"
+chip_device_platform_config_include =
+    "<platform/nRF5/CHIPDevicePlatformConfig.h>"
+chip_device_project_config_include = "<CHIPProjectConfig.h>"
+chip_platform_config_include = "<platform/nRF5/CHIPPlatformConfig.h>"
+chip_project_config_include = "<CHIPProjectConfig.h>"
+inet_platform_config_include = "<platform/nRF5/InetPlatformConfig.h>"
+inet_project_config_include = "<CHIPProjectConfig.h>"
+system_platform_config_include = "<platform/nRF5/SystemPlatformConfig.h>"
+system_project_config_include = "<CHIPProjectConfig.h>"

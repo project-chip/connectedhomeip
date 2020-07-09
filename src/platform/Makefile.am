@@ -59,6 +59,10 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp \
     @top_srcdir@/src/include/platform/internal/CHIPDeviceLayerInternal.h \
+    @top_srcdir@/src/platform/Darwin/CHIPDevicePlatformConfig.h \
+    @top_srcdir@/src/platform/Darwin/CHIPDevicePlatformEvent.h \
+    @top_srcdir@/src/platform/Darwin/ConfigurationManagerImpl.h \
+    @top_srcdir@/src/platform/Darwin/PlatformManagerImpl.h \
     @top_srcdir@/src/platform/nRF5/ConnectivityManagerImpl.h \
     @top_srcdir@/src/platform/nRF5/nRF5Config.h \
     @top_srcdir@/src/platform/nRF5/CHIPDevicePlatformConfig.h \
@@ -121,6 +125,29 @@ libDeviceLayer_a_SOURCES               += \
     OpenThread/OpenThreadUtils.cpp        \
     $(NULL)
 endif
+
+if CHIP_DEVICE_LAYER_TARGET_DARWIN
+
+libDeviceLayer_a_CPPFLAGS              += \
+    $(NULL)
+
+libDeviceLayer_a_SOURCES               += \
+    Darwin/ConfigurationManagerImpl.cpp   \
+    Darwin/ConnectivityManagerImpl.cpp    \
+    Darwin/PlatformManagerImpl.cpp        \
+    Darwin/PosixConfig.cpp                \
+    $(NULL)
+
+Platformdir                                                     = $(includedir)/platform/Darwin
+dist_Platform_HEADERS                                           = \
+    @top_srcdir@/src/platform/Darwin/BlePlatformConfig.h        \
+    @top_srcdir@/src/platform/Darwin/InetPlatformConfig.h       \
+    @top_srcdir@/src/platform/Darwin/CHIPPlatformConfig.h       \
+    @top_srcdir@/src/platform/Darwin/CHIPDevicePlatformConfig.h \
+    @top_srcdir@/src/platform/Darwin/SystemPlatformConfig.h     \
+    $(NULL)
+
+endif # CHIP_DEVICE_LAYER_TARGET_DARWIN
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
 

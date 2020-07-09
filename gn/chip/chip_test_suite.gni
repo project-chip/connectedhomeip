@@ -1,0 +1,73 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/gn/chip/chip_test.gni")
+import("${chip_root}/gn/chip/tests.gni")
+import("${dir_pw_unit_test}/test.gni")
+
+assert(chip_build_tests)
+
+template("chip_test_suite") {
+  _suite_name = target_name
+
+  static_library("${_suite_name}_common") {
+    forward_variables_from(invoker,
+                           "*",
+                           [
+                             "tests",
+                             "c_tests",
+                           ])
+  }
+
+  tests = []
+  if (defined(invoker.tests)) {
+    foreach(_test, invoker.tests) {
+      chip_test(_test) {
+        sources = [ "${_test}Driver.cpp" ]
+
+        public_deps = [ ":${_suite_name}_common" ]
+      }
+
+      tests += [ _test ]
+    }
+  }
+
+  if (defined(invoker.c_tests)) {
+    foreach(_test, invoker.c_tests) {
+      chip_test(_test) {
+        sources = [ "${_test}Driver.c" ]
+
+        public_deps = [ ":${_suite_name}_common" ]
+      }
+
+      tests += [ _test ]
+    }
+  }
+
+  group(_suite_name) {
+    deps = []
+    foreach(_test, tests) {
+      deps += [ ":${_test}" ]
+    }
+  }
+
+  group("${_suite_name}_run") {
+    deps = []
+    foreach(_test, tests) {
+      deps += [ ":${_test}_run" ]
+    }
+  }
+}

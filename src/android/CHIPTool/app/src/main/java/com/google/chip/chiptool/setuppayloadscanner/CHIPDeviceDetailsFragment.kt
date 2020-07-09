@@ -25,6 +25,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.google.chip.chiptool.R
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.*
 
 /** Show the [CHIPDeviceInfo]. */
 class CHIPDeviceDetailsFragment : Fragment() {
@@ -41,12 +42,25 @@ class CHIPDeviceDetailsFragment : Fragment() {
         return inflater.inflate(R.layout.chip_device_info_fragment, container, false).apply {
 
             // Display CHIP setup code info to user for manual connect to soft AP
-            findViewById<TextView>(R.id.version_tv).apply { text = "${deviceInfo.version}" }
-            findViewById<TextView>(R.id.vendor_id_tv).apply { text = "${deviceInfo.vendorId}" }
-            findViewById<TextView>(R.id.product_id_tv).apply { text = "${deviceInfo.productId}" }
-            findViewById<TextView>(R.id.setup_code_tv).apply { text = "${deviceInfo.setupPinCode}" }
+            versionTv.text = "${deviceInfo.version}"
+            vendorIdTv.text = "${deviceInfo.vendorId}"
+            productIdTv.text = "${deviceInfo.productId}"
+            setupCodeTv.text = "${deviceInfo.setupPinCode}"
 
-            // TODO : Extract vendor tags for IP and SOFT AP SSID and display them here
+            if (deviceInfo.optionalQrCodeInfoMap.isEmpty()) {
+                vendorTagsLabelTv.visibility = View.GONE
+                vendorTagsContainer.visibility = View.GONE
+            } else {
+                vendorTagsLabelTv.visibility = View.VISIBLE
+                vendorTagsContainer.visibility = View.VISIBLE
+
+                deviceInfo.optionalQrCodeInfoMap.forEach { (_, qrCodeInfo) ->
+                    val tv = inflater.inflate(R.layout.barcode_vendor_tag, null, false) as TextView
+                    val info = "${qrCodeInfo.tag}. ${qrCodeInfo.data}, ${qrCodeInfo.intDataValue}"
+                    tv.text = info
+                    vendorTagsContainer.addView(tv)
+                }
+            }
         }
     }
 

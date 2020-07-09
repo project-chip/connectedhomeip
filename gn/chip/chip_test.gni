@@ -1,0 +1,48 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${chip_root}/gn/chip/tests.gni")
+import("${dir_pw_unit_test}/test.gni")
+
+assert(chip_build_tests)
+
+template("chip_test") {
+  _test_name = target_name
+
+  _test_output_dir = "${root_out_dir}/tests"
+  if (defined(invoker.output_dir)) {
+    _test_output_dir = invoker.output_dir
+  }
+
+  executable(_test_name) {
+    forward_variables_from(invoker, "*", [ "output_dir" ])
+    output_dir = _test_output_dir
+  }
+
+  pw_python_script(_test_name + "_run") {
+    deps = [ ":${_test_name}" ]
+    inputs = [ pw_unit_test_AUTOMATIC_RUNNER ]
+    script = "$dir_pw_unit_test/py/pw_unit_test/test_runner.py"
+    args = [
+      "--runner",
+      pw_unit_test_AUTOMATIC_RUNNER,
+      "--test",
+      get_path_info("$_test_output_dir:$_test_name", "abspath"),
+    ]
+    stamp = true
+  }
+}

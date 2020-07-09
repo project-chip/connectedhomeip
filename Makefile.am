@@ -208,6 +208,14 @@ distclean-local:
 	$(MAKE) -C $(srcdir) -f Makefile-bootstrap clean-repos
 
 #
+# Top-level convenience target for making documentation.
+#
+
+.PHONY: doc
+doc: $(BUILT_SOURCES)
+	$(MAKE) -C docs $(@)
+
+#
 # Top-level convenience target for making a documentation-only
 # distribution whose results appear at the top level of the build tree
 # in the same fashion that the distribution would be for 'make dist'.
