@@ -278,8 +278,9 @@ make -f Makefile-Android
 ### Generate the documentation
 
 The Doxygen documentation is generated automatically if Doxygen is detected on
-the system. The generated documentation can be found into `${top_builddir}/docs/html`
-where `${top_builddir}` varies depending on how the project was built.
+the system. The generated documentation can be found into
+`${top_builddir}/docs/html` where `${top_builddir}` varies depending on how the
+project was built.
 
 #### How to install Doxygen on Linux
 
