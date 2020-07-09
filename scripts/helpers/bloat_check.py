@@ -174,23 +174,19 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
 """.format(title=titleHeading, table=compareTable, rawReportText=rawText))
 
 
-def extractPrNumberFromRef(refStr):
-  logging.info('EXTRACTING REF FROM "%s"', refStr)
-  match = re.compile('^refs/pull/(\\d*)/merge').match(refStr)
+def getPullRequestBaseSha(githubToken,  githubRepo, pullRequestNumber):
+  """Figure out the SHA for the base of a pull request"""
+  api = github.Github(githubToken)
+  repo = api.get_repo(githubRepo)
+  pull = repo.get_pull(pullRequestNumber)
 
-  if match:
-    return int(match.group(1))
+  return pull.base.sha
 
-  logging.warning('Cannot extract PR number from ref: "%s"', refStr)
-
-  return None
 
 
 def main():
   """Main task if executed standalone."""
   parser = argparse.ArgumentParser(description='Fetch master build artifacts.')
-  parser.add_argument(
-      '--job', type=str, help='Name of the job generating the report')
   parser.add_argument(
       '--artifact-download-dir',
       type=str,
@@ -202,36 +198,16 @@ def main():
       default='.',
       help='Generated build files directory to use to compare for bloat')
   parser.add_argument(
-      '--report-file',
-      type=str,
-      default='report.csv',
-      help='Report file output name')
-  parser.add_argument(
       '--github-api-token',
       type=str,
       help='Github API token to upload the report as a comment')
   parser.add_argument(
       '--github-repository', type=str, help='Repository to use for PR comments')
   parser.add_argument(
-      '--github-ref',
-      type=str,
-      default=None,
-      help='Github action ref, of format refs/pull/:prNumber/merge')
-  parser.add_argument(
       '--log-level',
       default=logging.INFO,
       type=lambda x: getattr(logging, x),
       help='Configure the logging level.')
-  parser.add_argument(
-      '--git-fork-point',
-      type=str,
-      default='refs/heads/master',
-      help='What forkpoint to get')
-  parser.add_argument(
-      '--git-master-ref',
-      type=str,
-      default=None,
-      help='Ref for fetching artifacts for the bloat report (for debug purposes)')
   args = parser.parse_args()
 
   # Ensures somewhat pretty logging of what is going on
@@ -244,35 +220,34 @@ def main():
     logging.error('Required arguments missing: github api token is required.')
     return
 
-  if not args.job:
-    logging.error('Required arguments missing: job is required.')
-    return
 
-  if not args.github_ref:
-    logging.error('Required arguments missing: github_ref is required.')
-    return
+  pull_artifact_re = re.compile('^(.*)-pull-(\\d+)$')
+  for a in github_fetch_artifacts.getAllArtifacts(args.github_api_token, args.github_repository):
+    m = pull_artifact_re.match(a.name)
 
-  try:
-    github_fetch_artifacts.fetchArtifactsForJob(args.job, args.github_api_token, args.github_repository,
-                                                args.artifact_download_dir, 
-                                                args.git_fork_point, args.git_master_ref)
-  except Exception as e:
-    logging.warning('Failed to fetch artifacts: %r', e)
-  
-  compareResults = generateBloatReport(
-      args.report_file,
-      args.artifact_download_dir,
-      args.build_output_dir,
-      title="Bloat report for job '%s'" % args.job)
-  
-  comment_pr_number = extractPrNumberFromRef(args.github_ref)
-  if args.github_api_token and args.github_repository and comment_pr_number:
+    if not m:
+      logging.info('Non-PR artifact found: %r' % a.name)
+      continue
+
+    prefix = int(m.group(2))
+    pull_number = int(m.group(2))
+
+    logging.info('Processing PR %s via artifact %r' % (pull_number, a.name))
+
     try:
-      sendFileAsPrComment(args.job, args.report_file, args.github_api_token,
-                          args.github_repository,
-                          comment_pr_number, compareResults)
+      base_sha = getPullRequestBaseSha(args.github_api_token, args.github_repository, pull_number)
+
+      logging.info('Diff is based on %r' % base_sha)
+
+      # FIXME:
+      #   - grab main artifact (IFF exists)
+      #   - clean output directories
+      #   - extract artifacts
+      #   - bloat report
+
     except Exception as e:
-      logging.warning('Failed to send PR comment: %r', e)
+      logging.warning('Failed to process bloat report: %r', e)
+
 
 
 if __name__ == '__main__':

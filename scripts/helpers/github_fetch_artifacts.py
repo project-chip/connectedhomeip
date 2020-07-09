@@ -105,31 +105,10 @@ def fetchMasterMergeCommitSHA(forkPointRef, revStr):
   return result.split()[0]
 
 
-def fetchArtifactsForJob(jobName, githubToken, githubRepo, downloadDir, forkPointRef, compareRev):
-  masterMergeSha = fetchMasterMergeCommitSHA(forkPointRef, compareRev)
 
-  logging.info('Master merge commit: "%s"', masterMergeSha)
-
+def getAllArtifacts(githubToken, githubRepo):
+  """Get all artifacts visible in the given repo."""
   api = github.Github(githubToken)
   repo = api.get_repo(githubRepo)
 
-  masterArtifactName = '%s-%s' % (jobName, masterMergeSha)
-  logging.info('Searching for artifact: %s' % masterArtifactName)
-
-  artifact = None
-  fetcher = ArtifactFetcher(repo)
-  for idx, a in enumerate(fetcher.get_artifacts()):
-    logging.debug('%d: Found artifact: %s from %r', idx, a.name, a.created_at)
-
-    if a.name == masterArtifactName:
-        artifact = a
-        break
-
-  if not artifact:
-    logging.error('Artifact not found')
-    return
-
-  zipFile = zipfile.ZipFile(io.BytesIO(artifact.downloadBlob()), 'r')
-
-  logging.info('Extracting zip file to %r' % downloadDir)
-  zipFile.extractall(downloadDir)
+  return ArtifactFetcher(repo).get_artifacts()
