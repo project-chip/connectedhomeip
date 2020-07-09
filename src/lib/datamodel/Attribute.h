@@ -24,6 +24,7 @@
 #ifndef CHIP_ATTRIBUTE_H_
 #define CHIP_ATTRIBUTE_H_
 
+#include <core/CHIPError.h>
 #include <datamodel/Value.h>
 
 namespace chip {
@@ -54,19 +55,19 @@ public:
      *   with a Set() call on the base-ptr. In this case the argument
      *   will be Value.
      */
-    int Set(const Value & newValue)
+    CHIP_ERROR Set(const Value & newValue)
     {
         /* We have to check the element type match in this case */
         if (mValue.mType != newValue.mType)
         {
-            return FAIL;
+            return CHIP_ERROR_INTERNAL;
         }
         if (withinRange(newValue))
         {
             mValue = newValue;
-            return SUCCESS;
+            return CHIP_NO_ERROR;
         }
-        return FAIL;
+        return CHIP_ERROR_INTERNAL;
     }
 
     /* Need to define the behaviour when Value contains pointers

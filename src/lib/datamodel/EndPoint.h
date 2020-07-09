@@ -57,17 +57,17 @@ public:
         }
     }
 
-    int AddCluster(Cluster * cluster)
+    CHIP_ERROR AddCluster(Cluster * cluster)
     {
         for (int i = 0; i < kMaxClustersPerEndPoint; i++)
         {
             if (mClusters[i] == nullptr)
             {
                 mClusters[i] = cluster;
-                return SUCCESS;
+                return CHIP_NO_ERROR;
             }
         }
-        return FAIL;
+        return CHIP_ERROR_INTERNAL;
     }
 
     Cluster * GetCluster(uint8_t clusterId)
