@@ -17,8 +17,9 @@
 
 /**
  *  @file
- *    basic double-ended queue, intended to be embedded as a member
- *     of an object
+ *    basic double-ended queue.  Two intended use models:
+ *    1. used as a raw templated type
+ *     of an object or used as a base class
  */
 
 #ifndef CHIP_DEQUE_H
@@ -40,12 +41,12 @@ class Deque
 {
 
 public:
-    Deque(T * me) : me(me) { mNext = mPrev = this; };
+    Deque(T * me) : mMe(me) { mNext = mPrev = this; };
     ~Deque() { Remove(); };
 
     Deque * Next() { return mNext; }
     Deque * Prev() { return mPrev; }
-    T * Me() { return me; }
+    T * Me() { return mMe; }
 
     void Remove()
     {
@@ -57,7 +58,7 @@ public:
     /**
      * @brief iterate over the list, starting from
      *     this item, until fn() returns true.  Returns
-     *     item->me of the match or NULL if no match.
+     *     item->mMe of the match or NULL if no match.
      *  Mutation of the list during fn() should be avoided
      */
     T * Find(std::function<bool(T *)> fn)
@@ -68,11 +69,11 @@ public:
             next = item->mNext;
 
             // skip any "head" node we encounter
-            if (item->me != nullptr)
+            if (item->mMe != nullptr)
             {
-                if (fn(item->me))
+                if (fn(item->mMe))
                 {
-                    return item->me;
+                    return item->mMe;
                 }
             }
             item = next;
@@ -83,7 +84,7 @@ public:
     /**
      * @brief iterate over the list, starting from
      *     this item, until fn() returns true.  Returns
-     *     item->me of the match or NULL if no match.
+     *     item->mMe of the match or NULL if no match.
      *  Mutation of the list during fn() should be avoided
      */
     T * FindR(std::function<bool(T *)> fn)
@@ -93,9 +94,9 @@ public:
         {
             prev = item->mPrev;
             // skip any "head" node we encounter
-            if (item->me != nullptr)
+            if (item->mMe != nullptr)
             {
-                if (fn(item->me))
+                if (fn(item->mMe))
                 {
                     return item;
                 }
@@ -115,9 +116,9 @@ public:
         for (Deque * item = this; next != this; item = next)
         {
             next = item->mNext;
-            if (item->me != nullptr)
+            if (item->mMe != nullptr)
             {
-                fn(item->me);
+                fn(item->mMe);
             }
             item = next;
         }
@@ -134,9 +135,9 @@ public:
         for (Deque * item = mPrev; prev != mPrev; item = prev)
         {
             prev = item->mPrev;
-            if (item->me != nullptr)
+            if (item->mMe != nullptr)
             {
-                fn(item->me);
+                fn(item->mMe);
             }
             item = prev;
         }
@@ -152,7 +153,7 @@ public:
      */
     void Insert(Deque * item)
     {
-        if (item->me == nullptr)
+        if (item->mMe == nullptr)
         {
             if (item->mNext == item)
             {
@@ -177,7 +178,7 @@ public:
 private:
     Deque * mNext;
     Deque * mPrev;
-    T * me; // when null, is treated as a "head" node
+    T * mMe; // when null, is treated as a "head" node
 };
 
 } // namespace chip

@@ -362,36 +362,25 @@ std::string createSetupPayload()
 void PrintDataModel(ClusterServer & server)
 {
     printf("Server:\n");
-    for (int i = 0; i < kMaxEndPointPerServer; i++)
-    {
-        /* EndPoints */
-        if (server.mEndPoints[i])
-        {
-            auto endpoint = server.mEndPoints[i];
-            printf("  EndPoint: %d\n", i);
-            for (int j = 0; j < kMaxClustersPerEndPoint; j++)
-            {
-                /* Clusters */
-                if (endpoint->mClusters[j])
-                {
-                    auto cluster = endpoint->mClusters[j];
-                    printf("    ClusterId: 0x%04x\n", cluster->mClusterId);
-                    for (int k = 0; k < kMaxAttributesPerCluster; k++)
-                    {
-                        /* Attributes */
-                        if (cluster->mAttrs[k])
-                        {
-                            auto attr = cluster->mAttrs[k];
-                            printf("      Attribute: 0x%04x\n", attr->mAttrId);
-                            char printstr[20];
-                            attr->mValue.ValueToStr(printstr, sizeof(printstr));
-                            printf("              Value: %s\n", printstr);
-                        }
-                    }
-                }
-            }
-        }
-    }
+    int endpointId;
+
+    /* Endpoints */
+    server.mEndpoints.Foreach([&endpointId](Endpoint * endpoint) -> void {
+        printf("  EndPoint: %d\n", endpointId++);
+
+        /* Clusters */
+        endpoint->mClusters.Foreach([](Cluster * cluster) -> void {
+            printf("    ClusterId: 0x%04x\n", cluster->mClusterId);
+
+            /* Attributes */
+            cluster->mAttrs.Foreach([](Attribute * attr) -> void {
+                printf("      Attribute: 0x%04x\n", attr->mAttrId);
+                char printstr[20];
+                attr->mValue.ValueToStr(printstr, sizeof(printstr));
+                printf("              Value: %s\n", printstr);
+            });
+        });
+    });
 }
 
 extern "C" void app_main()
