@@ -430,7 +430,7 @@ extern "C" void app_main()
     /* Add a cluster to the primary endpoint of our cluster server */
     server.AddCluster(&statusLED);
     PrintDataModel(server);
-    
+
     // Start the Echo Server
     InitDataModelHandler();
     startServer();
