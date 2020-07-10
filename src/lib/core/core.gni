@@ -38,6 +38,9 @@ declare_args() {
 
   # Enable argument parser.
   chip_config_enable_arg_parser = true
+
+  # Memory management style: malloc, simple, platform.
+  chip_config_memory_management = "malloc"
 }
 
 if (chip_target_style == "") {
@@ -63,3 +66,9 @@ assert(
     chip_logging_style == "android" || chip_logging_style == "external" ||
         chip_logging_style == "stdio" || chip_logging_style == "stdio_weak",
     "Please select a valid logging style: android, external, stdio, stdio_weak")
+
+assert(
+    chip_config_memory_management == "malloc" ||
+        chip_config_memory_management == "simple" ||
+        chip_config_memory_management == "platform",
+    "Please select a valid memory management style: malloc, simple, platform")
