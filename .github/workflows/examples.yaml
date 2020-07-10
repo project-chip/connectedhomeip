@@ -37,7 +37,7 @@ jobs:
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
               with:
-                  cond: "${{ github.event.pull_request.number }}"
+                  cond: ${{ github.event.pull_request.number == '' }}
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
             - name: Copy aside bloat report & binaries
@@ -81,7 +81,7 @@ jobs:
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
               with:
-                  cond: "${{ github.event.pull_request.number }}"
+                  cond: ${{ github.event.pull_request.number == '' }}
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
             - name: Copy aside bloat report & binaries
@@ -127,7 +127,7 @@ jobs:
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
               with:
-                  cond: "${{ github.event.pull_request.number }}"
+                  cond: ${{ github.event.pull_request.number == '' }}
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
             - name: Copy aside bloat report & binaries
@@ -138,4 +138,3 @@ jobs:
               with:
                   name: ${{ env.BUILD_TYPE }}-example-build-${{ steps.outsuffix.outputs.value }}
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
-
