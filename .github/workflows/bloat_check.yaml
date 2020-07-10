@@ -11,9 +11,12 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: "connectedhomeip/chip-build-openssl:0.2.18"
+            image: connectedhomeip/chip-build:0.3.0
 
         steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+
             - name: Report
               run: |
                   scripts/helpers/bloat_check.py                        \
