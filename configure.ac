@@ -1927,6 +1927,16 @@ if test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1; then
 fi
 
 #
+#
+# GIO
+#
+
+if test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1; then
+    PKG_CHECK_MODULES([GIO], [gio-2.0])
+    PKG_CHECK_MODULES([GIO_UNIX], [gio-unix-2.0])
+fi
+
+#
 # Sockets
 #
 
@@ -2350,6 +2360,8 @@ AC_MSG_NOTICE([
   PThreads compile flags                           : ${PTHREAD_CFLAGS:--}
   PThreads link libraries                          : ${PTHREAD_LIBS:--}
   IniPP compile flags                              : ${INIPP_CPPFLAGS:--}
+  GIO compile flags                                : ${GIO_CFLAGS:--}
+  GIO Unix compile flags                           : ${GIO_UNIX_CFLAGS:--}
   C Preprocessor                                   : ${CPP}
   C Compiler                                       : ${CC}
   C++ Preprocessor                                 : ${CXXCPP}

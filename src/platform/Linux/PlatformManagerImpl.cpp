@@ -27,15 +27,31 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
 
+#include <thread>
+
 namespace chip {
 namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
+static void GDBus_Thread()
+{
+    GMainLoop * loop = g_main_loop_new(nullptr, false);
+
+    g_main_loop_run(loop);
+    g_main_loop_unref(loop);
+}
+
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
+    GError * error = NULL;
 
+    this->mpGDBusConnection = UniqueGDBusConnection(g_bus_get_sync(G_BUS_TYPE_SYSTEM, NULL, &error));
+
+    std::thread gdbusThread(GDBus_Thread);
+    gdbusThread.detach();
+    
     // Initialize the configuration system.
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);
@@ -47,6 +63,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 exit:
     return err;
+}
+
+GDBusConnection * PlatformManagerImpl::GetGDBusConnection()
+{
+    return this->mpGDBusConnection.get();
 }
 
 } // namespace DeviceLayer
