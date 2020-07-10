@@ -23,6 +23,7 @@ chip_test_suite("tests") {
   sources = [
     "TestCHIPArgParser.cpp",
     "TestCHIPCounter.cpp",
+    "TestCHIPMem.cpp",
     "TestErrorStr.cpp",
     "TestPersistedCounter.cpp",
     "TestPersistedStorageImplementation.cpp",
@@ -40,5 +41,6 @@ chip_test_suite("tests") {
     "TestErrorStr",
     "TestCHIPArgParser",
     "TestTimeUtils",
+    "TestCHIPMem",
   ]
 }

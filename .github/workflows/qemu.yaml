@@ -10,20 +10,19 @@ jobs:
 
         env:
             BUILD_TYPE: esp32-qemu
-            BUILD_VERSION: 0.2.14
-            BUILD_IMAGE: chip-build-esp32-qemu
-            BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-esp32-qemu:0.2.14 # $BUILD_IMAGE/$BUILD_ORG:$BUILD_VERSION
+            image: connectedhomeip/chip-build-esp32-qemu:0.3.0
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
             - name: Checkout
               uses: actions/checkout@v2
+              with:
+                 submodules: true
             - name: Build example Echo App
               run: scripts/examples/esp_echo_app.sh
             - name: Build ESP32 QEMU and Run Tests
@@ -35,3 +34,4 @@ jobs:
               with:
                   name: qemu-esp32-logs
                   path: /tmp/log_output
+

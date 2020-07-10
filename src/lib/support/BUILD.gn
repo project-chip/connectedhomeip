@@ -63,6 +63,7 @@ support_headers = [
   "TimeUtils.h",
   "logging/CHIPLogging.h",
   "verhoeff/Verhoeff.h",
+  "CHIPMem.h",
 ]
 
 static_library("support") {
@@ -72,6 +73,8 @@ static_library("support") {
     "Base64.cpp",
     "CHIPArgParser.cpp",
     "CHIPCounter.cpp",
+    "CHIPMem-Malloc.cpp",
+    "CHIPMem-SimpleAlloc.cpp",
     "ErrorStr.cpp",
     "FibonacciUtils.cpp",
     "PersistedCounter.cpp",

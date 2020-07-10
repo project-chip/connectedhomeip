@@ -15,7 +15,7 @@
 #
 
 if [[ ! -d "${CHIP_ROOT}" ]]; then
-  CHIP_ROOT="$(dirname "$0")/.."
+    CHIP_ROOT=$(cd "$(dirname "$0")/.." && pwd)
 fi
 
 export PW_BRANDING_BANNER="$CHIP_ROOT/.chip-banner.txt"

@@ -52,6 +52,7 @@ EXTRA_DIST                               = \
     bootstrap                              \
     bootstrap-configure                    \
     repos.conf                             \
+    .gitmodules                            \
     $(srcdir)/build/autoconf               \
     $(srcdir)/config                       \
     $(srcdir)/config/efr32                 \
@@ -206,6 +207,14 @@ dist-hook: $(distdir)/.dist-version
 #
 distclean-local:
 	$(MAKE) -C $(srcdir) -f Makefile-bootstrap clean-repos
+
+#
+# Top-level convenience target for making documentation.
+#
+
+.PHONY: doc
+doc: $(BUILT_SOURCES)
+	$(MAKE) -C docs $(@)
 
 #
 # Top-level convenience target for making a documentation-only

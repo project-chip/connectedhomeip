@@ -52,7 +52,7 @@ void ListScreen::Display()
     for (int count = 0, y = ScreenTitleSafeTop; i < model->GetItemCount() && count < items; ++i, ++count, y += ScreenFontHeight)
     {
         tft_fg = focusIndex == i ? ScreenFocusColor : ScreenNormalColor;
-        TFT_print((char *) model->GetItemText(i).c_str(), ScreenTitleSafeTop, y);
+        TFT_print(model->GetItemText(i).c_str(), ScreenTitleSafeTop, y);
     }
 }
 

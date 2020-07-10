@@ -77,7 +77,7 @@ static void EchoKeyExchange(chip::DeviceController::ChipDeviceController * contr
 
     if (err != CHIP_NO_ERROR)
     {
-        fprintf(stderr, "Failed to exchange keys");
+        fprintf(stderr, "Failed to exchange keys\n");
     }
 }
 
@@ -229,9 +229,9 @@ bool DetermineCommandArgs(int argc, char * argv[], Command command, CommandArgs 
     // stringstream treats uint8_t as char, which is not what we want here.
     uint16_t endpoint;
     ss >> endpoint;
-    if (ss.fail() || !ss.eof() || endpoint > UINT8_MAX)
+    if (ss.fail() || !ss.eof() || endpoint < CHIP_ZCL_ENDPOINT_MIN || endpoint > CHIP_ZCL_ENDPOINT_MAX)
     {
-        fprintf(stderr, "Error: Invalid endpoint id '%s'", argv[4]);
+        fprintf(stderr, "Error: Invalid endpoint id '%s'\n", argv[4]);
         return false;
     }
     commandArgs->endpointId = endpoint;

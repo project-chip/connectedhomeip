@@ -34,7 +34,9 @@
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/UDP.h>
 
+#include "Server.h"
 #include "chip-zcl/chip-zcl.h"
 
 extern "C" {
@@ -68,7 +70,7 @@ class ServerCallback : public SecureSessionMgrCallback
 {
 public:
     virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                   System::PacketBuffer * buffer, SecureSessionMgr * mgr)
+                                   System::PacketBuffer * buffer, SecureSessionMgrBase * mgr)
     {
         const size_t data_len = buffer->DataLength();
         char src_addr[PeerAddress::kMaxToStringSize];
@@ -94,7 +96,7 @@ public:
         }
     }
 
-    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr)
+    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
     {
         CHIP_ERROR err;
 
@@ -135,15 +137,21 @@ static ServerCallback gCallbacks;
 
 } // namespace
 
+void InitDataModelHandler()
+{
+    chipZclEndpointInit();
+}
+
 // The echo server assumes the platform's networking has been setup already
-void SetupTransport(IPAddressType type, SecureSessionMgr * transport)
+void StartServer(DemoSessionManager * sessions)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = transport->Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::InetLayer, UdpListenParameters().SetAddressType(type));
+    err = sessions->Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::SystemLayer,
+                         UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
     SuccessOrExit(err);
 
-    transport->SetDelegate(&gCallbacks);
+    sessions->SetDelegate(&gCallbacks);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -154,15 +162,4 @@ exit:
     {
         NRF_LOG_INFO("Lock Server Listening...");
     }
-}
-
-// The echo server assumes the platform's networking has been setup already
-void StartServer(SecureSessionMgr * transport_ipv6)
-{
-    SetupTransport(kIPAddressType_IPv6, transport_ipv6);
-}
-
-void InitDataModelHandler()
-{
-    chipZclEndpointInit();
 }

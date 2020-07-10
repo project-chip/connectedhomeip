@@ -90,6 +90,7 @@ public:
     void LockChipStack(void);
     bool TryLockChipStack(void);
     void UnlockChipStack(void);
+    CHIP_ERROR Shutdown(void);
 
 private:
     // ===== Members for internal use by the following friends.
@@ -232,6 +233,11 @@ inline void PlatformManager::DispatchEvent(const ChipDeviceEvent * event)
 inline CHIP_ERROR PlatformManager::StartChipTimer(uint32_t durationMS)
 {
     return static_cast<ImplClass *>(this)->_StartChipTimer(durationMS);
+}
+
+inline CHIP_ERROR PlatformManager::Shutdown(void)
+{
+    return static_cast<ImplClass *>(this)->_Shutdown();
 }
 
 } // namespace DeviceLayer

@@ -22,10 +22,11 @@
 #include <inet/InetLayer.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/UDP.h>
 
-void SetupTransport(chip::Inet::IPAddressType type, chip::SecureSessionMgr * transport);
-void StartServer(chip::SecureSessionMgr * transport_ipv6);
+using DemoSessionManager = chip::SecureSessionMgr<chip::Transport::UDP>;
 
+void StartServer(DemoSessionManager * sessions);
 void InitDataModelHandler();
 
 #endif // NRF5_COMMON_SERVER_H

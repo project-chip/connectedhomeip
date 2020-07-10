@@ -60,9 +60,11 @@ CLEANFILES                                      = \
     $(chip_docdist_archive)                      \
     $(NULL)
 
+.PHONY: doc docdist
+
 if CHIP_BUILD_DOCS
 
-all-local: html/index.html
+all-local doc: html/index.html
 
 #
 # We choose to manually transform Doxyfile.in into Doxyfile here in
@@ -105,6 +107,11 @@ docdist $(chip_docdist_alias): $(chip_docdist_archive)
 
 clean-local:
 	$(AM_V_at)rm -f -r html
+
+else
+
+doc docdist:
+	$(error "Documentation support is disabled. Please explicitly enable documentation with `--enable-docs` via `configure` and/or ensure that Doxygen is installed")
 
 endif # CHIP_BUILD_DOCS
 

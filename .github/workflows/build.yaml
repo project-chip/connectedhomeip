@@ -13,25 +13,24 @@ jobs:
                 type: [main, clang, linux-embedded, mbedtls]
         env:
             BUILD_TYPE: ${{ matrix.type }}
-            BUILD_VERSION: 0.2.14
-            BUILD_IMAGE: chip-build-openssl
-            BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
 
         container:
-            image: "connectedhomeip/chip-build-openssl:0.2.18"
+            image: connectedhomeip/chip-build:0.3.0
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
             - name: Checkout
               uses: actions/checkout@v2
+              with:
+                 submodules: true
             - name: Bootstrap
               run: |
                   case $BUILD_TYPE in
                      "main") export BOOTSTRAP_ARGUMENTS="";;
-                     "clang") export BOOTSTRAP_ARGUMENTS="CC=clang-9 CXX=clang++-9";;
+                     "clang") export BOOTSTRAP_ARGUMENTS="CC=clang CXX=clang++";;
                      "linux-embedded") export BOOTSTRAP_ARGUMENTS="--with-device-layer=linux";;
                      "mbedtls") export BOOTSTRAP_ARGUMENTS="--with-crypto=mbedtls";;
                      *) ;;
@@ -76,3 +75,4 @@ jobs:
             # - name: Upload Code Coverage
             #   if: ${{ contains('main', env.BUILD_TYPE) }}
             #   run: bash <(curl -s https://codecov.io/bash)
+
