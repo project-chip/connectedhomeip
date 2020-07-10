@@ -109,7 +109,7 @@ TESTS                                                 = \
 
 # Source, compiler, and linker options for test programs.
 
-TestAppLayer_SOURCES                                  = TestDriver.cpp
+TestAppLayer_SOURCES                                  = TestDataModelDriver.cpp
 TestAppLayer_LDADD                                    = $(COMMON_LDADD)
 
 #
