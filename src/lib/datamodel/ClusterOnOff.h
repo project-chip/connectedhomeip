@@ -29,37 +29,14 @@
 namespace chip {
 namespace DataModel {
 
-
 /* Cluster ID */
 static const uint16_t kClusterIdOnOff = 0x0006;
 
 /* Attribute IDs */
-static const uint16_t kAttributeIdOnOff = 0x0000;
+static const uint16_t kAttributeIdOnOff              = 0x0000;
 static const uint16_t kAttributeIdGlobalSceneControl = 0x4000;
-static const uint16_t kAttributeIdOnTime = 0x4001;
-static const uint16_t kAttributeIdOffWaitTime = 0x4002;
-
-/* Attributes */
-
-static inline Attribute * CHIPAttributeOnOffNew(void)
-{
-    return new Attribute(kAttributeIdOnOff, kCHIPValueType_Bool);
-}
-
-static inline Attribute * CHIPAttributeGlobalSceneControlNew(void)
-{
-    return new Attribute(kAttributeIdGlobalSceneControl, kCHIPValueType_Bool);
-}
-
-static inline Attribute * CHIPAttributeOnTimeNew(void)
-{
-    return new Attribute(0x4001, kCHIPValueType_UInt16);
-}
-
-static inline Attribute * CHIPAttributeOffWaitTimeNew(void)
-{
-    return new Attribute(0x4002, kCHIPValueType_UInt16);
-}
+static const uint16_t kAttributeIdOnTime             = 0x4001;
+static const uint16_t kAttributeIdOffWaitTime        = 0x4002;
 
 /**
  * @brief
@@ -67,22 +44,23 @@ static inline Attribute * CHIPAttributeOffWaitTimeNew(void)
  */
 class ClusterOnOff : public Cluster
 {
-public:
-    CHIP_ERROR Init()
-    {
-        if (mAttrs[0] == nullptr)
-        {
-            AddAttribute(CHIPAttributeOnOffNew());
-            AddAttribute(CHIPAttributeGlobalSceneControlNew());
-            AddAttribute(CHIPAttributeOnTimeNew());
-            AddAttribute(CHIPAttributeOffWaitTimeNew());
-        }
-        return CHIP_NO_ERROR;
-    }
+    // TODO: these should
+private:
+    Attribute mOnOff;
+    Attribute mGlobalSceneControl;
+    Attribute mOnTime;
+    Attribute mOffWaitTime;
 
-    ClusterOnOff() : Cluster(kClusterIdOnOff)
+public:
+    ClusterOnOff() :
+        Cluster(kClusterIdOnOff), mOnOff(kAttributeIdOnOff, kCHIPValueType_Bool),
+        mGlobalSceneControl(kAttributeIdGlobalSceneControl, kCHIPValueType_Bool),
+        mOnTime(kAttributeIdOnTime, kCHIPValueType_UInt16), mOffWaitTime(kAttributeIdOffWaitTime, kCHIPValueType_UInt16)
     {
-        Init();
+        AddAttribute(&mOnOff);
+        AddAttribute(&mGlobalSceneControl);
+        AddAttribute(&mOnTime);
+        AddAttribute(&mOffWaitTime);
     }
 };
 

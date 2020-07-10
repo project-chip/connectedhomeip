@@ -25,36 +25,25 @@
 #define CHIPBASECLUSTER_H_
 
 #include <datamodel/Attribute.h>
+#include <datamodel/Deque.h>
 
 namespace chip {
 namespace DataModel {
 
-/* TODO: To be converted to a template version or Kconfig later on */
-static const uint8_t kMaxAttributesPerCluster = 10;
 /**
  * @brief
  *   This class implements the cluster object that maintains its attributes. Typically specific
  *   cluster definitions will derive from this class and implement their functionality.
  */
-class Cluster
+class Cluster : public Deque<Cluster>
 {
 public:
     uint16_t mClusterId;
-    Attribute * mAttrs[kMaxAttributesPerCluster];
+    Deque<Attribute> mAttrs;
 
-    Cluster(uint16_t clusterId) : mClusterId(clusterId), mAttrs() {}
+    Cluster(uint16_t clusterId) : Deque(this), mClusterId(clusterId), mAttrs(nullptr) {}
 
-    virtual ~Cluster()
-    {
-        for (int i = 0; i < kMaxAttributesPerCluster; i++)
-        {
-            if (mAttrs[i] != nullptr)
-            {
-                delete mAttrs[i];
-                mAttrs[i] = nullptr;
-            }
-        }
-    }
+    virtual ~Cluster() {}
 
     /**
      * @brief
@@ -64,15 +53,8 @@ public:
      */
     CHIP_ERROR AddAttribute(Attribute * attr)
     {
-        for (int i = 0; i < kMaxAttributesPerCluster; i++)
-        {
-            if (mAttrs[i] == nullptr)
-            {
-                mAttrs[i] = attr;
-                return CHIP_NO_ERROR;
-            }
-        }
-        return CHIP_ERROR_INTERNAL;
+        mAttrs.Insert(&attr->mDeque);
+        return CHIP_NO_ERROR;
     }
 
     /**
@@ -83,14 +65,7 @@ public:
      */
     Attribute * GetAttribute(uint16_t attrId)
     {
-        for (int i = 0; i < kMaxAttributesPerCluster; i++)
-        {
-            if (mAttrs[i] && (mAttrs[i]->mAttrId == attrId))
-            {
-                return mAttrs[i];
-            }
-        }
-        return nullptr;
+        return mAttrs.Find([attrId](Attribute * item) -> bool { return (item->mAttrId == attrId); });
     }
 
     /**
@@ -104,7 +79,7 @@ public:
     {
         /* Just hand-off to update the value internally */
         auto attr = GetAttribute(attrId);
-        if (attr)
+        if (attr != nullptr)
         {
             return attr->Set(value);
         }
