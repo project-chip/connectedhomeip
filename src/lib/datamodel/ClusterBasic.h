@@ -33,31 +33,10 @@ namespace DataModel {
 static const uint16_t kClusterIdBase = 0x0000;
 
 /* Attribute IDs */
-static const uint16_t kAttributeIdZCLVersion = 0x0000;
+static const uint16_t kAttributeIdZCLVersion         = 0x0000;
 static const uint16_t kAttributeIdApplicationVersion = 0x0001;
-static const uint16_t kAttributeIdStackVersion = 0x0002;
-static const uint16_t kAttributeIdHWVersion = 0x0003;
-
-/* Attributes */
-static inline Attribute * CHIPAttributeZCLVersionNew(uint8_t ZCLVersion)
-{
-    return new Attribute(kAttributeIdZCLVersion, ValueUInt8(ZCLVersion));
-}
-
-static inline Attribute * CHIPAttributeApplicationVersionNew(uint8_t applicationVersion)
-{
-    return new Attribute(kAttributeIdApplicationVersion, ValueUInt8(applicationVersion));
-}
-
-static inline Attribute * CHIPAttributeStackVersionNew(uint8_t stackVersion)
-{
-    return new Attribute(kAttributeIdStackVersion, ValueUInt8(stackVersion));
-}
-
-static inline Attribute * CHIPAttributeHWVersionNew(uint8_t HWVersion)
-{
-    return new Attribute(0x0003, ValueUInt8(HWVersion));
-}
+static const uint16_t kAttributeIdStackVersion       = 0x0002;
+static const uint16_t kAttributeIdHWVersion          = 0x0003;
 
 /**
  * @brief
@@ -65,28 +44,26 @@ static inline Attribute * CHIPAttributeHWVersionNew(uint8_t HWVersion)
  */
 class ClusterBasic : public Cluster
 {
+private:
+    Attribute mZCLVersion;
+    Attribute mApplicationVersion;
+    Attribute mStackVersion;
+    Attribute mHWVersion;
+
 public:
-    ClusterBasic() : Cluster(kClusterIdBase) {}
-
-    CHIP_ERROR Init(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion)
-    {
-        if (mAttrs[0] == nullptr)
-        {
-            AddAttribute(CHIPAttributeZCLVersionNew(ZCLVersion));
-            AddAttribute(CHIPAttributeApplicationVersionNew(applicationVersion));
-            AddAttribute(CHIPAttributeStackVersionNew(stackVersion));
-            AddAttribute(CHIPAttributeHWVersionNew(HWVersion));
-        }
-        return CHIP_NO_ERROR;
-    }
-
     ClusterBasic(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) :
-        Cluster(kClusterIdBase)
+        Cluster(kClusterIdBase),
+        /* Attributes */
+        mZCLVersion(kAttributeIdZCLVersion, ValueUInt8(ZCLVersion)),
+        mApplicationVersion(kAttributeIdApplicationVersion, ValueUInt8(applicationVersion)),
+        mStackVersion(kAttributeIdStackVersion, ValueUInt8(stackVersion)), mHWVersion(kAttributeIdHWVersion, ValueUInt8(HWVersion))
     {
-        Init(ZCLVersion, applicationVersion, stackVersion, HWVersion);
+        AddAttribute(&mZCLVersion);
+        AddAttribute(&mApplicationVersion);
+        AddAttribute(&mStackVersion);
+        AddAttribute(&mHWVersion);
     }
 };
-
 
 } // namespace DataModel
 } // namespace chip

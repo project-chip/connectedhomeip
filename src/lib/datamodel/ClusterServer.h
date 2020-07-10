@@ -25,16 +25,11 @@
 #ifndef CHIPCLUSTERSERVER_H_
 #define CHIPCLUSTERSERVER_H_
 
-#include <datamodel/EndPoint.h>
+#include <datamodel/Deque.h>
+#include <datamodel/Endpoint.h>
 
 namespace chip {
 namespace DataModel {
-
-/* TODO: To be converted to a template version or Kconfig later on */
-static const uint8_t kMaxEndPointPerServer = 5;
-/* TODO: If endpoint numbers range up to 256, it may be better not to use array index as the endpoint id */
-/* Skip the reserved endPointId */
-static const uint8_t kEndPointIdStart = 1;
 
 /**
  * @brief
@@ -44,24 +39,13 @@ static const uint8_t kEndPointIdStart = 1;
 class ClusterServer
 {
 public:
-    EndPoint * mEndPoints[kMaxEndPointPerServer];
+    Endpoint mEndpoints;
 
-    ClusterServer(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) : mEndPoints()
-    {
-        mEndPoints[kEndPointIdStart] = new EndPoint(ZCLVersion, applicationVersion, stackVersion, HWVersion);
-    }
+    ClusterServer(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) :
+        mEndpoints(ZCLVersion, applicationVersion, stackVersion, HWVersion)
+    {}
 
-    virtual ~ClusterServer()
-    {
-        for (int i = kEndPointIdStart; i < kMaxEndPointPerServer; i++)
-        {
-            if (mEndPoints[i] != nullptr)
-            {
-                delete mEndPoints[i];
-                mEndPoints[i] = nullptr;
-            }
-        }
-    }
+    virtual ~ClusterServer() {}
 
     /**
      * @brief
@@ -69,15 +53,8 @@ public:
      *
      * @param cluster Pointer to the cluster object being added
      */
-    CHIP_ERROR AddCluster(Cluster * cluster)
-    {
-        if (!cluster)
-        {
-            return CHIP_ERROR_INTERNAL;
-        }
-
-        return mEndPoints[kEndPointIdStart]->AddCluster(cluster);
-    }
+    CHIP_ERROR
+    AddCluster(Cluster * cluster) { return mEndpoints.AddCluster(cluster); }
 
     /**
      * @brief
@@ -85,14 +62,30 @@ public:
      *
      * @param cluster Pointer to the endpoint object being added
      */
-    CHIP_ERROR AddEndPoint(EndPoint * endPoint)
+    CHIP_ERROR
+    AddEndpoint(Endpoint * endpoint)
     {
-        for (int i = kEndPointIdStart; i < kMaxEndPointPerServer; i++)
+        mEndpoints.Insert(endpoint);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetValue(uint8_t endPointId, uint16_t clusterId, uint16_t attrId, Value & value)
+    {
+        auto endpoint = mEndpoints.Find([&endPointId](Endpoint * item) -> bool { return (endPointId-- == 0); });
+
+        if (endpoint != nullptr)
         {
-            if (mEndPoints[i] == nullptr)
+            auto cluster = endpoint->GetCluster(clusterId);
+
+            if (cluster != nullptr)
             {
-                mEndPoints[i] = endPoint;
-                return CHIP_NO_ERROR;
+                auto attr = cluster->GetAttribute(attrId);
+
+                if (attr != nullptr)
+                {
+                    value = attr->mValue;
+                    return CHIP_NO_ERROR;
+                }
             }
         }
         return CHIP_ERROR_INTERNAL;

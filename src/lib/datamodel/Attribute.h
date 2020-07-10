@@ -24,8 +24,10 @@
 #ifndef CHIP_ATTRIBUTE_H_
 #define CHIP_ATTRIBUTE_H_
 
-#include <core/CHIPError.h>
+#include <datamodel/Deque.h>
 #include <datamodel/Value.h>
+
+#include <core/CHIPError.h>
 
 namespace chip {
 namespace DataModel {
@@ -36,16 +38,20 @@ namespace DataModel {
  */
 class Attribute
 {
+private:
+    Deque<Attribute> mDeque;
+    friend class Cluster;
+
 public:
     uint16_t mAttrId;
     Value mValue;
     Value mMin;
     Value mMax;
 
-    Attribute(uint16_t attrId, ValueTypes type) : mAttrId(attrId), mValue(type), mMin(type), mMax(type) {}
-    Attribute(uint16_t attrId, Value value) : mAttrId(attrId), mValue(value), mMin(value.mType), mMax(value.mType) {}
+    Attribute(uint16_t attrId, ValueTypes type) : mDeque(this), mAttrId(attrId), mValue(type), mMin(type), mMax(type) {}
+    Attribute(uint16_t attrId, Value value) : mDeque(this), mAttrId(attrId), mValue(value), mMin(value.mType), mMax(value.mType) {}
     Attribute(uint16_t attrId, ValueTypes type, uint64_t min, uint64_t max) :
-        mAttrId(attrId), mValue(type), mMin(type, min), mMax(type, max)
+        mDeque(this), mAttrId(attrId), mValue(type), mMin(type, min), mMax(type, max)
     {}
 
     /**
