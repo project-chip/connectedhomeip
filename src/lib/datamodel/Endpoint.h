@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This file contains the EndPoint class
+ *      This file contains the Endpoint class
  *
  */
 
@@ -26,41 +26,29 @@
 
 #include <datamodel/Attribute.h>
 #include <datamodel/ClusterBasic.h>
+#include <datamodel/Deque.h>
 
 namespace chip {
 namespace DataModel {
 
 /* TODO: To be converted to a template version or Kconfig later on */
-static const uint8_t kMaxClustersPerEndPoint = 5;
+static const uint8_t kMaxClustersPerEndpoint = 5;
 
 /**
  * @brief
  *   This class implements the endpoint that maintains all the clusters supported by this endpoint.
  */
-class EndPoint
+class Endpoint : public Deque<Endpoint>
 {
+
 public:
-    static ClusterBasic mBasicCluster;
-    Cluster * mClusters[kMaxClustersPerEndPoint];
+    ClusterBasic mClusters; // head pointer is a BasicCluster
 
-    EndPoint(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) : mClusters()
-    {
-        mBasicCluster.Init(ZCLVersion, applicationVersion, stackVersion, HWVersion);
-        mClusters[0] = &mBasicCluster;
-    }
+    Endpoint(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) :
+        Deque(this), mClusters(ZCLVersion, applicationVersion, stackVersion, HWVersion)
+    {}
 
-    virtual ~EndPoint()
-    {
-        /* The 0th index is not dynamically allocated */
-        for (int i = 1; i < kMaxClustersPerEndPoint; i++)
-        {
-            if (mClusters[i] != nullptr)
-            {
-                delete mClusters[i];
-                mClusters[i] = nullptr;
-            }
-        }
-    }
+    virtual ~Endpoint() {}
 
     /**
      * @brief
@@ -70,15 +58,8 @@ public:
      */
     CHIP_ERROR AddCluster(Cluster * cluster)
     {
-        for (int i = 0; i < kMaxClustersPerEndPoint; i++)
-        {
-            if (mClusters[i] == nullptr)
-            {
-                mClusters[i] = cluster;
-                return CHIP_NO_ERROR;
-            }
-        }
-        return CHIP_ERROR_INTERNAL;
+        mClusters.Insert(cluster);
+        return CHIP_NO_ERROR;
     }
 
     /**
@@ -89,14 +70,7 @@ public:
      */
     Cluster * GetCluster(uint8_t clusterId)
     {
-        for (int i = 0; i < kMaxClustersPerEndPoint; i++)
-        {
-            if (mClusters[i] && mClusters[i]->mClusterId == clusterId)
-            {
-                return mClusters[i];
-            }
-        }
-        return nullptr;
+        return mClusters.Find([clusterId](Cluster * item) -> bool { return (item->mClusterId == clusterId); });
     }
 };
 

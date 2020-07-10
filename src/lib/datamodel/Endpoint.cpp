@@ -17,16 +17,14 @@
 
 /**
  *    @file
- *      This file implements the EndPoint class
+ *      This file implements the Endpoint class
  *
  */
 
-#include <datamodel/EndPoint.h>
+#include <datamodel/Endpoint.h>
 
 namespace chip {
 namespace DataModel {
-
-ClusterBasic EndPoint::mBasicCluster;
 
 } // namespace DataModel
 } // namespace chip
