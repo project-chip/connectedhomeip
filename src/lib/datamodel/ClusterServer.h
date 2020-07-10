@@ -69,6 +69,62 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    Endpoint * GetEndpoint(uint8_t endPointId)
+    {
+        return mEndpoints.Find([&endPointId](Endpoint * item) -> bool { return (endPointId-- == 0); });
+    }
+
+    Cluster * GetCluster(uint8_t endPointId, uint16_t clusterId)
+    {
+        Cluster * cluster = nullptr;
+
+        auto endpoint = GetEndpoint(endPointId);
+        if (endpoint != nullptr)
+        {
+            cluster = endpoint->GetCluster(clusterId);
+        }
+        return cluster;
+    }
+
+    Attribute * GetAttribute(uint8_t endPointId, uint16_t clusterId, uint16_t attrId)
+    {
+        Attribute * attr = nullptr;
+        auto endpoint    = GetEndpoint(endPointId);
+
+        if (endpoint != nullptr)
+        {
+            auto cluster = endpoint->GetCluster(clusterId);
+
+            if (cluster != nullptr)
+            {
+                attr = cluster->GetAttribute(attrId);
+            }
+        }
+        return attr;
+    }
+
+    CHIP_ERROR SetValue(uint8_t endPointId, uint16_t clusterId, uint16_t attrId, Value & value)
+    {
+        auto endpoint = GetEndpoint(endPointId-- == 0);
+
+        if (endpoint != nullptr)
+        {
+            auto cluster = endpoint->GetCluster(clusterId);
+
+            if (cluster != nullptr)
+            {
+                auto attr = cluster->GetAttribute(attrId);
+
+                if (attr != nullptr)
+                {
+                    attr->mValue = value;
+                    return CHIP_NO_ERROR;
+                }
+            }
+        }
+        return CHIP_ERROR_INTERNAL;
+    }
+
     CHIP_ERROR GetValue(uint8_t endPointId, uint16_t clusterId, uint16_t attrId, Value & value)
     {
         auto endpoint = mEndpoints.Find([&endPointId](Endpoint * item) -> bool { return (endPointId-- == 0); });
