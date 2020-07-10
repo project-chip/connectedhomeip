@@ -33,6 +33,9 @@ IMAGE=${DOCKER_BUILD_IMAGE:-$(basename "$(pwd)")}
 # version
 VERSION=${DOCKER_BUILD_VERSION:-$(cat version)}
 
+# target (if Dockerfile defines several images)
+TARGET=${DOCKER_BUILD_TARGET}
+
 [[ ${*/--help//} != "${*}" ]] && {
     set +x
     echo "Usage: $me <OPTIONS>
@@ -61,13 +64,12 @@ set -ex
 # go find and build any CHIP images this image is "FROM"
 awk -F/ '/^FROM connectedhomeip/ {print $2}' Dockerfile | while read -r dep; do
     dep=${dep%:*}
-    (cd "../$dep" && ./build.sh "$@")
+    (cd "../$dep" && DOCKER_BUILD_IMAGE= DOCKER_BUILD_TARGET= ./build.sh "$@")
 done
 
 BUILD_ARGS=()
-if [[ ${*/--no-cache//} != "${*}" ]]; then
-    BUILD_ARGS+=(--no-cache)
-fi
+[[ ${*/--no-cache//} != "${*}" ]] && BUILD_ARGS+=(--no-cache)
+[[ -n $TARGET ]]                  && BUILD_ARGS+=(--target "$TARGET")
 
 docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
 

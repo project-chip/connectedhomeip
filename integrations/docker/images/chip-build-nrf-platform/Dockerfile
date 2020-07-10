@@ -1,15 +1,9 @@
 ARG VERSION=latest
-FROM connectedhomeip/chip-build:${VERSION}
+FROM connectedhomeip/chip-build:${VERSION} AS common
 
-# nRF5 SDK, needed for building Nordic Platform code
-RUN set -x \
-    && curl -o /tmp/nRF5SDKforThreadandZigbee.zip \
-    https://www.nordicsemi.com/-/media/Software-and-other-downloads/SDKs/nRF5-SDK-for-Thread/nRF5-SDK-for-Thread-and-Zigbee/nRF5SDKforThreadandZigbeev400dc7186b.zip \
-    && (mkdir /var/nRF5_SDK_for_Thread_and_Zigbee \
-    && cd /var/nRF5_SDK_for_Thread_and_Zigbee \
-    && unzip /tmp/nRF5SDKforThreadandZigbee.zip) \
-    && rm -rf /tmp/nRF5SDKforThreadandZigbee.zip \
-    && : # last line
+# ==================================================
+# Common layers for nRF5 and nRF Connect SDK images
+# ==================================================
 
 # Tools for flashing software on Nordic devices, and accessing device logs
 RUN set -x \
@@ -30,6 +24,49 @@ RUN set -x \
     | tar jxvf -) \
     && : # last line
 
+# ==================================================
+# nRF5 SDK image (target: chip-build-nrf-platform)
+# ==================================================
+FROM common AS chip-build-nrf-platform
+
+RUN set -x \
+    && curl -o /tmp/nRF5SDKforThreadandZigbee.zip \
+    https://www.nordicsemi.com/-/media/Software-and-other-downloads/SDKs/nRF5-SDK-for-Thread/nRF5-SDK-for-Thread-and-Zigbee/nRF5SDKforThreadandZigbeev400dc7186b.zip \
+    && (mkdir /var/nRF5_SDK_for_Thread_and_Zigbee \
+    && cd /var/nRF5_SDK_for_Thread_and_Zigbee \
+    && unzip /tmp/nRF5SDKforThreadandZigbee.zip) \
+    && rm -rf /tmp/nRF5SDKforThreadandZigbee.zip \
+    && : # last line
+
 ENV NRF5_SDK_ROOT=/var/nRF5_SDK_for_Thread_and_Zigbee
 ENV NRF5_TOOLS_ROOT=/var/nRF5_tools
 ENV ARM_GCC_INSTALL_ROOT=/var/gcc-arm-none-eabi-9-2019-q4-major/bin/
+
+# ==============================================================
+# nRF Connect SDK image (target: chip-build-nrfconnect-platform)
+# ==============================================================
+FROM common AS chip-build-nrfconnect-platform
+
+RUN set -x \
+    # Device Tree Compiler 1.4.7
+    && curl -o /tmp/dtc.deb http://mirrors.edge.kernel.org/ubuntu/pool/main/d/device-tree-compiler/device-tree-compiler_1.4.7-3ubuntu2_amd64.deb \
+    && dpkg -i /tmp/dtc.deb \
+    # nRF Connect SDK 1.3.0 sources & requirements
+    && (mkdir /var/ncs && cd /var/ncs \
+    && pip3 install --no-cache-dir setuptools wheel cmake west \
+    && west init -m https://github.com/nrfconnect/sdk-nrf --mr v1.3.0 \
+    && west update \
+    && pip3 install --no-cache-dir -r zephyr/scripts/requirements.txt \
+    && pip3 install --no-cache-dir -r nrf/scripts/requirements.txt \
+    && pip3 install --no-cache-dir -r bootloader/mcuboot/scripts/requirements.txt) \
+    # Configuration
+    && echo "source /var/ncs/zephyr/zephyr-env.sh" >> ~/.bashrc \
+    # Cleanup
+    && rm -rf /tmp/* ~/.cache/* \
+    && : # last line
+
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+ENV ZEPHYR_BASE=/var/ncs/zephyr
+ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
+ENV GNUARMEMB_TOOLCHAIN_PATH=/var/gcc-arm-none-eabi-9-2019-q4-major
