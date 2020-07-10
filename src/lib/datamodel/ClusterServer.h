@@ -78,7 +78,7 @@ public:
     {
         /* Endpoint #0 is reserved, until we handle that properly, we will offset everything by 1 */
         endpointId--;
-        auto *p = mEndpoints.Find([&endpointId](Endpoint * item) -> bool { return (endpointId-- == 0); });
+        auto * p = mEndpoints.Find([&endpointId](Endpoint * item) -> bool { return (endpointId-- == 0); });
         return p;
     }
 
