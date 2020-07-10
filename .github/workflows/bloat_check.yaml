@@ -1,0 +1,23 @@
+name: Bloat Check
+on:
+    schedule:
+        - cron: '*/10 * * * *'
+
+
+jobs:
+    pull_request_update:
+        name: Report on pull requests
+
+        runs-on: ubuntu-latest
+
+        container:
+            image: "connectedhomeip/chip-build-openssl:0.2.18"
+
+        steps:
+            - name: Report
+              run: |
+                  scripts/helpers/bloat_check.py                        \
+                       --github-repository project-chip/connectedhomeip \
+                       --github-api-token "${{ secrets.GITHUB_TOKEN }}"
+
+
