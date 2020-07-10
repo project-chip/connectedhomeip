@@ -12,17 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Device platform layer: freertos, nrf5, none.
-  device_platform = ""
-}
+# The location of the build configuration file.
+buildconfig = "//build/config/BUILDCONFIG.gn"
 
-if (device_platform == "") {
-  if (current_os != "freertos") {
-    device_platform = "none"
-  }
-}
+# CHIP uses angle bracket includes.
+check_system_includes = true
 
-assert((current_os != "freertos" && device_platform == "none") ||
-           device_platform == "nrf5",
-       "Please select a valid value for device_platform")
+# Allow loading paths relative to //gn.
+secondary_source = "//third_party/connectedhomeip/gn/"
+
+default_args = {
+  import("//args.gni")
+}

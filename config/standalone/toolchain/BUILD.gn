@@ -12,12 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Enable building tests.
-  chip_build_tests = current_os != "freertos"
-}
+import("//build_overrides/chip.gni")
 
-declare_args() {
-  # Enable use of nlfaultinjection.
-  chip_with_nlfaultinjection = chip_build_tests
+import("//build/toolchain/gcc_toolchain.gni")
+
+gcc_toolchain("standalone") {
+  toolchain_args = {
+    current_os = host_os
+    current_cpu = host_cpu
+    is_clang = false
+    import("${chip_root}/config/standalone/args.gni")
+  }
 }

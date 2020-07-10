@@ -14,15 +14,14 @@
 
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/src/system/system.gni")
+
 declare_args() {
   # Enable IPv4 support.
   inet_config_enable_ipv4 = true
 
   # Enable DNS resolver.
   inet_config_enable_dns_resolver = true
-
-  # Enable async DNS.
-  inet_config_enable_async_dns_sockets = true
 
   # Enable raw endpoint.
   inet_config_enable_raw_endpoint = true
@@ -35,4 +34,10 @@ declare_args() {
 
   # Enable TUN endpoint.
   inet_config_enable_tun_endpoint = current_os == "linux"
+}
+
+declare_args() {
+  # Enable async DNS.
+  inet_config_enable_async_dns_sockets =
+      inet_config_enable_dns_resolver && chip_system_config_use_sockets
 }

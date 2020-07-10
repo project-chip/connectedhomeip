@@ -33,6 +33,9 @@ declare_args() {
 
   # Extra header to include in SystemConfig.h for platform.
   system_platform_config_include = ""
+
+  # Extra include dirs for project configs.
+  project_config_include_dirs = []
 }
 
 config("system_config") {
@@ -106,6 +109,8 @@ config("system_config") {
   if (chip_system_config_clock == "gettimeofday") {
     defines += [ "HAVE_GETTIMEOFDAY=1" ]
   }
+
+  include_dirs = project_config_include_dirs
 }
 
 source_set("system_config_header") {
@@ -152,6 +157,8 @@ static_library("system") {
     "${chip_root}/src/lib/support",
     "${nlassert_root}:nlassert",
   ]
+
+  allow_circular_includes_from = [ "${chip_root}/src/lib/support" ]
 
   if (chip_with_nlfaultinjection) {
     sources += [ "SystemFaultInjection.cpp" ]

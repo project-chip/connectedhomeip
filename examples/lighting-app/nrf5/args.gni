@@ -12,34 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/nrf5_lock_app.gni")
+import("//build_overrides/chip.gni")
 
-device_platform = "nrf5"
+import("${chip_root}/src/platform/nRF5/args.gni")
+
+# SDK target. This is overriden to add our SDK app_config.h & defines.
+nrf5_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 arm_arch = "armv7e-m"
 arm_float_abi = "hard"
 arm_cpu = "cortex-m4"
 arm_fpu = "fpv4-sp-d16"
 
-lwip_platform = "nrf5"
-lwip_ipv6 = true
-lwip_ipv4 = false
-lwip_api = true
-
-inet_config_enable_ipv4 = false
-inet_config_enable_dns_resolver = false
-
-chip_build_tests = false
-nrf5_sdk_target = "${nrf5_lock_app_root}:sdk"
-
-ble_platform_config_include = "<platform/nRF5/BlePlatformConfig.h>"
 ble_project_config_include = "<CHIPProjectConfig.h>"
-chip_device_platform_config_include =
-    "<platform/nRF5/CHIPDevicePlatformConfig.h>"
 chip_device_project_config_include = "<CHIPProjectConfig.h>"
-chip_platform_config_include = "<platform/nRF5/CHIPPlatformConfig.h>"
 chip_project_config_include = "<CHIPProjectConfig.h>"
-inet_platform_config_include = "<platform/nRF5/InetPlatformConfig.h>"
 inet_project_config_include = "<CHIPProjectConfig.h>"
-system_platform_config_include = "<platform/nRF5/SystemPlatformConfig.h>"
 system_project_config_include = "<CHIPProjectConfig.h>"

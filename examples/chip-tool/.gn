@@ -12,7 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Root directory for nRF5 lock app example.
-  nrf5_lock_app_root = "//"
+# The location of the build configuration file.
+buildconfig = "//build/config/BUILDCONFIG.gn"
+
+# CHIP uses angle bracket includes.
+check_system_includes = true
+
+# Allow loading paths relative to //gn.
+secondary_source = "//third_party/connectedhomeip/gn/"
+
+default_args = {
+  import("//args.gni")
 }

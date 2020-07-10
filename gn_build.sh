@@ -46,7 +46,7 @@ extra_args=""
 
 if [[ -d "$NRF5_SDK_ROOT/components/libraries" ]]; then
     nrf5_sdk_args+="nrf5_sdk_root=\"$NRF5_SDK_ROOT\""
-    extra_args+=" $nrf5_sdk_args enable_nrf5_lock_app_build=true"
+    extra_args+=" $nrf5_sdk_args enable_nrf5_builds=true"
 fi
 
 gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args"

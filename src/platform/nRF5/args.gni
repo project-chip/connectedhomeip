@@ -12,12 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Enable building tests.
-  chip_build_tests = current_os != "freertos"
-}
+device_platform = "nrf5"
 
-declare_args() {
-  # Enable use of nlfaultinjection.
-  chip_with_nlfaultinjection = chip_build_tests
-}
+lwip_platform = "nrf5"
+lwip_ipv6 = true
+lwip_ipv4 = false
+lwip_api = true
+
+inet_config_enable_ipv4 = false
+inet_config_enable_dns_resolver = false
+
+chip_build_tests = false
+
+ble_platform_config_include = "<platform/nRF5/BlePlatformConfig.h>"
+chip_device_platform_config_include =
+    "<platform/nRF5/CHIPDevicePlatformConfig.h>"
+chip_platform_config_include = "<platform/nRF5/CHIPPlatformConfig.h>"
+inet_platform_config_include = "<platform/nRF5/InetPlatformConfig.h>"
+system_platform_config_include = "<platform/nRF5/SystemPlatformConfig.h>"

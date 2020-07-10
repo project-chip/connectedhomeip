@@ -13,11 +13,19 @@
 # limitations under the License.
 
 declare_args() {
-  # Enable building tests.
-  chip_build_tests = current_os != "freertos"
+  # Device platform layer: freertos, nrf5, none.
+  device_platform = ""
+
+  # Enable openthread support.
+  chip_enable_openthread = false
 }
 
-declare_args() {
-  # Enable use of nlfaultinjection.
-  chip_with_nlfaultinjection = chip_build_tests
+if (device_platform == "") {
+  if (current_os != "freertos") {
+    device_platform = "none"
+  }
 }
+
+assert((current_os != "freertos" && device_platform == "none") ||
+           device_platform == "nrf5" || device_platform == "linux",
+       "Please select a valid value for device_platform")

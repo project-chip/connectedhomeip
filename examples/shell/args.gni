@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Location of the Pigweed repository.
-  dir_pigweed = "//third_party/connectedhomeip/third_party/repo/pigweed"
-}
+import("//build_overrides/chip.gni")
 
-import("$dir_pigweed/modules.gni")
+import("${chip_root}/config/standalone/args.gni")

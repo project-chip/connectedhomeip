@@ -50,30 +50,35 @@ source_set("ble_config_header") {
   public_deps = [ "${chip_root}/src/system:system_config_header" ]
 }
 
-static_library("ble") {
-  output_name = "libBleLayer"
+if (config_network_layer_ble) {
+  static_library("ble") {
+    output_name = "libBleLayer"
 
-  sources = [
-    "BLEEndPoint.cpp",
-    "BLEEndPoint.h",
-    "Ble.h",
-    "BleApplicationDelegate.h",
-    "BleConfig.h",
-    "BleError.cpp",
-    "BleError.h",
-    "BleLayer.cpp",
-    "BleLayer.h",
-    "BlePlatformDelegate.h",
-    "BleUUID.cpp",
-    "BleUUID.h",
-    "BtpEngine.cpp",
-    "BtpEngine.h",
-    "CHIPBleServiceData.h",
-  ]
+    sources = [
+      "BLEEndPoint.cpp",
+      "BLEEndPoint.h",
+      "Ble.h",
+      "BleApplicationDelegate.h",
+      "BleConfig.h",
+      "BleError.cpp",
+      "BleError.h",
+      "BleLayer.cpp",
+      "BleLayer.h",
+      "BlePlatformDelegate.h",
+      "BleUUID.cpp",
+      "BleUUID.h",
+      "BtpEngine.cpp",
+      "BtpEngine.h",
+      "CHIPBleServiceData.h",
+    ]
 
-  public_deps = [
-    ":ble_config_header",
-    "${chip_root}/src/inet",
-    "${chip_root}/src/lib/support",
-  ]
+    public_deps = [
+      ":ble_config_header",
+      "${chip_root}/src/inet",
+      "${chip_root}/src/lib/support",
+    ]
+  }
+} else {
+  group("ble") {
+  }
 }

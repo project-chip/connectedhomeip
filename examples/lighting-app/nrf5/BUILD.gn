@@ -50,8 +50,8 @@ nrf5_sdk("sdk") {
   defines += [ "USE_APP_CONFIG" ]
 }
 
-executable("lock_app") {
-  output_name = "chip-nrf52840-lock-example"
+executable("lighting_app") {
+  output_name = "chip-nrf52840-lighting-example"
 
   public_deps = [
     ":sdk",
@@ -69,12 +69,12 @@ executable("lock_app") {
     "${nrf5_platform_dir}/util/LEDWidget.cpp",
     "${nrf5_platform_dir}/util/include/LEDWidget.h",
     "main/AppTask.cpp",
-    "main/BoltLockManager.cpp",
     "main/DataModelHandler.cpp",
+    "main/LightingManager.cpp",
     "main/include/AppEvent.h",
     "main/include/AppTask.h",
-    "main/include/BoltLockManager.h",
     "main/include/DataModelHandler.h",
+    "main/include/LightingManager.h",
     "main/main.cpp",
   ]
 
@@ -86,5 +86,5 @@ executable("lock_app") {
 }
 
 group("nrf5") {
-  deps = [ ":lock_app" ]
+  deps = [ ":lighting_app" ]
 }

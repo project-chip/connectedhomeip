@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Enable building tests.
-  chip_build_tests = current_os != "freertos"
+config("inipp_config") {
+  include_dirs = [ "repo/inipp" ]
 }
 
-declare_args() {
-  # Enable use of nlfaultinjection.
-  chip_with_nlfaultinjection = chip_build_tests
+source_set("inipp") {
+  sources = [ "repo/inipp/inipp/inipp.h" ]
+
+  public_configs = [ ":inipp_config" ]
 }
