@@ -9,7 +9,7 @@ jobs:
         name: nRF
 
         env:
-            BUILD_TYPE: nrf
+            BUILD_TYPE: gn_nrf
             BUILD_VERSION: 0.2.14
             BUILD_IMAGE: chip-build-nrf-platform
             BUILD_ORG: connectedhomeip
@@ -52,7 +52,7 @@ jobs:
         name: Linux Standalone
 
         env:
-            BUILD_TYPE: linux
+            BUILD_TYPE: gn_linux
             BUILD_VERSION: 0.2.14
             BUILD_IMAGE: chip-build
             BUILD_ORG: connectedhomeip
