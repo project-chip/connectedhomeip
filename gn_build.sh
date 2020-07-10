@@ -94,4 +94,3 @@ gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/release" --args='target_os="a
 _chip_banner "Build: Ninja build"
 
 time ninja -C "$CHIP_ROOT/out/debug" all check
-
