@@ -42,6 +42,13 @@ set(PLATFORM_LINK_START "-Wl,--start-group")
 set(PLATFORM_LINK_END "-Wl,--end-group -Wl,--gc-sections")
 
 #
+# Override build configurations with ones this platform supports
+#
+
+set(with_crypto mbedtls)
+set(with_system lwip)
+
+#
 # Define chip-config library to provide defines and include paths for platform
 #
 

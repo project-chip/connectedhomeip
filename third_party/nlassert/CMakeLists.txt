@@ -22,6 +22,9 @@
 
 if (BUILD_EXTERNALS_WITH_CMAKE)
 
+#
+# Build external project with cmake
+#
 add_library(nlassert INTERFACE)     # Tag header-only library as INTERFACE
 
 target_include_directories(nlassert INTERFACE repo/include)
@@ -66,8 +69,11 @@ add_dependencies(check nlassert-test)
 
 else (BUILD_EXTERNALS_WITH_CMAKE)
 
-include(ExternalProject)
+#
+# Build external project with autotools
+#
 
+include(ExternalProject)
 project(nlassert)
 ExternalProject_Add(nlassert
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repo

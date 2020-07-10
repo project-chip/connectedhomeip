@@ -20,8 +20,6 @@
 #      This file is the CMake template for defining global build options for the CHIP SDK.
 #
 
-option(CHIP_BUILD_EXECUTABLES "Build executables" ON)
-
 #
 # This option chooses whether to optimize builds of third_party packages:
 #
@@ -36,3 +34,55 @@ option(BUILD_EXTERNALS_WITH_CMAKE
     "Builds third_party packages with optimized cmake. Otherwise, use the native build system provided by the package."
     ON
 )
+
+if (NOT BUILD_EXTERNALS_WITH_CMAKE)
+include(ExternalProject)
+endif ()
+
+#
+# Provides selection of the cryptographic implementation.
+#
+set(with_crypto "mbedtls" CACHE STRING "Specify the crypto implementation from one of: auto, mbedtls, or openssl (default=auto)")
+set_property(CACHE with_crypto PROPERTY STRINGS mbedtls openssl)
+
+#
+# Provides selection of the network layer technology.
+#
+set(with_network "all" CACHE STRING "Specify the target network layers from one of: ble, inet, or all (default=all)")
+set_property(CACHE with_network PROPERTY STRINGS all inet ble)
+
+#
+# Provides selection of the system layer technology.
+#
+set(with_system "sockets" CACHE STRING "Specify the target network stack from one of: sockets, lwip or Network.framework (default=sockets)")
+set_property(CACHE with_system PROPERTY STRINGS sockets lwip Network.framework)
+
+#
+# Map CMake target descriptions to same names as autotools and gn for convenience.
+#
+set(target_cpu ${CMAKE_SYSTEM_PROCESSOR})
+set(target_os ${CMAKE_SYSTEM_NAME})
+
+message(STATUS "
+  Configuration Summary
+  ---------------------
+  Package                                          : ${PROJECT_NAME}
+  Version                                          : ${PROJECT_VERSION}
+
+  Host system                                      : ${CMAKE_HOST_SYSTEM_NAME}
+  Host build system                                : ${CMAKE_MAKE_PROGRAM}
+  Host name                                        : ${SITE}
+  Host compiler                                    : ${CMAKE_C_COMPILER}
+  Host compiler version                            : ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}
+
+  Target platform                                  : ${CHIP_PLATFORM}
+  Target build type                                : ${CMAKE_BUILD_TYPE}
+  Target architecture                              : ${target_cpu}
+  Target OS                                        : ${target_os}
+  Target style                                     : ${CHIP_TARGET_STYLE}
+
+  Target device layer                              : ${CHIP_DEVICE_LAYER_TARGET}
+  Target crypto layer                              : ${with_crypto}
+  Target network layer                             : ${with_network}
+  Target system layer                              : ${with_system}
+")

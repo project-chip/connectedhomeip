@@ -22,6 +22,9 @@
 
 if (BUILD_EXTERNALS_WITH_CMAKE)
 
+#
+# Build external project with cmake
+#
 add_library(nlfaultinjection
     repo/src/nlfaultinjection.cpp
 )
@@ -62,8 +65,9 @@ add_dependencies(check TestFaultInjection)
 
 else (BUILD_EXTERNALS_WITH_CMAKE)
 
-include(ExternalProject)
-
+#
+# Build external project with autotools
+#
 project(nlfaultinjection)
 ExternalProject_Add(nlfaultinjection
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repo

@@ -42,7 +42,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CHIP_PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE PATH "Root of CHIP SDK source")
 set(CHIP_PROJECT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} CACHE PATH "Root of CHIP SDK build output")
 
-include("${CHIP_PROJECT_SOURCE_DIR}/integrations/cmake/options.cmake")
 include("${CHIP_PROJECT_SOURCE_DIR}/integrations/cmake/toolchain.cmake")
 
 add_subdirectory(src)
@@ -62,10 +61,6 @@ set(CHIP_LIBRARIES
     SupportLayer
     TransportLayer
     ${CHIP_PLATFORM_LIBS_PACKAGE}
-    nlassert
-    nlfaultinjection
-    nlio
-    nlunit-test
 )
 
 #

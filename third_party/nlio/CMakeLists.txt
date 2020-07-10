@@ -22,6 +22,9 @@
 
 if (BUILD_EXTERNALS_WITH_CMAKE)
 
+#
+# Build external project with cmake
+#
 add_library(nlio INTERFACE)     # Tag header-only library as INTERFACE
 
 target_include_directories(nlio INTERFACE repo/include)
@@ -89,8 +92,9 @@ add_dependencies(check nlio-test)
 
 else (BUILD_EXTERNALS_WITH_CMAKE)
 
-include(ExternalProject)
-
+#
+# Build external project with autotools
+#
 project(nlio)
 ExternalProject_Add(nlio
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repo

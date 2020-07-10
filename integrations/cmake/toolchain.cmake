@@ -22,12 +22,23 @@
 #
 
 if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-include("${CHIP_PROJECT_SOURCE_DIR}/integrations/cmake/platforms.cmake")
+
+  set(with_toolchain "auto" CACHE STRING "Specify the toolchain to use: auto, gcc or clang (default=auto)")
+  set_property(CACHE with_toolchain PROPERTY STRINGS auto gcc clang)
+
+  if (${with_toolchain} STREQUAL "gcc")
+  include("${CHIP_PROJECT_SOURCE_DIR}/integrations/cmake/toolchains/gcc.cmake")
+  endif ()
+
+  if (${with_toolchain} STREQUAL "clang")
+  include("${CHIP_PROJECT_SOURCE_DIR}/integrations/cmake/toolchains/clang.cmake")
+  endif ()
+
+  include("${CHIP_PROJECT_SOURCE_DIR}/integrations/cmake/platforms.cmake")
 endif ()
 
-set(default_build_type "Debug")
-
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(default_build_type "Debug")
   message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
   set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE STRING "Choose the type of build." FORCE)
   # Set the possible values of build type for cmake-gui
@@ -35,8 +46,11 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "(Apple)?[Cc]lang")
-    option(CHIP_COMPILE_WARNING_AS_ERROR "whether to include -Werror with gcc-compatible compilers")
-    if (CHIP_COMPILE_WARNING_AS_ERROR)
+    #
+    # This option enables stricter compilation, treating any warning as an error.
+    #
+    option(BUILD_COMPILE_WARNING_AS_ERROR "whether to include -Werror with gcc-compatible compilers")
+    if (BUILD_COMPILE_WARNING_AS_ERROR)
         set(CHIP_CFLAGS -Werror)
     endif()
 
@@ -53,6 +67,8 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "(Apple)?[Cc]lang")
     set(CMAKE_CXX_FLAGS_RELEASE        "-Os")
     set(CMAKE_ASM_FLAGS_RELEASE        "")
 endif()
+
+include("${CHIP_PROJECT_SOURCE_DIR}/integrations/cmake/options.cmake")
 
 #
 # Enable modular feature extensions to the cmake build system

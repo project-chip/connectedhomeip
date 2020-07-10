@@ -22,6 +22,9 @@
 
 if (BUILD_EXTERNALS_WITH_CMAKE)
 
+#
+# Build external project with cmake
+#
 add_library(nlunit-test
     repo/src/nlunit-test.c
 )
@@ -34,8 +37,9 @@ target_link_libraries(nlunit-test PRIVATE chip-config)
 
 else (BUILD_EXTERNALS_WITH_CMAKE)
 
-include(ExternalProject)
-
+#
+# Build external project with autotools
+#
 project(nlunit-test)
 ExternalProject_Add(nlunit-test
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repo
