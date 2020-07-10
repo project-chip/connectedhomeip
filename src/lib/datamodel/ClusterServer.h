@@ -76,7 +76,10 @@ public:
      */
     Endpoint * GetEndpoint(uint8_t endpointId)
     {
-        return mEndpoints.Find([&endPointId](Endpoint * item) -> bool { return (endPointId-- == 0); });
+        /* Endpoint #0 is reserved, until we handle that properly, we will offset everything by 1 */
+        endpointId--;
+        auto *p = mEndpoints.Find([&endpointId](Endpoint * item) -> bool { return (endpointId-- == 0); });
+        return p;
     }
 
     /**
@@ -113,16 +116,11 @@ public:
     Attribute * GetAttribute(uint8_t endPointId, uint16_t clusterId, uint16_t attrId)
     {
         Attribute * attr = nullptr;
-        auto endpoint    = GetEndpoint(endPointId);
 
-        if (endpoint != nullptr)
+        auto cluster = GetCluster(endPointId, clusterId);
+        if (cluster != nullptr)
         {
-            auto cluster = endpoint->GetCluster(clusterId);
-
-            if (cluster != nullptr)
-            {
-                attr = cluster->GetAttribute(attrId);
-            }
+            attr = cluster->GetAttribute(attrId);
         }
         return attr;
     }
@@ -140,7 +138,7 @@ public:
      */
     CHIP_ERROR SetValue(uint8_t endPointId, uint16_t clusterId, uint16_t attrId, Value & value)
     {
-        auto endpoint = GetEndpoint(endPointId-- == 0);
+        auto endpoint = GetEndpoint(endPointId);
 
         if (endpoint != nullptr)
         {
@@ -148,13 +146,7 @@ public:
 
             if (cluster != nullptr)
             {
-                auto attr = cluster->GetAttribute(attrId);
-
-                if (attr != nullptr)
-                {
-                    attr->mValue = value;
-                    return CHIP_NO_ERROR;
-                }
+                return cluster->Set(attrId, value);
             }
         }
         return CHIP_ERROR_INTERNAL;
@@ -173,7 +165,7 @@ public:
      */
     CHIP_ERROR GetValue(uint8_t endPointId, uint16_t clusterId, uint16_t attrId, Value & value)
     {
-        auto endpoint = mEndpoints.Find([&endPointId](Endpoint * item) -> bool { return (endPointId-- == 0); });
+        auto endpoint = GetEndpoint(endPointId);
 
         if (endpoint != nullptr)
         {

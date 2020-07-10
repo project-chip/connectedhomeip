@@ -46,7 +46,7 @@ void TestClusterServerBasic(nlTestSuite * inSuite, void * inContext)
 
     /* Validate attributes of the Base Cluster */
     server.GetValue(1, kClusterIdBase, kAttributeIdZCLVersion, value);
-    NL_TEST_ASSERT(inSuite, ValueToUInt8(value) != ZCLVersion);
+    NL_TEST_ASSERT(inSuite, ValueToUInt8(value) == ZCLVersion);
 
     server.GetValue(1, kClusterIdBase, kAttributeIdApplicationVersion, value);
     NL_TEST_ASSERT(inSuite, ValueToUInt8(value) == applicationVersion);
