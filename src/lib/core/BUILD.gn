@@ -89,6 +89,26 @@ config("chip_config") {
     defines += [ "CHIP_LOGGING_STYLE_STDIO_WEAK=0" ]
   }
 
+  if (chip_config_memory_management == "malloc") {
+    defines += [
+      "CHIP_CONFIG_MEMORY_MGMT_MALLOC=1",
+      "HAVE_MALLOC=1",
+      "HAVE_FREE=1",
+    ]
+  } else {
+    defines += [ "CHIP_CONFIG_MEMORY_MGMT_MALLOC=0" ]
+  }
+  if (chip_config_memory_management == "simple") {
+    defines += [ "CHIP_CONFIG_MEMORY_MGMT_SIMPLE=1" ]
+  } else {
+    defines += [ "CHIP_CONFIG_MEMORY_MGMT_SIMPLE=0" ]
+  }
+  if (chip_config_memory_management == "platform") {
+    defines += [ "CHIP_CONFIG_MEMORY_MGMT_PLATFORM=1" ]
+  } else {
+    defines += [ "CHIP_CONFIG_MEMORY_MGMT_PLATFORM=0" ]
+  }
+
   include_dirs = [ target_gen_dir ]
 
   configs = [
