@@ -13,12 +13,6 @@
 # limitations under the License.
 
 declare_args() {
-  # Build tests.
-  chip_system_config_test = true
-
-  # Use malloc.
-  chip_system_config_use_malloc = current_os != "freertos"
-
   # Use the lwIP library.
   chip_system_config_use_lwip = current_os == "freertos"
 

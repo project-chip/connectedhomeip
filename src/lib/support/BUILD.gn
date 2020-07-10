@@ -19,6 +19,7 @@ import("//build_overrides/nlio.gni")
 
 import("${chip_root}/gn/chip/chip_version.gni")
 import("${chip_root}/gn/chip/tests.gni")
+import("${chip_root}/src/lib/core/core.gni")
 
 action("gen_chip_version") {
   script = "${chip_root}/scripts/gen_chip_version.py"
@@ -73,8 +74,6 @@ static_library("support") {
     "Base64.cpp",
     "CHIPArgParser.cpp",
     "CHIPCounter.cpp",
-    "CHIPMem-Malloc.cpp",
-    "CHIPMem-SimpleAlloc.cpp",
     "ErrorStr.cpp",
     "FibonacciUtils.cpp",
     "PersistedCounter.cpp",
@@ -101,6 +100,12 @@ static_library("support") {
 
   public_configs = [ ":support_config" ]
 
+  if (chip_config_memory_management == "simple") {
+    sources += [ "CHIPMem-SimpleAlloc.cpp" ]
+  }
+  if (chip_config_memory_management == "malloc") {
+    sources += [ "CHIPMem-Malloc.cpp" ]
+  }
   if (chip_with_nlfaultinjection) {
     sources += [ "CHIPFaultInjection.cpp" ]
     public += [ "CHIPFaultInjection.h" ]

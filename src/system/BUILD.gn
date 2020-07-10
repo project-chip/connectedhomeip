@@ -97,11 +97,6 @@ config("system_config") {
   } else {
     defines += [ "CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS=0" ]
   }
-  if (chip_system_config_use_malloc) {
-    defines += [ "CONFIG_HAVE_HEAP=1" ]
-    defines += [ "HAVE_MALLOC=1" ]
-    defines += [ "HAVE_FREE=1" ]
-  }
   if (chip_system_config_clock == "clock_gettime") {
     defines += [ "HAVE_CLOCK_GETTIME=1" ]
     defines += [ "HAVE_CLOCK_SETTIME=1" ]
