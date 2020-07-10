@@ -22,6 +22,10 @@
 
 include("${PROJECT_SOURCE_DIR}/integrations/cmake/toolchains/arm-none-eabi.cmake")
 
+#
+# Define chip-config interface library to provide defines and include paths for platform
+#
+
 add_library(chip-config INTERFACE)
 
 target_compile_definitions(chip-config INTERFACE

@@ -49,7 +49,7 @@ set(with_crypto mbedtls)
 set(with_system lwip)
 
 #
-# Define chip-config library to provide defines and include paths for platform
+# Define chip-config interface library to provide defines and include paths for platform
 #
 
 add_library(chip-config INTERFACE)
@@ -100,8 +100,6 @@ target_compile_definitions(chip-config INTERFACE
     CONFIG_GPIO_AS_PINRESET
     PRINTF_DISABLE_SUPPORT_EXPONENTIAL
 
-#   USE_APP_CONFIG=1
-    # NRF_MODULE_ENABLED
     NRF_CLOCK_ENABLED=1
     NRF_SDH_SOC_ENABLED=1
     NRF_SDH_ENABLED=1
@@ -146,13 +144,7 @@ set(CHIP_PLATFORM_CONFIG_MBEDTLS_INCLUDE
 )
 
 set(CHIP_PLATFORM_CONFIG_FREERTOS_INCLUDE
-
-    #${CHIP_PROJECT_SOURCE_DIR}/examples/lock-app/nrf5/main/include
-    #${NRF5_SDK_ROOT}/examples/ble_peripheral/ble_app_hrs_freertos/config
-    #${NRF5_SDK_ROOT}/external/freertos/config
     ${NRF5_SDK_ROOT}/examples/peripheral/blinky_rtc_freertos/config
-    #${NRF5_SDK_ROOT}/examples/multiprotocol/ble_thread/ble_thread_dyn_hrs_coap_srv_freertos/config
-    #${NRF5_SDK_ROOT}/examples/multiprotocol/ble_thread/ble_thread_dyn_hrs_coap_srv_freertos/pca10056/s140/config
 )
 
 set(NRF5_SDK_INCLUDES
@@ -179,7 +171,6 @@ set(NRF5_SDK_INCLUDES
     ${NRF5_SDK_ROOT}/components/softdevice/common
     ${NRF5_SDK_ROOT}/components/softdevice/s140/headers
     ${NRF5_SDK_ROOT}/components/softdevice/s140/headers/nrf52
-    # ${NRF5_SDK_ROOT}/components/softdevice/mbr/nrf52840/headers
 
     # FDS
     ${NRF5_SDK_ROOT}/components/libraries/atomic
@@ -191,12 +182,10 @@ set(NRF5_SDK_INCLUDES
     ${NRF5_SDK_ROOT}/external/freertos/portable/CMSIS/nrf52
     ${NRF5_SDK_ROOT}/external/freertos/portable/GCC/nrf52
     ${NRF5_SDK_ROOT}/external/freertos/source/include
-#    ${CHIP_PROJECT_SOURCE_DIR}/config/nrf5
 
     # Required by DeviceLayer Thread integration
     ${NRF5_SDK_ROOT}/external/openthread/include
     ${NRF5_SDK_ROOT}/components/boards
-    #${NRF5_SDK_ROOT}/external/fprintf
 )
 
 set(NRF5_SDK_SOURCES
@@ -240,14 +229,6 @@ set(NRF5_SDK_SOURCES
     ${NRF5_SDK_ROOT}/components/softdevice/common/nrf_sdh.c
     ${NRF5_SDK_ROOT}/components/softdevice/common/nrf_sdh_ble.c
     ${NRF5_SDK_ROOT}/components/softdevice/common/nrf_sdh_soc.c
-
-    # SEGGER
-    #${NRF5_SDK_ROOT}/external/segger_rtt/SEGGER_RTT.c
-    #${NRF5_SDK_ROOT}/external/segger_rtt/SEGGER_RTT_printf.c
-    #${NRF5_SDK_ROOT}/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c
-
-    #${NRF5_SDK_ROOT}/external/openthread/nrf_security/nrf_cc310_plat/src/nrf_cc310_platform_mutex_freertos.c
-    #${NRF5_SDK_ROOT}/external/openthread/nrf_security/nrf_cc310_plat/src/nrf_cc310_platform_abort_freertos.c
 )
 
 target_include_directories(chip-config INTERFACE

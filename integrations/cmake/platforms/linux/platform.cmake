@@ -21,7 +21,7 @@
 #
 
 #
-# Define chip-config library to provide defines and include paths for platform
+# Define chip-config interface library to provide defines and include paths for platform
 #
 
 add_library(chip-config INTERFACE)

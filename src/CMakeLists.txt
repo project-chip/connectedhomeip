@@ -32,11 +32,9 @@ add_subdirectory(system)
 add_subdirectory(transport)
 
 if(CONFIG_DEVICE_LAYER)
-
 add_subdirectory(platform)
+endif()
 
-else(CONFIG_DEVICE_LAYER)
-
+if(CHIP_TARGET_STYLE_UNIX)
 add_subdirectory(setup_payload)
-
-endif(CONFIG_DEVICE_LAYER)
+endif()
