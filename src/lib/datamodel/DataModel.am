@@ -33,6 +33,7 @@ CHIP_BUILD_DATAMODEL_HEADER_FILES                              = \
     @top_builddir@/src/lib/datamodel/ClusterServer.h         \
     @top_builddir@/src/lib/datamodel/Endpoint.h              \
     @top_builddir@/src/lib/datamodel/Value.h                \
+    @top_builddir@/src/lib/datamodel/Deque.h                \
     @top_builddir@/src/lib/datamodel/ClusterBasic.h    \
     @top_builddir@/src/lib/datamodel/ClusterOnOff.h      \
     $(NULL)
