@@ -13,21 +13,12 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-
 #
-# This is a project Makefile. It is assumed the directory this Makefile resides in is a
-# project subdirectory.
+#    Description:
+#      Component makefile for the screen framework component used by the CHIP
+#      ESP32 demo applications.
 #
 
-PROJECT_NAME := chip-wifi-echo
-
-EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/third_party/connectedhomeip/config/esp32/components \
-                        $(PROJECT_PATH)/../../../common/m5stack-tft/repo/components \
-                        $(PROJECT_PATH)/../../../common/QRCode \
-                        $(PROJECT_PATH)/../../../common/screen-framework \
-
-CXXFLAGS += -std=c++11 -Os
-CPPFLAGS += -Os
-CLAGS += -Os
-
-include $(IDF_PATH)/make/project.mk
+COMPONENT_ADD_INCLUDEDIRS := include
+COMPONENT_SRCDIRS := .
+COMPONENT_OBJS := Display.o ScreenManager.o Screen.o ListScreen.o
