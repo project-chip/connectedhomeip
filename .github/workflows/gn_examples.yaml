@@ -33,12 +33,20 @@ jobs:
               run: scripts/examples/gn_nrf_example.sh examples/lock-app/nrf5 out/lock_app_debug
             - name: Build example nRF5 Lighting App
               run: scripts/examples/gn_nrf_example.sh examples/lighting-app/nrf5 out/lighting_app_debug
-            - name: Preserve artifacts
-              run: |
-                  mkdir -p example_binaries/nrf-build
-                  cp out/lock_app_debug/chip-nrf52840-lock-example \
-                     out/lighting_app_debug/chip-nrf52840-lighting-example \
-                     example_binaries/nrf-build/
+            - name: Binary artifact suffix
+              id: outsuffix
+              uses: haya14busa/action-cond@v1.0.0
+              with:
+                  cond: ${{ github.event.pull_request.number == '' }}
+                  if_true: "${{ github.sha }}"
+                  if_false: "pull-${{ github.event.pull_request.number }}"
+            - name: Uploading Binaries
+              uses: actions/upload-artifact@v2
+              with:
+                  name: ${{ env.BUILD_TYPE }}-example-build-${{ steps.outsuffix.outputs.value }}
+                  path: |
+                          out/lock_app_debug/chip-nrf52840-lock-example
+                          out/lighting_app_debug/chip-nrf52840-lighting-example
 
     linux-standalone:
         name: Linux Standalone
@@ -68,9 +76,17 @@ jobs:
               run: scripts/examples/gn_build_example.sh examples/chip-tool out/chip_tool_debug
             - name: Build example Standalone Shell
               run: scripts/examples/gn_build_example.sh examples/shell out/shell_debug
-            - name: Preserve artifacts
-              run: |
-                  mkdir -p example_binaries/$BUILD_TYPE
-                  cp out/chip_tool_debug/bin/chip-standalone-demo \
-                     out/shell_debug/bin/chip-shell \
-                     example_binaries/$BUILD_TYPE/
+            - name: Binary artifact suffix
+              id: outsuffix
+              uses: haya14busa/action-cond@v1.0.0
+              with:
+                  cond: ${{ github.event.pull_request.number == '' }}
+                  if_true: "${{ github.sha }}"
+                  if_false: "pull-${{ github.event.pull_request.number }}"
+            - name: Uploading Binaries
+              uses: actions/upload-artifact@v2
+              with:
+                  name: ${{ env.BUILD_TYPE }}-example-build-${{ steps.outsuffix.outputs.value }}
+                  path: |
+                          out/chip_tool_debug/chip-standalone-demo
+                          out/shell_debug/chip-shell
