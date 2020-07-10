@@ -362,7 +362,7 @@ std::string createSetupPayload()
 void PrintDataModel(ClusterServer & server)
 {
     printf("Server:\n");
-    int endpointId;
+    int endpointId = 1;
 
     /* Endpoints */
     server.mEndpoints.Foreach([&endpointId](Endpoint * endpoint) -> void {
@@ -429,7 +429,8 @@ extern "C" void app_main()
 
     /* Add a cluster to the primary endpoint of our cluster server */
     server.AddCluster(&statusLED);
-
+    PrintDataModel(server);
+    
     // Start the Echo Server
     InitDataModelHandler();
     startServer();
