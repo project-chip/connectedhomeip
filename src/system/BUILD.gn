@@ -160,7 +160,7 @@ static_library("system") {
 
   allow_circular_includes_from = [ "${chip_root}/src/lib/support" ]
 
-  if (chip_build_tests && chip_with_nlfaultinjection) {
+  if (chip_with_nlfaultinjection) {
     sources += [ "SystemFaultInjection.cpp" ]
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
   }
