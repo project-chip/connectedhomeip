@@ -149,7 +149,7 @@ int TestClusterServer(void)
     return (nlTestRunnerStats(&theSuite));
 }
 
-static void __attribute__((constructor)) Ctor(void)
+void RegisterTests(void)
 {
     nlABORT(chip::RegisterUnitTests(&TestClusterServer) == CHIP_NO_ERROR);
 }
