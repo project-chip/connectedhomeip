@@ -215,6 +215,13 @@ CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t 
 CHIP_ERROR pbkdf2_sha256(const unsigned char * password, size_t plen, const unsigned char * salt, size_t slen,
                          unsigned int iteration_count, uint32_t key_length, unsigned char * output);
 
+/** @brief Clears the first `len` bytes of memory area `buf`.
+ * @param buf Pointer to a memory buffer holding secret data that should be cleared.
+ * @param len Specifies secret data size in bytes.
+ * @return void
+ **/
+void ClearSecretData(uint8_t *buf, uint32_t len);
+
 } // namespace Crypto
 } // namespace chip
 

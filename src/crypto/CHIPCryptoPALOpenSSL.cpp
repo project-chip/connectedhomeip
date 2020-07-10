@@ -776,5 +776,10 @@ exit:
     return error;
 }
 
+void ClearSecretData(uint8_t *buf, uint32_t len)
+{
+    memset(buf, 0, len);
+}
+
 } // namespace Crypto
 } // namespace chip
