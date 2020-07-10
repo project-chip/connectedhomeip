@@ -40,3 +40,31 @@ jobs:
                   ninja -C out/$BUILD_TYPE
             - name: Test
               run: ninja -C out/$BUILD_TYPE check
+
+
+    examples:
+        name: CMake Examples
+
+        runs-on: ubuntu-latest
+
+        container:
+          image: connectedhomeip/chip-build-nrf-platform:0.3.0
+          volumes:
+              - "/tmp/bloat_reports:/tmp/bloat_reports"
+              - "/tmp/output_binaries:/tmp/output_binaries"
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
+              with:
+                  fetch-depth: 0
+                  submodules: true
+            - name: Build lock-app - NRF
+              run: |
+                  cmake examples/lock-app/nrf5 -B examples/lock-app/nrf5/out -GNinja
+                  ninja -C examples/lock-app/nrf5/out
+            - name: Build shell - Standalone
+              run: |
+                  cmake examples/shell -B examples/shell/standalone/out -GNinja
+                  ninja -C examples/shell/standalone/out
