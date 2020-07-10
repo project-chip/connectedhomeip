@@ -53,8 +53,7 @@ public:
      *
      * @param cluster Pointer to the cluster object being added
      */
-    CHIP_ERROR
-    AddCluster(Cluster * cluster) { return mEndpoints.AddCluster(cluster); }
+    CHIP_ERROR AddCluster(Cluster * cluster) { return mEndpoints.AddCluster(cluster); }
 
     /**
      * @brief
@@ -62,18 +61,33 @@ public:
      *
      * @param cluster Pointer to the endpoint object being added
      */
-    CHIP_ERROR
-    AddEndpoint(Endpoint * endpoint)
+    CHIP_ERROR AddEndpoint(Endpoint * endpoint)
     {
         mEndpoints.Insert(endpoint);
         return CHIP_NO_ERROR;
     }
 
-    Endpoint * GetEndpoint(uint8_t endPointId)
+    /**
+     * @brief
+     *   Retrieve a pointer to the corresponding Endpoint, if any
+     *
+     * @param endpointId the index of the desired Endpoint
+     * @return pointer to the Endpoint or null if not found
+     */
+    Endpoint * GetEndpoint(uint8_t endpointId)
     {
         return mEndpoints.Find([&endPointId](Endpoint * item) -> bool { return (endPointId-- == 0); });
     }
 
+    /**
+     * @brief
+     *   Retrieve a pointer to the corresponding Cluster, if any
+     *
+     * @param endpointId the index of the Endpoint with the Cluster
+     * @param clusterId the id of desired Cluster
+     *
+     * @return pointer to the Cluster or null if not found
+     */
     Cluster * GetCluster(uint8_t endPointId, uint16_t clusterId)
     {
         Cluster * cluster = nullptr;
@@ -86,6 +100,16 @@ public:
         return cluster;
     }
 
+    /**
+     * @brief
+     *   Retrieve a pointer to the corresponding Attribute, if any
+     *
+     * @param endpointId the index of the desired Endpoint
+     * @param clusterId the id of desired Cluster
+     * @param attrId the id of desired Attribute
+     *
+     * @return pointer to the Attribute or null if not found
+     */
     Attribute * GetAttribute(uint8_t endPointId, uint16_t clusterId, uint16_t attrId)
     {
         Attribute * attr = nullptr;
@@ -103,6 +127,17 @@ public:
         return attr;
     }
 
+    /**
+     * @brief
+     *   Find and set an Attribute's Value
+     *
+     * @param endpointId the index of the desired Endpoint
+     * @param clusterId the id of desired Cluster
+     * @param attrId the id of desired Attribute
+     * @param value the Value to set
+     *
+     * @return CHIP_NO_ERROR on success or a failure-specific error code otherwise
+     */
     CHIP_ERROR SetValue(uint8_t endPointId, uint16_t clusterId, uint16_t attrId, Value & value)
     {
         auto endpoint = GetEndpoint(endPointId-- == 0);
@@ -125,6 +160,17 @@ public:
         return CHIP_ERROR_INTERNAL;
     }
 
+    /**
+     * @brief
+     *   Find and read an Attribute's Value
+     *
+     * @param endpointId the index of the desired Endpoint
+     * @param clusterId the id of desired Cluster
+     * @param attrId the id of desired Attribute
+     * @param value the Value to populate with the Attribute's value
+     *
+     * @return CHIP_NO_ERROR on success or a failure-specific error code otherwise
+     */
     CHIP_ERROR GetValue(uint8_t endPointId, uint16_t clusterId, uint16_t attrId, Value & value)
     {
         auto endpoint = mEndpoints.Find([&endPointId](Endpoint * item) -> bool { return (endPointId-- == 0); });
