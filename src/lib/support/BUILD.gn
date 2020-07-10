@@ -30,7 +30,7 @@ action("gen_chip_version") {
     "--chip_major=${chip_version_major}",
     "--chip_minor=${chip_version_minor}",
     "--chip_patch=${chip_version_patch}",
-    "--chip_extra={chip_version_extra}",
+    "--chip_extra=${chip_version_extra}",
   ]
 }
 
