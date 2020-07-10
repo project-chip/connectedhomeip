@@ -29,7 +29,7 @@ executable("chip-standalone-demo") {
 
   public_deps = [ "${chip_root}/src/lib" ]
 
-  output_dir = "${root_out_dir}/bin"
+  output_dir = root_out_dir
 }
 
 group("chip-tool") {

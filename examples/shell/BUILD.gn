@@ -33,7 +33,7 @@ executable("chip-shell") {
     defines = [ "BUILD_RELEASE=1" ]
   }
 
-  output_dir = "${root_out_dir}/bin"
+  output_dir = root_out_dir
 }
 
 group("shell") {
