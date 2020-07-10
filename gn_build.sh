@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
 #
 # Copyright (c) 2020 Project CHIP Authors
 #
@@ -85,7 +85,7 @@ extra_args=""
 
 if [[ -d "$NRF5_SDK_ROOT/components/libraries" ]]; then
     nrf5_sdk_args+="nrf5_sdk_root=\"$NRF5_SDK_ROOT\""
-    extra_args+=" $nrf5_sdk_args enable_nrf5_lock_app_build=true"
+    extra_args+=" $nrf5_sdk_args enable_nrf5_builds=true"
 fi
 
 gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args"
@@ -93,4 +93,5 @@ gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/release" --args='target_os="a
 
 _chip_banner "Build: Ninja build"
 
-time ninja -C "$CHIP_ROOT/out/debug" check
+time ninja -C "$CHIP_ROOT/out/debug" all check
+
