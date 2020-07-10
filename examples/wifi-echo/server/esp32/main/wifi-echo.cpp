@@ -111,37 +111,37 @@ std::vector<Button> buttons          = { Button(), Button(), Button() };
 std::vector<gpio_num_t> button_gpios = { BUTTON_1_GPIO_NUM, BUTTON_2_GPIO_NUM, BUTTON_3_GPIO_NUM };
 
 // Pretend these are devices with endpoints with clusters with attributes
-typedef std::tuple<std::string, std::string> Attribute;
-typedef std::vector<Attribute> Attributes;
-typedef std::tuple<std::string, Attributes> Cluster;
-typedef std::vector<Cluster> Clusters;
-typedef std::tuple<std::string, Clusters> Endpoint;
-typedef std::vector<Endpoint> Endpoints;
-typedef std::tuple<std::string, Endpoints> Device;
+typedef std::tuple<std::string, std::string> AppAttribute;
+typedef std::vector<AppAttribute> AppAttributes;
+typedef std::tuple<std::string, AppAttributes> AppCluster;
+typedef std::vector<AppCluster> AppClusters;
+typedef std::tuple<std::string, AppClusters> AppEndpoint;
+typedef std::vector<AppEndpoint> AppEndpoints;
+typedef std::tuple<std::string, AppEndpoints> Device;
 typedef std::vector<Device> Devices;
 Devices devices;
 
 void AddAttribute(std::string name, std::string value)
 {
-    Attribute attribute = std::make_tuple(std::move(name), std::move(value));
+    AppAttribute attribute = std::make_tuple(std::move(name), std::move(value));
     std::get<1>(std::get<1>(std::get<1>(devices.back()).back()).back()).emplace_back(std::move(attribute));
 }
 
 void AddCluster(std::string name)
 {
-    Cluster cluster = std::make_tuple(std::move(name), std::move(Attributes()));
+    AppCluster cluster = std::make_tuple(std::move(name), std::move(AppAttributes()));
     std::get<1>(std::get<1>(devices.back()).back()).emplace_back(std::move(cluster));
 }
 
 void AddEndpoint(std::string name)
 {
-    Endpoint endpoint = std::make_tuple(std::move(name), std::move(Clusters()));
+    AppEndpoint endpoint = std::make_tuple(std::move(name), std::move(AppClusters()));
     std::get<1>(devices.back()).emplace_back(std::move(endpoint));
 }
 
 void AddDevice(std::string name)
 {
-    Device device = std::make_tuple(std::move(name), std::move(Endpoints()));
+    Device device = std::make_tuple(std::move(name), std::move(AppEndpoints()));
     devices.emplace_back(std::move(device));
 }
 
