@@ -154,6 +154,8 @@ if CHIP_DEVICE_LAYER_TARGET_LINUX
 SUBDIRS                                += tests
 
 libDeviceLayer_a_CPPFLAGS              += \
+    $(GIO_CFLAGS)                         \
+    $(GIO_UNIX_CFLAGS)                    \
     $(INIPP_CPPFLAGS)                     \
     $(NULL)
 
