@@ -145,13 +145,13 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
   if (enable_nrf5_lock_app_build) {
     group("nrf5_lock_app") {
-      deps = [ "${chip_root}/examples/lock-app/nrf5(${chip_root}/config/toolchain:nrf5_lock_app)" ]
+      deps = [ "${chip_root}/examples/lock-app/nrf5(${chip_root}/config/toolchain/nrf5:nrf5_lock_app)" ]
     }
   }
 
   if (enable_nrf5_lighting_app_build) {
     group("nrf5_lighting_app") {
-      deps = [ "${chip_root}/examples/lighting-app/nrf5(${chip_root}/config/toolchain:nrf5_lighting_app)" ]
+      deps = [ "${chip_root}/examples/lighting-app/nrf5(${chip_root}/config/toolchain/nrf5:nrf5_lighting_app)" ]
     }
   }
 
