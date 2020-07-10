@@ -27,10 +27,11 @@
 
 #include <nlunit-test.h>
 
+void RegisterTests(void);
 int main(void)
 {
     // Generate machine-readable, comma-separated value (CSV) output.
     nlTestSetOutputStyle(OUTPUT_CSV);
-
+    RegisterTests();
     return chip::RunRegisteredUnitTests();
 }
