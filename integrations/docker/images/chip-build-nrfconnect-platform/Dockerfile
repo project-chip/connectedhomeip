@@ -11,8 +11,8 @@ RUN set -x \
     # nRF Tools for flashing software on Nordic devices, and accessing device logs
     && wget -qO- https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-7-0/nRFCommandLineTools1070Linuxamd64tar.gz \
         | tar xz -C /tmp \
-    && dpkg -i /tmp/JLink_Linux_*.deb \
-    && dpkg -i /tmp/nRF-Command-Line-Tools_*.deb \
+    && dpkg -i --force-depends /tmp/JLink_Linux_*.deb \
+    && dpkg -i --force-depends /tmp/nRF-Command-Line-Tools_*.deb \
     # nRF Connect SDK dependencies
     && pip3 install --no-cache-dir setuptools wheel cmake west pyyaml \
     # nRF Connect SDK 1.3.0 sources & requirements
