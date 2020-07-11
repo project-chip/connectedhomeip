@@ -63,6 +63,14 @@ set_property(CACHE with_system PROPERTY STRINGS sockets lwip Network.framework)
 set(target_cpu ${CMAKE_SYSTEM_PROCESSOR})
 set(target_os ${CMAKE_SYSTEM_NAME})
 
+#
+# Update the version variable with the final toolchain the platform set.
+#
+execute_process(
+    COMMAND ${CMAKE_C_COMPILER} -dumpfullversion -dumpversion
+    OUTPUT_VARIABLE CMAKE_C_COMPILER_VERSION
+)
+
 message(STATUS "
   Configuration Summary
   ---------------------
@@ -73,7 +81,7 @@ message(STATUS "
   Host build system                                : ${CMAKE_MAKE_PROGRAM}
   Host name                                        : ${SITE}
   Host compiler                                    : ${CMAKE_C_COMPILER}
-  Host compiler version                            : ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}
+  Host compiler version                            : ${CMAKE_C_COMPILER_VERSION}
 
   Target platform                                  : ${CHIP_PLATFORM}
   Target build type                                : ${CMAKE_BUILD_TYPE}

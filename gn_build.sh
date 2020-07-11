@@ -16,6 +16,7 @@
 #
 set -e
 
+
 CHIP_ROOT="$(dirname "$0")"
 
 _chip_red() {
