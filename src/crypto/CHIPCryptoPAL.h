@@ -220,7 +220,7 @@ CHIP_ERROR pbkdf2_sha256(const unsigned char * password, size_t plen, const unsi
  * @param len Specifies secret data size in bytes.
  * @return void
  **/
-void ClearSecretData(uint8_t *buf, uint32_t len);
+void ClearSecretData(uint8_t * buf, uint32_t len);
 
 } // namespace Crypto
 } // namespace chip
