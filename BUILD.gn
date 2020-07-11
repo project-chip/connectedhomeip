@@ -137,7 +137,8 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
   if (host_os == "linux") {
     chip_build("linux_embedded") {
-      toolchain = "${chip_root}/config/linux/toolchain:linux_embedded"
+      toolchain =
+          "${chip_root}/config/linux/toolchain:linux_${host_cpu}_gcc_embedded"
     }
   }
 
