@@ -76,9 +76,8 @@ public:
      */
     Endpoint * GetEndpoint(uint8_t endpointId)
     {
-        /* Endpoint #0 is reserved, until we handle that properly, we will offset everything by 1 */
-        endpointId--;
-        auto * p = mEndpoints.Find([&endpointId](Endpoint * item) -> bool { return (endpointId-- == 0); });
+        /* Endpoint #0 is reserved, offset by 1 */
+        auto * p = mEndpoints.Find([&endpointId](Endpoint * item) -> bool { return (endpointId-- == 1); });
         return p;
     }
 
@@ -173,13 +172,7 @@ public:
 
             if (cluster != nullptr)
             {
-                auto attr = cluster->GetAttribute(attrId);
-
-                if (attr != nullptr)
-                {
-                    value = attr->mValue;
-                    return CHIP_NO_ERROR;
-                }
+                return cluster->Get(attrId, value);
             }
         }
         return CHIP_ERROR_INTERNAL;
