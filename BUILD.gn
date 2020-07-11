@@ -104,8 +104,11 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     # Enable building chip with gcc.
     enable_host_gcc_build = enable_default_builds
 
-    # Build building chip with gcc & mbedtls.
-    enable_host_gcc_mbdtls_build = enable_default_builds
+    # Enable building chip with gcc & mbedtls.
+    enable_host_gcc_mbedtls_build = enable_default_builds
+
+    # Enable building chip for linux embedded.
+    enable_linux_embedded_build = enable_default_builds && host_os == "linux"
 
     # Build the chip-tool example.
     enable_standalone_chip_tool_build = enable_default_builds
@@ -130,6 +133,12 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
   chip_build("host_gcc_mbedtls") {
     toolchain = "${chip_root}/config/mbedtls/toolchain:${host_os}_${host_cpu}_gcc_mbedtls"
+  }
+
+  if (host_os == "linux") {
+    chip_build("linux_embedded") {
+      toolchain = "${chip_root}/config/linux/toolchain:linux_embedded"
+    }
   }
 
   standalone_toolchain = "${chip_root}/config/standalone/toolchain:standalone"
@@ -162,8 +171,11 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     if (enable_host_gcc_build) {
       deps += [ ":all_host_gcc" ]
     }
-    if (enable_host_gcc_mbdtls_build) {
+    if (enable_host_gcc_mbedtls_build) {
       deps += [ ":all_host_gcc_mbedtls" ]
+    }
+    if (enable_linux_embedded_build) {
+      deps += [ ":all_linux_embedded" ]
     }
     if (enable_standalone_chip_tool_build) {
       deps += [ ":standalone_chip_tool" ]
@@ -188,8 +200,11 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       if (enable_host_gcc_build) {
         deps += [ ":check_host_gcc" ]
       }
-      if (enable_host_gcc_mbdtls_build) {
+      if (enable_host_gcc_mbedtls_build) {
         deps += [ ":check_host_gcc_mbedtls" ]
+      }
+      if (enable_linux_embedded_build) {
+        deps += [ ":check_linux_embedded" ]
       }
     }
   }
