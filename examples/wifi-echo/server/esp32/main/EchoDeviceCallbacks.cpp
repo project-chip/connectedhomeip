@@ -79,10 +79,8 @@ void EchoDeviceCallbacks::PostAttributeChangeCallback(uint8_t endpoint, ChipZclC
                                                       uint8_t * value)
 {
     // At this point we can assume that value points to a boolean value.
-    printf("endpoint: %d, clusterId: %d, attrId: %d type: %d\n", endpoint, clusterId, attributeId, type);
     Value cValue(kCHIPValueType_Bool);
     memcpy((void *) &cValue.Int64, (void *) value, size);
-    printf("Value is %lld type is %d\n", cValue.Int64, type);
 
     server.SetValue(endpoint, clusterId, attributeId, cValue);
 }

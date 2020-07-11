@@ -85,6 +85,25 @@ public:
         }
         return CHIP_ERROR_INTERNAL;
     }
+
+    /**
+     * @brief
+     *   Get a value for an attribute
+     *
+     * @param attrId the attribute identifer that should be queried
+     * @param value  the value that the attribute has
+     */
+    virtual CHIP_ERROR Get(uint16_t attrId, Value & value)
+    {
+        /* Just hand-off to update the value internally */
+        auto attr = GetAttribute(attrId);
+        if (attr != nullptr)
+        {
+            value = attr->Get();
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_INTERNAL;
+    }
 };
 
 } // namespace DataModel
