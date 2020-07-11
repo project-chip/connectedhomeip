@@ -59,6 +59,40 @@ if (device_platform != "none") {
     output_name = "libDeviceLayer"
 
     sources = [
+      "../include/platform/CHIPDeviceConfig.h",
+      "../include/platform/CHIPDeviceError.h",
+      "../include/platform/CHIPDeviceEvent.h",
+      "../include/platform/CHIPDeviceLayer.h",
+      "../include/platform/ConfigurationManager.h",
+      "../include/platform/ConnectivityManager.h",
+      "../include/platform/GeneralUtils.h",
+      "../include/platform/PersistedStorage.h",
+      "../include/platform/PlatformManager.h",
+      "../include/platform/SoftwareUpdateManager.h",
+      "../include/platform/SoftwareUpdateManagerImpl.h",
+      "../include/platform/ThreadStackManager.h",
+      "../include/platform/TimeSyncManager.h",
+      "../include/platform/internal/BLEManager.h",
+      "../include/platform/internal/CHIPDeviceLayerInternal.h",
+      "../include/platform/internal/DeviceDescriptionServer.h",
+      "../include/platform/internal/DeviceNetworkInfo.h",
+      "../include/platform/internal/EventLogging.h",
+      "../include/platform/internal/GenericConfigurationManagerImpl.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_BLE.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_NoBLE.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_NoThread.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_NoTunnel.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_NoWiFi.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_Thread.h",
+      "../include/platform/internal/GenericNetworkProvisioningServerImpl.h",
+      "../include/platform/internal/GenericPlatformManagerImpl.h",
+      "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h",
+      "../include/platform/internal/GenericPlatformManagerImpl_POSIX.h",
+      "../include/platform/internal/GenericSoftwareUpdateManagerImpl.h",
+      "../include/platform/internal/GenericSoftwareUpdateManagerImpl_BDX.h",
+      "../include/platform/internal/NetworkProvisioningServer.h",
+      "../include/platform/internal/testing/ConfigUnitTest.h",
       "GeneralUtils.cpp",
       "Globals.cpp",
       "PersistedStorage.cpp",
@@ -144,6 +178,8 @@ if (device_platform != "none") {
         ]
       }
     }
+
+    allow_circular_includes_from = [ "${chip_root}/src/lib/support" ]
   }
 } else {
   group("platform") {
