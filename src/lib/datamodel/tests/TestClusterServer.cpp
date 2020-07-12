@@ -129,6 +129,48 @@ void TestClusterServerTwoEndpoints(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, switch2->mTestVector == true);
 }
 
+void TestHandleCommand(nlTestSuite * inSuite, void * inContext)
+{
+    const uint8_t ZCLVersion         = 10;
+    const uint8_t applicationVersion = 20;
+    const uint8_t stackVersion       = 1;
+    const uint8_t HWVersion          = 1;
+    Value value;
+
+    chip::DataModel::ClusterServer server(ZCLVersion, applicationVersion, stackVersion, HWVersion);
+    const uint8_t switch1Gpio = 10;
+    auto * switch1            = new testSwitch(switch1Gpio);
+    server.AddCluster(switch1);
+
+    /* Validate attributes of the OnOff Cluster on Endpoint 1 */
+    server.GetValue(1, kClusterIdOnOff, kAttributeIdOnOff, value);
+    NL_TEST_ASSERT(inSuite, ValueToBool(value) == false);
+
+    Command cmd;
+
+    /* Validate On */
+    cmd.mId = kOnOffCmdIdOn;
+    server.HandleCommands(1, kClusterIdOnOff, cmd);
+    server.GetValue(1, kClusterIdOnOff, kAttributeIdOnOff, value);
+    NL_TEST_ASSERT(inSuite, ValueToBool(value) == true);
+
+    /* Validate Off */
+    cmd.mId = kOnOffCmdIdOff;
+    server.HandleCommands(1, kClusterIdOnOff, cmd);
+    server.GetValue(1, kClusterIdOnOff, kAttributeIdOnOff, value);
+    NL_TEST_ASSERT(inSuite, ValueToBool(value) == false);
+
+    /* Validate Toggle */
+    cmd.mId = kOnOffCmdIdToggle;
+    server.HandleCommands(1, kClusterIdOnOff, cmd);
+    server.GetValue(1, kClusterIdOnOff, kAttributeIdOnOff, value);
+    NL_TEST_ASSERT(inSuite, ValueToBool(value) == true);
+    cmd.mId = kOnOffCmdIdToggle;
+    server.HandleCommands(1, kClusterIdOnOff, cmd);
+    server.GetValue(1, kClusterIdOnOff, kAttributeIdOnOff, value);
+    NL_TEST_ASSERT(inSuite, ValueToBool(value) == false);
+}
+
 } // namespace
 
 int TestClusterServer(void)
@@ -138,6 +180,7 @@ int TestClusterServer(void)
      */
     static const nlTest sTests[] = { NL_TEST_DEF("TestClusterServerBasic", TestClusterServerBasic),
                                      NL_TEST_DEF("TestClusterServerTwoEndpoints", TestClusterServerTwoEndpoints),
+                                     NL_TEST_DEF("TestHandleCommand", TestHandleCommand),
                                      NL_TEST_SENTINEL() };
 
     nlTestSuite theSuite = {

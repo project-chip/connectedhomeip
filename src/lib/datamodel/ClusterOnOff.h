@@ -38,6 +38,14 @@ static const uint16_t kAttributeIdGlobalSceneControl = 0x4000;
 static const uint16_t kAttributeIdOnTime             = 0x4001;
 static const uint16_t kAttributeIdOffWaitTime        = 0x4002;
 
+/* Command IDs */
+static const uint16_t kOnOffCmdIdOff                  = 0x00;
+static const uint16_t kOnOffCmdIdOn                   = 0x01;
+static const uint16_t kOnOffCmdIdToggle               = 0x02;
+static const uint16_t kOnOffCmdIdOffWithEffect        = 0x40;
+static const uint16_t kOnOffCmdIdOffWithRecall        = 0x41;
+static const uint16_t kOnOffCmdIdOnWithTimedOff       = 0x42;
+
 /**
  * @brief
  *   This class implements the OnOff cluster as defined in the CHIP specification.
@@ -61,6 +69,44 @@ public:
         AddAttribute(&mGlobalSceneControl);
         AddAttribute(&mOnTime);
         AddAttribute(&mOffWaitTime);
+    }
+
+    virtual CHIP_ERROR HandleCommandOff(const Command & cmd)
+    {
+        return Set(kAttributeIdOnOff, ValueBool(false));
+    }
+    
+    virtual CHIP_ERROR HandleCommandOn(const Command & cmd)
+    {
+        return Set(kAttributeIdOnOff, ValueBool(true));
+    }
+    
+    virtual CHIP_ERROR HandleCommandToggle(const Command & cmd)
+    {
+        Value currentVal;
+        Get(kAttributeIdOnOff, currentVal);
+        return Set(kAttributeIdOnOff, ValueBool( ! ValueToBool(currentVal)));
+    }
+
+    virtual CHIP_ERROR HandleCommands(const Command & cmd)
+    {
+        switch (cmd.mId)
+        {
+        case kOnOffCmdIdOff:
+            HandleCommandOff(cmd);
+            break;
+        case kOnOffCmdIdOn:
+            HandleCommandOn(cmd);
+            break;
+        case kOnOffCmdIdToggle:
+            HandleCommandToggle(cmd);
+            break;
+        default:
+            /* Unsupported */
+            return CHIP_ERROR_INTERNAL;
+            break;
+        }
+        return CHIP_ERROR_INTERNAL;
     }
 };
 
