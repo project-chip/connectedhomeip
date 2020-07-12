@@ -25,6 +25,7 @@
 #define CHIPBASECLUSTER_H_
 
 #include <datamodel/Attribute.h>
+#include <datamodel/Command.h>
 #include <datamodel/Deque.h>
 
 namespace chip {
@@ -67,6 +68,18 @@ public:
     Attribute * GetAttribute(AttributeId_t attrId)
     {
         return mAttrs.Find([attrId](Attribute * item) -> bool { return (item->mAttrId == attrId); });
+    }
+
+    /**
+     * @brief
+     *   Handle commands specific to this cluster
+     *
+     * @param cmd the command that needs to be processed
+     */
+    virtual CHIP_ERROR HandleCommands(const Command & cmd)
+    {
+        /* Do nothing */
+        return CHIP_NO_ERROR;
     }
 
     /**
