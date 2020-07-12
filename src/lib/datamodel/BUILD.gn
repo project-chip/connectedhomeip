@@ -23,6 +23,7 @@ static_library("datamodel") {
     "ClusterBasic.h",
     "ClusterOnOff.h",
     "ClusterServer.h",
+    "Command.h",
     "Deque.h",
     "Endpoint.cpp",
     "Endpoint.h",
