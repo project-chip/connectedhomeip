@@ -34,7 +34,7 @@ IMAGE=${DOCKER_BUILD_IMAGE:-$(basename "$(pwd)")}
 VERSION=${DOCKER_BUILD_VERSION:-$(cat version)}
 
 # target (if Dockerfile defines several images)
-TARGET=${DOCKER_BUILD_TARGET}
+TARGET=$DOCKER_BUILD_TARGET
 
 [[ ${*/--help//} != "${*}" ]] && {
     set +x
