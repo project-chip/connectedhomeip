@@ -25,7 +25,7 @@
 
 #include "EchoDeviceCallbacks.h"
 #include "esp_log.h"
-#include <lib/datamodel/ClusterServer.h>
+#include <datamodel/ClusterServer.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
 
