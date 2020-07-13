@@ -25,6 +25,7 @@
 
 CHIP_BUILD_DATAMODEL_SOURCE_FILES                         = \
     @top_builddir@/src/lib/datamodel/Endpoint.cpp       \
+    @top_builddir@/src/lib/datamodel/ClusterServer.cpp       \
     $(NULL)
 
 CHIP_BUILD_DATAMODEL_HEADER_FILES                              = \

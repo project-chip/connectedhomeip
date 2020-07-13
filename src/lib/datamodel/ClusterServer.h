@@ -182,27 +182,11 @@ public:
      * @brief
      *   Handle commands
      *
-     * @param endpointId the index of the desired Endpoint
-     * @param clusterId the id of desired Cluster
      * @param cmd the command to handle
      *
      * @return CHIP_NO_ERROR on success or a failure-specific error code otherwise
      */
-    CHIP_ERROR HandleCommand(uint8_t endPointId, uint16_t clusterId, const Command & cmd)
-    {
-        auto endpoint = GetEndpoint(endPointId);
-
-        if (endpoint != nullptr)
-        {
-            auto cluster = endpoint->GetCluster(clusterId);
-
-            if (cluster != nullptr)
-            {
-                return cluster->HandleCommand(cmd);
-            }
-        }
-        return CHIP_ERROR_INTERNAL;
-    }
+    CHIP_ERROR HandleCommand(const Command & cmd);
 };
 
 } // namespace DataModel
