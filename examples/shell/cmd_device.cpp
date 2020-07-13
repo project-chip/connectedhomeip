@@ -72,65 +72,208 @@ exit:
     return error;
 }
 
-int cmd_device_config(int argc, char ** argv)
+static CHIP_ERROR ConfigGetDone(streamer_t * sout, CHIP_ERROR error)
+{
+    if (error)
+    {
+        streamer_printf(sout, "<None>");
+    }
+    streamer_printf(sout, "\r\n");
+    return error;
+}
+
+static CHIP_ERROR ConfigGetVendorId(bool printHeader)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
     uint16_t value16;
-    uint64_t value64;
-    char buf[256];
+
+    if (printHeader)
+    {
+        streamer_printf(sout, "VendorId:        ");
+    }
+    SuccessOrExit(error = ConfigurationMgr().GetVendorId(value16));
+    streamer_printf(sout, "%04x", value16);
+
+exit:
+    return ConfigGetDone(sout, error);
+}
+
+static CHIP_ERROR ConfigGetProductId(bool printHeader)
+{
+    CHIP_ERROR error  = CHIP_NO_ERROR;
+    streamer_t * sout = streamer_get();
+    uint16_t value16;
+
+    if (printHeader)
+    {
+        streamer_printf(sout, "ProductId:       ");
+    }
+    SuccessOrExit(error = ConfigurationMgr().GetProductId(value16));
+    streamer_printf(sout, "%04x", value16);
+
+exit:
+    return ConfigGetDone(sout, error);
+}
+
+static CHIP_ERROR ConfigGetProductRevision(bool printHeader)
+{
+    CHIP_ERROR error  = CHIP_NO_ERROR;
+    streamer_t * sout = streamer_get();
+    uint16_t value16;
+
+    if (printHeader)
+    {
+        streamer_printf(sout, "ProductRevision: ");
+    }
+    SuccessOrExit(error = ConfigurationMgr().GetProductRevision(value16));
+    streamer_printf(sout, "%04x", value16);
+
+exit:
+    return ConfigGetDone(sout, error);
+}
+
+static CHIP_ERROR ConfigGetSerialNumber(bool printHeader)
+{
+    CHIP_ERROR error  = CHIP_NO_ERROR;
+    streamer_t * sout = streamer_get();
+    char buf[ConfigurationManager::kMaxSerialNumberLength];
     size_t bufSize;
+
+    if (printHeader)
+    {
+        streamer_printf(sout, "SerialNumber:    ");
+    }
+    SuccessOrExit(error = ConfigurationMgr().GetSerialNumber(buf, sizeof(buf), bufSize));
+    streamer_print_hex(sout, reinterpret_cast<const uint8_t *>(buf), bufSize);
+
+exit:
+    return ConfigGetDone(sout, error);
+}
+
+static CHIP_ERROR ConfigGetDeviceId(bool printHeader)
+{
+    CHIP_ERROR error  = CHIP_NO_ERROR;
+    streamer_t * sout = streamer_get();
+    uint64_t value64;
+
+    if (printHeader)
+    {
+        streamer_printf(sout, "DeviceId:        ");
+    }
+    SuccessOrExit(error = ConfigurationMgr().GetDeviceId(value64));
+    streamer_print_hex(sout, reinterpret_cast<const uint8_t *>(&value64), sizeof(value64));
+
+exit:
+    return ConfigGetDone(sout, error);
+}
+
+static CHIP_ERROR ConfigGetDeviceCert(bool printHeader)
+{
+    CHIP_ERROR error  = CHIP_NO_ERROR;
+    streamer_t * sout = streamer_get();
+    uint8_t buf[512];
+    size_t bufSize;
+
+    if (printHeader)
+    {
+        streamer_printf(sout, "DeviceCert:      ");
+    }
+    SuccessOrExit(error = ConfigurationMgr().GetDeviceCertificate(buf, sizeof(buf), bufSize));
+    streamer_print_hex(sout, const_cast<const uint8_t *>(buf), bufSize);
+
+exit:
+    return ConfigGetDone(sout, error);
+}
+
+static CHIP_ERROR ConfigGetDeviceCaCerts(bool printHeader)
+{
+    CHIP_ERROR error  = CHIP_NO_ERROR;
+    streamer_t * sout = streamer_get();
+    uint8_t buf[512];
+    size_t bufSize;
+
+    if (printHeader)
+    {
+        streamer_printf(sout, "DeviceCaCerts:   ");
+    }
+    SuccessOrExit(error = ConfigurationMgr().GetDeviceIntermediateCACerts(buf, sizeof(buf), bufSize));
+    streamer_print_hex(sout, const_cast<const uint8_t *>(buf), bufSize);
+
+exit:
+    return ConfigGetDone(sout, error);
+}
+
+static CHIP_ERROR ConfigGetPairingCode(bool printHeader)
+{
+    CHIP_ERROR error  = CHIP_NO_ERROR;
+    streamer_t * sout = streamer_get();
+    char buf[ConfigurationManager::kMaxPairingCodeLength];
+    size_t bufSize;
+
+    if (printHeader)
+    {
+        streamer_printf(sout, "PairingCode:     ");
+    }
+    SuccessOrExit(error = ConfigurationMgr().GetPairingCode(buf, sizeof(buf), bufSize));
+    streamer_print_hex(sout, reinterpret_cast<const uint8_t *>(buf), bufSize);
+
+exit:
+    return ConfigGetDone(sout, error);
+}
+
+static CHIP_ERROR ConfigGetServiceId(bool printHeader)
+{
+    CHIP_ERROR error  = CHIP_NO_ERROR;
+    streamer_t * sout = streamer_get();
+    uint64_t value64;
+
+    if (printHeader)
+    {
+        streamer_printf(sout, "ServiceId:       ");
+    }
+    SuccessOrExit(error = ConfigurationMgr().GetServiceId(value64));
+    streamer_print_hex(sout, reinterpret_cast<const uint8_t *>(&value64), sizeof(value64));
+
+exit:
+    return ConfigGetDone(sout, error);
+}
+
+static CHIP_ERROR ConfigGetFabricId(bool printHeader)
+{
+    CHIP_ERROR error  = CHIP_NO_ERROR;
+    streamer_t * sout = streamer_get();
+    uint64_t value64;
+
+    if (printHeader)
+    {
+        streamer_printf(sout, "FabricId:        ");
+    }
+    SuccessOrExit(error = ConfigurationMgr().GetFabricId(value64));
+    streamer_print_hex(sout, reinterpret_cast<const uint8_t *>(&value64), sizeof(value64));
+
+exit:
+    return ConfigGetDone(sout, error);
+}
+
+int cmd_device_config(int argc, char ** argv)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
 
     VerifyOrExit(argc == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    SuccessOrExit(error = ConfigurationMgr().GetVendorId(value16));
-    streamer_printf(sout, "VendorId:        %04x\n\r", value16);
+    error = ConfigGetVendorId(true);
+    error = ConfigGetProductId(true);
+    error = ConfigGetProductRevision(true);
+    error = ConfigGetSerialNumber(true);
 
-    SuccessOrExit(error = ConfigurationMgr().GetProductId(value16));
-    streamer_printf(sout, "ProductId:       %04x\n\r", value16);
+    error = ConfigGetServiceId(true);
+    error = ConfigGetFabricId(true);
+    error = ConfigGetPairingCode(true);
 
-    SuccessOrExit(error = ConfigurationMgr().GetProductRevision(value16));
-    streamer_printf(sout, "ProductRevision: %04x\n\r", value16);
-
-    error = ConfigurationMgr().GetServiceId(value64);
-    streamer_printf(sout, "ServiceId:       ");
-    if (error == CHIP_NO_ERROR)
-    {
-        streamer_print_hex(sout, reinterpret_cast<const uint8_t *>(&value64), sizeof(value64));
-    }
-    else
-    {
-        streamer_printf(sout, "<None>");
-        error = CHIP_NO_ERROR;
-    }
-    streamer_printf(sout, "\r\n");
-
-    error = ConfigurationMgr().GetFabricId(value64);
-    streamer_printf(sout, "FabricId:        ");
-    if (error == CHIP_NO_ERROR)
-    {
-        streamer_print_hex(sout, reinterpret_cast<const uint8_t *>(&value64), sizeof(value64));
-    }
-    else
-    {
-        streamer_printf(sout, "<None>");
-        error = CHIP_NO_ERROR;
-    }
-    streamer_printf(sout, "\r\n");
-
-    error = ConfigurationMgr().GetPairingCode(buf, sizeof(buf), bufSize);
-    streamer_printf(sout, "PairingCode:     ");
-    if (error == CHIP_NO_ERROR)
-    {
-        streamer_print_hex(sout, reinterpret_cast<const uint8_t *>(buf), bufSize);
-        streamer_printf(sout, "\n\r");
-    }
-    else
-    {
-        streamer_printf(sout, "<None>");
-        error = CHIP_NO_ERROR;
-    }
-    streamer_printf(sout, "\r\n");
+    error = ConfigGetDeviceId(true);
+    error = ConfigGetDeviceCert(true);
+    error = ConfigGetDeviceCaCerts(true);
 
 exit:
     return error;
@@ -148,30 +291,43 @@ int cmd_device_get(int argc, char ** argv)
 
     if (strcmp(argv[0], "vendorid") == 0)
     {
-        uint16_t value;
-        SuccessOrExit(error = ConfigurationMgr().GetVendorId(value));
-        streamer_printf(sout, "%04x\n\r", value);
+        SuccessOrExit(error = ConfigGetVendorId(false));
     }
     else if (strcmp(argv[0], "productid") == 0)
     {
-        uint16_t value;
-        SuccessOrExit(error = ConfigurationMgr().GetProductId(value));
-        streamer_printf(sout, "%04x\n\r", value);
+        SuccessOrExit(error = ConfigGetProductId(false));
     }
     else if (strcmp(argv[0], "productrev") == 0)
     {
-        uint16_t value;
-        SuccessOrExit(error = ConfigurationMgr().GetProductRevision(value));
-        streamer_printf(sout, "%04x\n\r", value);
+        SuccessOrExit(error = ConfigGetProductRevision(false));
     }
     else if (strcmp(argv[0], "serial") == 0)
     {
-        size_t bufSize = 20;
-        char buf[bufSize];
-        size_t serialNumLength;
-        SuccessOrExit(error = ConfigurationMgr().GetSerialNumber(buf, bufSize, serialNumLength));
-        streamer_print_hex(sout, reinterpret_cast<const uint8_t *>(buf), serialNumLength);
-        streamer_printf(sout, "\n\r");
+        SuccessOrExit(error = ConfigGetSerialNumber(false));
+    }
+    else if (strcmp(argv[0], "deviceid") == 0)
+    {
+        SuccessOrExit(error = ConfigGetDeviceId(false));
+    }
+    else if (strcmp(argv[0], "cert") == 0)
+    {
+        SuccessOrExit(error = ConfigGetDeviceCert(false));
+    }
+    else if (strcmp(argv[0], "cacerts") == 0)
+    {
+        SuccessOrExit(error = ConfigGetDeviceCaCerts(false));
+    }
+    else if (strcmp(argv[0], "pairingcode") == 0)
+    {
+        SuccessOrExit(error = ConfigGetPairingCode(false));
+    }
+    else if (strcmp(argv[0], "serviceid") == 0)
+    {
+        SuccessOrExit(error = ConfigGetServiceId(false));
+    }
+    else if (strcmp(argv[0], "fabricid") == 0)
+    {
+        SuccessOrExit(error = ConfigGetFabricId(false));
     }
     else
     {
