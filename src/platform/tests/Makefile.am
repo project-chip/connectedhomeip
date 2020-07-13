@@ -71,7 +71,6 @@ AM_CPPFLAGS                                    = \
 if CHIP_DEVICE_LAYER_TARGET_LINUX
 AM_CPPFLAGS                                   += \
     $(GIO_CFLAGS)                                \
-    $(GIO_UNIX_CFLAGS)                           \
     $(NULL)
 
 if CHIP_WITH_OT_BR_POSIX
@@ -94,7 +93,6 @@ CHIP_LDADD                                      = \
 if CHIP_DEVICE_LAYER_TARGET_LINUX
 CHIP_LDADD                                    += \
     $(GIO_CFLAGS) $(GIO_LIBS)                    \
-    $(GIO_UNIX_CFLAGS) $(GIO_UNIX_LIBS)          \
     $(NULL)
 
 if CHIP_WITH_OT_BR_POSIX

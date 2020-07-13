@@ -24,9 +24,12 @@
 #ifndef PLATFORM_MANAGER_IMPL_H
 #define PLATFORM_MANAGER_IMPL_H
 
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
 #include <memory>
+#include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
+
+#if CHIP_WITH_GIO
 #include <gio/gio.h>
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -46,8 +49,9 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
-
+#if CHIP_WITH_GIO
     GDBusConnection * GetGDBusConnection();
+#endif
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
@@ -62,12 +66,14 @@ private:
 
     static PlatformManagerImpl sInstance;
 
+#if CHIP_WITH_GIO
     struct GDBusConnectionDeleter
     {
-        void operator()(GDBusConnection *conn) { g_object_unref(conn); }
+        void operator()(GDBusConnection * conn) { g_object_unref(conn); }
     };
     using UniqueGDBusConnection = std::unique_ptr<GDBusConnection, GDBusConnectionDeleter>;
     UniqueGDBusConnection mpGDBusConnection;
+#endif
 };
 
 /**
