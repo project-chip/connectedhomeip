@@ -1933,7 +1933,16 @@ fi
 
 if test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1; then
     PKG_CHECK_MODULES([GIO], [gio-2.0])
-    PKG_CHECK_MODULES([GIO_UNIX], [gio-unix-2.0])
+
+    # Check for GIO library is available.
+    AC_CHECK_LIB([gio-2.0], [g_bus_get_sync],
+    [
+        AC_DEFINE([CHIP_WITH_GIO], [1], [Define to 1 to build CHIP with GIO])
+    ],
+    [
+        AC_DEFINE([CHIP_WITH_GIO], [0], [Define to 0 to build CHIP without GIO])
+    ]
+    )
 fi
 
 #
@@ -2361,7 +2370,6 @@ AC_MSG_NOTICE([
   PThreads link libraries                          : ${PTHREAD_LIBS:--}
   IniPP compile flags                              : ${INIPP_CPPFLAGS:--}
   GIO compile flags                                : ${GIO_CFLAGS:--}
-  GIO Unix compile flags                           : ${GIO_UNIX_CFLAGS:--}
   C Preprocessor                                   : ${CPP}
   C Compiler                                       : ${CC}
   C++ Preprocessor                                 : ${CXXCPP}
