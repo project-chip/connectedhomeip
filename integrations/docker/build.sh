@@ -69,7 +69,7 @@ done
 
 BUILD_ARGS=()
 [[ ${*/--no-cache//} != "${*}" ]] && BUILD_ARGS+=(--no-cache)
-[[ -n $TARGET ]]                  && BUILD_ARGS+=(--target "$TARGET")
+[[ -n $TARGET ]] && BUILD_ARGS+=(--target "$TARGET")
 
 docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
 
