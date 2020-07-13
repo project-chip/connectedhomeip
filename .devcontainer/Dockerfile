@@ -18,7 +18,7 @@ RUN apt-get -fy install git vim emacs sudo \
     iproute2 procps lsb-release \
     bash-completion \
     build-essential cmake cppcheck valgrind \
-    wget curl telnet bsdtar \
+    wget curl telnet libarchive-tools \
     docker.io
 RUN groupadd -g $USER_GID $USERNAME
 RUN useradd -s /bin/bash -u $USER_UID -g $USER_GID -G docker -m $USERNAME
