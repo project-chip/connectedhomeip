@@ -39,6 +39,11 @@
  *        the CHIP project
  ******************************************************************************/
 
+#ifndef TYPES_STUB_H
+#define TYPES_STUB_H
+
+#include <string.h> // For mem* functions.
+
 /**
  * @brief Defines binding types.
  */
@@ -256,6 +261,21 @@ typedef struct {
 } EmberApsFrame;
 
 /**
+ * @brief Size of EUI64 (an IEEE address) in bytes (8).
+ */
+#define EUI64_SIZE 8
+
+/**
+ * @brief Size of an encryption key in bytes (16).
+ */
+#define EMBER_ENCRYPTION_KEY_SIZE 16
+
+/**
+ * @brief Size of an extended PAN identifier in bytes (8).
+ */
+#define EXTENDED_PAN_ID_SIZE 8
+
+/**
  * @brief EUI 64-bit ID (an IEEE address).
  */
 typedef uint8_t EmberEUI64[EUI64_SIZE];
@@ -450,22 +470,6 @@ enum
    * It may not be passed to emberSendUnicast(). */
   EMBER_OUTGOING_BROADCAST
 };
-
-/**
- * @brief Size of EUI64 (an IEEE address) in bytes (8).
- */
-#define EUI64_SIZE 8
-
-/**
- * @brief Size of an encryption key in bytes (16).
- */
-#define EMBER_ENCRYPTION_KEY_SIZE 16
-
-/**
- * @brief Size of an extended PAN identifier in bytes (8).
- */
-#define EXTENDED_PAN_ID_SIZE 8
-
 
 /** @brief Endpoint information (a ZigBee Simple Descriptor).
  *
@@ -755,6 +759,7 @@ enum
 
 typedef uint8_t EmberAfPluginNetworkSteeringJoiningState;
 
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
 enum SleepModes
 #else
 typedef uint8_t SleepModes;
@@ -884,6 +889,7 @@ typedef struct {
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 enum EmberStatus
 #else
+typedef uint8_t EmberStatus;
 enum
 #endif //DOXYGEN_SHOULD_SKIP_THIS
 {
@@ -1833,29 +1839,7 @@ typedef struct {
 /**
  * @brief The minimum 2.4GHz 802.15.4 channel number is 11.
  */
-#define EMBER_MIN_802_15_4_CHANNEL_NUMBER 1
-/**
- * @brief Defines the possible join states for a node.
- */
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberNetworkStatus
-#else
-typedef uint8_t EmberNetworkStatus;
-enum
-#endif
-{
-  /** The node is not associated with a network in any way. */
-  EMBER_NO_NETWORK,
-  /** The node is currently attempting to join a network. */
-  EMBER_JOINING_NETWORK,
-  /** The node is joined to a network. */
-  EMBER_JOINED_NETWORK,
-  /** The node is an end device joined to a network but its parent
-      is not responding. */
-  EMBER_JOINED_NETWORK_NO_PARENT,
-  /** The node is in the process of leaving its current network. */
-  EMBER_LEAVING_NETWORK
-};
+#define EMBER_MIN_802_15_4_CHANNEL_NUMBER 11
 
 /**
  * @brief The maximum SubGhz channel number on pages 28, 30, 31 is 26.
@@ -1943,3 +1927,14 @@ enum
  */
 #define MAIN_FUNCTION_PARAMETERS void
 #define MAIN_FUNCTION_ARGUMENTS
+
+// Stubs to just silence some compile errors
+#define emberAfPrint(...) /* */
+#define emberAfPrintEnabled(...) false
+#define emberAfPrintln(...) /* */
+#define emberAfPrintBuffer(...) /* */
+
+// Needed by callback.h and callback-stubs.c
+typedef bool boolean;
+
+#endif // TYPES_STUB_H
