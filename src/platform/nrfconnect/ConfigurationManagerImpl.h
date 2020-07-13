@@ -85,11 +85,32 @@ inline ConfigurationManager & ConfigurationMgr(void)
  * Returns the platform-specific implementation of the ConfigurationManager singleton object.
  *
  * chip applications can use this to gain access to features of the ConfigurationManager
- * that are specific to the ESP32 platform.
+ * that are specific to the nRF Connect SDK platform.
  */
 inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
 {
     return ConfigurationManagerImpl::sInstance;
+}
+
+inline bool ConfigurationManagerImpl::_CanFactoryReset()
+{
+    return true;
+}
+
+inline CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key,
+                                                                       uint32_t & value)
+{
+    return ReadConfigValueCounter(key, value);
+}
+
+inline CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
+{
+    return WriteConfigValueCounter(key, value);
+}
+
+inline CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * /* buf */)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 } // namespace DeviceLayer

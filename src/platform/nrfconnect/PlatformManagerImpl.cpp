@@ -39,8 +39,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
 
-    // Call _InitChipStack() on the generic implementation base class
-    // to finish the initialization process.
+    // Initialize the configuration system.
+    err = Internal::ZephyrConfig::Init();
+    SuccessOrExit(err);
+
+    // Call _InitChipStack() on the generic implementation base class to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 

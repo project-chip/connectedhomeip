@@ -26,6 +26,8 @@
 
 #include <logging/log.h>
 
+#include <cstdio>
+
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;

@@ -275,6 +275,7 @@ if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 
 libDeviceLayer_a_SOURCES               +=       \
     nrfconnect/BLEManagerImpl.cpp               \
+    nrfconnect/ConfigurationManagerImpl.cpp     \
     nrfconnect/ConnectivityManagerImpl.cpp      \
     nrfconnect/Logging.cpp                      \
     nrfconnect/ZephyrConfig.cpp                 \
