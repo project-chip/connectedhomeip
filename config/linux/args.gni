@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-device_platform = "linux"
+import("//build_overrides/chip.gni")
 
-ble_platform_config_include = "<platform/Linux/BlePlatformConfig.h>"
-chip_device_platform_config_include = "<platform/Linux/CHIPDevicePlatformConfig.h>"
-chip_platform_config_include = "<platform/Linux/CHIPPlatformConfig.h>"
-inet_platform_config_include = "<platform/Linux/InetPlatformConfig.h>"
-system_platform_config_include = "<platform/Linux/SystemPlatformConfig.h>"
+import("${chip_root}/src/platform/Linux/args.gni")
+
+project_config_include_dirs = rebase_path([ "." ])
+ble_project_config_include = "<CHIPProjectConfig.h>"
+chip_device_project_config_include = "<CHIPProjectConfig.h>"
+chip_project_config_include = "<CHIPProjectConfig.h>"
+inet_project_config_include = "<CHIPProjectConfig.h>"
+system_project_config_include = "<CHIPProjectConfig.h>"
