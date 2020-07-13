@@ -24,8 +24,8 @@
 #ifndef PLATFORM_MANAGER_IMPL_H
 #define PLATFORM_MANAGER_IMPL_H
 
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
 #include <memory>
+#include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
 
 #if CHIP_WITH_GIO
 #include <gio/gio.h>
@@ -69,7 +69,7 @@ private:
 #if CHIP_WITH_GIO
     struct GDBusConnectionDeleter
     {
-        void operator()(GDBusConnection *conn) { g_object_unref(conn); }
+        void operator()(GDBusConnection * conn) { g_object_unref(conn); }
     };
     using UniqueGDBusConnection = std::unique_ptr<GDBusConnection, GDBusConnectionDeleter>;
     UniqueGDBusConnection mpGDBusConnection;
