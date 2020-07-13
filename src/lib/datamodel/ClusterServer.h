@@ -186,7 +186,7 @@ public:
      *
      * @return CHIP_NO_ERROR on success or a failure-specific error code otherwise
      */
-    CHIP_ERROR HandleCommands(uint8_t endPointId, uint16_t clusterId, const Command & cmd)
+    CHIP_ERROR HandleCommand(uint8_t endPointId, uint16_t clusterId, const Command & cmd)
     {
         auto endpoint = GetEndpoint(endPointId);
 
@@ -196,7 +196,7 @@ public:
 
             if (cluster != nullptr)
             {
-                return cluster->HandleCommands(cmd);
+                return cluster->HandleCommand(cmd);
             }
         }
         return CHIP_ERROR_INTERNAL;
