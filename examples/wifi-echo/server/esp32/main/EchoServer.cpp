@@ -38,6 +38,7 @@
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
+#include <lib/datamodel/ClusterServer.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -57,6 +58,7 @@ using namespace ::chip::Transport;
 
 constexpr NodeId kLocalNodeId = 12344321;
 extern LEDWidget statusLED; // In wifi-echo.cpp
+extern chip::DataModel::ClusterServer server; // In wifi-echo.cpp
 
 namespace {
 
@@ -159,7 +161,7 @@ public:
         // port from data model processing.
         if (ContentMayBeADataModelMessage(buffer))
         {
-            HandleDataModelMessage(buffer);
+            HandleDataModelMessage(server, buffer);
             buffer = NULL;
         }
         else

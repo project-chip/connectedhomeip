@@ -64,22 +64,6 @@ public:
      */
     virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
-    /**
-     * @brief
-     *   Called after an attribute has been changed
-     *
-     * @param endpoint           endpoint id
-     * @param clusterID          cluster id
-     * @param attributeId        attribute id that was changed
-     * @param mask               mask of the attribute
-     * @param manufacturerCode   manufacturer code
-     * @param type               attribute type
-     * @param size               size of the attribute
-     * @param value              pointer to the new value
-     */
-    virtual void PostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId,
-                                             uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
-    {}
     virtual ~CHIPDeviceManagerCallbacks() {}
 };
 
