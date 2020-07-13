@@ -38,7 +38,7 @@ using namespace chip::DeviceLayer;
 using namespace chip::Logging;
 using namespace chip::ArgParser;
 
-static chip::Shell::Shell theShellDevice;
+static chip::Shell::Shell sShellDeviceSubcommands;
 
 int cmd_device_help_iterator(shell_command_t * command, void * arg)
 {
@@ -48,7 +48,7 @@ int cmd_device_help_iterator(shell_command_t * command, void * arg)
 
 int cmd_device_help(int argc, char ** argv)
 {
-    theShellDevice.ForEachCommand(cmd_device_help_iterator, NULL);
+    sShellDeviceSubcommands.ForEachCommand(cmd_device_help_iterator, NULL);
     return 0;
 }
 
@@ -171,6 +171,7 @@ static CHIP_ERROR ConfigGetDeviceCert(bool printHeader)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
+    // TODO(#1586): MemoryAlloc temp buffer rather than use stack.
     uint8_t buf[512];
     size_t bufSize;
 
@@ -189,6 +190,7 @@ static CHIP_ERROR ConfigGetDeviceCaCerts(bool printHeader)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
+    // TODO(#1586): MemoryAlloc temp buffer rather than use stack.
     uint8_t buf[512];
     size_t bufSize;
 
@@ -343,7 +345,7 @@ int cmd_device_dispatch(int argc, char ** argv)
 
     VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = theShellDevice.ExecCommand(argc, argv);
+    error = sShellDeviceSubcommands.ExecCommand(argc, argv);
 
 exit:
     return error;
@@ -365,7 +367,7 @@ void cmd_device_init(void)
 {
 #if CONFIG_DEVICE_LAYER
     // Register `device` subcommands with the local shell dispatcher.
-    theShellDevice.RegisterCommands(cmds_device, ARRAY_SIZE(cmds_device));
+    sShellDeviceSubcommands.RegisterCommands(cmds_device, ARRAY_SIZE(cmds_device));
 
     // Register the root `base64` command with the top-level shell.
     shell_register(&cmds_base64_root, 1);
