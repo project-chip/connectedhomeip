@@ -69,6 +69,14 @@ echo 'To build a custom build (for help run "gn args --list out/debug")'
 echo gn args "$CHIP_ROOT/out/custom"
 echo ninja -C "$CHIP_ROOT/out/custom"
 
+nrf5_sdk_args=""
+extra_args=""
+
+if [[ -d "$NRF5_SDK_ROOT/components/libraries" ]]; then
+    nrf5_sdk_args+="nrf5_sdk_root=\"$NRF5_SDK_ROOT\""
+    extra_args+=" $nrf5_sdk_args enable_nrf5_builds=true"
+fi
+
 echo
 if [[ ! -d "$NRF5_SDK_ROOT/components/libraries" ]]; then
     echo "Hint: Set \$NRF5_SDK_ROOT to enable building for nRF5"
@@ -79,14 +87,6 @@ fi
 echo
 
 _chip_banner "Build: GN configure"
-
-nrf5_sdk_args=""
-extra_args=""
-
-if [[ -d "$NRF5_SDK_ROOT/components/libraries" ]]; then
-    nrf5_sdk_args+="nrf5_sdk_root=\"$NRF5_SDK_ROOT\""
-    extra_args+=" $nrf5_sdk_args enable_nrf5_builds=true"
-fi
 
 gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args"
 gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"$extra_args"
