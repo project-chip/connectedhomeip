@@ -56,7 +56,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     std::thread gdbusThread(GDBus_Thread);
     gdbusThread.detach();
 #endif
-    
+
     // Initialize the configuration system.
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);
