@@ -141,23 +141,23 @@ void TestHandleCommand(nlTestSuite * inSuite, void * inContext)
 
     /* Validate On */
     cmd.mId = kOnOffCmdIdOn;
-    server.HandleCommands(1, kClusterIdOnOff, cmd);
+    server.HandleCommand(1, kClusterIdOnOff, cmd);
     server.GetValue(1, kClusterIdOnOff, kAttributeIdOnOff, value);
     NL_TEST_ASSERT(inSuite, ValueToBool(value) == true);
 
     /* Validate Off */
     cmd.mId = kOnOffCmdIdOff;
-    server.HandleCommands(1, kClusterIdOnOff, cmd);
+    server.HandleCommand(1, kClusterIdOnOff, cmd);
     server.GetValue(1, kClusterIdOnOff, kAttributeIdOnOff, value);
     NL_TEST_ASSERT(inSuite, ValueToBool(value) == false);
 
     /* Validate Toggle */
     cmd.mId = kOnOffCmdIdToggle;
-    server.HandleCommands(1, kClusterIdOnOff, cmd);
+    server.HandleCommand(1, kClusterIdOnOff, cmd);
     server.GetValue(1, kClusterIdOnOff, kAttributeIdOnOff, value);
     NL_TEST_ASSERT(inSuite, ValueToBool(value) == true);
     cmd.mId = kOnOffCmdIdToggle;
-    server.HandleCommands(1, kClusterIdOnOff, cmd);
+    server.HandleCommand(1, kClusterIdOnOff, cmd);
     server.GetValue(1, kClusterIdOnOff, kAttributeIdOnOff, value);
     NL_TEST_ASSERT(inSuite, ValueToBool(value) == false);
 }

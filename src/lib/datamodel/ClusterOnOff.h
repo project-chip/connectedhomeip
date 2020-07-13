@@ -70,16 +70,46 @@ public:
         AddAttribute(&mOffWaitTime);
     }
 
+    /**
+     * @brief
+     *   Handle the off command. This command is already handled in the ClusterOnOff class, and the
+     *   Cluster's Set() method will be called with the appropriate value. Applications may choose
+     *   to override this handling if required.
+     *
+     * @param cmd the command to handle
+     *
+     * @return CHIP_NO_ERROR on success or a failure-specific error code otherwise
+     */
     virtual CHIP_ERROR HandleCommandOff(const Command & cmd)
     {
         return Set(kAttributeIdOnOff, ValueBool(false));
     }
     
+    /**
+     * @brief
+     *   Handle the on command. This command is already handled in the ClusterOnOff class, and the
+     *   Cluster's Set() method will be called with the appropriate value. Applications may choose
+     *   to override this handling if required.
+     *
+     * @param cmd the command to handle
+     *
+     * @return CHIP_NO_ERROR on success or a failure-specific error code otherwise
+     */
     virtual CHIP_ERROR HandleCommandOn(const Command & cmd)
     {
         return Set(kAttributeIdOnOff, ValueBool(true));
     }
     
+    /**
+     * @brief
+     *   Handle the toggle command. This command is already handled in the ClusterOnOff class, and
+     *   the Cluster's Set() method will be called with the appropriate value. Applications may
+     *   choose to override this handling if required.
+     *
+     * @param cmd the command to handle
+     *
+     * @return CHIP_NO_ERROR on success or a failure-specific error code otherwise
+     */
     virtual CHIP_ERROR HandleCommandToggle(const Command & cmd)
     {
         Value currentVal;
@@ -87,7 +117,16 @@ public:
         return Set(kAttributeIdOnOff, ValueBool( ! ValueToBool(currentVal)));
     }
 
-    virtual CHIP_ERROR HandleCommands(const Command & cmd)
+    /**
+     * @brief
+     *   Handle commands for the Cluster OnOff. This is already handled in the ClusterOnOff
+     *   class. Applications may choose to override this handling if required.
+     *
+     * @param cmd the command to handle
+     *
+     * @return CHIP_NO_ERROR on success or a failure-specific error code otherwise
+     */
+    virtual CHIP_ERROR HandleCommand(const Command & cmd)
     {
         switch (cmd.mId)
         {
