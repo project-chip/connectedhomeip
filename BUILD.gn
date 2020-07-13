@@ -59,6 +59,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       deps += [
         "${chip_root}/src/qrcodetool",
         "${chip_root}/src/setup_payload",
+        "${chip_root}/examples/shell",
       ]
     }
   }
@@ -152,10 +153,6 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     deps = [ "${chip_root}/examples/shell(${standalone_toolchain})" ]
   }
 
-  group("shell_linux_embedded") {
-    deps = [ "${chip_root}/examples/shell(${chip_root}/config/linux/toolchain:linux_${host_cpu}_gcc_embedded)" ]
-  }
-
   if (enable_nrf5_lock_app_build) {
     group("nrf5_lock_app") {
       deps = [ "${chip_root}/examples/lock-app/nrf5(${chip_root}/config/nrf5/toolchain:nrf5_lock_app)" ]
@@ -181,7 +178,6 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
     if (enable_linux_embedded_build) {
       deps += [ ":all_linux_embedded" ]
-      deps += [ ":shell_linux_embedded" ]
     }
     if (enable_standalone_chip_tool_build) {
       deps += [ ":standalone_chip_tool" ]
