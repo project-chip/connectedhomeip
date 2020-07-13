@@ -75,7 +75,7 @@ public:
      *
      * @param cmd the command that needs to be processed
      */
-    virtual CHIP_ERROR HandleCommands(const Command & cmd)
+    virtual CHIP_ERROR HandleCommand(const Command & cmd)
     {
         /* Do nothing */
         return CHIP_NO_ERROR;

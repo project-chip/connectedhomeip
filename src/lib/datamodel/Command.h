@@ -30,7 +30,15 @@ namespace DataModel {
 class Command
 {
 public:
+    /* The type of command, global, cluster-specific or manufacturer-specific */
+    enum {
+        CmdTypeGlobal  = 1,
+        CmdTypeCluster = 2,
+        CmdTypeMfg     = 3,
+    } mType;
+    /* The command identifier */
     uint16_t mId;
+    /* The direction of the command */
     uint8_t  mDirection;
 };
 
