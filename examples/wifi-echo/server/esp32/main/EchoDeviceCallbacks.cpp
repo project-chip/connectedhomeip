@@ -25,7 +25,6 @@
 
 #include "EchoDeviceCallbacks.h"
 #include "esp_log.h"
-#include <datamodel/ClusterServer.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
 
@@ -70,17 +69,4 @@ void EchoDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, int
     {
         ESP_LOGI(TAG, "Commissioner detected!");
     }
-}
-
-extern ClusterServer gServer;
-/* This function can be eliminated, and instead its contents will get executed */
-void EchoDeviceCallbacks::PostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId,
-                                                      uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
-                                                      uint8_t * value)
-{
-    // At this point we can assume that value points to a boolean value.
-    Value cValue(kCHIPValueType_Bool);
-    memcpy((void *) &cValue.Int64, (void *) value, size);
-
-    gServer.SetValue(endpoint, clusterId, attributeId, cValue);
 }

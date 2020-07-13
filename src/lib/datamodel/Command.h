@@ -27,19 +27,38 @@
 namespace chip {
 namespace DataModel {
 
+enum CmdTypes
+{
+    kCmdTypeUnknown = 0,
+    kCmdTypeGlobal  = 1,
+    kCmdTypeCluster = 2,
+    kCmdTypeMfg     = 3,
+};
+
+enum CmdDirection : uint8_t
+{
+    kCmdDirectionClientToServer = 0,
+    kCmdDirectionServerToClient = 1,
+};
+
 class Command
 {
 public:
     /* The type of command, global, cluster-specific or manufacturer-specific */
-    enum {
-        CmdTypeGlobal  = 1,
-        CmdTypeCluster = 2,
-        CmdTypeMfg     = 3,
-    } mType;
+    CmdTypes mType;
     /* The command identifier */
     uint16_t mId;
+    /* The endpoint this command is for */
+    uint8_t mEndpointId;
     /* The direction of the command */
-    uint8_t  mDirection;
+    CmdDirection mDirection;
+    union
+    {
+        /* The ClusterId, if this is cluster-specific command */
+        uint16_t mClusterId;
+        /* The MfgCode, if this is manufacturer-specific command */
+        uint16_t mMfgCode;
+    };
 };
 
 } // namespace DataModel

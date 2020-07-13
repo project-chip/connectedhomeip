@@ -23,6 +23,7 @@
 #ifndef DATA_MODEL_HANDLER_H
 #define DATA_MODEL_HANDLER_H
 
+#include <lib/datamodel/ClusterServer.h>
 namespace chip {
 namespace System {
 class PacketBuffer;
@@ -39,9 +40,10 @@ void InitDataModelHandler();
  * Handle a message that should be processed via our data model processing
  * codepath.
  *
+ * @param [in] server The ClusterServer object that holds the data model
  * @param [in] buffer The buffer holding the message.  This function guarantees
  *                    that it will free the buffer before returning.
  */
-void HandleDataModelMessage(chip::System::PacketBuffer * buffer);
+void HandleDataModelMessage(chip::DataModel::ClusterServer & server, chip::System::PacketBuffer * buffer);
 
 #endif // DATA_MODEL_HANDLER_H
