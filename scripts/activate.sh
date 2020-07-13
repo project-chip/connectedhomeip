@@ -13,9 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-if [[ ! -d "${CHIP_ROOT}" ]]; then
-    CHIP_ROOT=$(cd "$(dirname "$0")/.." && pwd)
+if [[ ! -d ${CHIP_ROOT} ]]; then
+    if [[ -n ${BASH_SOURCE[0]} ]]; then
+        CHIP_ROOT=$(cd "${BASH_SOURCE[0]%/*}/.." && pwd)
+    else
+        CHIP_ROOT=$(cd "${0%/*}/.." && pwd)
+    fi
 fi
 
 export PW_BRANDING_BANNER="$CHIP_ROOT/.chip-banner.txt"
