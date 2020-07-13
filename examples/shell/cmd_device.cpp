@@ -38,8 +38,7 @@ using namespace chip::DeviceLayer;
 using namespace chip::Logging;
 using namespace chip::ArgParser;
 
-#define THE_SHELL_SUBMODULE theShellDevice
-static chip::Shell::Shell THE_SHELL_SUBMODULE;
+static chip::Shell::Shell theShellDevice;
 
 int cmd_device_help_iterator(shell_command_t * command, void * arg)
 {
@@ -49,7 +48,7 @@ int cmd_device_help_iterator(shell_command_t * command, void * arg)
 
 int cmd_device_help(int argc, char ** argv)
 {
-    THE_SHELL_SUBMODULE.ForEachCommand(cmd_device_help_iterator, NULL);
+    theShellDevice.ForEachCommand(cmd_device_help_iterator, NULL);
     return 0;
 }
 
@@ -262,21 +261,21 @@ int cmd_device_config(int argc, char ** argv)
 
     VerifyOrExit(argc == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = ConfigGetVendorId(true);
-    error = ConfigGetProductId(true);
-    error = ConfigGetProductRevision(true);
-    error = ConfigGetSerialNumber(true);
+    error |= ConfigGetVendorId(true);
+    error |= ConfigGetProductId(true);
+    error |= ConfigGetProductRevision(true);
+    error |= ConfigGetSerialNumber(true);
 
-    error = ConfigGetServiceId(true);
-    error = ConfigGetFabricId(true);
-    error = ConfigGetPairingCode(true);
+    error |= ConfigGetServiceId(true);
+    error |= ConfigGetFabricId(true);
+    error |= ConfigGetPairingCode(true);
 
-    error = ConfigGetDeviceId(true);
-    error = ConfigGetDeviceCert(true);
-    error = ConfigGetDeviceCaCerts(true);
+    error |= ConfigGetDeviceId(true);
+    error |= ConfigGetDeviceCert(true);
+    error |= ConfigGetDeviceCaCerts(true);
 
 exit:
-    return error;
+    return (error) ? CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND : CHIP_NO_ERROR;
 }
 
 int cmd_device_get(int argc, char ** argv)
@@ -344,7 +343,7 @@ int cmd_device_dispatch(int argc, char ** argv)
 
     VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = THE_SHELL_SUBMODULE.ExecCommand(argc, argv);
+    error = theShellDevice.ExecCommand(argc, argv);
 
 exit:
     return error;
@@ -366,7 +365,7 @@ void cmd_device_init(void)
 {
 #if CONFIG_DEVICE_LAYER
     // Register `device` subcommands with the local shell dispatcher.
-    THE_SHELL_SUBMODULE.RegisterCommands(cmds_device, ARRAY_SIZE(cmds_device));
+    theShellDevice.RegisterCommands(cmds_device, ARRAY_SIZE(cmds_device));
 
     // Register the root `base64` command with the top-level shell.
     shell_register(&cmds_base64_root, 1);
