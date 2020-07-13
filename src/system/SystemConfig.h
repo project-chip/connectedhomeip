@@ -609,4 +609,20 @@ struct LwIPEvent;
 #define CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD 946684800
 #endif // CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD
 
+/**
+ *  @def CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
+ *
+ *  @brief
+ *      Use the POSIX pipe() function.
+ *
+ *  Use the POSIX pipe() function to create an anonymous data stream.
+ *
+ *  Defaults to enabled if the system is using sockets (except for Zephyr RTOS).
+ */
+#ifndef CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
+#if (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK) && !__ZEPHYR__
+#define CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE 1
+#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
+
 #endif // defined(SYSTEMCONFIG_H)

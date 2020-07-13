@@ -40,7 +40,7 @@ public:
     Error Open(); /**< Initialize the pipeline */
     void Close(); /**< Close both ends of the pipeline. */
 
-#if CONFIG_HAVE_PIPE
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
     int GetNotifFD() const { return mFDs[FD_READ]; }
 #else
     int GetNotifFD() const { return mFD; }
@@ -50,7 +50,7 @@ public:
     void Confirm(); /**< Clear the event. */
 
 private:
-#if CONFIG_HAVE_PIPE
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
     enum
     {
         FD_READ  = 0,

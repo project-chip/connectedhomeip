@@ -33,14 +33,14 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#if !CONFIG_HAVE_PIPE
+#if !CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
 #include <sys/eventfd.h>
 #endif
 
 namespace chip {
 namespace System {
 
-#if CONFIG_HAVE_PIPE
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
 
 namespace {
 inline int SetNonBlockingMode(int fd)
@@ -87,7 +87,7 @@ void SystemWakeEvent::Notify()
     ::write(mFDs[FD_WRITE], &byte, 1);
 }
 
-#else // CONFIG_HAVE_PIPE
+#else // CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
 
 Error SystemWakeEvent::Open()
 {
@@ -119,7 +119,7 @@ void SystemWakeEvent::Notify()
     ::write(mFD, &value, sizeof(value));
 }
 
-#endif // CONFIG_HAVE_PIPE
+#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
 
 } // namespace System
 } // namespace chip

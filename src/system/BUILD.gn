@@ -145,6 +145,8 @@ static_library("system") {
     "SystemStats.h",
     "SystemTimer.cpp",
     "SystemTimer.h",
+    "SystemWakeEvent.cpp",
+    "SystemWakeEvent.h",
     "TimeSource.h",
   ]
 

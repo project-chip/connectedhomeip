@@ -17,27 +17,20 @@
 
 /**
  *    @file
- *      This file declares test entry points for CHIP system layer
- *      library unit tests.
+ *      This file implements a standalone/native program executable
+ *      test driver for the CHIP system layer library timer unit
+ *      tests.
  *
  */
 
-#ifndef TESTSYSTEMLAYER_H
-#define TESTSYSTEMLAYER_H
+#include "TestSystemLayer.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <nlunit-test.h>
 
-int TestSystemErrorStr(void);
-int TestSystemObject(void);
-int TestSystemPacketBuffer(void);
-int TestSystemTimer(void);
-int TestSystemWakeEvent(void);
-int TestTimeSource(void);
+int main(int argc, char * argv[])
+{
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nlTestSetOutputStyle(OUTPUT_CSV);
 
-#ifdef __cplusplus
+    return TestSystemWakeEvent();
 }
-#endif
-
-#endif // TESTSYSTEMLAYER_H
