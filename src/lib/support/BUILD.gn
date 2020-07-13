@@ -98,6 +98,14 @@ static_library("support") {
     "${nlassert_root}:nlassert",
   ]
 
+  # These are needed because we include CHIPCore.h, which uses config
+  # options for src/ble and src/inet, however we cannot depend on those
+  # directly as such a dependency is cyclic.
+  public_deps += [
+    "${chip_root}/src/ble:ble_config_header",
+    "${chip_root}/src/inet:inet_config_header",
+  ]
+
   public_configs = [ ":support_config" ]
 
   if (chip_config_memory_management == "simple") {
