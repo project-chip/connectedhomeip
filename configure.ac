@@ -905,36 +905,6 @@ NL_ENABLE_DOCS([auto],[NO])
 AM_CONDITIONAL(CHIP_BUILD_DOCS, [test "${nl_cv_build_docs}" = "yes"])
 
 #
-# OpenThread
-#
-
-NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
-    [OpenThread],
-    [OPENTHREAD],
-    [openthread],
-    [],
-    [
-        AC_MSG_NOTICE([No internal OpenThread support yet!])
-        with_openthread=no
-    ],
-    [
-        # Check for required OpenThread headers.
-        AC_CHECK_HEADERS([openthread/dataset.h] [openthread/dataset_ftd.h] [openthread/error.h] [openthread/icmp6.h] [openthread/instance.h] [openthread/ip6.h] [openthread/link.h] [openthread/message.h] [openthread/netdata.h] [openthread/tasklet.h] [openthread/thread.h],
-        [],
-        [
-            AC_MSG_ERROR(The nlio header "$ac_header" is required but cannot be found.)
-        ])
-    ]
-)
-AM_CONDITIONAL([CHIP_ENABLE_OPENTHREAD], [test "${with_openthread}" != "no"])
-if test "${with_openthread}" != "no"; then
-    CHIP_ENABLE_OPENTHREAD=1
-else
-    CHIP_ENABLE_OPENTHREAD=0
-fi
-AC_DEFINE_UNQUOTED([CHIP_ENABLE_OPENTHREAD],[${CHIP_ENABLE_OPENTHREAD}],[Define to 1 if you want to enable OpenThread.])
-
-#
 # Network Technology Layer
 #
 AC_MSG_CHECKING([network layer])
@@ -1043,6 +1013,8 @@ nrf5)
       CONFIG_DEVICE_LAYER=1
       CHIP_DEVICE_LAYER_TARGET=nRF5
       CHIP_DEVICE_LAYER_TARGET_NRF5=1
+      CFLAGS="${CFLAGS} -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb -mabi=aapcs"
+      CXXFLAGS="${CXXFLAGS} -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb -mabi=aapcs"
       ;;
 
 linux)
@@ -1617,6 +1589,106 @@ else
 fi
 
 #
+# OpenThread
+#
+
+NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
+    [OpenThread],
+    [OPENTHREAD],
+    [openthread],
+    [],
+    [
+        # use absolute path to support build out of source tree
+        chip_srcdir="$(cd ${srcdir} && pwd)"
+
+        # bootstrap
+        test -f ${chip_srcdir}/third_party/openthread/repo/configure || (cd ${chip_srcdir}/third_party/openthread/repo && ./bootstrap)
+
+        case "${with_device_layer}" in
+        nrf5)
+            OPENTHREAD_CPPFLAGS="-I\${abs_top_srcdir}/third_party/openthread/repo/include"
+            OPENTHREAD_LDFLAGS="-L${ac_pwd}/third_party/openthread"
+            OPENTHREAD_LIBS="-lopenthread-cli-ftd \
+                -lopenthread-ftd \
+                -lopenthread-platform-utils \
+                -lopenthread-nrf52840-transport \
+                -lopenthread-nrf52840-softdevice-sdk \
+                -lnordicsemi-nrf52840-radio-driver-softdevice \
+                \${NRF5_SDK_ROOT}/external/openthread/nrf_security/lib/libmbedcrypto_glue.a \
+                \${NRF5_SDK_ROOT}/external/openthread/nrf_security/lib/libmbedcrypto_glue_cc310.a \
+                \${NRF5_SDK_ROOT}/external/openthread/nrf_security/lib/libmbedcrypto_glue_vanilla.a \
+                \${NRF5_SDK_ROOT}/external/openthread/nrf_security/lib/libmbedcrypto_cc310_backend.a \
+                \${NRF5_SDK_ROOT}/external/openthread/nrf_security/lib/libmbedcrypto_vanilla_backend.a \
+                \${NRF5_SDK_ROOT}/external/openthread/nrf_security/lib/libmbedtls_base_vanilla.a \
+                \${NRF5_SDK_ROOT}/external/openthread/nrf_security/lib/libmbedtls_tls_vanilla.a \
+                \${NRF5_SDK_ROOT}/external/openthread/nrf_security/lib/libmbedtls_x509_vanilla.a \
+                \${NRF5_SDK_ROOT}/external/openthread/nrf_security/lib/libnrf_cc310_platform_0.9.1.a"
+
+            # private definitions
+            ot_cppflags="-Wno-expansion-to-defined \
+                -I${chip_srcdir}/third_party/openthread/repo/examples/platforms/nrf528xx/nrf52840 \
+                -I${chip_srcdir}/third_party/openthread/repo/third_party/NordicSemiconductor/libraries/nrf_security/config \
+                -I${chip_srcdir}/third_party/openthread/repo/third_party/NordicSemiconductor/libraries/nrf_security/include \
+                -I${chip_srcdir}/third_party/openthread/repo/third_party/NordicSemiconductor/libraries/nrf_security/mbedtls_plat_config \
+                -I${chip_srcdir}/third_party/openthread/repo/third_party/NordicSemiconductor/libraries/nrf_security/nrf_cc310_plat/include \
+                -I${chip_srcdir}/third_party/mbedtls/repo/include \
+                -DMBEDTLS_CONFIG_FILE=\<nrf-config.h\> \
+                -DMBEDTLS_USER_CONFIG_FILE=\<nrf52840-mbedtls-config.h\> \
+                -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE=\<openthread-core-nrf52840-config.h\> \
+                -DOPENTHREAD_CORE_CONFIG_PLATFORM_CHECK_FILE=\<openthread-core-nrf52840-config-check.h\> \
+                -DOPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1 \
+                -DOPENTHREAD_CONFIG_JOINER_ENABLE=1 \
+                -DOPENTHREAD_CONFIG_NCP_UART_ENABLE=1 \
+                -DUART_AS_SERIAL_TRANSPORT=1"
+
+            (mkdir -p ${ac_pwd}/third_party/openthread \
+             && cd ${ac_pwd}/third_party/openthread \
+             && CPPFLAGS="${ot_cppflags}" CFLAGS="${CFLAGS}" CXXFLAGS="${CXXFLAGS}" ${chip_srcdir}/third_party/openthread/repo/configure \
+             --disable-builtin-mbedtls \
+             --disable-docs \
+             --disable-executable \
+             --disable-tools \
+             --enable-cli \
+             --enable-ftd \
+             --host=arm-none-eabi \
+             --prefix=${prefix} \
+             --exec-prefix=${exec_prefix} \
+             --with-examples=nrf52840)
+
+            if test $? != 0; then
+                AC_MSG_ERROR([Failed to configure OpenThread!])
+            fi
+
+            maybe_openthread_dirstem="openthread"
+            ;;
+
+        *)
+            AC_MSG_NOTICE([No internal OpenThread support yet!])
+            nl_with_openthread=no
+            with_openthread=no
+            ;;
+        esac
+    ],
+    [
+        # Check for required OpenThread headers.
+        AC_CHECK_HEADERS([openthread/dataset.h] [openthread/dataset_ftd.h] [openthread/error.h] [openthread/icmp6.h] [openthread/instance.h] [openthread/ip6.h] [openthread/link.h] [openthread/message.h] [openthread/netdata.h] [openthread/tasklet.h] [openthread/thread.h],
+        [],
+        [
+            AC_MSG_ERROR(The OpenThread header "$ac_header" is required but cannot be found.)
+        ])
+        maybe_openthread_dirstem=""
+    ]
+)
+AC_SUBST(OPENTHREAD_SUBDIRS, [${maybe_openthread_dirstem}])
+AM_CONDITIONAL([CHIP_ENABLE_OPENTHREAD], [test "${nl_with_openthread}" != "no"])
+if test "${nl_with_openthread}" != "no"; then
+    CHIP_ENABLE_OPENTHREAD=1
+else
+    CHIP_ENABLE_OPENTHREAD=0
+fi
+AC_DEFINE_UNQUOTED([CHIP_ENABLE_OPENTHREAD],[${CHIP_ENABLE_OPENTHREAD}],[Define to 1 if you want to enable OpenThread.])
+
+#
 # LwIP
 #
 
@@ -2139,9 +2211,9 @@ AC_SUBST(CRYPTO_CPPFLAGS)
 AC_SUBST(CRYPTO_LDFLAGS)
 AC_SUBST(CRYPTO_LIBS)
 
-CPPFLAGS="${CPPFLAGS} ${CRYPTO_CPPFLAGS}"
-LDFLAGS="${LDFLAGS} ${CRYPTO_LDFLAGS}"
-LIBS="${LIBS} ${CRYPTO_LIBS}"
+CPPFLAGS="${CPPFLAGS} ${CRYPTO_CPPFLAGS} ${OPENTHREAD_CPPFLAGS}"
+LDFLAGS="${LDFLAGS} ${CRYPTO_LDFLAGS} ${OPENTHREAD_LDFLAGS}"
+LIBS="${LIBS} ${CRYPTO_LIBS} ${OPENTHREAD_LIBS}"
 
 # Add any code coverage CPPFLAGS, LDFLAGS, and LIBS
 
@@ -2321,6 +2393,10 @@ AC_MSG_NOTICE([
   mbedTLS compile flags                            : ${MBEDTLS_CPPFLAGS:--}
   mbedTLS link flags                               : ${MBEDTLS_LDFLAGS:--}
   mbedTLS link libraries                           : ${MBEDTLS_LIBS:--}
+  OpenThread source                                : ${nl_with_openthread}
+  OpenThread compile flags                         : ${OPENTHREAD_CPPFLAGS:--}
+  OpenThread link flags                            : ${OPENTHREAD_LDFLAGS:--}
+  OpenThread link libraries                        : ${OPENTHREAD_LIBS:--}
   OpenSSL source                                   : ${nl_with_openssl}
   OpenSSL compile flags                            : ${OPENSSL_CPPFLAGS:--}
   OpenSSL link flags                               : ${OPENSSL_LDFLAGS:--}
