@@ -44,7 +44,7 @@ DIST_SUBDIRS                                 = \
 # of the 'distclean' target. Consequently, we conditionally include
 # them in DIST_SUBDIRS on invocation of 'distclean-recursive'
 
-distclean-recursive: DIST_SUBDIRS += $(NLASSERT_SUBDIRS) $(NLFAULTINJECTION_SUBDIRS) $(NLIO_SUBDIRS) $(NLUNIT_TEST_SUBDIRS) $(MBEDTLS_SUBDIRS) $(OTBR_CLIENT_SUBDIRS)
+distclean-recursive: DIST_SUBDIRS += $(NLASSERT_SUBDIRS) $(NLFAULTINJECTION_SUBDIRS) $(NLIO_SUBDIRS) $(NLUNIT_TEST_SUBDIRS) $(MBEDTLS_SUBDIRS) $(OPENTHREAD_SUBDIRS) $(OTBR_CLIENT_SUBDIRS)
 
 # Always build (e.g. for 'make all') these subdirectories.
 #
@@ -58,6 +58,7 @@ SUBDIRS                                      = \
     $(NLIO_SUBDIRS)                            \
     $(NLUNIT_TEST_SUBDIRS)                     \
     $(MBEDTLS_SUBDIRS)                         \
+    $(OPENTHREAD_SUBDIRS)                      \
     $(OT_BR_POSIX_SUBDIRS)                     \
     $(NULL)
 
