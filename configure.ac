@@ -1541,7 +1541,7 @@ fi
 AM_CONDITIONAL([CHIP_WITH_OPENSSL], [test "${nl_with_openssl}" != "no"])
 
 if test "${nl_with_openssl}" = "no"; then
-    AC_DEFINE([CHIP_WITH_OPENSSL], [0], [Define to 1 to build CHIP with OpenSSL])
+    AC_DEFINE([CHIP_WITH_OPENSSL], [0], [Define to 0 to build CHIP without OpenSSL])
 else
     AC_DEFINE([CHIP_WITH_OPENSSL], [1], [Define to 1 to build CHIP with OpenSSL])
 fi
@@ -1611,7 +1611,7 @@ AM_CONDITIONAL([CHIP_WITH_MBEDTLS_INTERNAL], [test "${nl_with_mbedtls}" = "inter
 AM_CONDITIONAL([CHIP_WITH_MBEDTLS], [test "${nl_with_mbedtls}" != "no"])
 
 if test "${nl_with_mbedtls}" = "no"; then
-    AC_DEFINE([CHIP_WITH_MBEDTLS], [0], [Define to 1 to build CHIP with mbedTLS])
+    AC_DEFINE([CHIP_WITH_MBEDTLS], [0], [Define to 0 to build CHIP without mbedTLS])
 else
     AC_DEFINE([CHIP_WITH_MBEDTLS], [1], [Define to 1 to build CHIP with mbedTLS])
 fi
@@ -1785,7 +1785,7 @@ AM_CONDITIONAL([CHIP_WITH_NLFAULTINJECTION], [test "${nl_with_nlfaultinjection}"
 AM_CONDITIONAL([CHIP_WITH_NLFAULTINJECTION_INTERNAL], [test "${nl_with_nlfaultinjection}" = "internal"])
 
 if test "${nl_with_nlfaultinjection}" = "no"; then
-    AC_DEFINE([CHIP_WITH_NLFAULTINJECTION], [0], [Define to 1 to build CHIP with nlFaultInjection features])
+    AC_DEFINE([CHIP_WITH_NLFAULTINJECTION], [0], [Define to 0 to build CHIP without nlFaultInjection features])
 else
     AC_DEFINE([CHIP_WITH_NLFAULTINJECTION], [1], [Define to 1 to build CHIP with nlFaultInjection features])
 fi
