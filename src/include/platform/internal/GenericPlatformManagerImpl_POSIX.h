@@ -33,6 +33,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+#include <atomic>
 #include <pthread.h>
 #include <queue>
 
@@ -93,7 +94,7 @@ private:
 
     void ProcessDeviceEvents();
 
-    bool mShouldRunEventLoop;
+    std::atomic<bool> mShouldRunEventLoop;
     static void * EventLoopTaskMain(void * arg);
 };
 

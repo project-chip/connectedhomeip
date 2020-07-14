@@ -73,7 +73,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack(void)
     err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
     SuccessOrExit(err);
 
-    mShouldRunEventLoop = true;
+    mShouldRunEventLoop.store(true, std::memory_order_relaxed);
 
 exit:
     return err;
@@ -196,7 +196,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop(void)
     {
         SysUpdate();
         SysProcess();
-    } while (mShouldRunEventLoop);
+    } while (mShouldRunEventLoop.load(std::memory_order_relaxed));
 
     Impl()->UnlockChipStack();
 
@@ -232,7 +232,7 @@ template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown(void)
 {
     int err;
-    mShouldRunEventLoop = false;
+    mShouldRunEventLoop.store(false, std::memory_order_relaxed);;
     err                 = pthread_join(mChipTask, NULL);
     SuccessOrExit(err);
 
