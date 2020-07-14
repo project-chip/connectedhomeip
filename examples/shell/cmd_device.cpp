@@ -233,6 +233,95 @@ exit:
     return ConfigGetDone(sout, error);
 }
 
+static CHIP_ERROR ConfigGetManufacturerDeviceId(bool printHeader)
+{
+    CHIP_ERROR error  = CHIP_NO_ERROR;
+    streamer_t * sout = streamer_get();
+    uint64_t value64;
+
+    if (printHeader)
+    {
+        streamer_printf(sout, "MfrDeviceId:     ");
+    }
+    SuccessOrExit(error = ConfigurationMgr().GetManufacturerDeviceId(value64));
+    streamer_print_hex(sout, reinterpret_cast<const uint8_t *>(&value64), sizeof(value64));
+
+exit:
+    return ConfigGetDone(sout, error);
+}
+
+static CHIP_ERROR ConfigGetManufacturerDeviceCert(bool printHeader)
+{
+    CHIP_ERROR error  = CHIP_NO_ERROR;
+    streamer_t * sout = streamer_get();
+    uint8_t * certBuf = NULL;
+    size_t certLen;
+
+    if (printHeader)
+    {
+        streamer_printf(sout, "MfrDeviceCert:   ");
+    }
+    // Determine the length of the device certificate.
+    error = ConfigurationMgr().GetManufacturerDeviceCertificate((uint8_t *) NULL, 0, certLen);
+    SuccessOrExit(error);
+
+    // Fail if no certificate has been configured.
+    VerifyOrExit(certLen != 0, error = CHIP_ERROR_CERT_NOT_FOUND);
+
+    // Create a temporary buffer to hold the certificate.
+    certBuf = (uint8_t *) MemoryAlloc(certLen);
+    VerifyOrExit(certBuf != NULL, error = CHIP_ERROR_NO_MEMORY);
+
+    // Read the certificate
+    error = ConfigurationMgr().GetManufacturerDeviceCertificate(certBuf, certLen, certLen);
+    SuccessOrExit(error);
+
+    streamer_print_hex(sout, const_cast<const uint8_t *>(certBuf), certLen);
+
+exit:
+    if (certBuf != NULL)
+    {
+        MemoryFree(certBuf);
+    }
+    return ConfigGetDone(sout, error);
+}
+
+static CHIP_ERROR ConfigGetManufacturerDeviceCaCerts(bool printHeader)
+{
+    CHIP_ERROR error  = CHIP_NO_ERROR;
+    streamer_t * sout = streamer_get();
+    uint8_t * certBuf = NULL;
+    size_t certLen;
+
+    if (printHeader)
+    {
+        streamer_printf(sout, "MfgDeviceCaCerts:");
+    }
+    // Determine the length of the device certificate.
+    error = ConfigurationMgr().GetManufacturerDeviceIntermediateCACerts((uint8_t *) NULL, 0, certLen);
+    SuccessOrExit(error);
+
+    // Fail if no certificate has been configured.
+    VerifyOrExit(certLen != 0, error = CHIP_ERROR_CERT_NOT_FOUND);
+
+    // Create a temporary buffer to hold the certificate.
+    certBuf = (uint8_t *) MemoryAlloc(certLen);
+    VerifyOrExit(certBuf != NULL, error = CHIP_ERROR_NO_MEMORY);
+
+    // Read the certificate
+    error = ConfigurationMgr().GetManufacturerDeviceIntermediateCACerts(certBuf, certLen, certLen);
+    SuccessOrExit(error);
+
+    streamer_print_hex(sout, const_cast<const uint8_t *>(certBuf), certLen);
+
+exit:
+    if (certBuf != NULL)
+    {
+        MemoryFree(certBuf);
+    }
+    return ConfigGetDone(sout, error);
+}
+
 static CHIP_ERROR ConfigGetPairingCode(bool printHeader)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
@@ -304,6 +393,10 @@ int cmd_device_config(int argc, char ** argv)
     error |= ConfigGetDeviceCert(true);
     error |= ConfigGetDeviceCaCerts(true);
 
+    error |= ConfigGetManufacturerDeviceId(true);
+    error |= ConfigGetManufacturerDeviceCert(true);
+    error |= ConfigGetManufacturerDeviceCaCerts(true);
+
 exit:
     return (error) ? CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND : CHIP_NO_ERROR;
 }
@@ -345,6 +438,18 @@ int cmd_device_get(int argc, char ** argv)
     else if (strcmp(argv[0], "cacerts") == 0)
     {
         SuccessOrExit(error = ConfigGetDeviceCaCerts(false));
+    }
+    else if (strcmp(argv[0], "mfrdeviceid") == 0)
+    {
+        SuccessOrExit(error = ConfigGetManufacturerDeviceId(false));
+    }
+    else if (strcmp(argv[0], "mfrcert") == 0)
+    {
+        SuccessOrExit(error = ConfigGetManufacturerDeviceCert(false));
+    }
+    else if (strcmp(argv[0], "mfrcacerts") == 0)
+    {
+        SuccessOrExit(error = ConfigGetManufacturerDeviceCaCerts(false));
     }
     else if (strcmp(argv[0], "pairingcode") == 0)
     {
