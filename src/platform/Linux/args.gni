@@ -15,8 +15,7 @@
 device_platform = "linux"
 
 ble_platform_config_include = "<platform/Linux/BlePlatformConfig.h>"
-chip_device_platform_config_include =
-    "<platform/Linux/CHIPDevicePlatformConfig.h>"
+chip_device_platform_config_include = "<platform/Linux/CHIPDevicePlatformConfig.h>"
 chip_platform_config_include = "<platform/Linux/CHIPPlatformConfig.h>"
 inet_platform_config_include = "<platform/Linux/InetPlatformConfig.h>"
 system_platform_config_include = "<platform/Linux/SystemPlatformConfig.h>"
