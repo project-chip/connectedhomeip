@@ -58,3 +58,9 @@
 	branch = master
 	ignore = dirty
 	commit = 38e91052d1fb12a55c4e34073f9e399471650b4b
+[submodule "bluez"]
+	path = third_party/bluez/repo
+	url = git://git.kernel.org/pub/scm/bluetooth/bluez.git
+	branch = master
+	ignore = dirty
+	commit = df7d3fa5002373f7f955219defc7d0bc794a5a6c

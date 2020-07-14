@@ -1490,6 +1490,90 @@ AC_MSG_NOTICE([checking package dependencies])
 AC_PATH_PROG([PKG_CONFIG],[pkg-config])
 
 #
+# Chip over Ble over Bluez Peripheral support
+#
+
+# Only a concern when the BLE layer is enabled.
+
+CONFIG_BLE_PLATFORM_BLUEZ=0
+enable_chipoble_bluez="no"
+
+NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
+  [BlueZ],
+  [BLUEZ],
+  [bluez],
+  [-lgdbus-internal -lshared-glib],
+  [
+  # actions if not external
+  # At this time, enable this only for linux, and only if the tests are enabled
+      if test "${nl_cv_build_tests}" = "yes" && test "${CONFIG_NETWORK_LAYER_BLE}" = 1 && test "${with_device_layer}" = "linux"; then
+      case "${target}" in
+
+          *linux*)
+              if test "x${HAVE_CXX11}" == "0"; then
+                AC_MSG_ERROR([BlueZ support requires C++11 compiler])
+              fi
+              CONFIG_BLE_PLATFORM_BLUEZ=1
+              enable_chipoble_bluez="yes"
+              ;;
+
+          *)
+              CONFIG_BLE_PLATFORM_BLUEZ=0
+              enable_chipoble_bluez="no"
+              ;;
+
+          esac
+      fi
+  ]
+)
+
+# Depending on whether bluez has been configured for an internal
+# location, its directory stem within this package needs to be set
+# accordingly. In addition, if the location is internal, then we need
+# to attempt to pull it down using the bootstrap makefile.
+
+if test "${nl_with_bluez}" = "internal" && test "${enable_chipoble_bluez}" = "yes"; then
+    maybe_bluez_dirstem="bluez/repo"
+    bluez_dirstem="third_party/${maybe_bluez_dirstem}"
+
+    AC_MSG_NOTICE([attempting to create internal ${bluez_dirstem}])
+
+    ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${bluez_dirstem}
+
+    if test $? -ne 0; then
+        AC_MSG_ERROR([failed to create ${bluez_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
+    fi
+
+    echo "  BOOTSTRAP    ${bluez_dirstem}"
+
+    (cd ${srcdir}/${bluez_dirstem} && ./bootstrap)
+
+else
+    maybe_bluez_dirstem=""
+fi
+
+AC_SUBST(BLUEZ_SUBDIRS, [${maybe_bluez_dirstem}])
+AM_CONDITIONAL([CHIP_WITH_BLUEZ_INTERNAL], [test "${nl_with_bluez}" = "internal"])
+
+AM_CONDITIONAL([CONFIG_BLE_PLATFORM_BLUEZ], [test "${enable_chipoble_bluez}" = "yes"])
+AC_DEFINE_UNQUOTED([CONFIG_BLE_PLATFORM_BLUEZ],[${CONFIG_BLE_PLATFORM_BLUEZ}],[Define to 1 if you want to enable Chip over Ble over bluez.])
+
+if test "${enable_chipoble_bluez}" = "yes"; then
+    PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.28, dummy=yes,
+				AC_MSG_ERROR(GLib >= 2.28 is required))
+    AC_SUBST(GLIB_CFLAGS)
+    AC_SUBST(GLIB_LIBS)
+
+    PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.6, dummy=yes,
+				AC_MSG_ERROR(D-Bus >= 1.6 is required))
+    AC_SUBST(DBUS_CFLAGS)
+    AC_SUBST(DBUS_LIBS)
+
+    AX_CHECK_COMPILER_OPTIONS([C],   ${GLIB_CFLAGS} ${DBUS_CFLAGS})
+    AX_CHECK_COMPILER_OPTIONS([C++], ${GLIB_CFLAGS} ${DBUS_CFLAGS})
+fi
+
+#
 # OpenSSL
 #
 
@@ -2281,6 +2365,10 @@ AC_CONFIG_SUBDIRS([third_party/nlfaultinjection/repo])
 AC_SUBST(NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY,["${ac_pwd}/third_party/nlfaultinjection/repo/src"])
 fi
 
+if test "${nl_with_bluez}" = "internal" && test "${enable_chipoble_bluez}" = "yes"; then
+AC_CONFIG_SUBDIRS([third_party/bluez/repo])
+fi
+
 if test "${nl_with_mbedtls}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/mbedtls/repo])
 fi
@@ -2400,6 +2488,8 @@ AC_MSG_NOTICE([
   Doxygen                                          : ${DOXYGEN:--}
   GraphViz dot                                     : ${DOT:--}
   PERL                                             : ${PERL:--}
+  CHIP over BlueZ support                          : ${enable_chipoble_bluez:--}
+  BlueZ source                                     : ${nl_with_bluez:--}
   Valgrind                                         : ${VALGRIND:--}
   LwIP source                                      : ${nl_with_lwip:--}
   LwIP compile flags                               : ${LWIP_CPPFLAGS:--}
