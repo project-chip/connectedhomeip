@@ -39,6 +39,7 @@ if (device_platform != "none") {
 
     if (device_platform == "linux") {
       defines += [
+        "CONFIG_DEVICE_LAYER=1",
         "CHIP_DEVICE_LAYER_TARGET_LINUX=1",
         "CHIP_DEVICE_LAYER_TARGET=Linux",
       ]
@@ -47,6 +48,7 @@ if (device_platform != "none") {
     }
     if (device_platform == "nrf5") {
       defines += [
+        "CONFIG_DEVICE_LAYER=1",
         "CHIP_DEVICE_LAYER_TARGET_NRF5=1",
         "CHIP_DEVICE_LAYER_TARGET=nRF5",
       ]
