@@ -85,7 +85,7 @@ public:
     {
         return Set(kAttributeIdOnOff, ValueBool(false));
     }
-    
+
     /**
      * @brief
      *   Handle the on command. This command is already handled in the ClusterOnOff class, and the
@@ -100,7 +100,7 @@ public:
     {
         return Set(kAttributeIdOnOff, ValueBool(true));
     }
-    
+
     /**
      * @brief
      *   Handle the toggle command. This command is already handled in the ClusterOnOff class, and
