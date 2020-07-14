@@ -21,19 +21,13 @@
 
 #include <platform/CHIPDeviceLayer.h>
 #include <shell/shell.h>
-#include <support/Base64.h>
 #include <support/CHIPArgParser.hpp>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-#include <support/RandUtils.h>
-
-#include <inttypes.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 using namespace chip;
 using namespace chip::Shell;
+using namespace chip::Platform;
 using namespace chip::DeviceLayer;
 using namespace chip::Logging;
 using namespace chip::ArgParser;
@@ -171,18 +165,35 @@ static CHIP_ERROR ConfigGetDeviceCert(bool printHeader)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
-    // TODO(#1586): MemoryAlloc temp buffer rather than use stack.
-    uint8_t buf[512];
-    size_t bufSize;
+    uint8_t * certBuf = NULL;
+    size_t certLen;
 
     if (printHeader)
     {
         streamer_printf(sout, "DeviceCert:      ");
     }
-    SuccessOrExit(error = ConfigurationMgr().GetDeviceCertificate(buf, sizeof(buf), bufSize));
-    streamer_print_hex(sout, const_cast<const uint8_t *>(buf), bufSize);
+    // Determine the length of the device certificate.
+    error = ConfigurationMgr().GetDeviceCertificate((uint8_t *) NULL, 0, certLen);
+    SuccessOrExit(error);
+
+    // Fail if no certificate has been configured.
+    VerifyOrExit(certLen != 0, error = CHIP_ERROR_CERT_NOT_FOUND);
+
+    // Create a temporary buffer to hold the certificate.
+    certBuf = (uint8_t *) MemoryAlloc(certLen);
+    VerifyOrExit(certBuf != NULL, error = CHIP_ERROR_NO_MEMORY);
+
+    // Read the certificate
+    error = ConfigurationMgr().GetDeviceCertificate(certBuf, certLen, certLen);
+    SuccessOrExit(error);
+
+    streamer_print_hex(sout, const_cast<const uint8_t *>(certBuf), certLen);
 
 exit:
+    if (certBuf != NULL)
+    {
+        MemoryFree(certBuf);
+    }
     return ConfigGetDone(sout, error);
 }
 
@@ -190,18 +201,35 @@ static CHIP_ERROR ConfigGetDeviceCaCerts(bool printHeader)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
-    // TODO(#1586): MemoryAlloc temp buffer rather than use stack.
-    uint8_t buf[512];
-    size_t bufSize;
+    uint8_t * certBuf = NULL;
+    size_t certLen;
 
     if (printHeader)
     {
         streamer_printf(sout, "DeviceCaCerts:   ");
     }
-    SuccessOrExit(error = ConfigurationMgr().GetDeviceIntermediateCACerts(buf, sizeof(buf), bufSize));
-    streamer_print_hex(sout, const_cast<const uint8_t *>(buf), bufSize);
+    // Determine the length of the device certificate.
+    error = ConfigurationMgr().GetDeviceIntermediateCACerts((uint8_t *) NULL, 0, certLen);
+    SuccessOrExit(error);
+
+    // Fail if no certificate has been configured.
+    VerifyOrExit(certLen != 0, error = CHIP_ERROR_CERT_NOT_FOUND);
+
+    // Create a temporary buffer to hold the certificate.
+    certBuf = (uint8_t *) MemoryAlloc(certLen);
+    VerifyOrExit(certBuf != NULL, error = CHIP_ERROR_NO_MEMORY);
+
+    // Read the certificate
+    error = ConfigurationMgr().GetDeviceIntermediateCACerts(certBuf, certLen, certLen);
+    SuccessOrExit(error);
+
+    streamer_print_hex(sout, const_cast<const uint8_t *>(certBuf), certLen);
 
 exit:
+    if (certBuf != NULL)
+    {
+        MemoryFree(certBuf);
+    }
     return ConfigGetDone(sout, error);
 }
 
