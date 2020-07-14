@@ -31,8 +31,10 @@
 namespace chip {
 namespace DataModel {
 
-/* TODO: To be converted to a template version or Kconfig later on */
-static const uint8_t kMaxClustersPerEndpoint = 5;
+/* The ZCL/CHIP Version that is supported - this is arbitrary for now */
+static const uint8_t kZCLVersion = 5;
+/* The current stack version */
+static const uint8_t kstackVersion = 10;
 
 /**
  * @brief
@@ -44,8 +46,8 @@ class Endpoint : public Deque<Endpoint>
 public:
     ClusterBasic mClusters; // head pointer is a BasicCluster
 
-    Endpoint(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) :
-        Deque(this), mClusters(ZCLVersion, applicationVersion, stackVersion, HWVersion)
+    Endpoint(uint8_t applicationVersion, uint8_t HWVersion) :
+        Deque(this), mClusters(kZCLVersion, applicationVersion, kstackVersion, HWVersion)
     {}
 
     virtual ~Endpoint() {}

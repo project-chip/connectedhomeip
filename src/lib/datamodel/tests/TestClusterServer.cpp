@@ -36,23 +36,16 @@ namespace {
 
 void TestClusterServerBasic(nlTestSuite * inSuite, void * inContext)
 {
-    const uint8_t ZCLVersion         = 10;
     const uint8_t applicationVersion = 20;
-    const uint8_t stackVersion       = 1;
     const uint8_t HWVersion          = 1;
     Value value;
 
-    chip::DataModel::ClusterServer server(ZCLVersion, applicationVersion, stackVersion, HWVersion);
+    chip::DataModel::ClusterServer server(applicationVersion, HWVersion);
 
     /* Validate attributes of the Base Cluster */
-    server.GetValue(1, kClusterIdBase, kAttributeIdZCLVersion, value);
-    NL_TEST_ASSERT(inSuite, ValueToUInt8(value) == ZCLVersion);
 
     server.GetValue(1, kClusterIdBase, kAttributeIdApplicationVersion, value);
     NL_TEST_ASSERT(inSuite, ValueToUInt8(value) == applicationVersion);
-
-    server.GetValue(1, kClusterIdBase, kAttributeIdStackVersion, value);
-    NL_TEST_ASSERT(inSuite, ValueToUInt8(value) == stackVersion);
 
     server.GetValue(1, kClusterIdBase, kAttributeIdHWVersion, value);
     NL_TEST_ASSERT(inSuite, ValueToUInt8(value) == HWVersion);
@@ -84,13 +77,11 @@ public:
 
 void TestClusterServerTwoEndpoints(nlTestSuite * inSuite, void * inContext)
 {
-    const uint8_t ZCLVersion         = 10;
     const uint8_t applicationVersion = 20;
-    const uint8_t stackVersion       = 1;
     const uint8_t HWVersion          = 1;
     Value value;
 
-    chip::DataModel::ClusterServer server(ZCLVersion, applicationVersion, stackVersion, HWVersion);
+    chip::DataModel::ClusterServer server(applicationVersion, HWVersion);
     const uint8_t switch1Gpio = 10;
     auto * switch1            = new testSwitch(switch1Gpio);
     const uint8_t switch2Gpio = 11;

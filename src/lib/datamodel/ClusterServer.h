@@ -41,8 +41,8 @@ class ClusterServer
 public:
     Endpoint mEndpoints;
 
-    ClusterServer(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) :
-        mEndpoints(ZCLVersion, applicationVersion, stackVersion, HWVersion)
+    ClusterServer(uint8_t applicationVersion, uint8_t HWVersion) :
+        mEndpoints(applicationVersion, HWVersion)
     {}
 
     virtual ~ClusterServer() {}

@@ -106,11 +106,9 @@ LEDWidget statusLED;
 const char * TAG = "wifi-echo-demo";
 
 static EchoDeviceCallbacks EchoCallbacks;
-const uint8_t ZCLVersion         = 10;
 const uint8_t applicationVersion = 20;
-const uint8_t stackVersion       = 1;
 const uint8_t HWVersion          = 1;
-ClusterServer server(ZCLVersion, applicationVersion, stackVersion, HWVersion);
+ClusterServer server(applicationVersion, HWVersion);
 
 namespace {
 
