@@ -34,6 +34,7 @@
 #include <unistd.h>
 
 #include <pthread.h>
+#include <atomic>
 #include <queue>
 
 namespace chip {
@@ -93,7 +94,7 @@ private:
 
     void ProcessDeviceEvents();
 
-    bool mShouldRunEventLoop;
+    std::atomic<bool> mShouldRunEventLoop;
     static void * EventLoopTaskMain(void * arg);
 };
 
