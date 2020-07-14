@@ -18,7 +18,7 @@ RUN apt-get -fy install git vim emacs sudo \
     iproute2 procps lsb-release \
     bash-completion \
     build-essential cmake cppcheck valgrind \
-    wget curl telnet bsdtar \
+    wget curl telnet \
     docker.io
 RUN groupadd -g $USER_GID $USERNAME
 RUN useradd -s /bin/bash -u $USER_UID -g $USER_GID -G docker -m $USERNAME
@@ -27,7 +27,8 @@ RUN chmod 0440 /etc/sudoers.d/$USERNAME
 
 RUN mkdir -p /var/downloads
 RUN cd /var/downloads
-RUN curl -JL https://github.com/microsoft/vscode-cpptools/releases/download/0.27.0/cpptools-linux.vsix | bsdtar -xvf - extension
+RUN curl -JL https://github.com/microsoft/vscode-cpptools/releases/download/0.27.0/cpptools-linux.vsix > extension.zip
+RUN unzip extension.zip
 RUN mkdir -p /home/$USERNAME/.vscode-server/extensions
 RUN mv extension /home/$USERNAME/.vscode-server/extensions/ms-vscode.cpptools-0.27.0
 RUN mkdir -p /home/$USERNAME/bin
