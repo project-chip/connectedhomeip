@@ -70,4 +70,3 @@ void EchoDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, int
         ESP_LOGI(TAG, "Commissioner detected!");
     }
 }
-

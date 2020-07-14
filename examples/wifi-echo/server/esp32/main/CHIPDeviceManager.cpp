@@ -84,6 +84,5 @@ exit:
     return err;
 }
 
-
 } // namespace DeviceManager
 } // namespace chip

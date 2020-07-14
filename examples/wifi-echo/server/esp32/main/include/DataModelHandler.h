@@ -44,6 +44,6 @@ void InitDataModelHandler();
  * @param [in] buffer The buffer holding the message.  This function guarantees
  *                    that it will free the buffer before returning.
  */
-void HandleDataModelMessage(chip::DataModel::ClusterServer &server, chip::System::PacketBuffer * buffer);
+void HandleDataModelMessage(chip::DataModel::ClusterServer & server, chip::System::PacketBuffer * buffer);
 
 #endif // DATA_MODEL_HANDLER_H

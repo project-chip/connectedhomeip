@@ -52,7 +52,8 @@ public:
     uint8_t mEndpointId;
     /* The direction of the command */
     CmdDirection mDirection;
-    union {
+    union
+    {
         /* The ClusterId, if this is cluster-specific command */
         uint16_t mClusterId;
         /* The MfgCode, if this is manufacturer-specific command */

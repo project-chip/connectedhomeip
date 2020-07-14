@@ -34,7 +34,6 @@ class EchoDeviceCallbacks : public CHIPDeviceManagerCallbacks
 {
 public:
     virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-
 };
 
 #endif // ECHO_DEVICE_CALLBACKS_H
