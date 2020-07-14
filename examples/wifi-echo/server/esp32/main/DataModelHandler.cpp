@@ -28,8 +28,8 @@
 #include "LEDWidget.h"
 
 extern "C" {
-#include "chip-zcl/chip-zcl.h"
 #include "chip-zcl/chip-zcl-codec.h"
+#include "chip-zcl/chip-zcl.h"
 #include "gen/gen-cluster-id.h"
 #include "gen/gen-types.h"
 }
@@ -68,7 +68,7 @@ static void DecodeHeader(ChipZclBuffer_t * buffer, Command * cmd)
     chipZclCodecDecodeEnd(&codec);
 }
 
-void HandleDataModelMessage(ClusterServer &server, System::PacketBuffer * buffer)
+void HandleDataModelMessage(ClusterServer & server, System::PacketBuffer * buffer)
 {
     Command cmd;
     DecodeHeader((ChipZclBuffer_t *) buffer, &cmd);

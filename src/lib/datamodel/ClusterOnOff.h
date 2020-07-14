@@ -39,12 +39,12 @@ static const uint16_t kAttributeIdOnTime             = 0x4001;
 static const uint16_t kAttributeIdOffWaitTime        = 0x4002;
 
 /* Command IDs */
-static const uint16_t kOnOffCmdIdOff                  = 0x00;
-static const uint16_t kOnOffCmdIdOn                   = 0x01;
-static const uint16_t kOnOffCmdIdToggle               = 0x02;
-static const uint16_t kOnOffCmdIdOffWithEffect        = 0x40;
-static const uint16_t kOnOffCmdIdOffWithRecall        = 0x41;
-static const uint16_t kOnOffCmdIdOnWithTimedOff       = 0x42;
+static const uint16_t kOnOffCmdIdOff            = 0x00;
+static const uint16_t kOnOffCmdIdOn             = 0x01;
+static const uint16_t kOnOffCmdIdToggle         = 0x02;
+static const uint16_t kOnOffCmdIdOffWithEffect  = 0x40;
+static const uint16_t kOnOffCmdIdOffWithRecall  = 0x41;
+static const uint16_t kOnOffCmdIdOnWithTimedOff = 0x42;
 
 /**
  * @brief
@@ -81,10 +81,7 @@ public:
      *
      * @return CHIP_NO_ERROR on success or a failure-specific error code otherwise
      */
-    virtual CHIP_ERROR HandleCommandOff(const Command & cmd)
-    {
-        return Set(kAttributeIdOnOff, ValueBool(false));
-    }
+    virtual CHIP_ERROR HandleCommandOff(const Command & cmd) { return Set(kAttributeIdOnOff, ValueBool(false)); }
 
     /**
      * @brief
@@ -96,10 +93,7 @@ public:
      *
      * @return CHIP_NO_ERROR on success or a failure-specific error code otherwise
      */
-    virtual CHIP_ERROR HandleCommandOn(const Command & cmd)
-    {
-        return Set(kAttributeIdOnOff, ValueBool(true));
-    }
+    virtual CHIP_ERROR HandleCommandOn(const Command & cmd) { return Set(kAttributeIdOnOff, ValueBool(true)); }
 
     /**
      * @brief
@@ -115,7 +109,7 @@ public:
     {
         Value currentVal;
         Get(kAttributeIdOnOff, currentVal);
-        return Set(kAttributeIdOnOff, ValueBool( ! ValueToBool(currentVal)));
+        return Set(kAttributeIdOnOff, ValueBool(!ValueToBool(currentVal)));
     }
 
     /**
