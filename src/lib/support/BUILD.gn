@@ -74,6 +74,8 @@ static_library("support") {
     "Base64.cpp",
     "CHIPArgParser.cpp",
     "CHIPCounter.cpp",
+    "CHIPMem-SimpleAlloc.cpp",
+    "CHIPMem-Malloc.cpp",
     "ErrorStr.cpp",
     "FibonacciUtils.cpp",
     "PersistedCounter.cpp",
@@ -100,12 +102,6 @@ static_library("support") {
 
   public_configs = [ ":support_config" ]
 
-  if (chip_config_memory_management == "simple") {
-    sources += [ "CHIPMem-SimpleAlloc.cpp" ]
-  }
-  if (chip_config_memory_management == "malloc") {
-    sources += [ "CHIPMem-Malloc.cpp" ]
-  }
   if (chip_with_nlfaultinjection) {
     sources += [ "CHIPFaultInjection.cpp" ]
     public += [ "CHIPFaultInjection.h" ]
