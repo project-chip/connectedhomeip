@@ -53,13 +53,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-#if defined(PTHREAD_RECURSIVE_MUTEX_INITIALIZER)
-    mChipStackLock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
-#elif defined(PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP)
-    mChipStackLock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
-#else
-#error "No defined static initializer for POSIX Threads recursive mutex!"
-#endif // defined(PTHREAD_RECURSIVE_MUTEX_INITIALIZER)
+    mChipStackLock = PTHREAD_MUTEX_INITIALIZER;
 
     // Initialize the Configuration Manager object.
     err = ConfigurationMgr().Init();
