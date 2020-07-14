@@ -4,10 +4,10 @@ The chip::DeviceLayer APIs may be invoked via the CHIP Shell CLI.
 
 ## Command List
 
-- [help](#help)
-- [config](#config)
-- [get](#get-parameter)
-- [start](#start)
+-   [help](#help)
+-   [config](#config)
+-   [get](#get-parameter)
+-   [start](#start)
 
 ## Command Details
 
@@ -47,23 +47,23 @@ MfgDeviceCaCerts:<None>
 
 ### get \<parameter\>
 
-- parameter: name of field to query
+-   parameter: name of field to query
 
 Where valid parameter names include:
 
-- vendorid: Vendor Identifier
-- productid: Product Identifier
-- productrev: Product Revision
-- serial: Serial Number
-- deviceid: Device Identification Number
-- cert: Device Certificate
-- cacerts: Device CA Certificates
-- mfrdeviceid: Manufacturer Device Identification Number
-- mfrcert: Manufacturer Device Certificate 
-- mfrcacerts: Manufacturer Device CA Certs
-- pairingcode: Pairing Code
-- serviceid: Service Identifier
-- fabricid: Fabric Identifier
+-   vendorid: Vendor Identifier
+-   productid: Product Identifier
+-   productrev: Product Revision
+-   serial: Serial Number
+-   deviceid: Device Identification Number
+-   cert: Device Certificate
+-   cacerts: Device CA Certificates
+-   mfrdeviceid: Manufacturer Device Identification Number
+-   mfrcert: Manufacturer Device Certificate
+-   mfrcacerts: Manufacturer Device CA Certs
+-   pairingcode: Pairing Code
+-   serviceid: Service Identifier
+-   fabricid: Fabric Identifier
 
 ```bash
 > device get vendorid
