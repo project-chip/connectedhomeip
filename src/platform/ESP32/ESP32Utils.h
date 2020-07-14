@@ -20,6 +20,7 @@
 #ifndef ESP_UTILS_H
 #define ESP_UTILS_H
 
+#include "platform/internal/DeviceNetworkInfo.h"
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
@@ -42,6 +43,10 @@ public:
     static bool IsInterfaceUp(tcpip_adapter_if_t intfId);
     static const char * InterfaceIdToName(tcpip_adapter_if_t intfId);
     static bool HasIPv6LinkLocalAddress(tcpip_adapter_if_t intfId);
+
+    static CHIP_ERROR GetWiFiStationProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials);
+    static CHIP_ERROR SetWiFiStationProvision(const Internal::DeviceNetworkInfo & netInfo);
+    static CHIP_ERROR ClearWiFiStationProvision(void);
 };
 
 } // namespace Internal
