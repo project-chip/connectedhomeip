@@ -33,8 +33,8 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include <pthread.h>
 #include <atomic>
+#include <pthread.h>
 #include <queue>
 
 namespace chip {
