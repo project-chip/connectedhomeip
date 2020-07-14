@@ -378,7 +378,7 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::ReceivePacket(otM
     struct netif * threadNetIf = ThreadStackMgrImpl().ThreadNetIf();
 
     // Allocate an LwIP pbuf to hold the inbound packet.
-    pbuf = pbuf_alloc(PBUF_RAW, pktLen, PBUF_POOL);
+    pbuf = pbuf_alloc(PBUF_LINK, pktLen, PBUF_POOL);
     VerifyOrExit(pbuf != NULL, lwipErr = ERR_MEM);
 
     // Copy the packet data from the OpenThread message object to the pbuf.
