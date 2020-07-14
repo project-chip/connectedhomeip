@@ -33,6 +33,7 @@
 #include "esp_wifi.h"
 
 using namespace ::chip::DeviceLayer::Internal;
+using chip::DeviceLayer::Internal::DeviceNetworkInfo;
 
 CHIP_ERROR ESP32Utils::IsAPEnabled(bool & apEnabled)
 {
@@ -236,4 +237,71 @@ bool ESP32Utils::HasIPv6LinkLocalAddress(tcpip_adapter_if_t intfId)
 {
     ip6_addr_t unused;
     return tcpip_adapter_get_ip6_linklocal(intfId, &unused) == ESP_OK;
+}
+
+CHIP_ERROR ESP32Utils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    wifi_config_t stationConfig;
+
+    err = esp_wifi_get_config(ESP_IF_WIFI_STA, &stationConfig);
+    SuccessOrExit(err);
+
+    VerifyOrExit(stationConfig.sta.ssid[0] != 0, err = CHIP_ERROR_INCORRECT_STATE);
+
+    netInfo.NetworkId              = kWiFiStationNetworkId;
+    netInfo.FieldPresent.NetworkId = true;
+    memcpy(netInfo.WiFiSSID, stationConfig.sta.ssid, min(strlen((char *) stationConfig.sta.ssid) + 1, sizeof(netInfo.WiFiSSID)));
+
+    if (includeCredentials)
+    {
+        netInfo.WiFiKeyLen = min(strlen((char *) stationConfig.sta.password), sizeof(netInfo.WiFiKey));
+        memcpy(netInfo.WiFiKey, stationConfig.sta.password, netInfo.WiFiKeyLen);
+    }
+
+exit:
+    return err;
+}
+
+CHIP_ERROR ESP32Utils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo & netInfo)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    wifi_config_t wifiConfig;
+
+    // Ensure that ESP station mode is enabled.  This is required before esp_wifi_set_config(ESP_IF_WIFI_STA,...)
+    // can be called.
+    err = ESP32Utils::EnableStationMode();
+    SuccessOrExit(err);
+
+    // Initialize an ESP wifi_config_t structure based on the new provision information.
+    memset(&wifiConfig, 0, sizeof(wifiConfig));
+    memcpy(wifiConfig.sta.ssid, netInfo.WiFiSSID, min(strlen(netInfo.WiFiSSID) + 1, sizeof(wifiConfig.sta.ssid)));
+    memcpy(wifiConfig.sta.password, netInfo.WiFiKey, min((size_t) netInfo.WiFiKeyLen, sizeof(wifiConfig.sta.password)));
+    wifiConfig.sta.scan_method = WIFI_ALL_CHANNEL_SCAN;
+    wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
+
+    // Configure the ESP WiFi interface.
+    err = esp_wifi_set_config(ESP_IF_WIFI_STA, &wifiConfig);
+    if (err != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "esp_wifi_set_config() failed: %s", chip::ErrorStr(err));
+    }
+    SuccessOrExit(err);
+
+    ChipLogProgress(DeviceLayer, "WiFi station provision set (SSID: %s)", netInfo.WiFiSSID);
+
+exit:
+    return err;
+}
+
+CHIP_ERROR ESP32Utils::ClearWiFiStationProvision(void)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    wifi_config_t stationConfig;
+
+    // Clear the ESP WiFi station configuration.
+    memset(&stationConfig, 0, sizeof(stationConfig));
+    esp_wifi_set_config(ESP_IF_WIFI_STA, &stationConfig);
+
+    return err;
 }
