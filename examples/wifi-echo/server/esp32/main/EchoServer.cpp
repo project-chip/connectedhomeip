@@ -57,7 +57,7 @@ using namespace ::chip::Inet;
 using namespace ::chip::Transport;
 
 constexpr NodeId kLocalNodeId = 12344321;
-extern LEDWidget statusLED; // In wifi-echo.cpp
+extern LEDWidget statusLED;                   // In wifi-echo.cpp
 extern chip::DataModel::ClusterServer server; // In wifi-echo.cpp
 
 namespace {

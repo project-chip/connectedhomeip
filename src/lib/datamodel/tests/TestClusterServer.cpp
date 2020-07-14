@@ -148,9 +148,9 @@ void TestHandleCommand(nlTestSuite * inSuite, void * inContext)
 
     Command cmd;
     cmd.mEndpointId = 1;
-    cmd.mType = kCmdTypeCluster;
-    cmd.mClusterId = kClusterIdOnOff;
-    cmd.mDirection = kCmdDirectionClientToServer;
+    cmd.mType       = kCmdTypeCluster;
+    cmd.mClusterId  = kClusterIdOnOff;
+    cmd.mDirection  = kCmdDirectionClientToServer;
 
     /* Validate On */
     cmd.mId = kOnOffCmdIdOn;
@@ -184,8 +184,7 @@ int TestClusterServer(void)
      */
     static const nlTest sTests[] = { NL_TEST_DEF("TestClusterServerBasic", TestClusterServerBasic),
                                      NL_TEST_DEF("TestClusterServerTwoEndpoints", TestClusterServerTwoEndpoints),
-                                     NL_TEST_DEF("TestHandleCommand", TestHandleCommand),
-                                     NL_TEST_SENTINEL() };
+                                     NL_TEST_DEF("TestHandleCommand", TestHandleCommand), NL_TEST_SENTINEL() };
 
     nlTestSuite theSuite = {
         "TestClusterServer", &sTests[0], NULL /* setup */, NULL /* teardown */
