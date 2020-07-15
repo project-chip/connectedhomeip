@@ -69,14 +69,19 @@ AM_CPPFLAGS                                    = \
     $(NULL)
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
+AM_CPPFLAGS                                   += \
+    $(GIO_CFLAGS)                                \
+    $(NULL)
+
 if CHIP_WITH_OT_BR_POSIX
 AM_CPPFLAGS                                   += \
     $(DBUS_CFLAGS)                               \
     $(OT_BR_POSIX_CPPFLAGS)                     \
     $(NULL)
 libPlatformTests_a_SOURCES += TestThreadStackMgr.cpp
-endif
-endif
+endif # CHIP_WITH_OT_BR_POSIX
+endif # CHIP_DEVICE_LAYER_TARGET_LINUX
+
 
 CHIP_LDADD                                      = \
     $(top_builddir)/src/platform/libDeviceLayer.a \
@@ -86,13 +91,17 @@ CHIP_LDADD                                      = \
     $(NULL)
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
+CHIP_LDADD                                    += \
+    $(GIO_CFLAGS) $(GIO_LIBS)                    \
+    $(NULL)
+
 if CHIP_WITH_OT_BR_POSIX
 CHIP_LDADD                                    += \
     $(DBUS_LIBS)                                 \
     $(OT_BR_POSIX_LDFLAGS) $(OT_BR_POSIX_LIBS) \
     $(NULL)
-endif
-endif
+endif # CHIP_WITH_OT_BR_POSIX
+endif # CHIP_DEVICE_LAYER_TARGET_LINUX
 
 COMMON_LDADD                                          = \
     libPlatformTests.a                                  \
