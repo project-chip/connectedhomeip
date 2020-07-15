@@ -47,6 +47,9 @@ static const struct test_shell_vector test_vector_shell_tokenizer[] = {
     { .line = " leading space", .argv = (const char *[]){ "leading", "space" } },
     { .line = "trailing space ", .argv = (const char *[]){ "trailing", "space", "" } },
     { .line = "no_space", .argv = (const char *[]){ "no_space" } },
+    { .line = "escaped\\ space", .argv = (const char *[]){ "escaped space" } },
+    { .line = "escape\\\\", .argv = (const char *[]){ "escape\\" } },
+    { .line = "extended\\ escaped\\ space and\\ more", .argv = (const char *[]){ "extended escaped space", "and more" } },
     { .line = " ", .argv = (const char *[]){ "" } },
     { .line = "", .argv = (const char *[]){} },
 };
