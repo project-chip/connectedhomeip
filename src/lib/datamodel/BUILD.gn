@@ -29,6 +29,7 @@ static_library("datamodel") {
     "Endpoint.cpp",
     "Endpoint.h",
     "Value.h",
+    "ZCLCommand.h",
   ]
 
   public_deps = [
