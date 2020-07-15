@@ -125,18 +125,14 @@ public:
         switch (cmd.mId)
         {
         case kOnOffCmdIdOff:
-            HandleCommandOff(cmd);
-            break;
+            return HandleCommandOff(cmd);
         case kOnOffCmdIdOn:
-            HandleCommandOn(cmd);
-            break;
+            return HandleCommandOn(cmd);
         case kOnOffCmdIdToggle:
-            HandleCommandToggle(cmd);
-            break;
+            return HandleCommandToggle(cmd);
         default:
             /* Unsupported */
             return CHIP_ERROR_INTERNAL;
-            break;
         }
         return CHIP_ERROR_INTERNAL;
     }
