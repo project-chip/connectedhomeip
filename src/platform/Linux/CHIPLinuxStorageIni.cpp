@@ -196,6 +196,7 @@ CHIP_ERROR ChipLinuxStorageIni::GetStringValue(const char * key, char * buf, siz
 
                 if (len > bufSize - 1)
                 {
+                    outLen = len;
                     retval = CHIP_ERROR_BUFFER_TOO_SMALL;
                 }
                 else
@@ -281,6 +282,7 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobValue(const char * key, uint8_t * d
     {
         if (expectedDecodedLen > bufSize)
         {
+            decodedDataLen = expectedDecodedLen;
             retval = CHIP_ERROR_BUFFER_TOO_SMALL;
         }
     }
