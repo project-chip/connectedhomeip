@@ -496,7 +496,7 @@ static const shell_command_t cmds_device[] = {
 void cmd_device_init(void)
 {
 #if CONFIG_DEVICE_LAYER
-    CHIP_ERROR error  = CHIP_NO_ERROR;
+    CHIP_ERROR error = CHIP_NO_ERROR;
 
     // Register `device` subcommands with the local shell dispatcher.
     sShellDeviceSubcommands.RegisterCommands(cmds_device, ARRAY_SIZE(cmds_device));
