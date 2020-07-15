@@ -116,6 +116,7 @@ SRCS = \
 
 INC_DIRS = \
     $(PROJECT_ROOT)                                                                       \
+    $(PROJECT_ROOT)/src/platform/EFR32/                                                   \
     $(PROJECT_ROOT)/include                                                               \
     $(PROJECT_ROOT)/traits/include                                                        \
     $(PROJECT_ROOT)/schema/include                                                        \

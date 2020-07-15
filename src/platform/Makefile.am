@@ -211,11 +211,18 @@ libDeviceLayer_a_SOURCES               +=       \
     EFR32/freertos_bluetooth.c                  \
     EFR32/gatt_db.c                             \
     EFR32/PlatformManagerImpl.cpp               \
+    EFR32/ConfigurationManagerImpl.cpp          \
     EFR32/ConnectivityManagerImpl.cpp           \
     EFR32/EFR32Config.cpp                       \
     EFR32/Logging.cpp                           \
     FreeRTOS/SystemTimeSupport.cpp              \
     $(NULL)
+
+if CHIP_ENABLE_OPENTHREAD
+libDeviceLayer_a_SOURCES               +=       \
+    EFR32/ThreadStackManagerImpl.cpp            \
+    $(NULL)
+endif    
 
 endif # CHIP_DEVICE_LAYER_TARGET_EFR32
 
