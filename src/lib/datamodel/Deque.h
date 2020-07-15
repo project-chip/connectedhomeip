@@ -61,7 +61,8 @@ public:
      *     item->mMe of the match or NULL if no match.
      *  Mutation of the list during fn() should be avoided
      */
-    T * Find(std::function<bool(T *)> fn)
+    template <typename Functor>
+    T * Find(Functor fn)
     {
         Deque * next = nullptr;
         for (Deque * item = this; next != this; item = next)
@@ -87,7 +88,8 @@ public:
      *     item->mMe of the match or NULL if no match.
      *  Mutation of the list during fn() should be avoided
      */
-    T * FindR(std::function<bool(T *)> fn)
+    template <typename Functor>
+    T * FindR(Functor fn)
     {
         Deque * prev = nullptr;
         for (Deque * item = mPrev; prev != mPrev; item = prev)
@@ -110,7 +112,8 @@ public:
      *     this item.
      *  Mutation of the list during fn() should be avoided
      */
-    void Foreach(std::function<void(T *)> fn)
+    template <typename Functor>
+    void Foreach(Functor fn)
     {
         Deque * next = nullptr;
         for (Deque * item = this; next != this; item = next)
@@ -129,7 +132,8 @@ public:
      *    the last item
      *  Mutation of the list during fn() should be avoided
      */
-    void ForeachR(std::function<void(T *)> fn)
+    template <typename Functor>
+    void ForeachR(Functor fn)
     {
         Deque * prev = nullptr;
         for (Deque * item = mPrev; prev != mPrev; item = prev)
