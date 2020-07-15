@@ -38,4 +38,5 @@ CHIP_BUILD_DATAMODEL_HEADER_FILES                              = \
     @top_builddir@/src/lib/datamodel/Command.h    \
     @top_builddir@/src/lib/datamodel/ClusterBasic.h    \
     @top_builddir@/src/lib/datamodel/ClusterOnOff.h      \
+    @top_builddir@/src/lib/datamodel/ZCLCommand.h      \
     $(NULL)

@@ -139,6 +139,24 @@ public:
     }
 };
 
+static void GenerateCommand(Command * cmd, uint16_t cmdId, uint16_t endpointId)
+{
+    cmd->mType       = kCmdTypeCluster;
+    cmd->mId         = cmdId;
+    cmd->mEndpointId = endpointId;
+    cmd->mDirection  = kCmdDirectionClientToServer;
+    cmd->mClusterId  = kClusterIdOnOff;
+
+    cmd->StartEncode();
+    cmd->EndEncode();
+}
+
+void ClusterOnOffEncodeOn(Command * cmd, uint16_t endpointId) { GenerateCommand(cmd, kOnOffCmdIdOn, endpointId); }
+
+void ClusterOnOffEncodeOff(Command * cmd, uint16_t endpointId) { GenerateCommand(cmd, kOnOffCmdIdOff, endpointId); }
+
+void ClusterOnOffEncodeToggle(Command * cmd, uint16_t endpointId) { GenerateCommand(cmd, kOnOffCmdIdToggle, endpointId); }
+
 } // namespace DataModel
 } // namespace chip
 
