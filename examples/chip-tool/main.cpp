@@ -35,6 +35,8 @@
 #include <support/CHIPLogging.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <datamodel/ClusterOnOff.h>
+#include <datamodel/ZCLCommand.h>
 
 #include <controller/CHIPDeviceController.h>
 
@@ -50,6 +52,7 @@ extern "C" {
 
 using namespace ::chip;
 using namespace ::chip::Inet;
+using namespace ::chip::DataModel;
 
 // NOTE: Remote device ID is in sync with the echo server device id
 //       At some point, we may want to add an option to connect to a device without
@@ -151,7 +154,7 @@ bool DetermineAddress(int argc, char * argv[], IPAddress * hostAddr, uint16_t * 
     return true;
 }
 
-enum class Command
+enum class CommandIndicator
 {
     Off,
     On,
@@ -165,7 +168,7 @@ bool EqualsLiteral(const char * str, const char (&literal)[N])
     return strncmp(str, literal, N) == 0;
 }
 
-bool DetermineCommand(int argc, char * argv[], Command * command)
+bool DetermineCommand(int argc, char * argv[], CommandIndicator * command)
 {
     if (argc < 4)
     {
@@ -174,25 +177,25 @@ bool DetermineCommand(int argc, char * argv[], Command * command)
 
     if (EqualsLiteral(argv[3], "off"))
     {
-        *command = Command::Off;
+        *command = CommandIndicator::Off;
         return true;
     }
 
     if (EqualsLiteral(argv[3], "on"))
     {
-        *command = Command::On;
+        *command = CommandIndicator::On;
         return true;
     }
 
     if (EqualsLiteral(argv[3], "toggle"))
     {
-        *command = Command::Toggle;
+        *command = CommandIndicator::Toggle;
         return true;
     }
 
     if (EqualsLiteral(argv[3], "echo"))
     {
-        *command = Command::Echo;
+        *command = CommandIndicator::Echo;
         return true;
     }
 
@@ -205,15 +208,15 @@ union CommandArgs
     ChipZclEndpointId_t endpointId;
 };
 
-bool DetermineCommandArgs(int argc, char * argv[], Command command, CommandArgs * commandArgs)
+bool DetermineCommandArgs(int argc, char * argv[], CommandIndicator command, CommandArgs * commandArgs)
 {
-    if (command == Command::Echo)
+    if (command == CommandIndicator::Echo)
     {
         // No args.
         return true;
     }
 
-    if (command != Command::On && command != Command::Off && command != Command::Toggle)
+    if (command != CommandIndicator::On && command != CommandIndicator::Off && command != CommandIndicator::Toggle)
     {
         fprintf(stderr, "Need to define arg handling for command '%d'\n", int(command));
         return false;
@@ -264,58 +267,82 @@ void DoEcho(DeviceController::ChipDeviceController * controller, const IPAddress
     }
 }
 
+/* TODO: Move into a file of its own under datamodel */
+class ClusterOnOffClient
+{
+public:
+    /* The endpointId that is bound to this client */
+    uint16_t mEndpointId;
+
+    CHIP_ERROR GenerateCommand(Command *cmd, uint16_t mCmdId)
+    {
+        cmd->mType = kCmdTypeCluster;
+        cmd->mId = mCmdId;
+        cmd->mEndpointId = mEndpointId;
+        cmd->mDirection = kCmdDirectionClientToServer;
+        cmd->mClusterId = kClusterIdOnOff;
+
+        cmd->StartEncode();
+        cmd->EndEncode();
+    }
+
+    void On(Command * cmd)
+    {
+        GenerateCommand(cmd, kOnOffCmdIdOn);
+    }
+
+    void Off(Command * cmd)
+    {
+        GenerateCommand(cmd, kOnOffCmdIdOff);
+    }
+
+    void Toggle(Command * cmd)
+    {
+        GenerateCommand(cmd, kOnOffCmdIdToggle);
+    }
+
+    void BindEndpoint(uint16_t endpointId) { mEndpointId = endpointId; }
+};
+
 // Handle the on/off/toggle case, where we are sending a ZCL command and not
 // expecting a response at all.
-void DoOnOff(DeviceController::ChipDeviceController * controller, Command command, ChipZclEndpointId_t endpoint)
+void DoOnOff(DeviceController::ChipDeviceController * controller, CommandIndicator command, ChipZclEndpointId_t endpoint)
 {
-    ChipZclCommandId_t zclCommand;
+    // Make sure our buffer is big enough, but this will need a better setup!
+    static const size_t bufferSize = 1024;
+    auto * buffer                  = System::PacketBuffer::NewWithAvailableSize(bufferSize);
+    ZCLCommand cmd(buffer);
+    ClusterOnOffClient client;
+    /* This binding would have happened at some earlier point */
+    client.BindEndpoint(endpoint);
+
     switch (command)
     {
-    case Command::Off:
-        zclCommand = CHIP_ZCL_CLUSTER_ON_OFF_SERVER_COMMAND_OFF;
+    case CommandIndicator::Off:
+        client.Off(&cmd);
         break;
-    case Command::On:
-        zclCommand = CHIP_ZCL_CLUSTER_ON_OFF_SERVER_COMMAND_ON;
+    case CommandIndicator::On:
+        client.On(&cmd);
         break;
-    case Command::Toggle:
-        zclCommand = CHIP_ZCL_CLUSTER_ON_OFF_SERVER_COMMAND_TOGGLE;
+    case CommandIndicator::Toggle:
+        client.Toggle(&cmd);
         break;
     default:
         fprintf(stderr, "Unknown command: %d\n", command);
         return;
     }
 
-    // Make sure our buffer is big enough, but this will need a better setup!
-    static const size_t bufferSize = 1024;
-    auto * buffer                  = System::PacketBuffer::NewWithAvailableSize(bufferSize);
-
-    ChipZclBuffer_t * zcl_buffer = (ChipZclBuffer_t *) buffer;
-    ChipZclCommandContext_t ctx  = {
-        endpoint,                       // endpointId
-        CHIP_ZCL_CLUSTER_ON_OFF,        // clusterId
-        true,                           // clusterSpecific
-        false,                          // mfgSpecific
-        0,                              // mfgCode
-        zclCommand,                     // commandId
-        ZCL_DIRECTION_CLIENT_TO_SERVER, // direction
-        0,                              // payloadStartIndex
-        nullptr,                        // request
-        nullptr                         // response
-    };
-    chipZclEncodeZclHeader(zcl_buffer, &ctx);
-
 #ifdef DEBUG
-    const size_t data_len = chipZclBufferDataLength(zcl_buffer);
+    const size_t data_len = chipZclBufferDataLength((ChipZclBuffer_t *)cmd.mBuffer);
 
     fprintf(stderr, "SENDING: %zu ", data_len);
     for (size_t i = 0; i < data_len; ++i)
     {
-        fprintf(stderr, "%d ", chipZclBufferPointer(zcl_buffer)[i]);
+        fprintf(stderr, "%d ", chipZclBufferPointer((ChipZclBuffer_t *)cmd.mBuffer)[i]);
     }
     fprintf(stderr, "\n");
 #endif
-
-    controller->SendMessage(NULL, buffer);
+    controller->SendMessage(NULL, (System::PacketBuffer *)cmd.mBuffer);
     controller->ServiceEvents();
 }
 
@@ -326,7 +353,7 @@ int main(int argc, char * argv[])
 {
     IPAddress host_addr;
     uint16_t port;
-    Command command;
+    CommandIndicator command;
     CHIP_ERROR err;
     CommandArgs commandArgs;
     if (!DetermineAddress(argc, argv, &host_addr, &port) || !DetermineCommand(argc, argv, &command) ||
@@ -343,7 +370,7 @@ int main(int argc, char * argv[])
     err = controller->ConnectDevice(kRemoteDeviceId, host_addr, NULL, EchoKeyExchange, EchoResponse, ReceiveError, port);
     VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to connect to the device"));
 
-    if (command == Command::Echo)
+    if (command == CommandIndicator::Echo)
     {
         DoEcho(controller, host_addr, port);
     }

@@ -24,6 +24,8 @@
 #ifndef CHIPCOMMAND_H_
 #define CHIPCOMMAND_H_
 
+#include <core/CHIPError.h>
+
 namespace chip {
 namespace DataModel {
 
@@ -59,6 +61,31 @@ public:
         /* The MfgCode, if this is manufacturer-specific command */
         uint16_t mMfgCode;
     };
+
+    /**
+     * @brief
+     *   Start the process to parse/decode the incoming buffer
+     */
+    virtual void StartDecode(void) {}
+
+    /**
+     * @brief
+     *   Start the process to encode the outgoing buffer
+     */
+    virtual void StartEncode(void) {}
+
+    /**
+     * @brief
+     *   End the process to parse/decode the buffer freeing up any resources for the parsed entity
+     */
+    virtual void EndDecode(void) {}
+
+    /**
+     * @brief
+     *   End the process to encode the buffer
+     */
+    virtual void EndEncode(void) {}
+
 };
 
 } // namespace DataModel

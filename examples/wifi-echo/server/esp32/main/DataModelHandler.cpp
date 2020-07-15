@@ -21,8 +21,7 @@
  */
 
 #include "esp_log.h"
-#include <datamodel/Command.h>
-#include <system/SystemPacketBuffer.h>
+#include <datamodel/ZCLCommand.h>
 
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
@@ -41,37 +40,14 @@ static const char * TAG = "data_model_server";
 
 void InitDataModelHandler()
 {
-    chipZclEndpointInit();
-}
 
-static void DecodeHeader(ChipZclBuffer_t * buffer, Command * cmd)
-{
-    ChipZclCodec_t codec;
-    uint8_t mask = 0;
-    chipZclCodecDecodeStart(&codec, buffer);
-    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &mask, sizeof(mask), NULL);
-    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(cmd->mEndpointId), sizeof(cmd->mEndpointId), NULL);
-
-    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(cmd->mId), sizeof(cmd->mId), NULL);
-    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(cmd->mDirection), sizeof(cmd->mDirection), NULL);
-    cmd->mType = kCmdTypeGlobal;
-    if (mask & 0x01)
-    {
-        cmd->mType = kCmdTypeCluster;
-        chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(cmd->mClusterId), sizeof(cmd->mClusterId), NULL);
-    }
-    if (mask & 0x02)
-    {
-        cmd->mType = kCmdTypeMfg;
-        chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(cmd->mMfgCode), sizeof(cmd->mMfgCode), NULL);
-    }
-    chipZclCodecDecodeEnd(&codec);
 }
 
 void HandleDataModelMessage(ClusterServer & server, System::PacketBuffer * buffer)
 {
-    Command cmd;
-    DecodeHeader((ChipZclBuffer_t *) buffer, &cmd);
+    ZCLCommand cmd(buffer);
+    cmd.StartDecode();
+
     if (server.HandleCommand(cmd) != CHIP_NO_ERROR)
     {
         ESP_LOGI(TAG, "Data model processing success!");
@@ -80,5 +56,6 @@ void HandleDataModelMessage(ClusterServer & server, System::PacketBuffer * buffe
     {
         ESP_LOGI(TAG, "Data model processing failure");
     }
-    System::PacketBuffer::Free(buffer);
+    cmd.EndDecode();
+    System::PacketBuffer::Free((chip::System::PacketBuffer*)cmd.mBuffer);
 }
