@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
+/***************************************************************************/
+/**
  * @file
  * @brief API for generating command buffer.
  *******************************************************************************
-   ******************************************************************************/
+ ******************************************************************************/
 
 #ifndef __CLIENT_API__
 #define __CLIENT_API__
@@ -88,11 +89,7 @@
  *            copied as is to the destination buffer. The length is not
  *            included.
  */
-uint16_t emberAfFillExternalBuffer(uint8_t frameControl,
-                                   EmberAfClusterId clusterId,
-                                   uint8_t commandId,
-                                   const char * format,
-                                   ...);
+uint16_t emberAfFillExternalBuffer(uint8_t frameControl, EmberAfClusterId clusterId, uint8_t commandId, const char * format, ...);
 
 /**
  * @brief Function that fills in the buffer with manufacturer-specific command.
@@ -136,12 +133,8 @@ uint16_t emberAfFillExternalBuffer(uint8_t frameControl,
  *            copied as is to the destination buffer. The length is not
  *            included.
  */
-uint16_t emberAfFillExternalManufacturerSpecificBuffer(uint8_t frameControl,
-                                                       EmberAfClusterId clusterId,
-                                                       uint16_t manufacturerCode,
-                                                       uint8_t commandId,
-                                                       const char * format,
-                                                       ...);
+uint16_t emberAfFillExternalManufacturerSpecificBuffer(uint8_t frameControl, EmberAfClusterId clusterId, uint16_t manufacturerCode,
+                                                       uint8_t commandId, const char * format, ...);
 
 /**
  * @brief Function that registers the buffer to use with the fill function.
@@ -152,10 +145,7 @@ uint16_t emberAfFillExternalManufacturerSpecificBuffer(uint8_t frameControl,
  * @param responseLengthPtr Location where length of message will be written into.
  * @param apsFramePtr Location where APS frame data will be written.
  */
-void emberAfSetExternalBuffer(uint8_t *buffer,
-                              uint16_t bufferLen,
-                              uint16_t *responseLengthPtr,
-                              EmberApsFrame *apsFramePtr);
+void emberAfSetExternalBuffer(uint8_t * buffer, uint16_t bufferLen, uint16_t * responseLengthPtr, EmberApsFrame * apsFramePtr);
 
 /**
  * @brief Stateless function that fills the passed buffer with command data.
@@ -164,22 +154,17 @@ void emberAfSetExternalBuffer(uint8_t *buffer,
  * Used internally by emberAfFillExternalBuffer, but can be used
  * for generic buffer filling.
  */
-uint16_t emberAfFillBuffer(uint8_t *buffer,
-                           uint16_t bufferLen,
-                           uint8_t frameControl,
-                           uint8_t commandId,
-                           const char * format,
-                           ...);
+uint16_t emberAfFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameControl, uint8_t commandId, const char * format, ...);
 
 #if !defined(DOXYGEN_SHOULD_SKIP_THIS)
 // The buffer used for filling ZCL Messages.
-extern uint8_t *emAfZclBuffer;
+extern uint8_t * emAfZclBuffer;
 // Max length of the buffer.
 extern uint16_t emAfZclBufferLen;
 // Pointer to where this API should put the length.
-extern uint16_t *emAfResponseLengthPtr;
+extern uint16_t * emAfResponseLengthPtr;
 // The APS frame accompanying the ZCL message.
-extern EmberApsFrame *emAfCommandApsFrame;
+extern EmberApsFrame * emAfCommandApsFrame;
 #endif
 
 // Generated macros.

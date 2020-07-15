@@ -31,58 +31,67 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
+/***************************************************************************/
+/**
  * @file
- * @brief Contains storage and function for retrieving attribute size.
+ * @brief Contains storage and function for retrieving
+ *attribute size.
  *******************************************************************************
-   ******************************************************************************/
+ ******************************************************************************/
 
 //#include PLATFORM_HEADER
 
 #include "af.h"
 
-static const uint8_t attributeSizes[] =
-{
+static const uint8_t attributeSizes[] = {
 #include "gen/attribute-size.h"
 };
 
 uint8_t emberAfGetDataSize(uint8_t dataType)
 {
-  uint8_t i;
-  for (i = 0; (i + 1) < sizeof(attributeSizes); i += 2) {
-    if (attributeSizes[i] == dataType) {
-      return attributeSizes[i + 1];
+    uint8_t i;
+    for (i = 0; (i + 1) < sizeof(attributeSizes); i += 2)
+    {
+        if (attributeSizes[i] == dataType)
+        {
+            return attributeSizes[i + 1];
+        }
     }
-  }
 
-  return 0;
+    return 0;
 }
 
-uint16_t emberAfAttributeValueSize(EmberAfAttributeType dataType,
-                                   const uint8_t *buffer)
+uint16_t emberAfAttributeValueSize(EmberAfAttributeType dataType, const uint8_t * buffer)
 {
-  // If the dataType is a string or long string, refer to the buffer for the
-  // string's length prefix; size is string length plus number of prefix bytes.
-  // If non-string, determine size from dataType. If dataType is unrecognized,
-  // return zero.
-  //
-  // Note: A non-empty long string has max length 0xFFFE, and adding 2 for its
-  // length prefix would roll a uint16_t back to zero. Choosing not to
-  // expand return type to uint32_t just to accommodate that one case.
-  uint16_t dataSize = 0;
-  if (emberAfIsThisDataTypeAStringType(dataType)) {
-    if (buffer != 0) {
-      if (emberAfIsStringAttributeType(dataType)) {
-        // size is string length plus 1-byte length prefix
-        dataSize = ((uint16_t) emberAfStringLength(buffer)) + 1u;
-      } else {
-        // size is long string length plus 2-byte length prefix
-        dataSize = emberAfLongStringLength(buffer) + 2u;
-      }
+    // If the dataType is a string or long string, refer to the buffer for the
+    // string's length prefix; size is string length plus number of prefix bytes.
+    // If non-string, determine size from dataType. If dataType is unrecognized,
+    // return zero.
+    //
+    // Note: A non-empty long string has max length 0xFFFE, and adding 2 for its
+    // length prefix would roll a uint16_t back to zero. Choosing not to
+    // expand return type to uint32_t just to accommodate that one case.
+    uint16_t dataSize = 0;
+    if (emberAfIsThisDataTypeAStringType(dataType))
+    {
+        if (buffer != 0)
+        {
+            if (emberAfIsStringAttributeType(dataType))
+            {
+                // size is string length plus 1-byte length prefix
+                dataSize = ((uint16_t) emberAfStringLength(buffer)) + 1u;
+            }
+            else
+            {
+                // size is long string length plus 2-byte length prefix
+                dataSize = emberAfLongStringLength(buffer) + 2u;
+            }
+        }
     }
-  } else {
-    dataSize = (uint16_t) emberAfGetDataSize(dataType);
-  }
+    else
+    {
+        dataSize = (uint16_t) emberAfGetDataSize(dataType);
+    }
 
-  return dataSize;
+    return dataSize;
 }

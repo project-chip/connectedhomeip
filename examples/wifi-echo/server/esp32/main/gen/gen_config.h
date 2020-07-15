@@ -39,25 +39,22 @@
 #ifndef SILABS_ZNET_CONFIG
 #define SILABS_ZNET_CONFIG
 
-
 /**** Included Header Section ****/
 
-
-
 // Networks
-#define EM_AF_GENERATED_NETWORK_TYPES { \
-  EM_AF_NETWORK_TYPE_ZIGBEE_PRO, /* Primary */ \
-}
-#define EM_AF_GENERATED_ZIGBEE_PRO_NETWORKS { \
-  { \
-    /* Primary */ \
-    ZA_ROUTER, \
-    EMBER_AF_SECURITY_PROFILE_Z3, \
-  }, \
-}
-#define EM_AF_GENERATED_NETWORK_STRINGS  \
-  "Primary (pro)", \
-/**** ZCL Section ****/
+#define EM_AF_GENERATED_NETWORK_TYPES                                                                                              \
+    {                                                                                                                              \
+        EM_AF_NETWORK_TYPE_ZIGBEE_PRO, /* Primary */                                                                               \
+    }
+#define EM_AF_GENERATED_ZIGBEE_PRO_NETWORKS                                                                                        \
+    {                                                                                                                              \
+        {                                                                                                                          \
+            /* Primary */                                                                                                          \
+            ZA_ROUTER,                                                                                                             \
+            EMBER_AF_SECURITY_PROFILE_Z3,                                                                                          \
+        },                                                                                                                         \
+    }
+#define EM_AF_GENERATED_NETWORK_STRINGS "Primary (pro)", /**** ZCL Section ****/
 #define ZA_PROMPT "ZigbeeMinimalSoc"
 #define ZCL_USING_ON_OFF_CLUSTER_SERVER
 #define EMBER_AF_MANUFACTURER_CODE 0x1002
@@ -102,19 +99,17 @@
 #define EMBER_AF_PRINT_DEBUG 0x0002
 #define EMBER_AF_PRINT_APP 0x0004
 #define EMBER_AF_PRINT_ZDO 0x0008
-#define EMBER_AF_PRINT_BITS { 0x0F }
-#define EMBER_AF_PRINT_NAMES { \
-  "Core",\
-  "Debug",\
-  "Application",\
-  "ZDO (ZigBee Device Object)",\
-  NULL\
-}
+#define EMBER_AF_PRINT_BITS                                                                                                        \
+    {                                                                                                                              \
+        0x0F                                                                                                                       \
+    }
+#define EMBER_AF_PRINT_NAMES                                                                                                       \
+    {                                                                                                                              \
+        "Core", "Debug", "Application", "ZDO (ZigBee Device Object)", NULL                                                         \
+    }
 #define EMBER_AF_PRINT_NAME_NUMBER 4
 
-
 #define EMBER_AF_SUPPORT_COMMAND_DISCOVERY
-
 
 // Generated plugin macros
 
@@ -222,36 +217,56 @@
 #define EMBER_BROADCAST_TABLE_SIZE 15
 #define EMBER_NEIGHBOR_TABLE_SIZE 16
 
-
 // Generated API headers
 
 // API antenna from Antenna Stub plugin
-#define EMBER_AF_API_ANTENNA "../../../../../Applications/Simplicity Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/platform/base/hal/plugin/antenna/antenna.h"
+#define EMBER_AF_API_ANTENNA                                                                                                       \
+    "../../../../../Applications/Simplicity "                                                                                      \
+    "Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/platform/base/hal/plugin/antenna/antenna.h"
 
 // API coexistence from Radio Coexistence Stub plugin
-#define EMBER_AF_API_COEXISTENCE "../../../../../Applications/Simplicity Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/platform/radio/rail_lib/plugin/coexistence/protocol/ieee802154/coexistence-802154.h"
+#define EMBER_AF_API_COEXISTENCE                                                                                                   \
+    "../../../../../Applications/Simplicity "                                                                                      \
+    "Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/platform/radio/rail_lib/plugin/coexistence/protocol/"         \
+    "ieee802154/coexistence-802154.h"
 
 // API network-steering from Network Steering plugin
-#define EMBER_AF_API_NETWORK_STEERING "../../../../../Applications/Simplicity Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/protocol/zigbee/app/framework/plugin/network-steering/network-steering.h"
+#define EMBER_AF_API_NETWORK_STEERING                                                                                              \
+    "../../../../../Applications/Simplicity "                                                                                      \
+    "Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/protocol/zigbee/app/framework/plugin/network-steering/"       \
+    "network-steering.h"
 
 // API nvm3 from NVM3 Library plugin
-#define EMBER_AF_API_NVM3 "../../../../../Applications/Simplicity Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/platform/base/hal/plugin/nvm3/nvm3-token.h"
+#define EMBER_AF_API_NVM3                                                                                                          \
+    "../../../../../Applications/Simplicity "                                                                                      \
+    "Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/platform/base/hal/plugin/nvm3/nvm3-token.h"
 
 // API rail-library from RAIL Library plugin
-#define EMBER_AF_API_RAIL_LIBRARY "../../../../../Applications/Simplicity Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/platform/radio/rail_lib/common/rail.h"
+#define EMBER_AF_API_RAIL_LIBRARY                                                                                                  \
+    "../../../../../Applications/Simplicity "                                                                                      \
+    "Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/platform/radio/rail_lib/common/rail.h"
 
 // API scan-dispatch from Scan Dispatch plugin
-#define EMBER_AF_API_SCAN_DISPATCH "../../../../../Applications/Simplicity Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/protocol/zigbee/app/framework/plugin/scan-dispatch/scan-dispatch.h"
+#define EMBER_AF_API_SCAN_DISPATCH                                                                                                 \
+    "../../../../../Applications/Simplicity "                                                                                      \
+    "Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/protocol/zigbee/app/framework/plugin/scan-dispatch/"          \
+    "scan-dispatch.h"
 
 // API serial from Serial plugin
-#define EMBER_AF_API_SERIAL "../../../../../Applications/Simplicity Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/platform/base/hal/plugin/serial/serial.h"
+#define EMBER_AF_API_SERIAL                                                                                                        \
+    "../../../../../Applications/Simplicity "                                                                                      \
+    "Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/platform/base/hal/plugin/serial/serial.h"
 
 // API update-tc-link-key from Update TC Link Key plugin
-#define EMBER_AF_API_UPDATE_TC_LINK_KEY "../../../../../Applications/Simplicity Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/protocol/zigbee/app/framework/plugin/update-tc-link-key/update-tc-link-key.h"
+#define EMBER_AF_API_UPDATE_TC_LINK_KEY                                                                                            \
+    "../../../../../Applications/Simplicity "                                                                                      \
+    "Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/protocol/zigbee/app/framework/plugin/update-tc-link-key/"     \
+    "update-tc-link-key.h"
 
 // API command-interpreter2 from ZCL Framework Core plugin
-#define EMBER_AF_API_COMMAND_INTERPRETER2 "../../../../../Applications/Simplicity Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/protocol/zigbee/app/util/serial/command-interpreter2.h"
-
+#define EMBER_AF_API_COMMAND_INTERPRETER2                                                                                          \
+    "../../../../../Applications/Simplicity "                                                                                      \
+    "Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/protocol/zigbee/app/util/serial/command-interpreter2.h"
 
 // Custom macros
 #ifdef TRANSITION_TIME_DS
@@ -263,7 +278,5 @@
 #undef FINDING_AND_BINDING_DELAY_MS
 #endif
 #define FINDING_AND_BINDING_DELAY_MS 3000
-
-
 
 #endif // SILABS_ZNET_CONFIG

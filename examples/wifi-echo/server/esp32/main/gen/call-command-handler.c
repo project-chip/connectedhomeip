@@ -38,17 +38,15 @@
 // This is a set of generated functions that parse the
 // the incomming message, and call appropriate command handler.
 
-
-
 // #include PLATFORM_HEADER
 #ifdef EZSP_HOST
 // Includes needed for ember related functions for the EZSP host
-#include "stack/include/error.h"
-#include "stack/include/ember-types.h"
 #include "app/util/ezsp/ezsp-protocol.h"
-#include "app/util/ezsp/ezsp.h"
 #include "app/util/ezsp/ezsp-utils.h"
+#include "app/util/ezsp/ezsp.h"
 #include "app/util/ezsp/serial-interface.h"
+#include "stack/include/ember-types.h"
+#include "stack/include/error.h"
 #else
 // Includes needed for ember related functions for the EM250
 // #include "stack/include/ember.h"
@@ -59,81 +57,87 @@
 #include "../util.h"
 #include "af-structs.h"
 #include "call-command-handler.h"
-#include "command-id.h"
 #include "callback.h"
+#include "command-id.h"
 
 static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecific)
 {
-  if (wasHandled) {
-    return EMBER_ZCL_STATUS_SUCCESS;
-  } else if (mfgSpecific) {
-    return EMBER_ZCL_STATUS_UNSUP_MANUF_CLUSTER_COMMAND;
-  } else if (clusterExists) {
-    return EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND;
-  } else {
-    return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
-  }
+    if (wasHandled)
+    {
+        return EMBER_ZCL_STATUS_SUCCESS;
+    }
+    else if (mfgSpecific)
+    {
+        return EMBER_ZCL_STATUS_UNSUP_MANUF_CLUSTER_COMMAND;
+    }
+    else if (clusterExists)
+    {
+        return EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND;
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
+    }
 }
 
 // Main command parsing controller.
-EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand *cmd)
+EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
 {
-  EmberAfStatus result = status(false, false, cmd->mfgSpecific);
-  if (cmd->direction == (uint8_t)ZCL_DIRECTION_SERVER_TO_CLIENT
-      && emberAfContainsClientWithMfgCode(cmd->apsFrame->destinationEndpoint,
-                               cmd->apsFrame->clusterId,
-                               cmd->mfgCode)) {
-    switch (cmd->apsFrame->clusterId) {
-    default:
-      // Unrecognized cluster ID, error status will apply.
-      break;
+    EmberAfStatus result = status(false, false, cmd->mfgSpecific);
+    if (cmd->direction == (uint8_t) ZCL_DIRECTION_SERVER_TO_CLIENT &&
+        emberAfContainsClientWithMfgCode(cmd->apsFrame->destinationEndpoint, cmd->apsFrame->clusterId, cmd->mfgCode))
+    {
+        switch (cmd->apsFrame->clusterId)
+        {
+        default:
+            // Unrecognized cluster ID, error status will apply.
+            break;
+        }
     }
-  } else if (cmd->direction == (uint8_t)ZCL_DIRECTION_CLIENT_TO_SERVER
-             && emberAfContainsServerWithMfgCode(cmd->apsFrame->destinationEndpoint,
-                                       cmd->apsFrame->clusterId,
-                                       cmd->mfgCode)) {
-    switch (cmd->apsFrame->clusterId) {
-    case ZCL_ON_OFF_CLUSTER_ID:
-      result = emberAfOnOffClusterServerCommandParse(cmd);
-      break;
-    default:
-      // Unrecognized cluster ID, error status will apply.
-      break;
+    else if (cmd->direction == (uint8_t) ZCL_DIRECTION_CLIENT_TO_SERVER &&
+             emberAfContainsServerWithMfgCode(cmd->apsFrame->destinationEndpoint, cmd->apsFrame->clusterId, cmd->mfgCode))
+    {
+        switch (cmd->apsFrame->clusterId)
+        {
+        case ZCL_ON_OFF_CLUSTER_ID:
+            result = emberAfOnOffClusterServerCommandParse(cmd);
+            break;
+        default:
+            // Unrecognized cluster ID, error status will apply.
+            break;
+        }
     }
-  }
-  return result;
+    return result;
 }
 
 // Cluster: On/off, server
-EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand *cmd)
+EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd)
 {
-  bool wasHandled = false;
-  if (!cmd->mfgSpecific) {
-    switch (cmd->commandId) {
-    case ZCL_OFF_COMMAND_ID:
-      {
-        // Command is fixed length: 0
-        wasHandled = emberAfOnOffClusterOffCallback();
-        break;
-      }
-    case ZCL_ON_COMMAND_ID:
-      {
-        // Command is fixed length: 0
-        wasHandled = emberAfOnOffClusterOnCallback();
-        break;
-      }
-    case ZCL_TOGGLE_COMMAND_ID:
-      {
-        // Command is fixed length: 0
-        wasHandled = emberAfOnOffClusterToggleCallback();
-        break;
-      }
-    default:
-      {
-        // Unrecognized command ID, error status will apply.
-        break;
-      }
+    bool wasHandled = false;
+    if (!cmd->mfgSpecific)
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_OFF_COMMAND_ID: {
+            // Command is fixed length: 0
+            wasHandled = emberAfOnOffClusterOffCallback();
+            break;
+        }
+        case ZCL_ON_COMMAND_ID: {
+            // Command is fixed length: 0
+            wasHandled = emberAfOnOffClusterOnCallback();
+            break;
+        }
+        case ZCL_TOGGLE_COMMAND_ID: {
+            // Command is fixed length: 0
+            wasHandled = emberAfOnOffClusterToggleCallback();
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
     }
-  }
-  return status(wasHandled, true, cmd->mfgSpecific);
+    return status(wasHandled, true, cmd->mfgSpecific);
 }

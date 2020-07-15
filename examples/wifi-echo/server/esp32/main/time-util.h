@@ -31,20 +31,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
+/***************************************************************************/
+/**
  * @file
  * @brief
  *******************************************************************************
-   ******************************************************************************/
+ ******************************************************************************/
 
 #ifndef __TIME_UTIL_H__
 #define __TIME_UTIL_H__
 
 #define SECONDS_IN_MINUTE 60
 #define SECONDS_IN_HOUR 3600
-#define SECONDS_IN_DAY   (SECONDS_IN_MINUTE * 60 * 24)
-#define SECONDS_IN_WEEK  (SECONDS_IN_DAY * 7)
-#define DURATION_FOREVER_U32  0xFFFFFFFFU
+#define SECONDS_IN_DAY (SECONDS_IN_MINUTE * 60 * 24)
+#define SECONDS_IN_WEEK (SECONDS_IN_DAY * 7)
+#define DURATION_FOREVER_U32 0xFFFFFFFFU
 
 /**
  * @brief ZCL Date comparison function.
@@ -54,12 +55,12 @@
  *          0, if they are the same
  *          1, if val2 is smaller
  */
-int8_t emberAfCompareDates(EmberAfDate* date1, EmberAfDate* date2);
+int8_t emberAfCompareDates(EmberAfDate * date1, EmberAfDate * date2);
 
 /**
  * @brief function that copies a ZigBee Date into a buffer
  */
-void emberAfCopyDate(uint8_t *data, uint16_t index, EmberAfDate *src);
+void emberAfCopyDate(uint8_t * data, uint16_t index, EmberAfDate * src);
 
 /**
  * @brief Decode the given uint32_t into a ZCL Date object where
@@ -71,32 +72,31 @@ void emberAfCopyDate(uint8_t *data, uint16_t index, EmberAfDate *src);
  * (0x000000FF & value) = day of week
  *
  */
-void emberAfDecodeDate(uint32_t src, EmberAfDate* dest);
+void emberAfDecodeDate(uint32_t src, EmberAfDate * dest);
 
 /**
  * @brief Encode and return the given ZCL Date object as an uint32_t.
  * Refer to emberAFDecodeDate for details on how the information is stored
  * within an uint32_t.
  */
-uint32_t emberAfEncodeDate(EmberAfDate* date);
+uint32_t emberAfEncodeDate(EmberAfDate * date);
 
 /**
  * @brief Fills the a time structure based on the passed UTC time.
  *
  */
-void emberAfFillTimeStructFromUtc(uint32_t utcTime,
-                                  EmberAfTimeStruct* returnTime);
+void emberAfFillTimeStructFromUtc(uint32_t utcTime, EmberAfTimeStruct * returnTime);
 /**
  * @brief Returns the number of days in the month specified in the EmberAfTimeStruct.
  *
  */
-uint8_t emberAfGetNumberDaysInMonth(EmberAfTimeStruct *time);
+uint8_t emberAfGetNumberDaysInMonth(EmberAfTimeStruct * time);
 
 /**
  * @brief Calculate a UTC time from the passed time structure.
  *
  */
-uint32_t emberAfGetUtcFromTimeStruct(EmberAfTimeStruct *time);
+uint32_t emberAfGetUtcFromTimeStruct(EmberAfTimeStruct * time);
 
 /**
  * @brief Determine the week day (Monday=0 ... Sunday=6) based on

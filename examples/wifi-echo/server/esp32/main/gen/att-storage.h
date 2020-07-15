@@ -39,8 +39,6 @@
 #ifndef SILABS_ATTRIBUTE_STORAGE_GEN
 #define SILABS_ATTRIBUTE_STORAGE_GEN
 
-
-
 // Attribute masks modify how attributes are used by the framework
 // Attribute that has this mask is NOT read-only
 #define ATTRIBUTE_MASK_WRITABLE (0x01)
@@ -56,7 +54,6 @@
 #define ATTRIBUTE_MASK_SINGLETON (0x20)
 // Attribute is a client attribute
 #define ATTRIBUTE_MASK_CLIENT (0x40)
-
 
 // Cluster masks modify how clusters are used by the framework
 // Does this cluster have init function?
@@ -75,7 +72,6 @@
 #define CLUSTER_MASK_SERVER (0x40)
 // Cluster is a client
 #define CLUSTER_MASK_CLIENT (0x80)
-
 
 // Command masks modify meanings of commands
 // Is sending of this client command supported
