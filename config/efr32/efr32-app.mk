@@ -122,7 +122,8 @@ EXTRA_SRCS += \
     $(EFR32_SDK_ROOT)/util/third_party/segger/systemview/SEGGER/SEGGER_RTT.c
 
 STD_INC_DIRS += \
-    $(CHIP_ROOT)/src/include/platform/EFR32                                                 \
+    $(CHIP_ROOT)/src/include/platform                                                       \
+    $(CHIP_ROOT)/src/platform/EFR32                                                         \
     $(FREERTOS_ROOT)/Source/include                                                         \
     $(FREERTOS_ROOT)/Source/portable/GCC/ARM_CM3                                            \
     $(EFR32_SDK_ROOT)                                                                       \
@@ -252,13 +253,15 @@ ifeq ($(EFR32FAMILY), efr32mg12)
 STD_LIBS += \
     $(EFR32_SDK_ROOT)/protocol/bluetooth/lib/EFR32MG12P/GCC/libbluetooth.a \
     $(EFR32_SDK_ROOT)/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg12_gcc_release.a \
-    $(EFR32_SDK_ROOT)/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a
+    $(EFR32_SDK_ROOT)/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a \
+    $(EFR32_SDK_ROOT)/protocol/bluetooth/lib/EFR32MG12P/GCC/libmbedtls.a
 else
 ifeq ($(EFR32FAMILY), efr32mg21)
 STD_LIBS += \
     $(EFR32_SDK_ROOT)/protocol/bluetooth/lib/EFR32MG21/GCC/libbluetooth.a \
     $(EFR32_SDK_ROOT)/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg21_gcc_release.a \
-    $(EFR32_SDK_ROOT)/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a
+    $(EFR32_SDK_ROOT)/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a \
+    $(EFR32_SDK_ROOT)/protocol/bluetooth/lib/EFR32MG21/GCC/libmbedtls.a
 endif
 endif
 
