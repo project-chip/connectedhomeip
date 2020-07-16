@@ -28,7 +28,7 @@
 
 using namespace chip;
 
-static uint32_t shortPayloadRepresentation(SetupPayload payload)
+static uint32_t shortPayloadRepresentation(const SetupPayload & payload)
 {
     int offset      = 1;
     uint32_t result = payload.requiresCustomFlow ? 1 : 0;

@@ -43,7 +43,7 @@ private:
     SetupPayload mPayload;
 
 public:
-    QRCodeSetupPayloadGenerator(SetupPayload setupPayload) : mPayload(setupPayload){};
+    QRCodeSetupPayloadGenerator(const SetupPayload & setupPayload) : mPayload(setupPayload){};
 
     /**
      * This function is called to encode the binary data of a payload to a
