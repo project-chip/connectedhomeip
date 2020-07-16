@@ -68,7 +68,6 @@ bool ConfigurationManagerImpl::_CanFactoryReset()
 
 void ConfigurationManagerImpl::_InitiateFactoryReset()
 {
-    PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
@@ -87,70 +86,6 @@ CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platfor
 {
     PosixConfig::Key configKey{ kConfigNamespace_ChipCounters, key };
     return WriteConfigValue(configKey, value);
-}
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-CHIP_ERROR ConfigurationManagerImpl::GetWiFiStationSecurityType(Profiles::NetworkProvisioning::WiFiSecurityType & secType)
-{
-    CHIP_ERROR err;
-    uint32_t secTypeInt;
-
-    err = ReadConfigValue(kConfigKey_WiFiStationSecType, secTypeInt);
-    if (err == CHIP_NO_ERROR)
-    {
-        secType = (Profiles::NetworkProvisioning::WiFiSecurityType) secTypeInt;
-    }
-    return err;
-}
-
-CHIP_ERROR ConfigurationManagerImpl::UpdateWiFiStationSecurityType(Profiles::NetworkProvisioning::WiFiSecurityType secType)
-{
-    CHIP_ERROR err;
-    Profiles::NetworkProvisioning::WiFiSecurityType curSecType;
-
-    if (secType != Profiles::NetworkProvisioning::kWiFiSecurityType_NotSpecified)
-    {
-        err = GetWiFiStationSecurityType(curSecType);
-        if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || (err == CHIP_NO_ERROR && secType != curSecType))
-        {
-            uint32_t secTypeInt = secType;
-            err                 = WriteConfigValue(kConfigKey_WiFiStationSecType, secTypeInt);
-        }
-        SuccessOrExit(err);
-    }
-    else
-    {
-        err = ClearConfigValue(kConfigKey_WiFiStationSecType);
-        SuccessOrExit(err);
-    }
-
-exit:
-    return err;
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-
-void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
-{
-    CHIP_ERROR err;
-
-    ChipLogProgress(DeviceLayer, "Performing factory reset");
-
-    err = FactoryResetConfig();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));
-    }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
-    ChipLogProgress(DeviceLayer, "Clearing Thread provision");
-    ThreadStackMgr().ErasePersistentInfo();
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
-    // Restart the system.
-    ChipLogProgress(DeviceLayer, "System restarting (not implemented)");
-    // TODO(#742): restart CHIP exe
 }
 
 } // namespace DeviceLayer
