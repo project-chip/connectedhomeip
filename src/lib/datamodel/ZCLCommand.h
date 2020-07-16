@@ -99,7 +99,7 @@ public:
         {
             chipZclCodecEncode(&mCodec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(mMfgCode), sizeof(mMfgCode));
         }
-        
+
     }
 
     void EndEncode(void)
