@@ -154,7 +154,7 @@ public:
     bool HaveServiceConnectivity(void);
 
     // CHIPoBLE service methods
-    typedef void (*BleConnectionReceivedFunct)(BLEEndPoint * endpoint);
+    typedef void (*BleConnectionReceivedFunct)(Ble::BLEEndPoint * endpoint);
     void AddCHIPoBLEConnectionHandler(BleConnectionReceivedFunct handler);
     void RemoveCHIPoBLEConnectionHandler(void);
     CHIPoBLEServiceMode GetCHIPoBLEServiceMode(void);
