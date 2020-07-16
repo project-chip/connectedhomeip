@@ -20,6 +20,7 @@
 #if CHIP_ENABLE_OPENTHREAD
 
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/ThreadStackManager.h>
 #include <shell/shell.h>
 #include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
