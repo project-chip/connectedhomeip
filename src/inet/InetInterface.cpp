@@ -1032,7 +1032,7 @@ uint8_t NetmaskToPrefixLength(const uint8_t * netmask, uint16_t netmaskLen)
 {
     uint8_t prefixLen = 0;
 
-    for (uint8_t i = 0; i < netmaskLen; i++, prefixLen += 8)
+    for (uint16_t i = 0; i < netmaskLen; i++, prefixLen += 8)
     {
         uint8_t b = netmask[i];
         if (b != 0xFF)
