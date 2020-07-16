@@ -279,7 +279,7 @@ static void TestConfigurationMgr_PairingCode(nlTestSuite * inSuite, void * inCon
 
     char buf[64];
     size_t pairingCodeLen    = 0;
-    const char * pairingCode = "16CB664A86A888D";
+    const char * pairingCode = "016CB664A86A888D";
 
     err = ConfigurationMgr().StorePairingCode(pairingCode, strlen(pairingCode));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -288,7 +288,7 @@ static void TestConfigurationMgr_PairingCode(nlTestSuite * inSuite, void * inCon
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, pairingCodeLen == strlen(pairingCode));
-    NL_TEST_ASSERT(inSuite, strcmp(buf, "16CB664A86A888D") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(buf, "016CB664A86A888D") == 0);
 }
 
 static void TestConfigurationMgr_PairedAccountId(nlTestSuite * inSuite, void * inContext)
