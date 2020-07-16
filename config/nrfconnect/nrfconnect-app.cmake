@@ -36,6 +36,11 @@
 #   target_sources(app PRIVATE main/main.cpp ...)
 #
 
+# Set DTC overlay before finding the Zephyr package.
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/dts.overlay")
+    set(DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/dts.overlay")
+endif()
+
 # ==================================================
 # Load NCS/Zephyr build system
 # ==================================================
@@ -46,7 +51,7 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 # ==================================================
 
 # Archtecture for which CHIP will be built.
-set(CHIP_HOST_ARCH armv7-unknown-linux-gnu)
+set(CHIP_HOST_ARCH arm-none-eabi)
 
 # Directory into which the CHIP build system will place its output.
 set(CHIP_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/chip")
