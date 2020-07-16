@@ -80,7 +80,9 @@ private:
 
     friend class PlatformManagerImpl;
     friend class ConfigurationManagerImpl;
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     friend class Internal::BLEManagerImpl;
+#endif
     friend class Internal::DeviceControlServer;
     template <class>
     friend class Internal::GenericPlatformManagerImpl;
