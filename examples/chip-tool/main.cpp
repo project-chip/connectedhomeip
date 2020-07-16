@@ -30,13 +30,13 @@
 #include <unistd.h>
 
 #include <core/CHIPError.h>
+#include <datamodel/ClusterOnOff.h>
+#include <datamodel/ZCLCommand.h>
 #include <inet/InetLayer.h>
 #include <inet/UDPEndPoint.h>
 #include <support/CHIPLogging.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
-#include <datamodel/ClusterOnOff.h>
-#include <datamodel/ZCLCommand.h>
 
 #include <controller/CHIPDeviceController.h>
 
@@ -274,32 +274,23 @@ public:
     /* The endpointId that is bound to this client */
     uint16_t mEndpointId;
 
-    CHIP_ERROR GenerateCommand(Command *cmd, uint16_t mCmdId)
+    CHIP_ERROR GenerateCommand(Command * cmd, uint16_t mCmdId)
     {
-        cmd->mType = kCmdTypeCluster;
-        cmd->mId = mCmdId;
+        cmd->mType       = kCmdTypeCluster;
+        cmd->mId         = mCmdId;
         cmd->mEndpointId = mEndpointId;
-        cmd->mDirection = kCmdDirectionClientToServer;
-        cmd->mClusterId = kClusterIdOnOff;
+        cmd->mDirection  = kCmdDirectionClientToServer;
+        cmd->mClusterId  = kClusterIdOnOff;
 
         cmd->StartEncode();
         cmd->EndEncode();
     }
 
-    void On(Command * cmd)
-    {
-        GenerateCommand(cmd, kOnOffCmdIdOn);
-    }
+    void On(Command * cmd) { GenerateCommand(cmd, kOnOffCmdIdOn); }
 
-    void Off(Command * cmd)
-    {
-        GenerateCommand(cmd, kOnOffCmdIdOff);
-    }
+    void Off(Command * cmd) { GenerateCommand(cmd, kOnOffCmdIdOff); }
 
-    void Toggle(Command * cmd)
-    {
-        GenerateCommand(cmd, kOnOffCmdIdToggle);
-    }
+    void Toggle(Command * cmd) { GenerateCommand(cmd, kOnOffCmdIdToggle); }
 
     void BindEndpoint(uint16_t endpointId) { mEndpointId = endpointId; }
 };
@@ -333,16 +324,16 @@ void DoOnOff(DeviceController::ChipDeviceController * controller, CommandIndicat
     }
 
 #ifdef DEBUG
-    const size_t data_len = chipZclBufferDataLength((ChipZclBuffer_t *)cmd.mBuffer);
+    const size_t data_len = chipZclBufferDataLength((ChipZclBuffer_t *) cmd.mBuffer);
 
     fprintf(stderr, "SENDING: %zu ", data_len);
     for (size_t i = 0; i < data_len; ++i)
     {
-        fprintf(stderr, "%d ", chipZclBufferPointer((ChipZclBuffer_t *)cmd.mBuffer)[i]);
+        fprintf(stderr, "%d ", chipZclBufferPointer((ChipZclBuffer_t *) cmd.mBuffer)[i]);
     }
     fprintf(stderr, "\n");
 #endif
-    controller->SendMessage(NULL, (System::PacketBuffer *)cmd.mBuffer);
+    controller->SendMessage(NULL, (System::PacketBuffer *) cmd.mBuffer);
     controller->ServiceEvents();
 }
 

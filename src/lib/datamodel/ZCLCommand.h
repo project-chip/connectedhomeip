@@ -45,7 +45,7 @@ public:
     ChipZclCodec_t mCodec;
     ChipZclBuffer_t * mBuffer;
 
-    ZCLCommand(System::PacketBuffer * buffer): mBuffer((ChipZclBuffer_t *)buffer) { }
+    ZCLCommand(System::PacketBuffer * buffer) : mBuffer((ChipZclBuffer_t *) buffer) {}
 
     void StartDecode(void)
     {
@@ -69,10 +69,7 @@ public:
         }
     }
 
-    void EndDecode(void)
-    {
-        chipZclCodecDecodeEnd(&mCodec);
-    }
+    void EndDecode(void) { chipZclCodecDecodeEnd(&mCodec); }
 
     void StartEncode(void)
     {
@@ -99,14 +96,9 @@ public:
         {
             chipZclCodecEncode(&mCodec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(mMfgCode), sizeof(mMfgCode));
         }
-
     }
 
-    void EndEncode(void)
-    {
-        chipZclCodecEncodeEnd(&mCodec);
-    }
-
+    void EndEncode(void) { chipZclCodecEncodeEnd(&mCodec); }
 };
 
 } // namespace DataModel

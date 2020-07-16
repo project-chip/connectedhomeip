@@ -38,10 +38,7 @@ using namespace ::chip::DataModel;
 
 static const char * TAG = "data_model_server";
 
-void InitDataModelHandler()
-{
-
-}
+void InitDataModelHandler() {}
 
 void HandleDataModelMessage(ClusterServer & server, System::PacketBuffer * buffer)
 {
@@ -57,5 +54,5 @@ void HandleDataModelMessage(ClusterServer & server, System::PacketBuffer * buffe
         ESP_LOGI(TAG, "Data model processing failure");
     }
     cmd.EndDecode();
-    System::PacketBuffer::Free((chip::System::PacketBuffer*)cmd.mBuffer);
+    System::PacketBuffer::Free((chip::System::PacketBuffer *) cmd.mBuffer);
 }

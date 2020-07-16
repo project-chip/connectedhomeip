@@ -85,7 +85,6 @@ public:
      *   End the process to encode the buffer
      */
     virtual void EndEncode(void) {}
-
 };
 
 } // namespace DataModel
