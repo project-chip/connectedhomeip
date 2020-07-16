@@ -64,10 +64,6 @@ private:
     friend ConfigurationManagerImpl & ConfigurationMgrImpl(void);
 
     static ConfigurationManagerImpl sInstance;
-
-    // ===== Private members reserved for use by this class only.
-
-    static void DoFactoryReset(intptr_t arg);
 };
 
 /**

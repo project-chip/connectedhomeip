@@ -58,7 +58,7 @@ enum InternalPlatformSpecificEventTypes
 } // namespace DeviceEventType
 
 /**
- * Represents platform-specific event information for Linux platforms.
+ * Represents platform-specific event information for Darwin platforms.
  */
 struct ChipDevicePlatformEvent final
 {
