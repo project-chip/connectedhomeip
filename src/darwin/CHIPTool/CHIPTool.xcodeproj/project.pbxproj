@@ -221,7 +221,7 @@
 		B204A614244E1D0600C7C0E1 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1140;
+				LastUpgradeCheck = 1150;
 				ORGANIZATIONNAME = CHIP;
 				TargetAttributes = {
 					B204A61B244E1D0600C7C0E1 = {
@@ -444,7 +444,6 @@
 		B204A64C244E1D0700C7C0E1 /* Debug iOS */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -468,7 +467,6 @@
 		B204A64D244E1D0700C7C0E1 /* Release iOS */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
