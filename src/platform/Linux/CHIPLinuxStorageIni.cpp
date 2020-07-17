@@ -76,7 +76,7 @@ CHIP_ERROR ChipLinuxStorageIni::AddConfig(const std::string & configFile)
     else
     {
         ChipLogError(DeviceLayer, "Failed to open config file: %s", configFile.c_str());
-        retval = CHIP_ERROR_PERSISTED_STORAGE_FAIL;
+        retval = CHIP_ERROR_OPEN_FAILED;
     }
 
     return retval;
@@ -110,13 +110,13 @@ CHIP_ERROR ChipLinuxStorageIni::CommitConfig(const std::string & configFile)
         else
         {
             ChipLogError(DeviceLayer, "failed to rename (%s), %s (%d)", tmpPath.c_str(), strerror(errno), errno);
-            retval = CHIP_ERROR_PERSISTED_STORAGE_FAIL;
+            retval = CHIP_ERROR_WRITE_FAILED;
         }
     }
     else
     {
         ChipLogError(DeviceLayer, "failed to open file (%s) for writing", tmpPath.c_str());
-        retval = CHIP_ERROR_PERSISTED_STORAGE_FAIL;
+        retval = CHIP_ERROR_OPEN_FAILED;
     }
 
     return retval;
@@ -291,7 +291,7 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobValue(const char * key, uint8_t * d
         decodedDataLen = Base64Decode(encodedData, encodedDataLen, (uint8_t *) decodedData);
         if (decodedDataLen == UINT16_MAX || decodedDataLen > expectedDecodedLen)
         {
-            retval = CHIP_ERROR_NOT_IMPLEMENTED;
+            retval = CHIP_ERROR_DECODE_FAILED;
         }
 
         if (encodedData)
