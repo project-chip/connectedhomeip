@@ -130,7 +130,9 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress 
     mSessionManager = new SecureSessionMgr<Transport::UDP>();
 
     err = mSessionManager->Init(mLocalDeviceId, &DeviceLayer::SystemLayer,
-                                Transport::UdpListenParameters(&DeviceLayer:InetLayer).SetAddressType(deviceAddr.Type()));
+                                Transport::UdpListenParameters(&DeviceLayer
+                                                               : InetLayer)
+                                    .SetAddressType(deviceAddr.Type()));
     SuccessOrExit(err);
 
     mSessionManager->SetDelegate(this);
