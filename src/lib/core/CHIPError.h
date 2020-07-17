@@ -870,13 +870,13 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
 #define CHIP_ERROR_UNSUPPORTED_CASE_CONFIGURATION              _CHIP_ERROR(85)
 
 /**
- *  @def CHIP_ERROR_CERT_LOAD_FAIL
+ *  @def CHIP_ERROR_CERT_LOAD_FAILED
  *
  *  @brief
  *    A certificate load failed.
  *
  */
-#define CHIP_ERROR_CERT_LOAD_FAIL                              _CHIP_ERROR(86)
+#define CHIP_ERROR_CERT_LOAD_FAILED                             _CHIP_ERROR(86)
 
 /**
  *  @def CHIP_ERROR_CERT_NOT_TRUSTED
@@ -1531,7 +1531,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *   the required elements, or it contais both the MergeData element
  *   and DeletedDictionaryKeyList.
  */
-#define CHIP_ERROR_MALFORMED_DATA_ELEMENT                  _CHIP_ERROR(158)
+#define CHIP_ERROR_MALFORMED_DATA_ELEMENT                       _CHIP_ERROR(158)
 
 /**
  * @def CHIP_ERROR_WRONG_CERT_TYPE
@@ -1539,7 +1539,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  * @brief
  *   The presented certificate was of the wrong type.
  */
-#define CHIP_ERROR_WRONG_CERT_TYPE                             _CHIP_ERROR(159)
+#define CHIP_ERROR_WRONG_CERT_TYPE                              _CHIP_ERROR(159)
 
 /**
  * @def CHIP_ERROR_DEFAULT_EVENT_HANDLER_NOT_CALLED
@@ -1551,13 +1551,13 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
 #define CHIP_ERROR_DEFAULT_EVENT_HANDLER_NOT_CALLED            _CHIP_ERROR(162)
 
 /**
- *  @def CHIP_ERROR_PERSISTED_STORAGE_FAIL
+ *  @def CHIP_ERROR_PERSISTED_STORAGE_FAILED
  *
  *  @brief
  *    Persisted storage memory read/write failure.
  *
  */
-#define CHIP_ERROR_PERSISTED_STORAGE_FAIL                      _CHIP_ERROR(163)
+#define CHIP_ERROR_PERSISTED_STORAGE_FAILED                     _CHIP_ERROR(163)
 
 /**
  *  @def CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND
@@ -1668,7 +1668,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    same Trait Instance.
  *
  */
-#define CHIP_ERROR_INCONSISTENT_CONDITIONALITY              _CHIP_ERROR(179)
+#define CHIP_ERROR_INCONSISTENT_CONDITIONALITY                  _CHIP_ERROR(179)
 
 /**
  *  @def CHIP_ERROR_LOCAL_DATA_INCONSISTENT
@@ -1678,7 +1678,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    Trait Instance and cannot support the operation requested.
  *
  */
-#define CHIP_ERROR_LOCAL_DATA_INCONSISTENT                  _CHIP_ERROR(180)
+#define CHIP_ERROR_LOCAL_DATA_INCONSISTENT                      _CHIP_ERROR(180)
 
 /**
  * @def CHIP_EVENT_ID_FOUND
@@ -1695,6 +1695,38 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *   Internal error
  */
 #define CHIP_ERROR_INTERNAL                                     _CHIP_ERROR(183)
+
+/**
+ * @def CHIP_ERROR_OPEN_FAILED
+ *
+ * @brief
+ *   Open file failed
+ */
+#define CHIP_ERROR_OPEN_FAILED                                  _CHIP_ERROR(184)
+
+/**
+ * @def CHIP_ERROR_READ_FAILED
+ *
+ * @brief
+ *   Read from file failed
+ */
+#define CHIP_ERROR_READ_FAILED                                  _CHIP_ERROR(185)
+
+/**
+ * @def CHIP_ERROR_WRITE_FAILED
+ *
+ * @brief
+ *   Write to file failed
+ */
+#define CHIP_ERROR_WRITE_FAILED                                 _CHIP_ERROR(186)
+
+/**
+ * @def CHIP_ERROR_DECODE_FAILED
+ *
+ * @brief
+ *   Decoding failed
+ */
+#define CHIP_ERROR_DECODE_FAILED                                _CHIP_ERROR(187)
 
 /**
  *  @}

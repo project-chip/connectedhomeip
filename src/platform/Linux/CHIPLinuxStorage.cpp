@@ -281,7 +281,7 @@ CHIP_ERROR ChipLinuxStorage::ClearAll(void)
     }
     else
     {
-        retval = CHIP_ERROR_PERSISTED_STORAGE_FAIL;
+        retval = CHIP_ERROR_WRITE_FAILED;
     }
 
     return retval;
@@ -314,7 +314,7 @@ CHIP_ERROR ChipLinuxStorage::Commit(void)
     }
     else
     {
-        retval = CHIP_ERROR_PERSISTED_STORAGE_FAIL;
+        retval = CHIP_ERROR_WRITE_FAILED;
     }
 
     return retval;

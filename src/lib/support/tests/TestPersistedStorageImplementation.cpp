@@ -75,14 +75,14 @@ static CHIP_ERROR GetCounterValueFromFile(const char * aKey, uint32_t & aValue)
         {
             if (fgets(value, sizeof(value), sPersistentStoreFile) == NULL)
             {
-                err = CHIP_ERROR_PERSISTED_STORAGE_FAIL;
+                err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
             }
             else
             {
                 RemoveEndOfLineSymbol(value);
 
                 if (!ParseInt(value, aValue, 0))
-                    err = CHIP_ERROR_PERSISTED_STORAGE_FAIL;
+                    err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
             }
 
             ExitNow();
@@ -115,7 +115,7 @@ static CHIP_ERROR SaveCounterValueToFile(const char * aKey, uint32_t aValue)
         if (strcmp(key, aKey) == 0)
         {
             res = fputs(value, sPersistentStoreFile);
-            VerifyOrExit(res != EOF, err = CHIP_ERROR_PERSISTED_STORAGE_FAIL);
+            VerifyOrExit(res != EOF, err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
             ExitNow();
         }
@@ -124,13 +124,13 @@ static CHIP_ERROR SaveCounterValueToFile(const char * aKey, uint32_t aValue)
     // If value not found in the file then write the counter key and
     // the counter value to the end of the file.
     res = fputs(aKey, sPersistentStoreFile);
-    VerifyOrExit(res != EOF, err = CHIP_ERROR_PERSISTED_STORAGE_FAIL);
+    VerifyOrExit(res != EOF, err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
     res = fputs("\n", sPersistentStoreFile);
-    VerifyOrExit(res != EOF, err = CHIP_ERROR_PERSISTED_STORAGE_FAIL);
+    VerifyOrExit(res != EOF, err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
     res = fputs(value, sPersistentStoreFile);
-    VerifyOrExit(res != EOF, err = CHIP_ERROR_PERSISTED_STORAGE_FAIL);
+    VerifyOrExit(res != EOF, err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
 exit:
     fflush(sPersistentStoreFile);
@@ -155,7 +155,7 @@ CHIP_ERROR Read(const char * aKey, uint32_t & aValue)
         VerifyOrExit(it != sPersistentStore.end(), err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
         size_t aValueLength = Base64Decode(it->second.c_str(), strlen(it->second.c_str()), (uint8_t *) &aValue);
-        VerifyOrExit(aValueLength == sizeof(uint32_t), err = CHIP_ERROR_PERSISTED_STORAGE_FAIL);
+        VerifyOrExit(aValueLength == sizeof(uint32_t), err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
     }
 
 exit:
