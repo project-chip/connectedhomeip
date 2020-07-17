@@ -26,6 +26,7 @@ chip_test_suite("tests") {
     "TestSystemObject.cpp",
     "TestSystemPacketBuffer.cpp",
     "TestSystemTimer.cpp",
+    "TestSystemWakeEvent.cpp",
     "TestTimeSource.cpp",
   ]
 
@@ -40,6 +41,7 @@ chip_test_suite("tests") {
     "TestSystemObject",
     "TestSystemPacketBuffer",
     "TestSystemTimer",
+    "TestSystemWakeEvent",
     "TestTimeSource",
   ]
 }
