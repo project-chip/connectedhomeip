@@ -1106,6 +1106,11 @@ if test "${CONFIG_DEVICE_LAYER}" = 1; then
                        [Path to CHIP Device Layer platform config header file])
 fi
 
+if test ${CHIP_DEVICE_LAYER_TARGET_DARWIN} = 1 && test ${CONFIG_NETWORK_LAYER_BLE} = 1; then
+    AC_CHECK_HEADER([CoreBluetooth/CoreBluetooth.h])
+    LDFLAGS="${LDFLAGS} -framework Foundation -framework CoreBluetooth"
+fi
+
 #
 # CHIP target network stack(s)
 #

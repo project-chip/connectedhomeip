@@ -70,6 +70,10 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/include/platform/internal/GenericSoftwareUpdateManagerImpl.ipp \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp \
+    @top_srcdir@/src/platform/Darwin/BleApplicationDelegate.h \
+    @top_srcdir@/src/platform/Darwin/BleConnectionDelegate.h \
+    @top_srcdir@/src/platform/Darwin/BlePlatformDelegate.h \
+    @top_srcdir@/src/platform/Darwin/BLEManagerImpl.h \
     @top_srcdir@/src/platform/Darwin/BlePlatformConfig.h \
     @top_srcdir@/src/platform/Darwin/CHIPDevicePlatformConfig.h \
     @top_srcdir@/src/platform/Darwin/CHIPDevicePlatformEvent.h \
@@ -160,6 +164,10 @@ libDeviceLayer_a_CPPFLAGS              += \
     $(NULL)
 
 libDeviceLayer_a_SOURCES               += \
+    Darwin/BleApplicationDelegateImpl.mm  \
+    Darwin/BleConnectionDelegateImpl.mm   \
+    Darwin/BlePlatformDelegateImpl.mm     \
+    Darwin/BLEManagerImpl.cpp             \
     Darwin/ConfigurationManagerImpl.cpp   \
     Darwin/ConnectivityManagerImpl.cpp    \
     Darwin/PlatformManagerImpl.cpp        \
