@@ -95,7 +95,7 @@ CHIP_CONFIGURE_OPTIONS = \
     --exec-prefix=$(CHIP_OUTPUT_DIR) \
     --host=$(CHIP_HOST_ARCH) \
     --build=$(CHIP_BUILD_ARCH) \
-    --with-network-layer=inet \
+    --with-network-layer=all \
     --with-target-network=sockets \
     --with-inet-endpoint="tcp udp" \
     --disable-tests \
