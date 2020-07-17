@@ -966,11 +966,11 @@ AC_DEFINE_UNQUOTED([CONFIG_NETWORK_LAYER_INET],[${CONFIG_NETWORK_LAYER_INET}],[D
 AC_MSG_CHECKING([device layer])
 AC_ARG_WITH(device-layer,
     [AS_HELP_STRING([--with-device-layer=LAYER],
-        [Specify the target environment for the CHIP Device Layer.  Choose one of: darwin, efr32, esp32, nrf5, linux, or none @<:@default=none@:>@.])],
+        [Specify the target environment for the CHIP Device Layer.  Choose one of: auto, darwin, efr32, esp32, nrf5, linux, or none @<:@default=auto@:>@.])],
     [
         case "${with_device_layer}" in
 
-        darwin|efr32|esp32|nrf5|linux|none)
+        auto|darwin|efr32|esp32|nrf5|linux|none)
             ;;
 
         *)
@@ -979,7 +979,7 @@ AC_ARG_WITH(device-layer,
 
         esac
     ],
-    [with_device_layer=none])
+    [with_device_layer=auto])
 AC_MSG_RESULT(${with_device_layer})
 
 # Disable all device layer targets by default
@@ -988,6 +988,24 @@ CHIP_DEVICE_LAYER_TARGET_EFR32=0
 CHIP_DEVICE_LAYER_TARGET_ESP32=0
 CHIP_DEVICE_LAYER_TARGET_NRF5=0
 CHIP_DEVICE_LAYER_TARGET_LINUX=0
+
+if test "${with_device_layer}" = "auto"; then
+    case ${target_os} in
+
+	*darwin*)
+            with_device_layer=darwin
+	    ;;
+
+	*linux*)
+            with_device_layer=linux
+	    ;;
+
+	*)
+            with_device_layer=none
+	    ;;
+
+    esac
+fi
 
 case "${with_device_layer}" in
 
