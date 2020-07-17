@@ -47,6 +47,7 @@ libSystemLayerTests_a_SOURCES                         = \
     TestSystemObject.cpp                                \
     TestSystemPacketBuffer.cpp                          \
     TestSystemTimer.cpp                                 \
+    TestSystemWakeEvent.cpp                             \
     TestTimeSource.cpp                                  \
     $(NULL)
 
@@ -119,6 +120,7 @@ check_PROGRAMS                                       += \
     TestSystemObject                                    \
     TestSystemPacketBuffer                              \
     TestSystemTimer                                     \
+    TestSystemWakeEvent                                 \
     TestTimeSource                                      \
     $(NULL)
 
@@ -145,6 +147,9 @@ TestSystemPacketBuffer_LDADD                          = $(COMMON_LDADD)
 
 TestSystemTimer_SOURCES                               = TestSystemTimerDriver.cpp
 TestSystemTimer_LDADD                                 = $(COMMON_LDADD)
+
+TestSystemWakeEvent_SOURCES                           = TestSystemWakeEventDriver.cpp
+TestSystemWakeEvent_LDADD                             = $(COMMON_LDADD)
 
 TestTimeSource_SOURCES                               = TestTimeSourceDriver.cpp
 TestTimeSource_LDADD                                 = $(COMMON_LDADD)
