@@ -21,8 +21,8 @@
  *      reasons have not (yet) been implemented or exposed in Zephyr.
  */
 
-#ifndef INET_ZEPHYR_SOCKET_HACKS_H
-#define INET_ZEPHYR_SOCKET_HACKS_H
+#ifndef INET_ZEPHYR_SOCKET_H
+#define INET_ZEPHYR_SOCKET_H
 
 #include <sys/socket.h>
 
@@ -38,12 +38,13 @@ static inline ssize_t sendmsg(int sock, const struct msghdr * msg, int flags)
 
 static inline ssize_t recvmsg(int sock, struct msghdr * msg, int flags)
 {
-    // Zephyr doesn't implement recvmsg at all, but if the message vector size is 1 we can simply
-    // translate recvmsg to recvfrom (although we don't get destination interface info in such a case).
+    // Zephyr doesn't implement recvmsg at all, but if the message vector size is > 0 we can simply
+    // translate recvmsg to recvfrom which fills only the first of the provided buffers (although
+    // we don't get control messages in such a case).
 
-    if (msg->msg_iovlen != 1)
+    if (msg->msg_iovlen < 1)
     {
-        errno = EINVAL;
+        errno = EMSGSIZE;
         return -1;
     }
 
@@ -56,4 +57,4 @@ static inline ssize_t recvmsg(int sock, struct msghdr * msg, int flags)
     return ret;
 }
 
-#endif // INET_ZEPHYR_SOCKET_HACKS_H
+#endif // INET_ZEPHYR_SOCKET_H

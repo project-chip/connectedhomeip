@@ -54,9 +54,9 @@
 #include <unistd.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_HACKS
-#include "ZephyrSocketHacks.h"
-#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_HACKS
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
+#include "ZephyrSocket.h"
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
 
 #include "arpa-inet-compatibility.h"
 
