@@ -225,7 +225,6 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_UNKNOWN_TOPIC:
         desc = "Unknown Topic";
         break;
-
     case CHIP_ERROR_TIMEOUT:
         desc = "Timeout";
         break;
@@ -283,7 +282,6 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_UNSUPPORTED_AUTH_MODE:
         desc = "Unsupported authentication mode";
         break;
-
     case CHIP_ERROR_INVALID_SERVICE_EP:
         desc = "Invalid service endpoint";
         break;
@@ -305,7 +303,6 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_NO_SW_UPDATE_AVAILABLE:
         desc = "No SW update available";
         break;
-
     case CHIP_ERROR_CA_CERT_NOT_FOUND:
         desc = "CA certificate not found";
         break;
@@ -342,7 +339,7 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_UNSUPPORTED_CASE_CONFIGURATION:
         desc = "Unsupported CASE configuration";
         break;
-    case CHIP_ERROR_CERT_LOAD_FAIL:
+    case CHIP_ERROR_CERT_LOAD_FAILED:
         desc = "Unable to load certificate";
         break;
     case CHIP_ERROR_CERT_NOT_TRUSTED:
@@ -546,7 +543,7 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_DEFAULT_EVENT_HANDLER_NOT_CALLED:
         desc = "Default event handler not called";
         break;
-    case CHIP_ERROR_PERSISTED_STORAGE_FAIL:
+    case CHIP_ERROR_PERSISTED_STORAGE_FAILED:
         desc = "Persisted storage failed";
         break;
     case CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND:
@@ -593,6 +590,18 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
         break;
     case CHIP_ERROR_INTERNAL:
         desc = "Internal error";
+        break;
+    case CHIP_ERROR_OPEN_FAILED:
+        desc = "Open file failed";
+        break;
+    case CHIP_ERROR_READ_FAILED:
+        desc = "Read from file failed";
+        break;
+    case CHIP_ERROR_WRITE_FAILED:
+        desc = "Write to file failed";
+        break;
+    case CHIP_ERROR_DECODE_FAILED:
+        desc = "Decoding failed";
         break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
