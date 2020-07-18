@@ -33,7 +33,7 @@ include $(BUILD_SUPPORT_DIR)/standalone-chip.mk
 APP = chip-standalone-demo
 
 SRCS = \
-    $(PROJECT_ROOT)/main.cpp \
+    $(PROJECT_ROOT)/main.cpp       \
     $(NULL)
 
 INC_DIRS = \
