@@ -27,10 +27,6 @@
 
 // ==================== Platform Adaptations ====================
 
-#define BLE_CONNECTION_OBJECT uint16_t
-#define BLE_CONNECTION_UNINITIALIZED ((uint16_t) -1)
-#define BLE_MAX_RECEIVE_WINDOW_SIZE 5
-
 // ========== Platform-specific Configuration Overrides =========
 
 /* none so far */
