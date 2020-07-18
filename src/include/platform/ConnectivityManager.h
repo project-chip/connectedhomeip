@@ -25,6 +25,12 @@
 #define CONNECTIVITY_MANAGER_H
 
 namespace chip {
+
+namespace Ble {
+class BleLayer;
+class BLEEndPoint;
+} // namespace Ble
+
 namespace DeviceLayer {
 
 namespace Internal {
@@ -154,6 +160,7 @@ public:
     bool HaveServiceConnectivity(void);
 
     // CHIPoBLE service methods
+    Ble::BleLayer * GetBleLayer();
     typedef void (*BleConnectionReceivedFunct)(Ble::BLEEndPoint * endpoint);
     void AddCHIPoBLEConnectionHandler(BleConnectionReceivedFunct handler);
     void RemoveCHIPoBLEConnectionHandler(void);
@@ -452,6 +459,11 @@ inline void ConnectivityManager::ErasePersistentInfo(void)
 inline bool ConnectivityManager::HaveServiceConnectivityViaThread(void)
 {
     return static_cast<ImplClass *>(this)->_HaveServiceConnectivityViaThread();
+}
+
+inline Ble::BleLayer * ConnectivityManager::GetBleLayer(void)
+{
+    return static_cast<ImplClass *>(this)->_GetBleLayer();
 }
 
 inline void ConnectivityManager::AddCHIPoBLEConnectionHandler(BleConnectionReceivedFunct handler)
