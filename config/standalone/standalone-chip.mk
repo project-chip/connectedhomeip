@@ -148,6 +148,10 @@ STD_LIBS += $(shell pkg-config --libs gio-2.0)
 STD_CFLAGS += $(shell pkg-config --cflags gio-2.0)
 endif
 
+ifeq ($(findstring darwin,$(CHIP_HOST_ARCH)),darwin)
+STD_LIBS += -framework Foundation -framework CoreBluetooth
+endif
+
 # Add the appropriate CHIP target as a prerequisite to all application
 # compilation targets to ensure that CHIP gets built and its header
 # files installed prior to compiling any dependent source files.

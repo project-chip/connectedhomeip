@@ -32,6 +32,7 @@
 #include <core/CHIPError.h>
 #include <inet/InetLayer.h>
 #include <inet/UDPEndPoint.h>
+#include <platform/ConnectivityManager.h>
 #include <support/CHIPLogging.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -68,26 +69,31 @@ static const unsigned char remote_public_key[] = { 0x04, 0xe2, 0x07, 0x64, 0xff,
                                                    0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
 
 static const char * PAYLOAD = "Message from Standalone CHIP echo client!";
+bool isDeviceConnected      = false;
 
-static void EchoKeyExchange(chip::DeviceController::ChipDeviceController * controller, Transport::PeerConnectionState * state,
-                            void * appReqState)
+// Device Manager Callbacks
+static void OnConnect(DeviceController::ChipDeviceController * controller, Transport::PeerConnectionState * state,
+                      void * appReqState)
 {
-    CHIP_ERROR err = controller->ManualKeyExchange(state, remote_public_key, sizeof(remote_public_key), local_private_key,
-                                                   sizeof(local_private_key));
+    isDeviceConnected = true;
 
-    if (err != CHIP_NO_ERROR)
+    if (state && appReqState)
     {
-        fprintf(stderr, "Failed to exchange keys\n");
+        CHIP_ERROR err = controller->ManualKeyExchange(state, remote_public_key, sizeof(remote_public_key), local_private_key,
+                                                       sizeof(local_private_key));
+
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to exchange keys\n");
+        }
     }
 }
 
-// Device Manager Callbacks
-static void EchoResponse(chip::DeviceController::ChipDeviceController * deviceController, void * appReqState,
-                         System::PacketBuffer * buffer)
+static void OnMessage(DeviceController::ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * buffer)
 {
     size_t data_len = buffer->DataLength();
 
-    printf("UDP packet received: %zu bytes\n", static_cast<size_t>(buffer->DataLength()));
+    printf("Message received: %zu bytes\n", data_len);
 
     // attempt to print the incoming message
     char msg_buffer[data_len];
@@ -107,48 +113,24 @@ static void EchoResponse(chip::DeviceController::ChipDeviceController * deviceCo
     System::PacketBuffer::Free(buffer);
 }
 
-static void ReceiveError(chip::DeviceController::ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR error,
-                         const IPPacketInfo * pi)
+static void OnError(DeviceController::ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR error,
+                    const IPPacketInfo * pi)
 {
-    printf("ERROR: %s\n Got UDP error\n", ErrorStr(error));
+    printf("ERROR: %s\n Got error\n", ErrorStr(error));
 }
 
 void ShowUsage(const char * executable)
 {
     fprintf(stderr,
             "Usage: \n"
-            "  %s device-ip-address device-port command [params]\n"
+            "  %s command [params]\n"
             "  Supported commands and their parameters:\n"
-            "    echo\n"
-            "    off endpoint-id\n"
-            "    on endpoint-id\n"
-            "    toggle endpoint-id\n",
+            "    echo-ble device-ble-name\n"
+            "    echo device-ip-address device-port\n"
+            "    off device-ip-address device-port endpoint-id\n"
+            "    on device-ip-address device-port endpoint-id\n"
+            "    toggle device-ip-address device-port endpoint-id\n",
             executable);
-}
-
-bool DetermineAddress(int argc, char * argv[], IPAddress * hostAddr, uint16_t * port)
-{
-    if (argc < 3)
-    {
-        return false;
-    }
-
-    if (!IPAddress::FromString(argv[1], *hostAddr))
-    {
-        fputs("Error: Invalid device IP address", stderr);
-        return false;
-    }
-
-    std::string port_str(argv[2]);
-    std::stringstream ss(port_str);
-    ss >> *port;
-    if (ss.fail() || !ss.eof())
-    {
-        fputs("Error: Invalid device port", stderr);
-        return false;
-    }
-
-    return true;
 }
 
 enum class Command
@@ -157,6 +139,7 @@ enum class Command
     On,
     Toggle,
     Echo,
+    EchoBle,
 };
 
 template <int N>
@@ -167,33 +150,34 @@ bool EqualsLiteral(const char * str, const char (&literal)[N])
 
 bool DetermineCommand(int argc, char * argv[], Command * command)
 {
-    if (argc < 4)
-    {
-        return false;
-    }
-
-    if (EqualsLiteral(argv[3], "off"))
+    if (EqualsLiteral(argv[1], "off"))
     {
         *command = Command::Off;
-        return true;
+        return argc == 5;
     }
 
-    if (EqualsLiteral(argv[3], "on"))
+    if (EqualsLiteral(argv[1], "on"))
     {
         *command = Command::On;
-        return true;
+        return argc == 5;
     }
 
-    if (EqualsLiteral(argv[3], "toggle"))
+    if (EqualsLiteral(argv[1], "toggle"))
     {
         *command = Command::Toggle;
-        return true;
+        return argc == 4;
     }
 
-    if (EqualsLiteral(argv[3], "echo"))
+    if (EqualsLiteral(argv[1], "echo"))
     {
         *command = Command::Echo;
-        return true;
+        return argc == 4;
+    }
+
+    if (EqualsLiteral(argv[1], "echo-ble"))
+    {
+        *command = Command::EchoBle;
+        return argc == 3;
     }
 
     fprintf(stderr, "Unknown command: %s\n", argv[3]);
@@ -202,24 +186,41 @@ bool DetermineCommand(int argc, char * argv[], Command * command)
 
 union CommandArgs
 {
+    IPAddress hostAddr;
+    uint16_t port;
+    char * name;
     ChipZclEndpointId_t endpointId;
 };
 
-bool DetermineCommandArgs(int argc, char * argv[], Command command, CommandArgs * commandArgs)
+bool DetermineArgsBle(char * argv[], CommandArgs * commandArgs)
 {
-    if (command == Command::Echo)
-    {
-        // No args.
-        return true;
-    }
+    commandArgs->name = argv[2];
+    return true;
+}
 
-    if (command != Command::On && command != Command::Off && command != Command::Toggle)
+bool DetermineArgsEcho(char * argv[], CommandArgs * commandArgs)
+{
+    if (!IPAddress::FromString(argv[2], commandArgs->hostAddr))
     {
-        fprintf(stderr, "Need to define arg handling for command '%d'\n", int(command));
+        fputs("Error: Invalid device IP address", stderr);
         return false;
     }
 
-    if (argc < 5)
+    std::string port_str(argv[3]);
+    std::stringstream ss(port_str);
+    ss >> commandArgs->port;
+    if (ss.fail() || !ss.eof())
+    {
+        fputs("Error: Invalid device port", stderr);
+        return false;
+    }
+
+    return true;
+}
+
+bool DetermineArgsOnOff(char * argv[], CommandArgs * commandArgs)
+{
+    if (!DetermineArgsEcho(argv, commandArgs))
     {
         return false;
     }
@@ -239,27 +240,63 @@ bool DetermineCommandArgs(int argc, char * argv[], Command command, CommandArgs 
     return true;
 }
 
+bool DetermineCommandArgs(char * argv[], Command command, CommandArgs * commandArgs)
+{
+    switch (command)
+    {
+    case Command::EchoBle:
+        return DetermineArgsBle(argv, commandArgs);
+
+    case Command::Echo:
+        return DetermineArgsEcho(argv, commandArgs);
+
+    case Command::On:
+    case Command::Off:
+    case Command::Toggle:
+        return DetermineArgsOnOff(argv, commandArgs);
+    }
+
+    fprintf(stderr, "Need to define arg handling for command '%d'\n", int(command));
+    return false;
+}
+
 // Handle the echo case, where we just send a string and expect to get it back.
-void DoEcho(DeviceController::ChipDeviceController * controller, const IPAddress & host_addr, uint16_t port)
+void DoEcho(DeviceController::ChipDeviceController * controller, const char * identifier)
 {
     size_t payload_len = strlen(PAYLOAD);
 
     // Run the client
-    char host_ip_str[40];
-    host_addr.ToString(host_ip_str, sizeof(host_ip_str));
     while (1)
     {
-        // Reallocate buffer on each run, as the secure transport encrypts and
-        // overwrites the buffer from previous iteration.
-        auto * buffer = System::PacketBuffer::NewWithAvailableSize(payload_len);
-        memcpy(buffer->Start(), PAYLOAD, payload_len);
-        buffer->SetDataLength(payload_len);
+        if (isDeviceConnected)
+        {
+            // Reallocate buffer on each run, as the secure transport encrypts and
+            // overwrites the buffer from previous iteration.
+            auto * buffer = System::PacketBuffer::NewWithAvailableSize(payload_len);
+            memcpy(buffer->Start(), PAYLOAD, payload_len);
+            buffer->SetDataLength(payload_len);
 
-        controller->SendMessage(NULL, buffer);
-        printf("Msg sent to server at %s:%d\n", host_ip_str, port);
+            controller->SendMessage(NULL, buffer);
+            printf("Msg sent to server %s\n", identifier);
+        }
 
         sleep(SEND_DELAY);
     }
+}
+
+void DoEchoBle(DeviceController::ChipDeviceController * controller, const std::string & name)
+{
+    DoEcho(controller, name.c_str());
+}
+
+void DoEchoIP(DeviceController::ChipDeviceController * controller, const IPAddress & hostAddr, uint16_t port)
+{
+    char name[46];
+    char hostIpStr[40];
+    hostAddr.ToString(hostIpStr, sizeof(hostIpStr));
+    snprintf(name, sizeof(name), "%s:%d", hostIpStr, port);
+
+    DoEcho(controller, name);
 }
 
 // Handle the on/off/toggle case, where we are sending a ZCL command and not
@@ -316,43 +353,60 @@ void DoOnOff(DeviceController::ChipDeviceController * controller, Command comman
     controller->SendMessage(NULL, buffer);
 }
 
+CHIP_ERROR ExecuteCommand(DeviceController::ChipDeviceController * controller, Command command, CommandArgs & commandArgs)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    switch (command)
+    {
+    case Command::EchoBle:
+        err = controller->ConnectDevice(kRemoteDeviceId, commandArgs.name, NULL, OnConnect, OnMessage, OnError);
+        VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to connect to the device"));
+        DoEchoBle(controller, commandArgs.name);
+        break;
+
+    case Command::Echo:
+        err =
+            controller->ConnectDevice(kRemoteDeviceId, commandArgs.hostAddr, NULL, OnConnect, OnMessage, OnError, commandArgs.port);
+        VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to connect to the device"));
+        DoEchoIP(controller, commandArgs.hostAddr, commandArgs.port);
+        break;
+
+    default:
+        err =
+            controller->ConnectDevice(kRemoteDeviceId, commandArgs.hostAddr, NULL, OnConnect, OnMessage, OnError, commandArgs.port);
+        VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to connect to the device"));
+        DoOnOff(controller, command, commandArgs.endpointId);
+        controller->ServiceEventSignal();
+        break;
+    }
+
+exit:
+    return err;
+}
+
 // ================================================================================
 // Main Code
 // ================================================================================
 int main(int argc, char * argv[])
 {
-    IPAddress host_addr;
-    uint16_t port;
     Command command;
-    CHIP_ERROR err;
     CommandArgs commandArgs;
-    if (!DetermineAddress(argc, argv, &host_addr, &port) || !DetermineCommand(argc, argv, &command) ||
-        !DetermineCommandArgs(argc, argv, command, &commandArgs))
+
+    if (!DetermineCommand(argc, argv, &command) || !DetermineCommandArgs(argv, command, &commandArgs))
     {
         ShowUsage(argv[0]);
-        return -1;
+        return EXIT_FAILURE;
     }
 
     auto * controller = new DeviceController::ChipDeviceController();
-    err               = controller->Init(kLocalDeviceId);
+    CHIP_ERROR err    = controller->Init(kLocalDeviceId);
     VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to initialize the device controller"));
 
     err = controller->ServiceEvents();
-    SuccessOrExit(err);
+    VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to initialize the run loop"));
 
-    err = controller->ConnectDevice(kRemoteDeviceId, host_addr, NULL, EchoKeyExchange, EchoResponse, ReceiveError, port);
-    VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to connect to the device"));
-
-    if (command == Command::Echo)
-    {
-        DoEcho(controller, host_addr, port);
-    }
-    else
-    {
-        DoOnOff(controller, command, commandArgs.endpointId);
-        controller->ServiceEventSignal();
-    }
-
+    err = ExecuteCommand(controller, command, commandArgs);
+    VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to send command"));
 exit:
     if (err != CHIP_NO_ERROR)
     {
