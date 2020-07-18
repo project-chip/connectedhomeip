@@ -46,7 +46,8 @@ enum class Type
 {
     kUndefined,
     kUdp,
-    // More constants to be added later, such as TCP and BLE
+    kBle,
+    // More constants to be added later, such as TCP
 };
 
 /**
@@ -56,6 +57,7 @@ class PeerAddress
 {
 public:
     PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type) {}
+    PeerAddress(Type type) : mTransportType(type) {}
 
     PeerAddress(PeerAddress &&)      = default;
     PeerAddress(const PeerAddress &) = default;
@@ -128,6 +130,7 @@ public:
 
     static PeerAddress Uninitialized() { return PeerAddress(Inet::IPAddress::Any, Type::kUndefined); }
 
+    static PeerAddress BLE() { return PeerAddress(Type::kBle); }
     static PeerAddress UDP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kUdp); }
     static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port) { return UDP(addr).SetPort(port); }
 
