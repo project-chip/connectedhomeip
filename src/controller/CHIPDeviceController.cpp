@@ -99,6 +99,13 @@ CHIP_ERROR ChipDeviceController::Shutdown()
         mSessionManager = NULL;
     }
 
+    if (mUnsecuredTransport != NULL)
+    {
+        mUnsecuredTransport->Release();
+        delete mUnsecuredTransport;
+        mUnsecuredTransport = NULL;
+    }
+
     mConState = kConnectionState_NotConnected;
     memset(&mOnComplete, 0, sizeof(mOnComplete));
     mOnError         = NULL;
@@ -108,6 +115,46 @@ CHIP_ERROR ChipDeviceController::Shutdown()
 
 exit:
     return err;
+}
+
+CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const char * deviceName, void * appReqState,
+                                               NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
+                                               ErrorHandler onError)
+{
+#if CONFIG_NETWORK_LAYER_BLE
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (mState != kState_Initialized || mConState != kConnectionState_NotConnected)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    mRemoteDeviceId  = Optional<NodeId>::Value(remoteDeviceId);
+    mAppReqState     = appReqState;
+    mOnNewConnection = onConnected;
+
+    Transport::BLE * transport = new Transport::BLE();
+    err                        = transport->Init(
+        Transport::BleConnectionParameters(this, DeviceLayer::ConnectivityMgr().GetBleLayer()).SetConnectionName(deviceName));
+    SuccessOrExit(err);
+    mUnsecuredTransport = transport->Retain();
+
+    // connected state before 'OnConnect'
+    mConState = kConnectionState_Connected;
+
+    mOnComplete.Response = onMessageReceived;
+    mOnError             = onError;
+
+    if (err != CHIP_NO_ERROR)
+    {
+        mConState = kConnectionState_NotConnected;
+    }
+
+exit:
+    return err;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif // CONFIG_NETWORK_LAYER_BLE
 }
 
 CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
@@ -213,9 +260,20 @@ CHIP_ERROR ChipDeviceController::DisconnectDevice()
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    delete mSessionManager;
-    mSessionManager = NULL;
-    mConState       = kConnectionState_NotConnected;
+    if (mSessionManager != NULL)
+    {
+        delete mSessionManager;
+        mSessionManager = NULL;
+    }
+
+    if (mUnsecuredTransport != NULL)
+    {
+        mUnsecuredTransport->Release();
+        delete mUnsecuredTransport;
+        mUnsecuredTransport = NULL;
+    }
+
+    mConState = kConnectionState_NotConnected;
     return err;
 };
 
@@ -226,9 +284,21 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
     VerifyOrExit(mRemoteDeviceId.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
 
     mAppReqState = appReqState;
-    VerifyOrExit(IsSecurelyConnected(), err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = mSessionManager->SendMessage(mRemoteDeviceId.Value(), buffer);
+    if (mUnsecuredTransport)
+    {
+        VerifyOrExit(IsConnected(), err = CHIP_ERROR_INCORRECT_STATE);
+        // Unsecured transport does not use a MessageHeader, but the Transport::Base API expects one, so
+        // let build an empty one for now.
+        MessageHeader header;
+        Transport::PeerAddress peerAddress = Transport::PeerAddress::BLE();
+        err                                = mUnsecuredTransport->SendMessage(header, peerAddress, buffer);
+    }
+    else
+    {
+        VerifyOrExit(IsSecurelyConnected(), err = CHIP_ERROR_INCORRECT_STATE);
+        err = mSessionManager->SendMessage(mRemoteDeviceId.Value(), buffer);
+    }
 exit:
 
     return err;
