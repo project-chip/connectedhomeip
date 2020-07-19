@@ -39,12 +39,12 @@ static const AttributeId_t kAttributeIdOnTime             = 0x4001;
 static const AttributeId_t kAttributeIdOffWaitTime        = 0x4002;
 
 /* Command IDs */
-static const uint16_t kOnOffCmdIdOff            = 0x00;
-static const uint16_t kOnOffCmdIdOn             = 0x01;
-static const uint16_t kOnOffCmdIdToggle         = 0x02;
-static const uint16_t kOnOffCmdIdOffWithEffect  = 0x40;
-static const uint16_t kOnOffCmdIdOffWithRecall  = 0x41;
-static const uint16_t kOnOffCmdIdOnWithTimedOff = 0x42;
+static const CommandId_t kOnOffCmdIdOff            = 0x00;
+static const CommandId_t kOnOffCmdIdOn             = 0x01;
+static const CommandId_t kOnOffCmdIdToggle         = 0x02;
+static const CommandId_t kOnOffCmdIdOffWithEffect  = 0x40;
+static const CommandId_t kOnOffCmdIdOffWithRecall  = 0x41;
+static const CommandId_t kOnOffCmdIdOnWithTimedOff = 0x42;
 
 /**
  * @brief
@@ -139,7 +139,7 @@ public:
     }
 };
 
-static void GenerateCommand(Command * cmd, uint16_t cmdId, uint16_t endpointId)
+static void GenerateCommand(Command * cmd, CommandId_t cmdId, uint16_t endpointId)
 {
     cmd->mType       = kCmdTypeCluster;
     cmd->mId         = cmdId;
@@ -151,11 +151,20 @@ static void GenerateCommand(Command * cmd, uint16_t cmdId, uint16_t endpointId)
     cmd->EndEncode();
 }
 
-void ClusterOnOffEncodeOn(Command * cmd, uint16_t endpointId) { GenerateCommand(cmd, kOnOffCmdIdOn, endpointId); }
+void ClusterOnOffEncodeOn(Command * cmd, uint16_t endpointId)
+{
+    GenerateCommand(cmd, kOnOffCmdIdOn, endpointId);
+}
 
-void ClusterOnOffEncodeOff(Command * cmd, uint16_t endpointId) { GenerateCommand(cmd, kOnOffCmdIdOff, endpointId); }
+void ClusterOnOffEncodeOff(Command * cmd, uint16_t endpointId)
+{
+    GenerateCommand(cmd, kOnOffCmdIdOff, endpointId);
+}
 
-void ClusterOnOffEncodeToggle(Command * cmd, uint16_t endpointId) { GenerateCommand(cmd, kOnOffCmdIdToggle, endpointId); }
+void ClusterOnOffEncodeToggle(Command * cmd, uint16_t endpointId)
+{
+    GenerateCommand(cmd, kOnOffCmdIdToggle, endpointId);
+}
 
 } // namespace DataModel
 } // namespace chip

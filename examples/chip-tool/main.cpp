@@ -267,7 +267,6 @@ void DoEcho(DeviceController::ChipDeviceController * controller, const IPAddress
     }
 }
 
-
 // Handle the on/off/toggle case, where we are sending a ZCL command and not
 // expecting a response at all.
 void DoOnOff(DeviceController::ChipDeviceController * controller, CommandIndicator command, ChipZclEndpointId_t endpoint)
