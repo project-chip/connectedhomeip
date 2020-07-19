@@ -72,7 +72,7 @@ void EchoDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, int
     }
 }
 
-extern ClusterServer server;
+extern ClusterServer gServer;
 /* This function can be eliminated, and instead its contents will get executed */
 void EchoDeviceCallbacks::PostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId,
                                                       uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
@@ -82,5 +82,5 @@ void EchoDeviceCallbacks::PostAttributeChangeCallback(uint8_t endpoint, ChipZclC
     Value cValue(kCHIPValueType_Bool);
     memcpy((void *) &cValue.Int64, (void *) value, size);
 
-    server.SetValue(endpoint, clusterId, attributeId, cValue);
+    gServer.SetValue(endpoint, clusterId, attributeId, cValue);
 }

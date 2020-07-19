@@ -108,7 +108,7 @@ const char * TAG = "wifi-echo-demo";
 static EchoDeviceCallbacks EchoCallbacks;
 const uint8_t applicationVersion = 20;
 const uint8_t HWVersion          = 1;
-ClusterServer server(applicationVersion, HWVersion);
+ClusterServer gServer(applicationVersion, HWVersion);
 
 namespace {
 
@@ -426,8 +426,8 @@ extern "C" void app_main()
     statusLED.Init(STATUS_LED_GPIO_NUM);
 
     /* Add a cluster to the primary endpoint of our cluster server */
-    server.AddCluster(&statusLED);
-    PrintDataModel(server);
+    gServer.AddCluster(&statusLED);
+    PrintDataModel(gServer);
 
     // Start the Echo Server
     InitDataModelHandler();
