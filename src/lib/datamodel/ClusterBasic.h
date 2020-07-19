@@ -30,13 +30,13 @@ namespace chip {
 namespace DataModel {
 
 /* Cluster ID */
-static const uint16_t kClusterIdBase = 0x0000;
+static const ClusterId_t kClusterIdBase = 0x0000;
 
 /* Attribute IDs */
-static const uint16_t kAttributeIdZCLVersion         = 0x0000;
-static const uint16_t kAttributeIdApplicationVersion = 0x0001;
-static const uint16_t kAttributeIdStackVersion       = 0x0002;
-static const uint16_t kAttributeIdHWVersion          = 0x0003;
+static const AttributeId_t kAttributeIdZCLVersion         = 0x0000;
+static const AttributeId_t kAttributeIdApplicationVersion = 0x0001;
+static const AttributeId_t kAttributeIdStackVersion       = 0x0002;
+static const AttributeId_t kAttributeIdHWVersion          = 0x0003;
 
 /**
  * @brief

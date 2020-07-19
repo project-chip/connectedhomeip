@@ -30,6 +30,7 @@
 namespace chip {
 namespace DataModel {
 
+typedef uint16_t ClusterId_t;
 /**
  * @brief
  *   This class implements the cluster object that maintains its attributes. Typically specific
@@ -38,10 +39,10 @@ namespace DataModel {
 class Cluster : public Deque<Cluster>
 {
 public:
-    uint16_t mClusterId;
+    ClusterId_t mClusterId;
     Deque<Attribute> mAttrs;
 
-    Cluster(uint16_t clusterId) : Deque(this), mClusterId(clusterId), mAttrs(nullptr) {}
+    Cluster(ClusterId_t clusterId) : Deque(this), mClusterId(clusterId), mAttrs(nullptr) {}
 
     virtual ~Cluster() {}
 
@@ -63,7 +64,7 @@ public:
      *
      * @param attrId the attribute identifer that we are looking for
      */
-    Attribute * GetAttribute(uint16_t attrId)
+    Attribute * GetAttribute(AttributeId_t attrId)
     {
         return mAttrs.Find([attrId](Attribute * item) -> bool { return (item->mAttrId == attrId); });
     }
@@ -75,7 +76,7 @@ public:
      * @param attrId the attribute identifer that should be set
      * @param value  the new value that the attribute should be updated with
      */
-    virtual CHIP_ERROR Set(uint16_t attrId, const Value & value)
+    virtual CHIP_ERROR Set(AttributeId_t attrId, const Value & value)
     {
         /* Just hand-off to update the value internally */
         auto attr = GetAttribute(attrId);
@@ -93,7 +94,7 @@ public:
      * @param attrId the attribute identifer that should be queried
      * @param value  the value that the attribute has
      */
-    virtual CHIP_ERROR Get(uint16_t attrId, Value & value)
+    virtual CHIP_ERROR Get(AttributeId_t attrId, Value & value)
     {
         /* Just hand-off to update the value internally */
         auto attr = GetAttribute(attrId);
