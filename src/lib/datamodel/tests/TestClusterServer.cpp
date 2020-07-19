@@ -122,9 +122,7 @@ void TestClusterServerTwoEndpoints(nlTestSuite * inSuite, void * inContext)
 
 void TestHandleCommand(nlTestSuite * inSuite, void * inContext)
 {
-    const uint8_t ZCLVersion         = 10;
     const uint8_t applicationVersion = 20;
-    const uint8_t stackVersion       = 1;
     const uint8_t HWVersion          = 1;
     Value value;
 
