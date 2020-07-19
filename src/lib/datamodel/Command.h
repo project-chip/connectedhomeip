@@ -29,6 +29,8 @@
 namespace chip {
 namespace DataModel {
 
+typedef uint16_t CommandId_t;
+
 enum CmdTypes
 {
     kCmdTypeUnknown = 0,
@@ -49,7 +51,7 @@ public:
     /* The type of command, global, cluster-specific or manufacturer-specific */
     CmdTypes mType;
     /* The command identifier */
-    uint16_t mId;
+    CommandId_t mId;
     /* The endpoint this command is for */
     uint8_t mEndpointId;
     /* The direction of the command */
