@@ -51,7 +51,8 @@ public:
 
     Attribute(AttributeId_t attrId, ValueTypes type) : mDeque(this), mAttrId(attrId), mValue(type), mMin(type), mMax(type) {}
     Attribute(AttributeId_t attrId, Value value) :
-        mDeque(this), mAttrId(attrId), mValue(value), mMin(value.mType), mMax(value.mType) {}
+        mDeque(this), mAttrId(attrId), mValue(value), mMin(value.mType), mMax(value.mType)
+    {}
     Attribute(AttributeId_t attrId, ValueTypes type, uint64_t min, uint64_t max) :
         mDeque(this), mAttrId(attrId), mValue(type), mMin(type, min), mMax(type, max)
     {}
