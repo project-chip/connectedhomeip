@@ -58,6 +58,7 @@ if (config_network_layer_ble) {
       "Ble.h",
       "BleApplicationDelegate.h",
       "BleConfig.h",
+      "BleConnectionDelegate.h",
       "BleError.cpp",
       "BleError.h",
       "BleLayer.cpp",
