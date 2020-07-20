@@ -28,6 +28,7 @@ CHIP_BUILD_SYSTEM_LAYER_SOURCE_FILES                  = \
     @top_builddir@/src/system/SystemLayer.cpp           \
     @top_builddir@/src/system/SystemMutex.cpp           \
     @top_builddir@/src/system/SystemObject.cpp          \
+    @top_builddir@/src/system/SystemWakeEvent.cpp       \
     @top_builddir@/src/system/SystemTimer.cpp           \
     @top_builddir@/src/system/SystemPacketBuffer.cpp    \
     @top_builddir@/src/system/SystemStats.cpp           \
@@ -48,6 +49,7 @@ CHIP_BUILD_SYSTEM_LAYER_HEADER_FILES                  = \
     @top_builddir@/src/system/SystemLayer.h             \
     @top_builddir@/src/system/SystemMutex.h             \
     @top_builddir@/src/system/SystemObject.h            \
+    @top_builddir@/src/system/SystemWakeEvent.h         \
     @top_builddir@/src/system/SystemTimer.h             \
     @top_builddir@/src/system/SystemPacketBuffer.h      \
     @top_builddir@/src/system/TimeSource.h              \

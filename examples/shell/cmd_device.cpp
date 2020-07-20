@@ -53,10 +53,6 @@ int cmd_device_start(int argc, char ** argv)
 
     VerifyOrExit(argc == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    streamer_printf(sout, "Init CHIP Stack\r\n");
-    error = PlatformMgr().InitChipStack();
-    SuccessOrExit(error);
-
     streamer_printf(sout, "Starting Platform Manager Event Loop\r\n");
     error = PlatformMgr().StartEventLoopTask();
     SuccessOrExit(error);
@@ -86,7 +82,7 @@ static CHIP_ERROR ConfigGetVendorId(bool printHeader)
         streamer_printf(sout, "VendorId:        ");
     }
     SuccessOrExit(error = ConfigurationMgr().GetVendorId(value16));
-    streamer_printf(sout, "%04x", value16);
+    streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")", value16, value16);
 
 exit:
     return ConfigGetDone(sout, error);
@@ -103,7 +99,7 @@ static CHIP_ERROR ConfigGetProductId(bool printHeader)
         streamer_printf(sout, "ProductId:       ");
     }
     SuccessOrExit(error = ConfigurationMgr().GetProductId(value16));
-    streamer_printf(sout, "%04x", value16);
+    streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")", value16, value16);
 
 exit:
     return ConfigGetDone(sout, error);
@@ -120,7 +116,7 @@ static CHIP_ERROR ConfigGetProductRevision(bool printHeader)
         streamer_printf(sout, "ProductRevision: ");
     }
     SuccessOrExit(error = ConfigurationMgr().GetProductRevision(value16));
-    streamer_printf(sout, "%04x", value16);
+    streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")", value16, value16);
 
 exit:
     return ConfigGetDone(sout, error);
@@ -130,7 +126,7 @@ static CHIP_ERROR ConfigGetSerialNumber(bool printHeader)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
-    char buf[ConfigurationManager::kMaxSerialNumberLength];
+    char buf[ConfigurationManager::kMaxSerialNumberLength + 1];
     size_t bufSize;
 
     if (printHeader)
@@ -138,7 +134,8 @@ static CHIP_ERROR ConfigGetSerialNumber(bool printHeader)
         streamer_printf(sout, "SerialNumber:    ");
     }
     SuccessOrExit(error = ConfigurationMgr().GetSerialNumber(buf, sizeof(buf), bufSize));
-    streamer_print_hex(sout, reinterpret_cast<const uint8_t *>(buf), bufSize);
+    buf[bufSize] = '\0';
+    streamer_printf(sout, "%s", buf);
 
 exit:
     return ConfigGetDone(sout, error);
@@ -155,7 +152,7 @@ static CHIP_ERROR ConfigGetDeviceId(bool printHeader)
         streamer_printf(sout, "DeviceId:        ");
     }
     SuccessOrExit(error = ConfigurationMgr().GetDeviceId(value64));
-    streamer_print_hex(sout, reinterpret_cast<const uint8_t *>(&value64), sizeof(value64));
+    streamer_printf(sout, "%" PRIu64 " (0x%" PRIX64 ")", value64, value64);
 
 exit:
     return ConfigGetDone(sout, error);
@@ -244,7 +241,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceId(bool printHeader)
         streamer_printf(sout, "MfrDeviceId:     ");
     }
     SuccessOrExit(error = ConfigurationMgr().GetManufacturerDeviceId(value64));
-    streamer_print_hex(sout, reinterpret_cast<const uint8_t *>(&value64), sizeof(value64));
+    streamer_printf(sout, "%" PRIu64 " (0x%" PRIX64 ")", value64, value64);
 
 exit:
     return ConfigGetDone(sout, error);
@@ -326,7 +323,7 @@ static CHIP_ERROR ConfigGetPairingCode(bool printHeader)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
-    char buf[ConfigurationManager::kMaxPairingCodeLength];
+    char buf[ConfigurationManager::kMaxPairingCodeLength + 1];
     size_t bufSize;
 
     if (printHeader)
@@ -334,8 +331,8 @@ static CHIP_ERROR ConfigGetPairingCode(bool printHeader)
         streamer_printf(sout, "PairingCode:     ");
     }
     SuccessOrExit(error = ConfigurationMgr().GetPairingCode(buf, sizeof(buf), bufSize));
-    streamer_print_hex(sout, reinterpret_cast<const uint8_t *>(buf), bufSize);
-
+    buf[bufSize] = '\0';
+    streamer_printf(sout, "%s", buf);
 exit:
     return ConfigGetDone(sout, error);
 }
@@ -351,7 +348,7 @@ static CHIP_ERROR ConfigGetServiceId(bool printHeader)
         streamer_printf(sout, "ServiceId:       ");
     }
     SuccessOrExit(error = ConfigurationMgr().GetServiceId(value64));
-    streamer_print_hex(sout, reinterpret_cast<const uint8_t *>(&value64), sizeof(value64));
+    streamer_printf(sout, "%" PRIu64 " (0x%" PRIX64 ")", value64, value64);
 
 exit:
     return ConfigGetDone(sout, error);
@@ -368,7 +365,7 @@ static CHIP_ERROR ConfigGetFabricId(bool printHeader)
         streamer_printf(sout, "FabricId:        ");
     }
     SuccessOrExit(error = ConfigurationMgr().GetFabricId(value64));
-    streamer_print_hex(sout, reinterpret_cast<const uint8_t *>(&value64), sizeof(value64));
+    streamer_printf(sout, "%" PRIu64 " (0x%" PRIX64 ")", value64, value64);
 
 exit:
     return ConfigGetDone(sout, error);
@@ -499,10 +496,21 @@ static const shell_command_t cmds_device[] = {
 void cmd_device_init(void)
 {
 #if CONFIG_DEVICE_LAYER
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
     // Register `device` subcommands with the local shell dispatcher.
     sShellDeviceSubcommands.RegisterCommands(cmds_device, ARRAY_SIZE(cmds_device));
 
     // Register the root `base64` command with the top-level shell.
     shell_register(&cmds_base64_root, 1);
+
+    streamer_t * sout = streamer_get();
+
+    streamer_printf(sout, "Init CHIP Stack\r\n");
+    error = PlatformMgr().InitChipStack();
+
+    if (error != CHIP_NO_ERROR)
+        streamer_printf(sout, "Failed to init CHIP Stack with error: %s\r\n", ErrorStr(error));
+
 #endif // CONFIG_DEVICE_LAYER
 }

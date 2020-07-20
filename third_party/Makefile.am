@@ -29,6 +29,14 @@ EXTRA_DIST                                   = \
     nlbuild-autotools                          \
     $(NULL)
 
+if CHIP_DEVICE_LAYER_TARGET_LINUX
+if CHIP_WITH_OT_BR_POSIX
+EXTRA_DIST                                   += \
+    inipp                                       \
+    $(NULL)
+endif # CHIP_WITH_OT_BR_POSIX
+endif # CHIP_DEVICE_LAYER_TARGET_LINUX
+
 # Always package (e.g. for 'make dist') these subdirectories.
 
 DIST_SUBDIRS                                 = \
@@ -44,7 +52,7 @@ DIST_SUBDIRS                                 = \
 # of the 'distclean' target. Consequently, we conditionally include
 # them in DIST_SUBDIRS on invocation of 'distclean-recursive'
 
-distclean-recursive: DIST_SUBDIRS += $(NLASSERT_SUBDIRS) $(NLFAULTINJECTION_SUBDIRS) $(NLIO_SUBDIRS) $(NLUNIT_TEST_SUBDIRS) $(MBEDTLS_SUBDIRS) $(OPENTHREAD_SUBDIRS) $(OTBR_CLIENT_SUBDIRS)
+distclean-recursive: DIST_SUBDIRS += $(NLASSERT_SUBDIRS) $(NLFAULTINJECTION_SUBDIRS) $(NLIO_SUBDIRS) $(NLUNIT_TEST_SUBDIRS) $(MBEDTLS_SUBDIRS) $(OPENTHREAD_SUBDIRS) $(OT_BR_POSIX_SUBDIRS)
 
 # Always build (e.g. for 'make all') these subdirectories.
 #

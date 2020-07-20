@@ -102,7 +102,7 @@ CHIP_ERROR PosixConfig::ReadConfigValue(Key key, bool & val)
     uint32_t intVal;
 
     storage = GetStorageForNamespace(key);
-    VerifyOrExit(storage != NULL, err = CHIP_ERROR_PERSISTED_STORAGE_FAIL);
+    VerifyOrExit(storage != NULL, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
     err = storage->ReadValue(key.Name, intVal);
     if (err == CHIP_ERROR_KEY_NOT_FOUND)
@@ -123,7 +123,7 @@ CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint32_t & val)
     ChipLinuxStorage * storage;
 
     storage = GetStorageForNamespace(key);
-    VerifyOrExit(storage != NULL, err = CHIP_ERROR_PERSISTED_STORAGE_FAIL);
+    VerifyOrExit(storage != NULL, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
     err = storage->ReadValue(key.Name, val);
     if (err == CHIP_ERROR_KEY_NOT_FOUND)
@@ -142,7 +142,7 @@ CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint64_t & val)
     ChipLinuxStorage * storage;
 
     storage = GetStorageForNamespace(key);
-    VerifyOrExit(storage != NULL, err = CHIP_ERROR_PERSISTED_STORAGE_FAIL);
+    VerifyOrExit(storage != NULL, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
     // Special case the MfrDeviceId value, optionally allowing it to be read as a blob containing
     // a 64-bit big-endian integer, instead of a u64 value.
@@ -177,7 +177,7 @@ CHIP_ERROR PosixConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
     ChipLinuxStorage * storage;
 
     storage = GetStorageForNamespace(key);
-    VerifyOrExit(storage != NULL, err = CHIP_ERROR_PERSISTED_STORAGE_FAIL);
+    VerifyOrExit(storage != NULL, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
     err = storage->ReadValueStr(key.Name, buf, bufSize, outLen);
     if (err == CHIP_ERROR_KEY_NOT_FOUND)
@@ -201,7 +201,7 @@ CHIP_ERROR PosixConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSiz
     ChipLinuxStorage * storage;
 
     storage = GetStorageForNamespace(key);
-    VerifyOrExit(storage != NULL, err = CHIP_ERROR_PERSISTED_STORAGE_FAIL);
+    VerifyOrExit(storage != NULL, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
     err = storage->ReadValueBin(key.Name, buf, bufSize, outLen);
     if (err == CHIP_ERROR_KEY_NOT_FOUND)
@@ -225,7 +225,7 @@ CHIP_ERROR PosixConfig::WriteConfigValue(Key key, bool val)
     ChipLinuxStorage * storage;
 
     storage = GetStorageForNamespace(key);
-    VerifyOrExit(storage != NULL, err = CHIP_ERROR_PERSISTED_STORAGE_FAIL);
+    VerifyOrExit(storage != NULL, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
     err = storage->WriteValue(key.Name, val ? true : false);
     SuccessOrExit(err);
@@ -246,7 +246,7 @@ CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint32_t val)
     ChipLinuxStorage * storage;
 
     storage = GetStorageForNamespace(key);
-    VerifyOrExit(storage != NULL, err = CHIP_ERROR_PERSISTED_STORAGE_FAIL);
+    VerifyOrExit(storage != NULL, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
     err = storage->WriteValue(key.Name, val);
     SuccessOrExit(err);
@@ -267,7 +267,7 @@ CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint64_t val)
     ChipLinuxStorage * storage;
 
     storage = GetStorageForNamespace(key);
-    VerifyOrExit(storage != NULL, err = CHIP_ERROR_PERSISTED_STORAGE_FAIL);
+    VerifyOrExit(storage != NULL, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
     err = storage->WriteValue(key.Name, val);
     SuccessOrExit(err);
@@ -290,7 +290,7 @@ CHIP_ERROR PosixConfig::WriteConfigValueStr(Key key, const char * str)
     if (str != NULL)
     {
         storage = GetStorageForNamespace(key);
-        VerifyOrExit(storage != NULL, err = CHIP_ERROR_PERSISTED_STORAGE_FAIL);
+        VerifyOrExit(storage != NULL, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
         err = storage->WriteValueStr(key.Name, str);
         SuccessOrExit(err);
@@ -341,7 +341,7 @@ CHIP_ERROR PosixConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_
     if (data != NULL)
     {
         storage = GetStorageForNamespace(key);
-        VerifyOrExit(storage != NULL, err = CHIP_ERROR_PERSISTED_STORAGE_FAIL);
+        VerifyOrExit(storage != NULL, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
         err = storage->WriteValueBin(key.Name, data, dataLen);
         SuccessOrExit(err);
@@ -368,7 +368,7 @@ CHIP_ERROR PosixConfig::ClearConfigValue(Key key)
     ChipLinuxStorage * storage;
 
     storage = GetStorageForNamespace(key);
-    VerifyOrExit(storage != NULL, err = CHIP_ERROR_PERSISTED_STORAGE_FAIL);
+    VerifyOrExit(storage != NULL, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
     err = storage->ClearValue(key.Name);
     if (err == CHIP_ERROR_KEY_NOT_FOUND)

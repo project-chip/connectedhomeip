@@ -609,4 +609,65 @@ struct LwIPEvent;
 #define CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD 946684800
 #endif // CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD
 
+/**
+ *  @def CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
+ *
+ *  @brief
+ *      Use the POSIX pipe() function.
+ *
+ *  Use the POSIX pipe() function to create an anonymous data stream.
+ *
+ *  Defaults to enabled if the system is using sockets (except for Zephyr RTOS).
+ */
+#ifndef CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
+#if (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK) && !__ZEPHYR__
+#define CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE 1
+#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
+
+/**
+ *  @def CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
+ *
+ *  @brief
+ *      Include missing functions for Zephyr sockets
+ *
+ *  Zephyr socket API lacks some of the functions required by CHIP, e.g. getsockname, recvmsg.
+ *  If this value is set CHIP will provide the missing functions.
+ *
+ *  Defaults to enabled on Zephyr platforms using sockets
+ */
+#ifndef CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && __ZEPHYR__
+#define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS 1
+#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
+
+/**
+ *  @def CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+ *
+ *  @brief
+ *      Use Zephyr net_if API to enumerate available network interfaces
+ *
+ *  Defaults to enabled on Zephyr platforms using sockets
+ */
+#ifndef CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && __ZEPHYR__
+#define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF 1
+#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+
+/**
+ *  @def CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+ *
+ *  @brief
+ *      Use BSD ifaddrs.h API to enumerate available network interfaces
+ *
+ *  Defaults to enabled on Unix/Linux platforms using sockets
+ */
+#ifndef CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+#if (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK) && !__ZEPHYR__
+#define CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS 1
+#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+
 #endif // defined(SYSTEMCONFIG_H)

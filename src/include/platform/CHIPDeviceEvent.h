@@ -275,6 +275,7 @@ typedef void (*AsyncWorkFunct)(intptr_t arg);
 #include CHIPDEVICEPLATFORMEVENT_HEADER
 #endif
 
+#include <ble/BleConfig.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {

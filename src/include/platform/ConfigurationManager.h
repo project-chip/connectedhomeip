@@ -55,7 +55,7 @@ public:
 
     enum
     {
-        kMaxPairingCodeLength      = 15,
+        kMaxPairingCodeLength      = 16,
         kMaxSerialNumberLength     = 32,
         kMaxFirmwareRevisionLength = 32,
     };

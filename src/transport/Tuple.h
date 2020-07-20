@@ -110,7 +110,7 @@ private:
      *
      * Will return true if any transport with index N and up can CanSendToPeer(address);
      *
-     * @param N the index of the underlying transport to check for CanSendToPeer
+     * @tparam N the index of the underlying transport to check for CanSendToPeer
      *
      * @param address what address to check.
      */
@@ -134,7 +134,7 @@ private:
      *
      * Message is sent through the first transport from index N or above, which returns 'CanSendToPeer'
      *
-     * @param N the index of the underlying transport to run SendMessage throug.
+     * @tparam N the index of the underlying transport to run SendMessage throug.
      *
      * @param header the message header to send
      * @param address where to send the message
