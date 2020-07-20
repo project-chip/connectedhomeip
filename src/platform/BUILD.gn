@@ -74,6 +74,15 @@ if (device_platform != "none") {
     if (chip_enable_openthread) {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_THREAD=1" ]
     }
+    if (device_platform == "efr32") {
+      defines += [
+        "CONFIG_DEVICE_LAYER=1",
+        "CHIP_DEVICE_LAYER_TARGET_EFR32=1",
+        "CHIP_DEVICE_LAYER_TARGET=efr32",
+      ]
+    } else {
+      defines += [ "CHIP_DEVICE_LAYER_TARGET_EFR32=0" ]
+    }
   }
 
   static_library("platform") {
@@ -222,6 +231,37 @@ if (device_platform != "none") {
           "OpenThread/OpenThreadUtils.cpp",
           "nRF5/ThreadStackManagerImpl.cpp",
           "nRF5/ThreadStackManagerImpl.h",
+        ]
+      }
+    } else if (device_platform == "efr32") {
+      sources += [
+        "FreeRTOS/SystemTimeSupport.cpp",
+        "EFR32/BLEManagerImpl.cpp",
+        "EFR32/BLEManagerImpl.h",
+        "EFR32/BlePlatformConfig.h",
+        "EFR32/CHIPDevicePlatformConfig.h",
+        "EFR32/CHIPDevicePlatformEvent.h",
+        "EFR32/CHIPPlatformConfig.h",
+        "EFR32/ConfigurationManagerImpl.cpp",
+        "EFR32/ConfigurationManagerImpl.h",
+        "EFR32/ConnectivityManagerImpl.cpp",
+        "EFR32/ConnectivityManagerImpl.h",
+        "EFR32/InetPlatformConfig.h",
+        "EFR32/Logging.cpp",
+        "EFR32/PlatformManagerImpl.cpp",
+        "EFR32/PlatformManagerImpl.h",
+        "EFR32/SystemPlatformConfig.h",
+        "EFR32/EFR32Config.cpp",
+        "EFR32/EFR32Config.h",
+        "EFR32/freertos_bluetooth.c",
+        "EFR32/freertos_bluetooth.h",
+        "EFR32/gatt_db.c",
+        "EFR32/gatt_db.h",
+      ]
+      if (chip_enable_openthread) {
+        sources += [
+          "EFR32/ThreadStackManagerImpl.cpp",
+          "EFR32/ThreadStackManagerImpl.h",
         ]
       }
     }

@@ -40,6 +40,10 @@ template("gcc_toolchain") {
       cxx = invoker.cxx
     }
 
+    if (defined(invoker.link)) {
+      link = invoker.link
+    }
+
     is_host_toolchain = invoker_toolchain_args.current_os == host_os
     link_group = true
 

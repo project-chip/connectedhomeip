@@ -15,7 +15,7 @@
 import("//build_overrides/chip.gni")
 
 declare_args() {
-  # Device platform layer: freertos, nrf5, none.
+  # Device platform layer: freertos, nrf5, efr32, none.
   device_platform = "auto"
 }
 
@@ -65,5 +65,5 @@ if (device_layer != "none") {
 
 assert((current_os != "freertos" && device_platform == "none") ||
            device_platform == "darwin" || device_platform == "nrf5" ||
-           device_platform == "linux",
+           device_platform == "linux" || device_platform == "efr32",
        "Please select a valid value for device_platform")

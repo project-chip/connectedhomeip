@@ -12,22 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/toolchain/gcc_toolchain.gni")
-
-template("arm_toolchain") {
-  gcc_toolchain(target_name) {
-    _tool_name_root = "arm-none-eabi-"
-    ar = _tool_name_root + "ar"
-    cc = _tool_name_root + "gcc"
-    cxx = _tool_name_root + "g++"
-    link = _tool_name_root + "ld"
-
-    toolchain_args = {
-      current_cpu = "arm"
-      current_os = invoker.current_os
-      is_clang = false
-
-      forward_variables_from(invoker.toolchain_args, "*")
-    }
-  }
+declare_args() {
+  # Location of the Pigweed repository.
+  dir_pigweed = "//third_party/connectedhomeip/third_party/pigweed/repo"
 }
+
+import("$dir_pigweed/modules.gni")

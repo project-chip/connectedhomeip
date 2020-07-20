@@ -192,13 +192,14 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
 {
     bool initiated = false;
     BoltLockManager::Action_t action;
-    int32_t actor;
+    // int32_t actor;
     int err = CHIP_NO_ERROR;
 
     if (aEvent->Type == AppEvent::kEventType_Lock)
     {
         action = static_cast<BoltLockManager::Action_t>(aEvent->LockEvent.Action);
-        actor  = aEvent->LockEvent.Actor;
+        // TODO : Use this variable
+        // actor  = aEvent->LockEvent.Actor;
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {

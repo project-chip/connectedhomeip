@@ -12,22 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/toolchain/gcc_toolchain.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
-template("arm_toolchain") {
-  gcc_toolchain(target_name) {
-    _tool_name_root = "arm-none-eabi-"
-    ar = _tool_name_root + "ar"
-    cc = _tool_name_root + "gcc"
-    cxx = _tool_name_root + "g++"
-    link = _tool_name_root + "ld"
+declare_args() {
+  # Build target to use for efr32 SDK. Use this to set global SDK defines.
+  efr32_sdk_target = ""
+}
 
-    toolchain_args = {
-      current_cpu = "arm"
-      current_os = invoker.current_os
-      is_clang = false
+assert(efr32_sdk_target != "", "efr32_sdk_target must be specified")
 
-      forward_variables_from(invoker.toolchain_args, "*")
-    }
-  }
+group("efr32_sdk") {
+    public_deps = [efr32_sdk_target]
 }

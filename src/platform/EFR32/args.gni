@@ -12,22 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/toolchain/gcc_toolchain.gni")
+device_platform = "efr32"
 
-template("arm_toolchain") {
-  gcc_toolchain(target_name) {
-    _tool_name_root = "arm-none-eabi-"
-    ar = _tool_name_root + "ar"
-    cc = _tool_name_root + "gcc"
-    cxx = _tool_name_root + "g++"
-    link = _tool_name_root + "ld"
+lwip_platform = "efr32"
+lwip_ipv6 = true
+lwip_ipv4 = false
+lwip_api = true
 
-    toolchain_args = {
-      current_cpu = "arm"
-      current_os = invoker.current_os
-      is_clang = false
+inet_config_enable_ipv4 = false
+inet_config_enable_dns_resolver = false
 
-      forward_variables_from(invoker.toolchain_args, "*")
-    }
-  }
-}
+chip_build_tests = false
+
+ble_platform_config_include = "<platform/EFR32/BlePlatformConfig.h>"
+chip_device_platform_config_include = "<platform/EFR32/CHIPDevicePlatformConfig.h>"
+chip_platform_config_include = "<platform/EFR32/CHIPPlatformConfig.h>"
+inet_platform_config_include = "<platform/EFR32/InetPlatformConfig.h>"
+system_platform_config_include = "<platform/EFR32/SystemPlatformConfig.h>"
