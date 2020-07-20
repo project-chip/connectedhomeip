@@ -116,9 +116,6 @@ static void TestBlockingSelect(nlTestSuite * inSuite, void * aContext)
 {
     TestContext & lContext = *static_cast<TestContext *>(aContext);
 
-    // Clear the event
-    lContext.mWakeEvent.Confirm();
-
     // Spawn a thread waiting for the event
     pthread_t tid = 0;
     NL_TEST_ASSERT(inSuite, 0 == pthread_create(&tid, nullptr, WaitForEvent, aContext));

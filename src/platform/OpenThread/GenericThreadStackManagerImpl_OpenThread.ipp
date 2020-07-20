@@ -30,6 +30,7 @@
 #include <openthread/dataset.h>
 #include <openthread/dataset_ftd.h>
 #include <openthread/link.h>
+#include <openthread/netdata.h>
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
 #include <openthread/thread_ftd.h>
@@ -37,6 +38,7 @@
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 extern "C" void otSysProcessDrivers(otInstance * aInstance);
@@ -730,7 +732,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
         VerifyOrExit(otInst != NULL, err = MapOpenThreadError(OT_ERROR_FAILED));
     }
 
+#ifndef __ZEPHYR__
     otCliUartInit(otInst);
+#endif
 
     mOTInst = otInst;
 

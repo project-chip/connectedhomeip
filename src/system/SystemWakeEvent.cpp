@@ -91,7 +91,7 @@ void SystemWakeEvent::Notify()
 
 Error SystemWakeEvent::Open()
 {
-    mFD = eventfd(0, EFD_NONBLOCK);
+    mFD = eventfd(0, 0);
 
     if (mFD == -1)
     {
