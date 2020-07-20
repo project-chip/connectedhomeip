@@ -67,6 +67,9 @@ public:
     /** Get the Session ID from this header. */
     uint32_t GetSecureSessionID(void) const { return mSecureSessionID; }
 
+    /** Get the Profile ID from this header. */
+    uint32_t GetProfileID(void) const { return mProfileID; }
+
     /** Get the message auth tag from this header. */
     uint64_t GetTag(void) const { return mTag; }
 
@@ -74,6 +77,14 @@ public:
     MessageHeader & SetMessageId(uint32_t id)
     {
         mMessageId = id;
+
+        return *this;
+    }
+
+    /** Set the message id for this header. */
+    MessageHeader & SetProfileId(uint16_t id)
+    {
+        mProfileID = id;
 
         return *this;
     }
@@ -205,6 +216,9 @@ private:
 
     /// Message authentication tag generated at encryption of the message.
     uint64_t mTag = 0;
+
+    // CHIP Profile ID
+    uint16_t mProfileID = 0;
 };
 
 } // namespace chip

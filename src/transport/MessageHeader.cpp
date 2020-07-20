@@ -34,6 +34,7 @@
  *  16 bit: | Secure message type                             |
  *  32 bit: | MESSAGE_ID                                      |
  *  32 bit: | Secure Session ID                               |
+ *  16 bit: | Profile ID                                      |
  *  64 bit: | Message Authentication Tag                      |
  *  64 bit: | SOURCE_NODE_ID (iff source node flag is set)    |
  *  64 bit: | DEST_NODE_ID (iff destination node flag is set) |
@@ -96,6 +97,7 @@ CHIP_ERROR MessageHeader::Decode(const uint8_t * data, size_t size, size_t * dec
     mSecureMsgType   = LittleEndian::Read16(p);
     mMessageId       = LittleEndian::Read32(p);
     mSecureSessionID = LittleEndian::Read32(p);
+    mProfileID       = LittleEndian::Read16(p);
     mTag             = LittleEndian::Read64(p);
 
     assert(p - data == kFixedHeaderSizeBytes);
@@ -151,6 +153,7 @@ CHIP_ERROR MessageHeader::Encode(uint8_t * data, size_t size, size_t * encode_si
     LittleEndian::Write16(p, mSecureMsgType);
     LittleEndian::Write32(p, mMessageId);
     LittleEndian::Write32(p, mSecureSessionID);
+    LittleEndian::Write16(p, mProfileID);
     LittleEndian::Write64(p, mTag);
     if (mSourceNodeId.HasValue())
     {
