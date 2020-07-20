@@ -42,7 +42,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		1E3DE6E024AF86F50028DC40 /* libDeviceLayer.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libDeviceLayer.a; path = "lib/libDeviceLayer.a"; sourceTree = BUILD_PRODUCT_DIR; };
+		1E3DE6E024AF86F50028DC40 /* libDeviceLayer.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libDeviceLayer.a; path = lib/libDeviceLayer.a; sourceTree = BUILD_PRODUCT_DIR; };
 		2C4DF09D248B2C60009307CB /* libmbedtls.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedtls.a; path = lib/libmbedtls.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		515C401A2486BF43004C4DB3 /* CHIPOnOff.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPOnOff.mm; sourceTree = "<group>"; };
 		515C401B2486BF43004C4DB3 /* CHIPOnOff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPOnOff.h; sourceTree = "<group>"; };
@@ -463,7 +463,13 @@
 				LIBRARY_SEARCH_PATHS = "$(CHIP_PREFIX)/lib";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
-				"OTHER_LDFLAGS[arch=*]" = "-lnetwork";
+				"OTHER_LDFLAGS[arch=*]" = (
+					"-framework",
+					Foundation,
+					"-framework",
+					CoreBluetooth,
+					"-lnetwork",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIP;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -494,7 +500,13 @@
 				LIBRARY_SEARCH_PATHS = "$(CHIP_PREFIX)/lib";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
-				"OTHER_LDFLAGS[arch=*]" = "-lnetwork";
+				"OTHER_LDFLAGS[arch=*]" = (
+					"-lnetwork",
+					"-framework",
+					Foundation,
+					"-framework",
+					CoreBluetooth,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIP;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -623,7 +635,13 @@
 				LIBRARY_SEARCH_PATHS = "$(CHIP_PREFIX)/lib";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
-				"OTHER_LDFLAGS[sdk=*]" = "-lnetwork";
+				"OTHER_LDFLAGS[sdk=*]" = (
+					"-framework",
+					Foundation,
+					"-framework",
+					CoreBluetooth,
+					"-lnetwork",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIP;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -731,7 +749,13 @@
 				LIBRARY_SEARCH_PATHS = "$(CHIP_PREFIX)/lib";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
-				"OTHER_LDFLAGS[arch=*]" = "-lnetwork";
+				"OTHER_LDFLAGS[arch=*]" = (
+					"-lnetwork",
+					"-framework",
+					Foundation,
+					"-framework",
+					CoreBluetooth,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIP;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;

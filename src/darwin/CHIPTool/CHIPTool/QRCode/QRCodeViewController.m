@@ -71,7 +71,6 @@ static NSString * const ipKey = @"ipk";
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
-    [_ble stop];
 }
 
 - (void)dismissKeyboard
@@ -253,8 +252,8 @@ static NSString * const ipKey = @"ipk";
 
 - (void)handleRendezVousBLE:(NSString *)name
 {
-    _ble = [[BLEConnectionController alloc] initWithName:name];
-    [_ble start];
+    NSError * error;
+    [self.chipController connect:name error:&error];
 }
 
 - (void)handleRendezVousWiFi:(NSString *)name
