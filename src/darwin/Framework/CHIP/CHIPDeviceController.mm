@@ -208,8 +208,9 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     }
 
     // Start the IO pump
-    [self _serviceEvents];
-
+    dispatch_async(_chipSelectQueue, ^() {
+        self.cppController->ServiceEvents();
+    });
     return YES;
 }
 
@@ -325,31 +326,6 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     [self.lock unlock];
 
     return isConnected ? YES : NO;
-}
-
-// TODO kill this with fire (NW might implicitly replace this?)
-- (void)_serviceEvents
-{
-    __weak typeof(self) weakSelf = self;
-    dispatch_async(self.chipSelectQueue, ^() {
-        typeof(self) strongSelf = weakSelf;
-        if (!strongSelf) {
-            return;
-        }
-
-        [self.lock lock];
-
-        if (!self.cppController->IsConnected()) {
-            [self.lock unlock];
-            // cancel the loop, it'll restart the next time a connection is established
-            return;
-        }
-
-        self.cppController->ServiceEvents();
-        [self.lock unlock];
-
-        [self _serviceEvents];
-    });
 }
 
 - (void)registerCallbacks:appCallbackQueue onMessage:(ControllerOnMessageBlock)onMessage onError:(ControllerOnErrorBlock)onError

@@ -258,8 +258,6 @@ void DoEcho(DeviceController::ChipDeviceController * controller, const IPAddress
         controller->SendMessage(NULL, buffer);
         printf("Msg sent to server at %s:%d\n", host_ip_str, port);
 
-        controller->ServiceEvents();
-
         sleep(SEND_DELAY);
     }
 }
@@ -316,7 +314,6 @@ void DoOnOff(DeviceController::ChipDeviceController * controller, Command comman
 #endif
 
     controller->SendMessage(NULL, buffer);
-    controller->ServiceEvents();
 }
 
 // ================================================================================
@@ -340,6 +337,9 @@ int main(int argc, char * argv[])
     err               = controller->Init(kLocalDeviceId);
     VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to initialize the device controller"));
 
+    err = controller->ServiceEvents();
+    SuccessOrExit(err);
+
     err = controller->ConnectDevice(kRemoteDeviceId, host_addr, NULL, EchoKeyExchange, EchoResponse, ReceiveError, port);
     VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to connect to the device"));
 
@@ -350,6 +350,7 @@ int main(int argc, char * argv[])
     else
     {
         DoOnOff(controller, command, commandArgs.endpointId);
+        controller->ServiceEventSignal();
     }
 
 exit:

@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
 import("//build_overrides/nlfaultinjection.gni")
 
+import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/gn/chip/tests.gni")
 import("system.gni")
 
@@ -24,15 +25,8 @@ declare_args() {
   # TODO - This should probably be in src/core but src/system also uses it.
   chip_project_config_include = "<CHIPProjectConfig.h>"
 
-  # Extra header to include in CHIPConfig.h for platform.
-  # TODO - This should probably be in src/core but src/system also uses it.
-  chip_platform_config_include = ""
-
   # Extra header to include in SystemConfig.h for project.
   system_project_config_include = "<SystemProjectConfig.h>"
-
-  # Extra header to include in SystemConfig.h for platform.
-  system_platform_config_include = ""
 
   # Extra include dirs for project configs.
   project_config_include_dirs = []

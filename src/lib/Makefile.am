@@ -70,6 +70,12 @@ libCHIP_a_CPPFLAGS                  =                         \
     $(SOCKETS_CPPFLAGS)                                       \
     $(NULL)
 
+if CHIP_DEVICE_LAYER_TARGET_LINUX
+libCHIP_a_CPPFLAGS                                         += \
+    $(GIO_CFLAGS)                                             \
+    $(NULL)
+endif
+
 libCHIP_a_SOURCES                   = $(CHIP_BUILD_SYSTEM_LAYER_SOURCE_FILES)
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_INET_LAYER_SOURCE_FILES)
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_CORE_LAYER_SOURCE_FILES)
