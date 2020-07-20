@@ -88,7 +88,7 @@ def writeFileBloatReport(f, baselineName, buildName):
       section, vm, f = row
       if (section in SECTIONS_TO_WATCH) or (vm not in ['0', 'vmsize']):
         result.sectionChanges.append(SectionChange(section, int(f), int(vm)))
-  except:
+  except Exception:
     pass
 
   return result
