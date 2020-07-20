@@ -30,8 +30,8 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <support/Base64.h>
-#include <support/CodeUtils.h>
 #include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
@@ -88,7 +88,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ConfigureChipStack()
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         FabricState.FabricId = kFabricIdNotSpecified;
-        err = CHIP_NO_ERROR;
+        err                  = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 #endif // CHIP_CONFIG_ENABLE_FABRIC_STATE
@@ -546,21 +546,19 @@ void GenericConfigurationManagerImpl<ImplClass>::_UseManufacturerCredentialsAsOp
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPairingCode(char * buf, size_t bufSize, size_t & pairingCodeLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSetupPinCode(uint32_t & setupPinCode)
 {
     CHIP_ERROR err;
 
-    err = Impl()->ReadConfigValueStr(ImplClass::kConfigKey_PairingCode, buf, bufSize, pairingCodeLen);
-#ifdef CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE
-    if (CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE[0] != 0 && err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    err = Impl()->ReadConfigValue(ImplClass::kConfigKey_SetupPinCode, setupPinCode);
+#ifdef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
+    if (CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE != 0 && err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        VerifyOrExit(sizeof(CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE) <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(buf, CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE, sizeof(CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE));
-        pairingCodeLen = sizeof(CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE) - 1;
-        ChipLogProgress(DeviceLayer, "Pairing code not found; using default: %s", CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE);
+        setupPinCode = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
+        ChipLogProgress(DeviceLayer, "Pairing code not found; using default: %08u", CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE);
         err = CHIP_NO_ERROR;
     }
-#endif // CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE
+#endif // CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
     SuccessOrExit(err);
 
 exit:
@@ -568,9 +566,36 @@ exit:
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePairingCode(const char * pairingCode, size_t pairingCodeLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreSetupPinCode(uint32_t setupPinCode)
 {
-    return Impl()->WriteConfigValueStr(ImplClass::kConfigKey_PairingCode, pairingCode, pairingCodeLen);
+    return Impl()->WriteConfigValue(ImplClass::kConfigKey_SetupPinCode, setupPinCode);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSetupDiscriminator(uint32_t & setupDiscriminator)
+{
+    CHIP_ERROR err;
+
+    err = Impl()->ReadConfigValue(ImplClass::kConfigKey_SetupDiscriminator, setupDiscriminator);
+#ifdef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+    if (CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR != 0 && err == CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR)
+    {
+        setupDiscriminator = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
+        ChipLogProgress(DeviceLayer, "Pairing code not found; using default: %03x",
+                        CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR);
+        err = CHIP_NO_ERROR;
+    }
+#endif // CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreSetupDiscriminator(uint32_t setupDiscriminator)
+{
+    return Impl()->WriteConfigValue(ImplClass::kConfigKey_SetupDiscriminator, setupDiscriminator);
 }
 
 template <class ImplClass>
@@ -964,7 +989,7 @@ exit:
 }
 
 #if defined(DEBUG)
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_RunUnitTests()
 {
     ChipLogProgress(DeviceLayer, "Running configuration unit test");

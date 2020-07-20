@@ -319,20 +319,36 @@ exit:
     return ConfigGetDone(sout, error);
 }
 
-static CHIP_ERROR ConfigGetPairingCode(bool printHeader)
+static CHIP_ERROR ConfigGetSetupPinCode(bool printHeader)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
-    char buf[ConfigurationManager::kMaxPairingCodeLength + 1];
-    size_t bufSize;
+    uint32_t setupPinCode;
 
     if (printHeader)
     {
-        streamer_printf(sout, "PairingCode:     ");
+        streamer_printf(sout, "SetupPinCode:     ");
     }
-    SuccessOrExit(error = ConfigurationMgr().GetPairingCode(buf, sizeof(buf), bufSize));
-    buf[bufSize] = '\0';
-    streamer_printf(sout, "%s", buf);
+    SuccessOrExit(error = ConfigurationMgr().GetSetupPinCode(setupPinCode));
+    streamer_printf(sout, "%08u", setupPinCode);
+
+exit:
+    return ConfigGetDone(sout, error);
+}
+
+static CHIP_ERROR ConfigGetSetupDiscriminator(bool printHeader)
+{
+    CHIP_ERROR error  = CHIP_NO_ERROR;
+    streamer_t * sout = streamer_get();
+    uint32_t setupDiscriminator;
+
+    if (printHeader)
+    {
+        streamer_printf(sout, "SetupDiscriminator:");
+    }
+    SuccessOrExit(error = ConfigurationMgr().GetSetupDiscriminator(setupDiscriminator));
+    streamer_printf(sout, "%03x", setupDiscriminator & 0xFFF);
+
 exit:
     return ConfigGetDone(sout, error);
 }
@@ -384,7 +400,8 @@ int cmd_device_config(int argc, char ** argv)
 
     error |= ConfigGetServiceId(true);
     error |= ConfigGetFabricId(true);
-    error |= ConfigGetPairingCode(true);
+    error |= ConfigGetSetupPinCode(true);
+    error |= ConfigGetSetupDiscriminator(true);
 
     error |= ConfigGetDeviceId(true);
     error |= ConfigGetDeviceCert(true);
@@ -450,7 +467,11 @@ int cmd_device_get(int argc, char ** argv)
     }
     else if (strcmp(argv[0], "pairingcode") == 0)
     {
-        SuccessOrExit(error = ConfigGetPairingCode(false));
+        SuccessOrExit(error = ConfigGetSetupPinCode(false));
+    }
+    else if (strcmp(argv[0], "discriminator") == 0)
+    {
+        SuccessOrExit(error = ConfigGetSetupDiscriminator(false));
     }
     else if (strcmp(argv[0], "serviceid") == 0)
     {
