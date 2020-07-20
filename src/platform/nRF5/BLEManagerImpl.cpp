@@ -253,7 +253,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * devName)
     }
     else
     {
-        snprintf(devNameBuf, sizeof(devNameBuf), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, (uint32_t) 0);
+        snprintf(devNameBuf, sizeof(devNameBuf), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, (uint32_t) 0xabcd);
         devNameBuf[kMaxDeviceNameLength] = 0;
     }
 

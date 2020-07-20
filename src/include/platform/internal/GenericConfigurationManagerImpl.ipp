@@ -756,6 +756,7 @@ GenericConfigurationManagerImpl<ImplClass>::_GetBLEDeviceIdentificationInfo(Ble:
 {
     CHIP_ERROR err;
     uint16_t id;
+    uint16_t discriminator = 0x0ABC; // FIXME: use discriminator from factory data
 
     deviceIdInfo.Init();
 
@@ -766,10 +767,7 @@ GenericConfigurationManagerImpl<ImplClass>::_GetBLEDeviceIdentificationInfo(Ble:
     err = Impl()->_GetProductId(id);
     SuccessOrExit(err);
     deviceIdInfo.SetProductId(id);
-
-#if CHIP_CONFIG_ENABLE_FABRIC_STATE
-    deviceIdInfo.SetDeviceId(FabricState.LocalNodeId);
-#endif
+    deviceIdInfo.SetDeviceDiscriminator(discriminator);
 
     deviceIdInfo.PairingStatus = Impl()->_IsPairedToAccount() ? Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Paired
                                                               : Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Unpaired;
