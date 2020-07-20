@@ -207,13 +207,13 @@ private:
      * @param info Optional QR code info object to add
      * @return Returns a CHIP_ERROR_INVALID_ARGUMENT on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR addOptionalVendorData(OptionalQRCodeInfo info);
+    CHIP_ERROR addOptionalVendorData(const OptionalQRCodeInfo & info);
 
     /** @brief A function to add an optional QR Code info CHIP object
      * @param info Optional QR code info object to add
      * @return Returns a CHIP_ERROR_INVALID_ARGUMENT on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR addOptionalExtensionData(OptionalQRCodeInfoExtension info);
+    CHIP_ERROR addOptionalExtensionData(const OptionalQRCodeInfoExtension & info);
 
     /**
      * @brief A function to retrieve the vector of CHIPQRCodeInfo infos
