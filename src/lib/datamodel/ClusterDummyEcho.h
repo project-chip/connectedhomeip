@@ -72,10 +72,7 @@ private:
     AttributeSimple<bool> mDummyEcho;
 
 public:
-    ClusterDummyEcho() : Cluster(kClusterIdDummyEcho), mDummyEcho(kAttributeIdDummyEcho)
-    {
-        AddAttribute(&mDummyEcho);
-    }
+    ClusterDummyEcho() : Cluster(kClusterIdDummyEcho), mDummyEcho(kAttributeIdDummyEcho) { AddAttribute(&mDummyEcho); }
 
     virtual CHIP_ERROR HandleCommandEchoRequest(Command & cmd)
     {
