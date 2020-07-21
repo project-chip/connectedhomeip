@@ -279,7 +279,7 @@ err_t GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::DoInitThreadNetI
     netif->output = NULL;
 #endif /* LWIP_IPV4 || LWIP_VERSION_MAJOR < 2 */
     netif->linkoutput = NULL;
-    netif->flags      = NETIF_FLAG_UP | NETIF_FLAG_LINK_UP | NETIF_FLAG_BROADCAST | NETIF_FLAG_MLD6;
+    netif->flags      = NETIF_FLAG_UP | NETIF_FLAG_LINK_UP | NETIF_FLAG_BROADCAST;
     netif->mtu        = CHIP_DEVICE_CONFIG_THREAD_IF_MTU;
     return ERR_OK;
 }
