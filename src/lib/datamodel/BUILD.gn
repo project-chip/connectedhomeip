@@ -21,6 +21,7 @@ static_library("datamodel") {
     "Attribute.h",
     "Cluster.h",
     "ClusterBasic.h",
+    "ClusterDummyEcho.h",
     "ClusterOnOff.h",
     "ClusterServer.cpp",
     "ClusterServer.h",

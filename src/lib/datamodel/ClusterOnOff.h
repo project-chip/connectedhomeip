@@ -120,7 +120,7 @@ public:
      *
      * @return CHIP_NO_ERROR on success or a failure-specific error code otherwise
      */
-    virtual CHIP_ERROR HandleCommand(const Command & cmd)
+    virtual CHIP_ERROR HandleCommand(Command & cmd)
     {
         switch (cmd.mId)
         {
@@ -138,7 +138,7 @@ public:
     }
 };
 
-static inline void GenerateCommand(Command * cmd, CommandId_t cmdId, uint16_t endpointId)
+static inline void ClusterOnOffGenerateCommand(Command * cmd, CommandId_t cmdId, uint16_t endpointId)
 {
     cmd->mType       = kCmdTypeCluster;
     cmd->mId         = cmdId;
@@ -152,17 +152,17 @@ static inline void GenerateCommand(Command * cmd, CommandId_t cmdId, uint16_t en
 
 static inline void ClusterOnOffEncodeOn(Command * cmd, uint16_t endpointId)
 {
-    GenerateCommand(cmd, kOnOffCmdIdOn, endpointId);
+    ClusterOnOffGenerateCommand(cmd, kOnOffCmdIdOn, endpointId);
 }
 
 static inline void ClusterOnOffEncodeOff(Command * cmd, uint16_t endpointId)
 {
-    GenerateCommand(cmd, kOnOffCmdIdOff, endpointId);
+    ClusterOnOffGenerateCommand(cmd, kOnOffCmdIdOff, endpointId);
 }
 
 static inline void ClusterOnOffEncodeToggle(Command * cmd, uint16_t endpointId)
 {
-    GenerateCommand(cmd, kOnOffCmdIdToggle, endpointId);
+    ClusterOnOffGenerateCommand(cmd, kOnOffCmdIdToggle, endpointId);
 }
 
 } // namespace DataModel
