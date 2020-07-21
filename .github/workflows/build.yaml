@@ -37,11 +37,6 @@ jobs:
                   esac
 
                   scripts/build/bootstrap.sh $BOOTSTRAP_ARGUMENTS
-            - name: Configure IPv6
-              run:
-                  sudo sed -i 's/::1 ip6-localhost
-                  ip6-loopback/::1     localhost ip6-localhost ip6-loopback/g'
-                  /etc/hosts
             - name: Run Build
               run: scripts/build/default.sh
             - name: Run mbedTLS Tests
