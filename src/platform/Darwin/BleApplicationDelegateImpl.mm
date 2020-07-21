@@ -1,4 +1,4 @@
-/**
+/*
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *
@@ -15,17 +15,21 @@
  *    limitations under the License.
  */
 
-#import <CoreBluetooth/CoreBluetooth.h>
-#import <UIKit/UIKit.h>
+/**
+ *    @file
+ *          Provides an implementation of BleApplicationDelegate for Darwin platforms.
+ */
 
-@interface BLEConnectionController : NSObject <CBCentralManagerDelegate>
+#include <ble/BleConfig.h>
+#include <platform/Darwin/BleApplicationDelegate.h>
 
-@property (strong, nonatomic) CBCentralManager * centralManager;
-@property (strong, nonatomic) NSString * peripheralName;
-@property (strong, nonatomic) CBPeripheral * peripheral;
+using namespace ::chip;
+using namespace ::chip::Ble;
 
-- (id)initWithName:(NSString *)peripheralName;
-- (void)start;
-- (void)stop;
-
-@end
+namespace chip {
+namespace DeviceLayer {
+    namespace Internal {
+        void BleApplicationDelegateImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj) {}
+    } // namespace Internal
+} // namespace DeviceLayer
+} // namespace chip

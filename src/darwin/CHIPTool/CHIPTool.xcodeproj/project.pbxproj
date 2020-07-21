@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		0C47BE4424885B97005E97F6 /* CHIPViewControllerBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 0C47BE4324885B97005E97F6 /* CHIPViewControllerBase.m */; };
 		0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0CA0E0CE248599BB009087B9 /* OnOffViewController.m */; };
-		1E87C7B624A5E74E00457C90 /* BLEConnectionController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E87C7B524A5E74E00457C90 /* BLEConnectionController.m */; };
 		991DC091247747F500C13860 /* EchoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 991DC090247747F500C13860 /* EchoViewController.m */; };
 		B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A620244E1D0600C7C0E1 /* AppDelegate.m */; };
 		B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A623244E1D0600C7C0E1 /* SceneDelegate.m */; };
@@ -50,8 +49,6 @@
 		0C47BE4324885B97005E97F6 /* CHIPViewControllerBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHIPViewControllerBase.m; sourceTree = "<group>"; };
 		0CA0E0CD248599BB009087B9 /* OnOffViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OnOffViewController.h; sourceTree = "<group>"; };
 		0CA0E0CE248599BB009087B9 /* OnOffViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OnOffViewController.m; sourceTree = "<group>"; };
-		1E87C7B424A5E57100457C90 /* BLEConnectionController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLEConnectionController.h; sourceTree = "<group>"; };
-		1E87C7B524A5E74E00457C90 /* BLEConnectionController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLEConnectionController.m; sourceTree = "<group>"; };
 		515C401824868BF0004C4DB3 /* CHIPViewControllerBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPViewControllerBase.h; sourceTree = "<group>"; };
 		991DC08F247747F500C13860 /* EchoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EchoViewController.h; sourceTree = "<group>"; };
 		991DC090247747F500C13860 /* EchoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EchoViewController.m; sourceTree = "<group>"; };
@@ -96,8 +93,6 @@
 			children = (
 				B204A625244E1D0600C7C0E1 /* QRCodeViewController.h */,
 				B204A626244E1D0600C7C0E1 /* QRCodeViewController.m */,
-				1E87C7B424A5E57100457C90 /* BLEConnectionController.h */,
-				1E87C7B524A5E74E00457C90 /* BLEConnectionController.m */,
 			);
 			path = QRCode;
 			sourceTree = "<group>";
@@ -280,7 +275,6 @@
 				B204A627244E1D0600C7C0E1 /* QRCodeViewController.m in Sources */,
 				991DC091247747F500C13860 /* EchoViewController.m in Sources */,
 				B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */,
-				1E87C7B624A5E74E00457C90 /* BLEConnectionController.m in Sources */,
 				B204A632244E1D0700C7C0E1 /* main.m in Sources */,
 				B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */,
 				0C47BE4424885B97005E97F6 /* CHIPViewControllerBase.m in Sources */,

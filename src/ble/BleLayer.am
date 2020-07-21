@@ -38,6 +38,7 @@ CHIP_BUILD_BLE_LAYER_HEADER_FILES                         = \
     @top_builddir@/src/ble/Ble.h                            \
     @top_builddir@/src/ble/BleApplicationDelegate.h         \
     @top_builddir@/src/ble/BleConfig.h                      \
+    @top_builddir@/src/ble/BleConnectionDelegate.h          \
     @top_builddir@/src/ble/BleError.h                       \
     @top_builddir@/src/ble/BleLayer.h                       \
     @top_builddir@/src/ble/BlePlatformDelegate.h            \

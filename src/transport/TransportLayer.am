@@ -25,6 +25,7 @@
 #
 
 CHIP_BUILD_TRANSPORT_LAYER_SOURCE_FILES                  = \
+    @top_builddir@/src/transport/BLE.cpp                   \
     @top_builddir@/src/transport/SecureSession.cpp         \
     @top_builddir@/src/transport/MessageHeader.cpp         \
     @top_builddir@/src/transport/SecureSessionMgr.cpp      \
@@ -33,6 +34,7 @@ CHIP_BUILD_TRANSPORT_LAYER_SOURCE_FILES                  = \
 
 CHIP_BUILD_TRANSPORT_LAYER_HEADER_FILES              = \
     @top_builddir@/src/transport/Base.h                \
+    @top_builddir@/src/transport/BLE.h                 \
     @top_builddir@/src/transport/SecureSession.h       \
     @top_builddir@/src/transport/MessageHeader.h       \
     @top_builddir@/src/transport/PeerAddress.h         \

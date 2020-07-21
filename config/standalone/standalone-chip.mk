@@ -95,7 +95,7 @@ CHIP_CONFIGURE_OPTIONS = \
     --exec-prefix=$(CHIP_OUTPUT_DIR) \
     --host=$(CHIP_HOST_ARCH) \
     --build=$(CHIP_BUILD_ARCH) \
-    --with-network-layer=inet \
+    --with-network-layer=all \
     --with-target-network=sockets \
     --with-inet-endpoint="tcp udp" \
     --disable-tests \
@@ -146,6 +146,10 @@ STD_LIBS += $(shell pkg-config --libs openssl)
 ifeq ($(findstring linux,$(CHIP_HOST_ARCH)),linux)
 STD_LIBS += $(shell pkg-config --libs gio-2.0)
 STD_CFLAGS += $(shell pkg-config --cflags gio-2.0)
+endif
+
+ifeq ($(findstring darwin,$(CHIP_HOST_ARCH)),darwin)
+STD_LIBS += -framework Foundation -framework CoreBluetooth
 endif
 
 # Add the appropriate CHIP target as a prerequisite to all application

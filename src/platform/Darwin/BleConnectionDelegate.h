@@ -15,20 +15,25 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for the CHIP BLE
- *          Layer on Darwin platforms.
- *
- */
+#ifndef BLE_CONNECTION_DELEGATE_H
+#define BLE_CONNECTION_DELEGATE_H
 
-#ifndef BLE_PLATFORM_CONFIG_H
-#define BLE_PLATFORM_CONFIG_H
+#include <ble/BleConnectionDelegate.h>
 
-// ==================== Platform Adaptations ====================
+using namespace ::chip::Ble;
 
-// ========== Platform-specific Configuration Overrides =========
+namespace chip {
+namespace DeviceLayer {
+namespace Internal {
 
-/* none so far */
+class BleConnectionDelegateImpl : public BleConnectionDelegate
+{
+public:
+    virtual void NewConnection(Ble::BleLayer * bleLayer, void * appState, const char * connName);
+};
 
-#endif // BLE_PLATFORM_CONFIG_H
+} // namespace Internal
+} // namespace DeviceLayer
+} // namespace chip
+
+#endif // BLE_CONNECTION_DELEGATE_H
