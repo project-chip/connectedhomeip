@@ -37,10 +37,8 @@
 #include <stdlib.h>
 
 extern "C" {
-#include "chip-zcl/chip-zcl.h"
-#include "gen/gen-cluster-id.h"
-#include "gen/gen-types.h"
-}
+#include "../af-types.h"
+} // extern "C"
 
 namespace chip {
 namespace DeviceManager {
@@ -77,7 +75,7 @@ public:
      * @param size               size of the attribute
      * @param value              pointer to the new value
      */
-    virtual void PostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId,
+    virtual void PostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
                                              uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
     {}
     virtual ~CHIPDeviceManagerCallbacks() {}

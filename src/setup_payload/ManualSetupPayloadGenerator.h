@@ -49,7 +49,7 @@ private:
     SetupPayload mSetupPayload;
 
 public:
-    ManualSetupPayloadGenerator(SetupPayload payload) : mSetupPayload(payload){};
+    ManualSetupPayloadGenerator(const SetupPayload & payload) : mSetupPayload(payload){};
 
     // Populates decimal string representation of the payload into outDecimalString
     CHIP_ERROR payloadDecimalStringRepresentation(string & outDecimalString);

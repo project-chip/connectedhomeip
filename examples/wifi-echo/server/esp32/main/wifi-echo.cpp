@@ -51,6 +51,7 @@ using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
 extern void startServer();
+extern void startBle();
 
 #if CONFIG_USE_ECHO_CLIENT
 extern void startClient(void);
@@ -399,6 +400,12 @@ extern "C" void app_main()
     // Start the Echo Server
     InitDataModelHandler();
     startServer();
+
+    if (static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kBLE)
+    {
+        startBle();
+    }
+
 #if CONFIG_USE_ECHO_CLIENT
     startClient();
 #endif

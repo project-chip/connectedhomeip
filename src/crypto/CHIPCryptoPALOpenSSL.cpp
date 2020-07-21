@@ -359,11 +359,8 @@ CHIP_ERROR HKDF_SHA256(const unsigned char * secret, const size_t secret_length,
         VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
     }
 
-    if (info_length > 0 && info != NULL)
-    {
-        result = EVP_PKEY_CTX_add1_hkdf_info(context, info, info_length);
-        VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-    }
+    result = EVP_PKEY_CTX_add1_hkdf_info(context, info, info_length);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     result = EVP_PKEY_CTX_hkdf_mode(context, EVP_PKEY_HKDEF_MODE_EXTRACT_AND_EXPAND);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
