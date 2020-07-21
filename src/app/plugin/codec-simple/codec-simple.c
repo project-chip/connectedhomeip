@@ -24,8 +24,11 @@
  */
 #include "chip-zcl-codec.h"
 
+#include <assert.h>
 #include <memory.h>
 #include <stdint.h>
+
+#include "../../gen/gen-command-id.h"
 
 /**
  * @brief Starts the encoding process. if there is any kind of preamble of anything, this function is responsible for putting it
@@ -184,19 +187,44 @@ void chipZclEncodeZclHeader(ChipZclBuffer_t * buffer, ChipZclCommandContext_t * 
         mask |= 0x02;
     }
 
+    // Encode the fields as if they are an EmberApsFrame, in order, with a 0
+    // byte prepended.
     chipZclCodecEncodeStart(&codec, buffer);
-    chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &mask, sizeof(mask));
+    uint8_t small_zero = 0;
+    chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &small_zero, sizeof(small_zero));
+    uint16_t profile_id = 0xFFFF; // Wildcard profile id.
+    chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &profile_id, sizeof(profile_id));
+
+    chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->clusterId), sizeof(context->clusterId));
+
+    // Make up a fake source endpoint.
+    uint8_t source_endpoint = 1;
+    chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &source_endpoint, sizeof(source_endpoint));
+    // The context's endpoint id is the destination endpoint.
     chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->endpointId), sizeof(context->endpointId));
-    chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->commandId), sizeof(context->commandId));
-    chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->direction), sizeof(context->direction));
-    if (mask & 0x01)
-    {
-        chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->clusterId), sizeof(context->clusterId));
-    }
-    if (mask & 0x02)
-    {
-        chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->mfgCode), sizeof(context->mfgCode));
-    }
+    // 0 for options
+    uint16_t zero = 0;
+    chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &zero, sizeof(zero));
+    // 0 for group id.
+    chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &zero, sizeof(zero));
+    // 0 for sequence number
+    chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &small_zero, sizeof(small_zero));
+    // 0 for radius
+    chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &small_zero, sizeof(small_zero));
+
+    // And now the ZCL bits: mask, sequence number, command id.
+    // NOTE: We are dropping context->direction and assuming client-to-server
+    // for now; it would go in the mask in general.
+    chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &mask, sizeof(mask));
+    // Totally fake sequence number.
+    uint8_t one = 1;
+    chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &one, sizeof(one));
+
+    // context->commandId is 16-bit, but our wire format allows only 8 bits for
+    // command.
+    assert(context->commandId <= UINT8_MAX);
+    uint8_t commandId = (uint8_t) context->commandId;
+    chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &commandId, sizeof(commandId));
     chipZclCodecEncodeEnd(&codec);
 }
 
@@ -206,16 +234,52 @@ void chipZclEncodeZclHeader(ChipZclBuffer_t * buffer, ChipZclCommandContext_t * 
 void chipZclDecodeZclHeader(ChipZclBuffer_t * buffer, ChipZclCommandContext_t * context)
 {
     ChipZclCodec_t codec;
-    uint8_t mask = 0;
+
     chipZclCodecDecodeStart(&codec, buffer);
-    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &mask, sizeof(mask), NULL);
+    uint8_t temp8 = 0;
+    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &temp8, sizeof(temp8), NULL);
+    assert(temp8 == 0);
+
+    uint16_t temp16 = 0;
+    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &temp16, sizeof(temp16), NULL);
+    // Throw away temp16, which is the "profile" here.
+
+    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->clusterId), sizeof(context->clusterId), NULL);
+
+    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &temp8, sizeof(temp8), NULL);
+    // Throw away temp8, which is the "source endpoint" here.
+
     chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->endpointId), sizeof(context->endpointId), NULL);
-    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->commandId), sizeof(context->commandId), NULL);
-    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->direction), sizeof(context->direction), NULL);
+
+    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &temp16, sizeof(temp16), NULL);
+    // Throw away temp16, which is the "options" here.
+
+    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &temp16, sizeof(temp16), NULL);
+    // Throw away temp16, which is the "group id" here.
+
+    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &temp8, sizeof(temp8), NULL);
+    // Throw away temp8, which is the "APS sequence number" here.
+
+    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &temp8, sizeof(temp8), NULL);
+    // Throw away temp8, which is the "radius" here.
+
+    uint8_t mask = 0;
+    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &mask, sizeof(mask), NULL);
+
+    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &temp8, sizeof(temp8), NULL);
+    // Throw away temp8, which is the "ZCL sequence number" here.
+
+    // On the wire the command id is 8-bit, while context->commandId is 16-bit.
+    // Make sure to only read 8 bits.
+    uint8_t commandId = 0;
+    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &commandId, sizeof(commandId), NULL);
+    context->commandId = commandId;
+
+    context->direction = ZCL_DIRECTION_CLIENT_TO_SERVER;
+
     if (mask & 0x01)
     {
         context->clusterSpecific = true;
-        chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->clusterId), sizeof(context->clusterId), NULL);
     }
     else
     {
@@ -224,7 +288,7 @@ void chipZclDecodeZclHeader(ChipZclBuffer_t * buffer, ChipZclCommandContext_t * 
     if (mask & 0x02)
     {
         context->mfgSpecific = true;
-        chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->mfgCode), sizeof(context->mfgCode), NULL);
+        context->mfgCode     = 0;
     }
     else
     {
