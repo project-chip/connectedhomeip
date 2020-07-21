@@ -48,33 +48,16 @@ struct ChipBLEDeviceIdentificationInfo
 {
     enum
     {
-        kMajorVersion = 0,
-        kMinorVersion = 1,
-    };
-
-    enum
-    {
         kPairingStatus_Unpaired = 0,
         kPairingStatus_Paired   = 1,
     };
 
-    uint8_t BlockLen;
-    uint8_t BlockType;
-    uint8_t MajorVersion;
-    uint8_t MinorVersion;
+    uint8_t PairingStatus;
+    uint8_t DeviceDiscriminator[2];
     uint8_t DeviceVendorId[2];
     uint8_t DeviceProductId[2];
-    uint8_t DeviceId[8];
-    uint8_t PairingStatus;
 
-    void Init()
-    {
-        memset(this, 0, sizeof(*this));
-        BlockLen     = sizeof(*this) - sizeof(BlockLen); // size of all fields EXCEPT BlockLen
-        BlockType    = kchipBLEServiceDataType_DeviceIdentificationInfo;
-        MajorVersion = kMajorVersion;
-        MinorVersion = kMinorVersion;
-    }
+    void Init() { memset(this, 0, sizeof(*this)); }
 
     uint16_t GetVendorId(void) { return chip::Encoding::LittleEndian::Get16(DeviceVendorId); }
 
@@ -84,9 +67,19 @@ struct ChipBLEDeviceIdentificationInfo
 
     void SetProductId(uint16_t productId) { chip::Encoding::LittleEndian::Put16(DeviceProductId, productId); }
 
-    uint64_t GetDeviceId(void) { return chip::Encoding::LittleEndian::Get64(DeviceId); }
+    uint16_t GetDeviceDiscriminator(void)
+    {
+        uint16_t discriminator                = chip::Encoding::LittleEndian::Get16(DeviceDiscriminator);
+        constexpr uint16_t kDiscriminatorMask = 0x7f;
 
-    void SetDeviceId(uint64_t deviceId) { chip::Encoding::LittleEndian::Put64(DeviceId, deviceId); }
+        return discriminator & kDiscriminatorMask;
+    }
+
+    void SetDeviceDiscriminator(uint16_t deviceDiscriminator)
+    {
+        chip::Encoding::LittleEndian::Put16(DeviceDiscriminator, deviceDiscriminator);
+        DeviceDiscriminator[1] &= 0x0f;
+    }
 } __attribute__((packed));
 
 } /* namespace Ble */

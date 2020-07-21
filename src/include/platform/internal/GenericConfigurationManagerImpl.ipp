@@ -88,7 +88,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ConfigureChipStack()
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         FabricState.FabricId = kFabricIdNotSpecified;
-        err = CHIP_NO_ERROR;
+        err                  = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 #endif // CHIP_CONFIG_ENABLE_FABRIC_STATE
@@ -761,6 +761,7 @@ GenericConfigurationManagerImpl<ImplClass>::_GetBLEDeviceIdentificationInfo(Ble:
 {
     CHIP_ERROR err;
     uint16_t id;
+    uint16_t discriminator = 0x0ABC; // FIXME: use discriminator from factory data
 
     deviceIdInfo.Init();
 
@@ -771,10 +772,7 @@ GenericConfigurationManagerImpl<ImplClass>::_GetBLEDeviceIdentificationInfo(Ble:
     err = Impl()->_GetProductId(id);
     SuccessOrExit(err);
     deviceIdInfo.SetProductId(id);
-
-#if CHIP_CONFIG_ENABLE_FABRIC_STATE
-    deviceIdInfo.SetDeviceId(FabricState.LocalNodeId);
-#endif
+    deviceIdInfo.SetDeviceDiscriminator(discriminator);
 
     deviceIdInfo.PairingStatus = Impl()->_IsPairedToAccount() ? Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Paired
                                                               : Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Unpaired;
@@ -964,7 +962,7 @@ exit:
 }
 
 #if defined(DEBUG)
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_RunUnitTests()
 {
     ChipLogProgress(DeviceLayer, "Running configuration unit test");
