@@ -138,6 +138,7 @@ STD_LIBS += \
     -lDeviceLayer \
     -lInetLayer \
     -lnlfaultinjection \
+    -lSupportLayer \
     -lSystemLayer
 
 STD_LIBS += $(shell pkg-config --libs openssl)
@@ -158,6 +159,7 @@ STD_LINK_PREREQUISITES += \
     $(CHIP_OUTPUT_DIR)/lib/libDeviceLayer.a \
     $(CHIP_OUTPUT_DIR)/lib/libInetLayer.a \
     $(CHIP_OUTPUT_DIR)/lib/libnlfaultinjection.a \
+    $(CHIP_OUTPUT_DIR)/lib/libSupportLayer.a \
     $(CHIP_OUTPUT_DIR)/lib/libSystemLayer.a
 
 

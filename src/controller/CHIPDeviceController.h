@@ -142,21 +142,18 @@ public:
     // ----- IO -----
     /**
      * @brief
-     *   Allow the CHIP Stack to process any pending events
-     *   This can be called in an event handler loop to tigger callbacks within the CHIP stack
-     *   Note - Some platforms might need to implement their own event handler
+     * Start the event loop task within the CHIP stack
+     * @return CHIP_ERROR   The return status
      */
-    void ServiceEvents();
+    CHIP_ERROR ServiceEvents();
 
     /**
      * @brief
-     *   Get pointers to the Layers ownerd by the controller
-     *
-     * @param[out] systemLayer   A pointer to the SystemLayer object
-     * @param[out] inetLayer     A pointer to the InetLayer object
-     * @return CHIP_ERROR   Indicates whether the layers were populated correctly
+     *   Allow the CHIP Stack to process any pending events
+     *   This can be called in an event handler loop to tigger callbacks within the CHIP stack
+     * @return CHIP_ERROR   The return status
      */
-    CHIP_ERROR GetLayers(Layer ** systemLayer, InetLayer ** inetLayer);
+    CHIP_ERROR ServiceEventSignal();
 
     virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
                                    System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr);
@@ -176,9 +173,6 @@ private:
         kConnectionState_Connected       = 1,
         kConnectionState_SecureConnected = 2,
     };
-
-    System::Layer * mSystemLayer;
-    Inet::InetLayer * mInetLayer;
 
     SecureSessionMgr<Transport::UDP> * mSessionManager;
 

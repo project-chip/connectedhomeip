@@ -17,15 +17,13 @@ import("//build_overrides/nlassert.gni")
 import("//build_overrides/nlfaultinjection.gni")
 import("//build_overrides/nlio.gni")
 
+import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/gn/chip/tests.gni")
 import("inet.gni")
 
 declare_args() {
   # Extra header to include in SystemConfig.h for project.
   inet_project_config_include = ""
-
-  # Extra header to include in SystemConfig.h for platform.
-  inet_platform_config_include = ""
 }
 
 config("inet_config") {

@@ -14,14 +14,12 @@
 
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/src/platform/device.gni")
 import("ble.gni")
 
 declare_args() {
   # Extra header to include in BleConfig.h for project.
   ble_project_config_include = ""
-
-  # Extra header to include in BleConfig.h for platform.
-  ble_platform_config_include = ""
 }
 
 config("ble_config") {

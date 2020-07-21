@@ -2476,6 +2476,7 @@ AC_MSG_NOTICE([
   PThreads link libraries                          : ${PTHREAD_LIBS:--}
   IniPP compile flags                              : ${INIPP_CPPFLAGS:--}
   GIO compile flags                                : ${GIO_CFLAGS:--}
+  GIO link flags                                   : ${GIO_LIBS:--}
   C Preprocessor                                   : ${CPP}
   C Compiler                                       : ${CC}
   C++ Preprocessor                                 : ${CXXCPP}

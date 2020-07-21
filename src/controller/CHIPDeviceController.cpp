@@ -33,6 +33,8 @@
 
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
+#include <platform/PlatformManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <support/Base64.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -70,23 +72,7 @@ CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId)
 
     VerifyOrExit(mState == kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
-    mSystemLayer = new System::Layer();
-    mInetLayer   = new Inet::InetLayer();
-
-    // Initialize the CHIP System Layer.
-    err = mSystemLayer->Init(NULL);
-    if (err != CHIP_SYSTEM_NO_ERROR)
-    {
-        ChipLogError(Controller, "SystemLayer initialization failed: %s", ErrorStr(err));
-    }
-    SuccessOrExit(err);
-
-    // Initialize the CHIP Inet layer.
-    err = mInetLayer->Init(*mSystemLayer, NULL);
-    if (err != INET_NO_ERROR)
-    {
-        ChipLogError(Controller, "InetLayer initialization failed: %s", ErrorStr(err));
-    }
+    err = DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
     mState         = kState_Initialized;
@@ -98,25 +84,20 @@ exit:
 
 CHIP_ERROR ChipDeviceController::Shutdown()
 {
-    if (mState != kState_Initialized)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
     CHIP_ERROR err = CHIP_NO_ERROR;
-    mState         = kState_NotInitialized;
+
+    VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+
+    mState = kState_NotInitialized;
+
+    err = DeviceLayer::PlatformMgr().Shutdown();
+    SuccessOrExit(err);
 
     if (mSessionManager != NULL)
     {
         delete mSessionManager;
         mSessionManager = NULL;
     }
-    mSystemLayer->Shutdown();
-    mInetLayer->Shutdown();
-    delete mSystemLayer;
-    delete mInetLayer;
-    mSystemLayer = NULL;
-    mInetLayer   = NULL;
 
     mConState = kConnectionState_NotConnected;
     memset(&mOnComplete, 0, sizeof(mOnComplete));
@@ -125,6 +106,7 @@ CHIP_ERROR ChipDeviceController::Shutdown()
     mMessageNumber   = 0;
     mRemoteDeviceId.ClearValue();
 
+exit:
     return err;
 }
 
@@ -147,8 +129,8 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress 
 
     mSessionManager = new SecureSessionMgr<Transport::UDP>();
 
-    err = mSessionManager->Init(mLocalDeviceId, mSystemLayer,
-                                Transport::UdpListenParameters(mInetLayer).SetAddressType(deviceAddr.Type()));
+    err = mSessionManager->Init(mLocalDeviceId, &DeviceLayer::SystemLayer,
+                                Transport::UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(deviceAddr.Type()));
     SuccessOrExit(err);
 
     mSessionManager->SetDelegate(this);
@@ -252,87 +234,33 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::GetLayers(Layer ** systemLayer, InetLayer ** inetLayer)
+CHIP_ERROR ChipDeviceController::ServiceEvents()
 {
-    if (mState != kState_Initialized)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-    if (systemLayer != NULL)
-    {
-        *systemLayer = mSystemLayer;
-    }
-    if (inetLayer != NULL)
-    {
-        *inetLayer = mInetLayer;
-    }
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    return CHIP_NO_ERROR;
+    VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = DeviceLayer::PlatformMgr().StartEventLoopTask();
+    SuccessOrExit(err);
+
+exit:
+    return err;
 }
 
-void ChipDeviceController::ServiceEvents()
+CHIP_ERROR ChipDeviceController::ServiceEventSignal()
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    if (mState != kState_Initialized)
-    {
-        return;
-    }
-
-    // Set the select timeout to 100ms
-    struct timeval aSleepTime;
-    aSleepTime.tv_sec  = 0;
-    aSleepTime.tv_usec = 100 * 1000;
-
-#if !__ZEPHYR__
-    static bool printed = false;
-
-    if (!printed)
-    {
-        {
-            ChipLogProgress(Controller, "CHIP node ready to service events; PID: %d; PPID: %d\n", getpid(), getppid());
-            printed = true;
-        }
-    }
-#endif // !__ZEPHYR__
-    fd_set readFDs, writeFDs, exceptFDs;
-    int numFDs = 0;
-
-    FD_ZERO(&readFDs);
-    FD_ZERO(&writeFDs);
-    FD_ZERO(&exceptFDs);
-
-    if (mSystemLayer->State() == System::kLayerState_Initialized)
-    {
-        mSystemLayer->PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
-    }
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    if (mInetLayer->State == Inet::InetLayer::kState_Initialized)
-    {
-        mInetLayer->PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
-    }
-#endif
-
-    int selectRes = select(numFDs, &readFDs, &writeFDs, &exceptFDs, &aSleepTime);
-    if (selectRes < 0)
-    {
-        ChipLogError(Controller, "select failed: %s\n", ErrorStr(System::MapErrorPOSIX(errno)));
-        return;
-    }
-
-    if (mSystemLayer->State() == System::kLayerState_Initialized)
-    {
-        mSystemLayer->HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
-    }
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    if (mInetLayer->State == Inet::InetLayer::kState_Initialized)
-    {
-        mInetLayer->HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
-    }
-#endif
-
+    DeviceLayer::SystemLayer.WakeSelect();
+#else
+    err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
+exit:
+    return err;
 }
 
 void ChipDeviceController::ClearRequestState()

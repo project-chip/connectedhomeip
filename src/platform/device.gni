@@ -12,19 +12,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+
 declare_args() {
   # Device platform layer: freertos, nrf5, none.
-  device_platform = ""
+  device_platform = "auto"
 
   # Enable openthread support.
   chip_enable_openthread = false
 }
 
-if (device_platform == "") {
-  if (current_os != "freertos") {
+if (device_platform == "auto") {
+  if (current_os == "linux") {
+    device_platform = "linux"
+  } else {
     device_platform = "none"
   }
 }
+
+device_layer = "none"
+if (device_platform == "linux") {
+  device_layer = "Linux"
+} else if (device_platform == "nrf5") {
+  device_layer = "nRF5"
+}
+
+ble_platform_config_include = "<platform/" + device_layer + "/BlePlatformConfig.h>"
+chip_device_platform_config_include = "<platform/" + device_layer + "/CHIPDevicePlatformConfig.h>"
+chip_platform_config_include = "<platform/" + device_layer + "/CHIPPlatformConfig.h>"
+inet_platform_config_include = "<platform/" + device_layer + "/InetPlatformConfig.h>"
+system_platform_config_include = "<platform/" + device_layer + "/SystemPlatformConfig.h>"
 
 assert((current_os != "freertos" && device_platform == "none") ||
            device_platform == "nrf5" || device_platform == "linux",
