@@ -25,7 +25,7 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v2
               with:
-                 submodules: true
+                  submodules: true
             - name: Bootstrap
               run: |
                   case $BUILD_TYPE in
@@ -37,6 +37,10 @@ jobs:
                   esac
 
                   scripts/build/bootstrap.sh $BOOTSTRAP_ARGUMENTS
+            - name: Configure IPv6
+              run:
+                  sed -i 's/::1 ip6-localhost ip6-loopback/::1     localhost
+                  ip6-localhost ip6-loopback/g' /etc/hosts
             - name: Run Build
               run: scripts/build/default.sh
             - name: Run mbedTLS Tests
@@ -75,4 +79,3 @@ jobs:
             # - name: Upload Code Coverage
             #   if: ${{ contains('main', env.BUILD_TYPE) }}
             #   run: bash <(curl -s https://codecov.io/bash)
-
