@@ -11,58 +11,61 @@ a CHIP device
 
 Steps to build CHIP for Android apps
 
-Pre-conditions: Have Android NDK downloaded to your machine. Set $ANDROID_NDK_HOME environment variable to point to the NDK package is downloaded.
+Pre-conditions: Have Android NDK downloaded to your machine. Set
+\$ANDROID_NDK_HOME environment variable to point to the NDK package is
+downloaded.
 
 1. Checkout the CHIP repo
 
 2. In commandline / Terminal, 'cd' into the top CHIP directory
 
-3. May have to run 'autoconf' / 'autoreconf', if changes to configure.ac have been made.
+3. May have to run 'autoconf' / 'autoreconf', if changes to configure.ac have
+   been made.
 
 4. Run './bootstrap -w make'
 
-5. Exit out of the checked out CHIP repo directory and using 'mkdir [some-dir]' create
-a new empty one where you want the generated output files to go.
+5. Exit out of the checked out CHIP repo directory and using 'mkdir [some-dir]'
+   create a new empty one where you want the generated output files to go.
 
 6. 'cd' into this newly created directory
 
 7. Export the following variables
 
-ABIs that can be used as TARGET
-    armeabi-v7a:  armv7a-linux-androideabi
-    arm64-v8a:	  arch64-linux-android
-    x86:	        i686-linux-android
-    x86-64:	      x86_64-linux-android
+ABIs that can be used as TARGET armeabi-v7a: armv7a-linux-androideabi arm64-v8a:
+arch64-linux-android x86: i686-linux-android x86-64: x86_64-linux-android
 
-NDK OS Variants:
-    macOS:	        darwin-x86_64
-    Linux:	        linux-x86_64
-    32-bit Windows	windows
-    64-bit Windows	windows-x86_64
+NDK OS Variants: macOS: darwin-x86_64 Linux: linux-x86_64 32-bit Windows windows
+64-bit Windows windows-x86_64
 
-export TOOLCHAIN=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/darwin-x86_64 // Use the corresponding OS variant here.
+export
+TOOLCHAIN=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/darwin-x86_64 // Use the corresponding OS variant here.
 export TARGET=aarch64-linux-android // Use desired ABI
 export API=21
 export AR=$TOOLCHAIN/bin/$TARGET-ar
 export AS=$TOOLCHAIN/bin/$TARGET-as
 export CC=$TOOLCHAIN/bin/$TARGET$API-clang
-export CXX=$TOOLCHAIN/bin/$TARGET$API-clang++
+export
+CXX=$TOOLCHAIN/bin/$TARGET$API-clang++
 export LD=$TOOLCHAIN/bin/$TARGET-ld
 export RANLIB=$TOOLCHAIN/bin/$TARGET-ranlib
-export STRIP=$TOOLCHAIN/bin/$TARGET-strip
+export STRIP=$TOOLCHAIN/bin/\$TARGET-strip
 
-8. Then run '../connectedhomeip/configure --host=$TARGET --with-crypto=mbedtls --enable-tests=no --enable-shared'
+8. Then run '../connectedhomeip/configure --host=\$TARGET --with-crypto=mbedtls
+   --enable-tests=no --enable-shared'
 
 9. Finally 'make'
 
-You should see the generated SetupPayloadParser.jar under src/setup_payload/java and libSetupPayloadParser.so under
-src/setup_payload/java/.libs folders in the output directory.
+You should see the generated SetupPayloadParser.jar under src/setup_payload/java
+and libSetupPayloadParser.so under src/setup_payload/java/.libs folders in the
+output directory.
 
-Drop the .jar in the libs folder in the Android project.
-Drop the .so in the ABI-specific jniLibs folder in the Android project, eg. jniLibs/arm64-v8a
+Drop the .jar in the libs folder in the Android project. Drop the .so in the
+ABI-specific jniLibs folder in the Android project, eg. jniLibs/arm64-v8a
 'Gradle sync' the Android project and run.
 
-You will also need the "libc++_shared.so" file in the jniLibs folder. This file comes packaged with Android NDK
-and can be found under $ANDROID_NDK_HOME/sources/cxx-stl/llvm-libc++/libs/$TARGET
-(Eventually hoping to not have to include this .so, but that needs some more tweaking of the Android automake build rules.
-Include it in the interim to be able to build the Android app).
+You will also need the "libc++\_shared.so" file in the jniLibs folder. This file
+comes packaged with Android NDK and can be found under
+$ANDROID_NDK_HOME/sources/cxx-stl/llvm-libc++/libs/$TARGET (Eventually hoping to
+not have to include this .so, but that needs some more tweaking of the Android
+automake build rules. Include it in the interim to be able to build the Android
+app).
