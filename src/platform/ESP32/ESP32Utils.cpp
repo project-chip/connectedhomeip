@@ -252,7 +252,7 @@ CHIP_ERROR ESP32Utils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & net
     netInfo.NetworkId              = kWiFiStationNetworkId;
     netInfo.FieldPresent.NetworkId = true;
     memcpy(netInfo.WiFiSSID, stationConfig.sta.ssid,
-           min(strlen(static_cast<char *> stationConfig.sta.ssid) + 1, sizeof(netInfo.WiFiSSID)));
+           min(strlen(reinterpret_cast<char *>(stationConfig.sta.ssid)) + 1, sizeof(netInfo.WiFiSSID)));
 
     // Enforce that netInfo wifiSSID is null terminated
     netInfo.WiFiSSID[kMaxWiFiSSIDLength] = '\0';
@@ -272,17 +272,28 @@ CHIP_ERROR ESP32Utils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo
     CHIP_ERROR err = CHIP_NO_ERROR;
     wifi_config_t wifiConfig;
 
+    char wifiSSID[kMaxWiFiSSIDLength + 1];
+    size_t netInfoSSIDLen = strlen(netInfo.WiFiSSID);
+
     // Ensure that ESP station mode is enabled.  This is required before esp_wifi_set_config(ESP_IF_WIFI_STA,...)
     // can be called.
     err = ESP32Utils::EnableStationMode();
     SuccessOrExit(err);
 
-    // Enforce that netInfo wifiSSID is null terminated
-    netInfo.WiFiSSID[kMaxWiFiSSIDLength] = '\0';
+    // Enforce that wifiSSID is null terminated before copying it
+    memcpy(wifiSSID, netInfo.WiFiSSID, min(netInfoSSIDLen + 1, sizeof(wifiSSID)));
+    if (netInfoSSIDLen + 1 < sizeof(wifiSSID))
+    {
+        wifiSSID[netInfoSSIDLen] = '\0';
+    }
+    else
+    {
+        wifiSSID[kMaxWiFiSSIDLength] = '\0';
+    }
 
     // Initialize an ESP wifi_config_t structure based on the new provision information.
     memset(&wifiConfig, 0, sizeof(wifiConfig));
-    memcpy(wifiConfig.sta.ssid, netInfo.WiFiSSID, min(strlen(netInfo.WiFiSSID) + 1, sizeof(wifiConfig.sta.ssid)));
+    memcpy(wifiConfig.sta.ssid, wifiSSID, min(strlen(wifiSSID) + 1, sizeof(wifiConfig.sta.ssid)));
     memcpy(wifiConfig.sta.password, netInfo.WiFiKey, min((size_t) netInfo.WiFiKeyLen, sizeof(wifiConfig.sta.password)));
     wifiConfig.sta.scan_method = WIFI_ALL_CHANNEL_SCAN;
     wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
