@@ -661,9 +661,6 @@ menu "CHIP Device Layer"
                 Setting the value to 0 disables the feature.
 
                 Note that any decimal integer number between 00000000 and 99999999 can be used here.
-                However, the code within the CHIP commissioner mobile application that orchestrates
-                the device pairing process expects this string to end with a valid Verhoeff check
-                character, and will reject any input that does not.
 
                 This option is for testing only and should not be enabled in production releases.
 
