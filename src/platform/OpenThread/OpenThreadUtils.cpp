@@ -31,6 +31,8 @@
 
 #include <openthread/error.h>
 
+#include <cstdio>
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {

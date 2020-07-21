@@ -17,15 +17,12 @@
 
 /**
  *    @file
- *          Utilities for accessing persisted device configuration on
- *          Linux platforms.
+ *          Utilities for accessing persistent device configuration on
+ *          Zephyr platforms.
  */
 
 #ifndef ZEPHYR_CONFIG_H
 #define ZEPHYR_CONFIG_H
-
-#include <functional>
-#include <inttypes.h>
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -34,7 +31,9 @@ namespace DeviceLayer {
 namespace Internal {
 
 /**
- * Provides functions and definitions for accessing device configuration information on the Posix.
+ * Provides functions and definitions for accessing device configuration information on Zephyr platforms.
+ *
+ * This implementation uses Zephyr Settings API as the underlying storage layer.
  *
  * This class is designed to be mixed-in to concrete implementation classes as a means to
  * provide access to configuration information to generic base classes.
@@ -42,7 +41,29 @@ namespace Internal {
 class ZephyrConfig
 {
 public:
-    struct Key;
+    using Key = const char[];
+
+    // Key definitions for well-known keys.
+    static const Key kConfigKey_SerialNum;
+    static const Key kConfigKey_MfrDeviceId;
+    static const Key kConfigKey_MfrDeviceCert;
+    static const Key kConfigKey_MfrDeviceICACerts;
+    static const Key kConfigKey_MfrDevicePrivateKey;
+    static const Key kConfigKey_ProductRevision;
+    static const Key kConfigKey_ManufacturingDate;
+    static const Key kConfigKey_PairingCode;
+    static const Key kConfigKey_FabricId;
+    static const Key kConfigKey_ServiceConfig;
+    static const Key kConfigKey_PairedAccountId;
+    static const Key kConfigKey_ServiceId;
+    static const Key kConfigKey_FabricSecret;
+    static const Key kConfigKey_GroupKeyIndex;
+    static const Key kConfigKey_LastUsedEpochKeyId;
+    static const Key kConfigKey_FailSafeArmed;
+    static const Key kConfigKey_OperationalDeviceId;
+    static const Key kConfigKey_OperationalDeviceCert;
+    static const Key kConfigKey_OperationalDeviceICACerts;
+    static const Key kConfigKey_OperationalDevicePrivateKey;
 
     static CHIP_ERROR Init(void);
 
@@ -52,35 +73,23 @@ public:
     static CHIP_ERROR ReadConfigValue(Key key, uint64_t & val);
     static CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen);
     static CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen);
+    static CHIP_ERROR ReadConfigValueCounter(::chip::Platform::PersistedStorage::Key counterId, uint32_t & val);
     static CHIP_ERROR WriteConfigValue(Key key, bool val);
     static CHIP_ERROR WriteConfigValue(Key key, uint32_t val);
     static CHIP_ERROR WriteConfigValue(Key key, uint64_t val);
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str);
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen);
     static CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen);
+    static CHIP_ERROR WriteConfigValueCounter(::chip::Platform::PersistedStorage::Key counterId, uint32_t val);
     static CHIP_ERROR ClearConfigValue(Key key);
     static bool ConfigValueExists(Key key);
     static CHIP_ERROR FactoryResetConfig(void);
 
-protected:
-    // NVS Namespace helper functions.
-    static CHIP_ERROR EnsureNamespace(const char * ns);
-    static CHIP_ERROR ClearNamespace(const char * ns);
+    static void RunConfigUnitTest(void);
+
+private:
+    static bool BuildCounterConfigKey(::chip::Platform::PersistedStorage::Key counterId, char key[]);
 };
-
-struct ZephyrConfig::Key
-{
-    const char * Namespace;
-    const char * Name;
-
-    bool operator==(const Key & other) const;
-};
-
-inline bool ZephyrConfig::Key::operator==(const Key & other) const
-{
-    return strcmp(Namespace, other.Namespace) == 0 && strcmp(Name, other.Name) == 0;
-}
-
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
