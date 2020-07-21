@@ -27,9 +27,12 @@
 #include "LEDWidget.h"
 
 extern "C" {
-#include "chip-zcl/chip-zcl.h"
-#include "gen/gen-cluster-id.h"
-#include "gen/gen-types.h"
+#include "attribute-storage.h"
+#include "chip-zcl/chip-zcl-zpro-codec.h"
+#include "gen/attribute-id.h"
+#include "gen/cluster-id.h"
+#include "gen/znet-bookkeeping.h"
+#include "util.h"
 }
 
 using namespace ::chip;
@@ -38,19 +41,45 @@ static const char * TAG = "data_model_server";
 
 void InitDataModelHandler()
 {
-    chipZclEndpointInit();
+    emberAfEndpointConfigure();
+    emAfInit();
 }
 
 void HandleDataModelMessage(System::PacketBuffer * buffer)
 {
-    ChipZclStatus_t zclStatus = chipZclProcessIncoming((ChipZclBuffer_t *) buffer);
-    if (zclStatus == CHIP_ZCL_STATUS_SUCCESS)
+    EmberApsFrame frame;
+    bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame);
+    if (ok)
+    {
+        ESP_LOGI(TAG, "APS frame processing success!");
+    }
+    else
+    {
+        ESP_LOGI(TAG, "APS frame processing failure");
+        System::PacketBuffer::Free(buffer);
+        return;
+    }
+
+    // FIXME: Callee needs to be told the buffer length, so it can fail out if
+    // we don't have enough buffer!!!
+    void * raw_message;
+    uint32_t messageLen = extractMessage(buffer->Start(), &raw_message);
+    auto message        = static_cast<uint8_t *>(raw_message);
+
+    ok = emberAfProcessMessage(&frame,
+                               0, // type
+                               message, messageLen,
+                               0, // source node id
+                               NULL);
+
+    System::PacketBuffer::Free(buffer);
+
+    if (ok)
     {
         ESP_LOGI(TAG, "Data model processing success!");
     }
     else
     {
-        ESP_LOGI(TAG, "Data model processing failure: %d", zclStatus);
+        ESP_LOGI(TAG, "Data model processing failure");
     }
-    System::PacketBuffer::Free(buffer);
 }

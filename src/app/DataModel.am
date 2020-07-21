@@ -24,7 +24,7 @@
 #      must be anchored relative to the top build directory.
 #
 
-CHIP_BUILD_DATA_MODEL_SOURCE_FILES                                                  = \
+CHIP_BUILD_OLD_DATA_MODEL_SOURCE_FILES                                              = \
     @top_builddir@/src/app/gen/gen-callback-stubs.c                                   \
     @top_builddir@/src/app/gen/gen-command-handler.c                                  \
     @top_builddir@/src/app/gen/gen-global-command-handler.c                           \
@@ -38,6 +38,11 @@ CHIP_BUILD_DATA_MODEL_SOURCE_FILES                                              
     @top_builddir@/src/app/plugin/core-api/core-api.c                                 \
     @top_builddir@/src/app/plugin/core-data-model/zcl-data-model.c                    \
     @top_builddir@/src/app/plugin/core-message-dispatch/dispatch.c                    \
+    $(NULL)
+
+CHIP_BUILD_DATA_MODEL_SOURCE_FILES                                                  = \
+    @top_builddir@/src/app/chip-zcl-zpro/command-encoder/encoder.c                    \
+    @top_builddir@/src/app/chip-zcl-zpro/command-encoder/decoder.c                    \
     $(NULL)
 
 # Excluding this one for now because it has #include syntax that does
