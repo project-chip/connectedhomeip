@@ -251,7 +251,11 @@ CHIP_ERROR ESP32Utils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & net
 
     netInfo.NetworkId              = kWiFiStationNetworkId;
     netInfo.FieldPresent.NetworkId = true;
-    memcpy(netInfo.WiFiSSID, stationConfig.sta.ssid, min(strlen((char *) stationConfig.sta.ssid) + 1, sizeof(netInfo.WiFiSSID)));
+    memcpy(netInfo.WiFiSSID, stationConfig.sta.ssid,
+           min(strlen(static_cast<char *> stationConfig.sta.ssid) + 1, sizeof(netInfo.WiFiSSID)));
+
+    // Enforce that netInfo wifiSSID is null terminated
+    netInfo.WiFiSSID[kMaxWiFiSSIDLength] = '\0';
 
     if (includeCredentials)
     {
@@ -272,6 +276,9 @@ CHIP_ERROR ESP32Utils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo
     // can be called.
     err = ESP32Utils::EnableStationMode();
     SuccessOrExit(err);
+
+    // Enforce that netInfo wifiSSID is null terminated
+    netInfo.WiFiSSID[kMaxWiFiSSIDLength] = '\0';
 
     // Initialize an ESP wifi_config_t structure based on the new provision information.
     memset(&wifiConfig, 0, sizeof(wifiConfig));
