@@ -30,6 +30,11 @@ namespace Internal {
 /**
  * Constants for common network metadata entries
  */
+// ---- WiFi-specific Limits ----
+constexpr size_t kMaxWiFiSSIDLength = 32;
+constexpr size_t kMaxWiFiKeyLength  = 64;
+
+// ---- Thread-specific Limits ----
 constexpr size_t kMaxThreadNetworkNameLength = 16;
 constexpr size_t kThreadExtendedPANIdLength  = 8;
 constexpr size_t kThreadMeshPrefixLength     = 8;
@@ -38,9 +43,25 @@ constexpr size_t kThreadPSKcLength           = 16;
 constexpr size_t kThreadChannel_NotSpecified = UINT8_MAX;
 constexpr size_t kThreadPANId_NotSpecified   = UINT16_MAX;
 
+/**
+ * Ids for well-known network provision types.
+ */
+enum
+{
+    kThreadNetworkId      = 1,
+    kWiFiStationNetworkId = 2,
+};
+
 class DeviceNetworkInfo
 {
 public:
+    uint32_t NetworkId; /**< The network id assigned to the network by the device. */
+
+    // ---- WiFi-specific Fields ----
+    char WiFiSSID[kMaxWiFiSSIDLength + 1]; /**< The WiFi SSID as a NULL-terminated string. */
+    uint8_t WiFiKey[kMaxWiFiKeyLength];    /**< The WiFi key (NOT NULL-terminated). */
+    uint8_t WiFiKeyLen;                    /**< The length in bytes of the WiFi key. */
+
     // ---- Thread-specific Fields ----
     char ThreadNetworkName[kMaxThreadNetworkNameLength + 1];
     /**< The Thread network name as a NULL-terminated string. */
@@ -57,9 +78,10 @@ public:
 
     struct
     {
-        bool ThreadExtendedPANId : 1;
-        bool ThreadMeshPrefix : 1;
-        bool ThreadPSKc : 1;
+        bool NetworkId : 1;           /**< True if the NetworkId field is present. */
+        bool ThreadExtendedPANId : 1; /**< True if the ThreadExtendedPANId field is present. */
+        bool ThreadMeshPrefix : 1;    /**< True if the ThreadMeshPrefix field is present. */
+        bool ThreadPSKc : 1;          /**< True if the ThreadPSKc field is present. */
     } FieldPresent;
 };
 
