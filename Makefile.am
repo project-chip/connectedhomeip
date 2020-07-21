@@ -192,6 +192,13 @@ $(builddir)/.local-version.min: $(builddir)/.local-version
 
 DISTCHECK_CONFIGURE_FLAGS = `chmod u+w ../.. ../../third_party`
 
+#
+# BlueZ is not well set-up without patching to handle 'make distcheck';
+# disable it for that target.
+#
+
+DISTCHECK_CONFIGURE_FLAGS += --without-bluez
+
 all-recursive check-recursive coverage-recursive install-recursive pretty-recursive pretty-check-recursive dist distcheck distdir install-headers: $(BUILT_SOURCES)
 
 dist-hook: $(distdir)/.dist-version
