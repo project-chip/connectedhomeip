@@ -657,7 +657,7 @@ menu "CHIP Device Layer"
             range 0 99999999
             default 12345678
             help
-                Specifies a hard-coded device pairing code to be used if none is found in CHIP NV storage.
+                Specifies a hard-coded device setup pin code to be used if none is found in CHIP NV storage.
                 Setting the value to 0 disables the feature.
 
                 Note that any decimal integer number between 00000000 and 99999999 can be used here.
@@ -672,7 +672,7 @@ menu "CHIP Device Layer"
             range 0x000 0xFFF
             default 0xF00
             help
-                Specifies a hard-coded device pairing code to be used if none is found in CHIP NV storage.
+                Specifies a hard-coded device discriminator to be used if none is found in CHIP NV storage.
                 Setting the value to 0x0 disables the feature.
 
                 Note that any integer number between 0x000 and 0xFFF can be used here.

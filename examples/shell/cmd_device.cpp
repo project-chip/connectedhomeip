@@ -327,7 +327,7 @@ static CHIP_ERROR ConfigGetSetupPinCode(bool printHeader)
 
     if (printHeader)
     {
-        streamer_printf(sout, "SetupPinCode:     ");
+        streamer_printf(sout, "PinCode:         ");
     }
     SuccessOrExit(error = ConfigurationMgr().GetSetupPinCode(setupPinCode));
     streamer_printf(sout, "%08u", setupPinCode);
@@ -344,7 +344,7 @@ static CHIP_ERROR ConfigGetSetupDiscriminator(bool printHeader)
 
     if (printHeader)
     {
-        streamer_printf(sout, "SetupDiscriminator:");
+        streamer_printf(sout, "Discriminator:   ");
     }
     SuccessOrExit(error = ConfigurationMgr().GetSetupDiscriminator(setupDiscriminator));
     streamer_printf(sout, "%03x", setupDiscriminator & 0xFFF);
@@ -465,7 +465,7 @@ int cmd_device_get(int argc, char ** argv)
     {
         SuccessOrExit(error = ConfigGetManufacturerDeviceCaCerts(false));
     }
-    else if (strcmp(argv[0], "pairingcode") == 0)
+    else if (strcmp(argv[0], "pincode") == 0)
     {
         SuccessOrExit(error = ConfigGetSetupPinCode(false));
     }
