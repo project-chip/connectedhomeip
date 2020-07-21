@@ -374,7 +374,7 @@ void PrintDataModel(ClusterServer & server)
             cluster->mAttrs.Foreach([](Attribute * attr) -> void {
                 printf("      Attribute: 0x%04x\n", attr->mAttrId);
                 char printstr[20];
-                attr->mValue.ValueToStr(printstr, sizeof(printstr));
+                attr->Get().ValueToStr(printstr, sizeof(printstr));
                 printf("              Value: %s\n", printstr);
             });
         });

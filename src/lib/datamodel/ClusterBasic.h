@@ -45,18 +45,17 @@ static const AttributeId_t kAttributeIdHWVersion          = 0x0003;
 class ClusterBasic : public Cluster
 {
 private:
-    Attribute mZCLVersion;
-    Attribute mApplicationVersion;
-    Attribute mStackVersion;
-    Attribute mHWVersion;
+    AttributeSimple<uint8_t> mZCLVersion;
+    AttributeSimple<uint8_t> mApplicationVersion;
+    AttributeSimple<uint8_t> mStackVersion;
+    AttributeSimple<uint8_t> mHWVersion;
 
 public:
     ClusterBasic(uint8_t ZCLVersion, uint8_t applicationVersion, uint8_t stackVersion, uint8_t HWVersion) :
         Cluster(kClusterIdBase),
         /* Attributes */
-        mZCLVersion(kAttributeIdZCLVersion, ValueUInt8(ZCLVersion)),
-        mApplicationVersion(kAttributeIdApplicationVersion, ValueUInt8(applicationVersion)),
-        mStackVersion(kAttributeIdStackVersion, ValueUInt8(stackVersion)), mHWVersion(kAttributeIdHWVersion, ValueUInt8(HWVersion))
+        mZCLVersion(kAttributeIdZCLVersion, ZCLVersion), mApplicationVersion(kAttributeIdApplicationVersion, applicationVersion),
+        mStackVersion(kAttributeIdStackVersion, stackVersion), mHWVersion(kAttributeIdHWVersion, HWVersion)
     {
         AddAttribute(&mZCLVersion);
         AddAttribute(&mApplicationVersion);

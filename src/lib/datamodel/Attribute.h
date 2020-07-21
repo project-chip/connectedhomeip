@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This file contains definitions for working with CHIP values.
+ *      This file contains definitions for working with CHIP Attributes
  *
  */
 
@@ -45,17 +45,8 @@ private:
 
 public:
     AttributeId_t mAttrId;
-    Value mValue;
-    Value mMin;
-    Value mMax;
 
-    Attribute(AttributeId_t attrId, ValueTypes type) : mDeque(this), mAttrId(attrId), mValue(type), mMin(type), mMax(type) {}
-    Attribute(AttributeId_t attrId, Value value) :
-        mDeque(this), mAttrId(attrId), mValue(value), mMin(value.mType), mMax(value.mType)
-    {}
-    Attribute(AttributeId_t attrId, ValueTypes type, uint64_t min, uint64_t max) :
-        mDeque(this), mAttrId(attrId), mValue(type), mMin(type, min), mMax(type, max)
-    {}
+    Attribute(AttributeId_t attrId) : mDeque(this), mAttrId(attrId) {}
 
     /**
      * @brief
@@ -63,20 +54,7 @@ public:
      *
      * @param value  the new value that this attribute should be updated with
      */
-    CHIP_ERROR Set(const Value & newValue)
-    {
-        /* We have to check the element type match in this case */
-        if (mValue.mType != newValue.mType)
-        {
-            return CHIP_ERROR_INTERNAL;
-        }
-        if (withinRange(newValue))
-        {
-            mValue = newValue;
-            return CHIP_NO_ERROR;
-        }
-        return CHIP_ERROR_INTERNAL;
-    }
+    virtual CHIP_ERROR Set(const Value & newValue) = 0;
 
     /* Need to define the behaviour when Value contains pointers
      * to allocated data
@@ -86,32 +64,51 @@ public:
      *   Get the value of this attribute
      *
      */
-    Value Get() { return mValue; }
+    virtual Value Get(void) = 0;
+};
 
-protected:
-    bool withinRange(const uint64_t & value) { return (value >= mMin.Int64) && (value <= mMax.Int64); }
+template <typename ValueType>
+class AttributeSimple : public Attribute
+{
+private:
+    ValueType mValue;
 
-    bool withinRange(const Value value)
+public:
+    AttributeSimple(AttributeId_t attrId) : Attribute(attrId) {}
+    AttributeSimple(AttributeId_t attrId, ValueType value) : Attribute(attrId), mValue(value) {}
+
+    CHIP_ERROR Set(const Value & newValue) { return ValueToType(newValue, mValue); }
+
+    Value Get(void) { return TypeToValue(mValue); }
+};
+
+template <typename ValueType, ValueType min, ValueType max>
+class AttributeWithRange : public Attribute
+{
+private:
+    ValueType mValue;
+    const ValueType mMin = min;
+    const ValueType mMax = max;
+
+public:
+    AttributeWithRange(AttributeId_t attrId) : Attribute(attrId) {}
+    AttributeWithRange(AttributeId_t attrId, ValueType value) : Attribute(attrId), mValue(value) {}
+
+    CHIP_ERROR Set(const Value & newValue)
     {
-        switch (mValue.mType)
+        ValueType tmp;
+        if (ValueToType(newValue, tmp) == CHIP_NO_ERROR)
         {
-        case kCHIPValueType_Int8:
-        case kCHIPValueType_Int16:
-        case kCHIPValueType_Int32:
-        case kCHIPValueType_Int64:
-        case kCHIPValueType_UInt8:
-        case kCHIPValueType_UInt16:
-        case kCHIPValueType_UInt32:
-        case kCHIPValueType_UInt64:
-            return withinRange(value.Int64);
-            break;
-        case kCHIPValueType_Bool:
-            return true;
-        default:
-            return false;
+            if ((tmp >= mMin) && (tmp <= mMax))
+            {
+                mValue = tmp;
+                return CHIP_NO_ERROR;
+            }
         }
-        return false;
+        return CHIP_ERROR_INTERNAL;
     }
+
+    Value Get(void) { return TypeToValue(mValue); }
 };
 
 } // namespace DataModel

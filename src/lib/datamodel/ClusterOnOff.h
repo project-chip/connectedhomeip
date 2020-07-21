@@ -46,16 +46,15 @@ class ClusterOnOff : public Cluster
 {
     // TODO: these should
 private:
-    Attribute mOnOff;
-    Attribute mGlobalSceneControl;
-    Attribute mOnTime;
-    Attribute mOffWaitTime;
+    AttributeSimple<bool> mOnOff;
+    AttributeSimple<bool> mGlobalSceneControl;
+    AttributeSimple<uint16_t> mOnTime;
+    AttributeSimple<uint16_t> mOffWaitTime;
 
 public:
     ClusterOnOff() :
-        Cluster(kClusterIdOnOff), mOnOff(kAttributeIdOnOff, kCHIPValueType_Bool),
-        mGlobalSceneControl(kAttributeIdGlobalSceneControl, kCHIPValueType_Bool),
-        mOnTime(kAttributeIdOnTime, kCHIPValueType_UInt16), mOffWaitTime(kAttributeIdOffWaitTime, kCHIPValueType_UInt16)
+        Cluster(kClusterIdOnOff), mOnOff(kAttributeIdOnOff), mGlobalSceneControl(kAttributeIdGlobalSceneControl),
+        mOnTime(kAttributeIdOnTime), mOffWaitTime(kAttributeIdOffWaitTime)
     {
         AddAttribute(&mOnOff);
         AddAttribute(&mGlobalSceneControl);

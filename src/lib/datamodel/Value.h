@@ -24,6 +24,7 @@
 #ifndef CHIP_VALUE_H_
 #define CHIP_VALUE_H_
 
+#include <core/CHIPError.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -115,6 +116,67 @@ static inline Value ValueUInt8(uint8_t b)
 static inline uint8_t ValueToUInt8(Value v)
 {
     return (uint8_t) v.Int64;
+}
+
+/* TODO: Once we use this, I don't think we will need the above convenience API */
+static inline Value TypeToValue(bool b)
+{
+    return Value(kCHIPValueType_Bool, (uint64_t) b);
+}
+
+static inline Value TypeToValue(uint8_t i)
+{
+    return Value(kCHIPValueType_UInt8, (uint64_t) i);
+}
+
+static inline Value TypeToValue(uint16_t i)
+{
+    return Value(kCHIPValueType_UInt16, (uint64_t) i);
+}
+
+static inline Value TypeToValue(uint32_t i)
+{
+    return Value(kCHIPValueType_UInt32, (uint64_t) i);
+}
+
+static inline CHIP_ERROR ValueToType(Value v, bool & b)
+{
+    if (v.mType == kCHIPValueType_Bool)
+    {
+        b = (bool) v.Int64;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_INTERNAL;
+}
+
+static inline CHIP_ERROR ValueToType(Value v, uint8_t & i)
+{
+    if (v.mType == kCHIPValueType_UInt8)
+    {
+        i = (uint8_t) v.Int64;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_INTERNAL;
+}
+
+static inline CHIP_ERROR ValueToType(Value v, uint16_t & i)
+{
+    if (v.mType == kCHIPValueType_UInt16)
+    {
+        i = (uint16_t) v.Int64;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_INTERNAL;
+}
+
+static inline CHIP_ERROR ValueToType(Value v, uint32_t & i)
+{
+    if (v.mType == kCHIPValueType_UInt32)
+    {
+        i = (uint32_t) v.Int64;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_INTERNAL;
 }
 
 } // namespace DataModel
