@@ -184,7 +184,7 @@ public:
      *
      * @return CHIP_NO_ERROR on success or a failure-specific error code otherwise
      */
-    CHIP_ERROR HandleCommand(const Command & cmd);
+    CHIP_ERROR HandleCommand(Command & cmd);
 };
 
 } // namespace DataModel

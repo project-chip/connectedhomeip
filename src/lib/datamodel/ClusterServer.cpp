@@ -26,7 +26,7 @@
 namespace chip {
 namespace DataModel {
 
-CHIP_ERROR ClusterServer::HandleCommand(const Command & cmd)
+CHIP_ERROR ClusterServer::HandleCommand(Command & cmd)
 {
     if (cmd.mDirection != kCmdDirectionClientToServer)
     {
