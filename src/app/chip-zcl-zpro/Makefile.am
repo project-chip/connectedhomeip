@@ -1,6 +1,5 @@
 #
 #    Copyright (c) 2020 Project CHIP Authors
-#    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,11 +13,19 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-#    Description:
-#      Component makefile for the ESP32 demo application.
+
 #
-# (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
+#    Description:
+#      This file exports the CHIP ZCL Application layer API headers
+#       for install and dist targets
+#
 
-COMPONENT_DEPENDS := chip QRCode tft spidriver
+include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
-COMPONENT_SRCDIRS := . gen
+chip_zcldir = $(includedir)/chip-zcl
+
+chip_zcl_HEADERS                              = \
+    command-encoder/chip-zcl-zpro-codec.h       \
+    $(NULL)
+
+include $(abs_top_nlbuild_autotools_dir)/automake/post.am

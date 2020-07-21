@@ -65,6 +65,40 @@ notifications:
 
 groups:
     ############################################################
+    #  Shared Reviewer Groups
+    ############################################################
+    shared-reviewers-amazon:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-amazon]
+    shared-reviewers-apple:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-apple]
+    shared-reviewers-comcast:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-comcast]
+    shared-reviewers-google:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-google]
+    shared-reviewers-samsung:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-samsung]
+
+    ############################################################
     #  Base Required Reviewers
     ############################################################
     required-reviewers:
@@ -74,16 +108,7 @@ groups:
             This is the main group of required reviews for general pull
             requests.
         type: required
-        conditions:
-            - files.include('*')
+        requirements:
+            - len(groups.approved.include('shared-reviewers-*')) >= 3
         reviews:
-            required: 3
-            request: -1
-            request_order: shuffle
-        reviewers:
-            teams:
-                - reviewers-amazon
-                - reviewers-apple
-                - reviewers-comcast
-                - reviewers-google
-                - reviewers-samsung
+            required: 0

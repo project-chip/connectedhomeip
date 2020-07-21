@@ -31,6 +31,11 @@
 #include "LEDWidget.h"
 #include <inet/IPAddress.h>
 
+extern "C" {
+#include "gen/attribute-id.h"
+#include "gen/cluster-id.h"
+} // extern "C"
+
 static const char * TAG = "echo-devicecallbacks";
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
@@ -70,17 +75,17 @@ void EchoDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, int
     }
 }
 
-void EchoDeviceCallbacks::PostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId,
+void EchoDeviceCallbacks::PostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
                                                       uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
                                                       uint8_t * value)
 {
-    if (clusterId != CHIP_ZCL_CLUSTER_ON_OFF)
+    if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
     {
         ESP_LOGI(TAG, "Unknown cluster ID: %d", clusterId);
         return;
     }
 
-    if (attributeId != CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF)
+    if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
     {
         ESP_LOGI(TAG, "Unknown attribute ID: %d", attributeId);
         return;

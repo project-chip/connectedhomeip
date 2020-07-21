@@ -41,10 +41,9 @@
 
 extern "C" {
 #include "chip-zcl/chip-zcl.h"
-#include "gen/gen-cluster-id.h"
-#include "gen/gen-command-id.h"
-#include "gen/gen-types.h"
 } // extern "C"
+
+#include "chip-zcl/chip-zcl-zpro-codec.h"
 
 // Delay, in seconds, between sends for the echo case.
 #define SEND_DELAY 5
@@ -301,51 +300,37 @@ void DoEchoIP(DeviceController::ChipDeviceController * controller, const IPAddre
 
 // Handle the on/off/toggle case, where we are sending a ZCL command and not
 // expecting a response at all.
-void DoOnOff(DeviceController::ChipDeviceController * controller, Command command, ChipZclEndpointId_t endpoint)
+void DoOnOff(DeviceController::ChipDeviceController * controller, Command command, uint8_t endpoint)
 {
-    ChipZclCommandId_t zclCommand;
+    // Make sure our buffer is big enough, but this will need a better setup!
+    static const size_t bufferSize = 1024;
+    auto * buffer                  = System::PacketBuffer::NewWithAvailableSize(bufferSize);
+
+    uint16_t dataLength = 0;
     switch (command)
     {
     case Command::Off:
-        zclCommand = CHIP_ZCL_CLUSTER_ON_OFF_SERVER_COMMAND_OFF;
+        dataLength = encodeOffCommand(buffer->Start(), bufferSize, endpoint);
         break;
     case Command::On:
-        zclCommand = CHIP_ZCL_CLUSTER_ON_OFF_SERVER_COMMAND_ON;
+        dataLength = encodeOnCommand(buffer->Start(), bufferSize, endpoint);
         break;
     case Command::Toggle:
-        zclCommand = CHIP_ZCL_CLUSTER_ON_OFF_SERVER_COMMAND_TOGGLE;
+        dataLength = encodeToggleCommand(buffer->Start(), bufferSize, endpoint);
         break;
     default:
         fprintf(stderr, "Unknown command: %d\n", command);
         return;
     }
-
-    // Make sure our buffer is big enough, but this will need a better setup!
-    static const size_t bufferSize = 1024;
-    auto * buffer                  = System::PacketBuffer::NewWithAvailableSize(bufferSize);
-
-    ChipZclBuffer_t * zcl_buffer = (ChipZclBuffer_t *) buffer;
-    ChipZclCommandContext_t ctx  = {
-        endpoint,                       // endpointId
-        CHIP_ZCL_CLUSTER_ON_OFF,        // clusterId
-        true,                           // clusterSpecific
-        false,                          // mfgSpecific
-        0,                              // mfgCode
-        zclCommand,                     // commandId
-        ZCL_DIRECTION_CLIENT_TO_SERVER, // direction
-        0,                              // payloadStartIndex
-        nullptr,                        // request
-        nullptr                         // response
-    };
-    chipZclEncodeZclHeader(zcl_buffer, &ctx);
+    buffer->SetDataLength(dataLength);
 
 #ifdef DEBUG
-    const size_t data_len = chipZclBufferDataLength(zcl_buffer);
+    const size_t data_len = buffer->DataLength();
 
     fprintf(stderr, "SENDING: %zu ", data_len);
     for (size_t i = 0; i < data_len; ++i)
     {
-        fprintf(stderr, "%d ", chipZclBufferPointer(zcl_buffer)[i]);
+        fprintf(stderr, "%d ", buffer->Start()[i]);
     }
     fprintf(stderr, "\n");
 #endif
@@ -417,10 +402,3 @@ exit:
 
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
-
-extern "C" {
-// We have to have this empty callback, because the ZCL code links against it.
-void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
-{}
-} // extern "C"

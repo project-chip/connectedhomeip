@@ -149,6 +149,7 @@ STD_LDFLAGS += -L$(CHIP_OUTPUT_DIR)/lib
 STD_LIBS += \
     -lDeviceLayer \
     -lCHIP \
+    -lCHIPDataModel \
     -lInetLayer \
     -lSystemLayer \
     -llwip

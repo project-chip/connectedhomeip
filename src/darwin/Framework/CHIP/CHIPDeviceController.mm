@@ -17,11 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-extern "C" {
-#include "chip-zcl/chip-zcl-buffer.h"
-#include "chip-zcl/chip-zcl.h"
-#include "gen/gen-command-id.h"
-} // extern "C"
+#include "chip-zcl/chip-zcl-zpro-codec.h"
 
 #import "CHIPDeviceController.h"
 #import "CHIPError.h"
@@ -292,7 +288,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     return YES;
 }
 
-- (BOOL)sendCHIPCommand:(ChipZclClusterId_t)cluster command:(ChipZclCommandId_t)command
+- (BOOL)sendCHIPCommand:(uint32_t (^)(chip::System::PacketBuffer *, uint16_t))encodeCommandBlock
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     [self.lock lock];
@@ -300,24 +296,8 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     static const size_t bufferSize = 1024;
     chip::System::PacketBuffer * buffer = chip::System::PacketBuffer::NewWithAvailableSize(bufferSize);
 
-    ChipZclBuffer_t * zcl_buffer = (ChipZclBuffer_t *) buffer;
-    ChipZclCommandContext_t ctx = {
-        1, // endpointId
-        cluster, // clusterId
-        true, // clusterSpecific
-        false, // mfgSpecific
-        0, // mfgCode
-        command, // commandId
-        ZCL_DIRECTION_CLIENT_TO_SERVER, // direction
-        0, // payloadStartIndex
-        nullptr, // request
-        nullptr // response
-    };
-    chipZclEncodeZclHeader(zcl_buffer, &ctx);
-
-    const size_t data_len = chipZclBufferDataLength(zcl_buffer);
-
-    buffer->SetDataLength(data_len);
+    uint32_t dataLength = encodeCommandBlock(buffer, (uint16_t) bufferSize);
+    buffer->SetDataLength(dataLength);
 
     err = self.cppController->SendMessage((__bridge void *) self, buffer);
     [self.lock unlock];
@@ -326,6 +306,30 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
         return NO;
     }
     return YES;
+}
+
+- (BOOL)sendOnCommand
+{
+    return [self sendCHIPCommand:^(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
+        // Hardcode endpoint to 1 for now
+        return encodeOnCommand(buffer->Start(), bufferSize, 1);
+    }];
+}
+
+- (BOOL)sendOffCommand
+{
+    return [self sendCHIPCommand:^(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
+        // Hardcode endpoint to 1 for now
+        return encodeOffCommand(buffer->Start(), bufferSize, 1);
+    }];
+}
+
+- (BOOL)sendToggleCommand
+{
+    return [self sendCHIPCommand:^(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
+        // Hardcode endpoint to 1 for now
+        return encodeToggleCommand(buffer->Start(), bufferSize, 1);
+    }];
 }
 
 - (BOOL)disconnect:(NSError * __autoreleasing *)error
@@ -366,11 +370,3 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 }
 
 @end
-
-extern "C" {
-// We have to have this empty callback, because the ZCL code links against it.
-void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId, uint8_t mask,
-    uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
-{
-}
-} // extern "C"
