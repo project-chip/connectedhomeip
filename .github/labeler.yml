@@ -1,0 +1,104 @@
+# Add 'repo' label to any root file changes
+repo:
+    - ./*
+
+scripts:
+    - scripts/*
+
+examples:
+    - examples/*
+
+documentation:
+    - docs/*
+
+tools:
+    - tools/*
+
+integrations:
+    - integrations/*
+
+qr code:
+    - src/qrcode/*
+
+lwip:
+    - src/lwip/*
+
+vscode:
+    - .vscode
+    - .devcontainer
+
+gn:
+    - gn/*
+
+github:
+    - .github
+
+workflows:
+    - .github/workflows/*
+
+inet:
+    - src/inet/*
+
+config:
+    - config/*
+
+lib:
+    - src/lib/*
+
+platform:
+    - src/platform/*
+
+crypto:
+    - src/platform/*
+
+controller:
+    - src/controller/*
+
+ble:
+    - src/ble/*
+
+android:
+    - src/android/*
+
+app:
+    - src/app/*
+
+darwin:
+    - src/platform/Darwin/*
+    - src/darwin/*
+
+efr32:
+    - src/platform/EFR32/*
+
+esp32:
+    - src/platform/ESP32/*
+
+freeRTOS:
+    - src/platform/FreeRTOS/*
+
+k32w:
+    - src/platform/K32W/*
+
+linux:
+    - src/platform/Linux/*
+
+nrf5:
+    - src/platform/nRF5/*
+
+nrf connect:
+    - src/platform/nrfconnect/*
+
+openthread:
+    - src/platform/openthread/*
+
+zephyr:
+    - src/platform/Zephyr/*
+
+transport:
+    - src/transport/*
+
+system:
+    - src/system/*
+
+setup payload:
+    - src/setup_payload/*
