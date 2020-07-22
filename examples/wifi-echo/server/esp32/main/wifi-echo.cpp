@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "BluetoothWidget.h"
 #include "Button.h"
 #include "CHIPDeviceManager.h"
 #include "DataModelHandler.h"
@@ -101,6 +102,10 @@ extern void startClient(void);
 #endif // CONFIG_HAVE_DISPLAY
 
 LEDWidget statusLED;
+
+#if CONFIG_HAVE_DISPLAY
+BluetoothWidget bluetoothLED;
+#endif // CONFIG_HAVE_DISPLAY
 
 const char * TAG = "wifi-echo-demo";
 
@@ -396,6 +401,9 @@ extern "C" void app_main()
     SetupPretendDevices();
 
     statusLED.Init(STATUS_LED_GPIO_NUM);
+#if CONFIG_HAVE_DISPLAY
+    bluetoothLED.Init();
+#endif // CONFIG_HAVE_DISPLAY
 
     // Start the Echo Server
     InitDataModelHandler();
@@ -414,7 +422,6 @@ extern "C" void app_main()
     ESP_LOGI(TAG, "QR CODE: '%s'", qrCodeText.c_str());
 
 #if CONFIG_HAVE_DISPLAY
-
     // Initialize the buttons.
     for (int i = 0; i < buttons.size(); ++i)
     {
@@ -465,6 +472,8 @@ extern "C" void app_main()
         int vled1 = ScreenManager::AddVLED(TFT_GREEN);
         int vled2 = ScreenManager::AddVLED(TFT_RED);
         statusLED.SetVLED(vled1, vled2);
+
+        bluetoothLED.SetVLED(ScreenManager::AddVLED(TFT_BLUE));
     }
 
 #endif // CONFIG_HAVE_DISPLAY

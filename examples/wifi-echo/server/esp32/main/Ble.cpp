@@ -14,11 +14,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "Display.h"
+
+#include "BluetoothWidget.h"
 
 #include <platform/CHIPDeviceLayer.h>
 #include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
+
+#if CONFIG_HAVE_DISPLAY
+extern BluetoothWidget bluetoothLED;
+#endif // CONFIG_HAVE_DISPLAY
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -38,6 +45,10 @@ void HandleBleMessageReceived(BLEEndPoint * endPoint, PacketBuffer * buffer)
 void HandleBleConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)
 {
     ChipLogProgress(Ble, "BLEEndPoint: Connection closed (%s)", ErrorStr(err));
+
+#if CONFIG_HAVE_DISPLAY
+    bluetoothLED.Set(false);
+#endif // CONFIG_HAVE_DISPLAY
 }
 
 void HandleBleNewConnection(BLEEndPoint * endPoint)
@@ -45,6 +56,10 @@ void HandleBleNewConnection(BLEEndPoint * endPoint)
     ChipLogProgress(Ble, "BLEEndPoint: Connection opened");
     endPoint->OnMessageReceived  = HandleBleMessageReceived;
     endPoint->OnConnectionClosed = HandleBleConnectionClosed;
+
+#if CONFIG_HAVE_DISPLAY
+    bluetoothLED.Set(true);
+#endif // CONFIG_HAVE_DISPLAY
 }
 
 void startBle()
