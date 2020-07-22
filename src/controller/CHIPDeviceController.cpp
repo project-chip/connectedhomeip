@@ -285,7 +285,7 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
 
     mAppReqState = appReqState;
 
-    if (mUnsecuredTransport)
+    if (mUnsecuredTransport != NULL)
     {
         VerifyOrExit(IsConnected(), err = CHIP_ERROR_INCORRECT_STATE);
         // Unsecured transport does not use a MessageHeader, but the Transport::Base API expects one, so
