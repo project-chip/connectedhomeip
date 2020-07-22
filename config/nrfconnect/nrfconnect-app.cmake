@@ -75,6 +75,7 @@ set(CHIP_OUTPUT_LIBRARIES
     ${CHIP_OUTPUT_DIR}/lib/libSupportLayer.a
     ${CHIP_OUTPUT_DIR}/lib/libBleLayer.a
     ${CHIP_OUTPUT_DIR}/lib/libDeviceLayer.a
+    ${CHIP_OUTPUT_DIR}/lib/libCHIPDataModel.a
     )
 
 # ==================================================
@@ -95,8 +96,8 @@ get_zephyr_compilation_flags(CHIP_CFLAGS C)
 get_zephyr_compilation_flags(CHIP_CXXFLAGS CXX)
 list(FILTER CHIP_CXXFLAGS EXCLUDE REGEX -std.*) # CHIP adds gnu++11 anyway...
 
-set(CHIP_COMMON_FLAGS 
-    -D_SYS__PTHREADTYPES_H_ 
+set(CHIP_COMMON_FLAGS
+    -D_SYS__PTHREADTYPES_H_
     -isystem${ZEPHYR_BASE}/include/posix
     -DMBEDTLS_CONFIG_FILE=CONFIG_MBEDTLS_CFG_FILE
     -isystem${ZEPHYR_BASE}/../modules/crypto/mbedtls/configs)

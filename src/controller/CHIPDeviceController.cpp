@@ -30,11 +30,11 @@
 #endif
 // module header, comes first
 #include <controller/CHIPDeviceController.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <support/Base64.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
