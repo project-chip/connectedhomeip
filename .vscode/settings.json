@@ -153,5 +153,10 @@
         }
     ],
     "clang-format.fallbackStyle": "WebKit",
-    "files.trimFinalNewlines": true
+    "files.trimFinalNewlines": true,
+    "C_Cpp.default.defines": [
+        "CONFIG_NETWORK_LAYER_BLE=1",
+        "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1",
+        "CHIP_ENABLE_OPENTHREAD=1"
+    ]
 }
