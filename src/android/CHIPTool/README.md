@@ -28,44 +28,33 @@ downloaded.
 
 6. Export the following variables
 
-ABIs that can be used as TARGET:
-| ABI | Triple |
-| --- | --- |
-| armeabi-v7a | armv7a-linux-androideabi |
-| arm64-v8a | aarch64-linux-android |
-| x86 | i686-linux-android |
-| x86-64 | x86_64-linux-android |
+ABIs that can be used as TARGET: | ABI | Triple | | --- | --- | | armeabi-v7a |
+armv7a-linux-androideabi | | arm64-v8a | aarch64-linux-android | | x86 |
+i686-linux-android | | x86-64 | x86_64-linux-android |
 
-NDK OS Variants:
-| NDK OS Variant | Host Tag |
-| --- | --- |
-| macOS | darwin-x86_64 |
-| Linux | linux-x86_64 |
-| 32-bit Windows | windows |
-| 64-bit Windows | windows-x86_64 |
+NDK OS Variants: | NDK OS Variant | Host Tag | | --- | --- | | macOS |
+darwin-x86_64 | | Linux | linux-x86_64 | | 32-bit Windows | windows | | 64-bit
+Windows | windows-x86_64 |
 
-OS_VARIANT=darwin-x86_64 // Specify OS variant corresponding to system
-export TOOLCHAIN=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/$OS_VARIANT
-export TARGET=aarch64-linux-android // Use desired ABI
-export API=21
-export AR=$TOOLCHAIN/bin/$TARGET-ar
-export AS=$TOOLCHAIN/bin/$TARGET-as
-export CC=$TOOLCHAIN/bin/$TARGET$API-clang
+OS_VARIANT=darwin-x86_64 // Specify OS variant corresponding to system export
+TOOLCHAIN=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/$OS_VARIANT export
+TARGET=aarch64-linux-android // Use desired ABI export API=21 export
+AR=$TOOLCHAIN/bin/$TARGET-ar export AS=$TOOLCHAIN/bin/$TARGET-as export
+CC=$TOOLCHAIN/bin/$TARGET$API-clang
 export CXX=$TOOLCHAIN/bin/$TARGET$API-clang++
-export LD=$TOOLCHAIN/bin/$TARGET-ld
-export RANLIB=$TOOLCHAIN/bin/$TARGET-ranlib
-export STRIP=$TOOLCHAIN/bin/$TARGET-strip
-export JNI_INCLUDE_DIRS=$ANDROID_NDK_HOME/sysroot/usr/include
+export LD=$TOOLCHAIN/bin/$TARGET-ld export RANLIB=$TOOLCHAIN/bin/$TARGET-ranlib
+export STRIP=$TOOLCHAIN/bin/$TARGET-strip export
+JNI_INCLUDE_DIRS=\$ANDROID_NDK_HOME/sysroot/usr/include
 
 Note: Regardless of where JAVA_HOME points, always use the JNI headers from the
 Android NDK, and only include the top-most directory (include), not the system
 directory (include/linux). Because the NDK mixes the JNI headers in with the
 linux headers, listing the system directory in the -I flags will result in
-strange compilation errors.  And unlike the standard Java jni.h, the jni.h that
+strange compilation errors. And unlike the standard Java jni.h, the jni.h that
 comes with the Android NDK does not depend on any system-specific JNI header
-files (e.g. jni_md.h).  Thus only the top-level include directory is needed.
+files (e.g. jni_md.h). Thus only the top-level include directory is needed.
 
-7. Then run '../connectedhomeip/configure --host=$TARGET --with-crypto=mbedtls
+7. Then run '../connectedhomeip/configure --host=\$TARGET --with-crypto=mbedtls
    --enable-tests=no --enable-shared --with-device-layer=none'
 
 8. Finally 'make'
@@ -76,12 +65,12 @@ files (e.g. jni_md.h).  Thus only the top-level include directory is needed.
 
 Drop the .jar in the libs folder in the Android project.
 
-Drop the .so in the ABI-specific jniLibs folder in the Android project,
-eg. jniLibs/arm64-v8a
+Drop the .so in the ABI-specific jniLibs folder in the Android project, eg.
+jniLibs/arm64-v8a
 
 'Gradle sync' the Android project and run.
 
-10. You will also need the "libc++_shared.so" file in the jniLibs folder. This
+10. You will also need the "libc++\_shared.so" file in the jniLibs folder. This
     file comes packaged with Android NDK and can be found under
     $ANDROID_NDK_HOME/sources/cxx-stl/llvm-libc++/libs/$TARGET
 
