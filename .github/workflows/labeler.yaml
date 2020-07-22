@@ -15,7 +15,7 @@ jobs:
             - uses: actions/labeler@v2
               with:
                   repo-token: "${{ secrets.GITHUB_TOKEN }}"
-            - uses: jpmcb/prow-github-actions
+            - uses: jpmcb/prow-github-actions@v1
               with:
                   jobs: "pr-labeler"
                   github-token: "${{ secrets.GITHUB_TOKEN }}"
