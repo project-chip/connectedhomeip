@@ -76,7 +76,7 @@ static void OnConnect(DeviceController::ChipDeviceController * controller, Trans
 {
     isDeviceConnected = true;
 
-    if (state && appReqState)
+    if (state != NULL)
     {
         CHIP_ERROR err = controller->ManualKeyExchange(state, remote_public_key, sizeof(remote_public_key), local_private_key,
                                                        sizeof(local_private_key));
@@ -149,6 +149,11 @@ bool EqualsLiteral(const char * str, const char (&literal)[N])
 
 bool DetermineCommand(int argc, char * argv[], Command * command)
 {
+    if (argc <= 1)
+    {
+        return false;
+    }
+
     if (EqualsLiteral(argv[1], "off"))
     {
         *command = Command::Off;
@@ -183,7 +188,7 @@ bool DetermineCommand(int argc, char * argv[], Command * command)
     return false;
 }
 
-union CommandArgs
+struct CommandArgs
 {
     IPAddress hostAddr;
     uint16_t port;
@@ -262,6 +267,7 @@ bool DetermineCommandArgs(char * argv[], Command command, CommandArgs * commandA
 // Handle the echo case, where we just send a string and expect to get it back.
 void DoEcho(DeviceController::ChipDeviceController * controller, const char * identifier)
 {
+    CHIP_ERROR err     = CHIP_NO_ERROR;
     size_t payload_len = strlen(PAYLOAD);
 
     // Run the client
@@ -275,8 +281,8 @@ void DoEcho(DeviceController::ChipDeviceController * controller, const char * id
             memcpy(buffer->Start(), PAYLOAD, payload_len);
             buffer->SetDataLength(payload_len);
 
-            controller->SendMessage(NULL, buffer);
-            printf("Msg sent to server %s\n", identifier);
+            err = controller->SendMessage(NULL, buffer);
+            printf("Msg sent to server %s\n", err != CHIP_NO_ERROR ? ErrorStr(err) : identifier);
         }
 
         sleep(SEND_DELAY);

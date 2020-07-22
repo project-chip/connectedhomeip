@@ -195,7 +195,7 @@ private:
     };
 
     SecureSessionMgr<Transport::UDP> * mSessionManager;
-    Transport::Base * mUnsecuredTransport;
+    Transport::Base * mUnsecuredTransport = NULL;
 
     ConnectionState mConState;
     void * mAppReqState;
