@@ -1911,12 +1911,11 @@ typedef struct
 #define MAIN_FUNCTION_ARGUMENTS
 
 // Stubs to just silence some compile errors
-#define emberAfPrint(...) /* */
+
 #define emberAfPrintEnabled(...) false
-#define emberAfPrintln(...)     /* */
-#define emberAfPrintBuffer(...) /* */
 
 // Needed by callback.h and callback-stubs.c
 typedef bool boolean;
 
+#define emberAfPrintActiveArea 1
 #endif // TYPES_STUB_H
