@@ -96,7 +96,7 @@ struct LazyDisplay
 // Print text centered horizontally at x.
 void PrintCentered(const char * s, int x, int y)
 {
-    TFT_print(const_cast<char *>(s), x - (TFT_getStringWidth(const_cast<char *>(s)) / 2), y);
+    TFT_print(s, x - (TFT_getStringWidth(s) / 2), y);
 }
 
 // Print button text in appropriate location (1 to 3).
@@ -150,14 +150,13 @@ void ScreenManager::Display()
     if (screens.size() > 1)
     {
         tft_fg = focusBack ? ScreenFocusColor : ScreenNormalColor;
-        TFT_print(const_cast<char *>("<"), ScreenFontHeight, ScreenFontHeight / 2);
+        TFT_print("<", ScreenFontHeight, ScreenFontHeight / 2);
     }
 
     std::string title = screens.back()->GetTitle();
     tft_fg            = ScreenNormalColor;
-    TFT_print(const_cast<char *>(title.c_str()), ScreenTitleSafeTop, ScreenFontHeight / 2); // within ScreenTitleSafeTop
-    TFT_drawRect(ScreenTitleSafeTop, ScreenFontHeight * 3 / 2, TFT_getStringWidth(const_cast<char *>(title.c_str())), 2,
-                 ScreenNormalColor);
+    TFT_print(title.c_str(), ScreenTitleSafeTop, ScreenFontHeight / 2); // within ScreenTitleSafeTop
+    TFT_drawRect(ScreenTitleSafeTop, ScreenFontHeight * 3 / 2, TFT_getStringWidth(title.c_str()), 2, ScreenNormalColor);
 
     TFT_setFont(kButtonFont, nullptr);
     if (screens.back()->IsFocusable())
