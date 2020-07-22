@@ -8,7 +8,7 @@
         "dockerfile": "Dockerfile",
         "args": {
             //  "BUILD_VERSION": "$(cat integrations/docker/images/chip-build/version)" // trying to get this to work
-            "BUILD_VERSION": "0.3.0"
+            "BUILD_VERSION": "0.4.0"
         }
     },
     "remoteUser": "vscode",
