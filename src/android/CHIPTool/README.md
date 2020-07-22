@@ -30,7 +30,7 @@ downloaded.
 
 ABIs that can be used as TARGET:
 
-|     ABI     |          Triple          |
+| ABI         | Triple                   |
 | ----------- | ------------------------ |
 | armeabi-v7a | armv7a-linux-androideabi |
 | arm64-v8a   | aarch64-linux-android    |
@@ -39,7 +39,7 @@ ABIs that can be used as TARGET:
 
 NDK OS Variants:
 
-| NDK OS Variant |    Host Tag    |
+| NDK OS Variant | Host Tag       |
 | -------------- | -------------- |
 | macOS          | darwin-x86_64  |
 | Linux          | linux-x86_64   |
