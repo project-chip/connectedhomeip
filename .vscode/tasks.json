@@ -88,7 +88,7 @@
         {
             "label": "Bootstrap",
             "type": "shell",
-            "command": "scripts/build/bootstrap.sh",
+            "command": "scripts/build/bootstrap.sh --with-bluez=no",
             "group": "none",
             "problemMatcher": ["$gcc"]
         },
