@@ -273,22 +273,36 @@ static void TestConfigurationMgr_ServiceConfig(nlTestSuite * inSuite, void * inC
     NL_TEST_ASSERT(inSuite, memcmp(buf, serviceConfig, serviceConfigLen) == 0);
 }
 
-static void TestConfigurationMgr_PairingCode(nlTestSuite * inSuite, void * inContext)
+static void TestConfigurationMgr_SetupPinCode(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    char buf[64];
-    size_t pairingCodeLen    = 0;
-    const char * pairingCode = "016CB664A86A888D";
+    const uint32_t setSetupPinCode = 34567890;
+    uint32_t getSetupPinCode       = 0;
 
-    err = ConfigurationMgr().StorePairingCode(pairingCode, strlen(pairingCode));
+    err = ConfigurationMgr().StoreSetupPinCode(setSetupPinCode);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ConfigurationMgr().GetPairingCode(buf, 64, pairingCodeLen);
+    err = ConfigurationMgr().GetSetupPinCode(getSetupPinCode);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, pairingCodeLen == strlen(pairingCode));
-    NL_TEST_ASSERT(inSuite, strcmp(buf, "016CB664A86A888D") == 0);
+    NL_TEST_ASSERT(inSuite, getSetupPinCode == setSetupPinCode);
+}
+
+static void TestConfigurationMgr_SetupDiscriminator(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    const uint32_t setSetupDiscriminator = 0xBA0;
+    uint32_t getSetupDiscriminator       = 0;
+
+    err = ConfigurationMgr().StoreSetupDiscriminator(setSetupDiscriminator);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetSetupDiscriminator(getSetupDiscriminator);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, getSetupDiscriminator == setSetupDiscriminator);
 }
 
 static void TestConfigurationMgr_PairedAccountId(nlTestSuite * inSuite, void * inContext)
@@ -398,7 +412,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ConfigurationMgr::ManufacturerDeviceIntermediateCACerts",
                 TestConfigurationMgr_ManufacturerDeviceIntermediateCACerts),
     NL_TEST_DEF("Test ConfigurationMgr::ManufacturerDevicePrivateKey", TestConfigurationMgr_ManufacturerDevicePrivateKey),
-    NL_TEST_DEF("Test ConfigurationMgr::PairingCode", TestConfigurationMgr_PairingCode),
+    NL_TEST_DEF("Test ConfigurationMgr::SetupPinCode", TestConfigurationMgr_SetupPinCode),
+    NL_TEST_DEF("Test ConfigurationMgr::SetupDiscriminator", TestConfigurationMgr_SetupDiscriminator),
     NL_TEST_DEF("Test ConfigurationMgr::FabricId", TestConfigurationMgr_FabricId),
     NL_TEST_DEF("Test ConfigurationMgr::ServiceConfig", TestConfigurationMgr_ServiceConfig),
     NL_TEST_DEF("Test ConfigurationMgr::PairedAccountId", TestConfigurationMgr_PairedAccountId),

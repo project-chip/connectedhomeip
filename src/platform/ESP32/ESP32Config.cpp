@@ -54,7 +54,8 @@ const ESP32Config::Key ESP32Config::kConfigKey_MfrDeviceICACerts   = { kConfigNa
 const ESP32Config::Key ESP32Config::kConfigKey_MfrDevicePrivateKey = { kConfigNamespace_ChipFactory, "device-key" };
 const ESP32Config::Key ESP32Config::kConfigKey_ProductRevision     = { kConfigNamespace_ChipFactory, "product-rev" };
 const ESP32Config::Key ESP32Config::kConfigKey_ManufacturingDate   = { kConfigNamespace_ChipFactory, "mfg-date" };
-const ESP32Config::Key ESP32Config::kConfigKey_PairingCode         = { kConfigNamespace_ChipFactory, "pairing-code" };
+const ESP32Config::Key ESP32Config::kConfigKey_SetupPinCode        = { kConfigNamespace_ChipFactory, "pin-code" };
+const ESP32Config::Key ESP32Config::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
 
 // Keys stored in the chip-config namespace
 const ESP32Config::Key ESP32Config::kConfigKey_ServiceConfig               = { kConfigNamespace_ChipConfig, "service-config" };
