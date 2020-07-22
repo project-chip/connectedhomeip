@@ -295,6 +295,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         // Reset message back to start
         msgIndex          = cmd->payloadStartIndex;
         appResponseLength = (cmd->mfgSpecific ? 4 : 2);
+        /* fall through */
     // DO NOT BREAK from this case
 
     // the format of the write attributes cmd is:
