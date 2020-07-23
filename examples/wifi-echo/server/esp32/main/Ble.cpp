@@ -23,9 +23,7 @@
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
-#if CONFIG_HAVE_DISPLAY
 extern BluetoothWidget bluetoothLED;
-#endif // CONFIG_HAVE_DISPLAY
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -46,9 +44,7 @@ void HandleBleConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)
 {
     ChipLogProgress(Ble, "BLEEndPoint: Connection closed (%s)", ErrorStr(err));
 
-#if CONFIG_HAVE_DISPLAY
     bluetoothLED.Set(false);
-#endif // CONFIG_HAVE_DISPLAY
 }
 
 void HandleBleNewConnection(BLEEndPoint * endPoint)
@@ -57,9 +53,7 @@ void HandleBleNewConnection(BLEEndPoint * endPoint)
     endPoint->OnMessageReceived  = HandleBleMessageReceived;
     endPoint->OnConnectionClosed = HandleBleConnectionClosed;
 
-#if CONFIG_HAVE_DISPLAY
     bluetoothLED.Set(true);
-#endif // CONFIG_HAVE_DISPLAY
 }
 
 void startBle()

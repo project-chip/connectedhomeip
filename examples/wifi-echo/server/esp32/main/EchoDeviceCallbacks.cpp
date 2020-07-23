@@ -30,12 +30,15 @@
 #include <support/CodeUtils.h>
 
 #include "LEDWidget.h"
+#include "WiFiWidget.h"
 #include <inet/IPAddress.h>
 
 extern "C" {
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
 } // extern "C"
+
+extern WiFiWidget wifiLED;
 
 static const char * TAG = "echo-devicecallbacks";
 using namespace ::chip::Inet;
@@ -57,10 +60,12 @@ void EchoDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, int
                 IPAddress::FromIPv4(ipInfo.ip).ToString(ipAddrStr, sizeof(ipAddrStr));
                 ESP_LOGI(TAG, "Server ready at: %s:%d", ipAddrStr, CHIP_PORT);
             }
+            wifiLED.Set(true);
         }
         else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
         {
             ESP_LOGE(TAG, "Lost IPv4 connectivity...");
+            wifiLED.Set(false);
         }
         if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
         {
