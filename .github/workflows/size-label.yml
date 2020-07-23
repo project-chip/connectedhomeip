@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Size Label
+name: Sizes
 on: pull_request
 jobs:
     size-label:
+        name: Label Sizes
         runs-on: ubuntu-latest
         steps:
             - name: size-label
