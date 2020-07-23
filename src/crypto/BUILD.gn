@@ -44,7 +44,7 @@ if (chip_crypto == "openssl") {
 static_library("crypto") {
   output_name = "libChipCrypto"
 
-  sources = [ "CHIPCryptoPAL.h" ]
+  sources = [ "CHIPCryptoPAL.h", "CHIPCryptoPAL.cpp" ]
 
   public_deps = [
     "${chip_root}/src/lib/core",
