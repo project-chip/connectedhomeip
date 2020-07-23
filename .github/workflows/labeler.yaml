@@ -2,6 +2,11 @@ name: "Pull Request Labeler"
 on:
     schedule:
         - cron: "0 * * * *"
+    pull_request:
+        types:
+            - opened
+            - synchronize
+            - closed
 
 jobs:
     triage:
