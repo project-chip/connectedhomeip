@@ -12,26 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Bloat Check
+name: Categories
 on:
     schedule:
-        - cron: "*/5 * * * *"
+        - cron: "0 * * * *"
 
 jobs:
-    pull_request_update:
-        name: Report on pull requests
-
+    triage:
+        name: Label Categories
         runs-on: ubuntu-latest
-
-        container:
-            image: connectedhomeip/chip-build:0.4.0
-
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
-
-            - name: Report
-              run: |
-                  scripts/helpers/bloat_check.py                        \
-                       --github-repository project-chip/connectedhomeip \
-                       --github-api-token "${{ secrets.GITHUB_TOKEN }}"
+            - uses: actions/labeler@v3-preview
+              with:
+                  repo-token: "${{ secrets.GITHUB_TOKEN }}"
