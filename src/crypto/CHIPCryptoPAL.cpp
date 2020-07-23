@@ -30,16 +30,17 @@ namespace Crypto {
 CHIP_ERROR Spake2p::InternalHash(const unsigned char * in, size_t in_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
+    uint64_t u64_len = in_len;
 
     unsigned char lb[8];
-    lb[0] = (in_len >> 0) & 0xff;
-    lb[1] = (in_len >> 8) & 0xff;
-    lb[2] = (in_len >> 16) & 0xff;
-    lb[3] = (in_len >> 24) & 0xff;
-    lb[4] = (in_len >> 32) & 0xff;
-    lb[5] = (in_len >> 40) & 0xff;
-    lb[6] = (in_len >> 48) & 0xff;
-    lb[7] = (in_len >> 56) & 0xff;
+    lb[0] = (u64_len >> 0) & 0xff;
+    lb[1] = (u64_len >> 8) & 0xff;
+    lb[2] = (u64_len >> 16) & 0xff;
+    lb[3] = (u64_len >> 24) & 0xff;
+    lb[4] = (u64_len >> 32) & 0xff;
+    lb[5] = (u64_len >> 40) & 0xff;
+    lb[6] = (u64_len >> 48) & 0xff;
+    lb[7] = (u64_len >> 56) & 0xff;
 
     error = Hash(lb, sizeof(lb));
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
