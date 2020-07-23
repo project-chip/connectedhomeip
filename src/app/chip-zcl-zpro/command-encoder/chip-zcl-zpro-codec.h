@@ -70,7 +70,7 @@ bool extractApsFrame(void * buffer, uint32_t buf_length, EmberApsFrame * outApsF
 /** @brief Populates msg with address of the zcl message within buffer.
  * @return Returns the length of msg buffer.
  */
-uint16_t extractMessage(uint8_t * buffer, uint16_t buffer_length, void ** msg);
+uint16_t extractMessage(uint8_t * buffer, uint16_t buffer_length, uint8_t ** msg);
 
 /** @brief Prints an aps frame struct
  */

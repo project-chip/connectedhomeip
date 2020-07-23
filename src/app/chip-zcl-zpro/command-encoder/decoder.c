@@ -103,14 +103,18 @@ void printApsFrame(EmberApsFrame * frame)
            frame->groupId, frame->sequence, frame->radius);
 }
 
-uint16_t extractMessage(uint8_t * buffer, uint16_t buffer_length, void ** msg)
+uint16_t extractMessage(uint8_t * buffer, uint16_t buffer_length, uint8_t ** msg)
 {
     uint16_t result = 0;
-    if (msg && buffer_length > 13)
+    if (msg && buffer_length >= 16)
     {
         // These are hard coded for now.
         *msg   = buffer + 13;
         result = 3;
+    }
+    else if (msg)
+    {
+        *msg = NULL;
     }
     return result;
 }
