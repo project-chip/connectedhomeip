@@ -287,7 +287,7 @@ class Spake2p
 {
 public:
     Spake2p(size_t fe_size, size_t point_size, size_t hash_size);
-    ~Spake2p(void);
+    virtual ~Spake2p(void) {};
 
     /**
      * @brief Initialize Spake2+ with some context specific information.
@@ -650,7 +650,7 @@ class Spake2p_P256_SHA256_HKDF_HMAC : public Spake2p
 {
 public:
     Spake2p_P256_SHA256_HKDF_HMAC(void) : Spake2p(kP256_FE_Length, kP256_Point_Length, kSHA256_Hash_Length) {}
-    ~Spake2p_P256_SHA256_HKDF_HMAC(void) { FreeImpl(); }
+    virtual ~Spake2p_P256_SHA256_HKDF_HMAC(void) { FreeImpl(); }
 
     CHIP_ERROR InitImpl();
     CHIP_ERROR InitInternal();

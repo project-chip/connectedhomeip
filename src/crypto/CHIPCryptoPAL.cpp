@@ -67,8 +67,6 @@ Spake2p::Spake2p(size_t _fe_size, size_t _point_size, size_t _hash_size)
     Ke  = &Kae[hash_size / 2];
 }
 
-Spake2p::~Spake2p() {}
-
 CHIP_ERROR Spake2p::Init(const unsigned char * context, size_t context_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
