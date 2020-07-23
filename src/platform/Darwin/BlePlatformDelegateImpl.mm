@@ -98,15 +98,9 @@ namespace DeviceLayer {
             return found;
         }
 
-        bool BlePlatformDelegateImpl::CloseConnection(BLE_CONNECTION_OBJECT connObj)
-        {
-            return true;
-        }
+        bool BlePlatformDelegateImpl::CloseConnection(BLE_CONNECTION_OBJECT connObj) { return true; }
 
-        uint16_t BlePlatformDelegateImpl::GetMTU(BLE_CONNECTION_OBJECT connObj) const
-        {
-            return 0;
-        }
+        uint16_t BlePlatformDelegateImpl::GetMTU(BLE_CONNECTION_OBJECT connObj) const { return 0; }
 
         bool BlePlatformDelegateImpl::SendIndication(
             BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId, PacketBuffer * pBuf)
