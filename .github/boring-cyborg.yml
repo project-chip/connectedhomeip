@@ -12,125 +12,124 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 labelPRBasedOnFilePath:
+    ############################################################
+    #  Top Level Labels
+    ############################################################
+    repo:
+        - ./*
 
-  ############################################################
-  #  Top Level Labels
-  ############################################################
-  repo:
-      - ./*
+    ############################################################
+    #  Examples
+    ############################################################
+    examples:
+        - examples/*
 
-  ############################################################
-  #  Examples
-  ############################################################
-  examples:
-      - examples/*
+    ############################################################
+    #  Documentation
+    ############################################################
+    documentation:
+        - docs/*
 
-  ############################################################
-  #  Documentation
-  ############################################################
-  documentation:
-      - docs/*
+    ############################################################
+    #  Tools + Development Items
+    ############################################################
+    scripts:
+        - scripts/*
 
-  ############################################################
-  #  Tools + Development Items
-  ############################################################
-  scripts:
-      - scripts/*
+    integrations:
+        - integrations/*
 
-  integrations:
-      - integrations/*
+    vscode:
+        - .vscode
+        - .devcontainer
 
-  vscode:
-      - .vscode
-      - .devcontainer
+    gn:
+        - gn/*
 
-  gn:
-      - gn/*
+    github:
+        - .github
 
-  github:
-      - .github
+    workflows:
+        - .github/workflows/*
 
-  workflows:
-      - .github/workflows/*
+    tools:
+        - tools/*
 
-  tools:
-      - tools/*
+    ############################################################
+    #  Source Code
+    ############################################################
+    # qr code:
+    #     - src/qrcode/*
 
-  ############################################################
-  #  Source Code
-  ############################################################
-  qr code:
-      - src/qrcode/*
+    lwip:
+        - src/lwip/*
 
-  lwip:
-      - src/lwip/*
+    inet:
+        - src/inet/*
 
-  inet:
-      - src/inet/*
+    config:
+        - config/*
 
-  config:
-      - config/*
+    lib:
+        - src/lib/*
 
-  lib:
-      - src/lib/*
+    crypto:
+        - src/crypto/*
 
-  crypto:
-      - src/crypto/*
+    controller:
+        - src/controller/*
 
-  controller:
-      - src/controller/*
+    ble:
+        - src/ble/*
 
-  ble:
-      - src/ble/*
+    android:
+        - src/android/*
 
-  android:
-      - src/android/*
+    app:
+        - src/app/*
 
-  app:
-      - src/app/*
+    transport:
+        - src/transport/*
 
-  transport:
-      - src/transport/*
+    system:
+        - src/system/*
 
-  system:
-      - src/system/*
+    # setup payload:
+    #     - src/setup_payload/*
 
-  setup payload:
-      - src/setup_payload/*
+    ############################################################
+    #  Platforms
+    ############################################################
+    platform:
+        - src/platform/*
 
-  ############################################################
-  #  Platforms
-  ############################################################
-  platform:
-      - src/platform/*
+    darwin:
+        - src/platform/Darwin/*
+        - src/darwin/*
 
-  darwin:
-      - src/platform/Darwin/*
-      - src/darwin/*
+    efr32:
+        - src/platform/EFR32/*
 
-  efr32:
-      - src/platform/EFR32/*
+    esp32:
+        - src/platform/ESP32/*
 
-  esp32:
-      - src/platform/ESP32/*
+    freeRTOS:
+        - src/platform/FreeRTOS/*
 
-  freeRTOS:
-      - src/platform/FreeRTOS/*
+    k32w:
+        - src/platform/K32W/*
 
-  k32w:
-      - src/platform/K32W/*
+    linux:
+        - src/platform/Linux/*
 
-  linux:
-      - src/platform/Linux/*
+    nrf5:
+        - src/platform/nRF5/*
 
-  nrf5:
-      - src/platform/nRF5/*
+    # nrf connect:
+    #     - src/platform/nrfconnect/*
 
-  nrf connect:
-      - src/platform/nrfconnect/*
+    openthread:
+        - src/platform/openthread/*
 
-  openthread:
-      - src/platform/openthread/*
-
-  zephyr:
-      - src/platform/Zephyr/*
+    zephyr:
+        - src/platform/Zephyr/*
