@@ -27,8 +27,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-            - name: Checkout Submodules
-              run: make -f Makefile-bootstrap repos
+              with:
+                 submodules: true
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
             - name: Setup Build
