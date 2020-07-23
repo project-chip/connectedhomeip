@@ -24,6 +24,7 @@
  **/
 
 #include "EchoDeviceCallbacks.h"
+#include "esp_heap_caps.h"
 #include "esp_log.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
@@ -46,6 +47,7 @@ void EchoDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, int
 {
     if (event->Type == DeviceEventType::kInternetConnectivityChange)
     {
+        ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
         if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
         {
             tcpip_adapter_ip_info_t ipInfo;
@@ -93,4 +95,5 @@ void EchoDeviceCallbacks::PostAttributeChangeCallback(uint8_t endpoint, EmberAfC
     ESP_LOGI(TAG, "Got the post attribute callback");
     // At this point we can assume that value points to a boolean value.
     statusLED.Set(*value);
+    ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }
