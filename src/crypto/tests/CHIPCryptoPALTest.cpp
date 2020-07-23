@@ -24,6 +24,7 @@
 #include "Hash_SHA256_test_vectors.h"
 #include "PBKDF2_SHA256_test_vectors.h"
 
+#if CHIP_CRYPTO_OPENSSL
 #include "SPAKE2P_FE_MUL_test_vectors.h"
 #include "SPAKE2P_FE_RW_test_vectors.h"
 #include "SPAKE2P_HMAC_test_vectors.h"
@@ -32,6 +33,7 @@
 #include "SPAKE2P_POINT_RW_test_vectors.h"
 #include "SPAKE2P_POINT_VALID_test_vectors.h"
 #include "SPAKE2P_RFC_test_vectors.h"
+#endif
 
 #include <crypto/CHIPCryptoPAL.h>
 
@@ -911,6 +913,7 @@ static void TestPBKDF2_SHA256_TestVectors(nlTestSuite * inSuite, void * inContex
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
+#if CHIP_CRYPTO_OPENSSL
 static void TestSPAKE2P_spake2p_FEMul(nlTestSuite * inSuite, void * inContext)
 {
     unsigned char fe_out[kMAX_FE_Length];
@@ -1285,7 +1288,7 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
     NL_TEST_ASSERT(inSuite, numOfTestsRan == numOfTestVectors);
 }
-
+#endif
 namespace chip {
 namespace Logging {
 void LogV(uint8_t module, uint8_t category, const char * format, va_list argptr)
