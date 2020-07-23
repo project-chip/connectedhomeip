@@ -103,18 +103,10 @@ void printApsFrame(EmberApsFrame * frame)
            frame->groupId, frame->sequence, frame->radius);
 }
 
-void printCommandInfo(void * buffer)
+uint16_t extractMessage(uint8_t * buffer, uint16_t buffer_length, void ** msg)
 {
-    void * msg = NULL;
-    extractMessage(buffer, &msg);
-    uint8_t val = (uint8_t) * ((uint8_t *) (msg + 2));
-    printf("Encoded command id %d\n", val);
-}
-
-uint32_t extractMessage(void * buffer, void ** msg)
-{
-    uint32_t result = 0;
-    if (msg)
+    uint16_t result = 0;
+    if (msg && buffer_length > 13)
     {
         // These are hard coded for now.
         *msg   = buffer + 13;
