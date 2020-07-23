@@ -921,7 +921,7 @@ exit:
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEWrite(const void *fe, unsigned char *out, size_t out_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-    int bn_out_len = BN_bn2binpad((BIGNUM *) fe, out, out_len);
+    unsigned int bn_out_len = BN_bn2binpad((BIGNUM *) fe, out, out_len);
 
     VerifyOrExit(bn_out_len == out_len, error = CHIP_ERROR_INTERNAL);
 

@@ -1110,13 +1110,11 @@ static void TestSPAKE2P_spake2p_PointLoadWrite(nlTestSuite * inSuite, void * inC
 static void TestSPAKE2P_spake2p_PointIsValid(nlTestSuite * inSuite, void * inContext)
 {
     unsigned char output[kMAX_Point_Length];
-    size_t out_len = sizeof(output);
 
     int numOfTestVectors = ArraySize(point_valid_tvs);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
-        out_len = sizeof(output);
         const struct spake2p_point_valid_tv *vector = point_valid_tvs[vectorIndex];
         
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
@@ -1340,6 +1338,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ECDH sample vectors", TestECDH_SampleInputVectors),
     NL_TEST_DEF("Test adding entropy sources", TestAddEntropySources),
     NL_TEST_DEF("Test PBKDF2 SHA256", TestPBKDF2_SHA256_TestVectors),
+#if CHIP_CRYPTO_OPENSSL
     NL_TEST_DEF("Test Spake2p_spake2p FEMul", TestSPAKE2P_spake2p_FEMul),
     NL_TEST_DEF("Test Spake2p_spake2p FELoad/FEWrite", TestSPAKE2P_spake2p_FELoadWrite),
     NL_TEST_DEF("Test Spake2p_spake2p Mac", TestSPAKE2P_spake2p_Mac),
@@ -1348,6 +1347,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Spake2p_spake2p PointLoad/PointWrite", TestSPAKE2P_spake2p_PointLoadWrite),
     NL_TEST_DEF("Test Spake2p_spake2p PointIsValid", TestSPAKE2P_spake2p_PointIsValid),
     NL_TEST_DEF("Test Spake2+ against RFC test vectors", TestSPAKE2P_RFC),
+#endif
     NL_TEST_SENTINEL()
 };
 
