@@ -31,7 +31,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.2.14 # $BUILD_IMAGE/$BUILD_ORG:$BUILD_VERSION
+            image: connectedhomeip/chip-build-nrf-platform:0.4.0
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -39,8 +39,10 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-            - name: Checkout Submodules
-              run: make -f Makefile-bootstrap repos
+              # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
+              with:
+                 fetch-depth: 0
+                 submodules: true
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
             - name: Build example nRF5 Lock App
@@ -80,7 +82,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.2.14 # $BUILD_IMAGE/$BUILD_ORG:$BUILD_VERSION
+            image: connectedhomeip/chip-build:0.4.0
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -88,8 +90,10 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-            - name: Checkout Submodules
-              run: make -f Makefile-bootstrap repos
+              # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
+              with:
+                 fetch-depth: 0
+                 submodules: true
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
             - name: Build example Standalone Echo Client

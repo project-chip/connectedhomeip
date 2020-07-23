@@ -34,15 +34,15 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: "connectedhomeip/chip-build-openssl:0.2.18"
+            image: connectedhomeip/chip-build:0.4.0
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-            - name: Checkout Submodules
-              run: make -f Makefile-bootstrap repos
+              with:
+                 submodules: true
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
             - name: Setup Build
