@@ -27,8 +27,8 @@
 #include <stddef.h>
 
 #if CHIP_CRYPTO_OPENSSL
-#include <openssl/sha.h>
 #include <openssl/ec.h>
+#include <openssl/sha.h>
 #elif CHIP_CRYPTO_MBEDTLS
 #include <mbedtls/sha256.h>
 #endif
@@ -36,10 +36,9 @@
 namespace chip {
 namespace Crypto {
 
-
-const size_t kP256_FE_Length             = 32;
-const size_t kP256_Point_Length          = (2 * kP256_FE_Length + 1);
-const size_t kSHA256_Hash_Length         = 32;
+const size_t kP256_FE_Length     = 32;
+const size_t kP256_Point_Length  = (2 * kP256_FE_Length + 1);
+const size_t kSHA256_Hash_Length = 32;
 
 const size_t kMax_ECDH_Secret_Length     = kP256_FE_Length;
 const size_t kMax_ECDSA_Signature_Length = 72;
@@ -51,28 +50,40 @@ const size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
  * Spake2+ parameters for P256
  * Defined in https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html#name-ciphersuites
  */
-const unsigned char spake2p_M_p256[65] = {0x04, 0x88, 0x6e, 0x2f, 0x97, 0xac, 0xe4, 0x6e, 0x55, 0xba, 0x9d, 0xd7, 0x24, 0x25, 0x79, 0xf2, 0x99, 0x3b, 0x64, 0xe1, 0x6e, 0xf3, 0xdc, 0xab, 0x95, 0xaf, 0xd4, 0x97, 0x33, 0x3d, 0x8f, 0xa1, 0x2f, 0x5f, 0xf3, 0x55, 0x16, 0x3e, 0x43, 0xce, 0x22, 0x4e, 0x0b, 0x0e, 0x65, 0xff, 0x02, 0xac, 0x8e, 0x5c, 0x7b, 0xe0, 0x94, 0x19, 0xc7, 0x85, 0xe0, 0xca, 0x54, 0x7d, 0x55, 0xa1, 0x2e, 0x2d, 0x20, };
-const unsigned char spake2p_N_p256[65] = {0x04, 0xd8, 0xbb, 0xd6, 0xc6, 0x39, 0xc6, 0x29, 0x37, 0xb0, 0x4d, 0x99, 0x7f, 0x38, 0xc3, 0x77, 0x07, 0x19, 0xc6, 0x29, 0xd7, 0x01, 0x4d, 0x49, 0xa2, 0x4b, 0x4f, 0x98, 0xba, 0xa1, 0x29, 0x2b, 0x49, 0x07, 0xd6, 0x0a, 0xa6, 0xbf, 0xad, 0xe4, 0x50, 0x08, 0xa6, 0x36, 0x33, 0x7f, 0x51, 0x68, 0xc6, 0x4d, 0x9b, 0xd3, 0x60, 0x34, 0x80, 0x8c, 0xd5, 0x64, 0x49, 0x0b, 0x1e, 0x65, 0x6e, 0xdb, 0xe7, };
+const unsigned char spake2p_M_p256[65] = {
+    0x04, 0x88, 0x6e, 0x2f, 0x97, 0xac, 0xe4, 0x6e, 0x55, 0xba, 0x9d, 0xd7, 0x24, 0x25, 0x79, 0xf2, 0x99,
+    0x3b, 0x64, 0xe1, 0x6e, 0xf3, 0xdc, 0xab, 0x95, 0xaf, 0xd4, 0x97, 0x33, 0x3d, 0x8f, 0xa1, 0x2f, 0x5f,
+    0xf3, 0x55, 0x16, 0x3e, 0x43, 0xce, 0x22, 0x4e, 0x0b, 0x0e, 0x65, 0xff, 0x02, 0xac, 0x8e, 0x5c, 0x7b,
+    0xe0, 0x94, 0x19, 0xc7, 0x85, 0xe0, 0xca, 0x54, 0x7d, 0x55, 0xa1, 0x2e, 0x2d, 0x20,
+};
+const unsigned char spake2p_N_p256[65] = {
+    0x04, 0xd8, 0xbb, 0xd6, 0xc6, 0x39, 0xc6, 0x29, 0x37, 0xb0, 0x4d, 0x99, 0x7f, 0x38, 0xc3, 0x77, 0x07,
+    0x19, 0xc6, 0x29, 0xd7, 0x01, 0x4d, 0x49, 0xa2, 0x4b, 0x4f, 0x98, 0xba, 0xa1, 0x29, 0x2b, 0x49, 0x07,
+    0xd6, 0x0a, 0xa6, 0xbf, 0xad, 0xe4, 0x50, 0x08, 0xa6, 0x36, 0x33, 0x7f, 0x51, 0x68, 0xc6, 0x4d, 0x9b,
+    0xd3, 0x60, 0x34, 0x80, 0x8c, 0xd5, 0x64, 0x49, 0x0b, 0x1e, 0x65, 0x6e, 0xdb, 0xe7,
+};
 
 /**
  * Spake2+ state machine to ensure proper execution of the protocol.
  */
-enum {
-   CHIP_SPAKE2P_STATE_PREINIT = 0, // Before any initialization
-   CHIP_SPAKE2P_STATE_INIT,        // First initialization
-   CHIP_SPAKE2P_STATE_STARTED,     // Prover & Verifier starts
-   CHIP_SPAKE2P_STATE_R1,          // Round one complete
-   CHIP_SPAKE2P_STATE_R2,          // Round two complete
-   CHIP_SPAKE2P_STATE_KC,          // Key confirmation complete
+enum
+{
+    CHIP_SPAKE2P_STATE_PREINIT = 0, // Before any initialization
+    CHIP_SPAKE2P_STATE_INIT,        // First initialization
+    CHIP_SPAKE2P_STATE_STARTED,     // Prover & Verifier starts
+    CHIP_SPAKE2P_STATE_R1,          // Round one complete
+    CHIP_SPAKE2P_STATE_R2,          // Round two complete
+    CHIP_SPAKE2P_STATE_KC,          // Key confirmation complete
 };
 typedef unsigned char CHIP_SPAKE2P_STATE;
 
 /**
- * Spake2+ role. 
+ * Spake2+ role.
  */
-enum {
-   CHIP_SPAKE2P_VERIFIER = 0, // Accessory
-   CHIP_SPAKE2P_PROVER = 1,   // Commissioner
+enum
+{
+    CHIP_SPAKE2P_VERIFIER = 0, // Accessory
+    CHIP_SPAKE2P_PROVER   = 1, // Commissioner
 };
 typedef unsigned char CHIP_SPAKE2P_ROLE;
 
@@ -252,9 +263,9 @@ CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t 
 CHIP_ERROR pbkdf2_sha256(const unsigned char * password, size_t plen, const unsigned char * salt, size_t slen,
                          unsigned int iteration_count, uint32_t key_length, unsigned char * output);
 /**
- * The below class implements the draft 01 version of the Spake2+ protocol as 
- * defined in https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html. 
- * 
+ * The below class implements the draft 01 version of the Spake2+ protocol as
+ * defined in https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html.
+ *
  * The following describes the protocol flows:
  *
  *     Commissioner                     Accessory
@@ -262,7 +273,7 @@ CHIP_ERROR pbkdf2_sha256(const unsigned char * password, size_t plen, const unsi
  *
  *     Init
  *     BeginProver
- *     ComputeRoundOne  ------------->  
+ *     ComputeRoundOne  ------------->
  *                                      Init
  *                                      BeginVerifier
  *                                  /-  ComputeRoundOne
@@ -270,7 +281,7 @@ CHIP_ERROR pbkdf2_sha256(const unsigned char * password, size_t plen, const unsi
  *     ComputeRoundTwo  ------------->
  *     KeyConfirm                       KeyConfirm
  *     GetKeys                          GetKeys
- *                                      
+ *
  **/
 class Spake2p
 {
@@ -281,7 +292,7 @@ public:
     /**
      * @brief Initialize Spake2+ with some context specific information.
      *
-     * @param context     The context is arbitrary but should include information about the 
+     * @param context     The context is arbitrary but should include information about the
      *                    protocol being run, contain the transcript for negotiation, include
      *                    the PKBDF parameters, etc.
      * @param context_len The length of the context.
@@ -291,7 +302,7 @@ public:
     CHIP_ERROR Init(const unsigned char * context, size_t context_len);
 
     /**
-     * @brief Start the Spake2+ process as a verifier (i.e. an accessory being provisioned). 
+     * @brief Start the Spake2+ process as a verifier (i.e. an accessory being provisioned).
      *
      * @param my_identity       The verifier identity. May be NULL if identities are not established.
      * @param my_identity_len   The verifier identity length.
@@ -309,7 +320,7 @@ public:
                              size_t Lin_len);
 
     /**
-     * @brief Start the Spake2+ process as a prover (i.e. a commisioner). 
+     * @brief Start the Spake2+ process as a prover (i.e. a commisioner).
      *
      * @param my_identity       The prover identity. May be NULL if identities are not established.
      * @param my_identity_len   The prover identity length.
@@ -347,7 +358,7 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR ComputeRoundTwo(const unsigned char * in, size_t in_len, unsigned char * out, size_t * out_len);
-    
+
     /**
      * @brief Confirm that each party computed the same keys.
      *
@@ -450,17 +461,17 @@ public:
                            unsigned char * out) = 0;
 
     /**
-    * @brief Verify a message authentication code.
-    *
-    *  @param key     The MAC key buffer.
-    *  @param key_len The size of the MAC key in bytes.
-    *  @param mac     The input MAC buffer.
-    *  @param mac_len The size of the MAC in bytes.
-    *  @param in      The input buffer to verify.
-    *  @param in_len  The size of the input data to verify in bytes.
-    *
-    *  @return Returns a CHIP_ERROR when the MAC doesn't validate, CHIP_NO_ERROR otherwise.
-    **/
+     * @brief Verify a message authentication code.
+     *
+     *  @param key     The MAC key buffer.
+     *  @param key_len The size of the MAC key in bytes.
+     *  @param mac     The input MAC buffer.
+     *  @param mac_len The size of the MAC in bytes.
+     *  @param in      The input buffer to verify.
+     *  @param in_len  The size of the input data to verify in bytes.
+     *
+     *  @return Returns a CHIP_ERROR when the MAC doesn't validate, CHIP_NO_ERROR otherwise.
+     **/
     virtual CHIP_ERROR MacVerify(const unsigned char * key, size_t key_len, const unsigned char * mac, size_t mac_len,
                                  const unsigned char * in, size_t in_len) = 0;
     /**
@@ -477,9 +488,8 @@ public:
      *
      * @return Returns a CHIP_ERROR when the MAC doesn't validate, CHIP_NO_ERROR otherwise.
      **/
-    virtual CHIP_ERROR KDF(const unsigned char * ikm, const size_t ikm_len, const unsigned char * salt,
-                       const size_t salt_len, const unsigned char * info, const size_t info_len, unsigned char * out,
-                       size_t out_len) = 0;
+    virtual CHIP_ERROR KDF(const unsigned char * ikm, const size_t ikm_len, const unsigned char * salt, const size_t salt_len,
+                           const unsigned char * info, const size_t info_len, unsigned char * out, size_t out_len) = 0;
     /**
      * @brief Load a field element.
      *
@@ -650,9 +660,8 @@ public:
     CHIP_ERROR Mac(const unsigned char * key, size_t key_len, const unsigned char * in, size_t in_len, unsigned char * out);
     CHIP_ERROR MacVerify(const unsigned char * key, size_t key_len, const unsigned char * mac, size_t mac_len,
                          const unsigned char * in, size_t in_len);
-    CHIP_ERROR KDF(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
-                       const size_t salt_length, const unsigned char * info, const size_t info_length, unsigned char * out,
-                       size_t out_length);
+    CHIP_ERROR KDF(const unsigned char * secret, const size_t secret_length, const unsigned char * salt, const size_t salt_length,
+                   const unsigned char * info, const size_t info_length, unsigned char * out, size_t out_length);
     CHIP_ERROR FELoad(const unsigned char * in, size_t in_len, void * fe);
     CHIP_ERROR FEWrite(const void * fe, unsigned char * out, size_t out_len);
     CHIP_ERROR FEGenerate(void * fe);

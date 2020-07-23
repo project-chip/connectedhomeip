@@ -27,8 +27,8 @@
 #include "SPAKE2P_FE_MUL_test_vectors.h"
 #include "SPAKE2P_FE_RW_test_vectors.h"
 #include "SPAKE2P_HMAC_test_vectors.h"
-#include "SPAKE2P_POINT_MUL_test_vectors.h"
 #include "SPAKE2P_POINT_MUL_ADD_test_vectors.h"
+#include "SPAKE2P_POINT_MUL_test_vectors.h"
 #include "SPAKE2P_POINT_RW_test_vectors.h"
 #include "SPAKE2P_POINT_VALID_test_vectors.h"
 #include "SPAKE2P_RFC_test_vectors.h"
@@ -919,7 +919,7 @@ static void TestSPAKE2P_spake2p_FEMul(nlTestSuite * inSuite, void * inContext)
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
-        const struct spake2p_fe_mul_tv *vector = fe_mul_tvs[vectorIndex];
+        const struct spake2p_fe_mul_tv * vector = fe_mul_tvs[vectorIndex];
 
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
         CHIP_ERROR err = spake2p.Init(NULL, 0);
@@ -952,7 +952,7 @@ static void TestSPAKE2P_spake2p_FELoadWrite(nlTestSuite * inSuite, void * inCont
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
-        const struct spake2p_fe_rw_tv *vector = fe_rw_tvs[vectorIndex];
+        const struct spake2p_fe_rw_tv * vector = fe_rw_tvs[vectorIndex];
 
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
         CHIP_ERROR err = spake2p.Init(NULL, 0);
@@ -979,8 +979,8 @@ static void TestSPAKE2P_spake2p_Mac(nlTestSuite * inSuite, void * inContext)
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
-        const struct spake2p_hmac_tv *vector = hmac_tvs[vectorIndex];
-        
+        const struct spake2p_hmac_tv * vector = hmac_tvs[vectorIndex];
+
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
         CHIP_ERROR err = spake2p.Init(NULL, 0);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -1008,9 +1008,9 @@ static void TestSPAKE2P_spake2p_PointMul(nlTestSuite * inSuite, void * inContext
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
-        out_len = sizeof(output);
-        const struct spake2p_point_mul_tv *vector = point_mul_tvs[vectorIndex];
-        
+        out_len                                    = sizeof(output);
+        const struct spake2p_point_mul_tv * vector = point_mul_tvs[vectorIndex];
+
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
         CHIP_ERROR err = spake2p.Init(NULL, 0);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -1044,9 +1044,9 @@ static void TestSPAKE2P_spake2p_PointMulAdd(nlTestSuite * inSuite, void * inCont
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
-        out_len = sizeof(output);
-        const struct spake2p_point_muladd_tv *vector = point_muladd_tvs[vectorIndex];
-        
+        out_len                                       = sizeof(output);
+        const struct spake2p_point_muladd_tv * vector = point_muladd_tvs[vectorIndex];
+
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
         CHIP_ERROR err = spake2p.Init(NULL, 0);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -1086,9 +1086,9 @@ static void TestSPAKE2P_spake2p_PointLoadWrite(nlTestSuite * inSuite, void * inC
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
-        out_len = sizeof(output);
-        const struct spake2p_point_rw_tv *vector = point_rw_tvs[vectorIndex];
-        
+        out_len                                   = sizeof(output);
+        const struct spake2p_point_rw_tv * vector = point_rw_tvs[vectorIndex];
+
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
         CHIP_ERROR err = spake2p.Init(NULL, 0);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -1115,8 +1115,8 @@ static void TestSPAKE2P_spake2p_PointIsValid(nlTestSuite * inSuite, void * inCon
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
-        const struct spake2p_point_valid_tv *vector = point_valid_tvs[vectorIndex];
-        
+        const struct spake2p_point_valid_tv * vector = point_valid_tvs[vectorIndex];
+
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
         CHIP_ERROR err = spake2p.Init(NULL, 0);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -1136,10 +1136,13 @@ static void TestSPAKE2P_spake2p_PointIsValid(nlTestSuite * inSuite, void * inCon
 
 // We need to "generate" specific field elements
 // to do so we need to override the specific method
-class Test_Spake2p_P256_SHA256_HKDF_HMAC : public Spake2p_P256_SHA256_HKDF_HMAC {
+class Test_Spake2p_P256_SHA256_HKDF_HMAC : public Spake2p_P256_SHA256_HKDF_HMAC
+{
 public:
-    CHIP_ERROR TestSetFE(const unsigned char *fe_in, size_t fe_in_len) {
-        if (fe_in_len > kMAX_FE_Length) {
+    CHIP_ERROR TestSetFE(const unsigned char * fe_in, size_t fe_in_len)
+    {
+        if (fe_in_len > kMAX_FE_Length)
+        {
             return CHIP_ERROR_INTERNAL;
         }
         memcpy(fe, fe_in, fe_in_len);
@@ -1147,9 +1150,8 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR FEGenerate(void *feout) {
-        return FELoad(fe, fe_len, feout);
-    }
+    CHIP_ERROR FEGenerate(void * feout) { return FELoad(fe, fe_len, feout); }
+
 private:
     unsigned char fe[kMAX_FE_Length];
     size_t fe_len;
@@ -1179,7 +1181,7 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
-        const struct spake2p_rfc_tv *vector = rfc_tvs[vectorIndex];
+        const struct spake2p_rfc_tv * vector = rfc_tvs[vectorIndex];
 
         Test_Spake2p_P256_SHA256_HKDF_HMAC Verifier;
         Test_Spake2p_P256_SHA256_HKDF_HMAC Prover;
@@ -1188,9 +1190,8 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
         error = Prover.Init(vector->context, vector->context_len);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
-        error = Prover.BeginProver(vector->prover_identity, vector->prover_identity_len, 
-            vector->verifier_identity, vector->verifier_identity_len,
-            vector->w0, vector->w0_len, vector->w1, vector->w1_len);
+        error = Prover.BeginProver(vector->prover_identity, vector->prover_identity_len, vector->verifier_identity,
+                                   vector->verifier_identity_len, vector->w0, vector->w0_len, vector->w1, vector->w1_len);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
         // Monkey patch the generated x coordinate
@@ -1216,9 +1217,8 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, memcmp(L, vector->L, vector->L_len) == 0);
 
         // Start up the verifier
-        error = Verifier.BeginVerifier(vector->verifier_identity, vector->verifier_identity_len,
-            vector->prover_identity, vector->prover_identity_len,
-            vector->w0, vector->w0_len, L, L_len);
+        error = Verifier.BeginVerifier(vector->verifier_identity, vector->verifier_identity_len, vector->prover_identity,
+                                       vector->prover_identity_len, vector->w0, vector->w0_len, L, L_len);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
         // Monkey patch the generated y coordinate
@@ -1234,11 +1234,11 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
 
         // Compute the second round to also send to the prover
         Vverifier_len = sizeof(Vverifier);
-        error = Verifier.ComputeRoundTwo(X, X_len, Vverifier, &Vverifier_len);
+        error         = Verifier.ComputeRoundTwo(X, X_len, Vverifier, &Vverifier_len);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, Vverifier_len == vector->MAC_KcB_len);
         NL_TEST_ASSERT(inSuite, memcmp(Vverifier, vector->MAC_KcB, vector->MAC_KcB_len) == 0);
-        
+
         error = Verifier.PointWrite(Verifier.Z, Z, kP256_Point_Length);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, memcmp(Z, vector->Z, vector->Z_len) == 0);
@@ -1249,7 +1249,7 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
 
         // Now the prover computes round 2
         Pverifier_len = sizeof(Pverifier);
-        error = Prover.ComputeRoundTwo(Y, Y_len, Pverifier, &Pverifier_len);
+        error         = Prover.ComputeRoundTwo(Y, Y_len, Pverifier, &Pverifier_len);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, Pverifier_len == vector->MAC_KcA_len);
         NL_TEST_ASSERT(inSuite, memcmp(Pverifier, vector->MAC_KcA, vector->MAC_KcA_len) == 0);
@@ -1269,13 +1269,13 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
         PKe_len = sizeof(PKe);
-        error = Prover.GetKeys(PKe, &PKe_len);
+        error   = Prover.GetKeys(PKe, &PKe_len);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, PKe_len == vector->Ke_len);
         NL_TEST_ASSERT(inSuite, memcmp(PKe, vector->Ke, vector->Ke_len) == 0);
 
         VKe_len = sizeof(VKe);
-        error = Verifier.GetKeys(VKe, &VKe_len);
+        error   = Verifier.GetKeys(VKe, &VKe_len);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, VKe_len == vector->Ke_len);
         NL_TEST_ASSERT(inSuite, memcmp(VKe, vector->Ke, vector->Ke_len) == 0);
@@ -1284,8 +1284,6 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
     }
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
     NL_TEST_ASSERT(inSuite, numOfTestsRan == numOfTestVectors);
-
-
 }
 
 namespace chip {
