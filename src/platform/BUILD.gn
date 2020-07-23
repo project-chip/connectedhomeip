@@ -40,7 +40,7 @@ if (device_platform != "none") {
     }
 
     if (device_platform == "darwin") {
-      libs += [
+      frameworks = [
         "CoreFoundation.framework",
         "CoreBluetooth.framework",
         "Foundation.framework",

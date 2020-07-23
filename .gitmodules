@@ -45,7 +45,7 @@
 	url = https://pigweed.googlesource.com/pigweed/pigweed
 	branch = master
 	ignore = dirty
-	commit = 49dea4310ffa15c0ddb363db2149e5f7d96404cf
+	commit = ab1851d75e981378fc2bfe99855a2f7c8a887086
 [submodule "openthread"]
 	path = third_party/openthread/repo
 	url = https://github.com/openthread/openthread.git
