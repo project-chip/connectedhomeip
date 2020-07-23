@@ -58,8 +58,8 @@ labelPRBasedOnFilePath:
     ############################################################
     #  Source Code
     ############################################################
-    # qr code:
-    #     - src/qrcode/*
+    qr code:
+        - src/qrcode/*
 
     lwip:
         - src/lwip/*
@@ -94,8 +94,8 @@ labelPRBasedOnFilePath:
     system:
         - src/system/*
 
-    # setup payload:
-    #     - src/setup_payload/*
+    setup payload:
+        - src/setup_payload/*
 
     ############################################################
     #  Platforms
@@ -125,8 +125,8 @@ labelPRBasedOnFilePath:
     nrf5:
         - src/platform/nRF5/*
 
-    # nrf connect:
-    #     - src/platform/nrfconnect/*
+    nrf connect:
+        - src/platform/nrfconnect/*
 
     openthread:
         - src/platform/openthread/*
