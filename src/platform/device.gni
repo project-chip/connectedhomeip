@@ -23,7 +23,9 @@ declare_args() {
 }
 
 if (device_platform == "auto") {
-  if (current_os == "linux") {
+  if (current_os == "mac" || current_os == "ios") {
+    device_platform = "darwin"
+  } else if (current_os == "linux") {
     device_platform = "linux"
   } else {
     device_platform = "none"
@@ -31,7 +33,9 @@ if (device_platform == "auto") {
 }
 
 device_layer = "none"
-if (device_platform == "linux") {
+if (device_platform == "darwin") {
+  device_layer = "Darwin"
+} else if (device_platform == "linux") {
   device_layer = "Linux"
 } else if (device_platform == "nrf5") {
   device_layer = "nRF5"
@@ -57,5 +61,6 @@ if (device_layer != "none") {
 }
 
 assert((current_os != "freertos" && device_platform == "none") ||
-           device_platform == "nrf5" || device_platform == "linux",
+           device_platform == "darwin" || device_platform == "nrf5" ||
+           device_platform == "linux",
        "Please select a valid value for device_platform")

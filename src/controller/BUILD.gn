@@ -27,4 +27,6 @@ static_library("controller") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/transport",
   ]
+
+  allow_circular_includes_from = [ "${chip_root}/src/transport" ]
 }
