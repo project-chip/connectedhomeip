@@ -24,17 +24,11 @@ void emberAfPrint(int category, const char * format, ...)
 
 void emberAfPrintln(int category, const char * format, ...)
 {
-    int len = strlen(format);
-    if (format != NULL && len > 0)
+    if (format != NULL)
     {
-        char formatLn[len + 2];
-        strncpy(formatLn, format, len);
-        formatLn[len]     = '\n';
-        formatLn[len + 1] = 0;
-
         va_list args;
         va_start(args, format);
-        chip::Logging::LogV(chip::Logging::kLogModule_Zcl, chip::Logging::kLogCategory_Progress, formatLn, args);
+        chip::Logging::LogV(chip::Logging::kLogModule_Zcl, chip::Logging::kLogCategory_Progress, format, args);
         va_end(args);
     }
 }
