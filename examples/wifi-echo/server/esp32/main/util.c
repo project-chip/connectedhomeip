@@ -416,8 +416,6 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
 {
     uint8_t index = emberAfIndexFromEndpoint(cmd->apsFrame->destinationEndpoint);
 
-    emberAfPrint(1, "Received cmd: %d", cmd->commandId);
-    emberAfPrintln(1, "Routing to cluster: %d", cmd->apsFrame->clusterId);
     if (index == 0xFF)
     {
         emberAfDebugPrint("Drop cluster 0x%2x command 0x%x", cmd->apsFrame->clusterId, cmd->commandId);
@@ -774,8 +772,8 @@ EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback)
 #endif
     }
     UNUSED_VAR(label);
-    // emberAfDebugPrintln("T%4x:TX (%p) %ccast 0x%x%p", emberAfGetCurrentTime(), "resp", label, status,
-    //((emberAfResponseApsFrame.options & EMBER_APS_OPTION_ENCRYPTION) ? " w/ link key" : ""));
+    emberAfDebugPrintln("T%4x:TX (%p) %ccast 0x%x%p", 0, "resp", label, status,
+                        ((emberAfResponseApsFrame.options & EMBER_APS_OPTION_ENCRYPTION) ? " w/ link key" : ""));
     emberAfDebugPrint("TX buffer: [");
     emberAfDebugFlush();
     emberAfDebugPrintBuffer(appResponseData, appResponseLength, true);

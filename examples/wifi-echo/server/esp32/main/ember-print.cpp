@@ -2,15 +2,15 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <support/CHIPLogging.h>
+#include "gen/gen_config.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <support/CHIPLogging.h>
 
 bool emberAfPrintReceivedMessages = true;
 
 using namespace chip::Logging;
+extern "C" {
+
 void emberAfPrint(int category, const char * format, ...)
 {
     if (format != NULL)
@@ -48,21 +48,17 @@ void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, b
 
         uint32_t outStringLength = length * perByteCharCount + 1;
         char result[outStringLength];
-        uint32_t index = 0;
-        for (uint32_t i = 0; i < outStringLength && index < length; i += perByteCharCount, index++)
+        for (uint32_t dst_idx = 0, index = 0; dst_idx < outStringLength && index < length; dst_idx += perByteCharCount, index++)
         {
 
-            snprintf(result + i, perByteCharCount + 1, perByteFormatStr, buffer[index]);
+            snprintf(result + dst_idx, perByteCharCount + 1, perByteFormatStr, buffer[index]);
         }
         result[outStringLength] = 0;
         emberAfPrint(category, "%s", result);
     }
     else
     {
-        emberAfPrint(1, "NULL");
+        emberAfPrint(EMBER_AF_PRINT_CORE, "NULL");
     }
 }
-
-#ifdef __cplusplus
 }
-#endif

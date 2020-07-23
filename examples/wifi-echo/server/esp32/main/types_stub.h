@@ -46,6 +46,8 @@
 
 #include "chip-zcl/chip-zcl-zpro-codec.h" // For EmberApsFrame
 
+#include "gen/gen_config.h"
+
 /**
  * @brief Defines binding types.
  */
@@ -1917,5 +1919,5 @@ typedef struct
 // Needed by callback.h and callback-stubs.c
 typedef bool boolean;
 
-#define emberAfPrintActiveArea 1
+#define emberAfPrintActiveArea EMBER_AF_PRINT_CORE
 #endif // TYPES_STUB_H
