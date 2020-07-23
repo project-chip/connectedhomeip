@@ -507,9 +507,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl(void)
-{
-}
+void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl(void) {}
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const unsigned char * key, size_t key_len, const unsigned char * in, size_t in_len,
                                               unsigned char * out)
