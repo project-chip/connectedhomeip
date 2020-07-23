@@ -1078,7 +1078,6 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void *R)
     error = CHIP_NO_ERROR;
 exit:
     return error;
->>>>>>> Add spake2+ implementation.
 }
 
 } // namespace Crypto
