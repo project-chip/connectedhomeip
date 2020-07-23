@@ -40,8 +40,6 @@ namespace DeviceLayer {
         bool BlePlatformDelegateImpl::SubscribeCharacteristic(
             BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId)
         {
-            ChipLogError(Ble, "%s", __FUNCTION__);
-
             bool found = false;
             CBUUID * serviceId = nil;
             CBUUID * characteristicId = nil;
@@ -73,7 +71,6 @@ namespace DeviceLayer {
         bool BlePlatformDelegateImpl::UnsubscribeCharacteristic(
             BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId)
         {
-            ChipLogError(Ble, "%s", __FUNCTION__);
             bool found = false;
             CBUUID * serviceId = nil;
             CBUUID * characteristicId = nil;
@@ -101,23 +98,13 @@ namespace DeviceLayer {
             return found;
         }
 
-        bool BlePlatformDelegateImpl::CloseConnection(BLE_CONNECTION_OBJECT connObj)
-        {
-            ChipLogError(Ble, "%s", __FUNCTION__);
-            return true;
-        }
+        bool BlePlatformDelegateImpl::CloseConnection(BLE_CONNECTION_OBJECT connObj) { return true; }
 
-        uint16_t BlePlatformDelegateImpl::GetMTU(BLE_CONNECTION_OBJECT connObj) const
-        {
-            ChipLogError(Ble, "%s", __FUNCTION__);
-            return 0;
-        }
+        uint16_t BlePlatformDelegateImpl::GetMTU(BLE_CONNECTION_OBJECT connObj) const { return 0; }
 
         bool BlePlatformDelegateImpl::SendIndication(
             BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId, PacketBuffer * pBuf)
         {
-            ChipLogError(Ble, "%s", __FUNCTION__);
-
             if (pBuf) {
                 PacketBuffer::Free(pBuf);
             }
@@ -127,7 +114,6 @@ namespace DeviceLayer {
         bool BlePlatformDelegateImpl::SendWriteRequest(
             BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId, PacketBuffer * pBuf)
         {
-            ChipLogError(Ble, "%s", __FUNCTION__);
             bool found = false;
             CBUUID * serviceId = nil;
             CBUUID * characteristicId = nil;
@@ -167,8 +153,6 @@ namespace DeviceLayer {
         bool BlePlatformDelegateImpl::SendReadRequest(
             BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId, PacketBuffer * pBuf)
         {
-            ChipLogError(Ble, "%s", __FUNCTION__);
-
             if (pBuf) {
                 PacketBuffer::Free(pBuf);
             }
@@ -178,7 +162,6 @@ namespace DeviceLayer {
         bool BlePlatformDelegateImpl::SendReadResponse(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext,
             const ChipBleUUID * svcId, const ChipBleUUID * charId)
         {
-            ChipLogError(Ble, "%s", __FUNCTION__);
             return false;
         }
 
