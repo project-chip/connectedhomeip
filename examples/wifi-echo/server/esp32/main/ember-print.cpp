@@ -42,10 +42,10 @@ void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, b
 
         uint32_t outStringLength = length * perByteCharCount + 1;
         char result[outStringLength];
-        for (uint32_t dst_idx = 0, index = 0; dst_idx < outStringLength && index < length; dst_idx += perByteCharCount, index++)
+        for (uint32_t dst_idx = 0, index = 0; dst_idx < outStringLength - 1 && index < length; dst_idx += perByteCharCount, index++)
         {
 
-            snprintf(result + dst_idx, perByteCharCount + 1, perByteFormatStr, buffer[index]);
+            snprintf(result + dst_idx, outStringLength - dst_idx, perByteFormatStr, buffer[index]);
         }
         result[outStringLength] = 0;
         emberAfPrint(category, "%s", result);
