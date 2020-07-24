@@ -152,7 +152,7 @@ CHIP_ERROR ESP32Utils::SetAPMode(bool enabled)
 
     // If station mode is not already enabled (implying the current mode is WIFI_MODE_AP), change
     // the mode to WIFI_MODE_APSTA.
-    if (true /* curWiFiMode != targetWiFiMode */)
+    if (curWiFiMode != targetWiFiMode)
     {
         ChipLogProgress(DeviceLayer, "Changing ESP WiFi mode: %s -> %s", WiFiModeToStr(curWiFiMode), WiFiModeToStr(targetWiFiMode));
 
