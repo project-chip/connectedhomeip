@@ -416,7 +416,6 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
 {
     uint8_t index = emberAfIndexFromEndpoint(cmd->apsFrame->destinationEndpoint);
 
-    emberAfPrintln(1, "Hola");
     if (index == 0xFF)
     {
         emberAfDebugPrint("Drop cluster 0x%2x command 0x%x", cmd->apsFrame->clusterId, cmd->commandId);
