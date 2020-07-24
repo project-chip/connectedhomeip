@@ -73,8 +73,6 @@ public:
     CHIP_ERROR GetAndLogThreadTopologyFull(void);
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
 
-    void FactoryReset(void);
-
 private:
     // ===== Members for internal use by the following friends.
 
