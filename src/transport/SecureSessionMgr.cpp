@@ -285,8 +285,6 @@ void SecureSessionMgrBase::HandleConnectionExpired(const Transport::PeerConnecti
 
 void SecureSessionMgrBase::ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error)
 {
-    ChipLogProgress(Inet, "Checking for expired connections");
-
     SecureSessionMgrBase * mgr = reinterpret_cast<SecureSessionMgrBase *>(param);
     mgr->mPeerConnections.ExpireInactiveConnections(CHIP_PEER_CONNECTION_TIMEOUT_MS);
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
