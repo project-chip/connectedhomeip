@@ -65,6 +65,12 @@ int cmd_otcli_dispatch(int argc, char ** argv)
     char * buff_ptr           = buff;
     int i                     = 0;
 
+#if CHIP_TARGET_STYLE_UNIX
+    char ctl_command[] = "/usr/local/sbin/ot-ctl ";
+    strcpy(buff, ctl_command, sizeof(ctl_command));
+
+#endif
+
     for (i = 0; i < argc; i++)
     {
         size_t arg_len = strlen(argv[i]);
@@ -90,32 +96,31 @@ int cmd_otcli_dispatch(int argc, char ** argv)
         }
     }
 
+#if CHIP_TARGET_STYLE_EMBEDDED
     otCliConsoleInputLine(buff, buff_ptr - buff);
+#else
+    system(buff);
+#endif
 exit:
     return error;
 }
 
 static const shell_command_t cmds_otcli_root = { &cmd_otcli_dispatch, "otcli", "Dispatch OpenThread CLI command" };
 
-#endif // CHIP_ENABLE_OPENTHREAD
-
-/*
-static int OnOtCliInitialized(const char *aBuf, uint16_t aBufLength, void *aContext)
+static int OnOtCliInitialized(const char * aBuf, uint16_t aBufLength, void * aContext)
 {
     ChipLogProgress(chipTool, "%s", aBuf);
     return 0;
 }
-*/
+
+#endif // CHIP_ENABLE_OPENTHREAD
 
 void cmd_otcli_init(void)
 {
 #if CHIP_ENABLE_OPENTHREAD
-    /*
-        // Either init here, or delay to cmd_otcli_dispatch() behind isInited static
+    otCliConsoleInit(GetOtInstance(), &OnOtCliInitialized, NULL);
 
-        otCliConsoleInit(GetOtInstance(), &OnOtCliInitialized, NULL);
-    */
-    // Register the root `base64` command with the top-level shell.
+    // Register the root otcli command with the top-level shell.
     shell_register(&cmds_otcli_root, 1);
 #endif // CHIP_ENABLE_OPENTHREAD
 }
