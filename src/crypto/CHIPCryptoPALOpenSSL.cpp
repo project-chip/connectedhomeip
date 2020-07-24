@@ -781,12 +781,18 @@ void ClearSecretData(uint8_t * buf, uint32_t len)
 }
 
 #define init_point(_point_)                                                                                                        \
-    _point_ = EC_POINT_new(context.curve);                                                                                         \
-    VerifyOrExit(_point_ != NULL, error = CHIP_ERROR_INTERNAL);
+    do                                                                                                                             \
+    {                                                                                                                              \
+        _point_ = EC_POINT_new(context.curve);                                                                                     \
+        VerifyOrExit(_point_ != NULL, error = CHIP_ERROR_INTERNAL);                                                                \
+    } while (0);
 
 #define init_bn(_bn_)                                                                                                              \
-    _bn_ = BN_new();                                                                                                               \
-    VerifyOrExit(_bn_ != NULL, error = CHIP_ERROR_INTERNAL);
+    do                                                                                                                             \
+    {                                                                                                                              \
+        _bn_ = BN_new();                                                                                                           \
+        VerifyOrExit(_bn_ != NULL, error = CHIP_ERROR_INTERNAL);                                                                   \
+    } while (0);
 
 #define free_point(_point_) EC_POINT_clear_free((EC_POINT *) _point_);
 
