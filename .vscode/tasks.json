@@ -30,7 +30,10 @@
                 "reveal": "always",
                 "panel": "shared"
             },
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": ["relative", "${workspaceFolder}/out/debug/"]
+            }
         },
         {
             "label": "Auto-enforce coding style",
