@@ -36,6 +36,19 @@
             }
         },
         {
+            "label": "Update compilation database",
+            "type": "shell",
+            "command": "scripts/helpers/update_compile_commands.sh",
+            "group": "none",
+            "dependsOn": "GN Build",
+            "isBackground": false,
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Auto-enforce coding style",
             "type": "shell",
             "command": "scripts/helpers/auto_enforce_code_style.sh",
