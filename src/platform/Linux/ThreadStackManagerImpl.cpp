@@ -411,6 +411,11 @@ exit:
     return OTBR_TO_CHIP_ERROR(error);
 }
 
+CHIP_ERROR ThreadStackManagerImpl::_JoinerStart(void)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 // TODO: Implement after we decide on the dbus message loop
 extern ThreadStackManager & ThreadStackMgr(void);
 
