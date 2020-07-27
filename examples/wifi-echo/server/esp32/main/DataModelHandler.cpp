@@ -60,12 +60,9 @@ void HandleDataModelMessage(System::PacketBuffer * buffer)
         return;
     }
 
-    // FIXME: Callee needs to be told the buffer length, so it can fail out if
-    // we don't have enough buffer!!!
     uint8_t * message;
     uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
-
-    ok = emberAfProcessMessage(&frame,
+    ok                  = emberAfProcessMessage(&frame,
                                0, // type
                                message, messageLen,
                                0, // source node id
