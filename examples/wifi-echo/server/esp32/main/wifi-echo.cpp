@@ -25,6 +25,7 @@
 #include "ListScreen.h"
 #include "QRCodeScreen.h"
 #include "ScreenManager.h"
+#include "WiFiWidget.h"
 #include "esp_event_loop.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
@@ -102,10 +103,8 @@ extern void startClient(void);
 #endif // CONFIG_HAVE_DISPLAY
 
 LEDWidget statusLED;
-
-#if CONFIG_HAVE_DISPLAY
 BluetoothWidget bluetoothLED;
-#endif // CONFIG_HAVE_DISPLAY
+WiFiWidget wifiLED;
 
 const char * TAG = "wifi-echo-demo";
 
@@ -417,9 +416,8 @@ extern "C" void app_main()
     SetupPretendDevices();
 
     statusLED.Init(STATUS_LED_GPIO_NUM);
-#if CONFIG_HAVE_DISPLAY
     bluetoothLED.Init();
-#endif // CONFIG_HAVE_DISPLAY
+    wifiLED.Init();
 
     // Start the Echo Server
     InitDataModelHandler();
@@ -490,6 +488,7 @@ extern "C" void app_main()
         statusLED.SetVLED(vled1, vled2);
 
         bluetoothLED.SetVLED(ScreenManager::AddVLED(TFT_BLUE));
+        wifiLED.SetVLED(ScreenManager::AddVLED(TFT_YELLOW));
     }
 
 #endif // CONFIG_HAVE_DISPLAY
