@@ -24,6 +24,7 @@
 #include "LEDWidget.h"
 #include "ListScreen.h"
 #include "QRCodeScreen.h"
+#include "RendezvousSession.h"
 #include "ScreenManager.h"
 #include "WiFiWidget.h"
 #include "esp_event_loop.h"
@@ -53,7 +54,6 @@ using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
 extern void startServer();
-extern void startBle();
 
 #if CONFIG_USE_ECHO_CLIENT
 extern void startClient(void);
@@ -109,6 +109,7 @@ WiFiWidget wifiLED;
 const char * TAG = "wifi-echo-demo";
 
 static EchoDeviceCallbacks EchoCallbacks;
+RendezvousSession * rendezvousSession = nullptr;
 
 namespace {
 
@@ -449,7 +450,7 @@ extern "C" void app_main()
 
     if (isRendezvousBLE())
     {
-        startBle();
+        rendezvousSession = new RendezvousSession(&bluetoothLED);
     }
 
 #if CONFIG_USE_ECHO_CLIENT
