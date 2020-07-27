@@ -23,10 +23,11 @@
 
 # for all configs
 CHIP_BUILD_CRYPTO_SOURCE_FILES                          = \
+    @top_builddir@/src/crypto/CHIPCryptoPAL.cpp           \
     $(NULL)
 
-CHIP_BUILD_CRYPTO_HEADER_FILES                          = \
-    @top_builddir@/src/crypto/CHIPCryptoPAL.h             \
+CHIP_BUILD_CRYPTO_HEADER_FILES                                   = \
+    @top_builddir@/src/crypto/CHIPCryptoPAL.h                      \
     $(NULL)
 
 # source by config
