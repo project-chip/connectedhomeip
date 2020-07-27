@@ -383,7 +383,6 @@ public:
     CHIP_ERROR WriteMN(void);
     CHIP_ERROR GenerateKeys(void);
 
-
     /**
      * @brief Load a field element.
      *
@@ -605,7 +604,6 @@ protected:
     virtual CHIP_ERROR MacVerify(const unsigned char * key, size_t key_len, const unsigned char * mac, size_t mac_len,
                                  const unsigned char * in, size_t in_len) = 0;
 
-
     /**
      * @brief Derive an key of length out_len.
      *
@@ -634,7 +632,6 @@ protected:
     unsigned char * Kcb;
     unsigned char * Ka;
     unsigned char * Ke;
-
 };
 
 #if CHIP_CRYPTO_OPENSSL
@@ -689,7 +686,6 @@ private:
 #if CHIP_CRYPTO_OPENSSL
     struct openssl_spake2_ctx context;
 #endif
-
 };
 
 /** @brief Clears the first `len` bytes of memory area `buf`.
