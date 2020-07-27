@@ -87,15 +87,7 @@ static NSString * const ipKey = @"ipk";
 
 - (void)onConnected
 {
-    NSString * msg = @"ping";
-
-    NSError * error;
-    BOOL didSend = [self.chipController sendMessage:[msg dataUsingEncoding:NSUTF8StringEncoding] error:&error];
-    if (!didSend) {
-        NSLog(@"Error: %@", error.localizedDescription);
-    } else {
-        NSLog(@"Message Sent");
-    }
+    [self retrieveAndSendWifiCredentials];
 }
 
 - (void)onMessage:(NSString *)message
@@ -205,7 +197,7 @@ static NSString * const ipKey = @"ipk";
     [self handleRendezVous:payload];
 }
 
-- (void)retrieveWifiCredentials
+- (void)retrieveAndSendWifiCredentials
 {
     UIAlertController * alertController =
         [UIAlertController alertControllerWithTitle:@"Wifi Configuration"
@@ -213,7 +205,6 @@ static NSString * const ipKey = @"ipk";
                                      preferredStyle:UIAlertControllerStyleAlert];
     [alertController addTextFieldWithConfigurationHandler:^(UITextField * textField) {
         textField.placeholder = @"Network SSID";
-        textField.textColor = [UIColor whiteColor];
         textField.clearButtonMode = UITextFieldViewModeWhileEditing;
         textField.borderStyle = UITextBorderStyleRoundedRect;
 
@@ -225,7 +216,6 @@ static NSString * const ipKey = @"ipk";
     [alertController addTextFieldWithConfigurationHandler:^(UITextField * textField) {
         [textField setSecureTextEntry:YES];
         textField.placeholder = @"Password";
-        textField.textColor = [UIColor whiteColor];
         textField.clearButtonMode = UITextFieldViewModeWhileEditing;
         textField.borderStyle = UITextBorderStyleRoundedRect;
         textField.secureTextEntry = YES;
@@ -260,9 +250,24 @@ static NSString * const ipKey = @"ipk";
                                                          networkPassword.text);
                                                  }
                                                  NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
+
+                                                 [strongSelf sendWifiCredentialsWithSSID:networkSSID.text
+                                                                                password:networkPassword.text];
                                              }
                                          }]];
     [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)sendWifiCredentialsWithSSID:(NSString *)ssid password:(NSString *)password
+{
+    NSString * msg = [NSString stringWithFormat:@"%@:%@", ssid, password];
+    NSError * error;
+    BOOL didSend = [self.chipController sendMessage:[msg dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+    if (!didSend) {
+        NSLog(@"Error: %@", error.localizedDescription);
+    } else {
+        NSLog(@"Message Sent");
+    }
 }
 
 - (void)updateUIFields:(CHIPSetupPayload *)payload decimalString:(nullable NSString *)decimalString
