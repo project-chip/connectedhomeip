@@ -411,11 +411,6 @@ exit:
     return OTBR_TO_CHIP_ERROR(error);
 }
 
-void ThreadStackManagerImpl::_FactoryReset()
-{
-    mThreadApi->FactoryReset(nullptr);
-}
-
 // TODO: Implement after we decide on the dbus message loop
 extern ThreadStackManager & ThreadStackMgr(void);
 

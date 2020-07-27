@@ -84,8 +84,6 @@ public:
 
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
 
-    void _FactoryReset();
-
     ~ThreadStackManagerImpl() = default;
 
 private:
