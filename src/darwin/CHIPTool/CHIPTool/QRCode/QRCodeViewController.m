@@ -194,7 +194,7 @@ static NSString * const ipKey = @"ipk";
         }
     }];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {}]];
-    
+
     __weak typeof(self) weakSelf = self;
     [alertController addAction:[UIAlertAction actionWithTitle:@"Send" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         typeof(self) strongSelf = weakSelf;
@@ -205,7 +205,7 @@ static NSString * const ipKey = @"ipk";
             if ([networkSSID.text length] > 0) {
                 CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey, networkSSID.text);
             }
-            
+
             if ([networkPassword.text length] > 0) {
                 CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkPasswordDefaultsKey, networkPassword.text);
             }

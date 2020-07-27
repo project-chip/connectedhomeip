@@ -23,15 +23,15 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
+
     [self.networkPassword setSecureTextEntry:YES];
 
     self.saveButton.layer.cornerRadius = 5;
     self.saveButton.clipsToBounds = YES;
-    
+
     self.clearButton.layer.cornerRadius = 5;
     self.clearButton.clipsToBounds = YES;
-    
+
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
 }
@@ -54,7 +54,7 @@
     if ([networkSSID length] > 0) {
         self.networkSSID.text = networkSSID;
     }
-    
+
     NSString *networkPassword = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkPasswordDefaultsKey);
     if ([networkPassword length] > 0) {
         self.networkPassword.text = networkPassword;

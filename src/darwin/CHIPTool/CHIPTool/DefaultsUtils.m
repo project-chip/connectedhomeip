@@ -33,5 +33,3 @@ void CHIPSetDomainValueForKey(NSString *domain, NSString *key, id value) {
     CFPreferencesSetAppValue((CFStringRef)key, (__bridge CFPropertyListRef _Nullable)(value), (CFStringRef)domain);
     CFPreferencesAppSynchronize((CFStringRef)domain);
 }
-
-
