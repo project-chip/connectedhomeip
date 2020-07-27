@@ -58,7 +58,8 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMod
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
         wifi_mode_t curWiFiMode;
-        mWiFiStationMode = (esp_wifi_get_mode(&curWiFiMode) == ESP_OK && curWiFiMode == WIFI_MODE_APSTA)
+        mWiFiStationMode =
+            (esp_wifi_get_mode(&curWiFiMode) == ESP_OK && (curWiFiMode == WIFI_MODE_APSTA || curWiFiMode == WIFI_MODE_STA))
             ? kWiFiStationMode_Enabled
             : kWiFiStationMode_Disabled;
     }
