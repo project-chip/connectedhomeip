@@ -73,7 +73,7 @@ public:
     CHIP_ERROR GetAndLogThreadTopologyFull(void);
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
 
-    void FactoryReset(void);
+    void JoinerStart(void);
 
 private:
     // ===== Members for internal use by the following friends.
@@ -295,6 +295,11 @@ inline CHIP_ERROR ThreadStackManager::GetAndLogThreadTopologyFull(void)
 inline CHIP_ERROR ThreadStackManager::GetPrimary802154MACAddress(uint8_t * buf)
 {
     return static_cast<ImplClass *>(this)->_GetPrimary802154MACAddress(buf);
+}
+
+inline void ThreadStackManager::JoinerStart(void)
+{
+    static_cast<ImplClass *>(this)->_JoinerStart();
 }
 
 } // namespace DeviceLayer
