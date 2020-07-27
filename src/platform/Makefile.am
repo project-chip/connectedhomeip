@@ -187,12 +187,45 @@ endif # CHIP_DEVICE_LAYER_TARGET_DARWIN
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
 
+libDeviceLayer_a_CPPFLAGS              += \
+    -I$(builddir)/gen                     \
+    $(NULL)
+
 SUBDIRS                                += tests
+
+.PHONY: gen
+gen:
+	mkdir -p gen
+
+BUILT_SOURCES                         = \
+    gen                                 \
+    $(NULL)
 
 libDeviceLayer_a_CPPFLAGS              += \
     $(GIO_CFLAGS)                         \
+    $(GIO_UNIX_CFLAGS)                    \
     $(INIPP_CPPFLAGS)                     \
     $(NULL)
+
+if CONFIG_BLE_PLATFORM_BLUEZ
+
+BUILT_SOURCES                         += \
+    gen/DbusBluez.h                      \
+    gen/DbusBluez.c                      \
+    $(NULL)
+
+gen/DbusBluez.h: Linux/dbus/org.bluez.xml
+	gdbus-codegen --header --output $@ --c-namespace CHIPDBus $<
+
+gen/DbusBluez.c: Linux/dbus/org.bluez.xml
+	gdbus-codegen --body --output $@ --c-namespace CHIPDBus $<
+	sed -i 's/config\.h/BuildConfig.h/g' $@
+
+libDeviceLayer_a_SOURCES               += \
+    gen/DbusBluez.c                    \
+    $(NULL)
+
+endif #CONFIG_BLE_PLATFORM_BLUEZ
 
 libDeviceLayer_a_SOURCES               += \
     Linux/BLEManagerImpl.cpp              \
@@ -258,7 +291,7 @@ if CHIP_ENABLE_OPENTHREAD
 libDeviceLayer_a_SOURCES               +=       \
     EFR32/ThreadStackManagerImpl.cpp            \
     $(NULL)
-endif    
+endif
 
 endif # CHIP_DEVICE_LAYER_TARGET_EFR32
 
