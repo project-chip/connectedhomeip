@@ -283,7 +283,8 @@ void AppTask::JoinHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != JOIN_BUTTON)
         return;
 
-    ThreadStackMgr().JoinerStart();
+    CHIP_ERROR error = ThreadStackMgr().JoinerStart();
+    NRF_LOG_INFO("Thread joiner triggered: %s", chip::ErrorStr(error));
 }
 #endif
 
