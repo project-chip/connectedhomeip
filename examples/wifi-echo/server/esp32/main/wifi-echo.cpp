@@ -265,6 +265,30 @@ public:
     }
 };
 
+class SetupListModel : public ListScreen::Model
+{
+public:
+    SetupListModel()
+    {
+        std::string resetWiFi = "Reset WiFi";
+        options.emplace_back(resetWiFi);
+    }
+    virtual std::string GetTitle() { return "Setup"; }
+    virtual int GetItemCount() { return options.size(); }
+    virtual std::string GetItemText(int i) { return options.at(i); }
+    virtual void ItemAction(int i)
+    {
+        ESP_LOGI(TAG, "Opening options %d: %s", i, GetItemText(i).c_str());
+        if (i == 0)
+        {
+            ConnectivityMgr().ClearWiFiStationProvision();
+        }
+    }
+
+private:
+    std::vector<std::string> options;
+};
+
 class CustomScreen : public Screen
 {
 public:
@@ -475,7 +499,11 @@ extern "C" void app_main()
                                                             ESP_LOGI(TAG, "Opening QR code screen");
                                                             ScreenManager::PushScreen(new QRCodeScreen(qrCodeText));
                                                         })
-                                                 ->Item("Setup")
+                                                 ->Item("Setup",
+                                                        [=]() {
+                                                            ESP_LOGI(TAG, "Opening Setup list");
+                                                            ScreenManager::PushScreen(new ListScreen(new SetupListModel()));
+                                                        })
                                                  ->Item("More")
                                                  ->Item("Items")
                                                  ->Item("For")
