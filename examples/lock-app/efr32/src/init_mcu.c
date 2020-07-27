@@ -48,6 +48,7 @@
 
 #include "bsp.h"
 
+#include "FreeRTOSConfig.h"
 #include "init_mcu.h"
 
 // Bit [19] in MODULEINFO is the HFXOCALVAL:
@@ -71,6 +72,16 @@ static void initHFXO(void);
 
 void initMcu(void)
 {
+    // ISR safe FreeRTOS API functions must *only* be called
+    // from interrupts that have been assigned a priority at or below
+    // configMAX_SYSCALL_INTERRUPT_PRIORITY.
+    // Here we init all IRQ prio to configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY
+    // to make sure no IRQ use default priority of zero as that is the highest possible priority
+    for (IRQn_Type i = 0; i < EXT_IRQ_COUNT; i++)
+    {
+        NVIC_SetPriority(i, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY);
+    }
+
     // Device errata
     CHIP_Init();
 
