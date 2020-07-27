@@ -330,6 +330,11 @@ void GetGatewayIP(char * ip_buf, size_t ip_len)
     ESP_LOGE(TAG, "Got gateway ip %s", ip_buf);
 }
 
+bool isRendezvousBLE()
+{
+    return static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kBLE;
+}
+
 std::string createSetupPayload()
 {
     SetupPayload payload;
@@ -340,18 +345,29 @@ std::string createSetupPayload()
     payload.vendorID              = EXAMPLE_VENDOR_ID;
     payload.productID             = EXAMPLE_PRODUCT_ID;
 
-    char gw_ip[INET6_ADDRSTRLEN];
-    GetGatewayIP(gw_ip, sizeof(gw_ip));
-    payload.addOptionalVendorData(EXAMPLE_VENDOR_TAG_IP, gw_ip);
-
-    QRCodeSetupPayloadGenerator generator(payload);
+    CHIP_ERROR err = CHIP_NO_ERROR;
     string result;
-    size_t tlvDataLen = sizeof(gw_ip);
-    uint8_t tlvDataStart[tlvDataLen];
-    CHIP_ERROR err = generator.payloadBase41Representation(result, tlvDataStart, tlvDataLen);
+    if (!isRendezvousBLE())
+    {
+        char gw_ip[INET6_ADDRSTRLEN];
+        GetGatewayIP(gw_ip, sizeof(gw_ip));
+        payload.addOptionalVendorData(EXAMPLE_VENDOR_TAG_IP, gw_ip);
+
+        QRCodeSetupPayloadGenerator generator(payload);
+
+        size_t tlvDataLen = sizeof(gw_ip);
+        uint8_t tlvDataStart[tlvDataLen];
+        err = generator.payloadBase41Representation(result, tlvDataStart, tlvDataLen);
+    }
+    else
+    {
+        QRCodeSetupPayloadGenerator generator(payload);
+        err = generator.payloadBase41Representation(result);
+    }
+
     if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "Couldn't get payload string %d", generator.payloadBase41Representation(result));
+        ESP_LOGE(TAG, "Couldn't get payload string %d", err);
     }
     return result;
 };
@@ -409,7 +425,7 @@ extern "C" void app_main()
     InitDataModelHandler();
     startServer();
 
-    if (static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kBLE)
+    if (isRendezvousBLE())
     {
         startBle();
     }
