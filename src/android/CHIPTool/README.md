@@ -61,7 +61,7 @@ export STRIP=$TOOLCHAIN/bin/$TARGET-strip
 export JNI_INCLUDE_DIRS=$ANDROID_NDK_HOME/sysroot/usr/include
 ```
 
-Make sure that JAVA_HOME is set to correct path.
+Make sure that JAVA_HOME is set to the correct path.
 
 Note: Regardless of where JAVA_HOME points, always use the JNI headers from the
 Android NDK, and only include the top-most directory (include), not the system
