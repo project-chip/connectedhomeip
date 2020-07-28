@@ -33,9 +33,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>;
-
 template <class ImplClass>
 void GenericConnectivityManagerImpl_Thread<ImplClass>::_OnPlatformEvent(const ChipDeviceEvent * event)
 {

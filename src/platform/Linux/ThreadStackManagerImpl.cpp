@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <array>
 #include <limits.h>
 #include <string.h>
 
@@ -54,6 +55,8 @@ using otbr::DBus::NeighborInfo;
 
 namespace chip {
 namespace DeviceLayer {
+
+ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
 ThreadStackManagerImpl::ThreadStackManagerImpl() : mThreadApi(nullptr), mConnection(nullptr), mNetworkInfo(), mAttached(false) {}
 
@@ -416,11 +419,15 @@ CHIP_ERROR ThreadStackManagerImpl::_JoinerStart(void)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-// TODO: Implement after we decide on the dbus message loop
-extern ThreadStackManager & ThreadStackMgr(void);
+extern ThreadStackManager & ThreadStackMgr(void)
+{
+    return chip::DeviceLayer::ThreadStackManagerImpl::sInstance;
+}
 
-// TODO: Implement after we decide on the dbus message loop
-extern ThreadStackManagerImpl & ThreadStackMgrImpl(void);
+extern ThreadStackManagerImpl & ThreadStackMgrImpl(void)
+{
+    return chip::DeviceLayer::ThreadStackManagerImpl::sInstance;
+}
 
 } // namespace DeviceLayer
 } // namespace chip

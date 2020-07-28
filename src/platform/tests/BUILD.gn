@@ -54,7 +54,8 @@ if (device_platform != "none") {
         "TestThreadStackMgr.cpp",
         "TestThreadStackMgr.h",
       ]
-      tests += [ "TestThreadStackMgr" ]
+      # FIXME: TestThreadStackMgr requires ot-br-posix daemon to be running
+      # tests += [ "TestThreadStackMgr" ]
     }
   }
 } else {

@@ -34,8 +34,11 @@ class ConfigurationManagerImpl;
 namespace Internal {
 class DeviceNetworkInfo;
 class DeviceControlServer;
+class BLEManagerImpl;
 template <class>
 class GenericPlatformManagerImpl;
+template <class>
+class GenericConfigurationManagerImpl;
 template <class>
 class GenericPlatformManagerImpl_FreeRTOS;
 template <class>
