@@ -640,7 +640,6 @@ CHIP_ERROR BLEManagerImpl::EncodeAdvertisingData(ble_gap_adv_data_t & gapAdvData
     deviceIdInfo.Init();
     deviceIdInfo.SetVendorId(0xDEAD);
     deviceIdInfo.SetProductId(0xBEEF);
-    deviceIdInfo.SetDeviceId(0x123456789ABCDEF0ULL);
     SuccessOrExit(err);
 
     // Form the contents of the scan response packet.
