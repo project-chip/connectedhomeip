@@ -36,6 +36,11 @@
 #   target_sources(app PRIVATE main/main.cpp ...)
 #
 
+# Set DTC overlay before finding the Zephyr package.
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/dts.overlay")
+    set(DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/dts.overlay")
+endif()
+
 # ==================================================
 # Load NCS/Zephyr build system
 # ==================================================
@@ -46,7 +51,7 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 # ==================================================
 
 # Archtecture for which CHIP will be built.
-set(CHIP_HOST_ARCH armv7-unknown-linux-gnu)
+set(CHIP_HOST_ARCH arm-none-eabi)
 
 # Directory into which the CHIP build system will place its output.
 set(CHIP_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/chip")
@@ -99,7 +104,6 @@ list(FILTER CHIP_CXXFLAGS EXCLUDE REGEX -std.*) # CHIP adds gnu++11 anyway...
 set(CHIP_COMMON_FLAGS
     -D_SYS__PTHREADTYPES_H_
     -isystem${ZEPHYR_BASE}/include/posix
-    -DMBEDTLS_CONFIG_FILE=CONFIG_MBEDTLS_CFG_FILE
     -isystem${ZEPHYR_BASE}/../modules/crypto/mbedtls/configs)
 
 set(CHIP_CFLAGS ${CHIP_CFLAGS} ${CHIP_COMMON_FLAGS} --specs=nosys.specs)
@@ -142,10 +146,13 @@ set(CHIP_CONFIGURE_ARGS
     --disable-docs
     --disable-java
     --disable-device-manager
-    --with-openthread=${ZEPHYR_BASE}/../modules/lib/openthread
     --with-mbedtls=${ZEPHYR_BASE}/../modules/crypto/mbedtls
     --with-crypto=mbedtls
     )
+
+if (${CONFIG_NET_L2_OPENTHREAD})
+    list(APPEND CHIP_CONFIGURE_ARGS --with-openthread=${ZEPHYR_BASE}/../modules/lib/openthread)
+endif()
 
 # Define CHIP as an external project (since CHIP doesn't support CMake natively)
 include(ExternalProject)

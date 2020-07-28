@@ -55,7 +55,8 @@ const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDeviceICACerts   = CONFIG_KE
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDevicePrivateKey = CONFIG_KEY(NAMESPACE_FACTORY "device-key");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_ProductRevision     = CONFIG_KEY(NAMESPACE_FACTORY "product-rev");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_ManufacturingDate   = CONFIG_KEY(NAMESPACE_FACTORY "mfg-date");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_PairingCode         = CONFIG_KEY(NAMESPACE_FACTORY "pairing-code");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_SetupPinCode        = CONFIG_KEY(NAMESPACE_FACTORY "pin-code");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_SetupDiscriminator  = CONFIG_KEY(NAMESPACE_FACTORY "discriminator");
 // Keys stored in the chip config namespace
 // NOTE: update sAllResettableConfigKeys definition when adding a new entry below
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_FabricId                    = CONFIG_KEY(NAMESPACE_CONFIG "fabric-id");

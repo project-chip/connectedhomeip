@@ -250,6 +250,19 @@ bool FormatPOSIXError(char * buf, uint16_t bufSize, int32_t err)
     }
 }
 
+/**
+ * This implements a mapping function for CHIP System Layer errors that allows mapping integers in the number space of the
+ * Zephyr OS user API stack errors into the POSIX range.
+ *
+ *  @param[in] aError  The native Zephyr API error to map.
+ *
+ *  @return The mapped POSIX error.
+ */
+DLL_EXPORT Error MapErrorZephyr(int aError)
+{
+    return MapErrorPOSIX(-aError);
+}
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_LWIP_ERROR_FUNCTIONS
 

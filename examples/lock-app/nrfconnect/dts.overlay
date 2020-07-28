@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,26 +14,14 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for the CHIP BLE
- *          Layer on Zephyr platforms.
- *
- */
-
-#ifndef BLE_PLATFORM_CONFIG_H
-#define BLE_PLATFORM_CONFIG_H
-
-#include <bluetooth/bluetooth.h>
-
-// ==================== Platform Adaptations ====================
-
-#define BLE_CONNECTION_OBJECT bt_conn *
-#define BLE_CONNECTION_UNINITIALIZED nullptr
-#define BLE_MAX_RECEIVE_WINDOW_SIZE 5
-
-// ========== Platform-specific Configuration Overrides =========
-
-/* none so far */
-
-#endif // BLE_PLATFORM_CONFIG_H
+/ {
+	/*
+	* In some default configurations within the nRF Connect SDK,
+	* e.g. on nRF52840, the chosen zephyr,entropy node is &cryptocell.
+	* This devicetree overlay ensures that default is overridden wherever it
+	* is set, as this application uses the RNG node for entropy exclusively.
+	*/
+	chosen {
+		zephyr,entropy = &rng;
+	};
+};
