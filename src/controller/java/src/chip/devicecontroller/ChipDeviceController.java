@@ -52,22 +52,26 @@ public class ChipDeviceController {
   }
 
   private native long newDeviceController();
+
   private native void beginConnectDevice(long deviceControllerPtr, String ipAddress);
+
   private native boolean isConnected(long deviceControllerPtr);
+
   private native void beginSendMessage(long deviceControllerPtr, String message);
+
   private native void deleteDeviceController(long deviceControllerPtr);
 
   static {
-      System.loadLibrary("CHIPController");
+    System.loadLibrary("CHIPController");
   }
 
   protected void finalize() throws Throwable {
-      super.finalize();
+    super.finalize();
 
-      if (deviceControllerPtr != 0) {
-          deleteDeviceController(deviceControllerPtr);
-          deviceControllerPtr = 0;
-      }
+    if (deviceControllerPtr != 0) {
+      deleteDeviceController(deviceControllerPtr);
+      deviceControllerPtr = 0;
+    }
   }
 
   /** Interface to listen for callbacks from CHIPDeviceController. */

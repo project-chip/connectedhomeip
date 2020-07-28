@@ -22,7 +22,7 @@ public class ChipDeviceControllerException extends Exception {
 
   public int errorCode;
 
-  public ChipDeviceControllerException() { }
+  public ChipDeviceControllerException() {}
 
   public ChipDeviceControllerException(int errorCode, String message) {
     super(message != null ? message : String.format("Error Code %d", errorCode));
