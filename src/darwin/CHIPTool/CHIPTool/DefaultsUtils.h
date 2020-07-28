@@ -15,13 +15,11 @@
  *    limitations under the License.
  */
 
-#import "CHIPViewControllerBase.h"
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
-NS_ASSUME_NONNULL_BEGIN
+extern NSString * const kCHIPToolDefaultsDomain;
+extern NSString * const kNetworkSSIDDefaultsKey;
+extern NSString * const kNetworkPasswordDefaultsKey;
 
-@interface OnOffViewController : CHIPViewControllerBase
-
-@end
-
-NS_ASSUME_NONNULL_END
+id CHIPGetDomainValueForKey(NSString * domain, NSString * key);
+void CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value);

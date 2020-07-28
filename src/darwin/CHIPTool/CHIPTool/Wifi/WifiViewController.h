@@ -20,8 +20,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface OnOffViewController : CHIPViewControllerBase
+@interface WifiViewController : CHIPViewControllerBase
 
+@property (weak, nonatomic) IBOutlet UITextField * networkSSID;
+@property (weak, nonatomic) IBOutlet UITextField * networkPassword;
+@property (weak, nonatomic) IBOutlet UIButton * saveButton;
+@property (weak, nonatomic) IBOutlet UIButton * clearButton;
 @end
 
 NS_ASSUME_NONNULL_END

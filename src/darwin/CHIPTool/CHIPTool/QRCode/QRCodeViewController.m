@@ -18,6 +18,7 @@
 #import "QRCodeViewController.h"
 
 // local imports
+#import "DefaultsUtils.h"
 #import <CHIP/CHIP.h>
 
 // system imports
@@ -202,6 +203,66 @@ static NSString * const ipKey = @"ipk";
     [self updateUIFields:payload decimalString:decimalString];
     [self parseOptionalData:payload];
     [self handleRendezVous:payload];
+}
+
+- (void)retrieveWifiCredentials
+{
+    UIAlertController * alertController =
+        [UIAlertController alertControllerWithTitle:@"Wifi Configuration"
+                                            message:@"Input network SSID and password that your phone is connected to."
+                                     preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addTextFieldWithConfigurationHandler:^(UITextField * textField) {
+        textField.placeholder = @"Network SSID";
+        textField.textColor = [UIColor whiteColor];
+        textField.clearButtonMode = UITextFieldViewModeWhileEditing;
+        textField.borderStyle = UITextBorderStyleRoundedRect;
+
+        NSString * networkSSID = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey);
+        if ([networkSSID length] > 0) {
+            textField.text = networkSSID;
+        }
+    }];
+    [alertController addTextFieldWithConfigurationHandler:^(UITextField * textField) {
+        [textField setSecureTextEntry:YES];
+        textField.placeholder = @"Password";
+        textField.textColor = [UIColor whiteColor];
+        textField.clearButtonMode = UITextFieldViewModeWhileEditing;
+        textField.borderStyle = UITextBorderStyleRoundedRect;
+        textField.secureTextEntry = YES;
+
+        NSString * networkPassword = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkPasswordDefaultsKey);
+        if ([networkPassword length] > 0) {
+            textField.text = networkPassword;
+        }
+    }];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel"
+                                                        style:UIAlertActionStyleDefault
+                                                      handler:^(UIAlertAction * action) {
+                                                      }]];
+
+    __weak typeof(self) weakSelf = self;
+    [alertController
+        addAction:[UIAlertAction actionWithTitle:@"Send"
+                                           style:UIAlertActionStyleDefault
+                                         handler:^(UIAlertAction * action) {
+                                             typeof(self) strongSelf = weakSelf;
+                                             if (strongSelf) {
+                                                 NSArray * textfields = alertController.textFields;
+                                                 UITextField * networkSSID = textfields[0];
+                                                 UITextField * networkPassword = textfields[1];
+                                                 if ([networkSSID.text length] > 0) {
+                                                     CHIPSetDomainValueForKey(
+                                                         kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey, networkSSID.text);
+                                                 }
+
+                                                 if ([networkPassword.text length] > 0) {
+                                                     CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkPasswordDefaultsKey,
+                                                         networkPassword.text);
+                                                 }
+                                                 NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
+                                             }
+                                         }]];
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 - (void)updateUIFields:(CHIPSetupPayload *)payload decimalString:(nullable NSString *)decimalString
