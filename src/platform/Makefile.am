@@ -212,7 +212,7 @@ libDeviceLayer_a_SOURCES               += \
     $(NULL)
 
 libDeviceLayer_a_CPPFLAGS              += \
-    $(OT_BR_POSIX_CPPFLAGS)              \
+    $(OT_BR_POSIX_CPPFLAGS)               \
     $(DBUS_CFLAGS)                        \
     $(NULL)
 endif

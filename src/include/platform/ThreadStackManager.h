@@ -34,6 +34,7 @@ class ConfigurationManagerImpl;
 namespace Internal {
 class DeviceNetworkInfo;
 class DeviceControlServer;
+class BLEManagerImpl;
 template <class>
 class GenericPlatformManagerImpl;
 template <class>
