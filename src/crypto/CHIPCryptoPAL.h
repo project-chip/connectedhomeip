@@ -379,117 +379,10 @@ public:
      **/
     CHIP_ERROR GetKeys(unsigned char * out, size_t * out_len);
 
-    CHIP_SPAKE2P_ROLE role;
-    CHIP_SPAKE2P_STATE state;
-    size_t fe_size;
-    size_t hash_size;
-    size_t point_size;
-    unsigned char Kcab[kMAX_Hash_Length];
-    unsigned char Kae[kMAX_Hash_Length];
-    unsigned char * Kca;
-    unsigned char * Kcb;
-    unsigned char * Ka;
-    unsigned char * Ke;
-
     CHIP_ERROR InternalHash(const unsigned char * in, size_t in_len);
     CHIP_ERROR WriteMN(void);
     CHIP_ERROR GenerateKeys(void);
 
-    /**
-     * @brief Initialize underlying implementation curve, points, field elements, etc.
-     *
-     * @details The implementation needs to:
-     *     1. Initialize each of the points below and set the relevant pointers on the class:
-     *        a. M
-     *        b. N
-     *        c. G
-     *        d. X
-     *        e. Y
-     *        f. L
-     *        g. Z
-     *        h. V
-     *
-     *        As an example:
-     *           this.M = implementation_alloc_point();
-     *     2. Initialize each of the field elements below and set the relevant pointers on the class:
-     *        a. w0
-     *        b. w1
-     *        c. xy
-     *        d. tempbn
-     *     3. The hashing context should be initialized
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    virtual CHIP_ERROR InitImpl() = 0;
-
-    /**
-     * @brief Free any underlying implementation curve, points, field elements, etc.
-     **/
-    virtual void FreeImpl() = 0;
-
-    /**
-     * @brief Hash in_len bytes of in into the internal hash context.
-     *
-     * @param in     The input buffer.
-     * @param in_len Size of the input buffer in bytes.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    virtual CHIP_ERROR Hash(const unsigned char * in, size_t in_len) = 0;
-
-    /**
-     * @brief Return the hash.
-     *
-     * @param out    Output buffer. The size is implicit and is determined by the hash used.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    virtual CHIP_ERROR HashFinalize(unsigned char * out) = 0;
-
-    /**
-     * @brief Generate a message authentication code.
-     *
-     * @param key     The MAC key buffer.
-     * @param key_len The size of the MAC key in bytes.
-     * @param in      The input buffer.
-     * @param in_len  The size of the input data to MAC in bytes.
-     * @param out     The output MAC buffer. Size is implicit and is determined by the hash used.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    virtual CHIP_ERROR Mac(const unsigned char * key, size_t key_len, const unsigned char * in, size_t in_len,
-                           unsigned char * out) = 0;
-
-    /**
-     * @brief Verify a message authentication code.
-     *
-     *  @param key     The MAC key buffer.
-     *  @param key_len The size of the MAC key in bytes.
-     *  @param mac     The input MAC buffer.
-     *  @param mac_len The size of the MAC in bytes.
-     *  @param in      The input buffer to verify.
-     *  @param in_len  The size of the input data to verify in bytes.
-     *
-     *  @return Returns a CHIP_ERROR when the MAC doesn't validate, CHIP_NO_ERROR otherwise.
-     **/
-    virtual CHIP_ERROR MacVerify(const unsigned char * key, size_t key_len, const unsigned char * mac, size_t mac_len,
-                                 const unsigned char * in, size_t in_len) = 0;
-    /**
-     * @brief Derive an key of length out_len.
-     *
-     * @param ikm      The input key material buffer.
-     * @param ikm_len  The input key material length.
-     * @param salt     The optional salt. This may be NULL.
-     * @param salt_len The size of the salt in bytes.
-     * @param info     The info.
-     * @param info_len The size of the info in bytes.
-     * @param key      The output key
-     * @param key_len  The output key length
-     *
-     * @return Returns a CHIP_ERROR when the MAC doesn't validate, CHIP_NO_ERROR otherwise.
-     **/
-    virtual CHIP_ERROR KDF(const unsigned char * ikm, const size_t ikm_len, const unsigned char * salt, const size_t salt_len,
-                           const unsigned char * info, const size_t info_len, unsigned char * out, size_t out_len) = 0;
     /**
      * @brief Load a field element.
      *
@@ -634,6 +527,111 @@ public:
     void * xy;
     void * order;
     void * tempbn;
+
+protected:
+    /**
+     * @brief Initialize underlying implementation curve, points, field elements, etc.
+     *
+     * @details The implementation needs to:
+     *     1. Initialize each of the points below and set the relevant pointers on the class:
+     *        a. M
+     *        b. N
+     *        c. G
+     *        d. X
+     *        e. Y
+     *        f. L
+     *        g. Z
+     *        h. V
+     *
+     *        As an example:
+     *           this.M = implementation_alloc_point();
+     *     2. Initialize each of the field elements below and set the relevant pointers on the class:
+     *        a. w0
+     *        b. w1
+     *        c. xy
+     *        d. tempbn
+     *     3. The hashing context should be initialized
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR InitImpl() = 0;
+
+    /**
+     * @brief Hash in_len bytes of in into the internal hash context.
+     *
+     * @param in     The input buffer.
+     * @param in_len Size of the input buffer in bytes.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR Hash(const unsigned char * in, size_t in_len) = 0;
+
+    /**
+     * @brief Return the hash.
+     *
+     * @param out    Output buffer. The size is implicit and is determined by the hash used.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR HashFinalize(unsigned char * out) = 0;
+
+    /**
+     * @brief Generate a message authentication code.
+     *
+     * @param key     The MAC key buffer.
+     * @param key_len The size of the MAC key in bytes.
+     * @param in      The input buffer.
+     * @param in_len  The size of the input data to MAC in bytes.
+     * @param out     The output MAC buffer. Size is implicit and is determined by the hash used.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR Mac(const unsigned char * key, size_t key_len, const unsigned char * in, size_t in_len,
+                           unsigned char * out) = 0;
+
+    /**
+     * @brief Verify a message authentication code.
+     *
+     *  @param key     The MAC key buffer.
+     *  @param key_len The size of the MAC key in bytes.
+     *  @param mac     The input MAC buffer.
+     *  @param mac_len The size of the MAC in bytes.
+     *  @param in      The input buffer to verify.
+     *  @param in_len  The size of the input data to verify in bytes.
+     *
+     *  @return Returns a CHIP_ERROR when the MAC doesn't validate, CHIP_NO_ERROR otherwise.
+     **/
+    virtual CHIP_ERROR MacVerify(const unsigned char * key, size_t key_len, const unsigned char * mac, size_t mac_len,
+                                 const unsigned char * in, size_t in_len) = 0;
+
+    /**
+     * @brief Derive an key of length out_len.
+     *
+     * @param ikm      The input key material buffer.
+     * @param ikm_len  The input key material length.
+     * @param salt     The optional salt. This may be NULL.
+     * @param salt_len The size of the salt in bytes.
+     * @param info     The info.
+     * @param info_len The size of the info in bytes.
+     * @param key      The output key
+     * @param key_len  The output key length
+     *
+     * @return Returns a CHIP_ERROR when the MAC doesn't validate, CHIP_NO_ERROR otherwise.
+     **/
+    virtual CHIP_ERROR KDF(const unsigned char * ikm, const size_t ikm_len, const unsigned char * salt, const size_t salt_len,
+                           const unsigned char * info, const size_t info_len, unsigned char * out, size_t out_len) = 0;
+
+    CHIP_SPAKE2P_ROLE role;
+    CHIP_SPAKE2P_STATE state;
+    size_t fe_size;
+    size_t hash_size;
+    size_t point_size;
+    unsigned char Kcab[kMAX_Hash_Length];
+    unsigned char Kae[kMAX_Hash_Length];
+    unsigned char * Kca;
+    unsigned char * Kcb;
+    unsigned char * Ka;
+    unsigned char * Ke;
 };
 
 #if CHIP_CRYPTO_OPENSSL
@@ -652,16 +650,9 @@ public:
     Spake2p_P256_SHA256_HKDF_HMAC(void) : Spake2p(kP256_FE_Length, kP256_Point_Length, kSHA256_Hash_Length) {}
     virtual ~Spake2p_P256_SHA256_HKDF_HMAC(void) { FreeImpl(); }
 
-    CHIP_ERROR InitImpl();
-    CHIP_ERROR InitInternal();
-    void FreeImpl();
-    CHIP_ERROR Hash(const unsigned char * in, size_t in_len);
-    CHIP_ERROR HashFinalize(unsigned char * out);
     CHIP_ERROR Mac(const unsigned char * key, size_t key_len, const unsigned char * in, size_t in_len, unsigned char * out);
     CHIP_ERROR MacVerify(const unsigned char * key, size_t key_len, const unsigned char * mac, size_t mac_len,
                          const unsigned char * in, size_t in_len);
-    CHIP_ERROR KDF(const unsigned char * secret, const size_t secret_length, const unsigned char * salt, const size_t salt_length,
-                   const unsigned char * info, const size_t info_length, unsigned char * out, size_t out_length);
     CHIP_ERROR FELoad(const unsigned char * in, size_t in_len, void * fe);
     CHIP_ERROR FEWrite(const void * fe, unsigned char * out, size_t out_len);
     CHIP_ERROR FEGenerate(void * fe);
@@ -676,6 +667,20 @@ public:
     CHIP_ERROR PointIsValid(void * R);
     CHIP_ERROR ComputeL(unsigned char * Lout, size_t * L_len, const unsigned char * w1in, size_t w1in_len);
 
+protected:
+    CHIP_ERROR InitImpl();
+    CHIP_ERROR Hash(const unsigned char * in, size_t in_len);
+    CHIP_ERROR HashFinalize(unsigned char * out);
+    CHIP_ERROR KDF(const unsigned char * secret, const size_t secret_length, const unsigned char * salt, const size_t salt_length,
+                   const unsigned char * info, const size_t info_length, unsigned char * out, size_t out_length);
+
+private:
+    /**
+     * @brief Free any underlying implementation curve, points, field elements, etc.
+     **/
+    void FreeImpl();
+
+    CHIP_ERROR InitInternal();
     class Hash_SHA256_stream sha256_hash_ctx;
 
 #if CHIP_CRYPTO_OPENSSL
