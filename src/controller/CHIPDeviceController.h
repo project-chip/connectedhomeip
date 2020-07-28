@@ -60,6 +60,7 @@ public:
     void * AppState;
 
     CHIP_ERROR Init(NodeId localDeviceId);
+    CHIP_ERROR Init(NodeId localDeviceId, System::Layer * systemLayer, InetLayer * inetLayer);
     CHIP_ERROR Shutdown();
 
     // ----- Connection Management -----
