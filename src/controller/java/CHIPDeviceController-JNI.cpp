@@ -33,17 +33,18 @@
 using namespace chip;
 using namespace chip::DeviceController;
 
-#define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipDeviceController_##METHOD_NAME
+#define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
+    extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipDeviceController_##METHOD_NAME
 
-#define CDC_JNI_ERROR_MIN     10000
-#define CDC_JNI_ERROR_MAX     10999
+#define CDC_JNI_ERROR_MIN 10000
+#define CDC_JNI_ERROR_MAX 10999
 
 #define _CDC_JNI_ERROR(e) (CDC_JNI_ERROR_MIN + (e))
 
-#define CDC_JNI_ERROR_EXCEPTION_THROWN          _CDC_JNI_ERROR(0)
-#define CDC_JNI_ERROR_TYPE_NOT_FOUND            _CDC_JNI_ERROR(1)
-#define CDC_JNI_ERROR_METHOD_NOT_FOUND          _CDC_JNI_ERROR(2)
-#define CDC_JNI_ERROR_FIELD_NOT_FOUND           _CDC_JNI_ERROR(3)
+#define CDC_JNI_ERROR_EXCEPTION_THROWN _CDC_JNI_ERROR(0)
+#define CDC_JNI_ERROR_TYPE_NOT_FOUND _CDC_JNI_ERROR(1)
+#define CDC_JNI_ERROR_METHOD_NOT_FOUND _CDC_JNI_ERROR(2)
+#define CDC_JNI_ERROR_FIELD_NOT_FOUND _CDC_JNI_ERROR(3)
 
 #define CDC_JNI_CALLBACK_LOCAL_REF_COUNT 256
 
@@ -72,7 +73,7 @@ static jclass sChipDeviceControllerExceptionCls = NULL;
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
 // knowing its id, because the ID can be learned on the first response that is received.
-chip::NodeId kLocalDeviceId = 112233;
+chip::NodeId kLocalDeviceId  = 112233;
 chip::NodeId kRemoteDeviceId = 12344321;
 
 static const unsigned char local_private_key[] = { 0x00, 0xd1, 0x90, 0xd9, 0xb3, 0x95, 0x1c, 0x5f, 0xa4, 0xe7, 0x47,
@@ -98,7 +99,7 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     sJVM = jvm;
 
     // Get a JNI environment object.
-    sJVM->GetEnv((void **)&env, JNI_VERSION_1_6);
+    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
 
     ChipLogProgress(Controller, "Loading Java class references.");
 
@@ -125,7 +126,7 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     SuccessOrExit(err);
 
     // Create and start the IO thread.
-    sShutdown = false;
+    sShutdown  = false;
     pthreadErr = pthread_create(&sIOThread, NULL, IOThreadMain, NULL);
     VerifyOrExit(pthreadErr == 0, err = System::MapErrorPOSIX(pthreadErr));
 
@@ -172,9 +173,9 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
     err = deviceController->Init(kLocalDeviceId, &sSystemLayer, &sInetLayer);
     SuccessOrExit(err);
 
-    deviceController->AppState = (void *)env->NewGlobalRef(self);
+    deviceController->AppState = (void *) env->NewGlobalRef(self);
 
-    result = (long)deviceController;
+    result = (long) deviceController;
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -183,7 +184,7 @@ exit:
         {
             if (deviceController->AppState != NULL)
             {
-                env->DeleteGlobalRef((jobject)deviceController->AppState);
+                env->DeleteGlobalRef((jobject) deviceController->AppState);
             }
             deviceController->Shutdown();
             delete deviceController;
@@ -200,8 +201,8 @@ exit:
 
 JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong deviceControllerPtr, jstring deviceAddr)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipDeviceController * deviceController = (ChipDeviceController *)deviceControllerPtr;
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
     chip::Inet::IPAddress deviceIPAddr;
 
     ChipLogProgress(Controller, "beginConnectDevice() called with IP Address");
@@ -211,8 +212,8 @@ JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong deviceCon
     env->ReleaseStringUTFChars(deviceAddr, deviceAddrStr);
 
     pthread_mutex_lock(&sStackLock);
-    err = deviceController->ConnectDevice(kRemoteDeviceId, deviceIPAddr, (void *)"ConnectDevice",
-        HandleKeyExchange, HandleEchoResponse, HandleError, 11095);
+    err = deviceController->ConnectDevice(kRemoteDeviceId, deviceIPAddr, (void *) "ConnectDevice", HandleKeyExchange,
+                                          HandleEchoResponse, HandleError, 11095);
     pthread_mutex_unlock(&sStackLock);
 
     if (err != CHIP_NO_ERROR)
@@ -224,18 +225,18 @@ JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong deviceCon
 
 JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong deviceControllerPtr, jstring messageObj)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipDeviceController * deviceController = (ChipDeviceController *)deviceControllerPtr;
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
 
     ChipLogProgress(Controller, "beginSendMessage() called");
 
     const char * messageStr = env->GetStringUTFChars(messageObj, 0);
-    size_t messageLen = strlen(messageStr);
+    size_t messageLen       = strlen(messageStr);
 
     auto * buffer = System::PacketBuffer::NewWithAvailableSize(messageLen);
     memcpy(buffer->Start(), messageStr, messageLen);
     buffer->SetDataLength(messageLen);
-    err = deviceController->SendMessage((void *)"SendMessage", buffer);
+    err = deviceController->SendMessage((void *) "SendMessage", buffer);
 
     env->ReleaseStringUTFChars(messageObj, messageStr);
 
@@ -249,13 +250,13 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong deviceContr
 JNI_METHOD(jboolean, isConnected)(JNIEnv * env, jobject self, jlong deviceControllerPtr)
 {
     ChipLogProgress(Controller, "isConnected() called");
-    ChipDeviceController * deviceController = (ChipDeviceController *)deviceControllerPtr;
+    ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
     return deviceController->IsConnected() ? JNI_TRUE : JNI_FALSE;
 }
 
 JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong deviceControllerPtr)
 {
-    ChipDeviceController * deviceController = (ChipDeviceController *)deviceControllerPtr;
+    ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
 
     ChipLogProgress(Controller, "deleteDeviceController() called");
 
@@ -263,7 +264,7 @@ JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong devic
     {
         if (deviceController->AppState != NULL)
         {
-            env->DeleteGlobalRef((jobject)deviceController->AppState);
+            env->DeleteGlobalRef((jobject) deviceController->AppState);
         }
         deviceController->Shutdown();
         delete deviceController;
@@ -279,16 +280,16 @@ void HandleSimpleOperationComplete(ChipDeviceController * deviceController, void
     jobject self   = (jobject) deviceController->AppState;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(Controller, "Received response to %s request", (const char *)appReqState);
+    ChipLogProgress(Controller, "Received response to %s request", (const char *) appReqState);
 
-    sJVM->GetEnv((void **)&env, JNI_VERSION_1_6);
+    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
 
     deviceControllerCls = env->GetObjectClass(self);
     VerifyOrExit(deviceControllerCls != NULL, err = CDC_JNI_ERROR_TYPE_NOT_FOUND);
 
-    snprintf(methodName, sizeof(methodName) - 1, "on%sComplete", (const char *)appReqState);
+    snprintf(methodName, sizeof(methodName) - 1, "on%sComplete", (const char *) appReqState);
     methodName[sizeof(methodName) - 1] = 0;
-    methodID = env->GetMethodID(deviceControllerCls, methodName, "()V");
+    methodID                           = env->GetMethodID(deviceControllerCls, methodName, "()V");
     VerifyOrExit(methodID != NULL, err = CDC_JNI_ERROR_METHOD_NOT_FOUND);
 
     ChipLogProgress(Controller, "Calling Java %s method", methodName);
@@ -312,10 +313,18 @@ exit:
             const char * errStr;
             switch (err)
             {
-            case CDC_JNI_ERROR_TYPE_NOT_FOUND   : errStr = "JNI type not found"; break;
-            case CDC_JNI_ERROR_METHOD_NOT_FOUND : errStr = "JNI method not found"; break;
-            case CDC_JNI_ERROR_FIELD_NOT_FOUND  : errStr = "JNI field not found"; break;
-            default                             : errStr = ErrorStr(err); break;
+            case CDC_JNI_ERROR_TYPE_NOT_FOUND:
+                errStr = "JNI type not found";
+                break;
+            case CDC_JNI_ERROR_METHOD_NOT_FOUND:
+                errStr = "JNI method not found";
+                break;
+            case CDC_JNI_ERROR_FIELD_NOT_FOUND:
+                errStr = "JNI field not found";
+                break;
+            default:
+                errStr = ErrorStr(err);
+                break;
             }
             ChipLogError(Controller, "Error in %s : %s", functName, errStr);
         }
@@ -327,10 +336,10 @@ void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerC
 {
     JNIEnv * env;
 
-    sJVM->GetEnv((void **)&env, JNI_VERSION_1_6);
+    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
 
-    CHIP_ERROR err = deviceController->ManualKeyExchange(
-        state, remote_public_key, sizeof(remote_public_key), local_private_key, sizeof(local_private_key));
+    CHIP_ERROR err = deviceController->ManualKeyExchange(state, remote_public_key, sizeof(remote_public_key), local_private_key,
+                                                         sizeof(local_private_key));
 
     if (err != CHIP_NO_ERROR)
     {
@@ -348,11 +357,11 @@ void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqSt
     JNIEnv * env;
     jclass deviceControllerCls;
     jmethodID methodID;
-    jobject self          = (jobject)deviceController->AppState;
-    jstring msgString     = NULL;
-    CHIP_ERROR err        = CHIP_NO_ERROR;
+    jobject self      = (jobject) deviceController->AppState;
+    jstring msgString = NULL;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
 
-    sJVM->GetEnv((void **)&env, JNI_VERSION_1_6);
+    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
 
     int dataLen = payload->DataLength();
     char msgBuffer[dataLen];
@@ -384,11 +393,11 @@ void HandleError(ChipDeviceController * deviceController, void * appReqState, CH
     jclass cls;
     jmethodID method;
     jthrowable ex;
-    jobject self   = (jobject)deviceController->AppState;
+    jobject self = (jobject) deviceController->AppState;
 
     ChipLogError(Controller, "HandleError");
 
-    sJVM->GetEnv((void **)&env, JNI_VERSION_1_6);
+    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
 
     err = N2J_Error(env, err, ex);
     SuccessOrExit(err);
@@ -418,12 +427,12 @@ void * IOThreadMain(void * arg)
     // Attach the IO thread to the JVM as a daemon thread.
     // This allows the JVM to shutdown without waiting for this thread to exit.
     attachArgs.version = JNI_VERSION_1_6;
-    attachArgs.name = (char *)"CHIP Device Controller IO Thread";
-    attachArgs.group = NULL;
+    attachArgs.name    = (char *) "CHIP Device Controller IO Thread";
+    attachArgs.group   = NULL;
 #ifdef __ANDROID__
-    sJVM->AttachCurrentThreadAsDaemon(&env, (void *)&attachArgs);
+    sJVM->AttachCurrentThreadAsDaemon(&env, (void *) &attachArgs);
 #else
-    sJVM->AttachCurrentThreadAsDaemon((void **)&env, (void *)&attachArgs);
+    sJVM->AttachCurrentThreadAsDaemon((void **) &env, (void *) &attachArgs);
 #endif
 
     ChipLogProgress(Controller, "IO thread starting");
@@ -439,7 +448,7 @@ void * IOThreadMain(void * arg)
         FD_ZERO(&writeFDs);
         FD_ZERO(&exceptFDs);
 
-        sleepTime.tv_sec = 10;
+        sleepTime.tv_sec  = 10;
         sleepTime.tv_usec = 0;
 
         // Collect the currently active file descriptors.
@@ -454,7 +463,7 @@ void * IOThreadMain(void * arg)
 
         // Break the loop if requested to shutdown.
         // if (sShutdown)
-            // break;
+        // break;
 
         // Re-lock the stack.
         pthread_mutex_lock(&sStackLock);
@@ -490,7 +499,7 @@ CHIP_ERROR GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls)
     cls = env->FindClass(clsType);
     VerifyOrExit(cls != NULL, err = CDC_JNI_ERROR_TYPE_NOT_FOUND);
 
-    outCls = (jclass)env->NewGlobalRef((jobject)cls);
+    outCls = (jclass) env->NewGlobalRef((jobject) cls);
     VerifyOrExit(outCls != NULL, err = CDC_JNI_ERROR_TYPE_NOT_FOUND);
 
 exit:
@@ -507,11 +516,11 @@ CHIP_ERROR N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArray
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    outArray = env->NewByteArray((int)inArrayLen);
+    outArray = env->NewByteArray((int) inArrayLen);
     VerifyOrExit(outArray != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     env->ExceptionClear();
-    env->SetByteArrayRegion(outArray, 0, inArrayLen, (jbyte *)inArray);
+    env->SetByteArrayRegion(outArray, 0, inArrayLen, (jbyte *) inArray);
     VerifyOrExit(!env->ExceptionCheck(), err = CDC_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -566,15 +575,23 @@ CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx)
 
     switch (inErr)
     {
-    case CDC_JNI_ERROR_TYPE_NOT_FOUND   : errStr = "CHIP Device Controller Error: JNI type not found"; break;
-    case CDC_JNI_ERROR_METHOD_NOT_FOUND : errStr = "CHIP Device Controller Error: JNI method not found"; break;
-    case CDC_JNI_ERROR_FIELD_NOT_FOUND  : errStr = "CHIP Device Controller Error: JNI field not found"; break;
-    default                             : errStr = ErrorStr(inErr); break;
+    case CDC_JNI_ERROR_TYPE_NOT_FOUND:
+        errStr = "CHIP Device Controller Error: JNI type not found";
+        break;
+    case CDC_JNI_ERROR_METHOD_NOT_FOUND:
+        errStr = "CHIP Device Controller Error: JNI method not found";
+        break;
+    case CDC_JNI_ERROR_FIELD_NOT_FOUND:
+        errStr = "CHIP Device Controller Error: JNI field not found";
+        break;
+    default:
+        errStr = ErrorStr(inErr);
+        break;
     }
     errStrObj = (errStr != NULL) ? env->NewStringUTF(errStr) : NULL;
 
     env->ExceptionClear();
-    outEx = (jthrowable)env->NewObject(sChipDeviceControllerExceptionCls, constructor, (jint)inErr, errStrObj);
+    outEx = (jthrowable) env->NewObject(sChipDeviceControllerExceptionCls, constructor, (jint) inErr, errStrObj);
     VerifyOrExit(!env->ExceptionCheck(), err = CDC_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
