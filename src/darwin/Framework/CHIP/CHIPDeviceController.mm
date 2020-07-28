@@ -54,6 +54,7 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
 @property (atomic, readonly) dispatch_queue_t chipSelectQueue;
 // queue used to signal callbacks to the application
 @property (readwrite) dispatch_queue_t appCallbackQueue;
+@property (readwrite) ControllerOnConnectedBlock onConnectedHandler;
 @property (readwrite) ControllerOnMessageBlock onMessageHandler;
 @property (readwrite) ControllerOnErrorBlock onErrorHandler;
 @property (readonly) chip::DeviceController::ChipDeviceController * cppController;
@@ -105,7 +106,8 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
 static void onConnected(
     chip::DeviceController::ChipDeviceController * cppController, chip::Transport::PeerConnectionState * state, void * appReqState)
 {
-    CHIP_LOG_ERROR("Connected");
+    CHIPDeviceController * controller = (__bridge CHIPDeviceController *) appReqState;
+    [controller _dispatchAsyncConnectBlock];
 }
 
 static void doKeyExchange(
@@ -164,6 +166,17 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 
     dispatch_async(_appCallbackQueue, ^() {
         onMessageHandler(data);
+    });
+}
+
+- (void)_dispatchAsyncConnectBlock
+{
+    CHIP_LOG_METHOD_ENTRY();
+    // to avoid retaining "self"
+    ControllerOnConnectedBlock onConnectedHandler = self.onConnectedHandler;
+
+    dispatch_async(_appCallbackQueue, ^() {
+        onConnectedHandler();
     });
 }
 
@@ -362,9 +375,13 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     return isConnected ? YES : NO;
 }
 
-- (void)registerCallbacks:appCallbackQueue onMessage:(ControllerOnMessageBlock)onMessage onError:(ControllerOnErrorBlock)onError
+- (void)registerCallbacks:appCallbackQueue
+              onConnected:(ControllerOnConnectedBlock)onConnected
+                onMessage:(ControllerOnMessageBlock)onMessage
+                  onError:(ControllerOnErrorBlock)onError
 {
     self.appCallbackQueue = appCallbackQueue;
+    self.onConnectedHandler = onConnected;
     self.onMessageHandler = onMessage;
     self.onErrorHandler = onError;
 }

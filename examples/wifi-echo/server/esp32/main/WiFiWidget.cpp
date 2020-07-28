@@ -17,22 +17,22 @@
  */
 
 /**
- * @file BluetoothWidget.cpp
+ * @file WiFiWidget.cpp
  *
- * Implements a Bluetooth Widget controller that display the state of bluetooth
+ * Implements a WiFi Widget controller that display the state of bluetooth
  * connection on display.
  */
 
 #include "ScreenManager.h"
 
-#include "BluetoothWidget.h"
+#include "WiFiWidget.h"
 
 #include "esp_log.h"
 #include "esp_system.h"
 
 extern const char * TAG;
 
-void BluetoothWidget::Init()
+void WiFiWidget::Init()
 {
 #if CONFIG_HAVE_DISPLAY
     mVLED = -1;
@@ -41,7 +41,7 @@ void BluetoothWidget::Init()
     mState = false;
 }
 
-void BluetoothWidget::Set(bool state)
+void WiFiWidget::Set(bool state)
 {
     bool stateChange = (mState != state);
     mState           = state;
@@ -57,7 +57,7 @@ void BluetoothWidget::Set(bool state)
 }
 
 #if CONFIG_HAVE_DISPLAY
-void BluetoothWidget::SetVLED(int id)
+void WiFiWidget::SetVLED(int id)
 {
     mVLED = id;
     if (mVLED != -1)
