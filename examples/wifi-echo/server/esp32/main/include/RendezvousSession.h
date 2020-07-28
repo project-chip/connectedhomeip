@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,24 +15,23 @@
  *    limitations under the License.
  */
 
-#ifndef _BLUETOOTH_WIDGET_H
-#define _BLUETOOTH_WIDGET_H
+#include "BluetoothWidget.h"
 
-#include "Display.h"
+#include <platform/CHIPDeviceLayer.h>
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
+using namespace ::chip;
 
-class BluetoothWidget
+class RendezvousSession
 {
 public:
-    void Init();
-    void Set(bool state);
-    void SetVLED(int id);
+    RendezvousSession(BluetoothWidget * virtualLed);
+    CHIP_ERROR Send(const char * msg);
 
 private:
-    int mVLED;
-    bool mState;
-};
+    static void HandleConnectionOpened(Ble::BLEEndPoint * endPoint);
+    static void HandleConnectionClosed(Ble::BLEEndPoint * endPoint, BLE_ERROR err);
+    static void HandleMessageReceived(Ble::BLEEndPoint * endPoint, System::PacketBuffer * buffer);
 
-#endif // _BLUETOOTH_WIDGET_H
+    static BluetoothWidget * mVirtualLed;
+    static Ble::BLEEndPoint * mEndPoint;
+};

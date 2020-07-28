@@ -24,7 +24,9 @@
 #include "LEDWidget.h"
 #include "ListScreen.h"
 #include "QRCodeScreen.h"
+#include "RendezvousSession.h"
 #include "ScreenManager.h"
+#include "WiFiWidget.h"
 #include "esp_event_loop.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
@@ -52,7 +54,6 @@ using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
 extern void startServer();
-extern void startBle();
 
 #if CONFIG_USE_ECHO_CLIENT
 extern void startClient(void);
@@ -102,14 +103,13 @@ extern void startClient(void);
 #endif // CONFIG_HAVE_DISPLAY
 
 LEDWidget statusLED;
-
-#if CONFIG_HAVE_DISPLAY
 BluetoothWidget bluetoothLED;
-#endif // CONFIG_HAVE_DISPLAY
+WiFiWidget wifiLED;
 
 const char * TAG = "wifi-echo-demo";
 
 static EchoDeviceCallbacks EchoCallbacks;
+RendezvousSession * rendezvousSession = nullptr;
 
 namespace {
 
@@ -266,6 +266,30 @@ public:
     }
 };
 
+class SetupListModel : public ListScreen::Model
+{
+public:
+    SetupListModel()
+    {
+        std::string resetWiFi = "Reset WiFi";
+        options.emplace_back(resetWiFi);
+    }
+    virtual std::string GetTitle() { return "Setup"; }
+    virtual int GetItemCount() { return options.size(); }
+    virtual std::string GetItemText(int i) { return options.at(i); }
+    virtual void ItemAction(int i)
+    {
+        ESP_LOGI(TAG, "Opening options %d: %s", i, GetItemText(i).c_str());
+        if (i == 0)
+        {
+            ConnectivityMgr().ClearWiFiStationProvision();
+        }
+    }
+
+private:
+    std::vector<std::string> options;
+};
+
 class CustomScreen : public Screen
 {
 public:
@@ -330,6 +354,11 @@ void GetGatewayIP(char * ip_buf, size_t ip_len)
     ESP_LOGE(TAG, "Got gateway ip %s", ip_buf);
 }
 
+bool isRendezvousBLE()
+{
+    return static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kBLE;
+}
+
 std::string createSetupPayload()
 {
     SetupPayload payload;
@@ -340,18 +369,29 @@ std::string createSetupPayload()
     payload.vendorID              = EXAMPLE_VENDOR_ID;
     payload.productID             = EXAMPLE_PRODUCT_ID;
 
-    char gw_ip[INET6_ADDRSTRLEN];
-    GetGatewayIP(gw_ip, sizeof(gw_ip));
-    payload.addOptionalVendorData(EXAMPLE_VENDOR_TAG_IP, gw_ip);
-
-    QRCodeSetupPayloadGenerator generator(payload);
+    CHIP_ERROR err = CHIP_NO_ERROR;
     string result;
-    size_t tlvDataLen = sizeof(gw_ip);
-    uint8_t tlvDataStart[tlvDataLen];
-    CHIP_ERROR err = generator.payloadBase41Representation(result, tlvDataStart, tlvDataLen);
+    if (!isRendezvousBLE())
+    {
+        char gw_ip[INET6_ADDRSTRLEN];
+        GetGatewayIP(gw_ip, sizeof(gw_ip));
+        payload.addOptionalVendorData(EXAMPLE_VENDOR_TAG_IP, gw_ip);
+
+        QRCodeSetupPayloadGenerator generator(payload);
+
+        size_t tlvDataLen = sizeof(gw_ip);
+        uint8_t tlvDataStart[tlvDataLen];
+        err = generator.payloadBase41Representation(result, tlvDataStart, tlvDataLen);
+    }
+    else
+    {
+        QRCodeSetupPayloadGenerator generator(payload);
+        err = generator.payloadBase41Representation(result);
+    }
+
     if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "Couldn't get payload string %d", generator.payloadBase41Representation(result));
+        ESP_LOGE(TAG, "Couldn't get payload string %d", err);
     }
     return result;
 };
@@ -401,17 +441,16 @@ extern "C" void app_main()
     SetupPretendDevices();
 
     statusLED.Init(STATUS_LED_GPIO_NUM);
-#if CONFIG_HAVE_DISPLAY
     bluetoothLED.Init();
-#endif // CONFIG_HAVE_DISPLAY
+    wifiLED.Init();
 
     // Start the Echo Server
     InitDataModelHandler();
     startServer();
 
-    if (static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kBLE)
+    if (isRendezvousBLE())
     {
-        startBle();
+        rendezvousSession = new RendezvousSession(&bluetoothLED);
     }
 
 #if CONFIG_USE_ECHO_CLIENT
@@ -461,7 +500,11 @@ extern "C" void app_main()
                                                             ESP_LOGI(TAG, "Opening QR code screen");
                                                             ScreenManager::PushScreen(new QRCodeScreen(qrCodeText));
                                                         })
-                                                 ->Item("Setup")
+                                                 ->Item("Setup",
+                                                        [=]() {
+                                                            ESP_LOGI(TAG, "Opening Setup list");
+                                                            ScreenManager::PushScreen(new ListScreen(new SetupListModel()));
+                                                        })
                                                  ->Item("More")
                                                  ->Item("Items")
                                                  ->Item("For")
@@ -474,6 +517,7 @@ extern "C" void app_main()
         statusLED.SetVLED(vled1, vled2);
 
         bluetoothLED.SetVLED(ScreenManager::AddVLED(TFT_BLUE));
+        wifiLED.SetVLED(ScreenManager::AddVLED(TFT_YELLOW));
     }
 
 #endif // CONFIG_HAVE_DISPLAY

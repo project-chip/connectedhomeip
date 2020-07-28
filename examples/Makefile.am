@@ -73,7 +73,6 @@ PRETTY_FILES                                                  = \
     lock-app/nrf5/main/support/AltPrintf.c                      \
     lock-app/nrf5/main/support/FreeRTOSNewlibLockSupport.c      \
     lock-app/nrf5/main/support/nRF5Sbrk.c                       \
-    lock-app/nrf5/main/support/CXXExceptionStubs.cpp            \
     $(NULL)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

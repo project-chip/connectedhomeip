@@ -61,11 +61,50 @@ static NSString * const ipKey = @"ipk";
     _resetButton.clipsToBounds = YES;
     _manualCodeTextField.keyboardType = UIKeyboardTypeNumberPad;
 
+    __weak typeof(self) weakSelf = self;
+    self.onConnectedBlock = ^() {
+        typeof(self) strongSelf = weakSelf;
+        [strongSelf onConnected];
+    };
+
+    self.onMessageBlock = ^(NSString * message) {
+        typeof(self) strongSelf = weakSelf;
+        [strongSelf onMessage:message];
+    };
+
+    self.onErrorBlock = ^(NSString * error) {
+        typeof(self) strongSelf = weakSelf;
+        [strongSelf onError:error];
+    };
+
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
 
     [self manualCodeInitialState];
     [self qrCodeInitialState];
+}
+
+- (void)onConnected
+{
+    NSString * msg = @"ping";
+
+    NSError * error;
+    BOOL didSend = [self.chipController sendMessage:[msg dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+    if (!didSend) {
+        NSLog(@"Error: %@", error.localizedDescription);
+    } else {
+        NSLog(@"Message Sent");
+    }
+}
+
+- (void)onMessage:(NSString *)message
+{
+    [[NSUserDefaults standardUserDefaults] setObject:message forKey:ipKey];
+}
+
+- (void)onError:(NSString *)error
+{
+    NSLog(@"Receive an error: %@", error);
 }
 
 - (void)viewDidDisappear:(BOOL)animated

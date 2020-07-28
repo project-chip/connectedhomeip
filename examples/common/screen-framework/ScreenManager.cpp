@@ -43,7 +43,7 @@ namespace {
 constexpr int kMainFont   = DEJAVU24_FONT;
 constexpr int kButtonFont = DEJAVU18_FONT;
 
-constexpr int kVLEDWidth  = 8;
+constexpr int kVLEDWidth  = 16;
 constexpr int kVLEDHeight = 16;
 
 SemaphoreHandle_t mutex;

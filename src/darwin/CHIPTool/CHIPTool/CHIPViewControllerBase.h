@@ -20,6 +20,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef void (^OnConnectedBlock)(void);
+typedef void (^OnMessageBlock)(NSString * resutMsg);
+typedef void (^OnErrorBlock)(NSString * errorMsg);
+
 @interface CHIPViewControllerBase : UIViewController
 
 @property (readwrite) BOOL useIncorrectKey;
@@ -27,6 +31,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite) CHIPDeviceController * chipController;
 @property (weak, nonatomic) IBOutlet UILabel * resultLabel;
 @property (weak, nonatomic) IBOutlet UISwitch * encryptionKeySwitch;
+
+@property (nonatomic, copy) OnConnectedBlock onConnectedBlock;
+@property (nonatomic, copy) OnMessageBlock onMessageBlock;
+@property (nonatomic, copy) OnErrorBlock onErrorBlock;
 
 - (void)reconnectIfNeeded;
 - (void)dismissKeyboard;

@@ -23,6 +23,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef void (^ControllerOnConnectedBlock)(void);
 typedef void (^ControllerOnMessageBlock)(NSData * message);
 typedef void (^ControllerOnErrorBlock)(NSError * error);
 
@@ -68,6 +69,7 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
  * @param[in] onError the block to call when there is a network error.
  */
 - (void)registerCallbacks:(dispatch_queue_t)appCallbackQueue
+              onConnected:(ControllerOnConnectedBlock)onConnected
                 onMessage:(ControllerOnMessageBlock)onMessage
                   onError:(ControllerOnErrorBlock)onError;
 

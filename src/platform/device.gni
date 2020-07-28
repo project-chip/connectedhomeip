@@ -23,7 +23,9 @@ declare_args() {
 }
 
 if (device_platform == "auto") {
-  if (current_os == "linux") {
+  if (current_os == "mac" || current_os == "ios") {
+    device_platform = "darwin"
+  } else if (current_os == "linux") {
     device_platform = "linux"
   } else {
     device_platform = "none"
@@ -31,18 +33,34 @@ if (device_platform == "auto") {
 }
 
 device_layer = "none"
-if (device_platform == "linux") {
+if (device_platform == "darwin") {
+  device_layer = "Darwin"
+} else if (device_platform == "linux") {
   device_layer = "Linux"
 } else if (device_platform == "nrf5") {
   device_layer = "nRF5"
 }
 
-ble_platform_config_include = "<platform/" + device_layer + "/BlePlatformConfig.h>"
-chip_device_platform_config_include = "<platform/" + device_layer + "/CHIPDevicePlatformConfig.h>"
-chip_platform_config_include = "<platform/" + device_layer + "/CHIPPlatformConfig.h>"
-inet_platform_config_include = "<platform/" + device_layer + "/InetPlatformConfig.h>"
-system_platform_config_include = "<platform/" + device_layer + "/SystemPlatformConfig.h>"
+ble_platform_config_include = ""
+chip_device_platform_config_include = ""
+chip_platform_config_include = ""
+inet_platform_config_include = ""
+system_platform_config_include = ""
+
+if (device_layer != "none") {
+  ble_platform_config_include =
+      "<platform/" + device_layer + "/BlePlatformConfig.h>"
+  chip_device_platform_config_include =
+      "<platform/" + device_layer + "/CHIPDevicePlatformConfig.h>"
+  chip_platform_config_include =
+      "<platform/" + device_layer + "/CHIPPlatformConfig.h>"
+  inet_platform_config_include =
+      "<platform/" + device_layer + "/InetPlatformConfig.h>"
+  system_platform_config_include =
+      "<platform/" + device_layer + "/SystemPlatformConfig.h>"
+}
 
 assert((current_os != "freertos" && device_platform == "none") ||
-           device_platform == "nrf5" || device_platform == "linux",
+           device_platform == "darwin" || device_platform == "nrf5" ||
+           device_platform == "linux",
        "Please select a valid value for device_platform")

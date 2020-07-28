@@ -70,6 +70,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::DoInit(otIn
     // Initialize member data.
     memset(mAddrAssigned, 0, sizeof(mAddrAssigned));
 
+    sThreadNetIf.name[0] = 'o';
+    sThreadNetIf.name[1] = 't';
+
     // Initialize the base class.
     err = GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInst);
     SuccessOrExit(err);

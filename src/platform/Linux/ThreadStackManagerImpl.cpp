@@ -411,9 +411,9 @@ exit:
     return OTBR_TO_CHIP_ERROR(error);
 }
 
-void ThreadStackManagerImpl::_FactoryReset()
+CHIP_ERROR ThreadStackManagerImpl::_JoinerStart(void)
 {
-    mThreadApi->FactoryReset(nullptr);
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 // TODO: Implement after we decide on the dbus message loop

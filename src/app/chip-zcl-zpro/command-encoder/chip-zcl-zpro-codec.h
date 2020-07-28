@@ -67,17 +67,15 @@ uint32_t encodeToggleCommand(uint8_t * buffer, uint32_t buf_length, uint8_t dest
  */
 bool extractApsFrame(void * buffer, uint32_t buf_length, EmberApsFrame * outApsFrame);
 
-/** @brief Extracts an aps frame from buffer into outApsFrame. Returns the length of the msg.
+/** @brief Populates msg with address of the zcl message within buffer.
+ * @return Returns the length of msg buffer. Returns 0 on error e.g. if buffer is too short.
  */
-uint32_t extractMessage(void * buffer, void ** msg);
+uint16_t extractMessage(uint8_t * buffer, uint16_t buffer_length, uint8_t ** msg);
 
 /** @brief Prints an aps frame struct
  */
 void printApsFrame(EmberApsFrame * frame);
 
-/** @brief Prints commmand information. Assumes buffer was encoded using one of encode(On|Off|Toggle)Command function
- */
-void printCommandInfo(void * buffer);
 #ifdef __cplusplus
 }
 #endif

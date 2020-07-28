@@ -16,15 +16,15 @@
  *    limitations under the License.
  */
 
-#ifndef _BLUETOOTH_WIDGET_H
-#define _BLUETOOTH_WIDGET_H
+#ifndef _WIFI_WIDGET_H
+#define _WIFI_WIDGET_H
 
 #include "Display.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-class BluetoothWidget
+class WiFiWidget
 {
 public:
     void Init();
@@ -36,4 +36,4 @@ private:
     bool mState;
 };
 
-#endif // _BLUETOOTH_WIDGET_H
+#endif // _WIFI_WIDGET_H

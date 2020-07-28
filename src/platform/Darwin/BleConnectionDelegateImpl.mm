@@ -53,7 +53,7 @@ namespace DeviceLayer {
     namespace Internal {
         void BleConnectionDelegateImpl::NewConnection(Ble::BleLayer * bleLayer, void * appState, const char * connName)
         {
-            ChipLogError(Ble, "%s", __FUNCTION__);
+            ChipLogProgress(Ble, "%s", __FUNCTION__);
             BleConnection * ble = [[BleConnection alloc] initWithName:@(connName)];
             [ble setBleLayer:bleLayer];
             ble.appState = appState;
@@ -73,7 +73,6 @@ namespace DeviceLayer {
 {
     self = [super init];
     if (self) {
-        ChipLogError(Ble, "initWithName");
         _deviceName = deviceName;
         _workQueue = dispatch_queue_create("com.chip.ble.work_queue", DISPATCH_QUEUE_SERIAL);
         _centralManager = [CBCentralManager alloc];
@@ -89,24 +88,24 @@ namespace DeviceLayer {
 {
     switch (central.state) {
     case CBManagerStatePoweredOn:
-        ChipLogError(Ble, "CBManagerState: ON");
+        ChipLogDetail(Ble, "CBManagerState: ON");
         [self start];
         break;
     case CBManagerStatePoweredOff:
-        ChipLogError(Ble, "CBManagerState: OFF");
+        ChipLogDetail(Ble, "CBManagerState: OFF");
         [self stop];
         break;
     case CBManagerStateUnauthorized:
-        ChipLogError(Ble, "CBManagerState: Unauthorized");
+        ChipLogDetail(Ble, "CBManagerState: Unauthorized");
         break;
     case CBManagerStateResetting:
-        ChipLogError(Ble, "CBManagerState: RESETTING");
+        ChipLogDetail(Ble, "CBManagerState: RESETTING");
         break;
     case CBManagerStateUnsupported:
-        ChipLogError(Ble, "CBManagerState: UNSUPPORTED");
+        ChipLogDetail(Ble, "CBManagerState: UNSUPPORTED");
         break;
     case CBManagerStateUnknown:
-        ChipLogError(Ble, "CBManagerState: UNKNOWN");
+        ChipLogDetail(Ble, "CBManagerState: UNKNOWN");
         break;
     }
 }
@@ -118,9 +117,8 @@ namespace DeviceLayer {
 {
     BOOL isConnectable = !![advertisementData objectForKey:CBAdvertisementDataIsConnectable];
     NSString * localNameKey = [advertisementData objectForKey:CBAdvertisementDataLocalNameKey];
-    ChipLogError(Ble, "hasDiscoverPeripheral: %@", localNameKey);
     if (isConnectable && [localNameKey isEqual:_deviceName]) {
-        ChipLogError(Ble, "Connecting to device: %@", _deviceName);
+        ChipLogProgress(Ble, "Connecting to device: %@", _deviceName);
         [self connect:peripheral];
         [self stopScanning];
     }
@@ -128,8 +126,6 @@ namespace DeviceLayer {
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
 {
-    ChipLogError(Ble, "%s %@", __FUNCTION__, peripheral);
-
     [peripheral setDelegate:self];
     [peripheral discoverServices:nil];
 }
@@ -140,8 +136,6 @@ namespace DeviceLayer {
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
 {
-    ChipLogError(Ble, "%s", __FUNCTION__);
-
     if (nil != error) {
         ChipLogError(Ble, "BLE:Error finding Chip Service in the device: [%@]", error.localizedDescription);
     }
@@ -164,8 +158,6 @@ namespace DeviceLayer {
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
 {
-    ChipLogError(Ble, "%s", __FUNCTION__);
-
     if (nil != error) {
         ChipLogError(Ble, "BLE:Error finding Characteristics in Chip service on the device: [%@]", error.localizedDescription);
     }
@@ -178,8 +170,6 @@ namespace DeviceLayer {
     didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
                              error:(NSError *)error
 {
-    ChipLogError(Ble, "%s", __FUNCTION__);
-
     if (nil == error) {
         chip::Ble::ChipBleUUID svcId;
         chip::Ble::ChipBleUUID charId;
@@ -195,8 +185,6 @@ namespace DeviceLayer {
     didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic
                                           error:(NSError *)error
 {
-    ChipLogError(Ble, "%s", __FUNCTION__);
-
     bool isNotifying = characteristic.isNotifying;
 
     if (nil == error) {
@@ -225,8 +213,6 @@ namespace DeviceLayer {
     didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
                               error:(NSError *)error
 {
-    ChipLogError(Ble, "%s", __FUNCTION__);
-
     if (nil == error) {
         chip::Ble::ChipBleUUID svcId;
         chip::Ble::ChipBleUUID charId;
@@ -258,13 +244,11 @@ namespace DeviceLayer {
 
 - (void)start
 {
-    ChipLogError(Ble, "%s", __FUNCTION__);
     [self startScanning];
 }
 
 - (void)stop
 {
-    ChipLogError(Ble, "%s", __FUNCTION__);
     [self stopScanning];
     [self disconnect];
     _centralManager = nil;
@@ -273,7 +257,6 @@ namespace DeviceLayer {
 
 - (void)startScanning
 {
-    ChipLogError(Ble, "%s", __FUNCTION__);
     if (!_centralManager) {
         return;
     }
@@ -283,7 +266,6 @@ namespace DeviceLayer {
 
 - (void)stopScanning
 {
-    ChipLogError(Ble, "%s", __FUNCTION__);
     if (!_centralManager) {
         return;
     }
@@ -293,7 +275,6 @@ namespace DeviceLayer {
 
 - (void)connect:(CBPeripheral *)peripheral
 {
-    ChipLogError(Ble, "%s", __FUNCTION__);
     if (!_centralManager || !peripheral) {
         return;
     }
@@ -305,7 +286,6 @@ namespace DeviceLayer {
 
 - (void)disconnect
 {
-    ChipLogError(Ble, "%s", __FUNCTION__);
     if (!_centralManager || !_peripheral) {
         return;
     }
@@ -327,8 +307,6 @@ namespace DeviceLayer {
                                      svcId:(chip::Ble::ChipBleUUID *)svcId
                                     charId:(chip::Ble::ChipBleUUID *)charId
 {
-    ChipLogError(Ble, "%s", __FUNCTION__);
-
     static const size_t FullUUIDLength = 16;
     if ((FullUUIDLength != sizeof(charId->bytes)) || (FullUUIDLength != sizeof(svcId->bytes))
         || (FullUUIDLength != characteristic.UUID.data.length)) {
@@ -367,7 +345,6 @@ namespace DeviceLayer {
 
 - (void)setBleLayer:(chip::Ble::BleLayer *)bleLayer
 {
-    ChipLogError(Ble, "%s", __FUNCTION__);
     _mBleLayer = bleLayer;
 }
 
