@@ -29,6 +29,7 @@
 #include <openthread/cli.h>
 #include <openthread/dataset.h>
 #include <openthread/dataset_ftd.h>
+#include <openthread/joiner.h>
 #include <openthread/link.h>
 #include <openthread/netdata.h>
 #include <openthread/tasklet.h>
@@ -873,6 +874,72 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo(v
     otThreadSetEnabled(mOTInst, false);
     otInstanceErasePersistentInfo(mOTInst);
     Impl()->UnlockThreadStack();
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnJoinerComplete(otError aError, void * aContext)
+{
+    static_cast<GenericThreadStackManagerImpl_OpenThread *>(aContext)->OnJoinerComplete(aError);
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnJoinerComplete(otError aError)
+{
+    ChipLogProgress(DeviceLayer, "Join Thread network: %s", otThreadErrorToString(aError));
+
+    if (aError == OT_ERROR_NONE)
+    {
+        otError error = otThreadSetEnabled(mOTInst, true);
+
+        ChipLogProgress(DeviceLayer, "Start Thread network: %s", otThreadErrorToString(error));
+    }
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_JoinerStart(void)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    Impl()->LockThreadStack();
+    VerifyOrExit(!otDatasetIsCommissioned(mOTInst) && otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED,
+                 error = MapOpenThreadError(OT_ERROR_INVALID_STATE));
+    VerifyOrExit(otJoinerGetState(mOTInst) == OT_JOINER_STATE_IDLE, error = MapOpenThreadError(OT_ERROR_BUSY));
+
+    if (!otIp6IsEnabled(mOTInst))
+    {
+        SuccessOrExit(error = MapOpenThreadError(otIp6SetEnabled(mOTInst, true)));
+    }
+
+    {
+        otJoinerDiscerner discerner;
+        uint32_t discriminator;
+
+        SuccessOrExit(error = ConfigurationMgr().GetSetupDiscriminator(discriminator));
+        discerner.mLength = 12;
+        discerner.mValue  = discriminator;
+
+        ChipLogProgress(DeviceLayer, "Joiner Discerner: %u", discriminator);
+        otJoinerSetDiscerner(mOTInst, &discerner);
+    }
+
+    {
+        otJoinerPskd pskd;
+        uint32_t pincode;
+
+        SuccessOrExit(error = ConfigurationMgr().GetSetupPinCode(pincode));
+        snprintf(pskd.m8, sizeof(pskd.m8) - 1, "%u", pincode);
+
+        ChipLogProgress(DeviceLayer, "Joiner PSKd: %u", pincode);
+        error = MapOpenThreadError(otJoinerStart(mOTInst, pskd.m8, NULL, NULL, NULL, NULL, NULL,
+                                                 &GenericThreadStackManagerImpl_OpenThread::OnJoinerComplete, this));
+    }
+
+exit:
+    Impl()->UnlockThreadStack();
+
+    ChipLogProgress(DeviceLayer, "Joiner start: %s", chip::ErrorStr(error));
+
+    return error;
 }
 
 } // namespace Internal

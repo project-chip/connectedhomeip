@@ -33,6 +33,10 @@
 #include "FreeRTOS.h"
 
 #include <platform/CHIPDeviceLayer.h>
+#if CHIP_ENABLE_OPENTHREAD
+#include <platform/ThreadStackManager.h>
+#endif
+#include <support/ErrorStr.h>
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -102,6 +106,9 @@ int AppTask::Init()
     static app_button_cfg_t sButtons[] = {
         { LOCK_BUTTON, APP_BUTTON_ACTIVE_LOW, BUTTON_PULL, ButtonEventHandler },
         { FUNCTION_BUTTON, APP_BUTTON_ACTIVE_LOW, BUTTON_PULL, ButtonEventHandler },
+#if CHIP_ENABLE_OPENTHREAD
+        { JOIN_BUTTON, APP_BUTTON_ACTIVE_LOW, BUTTON_PULL, ButtonEventHandler },
+#endif
     };
 
     ret = app_button_init(sButtons, ARRAY_SIZE(sButtons), pdMS_TO_TICKS(FUNCTION_BUTTON_DEBOUNCE_PERIOD_MS));
@@ -160,7 +167,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     ret = sAppTask.Init();
     if (ret != NRF_SUCCESS)
     {
-        NRF_LOG_INFO("AppTask.Init() failed");
+        NRF_LOG_INFO("AppTask.Init() failed: %s", chip::ErrorStr(ret));
         APP_ERROR_HANDLER(ret);
     }
 
@@ -270,9 +277,24 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
 }
 
+#if CHIP_ENABLE_OPENTHREAD
+void AppTask::JoinHandler(AppEvent * aEvent)
+{
+    if (aEvent->ButtonEvent.PinNo != JOIN_BUTTON)
+        return;
+
+    CHIP_ERROR error = ThreadStackMgr().JoinerStart();
+    NRF_LOG_INFO("Thread joiner triggered: %s", chip::ErrorStr(error));
+}
+#endif
+
 void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 {
-    if (pin_no != LOCK_BUTTON && pin_no != FUNCTION_BUTTON)
+    if (pin_no != LOCK_BUTTON
+#if CHIP_ENABLE_OPENTHREAD
+        && pin_no != JOIN_BUTTON
+#endif
+        && pin_no != FUNCTION_BUTTON)
     {
         return;
     }
@@ -290,6 +312,12 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
     {
         button_event.Handler = FunctionHandler;
     }
+#if CHIP_ENABLE_OPENTHREAD
+    else if (pin_no == JOIN_BUTTON && button_action == APP_BUTTON_RELEASE)
+    {
+        button_event.Handler = JoinHandler;
+    }
+#endif
 
     sAppTask.PostEvent(&button_event);
 }
