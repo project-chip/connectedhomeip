@@ -100,6 +100,8 @@ static NSString * const ipKey = @"ipk";
 - (void)onMessage:(NSString *)message
 {
     [[NSUserDefaults standardUserDefaults] setObject:message forKey:ipKey];
+    NSError * error;
+    [self.chipController disconnect:&error];
 }
 
 - (void)onError:(NSString *)error
