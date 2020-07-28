@@ -59,7 +59,14 @@ public:
 
     void * AppState;
 
+    /**
+     * Init function to be used when there exists a device layer that takes care of initializing
+     * System::Layer and InetLayer.
+     */
     CHIP_ERROR Init(NodeId localDeviceId);
+    /**
+     * Init function to be used when already-initialized System::Layer and InetLayer are available.
+     */
     CHIP_ERROR Init(NodeId localDeviceId, System::Layer * systemLayer, InetLayer * inetLayer);
     CHIP_ERROR Shutdown();
 
