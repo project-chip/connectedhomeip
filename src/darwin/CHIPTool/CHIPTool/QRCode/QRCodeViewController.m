@@ -251,7 +251,8 @@ static NSString * const ipKey = @"ipk";
                                                  }
                                                  NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
 
-                                                 [strongSelf sendWifiCredentialsWithSSID:networkSSID.text password:networkPassword.text];
+                                                 [strongSelf sendWifiCredentialsWithSSID:networkSSID.text
+                                                                                password:networkPassword.text];
                                              }
                                          }]];
     [self presentViewController:alertController animated:YES completion:nil];
@@ -259,14 +260,14 @@ static NSString * const ipKey = @"ipk";
 
 - (void)sendWifiCredentialsWithSSID:(NSString *)ssid password:(NSString *)password
 {
-  NSString * msg = [NSString stringWithFormat:@"%@:%@", ssid, password];
-  NSError * error;
-  BOOL didSend = [self.chipController sendMessage:[msg dataUsingEncoding:NSUTF8StringEncoding] error:&error];
-  if (!didSend) {
-      NSLog(@"Error: %@", error.localizedDescription);
-  } else {
-      NSLog(@"Message Sent");
-  }
+    NSString * msg = [NSString stringWithFormat:@"%@:%@", ssid, password];
+    NSError * error;
+    BOOL didSend = [self.chipController sendMessage:[msg dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+    if (!didSend) {
+        NSLog(@"Error: %@", error.localizedDescription);
+    } else {
+        NSLog(@"Message Sent");
+    }
 }
 
 - (void)updateUIFields:(CHIPSetupPayload *)payload decimalString:(nullable NSString *)decimalString
