@@ -101,6 +101,10 @@ gn gen out/host --args='is_debug=true'
 ninja -C out/host
 ```
 
+This configure the build for debugging, which is also the default if the
+`is_debug` argument is omitted. To configure an optimized build, instead specify
+`is_debug=false`.
+
 To run all tests, run:
 
 ```
@@ -181,8 +185,8 @@ This unified build can be used for day to day development, although it's expensi
 to build everything. To save time, you can name the configuration to build:
 
 ```
-ninja -C all_host_gcc
-ninja -C check_host_gcc
+ninja -C out/debug all_host_gcc
+ninja -C out/debug check_host_gcc
 ```
 
 Replace `host_gcc` with the name of the configuration, which is found in
