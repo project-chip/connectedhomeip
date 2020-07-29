@@ -50,8 +50,8 @@ public:
     OnConnectionErrorFunct OnConnectionError;
 
     // Call this function to delegate the connection steps required to get a BLE_CONNECTION_OBJECT
-    // out of a peripheral name.
-    virtual void NewConnection(BleLayer * bleLayer, void * appState, const char * connName) = 0;
+    // out of a peripheral discriminator.
+    virtual void NewConnection(BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator) = 0;
 };
 
 } /* namespace Ble */

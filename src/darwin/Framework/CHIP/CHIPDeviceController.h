@@ -40,7 +40,7 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
       local_key:(NSData *)local_key
        peer_key:(NSData *)peer_key
           error:(NSError * __autoreleasing *)error;
-- (BOOL)connect:(NSString *)deviceName error:(NSError * __autoreleasing *)error;
+- (BOOL)connect:(uint16_t)deviceDiscriminator error:(NSError * __autoreleasing *)error;
 - (nullable AddressInfo *)getAddressInfo;
 - (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error;
 - (BOOL)sendOnCommand;

@@ -253,7 +253,7 @@ public:
                    BleApplicationDelegate * appDelegate, chip::System::Layer * systemLayer);
     BLE_ERROR Shutdown(void);
 
-    BLE_ERROR NewBleConnection(void * appState, const char * connName,
+    BLE_ERROR NewBleConnection(void * appState, const uint16_t connDiscriminator,
                                BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
                                BleConnectionDelegate::OnConnectionErrorFunct onConnectionError);
     BLE_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);

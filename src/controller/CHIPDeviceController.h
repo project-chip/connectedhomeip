@@ -68,15 +68,15 @@ public:
      *   Connect to a CHIP device with a given name for Rendezvous
      *
      * @param[in] remoteDeviceId        The remote device Id.
-     * @param[in] deviceName            The name of the requested Device
+     * @param[in] deviceDiscriminator   The discriminator of the requested Device
      * @param[in] appReqState           Application specific context to be passed back when a message is received or on error
      * @param[in] onConnected           Callback for when the connection is established
      * @param[in] onMessageReceived     Callback for when a message is received
      * @param[in] onError               Callback for when an error occurs
      * @return CHIP_ERROR               The connection status
      */
-    CHIP_ERROR ConnectDevice(NodeId remoteDeviceId, const char * deviceName, void * appReqState, NewConnectionHandler onConnected,
-                             MessageReceiveHandler onMessageReceived, ErrorHandler onError);
+    CHIP_ERROR ConnectDevice(NodeId remoteDeviceId, const uint16_t deviceDiscriminator, void * appReqState,
+                             NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived, ErrorHandler onError);
 
     /**
      * @brief

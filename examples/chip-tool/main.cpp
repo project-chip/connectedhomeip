@@ -192,13 +192,14 @@ struct CommandArgs
 {
     IPAddress hostAddr;
     uint16_t port;
-    char * name;
+    uint16_t discriminator;
     uint8_t endpointId;
 };
 
 bool DetermineArgsBle(char * argv[], CommandArgs * commandArgs)
 {
-    commandArgs->name = argv[2];
+    std::string discriminator_str(argv[2]);
+    commandArgs->discriminator = std::stoi(discriminator_str);
     return true;
 }
 
@@ -289,9 +290,11 @@ void DoEcho(DeviceController::ChipDeviceController * controller, const char * id
     }
 }
 
-void DoEchoBle(DeviceController::ChipDeviceController * controller, const std::string & name)
+void DoEchoBle(DeviceController::ChipDeviceController * controller, const uint16_t discriminator)
 {
-    DoEcho(controller, name.c_str());
+    char name[4];
+    snprintf(name, sizeof(name), "%u", discriminator);
+    DoEcho(controller, "");
 }
 
 void DoEchoIP(DeviceController::ChipDeviceController * controller, const IPAddress & hostAddr, uint16_t port)
@@ -350,9 +353,9 @@ CHIP_ERROR ExecuteCommand(DeviceController::ChipDeviceController * controller, C
     switch (command)
     {
     case Command::EchoBle:
-        err = controller->ConnectDevice(kRemoteDeviceId, commandArgs.name, NULL, OnConnect, OnMessage, OnError);
+        err = controller->ConnectDevice(kRemoteDeviceId, commandArgs.discriminator, NULL, OnConnect, OnMessage, OnError);
         VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to connect to the device"));
-        DoEchoBle(controller, commandArgs.name);
+        DoEchoBle(controller, commandArgs.discriminator);
         break;
 
     case Command::Echo:

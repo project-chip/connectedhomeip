@@ -74,11 +74,11 @@ public:
         return *this;
     }
 
-    bool HasConnectionName() const { return mConnectionName != nullptr; };
-    const char * GetConnectionName() const { return mConnectionName; };
-    BleConnectionParameters & SetConnectionName(const char * connName)
+    bool HasConnectionDiscriminator() const { return mConnectionDiscriminator != 0; };
+    uint16_t GetConnectionDiscriminator() const { return mConnectionDiscriminator; };
+    BleConnectionParameters & SetConnectionDiscriminator(const uint16_t connDiscriminator)
     {
-        mConnectionName = connName;
+        mConnectionDiscriminator = connDiscriminator;
 
         return *this;
     }
@@ -87,7 +87,7 @@ private:
     DeviceController::ChipDeviceController * mDeviceController = nullptr; ///< Associated device controller
     Ble::BleLayer * mLayer                                     = nullptr; ///< Associated ble layer
     BLE_CONNECTION_OBJECT mConnectionObj                       = 0;       ///< the target peripheral BLE_CONNECTION_OBJECT
-    const char * mConnectionName                               = nullptr; ///< the target peripheral name
+    uint16_t mConnectionDiscriminator                          = 0;       ///< the target peripheral discriminator
 };
 
 /** Implements a transport using BLE. */
@@ -123,7 +123,7 @@ public:
 
 private:
     CHIP_ERROR InitInternal(Ble::BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj);
-    CHIP_ERROR InitInternal(Ble::BleLayer * bleLayer, const char * connName);
+    CHIP_ERROR DelegateConnection(Ble::BleLayer * bleLayer, const uint16_t connDiscriminator);
 
     // Those functions are BLEConnectionDelegate callbacks used when the connection
     // parameters used a name instead of a BLE_CONNECTION_OBJECT.

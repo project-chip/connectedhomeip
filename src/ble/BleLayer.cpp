@@ -369,19 +369,19 @@ BLE_ERROR BleLayer::Shutdown()
     return BLE_NO_ERROR;
 }
 
-BLE_ERROR BleLayer::NewBleConnection(void * appState, const char * connName,
+BLE_ERROR BleLayer::NewBleConnection(void * appState, const uint16_t connDiscriminator,
                                      BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
                                      BleConnectionDelegate::OnConnectionErrorFunct onConnectionError)
 {
     BLE_ERROR err = BLE_NO_ERROR;
 
     VerifyOrExit(mState == kState_Initialized, err = BLE_ERROR_INCORRECT_STATE);
-    VerifyOrExit(connName != nullptr, err = BLE_ERROR_BAD_ARGS);
+    VerifyOrExit(connDiscriminator != 0, err = BLE_ERROR_BAD_ARGS);
     VerifyOrExit(mConnectionDelegate != nullptr, err = BLE_ERROR_INCORRECT_STATE);
 
     mConnectionDelegate->OnConnectionComplete = onConnectionComplete;
     mConnectionDelegate->OnConnectionError    = onConnectionError;
-    mConnectionDelegate->NewConnection(this, appState, connName);
+    mConnectionDelegate->NewConnection(this, appState, connDiscriminator);
 
 exit:
     return err;
