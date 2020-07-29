@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/ipAddressEd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:inputType="text"
+        android:textSize="20sp"
+        android:hint="@string/enter_ip_address_hint_text"/>
+
+    <EditText
+        android:id="@+id/inputTextEd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:inputType="textMultiLine"
+        android:minLines="2"
+        android:textSize="20sp"/>
+
+    <TextView
+        android:id="@+id/sendCommandBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_gravity="center"
+        android:background="@android:color/darker_gray"
+        android:text="@string/send_echo_btn_text"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/commandStatusTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:singleLine="false"
+        android:minLines="4"
+        android:textSize="20sp"/>
+
+</LinearLayout>

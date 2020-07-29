@@ -78,20 +78,21 @@ CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId)
     err = DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
-    mSystemLayer = &DeviceLayer::SystemLayer;
-    mInetLayer   = &DeviceLayer::InetLayer;
-#else
-    mSystemLayer = new System::Layer();
-    mInetLayer   = new Inet::InetLayer();
-
-    // Initialize the CHIP System Layer.
-    err = mSystemLayer->Init(NULL);
-    SuccessOrExit(err);
-
-    // Initialize the CHIP Inet layer.
-    err = mInetLayer->Init(*mSystemLayer, NULL);
-    SuccessOrExit(err);
+    err = Init(localNodeId, &DeviceLayer::SystemLayer, &DeviceLayer::InetLayer);
 #endif // CONFIG_DEVICE_LAYER
+
+exit:
+    return err;
+}
+
+CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, System::Layer * systemLayer, InetLayer * inetLayer)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(mState == kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
+
+    mSystemLayer = systemLayer;
+    mInetLayer   = inetLayer;
 
     mState         = kState_Initialized;
     mLocalDeviceId = localNodeId;
