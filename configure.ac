@@ -2133,6 +2133,10 @@ if test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1; then
         AC_DEFINE([CHIP_WITH_GIO], [0], [Define to 0 to build CHIP without GIO])
     ]
     )
+
+    PKG_CHECK_MODULES([GIO_UNIX], [gio-unix-2.0])
+
+    AC_CHECK_PROG(GDBUSCODEGEN, gdbus-codegen, gdbus-codegen)
 fi
 
 #
@@ -2572,6 +2576,8 @@ AC_MSG_NOTICE([
   IniPP compile flags                              : ${INIPP_CPPFLAGS:--}
   GIO compile flags                                : ${GIO_CFLAGS:--}
   GIO link flags                                   : ${GIO_LIBS:--}
+  GIO UNIX compile flags                           : ${GIO_UNIX_CFLAGS:--}
+  GIO UNIX link flags                              : ${GIO_UNIX_LIBS:--}
   C Preprocessor                                   : ${CPP}
   C Compiler                                       : ${CC}
   C++ Preprocessor                                 : ${CXXCPP}
