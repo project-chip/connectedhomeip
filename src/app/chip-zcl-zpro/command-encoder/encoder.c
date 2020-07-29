@@ -16,25 +16,29 @@
  */
 
 #include "chip-zcl-zpro-codec.h"
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 
-static uint16_t doEncodeApsFrame(uint8_t * buffer, uint32_t buf_length, uint16_t profileID, uint16_t clusterId, uint8_t sourceEndpoint,
-                        uint8_t destinationEndpoint, EmberApsOption options, uint16_t groupId, uint8_t sequence, uint8_t radius)
+static uint16_t doEncodeApsFrame(uint8_t * buffer, uint32_t buf_length, uint16_t profileID, uint16_t clusterId,
+                                 uint8_t sourceEndpoint, uint8_t destinationEndpoint, EmberApsOption options, uint16_t groupId,
+                                 uint8_t sequence, uint8_t radius)
 {
     size_t nextOutByte = 0;
 
-#define TRY_WRITE(dataItem)                                             \
-    do {                                                                \
-        size_t neededSize = nextOutByte + sizeof(dataItem);             \
-        if (buffer) {                                                   \
-            if (neededSize > buf_length) {                              \
-                return 0;                                               \
-            }                                                           \
-            memcpy(buffer + nextOutByte, &dataItem, sizeof(dataItem));  \
-        }                                                               \
-        nextOutByte = neededSize;                                       \
+#define TRY_WRITE(dataItem)                                                                                                        \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        size_t neededSize = nextOutByte + sizeof(dataItem);                                                                        \
+        if (buffer)                                                                                                                \
+        {                                                                                                                          \
+            if (neededSize > buf_length)                                                                                           \
+            {                                                                                                                      \
+                return 0;                                                                                                          \
+            }                                                                                                                      \
+            memcpy(buffer + nextOutByte, &dataItem, sizeof(dataItem));                                                             \
+        }                                                                                                                          \
+        nextOutByte = neededSize;                                                                                                  \
     } while (0) /* No semicolon so callers have to provide it. */
 
     // Simulated APS "frame control" byte.
@@ -56,8 +60,11 @@ static uint16_t doEncodeApsFrame(uint8_t * buffer, uint32_t buf_length, uint16_t
     return buf_length;
 }
 
-uint16_t encodeApsFrame(uint8_t* buffer, uint16_t buf_length, EmberApsFrame* apsFrame) {
-    return doEncodeApsFrame(buffer, buf_length, apsFrame->profileId, apsFrame->clusterId, apsFrame->sourceEndpoint, apsFrame->destinationEndpoint, apsFrame->options, apsFrame->groupId, apsFrame->sequence, apsFrame->radius);
+uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame)
+{
+    return doEncodeApsFrame(buffer, buf_length, apsFrame->profileId, apsFrame->clusterId, apsFrame->sourceEndpoint,
+                            apsFrame->destinationEndpoint, apsFrame->options, apsFrame->groupId, apsFrame->sequence,
+                            apsFrame->radius);
 }
 
 uint32_t _encodeOnOffCommand(uint8_t * buffer, uint32_t buf_length, int command, uint8_t destination_endpoint)

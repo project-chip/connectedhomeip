@@ -95,7 +95,7 @@ void printApsFrame(EmberApsFrame * frame);
  *   - If buffer us non-null and buf_length is large enough, the number of bytes
  *     placed in buffer.
  */
-uint16_t encodeApsFrame(uint8_t* buffer, uint16_t buf_length, EmberApsFrame* apsFrame);
+uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame);
 
 #ifdef __cplusplus
 }
