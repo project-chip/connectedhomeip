@@ -169,7 +169,7 @@ bool DetermineCommand(int argc, char * argv[], Command * command)
     if (EqualsLiteral(argv[1], "toggle"))
     {
         *command = Command::Toggle;
-        return argc == 4;
+        return argc == 5;
     }
 
     if (EqualsLiteral(argv[1], "echo"))
