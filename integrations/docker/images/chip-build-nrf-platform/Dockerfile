@@ -47,10 +47,10 @@ RUN set -x \
     # Device Tree Compiler 1.4.7
     && curl -o /tmp/dtc.deb http://mirrors.edge.kernel.org/ubuntu/pool/main/d/device-tree-compiler/device-tree-compiler_1.4.7-3ubuntu2_amd64.deb \
     && dpkg -i /tmp/dtc.deb \
-    # nRF Connect SDK 1.3.0 sources & requirements
+    # nRF Connect SDK [master] sources & requirements
     && (mkdir /var/ncs && cd /var/ncs \
     && pip3 install --no-cache-dir setuptools wheel cmake west \
-    && west init -m https://github.com/nrfconnect/sdk-nrf --mr v1.3.0 \
+    && west init -m https://github.com/nrfconnect/sdk-nrf \
     && west update \
     && pip3 install --no-cache-dir -r zephyr/scripts/requirements.txt \
     && pip3 install --no-cache-dir -r nrf/scripts/requirements.txt \
