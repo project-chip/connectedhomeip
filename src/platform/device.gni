@@ -26,7 +26,9 @@ if (device_platform == "auto") {
   if (current_os == "mac" || current_os == "ios") {
     device_platform = "darwin"
   } else if (current_os == "linux") {
+    # FIXME: enable openthread on nrf5 gn build
     device_platform = "linux"
+    chip_enable_openthread = true
   } else {
     device_platform = "none"
   }

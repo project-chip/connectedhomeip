@@ -144,7 +144,8 @@ STD_LIBS += \
 STD_LIBS += $(shell pkg-config --libs openssl)
 
 ifeq ($(findstring linux,$(CHIP_HOST_ARCH)),linux)
-STD_LIBS += $(shell pkg-config --libs gio-2.0)
+STD_LIBS += $(shell pkg-config --libs gio-2.0 dbus-1)
+STD_LIBS += -lot_br_client
 STD_CFLAGS += $(shell pkg-config --cflags gio-2.0)
 endif
 
@@ -166,6 +167,9 @@ STD_LINK_PREREQUISITES += \
     $(CHIP_OUTPUT_DIR)/lib/libSupportLayer.a \
     $(CHIP_OUTPUT_DIR)/lib/libSystemLayer.a
 
+ifeq ($(findstring linux,$(CHIP_HOST_ARCH)),linux)
+STD_LINK_PREREQUISITES += $(CHIP_OUTPUT_DIR)/lib/libot_br_client.a
+endif
 
 # ==================================================
 # Late-bound build rules for CHIP
