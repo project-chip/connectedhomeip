@@ -179,10 +179,11 @@ ninja -C out/debug all
 
 This can be used prior to change submission to configure, build, and test the
 gcc, clang, mbedtls, & examples configurations all together in one parallel
-build.
+build. Each configuration has a separate subdirectory in the output dir.
 
-This unified build can be used for day to day development, although it's expensive
-to build everything. To save time, you can name the configuration to build:
+This unified build can be used for day to day development, although it's more
+expensive to build everything for every edit. To save time, you can name the
+configuration to build:
 
 ```
 ninja -C out/debug all_host_gcc
@@ -199,6 +200,14 @@ gn gen out/debug --args='is_debug=true target_os="all" enable_host_clang_build=f
 ```
 
 For a full list, see the root `BUILD.gn`.
+
+Note that in the unified build, targets have multiple instances and need to be
+disambiguated by adding a `(toolchain)` suffix. Use `gn ls out/debug` to list
+all of the target instances. For example:
+
+```
+gn desc out/debug '//src/controller(//build/toolchain/host:linux_x64_clang)'
+```
 
 Note: Some builds are disabled by default as they need extra SDKs. For
 example, to add the nRF5 examples to the unified build, download the
