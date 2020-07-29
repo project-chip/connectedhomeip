@@ -43,6 +43,10 @@
 //#include CONFIGURATION_HEADER
 #include "../af.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 void emAfInit(void);
 
 void emAfTick(void);
@@ -63,5 +67,9 @@ void emAfZigbeeKeyEstablishment(EmberEUI64 partner, EmberKeyStatus status);
 bool emAfReadAttributesResponse(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 
 bool emAfReportAttributes(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif // __cplusplus
 
 #endif // SILABS_ZNET_BOOKKEEPING_H

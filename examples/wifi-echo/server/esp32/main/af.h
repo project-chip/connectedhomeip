@@ -51,6 +51,10 @@
 #ifndef SILABS_AF_API
 #define SILABS_AF_API
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 // Micro and compiler specific typedefs and macros
 //#include PLATFORM_HEADER
 
@@ -79,7 +83,17 @@
 
 //#include "stack/include/event.h"
 //#include "stack/include/error.h"
+
+#ifdef __cplusplus
+} // extern "C"
+#endif // __cplusplus
+
 #include "af-types.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 //#include "app/framework/util/print.h"
 //#include "app/framework/util/time-util.h"
 #include "client-api.h"
@@ -1897,5 +1911,9 @@ int emberAfMain(MAIN_FUNCTION_PARAMETERS);
  */
 // Note:  This is a #define for now but could be a real function call in the future.
 #define emberAfMaxPowerLevel() (3)
+
+#ifdef __cplusplus
+} // extern "C"
+#endif // __cplusplus
 
 #endif // SILABS_AF_API

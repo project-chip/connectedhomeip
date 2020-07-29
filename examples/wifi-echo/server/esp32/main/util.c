@@ -447,7 +447,7 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
 }
 
 bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message,
-                                     uint16_t messageLength, EmberNodeId source, InterPanHeader * interPanHeader,
+                                     uint16_t messageLength, ChipResponseDestination * source, InterPanHeader * interPanHeader,
                                      EmberAfClusterCommand * returnCmd)
 {
     uint8_t minLength =
@@ -493,7 +493,7 @@ bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMess
 
 // a single call to process global and cluster-specific messages and callbacks.
 bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message, uint16_t msgLen,
-                           EmberNodeId source, InterPanHeader * interPanHeader)
+                           ChipResponseDestination * source, InterPanHeader * interPanHeader)
 {
     EmberStatus sendStatus;
     bool msgHandled = false;
@@ -690,6 +690,12 @@ void emAfApplyDisableDefaultResponse(uint8_t * frame_control)
     }
 }
 
+static bool isBroadcastDestination(ChipResponseDestination * responseDestination)
+{
+    // FIXME: Will need to actually figure out how to test for this!
+    return false;
+}
+
 EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback)
 {
     EmberStatus status;
@@ -737,19 +743,10 @@ EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback)
         status = emberAfInterpanSendMessageCallback(&interpanResponseHeader, appResponseLength, appResponseData);
         emberAfResponseType &= ~ZCL_UTIL_RESP_INTERPAN;
     }
-    else if (emberAfResponseDestination < EMBER_BROADCAST_ADDRESS)
+    else if (!isBroadcastDestination(emberAfResponseDestination))
     {
-        label = 'U';
-#if 0
-    status = emberAfSendUnicastWithCallback(EMBER_OUTGOING_DIRECT,
-                                            emberAfResponseDestination,
-                                            &emberAfResponseApsFrame,
-                                            appResponseLength,
-                                            appResponseData,
-                                            callback);
-#else
-        status = EMBER_SUCCESS;
-#endif
+        label  = 'U';
+        status = chipSendResponse(emberAfResponseDestination, &emberAfResponseApsFrame, appResponseLength, appResponseData);
     }
     else
     {
@@ -852,7 +849,7 @@ EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberA
 }
 
 bool emberAfDetermineIfLinkSecurityIsRequired(uint8_t commandId, bool incoming, bool broadcast, EmberAfProfileId profileId,
-                                              EmberAfClusterId clusterId, EmberNodeId remoteNodeId)
+                                              EmberAfClusterId clusterId, ChipResponseDestination * remoteNodeId)
 {
     (void) afNoSecurityForDefaultResponse; // remove warning if not used
 
