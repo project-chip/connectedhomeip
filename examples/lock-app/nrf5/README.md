@@ -110,7 +110,18 @@ Run the following commands in the Docker container shell.
 
         $ scripts/examples/nrf_lock_app.sh
 
-Alternatively, you can run `Build nRF5 Lock App` VSCode task.
+Other alternatives in the container:
+
+-   Run `Build nRF5 Lock App` VSCode task.
+
+-   Run the `GN build` VSCode task. This does not require a clean tree.
+
+-   Build manually with GN.
+
+            $ source scripts/activate.sh
+            $ cd examples/lock-app/nrf5
+            $ gn gen out/debug
+            $ ninja -C out/debug
 
 ### Using Native Shell
 
@@ -159,6 +170,15 @@ Alternatively, you can run `Build nRF5 Lock App` VSCode task.
           $ cd ~/connectedhomeip
           $ git submodule update --init
           $ scripts/examples/nrf_lock_app.sh
+
+*   Or, run GN to build the application
+
+          $ cd ~/connectedhomeip
+          $ git submodule update --init
+          $ source scripts/activate.sh
+          $ cd examples/lock-app/nrf5
+          $ gn gen out/debug
+          $ ninja -C out/debug
 
 <a name="initializing"></a>
 
