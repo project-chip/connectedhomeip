@@ -28,7 +28,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-esp32-qemu:0.4.0
+            image: connectedhomeip/chip-build-esp32-qemu:0.4.1
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
