@@ -71,6 +71,9 @@ if (device_platform != "none") {
     } else {
       defines += [ "CHIP_DEVICE_LAYER_TARGET_NRF5=0" ]
     }
+    if (chip_enable_openthread) {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_THREAD=1" ]
+    }
   }
 
   static_library("platform") {
@@ -128,10 +131,6 @@ if (device_platform != "none") {
 
     public_configs = [ ":platform_config" ]
 
-    if (chip_enable_openthread) {
-      sources += [ "OpenThread/OpenThreadUtils.cpp" ]
-    }
-
     if (device_platform == "darwin") {
       sources += [
         "Darwin/BLEManagerImpl.cpp",
@@ -188,6 +187,7 @@ if (device_platform != "none") {
           "Linux/ThreadStackManagerImpl.cpp",
           "Linux/ThreadStackManagerImpl.h",
         ]
+        public_deps += [ "${chip_root}/third_party/ot-br-posix:ot_br_client" ]
       }
 
       public_deps += [ "${chip_root}/third_party/inipp" ]
@@ -219,6 +219,7 @@ if (device_platform != "none") {
 
       if (chip_enable_openthread) {
         sources += [
+          "OpenThread/OpenThreadUtils.cpp",
           "nRF5/ThreadStackManagerImpl.cpp",
           "nRF5/ThreadStackManagerImpl.h",
         ]

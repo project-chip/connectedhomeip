@@ -19,7 +19,7 @@ declare_args() {
   device_platform = "auto"
 
   # Enable openthread support.
-  chip_enable_openthread = false
+  chip_enable_openthread = true
 }
 
 if (device_platform == "auto") {

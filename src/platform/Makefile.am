@@ -212,6 +212,7 @@ libDeviceLayer_a_SOURCES               += \
     $(NULL)
 
 libDeviceLayer_a_CPPFLAGS              += \
+    -DCHIP_DEVICE_CONFIG_ENABLE_THREAD=1  \
     $(OT_BR_POSIX_CPPFLAGS)               \
     $(DBUS_CFLAGS)                        \
     $(NULL)
