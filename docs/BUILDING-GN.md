@@ -101,9 +101,15 @@ gn gen out/host --args='is_debug=true'
 ninja -C out/host
 ```
 
-This configure the build for debugging, which is also the default if the
-`is_debug` argument is omitted. To configure an optimized build, instead specify
-`is_debug=false`.
+This generates a configuration suitable for debugging, which is the default even
+if the `is_debug` argument is omitted. To configure an optimized build, instead
+specify `is_debug=false`:
+
+```
+gn gen out/host --args='is_debug=false'
+
+ninja -C out/host
+```
 
 To run all tests, run:
 
