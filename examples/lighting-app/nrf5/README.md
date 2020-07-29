@@ -107,16 +107,16 @@ commands in a devcontainer shell.
 
 Other alternatives:
 
-- Run `Build nRF5 Lock App` VSCode task.
+-   Run `Build nRF5 Lock App` VSCode task.
 
-- Run the `GN build` VSCode task. This does not require a clean tree.
+-   Run the `GN build` VSCode task. This does not require a clean tree.
 
-- Build manually with GN:
+-   Build manually with GN:
 
-          $ source scripts/activate.sh
-          $ cd examples/lock-app/nrf5
-          $ gn gen out/debug
-          $ ninja -C out/debug
+            $ source scripts/activate.sh
+            $ cd examples/lock-app/nrf5
+            $ gn gen out/debug
+            $ ninja -C out/debug
 
 ### Using Native Shell
 

@@ -138,10 +138,10 @@ that means that the tests passed in a previous build.
 
 ### Build Custom configuration
 
-The build is configured by setting build arguments. These are set by passing
-the `--args` option to `gn gen`, by running `gn args` on the output directory,
-or by hand editing `args.gn` in the output directory. To configure a new
-build or edit the arguments to existing build, run:
+The build is configured by setting build arguments. These are set by passing the
+`--args` option to `gn gen`, by running `gn args` on the output directory, or by
+hand editing `args.gn` in the output directory. To configure a new build or edit
+the arguments to existing build, run:
 
 ```
 source scripts/activate.sh
@@ -151,8 +151,8 @@ gn args out/custom
 ninja -C out/custom
 ```
 
-Two key builtin build arguments are `target_os` and `target_cpu`, which
-control the OS & CPU of the build.
+Two key builtin build arguments are `target_os` and `target_cpu`, which control
+the OS & CPU of the build.
 
 To see help for all available build arguments:
 
@@ -163,8 +163,8 @@ gn args --list out/custom
 
 ### Build Examples
 
-Examples can be built in two ways, as separate projects that add CHIP
-in the third_party directory, or in the top level CHIP project.
+Examples can be built in two ways, as separate projects that add CHIP in the
+third_party directory, or in the top level CHIP project.
 
 To build the `chip-shell` example as a separate project:
 
@@ -201,8 +201,8 @@ ninja -C out/unified all_host_gcc
 ninja -C out/unified check_host_gcc
 ```
 
-Replace `host_gcc` with the name of the configuration, which is found in
-the root `BUILD.gn`.
+Replace `host_gcc` with the name of the configuration, which is found in the
+root `BUILD.gn`.
 
 You can also fine tune the configurations generated via arguments such as:
 
@@ -220,8 +220,8 @@ all of the target instances. For example:
 gn desc out/unified '//src/controller(//build/toolchain/host:linux_x64_clang)'
 ```
 
-Note: Some builds are disabled by default as they need extra SDKs. For
-example, to add the nRF5 examples to the unified build, download the
+Note: Some builds are disabled by default as they need extra SDKs. For example,
+to add the nRF5 examples to the unified build, download the
 [Nordic nRF5 SDK for Thread and Zigbee](https://www.nordicsemi.com/Software-and-Tools/Software/nRF5-SDK-for-Thread-and-Zigbee)
 and add the following build arguments:
 
@@ -245,7 +245,8 @@ gn help grammar
 gn help toolchain
 ```
 
-Also see the [quick start guide](https://gn.googlesource.com/gn/+/master/docs/quick_start.md).
+Also see the
+[quick start guide](https://gn.googlesource.com/gn/+/master/docs/quick_start.md).
 
 ### Introspection
 
