@@ -87,6 +87,7 @@ public:
     ~ThreadStackManagerImpl() = default;
 
     static ThreadStackManagerImpl sInstance;
+
 private:
     struct DBusConnectionDeleter
     {
