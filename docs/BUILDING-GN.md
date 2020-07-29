@@ -228,6 +228,8 @@ Also see the [quick start guide](https://gn.googlesource.com/gn/+/master/docs/qu
 
 ### Introspection
 
+GN has various introspection tools to help examine the build configuration.
+
 To show all of the targets in an output directory:
 
 ```
@@ -240,13 +242,13 @@ To show all of the files that will be built:
 gn outputs out/debug '*'
 ```
 
-To describe a targt:
+To show the GN representation of a configured target:
 
 ```
 gn desc out/debug //src/inet --all
 ```
 
-To describe everything in JSON format:
+To dump the GN representation of the entire build as JSON:
 
 ```
 gn desc out/debug/ '*' --all --format=json
