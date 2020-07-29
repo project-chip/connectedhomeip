@@ -231,6 +231,7 @@ Recommended topics:
 ```
 gn help execution
 gn help grammar
+gn help toolchain
 ```
 
 Also see the [quick start guide](https://gn.googlesource.com/gn/+/master/docs/quick_start.md).
