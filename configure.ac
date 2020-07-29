@@ -2121,12 +2121,15 @@ fi
 # GIO
 #
 
+CHIP_WITH_GIO=no
+
 if test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1; then
     PKG_CHECK_MODULES([GIO], [gio-2.0])
 
     # Check for GIO library is available.
     AC_CHECK_LIB([gio-2.0], [g_bus_get_sync],
     [
+        CHIP_WITH_GIO=yes
         AC_DEFINE([CHIP_WITH_GIO], [1], [Define to 1 to build CHIP with GIO])
     ],
     [
@@ -2138,6 +2141,9 @@ if test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1; then
 
     AC_CHECK_PROG(GDBUSCODEGEN, gdbus-codegen, gdbus-codegen)
 fi
+
+AC_SUBST(CHIP_ENABLE_GIO)
+AM_CONDITIONAL([CHIP_ENABLE_GIO], [test "${CHIP_WITH_GIO}" == "yes"])
 
 #
 # Sockets
