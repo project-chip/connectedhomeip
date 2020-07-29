@@ -96,20 +96,25 @@ This will build all sources, libraries, and tests for the host platform:
 ```
 source scripts/activate.sh
 
-gn gen out/host --args='is_debug=true'
+gn gen out/host
 
 ninja -C out/host
 ```
 
-This generates a configuration suitable for debugging, which is the default even
-if the `is_debug` argument is omitted. To configure an optimized build, instead
-specify `is_debug=false`:
+This generates a configuration suitable for debugging. To configure an optimized
+build, specify `is_debug=false`:
 
 ```
 gn gen out/host --args='is_debug=false'
 
 ninja -C out/host
 ```
+
+The directory name `out/host` can be any directory, although it's conventional
+to build within the `out` directory. This example uses `host` to emphasize that
+we're building for the host system. Different build directories can be used for
+different configurations, or a single directory can be used and reconfigured as
+necessary via `gn args`.
 
 To run all tests, run:
 
@@ -169,18 +174,18 @@ gn gen out/debug
 ninja -C out/debug
 ```
 
-To build it at the top level, see below under "Maintainer Builds".
+To build it at the top level, see below under "Unified Builds".
 
-### Maintainer Builds
+### Unified Builds
 
-To build a unified configuration that approximates the continuous build:
+To build a unified configuration that approximates the set of continuous builds:
 
 ```
 source scripts/activate.sh
 
-gn gen out/debug --args='is_debug=true target_os="all"'
+gn gen out/unified --args='is_debug=true target_os="all"'
 
-ninja -C out/debug all
+ninja -C out/unified all
 ```
 
 This can be used prior to change submission to configure, build, and test the
@@ -192,8 +197,8 @@ expensive to build everything for every edit. To save time, you can name the
 configuration to build:
 
 ```
-ninja -C out/debug all_host_gcc
-ninja -C out/debug check_host_gcc
+ninja -C out/unified all_host_gcc
+ninja -C out/unified check_host_gcc
 ```
 
 Replace `host_gcc` with the name of the configuration, which is found in
@@ -202,7 +207,7 @@ the root `BUILD.gn`.
 You can also fine tune the configurations generated via arguments such as:
 
 ```
-gn gen out/debug --args='is_debug=true target_os="all" enable_host_clang_build=false'
+gn gen out/unified --args='is_debug=true target_os="all" enable_host_clang_build=false'
 ```
 
 For a full list, see the root `BUILD.gn`.
@@ -212,7 +217,7 @@ disambiguated by adding a `(toolchain)` suffix. Use `gn ls out/debug` to list
 all of the target instances. For example:
 
 ```
-gn desc out/debug '//src/controller(//build/toolchain/host:linux_x64_clang)'
+gn desc out/unified '//src/controller(//build/toolchain/host:linux_x64_clang)'
 ```
 
 Note: Some builds are disabled by default as they need extra SDKs. For
@@ -221,7 +226,7 @@ example, to add the nRF5 examples to the unified build, download the
 and add the following build arguments:
 
 ```
-gn gen out/debug --args='target_os="all" enable_nrf5_builds=true nrf5_sdk_root="/path/to/sdk"'
+gn gen out/unified --args='target_os="all" enable_nrf5_builds=true nrf5_sdk_root="/path/to/sdk"'
 ```
 
 ### Getting Help
@@ -249,37 +254,37 @@ GN has various introspection tools to help examine the build configuration.
 To show all of the targets in an output directory:
 
 ```
-gn ls out/debug
+gn ls out/host
 ```
 
 To show all of the files that will be built:
 
 ```
-gn outputs out/debug '*'
+gn outputs out/host '*'
 ```
 
 To show the GN representation of a configured target:
 
 ```
-gn desc out/debug //src/inet --all
+gn desc out/host //src/inet --all
 ```
 
 To dump the GN representation of the entire build as JSON:
 
 ```
-gn desc out/debug/ '*' --all --format=json
+gn desc out/host/ '*' --all --format=json
 ```
 
 To show the dependency tree:
 
 ```
-gn desc out/debug //:all deps --tree --all
+gn desc out/host //:all deps --tree --all
 ```
 
 To find dependency paths:
 
 ```
-gn path out/debug //src/transport/tests:tests //src/system
+gn path out/host //src/transport/tests:tests //src/system
 ```
 
 ## Maintaining CHIP

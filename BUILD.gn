@@ -89,7 +89,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
   }
 } else {
-  # This is the dummy toolchain. Configure various real toolchains.
+  # This is the unified build. Configure various real toolchains.
   import("${chip_root}/gn/chip/chip_build.gni")
   declare_args() {
     # Set this to false to disable all builds by default.
