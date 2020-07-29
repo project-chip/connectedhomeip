@@ -145,7 +145,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const char * deviceName, void * appReqState,
+CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const uint16_t deviceDiscriminator, void * appReqState,
                                                NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
                                                ErrorHandler onError)
 {
@@ -161,8 +161,8 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const char
     mOnNewConnection = onConnected;
 
     transport = new Transport::BLE();
-    err       = transport->Init(
-        Transport::BleConnectionParameters(this, DeviceLayer::ConnectivityMgr().GetBleLayer()).SetConnectionName(deviceName));
+    err       = transport->Init(Transport::BleConnectionParameters(this, DeviceLayer::ConnectivityMgr().GetBleLayer())
+                              .SetConnectionDiscriminator(deviceDiscriminator));
     SuccessOrExit(err);
     mUnsecuredTransport = transport->Retain();
 

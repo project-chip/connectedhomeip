@@ -511,7 +511,7 @@ menu "CHIP Device Layer"
 
         config BLE_FAST_ADVERTISING_INTERVAL
             int "Fast Advertising Interval"
-            default 800
+            default 320
             depends on ENABLE_CHIPOBLE
             help
                 The interval (in units of 0.625ms) at which the device will send BLE advertisements while

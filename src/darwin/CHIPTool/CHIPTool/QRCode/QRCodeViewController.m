@@ -340,22 +340,22 @@ static NSString * const ipKey = @"ipk";
         break;
     case kRendezvousInformationBLE:
         NSLog(@"Rendezvous BLE");
-        [self handleRendezVousBLE:[self getNetworkName:payload.discriminator]];
+        [self handleRendezVousBLE:payload.discriminator.unsignedShortValue];
         break;
     }
 }
 
 - (NSString *)getNetworkName:(NSNumber *)discriminator
 {
-    NSString * peripheralDiscriminator = [NSString stringWithFormat:@"%hX", discriminator.unsignedShortValue];
+    NSString * peripheralDiscriminator = [NSString stringWithFormat:@"%04u", discriminator.unsignedShortValue];
     NSString * peripheralFullName = [NSString stringWithFormat:@"%@%@", NETWORK_CHIP_PREFIX, peripheralDiscriminator];
     return peripheralFullName;
 }
 
-- (void)handleRendezVousBLE:(NSString *)name
+- (void)handleRendezVousBLE:(uint16_t)discriminator
 {
     NSError * error;
-    [self.chipController connect:name error:&error];
+    [self.chipController connect:discriminator error:&error];
 }
 
 - (void)handleRendezVousWiFi:(NSString *)name
