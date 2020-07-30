@@ -345,7 +345,7 @@ static NSString * const ipKey = @"ipk";
         break;
     case kRendezvousInformationBLE:
         NSLog(@"Rendezvous BLE");
-        [self handleRendezVousBLE:payload.discriminator.unsignedShortValue];
+        [self handleRendezVousBLE:payload.discriminator.unsignedShortValue setupPINCode:payload.setUpPINCode.unsignedIntValue];
         break;
     }
 }
@@ -357,10 +357,10 @@ static NSString * const ipKey = @"ipk";
     return peripheralFullName;
 }
 
-- (void)handleRendezVousBLE:(uint16_t)discriminator
+- (void)handleRendezVousBLE:(uint16_t)discriminator setupPINCode:(uint32_t)setupPINCode
 {
     NSError * error;
-    [self.chipController connect:discriminator error:&error];
+    [self.chipController connect:discriminator setupPINCode:setupPINCode error:&error];
 }
 
 - (void)handleRendezVousWiFi:(NSString *)name

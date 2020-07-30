@@ -74,11 +74,20 @@ public:
         return *this;
     }
 
-    bool HasConnectionDiscriminator() const { return mConnectionDiscriminator != 0; };
-    uint16_t GetConnectionDiscriminator() const { return mConnectionDiscriminator; };
-    BleConnectionParameters & SetConnectionDiscriminator(const uint16_t connDiscriminator)
+    bool HasDiscriminator() const { return mDiscriminator != 0; };
+    uint16_t GetDiscriminator() const { return mDiscriminator; };
+    BleConnectionParameters & SetDiscriminator(const uint16_t discriminator)
     {
-        mConnectionDiscriminator = connDiscriminator;
+        mDiscriminator = discriminator;
+
+        return *this;
+    }
+
+    bool HasSetupPINCode() const { return mSetupPINCode != 0; };
+    uint32_t GetSetupPINCode() const { return mSetupPINCode; };
+    BleConnectionParameters & SetSetupPINCode(const uint32_t setupPINCode)
+    {
+        mSetupPINCode = setupPINCode;
 
         return *this;
     }
@@ -87,7 +96,8 @@ private:
     DeviceController::ChipDeviceController * mDeviceController = nullptr; ///< Associated device controller
     Ble::BleLayer * mLayer                                     = nullptr; ///< Associated ble layer
     BLE_CONNECTION_OBJECT mConnectionObj                       = 0;       ///< the target peripheral BLE_CONNECTION_OBJECT
-    uint16_t mConnectionDiscriminator                          = 0;       ///< the target peripheral discriminator
+    uint16_t mDiscriminator                                    = 0;       ///< the target peripheral discriminator
+    uint32_t mSetupPINCode                                     = 0;       ///< the target peripheral setup PIN Code
 };
 
 /** Implements a transport using BLE. */
