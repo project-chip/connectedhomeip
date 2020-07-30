@@ -63,8 +63,13 @@ static NSString * const ipKey = @"ipk";
         }
         onMessage:^(NSData * _Nonnull message) {
             typeof(self) strongSelf = weakSelf;
-            NSString * strMessage = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
-            [strongSelf postResult:strMessage];
+            if ([CHIPDeviceController isDataModelCommand:message] == YES) {
+                NSString * strMessage = [CHIPDeviceController commandToString:message];
+                [strongSelf postResult:strMessage];
+            } else {
+                NSString * strMessage = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
+                [strongSelf postResult:strMessage];
+            }
         }
         onError:^(NSError * _Nonnull error) {
             typeof(self) strongSelf = weakSelf;
