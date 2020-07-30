@@ -35,6 +35,7 @@
 @property (strong, nonatomic) dispatch_queue_t workQueue;
 @property (strong, nonatomic) CBCentralManager * centralManager;
 @property (strong, nonatomic) CBPeripheral * peripheral;
+@property (strong, nonatomic) CBUUID * shortServiceUUID;
 @property (unsafe_unretained, nonatomic) uint16_t deviceDiscriminator;
 @property (unsafe_unretained, nonatomic) void * appState;
 @property (unsafe_unretained, nonatomic) BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete;
@@ -76,6 +77,7 @@ namespace DeviceLayer {
         _deviceDiscriminator = deviceDiscriminator;
         _workQueue = dispatch_queue_create("com.chip.ble.work_queue", DISPATCH_QUEUE_SERIAL);
         _centralManager = [CBCentralManager alloc];
+        _shortServiceUUID = [BleConnection getShortestServiceUUID:&chip::Ble::CHIP_BLE_SVC_ID];
         [_centralManager initWithDelegate:self queue:_workQueue];
     }
 
@@ -117,11 +119,9 @@ namespace DeviceLayer {
 {
     NSNumber * isConnectable = [advertisementData objectForKey:CBAdvertisementDataIsConnectable];
     if ([isConnectable boolValue]) {
-        CBUUID * shortChipServiceUUID = [BleConnection getShortestServiceUUID:&chip::Ble::CHIP_BLE_SVC_ID];
-
         NSDictionary * servicesData = [advertisementData objectForKey:CBAdvertisementDataServiceDataKey];
         for (CBUUID * serviceUUID in servicesData) {
-            if ([serviceUUID.data isEqualToData:shortChipServiceUUID.data]) {
+            if ([serviceUUID.data isEqualToData:_shortServiceUUID.data]) {
                 NSData * serviceData = [servicesData objectForKey:serviceUUID];
 
                 int length = [serviceData length];
@@ -279,7 +279,7 @@ namespace DeviceLayer {
         return;
     }
 
-    [_centralManager scanForPeripheralsWithServices:nil options:nil];
+    [_centralManager scanForPeripheralsWithServices:@[ _shortServiceUUID ] options:nil];
 }
 
 - (void)stopScanning
