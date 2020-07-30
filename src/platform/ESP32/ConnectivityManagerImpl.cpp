@@ -908,8 +908,8 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
 
     memset(&wifiConfig, 0, sizeof(wifiConfig));
 
-    // TODO Pull this from the configuration manager
-    const uint16_t discriminator = 0x0F00;
+    uint32_t discriminator;
+    SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
 
     snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s%04u", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX,
              discriminator);

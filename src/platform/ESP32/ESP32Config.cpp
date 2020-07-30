@@ -58,6 +58,7 @@ const ESP32Config::Key ESP32Config::kConfigKey_SetupPinCode        = { kConfigNa
 const ESP32Config::Key ESP32Config::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
 
 // Keys stored in the chip-config namespace
+const ESP32Config::Key ESP32Config::kConfigKey_FabricId                    = { kConfigNamespace_ChipConfig, "fabric-id" };
 const ESP32Config::Key ESP32Config::kConfigKey_ServiceConfig               = { kConfigNamespace_ChipConfig, "service-config" };
 const ESP32Config::Key ESP32Config::kConfigKey_PairedAccountId             = { kConfigNamespace_ChipConfig, "account-id" };
 const ESP32Config::Key ESP32Config::kConfigKey_ServiceId                   = { kConfigNamespace_ChipConfig, "service-id" };
