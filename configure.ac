@@ -2121,15 +2121,19 @@ fi
 # GIO
 #
 
+CHIP_ENABLE_GIO=0
+
 if test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1; then
     PKG_CHECK_MODULES([GIO], [gio-2.0])
 
     # Check for GIO library is available.
     AC_CHECK_LIB([gio-2.0], [g_bus_get_sync],
     [
+        CHIP_ENABLE_GIO=1
         AC_DEFINE([CHIP_WITH_GIO], [1], [Define to 1 to build CHIP with GIO])
     ],
     [
+        CHIP_ENABLE_GIO=0
         AC_DEFINE([CHIP_WITH_GIO], [0], [Define to 0 to build CHIP without GIO])
     ]
     )
