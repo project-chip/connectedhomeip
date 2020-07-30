@@ -229,13 +229,13 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     return YES;
 }
 
-- (BOOL)connect:(uint16_t)deviceDiscriminator error:(NSError * __autoreleasing *)error
+- (BOOL)connect:(uint16_t)discriminator setupPINCode:(uint32_t)setupPINCode error:(NSError * __autoreleasing *)error
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     [self.lock lock];
     err = self.cppController->ConnectDevice(
-        kRemoteDeviceId, deviceDiscriminator, (__bridge void *) self, onConnected, onMessageReceived, onInternalError);
+        kRemoteDeviceId, discriminator, setupPINCode, (__bridge void *) self, onConnected, onMessageReceived, onInternalError);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
