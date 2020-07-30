@@ -56,6 +56,7 @@ using namespace ::chip::DeviceLayer;
 
 DemoSessionManager sessions;
 
+#if CHIP_ENABLE_OPENTHREAD
 static void * ot_calloc(size_t n, size_t size)
 {
     void * p_ptr = NULL;
@@ -71,6 +72,7 @@ static void ot_free(void * p_ptr)
 {
     vPortFree(p_ptr);
 }
+#endif
 
 ret_code_t ChipInit()
 {

@@ -85,7 +85,9 @@ template("lwip_target") {
   config("${lwip_target_name}_warnings") {
     cflags = [
       "-Wno-address",
+      "-Wno-format",
       "-Wno-type-limits",
+      "-Wno-unused-variable",
     ]
   }
 

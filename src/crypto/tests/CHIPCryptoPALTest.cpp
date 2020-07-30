@@ -1112,8 +1112,6 @@ static void TestSPAKE2P_spake2p_PointLoadWrite(nlTestSuite * inSuite, void * inC
 
 static void TestSPAKE2P_spake2p_PointIsValid(nlTestSuite * inSuite, void * inContext)
 {
-    unsigned char output[kMAX_Point_Length];
-
     int numOfTestVectors = ArraySize(point_valid_tvs);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
