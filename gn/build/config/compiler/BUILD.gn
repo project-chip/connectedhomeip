@@ -89,13 +89,6 @@ config("optimize_default") {
 
 config("disabled_warnings") {
   cflags = [
-    "-Wno-unused-parameter",
-    "-Wno-unused-function",
-    "-Wno-unused-variable",
-    "-Wno-format",
-    "-Wno-missing-field-initializers",
-    "-Wno-expansion-to-defined",
-    "-Wno-implicit-fallthrough",
     "-Wno-deprecated-declarations",
   ]
   cflags_cc = [

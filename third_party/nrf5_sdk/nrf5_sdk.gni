@@ -109,7 +109,11 @@ template("nrf5_sdk") {
     if (defined(invoker.defines)) {
       defines += invoker.defines
     }
-    cflags = [ "-Wno-array-bounds" ]
+
+    cflags = [
+      "-Wno-array-bounds",
+      "-Wno-unused-function",
+    ]
   }
 
   # TODO - Break up this monolith and make it configurable.
