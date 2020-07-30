@@ -19,6 +19,8 @@ config.status
 configure
 src/include/BuildConfig.h.in
 src/include/BuildConfig.h.in~
+cmake-build-debug/**
+CMakeLists.txt
 
 # GN build system
 out/
@@ -54,3 +56,6 @@ TAGS
 # Patch files
 *.rej
 *.orig
+
+# C-Lion / IDEA files
+.idea/**
