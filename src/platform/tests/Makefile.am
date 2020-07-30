@@ -58,7 +58,7 @@ dist_libPlatformTests_a_HEADERS                = \
 # objects in this makefile.
 
 AM_CPPFLAGS                                    = \
-    -I$(builddir)/../gen                         \
+    -I$(builddir)/../Linux/gen                   \
     -I$(top_srcdir)/src/                         \
     -I$(top_srcdir)/src/lib                      \
     -I$(top_srcdir)/src/system                   \

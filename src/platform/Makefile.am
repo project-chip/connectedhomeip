@@ -233,43 +233,43 @@ libDeviceLayer_a_SOURCES               += \
 
 endif #CONFIG_BLE_PLATFORM_BLUEZ
 
-if CHIP_ENABLE_GIO
+if CONFIG_WIFI_PLATFORM_WPA
 BUILT_SOURCES                          += \
-    gen/DBusWpa.h                         \
-    gen/DBusWpaInterface.h                \
-    gen/DBusWpaNetwork.h                  \
-    gen/DBusWpa.c                         \
-    gen/DBusWpaInterface.c                \
-    gen/DBusWpaNetwork.c                  \
+    Linux/gen/DBusWpa.h                   \
+    Linux/gen/DBusWpaInterface.h          \
+    Linux/gen/DBusWpaNetwork.h            \
+    Linux/gen/DBusWpa.c                   \
+    Linux/gen/DBusWpaInterface.c          \
+    Linux/gen/DBusWpaNetwork.c            \
     $(NULL)
 
-gen/DBusWpa.h: Linux/dbus/wpa.xml
+Linux/gen/DBusWpa.h: Linux/dbus/wpa.xml
 	gdbus-codegen --header --output $@ --c-namespace Wpa $<
 
-gen/DBusWpaInterface.h: Linux/dbus/wpa_interface.xml
+Linux/gen/DBusWpaInterface.h: Linux/dbus/wpa_interface.xml
 	gdbus-codegen --header --output $@ --c-namespace Wpa $<
 
-gen/DBusWpaNetwork.h: Linux/dbus/wpa_network.xml
+Linux/gen/DBusWpaNetwork.h: Linux/dbus/wpa_network.xml
 	gdbus-codegen --header --output $@ --c-namespace Wpa $<
 
-gen/DBusWpa.c: Linux/dbus/wpa.xml
+Linux/gen/DBusWpa.c: Linux/dbus/wpa.xml
 	gdbus-codegen --body --output $@ --c-namespace Wpa $<
 	sed -i 's/config\.h/BuildConfig.h/g' $@
 
-gen/DBusWpaInterface.c: Linux/dbus/wpa_interface.xml
+Linux/gen/DBusWpaInterface.c: Linux/dbus/wpa_interface.xml
 	gdbus-codegen --body --output $@ --c-namespace Wpa $<
 	sed -i 's/config\.h/BuildConfig.h/g' $@
 
-gen/DBusWpaNetwork.c: Linux/dbus/wpa_network.xml
+Linux/gen/DBusWpaNetwork.c: Linux/dbus/wpa_network.xml
 	gdbus-codegen --body --output $@ --c-namespace Wpa $<
 	sed -i 's/config\.h/BuildConfig.h/g' $@
 
 libDeviceLayer_a_SOURCES               += \
-    gen/DBusWpa.c                         \
-    gen/DBusWpaInterface.c                \
-    gen/DBusWpaNetwork.c                  \
+    Linux/gen/DBusWpa.c                   \
+    Linux/gen/DBusWpaInterface.c          \
+    Linux/gen/DBusWpaNetwork.c            \
     $(NULL)
-endif #CHIP_ENABLE_GIO
+endif # CONFIG_WIFI_PLATFORM_WPA
 
 libDeviceLayer_a_SOURCES               += \
     Linux/BLEManagerImpl.cpp              \
