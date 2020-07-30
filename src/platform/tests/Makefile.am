@@ -58,6 +58,7 @@ dist_libPlatformTests_a_HEADERS                = \
 # objects in this makefile.
 
 AM_CPPFLAGS                                    = \
+    -I$(builddir)/../Linux/gen                   \
     -I$(top_srcdir)/src/                         \
     -I$(top_srcdir)/src/lib                      \
     -I$(top_srcdir)/src/system                   \
@@ -71,6 +72,7 @@ AM_CPPFLAGS                                    = \
 if CHIP_DEVICE_LAYER_TARGET_LINUX
 AM_CPPFLAGS                                   += \
     $(GIO_CFLAGS)                                \
+    $(GIO_UNIX_CFLAGS)                           \
     $(NULL)
 
 if CHIP_WITH_OT_BR_POSIX
@@ -103,6 +105,7 @@ COMMON_LDADD                                          = \
     libPlatformTests.a                                  \
     $(CHIP_LDADD)                                       \
     $(GIO_CFLAGS) $(GIO_LIBS)                           \
+    $(GIO_UNIX_CFLAGS) $(GIO_UNIX_LIBS)                 \
     $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS)\
     $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)          \
     $(LWIP_LDFLAGS) $(LWIP_LIBS)                        \

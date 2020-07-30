@@ -2140,6 +2140,40 @@ if test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1; then
 fi
 
 #
+#
+# WPA
+#
+
+CONFIG_WIFI_PLATFORM_WPA=0
+enable_chipwifi_wpa="no"
+
+NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
+  [BlueZ],
+  [BLUEZ],
+  [bluez],
+  [-lgdbus-internal -lshared-glib],
+  [
+  # actions if not external
+  # At this time, enable this only for linux, and only if the tests are enabled
+      if test "${nl_cv_build_tests}" = "yes" && test "${CONFIG_NETWORK_LAYER_BLE}" = 1 && test "${with_device_layer}" = "linux"; then
+      case "${target}" in
+          *linux*)
+              CONFIG_WIFI_PLATFORM_WPA=1
+              enable_chipwifi_wpa="yes"
+              ;;
+          *)
+              CONFIG_WIFI_PLATFORM_WPA=0
+              enable_chipwifi_wpa="no"
+              ;;
+          esac
+      fi
+  ]
+)
+
+AM_CONDITIONAL([CONFIG_WIFI_PLATFORM_WPA], [test "${enable_chipwifi_wpa}" = "yes"])
+AC_DEFINE_UNQUOTED([CHIP_DEVICE_CONFIG_ENABLE_WPA],[${CONFIG_WIFI_PLATFORM_WPA}],[Define to 1 if you want to enable WPA support for wpa_supplicant.])
+
+#
 # Sockets
 #
 
