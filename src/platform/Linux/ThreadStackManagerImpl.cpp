@@ -111,10 +111,7 @@ void ThreadStackManagerImpl::_ThreadDevcieRoleChangedHandler(DeviceRole role)
     PlatformMgr().PostEvent(&event);
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_ProcessThreadActivity()
-{
-    return CHIP_NO_ERROR;
-}
+void ThreadStackManagerImpl::_ProcessThreadActivity() {}
 
 static bool RouteMatch(const otbr::DBus::Ip6Prefix & prefix, const Inet::IPAddress & addr)
 {
