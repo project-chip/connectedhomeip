@@ -57,12 +57,14 @@ SRCS = \
     $(PROJECT_ROOT)/cmd_base64.cpp \
     $(PROJECT_ROOT)/cmd_btp.cpp \
     $(PROJECT_ROOT)/cmd_device.cpp \
+    $(PROJECT_ROOT)/data_model_handler.cpp \
+    $(PROJECT_ROOT)/test_identity.cpp \
     $(NRF5_PLATFORM_DIR)/app/support/CXXExceptionStubs.cpp \
     $(NRF5_PLATFORM_DIR)/app/support/nRF5Sbrk.c \
     $(NRF5_PLATFORM_DIR)/app/support/FreeRTOSNewlibLockSupport.c \
     $(NRF5_PLATFORM_DIR)/app/Server.cpp \
     $(NRF5_PLATFORM_DIR)/app/chipinit.cpp \
-    $(NRF5_PLATFORM_DIR)/util/LEDWidget.cpp \
+    $(NRF5_PLATFORM_DIR)/util/streamer/streamer_nrf5.cpp \
     $(NRF5_SDK_ROOT)/components/ble/common/ble_advdata.c \
     $(NRF5_SDK_ROOT)/components/ble/common/ble_srv_common.c \
     $(NRF5_SDK_ROOT)/components/ble/nrf_ble_gatt/nrf_ble_gatt.c \
@@ -137,6 +139,7 @@ INC_DIRS = \
     $(PROJECT_ROOT)/third_party/printf \
     $(CHIP_ROOT)/src/ \
     $(CHIP_ROOT)/src/lib \
+    $(CHIP_ROOT)/src/lib/shell \
     $(CHIP_ROOT)/src/system \
     $(CHIP_ROOT)/src/include/ \
     $(NRF5_PLATFORM_DIR)/app/include \
@@ -227,6 +230,8 @@ DEFINES = \
     UART1_ENABLED=1 \
     __HEAP_SIZE=40960 \
     __STACK_SIZE=8192 \
+    NRF_SHELL_STREAMER \
+    SHELL_STREAMER_SPECIFIC \
     $(NULL)
 
 #CXXFLAGS += -std=c++11
