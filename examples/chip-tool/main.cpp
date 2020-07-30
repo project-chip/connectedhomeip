@@ -332,7 +332,7 @@ void DoOnOff(DeviceController::ChipDeviceController * controller, Command comman
         dataLength = encodeToggleCommand(buffer->Start(), bufferSize, endpoint);
         break;
     default:
-        fprintf(stderr, "Unknown command: %d\n", command);
+        fprintf(stderr, "Unknown command: %d\n", int(command));
         return;
     }
     buffer->SetDataLength(dataLength);

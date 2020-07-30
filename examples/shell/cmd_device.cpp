@@ -418,7 +418,7 @@ exit:
 int cmd_device_get(int argc, char ** argv)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
-    streamer_t * sout = streamer_get();
+    streamer_get();
 
     if (argc == 0)
     {
