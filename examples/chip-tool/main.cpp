@@ -121,7 +121,8 @@ static void HandleDataModelMessage(System::PacketBuffer * buffer)
     VerifyOrExit(message[0] == 8, printf("Unexpected frame control byte: 0x%02x\n", message[0]));
     VerifyOrExit(message[1] == 1, printf("Unexpected sequence number: %d\n", message[1]));
     VerifyOrExit(message[2] == 0x0b, printf("Unexpected command 0x%02x; expected Default Response", message[2]));
-    printf("Got default response to command '0x%02x' for cluster '0x%02x'.  Status is '0x%02x'.\n", message[3], frame.clusterId, message[4]);
+    printf("Got default response to command '0x%02x' for cluster '0x%02x'.  Status is '0x%02x'.\n", message[3], frame.clusterId,
+           message[4]);
 exit:
     System::PacketBuffer::Free(buffer);
 }
