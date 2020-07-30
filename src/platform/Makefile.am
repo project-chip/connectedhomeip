@@ -188,17 +188,17 @@ endif # CHIP_DEVICE_LAYER_TARGET_DARWIN
 if CHIP_DEVICE_LAYER_TARGET_LINUX
 
 libDeviceLayer_a_CPPFLAGS              += \
-    -I$(builddir)/gen                     \
+    -I$(builddir)/Linux/gen               \
     $(NULL)
 
 SUBDIRS                                += tests
 
 .PHONY: gen
 gen:
-	mkdir -p gen
+	mkdir -p Linux/gen
 
 BUILT_SOURCES                         = \
-    gen                                 \
+    Linux/gen                           \
     $(NULL)
 
 libDeviceLayer_a_CPPFLAGS              += \
@@ -210,19 +210,25 @@ libDeviceLayer_a_CPPFLAGS              += \
 if CONFIG_BLE_PLATFORM_BLUEZ
 
 BUILT_SOURCES                         += \
-    gen/DbusBluez.h                      \
-    gen/DbusBluez.c                      \
+    Linux/gen/DbusBluez.h                      \
+    Linux/gen/DbusBluez.c                      \
     $(NULL)
 
-gen/DbusBluez.h: Linux/dbus/org.bluez.xml
-	gdbus-codegen --header --output $@ --c-namespace CHIPDBus $<
+GDBUSCODEGENOPTS                          = \
+    --interface-prefix org.bluez            \
+    --c-namespace Bluez                     \
+    --c-generate-object-manager             \
+    $(NULL)
 
-gen/DbusBluez.c: Linux/dbus/org.bluez.xml
-	gdbus-codegen --body --output $@ --c-namespace CHIPDBus $<
+Linux/gen/DbusBluez.h: Linux/dbus/org.bluez.xml
+	$(GDBUSCODEGEN) $(GDBUSCODEGENOPTS) --header --output $@ $<
+
+Linux/gen/DbusBluez.c: Linux/dbus/org.bluez.xml
+	$(GDBUSCODEGEN) $(GDBUSCODEGENOPTS) --body --output $@ $<
 	sed -i 's/config\.h/BuildConfig.h/g' $@
 
 libDeviceLayer_a_SOURCES               += \
-    gen/DbusBluez.c                    \
+    Linux/gen/DbusBluez.c                 \
     $(NULL)
 
 endif #CONFIG_BLE_PLATFORM_BLUEZ
