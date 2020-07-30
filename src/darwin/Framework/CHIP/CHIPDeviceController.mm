@@ -375,6 +375,74 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     return isConnected ? YES : NO;
 }
 
++ (BOOL)isDataModelCommand:(NSData * _Nonnull)message
+{
+    if (message.length == 0) {
+        return NO;
+    }
+
+    UInt8 * bytes = (UInt8 *) message.bytes;
+    return bytes[0] < 0x04 ? YES : NO;
+}
+
++ (NSString *)commandToString:(NSData * _Nonnull)response
+{
+    if ([CHIPDeviceController isDataModelCommand:response] == NO) {
+        return @"Response is not a CHIP command";
+    }
+
+    uint8_t * bytes = (uint8_t *) response.bytes;
+
+    EmberApsFrame frame;
+    if (!extractApsFrame(bytes, response.length, &frame)) {
+        return @"Response is not an APS frame";
+    }
+
+    uint8_t * message;
+    uint16_t messageLen = extractMessage(bytes, response.length, &message);
+    if (messageLen != 5) {
+        // Not a Default Response command for sure.
+        return @"Unexpected response length";
+    }
+
+    if (message[0] != 8) {
+        // Unexpected control byte
+        return [NSString stringWithFormat:@"Control byte value '0x%02x' is not expected", message[0]];
+    }
+
+    // message[1] is the sequence counter; just ignore it for now.
+
+    if (message[2] != 0x0b) {
+        // Not a Default Response command id
+        return [NSString stringWithFormat:@"Command id '0x%02x' is not the Default Response command id (0x0b)", message[2]];
+    }
+
+    if (frame.clusterId != 0x06) {
+        // Not On/Off cluster
+        return [NSString stringWithFormat:@"Cluster id '0x%02x' is not the on/off cluster id (0x06)", frame.clusterId];
+    }
+
+    NSString * command;
+    if (message[3] == 0) {
+        command = @"off";
+    } else if (message[3] == 1) {
+        command = @"on";
+    } else if (message[3] == 2) {
+        command = @"toggle";
+    } else {
+        return [NSString stringWithFormat:@"Command '0x%02x' is unknown", message[3]];
+    }
+
+    NSString * status;
+    if (message[4] == 0) {
+        status = @"succeeded";
+    } else {
+        status = @"failed";
+    }
+
+    return [NSString stringWithFormat:@"Sending '%@' command %@", command, status];
+}
+
 - (void)registerCallbacks:appCallbackQueue
               onConnected:(ControllerOnConnectedBlock)onConnected
                 onMessage:(ControllerOnMessageBlock)onMessage
