@@ -34,6 +34,7 @@ using namespace chip::Shell;
 
 void cmd_misc_init();
 void cmd_base64_init();
+void cmd_btp_init();
 void cmd_device_init();
 
 int main(void)
@@ -41,6 +42,7 @@ int main(void)
     cmd_misc_init();
     cmd_base64_init();
     cmd_device_init();
+    cmd_btp_init();
 
     shell_task(NULL);
 }

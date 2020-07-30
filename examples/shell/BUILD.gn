@@ -21,6 +21,7 @@ assert(chip_build_tools)
 executable("chip-shell") {
   sources = [
     "cmd_base64.cpp",
+    "cmd_btp.cpp",
     "cmd_device.cpp",
     "cmd_misc.cpp",
     "main.cpp",
