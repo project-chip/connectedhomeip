@@ -2155,7 +2155,7 @@ NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
   [
   # actions if not external
   # At this time, enable this only for linux, and only if the tests are enabled
-      if test "${nl_cv_build_tests}" = "yes" && test "${with_device_layer}" = "linux"; then
+      if test "${with_device_layer}" = "linux"; then
       case "${target}" in
           *linux*)
               CONFIG_WIFI_PLATFORM_WPA=1
