@@ -97,7 +97,7 @@ uint32_t encodeApsFrame(uint8_t * buffer, uint32_t buf_length, uint16_t profileI
     nextOutByte += sizeof(uint8_t);
 
     buf_length = nextOutByte;
-    printf("Encoded %"PRIu32" bytes of aps frame\n", buf_length);
+    printf("Encoded %" PRIu32 " bytes of aps frame\n", buf_length);
     return buf_length;
 }
 
@@ -111,7 +111,7 @@ uint32_t _encodeOnOffCommand(uint8_t * buffer, uint32_t buf_length, int command,
     result = encodeApsFrame(buffer, buf_length, 65535, 6, 1, destination_endpoint, 0, 0, 0, 0);
     if (result == 0 || result > buf_length)
     {
-        printf("Error encoding aps frame result %"PRIu32"\n", result);
+        printf("Error encoding aps frame result %" PRIu32 "\n", result);
         result = 0;
         return result;
     }
@@ -125,7 +125,7 @@ uint32_t _encodeOnOffCommand(uint8_t * buffer, uint32_t buf_length, int command,
 
     if (indexToWrite >= buf_length)
     {
-        printf("indexToWrite %"PRIu32"\n", indexToWrite);
+        printf("indexToWrite %" PRIu32 "\n", indexToWrite);
         return 0;
     }
     // Transaction sequence number.  Just pick something.
