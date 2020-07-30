@@ -629,10 +629,10 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     uint8_t index                        = 0;
 
     // If a custom device name has not been specified, generate a CHIP-standard name based on the
-    // bottom digits of the Chip device id.
+    // discriminator value
+    uint32_t discriminator;
+    SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
 
-    // TODO Pull this from the configuration manager
-    const uint16_t discriminator = 0x0F00;
     if (!GetFlag(mFlags, kFlag_UseCustomDeviceName))
     {
         snprintf(mDeviceName, sizeof(mDeviceName), "%s%04u", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, discriminator);

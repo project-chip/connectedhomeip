@@ -32,8 +32,8 @@
 #include <platform/internal/EventLogging.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
-#include <support/CodeUtils.h>
 #include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -54,7 +54,12 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
 
     // TODO Initialize the source used by CHIP to get secure random data.
 
-    // TODO Initialize the Configuration Manager object.
+    err = ConfigurationMgr().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Configuration Manager initialization failed: %s", ErrorStr(err));
+    }
+    SuccessOrExit(err);
 
     // Initialize the CHIP system layer.
     new (&SystemLayer) System::Layer();
