@@ -234,8 +234,8 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     [self.lock lock];
-    err = self.cppController->ConnectDevice(kRemoteDeviceId, discriminator, setupPINCode, (__bridge void *) self, onConnected,
-        onMessageReceived, onInternalError);
+    err = self.cppController->ConnectDevice(
+        kRemoteDeviceId, discriminator, setupPINCode, (__bridge void *) self, onConnected, onMessageReceived, onInternalError);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
