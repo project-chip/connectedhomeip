@@ -57,7 +57,7 @@ public:
     }
 
     /*
-     * @brief append a nulll terminated string, exclude the null term
+     * @brief append a null terminated string, exclude the null term
      */
     size_t Put(const char * s)
     {
