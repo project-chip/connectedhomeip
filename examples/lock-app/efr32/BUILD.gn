@@ -21,18 +21,6 @@ assert(current_os == "freertos")
 
 efr32_project_dir = "${chip_root}/examples/lock-app/efr32"
 
-# custom config
-config("efr32_config") {
-  cflags = [
-    "-fshort-enums",
-    "-Os",
-    "-g3",
-    "-ggdb3",
-    "--specs=nosys.specs",
-    "-Wall",
-  ]
-}
-
 efr32_sdk("sdk") {
   include_dirs = [
     "${chip_root}/src/include/platform",
@@ -44,7 +32,6 @@ efr32_sdk("sdk") {
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
     "${efr32_project_dir}/include/FreeRTOSConfig.h",
     "${efr32_project_dir}/include/hal-config.h",
-    "${efr32_sdk_root}/util/third_party/freertos/Source/include/FreeRTOS.h",
   ]
 
   defines = []
@@ -62,68 +49,14 @@ executable("lock_app") {
   lib_dirs = []
   output_name = "chip-efr32-lock-example.out"
 
-  # Remove unwanted configs
-  configs -= executable_default_configs
-  configs -= default_configs
-
-  # Add desired config
-  configs += default_configs_abi
-  configs += default_configs_size
-  configs += default_configs_aliasing
-  configs += [ ":efr32_config" ]
-
   public_deps = [
     ":sdk",
     "${chip_root}/src/lib",
   ]
 
-  include_dirs += [
-    "${efr32_project_dir}/include/",
-    "${efr32_sdk_root}/util/third_party/freertos/Source/include",
-    "${efr32_sdk_root}/platform/service/mpu/inc/",
-    "${efr32_sdk_root}/platform/service/sleeptimer/inc/",
-    "${efr32_sdk_root}/platform/service/sleeptimer/config",
-    "${efr32_sdk_root}/platform/common/inc",
-    "${efr32_sdk_root}/platform/emdrv/nvm3/inc",
-  ]
+  include_dirs += [ "${efr32_project_dir}/include/" ]
 
   sources = [
-    "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_bcc.c",
-    "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_init.c",
-    "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_stk.c",
-    "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_stk_leds.c",
-    "${efr32_sdk_root}/hardware/kit/common/drivers/mx25flash_spi.c",
-    "${efr32_sdk_root}/hardware/kit/common/drivers/retargetio.c",
-    "${efr32_sdk_root}/hardware/kit/common/drivers/retargetserial.c",
-    "${efr32_sdk_root}/platform/emdrv/dmadrv/src/dmadrv.c",
-    "${efr32_sdk_root}/platform/emdrv/gpiointerrupt/src/gpiointerrupt.c",
-    "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default.c",
-    "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_hal_flash.c",
-    "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_lock.c",
-    "${efr32_sdk_root}/platform/emdrv/sleep/src/sleep.c",
-    "${efr32_sdk_root}/platform/emdrv/uartdrv/src/uartdrv.c",
-    "${efr32_sdk_root}/platform/emdrv/ustimer/src/ustimer.c",
-    "${efr32_sdk_root}/platform/emlib/src/em_adc.c",
-    "${efr32_sdk_root}/platform/emlib/src/em_cmu.c",
-    "${efr32_sdk_root}/platform/emlib/src/em_core.c",
-    "${efr32_sdk_root}/platform/emlib/src/em_crypto.c",
-    "${efr32_sdk_root}/platform/emlib/src/em_emu.c",
-    "${efr32_sdk_root}/platform/emlib/src/em_gpio.c",
-    "${efr32_sdk_root}/platform/emlib/src/em_ldma.c",
-    "${efr32_sdk_root}/platform/emlib/src/em_leuart.c",
-    "${efr32_sdk_root}/platform/emlib/src/em_msc.c",
-    "${efr32_sdk_root}/platform/emlib/src/em_rmu.c",
-    "${efr32_sdk_root}/platform/emlib/src/em_rtcc.c",
-    "${efr32_sdk_root}/platform/emlib/src/em_system.c",
-    "${efr32_sdk_root}/platform/emlib/src/em_timer.c",
-    "${efr32_sdk_root}/platform/emlib/src/em_usart.c",
-    "${efr32_sdk_root}/platform/radio/rail_lib/hal/efr32/hal_efr.c",
-    "${efr32_sdk_root}/platform/radio/rail_lib/hal/hal_common.c",
-    "${efr32_sdk_root}/platform/service/mpu/src/sl_mpu.c",
-    "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
-    "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_rtcc.c",
-    "${efr32_sdk_root}/util/third_party/freertos/Source/include/FreeRTOS.h",
     "src/AppTask.cpp",
     "src/ButtonHandler.cpp",
     "src/LEDWidget.cpp",
@@ -138,22 +71,6 @@ executable("lock_app") {
     ldscript = "${efr32_project_dir}/ldscripts/efr32-lock-example-MG12P.ld"
   } else if (efr32_family == "efr32mg21") {
     ldscript = "${efr32_project_dir}/ldscripts/efr32-lock-example-MG21.ld"
-  }
-
-  if (efr32_family == "efr32mg12") {
-    libs = [
-      "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG12P/GCC/libbluetooth.a",
-      "${efr32_sdk_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg12_gcc_release.a",
-      "${efr32_sdk_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a",
-      "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG12P/GCC/libmbedtls.a",
-    ]
-  } else if (efr32_family == "efr32mg21") {
-    libs = [
-      "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG21/GCC/libbluetooth.a",
-      "${efr32_sdk_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg12_gcc_release.a",
-      "${efr32_sdk_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a",
-      "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG21/GCC/libmbedtls.a",
-    ]
   }
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]

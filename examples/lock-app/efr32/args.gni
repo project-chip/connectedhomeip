@@ -20,6 +20,8 @@ import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 efr32_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
+mbedtls_target = efr32_sdk_target
+
 if (efr32_family == "efr32mg12") {
   arm_float_abi = "softfp"
   arm_fpu = "fpv4-sp-d16"
@@ -27,6 +29,7 @@ if (efr32_family == "efr32mg12") {
   arm_float_abi = "hard"
   arm_fpu = "fpv5-sp-d16"
 }
+
 arm_abi = "aapcs"
 arm_cpu = "cortex-m4"
 

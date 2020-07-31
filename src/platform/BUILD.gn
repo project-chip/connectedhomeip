@@ -78,7 +78,7 @@ if (device_platform != "none") {
       defines += [
         "CONFIG_DEVICE_LAYER=1",
         "CHIP_DEVICE_LAYER_TARGET_EFR32=1",
-        "CHIP_DEVICE_LAYER_TARGET=efr32",
+        "CHIP_DEVICE_LAYER_TARGET=EFR32",
       ]
     } else {
       defines += [ "CHIP_DEVICE_LAYER_TARGET_EFR32=0" ]

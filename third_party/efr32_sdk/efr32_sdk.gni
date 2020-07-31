@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/efr32_sdk.gni")
+import("//build_overrides/mbedtls.gni")
 
 declare_args() {
   # Location of the efr32 SDK.
@@ -95,7 +96,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/radio/rail_lib/hal/efr32",
       "${efr32_sdk_root}/hardware/kit/common/bsp",
       "${efr32_sdk_root}/hardware/kit/common/drivers",
-      "${efr32_sdk_root}/platform/base/",
+      "${efr32_sdk_root}/platform/base",
       "${efr32_sdk_root}/platform/base/hal",
       "${efr32_sdk_root}/platform/base/hal/micro/cortexm3/compiler",
       "${efr32_sdk_root}/platform/base/hal/micro/cortexm3/efm32",
@@ -120,12 +121,20 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/rf/common/cortex",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions",
       "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER",
-      "${efr32_sdk_root}/util/third_party/segger/systemview/Config/",
+      "${efr32_sdk_root}/util/third_party/segger/systemview/Config",
       "${efr32_sdk_root}/util/plugin/plugin-common/fem-control",
       "${efr32_sdk_root}/protocol/bluetooth/ble_stack/inc/soc",
       "${efr32_sdk_root}/protocol/bluetooth/ble_stack/inc/common",
       "${efr32_sdk_root}/app/bluetooth/common/util",
-      "${efr32_sdk_root}/util/third_party/freertos/Source/include/",
+      "${efr32_sdk_root}/util/third_party/freertos/Source/include",
+      "${efr32_sdk_root}/platform/service/mpu/inc",
+      "${efr32_sdk_root}/platform/service/sleeptimer/inc",
+      "${efr32_sdk_root}/platform/service/sleeptimer/config",
+      "${efr32_sdk_root}/platform/common/inc",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/inc",
+
+      "${efr32_sdk_root}/util/third_party/mbedtls/include",
+      "${mbedtls_root}/repo/include",
     ]
 
     if (efr32_family == "efr32mg12") {
@@ -159,16 +168,16 @@ template("efr32_sdk") {
     }
 
     defines = [
+"__STARTUP_CLEAR_BSS",
+
       "HARD_FAULT_LOG_ENABLE",
       "RETARGET_VCOM",
       "RETARGET_USART0",
       "PLATFORM_HEADER='<hal/micro/cortexm3/compiler/gcc.h>'",
       "CORTEXM3_EFM32_MICRO",
-      "CHIP_ERROR_LOGGING=1",
-      "CHIP_PROGRESS_LOGGING=1",
-      "CHIP_DETAIL_LOGGING=1",
       "EFR32_LOG_ENABLED=1",
       "NVM3_DEFAULT_NVM_SIZE=40960",
+      "EFR32_OPENTHREAD_API",
       "${efr32_mcu}",
     ]
     if (defined(invoker.defines)) {
@@ -178,8 +187,43 @@ template("efr32_sdk") {
 
   static_library(sdk_target_name) {
     sources = [
+      "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_bcc.c",
+      "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_init.c",
+      "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_stk.c",
+      "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_stk_leds.c",
+      "${efr32_sdk_root}/hardware/kit/common/drivers/mx25flash_spi.c",
+      "${efr32_sdk_root}/hardware/kit/common/drivers/retargetio.c",
+      "${efr32_sdk_root}/hardware/kit/common/drivers/retargetserial.c",
+      "${efr32_sdk_root}/platform/emdrv/dmadrv/src/dmadrv.c",
+      "${efr32_sdk_root}/platform/emdrv/gpiointerrupt/src/gpiointerrupt.c",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default.c",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_hal_flash.c",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_lock.c",
+      "${efr32_sdk_root}/platform/emdrv/sleep/src/sleep.c",
+      "${efr32_sdk_root}/platform/emdrv/uartdrv/src/uartdrv.c",
+      "${efr32_sdk_root}/platform/emdrv/ustimer/src/ustimer.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_adc.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_cmu.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_core.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_crypto.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_emu.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_gpio.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_ldma.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_leuart.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_msc.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_rmu.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_rtcc.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_system.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_timer.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_usart.c",
+      "${efr32_sdk_root}/platform/radio/rail_lib/hal/efr32/hal_efr.c",
+      "${efr32_sdk_root}/platform/radio/rail_lib/hal/hal_common.c",
+      "${efr32_sdk_root}/platform/service/mpu/src/sl_mpu.c",
+      "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
+      "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_rtcc.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/croutine.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/event_groups.c",
+      "${efr32_sdk_root}/util/third_party/freertos/Source/include/FreeRTOS.h",
       "${efr32_sdk_root}/util/third_party/freertos/Source/list.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/portable/MemMang/heap_3.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/queue.c",
