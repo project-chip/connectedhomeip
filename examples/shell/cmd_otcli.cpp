@@ -19,6 +19,8 @@
 
 #if CHIP_ENABLE_OPENTHREAD
 
+#include <stdio.h>
+
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>
 #include <shell/shell.h>
@@ -26,11 +28,13 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 
+#if CHIP_TARGET_STYLE_EMBEDDED
 #include <openthread/cli.h>
 #include <openthread/instance.h>
 #include <openthread/ip6.h>
 #include <openthread/link.h>
 #include <openthread/thread.h>
+#endif
 
 using namespace chip;
 using namespace chip::Shell;
@@ -67,7 +71,7 @@ int cmd_otcli_dispatch(int argc, char ** argv)
 
 #if CHIP_TARGET_STYLE_UNIX
     char ctl_command[] = "/usr/local/sbin/ot-ctl ";
-    strcpy(buff, ctl_command, sizeof(ctl_command));
+    memcpy(buff, ctl_command, sizeof(ctl_command));
 
 #endif
 
@@ -101,6 +105,7 @@ int cmd_otcli_dispatch(int argc, char ** argv)
 #else
     system(buff);
 #endif
+
 exit:
     return error;
 }
@@ -118,7 +123,9 @@ static int OnOtCliInitialized(const char * aBuf, uint16_t aBufLength, void * aCo
 void cmd_otcli_init(void)
 {
 #if CHIP_ENABLE_OPENTHREAD
+#if CHIP_TARGET_STYLE_EMBEDDED
     otCliConsoleInit(GetOtInstance(), &OnOtCliInitialized, NULL);
+#endif
 
     // Register the root otcli command with the top-level shell.
     shell_register(&cmds_otcli_root, 1);
