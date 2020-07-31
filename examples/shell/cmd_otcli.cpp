@@ -60,9 +60,6 @@ int cmd_otcli_help(int argc, char ** argv)
 int cmd_otcli_dispatch(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-
-    VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-
 // From OT CLI internal lib, kMaxLineLength = 128
 #define kMaxLineLength 128
     char buff[kMaxLineLength] = { 0 };
@@ -72,8 +69,10 @@ int cmd_otcli_dispatch(int argc, char ** argv)
 #if CHIP_TARGET_STYLE_UNIX
     char ctl_command[] = "/usr/local/sbin/ot-ctl ";
     memcpy(buff, ctl_command, sizeof(ctl_command));
-
+    buff_ptr += sizeof(ctl_command) - 1;
 #endif
+
+    VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     for (i = 0; i < argc; i++)
     {
@@ -99,10 +98,12 @@ int cmd_otcli_dispatch(int argc, char ** argv)
             break;
         }
     }
+    buff_ptr = 0;
 
 #if CHIP_TARGET_STYLE_EMBEDDED
     otCliConsoleInputLine(buff, buff_ptr - buff);
 #else
+    streamer_printf(streamer_get(), "Exec: %s\n\r", buff);
     system(buff);
 #endif
 
@@ -112,11 +113,13 @@ exit:
 
 static const shell_command_t cmds_otcli_root = { &cmd_otcli_dispatch, "otcli", "Dispatch OpenThread CLI command" };
 
+#if CHIP_TARGET_STYLE_EMBEDDED
 static int OnOtCliInitialized(const char * aBuf, uint16_t aBufLength, void * aContext)
 {
     ChipLogProgress(chipTool, "%s", aBuf);
     return 0;
 }
+#endif
 
 #endif // CHIP_ENABLE_OPENTHREAD
 
