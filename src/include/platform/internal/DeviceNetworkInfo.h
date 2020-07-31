@@ -57,20 +57,20 @@ enum
  */
 enum WiFiAuthSecurityType
 {
-    kWiFiSecurityType_NotSpecified              = -1,
+    kWiFiSecurityType_NotSpecified = -1,
 
-    kWiFiSecurityType_None                      = 1,
-    kWiFiSecurityType_WEP                       = 2,
-    kWiFiSecurityType_WPAPersonal               = 3,
-    kWiFiSecurityType_WPA2Personal              = 4,
-    kWiFiSecurityType_WPA2MixedPersonal         = 5,
-    kWiFiSecurityType_WPAEnterprise             = 6,
-    kWiFiSecurityType_WPA2Enterprise            = 7,
-    kWiFiSecurityType_WPA2MixedEnterprise       = 8,
-    kWiFiSecurityType_WPA3Personal              = 9,
-    kWiFiSecurityType_WPA3MixedPersonal         = 10,
-    kWiFiSecurityType_WPA3Enterprise            = 11,
-    kWiFiSecurityType_WPA3MixedEnterprise       = 12,
+    kWiFiSecurityType_None                = 1,
+    kWiFiSecurityType_WEP                 = 2,
+    kWiFiSecurityType_WPAPersonal         = 3,
+    kWiFiSecurityType_WPA2Personal        = 4,
+    kWiFiSecurityType_WPA2MixedPersonal   = 5,
+    kWiFiSecurityType_WPAEnterprise       = 6,
+    kWiFiSecurityType_WPA2Enterprise      = 7,
+    kWiFiSecurityType_WPA2MixedEnterprise = 8,
+    kWiFiSecurityType_WPA3Personal        = 9,
+    kWiFiSecurityType_WPA3MixedPersonal   = 10,
+    kWiFiSecurityType_WPA3Enterprise      = 11,
+    kWiFiSecurityType_WPA3MixedEnterprise = 12,
 };
 
 class DeviceNetworkInfo
