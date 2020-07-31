@@ -43,7 +43,7 @@ public:
     bool expect(const void * val, size_t written, size_t available)
     {
         // check guards
-        for (int i = mLen + 1; i < sizeof(mBuf); i++)
+        for (size_t i = mLen + 1; i < sizeof(mBuf); i++)
         {
             if (mBuf[i] != kGuard)
             {
