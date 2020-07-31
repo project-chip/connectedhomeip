@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,11 +18,15 @@
 /**
  *    @file
  *          Provides an generic implementation of ConnectivityManager features
- *          for use on platforms that don't have WiFi.
+ *          for use on platforms that support WiFi.
  */
 
-#ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_WIFI_H
-#define GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_WIFI_H
+#ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_WIFI_H
+#define GENERIC_CONNECTIVITY_MANAGER_IMPL_WIFI_H
+
+#include <platform/ConnectivityManager.h>
+#include <platform/internal/DeviceNetworkInfo.h>
+#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -48,22 +51,19 @@ namespace Internal {
  * ```
  */
 template <class ImplClass>
-class GenericConnectivityManagerImpl_NoWiFi
+class GenericConnectivityManagerImpl_WiFi
 {
 public:
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
     ConnectivityManager::WiFiStationMode _GetWiFiStationMode(void);
-    CHIP_ERROR _SetWiFiStationMode(ConnectivityManager::WiFiStationMode val);
     bool _IsWiFiStationEnabled(void);
     bool _IsWiFiStationApplicationControlled(void);
-    bool _IsWiFiStationConnected(void);
     bool _HaveIPv4InternetConnectivity(void);
     bool _HaveIPv6InternetConnectivity(void);
     uint32_t _GetWiFiStationReconnectIntervalMS(void);
     CHIP_ERROR _SetWiFiStationReconnectIntervalMS(uint32_t val);
     bool _IsWiFiStationProvisioned(void);
-    void _ClearWiFiStationProvision(void);
     ConnectivityManager::WiFiAPMode _GetWiFiAPMode(void);
     CHIP_ERROR _SetWiFiAPMode(ConnectivityManager::WiFiAPMode val);
     bool _IsWiFiAPActive(void);
@@ -80,143 +80,136 @@ public:
     static const char * _WiFiStationModeToStr(ConnectivityManager::WiFiStationMode mode);
     static const char * _WiFiAPModeToStr(ConnectivityManager::WiFiAPMode mode);
 
+protected:
+    enum Flags
+    {
+        kFlag_HaveIPv4InternetConnectivity = 0x0001,
+        kFlag_HaveIPv6InternetConnectivity = 0x0002,
+        kFlag_AwaitingConnectivity         = 0x0010,
+    };
+
+    DeviceNetworkInfo mWiFiNetworkInfo;
+    ConnectivityManager::WiFiStationMode mWiFiStationMode;
+    uint16_t mFlags;
+    bool mWiFiProvisioned = false;
+    bool mWiFiScanPending = false;
+
 private:
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
 
 template <class ImplClass>
-inline ConnectivityManager::WiFiStationMode GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiStationMode(void)
+inline ConnectivityManager::WiFiStationMode GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetWiFiStationMode(void)
 {
-    return ConnectivityManager::kWiFiStationMode_NotSupported;
+    return mWiFiStationMode;;
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_SetWiFiStationMode(ConnectivityManager::WiFiStationMode val)
+inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiStationApplicationControlled(void)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    return mWiFiStationMode == ConnectivityManager::kWiFiStationMode_ApplicationControlled;
 }
 
 template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_IsWiFiStationEnabled(void)
+inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_HaveIPv4InternetConnectivity(void)
 {
-    return false;
+    return (mFlags & kFlag_HaveIPv4InternetConnectivity) != 0;
 }
 
 template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_IsWiFiStationConnected(void)
+inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_HaveIPv6InternetConnectivity(void)
 {
-    return false;
+    return (mFlags & kFlag_HaveIPv6InternetConnectivity) != 0;
 }
 
 template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_HaveIPv4InternetConnectivity(void)
-{
-    return false;
-}
-
-template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_HaveIPv6InternetConnectivity(void)
-{
-    return false;
-}
-
-template <class ImplClass>
-inline uint32_t GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiStationReconnectIntervalMS(void)
+inline uint32_t GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetWiFiStationReconnectIntervalMS(void)
 {
     return 0;
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_SetWiFiStationReconnectIntervalMS(uint32_t val)
+inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_SetWiFiStationReconnectIntervalMS(uint32_t val)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_IsWiFiStationProvisioned(void)
+inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiStationProvisioned(void)
 {
-    return false;
+    return mWiFiProvisioned;
 }
 
 template <class ImplClass>
-inline void GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_ClearWiFiStationProvision(void)
-{}
-
-template <class ImplClass>
-inline ConnectivityManager::WiFiAPMode GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiAPMode(void)
+inline ConnectivityManager::WiFiAPMode GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetWiFiAPMode(void)
 {
     return ConnectivityManager::kWiFiAPMode_NotSupported;
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_SetWiFiAPMode(ConnectivityManager::WiFiAPMode val)
+inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_SetWiFiAPMode(ConnectivityManager::WiFiAPMode val)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_IsWiFiAPActive(void)
+inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiAPActive(void)
 {
     return false;
 }
 
 template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_IsWiFiAPApplicationControlled(void)
+inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiAPApplicationControlled(void)
 {
     return false;
 }
 
 template <class ImplClass>
-inline void GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_DemandStartWiFiAP(void)
+inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_DemandStartWiFiAP(void)
 {}
 
 template <class ImplClass>
-inline void GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_StopOnDemandWiFiAP(void)
+inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_StopOnDemandWiFiAP(void)
 {}
 
 template <class ImplClass>
-inline void GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_MaintainOnDemandWiFiAP(void)
+inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_MaintainOnDemandWiFiAP(void)
 {}
 
 template <class ImplClass>
-inline uint32_t GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiAPIdleTimeoutMS(void)
+inline uint32_t GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetWiFiAPIdleTimeoutMS(void)
 {
     return 0;
 }
 
 template <class ImplClass>
-inline void GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_SetWiFiAPIdleTimeoutMS(uint32_t val)
+inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_SetWiFiAPIdleTimeoutMS(uint32_t val)
 {}
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetAndLogWifiStatsCounters(void)
+inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetAndLogWifiStatsCounters(void)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_CanStartWiFiScan()
+inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_CanStartWiFiScan()
 {
     return false;
 }
 
 template <class ImplClass>
-inline void GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_OnWiFiScanDone()
-{}
-
-template <class ImplClass>
-inline void GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_OnWiFiStationProvisionChange()
-{}
-
-template <class ImplClass>
-inline const char *
-GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_WiFiStationModeToStr(ConnectivityManager::WiFiStationMode mode)
+inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_OnWiFiScanDone()
 {
-    return NULL;
+    mWiFiScanPending = false;
 }
 
 template <class ImplClass>
-inline const char * GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_WiFiAPModeToStr(ConnectivityManager::WiFiAPMode mode)
+inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_OnWiFiStationProvisionChange()
+{}
+
+template <class ImplClass>
+inline const char * GenericConnectivityManagerImpl_WiFi<ImplClass>::_WiFiAPModeToStr(ConnectivityManager::WiFiAPMode mode)
 {
     return NULL;
 }
@@ -225,4 +218,4 @@ inline const char * GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_WiFiAPMod
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_WIFI_H
+#endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_WIFI_H
