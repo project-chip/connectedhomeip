@@ -205,11 +205,11 @@ TestInetLayerMulticast_LDADD                          = libTestInetCommon.a $(CO
 #
 
 NLFOREIGN_FILE_DEPENDENCIES                           = \
-   $(top_builddir)/src/include/CHIPVersion.h            \
    $(CHIP_LDADD)                                        \
    $(NULL)
 
 NLFOREIGN_SUBDIR_DEPENDENCIES                         = \
+   $(top_builddir)/src/include                          \
    $(LWIP_FOREIGN_SUBDIR_DEPENDENCY)                    \
    $(NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY)        \
    $(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY)             \

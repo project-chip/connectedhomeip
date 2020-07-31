@@ -17,26 +17,15 @@
 
 /**
  *    @file
- *      This file declares test entry points for CHIP support library
- *      unit tests.
+ *      This file implements a standalone/native program executable
+ *      test driver for the support library argument parser unit
+ *      tests.
  *
  */
 
-#ifndef TESTSUPPORT_H
-#define TESTSUPPORT_H
+#include "TestSupport.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-int TestCHIPArgParser(void);
-int TestErrorStr(void);
-int TestTimeUtils(void);
-int TestMemAlloc(void);
-int TestBufBound(void);
-
-#ifdef __cplusplus
+int main(void)
+{
+    return TestBufBound();
 }
-#endif
-
-#endif // TESTSUPPORT_H
