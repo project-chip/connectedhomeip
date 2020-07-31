@@ -101,7 +101,7 @@ private:
 template <class ImplClass>
 inline ConnectivityManager::WiFiStationMode GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetWiFiStationMode(void)
 {
-    return mWiFiStationMode;;
+    return mWiFiStationMode;
 }
 
 template <class ImplClass>
