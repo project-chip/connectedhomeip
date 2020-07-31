@@ -129,7 +129,7 @@ static void TestBufBound_PutLE(nlTestSuite * inSuite, void * inContext)
     {
         BBTest bb(8);
 
-        bb.PutLE(0x0102030405060708ull);
+        bb.PutLE((uint64_t) 0x0102030405060708ull);
 
         NL_TEST_ASSERT(inSuite, bb.expect("\x08\x07\x06\x05\x04\x03\x02\x01", 8, 0));
     }
@@ -165,7 +165,7 @@ static void TestBufBound_PutBE(nlTestSuite * inSuite, void * inContext)
     {
         BBTest bb(8);
 
-        bb.PutBE(0x0102030405060708ull);
+        bb.PutBE((uint64_t) 0x0102030405060708ull);
 
         NL_TEST_ASSERT(inSuite, bb.expect("\x01\x02\x03\x04\x05\x06\x07\x08", 8, 0));
     }
