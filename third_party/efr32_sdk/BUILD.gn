@@ -23,5 +23,5 @@ declare_args() {
 assert(efr32_sdk_target != "", "efr32_sdk_target must be specified")
 
 group("efr32_sdk") {
-    public_deps = [efr32_sdk_target]
+  public_deps = [ efr32_sdk_target ]
 }

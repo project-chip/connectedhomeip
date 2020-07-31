@@ -235,7 +235,6 @@ if (device_platform != "none") {
       }
     } else if (device_platform == "efr32") {
       sources += [
-        "FreeRTOS/SystemTimeSupport.cpp",
         "EFR32/BLEManagerImpl.cpp",
         "EFR32/BLEManagerImpl.h",
         "EFR32/BlePlatformConfig.h",
@@ -246,17 +245,18 @@ if (device_platform != "none") {
         "EFR32/ConfigurationManagerImpl.h",
         "EFR32/ConnectivityManagerImpl.cpp",
         "EFR32/ConnectivityManagerImpl.h",
+        "EFR32/EFR32Config.cpp",
+        "EFR32/EFR32Config.h",
         "EFR32/InetPlatformConfig.h",
         "EFR32/Logging.cpp",
         "EFR32/PlatformManagerImpl.cpp",
         "EFR32/PlatformManagerImpl.h",
         "EFR32/SystemPlatformConfig.h",
-        "EFR32/EFR32Config.cpp",
-        "EFR32/EFR32Config.h",
         "EFR32/freertos_bluetooth.c",
         "EFR32/freertos_bluetooth.h",
         "EFR32/gatt_db.c",
         "EFR32/gatt_db.h",
+        "FreeRTOS/SystemTimeSupport.cpp",
       ]
       if (chip_enable_openthread) {
         sources += [

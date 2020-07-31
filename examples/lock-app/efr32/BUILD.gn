@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/defaults.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
-import("//build/config/defaults.gni")
 
 assert(current_os == "freertos")
 
 efr32_project_dir = "${chip_root}/examples/lock-app/efr32"
 
 # custom config
-config("efr32_config"){
+config("efr32_config") {
   cflags = [
     "-fshort-enums",
     "-Os",
@@ -32,7 +32,6 @@ config("efr32_config"){
     "-Wall",
   ]
 }
-
 
 efr32_sdk("sdk") {
   include_dirs = [
@@ -71,7 +70,7 @@ executable("lock_app") {
   configs += default_configs_abi
   configs += default_configs_size
   configs += default_configs_aliasing
-  configs += [":efr32_config"]
+  configs += [ ":efr32_config" ]
 
   public_deps = [
     ":sdk",
@@ -89,24 +88,20 @@ executable("lock_app") {
   ]
 
   sources = [
-    "src/main.cpp",
-    "src/LEDWidget.cpp",
-    "src/AppTask.cpp",
-    "src/ButtonHandler.cpp",
-    "src/init_mcu.c",
-    "src/init_board.c",
-    "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_lock.c",
-    "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default.c",
-    "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_hal_flash.c",
-    "${efr32_sdk_root}/platform/emdrv/sleep/src/sleep.c",
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${efr32_sdk_root}/util/third_party/freertos/Source/include/FreeRTOS.h",
     "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_bcc.c",
     "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_init.c",
     "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_stk.c",
     "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_stk_leds.c",
+    "${efr32_sdk_root}/hardware/kit/common/drivers/mx25flash_spi.c",
+    "${efr32_sdk_root}/hardware/kit/common/drivers/retargetio.c",
+    "${efr32_sdk_root}/hardware/kit/common/drivers/retargetserial.c",
     "${efr32_sdk_root}/platform/emdrv/dmadrv/src/dmadrv.c",
     "${efr32_sdk_root}/platform/emdrv/gpiointerrupt/src/gpiointerrupt.c",
+    "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default.c",
+    "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_hal_flash.c",
+    "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_lock.c",
+    "${efr32_sdk_root}/platform/emdrv/sleep/src/sleep.c",
     "${efr32_sdk_root}/platform/emdrv/uartdrv/src/uartdrv.c",
     "${efr32_sdk_root}/platform/emdrv/ustimer/src/ustimer.c",
     "${efr32_sdk_root}/platform/emlib/src/em_adc.c",
@@ -128,11 +123,13 @@ executable("lock_app") {
     "${efr32_sdk_root}/platform/service/mpu/src/sl_mpu.c",
     "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
     "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_rtcc.c",
-    "${efr32_sdk_root}/hardware/kit/common/drivers/mx25flash_spi.c",
-    "${efr32_sdk_root}/hardware/kit/common/drivers/retargetio.c",
-    "${efr32_sdk_root}/hardware/kit/common/drivers/retargetserial.c",
-
-
+    "${efr32_sdk_root}/util/third_party/freertos/Source/include/FreeRTOS.h",
+    "src/AppTask.cpp",
+    "src/ButtonHandler.cpp",
+    "src/LEDWidget.cpp",
+    "src/init_board.c",
+    "src/init_mcu.c",
+    "src/main.cpp",
   ]
 
   output_dir = root_out_dir
@@ -148,19 +145,18 @@ executable("lock_app") {
       "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG12P/GCC/libbluetooth.a",
       "${efr32_sdk_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg12_gcc_release.a",
       "${efr32_sdk_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a",
-      "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG12P/GCC/libmbedtls.a"
+      "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG12P/GCC/libmbedtls.a",
     ]
   } else if (efr32_family == "efr32mg21") {
     libs = [
       "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG21/GCC/libbluetooth.a",
       "${efr32_sdk_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg12_gcc_release.a",
       "${efr32_sdk_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a",
-      "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG21/GCC/libmbedtls.a"
+      "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG21/GCC/libmbedtls.a",
     ]
   }
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
-
 }
 
 group("efr32") {
