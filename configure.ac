@@ -2121,15 +2121,19 @@ fi
 # GIO
 #
 
+CHIP_ENABLE_GIO=0
+
 if test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1; then
     PKG_CHECK_MODULES([GIO], [gio-2.0])
 
     # Check for GIO library is available.
     AC_CHECK_LIB([gio-2.0], [g_bus_get_sync],
     [
+        CHIP_ENABLE_GIO=1
         AC_DEFINE([CHIP_WITH_GIO], [1], [Define to 1 to build CHIP with GIO])
     ],
     [
+        CHIP_ENABLE_GIO=0
         AC_DEFINE([CHIP_WITH_GIO], [0], [Define to 0 to build CHIP without GIO])
     ]
     )
@@ -2138,6 +2142,34 @@ if test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1; then
 
     AC_CHECK_PROG(GDBUSCODEGEN, gdbus-codegen, gdbus-codegen)
 fi
+
+#
+#
+# WPA
+#
+
+CONFIG_WIFI_PLATFORM_WPA=0
+enable_chipwifi_wpa="no"
+
+# At this time, enable this only for linux, and only if the GIO package are installed. Currently, WiFi and Thread
+# are depending on the gdbus-internal configured by internal BLuez package. 
+# TODO: Refacrot BLuez to use common gdbus lib from GIO.
+
+if test "${with_device_layer}" = "linux" && test "${CHIP_ENABLE_GIO}" = 1 && test "${CONFIG_BLE_PLATFORM_BLUEZ}" = 1; then
+case "${target}" in
+    *linux*)
+        CONFIG_WIFI_PLATFORM_WPA=1
+        enable_chipwifi_wpa="yes"
+        ;;
+    *)
+        CONFIG_WIFI_PLATFORM_WPA=0
+        enable_chipwifi_wpa="no"
+        ;;
+    esac
+fi
+
+AM_CONDITIONAL([CONFIG_WIFI_PLATFORM_WPA], [test "${enable_chipwifi_wpa}" = "yes"])
+AC_DEFINE_UNQUOTED([CHIP_DEVICE_CONFIG_ENABLE_WPA],[${CONFIG_WIFI_PLATFORM_WPA}],[Define to 1 if you want to enable WPA support for wpa_supplicant.])
 
 #
 # Sockets
