@@ -41,6 +41,10 @@ efr32_sdk("sdk") {
     defines += [ "BUILD_RELEASE=1" ]
   }
 
+  if (efr32_board == "BRD4166A") {
+    defines += ["BSP_CLOCK_USE_SDK"]
+  }
+
   defines += [ "USE_APP_CONFIG" ]
 }
 

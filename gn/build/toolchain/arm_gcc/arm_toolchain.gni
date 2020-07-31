@@ -20,7 +20,6 @@ template("arm_toolchain") {
     ar = _tool_name_root + "ar"
     cc = _tool_name_root + "gcc"
     cxx = _tool_name_root + "g++"
-    link = _tool_name_root + "ld"
 
     toolchain_args = {
       current_cpu = "arm"

@@ -35,8 +35,6 @@ using namespace chip::DeviceLayer;
 
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
-static SemaphoreHandle_t sChipEventLock;
-
 static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
 
@@ -51,8 +49,6 @@ static bool sIsPairedToAccount                = false;
 static bool sIsServiceSubscriptionEstablished = false;
 static bool sHaveBLEConnections               = false;
 static bool sHaveServiceConnectivity          = false;
-
-static char sPackageSpecification[] = "Lock Example App";
 
 AppTask AppTask::sAppTask;
 
@@ -190,7 +186,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::LockActionEventHandler(AppEvent * aEvent)
 {
-    bool initiated = false;
     BoltLockManager::Action_t action;
     // int32_t actor;
     int err = CHIP_NO_ERROR;
