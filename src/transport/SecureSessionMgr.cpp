@@ -129,7 +129,7 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBu
         const size_t headerSize = header.EncryptedHeaderSizeBytes();
         size_t actualEncodedHeaderSize;
         size_t totalLen = 0;
-        size_t taglen = 0;
+        size_t taglen   = 0;
 
         header
             .SetSourceNodeId(mLocalNodeId)              //
@@ -260,7 +260,7 @@ void SecureSessionMgrBase::HandleDataReceived(MessageHeader & header, const Peer
         uint16_t len            = msg->TotalLength();
         const size_t headerSize = header.EncryptedHeaderSizeBytes();
         size_t decodedSize      = 0;
-        size_t taglen = 0;
+        size_t taglen           = 0;
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         /* This is a workaround for the case where PacketBuffer payload is not
            allocated as an inline buffer to PacketBuffer structure */
@@ -271,8 +271,7 @@ void SecureSessionMgrBase::HandleDataReceived(MessageHeader & header, const Peer
         plainText = msg->Start();
 
         err = header.DecodeMACTag(&data[header.GetPayloadLength()], kMaxTagLen, &taglen);
-        VerifyOrExit(err == CHIP_NO_ERROR,
-                     ChipLogProgress(Inet, "Secure transport failed to decode MAC Tag: err %d", err));
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Inet, "Secure transport failed to decode MAC Tag: err %d", err));
         len -= taglen;
         msg->SetDataLength(len, NULL);
 
