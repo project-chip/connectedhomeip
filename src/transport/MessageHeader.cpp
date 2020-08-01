@@ -191,9 +191,9 @@ exit:
 
 CHIP_ERROR MessageHeader::DecodeMACTag(const uint8_t * data, size_t size, size_t * decode_len)
 {
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    const uint8_t * p = data;
-    const size_t taglen   = TagLenForEncryptionType(mEncryptionType);
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    const uint8_t * p   = data;
+    const size_t taglen = TagLenForEncryptionType(mEncryptionType);
 
     VerifyOrExit(taglen != 0, err = CHIP_ERROR_WRONG_ENCRYPTION_TYPE_FROM_PEER);
     VerifyOrExit(size >= taglen, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -266,8 +266,8 @@ exit:
 
 CHIP_ERROR MessageHeader::EncodeMACTag(uint8_t * data, size_t size, size_t * encode_size) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t * p    = data;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    uint8_t * p         = data;
     const size_t taglen = TagLenForEncryptionType(mEncryptionType);
 
     VerifyOrExit(taglen != 0, err = CHIP_ERROR_WRONG_ENCRYPTION_TYPE);
