@@ -30,13 +30,21 @@
 /**********************************************
  * Header format (little endian):
  *
- *  16 bit: | VERSION: 4 bit | FLAGS: 4 bit | RESERVED: 8 bit |
- *  16 bit: | Secure message type                             |
- *  32 bit: | MESSAGE_ID                                      |
- *  32 bit: | Secure Session ID                               |
- *  64 bit: | Message Authentication Tag                      |
- *  64 bit: | SOURCE_NODE_ID (iff source node flag is set)    |
- *  64 bit: | DEST_NODE_ID (iff destination node flag is set) |
+ * -------- Unencrypted header -----------------------------------------------------
+ *  16 bit: | VERSION: 4 bit | FLAGS: 4 bit | ENCRYPTTYPE: 4 bit | RESERVED: 4 bit |
+ *  32 bit: | MESSAGE_ID                                                           |
+ *  64 bit: | SOURCE_NODE_ID (iff source node flag is set)                         |
+ *  64 bit: | DEST_NODE_ID (iff destination node flag is set)                      |
+ *  16 bit: | Encryption Key ID                                                    |
+ *  16 bit: | Payload Length                                                       |
+ * -------- Encrypted header -------------------------------------------------------
+ *  8 bit:  | Exchange Header                                                      |
+ *  8 bit:  | Exchange Message Type                                                |
+ *  16 bit: | Exchange ID                                                          |
+ * -------- Encrypted Application Data Start ---------------------------------------
+ *  <var>:  | Encrypted Data                                                       |
+ * -------- Encrypted Application Data End -----------------------------------------
+ *  <var>:  | (Unencrypted) Message Authentication Tag                             |
  *
  **********************************************/
 
@@ -46,7 +54,10 @@ namespace {
 using namespace chip::Encoding;
 
 /// size of the fixed portion of the header
-constexpr size_t kFixedHeaderSizeBytes = 20;
+constexpr size_t kFixedUnencryptedHeaderSizeBytes = 10;
+
+/// size of the encrypted portion of the header
+constexpr size_t kEncryptedHeaderSizeBytes = 4;
 
 /// size of a serialized node id inside a header
 constexpr size_t kNodeIdSizeBytes = 8;
@@ -61,11 +72,16 @@ constexpr uint16_t kVersionMask = 0xF000;
 /// Shift to convert to/from a masked version 16bit value to a 4bit version.
 constexpr int kVersionShift = 12;
 
+/// Mask to extract just the encryption type part from a 16bit header prefix.
+constexpr uint16_t kEncryptionTypeMask = 0xF0;
+/// Shift to convert to/from a masked encryption type 16bit value to a 4bit encryption type.
+constexpr int kEncryptionTypeShift = 4;
+
 } // namespace
 
 size_t MessageHeader::EncodeSizeBytes() const
 {
-    size_t size = kFixedHeaderSizeBytes;
+    size_t size = kFixedUnencryptedHeaderSizeBytes;
 
     if (mSourceNodeId.HasValue())
     {
@@ -80,6 +96,29 @@ size_t MessageHeader::EncodeSizeBytes() const
     return size;
 }
 
+size_t MessageHeader::EncryptedHeaderSizeBytes() const
+{
+    return kEncryptedHeaderSizeBytes;
+}
+
+size_t MessageHeader::TagLenForEncryptionType(EncryptionType encType) const
+{
+    switch (encType)
+    {
+    case EncryptionType::kAESCCMTagLen8:
+        return 8;
+
+    case EncryptionType::kAESCCMTagLen12:
+        return 12;
+
+    case EncryptionType::kAESCCMTagLen16:
+        return 16;
+
+    default:
+        return 0;
+    }
+}
+
 CHIP_ERROR MessageHeader::Decode(const uint8_t * data, size_t size, size_t * decode_len)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
@@ -87,19 +126,15 @@ CHIP_ERROR MessageHeader::Decode(const uint8_t * data, size_t size, size_t * dec
     uint16_t header;
     int version;
 
-    VerifyOrExit(size >= kFixedHeaderSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(size >= kFixedUnencryptedHeaderSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     header  = LittleEndian::Read16(p);
     version = ((header & kVersionMask) >> kVersionShift);
     VerifyOrExit(version == kHeaderVersion, err = CHIP_ERROR_VERSION_MISMATCH);
 
-    mSecureMsgType   = LittleEndian::Read16(p);
-    mMessageId       = LittleEndian::Read32(p);
-    mSecureSessionID = LittleEndian::Read32(p);
-    mTag             = LittleEndian::Read64(p);
+    mEncryptionType = (EncryptionType)((header & kEncryptionTypeMask) >> kEncryptionTypeShift);
 
-    assert(p - data == kFixedHeaderSizeBytes);
-    size -= kFixedHeaderSizeBytes;
+    mMessageId = LittleEndian::Read32(p);
 
     if (header & kFlagSourceNodeIdPresent)
     {
@@ -123,7 +158,49 @@ CHIP_ERROR MessageHeader::Decode(const uint8_t * data, size_t size, size_t * dec
         mDestinationNodeId.ClearValue();
     }
 
+    VerifyOrExit(size >= sizeof(uint16_t) * 2, err = CHIP_ERROR_INVALID_ARGUMENT);
+    mEncryptionKeyID = LittleEndian::Read16(p);
+    mPayloadLength   = LittleEndian::Read16(p);
+
     *decode_len = p - data;
+
+exit:
+
+    return err;
+}
+
+CHIP_ERROR MessageHeader::DecodeEncryptedHeader(const uint8_t * data, size_t size, size_t * decode_len)
+{
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    const uint8_t * p = data;
+
+    VerifyOrExit(size >= kEncryptedHeaderSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    mExchangeHeader  = Read8(p);
+    mExchangeMsgType = Read8(p);
+    mExchangeID      = LittleEndian::Read16(p);
+
+    size -= kEncryptedHeaderSizeBytes;
+
+    *decode_len = p - data;
+
+exit:
+
+    return err;
+}
+
+CHIP_ERROR MessageHeader::DecodeMACTag(const uint8_t * data, size_t size, size_t * decode_len)
+{
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    const uint8_t * p = data;
+    const size_t taglen   = TagLenForEncryptionType(mEncryptionType);
+
+    VerifyOrExit(taglen != 0, err = CHIP_ERROR_WRONG_ENCRYPTION_TYPE_FROM_PEER);
+    VerifyOrExit(size >= taglen, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    memcpy(&mTag[0], p, taglen);
+
+    *decode_len = taglen;
 
 exit:
 
@@ -147,11 +224,10 @@ CHIP_ERROR MessageHeader::Encode(uint8_t * data, size_t size, size_t * encode_si
         header |= kFlagDestinationNodeIdPresent;
     }
 
+    header |= (((uint16_t) mEncryptionType << kEncryptionTypeShift) & kEncryptionTypeMask);
+
     LittleEndian::Write16(p, header);
-    LittleEndian::Write16(p, mSecureMsgType);
     LittleEndian::Write32(p, mMessageId);
-    LittleEndian::Write32(p, mSecureSessionID);
-    LittleEndian::Write64(p, mTag);
     if (mSourceNodeId.HasValue())
     {
         LittleEndian::Write64(p, mSourceNodeId.Value());
@@ -161,8 +237,46 @@ CHIP_ERROR MessageHeader::Encode(uint8_t * data, size_t size, size_t * encode_si
         LittleEndian::Write64(p, mDestinationNodeId.Value());
     }
 
+    LittleEndian::Write16(p, mEncryptionKeyID);
+    LittleEndian::Write16(p, mPayloadLength);
+
     // Written data size provided to caller on success
     *encode_size = p - data;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR MessageHeader::EncodeEncryptedHeader(uint8_t * data, size_t size, size_t * encode_size) const
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t * p    = data;
+    VerifyOrExit(size >= kEncryptedHeaderSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    Write8(p, mExchangeHeader);
+    Write8(p, mExchangeMsgType);
+    LittleEndian::Write16(p, mExchangeID);
+
+    // Written data size provided to caller on success
+    *encode_size = p - data;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR MessageHeader::EncodeMACTag(uint8_t * data, size_t size, size_t * encode_size) const
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t * p    = data;
+    const size_t taglen = TagLenForEncryptionType(mEncryptionType);
+
+    VerifyOrExit(taglen != 0, err = CHIP_ERROR_WRONG_ENCRYPTION_TYPE);
+    VerifyOrExit(size >= taglen, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    memcpy(p, &mTag[0], taglen);
+
+    // Written data size provided to caller on success
+    *encode_size = taglen;
 
 exit:
     return err;

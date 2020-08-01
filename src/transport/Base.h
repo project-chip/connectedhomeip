@@ -52,8 +52,7 @@ public:
      *
      */
     template <class T>
-    void SetMessageReceiveHandler(void (*handler)(const MessageHeader &, const PeerAddress &, System::PacketBuffer *, T *),
-                                  T * param)
+    void SetMessageReceiveHandler(void (*handler)(MessageHeader &, const PeerAddress &, System::PacketBuffer *, T *), T * param)
     {
         mMessageReceivedArgument = param;
         OnMessageReceived        = reinterpret_cast<MessageReceiveHandler>(handler);
