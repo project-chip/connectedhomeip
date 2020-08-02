@@ -57,13 +57,13 @@ public:
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
     ConnectivityManager::WiFiStationMode _GetWiFiStationMode(void);
+    CHIP_ERROR _SetWiFiStationMode(ConnectivityManager::WiFiStationMode val);
     bool _IsWiFiStationEnabled(void);
     bool _IsWiFiStationApplicationControlled(void);
-    bool _HaveIPv4InternetConnectivity(void);
-    bool _HaveIPv6InternetConnectivity(void);
     uint32_t _GetWiFiStationReconnectIntervalMS(void);
     CHIP_ERROR _SetWiFiStationReconnectIntervalMS(uint32_t val);
     bool _IsWiFiStationProvisioned(void);
+    void _ClearWiFiStationProvision(void);
     ConnectivityManager::WiFiAPMode _GetWiFiAPMode(void);
     CHIP_ERROR _SetWiFiAPMode(ConnectivityManager::WiFiAPMode val);
     bool _IsWiFiAPActive(void);
@@ -90,9 +90,8 @@ protected:
 
     DeviceNetworkInfo mWiFiNetworkInfo;
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
-    uint16_t mFlags;
-    bool mWiFiProvisioned = false;
-    bool mWiFiScanPending = false;
+    bool mWiFiProvisioned;
+    bool mWiFiScanPending;
 
 private:
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
@@ -111,18 +110,6 @@ inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiStationApplic
 }
 
 template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_HaveIPv4InternetConnectivity(void)
-{
-    return (mFlags & kFlag_HaveIPv4InternetConnectivity) != 0;
-}
-
-template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_HaveIPv6InternetConnectivity(void)
-{
-    return (mFlags & kFlag_HaveIPv6InternetConnectivity) != 0;
-}
-
-template <class ImplClass>
 inline uint32_t GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetWiFiStationReconnectIntervalMS(void)
 {
     return 0;
@@ -138,6 +125,12 @@ template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiStationProvisioned(void)
 {
     return mWiFiProvisioned;
+}
+
+template <class ImplClass>
+inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_ClearWiFiStationProvision(void)
+{
+    mWiFiProvisioned = false;
 }
 
 template <class ImplClass>
