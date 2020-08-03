@@ -74,7 +74,7 @@ public:
     uint16_t GetPayloadLength() const { return mPayloadLength; }
 
     /** Get the secure msg type from this header. */
-    uint8_t GetExchangeMsgType(void) const { return mExchangeMsgType; }
+    uint8_t GetMessageType(void) const { return mMessageType; }
 
     /** Get the Session ID from this header. */
     uint16_t GetExchangeID(void) const { return mExchangeID; }
@@ -147,9 +147,9 @@ public:
     }
 
     /** Set the secure message type for this header. */
-    MessageHeader & SetExchangeMsgType(uint8_t type)
+    MessageHeader & SetMessageType(uint8_t type)
     {
-        mExchangeMsgType = type;
+        mMessageType = type;
         return *this;
     }
 
@@ -308,7 +308,7 @@ private:
 
     /// Packet type (application data, security control packets, e.g. pairing,
     /// configuration, rekey etc)
-    uint8_t mExchangeMsgType = 0;
+    uint8_t mMessageType = 0;
 
     /// Security session identifier
     uint16_t mExchangeID = 0;

@@ -39,7 +39,7 @@
  *  16 bit: | Payload Length                                                       |
  * -------- Encrypted header -------------------------------------------------------
  *  8 bit:  | Exchange Header                                                      |
- *  8 bit:  | Exchange Message Type                                                |
+ *  8 bit:  | Message Type                                                         |
  *  16 bit: | Exchange ID                                                          |
  * -------- Encrypted Application Data Start ---------------------------------------
  *  <var>:  | Encrypted Data                                                       |
@@ -176,9 +176,9 @@ CHIP_ERROR MessageHeader::DecodeEncryptedHeader(const uint8_t * data, size_t siz
 
     VerifyOrExit(size >= kEncryptedHeaderSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    mExchangeHeader  = Read8(p);
-    mExchangeMsgType = Read8(p);
-    mExchangeID      = LittleEndian::Read16(p);
+    mExchangeHeader = Read8(p);
+    mMessageType    = Read8(p);
+    mExchangeID     = LittleEndian::Read16(p);
 
     size -= kEncryptedHeaderSizeBytes;
 
@@ -254,7 +254,7 @@ CHIP_ERROR MessageHeader::EncodeEncryptedHeader(uint8_t * data, size_t size, siz
     VerifyOrExit(size >= kEncryptedHeaderSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     Write8(p, mExchangeHeader);
-    Write8(p, mExchangeMsgType);
+    Write8(p, mMessageType);
     LittleEndian::Write16(p, mExchangeID);
 
     // Written data size provided to caller on success
