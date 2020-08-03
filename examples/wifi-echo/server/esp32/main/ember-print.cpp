@@ -47,7 +47,7 @@ void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, b
 
             snprintf(result + dst_idx, outStringLength - dst_idx, perByteFormatStr, buffer[index]);
         }
-        result[outStringLength] = 0;
+        result[outStringLength - 1] = 0;
         emberAfPrint(category, "%s", result);
     }
     else
