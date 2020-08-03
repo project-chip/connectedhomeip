@@ -492,6 +492,7 @@ exit:
     return error;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 int cmd_device_thread(int argc, char ** argv)
 {
     streamer_t * sout = streamer_get();
@@ -586,6 +587,7 @@ exit:
     PlatformMgr().UnlockChipStack();
     return error;
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 int cmd_device_dispatch(int argc, char ** argv)
 {
