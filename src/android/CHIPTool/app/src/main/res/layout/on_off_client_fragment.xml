@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/ipAddressEd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_alignParentTop="true"
+        android:inputType="text"
+        android:textSize="20sp"
+        android:hint="@string/enter_ip_address_hint_text"/>
+
+    <TextView
+        android:id="@+id/onBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:layout_margin="32dp"
+        android:layout_gravity="center"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/ipAddressEd"
+        android:background="@android:color/darker_gray"
+        android:text="@string/send_command_on_btn_text"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/toggleBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="48dp"
+        android:layout_gravity="center"
+        android:layout_below="@id/ipAddressEd"
+        android:layout_toEndOf="@id/onBtn"
+        android:layout_toStartOf="@+id/offBtn"
+        android:background="@android:color/darker_gray"
+        android:text="@string/send_command_toggle_btn_text"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@id/offBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:layout_margin="32dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/ipAddressEd"
+        android:background="@android:color/darker_gray"
+        android:text="@string/send_command_off_btn_text"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/commandStatusTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:layout_below="@id/onBtn"
+        android:singleLine="false"
+        android:minLines="4"
+        android:textSize="20sp"/>
+
+</RelativeLayout>

@@ -30,6 +30,10 @@
 #include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
 
+extern "C" {
+#include "chip-zcl-zpro-codec.h"
+} // extern "C"
+
 using namespace chip;
 using namespace chip::DeviceController;
 
@@ -213,7 +217,7 @@ JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong deviceCon
 
     pthread_mutex_lock(&sStackLock);
     err = deviceController->ConnectDevice(kRemoteDeviceId, deviceIPAddr, (void *) "ConnectDevice", HandleKeyExchange,
-                                          HandleEchoResponse, HandleError, 11095);
+                                          HandleEchoResponse, HandleError, CHIP_PORT);
     pthread_mutex_unlock(&sStackLock);
 
     if (err != CHIP_NO_ERROR)
@@ -233,10 +237,14 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong deviceContr
     const char * messageStr = env->GetStringUTFChars(messageObj, 0);
     size_t messageLen       = strlen(messageStr);
 
+    pthread_mutex_lock(&sStackLock);
+
     auto * buffer = System::PacketBuffer::NewWithAvailableSize(messageLen);
     memcpy(buffer->Start(), messageStr, messageLen);
     buffer->SetDataLength(messageLen);
     err = deviceController->SendMessage((void *) "SendMessage", buffer);
+
+    pthread_mutex_unlock(&sStackLock);
 
     env->ReleaseStringUTFChars(messageObj, messageStr);
 
@@ -247,11 +255,83 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong deviceContr
     }
 }
 
+JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong deviceControllerPtr, jobject commandObj)
+{
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
+
+    ChipLogProgress(Controller, "beginSendCommand() called");
+
+    jclass commandCls = env->GetObjectClass(commandObj);
+    jmethodID commandMethodID = env->GetMethodID(commandCls, "getValue", "()I");
+    jint commandID = env->CallIntMethod(commandObj, commandMethodID);
+
+    pthread_mutex_lock(&sStackLock);
+
+    // Make sure our buffer is big enough, but this will need a better setup!
+    static const size_t bufferSize = 1024;
+    auto * buffer                  = System::PacketBuffer::NewWithAvailableSize(bufferSize);
+
+    // Hardcode endpoint to 1 for now
+    uint8_t endpoint = 1;
+
+    uint16_t dataLength = 0;
+    switch (commandID)
+    {
+    case 0:
+        dataLength = encodeOffCommand(buffer->Start(), bufferSize, endpoint);
+        break;
+    case 1:
+        dataLength = encodeOnCommand(buffer->Start(), bufferSize, endpoint);
+        break;
+    case 2:
+        dataLength = encodeToggleCommand(buffer->Start(), bufferSize, endpoint);
+        break;
+    default:
+        ChipLogError(Controller, "Unknown command: %d", commandID);
+        return;
+    }
+
+    buffer->SetDataLength(dataLength);
+
+    // Hardcode endpoint to 1 for now
+    err = deviceController->SendMessage((void *)"SendMessage", buffer);
+
+    pthread_mutex_unlock(&sStackLock);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to send CHIP command.");
+        ThrowError(env, err);
+    }
+}
+
 JNI_METHOD(jboolean, isConnected)(JNIEnv * env, jobject self, jlong deviceControllerPtr)
 {
     ChipLogProgress(Controller, "isConnected() called");
     ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
     return deviceController->IsConnected() ? JNI_TRUE : JNI_FALSE;
+}
+
+JNI_METHOD(jboolean, disconnectDevice)(JNIEnv * env, jobject self, jlong deviceControllerPtr)
+{
+    ChipLogProgress(Controller, "disconnectDevice() called");
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
+
+    pthread_mutex_lock(&sStackLock);
+    err = deviceController->DisconnectDevice();
+    pthread_mutex_unlock(&sStackLock);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to disconnect ChipDeviceController");
+        return JNI_FALSE;
+    }
+
+    return JNI_TRUE;
 }
 
 JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong deviceControllerPtr)
