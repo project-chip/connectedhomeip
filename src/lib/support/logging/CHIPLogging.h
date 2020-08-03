@@ -327,11 +327,11 @@ static inline void GetModuleName(char * buf, uint8_t module)
 
 extern uint8_t gLogFilter;
 
-#define IsCategoryEnabled(CAT) ((CAT) <= gLogFilter)
+inline bool IsCategoryEnabled(uint8_t CAT) { return (CAT <= gLogFilter); }
 
 #else // CHIP_LOG_FILTERING
 
-#define IsCategoryEnabled(CAT) (true)
+inline bool IsCategoryEnabled(uint8_t CAT) { return true; }
 
 #endif // CHIP_LOG_FILTERING
 
