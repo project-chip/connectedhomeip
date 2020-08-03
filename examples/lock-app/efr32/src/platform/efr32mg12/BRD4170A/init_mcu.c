@@ -36,7 +36,7 @@
 
 // Bit [19] in MODULEINFO is the HFXOCALVAL:
 // 1=No factory cal, use default XO tunning value in FW
-// 0=Factory Cal, use XO tunning value in DI 
+// 0=Factory Cal, use XO tunning value in DI
 #define DEVINFO_MODULEINFO_HFXOCALVAL_MASK  0x00080000UL
 // Calibration value for HFXO CTUNE is at DEVINFO Offset 0x08
 #define DEVINFO_MODULEINFO_CRYSTALOSCCALVAL  (*((uint16_t *) (uint32_t)(DEVINFO_BASE+0x8UL)))
