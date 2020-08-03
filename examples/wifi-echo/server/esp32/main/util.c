@@ -261,14 +261,7 @@ void emberAfInit(void)
     MEMSET(afDeviceEnabled, true, emberAfEndpointCount());
 
     // Set up client API buffer.
-    // FIXME: Is this needed?  appResponseData seems unused in the code we pulled
-    // in so far.
-#if 0
-  emberAfSetExternalBuffer(appResponseData,
-                           EMBER_AF_RESPONSE_BUFFER_LEN,
-                           &appResponseLength,
-                           &emberAfResponseApsFrame);
-#endif
+    emberAfSetExternalBuffer(appResponseData, EMBER_AF_RESPONSE_BUFFER_LEN, &appResponseLength, &emberAfResponseApsFrame);
 
     // initialize event management system
     // emAfInitEvents();
