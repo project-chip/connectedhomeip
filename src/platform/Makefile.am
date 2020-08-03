@@ -62,6 +62,8 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_NoWiFi.h \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_Thread.h \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_Thread.ipp \
+    @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_WiFi.h \
+    @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_WiFi.ipp \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl.h \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl.ipp \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_POSIX.h \
