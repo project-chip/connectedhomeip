@@ -39,7 +39,7 @@ void TestHeaderInitialState(nlTestSuite * inSuite, void * inContext)
 {
     MessageHeader header;
 
-    NL_TEST_ASSERT(inSuite, header.GetExchangeMsgType() == 0);
+    NL_TEST_ASSERT(inSuite, header.GetMessageType() == 0);
     NL_TEST_ASSERT(inSuite, header.GetExchangeID() == 0);
     NL_TEST_ASSERT(inSuite, header.GetMessageId() == 0);
     NL_TEST_ASSERT(inSuite, !header.GetDestinationNodeId().HasValue());
@@ -114,7 +114,7 @@ void TestHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.GetMessageId() == 234);
     NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<uint64_t>::Value(88));
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(77));
-    NL_TEST_ASSERT(inSuite, header.GetExchangeMsgType() == 112);
+    NL_TEST_ASSERT(inSuite, header.GetMessageType() == 112);
     NL_TEST_ASSERT(inSuite, header.GetExchangeID() == 2233);
 }
 
