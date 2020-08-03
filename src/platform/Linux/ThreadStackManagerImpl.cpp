@@ -416,12 +416,12 @@ CHIP_ERROR ThreadStackManagerImpl::_JoinerStart(void)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-extern ThreadStackManager & ThreadStackMgr(void)
+ThreadStackManager & ThreadStackMgr(void)
 {
     return chip::DeviceLayer::ThreadStackManagerImpl::sInstance;
 }
 
-extern ThreadStackManagerImpl & ThreadStackMgrImpl(void)
+ThreadStackManagerImpl & ThreadStackMgrImpl(void)
 {
     return chip::DeviceLayer::ThreadStackManagerImpl::sInstance;
 }
