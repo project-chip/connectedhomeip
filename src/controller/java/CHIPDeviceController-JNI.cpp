@@ -262,9 +262,9 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong deviceContr
 
     ChipLogProgress(Controller, "beginSendCommand() called");
 
-    jclass commandCls = env->GetObjectClass(commandObj);
+    jclass commandCls         = env->GetObjectClass(commandObj);
     jmethodID commandMethodID = env->GetMethodID(commandCls, "getValue", "()I");
-    jint commandID = env->CallIntMethod(commandObj, commandMethodID);
+    jint commandID            = env->CallIntMethod(commandObj, commandMethodID);
 
     pthread_mutex_lock(&sStackLock);
 
@@ -295,7 +295,7 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong deviceContr
     buffer->SetDataLength(dataLength);
 
     // Hardcode endpoint to 1 for now
-    err = deviceController->SendMessage((void *)"SendMessage", buffer);
+    err = deviceController->SendMessage((void *) "SendMessage", buffer);
 
     pthread_mutex_unlock(&sStackLock);
 
