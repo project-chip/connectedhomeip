@@ -100,14 +100,14 @@ void TestHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(77));
 
     header.SetMessageId(234).SetSourceNodeId(77).SetDestinationNodeId(88);
-    header.SetExchangeMsgType(112).SetExchangeID(2233);
+    header.SetMessageType(112).SetExchangeID(2233);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, sizeof(buffer), &encodeLen) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    header.EncodeEncryptedHeader(&buffer[encodeLen], sizeof(buffer) - encodeLen, &encodeLen) == CHIP_NO_ERROR);
 
     // change it to verify decoding
     header.SetMessageId(222).SetSourceNodeId(1).SetDestinationNodeId(2);
-    header.SetExchangeMsgType(221).SetExchangeID(3322);
+    header.SetMessageType(221).SetExchangeID(3322);
     NL_TEST_ASSERT(inSuite, header.Decode(buffer, sizeof(buffer), &decodeLen) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    header.DecodeEncryptedHeader(&buffer[decodeLen], sizeof(buffer) - decodeLen, &decodeLen) == CHIP_NO_ERROR);
