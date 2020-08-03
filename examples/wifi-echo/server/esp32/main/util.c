@@ -392,7 +392,7 @@ static void printIncomingZclMessage(const EmberAfClusterCommand * cmd)
 #if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_APP)
     if (emberAfPrintReceivedMessages)
     {
-        emberAfAppPrint("\r\nT%4x:", emberAfGetCurrentTime());
+        // emberAfAppPrint("\r\nT%4x:", emberAfGetCurrentTime());
         emberAfAppPrint("RX len %d, ep %x, clus 0x%2x ", cmd->bufLen, cmd->apsFrame->destinationEndpoint, cmd->apsFrame->clusterId);
         emberAfAppDebugExec(emberAfDecodeAndPrintClusterWithMfgCode(cmd->apsFrame->clusterId, cmd->mfgCode));
         if (cmd->mfgSpecific)
@@ -415,6 +415,7 @@ static void printIncomingZclMessage(const EmberAfClusterCommand * cmd)
 static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
 {
     uint8_t index = emberAfIndexFromEndpoint(cmd->apsFrame->destinationEndpoint);
+
     if (index == 0xFF)
     {
         emberAfDebugPrint("Drop cluster 0x%2x command 0x%x", cmd->apsFrame->clusterId, cmd->commandId);
@@ -771,7 +772,7 @@ EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback)
 #endif
     }
     UNUSED_VAR(label);
-    emberAfDebugPrintln("T%4x:TX (%p) %ccast 0x%x%p", emberAfGetCurrentTime(), "resp", label, status,
+    emberAfDebugPrintln("T%4x:TX (%p) %ccast 0x%x%p", 0, "resp", label, status,
                         ((emberAfResponseApsFrame.options & EMBER_APS_OPTION_ENCRYPTION) ? " w/ link key" : ""));
     emberAfDebugPrint("TX buffer: [");
     emberAfDebugFlush();
