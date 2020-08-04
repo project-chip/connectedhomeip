@@ -107,6 +107,7 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/platform/ESP32/CHIPDevicePlatformConfig.h \
     @top_srcdir@/src/platform/ESP32/ConnectivityManagerImpl.h \
     @top_srcdir@/src/platform/ESP32/BLEManagerImpl.h \
+    @top_srcdir@/src/platform/ESP32/nimble/BLEManagerImpl.h \
     @top_srcdir@/src/platform/ESP32/ConfigurationManagerImpl.h \
     @top_srcdir@/src/platform/ESP32/PlatformManagerImpl.h \
     @top_srcdir@/src/platform/ESP32/SoftwareUpdateManagerImpl.h \
@@ -346,6 +347,7 @@ if CHIP_DEVICE_LAYER_TARGET_ESP32
 
 libDeviceLayer_a_SOURCES               +=       \
     ESP32/BLEManagerImpl.cpp                    \
+    ESP32/nimble/BLEManagerImpl.cpp             \
     ESP32/ConfigurationManagerImpl.cpp          \
     ESP32/PlatformManagerImpl.cpp               \
     ESP32/ConnectivityManagerImpl.cpp           \
