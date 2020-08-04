@@ -63,6 +63,13 @@ public:
     const Optional<NodeId> & GetDestinationNodeId() const { return mDestinationNodeId; }
 
     /**
+     * Gets the vendor id in the current message.
+     *
+     * NOTE: the vendor id is optional and may be missing.
+     */
+    const Optional<uint16_t> & GetVendorId() const { return mVendorId; }
+
+    /**
      * Gets the message id set in the header.
      *
      * Message IDs are expecte to monotonically increase by one for each mesage
@@ -78,6 +85,9 @@ public:
 
     /** Get the Session ID from this header. */
     uint16_t GetExchangeID(void) const { return mExchangeID; }
+
+    /** Get the Protocol ID from this header. */
+    uint16_t GetProtocolID(void) const { return mProtocolID; }
 
     /** Get the MAC tag length. */
     size_t GetTagLength(void) const { return TagLenForEncryptionType(mEncryptionType); }
@@ -139,6 +149,30 @@ public:
         return *this;
     }
 
+    /** Set the vendor id for this header. */
+    MessageHeader & SetVendorId(uint16_t id)
+    {
+        mVendorId.SetValue(id);
+
+        return *this;
+    }
+
+    /** Set the vendor id for this header. */
+    MessageHeader & SetVendorId(Optional<uint16_t> id)
+    {
+        mVendorId = id;
+
+        return *this;
+    }
+
+    /** Clear the vendor id for this header. */
+    MessageHeader & ClearVendorId()
+    {
+        mVendorId.ClearValue();
+
+        return *this;
+    }
+
     /** Set the secure message type for this header. */
     MessageHeader & SetPayloadLength(uint16_t len)
     {
@@ -157,6 +191,13 @@ public:
     MessageHeader & SetExchangeID(uint16_t id)
     {
         mExchangeID = id;
+        return *this;
+    }
+
+    /** Set the Protocol ID for this header. */
+    MessageHeader & SetProtcolID(uint16_t id)
+    {
+        mProtocolID = id;
         return *this;
     }
 
@@ -313,8 +354,17 @@ private:
     /// Security session identifier
     uint16_t mExchangeID = 0;
 
+    /// Vendor identifier
+    Optional<uint16_t> mVendorId;
+
+    /// Protocol identifier
+    uint16_t mProtocolID = 0;
+
     /// Message authentication tag generated at encryption of the message.
     uint8_t mTag[kMaxTagLen];
+
+    /// Message header read from the message.
+    uint16_t mHeader = 0;
 };
 
 } // namespace chip

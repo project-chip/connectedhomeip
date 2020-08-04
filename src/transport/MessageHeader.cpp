@@ -41,6 +41,8 @@
  *  8 bit:  | Exchange Header                                                      |
  *  8 bit:  | Message Type                                                         |
  *  16 bit: | Exchange ID                                                          |
+ *  16 bit: | Optional Vendor ID                                                   |
+ *  16 bit: | Protocol ID                                                          |
  * -------- Encrypted Application Data Start ---------------------------------------
  *  <var>:  | Encrypted Data                                                       |
  * -------- Encrypted Application Data End -----------------------------------------
@@ -57,15 +59,20 @@ using namespace chip::Encoding;
 constexpr size_t kFixedUnencryptedHeaderSizeBytes = 10;
 
 /// size of the encrypted portion of the header
-constexpr size_t kEncryptedHeaderSizeBytes = 4;
+constexpr size_t kEncryptedHeaderSizeBytes = 6;
 
 /// size of a serialized node id inside a header
 constexpr size_t kNodeIdSizeBytes = 8;
+
+/// size of a serialized vendor id inside a header
+constexpr size_t kVendorIdSizeBytes = 2;
 
 /// Header flag specifying that a destination node id is included in the header.
 constexpr uint16_t kFlagDestinationNodeIdPresent = 0x0100;
 /// Header flag specifying that a source node id is included in the header.
 constexpr uint16_t kFlagSourceNodeIdPresent = 0x0200;
+/// Header flag specifying that a source vendor id is included in the header.
+constexpr uint16_t kFlagVendorIdPresent = 0x0400;
 
 /// Mask to extract just the version part from a 16bit header prefix.
 constexpr uint16_t kVersionMask = 0xF000;
@@ -98,7 +105,14 @@ size_t MessageHeader::EncodeSizeBytes() const
 
 size_t MessageHeader::EncryptedHeaderSizeBytes() const
 {
-    return kEncryptedHeaderSizeBytes;
+    size_t size = kEncryptedHeaderSizeBytes;
+
+    if (mVendorId.HasValue())
+    {
+        size += kVendorIdSizeBytes;
+    }
+
+    return size;
 }
 
 size_t MessageHeader::TagLenForEncryptionType(EncryptionType encType) const
@@ -123,20 +137,19 @@ CHIP_ERROR MessageHeader::Decode(const uint8_t * data, size_t size, size_t * dec
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     const uint8_t * p = data;
-    uint16_t header;
     int version;
 
     VerifyOrExit(size >= kFixedUnencryptedHeaderSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    header  = LittleEndian::Read16(p);
-    version = ((header & kVersionMask) >> kVersionShift);
+    mHeader = LittleEndian::Read16(p);
+    version = ((mHeader & kVersionMask) >> kVersionShift);
     VerifyOrExit(version == kHeaderVersion, err = CHIP_ERROR_VERSION_MISMATCH);
 
-    mEncryptionType = (EncryptionType)((header & kEncryptionTypeMask) >> kEncryptionTypeShift);
+    mEncryptionType = (EncryptionType)((mHeader & kEncryptionTypeMask) >> kEncryptionTypeShift);
 
     mMessageId = LittleEndian::Read32(p);
 
-    if (header & kFlagSourceNodeIdPresent)
+    if (mHeader & kFlagSourceNodeIdPresent)
     {
         VerifyOrExit(size >= kNodeIdSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
         mSourceNodeId.SetValue(LittleEndian::Read64(p));
@@ -147,7 +160,7 @@ CHIP_ERROR MessageHeader::Decode(const uint8_t * data, size_t size, size_t * dec
         mSourceNodeId.ClearValue();
     }
 
-    if (header & kFlagDestinationNodeIdPresent)
+    if (mHeader & kFlagDestinationNodeIdPresent)
     {
         VerifyOrExit(size >= kNodeIdSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
         mDestinationNodeId.SetValue(LittleEndian::Read64(p));
@@ -174,13 +187,24 @@ CHIP_ERROR MessageHeader::DecodeEncryptedHeader(const uint8_t * data, size_t siz
     CHIP_ERROR err    = CHIP_NO_ERROR;
     const uint8_t * p = data;
 
-    VerifyOrExit(size >= kEncryptedHeaderSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(size >= EncryptedHeaderSizeBytes(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     mExchangeHeader = Read8(p);
     mMessageType    = Read8(p);
     mExchangeID     = LittleEndian::Read16(p);
 
-    size -= kEncryptedHeaderSizeBytes;
+    if (mHeader & kFlagVendorIdPresent)
+    {
+        mVendorId.SetValue(LittleEndian::Read16(p));
+    }
+    else
+    {
+        mVendorId.ClearValue();
+    }
+
+    mProtocolID = LittleEndian::Read16(p);
+
+    size -= EncryptedHeaderSizeBytes();
 
     *decode_len = p - data;
 
@@ -223,6 +247,10 @@ CHIP_ERROR MessageHeader::Encode(uint8_t * data, size_t size, size_t * encode_si
     {
         header |= kFlagDestinationNodeIdPresent;
     }
+    if (mVendorId.HasValue())
+    {
+        header |= kFlagVendorIdPresent;
+    }
 
     header |= (((uint16_t) mEncryptionType << kEncryptionTypeShift) & kEncryptionTypeMask);
 
@@ -251,11 +279,16 @@ CHIP_ERROR MessageHeader::EncodeEncryptedHeader(uint8_t * data, size_t size, siz
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t * p    = data;
-    VerifyOrExit(size >= kEncryptedHeaderSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(size >= EncryptedHeaderSizeBytes(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     Write8(p, mExchangeHeader);
     Write8(p, mMessageType);
     LittleEndian::Write16(p, mExchangeID);
+    if (mVendorId.HasValue())
+    {
+        LittleEndian::Write16(p, mVendorId.Value());
+    }
+    LittleEndian::Write16(p, mProtocolID);
 
     // Written data size provided to caller on success
     *encode_size = p - data;
