@@ -234,7 +234,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       }
     } else if (chip_device_platform == "esp32") {
       sources += [
-        "ESP32/BLEManagerImpl.cpp",
+        "ESP32/bluedroid/BLEManagerImpl.cpp",
+        "ESP32/nimble/BLEManagerImpl.cpp",
         "ESP32/BLEManagerImpl.h",
         "ESP32/CHIPDevicePlatformConfig.h",
         "ESP32/CHIPDevicePlatformEvent.h",
