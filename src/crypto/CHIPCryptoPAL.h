@@ -30,6 +30,8 @@
 #include <openssl/ec.h>
 #include <openssl/sha.h>
 #elif CHIP_CRYPTO_MBEDTLS
+#include <mbedtls/ecp.h>
+#include <mbedtls/md.h>
 #include <mbedtls/sha256.h>
 #endif
 
@@ -634,15 +636,31 @@ protected:
     unsigned char * Ke;
 };
 
-#if CHIP_CRYPTO_OPENSSL
-struct openssl_spake2_ctx
+struct Spake2p_Context
 {
+#if CHIP_CRYPTO_OPENSSL
     EC_GROUP * curve;
     BN_CTX * bn_ctx;
     EVP_MD_CTX * hash_ctx;
     const EVP_MD * hash;
-};
+#elif CHIP_CRYPTO_MBEDTLS
+    mbedtls_ecp_group curve;
+    mbedtls_md_context_t hash_ctxt;
+    const mbedtls_md_info_t * md_info;
+    mbedtls_ecp_point M;
+    mbedtls_ecp_point N;
+    mbedtls_ecp_point X;
+    mbedtls_ecp_point Y;
+    mbedtls_ecp_point L;
+    mbedtls_ecp_point Z;
+    mbedtls_ecp_point V;
+
+    mbedtls_mpi w0;
+    mbedtls_mpi w1;
+    mbedtls_mpi xy;
+    mbedtls_mpi tempbn;
 #endif
+};
 
 class Spake2p_P256_SHA256_HKDF_HMAC : public Spake2p
 {
@@ -683,9 +701,7 @@ private:
     CHIP_ERROR InitInternal();
     class Hash_SHA256_stream sha256_hash_ctx;
 
-#if CHIP_CRYPTO_OPENSSL
-    struct openssl_spake2_ctx context;
-#endif
+    struct Spake2p_Context context;
 };
 
 /** @brief Clears the first `len` bytes of memory area `buf`.

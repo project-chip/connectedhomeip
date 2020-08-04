@@ -785,18 +785,18 @@ void ClearSecretData(uint8_t * buf, uint32_t len)
     {                                                                                                                              \
         _point_ = EC_POINT_new(context.curve);                                                                                     \
         VerifyOrExit(_point_ != NULL, error = CHIP_ERROR_INTERNAL);                                                                \
-    } while (0);
+    } while (0)
 
 #define init_bn(_bn_)                                                                                                              \
     do                                                                                                                             \
     {                                                                                                                              \
         _bn_ = BN_new();                                                                                                           \
         VerifyOrExit(_bn_ != NULL, error = CHIP_ERROR_INTERNAL);                                                                   \
-    } while (0);
+    } while (0)
 
-#define free_point(_point_) EC_POINT_clear_free((EC_POINT *) _point_);
+#define free_point(_point_) EC_POINT_clear_free((EC_POINT *) _point_)
 
-#define free_bn(_bn_) BN_clear_free((BIGNUM *) _bn_);
+#define free_bn(_bn_) BN_clear_free((BIGNUM *) _bn_)
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
 {
@@ -825,9 +825,20 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
     error_openssl = EVP_DigestInit(context.hash_ctx, context.hash);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
-    init_point(M) init_point(N) init_point(X) init_point(Y) init_point(L) init_point(V) init_point(Z) init_bn(w0) init_bn(w1)
-        init_bn(xy) init_bn(tempbn) init_bn(order) error_openssl =
-            EC_GROUP_get_order(context.curve, (BIGNUM *) order, context.bn_ctx);
+    init_point(M);
+    init_point(N);
+    init_point(X);
+    init_point(Y);
+    init_point(L);
+    init_point(V);
+    init_point(Z);
+    init_bn(w0);
+    init_bn(w1);
+    init_bn(xy);
+    init_bn(tempbn);
+    init_bn(order);
+
+    error_openssl = EC_GROUP_get_order(context.curve, (BIGNUM *) order, context.bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -841,8 +852,18 @@ void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl(void)
     BN_CTX_free(context.bn_ctx);
     EVP_MD_CTX_free(context.hash_ctx);
 
-    free_point(M) free_point(N) free_point(X) free_point(Y) free_point(L) free_point(V) free_point(Z) free_bn(w0) free_bn(w1)
-        free_bn(xy) free_bn(tempbn) free_bn(order)
+    free_point(M);
+    free_point(N);
+    free_point(X);
+    free_point(Y);
+    free_point(L);
+    free_point(V);
+    free_point(Z);
+    free_bn(w0);
+    free_bn(w1);
+    free_bn(xy);
+    free_bn(tempbn);
+    free_bn(order);
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const unsigned char * key, size_t key_len, const unsigned char * in, size_t in_len,
