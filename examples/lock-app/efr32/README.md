@@ -4,12 +4,12 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
 
 <hr>
 
-- [CHIP EFR32 Lock Example](#chip-efr32-lock-example)
-  - [Introduction](#introduction)
-  - [Building](#building)
-  - [Initializing the EFR32 module](#initializing-the-efr32-module)
-  - [Flashing the Application](#flashing-the-application)
-  - [Viewing Logging Output](#viewing-logging-output)
+-   [CHIP EFR32 Lock Example](#chip-efr32-lock-example)
+    -   [Introduction](#introduction)
+    -   [Building](#building)
+    -   [Initializing the EFR32 module](#initializing-the-efr32-module)
+    -   [Flashing the Application](#flashing-the-application)
+    -   [Viewing Logging Output](#viewing-logging-output)
 
 <hr>
 
