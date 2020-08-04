@@ -68,8 +68,8 @@ Error SystemWakeEvent::Open()
 
 void SystemWakeEvent::Close()
 {
-    ::close(mFDs[FD_WRITE]);
-    ::close(mFDs[FD_READ]);
+    (void) ::close(mFDs[FD_WRITE]);
+    (void) ::close(mFDs[FD_READ]);
     mFDs[FD_READ] = mFDs[FD_WRITE] = -1;
 }
 
@@ -84,7 +84,7 @@ void SystemWakeEvent::Confirm()
 void SystemWakeEvent::Notify()
 {
     char byte = 1;
-    ::write(mFDs[FD_WRITE], &byte, 1);
+    (void) ::write(mFDs[FD_WRITE], &byte, 1);
 }
 
 #else // CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
@@ -103,20 +103,20 @@ Error SystemWakeEvent::Open()
 
 void SystemWakeEvent::Close()
 {
-    ::close(mFD);
+    (void) ::close(mFD);
     mFD = -1;
 }
 
 void SystemWakeEvent::Confirm()
 {
     uint64_t value;
-    ::read(mFD, &value, sizeof(value));
+    (void) ::read(mFD, &value, sizeof(value));
 }
 
 void SystemWakeEvent::Notify()
 {
     uint64_t value = 1;
-    ::write(mFD, &value, sizeof(value));
+    (void) ::write(mFD, &value, sizeof(value));
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
