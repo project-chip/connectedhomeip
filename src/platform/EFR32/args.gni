@@ -12,22 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Use clang to build.
-  is_clang = false
+device_platform = "efr32"
 
-  # Optimize for size by default.
-  optimize_for_size = true
+lwip_platform = "efr32"
+lwip_ipv6 = true
+lwip_ipv4 = false
+lwip_api = true
 
-  # Optimize debug builds with -Og.
-  optimize_debug = current_os == "freertos"
+inet_config_enable_ipv4 = false
+inet_config_enable_dns_resolver = false
 
-  # Symbol level for debugging.
-  symbol_level = 2
+chip_build_tests = false
 
-  # Enable position independent code (-fPIC).
-  enable_pic = current_os == "linux" || current_os == "mac"
-
-  # Enable position independent executables (-pie).
-  enable_pie = current_os == "linux"
-}
+ble_platform_config_include = "<platform/EFR32/BlePlatformConfig.h>"
+chip_device_platform_config_include = "<platform/EFR32/CHIPDevicePlatformConfig.h>"
+chip_platform_config_include = "<platform/EFR32/CHIPPlatformConfig.h>"
+inet_platform_config_include = "<platform/EFR32/InetPlatformConfig.h>"
+system_platform_config_include = "<platform/EFR32/SystemPlatformConfig.h>"

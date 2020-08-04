@@ -12,22 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Use clang to build.
-  is_clang = false
+import("//build_overrides/chip.gni")
 
-  # Optimize for size by default.
-  optimize_for_size = true
+import("//build/toolchain/arm_gcc/arm_toolchain.gni")
 
-  # Optimize debug builds with -Og.
-  optimize_debug = current_os == "freertos"
-
-  # Symbol level for debugging.
-  symbol_level = 2
-
-  # Enable position independent code (-fPIC).
-  enable_pic = current_os == "linux" || current_os == "mac"
-
-  # Enable position independent executables (-pie).
-  enable_pie = current_os == "linux"
+arm_toolchain("efr32_lock_app") {
+  toolchain_args = {
+    current_os = "freertos"
+    import("${chip_root}/examples/lock-app/efr32/args.gni")
+  }
 }

@@ -12,22 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/efr32_sdk.gni")
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
+
 declare_args() {
-  # Use clang to build.
-  is_clang = false
+  # Build target to use for efr32 SDK. Use this to set global SDK defines.
+  efr32_sdk_target = ""
+}
 
-  # Optimize for size by default.
-  optimize_for_size = true
+assert(efr32_sdk_target != "", "efr32_sdk_target must be specified")
 
-  # Optimize debug builds with -Og.
-  optimize_debug = current_os == "freertos"
-
-  # Symbol level for debugging.
-  symbol_level = 2
-
-  # Enable position independent code (-fPIC).
-  enable_pic = current_os == "linux" || current_os == "mac"
-
-  # Enable position independent executables (-pie).
-  enable_pie = current_os == "linux"
+group("efr32_sdk") {
+  public_deps = [ efr32_sdk_target ]
 }

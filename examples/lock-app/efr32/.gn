@@ -12,22 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Use clang to build.
-  is_clang = false
+# The location of the build configuration file.
+buildconfig = "//build/config/BUILDCONFIG.gn"
 
-  # Optimize for size by default.
-  optimize_for_size = true
+# CHIP uses angle bracket includes.
+check_system_includes = true
 
-  # Optimize debug builds with -Og.
-  optimize_debug = current_os == "freertos"
+# Allow loading paths relative to //gn.
+secondary_source = "//third_party/connectedhomeip/gn/"
 
-  # Symbol level for debugging.
-  symbol_level = 2
+default_args = {
+  target_cpu = "arm"
+  target_os = "freertos"
 
-  # Enable position independent code (-fPIC).
-  enable_pic = current_os == "linux" || current_os == "mac"
-
-  # Enable position independent executables (-pie).
-  enable_pie = current_os == "linux"
+  import("//args.gni")
 }
