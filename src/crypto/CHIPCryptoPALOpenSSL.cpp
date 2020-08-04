@@ -805,8 +805,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
 
     context.curve    = NULL;
     context.bn_ctx   = NULL;
-    context.hash_ctx = NULL;
-    context.hash     = NULL;
+    context.md_info  = NULL;
 
     context.curve = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
     VerifyOrExit(context.curve != NULL, error = CHIP_ERROR_INTERNAL);
@@ -817,13 +816,8 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
     context.bn_ctx = BN_CTX_secure_new();
     VerifyOrExit(context.bn_ctx != NULL, error = CHIP_ERROR_INTERNAL);
 
-    context.hash = EVP_sha256();
-    VerifyOrExit(context.hash != NULL, error = CHIP_ERROR_INTERNAL);
-
-    context.hash_ctx = EVP_MD_CTX_new();
-    VerifyOrExit(context.hash_ctx != NULL, error = CHIP_ERROR_INTERNAL);
-    error_openssl = EVP_DigestInit(context.hash_ctx, context.hash);
-    VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
+    context.md_info = EVP_sha256();
+    VerifyOrExit(context.md_info != NULL, error = CHIP_ERROR_INTERNAL);
 
     init_point(M);
     init_point(N);
@@ -850,7 +844,6 @@ void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl(void)
 {
     EC_GROUP_clear_free(context.curve);
     BN_CTX_free(context.bn_ctx);
-    EVP_MD_CTX_free(context.hash_ctx);
 
     free_point(M);
     free_point(N);
@@ -876,7 +869,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const unsigned char * key, size_t 
     HMAC_CTX * mac_ctx = HMAC_CTX_new();
     VerifyOrExit(mac_ctx != NULL, error = CHIP_ERROR_INTERNAL);
 
-    error_openssl = HMAC_Init_ex(mac_ctx, key, key_len, context.hash, NULL);
+    error_openssl = HMAC_Init_ex(mac_ctx, key, key_len, context.md_info, NULL);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error_openssl = HMAC_Update(mac_ctx, in, in_len);

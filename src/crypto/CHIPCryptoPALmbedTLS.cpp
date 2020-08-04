@@ -515,11 +515,6 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
     context.md_info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
     VerifyOrExit(context.md_info != NULL, error = CHIP_ERROR_INTERNAL);
 
-    mbedtls_md_init(&context.hash_ctxt);
-
-    result = mbedtls_md_setup(&context.hash_ctxt, context.md_info, 0);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
     mbedtls_ecp_point_init(&context.M);
     mbedtls_ecp_point_init(&context.N);
     mbedtls_ecp_point_init(&context.X);
@@ -547,9 +542,6 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
     G     = &context.curve.G;
     order = &context.curve.N;
 
-    result = mbedtls_md_starts(&context.hash_ctxt);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
     return error;
 
 exit:
@@ -573,8 +565,6 @@ void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl(void)
     mbedtls_mpi_free(&context.w1);
     mbedtls_mpi_free(&context.xy);
     mbedtls_mpi_free(&context.tempbn);
-
-    mbedtls_md_free(&context.hash_ctxt);
 
     mbedtls_ecp_group_free(&context.curve);
 }

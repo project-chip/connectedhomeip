@@ -641,11 +641,9 @@ struct Spake2p_Context
 #if CHIP_CRYPTO_OPENSSL
     EC_GROUP * curve;
     BN_CTX * bn_ctx;
-    EVP_MD_CTX * hash_ctx;
-    const EVP_MD * hash;
+    const EVP_MD * md_info;
 #elif CHIP_CRYPTO_MBEDTLS
     mbedtls_ecp_group curve;
-    mbedtls_md_context_t hash_ctxt;
     const mbedtls_md_info_t * md_info;
     mbedtls_ecp_point M;
     mbedtls_ecp_point N;
