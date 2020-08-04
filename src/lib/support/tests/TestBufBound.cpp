@@ -114,14 +114,14 @@ static void TestBufBound_PutLE(nlTestSuite * inSuite, void * inContext)
     {
         BBTest bb(2);
 
-        bb.PutLE(static_cast<uint16_t>('h' + 'i' * 256));
+        bb.PutLE16('h' + 'i' * 256);
 
         NL_TEST_ASSERT(inSuite, bb.expect("hi", 2, 0));
     }
     {
         BBTest bb(4);
 
-        bb.PutLE(0x01020304u);
+        bb.PutLE32(0x01020304);
 
         NL_TEST_ASSERT(inSuite, bb.expect("\x04\x03\x02\x01", 4, 0));
     }
@@ -129,7 +129,7 @@ static void TestBufBound_PutLE(nlTestSuite * inSuite, void * inContext)
     {
         BBTest bb(8);
 
-        bb.PutLE((uint64_t) 0x0102030405060708ull);
+        bb.PutLE64(0x0102030405060708);
 
         NL_TEST_ASSERT(inSuite, bb.expect("\x08\x07\x06\x05\x04\x03\x02\x01", 8, 0));
     }
@@ -149,7 +149,7 @@ static void TestBufBound_PutBE(nlTestSuite * inSuite, void * inContext)
     {
         BBTest bb(2);
 
-        bb.PutBE(static_cast<uint16_t>('i' + 'h' * 256));
+        bb.PutBE16('i' + 'h' * 256);
 
         NL_TEST_ASSERT(inSuite, bb.expect("hi", 2, 0));
     }
@@ -157,7 +157,7 @@ static void TestBufBound_PutBE(nlTestSuite * inSuite, void * inContext)
     {
         BBTest bb(4);
 
-        bb.PutBE(0x01020304u);
+        bb.PutBE32(0x01020304);
 
         NL_TEST_ASSERT(inSuite, bb.expect("\x01\x02\x03\x04", 4, 0));
     }
@@ -165,7 +165,7 @@ static void TestBufBound_PutBE(nlTestSuite * inSuite, void * inContext)
     {
         BBTest bb(8);
 
-        bb.PutBE((uint64_t) 0x0102030405060708ull);
+        bb.PutBE64(0x0102030405060708);
 
         NL_TEST_ASSERT(inSuite, bb.expect("\x01\x02\x03\x04\x05\x06\x07\x08", 8, 0));
     }

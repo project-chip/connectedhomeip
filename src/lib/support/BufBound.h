@@ -82,9 +82,9 @@ public:
     /*
      * @brief write integer x into the buffer, least significant byte first
      */
-    size_t PutLE(uint64_t x) { return PutLE(x, sizeof(x)); }
-    size_t PutLE(uint32_t x) { return PutLE(x, sizeof(x)); }
-    size_t PutLE(uint16_t x) { return PutLE(x, sizeof(x)); }
+    size_t PutLE64(uint64_t x) { return PutLE(x, sizeof(x)); }
+    size_t PutLE32(uint32_t x) { return PutLE(x, sizeof(x)); }
+    size_t PutLE16(uint16_t x) { return PutLE(x, sizeof(x)); }
 
     size_t PutBE(uint64_t x, size_t size)
     {
@@ -99,9 +99,9 @@ public:
     /*
      * @brief write integer x into the buffer, most significant byte first
      */
-    size_t PutBE(uint64_t x) { return PutBE(x, sizeof(x)); }
-    size_t PutBE(uint32_t x) { return PutBE(x, sizeof(x)); }
-    size_t PutBE(uint16_t x) { return PutBE(x, sizeof(x)); }
+    size_t PutBE64(uint64_t x) { return PutBE(x, sizeof(x)); }
+    size_t PutBE32(uint32_t x) { return PutBE(x, sizeof(x)); }
+    size_t PutBE16(uint16_t x) { return PutBE(x, sizeof(x)); }
 
     /*
      * @brief append a buffer
