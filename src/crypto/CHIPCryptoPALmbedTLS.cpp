@@ -598,6 +598,20 @@ exit:
     return error;
 }
 
+static inline int const_memcmp(const void *a, const void *b, size_t n)
+{
+    const unsigned char *A = (const unsigned char *) a;
+    const unsigned char *B = (const unsigned char *) b;
+    unsigned char diff = 0;
+
+    for(size_t i = 0; i < n; i++)
+    {
+        diff |= (A[i] ^ B[i]);
+    }
+
+    return diff;
+}
+
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::MacVerify(const unsigned char * key, size_t key_len, const unsigned char * mac,
                                                     size_t mac_len, const unsigned char * in, size_t in_len)
 {
@@ -611,7 +625,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::MacVerify(const unsigned char * key, s
     error = Mac(key, key_len, in, in_len, computed_mac);
     SuccessOrExit(error);
 
-    VerifyOrExit(memcmp(mac, computed_mac, kSHA256_Hash_Length) == 0, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(const_memcmp(mac, computed_mac, kSHA256_Hash_Length) == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
     _log_mbedTLS_error(result);
@@ -649,10 +663,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEGenerate(void * fe)
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
 
-    result = mbedtls_mpi_fill_random((mbedtls_mpi *) fe, 128, ECDSA_sign_rng, nullptr);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_mpi_mod_mpi((mbedtls_mpi *) fe, (mbedtls_mpi *) fe, (const mbedtls_mpi *) order);
+    result = mbedtls_ecp_gen_privkey(&context.curve, (mbedtls_mpi *) fe, ECDSA_sign_rng, nullptr);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
