@@ -803,9 +803,9 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
     CHIP_ERROR error  = CHIP_ERROR_INTERNAL;
     int error_openssl = 0;
 
-    context.curve    = NULL;
-    context.bn_ctx   = NULL;
-    context.md_info  = NULL;
+    context.curve   = NULL;
+    context.bn_ctx  = NULL;
+    context.md_info = NULL;
 
     context.curve = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
     VerifyOrExit(context.curve != NULL, error = CHIP_ERROR_INTERNAL);

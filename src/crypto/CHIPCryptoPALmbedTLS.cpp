@@ -504,8 +504,8 @@ void ClearSecretData(uint8_t * buf, uint32_t len)
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
 {
-    CHIP_ERROR error  = CHIP_NO_ERROR;
-    int result        = 0;
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
 
     memset(&context, 0, sizeof(context));
     mbedtls_ecp_group_init(&context.curve);
@@ -598,13 +598,13 @@ exit:
     return error;
 }
 
-static inline int const_memcmp(const void *a, const void *b, size_t n)
+static inline int const_memcmp(const void * a, const void * b, size_t n)
 {
-    const unsigned char *A = (const unsigned char *) a;
-    const unsigned char *B = (const unsigned char *) b;
-    unsigned char diff = 0;
+    const unsigned char * A = (const unsigned char *) a;
+    const unsigned char * B = (const unsigned char *) b;
+    unsigned char diff      = 0;
 
-    for(size_t i = 0; i < n; i++)
+    for (size_t i = 0; i < n; i++)
     {
         diff |= (A[i] ^ B[i]);
     }
