@@ -89,10 +89,9 @@ echo
 
 # EFR32 SDK setup
 efr32_sdk_args=""
-extra_args=""
 
 if [[ -d "$EFR32_SDK_ROOT/protocol/" ]]; then
-    efr32_sdk_args+="efr32_sdk_root=\"$EFR32_SDK_ROOT\""
+    efr32_sdk_args+="efr32_sdk_root=\"$EFR32_SDK_ROOT\" efr32_board=\"$EFR32_BOARD\""
     extra_args+=" $efr32_sdk_args enable_efr32_builds=true"
     echo 'To build the EFR32 lock sample as a standalone project':
     echo "(cd $CHIP_ROOT/examples/lock-app/efr32; gn gen out/debug --args='$efr32_sdk_args'; ninja -C out/debug)"
