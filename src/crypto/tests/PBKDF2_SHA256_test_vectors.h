@@ -75,13 +75,13 @@ static const struct pbkdf2_test_vector chiptest_test_vector_3 = { .password = (c
                                                                   .tcId     = 3,
                                                                   .result   = CHIP_NO_ERROR };
 
-static const unsigned char chiptest_key4[]                    = { 0xcf, 0x81, 0xc6, 0x6f, 0xe8, 0xcf, 0xc0, 0x4d, 0x1f, 0x31,
-                                               0xec, 0xb6, 0x5d, 0xab, 0x40, 0x89, 0xf7, 0xf1, 0x79, 0xe8 };
+static const unsigned char chiptest_key4[]                    = { 0xad, 0x35, 0x24, 0x0a, 0xc6, 0x83, 0xfe, 0xbf, 0xaf, 0x3c,
+                                               0xd4, 0x9d, 0x84, 0x54, 0x73, 0xfb, 0xbb, 0xaa, 0x24, 0x37 };
 static const struct pbkdf2_test_vector chiptest_test_vector_4 = { .password = (const unsigned char *) "password",
                                                                   .plen     = 8,
                                                                   .salt     = (const unsigned char *) "salt",
                                                                   .slen     = 4,
-                                                                  .iter     = 16777216,
+                                                                  .iter     = 3,
                                                                   .key_len  = 20,
                                                                   .key      = chiptest_key4,
                                                                   .tcId     = 4,
