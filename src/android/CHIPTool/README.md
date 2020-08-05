@@ -72,7 +72,8 @@ comes with the Android NDK does not depend on any system-specific JNI header
 files (e.g. jni_md.h). Thus only the top-level include directory is needed.
 
 7. Then run '../connectedhomeip/configure --host=\$TARGET --with-crypto=mbedtls
-   --enable-tests=no --enable-shared --with-device-layer=none'
+   --enable-tests=no --enable-shared --with-device-layer=none
+   --with-chip-project-includes=../connectedhomeip/config/android'
 
 8. Finally 'make'
 
