@@ -103,16 +103,18 @@ void printApsFrame(EmberApsFrame * frame)
            frame->groupId, frame->sequence, frame->radius);
 }
 
+// Size of an encoded EmberApsFrame.
+static const size_t kEmberApsFrameSize = 13;
+
 uint16_t extractMessage(uint8_t * buffer, uint16_t buffer_length, uint8_t ** msg)
 {
-    // buffer is at least 16 bytes long and the msg is 3 bytes long and 13 bytes offset into the buffer.
-    // This is hard coded now till we refactor encoder.c to not have this be hardcoded.
+    // The message starts after the EmberApsFrame.
     uint16_t result = 0;
-    if (msg && buffer_length >= 16)
+    if (msg && buffer_length > kEmberApsFrameSize)
     {
         // These are hard coded for now.
-        *msg   = buffer + 13;
-        result = 3;
+        *msg   = buffer + kEmberApsFrameSize;
+        result = buffer_length - kEmberApsFrameSize;
     }
     else if (msg)
     {

@@ -49,6 +49,17 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
 - (BOOL)disconnect:(NSError * __autoreleasing *)error;
 - (BOOL)isConnected;
 
+/**
+ * Test whether a given message is likely to be a data model command.
+ */
++ (BOOL)isDataModelCommand:(NSData * _Nonnull)message;
+
+/**
+ * Given a data model command, convert it to some sort of human-readable
+ * string that describes what it is, as far as we can tell.
+ */
++ (NSString *)commandToString:(NSData * _Nonnull)command;
+
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 

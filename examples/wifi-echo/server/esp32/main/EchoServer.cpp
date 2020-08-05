@@ -159,7 +159,7 @@ public:
         // port from data model processing.
         if (ContentMayBeADataModelMessage(buffer))
         {
-            HandleDataModelMessage(buffer);
+            HandleDataModelMessage(header, buffer, mgr);
             buffer = NULL;
         }
         else

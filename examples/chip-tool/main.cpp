@@ -67,8 +67,9 @@ static const unsigned char remote_public_key[] = { 0x04, 0xe2, 0x07, 0x64, 0xff,
                                                    0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
                                                    0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
 
-static const char * PAYLOAD = "Message from Standalone CHIP echo client!";
-bool isDeviceConnected      = false;
+static const char * PAYLOAD    = "Message from Standalone CHIP echo client!";
+bool isDeviceConnected         = false;
+static bool waitingForResponse = true;
 
 // Device Manager Callbacks
 static void OnConnect(DeviceController::ChipDeviceController * controller, Transport::PeerConnectionState * state,
@@ -88,11 +89,56 @@ static void OnConnect(DeviceController::ChipDeviceController * controller, Trans
     }
 }
 
+static bool ContentMayBeADataModelMessage(System::PacketBuffer * buffer)
+{
+    // A data model message has a first byte whose value is always one of  0x00,
+    // 0x01, 0x02, 0x03.
+    return buffer->DataLength() > 0 && buffer->Start()[0] < 0x04;
+}
+
+// This function consumes (i.e. frees) the buffer.
+static void HandleDataModelMessage(System::PacketBuffer * buffer)
+{
+    EmberApsFrame frame;
+    bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame);
+    if (ok)
+    {
+        printf("APS frame processing success!\n");
+    }
+    else
+    {
+        printf("APS frame processing failure!\n");
+        System::PacketBuffer::Free(buffer);
+        return;
+    }
+
+    uint8_t * message;
+    uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
+
+    VerifyOrExit(messageLen == 5, printf("Unexpected response length: %d\n", messageLen));
+    // Bit 3 of the frame control byte set means direction is server to client.
+    // We expect no other bits to be set.
+    VerifyOrExit(message[0] == 8, printf("Unexpected frame control byte: 0x%02x\n", message[0]));
+    VerifyOrExit(message[1] == 1, printf("Unexpected sequence number: %d\n", message[1]));
+    VerifyOrExit(message[2] == 0x0b, printf("Unexpected command 0x%02x; expected Default Response", message[2]));
+    printf("Got default response to command '0x%02x' for cluster '0x%02x'.  Status is '0x%02x'.\n", message[3], frame.clusterId,
+           message[4]);
+exit:
+    System::PacketBuffer::Free(buffer);
+}
+
 static void OnMessage(DeviceController::ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * buffer)
 {
-    size_t data_len = buffer->DataLength();
+    size_t data_len    = buffer->DataLength();
+    waitingForResponse = false;
 
     printf("Message received: %zu bytes\n", data_len);
+
+    if (ContentMayBeADataModelMessage(buffer))
+    {
+        HandleDataModelMessage(buffer);
+        return;
+    }
 
     // attempt to print the incoming message
     char msg_buffer[data_len];
@@ -115,6 +161,7 @@ static void OnMessage(DeviceController::ChipDeviceController * deviceController,
 static void OnError(DeviceController::ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR error,
                     const IPPacketInfo * pi)
 {
+    waitingForResponse = false;
     printf("ERROR: %s\n Got error\n", ErrorStr(error));
 }
 
@@ -349,6 +396,13 @@ void DoOnOff(DeviceController::ChipDeviceController * controller, Command comman
 #endif
 
     controller->SendMessage(NULL, buffer);
+    // FIXME: waitingForResponse is being written on other threads, presumably.
+    // We probably need some more synchronization here.
+    while (waitingForResponse)
+    {
+        // Just poll for the response.
+        sleep(0);
+    }
 }
 
 CHIP_ERROR ExecuteCommand(DeviceController::ChipDeviceController * controller, Command command, CommandArgs & commandArgs)

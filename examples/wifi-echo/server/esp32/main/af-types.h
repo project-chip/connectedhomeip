@@ -52,8 +52,20 @@
 #include <stddef.h>  // For NULL.
 #include <stdint.h>  // For various uint*_t types
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
 #include "gen/enums.h"
 #include "types_stub.h" // For various types.
+#ifdef __cplusplus
+} // extern "C"
+#endif // __cplusplus
+
+#include "chip-response.h" // For ChipResponseDestination
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
 
 #ifdef EZSP_HOST
 #include "app/util/ezsp/ezsp-enum.h"
@@ -453,7 +465,7 @@ typedef struct
      */
     EmberApsFrame * apsFrame;
     EmberIncomingMessageType type;
-    EmberNodeId source;
+    ChipResponseDestination * source;
     uint8_t * buffer;
     uint16_t bufLen;
     bool clusterSpecific;
@@ -1972,5 +1984,9 @@ typedef struct
 #define EMBER_AF_ZDO_RESPONSE_OVERHEAD 2
 
 /** @} END addtogroup */
+
+#ifdef __cplusplus
+} // extern "C"
+#endif // __cplusplus
 
 #endif // SILABS_AF_API_TYPES
