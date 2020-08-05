@@ -598,7 +598,11 @@ exit:
     return error;
 }
 
-static inline int const_memcmp(const void * a, const void * b, size_t n)
+/**
+ * This function implements constant time memcmp. It's good practice
+ * to use constant time functions for cryptographic functions.
+ */
+static inline int constant_time_memcmp(const void * a, const void * b, size_t n)
 {
     const unsigned char * A = (const unsigned char *) a;
     const unsigned char * B = (const unsigned char *) b;
@@ -625,7 +629,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::MacVerify(const unsigned char * key, s
     error = Mac(key, key_len, in, in_len, computed_mac);
     SuccessOrExit(error);
 
-    VerifyOrExit(const_memcmp(mac, computed_mac, kSHA256_Hash_Length) == 0, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(constant_time_memcmp(mac, computed_mac, kSHA256_Hash_Length) == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
     _log_mbedTLS_error(result);
@@ -762,11 +766,11 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(unsigned char * Lout, size_t 
     mbedtls_ecp_point Ltemp;
 
     mbedtls_ecp_group_init(&curve);
-    result = mbedtls_ecp_group_load(&curve, MBEDTLS_ECP_DP_SECP256R1);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
     mbedtls_mpi_init(&w1_bn);
     mbedtls_ecp_point_init(&Ltemp);
+
+    result = mbedtls_ecp_group_load(&curve, MBEDTLS_ECP_DP_SECP256R1);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     result = mbedtls_mpi_read_binary(&w1_bn, w1in, w1in_len);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
