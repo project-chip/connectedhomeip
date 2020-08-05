@@ -344,12 +344,14 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
             return;
         }
 
+	/*
         if (SoftwareUpdateMgr().IsInProgress())
         {
             K32W_LOG("Canceling In Progress Software Update");
             SoftwareUpdateMgr().Abort();
             K32W_LOG("OTA processs was cancelled!");
         }
+        */
         K32W_LOG("Factory Reset Triggered. Push the RESET button within %u ms to cancel!", resetTimeout);
         sAppTask.mFunction = kFunction_FactoryReset;
 
@@ -371,7 +373,6 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
 void AppTask::LockActionEventHandler(AppEvent * aEvent)
 {
     BoltLockManager::Action_t action;
-    int32_t actor;
     int err = CHIP_NO_ERROR;
 
 
@@ -384,7 +385,6 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     if (aEvent->Type == AppEvent::kEventType_Lock)
     {
         action = static_cast<BoltLockManager::Action_t>(aEvent->LockEvent.Action);
-        actor  = aEvent->LockEvent.Actor;
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
@@ -420,6 +420,7 @@ void AppTask::OtaHandler(AppEvent * aEvent)
         return;
     }
 
+    /*
     if (SoftwareUpdateMgr().IsInProgress())
     {
         K32W_LOG("Canceling In Progress Software Update");
@@ -430,6 +431,7 @@ void AppTask::OtaHandler(AppEvent * aEvent)
         K32W_LOG("Manual Software Update Triggered");
         SoftwareUpdateMgr().CheckNow();
     }
+    */
 }
 
 void AppTask::CancelTimer()
