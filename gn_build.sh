@@ -89,7 +89,6 @@ echo
 
 # EFR32 SDK setup
 efr32_sdk_args=""
-extra_args=""
 
 if [[ -d "$EFR32_SDK_ROOT/protocol/" ]]; then
     efr32_sdk_args+="efr32_sdk_root=\"$EFR32_SDK_ROOT\" efr32_board=\"$EFR32_BOARD\""
