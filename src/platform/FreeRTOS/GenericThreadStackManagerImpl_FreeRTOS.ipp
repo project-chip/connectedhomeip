@@ -123,13 +123,15 @@ void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::OnJoinerTimer(TimerHandl
 
     if (xTaskGetTickCount() > self->mJoinerExpire || self->Impl()->IsThreadProvisioned())
     {
-        ChipLogDetail(DeviceLayer, "Thread joiner timer stopped.");
-        xTimerStop(xTimer, 0);
-        xTimerDelete(xTimer, 0);
+        ChipLogDetail(DeviceLayer, "Thread joiner timer stopped");
+
+        VerifyOrDie(pdPASS == xTimerStop(xTimer, portMAX_DELAY) && pdPASS == xTimerDelete(xTimer, portMAX_DELAY));
     }
     else
     {
-        self->Impl()->JoinerStart();
+        CHIP_ERROR error = self->Impl()->JoinerStart();
+
+        ChipLogDetail(DeviceLayer, "Thread joiner timer triggered: %s", chip::ErrorStr(error));
     }
 }
 
@@ -150,7 +152,8 @@ void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::ThreadTaskMain(void * ar
     self->mJoinerExpire = xTaskGetTickCount() + pdMS_TO_TICKS(15 * 60 * 1000);
 
     TimerHandle_t joinerTimer = xTimerCreate("JoinerTimer", pdMS_TO_TICKS(10000), pdTRUE, self, &OnJoinerTimer);
-    xTimerStart(joinerTimer, 0);
+    VerifyOrDie(joinerTimer != NULL);
+    VerifyOrDie(pdPASS == xTimerStart(joinerTimer, portMAX_DELAY));
 
     while (true)
     {
