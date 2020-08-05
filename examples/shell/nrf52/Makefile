@@ -145,6 +145,7 @@ INC_DIRS = \
     $(CHIP_ROOT)/src/lib/shell \
     $(CHIP_ROOT)/src/system \
     $(CHIP_ROOT)/src/include/ \
+    $(CHIP_ROOT)/third_party/openthread/repo/include \
     $(NRF5_PLATFORM_DIR)/app/include \
     $(NRF5_PLATFORM_DIR)/app/project_include \
     $(NRF5_PLATFORM_DIR)/util/include \
@@ -210,6 +211,7 @@ INC_DIRS = \
     $(NRF5_SDK_ROOT)/modules/nrfx/hal \
     $(NRF5_SDK_ROOT)/modules/nrfx/mdk \
     $(NULL)
+
 
 DEFINES = \
     USE_APP_CONFIG \
