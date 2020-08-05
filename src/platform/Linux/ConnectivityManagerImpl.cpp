@@ -63,7 +63,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mWpaSupplicant.proxy = NULL;
     mWpaSupplicant.iface = NULL;
     mWpaSupplicant.interfacePath = NULL;
-    mWpaSupplicant.networkPath = NULL;    
+    mWpaSupplicant.networkPath = NULL;
 
     wpa_fi_w1_wpa_supplicant1_proxy_new_for_bus (
         G_BUS_TYPE_SYSTEM,
@@ -161,7 +161,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object,
         else
             ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to create wpa_supplicant1 interface proxy %s",
                 mWpaSupplicant.interfacePath);
-        
+
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_NOT_CONNECTED;
     }
 
@@ -176,11 +176,11 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object,
     GError * err   = NULL;
 
     gboolean result = wpa_fi_w1_wpa_supplicant1_call_get_interface_finish(mWpaSupplicant.proxy,
-                                                                          &mWpaSupplicant.interfacePath, 
-                                                                          res, 
+                                                                          &mWpaSupplicant.interfacePath,
+                                                                          res,
                                                                           &err);
     if (result)
-    {        
+    {
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_GOT_INTERFACE_PATH;
         ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi interface: %s", mWpaSupplicant.interfacePath);
 
@@ -223,7 +223,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * prox
 
     mWpaSupplicant.interfacePath = const_cast<gchar *>(path);
     if (mWpaSupplicant.interfacePath)
-    {        
+    {
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_GOT_INTERFACE_PATH;
         ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi interface added: %s", mWpaSupplicant.interfacePath);
 
@@ -284,7 +284,7 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object,
             "interface-added",
             G_CALLBACK(_OnWpaInterfaceAdded),
             NULL);
-    
+
         g_signal_connect(mWpaSupplicant.proxy,
             "interface-removed",
             G_CALLBACK(_OnWpaInterfaceRemoved),
