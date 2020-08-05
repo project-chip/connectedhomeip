@@ -29,7 +29,7 @@ BluetoothWidget * RendezvousSession::mVirtualLed;
 
 Ble::BLEEndPoint * RendezvousSession::mEndPoint = nullptr;
 
-RendezvousSession::RendezvousSession(BluetoothWidget * virtualLed)
+RendezvousSession::RendezvousSession(BluetoothWidget * virtualLed, uint32_t setUpPINCode)
 {
     mVirtualLed = virtualLed;
 

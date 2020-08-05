@@ -57,6 +57,20 @@ public:
 
     /**
      * @brief
+     *   Derive a shared key. The derived key will be used for encryting/decrypting
+     *   data exchanged on the secure channel.
+     *
+     * @param remote_public_key  A pointer to peer's public key
+     * @param public_key_length  Length of remote_public_key
+     * @param local_private_key  A pointer to local private key
+     * @param private_key_length Length of local_private_key
+     * @return CHIP_ERROR        The result of key derivation
+     */
+    CHIP_ERROR InitFromSecret(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
+                              const size_t salt_length, const unsigned char * info, const size_t info_length);
+
+    /**
+     * @brief
      *   Encrypt the input data using keys established in the secure channel
      *
      * @param input Unencrypted input data

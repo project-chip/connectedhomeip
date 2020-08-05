@@ -24,7 +24,7 @@ using namespace ::chip;
 class RendezvousSession
 {
 public:
-    RendezvousSession(BluetoothWidget * virtualLed);
+    RendezvousSession(BluetoothWidget * virtualLed, uint32_t setupPINCode);
     CHIP_ERROR Send(const char * msg);
 
 private:

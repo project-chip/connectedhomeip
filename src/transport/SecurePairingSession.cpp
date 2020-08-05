@@ -1,0 +1,275 @@
+/*
+ *
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/**
+ *    @file
+ *      This file implements the CHIP SPAKE2P Session object that provides
+ *      APIs for constructing spake2p messages and establishing encryption
+ *      keys.
+ *
+ */
+
+#include <support/CodeUtils.h>
+#include <transport/SecurePairingSession.h>
+
+namespace chip {
+
+static const char * kSpake2pKeyExchangeSalt = "SPAKE2P Key Exchange Salt";
+
+using namespace Crypto;
+
+SecurePairingSession::SecurePairingSession(void) {}
+
+SecurePairingSession::~SecurePairingSession(void)
+{
+    if (mDelegate != nullptr)
+    {
+        mDelegate->Release();
+    }
+}
+
+CHIP_ERROR SecurePairingSession::Init(uint32_t setupCode, SecurePairingSessionDelegate * delegate)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(delegate != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    err = mSpake2p.Init((const unsigned char *) &mSpake2pContext, sizeof(mSpake2pContext));
+    SuccessOrExit(err);
+
+    err = pbkdf2_sha256((const unsigned char *) &setupCode, sizeof(setupCode), (const unsigned char *) kSpake2pKeyExchangeSalt,
+                        strlen(kSpake2pKeyExchangeSalt), kPBKDF_Iteration_Count, sizeof(mWS), &mWS[0][0]);
+    SuccessOrExit(err);
+
+    if (mDelegate != nullptr)
+    {
+        mDelegate->Release();
+    }
+    mDelegate = delegate->Retain();
+
+exit:
+    return err;
+}
+
+CHIP_ERROR SecurePairingSession::WaitForPairing(uint32_t mySetUpPINCode, SecurePairingSessionDelegate * delegate)
+{
+    size_t sizeof_point = sizeof(mPoint);
+
+    CHIP_ERROR err = Init(mySetUpPINCode, delegate);
+    SuccessOrExit(err);
+
+    err = mSpake2p.ComputeL(mPoint, &sizeof_point, &mWS[1][0], kSpake2p_WS_Length);
+    SuccessOrExit(err);
+
+    mNextExpectedMsg = Spake2pMsgType::kSpake2pCompute_pA;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR SecurePairingSession::Pair(uint32_t peerSetUpPINCode, SecurePairingSessionDelegate * delegate)
+{
+    unsigned char X[kMAX_Point_Length];
+    size_t X_len = sizeof(X);
+
+    CHIP_ERROR err = Init(peerSetUpPINCode, delegate);
+    SuccessOrExit(err);
+
+    err = mSpake2p.BeginProver((const unsigned char *) "", 0, (const unsigned char *) "", 0, &mWS[0][0], kSpake2p_WS_Length,
+                               &mWS[1][0], kSpake2p_WS_Length);
+    SuccessOrExit(err);
+
+    err = mSpake2p.ComputeRoundOne(X, &X_len);
+    SuccessOrExit(err);
+
+    {
+        // Call delegate to send the Compute_pA to peer
+        System::PacketBuffer * resp = System::PacketBuffer::NewWithAvailableSize(X_len);
+        VerifyOrExit(resp != NULL, err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+
+        memcpy(resp->Start(), &X, X_len);
+
+        err = mDelegate->OnNewMessageForPeer((uint8_t) Spake2pMsgType::kSpake2pCompute_pA, resp);
+        SuccessOrExit(err);
+    }
+
+    mNextExpectedMsg = Spake2pMsgType::kSpake2pCompute_pB_cB;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR SecurePairingSession::DeriveSecureSession(const unsigned char * info, size_t info_len, SecureSession * session)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(info != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(info_len > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(mPairingComplete, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = session->InitFromSecret(mKe, mKeLen, NULL, 0, info, info_len);
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
+
+CHIP_ERROR SecurePairingSession::HandleCompute_pA(const MessageHeader & header, System::PacketBuffer * msg)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    unsigned char Y[kMAX_Point_Length];
+    size_t Y_len = sizeof(Y);
+
+    unsigned char verifier[kMAX_Hash_Length];
+    size_t verifier_len = sizeof(verifier);
+
+    err = mSpake2p.BeginVerifier((const unsigned char *) "", 0, (const unsigned char *) "", 0, &mWS[0][0], kSpake2p_WS_Length,
+                                 mPoint, sizeof(mPoint));
+    SuccessOrExit(err);
+
+    err = mSpake2p.ComputeRoundOne(Y, &Y_len);
+    SuccessOrExit(err);
+
+    err = mSpake2p.ComputeRoundTwo(msg->Start(), msg->TotalLength(), verifier, &verifier_len);
+    SuccessOrExit(err);
+
+    {
+        // Call delegate to send the Compute_pB_cB to peer
+        uint8_t * buf               = nullptr;
+        System::PacketBuffer * resp = System::PacketBuffer::NewWithAvailableSize(Y_len + verifier_len);
+        VerifyOrExit(resp != NULL, err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+
+        buf = resp->Start();
+        memcpy(buf, &Y, Y_len);
+        memcpy(&buf[Y_len], verifier, Y_len);
+
+        err = mDelegate->OnNewMessageForPeer((uint8_t) Spake2pMsgType::kSpake2pCompute_pB_cB, resp);
+        VerifyOrExit(msg != NULL, err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    }
+
+    mNextExpectedMsg = Spake2pMsgType::kSpake2pCompute_cA;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const MessageHeader & header, System::PacketBuffer * msg)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    unsigned char verifier[kMAX_Hash_Length];
+    size_t verifier_len = sizeof(verifier);
+
+    uint8_t * buf  = msg->Start();
+    size_t buf_len = msg->TotalLength();
+
+    VerifyOrExit(buf_len >= kMAX_Point_Length + kMAX_Hash_Length, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
+
+    err = mSpake2p.ComputeRoundTwo(buf, kMAX_Point_Length, verifier, &verifier_len);
+    SuccessOrExit(err);
+
+    err = mSpake2p.KeyConfirm(&buf[kMAX_Point_Length], buf_len - kMAX_Point_Length);
+    SuccessOrExit(err);
+
+    err = mSpake2p.GetKeys(mKe, &mKeLen);
+    SuccessOrExit(err);
+
+    {
+        // Call delegate to send the Compute_cA to peer
+        System::PacketBuffer * resp = System::PacketBuffer::NewWithAvailableSize(verifier_len);
+        VerifyOrExit(resp != NULL, err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+
+        memcpy(resp->Start(), verifier, verifier_len);
+
+        err = mDelegate->OnNewMessageForPeer((uint8_t) Spake2pMsgType::kSpake2pCompute_cA, resp);
+        SuccessOrExit(resp);
+    }
+
+    mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgTypeMax;
+
+    // Call delegate to indicate pairing completion
+    mDelegate->OnPairingComplete();
+    mPairingComplete = true;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR SecurePairingSession::HandleCompute_cA(const MessageHeader & header, System::PacketBuffer * msg)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = mSpake2p.KeyConfirm(msg->Start(), msg->TotalLength());
+    SuccessOrExit(err);
+
+    err = mSpake2p.GetKeys(mKe, &mKeLen);
+    SuccessOrExit(err);
+
+    mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgTypeMax;
+
+    // Call delegate to indicate pairing completion
+    mDelegate->OnPairingComplete();
+    mPairingComplete = true;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR SecurePairingSession::HandlePeerMessage(const MessageHeader & header, System::PacketBuffer * msg)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrExit(msg != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(header.GetMessageType() == (uint8_t) mNextExpectedMsg, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
+
+    switch ((Spake2pMsgType) header.GetMessageType())
+    {
+    case Spake2pMsgType::kSpake2pCompute_pA:
+        err = HandleCompute_pA(header, msg);
+        break;
+
+    case Spake2pMsgType::kSpake2pCompute_pB_cB:
+        err = HandleCompute_pB_cB(header, msg);
+        break;
+
+    case Spake2pMsgType::kSpake2pCompute_cA:
+        err = HandleCompute_cA(header, msg);
+        break;
+
+    default:
+        err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
+        break;
+    };
+
+exit:
+
+    // Call delegate to indicate pairing failure
+    if (err != CHIP_NO_ERROR)
+    {
+        mDelegate->OnPairingError(err);
+    }
+
+    if (msg != NULL)
+    {
+        System::PacketBuffer::Free(msg);
+    }
+
+    return err;
+}
+
+} // namespace chip
