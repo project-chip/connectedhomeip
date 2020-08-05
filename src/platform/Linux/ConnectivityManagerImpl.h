@@ -120,7 +120,8 @@ private:
     bool _IsWiFiStationConnected(void);
     bool _CanStartWiFiScan();
     static void _OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
-    static void _OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties, gpointer user_data);
+    static void _OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
+                                       gpointer user_data);
     static void _OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties, gpointer user_data);
     static void _OnWpaInterfaceReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
     static void _OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
