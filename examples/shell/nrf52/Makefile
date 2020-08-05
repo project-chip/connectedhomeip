@@ -76,6 +76,7 @@ SRCS = \
     $(NRF5_SDK_ROOT)/components/libraries/crc16/crc16.c \
     $(NRF5_SDK_ROOT)/components/libraries/experimental_section_vars/nrf_section_iter.c \
     $(NRF5_SDK_ROOT)/components/libraries/fds/fds.c \
+    $(NRF5_SDK_ROOT)/components/libraries/fifo/app_fifo.c \
     $(NRF5_SDK_ROOT)/components/libraries/fstorage/nrf_fstorage.c \
     $(NRF5_SDK_ROOT)/components/libraries/fstorage/nrf_fstorage_sd.c \
     $(NRF5_SDK_ROOT)/components/libraries/log/src/nrf_log_backend_rtt.c \
@@ -89,6 +90,7 @@ SRCS = \
     $(NRF5_SDK_ROOT)/components/libraries/ringbuf/nrf_ringbuf.c \
     $(NRF5_SDK_ROOT)/components/libraries/strerror/nrf_strerror.c \
     $(NRF5_SDK_ROOT)/components/libraries/timer/app_timer_freertos.c \
+    $(NRF5_SDK_ROOT)/components/libraries/uart/app_uart_fifo.c \
     $(NRF5_SDK_ROOT)/components/libraries/uart/retarget.c \
     $(NRF5_SDK_ROOT)/components/libraries/util/app_error.c \
     $(NRF5_SDK_ROOT)/components/libraries/util/app_error_handler_gcc.c \
@@ -119,6 +121,7 @@ SRCS = \
     $(NRF5_SDK_ROOT)/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c \
     $(NRF5_SDK_ROOT)/integration/nrfx/legacy/nrf_drv_clock.c \
     $(NRF5_SDK_ROOT)/integration/nrfx/legacy/nrf_drv_rng.c \
+    $(NRF5_SDK_ROOT)/integration/nrfx/legacy/nrf_drv_uart.c \
     $(NRF5_SDK_ROOT)/modules/nrfx/drivers/src/nrfx_clock.c \
     $(NRF5_SDK_ROOT)/modules/nrfx/drivers/src/nrfx_gpiote.c \
     $(NRF5_SDK_ROOT)/modules/nrfx/drivers/src/nrfx_uart.c \
@@ -159,6 +162,7 @@ INC_DIRS = \
     $(NRF5_SDK_ROOT)/components/libraries/delay \
     $(NRF5_SDK_ROOT)/components/libraries/experimental_section_vars \
     $(NRF5_SDK_ROOT)/components/libraries/fds \
+    $(NRF5_SDK_ROOT)/components/libraries/fifo \
     $(NRF5_SDK_ROOT)/components/libraries/fstorage \
     $(NRF5_SDK_ROOT)/components/libraries/log \
     $(NRF5_SDK_ROOT)/components/libraries/log/src \
@@ -170,6 +174,7 @@ INC_DIRS = \
     $(NRF5_SDK_ROOT)/components/libraries/stack_info \
     $(NRF5_SDK_ROOT)/components/libraries/strerror \
     $(NRF5_SDK_ROOT)/components/libraries/timer \
+    $(NRF5_SDK_ROOT)/components/libraries/uart \
     $(NRF5_SDK_ROOT)/components/libraries/util \
     $(NRF5_SDK_ROOT)/components/softdevice/common \
     $(NRF5_SDK_ROOT)/components/softdevice/s140/headers \
@@ -206,8 +211,6 @@ INC_DIRS = \
     $(NRF5_SDK_ROOT)/modules/nrfx/mdk \
     $(NULL)
 
-#$(CHIP_ROOT)/config/standalone \
-
 DEFINES = \
     USE_APP_CONFIG \
     BOARD_PCA10056 \
@@ -226,8 +229,6 @@ DEFINES = \
     PRINTF_DISABLE_SUPPORT_EXPONENTIAL \
     S140 \
     SOFTDEVICE_PRESENT \
-    UART0_ENABLED=0 \
-    UART1_ENABLED=1 \
     __HEAP_SIZE=40960 \
     __STACK_SIZE=8192 \
     NRF_SHELL_STREAMER \
@@ -235,6 +236,7 @@ DEFINES = \
     $(NULL)
 
 #CXXFLAGS += -std=c++11
+#CXXFLAGS += -std=gnu++11
 
 ifdef BUILD_RELEASE
     DEFINES += BUILD_RELEASE=1

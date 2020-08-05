@@ -40,8 +40,26 @@
 #include "nrf_ble_gatt.h"
 #include "nrf_error.h"
 
+#ifdef SOFTDEVICE_PRESENT
+#include "nrf_sdh.h"
+#include "nrf_sdh_ble.h"
+#include "nrf_sdh_soc.h"
+#endif
+
+#if CHIP_ENABLE_OPENTHREAD
+extern "C" {
+#include <openthread/platform/platform-softdevice.h>
+}
+#endif // CHIP_ENABLE_OPENTHREAD
+
 #define NRF_LOG_MODULE_NAME chip
 #include "nrf_log.h"
+
+#if NRF_LOG_ENABLED
+#include "nrf_log_backend_uart.h"
+#include "nrf_log_ctrl.h"
+#include "nrf_log_default_backends.h"
+#endif // NRF_LOG_ENABLED
 
 using namespace chip::Ble;
 
@@ -88,6 +106,95 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 #define CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY 3
 #endif // CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
 
+#if defined(SOFTDEVICE_PRESENT)
+
+static void OnSoCEvent(uint32_t sys_evt, void * p_context)
+{
+#if CHIP_ENABLE_OPENTHREAD
+    otSysSoftdeviceSocEvtHandler(sys_evt);
+#endif
+    UNUSED_PARAMETER(p_context);
+}
+
+#endif // defined(SOFTDEVICE_PRESENT)
+
+static uint32_t LogTimestamp(void)
+{
+    return 0;
+}
+
+CHIP_ERROR BLEManagerImpl::_PlatformInit()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // #if JLINK_MMD
+    //     NVIC_SetPriority(DebugMonitor_IRQn, _PRIO_SD_LOWEST);
+    // #endif
+
+    //     // Initialize clock driver.
+    //     ret = nrf_drv_clock_init();
+    //     APP_ERROR_CHECK(ret);
+
+    //     nrf_drv_clock_lfclk_request(NULL);
+
+    //     // Wait for the clock to be ready.
+    //     while (!nrf_clock_lf_is_running())
+    //     {
+    //     }
+
+#if NRF_LOG_ENABLED
+
+    // Initialize logging component
+    err = NRF_LOG_INIT(LogTimestamp, 1000);
+    SuccessOrExit(err);
+
+    // Initialize logging backends
+    NRF_LOG_DEFAULT_BACKENDS_INIT();
+#endif
+
+    NRF_LOG_INFO("==================================================");
+    NRF_LOG_INFO("chip-nrf52840-lock-example starting");
+#if BUILD_RELEASE
+    NRF_LOG_INFO("*** PSEUDO-RELEASE BUILD ***");
+#else
+    NRF_LOG_INFO("*** DEVELOPMENT BUILD ***");
+#endif
+    NRF_LOG_INFO("==================================================");
+    NRF_LOG_FLUSH();
+
+#if defined(SOFTDEVICE_PRESENT)
+
+    // NRF_LOG_INFO("Enabling SoftDevice");
+
+    err = nrf_sdh_enable_request();
+    SuccessOrExit(err);
+
+    while (!nrf_sdh_is_enabled())
+    {
+    }
+
+    // Register a handler for SOC events.
+    NRF_SDH_SOC_OBSERVER(m_soc_observer, NRF_SDH_SOC_STACK_OBSERVER_PRIO, OnSoCEvent, NULL);
+
+    {
+        uint32_t appRAMStart = 0;
+
+        // Configure the BLE stack using the default settings.
+        // Fetch the start address of the application RAM.
+        err = nrf_sdh_ble_default_cfg_set(CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG, &appRAMStart);
+        SuccessOrExit(err);
+
+        // Enable BLE stack.
+        err = nrf_sdh_ble_enable(&appRAMStart);
+        SuccessOrExit(err);
+    }
+#endif // defined(SOFTDEVICE_PRESENT)
+
+exit:
+    // ChipLogProgress(DeviceLayer, "BLEManagerImpl::PlatformInit() complete");
+    return err;
+}
+
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
@@ -105,6 +212,10 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     // Initialize the CHIP BleLayer.
     err = BleLayer::Init(this, this, &SystemLayer);
+    SuccessOrExit(err);
+
+    // Initialize the Softdevice
+    err = _PlatformInit();
     SuccessOrExit(err);
 
     // Register vendor-specific UUIDs with the soft device.

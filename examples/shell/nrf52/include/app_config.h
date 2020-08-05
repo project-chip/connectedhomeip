@@ -73,12 +73,6 @@
 #define NRF_LOG_BACKEND_UART_BAUDRATE 30801920
 #define NRF_LOG_BACKEND_UART_TEMP_BUFFER_SIZE 64
 
-#define UART_ENABLED 1
-#define UART0_ENABLED 1
-#define NRFX_UARTE_ENABLED 1
-#define NRFX_UART_ENABLED 1
-#define UART_LEGACY_SUPPORT 0
-
 #endif // NRF_LOG_BACKEND_UART_ENABLED
 
 #if NRF_LOG_BACKEND_RTT_ENABLED
@@ -110,7 +104,17 @@
 #define NRF_STRERROR_ENABLED 1
 #define NRF_QUEUE_ENABLED 1
 #define APP_TIMER_ENABLED 1
+#define APP_UART_ENABLED 1
+#define APP_FIFO_ENABLED 1
 #define BUTTON_ENABLED 1
+
+#define UART_ENABLED 1
+#define UART1_ENABLED 1
+#define NRFX_UARTE_ENABLED 1
+#define NRFX_UARTE1_ENABLED 1
+#define APP_UART_DRIVER_INSTANCE 1
+#define NRFX_UART_ENABLED 0
+#define UART_LEGACY_SUPPORT 0
 
 #define GPIOTE_ENABLED 1
 #define GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS 2
@@ -125,14 +129,6 @@
 
 #define SYSTEM_STATE_LED BSP_LED_0
 #define LOCK_STATE_LED BSP_LED_1
-
-// Time it takes in ms for the simulated actuator to move from one
-// state to another.
-#define ACTUATOR_MOVEMENT_PERIOS_MS 2000
-
-// ---- Lock Example SWU Config ----
-#define SWU_INTERVAl_WINDOW_MIN_MS (23 * 60 * 60 * 1000) // 23 hours
-#define SWU_INTERVAl_WINDOW_MAX_MS (24 * 60 * 60 * 1000) // 24 hours
 
 // ---- Thread Polling Config ----
 #define THREAD_ACTIVE_POLLING_INTERVAL_MS 100

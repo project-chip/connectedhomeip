@@ -1,4 +1,4 @@
- /*
+/*
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *
@@ -22,25 +22,66 @@
 
 #include "shell.h"
 
+#ifdef NRF_SHELL_STREAMER
+
+#include "app_uart.h"
+#include "bsp.h"
+#include "nrf_uarte.h"
+
 namespace chip {
 namespace Shell {
 
-#ifdef NRF_SHELL_STREAMER
+const size_t c_rx_buffer_size = 256; /**< UART RX buffer size. */
+const size_t c_tx_buffer_size = 512; /**< UART TX buffer size. */
 
-int streamer_nrf5_init(streamer_t * streamer)
+void uart_error_handle(app_uart_evt_t * p_event)
 {
-    int ret = 0;
-    return ret;
+    // if (p_event->evt_type == APP_UART_COMMUNICATION_ERROR)
+    // {
+    //     APP_ERROR_HANDLER(p_event->data.error_communication);
+    // }
+    // else if (p_event->evt_type == APP_UART_FIFO_ERROR)
+    // {
+    //     APP_ERROR_HANDLER(p_event->data.error_code);
+    // }
 }
 
-int streamer_nrf5_read(streamer_t * streamer, char * buf, size_t len)
+void streamer_nrf5_init_internal()
+{
+    uint32_t err_code;
+    const app_uart_comm_params_t comm_params = { RX_PIN_NUMBER,
+                                                 TX_PIN_NUMBER,
+                                                 RTS_PIN_NUMBER,
+                                                 CTS_PIN_NUMBER,
+                                                 APP_UART_FLOW_CONTROL_DISABLED,
+                                                 false,
+                                                 NRF_UARTE_BAUDRATE_115200 };
+
+    APP_UART_FIFO_INIT(&comm_params, c_rx_buffer_size, c_tx_buffer_size, uart_error_handle, APP_IRQ_PRIORITY_LOWEST, err_code);
+    APP_ERROR_CHECK(err_code);
+}
+
+int streamer_nrf5_init(streamer_t * streamer)
 {
     return 0;
 }
 
+int streamer_nrf5_read(streamer_t * streamer, char * buf, size_t len)
+{
+    size_t count = 0;
+    while (count < len && app_uart_get(reinterpret_cast<uint8_t *>(buf + count)) == NRF_SUCCESS)
+        count++;
+
+    return count;
+}
+
 int streamer_nrf5_write(streamer_t * streamer, const char * buf, size_t len)
 {
-    return len;
+    size_t count = 0;
+    while (count < len && app_uart_put(buf[count]) == NRF_SUCCESS)
+        count++;
+
+    return count;
 }
 
 static streamer_t streamer_nrf5 = {
@@ -51,10 +92,16 @@ static streamer_t streamer_nrf5 = {
 
 streamer_t * streamer_get(void)
 {
+    static bool initialized = false;
+    if (!initialized)
+    {
+        streamer_nrf5_init_internal();
+        initialized = true;
+    }
     return &streamer_nrf5;
 }
 
-#endif //#ifdef NRF_SHELL_STREAMER
-
 } // namespace Shell
 } // namespace chip
+
+#endif //#ifdef NRF_SHELL_STREAMER
