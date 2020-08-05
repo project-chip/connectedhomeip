@@ -34,8 +34,11 @@ class ConfigurationManagerImpl;
 namespace Internal {
 class DeviceNetworkInfo;
 class DeviceControlServer;
+class BLEManagerImpl;
 template <class>
 class GenericPlatformManagerImpl;
+template <class>
+class GenericConfigurationManagerImpl;
 template <class>
 class GenericPlatformManagerImpl_FreeRTOS;
 template <class>
@@ -73,14 +76,16 @@ public:
     CHIP_ERROR GetAndLogThreadTopologyFull(void);
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
 
-    void FactoryReset(void);
+    CHIP_ERROR JoinerStart(void);
 
 private:
     // ===== Members for internal use by the following friends.
 
     friend class PlatformManagerImpl;
     friend class ConfigurationManagerImpl;
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     friend class Internal::BLEManagerImpl;
+#endif
     friend class Internal::DeviceControlServer;
     template <class>
     friend class Internal::GenericPlatformManagerImpl;
@@ -295,6 +300,11 @@ inline CHIP_ERROR ThreadStackManager::GetAndLogThreadTopologyFull(void)
 inline CHIP_ERROR ThreadStackManager::GetPrimary802154MACAddress(uint8_t * buf)
 {
     return static_cast<ImplClass *>(this)->_GetPrimary802154MACAddress(buf);
+}
+
+inline CHIP_ERROR ThreadStackManager::JoinerStart(void)
+{
+    return static_cast<ImplClass *>(this)->_JoinerStart();
 }
 
 } // namespace DeviceLayer

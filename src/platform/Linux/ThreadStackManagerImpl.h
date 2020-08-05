@@ -35,12 +35,12 @@ public:
     ThreadStackManagerImpl();
 
     CHIP_ERROR _InitThreadStack();
-    CHIP_ERROR _ProcessThreadActivity();
+    void _ProcessThreadActivity();
 
-    CHIP_ERROR _StartThreadTask() { return CHIP_NO_ERROR; }    // Intentionally left blank
-    CHIP_ERROR _LockThreadStack() { return CHIP_NO_ERROR; }    // Intentionally left blank
-    CHIP_ERROR _TryLockThreadStack() { return CHIP_NO_ERROR; } // Intentionally left blank
-    CHIP_ERROR _UnlockThreadStack() { return CHIP_NO_ERROR; }  // Intentionally left blank
+    CHIP_ERROR _StartThreadTask() { return CHIP_NO_ERROR; } // Intentionally left blank
+    void _LockThreadStack() {}                              // Intentionally left blank
+    bool _TryLockThreadStack() { return false; }            // Intentionally left blank
+    void _UnlockThreadStack() {}                            // Intentionally left blank
 
     bool _HaveRouteToAddress(const Inet::IPAddress & destAddr);
 
@@ -84,9 +84,11 @@ public:
 
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
 
-    void _FactoryReset();
+    CHIP_ERROR _JoinerStart(void);
 
     ~ThreadStackManagerImpl() = default;
+
+    static ThreadStackManagerImpl sInstance;
 
 private:
     struct DBusConnectionDeleter

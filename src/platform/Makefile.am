@@ -62,6 +62,8 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_NoWiFi.h \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_Thread.h \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_Thread.ipp \
+    @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_WiFi.h \
+    @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_WiFi.ipp \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl.h \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl.ipp \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_POSIX.h \
@@ -187,12 +189,89 @@ endif # CHIP_DEVICE_LAYER_TARGET_DARWIN
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
 
+libDeviceLayer_a_CPPFLAGS              += \
+    -I$(builddir)/Linux/gen               \
+    $(NULL)
+
 SUBDIRS                                += tests
+
+.PHONY: gen
+gen:
+	mkdir -p Linux/gen
+
+BUILT_SOURCES                         = \
+    Linux/gen                           \
+    $(NULL)
 
 libDeviceLayer_a_CPPFLAGS              += \
     $(GIO_CFLAGS)                         \
+    $(GIO_UNIX_CFLAGS)                    \
     $(INIPP_CPPFLAGS)                     \
     $(NULL)
+
+if CONFIG_BLE_PLATFORM_BLUEZ
+
+BUILT_SOURCES                         += \
+    Linux/gen/DbusBluez.h                      \
+    Linux/gen/DbusBluez.c                      \
+    $(NULL)
+
+GDBUSCODEGENOPTS                          = \
+    --interface-prefix org.bluez            \
+    --c-namespace Bluez                     \
+    --c-generate-object-manager             \
+    $(NULL)
+
+Linux/gen/DbusBluez.h: Linux/dbus/org.bluez.xml
+	$(GDBUSCODEGEN) $(GDBUSCODEGENOPTS) --header --output $@ $<
+
+Linux/gen/DbusBluez.c: Linux/dbus/org.bluez.xml
+	$(GDBUSCODEGEN) $(GDBUSCODEGENOPTS) --body --output $@ $<
+	sed -i 's/config\.h/BuildConfig.h/g' $@
+
+libDeviceLayer_a_SOURCES               += \
+    Linux/gen/DbusBluez.c                 \
+    $(NULL)
+
+endif #CONFIG_BLE_PLATFORM_BLUEZ
+
+if CONFIG_WIFI_PLATFORM_WPA
+BUILT_SOURCES                          += \
+    Linux/gen/DBusWpa.h                   \
+    Linux/gen/DBusWpaInterface.h          \
+    Linux/gen/DBusWpaNetwork.h            \
+    Linux/gen/DBusWpa.c                   \
+    Linux/gen/DBusWpaInterface.c          \
+    Linux/gen/DBusWpaNetwork.c            \
+    $(NULL)
+
+Linux/gen/DBusWpa.h: Linux/dbus/wpa.xml
+	gdbus-codegen --header --output $@ --c-namespace Wpa $<
+
+Linux/gen/DBusWpaInterface.h: Linux/dbus/wpa_interface.xml
+	gdbus-codegen --header --output $@ --c-namespace Wpa $<
+
+Linux/gen/DBusWpaNetwork.h: Linux/dbus/wpa_network.xml
+	gdbus-codegen --header --output $@ --c-namespace Wpa $<
+
+Linux/gen/DBusWpa.c: Linux/dbus/wpa.xml
+	gdbus-codegen --body --output $@ --c-namespace Wpa $<
+	sed -i 's/config\.h/BuildConfig.h/g' $@
+
+Linux/gen/DBusWpaInterface.c: Linux/dbus/wpa_interface.xml
+	gdbus-codegen --body --output $@ --c-namespace Wpa $<
+	sed -i 's/config\.h/BuildConfig.h/g' $@
+
+Linux/gen/DBusWpaNetwork.c: Linux/dbus/wpa_network.xml
+	gdbus-codegen --body --output $@ --c-namespace Wpa $<
+	sed -i 's/config\.h/BuildConfig.h/g' $@
+
+libDeviceLayer_a_SOURCES               += \
+    Linux/gen/DBusWpa.c                   \
+    Linux/gen/DBusWpaInterface.c          \
+    Linux/gen/DBusWpaNetwork.c            \
+    $(NULL)
+endif # CONFIG_WIFI_PLATFORM_WPA
 
 libDeviceLayer_a_SOURCES               += \
     Linux/BLEManagerImpl.cpp              \
@@ -212,7 +291,8 @@ libDeviceLayer_a_SOURCES               += \
     $(NULL)
 
 libDeviceLayer_a_CPPFLAGS              += \
-    $(OT_BR_POSIX_CPPFLAGS)              \
+    -DCHIP_DEVICE_CONFIG_ENABLE_THREAD=1  \
+    $(OT_BR_POSIX_CPPFLAGS)               \
     $(DBUS_CFLAGS)                        \
     $(NULL)
 endif
@@ -258,7 +338,7 @@ if CHIP_ENABLE_OPENTHREAD
 libDeviceLayer_a_SOURCES               +=       \
     EFR32/ThreadStackManagerImpl.cpp            \
     $(NULL)
-endif    
+endif
 
 endif # CHIP_DEVICE_LAYER_TARGET_EFR32
 

@@ -33,6 +33,7 @@ int TestCHIPArgParser(void);
 int TestErrorStr(void);
 int TestTimeUtils(void);
 int TestMemAlloc(void);
+int TestBufBound(void);
 
 #ifdef __cplusplus
 }

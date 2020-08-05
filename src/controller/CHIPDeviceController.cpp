@@ -31,10 +31,12 @@
 // module header, comes first
 #include <controller/CHIPDeviceController.h>
 
+#if CONFIG_DEVICE_LAYER
+#include <platform/CHIPDeviceLayer.h>
+#endif
+
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
-#include <platform/PlatformManager.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <support/Base64.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -72,8 +74,25 @@ CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId)
 
     VerifyOrExit(mState == kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
+#if CONFIG_DEVICE_LAYER
     err = DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
+
+    err = Init(localNodeId, &DeviceLayer::SystemLayer, &DeviceLayer::InetLayer);
+#endif // CONFIG_DEVICE_LAYER
+
+exit:
+    return err;
+}
+
+CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, System::Layer * systemLayer, InetLayer * inetLayer)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(mState == kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
+
+    mSystemLayer = systemLayer;
+    mInetLayer   = inetLayer;
 
     mState         = kState_Initialized;
     mLocalDeviceId = localNodeId;
@@ -90,8 +109,18 @@ CHIP_ERROR ChipDeviceController::Shutdown()
 
     mState = kState_NotInitialized;
 
+#if CONFIG_DEVICE_LAYER
     err = DeviceLayer::PlatformMgr().Shutdown();
     SuccessOrExit(err);
+#else
+    mSystemLayer->Shutdown();
+    mInetLayer->Shutdown();
+    delete mSystemLayer;
+    delete mInetLayer;
+#endif // CONFIG_DEVICE_LAYER
+
+    mSystemLayer = NULL;
+    mInetLayer   = NULL;
 
     if (mSessionManager != NULL)
     {
@@ -117,25 +146,25 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const char * deviceName, void * appReqState,
-                                               NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
-                                               ErrorHandler onError)
+CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const uint16_t discriminator, const uint32_t setupPINCode,
+                                               void * appReqState, NewConnectionHandler onConnected,
+                                               MessageReceiveHandler onMessageReceived, ErrorHandler onError)
 {
-#if CONFIG_NETWORK_LAYER_BLE
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (mState != kState_Initialized || mConState != kConnectionState_NotConnected)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+#if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
+    Transport::BLE * transport;
+
+    VerifyOrExit(mState == kState_Initialized && mConState == kConnectionState_NotConnected, err = CHIP_ERROR_INCORRECT_STATE);
 
     mRemoteDeviceId  = Optional<NodeId>::Value(remoteDeviceId);
     mAppReqState     = appReqState;
     mOnNewConnection = onConnected;
 
-    Transport::BLE * transport = new Transport::BLE();
-    err                        = transport->Init(
-        Transport::BleConnectionParameters(this, DeviceLayer::ConnectivityMgr().GetBleLayer()).SetConnectionName(deviceName));
+    transport = new Transport::BLE();
+    err       = transport->Init(Transport::BleConnectionParameters(this, DeviceLayer::ConnectivityMgr().GetBleLayer())
+                              .SetDiscriminator(discriminator)
+                              .SetSetupPINCode(setupPINCode));
     SuccessOrExit(err);
     mUnsecuredTransport = transport->Retain();
 
@@ -149,12 +178,14 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const char
     {
         mConState = kConnectionState_NotConnected;
     }
+#else
+    err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif // CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
+
+    SuccessOrExit(err);
 
 exit:
     return err;
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // CONFIG_NETWORK_LAYER_BLE
 }
 
 CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
@@ -176,8 +207,8 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress 
 
     mSessionManager = new SecureSessionMgr<Transport::UDP>();
 
-    err = mSessionManager->Init(mLocalDeviceId, &DeviceLayer::SystemLayer,
-                                Transport::UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(deviceAddr.Type()));
+    err = mSessionManager->Init(mLocalDeviceId, mSystemLayer,
+                                Transport::UdpListenParameters(mInetLayer).SetAddressType(deviceAddr.Type()));
     SuccessOrExit(err);
 
     mSessionManager->SetDelegate(this);
@@ -285,7 +316,7 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
 
     mAppReqState = appReqState;
 
-    if (mUnsecuredTransport)
+    if (mUnsecuredTransport != NULL)
     {
         VerifyOrExit(IsConnected(), err = CHIP_ERROR_INCORRECT_STATE);
         // Unsecured transport does not use a MessageHeader, but the Transport::Base API expects one, so
@@ -310,8 +341,10 @@ CHIP_ERROR ChipDeviceController::ServiceEvents()
 
     VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
 
+#if CONFIG_DEVICE_LAYER
     err = DeviceLayer::PlatformMgr().StartEventLoopTask();
     SuccessOrExit(err);
+#endif // CONFIG_DEVICE_LAYER
 
 exit:
     return err;
@@ -323,11 +356,11 @@ CHIP_ERROR ChipDeviceController::ServiceEventSignal()
 
     VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#if CONFIG_DEVICE_LAYER && (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
     DeviceLayer::SystemLayer.WakeSelect();
 #else
     err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#endif // CONFIG_DEVICE_LAYER && (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 
 exit:
     return err;

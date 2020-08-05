@@ -40,6 +40,9 @@
 
 #ifndef __CLIENT_API__
 #define __CLIENT_API__
+
+#include "af-types.h"
+
 /*
    @addtogroup command
    @{

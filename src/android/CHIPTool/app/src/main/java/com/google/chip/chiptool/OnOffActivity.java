@@ -66,8 +66,6 @@ public class OnOffActivity extends AppCompatActivity implements View.OnClickList
                   activity.finish();
                 }
               });
-
-      ConnectionStatusFragment.updateStatus(activity);
       return inflated;
     }
 
@@ -78,9 +76,5 @@ public class OnOffActivity extends AppCompatActivity implements View.OnClickList
   }
 
   @Override
-  public void onClick(View view) {
-    if (view.getId() == R.id.send_echo_request) {
-      ConnectionStatusFragment.updateStatus(this);
-    }
-  }
+  public void onClick(View view) {}
 }

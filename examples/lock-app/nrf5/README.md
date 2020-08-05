@@ -9,7 +9,7 @@ An example application showing the use
     -   [Introduction](#introduction)
     -   [Device UI](#device-ui)
     -   [Building](#building)
-        -   [Using CHIP's VSCode `devcontainer`](#using-chips-vscode-devcontainer)
+        -   [Using CHIP's nRF Platform Docker container](#using-chips-nrf-platform-docker-container)
         -   [Using Native Shell](#using-native-shell)
     -   [Initializing the nRF52840 DK](#initializing-the-nrf52840-dk)
     -   [Flashing the Application](#flashing-the-application)
@@ -90,23 +90,38 @@ The remaining two LEDs and buttons (#3 and #4) are unused.
 
 ## Building
 
-### Using CHIP's VSCode `devcontainer`
+### Using CHIP's nRF Platform Docker container
 
-Tools and SDK are preinstalled in
-[CHIP's VSCode devcontainer](https://github.com/project-chip/connectedhomeip/blob/master/docs/VSCODE_DEVELOPMENT.md).
-You can build this example on a clean tree by running `make`. Run the following
-commands in a devcontainer shell.
+Tools and SDK are preinstalled in CHIP's nRF Platform Docker container. You can
+build this example on a clean tree by running `make`.
+
+Run the following commands to start a shell using Docker container.
+
+        $ cd <connectedhomeip source directory>
+        $ git submodule update --init
+        $ docker run -v $(pwd):/workspaces/connectedhomeip -it connectedhomeip/chip-build-nrf-platform:latest /bin/bash
+
+Run the following commands in the Docker container shell.
 
         $ cd /workspaces/connectedhomeip
 
         # CAUTION: the following step will delete any unstaged files
         $ git clean -Xdf
 
-        $ cd examples/lock-app/nrf5
-        $ make clean
-        $ make
+        $ scripts/examples/nrf_lock_app.sh
 
-Alternatively, you can run `Build nRF5 Lock App` VSCode task.
+Other alternatives in the container:
+
+-   Run `Build nRF5 Lock App` VSCode task.
+
+-   Run the `GN build` VSCode task. This does not require a clean tree.
+
+-   Build manually with GN.
+
+            $ source scripts/activate.sh
+            $ cd examples/lock-app/nrf5
+            $ gn gen out/debug
+            $ ninja -C out/debug
 
 ### Using Native Shell
 
@@ -152,9 +167,18 @@ Alternatively, you can run `Build nRF5 Lock App` VSCode task.
 
 *   Run make to build the application
 
-          $ cd ~/connectedhomeip/examples/lock-app/nrf5
-          $ make clean
-          $ make
+          $ cd ~/connectedhomeip
+          $ git submodule update --init
+          $ scripts/examples/nrf_lock_app.sh
+
+*   Or, run GN to build the application
+
+          $ cd ~/connectedhomeip
+          $ git submodule update --init
+          $ source scripts/activate.sh
+          $ cd examples/lock-app/nrf5
+          $ gn gen out/debug
+          $ ninja -C out/debug
 
 <a name="initializing"></a>
 

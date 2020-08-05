@@ -29,7 +29,7 @@ namespace Internal {
 class BleConnectionDelegateImpl : public BleConnectionDelegate
 {
 public:
-    virtual void NewConnection(Ble::BleLayer * bleLayer, void * appState, const char * connName);
+    virtual void NewConnection(Ble::BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator);
 };
 
 } // namespace Internal

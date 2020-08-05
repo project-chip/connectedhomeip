@@ -28,6 +28,8 @@
 #include <net/openthread.h>
 #include <zephyr.h>
 
+#include <support/logging/CHIPLogging.h>
+
 namespace chip {
 namespace DeviceLayer {
 

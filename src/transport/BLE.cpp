@@ -54,7 +54,7 @@ CHIP_ERROR BLE::Init(BleConnectionParameters & params)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(params.HasConnectionObject() || params.HasConnectionName(), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(params.HasConnectionObject() || params.HasDiscriminator(), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(params.GetDeviceController(), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(params.GetBleLayer(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -64,7 +64,7 @@ CHIP_ERROR BLE::Init(BleConnectionParameters & params)
     }
     else
     {
-        err = InitInternal(params.GetBleLayer(), params.GetConnectionName());
+        err = DelegateConnection(params.GetBleLayer(), params.GetDiscriminator());
     }
     SuccessOrExit(err);
 
@@ -107,11 +107,12 @@ exit:
     return err;
 }
 
-CHIP_ERROR BLE::InitInternal(Ble::BleLayer * bleLayer, const char * connName)
+CHIP_ERROR BLE::DelegateConnection(Ble::BleLayer * bleLayer, const uint16_t connDiscriminator)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = bleLayer->NewBleConnection(reinterpret_cast<void *>(this), connName, OnBleConnectionComplete, OnBleConnectionError);
+    err = bleLayer->NewBleConnection(reinterpret_cast<void *>(this), connDiscriminator, OnBleConnectionComplete,
+                                     OnBleConnectionError);
     SuccessOrExit(err);
 
 exit:

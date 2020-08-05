@@ -52,6 +52,27 @@ enum
     kWiFiStationNetworkId = 2,
 };
 
+/**
+ * WiFi Security Modes.
+ */
+enum WiFiAuthSecurityType
+{
+    kWiFiSecurityType_NotSpecified = -1,
+
+    kWiFiSecurityType_None                = 1,
+    kWiFiSecurityType_WEP                 = 2,
+    kWiFiSecurityType_WPAPersonal         = 3,
+    kWiFiSecurityType_WPA2Personal        = 4,
+    kWiFiSecurityType_WPA2MixedPersonal   = 5,
+    kWiFiSecurityType_WPAEnterprise       = 6,
+    kWiFiSecurityType_WPA2Enterprise      = 7,
+    kWiFiSecurityType_WPA2MixedEnterprise = 8,
+    kWiFiSecurityType_WPA3Personal        = 9,
+    kWiFiSecurityType_WPA3MixedPersonal   = 10,
+    kWiFiSecurityType_WPA3Enterprise      = 11,
+    kWiFiSecurityType_WPA3MixedEnterprise = 12,
+};
+
 class DeviceNetworkInfo
 {
 public:
@@ -61,6 +82,7 @@ public:
     char WiFiSSID[kMaxWiFiSSIDLength + 1]; /**< The WiFi SSID as a NULL-terminated string. */
     uint8_t WiFiKey[kMaxWiFiKeyLength];    /**< The WiFi key (NOT NULL-terminated). */
     uint8_t WiFiKeyLen;                    /**< The length in bytes of the WiFi key. */
+    WiFiAuthSecurityType WiFiSecurityType; /**< The WiFi security type. */
 
     // ---- Thread-specific Fields ----
     char ThreadNetworkName[kMaxThreadNetworkNameLength + 1];

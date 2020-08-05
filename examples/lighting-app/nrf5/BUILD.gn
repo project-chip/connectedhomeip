@@ -25,7 +25,6 @@ nrf5_sdk("sdk") {
   include_dirs = [
     "main/include",
     "main",
-    "${chip_root}/src/include",
     "${nrf5_platform_dir}/app/project_include",
     "${nrf5_platform_dir}/util/include",
     "${nrf5_platform_dir}/app/include",

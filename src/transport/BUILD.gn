@@ -18,6 +18,8 @@ static_library("transport") {
   output_name = "libTransportLayer"
 
   sources = [
+    "BLE.cpp",
+    "BLE.h",
     "Base.h",
     "MessageHeader.cpp",
     "MessageHeader.h",

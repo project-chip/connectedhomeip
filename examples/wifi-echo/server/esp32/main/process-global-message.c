@@ -295,6 +295,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         // Reset message back to start
         msgIndex          = cmd->payloadStartIndex;
         appResponseLength = (cmd->mfgSpecific ? 4 : 2);
+        /* fall through */
     // DO NOT BREAK from this case
 
     // the format of the write attributes cmd is:
@@ -503,7 +504,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
                 (emberAfGetInt8u(message, msgIndex + 3, msgLen) == ZCL_UTC_TIME_ATTRIBUTE_TYPE))
             {
                 // emberAfSetTime(emberAfGetInt32u(message, msgIndex + 4, msgLen));
-                emberAfDebugPrintln("time sync ok, time: %4x", emberAfGetCurrentTime());
+                // emberAfDebugPrintln("time sync ok, time: %4x", emberAfGetCurrentTime());
                 emAfSyncingTime = false;
             }
 #ifdef EMBER_AF_PLUGIN_SMART_ENERGY_REGISTRATION_TIME_SOURCE_REQUIRED

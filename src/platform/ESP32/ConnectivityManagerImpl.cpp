@@ -58,7 +58,8 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMod
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
         wifi_mode_t curWiFiMode;
-        mWiFiStationMode = (esp_wifi_get_mode(&curWiFiMode) == ESP_OK && curWiFiMode == WIFI_MODE_APSTA)
+        mWiFiStationMode =
+            (esp_wifi_get_mode(&curWiFiMode) == ESP_OK && (curWiFiMode == WIFI_MODE_APSTA || curWiFiMode == WIFI_MODE_STA))
             ? kWiFiStationMode_Enabled
             : kWiFiStationMode_Disabled;
     }
@@ -907,10 +908,10 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
 
     memset(&wifiConfig, 0, sizeof(wifiConfig));
 
-    // TODO Pull this from the configuration manager
-    const uint16_t discriminator = 0x0F00;
+    uint32_t discriminator;
+    SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
 
-    snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s%03" PRIX16, CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX,
+    snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s%04u", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX,
              discriminator);
     wifiConfig.ap.channel         = CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL;
     wifiConfig.ap.authmode        = WIFI_AUTH_OPEN;

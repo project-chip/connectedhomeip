@@ -57,6 +57,7 @@ CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES                        = \
     @top_builddir@/src/lib/support/FlagUtils.hpp               \
     @top_builddir@/src/lib/support/logging/CHIPLogging.h       \
     @top_builddir@/src/lib/support/Base64.h                    \
+    @top_builddir@/src/lib/support/BufBound.h                  \
     @top_builddir@/src/lib/support/PersistedCounter.h          \
     @top_builddir@/src/lib/support/RandUtils.h                 \
     @top_builddir@/src/lib/support/TestUtils.h                 \
