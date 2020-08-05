@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
@@ -17,8 +18,6 @@
  */
 
 #include "LEDWidget.h"
-
-#include <Weave/DeviceLayer/WeaveDeviceLayer.h>
 
 void LEDWidget::Init(LED_t led)
 {
@@ -58,7 +57,7 @@ void LEDWidget::Animate()
 {
     if (mBlinkOnTimeMS != 0 && mBlinkOffTimeMS != 0)
     {
-        int64_t nowUS            = ::nl::Weave::System::Platform::Layer::GetClock_MonotonicHiRes();
+        int64_t nowUS            = 0;
         int64_t stateDurUS       = ((mState) ? mBlinkOnTimeMS : mBlinkOffTimeMS) * 1000LL;
         int64_t nextChangeTimeUS = mLastChangeTimeUS + stateDurUS;
 

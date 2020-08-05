@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
@@ -29,7 +30,7 @@ TimerHandle_t sLockTimer; // FreeRTOS app sw timer.
 
 int BoltLockManager::Init()
 {
-    int err = WEAVE_NO_ERROR;
+    int err = CHIP_NO_ERROR;
 
     // Create FreeRTOS sw timer for Lock timer.
 
@@ -181,7 +182,7 @@ void BoltLockManager::TimerEventHandler(TimerHandle_t xTimer)
 void BoltLockManager::AutoReLockTimerEventHandler(AppEvent * aEvent)
 {
     BoltLockManager * lock = static_cast<BoltLockManager *>(aEvent->TimerEvent.Context);
-    int32_t actor = Schema::Weave::Trait::Security::BoltLockTrait::BOLT_LOCK_ACTOR_METHOD_LOCAL_IMPLICIT;
+    int32_t actor = 0;
 
     // Make sure auto lock timer is still armed.
     if (!lock->mAutoLockTimerArmed)
