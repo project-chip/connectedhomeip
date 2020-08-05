@@ -32,6 +32,8 @@ using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 
+LOG_MODULE_REGISTER(chip, LOG_LEVEL_DBG);
+
 namespace {
 
 void GetModuleName(char * buf, uint8_t module)
@@ -62,8 +64,6 @@ void __attribute__((weak)) OnLogOutput(void) {}
 } // namespace DeviceLayer
 
 namespace Logging {
-
-LOG_MODULE_REGISTER(chip);
 
 /**
  * CHIP log output function.

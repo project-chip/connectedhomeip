@@ -57,14 +57,18 @@ static NSString * const ipKey = @"ipk";
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.example.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = [CHIPDeviceController sharedController];
     [self.chipController registerCallbacks:callbackQueue
+        onConnected:^(void) {
+            typeof(self) strongSelf = weakSelf;
+            [strongSelf postConnected];
+        }
         onMessage:^(NSData * _Nonnull message) {
             typeof(self) strongSelf = weakSelf;
             NSString * strMessage = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
-            [strongSelf postResult:[@"Echo Response: " stringByAppendingFormat:@"%@", strMessage]];
+            [strongSelf postResult:strMessage];
         }
         onError:^(NSError * _Nonnull error) {
             typeof(self) strongSelf = weakSelf;
-            [strongSelf postResult:[@"Error: " stringByAppendingString:error.localizedDescription]];
+            [strongSelf postError:error.localizedDescription];
         }];
 
     // need to restart connections on background/foreground transitions otherwise the socket can be closed without CHIP knowing
@@ -186,14 +190,42 @@ static NSString * const ipKey = @"ipk";
     }
 }
 
-- (void)postResult:(NSString *)result
+- (void)postResult:(NSString *)resultMsg
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.resultLabel.text = result;
+        self.resultLabel.text = [@"Echo Response: " stringByAppendingFormat:@"%@", resultMsg];
         self.resultLabel.hidden = NO;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, RESULT_DISPLAY_DURATION), dispatch_get_main_queue(), ^{
             self.resultLabel.hidden = YES;
         });
+
+        if (self.onMessageBlock) {
+            self.onMessageBlock(resultMsg);
+        }
+    });
+}
+
+- (void)postError:(NSString *)errorMsg
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.resultLabel.text = [@"Error: " stringByAppendingString:errorMsg];
+        self.resultLabel.hidden = NO;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, RESULT_DISPLAY_DURATION), dispatch_get_main_queue(), ^{
+            self.resultLabel.hidden = YES;
+        });
+
+        if (self.onErrorBlock) {
+            self.onErrorBlock(errorMsg);
+        }
+    });
+}
+
+- (void)postConnected
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.onConnectedBlock) {
+            self.onConnectedBlock();
+        }
     });
 }
 

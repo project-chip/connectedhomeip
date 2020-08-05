@@ -45,22 +45,22 @@
 	url = https://pigweed.googlesource.com/pigweed/pigweed
 	branch = master
 	ignore = dirty
-	commit = ce87bc01d82d813506ece5122250a1b909d78e68
+	commit = ab1851d75e981378fc2bfe99855a2f7c8a887086
 [submodule "openthread"]
 	path = third_party/openthread/repo
 	url = https://github.com/openthread/openthread.git
 	branch = master
 	ignore = dirty
-	commit = c6d5c4aae0ff9f891ec9f734f6b44598e569c48d
+	commit = 5e9b2818eb9811b957f74ba8ad64f00fb62e8ea0
 [submodule "ot-br-posix"]
 	path = third_party/ot-br-posix/repo
 	url = https://github.com/openthread/ot-br-posix.git
 	branch = master
 	ignore = dirty
-	commit = 250c6d605b83910f86fa61fcdbde9ba67dcc7d93
+	commit = 3e7580c2d11c610ac7e65b89754dcc18b5b49da2
 [submodule "bluez"]
 	path = third_party/bluez/repo
 	url = git://git.kernel.org/pub/scm/bluetooth/bluez.git
 	branch = master
 	ignore = dirty
-	commit = df7d3fa5002373f7f955219defc7d0bc794a5a6c
+	commit = 18e137db73e2ae6d307e62ac8430f7326efdb0c3

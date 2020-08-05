@@ -105,7 +105,18 @@ commands in a devcontainer shell.
         $ make clean
         $ make
 
-Alternatively, you can run `Build nRF5 Lock App` VSCode task.
+Other alternatives:
+
+-   Run `Build nRF5 Lock App` VSCode task.
+
+-   Run the `GN build` VSCode task. This does not require a clean tree.
+
+-   Build manually with GN:
+
+            $ source scripts/activate.sh
+            $ cd examples/lock-app/nrf5
+            $ gn gen out/debug
+            $ ninja -C out/debug
 
 ### Using Native Shell
 
@@ -154,6 +165,15 @@ Alternatively, you can run `Build nRF5 Lock App` VSCode task.
           $ cd ~/connectedhomeip/examples/lock-app/nrf5
           $ make clean
           $ make
+
+*   Or, run GN to build the application
+
+          $ cd ~/connectedhomeip
+          $ git submodule update --init
+          $ source scripts/activate.sh
+          $ cd examples/lock-app/nrf5
+          $ gn gen out/debug
+          $ ninja -C out/debug
 
 <a name="initializing"></a>
 

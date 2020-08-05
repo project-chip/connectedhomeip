@@ -59,7 +59,15 @@ public:
 
     void * AppState;
 
+    /**
+     * Init function to be used when there exists a device layer that takes care of initializing
+     * System::Layer and InetLayer.
+     */
     CHIP_ERROR Init(NodeId localDeviceId);
+    /**
+     * Init function to be used when already-initialized System::Layer and InetLayer are available.
+     */
+    CHIP_ERROR Init(NodeId localDeviceId, System::Layer * systemLayer, InetLayer * inetLayer);
     CHIP_ERROR Shutdown();
 
     // ----- Connection Management -----
@@ -68,15 +76,16 @@ public:
      *   Connect to a CHIP device with a given name for Rendezvous
      *
      * @param[in] remoteDeviceId        The remote device Id.
-     * @param[in] deviceName            The name of the requested Device
+     * @param[in] discriminator         The discriminator of the requested Device
+     * @param[in] setupPINCode          The setup PIN code of the requested Device
      * @param[in] appReqState           Application specific context to be passed back when a message is received or on error
      * @param[in] onConnected           Callback for when the connection is established
      * @param[in] onMessageReceived     Callback for when a message is received
      * @param[in] onError               Callback for when an error occurs
      * @return CHIP_ERROR               The connection status
      */
-    CHIP_ERROR ConnectDevice(NodeId remoteDeviceId, const char * deviceName, void * appReqState, NewConnectionHandler onConnected,
-                             MessageReceiveHandler onMessageReceived, ErrorHandler onError);
+    CHIP_ERROR ConnectDevice(NodeId remoteDeviceId, const uint16_t discriminator, const uint32_t setupPINCode, void * appReqState,
+                             NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived, ErrorHandler onError);
 
     /**
      * @brief
@@ -194,8 +203,11 @@ private:
         kConnectionState_SecureConnected = 2,
     };
 
+    System::Layer * mSystemLayer;
+    Inet::InetLayer * mInetLayer;
+
     SecureSessionMgr<Transport::UDP> * mSessionManager;
-    Transport::Base * mUnsecuredTransport;
+    Transport::Base * mUnsecuredTransport = NULL;
 
     ConnectionState mConState;
     void * mAppReqState;

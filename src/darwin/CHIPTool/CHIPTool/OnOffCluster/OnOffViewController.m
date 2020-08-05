@@ -15,14 +15,6 @@
  *    limitations under the License.
  */
 
-//
-//  OnOffViewController.m
-//  CHIPTool
-//
-//  Created by Bhaskar on 6/1/20.
-//  Copyright © 2020 CHIP. All rights reserved.
-//
-
 #import "OnOffViewController.h"
 #import <CHIP/CHIP.h>
 

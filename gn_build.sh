@@ -69,6 +69,7 @@ echo 'To build a custom build (for help run "gn args --list out/debug")'
 echo gn args "$CHIP_ROOT/out/custom"
 echo ninja -C "$CHIP_ROOT/out/custom"
 
+# nRF5 SDK setup
 nrf5_sdk_args=""
 extra_args=""
 
@@ -84,6 +85,21 @@ else
     echo 'To build the nRF5 lock sample as a standalone project':
     echo "(cd $CHIP_ROOT/examples/lock-app/nrf5; gn gen out/debug --args='$nrf5_sdk_args'; ninja -C out/debug)"
 fi
+echo
+
+# EFR32 SDK setup
+efr32_sdk_args=""
+extra_args=""
+
+if [[ -d "$EFR32_SDK_ROOT/protocol/" ]]; then
+    efr32_sdk_args+="efr32_sdk_root=\"$EFR32_SDK_ROOT\""
+    extra_args+=" $efr32_sdk_args enable_efr32_builds=true"
+    echo 'To build the EFR32 lock sample as a standalone project':
+    echo "(cd $CHIP_ROOT/examples/lock-app/efr32; gn gen out/debug --args='$efr32_sdk_args'; ninja -C out/debug)"
+else
+    echo "Hint: Set \$EFR32_SDK_ROOT to enable building for EFR32"
+fi
+
 echo
 
 _chip_banner "Build: GN configure"

@@ -67,17 +67,36 @@ uint32_t encodeToggleCommand(uint8_t * buffer, uint32_t buf_length, uint8_t dest
  */
 bool extractApsFrame(void * buffer, uint32_t buf_length, EmberApsFrame * outApsFrame);
 
-/** @brief Extracts an aps frame from buffer into outApsFrame. Returns the length of the msg.
+/** @brief Populates msg with address of the zcl message within buffer.
+ * @return Returns the length of msg buffer. Returns 0 on error e.g. if buffer is too short.
  */
-uint32_t extractMessage(void * buffer, void ** msg);
+uint16_t extractMessage(uint8_t * buffer, uint16_t buffer_length, uint8_t ** msg);
 
 /** @brief Prints an aps frame struct
  */
 void printApsFrame(EmberApsFrame * frame);
 
-/** @brief Prints commmand information. Assumes buffer was encoded using one of encode(On|Off|Toggle)Command function
+/**
+ * @brief Encode an APS frame into the given buffer.  Returns the number of
+ * bytes of buffer used by the encoding or 0 if the given buffer is not big
+ * enough.  If buffer is null, no encoding will happen; the function will
+ * instead return the number of bytes that would be needed to encode the APS
+ * frame.
+ *
+ * @param[in] buffer The buffer to write to.  If null, the call is in "count the
+ *                   bytes" mode, and no writing will happen.
+ * @parem[in] buf_length The size of the buffer.  Ignored if buffer is null.
+ * @param[in] apsFrame The frame to encode.
+ *
+ * @return
+ *   - If buffer is null, the number of bytes needed to encode.
+ *   - If buffer is non-null but buf_length is not enough to hold the
+ *     EmberApsFrame, 0.
+ *   - If buffer us non-null and buf_length is large enough, the number of bytes
+ *     placed in buffer.
  */
-void printCommandInfo(void * buffer);
+uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame);
+
 #ifdef __cplusplus
 }
 #endif

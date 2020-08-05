@@ -41,6 +41,13 @@
 
 #include <new>
 
+#define MAX_ADV_DATA_LEN 31
+#define CHIP_ADV_DATA_TYPE_FLAGS 0x01
+#define CHIP_ADV_DATA_FLAGS 0x06
+#define CHIP_ADV_DATA_TYPE_SERVICE_DATA 0x16
+#define CHIP_BLE_OPCODE 0x00
+#define CHIP_ADV_VERSION 0x00
+
 using namespace ::chip;
 using namespace ::chip::Ble;
 
@@ -617,17 +624,18 @@ exit:
 CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 {
     CHIP_ERROR err;
-    esp_ble_adv_data_t advertData;
-    ESP32ChipServiceData chipServiceData;
+    uint8_t advData[MAX_ADV_DATA_LEN];
+    uint16_t advDataVersionDiscriminator = 0;
+    uint8_t index                        = 0;
 
     // If a custom device name has not been specified, generate a CHIP-standard name based on the
-    // bottom digits of the Chip device id.
+    // discriminator value
+    uint32_t discriminator;
+    SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
 
-    // TODO Pull this from the configuration manager
-    const uint16_t discriminator = 0x0F00;
     if (!GetFlag(mFlags, kFlag_UseCustomDeviceName))
     {
-        snprintf(mDeviceName, sizeof(mDeviceName), "%s%03" PRIX16, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, discriminator);
+        snprintf(mDeviceName, sizeof(mDeviceName), "%s%04u", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, discriminator);
         mDeviceName[kMaxDeviceNameLength] = 0;
     }
 
@@ -639,53 +647,25 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         ExitNow();
     }
 
-    // Configure the contents of the advertising packet.
-    memset(&advertData, 0, sizeof(advertData));
-    advertData.set_scan_rsp        = false;
-    advertData.include_name        = true;
-    advertData.include_txpower     = false;
-    advertData.min_interval        = 0;
-    advertData.max_interval        = 0;
-    advertData.appearance          = 0;
-    advertData.manufacturer_len    = 0;
-    advertData.p_manufacturer_data = NULL;
-    advertData.service_data_len    = 0;
-    advertData.p_service_data      = NULL;
-    advertData.service_uuid_len    = sizeof(UUID_CHIPoBLEService);
-    advertData.p_service_uuid      = (uint8_t *) UUID_CHIPoBLEService;
-    advertData.flag                = ESP_BLE_ADV_FLAG_GEN_DISC | ESP_BLE_ADV_FLAG_BREDR_NOT_SPT;
-    err                            = esp_ble_gap_config_adv_data(&advertData);
+    advDataVersionDiscriminator = (discriminator | (CHIP_ADV_VERSION << 12));
+
+    memset(advData, 0, sizeof(advData));
+    advData[index++] = 0x02;                             // length
+    advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;         // AD type : flags
+    advData[index++] = CHIP_ADV_DATA_FLAGS;              // AD value
+    advData[index++] = 0x06;                             // length
+    advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;  // AD type: (Service Data - 16-bit UUID)
+    advData[index++] = ShortUUID_CHIPoBLEService[0];     // AD value
+    advData[index++] = ShortUUID_CHIPoBLEService[1];     // AD value
+    advData[index++] = CHIP_BLE_OPCODE;                  // Used to differentiate from operational CHIP Ble adv
+    advData[index++] = advDataVersionDiscriminator >> 8; // Bits[15:12] == version - Bits[11:0] Discriminator
+    advData[index++] = advDataVersionDiscriminator & 0x00FF;
+
+    // Construct the Chip BLE Service Data to be sent in the scan response packet.
+    err = esp_ble_gap_config_adv_data_raw(advData, sizeof(advData));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "esp_ble_gap_config_adv_data(<advertising data>) failed: %s", ErrorStr(err));
-        ExitNow();
-    }
-
-    // Construct the Chip BLE Service Data to be sent in the scan response packet.  On the ESP32,
-    // the buffer given to esp_ble_gap_config_adv_data() must begin with the Chip BLE service UUID.
-    memcpy(chipServiceData.ServiceUUID, ShortUUID_CHIPoBLEService, sizeof(chipServiceData.ServiceUUID));
-    err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(chipServiceData.DeviceIdInfo);
-    SuccessOrExit(err);
-
-    // Configure the contents of the scan response packet.
-    memset(&advertData, 0, sizeof(advertData));
-    advertData.set_scan_rsp        = true;
-    advertData.include_name        = false;
-    advertData.include_txpower     = true;
-    advertData.min_interval        = 0;
-    advertData.max_interval        = 0;
-    advertData.appearance          = 0;
-    advertData.manufacturer_len    = 0;
-    advertData.p_manufacturer_data = NULL;
-    advertData.service_data_len    = sizeof(chipServiceData);
-    advertData.p_service_data      = (uint8_t *) &chipServiceData;
-    advertData.service_uuid_len    = 0;
-    advertData.p_service_uuid      = NULL;
-    advertData.flag                = 0;
-    err                            = esp_ble_gap_config_adv_data(&advertData);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "esp_ble_gap_config_adv_data(<scan response>) failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_ble_gap_config_adv_data_raw(<raw_data>) failed: %s", ErrorStr(err));
         ExitNow();
     }
 
@@ -1215,7 +1195,7 @@ void BLEManagerImpl::HandleGAPEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb
 
     switch (event)
     {
-    case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT:
+    case ESP_GAP_BLE_ADV_DATA_RAW_SET_COMPLETE_EVT:
 
         if (param->adv_data_cmpl.status != ESP_BT_STATUS_SUCCESS)
         {

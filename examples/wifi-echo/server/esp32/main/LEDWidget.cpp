@@ -32,23 +32,6 @@
 #include "esp_system.h"
 #include "esp_timer.h"
 
-#if CONFIG_HAVE_DISPLAY
-// The Y position of the LED Status message on screen as a
-// percentage of the screen's height.
-#define LED_STATUS_POSITION 85
-// Position the LED Indicator at the bottom right corner
-#define LED_INDICATOR_X 92
-#define LED_INDICATOR_Y 88
-// The radius of the LED Indicator
-#define LED_INDICATOR_R_PX 16
-
-static const char * onMsg  = "LIGHT: ON";
-static const char * offMsg = "LIGHT: OFF";
-
-#endif
-
-extern const char * TAG;
-
 void LEDWidget::Init(gpio_num_t gpioNum)
 {
     mLastChangeTimeUS = 0;

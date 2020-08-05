@@ -74,11 +74,20 @@ public:
         return *this;
     }
 
-    bool HasConnectionName() const { return mConnectionName != nullptr; };
-    const char * GetConnectionName() const { return mConnectionName; };
-    BleConnectionParameters & SetConnectionName(const char * connName)
+    bool HasDiscriminator() const { return mDiscriminator != 0; };
+    uint16_t GetDiscriminator() const { return mDiscriminator; };
+    BleConnectionParameters & SetDiscriminator(const uint16_t discriminator)
     {
-        mConnectionName = connName;
+        mDiscriminator = discriminator;
+
+        return *this;
+    }
+
+    bool HasSetupPINCode() const { return mSetupPINCode != 0; };
+    uint32_t GetSetupPINCode() const { return mSetupPINCode; };
+    BleConnectionParameters & SetSetupPINCode(const uint32_t setupPINCode)
+    {
+        mSetupPINCode = setupPINCode;
 
         return *this;
     }
@@ -87,7 +96,8 @@ private:
     DeviceController::ChipDeviceController * mDeviceController = nullptr; ///< Associated device controller
     Ble::BleLayer * mLayer                                     = nullptr; ///< Associated ble layer
     BLE_CONNECTION_OBJECT mConnectionObj                       = 0;       ///< the target peripheral BLE_CONNECTION_OBJECT
-    const char * mConnectionName                               = nullptr; ///< the target peripheral name
+    uint16_t mDiscriminator                                    = 0;       ///< the target peripheral discriminator
+    uint32_t mSetupPINCode                                     = 0;       ///< the target peripheral setup PIN Code
 };
 
 /** Implements a transport using BLE. */
@@ -123,7 +133,7 @@ public:
 
 private:
     CHIP_ERROR InitInternal(Ble::BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj);
-    CHIP_ERROR InitInternal(Ble::BleLayer * bleLayer, const char * connName);
+    CHIP_ERROR DelegateConnection(Ble::BleLayer * bleLayer, const uint16_t connDiscriminator);
 
     // Those functions are BLEConnectionDelegate callbacks used when the connection
     // parameters used a name instead of a BLE_CONNECTION_OBJECT.

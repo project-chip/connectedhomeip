@@ -68,6 +68,8 @@ libCHIP_a_CPPFLAGS                  =                         \
     $(NLIO_CPPFLAGS)                                          \
     $(LWIP_CPPFLAGS)                                          \
     $(SOCKETS_CPPFLAGS)                                       \
+    $(OT_BR_POSIX_CPPFLAGS)                                   \
+    $(DBUS_CFLAGS)                                            \
     $(NULL)
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX

@@ -124,16 +124,35 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBu
     mPeerConnections.MarkConnectionActive(state);
 
     {
-        uint8_t * data = msgBuf->Start();
+        uint8_t * data = nullptr;
         MessageHeader header;
+        const size_t headerSize = header.EncryptedHeaderSizeBytes();
+        size_t actualEncodedHeaderSize;
+        size_t totalLen = 0;
+        size_t taglen   = 0;
 
         header
-            .SetSourceNodeId(mLocalNodeId)    //
-            .SetDestinationNodeId(peerNodeId) //
-            .SetMessageId(state->GetSendMessageIndex());
+            .SetSourceNodeId(mLocalNodeId)              //
+            .SetDestinationNodeId(peerNodeId)           //
+            .SetMessageId(state->GetSendMessageIndex()) //
+            .SetPayloadLength(headerSize + msgBuf->TotalLength());
 
-        err = state->GetSecureSession().Encrypt(data, msgBuf->TotalLength(), data, header);
+        VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
+
+        msgBuf->SetStart(msgBuf->Start() - headerSize);
+        data     = msgBuf->Start();
+        totalLen = msgBuf->TotalLength();
+
+        err = header.EncodeEncryptedHeader(data, totalLen, &actualEncodedHeaderSize);
         SuccessOrExit(err);
+
+        err = state->GetSecureSession().Encrypt(data, totalLen, data, header);
+        SuccessOrExit(err);
+
+        err = header.EncodeMACTag(&data[totalLen], kMaxTagLen, &taglen);
+        SuccessOrExit(err);
+
+        msgBuf->SetDataLength(totalLen + taglen, NULL);
 
         ChipLogProgress(Inet, "Secure transport transmitting msg %u after encryption", state->GetSendMessageIndex());
 
@@ -200,8 +219,8 @@ void SecureSessionMgrBase::CancelExpiryTimer(void)
     }
 }
 
-void SecureSessionMgrBase::HandleDataReceived(const MessageHeader & header, const PeerAddress & peerAddress,
-                                              System::PacketBuffer * msg, SecureSessionMgrBase * connection)
+void SecureSessionMgrBase::HandleDataReceived(MessageHeader & header, const PeerAddress & peerAddress, System::PacketBuffer * msg,
+                                              SecureSessionMgrBase * connection)
 
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
@@ -236,20 +255,36 @@ void SecureSessionMgrBase::HandleDataReceived(const MessageHeader & header, cons
 
     // TODO this is where messages should be decoded
     {
-        uint8_t * data      = msg->Start();
-        uint8_t * plainText = nullptr;
-        uint16_t len        = msg->TotalLength();
+        uint8_t * data          = msg->Start();
+        uint8_t * plainText     = nullptr;
+        uint16_t len            = msg->TotalLength();
+        const size_t headerSize = header.EncryptedHeaderSizeBytes();
+        size_t decodedSize      = 0;
+        size_t taglen           = 0;
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-        /* This is a workaround for the case where PacketBuffer payload is not allocated
-           as an inline buffer to PacketBuffer structure */
+        /* This is a workaround for the case where PacketBuffer payload is not
+           allocated as an inline buffer to PacketBuffer structure */
         origMsg = msg;
         msg     = PacketBuffer::NewWithAvailableSize(len);
         msg->SetDataLength(len, msg);
 #endif
         plainText = msg->Start();
 
+        err = header.DecodeMACTag(&data[header.GetPayloadLength()], kMaxTagLen, &taglen);
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Inet, "Secure transport failed to decode MAC Tag: err %d", err));
+        len -= taglen;
+        msg->SetDataLength(len, NULL);
+
         err = state->GetSecureSession().Decrypt(data, len, plainText, header);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Inet, "Secure transport failed to decrypt msg: err %d", err));
+
+        err = header.DecodeEncryptedHeader(plainText, headerSize, &decodedSize);
+        VerifyOrExit(err == CHIP_NO_ERROR,
+                     ChipLogProgress(Inet, "Secure transport failed to decode encrypted header: err %d", err));
+        VerifyOrExit(headerSize == decodedSize,
+                     ChipLogProgress(Inet, "Secure transport decode encrypted header length mismatched"));
+
+        msg->ConsumeHead(headerSize);
 
         if (connection->mCB != nullptr)
         {
@@ -285,8 +320,6 @@ void SecureSessionMgrBase::HandleConnectionExpired(const Transport::PeerConnecti
 
 void SecureSessionMgrBase::ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error)
 {
-    ChipLogProgress(Inet, "Checking for expired connections");
-
     SecureSessionMgrBase * mgr = reinterpret_cast<SecureSessionMgrBase *>(param);
     mgr->mPeerConnections.ExpireInactiveConnections(CHIP_PEER_CONNECTION_TIMEOUT_MS);
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer

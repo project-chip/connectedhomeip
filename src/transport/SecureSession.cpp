@@ -25,6 +25,7 @@
 #include <core/CHIPEncoding.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <support/CodeUtils.h>
+#include <transport/MessageHeader.h>
 #include <transport/SecureSession.h>
 
 #include <string.h>
@@ -109,7 +110,7 @@ CHIP_ERROR SecureSession::Encrypt(const unsigned char * input, size_t input_leng
                             (unsigned char *) &tag, sizeof(tag));
     SuccessOrExit(error);
 
-    header.SetTag(tag);
+    header.SetTag(MessageHeader::EncryptionType::kAESCCMTagLen8, (uint8_t *) &tag, sizeof(tag));
 
 exit:
     return error;
@@ -118,16 +119,17 @@ exit:
 CHIP_ERROR SecureSession::Decrypt(const unsigned char * input, size_t input_length, unsigned char * output,
                                   const MessageHeader & header)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    uint64_t tag     = header.GetTag();
-    uint64_t IV      = SecureSession::GetIV(header);
+    CHIP_ERROR error    = CHIP_NO_ERROR;
+    size_t taglen       = header.GetTagLength();
+    const uint8_t * tag = header.GetTag();
+    uint64_t IV         = SecureSession::GetIV(header);
 
     VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     VerifyOrExit(input != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(input_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = AES_CCM_decrypt(input, input_length, NULL, 0, (const unsigned char *) &tag, sizeof(tag), mKey, sizeof(mKey),
+    error = AES_CCM_decrypt(input, input_length, NULL, 0, (const unsigned char *) tag, taglen, mKey, sizeof(mKey),
                             (const unsigned char *) &IV, sizeof(IV), output);
 exit:
     return error;

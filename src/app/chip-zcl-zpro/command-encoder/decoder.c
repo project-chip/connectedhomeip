@@ -103,22 +103,20 @@ void printApsFrame(EmberApsFrame * frame)
            frame->groupId, frame->sequence, frame->radius);
 }
 
-void printCommandInfo(void * buffer)
+uint16_t extractMessage(uint8_t * buffer, uint16_t buffer_length, uint8_t ** msg)
 {
-    void * msg = NULL;
-    extractMessage(buffer, &msg);
-    uint8_t val = (uint8_t) * ((uint8_t *) (msg + 2));
-    printf("Encoded command id %d\n", val);
-}
-
-uint32_t extractMessage(void * buffer, void ** msg)
-{
-    uint32_t result = 0;
-    if (msg)
+    // buffer is at least 16 bytes long and the msg is 3 bytes long and 13 bytes offset into the buffer.
+    // This is hard coded now till we refactor encoder.c to not have this be hardcoded.
+    uint16_t result = 0;
+    if (msg && buffer_length >= 16)
     {
         // These are hard coded for now.
         *msg   = buffer + 13;
         result = 3;
+    }
+    else if (msg)
+    {
+        *msg = NULL;
     }
     return result;
 }

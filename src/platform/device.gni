@@ -15,34 +15,57 @@
 import("//build_overrides/chip.gni")
 
 declare_args() {
-  # Device platform layer: freertos, nrf5, none.
+  # Device platform layer: freertos, nrf5, efr32, none.
   device_platform = "auto"
-
-  # Enable openthread support.
-  chip_enable_openthread = false
 }
 
 if (device_platform == "auto") {
-  if (current_os == "linux") {
+  if (current_os == "mac" || current_os == "ios") {
+    device_platform = "darwin"
+  } else if (current_os == "linux") {
+    # FIXME: enable openthread on nrf5 gn build
     device_platform = "linux"
   } else {
     device_platform = "none"
   }
 }
 
+declare_args() {
+  # Enable openthread support.
+  chip_enable_openthread = (device_platform == "linux")
+}
+
 device_layer = "none"
-if (device_platform == "linux") {
+if (device_platform == "darwin") {
+  device_layer = "Darwin"
+} else if (device_platform == "linux") {
   device_layer = "Linux"
 } else if (device_platform == "nrf5") {
   device_layer = "nRF5"
+} else if (device_platform == "efr32") {
+  device_layer = "EFR32"
 }
 
-ble_platform_config_include = "<platform/" + device_layer + "/BlePlatformConfig.h>"
-chip_device_platform_config_include = "<platform/" + device_layer + "/CHIPDevicePlatformConfig.h>"
-chip_platform_config_include = "<platform/" + device_layer + "/CHIPPlatformConfig.h>"
-inet_platform_config_include = "<platform/" + device_layer + "/InetPlatformConfig.h>"
-system_platform_config_include = "<platform/" + device_layer + "/SystemPlatformConfig.h>"
+ble_platform_config_include = ""
+chip_device_platform_config_include = ""
+chip_platform_config_include = ""
+inet_platform_config_include = ""
+system_platform_config_include = ""
+
+if (device_layer != "none") {
+  ble_platform_config_include =
+      "<platform/" + device_layer + "/BlePlatformConfig.h>"
+  chip_device_platform_config_include =
+      "<platform/" + device_layer + "/CHIPDevicePlatformConfig.h>"
+  chip_platform_config_include =
+      "<platform/" + device_layer + "/CHIPPlatformConfig.h>"
+  inet_platform_config_include =
+      "<platform/" + device_layer + "/InetPlatformConfig.h>"
+  system_platform_config_include =
+      "<platform/" + device_layer + "/SystemPlatformConfig.h>"
+}
 
 assert((current_os != "freertos" && device_platform == "none") ||
-           device_platform == "nrf5" || device_platform == "linux",
+           device_platform == "darwin" || device_platform == "nrf5" ||
+           device_platform == "linux" || device_platform == "efr32",
        "Please select a valid value for device_platform")

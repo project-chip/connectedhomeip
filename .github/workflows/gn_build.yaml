@@ -1,3 +1,17 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 name: GN Builds
 
 on:
@@ -20,15 +34,15 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: "connectedhomeip/chip-build-openssl:0.2.18"
+            image: connectedhomeip/chip-build:0.4.1
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-            - name: Checkout Submodules
-              run: make -f Makefile-bootstrap repos
+              with:
+                 submodules: true
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
             - name: Setup Build

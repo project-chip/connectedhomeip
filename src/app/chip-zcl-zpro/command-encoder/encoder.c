@@ -16,88 +16,58 @@
  */
 
 #include "chip-zcl-zpro-codec.h"
+#include <assert.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 
-uint32_t encodeApsFrame(uint8_t * buffer, uint32_t buf_length, uint16_t profileID, uint16_t clusterId, uint8_t sourceEndpoint,
-                        uint8_t destinationEndpoint, EmberApsOption options, uint16_t groupId, uint8_t sequence, uint8_t radius)
+static uint16_t doEncodeApsFrame(uint8_t * buffer, uint32_t buf_length, uint16_t profileID, uint16_t clusterId,
+                                 uint8_t sourceEndpoint, uint8_t destinationEndpoint, EmberApsOption options, uint16_t groupId,
+                                 uint8_t sequence, uint8_t radius)
 {
-    uint32_t size = 0;
-    if (buffer == NULL || buf_length == 0)
-    {
-        return size;
-    }
     size_t nextOutByte = 0;
 
-    if (nextOutByte >= buf_length)
-    {
-        return size;
-    }
+#define TRY_WRITE(dataItem)                                                                                                        \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        size_t neededSize = nextOutByte + sizeof(dataItem);                                                                        \
+        if (buffer)                                                                                                                \
+        {                                                                                                                          \
+            if (neededSize > buf_length)                                                                                           \
+            {                                                                                                                      \
+                return 0;                                                                                                          \
+            }                                                                                                                      \
+            memcpy(buffer + nextOutByte, &dataItem, sizeof(dataItem));                                                             \
+        }                                                                                                                          \
+        nextOutByte = neededSize;                                                                                                  \
+    } while (0) /* No semicolon so callers have to provide it. */
 
     // Simulated APS "frame control" byte.
-    buffer[nextOutByte] = 0;
-    ++nextOutByte;
+    uint8_t controlByte = 0;
+    TRY_WRITE(controlByte);
+    TRY_WRITE(profileID);
+    TRY_WRITE(clusterId);
+    TRY_WRITE(sourceEndpoint);
+    TRY_WRITE(destinationEndpoint);
+    TRY_WRITE(options);
+    TRY_WRITE(groupId);
+    TRY_WRITE(sequence);
+    TRY_WRITE(radius);
 
-    if (nextOutByte >= buf_length)
-    {
-        return size;
-    }
+#undef TRY_WRITE
 
-    memcpy(buffer + nextOutByte, &profileID, sizeof(uint16_t));
-    nextOutByte += sizeof(uint16_t);
-
-    if (nextOutByte >= buf_length)
-    {
-        return size;
-    }
-    memcpy(buffer + nextOutByte, &clusterId, sizeof(uint16_t));
-    nextOutByte += sizeof(uint16_t);
-
-    if (nextOutByte >= buf_length)
-    {
-        return size;
-    }
-    memcpy(buffer + nextOutByte, &sourceEndpoint, sizeof(uint8_t));
-    nextOutByte += sizeof(uint8_t);
-
-    if (nextOutByte >= buf_length)
-    {
-        return size;
-    }
-    memcpy(buffer + nextOutByte, &destinationEndpoint, sizeof(uint8_t));
-    nextOutByte += sizeof(uint8_t);
-
-    if (nextOutByte >= buf_length)
-    {
-        return size;
-    }
-    memcpy(buffer + nextOutByte, &options, sizeof(EmberApsOption));
-    nextOutByte += sizeof(EmberApsOption);
-
-    if (nextOutByte >= buf_length)
-    {
-        return size;
-    }
-    memcpy(buffer + nextOutByte, &groupId, sizeof(uint16_t));
-    nextOutByte += sizeof(uint16_t);
-
-    if (nextOutByte >= buf_length)
-    {
-        return size;
-    }
-    memcpy(buffer + nextOutByte, &sequence, sizeof(uint8_t));
-    nextOutByte += sizeof(uint8_t);
-
-    if (nextOutByte >= buf_length)
-    {
-        return size;
-    }
-    memcpy(buffer + nextOutByte, &radius, sizeof(uint8_t));
-    nextOutByte += sizeof(uint8_t);
+    assert(nextOutByte < UINT16_MAX);
 
     buf_length = nextOutByte;
-    printf("Encoded %d bytes of aps frame\n", buf_length);
+    printf("Encoded %" PRIu32 " bytes of aps frame\n", buf_length);
     return buf_length;
+}
+
+uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame)
+{
+    return doEncodeApsFrame(buffer, buf_length, apsFrame->profileId, apsFrame->clusterId, apsFrame->sourceEndpoint,
+                            apsFrame->destinationEndpoint, apsFrame->options, apsFrame->groupId, apsFrame->sequence,
+                            apsFrame->radius);
 }
 
 uint32_t _encodeOnOffCommand(uint8_t * buffer, uint32_t buf_length, int command, uint8_t destination_endpoint)
@@ -107,10 +77,10 @@ uint32_t _encodeOnOffCommand(uint8_t * buffer, uint32_t buf_length, int command,
     // pick source and destination end points as 1 for now.
     // Profile is 65535 because that matches our simple generated code, but we
     // should sort out the profile situation.
-    result = encodeApsFrame(buffer, buf_length, 65535, 6, 1, destination_endpoint, 0, 0, 0, 0);
+    result = doEncodeApsFrame(buffer, buf_length, 65535, 6, 1, destination_endpoint, 0, 0, 0, 0);
     if (result == 0 || result > buf_length)
     {
-        printf("Error encoding aps frame result %d", result);
+        printf("Error encoding aps frame result %" PRIu32 "\n", result);
         result = 0;
         return result;
     }
@@ -124,7 +94,7 @@ uint32_t _encodeOnOffCommand(uint8_t * buffer, uint32_t buf_length, int command,
 
     if (indexToWrite >= buf_length)
     {
-        printf("indexToWrite %d\n", indexToWrite);
+        printf("indexToWrite %" PRIu32 "\n", indexToWrite);
         return 0;
     }
     // Transaction sequence number.  Just pick something.

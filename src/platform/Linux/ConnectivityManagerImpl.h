@@ -83,16 +83,6 @@ private:
     static ConnectivityManagerImpl sInstance;
 };
 
-inline bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
-{
-    return false;
-}
-
-inline bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
-{
-    return false;
-}
-
 inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
 {
     return _HaveServiceConnectivityViaThread();

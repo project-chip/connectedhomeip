@@ -24,11 +24,14 @@
  **/
 
 #include "EchoDeviceCallbacks.h"
+#include "RendezvousSession.h"
+#include "esp_heap_caps.h"
 #include "esp_log.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
 
 #include "LEDWidget.h"
+#include "WiFiWidget.h"
 #include <inet/IPAddress.h>
 
 extern "C" {
@@ -40,12 +43,16 @@ static const char * TAG = "echo-devicecallbacks";
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 
-extern LEDWidget statusLED; // In wifi-echo.cpp
+// In wifi-echo.cpp
+extern LEDWidget statusLED;
+extern WiFiWidget wifiLED;
+extern RendezvousSession * rendezvousSession;
 
 void EchoDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
     if (event->Type == DeviceEventType::kInternetConnectivityChange)
     {
+        ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
         if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
         {
             tcpip_adapter_ip_info_t ipInfo;
@@ -54,11 +61,20 @@ void EchoDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, int
                 char ipAddrStr[INET_ADDRSTRLEN];
                 IPAddress::FromIPv4(ipInfo.ip).ToString(ipAddrStr, sizeof(ipAddrStr));
                 ESP_LOGI(TAG, "Server ready at: %s:%d", ipAddrStr, CHIP_PORT);
+
+                // Since the commissioner device does not yet have a mechanism to discover the IP address
+                // of the peripheral, the following code send it over the current Rendezvous session.
+                if (rendezvousSession != NULL)
+                {
+                    rendezvousSession->Send(ipAddrStr);
+                }
             }
+            wifiLED.Set(true);
         }
         else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
         {
             ESP_LOGE(TAG, "Lost IPv4 connectivity...");
+            wifiLED.Set(false);
         }
         if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
         {
@@ -93,4 +109,5 @@ void EchoDeviceCallbacks::PostAttributeChangeCallback(uint8_t endpoint, EmberAfC
     ESP_LOGI(TAG, "Got the post attribute callback");
     // At this point we can assume that value points to a boolean value.
     statusLED.Set(*value);
+    ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }

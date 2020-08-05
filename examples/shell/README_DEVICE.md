@@ -36,7 +36,8 @@ ProductRevision: 0001
 SerialNumber:    <None>
 ServiceId:       <None>
 FabricId:        <None>
-PairingCode:     <None>
+PinCode:         <None>
+Discriminator:   <None>
 DeviceId:        <None>
 DeviceCert:      <None>
 DeviceCaCerts:   <None>
@@ -61,7 +62,8 @@ Where valid parameter names include:
 -   mfrdeviceid: Manufacturer Device Identification Number
 -   mfrcert: Manufacturer Device Certificate
 -   mfrcacerts: Manufacturer Device CA Certs
--   pairingcode: Pairing Code
+-   pincode: Setup Pin Code
+-   discriminator: Setup Discriminator
 -   serviceid: Service Identifier
 -   fabricid: Fabric Identifier
 

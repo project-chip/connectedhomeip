@@ -1,0 +1,86 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/defaults.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
+
+assert(current_os == "freertos")
+
+efr32_project_dir = "${chip_root}/examples/lock-app/efr32"
+
+efr32_sdk("sdk") {
+  include_dirs = [
+    "${chip_root}/src/include/platform",
+    "${chip_root}/src/platform/EFR32",
+    "${efr32_project_dir}/include/",
+    "${efr32_project_dir}/src/platform/${efr32_family}/${efr32_board}",
+  ]
+
+  sources = [
+    "${efr32_project_dir}/include/CHIPProjectConfig.h",
+    "${efr32_project_dir}/include/FreeRTOSConfig.h",
+    "${efr32_project_dir}/src/platform/${efr32_family}/${efr32_board}/hal-config.h",
+  ]
+
+  defines = []
+  if (is_debug) {
+    defines += [ "BUILD_RELEASE=0" ]
+  } else {
+    defines += [ "BUILD_RELEASE=1" ]
+  }
+
+  defines += [ "USE_APP_CONFIG",
+               "${efr32_board}=1",
+               "BOARD_ID=${efr32_board}",
+  ]
+}
+
+executable("lock_app") {
+  include_dirs = []
+  defines = []
+  output_name = "chip-efr32-lock-example.out"
+
+  public_deps = [
+    ":sdk",
+    "${chip_root}/src/lib",
+  ]
+
+  include_dirs += [ "${efr32_project_dir}/include/" ]
+
+  sources = [
+    "src/AppTask.cpp",
+    "src/ButtonHandler.cpp",
+    "src/LEDWidget.cpp",
+    "src/platform/${efr32_family}/${efr32_board}/init_board.c",
+    "src/platform/${efr32_family}/${efr32_board}/init_mcu.c",
+    "src/platform/${efr32_family}/${efr32_board}/hal-config.h",
+    "src/main.cpp",
+  ]
+
+  output_dir = root_out_dir
+
+  if (efr32_family == "efr32mg12") {
+    ldscript = "${efr32_project_dir}/ldscripts/efr32-lock-example-MG12P.ld"
+  } else if (efr32_family == "efr32mg21") {
+    ldscript = "${efr32_project_dir}/ldscripts/efr32-lock-example-MG21.ld"
+  }
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+}
+
+group("efr32") {
+  deps = [ ":lock_app" ]
+}

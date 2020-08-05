@@ -20,127 +20,18 @@
  *          Provides an implementation of the BLEManager singleton object
  *          for Zephyr platforms.
  */
+
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include <ble/CHIPBleServiceData.h>
-#include <platform/internal/BLEManager.h>
-
-#include <support/logging/CHIPLogging.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-using namespace ::chip;
-using namespace ::chip::Ble;
+#include <platform/Zephyr/GenericBLEManagerImpl_Zephyr.ipp>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
 BLEManagerImpl BLEManagerImpl::sInstance;
-
-CHIP_ERROR BLEManagerImpl::_Init()
-{
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
-{
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
-{
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR BLEManagerImpl::_SetFastAdvertisingEnabled(bool val)
-{
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
-{
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
-{
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return CHIP_NO_ERROR;
-}
-
-void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
-{
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-}
-
-uint16_t BLEManagerImpl::_NumConnections(void)
-{
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return 0;
-}
-
-bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
-{
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
-}
-
-bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
-{
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
-}
-
-bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
-{
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
-}
-
-uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
-{
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return 0;
-}
-
-bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                    PacketBuffer * pBuf)
-{
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
-}
-
-bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                      PacketBuffer * pBuf)
-{
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
-}
-
-bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                     PacketBuffer * pBuf)
-{
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
-}
-
-bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                      const ChipBleUUID * svcId, const ChipBleUUID * charId)
-{
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
-}
-
-void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
-{
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-}
 
 } // namespace Internal
 } // namespace DeviceLayer

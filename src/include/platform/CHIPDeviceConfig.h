@@ -249,6 +249,15 @@
 #define CHIP_DEVICE_CONFIG_LWIP_WIFI_STATION_IF_NAME "wl"
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME
+ *
+ * Name of the WiFi station interface
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME
+#define CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME "wlan0"
+#endif
+
 // -------------------- WiFi AP Configuration --------------------
 
 /**
@@ -367,10 +376,10 @@
  * The interval (in units of 0.625ms) at which the device will send BLE advertisements while
  * in fast advertising mode.
  *
- * Defaults to 800 (500ms).
+ * Defaults to 320 (200ms).
  */
 #ifndef CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
-#define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL 800
+#define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL 320
 #endif
 
 /**
