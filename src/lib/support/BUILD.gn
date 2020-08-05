@@ -53,6 +53,7 @@ config("support_config") {
 
 support_headers = [
   "Base64.h",
+  "BufBound.h",
   "CHIPCounter.h",
   "CodeUtils.h",
   "DLLUtil.h",

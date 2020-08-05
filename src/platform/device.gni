@@ -15,11 +15,8 @@
 import("//build_overrides/chip.gni")
 
 declare_args() {
-  # Device platform layer: freertos, nrf5, none.
+  # Device platform layer: freertos, nrf5, efr32, none.
   device_platform = "auto"
-
-  # Enable openthread support.
-  chip_enable_openthread = false
 }
 
 if (device_platform == "auto") {
@@ -28,10 +25,14 @@ if (device_platform == "auto") {
   } else if (current_os == "linux") {
     # FIXME: enable openthread on nrf5 gn build
     device_platform = "linux"
-    chip_enable_openthread = true
   } else {
     device_platform = "none"
   }
+}
+
+declare_args() {
+  # Enable openthread support.
+  chip_enable_openthread = (device_platform == "linux")
 }
 
 device_layer = "none"
@@ -41,6 +42,8 @@ if (device_platform == "darwin") {
   device_layer = "Linux"
 } else if (device_platform == "nrf5") {
   device_layer = "nRF5"
+} else if (device_platform == "efr32") {
+  device_layer = "EFR32"
 }
 
 ble_platform_config_include = ""
@@ -64,5 +67,5 @@ if (device_layer != "none") {
 
 assert((current_os != "freertos" && device_platform == "none") ||
            device_platform == "darwin" || device_platform == "nrf5" ||
-           device_platform == "linux",
+           device_platform == "linux" || device_platform == "efr32",
        "Please select a valid value for device_platform")

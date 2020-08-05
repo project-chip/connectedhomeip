@@ -83,6 +83,7 @@
 //#include "app/framework/util/print.h"
 //#include "app/framework/util/time-util.h"
 #include "client-api.h"
+#include "ember-print.h"
 #include "gen/af-structs.h"
 #include "gen/att-storage.h"
 #include "gen/attribute-id.h"

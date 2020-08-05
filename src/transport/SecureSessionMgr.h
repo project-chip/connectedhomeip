@@ -170,8 +170,8 @@ private:
     CHIP_ERROR AllocateNewConnection(const MessageHeader & header, const Transport::PeerAddress & address,
                                      Transport::PeerConnectionState ** state);
 
-    static void HandleDataReceived(const MessageHeader & header, const Transport::PeerAddress & source,
-                                   System::PacketBuffer * msgBuf, SecureSessionMgrBase * transport);
+    static void HandleDataReceived(MessageHeader & header, const Transport::PeerAddress & source, System::PacketBuffer * msgBuf,
+                                   SecureSessionMgrBase * transport);
 
     /**
      * Called when a specific connection expires.

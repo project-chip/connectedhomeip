@@ -51,8 +51,6 @@ PRETTY_FILES                                                  = \
     lock-app/efr32/src/display/init_lcd.c                       \
     lock-app/efr32/src/display/sample_qr_code.c                 \
     lock-app/efr32/src/AppTask.cpp                              \
-    lock-app/efr32/src/init_mcu.c                               \
-    lock-app/efr32/src/init_board.c                             \
     lock-app/efr32/src/LEDWidget.cpp                            \
     lock-app/efr32/src/ButtonHandler.cpp                        \
     lock-app/nrf5/main/BoltLockManager.cpp                      \

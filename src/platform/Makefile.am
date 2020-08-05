@@ -62,6 +62,8 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_NoWiFi.h \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_Thread.h \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_Thread.ipp \
+    @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_WiFi.h \
+    @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_WiFi.ipp \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl.h \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl.ipp \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_POSIX.h \
@@ -232,6 +234,44 @@ libDeviceLayer_a_SOURCES               += \
     $(NULL)
 
 endif #CONFIG_BLE_PLATFORM_BLUEZ
+
+if CONFIG_WIFI_PLATFORM_WPA
+BUILT_SOURCES                          += \
+    Linux/gen/DBusWpa.h                   \
+    Linux/gen/DBusWpaInterface.h          \
+    Linux/gen/DBusWpaNetwork.h            \
+    Linux/gen/DBusWpa.c                   \
+    Linux/gen/DBusWpaInterface.c          \
+    Linux/gen/DBusWpaNetwork.c            \
+    $(NULL)
+
+Linux/gen/DBusWpa.h: Linux/dbus/wpa.xml
+	gdbus-codegen --header --output $@ --c-namespace Wpa $<
+
+Linux/gen/DBusWpaInterface.h: Linux/dbus/wpa_interface.xml
+	gdbus-codegen --header --output $@ --c-namespace Wpa $<
+
+Linux/gen/DBusWpaNetwork.h: Linux/dbus/wpa_network.xml
+	gdbus-codegen --header --output $@ --c-namespace Wpa $<
+
+Linux/gen/DBusWpa.c: Linux/dbus/wpa.xml
+	gdbus-codegen --body --output $@ --c-namespace Wpa $<
+	sed -i 's/config\.h/BuildConfig.h/g' $@
+
+Linux/gen/DBusWpaInterface.c: Linux/dbus/wpa_interface.xml
+	gdbus-codegen --body --output $@ --c-namespace Wpa $<
+	sed -i 's/config\.h/BuildConfig.h/g' $@
+
+Linux/gen/DBusWpaNetwork.c: Linux/dbus/wpa_network.xml
+	gdbus-codegen --body --output $@ --c-namespace Wpa $<
+	sed -i 's/config\.h/BuildConfig.h/g' $@
+
+libDeviceLayer_a_SOURCES               += \
+    Linux/gen/DBusWpa.c                   \
+    Linux/gen/DBusWpaInterface.c          \
+    Linux/gen/DBusWpaNetwork.c            \
+    $(NULL)
+endif # CONFIG_WIFI_PLATFORM_WPA
 
 libDeviceLayer_a_SOURCES               += \
     Linux/BLEManagerImpl.cpp              \
