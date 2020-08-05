@@ -113,10 +113,12 @@ INC_DIRS = \
     $(PROJECT_ROOT)/main/traits/include \
     $(PROJECT_ROOT)/main/schema/include \
     $(PROJECT_ROOT)/third_party/printf \
+    $(CHIP_OUTPUT_DIR)/third_party/openthread/include \
     $(CHIP_ROOT)/src/include/ \
     $(CHIP_ROOT)/src/lib \
     $(CHIP_ROOT)/src/ \
     $(CHIP_ROOT)/src/system \
+    $(CHIP_ROOT)/third_party/openthread/repo/include \
     $(NRF5_PLATFORM_DIR)/app/include \
     $(NRF5_PLATFORM_DIR)/app/project_include \
     $(NRF5_PLATFORM_DIR)/util/include \
@@ -210,6 +212,7 @@ LIBS = \
     -lopenthread-nrf52840-transport \
     -lopenthread-nrf52840-softdevice-sdk \
     -lnordicsemi-nrf52840-radio-driver-softdevice \
+    -lSetupPayload \
     $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_glue.a \
     $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_glue_cc310.a \
     $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_glue_vanilla.a \
