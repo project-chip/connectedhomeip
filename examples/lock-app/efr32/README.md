@@ -90,12 +90,27 @@ following SDKs are installed (as of January 2020).
 
 *   Build the example application:
 
-           $ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
-           $ make BOARD=BRD4161A
+    -   With Make
+
+             $ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
+             $ make BOARD=BRD4161A
+
+    -   With Ninja
+
+              $ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
+              $ export EFR32_BOARD=BRD4161A
+              <From CHIP root>
+              $ ./scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/ out/lock_app_debug
 
 -   To delete generated executable, libraries and object files use:
 
-           $ make BOARD=BRD4161A clean
+    -   With Make
+
+             $ make BOARD=BRD4161A clean
+
+    -   With Ninja
+
+              $ rm -rf ./out/lock_app_debug
 
 <a name="initializing"></a>
 
@@ -120,17 +135,28 @@ erased.
 
 ## Flashing the Application
 
--   To rebuild the image and flash the example app:
+-   With Make
 
-          $ make BOARD=BRD4161A flash
+    -   To rebuild the image and flash the example app:
 
--   To rebuild the image and flash a specific device using its serial number:
+            $ make BOARD=BRD4161A flash
 
-          $ make BOARD=BRD4161A SERIALNO=440113717 flash
+    -   To rebuild the image and flash a specific device using its serial
+        number:
 
--   To flash an existing image without rebuilding:
+            $ make BOARD=BRD4161A SERIALNO=440113717 flash
 
-          $ make BOARD=BRD4161A flash-app
+    -   To flash an existing image without rebuilding:
+
+            $ make BOARD=BRD4161A flash-app
+
+*   With Ninja
+    -   To Flash directly the board with the .s37 binary please follows
+        instruction
+        [here](https://www.silabs.com/community/mcu/32-bit/knowledge-base.entry.html/2014/10/22/using_jlink_commande-YYdy).
+        **However** do **NOT** erase the flash since it will erase the
+        bootloader and the example is not standalone as for now.
+    -   Or with the Ozone debugger, just load the .out file.
 
 <a name="view-logging"></a>
 

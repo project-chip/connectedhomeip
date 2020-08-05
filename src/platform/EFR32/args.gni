@@ -12,6 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/efr32_sdk.gni")
+
+# ARM architecture flags will be set based on efr32_family.
+arm_platform_config = "${efr32_sdk_build_root}/efr32_arm.gni"
+
 device_platform = "efr32"
 
 lwip_platform = "efr32"
@@ -23,9 +28,3 @@ inet_config_enable_ipv4 = false
 inet_config_enable_dns_resolver = false
 
 chip_build_tests = false
-
-ble_platform_config_include = "<platform/EFR32/BlePlatformConfig.h>"
-chip_device_platform_config_include = "<platform/EFR32/CHIPDevicePlatformConfig.h>"
-chip_platform_config_include = "<platform/EFR32/CHIPPlatformConfig.h>"
-inet_platform_config_include = "<platform/EFR32/InetPlatformConfig.h>"
-system_platform_config_include = "<platform/EFR32/SystemPlatformConfig.h>"
