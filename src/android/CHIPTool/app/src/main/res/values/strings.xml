@@ -23,4 +23,7 @@
     <string name="on_off_btn_text">Light On/Off Cluster</string>
     <string name="enter_ip_address_hint_text">Enter IP Address (eg. 192.168.10.2)</string>
     <string name="echo_input_hint_text">Enter message for device</string>
+    <string name="send_command_on_btn_text">On</string>
+    <string name="send_command_off_btn_text">Off</string>
+    <string name="send_command_toggle_btn_text">Toggle</string>
 </resources>

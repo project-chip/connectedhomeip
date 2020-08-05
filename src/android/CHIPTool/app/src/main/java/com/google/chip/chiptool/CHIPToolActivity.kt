@@ -21,6 +21,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.chip.chiptool.echoclient.EchoClientFragment
+import com.google.chip.chiptool.clusterclient.OnOffClientFragment
 import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
@@ -56,7 +57,7 @@ class CHIPToolActivity :
   }
 
   override fun handleOnOffClicked() {
-    TODO("Not yet implemented")
+    showFragment(OnOffClientFragment.newInstance())
   }
 
   private fun showFragment(fragment: Fragment) {
