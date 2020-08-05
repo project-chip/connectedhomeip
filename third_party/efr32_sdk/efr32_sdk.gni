@@ -15,59 +15,18 @@
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/mbedtls.gni")
 
+import("efr32_board.gni")
+
 declare_args() {
   # Location of the efr32 SDK.
   efr32_sdk_root = ""
-
-  # EFR32 board used
-  efr32_board = ""
-
-  # EFR32 chip family
-  efr32_family = ""
-
-  # EFR32 MCU
-  efr32_mcu = ""
 }
-
-if (efr32_board == "") {
-  efr32_board = getenv("EFR32_BOARD")
-}
-
-assert(efr32_board != "", "The EFR32_BOARD env must be specified")
 
 if (efr32_sdk_root == "") {
   efr32_sdk_root = getenv("EFR32_SDK_ROOT")
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
-
-# Differentiate between boards
-# - BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
-# - BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-# - BRD4166A / SLTB004A    / Thunderboard Sense 2 / 2.4GHz@10dBm
-# - BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm, 915MHz@19dBm, 868MHz@19dBm
-# - BRD4180A / SLWSTK6006A / MG21 Module / 2.4GHz@20dBm
-
-if (efr32_board == "BRD4304A") {
-  efr32_family = "efr32mg12"
-  efr32_mcu = "EFR32MG12P432F1024GM48"
-} else if (efr32_board == "BRD4161A") {
-  efr32_family = "efr32mg12"
-  efr32_mcu = "EFR32MG12P432F1024GL125"
-} else if (efr32_board == "BRD4166A") {
-  efr32_family = "efr32mg12"
-  efr32_mcu = "EFR32MG12P332F1024GL125"
-} else if (efr32_board == "BRD4170A") {
-  efr32_family = "efr32mg12"
-  efr32_mcu = "EFR32MG12P433F1024GM68"
-} else if (efr32_board == "BRD4180A") {
-  efr32_family = "efr32mg21"
-  efr32_mcu = "EFR32MG21A020F1024IM32"
-} else {
-  print(
-      "Please provide a valid value for EFR32_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4166A, BRD4170A or BRD4180A)")
-  assert(false, "The board ${efr32_board} is unsupported as for now.")
-}
 
 # Defines an efr32 SDK build target.
 #
@@ -168,8 +127,7 @@ template("efr32_sdk") {
     }
 
     defines = [
-"__STARTUP_CLEAR_BSS",
-
+      "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
       "RETARGET_VCOM",
       "RETARGET_USART0",
