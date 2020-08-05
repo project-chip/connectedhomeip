@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Google LLC.
  *    All rights reserved.
  *
@@ -52,8 +53,6 @@ static bool sHaveBLEConnections               = false;
 static bool sHaveServiceConnectivity          = false;
 
 static uint32_t                     eventMask = 0;
-
-static nl::Weave::Platform::Security::SHA256 sSHA256;
 
 using namespace ::chip::DeviceLayer;
 
@@ -117,25 +116,13 @@ int AppTask::Init()
 
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-    sWeaveEventLock = xSemaphoreCreateMutex();
-    if (sWeaveEventLock == NULL)
+    sCHIPEventLock = xSemaphoreCreateMutex();
+    if (sCHIPEventLock == NULL)
     {
         K32W_LOG("xSemaphoreCreateMutex() failed");
         assert(err == CHIP_NO_ERROR);
     }
 
-    // Initialize WDM Feature
-    err = WdmFeature().Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        K32W_LOG("WdmFeature().Init() failed");
-        assert(err == CHIP_NO_ERROR);
-    }
-
-    SoftwareUpdateMgr().SetEventCallback(this, HandleSoftwareUpdateEvent);
-
-    // Enable timer based Software Update Checks
-    SoftwareUpdateMgr().SetQueryIntervalWindow(SWU_INTERVAl_WINDOW_MIN_MS, SWU_INTERVAl_WINDOW_MAX_MS);
 
     // Print the current software version
     char currentFirmwareRev[ConfigurationManager::kMaxFirmwareRevisionLength+1] = {0};
@@ -173,12 +160,12 @@ void AppTask::AppTaskMain(void * pvParameter)
             eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
         }
 
-        // Collect connectivity and configuration state from the Weave stack.  Because the
-        // Weave event loop is being run in a separate task, the stack must be locked
+        // Collect connectivity and configuration state from the CHIP stack.  Because the
+        // CHIP event loop is being run in a separate task, the stack must be locked
         // while these values are queried.  However we use a non-blocking lock request
-        // (TryLockWeaveStack()) to avoid blocking other UI activities when the Weave
+        // (TryLockChipStack()) to avoid blocking other UI activities when the CHIP
         // task is busy (e.g. with a long crypto operation).
-        if (PlatformMgr().TryLockWeaveStack())
+        if (PlatformMgr().TryLockChipStack())
         {
             sIsThreadProvisioned              = ConnectivityMgr().IsThreadProvisioned();
             sIsThreadEnabled                  = ConnectivityMgr().IsThreadEnabled();
@@ -186,8 +173,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             sHaveBLEConnections               = (ConnectivityMgr().NumBLEConnections() != 0);
             sIsPairedToAccount                = ConfigurationMgr().IsPairedToAccount();
             sHaveServiceConnectivity          = ConnectivityMgr().HaveServiceConnectivity();
-            sIsServiceSubscriptionEstablished = WdmFeature().AreServiceSubscriptionsEstablished();
-            PlatformMgr().UnlockWeaveStack();
+            PlatformMgr().UnlockChipStack();
         }
 
         // Consider the system to be "fully connected" if it has service
@@ -319,7 +305,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     K32W_LOG("Device will factory reset...");
 
     // Actually trigger Factory Reset
-    nl::Weave::DeviceLayer::ConfigurationMgr().InitiateFactoryReset();
+    ConfigurationMgr().InitiateFactoryReset();
 }
 
 void AppTask::ResetActionEventHandler(AppEvent * aEvent)
@@ -384,7 +370,6 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
 
 void AppTask::LockActionEventHandler(AppEvent * aEvent)
 {
-    bool initiated = false;
     BoltLockManager::Action_t action;
     int32_t actor;
     int err = CHIP_NO_ERROR;
@@ -411,8 +396,6 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
         {
             action = BoltLockManager::UNLOCK_ACTION;
         }
-
-        actor = Schema::Weave::Trait::Security::BoltLockTrait::BOLT_LOCK_ACTOR_METHOD_PHYSICAL;
     }
     else
     {
@@ -421,12 +404,8 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
 
     if (err == CHIP_NO_ERROR)
     {
-        initiated = BoltLockMgr().InitiateAction(actor, action);
-
-        if (!initiated)
-        {
-            K32W_LOG("Action is already in progress or active.");
-        }
+        K32W_LOG("Action is already in progress or active.");
+        ActionCompleted(action);
     }
 }
 
@@ -488,12 +467,10 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
     // and start flashing the LEDs rapidly to indicate action initiation.
     if (aAction == BoltLockManager::LOCK_ACTION)
     {
-        WdmFeature().GetBoltLockTraitDataSource().InitiateLock(aActor);
         K32W_LOG("Lock Action has been initiated")
     }
     else if (aAction == BoltLockManager::UNLOCK_ACTION)
     {
-        WdmFeature().GetBoltLockTraitDataSource().InitiateUnlock(aActor);
         K32W_LOG("Unlock Action has been initiated")
     }
 
@@ -509,17 +486,11 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
     if (aAction == BoltLockManager::LOCK_ACTION)
     {
         K32W_LOG("Lock Action has been completed")
-
-        WdmFeature().GetBoltLockTraitDataSource().LockingSuccessful();
-
         sLockLED.Set(true);
     }
     else if (aAction == BoltLockManager::UNLOCK_ACTION)
     {
         K32W_LOG("Unlock Action has been completed")
-
-        WdmFeature().GetBoltLockTraitDataSource().UnlockingSuccessful();
-
         sLockLED.Set(false);
     }
 
@@ -556,246 +527,5 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     else
     {
         K32W_LOG("Event received with no handler. Dropping event.");
-    }
-}
-
-void AppTask::InstallEventHandler(AppEvent * aEvent)
-{
-    SoftwareUpdateMgr().ImageInstallComplete(CHIP_NO_ERROR);
-}
-
-void AppTask::HandleSoftwareUpdateEvent(void *apAppState,
-                                        SoftwareUpdateManager::EventType aEvent,
-                                        const SoftwareUpdateManager::InEventParam& aInParam,
-                                        SoftwareUpdateManager::OutEventParam& aOutParam)
-{
-    static uint32_t persistedImageLen = 0;
-    static char persistedImageURI[CHIP_DEVICE_CONFIG_SOFTWARE_UPDATE_URI_LEN+1] = "";
-
-    switch(aEvent)
-    {
-        case SoftwareUpdateManager::kEvent_PrepareQuery:
-        {
-            aOutParam.PrepareQuery.PackageSpecification = NULL;
-            aOutParam.PrepareQuery.DesiredLocale = NULL;
-            break;
-        }
-
-        case SoftwareUpdateManager::kEvent_PrepareQuery_Metadata:
-        {
-            CHIP_ERROR err;
-            bool haveSufficientBattery = true;
-            uint32_t certBodyId = 0;
-
-            TLVWriter *writer = aInParam.PrepareQuery_Metadata.MetaDataWriter;
-
-            if (writer)
-            {
-                // Providing an installed Locale as MetaData is optional. The commented section below provides an example
-                // of how one can be added to metadata.
-
-                // TLVType arrayContainerType;
-                // err = writer->StartContainer(ProfileTag(::nl::Weave::Profiles::kWeaveProfile_SWU, kTag_InstalledLocales), kTLVType_Array, arrayContainerType);
-                // SuccessOrExit(err);
-                // err = writer->PutString(AnonymousTag, installedLocale);
-                // SuccessOrExit(err);
-                // err = writer->EndContainer(arrayContainerType);
-
-                err = writer->Put(ProfileTag(::nl::Weave::Profiles::kWeaveProfile_SWU, kTag_CertBodyId), certBodyId);
-                assert(err == CHIP_NO_ERROR);
-
-                err = writer->PutBoolean(ProfileTag(::nl::Weave::Profiles::kWeaveProfile_SWU, kTag_SufficientBatterySWU), haveSufficientBattery);
-                assert(err == CHIP_NO_ERROR);
-            }
-            else
-            {
-                aOutParam.PrepareQuery_Metadata.Error = CHIP_ERROR_INVALID_ARGUMENT;
-                K32W_LOG("ERROR ! aOutParam.PrepareQuery_Metadata.MetaDataWriter is NULL");
-            }
-            break;
-        }
-
-        case SoftwareUpdateManager::kEvent_QueryPrepareFailed:
-        {
-            if (aInParam.QueryPrepareFailed.Error == CHIP_ERROR_STATUS_REPORT_RECEIVED)
-            {
-                K32W_LOG("Software Update failed during prepare: Received StatusReport %s",
-                             nl::StatusReportStr(aInParam.QueryPrepareFailed.StatusReport->mProfileId,
-                                     aInParam.QueryPrepareFailed.StatusReport->mStatusCode));
-            }
-            else
-            {
-                K32W_LOG("Software Update failed during prepare: %s", nl::ErrorStr(aInParam.QueryPrepareFailed.Error));
-            }
-            break;
-        }
-
-        case SoftwareUpdateManager::kEvent_SoftwareUpdateAvailable:
-        {
-            CHIP_ERROR err;
-
-            char currentFirmwareRev[ConfigurationManager::kMaxFirmwareRevisionLength+1] = {0};
-            size_t currentFirmwareRevLen;
-            err = ConfigurationMgr().GetFirmwareRevision(currentFirmwareRev, sizeof(currentFirmwareRev), currentFirmwareRevLen);
-            if (err != CHIP_NO_ERROR)
-            {
-                K32W_LOG("sw update- Get version error");
-                assert(err == CHIP_NO_ERROR);
-            }
-
-            K32W_LOG("Current Firmware Version: %s", currentFirmwareRev);
-
-            K32W_LOG("Software Update Available - Priority: %d Condition: %d Version: %s IntegrityType: %d URI: %s",
-                                                                                aInParam.SoftwareUpdateAvailable.Priority,
-                                                                                aInParam.SoftwareUpdateAvailable.Condition,
-                                                                                aInParam.SoftwareUpdateAvailable.Version,
-                                                                                aInParam.SoftwareUpdateAvailable.IntegrityType,
-                                                                                aInParam.SoftwareUpdateAvailable.URI);
-
-            break;
-        }
-
-        case SoftwareUpdateManager::kEvent_FetchPartialImageInfo:
-        {
-            K32W_LOG("Fetching Partial Image Information");
-            if (strcmp(aInParam.FetchPartialImageInfo.URI, persistedImageURI) == 0)
-            {
-                K32W_LOG("Partial image detected in local storage; resuming download at offset %" PRId32, persistedImageLen);
-                aOutParam.FetchPartialImageInfo.PartialImageLen = persistedImageLen;
-            }
-            else
-            {
-                K32W_LOG("No partial image detected in local storage");
-                aOutParam.FetchPartialImageInfo.PartialImageLen = 0;
-            }
-            break;
-        }
-
-        case SoftwareUpdateManager::kEvent_PrepareImageStorage:
-        {
-            K32W_LOG("Preparing Image Storage");
-
-            // Capture state information about the image being downloaded.
-            persistedImageLen = 0;
-            strncpy(persistedImageURI, aInParam.PrepareImageStorage.URI, sizeof(persistedImageURI));
-            persistedImageURI[sizeof(persistedImageURI) - 1] = 0;
-
-            // Prepare to compute the integrity of the image as it is received.
-            //
-            // This example does not actually store image blocks in persistent storage and merely discards
-            // them after computing the SHA over it. As a result, integrity has to be computed as the image
-            // blocks are received, rather than over the entire image at the end. This pattern is NOT
-            // recommended since the computed integrity will be lost if the device rebooted during download.
-            //
-            sSHA256.Begin();
-
-            // Tell the SoftwareUpdateManager that storage preparation has completed.
-            SoftwareUpdateMgr().PrepareImageStorageComplete(CHIP_NO_ERROR);
-            break;
-        }
-
-        case SoftwareUpdateManager::kEvent_StartImageDownload:
-        {
-            K32W_LOG("Starting Image Download");
-            break;
-        }
-        case SoftwareUpdateManager::kEvent_StoreImageBlock:
-        {
-            sSHA256.AddData(aInParam.StoreImageBlock.DataBlock, aInParam.StoreImageBlock.DataBlockLen);
-            persistedImageLen += aInParam.StoreImageBlock.DataBlockLen;
-            K32W_LOG("Image Download: %" PRId32 " bytes received", persistedImageLen);
-            break;
-        }
-
-        case SoftwareUpdateManager::kEvent_ComputeImageIntegrity:
-        {
-            K32W_LOG("Computing image integrity");
-            K32W_LOG("Total image length: %" PRId32, persistedImageLen);
-
-            // Make sure that the buffer provided in the parameter is large enough.
-            if (aInParam.ComputeImageIntegrity.IntegrityValueBufLen < sSHA256.kHashLength)
-            {
-                aOutParam.ComputeImageIntegrity.Error = CHIP_ERROR_BUFFER_TOO_SMALL;
-            }
-            else
-            {
-                sSHA256.Finish(aInParam.ComputeImageIntegrity.IntegrityValueBuf);
-            }
-            break;
-        }
-
-        case SoftwareUpdateManager::kEvent_ResetPartialImageInfo:
-        {
-            // Reset the "persistent" state information related to the image being downloaded,
-            // This ensures that the image will be re-downloaded in its entirety during the next
-            // software update attempt.
-            persistedImageLen = 0;
-            persistedImageURI[0] = '\0';
-            break;
-        }
-
-        case SoftwareUpdateManager::kEvent_ReadyToInstall:
-        {
-            K32W_LOG("Image is ready to be installed");
-            break;
-        }
-
-        case SoftwareUpdateManager::kEvent_StartInstallImage:
-        {
-            AppTask *_this = static_cast<AppTask*>(apAppState);
-
-            K32W_LOG("Image Install is not supported in this example application");
-
-            AppEvent event;
-            event.Type             = AppEvent::kEventType_Install;
-            event.Handler          = InstallEventHandler;
-            _this->PostEvent(&event);
-
-            break;
-        }
-
-        case SoftwareUpdateManager::kEvent_Finished:
-        {
-            if (aInParam.Finished.Error == CHIP_ERROR_NO_SW_UPDATE_AVAILABLE)
-            {
-                K32W_LOG("No Software Update Available");
-            }
-            else if (aInParam.Finished.Error == CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_IGNORED)
-            {
-                K32W_LOG("Software Update Ignored by Application");
-            }
-            else if (aInParam.Finished.Error == CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED)
-            {
-                K32W_LOG("Software Update Aborted by Application");
-            }
-            else if (aInParam.Finished.Error != CHIP_NO_ERROR || aInParam.Finished.StatusReport != NULL)
-            {
-                if (aInParam.Finished.Error == CHIP_ERROR_STATUS_REPORT_RECEIVED)
-                {
-                    K32W_LOG("Software Update failed: Received StatusReport %s",
-                                 nl::StatusReportStr(aInParam.Finished.StatusReport->mProfileId,
-                                                     aInParam.Finished.StatusReport->mStatusCode));
-                }
-                else
-                {
-                    K32W_LOG("Software Update failed: %s", nl::ErrorStr(aInParam.Finished.Error));
-                }
-            }
-            else
-            {
-                K32W_LOG("Software Update Completed");
-
-                // Reset the "persistent" image state information.  Since we don't actually apply the
-                // downloaded image, this ensures that the next software update attempt will re-download
-                // the image.
-                persistedImageLen = 0;
-                persistedImageURI[0] = '\0';
-            }
-            break;
-        }
-
-        default:
-            nl::Weave::DeviceLayer::SoftwareUpdateManager::DefaultEventHandler(apAppState, aEvent, aInParam, aOutParam);
-            break;
     }
 }

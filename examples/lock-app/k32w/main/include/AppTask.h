@@ -62,11 +62,6 @@ private:
     static void ButtonEventHandler(uint8_t pin_no, uint8_t button_action);
     static void TimerEventHandler(TimerHandle_t xTimer);
 
-    static void HandleSoftwareUpdateEvent(void *apAppState,
-                                          SoftwareUpdateManager::EventType aEvent,
-                                          const SoftwareUpdateManager::InEventParam& aInParam,
-                                          SoftwareUpdateManager::OutEventParam& aOutParam);
-
     void StartTimer(uint32_t aTimeoutInMs);
 
     enum Function_t
