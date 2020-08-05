@@ -73,7 +73,11 @@ set(CHIP_OUTPUT_LIBRARIES
 )
 
 set(CHIP_OUTPUT_TESTS
+    -lSupportTests
+    -lCoreTests
     -lSystemLayerTests
+    -lTransportLayerTests
+    -lCryptoLayerTests
 )
 
 # ==================================================

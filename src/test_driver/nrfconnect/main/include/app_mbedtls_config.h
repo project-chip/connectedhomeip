@@ -21,10 +21,11 @@
 #define MBEDTLS_ECDH_C
 #define MBEDTLS_HKDF_C
 #define MBEDTLS_BIGNUM_C
+#define MBEDTLS_PKCS5_C
 
 // Define mbedtls_error()
 #define MBEDTLS_ERROR_C
 
-// Use hardware entropy generator
-#define MBEDTLS_ENTROPY_HARDWARE_ALT
+// Use /dev/urandom as entropy generator
 #undef MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
+#undef MBEDTLS_NO_PLATFORM_ENTROPY

@@ -216,7 +216,7 @@ static void __attribute__((constructor)) TestSecureSessionCtor(void)
 
 namespace chip {
 namespace Logging {
-void LogV(uint8_t module, uint8_t category, const char * format, va_list argptr)
+void __attribute__((weak)) LogV(uint8_t module, uint8_t category, const char * format, va_list argptr)
 {
     (void) module, (void) category;
     vfprintf(stderr, format, argptr);
