@@ -127,21 +127,6 @@ CHIP_ERROR BLEManagerImpl::_PlatformInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // #if JLINK_MMD
-    //     NVIC_SetPriority(DebugMonitor_IRQn, _PRIO_SD_LOWEST);
-    // #endif
-
-    //     // Initialize clock driver.
-    //     ret = nrf_drv_clock_init();
-    //     APP_ERROR_CHECK(ret);
-
-    //     nrf_drv_clock_lfclk_request(NULL);
-
-    //     // Wait for the clock to be ready.
-    //     while (!nrf_clock_lf_is_running())
-    //     {
-    //     }
-
 #if NRF_LOG_ENABLED
 
     // Initialize logging component
