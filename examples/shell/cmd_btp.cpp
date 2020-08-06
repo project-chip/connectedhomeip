@@ -59,14 +59,12 @@ int cmd_btp_adv(int argc, char ** argv)
     if (strcmp(argv[0], "start") == 0)
     {
         streamer_printf(sout, "Starting BLE advertising");
-        // start advertising
-        SuccessOrExit(error = CHIP_NO_ERROR);
+        // TODO: start advertising
     }
     else if (strcmp(argv[0], "stop") == 0)
     {
         streamer_printf(sout, "Stopping BLE advertising");
-        // stop advertising
-        SuccessOrExit(error = CHIP_NO_ERROR);
+        // TODO: stop advertising
     }
     else
     {
@@ -179,14 +177,6 @@ void cmd_btp_init(void)
 
     // Register the root `btp` command with the top-level shell.
     shell_register(&cmds_btp_root, 1);
-
-    // streamer_t * sout = streamer_get();
-
-    // streamer_printf(sout, "Init CHIP Stack\r\n");
-    // error = PlatformMgr().InitChipStack();
-
-    // if (error != CHIP_NO_ERROR)
-    //     streamer_printf(sout, "Failed to init CHIP Stack with error: %s\r\n", ErrorStr(error));
 
 #endif // CONFIG_DEVICE_LAYER
 }

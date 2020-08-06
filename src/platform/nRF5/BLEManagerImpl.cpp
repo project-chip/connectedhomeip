@@ -149,8 +149,6 @@ CHIP_ERROR BLEManagerImpl::_PlatformInit()
 
 #if defined(SOFTDEVICE_PRESENT)
 
-    // NRF_LOG_INFO("Enabling SoftDevice");
-
     err = nrf_sdh_enable_request();
     SuccessOrExit(err);
 
@@ -176,7 +174,6 @@ CHIP_ERROR BLEManagerImpl::_PlatformInit()
 #endif // defined(SOFTDEVICE_PRESENT)
 
 exit:
-    // ChipLogProgress(DeviceLayer, "BLEManagerImpl::PlatformInit() complete");
     return err;
 }
 
@@ -615,6 +612,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     // Advertise in fast mode if not fully provisioned and there are no CHIPoBLE connections, or
     // if the application has expressly requested fast advertising.
+    // TODO: Return back the !ConfigurationMgr().IsFullyProvisioned() checking when the ConfigurationMgr() will be available
     gapAdvParams.interval =
         ((numCHIPoBLECons == 0 /* && !ConfigurationMgr().IsFullyProvisioned()*/) || GetFlag(mFlags, kFlag_FastAdvertisingEnabled))
         ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
@@ -732,6 +730,7 @@ CHIP_ERROR BLEManagerImpl::EncodeAdvertisingData(ble_gap_adv_data_t & gapAdvData
 
     // Initialize the CHIP BLE Device Identification Information block that will be sent as payload
     // within the BLE service advertisement data.
+    // TODO: retrive device configuration from the ConfigurationMgr()
     // err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
     deviceIdInfo.Init();
     deviceIdInfo.SetVendorId(0xDEAD);

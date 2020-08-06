@@ -34,17 +34,7 @@ namespace Shell {
 const size_t c_rx_buffer_size = 256; /**< UART RX buffer size. */
 const size_t c_tx_buffer_size = 512; /**< UART TX buffer size. */
 
-void uart_error_handle(app_uart_evt_t * p_event)
-{
-    // if (p_event->evt_type == APP_UART_COMMUNICATION_ERROR)
-    // {
-    //     APP_ERROR_HANDLER(p_event->data.error_communication);
-    // }
-    // else if (p_event->evt_type == APP_UART_FIFO_ERROR)
-    // {
-    //     APP_ERROR_HANDLER(p_event->data.error_code);
-    // }
-}
+void uart_error_handle(app_uart_evt_t * p_event) {}
 
 void streamer_nrf5_init_internal()
 {
