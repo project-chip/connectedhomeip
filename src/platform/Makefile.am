@@ -146,6 +146,7 @@ libDeviceLayer_a_CPPFLAGS               = \
     $(SOCKETS_CPPFLAGS)                   \
     $(NULL)
 
+nodist_libDeviceLayer_a_SOURCES         = $(NULL)
 libDeviceLayer_a_SOURCES                = \
     PersistedStorage.cpp                  \
     SystemEventSupport.cpp                \
@@ -229,7 +230,7 @@ Linux/gen/DbusBluez.c: Linux/dbus/org.bluez.xml
 	$(GDBUSCODEGEN) $(GDBUSCODEGENOPTS) --body --output $@ $<
 	sed -i 's/config\.h/BuildConfig.h/g' $@
 
-libDeviceLayer_a_SOURCES               += \
+nodist_libDeviceLayer_a_SOURCES        += \
     Linux/gen/DbusBluez.c                 \
     $(NULL)
 
@@ -266,7 +267,7 @@ Linux/gen/DBusWpaNetwork.c: Linux/dbus/wpa_network.xml
 	gdbus-codegen --body --output $@ --c-namespace Wpa $<
 	sed -i 's/config\.h/BuildConfig.h/g' $@
 
-libDeviceLayer_a_SOURCES               += \
+nodist_libDeviceLayer_a_SOURCES        += \
     Linux/gen/DBusWpa.c                   \
     Linux/gen/DBusWpaInterface.c          \
     Linux/gen/DBusWpaNetwork.c            \
