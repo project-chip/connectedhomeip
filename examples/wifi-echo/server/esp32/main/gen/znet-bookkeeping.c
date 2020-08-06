@@ -37,7 +37,7 @@
 
 //#include PLATFORM_HEADER
 //#include CONFIGURATION_HEADER
-#include "../af.h"
+#include "af.h"
 
 // Init function declarations.
 void emberAfMainInitCallback(void); // Global
