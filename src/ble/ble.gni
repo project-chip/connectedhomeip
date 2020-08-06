@@ -14,5 +14,5 @@
 
 declare_args() {
   # Enable BLE support.
-  config_network_layer_ble = true
+  chip_config_network_layer_ble = true
 }

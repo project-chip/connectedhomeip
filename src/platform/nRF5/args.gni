@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-device_platform = "nrf5"
+chip_device_platform = "nrf5"
 
 lwip_platform = "nrf5"
 lwip_ipv6 = true
 lwip_ipv4 = false
 lwip_api = true
 
-inet_config_enable_ipv4 = false
-inet_config_enable_dns_resolver = false
+chip_inet_config_enable_ipv4 = false
+chip_inet_config_enable_dns_resolver = false
 
 chip_build_tests = false

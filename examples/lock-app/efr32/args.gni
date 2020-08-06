@@ -18,8 +18,8 @@ import("${chip_root}/src/platform/EFR32/args.gni")
 efr32_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 mbedtls_target = efr32_sdk_target
 
-ble_project_config_include = "<CHIPProjectConfig.h>"
+chip_ble_project_config_include = "<CHIPProjectConfig.h>"
 chip_device_project_config_include = "<CHIPProjectConfig.h>"
 chip_project_config_include = "<CHIPProjectConfig.h>"
-inet_project_config_include = "<CHIPProjectConfig.h>"
-system_project_config_include = "<CHIPProjectConfig.h>"
+chip_inet_project_config_include = "<CHIPProjectConfig.h>"
+chip_system_project_config_include = "<CHIPProjectConfig.h>"
