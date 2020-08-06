@@ -17,10 +17,10 @@
 
 #include "Server.h"
 
-#include "chip-zcl/chip-zcl-zpro-codec.h"
-#include "util.h"
 #include "attribute-storage.h"
+#include "chip-zcl/chip-zcl-zpro-codec.h"
 #include "gen/znet-bookkeeping.h"
+#include "util.h"
 
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
@@ -116,18 +116,21 @@ private:
     {
         EmberApsFrame frame;
         bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame);
-        if (ok) {
+        if (ok)
+        {
             LOG_INF("APS frame processing success!");
-        } else {
+        }
+        else
+        {
             LOG_INF("Aps frame processing failure!");
             System::PacketBuffer::Free(buffer);
             return;
         }
 
         ChipResponseDestination responseDest(header.GetSourceNodeId().Value(), mgr);
-        uint8_t* message;
+        uint8_t * message;
         uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
-        ok = emberAfProcessMessage(&frame,
+        ok                  = emberAfProcessMessage(&frame,
                                    0, // type
                                    message, messageLen,
                                    &responseDest, // source identifier

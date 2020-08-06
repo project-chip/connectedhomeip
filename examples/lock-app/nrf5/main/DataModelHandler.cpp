@@ -27,8 +27,8 @@
 #include "nrf_log.h"
 
 #include "af-types.h"
-#include "gen/cluster-id.h"
 #include "gen/attribute-id.h"
+#include "gen/cluster-id.h"
 
 using namespace ::chip;
 

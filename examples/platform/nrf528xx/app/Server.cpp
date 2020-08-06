@@ -38,10 +38,10 @@
 
 #include "Server.h"
 
-#include "chip-zcl/chip-zcl-zpro-codec.h"
-#include "util.h"
 #include "attribute-storage.h"
+#include "chip-zcl/chip-zcl-zpro-codec.h"
 #include "gen/znet-bookkeeping.h"
+#include "util.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -121,7 +121,8 @@ private:
     {
         EmberApsFrame frame;
         bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame);
-        if (ok) {
+        if (ok)
+        {
             NRF_LOG_INFO("APS frame processing success!");
         }
         else
@@ -132,9 +133,9 @@ private:
         }
 
         ChipResponseDestination responseDest(header.GetSourceNodeId().Value(), mgr);
-        uint8_t* message;
+        uint8_t * message;
         uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
-        ok = emberAfProcessMessage(&frame,
+        ok                  = emberAfProcessMessage(&frame,
                                    0, // type
                                    message, messageLen,
                                    &responseDest, // source identifier
@@ -142,10 +143,12 @@ private:
 
         System::PacketBuffer::Free(buffer);
 
-        if (ok) {
+        if (ok)
+        {
             NRF_LOG_INFO("Data model processing success!");
         }
-        else {
+        else
+        {
             NRF_LOG_INFO("Data model processing failure!");
         }
     }

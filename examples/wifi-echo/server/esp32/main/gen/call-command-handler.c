@@ -54,11 +54,11 @@
 
 #include <stdint.h>
 
-#include "util.h"
 #include "af-structs.h"
 #include "call-command-handler.h"
 #include "callback.h"
 #include "command-id.h"
+#include "util.h"
 
 static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecific)
 {
