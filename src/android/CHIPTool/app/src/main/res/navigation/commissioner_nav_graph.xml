@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/commissioner_scan_qr_code_fragment">
+
+  <fragment
+      android:id="@+id/commissioner_scan_qr_code_fragment"
+      android:name="com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment"
+      tools:layout="@layout/barcode_fragment">
+
+    <action
+        android:id="@+id/action_scan_qr_code_to_select_network"
+        app:destination="@id/commissioner_select_network_fragment" />
+  </fragment>
+
+  <fragment
+      android:id="@+id/commissioner_select_network_fragment"
+      android:name="com.google.chip.chiptool.commissioner.SelectNetworkFragment"
+      android:label="@string/commissioner_select_network_fragment_label"
+      tools:layout="@layout/commissioner_select_network_fragment">
+
+    <action
+        android:id="@+id/action_select_network_to_commissioning"
+        app:destination="@id/commissioner_commissioning_fragment" />
+  </fragment>
+
+  <fragment
+      android:id="@+id/commissioner_commissioning_fragment"
+      android:name="com.google.chip.chiptool.commissioner.CommissioningFragment"
+      android:label="@string/commissioner_commissioning_fragment_label"
+      tools:layout="@layout/commissioner_commissioning_fragment">
+
+    <action
+        android:id="@+id/action_commissioning_to_select_network"
+        app:destination="@id/commissioner_select_network_fragment" />
+  </fragment>
+
+</navigation>

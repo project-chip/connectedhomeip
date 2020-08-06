@@ -3,6 +3,7 @@
     package="com.google.chip.chiptool">
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -22,6 +23,15 @@
             android:name=".OnOffActivity"
             android:exported="false"
             android:screenOrientation="portrait"/>
+
+        <activity
+            android:name="com.google.chip.chiptool.commissioner.CommissionerActivity"
+            android:label="@string/commissioner_name">
+            <intent-filter>
+                <action android:name="com.google.chip.chiptool.commissioner.COMMISSION" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

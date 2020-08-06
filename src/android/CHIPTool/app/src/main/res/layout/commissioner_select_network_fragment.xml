@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SelectNetworkFragment">
+
+  <Button
+      android:id="@+id/add_device_button"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="32dp"
+      android:text="@string/commissioner_commission_device"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent" />
+
+  <ListView
+      android:id="@+id/networks"
+      style="@style/Widget.AppCompat.Light.ListView.DropDown"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:choiceMode="singleChoice"
+      android:listSelector="#bbbbbb"
+      app:layout_constrainedHeight="true"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHeight_max="240dp"
+      app:layout_constraintHeight_min="120dp"
+      app:layout_constraintHorizontal_bias="0.0"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/network_scan_bar"></ListView>
+
+  <TextView
+      android:id="@+id/device_info"
+      style="@style/info_text"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="16dp"
+      app:layout_constraintStart_toStartOf="@+id/your_device"
+      app:layout_constraintTop_toBottomOf="@+id/your_device" />
+
+  <TextView
+      android:id="@+id/select_network"
+      style="@style/title_text"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="24dp"
+      android:text="@string/commissioner_select_network"
+      app:layout_constraintStart_toStartOf="@+id/your_device"
+      app:layout_constraintTop_toBottomOf="@+id/device_info" />
+
+  <TextView
+      android:id="@+id/your_device"
+      style="@style/title_text"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="2dp"
+      android:layout_marginTop="24dp"
+      android:text="@string/commissioner_your_device"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+  <ProgressBar
+      android:id="@+id/network_scan_bar"
+      style="?android:attr/progressBarStyleHorizontal"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:indeterminate="true"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/select_network" />
+
+  <View
+      android:id="@+id/networks_bottom_separator"
+      android:layout_width="0dp"
+      android:layout_height="1dp"
+      android:layout_marginTop="2dp"
+      android:background="@android:color/darker_gray"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/networks" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

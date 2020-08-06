@@ -18,6 +18,23 @@ android {
         // NOTE: This build assumes CHIP was configured and built for armeabi-v7a. Deal with
         // other archs later when build is sane.
         //  ndk {abiFilters 'armeabi-v7a'}
+
+        externalNativeBuild {
+            // For ndk-build, instead use the ndkBuild block.
+            cmake {
+                arguments "-DBUILD_SHARED_LIBS=ON",
+                          "-DOT_COMM_ANDROID=ON",
+                          "-DOT_COMM_JAVA_BINDING=ON",
+                          "-DOT_COMM_APP=OFF",
+                          "-DOT_COMM_CCM=OFF",
+                          "-DOT_COMM_COVERAGE=OFF",
+                          "-DOT_COMM_TEST=OFF",
+                          "-DOT_COMM_JAVA_BINDING_OUTDIR=$projectDir/src/main/java"
+                // Specifies the library and executable targets from your CMake project
+                // that Gradle should build.
+                targets "commissioner-java", "event_core_shared", "event_pthreads_shared"
+            }
+        }
     }
 
     buildTypes {
@@ -37,6 +54,16 @@ android {
             }
         }
     }
+
+    externalNativeBuild {
+        cmake {
+            path "../../../../third_party/ot-commissioner/repo/CMakeLists.txt"
+        }
+    }
+}
+
+project.afterEvaluate {
+    javaPreCompileDebug.dependsOn externalNativeBuildDebug
 }
 
 dependencies {
@@ -45,11 +72,16 @@ dependencies {
     implementation 'androidx.preference:preference:1.1.1'
     implementation "com.google.android.gms:play-services-vision:20.1.0"
     implementation "androidx.annotation:annotation:1.1.0"
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.0'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.3.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation "androidx.core:core-ktx:1.3.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "androidx.work:work-runtime:2.3.3"
+    implementation 'com.google.code.gson:gson:2.8.5'
 }
 repositories {
     mavenCentral()

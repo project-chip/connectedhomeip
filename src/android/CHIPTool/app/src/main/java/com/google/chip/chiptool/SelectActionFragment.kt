@@ -35,6 +35,7 @@ class SelectActionFragment : Fragment() {
   ): View {
     return inflater.inflate(R.layout.select_action_fragment, container, false).apply {
       scanQrBtn.setOnClickListener { getCallback()?.handleScanQrCodeClicked() }
+      commissioningBtn.setOnClickListener { getCallback()?.handleCommissioningClicked() }
       echoClientBtn.setOnClickListener { getCallback()?.handleEchoClientClicked() }
       onOffClusterBtn.setOnClickListener { getCallback()?.handleOnOffClicked() }
     }
@@ -46,6 +47,8 @@ class SelectActionFragment : Fragment() {
   interface Callback {
     /** Notifies listener of Scan QR code button click. */
     fun handleScanQrCodeClicked()
+    /** Notifies listener of Commissioning button click. */
+    fun handleCommissioningClicked()
     /** Notifies listener of Echo client button click. */
     fun handleEchoClientClicked()
     /** Notifies listener of send command button click. */
