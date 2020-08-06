@@ -88,9 +88,7 @@ config("optimize_default") {
 }
 
 config("disabled_warnings") {
-  cflags = [
-    "-Wno-deprecated-declarations",
-  ]
+  cflags = [ "-Wno-deprecated-declarations" ]
   cflags_cc = [
     "-Wno-non-virtual-dtor",
     "-Wno-deprecated-copy",
@@ -110,6 +108,10 @@ config("strict_warnings") {
     "-Wall",
     "-Werror",
   ]
+
+  if (is_clang) {
+    cflags += [ "-Wimplicit-fallthrough" ]
+  }
 }
 
 config("warnings_default") {
