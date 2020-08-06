@@ -27,4 +27,4 @@ cd "$CHIP_ROOT" \
     && cd src/test_driver/nrfconnect \
     && west build -b native_posix \
     && cd build \
-    && ctest -V
+    && timeout 5m ctest -V

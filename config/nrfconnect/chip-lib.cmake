@@ -159,7 +159,7 @@ function(chip_build TARGET_NAME BASE_TARGET_NAME)
         ${CHIP_OUTPUT_DIR}/src/include
     )
     target_link_directories(${TARGET_NAME} INTERFACE ${CHIP_OUTPUT_DIR}/lib)
-    target_link_libraries(${TARGET_NAME} INTERFACE ${CHIP_BUILD_ARTIFACTS})
+    target_link_libraries(${TARGET_NAME} INTERFACE -Wl,--start-group ${CHIP_BUILD_ARTIFACTS} -Wl,--end-group)
 
     add_dependencies(${TARGET_NAME}Build ${BASE_TARGET_NAME})
     add_dependencies(${TARGET_NAME} ${TARGET_NAME}Build)

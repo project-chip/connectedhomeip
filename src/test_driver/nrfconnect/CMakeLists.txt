@@ -78,6 +78,7 @@ set(CHIP_OUTPUT_TESTS
     -lSystemLayerTests
     -lTransportLayerTests
     -lCryptoLayerTests
+    -lPlatformTests
 )
 
 # ==================================================
@@ -105,6 +106,6 @@ enable_testing()
 target_compile_definitions(app PRIVATE HAVE_CONFIG_H)
 target_sources(app PRIVATE main/runner.cpp)
 target_link_options(app PUBLIC -Wl,--whole-archive ${CHIP_OUTPUT_TESTS} -Wl,--no-whole-archive)
-target_link_libraries(app PUBLIC -Wl,--start-group ChipLib -Wl,--end-group)
+target_link_libraries(app PUBLIC ChipLib $<TARGET_FILE:kernel>)
 
 add_test(AllChipTests zephyr/zephyr.exe)
