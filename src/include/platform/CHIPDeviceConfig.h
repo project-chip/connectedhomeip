@@ -990,7 +990,7 @@
 /**
  * CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME
  *
- * Specifies the date of the build. Useful for deterministic builds.
+ * Specifies the time of the build. Useful for deterministic builds.
  */
 #ifndef CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME
 #define CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME __TIME__
