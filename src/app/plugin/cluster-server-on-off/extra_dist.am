@@ -1,1 +1,0 @@
-EXTRA_DIST+=cluster-server-on-off/on-off-server-tokens.h cluster-server-on-off/on-off-server.c cluster-server-on-off/on-off-server.h

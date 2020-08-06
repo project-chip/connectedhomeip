@@ -33,10 +33,7 @@ DIST_SUBDIRS = \
 # Build (e.g for 'make all') these subdirectories
 
 SUBDIRS                               = \
-    gen                                 \
-    chip-zcl                            \
     chip-zcl-zpro                       \
-    plugin                              \
     $(NULL)
 
 include DataModel.am
@@ -44,15 +41,12 @@ include DataModel.am
 lib_LIBRARIES                         = libCHIPDataModel.a
 
 libCHIPDataModel_a_CPPFLAGS           = \
-    -I$(top_srcdir)/src/app/chip-zcl    \
-    -I$(top_srcdir)/src/app/gen         \
     -I$(top_srcdir)/src                 \
     -I$(top_srcdir)/src/lib             \
     $(NULL)
 
 libCHIPDataModel_a_SOURCES            = \
     $(CHIP_BUILD_DATA_MODEL_SOURCE_FILES) \
-    $(CHIP_BUILD_OLD_DATA_MODEL_SOURCE_FILES) \
     $(NULL)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
