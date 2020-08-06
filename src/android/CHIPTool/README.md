@@ -88,9 +88,13 @@ jniLibs/arm64-v8a
 
 'Gradle sync' the Android project and run.
 
-10. You will also need the "libc++\_shared.so" file in the jniLibs folder. This file comes packaged with Android NDK and can be found under `$ANDROID_NDK_HOME/sources/cxx-stl/llvm-libc++/libs/$TARGET`.
+10. You will also need the "libc++\_shared.so" file in the jniLibs folder. This
+    file comes packaged with Android NDK and can be found under
+    `$ANDROID_NDK_HOME/sources/cxx-stl/llvm-libc++/libs/$TARGET`.
 
-    (Eventually hoping to not have to include this .so, but that needs some more tweaking of the Android automake build rules. Include it in the interim to be able to build the Android app).
+    (Eventually hoping to not have to include this .so, but that needs some more
+    tweaking of the Android automake build rules. Include it in the interim to
+    be able to build the Android app).
 
 11. Before running `gradle sync`, seetup ot-commissioner
 
