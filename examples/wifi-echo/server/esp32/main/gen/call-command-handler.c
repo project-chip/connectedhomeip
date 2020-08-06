@@ -54,7 +54,7 @@
 
 #include <stdint.h>
 
-#include "../util.h"
+#include "util.h"
 #include "af-structs.h"
 #include "call-command-handler.h"
 #include "callback.h"

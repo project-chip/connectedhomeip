@@ -21,4 +21,14 @@
 
 COMPONENT_DEPENDS := chip QRCode tft spidriver
 
-COMPONENT_SRCDIRS := . gen
+COMPONENT_SRCDIRS :=                                                           \
+  .                                                                            \
+  gen                                                                          \
+  ../third_party/connectedhomeip/src/app/util                                  \
+  ../third_party/connectedhomeip/src/app/clusters/on-off-server                \
+
+
+COMPONENT_EXTRA_INCLUDES := $(PROJECT_PATH)/third_party/connectedhomeip/src/app/util
+
+# So "gen/*" files are found by the src/app bits.
+COMPONENT_PRIV_INCLUDEDIRS := .

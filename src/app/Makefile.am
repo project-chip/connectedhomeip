@@ -23,6 +23,15 @@
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
+# Package (e.g. 'make dist') these subdirectories
+
+DIST_SUBDIRS = \
+    clusters \
+    util \
+    $(NULL)
+
+# Build (e.g for 'make all') these subdirectories
+
 SUBDIRS                               = \
     gen                                 \
     chip-zcl                            \
