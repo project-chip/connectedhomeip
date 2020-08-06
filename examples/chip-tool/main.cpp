@@ -32,7 +32,6 @@
 #include <core/CHIPError.h>
 #include <inet/InetLayer.h>
 #include <inet/UDPEndPoint.h>
-#include <platform/ConnectivityManager.h>
 #include <support/CHIPLogging.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
