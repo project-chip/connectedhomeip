@@ -32,9 +32,13 @@ public class NetworkInfo implements Parcelable {
     borderAgents.add(borderAgent);
   }
 
-  public InetAddress getHost() { return borderAgents.get(0).host; }
+  public InetAddress getHost() {
+    return borderAgents.get(0).host;
+  }
 
-  public int getPort() { return borderAgents.get(0).port; }
+  public int getPort() {
+    return borderAgents.get(0).port;
+  }
 
   public String getNetworkName() {
     return borderAgents.get(0).networkName;
@@ -57,17 +61,18 @@ public class NetworkInfo implements Parcelable {
     borderAgents = in.readArrayList(BorderAgentInfo.class.getClassLoader());
   }
 
-  public static final Creator<NetworkInfo> CREATOR = new Creator<NetworkInfo>() {
-    @Override
-    public NetworkInfo createFromParcel(Parcel in) {
-      return new NetworkInfo(in);
-    }
+  public static final Creator<NetworkInfo> CREATOR =
+      new Creator<NetworkInfo>() {
+        @Override
+        public NetworkInfo createFromParcel(Parcel in) {
+          return new NetworkInfo(in);
+        }
 
-    @Override
-    public NetworkInfo[] newArray(int size) {
-      return new NetworkInfo[size];
-    }
-  };
+        @Override
+        public NetworkInfo[] newArray(int size) {
+          return new NetworkInfo[size];
+        }
+      };
 
   @Override
   public int describeContents() {

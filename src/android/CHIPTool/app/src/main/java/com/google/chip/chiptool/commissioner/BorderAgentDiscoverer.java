@@ -30,7 +30,7 @@ import android.util.Log;
 import androidx.annotation.RequiresPermission;
 import java.util.Map;
 
-public class BorderAgentDiscoverer implements NsdManager.DiscoveryListener  {
+public class BorderAgentDiscoverer implements NsdManager.DiscoveryListener {
 
   private static final String TAG = BorderAgentDiscoverer.class.getSimpleName();
 
@@ -50,7 +50,7 @@ public class BorderAgentDiscoverer implements NsdManager.DiscoveryListener  {
     WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
     wifiMulticastLock = wifi.createMulticastLock("multicastLock");
 
-    nsdManager = (NsdManager)context.getSystemService(Context.NSD_SERVICE);
+    nsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
 
     this.networkAdapter = networkAdapter;
   }
@@ -59,7 +59,8 @@ public class BorderAgentDiscoverer implements NsdManager.DiscoveryListener  {
     wifiMulticastLock.setReferenceCounted(true);
     wifiMulticastLock.acquire();
 
-    nsdManager.discoverServices(BorderAgentDiscoverer.SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, this);
+    nsdManager.discoverServices(
+        BorderAgentDiscoverer.SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, this);
   }
 
   public void stop() {
@@ -85,45 +86,52 @@ public class BorderAgentDiscoverer implements NsdManager.DiscoveryListener  {
   public void onServiceFound(NsdServiceInfo nsdServiceInfo) {
     Log.d(TAG, "a Border Agent service found");
 
-    nsdManager.resolveService(nsdServiceInfo, new NsdManager.ResolveListener() {
-      @Override
-      public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
-        Log.e(TAG, String.format("failed to resolve service %s, error: %d", serviceInfo.toString(), errorCode));
-      }
-
-      @Override
-      public void onServiceResolved(NsdServiceInfo serviceInfo) {
-        Log.d(TAG, "successfully resolved service " + serviceInfo.toString());
-
-        Map<String, byte[]> attrs = serviceInfo.getAttributes();
-
-        String discriminator = "CC11BB22";
-
-        try {
-          if (attrs.containsKey(KEY_DISCRIMINATOR)) {
-            discriminator = new String(attrs.get(KEY_DISCRIMINATOR));
+    nsdManager.resolveService(
+        nsdServiceInfo,
+        new NsdManager.ResolveListener() {
+          @Override
+          public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
+            Log.e(
+                TAG,
+                String.format(
+                    "failed to resolve service %s, error: %d", serviceInfo.toString(), errorCode));
           }
-          final BorderAgentInfo borderAgent = new BorderAgentInfo(
-                  discriminator,
-                  new String(attrs.get(KEY_NETWORK_NAME)),
-                  attrs.get(KEY_EXTENDED_PAN_ID),
-                  serviceInfo.getHost(),
-                  serviceInfo.getPort(),
-                  PSKC);
 
-          Handler handler = new Handler(Looper.getMainLooper());
-          handler.post(new Runnable() {
-            @RequiresPermission(Manifest.permission.CAMERA)
-            @Override
-            public void run () {
-              networkAdapter.addNetwork(new NetworkInfo(borderAgent));
+          @Override
+          public void onServiceResolved(NsdServiceInfo serviceInfo) {
+            Log.d(TAG, "successfully resolved service " + serviceInfo.toString());
+
+            Map<String, byte[]> attrs = serviceInfo.getAttributes();
+
+            String discriminator = "CC11BB22";
+
+            try {
+              if (attrs.containsKey(KEY_DISCRIMINATOR)) {
+                discriminator = new String(attrs.get(KEY_DISCRIMINATOR));
+              }
+              final BorderAgentInfo borderAgent =
+                  new BorderAgentInfo(
+                      discriminator,
+                      new String(attrs.get(KEY_NETWORK_NAME)),
+                      attrs.get(KEY_EXTENDED_PAN_ID),
+                      serviceInfo.getHost(),
+                      serviceInfo.getPort(),
+                      PSKC);
+
+              Handler handler = new Handler(Looper.getMainLooper());
+              handler.post(
+                  new Runnable() {
+                    @RequiresPermission(Manifest.permission.CAMERA)
+                    @Override
+                    public void run() {
+                      networkAdapter.addNetwork(new NetworkInfo(borderAgent));
+                    }
+                  });
+            } catch (Exception e) {
+              Log.e(TAG, "invalid Border Agent service: " + e.toString());
             }
-          });
-        } catch (Exception e) {
-          Log.e(TAG, "invalid Border Agent service: " + e.toString());
-        }
-      }
-    });
+          }
+        });
   }
 
   @Override

@@ -20,8 +20,6 @@ package com.google.chip.chiptool.commissioner;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,9 +51,7 @@ public class CommissioningFragment extends Fragment implements Observer<WorkInfo
 
   @Override
   public View onCreateView(
-      LayoutInflater inflater, ViewGroup container,
-      Bundle savedInstanceState
-  ) {
+      LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     // Inflate the layout for this fragment
     return inflater.inflate(R.layout.commissioner_commissioning_fragment, container, false);
   }
@@ -70,34 +66,42 @@ public class CommissioningFragment extends Fragment implements Observer<WorkInfo
     deviceInfo = getArguments().getParcelable(Constants.KEY_DEVICE_INFO);
     networkInfo = getArguments().getParcelable(Constants.KEY_NETWORK_INFO);
 
-    Data arguments = new Data.Builder()
+    Data arguments =
+        new Data.Builder()
             .putString(Constants.KEY_DEVICE_INFO, new Gson().toJson(deviceInfo))
             .putString(Constants.KEY_DEVICE_INFO, new Gson().toJson(networkInfo))
             .build();
-    commssionerWorkRequest = new OneTimeWorkRequest.Builder(CommissionerWorker.class).setInputData(arguments).build();
+    commssionerWorkRequest =
+        new OneTimeWorkRequest.Builder(CommissionerWorker.class).setInputData(arguments).build();
 
     WorkManager.getInstance(getActivity()).enqueue(commssionerWorkRequest);
 
-    WorkManager.getInstance(getActivity()).getWorkInfoByIdLiveData(commssionerWorkRequest.getId())
-            .observe(getViewLifecycleOwner(), this);
+    WorkManager.getInstance(getActivity())
+        .getWorkInfoByIdLiveData(commssionerWorkRequest.getId())
+        .observe(getViewLifecycleOwner(), this);
 
-    view.findViewById(R.id.cancel_button).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        WorkManager.getInstance(getActivity()).cancelWorkById(commssionerWorkRequest.getId());
+    view.findViewById(R.id.cancel_button)
+        .setOnClickListener(
+            new View.OnClickListener() {
+              @Override
+              public void onClick(View view) {
+                WorkManager.getInstance(getActivity())
+                    .cancelWorkById(commssionerWorkRequest.getId());
 
-        CommissionerActivity commissionerActivity = (CommissionerActivity)getActivity();
-        commissionerActivity.finishCommissioning(Activity.RESULT_CANCELED);
-      }
-    });
+                CommissionerActivity commissionerActivity = (CommissionerActivity) getActivity();
+                commissionerActivity.finishCommissioning(Activity.RESULT_CANCELED);
+              }
+            });
 
-    view.findViewById(R.id.done_button).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        CommissionerActivity commissionerActivity = (CommissionerActivity)getActivity();
-        commissionerActivity.finishCommissioning(Activity.RESULT_OK);
-      }
-    });
+    view.findViewById(R.id.done_button)
+        .setOnClickListener(
+            new View.OnClickListener() {
+              @Override
+              public void onClick(View view) {
+                CommissionerActivity commissionerActivity = (CommissionerActivity) getActivity();
+                commissionerActivity.finishCommissioning(Activity.RESULT_OK);
+              }
+            });
   }
 
   @Override
@@ -108,7 +112,9 @@ public class CommissioningFragment extends Fragment implements Observer<WorkInfo
     if (workInfo != null) {
       if (workInfo.getState().isFinished()) {
 
-        showCommissionDone(workInfo.getOutputData().getBoolean(Constants.KEY_SUCCESS, false), workInfo.getOutputData().getString(Constants.KEY_COMMISSIONING_STATUS));
+        showCommissionDone(
+            workInfo.getOutputData().getBoolean(Constants.KEY_SUCCESS, false),
+            workInfo.getOutputData().getString(Constants.KEY_COMMISSIONING_STATUS));
       } else {
         showInProgress(workInfo.getProgress().getString(Constants.KEY_COMMISSIONING_STATUS));
       }

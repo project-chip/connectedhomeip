@@ -24,8 +24,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
-import com.google.chip.chiptool.CHIPToolActivity;
 import com.google.chip.chiptool.R;
 import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment;
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo;

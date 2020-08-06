@@ -34,14 +34,14 @@ public class NetworkAdapter extends BaseAdapter {
   private LayoutInflater inflater;
 
   NetworkAdapter(Context context) {
-    inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     networks = new Vector<>();
   }
 
   public boolean addNetwork(NetworkInfo newNetwork) {
     for (NetworkInfo network : networks) {
-      if (network.getNetworkName().equals(newNetwork.getNetworkName()) &&
-              Arrays.equals(network.getExtendedPanId(), newNetwork.getExtendedPanId())) {
+      if (network.getNetworkName().equals(newNetwork.getNetworkName())
+          && Arrays.equals(network.getExtendedPanId(), newNetwork.getExtendedPanId())) {
         network.merge(newNetwork);
         return false;
       }

@@ -42,9 +42,7 @@ public class SelectNetworkFragment extends Fragment {
   private NetworkInfo selectedNetwork;
   private Button addDeviceButton;
 
-
   private BorderAgentDiscoverer borderAgentDiscoverer;
-
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -64,9 +62,7 @@ public class SelectNetworkFragment extends Fragment {
 
   @Override
   public View onCreateView(
-      LayoutInflater inflater, ViewGroup container,
-      Bundle savedInstanceState
-  ) {
+      LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     // Inflate the layout for this fragment
     return inflater.inflate(R.layout.commissioner_select_network_fragment, container, false);
   }
@@ -80,43 +76,51 @@ public class SelectNetworkFragment extends Fragment {
 
     deviceInfo = getArguments().getParcelable(Constants.KEY_DEVICE_INFO);
 
-    String deviceInfoString = String.format("version: %d\nvendorId: %d\nproductId: %d\nsetupPinCode: %d",
-            deviceInfo.getVersion(), deviceInfo.getVendorId(), deviceInfo.getProductId(), deviceInfo.getSetupPinCode());
+    String deviceInfoString =
+        String.format(
+            "version: %d\nvendorId: %d\nproductId: %d\nsetupPinCode: %d",
+            deviceInfo.getVersion(),
+            deviceInfo.getVendorId(),
+            deviceInfo.getProductId(),
+            deviceInfo.getSetupPinCode());
     TextView deviceInfoView = view.findViewById(R.id.device_info);
     deviceInfoView.setText(deviceInfoString);
 
     final ListView networkListView = view.findViewById(R.id.networks);
     networkListView.setAdapter(networksAdapter);
 
-    networkListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        selectedNetwork = (NetworkInfo)adapterView.getItemAtPosition(position);
-        addDeviceButton.setVisibility(View.VISIBLE);
-      }
-    });
+    networkListView.setOnItemClickListener(
+        new AdapterView.OnItemClickListener() {
+          @Override
+          public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+            selectedNetwork = (NetworkInfo) adapterView.getItemAtPosition(position);
+            addDeviceButton.setVisibility(View.VISIBLE);
+          }
+        });
 
-    view.findViewById(R.id.add_device_button).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        NavController controller = NavHostFragment.findNavController(SelectNetworkFragment.this);
+    view.findViewById(R.id.add_device_button)
+        .setOnClickListener(
+            new View.OnClickListener() {
+              @Override
+              public void onClick(View view) {
+                NavController controller =
+                    NavHostFragment.findNavController(SelectNetworkFragment.this);
 
-        if (controller.getCurrentDestination().getId() == R.id.commissioner_select_network_fragment) {
-          Bundle bundle = new Bundle();
+                if (controller.getCurrentDestination().getId()
+                    == R.id.commissioner_select_network_fragment) {
+                  Bundle bundle = new Bundle();
 
-          assert(deviceInfo != null);
-          assert(selectedNetwork != null);
-          bundle.putParcelable(Constants.KEY_DEVICE_INFO, deviceInfo);
-          bundle.putParcelable(Constants.KEY_NETWORK_INFO, selectedNetwork);
+                  assert (deviceInfo != null);
+                  assert (selectedNetwork != null);
+                  bundle.putParcelable(Constants.KEY_DEVICE_INFO, deviceInfo);
+                  bundle.putParcelable(Constants.KEY_NETWORK_INFO, selectedNetwork);
 
-          controller.navigate(R.id.action_select_network_to_commissioning, bundle);
-        }
-      }
-    });
+                  controller.navigate(R.id.action_select_network_to_commissioning, bundle);
+                }
+              }
+            });
   }
 
   // TODO: may add network if it is new.
-  private void onFoundBorderAgent() {
-
-  }
+  private void onFoundBorderAgent() {}
 }
