@@ -88,7 +88,6 @@ const ble_uuid128_t UUID_CHIPoBLEChar_TX   = {
 const uint8_t CharProps_ReadNotify = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY;
 const uint8_t CharProps_Write      = BLE_GATT_CHR_F_WRITE;
 
-
 } // unnamed namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
@@ -868,7 +867,7 @@ int BLEManagerImpl::gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_hand
         param.arg         = arg;
 
         HandleRXCharWrite(&param);
-        return 0; //XXX
+        return 0; // XXX
 
     default:
         return BLE_ATT_ERR_UNLIKELY;
