@@ -27,10 +27,10 @@ if (device_platform != "none") {
     chip_device_project_config_include = ""
 
     # Date the firmware was built.
-    chip_device_config_firwmare_build_date = ""
+    chip_device_config_firmware_build_date = ""
 
     # Time the firmware was built.
-    chip_device_config_firwmare_build_time = ""
+    chip_device_config_firmware_build_time = ""
   }
 
   config("platform_config") {
@@ -45,10 +45,10 @@ if (device_platform != "none") {
       defines += [ "CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE=${chip_device_platform_config_include}" ]
     }
 
-    if (chip_device_config_firwmare_build_date != "") {
+    if (chip_device_config_firmware_build_date != "") {
       defines += [ "CHIP_DEVICE_CONFIG_FIRWMARE_BUILD_DATE=\"${chip_device_config_firwmare_build_date}\"" ]
     }
-    if (chip_device_config_firwmare_build_time != "") {
+    if (chip_device_config_firmware_build_time != "") {
       defines += [ "CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME=\"${chip_device_config_firwmare_build_time}\"" ]
     }
 
