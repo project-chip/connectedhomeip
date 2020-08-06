@@ -286,9 +286,11 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
             type = linkMode.mDeviceType ? ConnectivityManager::ThreadDeviceType::kThreadDeviceType_FullEndDevice
                                         : ConnectivityManager::ThreadDeviceType::kThreadDeviceType_MinimalEndDevice;
         }
+        break;
     case DeviceRole::OTBR_DEVICE_ROLE_ROUTER:
     case DeviceRole::OTBR_DEVICE_ROLE_LEADER:
         type = ConnectivityManager::ThreadDeviceType::kThreadDeviceType_Router;
+        break;
     default:
         ChipLogError(DeviceLayer, "Unknown Thread role: %d", static_cast<int>(role));
         break;

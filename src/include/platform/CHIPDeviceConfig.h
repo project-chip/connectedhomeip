@@ -978,4 +978,22 @@
  */
 #define CHIP_DEVICE_CONFIG_SWU_BDX_BLOCK_SIZE 1024
 
+/**
+ * CHIP_DEVICE_CONFIG_FIRWMARE_BUILD_DATE
+ *
+ * Specifies the date of the build. Useful for deterministic builds.
+ */
+#ifndef CHIP_DEVICE_CONFIG_FIRWMARE_BUILD_DATE
+#define CHIP_DEVICE_CONFIG_FIRWMARE_BUILD_DATE __DATE__
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME
+ *
+ * Specifies the time of the build. Useful for deterministic builds.
+ */
+#ifndef CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME
+#define CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME __TIME__
+#endif
+
 #endif // CHIP_DEVICE_CONFIG_H
