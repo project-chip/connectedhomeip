@@ -22,9 +22,9 @@ env
 
 CHIP_ROOT="$(dirname "$0")/../.."
 
-cd "$CHIP_ROOT" \
-    && ./bootstrap \
-    && cd src/test_driver/nrfconnect \
-    && west build -b native_posix \
-    && cd build \
-    && timeout 5m ctest -V
+cd "$CHIP_ROOT" &&
+    ./bootstrap &&
+    cd src/test_driver/nrfconnect &&
+    west build -b native_posix &&
+    cd build &&
+    timeout 5m ctest -V
