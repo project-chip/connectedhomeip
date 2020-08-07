@@ -343,7 +343,7 @@ void DoEcho(DeviceController::ChipDeviceController * controller, const char * id
 
 void DoEchoBle(DeviceController::ChipDeviceController * controller, const uint16_t discriminator)
 {
-    char name[4];
+    char name[6];
     snprintf(name, sizeof(name), "%u", discriminator);
     DoEcho(controller, "");
 }
