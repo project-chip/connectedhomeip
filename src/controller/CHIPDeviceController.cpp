@@ -420,8 +420,7 @@ void ChipDeviceController::OnBLEConnectionComplete(BLE_ERROR err)
 
 void ChipDeviceController::OnBLEConnectionClosed(BLE_ERROR err)
 {
-    // TODO: determine if connection closed is really to be treated
-    // as an error.
+    // TODO: determine if connection closed is really to be treated as an error.
     if (mOnError)
     {
         mOnError(this, mAppReqState, err, NULL);
