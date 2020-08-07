@@ -163,7 +163,7 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pA(const MessageHeader & header, 
         memcpy(&buf[Y_len], verifier, Y_len);
 
         err = mDelegate->OnNewMessageForPeer((uint8_t) Spake2pMsgType::kSpake2pCompute_pB_cB, resp);
-        VerifyOrExit(msg != NULL, err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+        SuccessOrExit(err);
     }
 
     mNextExpectedMsg = Spake2pMsgType::kSpake2pCompute_cA;
@@ -201,7 +201,7 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const MessageHeader & heade
         memcpy(resp->Start(), verifier, verifier_len);
 
         err = mDelegate->OnNewMessageForPeer((uint8_t) Spake2pMsgType::kSpake2pCompute_cA, resp);
-        SuccessOrExit(resp);
+        SuccessOrExit(err);
     }
 
     mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgTypeMax;
