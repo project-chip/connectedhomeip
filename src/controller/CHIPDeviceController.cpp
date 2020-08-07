@@ -167,9 +167,6 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const uint
                               .SetSetupPINCode(setupPINCode));
     SuccessOrExit(err);
 
-    // FIXME: set BLE transport callbacks
-    // transport->
-
     mUnsecuredTransport = transport->Retain();
 
     // connected state before 'OnConnect'
