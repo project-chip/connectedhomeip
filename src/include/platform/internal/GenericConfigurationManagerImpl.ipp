@@ -148,12 +148,10 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareBuildTime(uin
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO: Allow build time to be overridden by compile-time config (e.g. CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME).
-
-    err = ParseCompilerDateStr(__DATE__, year, month, dayOfMonth);
+    err = ParseCompilerDateStr(CHIP_DEVICE_CONFIG_FIRWMARE_BUILD_DATE, year, month, dayOfMonth);
     SuccessOrExit(err);
 
-    err = Parse24HourTimeStr(__TIME__, hour, minute, second);
+    err = Parse24HourTimeStr(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME, hour, minute, second);
     SuccessOrExit(err);
 
 exit:

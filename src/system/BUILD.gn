@@ -16,8 +16,8 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
 import("//build_overrides/nlfaultinjection.gni")
 
-import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/gn/chip/tests.gni")
+import("${chip_root}/src/platform/device.gni")
 import("system.gni")
 
 declare_args() {
@@ -26,16 +26,16 @@ declare_args() {
   chip_project_config_include = "<CHIPProjectConfig.h>"
 
   # Extra header to include in SystemConfig.h for project.
-  system_project_config_include = "<SystemProjectConfig.h>"
+  chip_system_project_config_include = "<SystemProjectConfig.h>"
 
   # Extra include dirs for project configs.
-  project_config_include_dirs = []
+  chip_project_config_include_dirs = []
 }
 
-if (project_config_include_dirs == [] &&
+if (chip_project_config_include_dirs == [] &&
     chip_project_config_include == "<CHIPProjectConfig.h>" &&
-    system_project_config_include == "<SystemProjectConfig.h>") {
-  project_config_include_dirs += [ "${chip_root}/config/standalone" ]
+    chip_system_project_config_include == "<SystemProjectConfig.h>") {
+  chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 }
 
 config("system_config") {
@@ -49,13 +49,15 @@ config("system_config") {
     defines +=
         [ "CHIP_PLATFORM_CONFIG_INCLUDE=${chip_platform_config_include}" ]
   }
-  if (system_project_config_include != "") {
-    defines +=
-        [ "SYSTEM_PROJECT_CONFIG_INCLUDE=${system_project_config_include}" ]
+  if (chip_system_project_config_include != "") {
+    defines += [
+      "SYSTEM_PROJECT_CONFIG_INCLUDE=${chip_system_project_config_include}",
+    ]
   }
-  if (system_platform_config_include != "") {
-    defines +=
-        [ "SYSTEM_PLATFORM_CONFIG_INCLUDE=${system_platform_config_include}" ]
+  if (chip_system_platform_config_include != "") {
+    defines += [
+      "SYSTEM_PLATFORM_CONFIG_INCLUDE=${chip_system_platform_config_include}",
+    ]
   }
   if (chip_build_tests) {
     defines += [ "CHIP_SYSTEM_CONFIG_TEST=1" ]
@@ -105,7 +107,7 @@ config("system_config") {
     defines += [ "HAVE_GETTIMEOFDAY=1" ]
   }
 
-  include_dirs = project_config_include_dirs
+  include_dirs = chip_project_config_include_dirs
 }
 
 source_set("system_config_header") {

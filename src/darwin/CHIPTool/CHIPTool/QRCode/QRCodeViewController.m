@@ -260,7 +260,7 @@ static NSString * const ipKey = @"ipk";
 
 - (void)sendWifiCredentialsWithSSID:(NSString *)ssid password:(NSString *)password
 {
-    NSString * msg = [NSString stringWithFormat:@"%@:%@", ssid, password];
+    NSString * msg = [NSString stringWithFormat:@"::%@:%@:", ssid, password];
     NSError * error;
     BOOL didSend = [self.chipController sendMessage:[msg dataUsingEncoding:NSUTF8StringEncoding] error:&error];
     if (!didSend) {

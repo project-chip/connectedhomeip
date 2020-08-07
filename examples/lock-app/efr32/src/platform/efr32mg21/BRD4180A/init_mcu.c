@@ -1,21 +1,34 @@
-/***************************************************************************/
-/**
+/*
+ *
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+/*******************************************************************************
  * @file
  * @brief init_mcu.c
  *******************************************************************************
  * # License
- * <b>Copyright 2018 Silicon Laboratories Inc.
- *www.silabs.com</b>
+ * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
- * The licensor of this software is Silicon
- *Laboratories Inc. Your use of this software is
- *governed by the terms of Silicon Labs Master
- *Software License Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement.
- *This software is distributed to you in Source Code
- *format and is governed by the sections of the MSLA
- *applicable to Source Code.
+ * The licensor of this software is Silicon Laboratories Inc. Your use of this
+ * software is governed by the terms of Silicon Labs Master Software License
+ * Agreement (MSLA) available at
+ * www.silabs.com/about-us/legal/master-software-license-agreement. This
+ * software is distributed to you in Source Code format and is governed by the
+ * sections of the MSLA applicable to Source Code.
  *
  ******************************************************************************/
 
@@ -33,8 +46,8 @@
 #include "em_emu.h"
 #include "em_rtcc.h"
 
+#include "FreeRTOSConfig.h"
 #include "bsp.h"
-
 #include "init_mcu.h"
 
 // Bit [19] in MODULEINFO is the HFXOCALVAL:
@@ -59,6 +72,15 @@ static void initHFXO(void);
 
 void initMcu(void)
 {
+    // ISR safe FreeRTOS API functions must *only* be called
+    // from interrupts that have been assigned a priority at or below
+    // configMAX_SYSCALL_INTERRUPT_PRIORITY.
+    // Here we init all IRQ prio to configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY
+    // to make sure no IRQ use default priority of zero as that is the highest possible priority
+    for (IRQn_Type i = 0; i < EXT_IRQ_COUNT; i++)
+    {
+        NVIC_SetPriority(i, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY);
+    }
     // Device errata
     CHIP_Init();
 
