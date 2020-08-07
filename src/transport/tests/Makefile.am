@@ -44,6 +44,7 @@ libTransportLayerTests_a_SOURCES                      = \
     NetworkTestHelpers.cpp                              \
     TestMessageHeader.cpp                               \
     TestPeerConnections.cpp                             \
+    TestSecurePairingSession.cpp                        \
     TestSecureSession.cpp                               \
     TestSecureSessionMgr.cpp                            \
     TestUDP.cpp                                         \
@@ -120,6 +121,7 @@ else # CHIP_DEVICE_LAYER_TARGET_ESP32
 check_PROGRAMS                                       += \
     TestMessageHeader                                   \
     TestPeerConnections                                 \
+    TestSecurePairingSession                            \
     TestSecureSessionMgr                                \
     TestSecureSession                                   \
     TestUDP                                             \
@@ -137,20 +139,23 @@ TESTS                                                 = \
 
 # Source, compiler, and linker options for test programs.
 
-TestMessageHeader_SOURCES     = TestMessageHeaderDriver.cpp
-TestMessageHeader_LDADD       = $(COMMON_LDADD)
+TestMessageHeader_SOURCES        = TestMessageHeaderDriver.cpp
+TestMessageHeader_LDADD          = $(COMMON_LDADD)
 
-TestSecureSessionMgr_SOURCES  = TestSecureSessionMgrDriver.cpp
-TestSecureSessionMgr_LDADD    = $(COMMON_LDADD)
+TestSecurePairingSession_SOURCES = TestSecurePairingSessionDriver.cpp
+TestSecurePairingSession_LDADD   = $(COMMON_LDADD)
 
-TestSecureSession_SOURCES     = TestSecureSessionDriver.cpp
-TestSecureSession_LDADD       = $(COMMON_LDADD)
+TestSecureSessionMgr_SOURCES     = TestSecureSessionMgrDriver.cpp
+TestSecureSessionMgr_LDADD       = $(COMMON_LDADD)
 
-TestUDP_SOURCES               = TestUDPDriver.cpp
-TestUDP_LDADD                 = $(COMMON_LDADD)
+TestSecureSession_SOURCES        = TestSecureSessionDriver.cpp
+TestSecureSession_LDADD          = $(COMMON_LDADD)
 
-TestPeerConnections_SOURCES   = TestPeerConnectionsDriver.cpp
-TestPeerConnections_LDADD     = $(COMMON_LDADD)
+TestUDP_SOURCES                  = TestUDPDriver.cpp
+TestUDP_LDADD                    = $(COMMON_LDADD)
+
+TestPeerConnections_SOURCES      = TestPeerConnectionsDriver.cpp
+TestPeerConnections_LDADD        = $(COMMON_LDADD)
 
 #
 # Foreign make dependencies

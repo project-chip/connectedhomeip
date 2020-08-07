@@ -34,8 +34,8 @@
 
 namespace chip {
 
-const char * kSpake2pI2RSessionInfo = "Commissioning I2R Key";
-const char * kSpake2pR2ISessionInfo = "Commissioning R2I Key";
+extern const char * kSpake2pI2RSessionInfo;
+extern const char * kSpake2pR2ISessionInfo;
 
 using namespace Crypto;
 

@@ -33,6 +33,9 @@ static const char * kSpake2pKeyExchangeSalt = "SPAKE2P Key Exchange Salt";
 
 using namespace Crypto;
 
+const char * kSpake2pI2RSessionInfo = "Commissioning I2R Key";
+const char * kSpake2pR2ISessionInfo = "Commissioning R2I Key";
+
 SecurePairingSession::SecurePairingSession(void) {}
 
 SecurePairingSession::~SecurePairingSession(void)
