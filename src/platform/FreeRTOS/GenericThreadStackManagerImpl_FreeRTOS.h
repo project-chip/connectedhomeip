@@ -30,10 +30,12 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "freertos/task.h"
+#include "timers.h"
 #else
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "task.h"
+#include "timers.h"
 #endif
 
 namespace chip {
@@ -77,6 +79,9 @@ private:
     inline ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 
     static void ThreadTaskMain(void * arg);
+    static void OnJoinerTimer(TimerHandle_t xTimer);
+
+    portTickType mJoinerExpire;
 };
 
 // Instruct the compiler to instantiate the template only when explicitly told to do so.

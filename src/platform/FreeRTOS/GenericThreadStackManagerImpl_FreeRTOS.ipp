@@ -27,6 +27,7 @@
 #define GENERIC_THREAD_STACK_MANAGER_IMPL_FREERTOS_IPP
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.h>
+#include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <support/CodeUtils.h>
@@ -115,6 +116,26 @@ BaseType_t GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::SignalThreadActivi
 }
 
 template <class ImplClass>
+void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::OnJoinerTimer(TimerHandle_t xTimer)
+{
+    GenericThreadStackManagerImpl_FreeRTOS<ImplClass> * self =
+        static_cast<GenericThreadStackManagerImpl_FreeRTOS<ImplClass> *>(pvTimerGetTimerID(xTimer));
+
+    if (xTaskGetTickCount() > self->mJoinerExpire || self->Impl()->IsThreadProvisioned())
+    {
+        ChipLogDetail(DeviceLayer, "Thread joiner timer stopped");
+
+        VerifyOrDie(pdPASS == xTimerStop(xTimer, portMAX_DELAY) && pdPASS == xTimerDelete(xTimer, portMAX_DELAY));
+    }
+    else
+    {
+        CHIP_ERROR error = self->Impl()->JoinerStart();
+
+        ChipLogDetail(DeviceLayer, "Thread joiner timer triggered: %s", chip::ErrorStr(error));
+    }
+}
+
+template <class ImplClass>
 void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::ThreadTaskMain(void * arg)
 {
     GenericThreadStackManagerImpl_FreeRTOS<ImplClass> * self =
@@ -126,6 +147,13 @@ void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::ThreadTaskMain(void * ar
 
     // Capture the Thread task handle.
     self->mThreadTask = xTaskGetCurrentTaskHandle();
+
+    // Try starting joiner within 15m.
+    self->mJoinerExpire = xTaskGetTickCount() + pdMS_TO_TICKS(15 * 60 * 1000);
+
+    TimerHandle_t joinerTimer = xTimerCreate("JoinerTimer", pdMS_TO_TICKS(10000), pdTRUE, self, &OnJoinerTimer);
+    VerifyOrDie(joinerTimer != NULL);
+    VerifyOrDie(pdPASS == xTimerStart(joinerTimer, portMAX_DELAY));
 
     while (true)
     {
