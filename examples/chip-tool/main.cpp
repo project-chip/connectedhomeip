@@ -231,7 +231,7 @@ bool DetermineCommand(int argc, char * argv[], Command * command)
         return argc == 4;
     }
 
-    fprintf(stderr, "Unknown command: %s\n", argv[3]);
+    fprintf(stderr, "Unknown command: %s\n", argv[1]);
     return false;
 }
 
