@@ -32,6 +32,7 @@
 
 #include <nlunit-test.h>
 #include <support/CodeUtils.h>
+#include <support/TestUtils.h>
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -428,4 +429,9 @@ int TestConfigurationMgr(void)
     // Run test suit againt one context.
     nlTestRunner(&theSuite, NULL);
     return nlTestRunnerStats(&theSuite);
+}
+
+static void __attribute__((constructor)) TestConfigurationMgrCtor(void)
+{
+    VerifyOrDie(RegisterUnitTests(&TestConfigurationMgr) == CHIP_NO_ERROR);
 }

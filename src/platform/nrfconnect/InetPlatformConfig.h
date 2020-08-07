@@ -27,7 +27,13 @@
 
 // ==================== Platform Adaptations ====================
 
+#ifndef INET_CONFIG_ENABLE_IPV4
+#ifdef CONFIG_NET_IPV4
+#define INET_CONFIG_ENABLE_IPV4 CONFIG_NET_IPV4
+#else
 #define INET_CONFIG_ENABLE_IPV4 0
+#endif
+#endif // INET_CONFIG_ENABLE_IPV4
 
 // ========== Platform-specific Configuration Overrides =========
 

@@ -57,11 +57,6 @@ static const char sLargeString [] =
     "...END";
 // clang-format on
 
-void Abort()
-{
-    abort();
-}
-
 void TestAndOpenContainer(nlTestSuite * inSuite, TLVReader & reader, TLVType type, uint64_t tag, TLVReader & containerReader)
 {
     NL_TEST_ASSERT(inSuite, reader.GetType() == type);

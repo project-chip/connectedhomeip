@@ -362,6 +362,10 @@ endif # CHIP_DEVICE_LAYER_TARGET_ESP32
 
 if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 
+SUBDIRS                                +=       \
+    tests                                       \
+    $(NULL)
+
 libDeviceLayer_a_SOURCES               +=       \
     nrfconnect/BLEManagerImpl.cpp               \
     nrfconnect/ConfigurationManagerImpl.cpp     \
