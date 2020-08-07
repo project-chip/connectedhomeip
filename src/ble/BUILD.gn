@@ -19,21 +19,23 @@ import("ble.gni")
 
 declare_args() {
   # Extra header to include in BleConfig.h for project.
-  ble_project_config_include = ""
+  chip_ble_project_config_include = ""
 }
 
 config("ble_config") {
   configs = [ "${chip_root}/src:includes" ]
 
   defines = []
-  if (ble_project_config_include != "") {
-    defines += [ "BLE_PROJECT_CONFIG_INCLUDE=${ble_project_config_include}" ]
+  if (chip_ble_project_config_include != "") {
+    defines +=
+        [ "BLE_PROJECT_CONFIG_INCLUDE=${chip_ble_project_config_include}" ]
   }
-  if (ble_platform_config_include != "") {
-    defines += [ "BLE_PLATFORM_CONFIG_INCLUDE=${ble_platform_config_include}" ]
+  if (chip_ble_project_config_include != "") {
+    defines +=
+        [ "BLE_PLATFORM_CONFIG_INCLUDE=${chip_ble_platform_config_include}" ]
   }
 
-  if (config_network_layer_ble) {
+  if (chip_config_network_layer_ble) {
     defines += [ "CONFIG_NETWORK_LAYER_BLE=1" ]
   } else {
     defines += [ "CONFIG_NETWORK_LAYER_BLE=0" ]
@@ -48,7 +50,7 @@ source_set("ble_config_header") {
   public_deps = [ "${chip_root}/src/system:system_config_header" ]
 }
 
-if (config_network_layer_ble) {
+if (chip_config_network_layer_ble) {
   static_library("ble") {
     output_name = "libBleLayer"
 

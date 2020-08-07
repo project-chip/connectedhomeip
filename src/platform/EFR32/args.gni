@@ -17,14 +17,14 @@ import("//build_overrides/efr32_sdk.gni")
 # ARM architecture flags will be set based on efr32_family.
 arm_platform_config = "${efr32_sdk_build_root}/efr32_arm.gni"
 
-device_platform = "efr32"
+chip_device_platform = "efr32"
 
 lwip_platform = "efr32"
 lwip_ipv6 = true
 lwip_ipv4 = false
 lwip_api = true
 
-inet_config_enable_ipv4 = false
-inet_config_enable_dns_resolver = false
+chip_inet_config_enable_ipv4 = false
+chip_inet_config_enable_dns_resolver = false
 
 chip_build_tests = false
