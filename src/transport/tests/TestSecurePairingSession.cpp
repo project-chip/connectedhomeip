@@ -35,7 +35,8 @@
 
 using namespace chip;
 
-class TestSecurePairingDelegate : public SecurePairingSessionDelegate {
+class TestSecurePairingDelegate : public SecurePairingSessionDelegate
+{
 public:
     virtual CHIP_ERROR OnNewMessageForPeer(uint8_t msgType, System::PacketBuffer * msgBuf)
     {
@@ -44,19 +45,13 @@ public:
         return mMessageSendError;
     }
 
-    virtual void OnPairingError(CHIP_ERROR error)
-    {
-        mNumPairingErrors++;
-    }
+    virtual void OnPairingError(CHIP_ERROR error) { mNumPairingErrors++; }
 
-    virtual void OnPairingComplete()
-    {
-        mNumPairingComplete++;
-    }
+    virtual void OnPairingComplete() { mNumPairingComplete++; }
 
-    uint8_t mLastMsgToPeer = 0xff;
-    uint32_t mNumMessageSend = 0;
-    uint32_t mNumPairingErrors = 0;
+    uint8_t mLastMsgToPeer       = 0xff;
+    uint32_t mNumMessageSend     = 0;
+    uint32_t mNumPairingErrors   = 0;
     uint32_t mNumPairingComplete = 0;
     CHIP_ERROR mMessageSendError = CHIP_NO_ERROR;
 };
@@ -69,7 +64,6 @@ void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, pairing.WaitForPairing(1234, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
     NL_TEST_ASSERT(inSuite, pairing.WaitForPairing(1234, &delegate) == CHIP_NO_ERROR);
-
 }
 
 void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
