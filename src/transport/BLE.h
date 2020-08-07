@@ -20,11 +20,6 @@
  *    @file
  *      This file defines the CHIP Connection object that maintains a BLE connection.
  *
- *    TODO
- *    In the current state, Transport::BLE relies on beeing a Friend class of
- *    ChipDeviceController in order to use its private members to fire
- *    Ble related callbacks.
- *
  */
 
 #ifndef __TRANSPORT_BLE_H__
@@ -42,26 +37,22 @@
 #include <transport/Base.h>
 
 namespace chip {
-namespace DeviceController {
-class ChipDeviceController;
-} // namespace DeviceController
-} // namespace chip
-
-namespace chip {
 namespace Transport {
+
+class BLECallbackHandler;
 
 /** Defines connections parameters for setting up a BLE transport */
 class BleConnectionParameters
 {
 public:
-    explicit BleConnectionParameters(DeviceController::ChipDeviceController * dc, Ble::BleLayer * layer) :
-        mDeviceController(dc), mLayer(layer)
+    explicit BleConnectionParameters(BLECallbackHandler * callbacks, Ble::BleLayer * layer) :
+        mCallbackHandler(callbacks), mLayer(layer)
     {}
 
     BleConnectionParameters(const BleConnectionParameters &) = default;
     BleConnectionParameters(BleConnectionParameters &&)      = default;
 
-    DeviceController::ChipDeviceController * GetDeviceController() { return mDeviceController; }
+    BLECallbackHandler * GetCallbackHandler() { return mCallbackHandler; }
 
     Ble::BleLayer * GetBleLayer() { return mLayer; }
 
@@ -93,14 +84,19 @@ public:
     }
 
 private:
-    DeviceController::ChipDeviceController * mDeviceController = nullptr; ///< Associated device controller
-    Ble::BleLayer * mLayer                                     = nullptr; ///< Associated ble layer
-    BLE_CONNECTION_OBJECT mConnectionObj                       = 0;       ///< the target peripheral BLE_CONNECTION_OBJECT
-    uint16_t mDiscriminator                                    = 0;       ///< the target peripheral discriminator
-    uint32_t mSetupPINCode                                     = 0;       ///< the target peripheral setup PIN Code
+    BLECallbackHandler * mCallbackHandler = nullptr;
+    Ble::BleLayer * mLayer                = nullptr; ///< Associated ble layer
+    BLE_CONNECTION_OBJECT mConnectionObj  = 0;       ///< the target peripheral BLE_CONNECTION_OBJECT
+    uint16_t mDiscriminator               = 0;       ///< the target peripheral discriminator
+    uint32_t mSetupPINCode                = 0;       ///< the target peripheral setup PIN Code
 };
 
-/** Implements a transport using BLE. */
+/** Implements a transport using BLE.
+ *
+ *  TODO: BLE transport currently does NOT receive messages as defined
+ *        in the Transport::Base (i.e. no header is parsed and processed) and
+ *        instead received packets are sent raw via BLE Handler callbacks.
+ */
 class DLL_EXPORT BLE : public Base
 {
     /**
@@ -145,10 +141,24 @@ private:
     static void OnBleEndPointConnectionComplete(BLEEndPoint * endPoint, BLE_ERROR err);
     static void OnBleEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err);
 
-    DeviceController::ChipDeviceController * mDeviceController = nullptr;          ///< Associated device controller
-    Ble::BleLayer * mBleLayer                                  = nullptr;          ///< Associated ble layer
-    BLEEndPoint * mBleEndPoint                                 = nullptr;          ///< BLE endpoint used by the transport
-    State mState                                               = State::kNotReady; ///< State of the BLE transport
+    Ble::BleLayer * mBleLayer          = nullptr;          ///< Associated ble layer
+    BLEEndPoint * mBleEndPoint         = nullptr;          ///< BLE endpoint used by the transport
+    State mState                       = State::kNotReady; ///< State of the BLE transport
+    BLECallbackHandler * mBleCallbacks = nullptr;          ///< BLE events
+};
+
+/** Defines callbacks that are BLE specific, beyond standard
+ *  'transport' layer base callbacks for message receive
+ */
+class BLECallbackHandler
+{
+public:
+    virtual ~BLECallbackHandler() {}
+
+    virtual void OnBLEConnectionError(BLE_ERROR err)        = 0;
+    virtual void OnBLEConnectionComplete(BLE_ERROR err)     = 0;
+    virtual void OnBLEConnectionClosed(BLE_ERROR err)       = 0;
+    virtual void OnBLEPacketReceived(PacketBuffer * buffer) = 0;
 };
 
 } // namespace Transport
