@@ -412,6 +412,8 @@ void ChipDeviceController::OnBLEConnectionError(BLE_ERROR err)
 
 void ChipDeviceController::OnBLEConnectionComplete(BLE_ERROR err)
 {
+    ChipLogDetail(Controller, "BLE Connection complete");
+
     if (mOnNewConnection)
     {
         mOnNewConnection(this, NULL, mAppReqState);
@@ -420,6 +422,8 @@ void ChipDeviceController::OnBLEConnectionComplete(BLE_ERROR err)
 
 void ChipDeviceController::OnBLEConnectionClosed(BLE_ERROR err)
 {
+    ChipLogDetail(Controller, "BLE Connection closed");
+
     // TODO: determine if connection closed is really to be treated as an error.
     if (mOnError)
     {
