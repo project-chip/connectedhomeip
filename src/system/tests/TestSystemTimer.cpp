@@ -236,13 +236,13 @@ static nlTestSuite kTheSuite =
 };
 // clang-format on
 
+static Layer sLayer;
+
 /**
  *  Set up the test suite.
  */
 static int TestSetup(void * aContext)
 {
-    static Layer sLayer;
-
     TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
     void * lLayerContext   = NULL;
 

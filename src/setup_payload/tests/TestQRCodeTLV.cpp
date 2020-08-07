@@ -24,6 +24,8 @@
 using namespace chip;
 using namespace std;
 
+namespace {
+
 void TestOptionalDataAddRemove(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload payload = GetDefaultPayload();
@@ -253,7 +255,7 @@ void TestPayloadBinary(nlTestSuite * inSuite, void * inContext)
  *  Test Suite that lists all the test functions.
  */
 // clang-format off
-static const nlTest sTests[] =
+const nlTest sTests[] =
 {
     NL_TEST_DEF("Test Simple Write",                TestSimpleWrite),
     NL_TEST_DEF("Test Simple Read",                 TestSimpleRead),
@@ -278,6 +280,8 @@ struct TestContext
 {
     nlTestSuite * mSuite;
 };
+
+} // namespace
 
 /**
  *  Main

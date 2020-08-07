@@ -36,7 +36,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
-#include "../af-types.h"
+#include "af-types.h"
 
 namespace chip {
 namespace DeviceManager {
