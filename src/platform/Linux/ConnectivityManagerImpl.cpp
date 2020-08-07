@@ -44,8 +44,8 @@ using namespace ::chip::DeviceLayer::Internal;
 
 namespace {
 const char kWpaSupplicantServiceName[] = "fi.w1.wpa_supplicant1";
-const char kWpaSupplicantObjectPath[] = "/fi/w1/wpa_supplicant1";
-}
+const char kWpaSupplicantObjectPath[]  = "/fi/w1/wpa_supplicant1";
+} // namespace
 
 namespace chip {
 namespace DeviceLayer {
@@ -154,7 +154,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object,
     else
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to create wpa_supplicant1 interface proxy %s: %s",
-                            mWpaSupplicant.interfacePath, err ? err->message : "unknown error");
+                        mWpaSupplicant.interfacePath, err ? err->message : "unknown error");
 
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_NOT_CONNECTED;
     }
@@ -259,7 +259,8 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to create wpa_supplicant proxy %s", err ? err->message : "unknown error");
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to create wpa_supplicant proxy %s",
+                        err ? err->message : "unknown error");
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_NOT_CONNECTED;
     }
 
