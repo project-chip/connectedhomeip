@@ -39,6 +39,8 @@
 #ifndef SILABS_EMBER_AF_COMMAND_PARSE_HEADER
 #define SILABS_EMBER_AF_COMMAND_PARSE_HEADER
 
+#include "af-types.h"
+
 // This is a set of generated prototype for functions that parse the
 // the incomming message, and call appropriate command handler.
 
