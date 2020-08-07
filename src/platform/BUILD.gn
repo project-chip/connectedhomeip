@@ -46,10 +46,10 @@ if (device_platform != "none") {
     }
 
     if (chip_device_config_firmware_build_date != "") {
-      defines += [ "CHIP_DEVICE_CONFIG_FIRWMARE_BUILD_DATE=\"${chip_device_config_firwmare_build_date}\"" ]
+      defines += [ "CHIP_DEVICE_CONFIG_FIRWMARE_BUILD_DATE=\"${chip_device_config_firmware_build_date}\"" ]
     }
     if (chip_device_config_firmware_build_time != "") {
-      defines += [ "CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME=\"${chip_device_config_firwmare_build_time}\"" ]
+      defines += [ "CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME=\"${chip_device_config_firmware_build_time}\"" ]
     }
 
     if (device_platform == "darwin") {
