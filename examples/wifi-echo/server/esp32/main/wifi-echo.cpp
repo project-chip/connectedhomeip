@@ -463,14 +463,7 @@ extern "C" void app_main()
 
     if (isRendezvousBLE())
     {
-        uint32_t setupPINCode;
-        err = ConfigurationMgr().GetSetupPinCode(setupPINCode);
-        if (err != CHIP_NO_ERROR)
-        {
-            ESP_LOGE(TAG, "GetSetupPinCode() failed: %s", ErrorStr(err));
-            return;
-        }
-        rendezvousSession = new RendezvousSession(&bluetoothLED, setUpPINCode);
+        rendezvousSession = new RendezvousSession(&bluetoothLED);
     }
 
 #if CONFIG_USE_ECHO_CLIENT
