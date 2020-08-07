@@ -88,7 +88,8 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, SecurePairingSessionDelegate * delegate);
+    CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const unsigned char * salt, size_t saltLen,
+                              SecurePairingSessionDelegate * delegate);
 
     /**
      * @brief
@@ -99,7 +100,8 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR Pair(uint32_t peerSetUpPINCode, SecurePairingSessionDelegate * delegate);
+    CHIP_ERROR Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const unsigned char * salt, size_t saltLen,
+                    SecurePairingSessionDelegate * delegate);
 
     /**
      * @brief
@@ -124,15 +126,14 @@ public:
     CHIP_ERROR HandlePeerMessage(const MessageHeader & header, System::PacketBuffer * msg);
 
 private:
-    CHIP_ERROR Init(uint32_t setupCode, SecurePairingSessionDelegate * delegate);
+    CHIP_ERROR Init(uint32_t setupCode, uint32_t pbkdf2IterCount, const unsigned char * salt, size_t saltLen,
+                    SecurePairingSessionDelegate * delegate);
 
     CHIP_ERROR HandleCompute_pA(const MessageHeader & header, System::PacketBuffer * msg);
     CHIP_ERROR HandleCompute_pB_cB(const MessageHeader & header, System::PacketBuffer * msg);
     CHIP_ERROR HandleCompute_cA(const MessageHeader & header, System::PacketBuffer * msg);
 
     static constexpr size_t kSpake2p_WS_Length = kMAX_Point_Length + 8;
-
-    static constexpr uint32_t kPBKDF_Iteration_Count = 500000;
 
     enum class Spake2pMsgType
     {

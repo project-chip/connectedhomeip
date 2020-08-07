@@ -29,8 +29,6 @@
 
 namespace chip {
 
-static const char * kSpake2pKeyExchangeSalt = "SPAKE2P Key Exchange Salt";
-
 using namespace Crypto;
 
 const char * kSpake2pI2RSessionInfo = "Commissioning I2R Key";
@@ -46,17 +44,20 @@ SecurePairingSession::~SecurePairingSession(void)
     }
 }
 
-CHIP_ERROR SecurePairingSession::Init(uint32_t setupCode, SecurePairingSessionDelegate * delegate)
+CHIP_ERROR SecurePairingSession::Init(uint32_t setupCode, uint32_t pbkdf2IterCount, const unsigned char * salt, size_t saltLen,
+                                      SecurePairingSessionDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    VerifyOrExit(salt != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(saltLen > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(delegate != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     err = mSpake2p.Init((const unsigned char *) &mSpake2pContext, sizeof(mSpake2pContext));
     SuccessOrExit(err);
 
-    err = pbkdf2_sha256((const unsigned char *) &setupCode, sizeof(setupCode), (const unsigned char *) kSpake2pKeyExchangeSalt,
-                        strlen(kSpake2pKeyExchangeSalt), kPBKDF_Iteration_Count, sizeof(mWS), &mWS[0][0]);
+    err = pbkdf2_sha256((const unsigned char *) &setupCode, sizeof(setupCode), salt, saltLen, pbkdf2IterCount, sizeof(mWS),
+                        &mWS[0][0]);
     SuccessOrExit(err);
 
     if (mDelegate != nullptr)
@@ -69,11 +70,12 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::WaitForPairing(uint32_t mySetUpPINCode, SecurePairingSessionDelegate * delegate)
+CHIP_ERROR SecurePairingSession::WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const unsigned char * salt,
+                                                size_t saltLen, SecurePairingSessionDelegate * delegate)
 {
     size_t sizeof_point = sizeof(mPoint);
 
-    CHIP_ERROR err = Init(mySetUpPINCode, delegate);
+    CHIP_ERROR err = Init(mySetUpPINCode, pbkdf2IterCount, salt, saltLen, delegate);
     SuccessOrExit(err);
 
     err = mSpake2p.ComputeL(mPoint, &sizeof_point, &mWS[1][0], kSpake2p_WS_Length);
@@ -85,12 +87,13 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::Pair(uint32_t peerSetUpPINCode, SecurePairingSessionDelegate * delegate)
+CHIP_ERROR SecurePairingSession::Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const unsigned char * salt,
+                                      size_t saltLen, SecurePairingSessionDelegate * delegate)
 {
     unsigned char X[kMAX_Point_Length];
     size_t X_len = sizeof(X);
 
-    CHIP_ERROR err = Init(peerSetUpPINCode, delegate);
+    CHIP_ERROR err = Init(peerSetUpPINCode, pbkdf2IterCount, salt, saltLen, delegate);
     SuccessOrExit(err);
 
     err = mSpake2p.BeginProver((const unsigned char *) "", 0, (const unsigned char *) "", 0, &mWS[0][0], kSpake2p_WS_Length,
