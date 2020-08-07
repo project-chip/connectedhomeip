@@ -92,13 +92,13 @@ config("disabled_warnings") {
   cflags_cc = [
     "-Wno-non-virtual-dtor",
     "-Wno-deprecated-copy",
+    "-Wno-unknown-warning-option",
   ]
   if (!is_clang) {
     cflags += [
       "-Wno-psabi",
       "-Wno-cast-function-type",
       "-Wno-maybe-uninitialized",
-      "-Wno-unknown-warning-option",
     ]
   }
 }
