@@ -1,0 +1,10 @@
+/** @brief CheckInTimeout
+ *
+ * This function is called by the Poll Control Server plugin after a threshold value of poll control
+ * check in messages are sent to a trust center and no responses are received. The existence of this
+ * callback provides an opportunity for the application to implement its own rejoin algorithm or logic.
+ */
+void emberAfPluginPollControlServerCheckInTimeoutCallback(void)
+{
+  return;
+}
