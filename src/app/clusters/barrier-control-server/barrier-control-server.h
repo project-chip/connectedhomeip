@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
+/****************************************************************************
  * @file
  * @brief APIs for the Barrier Control Server plugin.
  *******************************************************************************
-   ******************************************************************************/
+ ******************************************************************************/
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 // There are helper getter/setting APIs that are shared between the core
@@ -47,8 +47,7 @@ uint8_t emAfPluginBarrierControlServerGetBarrierPosition(uint8_t endpoint);
 
 // This will always either set the current BarrierPosition attribute value or
 // assert.
-void emAfPluginBarrierControlServerSetBarrierPosition(uint8_t endpoint,
-                                                      uint8_t barrierPosition);
+void emAfPluginBarrierControlServerSetBarrierPosition(uint8_t endpoint, uint8_t barrierPosition);
 
 // This will either return whether or not the PartialBarrier bit is set in the
 // Capabilities attribute value, or it will assert.
@@ -57,9 +56,7 @@ bool emAfPluginBarrierControlServerIsPartialBarrierSupported(uint8_t endpoint);
 // This will increment the OpenEvents, CloseEvents, CommandOpenEvents, and
 // CommandCloseEvents attribute values depending on which combination of the
 // open and command arguments are passed, or assert.
-void emAfPluginBarrierControlServerIncrementEvents(uint8_t endpoint,
-                                                   bool open,
-                                                   bool command);
+void emAfPluginBarrierControlServerIncrementEvents(uint8_t endpoint, bool open, bool command);
 
 // This will read the SafetyStatus attribute and return the value, or assert.
 uint16_t emAfPluginBarrierControlServerGetSafetyStatus(uint8_t endpoint);

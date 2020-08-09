@@ -31,53 +31,51 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
+/****************************************************************************
  * @file
- * @brief Routines for the Poll Control Client plugin, which implement the
- *        client side of the Poll Control cluster. The Poll Control cluster
- *        provides a means to communicate with an end device with a sleep
+ * @brief Routines for the Poll Control Client plugin,
+ *which implement the client side of the Poll Control
+ *cluster. The Poll Control cluster provides a means
+ *to communicate with an end device with a sleep
  *        schedule.
  *******************************************************************************
-   ******************************************************************************/
+ ******************************************************************************/
 
-#include "../../include/af.h"
 #include "poll-control-client.h"
+#include "../../include/af.h"
 
-static bool fastPolling = false;
-static bool respondToCheckIn = true;
+static bool fastPolling            = false;
+static bool respondToCheckIn       = true;
 static uint16_t fastPollingTimeout = EMBER_AF_PLUGIN_POLL_CONTROL_CLIENT_DEFAULT_FAST_POLL_TIMEOUT;
 
 void emAfSetFastPollingMode(bool mode)
 {
-  fastPolling = mode;
+    fastPolling = mode;
 }
 
 void emAfSetFastPollingTimeout(uint16_t timeout)
 {
-  fastPollingTimeout = timeout;
+    fastPollingTimeout = timeout;
 }
 
 void emAfSetResponseMode(bool mode)
 {
-  respondToCheckIn = mode;
+    respondToCheckIn = mode;
 }
 
 bool emberAfPollControlClusterCheckInCallback(void)
 {
-  emberAfPollControlClusterPrintln("RX: CheckIn");
-  if (respondToCheckIn) {
-    emberAfFillCommandPollControlClusterCheckInResponse(fastPolling,
-                                                        fastPollingTimeout);
-    emberAfSendResponse();
-  }
-  return true;
+    emberAfPollControlClusterPrintln("RX: CheckIn");
+    if (respondToCheckIn)
+    {
+        emberAfFillCommandPollControlClusterCheckInResponse(fastPolling, fastPollingTimeout);
+        emberAfSendResponse();
+    }
+    return true;
 }
 
 void emAfPollControlClientPrint(void)
 {
-  emberAfPollControlClusterPrintln("Poll Control Client:\n%p %p\n%p 0x%2x",
-                                   "fast polling: ",
-                                   fastPolling ? "on" : "off",
-                                   "fast polling timeout: ",
-                                   fastPollingTimeout);
+    emberAfPollControlClusterPrintln("Poll Control Client:\n%p %p\n%p 0x%2x", "fast polling: ", fastPolling ? "on" : "off",
+                                     "fast polling timeout: ", fastPollingTimeout);
 }

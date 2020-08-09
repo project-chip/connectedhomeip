@@ -31,21 +31,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
+/****************************************************************************
  * @file
  * @brief Definitions for the Scenes Client plugin.
  *******************************************************************************
-   ******************************************************************************/
+ ******************************************************************************/
 
-bool emberAfPluginScenesClientParseAddSceneResponse(const EmberAfClusterCommand *cmd,
-                                                    uint8_t status,
-                                                    uint16_t groupId,
+bool emberAfPluginScenesClientParseAddSceneResponse(const EmberAfClusterCommand * cmd, uint8_t status, uint16_t groupId,
                                                     uint8_t sceneId);
 
-bool emberAfPluginScenesClientParseViewSceneResponse(const EmberAfClusterCommand *cmd,
-                                                     uint8_t status,
-                                                     uint16_t groupId,
-                                                     uint8_t sceneId,
-                                                     uint16_t transitionTime,
-                                                     const uint8_t *sceneName,
-                                                     const uint8_t *extensionFieldSets);
+bool emberAfPluginScenesClientParseViewSceneResponse(const EmberAfClusterCommand * cmd, uint8_t status, uint16_t groupId,
+                                                     uint8_t sceneId, uint16_t transitionTime, const uint8_t * sceneName,
+                                                     const uint8_t * extensionFieldSets);

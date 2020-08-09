@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
+/****************************************************************************
  * @file
- * @brief Implementation for the Basic Server Cluster plugin.
+ * @brief Implementation for the Basic Server Cluster
+ *plugin.
  *******************************************************************************
-   ******************************************************************************/
+ ******************************************************************************/
 
 #include "../../include/af.h"
 
@@ -43,9 +44,9 @@ void emberAfResetAttributes(uint8_t endpoint);
 
 bool emberAfBasicClusterResetToFactoryDefaultsCallback(void)
 {
-  emberAfBasicClusterPrintln("RX: ResetToFactoryDefaultsCallback");
-  emberAfResetAttributes(emberAfCurrentEndpoint());
-  emberAfPluginBasicResetToFactoryDefaultsCallback(emberAfCurrentEndpoint());
-  emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-  return true;
+    emberAfBasicClusterPrintln("RX: ResetToFactoryDefaultsCallback");
+    emberAfResetAttributes(emberAfCurrentEndpoint());
+    emberAfPluginBasicResetToFactoryDefaultsCallback(emberAfCurrentEndpoint());
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
 }

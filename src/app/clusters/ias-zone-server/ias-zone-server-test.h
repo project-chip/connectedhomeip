@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
+/****************************************************************************
  * @file
- * @brief Include file for ias zone server's unit tests
+ * @brief Include file for ias zone server's unit
+ *tests
  *******************************************************************************
-   ******************************************************************************/
+ ******************************************************************************/
 
 #ifndef SILABS_IAS_ZONE_SERVER_TEST_H
 #define SILABS_IAS_ZONE_SERVER_TEST_H
@@ -54,8 +55,8 @@
 
 #endif
 
-#define TOKEN_PLUGIN_IAS_ZONE_SERVER_ENROLLMENT_METHOD  0
-#define TOKEN_PLUGIN_IAS_ZONE_SERVER_ENROLLMENT_METHOD_SIZE  1
+#define TOKEN_PLUGIN_IAS_ZONE_SERVER_ENROLLMENT_METHOD 0
+#define TOKEN_PLUGIN_IAS_ZONE_SERVER_ENROLLMENT_METHOD_SIZE 1
 
 #undef EMBER_BINDING_TABLE_SIZE
 #define EMBER_BINDING_TABLE_SIZE 12
