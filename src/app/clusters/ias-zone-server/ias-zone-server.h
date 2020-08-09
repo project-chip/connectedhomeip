@@ -31,38 +31,42 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
+/****************************************************************************
  * @file
- * @brief This is the source for the plugin used to add an IAS Zone cluster server
- * to a project. This source handles zone enrollment and storing of
- * attributes from a CIE device and provides an API for different plugins to
- * post updated zone status values.
+ * @brief This is the source for the plugin used to
+ *add an IAS Zone cluster server to a project. This
+ *source handles zone enrollment and storing of
+ * attributes from a CIE device and provides an API
+ *for different plugins to post updated zone status
+ *values.
  *******************************************************************************
-   ******************************************************************************/
+ ******************************************************************************/
 
 //-----------------------------------------------------------------------------
 #ifndef SILABS_IAS_ZONE_SERVER_H
 #define SILABS_IAS_ZONE_SERVER_H
 
-#define EM_AF_UNKNOWN_ENDPOINT  0
+#define EM_AF_UNKNOWN_ENDPOINT 0
 // Absolute max backoff time, at least one retry a day
 // (ie. 24 hours * 60 minutes * 60 seconds).
 #define IAS_ZONE_STATUS_QUEUE_RETRY_ABS_MAX_BACKOFF_TIME_SEC (24 * 60 * 60)
 
 // Definitions for the IAS Zone enrollment mode.
-typedef enum {
-  EMBER_ZCL_IAS_ZONE_ENROLLMENT_MODE_TRIP_TO_PAIR = 0x00,
-  EMBER_ZCL_IAS_ZONE_ENROLLMENT_MODE_AUTO_ENROLLMENT_RESPONSE = 0x01,
-  EMBER_ZCL_IAS_ZONE_ENROLLMENT_MODE_REQUEST = 0x02
+typedef enum
+{
+    EMBER_ZCL_IAS_ZONE_ENROLLMENT_MODE_TRIP_TO_PAIR             = 0x00,
+    EMBER_ZCL_IAS_ZONE_ENROLLMENT_MODE_AUTO_ENROLLMENT_RESPONSE = 0x01,
+    EMBER_ZCL_IAS_ZONE_ENROLLMENT_MODE_REQUEST                  = 0x02
 } EmberAfIasZoneEnrollmentMode;
 
 // Status queue retry parameters
-typedef struct {
-  uint8_t firstBackoffTimeSec;
-  uint8_t backoffSeqCommonRatio;
-  uint32_t maxBackoffTimeSec;
-  bool unlimitedRetries;
-  uint8_t maxRetryAttempts;
+typedef struct
+{
+    uint8_t firstBackoffTimeSec;
+    uint8_t backoffSeqCommonRatio;
+    uint32_t maxBackoffTimeSec;
+    bool unlimitedRetries;
+    uint8_t maxRetryAttempts;
 } IasZoneStatusQueueRetryConfig;
 
 /** @brief Updates the zone status for an endpoint.
@@ -79,10 +83,7 @@ typedef struct {
  * @return EMBER_SUCCESS if the attribute update and notify succeeded, error
  * code otherwise.
  */
-EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(
-  uint8_t endpoint,
-  uint16_t newStatus,
-  uint16_t  timeSinceStatusOccurredQs);
+EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(uint8_t endpoint, uint16_t newStatus, uint16_t timeSinceStatusOccurredQs);
 
 /** @brief Gets the CIE assigned zone id of a given endpoint.
  *
@@ -115,8 +116,7 @@ bool emberAfIasZoneClusterAmIEnrolled(uint8_t endpoint);
  *
  * @return An ::EmberAfStatus value indicating the status of the set action.
  */
-EmberAfStatus emberAfPluginIasZoneClusterSetEnrollmentMethod(uint8_t endpoint,
-                                                             EmberAfIasZoneEnrollmentMode method);
+EmberAfStatus emberAfPluginIasZoneClusterSetEnrollmentMethod(uint8_t endpoint, EmberAfIasZoneEnrollmentMode method);
 
 /** @brief Configure the retry parameters of the status queue.
  *
@@ -124,7 +124,7 @@ EmberAfStatus emberAfPluginIasZoneClusterSetEnrollmentMethod(uint8_t endpoint,
  *
  * @param retryConfig Status queue retry configuration.
  */
-EmberStatus emberAfIasZoneServerConfigStatusQueueRetryParams(IasZoneStatusQueueRetryConfig *retryConfig);
+EmberStatus emberAfIasZoneServerConfigStatusQueueRetryParams(IasZoneStatusQueueRetryConfig * retryConfig);
 
 /** @brief Set the retry parameters of the status queue to default.
  *

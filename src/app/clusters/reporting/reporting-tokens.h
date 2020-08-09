@@ -31,19 +31,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
+/****************************************************************************
  * @file
  * @brief Tokens for the Reporting plugin.
  *******************************************************************************
-   ******************************************************************************/
+ ******************************************************************************/
 
-#define CREATOR_REPORT_TABLE  (0x8725)
+#define CREATOR_REPORT_TABLE (0x8725)
 // This key is used for an indexed token and the subsequent 0x7F keys are also reserved
 #define NVM3KEY_REPORT_TABLE (NVM3KEY_DOMAIN_ZIGBEE | 0x4000)
 
 #ifdef DEFINETYPES
 // Include or define any typedef for tokens here
-#endif //DEFINETYPES
+#endif // DEFINETYPES
 #ifdef DEFINETOKENS
 // Define the actual token storage information here
 
@@ -57,10 +57,7 @@
 #define REPORT_TABLE_SIZE (EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE)
 #endif
 
-DEFINE_INDEXED_TOKEN(REPORT_TABLE,
-                     EmberAfPluginReportingEntry,
-                     REPORT_TABLE_SIZE,
-                     { EMBER_ZCL_REPORTING_DIRECTION_REPORTED,
-                       EMBER_AF_PLUGIN_REPORTING_UNUSED_ENDPOINT_ID })
+DEFINE_INDEXED_TOKEN(REPORT_TABLE, EmberAfPluginReportingEntry, REPORT_TABLE_SIZE,
+                     { EMBER_ZCL_REPORTING_DIRECTION_REPORTED, EMBER_AF_PLUGIN_REPORTING_UNUSED_ENDPOINT_ID })
 
-#endif //DEFINETOKENS
+#endif // DEFINETOKENS

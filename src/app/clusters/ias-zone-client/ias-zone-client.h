@@ -31,21 +31,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
+/****************************************************************************
  * @file
- * @brief APIs and defines for the IAS Zone Client plugin, which keeps track of
- *        IAS Zone servers.
+ * @brief APIs and defines for the IAS Zone Client
+ *plugin, which keeps track of IAS Zone servers.
  *******************************************************************************
-   ******************************************************************************/
+ ******************************************************************************/
 
-typedef struct {
-  EmberEUI64 ieeeAddress;
-  EmberNodeId nodeId;
-  uint16_t zoneType;
-  uint16_t zoneStatus;
-  uint8_t zoneState;
-  uint8_t endpoint;
-  uint8_t zoneId;
+typedef struct
+{
+    EmberEUI64 ieeeAddress;
+    EmberNodeId nodeId;
+    uint16_t zoneType;
+    uint16_t zoneStatus;
+    uint8_t zoneState;
+    uint8_t endpoint;
+    uint8_t zoneId;
 } IasZoneDevice;
 
 extern IasZoneDevice emberAfIasZoneClientKnownServers[];
@@ -57,15 +58,8 @@ extern IasZoneDevice emberAfIasZoneClientKnownServers[];
 
 void emAfClearServers(void);
 
-void emberAfPluginIasZoneClientZdoCallback(EmberNodeId emberNodeId,
-                                           EmberApsFrame* apsFrame,
-                                           uint8_t* message,
-                                           uint16_t length);
+void emberAfPluginIasZoneClientZdoCallback(EmberNodeId emberNodeId, EmberApsFrame * apsFrame, uint8_t * message, uint16_t length);
 
-void emberAfPluginIasZoneClientWriteAttributesResponseCallback(EmberAfClusterId clusterId,
-                                                               uint8_t * buffer,
-                                                               uint16_t bufLen);
+void emberAfPluginIasZoneClientWriteAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 
-void emberAfPluginIasZoneClientReadAttributesResponseCallback(EmberAfClusterId clusterId,
-                                                              uint8_t * buffer,
-                                                              uint16_t bufLen);
+void emberAfPluginIasZoneClientReadAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
