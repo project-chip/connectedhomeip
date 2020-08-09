@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-poll-control-client" name="Plugin Commands: Poll Control Client">
+    <description>
+      The poll-control-client plugin contributes CLI commands to the application framework to be used for setting poll control parameters in a local, client context.
+    </description>
+  </group>
+  <command cli="plugin poll-control-client mode" functionName="mode" group="plugin-poll-control-client">
+    <description>
+      Set the fast polling mode.
+    </description>
+    <arg name="mode" type="BOOLEAN" description = "The fast polling mode." />
+  </command>
+  <command cli="plugin poll-control-client timeout" functionName="timeout" group="plugin-poll-control-client">
+    <description>
+      Set the fast polling timeout.
+    </description>
+    <arg name="timeout" type="INT16U" description = "The fast polling timeout." />
+  </command>
+  <command cli="plugin poll-control-client respond" functionName="respond" group="plugin-poll-control-client">
+    <description>
+      Set the response mode.
+    </description>
+    <arg name="mode" type="BOOLEAN" description = "The response mode." />
+  </command>
+  <command cli="plugin poll-control-client print" functionName="print" group="plugin-poll-control-client">
+    <description>
+      Print the fast polling mode and timeout.
+    </description>
+  </command>
+</cli>

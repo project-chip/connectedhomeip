@@ -1,0 +1,11 @@
+/** @brief Activate Door Lock
+ *
+ * This function is provided by the door lock server plugin. It is
+ *
+ * @param activate True if the lock should move to the locked position, false
+ * if it should move to the unlocked position Ver.: always
+ */
+bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate)
+{
+  return true;
+}
