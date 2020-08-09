@@ -274,7 +274,7 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
         return;
     }
 
-    AppEvent button_event;
+    AppEvent button_event           = {};
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.PinNo  = pin_no;
     button_event.ButtonEvent.Action = button_action;
@@ -286,6 +286,10 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
     else if (pin_no == FUNCTION_BUTTON)
     {
         button_event.Handler = FunctionHandler;
+    }
+    else
+    {
+        return;
     }
 
     sAppTask.PostEvent(&button_event);
