@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
+/***************************************************************************//**
  * @file
  * @brief Routines for the Level Control plugin, which implements the
  *        Level Control cluster.
- *******************************************************************************/
+ *******************************************************************************
+   ******************************************************************************/
 
 // this file contains all the common includes for clusters in the util
 #include "app/framework/include/af.h"

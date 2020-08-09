@@ -31,3 +31,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+/***************************************************************************//**
+ * @file
+ * @brief APIs and defines for the Poll Control Client plugin.
+ *******************************************************************************
+   ******************************************************************************/
+
+// Set fast polling mode
+void emAfSetFastPollingMode(bool mode);
+
+// Set fast polling timeout
+void emAfSetFastPollingTimeout(uint16_t timeout);
+
+// Set response mode
+void emAfSetResponseMode(bool mode);
+
+// Print mode and timeout
+void emAfPollControlClientPrint(void);
