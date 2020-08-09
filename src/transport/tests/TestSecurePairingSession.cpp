@@ -42,6 +42,12 @@ public:
     {
         mNumMessageSend++;
         mLastMsgToPeer = msgType;
+        if (peer != nullptr)
+        {
+            MessageHeader hdr;
+            hdr.SetMessageType(msgType);
+            return peer->HandlePeerMessage(hdr, msgBuf);
+        }
         return mMessageSendError;
     }
 
@@ -54,6 +60,8 @@ public:
     uint32_t mNumPairingErrors   = 0;
     uint32_t mNumPairingComplete = 0;
     CHIP_ERROR mMessageSendError = CHIP_NO_ERROR;
+
+    SecurePairingSession * peer = nullptr;
 };
 
 void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
@@ -88,6 +96,30 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, pairing1.Pair(1234, 500, (const unsigned char *) "salt", 4, &delegate) == CHIP_ERROR_BAD_REQUEST);
 }
 
+void SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
+{
+    // Test all combinations of invalid parameters
+    TestSecurePairingDelegate delegateAccessory, deleageCommissioner;
+    SecurePairingSession pairingAccessory, pairingCommissioner;
+
+    deleageCommissioner.peer = &pairingAccessory;
+    delegateAccessory.peer   = &pairingCommissioner;
+
+    NL_TEST_ASSERT(inSuite,
+                   pairingAccessory.WaitForPairing(1234, 500, (const unsigned char *) "salt", 4, &delegateAccessory) ==
+                       CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   pairingCommissioner.Pair(1234, 500, (const unsigned char *) "salt", 4, &deleageCommissioner) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumMessageSend == 1);
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mLastMsgToPeer == 1);
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
+
+    NL_TEST_ASSERT(inSuite, deleageCommissioner.mNumMessageSend == 2);
+    NL_TEST_ASSERT(inSuite, deleageCommissioner.mLastMsgToPeer == 2);
+    NL_TEST_ASSERT(inSuite, deleageCommissioner.mNumPairingComplete == 1);
+}
+
 // Test Suite
 
 /**
@@ -98,6 +130,7 @@ static const nlTest sTests[] =
 {
     NL_TEST_DEF("WaitInit",    SecurePairingWaitTest),
     NL_TEST_DEF("Start",       SecurePairingStartTest),
+    NL_TEST_DEF("Handshake",   SecurePairingHandshakeTest),
 
     NL_TEST_SENTINEL()
 };

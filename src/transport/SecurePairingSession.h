@@ -133,7 +133,7 @@ private:
     CHIP_ERROR HandleCompute_pB_cB(const MessageHeader & header, System::PacketBuffer * msg);
     CHIP_ERROR HandleCompute_cA(const MessageHeader & header, System::PacketBuffer * msg);
 
-    static constexpr size_t kSpake2p_WS_Length = kMAX_Point_Length + 8;
+    static constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;
 
     enum class Spake2pMsgType
     {
@@ -148,8 +148,6 @@ private:
     Spake2pMsgType mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgTypeMax;
 
     Spake2p_P256_SHA256_HKDF_HMAC mSpake2p;
-
-    Spake2p_Context mSpake2pContext;
 
     unsigned char mPoint[kMAX_Point_Length];
 

@@ -31,6 +31,7 @@ namespace chip {
 
 using namespace Crypto;
 
+const char * kSpake2pContext        = "CHIP 1.0 Provisioning";
 const char * kSpake2pI2RSessionInfo = "Commissioning I2R Key";
 const char * kSpake2pR2ISessionInfo = "Commissioning R2I Key";
 
@@ -53,7 +54,7 @@ CHIP_ERROR SecurePairingSession::Init(uint32_t setupCode, uint32_t pbkdf2IterCou
     VerifyOrExit(saltLen > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(delegate != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = mSpake2p.Init((const unsigned char *) &mSpake2pContext, sizeof(mSpake2pContext));
+    err = mSpake2p.Init((const unsigned char *) kSpake2pContext, sizeof(kSpake2pContext));
     SuccessOrExit(err);
 
     err = pbkdf2_sha256((const unsigned char *) &setupCode, sizeof(setupCode), salt, saltLen, pbkdf2IterCount, sizeof(mWS),
@@ -109,14 +110,18 @@ CHIP_ERROR SecurePairingSession::Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2
         VerifyOrExit(resp != NULL, err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
         memcpy(resp->Start(), &X, X_len);
+        resp->SetDataLength(X_len);
 
-        err = mDelegate->OnNewMessageForPeer((uint8_t) Spake2pMsgType::kSpake2pCompute_pA, resp);
+        mNextExpectedMsg = Spake2pMsgType::kSpake2pCompute_pB_cB;
+        err              = mDelegate->OnNewMessageForPeer((uint8_t) Spake2pMsgType::kSpake2pCompute_pA, resp);
         SuccessOrExit(err);
     }
 
-    mNextExpectedMsg = Spake2pMsgType::kSpake2pCompute_pB_cB;
+    return err;
 
 exit:
+
+    mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgTypeMax;
     return err;
 }
 
@@ -164,14 +169,18 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pA(const MessageHeader & header, 
         buf = resp->Start();
         memcpy(buf, &Y, Y_len);
         memcpy(&buf[Y_len], verifier, Y_len);
+        resp->SetDataLength(Y_len + verifier_len);
 
-        err = mDelegate->OnNewMessageForPeer((uint8_t) Spake2pMsgType::kSpake2pCompute_pB_cB, resp);
+        mNextExpectedMsg = Spake2pMsgType::kSpake2pCompute_cA;
+        err              = mDelegate->OnNewMessageForPeer((uint8_t) Spake2pMsgType::kSpake2pCompute_pB_cB, resp);
         SuccessOrExit(err);
     }
 
-    mNextExpectedMsg = Spake2pMsgType::kSpake2pCompute_cA;
+    return err;
 
 exit:
+
+    mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgTypeMax;
     return err;
 }
 
@@ -190,30 +199,31 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const MessageHeader & heade
     err = mSpake2p.ComputeRoundTwo(buf, kMAX_Point_Length, verifier, &verifier_len);
     SuccessOrExit(err);
 
-    err = mSpake2p.KeyConfirm(&buf[kMAX_Point_Length], buf_len - kMAX_Point_Length);
-    SuccessOrExit(err);
-
-    err = mSpake2p.GetKeys(mKe, &mKeLen);
-    SuccessOrExit(err);
-
     {
         // Call delegate to send the Compute_cA to peer
         System::PacketBuffer * resp = System::PacketBuffer::NewWithAvailableSize(verifier_len);
         VerifyOrExit(resp != NULL, err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
         memcpy(resp->Start(), verifier, verifier_len);
+        resp->SetDataLength(verifier_len);
 
         err = mDelegate->OnNewMessageForPeer((uint8_t) Spake2pMsgType::kSpake2pCompute_cA, resp);
         SuccessOrExit(err);
     }
 
-    mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgTypeMax;
+    err = mSpake2p.KeyConfirm(&buf[kMAX_Point_Length], buf_len - kMAX_Point_Length);
+    SuccessOrExit(err);
+
+    err = mSpake2p.GetKeys(mKe, &mKeLen);
+    SuccessOrExit(err);
 
     // Call delegate to indicate pairing completion
     mDelegate->OnPairingComplete();
     mPairingComplete = true;
 
 exit:
+
+    mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgTypeMax;
     return err;
 }
 
@@ -227,13 +237,13 @@ CHIP_ERROR SecurePairingSession::HandleCompute_cA(const MessageHeader & header, 
     err = mSpake2p.GetKeys(mKe, &mKeLen);
     SuccessOrExit(err);
 
-    mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgTypeMax;
-
     // Call delegate to indicate pairing completion
     mDelegate->OnPairingComplete();
     mPairingComplete = true;
 
 exit:
+
+    mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgTypeMax;
     return err;
 }
 
