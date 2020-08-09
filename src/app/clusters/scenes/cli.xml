@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-scenes" name="Plugin Commands: Scenes Server">
+    <description>
+      The Scenes server plugin contributes a CLI command to the application framework to be used for printing information related to scenes. 
+    </description>
+  </group>
+  <command cli="plugin scenes print" functionName="emAfPluginScenesServerPrintInfo" group="plugin-scenes">
+    <description>
+      Print information about the contents of the scenes table.
+    </description>
+  </command>
+  <command cli="plugin scenes clear" functionName="emAfPluginScenesServerClear" group="plugin-scenes">
+    <description>
+      Clear the scenes table on every endpoint.
+    </description>
+  </command>
+</cli>
