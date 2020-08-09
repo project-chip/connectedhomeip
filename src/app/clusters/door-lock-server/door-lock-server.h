@@ -31,28 +31,29 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
+/****************************************************************************
  * @file
- * @brief APIs and defines for the Door Lock Server plugin.
+ * @brief APIs and defines for the Door Lock Server
+ *plugin.
  *******************************************************************************
-   ******************************************************************************/
+ ******************************************************************************/
 
 // ------------------------------------------------------------------------------
 // Core
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-typedef struct {
-  EmberAfAttributeId id;
-  uint16_t value;
+typedef struct
+{
+    EmberAfAttributeId id;
+    uint16_t value;
 } EmAfPluginDoorLockServerAttributeData;
 
 // For each of the provided attribute ID/value pairs, write the attribute to the
 // value on the DOOR_LOCK_SERVER_ENDPOINT. If this function encounters a failure,
 // it will print something out. The description parameter is a string that
 // describes the type of attributes that are being written.
-void emAfPluginDoorLockServerWriteAttributes(const EmAfPluginDoorLockServerAttributeData *data,
-                                             uint8_t dataLength,
-                                             const char *description);
+void emAfPluginDoorLockServerWriteAttributes(const EmAfPluginDoorLockServerAttributeData * data, uint8_t dataLength,
+                                             const char * description);
 
 // This function should be called when the door state has changed. A status
 // describing the success or failure of the update will be returned.
@@ -64,9 +65,9 @@ EmberAfStatus emAfPluginDoorLockServerNoteDoorStateChanged(EmberAfDoorState stat
 // Note: the DOOR_LOCK_USER_TABLE_SIZE symbol is respected because it
 // was used originally as a configuration value for this plugin.
 #ifdef DOOR_LOCK_USER_TABLE_SIZE
-  #define EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE DOOR_LOCK_USER_TABLE_SIZE
+#define EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE DOOR_LOCK_USER_TABLE_SIZE
 #else
-  #define EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE 8
+#define EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE 8
 #endif
 
 // At boot, the NumberOfRFIDUsersSupported attribute will be written to this
@@ -77,9 +78,9 @@ EmberAfStatus emAfPluginDoorLockServerNoteDoorStateChanged(EmberAfDoorState stat
 // Note: the DOOR_LOCK_MAX_PIN_LENGTH symbol is respected because it was used
 // originally as a configuration value for this plugin.
 #ifdef DOOR_LOCK_MAX_PIN_LENGTH
-  #define EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_MAX_PIN_LENGTH DOOR_LOCK_MAX_PIN_LENGTH
+#define EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_MAX_PIN_LENGTH DOOR_LOCK_MAX_PIN_LENGTH
 #else
-  #define EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_MAX_PIN_LENGTH 8
+#define EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_MAX_PIN_LENGTH 8
 #endif
 
 // This value should reflect the value of the MaxRFIDCodeLength attribute.
@@ -92,9 +93,9 @@ EmberAfStatus emAfPluginDoorLockServerNoteDoorStateChanged(EmberAfDoorState stat
 // Also note: technically, this is the _total_ number of weekday schedules that
 // can be stored across all users.
 #ifdef DOOR_LOCK_SCHEDULE_TABLE_SIZE
-  #define EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_WEEKDAY_SCHEDULE_TABLE_SIZE DOOR_LOCK_SCHEDULE_TABLE_SIZE
+#define EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_WEEKDAY_SCHEDULE_TABLE_SIZE DOOR_LOCK_SCHEDULE_TABLE_SIZE
 #else
-  #define EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_WEEKDAY_SCHEDULE_TABLE_SIZE 4
+#define EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_WEEKDAY_SCHEDULE_TABLE_SIZE 4
 #endif
 
 // At boot, the NumberOfYearDaySchedulesSupportedPerUser attribute will be
@@ -108,7 +109,7 @@ EmberAfStatus emAfPluginDoorLockServerNoteDoorStateChanged(EmberAfDoorState stat
 #define EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_HOLIDAY_SCHEDULE_TABLE_SIZE 8
 
 #ifndef DOOR_LOCK_SERVER_ENDPOINT
-  #define DOOR_LOCK_SERVER_ENDPOINT 1
+#define DOOR_LOCK_SERVER_ENDPOINT 1
 #endif
 
 // ------------------------------------------------------------------------------
@@ -118,40 +119,36 @@ EmberAfStatus emAfPluginDoorLockServerNoteDoorStateChanged(EmberAfDoorState stat
 // attribute.
 #define EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_MAX_LOG_ENTRIES 16
 
-typedef struct {
-  uint16_t logEntryId;
-  uint32_t timestamp;
-  EmberAfDoorLockEventType eventType;
-  EmberAfDoorLockEventSource source;
+typedef struct
+{
+    uint16_t logEntryId;
+    uint32_t timestamp;
+    EmberAfDoorLockEventType eventType;
+    EmberAfDoorLockEventSource source;
 
-  // This field is either a EmberAfDoorLockOperationEventCode or a
-  // EmberAfDoorLockProgrammingEventCode.
-  uint8_t eventId;
+    // This field is either a EmberAfDoorLockOperationEventCode or a
+    // EmberAfDoorLockProgrammingEventCode.
+    uint8_t eventId;
 
-  uint16_t userId;
+    uint16_t userId;
 
-  // This field is a ZCL string representing the PIN code (i.e., the first byte
-  // of the buffer is the length of the total buffer).
-  uint8_t pin[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_MAX_PIN_LENGTH + 1];
+    // This field is a ZCL string representing the PIN code (i.e., the first byte
+    // of the buffer is the length of the total buffer).
+    uint8_t pin[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_MAX_PIN_LENGTH + 1];
 } EmberAfPluginDoorLockServerLogEntry;
 
 // Add a log entry. Returns true iff the entry was added. Note that the eventId
 // parameter should be of type EmberAfDoorLockOperationEventCode or
 // EmberAfDoorLockProgrammingEventCode.
-bool emberAfPluginDoorLockServerAddLogEntry(EmberAfDoorLockEventType eventType,
-                                            EmberAfDoorLockEventSource source,
-                                            uint8_t eventId,
-                                            uint16_t userId,
-                                            uint8_t pinLength,
-                                            uint8_t *pin);
+bool emberAfPluginDoorLockServerAddLogEntry(EmberAfDoorLockEventType eventType, EmberAfDoorLockEventSource source, uint8_t eventId,
+                                            uint16_t userId, uint8_t pinLength, uint8_t * pin);
 
 // Get a log entry associated with the entry ID. If the entry ID does not exist,
 // the most recent entry is returned and the entryId parameter is updated. The
 // entryId is a 1-based index into an array of log entries in order to match
 // GetLogRecord ZCL command. This will return true iff the entry was successfully
 // returned.
-bool emberAfPluginDoorLockServerGetLogEntry(uint16_t *entryId,
-                                            EmberAfPluginDoorLockServerLogEntry *entry);
+bool emberAfPluginDoorLockServerGetLogEntry(uint16_t * entryId, EmberAfPluginDoorLockServerLogEntry * entry);
 
 // ------------------------------------------------------------------------------
 // Users
@@ -162,27 +159,26 @@ void emAfPluginDoorLockServerInitUser(void);
 
 // Set the user type associated with the provided user ID (userId) and return
 // true iff successful.
-bool emAfPluginDoorLockServerSetPinUserType(uint16_t userId,
-                                            EmberAfDoorLockUserType type);
+bool emAfPluginDoorLockServerSetPinUserType(uint16_t userId, EmberAfDoorLockUserType type);
 #endif
 
-typedef struct {
-  EmberAfDoorLockUserStatus status;
-  EmberAfDoorLockUserType type;
+typedef struct
+{
+    EmberAfDoorLockUserStatus status;
+    EmberAfDoorLockUserType type;
 
-  // This field is a Zigbee string, so the first byte is the length of the
-  // remaining bytes.
-  union {
-    uint8_t pin[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_MAX_PIN_LENGTH + 1];
-    uint8_t rfid[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_MAX_RFID_LENGTH + 1];
-  } code;
+    // This field is a Zigbee string, so the first byte is the length of the
+    // remaining bytes.
+    union
+    {
+        uint8_t pin[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_MAX_PIN_LENGTH + 1];
+        uint8_t rfid[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_MAX_RFID_LENGTH + 1];
+    } code;
 } EmberAfPluginDoorLockServerUser;
 
 // These functions will attempt to unlock the door with a PIN/RFID.
-EmberAfStatus emberAfPluginDoorLockServerApplyPin(uint8_t *pin,
-                                                  uint8_t pinLength);
-EmberAfStatus emberAfPluginDoorLockServerApplyRfid(uint8_t *rfid,
-                                                   uint8_t rfidLength);
+EmberAfStatus emberAfPluginDoorLockServerApplyPin(uint8_t * pin, uint8_t pinLength);
+EmberAfStatus emberAfPluginDoorLockServerApplyRfid(uint8_t * rfid, uint8_t rfidLength);
 
 // ------------------------------------------------------------------------------
 // Schedule
@@ -192,28 +188,31 @@ EmberAfStatus emberAfPluginDoorLockServerApplyRfid(uint8_t *rfid,
 void emAfPluginDoorLockServerInitSchedule(void);
 #endif
 
-typedef struct {
-  uint16_t userId;
-  uint8_t daysMask;
-  uint8_t startHour;
-  uint8_t startMinute;
-  uint8_t stopHour;
-  uint8_t stopMinute;
-  bool inUse;
+typedef struct
+{
+    uint16_t userId;
+    uint8_t daysMask;
+    uint8_t startHour;
+    uint8_t startMinute;
+    uint8_t stopHour;
+    uint8_t stopMinute;
+    bool inUse;
 } EmberAfPluginDoorLockServerWeekdayScheduleEntry;
 
-typedef struct {
-  uint16_t userId;
-  uint32_t localStartTime;
-  uint32_t localEndTime;
-  bool inUse;
+typedef struct
+{
+    uint16_t userId;
+    uint32_t localStartTime;
+    uint32_t localEndTime;
+    bool inUse;
 } EmberAfPluginDoorLockServerYeardayScheduleEntry;
 
-typedef struct {
-  uint32_t localStartTime;
-  uint32_t localEndTime;
-  EmberAfDoorLockOperatingMode operatingModeDuringHoliday;
-  bool inUse;
+typedef struct
+{
+    uint32_t localStartTime;
+    uint32_t localEndTime;
+    EmberAfDoorLockOperatingMode operatingModeDuringHoliday;
+    bool inUse;
 } EmberAfPluginDoorLockServerHolidayScheduleEntry;
 
 // ------------------------------------------------------------------------------
@@ -231,7 +230,8 @@ bool emAfPluginDoorLockServerCheckForSufficientSpace(uint8_t spaceReq, uint8_t s
 // If the Critical Message Queue Plugin is available, use it for event notifications
 #ifdef EMBER_AF_PLUGIN_CRITICAL_MESSAGE_QUEUE
 #include "../critical-message-queue/critical-message-queue.h"
-#define SEND_COMMAND_UNICAST_TO_BINDINGS() emberAfSendCommandUnicastToBindingsWithCallback(emberAfPluginCriticalMessageQueueEnqueueCallback)
+#define SEND_COMMAND_UNICAST_TO_BINDINGS()                                                                                         \
+    emberAfSendCommandUnicastToBindingsWithCallback(emberAfPluginCriticalMessageQueueEnqueueCallback)
 #else
 #define SEND_COMMAND_UNICAST_TO_BINDINGS() emberAfSendCommandUnicastToBindings()
 #endif
