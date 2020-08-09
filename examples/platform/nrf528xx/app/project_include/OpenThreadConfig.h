@@ -45,6 +45,10 @@
 // Use smaller maximum interval to speed up reattaching.
 #define OPENTHREAD_CONFIG_MLE_ATTACH_BACKOFF_MAXIMUM_INTERVAL (60 * 10 * 1000) // default 1200000 ms
 
+#define OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE 1
+#define OPENTHREAD_CONFIG_JOINER_ENABLE 1
+#define OPENTHREAD_CONFIG_NCP_UART_ENABLE 1
+
 // Use the Nordic-supplied default platform configuration for remainder
 // of OpenThread config options.
 //
