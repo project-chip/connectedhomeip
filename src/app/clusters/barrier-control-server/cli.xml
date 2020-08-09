@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-barrier-control-server"
+         name="Plugin Commands: Barrier Control Server Cluster">
+    <description>
+      Commands pertaining to the Silicon Labs Barrier Control server cluster.
+    </description>
+  </group>
+
+  <command cli="plugin barrier-control-server status"
+           functionName="emAfPluginBarrierControlServerStatusCommand"
+           group="plugin-barrier-control-server">
+    <description>
+      Prints out the status of the Barrier Control server cluster implementation.
+    </description>
+    <arg name="endpoint" type="INT8U" description="The endpoint from which to receive status" />
+  </command>
+
+  <command cli="plugin barrier-control-server open"
+           functionName="emAfPluginBarrierControlServerOpenOrCloseCommand"
+           group="plugin-barrier-control-server">
+    <description>
+      Notify the plugin that the barrier has been opened manually.
+    </description>
+    <arg name="endpoint" type="INT8U" description="The endpoint on which the barrier has been opened" />
+  </command>
+
+  <command cli="plugin barrier-control-server close"
+           functionName="emAfPluginBarrierControlServerOpenOrCloseCommand"
+           group="plugin-barrier-control-server">
+    <description>
+      Notify the plugin that the barrier has been closed manually.
+    </description>
+    <arg name="endpoint" type="INT8U" description="The endpoint on which the barrier has been closed" />
+  </command>
+
+  <command cli="plugin barrier-control-server remote-lockout"
+           functionName="emAfPluginBarrierControlServerSafetyStatusCommand"
+           group="plugin-barrier-control-server">
+    <description>
+      Simulate or clear a remote lockout event on the barrier (i.e., set or clear the RemoteLockout bit in the SafetyStatus attribute).
+    </description>
+    <arg name="endpoint" type="INT8U" description="The endpoint on which to simulate this remote lockout event" />
+    <arg name="setOrClear" type="INT8U" description="Whether to set (1) or clear (0) the remove lockout state" />
+  </command>
+
+  <command cli="plugin barrier-control-server tamper-detected"
+           functionName="emAfPluginBarrierControlServerSafetyStatusCommand"
+           group="plugin-barrier-control-server">
+    <description>
+      Simulate or clear a tamper detected event on the barrier (i.e., set or clear the TamperDetected bit in the SafetyStatus attribute).
+    </description>
+    <arg name="endpoint" type="INT8U" description="The endpoint on which to simulate this tamper detected event" />
+    <arg name="setOrClear" type="INT8U" description="Whether to set (1) or clear (0) the tamper detected state" />
+  </command>
+
+  <command cli="plugin barrier-control-server failed-communication"
+           functionName="emAfPluginBarrierControlServerSafetyStatusCommand"
+           group="plugin-barrier-control-server">
+    <description>
+      Simulate or clear a failed communication event on the barrier (i.e., set or clear the FailedCommunication bit in the SafetyStatus attribute).
+    </description>
+    <arg name="endpoint" type="INT8U" description="The endpoint on which to simulate this failed communication event" />
+    <arg name="setOrClear" type="INT8U" description="Whether to set (1) or clear (0) the failed communication state" />
+  </command>
+
+  <command cli="plugin barrier-control-server position-failure"
+           functionName="emAfPluginBarrierControlServerSafetyStatusCommand"
+           group="plugin-barrier-control-server">
+    <description>
+      Simulate or clear a position failure event on the barrier (i.e., set or clear the PositionFailure bit in the SafetyStatus attribute).
+    </description>
+    <arg name="endpoint" type="INT8U" description="The endpoint on which to simulate this position failure event" />
+    <arg name="setOrClear" type="INT8U" description="Whether to set (1) or clear (0) the position failure state" />
+  </command>
+
+</cli>

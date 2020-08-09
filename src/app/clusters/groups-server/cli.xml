@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-groups-server" name="Plugin Commands: Groups Server">
+    <description>
+      The groups server plugin contributes a CLI command to the application framework to be used for printing information related to groups.
+    </description>
+  </group>
+  <command cli="plugin groups-server print" functionName="emAfGroupsServerCliPrint" group="plugin-groups-server">
+    <description>
+      Print information about the contents of the groups table.
+    </description>
+  </command>
+  <command cli="plugin groups-server clear" functionName="emAfGroupsServerCliClear" group="plugin-groups-server">
+    <description>
+      Clear the groups table on every endpoint.
+    </description>
+  </command>
+</cli>
