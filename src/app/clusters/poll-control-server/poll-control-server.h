@@ -31,11 +31,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
+/****************************************************************************
  * @file
- * @brief APIs and defines for the Poll Control Server plugin.
+ * @brief APIs and defines for the Poll Control Server
+ *plugin.
  *******************************************************************************
-   ******************************************************************************/
+ ******************************************************************************/
 
 // Callback triggered after multiple failed trust center poll control checkins
 void emberAfPluginPollControlServerCheckInTimeoutCallback(void);
