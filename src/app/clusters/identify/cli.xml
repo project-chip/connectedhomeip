@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-identify" name="Plugin Commands: Identify">
+    <description>
+      The identify plugin contributes a CLI command to the application framework to be used for printing information related to identification. 
+    </description>
+  </group>
+  <command cli="plugin identify print" functionName="emAfPluginIdentifyCliPrint" group="plugin-identify">
+    <description>
+      Print which endpoints are reporting.
+    </description>
+  </command>
+</cli>

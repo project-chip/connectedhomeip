@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-reporting" name="Plugin Commands: Reporting">
+    <description>
+      The reporting plugin contributes several CLI commands to the application framework to be used in creating and managing reporting table entries directly on the device.
+    </description>
+  </group>
+  <command cli="plugin reporting print" functionName="emAfPluginReportingCliPrint" group="plugin-reporting">
+    <description>
+      Print the report table.
+    </description>
+  </command>
+  <command cli="plugin reporting clear" functionName="emAfPluginReportingCliClear" group="plugin-reporting">
+    <description>
+      Clear all entries from the report table.
+    </description>
+  </command>
+  <command cli="plugin reporting remove" functionName="emAfPluginReportingCliRemove" group="plugin-reporting">
+    <description>
+      Remove an entry from the report table.
+    </description>
+    <arg name="index" type="INT8U" description="The index of the report to be removed." />
+  </command>
+  <command cli="plugin reporting add" functionName="emAfPluginReportingCliAdd" group="plugin-reporting">
+    <description>
+      Add a new entry to the report table.
+    </description>
+    <arg name="endpoint"         type="INT8U"  description="The local endpoint from which the attribute is reported." />
+    <arg name="clusterId"        type="INT16U" description="The cluster where the attribute is located." />
+    <arg name="attributeId"      type="INT16U" description="The id of the attribute being reported." />
+    <arg name="mask"             type="INT8U"  description="0 for client-side attributes or 1 for server-side attributes." />
+    <arg name="minInterval"      type="INT16U" description="The minimum reporting interval, measured in seconds." />
+    <arg name="maxInterval"      type="INT16U" description="The maximum reporting interval, measured in seconds." />
+    <arg name="reportableChange" type="INT32U" description="The minimum change to the attribute that will result in a report being sent." />
+  </command>
+  <command cli="plugin reporting clear-last-report-time" functionName="emAfPluginReportingCliClearLastReportTime" group="plugin-reporting">
+    <description>
+      Clear last report time of attributes.
+    </description>
+  </command>
+</cli>

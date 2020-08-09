@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-door-lock-server"
+         name="Plugin Commands: Door Lock Server Cluster">
+    <description>
+      Commands pertaining to the Silicon Labs Door Lock server cluster.
+    </description>
+  </group>
+
+  <command cli="plugin door-lock-server status"
+           functionName="emAfPluginDoorLockServerStatusCommand"
+           group="plugin-door-lock-server">
+    <description>
+      Print out the current status of the door lock.
+    </description>
+  </command>
+
+  <command cli="plugin door-lock-server lock"
+           functionName="emAfPluginDoorLockServerLockOrUnlockCommand"
+           group="plugin-door-lock-server">
+    <description>
+      Lock the door (on currently hardcoded endpoint 1).
+    </description>
+    <arg name="userId" type="INT16U" description="The user ID for whoever is locking the door." />
+  </command>
+
+  <command cli="plugin door-lock-server unlock"
+           functionName="emAfPluginDoorLockServerLockOrUnlockCommand"
+           group="plugin-door-lock-server">
+    <description>
+      Unlock the door (on currently hardcoded endpoint 1).
+    </description>
+    <arg name="userId" type="INT16U" description="The user ID for whoever is unlocking the door." />
+  </command>
+
+  <command cli="plugin door-lock-server open"
+           functionName="emAfPluginDoorLockServerOpenOrCloseCommand"
+           group="plugin-door-lock-server">
+    <description>
+      Open the door (on currently hardcoded endpoint 1).
+    </description>
+  </command>
+
+  <command cli="plugin door-lock-server close"
+           functionName="emAfPluginDoorLockServerOpenOrCloseCommand"
+           group="plugin-door-lock-server">
+    <description>
+      Close the door (on currently hardcoded endpoint 1).
+    </description>
+  </command>
+
+  <command cli="plugin door-lock-server apply-pin"
+           functionName="emAfPluginDoorLockServerApplyCodeCommand"
+           group="plugin-door-lock-server">
+    <description>
+      Simulate a PIN being entered into the door lock.
+    </description>
+    <arg name="pin" type="OCTET_STRING" description="The PIN to enter into the door lock." />
+  </command>
+
+  <command cli="plugin door-lock-server apply-rfid"
+           functionName="emAfPluginDoorLockServerApplyCodeCommand"
+           group="plugin-door-lock-server">
+    <description>
+      Simulate an RFID device being brought within range of the door lock.
+    </description>
+    <arg name="rfid" type="OCTET_STRING" description="The identifier of the RFID device." />
+  </command>
+
+</cli>
