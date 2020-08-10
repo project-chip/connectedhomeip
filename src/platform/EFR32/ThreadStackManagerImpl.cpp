@@ -120,4 +120,3 @@ extern "C" void otSysEventSignalPending(void)
     BaseType_t yieldRequired = ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
     portYIELD_FROM_ISR(yieldRequired);
 }
-
