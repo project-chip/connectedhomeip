@@ -136,7 +136,6 @@ template("nrf5_sdk") {
     }
 
     cflags = [
-      "-Wno-array-bounds",
       "-Wno-unused-function",
     ]
   }
