@@ -340,7 +340,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
                 // readable format. These should not be flipped.
                 if (emberAfIsThisDataTypeAStringType(dataType))
                 {
-                    MEMMOVE(writeData, message + msgIndex + 3, dataSize);
+                    memmove(writeData, message + msgIndex + 3, dataSize);
                 }
                 else
                 {

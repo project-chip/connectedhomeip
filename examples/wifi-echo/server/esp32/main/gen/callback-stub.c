@@ -1191,7 +1191,7 @@ void emberAfOtaClientVersionInfoCallback(EmberAfOtaImageId * currentImageInfo, u
     /* This is commented out since the #defines below are not defined.
 
       if (currentImageInfo != NULL) {
-        MEMSET(currentImageInfo, 0, sizeof(EmberAfOtaImageId));
+        memset(currentImageInfo, 0, sizeof(EmberAfOtaImageId));
         currentImageInfo->manufacturerId  = EMBER_AF_MANUFACTURER_CODE;
         currentImageInfo->imageTypeId     = EMBER_AF_IMAGE_TYPE_ID;
         currentImageInfo->firmwareVersion = EMBER_AF_CUSTOM_FIRMWARE_VERSION;
