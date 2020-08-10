@@ -38,8 +38,8 @@
 #define OPENTHREAD_CONFIG_MAC_MAX_TX_ATTEMPTS_INDIRECT_POLLS 16    // default is 4
 
 // Enable periodic parent search to speed up finding a better parent.
-#define OPENTHREAD_CONFIG_PARENT_SEARCH_ENABLE 1               // default is 0
-#define OPENTHREAD_CONFIG_PARENT_SEARCH_RSS_THRESHOLD -45      // default is -65
+#define OPENTHREAD_CONFIG_PARENT_SEARCH_ENABLE 1                   // default is 0
+#define OPENTHREAD_CONFIG_PARENT_SEARCH_RSS_THRESHOLD -45          // default is -65
 #define OPENTHREAD_CONFIG_MLE_INFORM_PREVIOUS_PARENT_ON_REATTACH 1 // default is 0
 
 // Use smaller maximum interval to speed up reattaching.
