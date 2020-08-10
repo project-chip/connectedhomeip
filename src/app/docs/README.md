@@ -14,10 +14,10 @@ APPLICATION FRAMEWORK IS STILL IN FLUX</code>_**
 
 ### <code>/src/app/util</code>
 
-This directory contains various utilities and some of the external API
-headers for interacting with the data model layer.  In particular the
-various data type definitions and the public APIs to the data model
-are declared in the headers here.
+This directory contains various utilities and some of the external API headers
+for interacting with the data model layer. In particular the various data type
+definitions and the public APIs to the data model are declared in the headers
+here.
 
 ### <code>/src/app/docs</code>
 
@@ -26,12 +26,13 @@ Framework including the file you are reading right now.
 
 ### <code>/src/app/clusters</code>
 
-This directory contains all of the cluster implementations included in
-the CHIP ZCL Application Framework.
+This directory contains all of the cluster implementations included in the CHIP
+ZCL Application Framework.
 
-## Public APIs ##
+## Public APIs
 
-### Attribute changes ###
+### Attribute changes
+
 When a ZCL attribute is updated in the data model, the framework will call the
 <code>postAttributeChangeCallback</code>, if this callback is implemented by the
 device it will be informed of the attribute change. The device may react to the
