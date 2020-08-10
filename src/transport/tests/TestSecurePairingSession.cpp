@@ -70,7 +70,7 @@ void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
     TestSecurePairingDelegate delegate;
     SecurePairingSession pairing;
 
-    NL_TEST_ASSERT(inSuite, pairing.WaitForPairing(1234, 500, NULL, 0, &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, pairing.WaitForPairing(1234, 500, nullptr, 0, &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
     NL_TEST_ASSERT(inSuite,
                    pairing.WaitForPairing(1234, 500, (const unsigned char *) "salt", 4, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
     NL_TEST_ASSERT(inSuite, pairing.WaitForPairing(1234, 500, (const unsigned char *) "salt", 4, &delegate) == CHIP_NO_ERROR);
@@ -82,7 +82,7 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     TestSecurePairingDelegate delegate;
     SecurePairingSession pairing;
 
-    NL_TEST_ASSERT(inSuite, pairing.Pair(1234, 500, NULL, 0, &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, pairing.Pair(1234, 500, nullptr, 0, &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
     NL_TEST_ASSERT(inSuite, pairing.Pair(1234, 500, (const unsigned char *) "salt", 4, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
     NL_TEST_ASSERT(inSuite, pairing.Pair(1234, 500, (const unsigned char *) "salt", 4, &delegate) == CHIP_NO_ERROR);
 

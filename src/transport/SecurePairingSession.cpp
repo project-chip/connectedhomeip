@@ -50,7 +50,7 @@ CHIP_ERROR SecurePairingSession::Init(uint32_t setupCode, uint32_t pbkdf2IterCou
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(salt != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(salt != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(saltLen > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(delegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -107,7 +107,7 @@ CHIP_ERROR SecurePairingSession::Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2
     {
         // Call delegate to send the Compute_pA to peer
         System::PacketBuffer * resp = System::PacketBuffer::NewWithAvailableSize(X_len);
-        VerifyOrExit(resp != NULL, err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+        VerifyOrExit(resp != nullptr, err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
         memcpy(resp->Start(), &X, X_len);
         resp->SetDataLength(X_len);
@@ -129,11 +129,11 @@ CHIP_ERROR SecurePairingSession::DeriveSecureSession(const unsigned char * info,
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(info != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(info != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(info_len > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mPairingComplete, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = session->InitFromSecret(mKe, mKeLen, NULL, 0, info, info_len);
+    err = session->InitFromSecret(mKe, mKeLen, nullptr, 0, info, info_len);
     SuccessOrExit(err);
 
 exit:
@@ -164,7 +164,7 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pA(const MessageHeader & header, 
         // Call delegate to send the Compute_pB_cB to peer
         uint8_t * buf               = nullptr;
         System::PacketBuffer * resp = System::PacketBuffer::NewWithAvailableSize(Y_len + verifier_len);
-        VerifyOrExit(resp != NULL, err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+        VerifyOrExit(resp != nullptr, err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
         buf = resp->Start();
         memcpy(buf, &Y, Y_len);
@@ -202,7 +202,7 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const MessageHeader & heade
     {
         // Call delegate to send the Compute_cA to peer
         System::PacketBuffer * resp = System::PacketBuffer::NewWithAvailableSize(verifier_len);
-        VerifyOrExit(resp != NULL, err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+        VerifyOrExit(resp != nullptr, err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
         memcpy(resp->Start(), verifier, verifier_len);
         resp->SetDataLength(verifier_len);
@@ -250,7 +250,7 @@ exit:
 CHIP_ERROR SecurePairingSession::HandlePeerMessage(const MessageHeader & header, System::PacketBuffer * msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(msg != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(msg != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(header.GetMessageType() == (uint8_t) mNextExpectedMsg, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     // The protocol for handling pA, pB, cB and cA is defined in SPAKE2 Plus specifications
@@ -282,7 +282,7 @@ exit:
         mDelegate->OnPairingError(err);
     }
 
-    if (msg != NULL)
+    if (msg != nullptr)
     {
         System::PacketBuffer::Free(msg);
     }
