@@ -7,5 +7,9 @@ sleep 1
 ot-ctl panid 0x1234
 ot-ctl ifconfig up
 ot-ctl thread start
-sleep infinity
 
+if [ $1 == "server" ]; then
+    chip-standalone-server.out
+elif [ $1 == "tool" ]; then
+    sleep infinity
+fi

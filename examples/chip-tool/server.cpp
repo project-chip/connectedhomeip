@@ -24,6 +24,16 @@ static const unsigned char remote_public_key[] = { 0x04, 0x30, 0x77, 0x2c, 0xe7,
 
 constexpr chip::NodeId kLocalNodeId = 12344321;
 
+#define println(format, ...) printf(format "\n", ##__VA_ARGS__)
+
+using namespace chip;
+using namespace chip::Inet;
+using namespace chip::Transport;
+
+namespace {
+chip::SecureSessionMgr<chip::Transport::UDP> sessions;
+}
+
 extern "C" {
 void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
@@ -35,73 +45,127 @@ void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clust
     (void) size;
     if (clusterId != CHIP_ZCL_CLUSTER_ON_OFF)
     {
-        printf("Unknown cluster ID: %d", clusterId);
+        println("Unknown cluster ID: %d", clusterId);
         return;
     }
 
     if (attributeId != CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF)
     {
-        printf("Unknown attribute ID: %d", attributeId);
+        println("Unknown attribute ID: %d", attributeId);
         return;
     }
 
     // At this point we can assume that value points to a boolean value.
-    printf("OnOff: %d\n", value[0]);
+    println("OnOff: %d", value[0]);
 }
 }
 
-void OnReceiveError(CHIP_ERROR error, const chip::Inet::IPPacketInfo & info)
+namespace {
+class ServerCallback : public SecureSessionMgrCallback
 {
-    (void) info;
-    printf("ReceiveError: %s\n", chip::ErrorStr(error));
-}
-
-void OnNewConnection(chip::Transport::PeerConnectionState * state, chip::SecureSessionMgr * transport)
-{
-    CHIP_ERROR err;
-    (void) transport;
-
-    printf("Received a new connection.\n");
-
-    err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key,
-                                                               sizeof(local_private_key));
-    assert(err == CHIP_NO_ERROR);
-
-    return;
-}
-
-void OnMessageReceived(const chip::MessageHeader & header, chip::Transport::PeerConnectionState * state,
-                       chip::System::PacketBuffer * buffer, chip::SecureSessionMgr * transport)
-{
-    (void) header;
-    (void) transport;
-    if (buffer != nullptr)
+public:
+    virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
+                                   System::PacketBuffer * buffer, SecureSessionMgrBase * mgr)
     {
-        printf("Got message from %lx", state->GetPeerNodeId());
-        chipZclProcessIncoming(reinterpret_cast<ChipZclBuffer_t *>(buffer));
-        chip::System::PacketBuffer::Free(buffer);
+        const size_t data_len = buffer->DataLength();
+        char src_addr[PeerAddress::kMaxToStringSize];
+
+        // as soon as a client connects, assume it is connected
+        VerifyOrExit(buffer != NULL, println("Received data but couldn't process it..."));
+        VerifyOrExit(header.GetSourceNodeId().HasValue(), println("Unknown source for received message"));
+
+        VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, println("Unknown source for received message"));
+
+        state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
+
+        println("Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
+
+        HandleDataModelMessage(buffer);
+        buffer = NULL;
+
+    exit:
+        // SendTo calls Free on the buffer without an AddRef, if SendTo was not called, free the buffer.
+        if (buffer != NULL)
+        {
+            System::PacketBuffer::Free(buffer);
+        }
     }
+
+    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
+    {
+        CHIP_ERROR err;
+
+        println("Received a new connection.");
+
+        err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key,
+                                                                   sizeof(local_private_key));
+        VerifyOrExit(err == CHIP_NO_ERROR, println("Failed to setup encryption\n"));
+
+    exit:
+        return;
+    }
+
+private:
+    /**
+     * Handle a message that should be processed via our data model processing
+     * codepath.
+     *
+     * @param [in] buffer The buffer holding the message.  This function guarantees
+     *                    that it will free the buffer before returning.
+     */
+    void HandleDataModelMessage(System::PacketBuffer * buffer)
+    {
+        ChipZclStatus_t zclStatus = chipZclProcessIncoming((ChipZclBuffer_t *) buffer);
+        if (zclStatus == CHIP_ZCL_STATUS_SUCCESS)
+        {
+            println("Data model processing success!");
+        }
+        else
+        {
+            println("Data model processing failure: %d", zclStatus);
+        }
+        System::PacketBuffer::Free(buffer);
+    }
+};
+
+static ServerCallback gCallbacks;
+
+} // namespace
+
+void InitDataModelHandler()
+{
+    chipZclEndpointInit();
 }
 
-void SetupTransport(chip::SecureSessionMgr & transport, chip::Inet::IPAddressType type)
+// The echo server assumes the platform's networking has been setup already
+void StartServer(chip::SecureSessionMgr<chip::Transport::UDP> * sessions)
 {
-    chip::Transport::UdpListenParameters p;
-    p.SetAddressType(type).SetListenPort(11095);
-    assert(transport.Init(kLocalNodeId, &chip::DeviceLayer::InetLayer, p) == CHIP_NO_ERROR);
-    transport.SetMessageReceiveHandler(OnMessageReceived, &transport);
-    transport.SetReceiveErrorHandler(OnReceiveError);
-    transport.SetNewConnectionHandler(OnNewConnection, &transport);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = sessions->Init(kLocalNodeId, &DeviceLayer::SystemLayer,
+                         UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
+    SuccessOrExit(err);
+
+    sessions->SetDelegate(&gCallbacks);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        println("ERROR setting up transport: %s", ErrorStr(err));
+    }
+    else
+    {
+        println("Lock Server Listening...");
+    }
 }
 
 int main()
 {
     chip::DeviceLayer::PlatformMgr().InitChipStack();
-    chipZclEndpointInit();
 
-    chip::SecureSessionMgr transport_ipv6;
-    chip::SecureSessionMgr transport_ipv4;
-    SetupTransport(transport_ipv4, chip::Inet::kIPAddressType_IPv4);
-    SetupTransport(transport_ipv6, chip::Inet::kIPAddressType_IPv6);
+    // Init ZCL Data Model
+    InitDataModelHandler();
+    StartServer(&sessions);
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
