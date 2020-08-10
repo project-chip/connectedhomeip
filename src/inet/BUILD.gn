@@ -116,12 +116,6 @@ static_library("inet") {
     "InetLayerBasis.h",
     "InetLayerEvents.h",
     "InetUtils.cpp",
-    "RawEndPoint.cpp",
-    "RawEndPoint.h",
-    "TCPEndPoint.cpp",
-    "TCPEndPoint.h",
-    "UDPEndPoint.cpp",
-    "UDPEndPoint.h",
     "arpa-inet-compatibility.h",
   ]
 
@@ -131,6 +125,27 @@ static_library("inet") {
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
   ]
+
+  if (chip_inet_config_enable_raw_endpoint) {
+    sources += [
+      "RawEndPoint.cpp",
+      "RawEndPoint.h",
+    ]
+  }
+
+  if (chip_inet_config_enable_tcp_endpoint) {
+    sources += [
+      "TCPEndPoint.cpp",
+      "TCPEndPoint.h",
+    ]
+  }
+
+  if (chip_inet_config_enable_udp_endpoint) {
+    sources += [
+      "UDPEndPoint.cpp",
+      "UDPEndPoint.h",
+    ]
+  }
 
   if (chip_inet_config_enable_dns_resolver) {
     sources += [
