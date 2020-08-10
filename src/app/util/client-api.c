@@ -207,7 +207,7 @@ static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameC
         // Finally, if there is data, add it to the destination buffer as is.  If
         // the data length is zero, data may actually be NULL.  Even if the length
         // argument is zero, passing NULL as either the source or destination to
-        // MEMCOPY is invalid and the behavior is undefined.  We avoid that with an
+        // memcpy is invalid and the behavior is undefined.  We avoid that with an
         // explicit check.
         if (dataLen != 0)
         {
@@ -216,7 +216,7 @@ static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameC
                 emberAfDebugPrintln("ERR: Missing data for %d bytes for format '%c'", dataLen, cmd);
                 return 0;
             }
-            MEMCOPY(buffer + bytes, data, dataLen);
+            memcpy(buffer + bytes, data, dataLen);
             bytes += dataLen;
         }
     }
