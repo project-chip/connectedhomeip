@@ -73,8 +73,8 @@ class DLL_EXPORT SecurePairingSession
 public:
     SecurePairingSession(void);
     SecurePairingSession(SecurePairingSession &&)      = default;
-    SecurePairingSession(const SecurePairingSession &) = default;
-    SecurePairingSession & operator=(const SecurePairingSession &) = default;
+    SecurePairingSession(const SecurePairingSession &) = delete;
+    SecurePairingSession & operator=(const SecurePairingSession &) = delete;
     SecurePairingSession & operator=(SecurePairingSession &&) = default;
 
     ~SecurePairingSession(void);
