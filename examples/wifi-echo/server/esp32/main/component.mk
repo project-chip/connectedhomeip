@@ -39,9 +39,9 @@ COMPONENT_SRCDIRS :=                                                      \
 #  ../third_party/connectedhomeip/src/app/clusters/on-off                 \
 #  ../third_party/connectedhomeip/src/app/clusters/poll-control-client    \
 #  ../third_party/connectedhomeip/src/app/clusters/poll-control-server    \
-#  ../third_party/connectedhomeip/src/app/clusters/reporting              \
 #  ../third_party/connectedhomeip/src/app/clusters/scenes                 \
 #  ../third_party/connectedhomeip/src/app/clusters/scenes-client          \
+#  ../third_party/connectedhomeip/src/app/reporting                       \
 
 
 COMPONENT_EXTRA_INCLUDES := $(PROJECT_PATH)/third_party/connectedhomeip/src/app/util
