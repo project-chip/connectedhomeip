@@ -1843,16 +1843,6 @@ typedef struct
 #define EMBER_BROADCAST_ENDPOINT 0xFF
 
 /**
- * @brief Friendly convenience macro pointing to the C Stdlib functions.
- */
-#define MEMSET(d, v, l) memset(d, v, l)
-#define MEMCOPY(d, s, l) memcpy(d, s, l)
-#define MEMMOVE(d, s, l) memmove(d, s, l)
-#define MEMPGMCOPY(d, s, l) memcpy(d, s, l)
-#define MEMCOMPARE(s0, s1, l) memcmp(s0, s1, l)
-#define MEMPGMCOMPARE(s0, s1, l) memcmp(s0, s1, l)
-
-/**
  * @brief Useful to reference a single bit of a byte.
  */
 #define BIT(x) (1U << (x)) // Unsigned avoids compiler warnings re BIT(15)

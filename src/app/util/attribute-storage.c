@@ -391,11 +391,11 @@ static EmberAfStatus typeSensitiveMemCopy(uint8_t * dest, uint8_t * src, EmberAf
         }
         if (src == NULL)
         {
-            MEMSET(dest, 0, size);
+            memset(dest, 0, size);
         }
         else
         {
-            MEMMOVE(dest, src, size);
+            memmove(dest, src, size);
         }
     }
     return EMBER_ZCL_STATUS_SUCCESS;
