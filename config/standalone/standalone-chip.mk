@@ -142,6 +142,7 @@ STD_LIBS += \
     -lSupportLayer \
     -lSystemLayer \
     -lDeviceLayer \
+    -lCHIPDataModel \
     -lCHIP
 
 STD_LIBS += $(shell pkg-config --libs openssl)
@@ -168,7 +169,8 @@ STD_LINK_PREREQUISITES += \
     $(CHIP_OUTPUT_DIR)/lib/libInetLayer.a \
     $(CHIP_OUTPUT_DIR)/lib/libnlfaultinjection.a \
     $(CHIP_OUTPUT_DIR)/lib/libSupportLayer.a \
-    $(CHIP_OUTPUT_DIR)/lib/libSystemLayer.a
+    $(CHIP_OUTPUT_DIR)/lib/libSystemLayer.a \
+    $(CHIP_OUTPUT_DIR)/lib/libCHIPDataModel.a
 
 ifeq ($(findstring linux,$(CHIP_HOST_ARCH)),linux)
 STD_LINK_PREREQUISITES += $(CHIP_OUTPUT_DIR)/lib/libot_br_client.a

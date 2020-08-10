@@ -21,4 +21,4 @@ COPY build/chip-standalone-demo.out /usr/bin/
 COPY build/chip-standalone-server.out /usr/bin/
 COPY entrypoint.sh /
 
-ENTRYPOINT /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh", "server"]
