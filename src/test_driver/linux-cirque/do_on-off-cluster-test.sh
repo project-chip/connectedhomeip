@@ -3,7 +3,7 @@
 set -v
 
 SOURCE="${BASH_SOURCE[0]}"
-SOURCE_DIR="$(cd -P "$( dirname "$SOURCE")" > /dev/null 2>&1 && pwd)"
+SOURCE_DIR="$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
 REPO_DIR="$SOURCE_DIR/../../../../"
 
 chip_tool_dir=$REPO_DIR/examples/chip-tool
