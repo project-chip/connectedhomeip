@@ -16,3 +16,8 @@ declare_args() {
   # Root directory for nRF5 SDK build files.
   nrf5_sdk_build_root = "//third_party/nrf5_sdk"
 }
+
+declare_args() {
+  # Location of the nRF5 SDK.
+  nrf5_sdk_root = ""
+}
