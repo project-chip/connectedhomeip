@@ -1272,7 +1272,7 @@ uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, co
     charsToWrite = (freeChars > appendingCharsLen) ? appendingCharsLen : freeChars;
 
     memcpy(&zclString[1 + curLen], // 1 is to account for zcl's length byte
-            appendingChars, charsToWrite);
+           appendingChars, charsToWrite);
     zclString[0] = curLen + charsToWrite;
     return charsToWrite;
 }
