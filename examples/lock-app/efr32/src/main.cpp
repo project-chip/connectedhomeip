@@ -118,9 +118,9 @@ int main(void)
 #if CHIP_ENABLE_OPENTHREAD && 0
     EFR32_LOG("Initializing OpenThread stack");
 
-   //mbedtls_platform_set_calloc_free(ot_calloc, ot_free);
+    // mbedtls_platform_set_calloc_free(ot_calloc, ot_free);
     mbedtls_platform_setup(NULL);
-    //otHeapSetCAllocFree(ot_calloc, ot_free);
+    // otHeapSetCAllocFree(ot_calloc, ot_free);
 
     otSysInit(0, NULL);
 
@@ -139,7 +139,6 @@ int main(void)
         appError(ret);
     }
 #endif // CHIP_ENABLE_OPENTHREAD
-
 
     EFR32_LOG("Starting Platform Manager Event Loop");
     ret = PlatformMgr().StartEventLoopTask();
