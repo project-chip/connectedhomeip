@@ -52,11 +52,6 @@ nrf5_sdk("sdk") {
 executable("lighting_app") {
   output_name = "chip-nrf52840-lighting-example"
 
-  public_deps = [
-    ":sdk",
-    "${chip_root}/src/lib",
-  ]
-
   sources = [
     "${nrf5_platform_dir}/app/Server.cpp",
     "${nrf5_platform_dir}/app/chipinit.cpp",
@@ -75,6 +70,11 @@ executable("lighting_app") {
     "main/include/DataModelHandler.h",
     "main/include/LightingManager.h",
     "main/main.cpp",
+  ]
+
+  deps = [
+    ":sdk",
+    "${chip_root}/src/lib",
   ]
 
   output_dir = root_out_dir
