@@ -41,7 +41,7 @@
 
 //#include PLATFORM_HEADER
 //#include CONFIGURATION_HEADER
-#include "../af.h"
+#include "af.h"
 
 #ifdef __cplusplus
 extern "C" {

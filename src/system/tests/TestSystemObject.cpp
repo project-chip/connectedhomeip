@@ -124,6 +124,7 @@ Error TestObject::Init(void)
     return CHIP_SYSTEM_NO_ERROR;
 }
 
+namespace {
 struct TestContext
 {
     nlTestSuite * mTestSuite;
@@ -132,6 +133,7 @@ struct TestContext
 };
 
 struct TestContext sContext;
+} // namespace
 
 // Test Object retention
 
@@ -524,7 +526,6 @@ static int Finalize(void * aContext)
 }
 
 } // namespace System
-
 } // namespace chip
 
 int TestSystemObject(void)

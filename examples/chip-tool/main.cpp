@@ -231,7 +231,7 @@ bool DetermineCommand(int argc, char * argv[], Command * command)
         return argc == 4;
     }
 
-    fprintf(stderr, "Unknown command: %s\n", argv[3]);
+    fprintf(stderr, "Unknown command: %s\n", argv[1]);
     return false;
 }
 
@@ -343,7 +343,7 @@ void DoEcho(DeviceController::ChipDeviceController * controller, const char * id
 
 void DoEchoBle(DeviceController::ChipDeviceController * controller, const uint16_t discriminator)
 {
-    char name[4];
+    char name[6];
     snprintf(name, sizeof(name), "%u", discriminator);
     DoEcho(controller, "");
 }

@@ -17,6 +17,12 @@ import("//build_overrides/pigweed.gni")
 
 import("//build/config/compiler/compiler.gni")
 
+declare_args() {
+  # Enable -Werror. This can be disabled if using a different compiler
+  # with unfixed or unsupported wanings.
+  treat_warnings_as_errors = true
+}
+
 if (current_cpu == "arm") {
   import("//build/config/arm.gni")
 }
@@ -92,22 +98,26 @@ config("disabled_warnings") {
   cflags_cc = [
     "-Wno-non-virtual-dtor",
     "-Wno-deprecated-copy",
+    "-Wno-unknown-warning-option",
   ]
   if (!is_clang) {
     cflags += [
       "-Wno-psabi",
       "-Wno-cast-function-type",
       "-Wno-maybe-uninitialized",
-      "-Wno-unknown-warning-option",
     ]
   }
 }
 
 config("strict_warnings") {
-  cflags = [
-    "-Wall",
-    "-Werror",
-  ]
+  cflags = [ "-Wall" ]
+
+  ldflags = []
+
+  if (treat_warnings_as_errors) {
+    cflags += [ "-Werror" ]
+    ldflags += [ "-Werror" ]
+  }
 
   if (is_clang) {
     cflags += [ "-Wimplicit-fallthrough" ]
