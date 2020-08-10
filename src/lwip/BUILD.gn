@@ -48,7 +48,10 @@ config("lwip_config") {
   } else {
     lwip_debug = 0
   }
-  defines = [ "LWIP_DEBUG=${lwip_debug}" ]
+  defines = [
+    "LWIP_DEBUG=${lwip_debug}",
+    "HAVE_LWIP_UDP_BIND_NETIF=1",
+  ]
 
   include_dirs = [ lwip_platform ]
 
