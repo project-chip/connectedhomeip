@@ -108,6 +108,10 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG12P/GCC/libbluetooth.a",
         "${efr32_sdk_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg12_gcc_release.a",
         "${efr32_sdk_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a",
+"/home/spang/connectedhomeip/third_party/openthread/repo/output/efr32mg12/lib/libopenthread-efr32mg12.a",
+"/home/spang/connectedhomeip/third_party/openthread/repo/output/efr32mg12/lib/libsilabs-efr32mg12-sdk.a",
+"/home/spang/connectedhomeip/third_party/openthread/repo/output/efr32mg12/lib/libopenthread-platform-utils.a",
+"/home/spang/connectedhomeip/third_party/openthread/repo/output/efr32mg12/lib/libmbedcrypto.a",
         "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG12P/GCC/libmbedtls.a",
       ]
     } else if (efr32_family == "efr32mg21") {
@@ -188,6 +192,13 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/Source/tasks.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/timers.c",
       "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER/SEGGER_RTT.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ctr_drbg.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/md.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/md_wrap.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/md5.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/sha512.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/sha1.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ripemd160.c",
     ]
 
     if (efr32_family == "efr32mg12") {

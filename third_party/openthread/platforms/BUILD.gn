@@ -12,17 +12,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/nrf5_sdk.gni")
 import("//build_overrides/openthread.gni")
 
 config("libopenthread-platform_config") {
   include_dirs = [ "${openthread_root}/examples/platforms" ]
 }
 
+copy("copy_openthread_system") {
+  sources = [ "${openthread_root}/examples/platforms/openthread-system.h" ]
+
+  outputs =
+      [ "${root_gen_dir}/include/openthread/platform/{{source_file_part}}" ]
+}
+
+source_set("openthread_system") {
+  sources = [ "${root_gen_dir}/include/openthread/platform/openthread-system.h" ]
+  deps = [ ":copy_openthread_system" ]
+}
+
 source_set("libopenthread-platform") {
   sources = [ "${openthread_root}/examples/platforms/openthread-system.h" ]
 
-  public_configs = [ ":libopenthread-platform_config" ]
+   public_deps = [
+    ":openthread_system",
+   ]
+
+  public_configs = [
+    ":libopenthread-platform_config",
+  ]
 }
 
 static_library("libopenthread-platform-utils") {
@@ -38,10 +55,7 @@ static_library("libopenthread-platform-utils") {
     "${openthread_root}/examples/platforms/utils/soft_source_match_table.c",
     "${openthread_root}/examples/platforms/utils/soft_source_match_table.h",
   ]
-  public_deps = [
-    "${nrf5_sdk_build_root}:nrf5_sdk",
-    "${openthread_root}/src/core:libopenthread_core_headers",
-  ]
+  public_deps = [ "${openthread_root}/src/core:libopenthread_core_headers" ]
 
   public_configs = [ ":libopenthread-platform_config" ]
 }

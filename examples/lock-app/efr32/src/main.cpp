@@ -37,6 +37,20 @@
 #include "init_lcd.h"
 #endif
 
+#if CHIP_ENABLE_OPENTHREAD
+#include <mbedtls/platform.h>
+#include <openthread/cli.h>
+#include <openthread/dataset.h>
+#include <openthread/error.h>
+#include <openthread/heap.h>
+#include <openthread/icmp6.h>
+#include <openthread/instance.h>
+#include <openthread/link.h>
+#include <openthread/platform/openthread-system.h>
+#include <openthread/tasklet.h>
+#include <openthread/thread.h>
+#endif // CHIP_ENABLE_OPENTHREAD
+
 #include <FreeRTOS.h>
 
 using namespace ::chip;
@@ -101,6 +115,32 @@ int main(void)
         appError(ret);
     }
 
+#if CHIP_ENABLE_OPENTHREAD && 0
+    EFR32_LOG("Initializing OpenThread stack");
+
+   //mbedtls_platform_set_calloc_free(ot_calloc, ot_free);
+    mbedtls_platform_setup(NULL);
+    //otHeapSetCAllocFree(ot_calloc, ot_free);
+
+    otSysInit(0, NULL);
+
+    ret = ThreadStackMgr().InitThreadStack();
+    if (ret != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("ThreadStackMgr().InitThreadStack() failed");
+        appError(ret);
+    }
+
+    // Configure device to operate as a Thread sleepy end-device.
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+    if (ret != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
+        appError(ret);
+    }
+#endif // CHIP_ENABLE_OPENTHREAD
+
+
     EFR32_LOG("Starting Platform Manager Event Loop");
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
@@ -108,6 +148,18 @@ int main(void)
         EFR32_LOG("PlatformMgr().StartEventLoopTask() failed");
         appError(ret);
     }
+
+#if CHIP_ENABLE_OPENTHREAD && 0
+    EFR32_LOG("Starting OpenThread task");
+
+    // Start OpenThread task
+    ret = ThreadStackMgrImpl().StartThreadTask();
+    if (ret != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("ThreadStackMgr().StartThreadTask() failed");
+        appError(ret);
+    }
+#endif // CHIP_ENABLE_OPENTHREAD
 
     EFR32_LOG("Starting App Task");
     ret = GetAppTask().StartAppTask();

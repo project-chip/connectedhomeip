@@ -24,6 +24,10 @@
 
 #include "AppConfig.h"
 
+#if CHIP_ENABLE_OPENTHREAD
+#include <platform/ThreadStackManager.h>
+#endif
+
 using namespace chip::TLV;
 using namespace chip::DeviceLayer;
 
