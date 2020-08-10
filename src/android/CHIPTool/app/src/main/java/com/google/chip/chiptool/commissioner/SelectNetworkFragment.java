@@ -19,6 +19,7 @@
 package com.google.chip.chiptool.commissioner;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,8 @@ import com.google.chip.chiptool.R;
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo;
 
 public class SelectNetworkFragment extends Fragment {
+
+  private static final String TAG = CommissioningFragment.class.getSimpleName();
 
   private CHIPDeviceInfo deviceInfo;
 
@@ -110,8 +113,14 @@ public class SelectNetworkFragment extends Fragment {
                     == R.id.commissioner_select_network_fragment) {
                   Bundle bundle = new Bundle();
 
-                  assert (deviceInfo != null);
-                  assert (selectedNetwork != null);
+                  if (deviceInfo == null) {
+                    Log.e(TAG, "no device info provided");
+                    return;
+                  }
+                  if (selectedNetwork == null) {
+                    Log.e(TAG, "no selected network");
+                    return;
+                  }
                   bundle.putParcelable(Constants.KEY_DEVICE_INFO, deviceInfo);
                   bundle.putParcelable(Constants.KEY_NETWORK_INFO, selectedNetwork);
 
@@ -120,7 +129,4 @@ public class SelectNetworkFragment extends Fragment {
               }
             });
   }
-
-  // TODO: may add network if it is new.
-  private void onFoundBorderAgent() {}
 }

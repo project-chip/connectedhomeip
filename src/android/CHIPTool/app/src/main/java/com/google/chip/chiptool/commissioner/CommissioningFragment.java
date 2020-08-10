@@ -49,6 +49,13 @@ public class CommissioningFragment extends Fragment implements Observer<WorkInfo
 
   WorkRequest commssionerWorkRequest;
 
+  TextView statusText;
+  ProgressBar progressBar;
+  Button cancelButton;
+  Button doneButton;
+  ImageView doneImage;
+  ImageView errorImage;
+
   @Override
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -59,7 +66,12 @@ public class CommissioningFragment extends Fragment implements Observer<WorkInfo
   public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
-    ProgressBar progressBar = getActivity().findViewById(R.id.commissioning_progress);
+    cancelButton = getActivity().findViewById(R.id.cancel_button);
+    doneButton = getActivity().findViewById(R.id.done_button);
+    doneImage = getActivity().findViewById(R.id.done_image);
+    errorImage = getActivity().findViewById(R.id.error_image);
+    statusText = getActivity().findViewById(R.id.status_text);
+    progressBar = getActivity().findViewById(R.id.commissioning_progress);
     progressBar.setMin(0);
     progressBar.setMax(100);
 
@@ -106,8 +118,7 @@ public class CommissioningFragment extends Fragment implements Observer<WorkInfo
 
   @Override
   public void onChanged(@Nullable WorkInfo workInfo) {
-    TextView statusText = getActivity().findViewById(R.id.status_text);
-    ProgressBar progressBar = getActivity().findViewById(R.id.commissioning_progress);
+    progressBar = getActivity().findViewById(R.id.commissioning_progress);
 
     if (workInfo != null) {
       if (workInfo.getState().isFinished()) {
@@ -122,48 +133,35 @@ public class CommissioningFragment extends Fragment implements Observer<WorkInfo
   }
 
   private void showInProgress(String status) {
-    TextView statusText = getActivity().findViewById(R.id.status_text);
+    statusText = getActivity().findViewById(R.id.status_text);
     if (status != null) {
       statusText.setText(status);
     }
 
-    ProgressBar progressBar = getActivity().findViewById(R.id.commissioning_progress);
+    progressBar = getActivity().findViewById(R.id.commissioning_progress);
     progressBar.setVisibility(View.VISIBLE);
 
-    Button cancelButton = getActivity().findViewById(R.id.cancel_button);
     cancelButton.setVisibility(View.VISIBLE);
-
-    ImageView doneImage = getActivity().findViewById(R.id.done_image);
     doneImage.setVisibility(View.GONE);
-
-    ImageView errorImage = getActivity().findViewById(R.id.error_image);
     errorImage.setVisibility(View.GONE);
-
-    Button doneButton = getActivity().findViewById(R.id.done_button);
     doneButton.setVisibility(View.GONE);
   }
 
   private void showCommissionDone(Boolean success, String status) {
-    TextView statusText = getActivity().findViewById(R.id.status_text);
     if (status != null) {
       statusText.setText(status);
     }
 
-    ProgressBar progressBar = getActivity().findViewById(R.id.commissioning_progress);
     progressBar.setVisibility(View.GONE);
-
-    Button cancelButton = getActivity().findViewById(R.id.cancel_button);
     cancelButton.setVisibility(View.GONE);
+    doneButton.setVisibility(View.VISIBLE);
 
     if (success) {
-      ImageView doneImage = getActivity().findViewById(R.id.done_image);
       doneImage.setVisibility(View.VISIBLE);
+      errorImage.setVisibility(View.GONE);
     } else {
-      ImageView errorImage = getActivity().findViewById(R.id.error_image);
+      doneImage.setVisibility(View.GONE);
       errorImage.setVisibility(View.VISIBLE);
     }
-
-    Button doneButton = getActivity().findViewById(R.id.done_button);
-    doneButton.setVisibility(View.VISIBLE);
   }
 }

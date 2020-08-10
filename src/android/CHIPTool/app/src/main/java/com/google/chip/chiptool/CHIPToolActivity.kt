@@ -55,8 +55,7 @@ class CHIPToolActivity :
   }
 
   override fun handleCommissioningClicked() {
-    var intent = Intent(ACTION_COMMISSIONING)
-    intent.setClass(this, CommissionerActivity::class.java)
+    var intent = Intent(this, CommissionerActivity::class.java)
     startActivityForResult(intent, REQUEST_CODE_COMMISSIONING)
   }
 
@@ -85,8 +84,6 @@ class CHIPToolActivity :
   }
 
   companion object{
-
-    val ACTION_COMMISSIONING = "com.google.chip.chiptool.commissioner.COMMISSION"
     var REQUEST_CODE_COMMISSIONING = 0xB003
   }
 }
