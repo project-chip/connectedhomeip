@@ -197,9 +197,10 @@ install-chip : configure-chip
 	echo "INSTALL CHIP..."
 	MAKEFLAGS= make -C $(OUTPUT_DIR) --no-print-directory install
 
-build : install-chip
-	echo "CHIP built and installed..."
-	cp ${OUTPUT_DIR}/lib/libCHIP.a ${OUTPUT_DIR}/libchip.a
+build: ;
+#build : install-chip
+#	echo "CHIP built and installed..."
+#	cp ${OUTPUT_DIR}/lib/libCHIP.a ${OUTPUT_DIR}/libchip.a
 
 clean:
 	echo "RM $(OUTPUT_DIR)"
