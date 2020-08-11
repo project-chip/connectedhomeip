@@ -96,7 +96,7 @@ jniLibs/arm64-v8a
     tweaking of the Android automake build rules. Include it in the interim to
     be able to build the Android app).
 
-11. Before running `gradle sync`, seetup ot-commissioner
+11. Before running `gradle sync`, setup ot-commissioner
 
     ```shell
     cd third_party/ot-commissioner/repo/

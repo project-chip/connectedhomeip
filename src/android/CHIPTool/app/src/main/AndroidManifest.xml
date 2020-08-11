@@ -27,10 +27,6 @@
         <activity
             android:name="com.google.chip.chiptool.commissioner.CommissionerActivity"
             android:label="@string/commissioner_name">
-            <intent-filter>
-                <action android:name="com.google.chip.chiptool.commissioner.COMMISSION" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 

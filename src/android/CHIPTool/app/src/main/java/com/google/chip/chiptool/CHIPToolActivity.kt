@@ -83,7 +83,7 @@ class CHIPToolActivity :
         .commit()
   }
 
-  companion object{
+  companion object {
     var REQUEST_CODE_COMMISSIONING = 0xB003
   }
 }
