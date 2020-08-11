@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -131,7 +132,8 @@ const WRMPConfig gDefaultWRMPConfig = { CHIP_CONFIG_WRMP_DEFAULT_INITIAL_RETRANS
 
 // clang-format on
 
-}; // CHIP
-}; // nl
+}; // namespace chip
+}
+; // nl
 
 #endif // CHIP_WRM_CONFIG_H_

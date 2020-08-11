@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
@@ -33,24 +34,23 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include <errno.h>
 #include <stdint.h>
 #include <string.h>
-#include <errno.h>
 
 #include <core/CHIPCore.h>
-#include <core/CHIPMessageLayer.h>
-#include <core/CHIPExchangeMgr.h>
 #include <core/CHIPEncoding.h>
-#include <support/crypto/CHIPCrypto.h>
-#include <support/crypto/HashAlgos.h>
-#include <support/crypto/HMAC.h>
-#include <support/crypto/AESBlockCipher.h>
-#include <support/crypto/CTRMode.h>
-#include <support/logging/CHIPLogging.h>
-#include <support/ErrorStr.h>
-#include <support/CodeUtils.h>
+#include <core/CHIPExchangeMgr.h>
+#include <core/CHIPMessageLayer.h>
 #include <support/CHIPFaultInjection.h>
-
+#include <support/CodeUtils.h>
+#include <support/ErrorStr.h>
+#include <support/crypto/AESBlockCipher.h>
+#include <support/crypto/CHIPCrypto.h>
+#include <support/crypto/CTRMode.h>
+#include <support/crypto/HMAC.h>
+#include <support/crypto/HashAlgos.h>
+#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 
@@ -78,15 +78,14 @@ using namespace chip::Encoding;
  *
  */
 #if CHIP_BIND_DETAIL_LOGGING && CHIP_DETAIL_LOGGING
-#define ChipBindLog(MSG, ...) ChipLogProgress(MessageLayer, MSG, ## __VA_ARGS__ )
+#define ChipBindLog(MSG, ...) ChipLogProgress(MessageLayer, MSG, ##__VA_ARGS__)
 #else
 #define ChipBindLog(MSG, ...)
 #endif
 
-
 enum
 {
-    kKeyIdLen = 2,
+    kKeyIdLen      = 2,
     kMinPayloadLen = 1
 };
 
@@ -114,7 +113,7 @@ ChipMessageLayer::ChipMessageLayer()
  *  @retval  other errors generated from the lower Inet layer during endpoint creation.
  *
  */
-CHIP_ERROR ChipMessageLayer::Init(InitContext *context)
+CHIP_ERROR ChipMessageLayer::Init(InitContext * context)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -124,7 +123,7 @@ CHIP_ERROR ChipMessageLayer::Init(InitContext *context)
     State = kState_Initializing;
 
     SystemLayer = context->systemLayer;
-    Inet = context->inet;
+    Inet        = context->inet;
 #if CONFIG_NETWORK_LAYER_BLE
     mBle = context->ble;
 #endif
@@ -136,26 +135,26 @@ CHIP_ERROR ChipMessageLayer::Init(InitContext *context)
     }
 #endif // CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
-    FabricState = context->fabricState;
-    FabricState->MessageLayer = this;
-    OnMessageReceived = NULL;
-    OnReceiveError = NULL;
-    OnConnectionReceived = NULL;
-    OnUnsecuredConnectionReceived = NULL;
+    FabricState                           = context->fabricState;
+    FabricState->MessageLayer             = this;
+    OnMessageReceived                     = NULL;
+    OnReceiveError                        = NULL;
+    OnConnectionReceived                  = NULL;
+    OnUnsecuredConnectionReceived         = NULL;
     OnUnsecuredConnectionCallbacksRemoved = NULL;
-    OnAcceptError = NULL;
-    OnMessageLayerActivityChange = NULL;
+    OnAcceptError                         = NULL;
+    OnMessageLayerActivityChange          = NULL;
     memset(mConPool, 0, sizeof(mConPool));
     memset(mTunnelPool, 0, sizeof(mTunnelPool));
-    AppState = NULL;
-    ExchangeMgr = NULL;
-    SecurityMgr = NULL;
-    IsListening = context->listenTCP || context->listenUDP;
+    AppState               = NULL;
+    ExchangeMgr            = NULL;
+    SecurityMgr            = NULL;
+    IsListening            = context->listenTCP || context->listenUDP;
     IncomingConIdleTimeout = CHIP_CONFIG_DEFAULT_INCOMING_CONNECTION_IDLE_TIMEOUT;
 
-    //Internal and for Debug Only; When set, Message Layer drops message and returns.
+    // Internal and for Debug Only; When set, Message Layer drops message and returns.
     mDropMessage = false;
-    mFlags = 0;
+    mFlags       = 0;
     SetTCPListenEnabled(context->listenTCP);
     SetUDPListenEnabled(context->listenUDP);
 #if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
@@ -163,11 +162,11 @@ CHIP_ERROR ChipMessageLayer::Init(InitContext *context)
 #endif
 
     mIPv6TCPListen = NULL;
-    mIPv6UDP = NULL;
+    mIPv6UDP       = NULL;
 
 #if INET_CONFIG_ENABLE_IPV4
     mIPv4TCPListen = NULL;
-    mIPv4UDP = NULL;
+    mIPv4UDP       = NULL;
 #endif // INET_CONFIG_ENABLE_IPV4
 
 #if CHIP_CONFIG_ENABLE_TARGETED_LISTEN
@@ -175,7 +174,7 @@ CHIP_ERROR ChipMessageLayer::Init(InitContext *context)
 #if INET_CONFIG_ENABLE_IPV4
     mIPv4UDPBroadcastRcv = NULL;
 #endif // INET_CONFIG_ENABLE_IPV4
-#endif //CHIP_CONFIG_ENABLE_TARGETED_LISTEN
+#endif // CHIP_CONFIG_ENABLE_TARGETED_LISTEN
 
 #if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
     mIPv6EphemeralUDP = NULL;
@@ -194,7 +193,7 @@ CHIP_ERROR ChipMessageLayer::Init(InitContext *context)
 #if CONFIG_NETWORK_LAYER_BLE
     if (context->listenBLE && mBle != NULL)
     {
-        mBle->mAppState = this;
+        mBle->mAppState                = this;
         mBle->OnChipBleConnectReceived = HandleIncomingBleConnection;
         ChipLogProgress(MessageLayer, "Accepting WoBLE connections");
     }
@@ -230,25 +229,25 @@ CHIP_ERROR ChipMessageLayer::Shutdown()
 #if CONFIG_NETWORK_LAYER_BLE
     if (mBle != NULL && mBle->mAppState == this)
     {
-        mBle->mAppState = NULL;
+        mBle->mAppState                = NULL;
         mBle->OnChipBleConnectReceived = NULL;
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-    State = kState_NotInitialized;
-    IsListening = false;
-    FabricState = NULL;
-    OnMessageReceived = NULL;
-    OnReceiveError = NULL;
+    State                         = kState_NotInitialized;
+    IsListening                   = false;
+    FabricState                   = NULL;
+    OnMessageReceived             = NULL;
+    OnReceiveError                = NULL;
     OnUnsecuredConnectionReceived = NULL;
-    OnConnectionReceived = NULL;
-    OnAcceptError = NULL;
-    OnMessageLayerActivityChange = NULL;
+    OnConnectionReceived          = NULL;
+    OnAcceptError                 = NULL;
+    OnMessageLayerActivityChange  = NULL;
     memset(mConPool, 0, sizeof(mConPool));
     memset(mTunnelPool, 0, sizeof(mTunnelPool));
     ExchangeMgr = NULL;
-    AppState = NULL;
-    mFlags = 0;
+    AppState    = NULL;
+    mFlags      = 0;
 
     return CHIP_NO_ERROR;
 }
@@ -270,17 +269,17 @@ CHIP_ERROR ChipMessageLayer::Shutdown()
  *  @retval  errors generated from the lower Inet layer UDP endpoint during sending.
  *
  */
-CHIP_ERROR ChipMessageLayer::SendUDPTunneledMessage(const IPAddress &destAddr, ChipMessageInfo *msgInfo, PacketBuffer *msgBuf)
+CHIP_ERROR ChipMessageLayer::SendUDPTunneledMessage(const IPAddress & destAddr, ChipMessageInfo * msgInfo, PacketBuffer * msgBuf)
 {
     CHIP_ERROR res = CHIP_NO_ERROR;
 
-    //Set message version to V2
+    // Set message version to V2
     msgInfo->MessageVersion = kChipMessageVersion_V2;
 
-    //Set the tunneling flag
+    // Set the tunneling flag
     msgInfo->Flags |= kChipMessageFlag_TunneledData;
 
-    res = SendMessage(destAddr, msgInfo, msgBuf);
+    res    = SendMessage(destAddr, msgInfo, msgBuf);
     msgBuf = NULL;
 
     return res;
@@ -311,8 +310,8 @@ CHIP_ERROR ChipMessageLayer::SendUDPTunneledMessage(const IPAddress &destAddr, C
  *  @retval  other errors generated by the fabric state object when fetching the session state.
  *
  */
-CHIP_ERROR ChipMessageLayer::EncodeMessage(const IPAddress &destAddr, uint16_t destPort, InterfaceId sendIntId,
-                                             ChipMessageInfo *msgInfo, PacketBuffer *payload)
+CHIP_ERROR ChipMessageLayer::EncodeMessage(const IPAddress & destAddr, uint16_t destPort, InterfaceId sendIntId,
+                                           ChipMessageInfo * msgInfo, PacketBuffer * payload)
 {
     CHIP_ERROR res = CHIP_NO_ERROR;
 
@@ -356,7 +355,7 @@ CHIP_ERROR ChipMessageLayer::EncodeMessage(const IPAddress &destAddr, uint16_t d
  *  @retval  errors generated from the lower Inet layer UDP endpoint during sending.
  *
  */
-CHIP_ERROR ChipMessageLayer::SendMessage(ChipMessageInfo *msgInfo, PacketBuffer *payload)
+CHIP_ERROR ChipMessageLayer::SendMessage(ChipMessageInfo * msgInfo, PacketBuffer * payload)
 {
     return SendMessage(IPAddress::Any, msgInfo, payload);
 }
@@ -385,8 +384,7 @@ CHIP_ERROR ChipMessageLayer::SendMessage(ChipMessageInfo *msgInfo, PacketBuffer 
  *  @retval  errors generated from the lower Inet layer UDP endpoint during sending.
  *
  */
-CHIP_ERROR ChipMessageLayer::SendMessage(const IPAddress &destAddr, ChipMessageInfo *msgInfo,
-                                           PacketBuffer *payload)
+CHIP_ERROR ChipMessageLayer::SendMessage(const IPAddress & destAddr, ChipMessageInfo * msgInfo, PacketBuffer * payload)
 {
     return SendMessage(destAddr, CHIP_PORT, INET_NULL_INTERFACEID, msgInfo, payload);
 }
@@ -420,10 +418,10 @@ CHIP_ERROR ChipMessageLayer::SendMessage(const IPAddress &destAddr, ChipMessageI
  *  @retval  errors generated from the lower Inet layer UDP endpoint during sending.
  *
  */
-CHIP_ERROR ChipMessageLayer::SendMessage(const IPAddress &aDestAddr, uint16_t destPort, InterfaceId sendIntfId,
-                                           ChipMessageInfo *msgInfo, PacketBuffer *payload)
+CHIP_ERROR ChipMessageLayer::SendMessage(const IPAddress & aDestAddr, uint16_t destPort, InterfaceId sendIntfId,
+                                         ChipMessageInfo * msgInfo, PacketBuffer * payload)
 {
-    CHIP_ERROR res = CHIP_NO_ERROR;
+    CHIP_ERROR res     = CHIP_NO_ERROR;
     IPAddress destAddr = aDestAddr;
 
     // Determine the message destination address based on the destination nodeId.
@@ -446,9 +444,7 @@ CHIP_ERROR ChipMessageLayer::SendMessage(const IPAddress &aDestAddr, uint16_t de
     return SendMessage(destAddr, destPort, sendIntfId, payload, msgInfo->Flags);
 
 exit:
-    if ((res != CHIP_NO_ERROR) &&
-        (payload != NULL) &&
-        ((msgInfo->Flags & kChipMessageFlag_RetainBuffer) == 0))
+    if ((res != CHIP_NO_ERROR) && (payload != NULL) && ((msgInfo->Flags & kChipMessageFlag_RetainBuffer) == 0))
     {
         PacketBuffer::Free(payload);
     }
@@ -460,11 +456,11 @@ bool ChipMessageLayer::IsIgnoredMulticastSendError(CHIP_ERROR err)
 {
     return err == CHIP_NO_ERROR ||
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-           err == System::MapErrorLwIP(ERR_RTE)
+        err == System::MapErrorLwIP(ERR_RTE)
 #else
-           err == System::MapErrorPOSIX(ENETUNREACH) || err == System::MapErrorPOSIX(EADDRNOTAVAIL)
+        err == System::MapErrorPOSIX(ENETUNREACH) || err == System::MapErrorPOSIX(EADDRNOTAVAIL)
 #endif
-           ;
+        ;
 }
 
 CHIP_ERROR ChipMessageLayer::FilterUDPSendError(CHIP_ERROR err, bool isMulticast)
@@ -492,7 +488,6 @@ CHIP_ERROR ChipMessageLayer::FilterUDPSendError(CHIP_ERROR err, bool isMulticast
     return err;
 }
 
-
 /**
  *  Checks if error, while sending, is critical enough to report to the application.
  *
@@ -504,8 +499,7 @@ CHIP_ERROR ChipMessageLayer::FilterUDPSendError(CHIP_ERROR err, bool isMulticast
 bool ChipMessageLayer::IsSendErrorNonCritical(CHIP_ERROR err)
 {
     return (err == INET_ERROR_NOT_IMPLEMENTED || err == INET_ERROR_OUTBOUND_MESSAGE_TRUNCATED ||
-            err == INET_ERROR_MESSAGE_TOO_LONG || err == INET_ERROR_NO_MEMORY ||
-            CHIP_CONFIG_IsPlatformErrorNonCritical(err));
+            err == INET_ERROR_MESSAGE_TOO_LONG || err == INET_ERROR_NO_MEMORY || CHIP_CONFIG_IsPlatformErrorNonCritical(err));
 }
 
 /**
@@ -547,7 +541,7 @@ void ChipMessageLayer::CheckForceRefreshUDPEndPointsNeeded(CHIP_ERROR err)
  *
  */
 CHIP_ERROR ChipMessageLayer::SendMessage(const IPAddress & destAddr, uint16_t destPort, InterfaceId sendIntfId,
-                                           PacketBuffer * payload, uint32_t msgFlags)
+                                         PacketBuffer * payload, uint32_t msgFlags)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     UDPEndPoint * ep;
@@ -563,17 +557,15 @@ CHIP_ERROR ChipMessageLayer::SendMessage(const IPAddress & destAddr, uint16_t de
     IPPacketInfo pktInfo;
     pktInfo.Clear();
     pktInfo.DestAddress = destAddr;
-    pktInfo.DestPort = destPort;
-    pktInfo.Interface = sendIntfId;
+    pktInfo.DestPort    = destPort;
+    pktInfo.Interface   = sendIntfId;
 
     // Check if drop flag is set; If so, do not send message; return CHIP_NO_ERROR;
     VerifyOrExit(!mDropMessage, err = CHIP_NO_ERROR);
 
     // Drop the message and return. Free the buffer if it does not need to be
     // retained(e.g., for WRM retransmissions).
-    CHIP_FAULT_INJECT(FaultInjection::kFault_DropOutgoingUDPMsg,
-            ExitNow(err = CHIP_NO_ERROR);
-            );
+    CHIP_FAULT_INJECT(FaultInjection::kFault_DropOutgoingUDPMsg, ExitNow(err = CHIP_NO_ERROR););
 
     // Select a UDP endpoint object for sending a message based on the destination address type
     // and the message send flags.
@@ -633,8 +625,8 @@ CHIP_ERROR ChipMessageLayer::SendMessage(const IPAddress & destAddr, uint16_t de
         // Send the message once. If requested by the caller, instruct the end point code to not free the
         // message buffer. If a send interface was specified, the message is sent over that interface.
         udpSendFlags = GetFlag(msgFlags, kChipMessageFlag_RetainBuffer) ? UDPEndPoint::kSendFlag_RetainBuffer : 0;
-        err = ep->SendMsg(&pktInfo, payload, udpSendFlags);
-        payload = NULL; // Prevent call to Free() in exit code
+        err          = ep->SendMsg(&pktInfo, payload, udpSendFlags);
+        payload      = NULL; // Prevent call to Free() in exit code
         CheckForceRefreshUDPEndPointsNeeded(err);
         err = FilterUDPSendError(err, sendAction == kMulticast_OneInterface);
         break;
@@ -646,7 +638,7 @@ CHIP_ERROR ChipMessageLayer::SendMessage(const IPAddress & destAddr, uint16_t de
         {
             if (intfIter.SupportsMulticast())
             {
-                pktInfo.Interface = intfIter.GetInterface();
+                pktInfo.Interface  = intfIter.GetInterface();
                 CHIP_ERROR sendErr = ep->SendMsg(&pktInfo, payload, UDPEndPoint::kSendFlag_RetainBuffer);
                 CheckForceRefreshUDPEndPointsNeeded(sendErr);
                 if (err == CHIP_NO_ERROR)
@@ -666,9 +658,8 @@ CHIP_ERROR ChipMessageLayer::SendMessage(const IPAddress & destAddr, uint16_t de
         for (InterfaceAddressIterator addrIter; addrIter.HasCurrent(); addrIter.Next())
         {
             pktInfo.SrcAddress = addrIter.GetAddress();
-            pktInfo.Interface = addrIter.GetInterface();
-            if (addrIter.SupportsMulticast() &&
-                FabricState->IsLocalFabricAddress(pktInfo.SrcAddress) &&
+            pktInfo.Interface  = addrIter.GetInterface();
+            if (addrIter.SupportsMulticast() && FabricState->IsLocalFabricAddress(pktInfo.SrcAddress) &&
                 (sendIntfId == INET_NULL_INTERFACEID || pktInfo.Interface == sendIntfId))
             {
                 CHIP_ERROR sendErr = ep->SendMsg(&pktInfo, payload, UDPEndPoint::kSendFlag_RetainBuffer);
@@ -749,7 +740,6 @@ exit:
     return err;
 }
 
-
 /**
  *  Resend an encoded CHIP message using the underlying Inetlayer UDP endpoint.
  *
@@ -761,7 +751,7 @@ exit:
  *  @retval  errors generated from the lower Inet layer UDP endpoint during sending.
  *
  */
-CHIP_ERROR ChipMessageLayer::ResendMessage(ChipMessageInfo *msgInfo, PacketBuffer *payload)
+CHIP_ERROR ChipMessageLayer::ResendMessage(ChipMessageInfo * msgInfo, PacketBuffer * payload)
 {
     IPAddress destAddr = IPAddress::Any;
     return ResendMessage(destAddr, msgInfo, payload);
@@ -783,7 +773,7 @@ CHIP_ERROR ChipMessageLayer::ResendMessage(ChipMessageInfo *msgInfo, PacketBuffe
  *  @retval  errors generated from the lower Inet layer UDP endpoint during sending.
  *
  */
-CHIP_ERROR ChipMessageLayer::ResendMessage(const IPAddress &destAddr, ChipMessageInfo *msgInfo, PacketBuffer *payload)
+CHIP_ERROR ChipMessageLayer::ResendMessage(const IPAddress & destAddr, ChipMessageInfo * msgInfo, PacketBuffer * payload)
 {
     return ResendMessage(destAddr, CHIP_PORT, msgInfo, payload);
 }
@@ -803,7 +793,8 @@ CHIP_ERROR ChipMessageLayer::ResendMessage(const IPAddress &destAddr, ChipMessag
  *  @retval  errors generated from the lower Inet layer UDP endpoint during sending.
  *
  */
-CHIP_ERROR ChipMessageLayer::ResendMessage(const IPAddress &destAddr, uint16_t destPort, ChipMessageInfo *msgInfo, PacketBuffer *payload)
+CHIP_ERROR ChipMessageLayer::ResendMessage(const IPAddress & destAddr, uint16_t destPort, ChipMessageInfo * msgInfo,
+                                           PacketBuffer * payload)
 {
     return ResendMessage(destAddr, CHIP_PORT, INET_NULL_INTERFACEID, msgInfo, payload);
 }
@@ -832,10 +823,10 @@ CHIP_ERROR ChipMessageLayer::ResendMessage(const IPAddress &destAddr, uint16_t d
  *  @retval  errors generated from the lower Inet layer UDP endpoint during sending.
  *
  */
-CHIP_ERROR ChipMessageLayer::ResendMessage(const IPAddress &aDestAddr, uint16_t destPort, InterfaceId interfaceId,
-                                             ChipMessageInfo *msgInfo, PacketBuffer *payload)
+CHIP_ERROR ChipMessageLayer::ResendMessage(const IPAddress & aDestAddr, uint16_t destPort, InterfaceId interfaceId,
+                                           ChipMessageInfo * msgInfo, PacketBuffer * payload)
 {
-    CHIP_ERROR res = CHIP_NO_ERROR;
+    CHIP_ERROR res     = CHIP_NO_ERROR;
     IPAddress destAddr = aDestAddr;
 
     res = SelectDestNodeIdAndAddress(msgInfo->DestNodeId, destAddr);
@@ -843,9 +834,7 @@ CHIP_ERROR ChipMessageLayer::ResendMessage(const IPAddress &aDestAddr, uint16_t 
 
     return SendMessage(destAddr, destPort, interfaceId, payload, msgInfo->Flags);
 exit:
-    if ((res != CHIP_NO_ERROR) &&
-        (payload != NULL) &&
-        ((msgInfo->Flags & kChipMessageFlag_RetainBuffer) == 0))
+    if ((res != CHIP_NO_ERROR) && (payload != NULL) && ((msgInfo->Flags & kChipMessageFlag_RetainBuffer) == 0))
     {
         PacketBuffer::Free(payload);
     }
@@ -859,11 +848,11 @@ exit:
  *                         connections in use is stored.
  *
  */
-void ChipMessageLayer::GetConnectionPoolStats(chip::System::Stats::count_t &aOutInUse) const
+void ChipMessageLayer::GetConnectionPoolStats(chip::System::Stats::count_t & aOutInUse) const
 {
     aOutInUse = 0;
 
-    const ChipConnection *con = (ChipConnection *) mConPool;
+    const ChipConnection * con = (ChipConnection *) mConPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_CONNECTIONS; i++, con++)
     {
         if (con->mRefCount != 0)
@@ -880,9 +869,9 @@ void ChipMessageLayer::GetConnectionPoolStats(chip::System::Stats::count_t &aOut
  *           NULL.
  *
  */
-ChipConnection *ChipMessageLayer::NewConnection()
+ChipConnection * ChipMessageLayer::NewConnection()
 {
-    ChipConnection *con = (ChipConnection *) mConPool;
+    ChipConnection * con = (ChipConnection *) mConPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_CONNECTIONS; i++, con++)
     {
         if (con->mRefCount == 0)
@@ -896,17 +885,15 @@ ChipConnection *ChipMessageLayer::NewConnection()
     return NULL;
 }
 
-void ChipMessageLayer::GetIncomingTCPConCount(const IPAddress &peerAddr, uint16_t &count, uint16_t &countFromIP)
+void ChipMessageLayer::GetIncomingTCPConCount(const IPAddress & peerAddr, uint16_t & count, uint16_t & countFromIP)
 {
-    count = 0;
+    count       = 0;
     countFromIP = 0;
 
-    ChipConnection *con = (ChipConnection *) mConPool;
+    ChipConnection * con = (ChipConnection *) mConPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_CONNECTIONS; i++, con++)
     {
-        if (con->mRefCount > 0 &&
-            con->NetworkType == ChipConnection::kNetworkType_IP &&
-            con->IsIncoming())
+        if (con->mRefCount > 0 && con->NetworkType == ChipConnection::kNetworkType_IP && con->IsIncoming())
         {
             count++;
             if (con->PeerAddr == peerAddr)
@@ -924,9 +911,9 @@ void ChipMessageLayer::GetIncomingTCPConCount(const IPAddress &peerAddr, uint16_
  *           otherwise NULL.
  *
  */
-ChipConnectionTunnel *ChipMessageLayer::NewConnectionTunnel()
+ChipConnectionTunnel * ChipMessageLayer::NewConnectionTunnel()
 {
-    ChipConnectionTunnel *tun = (ChipConnectionTunnel *) mTunnelPool;
+    ChipConnectionTunnel * tun = (ChipConnectionTunnel *) mTunnelPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_TUNNELS; i++, tun++)
     {
         if (tun->IsInUse() == false)
@@ -961,14 +948,14 @@ ChipConnectionTunnel *ChipMessageLayer::NewConnectionTunnel()
  *  @retval    #CHIP_ERROR_NO_MEMORY       if a new ChipConnectionTunnel object cannot be created.
  *
  */
-CHIP_ERROR ChipMessageLayer::CreateTunnel(ChipConnectionTunnel **tunPtr, ChipConnection &conOne,
-        ChipConnection &conTwo, uint32_t inactivityTimeoutMS)
+CHIP_ERROR ChipMessageLayer::CreateTunnel(ChipConnectionTunnel ** tunPtr, ChipConnection & conOne, ChipConnection & conTwo,
+                                          uint32_t inactivityTimeoutMS)
 {
     ChipLogDetail(ExchangeManager, "Entering CreateTunnel");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(conOne.State == ChipConnection::kState_Connected && conTwo.State ==
-            ChipConnection::kState_Connected, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(conOne.State == ChipConnection::kState_Connected && conTwo.State == ChipConnection::kState_Connected,
+                 err = CHIP_ERROR_INCORRECT_STATE);
 
     *tunPtr = NewConnectionTunnel();
     VerifyOrExit(*tunPtr != NULL, err = CHIP_ERROR_NO_MEMORY);
@@ -977,8 +964,8 @@ CHIP_ERROR ChipMessageLayer::CreateTunnel(ChipConnectionTunnel **tunPtr, ChipCon
     err = (*tunPtr)->MakeTunnelConnected(conOne.mTcpEndPoint, conTwo.mTcpEndPoint);
     SuccessOrExit(err);
 
-    ChipLogProgress(ExchangeManager, "Created CHIP tunnel from Cons (%04X, %04X) with EPs (%04X, %04X)",
-            conOne.LogId(), conTwo.LogId(), conOne.mTcpEndPoint->LogId(), conTwo.mTcpEndPoint->LogId());
+    ChipLogProgress(ExchangeManager, "Created CHIP tunnel from Cons (%04X, %04X) with EPs (%04X, %04X)", conOne.LogId(),
+                    conTwo.LogId(), conOne.mTcpEndPoint->LogId(), conTwo.mTcpEndPoint->LogId());
 
     if (inactivityTimeoutMS > 0)
     {
@@ -1001,14 +988,14 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipMessageLayer::SetUnsecuredConnectionListener(ConnectionReceiveFunct
-        newOnUnsecuredConnectionReceived, CallbackRemovedFunct newOnUnsecuredConnectionCallbacksRemoved, bool force,
-        void *listenerState)
+CHIP_ERROR ChipMessageLayer::SetUnsecuredConnectionListener(ConnectionReceiveFunct newOnUnsecuredConnectionReceived,
+                                                            CallbackRemovedFunct newOnUnsecuredConnectionCallbacksRemoved,
+                                                            bool force, void * listenerState)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(ExchangeManager, "Entered SetUnsecuredConnectionReceived, cb = %p, %p",
-            newOnUnsecuredConnectionReceived, newOnUnsecuredConnectionCallbacksRemoved);
+    ChipLogProgress(ExchangeManager, "Entered SetUnsecuredConnectionReceived, cb = %p, %p", newOnUnsecuredConnectionReceived,
+                    newOnUnsecuredConnectionCallbacksRemoved);
 
     if (UnsecuredListenEnabled() == false)
     {
@@ -1033,26 +1020,26 @@ CHIP_ERROR ChipMessageLayer::SetUnsecuredConnectionListener(ConnectionReceiveFun
         }
     }
 
-    OnUnsecuredConnectionReceived = newOnUnsecuredConnectionReceived;
+    OnUnsecuredConnectionReceived         = newOnUnsecuredConnectionReceived;
     OnUnsecuredConnectionCallbacksRemoved = newOnUnsecuredConnectionCallbacksRemoved;
-    UnsecuredConnectionReceivedAppState = listenerState;
+    UnsecuredConnectionReceivedAppState   = listenerState;
 
 exit:
     return err;
 }
 
-CHIP_ERROR ChipMessageLayer::ClearUnsecuredConnectionListener(ConnectionReceiveFunct
-        oldOnUnsecuredConnectionReceived, CallbackRemovedFunct oldOnUnsecuredConnectionCallbacksRemoved)
+CHIP_ERROR ChipMessageLayer::ClearUnsecuredConnectionListener(ConnectionReceiveFunct oldOnUnsecuredConnectionReceived,
+                                                              CallbackRemovedFunct oldOnUnsecuredConnectionCallbacksRemoved)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(ExchangeManager, "Entered ClearUnsecuredConnectionListener, cbs = %p, %p",
-            oldOnUnsecuredConnectionReceived, oldOnUnsecuredConnectionCallbacksRemoved);
+    ChipLogProgress(ExchangeManager, "Entered ClearUnsecuredConnectionListener, cbs = %p, %p", oldOnUnsecuredConnectionReceived,
+                    oldOnUnsecuredConnectionCallbacksRemoved);
 
     // Only clear callbacks and suppress OnUnsecuredConnectionCallbacksRemoved if caller can prove it owns current
     // callbacks. For proof of identification, we accept copies of callback function pointers.
-    if (oldOnUnsecuredConnectionReceived != OnUnsecuredConnectionReceived || oldOnUnsecuredConnectionCallbacksRemoved
-            != OnUnsecuredConnectionCallbacksRemoved)
+    if (oldOnUnsecuredConnectionReceived != OnUnsecuredConnectionReceived ||
+        oldOnUnsecuredConnectionCallbacksRemoved != OnUnsecuredConnectionCallbacksRemoved)
     {
         if (oldOnUnsecuredConnectionReceived != OnUnsecuredConnectionReceived)
             ChipLogError(ExchangeManager, "bad arg: OnUnsecuredConnectionReceived");
@@ -1068,15 +1055,15 @@ CHIP_ERROR ChipMessageLayer::ClearUnsecuredConnectionListener(ConnectionReceiveF
         SuccessOrExit(err);
     }
 
-    OnUnsecuredConnectionReceived = NULL;
+    OnUnsecuredConnectionReceived         = NULL;
     OnUnsecuredConnectionCallbacksRemoved = NULL;
-    UnsecuredConnectionReceivedAppState = NULL;
+    UnsecuredConnectionReceivedAppState   = NULL;
 
 exit:
     return err;
 }
 
-CHIP_ERROR ChipMessageLayer::SelectDestNodeIdAndAddress(uint64_t& destNodeId, IPAddress& destAddr)
+CHIP_ERROR ChipMessageLayer::SelectDestNodeIdAndAddress(uint64_t & destNodeId, IPAddress & destAddr)
 {
     // If the destination address has not been supplied, attempt to determine it from the node id.
     // Fail if this can't be done.
@@ -1096,17 +1083,17 @@ CHIP_ERROR ChipMessageLayer::SelectDestNodeIdAndAddress(uint64_t& destNodeId, IP
 }
 
 // Encode and return message header field value.
-static uint16_t EncodeHeaderField(const ChipMessageInfo *msgInfo)
+static uint16_t EncodeHeaderField(const ChipMessageInfo * msgInfo)
 {
-    return ((((uint16_t)msgInfo->Flags) << kMsgHeaderField_FlagsShift) & kMsgHeaderField_FlagsMask) |
-           ((((uint16_t)msgInfo->EncryptionType) << kMsgHeaderField_EncryptionTypeShift) & kMsgHeaderField_EncryptionTypeMask) |
-           ((((uint16_t)msgInfo->MessageVersion) << kMsgHeaderField_MessageVersionShift) & kMsgHeaderField_MessageVersionMask);
+    return ((((uint16_t) msgInfo->Flags) << kMsgHeaderField_FlagsShift) & kMsgHeaderField_FlagsMask) |
+        ((((uint16_t) msgInfo->EncryptionType) << kMsgHeaderField_EncryptionTypeShift) & kMsgHeaderField_EncryptionTypeMask) |
+        ((((uint16_t) msgInfo->MessageVersion) << kMsgHeaderField_MessageVersionShift) & kMsgHeaderField_MessageVersionMask);
 }
 
 // Decode message header field value.
-static void DecodeHeaderField(const uint16_t headerField, ChipMessageInfo *msgInfo)
+static void DecodeHeaderField(const uint16_t headerField, ChipMessageInfo * msgInfo)
 {
-    msgInfo->Flags = (uint16_t)((headerField & kMsgHeaderField_FlagsMask) >> kMsgHeaderField_FlagsShift);
+    msgInfo->Flags          = (uint16_t)((headerField & kMsgHeaderField_FlagsMask) >> kMsgHeaderField_FlagsShift);
     msgInfo->EncryptionType = (uint8_t)((headerField & kMsgHeaderField_EncryptionTypeMask) >> kMsgHeaderField_EncryptionTypeShift);
     msgInfo->MessageVersion = (uint8_t)((headerField & kMsgHeaderField_MessageVersionMask) >> kMsgHeaderField_MessageVersionShift);
 }
@@ -1129,13 +1116,13 @@ static void DecodeHeaderField(const uint16_t headerField, ChipMessageInfo *msgIn
  *                              If the CHIP Message header format version is not supported.
  *
  */
-CHIP_ERROR ChipMessageLayer::DecodeHeader(PacketBuffer *msgBuf, ChipMessageInfo *msgInfo, uint8_t **payloadStart)
+CHIP_ERROR ChipMessageLayer::DecodeHeader(PacketBuffer * msgBuf, ChipMessageInfo * msgInfo, uint8_t ** payloadStart)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t *msgStart = msgBuf->Start();
-    uint16_t msgLen = msgBuf->DataLength();
-    uint8_t *msgEnd = msgStart + msgLen;
-    uint8_t *p = msgStart;
+    CHIP_ERROR err     = CHIP_NO_ERROR;
+    uint8_t * msgStart = msgBuf->Start();
+    uint16_t msgLen    = msgBuf->DataLength();
+    uint8_t * msgEnd   = msgStart + msgLen;
+    uint8_t * p        = msgStart;
     uint16_t headerField;
 
     if (msgLen < 6)
@@ -1151,8 +1138,7 @@ CHIP_ERROR ChipMessageLayer::DecodeHeader(PacketBuffer *msgBuf, ChipMessageInfo 
     DecodeHeaderField(headerField, msgInfo);
 
     // Error if the message version is unsupported.
-    if (msgInfo->MessageVersion != kChipMessageVersion_V1 &&
-        msgInfo->MessageVersion != kChipMessageVersion_V2)
+    if (msgInfo->MessageVersion != kChipMessageVersion_V1 && msgInfo->MessageVersion != kChipMessageVersion_V2)
     {
         ExitNow(err = CHIP_ERROR_UNSUPPORTED_MESSAGE_VERSION);
     }
@@ -1213,14 +1199,14 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipMessageLayer::ReEncodeMessage(PacketBuffer *msgBuf)
+CHIP_ERROR ChipMessageLayer::ReEncodeMessage(PacketBuffer * msgBuf)
 {
     ChipMessageInfo msgInfo;
     CHIP_ERROR err;
-    uint8_t *p;
+    uint8_t * p;
     ChipSessionState sessionState;
-    uint16_t msgLen = msgBuf->DataLength();
-    uint8_t *msgStart = msgBuf->Start();
+    uint16_t msgLen    = msgBuf->DataLength();
+    uint8_t * msgStart = msgBuf->Start();
     uint16_t encryptionLen;
 
     msgInfo.Clear();
@@ -1241,17 +1227,16 @@ CHIP_ERROR ChipMessageLayer::ReEncodeMessage(PacketBuffer *msgBuf)
     case kChipEncryptionType_None:
         break;
 
-    case kChipEncryptionType_AES128CTRSHA1:
-        {
-            // TODO: re-validate MIC to ensure that no part of the message has been altered since the time it was received.
+    case kChipEncryptionType_AES128CTRSHA1: {
+        // TODO: re-validate MIC to ensure that no part of the message has been altered since the time it was received.
 
-            // Re-encrypt the payload.
-            AES128CTRMode aes128CTR;
-            aes128CTR.SetKey(sessionState.MsgEncKey->EncKey.AES128CTRSHA1.DataKey);
-            aes128CTR.SetChipMessageCounter(msgInfo.SourceNodeId, msgInfo.MessageId);
-            aes128CTR.EncryptData(p, encryptionLen, p);
-        }
-        break;
+        // Re-encrypt the payload.
+        AES128CTRMode aes128CTR;
+        aes128CTR.SetKey(sessionState.MsgEncKey->EncKey.AES128CTRSHA1.DataKey);
+        aes128CTR.SetChipMessageCounter(msgInfo.SourceNodeId, msgInfo.MessageId);
+        aes128CTR.EncryptData(p, encryptionLen, p);
+    }
+    break;
     default:
         return CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE;
     }
@@ -1288,14 +1273,13 @@ CHIP_ERROR ChipMessageLayer::ReEncodeMessage(PacketBuffer *msgBuf)
  *  @retval  other errors generated by the fabric state object when fetching the session state.
  *
  */
-CHIP_ERROR ChipMessageLayer::EncodeMessage(ChipMessageInfo *msgInfo, PacketBuffer *msgBuf, ChipConnection *con,
-        uint16_t maxLen, uint16_t reserve)
+CHIP_ERROR ChipMessageLayer::EncodeMessage(ChipMessageInfo * msgInfo, PacketBuffer * msgBuf, ChipConnection * con, uint16_t maxLen,
+                                           uint16_t reserve)
 {
     CHIP_ERROR err;
-    uint8_t *p1;
+    uint8_t * p1;
     // Error if an unsupported message version requested.
-    if (msgInfo->MessageVersion != kChipMessageVersion_V1 &&
-        msgInfo->MessageVersion != kChipMessageVersion_V2)
+    if (msgInfo->MessageVersion != kChipMessageVersion_V1 && msgInfo->MessageVersion != kChipMessageVersion_V2)
         return CHIP_ERROR_UNSUPPORTED_MESSAGE_VERSION;
 
     // Message already encoded, don't do anything
@@ -1314,8 +1298,8 @@ CHIP_ERROR ChipMessageLayer::EncodeMessage(ChipMessageInfo *msgInfo, PacketBuffe
 
     // Compute the number of bytes that will appear before and after the message payload
     // in the final encoded message.
-    uint16_t headLen = 6;
-    uint16_t tailLen = 0;
+    uint16_t headLen    = 6;
+    uint16_t tailLen    = 0;
     uint16_t payloadLen = msgBuf->DataLength();
     if (msgInfo->Flags & kChipMessageFlag_SourceNodeId)
         headLen += 8;
@@ -1349,7 +1333,7 @@ CHIP_ERROR ChipMessageLayer::EncodeMessage(ChipMessageInfo *msgInfo, PacketBuffe
     if ((msgBuf->DataLength() + tailLen) > msgBuf->MaxDataLength())
         return CHIP_ERROR_BUFFER_TOO_SMALL;
 
-    uint8_t *payloadStart = msgBuf->Start();
+    uint8_t * payloadStart = msgBuf->Start();
 
     // Get the session state for the given destination node and encryption key.
     ChipSessionState sessionState;
@@ -1366,7 +1350,7 @@ CHIP_ERROR ChipMessageLayer::EncodeMessage(ChipMessageInfo *msgInfo, PacketBuffe
         return err;
 
     // Starting encoding at the appropriate point in the buffer before the payload data.
-    uint8_t *p = payloadStart - headLen;
+    uint8_t * p = payloadStart - headLen;
 
     // Allocate a new message identifier and write the message identifier field.
     if ((msgInfo->Flags & kChipMessageFlag_ReuseMessageId) == 0)
@@ -1430,13 +1414,13 @@ CHIP_ERROR ChipMessageLayer::EncodeMessage(ChipMessageInfo *msgInfo, PacketBuffe
         p += payloadLen;
 
         // Compute the integrity check value and store it immediately after the payload data.
-        ComputeIntegrityCheck_AES128CTRSHA1(msgInfo, sessionState.MsgEncKey->EncKey.AES128CTRSHA1.IntegrityKey,
-                                            payloadStart, payloadLen, p);
+        ComputeIntegrityCheck_AES128CTRSHA1(msgInfo, sessionState.MsgEncKey->EncKey.AES128CTRSHA1.IntegrityKey, payloadStart,
+                                            payloadLen, p);
         p += HMACSHA1::kDigestLength;
 
         // Encrypt the message payload and the integrity check value that follows it, in place, in the message buffer.
-        Encrypt_AES128CTRSHA1(msgInfo, sessionState.MsgEncKey->EncKey.AES128CTRSHA1.DataKey,
-                              payloadStart, payloadLen + HMACSHA1::kDigestLength, payloadStart);
+        Encrypt_AES128CTRSHA1(msgInfo, sessionState.MsgEncKey->EncKey.AES128CTRSHA1.DataKey, payloadStart,
+                              payloadLen + HMACSHA1::kDigestLength, payloadStart);
 
         break;
     }
@@ -1453,17 +1437,18 @@ CHIP_ERROR ChipMessageLayer::EncodeMessage(ChipMessageInfo *msgInfo, PacketBuffe
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipMessageLayer::DecodeMessage(PacketBuffer *msgBuf, uint64_t sourceNodeId, ChipConnection *con,
-        ChipMessageInfo *msgInfo, uint8_t **rPayload, uint16_t *rPayloadLen) // TODO: use references
+CHIP_ERROR ChipMessageLayer::DecodeMessage(PacketBuffer * msgBuf, uint64_t sourceNodeId, ChipConnection * con,
+                                           ChipMessageInfo * msgInfo, uint8_t ** rPayload,
+                                           uint16_t * rPayloadLen) // TODO: use references
 {
     CHIP_ERROR err;
-    uint8_t *msgStart = msgBuf->Start();
-    uint16_t msgLen = msgBuf->DataLength();
-    uint8_t *msgEnd = msgStart + msgLen;
-    uint8_t *p = msgStart;
+    uint8_t * msgStart    = msgBuf->Start();
+    uint16_t msgLen       = msgBuf->DataLength();
+    uint8_t * msgEnd      = msgStart + msgLen;
+    uint8_t * p           = msgStart;
     msgInfo->SourceNodeId = sourceNodeId;
-    err = DecodeHeader(msgBuf, msgInfo, &p);
-    sourceNodeId = msgInfo->SourceNodeId;
+    err                   = DecodeHeader(msgBuf, msgInfo, &p);
+    sourceNodeId          = msgInfo->SourceNodeId;
 
     if (err != CHIP_NO_ERROR)
         return err;
@@ -1480,31 +1465,30 @@ CHIP_ERROR ChipMessageLayer::DecodeMessage(PacketBuffer *msgBuf, uint64_t source
     case kChipEncryptionType_None:
         // Return the position and length of the payload within the message.
         *rPayloadLen = msgLen - (p - msgStart);
-        *rPayload = p;
+        *rPayload    = p;
 
         // Skip over the payload.
         p += *rPayloadLen;
         break;
 
-    case kChipEncryptionType_AES128CTRSHA1:
-    {
+    case kChipEncryptionType_AES128CTRSHA1: {
         // Error if the message is short given the expected fields.
         if ((p + kMinPayloadLen + HMACSHA1::kDigestLength) > msgEnd)
             return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
 
         // Return the position and length of the payload within the message.
         uint16_t payloadLen = msgLen - ((p - msgStart) + HMACSHA1::kDigestLength);
-        *rPayloadLen = payloadLen;
-        *rPayload = p;
+        *rPayloadLen        = payloadLen;
+        *rPayload           = p;
 
         // Decrypt the message payload and the integrity check value that follows it, in place, in the message buffer.
-        Encrypt_AES128CTRSHA1(msgInfo, sessionState.MsgEncKey->EncKey.AES128CTRSHA1.DataKey,
-                              p, payloadLen + HMACSHA1::kDigestLength, p);
+        Encrypt_AES128CTRSHA1(msgInfo, sessionState.MsgEncKey->EncKey.AES128CTRSHA1.DataKey, p,
+                              payloadLen + HMACSHA1::kDigestLength, p);
 
         // Compute the expected integrity check value from the decrypted payload.
         uint8_t expectedIntegrityCheck[HMACSHA1::kDigestLength];
-        ComputeIntegrityCheck_AES128CTRSHA1(msgInfo, sessionState.MsgEncKey->EncKey.AES128CTRSHA1.IntegrityKey,
-                                            p, payloadLen, expectedIntegrityCheck);
+        ComputeIntegrityCheck_AES128CTRSHA1(msgInfo, sessionState.MsgEncKey->EncKey.AES128CTRSHA1.IntegrityKey, p, payloadLen,
+                                            expectedIntegrityCheck);
         // Error if the expected integrity check doesn't match the integrity check in the message.
         if (!ConstantTimeCompare(p + payloadLen, expectedIntegrityCheck, HMACSHA1::kDigestLength))
             return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
@@ -1536,8 +1520,8 @@ CHIP_ERROR ChipMessageLayer::DecodeMessage(PacketBuffer *msgBuf, uint64_t source
     return err;
 }
 
-CHIP_ERROR ChipMessageLayer::EncodeMessageWithLength(ChipMessageInfo *msgInfo, PacketBuffer *msgBuf,
-        ChipConnection *con, uint16_t maxLen)
+CHIP_ERROR ChipMessageLayer::EncodeMessageWithLength(ChipMessageInfo * msgInfo, PacketBuffer * msgBuf, ChipConnection * con,
+                                                     uint16_t maxLen)
 {
     // Encode the message, reserving 2 bytes for the length.
     CHIP_ERROR err = EncodeMessage(msgInfo, msgBuf, con, maxLen - 2, 2);
@@ -1546,18 +1530,19 @@ CHIP_ERROR ChipMessageLayer::EncodeMessageWithLength(ChipMessageInfo *msgInfo, P
 
     // Prepend the message length to the beginning of the message.
     uint8_t * newMsgStart = msgBuf->Start() - 2;
-    uint16_t msgLen = msgBuf->DataLength();
+    uint16_t msgLen       = msgBuf->DataLength();
     msgBuf->SetStart(newMsgStart);
     LittleEndian::Put16(newMsgStart, msgLen);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipMessageLayer::DecodeMessageWithLength(PacketBuffer *msgBuf, uint64_t sourceNodeId, ChipConnection *con,
-        ChipMessageInfo *msgInfo, uint8_t **rPayload, uint16_t *rPayloadLen, uint32_t *rFrameLen)
+CHIP_ERROR ChipMessageLayer::DecodeMessageWithLength(PacketBuffer * msgBuf, uint64_t sourceNodeId, ChipConnection * con,
+                                                     ChipMessageInfo * msgInfo, uint8_t ** rPayload, uint16_t * rPayloadLen,
+                                                     uint32_t * rFrameLen)
 {
-    uint8_t *dataStart = msgBuf->Start();
-    uint16_t dataLen = msgBuf->DataLength();
+    uint8_t * dataStart = msgBuf->Start();
+    uint16_t dataLen    = msgBuf->DataLength();
 
     // Error if the message buffer doesn't contain the entire message length field.
     if (dataLen < 2)
@@ -1607,18 +1592,16 @@ CHIP_ERROR ChipMessageLayer::DecodeMessageWithLength(PacketBuffer *msgBuf, uint6
     return err;
 }
 
-void ChipMessageLayer::HandleUDPMessage(UDPEndPoint *endPoint, PacketBuffer *msg, const IPPacketInfo *pktInfo)
+void ChipMessageLayer::HandleUDPMessage(UDPEndPoint * endPoint, PacketBuffer * msg, const IPPacketInfo * pktInfo)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipMessageLayer *msgLayer = (ChipMessageLayer *) endPoint->AppState;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    ChipMessageLayer * msgLayer = (ChipMessageLayer *) endPoint->AppState;
     ChipMessageInfo msgInfo;
     uint64_t sourceNodeId;
-    uint8_t *payload;
+    uint8_t * payload;
     uint16_t payloadLen;
 
-    CHIP_FAULT_INJECT(FaultInjection::kFault_DropIncomingUDPMsg,
-                       PacketBuffer::Free(msg);
-                       ExitNow(err = CHIP_NO_ERROR));
+    CHIP_FAULT_INJECT(FaultInjection::kFault_DropIncomingUDPMsg, PacketBuffer::Free(msg); ExitNow(err = CHIP_NO_ERROR));
 
     msgInfo.Clear();
     msgInfo.InPacketInfo = pktInfo;
@@ -1640,7 +1623,8 @@ void ChipMessageLayer::HandleUDPMessage(UDPEndPoint *endPoint, PacketBuffer *msg
     {
         // If the source address is a ULA, derive a node identifier from it.  Depending on what's in the
         // message header, this may in fact be the node identifier of the sending node.
-        sourceNodeId = (pktInfo->SrcAddress.IsIPv6ULA()) ? IPv6InterfaceIdToChipNodeId(pktInfo->SrcAddress.InterfaceId()) : kNodeIdNotSpecified;
+        sourceNodeId = (pktInfo->SrcAddress.IsIPv6ULA()) ? IPv6InterfaceIdToChipNodeId(pktInfo->SrcAddress.InterfaceId())
+                                                         : kNodeIdNotSpecified;
 
         // Attempt to decode the message.
         err = msgLayer->DecodeMessage(msg, sourceNodeId, NULL, &msgInfo, &payload, &payloadLen);
@@ -1670,10 +1654,10 @@ void ChipMessageLayer::HandleUDPMessage(UDPEndPoint *endPoint, PacketBuffer *msg
 #if INET_CONFIG_ENABLE_IPV4
              || endPoint == msgLayer->mIPv4EphemeralUDP
 #endif // INET_CONFIG_ENABLE_IPV4
-            ));
+             ));
 #endif // CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
 
-    //Check if message carries tunneled data and needs to be sent to Tunnel Agent
+    // Check if message carries tunneled data and needs to be sent to Tunnel Agent
     if (msgInfo.MessageVersion == kChipMessageVersion_V2)
     {
         if (msgInfo.Flags & kChipMessageFlag_TunneledData)
@@ -1740,19 +1724,19 @@ exit:
     return;
 }
 
-void ChipMessageLayer::HandleUDPReceiveError(UDPEndPoint *endPoint, INET_ERROR err, const IPPacketInfo *pktInfo)
+void ChipMessageLayer::HandleUDPReceiveError(UDPEndPoint * endPoint, INET_ERROR err, const IPPacketInfo * pktInfo)
 {
     ChipLogError(MessageLayer, "HandleUDPReceiveError Error %s", nl::ErrorStr(err));
 
-    ChipMessageLayer *msgLayer = (ChipMessageLayer *) endPoint->AppState;
+    ChipMessageLayer * msgLayer = (ChipMessageLayer *) endPoint->AppState;
     if (msgLayer->OnReceiveError != NULL)
         msgLayer->OnReceiveError(msgLayer, err, pktInfo);
 }
 
 #if CONFIG_NETWORK_LAYER_BLE
-void ChipMessageLayer::HandleIncomingBleConnection(BLEEndPoint *bleEP)
+void ChipMessageLayer::HandleIncomingBleConnection(BLEEndPoint * bleEP)
 {
-    ChipMessageLayer *msgLayer = (ChipMessageLayer *) bleEP->mAppState;
+    ChipMessageLayer * msgLayer = (ChipMessageLayer *) bleEP->mAppState;
 
     // Immediately close the connection if there's no callback registered.
     if (msgLayer->OnConnectionReceived == NULL && msgLayer->ExchangeMgr == NULL)
@@ -1764,7 +1748,7 @@ void ChipMessageLayer::HandleIncomingBleConnection(BLEEndPoint *bleEP)
     }
 
     // Attempt to allocate a connection object. Fail if too many connections.
-    ChipConnection *con = msgLayer->NewConnection();
+    ChipConnection * con = msgLayer->NewConnection();
     if (con == NULL)
     {
         bleEP->Close();
@@ -1798,14 +1782,15 @@ void ChipMessageLayer::HandleIncomingBleConnection(BLEEndPoint *bleEP)
 }
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
-void ChipMessageLayer::HandleIncomingTcpConnection(TCPEndPoint *listeningEP, TCPEndPoint *conEP, const IPAddress &peerAddr, uint16_t peerPort)
+void ChipMessageLayer::HandleIncomingTcpConnection(TCPEndPoint * listeningEP, TCPEndPoint * conEP, const IPAddress & peerAddr,
+                                                   uint16_t peerPort)
 {
     INET_ERROR err;
     IPAddress localAddr;
     uint16_t localPort;
     uint16_t incomingTCPConCount;
     uint16_t incomingTCPConCountFromIP;
-    ChipMessageLayer *msgLayer = (ChipMessageLayer *) listeningEP->AppState;
+    ChipMessageLayer * msgLayer = (ChipMessageLayer *) listeningEP->AppState;
 
     // Immediately close the connection if there's no callback registered.
     if (msgLayer->OnConnectionReceived == NULL && msgLayer->ExchangeMgr == NULL)
@@ -1828,7 +1813,7 @@ void ChipMessageLayer::HandleIncomingTcpConnection(TCPEndPoint *listeningEP, TCP
     }
 
     // Attempt to allocate a connection object. Fail if too many connections.
-    ChipConnection *con = msgLayer->NewConnection();
+    ChipConnection * con = msgLayer->NewConnection();
     if (con == NULL)
     {
         conEP->Free();
@@ -1854,7 +1839,7 @@ void ChipMessageLayer::HandleIncomingTcpConnection(TCPEndPoint *listeningEP, TCP
     {
         char ipAddrStr[64];
         peerAddr.ToString(ipAddrStr, sizeof(ipAddrStr));
-        ChipLogProgress(MessageLayer, "Con %s %04" PRIX16 " %s %d", "rcvd", con->LogId(), ipAddrStr, (int)peerPort);
+        ChipLogProgress(MessageLayer, "Con %s %04" PRIX16 " %s %d", "rcvd", con->LogId(), ipAddrStr, (int) peerPort);
     }
 #endif
 
@@ -1873,15 +1858,14 @@ void ChipMessageLayer::HandleIncomingTcpConnection(TCPEndPoint *listeningEP, TCP
         msgLayer->OnConnectionReceived(msgLayer, con);
 
     // If connection was received on unsecured port, call the app's OnUnsecuredConnectionReceived callback.
-    if (msgLayer->OnUnsecuredConnectionReceived != NULL && conEP->GetLocalInfo(&localAddr, &localPort) ==
-            CHIP_NO_ERROR && localPort == CHIP_UNSECURED_PORT)
+    if (msgLayer->OnUnsecuredConnectionReceived != NULL && conEP->GetLocalInfo(&localAddr, &localPort) == CHIP_NO_ERROR &&
+        localPort == CHIP_UNSECURED_PORT)
         msgLayer->OnUnsecuredConnectionReceived(msgLayer, con);
-
 }
 
-void ChipMessageLayer::HandleAcceptError(TCPEndPoint *ep, INET_ERROR err)
+void ChipMessageLayer::HandleAcceptError(TCPEndPoint * ep, INET_ERROR err)
 {
-    ChipMessageLayer *msgLayer = (ChipMessageLayer *) ep->AppState;
+    ChipMessageLayer * msgLayer = (ChipMessageLayer *) ep->AppState;
     if (msgLayer->OnAcceptError != NULL)
         msgLayer->OnAcceptError(msgLayer, err);
 }
@@ -1902,7 +1886,7 @@ void ChipMessageLayer::HandleAcceptError(TCPEndPoint *ep, INET_ERROR err)
  */
 CHIP_ERROR ChipMessageLayer::RefreshEndpoints()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err        = CHIP_NO_ERROR;
     const bool listenIPv6 = IPv6ListenEnabled();
 #if INET_CONFIG_ENABLE_IPV4
     const bool listenIPv4 = IPv4ListenEnabled();
@@ -1939,7 +1923,7 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoints()
     // ================================================================================
 
     {
-        const bool listenTCP = TCPListenEnabled();
+        const bool listenTCP     = TCPListenEnabled();
         const bool listenIPv6TCP = (listenTCP && listenIPv6);
 
 #if INET_CONFIG_ENABLE_IPV4
@@ -1951,8 +1935,8 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoints()
         // The CHIP IPv4 TCP listening endpoint is use to listen for incoming IPv4 TCP connections
         // to the local node's CHIP port.
         //
-        err = RefreshEndpoint(mIPv4TCPListen, listenIPv4TCP,
-                "CHIP IPv4 TCP listen", kIPAddressType_IPv4, listenIPv4Addr, CHIP_PORT);
+        err =
+            RefreshEndpoint(mIPv4TCPListen, listenIPv4TCP, "CHIP IPv4 TCP listen", kIPAddressType_IPv4, listenIPv4Addr, CHIP_PORT);
         SuccessOrExit(err);
 
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -1962,8 +1946,8 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoints()
         // The CHIP IPv6 TCP listening endpoint is use to listen for incoming IPv6 TCP connections
         // to the local node's CHIP port.
         //
-        err = RefreshEndpoint(mIPv6TCPListen, listenIPv6TCP,
-                "CHIP IPv6 TCP listen", kIPAddressType_IPv6, listenIPv6Addr, CHIP_PORT);
+        err =
+            RefreshEndpoint(mIPv6TCPListen, listenIPv6TCP, "CHIP IPv6 TCP listen", kIPAddressType_IPv6, listenIPv6Addr, CHIP_PORT);
         SuccessOrExit(err);
 
 #if CHIP_CONFIG_ENABLE_UNSECURED_TCP_LISTEN
@@ -1975,12 +1959,11 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoints()
         // listen feature has been enabled.
         //
         const bool listenUnsecuredIPv6TCP = (listenIPv6TCP && UnsecuredListenEnabled());
-        err = RefreshEndpoint(mUnsecuredIPv6TCPListen, listenUnsecuredIPv6TCP,
-                "unsecured IPv6 TCP listen", kIPAddressType_IPv6, listenIPv6Addr, CHIP_UNSECURED_PORT);
+        err = RefreshEndpoint(mUnsecuredIPv6TCPListen, listenUnsecuredIPv6TCP, "unsecured IPv6 TCP listen", kIPAddressType_IPv6,
+                              listenIPv6Addr, CHIP_UNSECURED_PORT);
         SuccessOrExit(err);
 
 #endif // CHIP_CONFIG_ENABLE_UNSECURED_TCP_LISTEN
-
     }
 
     // ================================================================================
@@ -2000,8 +1983,8 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoints()
         // feature has been enabled.
         //
         const bool listenIPv4UDP = (listenIPv4 && listenUDP);
-        err = RefreshEndpoint(mIPv4UDP, listenIPv4UDP,
-                "CHIP IPv4 UDP", kIPAddressType_IPv4, listenIPv4Addr, CHIP_PORT, INET_NULL_INTERFACEID);
+        err = RefreshEndpoint(mIPv4UDP, listenIPv4UDP, "CHIP IPv4 UDP", kIPAddressType_IPv4, listenIPv4Addr, CHIP_PORT,
+                              INET_NULL_INTERFACEID);
         SuccessOrExit(err);
 
 #if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
@@ -2013,8 +1996,8 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoints()
         // enabled.
         //
         const bool listenIPv4EphemeralUDP = (listenIPv4UDP && EphemeralUDPPortEnabled());
-        err = RefreshEndpoint(mIPv4EphemeralUDP, listenIPv4EphemeralUDP,
-                "ephemeral IPv4 UDP", kIPAddressType_IPv4, listenIPv4Addr, 0, INET_NULL_INTERFACEID);
+        err = RefreshEndpoint(mIPv4EphemeralUDP, listenIPv4EphemeralUDP, "ephemeral IPv4 UDP", kIPAddressType_IPv4, listenIPv4Addr,
+                              0, INET_NULL_INTERFACEID);
         SuccessOrExit(err);
 
 #endif // CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
@@ -2029,8 +2012,8 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoints()
         // feature has been enabled.
         //
         const bool listenIPv6UDP = (listenIPv6 && listenUDP);
-        err = RefreshEndpoint(mIPv6UDP, listenIPv6UDP,
-                "CHIP IPv6 UDP", kIPAddressType_IPv6, listenIPv6Addr, CHIP_PORT, listenIPv6Intf);
+        err = RefreshEndpoint(mIPv6UDP, listenIPv6UDP, "CHIP IPv6 UDP", kIPAddressType_IPv6, listenIPv6Addr, CHIP_PORT,
+                              listenIPv6Intf);
         SuccessOrExit(err);
 
 #if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
@@ -2042,8 +2025,8 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoints()
         // enabled.
         //
         const bool listenIPv6EphemeralUDP = (listenIPv6UDP && EphemeralUDPPortEnabled());
-        err = RefreshEndpoint(mIPv6EphemeralUDP, listenIPv6EphemeralUDP,
-                "ephemeral IPv6 UDP", kIPAddressType_IPv6, listenIPv6Addr, 0, listenIPv6Intf);
+        err = RefreshEndpoint(mIPv6EphemeralUDP, listenIPv6EphemeralUDP, "ephemeral IPv6 UDP", kIPAddressType_IPv6, listenIPv6Addr,
+                              0, listenIPv6Intf);
         SuccessOrExit(err);
 
 #endif // CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
@@ -2057,10 +2040,11 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoints()
         // to a specific IPv6 address.  This is required because the CHIP IPv6 UDP endpoint will not receive multicast
         // messages in this configuration.
         //
-        IPAddress ipv6LinkLocalAllNodes = IPAddress::MakeIPv6WellKnownMulticast(kIPv6MulticastScope_Link, kIPV6MulticastGroup_AllNodes);
+        IPAddress ipv6LinkLocalAllNodes =
+            IPAddress::MakeIPv6WellKnownMulticast(kIPv6MulticastScope_Link, kIPV6MulticastGroup_AllNodes);
         const bool listenChipIPv6UDPMulticastEP = (listenIPv6UDP && IsBoundToLocalIPv6Address());
-        err = RefreshEndpoint(mIPv6UDPMulticastRcv, listenChipIPv6UDPMulticastEP,
-                "CHIP IPv6 UDP multicast", kIPAddressType_IPv6, ipv6LinkLocalAllNodes, CHIP_PORT, listenIPv6Intf);
+        err = RefreshEndpoint(mIPv6UDPMulticastRcv, listenChipIPv6UDPMulticastEP, "CHIP IPv6 UDP multicast", kIPAddressType_IPv6,
+                              ipv6LinkLocalAllNodes, CHIP_PORT, listenIPv6Intf);
         SuccessOrExit(err);
 
 #if INET_CONFIG_ENABLE_IPV4
@@ -2070,16 +2054,15 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoints()
         // Similar to the IPv6 UDP multicast endpoint, this endpoint is used to receive IPv4 broadcast messages
         // when the message layer has been bound to a specific IPv4 address.
         //
-        IPAddress ipv4Broadcast = IPAddress::MakeIPv4Broadcast();
+        IPAddress ipv4Broadcast                 = IPAddress::MakeIPv4Broadcast();
         const bool listenChipIPv4UDPBroadcastEP = (listenIPv4UDP && IsBoundToLocalIPv4Address());
-        err = RefreshEndpoint(mIPv4UDPBroadcastRcv, listenChipIPv4UDPBroadcastEP,
-                "CHIP IPv4 UDP broadcast", kIPAddressType_IPv4, ipv4Broadcast, CHIP_PORT, INET_NULL_INTERFACEID);
+        err = RefreshEndpoint(mIPv4UDPBroadcastRcv, listenChipIPv4UDPBroadcastEP, "CHIP IPv4 UDP broadcast", kIPAddressType_IPv4,
+                              ipv4Broadcast, CHIP_PORT, INET_NULL_INTERFACEID);
         SuccessOrExit(err);
 
 #endif // INET_CONFIG_ENABLE_IPV4
 
 #endif // CHIP_CONFIG_ENABLE_TARGETED_LISTEN
-
     }
 
 exit:
@@ -2088,7 +2071,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipMessageLayer::RefreshEndpoint(TCPEndPoint *& endPoint, bool enable, const char * name, IPAddressType addrType, IPAddress addr, uint16_t port)
+CHIP_ERROR ChipMessageLayer::RefreshEndpoint(TCPEndPoint *& endPoint, bool enable, const char * name, IPAddressType addrType,
+                                             IPAddress addr, uint16_t port)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -2111,10 +2095,10 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoint(TCPEndPoint *& endPoint, bool enabl
         SuccessOrExit(err);
 
         // Accept incoming TCP connections.
-        endPoint->AppState = this;
+        endPoint->AppState             = this;
         endPoint->OnConnectionReceived = HandleIncomingTcpConnection;
-        endPoint->OnAcceptError = HandleAcceptError;
-        err = endPoint->Listen(1);
+        endPoint->OnAcceptError        = HandleAcceptError;
+        err                            = endPoint->Listen(1);
         SuccessOrExit(err);
 
 #if CHIP_BIND_DETAIL_LOGGING && CHIP_DETAIL_LOGGING
@@ -2139,7 +2123,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipMessageLayer::RefreshEndpoint(UDPEndPoint *& endPoint, bool enable, const char * name, IPAddressType addrType, IPAddress addr, uint16_t port, InterfaceId intfId)
+CHIP_ERROR ChipMessageLayer::RefreshEndpoint(UDPEndPoint *& endPoint, bool enable, const char * name, IPAddressType addrType,
+                                             IPAddress addr, uint16_t port, InterfaceId intfId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -2162,10 +2147,10 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoint(UDPEndPoint *& endPoint, bool enabl
         SuccessOrExit(err);
 
         // Accept incoming packets on the endpoint.
-        endPoint->AppState = this;
+        endPoint->AppState          = this;
         endPoint->OnMessageReceived = reinterpret_cast<IPEndPointBasis::OnMessageReceivedFunct>(HandleUDPMessage);
-        endPoint->OnReceiveError = reinterpret_cast<IPEndPointBasis::OnReceiveErrorFunct>(HandleUDPReceiveError);
-        err = endPoint->Listen();
+        endPoint->OnReceiveError    = reinterpret_cast<IPEndPointBasis::OnReceiveErrorFunct>(HandleUDPReceiveError);
+        err                         = endPoint->Listen();
         SuccessOrExit(err);
 
 #if CHIP_BIND_DETAIL_LOGGING && CHIP_DETAIL_LOGGING
@@ -2200,8 +2185,8 @@ exit:
     return err;
 }
 
-void ChipMessageLayer::Encrypt_AES128CTRSHA1(const ChipMessageInfo *msgInfo, const uint8_t *key,
-                                              const uint8_t *inData, uint16_t inLen, uint8_t *outBuf)
+void ChipMessageLayer::Encrypt_AES128CTRSHA1(const ChipMessageInfo * msgInfo, const uint8_t * key, const uint8_t * inData,
+                                             uint16_t inLen, uint8_t * outBuf)
 {
     AES128CTRMode aes128CTR;
     aes128CTR.SetKey(key);
@@ -2209,12 +2194,12 @@ void ChipMessageLayer::Encrypt_AES128CTRSHA1(const ChipMessageInfo *msgInfo, con
     aes128CTR.EncryptData(inData, inLen, outBuf);
 }
 
-void ChipMessageLayer::ComputeIntegrityCheck_AES128CTRSHA1(const ChipMessageInfo *msgInfo, const uint8_t *key,
-                                                            const uint8_t *inData, uint16_t inLen, uint8_t *outBuf)
+void ChipMessageLayer::ComputeIntegrityCheck_AES128CTRSHA1(const ChipMessageInfo * msgInfo, const uint8_t * key,
+                                                           const uint8_t * inData, uint16_t inLen, uint8_t * outBuf)
 {
     HMACSHA1 hmacSHA1;
     uint8_t encodedBuf[2 * sizeof(uint64_t) + sizeof(uint16_t) + sizeof(uint32_t)];
-    uint8_t *p = encodedBuf;
+    uint8_t * p = encodedBuf;
 
     // Initialize HMAC Key.
     hmacSHA1.Begin(key, ChipEncryptionKey_AES128CTRSHA1::IntegrityKeySize);
@@ -2266,13 +2251,13 @@ CHIP_ERROR ChipMessageLayer::CloseEndpoints()
     CloseListeningEndpoints();
 
     // Abort any open connections.
-    ChipConnection *con = static_cast<ChipConnection *>(mConPool);
+    ChipConnection * con = static_cast<ChipConnection *>(mConPool);
     for (int i = 0; i < CHIP_CONFIG_MAX_CONNECTIONS; i++, con++)
         if (con->mRefCount > 0)
             con->Abort();
 
     // Shut down any open tunnels.
-    ChipConnectionTunnel *tun = static_cast<ChipConnectionTunnel *>(mTunnelPool);
+    ChipConnectionTunnel * tun = static_cast<ChipConnectionTunnel *>(mTunnelPool);
     for (int i = 0; i < CHIP_CONFIG_MAX_TUNNELS; i++, tun++)
     {
         if (tun->mMessageLayer != NULL)
@@ -2400,7 +2385,8 @@ CHIP_ERROR ChipMessageLayer::DisableUnsecuredListen()
  *
  *  @retval None.
  */
-void ChipMessageLayer::SetSignalMessageLayerActivityChanged(MessageLayerActivityChangeHandlerFunct messageLayerActivityChangeHandler)
+void ChipMessageLayer::SetSignalMessageLayerActivityChanged(
+    MessageLayerActivityChangeHandlerFunct messageLayerActivityChangeHandler)
 {
     OnMessageLayerActivityChange = messageLayerActivityChangeHandler;
 }
@@ -2409,9 +2395,9 @@ bool ChipMessageLayer::IsMessageLayerActive(void)
 {
     return (ExchangeMgr->mContextsInUse != 0)
 #if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
-           || FabricState->IsMsgCounterSyncReqInProgress()
+        || FabricState->IsMsgCounterSyncReqInProgress()
 #endif
-           ;
+        ;
 }
 
 /**
@@ -2455,15 +2441,13 @@ void ChipMessageLayer::SignalMessageLayerActivityChanged(void)
  *
  *  @return the max CHIP payload size.
  */
-uint32_t ChipMessageLayer::GetMaxChipPayloadSize(const PacketBuffer *msgBuf, bool isUDP, uint32_t udpMTU)
+uint32_t ChipMessageLayer::GetMaxChipPayloadSize(const PacketBuffer * msgBuf, bool isUDP, uint32_t udpMTU)
 {
-    uint32_t maxChipMessageSize = isUDP ? udpMTU - INET_CONFIG_MAX_IP_AND_UDP_HEADER_SIZE : UINT16_MAX;
-    uint32_t maxChipPayloadSize = maxChipMessageSize - CHIP_HEADER_RESERVE_SIZE - CHIP_TRAILER_RESERVE_SIZE;
+    uint32_t maxChipMessageSize       = isUDP ? udpMTU - INET_CONFIG_MAX_IP_AND_UDP_HEADER_SIZE : UINT16_MAX;
+    uint32_t maxChipPayloadSize       = maxChipMessageSize - CHIP_HEADER_RESERVE_SIZE - CHIP_TRAILER_RESERVE_SIZE;
     uint32_t maxBufferablePayloadSize = msgBuf->AvailableDataLength() - CHIP_TRAILER_RESERVE_SIZE;
 
-    return maxBufferablePayloadSize < maxChipPayloadSize
-        ? maxBufferablePayloadSize
-        : maxChipPayloadSize;
+    return maxBufferablePayloadSize < maxChipPayloadSize ? maxBufferablePayloadSize : maxChipPayloadSize;
 }
 
 /**
@@ -2490,11 +2474,14 @@ uint32_t ChipMessageLayer::GetMaxChipPayloadSize(const PacketBuffer *msgBuf, boo
  * @param[in] con                       A pointer to a ChipConnection object whose logging id should be printed;
  *                                      or NULL if no connection id should be printed.
  */
-void ChipMessageLayer::GetPeerDescription(char * buf, size_t bufSize, uint64_t nodeId,
-    const IPAddress * addr, uint16_t port, InterfaceId interfaceId, const ChipConnection * con)
+void ChipMessageLayer::GetPeerDescription(char * buf, size_t bufSize, uint64_t nodeId, const IPAddress * addr, uint16_t port,
+                                          InterfaceId interfaceId, const ChipConnection * con)
 {
-    enum { kMaxInterfaceNameLength = 20 }; // Arbitrarily capped at 20 characters so long interface
-                                           // names do not blow out the available space.
+    enum
+    {
+        kMaxInterfaceNameLength = 20
+    }; // Arbitrarily capped at 20 characters so long interface
+       // names do not blow out the available space.
 
     uint32_t len;
     const char * sep = "";
@@ -2529,7 +2516,7 @@ void ChipMessageLayer::GetPeerDescription(char * buf, size_t bufSize, uint64_t n
 
         if (interfaceId != INET_NULL_INTERFACEID)
         {
-            char interfaceName[kMaxInterfaceNameLength+1];
+            char interfaceName[kMaxInterfaceNameLength + 1];
             Inet::GetInterfaceName(interfaceId, interfaceName, sizeof(interfaceName));
             interfaceName[kMaxInterfaceNameLength] = 0;
             len += snprintf(buf + len, bufSize - len, "%%%s", interfaceName);
@@ -2541,7 +2528,7 @@ void ChipMessageLayer::GetPeerDescription(char * buf, size_t bufSize, uint64_t n
 
     if (con != NULL)
     {
-        const char *conType;
+        const char * conType;
         switch (con->NetworkType)
         {
         case ChipConnection::kNetworkType_BLE:
@@ -2581,10 +2568,9 @@ exit:
 void ChipMessageLayer::GetPeerDescription(char * buf, size_t bufSize, const ChipMessageInfo * msgInfo)
 {
     GetPeerDescription(buf, bufSize, msgInfo->SourceNodeId,
-        (msgInfo->InPacketInfo != NULL) ? &msgInfo->InPacketInfo->SrcAddress : NULL,
-        (msgInfo->InPacketInfo != NULL) ? msgInfo->InPacketInfo->SrcPort : 0,
-        (msgInfo->InPacketInfo != NULL) ? msgInfo->InPacketInfo->Interface : INET_NULL_INTERFACEID,
-        msgInfo->InCon);
+                       (msgInfo->InPacketInfo != NULL) ? &msgInfo->InPacketInfo->SrcAddress : NULL,
+                       (msgInfo->InPacketInfo != NULL) ? msgInfo->InPacketInfo->SrcPort : 0,
+                       (msgInfo->InPacketInfo != NULL) ? msgInfo->InPacketInfo->Interface : INET_NULL_INTERFACEID, msgInfo->InCon);
 }
 
 /**
@@ -2607,7 +2593,7 @@ DLL_EXPORT CHIP_ERROR GenerateChipNodeId(uint64_t & nodeId)
 
     while (id <= kMaxAlwaysLocalChipNodeId)
     {
-        err = chip::Platform::Security::GetSecureRandomData(reinterpret_cast<uint8_t*>(&id), sizeof(id));
+        err = chip::Platform::Security::GetSecureRandomData(reinterpret_cast<uint8_t *>(&id), sizeof(id));
         SuccessOrExit(err);
 
         id &= ~kEUI64_UL_Local;
