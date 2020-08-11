@@ -59,6 +59,14 @@ void emAfTick(void)
     emberAfTick();             // Global
 }
 
+// ResetAttributes function declarations.
+void emAfPluginPollControlServerResetAttributesCallback(uint8_t endpointId); // Plugin: poll-control-server
+
+void emAfResetAttributes(uint8_t endpointId)
+{
+    emAfPluginPollControlServerResetAttributesCallback(endpointId); // Plugin: poll-control-server
+}
+
 // Marker function declarations.
 void emberAfMarkBuffersCallback(void);         // Global
 void emberAfPluginNetworkSteeringMarker(void); // Plugin: network-steering
@@ -68,8 +76,6 @@ void emAfMarkBuffers(void)
     emberAfMarkBuffersCallback();         // Global
     emberAfPluginNetworkSteeringMarker(); // Plugin: network-steering
 }
-
-void emAfResetAttributes(uint8_t endpointId) {}
 
 // PreCommandReceived function declarations.
 bool emberAfPreCommandReceivedCallback(EmberAfClusterCommand * cmd); // Global
