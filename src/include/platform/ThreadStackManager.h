@@ -77,6 +77,8 @@ public:
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
 
     CHIP_ERROR JoinerStart(void);
+    CHIP_ERROR SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo);
+    CHIP_ERROR SetThreadEnabled(bool val);
 
 private:
     // ===== Members for internal use by the following friends.
@@ -106,11 +108,9 @@ private:
 
     void OnPlatformEvent(const ChipDeviceEvent * event);
     bool IsThreadEnabled(void);
-    CHIP_ERROR SetThreadEnabled(bool val);
     bool IsThreadProvisioned(void);
     bool IsThreadAttached(void);
     CHIP_ERROR GetThreadProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials);
-    CHIP_ERROR SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo);
     void ErasePersistentInfo(void);
     ConnectivityManager::ThreadDeviceType GetThreadDeviceType(void);
     CHIP_ERROR SetThreadDeviceType(ConnectivityManager::ThreadDeviceType threadRole);
