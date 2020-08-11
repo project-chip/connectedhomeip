@@ -28,11 +28,12 @@
  */
 
 #include "CHIPServerBase.h"
-#include <profiles/CHIPProfiles.h>
-//#include <Profiles/common/CommonProfile.h>
 #include <core/CHIPCore.h>
+#include <core/CHIPEncoding.h>
 #include <core/CHIPTLV.h>
+#include <profiles/CHIPProfiles.h>
 #include <support/CodeUtils.h>
+//#include <Profiles/common/CommonProfile.h>
 
 namespace chip {
 

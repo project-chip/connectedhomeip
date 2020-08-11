@@ -37,18 +37,19 @@
 #include <string.h>
 
 #include <core/CHIPCore.h>
+#include <core/CHIPEncoding.h>
 #include <core/CHIPKeyIds.h>
 #include <core/CHIPTLV.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <message/CHIPFabricState.h>
 #include <profiles/CHIPProfiles.h>
+#include <support/CodeUtils.h>
+#include <support/RandUtils.h>
+#include <support/logging/CHIPLogging.h>
 // #include <profiles/fabric-provisioning/FabricProvisioning.h>
 // #include <profiles/security/CHIPApplicationKeys.h>
 // #include <profiles/security/CHIPDummyGroupKeyStore.h>
 // #include <profiles/security/CHIPSecurity.h>
-#include <support/CodeUtils.h>
-#include <support/RandUtils.h>
-//#include <support/crypto/CHIPCrypto.h>
-#include <support/logging/CHIPLogging.h>
 
 #if HAVE_NEW
 #include <new>
