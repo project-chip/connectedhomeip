@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file implements the WeaveExchangeManager class.
+ *      This file implements the ChipExchangeManager class.
  *
  */
 
@@ -31,55 +31,54 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include <Weave/Core/WeaveCore.h>
-#include <Weave/Profiles/WeaveProfiles.h>
-#include <Weave/Profiles/common/CommonProfile.h>
-#include <Weave/Profiles/security/WeaveSecurity.h>
-#include <Weave/Core/WeaveEncoding.h>
-#include <Weave/Support/CodeUtils.h>
-#include <Weave/Support/RandUtils.h>
-#include <Weave/Support/logging/WeaveLogging.h>
-#include <Weave/Support/WeaveFaultInjection.h>
+#include <core/CHIPCore.h>
+#include <Profiles/CHIPProfiles.h>
+#include <Profiles/common/CommonProfile.h>
+#include <Profiles/security/CHIPSecurity.h>
+#include <core/CHIPEncoding.h>
+#include <support/CodeUtils.h>
+#include <support/RandUtils.h>
+#include <support/logging/CHIPLogging.h>
+#include <support/CHIPFaultInjection.h>
 #include <SystemLayer/SystemTimer.h>
 #include <SystemLayer/SystemStats.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 
-using namespace nl::Weave::Profiles;
-using namespace nl::Weave::Encoding;
+using namespace chip::Profiles;
+using namespace chip::Encoding;
 
 /**
- *  Constructor for the WeaveExchangeManager class.
+ *  Constructor for the ChipExchangeManager class.
  *  It sets the state to kState_NotInitialized.
  *
  *  @note
- *    The class must be initialized via WeaveExchangeManager::Init()
+ *    The class must be initialized via ChipExchangeManager::Init()
  *    prior to use.
  *
  */
-WeaveExchangeManager::WeaveExchangeManager()
+ChipExchangeManager::ChipExchangeManager()
 {
     State = kState_NotInitialized;
 }
 
 /**
- *  Initialize the WeaveExchangeManager object. Within the lifetime
+ *  Initialize the ChipExchangeManager object. Within the lifetime
  *  of this instance, this method is invoked once after object
  *  construction until a call to Shutdown is made to terminate the
  *  instance.
  *
- *  @param[in]    msgLayer    A pointer to the WeaveMessageLayer object.
+ *  @param[in]    msgLayer    A pointer to the ChipMessageLayer object.
  *
- *  @retval #WEAVE_ERROR_INCORRECT_STATE If the state is not equal to
+ *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
  *          kState_NotInitialized.
- *  @retval #WEAVE_NO_ERROR On success.
+ *  @retval #CHIP_NO_ERROR On success.
  *
  */
-WEAVE_ERROR WeaveExchangeManager::Init(WeaveMessageLayer *msgLayer)
+CHIP_ERROR ChipExchangeManager::Init(ChipMessageLayer *msgLayer)
 {
     if (State != kState_NotInitialized)
-        return WEAVE_ERROR_INCORRECT_STATE;
+        return CHIP_ERROR_INCORRECT_STATE;
 
     MessageLayer = msgLayer;
     FabricState = msgLayer->FabricState;
@@ -98,8 +97,8 @@ WEAVE_ERROR WeaveExchangeManager::Init(WeaveMessageLayer *msgLayer)
     msgLayer->OnMessageReceived = HandleMessageReceived;
     msgLayer->OnAcceptError = HandleAcceptError;
 
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
-    mWRMPTimerInterval  = WEAVE_CONFIG_WRMP_TIMER_DEFAULT_PERIOD;       //WRMP Timer tick period
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
+    mWRMPTimerInterval  = CHIP_CONFIG_WRMP_TIMER_DEFAULT_PERIOD;       //WRMP Timer tick period
 
     memset(RetransTable, 0, sizeof(RetransTable));
 
@@ -110,23 +109,23 @@ WEAVE_ERROR WeaveExchangeManager::Init(WeaveMessageLayer *msgLayer)
 
     State = kState_Initialized;
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
- *  Shutdown the WeaveExchangeManager. This terminates this instance
+ *  Shutdown the ChipExchangeManager. This terminates this instance
  *  of the object and releases all held resources.
  *
  *  @note
  *     The application should only call this function after ensuring that
  *     there are no active ExchangeContext objects. Furthermore, it is the
- *     onus of the application to de-allocate the WeaveExchangeManager
- *     object after calling WeaveExchangeManager::Shutdown().
+ *     onus of the application to de-allocate the ChipExchangeManager
+ *     object after calling ChipExchangeManager::Shutdown().
  *
- *  @return #WEAVE_NO_ERROR unconditionally.
+ *  @return #CHIP_NO_ERROR unconditionally.
  *
  */
-WEAVE_ERROR WeaveExchangeManager::Shutdown()
+CHIP_ERROR ChipExchangeManager::Shutdown()
 {
     if (MessageLayer != NULL)
     {
@@ -136,11 +135,11 @@ WEAVE_ERROR WeaveExchangeManager::Shutdown()
             MessageLayer->OnMessageReceived = NULL;
             MessageLayer->OnAcceptError = NULL;
         }
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         WRMPStopTimer();
 
         //Clear the retransmit table
-        for (int i = 0; i < WEAVE_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+        for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
         {
             ClearRetransmitTable(RetransTable[i]);
         }
@@ -154,11 +153,11 @@ WEAVE_ERROR WeaveExchangeManager::Shutdown()
 
     State = kState_NotInitialized;
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
- *  Creates a new ExchangeContext with a given peer Weave node specified by the peer node identifier.
+ *  Creates a new ExchangeContext with a given peer CHIP node specified by the peer node identifier.
  *
  *  @param[in]    peerNodeId    The node identifier of the peer with which the ExchangeContext is being set up.
  *
@@ -168,13 +167,13 @@ WEAVE_ERROR WeaveExchangeManager::Shutdown()
  *            can be allocated or is available.
  *
  */
-ExchangeContext *WeaveExchangeManager::NewContext(const uint64_t &peerNodeId, void *appState)
+ExchangeContext *ChipExchangeManager::NewContext(const uint64_t &peerNodeId, void *appState)
 {
-    return NewContext(peerNodeId, FabricState->SelectNodeAddress(peerNodeId), WEAVE_PORT, INET_NULL_INTERFACEID, appState);
+    return NewContext(peerNodeId, FabricState->SelectNodeAddress(peerNodeId), CHIP_PORT, INET_NULL_INTERFACEID, appState);
 }
 
 /**
- *  Creates a new ExchangeContext with a given peer Weave node specified by the peer node identifier
+ *  Creates a new ExchangeContext with a given peer CHIP node specified by the peer node identifier
  *  and peer IP address.
  *
  *  @param[in]    peerNodeId    The node identifier of the peer with which the ExchangeContext is being set up.
@@ -187,13 +186,13 @@ ExchangeContext *WeaveExchangeManager::NewContext(const uint64_t &peerNodeId, vo
  *            can be allocated or is available.
  *
  */
-ExchangeContext *WeaveExchangeManager::NewContext(const uint64_t &peerNodeId, const IPAddress &peerAddr, void *appState)
+ExchangeContext *ChipExchangeManager::NewContext(const uint64_t &peerNodeId, const IPAddress &peerAddr, void *appState)
 {
-    return NewContext(peerNodeId, peerAddr, WEAVE_PORT, INET_NULL_INTERFACEID, appState);
+    return NewContext(peerNodeId, peerAddr, CHIP_PORT, INET_NULL_INTERFACEID, appState);
 }
 
 /**
- *  Creates a new ExchangeContext with a given peer Weave node specified by the peer node identifier, peer IP address,
+ *  Creates a new ExchangeContext with a given peer CHIP node specified by the peer node identifier, peer IP address,
  *  and destination port on a specified interface.
  *
  *  @param[in]    peerNodeId    The node identifier of the peer with which the ExchangeContext is being set up.
@@ -202,7 +201,7 @@ ExchangeContext *WeaveExchangeManager::NewContext(const uint64_t &peerNodeId, co
  *
  *  @param[in]    peerPort      The port of the peer node.
  *
- *  @param[in]    sendIntfId    The interface to use for sending Weave messages on this exchange.
+ *  @param[in]    sendIntfId    The interface to use for sending CHIP messages on this exchange.
  *
  *  @param[in]    appState      A pointer to a higher layer object that holds context state.
  *
@@ -210,7 +209,7 @@ ExchangeContext *WeaveExchangeManager::NewContext(const uint64_t &peerNodeId, co
  *            can be allocated or is available.
  *
  */
-ExchangeContext *WeaveExchangeManager::NewContext(const uint64_t &peerNodeId, const IPAddress &peerAddr, uint16_t peerPort, InterfaceId sendIntfId, void *appState)
+ExchangeContext *ChipExchangeManager::NewContext(const uint64_t &peerNodeId, const IPAddress &peerAddr, uint16_t peerPort, InterfaceId sendIntfId, void *appState)
 {
     ExchangeContext *ec = AllocContext();
     if (ec != NULL)
@@ -218,13 +217,13 @@ ExchangeContext *WeaveExchangeManager::NewContext(const uint64_t &peerNodeId, co
         ec->ExchangeId = NextExchangeId++;
         ec->PeerNodeId = peerNodeId;
         ec->PeerAddr = peerAddr;
-        ec->PeerPort = (peerPort != 0) ? peerPort : WEAVE_PORT;
+        ec->PeerPort = (peerPort != 0) ? peerPort : CHIP_PORT;
         ec->PeerIntf = sendIntfId;
         ec->AppState = appState;
         ec->SetInitiator(true);
         //Initialize WRMP variables
         ec->mMsgProtocolVersion = 0;
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         // No need to set WRMP timer, this will be done when we add to retrans table
         ec->mWRMPNextAckTime = 0;
         ec->SetAckPending(false);
@@ -239,18 +238,18 @@ ExchangeContext *WeaveExchangeManager::NewContext(const uint64_t &peerNodeId, co
         ec->OnAckRcvd = NULL;
         ec->OnSendError = NULL;
 #endif
-#if WEAVE_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
+#if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
         ec->SetUseEphemeralUDPPort(MessageLayer->EphemeralUDPPortEnabled());
-#endif // WEAVE_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
-        WeaveLogProgress(ExchangeManager, "ec id: %d, AppState: 0x%x", EXCHANGE_CONTEXT_ID(ec - ContextPool), ec->AppState);
+#endif // CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
+        ChipLogProgress(ExchangeManager, "ec id: %d, AppState: 0x%x", EXCHANGE_CONTEXT_ID(ec - ContextPool), ec->AppState);
     }
     return ec;
 }
 
 /**
- *  Creates a new ExchangeContext with a given peer Weave node over a specified WeaveConnection.
+ *  Creates a new ExchangeContext with a given peer CHIP node over a specified ChipConnection.
  *
- *  @param[in]    con           A pointer to the WeaveConnection object representing the TCP connection
+ *  @param[in]    con           A pointer to the ChipConnection object representing the TCP connection
  *                              with the peer.
  *
  *  @param[in]    appState      A pointer to a higher layer object that holds context state.
@@ -259,7 +258,7 @@ ExchangeContext *WeaveExchangeManager::NewContext(const uint64_t &peerNodeId, co
  *            can be allocated or is available.
  *
  */
-ExchangeContext *WeaveExchangeManager::NewContext(WeaveConnection *con, void *appState)
+ExchangeContext *ChipExchangeManager::NewContext(ChipConnection *con, void *appState)
 {
     ExchangeContext *ec = NewContext(con->PeerNodeId, con->PeerAddr, con->PeerPort, INET_NULL_INTERFACEID, appState);
     if (ec != NULL)
@@ -276,7 +275,7 @@ ExchangeContext *WeaveExchangeManager::NewContext(WeaveConnection *con, void *ap
  *
  *  @param[in]    peerNodeId    The node identifier of the peer with which the ExchangeContext has been set up.
  *
- *  @param[in]    con           A pointer to the WeaveConnection object representing the TCP connection
+ *  @param[in]    con           A pointer to the ChipConnection object representing the TCP connection
  *                              with the peer.
  *
  *  @param[in]    appState      A pointer to a higher layer object that holds context state.
@@ -286,10 +285,10 @@ ExchangeContext *WeaveExchangeManager::NewContext(WeaveConnection *con, void *ap
  *  @return   A pointer to the ExchangeContext object matching the provided parameters On success, NULL on no match.
  *
  */
-ExchangeContext *WeaveExchangeManager::FindContext(uint64_t peerNodeId, WeaveConnection *con, void *appState, bool isInitiator)
+ExchangeContext *ChipExchangeManager::FindContext(uint64_t peerNodeId, ChipConnection *con, void *appState, bool isInitiator)
 {
     ExchangeContext *ec = (ExchangeContext *) ContextPool;
-    for (int i = 0; i < WEAVE_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
+    for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
         if (ec->ExchangeMgr != NULL && ec->PeerNodeId == peerNodeId &&
             ec->Con == con && ec->AppState == appState &&
             ec->IsInitiator() == isInitiator)
@@ -307,11 +306,11 @@ ExchangeContext *WeaveExchangeManager::FindContext(uint64_t peerNodeId, WeaveCon
  *
  *  @param[in]    appState      A pointer to a higher layer object that holds context state.
  *
- *  @retval #WEAVE_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
+ *  @retval #CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
  *                                                             is full and a new one cannot be allocated.
- *  @retval #WEAVE_NO_ERROR On success.
+ *  @retval #CHIP_NO_ERROR On success.
  */
-WEAVE_ERROR WeaveExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId,
+CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId,
         ExchangeContext::MessageReceiveFunct handler, void *appState)
 {
     return RegisterUMH(profileId, (int16_t) -1, NULL, false, handler, appState);
@@ -328,11 +327,11 @@ WEAVE_ERROR WeaveExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t pro
  *
  *  @param[in]    appState      A pointer to a higher layer object that holds context state.
  *
- *  @retval #WEAVE_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
+ *  @retval #CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
  *                                                             is full and a new one cannot be allocated.
- *  @retval #WEAVE_NO_ERROR On success.
+ *  @retval #CHIP_NO_ERROR On success.
  */
-WEAVE_ERROR WeaveExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId,
+CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId,
         ExchangeContext::MessageReceiveFunct handler, bool allowDups, void *appState)
 {
     return RegisterUMH(profileId, (int16_t) -1, NULL, allowDups, handler, appState);
@@ -349,11 +348,11 @@ WEAVE_ERROR WeaveExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t pro
  *
  *  @param[in]    appState      A pointer to a higher layer object that holds context state.
  *
- *  @retval #WEAVE_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
+ *  @retval #CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
  *                                                             is full and a new one cannot be allocated.
- *  @retval #WEAVE_NO_ERROR On success.
+ *  @retval #CHIP_NO_ERROR On success.
  */
-WEAVE_ERROR WeaveExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType,
+CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType,
         ExchangeContext::MessageReceiveFunct handler, void *appState)
 {
     return RegisterUMH(profileId, (int16_t) msgType, NULL, false, handler, appState);
@@ -373,64 +372,64 @@ WEAVE_ERROR WeaveExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t pro
  *
  *  @param[in]    appState      A pointer to a higher layer object that holds context state.
  *
- *  @retval #WEAVE_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
+ *  @retval #CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
  *                                                             is full and a new one cannot be allocated.
- *  @retval #WEAVE_NO_ERROR On success.
+ *  @retval #CHIP_NO_ERROR On success.
  */
-WEAVE_ERROR WeaveExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType,
+CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType,
         ExchangeContext::MessageReceiveFunct handler, bool allowDups, void *appState)
 {
     return RegisterUMH(profileId, (int16_t) msgType, NULL, allowDups, handler, appState);
 }
 
 /**
- *  Register an unsolicited message handler for a given profile identifier, message type on a specified Weave
+ *  Register an unsolicited message handler for a given profile identifier, message type on a specified CHIP
  *  connection.
  *
  *  @param[in]    profileId     The profile identifier of the received message.
  *
  *  @param[in]    msgType       The message type of the corresponding profile.
  *
- *  @param[in]    con           A pointer to the WeaveConnection object representing the TCP connection
+ *  @param[in]    con           A pointer to the ChipConnection object representing the TCP connection
  *                              with the peer.
  *
  *  @param[in]    handler       The unsolicited message handler.
  *
  *  @param[in]    appState      A pointer to a higher layer object that holds context state.
  *
- *  @retval #WEAVE_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
+ *  @retval #CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
  *                                                             is full and a new one cannot be allocated.
- *  @retval #WEAVE_NO_ERROR On success.
+ *  @retval #CHIP_NO_ERROR On success.
  */
-WEAVE_ERROR WeaveExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, WeaveConnection *con,
+CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection *con,
         ExchangeContext::MessageReceiveFunct handler, void *appState)
 {
     return RegisterUMH(profileId, (int16_t) msgType, con, false, handler, appState);
 }
 
 /**
- *  Register an unsolicited message handler for a given profile identifier, message type on a specified Weave
+ *  Register an unsolicited message handler for a given profile identifier, message type on a specified CHIP
  *  connection.
  *
  *  @param[in]    profileId     The profile identifier of the received message.
  *
  *  @param[in]    msgType       The message type of the corresponding profile.
  *
- *  @param[in]    con           A pointer to the WeaveConnection object representing the TCP connection
+ *  @param[in]    con           A pointer to the ChipConnection object representing the TCP connection
  *                              with the peer.
  *
  *  @param[in]    handler       The unsolicited message handler.
  *
  *  @param[in]    allowDups     Boolean indicator of whether duplicate messages are allowed for a given
- *                              profile identifier, message type on a specified Weave connection.
+ *                              profile identifier, message type on a specified CHIP connection.
  *
  *  @param[in]    appState      A pointer to a higher layer object that holds context state.
  *
- *  @retval #WEAVE_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
+ *  @retval #CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
  *                                                             is full and a new one cannot be allocated.
- *  @retval #WEAVE_NO_ERROR On success.
+ *  @retval #CHIP_NO_ERROR On success.
  */
-WEAVE_ERROR WeaveExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, WeaveConnection *con,
+CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection *con,
         ExchangeContext::MessageReceiveFunct handler, bool allowDups, void *appState)
 {
     return RegisterUMH(profileId, (int16_t) msgType, con, allowDups, handler, appState);
@@ -441,11 +440,11 @@ WEAVE_ERROR WeaveExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t pro
  *
  *  @param[in]    profileId     The profile identifier of the received message.
  *
- *  @retval #WEAVE_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER  If the matching unsolicited message handler
+ *  @retval #CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER  If the matching unsolicited message handler
  *                                                       is not found.
- *  @retval #WEAVE_NO_ERROR On success.
+ *  @retval #CHIP_NO_ERROR On success.
  */
-WEAVE_ERROR WeaveExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t profileId)
+CHIP_ERROR ChipExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t profileId)
 {
     return UnregisterUMH(profileId, (int16_t) -1, NULL);
 }
@@ -457,64 +456,64 @@ WEAVE_ERROR WeaveExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t p
  *
  *  @param[in]    msgType       The message type of the corresponding profile.
  *
- *  @retval #WEAVE_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER  If the matching unsolicited message handler
+ *  @retval #CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER  If the matching unsolicited message handler
  *                                                       is not found.
- *  @retval #WEAVE_NO_ERROR On success.
+ *  @retval #CHIP_NO_ERROR On success.
  */
-WEAVE_ERROR WeaveExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType)
+CHIP_ERROR ChipExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType)
 {
     return UnregisterUMH(profileId, (int16_t) msgType, NULL);
 }
 
 /**
- *  Unregister an unsolicited message handler for a given profile identifier, message type, and Weave connection.
+ *  Unregister an unsolicited message handler for a given profile identifier, message type, and CHIP connection.
  *
  *  @param[in]    profileId     The profile identifier of the received message.
  *
  *  @param[in]    msgType       The message type of the corresponding profile.
  *
- *  @param[in]    con           A pointer to the WeaveConnection object representing the TCP connection
+ *  @param[in]    con           A pointer to the ChipConnection object representing the TCP connection
  *                              with the peer.
  *
- *  @retval #WEAVE_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER  If the matching unsolicited message handler
+ *  @retval #CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER  If the matching unsolicited message handler
  *                                                       is not found.
- *  @retval #WEAVE_NO_ERROR On success.
+ *  @retval #CHIP_NO_ERROR On success.
  */
-WEAVE_ERROR WeaveExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, WeaveConnection *con)
+CHIP_ERROR ChipExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection *con)
 {
     return UnregisterUMH(profileId, (int16_t) msgType, con);
 }
 
-void WeaveExchangeManager::HandleAcceptError(WeaveMessageLayer *msgLayer, WEAVE_ERROR err)
+void ChipExchangeManager::HandleAcceptError(ChipMessageLayer *msgLayer, CHIP_ERROR err)
 {
-    WeaveLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(err));
+    ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(err));
 }
 
-void WeaveExchangeManager::HandleConnectionReceived(WeaveConnection *con)
+void ChipExchangeManager::HandleConnectionReceived(ChipConnection *con)
 {
     // Hook the OnMessageReceived callback for new inbound connections.
     con->OnMessageReceived = HandleMessageReceived;
 }
 
-void WeaveExchangeManager::HandleConnectionClosed(WeaveConnection *con, WEAVE_ERROR conErr)
+void ChipExchangeManager::HandleConnectionClosed(ChipConnection *con, CHIP_ERROR conErr)
 {
-    for (int i = 0; i < WEAVE_CONFIG_MAX_BINDINGS; i++)
+    for (int i = 0; i < CHIP_CONFIG_MAX_BINDINGS; i++)
     {
         BindingPool[i].OnConnectionClosed(con, conErr);
     }
 
     ExchangeContext *ec = (ExchangeContext *) ContextPool;
-    for (int i = 0; i < WEAVE_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
+    for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
         if (ec->ExchangeMgr != NULL && ec->Con == con)
         {
             ec->HandleConnectionClosed(conErr);
         }
 
     UnsolicitedMessageHandler *umh = (UnsolicitedMessageHandler *) UMHandlerPool;
-    for (int i = 0; i < WEAVE_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
+    for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
         if (umh->Handler != NULL && umh->Con == con)
         {
-            SYSTEM_STATS_DECREMENT(nl::Weave::System::Stats::kExchangeMgr_NumUMHandlers);
+            SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumUMHandlers);
             umh->Handler = NULL;
         }
 }
@@ -525,12 +524,12 @@ void WeaveExchangeManager::HandleConnectionClosed(WeaveConnection *con, WEAVE_ER
  *
  * @return Number of timers found running.
  */
-#if WEAVE_CONFIG_TEST
-size_t WeaveExchangeManager::ExpireExchangeTimers(void)
+#if CHIP_CONFIG_TEST
+size_t ChipExchangeManager::ExpireExchangeTimers(void)
 {
     size_t retval = 0;
     ExchangeContext *ec = (ExchangeContext *) ContextPool;
-    for (int i = 0; i < WEAVE_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
+    for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
         if (ec->ExchangeMgr != NULL)
         {
@@ -547,14 +546,14 @@ size_t WeaveExchangeManager::ExpireExchangeTimers(void)
 }
 #endif
 
-ExchangeContext *WeaveExchangeManager::AllocContext()
+ExchangeContext *ChipExchangeManager::AllocContext()
 {
     ExchangeContext *ec = (ExchangeContext *) ContextPool;
 
-    WEAVE_FAULT_INJECT(FaultInjection::kFault_AllocExchangeContext,
+    CHIP_FAULT_INJECT(FaultInjection::kFault_AllocExchangeContext,
                        return NULL);
 
-    for (int i = 0; i < WEAVE_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
+    for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
         if (ec->ExchangeMgr == NULL)
         {
             *ec = ExchangeContext();
@@ -562,25 +561,25 @@ ExchangeContext *WeaveExchangeManager::AllocContext()
             ec->mRefCount = 1;
             mContextsInUse++;
             MessageLayer->SignalMessageLayerActivityChanged();
-#if defined(WEAVE_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-            WeaveLogProgress(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", EXCHANGE_CONTEXT_ID(ec - ContextPool), mContextsInUse, ec);
+#if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
+            ChipLogProgress(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", EXCHANGE_CONTEXT_ID(ec - ContextPool), mContextsInUse, ec);
 #endif
-            SYSTEM_STATS_INCREMENT(nl::Weave::System::Stats::kExchangeMgr_NumContexts);
+            SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 
             return ec;
         }
-    WeaveLogError(ExchangeManager, "Alloc ctxt FAILED");
+    ChipLogError(ExchangeManager, "Alloc ctxt FAILED");
     return NULL;
 }
 
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
-void WeaveExchangeManager::WRMPProcessDDMessage(uint32_t PauseTimeMillis, uint64_t DelayedNodeId)
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
+void ChipExchangeManager::WRMPProcessDDMessage(uint32_t PauseTimeMillis, uint64_t DelayedNodeId)
 {
     // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
     WRMPExpireTicks();
 
     //Go through the retrans table entries for that node and adjust the timer.
-    for (int i = 0; i < WEAVE_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
     {
         //Exchcontext is the sentinel object to ascertain validity of the element
         if (RetransTable[i].exchContext)
@@ -600,7 +599,7 @@ void WeaveExchangeManager::WRMPProcessDDMessage(uint32_t PauseTimeMillis, uint64
                 }
                 else
                 {
-                    WeaveLogError(ExchangeManager,
+                    ChipLogError(ExchangeManager,
                                   "No App Handler for Delayed Delivery for ExchangeContext with Id %04" PRIX16,
                                   RetransTable[i].exchContext->ExchangeId);
 
@@ -612,26 +611,26 @@ void WeaveExchangeManager::WRMPProcessDDMessage(uint32_t PauseTimeMillis, uint64
     // Schedule next physical wakeup
     WRMPStartTimer();
 }
-#endif // WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
-static void DefaultOnMessageReceived(ExchangeContext *ec, const IPPacketInfo *pktInfo, const WeaveMessageInfo *msgInfo, uint32_t profileId,
+static void DefaultOnMessageReceived(ExchangeContext *ec, const IPPacketInfo *pktInfo, const ChipMessageInfo *msgInfo, uint32_t profileId,
             uint8_t msgType, PacketBuffer *payload)
 {
-    WeaveLogError(ExchangeManager,
+    ChipLogError(ExchangeManager,
             "Dropping unexpected message %08" PRIX32 ":%d %04" PRIX16 " MsgId:%08" PRIX32,
             profileId, msgType, ec->ExchangeId, msgInfo->MessageId);
 
     PacketBuffer::Free(payload);
 }
 
-void WeaveExchangeManager::DispatchMessage(WeaveMessageInfo *msgInfo, PacketBuffer *msgBuf)
+void ChipExchangeManager::DispatchMessage(ChipMessageInfo *msgInfo, PacketBuffer *msgBuf)
 {
-    WeaveExchangeHeader exchangeHeader;
+    ChipExchangeHeader exchangeHeader;
     UnsolicitedMessageHandler *umh         = NULL;
     UnsolicitedMessageHandler *matchingUMH = NULL;
     ExchangeContext *ec                    = NULL;
-    WeaveConnection *msgCon                = NULL;
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+    ChipConnection *msgCon                = NULL;
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     const uint8_t      *p                  = NULL;
     uint32_t     PauseTimeMillis           = 0;
     uint64_t     DelayedNodeId             = 0;
@@ -639,40 +638,40 @@ void WeaveExchangeManager::DispatchMessage(WeaveMessageInfo *msgInfo, PacketBuff
     bool msgNeedsAck;
     bool sendAckAndCloseExchange;
 #endif
-#if WEAVE_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
+#if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
     bool isMsgCounterSyncResp;
     bool peerGroupMsgIdNotSynchronized;
 #endif
-    WEAVE_ERROR  err                       = WEAVE_NO_ERROR;
+    CHIP_ERROR  err                       = CHIP_NO_ERROR;
 
     // Decode the exchange header.
     err = DecodeHeader(&exchangeHeader, msgInfo, msgBuf);
     SuccessOrExit(err);
 
     //Check if the version is supported
-    if ((msgInfo->MessageVersion != kWeaveMessageVersion_V1) &&
-        (msgInfo->MessageVersion != kWeaveMessageVersion_V2))
+    if ((msgInfo->MessageVersion != kChipMessageVersion_V1) &&
+        (msgInfo->MessageVersion != kChipMessageVersion_V2))
     {
-        ExitNow(err = WEAVE_ERROR_UNSUPPORTED_MESSAGE_VERSION);
+        ExitNow(err = CHIP_ERROR_UNSUPPORTED_MESSAGE_VERSION);
     }
 
-    // Notify Weave Security Manager that encrypted message has been received.
-    if (msgInfo->EncryptionType != kWeaveEncryptionType_None)
+    // Notify CHIP Security Manager that encrypted message has been received.
+    if (msgInfo->EncryptionType != kChipEncryptionType_None)
     {
         MessageLayer->SecurityMgr->OnEncryptedMsgRcvd(msgInfo->KeyId, msgInfo->SourceNodeId, msgInfo->EncryptionType);
     }
 
     msgCon = msgInfo->InCon;
 
-    WeaveLogRetain(ExchangeManager, "Msg %s %08" PRIX32 ":%d %d %016" PRIX64 " %04" PRIX16 " %04" PRIX16 " %ld MsgId:%08" PRIX32,
+    ChipLogRetain(ExchangeManager, "Msg %s %08" PRIX32 ":%d %d %016" PRIX64 " %04" PRIX16 " %04" PRIX16 " %ld MsgId:%08" PRIX32,
                    "rcvd", exchangeHeader.ProfileId, exchangeHeader.MessageType,
                    (int)msgBuf->DataLength(), msgInfo->SourceNodeId, msgCon->LogId(), exchangeHeader.ExchangeId,
                    (long)err, msgInfo->MessageId);
 
-#if WEAVE_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
-    isMsgCounterSyncResp = exchangeHeader.ProfileId == nl::Weave::Profiles::kWeaveProfile_Security &&
-                           exchangeHeader.MessageType == nl::Weave::Profiles::Security::kMsgType_MsgCounterSyncResp;
-    peerGroupMsgIdNotSynchronized = (msgInfo->Flags & kWeaveMessageFlag_PeerGroupMsgIdNotSynchronized) != 0;
+#if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
+    isMsgCounterSyncResp = exchangeHeader.ProfileId == chip::Profiles::kChipProfile_Security &&
+                           exchangeHeader.MessageType == chip::Profiles::Security::kMsgType_MsgCounterSyncResp;
+    peerGroupMsgIdNotSynchronized = (msgInfo->Flags & kChipMessageFlag_PeerGroupMsgIdNotSynchronized) != 0;
 
     // If received message is a MsgCounterSyncResp process it first.
     if (isMsgCounterSyncResp)
@@ -682,11 +681,11 @@ void WeaveExchangeManager::DispatchMessage(WeaveMessageInfo *msgInfo, PacketBuff
     }
 
     // If message counter synchronization was requested.
-    if ((msgInfo->Flags & kWeaveMessageFlag_MsgCounterSyncReq) != 0)
+    if ((msgInfo->Flags & kChipMessageFlag_MsgCounterSyncReq) != 0)
     {
         MessageLayer->SecurityMgr->SendMsgCounterSyncResp(msgInfo, msgInfo->InPacketInfo);
 
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         // Retransmit all pending messages that were encrypted with application group key.
         RetransPendingAppGroupMsgs(msgInfo->SourceNodeId);
 #endif
@@ -702,15 +701,15 @@ void WeaveExchangeManager::DispatchMessage(WeaveMessageInfo *msgInfo, PacketBuff
     {
         ExitNow();
     }
-#endif // WEAVE_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
+#endif // CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
 
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     //Received Delayed Delivery Message: Extend time for pending retrans objects
-    if (exchangeHeader.ProfileId == nl::Weave::Profiles::kWeaveProfile_Common &&
-        exchangeHeader.MessageType == nl::Weave::Profiles::Common::kMsgType_WRMP_Delayed_Delivery)
+    if (exchangeHeader.ProfileId == chip::Profiles::kChipProfile_Common &&
+        exchangeHeader.MessageType == chip::Profiles::Common::kMsgType_WRMP_Delayed_Delivery)
     {
         // Process Delayed Delivery message if it is not a duplicate.
-        if ((msgInfo->Flags & kWeaveMessageFlag_DuplicateMessage) == 0)
+        if ((msgInfo->Flags & kChipMessageFlag_DuplicateMessage) == 0)
         {
             p = msgBuf->Start();
 
@@ -721,17 +720,17 @@ void WeaveExchangeManager::DispatchMessage(WeaveMessageInfo *msgInfo, PacketBuff
         }
 
         //Return after processing Delayed Delivery message
-        ExitNow(err = WEAVE_NO_ERROR);
+        ExitNow(err = CHIP_NO_ERROR);
     }//If delayed delivery Msg
 #endif
 
     // Search for an existing exchange that the message applies to. If a match is found...
     ec = (ExchangeContext *) ContextPool;
-    for (int i = 0; i < WEAVE_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
+    for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
         if (ec->ExchangeMgr != NULL && ec->MatchExchange(msgCon, msgInfo, &exchangeHeader))
         {
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
             // Found a matching exchange. Set flag for correct subsequent WRM
             // retransmission timeout selection.
             if (!ec->HasRcvdMsgFromPeer())
@@ -745,20 +744,20 @@ void WeaveExchangeManager::DispatchMessage(WeaveMessageInfo *msgInfo, PacketBuff
 
             msgBuf = NULL;
 
-            ExitNow(err = WEAVE_NO_ERROR);
+            ExitNow(err = CHIP_NO_ERROR);
         }
     }
 
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     // Is message a duplicate that needs ack.
-    msgNeedsAck = exchangeHeader.Flags & kWeaveExchangeFlag_NeedsAck;
-    dupMsg = (msgInfo->Flags & kWeaveMessageFlag_DuplicateMessage);
+    msgNeedsAck = exchangeHeader.Flags & kChipExchangeFlag_NeedsAck;
+    dupMsg = (msgInfo->Flags & kChipMessageFlag_DuplicateMessage);
 #endif
 
     // Search for an unsolicited message handler if it marked as being sent by an initiator. Since we didn't
     // find an existing exchange that matches the message, it must be an unsolicited message. However all
     // unsolicited messages must be marked as being from an initiator.
-    if (exchangeHeader.Flags & kWeaveExchangeFlag_Initiator)
+    if (exchangeHeader.Flags & kChipExchangeFlag_Initiator)
     {
         // Search for an unsolicited message handler that can handle the message. Prefer handlers that can explicitly
         // handle the message type over handlers that handle all messages for a profile.
@@ -766,9 +765,9 @@ void WeaveExchangeManager::DispatchMessage(WeaveMessageInfo *msgInfo, PacketBuff
 
         matchingUMH = NULL;
 
-        for (int i = 0; i < WEAVE_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
+        for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
             if (umh->Handler != NULL && umh->ProfileId == exchangeHeader.ProfileId && (umh->Con == NULL || umh->Con == msgCon)
-                && (!(msgInfo->Flags & kWeaveMessageFlag_DuplicateMessage) || umh->AllowDuplicateMsgs))
+                && (!(msgInfo->Flags & kChipMessageFlag_DuplicateMessage) || umh->AllowDuplicateMsgs))
             {
                 if (umh->MessageType == exchangeHeader.MessageType)
                 {
@@ -784,10 +783,10 @@ void WeaveExchangeManager::DispatchMessage(WeaveMessageInfo *msgInfo, PacketBuff
     // that needs to send ack to the peer.
     else
     {
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         if (!msgNeedsAck)
 #endif
-            ExitNow(err = WEAVE_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
+            ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
     }
 
     // If no existing exchange that the message applies to was found we need to create
@@ -802,11 +801,11 @@ void WeaveExchangeManager::DispatchMessage(WeaveMessageInfo *msgInfo, PacketBuff
     //       N      |     Y    |    -    |     -     | Create EC, ec->HandleMessage() sends ack (if needed) and App callback.
     //       N      |     N    |    -    |     -     | Do nothing.
 
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     // Create new exchange to send ack for a duplicate message and then close this exchange.
     sendAckAndCloseExchange = msgNeedsAck && (matchingUMH == NULL || (dupMsg && !matchingUMH->AllowDuplicateMsgs));
 
-#if WEAVE_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
+#if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
     // Don't create new EC only to send an ack if Peer's message counter synchronization is required.
     if (peerGroupMsgIdNotSynchronized)
         sendAckAndCloseExchange = false;
@@ -815,7 +814,7 @@ void WeaveExchangeManager::DispatchMessage(WeaveMessageInfo *msgInfo, PacketBuff
 
     // If we found a handler or we need to open a new exchange to send ack for a duplicate message.
     if (matchingUMH != NULL
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         || sendAckAndCloseExchange
 #endif
        )
@@ -823,7 +822,7 @@ void WeaveExchangeManager::DispatchMessage(WeaveMessageInfo *msgInfo, PacketBuff
         ExchangeContext::MessageReceiveFunct umhandler = NULL;
 
         ec = AllocContext();
-        VerifyOrExit(ec != NULL, err = WEAVE_ERROR_NO_MEMORY);
+        VerifyOrExit(ec != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         ec->Con = msgCon;
         ec->ExchangeId = exchangeHeader.ExchangeId;
@@ -848,7 +847,7 @@ void WeaveExchangeManager::DispatchMessage(WeaveMessageInfo *msgInfo, PacketBuff
         }
         ec->EncryptionType = msgInfo->EncryptionType;
         ec->KeyId = msgInfo->KeyId;
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         // No need to set WRMP timer, this will be done when we add to retrans table
         ec->mWRMPNextAckTime = 0;
         ec->SetAckPending(false);
@@ -863,7 +862,7 @@ void WeaveExchangeManager::DispatchMessage(WeaveMessageInfo *msgInfo, PacketBuff
         ec->mMsgProtocolVersion = msgInfo->MessageVersion;
 
         // If UMH was found and the exchange is created not just for sending ack.
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         if (!sendAckAndCloseExchange)
 #endif
         {
@@ -874,23 +873,23 @@ void WeaveExchangeManager::DispatchMessage(WeaveMessageInfo *msgInfo, PacketBuff
             ec->OnMessageReceived = DefaultOnMessageReceived;
             ec->AllowDuplicateMsgs = matchingUMH->AllowDuplicateMsgs;
 
-            WeaveLogProgress(ExchangeManager, "ec id: %d, AppState: 0x%x", EXCHANGE_CONTEXT_ID(ec - ContextPool), ec->AppState);
+            ChipLogProgress(ExchangeManager, "ec id: %d, AppState: 0x%x", EXCHANGE_CONTEXT_ID(ec - ContextPool), ec->AppState);
         }
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         // If the exchange is created only to send ack.
         else
         {
             // If rcvd msg is from initiator then this exchange is created as not Initiator (argument to SetInitiator() is false).
             // If rcvd msg is not from initiator then this exchange is created as Initiator (argument to SetInitiator() is true).
-            ec->SetInitiator((exchangeHeader.Flags & kWeaveExchangeFlag_Initiator) == 0);
+            ec->SetInitiator((exchangeHeader.Flags & kChipExchangeFlag_Initiator) == 0);
         }
 #endif
 
         // If support for ephemeral UDP ports is enabled, arrange to send outbound messages on this exchange from the
         // local ephemeral UDP port IF the inbound message that initiated the exchange was sent TO the local ephemeral port.
-#if WEAVE_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
-        ec->SetUseEphemeralUDPPort(GetFlag(msgInfo->Flags, kWeaveMessageFlag_ViaEphemeralUDPPort));
-#endif // WEAVE_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
+#if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
+        ec->SetUseEphemeralUDPPort(GetFlag(msgInfo->Flags, kChipMessageFlag_ViaEphemeralUDPPort));
+#endif // CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
 
         // Add a reservation for the message encryption key.  This will ensure the key is not removed until the exchange is freed.
         MessageLayer->SecurityMgr->ReserveKey(ec->PeerNodeId, ec->KeyId);
@@ -901,7 +900,7 @@ void WeaveExchangeManager::DispatchMessage(WeaveMessageInfo *msgInfo, PacketBuff
         ec->HandleMessage(msgInfo, &exchangeHeader, msgBuf, umhandler);
         msgBuf = NULL;
 
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         // Close exchange if it was created only to send ack for a duplicate message.
         if (sendAckAndCloseExchange)
             ec->Close();
@@ -909,9 +908,9 @@ void WeaveExchangeManager::DispatchMessage(WeaveMessageInfo *msgInfo, PacketBuff
     }
 
 exit:
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
-        WeaveLogError(ExchangeManager, "DispatchMessage failed, err = %d", err);
+        ChipLogError(ExchangeManager, "DispatchMessage failed, err = %d", err);
     }
 
     if (msgBuf != NULL)
@@ -922,12 +921,12 @@ exit:
     return;
 }
 
-WEAVE_ERROR WeaveExchangeManager::RegisterUMH(uint32_t profileId, int16_t msgType, WeaveConnection *con, bool allowDups,
+CHIP_ERROR ChipExchangeManager::RegisterUMH(uint32_t profileId, int16_t msgType, ChipConnection *con, bool allowDups,
         ExchangeContext::MessageReceiveFunct handler, void *appState)
 {
     UnsolicitedMessageHandler *umh = (UnsolicitedMessageHandler *) UMHandlerPool;
     UnsolicitedMessageHandler *selected = NULL;
-    for (int i = 0; i < WEAVE_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
+    for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
     {
         if (umh->Handler == NULL)
         {
@@ -938,12 +937,12 @@ WEAVE_ERROR WeaveExchangeManager::RegisterUMH(uint32_t profileId, int16_t msgTyp
         {
             umh->Handler = handler;
             umh->AppState = appState;
-            return WEAVE_NO_ERROR;
+            return CHIP_NO_ERROR;
         }
     }
 
     if (selected == NULL)
-        return WEAVE_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS;
+        return CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS;
 
     selected->Handler = handler;
     selected->AppState = appState;
@@ -952,53 +951,53 @@ WEAVE_ERROR WeaveExchangeManager::RegisterUMH(uint32_t profileId, int16_t msgTyp
     selected->MessageType = msgType;
     selected->AllowDuplicateMsgs = allowDups;
 
-    SYSTEM_STATS_INCREMENT(nl::Weave::System::Stats::kExchangeMgr_NumUMHandlers);
+    SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumUMHandlers);
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-WEAVE_ERROR WeaveExchangeManager::UnregisterUMH(uint32_t profileId, int16_t msgType, WeaveConnection *con)
+CHIP_ERROR ChipExchangeManager::UnregisterUMH(uint32_t profileId, int16_t msgType, ChipConnection *con)
 {
     UnsolicitedMessageHandler *umh = (UnsolicitedMessageHandler *) UMHandlerPool;
-    for (int i = 0; i < WEAVE_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
+    for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
     {
         if (umh->Handler != NULL && umh->ProfileId == profileId && umh->MessageType == msgType && umh->Con == con)
         {
             umh->Handler = NULL;
-            SYSTEM_STATS_DECREMENT(nl::Weave::System::Stats::kExchangeMgr_NumUMHandlers);
-            return WEAVE_NO_ERROR;
+            SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumUMHandlers);
+            return CHIP_NO_ERROR;
         }
     }
-    return WEAVE_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER;
+    return CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER;
 }
 
-void WeaveExchangeManager::HandleMessageReceived(WeaveMessageLayer *msgLayer, WeaveMessageInfo *msgInfo, PacketBuffer *msgBuf)
+void ChipExchangeManager::HandleMessageReceived(ChipMessageLayer *msgLayer, ChipMessageInfo *msgInfo, PacketBuffer *msgBuf)
 {
     msgLayer->ExchangeMgr->DispatchMessage(msgInfo, msgBuf);
 }
 
-void WeaveExchangeManager::HandleMessageReceived(WeaveConnection *con, WeaveMessageInfo *msgInfo, PacketBuffer *msgBuf)
+void ChipExchangeManager::HandleMessageReceived(ChipConnection *con, ChipMessageInfo *msgInfo, PacketBuffer *msgBuf)
 {
     con->MessageLayer->ExchangeMgr->DispatchMessage(msgInfo, msgBuf);
 }
 
-WEAVE_ERROR WeaveExchangeManager::PrependHeader(WeaveExchangeHeader *exchangeHeader, PacketBuffer *buf)
+CHIP_ERROR ChipExchangeManager::PrependHeader(ChipExchangeHeader *exchangeHeader, PacketBuffer *buf)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     uint16_t headLen = 8; //Constant part: Version/Flags + Msg Type + Exch Id + Profile Id
     uint8_t *p = NULL;
 
-    // Make sure the buffer has a reserved size big enough to hold the full Weave header.
-    if (!buf->EnsureReservedSize(WEAVE_HEADER_RESERVE_SIZE))
-        ExitNow(err = WEAVE_ERROR_BUFFER_TOO_SMALL);
+    // Make sure the buffer has a reserved size big enough to hold the full CHIP header.
+    if (!buf->EnsureReservedSize(CHIP_HEADER_RESERVE_SIZE))
+        ExitNow(err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Verify the right application version is selected.
-    if (exchangeHeader->Version != kWeaveExchangeVersion_V1)
-        ExitNow(err = WEAVE_ERROR_UNSUPPORTED_EXCHANGE_VERSION);
+    if (exchangeHeader->Version != kChipExchangeVersion_V1)
+        ExitNow(err = CHIP_ERROR_UNSUPPORTED_EXCHANGE_VERSION);
 
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     //Compute the Header Len
-    if (exchangeHeader->Flags & kWeaveExchangeFlag_AckId)
+    if (exchangeHeader->Flags & kChipExchangeFlag_AckId)
     {
         headLen += 4;
     }
@@ -1012,29 +1011,29 @@ WEAVE_ERROR WeaveExchangeManager::PrependHeader(WeaveExchangeHeader *exchangeHea
     // Adjust the buffer so that the start points to the start of the encoded message.
     buf->SetStart(p);
 
-    // Encode the Weave application header
+    // Encode the CHIP application header
     Write8(p, ((exchangeHeader->Version << 4) | (exchangeHeader->Flags & 0xF)));
     Write8(p, exchangeHeader->MessageType);
     LittleEndian::Write16(p, exchangeHeader->ExchangeId);
     LittleEndian::Write32(p, exchangeHeader->ProfileId);
 
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
-    if (exchangeHeader->Flags & kWeaveExchangeFlag_AckId)
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
+    if (exchangeHeader->Flags & kChipExchangeFlag_AckId)
     {
         LittleEndian::Write32(p, exchangeHeader->AckMsgId);
     }
 #endif
 
-    WEAVE_FAULT_INJECT_MAX_ARG(FaultInjection::kFault_FuzzExchangeHeaderTx,
+    CHIP_FAULT_INJECT_MAX_ARG(FaultInjection::kFault_FuzzExchangeHeaderTx,
             // The FuzzExchangeHeader function takes as argument an index (0 to n-1) into a
             // (logical) array of fuzzing cases, because every field of the header can be fuzzed in 3
             // different ways. Therefore, the max index that can be used for the
             // message being sent depends on the number of fields in the header.
             // There are 4 fields, unless the AckMsgId field is present as
             // well, for a total of 5.
-                ((exchangeHeader->Flags & kWeaveExchangeFlag_AckId ?
-                   WEAVE_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS :
-                   WEAVE_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS_WRMP) * WEAVE_FAULT_INJECTION_NUM_FUZZ_VALUES) -1,
+                ((exchangeHeader->Flags & kChipExchangeFlag_AckId ?
+                   CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS :
+                   CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS_WRMP) * CHIP_FAULT_INJECTION_NUM_FUZZ_VALUES) -1,
                 int32_t arg = 0;
                 if (numFaultArgs > 0)
                 {
@@ -1042,26 +1041,26 @@ WEAVE_ERROR WeaveExchangeManager::PrependHeader(WeaveExchangeHeader *exchangeHea
                 }
             ,
             // Code executed without the Manager's lock:
-                nl::Weave::FaultInjection::FuzzExchangeHeader(buf->Start(), arg);
+                chip::FaultInjection::FuzzExchangeHeader(buf->Start(), arg);
             );
 
 exit:
     return err;
 }
 
-WEAVE_ERROR WeaveExchangeManager::DecodeHeader(WeaveExchangeHeader *exchangeHeader, WeaveMessageInfo *msgInfo, PacketBuffer *buf)
+CHIP_ERROR ChipExchangeManager::DecodeHeader(ChipExchangeHeader *exchangeHeader, ChipMessageInfo *msgInfo, PacketBuffer *buf)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     uint8_t *p = NULL;
     uint8_t versionFlags;
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     uint16_t msgLen = buf->DataLength();
     uint8_t *msgEnd = buf->Start() + msgLen;
 #endif
 
     if (buf->DataLength() < 8)
-        ExitNow(err = WEAVE_ERROR_INVALID_MESSAGE_LENGTH);
+        ExitNow(err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     p = buf->Start();
 
@@ -1069,8 +1068,8 @@ WEAVE_ERROR WeaveExchangeManager::DecodeHeader(WeaveExchangeHeader *exchangeHead
     exchangeHeader->Version = versionFlags >> 4;
     exchangeHeader->Flags = versionFlags & 0xF;
 
-    if (exchangeHeader->Version != kWeaveExchangeVersion_V1)
-        ExitNow(err = WEAVE_ERROR_UNSUPPORTED_EXCHANGE_VERSION);
+    if (exchangeHeader->Version != kChipExchangeVersion_V1)
+        ExitNow(err = CHIP_ERROR_UNSUPPORTED_EXCHANGE_VERSION);
 
     exchangeHeader->MessageType = Read8(p);
 
@@ -1078,18 +1077,18 @@ WEAVE_ERROR WeaveExchangeManager::DecodeHeader(WeaveExchangeHeader *exchangeHead
 
     exchangeHeader->ProfileId = LittleEndian::Read32(p);
 
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
-    if ((exchangeHeader->Flags & kWeaveExchangeFlag_AckId))
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
+    if ((exchangeHeader->Flags & kChipExchangeFlag_AckId))
     {
         if ((p + 4) > msgEnd)
-            ExitNow(err = WEAVE_ERROR_INVALID_MESSAGE_LENGTH);
+            ExitNow(err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
         exchangeHeader->AckMsgId = LittleEndian::Read32(p);
     }
 #endif
 
     buf->SetStart(p);
 
-    SetFlag(msgInfo->Flags, kWeaveMessageFlag_FromInitiator, GetFlag(exchangeHeader->Flags, kWeaveExchangeFlag_Initiator));
+    SetFlag(msgInfo->Flags, kChipMessageFlag_FromInitiator, GetFlag(exchangeHeader->Flags, kChipExchangeFlag_Initiator));
 
 exit:
     return err;
@@ -1097,12 +1096,12 @@ exit:
 
 /**
  *  Allow unsolicited messages to be received on the specified connection. This
- *  method sets the message reception handler on the given Weave connection.
+ *  method sets the message reception handler on the given CHIP connection.
  *
- *  @param[in]    con           A pointer to the Weave connection object.
+ *  @param[in]    con           A pointer to the CHIP connection object.
  *
  */
-void WeaveExchangeManager::AllowUnsolicitedMessages(WeaveConnection *con)
+void ChipExchangeManager::AllowUnsolicitedMessages(ChipConnection *con)
 {
     // Hook the OnMessageReceived callback.
     con->OnMessageReceived = HandleMessageReceived;
@@ -1114,18 +1113,18 @@ void WeaveExchangeManager::AllowUnsolicitedMessages(WeaveConnection *con)
  *
  *  @param[in] peerNodeId  The ID of the peer node with which the key is associated.
  *  @param[in] keyId       The ID of the key that has failed.
- *  @param[in] keyErr      A WEAVE_ERROR representing the reason the key is no longer valid.
+ *  @param[in] keyErr      A CHIP_ERROR representing the reason the key is no longer valid.
  *
  */
-void WeaveExchangeManager::NotifyKeyFailed(uint64_t peerNodeId, uint16_t keyId, WEAVE_ERROR keyErr)
+void ChipExchangeManager::NotifyKeyFailed(uint64_t peerNodeId, uint16_t keyId, CHIP_ERROR keyErr)
 {
     ExchangeContext *ec = (ExchangeContext *) ContextPool;
 
-    for (int i = 0; i < WEAVE_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
+    for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
         if (ec->ExchangeMgr != NULL && ec->KeyId == keyId && ec->PeerNodeId == peerNodeId)
         {
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
             // Ensure the exchange context stays around until we're done with it.
             ec->AddRef();
 
@@ -1137,14 +1136,14 @@ void WeaveExchangeManager::NotifyKeyFailed(uint64_t peerNodeId, uint16_t keyId, 
             if (ec->OnKeyError)
                 ec->OnKeyError(ec, keyErr);
 
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
             // Release reference to the exchange context.
             ec->Release();
 #endif
         }
     }
 
-    for (int i = 0; i < WEAVE_CONFIG_MAX_BINDINGS; i++)
+    for (int i = 0; i < CHIP_CONFIG_MAX_BINDINGS; i++)
     {
         BindingPool[i].OnKeyFailed(peerNodeId, keyId, keyErr);
     }
@@ -1153,37 +1152,37 @@ void WeaveExchangeManager::NotifyKeyFailed(uint64_t peerNodeId, uint16_t keyId, 
 /**
  *  Invoked when the security manager becomes available for initiating new secure sessions.
  */
-void WeaveExchangeManager::NotifySecurityManagerAvailable()
+void ChipExchangeManager::NotifySecurityManagerAvailable()
 {
     // Notify each binding that the security manager is now available.
     //
     // Note that this algorithm is unfair to bindings that are positioned later in the pool.
     // In practice, however, this is unlikely to cause any problems.
-    for (int i = 0; i < WEAVE_CONFIG_MAX_BINDINGS; i++)
+    for (int i = 0; i < CHIP_CONFIG_MAX_BINDINGS; i++)
     {
         BindingPool[i].OnSecurityManagerAvailable();
     }
 }
 
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 /**
  *  Clear MsgCounterSyncReq flag for all pending messages to that peer.
  *
  *  @param[in] peerNodeId    Node ID of the destination node.
  *
  */
-void WeaveExchangeManager::ClearMsgCounterSyncReq(uint64_t peerNodeId)
+void ChipExchangeManager::ClearMsgCounterSyncReq(uint64_t peerNodeId)
 {
     RetransTableEntry *re = (RetransTableEntry *) RetransTable;
 
     // Find all retransmit entries (re) matching peerNodeId and using application group key.
-    for (int i = 0; i < WEAVE_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++, re++)
+    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++, re++)
     {
-        if (re->exchContext != NULL && re->exchContext->PeerNodeId == peerNodeId && WeaveKeyId::IsAppGroupKey(re->exchContext->KeyId))
+        if (re->exchContext != NULL && re->exchContext->PeerNodeId == peerNodeId && ChipKeyId::IsAppGroupKey(re->exchContext->KeyId))
         {
             // Clear MsgCounterSyncReq flag.
             uint16_t headerField = LittleEndian::Get16(re->msgBuf->Start());
-            headerField &= ~kWeaveMessageFlag_MsgCounterSyncReq;
+            headerField &= ~kChipMessageFlag_MsgCounterSyncReq;
             LittleEndian::Put16(re->msgBuf->Start(), headerField);
         }
     }
@@ -1196,14 +1195,14 @@ void WeaveExchangeManager::ClearMsgCounterSyncReq(uint64_t peerNodeId)
  *  @param[in] peerNodeId    Node ID of the destination node.
  *
  */
-void WeaveExchangeManager::RetransPendingAppGroupMsgs(uint64_t peerNodeId)
+void ChipExchangeManager::RetransPendingAppGroupMsgs(uint64_t peerNodeId)
 {
     RetransTableEntry *re = (RetransTableEntry *) RetransTable;
 
     // Find all retransmit entries (re) matching peerNodeId and using application group key.
-    for (int i = 0; i < WEAVE_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++, re++)
+    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++, re++)
     {
-        if (re->exchContext != NULL && re->exchContext->PeerNodeId == peerNodeId && WeaveKeyId::IsAppGroupKey(re->exchContext->KeyId))
+        if (re->exchContext != NULL && re->exchContext->PeerNodeId == peerNodeId && ChipKeyId::IsAppGroupKey(re->exchContext->KeyId))
         {
             // Decrement counter to discount the first sent message, which
             // was ignored by receiver due to un-synchronized message counter.
@@ -1228,12 +1227,12 @@ void WeaveExchangeManager::RetransPendingAppGroupMsgs(uint64_t peerNodeId)
 *
 * @return Tick count for the time delta.
 */
-uint32_t WeaveExchangeManager::GetTickCounterFromTimeDelta (uint64_t newTime,
+uint32_t ChipExchangeManager::GetTickCounterFromTimeDelta (uint64_t newTime,
                                                             uint64_t oldTime)
 {
     // Note on math: we have a utility function that will compute U64 var / U32
     // compile-time const => U32.  At the moment, we are leaving
-    // mWRMPTimerInterval as a member variable in WeaveExchangeManager, however,
+    // mWRMPTimerInterval as a member variable in ChipExchangeManager, however,
     // given its current usage, it could be replaced by a compile time const.
     // Should we make that change, I would recommend making the timeDelta a u64,
     // and replacing the plain 32-bit division below with the utility function.
@@ -1247,15 +1246,15 @@ uint32_t WeaveExchangeManager::GetTickCounterFromTimeDelta (uint64_t newTime,
 }
 
 #if defined(WRMP_TICKLESS_DEBUG)
-void WeaveExchangeManager::TicklessDebugDumpRetransTable(const char *log)
+void ChipExchangeManager::TicklessDebugDumpRetransTable(const char *log)
 {
-     WeaveLogProgress(ExchangeManager, log);
+     ChipLogProgress(ExchangeManager, log);
 
-     for (int i = 0; i < WEAVE_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+     for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
      {
          if (RetransTable[i].exchContext)
          {
-             WeaveLogProgress(ExchangeManager, "EC:%04" PRIX16 " MsgId:%08" PRIX32 " NextRetransTimeCtr:%04" PRIX16,
+             ChipLogProgress(ExchangeManager, "EC:%04" PRIX16 " MsgId:%08" PRIX32 " NextRetransTimeCtr:%04" PRIX16,
                               RetransTable[i].exchContext,
                               RetransTable[i].msgId,
                               RetransTable[i].nextRetransTime);
@@ -1263,7 +1262,7 @@ void WeaveExchangeManager::TicklessDebugDumpRetransTable(const char *log)
      }
 }
 #else
-void WeaveExchangeManager::TicklessDebugDumpRetransTable(const char *log) { return; }
+void ChipExchangeManager::TicklessDebugDumpRetransTable(const char *log) { return; }
 #endif // WRMP_TICKLESS_DEBUG
 
 /**
@@ -1272,7 +1271,7 @@ void WeaveExchangeManager::TicklessDebugDumpRetransTable(const char *log) { retu
 * that action.
 *
 */
-void WeaveExchangeManager::WRMPExecuteActions(void)
+void ChipExchangeManager::WRMPExecuteActions(void)
 {
     ExchangeContext *ec               = NULL;
 
@@ -1280,17 +1279,17 @@ void WeaveExchangeManager::WRMPExecuteActions(void)
     ec = (ExchangeContext *)ContextPool;
 
 #if defined(WRMP_TICKLESS_DEBUG)
-    WeaveLogProgress(ExchangeManager, "WRMPExecuteActions");
+    ChipLogProgress(ExchangeManager, "WRMPExecuteActions");
 #endif
 
-    for (int i = 0; i < WEAVE_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
+    for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
         if (ec->ExchangeMgr != NULL && ec->IsAckPending())
         {
             if (0 == ec->mWRMPNextAckTime)
             {
 #if defined(WRMP_TICKLESS_DEBUG)
-                WeaveLogProgress(ExchangeManager, "WRMPExecuteActions sending ACK");
+                ChipLogProgress(ExchangeManager, "WRMPExecuteActions sending ACK");
 #endif
                 //Send the Ack in a Common::Null message
                 ec->SendCommonNullMessage();
@@ -1303,12 +1302,12 @@ void WeaveExchangeManager::WRMPExecuteActions(void)
 
     // Retransmit / cancel anything in the retrans table whose retrans timeout
     // has expired
-    for (int i = 0; i < WEAVE_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
     {
         ec = RetransTable[i].exchContext;
         if (ec)
         {
-            WEAVE_ERROR err = WEAVE_NO_ERROR;
+            CHIP_ERROR err = CHIP_NO_ERROR;
 
             if (0 == RetransTable[i].nextRetransTime)
             {
@@ -1317,32 +1316,32 @@ void WeaveExchangeManager::WRMPExecuteActions(void)
 
                 if (sendCount > ec->mWRMPConfig.mMaxRetrans)
                 {
-                    err = WEAVE_ERROR_MESSAGE_NOT_ACKNOWLEDGED;
+                    err = CHIP_ERROR_MESSAGE_NOT_ACKNOWLEDGED;
 
-                    WeaveLogError(ExchangeManager, "Failed to Send Weave MsgId:%08" PRIX32 " sendCount: %" PRIu8 " max retries: %" PRIu8,
+                    ChipLogError(ExchangeManager, "Failed to Send CHIP MsgId:%08" PRIX32 " sendCount: %" PRIu8 " max retries: %" PRIu8,
                                   RetransTable[i].msgId, sendCount, ec->mWRMPConfig.mMaxRetrans);
 
                     // Remove from Table
                     ClearRetransmitTable(RetransTable[i]);
                 }
 
-                if (err == WEAVE_NO_ERROR)
+                if (err == CHIP_NO_ERROR)
                 {
                     // Resend from Table (if the operation fails, the entry is cleared)
                     err = SendFromRetransTable(&(RetransTable[i]));
                 }
 
-                if (err == WEAVE_NO_ERROR)
+                if (err == CHIP_NO_ERROR)
                 {
                     // If the retransmission was successful, update the passive timer
                     RetransTable[i].nextRetransTime = ec->GetCurrentRetransmitTimeout() / mWRMPTimerInterval;
 #if defined(DEBUG)
-                    WeaveLogProgress(ExchangeManager, "Retransmit MsgId:%08" PRIX32 " Send Cnt %d",
+                    ChipLogProgress(ExchangeManager, "Retransmit MsgId:%08" PRIX32 " Send Cnt %d",
                             RetransTable[i].msgId, RetransTable[i].sendCount);
 #endif
                 }
 
-                if (err != WEAVE_NO_ERROR)
+                if (err != CHIP_NO_ERROR)
                 {
                     if (ec->OnSendError)
                     {
@@ -1365,7 +1364,7 @@ void WeaveExchangeManager::WRMPExecuteActions(void)
 * WRMP timer tick expiry.
 *
 */
-void WeaveExchangeManager::WRMPExpireTicks(void)
+void ChipExchangeManager::WRMPExpireTicks(void)
 {
     uint64_t            now         = 0;
     ExchangeContext*    ec          = NULL;
@@ -1389,10 +1388,10 @@ void WeaveExchangeManager::WRMPExpireTicks(void)
     // against underflow.
 
 #if defined(WRMP_TICKLESS_DEBUG)
-    WeaveLogProgress(ExchangeManager, "WRMPExpireTicks at %" PRIu64 ", %" PRIu64 ", %u", now, mWRMPTimeStampBase, deltaTicks);
+    ChipLogProgress(ExchangeManager, "WRMPExpireTicks at %" PRIu64 ", %" PRIu64 ", %u", now, mWRMPTimeStampBase, deltaTicks);
 #endif
 
-    for (int i = 0; i < WEAVE_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
+    for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
         if (ec->ExchangeMgr != NULL && ec->IsAckPending())
         {
@@ -1406,14 +1405,14 @@ void WeaveExchangeManager::WRMPExpireTicks(void)
                 ec->mWRMPNextAckTime = 0;
             }
 #if defined(WRMP_TICKLESS_DEBUG)
-            WeaveLogProgress(ExchangeManager, "WRMPExpireTicks set mWRMPNextAckTime to %u", ec->mWRMPNextAckTime);
+            ChipLogProgress(ExchangeManager, "WRMPExpireTicks set mWRMPNextAckTime to %u", ec->mWRMPNextAckTime);
 #endif
         }
     }
 
     //Process Throttle Time
     //Check Throttle timeout stored in EC to set/unset Throttle flag
-    for (int i = 0; i < WEAVE_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
     {
         ec = RetransTable[i].exchContext;
         if (ec)
@@ -1429,7 +1428,7 @@ void WeaveExchangeManager::WRMPExpireTicks(void)
                 ec->mWRMPThrottleTimeout = 0;
             }
 #if defined(WRMP_TICKLESS_DEBUG)
-            WeaveLogProgress(ExchangeManager, "WRMPExpireTicks set mWRMPThrottleTimeout to %u", RetransTable[i].nextRetransTime);
+            ChipLogProgress(ExchangeManager, "WRMPExpireTicks set mWRMPThrottleTimeout to %u", RetransTable[i].nextRetransTime);
 #endif
 
             //Decrement Retransmit timeout by elapsed timeticks
@@ -1442,7 +1441,7 @@ void WeaveExchangeManager::WRMPExpireTicks(void)
                 RetransTable[i].nextRetransTime = 0;
             }
 #if defined(WRMP_TICKLESS_DEBUG)
-            WeaveLogProgress(ExchangeManager, "WRMPExpireTicks set nextRetransTime to %u", RetransTable[i].nextRetransTime);
+            ChipLogProgress(ExchangeManager, "WRMPExpireTicks set nextRetransTime to %u", RetransTable[i].nextRetransTime);
 #endif
         } //ec entry is allocated
     }
@@ -1459,7 +1458,7 @@ void WeaveExchangeManager::WRMPExpireTicks(void)
     // const ==> U32
     mWRMPTimeStampBase += static_cast<uint64_t>(deltaTicks) * mWRMPTimerInterval;
 #if defined(WRMP_TICKLESS_DEBUG)
-    WeaveLogProgress(ExchangeManager, "WRMPExpireTicks mWRMPTimeStampBase to %" PRIu64, mWRMPTimeStampBase);
+    ChipLogProgress(ExchangeManager, "WRMPExpireTicks mWRMPTimeStampBase to %" PRIu64, mWRMPTimeStampBase);
 #endif
 }
 
@@ -1467,14 +1466,14 @@ void WeaveExchangeManager::WRMPExpireTicks(void)
  * Handle physical wakeup of system due to WRMP wakeup.
  *
  */
-void WeaveExchangeManager::WRMPTimeout(System::Layer* aSystemLayer, void* aAppState,  System::Error aError)
+void ChipExchangeManager::WRMPTimeout(System::Layer* aSystemLayer, void* aAppState,  System::Error aError)
 {
-    WeaveExchangeManager*   exchangeMgr             = reinterpret_cast<WeaveExchangeManager*>(aAppState);
+    ChipExchangeManager*   exchangeMgr             = reinterpret_cast<ChipExchangeManager*>(aAppState);
 
     VerifyOrDie((aSystemLayer != NULL) && (exchangeMgr != NULL));
 
 #if defined(WRMP_TICKLESS_DEBUG)
-    WeaveLogProgress(ExchangeManager, "WRMPTimeout\n");
+    ChipLogProgress(ExchangeManager, "WRMPTimeout\n");
 #endif
 
     // Make sure all tick counts are sync'd to the current time
@@ -1488,29 +1487,29 @@ void WeaveExchangeManager::WRMPTimeout(System::Layer* aSystemLayer, void* aAppSt
 }
 
 /**
- *  Add a Weave message into the retransmission table to be subsequently resent if a corresponding acknowledgment
+ *  Add a CHIP message into the retransmission table to be subsequently resent if a corresponding acknowledgment
  *  is not received within the retransmission timeout.
  *
  *  @param[in]    ec        A pointer to the ExchangeContext object.
  *
- *  @param[in]    msgBuf    A pointer to the message buffer holding the Weave message to be retransmitted.
+ *  @param[in]    msgBuf    A pointer to the message buffer holding the CHIP message to be retransmitted.
  *
- *  @param[in]    messageId The message identifier of the stored Weave message.
+ *  @param[in]    messageId The message identifier of the stored CHIP message.
  *
  *  @param[in]    msgCtxt   A pointer to some application specific context object pertaining to this message.
  *
  *  @param[out]   rEntry    A pointer to a pointer of a retransmission table entry added into the table.
  *
- *  @retval  #WEAVE_ERROR_RETRANS_TABLE_FULL If there is no empty slot left in the table for addition.
- *  @retval  #WEAVE_NO_ERROR On success.
+ *  @retval  #CHIP_ERROR_RETRANS_TABLE_FULL If there is no empty slot left in the table for addition.
+ *  @retval  #CHIP_NO_ERROR On success.
  *
  */
-WEAVE_ERROR WeaveExchangeManager::AddToRetransTable(ExchangeContext *ec, PacketBuffer *msgBuf, uint32_t messageId, void *msgCtxt, RetransTableEntry **rEntry)
+CHIP_ERROR ChipExchangeManager::AddToRetransTable(ExchangeContext *ec, PacketBuffer *msgBuf, uint32_t messageId, void *msgCtxt, RetransTableEntry **rEntry)
 {
     bool added      = false;
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    for (int i = 0; i < WEAVE_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
     {
         //Check the exchContext pointer for finding an empty slot in Table
         if (!RetransTable[i].exchContext)
@@ -1538,8 +1537,8 @@ WEAVE_ERROR WeaveExchangeManager::AddToRetransTable(ExchangeContext *ec, PacketB
 
     if (!added)
     {
-        WeaveLogError(ExchangeManager, "RetransTable Already Full");
-        err = WEAVE_ERROR_RETRANS_TABLE_FULL;
+        ChipLogError(ExchangeManager, "RetransTable Already Full");
+        err = CHIP_ERROR_RETRANS_TABLE_FULL;
     }
 
     return err;
@@ -1550,12 +1549,12 @@ WEAVE_ERROR WeaveExchangeManager::AddToRetransTable(ExchangeContext *ec, PacketB
  *
  *  @param[in]    entry                A pointer to a retransmission table entry object that needs to be sent.
  *
- *  @return  #WEAVE_NO_ERROR On success, else corresponding WEAVE_ERROR returned from SendMessage.
+ *  @return  #CHIP_NO_ERROR On success, else corresponding CHIP_ERROR returned from SendMessage.
  *
  */
-WEAVE_ERROR WeaveExchangeManager::SendFromRetransTable(RetransTableEntry *entry)
+CHIP_ERROR ChipExchangeManager::SendFromRetransTable(RetransTableEntry *entry)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     uint16_t msgSendFlags = 0;
     uint8_t     *p = NULL;
     uint32_t    len = 0;
@@ -1565,7 +1564,7 @@ WEAVE_ERROR WeaveExchangeManager::SendFromRetransTable(RetransTableEntry *entry)
     // that the next call to WRMPExecuteActions will abort this entry,
     // restart the timer immediately, and ExitNow.
 
-    WEAVE_FAULT_INJECT(FaultInjection::kFault_WRMSendError,
+    CHIP_FAULT_INJECT(FaultInjection::kFault_WRMSendError,
                        entry->sendCount = (ec->mWRMPConfig.mMaxRetrans + 1);
                        entry->nextRetransTime = 0;
                        WRMPStartTimer();
@@ -1573,11 +1572,11 @@ WEAVE_ERROR WeaveExchangeManager::SendFromRetransTable(RetransTableEntry *entry)
 
     if (ec)
     {
-        SetFlag(msgSendFlags, kWeaveMessageFlag_RetainBuffer);
+        SetFlag(msgSendFlags, kChipMessageFlag_RetainBuffer);
 
-#if WEAVE_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
-        SetFlag(msgSendFlags, kWeaveMessageFlag_ViaEphemeralUDPPort, ec->UseEphemeralUDPPort());
-#endif // WEAVE_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
+#if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
+        SetFlag(msgSendFlags, kChipMessageFlag_ViaEphemeralUDPPort, ec->UseEphemeralUDPPort());
+#endif // CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
 
         //Locally store the start and length;
         p = entry->msgBuf->Start();
@@ -1596,24 +1595,24 @@ WEAVE_ERROR WeaveExchangeManager::SendFromRetransTable(RetransTableEntry *entry)
     }
     else
     {
-        WeaveLogError(ExchangeManager, "Table entry invalid");
+        ChipLogError(ExchangeManager, "Table entry invalid");
     }
 
-    VerifyOrExit(err != WEAVE_NO_ERROR, err = WEAVE_NO_ERROR);
+    VerifyOrExit(err != CHIP_NO_ERROR, err = CHIP_NO_ERROR);
 
     //Any error generated during initial sending is evaluated for criticality which would
     //qualify it to be reportable back to the caller. If it is non-critical then
-    //err is set to WEAVE_NO_ERROR.
-    if (WeaveMessageLayer::IsSendErrorNonCritical(err))
+    //err is set to CHIP_NO_ERROR.
+    if (ChipMessageLayer::IsSendErrorNonCritical(err))
     {
-        WeaveLogError(ExchangeManager, "Non-crit err %ld sending Weave MsgId:%08" PRIX32 " from retrans table",
+        ChipLogError(ExchangeManager, "Non-crit err %ld sending CHIP MsgId:%08" PRIX32 " from retrans table",
                       long(err), entry->msgId);
-        err = WEAVE_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
     else
     {
         //Remove from table
-        WeaveLogError(ExchangeManager, "Crit-err %ld when sending Weave MsgId:%08" PRIX32 ", send tries: %d",
+        ChipLogError(ExchangeManager, "Crit-err %ld when sending CHIP MsgId:%08" PRIX32 ", send tries: %d",
                 long(err), entry->msgId, entry->sendCount);
 
         ClearRetransmitTable(*entry);
@@ -1629,9 +1628,9 @@ exit:
  *  @param[in]    ec    A pointer to the ExchangeContext object.
  *
  */
-void WeaveExchangeManager::ClearRetransmitTable(ExchangeContext *ec)
+void ChipExchangeManager::ClearRetransmitTable(ExchangeContext *ec)
 {
-    for (int i = 0; i < WEAVE_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
     {
         if (RetransTable[i].exchContext == ec)
         {
@@ -1647,7 +1646,7 @@ void WeaveExchangeManager::ClearRetransmitTable(ExchangeContext *ec)
  *  @param[in]    rEntry   A reference to the RetransTableEntry object.
  *
  */
-void WeaveExchangeManager::ClearRetransmitTable(RetransTableEntry &rEntry)
+void ChipExchangeManager::ClearRetransmitTable(RetransTableEntry &rEntry)
 {
     if (rEntry.exchContext)
     {
@@ -1680,9 +1679,9 @@ void WeaveExchangeManager::ClearRetransmitTable(RetransTableEntry &rEntry)
  *  @param[in]    err   The error for failing table entries.
  *
  */
-void WeaveExchangeManager::FailRetransmitTableEntries(ExchangeContext *ec, WEAVE_ERROR err)
+void ChipExchangeManager::FailRetransmitTableEntries(ExchangeContext *ec, CHIP_ERROR err)
 {
-    for (int i = 0; i < WEAVE_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
     {
         if (RetransTable[i].exchContext == ec)
         {
@@ -1705,9 +1704,9 @@ void WeaveExchangeManager::FailRetransmitTableEntries(ExchangeContext *ec, WEAVE
 * next need to wake the system.
 *
 */
-void WeaveExchangeManager::WRMPStartTimer()
+void ChipExchangeManager::WRMPStartTimer()
 {
-    WEAVE_ERROR res                   = WEAVE_NO_ERROR;
+    CHIP_ERROR res                   = CHIP_NO_ERROR;
     uint32_t nextWakeTime             = UINT32_MAX;
     bool foundWake                    = false;
     ExchangeContext *ec               = NULL;
@@ -1715,18 +1714,18 @@ void WeaveExchangeManager::WRMPStartTimer()
     // When do we need to next wake up to send an ACK?
     ec = (ExchangeContext *)ContextPool;
 
-    for (int i = 0; i < WEAVE_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
+    for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
         if (ec->ExchangeMgr != NULL && ec->IsAckPending() && ec->mWRMPNextAckTime < nextWakeTime) {
             nextWakeTime = ec->mWRMPNextAckTime;
             foundWake = true;
 #if defined(WRMP_TICKLESS_DEBUG)
-            WeaveLogProgress(ExchangeManager, "WRMPStartTimer next ACK time %u", nextWakeTime);
+            ChipLogProgress(ExchangeManager, "WRMPStartTimer next ACK time %u", nextWakeTime);
 #endif
         }
     }
 
-    for (int i = 0; i < WEAVE_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
     {
         ec = RetransTable[i].exchContext;
         if (ec)
@@ -1736,7 +1735,7 @@ void WeaveExchangeManager::WRMPStartTimer()
                 nextWakeTime = ec->mWRMPThrottleTimeout;
                 foundWake = true;
 #if defined(WRMP_TICKLESS_DEBUG)
-                WeaveLogProgress(ExchangeManager, "WRMPStartTimer throttle timeout %u", nextWakeTime);
+                ChipLogProgress(ExchangeManager, "WRMPStartTimer throttle timeout %u", nextWakeTime);
 #endif
             }
 
@@ -1745,7 +1744,7 @@ void WeaveExchangeManager::WRMPStartTimer()
                 nextWakeTime = RetransTable[i].nextRetransTime;
                 foundWake = true;
 #if defined(WRMP_TICKLESS_DEBUG)
-                WeaveLogProgress(ExchangeManager, "WRMPStartTimer RetransTime %u", nextWakeTime);
+                ChipLogProgress(ExchangeManager, "WRMPStartTimer RetransTime %u", nextWakeTime);
 #endif
             }
         }
@@ -1758,7 +1757,7 @@ void WeaveExchangeManager::WRMPStartTimer()
         System::Timer::Epoch timerExpiryEpoch = currentTime + timerArmValue;
 
 #if defined(WRMP_TICKLESS_DEBUG)
-        WeaveLogProgress(ExchangeManager, "WRMPStartTimer wake in %d ms (%" PRIu64" %u %" PRIu64 " %" PRIu64 ")",
+        ChipLogProgress(ExchangeManager, "WRMPStartTimer wake in %d ms (%" PRIu64" %u %" PRIu64 " %" PRIu64 ")",
                 timerArmValue,
                 timerExpiryEpoch, nextWakeTime, currentTime, mWRMPTimeStampBase);
 #endif
@@ -1771,21 +1770,21 @@ void WeaveExchangeManager::WRMPStartTimer()
             }
 
 #if defined(WRMP_TICKLESS_DEBUG)
-            WeaveLogProgress(ExchangeManager, "WRMPStartTimer set timer for %d %" PRIu64, timerArmValue, timerExpiryEpoch);
+            ChipLogProgress(ExchangeManager, "WRMPStartTimer set timer for %d %" PRIu64, timerArmValue, timerExpiryEpoch);
 #endif
             WRMPStopTimer();
             res = MessageLayer->SystemLayer->StartTimer((uint32_t)timerArmValue, WRMPTimeout, this);
 
-            VerifyOrDieWithMsg(res == WEAVE_NO_ERROR, ExchangeManager, "Cannot start WRMPTimeout\n");
+            VerifyOrDieWithMsg(res == CHIP_NO_ERROR, ExchangeManager, "Cannot start WRMPTimeout\n");
             mWRMPCurrentTimerExpiry = timerExpiryEpoch;
 #if defined(WRMP_TICKLESS_DEBUG)
         } else {
-            WeaveLogProgress(ExchangeManager, "WRMPStartTimer timer already set for %" PRIu64, timerExpiryEpoch);
+            ChipLogProgress(ExchangeManager, "WRMPStartTimer timer already set for %" PRIu64, timerExpiryEpoch);
 #endif
         }
     } else {
 #if defined(WRMP_TICKLESS_DEBUG)
-        WeaveLogProgress(ExchangeManager, "Not setting WRMP timeout at %" PRIu64, System::Timer::GetCurrentEpoch());
+        ChipLogProgress(ExchangeManager, "Not setting WRMP timeout at %" PRIu64, System::Timer::GetCurrentEpoch());
 #endif
         WRMPStopTimer();
     }
@@ -1793,20 +1792,20 @@ void WeaveExchangeManager::WRMPStartTimer()
     TicklessDebugDumpRetransTable("WRMPStartTimer Dumping RetransTable entries after setting wakeup times");
 }
 
-void WeaveExchangeManager::WRMPStopTimer()
+void ChipExchangeManager::WRMPStopTimer()
 {
     MessageLayer->SystemLayer->CancelTimer(WRMPTimeout, this);
 }
-#endif // WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
 /**
  *  Initialize the shared pool of Bindings.
  *
  */
-void WeaveExchangeManager::InitBindingPool(void)
+void ChipExchangeManager::InitBindingPool(void)
 {
     memset(BindingPool, 0, sizeof(BindingPool));
-    for (size_t i = 0; i < WEAVE_CONFIG_MAX_BINDINGS; ++i)
+    for (size_t i = 0; i < CHIP_CONFIG_MAX_BINDINGS; ++i)
     {
         BindingPool[i].mState = Binding::kState_NotAllocated;
         BindingPool[i].mExchangeManager = this;
@@ -1820,20 +1819,20 @@ void WeaveExchangeManager::InitBindingPool(void)
  *  @return  A pointer to the newly allocated Binding, or NULL if the pool has been exhausted
  *
  */
-Binding * WeaveExchangeManager::AllocBinding(void)
+Binding * ChipExchangeManager::AllocBinding(void)
 {
     Binding * pResult = NULL;
 
-    WEAVE_FAULT_INJECT(FaultInjection::kFault_AllocBinding,
+    CHIP_FAULT_INJECT(FaultInjection::kFault_AllocBinding,
                            return NULL);
 
-    for (size_t i = 0; i < WEAVE_CONFIG_MAX_BINDINGS; ++i)
+    for (size_t i = 0; i < CHIP_CONFIG_MAX_BINDINGS; ++i)
     {
         if (Binding::kState_NotAllocated == BindingPool[i].mState)
         {
             pResult = &BindingPool[i];
             ++mBindingsInUse;
-            SYSTEM_STATS_INCREMENT(nl::Weave::System::Stats::kExchangeMgr_NumBindings);
+            SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumBindings);
             break;
         }
     }
@@ -1845,14 +1844,14 @@ Binding * WeaveExchangeManager::AllocBinding(void)
  *  Deallocate the binding object so it could be reused later
  *
  *  @param[in]  binding         A pointer to the binding object to be deallocated. The object
- *                              must be previously allocated from this #WeaveExchangeManager.
+ *                              must be previously allocated from this #ChipExchangeManager.
  *
  */
-void WeaveExchangeManager::FreeBinding(Binding * binding)
+void ChipExchangeManager::FreeBinding(Binding * binding)
 {
     binding->mState = Binding::kState_NotAllocated;
     --mBindingsInUse;
-    SYSTEM_STATS_DECREMENT(nl::Weave::System::Stats::kExchangeMgr_NumBindings);
+    SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumBindings);
 }
 
 /**
@@ -1864,7 +1863,7 @@ void WeaveExchangeManager::FreeBinding(Binding * binding)
  *  @return  A pointer to the newly allocated Binding, or NULL if the pool has been exhausted
  *
  */
-Binding * WeaveExchangeManager::NewBinding(Binding::EventCallback eventCallback, void *appState)
+Binding * ChipExchangeManager::NewBinding(Binding::EventCallback eventCallback, void *appState)
 {
     Binding * pResult = AllocBinding();
     if (NULL != pResult)
@@ -1882,11 +1881,10 @@ Binding * WeaveExchangeManager::NewBinding(Binding::EventCallback eventCallback,
  *  @return                     An unsigned integer identifying the binding
  *
  */
-uint16_t WeaveExchangeManager::GetBindingLogId(const Binding * const binding) const
+uint16_t ChipExchangeManager::GetBindingLogId(const Binding * const binding) const
 {
     // note that the result of pointer subtraction should be ptrdiff_t
     return static_cast<uint16_t>(binding - BindingPool);
 }
 
-} // namespace nl
-} // namespace Weave
+} // namespace chip

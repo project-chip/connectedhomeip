@@ -18,30 +18,29 @@
 
 /**
  *    @file
- *      Defines the Weave Binding class and its supporting types.
+ *      Defines the CHIP Binding class and its supporting types.
  *
  */
 
-// Include WeaveCore.h OUTSIDE of the include guard for WeaveBinding.h.
-// This allows WeaveCore.h to enforce a canonical include order for core
+// Include ChipCore.h OUTSIDE of the include guard for ChipBinding.h.
+// This allows ChipCore.h to enforce a canonical include order for core
 // header files, making it easier to manage dependencies between these files.
-#include <Weave/Core/WeaveCore.h>
+#include <core/CHIPCore.h>
 
-#ifndef WEAVE_BINDING_H_
-#define WEAVE_BINDING_H_
+#ifndef CHIP_BINDING_H_
+#define CHIP_BINDING_H_
 
 #ifndef __STDC_FORMAT_MACROS
 #define __STDC_FORMAT_MACROS
 #endif // __STDC_FORMAT_MACROS
 
-#include <Weave/Core/WeaveWRMPConfig.h>
+#include <core/CHIPWRMPConfig.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 
-class WeaveExchangeManager;
+class ChipExchangeManager;
 class ExchangeContext;
-class WeaveSecurityManager;
+class ChipSecurityManager;
 
 namespace Profiles {
 namespace StatusReporting {
@@ -49,7 +48,7 @@ class StatusReport;
 }
 namespace Security {
 namespace TAKE {
-class WeaveTAKEChallengerAuthDelegate;
+class ChipTAKEChallengerAuthDelegate;
 }
 }
 }
@@ -59,10 +58,10 @@ class WeaveTAKEChallengerAuthDelegate;
  * @class Binding
  *
  * @brief
- *   Captures the intended target of a Weave communication and associated configuration
+ *   Captures the intended target of a CHIP communication and associated configuration
  *   information.
  *
- * A Binding object identifies the intended target of a Weave communication (also known as the
+ * A Binding object identifies the intended target of a CHIP communication (also known as the
  * "peer"), along with a set of configuration parameters describing how communication with the
  * peer should take place. Bindings are independent of the application protocol being spoken
  * between the two parties. As such, they capture the "who" and the "how" of a communication,
@@ -72,7 +71,7 @@ class WeaveTAKEChallengerAuthDelegate;
  *
  * Applications must configure a Binding with parameters specific to the type of communication
  * channel desired. Bindings provide support for a range of network transports, including
- * TCP, UDP, UDP with Weave Reliable Messaging, and Weave over BLE (WoBLE). Applications can
+ * TCP, UDP, UDP with CHIP Reliable Messaging, and CHIP over BLE (WoBLE). Applications can
  * also request the use of specific security mechanisms to protect messages sent between the
  * parties. These include CASE and PASE sessions, and application group keys. The interface for
  * configuring a Binding uses a declarative API style that allows applications to state their
@@ -94,8 +93,8 @@ class WeaveTAKEChallengerAuthDelegate;
  *
  * Once a Binding has been prepared it becomes ready for use. In this state, applications (or
  * more commonly, protocol layer code working on behalf of an application) request the Binding
- * to allocate a Weave exchange context. The resultant exchange context comes pre-configured
- * for communication, allowing the application to immediately initiate a Weave exchange with
+ * to allocate a CHIP exchange context. The resultant exchange context comes pre-configured
+ * for communication, allowing the application to immediately initiate a CHIP exchange with
  * the peer. The application can continue to request exchange contexts from the Binding until
  * such time as the Binding is closed, or some event, e.g., a network failure, terminates the
  * underlying communication channel.
@@ -154,7 +153,7 @@ public:
 
     enum EventType
     {
-        kEvent_ConnectionEstablished                = 1,    ///< The requested Weave connection has been established.
+        kEvent_ConnectionEstablished                = 1,    ///< The requested CHIP connection has been established.
         kEvent_BindingReady                         = 2,    ///< The prepare action on the binding succeeded and the binding may now be used to communicate with the peer.
         kEvent_PrepareFailed                        = 3,    ///< The prepare action on the binding failed.
         kEvent_BindingFailed                        = 4,    ///< The binding failed and can no longer be used to communicate with the peer.
@@ -176,7 +175,7 @@ public:
 
     Configuration BeginConfiguration();
 
-    WEAVE_ERROR RequestPrepare();
+    CHIP_ERROR RequestPrepare();
 
     State GetState(void) const;
     bool IsPreparing(void) const;
@@ -191,14 +190,14 @@ public:
     uint8_t GetEncryptionType(void) const;
     uint32_t GetDefaultResponseTimeout() const;
     void SetDefaultResponseTimeout(uint32_t msec);
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     const WRMPConfig& GetDefaultWRMPConfig(void) const;
     void SetDefaultWRMPConfig(const WRMPConfig& wrmpConfig);
-#endif // #if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#endif // #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     EventCallback GetEventCallback() const;
     void SetEventCallback(EventCallback aEventCallback);
-    WeaveConnection *GetConnection() const;
-    WeaveExchangeManager *GetExchangeManager() const;
+    ChipConnection *GetConnection() const;
+    ChipExchangeManager *GetExchangeManager() const;
     bool IsConnectionTransport() const;
     bool IsUDPTransport() const;
     bool IsWRMTransport() const;
@@ -206,7 +205,7 @@ public:
 
     enum
     {
-        kGetPeerDescription_MaxLength = nl::Weave::kWeavePeerDescription_MaxLength,
+        kGetPeerDescription_MaxLength = chip::kChipPeerDescription_MaxLength,
                                                              /**< Maximum length of string (including NUL character)
                                                                   returned by GetPeerDescription(). */
     };
@@ -216,30 +215,30 @@ public:
     void GetProtocolLayerCallback(EventCallback& callback, void *& state) const;
     void SetProtocolLayerCallback(EventCallback callback, void *state);
 
-    WEAVE_ERROR NewExchangeContext(ExchangeContext *& appExchangeContext);
+    CHIP_ERROR NewExchangeContext(ExchangeContext *& appExchangeContext);
 
-    WEAVE_ERROR AdjustResponseTimeout(ExchangeContext * apExchangeContext) const;
+    CHIP_ERROR AdjustResponseTimeout(ExchangeContext * apExchangeContext) const;
 
-    bool IsAuthenticMessageFromPeer(const WeaveMessageInfo *msgInfo);
+    bool IsAuthenticMessageFromPeer(const ChipMessageInfo *msgInfo);
 
-    uint32_t GetMaxWeavePayloadSize(const System::PacketBuffer *msgBuf);
+    uint32_t GetMaxChipPayloadSize(const System::PacketBuffer *msgBuf);
 
     static void DefaultEventHandler(void *apAppState, EventType aEvent, const InEventParam& aInParam, OutEventParam& aOutParam);
 
-    WEAVE_ERROR AllocateRightSizedBuffer(PacketBuffer *& buf,
+    CHIP_ERROR AllocateRightSizedBuffer(PacketBuffer *& buf,
                                          const uint32_t desiredSize,
                                          const uint32_t minSize,
                                          uint32_t & outMaxPayloadSize);
 private:
 
-    friend class WeaveExchangeManager;
+    friend class ChipExchangeManager;
 
     enum AddressingOption
     {
         kAddressing_NotSpecified                    = 0,
         kAddressing_UnicastIP                       = 1,
         kAddressing_HostName                        = 2,
-        kAddressing_WeaveFabric                     = 3,
+        kAddressing_ChipFabric                     = 3,
         kAddressing_ServiceDirectory                = 4,
         kAddressing_MulticastIP                     = 5,
     };
@@ -270,7 +269,7 @@ private:
         kFlag_ConnectionReferenced                  = 0x2,
     };
 
-    WeaveExchangeManager * mExchangeManager;
+    ChipExchangeManager * mExchangeManager;
 
     uint8_t mRefCount;
     State mState : 4;
@@ -278,7 +277,7 @@ private:
     AddressingOption mAddressingOption : 3;
     TransportOption mTransportOption : 3;
     unsigned mFlags : 3;
-#if WEAVE_CONFIG_ENABLE_DNS_RESOLVER
+#if CHIP_CONFIG_ENABLE_DNS_RESOLVER
     uint8_t mDNSOptions;
 #endif
 
@@ -295,26 +294,26 @@ private:
     // Transport-specific configuration
     nl::Inet::IPAddress mPeerAddress;
     const char *mHostName;
-    WeaveConnection *mCon;
+    ChipConnection *mCon;
     uint32_t mDefaultResponseTimeoutMsec;
     uint32_t mUDPPathMTU;
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     WRMPConfig mDefaultWRMPConfig;
 #endif
     uint8_t mHostNameLen;
 
     // Security-specific configuration
     uint8_t mEncType;
-    WeaveAuthMode mAuthMode;
+    ChipAuthMode mAuthMode;
     uint32_t mKeyId;
 
-    WEAVE_ERROR Init(void * apAppState, EventCallback aEventCallback);
+    CHIP_ERROR Init(void * apAppState, EventCallback aEventCallback);
 
     bool GetFlag(uint8_t flag) const;
     void SetFlag(uint8_t flag);
     void ClearFlag(uint8_t flag);
 
-    WEAVE_ERROR DoPrepare(WEAVE_ERROR configErr);
+    CHIP_ERROR DoPrepare(CHIP_ERROR configErr);
     void DoReset(State newState);
     void DoClose(void);
     void ResetConfig(void);
@@ -322,22 +321,22 @@ private:
     void PrepareTransport(void);
     void PrepareSecurity(void);
     void HandleBindingReady(void);
-    void HandleBindingFailed(WEAVE_ERROR err, Profiles::StatusReporting::StatusReport *statusReport, bool raiseEvent);
-    void OnKeyFailed(uint64_t peerNodeId, uint32_t keyId, WEAVE_ERROR keyErr);
+    void HandleBindingFailed(CHIP_ERROR err, Profiles::StatusReporting::StatusReport *statusReport, bool raiseEvent);
+    void OnKeyFailed(uint64_t peerNodeId, uint32_t keyId, CHIP_ERROR keyErr);
     void OnSecurityManagerAvailable(void);
-    void OnConnectionClosed(WeaveConnection *con, WEAVE_ERROR conErr);
-    uint32_t GetWeaveTrailerSize(void);
-    uint32_t GetWeaveHeaderSize(void);
+    void OnConnectionClosed(ChipConnection *con, CHIP_ERROR conErr);
+    uint32_t GetChipTrailerSize(void);
+    uint32_t GetChipHeaderSize(void);
 
-    static void OnSecureSessionReady(WeaveSecurityManager *sm, WeaveConnection *con, void *reqState,
+    static void OnSecureSessionReady(ChipSecurityManager *sm, ChipConnection *con, void *reqState,
             uint16_t keyId, uint64_t peerNodeId, uint8_t encType);
-    static void OnSecureSessionFailed(WeaveSecurityManager *sm, WeaveConnection *con, void *reqState,
-            WEAVE_ERROR localErr, uint64_t peerNodeId, Profiles::StatusReporting::StatusReport *statusReport);
-    void OnSecureSessionReady(uint64_t peerNodeId, uint8_t encType, WeaveAuthMode authMode, uint16_t keyId);
-    void OnKeyError(const uint32_t aKeyId, const uint64_t aPeerNodeId, const WEAVE_ERROR aKeyErr);
+    static void OnSecureSessionFailed(ChipSecurityManager *sm, ChipConnection *con, void *reqState,
+            CHIP_ERROR localErr, uint64_t peerNodeId, Profiles::StatusReporting::StatusReport *statusReport);
+    void OnSecureSessionReady(uint64_t peerNodeId, uint8_t encType, ChipAuthMode authMode, uint16_t keyId);
+    void OnKeyError(const uint32_t aKeyId, const uint64_t aPeerNodeId, const CHIP_ERROR aKeyErr);
 
     static void OnResolveComplete(void *appState, INET_ERROR err, uint8_t addrCount, IPAddress *addrArray);
-    static void OnConnectionComplete(WeaveConnection *con, WEAVE_ERROR conErr);
+    static void OnConnectionComplete(ChipConnection *con, CHIP_ERROR conErr);
 };
 
 /**
@@ -361,11 +360,11 @@ public:
     Configuration& Target_NodeId(uint64_t aPeerNodeId);
     Configuration& Target_ServiceEndpoint(uint64_t aPeerNodeId);
 
-    Configuration& TargetAddress_WeaveService(void);
-    Configuration& TargetAddress_WeaveFabric(uint16_t aSubnetId);
-    Configuration& TargetAddress_IP(nl::Inet::IPAddress aPeerAddress, uint16_t aPeerPort = WEAVE_PORT, InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
-    Configuration& TargetAddress_IP(const char *aHostName, uint16_t aPeerPort = WEAVE_PORT, InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
-    Configuration& TargetAddress_IP(const char *aHostName, size_t aHostNameLen, uint16_t aPeerPort = WEAVE_PORT, InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
+    Configuration& TargetAddress_ChipService(void);
+    Configuration& TargetAddress_ChipFabric(uint16_t aSubnetId);
+    Configuration& TargetAddress_IP(nl::Inet::IPAddress aPeerAddress, uint16_t aPeerPort = CHIP_PORT, InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
+    Configuration& TargetAddress_IP(const char *aHostName, uint16_t aPeerPort = CHIP_PORT, InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
+    Configuration& TargetAddress_IP(const char *aHostName, size_t aHostNameLen, uint16_t aPeerPort = CHIP_PORT, InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
 
     Configuration& DNS_Options(uint8_t dnsOptions);
 
@@ -374,7 +373,7 @@ public:
     Configuration& Transport_UDP_WRM(void);
     Configuration& Transport_UDP_PathMTU(uint32_t aPathMTU);
     Configuration& Transport_DefaultWRMPConfig(const WRMPConfig& aWRMPConfig);
-    Configuration& Transport_ExistingConnection(WeaveConnection *apConnection);
+    Configuration& Transport_ExistingConnection(ChipConnection *apConnection);
 
     Configuration& Exchange_ResponseTimeoutMsec(uint32_t aResponseTimeoutMsec);
 
@@ -387,19 +386,19 @@ public:
     Configuration& Security_Key(uint32_t aKeyId);
     Configuration& Security_AppGroupKey(uint32_t aAppGroupGlobalId, uint32_t aRootKeyId, bool aUseRotatingKey);
     Configuration& Security_EncryptionType(uint8_t aEncType);
-    Configuration& Security_AuthenticationMode(WeaveAuthMode aAuthMode);
+    Configuration& Security_AuthenticationMode(ChipAuthMode aAuthMode);
 
-    Configuration& ConfigureFromMessage(const WeaveMessageInfo *aMsgInfo, const Inet::IPPacketInfo *aPacketInfo);
+    Configuration& ConfigureFromMessage(const ChipMessageInfo *aMsgInfo, const Inet::IPPacketInfo *aPacketInfo);
 
-    WEAVE_ERROR PrepareBinding(void);
+    CHIP_ERROR PrepareBinding(void);
 
-    WEAVE_ERROR GetError(void) const;
+    CHIP_ERROR GetError(void) const;
 
 private:
     friend class Binding;
 
     Binding& mBinding;
-    WEAVE_ERROR mError;
+    CHIP_ERROR mError;
 
     Configuration(Binding& aBinding);
 };
@@ -414,13 +413,13 @@ struct Binding::InEventParam
     {
         struct
         {
-            WEAVE_ERROR Reason;
+            CHIP_ERROR Reason;
             Profiles::StatusReporting::StatusReport *StatusReport;
         } PrepareFailed;
 
         struct
         {
-            WEAVE_ERROR Reason;
+            CHIP_ERROR Reason;
         } BindingFailed;
 
         struct
@@ -442,7 +441,7 @@ struct Binding::OutEventParam
     {
         struct
         {
-            WEAVE_ERROR PrepareError;
+            CHIP_ERROR PrepareError;
         } PrepareRequested;
 
         struct
@@ -457,7 +456,7 @@ struct Binding::OutEventParam
             bool EncryptCommPhase;
             bool TimeLimitedIK;
             bool SendChallengerId;
-            nl::Weave::Profiles::Security::TAKE::WeaveTAKEChallengerAuthDelegate *AuthDelegate;
+            chip::Profiles::Security::TAKE::ChipTAKEChallengerAuthDelegate *AuthDelegate;
         } TAKEParametersRequested;
     };
 
@@ -523,7 +522,7 @@ inline void Binding::SetDefaultResponseTimeout(uint32_t timeout)
     mDefaultResponseTimeoutMsec = timeout;
 }
 
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
 inline const WRMPConfig& Binding::GetDefaultWRMPConfig(void) const
 {
@@ -535,7 +534,7 @@ inline void Binding::SetDefaultWRMPConfig(const WRMPConfig& aWRMPConfig)
     mDefaultWRMPConfig = aWRMPConfig;
 }
 
-#endif // #if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#endif // #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
 inline Binding::EventCallback Binding::GetEventCallback() const
 {
@@ -559,7 +558,7 @@ inline void Binding::SetProtocolLayerCallback(EventCallback callback, void *stat
     mProtocolLayerState = state;
 }
 
-inline WeaveConnection *Binding::GetConnection() const
+inline ChipConnection *Binding::GetConnection() const
 {
     return mCon;
 }
@@ -579,7 +578,7 @@ inline void Binding::ClearFlag(uint8_t flag)
     mFlags &= ~flag;
 }
 
-inline WeaveExchangeManager *Binding::GetExchangeManager() const
+inline ChipExchangeManager *Binding::GetExchangeManager() const
 {
     return mExchangeManager;
 }
@@ -609,17 +608,17 @@ inline Binding::Configuration Binding::BeginConfiguration()
     return Configuration(*this);
 }
 
-inline WEAVE_ERROR Binding::Configuration::PrepareBinding(void)
+inline CHIP_ERROR Binding::Configuration::PrepareBinding(void)
 {
     return mBinding.DoPrepare(mError);
 }
 
-inline WEAVE_ERROR Binding::Configuration::GetError(void) const
+inline CHIP_ERROR Binding::Configuration::GetError(void) const
 {
     return mError;
 }
 
-}; // Weave
+}; // CHIP
 }; // nl
 
-#endif // WEAVE_BINDING_H_
+#endif // CHIP_BINDING_H_
