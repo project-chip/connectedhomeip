@@ -81,7 +81,7 @@ public class CommissioningFragment extends Fragment implements Observer<WorkInfo
     Data arguments =
         new Data.Builder()
             .putString(Constants.KEY_DEVICE_INFO, new Gson().toJson(deviceInfo))
-            .putString(Constants.KEY_DEVICE_INFO, new Gson().toJson(networkInfo))
+            .putString(Constants.KEY_NETWORK_INFO, new Gson().toJson(networkInfo))
             .build();
     commssionerWorkRequest =
         new OneTimeWorkRequest.Builder(CommissionerWorker.class).setInputData(arguments).build();
