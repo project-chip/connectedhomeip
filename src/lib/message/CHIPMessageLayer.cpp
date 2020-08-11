@@ -40,8 +40,8 @@
 
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
-#include <core/CHIPExchangeMgr.h>
-#include <core/CHIPMessageLayer.h>
+#include <message/CHIPExchangeMgr.h>
+#include <message/CHIPMessageLayer.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>

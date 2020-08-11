@@ -35,7 +35,7 @@
 #define __STDC_FORMAT_MACROS
 #endif // __STDC_FORMAT_MACROS
 
-#include <core/CHIPWRMPConfig.h>
+#include <message/CHIPWRMPConfig.h>
 
 namespace chip {
 

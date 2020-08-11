@@ -34,14 +34,14 @@
 #include <Profiles/CHIPProfiles.h>
 #include <Profiles/common/CommonProfile.h>
 #include <Profiles/security/CHIPSecurity.h>
-#include <SystemLayer/SystemStats.h>
-#include <SystemLayer/SystemTimer.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 #include <support/logging/CHIPLogging.h>
+#include <system/SystemStats.h>
+#include <system/SystemTimer.h>
 
 namespace chip {
 

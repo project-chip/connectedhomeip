@@ -31,9 +31,9 @@
 #ifndef CHIP_EXCHANGE_MGR_H
 #define CHIP_EXCHANGE_MGR_H
 
-#include <SystemLayer/SystemTimer.h>
-#include <core/CHIPWRMPConfig.h>
+#include <message/CHIPWRMPConfig.h>
 #include <support/DLLUtil.h>
+#include <system/SystemTimer.h>
 
 #define EXCHANGE_CONTEXT_ID(x) ((x) + 1)
 

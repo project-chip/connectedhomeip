@@ -26,10 +26,10 @@
 #define __STDC_FORMAT_MACROS
 #endif // __STDC_FORMAT_MACROS
 
-#include <SystemLayer/SystemStats.h>
 #include <core/CHIPCore.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
+#include <system/SystemStats.h>
 
 namespace chip {
 

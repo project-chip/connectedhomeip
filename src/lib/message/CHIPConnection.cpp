@@ -39,7 +39,7 @@
 #include <support/logging/CHIPLogging.h>
 
 #include <InetLayer/InetLayer.h>
-#include <SystemLayer/SystemStats.h>
+#include <system/SystemStats.h>
 
 namespace chip {
 

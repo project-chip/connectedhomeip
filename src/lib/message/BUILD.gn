@@ -32,6 +32,8 @@ static_library("message") {
      "CHIPMessageLayer.cpp",
      "CHIPMessageLayer.h",
      "CHIPWRMPConfig.h",
+     "HostPortList.h",
+     "HostPortList.cpp",
   ]
 
   public_deps = [

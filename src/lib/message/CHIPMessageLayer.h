@@ -36,8 +36,8 @@
 #include <string.h>
 
 #include "HostPortList.h"
-#include <SystemLayer/SystemStats.h>
 #include <support/DLLUtil.h>
+#include <system/SystemStats.h>
 
 namespace chip {
 
