@@ -35,10 +35,11 @@
 #include <inttypes.h>
 
 #include <core/CHIPCore.h>
+#include <message/CHIPMessageLayer.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
-#include <InetLayer/InetLayer.h>
+#include <inet/InetLayer.h>
 #include <system/SystemStats.h>
 
 namespace chip {
@@ -303,7 +304,7 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, c
                                    uint16_t defaultPort)
 {
 #if CHIP_CONFIG_ENABLE_DNS_RESOLVER
-    const uint8_t dnsOptions = ::nl::Inet::kDNSOption_Default;
+    const uint8_t dnsOptions = ::Inet::kDNSOption_Default;
 #else
     const uint8_t dnsOptions = 0;
 #endif
@@ -339,7 +340,7 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, c
  *
  *  @param[in]    dnsOptions    An integer value controlling how host name resolution is performed.
  *                              Value should be the OR of one or more values from from the
- *                              #::nl::Inet::DNSOptions enumeration.
+ *                              #::Inet::DNSOptions enumeration.
  *
  *  @param[in]    defaultPort   The optional default port to use for the connection if not supplied in the peerAddr
  *                              string.
@@ -383,7 +384,7 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, c
     NetworkType = kNetworkType_IP;
 
     // Parse the address into a host, port and interface name.
-    err = nl::Inet::ParseHostPortAndInterface(peerAddr, peerAddrLen, hostName, hostNameLen, PeerPort, intfName, intfNameLen);
+    err = Inet::ParseHostPortAndInterface(peerAddr, peerAddrLen, hostName, hostNameLen, PeerPort, intfName, intfNameLen);
     SuccessOrExit(err);
     if (PeerPort == 0)
         PeerPort = (defaultPort != 0) ? defaultPort : CHIP_PORT;
@@ -446,7 +447,7 @@ exit:
 CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, HostPortList hostPortList, InterfaceId intf)
 {
 #if CHIP_CONFIG_ENABLE_DNS_RESOLVER
-    const uint8_t dnsOptions = ::nl::Inet::kDNSOption_Default;
+    const uint8_t dnsOptions = ::Inet::kDNSOption_Default;
 #else
     const uint8_t dnsOptions = 0;
 #endif
@@ -464,7 +465,7 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, H
  *
  *  @param[in]    dnsOptions    An integer value controlling how host name resolution is performed.
  *                              Value should be the OR of one or more values from from the
- *                              #::nl::Inet::DNSOptions enumeration.
+ *                              #::Inet::DNSOptions enumeration.
  *
  *  @param[in]    intf          The optional interface to use to connect to the peer node,
  *                              default to #INET_NULL_INTERFACEID.

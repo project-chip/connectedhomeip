@@ -23,14 +23,10 @@
  *
  */
 
-// Include ChipCore.h OUTSIDE of the include guard for ChipExchangeMgr.h.
-// This allows ChipCore.h to enforce a canonical include order for core
-// header files, making it easier to manage dependencies between these files.
-#include <core/CHIPCore.h>
-
 #ifndef CHIP_EXCHANGE_MGR_H
 #define CHIP_EXCHANGE_MGR_H
 
+#include <message/CHIPFabricState.h>
 #include <message/CHIPWRMPConfig.h>
 #include <support/DLLUtil.h>
 #include <system/SystemTimer.h>

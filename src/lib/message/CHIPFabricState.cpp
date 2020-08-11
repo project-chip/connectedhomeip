@@ -36,13 +36,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <Profiles/CHIPProfiles.h>
-#include <Profiles/fabric-provisioning/FabricProvisioning.h>
-#include <Profiles/security/CHIPApplicationKeys.h>
-#include <Profiles/security/CHIPDummyGroupKeyStore.h>
-#include <Profiles/security/CHIPSecurity.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPKeyIds.h>
+#include <profiles/CHIPProfiles.h>
+#include <profiles/fabric-provisioning/FabricProvisioning.h>
+#include <profiles/security/CHIPApplicationKeys.h>
+#include <profiles/security/CHIPDummyGroupKeyStore.h>
+#include <profiles/security/CHIPSecurity.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 #include <support/crypto/CHIPCrypto.h>

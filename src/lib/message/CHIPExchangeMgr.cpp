@@ -31,11 +31,11 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include <Profiles/CHIPProfiles.h>
-#include <Profiles/common/CommonProfile.h>
-#include <Profiles/security/CHIPSecurity.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
+#include <profiles/CHIPProfiles.h>
+#include <profiles/common/CommonProfile.h>
+#include <profiles/security/CHIPSecurity.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>

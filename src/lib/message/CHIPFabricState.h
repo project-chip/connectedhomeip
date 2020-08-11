@@ -24,11 +24,6 @@
  *
  */
 
-// Include ChipCore.h OUTSIDE of the include guard for ChipFabricState.h.
-// This allows ChipCore.h to enforce a canonical include order for core
-// header files, making it easier to manage dependencies between these files.
-#include <core/CHIPCore.h>
-
 #ifndef CHIP_FABRIC_STATE_H
 #define CHIP_FABRIC_STATE_H
 

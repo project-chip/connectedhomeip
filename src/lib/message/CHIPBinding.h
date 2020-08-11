@@ -23,11 +23,6 @@
  *
  */
 
-// Include ChipCore.h OUTSIDE of the include guard for ChipBinding.h.
-// This allows ChipCore.h to enforce a canonical include order for core
-// header files, making it easier to manage dependencies between these files.
-#include <core/CHIPCore.h>
-
 #ifndef CHIP_BINDING_H_
 #define CHIP_BINDING_H_
 
@@ -35,6 +30,7 @@
 #define __STDC_FORMAT_MACROS
 #endif // __STDC_FORMAT_MACROS
 
+#include <message/CHIPMessageLayer.h>
 #include <message/CHIPWRMPConfig.h>
 
 namespace chip {
@@ -188,7 +184,7 @@ public:
     uint16_t GetLogId(void) const;
 
     uint64_t GetPeerNodeId(void) const;
-    void GetPeerIPAddress(nl::Inet::IPAddress & address, uint16_t & port, InterfaceId & interfaceId) const;
+    void GetPeerIPAddress(Inet::IPAddress & address, uint16_t & port, InterfaceId & interfaceId) const;
     uint32_t GetKeyId(void) const;
     uint8_t GetEncryptionType(void) const;
     uint32_t GetDefaultResponseTimeout() const;
@@ -293,7 +289,7 @@ private:
     uint16_t mPeerPort;
 
     // Transport-specific configuration
-    nl::Inet::IPAddress mPeerAddress;
+    Inet::IPAddress mPeerAddress;
     const char * mHostName;
     ChipConnection * mCon;
     uint32_t mDefaultResponseTimeoutMsec;
@@ -362,7 +358,7 @@ public:
 
     Configuration & TargetAddress_ChipService(void);
     Configuration & TargetAddress_ChipFabric(uint16_t aSubnetId);
-    Configuration & TargetAddress_IP(nl::Inet::IPAddress aPeerAddress, uint16_t aPeerPort = CHIP_PORT,
+    Configuration & TargetAddress_IP(Inet::IPAddress aPeerAddress, uint16_t aPeerPort = CHIP_PORT,
                                      InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
     Configuration & TargetAddress_IP(const char * aHostName, uint16_t aPeerPort = CHIP_PORT,
                                      InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
@@ -497,7 +493,7 @@ inline uint64_t Binding::GetPeerNodeId() const
     return mPeerNodeId;
 }
 
-inline void Binding::GetPeerIPAddress(nl::Inet::IPAddress & address, uint16_t & port, InterfaceId & interfaceId) const
+inline void Binding::GetPeerIPAddress(Inet::IPAddress & address, uint16_t & port, InterfaceId & interfaceId) const
 {
     address     = mPeerAddress;
     port        = mPeerPort;

@@ -27,6 +27,7 @@
 #endif // __STDC_FORMAT_MACROS
 
 #include <core/CHIPCore.h>
+#include <message/CHIPBinding.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <system/SystemStats.h>
@@ -64,7 +65,7 @@ namespace chip {
  */
 
 /**
- * @fn void Binding::GetPeerIPAddress(nl::Inet::IPAddress & address, uint16_t & port, InterfaceId & interfaceId) const
+ * @fn void Binding::GetPeerIPAddress(Inet::IPAddress & address, uint16_t & port, InterfaceId & interfaceId) const
  *
  * Retrieve the IP address information for the peer, if available.
  *
@@ -432,7 +433,7 @@ void Binding::ResetConfig()
     mPeerNodeId = kNodeIdNotSpecified;
 
     mAddressingOption = kAddressing_NotSpecified;
-    mPeerAddress      = nl::Inet::IPAddress::Any;
+    mPeerAddress      = Inet::IPAddress::Any;
     mPeerPort         = CHIP_PORT;
     mInterfaceId      = INET_NULL_INTERFACEID;
     mHostName         = NULL;
@@ -454,7 +455,7 @@ void Binding::ResetConfig()
     mFlags = 0;
 
 #if CHIP_CONFIG_ENABLE_DNS_RESOLVER
-    mDNSOptions = ::nl::Inet::kDNSOption_Default;
+    mDNSOptions = ::Inet::kDNSOption_Default;
 #endif
 }
 
@@ -960,7 +961,7 @@ void Binding::HandleBindingFailed(CHIP_ERROR err, Profiles::StatusReporting::Sta
                   (eventType == kEvent_BindingFailed) ? "Binding" : "Prepare", mPeerNodeId,
                   (err == CHIP_ERROR_STATUS_REPORT_RECEIVED && statusReport != NULL) ? "Status Report received: " : "",
                   (err == CHIP_ERROR_STATUS_REPORT_RECEIVED && statusReport != NULL)
-                      ? nl::StatusReportStr(statusReport->mProfileId, statusReport->mStatusCode)
+                      ? StatusReportStr(statusReport->mProfileId, statusReport->mStatusCode)
                       : ErrorStr(err));
 
     // Reset the binding and enter the Failed state.
@@ -1280,9 +1281,8 @@ uint32_t Binding::GetMaxChipPayloadSize(const System::PacketBuffer * msgBuf)
  */
 void Binding::GetPeerDescription(char * buf, uint32_t bufSize) const
 {
-    ChipMessageLayer::GetPeerDescription(buf, bufSize, mPeerNodeId,
-                                         (mPeerAddress != nl::Inet::IPAddress::Any) ? &mPeerAddress : NULL, mPeerPort, mInterfaceId,
-                                         mCon);
+    ChipMessageLayer::GetPeerDescription(buf, bufSize, mPeerNodeId, (mPeerAddress != Inet::IPAddress::Any) ? &mPeerAddress : NULL,
+                                         mPeerPort, mInterfaceId, mCon);
 }
 
 /**
@@ -1497,7 +1497,7 @@ Binding::Configuration & Binding::Configuration::Target_ServiceEndpoint(uint64_t
  *
  * @return                              A reference to the binding object.
  */
-Binding::Configuration & Binding::Configuration::TargetAddress_IP(const nl::Inet::IPAddress aPeerAddress, const uint16_t aPeerPort,
+Binding::Configuration & Binding::Configuration::TargetAddress_IP(const Inet::IPAddress aPeerAddress, const uint16_t aPeerPort,
                                                                   const InterfaceId aInterfaceId)
 {
     mBinding.mAddressingOption = Binding::kAddressing_UnicastIP;
@@ -1561,7 +1561,7 @@ Binding::Configuration & Binding::Configuration::TargetAddress_IP(const char * a
  * When resolving the host name of the peer, use the specified DNS options.
  *
  * @param[in]  dnsOptions               An integer value controlling how host name resolution is performed.
- *                                      Value should be one of values from the #::nl::Inet::DNSOptions enumeration.
+ *                                      Value should be one of values from the #::Inet::DNSOptions enumeration.
  *
  * @return                              A reference to the binding object.
  */
@@ -1925,7 +1925,7 @@ Binding::Configuration & Binding::Configuration::Security_AuthenticationMode(Chi
  *
  */
 Binding::Configuration & Binding::Configuration::ConfigureFromMessage(const chip::ChipMessageInfo * aMsgInfo,
-                                                                      const nl::Inet::IPPacketInfo * aPacketInfo)
+                                                                      const Inet::IPPacketInfo * aPacketInfo)
 {
     mBinding.mPeerNodeId = aMsgInfo->SourceNodeId;
 

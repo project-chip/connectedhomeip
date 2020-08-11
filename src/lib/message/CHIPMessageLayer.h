@@ -24,18 +24,14 @@
  *
  */
 
-// Include ChipCore.h OUTSIDE of the include guard for ChipMessageLayer.h.
-// This allows ChipCore.h to enforce a canonical include order for core
-// header files, making it easier to manage dependencies between these files.
-#include <core/CHIPCore.h>
-
 #ifndef CHIP_MESSAGE_LAYER_H
 #define CHIP_MESSAGE_LAYER_H
 
 #include <stdint.h>
 #include <string.h>
 
-#include "HostPortList.h"
+#include <message/CHIPFabricState.h>
+#include <message/HostPortList.h>
 #include <support/DLLUtil.h>
 #include <system/SystemStats.h>
 
