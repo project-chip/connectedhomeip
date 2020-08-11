@@ -49,6 +49,7 @@
 #include <profiles/CHIPProfiles.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
+#include <support/crypto/CHIPRNG.h>
 #include <support/logging/CHIPLogging.h>
 
 #if HAVE_NEW

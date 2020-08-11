@@ -30,6 +30,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <core/CHIPTunnelConfig.h>
 #include <message/CHIPFabricState.h>
 #include <message/HostPortList.h>
 #include <support/DLLUtil.h>

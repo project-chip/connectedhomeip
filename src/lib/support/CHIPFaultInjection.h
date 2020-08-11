@@ -67,6 +67,7 @@ typedef enum
     kFault_ServiceManager_Lookup,            /**< Fail the lookup of an endpoint id */
     kFault_ServiceDirectoryReplaceError,     /**< Fail the replacement of a ServiceDirectory entry */
 #endif                                       // CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
+    kFault_SecMgrBusy, /**< Trigger a WEAVE_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
 #if CHIP_CONFIG_ENABLE_TUNNELING
     kFault_TunnelQueueFull, /**< Trigger a CHIP_ERROR_TUNNEL_SERVICE_QUEUE_FULL when enqueueing a packet in the Tunnel queue */
     kFault_TunnelPacketDropByPolicy, /**< Trigger an explicit drop of the packet as if done by an application policy */

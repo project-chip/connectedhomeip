@@ -44,6 +44,10 @@ static const nl::FaultInjection::Name sFaultNames[] = {
     "SendAlarm",
     "HandleAlarm",
     "FuzzExchangeHeaderTx",
+#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+    "WRMDoubleTx",
+    "WRMSendError",
+#endif // WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
     "BDXBadBlockCounter",
     "BDXAllocTransfer",
 #if CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY

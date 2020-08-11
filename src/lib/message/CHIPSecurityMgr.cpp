@@ -200,7 +200,7 @@ void ChipSecurityManager::HandleUnsolicitedMessage(ExchangeContext * ec, const I
     // Verify that we don't already have a session establishment in progress.
     VerifyOrExit(secMgr->State == kState_Idle, err = CHIP_ERROR_SECURITY_MANAGER_BUSY);
 
-    CHIP_FAULT_INJECT(nl::FaultInjection::kFault_SecMgrBusy, {
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_SecMgrBusy, {
         secMgr->AsyncNotifySecurityManagerAvailable();
         ExitNow(err = CHIP_ERROR_SECURITY_MANAGER_BUSY);
     });
@@ -321,7 +321,7 @@ CHIP_ERROR ChipSecurityManager::StartPASESession(ChipConnection * con, ChipAuthM
     // Verify there is no session in process.
     VerifyOrExit(State == kState_Idle, err = CHIP_ERROR_SECURITY_MANAGER_BUSY);
 
-    CHIP_FAULT_INJECT(nl::FaultInjection::kFault_SecMgrBusy, {
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_SecMgrBusy, {
         AsyncNotifySecurityManagerAvailable();
         ExitNow(err = CHIP_ERROR_SECURITY_MANAGER_BUSY);
     });
@@ -972,7 +972,7 @@ CHIP_ERROR ChipSecurityManager::StartCASESession(ChipConnection * con, uint64_t 
     // Verify there is no session in process.
     VerifyOrExit(State == kState_Idle, err = CHIP_ERROR_SECURITY_MANAGER_BUSY);
 
-    CHIP_FAULT_INJECT(nl::FaultInjection::kFault_SecMgrBusy, {
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_SecMgrBusy, {
         AsyncNotifySecurityManagerAvailable();
         ExitNow(err = CHIP_ERROR_SECURITY_MANAGER_BUSY);
     });
@@ -1496,7 +1496,7 @@ CHIP_ERROR ChipSecurityManager::StartTAKESession(ChipConnection * con, ChipAuthM
     // Verify there is no session in process.
     VerifyOrExit(State == kState_Idle, err = CHIP_ERROR_SECURITY_MANAGER_BUSY);
 
-    CHIP_FAULT_INJECT(nl::FaultInjection::kFault_SecMgrBusy, {
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_SecMgrBusy, {
         AsyncNotifySecurityManagerAvailable();
         ExitNow(err = CHIP_ERROR_SECURITY_MANAGER_BUSY);
     });
