@@ -17,8 +17,8 @@
  *    limitations under the License.
  */
 
-#include "AppEvent.h"
 #include "AppTask.h"
+#include "AppEvent.h"
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
 #include "Server.h"
