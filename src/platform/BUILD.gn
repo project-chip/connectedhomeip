@@ -14,8 +14,32 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
+import("//build/config/linux/pkg_config.gni")
 
 import("device.gni")
+
+action("gen_gdbus_wrapper") {
+  script = "${chip_root}/scripts/gen_gdbus_wrapper.py"
+
+  source_path = "//src/platform/Linux/dbus"
+  gen_dbus_wpa = "${target_gen_dir}/Linux/dbus/DBusWpa.c"
+  gen_dbus_wpa_interface = "${target_gen_dir}/Linux/dbus/DBusWpaInterface.c"
+  gen_dbus_wpa_network = "${target_gen_dir}/Linux/dbus/DBusWpaNetwork.c"
+  outputs = [ gen_dbus_wpa,  gen_dbus_wpa_interface, gen_dbus_wpa_network]
+
+  outputs_files  = rebase_path("${gen_dbus_wpa}", root_build_dir) + ","
+  outputs_files += rebase_path("${gen_dbus_wpa_interface}", root_build_dir) + ","
+  outputs_files += rebase_path("${gen_dbus_wpa_network}", root_build_dir)
+
+  inputs_files  = rebase_path("${source_path}/wpa.xml", root_build_dir) + ","
+  inputs_files += rebase_path("${source_path}/wpa_interface.xml", root_build_dir) + ","
+  inputs_files += rebase_path("${source_path}/wpa_network.xml", root_build_dir)
+
+  args = [
+    "--output_files=" + outputs_files,
+    "--input_files=" + inputs_files,
+  ]
+}
 
 if (chip_device_platform == "nrf5") {
   import("//build_overrides/nrf5_sdk.gni")
@@ -88,6 +112,10 @@ if (chip_device_platform != "none") {
     if (chip_enable_openthread) {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_THREAD=1" ]
     }
+    if (chip_enable_wifi) {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_WPA=1" ]
+      include_dirs = [ "${chip_root}/src/platform/Linux/dbus" ]
+    }
     if (chip_device_platform == "efr32") {
       defines += [
         "CONFIG_DEVICE_LAYER=1",
@@ -97,6 +125,13 @@ if (chip_device_platform != "none") {
     } else {
       defines += [ "CHIP_DEVICE_LAYER_TARGET_EFR32=0" ]
     }
+  }
+
+  pkg_config("glib") {
+    packages = [
+    "glib-2.0",
+    "gio-unix-2.0",
+    ]
   }
 
   static_library("platform") {
@@ -211,6 +246,19 @@ if (chip_device_platform != "none") {
           "Linux/ThreadStackManagerImpl.h",
         ]
         public_deps += [ "${chip_root}/third_party/ot-br-posix:ot_br_client" ]
+      }
+
+      if (chip_enable_wifi) {
+        sources += [
+          "Linux/dbus/DBusWpa.h",
+          "${target_gen_dir}/Linux/dbus/DBusWpa.c",
+          "Linux/dbus/DBusWpaInterface.h",
+          "${target_gen_dir}/Linux/dbus/DBusWpaInterface.c",
+          "Linux/dbus/DBusWpaNetwork.h",
+          "${target_gen_dir}/Linux/dbus/DBusWpaNetwork.c",
+        ]
+        deps = [ ":gen_gdbus_wrapper" ]
+        public_configs += [ ":glib" ]
       }
 
       public_deps += [ "${chip_root}/third_party/inipp" ]
