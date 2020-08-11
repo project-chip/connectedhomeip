@@ -121,7 +121,8 @@ public class CommissionerWorker extends Worker {
         new Gson()
             .fromJson(getInputData().getString(Constants.KEY_DEVICE_INFO), CHIPDeviceInfo.class);
     networkInfo =
-        new Gson().fromJson(getInputData().getString(Constants.KEY_NETWORK_INFO), NetworkInfo.class);
+        new Gson()
+            .fromJson(getInputData().getString(Constants.KEY_NETWORK_INFO), NetworkInfo.class);
 
     nativeCommissioner = Commissioner.create(new NativeCommissionerHandler(this));
 
