@@ -394,10 +394,10 @@ void emberAfRetrieveAttributeAndCraftResponse(uint8_t endpoint, EmberAfClusterId
         }
         else
         {
-            MEMMOVE(&(appResponseData[appResponseLength]), data, dataLen);
+            memmove(&(appResponseData[appResponseLength]), data, dataLen);
         }
 #else  //(BIGENDIAN_CPU)
-        MEMMOVE(&(appResponseData[appResponseLength]), data, dataLen);
+        memmove(&(appResponseData[appResponseLength]), data, dataLen);
 #endif //(BIGENDIAN_CPU)
         appResponseLength += dataLen;
     }
@@ -443,10 +443,10 @@ EmberAfStatus emberAfAppendAttributeReportFields(uint8_t endpoint, EmberAfCluste
     }
     else
     {
-        MEMMOVE(buffer + *bufIndex, data, size);
+        memmove(buffer + *bufIndex, data, size);
     }
 #else
-    MEMMOVE(buffer + *bufIndex, data, size);
+    memmove(buffer + *bufIndex, data, size);
 #endif
     *bufIndex += size;
 

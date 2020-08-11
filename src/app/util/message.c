@@ -71,9 +71,9 @@ void emberAfClearResponseData(void)
     // To prevent accidentally sending to someone else,
     // set the destination to ourselves.
     emberAfResponseDestination = 0 /* emberAfGetNodeId() */;
-    MEMSET(appResponseData, 0, EMBER_AF_RESPONSE_BUFFER_LEN);
+    memset(appResponseData, 0, EMBER_AF_RESPONSE_BUFFER_LEN);
     appResponseLength = 0;
-    MEMSET(&emberAfResponseApsFrame, 0, sizeof(EmberApsFrame));
+    memset(&emberAfResponseApsFrame, 0, sizeof(EmberApsFrame));
 }
 
 uint8_t * emberAfPutInt8uInResp(uint8_t value)
@@ -142,7 +142,7 @@ uint8_t * emberAfPutBlockInResp(const uint8_t * data, uint16_t length)
 {
     if ((appResponseLength + length) < EMBER_AF_RESPONSE_BUFFER_LEN)
     {
-        MEMMOVE(appResponseData + appResponseLength, data, length);
+        memmove(appResponseData + appResponseLength, data, length);
         appResponseLength += length;
         return &appResponseData[appResponseLength - length];
     }

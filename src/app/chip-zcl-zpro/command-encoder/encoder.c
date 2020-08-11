@@ -130,3 +130,56 @@ uint32_t encodeToggleCommand(uint8_t * buffer, uint32_t buf_length, uint8_t dest
 {
     return _encodeOnOffCommand(buffer, buf_length, 2, destination_endpoint);
 }
+
+uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t cluster_id,
+                                     uint16_t * attr_ids, uint16_t attr_id_count)
+{
+    uint16_t indexToWrite = doEncodeApsFrame(buffer, buf_length, 65535, 6, 1, destination_endpoint, 0, 0, 0, 0);
+    if (indexToWrite == 0)
+    {
+        printf("Error encoding aps frame\n");
+        return 0;
+    }
+
+#define TRY_WRITE(val)                                                                                                             \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        size_t neededSize = indexToWrite + sizeof(val);                                                                            \
+        if (neededSize > buf_length)                                                                                               \
+        {                                                                                                                          \
+            printf("Can't put %zu bytes in buffer\n", neededSize);                                                                 \
+            return 0;                                                                                                              \
+        }                                                                                                                          \
+        memcpy(buffer + indexToWrite, &(val), sizeof(val));                                                                        \
+        indexToWrite = neededSize;                                                                                                 \
+    } while (0)
+
+    // This is a global command, so the low bits are 0b00.  The command is
+    // standard, so does not need a manufacturer code, and we're sending client
+    // to server, so all the remaining bits are 0.
+    uint8_t frameControl = 0x00;
+    TRY_WRITE(frameControl);
+
+    // Transaction sequence number.  Just pick something.
+    uint8_t seqNum = 0x1;
+    TRY_WRITE(seqNum);
+
+    uint8_t readAttributesCommandId = 0x00;
+    TRY_WRITE(readAttributesCommandId);
+
+    for (uint16_t i = 0; i < attr_id_count; ++i)
+    {
+        uint16_t attr_id = attr_ids[i];
+        TRY_WRITE(attr_id);
+    }
+
+#undef TRY_WRITE
+    return indexToWrite;
+}
+
+uint16_t encodeReadOnOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    uint16_t attr_id = 0x0000; /* OnOff attribute */
+    return encodeReadAttributesCommand(buffer, buf_length, destination_endpoint, 0x6 /* cluster_id */, &attr_id,
+                                       1 /* attr_id_count */);
+}

@@ -234,7 +234,7 @@ static void prepareForResponse(const EmberAfClusterCommand * cmd)
     else
     {
         emberAfResponseType |= ZCL_UTIL_RESP_INTERPAN;
-        MEMMOVE(&interpanResponseHeader, cmd->interPanHeader, sizeof(EmberAfInterpanHeader));
+        memmove(&interpanResponseHeader, cmd->interPanHeader, sizeof(EmberAfInterpanHeader));
         // Always send responses as unicast
         interpanResponseHeader.messageType = EMBER_AF_INTER_PAN_UNICAST;
     }
@@ -258,7 +258,7 @@ void emberAfInit(void)
         // emberAfPopNetworkIndex();
     }
 
-    MEMSET(afDeviceEnabled, true, emberAfEndpointCount());
+    memset(afDeviceEnabled, true, emberAfEndpointCount());
 
     // Set up client API buffer.
     emberAfSetExternalBuffer(appResponseData, EMBER_AF_RESPONSE_BUFFER_LEN, &appResponseLength, &emberAfResponseApsFrame);
@@ -593,7 +593,7 @@ bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType ty
 
 kickout:
     emberAfClearResponseData();
-    MEMSET(&interpanResponseHeader, 0, sizeof(EmberAfInterpanHeader));
+    memset(&interpanResponseHeader, 0, sizeof(EmberAfInterpanHeader));
     emAfCurrentCommand = NULL;
     return msgHandled;
 }
@@ -1041,7 +1041,7 @@ void emberAfCopyString(uint8_t * dest, uint8_t * src, uint8_t size)
         {
             length = size;
         }
-        MEMMOVE(dest + 1, src + 1, length);
+        memmove(dest + 1, src + 1, length);
         dest[0] = length;
     }
 }
@@ -1064,7 +1064,7 @@ void emberAfCopyLongString(uint8_t * dest, uint8_t * src, uint16_t size)
         {
             length = size;
         }
-        MEMMOVE(dest + 2, src + 2, length);
+        memmove(dest + 2, src + 2, length);
         dest[0] = LOW_BYTE(length);
         dest[1] = HIGH_BYTE(length);
     }
@@ -1246,7 +1246,7 @@ bool emberAfIsThisMyEui64(EmberEUI64 eui64)
 {
     EmberEUI64 myEui64;
     emberAfGetEui64(myEui64);
-    return (0 == MEMCOMPARE(eui64, myEui64, EUI64_SIZE) ? true : false);
+    return (0 == memcmp(eui64, myEui64, EUI64_SIZE) ? true : false);
 }
 
 uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, const uint8_t * appendingChars,
@@ -1271,8 +1271,8 @@ uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, co
     freeChars    = zclStringMaxLen - curLen;
     charsToWrite = (freeChars > appendingCharsLen) ? appendingCharsLen : freeChars;
 
-    MEMCOPY(&zclString[1 + curLen], // 1 is to account for zcl's length byte
-            appendingChars, charsToWrite);
+    memcpy(&zclString[1 + curLen], // 1 is to account for zcl's length byte
+           appendingChars, charsToWrite);
     zclString[0] = curLen + charsToWrite;
     return charsToWrite;
 }
