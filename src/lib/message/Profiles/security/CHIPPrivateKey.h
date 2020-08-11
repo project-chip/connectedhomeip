@@ -34,22 +34,20 @@ namespace Profiles {
 namespace Security {
 
 using chip::ASN1::OID;
-using chip::Crypto::EncodedECPublicKey;
 using chip::Crypto::EncodedECPrivateKey;
+using chip::Crypto::EncodedECPublicKey;
 
 // Utility functions for encoding/decoding private keys in CHIP TLV format.
 
-extern CHIP_ERROR EncodeChipECPrivateKey(uint32_t weaveCurveId,
-                                           const EncodedECPublicKey *pubKey,
-                                           const EncodedECPrivateKey& privKey,
-                                           uint8_t *outBuf, uint32_t outBufSize, uint32_t& outLen);
+extern CHIP_ERROR EncodeChipECPrivateKey(uint32_t weaveCurveId, const EncodedECPublicKey * pubKey,
+                                         const EncodedECPrivateKey & privKey, uint8_t * outBuf, uint32_t outBufSize,
+                                         uint32_t & outLen);
 
-extern CHIP_ERROR DecodeChipECPrivateKey(const uint8_t *buf, uint32_t len, uint32_t& weaveCurveId,
-                                           EncodedECPublicKey& pubKey, EncodedECPrivateKey& privKey);
+extern CHIP_ERROR DecodeChipECPrivateKey(const uint8_t * buf, uint32_t len, uint32_t & weaveCurveId, EncodedECPublicKey & pubKey,
+                                         EncodedECPrivateKey & privKey);
 
 } // namespace Security
 } // namespace Profiles
 } // namespace chip
-
 
 #endif /* CHIPPRIVATEKEY_H_ */

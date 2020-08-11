@@ -26,9 +26,9 @@
 #define APPLICATION_KEYS_TRAIT_DATA_SINK_H_
 
 #include <Profiles/data-management/TraitData.h>
-#include <Profiles/security/CHIPApplicationKeys.h>
-#include <Profiles/security/ApplicationKeysTrait.h>
 #include <Profiles/security/ApplicationKeysStructSchema.h>
+#include <Profiles/security/ApplicationKeysTrait.h>
+#include <Profiles/security/CHIPApplicationKeys.h>
 
 namespace Schema {
 namespace chip {
@@ -48,21 +48,22 @@ class ApplicationKeysTraitDataSink : public chip::Profiles::DataManagement::Trai
 public:
     ApplicationKeysTraitDataSink(void);
 
-    void SetGroupKeyStore(chip::Profiles::Security::AppKeys::GroupKeyStoreBase *groupKeyStore);
+    void SetGroupKeyStore(chip::Profiles::Security::AppKeys::GroupKeyStoreBase * groupKeyStore);
 
-    CHIP_ERROR OnEvent(uint16_t aType, void *aInEventParam) __OVERRIDE;
+    CHIP_ERROR OnEvent(uint16_t aType, void * aInEventParam) __OVERRIDE;
 
 protected:
-    chip::Profiles::Security::AppKeys::GroupKeyStoreBase *GroupKeyStore;
+    chip::Profiles::Security::AppKeys::GroupKeyStoreBase * GroupKeyStore;
 
 private:
-    CHIP_ERROR SetLeafData(chip::Profiles::DataManagement::PropertyPathHandle aLeafHandle, chip::TLV::TLVReader &aReader) __OVERRIDE;
+    CHIP_ERROR SetLeafData(chip::Profiles::DataManagement::PropertyPathHandle aLeafHandle,
+                           chip::TLV::TLVReader & aReader) __OVERRIDE;
 };
 
-} // ApplicationKeysTrait
-} // Auth
-} // Trait
-} // CHIP
-} // Schema
+} // namespace ApplicationKeysTrait
+} // namespace Auth
+} // namespace Trait
+} // namespace chip
+} // namespace Schema
 
 #endif // APPLICATION_KEYS_TRAIT_DATA_SINK_H_

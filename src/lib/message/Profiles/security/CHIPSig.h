@@ -27,22 +27,21 @@
 #ifndef CHIPSIG_H_
 #define CHIPSIG_H_
 
+#include <Profiles/security/CHIPCert.h>
 #include <core/CHIPTLV.h>
 #include <support/ASN1.h>
-#include <Profiles/security/CHIPCert.h>
-
 
 namespace chip {
 namespace Profiles {
 namespace Security {
 
-enum {
-    kGenerateChipSignatureFlag_None                                      = 0,
-    kGenerateChipSignatureFlag_IncludeSigningCertSubjectDN               = 0x0001,
-    kGenerateChipSignatureFlag_IncludeSigningCertKeyId                   = 0x0002,
-    kGenerateChipSignatureFlag_IncludeRelatedCertificates                = 0x0004,
+enum
+{
+    kGenerateChipSignatureFlag_None                        = 0,
+    kGenerateChipSignatureFlag_IncludeSigningCertSubjectDN = 0x0001,
+    kGenerateChipSignatureFlag_IncludeSigningCertKeyId     = 0x0002,
+    kGenerateChipSignatureFlag_IncludeRelatedCertificates  = 0x0004,
 };
-
 
 /**
  * Provides generic functionality for generating ChipSignatures.
@@ -56,10 +55,10 @@ class ChipSignatureGeneratorBase
 public:
     enum
     {
-        kFlag_None                                          = 0,
-        kFlag_IncludeSigningCertSubjectDN                   = 0x0001,
-        kFlag_IncludeSigningCertKeyId                       = 0x0002,
-        kFlag_IncludeRelatedCertificates                    = 0x0004,
+        kFlag_None                        = 0,
+        kFlag_IncludeSigningCertSubjectDN = 0x0001,
+        kFlag_IncludeSigningCertKeyId     = 0x0002,
+        kFlag_IncludeRelatedCertificates  = 0x0004,
     };
 
     ChipCertificateSet & CertSet;
@@ -68,7 +67,8 @@ public:
     uint16_t Flags;
 
     CHIP_ERROR GenerateSignature(const uint8_t * msgHash, uint8_t msgHashLen, TLVWriter & writer);
-    CHIP_ERROR GenerateSignature(const uint8_t * msgHash, uint8_t msgHashLen, uint8_t * sigBuf, uint16_t sigBufSize, uint16_t & sigLen);
+    CHIP_ERROR GenerateSignature(const uint8_t * msgHash, uint8_t msgHashLen, uint8_t * sigBuf, uint16_t sigBufSize,
+                                 uint16_t & sigLen);
     virtual CHIP_ERROR GenerateSignature(const uint8_t * msgHash, uint8_t msgHashLen, TLVWriter & writer, uint64_t tag);
 
 protected:
@@ -99,49 +99,38 @@ private:
     virtual CHIP_ERROR GenerateSignatureData(const uint8_t * msgHash, uint8_t msgHashLen, TLVWriter & writer) __OVERRIDE;
 };
 
-
-inline ChipSignatureGeneratorBase::ChipSignatureGeneratorBase(ChipCertificateSet & certSet)
-: CertSet(certSet)
+inline ChipSignatureGeneratorBase::ChipSignatureGeneratorBase(ChipCertificateSet & certSet) : CertSet(certSet)
 {
     SigningCert = certSet.LastCert();
-    SigAlgoOID = chip::ASN1::kOID_SigAlgo_ECDSAWithSHA256;
-    Flags = kFlag_IncludeRelatedCertificates;
+    SigAlgoOID  = chip::ASN1::kOID_SigAlgo_ECDSAWithSHA256;
+    Flags       = kFlag_IncludeRelatedCertificates;
 }
 
-inline ChipSignatureGenerator::ChipSignatureGenerator(ChipCertificateSet & certSet, const uint8_t * privKey, uint16_t privKeyLen)
-: ChipSignatureGeneratorBase(certSet), PrivKey(privKey), PrivKeyLen(privKeyLen)
-{
-}
+inline ChipSignatureGenerator::ChipSignatureGenerator(ChipCertificateSet & certSet, const uint8_t * privKey, uint16_t privKeyLen) :
+    ChipSignatureGeneratorBase(certSet), PrivKey(privKey), PrivKeyLen(privKeyLen)
+{}
 
+extern CHIP_ERROR VerifyChipSignature(const uint8_t * msgHash, uint8_t msgHashLen, const uint8_t * sig, uint16_t sigLen,
+                                      ChipCertificateSet & certSet, ValidationContext & certValidContext);
 
-extern CHIP_ERROR VerifyChipSignature(const uint8_t *msgHash, uint8_t msgHashLen,
-                                        const uint8_t *sig, uint16_t sigLen,
-                                        ChipCertificateSet& certSet,
-                                        ValidationContext& certValidContext);
+extern CHIP_ERROR VerifyChipSignature(const uint8_t * msgHash, uint8_t msgHashLen, const uint8_t * sig, uint16_t sigLen,
+                                      OID expectedSigAlgoOID, ChipCertificateSet & certSet, ValidationContext & certValidContext);
 
-extern CHIP_ERROR VerifyChipSignature(const uint8_t *msgHash, uint8_t msgHashLen,
-                                        const uint8_t *sig, uint16_t sigLen, OID expectedSigAlgoOID,
-                                        ChipCertificateSet& certSet,
-                                        ValidationContext& certValidContext);
+extern CHIP_ERROR GetChipSignatureAlgo(const uint8_t * sig, uint16_t sigLen, OID & sigAlgoOID);
 
-extern CHIP_ERROR GetChipSignatureAlgo(const uint8_t *sig, uint16_t sigLen, OID& sigAlgoOID);
+extern CHIP_ERROR GenerateAndEncodeChipECDSASignature(TLVWriter & writer, uint64_t tag, const uint8_t * msgHash, uint8_t msgHashLen,
+                                                      const uint8_t * signingKey, uint16_t signingKeyLen);
 
-extern CHIP_ERROR GenerateAndEncodeChipECDSASignature(TLVWriter& writer, uint64_t tag,
-        const uint8_t * msgHash, uint8_t msgHashLen,
-        const uint8_t * signingKey, uint16_t signingKeyLen);
-
-extern CHIP_ERROR EncodeChipECDSASignature(TLVWriter& writer, EncodedECDSASignature& sig, uint64_t tag);
-extern CHIP_ERROR DecodeChipECDSASignature(TLVReader& reader, EncodedECDSASignature& sig);
-extern CHIP_ERROR DecodeCopyECDSASignature_DER(const uint8_t * sigBuf, uint8_t sigLen, EncodedECDSASignature& sig);
-extern CHIP_ERROR ConvertECDSASignature_DERToChip(const uint8_t * sigBuf, uint8_t sigLen, TLVWriter& writer, uint64_t tag);
-extern CHIP_ERROR InsertRelatedCertificatesIntoChipSignature(
-                                        uint8_t *sigBuf, uint16_t sigLen, uint16_t sigBufLen,
-                                        const uint8_t *relatedCerts, uint16_t relatedCertsLen,
-                                        uint16_t& outSigLen);
+extern CHIP_ERROR EncodeChipECDSASignature(TLVWriter & writer, EncodedECDSASignature & sig, uint64_t tag);
+extern CHIP_ERROR DecodeChipECDSASignature(TLVReader & reader, EncodedECDSASignature & sig);
+extern CHIP_ERROR DecodeCopyECDSASignature_DER(const uint8_t * sigBuf, uint8_t sigLen, EncodedECDSASignature & sig);
+extern CHIP_ERROR ConvertECDSASignature_DERToChip(const uint8_t * sigBuf, uint8_t sigLen, TLVWriter & writer, uint64_t tag);
+extern CHIP_ERROR InsertRelatedCertificatesIntoChipSignature(uint8_t * sigBuf, uint16_t sigLen, uint16_t sigBufLen,
+                                                             const uint8_t * relatedCerts, uint16_t relatedCertsLen,
+                                                             uint16_t & outSigLen);
 
 } // namespace Security
 } // namespace Profiles
 } // namespace chip
-
 
 #endif /* CHIPSIG_H_ */

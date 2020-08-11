@@ -33,9 +33,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include <core/CHIPCore.h>
-#include <Profiles/security/CHIPSecurity.h>
 #include <Profiles/security/CHIPCert.h>
+#include <Profiles/security/CHIPSecurity.h>
+#include <core/CHIPCore.h>
 
 namespace chip {
 namespace Profiles {
@@ -43,13 +43,15 @@ namespace Security {
 
 #if CHIP_CONFIG_ENABLE_SECURITY_DEBUG_FUNCS
 
-extern void PrintCert(FILE *out, const ChipCertificateData& cert, const ChipCertificateSet  *certSet, uint16_t indent = 0, bool verbose = false);
-extern void PrintCertValidationResults(FILE *out, const ChipCertificateSet& certSet, const ValidationContext& validContext, uint16_t indent = 0);
+extern void PrintCert(FILE * out, const ChipCertificateData & cert, const ChipCertificateSet * certSet, uint16_t indent = 0,
+                      bool verbose = false);
+extern void PrintCertValidationResults(FILE * out, const ChipCertificateSet & certSet, const ValidationContext & validContext,
+                                       uint16_t indent = 0);
 extern CHIP_ERROR PrintChipDN(FILE * out, TLVReader & reader);
-extern void PrintChipDN(FILE *out, const ChipDN& dn);
-extern void PrintPackedTime(FILE *out, uint32_t t);
-extern void PrintPackedDate(FILE *out, uint16_t t);
-extern const char *DescribeChipCertId(OID attrOID, uint64_t weaveCertId);
+extern void PrintChipDN(FILE * out, const ChipDN & dn);
+extern void PrintPackedTime(FILE * out, uint32_t t);
+extern void PrintPackedDate(FILE * out, uint16_t t);
+extern const char * DescribeChipCertId(OID attrOID, uint64_t weaveCertId);
 extern CHIP_ERROR PrintCertArray(FILE * out, TLVReader & reader, uint16_t indent);
 extern CHIP_ERROR PrintECDSASignature(FILE * out, TLVReader & reader, uint16_t indent);
 extern CHIP_ERROR PrintCertReference(FILE * out, TLVReader & reader, uint16_t indent);

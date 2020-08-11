@@ -46,11 +46,11 @@ public:
     DummyGroupKeyStore(void);
 
     // Manage application group key material storage.
-    virtual CHIP_ERROR RetrieveGroupKey(uint32_t keyId, ChipGroupKey& key);
-    virtual CHIP_ERROR StoreGroupKey(const ChipGroupKey& key);
+    virtual CHIP_ERROR RetrieveGroupKey(uint32_t keyId, ChipGroupKey & key);
+    virtual CHIP_ERROR StoreGroupKey(const ChipGroupKey & key);
     virtual CHIP_ERROR DeleteGroupKey(uint32_t keyId);
     virtual CHIP_ERROR DeleteGroupKeysOfAType(uint32_t keyType);
-    virtual CHIP_ERROR EnumerateGroupKeys(uint32_t keyType, uint32_t *keyIds, uint8_t keyIdsArraySize, uint8_t & keyCount);
+    virtual CHIP_ERROR EnumerateGroupKeys(uint32_t keyType, uint32_t * keyIds, uint8_t keyIdsArraySize, uint8_t & keyCount);
     virtual CHIP_ERROR Clear(void);
 
 private:
@@ -59,7 +59,7 @@ private:
     virtual CHIP_ERROR StoreLastUsedEpochKeyId(void);
 
     // Get current platform UTC time in seconds.
-    virtual CHIP_ERROR GetCurrentUTCTime(uint32_t& utcTime);
+    virtual CHIP_ERROR GetCurrentUTCTime(uint32_t & utcTime);
 };
 
 } // namespace AppKeys

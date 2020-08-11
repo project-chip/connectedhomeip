@@ -46,7 +46,7 @@ namespace AppKeys {
  */
 enum ChipAppGroupGlobalId
 {
-    kChipAppGroupGlobalId_Unspecified           = 0,        /**< Application Group Global ID is not specified. */
+    kChipAppGroupGlobalId_Unspecified = 0, /**< Application Group Global ID is not specified. */
 
     /**
      * @brief Nest Labs Application Group Global IDs.
@@ -58,10 +58,10 @@ enum ChipAppGroupGlobalId
      *
      *  @{
      */
-    kChipAppGroupGlobalId_NestPhysicalAccess    = (kChipVendor_NestLabs << 16) | 0x0001,  /**< Nest Physical Access Group. */
-    kChipAppGroupGlobalId_NestStructureSecurity = (kChipVendor_NestLabs << 16) | 0x0002,  /**< Nest Structure Security Group. */
-    kChipAppGroupGlobalId_NestHVAC              = (kChipVendor_NestLabs << 16) | 0x0003,  /**< Nest HVAC Group. */
-    kChipAppGroupGlobalId_NestSecurityControl   = (kChipVendor_NestLabs << 16) | 0x0004,  /**< Nest Security Control Group. */
+    kChipAppGroupGlobalId_NestPhysicalAccess    = (kChipVendor_NestLabs << 16) | 0x0001, /**< Nest Physical Access Group. */
+    kChipAppGroupGlobalId_NestStructureSecurity = (kChipVendor_NestLabs << 16) | 0x0002, /**< Nest Structure Security Group. */
+    kChipAppGroupGlobalId_NestHVAC              = (kChipVendor_NestLabs << 16) | 0x0003, /**< Nest HVAC Group. */
+    kChipAppGroupGlobalId_NestSecurityControl   = (kChipVendor_NestLabs << 16) | 0x0004, /**< Nest Security Control Group. */
 
     /**
      *  @}

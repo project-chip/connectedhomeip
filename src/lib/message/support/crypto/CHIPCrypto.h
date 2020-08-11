@@ -28,8 +28,8 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #include <core/CHIPConfig.h>
 #include <core/CHIPError.h>
@@ -37,16 +37,17 @@
 
 // If one or more of the enabled CHIP features depends on OpenSSL but CHIP_WITH_OPENSSL has
 // NOT been defined, then assume we will be using OpenSSL and set CHIP_WITH_OPENSSL == 1.
-#define CHIP_CONFIG_REQUIRES_OPENSSL (CHIP_CONFIG_USE_OPENSSL_ECC || CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL || \
-                                       CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL || CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL || \
-                                       CHIP_CONFIG_SUPPORT_PASE_CONFIG1 || CHIP_CONFIG_ENABLE_PROVISIONING_BUNDLE_SUPPORT)
+#define CHIP_CONFIG_REQUIRES_OPENSSL                                                                                               \
+    (CHIP_CONFIG_USE_OPENSSL_ECC || CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL || CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL ||            \
+     CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL || CHIP_CONFIG_SUPPORT_PASE_CONFIG1 ||                                                \
+     CHIP_CONFIG_ENABLE_PROVISIONING_BUNDLE_SUPPORT)
 #if CHIP_CONFIG_REQUIRES_OPENSSL && !defined(CHIP_WITH_OPENSSL)
 #define CHIP_WITH_OPENSSL 1
 #endif
 
 #if CHIP_WITH_OPENSSL
-#include <openssl/crypto.h>
 #include <openssl/bn.h>
+#include <openssl/crypto.h>
 #ifdef OPENSSL_IS_BORINGSSL
 #include <openssl/mem.h>
 #endif // OPENSSL_IS_BORINGSSL
@@ -66,15 +67,15 @@ namespace Crypto {
 /**
  * Signature of a function used to gather random data from an entropy source.
  */
-typedef int (*EntropyFunct)(uint8_t *buf, size_t bufSize);
+typedef int (*EntropyFunct)(uint8_t * buf, size_t bufSize);
 
-extern bool ConstantTimeCompare(const uint8_t *buf1, const uint8_t *buf2, uint16_t len);
-extern void ClearSecretData(uint8_t *buf, uint32_t len);
+extern bool ConstantTimeCompare(const uint8_t * buf1, const uint8_t * buf2, uint16_t len);
+extern void ClearSecretData(uint8_t * buf, uint32_t len);
 
 #if CHIP_WITH_OPENSSL
 
-extern CHIP_ERROR EncodeBIGNUMValueLE(const BIGNUM& val, uint16_t size, uint8_t *& p);
-extern CHIP_ERROR DecodeBIGNUMValueLE(BIGNUM& val, uint16_t size, const uint8_t *& p);
+extern CHIP_ERROR EncodeBIGNUMValueLE(const BIGNUM & val, uint16_t size, uint8_t *& p);
+extern CHIP_ERROR DecodeBIGNUMValueLE(BIGNUM & val, uint16_t size, const uint8_t *& p);
 
 #endif // CHIP_WITH_OPENSSL
 
@@ -83,7 +84,7 @@ extern CHIP_ERROR DecodeBIGNUMValueLE(BIGNUM& val, uint16_t size, const uint8_t 
 
 using namespace chip::Crypto;
 
-#include "CHIPRNG.h"
 #include "AESBlockCipher.h"
+#include "CHIPRNG.h"
 
 #endif /* CHIPCRYPTO_H_ */

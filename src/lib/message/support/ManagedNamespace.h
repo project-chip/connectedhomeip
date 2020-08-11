@@ -237,7 +237,8 @@
  *    #include <support/ManagedNamespace.hpp>
 
  *    #if defined(CHIP_CONFIG_MERCURY_NAMESPACE) && CHIP_CONFIG_MERCURY_NAMESPACE != kChipManagedNamespace_Current
- *    #error Compiling CHIP Mercury current-designation managed namespace file with CHIP_CONFIG_MERCURY_NAMESPACE defined != kChipManagedNamespace_Current
+ *    #error Compiling CHIP Mercury current-designation managed namespace file with CHIP_CONFIG_MERCURY_NAMESPACE defined !=
+ kChipManagedNamespace_Current
  *    #endif
  *
  *    #ifndef CHIP_CONFIG_MERCURY_NAMESPACE
@@ -320,7 +321,8 @@
  *    #if defined(CHIP_CONFIG_MERCURY_NAMESPACE)                             \
  *      && (CHIP_CONFIG_MERCURY_NAMESPACE != kChipManagedNamespace_Current) \
  *      && (CHIP_CONFIG_MERCURY_NAMESPACE != kChipManagedNamespace_Development)
- *    #error "CHIP_CONFIG_MERCURY_NAMESPACE defined, but not as namespace kChipManagedNamespace_Current or kChipManagedNamespace_Development"
+ *    #error "CHIP_CONFIG_MERCURY_NAMESPACE defined, but not as namespace kChipManagedNamespace_Current or
+ kChipManagedNamespace_Development"
  *    #endif
  *
  *    #if !defined(CHIP_CONFIG_MERCURY_NAMESPACE)
@@ -366,7 +368,8 @@
  *    #include <support/ManagedNamespace.hpp>
 
  *    #if defined(CHIP_CONFIG_MERCURY_NAMESPACE) && CHIP_CONFIG_MERCURY_NAMESPACE != kChipManagedNamespace_Development
- *    #error Compiling CHIP Mercury development-designated managed namespace file with CHIP_CONFIG_MERCURY_NAMESPACE defined != kChipManagedNamespace_Development
+ *    #error Compiling CHIP Mercury development-designated managed namespace file with CHIP_CONFIG_MERCURY_NAMESPACE defined !=
+ kChipManagedNamespace_Development
  *    #endif
  *
  *    #ifndef CHIP_CONFIG_MERCURY_NAMESPACE
@@ -478,7 +481,7 @@
  *  @sa #ChipMakeManagedNamespaceIdentifier
  *
  */
-#define kChipManagedNamespaceDesignation_Legacy      Legacy
+#define kChipManagedNamespaceDesignation_Legacy Legacy
 
 /**
  *  @def kChipManagedNamespaceDesignation_Current
@@ -491,7 +494,7 @@
  *  @sa #ChipMakeManagedNamespaceIdentifier
  *
  */
-#define kChipManagedNamespaceDesignation_Current     Current
+#define kChipManagedNamespaceDesignation_Current Current
 
 /**
  *  @def kChipManagedNamespaceDesignation_Next
@@ -503,7 +506,7 @@
  *  @sa #ChipMakeManagedNamespaceIdentifier
  *
  */
-#define kChipManagedNamespaceDesignation_Next        Next
+#define kChipManagedNamespaceDesignation_Next Next
 
 /**
  *  @def kChipManagedNamespaceDesignation_Development
@@ -558,7 +561,7 @@
  *  @sa #kChipManagedNamespace_Development
  *
  */
-#define kChipManagedNamespace_Legacy      (0xFFFFFFFF)
+#define kChipManagedNamespace_Legacy (0xFFFFFFFF)
 
 /**
  *  @def kChipManagedNamespace_Current
@@ -573,7 +576,7 @@
  *  @sa #kChipManagedNamespace_Next
  *  @sa #kChipManagedNamespace_Development
  */
-#define kChipManagedNamespace_Current     (0x00000000)
+#define kChipManagedNamespace_Current (0x00000000)
 
 /**
  *  @def kChipManagedNamespace_Next
@@ -588,7 +591,7 @@
  *  @sa #kChipManagedNamespace_Current
  *  @sa #kChipManagedNamespace_Development
  */
-#define kChipManagedNamespace_Next        (0x00000001)
+#define kChipManagedNamespace_Next (0x00000001)
 
 /**
  *  @def kChipManagedNamespace_Development

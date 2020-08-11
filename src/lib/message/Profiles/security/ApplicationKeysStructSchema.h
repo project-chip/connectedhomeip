@@ -34,58 +34,60 @@ namespace Trait {
 namespace Auth {
 namespace ApplicationKeysTrait {
 
-    /**
-     * Epoch key data element tags.
-     */
-    enum EpochKey {
-        //---------------------------------------------------------------------------------------------------------------------------//
-        //  Name                                IDL Type                            TLV Type           Optional?       Nullable?     //
-        //---------------------------------------------------------------------------------------------------------------------------//
+/**
+ * Epoch key data element tags.
+ */
+enum EpochKey
+{
+    //---------------------------------------------------------------------------------------------------------------------------//
+    //  Name                                IDL Type                            TLV Type           Optional?       Nullable?     //
+    //---------------------------------------------------------------------------------------------------------------------------//
 
-        //
-        //  key_id                              uint32                              unsigned int       NO              NO
-        //
-        kTag_EpochKey_KeyId = 1,
+    //
+    //  key_id                              uint32                              unsigned int       NO              NO
+    //
+    kTag_EpochKey_KeyId = 1,
 
-        //
-        //  start_time                          google.protobuf.Timestamp           unsigned int       NO              NO
-        //                                      (int64 milliseconds)
-        kTag_EpochKey_StartTime = 2,
+    //
+    //  start_time                          google.protobuf.Timestamp           unsigned int       NO              NO
+    //                                      (int64 milliseconds)
+    kTag_EpochKey_StartTime = 2,
 
-        //
-        //  key                                 bytes                               array              NO              NO
-        //
-        kTag_EpochKey_Key = 3,
-    };
+    //
+    //  key                                 bytes                               array              NO              NO
+    //
+    kTag_EpochKey_Key = 3,
+};
 
-    /**
-     * Application master key data element tags.
-     */
-    enum ApplicationMasterKey {
-        //---------------------------------------------------------------------------------------------------------------------------//
-        //  Name                                IDL Type                            TLV Type           Optional?       Nullable?     //
-        //---------------------------------------------------------------------------------------------------------------------------//
+/**
+ * Application master key data element tags.
+ */
+enum ApplicationMasterKey
+{
+    //---------------------------------------------------------------------------------------------------------------------------//
+    //  Name                                IDL Type                            TLV Type           Optional?       Nullable?     //
+    //---------------------------------------------------------------------------------------------------------------------------//
 
-        //
-        //  application_group_global_id         uint32                              unsigned int       NO              NO
-        //
-        kTag_ApplicationGroup_GlobalId = 1,
+    //
+    //  application_group_global_id         uint32                              unsigned int       NO              NO
+    //
+    kTag_ApplicationGroup_GlobalId = 1,
 
-        //
-        //  application_group_short_id          uint32                              unsigned int       NO              NO
-        //
-        kTag_ApplicationGroup_ShortId = 2,
+    //
+    //  application_group_short_id          uint32                              unsigned int       NO              NO
+    //
+    kTag_ApplicationGroup_ShortId = 2,
 
-        //
-        //  key                                 bytes                               array              NO              NO
-        //
-        kTag_ApplicationGroup_Key = 3,
-    };
+    //
+    //  key                                 bytes                               array              NO              NO
+    //
+    kTag_ApplicationGroup_Key = 3,
+};
 
-} // ApplicationKeysTrait
-} // Auth
-} // Trait
-} // CHIP
-} // Schema
+} // namespace ApplicationKeysTrait
+} // namespace Auth
+} // namespace Trait
+} // namespace chip
+} // namespace Schema
 
 #endif // _APPLICATION_KEYS_TRAIT_TAGS_H

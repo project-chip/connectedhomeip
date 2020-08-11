@@ -69,20 +69,20 @@ extern const uint8_t kChipAppIntermediateKeyDiversifier[4];
 enum
 {
     // --- Key sizes.
-    kChipAppGroupKeySize                               = 32,                    /**< CHIP constituent group key size. */
-    kChipAppRootKeySize                                = kChipAppGroupKeySize, /**< CHIP application root key size. */
-    kChipAppEpochKeySize                               = kChipAppGroupKeySize, /**< CHIP application epoch key size. */
-    kChipAppGroupMasterKeySize                         = kChipAppGroupKeySize, /**< CHIP application group master key size. */
-    kChipAppIntermediateKeySize                        = kChipAppGroupKeySize, /**< CHIP application intermediate key size. */
-    kChipFabricSecretSize                              = 36,                    /**< CHIP fabric secret size. */
+    kChipAppGroupKeySize        = 32,                   /**< CHIP constituent group key size. */
+    kChipAppRootKeySize         = kChipAppGroupKeySize, /**< CHIP application root key size. */
+    kChipAppEpochKeySize        = kChipAppGroupKeySize, /**< CHIP application epoch key size. */
+    kChipAppGroupMasterKeySize  = kChipAppGroupKeySize, /**< CHIP application group master key size. */
+    kChipAppIntermediateKeySize = kChipAppGroupKeySize, /**< CHIP application intermediate key size. */
+    kChipFabricSecretSize       = 36,                   /**< CHIP fabric secret size. */
 
     // --- Key diversifiers sizes.
     /** Fabric root key diversifier size. */
-    kChipAppFabricRootKeyDiversifierSize               = sizeof(kChipAppFabricRootKeyDiversifier),
+    kChipAppFabricRootKeyDiversifierSize = sizeof(kChipAppFabricRootKeyDiversifier),
     /** Client root key diversifier size. */
-    kChipAppClientRootKeyDiversifierSize               = sizeof(kChipAppClientRootKeyDiversifier),
+    kChipAppClientRootKeyDiversifierSize = sizeof(kChipAppClientRootKeyDiversifier),
     /** Intermediate key diversifier size. */
-    kChipAppIntermediateKeyDiversifierSize             = sizeof(kChipAppIntermediateKeyDiversifier),
+    kChipAppIntermediateKeyDiversifierSize = sizeof(kChipAppIntermediateKeyDiversifier),
 };
 
 /**
@@ -99,14 +99,15 @@ class ChipGroupKey
 public:
     enum
     {
-        MaxKeySize                                      = kChipFabricSecretSize
+        MaxKeySize = kChipFabricSecretSize
     };
-    uint32_t KeyId;                                      /**< The key ID. */
-    uint8_t KeyLen;                                      /**< The key length. */
-    uint8_t Key[MaxKeySize];                             /**< The secret key material. */
-    union {
-        uint32_t StartTime;                              /**< The epoch key start time. */
-        uint32_t GlobalId;                               /**< The application group key global ID. */
+    uint32_t KeyId;          /**< The key ID. */
+    uint8_t KeyLen;          /**< The key length. */
+    uint8_t Key[MaxKeySize]; /**< The secret key material. */
+    union
+    {
+        uint32_t StartTime; /**< The epoch key start time. */
+        uint32_t GlobalId;  /**< The application group key global ID. */
     };
 };
 
@@ -121,30 +122,27 @@ public:
 class DLL_EXPORT GroupKeyStoreBase
 {
 public:
-
     // Manage application group key material storage.
-    virtual CHIP_ERROR RetrieveGroupKey(uint32_t keyId, ChipGroupKey& key) = 0;
-    virtual CHIP_ERROR StoreGroupKey(const ChipGroupKey& key) = 0;
-    virtual CHIP_ERROR DeleteGroupKey(uint32_t keyId) = 0;
-    virtual CHIP_ERROR DeleteGroupKeysOfAType(uint32_t keyType) = 0;
-    virtual CHIP_ERROR EnumerateGroupKeys(uint32_t keyType, uint32_t *keyIds, uint8_t keyIdsArraySize, uint8_t & keyCount) = 0;
-    virtual CHIP_ERROR Clear(void) = 0;
+    virtual CHIP_ERROR RetrieveGroupKey(uint32_t keyId, ChipGroupKey & key)                                                 = 0;
+    virtual CHIP_ERROR StoreGroupKey(const ChipGroupKey & key)                                                              = 0;
+    virtual CHIP_ERROR DeleteGroupKey(uint32_t keyId)                                                                       = 0;
+    virtual CHIP_ERROR DeleteGroupKeysOfAType(uint32_t keyType)                                                             = 0;
+    virtual CHIP_ERROR EnumerateGroupKeys(uint32_t keyType, uint32_t * keyIds, uint8_t keyIdsArraySize, uint8_t & keyCount) = 0;
+    virtual CHIP_ERROR Clear(void)                                                                                          = 0;
 
     // Get the current time.
-    virtual CHIP_ERROR GetCurrentUTCTime(uint32_t& utcTime);
+    virtual CHIP_ERROR GetCurrentUTCTime(uint32_t & utcTime);
 
     // Get current application key Id.
-    CHIP_ERROR GetCurrentAppKeyId(uint32_t keyId, uint32_t& curKeyId);
+    CHIP_ERROR GetCurrentAppKeyId(uint32_t keyId, uint32_t & curKeyId);
 
     // Get/Derive group key.
-    CHIP_ERROR GetGroupKey(uint32_t keyId, ChipGroupKey& groupKey);
+    CHIP_ERROR GetGroupKey(uint32_t keyId, ChipGroupKey & groupKey);
 
     // Derive application key.
-    CHIP_ERROR DeriveApplicationKey(uint32_t& appKeyId,
-                                     const uint8_t *keySalt, uint8_t saltLen,
-                                     const uint8_t *keyDiversifier, uint8_t diversifierLen,
-                                     uint8_t *appKey, uint8_t keyBufSize, uint8_t keyLen,
-                                     uint32_t& appGroupGlobalId);
+    CHIP_ERROR DeriveApplicationKey(uint32_t & appKeyId, const uint8_t * keySalt, uint8_t saltLen, const uint8_t * keyDiversifier,
+                                    uint8_t diversifierLen, uint8_t * appKey, uint8_t keyBufSize, uint8_t keyLen,
+                                    uint32_t & appGroupGlobalId);
 
 protected:
     uint32_t LastUsedEpochKeyId;
@@ -155,21 +153,19 @@ protected:
 
     // Retrieve and Store LastUsedEpochKeyId value.
     virtual CHIP_ERROR RetrieveLastUsedEpochKeyId(void) = 0;
-    virtual CHIP_ERROR StoreLastUsedEpochKeyId(void) = 0;
+    virtual CHIP_ERROR StoreLastUsedEpochKeyId(void)    = 0;
 
 private:
     // Derive fabric/client root key.
-    CHIP_ERROR DeriveFabricOrClientRootKey(uint32_t rootKeyId, ChipGroupKey& rootKey);
+    CHIP_ERROR DeriveFabricOrClientRootKey(uint32_t rootKeyId, ChipGroupKey & rootKey);
 
     // Derive intermediate key.
-    CHIP_ERROR DeriveIntermediateKey(uint32_t keyId, ChipGroupKey& intermediateKey);
+    CHIP_ERROR DeriveIntermediateKey(uint32_t keyId, ChipGroupKey & intermediateKey);
 };
 
-
-extern CHIP_ERROR GetAppGroupMasterKeyId(uint32_t groupGlobalId, GroupKeyStoreBase *groupKeyStore, uint32_t& groupMasterKeyId);
+extern CHIP_ERROR GetAppGroupMasterKeyId(uint32_t groupGlobalId, GroupKeyStoreBase * groupKeyStore, uint32_t & groupMasterKeyId);
 
 extern CHIP_ERROR LogGroupKeys(GroupKeyStoreBase * groupKeyStore);
-
 
 } // namespace AppKeys
 } // namespace Security

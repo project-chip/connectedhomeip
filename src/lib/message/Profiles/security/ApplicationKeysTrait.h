@@ -36,36 +36,38 @@ namespace Trait {
 namespace Auth {
 namespace ApplicationKeysTrait {
 
-    extern const chip::Profiles::DataManagement::TraitSchemaEngine TraitSchema;
+extern const chip::Profiles::DataManagement::TraitSchemaEngine TraitSchema;
 
-    enum {
-        kChipProfileId = (0x0U << 16) | 0x1dU
-    };
+enum
+{
+    kChipProfileId = (0x0U << 16) | 0x1dU
+};
 
-    enum {
-        kPropertyHandle_Root = 1,
+enum
+{
+    kPropertyHandle_Root = 1,
 
-        //---------------------------------------------------------------------------------------------------------------------------//
-        //  Name                                IDL Type                            TLV Type           Optional?       Nullable?     //
-        //---------------------------------------------------------------------------------------------------------------------------//
+    //---------------------------------------------------------------------------------------------------------------------------//
+    //  Name                                IDL Type                            TLV Type           Optional?       Nullable?     //
+    //---------------------------------------------------------------------------------------------------------------------------//
 
-        //
-        //  epoch_keys                          repeated EpochKey                   array              NO              NO
-        //
-        kPropertyHandle_EpochKeys = 2,
+    //
+    //  epoch_keys                          repeated EpochKey                   array              NO              NO
+    //
+    kPropertyHandle_EpochKeys = 2,
 
-        //
-        //  master_keys                         repeated ApplicationMasterKey       array              NO              NO
-        //
-        kPropertyHandle_MasterKeys = 3,
+    //
+    //  master_keys                         repeated ApplicationMasterKey       array              NO              NO
+    //
+    kPropertyHandle_MasterKeys = 3,
 
-    };
+};
 
 } // namespace ApplicationKeysTrait
-}
-}
-}
+} // namespace Auth
+} // namespace Trait
+} // namespace chip
 
-}
+} // namespace Schema
 
 #endif // _CHIP_TRAIT_AUTH__APPLICATION_KEYS_TRAIT_H_

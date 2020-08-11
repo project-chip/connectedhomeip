@@ -38,26 +38,25 @@ class ChipProvisioningBundle
 public:
     uint64_t ChipDeviceId;
 
-    const uint8_t *Certificate;
+    const uint8_t * Certificate;
     uint16_t CertificateLen;
 
-    const uint8_t *PrivateKey;
+    const uint8_t * PrivateKey;
     uint16_t PrivateKeyLen;
 
-    const char *PairingCode;
+    const char * PairingCode;
     uint16_t PairingCodeLen;
 
     void Clear(void);
 
     CHIP_ERROR Verify(uint64_t expectedDeviceId);
 
-    static CHIP_ERROR Decode(uint8_t *provBundleBuf, uint32_t provBundleLen, const char *masterKey, uint32_t masterKeyLen, ChipProvisioningBundle &provBundle);
+    static CHIP_ERROR Decode(uint8_t * provBundleBuf, uint32_t provBundleLen, const char * masterKey, uint32_t masterKeyLen,
+                             ChipProvisioningBundle & provBundle);
 };
-
 
 } // namespace Security
 } // namespace Profiles
 } // namespace chip
-
 
 #endif /* CHIPPROVBUNDLE_H_ */

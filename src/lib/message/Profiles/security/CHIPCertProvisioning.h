@@ -49,7 +49,6 @@ namespace CertProvisioning {
 class ChipNodeOpAuthDelegate
 {
 public:
-
     // ===== Abstract Interface methods
 
     /**
@@ -92,7 +91,6 @@ public:
 class ChipNodeMfrAttestDelegate
 {
 public:
-
     // ===== Abstract Interface methods
 
     /**
@@ -139,29 +137,32 @@ public:
 class DLL_EXPORT ChipCertProvEngine
 {
 public:
-
     struct InEventParam;
     struct OutEventParam;
 
     enum State
     {
-        kState_NotInitialized                       = 0,    /**< The engine object is not initialized. */
-        kState_Idle                                 = 1,    /**< The engine object is idle. */
-        kState_PreparingBinding                     = 2,    /**< The engine object is waiting for the binding to become ready. */
-        kState_RequestInProgress                    = 3,    /**< A GetCertificateRequest message has been sent and the engine object is awaiting a response. */
+        kState_NotInitialized   = 0, /**< The engine object is not initialized. */
+        kState_Idle             = 1, /**< The engine object is idle. */
+        kState_PreparingBinding = 2, /**< The engine object is waiting for the binding to become ready. */
+        kState_RequestInProgress =
+            3, /**< A GetCertificateRequest message has been sent and the engine object is awaiting a response. */
     };
 
     enum EventType
     {
-        kEvent_PrepareAuthorizeInfo                 = 1,    /**< The application is requested to prepare the payload for the GetCertificateRequest. */
-        kEvent_ResponseReceived                     = 2,    /**< A GetCertificateResponse message was received from the peer. */
-        kEvent_CommunicationError                   = 3,    /**< A communication error occurred while sending a GetCertificateRequest or waiting for a response. */
+        kEvent_PrepareAuthorizeInfo = 1, /**< The application is requested to prepare the payload for the GetCertificateRequest. */
+        kEvent_ResponseReceived     = 2, /**< A GetCertificateResponse message was received from the peer. */
+        kEvent_CommunicationError =
+            3, /**< A communication error occurred while sending a GetCertificateRequest or waiting for a response. */
     };
 
     enum
     {
-        kReqType_GetInitialOpDeviceCert             = 0,    /**< The Get Certificate request type is to obtain initial operational certificatete. */
-        kReqType_RotateOpDeviceCert                 = 1,    /**< The Get Certificate request type is to rotate the current operational certificatete. */
+        kReqType_GetInitialOpDeviceCert =
+            0, /**< The Get Certificate request type is to obtain initial operational certificatete. */
+        kReqType_RotateOpDeviceCert =
+            1, /**< The Get Certificate request type is to rotate the current operational certificatete. */
     };
 
     /**
@@ -172,13 +173,14 @@ public:
      *  @param[in]  inParam     Reference of input event parameters passed by the event callback.
      *  @param[in]  outParam    Reference of output event parameters passed by the event callback.
      */
-    typedef void (* EventCallback)(void * appState, EventType eventType, const InEventParam & inParam, OutEventParam & outParam);
+    typedef void (*EventCallback)(void * appState, EventType eventType, const InEventParam & inParam, OutEventParam & outParam);
 
-    void * AppState;                                        /**< A pointer to application-specific data. */
+    void * AppState; /**< A pointer to application-specific data. */
 
     ChipCertProvEngine(void);
 
-    CHIP_ERROR Init(Binding * binding, ChipNodeOpAuthDelegate * opAuthDelegate, ChipNodeMfrAttestDelegate * mfrAttestDelegate, EventCallback eventCallback, void * appState = NULL);
+    CHIP_ERROR Init(Binding * binding, ChipNodeOpAuthDelegate * opAuthDelegate, ChipNodeMfrAttestDelegate * mfrAttestDelegate,
+                    EventCallback eventCallback, void * appState = NULL);
     void Shutdown(void);
 
     CHIP_ERROR StartCertificateProvisioning(uint8_t reqType, bool doMfrAttest);
@@ -203,12 +205,11 @@ public:
     CHIP_ERROR ProcessGetCertificateResponse(PacketBuffer * msgBuf);
 
 private:
-
     uint8_t mReqType;
     bool mDoMfrAttest;
     Binding * mBinding;
-    ChipNodeOpAuthDelegate *mOpAuthDelegate;
-    ChipNodeMfrAttestDelegate *mMfrAttestDelegate;
+    ChipNodeOpAuthDelegate * mOpAuthDelegate;
+    ChipNodeMfrAttestDelegate * mMfrAttestDelegate;
     EventCallback mEventCallback;
     ExchangeContext * mEC;
     State mState;
@@ -227,7 +228,7 @@ private:
 #endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     static void HandleSendError(ExchangeContext * ec, CHIP_ERROR sendErr, void * msgCtxt);
     static void HandleKeyError(ExchangeContext * ec, CHIP_ERROR keyErr);
-    static void HandleConnectionClosed(ExchangeContext *ec, ChipConnection *con, CHIP_ERROR conErr);
+    static void HandleConnectionClosed(ExchangeContext * ec, ChipConnection * con, CHIP_ERROR conErr);
 };
 
 /**
@@ -235,29 +236,31 @@ private:
  */
 struct ChipCertProvEngine::InEventParam
 {
-    ChipCertProvEngine * Source;                       /**< The ChipCertProvEngine from which the API event originated. */
+    ChipCertProvEngine * Source; /**< The ChipCertProvEngine from which the API event originated. */
 
     union
     {
         struct
         {
-            TLVWriter * Writer;                         /**< A pointer to the TLV Writer object, where get certificate authorization
-                                                             information should be encoded. */
+            TLVWriter * Writer; /**< A pointer to the TLV Writer object, where get certificate authorization
+                                     information should be encoded. */
         } PrepareAuthorizeInfo;
 
         struct
         {
-            CHIP_ERROR Reason;                         /**< The error code associated with the communication failure. */
-            StatusReport * RcvdStatusReport;            /**< A pointer to the StatusReport object. Relevant if status report message received from the peer. */
+            CHIP_ERROR Reason;               /**< The error code associated with the communication failure. */
+            StatusReport * RcvdStatusReport; /**< A pointer to the StatusReport object. Relevant if status report message received
+                                                from the peer. */
         } CommunicationError;
 
         struct
         {
-            bool ReplaceCert;                           /**< Boolean indicator of whether operational device certificate should be replaced. */
-            const uint8_t * Cert;                       /**< A pointer to the TLV encoded CHIP operational certificate assigned by CA Service. */
-            uint16_t CertLen;                           /**< Length of the certificate received in the GetCertificateResponse message. */
-            const uint8_t * RelatedCerts;               /**< A pointer to the TLV encoded list of certificate related to the operational certificate. */
-            uint16_t RelatedCertsLen;                   /**< Length of the related certificate list received in the GetCertificateResponse message. */
+            bool ReplaceCert;     /**< Boolean indicator of whether operational device certificate should be replaced. */
+            const uint8_t * Cert; /**< A pointer to the TLV encoded CHIP operational certificate assigned by CA Service. */
+            uint16_t CertLen;     /**< Length of the certificate received in the GetCertificateResponse message. */
+            const uint8_t *
+                RelatedCerts; /**< A pointer to the TLV encoded list of certificate related to the operational certificate. */
+            uint16_t RelatedCertsLen; /**< Length of the related certificate list received in the GetCertificateResponse message. */
         } ResponseReceived;
     };
 
@@ -273,14 +276,14 @@ struct ChipCertProvEngine::OutEventParam
     {
         struct
         {
-            CHIP_ERROR Error;                          /**< An error set by the application indicating that
-                                                             an authorization info couldn't be prepared. */
+            CHIP_ERROR Error; /**< An error set by the application indicating that
+                                    an authorization info couldn't be prepared. */
         } PrepareAuthorizeInfo;
 
         struct
         {
-            CHIP_ERROR Error;                          /**< An error set by the application indicating that
-                                                             response data couldn't be processed. */
+            CHIP_ERROR Error; /**< An error set by the application indicating that
+                                    response data couldn't be processed. */
         } ResponseReceived;
     };
 
@@ -293,9 +296,7 @@ struct ChipCertProvEngine::OutEventParam
  * Documentation for these functions can be found at the end of the .cpp file.
  */
 
-inline ChipCertProvEngine::ChipCertProvEngine(void)
-{
-}
+inline ChipCertProvEngine::ChipCertProvEngine(void) {}
 
 inline void ChipCertProvEngine::AbortCertificateProvisioning(void)
 {
@@ -312,7 +313,7 @@ inline uint8_t ChipCertProvEngine::GetReqType(void) const
     return mReqType;
 }
 
-inline Binding *ChipCertProvEngine::GetBinding(void) const
+inline Binding * ChipCertProvEngine::GetBinding(void) const
 {
     return mBinding;
 }

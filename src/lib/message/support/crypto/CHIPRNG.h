@@ -30,7 +30,8 @@
 #include "CHIPCrypto.h"
 
 #if CHIP_CONFIG_USE_OPENSSL_ECC && !CHIP_WITH_OPENSSL
-#error "INVALID CHIP CONFIG: OpenSSL RNG implementation enabled but OpenSSL not available (CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL == 1 && CHIP_WITH_OPENSSL == 0)."
+#error                                                                                                                             \
+    "INVALID CHIP CONFIG: OpenSSL RNG implementation enabled but OpenSSL not available (CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL == 1 && CHIP_WITH_OPENSSL == 0)."
 #endif
 
 namespace chip {
@@ -62,7 +63,8 @@ extern "C" {
  * @retval  #CHIP_NO_ERROR                On success.
  *
  */
-extern CHIP_ERROR InitSecureRandomDataSource(chip::Crypto::EntropyFunct entropyFunct, uint16_t entropyLen, const uint8_t *personalizationData, uint16_t perDataLen);
+extern CHIP_ERROR InitSecureRandomDataSource(chip::Crypto::EntropyFunct entropyFunct, uint16_t entropyLen,
+                                             const uint8_t * personalizationData, uint16_t perDataLen);
 
 /**
  * This function is called by the CHIP layer to generate random data.
@@ -80,13 +82,13 @@ extern CHIP_ERROR InitSecureRandomDataSource(chip::Crypto::EntropyFunct entropyF
  * @retval  #CHIP_NO_ERROR                          On success.
  *
  */
-extern CHIP_ERROR GetSecureRandomData(uint8_t *buf, uint16_t len);
+extern CHIP_ERROR GetSecureRandomData(uint8_t * buf, uint16_t len);
 
 } /* end of extern "C" */
 
 #if CHIP_CONFIG_DEV_RANDOM_DRBG_SEED
 
-extern int GetDRBGSeedDevRandom(uint8_t *buf, size_t bufSize);
+extern int GetDRBGSeedDevRandom(uint8_t * buf, size_t bufSize);
 
 #endif // CHIP_CONFIG_DEV_RANDOM_ENTROPY_SOURCE
 
