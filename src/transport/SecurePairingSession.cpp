@@ -22,6 +22,10 @@
  *      APIs for constructing spake2p messages and establishing encryption
  *      keys.
  *
+ *      The protocol for handling pA, pB, cB and cA is defined in SPAKE2
+ *      Plus specifications.
+ *      (https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html)
+ *
  */
 
 #include <support/CodeUtils.h>
@@ -270,8 +274,6 @@ CHIP_ERROR SecurePairingSession::HandlePeerMessage(const MessageHeader & header,
     VerifyOrExit(msg != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(header.GetMessageType() == (uint8_t) mNextExpectedMsg, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    // The protocol for handling pA, pB, cB and cA is defined in SPAKE2 Plus specifications
-    // (https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html)
     switch ((Spake2pMsgType) header.GetMessageType())
     {
     case Spake2pMsgType::kSpake2pCompute_pA:
