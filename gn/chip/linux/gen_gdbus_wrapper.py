@@ -15,7 +15,6 @@
 # limitations under the License.
 
 import argparse
-import os
 import subprocess
 import sys
 
@@ -25,7 +24,7 @@ def main(argv):
 
     parser.add_argument("--input_file",
                         required=True,
-                        help="The list of dbus service definition XML files.")
+                        help="The dbus service definition XML file.")
 
     parser.add_argument(
         "--output_c",
