@@ -159,7 +159,7 @@ enum
     kTag_EllipticCurvePublicKey  = 10, // [ byte string ] The elliptic curve public key, in X9.62 encoded format.
     kTag_RSASignature            = 11, // [ byte string ] The RSA signature for the certificate.
     kTag_ECDSASignature          = 12, // [ structure ] The ECDSA signature for the certificate.
-                              // Tags identifying certificate extensions (tag numbers 128 - 255)
+                                       // Tags identifying certificate extensions (tag numbers 128 - 255)
     kCertificateExtensionTagsStart = 128,
     kTag_AuthorityKeyIdentifier    = 128, // [ structure ] Information about the public key used to sign the certificate.
     kTag_SubjectKeyIdentifier      = 129, // [ structure ] Information about the certificate's public key.
