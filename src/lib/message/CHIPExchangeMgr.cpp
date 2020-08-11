@@ -31,14 +31,16 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include <stddef.h>
+
+#include <Profiles/common/CommonProfile.h>
+#include <Profiles/security/CHIPSecurity.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <message/CHIPBinding.h>
 #include <message/CHIPExchangeMgr.h>
 #include <message/CHIPSecurityMgr.h>
 #include <profiles/CHIPProfiles.h>
-//#include <profiles/common/CommonProfile.h>
-//#include <profiles/security/CHIPSecurity.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
@@ -48,6 +50,7 @@
 
 namespace chip {
 
+using namespace nl;
 using namespace chip::Profiles;
 using namespace chip::Encoding;
 
@@ -1039,7 +1042,7 @@ CHIP_ERROR ChipExchangeManager::PrependHeader(ChipExchangeHeader * exchangeHeade
         int32_t arg = 0;
         if (numFaultArgs > 0) { arg = faultArgs[0]; },
         // Code executed without the Manager's lock:
-        chip::FaultInjection::FuzzExchangeHeader(buf->Start(), arg););
+        FaultInjection::FuzzExchangeHeader(buf->Start(), arg););
 
 exit:
     return err;

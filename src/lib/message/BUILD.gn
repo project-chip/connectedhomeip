@@ -18,6 +18,10 @@ import("//build_overrides/nlio.gni")
 import("${chip_root}/gn/chip/tests.gni")
 import("${chip_root}/src/inet/inet.gni")
 
+config("includes") {
+  include_dirs = [ "." ]
+}
+
 static_library("message") {
   output_name = "libChipMessage"
 
@@ -52,5 +56,9 @@ static_library("message") {
     "${chip_root}/src/platform",
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
+  ]
+
+  public_configs = [ 
+    ":includes",
   ]
 }

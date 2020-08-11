@@ -24,11 +24,6 @@
  *
  */
 
-// Include ChipCore.h OUTSIDE of the include guard for ChipSecurityMgr.h.
-// This allows ChipCore.h to enforce a canonical include order for core
-// header files, making it easier to manage dependencies between these files.
-#include <core/CHIPCore.h>
-
 #ifndef CHIPSECURITYMANAGER_H_
 #define CHIPSECURITYMANAGER_H_
 
@@ -39,6 +34,8 @@
 #include <Profiles/security/CHIPSecurity.h>
 #include <Profiles/security/CHIPTAKE.h>
 #include <Profiles/status-report/StatusReportProfile.h>
+#include <core/CHIPError.h>
+#include <message/CHIPExchangeMgr.h>
 #include <support/DLLUtil.h>
 
 /**

@@ -45,7 +45,7 @@ using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 // ==================== Security Adaptations ====================
 
 #define CHIP_CONFIG_USE_OPENSSL_ECC 0
-#define CHIP_CONFIG_USE_MICRO_ECC 1
+#define CHIP_CONFIG_USE_MICRO_ECC 0
 
 #define CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL 0
 #define CHIP_CONFIG_HASH_IMPLEMENTATION_MINCRYPT 1

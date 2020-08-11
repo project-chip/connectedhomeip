@@ -40,8 +40,10 @@
 
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <message/CHIPExchangeMgr.h>
 #include <message/CHIPMessageLayer.h>
+#include <message/CHIPSecurityMgr.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -1708,7 +1710,7 @@ void ChipMessageLayer::HandleUDPMessage(UDPEndPoint * endPoint, PacketBuffer * m
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(MessageLayer, "HandleUDPMessage Error %s", nl::ErrorStr(err));
+        ChipLogError(MessageLayer, "HandleUDPMessage Error %s", ErrorStr(err));
 
         PacketBuffer::Free(msg);
 
@@ -1726,7 +1728,7 @@ exit:
 
 void ChipMessageLayer::HandleUDPReceiveError(UDPEndPoint * endPoint, INET_ERROR err, const IPPacketInfo * pktInfo)
 {
-    ChipLogError(MessageLayer, "HandleUDPReceiveError Error %s", nl::ErrorStr(err));
+    ChipLogError(MessageLayer, "HandleUDPReceiveError Error %s", ErrorStr(err));
 
     ChipMessageLayer * msgLayer = (ChipMessageLayer *) endPoint->AppState;
     if (msgLayer->OnReceiveError != NULL)

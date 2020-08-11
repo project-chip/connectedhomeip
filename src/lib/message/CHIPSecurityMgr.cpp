@@ -29,7 +29,6 @@
 #endif // __STDC_FORMAT_MACROS
 
 #include "CHIPSecurityMgr.h"
-#include <Profiles/CHIPProfiles.h>
 #include <Profiles/common/CHIPMessage.h>
 #include <Profiles/common/CommonProfile.h>
 #include <Profiles/echo/CHIPEcho.h>
@@ -38,6 +37,7 @@
 #include <Profiles/status-report/StatusReportProfile.h>
 #include <core/CHIPCore.h>
 #include <message/CHIPServerBase.h>
+#include <profiles/CHIPProfiles.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <support/crypto/CHIPCrypto.h>
@@ -200,7 +200,7 @@ void ChipSecurityManager::HandleUnsolicitedMessage(ExchangeContext * ec, const I
     // Verify that we don't already have a session establishment in progress.
     VerifyOrExit(secMgr->State == kState_Idle, err = CHIP_ERROR_SECURITY_MANAGER_BUSY);
 
-    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_SecMgrBusy, {
+    CHIP_FAULT_INJECT(nl::FaultInjection::kFault_SecMgrBusy, {
         secMgr->AsyncNotifySecurityManagerAvailable();
         ExitNow(err = CHIP_ERROR_SECURITY_MANAGER_BUSY);
     });
@@ -321,7 +321,7 @@ CHIP_ERROR ChipSecurityManager::StartPASESession(ChipConnection * con, ChipAuthM
     // Verify there is no session in process.
     VerifyOrExit(State == kState_Idle, err = CHIP_ERROR_SECURITY_MANAGER_BUSY);
 
-    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_SecMgrBusy, {
+    CHIP_FAULT_INJECT(nl::FaultInjection::kFault_SecMgrBusy, {
         AsyncNotifySecurityManagerAvailable();
         ExitNow(err = CHIP_ERROR_SECURITY_MANAGER_BUSY);
     });
@@ -357,11 +357,11 @@ CHIP_ERROR ChipSecurityManager::StartPASESession(ChipConnection * con, ChipAuthM
     SuccessOrExit(err);
 
     // Initialize CHIP platform memory.
-    err = Platform::Security::MemoryInit();
+    err = chip::Platform::Security::MemoryInit();
     SuccessOrExit(err);
 
     // Allocate and initialize PASE engine object.
-    mPASEEngine = (ChipPASEEngine *) Platform::Security::MemoryAlloc(sizeof(ChipPASEEngine), true);
+    mPASEEngine = (ChipPASEEngine *) chip::Platform::Security::MemoryAlloc(sizeof(ChipPASEEngine), true);
     VerifyOrExit(mPASEEngine != NULL, err = CHIP_ERROR_NO_MEMORY);
     mPASEEngine->Init();
 
@@ -528,10 +528,10 @@ __attribute__((noinline)) CHIP_ERROR ChipSecurityManager::SendPASEInitiatorStep1
     pwSource = PasswordSourceFromAuthMode(mRequestedAuthMode);
 
     // Generate and encode PASE step 1 message.
-    Platform::Security::OnTimeConsumingCryptoStart();
+    chip::Platform::Security::OnTimeConsumingCryptoStart();
     err = mPASEEngine->GenerateInitiatorStep1(msgBuf, paseConfig, FabricState->LocalNodeId, mEC->PeerNodeId, mSessionKeyId,
                                               kChipEncryptionType_AES128CTRSHA1, pwSource, FabricState, true);
-    Platform::Security::OnTimeConsumingCryptoDone();
+    chip::Platform::Security::OnTimeConsumingCryptoDone();
     SuccessOrExit(err);
 
     // Send PASE step 1 message.
@@ -563,9 +563,9 @@ __attribute__((noinline)) CHIP_ERROR ChipSecurityManager::ProcessPASEResponderSt
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Decode and process the responder's step 1 message.
-    Platform::Security::OnTimeConsumingCryptoStart();
+    chip::Platform::Security::OnTimeConsumingCryptoStart();
     err = mPASEEngine->ProcessResponderStep1(msgBuf);
-    Platform::Security::OnTimeConsumingCryptoDone();
+    chip::Platform::Security::OnTimeConsumingCryptoDone();
     SuccessOrExit(err);
 
 exit:
@@ -577,9 +577,9 @@ __attribute__((noinline)) CHIP_ERROR ChipSecurityManager::ProcessPASEResponderSt
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Decode and process the responder's step 2 message.
-    Platform::Security::OnTimeConsumingCryptoStart();
+    chip::Platform::Security::OnTimeConsumingCryptoStart();
     err = mPASEEngine->ProcessResponderStep2(msgBuf);
-    Platform::Security::OnTimeConsumingCryptoDone();
+    chip::Platform::Security::OnTimeConsumingCryptoDone();
     SuccessOrExit(err);
 
 exit:
@@ -596,9 +596,9 @@ __attribute__((noinline)) CHIP_ERROR ChipSecurityManager::SendPASEInitiatorStep2
     VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     // Generate and encode PASE step 1 message.
-    Platform::Security::OnTimeConsumingCryptoStart();
+    chip::Platform::Security::OnTimeConsumingCryptoStart();
     err = mPASEEngine->GenerateInitiatorStep2(msgBuf);
-    Platform::Security::OnTimeConsumingCryptoDone();
+    chip::Platform::Security::OnTimeConsumingCryptoDone();
     SuccessOrExit(err);
 
     // Send PASE step 2 message.
@@ -658,11 +658,11 @@ void ChipSecurityManager::HandlePASESessionStart(ExchangeContext * ec, const IPP
     StartSessionTimer();
 
     // Initialize CHIP Platform Memory.
-    err = Platform::Security::MemoryInit();
+    err = chip::Platform::Security::MemoryInit();
     SuccessOrExit(err);
 
     // Prepare PASE engine and start session
-    mPASEEngine = (ChipPASEEngine *) Platform::Security::MemoryAlloc(sizeof(ChipPASEEngine), true);
+    mPASEEngine = (ChipPASEEngine *) chip::Platform::Security::MemoryAlloc(sizeof(ChipPASEEngine), true);
     VerifyOrExit(mPASEEngine != NULL, err = CHIP_ERROR_NO_MEMORY);
     mPASEEngine->Init();
 
@@ -753,9 +753,9 @@ __attribute__((noinline)) CHIP_ERROR ChipSecurityManager::ProcessPASEInitiatorSt
     ChipSessionKey * sessionKey;
 
     // Generate and encode PASE step 1 message.
-    Platform::Security::OnTimeConsumingCryptoStart();
+    chip::Platform::Security::OnTimeConsumingCryptoStart();
     err = mPASEEngine->ProcessInitiatorStep1(msgBuf, FabricState->LocalNodeId, ec->PeerNodeId, FabricState);
-    Platform::Security::OnTimeConsumingCryptoDone();
+    chip::Platform::Security::OnTimeConsumingCryptoDone();
     SuccessOrExit(err);
 
     // Allocate an entry in the session key table using the key id proposed by the peer.
@@ -811,9 +811,9 @@ __attribute__((noinline)) CHIP_ERROR ChipSecurityManager::SendPASEResponderStep1
     VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     // Generate PASE step 1 message.
-    Platform::Security::OnTimeConsumingCryptoStart();
+    chip::Platform::Security::OnTimeConsumingCryptoStart();
     err = mPASEEngine->GenerateResponderStep1(msgBuf);
-    Platform::Security::OnTimeConsumingCryptoDone();
+    chip::Platform::Security::OnTimeConsumingCryptoDone();
     SuccessOrExit(err);
 
     // Send PASE step 1 message.
@@ -837,9 +837,9 @@ __attribute__((noinline)) CHIP_ERROR ChipSecurityManager::SendPASEResponderStep2
     VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     // Generate PASE step 2 message.
-    Platform::Security::OnTimeConsumingCryptoStart();
+    chip::Platform::Security::OnTimeConsumingCryptoStart();
     err = mPASEEngine->GenerateResponderStep2(msgBuf);
-    Platform::Security::OnTimeConsumingCryptoDone();
+    chip::Platform::Security::OnTimeConsumingCryptoDone();
     SuccessOrExit(err);
 
     // Send PASE step 2 message.
@@ -858,9 +858,9 @@ __attribute__((noinline)) CHIP_ERROR ChipSecurityManager::ProcessPASEInitiatorSt
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Decode and process the initiator's step 2 message.
-    Platform::Security::OnTimeConsumingCryptoStart();
+    chip::Platform::Security::OnTimeConsumingCryptoStart();
     err = mPASEEngine->ProcessInitiatorStep2(msgBuf);
-    Platform::Security::OnTimeConsumingCryptoDone();
+    chip::Platform::Security::OnTimeConsumingCryptoDone();
     SuccessOrExit(err);
 
 exit:
@@ -972,7 +972,7 @@ CHIP_ERROR ChipSecurityManager::StartCASESession(ChipConnection * con, uint64_t 
     // Verify there is no session in process.
     VerifyOrExit(State == kState_Idle, err = CHIP_ERROR_SECURITY_MANAGER_BUSY);
 
-    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_SecMgrBusy, {
+    CHIP_FAULT_INJECT(nl::FaultInjection::kFault_SecMgrBusy, {
         AsyncNotifySecurityManagerAvailable();
         ExitNow(err = CHIP_ERROR_SECURITY_MANAGER_BUSY);
     });
@@ -1010,11 +1010,11 @@ CHIP_ERROR ChipSecurityManager::StartCASESession(ChipConnection * con, uint64_t 
     SuccessOrExit(err);
 
     // Initialize CHIP Platform Memory.
-    err = Platform::Security::MemoryInit();
+    err = chip::Platform::Security::MemoryInit();
     SuccessOrExit(err);
 
     // Allocate and Initialize CASE Engine object
-    mCASEEngine = (ChipCASEEngine *) Platform::Security::MemoryAlloc(sizeof(ChipCASEEngine), true);
+    mCASEEngine = (ChipCASEEngine *) chip::Platform::Security::MemoryAlloc(sizeof(ChipCASEEngine), true);
     VerifyOrExit(mCASEEngine != NULL, err = CHIP_ERROR_NO_MEMORY);
     mCASEEngine->Init();
 
@@ -1075,9 +1075,9 @@ void ChipSecurityManager::StartCASESession(uint32_t config, uint32_t curveId)
         reqCtx.SessionKeyId   = mSessionKeyId;
         reqCtx.EncryptionType = mEncType;
 
-        Platform::Security::OnTimeConsumingCryptoStart();
+        chip::Platform::Security::OnTimeConsumingCryptoStart();
         err = mCASEEngine->GenerateBeginSessionRequest(reqCtx, msgBuf);
-        Platform::Security::OnTimeConsumingCryptoDone();
+        chip::Platform::Security::OnTimeConsumingCryptoDone();
         SuccessOrExit(err);
     }
 
@@ -1143,9 +1143,9 @@ void ChipSecurityManager::HandleCASEMessageInitiator(ExchangeContext * ec, const
             respCtx.PeerNodeId = ec->PeerNodeId;
             respCtx.MsgInfo    = msgInfo;
 
-            Platform::Security::OnTimeConsumingCryptoStart();
+            chip::Platform::Security::OnTimeConsumingCryptoStart();
             err = secMgr->mCASEEngine->ProcessBeginSessionResponse(msgBuf, respCtx);
-            Platform::Security::OnTimeConsumingCryptoDone();
+            chip::Platform::Security::OnTimeConsumingCryptoDone();
             SuccessOrExit(err);
         }
 
@@ -1277,11 +1277,11 @@ void ChipSecurityManager::HandleCASESessionStart(ExchangeContext * ec, const IPP
 #endif
 
     // Initialize CHIP Platform Memory
-    err = Platform::Security::MemoryInit();
+    err = chip::Platform::Security::MemoryInit();
     SuccessOrExit(err);
 
     // Allocate and initialize a CASE engine.
-    mCASEEngine = (ChipCASEEngine *) Platform::Security::MemoryAlloc(sizeof(ChipCASEEngine), true);
+    mCASEEngine = (ChipCASEEngine *) chip::Platform::Security::MemoryAlloc(sizeof(ChipCASEEngine), true);
     VerifyOrExit(mCASEEngine != NULL, err = CHIP_ERROR_NO_MEMORY);
     mCASEEngine->Init();
 
@@ -1304,9 +1304,9 @@ void ChipSecurityManager::HandleCASESessionStart(ExchangeContext * ec, const IPP
     reqCtx.PeerNodeId = ec->PeerNodeId;
     reqCtx.MsgInfo    = msgInfo;
     reconfCtx.Reset();
-    Platform::Security::OnTimeConsumingCryptoStart();
+    chip::Platform::Security::OnTimeConsumingCryptoStart();
     err = mCASEEngine->ProcessBeginSessionRequest(msgBuf, reqCtx, reconfCtx);
-    Platform::Security::OnTimeConsumingCryptoDone();
+    chip::Platform::Security::OnTimeConsumingCryptoDone();
     if (err != CHIP_ERROR_CASE_RECONFIG_REQUIRED)
         SuccessOrExit(err);
 
@@ -1364,9 +1364,9 @@ void ChipSecurityManager::HandleCASESessionStart(ExchangeContext * ec, const IPP
             respCtx.CurveId        = reqCtx.CurveId;
             respCtx.SetPerformKeyConfirm(true);
 
-            Platform::Security::OnTimeConsumingCryptoStart();
+            chip::Platform::Security::OnTimeConsumingCryptoStart();
             err = mCASEEngine->GenerateBeginSessionResponse(respCtx, respMsgBuf, reqCtx);
-            Platform::Security::OnTimeConsumingCryptoDone();
+            chip::Platform::Security::OnTimeConsumingCryptoDone();
             SuccessOrExit(err);
         }
 
@@ -1496,7 +1496,7 @@ CHIP_ERROR ChipSecurityManager::StartTAKESession(ChipConnection * con, ChipAuthM
     // Verify there is no session in process.
     VerifyOrExit(State == kState_Idle, err = CHIP_ERROR_SECURITY_MANAGER_BUSY);
 
-    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_SecMgrBusy, {
+    CHIP_FAULT_INJECT(nl::FaultInjection::kFault_SecMgrBusy, {
         AsyncNotifySecurityManagerAvailable();
         ExitNow(err = CHIP_ERROR_SECURITY_MANAGER_BUSY);
     });
@@ -1535,11 +1535,11 @@ CHIP_ERROR ChipSecurityManager::StartTAKESession(ChipConnection * con, ChipAuthM
     SuccessOrExit(err);
 
     // Initialize CHIP platform memory.
-    err = Platform::Security::MemoryInit();
+    err = chip::Platform::Security::MemoryInit();
     SuccessOrExit(err);
 
     // Allocate and initialize TAKE engine object.
-    mTAKEEngine = (ChipTAKEEngine *) Platform::Security::MemoryAlloc(sizeof(ChipTAKEEngine), true);
+    mTAKEEngine = (ChipTAKEEngine *) chip::Platform::Security::MemoryAlloc(sizeof(ChipTAKEEngine), true);
     VerifyOrExit(mTAKEEngine != NULL, err = CHIP_ERROR_NO_MEMORY);
     mTAKEEngine->Init();
 
@@ -1746,9 +1746,9 @@ CHIP_ERROR ChipSecurityManager::SendTAKEAuthenticateToken(void)
     msgBuf = PacketBuffer::New();
     VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-    Platform::Security::OnTimeConsumingCryptoStart();
+    chip::Platform::Security::OnTimeConsumingCryptoStart();
     err = mTAKEEngine->GenerateAuthenticateTokenMessage(msgBuf);
-    Platform::Security::OnTimeConsumingCryptoDone();
+    chip::Platform::Security::OnTimeConsumingCryptoDone();
     SuccessOrExit(err);
 
     err    = mEC->SendMessage(kChipProfile_Security, kMsgType_TAKEAuthenticateToken, msgBuf, 0);
@@ -1763,9 +1763,9 @@ CHIP_ERROR ChipSecurityManager::ProcessTAKEAuthenticateTokenResponse(const Packe
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Platform::Security::OnTimeConsumingCryptoStart();
+    chip::Platform::Security::OnTimeConsumingCryptoStart();
     err = mTAKEEngine->ProcessAuthenticateTokenResponseMessage(msgBuf);
-    Platform::Security::OnTimeConsumingCryptoDone();
+    chip::Platform::Security::OnTimeConsumingCryptoDone();
     SuccessOrExit(err);
 
 exit:
@@ -1838,11 +1838,11 @@ void ChipSecurityManager::HandleTAKESessionStart(ExchangeContext * ec, const IPP
     StartSessionTimer();
 
     // Initialize CHIP Platform Memory
-    err = Platform::Security::MemoryInit();
+    err = chip::Platform::Security::MemoryInit();
     SuccessOrExit(err);
 
     // Prepare TAKE engine and start session
-    mTAKEEngine = (ChipTAKEEngine *) Platform::Security::MemoryAlloc(sizeof(ChipTAKEEngine), true);
+    mTAKEEngine = (ChipTAKEEngine *) chip::Platform::Security::MemoryAlloc(sizeof(ChipTAKEEngine), true);
     VerifyOrExit(mTAKEEngine != NULL, err = CHIP_ERROR_NO_MEMORY);
     mTAKEEngine->Init();
 
@@ -1972,9 +1972,9 @@ CHIP_ERROR ChipSecurityManager::ProcessTAKEAuthenticateToken(const PacketBuffer 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Platform::Security::OnTimeConsumingCryptoStart();
+    chip::Platform::Security::OnTimeConsumingCryptoStart();
     err = mTAKEEngine->ProcessAuthenticateTokenMessage(msgBuf);
-    Platform::Security::OnTimeConsumingCryptoDone();
+    chip::Platform::Security::OnTimeConsumingCryptoDone();
     SuccessOrExit(err);
 
 exit:
@@ -2011,9 +2011,9 @@ CHIP_ERROR ChipSecurityManager::SendTAKEAuthenticateTokenResponse(void)
     msgBuf = PacketBuffer::New();
     VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-    Platform::Security::OnTimeConsumingCryptoStart();
+    chip::Platform::Security::OnTimeConsumingCryptoStart();
     err = mTAKEEngine->GenerateAuthenticateTokenResponseMessage(msgBuf);
-    Platform::Security::OnTimeConsumingCryptoDone();
+    chip::Platform::Security::OnTimeConsumingCryptoDone();
     SuccessOrExit(err);
 
     err    = mEC->SendMessage(kChipProfile_Security, kMsgType_TAKEAuthenticateTokenResponse, msgBuf, 0);
@@ -2136,11 +2136,11 @@ CHIP_ERROR ChipSecurityManager::StartKeyExport(ChipConnection * con, uint64_t pe
         keyExportDelegate = mDefaultKeyExportDelegate;
 
     // Initialize CHIP Platform Memory.
-    err = Platform::Security::MemoryInit();
+    err = chip::Platform::Security::MemoryInit();
     SuccessOrExit(err);
 
     // Allocate and initialize KeyExport object.
-    mKeyExport = (ChipKeyExport *) Platform::Security::MemoryAlloc(sizeof(ChipKeyExport), true);
+    mKeyExport = (ChipKeyExport *) chip::Platform::Security::MemoryAlloc(sizeof(ChipKeyExport), true);
     VerifyOrExit(mKeyExport != NULL, err = CHIP_ERROR_NO_MEMORY);
     mKeyExport->Init(keyExportDelegate);
 
@@ -2358,7 +2358,7 @@ void ChipSecurityManager::HandleKeyExportRequest(ExchangeContext * ec, const IPP
 #endif
 
     // Initialize CHIP Platform Memory.
-    err = Platform::Security::MemoryInit();
+    err = chip::Platform::Security::MemoryInit();
     SuccessOrExit(err);
 
     // Prepare key export engine.
@@ -3214,7 +3214,7 @@ void ChipSecurityManager::Reset(void)
         if (mPASEEngine != NULL)
         {
             mPASEEngine->Shutdown();
-            Platform::Security::MemoryFree(mPASEEngine);
+            chip::Platform::Security::MemoryFree(mPASEEngine);
             mPASEEngine = NULL;
         }
         break;
@@ -3224,7 +3224,7 @@ void ChipSecurityManager::Reset(void)
         if (mTAKEEngine != NULL)
         {
             mTAKEEngine->Shutdown();
-            Platform::Security::MemoryFree(mTAKEEngine);
+            chip::Platform::Security::MemoryFree(mTAKEEngine);
             mTAKEEngine = NULL;
         }
         break;
@@ -3234,7 +3234,7 @@ void ChipSecurityManager::Reset(void)
         if (mCASEEngine != NULL)
         {
             mCASEEngine->Shutdown();
-            Platform::Security::MemoryFree(mCASEEngine);
+            chip::Platform::Security::MemoryFree(mCASEEngine);
             mCASEEngine = NULL;
         }
         break;
@@ -3244,7 +3244,7 @@ void ChipSecurityManager::Reset(void)
         if (mKeyExport != NULL)
         {
             mKeyExport->Shutdown();
-            Platform::Security::MemoryFree(mKeyExport);
+            chip::Platform::Security::MemoryFree(mKeyExport);
             mKeyExport = NULL;
         }
         break;
@@ -3253,7 +3253,7 @@ void ChipSecurityManager::Reset(void)
         break;
     }
 
-    Platform::Security::MemoryShutdown();
+    chip::Platform::Security::MemoryShutdown();
 
     CancelSessionTimer();
 

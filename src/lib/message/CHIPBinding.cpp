@@ -457,7 +457,7 @@ void Binding::ResetConfig()
     mFlags = 0;
 
 #if CHIP_CONFIG_ENABLE_DNS_RESOLVER
-    mDNSOptions = ::Inet::kDNSOption_Default;
+    mDNSOptions = Inet::kDNSOption_Default;
 #endif
 }
 
@@ -1563,7 +1563,7 @@ Binding::Configuration & Binding::Configuration::TargetAddress_IP(const char * a
  * When resolving the host name of the peer, use the specified DNS options.
  *
  * @param[in]  dnsOptions               An integer value controlling how host name resolution is performed.
- *                                      Value should be one of values from the #::Inet::DNSOptions enumeration.
+ *                                      Value should be one of values from the #Inet::DNSOptions enumeration.
  *
  * @return                              A reference to the binding object.
  */

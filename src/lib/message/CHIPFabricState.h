@@ -37,8 +37,8 @@
 
 #include <inttypes.h>
 
-//#include <Profiles/security/CHIPApplicationKeys.h>
-//#include <Profiles/security/CHIPSecurity.h>
+#include <Profiles/security/CHIPApplicationKeys.h>
+#include <Profiles/security/CHIPSecurity.h>
 #include <core/CHIPKeyIds.h>
 #include <support/CHIPCounter.h>
 #include <support/DLLUtil.h>

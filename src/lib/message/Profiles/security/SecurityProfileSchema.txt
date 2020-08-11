@@ -1,0 +1,377 @@
+/*
+ *
+ *    Copyright (c) 2020 Google LLC.
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/**
+ *    @file
+ *      Definition of the CHIP Security profile.
+ */
+
+namespace CHIP.profiles {
+
+/** CHIP Security Profile
+ */
+security => PROFILE [id common:0x0004]
+{
+    // ---- Message Types ----
+
+    pase-initiator-step1                => MESSAGE [id 1]
+    pase-responder-step1                => MESSAGE [id 2]
+    pase-responder-step2                => MESSAGE [id 3]
+    pase-initiator-step2                => MESSAGE [id 4]
+    pase-responder-key-confirm          => MESSAGE [id 5]
+    pase-responder-reconfigure          => MESSAGE [id 6]
+
+    case-begin-session-request          => MESSAGE [id 10]
+    case-begin-session-response         => MESSAGE [id 11]
+    case-initiator-key-confirm          => MESSAGE [id 12]
+    case-reconfigure                    => MESSAGE [id 13]
+
+    take-identify-token                 => MESSAGE [id 20]
+    take-identify-token-response        => MESSAGE [id 21]
+    take-token-reconfigure              => MESSAGE [id 22]
+    take-authenticate-token             => MESSAGE [id 23]
+    take-authenticate-token-response    => MESSAGE [id 24]
+    take-re-authenticate-token          => MESSAGE [id 25]
+    take-re-authenticate-token-response => MESSAGE [id 26]
+
+    key-export-request                  => MESSAGE [id 30]
+    key-export-response                 => MESSAGE [id 31]
+    key-export-reconfigure              => MESSAGE [id 32]
+
+    get-certificate-request             => MESSAGE [id 40]
+    get-certificate-response            => MESSAGE [id 41]
+
+    end-session                         => MESSAGE [id 100]
+    key-error                           => MESSAGE [id 101]
+    msg-counter-sync-response           => MESSAGE [id 102]
+
+    // ---- Status Codes ----
+    
+    session-aborted                     => STATUS CODE [id 1] 
+    pase-supports-only-config1          => STATUS CODE [id 2] 
+    unsupported-encryption-type         => STATUS CODE [id 3] 
+    invalid-key-id                      => STATUS CODE [id 4] 
+    duplicate-key-id                    => STATUS CODE [id 5] 
+    key-confirmation-failed             => STATUS CODE [id 6] 
+    internal-error                      => STATUS CODE [id 7] 
+    authentication-failed               => STATUS CODE [id 8] 
+    unsupported-case-configuration      => STATUS CODE [id 9] 
+    unsupported-certificate             => STATUS CODE [id 10]
+    no-common-pase-configurations       => STATUS CODE [id 11]
+    key-not-found                       => STATUS CODE [id 12]
+    wrong-encryption-type               => STATUS CODE [id 13]
+    unknown-key-type                    => STATUS CODE [id 14]
+    invalid-use-of-session-key          => STATUS CODE [id 15]
+    internal-key-error                  => STATUS CODE [id 16]
+    no-common-key-export-configuration  => STATUS CODE [id 17]
+    unauthorized-key-export-request     => STATUS CODE [id 18]
+    no-new-operational-cert-required    => STATUS CODE [id 19]
+    operational-node-id-in-use          => STATUS CODE [id 20]
+    invalid-operational-node-id         => STATUS CODE [id 21]
+    invalid-operational-certificate     => STATUS CODE [id 22]
+    
+    // ---- Data Types ----
+    
+    /** CHIP Certificate
+     *  Represents a compressed form of an X.509 certificate.
+     */
+    CHIP-certificate [*:1] => STRUCTURE [any-order]
+    {
+        // BASE CERTIFICATE FIELDS
+        // These fields are always encoded in the order shown.
+        
+        serial-num [1]                  : BYTE STRING,          /**< Certificate serial number, in BER integer encoding. */
+        sig-algo [2]                    : signature-algorithm,  /**< Enumerated value identifying the certificate signature algorithm. */
+        issuer [3]                      : dn,                   /**< Distinguished name of the certificate issuer. */
+        not-before [4]                  : UNSIGNED INTEGER,     /**< Certificate validity period start, in compressed certificate date format. */
+        not-after [5]                   : UNSIGNED INTEGER,     /**< Certificate validity period end, in compressed certificate date format. */
+        subject [6]                     : dn,                   /**< Distinguished name of the certificate subject. */
+        pub-key-algo [7]                : public-key-algorithm, /**< Algorithm with which the public key may be used. */
+        ec-curve-id [8,opt]             : ec-curve-id,          /**< Elliptic curve of the public key. Only present for EC certificates. */
+        rsa-pub-key [9,opt]             : rsa-public-key,       /**< RSA public key. Only present for RSA certificates. */
+        ec-pub-key [10,opt]             : ec-public-key,        /**< Elliptic curve public key. Only present for EC certificates. */
+        
+        // CERTIFICATE EXTENSION FIELDs (tags 128-255)
+        // These fields are encoded in the same order as they appeared in the
+        // original X.509 certificate.
+        
+        auth-key-id [128,opt]           : authority-key-id,     /**< Information about the public key used to sign the certificate. */
+        subject-key-id [129,opt]        : subject-key-id,       /**< Information about the certificate's public key. */
+        key-usage [130,opt]             : key-usage,            /**< Allowed usages of certificate public key. */
+        basic-constraints [131,opt]     : basic-constraints,    /**< CA constraints for certificate. */
+        extended-key-usage [132,opt]    : extended-key-usage,   /**< Extended usages of certificate public key. */
+
+        // SIGNATURE FIELDS
+        // These fields are always encoded at the end of the certificate structure.
+
+        rsa-sig [11,opt]                : BYTE STRING,          /**< RSA signature for the certificate. Only present for RSA certificates. */
+        ecdsa-sig [12,opt]              : ecdsa-signature,      /**< ECDSA signature for the certificate. Only present for EC certificates. */
+    }
+    
+    ec-private-key [*:2] => STRUCTURE [tag-order]
+    {
+        curve-id [1]                    : ec-curve-id,
+        private-key [2]                 : BYTE STRING,
+        public-key [3,opt]              : ec-public-key
+    }
+
+    CHIP-cert-list [*:3] => ARRAY OF CHIP-certificate
+    
+    CHIP-signature [*:5] => STRUCTURE [tag-order]
+    {
+        ecdsa-sig [1,opt]               : ecdsa-signature,
+        rsa-sig [2,opt]                 : BYTE STRING,
+        signing-cert-ref [3,opt]        : CHIP-cert-reference,
+        related-certs [4,opt]           : CHIP-cert-list,
+        sig-algo [5,opt]                : signature-algorithm,
+    }
+
+    CHIP-cert-reference [*:6] => STRUCTURE [tag-order]
+    {
+        subject [1,opt]                 : dn,
+        pub-key-id [2,opt]              : BYTE STRING,
+    }
+
+    case-certificate-info [*:7] => STRUCTURE [tag-order]
+    {
+        entity-cert [1,opt]             : CHIP-certificate,
+        entity-cert-ref [2,opt]         : CHIP-cert-reference,
+        related-certs [3,opt]           : LIST OF CHIP-certificate,
+        trust-anchors [4,opt]           : LIST [len 1..] OF CHIP-cert-reference,
+    }
+    
+    case-signature [*:8] => ecdsa-signature
+    
+    access-token [*:9] => STRUCTURE [tag-order]
+    {
+        cert [1]                        : CHIP-certificate,
+        priv-key [2]                    : ec-private-key,
+        related-certs [3,opt]           : ARRAY OF CHIP-certificate,
+    }
+    
+    group-key-signature [*:10] => STRUCTURE [tag-order]
+    {
+        sig-algo [1]                    : signature-algorithm,
+        key-id [2]                      : UNSIGNED INTEGER [range 32bits],
+        sig [3]                         : BYTE STRING,
+    }
+    
+    rsa-public-key => STRUCTURE [tag-order]
+    {
+        modulus [1]                     : BYTE STRING,
+        pub-exponent [2]                : UNSIGNED INTEGER,
+    }
+    
+    ec-public-key => BYTE STRING
+    
+    ecdsa-signature => STRUCTURE [tag-order]
+    {
+        r [1]                           : BYTE STRING,
+        s [2]                           : BYTE STRING,
+    }
+
+    common-extension-fields => FIELD GROUP
+    {
+        critical [1,opt]                : BOOLEAN
+    }
+    
+    authority-key-id => STRUCTURE [tag-order]
+    {
+        includes common-extension-fields,
+        
+        key-id [2,opt]                  : BYTE STRING,
+        issuer [3,opt]                  : dn,
+        serial-num [4,opt]              : BYTE STRING,
+    }
+    
+    subject-key-id => STRUCTURE [tag-order]
+    {
+        includes common-extension-fields,
+        
+        key-id [2]                      : BYTE STRING,
+    }
+    
+    key-usage => STRUCTURE [tag-order]
+    {
+        includes common-extension-fields,
+        
+        key-usage [2]                   : UNSIGNED INTEGER,
+    }
+    
+    basic-constraints => STRUCTURE [tag-order]
+    {
+        includes common-extension-fields,
+
+        is-ca [2,opt]                   : BOOLEAN,
+        path-len-constraint [3,opt]     : UNSIGNED INTEGER [range 8bits],        
+    }
+    
+    extended-key-usage => STRUCTURE [tag-order]
+    {
+        includes common-extension-fields,
+
+        key-purpose-ids [2]             : ARRAY [len 1..] OF key-purpose-id,
+    }
+    
+    dn => LIST [len 1..] OF rdn
+    
+    rdn => CHOICE OF
+    {
+        single-attr                     : dn-attribute,
+        multi-attr [anon]               : LIST [len 2..] OF dn-attribute 
+    }
+    
+    dn-attribute => CHOICE OF
+    {
+        // Base DN attributes
+        // Of these, all are encoded as UTF8String except domain-component,
+        // which is encoded as IA5String.
+        common-name [1]                 : STRING,
+        surname [2]                     : STRING,
+        serial-num [3]                  : STRING,
+        country-name [4]                : STRING,
+        locality-name [5]               : STRING,
+        state-or-province-name [6]      : STRING,
+        org-name [7]                    : STRING,
+        org-unit-name [8]               : STRING,
+        title [9]                       : STRING,
+        name [10]                       : STRING,
+        given-name [11]                 : STRING,
+        initials [12]                   : STRING,
+        gen-qualifier [13]              : STRING,
+        dn-qualifier [14]               : STRING,
+        pseudonym [15]                  : STRING,
+        domain-component [16]           : STRING,
+        CHIP-device-id [17]            : STRING [len 16],
+        CHIP-service-endpoint-id [18]  : STRING [len 16],
+        CHIP-ca-id [19]                : STRING [len 16],
+        CHIP-software-publisher-id [20]: STRING [len 16],
+        
+        // Aliases for certain DN attributes when encoded as PrintableString
+        // NOTE: The tags for these must be the base tags + 0x80.  
+        common-name-ps [129]            : STRING,
+        surname-ps [130]                : STRING,
+        serial-num-ps [131]             : STRING,
+        country-name-ps [132]           : STRING,
+        locality-name-ps [133]          : STRING,
+        state-or-province-name-ps [134] : STRING,
+        org-name-ps [135]               : STRING,
+        org-unit-name-ps [136]          : STRING,
+        title-ps [137]                  : STRING,
+        name-ps [138]                   : STRING,
+        given-name-ps [139]             : STRING,
+        initials-ps [140]               : STRING,
+        gen-qualifier-ps [141]          : STRING,
+        dn-qualifier-ps [142]           : STRING,
+        pseudonym-ps [143]              : STRING,
+    }
+
+    signature-algorithm => UNSIGNED INTEGER [range 8bits]
+    {
+        md2-with-rsa            = 1,
+        md5-with-rsa            = 2,
+        sha1-with-rsa           = 3,
+        ecdsa-with-sha1         = 4,
+        ecdsa-with-sha256       = 5,
+        mhac-with-sha256        = 6,
+        sha256-with-rsa         = 7,
+    }
+    
+    public-key-algorithm => UNSIGNED INTEGER [range 8bits]
+    {
+        rsa                     = 1,
+        ec-pub-key              = 2,
+        ecdh                    = 3,
+        ecmqv                   = 4,
+    }
+    
+    ec-curve-id => UNSIGNED INTEGER [range 8bits]
+    {
+        c2pnb163v1              = 1, 
+        c2pnb163v2              = 2, 
+        c2pnb163v3              = 3, 
+        c2pnb176w1              = 4, 
+        c2tnb191v1              = 5, 
+        c2tnb191v2              = 6, 
+        c2tnb191v3              = 7, 
+        c2onb191v4              = 8, 
+        c2onb191v5              = 9, 
+        c2pnb208w1              = 10,
+        c2tnb239v1              = 11,
+        c2tnb239v2              = 12,
+        c2tnb239v3              = 13,
+        c2onb239v4              = 14,
+        c2onb239v5              = 15,
+        c2pnb272w1              = 16,
+        c2pnb304w1              = 17,
+        c2tnb359v1              = 18,
+        c2pnb368w1              = 19,
+        c2tnb431r1              = 20,
+        prime192v1              = 21,
+        prime192v2              = 22,
+        prime192v3              = 23,
+        prime239v1              = 24,
+        prime239v2              = 25,
+        prime239v3              = 26,
+        prime256v1              = 27,
+        secp112r1               = 28,
+        secp112r2               = 29,
+        secp128r1               = 30,
+        secp128r2               = 31,
+        secp160k1               = 32,
+        secp160r1               = 33,
+        secp160r2               = 34,
+        secp192k1               = 35,
+        secp224k1               = 36,
+        secp224r1               = 37,
+        secp256k1               = 38,
+        secp384r1               = 39,
+        secp521r1               = 40,
+        sect113r1               = 41,
+        sect113r2               = 42,
+        sect131r1               = 43,
+        sect131r2               = 44,
+        sect163k1               = 45,
+        sect163r1               = 46,
+        sect163r2               = 47,
+        sect193r1               = 48,
+        sect193r2               = 49,
+        sect233k1               = 50,
+        sect233r1               = 51,
+        sect239k1               = 52,
+        sect283k1               = 53,
+        sect283r1               = 54,
+        sect409k1               = 55,
+        sect409r1               = 56,
+        sect571k1               = 57,
+        sect571r1               = 58,
+    }
+
+    key-purpose-id => UNSIGNED INTEGER [range 8bits]
+    {
+        server-auth             = 1,
+        client-auth             = 2,
+        code-signing            = 3,
+        email-protection        = 4,
+        time-stamping           = 5,
+        ocsp-signing            = 6,
+    }
+}
+
+
+} // namespace CHIP.profiles
