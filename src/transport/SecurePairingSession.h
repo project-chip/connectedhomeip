@@ -135,7 +135,7 @@ private:
 
     static constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;
 
-    enum class Spake2pMsgType
+    enum Spake2pMsgType : uint8_t
     {
         kSpake2pCompute_pA    = 0,
         kSpake2pCompute_pB_cB = 1,
@@ -149,12 +149,12 @@ private:
 
     Spake2p_P256_SHA256_HKDF_HMAC mSpake2p;
 
-    unsigned char mPoint[kMAX_Point_Length];
+    uint8_t mPoint[kMAX_Point_Length];
 
     /* w0s and w1s */
-    unsigned char mWS[2][kSpake2p_WS_Length];
+    uint8_t mWS[2][kSpake2p_WS_Length];
 
-    unsigned char mKe[kMAX_Hash_Length];
+    uint8_t mKe[kMAX_Hash_Length];
 
     size_t mKeLen = sizeof(mKe);
 

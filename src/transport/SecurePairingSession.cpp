@@ -43,6 +43,9 @@ SecurePairingSession::~SecurePairingSession(void)
     {
         mDelegate->Release();
     }
+    memset(&mPoint[0], 0, sizeof(mPoint));
+    memset(&mWS[0][0], 0, sizeof(mWS));
+    memset(&mKe[0], 0, sizeof(mKe));
 }
 
 CHIP_ERROR SecurePairingSession::Init(uint32_t setupCode, uint32_t pbkdf2IterCount, const unsigned char * salt, size_t saltLen,
@@ -91,7 +94,7 @@ exit:
 CHIP_ERROR SecurePairingSession::Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const unsigned char * salt,
                                       size_t saltLen, SecurePairingSessionDelegate * delegate)
 {
-    unsigned char X[kMAX_Point_Length];
+    uint8_t X[kMAX_Point_Length];
     size_t X_len = sizeof(X);
 
     CHIP_ERROR err = Init(peerSetUpPINCode, pbkdf2IterCount, salt, saltLen, delegate);
@@ -109,11 +112,11 @@ CHIP_ERROR SecurePairingSession::Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2
         System::PacketBuffer * resp = System::PacketBuffer::NewWithAvailableSize(X_len);
         VerifyOrExit(resp != nullptr, err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
-        memcpy(resp->Start(), &X, X_len);
+        memcpy(resp->Start(), &X[0], X_len);
         resp->SetDataLength(X_len);
 
         mNextExpectedMsg = Spake2pMsgType::kSpake2pCompute_pB_cB;
-        err              = mDelegate->OnNewMessageForPeer((uint8_t) Spake2pMsgType::kSpake2pCompute_pA, resp);
+        err              = mDelegate->OnNewMessageForPeer(Spake2pMsgType::kSpake2pCompute_pA, resp);
         SuccessOrExit(err);
     }
 
@@ -144,11 +147,17 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pA(const MessageHeader & header, 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    unsigned char Y[kMAX_Point_Length];
+    uint8_t Y[kMAX_Point_Length];
     size_t Y_len = sizeof(Y);
 
-    unsigned char verifier[kMAX_Hash_Length];
-    size_t verifier_len = sizeof(verifier);
+    uint8_t verifier[kMAX_Hash_Length];
+    size_t verifier_len = kMAX_Hash_Length;
+
+    const uint8_t * buf = msg->Start();
+    size_t buf_len      = msg->TotalLength();
+
+    VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
+    VerifyOrExit(buf_len == kMAX_Point_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     err = mSpake2p.BeginVerifier((const unsigned char *) "", 0, (const unsigned char *) "", 0, &mWS[0][0], kSpake2p_WS_Length,
                                  mPoint, sizeof(mPoint));
@@ -157,7 +166,7 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pA(const MessageHeader & header, 
     err = mSpake2p.ComputeRoundOne(Y, &Y_len);
     SuccessOrExit(err);
 
-    err = mSpake2p.ComputeRoundTwo(msg->Start(), msg->TotalLength(), verifier, &verifier_len);
+    err = mSpake2p.ComputeRoundTwo(buf, buf_len, verifier, &verifier_len);
     SuccessOrExit(err);
 
     {
@@ -167,12 +176,12 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pA(const MessageHeader & header, 
         VerifyOrExit(resp != nullptr, err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
         buf = resp->Start();
-        memcpy(buf, &Y, Y_len);
+        memcpy(buf, &Y[0], Y_len);
         memcpy(&buf[Y_len], verifier, Y_len);
         resp->SetDataLength(Y_len + verifier_len);
 
         mNextExpectedMsg = Spake2pMsgType::kSpake2pCompute_cA;
-        err              = mDelegate->OnNewMessageForPeer((uint8_t) Spake2pMsgType::kSpake2pCompute_pB_cB, resp);
+        err              = mDelegate->OnNewMessageForPeer(Spake2pMsgType::kSpake2pCompute_pB_cB, resp);
         SuccessOrExit(err);
     }
 
@@ -188,13 +197,14 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const MessageHeader & heade
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    unsigned char verifier[kMAX_Hash_Length];
-    size_t verifier_len = sizeof(verifier);
+    uint8_t verifier[kMAX_Hash_Length];
+    size_t verifier_len = kMAX_Hash_Length;
 
-    uint8_t * buf  = msg->Start();
-    size_t buf_len = msg->TotalLength();
+    const uint8_t * buf = msg->Start();
+    size_t buf_len      = msg->TotalLength();
 
-    VerifyOrExit(buf_len >= kMAX_Point_Length + kMAX_Hash_Length, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
+    VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
+    VerifyOrExit(buf_len == kMAX_Point_Length + kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     err = mSpake2p.ComputeRoundTwo(buf, kMAX_Point_Length, verifier, &verifier_len);
     SuccessOrExit(err);
@@ -207,15 +217,18 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const MessageHeader & heade
         memcpy(resp->Start(), verifier, verifier_len);
         resp->SetDataLength(verifier_len);
 
-        err = mDelegate->OnNewMessageForPeer((uint8_t) Spake2pMsgType::kSpake2pCompute_cA, resp);
+        err = mDelegate->OnNewMessageForPeer(Spake2pMsgType::kSpake2pCompute_cA, resp);
         SuccessOrExit(err);
     }
 
-    err = mSpake2p.KeyConfirm(&buf[kMAX_Point_Length], buf_len - kMAX_Point_Length);
-    SuccessOrExit(err);
+    {
+        const uint8_t * hash = &buf[kMAX_Point_Length];
+        err                  = mSpake2p.KeyConfirm(hash, kMAX_Hash_Length);
+        SuccessOrExit(err);
 
-    err = mSpake2p.GetKeys(mKe, &mKeLen);
-    SuccessOrExit(err);
+        err = mSpake2p.GetKeys(mKe, &mKeLen);
+        SuccessOrExit(err);
+    }
 
     // Call delegate to indicate pairing completion
     mDelegate->OnPairingComplete();
@@ -229,9 +242,13 @@ exit:
 
 CHIP_ERROR SecurePairingSession::HandleCompute_cA(const MessageHeader & header, System::PacketBuffer * msg)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    const uint8_t * hash = msg->Start();
 
-    err = mSpake2p.KeyConfirm(msg->Start(), msg->TotalLength());
+    VerifyOrExit(hash != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
+    VerifyOrExit(msg->TotalLength() == kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+    err = mSpake2p.KeyConfirm(hash, kMAX_Hash_Length);
     SuccessOrExit(err);
 
     err = mSpake2p.GetKeys(mKe, &mKeLen);
