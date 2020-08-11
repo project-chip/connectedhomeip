@@ -100,7 +100,7 @@ static bool ContentMayBeADataModelMessage(System::PacketBuffer * buffer)
 static void HandleDataModelMessage(System::PacketBuffer * buffer)
 {
     EmberApsFrame frame;
-    bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame);
+    bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) > 0 ? true : false;
     if (ok)
     {
         printf("APS frame processing success!\n");
