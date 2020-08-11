@@ -2301,6 +2301,21 @@
 #endif // CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS
 
 /**
+   *  @def CHIP_CONFIG_MAX_BINDINGS
+   *
+   *  @brief
+   *    Maximum number of simultaneously active bindings per WeaveExchangeManager
+   *    The new single source TimeSync client takes one binding.
+   *    Every WDM one-way subscription takes one binding. Mutual subscription counts as two one-way subscriptions.
+   *    A reserved slot is needed to take an incoming subscription request.
+   *    For a device with 2 mutual subscriptions, and one single source time sync client, it needs 2 x 2 + 1 = 5 bindings at least.
+   *    At least six is needed if it still wants to take new WDM subscriptions under this load.
+   */
+  #ifndef CHIP_CONFIG_MAX_BINDINGS
+  #define CHIP_CONFIG_MAX_BINDINGS                           6
+  #endif // CHIP_CONFIG_MAX_BINDINGS
+
+/**
  * @def CHIP_NON_PRODUCTION_MARKER
  *
  * @brief Defines the name of a mark symbol whose presence signals that the chip code

@@ -616,8 +616,6 @@ inline CHIP_ERROR Binding::Configuration::GetError(void) const
     return mError;
 }
 
-}; // namespace chip
-}
-; // nl
+} // namespace chip
 
 #endif // CHIP_BINDING_H_

@@ -28,6 +28,8 @@
 
 #include <core/CHIPCore.h>
 #include <message/CHIPBinding.h>
+#include <message/CHIPExchangeMgr.h>
+#include <message/CHIPSecurityMgr.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <system/SystemStats.h>
@@ -1969,6 +1971,4 @@ Binding::Configuration & Binding::Configuration::ConfigureFromMessage(const chip
     return *this;
 }
 
-}; // namespace chip
-}
-; // nl
+} // namespace chip

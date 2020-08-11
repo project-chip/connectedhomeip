@@ -33,9 +33,12 @@
 
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
+#include <message/CHIPBinding.h>
+#include <message/CHIPExchangeMgr.h>
+#include <message/CHIPSecurityMgr.h>
 #include <profiles/CHIPProfiles.h>
-#include <profiles/common/CommonProfile.h>
-#include <profiles/security/CHIPSecurity.h>
+//#include <profiles/common/CommonProfile.h>
+//#include <profiles/security/CHIPSecurity.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>

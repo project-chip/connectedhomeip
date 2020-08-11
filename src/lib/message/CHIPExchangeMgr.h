@@ -26,7 +26,9 @@
 #ifndef CHIP_EXCHANGE_MGR_H
 #define CHIP_EXCHANGE_MGR_H
 
+#include <message/CHIPBinding.h>
 #include <message/CHIPFabricState.h>
+#include <message/CHIPMessageLayer.h>
 #include <message/CHIPWRMPConfig.h>
 #include <support/DLLUtil.h>
 #include <system/SystemTimer.h>
