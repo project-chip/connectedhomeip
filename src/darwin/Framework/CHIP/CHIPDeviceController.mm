@@ -394,7 +394,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     uint8_t * bytes = (uint8_t *) response.bytes;
 
     EmberApsFrame frame;
-    if (!extractApsFrame(bytes, response.length, &frame)) {
+    if (extractApsFrame(bytes, response.length, &frame) == 0) {
         return @"Response is not an APS frame";
     }
 
