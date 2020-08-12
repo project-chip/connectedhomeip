@@ -25,7 +25,10 @@ config("crypto_config") {
     defines += [ "CHIP_CRYPTO_MBEDTLS=0" ]
   }
   if (chip_crypto == "openssl") {
-    defines += [ "CHIP_CRYPTO_OPENSSL=1" ]
+    defines += [
+      "CHIP_CRYPTO_OPENSSL=1",
+      "CHIP_WITH_OPENSSL=1",
+    ]
   } else {
     defines += [ "CHIP_CRYPTO_OPENSSL=0" ]
   }
@@ -44,7 +47,10 @@ if (chip_crypto == "openssl") {
 static_library("crypto") {
   output_name = "libChipCrypto"
 
-  sources = [ "CHIPCryptoPAL.h", "CHIPCryptoPAL.cpp" ]
+  sources = [
+    "CHIPCryptoPAL.cpp",
+    "CHIPCryptoPAL.h",
+  ]
 
   public_deps = [
     "${chip_root}/src/lib/core",

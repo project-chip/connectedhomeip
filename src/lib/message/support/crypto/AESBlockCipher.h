@@ -42,12 +42,7 @@
 
 #include "CHIPCrypto.h"
 
-#if CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL && !CHIP_WITH_OPENSSL
-#error                                                                                                                             \
-    "INVALID CHIP CONFIG: OpenSSL AES implementation enabled but OpenSSL not available (CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL == 1 && CHIP_WITH_OPENSSL == 0)."
-#endif
-
-#if CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL
+#if CHIP_CRYPTO_OPENSSL
 #include <openssl/aes.h>
 #endif
 
@@ -55,7 +50,7 @@
 #include <wmmintrin.h>
 #endif
 
-#if CHIP_CONFIG_AES_IMPLEMENTATION_MBEDTLS
+#if CHIP_CRYPTO_MBEDTLS
 #include <mbedtls/aes.h>
 #endif
 
@@ -84,11 +79,11 @@ protected:
     AES128BlockCipher(void);
     ~AES128BlockCipher(void);
 
-#if CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL
+#if CHIP_CRYPTO_OPENSSL
     AES_KEY mKey;
 #elif CHIP_CONFIG_AES_IMPLEMENTATION_AESNI
     __m128i mKey[kRoundCount + 1];
-#elif CHIP_CONFIG_AES_IMPLEMENTATION_MBEDTLS
+#elif CHIP_CRYPTO_MBEDTLS
     mbedtls_aes_context mCtx;
 #elif CHIP_CONFIG_AES_USE_EXPANDED_KEY
     uint8_t mKey[kBlockLength * (kRoundCount + 1)];
@@ -134,7 +129,7 @@ protected:
     AES_KEY mKey;
 #elif CHIP_CONFIG_AES_IMPLEMENTATION_AESNI
     __m128i mKey[kRoundCount + 1];
-#elif CHIP_CONFIG_AES_IMPLEMENTATION_MBEDTLS
+#elif CHIP_CRYPTO_MBEDTLS
     mbedtls_aes_context mCtx;
 #elif CHIP_CONFIG_AES_USE_EXPANDED_KEY
     uint8_t mKey[kBlockLength * (kRoundCount + 1)];
