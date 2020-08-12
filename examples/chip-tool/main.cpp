@@ -100,18 +100,14 @@ static bool ContentMayBeADataModelMessage(System::PacketBuffer * buffer)
 static void HandleDataModelMessage(System::PacketBuffer * buffer)
 {
     EmberApsFrame frame;
-    bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) > 0 ? true : false;
-    if (ok)
-    {
-        printf("APS frame processing success!\n");
-    }
-    else
+    if (extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) == 0)
     {
         printf("APS frame processing failure!\n");
         System::PacketBuffer::Free(buffer);
         return;
     }
 
+    printf("APS frame processing success!\n");
     uint8_t * message;
     uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
 

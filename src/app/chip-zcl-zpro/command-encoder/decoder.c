@@ -111,7 +111,6 @@ uint16_t extractMessage(uint8_t * buffer, uint16_t buffer_length, uint8_t ** msg
     uint16_t apsFrameSize = extractApsFrame(buffer, buffer_length, &frame);
     if (msg && apsFrameSize > 0 && buffer_length > apsFrameSize)
     {
-        // These are hard coded for now.
         *msg   = buffer + apsFrameSize;
         result = buffer_length - apsFrameSize;
     }
