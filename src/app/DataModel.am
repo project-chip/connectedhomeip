@@ -24,30 +24,7 @@
 #      must be anchored relative to the top build directory.
 #
 
-CHIP_BUILD_OLD_DATA_MODEL_SOURCE_FILES                                              = \
-    @top_builddir@/src/app/gen/gen-callback-stubs.c                                   \
-    @top_builddir@/src/app/gen/gen-command-handler.c                                  \
-    @top_builddir@/src/app/gen/gen-global-command-handler.c                           \
-    @top_builddir@/src/app/gen/gen-specs.c                                            \
-    @top_builddir@/src/app/plugin/binding-chip/chip.cpp                               \
-    @top_builddir@/src/app/plugin/cluster-server-basic/basic-server.c                 \
-    @top_builddir@/src/app/plugin/cluster-server-identify/identify-server.c           \
-    @top_builddir@/src/app/plugin/cluster-server-level-control/level-control-server.c \
-    @top_builddir@/src/app/plugin/cluster-server-on-off/on-off-server.c               \
-    @top_builddir@/src/app/plugin/codec-simple/codec-simple.c                         \
-    @top_builddir@/src/app/plugin/core-api/core-api.c                                 \
-    @top_builddir@/src/app/plugin/core-data-model/zcl-data-model.c                    \
-    @top_builddir@/src/app/plugin/core-message-dispatch/dispatch.c                    \
-    $(NULL)
-
 CHIP_BUILD_DATA_MODEL_SOURCE_FILES                                                  = \
     @top_builddir@/src/app/chip-zcl-zpro/command-encoder/encoder.c                    \
     @top_builddir@/src/app/chip-zcl-zpro/command-encoder/decoder.c                    \
     $(NULL)
-
-# Excluding this one for now because it has #include syntax that does
-# not actually compile
-#     plugin/core-data-model/zcl-struct.c
-
-# Excluding this one because it seems to rely on stuff that's not in our tree
-#     plugin/binding-silabs/silabs.c

@@ -39,14 +39,15 @@
 
 #include <controller/CHIPDeviceController.h>
 
-extern "C" {
-#include "chip-zcl/chip-zcl.h"
-} // extern "C"
-
 #include "chip-zcl/chip-zcl-zpro-codec.h"
 
 // Delay, in seconds, between sends for the echo case.
 #define SEND_DELAY 5
+
+// Limits on endpoint values.  Could be wrong, if we start using endpoint 0 for
+// something.
+#define CHIP_ZCL_ENDPOINT_MIN 0x01
+#define CHIP_ZCL_ENDPOINT_MAX 0xF0
 
 using namespace ::chip;
 using namespace ::chip::Inet;

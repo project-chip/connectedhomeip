@@ -2,14 +2,7 @@
 
 ## What is this?
 
-The purpose of this folder is to contain functional ZCL Advanced Platform (CHIP)
-plugins. A plugin is a discrete piece of Zigbee Cluster Library (ZCL)
-functionality. Each plugin contains message processing code for a "Cluster"
-within the Zigbee Cluster Library. Each plugin can be individually tested
-through its own unit test code and Makefile.
-
-## Usage
-
-To build and run unit tests on these CHIP plugins run
-
-| make test
+The purpose of this folder is to contain CHIP clusters and associated utilities.
+The cluster implementations live under the clusters/ directory. Utility files
+live in the util/ and chip-zcl-zpro/ directory: the former contains most of the
+utilities while the latter contains encoder/decoder utility functions.
