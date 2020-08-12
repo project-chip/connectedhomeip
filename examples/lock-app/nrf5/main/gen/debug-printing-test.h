@@ -40,7 +40,6 @@
 #ifndef SILABS_EMBER_AF_PRINTING_TEST
 #define SILABS_EMBER_AF_PRINTING_TEST
 
-
 #define EMBER_AF_PRINT_ENABLE
 #define EMBER_AF_PRINT_BASIC_CLUSTER 0x0001
 #define EMBER_AF_PRINT_POWER_CONFIG_CLUSTER 0x0002
@@ -164,137 +163,46 @@
 #define EMBER_AF_PRINT_CUSTOM2 0x0E80
 #define EMBER_AF_PRINT_CUSTOM3 0x0F01
 
-
 #define EMBER_AF_PRINT_OUTPUT 1
 
-
-#define EMBER_AF_PRINT_NAMES { \
-  "Basic",\
-  "Power Configuration",\
-  "Device Temperature Configuration",\
-  "Identify",\
-  "Groups",\
-  "Scenes",\
-  "On/off",\
-  "On/off Switch Configuration",\
-  "Level Control",\
-  "Alarms",\
-  "Time",\
-  "RSSI Location",\
-  "Binary Input (Basic)",\
-  "Commissioning",\
-  "Partition",\
-  "Over the Air Bootloading",\
-  "Power Profile",\
-  "Appliance Control",\
-  "Poll Control",\
-  "Green Power",\
-  "Keep-Alive",\
-  "Shade Configuration",\
-  "Door Lock",\
-  "Window Covering",\
-  "Barrier Control",\
-  "Pump Configuration and Control",\
-  "Thermostat",\
-  "Fan Control",\
-  "Dehumidification Control",\
-  "Thermostat User Interface Configuration",\
-  "Color Control",\
-  "Ballast Configuration",\
-  "Illuminance Measurement",\
-  "Illuminance Level Sensing",\
-  "Temperature Measurement",\
-  "Pressure Measurement",\
-  "Flow Measurement",\
-  "Relative Humidity Measurement",\
-  "Occupancy Sensing",\
-  "Carbon Monoxide Concentration Measurement",\
-  "Carbon Dioxide Concentration Measurement",\
-  "Ethylene Concentration Measurement",\
-  "Ethylene Oxide Concentration Measurement",\
-  "Hydrogen Concentration Measurement",\
-  "Hydrogen Sulphide Concentration Measurement",\
-  "Nitric Oxide Concentration Measurement",\
-  "Nitrogen Dioxide Concentration Measurement",\
-  "Oxygen Concentration Measurement",\
-  "Ozone Concentration Measurement",\
-  "Sulfur Dioxide Concentration Measurement",\
-  "Dissolved Oxygen Concentration Measurement",\
-  "Bromate Concentration Measurement",\
-  "Chloramines Concentration Measurement",\
-  "Chlorine Concentration Measurement",\
-  "Fecal coliform and E. Coli Concentration Measurement",\
-  "Fluoride Concentration Measurement",\
-  "Haloacetic Acids Concentration Measurement",\
-  "Total Trihalomethanes Concentration Measurement",\
-  "Total Coliform Bacteria Concentration Measurement",\
-  "Turbidity Concentration Measurement",\
-  "Copper Concentration Measurement",\
-  "Lead Concentration Measurement",\
-  "Manganese Concentration Measurement",\
-  "Sulfate Concentration Measurement",\
-  "Bromodichloromethane Concentration Measurement",\
-  "Bromoform Concentration Measurement",\
-  "Chlorodibromomethane Concentration Measurement",\
-  "Chloroform Concentration Measurement",\
-  "Sodium Concentration Measurement",\
-  "IAS Zone",\
-  "IAS ACE",\
-  "IAS WD",\
-  "Generic Tunnel",\
-  "BACnet Protocol Tunnel",\
-  "11073 Protocol Tunnel",\
-  "ISO 7816 Protocol Tunnel",\
-  "Price",\
-  "Demand Response and Load Control",\
-  "Simple Metering",\
-  "Messaging",\
-  "Tunneling",\
-  "Prepayment",\
-  "Energy Management",\
-  "Calendar",\
-  "Device Management",\
-  "Events",\
-  "MDU Pairing",\
-  "Sub-GHz",\
-  "Key Establishment",\
-  "Information",\
-  "Data Sharing",\
-  "Gaming",\
-  "Data Rate Control",\
-  "Voice over ZigBee",\
-  "Chatting",\
-  "Payment",\
-  "Billing",\
-  "Appliance Identification",\
-  "Meter Identification",\
-  "Appliance Events and Alert",\
-  "Appliance Statistics",\
-  "Electrical Measurement",\
-  "Diagnostics",\
-  "ZLL Commissioning",\
-  "Sample Mfg Specific Cluster",\
-  "Sample Mfg Specific Cluster 2",\
-  "Configuration Cluster",\
-  "MFGLIB Cluster",\
-  "SL Works With All Hubs",\
-  "Core",\
-  "Debug",\
-  "Application",\
-  "Security",\
-  "Attributes",\
-  "Reporting",\
-  "Service discovery",\
-  "Registration",\
-  "ZDO (ZigBee Device Object)",\
-  "Custom messages (1)",\
-  "Custom messages (2)",\
-  "Custom messages (3)"\
-}
-
+#define EMBER_AF_PRINT_NAMES                                                                                                       \
+    {                                                                                                                              \
+        "Basic", "Power Configuration", "Device Temperature Configuration", "Identify", "Groups", "Scenes", "On/off",              \
+            "On/off Switch Configuration", "Level Control", "Alarms", "Time", "RSSI Location", "Binary Input (Basic)",             \
+            "Commissioning", "Partition", "Over the Air Bootloading", "Power Profile", "Appliance Control", "Poll Control",        \
+            "Green Power", "Keep-Alive", "Shade Configuration", "Door Lock", "Window Covering", "Barrier Control",                 \
+            "Pump Configuration and Control", "Thermostat", "Fan Control", "Dehumidification Control",                             \
+            "Thermostat User Interface Configuration", "Color Control", "Ballast Configuration", "Illuminance Measurement",        \
+            "Illuminance Level Sensing", "Temperature Measurement", "Pressure Measurement", "Flow Measurement",                    \
+            "Relative Humidity Measurement", "Occupancy Sensing", "Carbon Monoxide Concentration Measurement",                     \
+            "Carbon Dioxide Concentration Measurement", "Ethylene Concentration Measurement",                                      \
+            "Ethylene Oxide Concentration Measurement", "Hydrogen Concentration Measurement",                                      \
+            "Hydrogen Sulphide Concentration Measurement", "Nitric Oxide Concentration Measurement",                               \
+            "Nitrogen Dioxide Concentration Measurement", "Oxygen Concentration Measurement", "Ozone Concentration Measurement",   \
+            "Sulfur Dioxide Concentration Measurement", "Dissolved Oxygen Concentration Measurement",                              \
+            "Bromate Concentration Measurement", "Chloramines Concentration Measurement", "Chlorine Concentration Measurement",    \
+            "Fecal coliform and E. Coli Concentration Measurement", "Fluoride Concentration Measurement",                          \
+            "Haloacetic Acids Concentration Measurement", "Total Trihalomethanes Concentration Measurement",                       \
+            "Total Coliform Bacteria Concentration Measurement", "Turbidity Concentration Measurement",                            \
+            "Copper Concentration Measurement", "Lead Concentration Measurement", "Manganese Concentration Measurement",           \
+            "Sulfate Concentration Measurement", "Bromodichloromethane Concentration Measurement",                                 \
+            "Bromoform Concentration Measurement", "Chlorodibromomethane Concentration Measurement",                               \
+            "Chloroform Concentration Measurement", "Sodium Concentration Measurement", "IAS Zone", "IAS ACE", "IAS WD",           \
+            "Generic Tunnel", "BACnet Protocol Tunnel", "11073 Protocol Tunnel", "ISO 7816 Protocol Tunnel", "Price",              \
+            "Demand Response and Load Control", "Simple Metering", "Messaging", "Tunneling", "Prepayment", "Energy Management",    \
+            "Calendar", "Device Management", "Events", "MDU Pairing", "Sub-GHz", "Key Establishment", "Information",               \
+            "Data Sharing", "Gaming", "Data Rate Control", "Voice over ZigBee", "Chatting", "Payment", "Billing",                  \
+            "Appliance Identification", "Meter Identification", "Appliance Events and Alert", "Appliance Statistics",              \
+            "Electrical Measurement", "Diagnostics", "ZLL Commissioning", "Sample Mfg Specific Cluster",                           \
+            "Sample Mfg Specific Cluster 2", "Configuration Cluster", "MFGLIB Cluster", "SL Works With All Hubs", "Core", "Debug", \
+            "Application", "Security", "Attributes", "Reporting", "Service discovery", "Registration",                             \
+            "ZDO (ZigBee Device Object)", "Custom messages (1)", "Custom messages (2)", "Custom messages (3)"                      \
+    }
 
 #define EMBER_AF_PRINT_NAME_NUMBER 121
-#define EMBER_AF_PRINT_BITS { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }
-
+#define EMBER_AF_PRINT_BITS                                                                                                        \
+    {                                                                                                                              \
+        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF                             \
+    }
 
 #endif // SILABS_EMBER_AF_PRINTING_TEST
