@@ -1447,7 +1447,7 @@
  *
  */
 #ifndef CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID
-#define CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID       (chip::Profiles::Security::kchipCurveId_prime256v1)
+#define CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID       (chip::Profiles::Security::kChipCurveId_prime256v1)
 #endif // CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID
 
 /**
@@ -1557,13 +1557,13 @@
  */
 #ifndef CHIP_CONFIG_DEFAULT_CASE_CURVE_ID
 #if CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP224R1
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID                  (chip::Profiles::Security::kchipCurveId_secp224r1)
+#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID                  (chip::Profiles::Security::kChipCurveId_secp224r1)
 #elif CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID                  (chip::Profiles::Security::kchipCurveId_prime256v1)
+#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID                  (chip::Profiles::Security::kChipCurveId_prime256v1)
 #elif CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP192R1
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID                  (chip::Profiles::Security::kchipCurveId_prime192v1)
+#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID                  (chip::Profiles::Security::kChipCurveId_prime192v1)
 #else
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID                  (chip::Profiles::Security::kchipCurveId_secp160r1)
+#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID                  (chip::Profiles::Security::kChipCurveId_secp160r1)
 #endif
 #endif // CHIP_CONFIG_DEFAULT_CASE_CURVE_ID
 
@@ -1576,9 +1576,9 @@
  */
 #ifndef CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES
 #if CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP224R1 || CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1
-#define CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES            (chip::Profiles::Security::kchipCurveSet_secp224r1|chip::Profiles::Security::kchipCurveSet_prime256v1)
+#define CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES            (chip::Profiles::Security::kChipCurveSet_secp224r1|chip::Profiles::Security::kChipCurveSet_prime256v1)
 #else
-#define CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES            (chip::Profiles::Security::kchipCurveSet_All)
+#define CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES            (chip::Profiles::Security::kChipCurveSet_All)
 #endif
 #endif // CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES
 
@@ -2299,6 +2299,21 @@
 #ifndef CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS
 #define CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS      5000
 #endif // CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS
+
+/**
+   *  @def CHIP_CONFIG_MAX_BINDINGS
+   *
+   *  @brief
+   *    Maximum number of simultaneously active bindings per WeaveExchangeManager
+   *    The new single source TimeSync client takes one binding.
+   *    Every WDM one-way subscription takes one binding. Mutual subscription counts as two one-way subscriptions.
+   *    A reserved slot is needed to take an incoming subscription request.
+   *    For a device with 2 mutual subscriptions, and one single source time sync client, it needs 2 x 2 + 1 = 5 bindings at least.
+   *    At least six is needed if it still wants to take new WDM subscriptions under this load.
+   */
+  #ifndef CHIP_CONFIG_MAX_BINDINGS
+  #define CHIP_CONFIG_MAX_BINDINGS                           6
+  #endif // CHIP_CONFIG_MAX_BINDINGS
 
 /**
  * @def CHIP_NON_PRODUCTION_MARKER

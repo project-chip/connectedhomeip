@@ -31,6 +31,7 @@ extern "C" {
 
 int TestMessageHeader(void);
 int TestPeerConnectionsFn(void);
+int TestSecurePairingSession(void);
 int TestSecureSession(void);
 int TestSecureSessionMgr(void);
 int TestUDP(void);

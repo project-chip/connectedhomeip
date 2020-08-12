@@ -20,7 +20,7 @@
 /**
  *    @file
  *      Implementation of CHIP Device Controller, a common class
- *      that implements discovery, pairing and provisioning of Weave
+ *      that implements discovery, pairing and provisioning of CHIP
  *      devices.
  *
  */
@@ -166,6 +166,7 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const uint
                               .SetDiscriminator(discriminator)
                               .SetSetupPINCode(setupPINCode));
     SuccessOrExit(err);
+
     mUnsecuredTransport = transport->Retain();
 
     // connected state before 'OnConnect'
@@ -398,6 +399,43 @@ void ChipDeviceController::OnMessageReceived(const MessageHeader & header, Trans
     if (IsSecurelyConnected() && mOnComplete.Response != NULL)
     {
         mOnComplete.Response(this, mAppReqState, msgBuf);
+    }
+}
+
+void ChipDeviceController::OnBLEConnectionError(BLE_ERROR err)
+{
+    if (mOnError)
+    {
+        mOnError(this, mAppReqState, err, NULL);
+    }
+}
+
+void ChipDeviceController::OnBLEConnectionComplete(BLE_ERROR err)
+{
+    ChipLogDetail(Controller, "BLE Connection complete");
+
+    if (mOnNewConnection)
+    {
+        mOnNewConnection(this, NULL, mAppReqState);
+    }
+}
+
+void ChipDeviceController::OnBLEConnectionClosed(BLE_ERROR err)
+{
+    ChipLogDetail(Controller, "BLE Connection closed");
+
+    // TODO: determine if connection closed is really to be treated as an error.
+    if (mOnError)
+    {
+        mOnError(this, mAppReqState, err, NULL);
+    }
+}
+
+void ChipDeviceController::OnBLEPacketReceived(PacketBuffer * buffer)
+{
+    if (mOnComplete.Response)
+    {
+        mOnComplete.Response(this, mAppReqState, buffer);
     }
 }
 

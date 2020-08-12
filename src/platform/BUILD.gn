@@ -14,6 +14,7 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
+import("//build/config/linux/pkg_config.gni")
 
 import("device.gni")
 
@@ -93,6 +94,9 @@ if (chip_device_platform != "none") {
         "CHIP_DEVICE_CONFIG_ENABLE_THREAD=1",
         "CHIP_ENABLE_OPENTHREAD=1",
       ]
+    }
+    if (chip_enable_wifi) {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_WPA=1" ]
     }
     if (chip_device_platform == "efr32") {
       defines += [
@@ -217,6 +221,10 @@ if (chip_device_platform != "none") {
           "Linux/ThreadStackManagerImpl.h",
         ]
         public_deps += [ "${chip_root}/third_party/ot-br-posix:ot_br_client" ]
+      }
+
+      if (chip_enable_wifi) {
+        public_deps += [ "Linux/dbus" ]
       }
 
       public_deps += [ "${chip_root}/third_party/inipp" ]

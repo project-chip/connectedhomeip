@@ -26,6 +26,8 @@ static_library("transport") {
     "PeerAddress.h",
     "PeerConnectionState.h",
     "PeerConnections.h",
+    "SecurePairingSession.cpp",
+    "SecurePairingSession.h",
     "SecureSession.cpp",
     "SecureSession.h",
     "SecureSessionMgr.cpp",

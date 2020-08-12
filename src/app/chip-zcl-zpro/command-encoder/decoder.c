@@ -27,7 +27,7 @@
 #include <string.h>
 
 // TODO: Make this return a CHIP_ERROR
-bool extractApsFrame(void * buffer, uint32_t buf_length, EmberApsFrame * outApsFrame)
+bool extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * outApsFrame)
 {
     if (buffer == NULL || buf_length == 0 || outApsFrame == NULL)
     {
