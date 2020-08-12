@@ -102,6 +102,8 @@ LEDWidget statusLED;
 BluetoothWidget bluetoothLED;
 WiFiWidget wifiLED;
 
+extern NodeId kLocalNodeId;
+
 const char * TAG = "wifi-echo-demo";
 
 static EchoDeviceCallbacks EchoCallbacks;
@@ -463,7 +465,14 @@ extern "C" void app_main()
 
     if (isRendezvousBLE())
     {
-        rendezvousSession = new RendezvousSession(&bluetoothLED);
+        uint32_t setupPINCode;
+        err = ConfigurationMgr().GetSetupPinCode(setupPINCode);
+        if (err != CHIP_NO_ERROR)
+        {
+            ESP_LOGE(TAG, "GetSetupPinCode() failed: %s", ErrorStr(err));
+            return;
+        }
+        rendezvousSession = new RendezvousSession(&bluetoothLED, setupPINCode, kLocalNodeId);
     }
 
 #if CONFIG_USE_ECHO_CLIENT

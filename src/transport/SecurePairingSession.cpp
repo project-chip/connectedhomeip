@@ -240,8 +240,8 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pA(const MessageHeader & header, 
 
     {
         BufBound bbuf(resp->Start(), Y_len + verifier_len);
-        VerifyOrExit(bbuf.Put(&Y[0], Y_len) == Y_len, err = CHIP_ERROR_NO_MEMORY);
-        VerifyOrExit(bbuf.Put(verifier, verifier_len) == Y_len + verifier_len, err = CHIP_ERROR_NO_MEMORY);
+        bbuf.Put(&Y[0], Y_len);
+        bbuf.Put(verifier, verifier_len);
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
     }
 
@@ -292,7 +292,7 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const MessageHeader & heade
 
     {
         BufBound bbuf(resp->Start(), verifier_len);
-        VerifyOrExit(bbuf.Put(verifier, verifier_len) == verifier_len, err = CHIP_ERROR_NO_MEMORY);
+        bbuf.Put(verifier, verifier_len);
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
     }
 
@@ -316,7 +316,7 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const MessageHeader & heade
     mPairingComplete = true;
 
     // Call delegate to indicate pairing completion
-    mDelegate->OnPairingComplete(mPeerNodeId, mPeerKeyId);
+    mDelegate->OnPairingComplete(mPeerNodeId, mPeerKeyId, mKeyId);
 
 exit:
 
@@ -350,7 +350,7 @@ CHIP_ERROR SecurePairingSession::HandleCompute_cA(const MessageHeader & header, 
     mPairingComplete = true;
 
     // Call delegate to indicate pairing completion
-    mDelegate->OnPairingComplete(mPeerNodeId, mPeerKeyId);
+    mDelegate->OnPairingComplete(mPeerNodeId, mPeerKeyId, mKeyId);
 
 exit:
 

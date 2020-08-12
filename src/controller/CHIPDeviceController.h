@@ -33,6 +33,7 @@
 #include <core/CHIPTLV.h>
 #include <support/DLLUtil.h>
 #include <transport/BLE.h>
+#include <transport/SecurePairingSession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/UDP.h>
 
@@ -50,7 +51,7 @@ typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * app
 typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
 };
 
-class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback, public Transport::BLECallbackHandler
+class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback, public SecurePairingSessionDelegate, public Transport::BLECallbackHandler
 {
     friend class ChipDeviceControllerCallback;
 
@@ -105,20 +106,26 @@ public:
 
     /**
      * @brief
-     *   The keypair for the secure channel. This is a utility function that will be used
-     *   until we have automatic key exchange in place. The function is useful only for
-     *   example applications for now. It will eventually be removed.
+     *   Called when pairing session generates a new message that should be sent to peer.
      *
-     * @param state  Peer connection for which to establish the key
-     * @param remote_public_key  A pointer to peer's public key
-     * @param public_key_length  Length of remote_public_key
-     * @param local_private_key  A pointer to local private key
-     * @param private_key_length Length of local_private_key
-     * @return CHIP_ERROR        The result of key derivation
+     * @param msgBuf the new message that should be sent to the peer
      */
-    CHIP_ERROR ManualKeyExchange(Transport::PeerConnectionState * state, const unsigned char * remote_public_key,
-                                 const size_t public_key_length, const unsigned char * local_private_key,
-                                 const size_t private_key_length);
+    virtual CHIP_ERROR OnNewMessageForPeer(System::PacketBuffer * msgBuf);
+
+    /**
+     * @brief
+     *   Called when pairing fails with an error
+     *
+     * @param error error code
+     */
+    virtual void OnPairingError(CHIP_ERROR error);
+
+    /**
+     * @brief
+     *   Called when the pairing is complete and the new secure session has been established
+     *
+     */
+    virtual void OnPairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId);
 
     /**
      * @brief
@@ -226,6 +233,8 @@ private:
 
     ErrorHandler mOnError;
     NewConnectionHandler mOnNewConnection;
+    NewConnectionHandler mPairingComplete = nullptr;
+    MessageReceiveHandler mAppMsgHandler = nullptr;
     System::PacketBuffer * mCurReqMsg;
 
     NodeId mLocalDeviceId;
@@ -234,8 +243,21 @@ private:
     Optional<NodeId> mRemoteDeviceId;
     uint32_t mMessageNumber = 0;
 
+    SecurePairingSession mPairingSession;
+    uint16_t mNextKeyId = 0;
+    bool mPairingInProgress = false;
+
+    uint32_t mSetupPINCode = 0;
+    uint16_t mPeerKeyId = 0;
+    uint16_t mLocalPairedKeyId = 0;
+
     void ClearRequestState();
     void ClearOpState();
+
+    static void PairingMessageHandler(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
+
+    static void BLEConnectionHandler(ChipDeviceController * deviceController, Transport::PeerConnectionState * state,
+                                     void * appReqState);
 };
 
 } // namespace DeviceController

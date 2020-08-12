@@ -56,7 +56,7 @@ public:
 
     virtual void OnPairingError(CHIP_ERROR error) { mNumPairingErrors++; }
 
-    virtual void OnPairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId) { mNumPairingComplete++; }
+    virtual void OnPairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId) { mNumPairingComplete++; }
 
     uint32_t mNumMessageSend     = 0;
     uint32_t mNumPairingErrors   = 0;
