@@ -33,6 +33,9 @@ if (chip_device_platform == "auto") {
 declare_args() {
   # Enable openthread support.
   chip_enable_openthread = chip_device_platform == "linux"
+
+  # Enable wifi support.
+  chip_enable_wifi = chip_device_platform == "linux"  
 }
 
 _chip_device_layer = "none"
