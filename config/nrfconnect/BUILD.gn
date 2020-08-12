@@ -27,4 +27,8 @@ group("nrfconnect") {
 
 group("default") {
   deps = [ ":nrfconnect" ]
+
+  if (chip_build_tests) {
+    deps += [ "${chip_root}/src:tests" ]
+  }
 }

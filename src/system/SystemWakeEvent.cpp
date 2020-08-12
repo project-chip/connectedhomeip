@@ -37,6 +37,11 @@
 #include <sys/eventfd.h>
 #endif
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
+#endif
+
 namespace chip {
 namespace System {
 
@@ -68,8 +73,8 @@ Error SystemWakeEvent::Open()
 
 void SystemWakeEvent::Close()
 {
-    (void) ::close(mFDs[FD_WRITE]);
-    (void) ::close(mFDs[FD_READ]);
+    ::close(mFDs[FD_WRITE]);
+    ::close(mFDs[FD_READ]);
     mFDs[FD_READ] = mFDs[FD_WRITE] = -1;
 }
 
@@ -84,14 +89,14 @@ void SystemWakeEvent::Confirm()
 void SystemWakeEvent::Notify()
 {
     char byte = 1;
-    (void) ::write(mFDs[FD_WRITE], &byte, 1);
+    ::write(mFDs[FD_WRITE], &byte, 1);
 }
 
 #else // CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
 
 Error SystemWakeEvent::Open()
 {
-    mFD = eventfd(0, 0);
+    mFD = ::eventfd(0, 0);
 
     if (mFD == -1)
     {
@@ -103,25 +108,29 @@ Error SystemWakeEvent::Open()
 
 void SystemWakeEvent::Close()
 {
-    (void) ::close(mFD);
+    ::close(mFD);
     mFD = -1;
 }
 
 void SystemWakeEvent::Confirm()
 {
     uint64_t value;
-    (void) ::read(mFD, &value, sizeof(value));
+    ::read(mFD, &value, sizeof(value));
 }
 
 void SystemWakeEvent::Notify()
 {
     uint64_t value = 1;
-    (void) ::write(mFD, &value, sizeof(value));
+    ::write(mFD, &value, sizeof(value));
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
 
 } // namespace System
 } // namespace chip
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS

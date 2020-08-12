@@ -57,7 +57,7 @@ set(CHIP_COMMON_FLAGS
     -DCHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS=1
     -I${CMAKE_CURRENT_SOURCE_DIR}/main/include
     -isystem${ZEPHYR_BASE}/../modules/crypto/mbedtls/configs
-    -include undef_main.h
+    -isystem${ZEPHYR_BASE}/../mbedtls/include
 )
 
 set(CHIP_OUTPUT_LIBRARIES
@@ -69,8 +69,9 @@ set(CHIP_OUTPUT_TESTS
     -lCoreTests
     -lSystemLayerTests
     -lTransportLayerTests
-    -lCryptoLayerTests
+    -lChipCryptoTests
     -lPlatformTests
+    -lnlunit-test
 )
 
 # ==================================================
@@ -97,5 +98,6 @@ chip_build(ChipLib ChipConfig
 target_sources(app PRIVATE main/runner.cpp)
 target_link_options(app PUBLIC -Wl,--whole-archive ${CHIP_OUTPUT_TESTS} -Wl,--no-whole-archive)
 target_link_libraries(app PUBLIC ChipLib $<TARGET_FILE:kernel>)
+target_compile_definitions(app PUBLIC CHIP_SEPARATE_CONFIG_H)
 
 add_test(AllChipTests zephyr/zephyr.exe)
