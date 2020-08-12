@@ -274,83 +274,86 @@ uint16_t emberAfFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameCo
     return returnValue;
 }
 
-EmberStatus emberAfSendCommandUnicastToBindingsWithCallback(EmberAfMessageSentFunction callback)
-{
-    return emberAfSendUnicastToBindingsWithCallback(emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, callback);
-}
+// EmberStatus emberAfSendCommandUnicastToBindingsWithCallback(EmberAfMessageSentFunction callback)
+// {
+//     return emberAfSendUnicastToBindingsWithCallback(emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, callback);
+// }
 
-EmberStatus emberAfSendCommandUnicastToBindings(void)
-{
-    return emberAfSendCommandUnicastToBindingsWithCallback(NULL);
-}
+// EmberStatus emberAfSendCommandUnicastToBindings(void)
+// {
+//     return emberAfSendCommandUnicastToBindingsWithCallback(NULL);
+// }
 
-EmberStatus emberAfSendCommandMulticastWithCallback(EmberMulticastId multicastId, EmberAfMessageSentFunction callback)
-{
-    return emberAfSendMulticastWithCallback(multicastId, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, callback);
-}
+// EmberStatus emberAfSendCommandMulticastWithCallback(EmberMulticastId multicastId, EmberAfMessageSentFunction callback)
+// {
+//     return emberAfSendMulticastWithCallback(multicastId, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, callback);
+// }
 
-EmberStatus emberAfSendCommandMulticastWithAliasWithCallback(EmberMulticastId multicastId, EmberNodeId alias, uint8_t sequence,
-                                                             EmberAfMessageSentFunction callback)
-{
-    return emberAfSendMulticastWithAliasWithCallback(multicastId, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, alias,
-                                                     sequence, callback);
-}
+// EmberStatus emberAfSendCommandMulticastWithAliasWithCallback(EmberMulticastId multicastId, EmberNodeId alias, uint8_t sequence,
+//                                                              EmberAfMessageSentFunction callback)
+// {
+//     return emberAfSendMulticastWithAliasWithCallback(multicastId, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer,
+//     alias,
+//                                                      sequence, callback);
+// }
 
-EmberStatus emberAfSendCommandMulticast(EmberMulticastId multicastId)
-{
-    return emberAfSendCommandMulticastWithCallback(multicastId, NULL);
-}
+// EmberStatus emberAfSendCommandMulticast(EmberMulticastId multicastId)
+// {
+//     return emberAfSendCommandMulticastWithCallback(multicastId, NULL);
+// }
 
-EmberStatus emberAfSendCommandMulticastWithAlias(EmberMulticastId multicastId, EmberNodeId alias, uint8_t sequence)
-{
-    return emberAfSendCommandMulticastWithAliasWithCallback(multicastId, alias, sequence, NULL);
-}
+// EmberStatus emberAfSendCommandMulticastWithAlias(EmberMulticastId multicastId, EmberNodeId alias, uint8_t sequence)
+// {
+//     return emberAfSendCommandMulticastWithAliasWithCallback(multicastId, alias, sequence, NULL);
+// }
 
-EmberStatus emberAfSendCommandMulticastToBindings(void)
-{
-    return emberAfSendMulticastToBindings(emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer);
-}
+// EmberStatus emberAfSendCommandMulticastToBindings(void)
+// {
+//     return emberAfSendMulticastToBindings(emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer);
+// }
 
-EmberStatus emberAfSendCommandUnicastWithCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination,
-                                                  EmberAfMessageSentFunction callback)
-{
-    return emberAfSendUnicastWithCallback(type, indexOrDestination, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer,
-                                          callback);
-}
+// EmberStatus emberAfSendCommandUnicastWithCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination,
+//                                                   EmberAfMessageSentFunction callback)
+// {
+//     return emberAfSendUnicastWithCallback(type, indexOrDestination, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer,
+//                                           callback);
+// }
 
-EmberStatus emberAfSendCommandUnicast(EmberOutgoingMessageType type, uint16_t indexOrDestination)
-{
-    return emberAfSendCommandUnicastWithCallback(type, indexOrDestination, NULL);
-}
+// EmberStatus emberAfSendCommandUnicast(EmberOutgoingMessageType type, uint16_t indexOrDestination)
+// {
+//     return emberAfSendCommandUnicastWithCallback(type, indexOrDestination, NULL);
+// }
 
-EmberStatus emberAfSendCommandBroadcastWithCallback(EmberNodeId destination, EmberAfMessageSentFunction callback)
-{
-    return emberAfSendBroadcastWithCallback(destination, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, callback);
-}
+// EmberStatus emberAfSendCommandBroadcastWithCallback(EmberNodeId destination, EmberAfMessageSentFunction callback)
+// {
+//     return emberAfSendBroadcastWithCallback(destination, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, callback);
+// }
 
-EmberStatus emberAfSendCommandBroadcastWithAliasWithCallback(EmberNodeId destination, EmberNodeId alias, uint8_t sequence,
-                                                             EmberAfMessageSentFunction callback)
-{
-    return emberAfSendBroadcastWithAliasWithCallback(destination, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, alias,
-                                                     sequence, callback);
-}
+// EmberStatus emberAfSendCommandBroadcastWithAliasWithCallback(EmberNodeId destination, EmberNodeId alias, uint8_t sequence,
+//                                                              EmberAfMessageSentFunction callback)
+// {
+//     return emberAfSendBroadcastWithAliasWithCallback(destination, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer,
+//     alias,
+//                                                      sequence, callback);
+// }
 
-EmberStatus emberAfSendCommandBroadcastWithAlias(EmberNodeId destination, EmberNodeId alias, uint8_t sequence)
-{
-    return emberAfSendCommandBroadcastWithAliasWithCallback(destination, alias, sequence, NULL);
-}
+// EmberStatus emberAfSendCommandBroadcastWithAlias(EmberNodeId destination, EmberNodeId alias, uint8_t sequence)
+// {
+//     return emberAfSendCommandBroadcastWithAliasWithCallback(destination, alias, sequence, NULL);
+// }
 
-EmberStatus emberAfSendCommandBroadcast(EmberNodeId destination)
-{
-    return emberAfSendCommandBroadcastWithCallback(destination, NULL);
-}
+// EmberStatus emberAfSendCommandBroadcast(EmberNodeId destination)
+// {
+//     return emberAfSendCommandBroadcastWithCallback(destination, NULL);
+// }
 
-EmberStatus emberAfSendCommandInterPan(EmberPanId panId, const EmberEUI64 destinationLongId, EmberNodeId destinationShortId,
-                                       EmberMulticastId multicastId, EmberAfProfileId profileId)
-{
-    return emberAfSendInterPan(panId, destinationLongId, destinationShortId, multicastId, emAfCommandApsFrame->clusterId, profileId,
-                               *emAfResponseLengthPtr, emAfZclBuffer);
-}
+// EmberStatus emberAfSendCommandInterPan(EmberPanId panId, const EmberEUI64 destinationLongId, EmberNodeId destinationShortId,
+//                                        EmberMulticastId multicastId, EmberAfProfileId profileId)
+// {
+//     return emberAfSendInterPan(panId, destinationLongId, destinationShortId, multicastId, emAfCommandApsFrame->clusterId,
+//     profileId,
+//                                *emAfResponseLengthPtr, emAfZclBuffer);
+// }
 
 EmberApsFrame * emberAfGetCommandApsFrame(void)
 {

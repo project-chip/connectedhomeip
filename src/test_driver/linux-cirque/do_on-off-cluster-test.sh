@@ -4,7 +4,7 @@ set -v
 
 SOURCE="${BASH_SOURCE[0]}"
 SOURCE_DIR="$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
-REPO_DIR="$SOURCE_DIR/../../../../"
+REPO_DIR="$SOURCE_DIR/../../../"
 
 chip_tool_dir=$REPO_DIR/examples/chip-tool
 
@@ -12,8 +12,8 @@ build_docker_image() {
     cd "$chip_tool_dir"
     make -f Makefile
     make -f server.mk
-    docker build -t chip_server -f Dockerfile.server .
     docker build -t chip_tool -f Dockerfile.tool .
+    docker build -t chip_server -f Dockerfile.server .
 }
 
 main() {

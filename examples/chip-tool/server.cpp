@@ -5,12 +5,12 @@
 
 #include <cassert>
 
-extern "C" {
-#include "chip-zcl/chip-zcl.h"
-#include "gen/gen-cluster-id.h"
-#include "gen/gen-command-id.h"
-#include "gen/gen-types.h"
-}
+#include "attribute-storage.h"
+#include "chip-zcl/chip-zcl-zpro-codec.h"
+#include "gen/attribute-id.h"
+#include "gen/cluster-id.h"
+#include "gen/znet-bookkeeping.h"
+#include "util.h"
 
 static const unsigned char local_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f,
                                                    0x11, 0x0e, 0x34, 0x15, 0x81, 0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65,
@@ -24,8 +24,6 @@ static const unsigned char remote_public_key[] = { 0x04, 0x30, 0x77, 0x2c, 0xe7,
 
 constexpr chip::NodeId kLocalNodeId = 12344321;
 
-#define println(format, ...) printf(format "\n", ##__VA_ARGS__)
-
 using namespace chip;
 using namespace chip::Inet;
 using namespace chip::Transport;
@@ -35,7 +33,7 @@ chip::SecureSessionMgr<chip::Transport::UDP> sessions;
 }
 
 extern "C" {
-void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId, uint8_t mask,
+void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
     (void) endpoint;
@@ -43,20 +41,20 @@ void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clust
     (void) manufacturerCode;
     (void) type;
     (void) size;
-    if (clusterId != CHIP_ZCL_CLUSTER_ON_OFF)
+    if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
     {
-        println("Unknown cluster ID: %d", clusterId);
+        printf("Unknown cluster ID: %d\n", clusterId);
         return;
     }
 
-    if (attributeId != CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF)
+    if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
     {
-        println("Unknown attribute ID: %d", attributeId);
+        printf("Unknown attribute ID: %d\n", attributeId);
         return;
     }
 
     // At this point we can assume that value points to a boolean value.
-    println("OnOff: %d", value[0]);
+    printf("OnOff: %d\n", value[0]);
 }
 }
 
@@ -64,23 +62,23 @@ namespace {
 class ServerCallback : public SecureSessionMgrCallback
 {
 public:
-    virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                   System::PacketBuffer * buffer, SecureSessionMgrBase * mgr)
+    void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
+                           SecureSessionMgrBase * mgr) override
     {
         const size_t data_len = buffer->DataLength();
         char src_addr[PeerAddress::kMaxToStringSize];
 
         // as soon as a client connects, assume it is connected
-        VerifyOrExit(buffer != NULL, println("Received data but couldn't process it..."));
-        VerifyOrExit(header.GetSourceNodeId().HasValue(), println("Unknown source for received message"));
+        VerifyOrExit(buffer != NULL, printf("Received data but couldn't process it...\n"));
+        VerifyOrExit(header.GetSourceNodeId().HasValue(), printf("Unknown source for received message\n"));
 
-        VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, println("Unknown source for received message"));
+        VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, printf("Unknown source for received message\n"));
 
         state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
 
-        println("Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
+        printf("Packet received from %s: %zu bytes\n", src_addr, static_cast<size_t>(data_len));
 
-        HandleDataModelMessage(buffer);
+        HandleDataModelMessage(header, buffer, mgr);
         buffer = NULL;
 
     exit:
@@ -91,15 +89,15 @@ public:
         }
     }
 
-    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
+    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override
     {
         CHIP_ERROR err;
 
-        println("Received a new connection.");
+        printf("Received a new connection.\n");
 
         err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key,
                                                                    sizeof(local_private_key));
-        VerifyOrExit(err == CHIP_NO_ERROR, println("Failed to setup encryption\n"));
+        VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to setup encryption\n\n"));
 
     exit:
         return;
@@ -113,28 +111,51 @@ private:
      * @param [in] buffer The buffer holding the message.  This function guarantees
      *                    that it will free the buffer before returning.
      */
-    void HandleDataModelMessage(System::PacketBuffer * buffer)
+    void HandleDataModelMessage(const MessageHeader & header, System::PacketBuffer * buffer, SecureSessionMgrBase * mgr)
     {
-        ChipZclStatus_t zclStatus = chipZclProcessIncoming((ChipZclBuffer_t *) buffer);
-        if (zclStatus == CHIP_ZCL_STATUS_SUCCESS)
+        EmberApsFrame frame;
+        bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame);
+        if (ok)
         {
-            println("Data model processing success!");
+            printf("APS frame processing success!\n");
         }
         else
         {
-            println("Data model processing failure: %d", zclStatus);
+            printf("APS frame processing failure\n");
+            System::PacketBuffer::Free(buffer);
+            return;
         }
+
+        ChipResponseDestination responseDest(header.GetSourceNodeId().Value(), mgr);
+        uint8_t * message;
+        uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
+        ok                  = emberAfProcessMessage(&frame,
+                                   0, // type
+                                   message, messageLen,
+                                   &responseDest, // source identifier
+                                   NULL);
+
         System::PacketBuffer::Free(buffer);
+
+        if (ok)
+        {
+            printf("Data model processing success!\n");
+        }
+        else
+        {
+            printf("Data model processing failure\n");
+        }
     }
 };
 
-static ServerCallback gCallbacks;
+ServerCallback gCallbacks;
 
 } // namespace
 
 void InitDataModelHandler()
 {
-    chipZclEndpointInit();
+    emberAfEndpointConfigure();
+    emAfInit();
 }
 
 // The echo server assumes the platform's networking has been setup already
@@ -151,11 +172,11 @@ void StartServer(chip::SecureSessionMgr<chip::Transport::UDP> * sessions)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        println("ERROR setting up transport: %s", ErrorStr(err));
+        printf("ERROR setting up transport: %s\n", ErrorStr(err));
     }
     else
     {
-        println("Lock Server Listening...");
+        printf("Lock Server Listening...\n");
     }
 }
 

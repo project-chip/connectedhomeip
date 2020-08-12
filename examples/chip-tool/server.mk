@@ -34,6 +34,20 @@ APP = chip-standalone-server
 
 SRCS = \
     $(PROJECT_ROOT)/server.cpp \
+    $(CHIP_ROOT)/src/app/util/attribute-size.c \
+    $(CHIP_ROOT)/src/app/util/attribute-storage.c \
+    $(CHIP_ROOT)/src/app/util/attribute-table.c \
+    $(CHIP_ROOT)/src/app/util/chip-response.cpp \
+    $(CHIP_ROOT)/src/app/util/client-api.c \
+    $(CHIP_ROOT)/src/app/util/ember-print.cpp \
+    $(CHIP_ROOT)/src/app/util/message.c \
+    $(CHIP_ROOT)/src/app/util/process-cluster-message.c \
+    $(CHIP_ROOT)/src/app/util/process-global-message.c \
+    $(CHIP_ROOT)/src/app/util/util.c \
+    $(CHIP_ROOT)/src/app/clusters/on-off-server/on-off.c \
+    $(PROJECT_ROOT)/gen/call-command-handler.c \
+    $(PROJECT_ROOT)/gen/callback-stub.c \
+    $(PROJECT_ROOT)/gen/znet-bookkeeping.c \
     $(NULL)
 
 INC_DIRS = \
@@ -45,13 +59,17 @@ INC_DIRS = \
     $(CHIP_ROOT)/src/controller \
     $(CHIP_ROOT)/config/standalone \
     $(CHIP_ROOT)/src/app \
+    $(CHIP_ROOT)/src/app/util \
     $(NULL)
 
 DEFINES = \
     USE_APP_CONFIG \
     $(NULL)
 
-CXXFLAGS += -std=c++11
+# Ignore the dead code
+CXXFLAGS += -std=c++11 -O3 -flto -ffunction-sections
+CFLAGS += -O3 -flto -ffunction-sections
+OPT_FLAGS += -O3 -flto
 
 ifdef BUILD_RELEASE
     DEFINES += BUILD_RELEASE=1
