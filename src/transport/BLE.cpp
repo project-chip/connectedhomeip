@@ -42,11 +42,6 @@ BLE::~BLE()
         mBleEndPoint->Close();
         mBleEndPoint = nullptr;
     }
-
-    if (mDeviceController)
-    {
-        mDeviceController = nullptr;
-    }
 }
 
 CHIP_ERROR BLE::Init(BleConnectionParameters & params)
@@ -55,7 +50,6 @@ CHIP_ERROR BLE::Init(BleConnectionParameters & params)
 
     VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(params.HasConnectionObject() || params.HasDiscriminator(), err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(params.GetDeviceController(), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(params.GetBleLayer(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     if (params.HasConnectionObject())
@@ -68,8 +62,8 @@ CHIP_ERROR BLE::Init(BleConnectionParameters & params)
     }
     SuccessOrExit(err);
 
-    mBleLayer         = params.GetBleLayer();
-    mDeviceController = params.GetDeviceController();
+    mBleCallbacks = params.GetCallbackHandler();
+    mBleLayer     = params.GetBleLayer();
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -160,10 +154,9 @@ void BLE::OnBleConnectionError(void * appState, BLE_ERROR err)
 {
     BLE * ble = reinterpret_cast<BLE *>(appState);
 
-    DeviceController::ChipDeviceController * dc = ble->mDeviceController;
-    if (dc && dc->mOnError)
+    if (ble->mBleCallbacks)
     {
-        dc->mOnError(dc, dc->mAppReqState, err, NULL);
+        ble->mBleCallbacks->OnBLEConnectionError(err);
     }
 }
 
@@ -171,10 +164,9 @@ void BLE::OnBleEndPointReceive(BLEEndPoint * endPoint, PacketBuffer * buffer)
 {
     BLE * ble = reinterpret_cast<BLE *>(endPoint->mAppState);
 
-    DeviceController::ChipDeviceController * dc = ble->mDeviceController;
-    if (dc && dc->mOnComplete.Response)
+    if (ble->mBleCallbacks)
     {
-        dc->mOnComplete.Response(dc, dc->mAppReqState, buffer);
+        ble->mBleCallbacks->OnBLEPacketReceived(buffer);
     }
 }
 
@@ -183,10 +175,9 @@ void BLE::OnBleEndPointConnectionComplete(BLEEndPoint * endPoint, BLE_ERROR err)
     BLE * ble   = reinterpret_cast<BLE *>(endPoint->mAppState);
     ble->mState = State::kInitialized;
 
-    DeviceController::ChipDeviceController * dc = ble->mDeviceController;
-    if (dc && dc->mOnNewConnection)
+    if (ble->mBleCallbacks)
     {
-        dc->mOnNewConnection(dc, NULL, dc->mAppReqState);
+        ble->mBleCallbacks->OnBLEConnectionComplete(err);
     }
 }
 
@@ -195,10 +186,9 @@ void BLE::OnBleEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)
     BLE * ble   = reinterpret_cast<BLE *>(endPoint->mAppState);
     ble->mState = State::kNotReady;
 
-    DeviceController::ChipDeviceController * dc = ble->mDeviceController;
-    if (dc && dc->mOnError)
+    if (ble->mBleCallbacks)
     {
-        dc->mOnError(dc, dc->mAppReqState, err, NULL);
+        ble->mBleCallbacks->OnBLEConnectionClosed(err);
     }
 }
 
