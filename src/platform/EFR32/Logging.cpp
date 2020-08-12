@@ -249,7 +249,7 @@ extern "C" void LwIPLog(const char * aFormat, ...)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
 {
-    IgnoreUnusedVariable(aLogRegion);
+    (void) aLogRegion;
     va_list v;
 
     va_start(v, aFormat);

@@ -29,6 +29,9 @@
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.h>
 
+#include <openthread/tasklet.h>
+#include <openthread/thread.h>
+
 extern "C" void otSysEventSignalPending(void);
 
 namespace chip {
@@ -68,6 +71,8 @@ public:
 
     using ThreadStackManager::InitThreadStack;
     CHIP_ERROR InitThreadStack(otInstance * otInst);
+    void _OnCHIPoBLEAdvertisingStart(void);
+    void _OnCHIPoBLEAdvertisingStop(void);
 
 private:
     // ===== Methods that implement the ThreadStackManager abstract interface.

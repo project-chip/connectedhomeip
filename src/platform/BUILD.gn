@@ -289,6 +289,8 @@ if (chip_device_platform != "none") {
         "FreeRTOS/SystemTimeSupport.cpp",
       ]
       if (chip_enable_openthread) {
+        public_deps += [ "${openthread_root}:libopenthread-ftd" ]
+
         sources += [
           "EFR32/ThreadStackManagerImpl.cpp",
           "EFR32/ThreadStackManagerImpl.h",

@@ -33,7 +33,7 @@
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <DeviceLayer/internal/GenericConnectivityManagerImpl_Thread.ipp>
+#include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
 #endif
 
 using namespace ::chip;
