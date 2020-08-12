@@ -40,6 +40,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       "${chip_root}/src/inet",
       "${chip_root}/src/lib",
       "${chip_root}/src/lib/core",
+      "${chip_root}/src/lib/message",
       "${chip_root}/src/lib/shell",
       "${chip_root}/src/lib/support",
       "${chip_root}/src/lwip:all",

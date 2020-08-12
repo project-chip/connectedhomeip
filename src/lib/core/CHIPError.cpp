@@ -603,6 +603,15 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_DECODE_FAILED:
         desc = "Decoding failed";
         break;
+    case CHIP_ERROR_SESSION_KEY_SUSPENDED:
+        desc = "Session key suspended";
+        break;
+    case CHIP_ERROR_UNSUPPORTED_WIRELESS_REGULATORY_DOMAIN:
+        desc = "Unsupported wireless regulatory domain";
+        break;
+    case CHIP_ERROR_UNSUPPORTED_WIRELESS_OPERATING_LOCATION:
+        desc = "Unsupported wireless operating location";
+        break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 
