@@ -39,6 +39,8 @@
 #ifndef SILABS_ZNET_CONFIG
 #define SILABS_ZNET_CONFIG
 
+#include "debug-printing-test.h"
+
 /**** Included Header Section ****/
 
 // Networks
@@ -94,20 +96,6 @@
 
 // Global switch
 #define EMBER_AF_PRINT_ENABLE
-// Individual areas
-#define EMBER_AF_PRINT_CORE 0x0001
-#define EMBER_AF_PRINT_DEBUG 0x0002
-#define EMBER_AF_PRINT_APP 0x0004
-#define EMBER_AF_PRINT_ZDO 0x0008
-#define EMBER_AF_PRINT_BITS                                                                                                        \
-    {                                                                                                                              \
-        0x0F                                                                                                                       \
-    }
-#define EMBER_AF_PRINT_NAMES                                                                                                       \
-    {                                                                                                                              \
-        "Core", "Debug", "Application", "ZDO (ZigBee Device Object)", NULL                                                         \
-    }
-#define EMBER_AF_PRINT_NAME_NUMBER 4
 
 #define EMBER_AF_SUPPORT_COMMAND_DISCOVERY
 
