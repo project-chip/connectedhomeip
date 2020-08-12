@@ -61,7 +61,10 @@ buildconfig_header("lwip_buildconfig") {
   }
 }
 
-if (lwip_platform == "external") {
+if (current_os == "zephyr") {
+  group("lwip") {
+  }
+} else if (lwip_platform == "external") {
   group("lwip") {
     public_deps = [ ":lwip_buildconfig" ]
   }

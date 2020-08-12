@@ -12,19 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+
+import("//build/toolchain/arm_gcc/arm_toolchain.gni")
+
 declare_args() {
-  # Crypto implementation: mbedtls, openssl.
-  chip_crypto = ""
+  zephyr_ar = ""
+  zephyr_cc = ""
+  zephyr_cxx = ""
 }
 
-if (chip_crypto == "") {
-  if (current_os == "android" || current_os == "freertos" ||
-      current_os == "zephyr") {
-    chip_crypto = "mbedtls"
-  } else {
-    chip_crypto = "openssl"
+gcc_toolchain("zephyr") {
+  ar = zephyr_ar
+  cc = zephyr_cc
+  cxx = zephyr_cxx
+
+  toolchain_args = {
+    current_os = "zephyr"
+    is_clang = false
   }
 }
-
-assert(chip_crypto == "mbedtls" || chip_crypto == "openssl",
-       "Please select a valid crypto implementation: mbedtls, openssl")
