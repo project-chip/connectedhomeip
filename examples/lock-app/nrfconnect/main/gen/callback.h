@@ -23770,7 +23770,7 @@ void halRadioPowerDownHandler(void);
  * @param enter        True if entering idle/sleep, False if exiting
  * @param sleepMode    Idle/sleep mode
  */
-void halSleepCallback(boolean enter, SleepModes sleepMode);
+void halSleepCallback(bool enter, SleepModes sleepMode);
 /** @} END HAL Library Plugin Callbacks */
 
 /** @} END addtogroup */

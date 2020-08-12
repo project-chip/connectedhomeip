@@ -2474,4 +2474,4 @@ void halRadioPowerUpHandler(void) {}
  * @param enter        True if entering idle/sleep, False if exiting
  * @param sleepMode    Idle/sleep mode
  */
-void halSleepCallback(boolean enter, SleepModes sleepMode) {}
+void halSleepCallback(bool enter, SleepModes sleepMode) {}
