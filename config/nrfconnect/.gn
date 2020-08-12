@@ -12,18 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Crypto implementation: mbedtls, openssl.
-  chip_crypto = ""
-}
+# The location of the build configuration file.
+buildconfig = "//build/config/BUILDCONFIG.gn"
 
-if (chip_crypto == "") {
-  if (current_os == "android" || current_os == "freertos" || current_os == "zephyr") {
-    chip_crypto = "mbedtls"
-  } else {
-    chip_crypto = "openssl"
-  }
-}
+# CHIP uses angle bracket includes.
+check_system_includes = true
 
-assert(chip_crypto == "mbedtls" || chip_crypto == "openssl",
-       "Please select a valid crypto implementation: mbedtls, openssl")
+# Allow loading paths relative to //gn.
+secondary_source = "//third_party/connectedhomeip/gn/"
+
+default_args = {
+  # We don't want the build scripts to inject any additional CPU related compiler flags,
+  # because those are supplied from cmake.
+  target_cpu = "zephyr"
+  target_os = "zephyr"
+
+  import("//args.gni")
+}

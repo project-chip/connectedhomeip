@@ -13,21 +13,34 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//${chip_root}/gn/chip/tests.gni")
 
-import("${chip_root}/gn/chip/chip_test.gni")
-import("${chip_root}/gn/chip/chip_test_group.gni")
+assert(current_os == "zephyr")
 
-declare_args() {
-  chip_build_lwip_tests = current_os != "zephyr"
+group("nrfconnect") {
+  deps = [
+    "${chip_root}/src/lib",
+  ]
 }
 
-if (chip_build_lwip_tests) {
-  chip_test("TestLwIP") {
-    sources = [ "tests.c" ]
-    deps = [ "${chip_root}/src/lwip" ]
+if (chip_build_tests) {
+  import("//${chip_root}/gn/chip/chip_test_group.gni")
+
+  group("check") {
+    deps = [ ":tests_run" ]
   }
 
   chip_test_group("tests") {
-    deps = [ ":TestLwIP" ]
+    deps = [
+      "${chip_root}/src/ble/tests",
+      "${chip_root}/src/crypto/tests",
+      "${chip_root}/src/inet/tests",
+      "${chip_root}/src/lib/core/tests",
+      "${chip_root}/src/lib/support/tests",
+      "${chip_root}/src/platform/tests",
+      "${chip_root}/src/setup_payload/tests",
+      "${chip_root}/src/system/tests",
+      "${chip_root}/src/transport/tests",
+    ]
   }
 }

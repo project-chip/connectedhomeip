@@ -60,19 +60,13 @@ set(CHIP_COMMON_FLAGS
 
 set(CHIP_OUTPUT_LIBRARIES
     ${CHIP_OUTPUT_DIR}/lib/libCHIP.a
-    ${CHIP_OUTPUT_DIR}/lib/libInetLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libSystemLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libSupportLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libBleLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libDeviceLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libCHIPDataModel.a
 )
 
 # ==================================================
 # Setup CHIP build
 # ==================================================
 
-chip_configure(ChipConfig 
+chip_configure(ChipConfig
     ARCH arm-none-eabi
     CFLAGS ${CHIP_COMMON_FLAGS} --specs=nosys.specs
     CXXFLAGS ${CHIP_COMMON_FLAGS}
@@ -80,7 +74,7 @@ chip_configure(ChipConfig
 )
 
 chip_build(ChipLib ChipConfig
-    BUILD_COMMAND make --no-print-directory install V=${CMAKE_AUTOGEN_VERBOSE}
+    BUILD_COMMAND ninja
     BUILD_ARTIFACTS ${CHIP_OUTPUT_LIBRARIES}
 )
 
@@ -88,5 +82,5 @@ chip_build(ChipLib ChipConfig
 # Configure application
 # ==================================================
 
-target_compile_definitions(app PRIVATE HAVE_CONFIG_H)
 target_link_libraries(app PUBLIC -Wl,--start-group ChipLib -Wl,--end-group)
+target_compile_definitions(app PRIVATE CHIP_SEPARATE_CONFIG_H)

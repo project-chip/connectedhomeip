@@ -28,9 +28,11 @@ template("chip_test") {
     _test_output_dir = invoker.output_dir
   }
 
-  executable(_test_name) {
-    forward_variables_from(invoker, "*", [ "output_dir" ])
-    output_dir = _test_output_dir
+  if (current_os != "zephyr") {
+    executable(_test_name) {
+      forward_variables_from(invoker, "*", [ "output_dir" ])
+      output_dir = _test_output_dir
+    }
   }
 
   # Only execute tests when current_os == host_os
