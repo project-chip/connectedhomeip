@@ -14,6 +14,7 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/nrf5_sdk.gni")
+import("//build_overrides/openthread.gni")
 
 import("${nrf5_sdk_build_root}/nrf5_sdk.gni")
 
@@ -90,6 +91,10 @@ executable("lock_app") {
   deps = [
     ":sdk",
     "${chip_root}/src/lib",
+    "${chip_root}/third_party/openthread/platforms/nrf528xx:libnordicsemi_nrf52840_radio_driver_softdevice",
+    "${chip_root}/third_party/openthread/platforms/nrf528xx:libopenthread-nrf52840-softdevice-sdk",
+    "${openthread_root}:libopenthread-cli-ftd",
+    "${openthread_root}:libopenthread-ftd",
   ]
 
   output_dir = root_out_dir

@@ -18,6 +18,10 @@ import("//build/config/linux/pkg_config.gni")
 
 import("device.gni")
 
+if (chip_enable_openthread) {
+  import("//build_overrides/openthread.gni")
+}
+
 if (chip_device_platform == "nrf5") {
   import("//build_overrides/nrf5_sdk.gni")
 }
@@ -86,7 +90,10 @@ if (chip_device_platform != "none") {
       defines += [ "CHIP_DEVICE_LAYER_TARGET_NRF5=0" ]
     }
     if (chip_enable_openthread) {
-      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_THREAD=1" ]
+      defines += [
+        "CHIP_DEVICE_CONFIG_ENABLE_THREAD=1",
+        "CHIP_ENABLE_OPENTHREAD=1",
+      ]
     }
     if (chip_enable_wifi) {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_WPA=1" ]
@@ -248,6 +255,8 @@ if (chip_device_platform != "none") {
       public_deps += [ "${nrf5_sdk_build_root}:nrf5_sdk" ]
 
       if (chip_enable_openthread) {
+        public_deps += [ "${openthread_root}:libopenthread-ftd" ]
+
         sources += [
           "OpenThread/OpenThreadUtils.cpp",
           "nRF5/ThreadStackManagerImpl.cpp",

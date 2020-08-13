@@ -23,7 +23,6 @@ if (chip_device_platform == "auto") {
   if (current_os == "mac" || current_os == "ios") {
     chip_device_platform = "darwin"
   } else if (current_os == "linux") {
-    # FIXME: enable openthread on nrf5 gn build
     chip_device_platform = "linux"
   } else {
     chip_device_platform = "none"
@@ -32,7 +31,7 @@ if (chip_device_platform == "auto") {
 
 declare_args() {
   # Enable openthread support.
-  chip_enable_openthread = chip_device_platform == "linux"
+  chip_enable_openthread = (chip_device_platform == "linux" || chip_device_platform == "nrf5")
 
   # Enable wifi support.
   chip_enable_wifi = chip_device_platform == "linux"  
