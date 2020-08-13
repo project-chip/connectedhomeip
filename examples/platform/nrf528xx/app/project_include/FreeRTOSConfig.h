@@ -116,6 +116,10 @@
 #define configASSERT(x) ASSERT(x)
 #endif
 
+#ifndef NDEBUG
+#define configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES 1
+#endif
+
 /* FreeRTOS MPU specific definitions. */
 #define configINCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS 1
 

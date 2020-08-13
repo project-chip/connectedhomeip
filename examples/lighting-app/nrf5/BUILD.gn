@@ -59,7 +59,6 @@ executable("lighting_app") {
     "${nrf5_platform_dir}/app/include/Server.h",
     "${nrf5_platform_dir}/app/include/chipinit.h",
     "${nrf5_platform_dir}/app/support/CXXExceptionStubs.cpp",
-    "${nrf5_platform_dir}/app/support/FreeRTOSNewlibLockSupport.c",
     "${nrf5_platform_dir}/app/support/nRF5Sbrk.c",
     "${nrf5_platform_dir}/util/LEDWidget.cpp",
     "${nrf5_platform_dir}/util/include/LEDWidget.h",
@@ -94,6 +93,8 @@ executable("lighting_app") {
     "${chip_root}/third_party/openthread/platforms/nrf528xx:libopenthread-nrf52840-softdevice-sdk",
     "${openthread_root}:libopenthread-cli-ftd",
     "${openthread_root}:libopenthread-ftd",
+    "${nrf5_platform_dir}/app/support:freertos_newlib_lock_support",
+    "${nrf5_platform_dir}/app/support:freertos_newlib_lock_support_test",
   ]
 
   output_dir = root_out_dir

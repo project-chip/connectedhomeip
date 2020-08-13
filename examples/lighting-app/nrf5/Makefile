@@ -55,6 +55,7 @@ SRCS = \
     $(NRF5_PLATFORM_DIR)/app/support/CXXExceptionStubs.cpp \
     $(NRF5_PLATFORM_DIR)/app/support/nRF5Sbrk.c \
     $(NRF5_PLATFORM_DIR)/app/support/FreeRTOSNewlibLockSupport.c \
+    $(NRF5_PLATFORM_DIR)/app/support/FreeRTOSNewlibLockSupport_test.c \
     $(NRF5_PLATFORM_DIR)/app/Server.cpp \
     $(NRF5_PLATFORM_DIR)/app/chipinit.cpp \
     $(NRF5_PLATFORM_DIR)/util/LEDWidget.cpp \
@@ -128,6 +129,7 @@ INC_DIRS = \
     $(PROJECT_ROOT)/main/schema/include \
     $(PROJECT_ROOT)/third_party/printf \
     $(CHIP_OUTPUT_DIR)/third_party/openthread/include \
+    $(CHIP_ROOT)/examples/platform \
     $(CHIP_ROOT)/src/include/ \
     $(CHIP_ROOT)/src/lib \
     $(CHIP_ROOT)/src/ \
