@@ -99,6 +99,7 @@ jniLibs/arm64-v8a
 11. Build OT Commissioner
 
     ```shell
+    git submodule update --init --recursive third_party/ot-commissioner/repo
     ./third_party/ot-commissioner/build-android-libs.sh
     ## JAR and .so libraries will be copy to target directories.
     ```
