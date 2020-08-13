@@ -74,7 +74,8 @@ enum
     kChipHeaderFlag_SourceNodeId = 0x0200, /**< Indicates that the source node ID is present in the CHIP message header. */
     kChipHeaderFlag_MsgCounterSyncReq = 0x0800, /**< Indicates that the sender requests message counter synchronization. */
 
-    kMsgHeaderField_ReservedFlagsMask = kMsgHeaderField_FlagsMask & ~kChipHeaderFlag_DestNodeId & ~kChipHeaderFlag_SourceNodeId & ~kChipHeaderFlag_MsgCounterSyncReq,
+    kMsgHeaderField_ReservedFlagsMask = kMsgHeaderField_FlagsMask & ~kChipHeaderFlag_DestNodeId & ~kChipHeaderFlag_SourceNodeId &
+        ~kChipHeaderFlag_MsgCounterSyncReq,
 
     kMsgHeaderField_MessageHMACMask =
         ~((kChipHeaderFlag_DestNodeId | kChipHeaderFlag_SourceNodeId | kChipHeaderFlag_MsgCounterSyncReq)

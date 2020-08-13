@@ -1355,8 +1355,7 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
     ChipMessageLayer * msgLayer = con->MessageLayer;
 
     // While in a state that allows receiving, process the received data...
-    while (data != NULL && con->StateAllowsReceive() && con->ReceiveEnabled &&
-           (con->OnMessageReceived != NULL))
+    while (data != NULL && con->StateAllowsReceive() && con->ReceiveEnabled && (con->OnMessageReceived != NULL))
     {
         IPPacketInfo packetInfo;
         ChipMessageInfo msgInfo;
@@ -1583,8 +1582,8 @@ void ChipConnection::Init(ChipMessageLayer * msgLayer)
     ReceiveEnabled        = true;
     OnConnectionComplete  = NULL;
     OnMessageReceived     = NULL;
-    OnConnectionClosed = DefaultConnectionClosedHandler;
-    OnReceiveError     = NULL;
+    OnConnectionClosed    = DefaultConnectionClosedHandler;
+    OnReceiveError        = NULL;
     memset(&mPeerAddrs, 0, sizeof(mPeerAddrs));
     mTcpEndPoint = NULL;
 #if CONFIG_NETWORK_LAYER_BLE

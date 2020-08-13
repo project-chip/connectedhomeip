@@ -1229,7 +1229,7 @@ void InetLayer::HandleSelectResult(int selectRes, fd_set * readfds, fd_set * wri
         }
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
-       // Now call each active endpoint to handle its pending I/O.
+        // Now call each active endpoint to handle its pending I/O.
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
         for (size_t i = 0; i < RawEndPoint::sPool.Size(); i++)
         {
