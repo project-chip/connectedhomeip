@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 
-uint16_t extractApsFrame(void * buffer, uint32_t buf_length, EmberApsFrame * outApsFrame)
+uint16_t extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * outApsFrame)
 {
 
     if (buffer == NULL || buf_length == 0 || outApsFrame == NULL)
@@ -109,7 +109,7 @@ uint16_t extractMessage(uint8_t * buffer, uint16_t buffer_length, uint8_t ** msg
     uint16_t result = 0;
     EmberApsFrame frame;
     uint16_t apsFrameSize = extractApsFrame(buffer, buffer_length, &frame);
-    if (msg && apsFrameSize > 0 && buffer_length > apsFrameSize)
+    if (msg && apsFrameSize > 0)
     {
         *msg   = buffer + apsFrameSize;
         result = buffer_length - apsFrameSize;
