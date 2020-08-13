@@ -129,6 +129,7 @@ INC_DIRS = \
     $(PROJECT_ROOT)/main/schema/include \
     $(PROJECT_ROOT)/third_party/printf \
     $(CHIP_OUTPUT_DIR)/third_party/openthread/include \
+    $(CHIP_ROOT)/examples/platform \
     $(CHIP_ROOT)/src/include/ \
     $(CHIP_ROOT)/src/lib \
     $(CHIP_ROOT)/src/ \
