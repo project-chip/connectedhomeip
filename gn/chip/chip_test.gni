@@ -39,9 +39,9 @@ template("chip_test") {
     script = "$dir_pw_unit_test/py/pw_unit_test/test_runner.py"
     args = [
       "--runner",
-      pw_unit_test_AUTOMATIC_RUNNER,
+      rebase_path(pw_unit_test_AUTOMATIC_RUNNER, root_build_dir),
       "--test",
-      get_path_info("$_test_output_dir:$_test_name", "abspath"),
+      rebase_path("$_test_output_dir/$_test_name", root_build_dir),
     ]
     stamp = true
   }

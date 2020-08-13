@@ -40,15 +40,11 @@ static_library("common") {
   public_configs = [ ":app_config" ]
 }
 
-static_library("chip") {
-  output_name = "libCHIPDataModel"
-
+group("chip") {
   public_deps = [ ":common" ]
 }
 
-static_library("mock") {
-  output_name = "libCHIPDataModelMock"
-
+group("mock") {
   public_deps = [ ":common" ]
 }
 
