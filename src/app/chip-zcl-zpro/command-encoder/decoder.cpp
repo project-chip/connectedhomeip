@@ -109,10 +109,12 @@ uint16_t extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * 
 
 void printApsFrame(EmberApsFrame * frame)
 {
-    printf("\n<EmberApsFrame %p> profileID %d, clusterID %d, sourceEndpoint %d, destinationEndPoint %d, options %d, groupID %d, "
-           "sequence %d, radius %d\n",
-           frame, frame->profileId, frame->clusterId, frame->sourceEndpoint, frame->destinationEndpoint, frame->options,
-           frame->groupId, frame->sequence, frame->radius);
+    ChipLogProgress(
+        Zcl,
+        "\n<EmberApsFrame %p> profileID %d, clusterID %d, sourceEndpoint %d, destinationEndPoint %d, options %d, groupID %d, "
+        "sequence %d, radius %d\n",
+        frame, frame->profileId, frame->clusterId, frame->sourceEndpoint, frame->destinationEndpoint, frame->options,
+        frame->groupId, frame->sequence, frame->radius);
 }
 
 uint16_t extractMessage(uint8_t * buffer, uint16_t buffer_length, uint8_t ** msg)
