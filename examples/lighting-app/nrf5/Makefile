@@ -55,6 +55,7 @@ SRCS = \
     $(NRF5_PLATFORM_DIR)/app/support/CXXExceptionStubs.cpp \
     $(NRF5_PLATFORM_DIR)/app/support/nRF5Sbrk.c \
     $(NRF5_PLATFORM_DIR)/app/support/FreeRTOSNewlibLockSupport.c \
+    $(NRF5_PLATFORM_DIR)/app/support/FreeRTOSNewlibLockSupport_test.c \
     $(NRF5_PLATFORM_DIR)/app/Server.cpp \
     $(NRF5_PLATFORM_DIR)/app/chipinit.cpp \
     $(NRF5_PLATFORM_DIR)/util/LEDWidget.cpp \
