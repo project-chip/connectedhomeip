@@ -1856,29 +1856,6 @@
 #define CHIP_CONFIG_ENABLE_CONDITION_LOGGING 0
 #endif // CHIP_CONFIG_ENABLE_CONDITION_LOGGING
 
-
-/**
- *  @def CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
- *
- *  @brief
- *    If set to (1), use of the ServiceDirectory implementation
- *    is enabled. Default value is (1) or enabled.
- *
- *  @note
- *    Enabling this profile allows applications using chip to
- *    request a connection to a particular chip service using
- *    a predefined service endpoint. It is relevant for
- *    applications that run on devices that interact with the
- *    Service over a direct TCP/IPv4 connection rather than those
- *    that use the chip Tunnel through a gateway device. For
- *    devices of the latter category, the Service Directory
- *    profile can be disabled via this compilation switch.
- *
- */
-#ifndef CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
-#define CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY               1
-#endif // CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
-
 /**
  *  @def CHIP_CONFIG_SERVICE_DIR_CONNECT_TIMEOUT_MSECS
  *

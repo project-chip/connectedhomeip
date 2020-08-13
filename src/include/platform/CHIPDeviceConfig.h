@@ -89,15 +89,6 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_SERVICE_DIRECTORY_CACHE_SIZE
- *
- * The size (in bytes) of the service directory cache.
- */
-#ifndef CHIP_DEVICE_CONFIG_SERVICE_DIRECTORY_CACHE_SIZE
-#define CHIP_DEVICE_CONFIG_SERVICE_DIRECTORY_CACHE_SIZE 512
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE
  *
  * The maximum size (in bytes) of a debug logging message.
@@ -395,18 +386,6 @@
 #endif
 
 // -------------------- Time Sync Configuration --------------------
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_SERVICE_DIRECTORY_TIME_SYNC
- *
- * Enables synchronizing the device real-time clock using information returned during
- * a chip service end point query.  For any device that uses the chip service directory
- * to lookup a tunnel server, enabling this option will result in the real time clock being
- * synchronized every time the service tunnel is established.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_SERVICE_DIRECTORY_TIME_SYNC
-#define CHIP_DEVICE_CONFIG_ENABLE_SERVICE_DIRECTORY_TIME_SYNC 1
-#endif
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
