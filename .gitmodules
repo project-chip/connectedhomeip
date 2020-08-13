@@ -64,3 +64,6 @@
 	branch = master
 	ignore = dirty
 	commit = 18e137db73e2ae6d307e62ac8430f7326efdb0c3
+[submodule "third_party/ot-commissioner/repo"]
+	path = third_party/ot-commissioner/repo
+	url = https://github.com/openthread/ot-commissioner
