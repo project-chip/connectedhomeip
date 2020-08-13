@@ -1,45 +1,35 @@
 /*
+ *  Copyright (c) 2020, The OpenThread Authors.
+ *  All rights reserved.
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions are met:
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. Neither the name of the copyright holder nor the
+ *     names of its contributors may be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ *  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ *  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ *  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ *  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ *  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ *  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ *  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
  */
 
 #ifndef EFR32_MBEDTLS_CONFIG_H
 #define EFR32_MBEDTLS_CONFIG_H
 
 #include "em_device.h"
-#include "em_se.h"
-
-/**
- * Enable FreeRTOS threading support
- */
-#define MBEDTLS_FREERTOS
-#define MBEDTLS_THREADING_C
-#define MBEDTLS_THREADING_ALT
-
-/**
- * Enable Crypto and Entropy modules
- */
-#define MBEDTLS_AES_C
-#define MBEDTLS_ECP_C
-#define MBEDTLS_ECDH_C
-#define MBEDTLS_ENTROPY_C
-#define MBEDTLS_SHA1_C
-#define MBEDTLS_SHA256_C
-#define MBEDTLS_TRNG_C
-#define MBEDTLS_CIPHER_MODE_CTR
 
 /**
  * \def MBEDTLS_AES_ALT
@@ -52,15 +42,6 @@
  * See MBEDTLS_AES_C for more information.
  */
 #define MBEDTLS_AES_ALT
-
-/**
- * \def MBEDTLS_ENTROPY_HARDWARE_ALT
- *
- * Integrate the provided default entropy source into the mbed
- * TLS entropy infrastructure.
- *
- */
-#define MBEDTLS_ENTROPY_HARDWARE_ALT
 
 /**
  * \def MBEDTLS_ECP_INTERNAL_ALT
@@ -86,25 +67,6 @@
 #define MBEDTLS_ECP_NORMALIZE_JAC_MANY_ALT
 #define MBEDTLS_ECP_NORMALIZE_JAC_ALT
 #define MBEDTLS_ECP_RANDOMIZE_JAC_ALT
-#endif
-
-/**
- * \def MBEDTLS_SHA1_ALT
- *
- * Enable hardware acceleration for the SHA-224 and SHA-256 cryptographic
- * hash algorithms.
- * Module: sl_crypto/src/crypto_sha.c
- * Caller: library/mbedtls_md.c
- *         library/ssl_cli.c
- *         library/ssl_srv.c
- *         library/ssl_tls.c
- *         library/x509write_crt.c
- *
- * Requires: MBEDTLS_SHA1_C and (CRYPTO_COUNT > 0)
- * See MBEDTLS_SHA1_C for more information.
- */
-#if defined(CRYPTO_COUNT) && (CRYPTO_COUNT > 0)
-#define MBEDTLS_SHA1_ALT
 #endif
 
 /**

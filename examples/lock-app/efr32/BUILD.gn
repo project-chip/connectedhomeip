@@ -23,9 +23,11 @@ efr32_project_dir = "${chip_root}/examples/lock-app/efr32"
 
 efr32_sdk("sdk") {
   include_dirs = [
+    "${chip_root}/src/app/util",
     "${chip_root}/src/include/platform",
     "${chip_root}/src/platform/EFR32",
     "${efr32_project_dir}/include/",
+    "${efr32_project_dir}/src/",
     "${efr32_project_dir}/src/platform/${efr32_family}/${efr32_board}",
   ]
 
@@ -62,12 +64,29 @@ executable("lock_app") {
 
   sources = [
     "src/AppTask.cpp",
+    "src/BoltLockManager.cpp",
     "src/ButtonHandler.cpp",
+    "src/DataModelHandler.cpp",
     "src/LEDWidget.cpp",
     "src/platform/${efr32_family}/${efr32_board}/init_board.c",
     "src/platform/${efr32_family}/${efr32_board}/init_mcu.c",
     "src/platform/${efr32_family}/${efr32_board}/hal-config.h",
     "src/main.cpp",
+    "src/Server.cpp",
+    "src/gen/call-command-handler.c",
+    "src/gen/callback-stub.c",
+    "src/gen/znet-bookkeeping.c",
+    "${chip_root}/src/app/util/attribute-size.c",
+    "${chip_root}/src/app/util/attribute-storage.c",
+    "${chip_root}/src/app/util/attribute-table.c",
+    "${chip_root}/src/app/util/chip-response.cpp",
+    "${chip_root}/src/app/util/client-api.c",
+    "${chip_root}/src/app/util/ember-print.cpp",
+    "${chip_root}/src/app/util/message.c",
+    "${chip_root}/src/app/util/process-cluster-message.c",
+    "${chip_root}/src/app/util/process-global-message.c",
+    "${chip_root}/src/app/util/util.c",
+    "${chip_root}/src/app/clusters/on-off-server/on-off.c",
   ]
 
   output_dir = root_out_dir

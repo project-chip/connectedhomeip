@@ -20,6 +20,7 @@
 #include "AppTask.h"
 #include "AppEvent.h"
 #include "ButtonHandler.h"
+#include "DataModelHandler.h"
 #include "LEDWidget.h"
 
 #include "AppConfig.h"
@@ -41,7 +42,6 @@ static QueueHandle_t sAppEventQueue;
 static LEDWidget sStatusLED;
 static LEDWidget sLockLED;
 
-static bool sLEDState                         = true;
 static bool sIsThreadProvisioned              = false;
 static bool sIsThreadEnabled                  = false;
 static bool sIsThreadAttached                 = false;
@@ -49,6 +49,8 @@ static bool sIsPairedToAccount                = false;
 static bool sIsServiceSubscriptionEstablished = false;
 static bool sHaveBLEConnections               = false;
 static bool sHaveServiceConnectivity          = false;
+
+using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 
@@ -84,7 +86,7 @@ int AppTask::Init()
     sStatusLED.Init(SYSTEM_STATE_LED);
 
     sLockLED.Init(LOCK_STATE_LED);
-    sLockLED.Set(sLEDState);
+    sLockLED.Set(!BoltLockMgr().IsUnlocked());
 
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
@@ -100,6 +102,14 @@ int AppTask::Init()
     }
 
     EFR32_LOG("Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION);
+    err = BoltLockMgr().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("BoltLockMgr().Init() failed");
+        appError(err);
+    }
+
+    BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     return err;
 }
@@ -186,19 +196,19 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::LockActionEventHandler(AppEvent * aEvent)
 {
+    bool initiated = false;
     BoltLockManager::Action_t action;
-    // int32_t actor;
+    int32_t actor;
     int err = CHIP_NO_ERROR;
 
     if (aEvent->Type == AppEvent::kEventType_Lock)
     {
         action = static_cast<BoltLockManager::Action_t>(aEvent->LockEvent.Action);
-        // TODO : Use this variable
-        // actor  = aEvent->LockEvent.Actor;
+        actor  = aEvent->LockEvent.Actor;
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        if (!sLEDState)
+        if (BoltLockMgr().IsUnlocked())
         {
             action = BoltLockManager::LOCK_ACTION;
         }
@@ -206,6 +216,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
         {
             action = BoltLockManager::UNLOCK_ACTION;
         }
+        actor = 0; // BOLT_LOCK_ACTOR_METHOD_PHYSICAL
     }
     else
     {
@@ -214,8 +225,12 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
 
     if (err == CHIP_NO_ERROR)
     {
-        EFR32_LOG("Begin Lock Request");
-        ActionCompleted(action);
+        initiated = BoltLockMgr().InitiateAction(actor, action);
+
+        if (!initiated)
+        {
+            EFR32_LOG("Action is already in progress or active.");
+        }
     }
 }
 
@@ -322,9 +337,8 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
-
             // Set lock status LED back to show state of lock.
-            sLockLED.Set(sLEDState);
+            sLockLED.Set(!BoltLockMgr().IsUnlocked());
 
             sAppTask.CancelTimer();
 
@@ -393,15 +407,13 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
     {
         EFR32_LOG("Lock Action has been completed")
 
-        sLEDState = true;
-        sLockLED.Set(sLEDState);
+        sLockLED.Set(true);
     }
     else if (aAction == BoltLockManager::UNLOCK_ACTION)
     {
         EFR32_LOG("Unlock Action has been completed")
 
-        sLEDState = false;
-        sLockLED.Set(sLEDState);
+        sLockLED.Set(false);
     }
 }
 

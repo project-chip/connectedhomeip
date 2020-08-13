@@ -31,4 +31,4 @@ gn gen --root="$1" --args="efr32_sdk_root=\"$EFR32_SDK_ROOT\"" "$2"
 ninja -v -C "$2"
 
 # Post build step since Pigweed doesn't seems to support objcopy yet.
-arm-none-eabi-objcopy -O srec ./"$2"/chip-efr32-lock-example ./"$2"/chip-efr32-lock-example.s37
+arm-none-eabi-objcopy -O srec ./"$2"/chip-efr32-lock-example.out ./"$2"/chip-efr32-lock-example.s37
