@@ -20,6 +20,7 @@ efr32_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 mbedtls_target = efr32_sdk_target
 openthread_external_mbedtls = mbedtls_target
 
+
 chip_ble_project_config_include = "<CHIPProjectConfig.h>"
 chip_device_project_config_include = "<CHIPProjectConfig.h>"
 chip_project_config_include = "<CHIPProjectConfig.h>"

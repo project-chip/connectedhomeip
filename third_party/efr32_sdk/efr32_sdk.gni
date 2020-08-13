@@ -91,8 +91,9 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/sleeptimer/config",
       "${efr32_sdk_root}/platform/common/inc",
       "${efr32_sdk_root}/platform/emdrv/nvm3/inc",
-
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/include",
       "${efr32_sdk_root}/util/third_party/mbedtls/include",
+      "${efr32_sdk_root}/util/third_party/mbedtls/include/mbedtls",
       "${mbedtls_root}/repo/include",
     ]
 

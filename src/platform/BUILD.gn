@@ -292,6 +292,7 @@ if (chip_device_platform != "none") {
         public_deps += [ "${openthread_root}:libopenthread-ftd" ]
 
         sources += [
+          "OpenThread/OpenThreadUtils.cpp",
           "EFR32/ThreadStackManagerImpl.cpp",
           "EFR32/ThreadStackManagerImpl.h",
         ]
