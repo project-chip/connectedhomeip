@@ -136,7 +136,6 @@ if (chip_device_platform != "none") {
       "../include/platform/internal/GenericConnectivityManagerImpl_BLE.h",
       "../include/platform/internal/GenericConnectivityManagerImpl_NoBLE.h",
       "../include/platform/internal/GenericConnectivityManagerImpl_NoThread.h",
-      "../include/platform/internal/GenericConnectivityManagerImpl_NoTunnel.h",
       "../include/platform/internal/GenericConnectivityManagerImpl_NoWiFi.h",
       "../include/platform/internal/GenericConnectivityManagerImpl_Thread.h",
       "../include/platform/internal/GenericNetworkProvisioningServerImpl.h",

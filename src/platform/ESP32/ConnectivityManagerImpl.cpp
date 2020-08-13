@@ -378,35 +378,6 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_SetServiceTunnelMode(ServiceTunnelMode val)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(val != kServiceTunnelMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    mServiceTunnelMode = val;
-
-    SystemLayer.ScheduleWork(DriveServiceTunnelState, NULL);
-
-exit:
-    return err;
-}
-
-bool ConnectivityManagerImpl::_IsServiceTunnelConnected(void)
-{
-    return false;
-}
-
-bool ConnectivityManagerImpl::_IsServiceTunnelRestricted(void)
-{
-    return false;
-}
-
-bool ConnectivityManagerImpl::_HaveServiceConnectivityViaTunnel(void)
-{
-    return IsServiceTunnelConnected() && !IsServiceTunnelRestricted();
-}
-
 // ==================== ConnectivityManager Platform Internal Methods ====================
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
@@ -419,14 +390,11 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mWiFiStationState               = kWiFiStationState_NotConnected;
     mWiFiAPMode                     = kWiFiAPMode_Disabled;
     mWiFiAPState                    = kWiFiAPState_NotActive;
-    mServiceTunnelMode              = kServiceTunnelMode_Enabled;
     mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
     mWiFiAPIdleTimeoutMS            = CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT;
     mFlags                          = 0;
 
     // TODO Initialize the Chip Addressing and Routing Module.
-
-    // TODO Initialize the service tunnel agent.
 
     // Ensure that ESP station mode is enabled.
     err = Internal::ESP32Utils::EnableStationMode();
@@ -542,38 +510,6 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
             break;
         }
     }
-
-    // Handle fabric membership changes.
-    else if (event->Type == DeviceEventType::kFabricMembershipChange)
-    {
-        DriveServiceTunnelState();
-    }
-
-    // Handle service provisioning changes.
-    else if (event->Type == DeviceEventType::kServiceProvisioningChange)
-    {
-        DriveServiceTunnelState();
-    }
-
-#if !CHIP_DEVICE_CONFIG_DISABLE_ACCOUNT_PAIRING
-
-    // Handle account pairing changes.
-    else if (event->Type == DeviceEventType::kAccountPairingChange)
-    {
-        // When account pairing successfully completes, if the tunnel to the
-        // service is subject to routing restrictions (imposed because at the time
-        // the tunnel was established the device was not paired to an account)
-        // then force the tunnel to close.  This will result in the tunnel being
-        // re-established, which should lift the service-side restrictions.
-        if (event->AccountPairingChange.IsPairedToAccount && GetFlag(mFlags, kFlag_ServiceTunnelStarted))
-        {
-            ChipLogProgress(DeviceLayer, "Restarting service tunnel to lift routing restrictions");
-            ClearFlag(mFlags, kFlag_ServiceTunnelStarted);
-            DriveServiceTunnelState();
-        }
-    }
-
-#endif // !CHIP_DEVICE_CONFIG_DISABLE_ACCOUNT_PAIRING
 }
 
 void ConnectivityManagerImpl::_OnWiFiScanDone()
@@ -1014,8 +950,6 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
         {
             ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv6", (haveIPv6Conn) ? "ESTABLISHED" : "LOST");
         }
-
-        DriveServiceTunnelState();
     }
 }
 
@@ -1063,40 +997,6 @@ void ConnectivityManagerImpl::OnIPv6AddressAvailable(const system_event_got_ip6_
     UpdateInternetConnectivityState();
 }
 
-void ConnectivityManagerImpl::DriveServiceTunnelState(void)
-{
-    bool startServiceTunnel;
-
-    // Determine if the tunnel to the service should be started.
-    startServiceTunnel = (mServiceTunnelMode == kServiceTunnelMode_Enabled && GetFlag(mFlags, kFlag_HaveIPv4InternetConnectivity));
-
-    // If the tunnel should be started but isn't, or vice versa, ...
-    if (startServiceTunnel != GetFlag(mFlags, kFlag_ServiceTunnelStarted))
-    {
-        // Update the tunnel started state.
-        SetFlag(mFlags, kFlag_ServiceTunnelStarted, startServiceTunnel);
-
-        // Start or stop the tunnel as necessary.
-        if (startServiceTunnel)
-        {
-            ChipLogProgress(DeviceLayer, "Starting service tunnel");
-
-            ChipLogError(DeviceLayer, "Service tunnel unsupported");
-            ClearFlag(mFlags, kFlag_ServiceTunnelStarted);
-        }
-
-        else
-        {
-            ChipLogProgress(DeviceLayer, "Stopping service tunnel");
-        }
-    }
-}
-
-void ConnectivityManagerImpl::DriveServiceTunnelState(chip::System::Layer * aLayer, void * aAppState, chip::System::Error aError)
-{
-    sInstance.DriveServiceTunnelState();
-}
-
 const char * ConnectivityManagerImpl::_WiFiStationModeToStr(WiFiStationMode mode)
 {
     switch (mode)
@@ -1130,21 +1030,6 @@ const char * ConnectivityManagerImpl::_WiFiAPModeToStr(WiFiAPMode mode)
         return "OnDemand";
     case kWiFiAPMode_OnDemand_NoStationProvision:
         return "OnDemand_NoStationProvision";
-    default:
-        return "(unknown)";
-    }
-}
-
-const char * ConnectivityManagerImpl::_ServiceTunnelModeToStr(ServiceTunnelMode mode)
-{
-    switch (mode)
-    {
-    case kServiceTunnelMode_NotSupported:
-        return "NotSupported";
-    case kServiceTunnelMode_Disabled:
-        return "Disabled";
-    case kServiceTunnelMode_Enabled:
-        return "Enabled";
     default:
         return "(unknown)";
     }

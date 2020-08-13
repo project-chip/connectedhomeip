@@ -101,7 +101,6 @@ enum LogModule
     kLogModule_SoftwareUpdate,
     kLogModule_TokenPairing,
     kLogModule_TimeService,
-    kLogModule_chipTunnel,
     kLogModule_Heartbeat,
     kLogModule_chipSystemLayer,
     kLogModule_EventLogging,

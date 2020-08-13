@@ -79,7 +79,6 @@ static const char ModuleNames[] = "-\0\0" // None
                                   "SWU"   // SoftwareUpdate
                                   "TP\0"  // TokenPairing
                                   "TS\0"  // TimeServices
-                                  "TUN"   // chipTunnel
                                   "HB\0"  // Heartbeat
                                   "CSL"   // chipSystemLayer
                                   "EVL"   // Event Logging

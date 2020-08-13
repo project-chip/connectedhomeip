@@ -50,9 +50,6 @@ struct udp_pcb;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 struct tcp_pcb;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-struct netif;
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace chip {
@@ -116,9 +113,6 @@ protected:
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
         tcp_pcb * mTCP; /**< Transmission control protocol (TCP) control */
 #endif                  // INET_CONFIG_ENABLE_TCP_ENDPOINT
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-        netif * mNetIf; /**< Tunnel interface control */
-#endif                  // INET_CONFIG_ENABLE_TUN_ENDPOINT
     };
 
     enum

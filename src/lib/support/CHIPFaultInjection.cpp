@@ -52,10 +52,6 @@ static const nl::FaultInjection::Name sFaultNames[] = {
     "BDXAllocTransfer",
     "CASEKeyConfirm",
     "SecMgrBusy",
-#if CHIP_CONFIG_ENABLE_TUNNELING
-    "TunnelQueueFull",
-    "TunnelPacketDropByPolicy",
-#endif // CHIP_CONFIG_ENABLE_TUNNELING
 #if CONFIG_NETWORK_LAYER_BLE
     "CHIPOBLESend",
 #endif // CONFIG_NETWORK_LAYER_BLE

@@ -31,9 +31,6 @@ declare_args() {
 
   # Enable TCP endpoint.
   chip_inet_config_enable_tcp_endpoint = true
-
-  # Enable TUN endpoint.
-  chip_inet_config_enable_tun_endpoint = current_os == "linux"
 }
 
 declare_args() {
