@@ -1,5 +1,7 @@
 #!/bin/bash
 
+readonly CUR_DIR=$(dirname "$(realpath -s $0)")
+
 set -e
 
 case "${TARGET}" in
@@ -7,7 +9,7 @@ case "${TARGET}" in
         ABI="armeabi-v7a"
         ;;
     aarch64-linux-android)
-        ABI="arm64-v8a "
+        ABI="arm64-v8a"
         ;;
     i686-linux-android)
         ABI="x86"
@@ -20,8 +22,10 @@ case "${TARGET}" in
         exit 1
 esac
 
+cd "${CUR_DIR}"
+
 ## Install dependencies.
-#[ ! -d build/ ] && ./repo/script/bootstrap.sh
+[ ! -d build/ ] && ./repo/script/bootstrap.sh
 
 mkdir -p build && cd build
 cmake -GNinja                                                                               \
@@ -56,3 +60,6 @@ cd ../../../
 for lib in $(find ./build -name "*.so"); do
     [ ! -L "$lib" ] && cp "$lib" libs
 done
+
+cp libs/libotcommissioner.jar ../../src/android/CHIPTool/app/libs
+cp libs/*.so ../../src/android/CHIPTool/app/src/main/jniLibs/"$ABI"

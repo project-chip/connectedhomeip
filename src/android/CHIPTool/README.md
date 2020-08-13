@@ -96,12 +96,9 @@ jniLibs/arm64-v8a
     tweaking of the Android automake build rules. Include it in the interim to
     be able to build the Android app).
 
-11. Before running `gradle sync`, setup ot-commissioner
+11. Build OT Commissioner
 
     ```shell
-    cd third_party/ot-commissioner/repo/
-    ./script/bootstrap.sh
-
-    ## Install SWIG 4.0
-    brew install swig@4
+    ./third_party/ot-commissioner/build-android-libs.sh
+    ## JAR and .so libraries will be copy to target directories.
     ```
