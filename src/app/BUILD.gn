@@ -27,8 +27,8 @@ static_library("common") {
   output_name = "libCHIPDataModelCommon"
 
   sources = [
-    "chip-zcl-zpro/command-encoder/decoder.c",
-    "chip-zcl-zpro/command-encoder/encoder.c",
+    "chip-zcl-zpro/command-encoder/encoder.cpp",
+    "chip-zcl-zpro/command-encoder/decoder.cpp",
   ]
 
   public_deps = [

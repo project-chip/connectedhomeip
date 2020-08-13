@@ -25,12 +25,16 @@
 #include "chip-zcl-zpro-codec.h"
 #include <stdio.h>
 #include <string.h>
+#include <support/logging/CHIPLogging.h>
+
+extern "C" {
 
 uint16_t extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * outApsFrame)
 {
 
     if (buffer == NULL || buf_length == 0 || outApsFrame == NULL)
     {
+        ChipLogError(Zcl, "Error extracting APS frame. invalid inputs");
         return 0;
     }
     // Skip first byte, because that's the always-0 frame control.
@@ -38,6 +42,7 @@ uint16_t extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * 
 
     if (nextByteToRead >= buf_length)
     {
+        ChipLogError(Zcl, "Error extracting APS frame after reading first byte");
         return 0;
     }
     memcpy(&outApsFrame->profileId, buffer + nextByteToRead, sizeof(outApsFrame->profileId));
@@ -45,6 +50,7 @@ uint16_t extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * 
 
     if (nextByteToRead >= buf_length)
     {
+        ChipLogError(Zcl, "Error extracting APS frame after reading profileId");
         return 0;
     }
     memcpy(&outApsFrame->clusterId, buffer + nextByteToRead, sizeof(outApsFrame->clusterId));
@@ -52,6 +58,7 @@ uint16_t extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * 
 
     if (nextByteToRead >= buf_length)
     {
+        ChipLogError(Zcl, "Error extracting APS frame after reading clusterId");
         return 0;
     }
     memcpy(&outApsFrame->sourceEndpoint, buffer + nextByteToRead, sizeof(outApsFrame->sourceEndpoint));
@@ -59,6 +66,7 @@ uint16_t extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * 
 
     if (nextByteToRead >= buf_length)
     {
+        ChipLogError(Zcl, "Error extracting APS frame after reading sourceEndpoint");
         return 0;
     }
     memcpy(&outApsFrame->destinationEndpoint, buffer + nextByteToRead, sizeof(outApsFrame->destinationEndpoint));
@@ -66,6 +74,7 @@ uint16_t extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * 
 
     if (nextByteToRead >= buf_length)
     {
+        ChipLogError(Zcl, "Error extracting APS frame after reading destinationEndpoint");
         return 0;
     }
     memcpy(&outApsFrame->options, buffer + nextByteToRead, sizeof(outApsFrame->options));
@@ -73,6 +82,7 @@ uint16_t extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * 
 
     if (nextByteToRead >= buf_length)
     {
+        ChipLogError(Zcl, "Error extracting APS frame after reading options");
         return 0;
     }
     memcpy(&outApsFrame->groupId, buffer + nextByteToRead, sizeof(outApsFrame->groupId));
@@ -80,6 +90,7 @@ uint16_t extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * 
 
     if (nextByteToRead >= buf_length)
     {
+        ChipLogError(Zcl, "Error extracting APS frame after reading groupId");
         return 0;
     }
     memcpy(&outApsFrame->sequence, buffer + nextByteToRead, sizeof(outApsFrame->sequence));
@@ -87,6 +98,7 @@ uint16_t extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * 
 
     if (nextByteToRead >= buf_length)
     {
+        ChipLogError(Zcl, "Error extracting APS frame after reading sequence");
         return 0;
     }
     memcpy(&outApsFrame->radius, buffer + nextByteToRead, sizeof(outApsFrame->radius));
@@ -120,3 +132,5 @@ uint16_t extractMessage(uint8_t * buffer, uint16_t buffer_length, uint8_t ** msg
     }
     return result;
 }
+
+} // extern C
