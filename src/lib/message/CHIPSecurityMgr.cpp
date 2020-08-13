@@ -33,8 +33,6 @@
 #include <Profiles/common/CommonProfile.h>
 #include <Profiles/echo/CHIPEcho.h>
 #include <Profiles/security/CHIPSecurity.h>
-#include <Profiles/service-directory/ServiceDirectory.h>
-#include <Profiles/status-report/StatusReportProfile.h>
 #include <core/CHIPCore.h>
 #include <message/CHIPServerBase.h>
 #include <profiles/CHIPProfiles.h>
