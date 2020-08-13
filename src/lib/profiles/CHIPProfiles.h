@@ -49,6 +49,10 @@ enum CHIPProfileId
     // NOTE: Do not attempt to allocate these values yourself.
 
     kChipProfile_Common              = (kChipVendor_Common << 16) | 0x0000, // Common Profile
+    kChipProfile_Echo                = (kChipVendor_Common << 16) | 0x0001, // Echo Profile
+    kChipProfile_NetworkProvisioning = (kChipVendor_Common << 16) | 0x0003, // Network Provisioning Profile
+    kChipProfile_Security            = (kChipVendor_Common << 16) | 0x0004, // Network Security Profile
+    kChipProfile_FabricProvisioning  = (kChipVendor_Common << 16) | 0x0005, // Fabric Provisioning Profile
     kChipProfile_ServiceProvisioning = (kChipVendor_Common << 16) | 0x000F, // Service Provisioning Profile
 
     // Profiles reserved for internal protocol use

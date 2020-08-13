@@ -40,6 +40,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       "${chip_root}/src/inet",
       "${chip_root}/src/lib",
       "${chip_root}/src/lib/core",
+      "${chip_root}/src/lib/message",
       "${chip_root}/src/lib/shell",
       "${chip_root}/src/lib/support",
       "${chip_root}/src/lwip:all",
@@ -69,7 +70,6 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
     chip_test_group("tests") {
       deps = [
-        "${chip_root}/src/app/plugin/tests",
         "${chip_root}/src/ble/tests",
         "${chip_root}/src/crypto/tests",
         "${chip_root}/src/inet/tests",

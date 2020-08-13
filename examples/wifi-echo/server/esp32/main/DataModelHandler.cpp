@@ -47,7 +47,7 @@ void InitDataModelHandler()
 void HandleDataModelMessage(const MessageHeader & header, System::PacketBuffer * buffer, SecureSessionMgrBase * mgr)
 {
     EmberApsFrame frame;
-    bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame);
+    bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) > 0;
     if (ok)
     {
         ESP_LOGI(TAG, "APS frame processing success!");

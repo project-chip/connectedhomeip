@@ -56,13 +56,18 @@ typedef enum
     kFault_FuzzExchangeHeaderTx, /**< Fuzz a chip Exchange Header after it has been encoded into the packet buffer;
                                       when the fault is enabled, it expects an integer argument, which is an index into
                                       a table of modifications that can be applied to the header. @see FuzzExchangeHeader */
-    kFault_BDXBadBlockCounter,   /**< Corrupt the BDX Block Counter in the BDX BlockSend or BlockEOF message about to be sent */
-    kFault_BDXAllocTransfer,     /**< Fail the allocation of a BDXTransfer object */
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
+    kFault_WRMDoubleTx,        /**< Force WRMP to transmit the outgoing message twice */
+    kFault_WRMSendError,       /**< Fail a transmission in WRMP as if the max number of retransmission has been exceeded */
+#endif                         // WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+    kFault_BDXBadBlockCounter, /**< Corrupt the BDX Block Counter in the BDX BlockSend or BlockEOF message about to be sent */
+    kFault_BDXAllocTransfer,   /**< Fail the allocation of a BDXTransfer object */
 #if CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
     kFault_ServiceManager_ConnectRequestNew, /**< Fail the allocation of a chipServiceManager::ConnectRequest */
     kFault_ServiceManager_Lookup,            /**< Fail the lookup of an endpoint id */
     kFault_ServiceDirectoryReplaceError,     /**< Fail the replacement of a ServiceDirectory entry */
 #endif                                       // CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
+    kFault_SecMgrBusy, /**< Trigger a WEAVE_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
 #if CHIP_CONFIG_ENABLE_TUNNELING
     kFault_TunnelQueueFull, /**< Trigger a CHIP_ERROR_TUNNEL_SERVICE_QUEUE_FULL when enqueueing a packet in the Tunnel queue */
     kFault_TunnelPacketDropByPolicy, /**< Trigger an explicit drop of the packet as if done by an application policy */
@@ -111,8 +116,8 @@ DLL_EXPORT void FuzzExchangeHeader(uint8_t * p, int32_t arg);
 #define CHIP_FAULT_INJECT_MAX_ARG(aFaultID, aMaxArg, aProtectedStatements, aUnprotectedStatements)                                 \
     do                                                                                                                             \
     {                                                                                                                              \
-        FaultInjection::Manager & mgr          = chip::FaultInjection::GetManager();                                               \
-        const FaultInjection::Record * records = mgr.GetFaultRecords();                                                            \
+        nl::FaultInjection::Manager & mgr          = chip::FaultInjection::GetManager();                                           \
+        const nl::FaultInjection::Record * records = mgr.GetFaultRecords();                                                        \
         if (records[aFaultID].mNumArguments == 0)                                                                                  \
         {                                                                                                                          \
             int32_t arg = aMaxArg;                                                                                                 \

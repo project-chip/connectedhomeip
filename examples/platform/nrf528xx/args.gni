@@ -21,6 +21,11 @@ arm_float_abi = "hard"
 arm_cpu = "cortex-m4"
 arm_fpu = "fpv4-sp-d16"
 
+openthread_project_core_config_file = "OpenThreadConfig.h"
+openthread_core_config_deps = []
+openthread_core_config_deps =
+    [ "${chip_root}/examples/platform/nrf528xx:openthread_core_config_nrf52840_chip_examples" ]
+
 chip_ble_project_config_include = "<CHIPProjectConfig.h>"
 chip_device_project_config_include = "<CHIPProjectConfig.h>"
 chip_project_config_include = "<CHIPProjectConfig.h>"

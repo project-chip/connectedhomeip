@@ -2461,12 +2461,8 @@ third_party/ot-br-posix/Makefile
 src/Makefile
 src/include/Makefile
 src/app/Makefile
-src/app/chip-zcl/Makefile
 src/app/chip-zcl-zpro/Makefile
 src/app/clusters/Makefile
-src/app/gen/Makefile
-src/app/plugin/Makefile
-src/app/plugin/tests/Makefile
 src/app/util/Makefile
 src/ble/Makefile
 src/ble/tests/Makefile

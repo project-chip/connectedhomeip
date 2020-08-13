@@ -39,14 +39,15 @@
 
 #include <controller/CHIPDeviceController.h>
 
-extern "C" {
-#include "chip-zcl/chip-zcl.h"
-} // extern "C"
-
 #include "chip-zcl/chip-zcl-zpro-codec.h"
 
 // Delay, in seconds, between sends for the echo case.
 #define SEND_DELAY 5
+
+// Limits on endpoint values.  Could be wrong, if we start using endpoint 0 for
+// something.
+#define CHIP_ZCL_ENDPOINT_MIN 0x01
+#define CHIP_ZCL_ENDPOINT_MAX 0xF0
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -100,18 +101,14 @@ static bool ContentMayBeADataModelMessage(System::PacketBuffer * buffer)
 static void HandleDataModelMessage(System::PacketBuffer * buffer)
 {
     EmberApsFrame frame;
-    bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame);
-    if (ok)
-    {
-        printf("APS frame processing success!\n");
-    }
-    else
+    if (extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) == 0)
     {
         printf("APS frame processing failure!\n");
         System::PacketBuffer::Free(buffer);
         return;
     }
 
+    printf("APS frame processing success!\n");
     uint8_t * message;
     uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
 
@@ -219,7 +216,9 @@ void ShowUsage(const char * executable)
             "    off device-ip-address device-port endpoint-id\n"
             "    on device-ip-address device-port endpoint-id\n"
             "    toggle device-ip-address device-port endpoint-id\n"
-            "    read-onoff device-ip-address device-port endpoint-id\n",
+            "    read device-ip-address device-port endpoint-id attr-name\n"
+            "  Supported attribute names for the 'read' command:\n"
+            "    onoff -- OnOff attribute from the On/Off cluster\n",
             executable);
 }
 
@@ -228,7 +227,7 @@ enum class Command
     Off,
     On,
     Toggle,
-    ReadOnOff,
+    Read,
     Echo,
     EchoBle,
 };
@@ -264,10 +263,10 @@ bool DetermineCommand(int argc, char * argv[], Command * command)
         return argc == 5;
     }
 
-    if (EqualsLiteral(argv[1], "read-onoff"))
+    if (EqualsLiteral(argv[1], "read"))
     {
-        *command = Command::ReadOnOff;
-        return argc == 5;
+        *command = Command::Read;
+        return argc == 6;
     }
 
     if (EqualsLiteral(argv[1], "echo"))
@@ -293,6 +292,8 @@ struct CommandArgs
     uint16_t discriminator;
     uint32_t setupPINCode;
     uint8_t endpointId;
+    // attrName is only used for Read commands.
+    const char * attrName;
 };
 
 bool DetermineArgsBle(char * argv[], CommandArgs * commandArgs)
@@ -360,8 +361,17 @@ bool DetermineCommandArgs(char * argv[], Command command, CommandArgs * commandA
     case Command::On:
     case Command::Off:
     case Command::Toggle:
-    case Command::ReadOnOff:
-        return DetermineArgsOnOff(argv, commandArgs);
+    case Command::Read: {
+        if (!DetermineArgsOnOff(argv, commandArgs))
+        {
+            return false;
+        }
+        if (command == Command::Read)
+        {
+            commandArgs->attrName = argv[5];
+        }
+        return true;
+    }
     }
 
     fprintf(stderr, "Need to define arg handling for command '%d'\n", int(command));
@@ -412,8 +422,10 @@ void DoEchoIP(DeviceController::ChipDeviceController * controller, const IPAddre
 
 // Handle the on/off/toggle case, where we are sending a ZCL command and not
 // expecting a response at all.
-void DoOnOff(DeviceController::ChipDeviceController * controller, Command command, uint8_t endpoint)
+void DoOnOff(DeviceController::ChipDeviceController * controller, Command command, const CommandArgs & commandArgs)
 {
+    const uint8_t endpoint = commandArgs.endpointId;
+
     // Make sure our buffer is big enough, but this will need a better setup!
     static const size_t bufferSize = 1024;
     auto * buffer                  = System::PacketBuffer::NewWithAvailableSize(bufferSize);
@@ -430,7 +442,12 @@ void DoOnOff(DeviceController::ChipDeviceController * controller, Command comman
     case Command::Toggle:
         dataLength = encodeToggleCommand(buffer->Start(), bufferSize, endpoint);
         break;
-    case Command::ReadOnOff:
+    case Command::Read:
+        if (!EqualsLiteral(commandArgs.attrName, "onoff"))
+        {
+            fprintf(stderr, "Don't know how to read '%s' attribute\n", commandArgs.attrName);
+            return;
+        }
         dataLength = encodeReadOnOffCommand(buffer->Start(), bufferSize, endpoint);
         break;
     default:
@@ -483,7 +500,7 @@ CHIP_ERROR ExecuteCommand(DeviceController::ChipDeviceController * controller, C
         err =
             controller->ConnectDevice(kRemoteDeviceId, commandArgs.hostAddr, NULL, OnConnect, OnMessage, OnError, commandArgs.port);
         VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to connect to the device"));
-        DoOnOff(controller, command, commandArgs.endpointId);
+        DoOnOff(controller, command, commandArgs);
         controller->ServiceEventSignal();
         break;
     }

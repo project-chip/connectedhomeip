@@ -69,7 +69,7 @@ extern CHIP_ERROR MemoryInit(void * buf = NULL, size_t bufSize = 0);
 extern void MemoryShutdown(void);
 
 /**
- * This function is called by the Weave layer to allocate a block of memory of "size" bytes.
+ * This function is called by the CHIP layer to allocate a block of memory of "size" bytes.
  *
  * @param[in]  size             Specifies requested memory size in bytes.
  *

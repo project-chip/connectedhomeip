@@ -36,6 +36,7 @@ namespace chip {
 enum ChipVendorId
 {
     kChipVendor_Common       = 0x0000,
+    kChipVendor_NestLabs     = 0x235A,
     kChipVendor_NotSpecified = 0xFFFF
 };
 

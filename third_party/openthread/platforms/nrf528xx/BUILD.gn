@@ -1,0 +1,199 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/nrf5_sdk.gni")
+import("//build_overrides/openthread.gni")
+
+# TODO(spang): Clean this up. We're mixing the vanilla Nordic SDK with forked
+# SDK code from OpenThread. See use_openthread_radio_driver below.
+
+nrf528xx_sdk_common = [
+  "${openthread_root}/examples/platforms/nrf528xx/src/misc.c",
+  "${openthread_root}/examples/platforms/nrf528xx/src/radio.c",
+  "${openthread_root}/examples/platforms/nrf528xx/src/alarm.c",
+  "${openthread_root}/examples/platforms/nrf528xx/src/diag.c",
+  "${openthread_root}/examples/platforms/nrf528xx/src/entropy.c",
+  "${openthread_root}/examples/platforms/nrf528xx/src/fem.c",
+  "${openthread_root}/examples/platforms/nrf528xx/src/flash.c",
+  "${openthread_root}/examples/platforms/nrf528xx/src/logging.c",
+  "${openthread_root}/examples/platforms/nrf528xx/src/system.c",
+  "${openthread_root}/examples/platforms/nrf528xx/src/temp.c",
+  "${openthread_root}/examples/platforms/nrf528xx/src/platform-fem.h",
+  "${openthread_root}/examples/platforms/nrf528xx/src/platform-nrf5.h",
+]
+
+copy("copy_nrf52840_headers") {
+  sources = [
+    "${openthread_root}/examples/platforms/nrf528xx/src/platform-softdevice.h",
+    "${openthread_root}/examples/platforms/openthread-system.h",
+  ]
+
+  outputs =
+      [ "${root_gen_dir}/include/openthread/platform/{{source_file_part}}" ]
+}
+
+static_library("libopenthread-nrf52840-softdevice-sdk") {
+  sources = nrf528xx_sdk_common
+  sources += [
+    "${openthread_root}/examples/platforms/nrf528xx/src/flash_sd.c",
+    "${openthread_root}/examples/platforms/nrf528xx/src/platform-softdevice.h",
+    "${openthread_root}/examples/platforms/nrf528xx/src/softdevice.c",
+    "${openthread_root}/examples/platforms/nrf528xx/src/softdevice.h",
+  ]
+  public_deps = [
+    ":copy_nrf52840_headers",
+    ":libnordicsemi_nrf52840_radio_driver_softdevice",
+    ":libopenthread-nrf52840-transport",
+    "${nrf5_sdk_build_root}:nrf5_sdk",
+    "..:libopenthread-platform",
+    "..:libopenthread-platform-utils",
+  ]
+}
+
+config("libopenthread-nrf52840-transport_config") {
+  defines = [ "UART_AS_SERIAL_TRANSPORT=1" ]
+}
+
+static_library("libopenthread-nrf52840-transport") {
+  sources = [
+    "${openthread_root}/examples/platforms/nrf528xx/src/platform-nrf5-transport.h",
+    "${openthread_root}/examples/platforms/nrf528xx/src/transport/spi-slave.c",
+    "${openthread_root}/examples/platforms/nrf528xx/src/transport/transport-drivers.h",
+    "${openthread_root}/examples/platforms/nrf528xx/src/transport/transport.c",
+    "${openthread_root}/examples/platforms/nrf528xx/src/transport/uart.c",
+    "${openthread_root}/examples/platforms/nrf528xx/src/transport/usb-cdc-uart.c",
+  ]
+
+  public_configs = [ ":libopenthread-nrf52840-transport_config" ]
+
+  public_deps = [
+    ":libnordicsemi_nrf52840",
+    "${nrf5_sdk_build_root}:nrf5_sdk",
+    "${openthread_root}/src/core:libopenthread_core_headers",
+    "..:libopenthread-platform",
+    "..:libopenthread-platform-utils",
+  ]
+}
+
+declare_args() {
+  # Use the OpenThread copy of the 802.15.4 radio driver.
+  use_openthread_radio_driver = true
+}
+
+if (use_openthread_radio_driver) {
+  nrf528xx_radio_driver_src =
+      "${openthread_root}/third_party/NordicSemiconductor/drivers/radio"
+} else {
+  nrf528xx_radio_driver_src =
+      "${nrf5_sdk_root}/external/nRF-IEEE-802.15.4-radio-driver/src"
+}
+
+nrf528xx_radio_driver_common_sources = [
+  "${nrf528xx_radio_driver_src}/fal/nrf_802154_fal.c",
+  "${nrf528xx_radio_driver_src}/fem/three_pin_gpio/nrf_fem_three_pin_gpio.c",
+  "${nrf528xx_radio_driver_src}/mac_features/ack_generator/nrf_802154_ack_data.c",
+  "${nrf528xx_radio_driver_src}/mac_features/ack_generator/nrf_802154_ack_generator.c",
+  "${nrf528xx_radio_driver_src}/mac_features/ack_generator/nrf_802154_enh_ack_generator.c",
+  "${nrf528xx_radio_driver_src}/mac_features/ack_generator/nrf_802154_imm_ack_generator.c",
+  "${nrf528xx_radio_driver_src}/mac_features/nrf_802154_csma_ca.c",
+  "${nrf528xx_radio_driver_src}/mac_features/nrf_802154_delayed_trx.c",
+  "${nrf528xx_radio_driver_src}/mac_features/nrf_802154_filter.c",
+  "${nrf528xx_radio_driver_src}/mac_features/nrf_802154_frame_parser.c",
+  "${nrf528xx_radio_driver_src}/mac_features/nrf_802154_precise_ack_timeout.c",
+  "${nrf528xx_radio_driver_src}/nrf_802154.c",
+  "${nrf528xx_radio_driver_src}/nrf_802154_core.c",
+  "${nrf528xx_radio_driver_src}/nrf_802154_core_hooks.c",
+  "${nrf528xx_radio_driver_src}/nrf_802154_critical_section.c",
+  "${nrf528xx_radio_driver_src}/nrf_802154_debug.c",
+  "${nrf528xx_radio_driver_src}/nrf_802154_pib.c",
+  "${nrf528xx_radio_driver_src}/nrf_802154_rssi.c",
+  "${nrf528xx_radio_driver_src}/nrf_802154_rx_buffer.c",
+  "${nrf528xx_radio_driver_src}/nrf_802154_timer_coord.c",
+  "${nrf528xx_radio_driver_src}/platform/clock/nrf_802154_clock_sdk.c",
+  "${nrf528xx_radio_driver_src}/platform/coex/nrf_802154_wifi_coex_none.c",
+  "${nrf528xx_radio_driver_src}/platform/hp_timer/nrf_802154_hp_timer.c",
+  "${nrf528xx_radio_driver_src}/rsch/nrf_802154_rsch.c",
+  "${nrf528xx_radio_driver_src}/rsch/nrf_802154_rsch_crit_sect.c",
+  "${nrf528xx_radio_driver_src}/timer_scheduler/nrf_802154_timer_sched.c",
+  "${nrf5_sdk_root}/examples/multiprotocol/app_utils/multiprotocol_802154_config.c",
+  "${nrf5_sdk_root}/examples/multiprotocol/app_utils/multiprotocol_802154_config.h",
+]
+
+nrf528xx_radio_driver_softdevice_sources = [
+  "${nrf528xx_radio_driver_src}/nrf_802154_notification_swi.c",
+  "${nrf528xx_radio_driver_src}/nrf_802154_priority_drop_swi.c",
+  "${nrf528xx_radio_driver_src}/nrf_802154_request_swi.c",
+  "${nrf528xx_radio_driver_src}/nrf_802154_swi.c",
+  "${nrf528xx_radio_driver_src}/rsch/raal/softdevice/nrf_raal_softdevice.c",
+]
+
+config("libnordicsemi_nrf52840_config") {
+  defines = [ "NRF_802154_PROJECT_CONFIG=\"platform-config.h\"" ]
+
+  include_dirs = [
+    "${openthread_root}/examples/platforms/nrf528xx/src",
+    "${openthread_root}/examples/platforms/nrf528xx/nrf52840",
+  ]
+}
+
+source_set("openthread_core_config_nrf52840") {
+  sources = [
+    "${openthread_root}/examples/platforms/nrf528xx/nrf52840/openthread-core-nrf52840-config-check.h",
+    "${openthread_root}/examples/platforms/nrf528xx/nrf52840/openthread-core-nrf52840-config.h",
+  ]
+
+  public_configs = [ ":libnordicsemi_nrf52840_config" ]
+}
+
+source_set("libnordicsemi_nrf52840") {
+  sources = [
+    "${openthread_root}/examples/platforms/nrf528xx/nrf52840/platform-config.h",
+    "${openthread_root}/examples/platforms/nrf528xx/nrf52840/transport-config.h",
+  ]
+
+  public_configs = [ ":libnordicsemi_nrf52840_config" ]
+}
+
+config("nrf528xx_radio_driver_config") {
+  include_dirs = [
+    "${nrf528xx_radio_driver_src}",
+    "${nrf528xx_radio_driver_src}/fem",
+    "${nrf528xx_radio_driver_src}/fem/three_pin_gpio",
+    "${nrf528xx_radio_driver_src}/rsch/raal",
+    "${nrf528xx_radio_driver_src}/rsch/raal/softdevice",
+    "${nrf528xx_radio_driver_src}/platform/temperature",
+    "${nrf528xx_radio_driver_src}/platform/lp_timer",
+    "${nrf5_sdk_root}/examples/multiprotocol/app_utils",
+  ]
+}
+
+config("libnordicsemi_softdevice_config") {
+  defines = [ "RAAL_SOFTDEVICE=1" ]
+}
+
+static_library("libnordicsemi_nrf52840_radio_driver_softdevice") {
+  sources = nrf528xx_radio_driver_common_sources +
+            nrf528xx_radio_driver_softdevice_sources
+
+  public_configs = [
+    ":nrf528xx_radio_driver_config",
+    ":libnordicsemi_softdevice_config",
+  ]
+
+  public_deps = [
+    ":libnordicsemi_nrf52840",
+    "${nrf5_sdk_build_root}:nrf5_sdk",
+    "${openthread_root}/src/core:libopenthread_core_headers",
+  ]
+}

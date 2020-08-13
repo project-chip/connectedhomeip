@@ -42,6 +42,32 @@ using namespace Crypto;
 
 SecureSession::SecureSession() : mKeyAvailable(false) {}
 
+CHIP_ERROR SecureSession::InitFromSecret(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
+                                         const size_t salt_length, const unsigned char * info, const size_t info_length)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    VerifyOrExit(mKeyAvailable == false, error = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(secret != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(secret_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (salt_length > 0)
+    {
+        VerifyOrExit(salt != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    VerifyOrExit(info_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(info != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    error = HKDF_SHA256(secret, secret_length, salt, salt_length, info, info_length, mKey, sizeof(mKey));
+    SuccessOrExit(error);
+
+    mKeyAvailable = true;
+
+exit:
+    return error;
+}
+
 CHIP_ERROR SecureSession::Init(const unsigned char * remote_public_key, const size_t public_key_length,
                                const unsigned char * local_private_key, const size_t private_key_length, const unsigned char * salt,
                                const size_t salt_length, const unsigned char * info, const size_t info_length)
@@ -64,11 +90,9 @@ CHIP_ERROR SecureSession::Init(const unsigned char * remote_public_key, const si
     VerifyOrExit(info != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     error = ECDH_derive_secret(remote_public_key, public_key_length, local_private_key, private_key_length, secret, secret_size);
-    if (error == CHIP_NO_ERROR)
-    {
-        error         = HKDF_SHA256(secret, sizeof(secret), salt, salt_length, info, info_length, mKey, sizeof(mKey));
-        mKeyAvailable = (error == CHIP_NO_ERROR);
-    }
+    SuccessOrExit(error);
+
+    error = InitFromSecret(secret, secret_size, salt, salt_length, info, info_length);
 
 exit:
     return error;

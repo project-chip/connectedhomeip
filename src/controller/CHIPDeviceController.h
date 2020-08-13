@@ -50,7 +50,7 @@ typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * app
 typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
 };
 
-class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback
+class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback, public Transport::BLECallbackHandler
 {
     friend class ChipDeviceControllerCallback;
 
@@ -180,10 +180,16 @@ public:
      */
     CHIP_ERROR ServiceEventSignal();
 
-    virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                   System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr);
+    void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
+                           SecureSessionMgrBase * mgr) override;
 
-    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr);
+    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
+
+    //////////// BLECallbackHandler Implementation ///////////////
+    void OnBLEConnectionError(BLE_ERROR err) override;
+    void OnBLEConnectionComplete(BLE_ERROR err) override;
+    void OnBLEConnectionClosed(BLE_ERROR err) override;
+    void OnBLEPacketReceived(PacketBuffer * buffer) override;
 
 private:
 #if CONFIG_NETWORK_LAYER_BLE

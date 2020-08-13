@@ -1845,7 +1845,7 @@ typedef struct
 /**
  * @brief Useful to reference a single bit of a byte.
  */
-#define BIT(x) (1U << (x)) // Unsigned avoids compiler warnings re BIT(15)
+#define BIT(nr) (1UL << (nr)) // Unsigned avoids compiler warnings re BIT(15)
 
 /**
  * @brief Returns the low byte of the 16-bit value \c n as an \c uint8_t.
@@ -1905,9 +1905,6 @@ typedef struct
 // Stubs to just silence some compile errors
 
 #define emberAfPrintEnabled(...) false
-
-// Needed by callback.h and callback-stubs.c
-typedef bool boolean;
 
 #define emberAfPrintActiveArea EMBER_AF_PRINT_CORE
 #endif // TYPES_STUB_H

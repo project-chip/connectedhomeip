@@ -77,8 +77,12 @@ uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint
 uint16_t encodeReadOnOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
 /** @brief Extracts an aps frame from buffer into outApsFrame
+ * @param buffer Buffer to read from
+ * @param buf_length Length of buffer
+ * @param outApsFrame Pointer to EmberApsFrame struct to read into
+ * @return returns the number of bytes that were consumed to read out the EmberApsFrame. 0 means an error was encountered
  */
-bool extractApsFrame(void * buffer, uint32_t buf_length, EmberApsFrame * outApsFrame);
+uint16_t extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * outApsFrame);
 
 /** @brief Populates msg with address of the zcl message within buffer.
  * @return Returns the length of msg buffer. Returns 0 on error e.g. if buffer is too short.

@@ -43,7 +43,7 @@
 // properly when CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG is enabled.
 #define CHIP_CONFIG_DEV_RANDOM_DRBG_SEED 1
 
-#define CHIP_CONFIG_SECURITY_TEST_MODE 1
+#define CHIP_CONFIG_SECURITY_TEST_MODE 0
 
 // Increase session idle timeout in stand-alone builds for the convenience of developers.
 #define CHIP_CONFIG_DEFAULT_SECURITY_SESSION_IDLE_TIMEOUT 120000

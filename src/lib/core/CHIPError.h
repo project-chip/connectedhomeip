@@ -1728,6 +1728,34 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  */
 #define CHIP_ERROR_DECODE_FAILED                                _CHIP_ERROR(187)
 
+
+/**
+ *  @def CHIP_ERROR_SESSION_KEY_SUSPENDED
+ *
+ *  @brief
+ *    Use of the identified session key is suspended.
+ *
+ */
+#define CHIP_ERROR_SESSION_KEY_SUSPENDED                        _CHIP_ERROR(188)
+
+/**
+ *  @def CHIP_ERROR_UNSUPPORTED_WIRELESS_REGULATORY_DOMAIN
+ *
+ *  @brief
+ *    The specified wireless regulatory domain is unsupported.
+ *
+ */
+#define CHIP_ERROR_UNSUPPORTED_WIRELESS_REGULATORY_DOMAIN       _CHIP_ERROR(189)
+
+/**
+ *  @def CHIP_ERROR_UNSUPPORTED_WIRELESS_OPERATING_LOCATION
+ *
+ *  @brief
+ *    The specified wireless operating location is unsupported.
+ *
+ */
+#define CHIP_ERROR_UNSUPPORTED_WIRELESS_OPERATING_LOCATION      _CHIP_ERROR(190)
+
 /**
  *  @}
  */
