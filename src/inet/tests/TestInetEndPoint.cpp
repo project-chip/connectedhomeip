@@ -309,7 +309,7 @@ static void TestInetEndPoint(nlTestSuite * inSuite, void * inContext)
 #if INET_CONFIG_ENABLE_IPV4
     RawEndPoint * testRaw4EP = NULL;
 #endif // INET_CONFIG_ENABLE_IPV4
-    UDPEndPoint * testUDPEP = NULL;
+    UDPEndPoint * testUDPEP  = NULL;
     TCPEndPoint * testTCPEP1 = NULL;
     PacketBuffer * buf       = PacketBuffer::New();
     bool didBind             = false;
