@@ -62,7 +62,7 @@ typedef enum
 #endif                         // WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
     kFault_BDXBadBlockCounter, /**< Corrupt the BDX Block Counter in the BDX BlockSend or BlockEOF message about to be sent */
     kFault_BDXAllocTransfer,   /**< Fail the allocation of a BDXTransfer object */
-    kFault_SecMgrBusy, /**< Trigger a WEAVE_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
+    kFault_SecMgrBusy,         /**< Trigger a WEAVE_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
 #if CHIP_CONFIG_ENABLE_TUNNELING
     kFault_TunnelQueueFull, /**< Trigger a CHIP_ERROR_TUNNEL_SERVICE_QUEUE_FULL when enqueueing a packet in the Tunnel queue */
     kFault_TunnelPacketDropByPolicy, /**< Trigger an explicit drop of the packet as if done by an application policy */
