@@ -70,7 +70,7 @@ uint32_t _encodeOnOffCommand(uint8_t * buffer, uint32_t buf_length, int command,
         result = 0;
         return result;
     }
-    uint32_t indexToWrite = result;
+
     // This is a cluster-specific command so low two bits are 0b01.  The command
     // is standard, so does not need a manufacturer code, and we're sending
     // client to server, so all the remaining bits are 0.
