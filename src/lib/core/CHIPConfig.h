@@ -79,8 +79,6 @@
 
 #include "CHIPTimeConfig.h"
 
-#include "CHIPTunnelConfig.h"
-
 #include "CHIPEventLoggingConfig.h"
 
 #include "CHIPWRMPConfig.h"
@@ -1043,17 +1041,6 @@
 #ifndef CHIP_CONFIG_MAX_INCOMING_TCP_CON_FROM_SINGLE_IP
 #define CHIP_CONFIG_MAX_INCOMING_TCP_CON_FROM_SINGLE_IP    2
 #endif // CHIP_CONFIG_MAX_INCOMING_TCP_CON_FROM_SINGLE_IP
-
-/**
- *  @def CHIP_CONFIG_MAX_TUNNELS
- *
- *  @brief
- *    Maximum number of simultaneously active connection tunnels.
- *
- */
-#ifndef CHIP_CONFIG_MAX_TUNNELS
-#define CHIP_CONFIG_MAX_TUNNELS                            1
-#endif // CHIP_CONFIG_MAX_TUNNELS
 
 /**
  *  @def CHIP_CONFIG_MAX_SESSION_KEYS

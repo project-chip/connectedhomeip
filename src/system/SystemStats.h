@@ -66,9 +66,6 @@ enum
 #if INET_CONFIG_NUM_UDP_ENDPOINTS
     kInetLayer_NumUDPEps,
 #endif
-#if INET_CONFIG_NUM_TUN_ENDPOINTS
-    kInetLayer_NumTunEps,
-#endif
 #if INET_CONFIG_NUM_DNS_RESOLVERS
     kInetLayer_NumDNSResolvers,
 #endif

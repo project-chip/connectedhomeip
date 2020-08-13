@@ -257,19 +257,6 @@
 #endif // INET_CONFIG_NUM_UDP_ENDPOINTS
 
 /**
- *  @def INET_CONFIG_NUM_TUN_ENDPOINTS
- *
- *  @brief
- *    This is the total number of TUN end point context structures.
- *
- *    Up to this many outstanding TUN endpoints may be instantiated.
- *
- */
-#ifndef INET_CONFIG_NUM_TUN_ENDPOINTS
-#define INET_CONFIG_NUM_TUN_ENDPOINTS                       64
-#endif // INET_CONFIG_NUM_TUN_ENDPOINTS
-
-/**
  *  @def INET_CONFIG_NUM_DNS_RESOLVERS
  *
  *  @brief
@@ -344,21 +331,6 @@
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 /**
- *  @def INET_CONFIG_ENABLE_TUN_ENDPOINT
- *
- *  @brief
- *    Defines whether (1) or not (0) to enable the ability
- *    to instantiate a Tunnel endpoint for tun interfaces.
- *    By default, set when LWIP is enabled or being built
- *    on a Linux platform.
- *
- */
-#ifndef INET_CONFIG_ENABLE_TUN_ENDPOINT
-#define INET_CONFIG_ENABLE_TUN_ENDPOINT                     0
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
-
-
-/**
  *  @def INET_CONFIG_ENABLE_UDP_ENDPOINT
  *
  *  @brief
@@ -405,16 +377,6 @@
 #ifndef INET_CONFIG_TEST
 #define INET_CONFIG_TEST                                   0
 #endif
-
-/**
- *  @def INET_CONFIG_TUNNEL_DEVICE_NAME
- *
- *  @brief
- *    Defines tunnel device name
- */
-#ifndef INET_CONFIG_TUNNEL_DEVICE_NAME
-#define INET_CONFIG_TUNNEL_DEVICE_NAME                      "/dev/net/tun"
-#endif //INET_CONFIG_TUNNEL_DEVICE_NAME
 
 /**
  * @def INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS

@@ -27,7 +27,6 @@
 #include <core/CHIPConfig.h>
 #include <core/CHIPEventLoggingConfig.h>
 #include <core/CHIPTimeConfig.h>
-#include <core/CHIPTunnelConfig.h>
 
 #if CHIP_CONFIG_TEST && CHIP_WITH_NLFAULTINJECTION
 
@@ -68,10 +67,6 @@ typedef enum
     kFault_ServiceDirectoryReplaceError,     /**< Fail the replacement of a ServiceDirectory entry */
 #endif                                       // CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
     kFault_SecMgrBusy, /**< Trigger a WEAVE_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
-#if CHIP_CONFIG_ENABLE_TUNNELING
-    kFault_TunnelQueueFull, /**< Trigger a CHIP_ERROR_TUNNEL_SERVICE_QUEUE_FULL when enqueueing a packet in the Tunnel queue */
-    kFault_TunnelPacketDropByPolicy, /**< Trigger an explicit drop of the packet as if done by an application policy */
-#endif                               // CHIP_CONFIG_ENABLE_TUNNELING
 #if CONFIG_NETWORK_LAYER_BLE
     kFault_CHIPOBLESend, /**< Inject a GATT error when sending the first fragment of a chip message over BLE */
 #endif                   // CONFIG_NETWORK_LAYER_BLE
