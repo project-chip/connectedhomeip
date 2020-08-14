@@ -146,8 +146,12 @@ CHIP_ERROR ChipMessageLayer::Init(InitContext * context)
     OnUnsecuredConnectionCallbacksRemoved = NULL;
     OnAcceptError                         = NULL;
     OnMessageLayerActivityChange          = NULL;
+#if CHIP_CONFIG_MAX_CONNECTIONS
     memset(mConPool, 0, sizeof(mConPool));
+#endif
+#if CHIP_CONFIG_MAX_TUNNELS
     memset(mTunnelPool, 0, sizeof(mTunnelPool));
+#endif
     AppState               = NULL;
     ExchangeMgr            = NULL;
     SecurityMgr            = NULL;
@@ -245,8 +249,12 @@ CHIP_ERROR ChipMessageLayer::Shutdown()
     OnConnectionReceived          = NULL;
     OnAcceptError                 = NULL;
     OnMessageLayerActivityChange  = NULL;
+#if CHIP_CONFIG_MAX_CONNECTIONS
     memset(mConPool, 0, sizeof(mConPool));
+#endif
+#if CHIP_CONFIG_MAX_TUNNELS
     memset(mTunnelPool, 0, sizeof(mTunnelPool));
+#endif
     ExchangeMgr = NULL;
     AppState    = NULL;
     mFlags      = 0;
