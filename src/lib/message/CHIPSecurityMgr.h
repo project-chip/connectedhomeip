@@ -276,7 +276,7 @@ public:
                                 uint16_t pwLen = 0);
 
     // Initiate a secure CASE session, optionally providing a CASE auth delegate.
-    // Session establishment is done over specified connection or over UDP using WRM Protocol.
+    // Session establishment is done over specified connection or over UDP using RMP Protocol.
     CHIP_ERROR StartCASESession(ChipConnection * con, uint64_t peerNodeId, const IPAddress & peerAddr, uint16_t peerPort,
                                 ChipAuthMode requestedAuthMode, void * reqState, SessionEstablishedFunct onComplete,
                                 SessionErrorFunct onError, ChipCASEAuthDelegate * authDelegate = NULL,
@@ -514,8 +514,8 @@ private:
     void HandleKeyExportError(CHIP_ERROR err, PacketBuffer * statusReportMsgBuf);
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    static void WRMPHandleAckRcvd(ExchangeContext * ec, void * msgCtxt);
-    static void WRMPHandleSendError(ExchangeContext * ec, CHIP_ERROR err, void * msgCtxt);
+    static void RMPHandleAckRcvd(ExchangeContext * ec, void * msgCtxt);
+    static void RMPHandleSendError(ExchangeContext * ec, CHIP_ERROR err, void * msgCtxt);
 #endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
     void Reset(void);

@@ -72,7 +72,7 @@ namespace chip {
  * Retrieve the IP address information for the peer, if available.
  *
  * The availability of the peer's IP address information depends on the state and configuration of the binding.
- * IP address information is only available when using an IP-based transport (TCP, UDP, or UDP with WRMP).  Prior to
+ * IP address information is only available when using an IP-based transport (TCP, UDP, or UDP with RMP).  Prior to
  * the start of preparation, address information is only available if it has been set expressly by the application
  * during configuration.  During the preparation phase, address information is available when address preparation
  * completes (e.g. after DNS resolution has completed).  After the Binding is ready, address information remains
@@ -116,20 +116,20 @@ namespace chip {
  */
 
 /**
- * @fn const WRMPConfig& Binding::GetDefaultWRMPConfig(void) const
+ * @fn const RMPConfig& Binding::GetDefaultRMPConfig(void) const
  *
- * Get the default WRMP configuration to be used when communicating with the peer.
+ * Get the default RMP configuration to be used when communicating with the peer.
  *
- * @return                          A reference to a WRMPConfig structure containing
+ * @return                          A reference to a RMPConfig structure containing
  *                                  the default configuration values.
  */
 
 /**
- * @fn void Binding::SetDefaultWRMPConfig(const WRMPConfig& aWRMPConfig)
+ * @fn void Binding::SetDefaultRMPConfig(const RMPConfig& aRMPConfig)
  *
- * Set the default WRMP configuration to be used when communicating with the peer.
+ * Set the default RMP configuration to be used when communicating with the peer.
  *
- * @param[in] aWRMPConfig           A reference to a WRMPConfig structure containing
+ * @param[in] aRMPConfig           A reference to a RMPConfig structure containing
  *                                  the new default configuration.
  */
 
@@ -445,7 +445,7 @@ void Binding::ResetConfig()
     mTransportOption            = kTransport_NotSpecified;
     mDefaultResponseTimeoutMsec = 0;
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    mDefaultWRMPConfig = gDefaultWRMPConfig;
+    mDefaultRMPConfig = gDefaultRMPConfig;
 #endif
     mUDPPathMTU = CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE;
 
@@ -545,21 +545,21 @@ CHIP_ERROR Binding::DoPrepare(CHIP_ERROR configErr)
 #if CHIP_CONFIG_ENABLE_CASE_INITIATOR
     // Shared CASE session not supported over connection-oriented transports.
     VerifyOrExit(mSecurityOption != kSecurityOption_SharedCASESession || mTransportOption == kTransport_UDP ||
-                     mTransportOption == kTransport_UDP_WRM,
+                     mTransportOption == kTransport_UDP_RMP,
                  err = CHIP_ERROR_NOT_IMPLEMENTED);
 #endif
 
 #if CHIP_CONFIG_ENABLE_PASE_INITIATOR
     // PASE sessions not supported over UDP transports.
     VerifyOrExit(mSecurityOption != kSecurityOption_PASESession ||
-                     (mTransportOption != kTransport_UDP && mTransportOption != kTransport_UDP_WRM),
+                     (mTransportOption != kTransport_UDP && mTransportOption != kTransport_UDP_RMP),
                  err = CHIP_ERROR_NOT_IMPLEMENTED);
 #endif
 
 #if CHIP_CONFIG_ENABLE_TAKE_INITIATOR
     // TAKE sessions not supported over UDP transports.
     VerifyOrExit(mSecurityOption != kSecurityOption_TAKESession ||
-                     (mTransportOption != kTransport_UDP && mTransportOption != kTransport_UDP_WRM),
+                     (mTransportOption != kTransport_UDP && mTransportOption != kTransport_UDP_RMP),
                  err = CHIP_ERROR_NOT_IMPLEMENTED);
 #endif
 
@@ -887,8 +887,8 @@ void Binding::HandleBindingReady()
         case kTransport_UDP:
             transport = "UDP";
             break;
-        case kTransport_UDP_WRM:
-            transport = "WRM";
+        case kTransport_UDP_RMP:
+            transport = "RMP";
             break;
         case kTransport_TCP:
         case kTransport_ExistingConnection:
@@ -1236,7 +1236,7 @@ bool Binding::IsAuthenticMessageFromPeer(const chip::ChipMessageHeader * msgInfo
     }
     else
     {
-        if (mTransportOption != kTransport_UDP && mTransportOption != kTransport_UDP_WRM)
+        if (mTransportOption != kTransport_UDP && mTransportOption != kTransport_UDP_RMP)
             return false;
     }
 
@@ -1252,7 +1252,7 @@ bool Binding::IsAuthenticMessageFromPeer(const chip::ChipMessageHeader * msgInfo
 /**
  *  Get the max CHIP payload size that can fit inside the supplied PacketBuffer.
  *
- *  For UDP, including UDP with WRM, the maximum payload size returned will
+ *  For UDP, including UDP with RMP, the maximum payload size returned will
  *  ensure the resulting CHIP message will not overflow the configured UDP MTU.
  *
  *  Additionally, this method will ensure the CHIP payload will not overflow
@@ -1268,7 +1268,7 @@ uint32_t Binding::GetMaxChipPayloadSize(const System::PacketBuffer * msgBuf)
     // Constrain the max CHIP payload size by the UDP MTU if we are using UDP.
     // TODO: Eventually, we may configure a custom UDP MTU size on the binding
     //       instead of using the default value directly.
-    bool isUDP = (mTransportOption == kTransport_UDP || mTransportOption == kTransport_UDP_WRM);
+    bool isUDP = (mTransportOption == kTransport_UDP || mTransportOption == kTransport_UDP_RMP);
     return ChipMessageLayer::GetMaxChipPayloadSize(msgBuf, isUDP, mUDPPathMTU);
 }
 
@@ -1318,11 +1318,11 @@ CHIP_ERROR Binding::NewExchangeContext(chip::ExchangeContext *& appExchangeConte
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
-    // Set the default WRMP configuration in the new exchange.
-    appExchangeContext->mWRMPConfig = mDefaultWRMPConfig;
+    // Set the default RMP configuration in the new exchange.
+    appExchangeContext->mRMPConfig = mDefaultRMPConfig;
 
     // If CHIP reliable messaging was expressly requested as a transport...
-    if (mTransportOption == kTransport_UDP_WRM)
+    if (mTransportOption == kTransport_UDP_RMP)
     {
         // Enable the auto-request ACK feature in the exchange so that all outgoing messages
         // include a request for acknowledgment.
@@ -1628,10 +1628,10 @@ Binding::Configuration & Binding::Configuration::Transport_UDP()
  *
  * @return                              A reference to the binding object.
  */
-Binding::Configuration & Binding::Configuration::Transport_UDP_WRM()
+Binding::Configuration & Binding::Configuration::Transport_UDP_RMP()
 {
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    mBinding.mTransportOption = kTransport_UDP_WRM;
+    mBinding.mTransportOption = kTransport_UDP_RMP;
 #else  // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     mError = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
@@ -1653,18 +1653,18 @@ Binding::Configuration & Binding::Configuration::Transport_UDP_PathMTU(uint32_t 
 }
 
 /**
- * Set the default WRMP configuration for exchange contexts created from this Binding object.
+ * Set the default RMP configuration for exchange contexts created from this Binding object.
  *
- * @param[in] aWRMPConfig               A reference to the new default WRMP configuration.
+ * @param[in] aRMPConfig               A reference to the new default RMP configuration.
  *
  * @return                              A reference to the binding object.
  */
-Binding::Configuration & Binding::Configuration::Transport_DefaultWRMPConfig(const chip::WRMPConfig & aWRMPConfig)
+Binding::Configuration & Binding::Configuration::Transport_DefaultRMPConfig(const chip::RMPConfig & aRMPConfig)
 {
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    mBinding.mDefaultWRMPConfig = aWRMPConfig;
+    mBinding.mDefaultRMPConfig = aRMPConfig;
 #else  // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    IgnoreUnusedVariable(aWRMPConfig);
+    IgnoreUnusedVariable(aRMPConfig);
     mError = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     return *this;
@@ -1940,7 +1940,7 @@ Binding::Configuration & Binding::Configuration::ConfigureFromMessage(const chip
         if (aMsgInfo->Flags & kChipMessageFlag_PeerRequestedAck)
         {
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-            Transport_UDP_WRM();
+            Transport_UDP_RMP();
 #else
             mError = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
