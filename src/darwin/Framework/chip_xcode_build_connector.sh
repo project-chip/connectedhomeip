@@ -46,7 +46,7 @@ declare -a args=(
     'chip_device_project_config_include=""'
     'chip_inet_project_config_include=""'
     'chip_system_project_config_include=""'
-    'target_cpu="'$ARCHS'"'
+    'target_cpu="'"$ARCHS"'"'
 )
 
 # lots of environment variables passed by xcode to this script
@@ -87,6 +87,6 @@ fi
     popd
 
     # [[ -f out/build.ninja ]] ?
-    gn --root="${CHIP_ROOT}" gen --check out --args="${args[*]}"
+    gn --root="$CHIP_ROOT" gen --check out --args="${args[*]}"
     ninja -v -C out
 )
