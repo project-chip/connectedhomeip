@@ -121,6 +121,60 @@ void TestFindByNodeId(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, statePtr == nullptr);
 }
 
+void TestFindByKeyId(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err;
+    PeerConnectionState * statePtr;
+    PeerConnections<2, Time::Source::kTest> connections;
+
+    // No Node ID, peer key 1, local key 2
+    err = connections.CreateNewPeerConnectionState(Optional<NodeId>::Missing(), 1, 2, &statePtr);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Lookup using no node, and peer key
+    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(Optional<NodeId>::Missing(), 1, &statePtr));
+    // Lookup using no node, and local key
+    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Missing(), 2, &statePtr));
+
+    // Lookup using no node, and incorrect peer key
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(Optional<NodeId>::Missing(), 2, &statePtr));
+    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
+
+    // Lookup using no node, and incorrect local key
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Missing(), 1, &statePtr));
+    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
+
+    // Lookup using a node ID, and peer key
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(Optional<NodeId>::Value(kPeer1NodeId), 1, &statePtr));
+    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
+
+    // Lookup using a node ID, and local key
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(kPeer1NodeId), 2, &statePtr));
+    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
+
+    // Some Node ID, peer key 3, local key 4
+    err = connections.CreateNewPeerConnectionState(Optional<NodeId>::Value(kPeer1NodeId), 3, 4, &statePtr);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Lookup using correct node (or no node), and correct keys
+    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(Optional<NodeId>::Value(kPeer1NodeId), 3, &statePtr));
+    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(kPeer1NodeId), 4, &statePtr));
+    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(Optional<NodeId>::Missing(), 3, &statePtr));
+    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Missing(), 4, &statePtr));
+
+    // Lookup using incorrect keys
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(Optional<NodeId>::Value(kPeer1NodeId), 4, &statePtr));
+    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(kPeer1NodeId), 3, &statePtr));
+    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
+
+    // Lookup using incorrect node, but correct keys
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(Optional<NodeId>::Value(kPeer2NodeId), 3, &statePtr));
+    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(kPeer2NodeId), 4, &statePtr));
+    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
+}
+
 struct ExpiredCallInfo
 {
     int callCount                   = 0;
@@ -218,6 +272,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("BasicFunctionality", TestBasicFunctionality),
     NL_TEST_DEF("FindByPeerAddress", TestFindByAddress),
     NL_TEST_DEF("FindByNodeId", TestFindByNodeId),
+    NL_TEST_DEF("FindByKeyId", TestFindByKeyId),
     NL_TEST_DEF("ExpireConnections", TestExpireConnections),
     NL_TEST_SENTINEL()
 };
