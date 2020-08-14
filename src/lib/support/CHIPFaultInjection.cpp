@@ -50,11 +50,6 @@ static const nl::FaultInjection::Name sFaultNames[] = {
 #endif // WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
     "BDXBadBlockCounter",
     "BDXAllocTransfer",
-#if CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
-    "SMConnectRequestNew",
-    "SMLookup",
-    "SMCacheReplaceEntryError",
-#endif // CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
     "CASEKeyConfirm",
     "SecMgrBusy",
 #if CHIP_CONFIG_ENABLE_TUNNELING

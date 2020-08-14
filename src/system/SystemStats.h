@@ -76,10 +76,6 @@ enum
     kExchangeMgr_NumUMHandlers,
     kExchangeMgr_NumBindings,
     kMessageLayer_NumConnections,
-#if CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
-    kServiceMgr_NumRequests,
-#endif
-
     kNumEntries
 };
 
