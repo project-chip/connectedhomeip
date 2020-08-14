@@ -322,7 +322,7 @@ public:
     RMPPauseRcvdFunct OnDDRcvd;       /**< Application callback for received Delayed Delivery message. */
     RMPSendErrorFunct OnSendError;    /**< Application callback for error while sending. */
     RMPAckRcvdFunct OnAckRcvd;        /**< Application callback for received acknowledgment. */
-#endif                                 // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
+#endif                                // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
     /*
      * in order to use reference counting (see refCount below)
