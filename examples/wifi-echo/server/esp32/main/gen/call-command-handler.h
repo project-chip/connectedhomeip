@@ -71,12 +71,6 @@ EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd)
 // Cluster: Level Control, server
 EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
-// Cluster: Poll Control, client
-EmberAfStatus emberAfPollControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
-
-// Cluster: Poll Control, server
-EmberAfStatus emberAfPollControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
-
 // Cluster: Door Lock, server
 EmberAfStatus emberAfDoorLockClusterServerCommandParse(EmberAfClusterCommand * cmd);
 

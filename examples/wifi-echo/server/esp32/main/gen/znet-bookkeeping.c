@@ -59,13 +59,7 @@ void emAfTick(void)
     emberAfTick();             // Global
 }
 
-// ResetAttributes function declarations.
-void emAfPluginPollControlServerResetAttributesCallback(uint8_t endpointId); // Plugin: poll-control-server
-
-void emAfResetAttributes(uint8_t endpointId)
-{
-    emAfPluginPollControlServerResetAttributesCallback(endpointId); // Plugin: poll-control-server
-}
+void emAfResetAttributes(uint8_t endpointId) {}
 
 // Marker function declarations.
 void emberAfMarkBuffersCallback(void);         // Global
