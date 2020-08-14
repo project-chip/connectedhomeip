@@ -1068,77 +1068,38 @@ boolean emberAfScenesClusterViewSceneResponseCallback(uint8_t status, uint16_t g
 }
 
 // endpoint_config.h callbacks, grep'd from SDK, comment these out as clusters come in
-void emberAfColorControlClusterServerInitCallback(uint8_t endpoint)
-{
-}
+void emberAfColorControlClusterServerInitCallback(uint8_t endpoint) {}
 
-void emberAfDoorLockClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                          EmberAfAttributeId attributeId)
-{
-
-}
-void emberAfGroupsClusterServerInitCallback(uint8_t endpoint)
-{
-}void emberAfIasZoneClusterClientInitCallback(uint8_t endpoint)
-{
-}void emberAfIasZoneClusterServerInitCallback(uint8_t endpoint)
-{
-}
- void emberAfIasZoneClusterServerMessageSentCallback(
-  EmberOutgoingMessageType type,
-  uint16_t indexOrDestination,
-  EmberApsFrame *apsFrame,
-  uint16_t msgLen,
-  uint8_t *message,
-  EmberStatus status)
-  {}
-
-EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(
-  uint8_t endpoint,
-  EmberAfAttributeId attributeId,
-  EmberAfAttributeType attributeType,
-  uint8_t size,
-  uint8_t *value)
-{
-  return EMBER_ZCL_STATUS_SUCCESS;}
-void emberAfIdentifyClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                          EmberAfAttributeId attributeId)
-{
-  }
-void emberAfIdentifyClusterServerInitCallback(uint8_t endpoint)
-{
-
-}
-
-void emberAfLevelControlClusterServerInitCallback(uint8_t endpoint)
-{
-}
-void emberAfPluginBarrierControlServerInitCallback(void)
-{
-}
-
-void emberAfPluginDoorLockServerInitCallback(void)
-{
-}
- void emberAfPluginReportingInitCallback(void)
-{
-}
-void emberAfPollControlClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                             EmberAfAttributeId attributeId)
+void emberAfDoorLockClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId) {}
+void emberAfGroupsClusterServerInitCallback(uint8_t endpoint) {}
+void emberAfIasZoneClusterClientInitCallback(uint8_t endpoint) {}
+void emberAfIasZoneClusterServerInitCallback(uint8_t endpoint) {}
+void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination,
+                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                    EmberStatus status)
 {}
-void emberAfPollControlClusterServerInitCallback(uint8_t endpoint)
+
+EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+                                                                     EmberAfAttributeType attributeType, uint8_t size,
+                                                                     uint8_t * value)
 {
-}
-void emberAfPluginPollControlServerStackStatusCallback(EmberStatus status)
-{
-}
-EmberAfStatus emberAfPollControlClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                         EmberAfAttributeId attributeId,
-                                                                         EmberAfAttributeType attributeType,
-                                                                         uint8_t size,
-                                                                         uint8_t *value) {
     return EMBER_ZCL_STATUS_SUCCESS;
 }
-void emberAfScenesClusterServerInitCallback(uint8_t endpoint)
+void emberAfIdentifyClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId) {}
+void emberAfIdentifyClusterServerInitCallback(uint8_t endpoint) {}
+
+void emberAfLevelControlClusterServerInitCallback(uint8_t endpoint) {}
+void emberAfPluginBarrierControlServerInitCallback(void) {}
+
+void emberAfPluginDoorLockServerInitCallback(void) {}
+void emberAfPluginReportingInitCallback(void) {}
+void emberAfPollControlClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId) {}
+void emberAfPollControlClusterServerInitCallback(uint8_t endpoint) {}
+void emberAfPluginPollControlServerStackStatusCallback(EmberStatus status) {}
+EmberAfStatus emberAfPollControlClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+                                                                         EmberAfAttributeType attributeType, uint8_t size,
+                                                                         uint8_t * value)
 {
+    return EMBER_ZCL_STATUS_SUCCESS;
 }
+void emberAfScenesClusterServerInitCallback(uint8_t endpoint) {}
