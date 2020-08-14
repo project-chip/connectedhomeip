@@ -31,7 +31,6 @@
 #include <Profiles/security/CHIPCASE.h>
 #include <Profiles/security/CHIPKeyExport.h>
 #include <Profiles/security/CHIPPASE.h>
-#include <Profiles/security/CHIPSecurity.h>
 #include <Profiles/security/CHIPTAKE.h>
 #include <Profiles/status-report/StatusReportProfile.h>
 #include <core/CHIPError.h>

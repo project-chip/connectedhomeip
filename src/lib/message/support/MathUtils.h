@@ -33,32 +33,6 @@ namespace Platform {
 
 /**
  * @brief
- *   Performs signed 64-bit divided by 64-bit operation and returns the quotient.
- *
- * @param[in] inDividend    The dividend in this function.
- *
- * @param[in] inDivisor     The divisor in this function.
- *
- * @note
- *   This is the same as the / operator in C++, for int64_t, which is needed since some platforms
- *   might lack intrinsic support for 64-bit division.
- *
- * @return The quotient of inDividend divided by inDivisor
- */
-DLL_EXPORT int64_t Divide(int64_t inDividend, int64_t inDivisor);
-
-/**
- * @brief
- *   Divide a 64-bit unsigned dividend by 1000 producing a 32-bit value.
- *
- * @param[in] inDividend 64-bit value to be divided
- *
- * @result the 32-bit quotient.
- */
-DLL_EXPORT uint32_t DivideBy1000(uint64_t inDividend);
-
-/**
- * @brief
  *   Performs rounding towards 0.
  *
  * @param[in] a         Value to be rounded.
