@@ -1,3 +1,4 @@
+# Copyright 2020 The Pigweed Authors
 # Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,9 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
+import("//build/toolchain/gcc_toolchain.gni")
 
-declare_args() {
-  # Toolchain to use for target.
-  custom_toolchain = ""
+gcc_toolchain("ios_arm") {
+  toolchain_args = {
+    current_os = "ios"
+    current_cpu = "arm"
+    is_clang = true
+  }
+}
+
+gcc_toolchain("ios_arm64") {
+  toolchain_args = {
+    current_os = "ios"
+    current_cpu = "arm64"
+    is_clang = true
+  }
 }

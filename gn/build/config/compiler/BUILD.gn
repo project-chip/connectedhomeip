@@ -23,7 +23,7 @@ declare_args() {
   treat_warnings_as_errors = true
 }
 
-if (current_cpu == "arm") {
+if (current_cpu == "arm" || current_cpu == "arm64") {
   import("//build/config/arm.gni")
 }
 
@@ -39,7 +39,7 @@ config("debug_default") {
 
 config("abi_default") {
   cflags = []
-  if (current_cpu == "arm") {
+  if (current_cpu == "arm" || current_cpu == "arm64") {
     if (arm_arch != "") {
       cflags += [ "-march=${arm_arch}" ]
     }
@@ -58,7 +58,19 @@ config("abi_default") {
     if (arm_float_abi != "") {
       cflags += [ "-mfloat-abi=${arm_float_abi}" ]
     }
-    if (arm_use_thumb) {
+    if (is_clang) {
+      if (current_os == "ios" || current_os == "mac") {
+        cflags += [ "-target",
+          string_join("-",
+              [
+                getenv("ARCHS"),
+                getenv("LLVM_TARGET_TRIPLE_VENDOR"),
+                getenv("LLVM_TARGET_TRIPLE_OS_VERSION"),
+          ])
+        ]
+      }
+    }
+    if (arm_use_thumb && ! is_clang) {
       cflags += [ "-mthumb" ]
     }
   }
@@ -132,7 +144,7 @@ config("warnings_default") {
     ":disabled_warnings",
   ]
 
-  if (current_os != "mac") {
+  if (current_os != "mac" && current_os != "ios") {
     ldflags = [ "-Wl,--fatal-warnings" ]
   }
 }

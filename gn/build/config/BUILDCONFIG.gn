@@ -69,6 +69,8 @@ if (_chip_defaults.custom_toolchain != "") {
   } else {
     assert(false, "Unsupported target_cpu: ${target_cpu}")
   }
+} else if (target_os == "ios") {
+  _default_toolchain = "//build/toolchain/ios:ios_${target_cpu}"
 } else {
   assert(false, "No toolchain specified, please specify custom_toolchain")
 }
@@ -83,7 +85,7 @@ set_defaults("source_set") {
 }
 set_defaults("executable") {
   configs =
-      _chip_defaults.default_configs + _chip_defaults.executable_default_configs
+  _chip_defaults.default_configs + _chip_defaults.executable_default_configs
 }
 set_defaults("shared_library") {
   configs = _chip_defaults.default_configs
