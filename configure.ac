@@ -1757,6 +1757,7 @@ NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
                 -DOPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1 \
                 -DOPENTHREAD_CONFIG_JOINER_ENABLE=1 \
                 -DOPENTHREAD_CONFIG_NCP_UART_ENABLE=1 \
+                -DOPENTHREAD_CONFIG_IP6_SLAAC_ENABLE=1 \
                 -DUART_AS_SERIAL_TRANSPORT=1"
 
             (mkdir -p ${ac_pwd}/third_party/openthread \

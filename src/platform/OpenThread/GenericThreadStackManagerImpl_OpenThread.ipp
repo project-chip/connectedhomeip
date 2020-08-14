@@ -806,9 +806,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
         VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
     }
 
-    // Disable automatic assignment of Thread advertised addresses.
-#if OPENTHREAD_CONFIG_ENABLE_SLAAC
-    otIp6SetSlaacEnabled(otInst, false);
+    // Enable automatic assignment of Thread advertised addresses.
+#if OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE
+    otIp6SetSlaacEnabled(otInst, true);
 #endif
 
     // If the Thread stack has been provisioned, but is not currently enabled, enable it now.
