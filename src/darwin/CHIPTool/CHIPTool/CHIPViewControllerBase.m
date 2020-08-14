@@ -24,7 +24,7 @@
 
 static NSString * const ipKey = @"ipk";
 
-@interface CHIPViewControllerBase ()
+@interface CHIPViewControllerBase () <CHIPDeviceControllerDelegate>
 
 @property (readwrite) dispatch_queue_t chipCallbackQueue;
 @property (readwrite) BOOL reconnectOnForeground;
@@ -53,28 +53,9 @@ static NSString * const ipKey = @"ipk";
     [self.view addGestureRecognizer:tap];
 
     // initialize the device controller
-    __weak typeof(self) weakSelf = self;
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.example.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = [CHIPDeviceController sharedController];
-    [self.chipController registerCallbacks:callbackQueue
-        onConnected:^(void) {
-            typeof(self) strongSelf = weakSelf;
-            [strongSelf postConnected];
-        }
-        onMessage:^(NSData * _Nonnull message) {
-            typeof(self) strongSelf = weakSelf;
-            if ([CHIPDeviceController isDataModelCommand:message] == YES) {
-                NSString * strMessage = [CHIPDeviceController commandToString:message];
-                [strongSelf postResult:strMessage];
-            } else {
-                NSString * strMessage = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
-                [strongSelf postResult:strMessage];
-            }
-        }
-        onError:^(NSError * _Nonnull error) {
-            typeof(self) strongSelf = weakSelf;
-            [strongSelf postError:error.localizedDescription];
-        }];
+    [self.chipController setDelegate:self queue:callbackQueue];
 
     // need to restart connections on background/foreground transitions otherwise the socket can be closed without CHIP knowing
     // about it.
@@ -246,6 +227,29 @@ static NSString * const ipKey = @"ipk";
     if (error) {
         NSLog(@"Error disconnecting on view disappearing %@", error);
     }
+}
+
+#if 0
+#pragma mark -
+#pragma mark == CHIPDeviceControllerDelegate Methods ==
+#endif
+
+- (void)deviceControllerOnConnected {
+    [self postConnected];
+}
+
+- (void)deviceControllerOnMessage:(NSData *)message {
+    if ([CHIPDeviceController isDataModelCommand:message] == YES) {
+        NSString * strMessage = [CHIPDeviceController commandToString:message];
+        [self postResult:strMessage];
+    } else {
+        NSString * strMessage = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
+        [self postResult:strMessage];
+    }
+}
+
+- (void)deviceControllerOnError:(NSError *)error {
+    [self postError:error.localizedDescription];
 }
 
 @end

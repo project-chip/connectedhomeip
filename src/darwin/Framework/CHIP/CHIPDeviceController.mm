@@ -52,11 +52,16 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
 // queue used to call select on the system and inet layer fds., remove this with NW Framework.
 // primarily used to not block the work queue
 @property (atomic, readonly) dispatch_queue_t chipSelectQueue;
-// queue used to signal callbacks to the application
-@property (readwrite) dispatch_queue_t appCallbackQueue;
-@property (readwrite) ControllerOnConnectedBlock onConnectedHandler;
-@property (readwrite) ControllerOnMessageBlock onMessageHandler;
-@property (readwrite) ControllerOnErrorBlock onErrorHandler;
+/**
+ *  The Controller delegate.
+ *  Note: Getter is not thread safe.
+ */
+@property (readonly, weak, nonatomic) id<CHIPDeviceControllerDelegate> delegate;
+
+/**
+ * The delegate queue where delegate callbacks will run
+ */
+@property (readonly, nonatomic) dispatch_queue_t delegateQueue;
 @property (readonly) chip::DeviceController::ChipDeviceController * cppController;
 @property (readwrite) NSData * localKey;
 @property (readwrite) NSData * peerKey;
@@ -150,34 +155,40 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 - (void)_dispatchAsyncErrorBlock:(NSError *)error
 {
     CHIP_LOG_METHOD_ENTRY();
-    // to avoid retaining "self"
-    ControllerOnErrorBlock onErrorHandler = self.onErrorHandler;
 
-    dispatch_async(_appCallbackQueue, ^() {
-        onErrorHandler(error);
-    });
+    id<CHIPDeviceControllerDelegate> strongDelegate = [self delegate];
+    if (strongDelegate && [self delegateQueue])
+    {
+        dispatch_async(self.delegateQueue, ^{
+            [strongDelegate deviceControllerOnError:error];
+        });
+    }
 }
 
 - (void)_dispatchAsyncMessageBlock:(NSData *)data
 {
     CHIP_LOG_METHOD_ENTRY();
-    // to avoid retaining "self"
-    ControllerOnMessageBlock onMessageHandler = self.onMessageHandler;
 
-    dispatch_async(_appCallbackQueue, ^() {
-        onMessageHandler(data);
-    });
+    id<CHIPDeviceControllerDelegate> strongDelegate = [self delegate];
+    if (strongDelegate && [self delegateQueue])
+    {
+        dispatch_async(self.delegateQueue, ^{
+            [strongDelegate deviceControllerOnMessage:data];
+        });
+    }
 }
 
 - (void)_dispatchAsyncConnectBlock
 {
     CHIP_LOG_METHOD_ENTRY();
-    // to avoid retaining "self"
-    ControllerOnConnectedBlock onConnectedHandler = self.onConnectedHandler;
 
-    dispatch_async(_appCallbackQueue, ^() {
-        onConnectedHandler();
-    });
+    id<CHIPDeviceControllerDelegate> strongDelegate = [self delegate];
+    if (strongDelegate && [self delegateQueue])
+    {
+        dispatch_async(self.delegateQueue, ^{
+            [strongDelegate deviceControllerOnConnected];
+        });
+    }
 }
 
 - (void)_manualKeyExchange:(chip::Transport::PeerConnectionState *)state
@@ -443,15 +454,20 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     return [NSString stringWithFormat:@"Sending '%@' command %@", command, status];
 }
 
-- (void)registerCallbacks:appCallbackQueue
-              onConnected:(ControllerOnConnectedBlock)onConnected
-                onMessage:(ControllerOnMessageBlock)onMessage
-                  onError:(ControllerOnErrorBlock)onError
+- (void)setDelegate:(id<CHIPDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
 {
-    self.appCallbackQueue = appCallbackQueue;
-    self.onConnectedHandler = onConnected;
-    self.onMessageHandler = onMessage;
-    self.onErrorHandler = onError;
+    [self.lock lock];
+    if ( delegate && queue )
+    {
+        self->_delegate = delegate;
+        self->_delegateQueue = queue;
+    }
+    else
+    {
+        self->_delegate = nil;
+        self->_delegateQueue = NULL;
+    }
+    [self.lock unlock];
 }
 
 @end
