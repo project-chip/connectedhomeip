@@ -61,6 +61,7 @@ static_library("libopenthread-nrf52840-softdevice-sdk") {
     "..:libopenthread-platform",
     "..:libopenthread-platform-utils",
   ]
+  cflags = [ "-Wno-unused-but-set-variable" ]
 }
 
 config("libopenthread-nrf52840-transport_config") {
