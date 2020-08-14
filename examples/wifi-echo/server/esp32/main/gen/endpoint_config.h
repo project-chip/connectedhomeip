@@ -163,8 +163,6 @@
         EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback };                                             \
     const EmberAfGenericClusterFunction emberAfFuncArrayLevelControlClusterServer[] = { (                                          \
         EmberAfGenericClusterFunction) emberAfLevelControlClusterServerInitCallback };                                             \
-    }                                                                                                                              \
-    ;                                                                                                                              \
     const EmberAfGenericClusterFunction emberAfFuncArrayDoorLockClusterServer[]     = { (                                          \
         EmberAfGenericClusterFunction) emberAfDoorLockClusterServerAttributeChangedCallback };                                 \
     const EmberAfGenericClusterFunction emberAfFuncArrayColorControlClusterServer[] = { (                                          \
