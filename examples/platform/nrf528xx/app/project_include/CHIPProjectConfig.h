@@ -28,21 +28,16 @@
 #ifndef CHIP_PROJECT_CONFIG_H
 #define CHIP_PROJECT_CONFIG_H
 
-#if BUILD_RELEASE // release build
+#if !BUILD_RELEASE // development build
 
-// Security and Authentication enabled for release build.
+// For convenience, Chip Security Test Mode can be enabled and the
+// requirement for authentication in various protocols can be disabled.
+//
+//    WARNING: These options make it possible to circumvent basic Chip security functionality,
+//    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
+//
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
 #define CHIP_CONFIG_REQUIRE_AUTH 1
-
-#else // development build
-
-// Security and Authentication disabled for development build.
-// For convenience, enable CHIP Security Test Mode and disable the requirement for
-// authentication in various protocols.
-// WARNING: These options make it possible to circumvent basic CHIP security functionality,
-// including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
-#define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 0
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY

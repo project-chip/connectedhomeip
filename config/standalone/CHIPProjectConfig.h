@@ -43,7 +43,14 @@
 // properly when CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG is enabled.
 #define CHIP_CONFIG_DEV_RANDOM_DRBG_SEED 1
 
+// For convenience, Chip Security Test Mode can be enabled and the
+// requirement for authentication in various protocols can be disabled.
+//
+//    WARNING: These options make it possible to circumvent basic Chip security functionality,
+//    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
+//
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
+#define CHIP_CONFIG_REQUIRE_AUTH 1
 
 // Increase session idle timeout in stand-alone builds for the convenience of developers.
 #define CHIP_CONFIG_DEFAULT_SECURITY_SESSION_IDLE_TIMEOUT 120000
