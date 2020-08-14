@@ -3,6 +3,9 @@
 The CHIP build system uses GNU autotools to build various platform images on
 Linux or macOS.
 
+Note: CHIP has brought up GN which builds much faster. See `BUILDING-GN.md`.
+Please try the new flow and report any problems.
+
 Tested on:
 
 -   macOS
