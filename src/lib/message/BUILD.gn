@@ -39,7 +39,7 @@ static_library("message") {
      "CHIPSecurityMgr.cpp",
      "CHIPServerBase.h",
      "CHIPServerBase.cpp",
-     "CHIPWRMPConfig.h",
+     "CHIPRMPConfig.h",
      "HostPortList.h",
      "HostPortList.cpp",
   ]

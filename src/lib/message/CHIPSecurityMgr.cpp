@@ -215,7 +215,7 @@ void ChipSecurityManager::HandleUnsolicitedMessage(ExchangeContext * ec, const I
     {
 #if CHIP_CONFIG_ENABLE_PASE_RESPONDER
         // Reject the request if it did not arrive over a connection.
-        // PASE is not supported over WRMP.
+        // PASE is not supported over RMP.
         VerifyOrExit(ec->Con != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         uint64_t nowTimeMS = System::Layer::GetClock_MonotonicMS();
@@ -249,7 +249,7 @@ void ChipSecurityManager::HandleUnsolicitedMessage(ExchangeContext * ec, const I
     {
 #if CHIP_CONFIG_ENABLE_TAKE_RESPONDER
         // Reject the request if it did not arrive over a connection.
-        // TAKE is not supported over WRMP.
+        // TAKE is not supported over RMP.
         VerifyOrExit(ec->Con != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         secMgr->HandleTAKESessionStart(ec, pktInfo, msgInfo, msgBuf);
@@ -327,7 +327,7 @@ CHIP_ERROR ChipSecurityManager::StartPASESession(ChipConnection * con, ChipAuthM
     VerifyOrExit(IsPASEAuthMode(requestedAuthMode), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Reject the request if no connection has been specified.
-    // PASE is not yet supported over WRMP.
+    // PASE is not yet supported over RMP.
     VerifyOrExit(con != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     State                          = kState_PASEInProgress;
@@ -764,7 +764,7 @@ __attribute__((noinline)) CHIP_ERROR ChipSecurityManager::ProcessPASEInitiatorSt
     err = FabricState->AllocSessionKey(ec->PeerNodeId, mPASEEngine->SessionKeyId, ec->Con, sessionKey);
     SuccessOrExit(err);
     sessionKey->SetLocallyInitiated(false);
-    sessionKey->SetRemoveOnIdle(false); // TODO FUTURE: Set this to true when support for PASE over WRM is implemented.
+    sessionKey->SetRemoveOnIdle(false); // TODO FUTURE: Set this to true when support for PASE over RMP is implemented.
 
     // Save the proposed session key id and encryption type.
     mSessionKeyId = mPASEEngine->SessionKeyId;
@@ -941,7 +941,7 @@ CHIP_ERROR ChipSecurityManager::StartCASESession(ChipConnection * con, uint64_t 
         {
             // Ensure that the shared session is NOT currently in the process of being established.
             // This situation can arise when establishing CASE over CHIP Reliable Messaging.  After
-            // the initiator has sent a KeyConfirm message it waits for a WRM ACK from the responder.
+            // the initiator has sent a KeyConfirm message it waits for a RMP ACK from the responder.
             // During this time, the session exists in the session table but is not yet considered
             // ready for use.  Until the ACK is received, additional requests to establish the same
             // shared session should be denied with a SECURITY_MANAGER_BUSY error, which will force
@@ -1125,9 +1125,9 @@ void ChipSecurityManager::HandleCASEMessageInitiator(ExchangeContext * ec, const
     if (msgType == kMsgType_CASEBeginSessionResponse)
     {
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-        // Flush any pending WRM ACKs before we begin the long crypto operation,
+        // Flush any pending RMP ACKs before we begin the long crypto operation,
         // to prevent the peer from re-transmitting the Begin Session response.
-        err = secMgr->mEC->WRMPFlushAcks();
+        err = secMgr->mEC->RMPFlushAcks();
         SuccessOrExit(err);
 #endif
 
@@ -1180,7 +1180,7 @@ void ChipSecurityManager::HandleCASEMessageInitiator(ExchangeContext * ec, const
         // Complete the session when any of these is true:
         //     - session establishment was done over a CHIP connection
         //     - key confirmation wasn't required
-        // For WRMP when key confirmation is required, the session will be completed
+        // For RMP when key confirmation is required, the session will be completed
         // on one of these events:
         //     - Received Ack from the peer for the last message on this exchange (CASEInitiatorKeyConfirm)
         //     - Received first message from the peer encrypted with established session key (mSessionKeyId)
@@ -1261,12 +1261,12 @@ void ChipSecurityManager::HandleCASESessionStart(ExchangeContext * ec, const IPP
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     if (mCon == NULL)
     {
-        mEC->OnAckRcvd   = WRMPHandleAckRcvd;
-        mEC->OnSendError = WRMPHandleSendError;
+        mEC->OnAckRcvd   = RMPHandleAckRcvd;
+        mEC->OnSendError = RMPHandleSendError;
 
-        // Flush any pending WRM ACKs before we begin the long crypto operation,
+        // Flush any pending RMP ACKs before we begin the long crypto operation,
         // to prevent the peer from re-transmitting the Begin Session request.
-        err = mEC->WRMPFlushAcks();
+        err = mEC->RMPFlushAcks();
         SuccessOrExit(err);
 
         sendFlags |= ExchangeContext::kSendFlag_RequestAck;
@@ -1385,7 +1385,7 @@ void ChipSecurityManager::HandleCASESessionStart(ExchangeContext * ec, const IPP
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
             // 1. Complete the session now if it was established over a connection.
-            // 2. For WRMP the session will be completed on one of these events:
+            // 2. For RMP the session will be completed on one of these events:
             //     - Received Ack from the peer for the last message on this exchange (CASEBeginSessionResponse)
             //     - Received first message from the peer encrypted with established session key (mSessionKeyId)
             if (mCon)
@@ -1424,9 +1424,9 @@ void ChipSecurityManager::HandleCASEMessageResponder(ExchangeContext * ec, const
                  err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    // Flush any pending WRM ACKs to give sooner notification to the peer that current
+    // Flush any pending RMP ACKs to give sooner notification to the peer that current
     // CASE session establishment can be finalized.
-    err = secMgr->mEC->WRMPFlushAcks();
+    err = secMgr->mEC->RMPFlushAcks();
     SuccessOrExit(err);
 #endif
 
@@ -2185,9 +2185,9 @@ void ChipSecurityManager::HandleKeyExportMessageInitiator(ExchangeContext * ec, 
     VerifyOrExit(profileId == kChipProfile_Security, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    // Flush any pending WRM ACKs before we begin the long crypto operation,
+    // Flush any pending RM ACKs before we begin the long crypto operation,
     // to prevent the peer from re-transmitting message.
-    err = secMgr->mEC->WRMPFlushAcks();
+    err = secMgr->mEC->RMPFlushAcks();
     SuccessOrExit(err);
 #endif
 
@@ -2347,9 +2347,9 @@ void ChipSecurityManager::HandleKeyExportRequest(ExchangeContext * ec, const IPP
         // Do nothing on the message send error.
         // mEC->OnSendError is not initialized.
 
-        // Flush any pending WRM ACKs before we begin the long crypto operation,
+        // Flush any pending RMP ACKs before we begin the long crypto operation,
         // to prevent the peer from re-transmitting the Key Export request.
-        err = mEC->WRMPFlushAcks();
+        err = mEC->RMPFlushAcks();
         SuccessOrExit(err);
     }
 #endif
@@ -2708,8 +2708,8 @@ CHIP_ERROR ChipSecurityManager::NewSessionExchange(uint64_t peerNodeId, IPAddres
         mEC = ExchangeManager->NewContext(peerNodeId, peerAddr, peerPort, INET_NULL_INTERFACEID, this);
         VerifyOrExit(mEC != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-        mEC->OnAckRcvd   = WRMPHandleAckRcvd;
-        mEC->OnSendError = WRMPHandleSendError;
+        mEC->OnAckRcvd   = RMPHandleAckRcvd;
+        mEC->OnSendError = RMPHandleSendError;
 #else
         // Reject the request if no connection has been specified.
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -3331,7 +3331,7 @@ void ChipSecurityManager::HandleIdleSessionTimeout(System::Layer * aLayer, void 
 void ChipSecurityManager::OnEncryptedMsgRcvd(uint16_t sessionKeyId, uint64_t peerNodeId, uint8_t encType)
 {
     // Check if corresponding secure session is established but not completed - if true then complete this session.
-    // This function is needed in WRMP case when first message from the peer encrypted with sessionKeyId
+    // This function is needed in RMP case when first message from the peer encrypted with sessionKeyId
     // is received before the Ack for the last message on the session establishment exchange.
     // In that case there is no need to wait for the Ack and the session can be completed.
 #if CHIP_CONFIG_ENABLE_CASE_INITIATOR || CHIP_CONFIG_ENABLE_CASE_RESPONDER
@@ -3345,7 +3345,7 @@ void ChipSecurityManager::OnEncryptedMsgRcvd(uint16_t sessionKeyId, uint64_t pee
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
-void ChipSecurityManager::WRMPHandleAckRcvd(ExchangeContext * ec, void * msgCtxt)
+void ChipSecurityManager::RMPHandleAckRcvd(ExchangeContext * ec, void * msgCtxt)
 {
     ChipLogProgress(SecurityManager, "%s", __FUNCTION__);
     ChipSecurityManager * secMgr = (ChipSecurityManager *) ec->AppState;
@@ -3356,7 +3356,7 @@ void ChipSecurityManager::WRMPHandleAckRcvd(ExchangeContext * ec, void * msgCtxt
     }
 }
 
-void ChipSecurityManager::WRMPHandleSendError(ExchangeContext * ec, CHIP_ERROR err, void * msgCtxt)
+void ChipSecurityManager::RMPHandleSendError(ExchangeContext * ec, CHIP_ERROR err, void * msgCtxt)
 {
     ChipLogProgress(SecurityManager, "%s", __FUNCTION__);
     ChipSecurityManager * secMgr = (ChipSecurityManager *) ec->AppState;

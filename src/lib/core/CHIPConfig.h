@@ -83,7 +83,7 @@
 
 #include "CHIPEventLoggingConfig.h"
 
-#include "CHIPWRMPConfig.h"
+#include "CHIPRMPConfig.h"
 */
 /**
  *  @def CHIP_CONFIG_ERROR_TYPE

@@ -57,8 +57,8 @@ typedef enum
                                       when the fault is enabled, it expects an integer argument, which is an index into
                                       a table of modifications that can be applied to the header. @see FuzzExchangeHeader */
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    kFault_WRMDoubleTx,        /**< Force WRMP to transmit the outgoing message twice */
-    kFault_WRMSendError,       /**< Fail a transmission in WRMP as if the max number of retransmission has been exceeded */
+    kFault_RMPDoubleTx,        /**< Force RMP to transmit the outgoing message twice */
+    kFault_RMPSendError,       /**< Fail a transmission in RMP as if the max number of retransmission has been exceeded */
 #endif                         // WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
     kFault_BDXBadBlockCounter, /**< Corrupt the BDX Block Counter in the BDX BlockSend or BlockEOF message about to be sent */
     kFault_BDXAllocTransfer,   /**< Fail the allocation of a BDXTransfer object */
@@ -135,7 +135,7 @@ DLL_EXPORT void FuzzExchangeHeader(uint8_t * p, int32_t arg);
     nlFAULT_INJECT_WITH_ARGS(chip::FaultInjection::GetManager(), aFaultID, aProtectedStatements, aUnprotectedStatements);
 
 #define CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS 4
-#define CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS_WRMP 5
+#define CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS_RMP 5
 
 #else // CHIP_CONFIG_TEST
 

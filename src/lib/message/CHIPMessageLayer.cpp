@@ -566,7 +566,7 @@ CHIP_ERROR ChipMessageLayer::SendMessage(const IPAddress & destAddr, uint16_t de
     VerifyOrExit(!mDropMessage, err = CHIP_NO_ERROR);
 
     // Drop the message and return. Free the buffer if it does not need to be
-    // retained(e.g., for WRM retransmissions).
+    // retained(e.g., for RMP retransmissions).
     CHIP_FAULT_INJECT(FaultInjection::kFault_DropOutgoingUDPMsg, ExitNow(err = CHIP_NO_ERROR););
 
     // Select a UDP endpoint object for sending a message based on the destination address type

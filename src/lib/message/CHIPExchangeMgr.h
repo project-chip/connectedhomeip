@@ -29,7 +29,7 @@
 #include <message/CHIPBinding.h>
 #include <message/CHIPFabricState.h>
 #include <message/CHIPMessageLayer.h>
-#include <message/CHIPWRMPConfig.h>
+#include <message/CHIPRMPConfig.h>
 #include <support/DLLUtil.h>
 #include <system/SystemTimer.h>
 
@@ -139,7 +139,7 @@ public:
     uint32_t RetransInterval; /**< Time between retransmissions (in milliseconds); 0 disables retransmissions. */
     Timeout ResponseTimeout;  /**< Maximum time to wait for response (in milliseconds); 0 disables response timeout. */
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    WRMPConfig mWRMPConfig; /**< WRMP configuration. */
+    RMPConfig mRMPConfig; /**< RMP configuration. */
 #endif
     enum
     {
@@ -154,7 +154,7 @@ public:
         kSendFlag_DefaultMulticastSourceAddress = 0x0100, /**< Used to indicate that default IPv6 source address selection should be
                                                              used when sending IPv6 multicast messages. */
         kSendFlag_FromInitiator    = 0x0200, /**< Used to indicate that the current message is the initiator of the exchange. */
-        kSendFlag_RequestAck       = 0x0400, /**< Used to send a WRM message requesting an acknowledgment. */
+        kSendFlag_RequestAck       = 0x0400, /**< Used to send a RMP message requesting an acknowledgment. */
         kSendFlag_NoAutoRequestAck = 0x0800, /**< Suppress the auto-request acknowledgment feature when sending a message. */
 
         kSendFlag_MulticastFromLinkLocal = kSendFlag_DefaultMulticastSourceAddress,
@@ -175,7 +175,7 @@ public:
     void SetPeerRequestedAck(bool inPeerRequestedAck);
     bool HasRcvdMsgFromPeer(void) const;
     void SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer);
-    CHIP_ERROR WRMPFlushAcks(void);
+    CHIP_ERROR RMPFlushAcks(void);
     uint32_t GetCurrentRetransmitTimeout(void);
 #endif
     void SetResponseExpected(bool inResponseExpected);
@@ -275,8 +275,8 @@ public:
     void HandleTrickleMessage(const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo);
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    CHIP_ERROR WRMPSendThrottleFlow(uint32_t PauseTimeMillis);
-    CHIP_ERROR WRMPSendDelayedDelivery(uint32_t PauseTimeMillis, uint64_t DelayedNodeId);
+    CHIP_ERROR RMPSendThrottleFlow(uint32_t PauseTimeMillis);
+    CHIP_ERROR RMPSendDelayedDelivery(uint32_t PauseTimeMillis, uint64_t DelayedNodeId);
 
     /**
      * This function is the application callback to invoke when an Acknowledgment is received
@@ -288,7 +288,7 @@ public:
      *                              the original message being acknowledged.
      *
      */
-    typedef void (*WRMPAckRcvdFunct)(ExchangeContext * ec, void * msgCtxt);
+    typedef void (*RMPAckRcvdFunct)(ExchangeContext * ec, void * msgCtxt);
 
     /**
      * This function is the application callback to invoke when a Throttle message or Delayed
@@ -301,7 +301,7 @@ public:
      *  @param[in]    pauseTime     Time to pause transmission (in milliseconds).
      *
      */
-    typedef void (*WRMPPauseRcvdFunct)(ExchangeContext * ec, uint32_t pauseTime);
+    typedef void (*RMPPauseRcvdFunct)(ExchangeContext * ec, uint32_t pauseTime);
 
     /**
      * This function is the application callback to invoke when an error is encountered while
@@ -316,12 +316,12 @@ public:
      *                              the original message being reported on.
      *
      */
-    typedef void (*WRMPSendErrorFunct)(ExchangeContext * ec, CHIP_ERROR err, void * msgCtxt);
+    typedef void (*RMPSendErrorFunct)(ExchangeContext * ec, CHIP_ERROR err, void * msgCtxt);
 
-    WRMPPauseRcvdFunct OnThrottleRcvd; /**< Application callback for received Throttle message. */
-    WRMPPauseRcvdFunct OnDDRcvd;       /**< Application callback for received Delayed Delivery message. */
-    WRMPSendErrorFunct OnSendError;    /**< Application callback for error while sending. */
-    WRMPAckRcvdFunct OnAckRcvd;        /**< Application callback for received acknowledgment. */
+    RMPPauseRcvdFunct OnThrottleRcvd; /**< Application callback for received Throttle message. */
+    RMPPauseRcvdFunct OnDDRcvd;       /**< Application callback for received Delayed Delivery message. */
+    RMPSendErrorFunct OnSendError;    /**< Application callback for error while sending. */
+    RMPAckRcvdFunct OnAckRcvd;        /**< Application callback for received acknowledgment. */
 #endif                                 // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
     /*
@@ -367,8 +367,8 @@ private:
 
     uint32_t mPendingPeerAckId;
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    uint16_t mWRMPNextAckTime;     // Next time for triggering Solo Ack
-    uint16_t mWRMPThrottleTimeout; // Timeout until when Throttle is On when WRMPThrottleEnabled is set
+    uint16_t mRMPNextAckTime;     // Next time for triggering Solo Ack
+    uint16_t mRMPThrottleTimeout; // Timeout until when Throttle is On when RMPThrottleEnabled is set
 #endif
     void DoClose(bool clearRetransTable);
     CHIP_ERROR HandleMessage(ChipMessageInfo * msgInfo, const ChipExchangeHeader * exchHeader, PacketBuffer * msgBuf);
@@ -377,9 +377,9 @@ private:
     void HandleConnectionClosed(CHIP_ERROR conErr);
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    bool WRMPCheckAndRemRetransTable(uint32_t msgId, void ** rCtxt);
-    CHIP_ERROR WRMPHandleRcvdAck(const ChipExchangeHeader * exchHeader, const ChipMessageInfo * msgInfo);
-    CHIP_ERROR WRMPHandleNeedsAck(const ChipMessageInfo * msgInfo);
+    bool RMPCheckAndRemRetransTable(uint32_t msgId, void ** rCtxt);
+    CHIP_ERROR RMPHandleRcvdAck(const ChipExchangeHeader * exchHeader, const ChipMessageInfo * msgInfo);
+    CHIP_ERROR RMPHandleNeedsAck(const ChipMessageInfo * msgInfo);
     CHIP_ERROR HandleThrottleFlow(uint32_t PauseTimeMillis);
 #endif
 
@@ -458,9 +458,9 @@ public:
 private:
     uint16_t NextExchangeId;
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    uint64_t mWRMPTimeStampBase;                  // WRMP timer base value to add offsets to evaluate timeouts
-    System::Timer::Epoch mWRMPCurrentTimerExpiry; // Tracks when the WRM timer will next expire
-    uint16_t mWRMPTimerInterval;                  // WRMP Timer tick period
+    uint64_t mRMPTimeStampBase;                  // RMP timer base value to add offsets to evaluate timeouts
+    System::Timer::Epoch mRMPCurrentTimerExpiry; // Tracks when the RMP timer will next expire
+    uint16_t mRMPTimerInterval;                  // RMP Timer tick period
     /**
      *  @class RetransTableEntry
      *
@@ -481,14 +481,14 @@ private:
         uint16_t nextRetransTime;      /**< A counter representing the next retransmission time for the message. */
         uint8_t sendCount;             /**< A counter representing the number of times the message has been sent. */
     };
-    void WRMPExecuteActions(void);
-    void WRMPExpireTicks(void);
-    void WRMPStartTimer(void);
-    void WRMPStopTimer(void);
-    void WRMPProcessDDMessage(uint32_t PauseTimeMillis, uint64_t DelayedNodeId);
+    void RMPExecuteActions(void);
+    void RMPExpireTicks(void);
+    void RMPStartTimer(void);
+    void RMPStopTimer(void);
+    void RMPProcessDDMessage(uint32_t PauseTimeMillis, uint64_t DelayedNodeId);
     uint32_t GetTickCounterFromTimeDelta(uint64_t newTime, uint64_t oldTime);
-    static void WRMPTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
-    static bool isLaterInWRMP(uint64_t t2, uint64_t t1);
+    static void RMPTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
+    static bool isLaterInRMP(uint64_t t2, uint64_t t1);
     bool IsSendErrorCritical(CHIP_ERROR err) const;
     CHIP_ERROR AddToRetransTable(ExchangeContext * ec, PacketBuffer * inetBuff, uint32_t msgId, void * msgCtxt,
                                  RetransTableEntry ** rEntry);
@@ -500,8 +500,8 @@ private:
 
     void TicklessDebugDumpRetransTable(const char * log);
 
-    // WRMP Global tables for timer context
-    RetransTableEntry RetransTable[CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE];
+    // RMP Global tables for timer context
+    RetransTableEntry RetransTable[CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE];
 #endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
     class UnsolicitedMessageHandler
