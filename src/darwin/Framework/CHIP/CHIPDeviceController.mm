@@ -157,8 +157,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     CHIP_LOG_METHOD_ENTRY();
 
     id<CHIPDeviceControllerDelegate> strongDelegate = [self delegate];
-    if (strongDelegate && [self delegateQueue])
-    {
+    if (strongDelegate && [self delegateQueue]) {
         dispatch_async(self.delegateQueue, ^{
             [strongDelegate deviceControllerOnError:error];
         });
@@ -170,8 +169,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     CHIP_LOG_METHOD_ENTRY();
 
     id<CHIPDeviceControllerDelegate> strongDelegate = [self delegate];
-    if (strongDelegate && [self delegateQueue])
-    {
+    if (strongDelegate && [self delegateQueue]) {
         dispatch_async(self.delegateQueue, ^{
             [strongDelegate deviceControllerOnMessage:data];
         });
@@ -183,8 +181,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     CHIP_LOG_METHOD_ENTRY();
 
     id<CHIPDeviceControllerDelegate> strongDelegate = [self delegate];
-    if (strongDelegate && [self delegateQueue])
-    {
+    if (strongDelegate && [self delegateQueue]) {
         dispatch_async(self.delegateQueue, ^{
             [strongDelegate deviceControllerOnConnected];
         });
@@ -457,13 +454,10 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 - (void)setDelegate:(id<CHIPDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     [self.lock lock];
-    if ( delegate && queue )
-    {
+    if (delegate && queue) {
         self->_delegate = delegate;
         self->_delegateQueue = queue;
-    }
-    else
-    {
+    } else {
         self->_delegate = nil;
         self->_delegateQueue = NULL;
     }

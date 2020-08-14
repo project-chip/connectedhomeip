@@ -81,7 +81,6 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
 
 @end
 
-
 /**
  * The protocol definition for the CHIPDeviceControllerDelegate
  *

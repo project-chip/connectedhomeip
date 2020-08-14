@@ -234,11 +234,13 @@ static NSString * const ipKey = @"ipk";
 #pragma mark == CHIPDeviceControllerDelegate Methods ==
 #endif
 
-- (void)deviceControllerOnConnected {
+- (void)deviceControllerOnConnected
+{
     [self postConnected];
 }
 
-- (void)deviceControllerOnMessage:(NSData *)message {
+- (void)deviceControllerOnMessage:(NSData *)message
+{
     if ([CHIPDeviceController isDataModelCommand:message] == YES) {
         NSString * strMessage = [CHIPDeviceController commandToString:message];
         [self postResult:strMessage];
@@ -248,7 +250,8 @@ static NSString * const ipKey = @"ipk";
     }
 }
 
-- (void)deviceControllerOnError:(NSError *)error {
+- (void)deviceControllerOnError:(NSError *)error
+{
     [self postError:error.localizedDescription];
 }
 
