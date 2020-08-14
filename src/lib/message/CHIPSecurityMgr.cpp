@@ -31,7 +31,6 @@
 #include "CHIPSecurityMgr.h"
 #include <Profiles/common/CHIPMessage.h>
 #include <Profiles/common/CommonProfile.h>
-#include <Profiles/echo/CHIPEcho.h>
 #include <Profiles/security/CHIPSecurity.h>
 #include <core/CHIPCore.h>
 #include <message/CHIPServerBase.h>
