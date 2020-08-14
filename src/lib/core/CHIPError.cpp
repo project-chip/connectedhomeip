@@ -402,23 +402,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR:
         desc = "Unsolicited msg with originator bit clear";
         break;
-    case CHIP_ERROR_UNSUPPORTED_TUNNEL_VERSION:
-        desc = "Unsupported Tunnel version";
-        break;
     case CHIP_ERROR_INVALID_FABRIC_ID:
         desc = "Invalid Fabric Id";
-        break;
-    case CHIP_ERROR_TUNNEL_NEXTHOP_TABLE_FULL:
-        desc = "Local tunnel nexthop table full";
-        break;
-    case CHIP_ERROR_TUNNEL_SERVICE_QUEUE_FULL:
-        desc = "Service queue full";
-        break;
-    case CHIP_ERROR_TUNNEL_PEER_ENTRY_NOT_FOUND:
-        desc = "Shortcut Tunnel peer entry not found";
-        break;
-    case CHIP_ERROR_TUNNEL_FORCE_ABORT:
-        desc = "Forced Tunnel Abort";
         break;
     case CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED:
         desc = "DRBG entropy source failed to generate entropy data";
@@ -557,12 +542,6 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
         break;
     case CHIP_ERROR_INCOMPATIBLE_SCHEMA_VERSION:
         desc = "Incompatible data schema version";
-        break;
-    case CHIP_ERROR_TUNNEL_ROUTING_RESTRICTED:
-        desc = "Restricted Routing: Border Routing disabled";
-        break;
-    case CHIP_ERROR_TUNNEL_RESET_RECONNECT_ALREADY_ARMED:
-        desc = "The Reset reconnect timer is already armed";
         break;
     case CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION:
         desc = "Update Required Version mismatch";

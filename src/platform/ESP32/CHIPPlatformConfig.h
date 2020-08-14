@@ -30,8 +30,6 @@
 
 // ==================== General Platform Adaptations ====================
 
-#define CHIP_CONFIG_MAX_TUNNELS 0
-#define CHIP_CONFIG_ENABLE_TUNNELING 0
 #define CHIP_CONFIG_PERSISTED_STORAGE_ENC_MSG_CNTR_ID "enc-msg-counter"
 // The ESP NVS implementation limits key names to 15 characters.
 #define CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH 15

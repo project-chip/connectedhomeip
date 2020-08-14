@@ -37,25 +37,12 @@ static int32_t sFault_FuzzExchangeHeader_Arguments[1];
 static class nl::FaultInjection::Manager sChipFaultInMgr;
 static const nl::FaultInjection::Name sManagerName  = "chip";
 static const nl::FaultInjection::Name sFaultNames[] = {
-    "AllocExchangeContext",
-    "DropIncomingUDPMsg",
-    "DropOutgoingUDPMsg",
-    "AllocBinding",
-    "SendAlarm",
-    "HandleAlarm",
-    "FuzzExchangeHeaderTx",
+    "AllocExchangeContext", "DropIncomingUDPMsg",   "DropOutgoingUDPMsg", "AllocBinding", "SendAlarm",
+    "HandleAlarm",          "FuzzExchangeHeaderTx",
 #if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
-    "WRMDoubleTx",
-    "WRMSendError",
+    "WRMDoubleTx",          "WRMSendError",
 #endif // WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
-    "BDXBadBlockCounter",
-    "BDXAllocTransfer",
-    "CASEKeyConfirm",
-    "SecMgrBusy",
-#if CHIP_CONFIG_ENABLE_TUNNELING
-    "TunnelQueueFull",
-    "TunnelPacketDropByPolicy",
-#endif // CHIP_CONFIG_ENABLE_TUNNELING
+    "BDXBadBlockCounter",   "BDXAllocTransfer",     "CASEKeyConfirm",     "SecMgrBusy",
 #if CONFIG_NETWORK_LAYER_BLE
     "CHIPOBLESend",
 #endif // CONFIG_NETWORK_LAYER_BLE
