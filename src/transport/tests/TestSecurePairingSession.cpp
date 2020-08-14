@@ -38,14 +38,17 @@ using namespace chip;
 class TestSecurePairingDelegate : public SecurePairingSessionDelegate
 {
 public:
-    virtual CHIP_ERROR OnNewMessageForPeer(uint8_t msgType, System::PacketBuffer * msgBuf)
+    virtual CHIP_ERROR OnNewMessageForPeer(System::PacketBuffer * msgBuf)
     {
         mNumMessageSend++;
-        mLastMsgToPeer = msgType;
         if (peer != nullptr)
         {
             MessageHeader hdr;
-            hdr.SetMessageType(msgType);
+            size_t headerSize = 0;
+
+            hdr.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
+            msgBuf->ConsumeHead(headerSize);
+
             return peer->HandlePeerMessage(hdr, msgBuf);
         }
         return mMessageSendError;
@@ -53,9 +56,8 @@ public:
 
     virtual void OnPairingError(CHIP_ERROR error) { mNumPairingErrors++; }
 
-    virtual void OnPairingComplete() { mNumPairingComplete++; }
+    virtual void OnPairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId) { mNumPairingComplete++; }
 
-    uint8_t mLastMsgToPeer       = 0xff;
     uint32_t mNumMessageSend     = 0;
     uint32_t mNumPairingErrors   = 0;
     uint32_t mNumPairingComplete = 0;
@@ -70,10 +72,15 @@ void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
     TestSecurePairingDelegate delegate;
     SecurePairingSession pairing;
 
-    NL_TEST_ASSERT(inSuite, pairing.WaitForPairing(1234, 500, nullptr, 0, &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
     NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForPairing(1234, 500, (const unsigned char *) "salt", 4, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, pairing.WaitForPairing(1234, 500, (const unsigned char *) "salt", 4, &delegate) == CHIP_NO_ERROR);
+                   pairing.WaitForPairing(1234, 500, nullptr, 0, Optional<NodeId>::Value(1), 0, &delegate) ==
+                       CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite,
+                   pairing.WaitForPairing(1234, 500, (const unsigned char *) "salt", 4, Optional<NodeId>::Value(1), 0, nullptr) ==
+                       CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite,
+                   pairing.WaitForPairing(1234, 500, (const unsigned char *) "salt", 4, Optional<NodeId>::Value(1), 0, &delegate) ==
+                       CHIP_NO_ERROR);
 }
 
 void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
@@ -82,18 +89,24 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     TestSecurePairingDelegate delegate;
     SecurePairingSession pairing;
 
-    NL_TEST_ASSERT(inSuite, pairing.Pair(1234, 500, nullptr, 0, &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, pairing.Pair(1234, 500, (const unsigned char *) "salt", 4, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, pairing.Pair(1234, 500, (const unsigned char *) "salt", 4, &delegate) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   pairing.Pair(1234, 500, nullptr, 0, Optional<NodeId>::Value(1), 0, &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite,
+                   pairing.Pair(1234, 500, (const unsigned char *) "salt", 4, Optional<NodeId>::Value(1), 0, nullptr) ==
+                       CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite,
+                   pairing.Pair(1234, 500, (const unsigned char *) "salt", 4, Optional<NodeId>::Value(1), 0, &delegate) ==
+                       CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, delegate.mNumMessageSend == 1);
-    NL_TEST_ASSERT(inSuite, delegate.mLastMsgToPeer == 0);
 
     delegate.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
 
     SecurePairingSession pairing1;
 
-    NL_TEST_ASSERT(inSuite, pairing1.Pair(1234, 500, (const unsigned char *) "salt", 4, &delegate) == CHIP_ERROR_BAD_REQUEST);
+    NL_TEST_ASSERT(inSuite,
+                   pairing1.Pair(1234, 500, (const unsigned char *) "salt", 4, Optional<NodeId>::Value(1), 0, &delegate) ==
+                       CHIP_ERROR_BAD_REQUEST);
 }
 
 void SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
@@ -106,17 +119,16 @@ void SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
     delegateAccessory.peer   = &pairingCommissioner;
 
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.WaitForPairing(1234, 500, (const unsigned char *) "salt", 4, &delegateAccessory) ==
-                       CHIP_NO_ERROR);
+                   pairingAccessory.WaitForPairing(1234, 500, (const unsigned char *) "salt", 4, Optional<NodeId>::Value(1), 0,
+                                                   &delegateAccessory) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.Pair(1234, 500, (const unsigned char *) "salt", 4, &deleageCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner.Pair(1234, 500, (const unsigned char *) "salt", 4, Optional<NodeId>::Value(2), 0,
+                                            &deleageCommissioner) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumMessageSend == 1);
-    NL_TEST_ASSERT(inSuite, delegateAccessory.mLastMsgToPeer == 1);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
 
     NL_TEST_ASSERT(inSuite, deleageCommissioner.mNumMessageSend == 2);
-    NL_TEST_ASSERT(inSuite, deleageCommissioner.mLastMsgToPeer == 2);
     NL_TEST_ASSERT(inSuite, deleageCommissioner.mNumPairingComplete == 1);
 }
 
