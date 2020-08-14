@@ -31,7 +31,7 @@
 #endif // __STDC_FORMAT_MACROS
 
 #include <message/CHIPMessageLayer.h>
-#include <message/CHIPWRMPConfig.h>
+#include <message/CHIPRMPConfig.h>
 
 namespace chip {
 
@@ -190,8 +190,8 @@ public:
     uint32_t GetDefaultResponseTimeout() const;
     void SetDefaultResponseTimeout(uint32_t msec);
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    const WRMPConfig & GetDefaultWRMPConfig(void) const;
-    void SetDefaultWRMPConfig(const WRMPConfig & wrmpConfig);
+    const RMPConfig & GetDefaultRMPConfig(void) const;
+    void SetDefaultRMPConfig(const RMPConfig & RMPConfig);
 #endif // #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     EventCallback GetEventCallback() const;
     void SetEventCallback(EventCallback aEventCallback);
@@ -199,7 +199,7 @@ public:
     ChipExchangeManager * GetExchangeManager() const;
     bool IsConnectionTransport() const;
     bool IsUDPTransport() const;
-    bool IsWRMTransport() const;
+    bool IsRMPTransport() const;
     bool IsUnreliableUDPTransport() const;
 
     enum
@@ -244,7 +244,7 @@ private:
     {
         kTransport_NotSpecified       = 0,
         kTransport_UDP                = 1,
-        kTransport_UDP_WRM            = 2,
+        kTransport_UDP_RMP            = 2,
         kTransport_TCP                = 3,
         kTransport_ExistingConnection = 4,
     };
@@ -295,7 +295,7 @@ private:
     uint32_t mDefaultResponseTimeoutMsec;
     uint32_t mUDPPathMTU;
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    WRMPConfig mDefaultWRMPConfig;
+    RMPConfig mDefaultRMPConfig;
 #endif
     uint8_t mHostNameLen;
 
@@ -369,9 +369,9 @@ public:
 
     Configuration & Transport_TCP(void);
     Configuration & Transport_UDP(void);
-    Configuration & Transport_UDP_WRM(void);
+    Configuration & Transport_UDP_RMP(void);
     Configuration & Transport_UDP_PathMTU(uint32_t aPathMTU);
-    Configuration & Transport_DefaultWRMPConfig(const WRMPConfig & aWRMPConfig);
+    Configuration & Transport_DefaultRMPConfig(const RMPConfig & aRMPConfig);
     Configuration & Transport_ExistingConnection(ChipConnection * apConnection);
 
     Configuration & Exchange_ResponseTimeoutMsec(uint32_t aResponseTimeoutMsec);
@@ -522,14 +522,14 @@ inline void Binding::SetDefaultResponseTimeout(uint32_t timeout)
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
-inline const WRMPConfig & Binding::GetDefaultWRMPConfig(void) const
+inline const RMPConfig & Binding::GetDefaultRMPConfig(void) const
 {
-    return mDefaultWRMPConfig;
+    return mDefaultRMPConfig;
 }
 
-inline void Binding::SetDefaultWRMPConfig(const WRMPConfig & aWRMPConfig)
+inline void Binding::SetDefaultRMPConfig(const RMPConfig & aRMPConfig)
 {
-    mDefaultWRMPConfig = aWRMPConfig;
+    mDefaultRMPConfig = aRMPConfig;
 }
 
 #endif // #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
@@ -588,12 +588,12 @@ inline bool Binding::IsConnectionTransport() const
 
 inline bool Binding::IsUDPTransport() const
 {
-    return mTransportOption == kTransport_UDP || mTransportOption == kTransport_UDP_WRM;
+    return mTransportOption == kTransport_UDP || mTransportOption == kTransport_UDP_RMP;
 }
 
-inline bool Binding::IsWRMTransport() const
+inline bool Binding::IsRMPTransport() const
 {
-    return mTransportOption == kTransport_UDP_WRM;
+    return mTransportOption == kTransport_UDP_RMP;
 }
 
 inline bool Binding::IsUnreliableUDPTransport() const

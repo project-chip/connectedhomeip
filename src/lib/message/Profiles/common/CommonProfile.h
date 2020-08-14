@@ -50,8 +50,8 @@ enum
     kMsgType_Null         = 2,
 
     // Reliable Messaging Protocol Message Types
-    kMsgType_WRMP_Delayed_Delivery = 3,
-    kMsgType_WRMP_Throttle_Flow    = 4
+    kMsgType_RMP_Delayed_Delivery = 3,
+    kMsgType_RMP_Throttle_Flow    = 4
 };
 
 /**

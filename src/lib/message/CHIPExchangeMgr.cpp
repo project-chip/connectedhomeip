@@ -104,13 +104,13 @@ CHIP_ERROR ChipExchangeManager::Init(ChipMessageLayer * msgLayer)
     msgLayer->OnAcceptError     = HandleAcceptError;
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    mWRMPTimerInterval = CHIP_CONFIG_WRMP_TIMER_DEFAULT_PERIOD; // WRMP Timer tick period
+    mRMPTimerInterval = CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD; // CRMP Timer tick period
 
     memset(RetransTable, 0, sizeof(RetransTable));
 
-    mWRMPTimeStampBase = System::Timer::GetCurrentEpoch();
+    mRMPTimeStampBase = System::Timer::GetCurrentEpoch();
 
-    mWRMPCurrentTimerExpiry = 0;
+    mRMPCurrentTimerExpiry = 0;
 #endif
 
     State = kState_Initialized;
@@ -142,10 +142,10 @@ CHIP_ERROR ChipExchangeManager::Shutdown()
             MessageLayer->OnAcceptError     = NULL;
         }
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-        WRMPStopTimer();
+        RMPStopTimer();
 
         // Clear the retransmit table
-        for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+        for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
         {
             ClearRetransmitTable(RetransTable[i]);
         }
@@ -228,15 +228,15 @@ ExchangeContext * ChipExchangeManager::NewContext(const uint64_t & peerNodeId, c
         ec->PeerIntf   = sendIntfId;
         ec->AppState   = appState;
         ec->SetInitiator(true);
-        // Initialize WRMP variables
+        // Initialize RMP variables
         ec->mMsgProtocolVersion = 0;
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-        // No need to set WRMP timer, this will be done when we add to retrans table
-        ec->mWRMPNextAckTime = 0;
+        // No need to set RMP timer, this will be done when we add to retrans table
+        ec->mRMPNextAckTime = 0;
         ec->SetAckPending(false);
         ec->SetMsgRcvdFromPeer(false);
-        ec->mWRMPConfig          = gDefaultWRMPConfig;
-        ec->mWRMPThrottleTimeout = 0;
+        ec->mRMPConfig          = gDefaultRMPConfig;
+        ec->mRMPThrottleTimeout = 0;
         // Internal and for Debug Only; When set, Exchange Layer does not send Ack.
         ec->SetDropAck(false);
         // Initialize the App callbacks to NULL
@@ -582,13 +582,13 @@ ExchangeContext * ChipExchangeManager::AllocContext()
 }
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-void ChipExchangeManager::WRMPProcessDDMessage(uint32_t PauseTimeMillis, uint64_t DelayedNodeId)
+void ChipExchangeManager::RMPProcessDDMessage(uint32_t PauseTimeMillis, uint64_t DelayedNodeId)
 {
     // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
-    WRMPExpireTicks();
+    RMPExpireTicks();
 
     // Go through the retrans table entries for that node and adjust the timer.
-    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+    for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
         // Exchcontext is the sentinel object to ascertain validity of the element
         if (RetransTable[i].exchContext)
@@ -598,7 +598,7 @@ void ChipExchangeManager::WRMPProcessDDMessage(uint32_t PauseTimeMillis, uint64_
             {
 
                 // Paustime is specified in milliseconds; Update retrans values
-                RetransTable[i].nextRetransTime += (PauseTimeMillis / mWRMPTimerInterval);
+                RetransTable[i].nextRetransTime += (PauseTimeMillis / mRMPTimerInterval);
 
                 // Call the application callback
                 if (RetransTable[i].exchContext->OnDDRcvd)
@@ -615,7 +615,7 @@ void ChipExchangeManager::WRMPProcessDDMessage(uint32_t PauseTimeMillis, uint64_
     }         // for loop in table entry
 
     // Schedule next physical wakeup
-    WRMPStartTimer();
+    RMPStartTimer();
 }
 #endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
@@ -709,7 +709,7 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     // Received Delayed Delivery Message: Extend time for pending retrans objects
     if (exchangeHeader.ProfileId == chip::Profiles::kChipProfile_Common &&
-        exchangeHeader.MessageType == chip::Profiles::Common::kMsgType_WRMP_Delayed_Delivery)
+        exchangeHeader.MessageType == chip::Profiles::Common::kMsgType_RMP_Delayed_Delivery)
     {
         // Process Delayed Delivery message if it is not a duplicate.
         if ((msgInfo->Flags & kChipMessageFlag_DuplicateMessage) == 0)
@@ -719,7 +719,7 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
             PauseTimeMillis = LittleEndian::Read32(p);
             DelayedNodeId   = LittleEndian::Read64(p);
 
-            WRMPProcessDDMessage(PauseTimeMillis, DelayedNodeId);
+            RMPProcessDDMessage(PauseTimeMillis, DelayedNodeId);
         }
 
         // Return after processing Delayed Delivery message
@@ -734,7 +734,7 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
         if (ec->ExchangeMgr != NULL && ec->MatchExchange(msgCon, msgInfo, &exchangeHeader))
         {
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-            // Found a matching exchange. Set flag for correct subsequent WRM
+            // Found a matching exchange. Set flag for correct subsequent RMP
             // retransmission timeout selection.
             if (!ec->HasRcvdMsgFromPeer())
             {
@@ -851,12 +851,12 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
         ec->EncryptionType = msgInfo->EncryptionType;
         ec->KeyId          = msgInfo->KeyId;
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-        // No need to set WRMP timer, this will be done when we add to retrans table
-        ec->mWRMPNextAckTime = 0;
+        // No need to set RMP timer, this will be done when we add to retrans table
+        ec->mRMPNextAckTime = 0;
         ec->SetAckPending(false);
         ec->SetMsgRcvdFromPeer(true);
-        ec->mWRMPConfig          = gDefaultWRMPConfig;
-        ec->mWRMPThrottleTimeout = 0;
+        ec->mRMPConfig          = gDefaultRMPConfig;
+        ec->mRMPThrottleTimeout = 0;
         // Internal and for Debug Only; When set, Exchange Layer does not send Ack.
         ec->SetDropAck(false);
 #endif
@@ -1036,7 +1036,7 @@ CHIP_ERROR ChipExchangeManager::PrependHeader(ChipExchangeHeader * exchangeHeade
         // There are 4 fields, unless the AckMsgId field is present as
         // well, for a total of 5.
         ((exchangeHeader->Flags & kChipExchangeFlag_AckId ? CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS
-                                                          : CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS_WRMP) *
+                                                          : CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS_RMP) *
          CHIP_FAULT_INJECTION_NUM_FUZZ_VALUES) -
             1,
         int32_t arg = 0;
@@ -1176,7 +1176,7 @@ void ChipExchangeManager::ClearMsgCounterSyncReq(uint64_t peerNodeId)
     RetransTableEntry * re = (RetransTableEntry *) RetransTable;
 
     // Find all retransmit entries (re) matching peerNodeId and using application group key.
-    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++, re++)
+    for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++, re++)
     {
         if (re->exchContext != NULL && re->exchContext->PeerNodeId == peerNodeId &&
             ChipKeyId::IsAppGroupKey(re->exchContext->KeyId))
@@ -1201,7 +1201,7 @@ void ChipExchangeManager::RetransPendingAppGroupMsgs(uint64_t peerNodeId)
     RetransTableEntry * re = (RetransTableEntry *) RetransTable;
 
     // Find all retransmit entries (re) matching peerNodeId and using application group key.
-    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++, re++)
+    for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++, re++)
     {
         if (re->exchContext != NULL && re->exchContext->PeerNodeId == peerNodeId &&
             ChipKeyId::IsAppGroupKey(re->exchContext->KeyId))
@@ -1219,7 +1219,7 @@ void ChipExchangeManager::RetransPendingAppGroupMsgs(uint64_t peerNodeId)
 /**
  * Return a tick counter value given a time difference and a tick interval.
  * The difference in time is not expected to exceed (2^32 - 1) within the
- * scope of two timestamp comparisons in WRMP and, thus, it makes sense to cast
+ * scope of two timestamp comparisons in RMP and, thus, it makes sense to cast
  * the time delta to uint32_t. This also avoids invocation of 64 bit divisions
  * in constrained platforms that do not support them.
  *
@@ -1233,25 +1233,25 @@ uint32_t ChipExchangeManager::GetTickCounterFromTimeDelta(uint64_t newTime, uint
 {
     // Note on math: we have a utility function that will compute U64 var / U32
     // compile-time const => U32.  At the moment, we are leaving
-    // mWRMPTimerInterval as a member variable in ChipExchangeManager, however,
+    // mRMPTimerInterval as a member variable in ChipExchangeManager, however,
     // given its current usage, it could be replaced by a compile time const.
     // Should we make that change, I would recommend making the timeDelta a u64,
     // and replacing the plain 32-bit division below with the utility function.
     // Note that the 32bit timeDelta overflows at around 46 days; pursuing the
     // above code strategy would extend that overflow by a factor if 200 given
-    // the default mWRMPPTimerInterval.  If and when such change is made, please
+    // the default mRMPPTimerInterval.  If and when such change is made, please
     // update the comment around line 1426.
     uint32_t timeDelta = static_cast<uint32_t>(newTime - oldTime);
 
-    return (timeDelta / mWRMPTimerInterval);
+    return (timeDelta / mRMPTimerInterval);
 }
 
-#if defined(WRMP_TICKLESS_DEBUG)
+#if defined(RMP_TICKLESS_DEBUG)
 void ChipExchangeManager::TicklessDebugDumpRetransTable(const char * log)
 {
     ChipLogProgress(ExchangeManager, log);
 
-    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+    for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
         if (RetransTable[i].exchContext)
         {
@@ -1265,33 +1265,33 @@ void ChipExchangeManager::TicklessDebugDumpRetransTable(const char * log)
 {
     return;
 }
-#endif // WRMP_TICKLESS_DEBUG
+#endif // RMP_TICKLESS_DEBUG
 
 /**
  * Iterate through active exchange contexts and retrans table entries.
- * If an action needs to be triggered by WRMP time facilities, execute
+ * If an action needs to be triggered by RMP time facilities, execute
  * that action.
  *
  */
-void ChipExchangeManager::WRMPExecuteActions(void)
+void ChipExchangeManager::RMPExecuteActions(void)
 {
     ExchangeContext * ec = NULL;
 
     // Process Ack Tables for all ExchangeContexts
     ec = (ExchangeContext *) ContextPool;
 
-#if defined(WRMP_TICKLESS_DEBUG)
-    ChipLogProgress(ExchangeManager, "WRMPExecuteActions");
+#if defined(RMP_TICKLESS_DEBUG)
+    ChipLogProgress(ExchangeManager, "RMPExecuteActions");
 #endif
 
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
         if (ec->ExchangeMgr != NULL && ec->IsAckPending())
         {
-            if (0 == ec->mWRMPNextAckTime)
+            if (0 == ec->mRMPNextAckTime)
             {
-#if defined(WRMP_TICKLESS_DEBUG)
-                ChipLogProgress(ExchangeManager, "WRMPExecuteActions sending ACK");
+#if defined(RMP_TICKLESS_DEBUG)
+                ChipLogProgress(ExchangeManager, "RMPExecuteActions sending ACK");
 #endif
                 // Send the Ack in a Common::Null message
                 ec->SendCommonNullMessage();
@@ -1300,11 +1300,11 @@ void ChipExchangeManager::WRMPExecuteActions(void)
         }
     }
 
-    TicklessDebugDumpRetransTable("WRMPExecuteActions Dumping RetransTable entries before processing");
+    TicklessDebugDumpRetransTable("RMPExecuteActions Dumping RetransTable entries before processing");
 
     // Retransmit / cancel anything in the retrans table whose retrans timeout
     // has expired
-    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+    for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
         ec = RetransTable[i].exchContext;
         if (ec)
@@ -1316,13 +1316,13 @@ void ChipExchangeManager::WRMPExecuteActions(void)
                 uint8_t sendCount = RetransTable[i].sendCount;
                 void * msgCtxt    = RetransTable[i].msgCtxt;
 
-                if (sendCount > ec->mWRMPConfig.mMaxRetrans)
+                if (sendCount > ec->mRMPConfig.mMaxRetrans)
                 {
                     err = CHIP_ERROR_MESSAGE_NOT_ACKNOWLEDGED;
 
                     ChipLogError(ExchangeManager,
                                  "Failed to Send CHIP MsgId:%08" PRIX32 " sendCount: %" PRIu8 " max retries: %" PRIu8,
-                                 RetransTable[i].msgId, sendCount, ec->mWRMPConfig.mMaxRetrans);
+                                 RetransTable[i].msgId, sendCount, ec->mRMPConfig.mMaxRetrans);
 
                     // Remove from Table
                     ClearRetransmitTable(RetransTable[i]);
@@ -1337,7 +1337,7 @@ void ChipExchangeManager::WRMPExecuteActions(void)
                 if (err == CHIP_NO_ERROR)
                 {
                     // If the retransmission was successful, update the passive timer
-                    RetransTable[i].nextRetransTime = ec->GetCurrentRetransmitTimeout() / mWRMPTimerInterval;
+                    RetransTable[i].nextRetransTime = ec->GetCurrentRetransmitTimeout() / mRMPTimerInterval;
 #if defined(DEBUG)
                     ChipLogProgress(ExchangeManager, "Retransmit MsgId:%08" PRIX32 " Send Cnt %d", RetransTable[i].msgId,
                                     RetransTable[i].sendCount);
@@ -1355,19 +1355,19 @@ void ChipExchangeManager::WRMPExecuteActions(void)
         }
     }
 
-    TicklessDebugDumpRetransTable("WRMPExecuteActions Dumping RetransTable entries after processing");
+    TicklessDebugDumpRetransTable("RMPExecuteActions Dumping RetransTable entries after processing");
 }
 
 /**
- * Calculate number of virtual WRMP ticks that have expired since we last
+ * Calculate number of virtual RMP ticks that have expired since we last
  * called this function. Iterate through active exchange contexts and
  * retrans table entries, subtracting expired virtual ticks to synchronize
  * wakeup times with the current system time. Do not perform any actions
  * beyond updating tick counts, actions will be performed by the physical
- * WRMP timer tick expiry.
+ * RMP timer tick expiry.
  *
  */
-void ChipExchangeManager::WRMPExpireTicks(void)
+void ChipExchangeManager::RMPExpireTicks(void)
 {
     uint64_t now         = 0;
     ExchangeContext * ec = NULL;
@@ -1381,17 +1381,17 @@ void ChipExchangeManager::WRMPExpireTicks(void)
     // Number of full ticks elapsed since last timer processing.  We always round down
     // to the previous tick.  If we are between tick boundaries, the extra time since the
     // last virtual tick is not accounted for here (it will be accounted for when resetting
-    // the WRMP timer)
+    // the RMP timer)
 
-    deltaTicks = GetTickCounterFromTimeDelta(now, mWRMPTimeStampBase);
+    deltaTicks = GetTickCounterFromTimeDelta(now, mRMPTimeStampBase);
 
     // Note on math involving deltaTicks: in the code below, deltaTicks, a
     // 32-bit value, is being subtracted from 16-bit expiration times.  In each
     // case, we compare the expiration time prior to subtraction to guard
     // against underflow.
 
-#if defined(WRMP_TICKLESS_DEBUG)
-    ChipLogProgress(ExchangeManager, "WRMPExpireTicks at %" PRIu64 ", %" PRIu64 ", %u", now, mWRMPTimeStampBase, deltaTicks);
+#if defined(RMP_TICKLESS_DEBUG)
+    ChipLogProgress(ExchangeManager, "RMPExpireTicks at %" PRIu64 ", %" PRIu64 ", %u", now, mRMPTimeStampBase, deltaTicks);
 #endif
 
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
@@ -1399,39 +1399,39 @@ void ChipExchangeManager::WRMPExpireTicks(void)
         if (ec->ExchangeMgr != NULL && ec->IsAckPending())
         {
             // Decrement counter of Ack timestamp by the elapsed timer ticks
-            if (ec->mWRMPNextAckTime >= deltaTicks)
+            if (ec->mRMPNextAckTime >= deltaTicks)
             {
-                ec->mWRMPNextAckTime -= deltaTicks;
+                ec->mRMPNextAckTime -= deltaTicks;
             }
             else
             {
-                ec->mWRMPNextAckTime = 0;
+                ec->mRMPNextAckTime = 0;
             }
-#if defined(WRMP_TICKLESS_DEBUG)
-            ChipLogProgress(ExchangeManager, "WRMPExpireTicks set mWRMPNextAckTime to %u", ec->mWRMPNextAckTime);
+#if defined(RMP_TICKLESS_DEBUG)
+            ChipLogProgress(ExchangeManager, "RMPExpireTicks set mRMPNextAckTime to %u", ec->mRMPNextAckTime);
 #endif
         }
     }
 
     // Process Throttle Time
     // Check Throttle timeout stored in EC to set/unset Throttle flag
-    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+    for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
         ec = RetransTable[i].exchContext;
         if (ec)
         {
             // Process Retransmit Table
             // Decrement Throttle timeout by elapsed timeticks
-            if (ec->mWRMPThrottleTimeout >= deltaTicks)
+            if (ec->mRMPThrottleTimeout >= deltaTicks)
             {
-                ec->mWRMPThrottleTimeout -= deltaTicks;
+                ec->mRMPThrottleTimeout -= deltaTicks;
             }
             else
             {
-                ec->mWRMPThrottleTimeout = 0;
+                ec->mRMPThrottleTimeout = 0;
             }
-#if defined(WRMP_TICKLESS_DEBUG)
-            ChipLogProgress(ExchangeManager, "WRMPExpireTicks set mWRMPThrottleTimeout to %u", RetransTable[i].nextRetransTime);
+#if defined(RMP_TICKLESS_DEBUG)
+            ChipLogProgress(ExchangeManager, "RMPExpireTicks set mRMPThrottleTimeout to %u", RetransTable[i].nextRetransTime);
 #endif
 
             // Decrement Retransmit timeout by elapsed timeticks
@@ -1443,8 +1443,8 @@ void ChipExchangeManager::WRMPExpireTicks(void)
             {
                 RetransTable[i].nextRetransTime = 0;
             }
-#if defined(WRMP_TICKLESS_DEBUG)
-            ChipLogProgress(ExchangeManager, "WRMPExpireTicks set nextRetransTime to %u", RetransTable[i].nextRetransTime);
+#if defined(RMP_TICKLESS_DEBUG)
+            ChipLogProgress(ExchangeManager, "RMPExpireTicks set nextRetransTime to %u", RetransTable[i].nextRetransTime);
 #endif
         } // ec entry is allocated
     }
@@ -1454,39 +1454,39 @@ void ChipExchangeManager::WRMPExpireTicks(void)
     // Note on math: we cast deltaTicks to a 64bit value to ensure that that we
     // produce a full 64 bit product.  At the moment this is a bit of a moot
     // conversion: right now, the math in GetTickCounterFromTimeDelta ensures
-    // that the deltaTicks * mWRMPTimerTick fits in 32bits.  However, I'm
+    // that the deltaTicks * mRMPTimerTick fits in 32bits.  However, I'm
     // leaving the math in this form, because I'm leaving the door open to
     // refactoring the division in GetTickCounterFromTimeDelta to use our
     // specialized utility function that computes U64 var/ U32 compile-time
     // const ==> U32
-    mWRMPTimeStampBase += static_cast<uint64_t>(deltaTicks) * mWRMPTimerInterval;
-#if defined(WRMP_TICKLESS_DEBUG)
-    ChipLogProgress(ExchangeManager, "WRMPExpireTicks mWRMPTimeStampBase to %" PRIu64, mWRMPTimeStampBase);
+    mRMPTimeStampBase += static_cast<uint64_t>(deltaTicks) * mRMPTimerInterval;
+#if defined(RMP_TICKLESS_DEBUG)
+    ChipLogProgress(ExchangeManager, "RMPExpireTicks mRMPTimeStampBase to %" PRIu64, mRMPTimeStampBase);
 #endif
 }
 
 /**
- * Handle physical wakeup of system due to WRMP wakeup.
+ * Handle physical wakeup of system due to RMP wakeup.
  *
  */
-void ChipExchangeManager::WRMPTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError)
+void ChipExchangeManager::RMPTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError)
 {
     ChipExchangeManager * exchangeMgr = reinterpret_cast<ChipExchangeManager *>(aAppState);
 
     VerifyOrDie((aSystemLayer != NULL) && (exchangeMgr != NULL));
 
-#if defined(WRMP_TICKLESS_DEBUG)
-    ChipLogProgress(ExchangeManager, "WRMPTimeout\n");
+#if defined(RMP_TICKLESS_DEBUG)
+    ChipLogProgress(ExchangeManager, "RMPTimeout\n");
 #endif
 
     // Make sure all tick counts are sync'd to the current time
-    exchangeMgr->WRMPExpireTicks();
+    exchangeMgr->RMPExpireTicks();
 
     // Execute any actions that are due this tick
-    exchangeMgr->WRMPExecuteActions();
+    exchangeMgr->RMPExecuteActions();
 
     // Calculate next physical wakeup
-    exchangeMgr->WRMPStartTimer();
+    exchangeMgr->RMPStartTimer();
 }
 
 /**
@@ -1513,20 +1513,20 @@ CHIP_ERROR ChipExchangeManager::AddToRetransTable(ExchangeContext * ec, PacketBu
     bool added     = false;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+    for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
         // Check the exchContext pointer for finding an empty slot in Table
         if (!RetransTable[i].exchContext)
         {
             // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
-            WRMPExpireTicks();
+            RMPExpireTicks();
 
             RetransTable[i].exchContext     = ec;
             RetransTable[i].msgId           = messageId;
             RetransTable[i].msgBuf          = msgBuf;
             RetransTable[i].sendCount       = 0;
             RetransTable[i].nextRetransTime = GetTickCounterFromTimeDelta(
-                ec->GetCurrentRetransmitTimeout() + System::Timer::GetCurrentEpoch(), mWRMPTimeStampBase);
+                ec->GetCurrentRetransmitTimeout() + System::Timer::GetCurrentEpoch(), mRMPTimeStampBase);
 
             RetransTable[i].msgCtxt = msgCtxt;
             *rEntry                 = &RetransTable[i];
@@ -1535,7 +1535,7 @@ CHIP_ERROR ChipExchangeManager::AddToRetransTable(ExchangeContext * ec, PacketBu
             added = true;
 
             // Check if the timer needs to be started and start it.
-            WRMPStartTimer();
+            RMPStartTimer();
             break;
         }
     }
@@ -1566,11 +1566,11 @@ CHIP_ERROR ChipExchangeManager::SendFromRetransTable(RetransTableEntry * entry)
     ExchangeContext * ec  = entry->exchContext;
 
     // To trigger a call to OnSendError, set the number of transmissions so
-    // that the next call to WRMPExecuteActions will abort this entry,
+    // that the next call to RMPExecuteActions will abort this entry,
     // restart the timer immediately, and ExitNow.
 
-    CHIP_FAULT_INJECT(FaultInjection::kFault_WRMSendError, entry->sendCount = (ec->mWRMPConfig.mMaxRetrans + 1);
-                      entry->nextRetransTime = 0; WRMPStartTimer(); ExitNow());
+    CHIP_FAULT_INJECT(FaultInjection::kFault_RMPSendError, entry->sendCount = (ec->mRMPConfig.mMaxRetrans + 1);
+                      entry->nextRetransTime = 0; RMPStartTimer(); ExitNow());
 
     if (ec)
     {
@@ -1630,7 +1630,7 @@ exit:
  */
 void ChipExchangeManager::ClearRetransmitTable(ExchangeContext * ec)
 {
-    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+    for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
         if (RetransTable[i].exchContext == ec)
         {
@@ -1651,7 +1651,7 @@ void ChipExchangeManager::ClearRetransmitTable(RetransTableEntry & rEntry)
     if (rEntry.exchContext)
     {
         // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
-        WRMPExpireTicks();
+        RMPExpireTicks();
 
         rEntry.exchContext->Release();
         rEntry.exchContext = NULL;
@@ -1666,7 +1666,7 @@ void ChipExchangeManager::ClearRetransmitTable(RetransTableEntry & rEntry)
         memset(&rEntry, 0, sizeof(rEntry));
 
         // Schedule next physical wakeup
-        WRMPStartTimer();
+        RMPStartTimer();
     }
 }
 
@@ -1680,7 +1680,7 @@ void ChipExchangeManager::ClearRetransmitTable(RetransTableEntry & rEntry)
  */
 void ChipExchangeManager::FailRetransmitTableEntries(ExchangeContext * ec, CHIP_ERROR err)
 {
-    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+    for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
         if (RetransTable[i].exchContext == ec)
         {
@@ -1698,12 +1698,12 @@ void ChipExchangeManager::FailRetransmitTableEntries(ExchangeContext * ec, CHIP_
 
 /**
  * Iterate through active exchange contexts and retrans table entries.
- * Determine how many WRMP ticks we need to sleep before we need to physically
+ * Determine how many RMP ticks we need to sleep before we need to physically
  * wake the CPU to perform an action.  Set a timer to go off when we
  * next need to wake the system.
  *
  */
-void ChipExchangeManager::WRMPStartTimer()
+void ChipExchangeManager::RMPStartTimer()
 {
     CHIP_ERROR res        = CHIP_NO_ERROR;
     uint32_t nextWakeTime = UINT32_MAX;
@@ -1715,38 +1715,38 @@ void ChipExchangeManager::WRMPStartTimer()
 
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
-        if (ec->ExchangeMgr != NULL && ec->IsAckPending() && ec->mWRMPNextAckTime < nextWakeTime)
+        if (ec->ExchangeMgr != NULL && ec->IsAckPending() && ec->mRMPNextAckTime < nextWakeTime)
         {
-            nextWakeTime = ec->mWRMPNextAckTime;
+            nextWakeTime = ec->mRMPNextAckTime;
             foundWake    = true;
-#if defined(WRMP_TICKLESS_DEBUG)
-            ChipLogProgress(ExchangeManager, "WRMPStartTimer next ACK time %u", nextWakeTime);
+#if defined(RMP_TICKLESS_DEBUG)
+            ChipLogProgress(ExchangeManager, "RMPStartTimer next ACK time %u", nextWakeTime);
 #endif
         }
     }
 
-    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+    for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
         ec = RetransTable[i].exchContext;
         if (ec)
         {
             // When do we need to next wake up for throttle retransmission?
-            if (ec->mWRMPThrottleTimeout != 0 && ec->mWRMPThrottleTimeout < nextWakeTime)
+            if (ec->mRMPThrottleTimeout != 0 && ec->mRMPThrottleTimeout < nextWakeTime)
             {
-                nextWakeTime = ec->mWRMPThrottleTimeout;
+                nextWakeTime = ec->mRMPThrottleTimeout;
                 foundWake    = true;
-#if defined(WRMP_TICKLESS_DEBUG)
-                ChipLogProgress(ExchangeManager, "WRMPStartTimer throttle timeout %u", nextWakeTime);
+#if defined(RMP_TICKLESS_DEBUG)
+                ChipLogProgress(ExchangeManager, "RMPStartTimer throttle timeout %u", nextWakeTime);
 #endif
             }
 
-            // When do we need to next wake up for WRMP retransmit?
+            // When do we need to next wake up for RMP retransmit?
             if (RetransTable[i].nextRetransTime < nextWakeTime)
             {
                 nextWakeTime = RetransTable[i].nextRetransTime;
                 foundWake    = true;
-#if defined(WRMP_TICKLESS_DEBUG)
-                ChipLogProgress(ExchangeManager, "WRMPStartTimer RetransTime %u", nextWakeTime);
+#if defined(RMP_TICKLESS_DEBUG)
+                ChipLogProgress(ExchangeManager, "RMPStartTimer RetransTime %u", nextWakeTime);
 #endif
             }
         }
@@ -1756,14 +1756,14 @@ void ChipExchangeManager::WRMPStartTimer()
     {
         // Set timer for next tick boundary - subtract the elapsed time from the current tick
         System::Timer::Epoch currentTime      = System::Timer::GetCurrentEpoch();
-        int32_t timerArmValue                 = nextWakeTime * mWRMPTimerInterval - (currentTime - mWRMPTimeStampBase);
+        int32_t timerArmValue                 = nextWakeTime * mRMPTimerInterval - (currentTime - mRMPTimeStampBase);
         System::Timer::Epoch timerExpiryEpoch = currentTime + timerArmValue;
 
-#if defined(WRMP_TICKLESS_DEBUG)
-        ChipLogProgress(ExchangeManager, "WRMPStartTimer wake in %d ms (%" PRIu64 " %u %" PRIu64 " %" PRIu64 ")", timerArmValue,
-                        timerExpiryEpoch, nextWakeTime, currentTime, mWRMPTimeStampBase);
+#if defined(RMP_TICKLESS_DEBUG)
+        ChipLogProgress(ExchangeManager, "RMPStartTimer wake in %d ms (%" PRIu64 " %u %" PRIu64 " %" PRIu64 ")", timerArmValue,
+                        timerExpiryEpoch, nextWakeTime, currentTime, mRMPTimeStampBase);
 #endif
-        if (timerExpiryEpoch != mWRMPCurrentTimerExpiry)
+        if (timerExpiryEpoch != mRMPCurrentTimerExpiry)
         {
             // If the tick boundary has expired in the past (delayed processing of event due to other system activity),
             // expire the timer immediately
@@ -1772,36 +1772,36 @@ void ChipExchangeManager::WRMPStartTimer()
                 timerArmValue = 0;
             }
 
-#if defined(WRMP_TICKLESS_DEBUG)
-            ChipLogProgress(ExchangeManager, "WRMPStartTimer set timer for %d %" PRIu64, timerArmValue, timerExpiryEpoch);
+#if defined(RMP_TICKLESS_DEBUG)
+            ChipLogProgress(ExchangeManager, "RMPStartTimer set timer for %d %" PRIu64, timerArmValue, timerExpiryEpoch);
 #endif
-            WRMPStopTimer();
-            res = MessageLayer->SystemLayer->StartTimer((uint32_t) timerArmValue, WRMPTimeout, this);
+            RMPStopTimer();
+            res = MessageLayer->SystemLayer->StartTimer((uint32_t) timerArmValue, RMPTimeout, this);
 
-            VerifyOrDieWithMsg(res == CHIP_NO_ERROR, ExchangeManager, "Cannot start WRMPTimeout\n");
-            mWRMPCurrentTimerExpiry = timerExpiryEpoch;
-#if defined(WRMP_TICKLESS_DEBUG)
+            VerifyOrDieWithMsg(res == CHIP_NO_ERROR, ExchangeManager, "Cannot start RMPTimeout\n");
+            mRMPCurrentTimerExpiry = timerExpiryEpoch;
+#if defined(RMP_TICKLESS_DEBUG)
         }
         else
         {
-            ChipLogProgress(ExchangeManager, "WRMPStartTimer timer already set for %" PRIu64, timerExpiryEpoch);
+            ChipLogProgress(ExchangeManager, "RMPStartTimer timer already set for %" PRIu64, timerExpiryEpoch);
 #endif
         }
     }
     else
     {
-#if defined(WRMP_TICKLESS_DEBUG)
-        ChipLogProgress(ExchangeManager, "Not setting WRMP timeout at %" PRIu64, System::Timer::GetCurrentEpoch());
+#if defined(RMP_TICKLESS_DEBUG)
+        ChipLogProgress(ExchangeManager, "Not setting RMP timeout at %" PRIu64, System::Timer::GetCurrentEpoch());
 #endif
-        WRMPStopTimer();
+        RMPStopTimer();
     }
 
-    TicklessDebugDumpRetransTable("WRMPStartTimer Dumping RetransTable entries after setting wakeup times");
+    TicklessDebugDumpRetransTable("RMPStartTimer Dumping RetransTable entries after setting wakeup times");
 }
 
-void ChipExchangeManager::WRMPStopTimer()
+void ChipExchangeManager::RMPStopTimer()
 {
-    MessageLayer->SystemLayer->CancelTimer(WRMPTimeout, this);
+    MessageLayer->SystemLayer->CancelTimer(RMPTimeout, this);
 }
 #endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
