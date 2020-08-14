@@ -115,7 +115,7 @@ CHIP_ERROR SecureSession::GetIV(const MessageHeader & header, uint8_t * iv, size
 
     BufBound bbuf(iv, len);
 
-    VerifyOrExit(len >= kAESCCMIVLen, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(len == kAESCCMIVLen, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     if (header.GetSourceNodeId().HasValue())
     {
