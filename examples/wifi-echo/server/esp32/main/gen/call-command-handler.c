@@ -110,9 +110,6 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         case ZCL_LEVEL_CONTROL_CLUSTER_ID:
             result = status(false, true, cmd->mfgSpecific);
             break;
-        case ZCL_POLL_CONTROL_CLUSTER_ID:
-            result = emberAfPollControlClusterClientCommandParse(cmd);
-            break;
         case ZCL_DOOR_LOCK_CLUSTER_ID:
             result = status(false, true, cmd->mfgSpecific);
             break;
@@ -155,9 +152,6 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_LEVEL_CONTROL_CLUSTER_ID:
             result = emberAfLevelControlClusterServerCommandParse(cmd);
-            break;
-        case ZCL_POLL_CONTROL_CLUSTER_ID:
-            result = emberAfPollControlClusterServerCommandParse(cmd);
             break;
         case ZCL_DOOR_LOCK_CLUSTER_ID:
             result = emberAfDoorLockClusterServerCommandParse(cmd);
@@ -1060,89 +1054,6 @@ EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand
         case ZCL_STOP_WITH_ON_OFF_COMMAND_ID: {
             // Command is fixed length: 0
             wasHandled = emberAfLevelControlClusterStopWithOnOffCallback();
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            break;
-        }
-        }
-    }
-    return status(wasHandled, true, cmd->mfgSpecific);
-}
-
-// Cluster: Poll Control, client
-EmberAfStatus emberAfPollControlClusterClientCommandParse(EmberAfClusterCommand * cmd)
-{
-    bool wasHandled = false;
-    if (!cmd->mfgSpecific)
-    {
-        switch (cmd->commandId)
-        {
-        case ZCL_CHECK_IN_COMMAND_ID: {
-            // Command is fixed length: 0
-            wasHandled = emberAfPollControlClusterCheckInCallback();
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            break;
-        }
-        }
-    }
-    return status(wasHandled, true, cmd->mfgSpecific);
-}
-
-// Cluster: Poll Control, server
-EmberAfStatus emberAfPollControlClusterServerCommandParse(EmberAfClusterCommand * cmd)
-{
-    bool wasHandled = false;
-    if (!cmd->mfgSpecific)
-    {
-        switch (cmd->commandId)
-        {
-        case ZCL_CHECK_IN_RESPONSE_COMMAND_ID: {
-            uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint8_t startFastPolling; // Ver.: always
-            uint16_t fastPollTimeout; // Ver.: always
-            // Command is fixed length: 3
-            if (cmd->bufLen < payloadOffset + 3u)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            startFastPolling = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-            payloadOffset += 1u;
-            fastPollTimeout = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-            wasHandled      = emberAfPollControlClusterCheckInResponseCallback(startFastPolling, fastPollTimeout);
-            break;
-        }
-        case ZCL_FAST_POLL_STOP_COMMAND_ID: {
-            // Command is fixed length: 0
-            wasHandled = emberAfPollControlClusterFastPollStopCallback();
-            break;
-        }
-        case ZCL_SET_LONG_POLL_INTERVAL_COMMAND_ID: {
-            uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint32_t newLongPollInterval; // Ver.: always
-            // Command is fixed length: 4
-            if (cmd->bufLen < payloadOffset + 4u)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            newLongPollInterval = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
-            wasHandled          = emberAfPollControlClusterSetLongPollIntervalCallback(newLongPollInterval);
-            break;
-        }
-        case ZCL_SET_SHORT_POLL_INTERVAL_COMMAND_ID: {
-            uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint16_t newShortPollInterval; // Ver.: always
-            // Command is fixed length: 2
-            if (cmd->bufLen < payloadOffset + 2u)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            newShortPollInterval = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-            wasHandled           = emberAfPollControlClusterSetShortPollIntervalCallback(newShortPollInterval);
             break;
         }
         default: {
