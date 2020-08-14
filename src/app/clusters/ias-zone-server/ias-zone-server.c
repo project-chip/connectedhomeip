@@ -135,7 +135,7 @@ static void resetCurrentQueueRetryParams(void)
 
 static void setZoneId(uint8_t endpoint, uint8_t zoneId);
 static bool areZoneServerAttributesTokenized(uint8_t endpoint);
-static boolean isValidEnrollmentMode(EmberAfIasZoneEnrollmentMode method);
+static bool isValidEnrollmentMode(EmberAfIasZoneEnrollmentMode method);
 #if defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ENABLE_QUEUE)
 static uint16_t computeElapsedTimeQs(IasZoneStatusQueueEntry * entry);
 static void bufferInit(IasZoneStatusQueue * ring);
@@ -300,7 +300,7 @@ EmberAfStatus emberAfPluginIasZoneClusterSetEnrollmentMethod(uint8_t endpoint, E
     return status;
 }
 
-static boolean isValidEnrollmentMode(EmberAfIasZoneEnrollmentMode method)
+static bool isValidEnrollmentMode(EmberAfIasZoneEnrollmentMode method)
 {
     return ((method == EMBER_ZCL_IAS_ZONE_ENROLLMENT_MODE_TRIP_TO_PAIR) ||
             (method == EMBER_ZCL_IAS_ZONE_ENROLLMENT_MODE_AUTO_ENROLLMENT_RESPONSE) ||

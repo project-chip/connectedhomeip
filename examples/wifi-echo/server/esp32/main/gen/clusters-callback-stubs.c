@@ -28,7 +28,7 @@
  *
  * @param timeout   Ver.: always
  */
-boolean emberAfIdentifyClusterIdentifyQueryResponseCallback(uint16_t timeout)
+bool emberAfIdentifyClusterIdentifyQueryResponseCallback(uint16_t timeout)
 {
     return false;
 }
@@ -38,7 +38,7 @@ boolean emberAfIdentifyClusterIdentifyQueryResponseCallback(uint16_t timeout)
  *
  *
  */
-boolean emberAfBarrierControlClusterBarrierControlStopCallback(void)
+bool emberAfBarrierControlClusterBarrierControlStopCallback(void)
 {
     return false;
 }
@@ -49,7 +49,7 @@ boolean emberAfBarrierControlClusterBarrierControlStopCallback(void)
  *
  * @param percentOpen   Ver.: always
  */
-boolean emberAfBarrierControlClusterBarrierControlGoToPercentCallback(uint8_t percentOpen)
+bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(uint8_t percentOpen)
 {
     return false;
 }
@@ -59,7 +59,7 @@ boolean emberAfBarrierControlClusterBarrierControlGoToPercentCallback(uint8_t pe
  *
  *
  */
-boolean emberAfBasicClusterResetToFactoryDefaultsCallback(void)
+bool emberAfBasicClusterResetToFactoryDefaultsCallback(void)
 {
     return false;
 }
@@ -73,7 +73,7 @@ boolean emberAfBasicClusterResetToFactoryDefaultsCallback(void)
  * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
  * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
  */
-boolean emberAfColorControlClusterMoveColorCallback(int16_t rateX, int16_t rateY, uint8_t optionsMask, uint8_t optionsOverride)
+bool emberAfColorControlClusterMoveColorCallback(int16_t rateX, int16_t rateY, uint8_t optionsMask, uint8_t optionsOverride)
 {
     return false;
 }
@@ -89,9 +89,9 @@ boolean emberAfColorControlClusterMoveColorCallback(int16_t rateX, int16_t rateY
  * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
  * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
  */
-boolean emberAfColorControlClusterMoveColorTemperatureCallback(uint8_t moveMode, uint16_t rate, uint16_t colorTemperatureMinimum,
-                                                               uint16_t colorTemperatureMaximum, uint8_t optionsMask,
-                                                               uint8_t optionsOverride)
+bool emberAfColorControlClusterMoveColorTemperatureCallback(uint8_t moveMode, uint16_t rate, uint16_t colorTemperatureMinimum,
+                                                            uint16_t colorTemperatureMaximum, uint8_t optionsMask,
+                                                            uint8_t optionsOverride)
 {
     return false;
 }
@@ -106,8 +106,8 @@ boolean emberAfColorControlClusterMoveColorTemperatureCallback(uint8_t moveMode,
  * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
  * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
  */
-boolean emberAfColorControlClusterMoveToColorCallback(uint16_t colorX, uint16_t colorY, uint16_t transitionTime,
-                                                      uint8_t optionsMask, uint8_t optionsOverride)
+bool emberAfColorControlClusterMoveToColorCallback(uint16_t colorX, uint16_t colorY, uint16_t transitionTime, uint8_t optionsMask,
+                                                   uint8_t optionsOverride)
 {
     return false;
 }
@@ -121,7 +121,7 @@ boolean emberAfColorControlClusterMoveToColorCallback(uint16_t colorX, uint16_t 
  * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
  * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
  */
-boolean emberAfColorControlClusterMoveHueCallback(uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride)
+bool emberAfColorControlClusterMoveHueCallback(uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride)
 {
     return false;
 }
@@ -135,8 +135,7 @@ boolean emberAfColorControlClusterMoveHueCallback(uint8_t moveMode, uint8_t rate
  * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
  * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
  */
-boolean emberAfColorControlClusterMoveSaturationCallback(uint8_t moveMode, uint8_t rate, uint8_t optionsMask,
-                                                         uint8_t optionsOverride)
+bool emberAfColorControlClusterMoveSaturationCallback(uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride)
 {
     return false;
 }
@@ -150,8 +149,8 @@ boolean emberAfColorControlClusterMoveSaturationCallback(uint8_t moveMode, uint8
  * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
  * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
  */
-boolean emberAfColorControlClusterMoveToColorTemperatureCallback(uint16_t colorTemperature, uint16_t transitionTime,
-                                                                 uint8_t optionsMask, uint8_t optionsOverride)
+bool emberAfColorControlClusterMoveToColorTemperatureCallback(uint16_t colorTemperature, uint16_t transitionTime,
+                                                              uint8_t optionsMask, uint8_t optionsOverride)
 {
     return false;
 }
@@ -166,8 +165,8 @@ boolean emberAfColorControlClusterMoveToColorTemperatureCallback(uint16_t colorT
  * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
  * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
  */
-boolean emberAfColorControlClusterMoveToHueAndSaturationCallback(uint8_t hue, uint8_t saturation, uint16_t transitionTime,
-                                                                 uint8_t optionsMask, uint8_t optionsOverride)
+bool emberAfColorControlClusterMoveToHueAndSaturationCallback(uint8_t hue, uint8_t saturation, uint16_t transitionTime,
+                                                              uint8_t optionsMask, uint8_t optionsOverride)
 {
     return false;
 }
@@ -182,8 +181,8 @@ boolean emberAfColorControlClusterMoveToHueAndSaturationCallback(uint8_t hue, ui
  * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
  * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
  */
-boolean emberAfColorControlClusterMoveToHueCallback(uint8_t hue, uint8_t direction, uint16_t transitionTime, uint8_t optionsMask,
-                                                    uint8_t optionsOverride)
+bool emberAfColorControlClusterMoveToHueCallback(uint8_t hue, uint8_t direction, uint16_t transitionTime, uint8_t optionsMask,
+                                                 uint8_t optionsOverride)
 {
     return false;
 }
@@ -197,8 +196,8 @@ boolean emberAfColorControlClusterMoveToHueCallback(uint8_t hue, uint8_t directi
  * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
  * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
  */
-boolean emberAfColorControlClusterMoveToSaturationCallback(uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
-                                                           uint8_t optionsOverride)
+bool emberAfColorControlClusterMoveToSaturationCallback(uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
+                                                        uint8_t optionsOverride)
 {
     return false;
 }
@@ -213,8 +212,8 @@ boolean emberAfColorControlClusterMoveToSaturationCallback(uint8_t saturation, u
  * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
  * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
  */
-boolean emberAfColorControlClusterStepColorCallback(int16_t stepX, int16_t stepY, uint16_t transitionTime, uint8_t optionsMask,
-                                                    uint8_t optionsOverride)
+bool emberAfColorControlClusterStepColorCallback(int16_t stepX, int16_t stepY, uint16_t transitionTime, uint8_t optionsMask,
+                                                 uint8_t optionsOverride)
 {
     return false;
 }
@@ -231,9 +230,9 @@ boolean emberAfColorControlClusterStepColorCallback(int16_t stepX, int16_t stepY
  * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
  * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
  */
-boolean emberAfColorControlClusterStepColorTemperatureCallback(uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime,
-                                                               uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum,
-                                                               uint8_t optionsMask, uint8_t optionsOverride)
+bool emberAfColorControlClusterStepColorTemperatureCallback(uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime,
+                                                            uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum,
+                                                            uint8_t optionsMask, uint8_t optionsOverride)
 {
     return false;
 }
@@ -248,8 +247,8 @@ boolean emberAfColorControlClusterStepColorTemperatureCallback(uint8_t stepMode,
  * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
  * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
  */
-boolean emberAfColorControlClusterStepHueCallback(uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask,
-                                                  uint8_t optionsOverride)
+bool emberAfColorControlClusterStepHueCallback(uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask,
+                                               uint8_t optionsOverride)
 {
     return false;
 }
@@ -264,8 +263,8 @@ boolean emberAfColorControlClusterStepHueCallback(uint8_t stepMode, uint8_t step
  * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
  * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
  */
-boolean emberAfColorControlClusterStepSaturationCallback(uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime,
-                                                         uint8_t optionsMask, uint8_t optionsOverride)
+bool emberAfColorControlClusterStepSaturationCallback(uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime,
+                                                      uint8_t optionsMask, uint8_t optionsOverride)
 {
     return false;
 }
@@ -277,7 +276,7 @@ boolean emberAfColorControlClusterStepSaturationCallback(uint8_t stepMode, uint8
  * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
  * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
  */
-boolean emberAfColorControlClusterStopMoveStepCallback(uint8_t optionsMask, uint8_t optionsOverride)
+bool emberAfColorControlClusterStopMoveStepCallback(uint8_t optionsMask, uint8_t optionsOverride)
 {
     return false;
 }
@@ -287,7 +286,7 @@ boolean emberAfColorControlClusterStopMoveStepCallback(uint8_t optionsMask, uint
  *
  *
  */
-boolean emberAfDoorLockClusterClearAllPinsCallback(void)
+bool emberAfDoorLockClusterClearAllPinsCallback(void)
 {
     return false;
 }
@@ -297,7 +296,7 @@ boolean emberAfDoorLockClusterClearAllPinsCallback(void)
  *
  *
  */
-boolean emberAfDoorLockClusterClearAllRfidsCallback(void)
+bool emberAfDoorLockClusterClearAllRfidsCallback(void)
 {
     return false;
 }
@@ -308,7 +307,7 @@ boolean emberAfDoorLockClusterClearAllRfidsCallback(void)
  *
  * @param scheduleId   Ver.: always
  */
-boolean emberAfDoorLockClusterClearHolidayScheduleCallback(uint8_t scheduleId)
+bool emberAfDoorLockClusterClearHolidayScheduleCallback(uint8_t scheduleId)
 {
     return false;
 }
@@ -319,7 +318,7 @@ boolean emberAfDoorLockClusterClearHolidayScheduleCallback(uint8_t scheduleId)
  *
  * @param userId   Ver.: always
  */
-boolean emberAfDoorLockClusterClearPinCallback(uint16_t userId)
+bool emberAfDoorLockClusterClearPinCallback(uint16_t userId)
 {
     return false;
 }
@@ -330,7 +329,7 @@ boolean emberAfDoorLockClusterClearPinCallback(uint16_t userId)
  *
  * @param userId   Ver.: always
  */
-boolean emberAfDoorLockClusterClearRfidCallback(uint16_t userId)
+bool emberAfDoorLockClusterClearRfidCallback(uint16_t userId)
 {
     return false;
 }
@@ -342,7 +341,7 @@ boolean emberAfDoorLockClusterClearRfidCallback(uint16_t userId)
  * @param scheduleId   Ver.: always
  * @param userId   Ver.: always
  */
-boolean emberAfDoorLockClusterClearWeekdayScheduleCallback(uint8_t scheduleId, uint16_t userId)
+bool emberAfDoorLockClusterClearWeekdayScheduleCallback(uint8_t scheduleId, uint16_t userId)
 {
     return false;
 }
@@ -353,7 +352,7 @@ boolean emberAfDoorLockClusterClearWeekdayScheduleCallback(uint8_t scheduleId, u
  *
  * @param scheduleId   Ver.: always
  */
-boolean emberAfDoorLockClusterGetHolidayScheduleCallback(uint8_t scheduleId)
+bool emberAfDoorLockClusterGetHolidayScheduleCallback(uint8_t scheduleId)
 {
     return false;
 }
@@ -364,7 +363,7 @@ boolean emberAfDoorLockClusterGetHolidayScheduleCallback(uint8_t scheduleId)
  *
  * @param logIndex   Ver.: always
  */
-boolean emberAfDoorLockClusterGetLogRecordCallback(uint16_t logIndex)
+bool emberAfDoorLockClusterGetLogRecordCallback(uint16_t logIndex)
 {
     return false;
 }
@@ -375,7 +374,7 @@ boolean emberAfDoorLockClusterGetLogRecordCallback(uint16_t logIndex)
  *
  * @param userId   Ver.: always
  */
-boolean emberAfDoorLockClusterGetPinCallback(uint16_t userId)
+bool emberAfDoorLockClusterGetPinCallback(uint16_t userId)
 {
     return false;
 }
@@ -386,7 +385,7 @@ boolean emberAfDoorLockClusterGetPinCallback(uint16_t userId)
  *
  * @param userId   Ver.: always
  */
-boolean emberAfDoorLockClusterGetRfidCallback(uint16_t userId)
+bool emberAfDoorLockClusterGetRfidCallback(uint16_t userId)
 {
     return false;
 }
@@ -397,7 +396,7 @@ boolean emberAfDoorLockClusterGetRfidCallback(uint16_t userId)
  *
  * @param userId   Ver.: always
  */
-boolean emberAfDoorLockClusterGetUserTypeCallback(uint16_t userId)
+bool emberAfDoorLockClusterGetUserTypeCallback(uint16_t userId)
 {
     return false;
 }
@@ -409,7 +408,7 @@ boolean emberAfDoorLockClusterGetUserTypeCallback(uint16_t userId)
  * @param scheduleId   Ver.: always
  * @param userId   Ver.: always
  */
-boolean emberAfDoorLockClusterGetWeekdayScheduleCallback(uint8_t scheduleId, uint16_t userId)
+bool emberAfDoorLockClusterGetWeekdayScheduleCallback(uint8_t scheduleId, uint16_t userId)
 {
     return false;
 }
@@ -421,7 +420,7 @@ boolean emberAfDoorLockClusterGetWeekdayScheduleCallback(uint8_t scheduleId, uin
  * @param scheduleId   Ver.: always
  * @param userId   Ver.: always
  */
-boolean emberAfDoorLockClusterGetYeardayScheduleCallback(uint8_t scheduleId, uint16_t userId)
+bool emberAfDoorLockClusterGetYeardayScheduleCallback(uint8_t scheduleId, uint16_t userId)
 {
     return false;
 }
@@ -432,7 +431,7 @@ boolean emberAfDoorLockClusterGetYeardayScheduleCallback(uint8_t scheduleId, uin
  *
  * @param PIN   Ver.: since ha-1.2-05-3520-29
  */
-boolean emberAfDoorLockClusterLockDoorCallback(uint8_t * PIN)
+bool emberAfDoorLockClusterLockDoorCallback(uint8_t * PIN)
 {
     return false;
 }
@@ -446,8 +445,8 @@ boolean emberAfDoorLockClusterLockDoorCallback(uint8_t * PIN)
  * @param localEndTime   Ver.: always
  * @param operatingModeDuringHoliday   Ver.: always
  */
-boolean emberAfDoorLockClusterSetHolidayScheduleCallback(uint8_t scheduleId, uint32_t localStartTime, uint32_t localEndTime,
-                                                         uint8_t operatingModeDuringHoliday)
+bool emberAfDoorLockClusterSetHolidayScheduleCallback(uint8_t scheduleId, uint32_t localStartTime, uint32_t localEndTime,
+                                                      uint8_t operatingModeDuringHoliday)
 {
     return false;
 }
@@ -461,7 +460,7 @@ boolean emberAfDoorLockClusterSetHolidayScheduleCallback(uint8_t scheduleId, uin
  * @param userType   Ver.: always
  * @param pin   Ver.: always
  */
-boolean emberAfDoorLockClusterSetPinCallback(uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * pin)
+bool emberAfDoorLockClusterSetPinCallback(uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * pin)
 {
     return false;
 }
@@ -475,7 +474,7 @@ boolean emberAfDoorLockClusterSetPinCallback(uint16_t userId, uint8_t userStatus
  * @param userType   Ver.: always
  * @param id   Ver.: always
  */
-boolean emberAfDoorLockClusterSetRfidCallback(uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * id)
+bool emberAfDoorLockClusterSetRfidCallback(uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * id)
 {
     return false;
 }
@@ -487,7 +486,7 @@ boolean emberAfDoorLockClusterSetRfidCallback(uint16_t userId, uint8_t userStatu
  * @param scheduleId   Ver.: always
  * @param userId   Ver.: always
  */
-boolean emberAfDoorLockClusterClearYeardayScheduleCallback(uint8_t scheduleId, uint16_t userId)
+bool emberAfDoorLockClusterClearYeardayScheduleCallback(uint8_t scheduleId, uint16_t userId)
 {
     return false;
 }
@@ -499,7 +498,7 @@ boolean emberAfDoorLockClusterClearYeardayScheduleCallback(uint8_t scheduleId, u
  * @param userId   Ver.: always
  * @param userType   Ver.: always
  */
-boolean emberAfDoorLockClusterSetUserTypeCallback(uint16_t userId, uint8_t userType)
+bool emberAfDoorLockClusterSetUserTypeCallback(uint16_t userId, uint8_t userType)
 {
     return false;
 }
@@ -516,8 +515,8 @@ boolean emberAfDoorLockClusterSetUserTypeCallback(uint16_t userId, uint8_t userT
  * @param endHour   Ver.: always
  * @param endMinute   Ver.: always
  */
-boolean emberAfDoorLockClusterSetWeekdayScheduleCallback(uint8_t scheduleId, uint16_t userId, uint8_t daysMask, uint8_t startHour,
-                                                         uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
+bool emberAfDoorLockClusterSetWeekdayScheduleCallback(uint8_t scheduleId, uint16_t userId, uint8_t daysMask, uint8_t startHour,
+                                                      uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
 {
     return false;
 }
@@ -531,8 +530,8 @@ boolean emberAfDoorLockClusterSetWeekdayScheduleCallback(uint8_t scheduleId, uin
  * @param localStartTime   Ver.: always
  * @param localEndTime   Ver.: always
  */
-boolean emberAfDoorLockClusterSetYeardayScheduleCallback(uint8_t scheduleId, uint16_t userId, uint32_t localStartTime,
-                                                         uint32_t localEndTime)
+bool emberAfDoorLockClusterSetYeardayScheduleCallback(uint8_t scheduleId, uint16_t userId, uint32_t localStartTime,
+                                                      uint32_t localEndTime)
 {
     return false;
 }
@@ -543,7 +542,7 @@ boolean emberAfDoorLockClusterSetYeardayScheduleCallback(uint8_t scheduleId, uin
  *
  * @param PIN   Ver.: since ha-1.2-05-3520-29
  */
-boolean emberAfDoorLockClusterUnlockDoorCallback(uint8_t * PIN)
+bool emberAfDoorLockClusterUnlockDoorCallback(uint8_t * PIN)
 {
     return false;
 }
@@ -555,7 +554,7 @@ boolean emberAfDoorLockClusterUnlockDoorCallback(uint8_t * PIN)
  * @param timeoutInSeconds   Ver.: always
  * @param pin   Ver.: since ha-1.2-05-3520-29
  */
-boolean emberAfDoorLockClusterUnlockWithTimeoutCallback(uint16_t timeoutInSeconds, uint8_t * pin)
+bool emberAfDoorLockClusterUnlockWithTimeoutCallback(uint16_t timeoutInSeconds, uint8_t * pin)
 {
     return false;
 }
@@ -567,7 +566,7 @@ boolean emberAfDoorLockClusterUnlockWithTimeoutCallback(uint16_t timeoutInSecond
  * @param groupId   Ver.: always
  * @param groupName   Ver.: always
  */
-boolean emberAfGroupsClusterAddGroupCallback(uint16_t groupId, uint8_t * groupName)
+bool emberAfGroupsClusterAddGroupCallback(uint16_t groupId, uint8_t * groupName)
 {
     return false;
 }
@@ -579,7 +578,7 @@ boolean emberAfGroupsClusterAddGroupCallback(uint16_t groupId, uint8_t * groupNa
  * @param groupId   Ver.: always
  * @param groupName   Ver.: always
  */
-boolean emberAfGroupsClusterAddGroupIfIdentifyingCallback(uint16_t groupId, uint8_t * groupName)
+bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(uint16_t groupId, uint8_t * groupName)
 {
     return false;
 }
@@ -591,7 +590,7 @@ boolean emberAfGroupsClusterAddGroupIfIdentifyingCallback(uint16_t groupId, uint
  * @param status   Ver.: always
  * @param groupId   Ver.: always
  */
-boolean emberAfGroupsClusterAddGroupResponseCallback(uint8_t status, uint16_t groupId)
+bool emberAfGroupsClusterAddGroupResponseCallback(uint8_t status, uint16_t groupId)
 {
     return false;
 }
@@ -603,7 +602,7 @@ boolean emberAfGroupsClusterAddGroupResponseCallback(uint8_t status, uint16_t gr
  * @param groupCount   Ver.: always
  * @param groupList   Ver.: always
  */
-boolean emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t * groupList)
+bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t * groupList)
 {
     return false;
 }
@@ -616,7 +615,7 @@ boolean emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8
  * @param groupCount   Ver.: always
  * @param groupList   Ver.: always
  */
-boolean emberAfGroupsClusterGetGroupMembershipResponseCallback(uint8_t capacity, uint8_t groupCount, uint8_t * groupList)
+bool emberAfGroupsClusterGetGroupMembershipResponseCallback(uint8_t capacity, uint8_t groupCount, uint8_t * groupList)
 {
     return false;
 }
@@ -626,7 +625,7 @@ boolean emberAfGroupsClusterGetGroupMembershipResponseCallback(uint8_t capacity,
  *
  *
  */
-boolean emberAfGroupsClusterRemoveAllGroupsCallback(void)
+bool emberAfGroupsClusterRemoveAllGroupsCallback(void)
 {
     return false;
 }
@@ -637,7 +636,7 @@ boolean emberAfGroupsClusterRemoveAllGroupsCallback(void)
  *
  * @param groupId   Ver.: always
  */
-boolean emberAfGroupsClusterRemoveGroupCallback(uint16_t groupId)
+bool emberAfGroupsClusterRemoveGroupCallback(uint16_t groupId)
 {
     return false;
 }
@@ -649,7 +648,7 @@ boolean emberAfGroupsClusterRemoveGroupCallback(uint16_t groupId)
  * @param status   Ver.: always
  * @param groupId   Ver.: always
  */
-boolean emberAfGroupsClusterRemoveGroupResponseCallback(uint8_t status, uint16_t groupId)
+bool emberAfGroupsClusterRemoveGroupResponseCallback(uint8_t status, uint16_t groupId)
 {
     return false;
 }
@@ -660,7 +659,7 @@ boolean emberAfGroupsClusterRemoveGroupResponseCallback(uint8_t status, uint16_t
  *
  * @param groupId   Ver.: always
  */
-boolean emberAfGroupsClusterViewGroupCallback(uint16_t groupId)
+bool emberAfGroupsClusterViewGroupCallback(uint16_t groupId)
 {
     return false;
 }
@@ -673,7 +672,7 @@ boolean emberAfGroupsClusterViewGroupCallback(uint16_t groupId)
  * @param groupId   Ver.: always
  * @param groupName   Ver.: always
  */
-boolean emberAfGroupsClusterViewGroupResponseCallback(uint8_t status, uint16_t groupId, uint8_t * groupName)
+bool emberAfGroupsClusterViewGroupResponseCallback(uint8_t status, uint16_t groupId, uint8_t * groupName)
 {
     return false;
 }
@@ -685,7 +684,7 @@ boolean emberAfGroupsClusterViewGroupResponseCallback(uint8_t status, uint16_t g
  * @param zoneType   Ver.: always
  * @param manufacturerCode   Ver.: always
  */
-boolean emberAfIasZoneClusterZoneEnrollRequestCallback(uint16_t zoneType, uint16_t manufacturerCode)
+bool emberAfIasZoneClusterZoneEnrollRequestCallback(uint16_t zoneType, uint16_t manufacturerCode)
 {
     return false;
 }
@@ -697,7 +696,7 @@ boolean emberAfIasZoneClusterZoneEnrollRequestCallback(uint16_t zoneType, uint16
  * @param enrollResponseCode   Ver.: always
  * @param zoneId   Ver.: always
  */
-boolean emberAfIasZoneClusterZoneEnrollResponseCallback(uint8_t enrollResponseCode, uint8_t zoneId)
+bool emberAfIasZoneClusterZoneEnrollResponseCallback(uint8_t enrollResponseCode, uint8_t zoneId)
 {
     return false;
 }
@@ -711,8 +710,8 @@ boolean emberAfIasZoneClusterZoneEnrollResponseCallback(uint8_t enrollResponseCo
  * @param zoneId   Ver.: since ha-1.2-05-3520-29
  * @param delay   Ver.: since ha-1.2-05-3520-29
  */
-boolean emberAfIasZoneClusterZoneStatusChangeNotificationCallback(uint16_t zoneStatus, uint8_t extendedStatus, uint8_t zoneId,
-                                                                  uint16_t delay)
+bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(uint16_t zoneStatus, uint8_t extendedStatus, uint8_t zoneId,
+                                                               uint16_t delay)
 {
     return false;
 }
@@ -723,7 +722,7 @@ boolean emberAfIasZoneClusterZoneStatusChangeNotificationCallback(uint16_t zoneS
  *
  * @param identifyTime   Ver.: always
  */
-boolean emberAfIdentifyClusterIdentifyCallback(uint16_t identifyTime)
+bool emberAfIdentifyClusterIdentifyCallback(uint16_t identifyTime)
 {
     return false;
 }
@@ -733,7 +732,7 @@ boolean emberAfIdentifyClusterIdentifyCallback(uint16_t identifyTime)
  *
  *
  */
-boolean emberAfIdentifyClusterIdentifyQueryCallback(void)
+bool emberAfIdentifyClusterIdentifyQueryCallback(void)
 {
     return false;
 }
@@ -747,7 +746,7 @@ boolean emberAfIdentifyClusterIdentifyQueryCallback(void)
  * @param optionMask   Ver.: since zcl6-errata-14-0129-15
  * @param optionOverride   Ver.: since zcl6-errata-14-0129-15
  */
-boolean emberAfLevelControlClusterMoveCallback(uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride)
+bool emberAfLevelControlClusterMoveCallback(uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride)
 {
     return false;
 }
@@ -761,8 +760,8 @@ boolean emberAfLevelControlClusterMoveCallback(uint8_t moveMode, uint8_t rate, u
  * @param optionMask   Ver.: since zcl6-errata-14-0129-15
  * @param optionOverride   Ver.: since zcl6-errata-14-0129-15
  */
-boolean emberAfLevelControlClusterMoveToLevelCallback(uint8_t level, uint16_t transitionTime, uint8_t optionMask,
-                                                      uint8_t optionOverride)
+bool emberAfLevelControlClusterMoveToLevelCallback(uint8_t level, uint16_t transitionTime, uint8_t optionMask,
+                                                   uint8_t optionOverride)
 {
     return false;
 }
@@ -774,7 +773,7 @@ boolean emberAfLevelControlClusterMoveToLevelCallback(uint8_t level, uint16_t tr
  * @param level   Ver.: always
  * @param transitionTime   Ver.: always
  */
-boolean emberAfLevelControlClusterMoveToLevelWithOnOffCallback(uint8_t level, uint16_t transitionTime)
+bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(uint8_t level, uint16_t transitionTime)
 {
     return false;
 }
@@ -786,7 +785,7 @@ boolean emberAfLevelControlClusterMoveToLevelWithOnOffCallback(uint8_t level, ui
  * @param moveMode   Ver.: always
  * @param rate   Ver.: always
  */
-boolean emberAfLevelControlClusterMoveWithOnOffCallback(uint8_t moveMode, uint8_t rate)
+bool emberAfLevelControlClusterMoveWithOnOffCallback(uint8_t moveMode, uint8_t rate)
 {
     return false;
 }
@@ -801,8 +800,8 @@ boolean emberAfLevelControlClusterMoveWithOnOffCallback(uint8_t moveMode, uint8_
  * @param optionMask   Ver.: since zcl6-errata-14-0129-15
  * @param optionOverride   Ver.: since zcl6-errata-14-0129-15
  */
-boolean emberAfLevelControlClusterStepCallback(uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask,
-                                               uint8_t optionOverride)
+bool emberAfLevelControlClusterStepCallback(uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask,
+                                            uint8_t optionOverride)
 {
     return false;
 }
@@ -814,7 +813,7 @@ boolean emberAfLevelControlClusterStepCallback(uint8_t stepMode, uint8_t stepSiz
  * @param optionMask   Ver.: since zcl6-errata-14-0129-15
  * @param optionOverride   Ver.: since zcl6-errata-14-0129-15
  */
-boolean emberAfLevelControlClusterStopCallback(uint8_t optionMask, uint8_t optionOverride)
+bool emberAfLevelControlClusterStopCallback(uint8_t optionMask, uint8_t optionOverride)
 {
     return false;
 }
@@ -827,7 +826,7 @@ boolean emberAfLevelControlClusterStopCallback(uint8_t optionMask, uint8_t optio
  * @param stepSize   Ver.: always
  * @param transitionTime   Ver.: always
  */
-boolean emberAfLevelControlClusterStepWithOnOffCallback(uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime)
+bool emberAfLevelControlClusterStepWithOnOffCallback(uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime)
 {
     return false;
 }
@@ -837,61 +836,7 @@ boolean emberAfLevelControlClusterStepWithOnOffCallback(uint8_t stepMode, uint8_
  *
  *
  */
-boolean emberAfLevelControlClusterStopWithOnOffCallback(void)
-{
-    return false;
-}
-
-/** @brief Poll Control Cluster Check In
- *
- *
- *
- */
-boolean emberAfPollControlClusterCheckInCallback(void)
-{
-    return false;
-}
-
-/** @brief Poll Control Cluster Check In Response
- *
- *
- *
- * @param startFastPolling   Ver.: always
- * @param fastPollTimeout   Ver.: always
- */
-boolean emberAfPollControlClusterCheckInResponseCallback(uint8_t startFastPolling, uint16_t fastPollTimeout)
-{
-    return false;
-}
-
-/** @brief Poll Control Cluster Fast Poll Stop
- *
- *
- *
- */
-boolean emberAfPollControlClusterFastPollStopCallback(void)
-{
-    return false;
-}
-
-/** @brief Poll Control Cluster Set Long Poll Interval
- *
- *
- *
- * @param newLongPollInterval   Ver.: always
- */
-boolean emberAfPollControlClusterSetLongPollIntervalCallback(uint32_t newLongPollInterval)
-{
-    return false;
-}
-
-/** @brief Poll Control Cluster Set Short Poll Interval
- *
- *
- *
- * @param newShortPollInterval   Ver.: always
- */
-boolean emberAfPollControlClusterSetShortPollIntervalCallback(uint16_t newShortPollInterval)
+bool emberAfLevelControlClusterStopWithOnOffCallback(void)
 {
     return false;
 }
@@ -906,8 +851,8 @@ boolean emberAfPollControlClusterSetShortPollIntervalCallback(uint16_t newShortP
  * @param sceneName   Ver.: always
  * @param extensionFieldSets   Ver.: always
  */
-boolean emberAfScenesClusterAddSceneCallback(uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
-                                             uint8_t * extensionFieldSets)
+bool emberAfScenesClusterAddSceneCallback(uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
+                                          uint8_t * extensionFieldSets)
 {
     return false;
 }
@@ -920,7 +865,7 @@ boolean emberAfScenesClusterAddSceneCallback(uint16_t groupId, uint8_t sceneId, 
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-boolean emberAfScenesClusterAddSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId)
+bool emberAfScenesClusterAddSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId)
 {
     return false;
 }
@@ -931,7 +876,7 @@ boolean emberAfScenesClusterAddSceneResponseCallback(uint8_t status, uint16_t gr
  *
  * @param groupId   Ver.: always
  */
-boolean emberAfScenesClusterGetSceneMembershipCallback(uint16_t groupId)
+bool emberAfScenesClusterGetSceneMembershipCallback(uint16_t groupId)
 {
     return false;
 }
@@ -946,8 +891,8 @@ boolean emberAfScenesClusterGetSceneMembershipCallback(uint16_t groupId)
  * @param sceneCount   Ver.: always
  * @param sceneList   Ver.: always
  */
-boolean emberAfScenesClusterGetSceneMembershipResponseCallback(uint8_t status, uint8_t capacity, uint16_t groupId,
-                                                               uint8_t sceneCount, uint8_t * sceneList)
+bool emberAfScenesClusterGetSceneMembershipResponseCallback(uint8_t status, uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
+                                                            uint8_t * sceneList)
 {
     return false;
 }
@@ -960,7 +905,7 @@ boolean emberAfScenesClusterGetSceneMembershipResponseCallback(uint8_t status, u
  * @param sceneId   Ver.: always
  * @param transitionTime   Ver.: since zcl-7.0-07-5123-07
  */
-boolean emberAfScenesClusterRecallSceneCallback(uint16_t groupId, uint8_t sceneId, uint16_t transitionTime)
+bool emberAfScenesClusterRecallSceneCallback(uint16_t groupId, uint8_t sceneId, uint16_t transitionTime)
 {
     return false;
 }
@@ -971,7 +916,7 @@ boolean emberAfScenesClusterRecallSceneCallback(uint16_t groupId, uint8_t sceneI
  *
  * @param groupId   Ver.: always
  */
-boolean emberAfScenesClusterRemoveAllScenesCallback(uint16_t groupId)
+bool emberAfScenesClusterRemoveAllScenesCallback(uint16_t groupId)
 {
     return false;
 }
@@ -983,7 +928,7 @@ boolean emberAfScenesClusterRemoveAllScenesCallback(uint16_t groupId)
  * @param status   Ver.: always
  * @param groupId   Ver.: always
  */
-boolean emberAfScenesClusterRemoveAllScenesResponseCallback(uint8_t status, uint16_t groupId)
+bool emberAfScenesClusterRemoveAllScenesResponseCallback(uint8_t status, uint16_t groupId)
 {
     return false;
 }
@@ -995,7 +940,7 @@ boolean emberAfScenesClusterRemoveAllScenesResponseCallback(uint8_t status, uint
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-boolean emberAfScenesClusterRemoveSceneCallback(uint16_t groupId, uint8_t sceneId)
+bool emberAfScenesClusterRemoveSceneCallback(uint16_t groupId, uint8_t sceneId)
 {
     return false;
 }
@@ -1008,7 +953,7 @@ boolean emberAfScenesClusterRemoveSceneCallback(uint16_t groupId, uint8_t sceneI
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-boolean emberAfScenesClusterRemoveSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId)
+bool emberAfScenesClusterRemoveSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId)
 {
     return false;
 }
@@ -1020,7 +965,7 @@ boolean emberAfScenesClusterRemoveSceneResponseCallback(uint8_t status, uint16_t
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-boolean emberAfScenesClusterStoreSceneCallback(uint16_t groupId, uint8_t sceneId)
+bool emberAfScenesClusterStoreSceneCallback(uint16_t groupId, uint8_t sceneId)
 {
     return false;
 }
@@ -1033,7 +978,7 @@ boolean emberAfScenesClusterStoreSceneCallback(uint16_t groupId, uint8_t sceneId
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-boolean emberAfScenesClusterStoreSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId)
+bool emberAfScenesClusterStoreSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId)
 {
     return false;
 }
@@ -1045,7 +990,7 @@ boolean emberAfScenesClusterStoreSceneResponseCallback(uint8_t status, uint16_t 
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-boolean emberAfScenesClusterViewSceneCallback(uint16_t groupId, uint8_t sceneId)
+bool emberAfScenesClusterViewSceneCallback(uint16_t groupId, uint8_t sceneId)
 {
     return false;
 }
@@ -1061,84 +1006,45 @@ boolean emberAfScenesClusterViewSceneCallback(uint16_t groupId, uint8_t sceneId)
  * @param sceneName   Ver.: always
  * @param extensionFieldSets   Ver.: always
  */
-boolean emberAfScenesClusterViewSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
-                                                      uint8_t * sceneName, uint8_t * extensionFieldSets)
+bool emberAfScenesClusterViewSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
+                                                   uint8_t * sceneName, uint8_t * extensionFieldSets)
 {
     return false;
 }
 
 // endpoint_config.h callbacks, grep'd from SDK, comment these out as clusters come in
-void emberAfColorControlClusterServerInitCallback(uint8_t endpoint)
-{
-}
+void emberAfColorControlClusterServerInitCallback(uint8_t endpoint) {}
 
-void emberAfDoorLockClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                          EmberAfAttributeId attributeId)
-{
-
-}
-void emberAfGroupsClusterServerInitCallback(uint8_t endpoint)
-{
-}void emberAfIasZoneClusterClientInitCallback(uint8_t endpoint)
-{
-}void emberAfIasZoneClusterServerInitCallback(uint8_t endpoint)
-{
-}
- void emberAfIasZoneClusterServerMessageSentCallback(
-  EmberOutgoingMessageType type,
-  uint16_t indexOrDestination,
-  EmberApsFrame *apsFrame,
-  uint16_t msgLen,
-  uint8_t *message,
-  EmberStatus status)
-  {}
-
-EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(
-  uint8_t endpoint,
-  EmberAfAttributeId attributeId,
-  EmberAfAttributeType attributeType,
-  uint8_t size,
-  uint8_t *value)
-{
-  return EMBER_ZCL_STATUS_SUCCESS;}
-void emberAfIdentifyClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                          EmberAfAttributeId attributeId)
-{
-  }
-void emberAfIdentifyClusterServerInitCallback(uint8_t endpoint)
-{
-
-}
-
-void emberAfLevelControlClusterServerInitCallback(uint8_t endpoint)
-{
-}
-void emberAfPluginBarrierControlServerInitCallback(void)
-{
-}
-
-void emberAfPluginDoorLockServerInitCallback(void)
-{
-}
- void emberAfPluginReportingInitCallback(void)
-{
-}
-void emberAfPollControlClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                             EmberAfAttributeId attributeId)
+void emberAfDoorLockClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId) {}
+void emberAfGroupsClusterServerInitCallback(uint8_t endpoint) {}
+void emberAfIasZoneClusterClientInitCallback(uint8_t endpoint) {}
+void emberAfIasZoneClusterServerInitCallback(uint8_t endpoint) {}
+void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination,
+                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                    EmberStatus status)
 {}
-void emberAfPollControlClusterServerInitCallback(uint8_t endpoint)
+
+EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+                                                                     EmberAfAttributeType attributeType, uint8_t size,
+                                                                     uint8_t * value)
 {
-}
-void emberAfPluginPollControlServerStackStatusCallback(EmberStatus status)
-{
-}
-EmberAfStatus emberAfPollControlClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                         EmberAfAttributeId attributeId,
-                                                                         EmberAfAttributeType attributeType,
-                                                                         uint8_t size,
-                                                                         uint8_t *value) {
     return EMBER_ZCL_STATUS_SUCCESS;
 }
-void emberAfScenesClusterServerInitCallback(uint8_t endpoint)
+void emberAfIdentifyClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId) {}
+void emberAfIdentifyClusterServerInitCallback(uint8_t endpoint) {}
+
+void emberAfLevelControlClusterServerInitCallback(uint8_t endpoint) {}
+void emberAfPluginBarrierControlServerInitCallback(void) {}
+
+void emberAfPluginDoorLockServerInitCallback(void) {}
+void emberAfPluginReportingInitCallback(void) {}
+void emberAfPollControlClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId) {}
+void emberAfPollControlClusterServerInitCallback(uint8_t endpoint) {}
+void emberAfPluginPollControlServerStackStatusCallback(EmberStatus status) {}
+EmberAfStatus emberAfPollControlClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+                                                                         EmberAfAttributeType attributeType, uint8_t size,
+                                                                         uint8_t * value)
 {
+    return EMBER_ZCL_STATUS_SUCCESS;
 }
+void emberAfScenesClusterServerInitCallback(uint8_t endpoint) {}
