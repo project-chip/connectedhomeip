@@ -23,8 +23,8 @@ config("app_config") {
   ]
 }
 
-static_library("common") {
-  output_name = "libCHIPDataModelCommon"
+static_library("chip") {
+  output_name = "libCHIPDataModel"
 
   sources = [
     "chip-zcl-zpro/command-encoder/decoder.c",
@@ -38,14 +38,6 @@ static_library("common") {
   ]
 
   public_configs = [ ":app_config" ]
-}
-
-group("chip") {
-  public_deps = [ ":common" ]
-}
-
-group("mock") {
-  public_deps = [ ":common" ]
 }
 
 group("app") {

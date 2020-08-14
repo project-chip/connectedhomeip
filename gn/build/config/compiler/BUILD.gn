@@ -60,7 +60,19 @@ config("abi_default") {
     if (arm_float_abi != "") {
       cflags += [ "-mfloat-abi=${arm_float_abi}" ]
     }
-    if (arm_use_thumb) {
+    if (is_clang) {
+      if (current_os == "ios" || current_os == "mac") {
+        cflags += [ "-target",
+          string_join("-",
+              [
+                getenv("ARCHS"),
+                getenv("LLVM_TARGET_TRIPLE_VENDOR"),
+                getenv("LLVM_TARGET_TRIPLE_OS_VERSION"),
+          ])
+        ]
+      }
+    }
+    if (arm_use_thumb && ! is_clang) {
       cflags += [ "-mthumb" ]
     }
   } else if (current_cpu == "x86" || current_cpu == "x86_64") {
@@ -150,7 +162,7 @@ config("warnings_default") {
     ":disabled_warnings",
   ]
 
-  if (current_os != "mac") {
+  if (current_os != "mac" && current_os != "ios") {
     ldflags = [ "-Wl,--fatal-warnings" ]
   }
 }
