@@ -23,8 +23,8 @@
  *      for the CHIP Reliable Messaging Protocol.
  *
  */
-#ifndef CHIP_RM_CONFIG_H_
-#define CHIP_RM_CONFIG_H_
+#ifndef CHIP_RMP_CONFIG_H_
+#define CHIP_RMP_CONFIG_H_
 
 namespace chip {
 
@@ -134,4 +134,4 @@ const RMPConfig gDefaultRMPConfig = { CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TI
 
 } // namespace chip
 
-#endif // CHIP_RM_CONFIG_H_
+#endif // CHIP_RMP_CONFIG_H_
