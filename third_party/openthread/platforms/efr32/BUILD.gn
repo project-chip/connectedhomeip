@@ -39,6 +39,7 @@ efr32_sdk("efr32_ot_sdk") {
     "${efr32_sdk_root}/util/third_party/mbedtls/library/platform.c",
     "${efr32_sdk_root}/util/third_party/mbedtls/library/md_wrap.c",
     "${efr32_sdk_root}/util/third_party/mbedtls/library/ctr_drbg.c",
+    "${efr32_sdk_root}/util/third_party/mbedtls/library/entropy.c",
     "${chip_root}/third_party/mbedtls/repo/include/mbedtls/platform.h",
   ]
 
@@ -54,13 +55,15 @@ efr32_sdk("efr32_ot_sdk") {
                "BOARD_ID=${efr32_board}",
                "MBEDTLS_CONFIG_FILE=\"mbedtls-config.h\"",
                "MBEDTLS_USER_CONFIG_FILE=\"efr32-mbedtls-config.h\"",
+               "NVIC_CONFIG=\"platform/base/hal/micro/cortexm3/efm32/nvic-config.h\"",
   ]
 }
 
 config("libot_efr32_config") {
   include_dirs = [
+    "${openthread_root}/examples/platforms",
     "${openthread_root}/examples/platforms/${efr32_family}",
-    "${openthread_root}/examples/platforms/${efr32_family}/brd4166a/",
+    "${openthread_root}/examples/platforms/${efr32_family}/brd4166a",
     "${chip_root}/examples/lock-app/efr32/include",
   ]
 }
@@ -70,9 +73,14 @@ source_set("libopenthread-efr32") {
     sources = [
         "${openthread_root}/examples/platforms/utils/soft_source_match_table.c",
         "${openthread_root}/examples/platforms/${efr32_family}/alarm.c",
+        "${openthread_root}/examples/platforms/${efr32_family}/entropy.c",
         "${openthread_root}/examples/platforms/${efr32_family}/flash.c",
+        "${openthread_root}/examples/platforms/${efr32_family}/misc.c",
         "${openthread_root}/examples/platforms/${efr32_family}/radio.c",
+        "${openthread_root}/examples/platforms/${efr32_family}/system.c",
+        "${openthread_root}/examples/platforms/${efr32_family}/uart.c",
         "${openthread_root}/examples/platforms/${efr32_family}/crypto/efr32-mbedtls-config.h",
+        "${openthread_root}/examples/platforms/openthread-system.h",
         "${chip_root}/examples/lock-app/efr32/include/mbedtls-config.h",
     ]
 

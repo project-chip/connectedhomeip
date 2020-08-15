@@ -32,6 +32,8 @@
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 
+#include <openthread/platform/entropy.h>
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -70,7 +72,7 @@ void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStart(void)
     // IPv6 interface via a call to otIp6SetEnabled(false).
     //
     // On platforms where there is no native support for simultaneous BLE advertising
-    // (e.g. Nordic’s SoftDevice), it is necessary to coordinate between the different
+    // it is necessary to coordinate between the different
     // advertising modes a CHIP device may employ.  This arises in particular when a
     // device supports both CHIPoBLE and ToBLE, each of which requires a separate advertising
     // regime.  The OnCHIPoBLEAdvertisingStart()/OnCHIPoBLEAdvertisingStop() methods handle
