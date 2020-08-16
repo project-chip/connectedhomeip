@@ -58,9 +58,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
     if (chip_build_tools) {
       deps += [
+        "${chip_root}/examples/shell",
         "${chip_root}/src/qrcodetool",
         "${chip_root}/src/setup_payload",
-        "${chip_root}/examples/shell",
       ]
     }
   }
@@ -74,8 +74,8 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
         "${chip_root}/src/crypto/tests",
         "${chip_root}/src/inet/tests",
         "${chip_root}/src/lib/core/tests",
-        "${chip_root}/src/lib/support/tests",
         "${chip_root}/src/lib/shell/tests",
+        "${chip_root}/src/lib/support/tests",
         "${chip_root}/src/lwip/tests",
         "${chip_root}/src/platform/tests",
         "${chip_root}/src/setup_payload/tests",
