@@ -1,0 +1,57 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/arm.gni")
+import("//build_overrides/chip.gni")
+
+_rtt_asm = ""
+if (current_cpu == "arm") {
+  if (arm_arch == "armv7-m" || arm_arch == "armv7e-m") {
+    _rtt_asm = "SEGGER_RTT_ASM_ARMv7M.S"
+  }
+}
+
+declare_args() {
+  # Use assembly routines for Segger RTT.
+  rtt_use_asm = _rtt_asm != ""
+}
+
+config("rtt_config") {
+  include_dirs = [ "." ]
+
+  defines = []
+  if (rtt_use_asm) {
+    defines += [ "RTT_USE_ASM=1" ]
+  } else {
+    defines += [ "RTT_USE_ASM=0" ]
+  }
+}
+
+source_set("RTT") {
+  sources = [
+    "SEGGER_RTT.c",
+    "SEGGER_RTT.h",
+    "SEGGER_RTT_Conf.h",
+  ]
+
+  if (rtt_use_asm) {
+    sources += [ _rtt_asm ]
+  }
+
+  public_configs = [ ":rtt_config" ]
+}
+
+source_set("printf") {
+  sources = [ "SEGGER_RTT_printf.c" ]
+}
