@@ -97,7 +97,7 @@
 #define configTIMER_QUEUE_LENGTH 32
 
 // TODO: Fix high stack usage in GenericThreadStackManagerImpl_FreeRTOS
-#define configTIMER_TASK_STACK_DEPTH (1024)
+#define configTIMER_TASK_STACK_DEPTH (512)
 
 /* Tickless Idle configuration. */
 #define configEXPECTED_IDLE_TIME_BEFORE_SLEEP 2
