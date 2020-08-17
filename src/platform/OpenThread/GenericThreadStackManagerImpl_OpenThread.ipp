@@ -927,7 +927,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_JoinerStart(voi
         uint32_t pincode;
 
         SuccessOrExit(error = ConfigurationMgr().GetSetupPinCode(pincode));
-        snprintf(pskd.m8, sizeof(pskd.m8) - 1, "%09u", pincode);
+        snprintf(pskd.m8, sizeof(pskd.m8) - 1, "%09" PRIu32, pincode);
 
         ChipLogProgress(DeviceLayer, "Joiner PSKd: %s", pskd.m8);
         error = MapOpenThreadError(otJoinerStart(mOTInst, pskd.m8, NULL, NULL, NULL, NULL, NULL,
