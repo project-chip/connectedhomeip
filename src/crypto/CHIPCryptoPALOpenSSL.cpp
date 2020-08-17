@@ -794,9 +794,23 @@ void ClearSecretData(uint8_t * buf, uint32_t len)
         VerifyOrExit(_bn_ != NULL, error = CHIP_ERROR_INTERNAL);                                                                   \
     } while (0)
 
-#define free_point(_point_) EC_POINT_clear_free((EC_POINT *) _point_)
+#define free_point(_point_)                                                                                                        \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (_point_ != nullptr)                                                                                                    \
+        {                                                                                                                          \
+            EC_POINT_clear_free((EC_POINT *) _point_);                                                                             \
+        }                                                                                                                          \
+    } while (0)
 
-#define free_bn(_bn_) BN_clear_free((BIGNUM *) _bn_)
+#define free_bn(_bn_)                                                                                                              \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (_bn_ != nullptr)                                                                                                       \
+        {                                                                                                                          \
+            BN_clear_free((BIGNUM *) _bn_);                                                                                        \
+        }                                                                                                                          \
+    } while (0)
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
 {
@@ -842,8 +856,15 @@ exit:
 
 void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl(void)
 {
-    EC_GROUP_clear_free(context.curve);
-    BN_CTX_free(context.bn_ctx);
+    if (context.curve != nullptr)
+    {
+        EC_GROUP_clear_free(context.curve);
+    }
+
+    if (context.bn_ctx != nullptr)
+    {
+        BN_CTX_free(context.bn_ctx);
+    }
 
     free_point(M);
     free_point(N);

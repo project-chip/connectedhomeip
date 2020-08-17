@@ -25,6 +25,7 @@
 
 #include <core/CHIPError.h>
 #include <stddef.h>
+#include <string.h>
 
 #if CHIP_CRYPTO_OPENSSL
 #include <openssl/ec.h>
@@ -663,7 +664,11 @@ struct Spake2p_Context
 class Spake2p_P256_SHA256_HKDF_HMAC : public Spake2p
 {
 public:
-    Spake2p_P256_SHA256_HKDF_HMAC(void) : Spake2p(kP256_FE_Length, kP256_Point_Length, kSHA256_Hash_Length) {}
+    Spake2p_P256_SHA256_HKDF_HMAC(void) : Spake2p(kP256_FE_Length, kP256_Point_Length, kSHA256_Hash_Length)
+    {
+        memset(&context, 0, sizeof(context));
+    }
+
     virtual ~Spake2p_P256_SHA256_HKDF_HMAC(void) { FreeImpl(); }
 
     CHIP_ERROR Mac(const unsigned char * key, size_t key_len, const unsigned char * in, size_t in_len, unsigned char * out);
