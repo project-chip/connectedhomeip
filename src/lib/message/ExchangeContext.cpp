@@ -37,7 +37,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <message/CHIPExchangeMgr.h>
-#include <message/SecurityMgr.h>
+#include <message/CHIPSecurityMgr.h>
 #include <profiles/CHIPProfiles.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
