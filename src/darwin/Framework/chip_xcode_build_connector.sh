@@ -25,9 +25,12 @@ die() {
     exit 1
 }
 
-export >"$TEMP_DIR/env.sh"
+set -e
 
-set -ex
+mkdir -p "$TEMP_DIR"
+export > "$TEMP_DIR/env.sh"
+
+set -x
 
 # these should be set by the Xcode project
 CHIP_ROOT=${CHIP_ROOT:-"$SRCROOT/../../.."}
@@ -35,6 +38,16 @@ CHIP_ROOT=$(cd "$CHIP_ROOT" && pwd)
 CHIP_PREFIX=${CHIP_PREFIX:-"$BUILT_PRODUCTS_DIR"}
 
 [[ -d ${CHIP_ROOT} ]] || die Please set CHIP_ROOT to the location of the CHIP directory
+
+declare -a DEFINES=()
+# lots of environment variables passed by Xcode to this script
+read -r -a DEFINES <<<"$GCC_PREPROCESSOR_DEFINITIONS"
+
+declare target_defines=
+for define in "${DEFINES[@]}"; do
+    target_defines+=,\"${define//\"/\\\"}\"
+done
+target_defines=[${target_defines:1}]
 
 declare -a args=(
     'is_clang=true'
@@ -47,14 +60,10 @@ declare -a args=(
     'chip_inet_project_config_include=""'
     'chip_system_project_config_include=""'
     'target_cpu="'"$ARCHS"'"'
+    'target_defines='"$target_defines"
+    'target_cflags=["-target","'"$ARCHS"'-'"$LLVM_TARGET_TRIPLE_VENDOR"'-'"$LLVM_TARGET_TRIPLE_OS_VERSION"'"]'
+    'arm_use_thumb=false'
 )
-
-# lots of environment variables passed by xcode to this script
-read -r -a GCC_PREPROCESSOR_DEFINITIONS <<<"$GCC_PREPROCESSOR_DEFINITIONS"
-
-DEFINES+=("${GCC_PREPROCESSOR_DEFINITIONS[@]/#/-D}")
-
-COMPILER_FLAGS="${DEFINES[*]}"
 
 if [[ ${CONFIGURATION} != Debug* ]]; then
     args+='is_debug=true'
@@ -76,7 +85,6 @@ fi
 }
 
 (
-    mkdir -p "$TEMP_DIR"
     cd "$TEMP_DIR"
 
     # activate.sh isn't 'set -e' safe

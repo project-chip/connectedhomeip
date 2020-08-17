@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
 import("//build/config/compiler/compiler.gni")
+import("//build/config/target.gni")
 
 declare_args() {
   # Enable -Werror. This can be disabled if using a different compiler
@@ -60,19 +61,7 @@ config("abi_default") {
     if (arm_float_abi != "") {
       cflags += [ "-mfloat-abi=${arm_float_abi}" ]
     }
-    if (is_clang) {
-      if (current_os == "ios" || current_os == "mac") {
-        cflags += [ "-target",
-          string_join("-",
-              [
-                getenv("ARCHS"),
-                getenv("LLVM_TARGET_TRIPLE_VENDOR"),
-                getenv("LLVM_TARGET_TRIPLE_OS_VERSION"),
-          ])
-        ]
-      }
-    }
-    if (arm_use_thumb && ! is_clang) {
+    if (arm_use_thumb) {
       cflags += [ "-mthumb" ]
     }
   } else if (current_cpu == "x86" || current_cpu == "x86_64") {
@@ -93,6 +82,14 @@ config("abi_default") {
     }
   }
   ldflags = cflags
+}
+
+config("target_default") {
+  if (current_toolchain == default_toolchain) {
+    defines = target_defines
+    cflags = target_cflags
+    ldflags = target_ldflags
+  }
 }
 
 config("optimize_zero") {
