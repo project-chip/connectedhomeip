@@ -23770,11 +23770,7 @@ void halRadioPowerDownHandler(void);
  * @param enter        True if entering idle/sleep, False if exiting
  * @param sleepMode    Idle/sleep mode
  */
-<<<<<<< HEAD
 void halSleepCallback(bool enter, SleepModes sleepMode);
-=======
-void halSleepCallback(boolean enter, SleepModes sleepMode);
->>>>>>> dc1eaea... Add BoltLockManager to manage the lock and unlock request and state
 /** @} END HAL Library Plugin Callbacks */
 
 /** @} END addtogroup */
