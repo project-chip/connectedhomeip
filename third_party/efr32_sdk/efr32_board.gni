@@ -26,6 +26,8 @@ assert(efr32_board != "", "efr32_board must be specified")
 # Differentiate between boards
 # - BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
 # - BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
+# - BRD4163A / SLWSTK6000B / Dual band Wireless Starter Kit / 2.4GHz@19dBm, 868MHz@19dBm
+# - BRD4164A / SLWSTK6000B / Dual band Wireless Starter Kit / 2.4GHz@19dBm, 915MHz@19dBm
 # - BRD4166A / SLTB004A    / Thunderboard Sense 2 / 2.4GHz@10dBm
 # - BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm, 915MHz@19dBm, 868MHz@19dBm
 # - BRD4180A / SLWSTK6006A / MG21 Module / 2.4GHz@20dBm
@@ -36,6 +38,12 @@ if (efr32_board == "BRD4304A") {
 } else if (efr32_board == "BRD4161A") {
   efr32_family = "efr32mg12"
   efr32_mcu = "EFR32MG12P432F1024GL125"
+} else if (efr32_board == "BRD4163A") {
+  efr32_family = "efr32mg12"
+  efr32_mcu = "EFR32MG12P433F1024GL125"
+} else if (efr32_board == "BRD4164A") {
+  efr32_family = "efr32mg12"
+  efr32_mcu = "EFR32MG12P433F1024GL125"
 } else if (efr32_board == "BRD4166A") {
   efr32_family = "efr32mg12"
   efr32_mcu = "EFR32MG12P332F1024GL125"
