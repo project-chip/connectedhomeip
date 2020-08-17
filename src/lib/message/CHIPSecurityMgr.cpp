@@ -37,6 +37,7 @@
 #include <profiles/CHIPProfiles.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
+#include <support/CHIPMem.h>
 #include <support/crypto/CHIPCrypto.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -354,11 +355,11 @@ CHIP_ERROR ChipSecurityManager::StartPASESession(ChipConnection * con, ChipAuthM
     SuccessOrExit(err);
 
     // Initialize CHIP platform memory.
-    err = chip::Platform::Security::MemoryInit();
+    err = chip::Platform::MemoryInit();
     SuccessOrExit(err);
 
     // Allocate and initialize PASE engine object.
-    mPASEEngine = (ChipPASEEngine *) chip::Platform::Security::MemoryAlloc(sizeof(ChipPASEEngine), true);
+    mPASEEngine = (ChipPASEEngine *) chip::Platform::MemoryAlloc(sizeof(ChipPASEEngine), true);
     VerifyOrExit(mPASEEngine != NULL, err = CHIP_ERROR_NO_MEMORY);
     mPASEEngine->Init();
 
@@ -655,11 +656,11 @@ void ChipSecurityManager::HandlePASESessionStart(ExchangeContext * ec, const IPP
     StartSessionTimer();
 
     // Initialize CHIP Platform Memory.
-    err = chip::Platform::Security::MemoryInit();
+    err = chip::Platform::MemoryInit();
     SuccessOrExit(err);
 
     // Prepare PASE engine and start session
-    mPASEEngine = (ChipPASEEngine *) chip::Platform::Security::MemoryAlloc(sizeof(ChipPASEEngine), true);
+    mPASEEngine = (ChipPASEEngine *) chip::Platform::MemoryAlloc(sizeof(ChipPASEEngine), true);
     VerifyOrExit(mPASEEngine != NULL, err = CHIP_ERROR_NO_MEMORY);
     mPASEEngine->Init();
 
@@ -1007,11 +1008,11 @@ CHIP_ERROR ChipSecurityManager::StartCASESession(ChipConnection * con, uint64_t 
     SuccessOrExit(err);
 
     // Initialize CHIP Platform Memory.
-    err = chip::Platform::Security::MemoryInit();
+    err = chip::Platform::MemoryInit();
     SuccessOrExit(err);
 
     // Allocate and Initialize CASE Engine object
-    mCASEEngine = (ChipCASEEngine *) chip::Platform::Security::MemoryAlloc(sizeof(ChipCASEEngine), true);
+    mCASEEngine = (ChipCASEEngine *) chip::Platform::MemoryAlloc(sizeof(ChipCASEEngine), true);
     VerifyOrExit(mCASEEngine != NULL, err = CHIP_ERROR_NO_MEMORY);
     mCASEEngine->Init();
 
@@ -1274,11 +1275,11 @@ void ChipSecurityManager::HandleCASESessionStart(ExchangeContext * ec, const IPP
 #endif
 
     // Initialize CHIP Platform Memory
-    err = chip::Platform::Security::MemoryInit();
+    err = chip::Platform::MemoryInit();
     SuccessOrExit(err);
 
     // Allocate and initialize a CASE engine.
-    mCASEEngine = (ChipCASEEngine *) chip::Platform::Security::MemoryAlloc(sizeof(ChipCASEEngine), true);
+    mCASEEngine = (ChipCASEEngine *) chip::Platform::MemoryAlloc(sizeof(ChipCASEEngine), true);
     VerifyOrExit(mCASEEngine != NULL, err = CHIP_ERROR_NO_MEMORY);
     mCASEEngine->Init();
 
@@ -1532,11 +1533,11 @@ CHIP_ERROR ChipSecurityManager::StartTAKESession(ChipConnection * con, ChipAuthM
     SuccessOrExit(err);
 
     // Initialize CHIP platform memory.
-    err = chip::Platform::Security::MemoryInit();
+    err = chip::Platform::MemoryInit();
     SuccessOrExit(err);
 
     // Allocate and initialize TAKE engine object.
-    mTAKEEngine = (ChipTAKEEngine *) chip::Platform::Security::MemoryAlloc(sizeof(ChipTAKEEngine), true);
+    mTAKEEngine = (ChipTAKEEngine *) chip::Platform::MemoryAlloc(sizeof(ChipTAKEEngine), true);
     VerifyOrExit(mTAKEEngine != NULL, err = CHIP_ERROR_NO_MEMORY);
     mTAKEEngine->Init();
 
@@ -1835,11 +1836,11 @@ void ChipSecurityManager::HandleTAKESessionStart(ExchangeContext * ec, const IPP
     StartSessionTimer();
 
     // Initialize CHIP Platform Memory
-    err = chip::Platform::Security::MemoryInit();
+    err = chip::Platform::MemoryInit();
     SuccessOrExit(err);
 
     // Prepare TAKE engine and start session
-    mTAKEEngine = (ChipTAKEEngine *) chip::Platform::Security::MemoryAlloc(sizeof(ChipTAKEEngine), true);
+    mTAKEEngine = (ChipTAKEEngine *) chip::Platform::MemoryAlloc(sizeof(ChipTAKEEngine), true);
     VerifyOrExit(mTAKEEngine != NULL, err = CHIP_ERROR_NO_MEMORY);
     mTAKEEngine->Init();
 
@@ -2133,11 +2134,11 @@ CHIP_ERROR ChipSecurityManager::StartKeyExport(ChipConnection * con, uint64_t pe
         keyExportDelegate = mDefaultKeyExportDelegate;
 
     // Initialize CHIP Platform Memory.
-    err = chip::Platform::Security::MemoryInit();
+    err = chip::Platform::MemoryInit();
     SuccessOrExit(err);
 
     // Allocate and initialize KeyExport object.
-    mKeyExport = (ChipKeyExport *) chip::Platform::Security::MemoryAlloc(sizeof(ChipKeyExport), true);
+    mKeyExport = (ChipKeyExport *) chip::Platform::MemoryAlloc(sizeof(ChipKeyExport), true);
     VerifyOrExit(mKeyExport != NULL, err = CHIP_ERROR_NO_MEMORY);
     mKeyExport->Init(keyExportDelegate);
 
@@ -2355,7 +2356,7 @@ void ChipSecurityManager::HandleKeyExportRequest(ExchangeContext * ec, const IPP
 #endif
 
     // Initialize CHIP Platform Memory.
-    err = chip::Platform::Security::MemoryInit();
+    err = chip::Platform::MemoryInit();
     SuccessOrExit(err);
 
     // Prepare key export engine.
@@ -3211,7 +3212,7 @@ void ChipSecurityManager::Reset(void)
         if (mPASEEngine != NULL)
         {
             mPASEEngine->Shutdown();
-            chip::Platform::Security::MemoryFree(mPASEEngine);
+            chip::Platform::MemoryFree(mPASEEngine);
             mPASEEngine = NULL;
         }
         break;
@@ -3221,7 +3222,7 @@ void ChipSecurityManager::Reset(void)
         if (mTAKEEngine != NULL)
         {
             mTAKEEngine->Shutdown();
-            chip::Platform::Security::MemoryFree(mTAKEEngine);
+            chip::Platform::MemoryFree(mTAKEEngine);
             mTAKEEngine = NULL;
         }
         break;
@@ -3231,7 +3232,7 @@ void ChipSecurityManager::Reset(void)
         if (mCASEEngine != NULL)
         {
             mCASEEngine->Shutdown();
-            chip::Platform::Security::MemoryFree(mCASEEngine);
+            chip::Platform::MemoryFree(mCASEEngine);
             mCASEEngine = NULL;
         }
         break;
@@ -3241,7 +3242,7 @@ void ChipSecurityManager::Reset(void)
         if (mKeyExport != NULL)
         {
             mKeyExport->Shutdown();
-            chip::Platform::Security::MemoryFree(mKeyExport);
+            chip::Platform::MemoryFree(mKeyExport);
             mKeyExport = NULL;
         }
         break;
@@ -3250,7 +3251,7 @@ void ChipSecurityManager::Reset(void)
         break;
     }
 
-    chip::Platform::Security::MemoryShutdown();
+    chip::Platform::MemoryShutdown();
 
     CancelSessionTimer();
 
