@@ -64,11 +64,23 @@ public:
     uint32_t GetSendMessageIndex() const { return mSendMessageIndex; }
     void IncrementSendMessageIndex() { mSendMessageIndex++; }
 
+    uint32_t GetPeerKeyID() const { return mPeerKeyID; }
+    void SetPeerKeyID(uint32_t id) { mPeerKeyID = id; }
+
+    uint32_t GetLocalKeyID() const { return mLocalKeyID; }
+    void SetLocalKeyID(uint32_t id) { mLocalKeyID = id; }
+
     uint64_t GetLastActivityTimeMs() const { return mLastActityTimeMs; }
     void SetLastActivityTimeMs(uint64_t value) { mLastActityTimeMs = value; }
 
     SecureSession & GetSecureSession() { return mSecureSession; }
     const SecureSession & GetSecureSession() const { return mSecureSession; }
+
+    bool IsInitialized()
+    {
+        return (mPeerAddress.IsInitialized() || mPeerNodeId != kUndefinedNodeId || mPeerKeyID != UINT32_MAX ||
+                mLocalKeyID != UINT32_MAX);
+    }
 
     /**
      *  Reset the connection state to a completely uninitialized status.
@@ -86,6 +98,8 @@ private:
     PeerAddress mPeerAddress;
     NodeId mPeerNodeId         = kUndefinedNodeId;
     uint32_t mSendMessageIndex = 0;
+    uint32_t mPeerKeyID        = UINT32_MAX;
+    uint32_t mLocalKeyID       = UINT32_MAX;
     uint64_t mLastActityTimeMs = 0;
     SecureSession mSecureSession;
 };
