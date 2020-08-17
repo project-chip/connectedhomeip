@@ -34,16 +34,17 @@
 #include <stdlib.h>
 
 #include <Profiles/common/CommonProfile.h>
-#include <SystemLayer/SystemStats.h>
-#include <SystemLayer/SystemTimer.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
+#include <message/CHIPExchangeMgr.h>
 #include <profiles/CHIPProfiles.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <support/FlagUtils.hpp>
 #include <support/RandUtils.h>
 #include <support/logging/CHIPLogging.h>
+#include <system/SystemStats.h>
+#include <system/SystemTimer.h>
 //#include <nestlabs/log/nllog.hpp>
 #undef nlLogError
 #define nlLogError(MSG, ...)
@@ -63,7 +64,7 @@ enum
     kFlagPeerRequestedAck =
         0x0040, /// When set, signifies that at least one message received on this exchange requested an acknowledgment.
                 /// This flag is read by the application to decide if it needs to request an acknowledgment for the
-                /// response message it is about to send. This flag can also indicate whether peer is using WRMP.
+                /// response message it is about to send. This flag can also indicate whether peer is using RMP.
     kFlagMsgRcvdFromPeer =
         0x0080, /// When set, signifies that at least one message has been received from peer on this exchange context.
     kFlagAutoReleaseKey        = 0x0100, /// Automatically release the message encryption key when the exchange context is freed.
@@ -234,11 +235,11 @@ bool ExchangeContext::ShouldDropAck(void) const
     return GetFlag(mFlags, static_cast<uint16_t>(kFlagDropAck));
 }
 
-static inline bool IsWRMPControlMessage(uint32_t profileId, uint8_t msgType)
+static inline bool IsRMPControlMessage(uint32_t profileId, uint8_t msgType)
 {
     return (profileId == chip::Profiles::kChipProfile_Common &&
-            (msgType == chip::Profiles::Common::kMsgType_WRMP_Throttle_Flow ||
-             msgType == chip::Profiles::Common::kMsgType_WRMP_Delayed_Delivery));
+            (msgType == chip::Profiles::Common::kMsgType_RMP_Throttle_Flow ||
+             msgType == chip::Profiles::Common::kMsgType_RMP_Delayed_Delivery));
 }
 #endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
@@ -455,7 +456,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
     }
 
     // Abort early if Throttle is already set;
-    VerifyOrExit(mWRMPThrottleTimeout == 0, err = CHIP_ERROR_SEND_THROTTLED);
+    VerifyOrExit(mRMPThrottleTimeout == 0, err = CHIP_ERROR_SEND_THROTTLED);
 
 #else // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
@@ -470,7 +471,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
 
     // Set the Message Protocol Version
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    if (sendFlags & kSendFlag_RequestAck || IsWRMPControlMessage(profileId, msgType) ||
+    if (sendFlags & kSendFlag_RequestAck || IsRMPControlMessage(profileId, msgType) ||
         (profileId == chip::Profiles::kChipProfile_Common && msgType == chip::Profiles::Common::kMsgType_Null))
     {
         if (kChipMessageVersion_Unspecified == mMsgProtocolVersion)
@@ -599,7 +600,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
             sendCalled = true;
             SuccessOrExit(err);
 
-            CHIP_FAULT_INJECT(FaultInjection::kFault_WRMDoubleTx, entry->nextRetransTime = 0; ExchangeMgr->WRMPStartTimer());
+            CHIP_FAULT_INJECT(FaultInjection::kFault_WRMDoubleTx, entry->nextRetransTime = 0; ExchangeMgr->RMPStartTimer());
         }
         else
 #endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
@@ -727,7 +728,7 @@ CHIP_ERROR ExchangeContext::EncodeExchHeader(ChipExchangeHeader * exchangeHeader
     // ExchangeId in the namespace of the SourceNodeId
     exchangeHeader->Flags = (IsInitiator() || (sendFlags & kSendFlag_FromInitiator)) ? kChipExchangeFlag_Initiator : 0;
 
-    // WRMP PreProcess Checks and Flag setting
+    // RMP PreProcess Checks and Flag setting
     if (mMsgProtocolVersion == kChipMessageVersion_V2)
     {
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
@@ -738,7 +739,7 @@ CHIP_ERROR ExchangeContext::EncodeExchHeader(ChipExchangeHeader * exchangeHeader
         if (HasPeerRequestedAck())
         {
             // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
-            ExchangeMgr->WRMPExpireTicks();
+            ExchangeMgr->RMPExpireTicks();
 
             exchangeHeader->Flags |= kChipExchangeFlag_AckId;
             exchangeHeader->AckMsgId = mPendingPeerAckId;
@@ -747,7 +748,7 @@ CHIP_ERROR ExchangeContext::EncodeExchHeader(ChipExchangeHeader * exchangeHeader
             SetAckPending(false);
 
             // Schedule next physical wakeup
-            ExchangeMgr->WRMPStartTimer();
+            ExchangeMgr->RMPStartTimer();
 
 #if defined(DEBUG)
             ChipLogProgress(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg", mPendingPeerAckId);
@@ -755,7 +756,7 @@ CHIP_ERROR ExchangeContext::EncodeExchHeader(ChipExchangeHeader * exchangeHeader
         }
 
         // Assert the flag if message requires an Ack back;
-        if ((sendFlags & kSendFlag_RequestAck) && !IsWRMPControlMessage(profileId, msgType))
+        if ((sendFlags & kSendFlag_RequestAck) && !IsRMPControlMessage(profileId, msgType))
         {
             exchangeHeader->Flags |= kChipExchangeFlag_NeedsAck;
         }
@@ -801,7 +802,7 @@ void ExchangeContext::DoClose(bool clearRetransTable)
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
-    ExchangeMgr->WRMPExpireTicks();
+    ExchangeMgr->RMPExpireTicks();
 
     OnThrottleRcvd = NULL;
     OnDDRcvd       = NULL;
@@ -809,7 +810,7 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     OnAckRcvd      = NULL;
 
     // Flush any pending WRM acks
-    WRMPFlushAcks();
+    RMPFlushAcks();
 
     // Clear the WRM retransmission table
     if (clearRetransTable)
@@ -818,7 +819,7 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     }
 
     // Schedule next physical wakeup
-    ExchangeMgr->WRMPStartTimer();
+    ExchangeMgr->RMPStartTimer();
 #endif
 
     // Cancel the trickle retransmission timer.
@@ -1152,11 +1153,11 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
 }
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-bool ExchangeContext::WRMPCheckAndRemRetransTable(uint32_t ackMsgId, void ** rCtxt)
+bool ExchangeContext::RMPCheckAndRemRetransTable(uint32_t ackMsgId, void ** rCtxt)
 {
     bool res = false;
 
-    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+    for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
         if ((ExchangeMgr->RetransTable[i].exchContext == this) && (ExchangeMgr->RetransTable[i].msgId == ackMsgId))
         {
@@ -1182,7 +1183,7 @@ bool ExchangeContext::WRMPCheckAndRemRetransTable(uint32_t ackMsgId, void ** rCt
 }
 
 // Flush the pending Ack
-CHIP_ERROR ExchangeContext::WRMPFlushAcks(void)
+CHIP_ERROR ExchangeContext::RMPFlushAcks(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -1212,7 +1213,7 @@ CHIP_ERROR ExchangeContext::WRMPFlushAcks(void)
  */
 uint32_t ExchangeContext::GetCurrentRetransmitTimeout(void)
 {
-    return (HasRcvdMsgFromPeer() ? mWRMPConfig.mActiveRetransTimeout : mWRMPConfig.mInitialRetransTimeout);
+    return (HasRcvdMsgFromPeer() ? mRMPConfig.mActiveRetransTimeout : mRMPConfig.mInitialRetransTimeout);
 }
 
 /**
@@ -1238,7 +1239,7 @@ uint32_t ExchangeContext::GetCurrentRetransmitTimeout(void)
  *                                                       network layer.
  *
  */
-CHIP_ERROR ExchangeContext::WRMPSendThrottleFlow(uint32_t pauseTimeMillis)
+CHIP_ERROR ExchangeContext::RMPSendThrottleFlow(uint32_t pauseTimeMillis)
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
     PacketBuffer * msgBuf = NULL;
@@ -1257,7 +1258,7 @@ CHIP_ERROR ExchangeContext::WRMPSendThrottleFlow(uint32_t pauseTimeMillis)
     // Send a Throttle Flow message to the peer.  Throttle Flow messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = SendMessage(Profiles::kChipProfile_Common, Profiles::Common::kMsgType_WRMP_Throttle_Flow, msgBuf,
+    err = SendMessage(Profiles::kChipProfile_Common, Profiles::Common::kMsgType_RMP_Throttle_Flow, msgBuf,
                       kSendFlag_NoAutoRequestAck);
 
 exit:
@@ -1294,7 +1295,7 @@ exit:
  *                                                       network layer.
  *
  */
-CHIP_ERROR ExchangeContext::WRMPSendDelayedDelivery(uint32_t pauseTimeMillis, uint64_t delayedNodeId)
+CHIP_ERROR ExchangeContext::RMPSendDelayedDelivery(uint32_t pauseTimeMillis, uint64_t delayedNodeId)
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
     PacketBuffer * msgBuf = NULL;
@@ -1315,7 +1316,7 @@ CHIP_ERROR ExchangeContext::WRMPSendDelayedDelivery(uint32_t pauseTimeMillis, ui
     // Send a Delayed Delivery message to the peer.  Delayed Delivery messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = SendMessage(Profiles::kChipProfile_Common, Profiles::Common::kMsgType_WRMP_Delayed_Delivery, msgBuf,
+    err = SendMessage(Profiles::kChipProfile_Common, Profiles::Common::kMsgType_RMP_Delayed_Delivery, msgBuf,
                       kSendFlag_NoAutoRequestAck);
 
 exit:
@@ -1339,13 +1340,13 @@ exit:
  *  @retval  #CHIP_NO_ERROR                             if the context was removed.
  *
  */
-CHIP_ERROR ExchangeContext::WRMPHandleRcvdAck(const ChipExchangeHeader * exchHeader, const ChipMessageInfo * msgInfo)
+CHIP_ERROR ExchangeContext::RMPHandleRcvdAck(const ChipExchangeHeader * exchHeader, const ChipMessageInfo * msgInfo)
 {
     void * msgCtxt = NULL;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Msg is an Ack; Check Retrans Table and remove message context
-    if (!WRMPCheckAndRemRetransTable(exchHeader->AckMsgId, &msgCtxt))
+    if (!RMPCheckAndRemRetransTable(exchHeader->AckMsgId, &msgCtxt))
     {
 #if defined(DEBUG)
         ChipLogError(ExchangeManager, "CHIP MsgId:%08" PRIX32 " not in RetransTable", exchHeader->AckMsgId);
@@ -1372,12 +1373,12 @@ CHIP_ERROR ExchangeContext::WRMPHandleRcvdAck(const ChipExchangeHeader * exchHea
     return err;
 }
 
-CHIP_ERROR ExchangeContext::WRMPHandleNeedsAck(const ChipMessageInfo * msgInfo)
+CHIP_ERROR ExchangeContext::RMPHandleNeedsAck(const ChipMessageInfo * msgInfo)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
-    ExchangeMgr->WRMPExpireTicks();
+    ExchangeMgr->RMPExpireTicks();
 
     // If the message IS a duplicate.
     if (msgInfo->Flags & kChipMessageFlag_DuplicateMessage)
@@ -1423,38 +1424,38 @@ CHIP_ERROR ExchangeContext::WRMPHandleNeedsAck(const ChipMessageInfo * msgInfo)
 
         // Replace the Pending ack id.
         mPendingPeerAckId = msgInfo->MessageId;
-        mWRMPNextAckTime  = ExchangeMgr->GetTickCounterFromTimeDelta(
-            mWRMPConfig.mAckPiggybackTimeout + System::Timer::GetCurrentEpoch(), ExchangeMgr->mWRMPTimeStampBase);
+        mRMPNextAckTime   = ExchangeMgr->GetTickCounterFromTimeDelta(
+            mRMPConfig.mAckPiggybackTimeout + System::Timer::GetCurrentEpoch(), ExchangeMgr->mRMPTimeStampBase);
         SetAckPending(true);
     }
 
 exit:
     // Schedule next physical wakeup
-    ExchangeMgr->WRMPStartTimer();
+    ExchangeMgr->RMPStartTimer();
     return err;
 }
 
 CHIP_ERROR ExchangeContext::HandleThrottleFlow(uint32_t PauseTimeMillis)
 {
     // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
-    ExchangeMgr->WRMPExpireTicks();
+    ExchangeMgr->RMPExpireTicks();
 
     // Flow Control Message Received; Adjust Throttle timeout accordingly.
     // A PauseTimeMillis of zero indicates that peer is unthrottling this Exchange.
 
     if (0 != PauseTimeMillis)
     {
-        mWRMPThrottleTimeout = ExchangeMgr->GetTickCounterFromTimeDelta((System::Timer::GetCurrentEpoch() + PauseTimeMillis),
-                                                                        ExchangeMgr->mWRMPTimeStampBase);
+        mRMPThrottleTimeout = ExchangeMgr->GetTickCounterFromTimeDelta((System::Timer::GetCurrentEpoch() + PauseTimeMillis),
+                                                                       ExchangeMgr->mRMPTimeStampBase);
     }
     else
     {
-        mWRMPThrottleTimeout = 0;
+        mRMPThrottleTimeout = 0;
     }
 
     // Go through the retrans table entries for that node and adjust the timer.
 
-    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+    for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
         // Check if ExchangeContext matches
 
@@ -1463,7 +1464,7 @@ CHIP_ERROR ExchangeContext::HandleThrottleFlow(uint32_t PauseTimeMillis)
             // Adjust the retrans timer value to account for throttling.
             if (0 != PauseTimeMillis)
             {
-                ExchangeMgr->RetransTable[i].nextRetransTime += PauseTimeMillis / ExchangeMgr->mWRMPTimerInterval;
+                ExchangeMgr->RetransTable[i].nextRetransTime += PauseTimeMillis / ExchangeMgr->mRMPTimerInterval;
             }
             // UnThrottle when PauseTimeMillis is set to 0
             else
@@ -1485,7 +1486,7 @@ CHIP_ERROR ExchangeContext::HandleThrottleFlow(uint32_t PauseTimeMillis)
     }
 
     // Schedule next physical wakeup
-    ExchangeMgr->WRMPStartTimer();
+    ExchangeMgr->RMPStartTimer();
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
@@ -1538,7 +1539,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo * msgInfo, const ChipE
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         if (exchHeader->Flags & kChipExchangeFlag_AckId)
         {
-            err = WRMPHandleRcvdAck(exchHeader, msgInfo);
+            err = RMPHandleRcvdAck(exchHeader, msgInfo);
         }
         if (exchHeader->Flags & kChipExchangeFlag_NeedsAck)
         {
@@ -1550,7 +1551,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo * msgInfo, const ChipE
 
             if (!ShouldDropAck())
             {
-                err = WRMPHandleNeedsAck(msgInfo);
+                err = RMPHandleNeedsAck(msgInfo);
             }
         }
 #endif
@@ -1564,7 +1565,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo * msgInfo, const ChipE
 
     // Received Flow Throttle
     if (exchHeader->ProfileId == chip::Profiles::kChipProfile_Common &&
-        exchHeader->MessageType == chip::Profiles::Common::kMsgType_WRMP_Throttle_Flow)
+        exchHeader->MessageType == chip::Profiles::Common::kMsgType_RMP_Throttle_Flow)
     {
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         // Extract PauseTimeMillis from msgBuf
