@@ -80,17 +80,21 @@ void TestFindByAddress(nlTestSuite * inSuite, void * inContext)
     PeerConnectionState * statePtr;
     PeerConnections<2, Time::Source::kTest> connections;
 
-    err = connections.CreateNewPeerConnectionState(kPeer1Addr, nullptr);
+    PeerConnectionState * state1 = nullptr;
+    PeerConnectionState * state2 = nullptr;
+
+    err = connections.CreateNewPeerConnectionState(kPeer1Addr, &state1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = connections.CreateNewPeerConnectionState(kPeer2Addr, nullptr);
+    err = connections.CreateNewPeerConnectionState(kPeer2Addr, &state2);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, state1 != state2);
 
     NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(kPeer1Addr, &statePtr));
     NL_TEST_ASSERT(inSuite, statePtr->GetPeerAddress() == kPeer1Addr);
     NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(kPeer2Addr, &statePtr));
     NL_TEST_ASSERT(inSuite, statePtr->GetPeerAddress() == kPeer2Addr);
-
     NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer3Addr, &statePtr));
     NL_TEST_ASSERT(inSuite, statePtr == nullptr);
 }
