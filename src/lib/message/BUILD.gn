@@ -29,6 +29,7 @@ static_library("message") {
     "CHIPBinding.cpp",
     "CHIPBinding.h",
     "CHIPConnection.cpp",
+    "CHIPExchangeContext.cpp",
     "CHIPExchangeMgr.cpp",
     "CHIPExchangeMgr.h",
     "CHIPFabricState.cpp",
