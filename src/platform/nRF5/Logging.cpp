@@ -221,6 +221,12 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
             NRF_LOG_DEBUG("%s", NRF_LOG_PUSH(formattedMsg));
             break;
         }
+
+#if configCHECK_FOR_STACK_OVERFLOW
+        // Force a stack overflow check.
+        if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+            taskYIELD();
+#endif
     }
 
     // Let the application know that a log message has been emitted.
