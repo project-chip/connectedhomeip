@@ -150,7 +150,7 @@ int main(void)
 #endif
 
     NRF_LOG_INFO("==================================================");
-    NRF_LOG_INFO("chip-nrf52840-lock-example starting");
+    NRF_LOG_INFO("chip-nrf52840-lighting-example starting");
 #if BUILD_RELEASE
     NRF_LOG_INFO("*** PSEUDO-RELEASE BUILD ***");
 #else
