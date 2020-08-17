@@ -37,6 +37,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <message/CHIPExchangeMgr.h>
+#include <message/SecurityMgr.h>
 #include <profiles/CHIPProfiles.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
@@ -449,7 +450,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
         sendFlags |= kSendFlag_RequestAck;
     }
 
-    // Do not allow WRM to be used over a TCP connection
+    // Do not allow RMP to be used over a TCP connection
     if ((sendFlags & kSendFlag_RequestAck) && Con != NULL)
     {
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -501,7 +502,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
     // flag validation
     if (sendFlags & kSendFlag_RetransmissionTrickle)
     {
-        // We do not allow WRM to be used when Trickle retransmission is requested
+        // We do not allow RMP to be used when Trickle retransmission is requested
         if (sendFlags & kSendFlag_RequestAck)
         {
             ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -600,7 +601,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
             sendCalled = true;
             SuccessOrExit(err);
 
-            CHIP_FAULT_INJECT(FaultInjection::kFault_WRMDoubleTx, entry->nextRetransTime = 0; ExchangeMgr->RMPStartTimer());
+            CHIP_FAULT_INJECT(FaultInjection::kFault_RMPDoubleTx, entry->nextRetransTime = 0; ExchangeMgr->RMPStartTimer());
         }
         else
 #endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
@@ -809,10 +810,10 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     OnSendError    = NULL;
     OnAckRcvd      = NULL;
 
-    // Flush any pending WRM acks
+    // Flush any pending RMP acks
     RMPFlushAcks();
 
-    // Clear the WRM retransmission table
+    // Clear the RMP retransmission table
     if (clearRetransTable)
     {
         ExchangeMgr->ClearRetransmitTable(this);
