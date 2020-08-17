@@ -110,7 +110,7 @@ public:
      *
      * @param msgBuf the new message that should be sent to the peer
      */
-    virtual CHIP_ERROR OnNewMessageForPeer(System::PacketBuffer * msgBuf);
+    virtual CHIP_ERROR OnNewMessageForPeer(System::PacketBuffer * msgBuf) override;
 
     /**
      * @brief
@@ -118,14 +118,14 @@ public:
      *
      * @param error error code
      */
-    virtual void OnPairingError(CHIP_ERROR error);
+    virtual void OnPairingError(CHIP_ERROR error) override;
 
     /**
      * @brief
      *   Called when the pairing is complete and the new secure session has been established
      *
      */
-    virtual void OnPairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId);
+    virtual void OnPairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId) override;
 
     /**
      * @brief
