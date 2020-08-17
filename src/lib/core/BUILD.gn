@@ -122,7 +122,6 @@ source_set("chip_config_header") {
     "CHIPConfig.h",
     "CHIPEventLoggingConfig.h",
     "CHIPTimeConfig.h",
-    "CHIPTunnelConfig.h",
   ]
 
   public_configs = [ ":chip_config" ]

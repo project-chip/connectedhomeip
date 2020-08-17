@@ -49,7 +49,6 @@ CHIP_BUILD_CORE_LAYER_HEADER_FILES                        = \
     @top_builddir@/src/lib/core/CHIPTLVTypes.h              \
     @top_builddir@/src/lib/core/CHIPTLVUtilities.hpp        \
     @top_builddir@/src/lib/core/CHIPTimeConfig.h            \
-    @top_builddir@/src/lib/core/CHIPTunnelConfig.h          \
     @top_builddir@/src/lib/core/CHIPKeyIds.h                \
     @top_builddir@/src/lib/core/Optional.h                  \
     @top_builddir@/src/lib/core/ReferenceCounted.h          \

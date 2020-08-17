@@ -50,6 +50,7 @@ extern "C" {
 #endif // NRF_LOG_ENABLED
 
 #include "chipinit.h"
+#include "nrf528xx/app/support/FreeRTOSNewlibLockSupport_test.h"
 #include <AppTask.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -149,7 +150,7 @@ int main(void)
 #endif
 
     NRF_LOG_INFO("==================================================");
-    NRF_LOG_INFO("chip-nrf52840-lock-example starting");
+    NRF_LOG_INFO("chip-nrf52840-lighting-example starting");
 #if BUILD_RELEASE
     NRF_LOG_INFO("*** PSEUDO-RELEASE BUILD ***");
 #else
@@ -157,6 +158,11 @@ int main(void)
 #endif
     NRF_LOG_INFO("==================================================");
     NRF_LOG_FLUSH();
+
+#ifndef NDEBUG
+    // TODO: Move this into a standalone test.
+    freertos_newlib_lock_test();
+#endif
 
 #if defined(SOFTDEVICE_PRESENT) && SOFTDEVICE_PRESENT
 

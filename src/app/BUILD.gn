@@ -27,28 +27,24 @@ static_library("common") {
   output_name = "libCHIPDataModelCommon"
 
   sources = [
-    "chip-zcl-zpro/command-encoder/encoder.c",
     "chip-zcl-zpro/command-encoder/decoder.c",
+    "chip-zcl-zpro/command-encoder/encoder.c",
   ]
 
   public_deps = [
+    ":codec_headers",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/system",
-    ":codec_headers",
   ]
 
   public_configs = [ ":app_config" ]
 }
 
-static_library("chip") {
-  output_name = "libCHIPDataModel"
-
+group("chip") {
   public_deps = [ ":common" ]
 }
 
-static_library("mock") {
-  output_name = "libCHIPDataModelMock"
-
+group("mock") {
   public_deps = [ ":common" ]
 }
 

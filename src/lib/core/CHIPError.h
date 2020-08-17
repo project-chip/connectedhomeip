@@ -1125,33 +1125,6 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
 #define CHIP_ERROR_INVALID_FABRIC_ID                           _CHIP_ERROR(113)
 
 /**
- *  @def CHIP_ERROR_UNSUPPORTED_TUNNEL_VERSION
- *
- *  @brief
- *    A tunnel version is unsupported.
- *
- */
-#define CHIP_ERROR_UNSUPPORTED_TUNNEL_VERSION                  _CHIP_ERROR(114)
-
-/**
- *  @def CHIP_ERROR_TUNNEL_NEXTHOP_TABLE_FULL
- *
- *  @brief
- *    A tunnel nexthop table is full.
- *
- */
-#define CHIP_ERROR_TUNNEL_NEXTHOP_TABLE_FULL                   _CHIP_ERROR(115)
-
-/**
- *  @def CHIP_ERROR_TUNNEL_SERVICE_QUEUE_FULL
- *
- *  @brief
- *    A tunnel service queue is full.
- *
- */
-#define CHIP_ERROR_TUNNEL_SERVICE_QUEUE_FULL                   _CHIP_ERROR(116)
-
-/**
  *  @def CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED
  *
  *  @brief
@@ -1314,22 +1287,13 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
 #define CHIP_ERROR_INVALID_TIME                                _CHIP_ERROR(134)
 
 /**
- *  @def CHIP_ERROR_TUNNEL_PEER_ENTRY_NOT_FOUND
- *
- *  @brief
- *    A tunnel shortcut peer entry not found in the cache.
- *
- */
-#define CHIP_ERROR_TUNNEL_PEER_ENTRY_NOT_FOUND                 _CHIP_ERROR(135)
-
-/**
  *  @def CHIP_ERROR_LOCKING_FAILURE
  *
  *  @brief
  *    Failure to acquire or release an OS provided mutex.
  *
  */
-#define CHIP_ERROR_LOCKING_FAILURE                             _CHIP_ERROR(136)
+#define CHIP_ERROR_LOCKING_FAILURE                             _CHIP_ERROR(135)
 
 /**
  *  @def CHIP_ERROR_UNSUPPORTED_PASSCODE_CONFIG
@@ -1338,7 +1302,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    A passcode encryption configuration is unsupported.
  *
  */
-#define CHIP_ERROR_UNSUPPORTED_PASSCODE_CONFIG                 _CHIP_ERROR(137)
+#define CHIP_ERROR_UNSUPPORTED_PASSCODE_CONFIG                 _CHIP_ERROR(136)
 
 /**
  *  @def CHIP_ERROR_PASSCODE_AUTHENTICATION_FAILED
@@ -1347,7 +1311,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    The CHIP passcode authentication failed.
  *
  */
-#define CHIP_ERROR_PASSCODE_AUTHENTICATION_FAILED              _CHIP_ERROR(138)
+#define CHIP_ERROR_PASSCODE_AUTHENTICATION_FAILED              _CHIP_ERROR(137)
 
 /**
  *  @def CHIP_ERROR_PASSCODE_FINGERPRINT_FAILED
@@ -1356,18 +1320,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    The CHIP passcode fingerprint failed.
  *
  */
-#define CHIP_ERROR_PASSCODE_FINGERPRINT_FAILED                 _CHIP_ERROR(139)
-
-/**
- *  @def CHIP_ERROR_TUNNEL_FORCE_ABORT
- *
- *  @brief
- *    The CHIP error code to be used with the API for stopping
- *    the tunnel to enforce it to abort its TCP connection and return
- *    synchronously to the caller.
- *
- */
-#define CHIP_ERROR_TUNNEL_FORCE_ABORT                          _CHIP_ERROR(140)
+#define CHIP_ERROR_PASSCODE_FINGERPRINT_FAILED                 _CHIP_ERROR(138)
 
 /**
  *  @def CHIP_ERROR_SERIALIZATION_ELEMENT_NULL
@@ -1376,7 +1329,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *      The element of the struct is null.
  *
  */
-#define CHIP_ERROR_SERIALIZATION_ELEMENT_NULL                  _CHIP_ERROR(141)
+#define CHIP_ERROR_SERIALIZATION_ELEMENT_NULL                  _CHIP_ERROR(139)
 
 /**
  *  @def CHIP_ERROR_WRONG_CERT_SIGNATURE_ALGORITHM
@@ -1385,7 +1338,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    The certificate was not signed using the required signature algorithm.
  *
  */
-#define CHIP_ERROR_WRONG_CERT_SIGNATURE_ALGORITHM              _CHIP_ERROR(142)
+#define CHIP_ERROR_WRONG_CERT_SIGNATURE_ALGORITHM              _CHIP_ERROR(140)
 
 /**
  *  @def CHIP_ERROR_WRONG_CHIP_SIGNATURE_ALGORITHM
@@ -1394,7 +1347,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    The CHIP signature was not signed using the required signature algorithm.
  *
  */
-#define CHIP_ERROR_WRONG_CHIP_SIGNATURE_ALGORITHM             _CHIP_ERROR(143)
+#define CHIP_ERROR_WRONG_CHIP_SIGNATURE_ALGORITHM             _CHIP_ERROR(141)
 
 /**
  *  @def CHIP_ERROR_SCHEMA_MISMATCH
@@ -1403,7 +1356,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    A mismatch in schema was encountered.
  *
  */
-#define CHIP_ERROR_SCHEMA_MISMATCH                            _CHIP_ERROR(144)
+#define CHIP_ERROR_SCHEMA_MISMATCH                            _CHIP_ERROR(142)
 
 /**
  *  @def CHIP_ERROR_INVALID_INTEGER_VALUE
@@ -1412,7 +1365,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    An integer does not have the kind of value we expect.
  *
  */
-#define CHIP_ERROR_INVALID_INTEGER_VALUE                       _CHIP_ERROR(145)
+#define CHIP_ERROR_INVALID_INTEGER_VALUE                       _CHIP_ERROR(143)
 
 /**
  *  @def CHIP_ERROR_CASE_RECONFIG_REQUIRED
@@ -1421,7 +1374,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    CASE is required to reconfigure.
  *
  */
-#define CHIP_ERROR_CASE_RECONFIG_REQUIRED                      _CHIP_ERROR(146)
+#define CHIP_ERROR_CASE_RECONFIG_REQUIRED                      _CHIP_ERROR(144)
 
 /**
  *  @def CHIP_ERROR_TOO_MANY_CASE_RECONFIGURATIONS
@@ -1430,7 +1383,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    Too many CASE reconfigurations were received.
  *
  */
-#define CHIP_ERROR_TOO_MANY_CASE_RECONFIGURATIONS              _CHIP_ERROR(147)
+#define CHIP_ERROR_TOO_MANY_CASE_RECONFIGURATIONS              _CHIP_ERROR(145)
 
 /**
  *  @def CHIP_ERROR_BAD_REQUEST
@@ -1439,7 +1392,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    The request cannot be processed or fulfilled
  *
  */
-#define CHIP_ERROR_BAD_REQUEST                                 _CHIP_ERROR(148)
+#define CHIP_ERROR_BAD_REQUEST                                 _CHIP_ERROR(146)
 
 /**
  *  @def CHIP_ERROR_INVALID_MESSAGE_FLAG
@@ -1448,7 +1401,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    One or more message flags have invalid value.
  *
  */
-#define CHIP_ERROR_INVALID_MESSAGE_FLAG                        _CHIP_ERROR(149)
+#define CHIP_ERROR_INVALID_MESSAGE_FLAG                        _CHIP_ERROR(147)
 
 /**
  *  @def CHIP_ERROR_KEY_EXPORT_RECONFIGURE_REQUIRED
@@ -1457,7 +1410,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    Key export protocol required to reconfigure.
  *
  */
-#define CHIP_ERROR_KEY_EXPORT_RECONFIGURE_REQUIRED             _CHIP_ERROR(150)
+#define CHIP_ERROR_KEY_EXPORT_RECONFIGURE_REQUIRED             _CHIP_ERROR(148)
 
 /**
  *  @def CHIP_ERROR_INVALID_KEY_EXPORT_CONFIGURATION
@@ -1466,7 +1419,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    A key export protocol configuration is invalid.
  *
  */
-#define CHIP_ERROR_INVALID_KEY_EXPORT_CONFIGURATION            _CHIP_ERROR(151)
+#define CHIP_ERROR_INVALID_KEY_EXPORT_CONFIGURATION            _CHIP_ERROR(149)
 
 /**
  *  @def CHIP_ERROR_NO_COMMON_KEY_EXPORT_CONFIGURATIONS
@@ -1475,7 +1428,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    No key export protocol configuration is in common.
  *
  */
-#define CHIP_ERROR_NO_COMMON_KEY_EXPORT_CONFIGURATIONS         _CHIP_ERROR(152)
+#define CHIP_ERROR_NO_COMMON_KEY_EXPORT_CONFIGURATIONS         _CHIP_ERROR(150)
 
 /**
  *  @def CHIP_ERROR_NO_KEY_EXPORT_DELEGATE
@@ -1484,7 +1437,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    No key export delegate is set.
  *
  */
-#define CHIP_ERROR_NO_KEY_EXPORT_DELEGATE                      _CHIP_ERROR(153)
+#define CHIP_ERROR_NO_KEY_EXPORT_DELEGATE                      _CHIP_ERROR(151)
 
 /**
  *  @def CHIP_ERROR_UNAUTHORIZED_KEY_EXPORT_REQUEST
@@ -1493,7 +1446,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    Unauthorized key export request.
  *
  */
-#define CHIP_ERROR_UNAUTHORIZED_KEY_EXPORT_REQUEST             _CHIP_ERROR(154)
+#define CHIP_ERROR_UNAUTHORIZED_KEY_EXPORT_REQUEST             _CHIP_ERROR(152)
 
 /**
  *  @def CHIP_ERROR_UNAUTHORIZED_KEY_EXPORT_RESPONSE
@@ -1502,7 +1455,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    Unauthorized key export response.
  *
  */
-#define CHIP_ERROR_UNAUTHORIZED_KEY_EXPORT_RESPONSE            _CHIP_ERROR(155)
+#define CHIP_ERROR_UNAUTHORIZED_KEY_EXPORT_RESPONSE            _CHIP_ERROR(153)
 
 /**
  *  @def CHIP_ERROR_EXPORTED_KEY_AUTHENTICATION_FAILED
@@ -1511,7 +1464,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    The CHIP exported encrypted key authentication failed.
  *
  */
-#define CHIP_ERROR_EXPORTED_KEY_AUTHENTICATION_FAILED          _CHIP_ERROR(156)
+#define CHIP_ERROR_EXPORTED_KEY_AUTHENTICATION_FAILED          _CHIP_ERROR(154)
 
 /**
  *  @def CHIP_ERROR_TOO_MANY_SHARED_SESSION_END_NODES
@@ -1521,7 +1474,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    the maximum limit.
  *
  */
-#define CHIP_ERROR_TOO_MANY_SHARED_SESSION_END_NODES           _CHIP_ERROR(157)
+#define CHIP_ERROR_TOO_MANY_SHARED_SESSION_END_NODES           _CHIP_ERROR(155)
 
 /**
  * @def CHIP_ERROR_MALFORMED_DATA_ELEMENT
@@ -1531,7 +1484,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *   the required elements, or it contais both the MergeData element
  *   and DeletedDictionaryKeyList.
  */
-#define CHIP_ERROR_MALFORMED_DATA_ELEMENT                       _CHIP_ERROR(158)
+#define CHIP_ERROR_MALFORMED_DATA_ELEMENT                      _CHIP_ERROR(156)
 
 /**
  * @def CHIP_ERROR_WRONG_CERT_TYPE
@@ -1539,7 +1492,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  * @brief
  *   The presented certificate was of the wrong type.
  */
-#define CHIP_ERROR_WRONG_CERT_TYPE                              _CHIP_ERROR(159)
+#define CHIP_ERROR_WRONG_CERT_TYPE                             _CHIP_ERROR(157)
 
 /**
  * @def CHIP_ERROR_DEFAULT_EVENT_HANDLER_NOT_CALLED
@@ -1548,7 +1501,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *   The application's event handler failed to call the default event handler function
  *   when presented with an unknown event.
  */
-#define CHIP_ERROR_DEFAULT_EVENT_HANDLER_NOT_CALLED            _CHIP_ERROR(162)
+#define CHIP_ERROR_DEFAULT_EVENT_HANDLER_NOT_CALLED            _CHIP_ERROR(158)
 
 /**
  *  @def CHIP_ERROR_PERSISTED_STORAGE_FAILED
@@ -1557,7 +1510,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    Persisted storage memory read/write failure.
  *
  */
-#define CHIP_ERROR_PERSISTED_STORAGE_FAILED                     _CHIP_ERROR(163)
+#define CHIP_ERROR_PERSISTED_STORAGE_FAILED                    _CHIP_ERROR(159)
 
 /**
  *  @def CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND
@@ -1566,7 +1519,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    The specific value is not found in the persisted storage.
  *
  */
-#define CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND           _CHIP_ERROR(164)
+#define CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND           _CHIP_ERROR(160)
 
 /**
  *  @def CHIP_ERROR_PROFILE_STRING_CONTEXT_ALREADY_REGISTERED
@@ -1575,7 +1528,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    The specified profile string support context is already registered.
  *
  */
-#define CHIP_ERROR_PROFILE_STRING_CONTEXT_ALREADY_REGISTERED   _CHIP_ERROR(165)
+#define CHIP_ERROR_PROFILE_STRING_CONTEXT_ALREADY_REGISTERED   _CHIP_ERROR(161)
 
 /**
  *  @def CHIP_ERROR_PROFILE_STRING_CONTEXT_NOT_REGISTERED
@@ -1584,7 +1537,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    The specified profile string support context is not registered.
  *
  */
-#define CHIP_ERROR_PROFILE_STRING_CONTEXT_NOT_REGISTERED       _CHIP_ERROR(166)
+#define CHIP_ERROR_PROFILE_STRING_CONTEXT_NOT_REGISTERED       _CHIP_ERROR(162)
 
 /**
  *  @def CHIP_ERROR_INCOMPATIBLE_SCHEMA_VERSION
@@ -1592,25 +1545,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *  @brief
  *    Encountered a mismatch in compatibility w.r.t to IDL schema version
  */
-#define CHIP_ERROR_INCOMPATIBLE_SCHEMA_VERSION                 _CHIP_ERROR(167)
-
-/**
- *  @def CHIP_ERROR_TUNNEL_ROUTING_RESTRICTED
- *
- *  @brief
- *    Indicates that the Tunnel can only be used by the border gateway
- *    for itself and, it cannot forward packets for any other device.
- *
- */
-#define CHIP_ERROR_TUNNEL_ROUTING_RESTRICTED                   _CHIP_ERROR(168)
-
-/**
- *  @def CHIP_ERROR_TUNNEL_RESET_RECONNECT_ALREADY_ARMED
- *
- *  @brief
- *    The Tunnel reset reconnect timer is already armed
- */
-#define CHIP_ERROR_TUNNEL_RESET_RECONNECT_ALREADY_ARMED        _CHIP_ERROR(169)
+#define CHIP_ERROR_INCOMPATIBLE_SCHEMA_VERSION                 _CHIP_ERROR(163)
 
 /**
  *  @def CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION
@@ -1618,7 +1553,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *  @brief
  *    Encountered a mismatch between update required version and current version
  */
-#define CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION            _CHIP_ERROR(170)
+#define CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION            _CHIP_ERROR(164)
 
 
 /**
@@ -1627,7 +1562,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *  @brief
  *    The CHIP message is not granted access for further processing.
  */
-#define CHIP_ERROR_ACCESS_DENIED                               _CHIP_ERROR(173)
+#define CHIP_ERROR_ACCESS_DENIED                               _CHIP_ERROR(165)
 
 /**
  *  @def CHIP_ERROR_UNKNOWN_RESOURCE_ID
@@ -1636,7 +1571,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    Unknown resource ID
  *
  */
-#define CHIP_ERROR_UNKNOWN_RESOURCE_ID                          _CHIP_ERROR(174)
+#define CHIP_ERROR_UNKNOWN_RESOURCE_ID                         _CHIP_ERROR(166)
 
 /**
  * @def CHIP_ERROR_VERSION_MISMATCH
@@ -1646,7 +1581,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *   because the local changes are based on an obsolete version of the
  *   data.
  */
-#define CHIP_ERROR_VERSION_MISMATCH                         _CHIP_ERROR(176)
+#define CHIP_ERROR_VERSION_MISMATCH                            _CHIP_ERROR(167)
 
 /**
  *  @def CHIP_ERROR_UNSUPPORTED_THREAD_NETWORK_CREATE
@@ -1657,7 +1592,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    together with CHIP Fabric using CrateFabric() message.
  *
  */
-#define CHIP_ERROR_UNSUPPORTED_THREAD_NETWORK_CREATE            _CHIP_ERROR(178)
+#define CHIP_ERROR_UNSUPPORTED_THREAD_NETWORK_CREATE           _CHIP_ERROR(168)
 
 /**
  *  @def CHIP_ERROR_INCONSISTENT_CONDITIONALITY
@@ -1668,7 +1603,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    same Trait Instance.
  *
  */
-#define CHIP_ERROR_INCONSISTENT_CONDITIONALITY                  _CHIP_ERROR(179)
+#define CHIP_ERROR_INCONSISTENT_CONDITIONALITY                 _CHIP_ERROR(169)
 
 /**
  *  @def CHIP_ERROR_LOCAL_DATA_INCONSISTENT
@@ -1678,7 +1613,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    Trait Instance and cannot support the operation requested.
  *
  */
-#define CHIP_ERROR_LOCAL_DATA_INCONSISTENT                      _CHIP_ERROR(180)
+#define CHIP_ERROR_LOCAL_DATA_INCONSISTENT                     _CHIP_ERROR(170)
 
 /**
  * @def CHIP_EVENT_ID_FOUND
@@ -1686,7 +1621,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  * @brief
  *   Event ID matching the criteria was found
  */
-#define CHIP_EVENT_ID_FOUND                                     _CHIP_ERROR(182)
+#define CHIP_EVENT_ID_FOUND                                    _CHIP_ERROR(171)
 
 /**
  * @def CHIP_ERROR_INTERNAL
@@ -1694,7 +1629,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  * @brief
  *   Internal error
  */
-#define CHIP_ERROR_INTERNAL                                     _CHIP_ERROR(183)
+#define CHIP_ERROR_INTERNAL                                    _CHIP_ERROR(172)
 
 /**
  * @def CHIP_ERROR_OPEN_FAILED
@@ -1702,7 +1637,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  * @brief
  *   Open file failed
  */
-#define CHIP_ERROR_OPEN_FAILED                                  _CHIP_ERROR(184)
+#define CHIP_ERROR_OPEN_FAILED                                 _CHIP_ERROR(173)
 
 /**
  * @def CHIP_ERROR_READ_FAILED
@@ -1710,7 +1645,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  * @brief
  *   Read from file failed
  */
-#define CHIP_ERROR_READ_FAILED                                  _CHIP_ERROR(185)
+#define CHIP_ERROR_READ_FAILED                                 _CHIP_ERROR(174)
 
 /**
  * @def CHIP_ERROR_WRITE_FAILED
@@ -1718,7 +1653,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  * @brief
  *   Write to file failed
  */
-#define CHIP_ERROR_WRITE_FAILED                                 _CHIP_ERROR(186)
+#define CHIP_ERROR_WRITE_FAILED                                _CHIP_ERROR(175)
 
 /**
  * @def CHIP_ERROR_DECODE_FAILED
@@ -1726,7 +1661,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  * @brief
  *   Decoding failed
  */
-#define CHIP_ERROR_DECODE_FAILED                                _CHIP_ERROR(187)
+#define CHIP_ERROR_DECODE_FAILED                               _CHIP_ERROR(176)
 
 
 /**
@@ -1736,7 +1671,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    Use of the identified session key is suspended.
  *
  */
-#define CHIP_ERROR_SESSION_KEY_SUSPENDED                        _CHIP_ERROR(188)
+#define CHIP_ERROR_SESSION_KEY_SUSPENDED                       _CHIP_ERROR(177)
 
 /**
  *  @def CHIP_ERROR_UNSUPPORTED_WIRELESS_REGULATORY_DOMAIN
@@ -1745,7 +1680,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    The specified wireless regulatory domain is unsupported.
  *
  */
-#define CHIP_ERROR_UNSUPPORTED_WIRELESS_REGULATORY_DOMAIN       _CHIP_ERROR(189)
+#define CHIP_ERROR_UNSUPPORTED_WIRELESS_REGULATORY_DOMAIN      _CHIP_ERROR(178)
 
 /**
  *  @def CHIP_ERROR_UNSUPPORTED_WIRELESS_OPERATING_LOCATION
@@ -1754,7 +1689,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    The specified wireless operating location is unsupported.
  *
  */
-#define CHIP_ERROR_UNSUPPORTED_WIRELESS_OPERATING_LOCATION      _CHIP_ERROR(190)
+#define CHIP_ERROR_UNSUPPORTED_WIRELESS_OPERATING_LOCATION     _CHIP_ERROR(179)
 
 /**
  *  @}

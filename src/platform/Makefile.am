@@ -58,7 +58,6 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_BLE.ipp \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_NoBLE.h \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_NoThread.h \
-    @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_NoTunnel.h \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_NoWiFi.h \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_Thread.h \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_Thread.ipp \

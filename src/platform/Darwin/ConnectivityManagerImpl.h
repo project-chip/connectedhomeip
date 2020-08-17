@@ -31,7 +31,6 @@
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
-#include <platform/internal/GenericConnectivityManagerImpl_NoTunnel.h>
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 #include <support/FlagUtils.hpp>
 
@@ -48,7 +47,6 @@ namespace DeviceLayer {
  * Concrete implementation of the ConnectivityManager singleton object for Darwin platforms.
  */
 class ConnectivityManagerImpl final : public ConnectivityManager,
-                                      public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
                                       public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
 #else
@@ -60,7 +58,7 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>,
 #endif
                                       public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl>,
-                                      public Internal::GenericConnectivityManagerImpl_NoTunnel<ConnectivityManagerImpl>
+                                      public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>
 {
     // Allow the ConnectivityManager interface class to delegate method calls to
     // the implementation methods provided by this class.

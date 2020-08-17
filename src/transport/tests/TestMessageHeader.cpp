@@ -44,6 +44,7 @@ void TestHeaderInitialState(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !header.IsSecureSessionControlMsg());
     NL_TEST_ASSERT(inSuite, header.GetMessageId() == 0);
     NL_TEST_ASSERT(inSuite, header.GetProtocolID() == 0);
+    NL_TEST_ASSERT(inSuite, header.GetEncryptionKeyID() == 0);
     NL_TEST_ASSERT(inSuite, !header.GetDestinationNodeId().HasValue());
     NL_TEST_ASSERT(inSuite, !header.GetSourceNodeId().HasValue());
     NL_TEST_ASSERT(inSuite, !header.GetVendorId().HasValue());
@@ -127,14 +128,14 @@ void TestHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !header.GetVendorId().HasValue());
 
     header.SetMessageId(234).SetSourceNodeId(77).SetDestinationNodeId(88);
-    header.SetMessageType(112).SetExchangeID(2233).SetProtcolID(1221);
+    header.SetMessageType(112).SetExchangeID(2233).SetProtocolID(1221).SetEncryptionKeyID(2);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, sizeof(buffer), &encodeLen) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    header.EncodeEncryptedHeader(&buffer[encodeLen], sizeof(buffer) - encodeLen, &encodeLen) == CHIP_NO_ERROR);
 
     // change it to verify decoding
     header.SetMessageId(222).SetSourceNodeId(1).SetDestinationNodeId(2);
-    header.SetMessageType(221).SetExchangeID(3322).SetProtcolID(4567);
+    header.SetMessageType(221).SetExchangeID(3322).SetProtocolID(4567).SetEncryptionKeyID(3);
     NL_TEST_ASSERT(inSuite, header.Decode(buffer, sizeof(buffer), &decodeLen) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    header.DecodeEncryptedHeader(&buffer[decodeLen], sizeof(buffer) - decodeLen, &decodeLen) == CHIP_NO_ERROR);
@@ -144,10 +145,11 @@ void TestHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.GetMessageType() == 112);
     NL_TEST_ASSERT(inSuite, header.GetExchangeID() == 2233);
     NL_TEST_ASSERT(inSuite, header.GetProtocolID() == 1221);
+    NL_TEST_ASSERT(inSuite, header.GetEncryptionKeyID() == 2);
     NL_TEST_ASSERT(inSuite, !header.GetVendorId().HasValue());
 
     header.SetMessageId(234).SetSourceNodeId(77).SetDestinationNodeId(88);
-    header.SetMessageType(112).SetExchangeID(2233).SetProtcolID(1221);
+    header.SetMessageType(112).SetExchangeID(2233).SetProtocolID(1221);
     header.SetVendorId(6789);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, sizeof(buffer), &encodeLen) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
@@ -155,7 +157,7 @@ void TestHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
 
     // change it to verify decoding
     header.SetMessageId(222).SetSourceNodeId(1).SetDestinationNodeId(2);
-    header.SetMessageType(221).SetExchangeID(3322).SetProtcolID(4567);
+    header.SetMessageType(221).SetExchangeID(3322).SetProtocolID(4567);
     header.SetVendorId(8976);
     NL_TEST_ASSERT(inSuite, header.Decode(buffer, sizeof(buffer), &decodeLen) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,

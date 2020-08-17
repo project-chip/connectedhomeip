@@ -23,8 +23,8 @@
  *      for the CHIP Reliable Messaging Protocol.
  *
  */
-#ifndef CHIP_WRM_CONFIG_H_
-#define CHIP_WRM_CONFIG_H_
+#ifndef CHIP_RMP_CONFIG_H_
+#define CHIP_RMP_CONFIG_H_
 
 namespace chip {
 
@@ -34,7 +34,7 @@ namespace chip {
  *  @def CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
  *
  *  @brief
- *    If set to (1), use of the WRMP implementation is
+ *    If set to (1), use of the RMP implementation is
  *    enabled. Default value is (1) or enabled.
  *
  */
@@ -43,81 +43,81 @@ namespace chip {
 #endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
 /**
- *  @def CHIP_CONFIG_WRMP_TIMER_DEFAULT_PERIOD
+ *  @def CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD
  *
  *  @brief
- *    The default WRMP timer tick interval in milliseconds.
+ *    The default RMP timer tick interval in milliseconds.
  *
  */
-#ifndef CHIP_CONFIG_WRMP_TIMER_DEFAULT_PERIOD
-#define CHIP_CONFIG_WRMP_TIMER_DEFAULT_PERIOD              200
-#endif // CHIP_CONFIG_WRMP_TIMER_DEFAULT_PERIOD
+#ifndef CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD
+#define CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD              200
+#endif // CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD
 
 /**
- *  @def CHIP_CONFIG_WRMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT
+ *  @def CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT
  *
  *  @brief
  *    The default retransmission timeout in milliseconds.
  *
  */
-#ifndef CHIP_CONFIG_WRMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT
-#define CHIP_CONFIG_WRMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT       (2000)
+#ifndef CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT
+#define CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT       (2000)
 #endif // CHIP_CONFIG_WRMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT
 
 /**
- *  @def CHIP_CONFIG_WRMP_DEFAULT_INITIAL_RETRANS_TIMEOUT
+ *  @def CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT
  *
  *  @brief
  *    The default long retransmission timeout in milliseconds
  *    to include sleepy destinaton nodes.
  *
  */
-#ifndef CHIP_CONFIG_WRMP_DEFAULT_INITIAL_RETRANS_TIMEOUT
-#define CHIP_CONFIG_WRMP_DEFAULT_INITIAL_RETRANS_TIMEOUT      (2000)
-#endif // CHIP_CONFIG_WRMP_DEFAULT_INITIAL_RETRANS_TIMEOUT
+#ifndef CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT
+#define CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT      (2000)
+#endif // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT
 
 /**
- *  @def CHIP_CONFIG_WRMP_DEFAULT_ACK_TIMEOUT
+ *  @def CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT
  *
  *  @brief
  *    The default acknowledgment timeout in milliseconds.
  *
  */
-#ifndef CHIP_CONFIG_WRMP_DEFAULT_ACK_TIMEOUT
-#define CHIP_CONFIG_WRMP_DEFAULT_ACK_TIMEOUT               (CHIP_CONFIG_WRMP_TIMER_DEFAULT_PERIOD)
-#endif // CHIP_CONFIG_WRMP_DEFAULT_ACK_TIMEOUT
+#ifndef CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT
+#define CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT               (CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD)
+#endif // CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT
 
 /**
- *  @def CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE
+ *  @def CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE
  *
  *  @brief
- *    The default size of the WRMP retransmission table.
+ *    The default size of the RMP retransmission table.
  *
  */
-#ifndef CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE
+#ifndef CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE
 #ifdef PBUF_POOL_SIZE
-#define CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE                (PBUF_POOL_SIZE)
+#define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE                (PBUF_POOL_SIZE)
 #else
-#define CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE                (CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC)
+#define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE                (CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC)
 #endif // PBUF_POOL_SIZE
-#endif // CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE
+#endif // CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE
 
 /**
- *  @def CHIP_CONFIG_WRMP_DEFAULT_MAX_RETRANS
+ *  @def CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS
  *
  *  @brief
  *    The maximum number of retransmissions before giving up.
  *
  */
-#ifndef CHIP_CONFIG_WRMP_DEFAULT_MAX_RETRANS
-#define CHIP_CONFIG_WRMP_DEFAULT_MAX_RETRANS               (3)
-#endif // CHIP_CONFIG_WRMP_DEFAULT_MAX_RETRANS
+#ifndef CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS
+#define CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS               (3)
+#endif // CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS
 
 /**
  *  @brief
- *    The WRMP configuration.
+ *    The RMP configuration.
  */
-struct WRMPConfig
+struct RMPConfig
 {
     uint32_t mInitialRetransTimeout;            /**< Configurable timeout in msec for retransmission of the first sent message. */
     uint32_t mActiveRetransTimeout;             /**< Configurable timeout in msec for retransmission of all subsequent messages. */
@@ -125,13 +125,13 @@ struct WRMPConfig
     uint8_t  mMaxRetrans;                       /**< Configurable max value for retransmissions in the ExchangeContext. */
 };
 
-const WRMPConfig gDefaultWRMPConfig = { CHIP_CONFIG_WRMP_DEFAULT_INITIAL_RETRANS_TIMEOUT,
-                                        CHIP_CONFIG_WRMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT,
-                                        CHIP_CONFIG_WRMP_DEFAULT_ACK_TIMEOUT,
-                                        CHIP_CONFIG_WRMP_DEFAULT_MAX_RETRANS };
+const RMPConfig gDefaultRMPConfig = { CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT,
+                                        CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT,
+                                        CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT,
+                                        CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS };
 
 // clang-format on
 
 } // namespace chip
 
-#endif // CHIP_WRM_CONFIG_H_
+#endif // CHIP_RMP_CONFIG_H_

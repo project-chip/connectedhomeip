@@ -90,11 +90,6 @@ private:
     CHIP_ERROR _GetAndLogWifiStatsCounters(void);
     bool _HaveIPv4InternetConnectivity(void);
     bool _HaveIPv6InternetConnectivity(void);
-    ServiceTunnelMode _GetServiceTunnelMode(void);
-    CHIP_ERROR _SetServiceTunnelMode(ServiceTunnelMode val);
-    bool _IsServiceTunnelConnected(void);
-    bool _IsServiceTunnelRestricted(void);
-    bool _HaveServiceConnectivityViaTunnel(void);
     bool _HaveServiceConnectivity(void);
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
@@ -103,7 +98,6 @@ private:
     void _OnWiFiStationProvisionChange();
     static const char * _WiFiStationModeToStr(WiFiStationMode mode);
     static const char * _WiFiAPModeToStr(WiFiAPMode mode);
-    static const char * _ServiceTunnelModeToStr(ServiceTunnelMode mode);
 
     // ===== Members for internal use by the following friends.
 
@@ -136,9 +130,7 @@ private:
     {
         kFlag_HaveIPv4InternetConnectivity = 0x0001,
         kFlag_HaveIPv6InternetConnectivity = 0x0002,
-        kFlag_ServiceTunnelStarted         = 0x0004,
-        kFlag_ServiceTunnelUp              = 0x0008,
-        kFlag_AwaitingConnectivity         = 0x0010,
+        kFlag_AwaitingConnectivity         = 0x0004,
     };
 
     uint64_t mLastStationConnectFailTime;
@@ -147,7 +139,6 @@ private:
     WiFiStationState mWiFiStationState;
     WiFiAPMode mWiFiAPMode;
     WiFiAPState mWiFiAPState;
-    ServiceTunnelMode mServiceTunnelMode;
     uint32_t mWiFiStationReconnectIntervalMS;
     uint32_t mWiFiAPIdleTimeoutMS;
     uint16_t mFlags;
@@ -167,9 +158,6 @@ private:
     void OnStationIPv4AddressAvailable(const system_event_sta_got_ip_t & got_ip);
     void OnStationIPv4AddressLost(void);
     void OnIPv6AddressAvailable(const system_event_got_ip6_t & got_ip);
-
-    void DriveServiceTunnelState(void);
-    static void DriveServiceTunnelState(::chip::System::Layer * aLayer, void * aAppState, ::chip::System::Error aError);
 
     static const char * WiFiStationStateToStr(WiFiStationState state);
     static const char * WiFiAPStateToStr(WiFiAPState state);
@@ -221,11 +209,6 @@ inline bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
     return ::chip::GetFlag(mFlags, kFlag_HaveIPv6InternetConnectivity);
 }
 
-inline ConnectivityManager::ServiceTunnelMode ConnectivityManagerImpl::_GetServiceTunnelMode(void)
-{
-    return mServiceTunnelMode;
-}
-
 inline bool ConnectivityManagerImpl::_CanStartWiFiScan()
 {
     return mWiFiStationState != kWiFiStationState_Connecting;
@@ -233,7 +216,7 @@ inline bool ConnectivityManagerImpl::_CanStartWiFiScan()
 
 inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
 {
-    return HaveServiceConnectivityViaTunnel() || HaveServiceConnectivityViaThread();
+    return HaveServiceConnectivityViaThread();
 }
 
 /**

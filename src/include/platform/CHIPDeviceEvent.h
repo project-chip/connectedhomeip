@@ -124,13 +124,6 @@ enum PublicEventTypes
     kInternetConnectivityChange,
 
     /**
-     * Service Tunnel State Change
-     *
-     * Signals a change in connectivity of the device's IP tunnel to a chip-enabled service.
-     */
-    kServiceTunnelStateChange,
-
-    /**
      * Service Connectivity Change
      *
      * Signals a change in the device's ability to communicate with a chip-enabled service.
@@ -317,19 +310,10 @@ struct ChipDeviceEvent final
         } InternetConnectivityChange;
         struct
         {
-            ConnectivityChange Result;
-            bool IsRestricted;
-        } ServiceTunnelStateChange;
-        struct
-        {
             struct
             {
                 ConnectivityChange Result;
             } Overall;
-            struct
-            {
-                ConnectivityChange Result;
-            } ViaTunnel;
             struct
             {
                 ConnectivityChange Result;

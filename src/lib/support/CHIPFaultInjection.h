@@ -27,7 +27,6 @@
 #include <core/CHIPConfig.h>
 #include <core/CHIPEventLoggingConfig.h>
 #include <core/CHIPTimeConfig.h>
-#include <core/CHIPTunnelConfig.h>
 
 #if CHIP_CONFIG_TEST && CHIP_WITH_NLFAULTINJECTION
 
@@ -57,21 +56,12 @@ typedef enum
                                       when the fault is enabled, it expects an integer argument, which is an index into
                                       a table of modifications that can be applied to the header. @see FuzzExchangeHeader */
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    kFault_WRMDoubleTx,        /**< Force WRMP to transmit the outgoing message twice */
-    kFault_WRMSendError,       /**< Fail a transmission in WRMP as if the max number of retransmission has been exceeded */
+    kFault_RMPDoubleTx,        /**< Force RMP to transmit the outgoing message twice */
+    kFault_RMPSendError,       /**< Fail a transmission in RMP as if the max number of retransmission has been exceeded */
 #endif                         // WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
     kFault_BDXBadBlockCounter, /**< Corrupt the BDX Block Counter in the BDX BlockSend or BlockEOF message about to be sent */
     kFault_BDXAllocTransfer,   /**< Fail the allocation of a BDXTransfer object */
-#if CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
-    kFault_ServiceManager_ConnectRequestNew, /**< Fail the allocation of a chipServiceManager::ConnectRequest */
-    kFault_ServiceManager_Lookup,            /**< Fail the lookup of an endpoint id */
-    kFault_ServiceDirectoryReplaceError,     /**< Fail the replacement of a ServiceDirectory entry */
-#endif                                       // CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
-    kFault_SecMgrBusy, /**< Trigger a WEAVE_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
-#if CHIP_CONFIG_ENABLE_TUNNELING
-    kFault_TunnelQueueFull, /**< Trigger a CHIP_ERROR_TUNNEL_SERVICE_QUEUE_FULL when enqueueing a packet in the Tunnel queue */
-    kFault_TunnelPacketDropByPolicy, /**< Trigger an explicit drop of the packet as if done by an application policy */
-#endif                               // CHIP_CONFIG_ENABLE_TUNNELING
+    kFault_SecMgrBusy,         /**< Trigger a WEAVE_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
 #if CONFIG_NETWORK_LAYER_BLE
     kFault_CHIPOBLESend, /**< Inject a GATT error when sending the first fragment of a chip message over BLE */
 #endif                   // CONFIG_NETWORK_LAYER_BLE
@@ -140,7 +130,7 @@ DLL_EXPORT void FuzzExchangeHeader(uint8_t * p, int32_t arg);
     nlFAULT_INJECT_WITH_ARGS(chip::FaultInjection::GetManager(), aFaultID, aProtectedStatements, aUnprotectedStatements);
 
 #define CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS 4
-#define CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS_WRMP 5
+#define CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS_RMP 5
 
 #else // CHIP_CONFIG_TEST
 

@@ -26,30 +26,30 @@ static_library("message") {
   output_name = "libChipMessage"
 
   sources = [
-     "CHIPBinding.cpp",
-     "CHIPBinding.h",
-     "CHIPConnection.cpp",
-     "CHIPExchangeMgr.cpp",
-     "CHIPExchangeMgr.h",
-     "CHIPFabricState.cpp",
-     "CHIPFabricState.h",
-     "CHIPMessageLayer.cpp",
-     "CHIPMessageLayer.h",
-     "CHIPSecurityMgr.h",
-     "CHIPSecurityMgr.cpp",
-     "CHIPServerBase.h",
-     "CHIPServerBase.cpp",
-     "CHIPWRMPConfig.h",
-     "HostPortList.h",
-     "HostPortList.cpp",
+    "CHIPBinding.cpp",
+    "CHIPBinding.h",
+    "CHIPConnection.cpp",
+    "CHIPExchangeMgr.cpp",
+    "CHIPExchangeMgr.h",
+    "CHIPFabricState.cpp",
+    "CHIPFabricState.h",
+    "CHIPMessageLayer.cpp",
+    "CHIPMessageLayer.h",
+    "CHIPRMPConfig.h",
+    "CHIPSecurityMgr.cpp",
+    "CHIPSecurityMgr.h",
+    "CHIPServerBase.cpp",
+    "CHIPServerBase.h",
+    "HostPortList.cpp",
+    "HostPortList.h",
   ]
 
   public_deps = [
     "${chip_root}/src/ble",
     "${chip_root}/src/ble:ble_config_header",
     "${chip_root}/src/crypto",
-    "${chip_root}/src/inet:inet_config_header",
     "${chip_root}/src/inet",
+    "${chip_root}/src/inet:inet_config_header",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/lib/support",
@@ -58,7 +58,5 @@ static_library("message") {
     "${nlio_root}:nlio",
   ]
 
-  public_configs = [ 
-    ":includes",
-  ]
+  public_configs = [ ":includes" ]
 }

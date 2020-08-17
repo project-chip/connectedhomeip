@@ -68,11 +68,6 @@ config("inet_config") {
   } else {
     defines += [ "INET_CONFIG_ENABLE_TCP_ENDPOINT=0" ]
   }
-  if (chip_inet_config_enable_tun_endpoint) {
-    defines += [ "INET_CONFIG_ENABLE_TUN_ENDPOINT=1" ]
-  } else {
-    defines += [ "INET_CONFIG_ENABLE_TUN_ENDPOINT=0" ]
-  }
   if (chip_inet_config_enable_udp_endpoint) {
     defines += [ "INET_CONFIG_ENABLE_UDP_ENDPOINT=1" ]
   } else {
@@ -158,13 +153,6 @@ static_library("inet") {
     sources += [
       "AsyncDNSResolverSockets.cpp",
       "AsyncDNSResolverSockets.h",
-    ]
-  }
-
-  if (chip_inet_config_enable_tun_endpoint) {
-    sources += [
-      "TunEndPoint.cpp",
-      "TunEndPoint.h",
     ]
   }
 

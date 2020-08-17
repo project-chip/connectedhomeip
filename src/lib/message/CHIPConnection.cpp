@@ -576,36 +576,6 @@ void ChipConnection::GetPeerDescription(char * buf, size_t bufSize) const
                                          (NetworkType == kNetworkType_IP) ? PeerPort : 0, INET_NULL_INTERFACEID, this);
 }
 
-#if CHIP_CONFIG_ENABLE_TUNNELING
-/**
- *  Send a tunneled CHIP message over an established connection.
- *
- *  @param[in] msgInfo        A pointer to a ChipMessageInfo object.
- *
- *  @param[in] msgBuf           A pointer to the PacketBuffer object holding the packet to send.
- *
- *  @retval    #CHIP_NO_ERROR                             on successfully sending the message down to
- *                                                         the network layer.
- *  @retval    #CHIP_ERROR_INCORRECT_STATE                if the ChipConnection object is not
- *                                                         in the correct state for sending messages.
- *  @retval    #CHIP_ERROR_INVALID_DESTINATION_NODE_ID    if the destination node identifier is unspecified.
- *  @retval    #CHIP_ERROR_SENDING_BLOCKED                if the message is too long to be sent.
- *  @retval    other Inet layer errors related to the specific endpoint send operations.
- *
- */
-CHIP_ERROR ChipConnection::SendTunneledMessage(ChipMessageInfo * msgInfo, PacketBuffer * msgBuf)
-{
-
-    // Set message version to V2
-    msgInfo->MessageVersion = kChipMessageVersion_V2;
-
-    // Set the tunneling flag
-    msgInfo->Flags |= kChipMessageFlag_TunneledData;
-
-    return SendMessage(msgInfo, msgBuf);
-}
-#endif // CHIP_CONFIG_ENABLE_TUNNELING
-
 /**
  *  Send a CHIP message over an established connection.
  *
@@ -1385,12 +1355,7 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
     ChipMessageLayer * msgLayer = con->MessageLayer;
 
     // While in a state that allows receiving, process the received data...
-    while (data != NULL && con->StateAllowsReceive() && con->ReceiveEnabled &&
-           (con->OnMessageReceived != NULL
-#if CHIP_CONFIG_ENABLE_TUNNELING
-            || con->OnTunneledMessageReceived != NULL
-#endif
-            ))
+    while (data != NULL && con->StateAllowsReceive() && con->ReceiveEnabled && (con->OnMessageReceived != NULL))
     {
         IPPacketInfo packetInfo;
         ChipMessageInfo msgInfo;
@@ -1533,56 +1498,16 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
             break;
         }
 
-        // Check if message carries tunneled data and needs to be sent to Tunnel Agent
-        if (msgInfo.MessageVersion == kChipMessageVersion_V2)
+        // Pass the message header and payload to the application.
+        // NOTE that when this function returns, the state of the connection may have changed.
+        if (con->OnMessageReceived)
         {
-            if (msgInfo.Flags & kChipMessageFlag_TunneledData)
-            {
-#if CHIP_CONFIG_ENABLE_TUNNELING
-                // Dispatch the tunneled data message to the application if it is not a duplicate.
-                // Although TCP guarantees in-order, at-most-once delivery in normal conditions,
-                // checking for and eliminating duplicate tunneled messages here prevents replay
-                // of messages by a malicious man-in-the-middle.
-                if (!(msgInfo.Flags & kChipMessageFlag_DuplicateMessage))
-                {
-                    if (con->OnTunneledMessageReceived)
-                    {
-                        con->OnTunneledMessageReceived(con, &msgInfo, payloadBuf);
-                    }
-                    else
-                    {
-                        con->DisconnectOnError(CHIP_ERROR_NO_MESSAGE_HANDLER);
-                        break;
-                    }
-                }
-#endif
-            }
-            else
-            {
-                if (con->OnMessageReceived)
-                {
-                    con->OnMessageReceived(con, &msgInfo, payloadBuf);
-                }
-                else
-                {
-                    con->DisconnectOnError(CHIP_ERROR_NO_MESSAGE_HANDLER);
-                    break;
-                }
-            }
+            con->OnMessageReceived(con, &msgInfo, payloadBuf);
         }
-        else if (msgInfo.MessageVersion == kChipMessageVersion_V1)
+        else
         {
-            // Pass the message header and payload to the application.
-            // NOTE that when this function returns, the state of the connection may have changed.
-            if (con->OnMessageReceived)
-            {
-                con->OnMessageReceived(con, &msgInfo, payloadBuf);
-            }
-            else
-            {
-                con->DisconnectOnError(CHIP_ERROR_NO_MESSAGE_HANDLER);
-                break;
-            }
+            con->DisconnectOnError(CHIP_ERROR_NO_MESSAGE_HANDLER);
+            break;
         }
     }
 
@@ -1657,11 +1582,8 @@ void ChipConnection::Init(ChipMessageLayer * msgLayer)
     ReceiveEnabled        = true;
     OnConnectionComplete  = NULL;
     OnMessageReceived     = NULL;
-#if CHIP_CONFIG_ENABLE_TUNNELING
-    OnTunneledMessageReceived = NULL;
-#endif
-    OnConnectionClosed = DefaultConnectionClosedHandler;
-    OnReceiveError     = NULL;
+    OnConnectionClosed    = DefaultConnectionClosedHandler;
+    OnReceiveError        = NULL;
     memset(&mPeerAddrs, 0, sizeof(mPeerAddrs));
     mTcpEndPoint = NULL;
 #if CONFIG_NETWORK_LAYER_BLE

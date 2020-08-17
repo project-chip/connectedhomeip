@@ -42,9 +42,10 @@ efr32_sdk("sdk") {
     defines += [ "BUILD_RELEASE=1" ]
   }
 
-  defines += [ "USE_APP_CONFIG",
-               "${efr32_board}=1",
-               "BOARD_ID=${efr32_board}",
+  defines += [
+    "USE_APP_CONFIG",
+    "${efr32_board}=1",
+    "BOARD_ID=${efr32_board}",
   ]
 }
 
@@ -64,10 +65,10 @@ executable("lock_app") {
     "src/AppTask.cpp",
     "src/ButtonHandler.cpp",
     "src/LEDWidget.cpp",
+    "src/main.cpp",
+    "src/platform/${efr32_family}/${efr32_board}/hal-config.h",
     "src/platform/${efr32_family}/${efr32_board}/init_board.c",
     "src/platform/${efr32_family}/${efr32_board}/init_mcu.c",
-    "src/platform/${efr32_family}/${efr32_board}/hal-config.h",
-    "src/main.cpp",
   ]
 
   output_dir = root_out_dir

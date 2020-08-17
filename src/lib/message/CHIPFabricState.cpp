@@ -37,7 +37,6 @@
 #include <string.h>
 
 #include <Profiles/fabric-provisioning/FabricProvisioning.h>
-#include <Profiles/security/CHIPApplicationKeys.h>
 #include <Profiles/security/CHIPDummyGroupKeyStore.h>
 #include <Profiles/security/CHIPSecurity.h>
 #include <core/CHIPCore.h>

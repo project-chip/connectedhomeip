@@ -89,15 +89,6 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_SERVICE_DIRECTORY_CACHE_SIZE
- *
- * The size (in bytes) of the service directory cache.
- */
-#ifndef CHIP_DEVICE_CONFIG_SERVICE_DIRECTORY_CACHE_SIZE
-#define CHIP_DEVICE_CONFIG_SERVICE_DIRECTORY_CACHE_SIZE 512
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE
  *
  * The maximum size (in bytes) of a debug logging message.
@@ -397,18 +388,6 @@
 // -------------------- Time Sync Configuration --------------------
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_SERVICE_DIRECTORY_TIME_SYNC
- *
- * Enables synchronizing the device real-time clock using information returned during
- * a chip service end point query.  For any device that uses the chip service directory
- * to lookup a tunnel server, enabling this option will result in the real time clock being
- * synchronized every time the service tunnel is established.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_SERVICE_DIRECTORY_TIME_SYNC
-#define CHIP_DEVICE_CONFIG_ENABLE_SERVICE_DIRECTORY_TIME_SYNC 1
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
  *
  * Enables synchronizing the device's real time clock with a remote chip Time service
@@ -586,17 +565,6 @@
 #define CHIP_DEVICE_CONFIG_THREAD_CONNECTIVITY_TIMEOUT 30000
 #endif
 
-// -------------------- Tunnel Configuration --------------------
-
-/**
- * CHIP_DEVICE_CONFIG_LWIP_SERVICE_TUN_IF_NAME
- *
- * Name of the service TUN interface on LwIP-based platforms.
- */
-#ifndef CHIP_DEVICE_CONFIG_LWIP_SERVICE_TUN_IF_NAME
-#define CHIP_DEVICE_CONFIG_LWIP_SERVICE_TUN_IF_NAME "tn"
-#endif
-
 // -------------------- Trait Manager Configuration --------------------
 
 /**
@@ -623,34 +591,6 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
 #define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 0
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_FIXED_TUNNEL_SERVER
- *
- * Forces the use of a service tunnel server at a fixed IP address and port.  This
- * bypasses the need for a directory query to the service directory endpoint to
- * determine the tunnel server address.  When enabled, this option allows devices
- * that haven't been service provisioned to establish a service tunnel.
- *
- * When this option is enabled, CHIP_DEVICE_CONFIG_TUNNEL_SERVER_ADDRESS must
- * be set to the address of the tunnel server.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_FIXED_TUNNEL_SERVER
-#define CHIP_DEVICE_CONFIG_ENABLE_FIXED_TUNNEL_SERVER 0
-#endif
-
-/** CHIP_DEVICE_CONFIG_TUNNEL_SERVER_ADDRESS
- *
- * The address of the server to which the device should establish a service tunnel.
- *
- * This value is only meaningful if CHIP_DEVICE_CONFIG_ENABLE_FIXED_TUNNEL_SERVER
- * has been enabled.
- *
- * Note: Currently this must be a dot-notation IP address--not a host name.
- */
-#ifndef CHIP_DEVICE_CONFIG_TUNNEL_SERVER_ADDRESS
-#define CHIP_DEVICE_CONFIG_TUNNEL_SERVER_ADDRESS ""
 #endif
 
 /**
@@ -708,24 +648,9 @@
 #error "If CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY_FULL set, then CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY must also be set."
 #endif
 
-/**
- * @def CHIP_DEVICE_CONFIG_ENABLE_TUNNEL_TELEMETRY
- *
- * @brief
- *   Enable automatically uploading chip tunnel telemetry via trait on an interval.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_TUNNEL_TELEMETRY
-#define CHIP_DEVICE_CONFIG_ENABLE_TUNNEL_TELEMETRY (0)
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_TUNNEL_TELEMETRY && !CHIP_CONFIG_ENABLE_TUNNELING
-#error "If CHIP_DEVICE_CONFIG_ENABLE_TUNNEL_TELEMETRY set, then CHIP_CONFIG_ENABLE_TUNNELING must also be set."
-#endif
-
 // Enable Network Telemetry feature if it is enabled for at lease one network.
 #define CHIP_DEVICE_CONFIG_ENABLE_NETWORK_TELEMETRY                                                                                \
-    (CHIP_DEVICE_CONFIG_ENABLE_WIFI_TELEMETRY || CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY ||                                     \
-     CHIP_DEVICE_CONFIG_ENABLE_TUNNEL_TELEMETRY)
+    (CHIP_DEVICE_CONFIG_ENABLE_WIFI_TELEMETRY || CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY)
 
 /**
  *  @def CHIP_DEVICE_CONFIG_DEFAULT_TELEMETRY_INTERVAL_MS
@@ -738,18 +663,6 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_DEFAULT_TELEMETRY_INTERVAL_MS
 #define CHIP_DEVICE_CONFIG_DEFAULT_TELEMETRY_INTERVAL_MS 90000
-#endif
-
-/**
- *  @def CHIP_DEVICE_CONFIG_DEFAULT_TUNNEL_TELEMETRY_INTERVAL_MS
- *
- *  @brief
- *    This sets the default interval at which chip tunnel telemetry events
- *    will be logged to chip buffers.
- *
- */
-#ifndef CHIP_DEVICE_CONFIG_DEFAULT_TUNNEL_TELEMETRY_INTERVAL_MS
-#define CHIP_DEVICE_CONFIG_DEFAULT_TUNNEL_TELEMETRY_INTERVAL_MS 300000
 #endif
 
 // -------------------- Event Logging Configuration --------------------

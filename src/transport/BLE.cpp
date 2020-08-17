@@ -24,7 +24,6 @@
 
 #include <transport/BLE.h>
 
-#include <controller/CHIPDeviceController.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/MessageHeader.h>

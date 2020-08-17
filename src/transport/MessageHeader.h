@@ -92,6 +92,9 @@ public:
     /** Get the Protocol ID from this header. */
     uint16_t GetProtocolID(void) const { return mProtocolID; }
 
+    /** Get the Encryption Key ID from this header. */
+    uint16_t GetEncryptionKeyID(void) const { return mEncryptionKeyID; }
+
     /** Get the MAC tag length. */
     size_t GetTagLength(void) const { return TagLenForEncryptionType(mEncryptionType); }
 
@@ -204,9 +207,16 @@ public:
     }
 
     /** Set the Protocol ID for this header. */
-    MessageHeader & SetProtcolID(uint16_t id)
+    MessageHeader & SetProtocolID(uint16_t id)
     {
         mProtocolID = id;
+        return *this;
+    }
+
+    /** Set the Encryption Key ID for this header. */
+    MessageHeader & SetEncryptionKeyID(uint16_t id)
+    {
+        mEncryptionKeyID = id;
         return *this;
     }
 

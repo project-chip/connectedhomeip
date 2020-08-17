@@ -34,7 +34,7 @@ declare_args() {
   lwip_ethernet = lwip_default
 
   # Enable SLIP interface support in lwIP.
-  lwip_slip = lwip_default
+  lwip_slip = false
 
   # Enable 6LoWPAN support in lwIP.
   lwip_6lowpan = lwip_default
