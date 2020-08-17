@@ -36,8 +36,8 @@
 #include <message/CHIPServerBase.h>
 #include <profiles/CHIPProfiles.h>
 #include <support/CHIPFaultInjection.h>
-#include <support/CodeUtils.h>
 #include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 #include <support/crypto/CHIPCrypto.h>
 #include <support/logging/CHIPLogging.h>
 
