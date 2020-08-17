@@ -74,10 +74,10 @@ namespace DeviceLayer {
 {
     self = [super init];
     if (self) {
+        self.shortServiceUUID = [BleConnection getShortestServiceUUID:&chip::Ble::CHIP_BLE_SVC_ID];
         _deviceDiscriminator = deviceDiscriminator;
         _workQueue = dispatch_queue_create("com.chip.ble.work_queue", DISPATCH_QUEUE_SERIAL);
         _centralManager = [CBCentralManager alloc];
-        _shortServiceUUID = [BleConnection getShortestServiceUUID:&chip::Ble::CHIP_BLE_SVC_ID];
         [_centralManager initWithDelegate:self queue:_workQueue];
     }
 
