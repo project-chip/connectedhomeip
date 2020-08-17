@@ -108,6 +108,90 @@ nodist_libmbedtls_a_SOURCES                                                    =
     repo/library/md_wrap.c                  \
     $(NULL)
 
+mbedtls_includedir = $(includedir)/mbedtls
+
+mbedtls_include_HEADERS =                   \
+    repo/include/mbedtls/aes.h              \
+    repo/include/mbedtls/aesni.h            \
+    repo/include/mbedtls/arc4.h             \
+    repo/include/mbedtls/aria.h             \
+    repo/include/mbedtls/asn1.h             \
+    repo/include/mbedtls/asn1write.h        \
+    repo/include/mbedtls/base64.h           \
+    repo/include/mbedtls/bignum.h           \
+    repo/include/mbedtls/blowfish.h         \
+    repo/include/mbedtls/bn_mul.h           \
+    repo/include/mbedtls/camellia.h         \
+    repo/include/mbedtls/ccm.h              \
+    repo/include/mbedtls/certs.h            \
+    repo/include/mbedtls/chacha20.h         \
+    repo/include/mbedtls/chachapoly.h       \
+    repo/include/mbedtls/check_config.h     \
+    repo/include/mbedtls/cipher.h           \
+    repo/include/mbedtls/cipher_internal.h  \
+    repo/include/mbedtls/cmac.h             \
+    repo/include/mbedtls/compat-1.3.h       \
+    repo/include/mbedtls/config.h           \
+    repo/include/mbedtls/ctr_drbg.h         \
+    repo/include/mbedtls/debug.h            \
+    repo/include/mbedtls/des.h              \
+    repo/include/mbedtls/dhm.h              \
+    repo/include/mbedtls/ecdh.h             \
+    repo/include/mbedtls/ecdsa.h            \
+    repo/include/mbedtls/ecjpake.h          \
+    repo/include/mbedtls/ecp.h              \
+    repo/include/mbedtls/ecp_internal.h     \
+    repo/include/mbedtls/entropy.h          \
+    repo/include/mbedtls/entropy_poll.h     \
+    repo/include/mbedtls/error.h            \
+    repo/include/mbedtls/gcm.h              \
+    repo/include/mbedtls/havege.h           \
+    repo/include/mbedtls/hkdf.h             \
+    repo/include/mbedtls/hmac_drbg.h        \
+    repo/include/mbedtls/md2.h              \
+    repo/include/mbedtls/md4.h              \
+    repo/include/mbedtls/md5.h              \
+    repo/include/mbedtls/md.h               \
+    repo/include/mbedtls/md_internal.h      \
+    repo/include/mbedtls/memory_buffer_alloc.h \
+    repo/include/mbedtls/net.h              \
+    repo/include/mbedtls/net_sockets.h      \
+    repo/include/mbedtls/nist_kw.h          \
+    repo/include/mbedtls/oid.h              \
+    repo/include/mbedtls/padlock.h          \
+    repo/include/mbedtls/pem.h              \
+    repo/include/mbedtls/pkcs11.h           \
+    repo/include/mbedtls/pkcs12.h           \
+    repo/include/mbedtls/pkcs5.h            \
+    repo/include/mbedtls/pk.h               \
+    repo/include/mbedtls/pk_internal.h      \
+    repo/include/mbedtls/platform.h         \
+    repo/include/mbedtls/platform_time.h    \
+    repo/include/mbedtls/platform_util.h    \
+    repo/include/mbedtls/poly1305.h         \
+    repo/include/mbedtls/psa_util.h         \
+    repo/include/mbedtls/ripemd160.h        \
+    repo/include/mbedtls/rsa.h              \
+    repo/include/mbedtls/rsa_internal.h     \
+    repo/include/mbedtls/sha1.h             \
+    repo/include/mbedtls/sha256.h           \
+    repo/include/mbedtls/sha512.h           \
+    repo/include/mbedtls/ssl_cache.h        \
+    repo/include/mbedtls/ssl_ciphersuites.h \
+    repo/include/mbedtls/ssl_cookie.h       \
+    repo/include/mbedtls/ssl.h              \
+    repo/include/mbedtls/ssl_internal.h     \
+    repo/include/mbedtls/ssl_ticket.h       \
+    repo/include/mbedtls/threading.h        \
+    repo/include/mbedtls/timing.h           \
+    repo/include/mbedtls/version.h          \
+    repo/include/mbedtls/x509_crl.h         \
+    repo/include/mbedtls/x509_crt.h         \
+    repo/include/mbedtls/x509_csr.h         \
+    repo/include/mbedtls/x509.h             \
+    repo/include/mbedtls/xtea.h             \
+    $(NULL)
+
 if !CONFIG_DEVICE_LAYER
 nodist_libmbedtls_a_SOURCES                                                   += \
     repo/library/entropy_poll.c             \

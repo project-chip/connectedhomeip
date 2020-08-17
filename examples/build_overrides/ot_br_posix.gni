@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Options from standalone-chip.mk that differ from configure defaults. These
-# options are used from examples/.
-chip_build_tests = false
-chip_inet_config_enable_raw_endpoint = false
-chip_inet_config_enable_dns_resolver = false
+declare_args() {
+  ot_br_posix_root = "//third_party/connectedhomeip/third_party/ot-br-posix"
+}

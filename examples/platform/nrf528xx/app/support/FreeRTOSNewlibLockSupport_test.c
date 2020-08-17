@@ -75,7 +75,7 @@ void freertos_newlib_lock_test()
     __lock_acquire_recursive(dynamic_lock_recursive);
     acquired = __lock_try_acquire_recursive(dynamic_lock_recursive);
     ASSERT(acquired);
-    __lock_release_recursive(dynamic_lock);
+    __lock_release_recursive(dynamic_lock_recursive);
     acquired = __lock_try_acquire_recursive(dynamic_lock_recursive);
     ASSERT(acquired);
     __lock_release_recursive(dynamic_lock_recursive);

@@ -16,7 +16,7 @@ import("//build_overrides/chip.gni")
 
 # FIXME: remove after actual key exchange is implemented
 config("controller_wno_deprecate") {
-  cflags = ["-Wno-deprecated-declarations"]
+  cflags = [ "-Wno-deprecated-declarations" ]
 }
 
 static_library("controller") {
@@ -33,6 +33,5 @@ static_library("controller") {
     "${chip_root}/src/transport",
   ]
 
-  allow_circular_includes_from = [ "${chip_root}/src/transport" ]
   configs += [ ":controller_wno_deprecate" ]
 }

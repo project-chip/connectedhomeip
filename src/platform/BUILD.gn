@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/linux/pkg_config.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
-import("//build/config/linux/pkg_config.gni")
 
 import("device.gni")
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
+  import("//build_overrides/ot_br_posix.gni")
 }
 
 if (chip_device_platform == "nrf5") {
@@ -219,7 +220,7 @@ if (chip_device_platform != "none") {
           "Linux/ThreadStackManagerImpl.cpp",
           "Linux/ThreadStackManagerImpl.h",
         ]
-        public_deps += [ "${chip_root}/third_party/ot-br-posix:ot_br_client" ]
+        public_deps += [ "${ot_br_posix_root}:ot_br_client" ]
       }
 
       if (chip_enable_wifi) {

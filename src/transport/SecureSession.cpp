@@ -24,6 +24,7 @@
 
 #include <core/CHIPEncoding.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <support/BufBound.h>
 #include <support/CodeUtils.h>
 #include <transport/MessageHeader.h>
 #include <transport/SecureSession.h>
@@ -35,6 +36,8 @@ namespace chip {
 namespace {
 
 const char * kManualKeyExchangeChannelInfo = "Manual Key Exchanged Channel";
+
+constexpr size_t kAESCCMIVLen = 12;
 
 } // namespace
 
@@ -104,33 +107,46 @@ void SecureSession::Reset(void)
     memset(mKey, 0, sizeof(mKey));
 }
 
-uint64_t SecureSession::GetIV(const MessageHeader & header)
+CHIP_ERROR SecureSession::GetIV(const MessageHeader & header, uint8_t * iv, size_t len)
 {
-    // The message ID is a 4 byte value. It's assumed that the security
-    // session will be rekeyed before (or on) message ID rollover.
-    uint64_t IV = header.GetMessageId() & 0xffffffff;
+    CHIP_ERROR err     = CHIP_NO_ERROR;
+    uint64_t nodeID    = 0;
+    uint32_t messageID = 0;
+
+    BufBound bbuf(iv, len);
+
+    VerifyOrExit(len == kAESCCMIVLen, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     if (header.GetSourceNodeId().HasValue())
     {
-        uint64_t nodeID = header.GetSourceNodeId().Value();
-        IV |= nodeID & 0xffffffff00000000;
-        IV |= (nodeID & 0xffffffff) << 32;
+        nodeID = header.GetSourceNodeId().Value();
     }
-    return IV;
+
+    VerifyOrExit(bbuf.Put(&nodeID, sizeof(nodeID)) == sizeof(nodeID), err = CHIP_ERROR_NO_MEMORY);
+
+    messageID = header.GetMessageId();
+    VerifyOrExit(bbuf.Put(&messageID, sizeof(messageID)) == sizeof(nodeID) + sizeof(messageID), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
+
+exit:
+    return err;
 }
 
 CHIP_ERROR SecureSession::Encrypt(const unsigned char * input, size_t input_length, unsigned char * output, MessageHeader & header)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     uint64_t tag     = 0;
-    uint64_t IV      = SecureSession::GetIV(header);
+    uint8_t IV[kAESCCMIVLen];
 
     VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     VerifyOrExit(input != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(input_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = AES_CCM_encrypt(input, input_length, NULL, 0, mKey, sizeof(mKey), (const unsigned char *) &IV, sizeof(IV), output,
+    error = GetIV(header, IV, sizeof(IV));
+    SuccessOrExit(error);
+
+    error = AES_CCM_encrypt(input, input_length, NULL, 0, mKey, sizeof(mKey), (const unsigned char *) IV, sizeof(IV), output,
                             (unsigned char *) &tag, sizeof(tag));
     SuccessOrExit(error);
 
@@ -146,15 +162,18 @@ CHIP_ERROR SecureSession::Decrypt(const unsigned char * input, size_t input_leng
     CHIP_ERROR error    = CHIP_NO_ERROR;
     size_t taglen       = header.GetTagLength();
     const uint8_t * tag = header.GetTag();
-    uint64_t IV         = SecureSession::GetIV(header);
+    uint8_t IV[kAESCCMIVLen];
 
     VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     VerifyOrExit(input != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(input_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
+    error = GetIV(header, IV, sizeof(IV));
+    SuccessOrExit(error);
+
     error = AES_CCM_decrypt(input, input_length, NULL, 0, (const unsigned char *) tag, taglen, mKey, sizeof(mKey),
-                            (const unsigned char *) &IV, sizeof(IV), output);
+                            (const unsigned char *) IV, sizeof(IV), output);
 exit:
     return error;
 }
