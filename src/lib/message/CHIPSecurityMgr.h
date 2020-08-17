@@ -135,32 +135,6 @@ extern void * MemoryAlloc(size_t size);
  */
 extern void MemoryFree(void * p);
 
-#if CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_PLATFORM
-
-/**
- * This function is called to notify the application when a time-consuming
- * cryptographic operation is about to start.
- *
- * @note If application wants to receive these alerts and adjust platform settings
- *       accordingly then it should provide its own implementation of these functions
- *       and enable (1) #CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_PLATFORM option.
- *
- */
-extern void OnTimeConsumingCryptoStart(void);
-
-/**
- * This function is called to notify the application when a time-consuming
- * cryptographic operation has just finished.
- *
- * @note If application wants to receive these alerts and adjust platform settings
- *       accordingly then it should provide its own implementation of these functions
- *       and enable (1) #CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_PLATFORM option.
- *
- */
-extern void OnTimeConsumingCryptoDone(void);
-
-#endif // CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_PLATFORM
-
 } // namespace Security
 } // namespace Platform
 
