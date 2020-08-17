@@ -80,16 +80,6 @@ static jclass sChipDeviceControllerExceptionCls = NULL;
 chip::NodeId kLocalDeviceId  = 112233;
 chip::NodeId kRemoteDeviceId = 12344321;
 
-static const unsigned char local_private_key[] = { 0x00, 0xd1, 0x90, 0xd9, 0xb3, 0x95, 0x1c, 0x5f, 0xa4, 0xe7, 0x47,
-                                                   0x92, 0x5b, 0x0a, 0xa9, 0xa7, 0xc1, 0x1c, 0xe7, 0x06, 0x10, 0xe2,
-                                                   0xdd, 0x16, 0x41, 0x52, 0x55, 0xb7, 0xb8, 0x80, 0x8d, 0x87, 0xa1 };
-
-static const unsigned char remote_public_key[] = { 0x04, 0xe2, 0x07, 0x64, 0xff, 0x6f, 0x6a, 0x91, 0xd9, 0xc2, 0xc3, 0x0a, 0xc4,
-                                                   0x3c, 0x56, 0x4b, 0x42, 0x8a, 0xf3, 0xb4, 0x49, 0x29, 0x39, 0x95, 0xa2, 0xf7,
-                                                   0x02, 0x8c, 0xa5, 0xce, 0xf3, 0xc9, 0xca, 0x24, 0xc5, 0xd4, 0x5c, 0x60, 0x79,
-                                                   0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
-                                                   0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
-
 jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -414,22 +404,6 @@ exit:
 
 void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState)
 {
-    JNIEnv * env;
-
-    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
-
-    CHIP_ERROR err = deviceController->ManualKeyExchange(state, remote_public_key, sizeof(remote_public_key), local_private_key,
-                                                         sizeof(local_private_key));
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Failed to exchange keys");
-        ThrowError(env, err);
-    }
-    else
-    {
-        HandleSimpleOperationComplete(deviceController, appReqState);
-    }
 }
 
 void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload)
