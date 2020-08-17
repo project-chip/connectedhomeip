@@ -19,6 +19,8 @@
 
 #include "LEDWidget.h"
 
+#include <system/SystemClock.h>
+
 void LEDWidget::Init(LED_t led)
 {
     mLastChangeTimeUS = 0;
@@ -57,7 +59,7 @@ void LEDWidget::Animate()
 {
     if (mBlinkOnTimeMS != 0 && mBlinkOffTimeMS != 0)
     {
-        int64_t nowUS            = 0;
+        int64_t nowUS            = chip::System::Platform::Layer::GetClock_Monotonic();;
         int64_t stateDurUS       = ((mState) ? mBlinkOnTimeMS : mBlinkOffTimeMS) * 1000LL;
         int64_t nextChangeTimeUS = mLastChangeTimeUS + stateDurUS;
 
