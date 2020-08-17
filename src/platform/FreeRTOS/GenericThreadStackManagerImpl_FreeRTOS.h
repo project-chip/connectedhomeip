@@ -82,6 +82,7 @@ private:
     static void OnJoinerTimer(TimerHandle_t xTimer);
 
     portTickType mJoinerExpire;
+    bool mJoinerStartPending = false;
 };
 
 // Instruct the compiler to instantiate the template only when explicitly told to do so.
