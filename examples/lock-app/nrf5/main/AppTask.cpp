@@ -34,8 +34,6 @@
 
 #include <platform/CHIPDeviceLayer.h>
 #if CHIP_ENABLE_OPENTHREAD
-#include <openthread/message.h>
-#include <openthread/udp.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
@@ -231,57 +229,6 @@ void AppTask::HandleBLEMessageReceived(chip::Ble::BLEEndPoint * endPoint, chip::
     chip::System::PacketBuffer::Free(buffer);
 }
 
-void SendUDPBroadCast()
-{
-#if CHIP_ENABLE_OPENTHREAD
-    // TODO: change to CHIP inet layer
-    const char * domainName = "LockDemo._chip._udp.local.";
-    chip::Inet::IPAddress addr;
-    if (!ConnectivityMgrImpl().IsThreadAttached())
-    {
-        return;
-    }
-    ThreadStackMgrImpl().LockThreadStack();
-    otError error = OT_ERROR_NONE;
-    otMessageInfo messageInfo;
-    otUdpSocket mSocket;
-    otMessage * message = nullptr;
-
-    memset(&mSocket, 0, sizeof(mSocket));
-    memset(&messageInfo, 0, sizeof(messageInfo));
-
-    // Select a address to send
-    const otNetifAddress * otAddrs = otIp6GetUnicastAddresses(ThreadStackMgrImpl().OTInstance());
-    for (const otNetifAddress * otAddr = otAddrs; otAddr != NULL; otAddr = otAddr->mNext)
-    {
-        addr = chip::DeviceLayer::Internal::ToIPAddress(otAddr->mAddress);
-        if (otAddr->mValid && !otAddr->mRloc &&
-            (!addr.IsIPv6ULA() ||
-             ::chip::DeviceLayer::Internal::IsOpenThreadMeshLocalAddress(ThreadStackMgrImpl().OTInstance(), addr)))
-        {
-            memcpy(&messageInfo.mSockAddr, &(otAddr->mAddress), sizeof(otAddr->mAddress));
-            break;
-        }
-    }
-
-    message = otUdpNewMessage(ThreadStackMgrImpl().OTInstance(), nullptr);
-    otIp6AddressFromString("ff03::1", &messageInfo.mPeerAddr);
-    messageInfo.mPeerPort = 23367;
-    otMessageAppend(message, domainName, static_cast<uint16_t>(strlen(domainName)));
-
-    error = otUdpSend(ThreadStackMgrImpl().OTInstance(), &mSocket, message, &messageInfo);
-
-    if (error != OT_ERROR_NONE && message != nullptr)
-    {
-        otMessageFree(message);
-        NRF_LOG_INFO("Failed to otUdpSend: %d", error);
-    }
-    ThreadStackMgrImpl().UnlockThreadStack();
-#else
-    NRF_LOG_INFO("OpenThread disabled, not sending UDP broadcasts");
-#endif
-}
-
 void AppTask::AppTaskMain(void * pvParameter)
 {
     ret_code_t ret;
@@ -296,6 +243,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
     chip::DeviceLayer::ConnectivityMgr().AddCHIPoBLEConnectionHandler(&AppTask::HandleBLEConnectionOpened);
+    SetDeviceName("LockDemo._chip._udp.local.");
 
     while (true)
     {

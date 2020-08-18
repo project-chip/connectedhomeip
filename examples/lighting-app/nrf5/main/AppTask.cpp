@@ -41,9 +41,6 @@
 #include <support/ErrorStr.h>
 #include <system/SystemClock.h>
 
-#include <openthread/message.h>
-#include <openthread/udp.h>
-
 APP_TIMER_DEF(sFunctionTimer);
 
 namespace {
@@ -161,53 +158,6 @@ int AppTask::Init()
     return ret;
 }
 
-void SendUDPBroadCast()
-{
-    // TODO: change to CHIP inet layer
-    const char * domainName = "LightingDemo._chip._udp.local.";
-    chip::Inet::IPAddress addr;
-    if (!ConnectivityMgrImpl().IsThreadAttached())
-    {
-        return;
-    }
-    ThreadStackMgrImpl().LockThreadStack();
-    otError error = OT_ERROR_NONE;
-    otMessageInfo messageInfo;
-    otUdpSocket mSocket;
-    otMessage * message = nullptr;
-
-    memset(&mSocket, 0, sizeof(mSocket));
-    memset(&messageInfo, 0, sizeof(messageInfo));
-
-    // Select a address to send
-    const otNetifAddress * otAddrs = otIp6GetUnicastAddresses(ThreadStackMgrImpl().OTInstance());
-    for (const otNetifAddress * otAddr = otAddrs; otAddr != NULL; otAddr = otAddr->mNext)
-    {
-        addr = chip::DeviceLayer::Internal::ToIPAddress(otAddr->mAddress);
-        if (otAddr->mValid && !otAddr->mRloc &&
-            (!addr.IsIPv6ULA() ||
-             ::chip::DeviceLayer::Internal::IsOpenThreadMeshLocalAddress(ThreadStackMgrImpl().OTInstance(), addr)))
-        {
-            memcpy(&messageInfo.mSockAddr, &(otAddr->mAddress), sizeof(otAddr->mAddress));
-            break;
-        }
-    }
-
-    message = otUdpNewMessage(ThreadStackMgrImpl().OTInstance(), nullptr);
-    otIp6AddressFromString("ff03::1", &messageInfo.mPeerAddr);
-    messageInfo.mPeerPort = 23367;
-    otMessageAppend(message, domainName, static_cast<uint16_t>(strlen(domainName)));
-
-    error = otUdpSend(ThreadStackMgrImpl().OTInstance(), &mSocket, message, &messageInfo);
-
-    if (error != OT_ERROR_NONE && message != nullptr)
-    {
-        otMessageFree(message);
-        NRF_LOG_INFO("Failed to otUdpSend: %d", error);
-    }
-    ThreadStackMgrImpl().UnlockThreadStack();
-}
-
 void AppTask::AppTaskMain(void * pvParameter)
 {
     ret_code_t ret;
@@ -220,6 +170,8 @@ void AppTask::AppTaskMain(void * pvParameter)
         NRF_LOG_INFO("AppTask.Init() failed");
         APP_ERROR_HANDLER(ret);
     }
+
+    SetDeviceName("LightingDemo._chip._udp.local.");
 
     while (true)
     {
