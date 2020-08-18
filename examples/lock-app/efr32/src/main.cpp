@@ -90,8 +90,8 @@ extern "C" void vApplicationIdleHook(void)
 // ================================================================================
 int main(void)
 {
-    int ret = CHIP_ERROR_MAX;
-    DemoSessionManager* sessions = new DemoSessionManager;
+    int ret                       = CHIP_ERROR_MAX;
+    DemoSessionManager * sessions = new DemoSessionManager;
 
 #if CHIP_ENABLE_OPENTHREAD
     otSysInit(0, NULL);
