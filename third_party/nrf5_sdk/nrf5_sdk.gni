@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/jlink.gni")
 import("//build_overrides/nrf5_sdk.gni")
 import("//build_overrides/openthread.gni")
 
@@ -86,7 +87,6 @@ template("nrf5_sdk") {
       "${nrf5_sdk_root}/external/openthread/nrf_security/include",
       "${nrf5_sdk_root}/external/openthread/nrf_security/mbedtls_plat_config",
       "${nrf5_sdk_root}/external/openthread/nrf_security/nrf_cc310_plat/include",
-      "${nrf5_sdk_root}/external/segger_rtt",
       "${nrf5_sdk_root}/integration/nrfx",
       "${nrf5_sdk_root}/integration/nrfx/legacy",
       "${nrf5_sdk_root}/modules/nrfx",
@@ -352,11 +352,6 @@ template("nrf5_sdk") {
       "${nrf5_sdk_root}/external/openthread/nrf_security/nrf_cc310_plat/include/nrf_cc310_platform_mutex.h",
       "${nrf5_sdk_root}/external/openthread/nrf_security/nrf_cc310_plat/src/nrf_cc310_platform_abort_freertos.c",
       "${nrf5_sdk_root}/external/openthread/nrf_security/nrf_cc310_plat/src/nrf_cc310_platform_mutex_freertos.c",
-      "${nrf5_sdk_root}/external/segger_rtt/SEGGER_RTT.c",
-      "${nrf5_sdk_root}/external/segger_rtt/SEGGER_RTT.h",
-      "${nrf5_sdk_root}/external/segger_rtt/SEGGER_RTT_Conf.h",
-      "${nrf5_sdk_root}/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c",
-      "${nrf5_sdk_root}/external/segger_rtt/SEGGER_RTT_printf.c",
       "${nrf5_sdk_root}/integration/nrfx/legacy/apply_old_config.h",
       "${nrf5_sdk_root}/integration/nrfx/legacy/nrf_drv_clock.c",
       "${nrf5_sdk_root}/integration/nrfx/legacy/nrf_drv_clock.h",
@@ -413,6 +408,12 @@ template("nrf5_sdk") {
       "${nrf5_sdk_root}/modules/nrfx/soc/nrfx_coredep.h",
       "${nrf5_sdk_root}/modules/nrfx/soc/nrfx_irqs.h",
       "${nrf5_sdk_root}/modules/nrfx/soc/nrfx_irqs_nrf52840.h",
+    ]
+
+    public_deps = [
+      "${segger_rtt_root}:segger_rtt",
+      "${segger_rtt_root}:segger_rtt_printf",
+      "${segger_rtt_root}:segger_rtt_syscalls",
     ]
 
     if (!defined(public_configs)) {

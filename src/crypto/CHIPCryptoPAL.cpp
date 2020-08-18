@@ -65,6 +65,21 @@ Spake2p::Spake2p(size_t _fe_size, size_t _point_size, size_t _hash_size)
     Kcb = &Kcab[hash_size / 2];
     Ka  = &Kae[0];
     Ke  = &Kae[hash_size / 2];
+
+    M  = nullptr;
+    N  = nullptr;
+    G  = nullptr;
+    X  = nullptr;
+    Y  = nullptr;
+    L  = nullptr;
+    Z  = nullptr;
+    V  = nullptr;
+    w0 = nullptr;
+    w1 = nullptr;
+    xy = nullptr;
+
+    order  = nullptr;
+    tempbn = nullptr;
 }
 
 CHIP_ERROR Spake2p::Init(const unsigned char * context, size_t context_len)

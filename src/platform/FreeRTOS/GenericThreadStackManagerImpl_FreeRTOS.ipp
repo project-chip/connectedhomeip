@@ -121,17 +121,20 @@ void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::OnJoinerTimer(TimerHandl
     GenericThreadStackManagerImpl_FreeRTOS<ImplClass> * self =
         static_cast<GenericThreadStackManagerImpl_FreeRTOS<ImplClass> *>(pvTimerGetTimerID(xTimer));
 
+    ChipLogDetail(DeviceLayer, "Thread joiner timer running");
+
     if (xTaskGetTickCount() > self->mJoinerExpire || self->Impl()->IsThreadProvisioned())
     {
         ChipLogDetail(DeviceLayer, "Thread joiner timer stopped");
 
         VerifyOrDie(pdPASS == xTimerStop(xTimer, portMAX_DELAY) && pdPASS == xTimerDelete(xTimer, portMAX_DELAY));
     }
-    else
+    else if (!self->mJoinerStartPending)
     {
-        CHIP_ERROR error = self->Impl()->JoinerStart();
+        ChipLogDetail(DeviceLayer, "Request Thread joiner start");
 
-        ChipLogDetail(DeviceLayer, "Thread joiner timer triggered: %s", chip::ErrorStr(error));
+        self->mJoinerStartPending = true;
+        self->Impl()->SignalThreadActivityPending();
     }
 }
 
@@ -145,7 +148,6 @@ void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::ThreadTaskMain(void * ar
 
     ChipLogDetail(DeviceLayer, "Thread task running");
 
-    // Capture the Thread task handle.
     self->mThreadTask = xTaskGetCurrentTaskHandle();
 
     // Try starting joiner within 15m.
@@ -157,17 +159,17 @@ void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::ThreadTaskMain(void * ar
 
     while (true)
     {
-        // Lock the Thread stack.
         self->Impl()->LockThreadStack();
-
-        // Process any pending Thread activity.
         self->Impl()->ProcessThreadActivity();
-
-        // Unlock the Thread stack.
         self->Impl()->UnlockThreadStack();
 
-        // Wait for a signal that more activity is pending.
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
+        if (self->mJoinerStartPending)
+        {
+            self->mJoinerStartPending = false;
+            self->Impl()->JoinerStart();
+        }
     }
 }
 
