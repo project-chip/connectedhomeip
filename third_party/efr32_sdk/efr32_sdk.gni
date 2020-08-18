@@ -15,6 +15,7 @@
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/jlink.gni")
 import("//build_overrides/mbedtls.gni")
+import("//build_overrides/chip.gni")
 
 import("efr32_board.gni")
 
@@ -89,8 +90,8 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/sleeptimer/inc",
       "${efr32_sdk_root}/platform/service/sleeptimer/config",
       "${efr32_sdk_root}/platform/common/inc",
-      "${efr32_sdk_root}/platform/emdrv/nvm3/inc",
-
+      
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/include",
       "${efr32_sdk_root}/util/third_party/mbedtls/include",
       "${mbedtls_root}/repo/include",
     ]
@@ -126,6 +127,9 @@ template("efr32_sdk") {
     }
 
     defines = [
+      "MBEDTLS_CONFIG_FILE=\"mbedtls-config.h\"",
+      "MBEDTLS_USER_CONFIG_FILE=\"efr32-chip-mbedtls-config.h\"",
+      "OPENTHREAD_FTD=1",
       "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
       "RETARGET_VCOM",
@@ -169,6 +173,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/emlib/src/em_msc.c",
       "${efr32_sdk_root}/platform/emlib/src/em_rmu.c",
       "${efr32_sdk_root}/platform/emlib/src/em_rtcc.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_se.c",
       "${efr32_sdk_root}/platform/emlib/src/em_system.c",
       "${efr32_sdk_root}/platform/emlib/src/em_timer.c",
       "${efr32_sdk_root}/platform/emlib/src/em_usart.c",
@@ -185,6 +190,71 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/Source/queue.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/tasks.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/timers.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/crypto_ecp.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/aes_aes.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/aes.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/aesni.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/arc4.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/asn1parse.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/asn1write.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/base64.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/bignum.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/blowfish.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/camellia.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ccm.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/certs.c", 
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/cipher.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/cipher_wrap.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ctr_drbg.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/debug.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/des.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/dhm.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ecdh.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ecdsa.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ecp.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ecp_curves.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/entropy.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/entropy_poll.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/error.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/gcm.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/hmac_drbg.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/md.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/md5.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/md_wrap.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/oid.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/pem.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/pk.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/pk_wrap.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/pkcs12.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/pkcs5.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/pkparse.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/pkwrite.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/platform.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ripemd160.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/rsa.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/rsa_internal.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/sha1.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/sha256.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/sha512.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_cache.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_ciphersuites.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_cli.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_cookie.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_srv.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_ticket.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_tls.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/timing.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/version.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/version_features.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/x509.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/x509_create.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/x509_crl.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/x509_csr.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/x509write_crt.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/x509write_csr.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/xtea.c",
+      "${mbedtls_root}/repo/library/hkdf.c",
+      "${mbedtls_root}/repo/library/platform_util.c",
     ]
 
     if (efr32_family == "efr32mg12") {

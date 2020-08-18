@@ -30,6 +30,8 @@
 #include <AppTask.h>
 
 #include "AppConfig.h"
+#include "DataModelHandler.h"
+#include "Server.h"
 #include "init_board.h"
 #include "init_mcu.h"
 
@@ -74,6 +76,7 @@ extern "C" void vApplicationIdleHook(void)
 int main(void)
 {
     int ret = CHIP_ERROR_MAX;
+    DemoSessionManager sessions;
 
     initMcu();
     initBoard();
@@ -108,6 +111,10 @@ int main(void)
         EFR32_LOG("PlatformMgr().StartEventLoopTask() failed");
         appError(ret);
     }
+
+    // Init ZCL Data Model
+    InitDataModelHandler();
+    StartServer(&sessions);
 
     EFR32_LOG("Starting App Task");
     ret = GetAppTask().StartAppTask();
