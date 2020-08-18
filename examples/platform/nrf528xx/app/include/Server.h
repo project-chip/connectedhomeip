@@ -29,6 +29,6 @@ using DemoSessionManager = chip::SecureSessionMgr<chip::Transport::UDP>;
 void StartServer(DemoSessionManager * sessions);
 void InitDataModelHandler();
 void SetDeviceName(const char * newDeviceName);
-void SendUDPBroadCast();
+void PublishService();
 
 #endif // NRF5_COMMON_SERVER_H

@@ -242,7 +242,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
         if (nowUS > nextChangeTimeUS)
         {
-            SendUDPBroadCast();
+            PublishService();
             mLastChangeTimeUS = nowUS;
         }
     }

@@ -176,7 +176,7 @@ void SetDeviceName(const char * newDeviceName)
     strncpy(deviceName, newDeviceName, sizeof(deviceName) - 1);
 }
 
-void SendUDPBroadCast()
+void PublishService()
 {
     chip::Inet::IPAddress addr;
     if (!ConnectivityMgrImpl().IsThreadAttached())
