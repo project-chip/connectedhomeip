@@ -27,7 +27,7 @@ if (chip_device_platform == "nrf5") {
   import("//build_overrides/nrf5_sdk.gni")
 }
 
-if (chip_device_platform != "none") {
+if (chip_device_platform != "none" && chip_device_platform != "external") {
   declare_args() {
     # Extra header to include in CHIPDeviceConfig.h for project.
     chip_device_project_config_include = ""
@@ -297,6 +297,10 @@ if (chip_device_platform != "none") {
     }
 
     allow_circular_includes_from = [ "${chip_root}/src/lib/support" ]
+  }
+} else if (chip_device_platform == "external") {
+  group("platform") {
+    public_deps = [ "${chip_platform_target}" ]
   }
 } else {
   group("platform") {

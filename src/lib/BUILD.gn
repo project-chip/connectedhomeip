@@ -20,7 +20,6 @@ config("includes") {
 
 static_library("lib") {
   public_deps = [
-    "${chip_platform_root}",
     "${chip_root}/src/app:chip",
     "${chip_root}/src/ble",
     "${chip_root}/src/controller",
@@ -28,6 +27,7 @@ static_library("lib") {
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
     "${chip_root}/src/system",
     "${chip_root}/src/transport",
   ]
