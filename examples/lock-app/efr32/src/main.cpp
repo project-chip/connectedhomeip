@@ -27,6 +27,8 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#include <openthread/platform/entropy.h>
+
 #include <AppTask.h>
 
 #include "AppConfig.h"
@@ -80,6 +82,7 @@ int main(void)
 
     initMcu();
     initBoard();
+    efr32RandomInit();
 
 #if DISPLAY_ENABLED
     initLCD();
@@ -115,6 +118,14 @@ int main(void)
     // Init ZCL Data Model
     InitDataModelHandler();
     StartServer(&sessions);
+
+    EFR32_LOG("Init OpenThread Stack");
+    ret = ThreadStackMgr().InitThreadStack();
+    if (ret != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("ThreadStackMgr().InitThreadStack(); failed");
+        appError(ret);
+    }
 
     EFR32_LOG("Starting App Task");
     ret = GetAppTask().StartAppTask();
