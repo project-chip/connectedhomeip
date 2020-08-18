@@ -24,6 +24,7 @@
 
 #include <assert.h>
 #include <inet/InetLayer.h> // PacketBuffer and the like
+#include <support/logging/CHIPLogging.h>
 
 using namespace chip;
 
@@ -50,6 +51,8 @@ EmberStatus chipSendResponse(ChipResponseDestination * destination, EmberApsFram
     if (encodeApsFrame(buffer->Start(), dataLength, apsFrame) != frameSize)
     {
         // Something is very wrong here; our first call lied to us!
+        printf("Something wrong happened trying to encode aps frame to respond with");
+        ChipLogError(Zcl, "Something wrong happened trying to encode aps frame to respond with");
         System::PacketBuffer::Free(buffer);
         return EMBER_ERR_FATAL;
     }
