@@ -62,9 +62,6 @@ CHIP_ERROR SecurePairingSession::Init(uint32_t setupCode, uint32_t pbkdf2IterCou
     VerifyOrExit(saltLen > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(delegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    ChipLogProgress(Inet, "Secure Pairing: SetupCode %d, Iter %d, SaltLen %ld", setupCode, pbkdf2IterCount, saltLen);
-    ChipLogProgress(Inet, "Secure Pairing: Context %s, Len %ld", kSpake2pContext, strlen(kSpake2pContext));
-
     err = mSpake2p.Init((const unsigned char *) kSpake2pContext, strlen(kSpake2pContext));
     SuccessOrExit(err);
 
