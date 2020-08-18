@@ -291,16 +291,16 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       ]
       if (chip_enable_openthread) {
         public_deps += [
-          "${openthread_root}:libopenthread-ftd",
           "${openthread_root}:libopenthread-cli-ftd",
+          "${openthread_root}:libopenthread-ftd",
         ]
 
-        public_configs += ["${chip_root}/third_party/openthread/platforms/efr32:libot_efr32_config"]
+        public_configs += [ "${chip_root}/third_party/openthread/platforms/efr32:libot_efr32_config" ]
 
         sources += [
-          "OpenThread/OpenThreadUtils.cpp",
           "EFR32/ThreadStackManagerImpl.cpp",
           "EFR32/ThreadStackManagerImpl.h",
+          "OpenThread/OpenThreadUtils.cpp",
         ]
       }
     }

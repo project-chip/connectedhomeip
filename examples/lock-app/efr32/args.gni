@@ -13,13 +13,12 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/platform/EFR32/args.gni")
 import("//build_overrides/openthread.gni")
+import("${chip_root}/src/platform/EFR32/args.gni")
 
 efr32_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 mbedtls_target = efr32_sdk_target
 openthread_external_mbedtls = mbedtls_target
-
 
 chip_ble_project_config_include = "<CHIPProjectConfig.h>"
 chip_device_project_config_include = "<CHIPProjectConfig.h>"
