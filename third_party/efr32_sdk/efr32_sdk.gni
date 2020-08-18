@@ -263,6 +263,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/mbedtls/library/xtea.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/aes_aes.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/crypto_aes.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/trng.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/crypto_ble.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/crypto_ecp.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/crypto_management.c",
