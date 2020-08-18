@@ -38,7 +38,7 @@ static uint16_t doEncodeApsFrame(BufBound & buf, uint16_t profileID, uint16_t cl
     buf.PutLE16(clusterId);
     buf.Put(sourceEndpoint);
     buf.Put(destinationEndpoint);
-    buf.Put(&options, sizeof(EmberApsOption));
+    buf.PutLE(options, sizeof(EmberApsOption));
     buf.PutLE16(groupId);
     buf.Put(sequence);
     buf.Put(radius);
@@ -49,18 +49,27 @@ static uint16_t doEncodeApsFrame(BufBound & buf, uint16_t profileID, uint16_t cl
 
 uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame)
 {
+    if (buffer == nullptr)
+    {
+        buf_length = 0; // This is the measuring case.
+    }
     BufBound buf = BufBound(buffer, buf_length);
     return doEncodeApsFrame(buf, apsFrame->profileId, apsFrame->clusterId, apsFrame->sourceEndpoint, apsFrame->destinationEndpoint,
                             apsFrame->options, apsFrame->groupId, apsFrame->sequence, apsFrame->radius);
 }
 
-uint32_t _encodeOnOffCommand(uint8_t * buffer, uint32_t buf_length, int command, uint8_t destination_endpoint)
+uint32_t _encodeOnOffCommand(uint8_t * buffer, uint32_t buf_length, uint8_t command, uint8_t destination_endpoint)
 {
     uint32_t result = 0;
     // pick cluster id as 6 for now.
     // pick source and destination end points as 1 for now.
     // Profile is 65535 because that matches our simple generated code, but we
     // should sort out the profile situation.
+
+    if (buffer == nullptr)
+    {
+        buf_length = 0; // This is the measuring case.
+    }
 
     BufBound buf = BufBound(buffer, buf_length);
     result       = doEncodeApsFrame(buf, 65535, 6, 1, destination_endpoint, 0, 0, 0, 0);
@@ -79,9 +88,14 @@ uint32_t _encodeOnOffCommand(uint8_t * buffer, uint32_t buf_length, int command,
     // Transaction sequence number.  Just pick something.
     buf.Put(0x1);
 
-    buf.Put(&command, sizeof(int));
+    buf.Put(&command, sizeof(uint8_t));
 
-    return buf.Fit() ? buf.Written() : 0;
+    result = buf.Fit() ? buf.Written() : 0;
+    if (result == 0)
+    {
+        ChipLogError(Zcl, "Error encoding on / off cmd");
+    }
+    return result;
 }
 
 uint32_t encodeOffCommand(uint8_t * buffer, uint32_t buf_length, uint8_t destination_endpoint)
@@ -102,6 +116,10 @@ uint32_t encodeToggleCommand(uint8_t * buffer, uint32_t buf_length, uint8_t dest
 uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t cluster_id,
                                      uint16_t * attr_ids, uint16_t attr_id_count)
 {
+    if (buffer == nullptr)
+    {
+        buf_length = 0; // This is the measuring case.
+    }
     BufBound buf    = BufBound(buffer, buf_length);
     uint16_t result = doEncodeApsFrame(buf, 65535, 6, 1, destination_endpoint, 0, 0, 0, 0);
     if (result == 0)
@@ -126,7 +144,12 @@ uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint
         buf.PutLE16(attr_id);
     }
 
-    return buf.Fit() ? buf.Written() : 0;
+    result = buf.Fit() ? buf.Written() : 0;
+    if (result == 0)
+    {
+        ChipLogError(Zcl, "Error encoding read attributes cmd");
+    }
+    return result;
 }
 
 uint16_t encodeReadOnOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
