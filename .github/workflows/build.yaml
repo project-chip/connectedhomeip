@@ -61,6 +61,7 @@ jobs:
             - name: Run Tests
               run: scripts/tests/gn_tests.sh
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
+            # TODO https://github.com/project-chip/connectedhomeip/issues/1512
             # - name: Run Code Coverage
             #   if: ${{ contains('main', env.BUILD_TYPE) }}
             #   run: scripts/tools/codecoverage.sh
