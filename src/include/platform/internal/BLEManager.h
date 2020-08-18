@@ -100,10 +100,9 @@ extern BLEManagerImpl & BLEMgrImpl(void);
  */
 #ifdef EXTERNAL_BLEMANAGERIMPL_HEADER
 #include EXTERNAL_BLEMANAGERIMPL_HEADER
-#else
+#elif defined(CHIP_DEVICE_LAYER_TARGET)
 #define BLEMANAGERIMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/BLEManagerImpl.h>
 #include BLEMANAGERIMPL_HEADER
-#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -178,6 +177,7 @@ inline chip::Ble::BleLayer * BLEManager::GetBleLayer(void) const
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #endif // BLE_MANAGER_H

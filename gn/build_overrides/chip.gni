@@ -15,4 +15,5 @@
 declare_args() {
   # Root directory for CHIP.
   chip_root = "//"
+  chip_platform_root = "//src/platform/"
 }

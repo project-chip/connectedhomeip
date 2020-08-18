@@ -175,10 +175,9 @@ extern PlatformManagerImpl & PlatformMgrImpl(void);
  */
 #ifdef EXTERNAL_PLATFORMMANAGERIMPL_HEADER
 #include EXTERNAL_PLATFORMMANAGERIMPL_HEADER
-#else
+#elif defined(CHIP_DEVICE_LAYER_TARGET)
 #define PLATFORMMANAGERIMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/PlatformManagerImpl.h>
 #include PLATFORMMANAGERIMPL_HEADER
-#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -251,4 +250,5 @@ inline CHIP_ERROR PlatformManager::Shutdown(void)
 } // namespace DeviceLayer
 } // namespace chip
 
+#endif // defined(CHIP_DEVICE_LAYER_TARGET)
 #endif // PLATFORM_MANAGER_H
