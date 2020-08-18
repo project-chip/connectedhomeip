@@ -15,6 +15,23 @@
 import("//build/config/arm.gni")
 import("//build_overrides/chip.gni")
 
+declare_args() {
+  # Size of SEGGER RTT up buffer.
+  segger_rtt_buffer_size_up = -1
+
+  # Size of SEGGER RTT down buffer.
+  segger_rtt_buffer_size_down = -1
+
+  # Number of SEGGER RTT up buffers.
+  segger_rtt_max_num_up_buffers = -1
+
+  # Number of SEGGER RTT down buffer.
+  segger_rtt_max_num_down_buffers = -1
+
+  # Default mode of SEGGER RTT.
+  segger_rtt_mode_default = -1
+}
+
 _rtt_asm = ""
 if (current_cpu == "arm") {
   if (arm_arch == "armv7-m" || arm_arch == "armv7e-m") {
@@ -35,6 +52,22 @@ config("rtt_config") {
     defines += [ "RTT_USE_ASM=1" ]
   } else {
     defines += [ "RTT_USE_ASM=0" ]
+  }
+
+  if (segger_rtt_buffer_size_up != -1) {
+    defines += ["BUFFER_SIZE_UP=${segger_rtt_buffer_size_up}"]
+  }
+  if (segger_rtt_buffer_size_down != -1) {
+    defines += ["BUFFER_SIZE_DOWN=${segger_rtt_buffer_size_down}"]
+  }
+  if (segger_rtt_max_num_up_buffers != -1) {
+    defines += ["SEGGER_RTT_MAX_NUM_UP_BUFFERS=${segger_rtt_max_num_up_buffers}"]
+  }
+  if (segger_rtt_max_num_down_buffers != -1) {
+    defines += ["SEGGER_RTT_MAX_NUM_UP_BUFFERS=${segger_rtt_max_num_down_buffers}"]
+  }
+  if (segger_rtt_mode_default != -1) {
+    defines += ["SEGGER_RTT_MODE_DEFAULT=${segger_rtt_mode_default}"]
   }
 }
 

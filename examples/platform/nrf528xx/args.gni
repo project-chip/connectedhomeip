@@ -36,3 +36,8 @@ chip_config_enable_arg_parser = false
 chip_system_config_provide_statistics = false
 chip_inet_config_enable_raw_endpoint = false
 chip_with_nlfaultinjection = true
+
+segger_rtt_buffer_size_up = 4096
+segger_rtt_max_num_up_buffers = 1
+segger_rtt_max_num_down_buffers = 1
+segger_rtt_mode_default = "SEGGER_RTT_MODE_NO_BLOCK_TRIM"
