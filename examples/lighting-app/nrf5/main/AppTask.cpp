@@ -34,6 +34,12 @@
 #include "FreeRTOS.h"
 
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/OpenThread/OpenThreadUtils.h>
+#include <platform/ThreadStackManager.h>
+#include <platform/internal/DeviceNetworkInfo.h>
+#include <platform/nRF5/ThreadStackManagerImpl.h>
+#include <support/ErrorStr.h>
+#include <system/SystemClock.h>
 
 APP_TIMER_DEF(sFunctionTimer);
 
@@ -156,6 +162,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 {
     ret_code_t ret;
     AppEvent event;
+    uint64_t mLastChangeTimeUS = 0;
 
     ret = sAppTask.Init();
     if (ret != NRF_SUCCESS)
@@ -163,6 +170,8 @@ void AppTask::AppTaskMain(void * pvParameter)
         NRF_LOG_INFO("AppTask.Init() failed");
         APP_ERROR_HANDLER(ret);
     }
+
+    SetDeviceName("LightingDemo._chip._udp.local.");
 
     while (true)
     {
@@ -227,6 +236,15 @@ void AppTask::AppTaskMain(void * pvParameter)
         sStatusLED.Animate();
         sUnusedLED.Animate();
         sUnusedLED_1.Animate();
+
+        uint64_t nowUS            = chip::System::Platform::Layer::GetClock_Monotonic();
+        uint64_t nextChangeTimeUS = mLastChangeTimeUS + 5 * 1000 * 1000UL;
+
+        if (nowUS > nextChangeTimeUS)
+        {
+            PublishService();
+            mLastChangeTimeUS = nowUS;
+        }
     }
 }
 
