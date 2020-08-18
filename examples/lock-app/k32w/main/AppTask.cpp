@@ -48,7 +48,6 @@ static bool sIsThreadProvisioned              = false;
 static bool sIsThreadEnabled                  = false;
 static bool sIsThreadAttached                 = false;
 static bool sIsPairedToAccount                = false;
-static bool sIsServiceSubscriptionEstablished = false;
 static bool sHaveBLEConnections               = false;
 static bool sHaveServiceConnectivity          = false;
 
@@ -178,7 +177,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
         // Consider the system to be "fully connected" if it has service
         // connectivity and it is able to interact with the service on a regular basis.
-        bool isFullyConnected = (sHaveServiceConnectivity && sIsServiceSubscriptionEstablished);
+        bool isFullyConnected = sHaveServiceConnectivity;
 
         // Update the status LED if factory reset has not been initiated.
         //
@@ -223,7 +222,8 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 {
-    if ((pin_no != RESET_BUTTON) && (pin_no != LOCK_BUTTON) && (pin_no != OTA_BUTTON))
+    if ((pin_no != RESET_BUTTON) && (pin_no != LOCK_BUTTON) &&
+       (pin_no != OTA_BUTTON))
     {
         return;
     }
@@ -426,18 +426,7 @@ void AppTask::OtaHandler(AppEvent * aEvent)
         return;
     }
 
-    /*
-    if (SoftwareUpdateMgr().IsInProgress())
-    {
-        K32W_LOG("Canceling In Progress Software Update");
-        SoftwareUpdateMgr().Abort();
-    }
-    else
-    {
-        K32W_LOG("Manual Software Update Triggered");
-        SoftwareUpdateMgr().CheckNow();
-    }
-    */
+    // TODO: Add OTA support
 }
 
 void AppTask::CancelTimer()
