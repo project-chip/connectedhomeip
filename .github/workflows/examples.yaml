@@ -19,7 +19,7 @@ on:
     pull_request:
 
 jobs:
-    # TODO ESP32
+    # TODO ESP32 https://github.com/project-chip/connectedhomeip/issues/1510
     nrf:
         name: nRF
 
@@ -70,7 +70,7 @@ jobs:
                   path: |
                       out/lock_app_debug/chip-nrf52840-lock-example
                       out/lighting_app_debug/chip-nrf52840-lighting-example
-    # TODO: NRF Connect
+    # TODO: NRF Connect https://github.com/project-chip/connectedhomeip/issues/2225
     linux-standalone:
         name: Linux Standalone
 
