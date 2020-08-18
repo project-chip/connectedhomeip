@@ -243,10 +243,9 @@ extern ConnectivityManagerImpl & ConnectivityMgrImpl(void);
  */
 #ifdef EXTERNAL_CONNECTIVITYMANAGERIMPL_HEADER
 #include EXTERNAL_CONNECTIVITYMANAGERIMPL_HEADER
-#else
+#elif defined(CHIP_DEVICE_LAYER_TARGET)
 #define CONNECTIVITYMANAGERIMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/ConnectivityManagerImpl.h>
 #include CONNECTIVITYMANAGERIMPL_HEADER
-#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -548,5 +547,5 @@ inline void ConnectivityManager::OnWiFiStationProvisionChange(void)
 
 } // namespace DeviceLayer
 } // namespace chip
-
+#endif // defined(CHIP_DEVICE_LAYER_TARGET)
 #endif // CONNECTIVITY_MANAGER_H

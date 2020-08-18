@@ -156,10 +156,9 @@ extern ThreadStackManagerImpl & ThreadStackMgrImpl(void);
  */
 #ifdef EXTERNAL_THREADSTACKMANAGERIMPL_HEADER
 #include EXTERNAL_THREADSTACKMANAGERIMPL_HEADER
-#else
+#elif defined(CHIP_DEVICE_LAYER_TARGET)
 #define THREADSTACKMANAGERIMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/ThreadStackManagerImpl.h>
 #include THREADSTACKMANAGERIMPL_HEADER
-#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -310,4 +309,5 @@ inline CHIP_ERROR ThreadStackManager::JoinerStart(void)
 } // namespace DeviceLayer
 } // namespace chip
 
+#endif // defined(CHIP_DEVICE_LAYER_TARGET)
 #endif // THREAD_STACK_MANAGER_H
