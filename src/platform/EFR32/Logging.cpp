@@ -31,6 +31,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <support/logging/CHIPLogging.h>
+#include <support/CodeUtils.h>
 
 #include <queue.h>
 #include <retargetserial.h>
@@ -256,7 +257,7 @@ extern "C" void LwIPLog(const char * aFormat, ...)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
 {
-    (void) aLogRegion;
+    IgnoreUnusedVariable(aLogRegion);
     va_list v;
 
     va_start(v, aFormat);

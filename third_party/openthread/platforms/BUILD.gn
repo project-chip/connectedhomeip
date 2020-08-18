@@ -19,8 +19,23 @@ config("libopenthread-platform_config") {
   include_dirs = [ "${openthread_root}/examples/platforms" ]
 }
 
+copy("copy_openthread_system") {
+  sources = [ "${openthread_root}/examples/platforms/openthread-system.h" ]
+
+  outputs =
+      [ "${root_gen_dir}/include/openthread/platform/{{source_file_part}}" ]
+}
+
+source_set("openthread_system") {
+  sources =
+      [ "${root_gen_dir}/include/openthread/platform/openthread-system.h" ]
+  deps = [ ":copy_openthread_system" ]
+}
+
 source_set("libopenthread-platform") {
   sources = [ "${openthread_root}/examples/platforms/openthread-system.h" ]
+
+  public_deps = [ ":openthread_system" ]
 
   public_configs = [ ":libopenthread-platform_config" ]
 }

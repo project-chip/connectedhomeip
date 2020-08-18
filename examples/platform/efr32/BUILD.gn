@@ -13,6 +13,19 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/examples/platform/efr32/args.gni")
+import("//build_overrides/efr32_sdk.gni")
 
-efr32_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
+
+config("chip_examples_project_config") {
+  include_dirs = [ "project_include" ]
+}
+
+source_set("openthread_core_config_efr32_chip_examples") {
+  sources = [ "project_include/OpenThreadConfig.h" ]
+  public_deps = [
+    "${chip_root}/third_party/openthread/platforms/efr32:openthread_core_config_efr32",
+    "${efr32_sdk_build_root}:efr32_sdk",
+  ]
+  public_configs = [ ":chip_examples_project_config" ]
+}

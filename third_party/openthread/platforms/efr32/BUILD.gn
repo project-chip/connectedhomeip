@@ -12,87 +12,55 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/openthread.gni")
-import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
-efr32_sdk("efr32_ot_sdk") {
-  include_dirs = [
-    "${chip_root}/src/include/platform",
-    "${chip_root}/src/platform/EFR32",
-    "${chip_root}/examples/lock-app/efr32/include/",
-    "${chip_root}/examples/lock-app/efr32/src/platform/${efr32_family}/${efr32_board}",
-    "${openthread_root}/examples/platforms/${efr32_family}/crypto",
-  ]
+import("${efr32_sdk_build_root}/efr32_board.gni")
 
-  sources = [
-    "${chip_root}/examples/lock-app/efr32/include/CHIPProjectConfig.h",
-    "${chip_root}/examples/lock-app/efr32/include/FreeRTOSConfig.h",
-    "${chip_root}/examples/lock-app/efr32/include/mbedtls-config.h",
-    "${chip_root}/examples/lock-app/efr32/src/platform/${efr32_family}/${efr32_board}/hal-config.h",
-    "${openthread_root}/examples/platforms/${efr32_family}/crypto/efr32-mbedtls-config.h",
-  ]
+config("openthread_efr32_config") {
+  include_dirs = [ "${openthread_root}/examples/platforms/${efr32_family}" ]
 
-  defines = []
-  if (is_debug) {
-    defines += [ "BUILD_RELEASE=0" ]
-  } else {
-    defines += [ "BUILD_RELEASE=1" ]
+  defines = [ "RADIO_CONFIG_DMP_SUPPORT=1" ]
+
+  if (efr32_board == "BRD4161A") {
+    include_dirs +=
+        [ "${openthread_root}/examples/platforms/${efr32_family}/brd4161a" ]
+  } else if (efr32_board == "BRD4166A") {
+    include_dirs +=
+        [ "${openthread_root}/examples/platforms/${efr32_family}/brd4166a" ]
   }
-
-  defines += [
-    "USE_APP_CONFIG",
-    "${efr32_board}=1",
-    "BOARD_ID=${efr32_board}",
-    "NVIC_CONFIG=\"platform/base/hal/micro/cortexm3/efm32/nvic-config.h\"",
-  ]
 }
 
-config("libot_efr32_config") {
-  include_dirs = [
-    "${openthread_root}/examples/platforms",
-    "${openthread_root}/examples/platforms/${efr32_family}",
-    "${openthread_root}/examples/platforms/${efr32_family}/brd4166a",
-    "${chip_root}/examples/lock-app/efr32/include",
+source_set("openthread_core_config_efr32") {
+  sources = [
+    "${openthread_root}/examples/platforms/${efr32_family}/openthread-core-efr32-config-check.h",
+    "${openthread_root}/examples/platforms/${efr32_family}/openthread-core-efr32-config.h",
   ]
+
+  public_deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
+
+  public_configs = [ ":openthread_efr32_config" ]
+}
+
+source_set("openthread_mbedtls_config_efr32") {
+  sources = [ "${openthread_root}/examples/platforms/${efr32_family}/crypto/efr32-mbedtls-config.h" ]
 }
 
 source_set("libopenthread-efr32") {
   sources = [
-    "${chip_root}/examples/lock-app/efr32/include/mbedtls-config.h",
     "${openthread_root}/examples/platforms/${efr32_family}/alarm.c",
-    "${openthread_root}/examples/platforms/${efr32_family}/crypto/efr32-mbedtls-config.h",
     "${openthread_root}/examples/platforms/${efr32_family}/entropy.c",
     "${openthread_root}/examples/platforms/${efr32_family}/flash.c",
     "${openthread_root}/examples/platforms/${efr32_family}/misc.c",
     "${openthread_root}/examples/platforms/${efr32_family}/radio.c",
     "${openthread_root}/examples/platforms/${efr32_family}/system.c",
     "${openthread_root}/examples/platforms/${efr32_family}/uart.c",
-    "${openthread_root}/examples/platforms/openthread-system.h",
-    "${openthread_root}/examples/platforms/utils/soft_source_match_table.c",
-  ]
-
-  include_dirs = [
-    "${openthread_root}/examples/platforms",
-    "${openthread_root}/examples/platforms/${efr32_family}/brd4166a/",
-    "${openthread_root}/examples/platforms/utils",
   ]
 
   public_deps = [
-    ":efr32_ot_sdk",
-    ":libopenthread-efr32-config",
+    ":openthread_core_config_efr32",
     "${openthread_root}/src/core:libopenthread_core_headers",
+    "..:libopenthread-platform",
+    "..:libopenthread-platform-utils",
   ]
-}
-
-source_set("libopenthread-efr32-config") {
-  sources = [
-    "${openthread_root}/examples/platforms/${efr32_family}/openthread-core-efr32-config-check.h",
-    "${openthread_root}/examples/platforms/${efr32_family}/openthread-core-efr32-config.h",
-  ]
-
-  public_configs = [ ":libot_efr32_config" ]
-
-  public_deps = [ ":efr32_ot_sdk" ]
 }

@@ -30,6 +30,27 @@
 #define EFR32_MBEDTLS_CONFIG_H
 
 #include "em_device.h"
+#include "em_se.h"
+#include <limits.h>
+
+/**
+ * Enable FreeRTOS threading support
+ */
+#define MBEDTLS_FREERTOS
+#define MBEDTLS_THREADING_C
+#define MBEDTLS_THREADING_ALT
+
+/**
+ * Enable Crypto and Entropy modules
+ */
+#define MBEDTLS_AES_C
+#define MBEDTLS_ECP_C
+#define MBEDTLS_ECDH_C
+#define MBEDTLS_ENTROPY_C
+#define MBEDTLS_SHA1_C
+#define MBEDTLS_SHA256_C
+#define MBEDTLS_TRNG_C
+#define MBEDTLS_CIPHER_MODE_CTR
 
 /**
  * \def MBEDTLS_AES_ALT
@@ -42,6 +63,15 @@
  * See MBEDTLS_AES_C for more information.
  */
 #define MBEDTLS_AES_ALT
+
+/**
+ * \def MBEDTLS_ENTROPY_HARDWARE_ALT
+ *
+ * Integrate the provided default entropy source into the mbed
+ * TLS entropy infrastructure.
+ *
+ */
+#define MBEDTLS_ENTROPY_HARDWARE_ALT
 
 /**
  * \def MBEDTLS_ECP_INTERNAL_ALT
@@ -67,6 +97,25 @@
 #define MBEDTLS_ECP_NORMALIZE_JAC_MANY_ALT
 #define MBEDTLS_ECP_NORMALIZE_JAC_ALT
 #define MBEDTLS_ECP_RANDOMIZE_JAC_ALT
+#endif
+
+/**
+ * \def MBEDTLS_SHA1_ALT
+ *
+ * Enable hardware acceleration for the SHA-224 and SHA-256 cryptographic
+ * hash algorithms.
+ * Module: sl_crypto/src/crypto_sha.c
+ * Caller: library/mbedtls_md.c
+ *         library/ssl_cli.c
+ *         library/ssl_srv.c
+ *         library/ssl_tls.c
+ *         library/x509write_crt.c
+ *
+ * Requires: MBEDTLS_SHA1_C and (CRYPTO_COUNT > 0)
+ * See MBEDTLS_SHA1_C for more information.
+ */
+#if defined(CRYPTO_COUNT) && (CRYPTO_COUNT > 0)
+#define MBEDTLS_SHA1_ALT
 #endif
 
 /**

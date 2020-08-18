@@ -38,7 +38,6 @@ nrf528xx_sdk_common = [
 copy("copy_nrf52840_headers") {
   sources = [
     "${openthread_root}/examples/platforms/nrf528xx/src/platform-softdevice.h",
-    "${openthread_root}/examples/platforms/openthread-system.h",
   ]
 
   outputs =

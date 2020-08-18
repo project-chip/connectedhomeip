@@ -105,6 +105,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET_EFR32=1",
         "CHIP_DEVICE_LAYER_TARGET=EFR32",
       ]
+      if (chip_enable_openthread) {
+        defines += [
+          "CHIP_DEVICE_CONFIG_ENABLE_THREAD=1",
+          "CHIP_ENABLE_OPENTHREAD=1",
+        ]
+      }
     } else {
       defines += [ "CHIP_DEVICE_LAYER_TARGET_EFR32=0" ]
     }
@@ -147,7 +153,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "../include/platform/internal/GenericSoftwareUpdateManagerImpl_BDX.h",
       "../include/platform/internal/NetworkProvisioningServer.h",
       "../include/platform/internal/testing/ConfigUnitTest.h",
-      "../lib/message/support/crypto/CHIPRNG.h",
       "GeneralUtils.cpp",
       "Globals.cpp",
       "PersistedStorage.cpp",
@@ -290,12 +295,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "FreeRTOS/SystemTimeSupport.cpp",
       ]
       if (chip_enable_openthread) {
-        public_deps += [
-          "${openthread_root}:libopenthread-cli-ftd",
-          "${openthread_root}:libopenthread-ftd",
-        ]
-
-        public_configs += [ "${chip_root}/third_party/openthread/platforms/efr32:libot_efr32_config" ]
+        public_deps += [ "${openthread_root}:libopenthread-ftd" ]
 
         sources += [
           "EFR32/ThreadStackManagerImpl.cpp",
