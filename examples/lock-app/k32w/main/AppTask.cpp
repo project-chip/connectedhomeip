@@ -374,7 +374,8 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
 {
     BoltLockManager::Action_t action;
     int err = CHIP_NO_ERROR;
-
+    int32_t actor  = 0;
+    bool initiated = false;
 
 	if (sAppTask.mFunction != kFunction_NoneSelected)
 	{
@@ -385,6 +386,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     if (aEvent->Type == AppEvent::kEventType_Lock)
     {
         action = static_cast<BoltLockManager::Action_t>(aEvent->LockEvent.Action);
+        actor  = aEvent->LockEvent.Actor;
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
@@ -404,8 +406,12 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
 
     if (err == CHIP_NO_ERROR)
     {
-        K32W_LOG("Action is already in progress or active.");
-        ActionCompleted(action);
+        initiated = BoltLockMgr().InitiateAction(actor, action);
+
+        if (!initiated)
+        {
+            K32W_LOG("Action is already in progress or active.");
+        }
     }
 }
 
