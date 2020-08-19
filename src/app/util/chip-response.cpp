@@ -40,6 +40,13 @@ EmberStatus chipSendResponse(ChipResponseDestination * destination, EmberApsFram
         // Definitely too long for a packet!
         return EMBER_MESSAGE_TOO_LONG;
     }
+
+    if (frameSize == 0)
+    {
+        ChipLogError(Zcl, "Error encoding APS frame");
+        return EMBER_ERR_FATAL;
+    }
+
     auto * buffer = System::PacketBuffer::NewWithAvailableSize(dataLength);
     if (!buffer)
     {
