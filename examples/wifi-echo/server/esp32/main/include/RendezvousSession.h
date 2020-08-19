@@ -43,7 +43,7 @@ private:
     static SecurePairingSession mPairing;
     static bool mPairingInProgress;
 
-    bool mPaired = false;
+    bool mPaired           = false;
     uint32_t mSetUpPINCode = 0;
     NodeId mNodeId;
 };

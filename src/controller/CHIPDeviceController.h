@@ -51,7 +51,9 @@ typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * app
 typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
 };
 
-class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback, public SecurePairingSessionDelegate, public Transport::BLECallbackHandler
+class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback,
+                                        public SecurePairingSessionDelegate,
+                                        public Transport::BLECallbackHandler
 {
     friend class ChipDeviceControllerCallback;
 
@@ -234,7 +236,7 @@ private:
     ErrorHandler mOnError;
     NewConnectionHandler mOnNewConnection;
     NewConnectionHandler mPairingComplete = nullptr;
-    MessageReceiveHandler mAppMsgHandler = nullptr;
+    MessageReceiveHandler mAppMsgHandler  = nullptr;
     System::PacketBuffer * mCurReqMsg;
 
     NodeId mLocalDeviceId;
@@ -244,11 +246,11 @@ private:
     uint32_t mMessageNumber = 0;
 
     SecurePairingSession mPairingSession;
-    uint16_t mNextKeyId = 0;
+    uint16_t mNextKeyId     = 0;
     bool mPairingInProgress = false;
 
-    uint32_t mSetupPINCode = 0;
-    uint16_t mPeerKeyId = 0;
+    uint32_t mSetupPINCode     = 0;
+    uint16_t mPeerKeyId        = 0;
     uint16_t mLocalPairedKeyId = 0;
 
     void ClearRequestState();

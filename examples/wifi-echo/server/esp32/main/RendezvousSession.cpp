@@ -33,9 +33,9 @@ bool RendezvousSession::mPairingInProgress = false;
 SecurePairingSession RendezvousSession::mPairing;
 
 static constexpr uint32_t kSpake2p_Iteration_Count = 50000;
-static const char * kSpake2pKeyExchangeSalt = "SPAKE2P Key Exchange Salt";
+static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Exchange Salt";
 
-extern void PairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId, SecurePairingSession* pairing);
+extern void PairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId, SecurePairingSession * pairing);
 
 RendezvousSession::RendezvousSession(BluetoothWidget * virtualLed, uint32_t setUpPINCode, NodeId myNodeId)
 {
@@ -44,12 +44,11 @@ RendezvousSession::RendezvousSession(BluetoothWidget * virtualLed, uint32_t setU
     DeviceLayer::ConnectivityMgr().AddCHIPoBLEConnectionHandler(HandleConnectionOpened);
 
     RendezvousSession::mPairing.WaitForPairing(setUpPINCode, kSpake2p_Iteration_Count,
-                            (const unsigned char*) kSpake2pKeyExchangeSalt,
-                            strlen(kSpake2pKeyExchangeSalt),
-                            Optional<NodeId>::Value(myNodeId), 0, this);
+                                               (const unsigned char *) kSpake2pKeyExchangeSalt, strlen(kSpake2pKeyExchangeSalt),
+                                               Optional<NodeId>::Value(myNodeId), 0, this);
     RendezvousSession::mPairingInProgress = true;
-    mSetUpPINCode = setUpPINCode;
-    mNodeId = myNodeId;
+    mSetUpPINCode                         = setUpPINCode;
+    mNodeId                               = myNodeId;
 }
 
 CHIP_ERROR RendezvousSession::OnNewMessageForPeer(System::PacketBuffer * buffer)
@@ -68,16 +67,15 @@ void RendezvousSession::OnPairingError(CHIP_ERROR error)
     ChipLogError(Ble, "RendezvousSession: failed in pairing");
     mPaired = false;
     RendezvousSession::mPairing.WaitForPairing(mSetUpPINCode, kSpake2p_Iteration_Count,
-                            (const unsigned char*) kSpake2pKeyExchangeSalt,
-                            strlen(kSpake2pKeyExchangeSalt),
-                            Optional<NodeId>::Value(mNodeId), 0, this);
+                                               (const unsigned char *) kSpake2pKeyExchangeSalt, strlen(kSpake2pKeyExchangeSalt),
+                                               Optional<NodeId>::Value(mNodeId), 0, this);
     RendezvousSession::mPairingInProgress = true;
 }
 
 void RendezvousSession::OnPairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId)
 {
     ChipLogProgress(Ble, "RendezvousSession: pairing complete");
-    mPaired = true;
+    mPaired                               = true;
     RendezvousSession::mPairingInProgress = false;
     PairingComplete(peerNodeId, peerKeyId, localKeyId, &RendezvousSession::mPairing);
 }

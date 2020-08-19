@@ -238,7 +238,7 @@ SecureSessionMgr<Transport::UDP, // IPV6
 
 } // namespace
 
-void PairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId, SecurePairingSession* pairing)
+void PairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId, SecurePairingSession * pairing)
 {
     Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
     sessions.NewPairing(peerNodeId, peer, peerKeyId, localKeyId, pairing);
