@@ -43,8 +43,16 @@ static uint16_t doEncodeApsFrame(BufBound & buf, uint16_t profileID, uint16_t cl
     buf.Put(sequence);
     buf.Put(radius);
 
-    ChipLogProgress(Zcl, "Encoded APS frame of size %d bytes", buf.Written());
-    return buf.Fit() ? buf.Written() : 0;
+    if (!buf.Fit() && buf.Size() > 0)
+    {
+        ChipLogError(Zcl, "Could not encode buffer due to insufficient space");
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "Successfully encoded APS frame of size %d bytes", buf.Written());
+    }
+
+    return (buf.Fit() || buf.Size() == 0) ? buf.Written() : 0; // 0 size buffer implies measure case.
 }
 
 uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame)
