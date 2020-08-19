@@ -130,13 +130,6 @@ CHIP_ERROR ChipMessageLayer::Init(InitContext * context)
     mBle = context->ble;
 #endif
 
-#if CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-    if (SystemLayer == NULL)
-    {
-        SystemLayer = Inet->SystemLayer();
-    }
-#endif // CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
     FabricState                           = context->fabricState;
     FabricState->MessageLayer             = this;
     OnMessageReceived                     = NULL;

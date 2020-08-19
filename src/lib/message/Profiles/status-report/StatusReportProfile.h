@@ -36,6 +36,7 @@
 #ifndef _STATUS_REPORT_PROFILE_H
 #define _STATUS_REPORT_PROFILE_H
 
+#include <message/CHIPMessageLayer.h>
 #include <support/DLLUtil.h>
 
 /**
