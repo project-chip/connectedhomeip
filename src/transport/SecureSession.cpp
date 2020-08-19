@@ -133,7 +133,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureSession::GetAAD(const MessageHeader & header, uint8_t * aad, size_t & len)
+CHIP_ERROR SecureSession::GetAdditionalAuthData(const MessageHeader & header, uint8_t * aad, size_t & len)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     size_t actualEncodedHeaderSize;
@@ -168,7 +168,7 @@ CHIP_ERROR SecureSession::Encrypt(const unsigned char * input, size_t input_leng
     error = GetIV(header, IV, sizeof(IV));
     SuccessOrExit(error);
 
-    error = GetAAD(header, AAD, aadLen);
+    error = GetAdditionalAuthData(header, AAD, aadLen);
     SuccessOrExit(error);
 
     error = AES_CCM_encrypt(input, input_length, AAD, aadLen, mKey, sizeof(mKey), (const unsigned char *) IV, sizeof(IV), output,
@@ -199,7 +199,7 @@ CHIP_ERROR SecureSession::Decrypt(const unsigned char * input, size_t input_leng
     error = GetIV(header, IV, sizeof(IV));
     SuccessOrExit(error);
 
-    error = GetAAD(header, AAD, aadLen);
+    error = GetAdditionalAuthData(header, AAD, aadLen);
     SuccessOrExit(error);
 
     error = AES_CCM_decrypt(input, input_length, AAD, aadLen, (const unsigned char *) tag, taglen, mKey, sizeof(mKey),

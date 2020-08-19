@@ -131,7 +131,10 @@ private:
 
     static CHIP_ERROR GetIV(const MessageHeader & header, uint8_t * iv, size_t len);
 
-    static CHIP_ERROR GetAAD(const MessageHeader & header, uint8_t * aad, size_t & len);
+    // Use unencrypted header as additional authenticated data (AAD) during encryption and decryption.
+    // The encryption operations includes AAD when message authentication tag is generated. This tag
+    // is used at the time of decryption to integrity check the received data.
+    static CHIP_ERROR GetAdditionalAuthData(const MessageHeader & header, uint8_t * aad, size_t & len);
 };
 
 } // namespace chip
