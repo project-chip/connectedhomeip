@@ -93,7 +93,7 @@ DIST_SUBDIRS                      = \
     inet                            \
     lib                             \
     setup_payload                   \
-		$(CONTROLLER_SUBDIRS)           \
+    $(CONTROLLER_SUBDIRS)           \
     $(SETUP_PAYLOAD_SUBDIRS)        \
     crypto                          \
     platform                        \

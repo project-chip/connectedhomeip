@@ -26,15 +26,13 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 # Package (e.g. 'make dist') these subdirectories
 
 DIST_SUBDIRS = \
-    chip-zcl-zpro \
     clusters \
     util \
     $(NULL)
 
 # Build (e.g for 'make all') these subdirectories
 
-SUBDIRS                               = \
-    chip-zcl-zpro                       \
+SUBDIRS = \
     $(NULL)
 
 include DataModel.am

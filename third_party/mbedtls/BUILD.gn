@@ -109,5 +109,8 @@ if (mbedtls_target != "") {
     }
 
     public_configs = [ ":mbedtls_config" ]
+
+    output_name = "libmbedtls"
+    output_dir = "${root_out_dir}/lib"
   }
 }

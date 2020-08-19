@@ -34,6 +34,7 @@
 #include <ble/BleError.h>
 #include <ble/BleLayer.h>
 #include <core/CHIPCore.h>
+#include <support/DLLUtil.h>
 #include <transport/Base.h>
 
 namespace chip {

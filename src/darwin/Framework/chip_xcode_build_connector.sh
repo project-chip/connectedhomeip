@@ -45,6 +45,27 @@ read -r -a DEFINES <<<"$GCC_PREPROCESSOR_DEFINITIONS"
 
 declare target_defines=
 for define in "${DEFINES[@]}"; do
+
+    echo define=$define
+    # skip over those that GN does for us
+    case "$define" in
+        CHIP_PROJECT_CONFIG_INCLUDE*)
+            echo skipping
+            continue
+            ;;
+        CHIP_LOGGING_STYLE*)
+            echo skipping
+            continue
+            ;;
+        CONFIG_NETWORK_LAYER*)
+            echo skipping
+            continue
+            ;;
+        CHIP_DEVICE_LAYER*)
+            echo skipping
+            continue
+            ;;
+    esac
     target_defines+=,\"${define//\"/\\\"}\"
 done
 target_defines=[${target_defines:1}]
