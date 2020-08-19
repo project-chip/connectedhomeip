@@ -20,13 +20,13 @@
 #ifndef NL_LWIP_FREERTOS_ARCH_CC_H
 #define NL_LWIP_FREERTOS_ARCH_CC_H
 
+#include <assert.h>
 #include <errno.h>
 #include <malloc.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <sys/time.h>
 
 #if __cplusplus
@@ -56,11 +56,11 @@ extern "C" {
 #define PACK_STRUCT_STRUCT __attribute__((__packed__))
 #define PACK_STRUCT_FIELD(x) x
 
-extern void LwIPLog(const char *fmt, ...);
-#define LWIP_PLATFORM_DIAG(x) \
-    do                        \
-    {                         \
-        LwIPLog x;            \
+extern void LwIPLog(const char * fmt, ...);
+#define LWIP_PLATFORM_DIAG(x)                                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        LwIPLog x;                                                                                                                 \
     } while (0)
 
 // Place LwIP pools into their own subsections of .bss to make it easier to see

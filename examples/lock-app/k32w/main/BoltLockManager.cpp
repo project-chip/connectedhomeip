@@ -37,7 +37,7 @@ int BoltLockManager::Init()
     sLockTimer = xTimerCreate("LockTmr",        // Just a text name, not used by the RTOS kernel
                               1,                // == default timer period (mS)
                               false,            // no timer reload (==one-shot)
-                              (void *)this,     // init timer id = lock obj context
+                              (void *) this,    // init timer id = lock obj context
                               TimerEventHandler // timer callback handler
     );
 
@@ -47,16 +47,15 @@ int BoltLockManager::Init()
         assert(0);
     }
 
-    mState = kState_LockingCompleted;
+    mState              = kState_LockingCompleted;
     mAutoLockTimerArmed = false;
-    mAutoRelock = false;
-    mAutoLockDuration = 0;
+    mAutoRelock         = false;
+    mAutoLockDuration   = 0;
 
     return err;
 }
 
-void BoltLockManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB,
-                              Callback_fn_completed aActionCompleted_CB)
+void BoltLockManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB)
 {
     mActionInitiated_CB = aActionInitiated_CB;
     mActionCompleted_CB = aActionCompleted_CB;
@@ -158,7 +157,7 @@ void BoltLockManager::CancelTimer(void)
 void BoltLockManager::TimerEventHandler(TimerHandle_t xTimer)
 {
     // Get lock obj context from timer id.
-    BoltLockManager *lock = static_cast<BoltLockManager *>(pvTimerGetTimerID(xTimer));
+    BoltLockManager * lock = static_cast<BoltLockManager *>(pvTimerGetTimerID(xTimer));
 
     // The timer event handler will be called in the context of the timer task
     // once sLockTimer expires. Post an event to apptask queue with the actual handler
@@ -182,7 +181,7 @@ void BoltLockManager::TimerEventHandler(TimerHandle_t xTimer)
 void BoltLockManager::AutoReLockTimerEventHandler(AppEvent * aEvent)
 {
     BoltLockManager * lock = static_cast<BoltLockManager *>(aEvent->TimerEvent.Context);
-    int32_t actor = 0;
+    int32_t actor          = 0;
 
     // Make sure auto lock timer is still armed.
     if (!lock->mAutoLockTimerArmed)

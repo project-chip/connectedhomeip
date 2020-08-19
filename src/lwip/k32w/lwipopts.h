@@ -160,7 +160,7 @@
 #define TCP_RST_DEBUG (LWIP_DBG_OFF)
 #define PPP_DEBUG (LWIP_DBG_OFF)
 
-#define LWIP_DBG_TYPES_ON \
+#define LWIP_DBG_TYPES_ON                                                                                                          \
     (LWIP_DBG_ON | LWIP_DBG_TRACE) /* (LWIP_DBG_ON|LWIP_DBG_TRACE|LWIP_DBG_STATE|LWIP_DBG_FRESH|LWIP_DBG_HALT) */
 
 #endif /* __LWIPOPTS_H__ */

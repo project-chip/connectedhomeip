@@ -20,20 +20,20 @@
 // Main Code
 // ================================================================================
 
+#include "openthread/platform/logging.h"
+#include "openthread/platform/uart.h"
+#include <openthread-system.h>
 #include <openthread/cli.h>
 #include <openthread/error.h>
 #include <openthread/heap.h>
-#include "openthread/platform/uart.h"
-#include "openthread/platform/logging.h"
-#include <openthread-system.h>
 
+#include <core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>
 #include <support/logging/CHIPLogging.h>
-#include <core/CHIPError.h>
 
-#include "app_config.h"
 #include "FreeRtosMbedtlsMutex.h"
+#include "app_config.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -42,7 +42,7 @@ using namespace ::chip::Logging;
 
 #include <AppTask.h>
 
-void k32wLog(const char *aFormat, ...)
+void k32wLog(const char * aFormat, ...)
 {
     va_list args;
 
@@ -55,13 +55,13 @@ typedef void (*InitFunc)(void);
 extern InitFunc __init_array_start;
 extern InitFunc __init_array_end;
 
-extern "C" void main_task(void const *argument)
+extern "C" void main_task(void const * argument)
 {
     CHIP_ERROR ret;
 
     /* Call C++ constructors */
-    InitFunc *pFunc = &__init_array_start;
-    for ( ; pFunc < &__init_array_end; ++pFunc )
+    InitFunc * pFunc = &__init_array_start;
+    for (; pFunc < &__init_array_end; ++pFunc)
     {
         (*pFunc)();
     }
@@ -87,14 +87,14 @@ extern "C" void main_task(void const *argument)
     ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
-	k32wLog("Error during PlatformMgr().InitWeaveStack()");
+        k32wLog("Error during PlatformMgr().InitWeaveStack()");
         goto exit;
     }
 
     ret = ThreadStackMgr().InitThreadStack();
     if (ret != CHIP_NO_ERROR)
     {
-	k32wLog("Error during ThreadStackMgr().InitThreadStack()");
+        k32wLog("Error during ThreadStackMgr().InitThreadStack()");
         goto exit;
     }
 
@@ -109,7 +109,7 @@ extern "C" void main_task(void const *argument)
     {
         ConnectivityManager::ThreadPollingConfig pollingConfig;
         pollingConfig.Clear();
-        pollingConfig.ActivePollingIntervalMS = THREAD_ACTIVE_POLLING_INTERVAL_MS;
+        pollingConfig.ActivePollingIntervalMS   = THREAD_ACTIVE_POLLING_INTERVAL_MS;
         pollingConfig.InactivePollingIntervalMS = THREAD_INACTIVE_POLLING_INTERVAL_MS;
 
         ret = ConnectivityMgr().SetThreadPollingConfig(pollingConfig);
@@ -123,7 +123,7 @@ extern "C" void main_task(void const *argument)
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
     {
-	k32wLog("Error during PlatformMgr().StartEventLoopTask();");
+        k32wLog("Error during PlatformMgr().StartEventLoopTask();");
         goto exit;
     }
 
@@ -131,14 +131,14 @@ extern "C" void main_task(void const *argument)
     ret = ThreadStackMgrImpl().StartThreadTask();
     if (ret != CHIP_NO_ERROR)
     {
-	k32wLog("Error during ThreadStackMgrImpl().StartThreadTask()");
+        k32wLog("Error during ThreadStackMgrImpl().StartThreadTask()");
         goto exit;
     }
 
     ret = GetAppTask().StartAppTask();
     if (ret != CHIP_NO_ERROR)
     {
-	k32wLog("Error during GetAppTask().StartAppTask()");
+        k32wLog("Error during GetAppTask().StartAppTask()");
         goto exit;
     }
 

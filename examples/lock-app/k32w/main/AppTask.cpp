@@ -23,16 +23,16 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#include "app_config.h"
+#include "Keyboard.h"
 #include "LED.h"
 #include "TimersManager.h"
-#include "Keyboard.h"
+#include "app_config.h"
 
-#define FACTORY_RESET_TRIGGER_TIMEOUT       6000
+#define FACTORY_RESET_TRIGGER_TIMEOUT 6000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE                 (4096)
-#define APP_TASK_PRIORITY                   2
-#define APP_EVENT_QUEUE_SIZE                10
+#define APP_TASK_STACK_SIZE (4096)
+#define APP_TASK_PRIORITY 2
+#define APP_EVENT_QUEUE_SIZE 10
 
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
@@ -44,14 +44,14 @@ static LEDWidget sLockLED;
 static LEDWidget sUnusedLED;
 static LEDWidget sUnusedLED_1;
 
-static bool sIsThreadProvisioned              = false;
-static bool sIsThreadEnabled                  = false;
-static bool sIsThreadAttached                 = false;
-static bool sIsPairedToAccount                = false;
-static bool sHaveBLEConnections               = false;
-static bool sHaveServiceConnectivity          = false;
+static bool sIsThreadProvisioned     = false;
+static bool sIsThreadEnabled         = false;
+static bool sIsThreadAttached        = false;
+static bool sIsPairedToAccount       = false;
+static bool sHaveBLEConnections      = false;
+static bool sHaveServiceConnectivity = false;
 
-static uint32_t                     eventMask = 0;
+static uint32_t eventMask = 0;
 
 using namespace ::chip::DeviceLayer;
 
@@ -97,7 +97,7 @@ int AppTask::Init()
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
                                   1,                // == default timer period (mS)
                                   false,            // no timer reload (==one-shot)
-                                  (void *)this,     // init timer id = app task obj context
+                                  (void *) this,    // init timer id = app task obj context
                                   TimerEventHandler // timer callback handler
     );
     if (sFunctionTimer == NULL)
@@ -122,9 +122,8 @@ int AppTask::Init()
         assert(err == CHIP_NO_ERROR);
     }
 
-
     // Print the current software version
-    char currentFirmwareRev[ConfigurationManager::kMaxFirmwareRevisionLength+1] = {0};
+    char currentFirmwareRev[ConfigurationManager::kMaxFirmwareRevisionLength + 1] = { 0 };
     size_t currentFirmwareRevLen;
     err = ConfigurationMgr().GetFirmwareRevision(currentFirmwareRev, sizeof(currentFirmwareRev), currentFirmwareRevLen);
     if (err != CHIP_NO_ERROR)
@@ -166,12 +165,12 @@ void AppTask::AppTaskMain(void * pvParameter)
         // task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
-            sIsThreadProvisioned              = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled                  = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached                 = ConnectivityMgr().IsThreadAttached();
-            sHaveBLEConnections               = (ConnectivityMgr().NumBLEConnections() != 0);
-            sIsPairedToAccount                = ConfigurationMgr().IsPairedToAccount();
-            sHaveServiceConnectivity          = ConnectivityMgr().HaveServiceConnectivity();
+            sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
+            sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
+            sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
+            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
+            sIsPairedToAccount       = ConfigurationMgr().IsPairedToAccount();
+            sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
 
@@ -222,8 +221,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 {
-    if ((pin_no != RESET_BUTTON) && (pin_no != LOCK_BUTTON) &&
-       (pin_no != OTA_BUTTON))
+    if ((pin_no != RESET_BUTTON) && (pin_no != LOCK_BUTTON) && (pin_no != OTA_BUTTON))
     {
         return;
     }
@@ -251,21 +249,21 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 
 void AppTask::KBD_Callback(uint8_t events)
 {
-    eventMask = eventMask | (uint32_t) (1 << events);
+    eventMask = eventMask | (uint32_t)(1 << events);
 }
 
 void AppTask::HandleKeyboard(void)
 {
     uint8_t keyEvent = 0xFF;
-    uint8_t pos = 0;
+    uint8_t pos      = 0;
 
-    while(eventMask)
+    while (eventMask)
     {
-        for(pos = 0; pos < (8 * sizeof(eventMask)); pos++)
+        for (pos = 0; pos < (8 * sizeof(eventMask)); pos++)
         {
-            if(eventMask & (1 << pos))
+            if (eventMask & (1 << pos))
             {
-                keyEvent = pos;
+                keyEvent  = pos;
                 eventMask = eventMask & ~(1 << pos);
                 break;
             }
@@ -273,17 +271,17 @@ void AppTask::HandleKeyboard(void)
 
         switch (keyEvent)
         {
-            case gKBD_EventPB1_c:
-                ButtonEventHandler(RESET_BUTTON, RESET_BUTTON_PUSH);
-                break;
-            case gKBD_EventPB2_c:
-                ButtonEventHandler(LOCK_BUTTON, LOCK_BUTTON_PUSH);
-                break;
-            case gKBD_EventPB3_c:
-                ButtonEventHandler(OTA_BUTTON, OTA_BUTTON_PUSH);
-                break;
-            default:
-                break;
+        case gKBD_EventPB1_c:
+            ButtonEventHandler(RESET_BUTTON, RESET_BUTTON_PUSH);
+            break;
+        case gKBD_EventPB2_c:
+            ButtonEventHandler(LOCK_BUTTON, LOCK_BUTTON_PUSH);
+            break;
+        case gKBD_EventPB3_c:
+            ButtonEventHandler(OTA_BUTTON, OTA_BUTTON_PUSH);
+            break;
+        default:
+            break;
         }
     }
 }
@@ -292,7 +290,7 @@ void AppTask::TimerEventHandler(TimerHandle_t xTimer)
 {
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;
-    event.TimerEvent.Context = (void *)xTimer;
+    event.TimerEvent.Context = (void *) xTimer;
     event.Handler            = FunctionTimerEventHandler;
     sAppTask.PostEvent(&event);
 }
@@ -344,7 +342,7 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
             return;
         }
 
-	/*
+        /*
         if (SoftwareUpdateMgr().IsInProgress())
         {
             K32W_LOG("Canceling In Progress Software Update");
@@ -373,15 +371,15 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
 void AppTask::LockActionEventHandler(AppEvent * aEvent)
 {
     BoltLockManager::Action_t action;
-    int err = CHIP_NO_ERROR;
+    int err        = CHIP_NO_ERROR;
     int32_t actor  = 0;
     bool initiated = false;
 
-	if (sAppTask.mFunction != kFunction_NoneSelected)
-	{
+    if (sAppTask.mFunction != kFunction_NoneSelected)
+    {
         K32W_LOG("Another function is scheduled. Could not initiate Lock/Unlock!");
         return;
-	}
+    }
 
     if (aEvent->Type == AppEvent::kEventType_Lock)
     {

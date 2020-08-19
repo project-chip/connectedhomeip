@@ -19,8 +19,8 @@
 #ifndef LOCK_MANAGER_H
 #define LOCK_MANAGER_H
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "AppEvent.h"
 
@@ -73,7 +73,7 @@ private:
 
     static void TimerEventHandler(TimerHandle_t xTimer);
     static void AutoReLockTimerEventHandler(AppEvent * aEvent);
-    static void ActuatorMovementTimerEventHandler(AppEvent *aEvent);
+    static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
 
     static BoltLockManager sLock;
 };
