@@ -23,7 +23,7 @@
 
 #include "ManualSetupPayloadGenerator.h"
 
-#include <cstdint>
+#include <inttypes.h>
 
 #include <support/logging/CHIPLogging.h>
 #include <support/verhoeff/Verhoeff.h>
