@@ -32,5 +32,6 @@ jobs:
             - name: Bootstrap
               run: |
                   scripts/tests/cirque_tests.sh bootstrap
-            - name: Setup tmate session
-              uses: mxschmitt/action-tmate@v2
+            - name: Do Test
+              run: |
+                  scripts/tests/cirque_tests.sh run_test

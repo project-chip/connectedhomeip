@@ -35,18 +35,14 @@ DEVICE_CONFIG = {
     'device0': {
         'type': 'CHIP-Server',
         'base_image': 'chip_server',
-        'capability': ['WiFi', 'Thread', 'Interactive'],
+        'capability': ['Thread', 'Interactive'],
         'rcp_mode': True,
     },
     'device1': {
         'type': 'CHIP-Tool',
         'base_image': 'chip_tool',
-        'capability': ['WiFi', 'Thread', 'Interactive'],
+        'capability': ['Thread', 'Interactive'],
         'rcp_mode': True,
-    },
-    'wifi-ap': {
-        'type': 'wifi_ap',
-        'base_image': 'mac80211_ap_image'
     }
 }
 
@@ -62,7 +58,6 @@ class TestOnOffCluster(CHIPVirtualHome):
 
     def setup(self):
         self.initialize_home()
-        self.enable_wifi_on_device()
         self.connect_to_thread_network()
 
     def test_routine(self):
@@ -83,12 +78,14 @@ class TestOnOffCluster(CHIPVirtualHome):
             server_ip_address.add(self.get_device_thread_ip(device_id))
 
         for ip in server_ip_address:
-            self.execute_device_cmd(
+            output = self.execute_device_cmd(
                 tool_device_id, "chip-standalone-demo.out on {} {} 1".format(ip, CHIP_PORT))
+            self.assertFalse(self.sequenceMatch(output['output'], ["No response from device."]))
         time.sleep(1)
         for ip in server_ip_address:
-            self.execute_device_cmd(
+            output = self.execute_device_cmd(
                 tool_device_id, "chip-standalone-demo.out off {} {} 1".format(ip, CHIP_PORT))
+            self.assertFalse(self.sequenceMatch(output['output'], ["No response from device."]))
 
         for device_id in server_ids:
             self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), ["OnOff: 1", "OnOff: 0"]),
