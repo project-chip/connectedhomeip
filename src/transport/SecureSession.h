@@ -130,6 +130,8 @@ private:
     uint8_t mKey[kAES_CCM128_Key_Length];
 
     static CHIP_ERROR GetIV(const MessageHeader & header, uint8_t * iv, size_t len);
+
+    static CHIP_ERROR GetAAD(const MessageHeader & header, uint8_t * aad, size_t & len);
 };
 
 } // namespace chip

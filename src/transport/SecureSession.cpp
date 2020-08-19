@@ -38,6 +38,7 @@ namespace {
 const char * kManualKeyExchangeChannelInfo = "Manual Key Exchanged Channel";
 
 constexpr size_t kAESCCMIVLen = 12;
+constexpr size_t kMaxAADLen   = 128;
 
 } // namespace
 
@@ -132,11 +133,32 @@ exit:
     return err;
 }
 
+CHIP_ERROR SecureSession::GetAAD(const MessageHeader & header, uint8_t * aad, size_t & len)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    size_t actualEncodedHeaderSize;
+
+    VerifyOrExit(len >= header.EncodeSizeBytes(), err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Use unencrypted part of header as AAD. This will help
+    // integrity protect the whole message
+    err = header.Encode(aad, len, &actualEncodedHeaderSize);
+    SuccessOrExit(err);
+
+    VerifyOrExit(len >= actualEncodedHeaderSize, err = CHIP_ERROR_INVALID_ARGUMENT);
+    len = actualEncodedHeaderSize;
+
+exit:
+    return err;
+}
+
 CHIP_ERROR SecureSession::Encrypt(const unsigned char * input, size_t input_length, unsigned char * output, MessageHeader & header)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     uint64_t tag     = 0;
     uint8_t IV[kAESCCMIVLen];
+    uint8_t AAD[kMaxAADLen];
+    size_t aadLen = sizeof(AAD);
 
     VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     VerifyOrExit(input != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -146,7 +168,10 @@ CHIP_ERROR SecureSession::Encrypt(const unsigned char * input, size_t input_leng
     error = GetIV(header, IV, sizeof(IV));
     SuccessOrExit(error);
 
-    error = AES_CCM_encrypt(input, input_length, NULL, 0, mKey, sizeof(mKey), (const unsigned char *) IV, sizeof(IV), output,
+    error = GetAAD(header, AAD, aadLen);
+    SuccessOrExit(error);
+
+    error = AES_CCM_encrypt(input, input_length, AAD, aadLen, mKey, sizeof(mKey), (const unsigned char *) IV, sizeof(IV), output,
                             (unsigned char *) &tag, sizeof(tag));
     SuccessOrExit(error);
 
@@ -163,6 +188,8 @@ CHIP_ERROR SecureSession::Decrypt(const unsigned char * input, size_t input_leng
     size_t taglen       = header.GetTagLength();
     const uint8_t * tag = header.GetTag();
     uint8_t IV[kAESCCMIVLen];
+    uint8_t AAD[kMaxAADLen];
+    size_t aadLen = sizeof(AAD);
 
     VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     VerifyOrExit(input != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -172,7 +199,10 @@ CHIP_ERROR SecureSession::Decrypt(const unsigned char * input, size_t input_leng
     error = GetIV(header, IV, sizeof(IV));
     SuccessOrExit(error);
 
-    error = AES_CCM_decrypt(input, input_length, NULL, 0, (const unsigned char *) tag, taglen, mKey, sizeof(mKey),
+    error = GetAAD(header, AAD, aadLen);
+    SuccessOrExit(error);
+
+    error = AES_CCM_decrypt(input, input_length, AAD, aadLen, (const unsigned char *) tag, taglen, mKey, sizeof(mKey),
                             (const unsigned char *) IV, sizeof(IV), output);
 exit:
     return error;
