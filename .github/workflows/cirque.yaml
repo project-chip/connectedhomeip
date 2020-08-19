@@ -32,6 +32,6 @@ jobs:
             - name: Bootstrap
               run: |
                   scripts/tests/cirque_tests.sh bootstrap
-            - name: Do Test
+            - name: Run Test
               run: |
                   scripts/tests/cirque_tests.sh run_test

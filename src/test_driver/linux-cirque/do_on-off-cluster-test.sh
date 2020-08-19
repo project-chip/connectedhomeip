@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -v
+set -x
 
 SOURCE="${BASH_SOURCE[0]}"
 SOURCE_DIR="$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
