@@ -162,12 +162,14 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureSessionMgrBase::NewPairing(Optional<NodeId> peerNodeId, const Optional<Transport::PeerAddress> & peerAddr,
-                                            uint16_t peerKeyId, uint16_t localKeyId, SecurePairingSession * pairing)
+CHIP_ERROR SecureSessionMgrBase::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, SecurePairingSession * pairing)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     PeerConnectionState * state = nullptr;
+    Optional<NodeId> peerNodeId = pairing->GetPeerNodeId();
+    uint16_t peerKeyId          = pairing->GetPeerKeyId();
+    uint16_t localKeyId         = pairing->GetLocalKeyId();
 
     // Find any existing connection with the same node and key ID
     if (mPeerConnections.FindPeerConnectionState(peerNodeId, peerKeyId, &state))

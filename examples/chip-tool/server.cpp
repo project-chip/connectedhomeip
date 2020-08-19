@@ -150,7 +150,7 @@ void StartServer(chip::SecureSessionMgr<chip::Transport::UDP> * sessions)
                          UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
     SuccessOrExit(err);
 
-    err = sessions->NewPairing(Optional<NodeId>::Value(kUndefinedNodeId), peer, 0, 0, &gTestPairing);
+    err = sessions->NewPairing(peer, &gTestPairing);
     SuccessOrExit(err);
 
     sessions->SetDelegate(&gCallbacks);

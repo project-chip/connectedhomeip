@@ -471,27 +471,30 @@ CHIP_ERROR ExecuteCommand(DeviceController::ChipDeviceController * controller, C
     CHIP_ERROR err = CHIP_NO_ERROR;
     switch (command)
     {
-    case Command::EchoBle:
-        err = controller->ConnectDevice(kRemoteDeviceId, commandArgs.discriminator, commandArgs.setupPINCode, NULL, OnConnect,
-                                        OnMessage, OnError);
+    case Command::EchoBle: {
+        RendezvousParameters params = RendezvousParameters(commandArgs.setupPINCode).SetDiscriminator(commandArgs.discriminator);
+        err                         = controller->ConnectDevice(kRemoteDeviceId, params, NULL, OnConnect, OnMessage, OnError);
         VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to connect to the device"));
         DoEchoBle(controller, commandArgs.discriminator);
         break;
+    }
 
-    case Command::Echo:
+    case Command::Echo: {
         err = controller->ConnectDeviceWithoutSecurePairing(kRemoteDeviceId, commandArgs.hostAddr, NULL, OnConnect, OnMessage,
                                                             OnError, commandArgs.port);
         VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to connect to the device"));
         DoEchoIP(controller, commandArgs.hostAddr, commandArgs.port);
         break;
+    }
 
-    default:
+    default: {
         err = controller->ConnectDeviceWithoutSecurePairing(kRemoteDeviceId, commandArgs.hostAddr, NULL, OnConnect, OnMessage,
                                                             OnError, commandArgs.port);
         VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to connect to the device"));
         DoOnOff(controller, command, commandArgs);
         controller->ServiceEventSignal();
         break;
+    }
     }
 
 exit:
