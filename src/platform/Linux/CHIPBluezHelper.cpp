@@ -49,8 +49,8 @@
  */
 
 #include <ble/CHIPBleServiceData.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/BLEManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <errno.h>
