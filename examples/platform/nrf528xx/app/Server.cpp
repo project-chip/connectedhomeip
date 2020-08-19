@@ -192,14 +192,15 @@ void PublishService()
     memset(&mSocket, 0, sizeof(mSocket));
     memset(&messageInfo, 0, sizeof(messageInfo));
 
+    // Use mesh local EID by default, if we have GUA, use that IP address.
+    memcpy(&messageInfo.mSockAddr, otThreadGetMeshLocalEid(ThreadStackMgrImpl().OTInstance()), sizeof(messageInfo.mSockAddr));
+
     // Select a address to send
     const otNetifAddress * otAddrs = otIp6GetUnicastAddresses(ThreadStackMgrImpl().OTInstance());
     for (const otNetifAddress * otAddr = otAddrs; otAddr != NULL; otAddr = otAddr->mNext)
     {
         addr = chip::DeviceLayer::Internal::ToIPAddress(otAddr->mAddress);
-        if (otAddr->mValid && !otAddr->mRloc &&
-            (!addr.IsIPv6ULA() ||
-             ::chip::DeviceLayer::Internal::IsOpenThreadMeshLocalAddress(ThreadStackMgrImpl().OTInstance(), addr)))
+        if (otAddr->mValid && addr.IsIPv6GlobalUnicast())
         {
             memcpy(&messageInfo.mSockAddr, &(otAddr->mAddress), sizeof(otAddr->mAddress));
             break;
