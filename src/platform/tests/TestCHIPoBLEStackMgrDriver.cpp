@@ -15,20 +15,11 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for the CHIP BLE
- *          Layer on Linux platforms.
- *
- */
+#include "TestCHIPoBLEStackMgr.h"
 
-#ifndef BLE_PLATFORM_CONFIG_H
-#define BLE_PLATFORM_CONFIG_H
-
-// ==================== Platform Adaptations ====================
-
-// ========== Platform-specific Configuration Overrides =========
-
-/* none so far */
-
-#endif // BLE_PLATFORM_CONFIG_H
+int main()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    TestCHIPoBLEStackManager();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+}

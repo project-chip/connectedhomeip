@@ -88,6 +88,19 @@ dist_libPlatformTests_a_HEADERS                += \
     $(NULL)
 
 endif # CHIP_WITH_OT_BR_POSIX
+
+if CONFIG_BLE_PLATFORM_BLUEZ
+AM_CPPFLAGS                                   += \
+    $(DBUS_CFLAGS)                               \
+    $(NULL)
+
+libPlatformTests_a_SOURCES += TestCHIPoBLEStackMgr.cpp
+
+dist_libPlatformTests_a_HEADERS                += \
+    TestCHIPoBLEStackMgr.h                          \
+    $(NULL)
+endif # CONFIG_BLE_PLATFORM_BLUEZ
+
 endif # CHIP_DEVICE_LAYER_TARGET_LINUX
 
 
@@ -97,6 +110,7 @@ CHIP_LDADD                                      = \
     $(top_builddir)/src/system/libSystemLayer.a   \
     $(top_builddir)/src/crypto/libChipCrypto.a    \
     $(top_builddir)/src/lib/support/libSupportLayer.a   \
+    $(top_builddir)/src/ble/libBleLayer.a       \
     $(NULL)
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
@@ -130,6 +144,16 @@ check_PROGRAMS                                 = \
     $(NULL)
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
+if CONFIG_BLE_PLATFORM_BLUEZ
+check_PROGRAMS += TestCHIPoBLEStackMgr
+
+TestCHIPoBLEStackMgr_LDADD                       = $(COMMON_LDADD)
+TestCHIPoBLEStackMgr_SOURCES                     = TestCHIPoBLEStackMgrDriver.cpp
+
+endif # CONFIG_BLE_PLATFORM_BLUEZ
+endif # CHIP_DEVICE_LAYER_TARGET_LINUX
+
+if CHIP_DEVICE_LAYER_TARGET_LINUX
 if CHIP_WITH_OT_BR_POSIX
 check_PROGRAMS += TestThreadStackMgr
 
@@ -144,6 +168,7 @@ endif
 # 'check' target is run.
 
 # TestThreadStackMgr requires additional daemon to be launched
+# TestCHIPoBLEStackMgr requires additional daemon to be launched
 TESTS                                          = \
     TestPlatformTime                             \
     TestPlatformMgr                              \

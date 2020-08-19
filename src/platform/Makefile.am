@@ -231,6 +231,7 @@ Linux/gen/DbusBluez.c: Linux/dbus/org.bluez.xml
 
 nodist_libDeviceLayer_a_SOURCES        += \
     Linux/gen/DbusBluez.c                 \
+    Linux/CHIPBluezHelper.cpp             \
     $(NULL)
 
 endif #CONFIG_BLE_PLATFORM_BLUEZ

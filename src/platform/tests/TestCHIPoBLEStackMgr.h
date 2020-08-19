@@ -17,18 +17,14 @@
 
 /**
  *    @file
- *          Platform-specific configuration overrides for the CHIP BLE
- *          Layer on Linux platforms.
+ *      This file declares test entry point for CHIP over BLE code unit tests in Linux
  *
  */
 
-#ifndef BLE_PLATFORM_CONFIG_H
-#define BLE_PLATFORM_CONFIG_H
+#ifndef CHIP_TEST_CHIP_BLE_STACK_MGR_H
+#define CHIP_TEST_CHIP_BLE_STACK_MGR_H
 
-// ==================== Platform Adaptations ====================
-
-// ========== Platform-specific Configuration Overrides =========
-
-/* none so far */
-
-#endif // BLE_PLATFORM_CONFIG_H
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+int TestCHIPoBLEStackManager(void);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#endif // CHIP_TEST_CHIP_BLE_STACK_MGR_H
