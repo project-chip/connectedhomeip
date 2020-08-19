@@ -224,13 +224,13 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const uint
 #if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
     Transport::BLE * transport;
 
-    ChipLogError(Controller, "Received new pairing request. Setupcode %d", setupPINCode);
-    ChipLogError(Controller, "mState %d. mConState %d", mState, mConState);
+    ChipLogProgress(Controller, "Received new pairing request");
+    ChipLogProgress(Controller, "mState %d. mConState %d", mState, mConState);
     VerifyOrExit(mState == kState_Initialized && mConState == kConnectionState_NotConnected, err = CHIP_ERROR_INCORRECT_STATE);
 
     if (mPairingInProgress)
     {
-        ChipLogError(Controller, "Pairing was already is progress");
+        ChipLogError(Controller, "Pairing was already is progress. This will restart pairing.");
     }
 
     mRemoteDeviceId  = Optional<NodeId>::Value(remoteDeviceId);
