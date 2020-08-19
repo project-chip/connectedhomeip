@@ -66,7 +66,6 @@ cirquetest_bootstrap() {
     cd $REPO_DIR/third_party/cirque
     sudo apt-get install -y bazel socat psmisc tigervnc-standalone-server tigervnc-viewer python3-pip python3-venv python3-setuptools libdbus-glib-1-dev libgirepository1.0-dev
     pip3 install pycodestyle==2.5.0 wheel
-    git fetch origin 96dc11b4a41137b471d3deac6e6ed13c24cf27c8 && git checkout FETCH_HEAD
     make NO_GRPC=1 install -j
     ./dependency_modules.sh
     pip3 install -r requirements_nogrpc.txt
