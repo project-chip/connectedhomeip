@@ -324,7 +324,7 @@
  * Enable support for chip-over-BLE (CHIPoBLE).
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
+#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0
 #endif
 
 /**

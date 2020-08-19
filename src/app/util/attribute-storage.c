@@ -809,60 +809,60 @@ bool emberAfEndpointIsEnabled(uint8_t endpoint)
     return emberAfEndpointIndexIsEnabled(index);
 }
 
-bool emberAfEndpointEnableDisable(uint8_t endpoint, bool enable)
-{
-    uint8_t index = findIndexFromEndpoint(endpoint,
-                                          false); // ignore disabled endpoints?
-    bool currentlyEnabled;
+// bool emberAfEndpointEnableDisable(uint8_t endpoint, bool enable)
+// {
+//     uint8_t index = findIndexFromEndpoint(endpoint,
+//                                           false); // ignore disabled endpoints?
+//     bool currentlyEnabled;
 
-    if (0xFF == index)
-    {
-        return false;
-    }
+//     if (0xFF == index)
+//     {
+//         return false;
+//     }
 
-    currentlyEnabled = emAfEndpoints[index].bitmask & EMBER_AF_ENDPOINT_ENABLED;
+//     currentlyEnabled = emAfEndpoints[index].bitmask & EMBER_AF_ENDPOINT_ENABLED;
 
-    if (enable)
-    {
-        emAfEndpoints[index].bitmask |= EMBER_AF_ENDPOINT_ENABLED;
-    }
-    else
-    {
-        emAfEndpoints[index].bitmask &= EMBER_AF_ENDPOINT_DISABLED;
-    }
+//     if (enable)
+//     {
+//         emAfEndpoints[index].bitmask |= EMBER_AF_ENDPOINT_ENABLED;
+//     }
+//     else
+//     {
+//         emAfEndpoints[index].bitmask &= EMBER_AF_ENDPOINT_DISABLED;
+//     }
 
-#if defined(EZSP_HOST)
-    ezspSetEndpointFlags(endpoint, (enable ? EZSP_ENDPOINT_ENABLED : EZSP_ENDPOINT_DISABLED));
-#endif
+// #if defined(EZSP_HOST)
+//     ezspSetEndpointFlags(endpoint, (enable ? EZSP_ENDPOINT_ENABLED : EZSP_ENDPOINT_DISABLED));
+// #endif
 
-    if (currentlyEnabled != enable)
-    {
-        if (enable)
-        {
-            initializeEndpoint(&(emAfEndpoints[index]));
-        }
-        else
-        {
-            uint8_t i;
-            for (i = 0; i < emAfEndpoints[index].endpointType->clusterCount; i++)
-            {
-                EmberAfCluster * cluster = &((emAfEndpoints[index].endpointType->cluster)[i]);
-                //        emberAfCorePrintln("Disabling cluster tick for ep:%d, cluster:0x%2X, %p",
-                //                           endpoint,
-                //                           cluster->clusterId,
-                //                           ((cluster->mask & CLUSTER_MASK_CLIENT)
-                //                            ? "client"
-                //                            : "server"));
-                //        emberAfCoreFlush();
-                emberAfDeactivateClusterTick(
-                    endpoint, cluster->clusterId,
-                    (cluster->mask & CLUSTER_MASK_CLIENT ? EMBER_AF_CLIENT_CLUSTER_TICK : EMBER_AF_SERVER_CLUSTER_TICK));
-            }
-        }
-    }
+//     if (currentlyEnabled != enable)
+//     {
+//         if (enable)
+//         {
+//             initializeEndpoint(&(emAfEndpoints[index]));
+//         }
+//         else
+//         {
+//             uint8_t i;
+//             for (i = 0; i < emAfEndpoints[index].endpointType->clusterCount; i++)
+//             {
+//                 EmberAfCluster * cluster = &((emAfEndpoints[index].endpointType->cluster)[i]);
+//                 //        emberAfCorePrintln("Disabling cluster tick for ep:%d, cluster:0x%2X, %p",
+//                 //                           endpoint,
+//                 //                           cluster->clusterId,
+//                 //                           ((cluster->mask & CLUSTER_MASK_CLIENT)
+//                 //                            ? "client"
+//                 //                            : "server"));
+//                 //        emberAfCoreFlush();
+//                 emberAfDeactivateClusterTick(
+//                     endpoint, cluster->clusterId,
+//                     (cluster->mask & CLUSTER_MASK_CLIENT ? EMBER_AF_CLIENT_CLUSTER_TICK : EMBER_AF_SERVER_CLUSTER_TICK));
+//             }
+//         }
+//     }
 
-    return true;
-}
+//     return true;
+// }
 
 // Returns the index of a given endpoint.  Does not consider disabled endpoints.
 uint8_t emberAfIndexFromEndpoint(uint8_t endpoint)

@@ -553,7 +553,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSetupPinCode(uint32_t
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         setupPinCode = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
-        ChipLogProgress(DeviceLayer, "Setup PIN code not found; using default: %08u", CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE);
+        ChipLogProgress(DeviceLayer, "Setup PIN code not found; using default: %09u", CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE);
         err = CHIP_NO_ERROR;
     }
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE

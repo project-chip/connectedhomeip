@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/nrf5_sdk.gni")
+import("//build_overrides/jlink.gni")
 import("//build_overrides/openthread.gni")
 
 config("libopenthread-platform_config") {
@@ -39,8 +39,8 @@ static_library("libopenthread-platform-utils") {
     "${openthread_root}/examples/platforms/utils/soft_source_match_table.h",
   ]
   public_deps = [
-    "${nrf5_sdk_build_root}:nrf5_sdk",
     "${openthread_root}/src/core:libopenthread_core_headers",
+    "${segger_rtt_root}:segger_rtt",
   ]
 
   public_configs = [ ":libopenthread-platform_config" ]

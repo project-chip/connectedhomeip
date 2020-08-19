@@ -15,6 +15,6 @@
 import("//build_overrides/chip.gni")
 
 declare_args() {
-  # Toolchain to use for taget.
+  # Toolchain to use for target.
   custom_toolchain = ""
 }
