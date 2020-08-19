@@ -33,16 +33,23 @@ template("chip_test") {
     output_dir = _test_output_dir
   }
 
-  pw_python_script(_test_name + "_run") {
-    deps = [ ":${_test_name}" ]
-    inputs = [ pw_unit_test_AUTOMATIC_RUNNER ]
-    script = "$dir_pw_unit_test/py/pw_unit_test/test_runner.py"
-    args = [
-      "--runner",
-      rebase_path(pw_unit_test_AUTOMATIC_RUNNER, root_build_dir),
-      "--test",
-      rebase_path("$_test_output_dir/$_test_name", root_build_dir),
-    ]
-    stamp = true
+  # Only execute tests when current_os == host_os
+  if (current_os != host_os) {
+    # NOOP dummy group
+    group(_test_name + "_run") {
+    }
+  } else {
+    pw_python_script(_test_name + "_run") {
+      deps = [ ":${_test_name}" ]
+      inputs = [ pw_unit_test_AUTOMATIC_RUNNER ]
+      script = "$dir_pw_unit_test/py/pw_unit_test/test_runner.py"
+      args = [
+        "--runner",
+        rebase_path(pw_unit_test_AUTOMATIC_RUNNER, root_build_dir),
+        "--test",
+        rebase_path("$_test_output_dir/$_test_name", root_build_dir),
+      ]
+      stamp = true
+    }
   }
 }

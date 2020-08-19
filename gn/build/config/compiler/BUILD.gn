@@ -23,8 +23,10 @@ declare_args() {
   treat_warnings_as_errors = true
 }
 
-if (current_cpu == "arm") {
+if (current_cpu == "arm" || current_cpu == "arm64") {
   import("//build/config/arm.gni")
+} else if (current_cpu == "x86" || current_cpu == "x86_64") {
+  import("//build/config/x86.gni")
 }
 
 config("release") {
@@ -39,7 +41,7 @@ config("debug_default") {
 
 config("abi_default") {
   cflags = []
-  if (current_cpu == "arm") {
+  if (current_cpu == "arm" || current_cpu == "arm64") {
     if (arm_arch != "") {
       cflags += [ "-march=${arm_arch}" ]
     }
@@ -60,6 +62,22 @@ config("abi_default") {
     }
     if (arm_use_thumb) {
       cflags += [ "-mthumb" ]
+    }
+  } else if (current_cpu == "x86" || current_cpu == "x86_64") {
+    if (x86_arch != "") {
+      cflags += [ "-march=${x86_arch}" ]
+    }
+    if (x86_cpu != "") {
+      cflags += [ "-mcpu=${x86_cpu}" ]
+    }
+    if (x86_tune != "") {
+      cflags += [ "-mtune=${x86_tune}" ]
+    }
+
+    if (current_cpu == "x86_64") {
+      cflags += [ "-msse4.2", "-mpopcnt", "-m64" ]
+    } else if (current_cpu == "x86") {
+      cflags += [ "-mssse3", "-mfpmath=sse", "-m32" ]
     }
   }
   ldflags = cflags
