@@ -55,7 +55,7 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
 
-NodeId kLocalNodeId = 12344321;
+extern const NodeId kLocalNodeId = 12344321;
 extern LEDWidget statusLED; // In wifi-echo.cpp
 
 namespace {
