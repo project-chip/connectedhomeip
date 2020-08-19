@@ -402,9 +402,7 @@ exit:
     env->ExceptionClear();
 }
 
-void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState)
-{
-}
+void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState) {}
 
 void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload)
 {

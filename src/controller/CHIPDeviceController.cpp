@@ -54,7 +54,7 @@ namespace DeviceController {
 using namespace chip::Encoding;
 
 static constexpr uint32_t kSpake2p_Iteration_Count = 50000;
-static const char * kSpake2pKeyExchangeSalt = "SPAKE2P Key Exchange Salt";
+static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Exchange Salt";
 
 ChipDeviceController::ChipDeviceController()
 {
@@ -172,20 +172,21 @@ void ChipDeviceController::OnPairingComplete(Optional<NodeId> peerNodeId, uint16
 
     if (mPairingComplete != nullptr)
     {
-        mPeerKeyId = peerKeyId;
+        mPeerKeyId        = peerKeyId;
         mLocalPairedKeyId = localKeyId;
         ChipLogProgress(Controller, "Calling mPairingComplete");
         mPairingComplete(this, nullptr, mAppReqState);
     }
 }
 
-void ChipDeviceController::PairingMessageHandler(ChipDeviceController * controller, void * appReqState, System::PacketBuffer * payload)
+void ChipDeviceController::PairingMessageHandler(ChipDeviceController * controller, void * appReqState,
+                                                 System::PacketBuffer * payload)
 {
     if (controller->mPairingInProgress)
     {
         MessageHeader header;
         size_t headerSize = 0;
-        CHIP_ERROR err = header.Decode(payload->Start(), payload->DataLength(), &headerSize);
+        CHIP_ERROR err    = header.Decode(payload->Start(), payload->DataLength(), &headerSize);
         SuccessOrExit(err);
 
         payload->ConsumeHead(headerSize);
@@ -201,12 +202,13 @@ exit:
 }
 
 void ChipDeviceController::BLEConnectionHandler(ChipDeviceController * controller, Transport::PeerConnectionState * state,
-                                     void * appReqState)
+                                                void * appReqState)
 {
     ChipLogProgress(Controller, "Starting pairing session");
     controller->mPairingInProgress = true;
-    CHIP_ERROR err = controller->mPairingSession.Pair(controller->mSetupPINCode, kSpake2p_Iteration_Count, (const unsigned char*) kSpake2pKeyExchangeSalt,
-                              strlen(kSpake2pKeyExchangeSalt), Optional<NodeId>::Value(controller->mLocalDeviceId), controller->mNextKeyId++, controller);
+    CHIP_ERROR err                 = controller->mPairingSession.Pair(
+        controller->mSetupPINCode, kSpake2p_Iteration_Count, (const unsigned char *) kSpake2pKeyExchangeSalt,
+        strlen(kSpake2pKeyExchangeSalt), Optional<NodeId>::Value(controller->mLocalDeviceId), controller->mNextKeyId++, controller);
     SuccessOrExit(err);
 
 exit:
@@ -297,7 +299,9 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress 
     mOnComplete.Response = onMessageReceived;
     mOnError             = onError;
 
-    err = mSessionManager->NewPairing(mRemoteDeviceId, Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(deviceAddr, devicePort)), mPeerKeyId, mLocalPairedKeyId, &mPairingSession);
+    err = mSessionManager->NewPairing(mRemoteDeviceId,
+                                      Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(deviceAddr, devicePort)),
+                                      mPeerKeyId, mLocalPairedKeyId, &mPairingSession);
     SuccessOrExit(err);
 
     mMessageNumber = 1;
@@ -433,9 +437,7 @@ void ChipDeviceController::ClearRequestState()
     }
 }
 
-void ChipDeviceController::OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
-{
-}
+void ChipDeviceController::OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
 
 void ChipDeviceController::OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
                                              System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr)
