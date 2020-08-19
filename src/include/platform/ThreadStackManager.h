@@ -24,6 +24,8 @@
 #ifndef THREAD_STACK_MANAGER_H
 #define THREAD_STACK_MANAGER_H
 
+//#include <platform/PlatformManager.h>
+
 namespace chip {
 namespace DeviceLayer {
 

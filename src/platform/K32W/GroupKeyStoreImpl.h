@@ -23,7 +23,7 @@
  *          for platforms based on the NXP SDK.
  */
 
-#include <Core/CHIPKeyIds.h>
+#include <core/CHIPKeyIds.h>
 #include <platform/K32W/K32WConfig.h>
 #include <platform/Profiles/security/ChipApplicationKeys.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>

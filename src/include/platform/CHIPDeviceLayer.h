@@ -24,10 +24,11 @@
 #include <ble/BleLayer.h>
 #include <core/CHIPCore.h>
 #include <platform/CHIPDeviceError.h>
+#include <platform/GeneralUtils.h>
+#include <platform/PlatformManager.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/GeneralUtils.h>
-#include <platform/PlatformManager.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 #include <platform/SoftwareUpdateManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
