@@ -80,7 +80,7 @@ public:
     SecurePairingSession & operator=(const SecurePairingSession &) = delete;
     SecurePairingSession & operator=(SecurePairingSession &&) = default;
 
-    ~SecurePairingSession(void);
+    virtual ~SecurePairingSession(void);
 
     /**
      * @brief
