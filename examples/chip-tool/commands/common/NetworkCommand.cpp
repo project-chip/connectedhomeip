@@ -79,7 +79,8 @@ CHIP_ERROR NetworkCommand::ConnectBLE(ChipDeviceController * dc, NodeId remoteId
 {
     snprintf(mName, sizeof(mName), "BLE:%u", mDiscriminator);
 
-    return dc->ConnectDevice(remoteId, mDiscriminator, mSetupPINCode, NULL, onConnect, onMessage, onError);
+    RendezvousParameters params = RendezvousParameters(mSetupPINCode).SetDiscriminator(mDiscriminator);
+    return dc->ConnectDevice(remoteId, params, NULL, onConnect, onMessage, onError);
 }
 
 CHIP_ERROR NetworkCommand::ConnectUDP(ChipDeviceController * dc, NodeId remoteId)

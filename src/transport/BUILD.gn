@@ -26,6 +26,10 @@ static_library("transport") {
     "PeerAddress.h",
     "PeerConnectionState.h",
     "PeerConnections.h",
+    "RendezvousParameters.h",
+    "RendezvousSession.cpp",
+    "RendezvousSession.h",
+    "RendezvousSessionDelegate.h",
     "SecurePairingSession.cpp",
     "SecurePairingSession.h",
     "SecureSession.cpp",
@@ -42,5 +46,6 @@ static_library("transport") {
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
   ]
 }

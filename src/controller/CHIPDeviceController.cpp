@@ -54,28 +54,19 @@ namespace DeviceController {
 
 using namespace chip::Encoding;
 
-BLEDeviceConnectionParameters::BLEDeviceConnectionParameters()
-{
-#if CONFIG_DEVICE_LAYER
-    SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
-#endif
-}
-
-static constexpr uint32_t kSpake2p_Iteration_Count = 50000;
-static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Exchange Salt";
-
 ChipDeviceController::ChipDeviceController()
 {
-    mState           = kState_NotInitialized;
-    AppState         = NULL;
-    mConState        = kConnectionState_NotConnected;
-    mSessionManager  = NULL;
-    mCurReqMsg       = NULL;
-    mOnError         = NULL;
-    mOnNewConnection = NULL;
-    mDeviceAddr      = IPAddress::Any;
-    mDevicePort      = CHIP_PORT;
-    mLocalDeviceId   = 0;
+    mState             = kState_NotInitialized;
+    AppState           = NULL;
+    mConState          = kConnectionState_NotConnected;
+    mRendezvousSession = NULL;
+    mSessionManager    = NULL;
+    mCurReqMsg         = NULL;
+    mOnError           = NULL;
+    mOnNewConnection   = NULL;
+    mDeviceAddr        = IPAddress::Any;
+    mDevicePort        = CHIP_PORT;
+    mLocalDeviceId     = 0;
     memset(&mOnComplete, 0, sizeof(mOnComplete));
 }
 
@@ -139,10 +130,10 @@ CHIP_ERROR ChipDeviceController::Shutdown()
         mSessionManager = NULL;
     }
 
-    if (mUnsecuredTransport != NULL)
+    if (mRendezvousSession != NULL)
     {
-        mUnsecuredTransport->Release();
-        mUnsecuredTransport = NULL;
+        delete mRendezvousSession;
+        mRendezvousSession = NULL;
     }
 
     mConState = kConnectionState_NotConnected;
@@ -156,121 +147,38 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::OnNewMessageForPeer(System::PacketBuffer * msgBuf)
-{
-    return SendMessage(mAppReqState, msgBuf);
-}
-
-void ChipDeviceController::OnPairingError(CHIP_ERROR error)
-{
-    ChipLogError(Controller, "Failed to pair with accessory. Error %d", error);
-    mPairingInProgress = false;
-
-    if (mOnError != nullptr)
-    {
-        mOnError(this, mAppReqState, error, nullptr);
-    }
-}
-
-void ChipDeviceController::OnPairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId)
-{
-    ChipLogProgress(Controller, "Successfully paired with accessory. Key Id %d", peerKeyId);
-    mPairingInProgress = false;
-
-    if (mPairingComplete != nullptr)
-    {
-        mPeerKeyId        = peerKeyId;
-        mLocalPairedKeyId = localKeyId;
-        ChipLogProgress(Controller, "Calling mPairingComplete");
-        mPairingComplete(this, nullptr, mAppReqState);
-    }
-}
-
-void ChipDeviceController::PairingMessageHandler(ChipDeviceController * controller, void * appReqState,
-                                                 System::PacketBuffer * payload)
-{
-    if (controller->mPairingInProgress)
-    {
-        MessageHeader header;
-        size_t headerSize = 0;
-        CHIP_ERROR err    = header.Decode(payload->Start(), payload->DataLength(), &headerSize);
-        SuccessOrExit(err);
-
-        payload->ConsumeHead(headerSize);
-        controller->mPairingSession.HandlePeerMessage(header, payload);
-    }
-    else if (controller->mAppMsgHandler != nullptr)
-    {
-        controller->mAppMsgHandler(controller, appReqState, payload);
-    }
-
-exit:
-    return;
-}
-
-void ChipDeviceController::BLEConnectionHandler(ChipDeviceController * controller, Transport::PeerConnectionState * state,
-                                                void * appReqState)
-{
-    ChipLogProgress(Controller, "Starting pairing session");
-    controller->mPairingInProgress = true;
-    CHIP_ERROR err                 = controller->mPairingSession.Pair(
-        controller->mSetupPINCode, kSpake2p_Iteration_Count, Uint8::from_const_char(kSpake2pKeyExchangeSalt),
-        strlen(kSpake2pKeyExchangeSalt), Optional<NodeId>::Value(controller->mLocalDeviceId), controller->mNextKeyId++, controller);
-    SuccessOrExit(err);
-
-exit:
-    return;
-}
-
-CHIP_ERROR ChipDeviceController::ConnectDevice(const BLEDeviceConnectionParameters & params)
+CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, RendezvousParameters & params, void * appReqState,
+                                               NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
+                                               ErrorHandler onError)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    RendezvousSession * rendezvousSession;
 
-#if CONFIG_NETWORK_LAYER_BLE
-    Transport::BLE * transport;
+    VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mConState == kConnectionState_NotConnected, err = CHIP_ERROR_INCORRECT_STATE);
 
-    ChipLogProgress(Controller, "Received new pairing request");
-    ChipLogProgress(Controller, "mState %d. mConState %d", mState, mConState);
-    VerifyOrExit(mState == kState_Initialized && mConState == kConnectionState_NotConnected, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(params.GetBleLayer() != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (mPairingInProgress)
+#if CONFIG_DEVICE_LAYER
+    if (!params.HasBleLayer())
     {
-        ChipLogError(Controller, "Pairing was already is progress. This will restart pairing.");
+        params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
     }
+#endif // CONFIG_DEVICE_LAYER
 
-    mRemoteDeviceId  = Optional<NodeId>::Value(params.GetRemoteDeviceId());
-    mAppReqState     = params.GetAppReqState();
-    mPairingComplete = params.GetOnConnected();
-    mOnNewConnection = BLEConnectionHandler;
-    mAppMsgHandler   = params.GetOnMessageReceived();
-
-    mSetupPINCode = params.GetSetupPINCode();
-
-    transport = new Transport::BLE();
-    err       = transport->Init(Transport::BleConnectionParameters(this, params.GetBleLayer())
-                              .SetDiscriminator(params.GetDiscriminator())
-                              .SetSetupPINCode(params.GetSetupPINCode()));
+    rendezvousSession = new RendezvousSession(this, params.SetLocalNodeId(mLocalDeviceId));
+    err               = rendezvousSession->Init();
     SuccessOrExit(err);
 
-    mUnsecuredTransport = transport->Retain();
-    transport->Release();
+    mRendezvousSession = rendezvousSession;
+
+    mRemoteDeviceId  = Optional<NodeId>::Value(remoteDeviceId);
+    mAppReqState     = appReqState;
+    mOnNewConnection = onConnected;
 
     // connected state before 'OnConnect'
     mConState = kConnectionState_Connected;
 
-    mOnComplete.Response = PairingMessageHandler;
-    mOnError             = params.GetOnError();
-
-    if (err != CHIP_NO_ERROR)
-    {
-        mConState = kConnectionState_NotConnected;
-    }
-#else
-    err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
-
-    SuccessOrExit(err);
+    mOnComplete.Response = onMessageReceived;
+    mOnError             = onError;
 
 exit:
     return err;
@@ -279,7 +187,7 @@ exit:
 CHIP_ERROR ChipDeviceController::ConnectDeviceUsingPairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
                                                            NewConnectionHandler onConnected,
                                                            MessageReceiveHandler onMessageReceived, ErrorHandler onError,
-                                                           uint16_t devicePort, uint16_t localKeyId, SecurePairingSession * pairing)
+                                                           uint16_t devicePort, SecurePairingSession * pairing)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -307,9 +215,8 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceUsingPairing(NodeId remoteDeviceId
     mOnComplete.Response = onMessageReceived;
     mOnError             = onError;
 
-    err = mSessionManager->NewPairing(mRemoteDeviceId,
-                                      Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(deviceAddr, devicePort)),
-                                      mPeerKeyId, localKeyId, pairing);
+    err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(deviceAddr, devicePort)),
+                                      pairing);
     SuccessOrExit(err);
 
     mMessageNumber = 1;
@@ -338,7 +245,7 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress 
                                                ErrorHandler onError, uint16_t devicePort)
 {
     return ConnectDeviceUsingPairing(remoteDeviceId, deviceAddr, appReqState, onConnected, onMessageReceived, onError, devicePort,
-                                     mLocalPairedKeyId, &mPairingSession);
+                                     &mPairingSession);
 }
 
 CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
@@ -346,9 +253,9 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remote
                                                                    MessageReceiveHandler onMessageReceived, ErrorHandler onError,
                                                                    uint16_t devicePort)
 {
-    SecurePairingUsingTestSecret pairing;
+    SecurePairingUsingTestSecret pairing(Optional<NodeId>::Value(remoteDeviceId), 0, 0);
     return ConnectDeviceUsingPairing(remoteDeviceId, deviceAddr, appReqState, onConnected, onMessageReceived, onError, devicePort,
-                                     0, &pairing);
+                                     &pairing);
 }
 
 CHIP_ERROR ChipDeviceController::PopulatePeerAddress(Transport::PeerAddress & peerAddress)
@@ -390,10 +297,10 @@ CHIP_ERROR ChipDeviceController::DisconnectDevice()
         mSessionManager = NULL;
     }
 
-    if (mUnsecuredTransport != NULL)
+    if (mRendezvousSession != NULL)
     {
-        mUnsecuredTransport->Release();
-        mUnsecuredTransport = NULL;
+        delete mRendezvousSession;
+        mRendezvousSession = NULL;
     }
 
     mConState = kConnectionState_NotConnected;
@@ -408,14 +315,10 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
 
     mAppReqState = appReqState;
 
-    if (mUnsecuredTransport != NULL)
+    if (mRendezvousSession != NULL)
     {
         VerifyOrExit(IsConnected(), err = CHIP_ERROR_INCORRECT_STATE);
-        // Unsecured transport does not use a MessageHeader, but the Transport::Base API expects one, so
-        // let build an empty one for now.
-        MessageHeader header;
-        Transport::PeerAddress peerAddress = Transport::PeerAddress::BLE();
-        err                                = mUnsecuredTransport->SendMessage(header, peerAddress, buffer);
+        err = mRendezvousSession->SendMessage(buffer);
     }
     else
     {
@@ -490,7 +393,7 @@ void ChipDeviceController::OnMessageReceived(const MessageHeader & header, Trans
     }
 }
 
-void ChipDeviceController::OnBLEConnectionError(BLE_ERROR err)
+void ChipDeviceController::OnRendezvousError(CHIP_ERROR err)
 {
     if (mOnError)
     {
@@ -498,9 +401,9 @@ void ChipDeviceController::OnBLEConnectionError(BLE_ERROR err)
     }
 }
 
-void ChipDeviceController::OnBLEConnectionComplete(BLE_ERROR err)
+void ChipDeviceController::OnRendezvousConnectionOpened()
 {
-    ChipLogDetail(Controller, "BLE Connection complete");
+    mPairingSession = mRendezvousSession->GetPairingSession();
 
     if (mOnNewConnection)
     {
@@ -508,18 +411,9 @@ void ChipDeviceController::OnBLEConnectionComplete(BLE_ERROR err)
     }
 }
 
-void ChipDeviceController::OnBLEConnectionClosed(BLE_ERROR err)
-{
-    ChipLogDetail(Controller, "BLE Connection closed");
+void ChipDeviceController::OnRendezvousConnectionClosed() {}
 
-    // TODO: determine if connection closed is really to be treated as an error.
-    if (mOnError)
-    {
-        mOnError(this, mAppReqState, err, NULL);
-    }
-}
-
-void ChipDeviceController::OnBLEPacketReceived(PacketBuffer * buffer)
+void ChipDeviceController::OnRendezvousMessageReceived(PacketBuffer * buffer)
 {
     if (mOnComplete.Response)
     {
