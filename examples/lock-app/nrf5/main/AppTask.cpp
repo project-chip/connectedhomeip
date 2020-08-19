@@ -42,11 +42,15 @@
 #include <support/ErrorStr.h>
 #include <system/SystemClock.h>
 
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <setup_payload/SetupPayload.h>
+
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
+#define EXAMPLE_VENDOR_ID 0xabcd
 
 APP_TIMER_DEF(sFunctionTimer);
 
@@ -163,6 +167,45 @@ int AppTask::Init()
     {
         NRF_LOG_INFO("xSemaphoreCreateMutex() failed");
         APP_ERROR_HANDLER(NRF_ERROR_NULL);
+    }
+
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        chip::SetupPayload payload;
+        uint32_t setUpPINCode       = 0;
+        uint32_t setUpDiscriminator = 0;
+
+        err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
+        if (err != CHIP_NO_ERROR)
+        {
+            NRF_LOG_INFO("ConfigurationMgr().GetSetupPinCode() failed: %s", chip::ErrorStr(err));
+        }
+
+        err = ConfigurationMgr().GetSetupDiscriminator(setUpDiscriminator);
+        if (err != CHIP_NO_ERROR)
+        {
+            NRF_LOG_INFO("ConfigurationMgr().GetSetupDiscriminator() failed: %s", chip::ErrorStr(err));
+        }
+
+        payload.version       = 1;
+        payload.vendorID      = EXAMPLE_VENDOR_ID;
+        payload.productID     = 1;
+        payload.setUpPINCode  = setUpPINCode;
+        payload.discriminator = setUpDiscriminator;
+        chip::QRCodeSetupPayloadGenerator generator(payload);
+
+        // TODO: Usage of STL will significantly increase the image size, this should be changed to more efficient method for
+        // generating payload
+        std::string result;
+        err = generator.payloadBase41Representation(result);
+        if (err != CHIP_NO_ERROR)
+        {
+            NRF_LOG_ERROR("Failed to generate QR Code");
+        }
+
+        NRF_LOG_INFO("SetupPINCode: [%" PRIu32 "]", setUpPINCode);
+        // There might be whitespace in setup QRCode, add brackets to make it clearer.
+        NRF_LOG_INFO("SetupQRCode:  [%s]", result.c_str());
     }
 
     return ret;
