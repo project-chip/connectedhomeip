@@ -53,6 +53,10 @@ config("lwip_config") {
     "HAVE_LWIP_UDP_BIND_NETIF=1",
   ]
 
+  if (current_os == "android") {
+     defines += [ "LWIP_NO_STDINT_H=1" ]
+  }
+
   include_dirs = [ lwip_platform ]
 
   if (lwip_platform != "standalone") {
