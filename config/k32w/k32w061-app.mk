@@ -136,7 +136,8 @@ STD_INC_DIRS += \
     $(K32W061_SDK_ROOT)/devices/K32W061/utilities/str                                       \
     $(CHIP_ROOT)/src/platform/K32W
 
-STD_DEFINES =
+STD_DEFINES = \
+    HAVE_CONFIG_H
 
 STD_COMPILE_PREREQUISITES = k32w061-sdk-check
 

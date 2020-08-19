@@ -25,16 +25,13 @@
 #include "AppEvent.h"
 #include "BoltLockManager.h"
 
-#include <Weave/DeviceLayer/WeaveDeviceLayer.h>
-#include <Weave/DeviceLayer/SoftwareUpdateManager.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include "FreeRTOS.h"
 #include "timers.h"
 
 class AppTask
 {
-    typedef ::nl::Weave::DeviceLayer::SoftwareUpdateManager SoftwareUpdateManager;
-
 public:
     int StartAppTask();
     static void AppTaskMain(void * pvParameter);

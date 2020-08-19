@@ -65,7 +65,6 @@ CHIP_BUILD_ARCH = $(shell $(CHIP_ROOT)/third_party/nlbuild-autotools/repo/third_
 # ==================================================
 
 CHIP_DEFINES += \
-    NEW_OPENTHREAD_API
 
 CHIP_DEFINE_FLAGS = $(foreach def,$(CHIP_DEFINES),-D$(def))
 CHIP_CPPFLAGS = $(STD_CFLAGS) $(CFLAGS) $(DEBUG_FLAGS) $(OPT_FLAGS) $(DEFINE_FLAGS) $(CHIP_DEFINE_FLAGS) $(INC_FLAGS)
@@ -142,7 +141,8 @@ STD_INC_DIRS += \
     $(K32W061_SDK_ROOT)/middleware/wireless/framework/PDM/Include \
     $(K32W061_SDK_ROOT)/middleware/wireless/framework/MemManager/Interface \
     $(K32W061_SDK_ROOT)/middleware/wireless/openthread/openthread \
-    $(K32W061_SDK_ROOT)/middleware/wireless/openthread/openthread/include
+    $(K32W061_SDK_ROOT)/middleware/wireless/openthread/openthread/include \
+    $(K32W061_SDK_ROOT)/middleware/wireless/openthread/openthread/examples/platforms
 
 # Add the location of CHIP libraries to application link action.
 STD_LDFLAGS += -L$(CHIP_OUTPUT_DIR)/lib

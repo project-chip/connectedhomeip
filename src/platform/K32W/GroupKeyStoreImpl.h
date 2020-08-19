@@ -25,12 +25,28 @@
 
 #include <core/CHIPKeyIds.h>
 #include <platform/K32W/K32WConfig.h>
-#include <platform/Profiles/security/ChipApplicationKeys.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+class ChipGroupKey
+{
+public:
+    enum
+    {
+        MaxKeySize = 36
+    };
+    uint32_t KeyId;          /**< The key ID. */
+    uint8_t KeyLen;          /**< The key length. */
+    uint8_t Key[MaxKeySize]; /**< The secret key material. */
+    union
+    {
+        uint32_t StartTime; /**< The epoch key start time. */
+        uint32_t GlobalId;  /**< The application group key global ID. */
+    };
+};
 
 /**
  * An implementation of the Chip GroupKeyStoreBase API for platforms based

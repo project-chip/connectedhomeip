@@ -18,8 +18,6 @@
 
 #include "BoltLockManager.h"
 
-#include <schema/include/BoltLockTrait.h>
-
 #include "AppTask.h"
 #include "FreeRTOS.h"
 

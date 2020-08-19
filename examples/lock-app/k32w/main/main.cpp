@@ -25,20 +25,20 @@
 #include <openthread/heap.h>
 #include "openthread/platform/uart.h"
 #include "openthread/platform/logging.h"
-#include <openthread/platform/openthread-system.h>
+#include <openthread-system.h>
 
-#include <Weave/DeviceLayer/WeaveDeviceLayer.h>
-#include <Weave/DeviceLayer/ThreadStackManager.h>
-#include <Weave/Core/WeaveError.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/ThreadStackManager.h>
+#include <support/logging/CHIPLogging.h>
+#include <core/CHIPError.h>
 
 #include "app_config.h"
 #include "FreeRtosMbedtlsMutex.h"
 
-using namespace ::nl;
-using namespace ::nl::Inet;
-using namespace ::nl::Weave;
-using namespace ::nl::Weave::DeviceLayer;
-using namespace ::nl::Weave::Logging;
+using namespace ::chip;
+using namespace ::chip::Inet;
+using namespace ::chip::DeviceLayer;
+using namespace ::chip::Logging;
 
 #include <AppTask.h>
 
@@ -57,14 +57,14 @@ extern InitFunc __init_array_end;
 
 extern "C" void main_task(void const *argument)
 {
-    WEAVE_ERROR ret;
+    CHIP_ERROR ret;
 
-	/* Call C++ constructors */
-	InitFunc *pFunc = &__init_array_start;
-	for ( ; pFunc < &__init_array_end; ++pFunc )
-	{
-		(*pFunc)();
-	}
+    /* Call C++ constructors */
+    InitFunc *pFunc = &__init_array_start;
+    for ( ; pFunc < &__init_array_end; ++pFunc )
+    {
+        (*pFunc)();
+    }
 
     /* Used for HW initializations */
     otSysInit(0, NULL);
@@ -84,15 +84,15 @@ extern "C" void main_task(void const *argument)
      * Thread and Weave tasks are using it */
     freertos_mbedtls_mutex_init();
 
-    ret = PlatformMgr().InitWeaveStack();
-    if (ret != WEAVE_NO_ERROR)
+    ret = PlatformMgr().InitChipStack();
+    if (ret != CHIP_NO_ERROR)
     {
 	k32wLog("Error during PlatformMgr().InitWeaveStack()");
         goto exit;
     }
 
     ret = ThreadStackMgr().InitThreadStack();
-    if (ret != WEAVE_NO_ERROR)
+    if (ret != CHIP_NO_ERROR)
     {
 	k32wLog("Error during ThreadStackMgr().InitThreadStack()");
         goto exit;
@@ -100,7 +100,7 @@ extern "C" void main_task(void const *argument)
 
     // Configure device to operate as a Thread sleepy end-device.
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-    if (ret != WEAVE_NO_ERROR)
+    if (ret != CHIP_NO_ERROR)
     {
         goto exit;
     }
@@ -113,15 +113,15 @@ extern "C" void main_task(void const *argument)
         pollingConfig.InactivePollingIntervalMS = THREAD_INACTIVE_POLLING_INTERVAL_MS;
 
         ret = ConnectivityMgr().SetThreadPollingConfig(pollingConfig);
-        if (ret != WEAVE_NO_ERROR)
+        if (ret != CHIP_NO_ERROR)
         {
-		k32wLog("Error during ConnectivityMgr().SetThreadPollingConfig(pollingConfig)");
+            k32wLog("Error during ConnectivityMgr().SetThreadPollingConfig(pollingConfig)");
             goto exit;
         }
     }
 
     ret = PlatformMgr().StartEventLoopTask();
-    if (ret != WEAVE_NO_ERROR)
+    if (ret != CHIP_NO_ERROR)
     {
 	k32wLog("Error during PlatformMgr().StartEventLoopTask();");
         goto exit;
@@ -129,14 +129,14 @@ extern "C" void main_task(void const *argument)
 
     // Start OpenThread task
     ret = ThreadStackMgrImpl().StartThreadTask();
-    if (ret != WEAVE_NO_ERROR)
+    if (ret != CHIP_NO_ERROR)
     {
 	k32wLog("Error during ThreadStackMgrImpl().StartThreadTask()");
         goto exit;
     }
 
     ret = GetAppTask().StartAppTask();
-    if (ret != WEAVE_NO_ERROR)
+    if (ret != CHIP_NO_ERROR)
     {
 	k32wLog("Error during GetAppTask().StartAppTask()");
         goto exit;

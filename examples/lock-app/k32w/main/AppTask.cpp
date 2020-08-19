@@ -18,23 +18,14 @@
 
 #include "AppTask.h"
 #include "AppEvent.h"
-#include "WDMFeature.h"
 #include "LEDWidget.h"
 
-#include <schema/include/BoltLockTrait.h>
-
-#include <Weave/Profiles/WeaveProfiles.h>
-#include <Weave/Support/crypto/HashAlgos.h>
-#include <Weave/DeviceLayer/SoftwareUpdateManager.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include "app_config.h"
 #include "LED.h"
 #include "TimersManager.h"
 #include "Keyboard.h"
-
-using namespace ::nl::Weave::TLV;
-using namespace ::nl::Weave::DeviceLayer;
-using namespace ::nl::Weave::Profiles::SoftwareUpdate;
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT       6000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -44,7 +35,7 @@ using namespace ::nl::Weave::Profiles::SoftwareUpdate;
 
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
-static SemaphoreHandle_t sWeaveEventLock;
+static SemaphoreHandle_t sCHIPEventLock;
 static QueueHandle_t sAppEventQueue;
 
 static LEDWidget sStatusLED;
@@ -64,40 +55,20 @@ static uint32_t                     eventMask = 0;
 
 static nl::Weave::Platform::Security::SHA256 sSHA256;
 
+using namespace ::chip::DeviceLayer;
+
 AppTask AppTask::sAppTask;
-
-namespace nl {
-namespace Weave {
-namespace Profiles {
-namespace DataManagement_Current {
-namespace Platform {
-
-void CriticalSectionEnter(void)
-{
-    xSemaphoreTake(sWeaveEventLock, 0);
-}
-
-void CriticalSectionExit(void)
-{
-    xSemaphoreGive(sWeaveEventLock);
-}
-
-} // namespace Platform
-} // namespace DataManagement_Current
-} // namespace Profiles
-} // namespace Weave
-} // namespace nl
 
 int AppTask::StartAppTask()
 {
-    int err = WEAVE_NO_ERROR;
+    int err = CHIP_NO_ERROR;
 
     sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
     if (sAppEventQueue == NULL)
     {
-        err = WEAVE_ERROR_MAX;
+        err = CHIP_ERROR_MAX;
         K32W_LOG("Failed to allocate app event queue");
-        assert(err == WEAVE_NO_ERROR);
+        assert(err == CHIP_NO_ERROR);
     }
 
     return err;
@@ -105,7 +76,7 @@ int AppTask::StartAppTask()
 
 int AppTask::Init()
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     TMR_Init();
 
@@ -134,14 +105,14 @@ int AppTask::Init()
     if (sFunctionTimer == NULL)
     {
         K32W_LOG("app_timer_create() failed");
-        assert(err == WEAVE_NO_ERROR);
+        assert(err == CHIP_NO_ERROR);
     }
 
     err = BoltLockMgr().Init();
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         K32W_LOG("BoltLockMgr().Init() failed");
-        assert(err == WEAVE_NO_ERROR);
+        assert(err == CHIP_NO_ERROR);
     }
 
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
@@ -150,15 +121,15 @@ int AppTask::Init()
     if (sWeaveEventLock == NULL)
     {
         K32W_LOG("xSemaphoreCreateMutex() failed");
-        assert(err == WEAVE_NO_ERROR);
+        assert(err == CHIP_NO_ERROR);
     }
 
     // Initialize WDM Feature
     err = WdmFeature().Init();
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         K32W_LOG("WdmFeature().Init() failed");
-        assert(err == WEAVE_NO_ERROR);
+        assert(err == CHIP_NO_ERROR);
     }
 
     SoftwareUpdateMgr().SetEventCallback(this, HandleSoftwareUpdateEvent);
@@ -170,10 +141,10 @@ int AppTask::Init()
     char currentFirmwareRev[ConfigurationManager::kMaxFirmwareRevisionLength+1] = {0};
     size_t currentFirmwareRevLen;
     err = ConfigurationMgr().GetFirmwareRevision(currentFirmwareRev, sizeof(currentFirmwareRev), currentFirmwareRevLen);
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         K32W_LOG("Get version error");
-        assert(err == WEAVE_NO_ERROR);
+        assert(err == CHIP_NO_ERROR);
     }
 
     K32W_LOG("Current Firmware Version: %s", currentFirmwareRev);
@@ -187,10 +158,10 @@ void AppTask::AppTaskMain(void * pvParameter)
     AppEvent event;
 
     err = sAppTask.Init();
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         K32W_LOG("AppTask.Init() failed");
-        assert(err == WEAVE_NO_ERROR);
+        assert(err == CHIP_NO_ERROR);
     }
 
     while (true)
@@ -416,7 +387,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     bool initiated = false;
     BoltLockManager::Action_t action;
     int32_t actor;
-    int err = WEAVE_NO_ERROR;
+    int err = CHIP_NO_ERROR;
 
 
 	if (sAppTask.mFunction != kFunction_NoneSelected)
@@ -445,10 +416,10 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
     else
     {
-        err = WEAVE_ERROR_MAX;
+        err = CHIP_ERROR_MAX;
     }
 
-    if (err == WEAVE_NO_ERROR)
+    if (err == CHIP_NO_ERROR)
     {
         initiated = BoltLockMgr().InitiateAction(actor, action);
 
@@ -590,7 +561,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
 void AppTask::InstallEventHandler(AppEvent * aEvent)
 {
-    SoftwareUpdateMgr().ImageInstallComplete(WEAVE_NO_ERROR);
+    SoftwareUpdateMgr().ImageInstallComplete(CHIP_NO_ERROR);
 }
 
 void AppTask::HandleSoftwareUpdateEvent(void *apAppState,
@@ -599,7 +570,7 @@ void AppTask::HandleSoftwareUpdateEvent(void *apAppState,
                                         SoftwareUpdateManager::OutEventParam& aOutParam)
 {
     static uint32_t persistedImageLen = 0;
-    static char persistedImageURI[WEAVE_DEVICE_CONFIG_SOFTWARE_UPDATE_URI_LEN+1] = "";
+    static char persistedImageURI[CHIP_DEVICE_CONFIG_SOFTWARE_UPDATE_URI_LEN+1] = "";
 
     switch(aEvent)
     {
@@ -612,7 +583,7 @@ void AppTask::HandleSoftwareUpdateEvent(void *apAppState,
 
         case SoftwareUpdateManager::kEvent_PrepareQuery_Metadata:
         {
-            WEAVE_ERROR err;
+            CHIP_ERROR err;
             bool haveSufficientBattery = true;
             uint32_t certBodyId = 0;
 
@@ -631,14 +602,14 @@ void AppTask::HandleSoftwareUpdateEvent(void *apAppState,
                 // err = writer->EndContainer(arrayContainerType);
 
                 err = writer->Put(ProfileTag(::nl::Weave::Profiles::kWeaveProfile_SWU, kTag_CertBodyId), certBodyId);
-                assert(err == WEAVE_NO_ERROR);
+                assert(err == CHIP_NO_ERROR);
 
                 err = writer->PutBoolean(ProfileTag(::nl::Weave::Profiles::kWeaveProfile_SWU, kTag_SufficientBatterySWU), haveSufficientBattery);
-                assert(err == WEAVE_NO_ERROR);
+                assert(err == CHIP_NO_ERROR);
             }
             else
             {
-                aOutParam.PrepareQuery_Metadata.Error = WEAVE_ERROR_INVALID_ARGUMENT;
+                aOutParam.PrepareQuery_Metadata.Error = CHIP_ERROR_INVALID_ARGUMENT;
                 K32W_LOG("ERROR ! aOutParam.PrepareQuery_Metadata.MetaDataWriter is NULL");
             }
             break;
@@ -646,7 +617,7 @@ void AppTask::HandleSoftwareUpdateEvent(void *apAppState,
 
         case SoftwareUpdateManager::kEvent_QueryPrepareFailed:
         {
-            if (aInParam.QueryPrepareFailed.Error == WEAVE_ERROR_STATUS_REPORT_RECEIVED)
+            if (aInParam.QueryPrepareFailed.Error == CHIP_ERROR_STATUS_REPORT_RECEIVED)
             {
                 K32W_LOG("Software Update failed during prepare: Received StatusReport %s",
                              nl::StatusReportStr(aInParam.QueryPrepareFailed.StatusReport->mProfileId,
@@ -661,15 +632,15 @@ void AppTask::HandleSoftwareUpdateEvent(void *apAppState,
 
         case SoftwareUpdateManager::kEvent_SoftwareUpdateAvailable:
         {
-            WEAVE_ERROR err;
+            CHIP_ERROR err;
 
             char currentFirmwareRev[ConfigurationManager::kMaxFirmwareRevisionLength+1] = {0};
             size_t currentFirmwareRevLen;
             err = ConfigurationMgr().GetFirmwareRevision(currentFirmwareRev, sizeof(currentFirmwareRev), currentFirmwareRevLen);
-            if (err != WEAVE_NO_ERROR)
+            if (err != CHIP_NO_ERROR)
             {
                 K32W_LOG("sw update- Get version error");
-                assert(err == WEAVE_NO_ERROR);
+                assert(err == CHIP_NO_ERROR);
             }
 
             K32W_LOG("Current Firmware Version: %s", currentFirmwareRev);
@@ -719,7 +690,7 @@ void AppTask::HandleSoftwareUpdateEvent(void *apAppState,
             sSHA256.Begin();
 
             // Tell the SoftwareUpdateManager that storage preparation has completed.
-            SoftwareUpdateMgr().PrepareImageStorageComplete(WEAVE_NO_ERROR);
+            SoftwareUpdateMgr().PrepareImageStorageComplete(CHIP_NO_ERROR);
             break;
         }
 
@@ -744,7 +715,7 @@ void AppTask::HandleSoftwareUpdateEvent(void *apAppState,
             // Make sure that the buffer provided in the parameter is large enough.
             if (aInParam.ComputeImageIntegrity.IntegrityValueBufLen < sSHA256.kHashLength)
             {
-                aOutParam.ComputeImageIntegrity.Error = WEAVE_ERROR_BUFFER_TOO_SMALL;
+                aOutParam.ComputeImageIntegrity.Error = CHIP_ERROR_BUFFER_TOO_SMALL;
             }
             else
             {
@@ -785,21 +756,21 @@ void AppTask::HandleSoftwareUpdateEvent(void *apAppState,
 
         case SoftwareUpdateManager::kEvent_Finished:
         {
-            if (aInParam.Finished.Error == WEAVE_ERROR_NO_SW_UPDATE_AVAILABLE)
+            if (aInParam.Finished.Error == CHIP_ERROR_NO_SW_UPDATE_AVAILABLE)
             {
                 K32W_LOG("No Software Update Available");
             }
-            else if (aInParam.Finished.Error == WEAVE_DEVICE_ERROR_SOFTWARE_UPDATE_IGNORED)
+            else if (aInParam.Finished.Error == CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_IGNORED)
             {
                 K32W_LOG("Software Update Ignored by Application");
             }
-            else if (aInParam.Finished.Error == WEAVE_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED)
+            else if (aInParam.Finished.Error == CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED)
             {
                 K32W_LOG("Software Update Aborted by Application");
             }
-            else if (aInParam.Finished.Error != WEAVE_NO_ERROR || aInParam.Finished.StatusReport != NULL)
+            else if (aInParam.Finished.Error != CHIP_NO_ERROR || aInParam.Finished.StatusReport != NULL)
             {
-                if (aInParam.Finished.Error == WEAVE_ERROR_STATUS_REPORT_RECEIVED)
+                if (aInParam.Finished.Error == CHIP_ERROR_STATUS_REPORT_RECEIVED)
                 {
                     K32W_LOG("Software Update failed: Received StatusReport %s",
                                  nl::StatusReportStr(aInParam.Finished.StatusReport->mProfileId,
