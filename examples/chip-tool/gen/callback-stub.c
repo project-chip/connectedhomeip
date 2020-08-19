@@ -2475,3 +2475,20 @@ void halRadioPowerUpHandler(void) {}
  * @param sleepMode    Idle/sleep mode
  */
 void halSleepCallback(bool enter, SleepModes sleepMode) {}
+
+// These functions / constants are added to avoid ld failure when building with GN
+// They should be removed if we have zcl updates and nolonger need this or causing other errors
+void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint) {}
+
+bool emberAfIsCurrentSecurityProfileSmartEnergy(void)
+{
+    return false;
+}
+
+const EmberAfOtaImageId emberAfInvalidImageId;
+
+const EmAfZigbeeProNetwork * emAfCurrentZigbeeProNetwork = NULL;
+
+void emberAfPluginUpdateTcLinkKeyZigbeeKeyEstablishmentCallback(EmberEUI64 partner, EmberKeyStatus status) {}
+
+void emberAfPluginNetworkSteeringMarker(void) {}
