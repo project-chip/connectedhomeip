@@ -34,7 +34,7 @@ static test_suites_t gs_test_suites;
 #if __ZEPHYR__
 inline static bool AlreadyExists(UnitTestTriggerFunction tests)
 {
-    for (int i = 0; i < gs_test_suites.num_test_suites; ++i)
+    for (uint32_t i = 0; i < gs_test_suites.num_test_suites; ++i)
         if (gs_test_suites.test_suites[i] == tests)
             return true;
     return false;
