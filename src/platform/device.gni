@@ -17,7 +17,6 @@ import("//build_overrides/chip.gni")
 declare_args() {
   # Device platform layer: darwin, linux, freertos, nrf5, efr32, external, none.
   chip_device_platform = "auto"
-  chip_platform_target = ""
 }
 
 if (chip_device_platform == "auto") {
@@ -46,39 +45,58 @@ if (chip_device_platform == "darwin") {
   _chip_device_layer = "Linux"
 } else if (chip_device_platform == "nrf5") {
   _chip_device_layer = "nRF5"
+} else if (chip_device_platform == "efr32") {
+  _chip_device_layer = "EFR32"
 }
 
-if (chip_device_platform != "external") {
-  chip_ble_platform_config_include = ""
-  chip_device_platform_config_include = ""
-  chip_platform_config_include = ""
-  chip_inet_platform_config_include = ""
-  chip_system_platform_config_include = ""
-} else {
+_chip_ble_platform_config_include = ""
+_chip_device_platform_config_include = ""
+_chip_platform_config_include = ""
+_chip_inet_platform_config_include = ""
+_chip_system_platform_config_include = ""
+
+if (chip_device_platform != "none") {
+  if (chip_device_platform != "external") {
+    _chip_ble_platform_config_include =
+        "<platform/" + _chip_device_layer + "/BlePlatformConfig.h>"
+    _chip_device_platform_config_include =
+        "<platform/" + _chip_device_layer + "/CHIPDevicePlatformConfig.h>"
+    _chip_platform_config_include =
+        "<platform/" + _chip_device_layer + "/CHIPPlatformConfig.h>"
+    _chip_inet_platform_config_include =
+        "<platform/" + _chip_device_layer + "/InetPlatformConfig.h>"
+    _chip_system_platform_config_include =
+        "<platform/" + _chip_device_layer + "/SystemPlatformConfig.h>"
+  }
+
   declare_args() {
-    chip_ble_platform_config_include = ""
-    chip_device_platform_config_include = ""
-    chip_platform_config_include = ""
-    chip_inet_platform_config_include = ""
-    chip_system_platform_config_include = ""
+    # Platform configuration header for BLE.
+    chip_ble_platform_config_include = _chip_ble_platform_config_include
+
+    # Platform configuration header for device layer.
+    chip_device_platform_config_include = _chip_device_platform_config_include
+
+    # Platform configuration header for CHIP core.
+    chip_platform_config_include = _chip_platform_config_include
+
+    # Platform configuration header for inet layer.
+    chip_inet_platform_config_include = _chip_inet_platform_config_include
+
+    # Platform configuration header for system layer.
+    chip_system_platform_config_include = _chip_system_platform_config_include
   }
 }
 
-if (_chip_device_layer != "none" && chip_device_platform != "external") {
-  chip_ble_platform_config_include =
-      "<platform/" + _chip_device_layer + "/BlePlatformConfig.h>"
-  chip_device_platform_config_include =
-      "<platform/" + _chip_device_layer + "/CHIPDevicePlatformConfig.h>"
-  chip_platform_config_include =
-      "<platform/" + _chip_device_layer + "/CHIPPlatformConfig.h>"
-  chip_inet_platform_config_include =
-      "<platform/" + _chip_device_layer + "/InetPlatformConfig.h>"
-  chip_system_platform_config_include =
-      "<platform/" + _chip_device_layer + "/SystemPlatformConfig.h>"
+if (chip_device_platform == "external") {
+  declare_args() {
+    # Target for external platform.
+    chip_platform_target = ""
+  }
+} else if (chip_device_platform != "none") {
+  chip_platform_target =
+      get_label_info(_chip_device_layer, "label_no_toolchain")
 }
 
-assert(
-    (current_os != "freertos" && chip_device_platform == "none") ||
-        chip_device_platform == "darwin" || chip_device_platform == "nrf5" ||
-        chip_device_platform == "linux" || chip_device_platform == "external",
-    "Please select a valid value for chip_device_platform")
+assert(chip_device_platform == "darwin" || chip_device_platform == "nrf5" || chip_device_platform == "efr32" || chip_device_platform == "linux" ||
+           chip_device_platform == "external" || chip_device_platform == "none",
+       "Please select a valid value for chip_device_platform")

@@ -17,6 +17,7 @@ import("//build_overrides/nlio.gni")
 
 import("${chip_root}/gn/chip/tests.gni")
 import("${chip_root}/src/inet/inet.gni")
+import("${chip_root}/src/platform/device.gni")
 import("core.gni")
 
 config("chip_config") {
@@ -153,6 +154,7 @@ static_library("core") {
   ]
 
   public_deps = [
+    chip_platform_target,
     ":chip_config_header",
     "${chip_root}/src/ble",
     "${chip_root}/src/inet",
@@ -163,6 +165,7 @@ static_library("core") {
   ]
 
   allow_circular_includes_from = [
+    chip_platform_target,
     "${chip_root}/src/ble",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/inet",
