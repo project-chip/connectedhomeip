@@ -102,12 +102,12 @@ void FillPrefix(char * buf, uint8_t bufLen, uint8_t chipCategory, uint8_t otLogL
     size_t prefixLen;
 
     /* add the error string */
-    assert(bufLen > nlChipLoggingChipPrefixLen);
+    assert(bufLen > ChipLoggingChipPrefixLen);
     ::GetMessageString(buf, chipCategory, otLogLevel);
 
     /* add the module name string */
     prefixLen = strlen(buf);
-    assert(bufLen > (prefixLen + nlChipLoggingModuleNameLen + 3));
+    assert(bufLen > (prefixLen + ChipLoggingModuleNameLen + 3));
     buf[prefixLen++] = '[';
     GetModuleName(buf + prefixLen, module);
     prefixLen        = strlen(buf);

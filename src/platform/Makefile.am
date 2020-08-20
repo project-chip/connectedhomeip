@@ -113,6 +113,17 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/platform/ESP32/NetworkProvisioningServerImpl.h \
     @top_srcdir@/src/platform/ESP32/ESP32Utils.h \
     @top_srcdir@/src/platform/ESP32/ESP32Config.h \
+    @top_srcdir@/src/platform/K32W/CHIPDevicePlatformConfig.h \
+    @top_srcdir@/src/platform/K32W/GroupKeyStoreImpl.h \
+    @top_srcdir@/src/platform/K32W/k32w-chip-mbedtls-config.h \
+    @top_srcdir@/src/platform/K32W/K32WConfig.h \
+    @top_srcdir@/src/platform/K32W/ConnectivityManagerImpl.h \
+    @top_srcdir@/src/platform/K32W/BLEManagerImpl.h \
+    @top_srcdir@/src/platform/K32W/ConfigurationManagerImpl.h \
+    @top_srcdir@/src/platform/K32W/PlatformManagerImpl.h \
+    @top_srcdir@/src/platform/K32W/SoftwareUpdateManagerImpl.h \
+    @top_srcdir@/src/platform/K32W/CHIPDevicePlatformEvent.h \
+    @top_srcdir@/src/platform/K32W/NetworkProvisioningServerImpl.h \
     @top_srcdir@/src/platform/Linux/BLEManagerImpl.h \
     @top_srcdir@/src/platform/Linux/BlePlatformConfig.h \
     @top_srcdir@/src/platform/Linux/CHIPLinuxStorage.h \
@@ -231,6 +242,7 @@ Linux/gen/DbusBluez.c: Linux/dbus/org.bluez.xml
 
 nodist_libDeviceLayer_a_SOURCES        += \
     Linux/gen/DbusBluez.c                 \
+    Linux/CHIPBluezHelper.cpp             \
     $(NULL)
 
 endif #CONFIG_BLE_PLATFORM_BLUEZ
@@ -382,6 +394,26 @@ libDeviceLayer_a_SOURCES               +=       \
 endif
 
 endif # CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+
+if CHIP_DEVICE_LAYER_TARGET_K32W
+
+libDeviceLayer_a_SOURCES               +=       \
+    K32W/BLEManagerImpl.cpp                     \
+    K32W/ConfigurationManagerImpl.cpp           \
+    K32W/PlatformManagerImpl.cpp                \
+    K32W/ConnectivityManagerImpl.cpp            \
+    K32W/K32WConfig.cpp                         \
+    K32W/Logging.cpp                            \
+    FreeRTOS/SystemTimeSupport.cpp              \
+    $(NULL)
+
+if CHIP_ENABLE_OPENTHREAD
+libDeviceLayer_a_SOURCES               +=       \
+    K32W/ThreadStackManagerImpl.cpp             \
+    $(NULL)
+endif
+
+endif # CHIP_DEVICE_LAYER_TARGET_K32W
 
 endif # CONFIG_DEVICE_LAYER
 

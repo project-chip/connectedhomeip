@@ -143,16 +143,7 @@ public class CommissionerWorker extends Worker {
   }
 
   String getPskd() {
-    final int pskdLength = 27 / 5 + 1;
-    StringBuilder str = new StringBuilder();
-
-    for (int i = 0; i < pskdLength; ++i) {
-      str.append(
-          "0123456789ABCDEFGHJKLMNPRSTUVWXY"
-              .charAt(((int) deviceInfo.getSetupPinCode() >> (i * 5)) & ((1 << 5) - 1)));
-    }
-
-    return str.toString();
+    return String.format("%09u", deviceInfo.getSetupPinCode());
   }
 
   private ByteArray getJoinerId() {

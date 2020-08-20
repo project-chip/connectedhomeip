@@ -333,7 +333,7 @@ static CHIP_ERROR ConfigGetSetupPinCode(bool printHeader)
         streamer_printf(sout, "PinCode:         ");
     }
     SuccessOrExit(error = ConfigurationMgr().GetSetupPinCode(setupPinCode));
-    streamer_printf(sout, "%08u", setupPinCode);
+    streamer_printf(sout, "%09u", setupPinCode);
 
 exit:
     return ConfigGetDone(sout, error);

@@ -1212,42 +1212,42 @@ EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl * controls, u
     return EMBER_SUCCESS;
 }
 
-EmberStatus emberAfEndpointEventControlSetDelayMS(EmberEventControl * controls, uint8_t endpoint, uint32_t delayMs)
-{
-    uint8_t index = emberAfIndexFromEndpoint(endpoint);
-    if (index == 0xFF)
-    {
-        return EMBER_INVALID_ENDPOINT;
-    }
-    return emberAfEventControlSetDelayMS(&controls[index], delayMs);
-}
+// EmberStatus emberAfEndpointEventControlSetDelayMS(EmberEventControl * controls, uint8_t endpoint, uint32_t delayMs)
+// {
+//     uint8_t index = emberAfIndexFromEndpoint(endpoint);
+//     if (index == 0xFF)
+//     {
+//         return EMBER_INVALID_ENDPOINT;
+//     }
+//     return emberAfEventControlSetDelayMS(&controls[index], delayMs);
+// }
 
-EmberStatus emberAfEndpointEventControlSetDelayQS(EmberEventControl * controls, uint8_t endpoint, uint32_t delayQs)
-{
-    uint8_t index = emberAfIndexFromEndpoint(endpoint);
-    if (index == 0xFF)
-    {
-        return EMBER_INVALID_ENDPOINT;
-    }
-    return emberAfEventControlSetDelayQS(&controls[index], delayQs);
-}
+// EmberStatus emberAfEndpointEventControlSetDelayQS(EmberEventControl * controls, uint8_t endpoint, uint32_t delayQs)
+// {
+//     uint8_t index = emberAfIndexFromEndpoint(endpoint);
+//     if (index == 0xFF)
+//     {
+//         return EMBER_INVALID_ENDPOINT;
+//     }
+//     return emberAfEventControlSetDelayQS(&controls[index], delayQs);
+// }
 
-EmberStatus emberAfEndpointEventControlSetDelayMinutes(EmberEventControl * controls, uint8_t endpoint, uint16_t delayM)
-{
-    uint8_t index = emberAfIndexFromEndpoint(endpoint);
-    if (index == 0xFF)
-    {
-        return EMBER_INVALID_ENDPOINT;
-    }
-    return emberAfEventControlSetDelayMinutes(&controls[index], delayM);
-}
+// EmberStatus emberAfEndpointEventControlSetDelayMinutes(EmberEventControl * controls, uint8_t endpoint, uint16_t delayM)
+// {
+//     uint8_t index = emberAfIndexFromEndpoint(endpoint);
+//     if (index == 0xFF)
+//     {
+//         return EMBER_INVALID_ENDPOINT;
+//     }
+//     return emberAfEventControlSetDelayMinutes(&controls[index], delayM);
+// }
 
-bool emberAfIsThisMyEui64(EmberEUI64 eui64)
-{
-    EmberEUI64 myEui64;
-    emberAfGetEui64(myEui64);
-    return (0 == memcmp(eui64, myEui64, EUI64_SIZE) ? true : false);
-}
+// bool emberAfIsThisMyEui64(EmberEUI64 eui64)
+// {
+//     EmberEUI64 myEui64;
+//     emberAfGetEui64(myEui64);
+//     return (0 == MEMCOMPARE(eui64, myEui64, EUI64_SIZE) ? true : false);
+// }
 
 uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, const uint8_t * appendingChars,
                                 uint8_t appendingCharsLen)

@@ -14,7 +14,7 @@
 
 declare_args() {
   # Use clang to build.
-  is_clang = false
+  is_clang = current_os == "android"
 
   # Optimize for size by default.
   optimize_for_size = true
