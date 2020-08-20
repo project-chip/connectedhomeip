@@ -23,10 +23,11 @@ SOURCE_DIR="$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
 REPO_DIR="$SOURCE_DIR/../../"
 
 function __flask_clean() {
+    echo $(ps aux | grep "[f]lask run")
     flask_pid=$(ps aux | grep "[f]lask run" | awk '{print $2}' | sort -k2 -rn)
     if [ ! -z "$flask_pid" ]; then
         for pid in $flask_pid; do
-            kill -2 "$pid" >/dev/null 2>&1
+            kill -2 "$pid"
         done
     fi
 }
@@ -35,7 +36,7 @@ function __socat_clean() {
     socat_pid=$(ps aux | grep "[s]ocat" | awk '{print $2}')
     if [ ! -z "$socat_pid" ]; then
         for pid in $socat_pid; do
-            kill -2 "$pid" >/dev/null 2>&1
+            kill -2 "$pid"
         done
     fi
 }
@@ -44,7 +45,7 @@ function __virtual_thread_clean() {
     vthread_pid=$(ps aux | grep "[o]t-ncp-ftd" | awk '{print $2}')
     if [ ! -z "$vthread_pid" ]; then
         for pid in $vthread_pid; do
-            kill -2 "$pid" >/dev/null 2>&1
+            kill -2 "$pid"
         done
     fi
 }
