@@ -46,23 +46,21 @@ read -r -a DEFINES <<<"$GCC_PREPROCESSOR_DEFINITIONS"
 declare target_defines=
 for define in "${DEFINES[@]}"; do
 
-    echo define=$define
     # skip over those that GN does for us
     case "$define" in
-        CHIP_PROJECT_CONFIG_INCLUDE*)
-            echo skipping
-            continue
-            ;;
         CHIP_LOGGING_STYLE*)
-            echo skipping
-            continue
-            ;;
-        CONFIG_NETWORK_LAYER*)
-            echo skipping
             continue
             ;;
         CHIP_DEVICE_LAYER*)
-            echo skipping
+            continue
+            ;;
+        CHIP_*_CONFIG_INCLUDE)
+            continue
+            ;;
+        CHIP_SYSTEM_CONFIG_*)
+            continue
+            ;;
+        CONFIG_NETWORK_LAYER*)
             continue
             ;;
     esac
@@ -71,7 +69,6 @@ done
 target_defines=[${target_defines:1}]
 
 declare -a args=(
-    'is_clang=true'
     'chip_crypto="mbedtls"'
     'chip_build_tools=false'
     'chip_build_tests=false'
@@ -82,8 +79,8 @@ declare -a args=(
     'chip_system_project_config_include=""'
     'target_cpu="'"$ARCHS"'"'
     'target_defines='"$target_defines"
-    'target_cflags=["-target","'"$ARCHS"'-'"$LLVM_TARGET_TRIPLE_VENDOR"'-'"$LLVM_TARGET_TRIPLE_OS_VERSION"'"]'
-    'arm_use_thumb=false'
+    'default_configs_cosmetic=[]'
+    'target_cflags=["-target","'"$ARCHS"'-'"$LLVM_TARGET_TRIPLE_VENDOR"'-'"$LLVM_TARGET_TRIPLE_OS_VERSION"'", "-DNDEBUG"]'
 )
 
 if [[ ${CONFIGURATION} != Debug* ]]; then

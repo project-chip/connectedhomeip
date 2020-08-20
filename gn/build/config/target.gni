@@ -16,6 +16,7 @@ declare_args() {
   # Global defines for target build. This only applies to the default toolchain.
   target_defines = []
   target_cflags = []
-  target_cxxflags = []
+  target_cflags_cc = []
+  target_cflags_c = []
   target_ldflags = []
 }

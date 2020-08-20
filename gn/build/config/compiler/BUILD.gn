@@ -24,7 +24,9 @@ declare_args() {
   treat_warnings_as_errors = true
 }
 
-if (current_cpu == "arm" || current_cpu == "arm64") {
+_is_embedded_arm = current_os != "ios" && current_os != "mac_os" && (current_cpu == "arm" || current_cpu == "arm64")
+
+if (_is_embedded_arm) {
   import("//build/config/arm.gni")
 } else if (current_cpu == "x86" || current_cpu == "x86_64") {
   import("//build/config/x86.gni")
@@ -42,7 +44,7 @@ config("debug_default") {
 
 config("abi_default") {
   cflags = []
-  if (current_cpu == "arm" || current_cpu == "arm64") {
+  if (_is_embedded_arm) {
     if (arm_arch != "") {
       cflags += [ "-march=${arm_arch}" ]
     }
@@ -88,6 +90,8 @@ config("target_default") {
   if (current_toolchain == default_toolchain) {
     defines = target_defines
     cflags = target_cflags
+    cflags_c = target_cflags_c
+    cflags_cc = target_cflags_cc
     ldflags = target_ldflags
   }
 }

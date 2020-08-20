@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2C4DF09E248B2C60009307CB /* libmbedtls.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C4DF09D248B2C60009307CB /* libmbedtls.a */; };
+		2C4DF09E248B2C60009307CB /* libmbedtls.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C4DF09D248B2C60009307CB /* libmbedtls.a */; settings = {ATTRIBUTES = (Required, ); }; };
 		515C401C2486BF43004C4DB3 /* CHIPOnOff.mm in Sources */ = {isa = PBXBuildFile; fileRef = 515C401A2486BF43004C4DB3 /* CHIPOnOff.mm */; };
 		515C401D2486BF43004C4DB3 /* CHIPOnOff.h in Headers */ = {isa = PBXBuildFile; fileRef = 515C401B2486BF43004C4DB3 /* CHIPOnOff.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		991DC0842475F45400C13860 /* CHIPDeviceController.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC0822475F45400C13860 /* CHIPDeviceController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -444,11 +444,16 @@
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"CHIP_PROJECT_CONFIG_INCLUDE=<CHIPProjectConfig.h>",
+					"CHIP_PLATFORM_CONFIG_INCLUDE=<platform/Darwin/CHIPPlatformConfig.h>",
+					"CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE=<platform/Darwin/CHIPDevicePlatformConfig.h>",
 					CONFIG_NETWORK_LAYER_INET,
 					CONFIG_NETWORK_LAYER_BLE,
 					"CHIP_LOGGING_STYLE_EXTERNAL=1",
 					"CHIP_DEVICE_LAYER_TARGET=Darwin",
 					"CHIP_DEVICE_LAYER_TARGET_DARWIN=1",
+                                        "CHIP_DEVICE_LAYER_TARGET_LINUX=0",
+                                        "CHIP_DEVICE_LAYER_TARGET_NRF5=0",
+                                        "CHIP_DEVICE_LAYER_TARGET_EFR32=0",
 					"CHIP_SYSTEM_CONFIG_USE_SOCKETS=1",
 					"$(inherited)",
 				);
@@ -497,11 +502,16 @@
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"CHIP_PROJECT_CONFIG_INCLUDE=<CHIPProjectConfig.h>",
+					"CHIP_PLATFORM_CONFIG_INCLUDE=<platform/Darwin/CHIPPlatformConfig.h>",
+					"CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE=<platform/Darwin/CHIPDevicePlatformConfig.h>",
 					CONFIG_NETWORK_LAYER_INET,
 					CONFIG_NETWORK_LAYER_BLE,
 					"CHIP_LOGGING_STYLE_EXTERNAL=1",
 					"CHIP_DEVICE_LAYER_TARGET=Darwin",
 					"CHIP_DEVICE_LAYER_TARGET_DARWIN=1",
+                                        "CHIP_DEVICE_LAYER_TARGET_LINUX=0",
+                                        "CHIP_DEVICE_LAYER_TARGET_NRF5=0",
+                                        "CHIP_DEVICE_LAYER_TARGET_EFR32=0",
 					"CHIP_SYSTEM_CONFIG_USE_SOCKETS=1",
 					"$(inherited)",
 				);
@@ -646,11 +656,16 @@
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"CHIP_PROJECT_CONFIG_INCLUDE=<CHIPProjectConfig.h>",
+					"CHIP_PLATFORM_CONFIG_INCLUDE=<platform/Darwin/CHIPPlatformConfig.h>",
+					"CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE=<platform/Darwin/CHIPDevicePlatformConfig.h>",
 					CONFIG_NETWORK_LAYER_INET,
 					CONFIG_NETWORK_LAYER_BLE,
 					"CHIP_LOGGING_STYLE_EXTERNAL=1",
 					"CHIP_DEVICE_LAYER_TARGET=Darwin",
 					"CHIP_DEVICE_LAYER_TARGET_DARWIN=1",
+                                        "CHIP_DEVICE_LAYER_TARGET_LINUX=0",
+                                        "CHIP_DEVICE_LAYER_TARGET_NRF5=0",
+                                        "CHIP_DEVICE_LAYER_TARGET_EFR32=0",
 					"CHIP_SYSTEM_CONFIG_USE_SOCKETS=1",
 					"$(inherited)",
 				);
@@ -776,11 +791,16 @@
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"CHIP_PROJECT_CONFIG_INCLUDE=<CHIPProjectConfig.h>",
+					"CHIP_PLATFORM_CONFIG_INCLUDE=<platform/Darwin/CHIPPlatformConfig.h>",
+					"CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE=<platform/Darwin/CHIPDevicePlatformConfig.h>",
 					CONFIG_NETWORK_LAYER_INET,
 					CONFIG_NETWORK_LAYER_BLE,
 					"CHIP_LOGGING_STYLE_EXTERNAL=1",
 					"CHIP_DEVICE_LAYER_TARGET=Darwin",
 					"CHIP_DEVICE_LAYER_TARGET_DARWIN=1",
+                                        "CHIP_DEVICE_LAYER_TARGET_LINUX=0",
+                                        "CHIP_DEVICE_LAYER_TARGET_NRF5=0",
+                                        "CHIP_DEVICE_LAYER_TARGET_EFR32=0",
 					"CHIP_SYSTEM_CONFIG_USE_SOCKETS=1",
 					"$(inherited)",
 				);
