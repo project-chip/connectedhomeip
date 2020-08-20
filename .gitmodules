@@ -51,7 +51,7 @@
 	url = https://github.com/openthread/openthread.git
 	branch = master
 	ignore = dirty
-	commit = 1ad22bac21f01597d86bf6f52aed6fd1a1b00d46
+	commit = 6886ff1e4c5dcf1bdc6ac7a067a81debff113938
 [submodule "ot-br-posix"]
 	path = third_party/ot-br-posix/repo
 	url = https://github.com/openthread/ot-br-posix.git
