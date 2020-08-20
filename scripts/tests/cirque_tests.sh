@@ -24,9 +24,9 @@ REPO_DIR="$SOURCE_DIR/../../"
 
 function __flask_clean() {
     echo $(ps aux | grep "[f]lask run")
-    flask_pid=$(ps aux | grep "[f]lask run" | awk '{print $2}' | sort -k2 -rn)
+    flask_pid=$(ps aux | grep "[f]lask run" | grep -v "sudo" | awk '{print $2}' | sort -k2 -rn)
     if [ ! -z "$flask_pid" ]; then
-        for pid in $flask_pid; do
+        for pid in "$flask_pid"; do
             kill -2 "$pid"
         done
     fi
