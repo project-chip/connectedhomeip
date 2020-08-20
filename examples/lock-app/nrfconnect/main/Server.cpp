@@ -17,10 +17,10 @@
 
 #include "Server.h"
 
+#include "app/chip-zcl-zpro-codec.h"
 #include "attribute-storage.h"
 #include "gen/znet-bookkeeping.h"
 #include "util.h"
-#include "app/chip-zcl-zpro-codec.h"
 
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
