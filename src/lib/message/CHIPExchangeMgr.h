@@ -412,6 +412,8 @@ public:
     };
 
     ChipExchangeManager(void);
+    ChipExchangeManager(const ChipExchangeManager &) = delete;
+    ChipExchangeManager operator=(const ChipExchangeManager &) = delete;
 
     ChipMessageLayer * MessageLayer; /**< [READ ONLY] The associated ChipMessageLayer object. */
     ChipFabricState * FabricState;   /**< [READ ONLY] The associated FabricState object. */
@@ -546,8 +548,6 @@ private:
 
     void NotifySecurityManagerAvailable();
     void NotifyKeyFailed(uint64_t peerNodeId, uint16_t keyId, CHIP_ERROR keyErr);
-
-    ChipExchangeManager(const ChipExchangeManager &); // not defined
 };
 
 #if !CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT

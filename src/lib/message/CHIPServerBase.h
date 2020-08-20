@@ -63,12 +63,11 @@ public:
 
 protected:
     ChipServerBase(void) {}
+    ChipServerBase(const ChipServerBase &) = delete;
+    ChipServerBase & operator=(const ChipServerBase &) = delete;
 
     bool EnforceAccessControl(ExchangeContext * ec, uint32_t msgProfileId, uint8_t msgType, const ChipMessageInfo * msgInfo,
                               ChipServerDelegateBase * delegate);
-
-private:
-    ChipServerBase(const ChipServerBase &); // not defined
 };
 
 /**
