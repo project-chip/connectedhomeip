@@ -120,8 +120,10 @@ public:
      * @param[in] devicePort            [Optional] The CHIP Device's port, defaults to CHIP_PORT
      * @return CHIP_ERROR           The connection status
      */
-    [[deprecated("Available until Rendezvous is implemented")]] CHIP_ERROR ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState, NewConnectionHandler onConnected,
-                             MessageReceiveHandler onMessageReceived, ErrorHandler onError, uint16_t devicePort = CHIP_PORT);
+    [[deprecated("Available until Rendezvous is implemented")]] CHIP_ERROR
+    ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
+                                      NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
+                                      ErrorHandler onError, uint16_t devicePort = CHIP_PORT);
 
     /**
      * @brief
@@ -279,9 +281,9 @@ private:
                                      void * appReqState);
 
     CHIP_ERROR ConnectDeviceUsingPairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
-                                               NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
-                                               ErrorHandler onError, uint16_t devicePort, uint16_t localKeyId, SecurePairingSession* pairing);
-
+                                         NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
+                                         ErrorHandler onError, uint16_t devicePort, uint16_t localKeyId,
+                                         SecurePairingSession * pairing);
 };
 
 } // namespace DeviceController

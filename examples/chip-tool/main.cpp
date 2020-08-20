@@ -478,15 +478,15 @@ CHIP_ERROR ExecuteCommand(DeviceController::ChipDeviceController * controller, C
         break;
 
     case Command::Echo:
-        err =
-            controller->ConnectDeviceWithoutSecurePairing(kRemoteDeviceId, commandArgs.hostAddr, NULL, OnConnect, OnMessage, OnError, commandArgs.port);
+        err = controller->ConnectDeviceWithoutSecurePairing(kRemoteDeviceId, commandArgs.hostAddr, NULL, OnConnect, OnMessage,
+                                                            OnError, commandArgs.port);
         VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to connect to the device"));
         DoEchoIP(controller, commandArgs.hostAddr, commandArgs.port);
         break;
 
     default:
-        err =
-            controller->ConnectDeviceWithoutSecurePairing(kRemoteDeviceId, commandArgs.hostAddr, NULL, OnConnect, OnMessage, OnError, commandArgs.port);
+        err = controller->ConnectDeviceWithoutSecurePairing(kRemoteDeviceId, commandArgs.hostAddr, NULL, OnConnect, OnMessage,
+                                                            OnError, commandArgs.port);
         VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to connect to the device"));
         DoOnOff(controller, command, commandArgs);
         controller->ServiceEventSignal();

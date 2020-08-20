@@ -206,8 +206,8 @@ JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong deviceCon
     env->ReleaseStringUTFChars(deviceAddr, deviceAddrStr);
 
     pthread_mutex_lock(&sStackLock);
-    err = deviceController->ConnectDeviceWithoutSecurePairing(kRemoteDeviceId, deviceIPAddr, (void *) "ConnectDevice", HandleKeyExchange,
-                                          HandleEchoResponse, HandleError, CHIP_PORT);
+    err = deviceController->ConnectDeviceWithoutSecurePairing(kRemoteDeviceId, deviceIPAddr, (void *) "ConnectDevice",
+                                                              HandleKeyExchange, HandleEchoResponse, HandleError, CHIP_PORT);
     pthread_mutex_unlock(&sStackLock);
 
     if (err != CHIP_NO_ERROR)
