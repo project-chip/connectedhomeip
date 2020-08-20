@@ -32,7 +32,8 @@ config("crypto_config") {
   } else {
     defines += [
       "CHIP_CRYPTO_OPENSSL=0",
-      "CHIP_WITH_OPENSSL=0" ]
+      "CHIP_WITH_OPENSSL=0",
+    ]
   }
 }
 

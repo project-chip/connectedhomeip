@@ -25,6 +25,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <FreeRTOS.h>
+#include <mbedtls/threading.h>
+
 #include <platform/CHIPDeviceLayer.h>
 
 #include <AppTask.h>
@@ -39,7 +42,19 @@
 #include "init_lcd.h"
 #endif
 
-#include <FreeRTOS.h>
+#if CHIP_ENABLE_OPENTHREAD
+#include <mbedtls/platform.h>
+#include <openthread/cli.h>
+#include <openthread/dataset.h>
+#include <openthread/error.h>
+#include <openthread/heap.h>
+#include <openthread/icmp6.h>
+#include <openthread/instance.h>
+#include <openthread/link.h>
+#include <openthread/platform/openthread-system.h>
+#include <openthread/tasklet.h>
+#include <openthread/thread.h>
+#endif // CHIP_ENABLE_OPENTHREAD
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -75,11 +90,22 @@ extern "C" void vApplicationIdleHook(void)
 // ================================================================================
 int main(void)
 {
-    int ret = CHIP_ERROR_MAX;
-    DemoSessionManager sessions;
+    int ret                       = CHIP_ERROR_MAX;
+    DemoSessionManager * sessions = new DemoSessionManager;
 
+#if CHIP_ENABLE_OPENTHREAD
+    otSysInit(0, NULL);
+    otHeapSetCAllocFree(calloc, free);
+#else
     initMcu();
     initBoard();
+    efr32RandomInit();
+#endif
+
+    mbedtls_platform_set_calloc_free(calloc, free);
+
+    // Initialize mbedtls threading support on EFR32
+    THREADING_setup();
 
 #if DISPLAY_ENABLED
     initLCD();
@@ -104,6 +130,24 @@ int main(void)
         appError(ret);
     }
 
+#if CHIP_ENABLE_OPENTHREAD
+    EFR32_LOG("Initializing OpenThread stack");
+    ret = ThreadStackMgr().InitThreadStack();
+    if (ret != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("ThreadStackMgr().InitThreadStack() failed");
+        appError(ret);
+    }
+
+    // Configure device to operate as a Thread sleepy end-device.
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+    if (ret != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
+        appError(ret);
+    }
+#endif // CHIP_ENABLE_OPENTHREAD
+
     EFR32_LOG("Starting Platform Manager Event Loop");
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
@@ -114,7 +158,19 @@ int main(void)
 
     // Init ZCL Data Model
     InitDataModelHandler();
-    StartServer(&sessions);
+    StartServer(sessions);
+
+#if CHIP_ENABLE_OPENTHREAD
+    EFR32_LOG("Starting OpenThread task");
+
+    // Start OpenThread task
+    ret = ThreadStackMgrImpl().StartThreadTask();
+    if (ret != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("ThreadStackMgr().StartThreadTask() failed");
+        appError(ret);
+    }
+#endif // CHIP_ENABLE_OPENTHREAD
 
     EFR32_LOG("Starting App Task");
     ret = GetAppTask().StartAppTask();

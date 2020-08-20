@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/jlink.gni")
 import("//build_overrides/mbedtls.gni")
-import("//build_overrides/chip.gni")
 
 import("efr32_board.gni")
 
@@ -90,9 +90,9 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/sleeptimer/inc",
       "${efr32_sdk_root}/platform/service/sleeptimer/config",
       "${efr32_sdk_root}/platform/common/inc",
-      
-      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/include",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/inc",
       "${efr32_sdk_root}/util/third_party/mbedtls/include",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/include",
       "${mbedtls_root}/repo/include",
     ]
 
@@ -129,7 +129,6 @@ template("efr32_sdk") {
     defines = [
       "MBEDTLS_CONFIG_FILE=\"mbedtls-config.h\"",
       "MBEDTLS_USER_CONFIG_FILE=\"efr32-chip-mbedtls-config.h\"",
-      "OPENTHREAD_FTD=1",
       "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
       "RETARGET_VCOM",
@@ -139,7 +138,15 @@ template("efr32_sdk") {
       "EFR32_LOG_ENABLED=1",
       "NVM3_DEFAULT_NVM_SIZE=40960",
       "EFR32_OPENTHREAD_API",
+      "NVIC_CONFIG=<platform/base/hal/micro/cortexm3/efm32/nvic-config.h>",
+      "PHY=EMBER_PHY_RAIL",
+      "CORTEXM3",
+      "MICRO=EMBER_MICRO_CORTEXM3_EFR32",
+      "PLAT=EMBER_PLATFORM_CORTEXM3",
+      "MBEDTLS_CONFIG_FILE=\"mbedtls-config.h\"",
+      "MBEDTLS_USER_CONFIG_FILE=\"efr32-chip-mbedtls-config.h\"",
       "${efr32_mcu}",
+      "${efr32_board}=1",
     ]
     if (defined(invoker.defines)) {
       defines += invoker.defines
@@ -148,6 +155,7 @@ template("efr32_sdk") {
 
   source_set(sdk_target_name) {
     sources = [
+      "${chip_root}/third_party/mbedtls/repo/include/mbedtls/platform.h",
       "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_bcc.c",
       "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_init.c",
       "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_stk.c",
@@ -190,11 +198,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/Source/queue.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/tasks.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/timers.c",
-      "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER/SEGGER_RTT.c",
-
-      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/crypto_ecp.c",
-      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/aes_aes.c",
-
       "${efr32_sdk_root}/util/third_party/mbedtls/library/aes.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/aesni.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/arc4.c",
@@ -205,7 +208,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/mbedtls/library/blowfish.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/camellia.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ccm.c",
-      "${efr32_sdk_root}/util/third_party/mbedtls/library/certs.c", 
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/certs.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/cipher.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/cipher_wrap.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ctr_drbg.c",
@@ -214,6 +217,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/mbedtls/library/dhm.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ecdh.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ecdsa.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ecjpake.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ecp.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ecp_curves.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/entropy.c",
@@ -246,6 +250,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_srv.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_ticket.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_tls.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/threading.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/timing.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/version.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/version_features.c",
@@ -256,6 +261,14 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/mbedtls/library/x509write_crt.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/x509write_csr.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/xtea.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/aes_aes.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/crypto_aes.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/crypto_ble.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/crypto_ecp.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/crypto_management.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/crypto_sha.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/shax.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/trng.c",
       "${mbedtls_root}/repo/library/hkdf.c",
       "${mbedtls_root}/repo/library/platform_util.c",
     ]

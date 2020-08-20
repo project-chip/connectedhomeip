@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
+#include "AppConfig.h"
 #include "FreeRTOS.h"
-#include "appConfig.h"
 #include "task.h"
 #include <string.h>
 #include <sys/param.h>

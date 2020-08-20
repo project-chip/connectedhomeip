@@ -12,10 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 
 # ARM architecture flags will be set based on efr32_family.
 arm_platform_config = "${efr32_sdk_build_root}/efr32_arm.gni"
+
+mbedtls_target = "${efr32_sdk_build_root}:efr32_sdk"
+
+openthread_external_mbedtls = mbedtls_target
 
 chip_device_platform = "efr32"
 
@@ -28,3 +33,11 @@ chip_inet_config_enable_ipv4 = false
 chip_inet_config_enable_dns_resolver = false
 
 chip_build_tests = false
+
+openthread_project_core_config_file = "openthread-core-efr32-config.h"
+openthread_core_config_platform_check_file =
+    "openthread-core-efr32-config-check.h"
+openthread_core_config_deps = [ "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32-config" ]
+
+openthread_external_platform =
+    "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32"

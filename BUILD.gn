@@ -53,7 +53,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
     # Temporary until RNG issue sorted out
     if (current_os != "android") {
-       deps += [ "${chip_root}/src/lib/message" ]
+      deps += [ "${chip_root}/src/lib/message" ]
     }
 
     if (chip_build_tests) {
@@ -93,7 +93,6 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
   }
 } else {
-
   # This is the unified build. Configure various real toolchains.
   import("${chip_root}/gn/chip/chip_build.gni")
   declare_args() {

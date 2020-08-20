@@ -1,4 +1,3 @@
-# Copyright 2020 The Pigweed Authors
 # Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,20 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("android_toolchain.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
 
-if (current_cpu == "arm") {
-  android_arm_toolchain("armv7_clang") {
-    toolchain_args = {
-      is_clang = true
-    }
-  }
-} else if (current_cpu == "x86_64") {
-  android_x86_64_toolchain("x86_64_clang") {
-    toolchain_args = {
-      is_clang = true
-    }
-  }
-} else {
-  assert(false, "Unknown target cpu ${current_cpu}")
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
+
+config("chip_examples_project_config") {
+  include_dirs = [ "project_include" ]
+}
+
+source_set("openthread_core_config_efr32_chip_examples") {
+  sources = [ "project_include/OpenThreadConfig.h" ]
+  public_deps = [
+    "${chip_root}/third_party/openthread/platforms/efr32:openthread_core_config_efr32",
+    "${efr32_sdk_build_root}:efr32_sdk",
+  ]
+  public_configs = [ ":chip_examples_project_config" ]
 }
