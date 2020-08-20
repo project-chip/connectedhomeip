@@ -189,8 +189,8 @@ CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::StartAdvertising(void)
     CHIP_ERROR err          = CHIP_NO_ERROR;
 
     // Advertising data Initialize with previously set name, flags and service UUIDs.
-    bt_data ad[] = { BT_DATA(BT_DATA_NAME_COMPLETE, deviceName, strlen(deviceName)),
-                     BT_DATA(BT_DATA_FLAGS, advFlags, sizeof(advFlags)), BT_DATA(BT_DATA_UUID16_ALL, &advUUID, sizeof(advUUID)) };
+    bt_data ad[] = { BT_DATA(BT_DATA_NAME_COMPLETE, deviceName, static_cast<uint8_t>(strlen(deviceName))),
+                     BT_DATA(BT_DATA_FLAGS, &advFlags, sizeof(advFlags)), BT_DATA(BT_DATA_UUID16_ALL, &advUUID, sizeof(advUUID)) };
 
     // Scan response data
     bt_data sd[] = { BT_DATA(BT_DATA_UUID16_ALL, &advUUID, sizeof(advUUID)),
@@ -691,7 +691,7 @@ bool GenericBLEManagerImpl_Zephyr<ImplClass>::UnsetSubscribed(bt_conn * conn)
 
 template <class ImplClass>
 ssize_t GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXWrite(struct bt_conn * conId, const struct bt_gatt_attr * attr,
-                                                               const void * buf, u16_t len, u16_t offset, u8_t flags)
+                                                               const void * buf, uint16_t len, uint16_t offset, uint8_t flags)
 {
     ChipDeviceEvent event;
     PacketBuffer * packetBuf = PacketBuffer::NewWithAvailableSize(len);
@@ -724,7 +724,7 @@ ssize_t GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXWrite(struct bt_conn * 
 
 template <class ImplClass>
 ssize_t GenericBLEManagerImpl_Zephyr<ImplClass>::HandleTXCCCWrite(struct bt_conn * conId, const struct bt_gatt_attr * attr,
-                                                                  u16_t value)
+                                                                  uint16_t value)
 {
     ChipDeviceEvent event;
 
@@ -743,7 +743,8 @@ ssize_t GenericBLEManagerImpl_Zephyr<ImplClass>::HandleTXCCCWrite(struct bt_conn
 }
 
 template <class ImplClass>
-void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleTXIndicated(struct bt_conn * conId, const struct bt_gatt_attr * attr, u8_t err)
+void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleTXIndicated(struct bt_conn * conId, const struct bt_gatt_attr * attr,
+                                                                uint8_t err)
 {
     ChipDeviceEvent event;
 
@@ -755,7 +756,7 @@ void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleTXIndicated(struct bt_conn *
 }
 
 template <class ImplClass>
-void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleConnect(struct bt_conn * conId, u8_t err)
+void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleConnect(struct bt_conn * conId, uint8_t err)
 {
     ChipDeviceEvent event;
 
@@ -767,7 +768,7 @@ void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleConnect(struct bt_conn * con
 }
 
 template <class ImplClass>
-void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleDisconnect(struct bt_conn * conId, u8_t reason)
+void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleDisconnect(struct bt_conn * conId, uint8_t reason)
 {
     ChipDeviceEvent event;
 

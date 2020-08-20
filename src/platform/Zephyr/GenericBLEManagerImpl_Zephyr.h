@@ -117,14 +117,15 @@ private:
     static void DriveBLEState(intptr_t arg);
 
     // Below callbacks run from the system workqueue context and have a limited stack capacity.
-    static void HandleTXIndicated(bt_conn * conn, const bt_gatt_attr * attr, u8_t err);
-    static void HandleConnect(bt_conn * conn, u8_t err);
-    static void HandleDisconnect(bt_conn * conn, u8_t reason);
+    static void HandleTXIndicated(bt_conn * conn, const bt_gatt_attr * attr, uint8_t err);
+    static void HandleConnect(bt_conn * conn, uint8_t err);
+    static void HandleDisconnect(bt_conn * conn, uint8_t reason);
 
 public:
     // Below callbacks are public in order to be visible from the global scope.
-    static ssize_t HandleRXWrite(bt_conn * conn, const bt_gatt_attr * attr, const void * buf, u16_t len, u16_t offset, u8_t flags);
-    static ssize_t HandleTXCCCWrite(bt_conn * conn, const bt_gatt_attr * attr, u16_t value);
+    static ssize_t HandleRXWrite(bt_conn * conn, const bt_gatt_attr * attr, const void * buf, uint16_t len, uint16_t offset,
+                                 uint8_t flags);
+    static ssize_t HandleTXCCCWrite(bt_conn * conn, const bt_gatt_attr * attr, uint16_t value);
 };
 
 template <class ImplClass>
