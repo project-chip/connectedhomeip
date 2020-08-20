@@ -40,7 +40,7 @@
 
 #include <controller/CHIPDeviceController.h>
 
-#include "chip-zcl/chip-zcl-zpro-codec.h"
+#include "util/chip-zcl-zpro-codec.h"
 
 // Delay, in seconds, between sends for the echo case.
 #define SEND_DELAY 5

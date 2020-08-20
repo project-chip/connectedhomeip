@@ -48,7 +48,7 @@
 #endif
 
 #include "attribute-storage.h"
-#include "chip-zcl/chip-zcl-zpro-codec.h"
+#include "util/chip-zcl-zpro-codec.h"
 #include "gen/znet-bookkeeping.h"
 #include "util.h"
 
