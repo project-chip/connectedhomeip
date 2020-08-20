@@ -35,7 +35,7 @@
 
 #define APP_JOIN_BUTTON PB0
 #define APP_LOCK_BUTTON PB1
-// TODO Currently no Fuction Button for EFR32,
+// TODO Currently no Function Button for EFR32,
 // OTA not implemented but keep for future use. (Reused PB0 for Join button)
 #define APP_FUNCTION_BUTTON PB2
 #define APP_BUTTON_DEBOUNCE_PERIOD_MS 50

@@ -18,13 +18,14 @@
  */
 
 #include "AppTask.h"
+#include "AppConfig.h"
 #include "AppEvent.h"
 #include "ButtonHandler.h"
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
 #include "Server.h"
 
-#include "AppConfig.h"
+#include <assert.h>
 
 using namespace chip::TLV;
 using namespace chip::DeviceLayer;
@@ -123,6 +124,8 @@ int AppTask::Init()
 
 void AppTask::HandleBLEConnectionOpened(chip::Ble::BLEEndPoint * endPoint)
 {
+    assert(endPoint != NULL);
+
     ChipLogProgress(DeviceLayer, "AppTask: Connection opened");
 
     GetAppTask().mBLEEndPoint    = endPoint;
@@ -139,7 +142,10 @@ void AppTask::HandleBLEConnectionClosed(chip::Ble::BLEEndPoint * endPoint, BLE_E
 
 void AppTask::HandleBLEMessageReceived(chip::Ble::BLEEndPoint * endPoint, chip::System::PacketBuffer * buffer)
 {
+    assert(endPoint != NULL);
 #if CHIP_ENABLE_OPENTHREAD
+    assert(endPoint != buffer);
+
     uint16_t bufferLen = buffer->DataLength();
     uint8_t * data     = buffer->Start();
     chip::DeviceLayer::Internal::DeviceNetworkInfo networkInfo;
@@ -315,6 +321,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
 #if CHIP_ENABLE_OPENTHREAD
 void AppTask::JoinHandler(AppEvent * aEvent)
 {
+    assert(aEvent != NULL);
     if (aEvent->ButtonEvent.ButtonIdx != APP_JOIN_BUTTON)
         return;
 

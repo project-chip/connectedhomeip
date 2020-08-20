@@ -65,7 +65,7 @@ namespace {
 #define EXAMPLE_SERVER_NODEID 0x3546526e
 #endif // EXAMPLE_SERVER_NODEID
 
-char deviceName[128];
+char deviceName[128] = { 0 };
 // Hardcode UDP BroadcastPort. Temporary use for demo with OTBR
 constexpr uint16_t kUDPBroadcastPort = 23367;
 
