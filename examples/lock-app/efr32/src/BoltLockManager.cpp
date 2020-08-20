@@ -59,12 +59,12 @@ void BoltLockManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Ca
 
 bool BoltLockManager::IsActionInProgress()
 {
-    return (mState == kState_LockingInitiated || mState == kState_UnlockingInitiated) ? true : false;
+    return (mState == kState_LockingInitiated || mState == kState_UnlockingInitiated);
 }
 
 bool BoltLockManager::IsUnlocked()
 {
-    return (mState == kState_UnlockingCompleted) ? true : false;
+    return (mState == kState_UnlockingCompleted);
 }
 
 void BoltLockManager::EnableAutoRelock(bool aOn)
