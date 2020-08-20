@@ -22,15 +22,23 @@
 #include "ButtonHandler.h"
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
+#include "Server.h"
 
 #include "AppConfig.h"
 
 using namespace chip::TLV;
 using namespace chip::DeviceLayer;
 
+#include <platform/CHIPDeviceLayer.h>
+#if CHIP_ENABLE_OPENTHREAD
+#include <platform/EFR32/ThreadStackManagerImpl.h>
+#include <platform/OpenThread/OpenThreadUtils.h>
+#include <platform/ThreadStackManager.h>
+#include <platform/internal/DeviceNetworkInfo.h>
+#endif
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE (2048)
+#define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 
@@ -42,13 +50,12 @@ static QueueHandle_t sAppEventQueue;
 static LEDWidget sStatusLED;
 static LEDWidget sLockLED;
 
-static bool sIsThreadProvisioned              = false;
-static bool sIsThreadEnabled                  = false;
-static bool sIsThreadAttached                 = false;
-static bool sIsPairedToAccount                = false;
-static bool sIsServiceSubscriptionEstablished = false;
-static bool sHaveBLEConnections               = false;
-static bool sHaveServiceConnectivity          = false;
+static bool sIsThreadProvisioned     = false;
+static bool sIsThreadEnabled         = false;
+static bool sIsThreadAttached        = false;
+static bool sIsPairedToAccount       = false;
+static bool sHaveBLEConnections      = false;
+static bool sHaveServiceConnectivity = false;
 
 using namespace ::chip::DeviceLayer;
 
@@ -114,10 +121,72 @@ int AppTask::Init()
     return err;
 }
 
+void AppTask::HandleBLEConnectionOpened(chip::Ble::BLEEndPoint * endPoint)
+{
+    ChipLogProgress(DeviceLayer, "AppTask: Connection opened");
+
+    GetAppTask().mBLEEndPoint    = endPoint;
+    endPoint->OnMessageReceived  = AppTask::HandleBLEMessageReceived;
+    endPoint->OnConnectionClosed = AppTask::HandleBLEConnectionClosed;
+}
+
+void AppTask::HandleBLEConnectionClosed(chip::Ble::BLEEndPoint * endPoint, BLE_ERROR err)
+{
+    ChipLogProgress(DeviceLayer, "AppTask: Connection closed");
+
+    GetAppTask().mBLEEndPoint = nullptr;
+}
+
+void AppTask::HandleBLEMessageReceived(chip::Ble::BLEEndPoint * endPoint, chip::System::PacketBuffer * buffer)
+{
+#if CHIP_ENABLE_OPENTHREAD
+    uint16_t bufferLen = buffer->DataLength();
+    uint8_t * data     = buffer->Start();
+    chip::DeviceLayer::Internal::DeviceNetworkInfo networkInfo;
+    ChipLogProgress(DeviceLayer, "AppTask: Receive message size %u", bufferLen);
+
+    memcpy(networkInfo.ThreadNetworkName, data, sizeof(networkInfo.ThreadNetworkName));
+    data += sizeof(networkInfo.ThreadNetworkName);
+
+    memcpy(networkInfo.ThreadExtendedPANId, data, sizeof(networkInfo.ThreadExtendedPANId));
+    data += sizeof(networkInfo.ThreadExtendedPANId);
+
+    memcpy(networkInfo.ThreadMeshPrefix, data, sizeof(networkInfo.ThreadMeshPrefix));
+    data += sizeof(networkInfo.ThreadMeshPrefix);
+
+    memcpy(networkInfo.ThreadNetworkKey, data, sizeof(networkInfo.ThreadNetworkKey));
+    data += sizeof(networkInfo.ThreadNetworkKey);
+
+    memcpy(networkInfo.ThreadPSKc, data, sizeof(networkInfo.ThreadPSKc));
+    data += sizeof(networkInfo.ThreadPSKc);
+
+    networkInfo.ThreadPANId = data[0] | (data[1] << 8);
+    data += sizeof(networkInfo.ThreadPANId);
+    networkInfo.ThreadChannel = data[0];
+    data += sizeof(networkInfo.ThreadChannel);
+
+    networkInfo.FieldPresent.ThreadExtendedPANId = *data;
+    data++;
+    networkInfo.FieldPresent.ThreadMeshPrefix = *data;
+    data++;
+    networkInfo.FieldPresent.ThreadPSKc = *data;
+    data++;
+    networkInfo.NetworkId              = 0;
+    networkInfo.FieldPresent.NetworkId = true;
+
+    ThreadStackMgr().SetThreadEnabled(false);
+    ThreadStackMgr().SetThreadProvision(networkInfo);
+    ThreadStackMgr().SetThreadEnabled(true);
+#endif
+    endPoint->Close();
+    chip::System::PacketBuffer::Free(buffer);
+}
+
 void AppTask::AppTaskMain(void * pvParameter)
 {
     int err;
     AppEvent event;
+    uint64_t mLastChangeTimeUS = 0;
 
     err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
@@ -127,6 +196,8 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
     EFR32_LOG("App Task started");
+    chip::DeviceLayer::ConnectivityMgr().AddCHIPoBLEConnectionHandler(&AppTask::HandleBLEConnectionOpened);
+    SetDeviceName("LockDemo._chip._udp.local.");
 
     while (true)
     {
@@ -152,11 +223,6 @@ void AppTask::AppTaskMain(void * pvParameter)
             PlatformMgr().UnlockChipStack();
         }
 
-        // Consider the system to be "fully connected" if it has service
-        // connectivity and it is able to interact with the service on a regular
-        // basis.
-        bool isFullyConnected = (sHaveServiceConnectivity && sIsServiceSubscriptionEstablished);
-
         // Update the status LED if factory reset has not been initiated.
         //
         // If system has "full connectivity", keep the LED On constantly.
@@ -171,11 +237,14 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
-            if (isFullyConnected)
+            // Consider the system to be "fully connected" if it has service
+            // connectivity
+            if (sHaveServiceConnectivity)
             {
                 sStatusLED.Set(true);
             }
-            else if (sIsThreadProvisioned && sIsThreadEnabled && sIsPairedToAccount && (!sIsThreadAttached || !isFullyConnected))
+            else if (sIsThreadProvisioned && sIsThreadEnabled && sIsPairedToAccount &&
+                     (!sIsThreadAttached || !sHaveServiceConnectivity))
             {
                 sStatusLED.Blink(950, 50);
             }
@@ -191,6 +260,15 @@ void AppTask::AppTaskMain(void * pvParameter)
 
         sStatusLED.Animate();
         sLockLED.Animate();
+
+        uint64_t nowUS            = chip::System::Platform::Layer::GetClock_Monotonic();
+        uint64_t nextChangeTimeUS = mLastChangeTimeUS + 5 * 1000 * 1000UL;
+
+        if (nowUS > nextChangeTimeUS)
+        {
+            PublishService();
+            mLastChangeTimeUS = nowUS;
+        }
     }
 }
 
@@ -234,14 +312,29 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
 }
 
+#if CHIP_ENABLE_OPENTHREAD
+void AppTask::JoinHandler(AppEvent * aEvent)
+{
+    if (aEvent->ButtonEvent.ButtonIdx != APP_JOIN_BUTTON)
+        return;
+
+    CHIP_ERROR error = ThreadStackMgr().JoinerStart();
+    EFR32_LOG("Thread joiner triggered: %s", chip::ErrorStr(error));
+}
+#endif
+
 void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
 {
-    if (btnIdx != APP_LOCK_BUTTON && btnIdx != APP_FUNCTION_BUTTON)
+    if (btnIdx != APP_LOCK_BUTTON
+#if CHIP_ENABLE_OPENTHREAD
+        && btnIdx != APP_JOIN_BUTTON
+#endif
+        && btnIdx != APP_FUNCTION_BUTTON)
     {
         return;
     }
 
-    AppEvent button_event;
+    AppEvent button_event              = {};
     button_event.Type                  = AppEvent::kEventType_Button;
     button_event.ButtonEvent.ButtonIdx = btnIdx;
     button_event.ButtonEvent.Action    = btnAction;
@@ -256,6 +349,13 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
         button_event.Handler = FunctionHandler;
         sAppTask.PostEvent(&button_event);
     }
+#if CHIP_ENABLE_OPENTHREAD
+    else if (btnIdx == APP_JOIN_BUTTON)
+    {
+        button_event.Handler = JoinHandler;
+        sAppTask.PostEvent(&button_event);
+    }
+#endif
 }
 
 void AppTask::TimerEventHandler(TimerHandle_t xTimer)
