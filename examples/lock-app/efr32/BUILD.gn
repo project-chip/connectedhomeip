@@ -64,19 +64,7 @@ executable("lock_app") {
   include_dirs += [ "${efr32_project_dir}/include/" ]
 
   sources = [
-    "src/AppTask.cpp",
-    "src/BoltLockManager.cpp",
-    "src/ButtonHandler.cpp",
-    "src/DataModelHandler.cpp",
-    "src/LEDWidget.cpp",
-    "src/main.cpp",
-    "src/Server.cpp",
-    "src/gen/call-command-handler.c",
-    "src/gen/callback-stub.c",
-    "src/gen/znet-bookkeeping.c",
-    "src/platform/${efr32_family}/${efr32_board}/hal-config.h",
-    "src/platform/${efr32_family}/${efr32_board}/init_board.c",
-    "src/platform/${efr32_family}/${efr32_board}/init_mcu.c",
+    "${chip_root}/src/app/clusters/on-off-server/on-off.c",
     "${chip_root}/src/app/util/attribute-size.c",
     "${chip_root}/src/app/util/attribute-storage.c",
     "${chip_root}/src/app/util/attribute-table.c",
@@ -87,7 +75,19 @@ executable("lock_app") {
     "${chip_root}/src/app/util/process-cluster-message.c",
     "${chip_root}/src/app/util/process-global-message.c",
     "${chip_root}/src/app/util/util.c",
-    "${chip_root}/src/app/clusters/on-off-server/on-off.c",
+    "src/AppTask.cpp",
+    "src/BoltLockManager.cpp",
+    "src/ButtonHandler.cpp",
+    "src/DataModelHandler.cpp",
+    "src/LEDWidget.cpp",
+    "src/Server.cpp",
+    "src/gen/call-command-handler.c",
+    "src/gen/callback-stub.c",
+    "src/gen/znet-bookkeeping.c",
+    "src/main.cpp",
+    "src/platform/${efr32_family}/${efr32_board}/hal-config.h",
+    "src/platform/${efr32_family}/${efr32_board}/init_board.c",
+    "src/platform/${efr32_family}/${efr32_board}/init_mcu.c",
   ]
 
   output_dir = root_out_dir
