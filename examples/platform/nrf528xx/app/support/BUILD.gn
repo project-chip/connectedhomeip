@@ -35,3 +35,12 @@ source_set("freertos_newlib_lock_support_test") {
 
   public_deps = [ ":freertos_newlib_lock_support" ]
 }
+
+source_set("freertos_debugging_hooks") {
+  sources = [
+    "FreeRTOSDebuggingHooks.c",
+    "FreeRTOSDebuggingHooks.h",
+  ]
+
+  public_deps = [ "${nrf5_sdk_build_root}:nrf5_sdk" ]
+}
