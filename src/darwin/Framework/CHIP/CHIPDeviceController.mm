@@ -17,7 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-#include "chip-zcl/chip-zcl-zpro-codec.h"
+#include <app/chip-zcl-zpro-codec.h>
 
 #import "CHIPDeviceController.h"
 #import "CHIPError.h"

@@ -32,6 +32,8 @@
 #include <core/ReferenceCounted.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
+#include <support/CodeUtils.h>
+#include <support/DLLUtil.h>
 #include <transport/Base.h>
 #include <transport/PeerConnections.h>
 #include <transport/SecureSession.h>

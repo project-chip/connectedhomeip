@@ -2165,7 +2165,7 @@ CONFIG_WIFI_PLATFORM_WPA=0
 enable_chipwifi_wpa="no"
 
 # At this time, enable this only for linux, and only if the GIO package are installed. Currently, WiFi and Thread
-# are depending on the gdbus-internal configured by internal BLuez package. 
+# are depending on the gdbus-internal configured by internal BLuez package.
 # TODO: Refacrot BLuez to use common gdbus lib from GIO.
 
 if test "${with_device_layer}" = "linux" && test "${CHIP_ENABLE_GIO}" = 1 && test "${CONFIG_BLE_PLATFORM_BLUEZ}" = 1; then
@@ -2474,7 +2474,6 @@ third_party/ot-br-posix/Makefile
 src/Makefile
 src/include/Makefile
 src/app/Makefile
-src/app/chip-zcl-zpro/Makefile
 src/app/clusters/Makefile
 src/app/util/Makefile
 src/ble/Makefile

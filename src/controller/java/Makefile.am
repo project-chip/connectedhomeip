@@ -34,7 +34,7 @@ lib_LTLIBRARIES                              = libCHIPController.la
 
 libCHIPController_la_CPPFLAGS                              = \
     -I$(top_srcdir)/src                                      \
-		-I$(top_srcdir)/src/app/chip-zcl-zpro/command-encoder    \
+    -I$(top_srcdir)/src/app/util/command-encoder             \
     -I$(top_srcdir)/src/lib                                  \
     -I$(top_srcdir)/src/lib/core                             \
     -I$(top_srcdir)/src/controller                           \
@@ -84,8 +84,8 @@ JARS                                         = \
 
 CHIPController_jar_JAVA_SRCS                                 = \
     chip/devicecontroller/ChipDeviceController.java            \
-		chip/devicecontroller/ChipDeviceControllerException.java   \
-		chip/devicecontroller/ChipCommandType.java                 \
+    chip/devicecontroller/ChipDeviceControllerException.java   \
+    chip/devicecontroller/ChipCommandType.java                 \
     $(NULL)
 
 CHIPController_jar_JFLAGS                    = -source 8 -target 8

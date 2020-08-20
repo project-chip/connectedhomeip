@@ -12,19 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-config("nlunit-test_config") {
-  include_dirs = [ "repo/src" ]
-}
+import("//build_overrides/chip.gni")
 
-static_library("nlunit-test") {
-  output_name = "libnlunit-test"
+chip_system_config_clock = "gettimeofday"
+chip_device_platform = "darwin"
 
-  output_dir = "${root_out_dir}/lib"
-
-  sources = [
-    "repo/src/nlunit-test.c",
-    "repo/src/nlunit-test.h",
-  ]
-
-  public_configs = [ ":nlunit-test_config" ]
-}
+chip_project_config_include_dirs = [ "${chip_root}/config/ios" ]

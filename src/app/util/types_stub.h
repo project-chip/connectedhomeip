@@ -44,7 +44,7 @@
 
 #include <string.h> // For mem* functions.
 
-#include "chip-zcl/chip-zcl-zpro-codec.h" // For EmberApsFrame
+#include <app/chip-zcl-zpro-codec.h> // For EmberApsFrame
 
 #include "gen/gen_config.h"
 

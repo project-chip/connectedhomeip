@@ -12,19 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-config("nlunit-test_config") {
-  include_dirs = [ "repo/src" ]
-}
-
-static_library("nlunit-test") {
-  output_name = "libnlunit-test"
-
-  output_dir = "${root_out_dir}/lib"
-
-  sources = [
-    "repo/src/nlunit-test.c",
-    "repo/src/nlunit-test.h",
-  ]
-
-  public_configs = [ ":nlunit-test_config" ]
+declare_args() {
+  # Global defines for target build. This only applies to the default toolchain.
+  target_defines = []
+  target_cflags = []
+  target_cflags_cc = []
+  target_cflags_c = []
+  target_ldflags = []
 }

@@ -69,6 +69,9 @@ declare_args() {
   # Defaults fuzzing configs.
   default_configs_fuzzing = [ "//build/config/compiler:fuzzing_default" ]
 
+  # Defaults target-specific configs.
+  default_configs_target = [ "//build/config/compiler:target_default" ]
+
   # Extra default configs.
   default_configs_extra = []
 }
@@ -90,6 +93,7 @@ default_configs += default_configs_runtime
 default_configs += default_configs_aliasing
 default_configs += default_configs_sanitize
 default_configs += default_configs_fuzzing
+default_configs += default_configs_target
 default_configs += default_configs_extra
 
 executable_default_configs = []

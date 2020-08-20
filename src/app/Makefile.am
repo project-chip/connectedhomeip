@@ -26,15 +26,13 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 # Package (e.g. 'make dist') these subdirectories
 
 DIST_SUBDIRS = \
-    chip-zcl-zpro \
     clusters \
     util \
     $(NULL)
 
 # Build (e.g for 'make all') these subdirectories
 
-SUBDIRS                               = \
-    chip-zcl-zpro                       \
+SUBDIRS = \
     $(NULL)
 
 include DataModel.am
@@ -49,5 +47,9 @@ libCHIPDataModel_a_CPPFLAGS           = \
 libCHIPDataModel_a_SOURCES            = \
     $(CHIP_BUILD_DATA_MODEL_SOURCE_FILES) \
     $(NULL)
+
+libCHIPDataModel_adir                = $(includedir)/app
+
+libCHIPDataModel_a_HEADERS           = chip-zcl-zpro-codec.h
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

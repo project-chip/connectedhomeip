@@ -31,7 +31,7 @@
 #include <support/logging/CHIPLogging.h>
 
 extern "C" {
-#include "chip-zcl-zpro-codec.h"
+#include <app/chip-zcl-zpro-codec.h>
 } // extern "C"
 
 using namespace chip;

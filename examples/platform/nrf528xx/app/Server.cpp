@@ -48,9 +48,9 @@
 #endif
 
 #include "attribute-storage.h"
-#include "chip-zcl/chip-zcl-zpro-codec.h"
 #include "gen/znet-bookkeeping.h"
 #include "util.h"
+#include <app/chip-zcl-zpro-codec.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;

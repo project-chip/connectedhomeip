@@ -43,6 +43,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       "${chip_root}/src/lib/shell",
       "${chip_root}/src/lib/support",
       "${chip_root}/src/lwip:all",
+      "${chip_root}/src/setup_payload",
       "${chip_root}/src/system",
       "${chip_root}/src/transport",
       "${mbedtls_root}:mbedtls",
