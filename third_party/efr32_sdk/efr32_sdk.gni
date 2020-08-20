@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/jlink.gni")
 import("//build_overrides/mbedtls.gni")
-import("//build_overrides/chip.gni")
 
 import("efr32_board.gni")
 
@@ -90,7 +90,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/sleeptimer/inc",
       "${efr32_sdk_root}/platform/service/sleeptimer/config",
       "${efr32_sdk_root}/platform/common/inc",
-      
+
       "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/include",
       "${efr32_sdk_root}/util/third_party/mbedtls/include",
       "${mbedtls_root}/repo/include",
@@ -190,11 +190,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/Source/queue.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/tasks.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/timers.c",
-      "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER/SEGGER_RTT.c",
-
-      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/crypto_ecp.c",
-      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/aes_aes.c",
-
       "${efr32_sdk_root}/util/third_party/mbedtls/library/aes.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/aesni.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/arc4.c",
@@ -205,7 +200,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/mbedtls/library/blowfish.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/camellia.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ccm.c",
-      "${efr32_sdk_root}/util/third_party/mbedtls/library/certs.c", 
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/certs.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/cipher.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/cipher_wrap.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ctr_drbg.c",
@@ -256,6 +251,9 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/mbedtls/library/x509write_crt.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/x509write_csr.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/xtea.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/aes_aes.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/crypto_ecp.c",
+      "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER/SEGGER_RTT.c",
       "${mbedtls_root}/repo/library/hkdf.c",
       "${mbedtls_root}/repo/library/platform_util.c",
     ]

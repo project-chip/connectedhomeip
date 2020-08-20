@@ -55,19 +55,21 @@ config("rtt_config") {
   }
 
   if (segger_rtt_buffer_size_up != -1) {
-    defines += ["BUFFER_SIZE_UP=${segger_rtt_buffer_size_up}"]
+    defines += [ "BUFFER_SIZE_UP=${segger_rtt_buffer_size_up}" ]
   }
   if (segger_rtt_buffer_size_down != -1) {
-    defines += ["BUFFER_SIZE_DOWN=${segger_rtt_buffer_size_down}"]
+    defines += [ "BUFFER_SIZE_DOWN=${segger_rtt_buffer_size_down}" ]
   }
   if (segger_rtt_max_num_up_buffers != -1) {
-    defines += ["SEGGER_RTT_MAX_NUM_UP_BUFFERS=${segger_rtt_max_num_up_buffers}"]
+    defines +=
+        [ "SEGGER_RTT_MAX_NUM_UP_BUFFERS=${segger_rtt_max_num_up_buffers}" ]
   }
   if (segger_rtt_max_num_down_buffers != -1) {
-    defines += ["SEGGER_RTT_MAX_NUM_UP_BUFFERS=${segger_rtt_max_num_down_buffers}"]
+    defines +=
+        [ "SEGGER_RTT_MAX_NUM_UP_BUFFERS=${segger_rtt_max_num_down_buffers}" ]
   }
   if (segger_rtt_mode_default != -1) {
-    defines += ["SEGGER_RTT_MODE_DEFAULT=${segger_rtt_mode_default}"]
+    defines += [ "SEGGER_RTT_MODE_DEFAULT=${segger_rtt_mode_default}" ]
   }
 }
 

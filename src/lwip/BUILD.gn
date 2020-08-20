@@ -54,7 +54,7 @@ config("lwip_config") {
   ]
 
   if (current_os == "android") {
-     defines += [ "LWIP_NO_STDINT_H=1" ]
+    defines += [ "LWIP_NO_STDINT_H=1" ]
   }
 
   include_dirs = [ lwip_platform ]

@@ -161,11 +161,11 @@ static_library("inet") {
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
   }
 
-  include_dirs = [ ]
+  include_dirs = []
   if (current_os == "android") {
     include_dirs += [
-       "${chip_root}/third_party/android/platform-libcore/android-platform-libcore/luni/src/main/native",
-       "${chip_root}/third_party/android/platform-libcore/android-platform-libcore/include"
+      "${chip_root}/third_party/android/platform-libcore/android-platform-libcore/luni/src/main/native",
+      "${chip_root}/third_party/android/platform-libcore/android-platform-libcore/include",
     ]
   }
 }
