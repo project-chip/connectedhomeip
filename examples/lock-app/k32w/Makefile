@@ -56,6 +56,7 @@ SRCS = \
     $(K32W061_SDK_ROOT)/middleware/wireless/framework/GPIO/GPIO_Adapter.c \
     $(K32W061_SDK_ROOT)/middleware/wireless/framework/TimersManager/Source/TimersManager.c \
     $(K32W061_SDK_ROOT)/middleware/wireless/framework/TimersManager/Source/TMR_Adapter.c \
+    $(K32W061_SDK_ROOT)/boards/k32w061dk6/wireless_examples/openthread/reed/bm/board_utility.c \
     $(K32W061_SDK_ROOT)/boards/k32w061dk6/wireless_examples/openthread/reed/bm/board.c \
     $(K32W061_SDK_ROOT)/boards/k32w061dk6/wireless_examples/openthread/reed/bm/hardware_init.c \
     $(K32W061_SDK_ROOT)/devices/K32W061/drivers/fsl_common.c \
@@ -116,7 +117,7 @@ DEFINES = \
     osCustomStartup=1 \
     OM15082=1\
     gKBD_KeysCount_c=3 \
-    gLEDsOnTargetBoardCnt_c=4 \
+    gLEDsOnTargetBoardCnt_c=2 \
     gLED_InvertedMode_d=1 \
     ENABLE_RAM_VECTOR_TABLE=1 \
     gTMR_Enabled_d=1 \
