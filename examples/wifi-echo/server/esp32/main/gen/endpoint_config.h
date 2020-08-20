@@ -102,51 +102,51 @@
             { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 26 / Level Control / cluster revision*/   \
             {                                                                                                                      \
                 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_CLIENT), { (uint8_t *) 0x0001 }                              \
-            },                                                                        /* 33 / Door Lock / cluster revision*/       \
-            { 0x0000, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },    /* 34 / Door Lock / lock state*/             \
-            { 0x0001, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },    /* 35 / Door Lock / lock type*/              \
-            { 0x0002, ZCL_BOOLEAN_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },  /* 36 / Door Lock / actuator enabled*/       \
-            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 37 / Door Lock / cluster revision*/       \
+            },                                                                        /* 27 / Door Lock / cluster revision*/       \
+            { 0x0000, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },    /* 28 / Door Lock / lock state*/             \
+            { 0x0001, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },    /* 29 / Door Lock / lock type*/              \
+            { 0x0002, ZCL_BOOLEAN_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },  /* 30 / Door Lock / actuator enabled*/       \
+            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 31 / Door Lock / cluster revision*/       \
             {                                                                                                                      \
                 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_CLIENT), { (uint8_t *) 0x0001 }                              \
-            }, /* 38 / Barrier Control / cluster revision*/                                                                        \
+            }, /* 32 / Barrier Control / cluster revision*/                                                                        \
             {                                                                                                                      \
                 0x0001, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 }                                                  \
-            }, /* 39 / Barrier Control / barrier moving state*/                                                                    \
+            }, /* 33 / Barrier Control / barrier moving state*/                                                                    \
             {                                                                                                                      \
                 0x0002, ZCL_BITMAP16_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000 }                                             \
-            }, /* 40 / Barrier Control / barrier safety status*/                                                                   \
+            }, /* 34 / Barrier Control / barrier safety status*/                                                                   \
             {                                                                                                                      \
                 0x0003, ZCL_BITMAP8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 }                                                \
-            }, /* 41 / Barrier Control / barrier capabilities*/                                                                    \
-            { 0x000A, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00UL } },  /* 42 / Barrier Control / barrier position*/ \
-            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 43 / Barrier Control / cluster revision*/ \
+            }, /* 35 / Barrier Control / barrier capabilities*/                                                                    \
+            { 0x000A, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00UL } },  /* 36 / Barrier Control / barrier position*/ \
+            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 37 / Barrier Control / cluster revision*/ \
             {                                                                                                                      \
                 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_CLIENT), { (uint8_t *) 0x0001 }                              \
-            },                                                                        /* 44 / Color Control / cluster revision*/   \
-            { 0x0003, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x616B } }, /* 45 / Color Control / current x*/          \
-            { 0x0004, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x607D } }, /* 46 / Color Control / current y*/          \
+            },                                                                        /* 38 / Color Control / cluster revision*/   \
+            { 0x0003, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x616B } }, /* 39 / Color Control / current x*/          \
+            { 0x0004, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x607D } }, /* 40 / Color Control / current y*/          \
             {                                                                                                                      \
                 0x000F, ZCL_BITMAP8_ATTRIBUTE_TYPE, 1, (ATTRIBUTE_MASK_WRITABLE), { (uint8_t *) 0x00 }                             \
-            }, /* 47 / Color Control / color control options*/                                                                     \
+            }, /* 41 / Color Control / color control options*/                                                                     \
             {                                                                                                                      \
                 0x400D, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000UL }                                             \
-            }, /* 48 / Color Control / couple color temp to level min-mireds*/                                                     \
+            }, /* 42 / Color Control / couple color temp to level min-mireds*/                                                     \
             {                                                                                                                      \
                 0x4010, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_WRITABLE), { (uint8_t *) 0x0000UL }                          \
-            }, /* 49 / Color Control / start up color temperature mireds*/                                                         \
-            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 50 / Color Control / cluster revision*/   \
+            }, /* 43 / Color Control / start up color temperature mireds*/                                                         \
+            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 44 / Color Control / cluster revision*/   \
             {                                                                                                                      \
                 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_CLIENT), { (uint8_t *) 0x0001 }                              \
-            },                                                                          /* 51 / IAS Zone / cluster revision*/      \
-            { 0x0000, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },      /* 52 / IAS Zone / zone state*/            \
-            { 0x0001, ZCL_ENUM16_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000 } },   /* 53 / IAS Zone / zone type*/             \
-            { 0x0002, ZCL_BITMAP16_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000 } }, /* 54 / IAS Zone / zone status*/           \
+            },                                                                          /* 45 / IAS Zone / cluster revision*/      \
+            { 0x0000, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },      /* 46 / IAS Zone / zone state*/            \
+            { 0x0001, ZCL_ENUM16_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000 } },   /* 47 / IAS Zone / zone type*/             \
+            { 0x0002, ZCL_BITMAP16_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000 } }, /* 48 / IAS Zone / zone status*/           \
             {                                                                                                                      \
                 0x0010, ZCL_IEEE_ADDRESS_ATTRIBUTE_TYPE, 8, (ATTRIBUTE_MASK_WRITABLE), { NULL }                                    \
-            },                                                                        /* 55 / IAS Zone / IAS CIE address*/         \
-            { 0x0011, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0xFF } },    /* 56 / IAS Zone / Zone ID*/                 \
-            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 57 / IAS Zone / cluster revision*/        \
+            },                                                                        /* 49 / IAS Zone / IAS CIE address*/         \
+            { 0x0011, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0xFF } },    /* 50 / IAS Zone / Zone ID*/                 \
+            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 51 / IAS Zone / cluster revision*/        \
     }
 
 // Cluster function static arrays
