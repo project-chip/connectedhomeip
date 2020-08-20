@@ -70,8 +70,9 @@
 	branch = master
 	ignore = dirty
 	commit = ad96e6f6f5b1915844ba4481bf8d0b66af91175e
-[submodule "third_party/cirque"]
+[submodule "cirque"]
 	path = third_party/cirque/repo
 	url = https://github.com/openweave/cirque.git
 	branch = master
 	ignore = dirty
+        commit = 3669450f26537e7f9e54926264781df06691f4fc
