@@ -80,9 +80,26 @@ SRCS = \
     $(PROJECT_ROOT)/src/main.cpp                                                             \
     $(PROJECT_ROOT)/src/LEDWidget.cpp                                                        \
     $(PROJECT_ROOT)/src/AppTask.cpp                                                          \
+    $(PROJECT_ROOT)/src/BoltLockManager.cpp                                                  \
     $(PROJECT_ROOT)/src/ButtonHandler.cpp                                                    \
+    $(PROJECT_ROOT)/src/DataModelHandler.cpp                                                 \
+    $(PROJECT_ROOT)/src/Server.cpp                                                           \
     $(PROJECT_ROOT)/src/platform/$(EFR32FAMILY)/$(BOARD)/init_mcu.c                          \
     $(PROJECT_ROOT)/src/platform/$(EFR32FAMILY)/$(BOARD)/init_board.c                        \
+    $(PROJECT_ROOT)/src/gen/call-command-handler.c                                           \
+    $(PROJECT_ROOT)/src/gen/callback-stub.c                                                  \
+    $(PROJECT_ROOT)/src/gen/znet-bookkeeping.c                                               \
+    $(CHIP_ROOT)/src/app/util/attribute-size.c                                               \
+    $(CHIP_ROOT)/src/app/util/attribute-storage.c                                            \
+    $(CHIP_ROOT)/src/app/util/attribute-table.c                                              \
+    $(CHIP_ROOT)/src/app/util/chip-response.cpp                                              \
+    $(CHIP_ROOT)/src/app/util/client-api.c                                                   \
+    $(CHIP_ROOT)/src/app/util/ember-print.cpp                                                \
+    $(CHIP_ROOT)/src/app/util/message.c                                                      \
+    $(CHIP_ROOT)/src/app/util/process-cluster-message.c                                      \
+    $(CHIP_ROOT)/src/app/util/process-global-message.c                                       \
+    $(CHIP_ROOT)/src/app/util/util.c                                                         \
+    $(CHIP_ROOT)/src/app/clusters/on-off-server/on-off.c                                     \
     $(EFR32_SDK_ROOT)/hardware/kit/common/bsp/bsp_init.c                                     \
     $(EFR32_SDK_ROOT)/hardware/kit/common/bsp/bsp_stk.c                                      \
     $(EFR32_SDK_ROOT)/hardware/kit/common/bsp/bsp_stk_leds.c                                 \
@@ -114,6 +131,7 @@ SRCS = \
 
 INC_DIRS = \
     $(PROJECT_ROOT)                                                                       \
+    $(PROJECT_ROOT)/src/                                                                  \
     $(PROJECT_ROOT)/src/platform/$(EFR32FAMILY)/$(BOARD)                                  \
     $(PROJECT_ROOT)/include                                                               \
     $(PROJECT_ROOT)/traits/include                                                        \
@@ -121,6 +139,7 @@ INC_DIRS = \
     $(CHIP_ROOT)/src/include/                                                             \
     $(CHIP_ROOT)/src/lib                                                                  \
     $(CHIP_ROOT)/src/                                                                     \
+    $(CHIP_ROOT)/src/app/util                                                             \
     $(CHIP_ROOT)/src/system                                                               \
     $(EFR32_SDK_ROOT)                                                                     \
     $(EFR32_SDK_ROOT)/platform/radio/rail_lib/common                                      \
