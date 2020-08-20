@@ -24,8 +24,13 @@
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
 #include "Server.h"
+#include "lcd.h"
+#include "qrcodegen.h"
 
 #include <assert.h>
+
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <setup_payload/SetupPayload.h>
 
 using namespace chip::TLV;
 using namespace chip::DeviceLayer;
@@ -44,6 +49,7 @@ using namespace chip::DeviceLayer;
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
+#define EXAMPLE_VENDOR_ID 0xcafe
 
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
@@ -120,6 +126,43 @@ int AppTask::Init()
 
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
+
+// Print setup info on LCD if available
+#ifdef DISPLAY_ENABLED
+    chip::SetupPayload payload;
+    uint32_t setUpPINCode       = 0;
+    uint32_t setUpDiscriminator = 0;
+
+    err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
+    if (err != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("ConfigurationMgr().GetSetupPinCode() failed: %s", chip::ErrorStr(err));
+    }
+
+    err = ConfigurationMgr().GetSetupDiscriminator(setUpDiscriminator);
+    if (err != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("ConfigurationMgr().GetSetupDiscriminator() failed: %s", chip::ErrorStr(err));
+    }
+
+    payload.version       = 1;
+    payload.vendorID      = EXAMPLE_VENDOR_ID;
+    payload.productID     = 1;
+    payload.setUpPINCode  = setUpPINCode;
+    payload.discriminator = setUpDiscriminator;
+    chip::QRCodeSetupPayloadGenerator generator(payload);
+
+    std::string result;
+    err = generator.payloadBase41Representation(result);
+    if (err != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("Failed to get Base41 payload for QR code with %s", chip::ErrorStr(err));
+    }
+
+    EFR32_LOG("SetupPINCode: [%" PRIu32 "]", setUpPINCode);
+    LCDWriteQRCode((uint8_t *) result.c_str());
+
+#endif
 
     return err;
 }

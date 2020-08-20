@@ -25,9 +25,11 @@ extern "C" {
 
 #include "AppConfig.h"
 #include "board_features.h"
+
 #define MAX_STR_LEN 48
 
 void initLCD(void);
+void LCDWriteQRCode(uint8_t * text);
 
 #ifdef __cplusplus
 }

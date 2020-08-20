@@ -23,6 +23,14 @@ assert(current_os == "freertos")
 efr32_project_dir = "${chip_root}/examples/lock-app/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/efr32"
 
+show_qr_code = true
+if (efr32_board == "BRD4166A") {
+  show_qr_code = false
+}
+
+
+
+
 efr32_sdk("sdk") {
   include_dirs = [
     "${chip_root}/src/platform/EFR32",
@@ -55,6 +63,7 @@ efr32_executable("lock_app") {
   public_deps = [
     ":sdk",
     "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
     "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
@@ -65,6 +74,7 @@ efr32_executable("lock_app") {
     "${efr32_project_dir}/include/",
     "${chip_root}/src/app/util",
     "${examples_plat_dir}/",
+    "${chip_root}/examples/common/QRCode/repo/c",
   ]
 
   sources = [
@@ -93,8 +103,13 @@ efr32_executable("lock_app") {
     "src/gen/callback-stub.c",
     "src/gen/znet-bookkeeping.c",
     "src/main.cpp",
+    "src/display/lcd.c",
+    "${chip_root}/examples/common/QRCode/repo/c/qrcodegen.c",
   ]
 
+  if (show_qr_code) {
+    defines += ["DISPLAY_ENABLED"]
+  }
   output_dir = root_out_dir
 
   if (efr32_family == "efr32mg12") {

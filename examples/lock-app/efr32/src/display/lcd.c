@@ -19,14 +19,23 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "init_lcd.h"
+#include "lcd.h"
 
 #include "display.h"
 #include "dmd.h"
 #include "glib.h"
-#include "sample_qr_code.h"
+#include "qrcodegen.h"
+
+#define LCD_SIZE 128
+#define QR_CODE_VERSION 4
+#define QR_CODE_MODULE_SIZE 3
+#define QR_CODE_BORDER_SIZE 0
 
 static GLIB_Context_t glibContext;
+static uint8_t qrCode[qrcodegen_BUFFER_LEN_FOR_VERSION(QR_CODE_VERSION)];
+static uint8_t workBuffer[qrcodegen_BUFFER_LEN_FOR_VERSION(QR_CODE_VERSION)];
+
+static void LCDFillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h);
 
 void initLCD(void)
 {
@@ -61,8 +70,47 @@ void initLCD(void)
     {
         EFR32_LOG("Glib clear failed %d", status);
     }
-    // Draw the QR Code
-    char str[MAX_STR_LEN];
-    GLIB_drawBitmap(&glibContext, 0, 0, SAMPLE_QR_CODE_WIDTH, SAMPLE_QR_CODE_HEIGHT, sample_qr_code_bits);
+}
+
+void LCDWriteQRCode(uint8_t * str)
+{
+    if (!qrcodegen_encodeText((const char *) str, workBuffer, qrCode, qrcodegen_Ecc_LOW, QR_CODE_VERSION, QR_CODE_VERSION,
+                              qrcodegen_Mask_AUTO, true))
+    {
+        EFR32_LOG("qrcodegen_encodeText() failed");
+        return;
+    }
+
+    const int size = qrcodegen_getSize(qrCode);
+
+    GLIB_clear(&glibContext);
+
+    const int displaySize = (2 * QR_CODE_BORDER_SIZE + size) * QR_CODE_MODULE_SIZE;
+    const int displayX    = (LCD_SIZE - displaySize) / 2;
+    const int displayY    = displayX;
+
+    for (int y = 0; y < size; ++y)
+    {
+        for (int x = 0; x < size; ++x)
+        {
+            if (qrcodegen_getModule(qrCode, x, y))
+            {
+                LCDFillRect(displayX + (QR_CODE_BORDER_SIZE + x) * QR_CODE_MODULE_SIZE,
+                            displayY + (QR_CODE_BORDER_SIZE + y) * QR_CODE_MODULE_SIZE, QR_CODE_MODULE_SIZE, QR_CODE_MODULE_SIZE);
+            }
+        }
+    }
+
     DMD_updateDisplay();
+}
+
+void LCDFillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h)
+{
+    for (int i = 0; i < h; i++)
+    {
+        for (int j = 0; j < w; j++)
+        {
+            GLIB_drawPixel(&glibContext, x + j, y + i);
+        }
+    }
 }
