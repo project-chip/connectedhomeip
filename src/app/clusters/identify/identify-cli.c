@@ -44,7 +44,8 @@
 // * Copyright 2012 by Ember Corporation. All rights reserved.              *80*
 // *******************************************************************
 
-#include "app/framework/include/af.h"
+#if 0
+#include "af.h"
 #include "app/util/serial/command-interpreter2.h"
 
 void emAfPluginIdentifyCliPrint(void);
@@ -69,3 +70,4 @@ void emAfPluginIdentifyCliPrint(void)
     }
 #endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_IDENTIFY_CLUSTER)
 }
+#endif //

@@ -2416,6 +2416,10 @@ bool emberAfIdentifyClusterTriggerEffectCallback(uint8_t effectId, uint8_t effec
  */
 bool emberAfIdentifyClusterUpdateCommissionStateCallback(uint8_t action, uint8_t commissionStateMask);
 
+bool emberAfPluginIdentifyStartFeedbackCallback(uint8_t endpoint, uint16_t identifyTime);
+
+bool emberAfPluginIdentifyStopFeedbackCallback(uint8_t endpoint);
+
 /** @} END Identify Cluster Callbacks */
 
 /** @name Groups Cluster Callbacks */

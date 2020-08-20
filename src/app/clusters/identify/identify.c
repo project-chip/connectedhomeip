@@ -46,8 +46,8 @@
 // *******************************************************************
 
 // this file contains all the common includes for clusters in the util
-#include "app/framework/include/af.h"
-#include "app/framework/util/common.h"
+#include "af.h"
+#include "common.h"
 
 typedef struct
 {
