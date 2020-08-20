@@ -80,8 +80,7 @@ cirquetest_run_test() {
     ./do_on-off-cluster-test.sh
     exit_code=$?
     __cirquetest_clean_flask
-    sleep 10
-    # Cleanup to run more tests
+    # Cleanup containers and possibly networks to run more tests
     yes | docker system prune
     return "$exit_code"
 }
