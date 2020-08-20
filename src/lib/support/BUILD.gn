@@ -52,6 +52,10 @@ config("support_config") {
 }
 
 support_headers = [
+  "ASN1.h",
+  "ASN1Config.h",
+  "ASN1Error.h",
+  "ASN1OID.h",  
   "Base64.h",
   "BufBound.h",
   "CHIPCounter.h",
@@ -72,6 +76,8 @@ static_library("support") {
   output_name = "libSupportLayer"
 
   sources = [
+    "ASN1Error.cpp",
+    "ASN1OID.cpp",
     "Base64.cpp",
     "CHIPArgParser.cpp",
     "CHIPCounter.cpp",
