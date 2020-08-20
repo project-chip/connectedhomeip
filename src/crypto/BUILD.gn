@@ -15,26 +15,22 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
 
+import("${chip_root}/gn/chip/buildconfig_header.gni")
+
 import("crypto.gni")
 
-config("crypto_config") {
-  defines = []
-  if (chip_crypto == "mbedtls") {
-    defines += [ "CHIP_CRYPTO_MBEDTLS=1" ]
-  } else {
-    defines += [ "CHIP_CRYPTO_MBEDTLS=0" ]
-  }
-  if (chip_crypto == "openssl") {
-    defines += [
-      "CHIP_CRYPTO_OPENSSL=1",
-      "CHIP_WITH_OPENSSL=1",
-    ]
-  } else {
-    defines += [
-      "CHIP_CRYPTO_OPENSSL=0",
-      "CHIP_WITH_OPENSSL=0",
-    ]
-  }
+buildconfig_header("crypto_buildconfig") {
+  header = "CryptoBuildConfig.h"
+  header_dir = "crypto"
+
+  chip_crypto_mbedtls = chip_crypto == "mbedtls"
+  chip_crypto_openssl = chip_crypto == "openssl"
+
+  defines = [
+    "CHIP_CRYPTO_MBEDTLS=${chip_crypto_mbedtls}",
+    "CHIP_CRYPTO_OPENSSL=${chip_crypto_openssl}",
+    "CHIP_WITH_OPENSSL=${chip_crypto_openssl}",
+  ]
 }
 
 if (chip_crypto == "openssl") {
@@ -56,12 +52,12 @@ static_library("crypto") {
   ]
 
   public_deps = [
+    ":crypto_buildconfig",
     "${chip_root}/src/lib/core",
     "${nlassert_root}:nlassert",
   ]
 
-  public_configs = [ ":crypto_config" ]
-
+  public_configs = []
   if (chip_crypto == "mbedtls") {
     sources += [ "CHIPCryptoPALmbedTLS.cpp" ]
     public_deps += [ "${mbedtls_root}:mbedtls" ]

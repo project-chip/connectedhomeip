@@ -14,6 +14,7 @@
 
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/gn/chip/buildconfig_header.gni")
 import("${chip_root}/src/platform/device.gni")
 import("ble.gni")
 
@@ -22,10 +23,15 @@ declare_args() {
   chip_ble_project_config_include = ""
 }
 
-config("ble_config") {
-  configs = [ "${chip_root}/src:includes" ]
+buildconfig_header("ble_buildconfig") {
+  header = "BleBuildConfig.h"
+  header_dir = "ble"
 
-  defines = []
+  defines = [
+    "CONFIG_NETWORK_LAYER_BLE=${chip_config_network_layer_ble}",
+    "CHIP_ENABLE_CHIPOBLE_TEST=false",
+  ]
+
   if (chip_ble_project_config_include != "") {
     defines +=
         [ "BLE_PROJECT_CONFIG_INCLUDE=${chip_ble_project_config_include}" ]
@@ -34,20 +40,17 @@ config("ble_config") {
     defines +=
         [ "BLE_PLATFORM_CONFIG_INCLUDE=${chip_ble_platform_config_include}" ]
   }
-
-  if (chip_config_network_layer_ble) {
-    defines += [ "CONFIG_NETWORK_LAYER_BLE=1" ]
-  } else {
-    defines += [ "CONFIG_NETWORK_LAYER_BLE=0" ]
-  }
 }
 
 source_set("ble_config_header") {
   sources = [ "BleConfig.h" ]
 
-  public_configs = [ ":ble_config" ]
+  public_configs = [ "${chip_root}/src:includes" ]
 
-  public_deps = [ "${chip_root}/src/system:system_config_header" ]
+  public_deps = [
+    ":ble_buildconfig",
+    "${chip_root}/src/system:system_config_header",
+  ]
 }
 
 if (chip_config_network_layer_ble) {

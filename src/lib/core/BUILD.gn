@@ -15,105 +15,56 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
 
+import("${chip_root}/gn/chip/buildconfig_header.gni")
 import("${chip_root}/gn/chip/tests.gni")
 import("${chip_root}/src/inet/inet.gni")
 import("core.gni")
 
-config("chip_config") {
+buildconfig_header("chip_buildconfig") {
+  header = "CHIPBuildConfig.h"
+  header_dir = "core"
+
+  chip_target_style_unix = chip_target_style == "unix"
+  chip_target_style_embedded = chip_target_style == "embedded"
+  chip_logging_style_android = chip_logging_style == "android"
+  chip_logging_style_external = chip_logging_style == "external"
+  chip_logging_style_stdio = chip_logging_style == "stdio"
+  chip_logging_style_stdio_weak = chip_logging_style == "stdio_weak"
+  chip_logging_style_stdio_with_timestamps =
+      chip_logging_style == "stdio_with_timestamps"
+
+  chip_config_memory_management_malloc =
+      chip_config_memory_management == "malloc"
+  chip_config_memory_management_simple =
+      chip_config_memory_management == "simple"
+  chip_config_memory_management_platform =
+      chip_config_memory_management == "platform"
+
   # TODO - Move CHIP_PROJECT_CONFIG_INCLUDE, CHIP_PLATFORM_CONFIG_INCLUDE here.
   # Currently those are also used from src/system.
-  defines = []
-
-  if (chip_build_tests) {
-    defines += [ "CHIP_CONFIG_TEST=1" ]
-  } else {
-    defines += [ "CHIP_CONFIG_TEST=0" ]
-  }
-  if (chip_error_logging) {
-    defines += [ "CHIP_ERROR_LOGGING=1" ]
-  } else {
-    defines += [ "CHIP_ERROR_LOGGING=0" ]
-  }
-  if (chip_progress_logging) {
-    defines += [ "CHIP_PROGRESS_LOGGING=1" ]
-  } else {
-    defines += [ "CHIP_PROGRESS_LOGGING=0" ]
-  }
-  if (chip_detail_logging) {
-    defines += [ "CHIP_DETAIL_LOGGING=1" ]
-  } else {
-    defines += [ "CHIP_DETAIL_LOGGING=0" ]
-  }
-
-  if (chip_config_short_error_str) {
-    defines += [ "CHIP_CONFIG_SHORT_ERROR_STR=1" ]
-  } else {
-    defines += [ "CHIP_CONFIG_SHORT_ERROR_STR=0" ]
-  }
-
-  if (chip_config_enable_arg_parser) {
-    defines += [ "CHIP_CONFIG_ENABLE_ARG_PARSER=1" ]
-  } else {
-    defines += [ "CHIP_CONFIG_ENABLE_ARG_PARSER=0" ]
-  }
-
-  if (chip_target_style == "unix") {
-    defines += [ "CHIP_TARGET_STYLE_UNIX=1" ]
-  } else {
-    defines += [ "CHIP_TARGET_STYLE_UNIX=0" ]
-  }
-  if (chip_target_style == "embedded") {
-    defines += [ "CHIP_TARGET_STYLE_EMBEDDED=1" ]
-  } else {
-    defines += [ "CHIP_TARGET_STYLE_EMBEDDED=0" ]
-  }
-
-  if (chip_logging_style == "android") {
-    defines += [ "CHIP_LOGGING_STYLE_ANDROID=1" ]
-  } else {
-    defines += [ "CHIP_LOGGING_STYLE_ANDROID=0" ]
-  }
-  if (chip_logging_style == "external") {
-    defines += [ "CHIP_LOGGING_STYLE_EXTERNAL=1" ]
-  } else {
-    defines += [ "CHIP_LOGGING_STYLE_EXTERNAL=0" ]
-  }
-  if (chip_logging_style == "stdio") {
-    defines += [ "CHIP_LOGGING_STYLE_STDIO=1" ]
-  } else {
-    defines += [ "CHIP_LOGGING_STYLE_STDIO=0" ]
-  }
-  if (chip_logging_style == "stdio_weak") {
-    defines += [ "CHIP_LOGGING_STYLE_STDIO_WEAK=1" ]
-  } else {
-    defines += [ "CHIP_LOGGING_STYLE_STDIO_WEAK=0" ]
-  }
-
-  if (chip_config_memory_management == "malloc") {
-    defines += [
-      "CHIP_CONFIG_MEMORY_MGMT_MALLOC=1",
-      "HAVE_MALLOC=1",
-      "HAVE_FREE=1",
-    ]
-  } else {
-    defines += [ "CHIP_CONFIG_MEMORY_MGMT_MALLOC=0" ]
-  }
-  if (chip_config_memory_management == "simple") {
-    defines += [ "CHIP_CONFIG_MEMORY_MGMT_SIMPLE=1" ]
-  } else {
-    defines += [ "CHIP_CONFIG_MEMORY_MGMT_SIMPLE=0" ]
-  }
-  if (chip_config_memory_management == "platform") {
-    defines += [ "CHIP_CONFIG_MEMORY_MGMT_PLATFORM=1" ]
-  } else {
-    defines += [ "CHIP_CONFIG_MEMORY_MGMT_PLATFORM=0" ]
-  }
-
-  include_dirs = [ target_gen_dir ]
-
-  configs = [
-    "${chip_root}/src:includes",
-    "${chip_root}/src/lib:includes",
+  defines = [
+    "CHIP_FUZZING_ENABLED=false",
+    "CHIP_CONFIG_TEST=${chip_build_tests}",
+    "CHIP_ERROR_LOGGING=${chip_error_logging}",
+    "CHIP_PROGRESS_LOGGING=${chip_progress_logging}",
+    "CHIP_DETAIL_LOGGING=${chip_detail_logging}",
+    "CHIP_CONFIG_SHORT_ERROR_STR=${chip_config_short_error_str}",
+    "CHIP_CONFIG_ENABLE_ARG_PARSER=${chip_config_enable_arg_parser}",
+    "CHIP_TARGET_STYLE_UNIX=${chip_target_style_unix}",
+    "CHIP_TARGET_STYLE_EMBEDDED=${chip_target_style_embedded}",
+    "CHIP_LOGGING_STYLE_ANDROID=${chip_logging_style_android}",
+    "CHIP_LOGGING_STYLE_EXTERNAL=${chip_logging_style_external}",
+    "CHIP_LOGGING_STYLE_STDIO=${chip_logging_style_stdio}",
+    "CHIP_LOGGING_STYLE_STDIO_WEAK=${chip_logging_style_stdio_weak}",
+    "CHIP_LOGGING_STYLE_STDIO_WITH_TIMESTAMPS=${chip_logging_style_stdio_with_timestamps}",
+    "CHIP_CONFIG_MEMORY_MGMT_MALLOC=${chip_config_memory_management_malloc}",
+    "HAVE_MALLOC=${chip_config_memory_management_malloc}",
+    "HAVE_FREE=${chip_config_memory_management_malloc}",
+    "HAVE_NEW=false",
+    "CHIP_CONFIG_MEMORY_MGMT_SIMPLE=${chip_config_memory_management_simple}",
+    "CHIP_CONFIG_MEMORY_MGMT_PLATFORM=${chip_config_memory_management_platform}",
+    "CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING=false",
+    "CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES=false",
   ]
 }
 
@@ -124,9 +75,16 @@ source_set("chip_config_header") {
     "CHIPTimeConfig.h",
   ]
 
-  public_configs = [ ":chip_config" ]
+  public_configs = [
+    "${chip_root}/src:includes",
+    "${chip_root}/src/lib:includes",
+  ]
 
-  public_deps = [ "${chip_root}/src/system:system_config_header" ]
+  public_deps = [
+    ":chip_buildconfig",
+    "${chip_root}/src/ble:ble_config_header",
+    "${chip_root}/src/system:system_config_header",
+  ]
 }
 
 static_library("core") {

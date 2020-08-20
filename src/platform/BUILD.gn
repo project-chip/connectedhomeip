@@ -16,6 +16,8 @@ import("//build/config/linux/pkg_config.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
 
+import("${chip_root}/gn/chip/buildconfig_header.gni")
+
 import("device.gni")
 
 if (chip_enable_openthread) {
@@ -39,11 +41,21 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     chip_device_config_firmware_build_time = ""
   }
 
-  config("platform_config") {
-    configs = [ "${chip_root}/src:includes" ]
+  buildconfig_header("platform_buildconfig") {
+    header = "CHIPDeviceBuildConfig.h"
+    header_dir = "platform"
 
-    defines = []
-    libs = []
+    chip_with_gio = chip_enable_wifi
+    chip_device_config_enable_wpa = chip_enable_wifi
+
+    defines = [
+      "CHIP_DEVICE_CONFIG_ENABLE_THREAD=${chip_enable_openthread}",
+      "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}",
+      "CHIP_ENABLE_OPENTHREAD=${chip_enable_openthread}",
+      "CHIP_WITH_GIO=${chip_with_gio}",
+      "OPENTHREAD_CONFIG_ENABLE_TOBLE=false",
+    ]
+
     if (chip_device_project_config_include != "") {
       defines += [ "CHIP_DEVICE_PROJECT_CONFIG_INCLUDE=${chip_device_project_config_include}" ]
     }
@@ -59,60 +71,36 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     }
 
     if (chip_device_platform == "darwin") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_DARWIN=1",
+        "CHIP_DEVICE_LAYER_TARGET=Darwin",
+      ]
+    } else if (chip_device_platform == "linux") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_LINUX=1",
+        "CHIP_DEVICE_LAYER_TARGET=Linux",
+      ]
+    } else if (chip_device_platform == "nrf5") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_NRF5=1",
+        "CHIP_DEVICE_LAYER_TARGET=nRF5",
+      ]
+    }
+    if (chip_device_platform == "efr32") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_EFR32=1",
+        "CHIP_DEVICE_LAYER_TARGET=EFR32",
+      ]
+    }
+  }
+
+  config("platform_config") {
+    if (chip_device_platform == "darwin") {
       frameworks = [
         "CoreFoundation.framework",
         "CoreBluetooth.framework",
         "Foundation.framework",
       ]
-      defines += [
-        "CONFIG_DEVICE_LAYER=1",
-        "CHIP_DEVICE_LAYER_TARGET_DARWIN=1",
-        "CHIP_DEVICE_LAYER_TARGET=Darwin",
-      ]
-    } else {
-      defines += [ "CHIP_DEVICE_LAYER_TARGET_DARWIN=0" ]
-    }
-    if (chip_device_platform == "linux") {
-      defines += [
-        "CONFIG_DEVICE_LAYER=1",
-        "CHIP_DEVICE_LAYER_TARGET_LINUX=1",
-        "CHIP_DEVICE_LAYER_TARGET=Linux",
-      ]
-    } else {
-      defines += [ "CHIP_DEVICE_LAYER_TARGET_LINUX=0" ]
-    }
-    if (chip_device_platform == "nrf5") {
-      defines += [
-        "CONFIG_DEVICE_LAYER=1",
-        "CHIP_DEVICE_LAYER_TARGET_NRF5=1",
-        "CHIP_DEVICE_LAYER_TARGET=nRF5",
-      ]
-    } else {
-      defines += [ "CHIP_DEVICE_LAYER_TARGET_NRF5=0" ]
-    }
-    if (chip_enable_openthread) {
-      defines += [
-        "CHIP_DEVICE_CONFIG_ENABLE_THREAD=1",
-        "CHIP_ENABLE_OPENTHREAD=1",
-      ]
-    }
-    if (chip_enable_wifi) {
-      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_WPA=1" ]
-    }
-    if (chip_device_platform == "efr32") {
-      defines += [
-        "CONFIG_DEVICE_LAYER=1",
-        "CHIP_DEVICE_LAYER_TARGET_EFR32=1",
-        "CHIP_DEVICE_LAYER_TARGET=EFR32",
-      ]
-      if (chip_enable_openthread) {
-        defines += [
-          "CHIP_DEVICE_CONFIG_ENABLE_THREAD=1",
-          "CHIP_ENABLE_OPENTHREAD=1",
-        ]
-      }
-    } else {
-      defines += [ "CHIP_DEVICE_LAYER_TARGET_EFR32=0" ]
     }
   }
 
@@ -161,6 +149,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     ]
 
     public_deps = [
+      ":platform_buildconfig",
       "${chip_root}/src/ble",
       "${chip_root}/src/inet",
       "${chip_root}/src/lib/core:chip_config_header",
@@ -168,7 +157,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "${nlio_root}:nlio",
     ]
 
-    public_configs = [ ":platform_config" ]
+    public_configs = [
+      ":platform_config",
+      "${chip_root}/src:includes",
+    ]
 
     if (chip_device_platform == "darwin") {
       sources += [

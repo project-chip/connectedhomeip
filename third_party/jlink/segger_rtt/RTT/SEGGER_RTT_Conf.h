@@ -53,6 +53,8 @@ Revision: $Rev: 18601 $
 #ifndef SEGGER_RTT_CONF_H
 #define SEGGER_RTT_CONF_H
 
+#include <SEGGER_RTT_BuildConfig.h>
+
 #ifdef __IAR_SYSTEMS_ICC__
 #include <intrinsics.h>
 #endif

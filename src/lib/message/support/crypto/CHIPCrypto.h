@@ -26,6 +26,10 @@
 #ifndef CHIPCRYPTO_H_
 #define CHIPCRYPTO_H_
 
+#if CHIP_SEPARATE_CONFIG_H
+#include <crypto/CryptoBuildConfig.h>
+#endif
+
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif

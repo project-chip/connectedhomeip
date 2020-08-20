@@ -36,6 +36,11 @@
 #ifndef CHIP_CONFIG_H_
 #define CHIP_CONFIG_H_
 
+#if CHIP_SEPARATE_CONFIG_H
+#include <core/CHIPBuildConfig.h>
+#endif
+
+#include <ble/BleConfig.h>
 #include <system/SystemConfig.h>
 
 /* COMING SOON: making the INET Layer optional entails making this inclusion optional. */

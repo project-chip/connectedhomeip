@@ -37,7 +37,10 @@ static_library("app") {
     "${chip_root}/src/system",
   ]
 
-  public_configs = [ ":app_config" ]
+  public_configs = [
+    ":app_config",
+    "${chip_root}/src:includes",
+  ]
 }
 
 copy("codec_headers") {
