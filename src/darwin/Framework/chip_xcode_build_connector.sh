@@ -28,7 +28,7 @@ die() {
 set -e
 
 mkdir -p "$TEMP_DIR"
-export > "$TEMP_DIR/env.sh"
+export >"$TEMP_DIR/env.sh"
 
 set -x
 

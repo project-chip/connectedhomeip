@@ -94,7 +94,7 @@ set_defaults("source_set") {
 }
 set_defaults("executable") {
   configs =
-  _chip_defaults.default_configs + _chip_defaults.executable_default_configs
+      _chip_defaults.default_configs + _chip_defaults.executable_default_configs
 }
 set_defaults("shared_library") {
   configs = _chip_defaults.default_configs
