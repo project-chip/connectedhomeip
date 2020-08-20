@@ -47,10 +47,10 @@
 #include <platform/nRF5/ThreadStackManagerImpl.h>
 #endif
 
+#include "app/chip-zcl-zpro-codec.h"
 #include "attribute-storage.h"
 #include "gen/znet-bookkeeping.h"
 #include "util.h"
-#include "app/chip-zcl-zpro-codec.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
