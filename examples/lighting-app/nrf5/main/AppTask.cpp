@@ -34,6 +34,15 @@
 #include "FreeRTOS.h"
 
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/OpenThread/OpenThreadUtils.h>
+#include <platform/ThreadStackManager.h>
+#include <platform/internal/DeviceNetworkInfo.h>
+#include <platform/nRF5/ThreadStackManagerImpl.h>
+#include <support/ErrorStr.h>
+#include <system/SystemClock.h>
+
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <setup_payload/SetupPayload.h>
 
 APP_TIMER_DEF(sFunctionTimer);
 
@@ -44,6 +53,7 @@ constexpr int kFactoryResetCancelWindowTimeout = 3000;
 constexpr size_t kAppTaskStackSize             = 4096;
 constexpr int kAppTaskPriority                 = 2;
 constexpr int kAppEventQueueSize               = 10;
+constexpr int kExampleVenderID                 = 0xabcd;
 
 SemaphoreHandle_t sCHIPEventLock;
 
@@ -149,6 +159,45 @@ int AppTask::Init()
         APP_ERROR_HANDLER(NRF_ERROR_NULL);
     }
 
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        chip::SetupPayload payload;
+        uint32_t setUpPINCode       = 0;
+        uint32_t setUpDiscriminator = 0;
+
+        err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
+        if (err != CHIP_NO_ERROR)
+        {
+            NRF_LOG_INFO("ConfigurationMgr().GetSetupPinCode() failed: %s", chip::ErrorStr(err));
+        }
+
+        err = ConfigurationMgr().GetSetupDiscriminator(setUpDiscriminator);
+        if (err != CHIP_NO_ERROR)
+        {
+            NRF_LOG_INFO("ConfigurationMgr().GetSetupDiscriminator() failed: %s", chip::ErrorStr(err));
+        }
+
+        payload.version       = 1;
+        payload.vendorID      = kExampleVenderID;
+        payload.productID     = 1;
+        payload.setUpPINCode  = setUpPINCode;
+        payload.discriminator = setUpDiscriminator;
+        chip::QRCodeSetupPayloadGenerator generator(payload);
+
+        // TODO: Usage of STL will significantly increase the image size, this should be changed to more efficient method for
+        // generating payload
+        std::string result;
+        err = generator.payloadBase41Representation(result);
+        if (err != CHIP_NO_ERROR)
+        {
+            NRF_LOG_ERROR("Failed to generate QR Code");
+        }
+
+        NRF_LOG_INFO("SetupPINCode: [%" PRIu32 "]", setUpPINCode);
+        // There might be whitespace in setup QRCode, add brackets to make it clearer.
+        NRF_LOG_INFO("SetupQRCode:  [%s]", result.c_str());
+    }
+
     return ret;
 }
 
@@ -156,6 +205,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 {
     ret_code_t ret;
     AppEvent event;
+    uint64_t mLastChangeTimeUS = 0;
 
     ret = sAppTask.Init();
     if (ret != NRF_SUCCESS)
@@ -163,6 +213,8 @@ void AppTask::AppTaskMain(void * pvParameter)
         NRF_LOG_INFO("AppTask.Init() failed");
         APP_ERROR_HANDLER(ret);
     }
+
+    SetDeviceName("LightingDemo._chip._udp.local.");
 
     while (true)
     {
@@ -227,6 +279,15 @@ void AppTask::AppTaskMain(void * pvParameter)
         sStatusLED.Animate();
         sUnusedLED.Animate();
         sUnusedLED_1.Animate();
+
+        uint64_t nowUS            = chip::System::Platform::Layer::GetClock_Monotonic();
+        uint64_t nextChangeTimeUS = mLastChangeTimeUS + 5 * 1000 * 1000UL;
+
+        if (nowUS > nextChangeTimeUS)
+        {
+            PublishService();
+            mLastChangeTimeUS = nowUS;
+        }
     }
 }
 

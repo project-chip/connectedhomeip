@@ -297,7 +297,7 @@ extern void SetLogFilter(uint8_t category);
 
 #if _CHIP_USE_LOGGING
 
-#define ChipLoggingchipPrefixLen 6
+#define ChipLoggingChipPrefixLen 6
 #define ChipLoggingModuleNameLen 3
 #define ChipLoggingMessageSeparatorLen 2
 #define ChipLoggingMessageTrailerLen 2

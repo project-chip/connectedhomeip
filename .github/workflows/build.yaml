@@ -27,6 +27,9 @@ jobs:
                 type: [main, clang, linux-embedded, mbedtls]
         env:
             BUILD_TYPE: ${{ matrix.type }}
+            BUILD_VERSION: 0.2.18
+            BUILD_IMAGE: chip-build-openssl
+            BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
 
@@ -41,48 +44,24 @@ jobs:
               with:
                   submodules: true
             - name: Bootstrap
+              run: scripts/build/gn_bootstrap.sh
+            - name: Setup Build
               run: |
                   case $BUILD_TYPE in
-                     "main") export BOOTSTRAP_ARGUMENTS="";;
-                     "clang") export BOOTSTRAP_ARGUMENTS="CC=clang CXX=clang++";;
-                     "linux-embedded") export BOOTSTRAP_ARGUMENTS="--with-device-layer=linux";;
-                     "mbedtls") export BOOTSTRAP_ARGUMENTS="--with-crypto=mbedtls";;
+                     "main") GN_ARGS='';;
+                     "clang") GN_ARGS='is_clang=true';;
+                     "linux-embedded") GN_ARGS='import("//src/platform/Linux/args.gni")';;
+                     "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
                      *) ;;
                   esac
 
-                  scripts/build/bootstrap.sh $BOOTSTRAP_ARGUMENTS
+                  scripts/build/gn_gen.sh --args="$GN_ARGS"
             - name: Run Build
-              run: scripts/build/default.sh
-            - name: Run mbedTLS Tests
-              if: ${{ contains('mbedtls', env.BUILD_TYPE) }}
-              run: scripts/tests/mbedtls_tests.sh
-            - name: Run Crypto Tests
-              if: ${{ contains('mbedtls,clang,main', env.BUILD_TYPE) }}
-              run: scripts/tests/crypto_tests.sh
-            - name: Run Setup Payload Tests
-              if: ${{ contains('main,clang', env.BUILD_TYPE) }}
-              run: scripts/tests/setup_payload_tests.sh
-            - name: OpenSSL Tests
-              if: ${{ contains('main,clang', env.BUILD_TYPE) }}
-              run: scripts/tests/openssl_tests.sh
-            - name: Run Embedded Platform Tests
-              if: ${{ contains('linux-embedded', env.BUILD_TYPE) }}
-              run: make -C build/default/src/platform check
-            - name: Run Network Tests
-              run: scripts/tests/inet_tests.sh
-            - name: Run All Unit & Functional Tests
-              if: ${{ contains('main,clang', env.BUILD_TYPE) }}
-              run: scripts/tests/all_tests.sh
-            - name: Copying Logs Aside
-              run: scripts/tests/save_logs.sh /tmp/test_logs
-            - name: Uploading Logs
-              uses: actions/upload-artifact@v1
-              with:
-                  name: ${{ env.BUILD_TYPE }}-logs
-                  path: /tmp/log_output
-            - name: Deployment Check
-              # if: ${{ contains('main', env.BUILD_TYPE) }}
-              run: scripts/build/distribution_check.sh
+              run: scripts/build/gn_build.sh
+            - name: Run Tests
+              run: scripts/tests/gn_tests.sh
+            # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
+            # TODO https://github.com/project-chip/connectedhomeip/issues/1512
             # - name: Run Code Coverage
             #   if: ${{ contains('main', env.BUILD_TYPE) }}
             #   run: scripts/tools/codecoverage.sh

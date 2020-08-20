@@ -23,6 +23,8 @@
 
 #include "ManualSetupPayloadGenerator.h"
 
+#include <inttypes.h>
+
 #include <support/logging/CHIPLogging.h>
 #include <support/verhoeff/Verhoeff.h>
 
@@ -41,7 +43,7 @@ static uint32_t shortPayloadRepresentation(const SetupPayload & payload)
 static string decimalStringWithPadding(uint32_t number, int minLength)
 {
     char buf[minLength + 1];
-    snprintf(buf, sizeof(buf), "%0*u", minLength, number);
+    snprintf(buf, sizeof(buf), "%0*" PRIu32, minLength, number);
     return string(buf);
 }
 

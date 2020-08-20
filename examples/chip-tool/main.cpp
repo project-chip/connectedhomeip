@@ -17,6 +17,7 @@
  */
 
 #include <assert.h>
+#include <chrono>
 #include <errno.h>
 #include <iostream>
 #include <new>
@@ -57,6 +58,7 @@ using namespace ::chip::Inet;
 //       knowing its id, because the ID can be learned on the first response that is received.
 constexpr NodeId kLocalDeviceId  = 112233;
 constexpr NodeId kRemoteDeviceId = 12344321;
+constexpr std::chrono::seconds kWaitingForResponseTimeout(1);
 
 static const unsigned char local_private_key[] = { 0x00, 0xd1, 0x90, 0xd9, 0xb3, 0x95, 0x1c, 0x5f, 0xa4, 0xe7, 0x47,
                                                    0x92, 0x5b, 0x0a, 0xa9, 0xa7, 0xc1, 0x1c, 0xe7, 0x06, 0x10, 0xe2,
@@ -470,10 +472,17 @@ void DoOnOff(DeviceController::ChipDeviceController * controller, Command comman
     controller->SendMessage(NULL, buffer);
     // FIXME: waitingForResponse is being written on other threads, presumably.
     // We probably need some more synchronization here.
-    while (waitingForResponse)
+    auto start = std::chrono::system_clock::now();
+    while (waitingForResponse &&
+           std::chrono::duration_cast<std::chrono::minutes>(std::chrono::system_clock::now() - start) < kWaitingForResponseTimeout)
     {
         // Just poll for the response.
-        sleep(0);
+        sleep(1);
+    }
+
+    if (waitingForResponse)
+    {
+        fprintf(stderr, "No response from device.");
     }
 }
 

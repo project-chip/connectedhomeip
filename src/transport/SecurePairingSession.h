@@ -48,7 +48,7 @@ public:
      *
      * @param msgBuf the new message that should be sent to the peer
      */
-    virtual CHIP_ERROR OnNewMessageForPeer(uint8_t msgType, System::PacketBuffer * msgBuf) { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR OnNewMessageForPeer(System::PacketBuffer * msgBuf) { return CHIP_NO_ERROR; }
 
     /**
      * @brief
@@ -62,8 +62,10 @@ public:
      * @brief
      *   Called when the pairing is complete and the new secure session has been established
      *
+     * @param peerNodeId  Node ID of peer
+     * @param peerKeyId   Encrytion key ID assigned by the peer node for this connection
      */
-    virtual void OnPairingComplete() {}
+    virtual void OnPairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId) {}
 
     virtual ~SecurePairingSessionDelegate() {}
 };
@@ -84,24 +86,34 @@ public:
      *   Initialize using setup PIN code and wait for pairing requests.
      *
      * @param mySetUpPINCode  Setup PIN code of the local device
+     * @param pbkdf2IterCount Iteration count for PBKDF2 function
+     * @param salt            Salt to be used for SPAKE2P opertation
+     * @param saltLen         Length of salt
+     * @param myNodeId        Optional node id of local node
+     * @param mKeyId          Key ID to be assigned to the secure session on the peer node
      * @param delegate        Callback object
      *
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const unsigned char * salt, size_t saltLen,
-                              SecurePairingSessionDelegate * delegate);
+                              Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
 
     /**
      * @brief
      *   Create a pairing request using peer's setup PIN code.
      *
      * @param peerSetUpPINCode Setup PIN code of the peer device
+     * @param pbkdf2IterCount  Iteration count for PBKDF2 function
+     * @param salt             Salt to be used for SPAKE2P opertation
+     * @param saltLen          Length of salt
+     * @param myNodeId         Optional node id of local node
+     * @param mKeyId           Key ID to be assigned to the secure session on the peer node
      * @param delegate         Callback object
      *
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const unsigned char * salt, size_t saltLen,
-                    SecurePairingSessionDelegate * delegate);
+                    Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
 
     /**
      * @brief
@@ -114,26 +126,30 @@ public:
      *                    initialized once pairing is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    CHIP_ERROR DeriveSecureSession(const unsigned char * info, size_t info_len, SecureSession * session);
+    virtual CHIP_ERROR DeriveSecureSession(const unsigned char * info, size_t info_len, SecureSession & session);
 
     /**
      * @brief
      *   Handler for peer's messages, exchanged during pairing handshake.
      *
+     * @param header      Message header for the received message
      * @param msg         Message sent by the peer
      * @return CHIP_ERROR The result of message processing
      */
-    CHIP_ERROR HandlePeerMessage(const MessageHeader & header, System::PacketBuffer * msg);
+    CHIP_ERROR HandlePeerMessage(MessageHeader & header, System::PacketBuffer * msg);
 
 private:
     CHIP_ERROR Init(uint32_t setupCode, uint32_t pbkdf2IterCount, const unsigned char * salt, size_t saltLen,
-                    SecurePairingSessionDelegate * delegate);
+                    Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
 
     CHIP_ERROR HandleCompute_pA(const MessageHeader & header, System::PacketBuffer * msg);
     CHIP_ERROR HandleCompute_pB_cB(const MessageHeader & header, System::PacketBuffer * msg);
     CHIP_ERROR HandleCompute_cA(const MessageHeader & header, System::PacketBuffer * msg);
 
-    static constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;
+    CHIP_ERROR AttachHeaderAndSend(uint8_t msgType, System::PacketBuffer * msgBuf);
+
+    static constexpr uint16_t kSecurePairingProtocol = 1;
+    static constexpr size_t kSpake2p_WS_Length       = kP256_FE_Length + 8;
 
     enum Spake2pMsgType : uint8_t
     {
@@ -159,6 +175,14 @@ private:
     size_t mKeLen = sizeof(mKe);
 
     bool mPairingComplete = false;
+
+    Optional<NodeId> mLocalNodeId;
+
+    Optional<NodeId> mPeerNodeId;
+
+    uint16_t mKeyId;
+
+    uint16_t mPeerKeyId;
 };
 
 } // namespace chip

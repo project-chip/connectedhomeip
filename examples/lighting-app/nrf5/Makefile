@@ -54,6 +54,7 @@ SRCS = \
     $(CHIP_ROOT)/src/app/clusters/on-off-server/on-off.c \
     $(NRF5_PLATFORM_DIR)/app/support/CXXExceptionStubs.cpp \
     $(NRF5_PLATFORM_DIR)/app/support/nRF5Sbrk.c \
+    $(NRF5_PLATFORM_DIR)/app/support/FreeRTOSDebuggingHooks.c \
     $(NRF5_PLATFORM_DIR)/app/support/FreeRTOSNewlibLockSupport.c \
     $(NRF5_PLATFORM_DIR)/app/support/FreeRTOSNewlibLockSupport_test.c \
     $(NRF5_PLATFORM_DIR)/app/Server.cpp \
