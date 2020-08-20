@@ -18,13 +18,13 @@ import("android_toolchain.gni")
 if (current_cpu == "arm") {
   android_arm_toolchain("armv7_clang") {
     toolchain_args = {
-       is_clang = true
+      is_clang = true
     }
   }
 } else if (current_cpu == "x86_64") {
   android_x86_64_toolchain("x86_64_clang") {
     toolchain_args = {
-       is_clang = true
+      is_clang = true
     }
   }
 } else {
