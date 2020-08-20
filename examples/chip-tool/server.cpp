@@ -5,12 +5,12 @@
 
 #include <cassert>
 
-#include <app/chip-zcl-zpro-codec.h>
 #include "attribute-storage.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
 #include "gen/znet-bookkeeping.h"
 #include "util.h"
+#include <app/chip-zcl-zpro-codec.h>
 
 static const unsigned char local_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f,
                                                    0x11, 0x0e, 0x34, 0x15, 0x81, 0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65,
