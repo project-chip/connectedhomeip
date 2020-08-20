@@ -267,6 +267,11 @@ void SecureSessionMgrBase::HandleDataReceived(MessageHeader & header, const Peer
 
         msg->ConsumeHead(headerSize);
 
+        if (state->GetPeerNodeId() == kUndefinedNodeId && header.GetSourceNodeId().HasValue())
+        {
+            state->SetPeerNodeId(header.GetSourceNodeId().Value());
+        }
+
         if (connection->mCB != nullptr)
         {
             connection->mCB->OnMessageReceived(header, state, msg, connection);

@@ -41,6 +41,8 @@ menu "WiFi Echo Demo"
       help
           Specifies the Rendezvous mode of the peripheral.
 
+      config RENDEZVOUS_MODE_BYPASS
+          bool "Bypass"
       config RENDEZVOUS_MODE_WIFI
           bool "Wi-Fi"
       config RENDEZVOUS_MODE_BLE
@@ -77,6 +79,7 @@ menu "WiFi Echo Demo"
     config RENDEZVOUS_MODE
        int
        range 0 8
+       default 0 if RENDEZVOUS_MODE_BYPASS
        default 1 if RENDEZVOUS_MODE_WIFI
        default 2 if RENDEZVOUS_MODE_BLE
        default 4 if RENDEZVOUS_MODE_THREAD

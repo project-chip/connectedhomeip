@@ -55,16 +55,6 @@ namespace {
 #define EXAMPLE_SERVER_NODEID 0x3546526e
 #endif // EXAMPLE_SERVER_NODEID
 
-const uint8_t local_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f,
-                                      0x11, 0x0e, 0x34, 0x15, 0x81, 0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65,
-                                      0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
-
-const uint8_t remote_public_key[] = { 0x04, 0x30, 0x77, 0x2c, 0xe7, 0xd4, 0x0a, 0xf2, 0xf3, 0x19, 0xbd, 0xfb, 0x1f,
-                                      0xcc, 0x88, 0xd9, 0x83, 0x25, 0x89, 0xf2, 0x09, 0xf3, 0xab, 0xe4, 0x33, 0xb6,
-                                      0x7a, 0xff, 0x73, 0x3b, 0x01, 0x35, 0x34, 0x92, 0x73, 0x14, 0x59, 0x0b, 0xbd,
-                                      0x44, 0x72, 0x1b, 0xcd, 0xb9, 0x02, 0x53, 0xd9, 0xaf, 0xcc, 0x1a, 0xcd, 0xae,
-                                      0xe8, 0x87, 0x2e, 0x52, 0x3b, 0x98, 0xf0, 0xa1, 0x88, 0x4a, 0xe3, 0x03, 0x75 };
-
 class ServerCallback : public SecureSessionMgrCallback
 {
 public:
@@ -97,16 +87,7 @@ public:
 
     virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
     {
-        CHIP_ERROR err;
-
         EFR32_LOG("Received a new connection.");
-
-        err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key,
-                                                                   sizeof(local_private_key));
-        VerifyOrExit(err == CHIP_NO_ERROR, EFR32_LOG("Failed to setup encryption"));
-
-    exit:
-        return;
     }
 
 private:
@@ -154,6 +135,7 @@ private:
 };
 
 static ServerCallback gCallbacks;
+static SecurePairingUsingTestSecret gTestPairing;
 
 } // namespace
 
@@ -167,9 +149,13 @@ void InitDataModelHandler()
 void StartServer(DemoSessionManager * sessions)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
 
     err = sessions->Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::SystemLayer,
                          UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
+    SuccessOrExit(err);
+
+    err = sessions->NewPairing(Optional<NodeId>::Value(kUndefinedNodeId), peer, 0, 0, &gTestPairing)
     SuccessOrExit(err);
 
     sessions->SetDelegate(&gCallbacks);

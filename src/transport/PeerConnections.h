@@ -201,7 +201,7 @@ public:
             }
             if (mStates[i].GetPeerKeyID() == peerKeyId)
             {
-                if (!nodeId.HasValue() || mStates[i].GetPeerNodeId() == nodeId.Value())
+                if (!nodeId.HasValue() || mStates[i].GetPeerNodeId() == kUndefinedNodeId || mStates[i].GetPeerNodeId() == nodeId.Value())
                 {
                     *state = &mStates[i];
                     break;
@@ -233,7 +233,7 @@ public:
             }
             if (mStates[i].GetLocalKeyID() == localKeyId)
             {
-                if (!nodeId.HasValue() || mStates[i].GetPeerNodeId() == nodeId.Value())
+                if (!nodeId.HasValue() || mStates[i].GetPeerNodeId() == kUndefinedNodeId  || mStates[i].GetPeerNodeId() == nodeId.Value())
                 {
                     *state = &mStates[i];
                     break;

@@ -108,6 +108,23 @@ public:
 
     /**
      * @brief
+     *   Connect to a CHIP device at a given address and an optional port. This is a test only API
+     *   that bypasses Rendezvous and Secure Pairing process.
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] deviceAddr            The IPAddress of the requested Device
+     * @param[in] appReqState           Application specific context to be passed back when a message is received or on error
+     * @param[in] onConnected           Callback for when the connection is established
+     * @param[in] onMessageReceived     Callback for when a message is received
+     * @param[in] onError               Callback for when an error occurs
+     * @param[in] devicePort            [Optional] The CHIP Device's port, defaults to CHIP_PORT
+     * @return CHIP_ERROR           The connection status
+     */
+    [[deprecated("Available until Rendezvous is implemented")]] CHIP_ERROR ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState, NewConnectionHandler onConnected,
+                             MessageReceiveHandler onMessageReceived, ErrorHandler onError, uint16_t devicePort = CHIP_PORT);
+
+    /**
+     * @brief
      *   Called when pairing session generates a new message that should be sent to peer.
      *
      * @param msgBuf the new message that should be sent to the peer
@@ -260,6 +277,11 @@ private:
 
     static void BLEConnectionHandler(ChipDeviceController * deviceController, Transport::PeerConnectionState * state,
                                      void * appReqState);
+
+    CHIP_ERROR ConnectDeviceUsingPairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
+                                               NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
+                                               ErrorHandler onError, uint16_t devicePort, uint16_t localKeyId, SecurePairingSession* pairing);
+
 };
 
 } // namespace DeviceController
