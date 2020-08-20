@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "chip-zcl-zpro-codec.h"
+#include <app/chip-zcl-zpro-codec.h>
 #include <assert.h>
 #include <inttypes.h>
 #include <stdio.h>

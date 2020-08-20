@@ -17,7 +17,7 @@
 
 #include "Server.h"
 
-#include "app/chip-zcl-zpro-codec.h"
+#include <app/chip-zcl-zpro-codec.h>
 #include "attribute-storage.h"
 #include "gen/znet-bookkeeping.h"
 #include "util.h"

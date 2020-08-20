@@ -5,7 +5,7 @@
 
 #include <cassert>
 
-#include "app/chip-zcl-zpro-codec.h"
+#include <app/chip-zcl-zpro-codec.h>
 #include "attribute-storage.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"

@@ -22,7 +22,7 @@
 //                            EmberNodeId source,
 //                            InterPanHeader *interPanHeader)
 
-#include "chip-zcl-zpro-codec.h"
+#include <app/chip-zcl-zpro-codec.h>
 #include <stdio.h>
 #include <string.h>
 
