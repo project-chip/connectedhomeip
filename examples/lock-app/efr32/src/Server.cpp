@@ -51,7 +51,7 @@ using namespace ::chip::Transport;
 namespace {
 
 #ifndef EXAMPLE_SERVER_NODEID
-// "nRF5"
+// Use this hardcoded NODEID for the lock app example if none was provided
 #define EXAMPLE_SERVER_NODEID 0x3546526e
 #endif // EXAMPLE_SERVER_NODEID
 
