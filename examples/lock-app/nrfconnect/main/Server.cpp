@@ -18,9 +18,9 @@
 #include "Server.h"
 
 #include "attribute-storage.h"
-#include "util/chip-zcl-zpro-codec.h"
 #include "gen/znet-bookkeeping.h"
 #include "util.h"
+#include "util/chip-zcl-zpro-codec.h"
 
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
