@@ -23,9 +23,9 @@ SOURCE_DIR="$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
 REPO_DIR="$SOURCE_DIR/../../"
 
 function __flask_clean() {
-    flask_pid=$(ps aux | grep "[f]lask" | awk '{print $2}' | sort -k2 -rn)
+    flask_pid=$(ps aux | grep "[f]lask run" | awk '{print $2}' | sort -k2 -rn)
     if [ ! -z "$flask_pid" ]; then
-        for pid in "$flask_pid"; do
+        for pid in $flask_pid; do
             kill -2 "$pid" >/dev/null 2>&1
         done
     fi
@@ -34,7 +34,7 @@ function __flask_clean() {
 function __socat_clean() {
     socat_pid=$(ps aux | grep "[s]ocat" | awk '{print $2}')
     if [ ! -z "$socat_pid" ]; then
-        for pid in "$socat_pid"; do
+        for pid in $socat_pid; do
             kill -2 "$pid" >/dev/null 2>&1
         done
     fi
@@ -43,7 +43,7 @@ function __socat_clean() {
 function __virtual_thread_clean() {
     vthread_pid=$(ps aux | grep "[o]t-ncp-ftd" | awk '{print $2}')
     if [ ! -z "$vthread_pid" ]; then
-        for pid in "$vthread_pid"; do
+        for pid in $vthread_pid; do
             kill -2 "$pid" >/dev/null 2>&1
         done
     fi
@@ -77,10 +77,12 @@ cirquetest_run_test() {
     sleep 5
     cd "$REPO_DIR"/src/test_driver/linux-cirque
     ./do_on-off-cluster-test.sh
+    exit_code=$?
     __cirquetest_clean_flask
     sleep 10
     # Cleanup to run more tests
     yes | docker system prune
+    return $exit_code
 }
 
 subcommand="$1"
