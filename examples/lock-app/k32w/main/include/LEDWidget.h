@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2020 Nest Labs, Inc.
+ *    Copyright (c) 2020 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,28 +16,29 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides an implementation of the BLEManager singleton object
- *          for the K32W platforms.
- */
+#include "LED.h"
 
-/* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#ifndef LED_WIDGET_H
+#define LED_WIDGET_H
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+class LEDWidget
+{
+public:
+    void Init(LED_t gpioNum);
+    void Set(bool state);
+    void Invert(void);
+    void Blink(uint32_t changeRateMS);
+    void Blink(uint32_t onTimeMS, uint32_t offTimeMS);
+    void Animate();
 
-using namespace ::chip;
-using namespace ::chip::Ble;
+private:
+    int64_t mLastChangeTimeUS;
+    uint32_t mBlinkOnTimeMS;
+    uint32_t mBlinkOffTimeMS;
+    LED_t mGPIONum;
+    bool mState;
 
-namespace chip {
-namespace DeviceLayer {
-namespace Internal {
+    void DoSet(bool state);
+};
 
-namespace {
-
-}
-} // namespace Internal
-} // namespace DeviceLayer
-} // namespace chip
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#endif // LED_WIDGET_H

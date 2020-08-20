@@ -966,11 +966,11 @@ AC_DEFINE_UNQUOTED([CONFIG_NETWORK_LAYER_INET],[${CONFIG_NETWORK_LAYER_INET}],[D
 AC_MSG_CHECKING([device layer])
 AC_ARG_WITH(device-layer,
     [AS_HELP_STRING([--with-device-layer=LAYER],
-        [Specify the target environment for the CHIP Device Layer.  Choose one of: auto, darwin, efr32, esp32, nrf5, nrfconnect, linux, or none @<:@default=auto@:>@.])],
+        [Specify the target environment for the CHIP Device Layer.  Choose one of: auto, darwin, efr32, esp32, nrf5, k32w, nrfconnect, linux, or none @<:@default=auto@:>@.])],
     [
         case "${with_device_layer}" in
 
-        auto|darwin|efr32|esp32|nrf5|nrfconnect|linux|none)
+        auto|darwin|efr32|esp32|nrf5|k32w|nrfconnect|linux|none)
             ;;
 
         *)
@@ -987,6 +987,7 @@ CHIP_DEVICE_LAYER_TARGET_DARWIN=0
 CHIP_DEVICE_LAYER_TARGET_EFR32=0
 CHIP_DEVICE_LAYER_TARGET_ESP32=0
 CHIP_DEVICE_LAYER_TARGET_NRF5=0
+CHIP_DEVICE_LAYER_TARGET_K32W=0
 CHIP_DEVICE_LAYER_TARGET_LINUX=0
 CHIP_DEVICE_LAYER_TARGET_NRFCONNECT=0
 
@@ -1035,6 +1036,13 @@ nrf5)
       CFLAGS="${CFLAGS} -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb -mabi=aapcs"
       CXXFLAGS="${CXXFLAGS} -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb -mabi=aapcs"
       ;;
+      
+       
+k32w)
+      CONFIG_DEVICE_LAYER=1
+      CHIP_DEVICE_LAYER_TARGET=K32W
+      CHIP_DEVICE_LAYER_TARGET_K32W=1
+      ;;
 
 nrfconnect)
       CONFIG_DEVICE_LAYER=1
@@ -1076,6 +1084,10 @@ AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_ESP32],[${CHIP_DEVICE_LAYER_TARGET_
 AC_SUBST(CHIP_DEVICE_LAYER_TARGET_NRF5)
 AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_NRF5],    [test "${CHIP_DEVICE_LAYER_TARGET_NRF5}" = 1])
 AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_NRF5],[${CHIP_DEVICE_LAYER_TARGET_NRF5}],[Define to 1 if you want to build the CHIP Device Layer for Nordic nRF5* platforms.])
+
+AC_SUBST(CHIP_DEVICE_LAYER_TARGET_K32W)
+AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_K32W],    [test "${CHIP_DEVICE_LAYER_TARGET_K32W}" = 1])
+AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_K32W],[${CHIP_DEVICE_LAYER_TARGET_K32W}],[Define to 1 if you want to build the CHIP Device Layer for NXP K32W platforms.])
 
 AC_SUBST(CHIP_DEVICE_LAYER_TARGET_NRFCONNECT)
 AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_NRFCONNECT],    [test "${CHIP_DEVICE_LAYER_TARGET_NRFCONNECT}" = 1])

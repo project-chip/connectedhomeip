@@ -1,6 +1,5 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -17,28 +16,43 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides an implementation of the BLEManager singleton object
- *          for the K32W platforms.
- */
+#ifndef APP_EVENT_H
+#define APP_EVENT_H
 
-/* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+struct AppEvent;
+typedef void (*EventHandler)(AppEvent *);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+struct AppEvent
+{
+    enum AppEventTypes
+    {
+        kEventType_Button = 0,
+        kEventType_Timer,
+        kEventType_Lock,
+        kEventType_Install,
+    };
 
-using namespace ::chip;
-using namespace ::chip::Ble;
+    uint16_t Type;
 
-namespace chip {
-namespace DeviceLayer {
-namespace Internal {
+    union
+    {
+        struct
+        {
+            uint8_t PinNo;
+            uint8_t Action;
+        } ButtonEvent;
+        struct
+        {
+            void * Context;
+        } TimerEvent;
+        struct
+        {
+            uint8_t Action;
+            int32_t Actor;
+        } LockEvent;
+    };
 
-namespace {
+    EventHandler Handler;
+};
 
-}
-} // namespace Internal
-} // namespace DeviceLayer
-} // namespace chip
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#endif // APP_EVENT_H
