@@ -55,7 +55,7 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
 
-constexpr NodeId kLocalNodeId = 12344321;
+extern const NodeId kLocalNodeId = 12344321;
 extern LEDWidget statusLED; // In wifi-echo.cpp
 
 namespace {
@@ -200,16 +200,7 @@ public:
 
     void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override
     {
-        CHIP_ERROR err;
-
         ESP_LOGI(TAG, "Received a new connection.");
-
-        err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key,
-                                                                   sizeof(local_private_key));
-        VerifyOrExit(err == CHIP_NO_ERROR, ESP_LOGE(TAG, "Failed to setup encryption"));
-
-    exit:
-        return;
     }
 
 private:
@@ -246,6 +237,12 @@ SecureSessionMgr<Transport::UDP, // IPV6
     sessions;
 
 } // namespace
+
+void PairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId, SecurePairingSession * pairing)
+{
+    Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
+    sessions.NewPairing(peerNodeId, peer, peerKeyId, localKeyId, pairing);
+}
 
 // The echo server assumes the platform's networking has been setup already
 void startServer()

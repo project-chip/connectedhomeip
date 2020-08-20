@@ -35,8 +35,6 @@ namespace chip {
 
 namespace {
 
-const char * kManualKeyExchangeChannelInfo = "Manual Key Exchanged Channel";
-
 constexpr size_t kAESCCMIVLen = 12;
 constexpr size_t kMaxAADLen   = 128;
 
@@ -110,9 +108,8 @@ void SecureSession::Reset(void)
 
 CHIP_ERROR SecureSession::GetIV(const MessageHeader & header, uint8_t * iv, size_t len)
 {
-    CHIP_ERROR err     = CHIP_NO_ERROR;
-    uint64_t nodeID    = 0;
-    uint32_t messageID = 0;
+    CHIP_ERROR err  = CHIP_NO_ERROR;
+    uint64_t nodeID = 0;
 
     BufBound bbuf(iv, len);
 
@@ -123,10 +120,8 @@ CHIP_ERROR SecureSession::GetIV(const MessageHeader & header, uint8_t * iv, size
         nodeID = header.GetSourceNodeId().Value();
     }
 
-    VerifyOrExit(bbuf.Put(&nodeID, sizeof(nodeID)) == sizeof(nodeID), err = CHIP_ERROR_NO_MEMORY);
-
-    messageID = header.GetMessageId();
-    VerifyOrExit(bbuf.Put(&messageID, sizeof(messageID)) == sizeof(nodeID) + sizeof(messageID), err = CHIP_ERROR_NO_MEMORY);
+    bbuf.PutLE64(nodeID);
+    bbuf.PutLE32(header.GetMessageId());
     VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
 
 exit:
@@ -206,20 +201,6 @@ CHIP_ERROR SecureSession::Decrypt(const unsigned char * input, size_t input_leng
                             (const unsigned char *) IV, sizeof(IV), output);
 exit:
     return error;
-}
-
-CHIP_ERROR SecureSession::TemporaryManualKeyExchange(const unsigned char * remote_public_key, const size_t public_key_length,
-                                                     const unsigned char * local_private_key, const size_t private_key_length)
-{
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    size_t info_len = strlen(kManualKeyExchangeChannelInfo);
-
-    err = Init(remote_public_key, public_key_length, local_private_key, private_key_length, NULL, 0,
-               (const unsigned char *) kManualKeyExchangeChannelInfo, info_len);
-    SuccessOrExit(err);
-
-exit:
-    return err;
 }
 
 } // namespace chip

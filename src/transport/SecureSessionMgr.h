@@ -36,6 +36,7 @@
 #include <support/DLLUtil.h>
 #include <transport/Base.h>
 #include <transport/PeerConnections.h>
+#include <transport/SecurePairingSession.h>
 #include <transport/SecureSession.h>
 #include <transport/Tuple.h>
 
@@ -92,13 +93,6 @@ class DLL_EXPORT SecureSessionMgrBase : public ReferenceCounted<SecureSessionMgr
 {
 public:
     /**
-     * Establishes a connection to the given peer node.
-     *
-     * A connection needs to be established before SendMessage can be called.
-     */
-    CHIP_ERROR Connect(NodeId peerNodeId, const Transport::PeerAddress & peerAddress);
-
-    /**
      * @brief
      *   Send a message to a currently connected peer
      *
@@ -126,6 +120,18 @@ public:
         }
         mCB = cb->Retain();
     }
+
+    /**
+     * @brief
+     *   Establish a new pairing with a peer node
+     *
+     * @details
+     *   This method sets up a new pairing with the peer node. It also
+     *   establishes the security keys for secure communication with the
+     *   peer node.
+     */
+    CHIP_ERROR NewPairing(Optional<NodeId> peerNodeId, const Optional<Transport::PeerAddress> & peerAddr, uint16_t peerKeyId,
+                          uint16_t localKeyId, SecurePairingSession * pairing);
 
 protected:
     /**

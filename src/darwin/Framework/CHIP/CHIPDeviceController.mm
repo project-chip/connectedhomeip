@@ -115,13 +115,6 @@ static void onConnected(
     [controller _dispatchAsyncConnectBlock];
 }
 
-static void doKeyExchange(
-    chip::DeviceController::ChipDeviceController * cppController, chip::Transport::PeerConnectionState * state, void * appReqState)
-{
-    CHIPDeviceController * controller = (__bridge CHIPDeviceController *) appReqState;
-    [controller _manualKeyExchange:state];
-}
-
 static void onMessageReceived(
     chip::DeviceController::ChipDeviceController * deviceController, void * appReqState, chip::System::PacketBuffer * buffer)
 {
@@ -188,22 +181,6 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     }
 }
 
-- (void)_manualKeyExchange:(chip::Transport::PeerConnectionState *)state
-{
-    [self.lock lock];
-    const unsigned char * local_key_bytes = (const unsigned char *) [self.localKey bytes];
-    const unsigned char * peer_key_bytes = (const unsigned char *) [self.peerKey bytes];
-
-    CHIP_ERROR err
-        = self.cppController->ManualKeyExchange(state, peer_key_bytes, self.peerKey.length, local_key_bytes, self.localKey.length);
-    [self.lock unlock];
-
-    if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Failed to exchange keys");
-        [self _dispatchAsyncErrorBlock:[CHIPError errorForCHIPErrorCode:err]];
-    }
-}
-
 - (BOOL)connect:(NSString *)ipAddress
       local_key:(NSData *)local_key
        peer_key:(NSData *)peer_key
@@ -219,7 +196,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     chip::Inet::IPAddress addr;
     chip::Inet::IPAddress::FromString([ipAddress UTF8String], addr);
     err = self.cppController->ConnectDevice(
-        kRemoteDeviceId, addr, (__bridge void *) self, doKeyExchange, onMessageReceived, onInternalError, CHIP_PORT);
+        kRemoteDeviceId, addr, (__bridge void *) self, nil, onMessageReceived, onInternalError, CHIP_PORT);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {

@@ -53,6 +53,9 @@ namespace DeviceController {
 
 using namespace chip::Encoding;
 
+static constexpr uint32_t kSpake2p_Iteration_Count = 50000;
+static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Exchange Salt";
+
 ChipDeviceController::ChipDeviceController()
 {
     mState           = kState_NotInitialized;
@@ -146,6 +149,72 @@ exit:
     return err;
 }
 
+CHIP_ERROR ChipDeviceController::OnNewMessageForPeer(System::PacketBuffer * msgBuf)
+{
+    return SendMessage(mAppReqState, msgBuf);
+}
+
+void ChipDeviceController::OnPairingError(CHIP_ERROR error)
+{
+    ChipLogError(Controller, "Failed to pair with accessory. Error %d", error);
+    mPairingInProgress = false;
+
+    if (mOnError != nullptr)
+    {
+        mOnError(this, mAppReqState, error, nullptr);
+    }
+}
+
+void ChipDeviceController::OnPairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId)
+{
+    ChipLogProgress(Controller, "Successfully paired with accessory. Key Id %d", peerKeyId);
+    mPairingInProgress = false;
+
+    if (mPairingComplete != nullptr)
+    {
+        mPeerKeyId        = peerKeyId;
+        mLocalPairedKeyId = localKeyId;
+        ChipLogProgress(Controller, "Calling mPairingComplete");
+        mPairingComplete(this, nullptr, mAppReqState);
+    }
+}
+
+void ChipDeviceController::PairingMessageHandler(ChipDeviceController * controller, void * appReqState,
+                                                 System::PacketBuffer * payload)
+{
+    if (controller->mPairingInProgress)
+    {
+        MessageHeader header;
+        size_t headerSize = 0;
+        CHIP_ERROR err    = header.Decode(payload->Start(), payload->DataLength(), &headerSize);
+        SuccessOrExit(err);
+
+        payload->ConsumeHead(headerSize);
+        controller->mPairingSession.HandlePeerMessage(header, payload);
+    }
+    else if (controller->mAppMsgHandler != nullptr)
+    {
+        controller->mAppMsgHandler(controller, appReqState, payload);
+    }
+
+exit:
+    return;
+}
+
+void ChipDeviceController::BLEConnectionHandler(ChipDeviceController * controller, Transport::PeerConnectionState * state,
+                                                void * appReqState)
+{
+    ChipLogProgress(Controller, "Starting pairing session");
+    controller->mPairingInProgress = true;
+    CHIP_ERROR err                 = controller->mPairingSession.Pair(
+        controller->mSetupPINCode, kSpake2p_Iteration_Count, (const unsigned char *) kSpake2pKeyExchangeSalt,
+        strlen(kSpake2pKeyExchangeSalt), Optional<NodeId>::Value(controller->mLocalDeviceId), controller->mNextKeyId++, controller);
+    SuccessOrExit(err);
+
+exit:
+    return;
+}
+
 CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const uint16_t discriminator, const uint32_t setupPINCode,
                                                void * appReqState, NewConnectionHandler onConnected,
                                                MessageReceiveHandler onMessageReceived, ErrorHandler onError)
@@ -155,11 +224,22 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const uint
 #if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
     Transport::BLE * transport;
 
+    ChipLogProgress(Controller, "Received new pairing request");
+    ChipLogProgress(Controller, "mState %d. mConState %d", mState, mConState);
     VerifyOrExit(mState == kState_Initialized && mConState == kConnectionState_NotConnected, err = CHIP_ERROR_INCORRECT_STATE);
+
+    if (mPairingInProgress)
+    {
+        ChipLogError(Controller, "Pairing was already is progress. This will restart pairing.");
+    }
 
     mRemoteDeviceId  = Optional<NodeId>::Value(remoteDeviceId);
     mAppReqState     = appReqState;
-    mOnNewConnection = onConnected;
+    mPairingComplete = onConnected;
+    mOnNewConnection = BLEConnectionHandler;
+    mAppMsgHandler   = onMessageReceived;
+
+    mSetupPINCode = setupPINCode;
 
     transport = new Transport::BLE();
     err       = transport->Init(Transport::BleConnectionParameters(this, DeviceLayer::ConnectivityMgr().GetBleLayer())
@@ -172,7 +252,7 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const uint
     // connected state before 'OnConnect'
     mConState = kConnectionState_Connected;
 
-    mOnComplete.Response = onMessageReceived;
+    mOnComplete.Response = PairingMessageHandler;
     mOnError             = onError;
 
     if (err != CHIP_NO_ERROR)
@@ -214,14 +294,15 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress 
 
     mSessionManager->SetDelegate(this);
 
-    // connected state before 'OnConnect' so that key exchange is accepted
-    mConState = kConnectionState_Connected;
-
-    err = mSessionManager->Connect(remoteDeviceId, Transport::PeerAddress::UDP(deviceAddr, devicePort));
-    SuccessOrExit(err);
+    mConState = kConnectionState_SecureConnected;
 
     mOnComplete.Response = onMessageReceived;
     mOnError             = onError;
+
+    err = mSessionManager->NewPairing(mRemoteDeviceId,
+                                      Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(deviceAddr, devicePort)),
+                                      mPeerKeyId, mLocalPairedKeyId, &mPairingSession);
+    SuccessOrExit(err);
 
     mMessageNumber = 1;
 
@@ -236,26 +317,6 @@ exit:
         }
         mConState = kConnectionState_NotConnected;
     }
-    return err;
-}
-
-CHIP_ERROR ChipDeviceController::ManualKeyExchange(Transport::PeerConnectionState * state, const unsigned char * remote_public_key,
-                                                   const size_t public_key_length, const unsigned char * local_private_key,
-                                                   const size_t private_key_length)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    if (!IsConnected() || mSessionManager == NULL)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, public_key_length, local_private_key,
-                                                               private_key_length);
-    SuccessOrExit(err);
-    mConState = kConnectionState_SecureConnected;
-
-exit:
     return err;
 }
 
@@ -376,10 +437,7 @@ void ChipDeviceController::ClearRequestState()
     }
 }
 
-void ChipDeviceController::OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
-{
-    mOnNewConnection(this, state, mAppReqState);
-}
+void ChipDeviceController::OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
 
 void ChipDeviceController::OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
                                              System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr)

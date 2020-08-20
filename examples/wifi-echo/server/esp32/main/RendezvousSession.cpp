@@ -29,11 +29,55 @@ BluetoothWidget * RendezvousSession::mVirtualLed;
 
 Ble::BLEEndPoint * RendezvousSession::mEndPoint = nullptr;
 
-RendezvousSession::RendezvousSession(BluetoothWidget * virtualLed)
+bool RendezvousSession::mPairingInProgress = false;
+SecurePairingSession RendezvousSession::mPairing;
+
+static constexpr uint32_t kSpake2p_Iteration_Count = 50000;
+static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Exchange Salt";
+
+extern void PairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId, SecurePairingSession * pairing);
+
+RendezvousSession::RendezvousSession(BluetoothWidget * virtualLed, uint32_t setUpPINCode, NodeId myNodeId)
 {
     mVirtualLed = virtualLed;
 
     DeviceLayer::ConnectivityMgr().AddCHIPoBLEConnectionHandler(HandleConnectionOpened);
+
+    RendezvousSession::mPairing.WaitForPairing(setUpPINCode, kSpake2p_Iteration_Count,
+                                               (const unsigned char *) kSpake2pKeyExchangeSalt, strlen(kSpake2pKeyExchangeSalt),
+                                               Optional<NodeId>::Value(myNodeId), 0, this);
+    RendezvousSession::mPairingInProgress = true;
+    mSetUpPINCode                         = setUpPINCode;
+    mNodeId                               = myNodeId;
+}
+
+CHIP_ERROR RendezvousSession::OnNewMessageForPeer(System::PacketBuffer * buffer)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(mEndPoint, err = CHIP_ERROR_INCORRECT_STATE);
+    err = mEndPoint->Send(buffer);
+
+exit:
+    return err;
+}
+
+void RendezvousSession::OnPairingError(CHIP_ERROR error)
+{
+    ChipLogError(Ble, "RendezvousSession: failed in pairing");
+    mPaired = false;
+    RendezvousSession::mPairing.WaitForPairing(mSetUpPINCode, kSpake2p_Iteration_Count,
+                                               (const unsigned char *) kSpake2pKeyExchangeSalt, strlen(kSpake2pKeyExchangeSalt),
+                                               Optional<NodeId>::Value(mNodeId), 0, this);
+    RendezvousSession::mPairingInProgress = true;
+}
+
+void RendezvousSession::OnPairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId)
+{
+    ChipLogProgress(Ble, "RendezvousSession: pairing complete");
+    mPaired                               = true;
+    RendezvousSession::mPairingInProgress = false;
+    PairingComplete(peerNodeId, peerKeyId, localKeyId, &RendezvousSession::mPairing);
 }
 
 CHIP_ERROR RendezvousSession::Send(const char * msg)
@@ -74,32 +118,49 @@ void RendezvousSession::HandleConnectionClosed(Ble::BLEEndPoint * endPoint, BLE_
 
 void RendezvousSession::HandleMessageReceived(Ble::BLEEndPoint * endPoint, PacketBuffer * buffer)
 {
-    const size_t bufferLen = buffer->DataLength();
-    char msg[bufferLen];
-    msg[bufferLen] = 0;
-    memcpy(msg, buffer->Start(), bufferLen);
-
-    ChipLogProgress(Ble, "RendezvousSession: Receive message: %s", msg);
-
-    if ((bufferLen > 3) && (msg[0] == msg[1]) && (msg[0] == msg[bufferLen - 1]))
+    if (RendezvousSession::mPairingInProgress)
     {
-        // WiFi credentials, of the form ‘::SSID:password:’, where ‘:’ can be any single ASCII character.
-        msg[1]      = 0;
-        char * ssid = strtok(&msg[2], msg);
-        char * key  = strtok(NULL, msg);
-        if (ssid && key)
-        {
-            ChipLogProgress(Ble, "RendezvousSession: SSID: %s, key: %s", ssid, key);
-            SetWiFiStationProvisioning(ssid, key);
-        }
-        else
-        {
-            ChipLogError(Ble, "RendezvousSession: SSID: %p, key: %p", ssid, key);
-        }
+        MessageHeader header;
+        size_t headerSize = 0;
+
+        CHIP_ERROR err = header.Decode(buffer->Start(), buffer->DataLength(), &headerSize);
+        SuccessOrExit(err);
+
+        buffer->ConsumeHead(headerSize);
+        RendezvousSession::mPairing.HandlePeerMessage(header, buffer);
     }
     else
     {
-        // Echo.
-        mEndPoint->Send(buffer);
+        const size_t bufferLen = buffer->DataLength();
+        char msg[bufferLen];
+        msg[bufferLen] = 0;
+        memcpy(msg, buffer->Start(), bufferLen);
+
+        ChipLogProgress(Ble, "RendezvousSession: Receive message: %s", msg);
+
+        if ((bufferLen > 3) && (msg[0] == msg[1]) && (msg[0] == msg[bufferLen - 1]))
+        {
+            // WiFi credentials, of the form ‘::SSID:password:’, where ‘:’ can be any single ASCII character.
+            msg[1]      = 0;
+            char * ssid = strtok(&msg[2], msg);
+            char * key  = strtok(NULL, msg);
+            if (ssid && key)
+            {
+                ChipLogProgress(Ble, "RendezvousSession: SSID: %s, key: %s", ssid, key);
+                SetWiFiStationProvisioning(ssid, key);
+            }
+            else
+            {
+                ChipLogError(Ble, "RendezvousSession: SSID: %p, key: %p", ssid, key);
+            }
+        }
+        else
+        {
+            // Echo.
+            mEndPoint->Send(buffer);
+        }
     }
+
+exit:
+    return;
 }

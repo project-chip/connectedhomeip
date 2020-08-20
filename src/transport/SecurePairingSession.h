@@ -64,8 +64,9 @@ public:
      *
      * @param peerNodeId  Node ID of peer
      * @param peerKeyId   Encrytion key ID assigned by the peer node for this connection
+     * @param localKeyId  Encrytion key ID assigned by the local node for this connection
      */
-    virtual void OnPairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId) {}
+    virtual void OnPairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId) {}
 
     virtual ~SecurePairingSessionDelegate() {}
 };
@@ -79,7 +80,7 @@ public:
     SecurePairingSession & operator=(const SecurePairingSession &) = delete;
     SecurePairingSession & operator=(SecurePairingSession &&) = default;
 
-    ~SecurePairingSession(void);
+    virtual ~SecurePairingSession(void);
 
     /**
      * @brief
