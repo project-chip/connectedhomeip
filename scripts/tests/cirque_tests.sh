@@ -51,7 +51,7 @@ function __virtual_thread_clean() {
 
 __cirquetest_start_flask() {
     cd "$REPO_DIR"/third_party/cirque
-    FLASK_APP='cirque/restservice/service.py' \
+    sudo FLASK_APP='cirque/restservice/service.py' \
         PATH="$PATH":"$REPO_DIR"/third_party/cirque/openthread/output/x86_64-unknown-linux-gnu/bin/ \
         python3 -m flask run
 }
