@@ -24,7 +24,8 @@ declare_args() {
   treat_warnings_as_errors = true
 }
 
-_is_embedded_arm = current_os != "ios" && current_os != "mac_os" && (current_cpu == "arm" || current_cpu == "arm64")
+_is_embedded_arm = current_os != "ios" && current_os != "mac_os" &&
+                   (current_cpu == "arm" || current_cpu == "arm64")
 
 if (_is_embedded_arm) {
   import("//build/config/arm.gni")
@@ -78,9 +79,17 @@ config("abi_default") {
     }
 
     if (current_cpu == "x86_64") {
-      cflags += [ "-msse4.2", "-mpopcnt", "-m64" ]
+      cflags += [
+        "-msse4.2",
+        "-mpopcnt",
+        "-m64",
+      ]
     } else if (current_cpu == "x86") {
-      cflags += [ "-mssse3", "-mfpmath=sse", "-m32" ]
+      cflags += [
+        "-mssse3",
+        "-mfpmath=sse",
+        "-m32",
+      ]
     }
   }
   ldflags = cflags
