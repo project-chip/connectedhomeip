@@ -34,7 +34,6 @@ executable("chip-standalone-demo") {
 
 executable("chip-standalone-server") {
   sources = [
-    "server.cpp",
     "${chip_root}/src/app/clusters/on-off-server/on-off.c",
     "${chip_root}/src/app/util/attribute-size.c",
     "${chip_root}/src/app/util/attribute-storage.c",
@@ -49,6 +48,7 @@ executable("chip-standalone-server") {
     "gen/call-command-handler.c",
     "gen/callback-stub.c",
     "gen/znet-bookkeeping.c",
+    "server.cpp",
   ]
 
   include_dirs = [
