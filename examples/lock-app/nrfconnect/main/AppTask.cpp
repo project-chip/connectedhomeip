@@ -314,6 +314,10 @@ void AppTask::JoinerHandler(AppEvent * aEvent)
 
     CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    error = ThreadStackMgr().JoinerStart();
+#endif
+
     LOG_INF("Thread joiner triggering result: %s", chip::ErrorStr(error));
 }
 
