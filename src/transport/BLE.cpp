@@ -24,6 +24,8 @@
 
 #include <transport/BLE.h>
 
+#if CONFIG_NETWORK_LAYER_BLE
+
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/MessageHeader.h>
@@ -193,3 +195,5 @@ void BLE::OnBleEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)
 
 } // namespace Transport
 } // namespace chip
+
+#endif // CONFIG_NETWORK_LAYER_BLE
