@@ -154,7 +154,6 @@ static_library("core") {
   ]
 
   public_deps = [
-    chip_platform_target,
     ":chip_config_header",
     "${chip_root}/src/ble",
     "${chip_root}/src/inet",
@@ -162,6 +161,7 @@ static_library("core") {
     "${chip_root}/src/platform",
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
+    chip_platform_target,
   ]
 
   allow_circular_includes_from = [

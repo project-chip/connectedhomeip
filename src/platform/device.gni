@@ -97,6 +97,7 @@ if (chip_device_platform == "external") {
       get_label_info(_chip_device_layer, "label_no_toolchain")
 }
 
-assert(chip_device_platform == "darwin" || chip_device_platform == "nrf5" || chip_device_platform == "efr32" || chip_device_platform == "linux" ||
+assert(chip_device_platform == "darwin" || chip_device_platform == "nrf5" ||
+           chip_device_platform == "efr32" || chip_device_platform == "linux" ||
            chip_device_platform == "external" || chip_device_platform == "none",
        "Please select a valid value for chip_device_platform")
