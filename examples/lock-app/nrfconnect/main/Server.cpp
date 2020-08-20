@@ -20,7 +20,7 @@
 #include "attribute-storage.h"
 #include "gen/znet-bookkeeping.h"
 #include "util.h"
-#include "util/chip-zcl-zpro-codec.h"
+#include "app/chip-zcl-zpro-codec.h"
 
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>

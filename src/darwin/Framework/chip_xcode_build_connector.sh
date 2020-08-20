@@ -35,7 +35,6 @@ set -x
 # these should be set by the Xcode project
 CHIP_ROOT=${CHIP_ROOT:-"$SRCROOT/../../.."}
 CHIP_ROOT=$(cd "$CHIP_ROOT" && pwd)
-CHIP_PREFIX=${CHIP_PREFIX:-"$BUILT_PRODUCTS_DIR"}
 
 [[ -d ${CHIP_ROOT} ]] || die Please set CHIP_ROOT to the location of the CHIP directory
 
@@ -103,15 +102,13 @@ fi
 }
 
 (
-    cd "$TEMP_DIR"
-
     # activate.sh isn't 'set -e' safe
-    pushd "$CHIP_ROOT" # pushd and popd because we need the env vars from activate
+    cd "$CHIP_ROOT" # pushd and popd because we need the env vars from activate
     set +ex
     PW_ENVSETUP_QUIET=1 . scripts/activate.sh
     set -ex
-    popd
 
+    cd "$TEMP_DIR"
     # [[ -f out/build.ninja ]] ?
     gn --root="$CHIP_ROOT" gen --check out --args="${args[*]}"
     ninja -v -C out

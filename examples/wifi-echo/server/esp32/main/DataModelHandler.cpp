@@ -32,7 +32,7 @@
 #include "gen/cluster-id.h"
 #include "gen/znet-bookkeeping.h"
 #include "util.h"
-#include "util/chip-zcl-zpro-codec.h"
+#include "app/chip-zcl-zpro-codec.h"
 
 using namespace ::chip;
 

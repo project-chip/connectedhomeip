@@ -48,4 +48,8 @@ libCHIPDataModel_a_SOURCES            = \
     $(CHIP_BUILD_DATA_MODEL_SOURCE_FILES) \
     $(NULL)
 
+libCHIPDataModel_adir                = $(includedir)/app
+
+libCHIPDataModel_a_HEADERS           = chip-zcl-zpro-codec.h
+
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

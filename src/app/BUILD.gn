@@ -27,8 +27,8 @@ static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
-    "util/decoder.c",
-    "util/encoder.c",
+    "decoder.c",
+    "encoder.c",
   ]
 
   public_deps = [
@@ -41,7 +41,7 @@ static_library("app") {
 }
 
 copy("codec_headers") {
-  sources = [ "util/chip-zcl-zpro-codec.h" ]
+  sources = [ "chip-zcl-zpro-codec.h" ]
 
-  outputs = [ "${target_gen_dir}/include/util/{{source_file_part}}" ]
+  outputs = [ "${target_gen_dir}/include/app/{{source_file_part}}" ]
 }

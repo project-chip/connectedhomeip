@@ -461,7 +461,6 @@
 					"$(CHIP_ROOT)/src",
 					"$(CHIP_ROOT)/src/include",
 					"$(CHIP_ROOT)/src/lib",
-					"$(CHIP_ROOT)/src/app",
 					"$(CHIP_ROOT)/config/standalone",
 					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
 				);
