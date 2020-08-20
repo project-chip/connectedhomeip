@@ -34,7 +34,7 @@ function __flask_clean() {
 function __socat_clean() {
     socat_pid=$(ps aux | grep "[s]ocat" | awk '{print $2}')
     if [ ! -z "$socat_pid" ]; then
-        for pid in $socat_pid; do
+        for pid in "$socat_pid"; do
             kill -2 "$pid"
         done
     fi
@@ -43,7 +43,7 @@ function __socat_clean() {
 function __virtual_thread_clean() {
     vthread_pid=$(ps aux | grep "[o]t-ncp-ftd" | awk '{print $2}')
     if [ ! -z "$vthread_pid" ]; then
-        for pid in $vthread_pid; do
+        for pid in "$vthread_pid"; do
             kill -2 "$pid"
         done
     fi
