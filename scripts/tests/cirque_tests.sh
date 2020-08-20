@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-set -x -e
+set -x
 
 SOURCE="${BASH_SOURCE[0]}"
 SOURCE_DIR="$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
@@ -63,6 +63,7 @@ __cirquetest_clean_flask() {
 }
 
 cirquetest_bootstrap() {
+    set -e
     cd "$REPO_DIR"/third_party/cirque
     sudo apt-get install -y bazel socat psmisc tigervnc-standalone-server tigervnc-viewer python3-pip python3-venv python3-setuptools libdbus-glib-1-dev libgirepository1.0-dev
     pip3 install pycodestyle==2.5.0 wheel
@@ -82,7 +83,7 @@ cirquetest_run_test() {
     sleep 10
     # Cleanup to run more tests
     yes | docker system prune
-    return $exit_code
+    return "$exit_code"
 }
 
 subcommand="$1"
