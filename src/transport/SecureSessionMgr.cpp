@@ -267,6 +267,11 @@ void SecureSessionMgrBase::HandleDataReceived(MessageHeader & header, const Peer
 
         msg->ConsumeHead(headerSize);
 
+        if (state->GetPeerNodeId() == kUndefinedNodeId && header.GetSourceNodeId().HasValue())
+        {
+            state->SetPeerNodeId(header.GetSourceNodeId().Value());
+        }
+
         if (connection->mCB != nullptr)
         {
             connection->mCB->OnMessageReceived(header, state, msg, connection);
@@ -302,7 +307,9 @@ void SecureSessionMgrBase::HandleConnectionExpired(const Transport::PeerConnecti
 void SecureSessionMgrBase::ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error)
 {
     SecureSessionMgrBase * mgr = reinterpret_cast<SecureSessionMgrBase *>(param);
+#if CHIP_CONFIG_SESSION_REKEYING
     mgr->mPeerConnections.ExpireInactiveConnections(CHIP_PEER_CONNECTION_TIMEOUT_MS);
+#endif
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
 }
 

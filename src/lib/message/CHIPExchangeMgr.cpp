@@ -654,7 +654,7 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
     SuccessOrExit(err);
 
     // Check if the version is supported
-    if ((msgInfo->MessageVersion != kChipMessageVersion_V1) && (msgInfo->MessageVersion != kChipMessageVersion_V2))
+    if (msgInfo->MessageVersion != kChipMessageVersion_V1)
     {
         ExitNow(err = CHIP_ERROR_UNSUPPORTED_MESSAGE_VERSION);
     }

@@ -76,6 +76,7 @@ chip_configure(ChipConfig
     ARCH arm-none-eabi
     CFLAGS ${CHIP_COMMON_FLAGS} --specs=nosys.specs
     CXXFLAGS ${CHIP_COMMON_FLAGS}
+    PROJECT_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/main/include/CHIPProjectConfig.h
 )
 
 chip_build(ChipLib ChipConfig

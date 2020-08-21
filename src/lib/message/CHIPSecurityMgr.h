@@ -28,10 +28,6 @@
 #define CHIPSECURITYMANAGER_H_
 
 #include <Profiles/common/CHIPMessage.h>
-#include <Profiles/security/CHIPCASE.h>
-#include <Profiles/security/CHIPKeyExport.h>
-#include <Profiles/security/CHIPPASE.h>
-#include <Profiles/security/CHIPTAKE.h>
 #include <Profiles/status-report/StatusReportProfile.h>
 #include <core/CHIPError.h>
 #include <message/CHIPExchangeMgr.h>
@@ -80,14 +76,6 @@ extern void OnTimeConsumingCryptoDone(void);
 } // namespace Security
 } // namespace Platform
 
-using chip::Profiles::Security::CASE::ChipCASEAuthDelegate;
-using chip::Profiles::Security::CASE::ChipCASEEngine;
-using chip::Profiles::Security::KeyExport::ChipKeyExport;
-using chip::Profiles::Security::KeyExport::ChipKeyExportDelegate;
-using chip::Profiles::Security::PASE::ChipPASEEngine;
-using chip::Profiles::Security::TAKE::ChipTAKEChallengerAuthDelegate;
-using chip::Profiles::Security::TAKE::ChipTAKEEngine;
-using chip::Profiles::Security::TAKE::ChipTAKETokenAuthDelegate;
 using chip::Profiles::StatusReporting::StatusReport;
 
 class DLL_EXPORT ChipSecurityManager
@@ -106,23 +94,6 @@ public:
     ChipFabricState * FabricState;         // [READ ONLY] Associated Fabric State object.
     ChipExchangeManager * ExchangeManager; // [READ ONLY] Associated Exchange Manager object.
     uint8_t State;                         // [READ ONLY] State of the CHIP Message Layer object
-#if CHIP_CONFIG_ENABLE_CASE_INITIATOR
-    uint32_t InitiatorCASEConfig;        // CASE configuration proposed when initiating a CASE session
-    uint32_t InitiatorCASECurveId;       // ECDH curve proposed when initiating a CASE session
-    uint8_t InitiatorAllowedCASEConfigs; // Set of allowed CASE configurations when initiating a CASE session
-    uint8_t InitiatorAllowedCASECurves;  // Set of allowed ECDH curves when initiating a CASE session
-#endif
-#if CHIP_CONFIG_ENABLE_CASE_RESPONDER
-    uint8_t ResponderAllowedCASEConfigs; // Set of allowed CASE configurations when responding to CASE session
-    uint8_t ResponderAllowedCASECurves;  // Set of allowed ECDH curves when responding to CASE session
-#endif
-#if CHIP_CONFIG_ENABLE_KEY_EXPORT_INITIATOR
-    uint8_t InitiatorKeyExportConfig;         // Key export configuration proposed when initiating key export request
-    uint8_t InitiatorAllowedKeyExportConfigs; // Set of allowed configurations when initiating key export request
-#endif
-#if CHIP_CONFIG_ENABLE_KEY_EXPORT_RESPONDER
-    uint8_t ResponderAllowedKeyExportConfigs; // Set of allowed configurations when responding to key export request
-#endif
 #if CHIP_CONFIG_SECURITY_TEST_MODE
     bool CASEUseKnownECDHKey; // Enable the use of a known ECDH key pair in CASE to allow man-in-the-middle
                               // key recovery for testing purposes.
@@ -134,10 +105,6 @@ public:
 
     CHIP_ERROR Init(ChipExchangeManager & aExchangeMgr, System::Layer & aSystemLayer);
     CHIP_ERROR Shutdown(void);
-
-#if CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-    CHIP_ERROR Init(ChipExchangeManager * aExchangeMgr, InetLayer * aInetLayer);
-#endif // CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
     typedef void (*SessionEstablishedFunct)(ChipSecurityManager * sm, ChipConnection * con, void * reqState, uint16_t sessionKeyId,
                                             uint64_t peerNodeId, uint8_t encType);
@@ -157,58 +124,6 @@ public:
     typedef void (*KeyErrorMsgRcvdFunct)(uint16_t keyId, uint8_t encType, uint32_t messageId, uint64_t peerNodeId,
                                          CHIP_ERROR keyErr);
 
-    /**
-     * Type of key export protocol complete handling function.
-     *
-     * @param[in] sm             A pointer to ChipSecurityManager object.
-     * @param[in] con            A pointer to ChipConnection object.
-     * @param[in] reqState       A pointer to the key export requester state.
-     * @param[in] keyId          Exported key ID.
-     * @param[in] exportedKey    A pointer to the exported secret key.
-     * @param[in] exportedKeyLen A reference to the exported secret key length.
-     *
-     */
-    typedef void (*KeyExportCompleteFunct)(ChipSecurityManager * sm, ChipConnection * con, void * reqState, uint32_t exportedKeyId,
-                                           const uint8_t * exportedKey, uint16_t exportedKeyLen);
-
-    /**
-     * Type of key export protocol error handling function.
-     *
-     * @param[in] sm             A pointer to ChipSecurityManager object.
-     * @param[in] con            A pointer to ChipConnection object.
-     * @param[in] reqState       A pointer to the key export requester state.
-     * @param[in] localErr       The CHIP_ERROR encountered during key export protocol.
-     * @param[in] statusReport   A pointer to StatusReport object if error status received from peer.
-     *
-     */
-    typedef void (*KeyExportErrorFunct)(ChipSecurityManager * sm, ChipConnection * con, void * reqState, CHIP_ERROR localErr,
-                                        StatusReport * statusReport);
-
-    // Initiate a secure PASE session, optionally providing a password.
-    // Session establishment is done over connection that was specified.
-    CHIP_ERROR StartPASESession(ChipConnection * con, ChipAuthMode requestedAuthMode, void * reqState,
-                                SessionEstablishedFunct onComplete, SessionErrorFunct onError, const uint8_t * pw = NULL,
-                                uint16_t pwLen = 0);
-
-    // Initiate a secure CASE session, optionally providing a CASE auth delegate.
-    // Session establishment is done over specified connection or over UDP using RMP Protocol.
-    CHIP_ERROR StartCASESession(ChipConnection * con, uint64_t peerNodeId, const IPAddress & peerAddr, uint16_t peerPort,
-                                ChipAuthMode requestedAuthMode, void * reqState, SessionEstablishedFunct onComplete,
-                                SessionErrorFunct onError, ChipCASEAuthDelegate * authDelegate = NULL,
-                                uint64_t terminatingNodeId = kNodeIdNotSpecified);
-
-    // Initiate a secure TAKE session, optionally providing a TAKE auth delegate.
-    // Session establishment is done over connection that was specified.
-    CHIP_ERROR StartTAKESession(ChipConnection * con, ChipAuthMode requestedAuthMode, void * reqState,
-                                SessionEstablishedFunct onComplete, SessionErrorFunct onError, bool encryptAuthPhase,
-                                bool encryptCommPhase, bool timeLimitedIK, bool sendChallengerId,
-                                ChipTAKEChallengerAuthDelegate * authDelegate = NULL);
-
-    // Initiate key export protocol.
-    CHIP_ERROR StartKeyExport(ChipConnection * con, uint64_t peerNodeId, const IPAddress & peerAddr, uint16_t peerPort,
-                              uint32_t keyId, bool signMessage, void * reqState, KeyExportCompleteFunct onComplete,
-                              KeyExportErrorFunct onError, ChipKeyExportDelegate * keyExportDelegate = NULL);
-
     // General callback functions. These will be called when a secure session is established or fails.
     SessionEstablishedFunct OnSessionEstablished;
     SessionErrorFunct OnSessionError;
@@ -218,34 +133,6 @@ public:
      * a key error message is received.
      */
     KeyErrorMsgRcvdFunct OnKeyErrorMsgRcvd;
-
-    void SetCASEAuthDelegate(ChipCASEAuthDelegate * delegate)
-    {
-#if CHIP_CONFIG_ENABLE_CASE_INITIATOR || CHIP_CONFIG_ENABLE_CASE_RESPONDER
-        mDefaultAuthDelegate = delegate;
-#endif
-    }
-
-    void SetTAKEAuthDelegate(ChipTAKEChallengerAuthDelegate * delegate)
-    {
-#if CHIP_CONFIG_ENABLE_TAKE_INITIATOR
-        mDefaultTAKEChallengerAuthDelegate = delegate;
-#endif
-    }
-
-    void SetTAKETokenAuthDelegate(ChipTAKETokenAuthDelegate * delegate)
-    {
-#if CHIP_CONFIG_ENABLE_TAKE_RESPONDER
-        mDefaultTAKETokenAuthDelegate = delegate;
-#endif
-    }
-
-    void SetKeyExportDelegate(ChipKeyExportDelegate * delegate)
-    {
-#if CHIP_CONFIG_ENABLE_KEY_EXPORT_INITIATOR || CHIP_CONFIG_ENABLE_KEY_EXPORT_RESPONDER
-        mDefaultKeyExportDelegate = delegate;
-#endif
-    }
 
     // Determine whether CHIP error code is a key error.
     bool IsKeyError(CHIP_ERROR err);
@@ -282,62 +169,17 @@ private:
     ChipConnection * mCon;
     union
     {
-#if CHIP_CONFIG_ENABLE_PASE_INITIATOR || CHIP_CONFIG_ENABLE_PASE_RESPONDER
-        ChipPASEEngine * mPASEEngine;
-#endif
-#if CHIP_CONFIG_ENABLE_CASE_INITIATOR || CHIP_CONFIG_ENABLE_CASE_RESPONDER
-        ChipCASEEngine * mCASEEngine;
-#endif
-#if CHIP_CONFIG_ENABLE_TAKE_INITIATOR || CHIP_CONFIG_ENABLE_TAKE_RESPONDER
-        ChipTAKEEngine * mTAKEEngine;
-#endif
-#if CHIP_CONFIG_ENABLE_KEY_EXPORT_INITIATOR
-        ChipKeyExport * mKeyExport;
-#endif
-    };
-    union
-    {
         SessionEstablishedFunct mStartSecureSession_OnComplete;
-
-        /**
-         * The key export protocol complete callback function. This function is
-         * called when the secret key export process is complete.
-         */
-        KeyExportCompleteFunct mStartKeyExport_OnComplete;
     };
     union
     {
         SessionErrorFunct mStartSecureSession_OnError;
-
-        /**
-         * The key export protocol error callback function. This function is
-         * called when an error is encountered during key export process.
-         */
-        KeyExportErrorFunct mStartKeyExport_OnError;
     };
     union
     {
         void * mStartSecureSession_ReqState;
         void * mStartKeyExport_ReqState;
     };
-#if CHIP_CONFIG_ENABLE_PASE_RESPONDER
-    uint32_t mPASERateLimiterTimeout;
-    uint8_t mPASERateLimiterCount;
-    void UpdatePASERateLimiter(CHIP_ERROR err);
-#endif
-#if CHIP_CONFIG_ENABLE_CASE_INITIATOR || CHIP_CONFIG_ENABLE_CASE_RESPONDER
-    ChipCASEAuthDelegate * mDefaultAuthDelegate;
-#endif
-#if CHIP_CONFIG_ENABLE_TAKE_INITIATOR
-    ChipTAKEChallengerAuthDelegate * mDefaultTAKEChallengerAuthDelegate;
-#endif
-#if CHIP_CONFIG_ENABLE_TAKE_RESPONDER
-    ChipTAKETokenAuthDelegate * mDefaultTAKETokenAuthDelegate;
-#endif
-#if CHIP_CONFIG_ENABLE_KEY_EXPORT_INITIATOR || CHIP_CONFIG_ENABLE_KEY_EXPORT_RESPONDER
-    ChipKeyExportDelegate * mDefaultKeyExportDelegate;
-#endif
-
     uint16_t mSessionKeyId;
     ChipAuthMode mRequestedAuthMode;
     uint8_t mEncType;
@@ -355,57 +197,6 @@ private:
     static void HandleUnsolicitedMessage(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
                                          uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf);
 
-    void StartPASESession(void);
-    void HandlePASESessionStart(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
-                                PacketBuffer * msgBuf);
-    CHIP_ERROR ProcessPASEInitiatorStep1(ExchangeContext * ec, PacketBuffer * msgBuf);
-    CHIP_ERROR SendPASEResponderReconfigure(void);
-    CHIP_ERROR SendPASEResponderStep1(void);
-    CHIP_ERROR SendPASEResponderStep2(void);
-    CHIP_ERROR SendPASEInitiatorStep1(uint32_t paseConfig);
-    CHIP_ERROR ProcessPASEResponderReconfigure(PacketBuffer * msgBuf, uint32_t & newConfig);
-    CHIP_ERROR ProcessPASEResponderStep1(PacketBuffer * msgBuf);
-    CHIP_ERROR ProcessPASEResponderStep2(PacketBuffer * msgBuf);
-    CHIP_ERROR SendPASEInitiatorStep2(void);
-    CHIP_ERROR ProcessPASEInitiatorStep2(PacketBuffer * msgBuf);
-    CHIP_ERROR SendPASEResponderKeyConfirm(void);
-    CHIP_ERROR ProcessPASEResponderKeyConfirm(PacketBuffer * msgBuf);
-    static void HandlePASEMessageInitiator(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
-                                           uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf);
-    static void HandlePASEMessageResponder(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
-                                           uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf);
-
-    void StartCASESession(uint32_t config, uint32_t curveId);
-    void HandleCASESessionStart(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
-                                PacketBuffer * msgBuf);
-    static void HandleCASEMessageInitiator(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
-                                           uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf);
-    static void HandleCASEMessageResponder(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
-                                           uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf);
-
-    void StartTAKESession(bool encryptAuthPhase, bool encryptCommPhase, bool timeLimitedIK, bool sendChallengerId);
-    void HandleTAKESessionStart(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
-                                PacketBuffer * msgBuf);
-    CHIP_ERROR SendTAKEIdentifyToken(uint8_t takeConfig, bool encryptAuthPhase, bool encryptCommPhase, bool timeLimitedIK,
-                                     bool sendChallengerId);
-    static void HandleTAKEMessageInitiator(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
-                                           uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf);
-    static void HandleTAKEMessageResponder(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
-                                           uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf);
-    CHIP_ERROR ProcessTAKEIdentifyTokenResponse(const PacketBuffer * msgBuf);
-    CHIP_ERROR CreateTAKESecureSession(void);
-    CHIP_ERROR SendTAKEAuthenticateToken(void);
-    CHIP_ERROR ProcessTAKEAuthenticateToken(const PacketBuffer * msgBuf);
-    CHIP_ERROR SendTAKEAuthenticateTokenResponse(void);
-    CHIP_ERROR ProcessTAKEAuthenticateTokenResponse(const PacketBuffer * msgBuf);
-    CHIP_ERROR SendTAKEReAuthenticateToken(void);
-    CHIP_ERROR ProcessTAKEReAuthenticateToken(const PacketBuffer * msgBuf);
-    CHIP_ERROR SendTAKEReAuthenticateTokenResponse(void);
-    CHIP_ERROR ProcessTAKEReAuthenticateTokenResponse(const PacketBuffer * msgBuf);
-    CHIP_ERROR SendTAKETokenReconfigure(void);
-    CHIP_ERROR ProcessTAKETokenReconfigure(uint8_t & config, const PacketBuffer * msgBuf);
-    CHIP_ERROR FinishTAKESetUp(void);
-
     void HandleKeyErrorMsg(ExchangeContext * ec, PacketBuffer * msgBuf);
 
 #if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
@@ -417,16 +208,7 @@ private:
     void HandleSessionComplete(void);
     void HandleSessionError(CHIP_ERROR err, PacketBuffer * statusReportMsgBuf);
     static void HandleConnectionClosed(ExchangeContext * ec, ChipConnection * con, CHIP_ERROR conErr);
-
     static CHIP_ERROR SendStatusReport(CHIP_ERROR localError, ExchangeContext * ec);
-
-    void HandleKeyExportRequest(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
-                                PacketBuffer * msgBuf);
-    CHIP_ERROR SendKeyExportRequest(uint8_t keyExportConfig, uint32_t keyId, bool signMessage);
-    CHIP_ERROR SendKeyExportResponse(ChipKeyExport & keyExport, uint8_t msgType, const ChipMessageInfo * msgInfo);
-    static void HandleKeyExportMessageInitiator(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
-                                                uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf);
-    void HandleKeyExportError(CHIP_ERROR err, PacketBuffer * statusReportMsgBuf);
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     static void RMPHandleAckRcvd(ExchangeContext * ec, void * msgCtxt);
