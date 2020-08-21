@@ -302,7 +302,9 @@ void SecureSessionMgrBase::HandleConnectionExpired(const Transport::PeerConnecti
 void SecureSessionMgrBase::ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error)
 {
     SecureSessionMgrBase * mgr = reinterpret_cast<SecureSessionMgrBase *>(param);
+#if CHIP_CONFIG_SESSION_REKEYING
     mgr->mPeerConnections.ExpireInactiveConnections(CHIP_PEER_CONNECTION_TIMEOUT_MS);
+#endif
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
 }
 
