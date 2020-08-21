@@ -29,7 +29,6 @@
 #define CHIPSECURITY_H_
 
 #include <core/CHIPVendorIdentifiers.hpp>
-#include <support/ASN1.h>
 
 /**
  *   @namespace chip::Profiles::Security
@@ -337,48 +336,6 @@ enum
     kTag_SerializedSession_AES128CTRSHA1_IntegrityKey = 12, // [ BYTE STRING, len 20 ] For sessions supporting AES128CTRSHA1
                                                             //    message encryption, the data integrity key.
 };
-
-// CHIP-defined elliptic curve ids
-//
-// NOTE: The bottom bits of each curve id must match the enum value used in the curve's
-// ASN1 OID (see ASN1OID.h).
-enum
-{
-    kChipCurveId_NotSpecified = 0,
-
-    kChipCurveId_secp160r1  = (kChipVendor_NestLabs << 16) | 0x0021,
-    kChipCurveId_prime192v1 = (kChipVendor_NestLabs << 16) | 0x0015,
-    kChipCurveId_secp224r1  = (kChipVendor_NestLabs << 16) | 0x0025,
-    kChipCurveId_prime256v1 = (kChipVendor_NestLabs << 16) | 0x001B,
-
-    kChipCurveId_VendorMask   = 0xFFFF0000,
-    kChipCurveId_VendorShift  = 16,
-    kChipCurveId_CurveNumMask = ASN1::kOID_Mask,
-};
-
-// Bit-field value represented set of defined elliptic curves.
-enum
-{
-    kChipCurveSet_Mask = 0xFF,
-
-    kChipCurveSet_secp160r1  = 0x01,
-    kChipCurveSet_prime192v1 = 0x02,
-    kChipCurveSet_secp224r1  = 0x04,
-    kChipCurveSet_prime256v1 = 0x08,
-
-    kChipCurveSet_All = (kChipCurveSet_secp160r1 | kChipCurveSet_prime192v1 | kChipCurveSet_secp224r1 | kChipCurveSet_prime256v1)
-};
-
-extern bool IsSupportedCurve(uint32_t curveId);
-
-extern bool IsCurveInSet(uint32_t curveId, uint8_t curveSet);
-
-extern ASN1::OID ChipCurveIdToOID(uint32_t weaveCurveId);
-
-inline uint32_t OIDToChipCurveId(ASN1::OID curveOID)
-{
-    return (((uint32_t) kChipVendor_NestLabs) << kChipCurveId_VendorShift) | (kChipCurveId_CurveNumMask & curveOID);
-}
 
 } // namespace Security
 } // namespace Profiles
