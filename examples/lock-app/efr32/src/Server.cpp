@@ -69,7 +69,7 @@ namespace {
 static char sDeviceName[128] = { 0 };
 // Hardcode UDP BroadcastPort. Temporary use for demo with OTBR
 constexpr uint16_t kUDPBroadcastPort = 23367;
-  
+
 class ServerCallback : public SecureSessionMgrCallback
 {
 public:
