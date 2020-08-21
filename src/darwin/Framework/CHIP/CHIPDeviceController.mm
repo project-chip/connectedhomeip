@@ -179,8 +179,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     }
 }
 
-- (BOOL)connect:(NSString *)ipAddress
-          error:(NSError * __autoreleasing *)error
+- (BOOL)connect:(NSString *)ipAddress error:(NSError * __autoreleasing *)error
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
