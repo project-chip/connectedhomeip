@@ -471,20 +471,6 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
 #endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
     // Set the Message Protocol Version
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    if (sendFlags & kSendFlag_RequestAck || IsRMPControlMessage(profileId, msgType) ||
-        (profileId == chip::Profiles::kChipProfile_Common && msgType == chip::Profiles::Common::kMsgType_Null))
-    {
-        if (kChipMessageVersion_Unspecified == mMsgProtocolVersion)
-        {
-            mMsgProtocolVersion = msgInfo->MessageVersion = kChipMessageVersion_V2;
-        }
-        else
-        {
-            VerifyOrExit(mMsgProtocolVersion == kChipMessageVersion_V2, err = CHIP_ERROR_WRONG_MSG_VERSION_FOR_EXCHANGE);
-        }
-    }
-#endif
     if (kChipMessageVersion_Unspecified == mMsgProtocolVersion)
     {
         mMsgProtocolVersion = msgInfo->MessageVersion = kChipMessageVersion_V1;
@@ -730,39 +716,36 @@ CHIP_ERROR ExchangeContext::EncodeExchHeader(ChipExchangeHeader * exchangeHeader
     exchangeHeader->Flags = (IsInitiator() || (sendFlags & kSendFlag_FromInitiator)) ? kChipExchangeFlag_Initiator : 0;
 
     // RMP PreProcess Checks and Flag setting
-    if (mMsgProtocolVersion == kChipMessageVersion_V2)
-    {
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-        // If there is a pending acknowledgment piggyback it on this message.
-        // If there is no pending acknowledgment piggyback the last Ack that was sent.
-        //   - HasPeerRequestedAck() is used to verify that AckId field is valid
-        //     to avoid piggybacking uninitialized AckId.
-        if (HasPeerRequestedAck())
-        {
-            // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
-            ExchangeMgr->RMPExpireTicks();
+    // If there is a pending acknowledgment piggyback it on this message.
+    // If there is no pending acknowledgment piggyback the last Ack that was sent.
+    //   - HasPeerRequestedAck() is used to verify that AckId field is valid
+    //     to avoid piggybacking uninitialized AckId.
+    if (HasPeerRequestedAck())
+    {
+        // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
+        ExchangeMgr->RMPExpireTicks();
 
-            exchangeHeader->Flags |= kChipExchangeFlag_AckId;
-            exchangeHeader->AckMsgId = mPendingPeerAckId;
+        exchangeHeader->Flags |= kChipExchangeFlag_AckId;
+        exchangeHeader->AckMsgId = mPendingPeerAckId;
 
-            // Set AckPending flag to false after setting the Ack flag;
-            SetAckPending(false);
+        // Set AckPending flag to false after setting the Ack flag;
+        SetAckPending(false);
 
-            // Schedule next physical wakeup
-            ExchangeMgr->RMPStartTimer();
+        // Schedule next physical wakeup
+        ExchangeMgr->RMPStartTimer();
 
 #if defined(DEBUG)
-            ChipLogProgress(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg", mPendingPeerAckId);
+        ChipLogProgress(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg", mPendingPeerAckId);
 #endif
-        }
-
-        // Assert the flag if message requires an Ack back;
-        if ((sendFlags & kSendFlag_RequestAck) && !IsRMPControlMessage(profileId, msgType))
-        {
-            exchangeHeader->Flags |= kChipExchangeFlag_NeedsAck;
-        }
-#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     }
+
+    // Assert the flag if message requires an Ack back;
+    if ((sendFlags & kSendFlag_RequestAck) && !IsRMPControlMessage(profileId, msgType))
+    {
+        exchangeHeader->Flags |= kChipExchangeFlag_NeedsAck;
+    }
+#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
     err = ChipExchangeManager::PrependHeader(exchangeHeader, msgBuf);
 
@@ -1535,28 +1518,25 @@ CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo * msgInfo, const ChipE
     // layer has completed its work on the ExchangeContext.
     AddRef();
 
-    if (msgInfo->MessageVersion == kChipMessageVersion_V2)
-    {
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-        if (exchHeader->Flags & kChipExchangeFlag_AckId)
-        {
-            err = RMPHandleRcvdAck(exchHeader, msgInfo);
-        }
-        if (exchHeader->Flags & kChipExchangeFlag_NeedsAck)
-        {
-            // Set the flag in message header indicating an ack requested by peer;
-            msgInfo->Flags |= kChipMessageFlag_PeerRequestedAck;
-
-            // Set the flag in the exchange context indicating an ack requested;
-            SetPeerRequestedAck(true);
-
-            if (!ShouldDropAck())
-            {
-                err = RMPHandleNeedsAck(msgInfo);
-            }
-        }
-#endif
+    if (exchHeader->Flags & kChipExchangeFlag_AckId)
+    {
+        err = RMPHandleRcvdAck(exchHeader, msgInfo);
     }
+    if (exchHeader->Flags & kChipExchangeFlag_NeedsAck)
+    {
+        // Set the flag in message header indicating an ack requested by peer;
+        msgInfo->Flags |= kChipMessageFlag_PeerRequestedAck;
+
+        // Set the flag in the exchange context indicating an ack requested;
+        SetPeerRequestedAck(true);
+
+        if (!ShouldDropAck())
+        {
+            err = RMPHandleNeedsAck(msgInfo);
+        }
+    }
+#endif
 
     // If the message is a duplicate and duplicates are not allowed for this exchange.
     if ((msgInfo->Flags & kChipMessageFlag_DuplicateMessage) && !AllowDuplicateMsgs)

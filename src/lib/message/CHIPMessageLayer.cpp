@@ -1020,7 +1020,7 @@ CHIP_ERROR ChipMessageLayer::DecodeHeader(PacketBuffer * msgBuf, ChipMessageInfo
     DecodeHeaderField(headerField, msgInfo);
 
     // Error if the message version is unsupported.
-    if (msgInfo->MessageVersion != kChipMessageVersion_V1 && msgInfo->MessageVersion != kChipMessageVersion_V2)
+    if (msgInfo->MessageVersion != kChipMessageVersion_V1)
     {
         ExitNow(err = CHIP_ERROR_UNSUPPORTED_MESSAGE_VERSION);
     }
@@ -1161,7 +1161,7 @@ CHIP_ERROR ChipMessageLayer::EncodeMessage(ChipMessageInfo * msgInfo, PacketBuff
     CHIP_ERROR err;
     uint8_t * p1;
     // Error if an unsupported message version requested.
-    if (msgInfo->MessageVersion != kChipMessageVersion_V1 && msgInfo->MessageVersion != kChipMessageVersion_V2)
+    if (msgInfo->MessageVersion != kChipMessageVersion_V1)
         return CHIP_ERROR_UNSUPPORTED_MESSAGE_VERSION;
 
     // Message already encoded, don't do anything
@@ -2052,19 +2052,15 @@ void ChipMessageLayer::ComputeIntegrityCheck_AES128CTRSHA1(const ChipMessageInfo
     Encoding::LittleEndian::Write64(p, msgInfo->SourceNodeId);
     Encoding::LittleEndian::Write64(p, msgInfo->DestNodeId);
 
-    // Hash the message header field and the message Id for the message version V2.
-    if (msgInfo->MessageVersion == kChipMessageVersion_V2)
-    {
-        // Encode message header field value.
-        uint16_t headerField = EncodeHeaderField(msgInfo);
+    // Encode message header field value.
+    uint16_t headerField = EncodeHeaderField(msgInfo);
 
-        // Mask destination and source node Id flags.
-        headerField &= kMsgHeaderField_MessageHMACMask;
+    // Mask destination and source node Id flags.
+    headerField &= kMsgHeaderField_MessageHMACMask;
 
-        // Encode the message header field and the message Id in a little-endian format.
-        Encoding::LittleEndian::Write16(p, headerField);
-        Encoding::LittleEndian::Write32(p, msgInfo->MessageId);
-    }
+    // Encode the message header field and the message Id in a little-endian format.
+    Encoding::LittleEndian::Write16(p, headerField);
+    Encoding::LittleEndian::Write32(p, msgInfo->MessageId);
 
     // Hash encoded message header fields.
     hmacSHA1.AddData(encodedBuf, p - encodedBuf);
