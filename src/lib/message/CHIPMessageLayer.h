@@ -492,6 +492,8 @@ public:
     };
 
     ChipMessageLayer(void);
+    ChipMessageLayer(const ChipMessageLayer &) = delete;
+    ChipMessageLayer & operator=(const ChipMessageLayer &) = delete;
 
     System::Layer * SystemLayer;       /*** [READ ONLY] The associated SystemLayer object. */
     InetLayer * Inet;                  /**< [READ ONLY] The associated InetLayer object. */
@@ -717,8 +719,6 @@ private:
     static bool IsIgnoredMulticastSendError(CHIP_ERROR err);
 
     static bool IsSendErrorNonCritical(CHIP_ERROR err);
-
-    ChipMessageLayer(const ChipMessageLayer &); // not defined
 
 #if CONFIG_NETWORK_LAYER_BLE
 public:
