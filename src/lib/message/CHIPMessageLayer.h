@@ -31,7 +31,6 @@
 #include <string.h>
 
 #include <message/CHIPFabricState.h>
-#include <message/HostPortList.h>
 #include <support/DLLUtil.h>
 #include <system/SystemStats.h>
 
@@ -255,10 +254,6 @@ public:
                        uint16_t defaultPort = 0);
     CHIP_ERROR Connect(uint64_t peerNodeId, ChipAuthMode authMode, const char * peerAddr, uint16_t peerAddrLen, uint8_t dnsOptions,
                        uint16_t defaultPort);
-    CHIP_ERROR Connect(uint64_t peerNodeId, ChipAuthMode authMode, HostPortList hostPortList,
-                       InterfaceId intf = INET_NULL_INTERFACEID);
-    CHIP_ERROR Connect(uint64_t peerNodeId, ChipAuthMode authMode, HostPortList hostPortList, uint8_t dnsOptions, InterfaceId intf);
-
     CHIP_ERROR GetPeerAddressInfo(IPPacketInfo & addrInfo);
 
     enum
@@ -356,7 +351,6 @@ private:
 
     IPAddress mPeerAddrs[CHIP_CONFIG_CONNECT_IP_ADDRS];
     TCPEndPoint * mTcpEndPoint;
-    HostPortList mPeerHostPortList;
     InterfaceId mTargetInterface;
     uint32_t mConnectTimeout;
     uint8_t mRefCount;
