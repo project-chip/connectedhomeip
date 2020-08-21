@@ -111,16 +111,7 @@ public:
 
     virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
     {
-        CHIP_ERROR err;
-
         EFR32_LOG("Received a new connection.");
-
-        err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key,
-                                                                   sizeof(local_private_key));
-        VerifyOrExit(err == CHIP_NO_ERROR, EFR32_LOG("Failed to setup encryption"));
-
-    exit:
-        return;
     }
 
 private:

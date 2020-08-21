@@ -144,7 +144,7 @@ void AppTask::HandleBLEMessageReceived(chip::Ble::BLEEndPoint * endPoint, chip::
 {
     assert(endPoint != NULL);
 #if CHIP_ENABLE_OPENTHREAD
-    assert(endPoint != buffer);
+    assert(buffer != NULL);
 
     uint16_t bufferLen = buffer->DataLength();
     uint8_t * data     = buffer->Start();
