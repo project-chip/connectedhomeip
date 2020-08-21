@@ -47,34 +47,6 @@ namespace Security {
 //
 enum
 {
-    // ---- PASE Protocol Messages ----
-    kMsgType_PASEInitiatorStep1       = 1,
-    kMsgType_PASEResponderStep1       = 2,
-    kMsgType_PASEResponderStep2       = 3,
-    kMsgType_PASEInitiatorStep2       = 4,
-    kMsgType_PASEResponderKeyConfirm  = 5,
-    kMsgType_PASEResponderReconfigure = 6,
-
-    // ---- CASE Protocol Messages ----
-    kMsgType_CASEBeginSessionRequest  = 10,
-    kMsgType_CASEBeginSessionResponse = 11,
-    kMsgType_CASEInitiatorKeyConfirm  = 12,
-    kMsgType_CASEReconfigure          = 13,
-
-    // ---- TAKE Protocol Messages ----
-    kMsgType_TAKEIdentifyToken               = 20,
-    kMsgType_TAKEIdentifyTokenResponse       = 21,
-    kMsgType_TAKETokenReconfigure            = 22,
-    kMsgType_TAKEAuthenticateToken           = 23,
-    kMsgType_TAKEAuthenticateTokenResponse   = 24,
-    kMsgType_TAKEReAuthenticateToken         = 25,
-    kMsgType_TAKEReAuthenticateTokenResponse = 26,
-
-    // ---- Key Extraction Protocol ----
-    kMsgType_KeyExportRequest     = 30,
-    kMsgType_KeyExportResponse    = 31,
-    kMsgType_KeyExportReconfigure = 32,
-
     // ---- Certificate Provisioning Protocol ----
     kMsgType_GetCertificateRequest  = 40,
     kMsgType_GetCertificateResponse = 41,

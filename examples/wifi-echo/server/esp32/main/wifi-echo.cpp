@@ -103,6 +103,7 @@ BluetoothWidget bluetoothLED;
 WiFiWidget wifiLED;
 
 extern NodeId kLocalNodeId;
+extern void PairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId, SecurePairingSession * pairing);
 
 const char * TAG = "wifi-echo-demo";
 
@@ -357,6 +358,11 @@ bool isRendezvousBLE()
     return static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kBLE;
 }
 
+bool isRendezvousBypassed()
+{
+    return static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kNone;
+}
+
 std::string createSetupPayload()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -410,6 +416,8 @@ std::string createSetupPayload()
     }
     return result;
 };
+
+static SecurePairingUsingTestSecret gTestPairing;
 
 } // namespace
 
@@ -473,6 +481,11 @@ extern "C" void app_main()
             return;
         }
         rendezvousSession = new RendezvousSession(&bluetoothLED, setupPINCode, kLocalNodeId);
+    }
+    else if (isRendezvousBypassed())
+    {
+        ChipLogProgress(Ble, "Rendezvous and Secure Pairing skipped. Using test secret.");
+        PairingComplete(Optional<NodeId>::Value(kUndefinedNodeId), 0, 0, &gTestPairing);
     }
 
 #if CONFIG_USE_ECHO_CLIENT

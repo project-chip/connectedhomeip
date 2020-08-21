@@ -1189,21 +1189,11 @@ void ChipConnection::StartSession()
 
         CHIP_ERROR err;
 
-        // Call the security manager to initiate secure CASE session.
-        if (IsCASEAuthMode(AuthMode))
-            err = MessageLayer->SecurityMgr->StartCASESession(this, PeerNodeId, PeerAddr, PeerPort, AuthMode, NULL,
-                                                              HandleSecureSessionEstablished, HandleSecureSessionError);
-        // Call the security manager to initiate secure PASE session.
-        else if (IsPASEAuthMode(AuthMode))
-            err = MessageLayer->SecurityMgr->StartPASESession(this, AuthMode, NULL, HandleSecureSessionEstablished,
-                                                              HandleSecureSessionError);
-        else
-            err = CHIP_ERROR_UNSUPPORTED_AUTH_MODE;
+        err = CHIP_ERROR_UNSUPPORTED_AUTH_MODE;
 
         if (err != CHIP_NO_ERROR)
             DoClose(err, 0);
     }
-
     // Otherwise...
     else
     {

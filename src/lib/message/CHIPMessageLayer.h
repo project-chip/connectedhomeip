@@ -170,15 +170,13 @@ typedef enum ChipEncryptionType
  *
  *  @details
  *    CHIP will choose the appropriate message version based on the frame format required for the CHIP
- *    message. By default, the message version is kChipMessageVersion_V1. When using CHIP Reliable
- *    Messaging, for example, the version is kChipMessageVersion_V2.
+ *    message.
  *
  */
 typedef enum ChipMessageVersion
 {
     kChipMessageVersion_Unspecified = 0, /**< Unspecified message version. */
     kChipMessageVersion_V1          = 1, /**< Message header format version V1. */
-    kChipMessageVersion_V2          = 2  /**< Message header format version V2. */
 } ChipMessageVersion;
 
 /**
@@ -492,6 +490,8 @@ public:
     };
 
     ChipMessageLayer(void);
+    ChipMessageLayer(const ChipMessageLayer &) = delete;
+    ChipMessageLayer & operator=(const ChipMessageLayer &) = delete;
 
     System::Layer * SystemLayer;       /*** [READ ONLY] The associated SystemLayer object. */
     InetLayer * Inet;                  /**< [READ ONLY] The associated InetLayer object. */
@@ -717,8 +717,6 @@ private:
     static bool IsIgnoredMulticastSendError(CHIP_ERROR err);
 
     static bool IsSendErrorNonCritical(CHIP_ERROR err);
-
-    ChipMessageLayer(const ChipMessageLayer &); // not defined
 
 #if CONFIG_NETWORK_LAYER_BLE
 public:
