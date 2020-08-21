@@ -55,7 +55,7 @@ support_headers = [
   "ASN1.h",
   "ASN1Config.h",
   "ASN1Error.h",
-  "ASN1OID.h",  
+  "ASN1OID.h",
   "Base64.h",
   "BufBound.h",
   "CHIPCounter.h",
