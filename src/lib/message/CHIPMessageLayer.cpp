@@ -1228,8 +1228,7 @@ CHIP_ERROR ChipMessageLayer::EncodeMessage(ChipMessageInfo * msgInfo, PacketBuff
     uint8_t * p = payloadStart - headLen;
 
     // Allocate a new message identifier and write the message identifier field.
-    if ((msgInfo->Flags & kChipMessageFlag_ReuseMessageId) == 0)
-        msgInfo->MessageId = sessionState.NewMessageId();
+    msgInfo->MessageId = sessionState.NewMessageId();
 
 #if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
     // Request message counter synchronization if peer group key counter is not synchronized.

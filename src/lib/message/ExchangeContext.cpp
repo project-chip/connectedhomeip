@@ -485,30 +485,6 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
 
     // TODO: implement support for retransmissions.
 
-    // flag validation
-    if (sendFlags & kSendFlag_RetransmissionTrickle)
-    {
-        // We do not allow RMP to be used when Trickle retransmission is requested
-        if (sendFlags & kSendFlag_RequestAck)
-        {
-            ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
-        }
-
-        // We do not support trickle retrasnmissions over
-        // connection-oriented exchanges
-        VerifyOrExit(Con == NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-        if (0 == RetransInterval)
-        { // we're not retransmitting, do not hold onto the buffer
-            sendFlags &= ~kSendFlag_RetainBuffer;
-        }
-        else
-        {
-            sendFlags |= kSendFlag_RetainBuffer;
-            msg = msgBuf;
-        }
-    }
-
     // Add the exchange header to the message buffer.
     ChipExchangeHeader exchangeHeader;
     memset(&exchangeHeader, 0, sizeof(exchangeHeader));
@@ -540,8 +516,6 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
         msgInfo->Flags |= kChipMessageFlag_RetainBuffer;
     if (sendFlags & kSendFlag_AlreadyEncoded)
         msgInfo->Flags |= kChipMessageFlag_MessageEncoded;
-    if (sendFlags & kSendFlag_ReuseMessageId)
-        msgInfo->Flags |= kChipMessageFlag_ReuseMessageId;
     if (sendFlags & kSendFlag_ReuseSourceId)
         msgInfo->Flags |= kChipMessageFlag_ReuseSourceId;
     if (sendFlags & kSendFlag_DefaultMulticastSourceAddress)
@@ -596,18 +570,6 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
             msgBuf     = NULL;
             sendCalled = true;
             SuccessOrExit(err);
-        }
-
-        if (sendFlags & kSendFlag_RetransmissionTrickle)
-        {
-            currentBcastMsgID = msgInfo->MessageId;
-            if (RetransInterval != 0)
-            {
-                if (StartTimerT() != CHIP_NO_ERROR)
-                {
-                    nlLogError("EC: cant start T\n");
-                }
-            }
         }
     }
 
@@ -753,16 +715,6 @@ CHIP_ERROR ExchangeContext::EncodeExchHeader(ChipExchangeHeader * exchangeHeader
 }
 
 /**
- *  Cancel the Trickle retransmission mechanism.
- *
- */
-void ExchangeContext::CancelRetrans()
-{
-    // NOTE: modify for other retransmission schemes
-    TeardownTrickleRetransmit();
-}
-
-/**
  *  Increment the reference counter for the exchange context by one.
  *
  */
@@ -806,8 +758,6 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     ExchangeMgr->RMPStartTimer();
 #endif
 
-    // Cancel the trickle retransmission timer.
-    CancelRetrans();
     // Cancel the response timer.
     CancelResponseTimer();
 }
@@ -925,71 +875,9 @@ CHIP_ERROR ExchangeContext::ResendMessage()
     if (res != CHIP_NO_ERROR)
         return CHIP_ERROR_INCORRECT_STATE;
 
-    msgInfo.Flags |= kChipMessageFlag_RetainBuffer | kChipMessageFlag_MessageEncoded | kChipMessageFlag_ReuseMessageId |
-        kChipMessageFlag_ReuseSourceId;
+    msgInfo.Flags |= kChipMessageFlag_RetainBuffer | kChipMessageFlag_MessageEncoded | kChipMessageFlag_ReuseSourceId;
 
     return ExchangeMgr->MessageLayer->ResendMessage(PeerAddr, PeerPort, PeerIntf, &msgInfo, msg);
-}
-
-/**
- *  Start the Trickle rebroadcast algorithm's periodic retransmission timer mechanism.
- *
- *  @return  #CHIP_NO_ERROR if successful, else an INET_ERROR mapped into a CHIP_ERROR.
- *
- */
-CHIP_ERROR ExchangeContext::StartTimerT()
-{
-    if (RetransInterval == 0)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    // range from 1 to RetransInterval
-    backoff      = 1 + (GetRandU32() % (RetransInterval - 1));
-    msgsReceived = 0;
-    ChipLogDetail(ExchangeManager, "Trickle new interval");
-    return ExchangeMgr->MessageLayer->SystemLayer->StartTimer(backoff, TimerTau, this);
-}
-
-void ExchangeContext::TimerT(System::Layer * aSystemLayer, void * aAppState, System::Error aError)
-{
-    ExchangeContext * client = reinterpret_cast<ExchangeContext *>(aAppState);
-
-    if ((aSystemLayer == NULL) || (aAppState == NULL) || (aError != CHIP_SYSTEM_NO_ERROR))
-    {
-        return;
-    }
-    if (client->StartTimerT() != CHIP_NO_ERROR)
-    {
-        nlLogError("EC: cant start T\n");
-    }
-}
-
-void ExchangeContext::TimerTau(System::Layer * aSystemLayer, void * aAppState, System::Error aError)
-{
-    ExchangeContext * ec = reinterpret_cast<ExchangeContext *>(aAppState);
-
-    if ((aSystemLayer == NULL) || (aAppState == NULL) || (aError != CHIP_SYSTEM_NO_ERROR))
-    {
-        return;
-    }
-    if (ec->msgsReceived < ec->rebroadcastThreshold)
-    {
-        ChipLogDetail(ExchangeManager, "Trickle re-send with duplicate message counter: %u", ec->msgsReceived);
-        ec->ResendMessage();
-    }
-    else
-    {
-        ChipLogDetail(ExchangeManager, "Trickle skipping this interval");
-    }
-    if ((ec->RetransInterval == 0) || (ec->RetransInterval <= ec->backoff))
-    {
-        return;
-    }
-    if (aSystemLayer->StartTimer(ec->RetransInterval - ec->backoff, TimerT, ec) != CHIP_NO_ERROR)
-    {
-        nlLogError("EC: cant start Tau\n");
-    }
 }
 
 bool ExchangeContext::MatchExchange(ChipConnection * msgCon, const ChipMessageInfo * msgInfo,
@@ -1015,90 +903,6 @@ bool ExchangeContext::MatchExchange(ChipConnection * msgCon, const ChipMessageIn
         //    case, the initiator is ill defined)
 
         && (((exchangeHeader->Flags & kChipExchangeFlag_Initiator) != 0) != IsInitiator());
-}
-
-/**
- *  Handle trickle message within the exchange context.
- *
- *  @param[in]    pktInfo    A pointer to the IPPacketInfo object.
- *
- *  @param[in]    msgInfo    A pointer to the CHIP message info structure.
- *
- */
-void ExchangeContext::HandleTrickleMessage(const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo)
-{
-    // check if we're at all interested in this message
-    const bool isMessageIdMatching = currentBcastMsgID == msgInfo->MessageId;
-    const bool isNodeIdMatching    = (PeerNodeId == kAnyNodeId) || (PeerNodeId == msgInfo->SourceNodeId);
-    if (isMessageIdMatching && isNodeIdMatching)
-    {
-        msgsReceived++;
-        ChipLogDetail(ExchangeManager, "Increasing trickle duplicate message counter: %u", msgsReceived);
-    }
-    else
-    {
-        ChipLogDetail(ExchangeManager, "Not counted as duplicate message, for MsgId:%08" PRIX32 " NodeId:%d", isMessageIdMatching,
-                      isNodeIdMatching);
-    }
-}
-
-/**
- *  Setup the trickle retransmission mechanism by setting the corresponding retransmission interval
- *  and rebroadcast threshold.
- *
- *  @param[in]    retransInterval    The retransmit interval of the Trickle rebroadcast algorithm.
- *
- *  @param[in]    threshold          The maximum number of times a message is rebroadcast.
- *
- *  @param[in]    timeout            The maximum time to wait before canceling the Trickle retransmission timer.
- *
- *  @return  #CHIP_NO_ERROR if Trickle setup was successful, else an INET_ERROR mapped into a CHIP_ERROR.
- *
- */
-CHIP_ERROR ExchangeContext::SetupTrickleRetransmit(uint32_t retransInterval, uint8_t threshold, uint32_t timeout)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    CancelRetrans();
-    RetransInterval      = retransInterval;
-    rebroadcastThreshold = threshold;
-    if (timeout != 0)
-    {
-        err = ExchangeMgr->MessageLayer->SystemLayer->StartTimer(timeout, CancelRetransmissionTimer, this);
-        if (err != CHIP_NO_ERROR)
-        {
-            nlLogError("EC: cant setup timeout\n");
-            return err;
-        }
-    }
-    ChipLogDetail(ExchangeManager, "Trickle interval %u ms, threshold %u, timeout %u ms", retransInterval, threshold, timeout);
-    return CHIP_NO_ERROR;
-}
-
-/**
- *  Tear down the Trickle retransmission mechanism by canceling the periodic timers
- *  within Trickle and freeing the message buffer holding the CHIP
- *  message.
- *
- */
-void ExchangeContext::TeardownTrickleRetransmit()
-{
-    System::Layer * lSystemLayer = ExchangeMgr->MessageLayer->SystemLayer;
-    if (lSystemLayer == NULL)
-    {
-        // this is an assertion error, which shall never happen
-        return;
-    }
-    lSystemLayer->CancelTimer(TimerT, this);
-    lSystemLayer->CancelTimer(TimerTau, this);
-    lSystemLayer->CancelTimer(CancelRetransmissionTimer, this);
-    if (msg != NULL)
-    {
-        PacketBuffer::Free(msg);
-    }
-
-    msg             = NULL;
-    backoff         = 0;
-    RetransInterval = 0;
 }
 
 void ExchangeContext::CancelRetransmissionTimer(System::Layer * aSystemLayer, void * aAppState, System::Error aError)
