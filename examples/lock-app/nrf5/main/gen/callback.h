@@ -3283,6 +3283,18 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(uint8_t endpoint, uint8_t comm
  */
 void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint);
 
+/** @brief Basic Cluster Reset To Factory Defaults
+ *
+ * This function is called by the Basic server plugin when a request to
+ * reset to factory defaults is received. The plugin will reset attributes
+ * managed by the framework to their default values.
+ * The application should perform any other necessary reset-related operations
+ * in this callback, including resetting any externally-stored attributes.
+ *
+ * @param endpoint Endpoint that is being initialized  Ver.: always
+ */
+void emberAfPluginBasicResetToFactoryDefaultsCallback(uint8_t endpoint);
+
 /** @} END On/off Cluster Callbacks */
 
 /** @name On/off Switch Configuration Cluster Callbacks */
