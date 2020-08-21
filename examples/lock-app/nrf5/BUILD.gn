@@ -100,7 +100,11 @@ executable("lock_app") {
     "${openthread_root}:libopenthread-ftd",
   ]
 
-  commit_id = exec_script("${chip_root}/scripts/examples/print_git_commit_id.py", [], "trim string", [])
+  commit_id =
+      exec_script("${chip_root}/scripts/examples/print_git_commit_id.py",
+                  [],
+                  "trim string",
+                  [])
 
   output_dir = root_out_dir
 
@@ -108,7 +112,10 @@ executable("lock_app") {
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
 
-  defines = [ "CHIP_ENABLE_OPENTHREAD=1", "COMMIT_ID=\"${commit_id}\"" ]
+  defines = [
+    "CHIP_ENABLE_OPENTHREAD=1",
+    "COMMIT_ID=\"${commit_id}\"",
+  ]
 }
 
 group("nrf5") {

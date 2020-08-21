@@ -103,7 +103,11 @@ executable("lighting_app") {
 
   ldscript = "${nrf5_platform_dir}/app/ldscripts/chip-nrf52840-example.ld"
 
-  commit_id = exec_script("${chip_root}/scripts/examples/print_git_commit_id.py", [], "trim string", [])
+  commit_id =
+      exec_script("${chip_root}/scripts/examples/print_git_commit_id.py",
+                  [],
+                  "trim string",
+                  [])
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
   defines = [ "COMMIT_ID=\"${commit_id}\"" ]
