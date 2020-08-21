@@ -149,6 +149,7 @@ private:
 };
 
 static ServerCallback gCallbacks;
+static SecurePairingUsingTestSecret gTestPairing;
 
 } // namespace
 
@@ -213,9 +214,13 @@ void InitDataModelHandler()
 void StartServer(DemoSessionManager * sessions)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
 
     err = sessions->Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::SystemLayer,
                          UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
+    SuccessOrExit(err);
+
+    err = sessions->NewPairing(Optional<NodeId>::Value(kUndefinedNodeId), peer, 0, 0, &gTestPairing);
     SuccessOrExit(err);
 
     sessions->SetDelegate(&gCallbacks);

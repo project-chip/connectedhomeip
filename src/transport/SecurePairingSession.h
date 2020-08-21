@@ -186,6 +186,42 @@ private:
     uint16_t mPeerKeyId;
 };
 
+/*
+ * The following class should only be used for test usecases.
+ * The class is currently also used for devices that do no yet support
+ * rendezvous. Once all the non-test usecases start supporting
+ * rendezvous, this class will be moved to the test code.
+ */
+class SecurePairingUsingTestSecret : public SecurePairingSession
+{
+public:
+    SecurePairingUsingTestSecret() : SecurePairingSession() {}
+
+    ~SecurePairingUsingTestSecret(void) {}
+
+    CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const unsigned char * salt, size_t saltLen,
+                              Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const unsigned char * salt, size_t saltLen,
+                    Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR DeriveSecureSession(const unsigned char * info, size_t info_len, SecureSession & session)
+    {
+        const char * secret = "Test secret for key derivation";
+        size_t secretLen    = strlen(secret);
+        return session.InitFromSecret((const unsigned char *) secret, secretLen, (const unsigned char *) "", 0,
+                                      (const unsigned char *) secret, secretLen);
+    }
+
+    CHIP_ERROR HandlePeerMessage(const MessageHeader & header, System::PacketBuffer * msg) { return CHIP_NO_ERROR; }
+};
+
 } // namespace chip
 
 #endif // __SECUREPAIRINGSESSION_H__
