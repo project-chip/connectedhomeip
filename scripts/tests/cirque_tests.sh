@@ -50,9 +50,9 @@ function __virtual_thread_clean() {
 }
 
 __cirquetest_start_flask() {
-    cd "$REPO_DIR"/third_party/cirque
+    cd "$REPO_DIR"/third_party/cirque/repo
     sudo FLASK_APP='cirque/restservice/service.py' \
-        PATH="$PATH":"$REPO_DIR"/third_party/cirque/openthread/output/x86_64-unknown-linux-gnu/bin/ \
+        PATH="$PATH":"$REPO_DIR"/third_party/cirque/repo/openthread/output/x86_64-unknown-linux-gnu/bin/ \
         python3 -m flask run
 }
 
@@ -64,7 +64,7 @@ __cirquetest_clean_flask() {
 
 cirquetest_bootstrap() {
     set -e
-    cd "$REPO_DIR"/third_party/cirque
+    cd "$REPO_DIR"/third_party/cirque/repo
     sudo apt-get install -y bazel socat psmisc tigervnc-standalone-server tigervnc-viewer python3-pip python3-venv python3-setuptools libdbus-glib-1-dev libgirepository1.0-dev
     pip3 install pycodestyle==2.5.0 wheel
     make NO_GRPC=1 install -j
