@@ -209,6 +209,14 @@ void AppTask::ButtonEventHandler(uint32_t button_state, uint32_t has_changed)
         button_event.Handler            = FunctionHandler;
         sAppTask.PostEvent(&button_event);
     }
+
+    if (JOINER_BUTTON_MASK & button_state & has_changed)
+    {
+        button_event.ButtonEvent.PinNo  = JOINER_BUTTON;
+        button_event.ButtonEvent.Action = BUTTON_PUSH_EVENT;
+        button_event.Handler            = JoinerHandler;
+        sAppTask.PostEvent(&button_event);
+    }
 }
 
 void AppTask::TimerEventHandler(k_timer * timer)
@@ -297,6 +305,20 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             LOG_INF("Factory Reset has been Canceled");
         }
     }
+}
+
+void AppTask::JoinerHandler(AppEvent * aEvent)
+{
+    if (aEvent->ButtonEvent.PinNo != JOINER_BUTTON)
+        return;
+
+    CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    error = ThreadStackMgr().JoinerStart();
+#endif
+
+    LOG_INF("Thread joiner triggering result: %s", chip::ErrorStr(error));
 }
 
 void AppTask::CancelTimer()
