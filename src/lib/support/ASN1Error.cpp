@@ -55,17 +55,39 @@ bool FormatASN1Error(char * buf, uint16_t bufSize, int32_t err)
 #if !WEAVE_CONFIG_SHORT_ERROR_STR
     switch (err)
     {
-    case ASN1_END                                               : desc = "End of input"; break;
-    case ASN1_ERROR_UNDERRUN                                    : desc = "Reader underrun"; break;
-    case ASN1_ERROR_OVERFLOW                                    : desc = "Writer overflow"; break;
-    case ASN1_ERROR_INVALID_STATE                               : desc = "Invalid state"; break;
-    case ASN1_ERROR_MAX_DEPTH_EXCEEDED                          : desc = "Max depth exceeded"; break;
-    case ASN1_ERROR_INVALID_ENCODING                            : desc = "Invalid encoding"; break;
-    case ASN1_ERROR_UNSUPPORTED_ENCODING                        : desc = "Unsupported encoding"; break;
-    case ASN1_ERROR_TAG_OVERFLOW                                : desc = "Tag overflow"; break;
-    case ASN1_ERROR_LENGTH_OVERFLOW                             : desc = "Length overflow"; break;
-    case ASN1_ERROR_VALUE_OVERFLOW                              : desc = "Value overflow"; break;
-    case ASN1_ERROR_UNKNOWN_OBJECT_ID                           : desc = "Unknown object id"; break;
+    case ASN1_END:
+        desc = "End of input";
+        break;
+    case ASN1_ERROR_UNDERRUN:
+        desc = "Reader underrun";
+        break;
+    case ASN1_ERROR_OVERFLOW:
+        desc = "Writer overflow";
+        break;
+    case ASN1_ERROR_INVALID_STATE:
+        desc = "Invalid state";
+        break;
+    case ASN1_ERROR_MAX_DEPTH_EXCEEDED:
+        desc = "Max depth exceeded";
+        break;
+    case ASN1_ERROR_INVALID_ENCODING:
+        desc = "Invalid encoding";
+        break;
+    case ASN1_ERROR_UNSUPPORTED_ENCODING:
+        desc = "Unsupported encoding";
+        break;
+    case ASN1_ERROR_TAG_OVERFLOW:
+        desc = "Tag overflow";
+        break;
+    case ASN1_ERROR_LENGTH_OVERFLOW:
+        desc = "Length overflow";
+        break;
+    case ASN1_ERROR_VALUE_OVERFLOW:
+        desc = "Value overflow";
+        break;
+    case ASN1_ERROR_UNKNOWN_OBJECT_ID:
+        desc = "Unknown object id";
+        break;
     }
 #endif // !WEAVE_CONFIG_SHORT_ERROR_STR
 
