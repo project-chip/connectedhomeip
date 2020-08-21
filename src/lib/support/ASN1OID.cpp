@@ -40,25 +40,24 @@
 namespace chip {
 namespace ASN1 {
 
-DLL_EXPORT OID ParseObjectID(const uint8_t *encodedOID, uint16_t encodedOIDLen)
+DLL_EXPORT OID ParseObjectID(const uint8_t * encodedOID, uint16_t encodedOIDLen)
 {
     if (encodedOID == NULL or encodedOIDLen == 0)
         return kOID_NotSpecified;
 
     for (uint32_t i = 0; i < sOIDTableSize; i++)
-        if (encodedOIDLen == sOIDTable[i].EncodedOIDLen &&
-            memcmp(encodedOID, sOIDTable[i].EncodedOID, encodedOIDLen) == 0)
+        if (encodedOIDLen == sOIDTable[i].EncodedOIDLen && memcmp(encodedOID, sOIDTable[i].EncodedOID, encodedOIDLen) == 0)
             return sOIDTable[i].EnumVal;
 
     return kOID_Unknown;
 }
 
-bool GetEncodedObjectID(OID oid, const uint8_t *& encodedOID, uint16_t& encodedOIDLen)
+bool GetEncodedObjectID(OID oid, const uint8_t *& encodedOID, uint16_t & encodedOIDLen)
 {
     for (uint32_t i = 0; i < sOIDTableSize; i++)
         if (oid == sOIDTable[i].EnumVal)
         {
-            encodedOID = sOIDTable[i].EncodedOID;
+            encodedOID    = sOIDTable[i].EncodedOID;
             encodedOIDLen = sOIDTable[i].EncodedOIDLen;
             return true;
         }
@@ -75,7 +74,7 @@ OIDCategory GetOIDCategory(OID oid)
     return (OIDCategory)(oid & kOIDCategory_Mask);
 }
 
-const char *GetOIDName(OID oid)
+const char * GetOIDName(OID oid)
 {
     if (oid == kOID_Unknown)
         return "Unknown";
@@ -87,7 +86,7 @@ const char *GetOIDName(OID oid)
     return "Unknown";
 }
 
-ASN1_ERROR ASN1Reader::GetObjectId(OID& oid)
+ASN1_ERROR ASN1Reader::GetObjectId(OID & oid)
 {
     if (Value == NULL)
         return ASN1_ERROR_INVALID_STATE;
@@ -101,7 +100,7 @@ ASN1_ERROR ASN1Reader::GetObjectId(OID& oid)
 
 ASN1_ERROR ASN1Writer::PutObjectId(OID oid)
 {
-    const uint8_t *encodedOID;
+    const uint8_t * encodedOID;
     uint16_t encodedOIDLen;
 
     if (!GetEncodedObjectID(oid, encodedOID, encodedOIDLen))
