@@ -31,8 +31,6 @@
 
 #include <core/CHIPError.h>
 
-using namespace std;
-
 namespace chip {
 
 // TODO this should point to the spec
@@ -104,7 +102,7 @@ struct OptionalQRCodeInfo
     /*@{*/
     uint8_t tag;                      /**< the tag number of the optional info */
     enum optionalQRCodeInfoType type; /**< the type (String or Int) of the optional info */
-    string data;                      /**< the string value if type is optionalQRCodeInfoTypeString, otherwise should not be set */
+    std::string data;                 /**< the string value if type is optionalQRCodeInfoTypeString, otherwise should not be set */
     int32_t int32;                    /**< the integer value if type is optionalQRCodeInfoTypeInt, otherwise should not be set */
     /*@}*/
 };
@@ -147,7 +145,7 @@ public:
      * @param data String representation of data to add
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR addOptionalVendorData(uint8_t tag, string data);
+    CHIP_ERROR addOptionalVendorData(uint8_t tag, std::string data);
 
     /** @brief A function to add an optional vendor data
      * @param tag 7 bit [0-127] tag number
@@ -165,13 +163,13 @@ public:
      * @brief A function to retrieve the vector of OptionalQRCodeInfo infos
      * @return Returns a vector of optionalQRCodeInfos
      **/
-    vector<OptionalQRCodeInfo> getAllOptionalVendorData();
+    std::vector<OptionalQRCodeInfo> getAllOptionalVendorData();
 
     /** @brief A function to add a string serial number
      * @param serialNumber string serial number
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR addSerialNumber(string serialNumber);
+    CHIP_ERROR addSerialNumber(std::string serialNumber);
 
     /** @brief A function to add a uint32_t serial number
      * @param serialNumber uint32_t serial number
@@ -183,7 +181,7 @@ public:
      * @param outSerialNumber retrieved string serial number
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR getSerialNumber(string & outSerialNumber);
+    CHIP_ERROR getSerialNumber(std::string & outSerialNumber);
 
     /** @brief A function to remove the serial number from the payload
      * @return Returns a CHIP_ERROR_KEY_NOT_FOUND on error, CHIP_NO_ERROR otherwise
@@ -200,8 +198,8 @@ public:
     bool operator==(SetupPayload & input);
 
 private:
-    map<uint8_t, OptionalQRCodeInfo> optionalVendorData;
-    map<uint8_t, OptionalQRCodeInfoExtension> optionalExtensionData;
+    std::map<uint8_t, OptionalQRCodeInfo> optionalVendorData;
+    std::map<uint8_t, OptionalQRCodeInfoExtension> optionalExtensionData;
 
     /** @brief A function to add an optional QR Code info vendor object
      * @param info Optional QR code info object to add
@@ -219,7 +217,7 @@ private:
      * @brief A function to retrieve the vector of CHIPQRCodeInfo infos
      * @return Returns a vector of CHIPQRCodeInfos
      **/
-    vector<OptionalQRCodeInfoExtension> getAllOptionalExtensionData();
+    std::vector<OptionalQRCodeInfoExtension> getAllOptionalExtensionData();
 
     /** @brief A function to retrieve an optional QR Code info vendor object
      * @param tag 7 bit [0-127] tag number

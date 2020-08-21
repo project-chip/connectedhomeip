@@ -40,14 +40,14 @@ static uint32_t shortPayloadRepresentation(const SetupPayload & payload)
     return result;
 }
 
-static string decimalStringWithPadding(uint32_t number, int minLength)
+static std::string decimalStringWithPadding(uint32_t number, int minLength)
 {
     char buf[minLength + 1];
     snprintf(buf, sizeof(buf), "%0*" PRIu32, minLength, number);
-    return string(buf);
+    return std::string(buf);
 }
 
-CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(string & outDecimalString)
+CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(std::string & outDecimalString)
 {
     if (!mSetupPayload.isValidManualCode())
     {
@@ -56,7 +56,7 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(strin
     }
 
     uint32_t shortDecimal = shortPayloadRepresentation(mSetupPayload);
-    string decimalString  = decimalStringWithPadding(shortDecimal, kManualSetupShortCodeCharLength);
+    std::string decimalString = decimalStringWithPadding(shortDecimal, kManualSetupShortCodeCharLength);
 
     if (mSetupPayload.requiresCustomFlow)
     {
