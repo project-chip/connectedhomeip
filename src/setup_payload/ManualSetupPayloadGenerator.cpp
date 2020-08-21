@@ -55,7 +55,7 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(std::
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    uint32_t shortDecimal = shortPayloadRepresentation(mSetupPayload);
+    uint32_t shortDecimal     = shortPayloadRepresentation(mSetupPayload);
     std::string decimalString = decimalStringWithPadding(shortDecimal, kManualSetupShortCodeCharLength);
 
     if (mSetupPayload.requiresCustomFlow)
