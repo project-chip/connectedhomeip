@@ -38,10 +38,7 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
 
 @interface CHIPDeviceController : NSObject
 
-- (BOOL)connect:(NSString *)ipAddress
-      local_key:(NSData *)local_key
-       peer_key:(NSData *)peer_key
-          error:(NSError * __autoreleasing *)error;
+- (BOOL)connect:(NSString *)ipAddress error:(NSError * __autoreleasing *)error;
 - (BOOL)connect:(uint16_t)discriminator setupPINCode:(uint32_t)setupPINCode error:(NSError * __autoreleasing *)error;
 - (nullable AddressInfo *)getAddressInfo;
 - (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error;
