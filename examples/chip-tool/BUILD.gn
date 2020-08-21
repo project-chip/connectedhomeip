@@ -29,6 +29,9 @@ executable("chip-standalone-demo") {
 
   public_deps = [ "${chip_root}/src/lib" ]
 
+  commit_id = exec_script("${chip_root}/scripts/examples/print_git_commit_id.py", [], "trim string", [])
+  defines += [ "COMMIT_ID=\"${commit_id}\"" ]
+
   output_dir = root_out_dir
 }
 

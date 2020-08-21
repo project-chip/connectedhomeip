@@ -505,6 +505,10 @@ int main(int argc, char * argv[])
     Command command;
     CommandArgs commandArgs;
 
+#ifdef COMMIT_ID
+    fprintf(stderr, "Commit ID: %s\n", COMMIT_ID);
+#endif
+
     if (!DetermineCommand(argc, argv, &command) || !DetermineCommandArgs(argv, command, &commandArgs))
     {
         ShowUsage(argv[0]);

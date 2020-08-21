@@ -156,6 +156,9 @@ int main(void)
 #else
     NRF_LOG_INFO("*** DEVELOPMENT BUILD ***");
 #endif
+#ifdef COMMIT_ID
+    NRF_LOG_INFO("*** COMMIT ID: %s ***", COMMIT_ID);
+#endif
     NRF_LOG_INFO("==================================================");
     NRF_LOG_FLUSH();
 
