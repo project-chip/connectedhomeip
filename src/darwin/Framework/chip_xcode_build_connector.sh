@@ -62,6 +62,9 @@ for define in "${DEFINES[@]}"; do
         CONFIG_NETWORK_LAYER*)
             continue
             ;;
+        CHIP_CRYPTO_*)
+            continue
+            ;;
     esac
     target_defines+=,\"${define//\"/\\\"}\"
 done
