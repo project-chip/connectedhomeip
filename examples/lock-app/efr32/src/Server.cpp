@@ -26,6 +26,7 @@
 #include "lwip/sys.h"
 #include <lwip/netdb.h>
 
+#include <app/chip-zcl-zpro-codec.h>
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
@@ -39,7 +40,6 @@
 #include "Server.h"
 
 #include "attribute-storage.h"
-#include "chip-zcl/chip-zcl-zpro-codec.h"
 #include "gen/znet-bookkeeping.h"
 #include "util.h"
 
