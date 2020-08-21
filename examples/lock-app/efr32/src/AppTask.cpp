@@ -203,7 +203,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     EFR32_LOG("App Task started");
     chip::DeviceLayer::ConnectivityMgr().AddCHIPoBLEConnectionHandler(&AppTask::HandleBLEConnectionOpened);
-    SetDeviceName("LockDemo._chip._udp.local.");
+    SetDeviceName("EFR32LockDemo._chip._udp.local.");
 
     while (true)
     {

@@ -48,9 +48,9 @@
 #include "Server.h"
 
 #include "attribute-storage.h"
-#include "chip-zcl/chip-zcl-zpro-codec.h"
 #include "gen/znet-bookkeeping.h"
 #include "util.h"
+#include <app/chip-zcl-zpro-codec.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -65,7 +65,7 @@ namespace {
 #define EXAMPLE_SERVER_NODEID 0x3546526e
 #endif // EXAMPLE_SERVER_NODEID
 
-char deviceName[128] = { 0 };
+static char sDeviceName[128] = { 0 };
 // Hardcode UDP BroadcastPort. Temporary use for demo with OTBR
 constexpr uint16_t kUDPBroadcastPort = 23367;
 
@@ -164,7 +164,7 @@ static ServerCallback gCallbacks;
 
 void SetDeviceName(const char * newDeviceName)
 {
-    strncpy(deviceName, newDeviceName, sizeof(deviceName) - 1);
+    strncpy(sDeviceName, newDeviceName, sizeof(sDeviceName) - 1);
 }
 
 void PublishService()
@@ -201,7 +201,7 @@ void PublishService()
     message = otUdpNewMessage(ThreadStackMgrImpl().OTInstance(), nullptr);
     otIp6AddressFromString("ff03::1", &messageInfo.mPeerAddr);
     messageInfo.mPeerPort = kUDPBroadcastPort;
-    otMessageAppend(message, deviceName, static_cast<uint16_t>(strlen(deviceName)));
+    otMessageAppend(message, sDeviceName, static_cast<uint16_t>(strlen(sDeviceName)));
 
     error = otUdpSend(ThreadStackMgrImpl().OTInstance(), &mSocket, message, &messageInfo);
 
@@ -213,6 +213,7 @@ void PublishService()
     ThreadStackMgrImpl().UnlockThreadStack();
 }
 
+;
 void InitDataModelHandler()
 {
     emberAfEndpointConfigure();
