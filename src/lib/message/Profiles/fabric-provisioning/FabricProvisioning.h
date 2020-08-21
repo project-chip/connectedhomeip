@@ -180,6 +180,8 @@ class DLL_EXPORT FabricProvisioningServer : public ChipServerBase
 {
 public:
     FabricProvisioningServer(void);
+    FabricProvisioningServer(const FabricProvisioningServer &) = delete;
+    FabricProvisioningServer & operator=(const FabricProvisioningServer &) = delete;
 
     CHIP_ERROR Init(ChipExchangeManager * exchangeMgr);
     CHIP_ERROR Shutdown(void);
@@ -218,8 +220,6 @@ private:
     FabricConfigAccessSession mFabricConfigAccessSession;
 
     chip::ChipFabricState::SessionEndCbCtxt mSessionEndCbCtxt;
-
-    FabricProvisioningServer(const FabricProvisioningServer &); // not defined
 };
 
 } // namespace FabricProvisioning

@@ -87,36 +87,6 @@ public:
     int NewConnectionHandlerCallCount = 0;
 };
 
-class TestSecurePairing : public SecurePairingSession
-{
-public:
-    TestSecurePairing() : SecurePairingSession() {}
-
-    ~TestSecurePairing(void) {}
-
-    CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const unsigned char * salt, size_t saltLen,
-                              Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const unsigned char * salt, size_t saltLen,
-                    Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR DeriveSecureSession(const unsigned char * info, size_t info_len, SecureSession & session)
-    {
-        const char * secret = "Secure Session Mgr Test Secret";
-        size_t secretLen    = strlen(secret);
-        return session.InitFromSecret((const unsigned char *) secret, secretLen, (const unsigned char *) "", 0,
-                                      (const unsigned char *) secret, secretLen);
-    }
-
-    CHIP_ERROR HandlePeerMessage(const MessageHeader & header, System::PacketBuffer * msg) { return CHIP_NO_ERROR; }
-};
-
 TestSessMgrCallback callback;
 
 void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
@@ -157,7 +127,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     conn.SetDelegate(&callback);
 
-    TestSecurePairing pairing1, pairing2;
+    SecurePairingUsingTestSecret pairing1, pairing2;
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
     err = conn.NewPairing(Optional<NodeId>::Value(kSourceNodeId), peer, 1, 2, &pairing1);

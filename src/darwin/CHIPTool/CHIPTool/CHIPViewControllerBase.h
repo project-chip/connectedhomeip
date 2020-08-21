@@ -26,8 +26,6 @@ typedef void (^OnErrorBlock)(NSString * errorMsg);
 
 @interface CHIPViewControllerBase : UIViewController
 
-@property (readwrite) BOOL useIncorrectKey;
-@property (readwrite) BOOL useIncorrectKeyStateChanged;
 @property (readwrite) CHIPDeviceController * chipController;
 @property (weak, nonatomic) IBOutlet UILabel * resultLabel;
 @property (weak, nonatomic) IBOutlet UISwitch * encryptionKeySwitch;
@@ -39,7 +37,6 @@ typedef void (^OnErrorBlock)(NSString * errorMsg);
 - (void)reconnectIfNeeded;
 - (void)dismissKeyboard;
 - (void)postResult:(NSString *)result;
-- (IBAction)encryptionKey:(id)sender;
 
 @end
 

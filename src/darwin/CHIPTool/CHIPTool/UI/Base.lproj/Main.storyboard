@@ -381,28 +381,12 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Use Incorrect Encryption Keys" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="778-me-ArK">
-                                <rect key="frame" x="16" y="273" width="231" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="dN9-8p-BcA">
-                                <rect key="frame" x="349" y="268" width="51" height="31"/>
-                                <connections>
-                                    <action selector="encryptionKey:" destination="NR6-8N-IDd" eventType="valueChanged" id="Ggg-GX-tuM"/>
-                                </connections>
-                            </switch>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="cfO-gM-sug" firstAttribute="top" secondItem="dN9-8p-BcA" secondAttribute="bottom" constant="24" id="A9R-9q-bzG"/>
                             <constraint firstItem="7aI-Vo-UyO" firstAttribute="top" secondItem="UPn-Qe-uvu" secondAttribute="top" constant="40" id="B9Y-y5-JFG"/>
                             <constraint firstItem="tC3-Jk-Opv" firstAttribute="centerY" secondItem="Tzm-Xh-QOZ" secondAttribute="centerY" id="Egc-2k-Dph"/>
                             <constraint firstItem="UPn-Qe-uvu" firstAttribute="trailing" secondItem="tC3-Jk-Opv" secondAttribute="trailing" constant="16" id="JXz-FF-C88"/>
-                            <constraint firstItem="dN9-8p-BcA" firstAttribute="top" secondItem="tC3-Jk-Opv" secondAttribute="bottom" constant="26" id="KUK-yd-Sge"/>
-                            <constraint firstItem="778-me-ArK" firstAttribute="leading" secondItem="UPn-Qe-uvu" secondAttribute="leading" constant="16" id="QGc-aq-sk9"/>
-                            <constraint firstItem="UPn-Qe-uvu" firstAttribute="trailing" secondItem="dN9-8p-BcA" secondAttribute="trailing" constant="16" id="REb-3f-Z1g"/>
                             <constraint firstItem="UPn-Qe-uvu" firstAttribute="trailing" secondItem="cfO-gM-sug" secondAttribute="trailing" constant="16" id="SN2-ii-WwN"/>
                             <constraint firstItem="6Z1-j3-AvT" firstAttribute="top" secondItem="cfO-gM-sug" secondAttribute="bottom" constant="40" id="SQh-l6-Flp"/>
                             <constraint firstItem="7aI-Vo-UyO" firstAttribute="centerX" secondItem="UPn-Qe-uvu" secondAttribute="centerX" id="VC8-BO-IEv"/>
@@ -415,7 +399,6 @@
                             <constraint firstItem="6Z1-j3-AvT" firstAttribute="leading" secondItem="UPn-Qe-uvu" secondAttribute="leading" constant="16" id="fdf-Mv-mqP"/>
                             <constraint firstItem="6Z1-j3-AvT" firstAttribute="top" secondItem="lvN-Eg-W6F" secondAttribute="bottom" constant="40" id="keR-8B-8EU"/>
                             <constraint firstItem="Tzm-Xh-QOZ" firstAttribute="leading" secondItem="UPn-Qe-uvu" secondAttribute="leading" constant="16" id="oFI-15-MgQ"/>
-                            <constraint firstItem="778-me-ArK" firstAttribute="centerY" secondItem="dN9-8p-BcA" secondAttribute="centerY" id="vRO-8x-KDG"/>
                             <constraint firstItem="tC3-Jk-Opv" firstAttribute="top" secondItem="7aI-Vo-UyO" secondAttribute="bottom" constant="8" id="xkI-6e-Plp"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="UPn-Qe-uvu"/>
@@ -424,7 +407,6 @@
                     <navigationItem key="navigationItem" id="gdO-P7-Ere"/>
                     <connections>
                         <outlet property="IPLabel" destination="Tzm-Xh-QOZ" id="lYU-0W-rNa"/>
-                        <outlet property="encryptionKeySwitch" destination="dN9-8p-BcA" id="geC-Ed-VOi"/>
                         <outlet property="messageTextField" destination="lvN-Eg-W6F" id="I9L-eN-4b6"/>
                         <outlet property="resultLabel" destination="6Z1-j3-AvT" id="mMP-KW-l7u"/>
                         <outlet property="sendButton" destination="cfO-gM-sug" id="jSr-fh-7Y0"/>
@@ -565,7 +547,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="192.168.1.1" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="WTA-xG-Iyv">
-                                <rect key="frame" x="145" y="187" width="253" height="34.666666666666657"/>
+                                <rect key="frame" x="145" y="187" width="253" height="34"/>
                                 <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                 <textInputTraits key="textInputTraits" keyboardType="decimalPad"/>
@@ -626,41 +608,24 @@
                                     <action selector="offButtonTapped:" destination="UgW-Ob-0KX" eventType="touchUpInside" id="JJt-5D-6pb"/>
                                 </connections>
                             </button>
-                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="kmC-Kl-vj2">
-                                <rect key="frame" x="349" y="255.66666666666663" width="51" height="31"/>
-                                <connections>
-                                    <action selector="encryptionKey:" destination="UgW-Ob-0KX" eventType="valueChanged" id="WaE-yH-elT"/>
-                                </connections>
-                            </switch>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="751" text="Use Incorrect Encryption Keys" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HeR-1a-hjt">
-                                <rect key="frame" x="16" y="260.66666666666669" width="231" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="cwX-vi-vgG" firstAttribute="width" secondItem="1XM-cR-Y6o" secondAttribute="width" id="582-Pj-QoZ"/>
                             <constraint firstItem="XIj-Oo-qmz" firstAttribute="leading" secondItem="kG5-yT-GzM" secondAttribute="leading" constant="16" id="6o4-kh-TOw"/>
-                            <constraint firstItem="HeR-1a-hjt" firstAttribute="leading" secondItem="kG5-yT-GzM" secondAttribute="leading" constant="16" id="9XA-y5-9Om"/>
                             <constraint firstItem="jhI-Pt-QaG" firstAttribute="top" secondItem="XIj-Oo-qmz" secondAttribute="bottom" constant="95" id="A5I-Ui-JsH"/>
                             <constraint firstItem="cwX-vi-vgG" firstAttribute="height" secondItem="1XM-cR-Y6o" secondAttribute="height" id="ARb-ea-aSV"/>
                             <constraint firstItem="eg3-7c-7WS" firstAttribute="top" secondItem="kG5-yT-GzM" secondAttribute="top" constant="19" id="Eu0-fd-IpC"/>
                             <constraint firstItem="XIj-Oo-qmz" firstAttribute="leading" secondItem="c45-FF-oLb" secondAttribute="leadingMargin" id="KLq-hK-kli"/>
                             <constraint firstItem="ERS-fv-Yhs" firstAttribute="leading" secondItem="kG5-yT-GzM" secondAttribute="leading" constant="16" id="LVO-tn-vpG"/>
                             <constraint firstItem="eg3-7c-7WS" firstAttribute="leading" secondItem="kG5-yT-GzM" secondAttribute="leading" constant="77" id="LyU-T1-mwz"/>
-                            <constraint firstItem="kG5-yT-GzM" firstAttribute="trailing" secondItem="kmC-Kl-vj2" secondAttribute="trailing" constant="16" id="O1w-nm-0Or"/>
-                            <constraint firstItem="1XM-cR-Y6o" firstAttribute="top" secondItem="kmC-Kl-vj2" secondAttribute="bottom" constant="23" id="OOf-aG-laS"/>
                             <constraint firstItem="1XM-cR-Y6o" firstAttribute="centerY" secondItem="cwX-vi-vgG" secondAttribute="centerY" id="PIV-cB-jxE"/>
                             <constraint firstItem="ERS-fv-Yhs" firstAttribute="top" secondItem="jhI-Pt-QaG" secondAttribute="bottom" constant="30" id="SfK-C8-ojg"/>
                             <constraint firstItem="kG5-yT-GzM" firstAttribute="trailing" relation="lessThanOrEqual" secondItem="1XM-cR-Y6o" secondAttribute="trailing" constant="200" id="Ssx-2M-iya"/>
                             <constraint firstItem="cwX-vi-vgG" firstAttribute="leading" secondItem="jhI-Pt-QaG" secondAttribute="trailing" constant="10" id="Urx-pk-Pkt"/>
-                            <constraint firstItem="HeR-1a-hjt" firstAttribute="centerY" secondItem="kmC-Kl-vj2" secondAttribute="centerY" id="V0E-8b-aCB"/>
                             <constraint firstItem="jhI-Pt-QaG" firstAttribute="height" secondItem="cwX-vi-vgG" secondAttribute="height" id="ZQb-0R-izb"/>
                             <constraint firstItem="jhI-Pt-QaG" firstAttribute="leading" secondItem="kG5-yT-GzM" secondAttribute="leading" constant="16" id="cec-Qo-hyK"/>
                             <constraint firstItem="XIj-Oo-qmz" firstAttribute="top" secondItem="eg3-7c-7WS" secondAttribute="bottom" constant="14.666666666666657" id="eBh-cR-lX1"/>
-                            <constraint firstItem="kmC-Kl-vj2" firstAttribute="top" secondItem="WTA-xG-Iyv" secondAttribute="bottom" constant="34" id="eCg-dt-JkC"/>
                             <constraint firstItem="kG5-yT-GzM" firstAttribute="trailing" secondItem="ERS-fv-Yhs" secondAttribute="trailing" constant="16" id="gij-Jw-J5R"/>
                             <constraint firstItem="1XM-cR-Y6o" firstAttribute="leading" secondItem="cwX-vi-vgG" secondAttribute="trailing" constant="10" id="kCe-dG-Nbo"/>
                             <constraint firstItem="cwX-vi-vgG" firstAttribute="centerY" secondItem="jhI-Pt-QaG" secondAttribute="centerY" id="lGp-co-aTI"/>
@@ -674,7 +639,6 @@
                     <navigationItem key="navigationItem" id="X3a-IB-ct7"/>
                     <connections>
                         <outlet property="IPLabel" destination="XIj-Oo-qmz" id="MW7-GN-hns"/>
-                        <outlet property="encryptionKeySwitch" destination="kmC-Kl-vj2" id="vlU-GK-77e"/>
                         <outlet property="offButton" destination="cwX-vi-vgG" id="ctm-j9-5Vj"/>
                         <outlet property="onButton" destination="jhI-Pt-QaG" id="qUw-MV-lYT"/>
                         <outlet property="resultLabel" destination="ERS-fv-Yhs" id="Jgg-GZ-RIs"/>

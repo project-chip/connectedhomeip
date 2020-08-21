@@ -46,26 +46,6 @@ class ChipConnection;
 class Binding;
 
 /**
- *  @def CHIP_TRICKLE_DEFAULT_PERIOD
- *
- *  @brief
- *    Defines Trickle algorithm's default period (in milliseconds) for periodic
- *    transmissions.
- *
- */
-#define CHIP_TRICKLE_DEFAULT_PERIOD 1000
-
-/**
- *  @def CHIP_TRICKLE_DEFAULT_THRESHOLD
- *
- *  @brief
- *    Defines Trickle algorithm's default value for the maximum number of received
- *    duplicate messages to wait before retransmission.
- *
- */
-#define CHIP_TRICKLE_DEFAULT_THRESHOLD 2
-
-/**
  *  @class ChipExchangeHeader
  *
  *  @brief
@@ -143,11 +123,9 @@ public:
 #endif
     enum
     {
-        kSendFlag_AutoRetrans           = 0x0001, /**< Used to indicate that automatic retransmission is enabled. */
-        kSendFlag_ExpectResponse        = 0x0002, /**< Used to indicate that a response is expected within a specified timeout. */
-        kSendFlag_RetransmissionTrickle = 0x0004, /**< Used to indicate the requirement of retransmissions for Trickle. */
+        kSendFlag_AutoRetrans    = 0x0001, /**< Used to indicate that automatic retransmission is enabled. */
+        kSendFlag_ExpectResponse = 0x0002, /**< Used to indicate that a response is expected within a specified timeout. */
         kSendFlag_DelaySend      = 0x0008, /**< Used to indicate that the sending of the current message needs to be delayed. */
-        kSendFlag_ReuseMessageId = 0x0010, /**< Used to indicate that the message ID in the message header can be reused. */
         kSendFlag_ReuseSourceId  = 0x0020, /**< Used to indicate that the source node ID in the message header can be reused. */
         kSendFlag_RetainBuffer   = 0x0040, /**< Used to indicate that the message buffer should not be freed after sending. */
         kSendFlag_AlreadyEncoded = 0x0080, /**< Used to indicate that the message is already encoded. */
@@ -197,9 +175,6 @@ public:
     CHIP_ERROR SendCommonNullMessage(void);
     CHIP_ERROR EncodeExchHeader(ChipExchangeHeader * exchangeHeader, uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf,
                                 uint16_t sendFlags);
-    void TeardownTrickleRetransmit(void);
-    CHIP_ERROR SetupTrickleRetransmit(uint32_t retransInterval = CHIP_TRICKLE_DEFAULT_PERIOD,
-                                      uint8_t threshold = CHIP_TRICKLE_DEFAULT_THRESHOLD, uint32_t timeout = 0);
 
     /**
      * This function is the application callback for handling a received CHIP message.
@@ -272,7 +247,6 @@ public:
     KeyErrorFunct OnKeyError;
 
     void CancelRetrans(void);
-    void HandleTrickleMessage(const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo);
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     CHIP_ERROR RMPSendThrottleFlow(uint32_t PauseTimeMillis);
@@ -334,7 +308,6 @@ public:
     void Close(void);
     void Abort(void);
     void Release(void);
-    CHIP_ERROR StartTimerT(void);
 
     enum
     {
@@ -347,19 +320,12 @@ public:
 
 private:
     PacketBuffer * msg; // If we are re-transmitting, then this is the pointer to the message being retransmitted
-    // Trickle-controlled retransmissions:
-    uint32_t backoff; // backoff for sampling the numner of messages
-    uint32_t currentBcastMsgID;
-    uint8_t msgsReceived;         // number of messages heard during the backoff period
-    uint8_t rebroadcastThreshold; // re-broadcast threshold
 
     uint16_t mFlags; // Internal state flags
 
     CHIP_ERROR ResendMessage(void);
     bool MatchExchange(ChipConnection * msgCon, const ChipMessageInfo * msgInfo, const ChipExchangeHeader * exchangeHeader);
-    static void TimerTau(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
     static void CancelRetransmissionTimer(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
-    static void TimerT(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 
     CHIP_ERROR StartResponseTimer(void);
     void CancelResponseTimer(void);
@@ -412,6 +378,8 @@ public:
     };
 
     ChipExchangeManager(void);
+    ChipExchangeManager(const ChipExchangeManager &) = delete;
+    ChipExchangeManager operator=(const ChipExchangeManager &) = delete;
 
     ChipMessageLayer * MessageLayer; /**< [READ ONLY] The associated ChipMessageLayer object. */
     ChipFabricState * FabricState;   /**< [READ ONLY] The associated FabricState object. */
@@ -546,8 +514,6 @@ private:
 
     void NotifySecurityManagerAvailable();
     void NotifyKeyFailed(uint64_t peerNodeId, uint16_t keyId, CHIP_ERROR keyErr);
-
-    ChipExchangeManager(const ChipExchangeManager &); // not defined
 };
 
 #if !CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT

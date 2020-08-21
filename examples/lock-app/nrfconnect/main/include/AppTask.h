@@ -47,6 +47,7 @@ private:
 
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
+    static void JoinerHandler(AppEvent * aEvent);
     static void LockActionEventHandler(AppEvent * aEvent);
 
     static void ButtonEventHandler(uint32_t buttons_state, uint32_t has_changed);

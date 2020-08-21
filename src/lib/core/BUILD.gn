@@ -63,7 +63,7 @@ buildconfig_header("chip_buildconfig") {
     "HAVE_NEW=false",
     "CHIP_CONFIG_MEMORY_MGMT_SIMPLE=${chip_config_memory_management_simple}",
     "CHIP_CONFIG_MEMORY_MGMT_PLATFORM=${chip_config_memory_management_platform}",
-    "CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING=false",
+    "CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING=true",
     "CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES=false",
   ]
 }

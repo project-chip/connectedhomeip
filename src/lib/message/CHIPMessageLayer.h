@@ -119,7 +119,6 @@ typedef struct ChipMessageInfo ChipMessageHeader;
  */
 typedef enum ChipMessageFlags
 {
-    kChipMessageFlag_ReuseMessageId = 0x00000010, /**< Indicates that the existing message identifier must be reused. */
     kChipMessageFlag_ReuseSourceId  = 0x00000020, /**< Indicates that the existing source node identifier must be reused. */
     kChipMessageFlag_DelaySend      = 0x00000040, /**< Indicates that the sending of the message needs to be delayed. */
     kChipMessageFlag_RetainBuffer   = 0x00000080, /**< Indicates that the message buffer should not be freed after sending. */
@@ -170,15 +169,13 @@ typedef enum ChipEncryptionType
  *
  *  @details
  *    CHIP will choose the appropriate message version based on the frame format required for the CHIP
- *    message. By default, the message version is kChipMessageVersion_V1. When using CHIP Reliable
- *    Messaging, for example, the version is kChipMessageVersion_V2.
+ *    message.
  *
  */
 typedef enum ChipMessageVersion
 {
     kChipMessageVersion_Unspecified = 0, /**< Unspecified message version. */
     kChipMessageVersion_V1          = 1, /**< Message header format version V1. */
-    kChipMessageVersion_V2          = 2  /**< Message header format version V2. */
 } ChipMessageVersion;
 
 /**
@@ -492,6 +489,8 @@ public:
     };
 
     ChipMessageLayer(void);
+    ChipMessageLayer(const ChipMessageLayer &) = delete;
+    ChipMessageLayer & operator=(const ChipMessageLayer &) = delete;
 
     System::Layer * SystemLayer;       /*** [READ ONLY] The associated SystemLayer object. */
     InetLayer * Inet;                  /**< [READ ONLY] The associated InetLayer object. */
@@ -717,8 +716,6 @@ private:
     static bool IsIgnoredMulticastSendError(CHIP_ERROR err);
 
     static bool IsSendErrorNonCritical(CHIP_ERROR err);
-
-    ChipMessageLayer(const ChipMessageLayer &); // not defined
 
 #if CONFIG_NETWORK_LAYER_BLE
 public:

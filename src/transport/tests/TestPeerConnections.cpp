@@ -149,12 +149,10 @@ void TestFindByKeyId(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, statePtr == nullptr);
 
     // Lookup using a node ID, and peer key
-    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(Optional<NodeId>::Value(kPeer1NodeId), 1, &statePtr));
-    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
+    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(Optional<NodeId>::Value(kPeer1NodeId), 1, &statePtr));
 
     // Lookup using a node ID, and local key
-    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(kPeer1NodeId), 2, &statePtr));
-    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
+    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(kPeer1NodeId), 2, &statePtr));
 
     // Some Node ID, peer key 3, local key 4
     err = connections.CreateNewPeerConnectionState(Optional<NodeId>::Value(kPeer1NodeId), 3, 4, &statePtr);
