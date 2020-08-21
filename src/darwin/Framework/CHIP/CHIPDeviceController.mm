@@ -63,8 +63,6 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
  */
 @property (readonly, nonatomic) dispatch_queue_t delegateQueue;
 @property (readonly) chip::DeviceController::ChipDeviceController * cppController;
-@property (readwrite) NSData * localKey;
-@property (readwrite) NSData * peerKey;
 
 @end
 
@@ -181,16 +179,9 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     }
 }
 
-- (BOOL)connect:(NSString *)ipAddress
-      local_key:(NSData *)local_key
-       peer_key:(NSData *)peer_key
-          error:(NSError * __autoreleasing *)error
+- (BOOL)connect:(NSString *)ipAddress error:(NSError * __autoreleasing *)error
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // cache the keys before calling connect (because connect invokes the manual key exchange)
-    self.localKey = local_key.copy;
-    self.peerKey = peer_key.copy;
 
     [self.lock lock];
     chip::Inet::IPAddress addr;
