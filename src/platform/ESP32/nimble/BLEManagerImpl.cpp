@@ -70,9 +70,9 @@ struct ESP32ChipServiceData
     ChipBLEDeviceIdentificationInfo DeviceIdInfo;
 };
 
-const uint16_t UUID16_CHIPoBLEService   = 0xFEAF;
-const ble_uuid16_t UUID_CHIPoBLEService = { BLE_UUID_TYPE_16, UUID16_CHIPoBLEService };
-const uint8_t ShortUUID_CHIPoBLEService[]  = { 0xAF, 0xFE };
+const uint16_t UUID16_CHIPoBLEService     = 0xFEAF;
+const ble_uuid16_t UUID_CHIPoBLEService   = { BLE_UUID_TYPE_16, UUID16_CHIPoBLEService };
+const uint8_t ShortUUID_CHIPoBLEService[] = { 0xAF, 0xFE };
 
 const ble_uuid128_t UUID128_CHIPoBLEChar_RX = {
     BLE_UUID_TYPE_128, { 0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 }
@@ -536,7 +536,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     advData[index++] = advDataVersionDiscriminator & 0x00FF;
 
     // Construct the Chip BLE Service Data to be sent in the scan response packet.
-    err= ble_gap_adv_set_data(advData, sizeof(advData));
+    err = ble_gap_adv_set_data(advData, sizeof(advData));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "ble_gap_adv_set_data failed: %s", ErrorStr(err));
