@@ -37,15 +37,26 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/UDP.h>
 
+#if CHIP_ENABLE_OPENTHREAD
+#include <openthread/message.h>
+#include <openthread/udp.h>
+#include <platform/EFR32/ThreadStackManagerImpl.h>
+#include <platform/OpenThread/OpenThreadUtils.h>
+#include <platform/ThreadStackManager.h>
+#include <platform/internal/DeviceNetworkInfo.h>
+#endif
+
 #include "Server.h"
 
 #include "attribute-storage.h"
 #include "gen/znet-bookkeeping.h"
 #include "util.h"
+#include <app/chip-zcl-zpro-codec.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
+using namespace ::chip::DeviceLayer;
 
 // Transport Callbacks
 namespace {
@@ -54,6 +65,10 @@ namespace {
 // Use this hardcoded NODEID for the lock app example if none was provided
 #define EXAMPLE_SERVER_NODEID 0x3546526e
 #endif // EXAMPLE_SERVER_NODEID
+
+static char sDeviceName[128] = { 0 };
+// Hardcode UDP BroadcastPort. Temporary use for demo with OTBR
+constexpr uint16_t kUDPBroadcastPort = 23367;
 
 class ServerCallback : public SecureSessionMgrCallback
 {
@@ -139,6 +154,58 @@ static SecurePairingUsingTestSecret gTestPairing;
 
 } // namespace
 
+void SetDeviceName(const char * newDeviceName)
+{
+    strncpy(sDeviceName, newDeviceName, sizeof(sDeviceName) - 1);
+}
+
+void PublishService()
+{
+    chip::Inet::IPAddress addr;
+    if (!ConnectivityMgrImpl().IsThreadAttached())
+    {
+        return;
+    }
+    ThreadStackMgrImpl().LockThreadStack();
+    otError error = OT_ERROR_NONE;
+    otMessageInfo messageInfo;
+    otUdpSocket mSocket;
+    otMessage * message = nullptr;
+
+    memset(&mSocket, 0, sizeof(mSocket));
+    memset(&messageInfo, 0, sizeof(messageInfo));
+
+    // Use mesh local EID by default, if we have GUA, use that IP address.
+    memcpy(&messageInfo.mSockAddr, otThreadGetMeshLocalEid(ThreadStackMgrImpl().OTInstance()), sizeof(messageInfo.mSockAddr));
+
+    // Select a address to send
+    const otNetifAddress * otAddrs = otIp6GetUnicastAddresses(ThreadStackMgrImpl().OTInstance());
+    for (const otNetifAddress * otAddr = otAddrs; otAddr != NULL; otAddr = otAddr->mNext)
+    {
+        addr = chip::DeviceLayer::Internal::ToIPAddress(otAddr->mAddress);
+        if (otAddr->mValid && addr.IsIPv6GlobalUnicast())
+        {
+            memcpy(&messageInfo.mSockAddr, &(otAddr->mAddress), sizeof(otAddr->mAddress));
+            break;
+        }
+    }
+
+    message = otUdpNewMessage(ThreadStackMgrImpl().OTInstance(), nullptr);
+    otIp6AddressFromString("ff03::1", &messageInfo.mPeerAddr);
+    messageInfo.mPeerPort = kUDPBroadcastPort;
+    otMessageAppend(message, sDeviceName, static_cast<uint16_t>(strlen(sDeviceName)));
+
+    error = otUdpSend(ThreadStackMgrImpl().OTInstance(), &mSocket, message, &messageInfo);
+
+    if (error != OT_ERROR_NONE && message != nullptr)
+    {
+        otMessageFree(message);
+        EFR32_LOG("Failed to otUdpSend: %d", error);
+    }
+    ThreadStackMgrImpl().UnlockThreadStack();
+}
+
+;
 void InitDataModelHandler()
 {
     emberAfEndpointConfigure();

@@ -26,6 +26,8 @@
 
 using DemoSessionManager = chip::SecureSessionMgr<chip::Transport::UDP>;
 
+void SetDeviceName(const char * newDeviceName);
+void PublishService();
 void StartServer(DemoSessionManager * sessions);
 void InitDataModelHandler();
 
