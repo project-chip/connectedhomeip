@@ -114,5 +114,5 @@ group("nrf5") {
 }
 
 group("default") {
-  deps = [":nrf5"]
+  deps = [ ":nrf5" ]
 }
