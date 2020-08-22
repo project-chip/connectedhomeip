@@ -109,3 +109,7 @@ executable("lighting_app") {
 group("nrf5") {
   deps = [ ":lighting_app" ]
 }
+
+group("default") {
+  deps = [":nrf5"]
+}
