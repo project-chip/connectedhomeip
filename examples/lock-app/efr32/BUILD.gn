@@ -107,5 +107,5 @@ group("efr32") {
 }
 
 group("default") {
-  deps = [":efr32"]
+  deps = [ ":efr32" ]
 }
