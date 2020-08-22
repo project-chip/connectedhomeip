@@ -89,13 +89,6 @@ int AppTask::Init()
     // Initialise WSTK buttons PB0 and PB1 (including debounce).
     ButtonHandler::Init();
 
-    // Initialize LEDs
-    LEDWidget::InitGpio();
-    sStatusLED.Init(SYSTEM_STATE_LED);
-
-    sLockLED.Init(LOCK_STATE_LED);
-    sLockLED.Set(!BoltLockMgr().IsUnlocked());
-
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
                                   1,                // == default timer period (mS)
@@ -118,6 +111,13 @@ int AppTask::Init()
     }
 
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+
+    // Initialize LEDs
+    LEDWidget::InitGpio();
+    sStatusLED.Init(SYSTEM_STATE_LED);
+
+    sLockLED.Init(LOCK_STATE_LED);
+    sLockLED.Set(!BoltLockMgr().IsUnlocked());
 
     return err;
 }
