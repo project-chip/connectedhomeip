@@ -41,8 +41,6 @@ static_library("message") {
     "CHIPServerBase.cpp",
     "CHIPServerBase.h",
     "ExchangeContext.cpp",
-    "HostPortList.cpp",
-    "HostPortList.h",
   ]
 
   public_deps = [
