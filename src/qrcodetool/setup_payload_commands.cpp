@@ -30,9 +30,9 @@ enum class SetupPayloadCodeType
     SetupPayloadCodeTypeManual
 };
 
-static string _extractFilePath(int argc, char * const * argv)
+static std::string _extractFilePath(int argc, char * const * argv)
 {
-    string path;
+    std::string path;
     if (argc == 0)
     {
         return path;
@@ -53,18 +53,18 @@ static string _extractFilePath(int argc, char * const * argv)
             return path; /* @@@ Return 2 triggers usage message. */
         }
     }
-    return string(filePath);
+    return std::string(filePath);
 }
 
 extern int setup_payload_operation_generate_qr_code(int argc, char * const * argv)
 {
     ChipLogDetail(chipTool, "setup_payload_operation_generate_qr_code\n");
-    string path = _extractFilePath(argc, argv);
+    std::string path = _extractFilePath(argc, argv);
     if (path.length() == 0)
     {
         return 2;
     }
-    string code;
+    std::string code;
     CHIP_ERROR err = generateQRCodeFromFilePath(path, code);
     if (err == CHIP_NO_ERROR)
     {
@@ -80,12 +80,12 @@ extern int setup_payload_operation_generate_qr_code(int argc, char * const * arg
 extern int setup_payload_operation_generate_manual_code(int argc, char * const * argv)
 {
     ChipLogDetail(chipTool, "setup_payload_operation_generate_qr_code\n");
-    string path = _extractFilePath(argc, argv);
+    std::string path = _extractFilePath(argc, argv);
     if (path.length() == 0)
     {
         return 2;
     }
-    string code;
+    std::string code;
     CHIP_ERROR err = generateManualCodeFromFilePath(path, code);
     if (err == CHIP_NO_ERROR)
     {

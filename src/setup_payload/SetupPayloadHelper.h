@@ -28,11 +28,9 @@
 
 #include <string>
 
-using namespace std;
-
 namespace chip {
-CHIP_ERROR generateQRCodeFromFilePath(string filePath, string & outCode);
-CHIP_ERROR generateManualCodeFromFilePath(string filePath, string & outCode);
+CHIP_ERROR generateQRCodeFromFilePath(std::string filePath, std::string & outCode);
+CHIP_ERROR generateManualCodeFromFilePath(std::string filePath, std::string & outCode);
 } // namespace chip
 
 #endif /* SetupPayloadHelper_h */

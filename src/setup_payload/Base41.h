@@ -29,12 +29,10 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
 namespace chip {
 // returns CHIP_NO_ERROR on successful decode
-CHIP_ERROR base41Decode(string base41, vector<uint8_t> & out);
-string base41Encode(const uint8_t * buf, size_t buf_len);
+CHIP_ERROR base41Decode(std::string base41, std::vector<uint8_t> & out);
+std::string base41Encode(const uint8_t * buf, size_t buf_len);
 
 } // namespace chip
 

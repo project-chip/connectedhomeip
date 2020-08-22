@@ -366,7 +366,7 @@ bool isRendezvousBypassed()
 std::string createSetupPayload()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    string result;
+    std::string result;
 
     uint32_t discriminator;
     err = ConfigurationMgr().GetSetupDiscriminator(discriminator);
