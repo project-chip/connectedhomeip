@@ -34,7 +34,6 @@ lib_LTLIBRARIES                              = libCHIPController.la
 
 libCHIPController_la_CPPFLAGS                              = \
     -I$(top_srcdir)/src                                      \
-    -I$(top_srcdir)/src/app/util/command-encoder             \
     -I$(top_srcdir)/src/lib                                  \
     -I$(top_srcdir)/src/lib/core                             \
     -I$(top_srcdir)/src/controller                           \
