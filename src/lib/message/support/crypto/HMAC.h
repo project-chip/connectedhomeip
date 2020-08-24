@@ -32,12 +32,10 @@
 #include "CHIPCrypto.h"
 #include "HashAlgos.h"
 #include <core/CHIPTLV.h>
-#include <support/ASN1.h>
 
 namespace chip {
 namespace Crypto {
 
-using chip::ASN1::OID;
 using chip::TLV::TLVReader;
 using chip::TLV::TLVWriter;
 
@@ -97,16 +95,6 @@ inline CHIP_ERROR EncodedHMACSignature::WriteSignature(TLVWriter & writer, uint6
 {
     return writer.PutBytes(tag, Sig, Len);
 }
-
-// =============================================================
-// Primary HMAC utility functions used by CHIP security code.
-// =============================================================
-
-extern CHIP_ERROR GenerateAndEncodeChipHMACSignature(OID sigAlgoOID, TLVWriter & writer, uint64_t tag, const uint8_t * data,
-                                                     uint16_t dataLen, const uint8_t * key, uint16_t keyLen);
-
-extern CHIP_ERROR VerifyHMACSignature(OID sigAlgoOID, const uint8_t * data, uint16_t dataLen, const EncodedHMACSignature & sig,
-                                      const uint8_t * key, uint16_t keyLen);
 
 } // namespace Crypto
 } // namespace chip
