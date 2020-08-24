@@ -33,14 +33,14 @@
 
 #include <stddef.h>
 
-#include <Profiles/common/CommonProfile.h>
-#include <Profiles/security/CHIPSecurity.h>
+#include <protocols/common/CommonProtocol.h>
+#include <protocols/security/CHIPSecurity.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <message/CHIPBinding.h>
 #include <message/CHIPExchangeMgr.h>
 #include <message/CHIPSecurityMgr.h>
-#include <profiles/CHIPProfiles.h>
+#include <protocols/CHIPProtocols.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
@@ -51,7 +51,7 @@
 namespace chip {
 
 using namespace nl;
-using namespace chip::Profiles;
+using namespace chip::Protocols;
 using namespace chip::Encoding;
 
 /**
@@ -672,8 +672,8 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
                   msgCon->LogId(), exchangeHeader.ExchangeId, (long) err, msgInfo->MessageId);
 
 #if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
-    isMsgCounterSyncResp = exchangeHeader.ProfileId == chip::Profiles::kChipProfile_Security &&
-        exchangeHeader.MessageType == chip::Profiles::Security::kMsgType_MsgCounterSyncResp;
+    isMsgCounterSyncResp = exchangeHeader.ProfileId == chip::Protocols::kChipProtocol_Security &&
+        exchangeHeader.MessageType == chip::Protocols::Security::kMsgType_MsgCounterSyncResp;
     peerGroupMsgIdNotSynchronized = (msgInfo->Flags & kChipMessageFlag_PeerGroupMsgIdNotSynchronized) != 0;
 
     // If received message is a MsgCounterSyncResp process it first.
@@ -708,8 +708,8 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     // Received Delayed Delivery Message: Extend time for pending retrans objects
-    if (exchangeHeader.ProfileId == chip::Profiles::kChipProfile_Common &&
-        exchangeHeader.MessageType == chip::Profiles::Common::kMsgType_RMP_Delayed_Delivery)
+    if (exchangeHeader.ProfileId == chip::Protocols::kChipProtocol_Common &&
+        exchangeHeader.MessageType == chip::Protocols::Common::kMsgType_RMP_Delayed_Delivery)
     {
         // Process Delayed Delivery message if it is not a duplicate.
         if ((msgInfo->Flags & kChipMessageFlag_DuplicateMessage) == 0)

@@ -33,12 +33,12 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <Profiles/common/CommonProfile.h>
+#include <protocols/common/CommonProtocol.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <message/CHIPExchangeMgr.h>
 #include <message/CHIPSecurityMgr.h>
-#include <profiles/CHIPProfiles.h>
+#include <protocols/CHIPProtocols.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <support/FlagUtils.hpp>
@@ -238,9 +238,9 @@ bool ExchangeContext::ShouldDropAck(void) const
 
 static inline bool IsRMPControlMessage(uint32_t profileId, uint8_t msgType)
 {
-    return (profileId == chip::Profiles::kChipProfile_Common &&
-            (msgType == chip::Profiles::Common::kMsgType_RMP_Throttle_Flow ||
-             msgType == chip::Profiles::Common::kMsgType_RMP_Delayed_Delivery));
+    return (profileId == chip::Protocols::kChipProtocol_Common &&
+            (msgType == chip::Protocols::Common::kMsgType_RMP_Throttle_Flow ||
+             msgType == chip::Protocols::Common::kMsgType_RMP_Delayed_Delivery));
 }
 #endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
@@ -625,7 +625,7 @@ CHIP_ERROR ExchangeContext::SendCommonNullMessage(void)
 
     // Send the null message
     err =
-        SendMessage(chip::Profiles::kChipProfile_Common, chip::Profiles::Common::kMsgType_Null, msgBuf, kSendFlag_NoAutoRequestAck);
+        SendMessage(chip::Protocols::kChipProtocol_Common, chip::Protocols::Common::kMsgType_Null, msgBuf, kSendFlag_NoAutoRequestAck);
     msgBuf = NULL;
 
 exit:
@@ -1046,7 +1046,7 @@ CHIP_ERROR ExchangeContext::RMPSendThrottleFlow(uint32_t pauseTimeMillis)
     // Send a Throttle Flow message to the peer.  Throttle Flow messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = SendMessage(Profiles::kChipProfile_Common, Profiles::Common::kMsgType_RMP_Throttle_Flow, msgBuf,
+    err = SendMessage(Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Throttle_Flow, msgBuf,
                       kSendFlag_NoAutoRequestAck);
 
 exit:
@@ -1104,7 +1104,7 @@ CHIP_ERROR ExchangeContext::RMPSendDelayedDelivery(uint32_t pauseTimeMillis, uin
     // Send a Delayed Delivery message to the peer.  Delayed Delivery messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = SendMessage(Profiles::kChipProfile_Common, Profiles::Common::kMsgType_RMP_Delayed_Delivery, msgBuf,
+    err = SendMessage(Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Delayed_Delivery, msgBuf,
                       kSendFlag_NoAutoRequestAck);
 
 exit:
@@ -1349,8 +1349,8 @@ CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo * msgInfo, const ChipE
     }
 
     // Received Flow Throttle
-    if (exchHeader->ProfileId == chip::Profiles::kChipProfile_Common &&
-        exchHeader->MessageType == chip::Profiles::Common::kMsgType_RMP_Throttle_Flow)
+    if (exchHeader->ProfileId == chip::Protocols::kChipProtocol_Common &&
+        exchHeader->MessageType == chip::Protocols::Common::kMsgType_RMP_Throttle_Flow)
     {
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         // Extract PauseTimeMillis from msgBuf
@@ -1361,8 +1361,8 @@ CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo * msgInfo, const ChipE
 #endif
     }
     // Return and not pass this to Application if Common::Null Msg Type
-    else if ((exchHeader->ProfileId == chip::Profiles::kChipProfile_Common) &&
-             (exchHeader->MessageType == chip::Profiles::Common::kMsgType_Null))
+    else if ((exchHeader->ProfileId == chip::Protocols::kChipProtocol_Common) &&
+             (exchHeader->MessageType == chip::Protocols::Common::kMsgType_Null))
     {
         ExitNow(err = CHIP_NO_ERROR);
     }

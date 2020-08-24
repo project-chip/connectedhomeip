@@ -27,8 +27,8 @@
 #ifndef CHIPSECURITYMANAGER_H_
 #define CHIPSECURITYMANAGER_H_
 
-#include <Profiles/common/CHIPMessage.h>
-#include <Profiles/status-report/StatusReportProfile.h>
+#include <protocols/common/CHIPMessage.h>
+#include <protocols/status-report/StatusReportProtocol.h>
 #include <core/CHIPError.h>
 #include <message/CHIPExchangeMgr.h>
 #include <support/DLLUtil.h>
@@ -76,7 +76,7 @@ extern void OnTimeConsumingCryptoDone(void);
 } // namespace Security
 } // namespace Platform
 
-using chip::Profiles::StatusReporting::StatusReport;
+using chip::Protocols::StatusReporting::StatusReport;
 
 class DLL_EXPORT ChipSecurityManager
 {
