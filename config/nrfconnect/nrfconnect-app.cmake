@@ -66,6 +66,7 @@ set(CHIP_OUTPUT_LIBRARIES
     ${CHIP_OUTPUT_DIR}/lib/libBleLayer.a
     ${CHIP_OUTPUT_DIR}/lib/libDeviceLayer.a
     ${CHIP_OUTPUT_DIR}/lib/libCHIPDataModel.a
+    ${CHIP_OUTPUT_DIR}/lib/libSetupPayload.a
 )
 
 # ==================================================
