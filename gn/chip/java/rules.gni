@@ -43,7 +43,7 @@ template("java_library") {
   }
   write_file(_java_sources_file, rebase_path(_java_files, root_build_dir))
 
-  # FIXME: implement
+  # Compiles the given files into a directory and generates a 'class list'
   _javac_target_name = target_name + "__javac"
   _class_dir = rebase_path(target_gen_dir, root_build_dir) + "/classes"
   _class_list_file = "$target_gen_dir/$target_name.classlist"
@@ -63,6 +63,7 @@ template("java_library") {
     ]
   }
 
+  # Bundles all files within the 'class directory' into a jar file
   action(target_name) {
     deps = [
       ":$_javac_target_name",

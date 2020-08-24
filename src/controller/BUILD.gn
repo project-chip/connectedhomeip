@@ -46,7 +46,6 @@ java_library("java") {
     "java/src/chip/devicecontroller/ChipCommandType.java",
   ]
 
-  # echo "  JAVAC   ";
-  # /usr/local/buildtools/java/jdk11//bin/javac  -source 8 -target 8 -d ./bin -cp 
-  # :/usr/local/google/home/andreilitvin/Android/Sdk/platforms/android-21/android.jar 
+  # TODO: add classpath support (we likely need to add something like
+  #  ..../platforms/android-21/android.jar to access BLE items)
 }
