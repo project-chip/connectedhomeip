@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//gn/chip/java/rules.gni")
 
 # FIXME: remove after actual key exchange is implemented
 config("controller_wno_deprecate") {
@@ -34,4 +35,18 @@ static_library("controller") {
   ]
 
   configs += [ ":controller_wno_deprecate" ]
+}
+
+java_library("java") {
+  output_name = "CHIPController.jar"
+
+  sources = [
+    "java/src/chip/devicecontroller/ChipDeviceController.java",
+    "java/src/chip/devicecontroller/ChipDeviceControllerException.java",
+    "java/src/chip/devicecontroller/ChipCommandType.java",
+  ]
+
+  # echo "  JAVAC   ";
+  # /usr/local/buildtools/java/jdk11//bin/javac  -source 8 -target 8 -d ./bin -cp 
+  # :/usr/local/google/home/andreilitvin/Android/Sdk/platforms/android-21/android.jar 
 }
