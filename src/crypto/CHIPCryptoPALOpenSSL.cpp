@@ -281,7 +281,7 @@ Hash_SHA256_stream::Hash_SHA256_stream(void) {}
 
 Hash_SHA256_stream::~Hash_SHA256_stream(void) {}
 
-static inline SHA256_CTX* to_inner_hash_sha256_context(HashSHA256OpaqueContext* context)
+static inline SHA256_CTX * to_inner_hash_sha256_context(HashSHA256OpaqueContext * context)
 {
     nlSTATIC_ASSERT_PRINT(sizeof(HashSHA256OpaqueContext) >= sizeof(SHA256_CTX), "Need more memory for SHA256 Context");
     return reinterpret_cast<SHA256_CTX *>(context->mOpaque);
@@ -832,7 +832,7 @@ typedef struct Spake2p_Context
     const EVP_MD * md_info;
 } Spake2p_Context;
 
-static inline Spake2p_Context* to_inner_spake2p_context(Spake2pOpaqueContext* context)
+static inline Spake2p_Context * to_inner_spake2p_context(Spake2pOpaqueContext * context)
 {
     nlSTATIC_ASSERT_PRINT(sizeof(Spake2pOpaqueContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
     return reinterpret_cast<Spake2p_Context *>(context->mOpaque);
