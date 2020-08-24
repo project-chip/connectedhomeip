@@ -141,6 +141,11 @@ CHIP_ERROR Hash_SHA256(const unsigned char * data, const size_t data_length, uns
  * @brief A class that defines stream based implementation of SHA-256 hash
  **/
 
+struct HashSHA256OpaqueContext
+{
+    uint8_t mOpaque[kMAX_Hash_SHA256_Context_Size];
+};
+
 class Hash_SHA256_stream
 {
 public:
@@ -153,7 +158,7 @@ public:
     void Clear(void);
 
 private:
-    uint8_t mContext[kMAX_Hash_SHA256_Context_Size];
+    HashSHA256OpaqueContext mContext;
 };
 
 /**
@@ -629,10 +634,19 @@ protected:
     unsigned char * Ke;
 };
 
+struct Spake2pOpaqueContext
+{
+    uint8_t mOpaque[kMAX_Spake2p_Context_Size];
+};
+
 class Spake2p_P256_SHA256_HKDF_HMAC : public Spake2p
 {
 public:
-    Spake2p_P256_SHA256_HKDF_HMAC(void);
+    Spake2p_P256_SHA256_HKDF_HMAC(void) : Spake2p(kP256_FE_Length, kP256_Point_Length, kSHA256_Hash_Length)
+    {
+        memset(&mSpake2pContext, 0, sizeof(mSpake2pContext));
+    }
+
     virtual ~Spake2p_P256_SHA256_HKDF_HMAC(void) { FreeImpl(); }
 
     CHIP_ERROR Mac(const unsigned char * key, size_t key_len, const unsigned char * in, size_t in_len, unsigned char * out);
@@ -668,7 +682,7 @@ private:
     CHIP_ERROR InitInternal();
     Hash_SHA256_stream sha256_hash_ctx;
 
-    uint8_t mSpake2pContext[kMAX_Spake2p_Context_Size];
+    Spake2pOpaqueContext mSpake2pContext;
 };
 
 /** @brief Clears the first `len` bytes of memory area `buf`.
