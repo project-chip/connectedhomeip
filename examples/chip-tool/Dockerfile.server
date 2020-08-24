@@ -17,8 +17,8 @@
 
 from generic_node_image
 
-COPY build/chip-standalone-demo.out /usr/bin/
-COPY build/chip-standalone-server.out /usr/bin/
+COPY out/debug/chip-standalone-demo /usr/bin/
+COPY out/debug/chip-standalone-server /usr/bin/
 COPY entrypoint.sh /
 
 ENTRYPOINT ["/entrypoint.sh", "server"]

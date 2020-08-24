@@ -1191,7 +1191,7 @@ void emberAfOtaClientVersionInfoCallback(EmberAfOtaImageId * currentImageInfo, u
     /* This is commented out since the #defines below are not defined.
 
       if (currentImageInfo != NULL) {
-        MEMSET(currentImageInfo, 0, sizeof(EmberAfOtaImageId));
+        memset(currentImageInfo, 0, sizeof(EmberAfOtaImageId));
         currentImageInfo->manufacturerId  = EMBER_AF_MANUFACTURER_CODE;
         currentImageInfo->imageTypeId     = EMBER_AF_IMAGE_TYPE_ID;
         currentImageInfo->firmwareVersion = EMBER_AF_CUSTOM_FIRMWARE_VERSION;
@@ -1656,12 +1656,11 @@ EmberAfOtaStorageStatus emberAfOtaStorageReadImageDataCallback(const EmberAfOtaI
  * version is present in an OTA file but the other parameters match, the file
  * will be considered a match  Ver.: always
  */
-// EmberAfOtaImageId emberAfOtaStorageSearchCallback(uint16_t manufacturerId, uint16_t imageTypeId, const uint16_t *
-// hardwareVersion)
-// {
-//     // If no image is found that matches the search criteria, this function should return the invalid image id.
-//     return emberAfInvalidImageId;
-// }
+EmberAfOtaImageId emberAfOtaStorageSearchCallback(uint16_t manufacturerId, uint16_t imageTypeId, const uint16_t * hardwareVersion)
+{
+    // If no image is found that matches the search criteria, this function should return the invalid image id.
+    return emberAfInvalidImageId;
+}
 
 /** @brief Ota Storage Write Temp Data
  *
@@ -1776,10 +1775,10 @@ bool emberAfPluginNetworkSteeringGetDistributedKeyCallback(EmberKeyData * key)
  * @return An ::EmberNodeType value that the network steering process will
  * try to join a network as.
  */
-// EmberNodeType emberAfPluginNetworkSteeringGetNodeTypeCallback(EmberAfPluginNetworkSteeringJoiningState state)
-// {
-//     return ((emAfCurrentZigbeeProNetwork->nodeType == EMBER_COORDINATOR) ? EMBER_ROUTER : emAfCurrentZigbeeProNetwork->nodeType);
-// }
+EmberNodeType emberAfPluginNetworkSteeringGetNodeTypeCallback(EmberAfPluginNetworkSteeringJoiningState state)
+{
+    return ((emAfCurrentZigbeeProNetwork->nodeType == EMBER_COORDINATOR) ? EMBER_ROUTER : emAfCurrentZigbeeProNetwork->nodeType);
+}
 
 /** @brief Get Power For Radio Channel
  *
@@ -2475,4 +2474,21 @@ void halRadioPowerUpHandler(void) {}
  * @param enter        True if entering idle/sleep, False if exiting
  * @param sleepMode    Idle/sleep mode
  */
-void halSleepCallback(boolean enter, SleepModes sleepMode) {}
+void halSleepCallback(bool enter, SleepModes sleepMode) {}
+
+// These functions / constants are added to avoid ld failure when building with GN
+// They should be removed if we have zcl updates and nolonger need this or causing other errors
+void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint) {}
+
+bool emberAfIsCurrentSecurityProfileSmartEnergy(void)
+{
+    return false;
+}
+
+const EmberAfOtaImageId emberAfInvalidImageId;
+
+const EmAfZigbeeProNetwork * emAfCurrentZigbeeProNetwork = NULL;
+
+void emberAfPluginUpdateTcLinkKeyZigbeeKeyEstablishmentCallback(EmberEUI64 partner, EmberKeyStatus status) {}
+
+void emberAfPluginNetworkSteeringMarker(void) {}

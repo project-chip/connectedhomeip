@@ -39,6 +39,8 @@
 #ifndef SILABS_EMBER_AF_DEBUG_PRINTING
 #define SILABS_EMBER_AF_DEBUG_PRINTING
 
+#include "debug-printing-test.h"
+
 // Printing macros for cluster: Basic
 #if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_BASIC_CLUSTER)
 #define emberAfBasicClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_BASIC_CLUSTER, __VA_ARGS__)

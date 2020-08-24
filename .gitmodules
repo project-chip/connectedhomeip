@@ -75,4 +75,4 @@
 	url = https://github.com/openweave/cirque.git
 	branch = master
 	ignore = dirty
-	commit = 3669450f26537e7f9e54926264781df06691f4fc
+	commit = f0214d37db6e7c91dce393493ca249129c442e6d

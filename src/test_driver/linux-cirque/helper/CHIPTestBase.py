@@ -95,10 +95,10 @@ class CHIPVirtualHome:
     def sequenceMatch(self, string, patterns):
         last_find = 0
         for s in patterns:
-            self.logger.info('Finding {}'.format(s))
+            self.logger.info('Finding string: "{}"'.format(s))
             this_find = string.find(s, last_find)
             if this_find < 0:
-                self.logger.info('Cannot find!')
+                self.logger.info('String not found')
                 return False
             self.logger.info("Found at index={}".format(this_find))
             last_find = this_find + len(s)
@@ -167,12 +167,17 @@ class CHIPVirtualHome:
 
     def assertTrue(self, exp, note=None):
         '''
-        addertTrue
-        assertEqual
-        assertNotEqual
+        assert{True|False}
+        assert(Not)Equal
         python unittest style functions that raise exceptions when condition not met
         '''
-        if not exp:
+        if not exp == True:
+            if note:
+                self.logger.error(note)
+            raise AssertionError
+
+    def assertFalse(self, exp, note=None):
+        if not exp == False:
             if note:
                 self.logger.error(note)
             raise AssertionError

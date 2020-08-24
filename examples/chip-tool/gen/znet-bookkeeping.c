@@ -94,16 +94,16 @@ bool emAfRetrieveAttributeAndCraftResponse(uint8_t endpoint, EmberAfClusterId cl
     return 0; // false
 }
 
-// // ZigbeeKeyEstablishment function declarations.
-// void emberAfZigbeeKeyEstablishmentCallback(EmberEUI64 partner, EmberKeyStatus status); // Global
-// void emberAfPluginUpdateTcLinkKeyZigbeeKeyEstablishmentCallback(EmberEUI64 partner,
-//                                                                 EmberKeyStatus status); // Plugin: update-tc-link-key
+// ZigbeeKeyEstablishment function declarations.
+void emberAfZigbeeKeyEstablishmentCallback(EmberEUI64 partner, EmberKeyStatus status); // Global
+void emberAfPluginUpdateTcLinkKeyZigbeeKeyEstablishmentCallback(EmberEUI64 partner,
+                                                                EmberKeyStatus status); // Plugin: update-tc-link-key
 
-// void emAfZigbeeKeyEstablishment(EmberEUI64 partner, EmberKeyStatus status)
-// {
-//     emberAfZigbeeKeyEstablishmentCallback(partner, status);                      // Global
-//     emberAfPluginUpdateTcLinkKeyZigbeeKeyEstablishmentCallback(partner, status); // Plugin: update-tc-link-key
-// }
+void emAfZigbeeKeyEstablishment(EmberEUI64 partner, EmberKeyStatus status)
+{
+    emberAfZigbeeKeyEstablishmentCallback(partner, status);                      // Global
+    emberAfPluginUpdateTcLinkKeyZigbeeKeyEstablishmentCallback(partner, status); // Plugin: update-tc-link-key
+}
 
 // ReadAttributesResponse function declarations.
 bool emberAfReadAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen); // Global

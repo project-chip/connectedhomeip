@@ -32,6 +32,41 @@ executable("chip-standalone-demo") {
   output_dir = root_out_dir
 }
 
+executable("chip-standalone-server") {
+  sources = [
+    "${chip_root}/src/app/clusters/on-off-server/on-off.c",
+    "${chip_root}/src/app/util/attribute-size.c",
+    "${chip_root}/src/app/util/attribute-storage.c",
+    "${chip_root}/src/app/util/attribute-table.c",
+    "${chip_root}/src/app/util/chip-response.cpp",
+    "${chip_root}/src/app/util/client-api.c",
+    "${chip_root}/src/app/util/ember-print.cpp",
+    "${chip_root}/src/app/util/message.c",
+    "${chip_root}/src/app/util/process-cluster-message.c",
+    "${chip_root}/src/app/util/process-global-message.c",
+    "${chip_root}/src/app/util/util.c",
+    "gen/call-command-handler.c",
+    "gen/callback-stub.c",
+    "gen/znet-bookkeeping.c",
+    "server.cpp",
+  ]
+
+  include_dirs = [
+    ".",
+    "${chip_root}/src/app/util",
+  ]
+
+  if (is_debug) {
+    defines = [ "BUILD_RELEASE=0" ]
+  } else {
+    defines = [ "BUILD_RELEASE=1" ]
+  }
+
+  public_deps = [ "${chip_root}/src/lib" ]
+
+  output_dir = root_out_dir
+}
+
 group("chip-tool") {
   deps = [ ":chip-standalone-demo" ]
 }
