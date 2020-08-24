@@ -181,7 +181,7 @@ Hash_SHA256_stream::Hash_SHA256_stream(void) {}
 
 Hash_SHA256_stream::~Hash_SHA256_stream(void) {}
 
-static inline mbedtls_sha256_context* to_inner_hash_sha256_context(HashSHA256OpaqueContext* context)
+static inline mbedtls_sha256_context * to_inner_hash_sha256_context(HashSHA256OpaqueContext * context)
 {
     nlSTATIC_ASSERT_PRINT(sizeof(context->mOpaque) >= sizeof(mbedtls_sha256_context), "Need more memory for SHA256 Context");
     return reinterpret_cast<mbedtls_sha256_context *>(context->mOpaque);
@@ -547,7 +547,7 @@ typedef struct Spake2p_Context
     mbedtls_mpi tempbn;
 } Spake2p_Context;
 
-static inline Spake2p_Context* to_inner_spake2p_context(Spake2pOpaqueContext* context)
+static inline Spake2p_Context * to_inner_spake2p_context(Spake2pOpaqueContext * context)
 {
     nlSTATIC_ASSERT_PRINT(sizeof(context->mOpaque) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
     return reinterpret_cast<Spake2p_Context *>(context->mOpaque);
