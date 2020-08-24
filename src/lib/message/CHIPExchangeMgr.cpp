@@ -33,14 +33,14 @@
 
 #include <stddef.h>
 
-#include <protocols/common/CommonProtocol.h>
-#include <protocols/security/CHIPSecurity.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <message/CHIPBinding.h>
 #include <message/CHIPExchangeMgr.h>
 #include <message/CHIPSecurityMgr.h>
 #include <protocols/CHIPProtocols.h>
+#include <protocols/common/CommonProtocol.h>
+#include <protocols/security/CHIPSecurity.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>

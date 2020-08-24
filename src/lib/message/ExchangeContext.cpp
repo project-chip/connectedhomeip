@@ -33,12 +33,12 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <protocols/common/CommonProtocol.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <message/CHIPExchangeMgr.h>
 #include <message/CHIPSecurityMgr.h>
 #include <protocols/CHIPProtocols.h>
+#include <protocols/common/CommonProtocol.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <support/FlagUtils.hpp>
@@ -624,8 +624,8 @@ CHIP_ERROR ExchangeContext::SendCommonNullMessage(void)
     VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     // Send the null message
-    err =
-        SendMessage(chip::Protocols::kChipProtocol_Common, chip::Protocols::Common::kMsgType_Null, msgBuf, kSendFlag_NoAutoRequestAck);
+    err    = SendMessage(chip::Protocols::kChipProtocol_Common, chip::Protocols::Common::kMsgType_Null, msgBuf,
+                      kSendFlag_NoAutoRequestAck);
     msgBuf = NULL;
 
 exit:

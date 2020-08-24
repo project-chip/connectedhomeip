@@ -29,12 +29,12 @@
 #endif // __STDC_FORMAT_MACROS
 
 #include "CHIPSecurityMgr.h"
-#include <protocols/common/CHIPMessage.h>
-#include <protocols/common/CommonProtocol.h>
-#include <protocols/security/CHIPSecurity.h>
 #include <core/CHIPCore.h>
 #include <message/CHIPServerBase.h>
 #include <protocols/CHIPProtocols.h>
+#include <protocols/common/CHIPMessage.h>
+#include <protocols/common/CommonProtocol.h>
+#include <protocols/security/CHIPSecurity.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>

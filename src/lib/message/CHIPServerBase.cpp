@@ -28,11 +28,11 @@
  */
 
 #include "CHIPServerBase.h"
-#include <protocols/common/CommonProtocol.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPTLV.h>
 #include <protocols/CHIPProtocols.h>
+#include <protocols/common/CommonProtocol.h>
 #include <support/CodeUtils.h>
 
 namespace chip {

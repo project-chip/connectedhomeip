@@ -27,10 +27,10 @@
 #ifndef CHIPSECURITYMANAGER_H_
 #define CHIPSECURITYMANAGER_H_
 
-#include <protocols/common/CHIPMessage.h>
-#include <protocols/status-report/StatusReportProtocol.h>
 #include <core/CHIPError.h>
 #include <message/CHIPExchangeMgr.h>
+#include <protocols/common/CHIPMessage.h>
+#include <protocols/status-report/StatusReportProtocol.h>
 #include <support/DLLUtil.h>
 
 /**

@@ -36,9 +36,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <protocols/fabric-provisioning/FabricProvisioning.h>
-#include <protocols/security/CHIPDummyGroupKeyStore.h>
-#include <protocols/security/CHIPSecurity.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPKeyIds.h>
@@ -46,6 +43,9 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <message/CHIPFabricState.h>
 #include <protocols/CHIPProtocols.h>
+#include <protocols/fabric-provisioning/FabricProvisioning.h>
+#include <protocols/security/CHIPDummyGroupKeyStore.h>
+#include <protocols/security/CHIPSecurity.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 #include <support/crypto/CHIPRNG.h>
