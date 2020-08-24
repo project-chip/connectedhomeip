@@ -71,7 +71,6 @@ echo ninja -C "$CHIP_ROOT/out/custom"
 
 # nRF5 SDK setup
 nrf5_sdk_args=""
-extra_args=""
 
 if [[ -d "$NRF5_SDK_ROOT/components/libraries" ]]; then
     nrf5_sdk_args+="nrf5_sdk_root=\"$NRF5_SDK_ROOT\""
@@ -99,12 +98,31 @@ else
     echo "Hint: Set \$EFR32_SDK_ROOT to enable building for EFR32"
 fi
 
+opts=$(getopt --longoptions "pincode:,discriminator:" -n "$0" --options "" -- "$@")
+eval set --$opts
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --pincode)
+      extra_args+=" chip_device_config_use_test_setup_pin_code=$2"
+      shift 2
+      ;;
+    --discriminator)
+      extra_args+=" chip_device_config_use_test_setup_discriminator=$2"
+      shift 2
+      ;;
+    *)
+      break
+      ;;
+ esac
+done
+
 echo
 
 _chip_banner "Build: GN configure"
 
-gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args"
-gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"$extra_args"
+gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/debug" --args='target_os="all"'" $extra_args"
+gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'" $extra_args"
 
 _chip_banner "Build: Ninja build"
 

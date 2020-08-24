@@ -37,6 +37,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     # Time the firmware was built.
     chip_device_config_firmware_build_time = ""
+
+    # Test setup pincode
+    chip_device_config_use_test_setup_pin_code = ""
+
+    # Test setup discriminator
+    chip_device_config_use_test_setup_discriminator = ""
   }
 
   config("platform_config") {
@@ -56,6 +62,13 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     }
     if (chip_device_config_firmware_build_time != "") {
       defines += [ "CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME=\"${chip_device_config_firmware_build_time}\"" ]
+    }
+
+    if (chip_device_config_use_test_setup_pin_code != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${chip_device_config_use_test_setup_pin_code}" ]
+    }
+    if (chip_device_config_use_test_setup_discriminator!= "") {
+      defines += [ "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${chip_device_config_use_test_setup_discriminator}" ]
     }
 
     if (chip_device_platform == "darwin") {
