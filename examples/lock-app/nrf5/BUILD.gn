@@ -112,3 +112,7 @@ executable("lock_app") {
 group("nrf5") {
   deps = [ ":lock_app" ]
 }
+
+group("default") {
+  deps = [ ":nrf5" ]
+}
