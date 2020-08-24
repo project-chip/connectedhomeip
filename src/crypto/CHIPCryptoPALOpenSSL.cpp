@@ -829,7 +829,8 @@ typedef struct Spake2p_Context
     const EVP_MD * md_info;
 } Spake2p_Context;
 
-Spake2p_P256_SHA256_HKDF_HMAC::Spake2p_P256_SHA256_HKDF_HMAC(void) : Spake2p(kP256_FE_Length, kP256_Point_Length, kSHA256_Hash_Length)
+Spake2p_P256_SHA256_HKDF_HMAC::Spake2p_P256_SHA256_HKDF_HMAC(void) :
+    Spake2p(kP256_FE_Length, kP256_Point_Length, kSHA256_Hash_Length)
 {
     memset(mSpake2pContext, 0, sizeof(mSpake2pContext));
     nlSTATIC_ASSERT_PRINT(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
