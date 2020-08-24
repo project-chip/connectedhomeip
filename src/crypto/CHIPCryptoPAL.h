@@ -45,7 +45,7 @@ const size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
  * the implementation files.
  */
 const size_t kMAX_Spake2p_Context_Size     = 1024;
-const size_t kMAX_Hash_SHA256_Context_Size = 128;
+const size_t kMAX_Hash_SHA256_Context_Size = 256;
 
 /**
  * Spake2+ parameters for P256
@@ -632,11 +632,7 @@ protected:
 class Spake2p_P256_SHA256_HKDF_HMAC : public Spake2p
 {
 public:
-    Spake2p_P256_SHA256_HKDF_HMAC(void) : Spake2p(kP256_FE_Length, kP256_Point_Length, kSHA256_Hash_Length)
-    {
-        memset(&mSpake2pContext, 0, sizeof(mSpake2pContext));
-    }
-
+    Spake2p_P256_SHA256_HKDF_HMAC(void);
     virtual ~Spake2p_P256_SHA256_HKDF_HMAC(void) { FreeImpl(); }
 
     CHIP_ERROR Mac(const unsigned char * key, size_t key_len, const unsigned char * in, size_t in_len, unsigned char * out);
