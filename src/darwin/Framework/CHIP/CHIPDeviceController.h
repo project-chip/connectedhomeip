@@ -40,6 +40,9 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
 
 - (BOOL)connect:(NSString *)ipAddress error:(NSError * __autoreleasing *)error;
 - (BOOL)connect:(uint16_t)discriminator setupPINCode:(uint32_t)setupPINCode error:(NSError * __autoreleasing *)error;
+- (BOOL)connectWithoutSecurePairing:(NSString *)ipAddress
+                              error:(NSError * __autoreleasing *)error
+    __attribute__((deprecated("Available until Rendezvous is fully integrated")));
 - (nullable AddressInfo *)getAddressInfo;
 - (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error;
 - (BOOL)sendOnCommand;
