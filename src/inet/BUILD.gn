@@ -99,6 +99,11 @@ static_library("inet") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
+    "${chip_root}/src/lwip:lwip_buildconfig",
+  ]
+
+  public_configs = [
+    "${chip_root}/src/lwip:lwip_config",
   ]
 
   if (chip_inet_config_enable_raw_endpoint) {

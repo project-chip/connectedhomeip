@@ -92,6 +92,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET=EFR32",
       ]
     }
+    if (chip_device_platform == "esp32") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_ESP32=1",
+        "CHIP_DEVICE_LAYER_TARGET=ESP32",
+      ]
+    }
   }
 
   config("platform_config") {
@@ -261,6 +267,30 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
           "nRF5/ThreadStackManagerImpl.h",
         ]
       }
+    } else if (chip_device_platform == "esp32") {
+      sources += [
+         "ESP32/BLEManagerImpl.cpp",
+         "ESP32/ConfigurationManagerImpl.cpp",
+         "ESP32/PlatformManagerImpl.cpp",
+         "ESP32/ConnectivityManagerImpl.cpp",
+         "ESP32/ESP32Config.cpp",
+         "ESP32/ESP32Utils.cpp",
+         "ESP32/Logging.cpp",
+         "ESP32/SystemTimeSupport.cpp",
+         "ESP32/LwIPCoreLock.cpp",
+         "ESP32/CHIPDevicePlatformConfig.h",
+         "ESP32/ConnectivityManagerImpl.h",
+         "ESP32/BLEManagerImpl.h",
+         "ESP32/ConfigurationManagerImpl.h",
+         "ESP32/PlatformManagerImpl.h",
+         "ESP32/SoftwareUpdateManagerImpl.h",
+         "ESP32/CHIPDevicePlatformEvent.h",
+         "ESP32/NetworkProvisioningServerImpl.h",
+         "ESP32/ESP32Utils.h",
+         "ESP32/ESP32Config.h",
+         "FreeRTOS/SystemTimeSupport.cpp",
+      ]
+#      public_configs += [ "${chip_root}/src/crypto:crypto_config" ]
     } else if (chip_device_platform == "efr32") {
       sources += [
         "EFR32/BLEManagerImpl.cpp",
