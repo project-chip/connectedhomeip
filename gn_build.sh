@@ -71,7 +71,6 @@ echo ninja -C "$CHIP_ROOT/out/custom"
 
 # nRF5 SDK setup
 nrf5_sdk_args=""
-extra_args=""
 
 if [[ -d "$NRF5_SDK_ROOT/components/libraries" ]]; then
     nrf5_sdk_args+="nrf5_sdk_root=\"$NRF5_SDK_ROOT\""
@@ -103,8 +102,8 @@ echo
 
 _chip_banner "Build: GN configure"
 
-gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args"
-gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"$extra_args"
+gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/debug" --args='target_os="all"'" $extra_args"
+gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'" $extra_args"
 
 _chip_banner "Build: Ninja build"
 
