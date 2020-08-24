@@ -92,11 +92,11 @@ INC_DIRS = \
     $(CHIP_ROOT)/src/system
 
 LIBS = \
-    $(K32W061_SDK_ROOT)/middleware/wireless/openthread/openthread/output/k32w061/lib/libopenthread-cli-ftd.a \
-    $(K32W061_SDK_ROOT)/middleware/wireless/openthread/openthread/output/k32w061/lib/libopenthread-ftd.a \
-    $(K32W061_SDK_ROOT)/middleware/wireless/openthread/openthread/output/k32w061/lib/libopenthread-k32w061_plat.a \
-    $(K32W061_SDK_ROOT)/middleware/wireless/openthread/openthread/output/k32w061/lib/libopenthread-k32w061_sdk.a \
-    $(K32W061_SDK_ROOT)/middleware/wireless/openthread/openthread/output/k32w061/lib/libmbedcrypto.a \
+    -lopenthread-cli-ftd \
+    -lopenthread-ftd \
+    -lopenthread-k32w061_plat \
+    -lopenthread-k32w061_sdk \
+    -lmbedcrypto \
     $(K32W061_SDK_ROOT)/middleware/wireless/ieee-802.15.4/lib/libMiniMac.a \
     $(K32W061_SDK_ROOT)/middleware/wireless/framework/XCVR/lib/libRadio.a \
     $(K32W061_SDK_ROOT)/middleware/wireless/framework/PDM/Library/libPDM.a \
