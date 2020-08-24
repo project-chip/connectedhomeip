@@ -63,7 +63,7 @@ static_library("crypto") {
 
     # ESP32 has its own mbedTLS
     if (target_cpu != "esp32") {
-       public_deps += [ "${mbedtls_root}:mbedtls" ]
+      public_deps += [ "${mbedtls_root}:mbedtls" ]
     }
   } else if (chip_crypto == "openssl") {
     sources += [ "CHIPCryptoPALOpenSSL.cpp" ]

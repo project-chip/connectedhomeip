@@ -20,11 +20,6 @@ import("${chip_root}/gn/chip/tests.gni")
 import("${chip_root}/src/inet/inet.gni")
 import("core.gni")
 
-declare_args() {
-  cflags_c_ext = []
-  cflags_cc_ext = []
-}
-
 buildconfig_header("chip_buildconfig") {
   header = "CHIPBuildConfig.h"
   header_dir = "core"
@@ -114,9 +109,6 @@ static_library("core") {
     "CHIPTLVUtilities.cpp",
     "CHIPTLVWriter.cpp",
   ]
-
-  cflags_c = cflags_c_ext
-  cflags_cc = cflags_cc_ext
 
   public_deps = [
     ":chip_config_header",

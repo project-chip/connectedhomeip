@@ -141,19 +141,17 @@ COMPONENT_ADD_INCLUDEDIRS 	 = project-config \
                                $(REL_CHIP_ROOT)/src/include/ \
                                $(REL_CHIP_ROOT)/src/lib \
                                $(REL_CHIP_ROOT)/src/ \
+                               $(REL_OUTPUT_DIR)/src/include \
                                $(REL_CHIP_ROOT)/src/system \
                                $(IDF_PATH)/components/mbedtls/mbedtls/include \
                                $(REL_CHIP_ROOT)/src/app \
-
+                               $(REL_CHIP_ROOT)/third_party/nlassert/repo/include \
+                               $(REL_OUTPUT_DIR)/gen/third_party/connectedhomeip/src/app/include \
+                               $(REL_OUTPUT_DIR)/gen/include
 
 # Linker flags to be included when building other components that use CHIP.
 COMPONENT_ADD_LDFLAGS        = -L$(OUTPUT_DIR)/lib/ \
-                               -lCHIP \
-                               -lInetLayer \
-                               -lSystemLayer \
-                               -lDeviceLayer \
-                               -lChipCrypto \
-                               -lSetupPayload
+                               -lCHIP
 
 ifneq (,$(findstring CHIP_SUPPORT_FOREIGN_TEST_DRIVERS,$(CXXFLAGS)))
 COMPONENT_ADD_LDFLAGS       += -lnlfaultinjection
@@ -193,13 +191,34 @@ $(OUTPUT_DIR) :
 	echo "MKDIR $@"
 	@mkdir -p "$@"
 
-install-chip : configure-chip
+
+fix_cflags = $(filter-out -DHAVE_CONFIG_H,\
+                $(filter-out -D,\
+                  $(filter-out IDF_VER%,\
+                    $(sort $(1)) -D$(filter IDF_VER%,$(1))\
+               )))
+CHIP_CFLAGS = $(call fix_cflags,$(CFLAGS) $(CPPFLAGS))
+CHIP_CXXFLAGS = $(call fix_cflags,$(CXXFLAGS) $(CPPFLAGS))
+
+install-chip :
 	echo "INSTALL CHIP..."
-	MAKEFLAGS= make -C $(OUTPUT_DIR) --no-print-directory install
+	echo                                   > $(OUTPUT_DIR)/args.gn
+	echo "import(\"//args.gni\")"          >> $(OUTPUT_DIR)/args.gn
+	echo target_cflags_c  = [$(foreach word,$(CHIP_CFLAGS),\"$(word)\",)] | sed -e 's/=\"/=\\"/g;s/\"\"/\\"\"/g;'  >> $(OUTPUT_DIR)/args.gn
+	echo target_cflags_cc = [$(foreach word,$(CHIP_CXXFLAGS),\"$(word)\",)] | sed -e 's/=\"/=\\"/g;s/\"\"/\\"\"/g;'   >> $(OUTPUT_DIR)/args.gn
+	echo ar_ext = \"$(AR)\"                >> $(OUTPUT_DIR)/args.gn
+	echo cc_ext = \"$(CC)\"                >> $(OUTPUT_DIR)/args.gn
+	echo cxx_ext = \"$(CXX)\"              >> $(OUTPUT_DIR)/args.gn
+	echo cpu_ext = \"esp32\"               >> $(OUTPUT_DIR)/args.gn
+	echo "Written file $(OUTPUT_DIR)/args.gn"
+#	MAKEFLAGS= make -C $(OUTPUT_DIR) --no-print-directory install
+	cd $(COMPONENT_PATH); gn gen $(OUTPUT_DIR)
+	cd $(COMPONENT_PATH); ninja -C $(OUTPUT_DIR) esp32
+
 
 build : install-chip
 	echo "CHIP built and installed..."
-	cp ${OUTPUT_DIR}/lib/libCHIP.a ${OUTPUT_DIR}/libchip.a
+	cp -a ${OUTPUT_DIR}/lib/libCHIP.a ${OUTPUT_DIR}/libchip.a
 
 clean:
 	echo "RM $(OUTPUT_DIR)"

@@ -33,7 +33,7 @@ if (lwip_platform == "") {
 }
 
 assert(lwip_platform == "standalone" || lwip_platform == "nrf5" ||
-           lwip_platform == "efr32",
+           lwip_platform == "esp32" || lwip_platform == "efr32",
        "Unsupported lwIP platform: ${lwip_platform}")
 
 if (lwip_platform == "nrf5") {
@@ -47,15 +47,16 @@ buildconfig_header("lwip_buildconfig") {
   header_dir = "lwip"
 
   # Automatically enable LWIP_DEBUG for internal is_debug builds.
-  if (lwip_debug) {
-    lwip_debug = 1
-  } else {
-    lwip_debug = 0
+  defines = []
+  if (lwip_platform != "esp32") {
+    if (lwip_debug) {
+      lwip_debug = 1
+    } else {
+      lwip_debug = 0
+    }
+    defines += [ "LWIP_DEBUG=${lwip_debug}" ]
   }
-  defines = [
-    "LWIP_DEBUG=${lwip_debug}",
-    "HAVE_LWIP_UDP_BIND_NETIF=1",
-  ]
+  defines += [ "HAVE_LWIP_UDP_BIND_NETIF=1" ]
 
   if (current_os == "android") {
     defines += [ "LWIP_NO_STDINT_H=1" ]
