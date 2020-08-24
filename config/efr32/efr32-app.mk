@@ -187,7 +187,7 @@ SRCS =
 ALL_SRCS = $(SRCS) $(EXTRA_SRCS)
 OBJS = $(foreach file,$(ALL_SRCS),$(call ObjFileName,$(file)))
 
-OUTPUT_DIR = $(PROJECT_ROOT)/build
+OUTPUT_DIR = $(PROJECT_ROOT)/build/$(BOARD)
 OBJS_DIR = $(OUTPUT_DIR)/objs
 DEPS_DIR = $(OUTPUT_DIR)/deps
 
