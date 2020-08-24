@@ -27,15 +27,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#if CHIP_CRYPTO_OPENSSL
-#include <openssl/ec.h>
-#include <openssl/sha.h>
-#elif CHIP_CRYPTO_MBEDTLS
-#include <mbedtls/ecp.h>
-#include <mbedtls/md.h>
-#include <mbedtls/sha256.h>
-#endif
-
 namespace chip {
 namespace Crypto {
 
@@ -48,6 +39,13 @@ const size_t kMax_ECDSA_Signature_Length = 72;
 const size_t kMAX_FE_Length              = kP256_FE_Length;
 const size_t kMAX_Point_Length           = kP256_Point_Length;
 const size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
+
+/* These sizes are hardcoded here to remove header dependency on underlying crypto library
+ * in a public interface file. The validity of these sizes is verified by static_assert in
+ * the implementation files.
+ */
+const size_t kMAX_Spake2p_Context_Size     = 1024;
+const size_t kMAX_Hash_SHA256_Context_Size = 128;
 
 /**
  * Spake2+ parameters for P256
@@ -155,13 +153,7 @@ public:
     void Clear(void);
 
 private:
-#if CHIP_CRYPTO_OPENSSL
-    SHA256_CTX context;
-#elif CHIP_CRYPTO_MBEDTLS
-    mbedtls_sha256_context context;
-#else
-    SHA256_CTX_PLATFORM context; // To be defined by the platform specific implementation of sha256.
-#endif
+    uint8_t mContext[kMAX_Hash_SHA256_Context_Size];
 };
 
 /**
@@ -637,36 +629,12 @@ protected:
     unsigned char * Ke;
 };
 
-struct Spake2p_Context
-{
-#if CHIP_CRYPTO_OPENSSL
-    EC_GROUP * curve;
-    BN_CTX * bn_ctx;
-    const EVP_MD * md_info;
-#elif CHIP_CRYPTO_MBEDTLS
-    mbedtls_ecp_group curve;
-    const mbedtls_md_info_t * md_info;
-    mbedtls_ecp_point M;
-    mbedtls_ecp_point N;
-    mbedtls_ecp_point X;
-    mbedtls_ecp_point Y;
-    mbedtls_ecp_point L;
-    mbedtls_ecp_point Z;
-    mbedtls_ecp_point V;
-
-    mbedtls_mpi w0;
-    mbedtls_mpi w1;
-    mbedtls_mpi xy;
-    mbedtls_mpi tempbn;
-#endif
-};
-
 class Spake2p_P256_SHA256_HKDF_HMAC : public Spake2p
 {
 public:
     Spake2p_P256_SHA256_HKDF_HMAC(void) : Spake2p(kP256_FE_Length, kP256_Point_Length, kSHA256_Hash_Length)
     {
-        memset(&context, 0, sizeof(context));
+        memset(&mSpake2pContext, 0, sizeof(mSpake2pContext));
     }
 
     virtual ~Spake2p_P256_SHA256_HKDF_HMAC(void) { FreeImpl(); }
@@ -702,9 +670,9 @@ private:
     void FreeImpl();
 
     CHIP_ERROR InitInternal();
-    class Hash_SHA256_stream sha256_hash_ctx;
+    Hash_SHA256_stream sha256_hash_ctx;
 
-    struct Spake2p_Context context;
+    uint8_t mSpake2pContext[kMAX_Spake2p_Context_Size];
 };
 
 /** @brief Clears the first `len` bytes of memory area `buf`.

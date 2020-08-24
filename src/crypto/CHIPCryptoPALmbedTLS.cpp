@@ -27,6 +27,7 @@
 #include <mbedtls/ctr_drbg.h>
 #include <mbedtls/ecdh.h>
 #include <mbedtls/ecdsa.h>
+#include <mbedtls/ecp.h>
 #include <mbedtls/entropy.h>
 #include <mbedtls/error.h>
 #include <mbedtls/hkdf.h>
@@ -176,7 +177,10 @@ exit:
     return error;
 }
 
-Hash_SHA256_stream::Hash_SHA256_stream(void) {}
+Hash_SHA256_stream::Hash_SHA256_stream(void)
+{
+    static_assert(sizeof(mContext) >= sizeof(mbedtls_sha256_context), "Need more memory to store SHA256 context");
+}
 
 Hash_SHA256_stream::~Hash_SHA256_stream(void) {}
 
@@ -185,7 +189,9 @@ CHIP_ERROR Hash_SHA256_stream::Begin(void)
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
 
-    result = mbedtls_sha256_starts_ret(&context, 0);
+    mbedtls_sha256_context* context = (mbedtls_sha256_context*) &mContext;
+
+    result = mbedtls_sha256_starts_ret(context, 0);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -197,7 +203,9 @@ CHIP_ERROR Hash_SHA256_stream::AddData(const unsigned char * data, const size_t 
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
 
-    result = mbedtls_sha256_update_ret(&context, data, data_length);
+    mbedtls_sha256_context* context = (mbedtls_sha256_context*) &mContext;
+
+    result = mbedtls_sha256_update_ret(context, data, data_length);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -209,7 +217,9 @@ CHIP_ERROR Hash_SHA256_stream::Finish(unsigned char * out_buffer)
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
 
-    result = mbedtls_sha256_finish_ret(&context, out_buffer);
+    mbedtls_sha256_context* context = (mbedtls_sha256_context*) &mContext;
+
+    result = mbedtls_sha256_finish_ret(context, out_buffer);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -516,45 +526,66 @@ void ClearSecretData(uint8_t * buf, uint32_t len)
     memset(buf, 0, len);
 }
 
+typedef struct Spake2p_Context
+{
+    mbedtls_ecp_group curve;
+    const mbedtls_md_info_t * md_info;
+    mbedtls_ecp_point M;
+    mbedtls_ecp_point N;
+    mbedtls_ecp_point X;
+    mbedtls_ecp_point Y;
+    mbedtls_ecp_point L;
+    mbedtls_ecp_point Z;
+    mbedtls_ecp_point V;
+
+    mbedtls_mpi w0;
+    mbedtls_mpi w1;
+    mbedtls_mpi xy;
+    mbedtls_mpi tempbn;
+} Spake2p_Context;
+
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
 
-    memset(&context, 0, sizeof(context));
-    mbedtls_ecp_group_init(&context.curve);
-    result = mbedtls_ecp_group_load(&context.curve, MBEDTLS_ECP_DP_SECP256R1);
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
+
+    memset(context, 0, sizeof(Spake2p_Context));
+    mbedtls_ecp_group_init(&context->curve);
+    result = mbedtls_ecp_group_load(&context->curve, MBEDTLS_ECP_DP_SECP256R1);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    context.md_info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
-    VerifyOrExit(context.md_info != NULL, error = CHIP_ERROR_INTERNAL);
+    context->md_info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
+    VerifyOrExit(context->md_info != NULL, error = CHIP_ERROR_INTERNAL);
 
-    mbedtls_ecp_point_init(&context.M);
-    mbedtls_ecp_point_init(&context.N);
-    mbedtls_ecp_point_init(&context.X);
-    mbedtls_ecp_point_init(&context.Y);
-    mbedtls_ecp_point_init(&context.L);
-    mbedtls_ecp_point_init(&context.V);
-    mbedtls_ecp_point_init(&context.Z);
-    M = &context.M;
-    N = &context.N;
-    X = &context.X;
-    Y = &context.Y;
-    L = &context.L;
-    V = &context.V;
-    Z = &context.Z;
+    mbedtls_ecp_point_init(&context->M);
+    mbedtls_ecp_point_init(&context->N);
+    mbedtls_ecp_point_init(&context->X);
+    mbedtls_ecp_point_init(&context->Y);
+    mbedtls_ecp_point_init(&context->L);
+    mbedtls_ecp_point_init(&context->V);
+    mbedtls_ecp_point_init(&context->Z);
+    M = &context->M;
+    N = &context->N;
+    X = &context->X;
+    Y = &context->Y;
+    L = &context->L;
+    V = &context->V;
+    Z = &context->Z;
 
-    mbedtls_mpi_init(&context.w0);
-    mbedtls_mpi_init(&context.w1);
-    mbedtls_mpi_init(&context.xy);
-    mbedtls_mpi_init(&context.tempbn);
-    w0     = &context.w0;
-    w1     = &context.w1;
-    xy     = &context.xy;
-    tempbn = &context.tempbn;
+    mbedtls_mpi_init(&context->w0);
+    mbedtls_mpi_init(&context->w1);
+    mbedtls_mpi_init(&context->xy);
+    mbedtls_mpi_init(&context->tempbn);
+    w0     = &context->w0;
+    w1     = &context->w1;
+    xy     = &context->xy;
+    tempbn = &context->tempbn;
 
-    G     = &context.curve.G;
-    order = &context.curve.N;
+    G     = &context->curve.G;
+    order = &context->curve.N;
 
     return error;
 
@@ -567,20 +598,23 @@ exit:
 
 void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl(void)
 {
-    mbedtls_ecp_point_free(&context.M);
-    mbedtls_ecp_point_free(&context.N);
-    mbedtls_ecp_point_free(&context.X);
-    mbedtls_ecp_point_free(&context.Y);
-    mbedtls_ecp_point_free(&context.L);
-    mbedtls_ecp_point_free(&context.Z);
-    mbedtls_ecp_point_free(&context.V);
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
 
-    mbedtls_mpi_free(&context.w0);
-    mbedtls_mpi_free(&context.w1);
-    mbedtls_mpi_free(&context.xy);
-    mbedtls_mpi_free(&context.tempbn);
+    mbedtls_ecp_point_free(&context->M);
+    mbedtls_ecp_point_free(&context->N);
+    mbedtls_ecp_point_free(&context->X);
+    mbedtls_ecp_point_free(&context->Y);
+    mbedtls_ecp_point_free(&context->L);
+    mbedtls_ecp_point_free(&context->Z);
+    mbedtls_ecp_point_free(&context->V);
 
-    mbedtls_ecp_group_free(&context.curve);
+    mbedtls_mpi_free(&context->w0);
+    mbedtls_mpi_free(&context->w1);
+    mbedtls_mpi_free(&context->xy);
+    mbedtls_mpi_free(&context->tempbn);
+
+    mbedtls_ecp_group_free(&context->curve);
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const unsigned char * key, size_t key_len, const unsigned char * in, size_t in_len,
@@ -591,7 +625,11 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const unsigned char * key, size_t 
 
     mbedtls_md_context_t hmac_ctx;
     mbedtls_md_init(&hmac_ctx);
-    result = mbedtls_md_setup(&hmac_ctx, context.md_info, 1);
+
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
+
+    result = mbedtls_md_setup(&hmac_ctx, context->md_info, 1);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     result = mbedtls_md_hmac_starts(&hmac_ctx, key, key_len);
@@ -681,7 +719,10 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEGenerate(void * fe)
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
 
-    result = mbedtls_ecp_gen_privkey(&context.curve, (mbedtls_mpi *) fe, ECDSA_sign_rng, nullptr);
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
+
+    result = mbedtls_ecp_gen_privkey(&context->curve, (mbedtls_mpi *) fe, ECDSA_sign_rng, nullptr);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -707,7 +748,10 @@ exit:
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointLoad(const unsigned char * in, size_t in_len, void * R)
 {
-    if (mbedtls_ecp_point_read_binary(&context.curve, (mbedtls_ecp_point *) R, in, in_len) != 0)
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
+
+    if (mbedtls_ecp_point_read_binary(&context->curve, (mbedtls_ecp_point *) R, in, in_len) != 0)
     {
         return CHIP_ERROR_INTERNAL;
     }
@@ -720,7 +764,10 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointWrite(const void * R, unsigned ch
     memset(out, 0, out_len);
     size_t mbedtls_out_len = out_len;
 
-    if (mbedtls_ecp_point_write_binary(&context.curve, (const mbedtls_ecp_point *) R, MBEDTLS_ECP_PF_UNCOMPRESSED, &mbedtls_out_len,
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
+
+    if (mbedtls_ecp_point_write_binary(&context->curve, (const mbedtls_ecp_point *) R, MBEDTLS_ECP_PF_UNCOMPRESSED, &mbedtls_out_len,
                                        out, out_len) != 0)
     {
         return CHIP_ERROR_INTERNAL;
@@ -731,7 +778,10 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointWrite(const void * R, unsigned ch
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointMul(void * R, const void * P1, const void * fe1)
 {
-    if (mbedtls_ecp_mul(&context.curve, (mbedtls_ecp_point *) R, (const mbedtls_mpi *) fe1, (const mbedtls_ecp_point *) P1,
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
+
+    if (mbedtls_ecp_mul(&context->curve, (mbedtls_ecp_point *) R, (const mbedtls_mpi *) fe1, (const mbedtls_ecp_point *) P1,
                         ECDSA_sign_rng, nullptr) != 0)
     {
         return CHIP_ERROR_INTERNAL;
@@ -743,8 +793,10 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointMul(void * R, const void * P1, co
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointAddMul(void * R, const void * P1, const void * fe1, const void * P2,
                                                       const void * fe2)
 {
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
 
-    if (mbedtls_ecp_muladd(&context.curve, (mbedtls_ecp_point *) R, (const mbedtls_mpi *) fe1, (const mbedtls_ecp_point *) P1,
+    if (mbedtls_ecp_muladd(&context->curve, (mbedtls_ecp_point *) R, (const mbedtls_mpi *) fe1, (const mbedtls_ecp_point *) P1,
                            (const mbedtls_mpi *) fe2, (const mbedtls_ecp_point *) P2) != 0)
     {
         return CHIP_ERROR_INTERNAL;
@@ -756,7 +808,10 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointAddMul(void * R, const void * P1,
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointInvert(void * R)
 {
     mbedtls_ecp_point * Rp = (mbedtls_ecp_point *) R;
-    if (mbedtls_mpi_sub_mpi(&Rp->Y, &context.curve.P, &Rp->Y) != 0)
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
+
+    if (mbedtls_mpi_sub_mpi(&Rp->Y, &context->curve.P, &Rp->Y) != 0)
     {
         return CHIP_ERROR_INTERNAL;
     }
@@ -811,7 +866,10 @@ exit:
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
 {
-    if (mbedtls_ecp_check_pubkey(&context.curve, (mbedtls_ecp_point *) R) != 0)
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
+
+    if (mbedtls_ecp_check_pubkey(&context->curve, (mbedtls_ecp_point *) R) != 0)
     {
         return CHIP_ERROR_INTERNAL;
     }

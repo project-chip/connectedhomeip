@@ -24,6 +24,7 @@
 
 #include <openssl/bn.h>
 #include <openssl/conf.h>
+#include <openssl/ec.h>
 #include <openssl/ecdsa.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
@@ -276,7 +277,10 @@ exit:
     return error;
 }
 
-Hash_SHA256_stream::Hash_SHA256_stream(void) {}
+Hash_SHA256_stream::Hash_SHA256_stream(void)
+{
+    static_assert(sizeof(mContext) >= sizeof(SHA256_CTX), "Need more memory to store SHA256 context");
+}
 
 Hash_SHA256_stream::~Hash_SHA256_stream(void) {}
 
@@ -285,7 +289,9 @@ CHIP_ERROR Hash_SHA256_stream::Begin(void)
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 1;
 
-    result = SHA256_Init(&context);
+    SHA256_CTX* context = (SHA256_CTX*)&mContext;
+
+    result = SHA256_Init(context);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -297,7 +303,9 @@ CHIP_ERROR Hash_SHA256_stream::AddData(const unsigned char * data, const size_t 
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 1;
 
-    result = SHA256_Update(&context, data, data_length);
+    SHA256_CTX* context = (SHA256_CTX*)&mContext;
+
+    result = SHA256_Update(context, data, data_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -309,7 +317,9 @@ CHIP_ERROR Hash_SHA256_stream::Finish(unsigned char * out_buffer)
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 1;
 
-    result = SHA256_Final(out_buffer, &context);
+    SHA256_CTX* context = (SHA256_CTX*)&mContext;
+
+    result = SHA256_Final(out_buffer, context);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -783,7 +793,7 @@ void ClearSecretData(uint8_t * buf, uint32_t len)
 #define init_point(_point_)                                                                                                        \
     do                                                                                                                             \
     {                                                                                                                              \
-        _point_ = EC_POINT_new(context.curve);                                                                                     \
+        _point_ = EC_POINT_new(context->curve);                                                                                     \
         VerifyOrExit(_point_ != NULL, error = CHIP_ERROR_INTERNAL);                                                                \
     } while (0)
 
@@ -812,26 +822,36 @@ void ClearSecretData(uint8_t * buf, uint32_t len)
         }                                                                                                                          \
     } while (0)
 
+typedef struct Spake2p_Context
+{
+    EC_GROUP * curve;
+    BN_CTX * bn_ctx;
+    const EVP_MD * md_info;
+} Spake2p_Context;
+
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
 {
     CHIP_ERROR error  = CHIP_ERROR_INTERNAL;
     int error_openssl = 0;
 
-    context.curve   = NULL;
-    context.bn_ctx  = NULL;
-    context.md_info = NULL;
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
 
-    context.curve = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
-    VerifyOrExit(context.curve != NULL, error = CHIP_ERROR_INTERNAL);
+    context->curve   = NULL;
+    context->bn_ctx  = NULL;
+    context->md_info = NULL;
 
-    G = (void *) EC_GROUP_get0_generator(context.curve);
+    context->curve = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
+    VerifyOrExit(context->curve != NULL, error = CHIP_ERROR_INTERNAL);
+
+    G = (void *) EC_GROUP_get0_generator(context->curve);
     VerifyOrExit(G != NULL, error = CHIP_ERROR_INTERNAL);
 
-    context.bn_ctx = BN_CTX_secure_new();
-    VerifyOrExit(context.bn_ctx != NULL, error = CHIP_ERROR_INTERNAL);
+    context->bn_ctx = BN_CTX_secure_new();
+    VerifyOrExit(context->bn_ctx != NULL, error = CHIP_ERROR_INTERNAL);
 
-    context.md_info = EVP_sha256();
-    VerifyOrExit(context.md_info != NULL, error = CHIP_ERROR_INTERNAL);
+    context->md_info = EVP_sha256();
+    VerifyOrExit(context->md_info != NULL, error = CHIP_ERROR_INTERNAL);
 
     init_point(M);
     init_point(N);
@@ -846,7 +866,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
     init_bn(tempbn);
     init_bn(order);
 
-    error_openssl = EC_GROUP_get_order(context.curve, (BIGNUM *) order, context.bn_ctx);
+    error_openssl = EC_GROUP_get_order(context->curve, (BIGNUM *) order, context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -856,14 +876,17 @@ exit:
 
 void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl(void)
 {
-    if (context.curve != nullptr)
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
+
+    if (context->curve != nullptr)
     {
-        EC_GROUP_clear_free(context.curve);
+        EC_GROUP_clear_free(context->curve);
     }
 
-    if (context.bn_ctx != nullptr)
+    if (context->bn_ctx != nullptr)
     {
-        BN_CTX_free(context.bn_ctx);
+        BN_CTX_free(context->bn_ctx);
     }
 
     free_point(M);
@@ -887,10 +910,13 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const unsigned char * key, size_t 
     int error_openssl        = 0;
     unsigned int mac_out_len = 0;
 
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
+
     HMAC_CTX * mac_ctx = HMAC_CTX_new();
     VerifyOrExit(mac_ctx != NULL, error = CHIP_ERROR_INTERNAL);
 
-    error_openssl = HMAC_Init_ex(mac_ctx, key, key_len, context.md_info, NULL);
+    error_openssl = HMAC_Init_ex(mac_ctx, key, key_len, context->md_info, NULL);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error_openssl = HMAC_Update(mac_ctx, in, in_len);
@@ -929,8 +955,11 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FELoad(const unsigned char * in, size_
     int error_openssl = 0;
     BIGNUM * bn_fe    = (BIGNUM *) fe;
 
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
+
     BN_bin2bn(in, in_len, bn_fe);
-    error_openssl = BN_mod(bn_fe, bn_fe, (BIGNUM *) order, context.bn_ctx);
+    error_openssl = BN_mod(bn_fe, bn_fe, (BIGNUM *) order, context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -968,7 +997,10 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEMul(void * fer, const void * fe1, co
     CHIP_ERROR error  = CHIP_ERROR_INTERNAL;
     int error_openssl = 0;
 
-    error_openssl = BN_mod_mul((BIGNUM *) fer, (BIGNUM *) fe1, (BIGNUM *) fe2, (BIGNUM *) order, context.bn_ctx);
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
+
+    error_openssl = BN_mod_mul((BIGNUM *) fer, (BIGNUM *) fe1, (BIGNUM *) fe2, (BIGNUM *) order, context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -981,7 +1013,10 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointLoad(const unsigned char * in, si
     CHIP_ERROR error  = CHIP_ERROR_INTERNAL;
     int error_openssl = 0;
 
-    error_openssl = EC_POINT_oct2point(context.curve, (EC_POINT *) R, in, in_len, context.bn_ctx);
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
+
+    error_openssl = EC_POINT_oct2point(context->curve, (EC_POINT *) R, in, in_len, context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -992,8 +1027,11 @@ exit:
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointWrite(const void * R, unsigned char * out, size_t out_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
+
     size_t ec_out_len =
-        EC_POINT_point2oct(context.curve, (EC_POINT *) R, POINT_CONVERSION_UNCOMPRESSED, out, out_len, context.bn_ctx);
+        EC_POINT_point2oct(context->curve, (EC_POINT *) R, POINT_CONVERSION_UNCOMPRESSED, out, out_len, context->bn_ctx);
     VerifyOrExit(ec_out_len == out_len, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -1006,7 +1044,10 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointMul(void * R, const void * P1, co
     CHIP_ERROR error  = CHIP_ERROR_INTERNAL;
     int error_openssl = 0;
 
-    error_openssl = EC_POINT_mul(context.curve, (EC_POINT *) R, NULL, (EC_POINT *) P1, (BIGNUM *) fe1, context.bn_ctx);
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
+
+    error_openssl = EC_POINT_mul(context->curve, (EC_POINT *) R, NULL, (EC_POINT *) P1, (BIGNUM *) fe1, context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -1021,7 +1062,10 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointAddMul(void * R, const void * P1,
     int error_openssl  = 0;
     EC_POINT * scratch = NULL;
 
-    scratch = EC_POINT_new(context.curve);
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
+
+    scratch = EC_POINT_new(context->curve);
     VerifyOrExit(scratch != NULL, error = CHIP_ERROR_INTERNAL);
 
     error = PointMul(scratch, P1, fe1);
@@ -1030,7 +1074,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointAddMul(void * R, const void * P1,
     error = PointMul(R, P2, fe2);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
-    error_openssl = EC_POINT_add(context.curve, (EC_POINT *) R, (EC_POINT *) R, (const EC_POINT *) scratch, context.bn_ctx);
+    error_openssl = EC_POINT_add(context->curve, (EC_POINT *) R, (EC_POINT *) R, (const EC_POINT *) scratch, context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -1044,7 +1088,10 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointInvert(void * R)
     CHIP_ERROR error  = CHIP_ERROR_INTERNAL;
     int error_openssl = 0;
 
-    error_openssl = EC_POINT_invert(context.curve, (EC_POINT *) R, context.bn_ctx);
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
+
+    error_openssl = EC_POINT_invert(context->curve, (EC_POINT *) R, context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -1066,20 +1113,23 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(unsigned char * Lout, size_t 
     BIGNUM * w1_bn        = NULL;
     EC_POINT * Lout_point = NULL;
 
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
+
     w1_bn = BN_new();
     VerifyOrExit(w1_bn != NULL, error = CHIP_ERROR_INTERNAL);
 
-    Lout_point = EC_POINT_new(context.curve);
+    Lout_point = EC_POINT_new(context->curve);
     VerifyOrExit(Lout_point != NULL, error = CHIP_ERROR_INTERNAL);
 
     BN_bin2bn(w1in, w1in_len, w1_bn);
-    error_openssl = BN_mod(w1_bn, w1_bn, (BIGNUM *) order, context.bn_ctx);
+    error_openssl = BN_mod(w1_bn, w1_bn, (BIGNUM *) order, context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
-    error_openssl = EC_POINT_mul(context.curve, Lout_point, w1_bn, NULL, NULL, context.bn_ctx);
+    error_openssl = EC_POINT_mul(context->curve, Lout_point, w1_bn, NULL, NULL, context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
-    *L_len = EC_POINT_point2oct(context.curve, Lout_point, POINT_CONVERSION_UNCOMPRESSED, Lout, *L_len, context.bn_ctx);
+    *L_len = EC_POINT_point2oct(context->curve, Lout_point, POINT_CONVERSION_UNCOMPRESSED, Lout, *L_len, context->bn_ctx);
     VerifyOrExit(*L_len != 0, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -1095,7 +1145,10 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
     CHIP_ERROR error  = CHIP_ERROR_INTERNAL;
     int error_openssl = 0;
 
-    error_openssl = EC_POINT_is_on_curve(context.curve, (EC_POINT *) R, context.bn_ctx);
+    Spake2p_Context* context = (Spake2p_Context*) &mSpake2pContext;
+    static_assert(sizeof(mSpake2pContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
+
+    error_openssl = EC_POINT_is_on_curve(context->curve, (EC_POINT *) R, context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
