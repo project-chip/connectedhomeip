@@ -17,6 +17,8 @@
  *    limitations under the License.
  */
 
+#include <platform/CHIPDeviceConfig.h>
+
 #include <stdbool.h>
 #include <stdint.h>
 

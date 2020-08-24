@@ -31,6 +31,7 @@
 
 // Include configuration headers
 #include <core/CHIPConfig.h>
+#include <inet/InetConfig.h>
 
 // Include dependent headers
 #include <support/DLLUtil.h>

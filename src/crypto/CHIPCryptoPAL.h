@@ -23,6 +23,10 @@
 #ifndef _CHIP_CRYPTO_PAL_H_
 #define _CHIP_CRYPTO_PAL_H_
 
+#if CHIP_SEPARATE_CONFIG_H
+#include <crypto/CryptoBuildConfig.h>
+#endif
+
 #include <core/CHIPError.h>
 #include <stddef.h>
 #include <string.h>

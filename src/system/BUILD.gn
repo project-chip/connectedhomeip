@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
 import("//build_overrides/nlfaultinjection.gni")
 
+import("${chip_root}/gn/chip/buildconfig_header.gni")
 import("${chip_root}/gn/chip/tests.gni")
 import("${chip_root}/src/platform/device.gni")
 import("system.gni")
@@ -38,10 +39,40 @@ if (chip_project_config_include_dirs == [] &&
   chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 }
 
-config("system_config") {
-  configs = [ "${chip_root}/src:includes" ]
+buildconfig_header("system_buildconfig") {
+  header = "SystemBuildConfig.h"
+  header_dir = "system"
 
-  defines = []
+  config_device_layer = chip_device_platform != "none"
+  chip_system_config_posix_locking = chip_system_config_locking == "posix"
+  chip_system_config_freertos_locking = chip_system_config_locking == "freertos"
+  chip_system_config_no_locking = chip_system_config_locking == "none"
+  have_clock_gettime = chip_system_config_clock == "clock_gettime"
+  have_clock_settime = have_clock_gettime
+  have_gettimeofday = chip_system_config_clock == "gettimeofday"
+
+  defines = [
+    "CONFIG_DEVICE_LAYER=${config_device_layer}",
+    "CHIP_SYSTEM_CONFIG_TEST=${chip_build_tests}",
+    "CHIP_WITH_NLFAULTINJECTION=${chip_with_nlfaultinjection}",
+    "CHIP_SYSTEM_CONFIG_USE_LWIP=${chip_system_config_use_lwip}",
+    "CHIP_SYSTEM_CONFIG_USE_SOCKETS=${chip_system_config_use_sockets}",
+    "CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK=false",
+    "CHIP_SYSTEM_CONFIG_POSIX_LOCKING=${chip_system_config_posix_locking}",
+    "CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING=${chip_system_config_freertos_locking}",
+    "CHIP_SYSTEM_CONFIG_NO_LOCKING=${chip_system_config_no_locking}",
+    "CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS=${chip_system_config_provide_statistics}",
+    "HAVE_CLOCK_GETTIME=${have_clock_gettime}",
+    "HAVE_CLOCK_SETTIME=${have_clock_settime}",
+    "HAVE_GETTIMEOFDAY=${have_gettimeofday}",
+    "HAVE_SYS_TIME_H=true",
+    "HAVE_NETINET_ICMP6_H=true",
+    "HAVE_ICMP6_FILTER=true",
+    "CONFIG_HAVE_VCBPRINTF=false",
+    "CONFIG_HAVE_VSNPRINTF_EX=false",
+    "HAVE_SYS_SOCKET_H=${chip_system_config_use_sockets}",
+  ]
+
   if (chip_project_config_include != "") {
     defines += [ "CHIP_PROJECT_CONFIG_INCLUDE=${chip_project_config_include}" ]
   }
@@ -59,63 +90,21 @@ config("system_config") {
       "SYSTEM_PLATFORM_CONFIG_INCLUDE=${chip_system_platform_config_include}",
     ]
   }
-  if (chip_build_tests) {
-    defines += [ "CHIP_SYSTEM_CONFIG_TEST=1" ]
-  } else {
-    defines += [ "CHIP_SYSTEM_CONFIG_TEST=0" ]
-  }
-  if (chip_with_nlfaultinjection) {
-    defines += [ "CHIP_WITH_NLFAULTINJECTION=1" ]
-  } else {
-    defines += [ "CHIP_WITH_NLFAULTINJECTION=0" ]
-  }
-  if (chip_system_config_use_lwip) {
-    defines += [ "CHIP_SYSTEM_CONFIG_USE_LWIP=1" ]
-  } else {
-    defines += [ "CHIP_SYSTEM_CONFIG_USE_LWIP=0" ]
-  }
-  if (chip_system_config_use_sockets) {
-    defines += [ "CHIP_SYSTEM_CONFIG_USE_SOCKETS=1" ]
-  } else {
-    defines += [ "CHIP_SYSTEM_CONFIG_USE_SOCKETS=0" ]
-  }
-  if (chip_system_config_locking == "posix") {
-    defines += [ "CHIP_SYSTEM_CONFIG_POSIX_LOCKING=1" ]
-  } else {
-    defines += [ "CHIP_SYSTEM_CONFIG_POSIX_LOCKING=0" ]
-  }
-  if (chip_system_config_locking == "freertos") {
-    defines += [ "CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING=1" ]
-  } else {
-    defines += [ "CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING=0" ]
-  }
-  if (chip_system_config_locking == "none") {
-    defines += [ "CHIP_SYSTEM_CONFIG_NO_LOCKING=1" ]
-  } else {
-    defines += [ "CHIP_SYSTEM_CONFIG_NO_LOCKING=0" ]
-  }
-  if (chip_system_config_provide_statistics) {
-    defines += [ "CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS=1" ]
-  } else {
-    defines += [ "CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS=0" ]
-  }
-  if (chip_system_config_clock == "clock_gettime") {
-    defines += [ "HAVE_CLOCK_GETTIME=1" ]
-    defines += [ "HAVE_CLOCK_SETTIME=1" ]
-  }
-  if (chip_system_config_clock == "gettimeofday") {
-    defines += [ "HAVE_GETTIMEOFDAY=1" ]
-  }
+}
 
+config("system_config") {
   include_dirs = chip_project_config_include_dirs
 }
 
 source_set("system_config_header") {
   sources = [ "SystemConfig.h" ]
 
-  public_configs = [ ":system_config" ]
+  public_configs = [
+    ":system_config",
+    "${chip_root}/src:includes",
+  ]
 
-  public_deps = []
+  public_deps = [ ":system_buildconfig" ]
 
   if (chip_system_config_use_lwip) {
     public_deps += [ "${chip_root}/src/lwip" ]

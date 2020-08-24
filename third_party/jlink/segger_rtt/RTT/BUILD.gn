@@ -15,6 +15,8 @@
 import("//build/config/arm.gni")
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/gn/chip/buildconfig_header.gni")
+
 declare_args() {
   # Size of SEGGER RTT up buffer.
   segger_rtt_buffer_size_up = -1
@@ -44,15 +46,11 @@ declare_args() {
   rtt_use_asm = _rtt_asm != ""
 }
 
-config("rtt_config") {
-  include_dirs = [ "." ]
+buildconfig_header("rtt_buildconfig") {
+  header = "SEGGER_RTT_BuildConfig.h"
+  header_dir = "RTT"
 
-  defines = []
-  if (rtt_use_asm) {
-    defines += [ "RTT_USE_ASM=1" ]
-  } else {
-    defines += [ "RTT_USE_ASM=0" ]
-  }
+  defines = [ "RTT_USE_ASM=${rtt_use_asm}" ]
 
   if (segger_rtt_buffer_size_up != -1) {
     defines += [ "BUFFER_SIZE_UP=${segger_rtt_buffer_size_up}" ]
@@ -73,6 +71,13 @@ config("rtt_config") {
   }
 }
 
+config("rtt_config") {
+  include_dirs = [
+    ".",
+    "${root_gen_dir}/include/RTT",
+  ]
+}
+
 source_set("RTT") {
   sources = [
     "SEGGER_RTT.c",
@@ -84,9 +89,13 @@ source_set("RTT") {
     sources += [ _rtt_asm ]
   }
 
+  public_deps = [ ":rtt_buildconfig" ]
+
   public_configs = [ ":rtt_config" ]
 }
 
 source_set("printf") {
   sources = [ "SEGGER_RTT_printf.c" ]
+
+  public_deps = [ ":RTT" ]
 }

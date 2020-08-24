@@ -1,5 +1,7 @@
 #include "chipinit.h"
 
+#include <platform/CHIPDeviceConfig.h>
+
 #include <stdbool.h>
 #include <stdint.h>
 

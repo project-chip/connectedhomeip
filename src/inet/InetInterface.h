@@ -27,6 +27,8 @@
 #ifndef INETINTERFACE_H
 #define INETINTERFACE_H
 
+#include <inet/InetConfig.h>
+
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <support/DLLUtil.h>
