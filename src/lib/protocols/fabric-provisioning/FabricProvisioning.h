@@ -40,7 +40,7 @@
 #include <support/DLLUtil.h>
 
 /**
- *   @namespace chip::Profiles::FabricProvisioning
+ *   @namespace chip::Protocols::FabricProvisioning
  *
  *   @brief
  *     This namespace includes all interfaces within CHIP for the
@@ -49,7 +49,7 @@
  */
 
 namespace chip {
-namespace Profiles {
+namespace Protocols {
 namespace FabricProvisioning {
 
 using Inet::IPAddress;
@@ -223,7 +223,7 @@ private:
 };
 
 } // namespace FabricProvisioning
-} // namespace Profiles
+} // namespace Protocols
 } // namespace chip
 
 #endif /* FABRICPROVISIONING_H_ */

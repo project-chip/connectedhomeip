@@ -23,6 +23,6 @@
 #
 
 
-CHIP_BUILD_PROFILES_LAYER_HEADER_FILES                        = \
-    @top_builddir@/src/lib/profiles/CHIPProfiles.h              \
+CHIP_BUILD_PROTOCOL_LAYER_HEADER_FILES                        = \
+    @top_builddir@/src/lib/protocols/CHIPProtocols.h            \
     $(NULL)

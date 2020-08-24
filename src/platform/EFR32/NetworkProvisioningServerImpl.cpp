@@ -21,8 +21,8 @@
 #include <platform/internal/NetworkProvisioningServer.h>
 
 #include <core/CHIPTLV.h>
-#include <platform/Profiles/CHIPProfiles.h>
-#include <platform/Profiles/common/CommonProfile.h>
+#include <protocols/CHIPProtocols.h>
+#include <protocols/common/CommonProtocol.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <platform/internal/GenericNetworkProvisioningServerImpl.ipp>
 
