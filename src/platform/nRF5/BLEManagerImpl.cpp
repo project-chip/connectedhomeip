@@ -27,6 +27,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include <ble/CHIPBleServiceData.h>
+#include <platform/ConfigurationManager.h>
 #include <platform/internal/BLEManager.h>
 
 #include <support/CodeUtils.h>
@@ -253,8 +254,10 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * devName)
     }
     else
     {
-        // FIXME: the name should be derived from factory data
-        snprintf(devNameBuf, sizeof(devNameBuf), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, (uint32_t) 0);
+        uint32_t discriminator = 0;
+
+        ConfigurationMgr().GetSetupDiscriminator(discriminator);
+        snprintf(devNameBuf, sizeof(devNameBuf), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, discriminator);
         devNameBuf[kMaxDeviceNameLength] = 0;
     }
 
