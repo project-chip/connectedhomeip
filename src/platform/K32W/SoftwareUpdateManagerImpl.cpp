@@ -21,8 +21,8 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
-#include <protocols/CHIPProtocolss.h>
 #include <Protocols/common/CommonProtocol.h>
+#include <protocols/CHIPProtocolss.h>
 
 #include <DeviceLayer/internal/GenericSoftwareUpdateManagerImpl.ipp>
 #include <DeviceLayer/internal/GenericSoftwareUpdateManagerImpl_BDX.ipp>

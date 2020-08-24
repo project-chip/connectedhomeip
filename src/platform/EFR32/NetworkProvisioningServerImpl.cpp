@@ -21,10 +21,10 @@
 #include <platform/internal/NetworkProvisioningServer.h>
 
 #include <core/CHIPTLV.h>
-#include <protocols/CHIPProtocols.h>
-#include <protocols/common/CommonProtocol.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <platform/internal/GenericNetworkProvisioningServerImpl.ipp>
+#include <protocols/CHIPProtocols.h>
+#include <protocols/common/CommonProtocol.h>
 
 namespace chip {
 namespace DeviceLayer {
