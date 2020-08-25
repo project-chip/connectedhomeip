@@ -47,7 +47,7 @@ static uint16_t doEncodeApsFrame(BufBound & buf, uint16_t profileID, uint16_t cl
     if (isMeasuring)
     {
         result = buf.Written();
-        ChipLogProgress(Zcl, "Measured buffer size %d", result);
+        ChipLogProgress(Zcl, "Measured APS frame size %d", result);
     }
     else
     {
@@ -93,10 +93,10 @@ uint32_t _encodeOnOffCommand(uint8_t * buffer, uint32_t buf_length, uint8_t comm
     // This is a cluster-specific command so low two bits are 0b01.  The command
     // is standard, so does not need a manufacturer code, and we're sending
     // client to server, so all the remaining bits are 0.
-    buf.Put(0x1);
+    buf.Put(uint8_t(1));
 
     // Transaction sequence number.  Just pick something.
-    buf.Put(0x1);
+    buf.Put(uint8_t(1));
 
     buf.Put(command);
 
