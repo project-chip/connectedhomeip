@@ -60,10 +60,8 @@ public:
     uint16_t ExchangeId; /**< The Exchange identifier for the ExchangeContext */
     uint32_t ProfileId;  /**< The Profile identifier of the CHIP message */
     uint8_t MessageType; /**< The Message type for the specified CHIP profile */
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     uint32_t AckMsgId; /**< Optional; Message identifier being acknowledged.
                             Specified when requiring acknowledgments. */
-#endif
 };
 
 /**
@@ -118,9 +116,7 @@ public:
     uint16_t KeyId;           /**< Encryption key to use when sending a message. */
     uint32_t RetransInterval; /**< Time between retransmissions (in milliseconds); 0 disables retransmissions. */
     Timeout ResponseTimeout;  /**< Maximum time to wait for response (in milliseconds); 0 disables response timeout. */
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     RMPConfig mRMPConfig; /**< RMP configuration. */
-#endif
     enum
     {
         kSendFlag_AutoRetrans    = 0x0001, /**< Used to indicate that automatic retransmission is enabled. */
@@ -144,7 +140,6 @@ public:
     bool IsResponseExpected(void) const;
     void SetInitiator(bool inInitiator);
     void SetConnectionClosed(bool inConnectionClosed);
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     bool ShouldDropAck(void) const;
     bool IsAckPending(void) const;
     void SetDropAck(bool inDropAck);
@@ -155,7 +150,6 @@ public:
     void SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer);
     CHIP_ERROR RMPFlushAcks(void);
     uint32_t GetCurrentRetransmitTimeout(void);
-#endif
     void SetResponseExpected(bool inResponseExpected);
     bool AutoRequestAck() const;
     void SetAutoRequestAck(bool autoReqAck);
@@ -248,7 +242,6 @@ public:
 
     void CancelRetrans(void);
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     CHIP_ERROR RMPSendThrottleFlow(uint32_t PauseTimeMillis);
     CHIP_ERROR RMPSendDelayedDelivery(uint32_t PauseTimeMillis, uint64_t DelayedNodeId);
 
@@ -296,7 +289,6 @@ public:
     RMPPauseRcvdFunct OnDDRcvd;       /**< Application callback for received Delayed Delivery message. */
     RMPSendErrorFunct OnSendError;    /**< Application callback for error while sending. */
     RMPAckRcvdFunct OnAckRcvd;        /**< Application callback for received acknowledgment. */
-#endif                                // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
     /*
      * in order to use reference counting (see refCount below)
@@ -332,22 +324,18 @@ private:
     static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 
     uint32_t mPendingPeerAckId;
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     uint16_t mRMPNextAckTime;     // Next time for triggering Solo Ack
     uint16_t mRMPThrottleTimeout; // Timeout until when Throttle is On when RMPThrottleEnabled is set
-#endif
     void DoClose(bool clearRetransTable);
     CHIP_ERROR HandleMessage(ChipMessageInfo * msgInfo, const ChipExchangeHeader * exchHeader, PacketBuffer * msgBuf);
     CHIP_ERROR HandleMessage(ChipMessageInfo * msgInfo, const ChipExchangeHeader * exchHeader, PacketBuffer * msgBuf,
                              ExchangeContext::MessageReceiveFunct umhandler);
     void HandleConnectionClosed(CHIP_ERROR conErr);
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     bool RMPCheckAndRemRetransTable(uint32_t msgId, void ** rCtxt);
     CHIP_ERROR RMPHandleRcvdAck(const ChipExchangeHeader * exchHeader, const ChipMessageInfo * msgInfo);
     CHIP_ERROR RMPHandleNeedsAck(const ChipMessageInfo * msgInfo);
     CHIP_ERROR HandleThrottleFlow(uint32_t PauseTimeMillis);
-#endif
 
     uint8_t mRefCount;
 };
@@ -418,14 +406,10 @@ public:
     CHIP_ERROR UnregisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection * con);
 
     void AllowUnsolicitedMessages(ChipConnection * con);
-
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     void ClearMsgCounterSyncReq(uint64_t peerNodeId);
-#endif
 
 private:
     uint16_t NextExchangeId;
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     uint64_t mRMPTimeStampBase;                  // RMP timer base value to add offsets to evaluate timeouts
     System::Timer::Epoch mRMPCurrentTimerExpiry; // Tracks when the RMP timer will next expire
     uint16_t mRMPTimerInterval;                  // RMP Timer tick period
@@ -470,7 +454,6 @@ private:
 
     // RMP Global tables for timer context
     RetransTableEntry RetransTable[CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE];
-#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
     class UnsolicitedMessageHandler
     {

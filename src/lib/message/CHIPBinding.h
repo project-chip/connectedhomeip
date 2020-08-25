@@ -189,10 +189,8 @@ public:
     uint8_t GetEncryptionType(void) const;
     uint32_t GetDefaultResponseTimeout() const;
     void SetDefaultResponseTimeout(uint32_t msec);
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     const RMPConfig & GetDefaultRMPConfig(void) const;
     void SetDefaultRMPConfig(const RMPConfig & RMPConfig);
-#endif // #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     EventCallback GetEventCallback() const;
     void SetEventCallback(EventCallback aEventCallback);
     ChipConnection * GetConnection() const;
@@ -294,9 +292,7 @@ private:
     ChipConnection * mCon;
     uint32_t mDefaultResponseTimeoutMsec;
     uint32_t mUDPPathMTU;
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     RMPConfig mDefaultRMPConfig;
-#endif
     uint8_t mHostNameLen;
 
     // Security-specific configuration
@@ -520,8 +516,6 @@ inline void Binding::SetDefaultResponseTimeout(uint32_t timeout)
     mDefaultResponseTimeoutMsec = timeout;
 }
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-
 inline const RMPConfig & Binding::GetDefaultRMPConfig(void) const
 {
     return mDefaultRMPConfig;
@@ -531,8 +525,6 @@ inline void Binding::SetDefaultRMPConfig(const RMPConfig & aRMPConfig)
 {
     mDefaultRMPConfig = aRMPConfig;
 }
-
-#endif // #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
 inline Binding::EventCallback Binding::GetEventCallback() const
 {

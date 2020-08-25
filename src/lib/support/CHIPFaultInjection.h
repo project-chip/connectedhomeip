@@ -55,10 +55,8 @@ typedef enum
     kFault_FuzzExchangeHeaderTx, /**< Fuzz a chip Exchange Header after it has been encoded into the packet buffer;
                                       when the fault is enabled, it expects an integer argument, which is an index into
                                       a table of modifications that can be applied to the header. @see FuzzExchangeHeader */
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     kFault_RMPDoubleTx,        /**< Force RMP to transmit the outgoing message twice */
     kFault_RMPSendError,       /**< Fail a transmission in RMP as if the max number of retransmission has been exceeded */
-#endif                         // WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
     kFault_BDXBadBlockCounter, /**< Corrupt the BDX Block Counter in the BDX BlockSend or BlockEOF message about to be sent */
     kFault_BDXAllocTransfer,   /**< Fail the allocation of a BDXTransfer object */
     kFault_SecMgrBusy,         /**< Trigger a WEAVE_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
