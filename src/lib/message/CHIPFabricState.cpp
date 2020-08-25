@@ -1067,10 +1067,8 @@ void ChipFabricState::OnMsgCounterSyncRespRcvd(uint64_t peerNodeId, uint32_t pee
             PeerStates.GroupKeyRcvFlags[peerIndex]     = ChipSessionState::kReceiveFlags_MessageIdSynchronized;
             PeerStates.MaxGroupKeyMsgIdRcvd[peerIndex] = peerMsgId;
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
             // Clear MsgCounterSyncReq flag for all pending messages to that peer.
             MessageLayer->ExchangeMgr->ClearMsgCounterSyncReq(peerNodeId);
-#endif
         }
     }
 
