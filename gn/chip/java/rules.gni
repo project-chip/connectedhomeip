@@ -55,7 +55,7 @@ template("java_library") {
   _class_dir = rebase_path(target_out_dir, root_build_dir) + "/classes"
   _class_list_file = "$target_gen_dir/$target_name.classlist"
   action(_javac_target_name) {
-    sources = rebase_path(_java_files, root_build_dir)
+    sources = _java_files
 
     outputs = [
       _class_list_file
