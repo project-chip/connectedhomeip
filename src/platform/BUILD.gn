@@ -67,7 +67,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     if (chip_device_config_use_test_setup_pin_code != "") {
       defines += [ "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${chip_device_config_use_test_setup_pin_code}" ]
     }
-    if (chip_device_config_use_test_setup_discriminator!= "") {
+    if (chip_device_config_use_test_setup_discriminator != "") {
       defines += [ "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${chip_device_config_use_test_setup_discriminator}" ]
     }
 
