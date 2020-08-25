@@ -41,7 +41,9 @@
 
 #include "af.h"
 #include "common.h"
-//#include "../plugin/ias-zone-client/ias-zone-client.h"
+
+#include <app/clusters/ias-zone-client/ias-zone-client.h>
+
 //#include "../plugin/key-establishment/key-establishment.h"
 //#include "../plugin/smart-energy-registration/smart-energy-registration.h"
 //#include "../plugin/trust-center-keepalive/trust-center-keepalive.h"
