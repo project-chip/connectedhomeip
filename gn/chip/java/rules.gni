@@ -34,9 +34,15 @@ template("java_library") {
     _jar_name += ".jar"
   }
   
+  # Additional flags
   _javac_flags = []
   if (defined(invoker.javac_flags)) {
     _javac_flags = invoker.javac_flags
+  }
+
+  _deps = []
+  if (defined(invoker.deps)) {
+    _deps = invoker.deps
   }
 
   # What files will be compiled
@@ -77,7 +83,7 @@ template("java_library") {
   action(target_name) {
     deps = [
       ":$_javac_target_name",
-    ]
+    ] + _deps
 
     outputs = [
       _jar_output,
