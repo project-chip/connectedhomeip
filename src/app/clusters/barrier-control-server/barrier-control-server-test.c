@@ -37,6 +37,7 @@
  *******************************************************************************
  ******************************************************************************/
 
+#if 0
 #include "af.h"
 #include "app/framework/test/script/afv2-scripted.h"
 #include "barrier-control-server.h"
@@ -710,3 +711,4 @@ void scriptTickCallback(void)
     };
     emberRunEvents(data);
 }
+#endif

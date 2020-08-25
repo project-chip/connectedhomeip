@@ -27,7 +27,7 @@ COMPONENT_SRCDIRS :=                                                      \
   ../third_party/connectedhomeip/src/app/util                             \
   ../third_party/connectedhomeip/src/app/clusters/on-off-server           \
   ../third_party/connectedhomeip/src/app/clusters/identify               \
-#  ../third_party/connectedhomeip/src/app/clusters/barrier-control-server \
+  ../third_party/connectedhomeip/src/app/clusters/barrier-control-server \
 #  ../third_party/connectedhomeip/src/app/clusters/basic                  \
 #  ../third_party/connectedhomeip/src/app/clusters/color-control-server   \
 #  ../third_party/connectedhomeip/src/app/clusters/door-lock-server       \

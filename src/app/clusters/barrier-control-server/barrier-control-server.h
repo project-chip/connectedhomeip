@@ -37,6 +37,12 @@
  *******************************************************************************
  ******************************************************************************/
 
+#ifndef BARRIER_CONTROL_SERVER_H
+#define BARRIER_CONTROL_SERVER_H
+
+#include <stdbool.h>
+#include <stdint.h>
+
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 // There are helper getter/setting APIs that are shared between the core
 // implementation and the CLI code. They are private to the plugin.
@@ -66,3 +72,4 @@ uint16_t emAfPluginBarrierControlServerGetSafetyStatus(uint8_t endpoint);
 #define MIN_POSITION_CHANGE_DELAY_MS 30
 
 #endif
+#endif // BARRIER_CONTROL_SERVER_H

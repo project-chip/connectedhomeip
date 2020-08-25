@@ -37,6 +37,7 @@
  *******************************************************************************
  ******************************************************************************/
 
+#if 0
 #include "af.h"
 #include "barrier-control-server.h"
 
@@ -157,3 +158,4 @@ void emAfPluginBarrierControlServerSafetyStatusCommand(void)
 
     printSafetyStatus(safetyStatus);
 }
+#endif
