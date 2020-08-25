@@ -58,6 +58,7 @@ dist_libPlatformTests_a_HEADERS                = \
 # objects in this makefile.
 
 AM_CPPFLAGS                                    = \
+    -I$(builddir)/../Linux/gen                   \
     -I$(top_srcdir)/src/                         \
     -I$(top_srcdir)/src/lib                      \
     -I$(top_srcdir)/src/system                   \
@@ -68,22 +69,71 @@ AM_CPPFLAGS                                    = \
     $(NLUNIT_TEST_CPPFLAGS)                      \
     $(NULL)
 
+if CHIP_DEVICE_LAYER_TARGET_LINUX
+AM_CPPFLAGS                                   += \
+    $(GIO_CFLAGS)                                \
+    $(GIO_UNIX_CFLAGS)                           \
+    $(NULL)
+
+if CHIP_WITH_OT_BR_POSIX
+AM_CPPFLAGS                                   += \
+    $(DBUS_CFLAGS)                               \
+    $(OT_BR_POSIX_CPPFLAGS)                      \
+    $(NULL)
+
+libPlatformTests_a_SOURCES += TestThreadStackMgr.cpp
+
+dist_libPlatformTests_a_HEADERS                += \
+    TestThreadStackMgr.h                          \
+    $(NULL)
+
+endif # CHIP_WITH_OT_BR_POSIX
+
+if CONFIG_BLE_PLATFORM_BLUEZ
+AM_CPPFLAGS                                   += \
+    $(DBUS_CFLAGS)                               \
+    $(NULL)
+
+libPlatformTests_a_SOURCES += TestCHIPoBLEStackMgr.cpp
+
+dist_libPlatformTests_a_HEADERS                += \
+    TestCHIPoBLEStackMgr.h                          \
+    $(NULL)
+endif # CONFIG_BLE_PLATFORM_BLUEZ
+
+endif # CHIP_DEVICE_LAYER_TARGET_LINUX
+
+
 CHIP_LDADD                                      = \
     $(top_builddir)/src/platform/libDeviceLayer.a \
     $(top_builddir)/src/inet/libInetLayer.a       \
     $(top_builddir)/src/system/libSystemLayer.a   \
+    $(top_builddir)/src/crypto/libChipCrypto.a    \
     $(top_builddir)/src/lib/support/libSupportLayer.a   \
+    $(top_builddir)/src/ble/libBleLayer.a       \
     $(NULL)
+
+if CHIP_DEVICE_LAYER_TARGET_LINUX
 
 COMMON_LDADD                                          = \
     libPlatformTests.a                                  \
     $(CHIP_LDADD)                                       \
+    $(GIO_CFLAGS) $(GIO_LIBS)                           \
+    $(GIO_UNIX_CFLAGS) $(GIO_UNIX_LIBS)                 \
     $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS)\
     $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)          \
     $(LWIP_LDFLAGS) $(LWIP_LIBS)                        \
     $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                  \
     $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                   \
     $(NULL)
+
+if CHIP_WITH_OT_BR_POSIX
+COMMON_LDADD                                   += \
+    $(DBUS_LIBS)                                  \
+    $(OT_BR_POSIX_LDFLAGS) $(OT_BR_POSIX_LIBS)    \
+    $(NULL)
+endif # CHIP_WITH_OT_BR_POSIX
+endif # CHIP_DEVICE_LAYER_TARGET_LINUX
 
 # Test applications that should be run when the 'check' target is run.
 
@@ -93,13 +143,36 @@ check_PROGRAMS                                 = \
     TestConfigurationMgr                         \
     $(NULL)
 
+if CHIP_DEVICE_LAYER_TARGET_LINUX
+if CONFIG_BLE_PLATFORM_BLUEZ
+check_PROGRAMS += TestCHIPoBLEStackMgr
+
+TestCHIPoBLEStackMgr_LDADD                       = $(COMMON_LDADD)
+TestCHIPoBLEStackMgr_SOURCES                     = TestCHIPoBLEStackMgrDriver.cpp
+
+endif # CONFIG_BLE_PLATFORM_BLUEZ
+endif # CHIP_DEVICE_LAYER_TARGET_LINUX
+
+if CHIP_DEVICE_LAYER_TARGET_LINUX
+if CHIP_WITH_OT_BR_POSIX
+check_PROGRAMS += TestThreadStackMgr
+
+TestThreadStackMgr_LDADD                       = $(COMMON_LDADD)
+TestThreadStackMgr_SOURCES                     = TestThreadStackMgrDriver.cpp
+endif
+endif
+
 # TODO Add TestConfigurationMgr to check_PROGRAMS when dependent core profile are merged 
 
 # Test applications and scripts that should be built and run when the
 # 'check' target is run.
 
+# TestThreadStackMgr requires additional daemon to be launched
+# TestCHIPoBLEStackMgr requires additional daemon to be launched
 TESTS                                          = \
-    $(check_PROGRAMS)                            \
+    TestPlatformTime                             \
+    TestPlatformMgr                              \
+    TestConfigurationMgr                         \
     $(NULL)
 
 # The additional environment variables and their values that will be

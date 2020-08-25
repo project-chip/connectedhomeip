@@ -25,14 +25,13 @@
 #ifndef GENERIC_PLATFORM_MANAGER_IMPL_FREERTOS_IPP
 #define GENERIC_PLATFORM_MANAGER_IMPL_FREERTOS_IPP
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/PlatformManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
 
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
 // from which the GenericPlatformManagerImpl_FreeRTOS<> template inherits.
 #include <platform/internal/GenericPlatformManagerImpl.ipp>
-
 
 namespace chip {
 namespace DeviceLayer {
@@ -41,15 +40,15 @@ namespace Internal {
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>;
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     vTaskSetTimeOutState(&mNextTimerBaseTime);
     mNextTimerDurationTicks = 0;
-    mEventLoopTask = NULL;
-    mChipTimerActive = false;
+    mEventLoopTask          = NULL;
+    mChipTimerActive        = false;
 
     mChipStackLock = xSemaphoreCreateMutex();
     if (mChipStackLock == NULL)
@@ -73,25 +72,25 @@ exit:
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_LockChipStack(void)
 {
     xSemaphoreTake(mChipStackLock, portMAX_DELAY);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 bool GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_TryLockChipStack(void)
 {
     return xSemaphoreTake(mChipStackLock, 0) == pdTRUE;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_UnlockChipStack(void)
 {
     xSemaphoreGive(mChipStackLock);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
     if (mChipEventQueue != NULL)
@@ -103,7 +102,7 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_PostEvent(const ChipDevice
     }
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
 {
     CHIP_ERROR err;
@@ -180,29 +179,26 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
     }
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartEventLoopTask(void)
 {
     BaseType_t res;
 
-    res = xTaskCreate(EventLoopTaskMain,
-                CHIP_DEVICE_CONFIG_CHIP_TASK_NAME,
-                CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE / sizeof(StackType_t),
-                this,
-                CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY,
-                NULL);
+    res = xTaskCreate(EventLoopTaskMain, CHIP_DEVICE_CONFIG_CHIP_TASK_NAME,
+                      CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE / sizeof(StackType_t), this, CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY,
+                      NULL);
 
     return (res == pdPASS) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::EventLoopTaskMain(void * arg)
 {
     ChipLogDetail(DeviceLayer, "CHIP task running");
-    static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass>*>(arg)->Impl()->RunEventLoop();
+    static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg)->Impl()->RunEventLoop();
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartChipTimer(uint32_t aMilliseconds)
 {
     mChipTimerActive = true;
@@ -222,7 +218,7 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartChipTimer(uint3
     return CHIP_NO_ERROR;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::PostEventFromISR(const ChipDeviceEvent * event, BaseType_t & yieldRequired)
 {
     yieldRequired = pdFALSE;
@@ -234,6 +230,12 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::PostEventFromISR(const Chip
             ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
         }
     }
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_Shutdown(void)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 } // namespace Internal

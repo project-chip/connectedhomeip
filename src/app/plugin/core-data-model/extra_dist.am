@@ -1,1 +1,0 @@
-EXTRA_DIST+=core-data-model/zcl-data-model.c core-data-model/zcl-struct.c

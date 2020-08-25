@@ -167,7 +167,7 @@ extern Error GetClock_RealTime(uint64_t & curTime);
  *   This function is reserved for internal use by the CHIP System Layer.  Users of the CHIP System
  *   Layer should call System::Layer::GetClock_RealTimeMS().
  *
- * @param[out] curTime                  The current time, expressed as Unix time scaled to milliseconds.
+ * @param[out] curTimeMS               The current time, expressed as Unix time scaled to milliseconds.
  *
  * @retval #CHIP_SYSTEM_NO_ERROR       If the method succeeded.
  * @retval #CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED

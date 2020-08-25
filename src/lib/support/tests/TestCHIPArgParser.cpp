@@ -677,6 +677,7 @@ static bool HandleNonOptionArgs(const char * progName, int argc, char * argv[])
 
 static void HandleArgError(const char * msg, ...)
 {
+    int msgLen;
     int status;
     va_list ap;
 
@@ -685,7 +686,12 @@ static void HandleArgError(const char * msg, ...)
     sCallbackRecords[sCallbackRecordCount].Type = CallbackRecord::kArgError;
 
     va_start(ap, msg);
-    status = vasprintf(&sCallbackRecords[sCallbackRecordCount].Error, msg, ap);
+    msgLen = vsnprintf(nullptr, 0, msg, ap);
+    va_end(ap);
+
+    va_start(ap, msg);
+    sCallbackRecords[sCallbackRecordCount].Error = (char *) malloc(msgLen + 1);
+    status                                       = vsnprintf(sCallbackRecords[sCallbackRecordCount].Error, msgLen + 1, msg, ap);
     (void) status;
     va_end(ap);
 

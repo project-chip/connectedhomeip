@@ -18,6 +18,37 @@
             "problemMatcher": ["$gcc"]
         },
         {
+            "label": "GN Build",
+            "type": "shell",
+            "command": "./gn_build.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "isBackground": false,
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": ["relative", "${workspaceFolder}/out/debug/"]
+            }
+        },
+        {
+            "label": "Update compilation database",
+            "type": "shell",
+            "command": "scripts/helpers/update_compile_commands.sh",
+            "group": "none",
+            "dependsOn": "GN Build",
+            "isBackground": false,
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Auto-enforce coding style",
             "type": "shell",
             "command": "scripts/helpers/auto_enforce_code_style.sh",

@@ -30,18 +30,20 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <support/Base64.h>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
 #endif
 
+#if CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
+#include <crypto/CHIPCryptoPAL.h>
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
 
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_Init()
@@ -86,7 +88,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ConfigureChipStack()
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         FabricState.FabricId = kFabricIdNotSpecified;
-        err = CHIP_NO_ERROR;
+        err                  = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 #endif // CHIP_CONFIG_ENABLE_FABRIC_STATE
@@ -97,7 +99,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ConfigureChipStack()
 
 #if CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
     {
-        uint8_t provHash[Platform::Security::SHA256::kHashLength];
+        uint8_t provHash[chip::Crypto::kSHA256_Hash_Length];
         char provHashBase64[BASE64_ENCODED_LEN(sizeof(provHash)) + 1];
         err = Impl()->_ComputeProvisioningHash(provHash, sizeof(provHash));
         if (err == CHIP_NO_ERROR)
@@ -146,12 +148,10 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareBuildTime(uin
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO: Allow build time to be overridden by compile-time config (e.g. CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME).
-
-    err = ParseCompilerDateStr(__DATE__, year, month, dayOfMonth);
+    err = ParseCompilerDateStr(CHIP_DEVICE_CONFIG_FIRWMARE_BUILD_DATE, year, month, dayOfMonth);
     SuccessOrExit(err);
 
-    err = Parse24HourTimeStr(__TIME__, hour, minute, second);
+    err = Parse24HourTimeStr(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME, hour, minute, second);
     SuccessOrExit(err);
 
 exit:
@@ -544,21 +544,19 @@ void GenericConfigurationManagerImpl<ImplClass>::_UseManufacturerCredentialsAsOp
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPairingCode(char * buf, size_t bufSize, size_t & pairingCodeLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSetupPinCode(uint32_t & setupPinCode)
 {
     CHIP_ERROR err;
 
-    err = Impl()->ReadConfigValueStr(ImplClass::kConfigKey_PairingCode, buf, bufSize, pairingCodeLen);
-#ifdef CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE
-    if (CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE[0] != 0 && err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    err = Impl()->ReadConfigValue(ImplClass::kConfigKey_SetupPinCode, setupPinCode);
+#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        VerifyOrExit(sizeof(CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE) <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(buf, CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE, sizeof(CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE));
-        pairingCodeLen = sizeof(CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE) - 1;
-        ChipLogProgress(DeviceLayer, "Pairing code not found; using default: %s", CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE);
+        setupPinCode = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
+        ChipLogProgress(DeviceLayer, "Setup PIN code not found; using default: %09u", CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE);
         err = CHIP_NO_ERROR;
     }
-#endif // CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE
+#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
     SuccessOrExit(err);
 
 exit:
@@ -566,9 +564,36 @@ exit:
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePairingCode(const char * pairingCode, size_t pairingCodeLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreSetupPinCode(uint32_t setupPinCode)
 {
-    return Impl()->WriteConfigValueStr(ImplClass::kConfigKey_PairingCode, pairingCode, pairingCodeLen);
+    return Impl()->WriteConfigValue(ImplClass::kConfigKey_SetupPinCode, setupPinCode);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSetupDiscriminator(uint32_t & setupDiscriminator)
+{
+    CHIP_ERROR err;
+
+    err = Impl()->ReadConfigValue(ImplClass::kConfigKey_SetupDiscriminator, setupDiscriminator);
+#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        setupDiscriminator = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
+        ChipLogProgress(DeviceLayer, "Setup PIN discriminator not found; using default: %03x",
+                        CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR);
+        err = CHIP_NO_ERROR;
+    }
+#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreSetupDiscriminator(uint32_t setupDiscriminator)
+{
+    return Impl()->WriteConfigValue(ImplClass::kConfigKey_SetupDiscriminator, setupDiscriminator);
 }
 
 template <class ImplClass>
@@ -759,6 +784,7 @@ GenericConfigurationManagerImpl<ImplClass>::_GetBLEDeviceIdentificationInfo(Ble:
 {
     CHIP_ERROR err;
     uint16_t id;
+    uint32_t discriminator;
 
     deviceIdInfo.Init();
 
@@ -770,9 +796,9 @@ GenericConfigurationManagerImpl<ImplClass>::_GetBLEDeviceIdentificationInfo(Ble:
     SuccessOrExit(err);
     deviceIdInfo.SetProductId(id);
 
-#if CHIP_CONFIG_ENABLE_FABRIC_STATE
-    deviceIdInfo.SetDeviceId(FabricState.LocalNodeId);
-#endif
+    err = Impl()->_GetSetupDiscriminator(discriminator);
+    SuccessOrExit(err);
+    deviceIdInfo.SetDeviceDiscriminator(discriminator);
 
     deviceIdInfo.PairingStatus = Impl()->_IsPairedToAccount() ? Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Paired
                                                               : Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Unpaired;
@@ -824,15 +850,14 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
     CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
-    using HashAlgo = Platform::Security::SHA256;
+    using HashAlgo = chip::Crypto::Hash_SHA256_stream;
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
     HashAlgo hash;
     uint8_t * dataBuf = NULL;
     size_t dataBufSize;
     constexpr uint16_t kLenFieldLen = 4; // 4 hex characters
 
-    VerifyOrExit(hashBufSize >= HashAlgo::kHashLength, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(hashBufSize >= chip::Crypto::kSHA256_Hash_Length, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Compute a hash of the device's provisioning data.  The generated hash value confirms to the form
     // described in the CHIP Chip: Factory Provisioning Specification.
@@ -881,7 +906,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
         // Create a temporary buffer to hold the certificate.  (This will also be used for
         // the private key).
         dataBufSize = certLen;
-        dataBuf     = (uint8_t *) Platform::Security::MemoryAlloc(dataBufSize);
+        dataBuf     = (uint8_t *) chip::Platform::MemoryAlloc(dataBufSize);
         VerifyOrExit(dataBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         // Read the certificate.
@@ -902,10 +927,10 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
         // (This will also be used for the private key).
         if (certsLen > dataBufSize)
         {
-            Platform::Security::MemoryFree(dataBuf);
+            chip::Platform::MemoryFree(dataBuf);
 
             dataBufSize = certsLen;
-            dataBuf     = (uint8_t *) Platform::Security::MemoryAlloc(dataBufSize);
+            dataBuf     = (uint8_t *) chip::Platform::MemoryAlloc(dataBufSize);
             VerifyOrExit(dataBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
         }
 
@@ -954,8 +979,8 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
 exit:
     if (dataBuf != NULL)
     {
-        Crypto::ClearSecretData(dataBuf, dataBufSize);
-        Platform::Security::MemoryFree(dataBuf);
+        chip::Crypto::ClearSecretData(dataBuf, dataBufSize);
+        chip::Platform::MemoryFree(dataBuf);
     }
 #endif // CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
 
@@ -963,7 +988,7 @@ exit:
 }
 
 #if defined(DEBUG)
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_RunUnitTests()
 {
     ChipLogProgress(DeviceLayer, "Running configuration unit test");
@@ -1049,6 +1074,9 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
 }
 
 #endif // CHIP_PROGRESS_LOGGING
+
+// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
+template class GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer

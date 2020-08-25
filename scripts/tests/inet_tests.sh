@@ -19,16 +19,4 @@
 set -x
 env
 
-here=$(cd "$(dirname "$0")" && pwd)
-CHIPDIR="$here"/../..
-cd "$CHIPDIR"
-
-mkdir -p build/default
-cd build/default
-"$CHIPDIR"/bootstrap-configure
-
-make V=1 -C src/include
-
-# Currently, only running inet tests
-# More/other tests can be added for IPV6 here.
-make V=1 -C src/inet check
+make V=1 -C build/default/src/inet check

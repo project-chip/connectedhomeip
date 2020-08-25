@@ -85,7 +85,7 @@ public:
     static constexpr Key kConfigKey_MfrDeviceCert               = NRF5ConfigKey(kFileId_ChipFactory, 0x0003);
     static constexpr Key kConfigKey_MfrDevicePrivateKey         = NRF5ConfigKey(kFileId_ChipFactory, 0x0004);
     static constexpr Key kConfigKey_ManufacturingDate           = NRF5ConfigKey(kFileId_ChipFactory, 0x0005);
-    static constexpr Key kConfigKey_PairingCode                 = NRF5ConfigKey(kFileId_ChipFactory, 0x0006);
+    static constexpr Key kConfigKey_SetupPinCode                = NRF5ConfigKey(kFileId_ChipFactory, 0x0006);
     static constexpr Key kConfigKey_FabricId                    = NRF5ConfigKey(kFileId_ChipConfig, 0x0007);
     static constexpr Key kConfigKey_ServiceConfig               = NRF5ConfigKey(kFileId_ChipConfig, 0x0008);
     static constexpr Key kConfigKey_PairedAccountId             = NRF5ConfigKey(kFileId_ChipConfig, 0x0009);
@@ -100,6 +100,7 @@ public:
     static constexpr Key kConfigKey_OperationalDeviceCert       = NRF5ConfigKey(kFileId_ChipConfig, 0x0012);
     static constexpr Key kConfigKey_OperationalDeviceICACerts   = NRF5ConfigKey(kFileId_ChipConfig, 0x0013);
     static constexpr Key kConfigKey_OperationalDevicePrivateKey = NRF5ConfigKey(kFileId_ChipConfig, 0x0014);
+    static constexpr Key kConfigKey_SetupDiscriminator          = NRF5ConfigKey(kFileId_ChipFactory, 0x0015);
 
     // Range of FDS record keys used to store CHIP persisted counter values.
     static constexpr uint16_t kPersistedCounterRecordKeyBase = kFDSRecordKeyMin;

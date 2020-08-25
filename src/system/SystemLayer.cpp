@@ -40,7 +40,7 @@
 // Include system and language headers
 #include <stddef.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -97,23 +97,16 @@ Layer::Layer() : mLayerState(kLayerState_NotInitialized), mContext(NULL), mPlatf
     this->mTimerComplete     = false;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    this->mWakePipeIn  = 0;
-    this->mWakePipeOut = 0;
-
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     this->mHandleSelectThread = PTHREAD_NULL;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 }
 
 Error Layer::Init(void * aContext)
 {
     Error lReturn;
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    int lPipeFDs[2];
-    int lOSReturn, lFlags;
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     RegisterLayerErrorFormatter();
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -133,23 +126,11 @@ Error Layer::Init(void * aContext)
     this->AddEventHandlerDelegate(sSystemEventHandlerDelegate);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    // Create a Unix pipe to allow an arbitrary thread to wake the thread in the select loop.
-    lOSReturn = ::pipe(lPipeFDs);
-    VerifyOrExit(lOSReturn == 0, lReturn = chip::System::MapErrorPOSIX(errno));
-
-    this->mWakePipeIn  = lPipeFDs[0];
-    this->mWakePipeOut = lPipeFDs[1];
-
-    // Enable non-blocking mode for both ends of the pipe.
-    lFlags    = ::fcntl(this->mWakePipeIn, F_GETFL, 0);
-    lOSReturn = ::fcntl(this->mWakePipeIn, F_SETFL, lFlags | O_NONBLOCK);
-    VerifyOrExit(lOSReturn == 0, lReturn = chip::System::MapErrorPOSIX(errno));
-
-    lFlags    = ::fcntl(this->mWakePipeOut, F_GETFL, 0);
-    lOSReturn = ::fcntl(this->mWakePipeOut, F_SETFL, lFlags | O_NONBLOCK);
-    VerifyOrExit(lOSReturn == 0, lReturn = chip::System::MapErrorPOSIX(errno));
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    // Create an event to allow an arbitrary thread to wake the thread in the select loop.
+    lReturn = this->mWakeEvent.Open();
+    SuccessOrExit(lReturn);
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
     this->mLayerState = kLayerState_Initialized;
     this->mContext    = aContext;
@@ -171,14 +152,9 @@ Error Layer::Shutdown()
     lReturn  = Platform::Layer::WillShutdown(*this, lContext);
     SuccessOrExit(lReturn);
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    if (this->mWakePipeOut != -1)
-    {
-        ::close(this->mWakePipeOut);
-        this->mWakePipeOut = -1;
-        this->mWakePipeIn  = -1;
-    }
-#endif
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    mWakeEvent.Close();
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
     for (size_t i = 0; i < Timer::sPool.Size(); ++i)
     {
@@ -598,7 +574,7 @@ void Layer::DispatchTimerCallbacks(const uint64_t kCurrentEpoch)
     }
 }
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 /**
  *  Prepare the sets of file descriptors for @p select() to work with.
@@ -615,10 +591,11 @@ void Layer::PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet,
     if (this->State() != kLayerState_Initialized)
         return;
 
-    if (this->mWakePipeIn + 1 > aSetSize)
-        aSetSize = this->mWakePipeIn + 1;
+    const int wakeEventFd = this->mWakeEvent.GetNotifFD();
+    FD_SET(wakeEventFd, aReadSet);
 
-    FD_SET(this->mWakePipeIn, aReadSet);
+    if (wakeEventFd + 1 > aSetSize)
+        aSetSize = wakeEventFd + 1;
 
     const Timer::Epoch kCurrentEpoch = Timer::GetCurrentEpoch();
     Timer::Epoch lAwakenEpoch = kCurrentEpoch + static_cast<Timer::Epoch>(aSleepTime.tv_sec) * 1000 + aSleepTime.tv_usec / 1000;
@@ -689,17 +666,9 @@ void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteS
 
     if (aSetSize > 0)
     {
-        // If we woke because of someone writing to the wake pipe, clear the contents of the pipe before returning.
-        if (FD_ISSET(this->mWakePipeIn, aReadSet))
-        {
-            while (true)
-            {
-                uint8_t lBytes[128];
-                int lTmp = ::read(this->mWakePipeIn, static_cast<void *>(lBytes), sizeof(lBytes));
-                if (lTmp < static_cast<int>(sizeof(lBytes)))
-                    break;
-            }
-        }
+        // If we woke because of someone writing to the wake event, clear the event before returning.
+        if (FD_ISSET(this->mWakeEvent.GetNotifFD(), aReadSet))
+            this->mWakeEvent.Confirm();
     }
 
     const Timer::Epoch kCurrentEpoch = Timer::GetCurrentEpoch();
@@ -747,13 +716,11 @@ void Layer::WakeSelect()
     }
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-    // Write a single byte to the wake pipe to wake up the select call.
-    const uint8_t kByte     = 0;
-    const ssize_t kIOResult = ::write(this->mWakePipeOut, &kByte, 1);
-    static_cast<void>(kIOResult);
+    // Send notification to wake up the select call.
+    this->mWakeEvent.Notify();
 }
 
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 LwIPEventHandlerDelegate Layer::sSystemEventHandlerDelegate;

@@ -1,0 +1,123 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/nlassert.gni")
+import("//build_overrides/nlfaultinjection.gni")
+import("//build_overrides/nlio.gni")
+
+import("${chip_root}/gn/chip/chip_version.gni")
+import("${chip_root}/gn/chip/tests.gni")
+import("${chip_root}/src/lib/core/core.gni")
+
+action("gen_chip_version") {
+  script = "${chip_root}/scripts/gen_chip_version.py"
+
+  version_file = "${root_gen_dir}/include/CHIPVersion.h"
+  outputs = [ version_file ]
+  args = [
+    "--output_file=" + rebase_path(version_file, root_build_dir),
+    "--chip_major=${chip_version_major}",
+    "--chip_minor=${chip_version_minor}",
+    "--chip_patch=${chip_version_patch}",
+    "--chip_extra=${chip_version_extra}",
+  ]
+}
+
+source_set("chip_version_header") {
+  sources = get_target_outputs(":gen_chip_version")
+
+  deps = [ ":gen_chip_version" ]
+}
+
+support_headers = [
+  "Base64.h",
+  "BufBound.h",
+  "CHIPCounter.h",
+  "CodeUtils.h",
+  "DLLUtil.h",
+  "ErrorStr.h",
+  "FibonacciUtils.h",
+  "PersistedCounter.h",
+  "RandUtils.h",
+  "TestUtils.h",
+  "TimeUtils.h",
+  "logging/CHIPLogging.h",
+  "verhoeff/Verhoeff.h",
+  "CHIPMem.h",
+]
+
+static_library("support") {
+  output_name = "libSupportLayer"
+
+  sources = [
+    "Base64.cpp",
+    "CHIPArgParser.cpp",
+    "CHIPCounter.cpp",
+    "ErrorStr.cpp",
+    "FibonacciUtils.cpp",
+    "PersistedCounter.cpp",
+    "RandUtils.cpp",
+    "TestUtils.cpp",
+    "TimeUtils.cpp",
+    "logging/CHIPLogging.cpp",
+    "logging/CHIPLoggingLogV.cpp",
+    "verhoeff/Verhoeff.cpp",
+    "verhoeff/Verhoeff10.cpp",
+    "verhoeff/Verhoeff16.cpp",
+    "verhoeff/Verhoeff32.cpp",
+    "verhoeff/Verhoeff36.cpp",
+  ]
+
+  public = support_headers
+
+  public_deps = [
+    ":chip_version_header",
+    ":support_headers",
+    "${chip_root}/src/lib/core:chip_config_header",
+    "${nlassert_root}:nlassert",
+  ]
+
+  # These are needed because we include CHIPCore.h, which uses config
+  # options for src/ble and src/inet, however we cannot depend on those
+  # directly as such a dependency is cyclic.
+  public_deps += [
+    "${chip_root}/src/ble:ble_config_header",
+    "${chip_root}/src/inet:inet_config_header",
+  ]
+
+  public_configs = [
+    "${chip_root}/src:includes",
+    "${chip_root}/src/lib:includes",
+    "${chip_root}/src/system:system_config",
+  ]
+
+  if (chip_config_memory_management == "simple") {
+    sources += [ "CHIPMem-SimpleAlloc.cpp" ]
+  }
+  if (chip_config_memory_management == "malloc") {
+    sources += [ "CHIPMem-Malloc.cpp" ]
+  }
+  if (chip_with_nlfaultinjection) {
+    sources += [ "CHIPFaultInjection.cpp" ]
+    public += [ "CHIPFaultInjection.h" ]
+    public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
+  }
+}
+
+copy("support_headers") {
+  sources = support_headers
+
+  outputs = [ "${root_gen_dir}/include/support/{{source_file_part}}" ]
+}

@@ -80,7 +80,7 @@ int shell_line_read(char * buffer, size_t max)
                 }
                 break;
             default:
-                if (isprint((int) *inptr))
+                if (isprint((int) *inptr) || *inptr == '\t')
                 {
                     streamer_printf(streamer_get(), "%c", *inptr);
                 }
@@ -147,6 +147,21 @@ int Shell::ExecCommand(int argc, char * argv[])
     return retval;
 }
 
+static bool IsSeparator(char aChar)
+{
+    return (aChar == ' ') || (aChar == '\t') || (aChar == '\r') || (aChar == '\n');
+}
+
+static bool IsEscape(char aChar)
+{
+    return (aChar == '\\');
+}
+
+static bool IsEscapable(char aChar)
+{
+    return IsSeparator(aChar) || IsEscape(aChar);
+}
+
 int Shell::TokenizeLine(char * buffer, char ** tokens, int max_tokens)
 {
     int len    = strlen(buffer);
@@ -166,10 +181,15 @@ int Shell::TokenizeLine(char * buffer, char ** tokens, int max_tokens)
 
     for (; i < len && cursor < max_tokens; i++)
     {
-        if (buffer[i] == ' ')
+        if (IsEscape(buffer[i]) && IsEscapable(buffer[i + 1]))
+        {
+            // include the null terminator: strlen(cmd) = strlen(cmd + 1) + 1
+            memmove(&buffer[i], &buffer[i + 1], strlen(&buffer[i]));
+        }
+        else if (IsSeparator(buffer[i]))
         {
             buffer[i] = 0;
-            if (buffer[i + 1] != ' ')
+            if (!IsSeparator(buffer[i + 1]))
             {
                 tokens[cursor++] = &buffer[i + 1];
             }

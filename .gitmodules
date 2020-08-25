@@ -1,36 +1,78 @@
-[submodule "third_party/nlunit-test/repo"]
-        path = third_party/nlunit-test/repo
-        url = https://github.com/nestlabs/nlunit-test.git
-        ignore = dirty
-[submodule "third_party/nlio/repo"]
-        path = third_party/nlio/repo
-        url = https://github.com/nestlabs/nlio.git
-        ignore = dirty
-[submodule "third_party/nlfaultinjection/repo"]
-        path = third_party/nlfaultinjection/repo
-        url = https://github.com/nestlabs/nlfaultinjection.git
-        ignore = dirty
-[submodule "third_party/nlassert/repo"]
-        path = third_party/nlassert/repo
-        url = https://github.com/nestlabs/nlassert.git
-        ignore = dirty
-[submodule "third_party/mbedtls/repo"]
-        path = third_party/mbedtls/repo
-        url = https://github.com/ARMmbed/mbedtls.git
-        ignore = dirty
-[submodule "examples/common/QRCode/repo"]
-        path = examples/common/QRCode/repo
-        url = https://github.com/nayuki/QR-Code-generator.git
-        ignore = dirty
-[submodule "examples/common/m5stack-tft/repo"]
-        path = examples/common/m5stack-tft/repo
-        url = https://github.com/jeremyjh/ESP32_TFT_library.git
-        ignore = dirty
-[submodule "third_party/pigweed"]
-        path = third_party/pigweed
-        url = https://pigweed.googlesource.com/pigweed/pigweed
-        ignore = dirty
-[submodule "third_party/openthread/repo"]
-        path = third_party/openthread/repo
-        url = https://github.com/openthread/openthread
-        ignore = dirty
+[submodule "nlassert"]
+	path = third_party/nlassert/repo
+	url = https://github.com/nestlabs/nlassert.git
+	branch = master
+	ignore = dirty
+	commit = bd2f082102d4456ca750189ee853fa8c7443af59
+[submodule "nlfaultinjection"]
+	path = third_party/nlfaultinjection/repo
+	url = https://github.com/nestlabs/nlfaultinjection.git
+	branch = master
+	ignore = dirty
+	commit = 79f92f309de58c4591f53a9b492600550b473c84
+[submodule "nlio"]
+	path = third_party/nlio/repo
+	url = https://github.com/nestlabs/nlio.git
+	branch = master
+	ignore = dirty
+	commit = 8a4048faf7c84c6c9e3c9b3e79f7dc48d5d69f71
+[submodule "nlunit-test"]
+	path = third_party/nlunit-test/repo
+	url = https://github.com/nestlabs/nlunit-test.git
+	branch = master
+	ignore = dirty
+	commit = ef5a2b9a8b71ad592fcf3681968fd63c844e3d81
+[submodule "mbedtls"]
+	path = third_party/mbedtls/repo
+	url = https://github.com/ARMmbed/mbedtls.git
+	branch = mbedtls-2.18
+	ignore = dirty
+	commit = ca933c7e0c9e84738b168b6b0feb89af4183a60a
+[submodule "qrcode"]
+	path = examples/common/QRCode/repo
+	url = https://github.com/nayuki/QR-Code-generator.git
+	branch = master
+	ignore = dirty
+	commit = 08ac806145aa6ab5d3e9df61d023092bb6cfe761
+[submodule "m5stack-tft"]
+	path = examples/common/m5stack-tft/repo
+	url = https://github.com/jeremyjh/ESP32_TFT_library.git
+	branch = master
+	ignore = dirty
+	commit = a1ece2c500cf179db8f0c7dbc7bb8f3ace562142
+[submodule "pigweed"]
+	path = third_party/pigweed/repo
+	url = https://pigweed.googlesource.com/pigweed/pigweed
+	branch = master
+	ignore = dirty
+	commit = 22dd0b0b486810b64bf528a38651c8d8c7b8274c
+[submodule "openthread"]
+	path = third_party/openthread/repo
+	url = https://github.com/openthread/openthread.git
+	branch = master
+	ignore = dirty
+	commit = 6886ff1e4c5dcf1bdc6ac7a067a81debff113938
+[submodule "ot-br-posix"]
+	path = third_party/ot-br-posix/repo
+	url = https://github.com/openthread/ot-br-posix.git
+	branch = master
+	ignore = dirty
+	commit = ecc25701117fc99c6630584dc98294527a145f7d
+[submodule "bluez"]
+	path = third_party/bluez/repo
+	url = git://git.kernel.org/pub/scm/bluetooth/bluez.git
+	branch = master
+	ignore = dirty
+	commit = 8ecfe3221a699f7e1d731a16a4da8e5c349bf754
+[submodule "ot-commissioner"]
+	path = third_party/ot-commissioner/repo
+	url = https://github.com/openthread/ot-commissioner
+	branch = master
+	ignore = dirty
+	commit = ad96e6f6f5b1915844ba4481bf8d0b66af91175e
+[submodule "cirque"]
+	path = third_party/cirque/repo
+	url = https://github.com/openweave/cirque.git
+	branch = master
+	ignore = dirty
+	commit = f0214d37db6e7c91dce393493ca249129c442e6d

@@ -84,17 +84,18 @@ const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
 
 BLEManagerImpl BLEManagerImpl::sInstance;
 
-/***************************************************************************/ /**
-                                                                               * Setup the bluetooth init function.
-                                                                               *
-                                                                               * @return error code for the gecko_init
-                                                                               *function
-                                                                               *
-                                                                               * All bluetooth specific initialization
-                                                                               *code should be here like gecko_init(),
-                                                                               * gecko_init_whitelisting(),
-                                                                               *gecko_init_multiprotocol() and so on.
-                                                                               ******************************************************************************/
+/***************************************************************************/
+/**
+ * Setup the bluetooth init function.
+ *
+ * @return error code for the gecko_init
+ * function
+ *
+ * All bluetooth specific initialization
+ * code should be here like gecko_init(),
+ * gecko_init_whitelisting(),
+ * gecko_init_multiprotocol() and so on.
+ ******************************************************************************/
 extern "C" errorcode_t initialize_bluetooth()
 {
     errorcode_t err = gecko_init(&config);

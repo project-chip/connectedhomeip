@@ -1,0 +1,234 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/mbedtls.gni")
+import("//build_overrides/nlassert.gni")
+import("//build_overrides/nlio.gni")
+import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
+
+# This build file should not be used in superproject builds.
+assert(chip_root == "//")
+
+import("${chip_root}/gn/chip/tests.gni")
+import("${chip_root}/gn/chip/tools.gni")
+
+if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
+  # This is a real toolchain. Build CHIP.
+  group("default") {
+    deps = [ ":all" ]
+  }
+
+  group("all") {
+    deps = [
+      "${chip_root}/src/app",
+      "${chip_root}/src/ble",
+      "${chip_root}/src/controller",
+      "${chip_root}/src/crypto",
+      "${chip_root}/src/inet",
+      "${chip_root}/src/lib",
+      "${chip_root}/src/lib/core",
+      "${chip_root}/src/lib/shell",
+      "${chip_root}/src/lib/support",
+      "${chip_root}/src/lwip:all",
+      "${chip_root}/src/setup_payload",
+      "${chip_root}/src/system",
+      "${chip_root}/src/transport",
+      "${mbedtls_root}:mbedtls",
+      "${nlassert_root}:nlassert",
+      "${nlio_root}:nlio",
+      "${nlunit_test_root}:nlunit-test",
+    ]
+
+    # Temporary until RNG issue sorted out
+    if (current_os != "android") {
+      deps += [ "${chip_root}/src/lib/message" ]
+    }
+
+    if (chip_build_tests) {
+      deps += [ ":tests" ]
+    }
+
+    if (chip_build_tools) {
+      deps += [
+        "${chip_root}/examples/shell",
+        "${chip_root}/src/qrcodetool",
+        "${chip_root}/src/setup_payload",
+      ]
+    }
+  }
+
+  if (chip_build_tests) {
+    import("${chip_root}/gn/chip/chip_test_group.gni")
+
+    chip_test_group("tests") {
+      deps = [
+        "${chip_root}/src/ble/tests",
+        "${chip_root}/src/crypto/tests",
+        "${chip_root}/src/inet/tests",
+        "${chip_root}/src/lib/core/tests",
+        "${chip_root}/src/lib/shell/tests",
+        "${chip_root}/src/lib/support/tests",
+        "${chip_root}/src/lwip/tests",
+        "${chip_root}/src/platform/tests",
+        "${chip_root}/src/setup_payload/tests",
+        "${chip_root}/src/system/tests",
+        "${chip_root}/src/transport/tests",
+      ]
+    }
+
+    group("check") {
+      deps = [ ":tests_run" ]
+    }
+  }
+} else {
+  # This is the unified build. Configure various real toolchains.
+  import("${chip_root}/gn/chip/chip_build.gni")
+  declare_args() {
+    # Set this to false to disable all builds by default.
+    enable_default_builds = true
+
+    # Set this to true to enable nRF5 builds by default.
+    enable_nrf5_builds = false
+
+    # Set this to true to enable efr32 builds by default.
+    enable_efr32_builds = false
+  }
+
+  declare_args() {
+    # Enable building chip with clang.
+    enable_host_clang_build = enable_default_builds
+
+    # Enable building chip with gcc.
+    enable_host_gcc_build = enable_default_builds
+
+    # Enable building chip with gcc & mbedtls.
+    enable_host_gcc_mbedtls_build = enable_default_builds
+
+    # Enable building chip for linux embedded.
+    enable_linux_embedded_build = enable_default_builds && host_os == "linux"
+
+    # Build the chip-tool example.
+    enable_standalone_chip_tool_build = enable_default_builds
+
+    # Build the shell example.
+    enable_standalone_shell_build = enable_default_builds
+
+    # Build the nRF5 lock app example.
+    enable_nrf5_lock_app_build = enable_nrf5_builds
+
+    # Build the nRF5 lighting app example.
+    enable_nrf5_lighting_app_build = enable_nrf5_builds
+
+    # Build the efr32 lock app example.
+    enable_efr32_lock_app_build = enable_efr32_builds
+  }
+
+  chip_build("host_clang") {
+    toolchain = "//build/toolchain/host:${host_os}_${host_cpu}_clang"
+  }
+
+  chip_build("host_gcc") {
+    toolchain = "//build/toolchain/host:${host_os}_${host_cpu}_gcc"
+  }
+
+  chip_build("host_gcc_mbedtls") {
+    toolchain = "${chip_root}/config/mbedtls/toolchain:${host_os}_${host_cpu}_gcc_mbedtls"
+  }
+
+  if (host_os == "linux") {
+    chip_build("linux_embedded") {
+      toolchain =
+          "${chip_root}/config/linux/toolchain:linux_${host_cpu}_gcc_embedded"
+    }
+  }
+
+  standalone_toolchain = "${chip_root}/config/standalone/toolchain:standalone"
+
+  group("standalone_chip_tool") {
+    deps = [ "${chip_root}/examples/chip-tool(${standalone_toolchain})" ]
+  }
+
+  group("standalone_shell") {
+    deps = [ "${chip_root}/examples/shell(${standalone_toolchain})" ]
+  }
+
+  if (enable_nrf5_lock_app_build) {
+    group("nrf5_lock_app") {
+      deps = [ "${chip_root}/examples/lock-app/nrf5(${chip_root}/config/nrf5/toolchain:nrf5_lock_app)" ]
+    }
+  }
+
+  if (enable_nrf5_lighting_app_build) {
+    group("nrf5_lighting_app") {
+      deps = [ "${chip_root}/examples/lighting-app/nrf5(${chip_root}/config/nrf5/toolchain:nrf5_lighting_app)" ]
+    }
+  }
+
+  if (enable_efr32_lock_app_build) {
+    group("efr32_lock_app") {
+      deps = [ "${chip_root}/examples/lock-app/efr32(${chip_root}/config/efr32/toolchain:efr32_lock_app)" ]
+    }
+  }
+
+  group("default") {
+    deps = []
+    if (enable_host_clang_build) {
+      deps += [ ":all_host_clang" ]
+    }
+    if (enable_host_gcc_build) {
+      deps += [ ":all_host_gcc" ]
+    }
+    if (enable_host_gcc_mbedtls_build) {
+      deps += [ ":all_host_gcc_mbedtls" ]
+    }
+    if (enable_linux_embedded_build) {
+      deps += [ ":all_linux_embedded" ]
+    }
+    if (enable_standalone_chip_tool_build) {
+      deps += [ ":standalone_chip_tool" ]
+    }
+    if (enable_standalone_shell_build) {
+      deps += [ ":standalone_shell" ]
+    }
+    if (enable_nrf5_lock_app_build) {
+      deps += [ ":nrf5_lock_app" ]
+    }
+    if (enable_nrf5_lighting_app_build) {
+      deps += [ ":nrf5_lighting_app" ]
+    }
+    if (enable_efr32_lock_app_build) {
+      deps += [ ":efr32_lock_app" ]
+    }
+  }
+
+  if (chip_build_tests) {
+    group("check") {
+      deps = []
+      if (enable_host_clang_build) {
+        deps += [ ":check_host_clang" ]
+      }
+      if (enable_host_gcc_build) {
+        deps += [ ":check_host_gcc" ]
+      }
+      if (enable_host_gcc_mbedtls_build) {
+        deps += [ ":check_host_gcc_mbedtls" ]
+      }
+      if (enable_linux_embedded_build) {
+        deps += [ ":check_linux_embedded" ]
+      }
+    }
+  }
+}

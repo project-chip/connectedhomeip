@@ -19,12 +19,6 @@
 
 #import "CHIPOnOff.h"
 
-extern "C" {
-#include "chip-zcl/chip-zcl.h"
-#include "gen/gen-cluster-id.h"
-#include "gen/gen-types.h"
-}
-
 @interface CHIPOnOff ()
 
 @property (readonly) CHIPDeviceController * deviceController;
@@ -43,17 +37,17 @@ extern "C" {
 
 - (BOOL)lightOn
 {
-    return [self.deviceController sendCHIPCommand:CHIP_ZCL_CLUSTER_ON_OFF command:CHIP_ZCL_CLUSTER_ON_OFF_SERVER_COMMAND_ON];
+    return [self.deviceController sendOnCommand];
 }
 
 - (BOOL)lightOff
 {
-    return [self.deviceController sendCHIPCommand:CHIP_ZCL_CLUSTER_ON_OFF command:CHIP_ZCL_CLUSTER_ON_OFF_SERVER_COMMAND_OFF];
+    return [self.deviceController sendOffCommand];
 }
 
 - (BOOL)toggleLight
 {
-    return [self.deviceController sendCHIPCommand:CHIP_ZCL_CLUSTER_ON_OFF command:CHIP_ZCL_CLUSTER_ON_OFF_SERVER_COMMAND_TOGGLE];
+    return [self.deviceController sendToggleCommand];
 }
 
 @end

@@ -51,7 +51,7 @@ TestContext sContext;
 const char PAYLOAD[]        = "Hello!";
 int ReceiveHandlerCallCount = 0;
 
-void MessageReceiveHandler(const MessageHeader & header, const Transport::PeerAddress & source, System::PacketBuffer * msgBuf,
+void MessageReceiveHandler(MessageHeader & header, const Transport::PeerAddress & source, System::PacketBuffer * msgBuf,
                            nlTestSuite * inSuite)
 {
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
@@ -75,7 +75,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
 
     Transport::UDP udp;
 
-    CHIP_ERROR err = udp.Init(&ctx.GetInetLayer(), Transport::UdpListenParameters().SetAddressType(type));
+    CHIP_ERROR err = udp.Init(Transport::UdpListenParameters(&ctx.GetInetLayer()).SetAddressType(type));
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
@@ -108,7 +108,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
 
     Transport::UDP udp;
 
-    err = udp.Init(&ctx.GetInetLayer(), Transport::UdpListenParameters().SetAddressType(addr.Type()));
+    err = udp.Init(Transport::UdpListenParameters(&ctx.GetInetLayer()).SetAddressType(addr.Type()));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     udp.SetMessageReceiveHandler(MessageReceiveHandler, inSuite);

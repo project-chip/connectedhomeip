@@ -1,0 +1,50 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+config("app_config") {
+  include_dirs = [
+    "gen",
+    "util",
+    ".",
+    "${target_gen_dir}/include",
+  ]
+}
+
+static_library("app") {
+  output_name = "libCHIPDataModel"
+
+  sources = [
+    "decoder.c",
+    "encoder.c",
+  ]
+
+  public_deps = [
+    ":codec_headers",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/system",
+  ]
+
+  public_configs = [
+    ":app_config",
+    "${chip_root}/src:includes",
+  ]
+}
+
+copy("codec_headers") {
+  sources = [ "chip-zcl-zpro-codec.h" ]
+
+  outputs = [ "${target_gen_dir}/include/app/{{source_file_part}}" ]
+}

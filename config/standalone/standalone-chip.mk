@@ -58,10 +58,10 @@ CHIP_OUTPUT_DIR = $(OUTPUT_DIR)/chip
 # An optional file containing application-specific configuration overrides.
 CHIP_PROJECT_CONFIG = $(wildcard $(PROJECT_ROOT)/include/CHIPProjectConfig.h)
 
-# Architcture on which CHIP is being built.
+# Architecture on which CHIP is being built.
 CHIP_BUILD_ARCH = $(shell $(CHIP_ROOT)/third_party/nlbuild-autotools/repo/third_party/autoconf/config.guess | sed -e 's/[[:digit:].]*$$//g')
 
-# Archtecture for which CHIP will be built.
+# Architecture for which CHIP will be built.
 CHIP_HOST_ARCH := $(CHIP_BUILD_ARCH)
 
 
@@ -95,9 +95,10 @@ CHIP_CONFIGURE_OPTIONS = \
     --exec-prefix=$(CHIP_OUTPUT_DIR) \
     --host=$(CHIP_HOST_ARCH) \
     --build=$(CHIP_BUILD_ARCH) \
-    --with-network-layer=inet \
+    --with-network-layer=all \
     --with-target-network=sockets \
     --with-inet-endpoint="tcp udp" \
+    --with-device-layer=linux \
     --disable-tests \
     --disable-tools \
     --disable-docs \
@@ -135,11 +136,26 @@ STD_LDFLAGS += -L$(CHIP_OUTPUT_DIR)/lib
 # Add CHIP libraries to standard libraries list.
 STD_LIBS += \
     -lCHIP \
+    -lDeviceLayer \
     -lInetLayer \
     -lnlfaultinjection \
-    -lSystemLayer
+    -lSupportLayer \
+    -lSystemLayer \
+    -lDeviceLayer \
+    -lCHIPDataModel \
+    -lCHIP
 
 STD_LIBS += $(shell pkg-config --libs openssl)
+
+ifeq ($(findstring linux,$(CHIP_HOST_ARCH)),linux)
+STD_LIBS += $(shell pkg-config --libs gio-2.0 dbus-1)
+STD_LIBS += -lot_br_client
+STD_CFLAGS += $(shell pkg-config --cflags gio-2.0)
+endif
+
+ifeq ($(findstring darwin,$(CHIP_HOST_ARCH)),darwin)
+STD_LIBS += -framework Foundation -framework CoreBluetooth
+endif
 
 # Add the appropriate CHIP target as a prerequisite to all application
 # compilation targets to ensure that CHIP gets built and its header
@@ -149,10 +165,16 @@ STD_COMPILE_PREREQUISITES += install-chip
 # Add the CHIP libraries as prerequisites for linking the application.
 STD_LINK_PREREQUISITES += \
     $(CHIP_OUTPUT_DIR)/lib/libCHIP.a \
+    $(CHIP_OUTPUT_DIR)/lib/libDeviceLayer.a \
     $(CHIP_OUTPUT_DIR)/lib/libInetLayer.a \
     $(CHIP_OUTPUT_DIR)/lib/libnlfaultinjection.a \
-    $(CHIP_OUTPUT_DIR)/lib/libSystemLayer.a
+    $(CHIP_OUTPUT_DIR)/lib/libSupportLayer.a \
+    $(CHIP_OUTPUT_DIR)/lib/libSystemLayer.a \
+    $(CHIP_OUTPUT_DIR)/lib/libCHIPDataModel.a
 
+ifeq ($(findstring linux,$(CHIP_HOST_ARCH)),linux)
+STD_LINK_PREREQUISITES += $(CHIP_OUTPUT_DIR)/lib/libot_br_client.a
+endif
 
 # ==================================================
 # Late-bound build rules for CHIP

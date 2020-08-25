@@ -1,0 +1,130 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/nlio.gni")
+
+import("${chip_root}/gn/chip/buildconfig_header.gni")
+import("${chip_root}/gn/chip/tests.gni")
+import("${chip_root}/src/inet/inet.gni")
+import("core.gni")
+
+buildconfig_header("chip_buildconfig") {
+  header = "CHIPBuildConfig.h"
+  header_dir = "core"
+
+  chip_target_style_unix = chip_target_style == "unix"
+  chip_target_style_embedded = chip_target_style == "embedded"
+  chip_logging_style_android = chip_logging_style == "android"
+  chip_logging_style_external = chip_logging_style == "external"
+  chip_logging_style_stdio = chip_logging_style == "stdio"
+  chip_logging_style_stdio_weak = chip_logging_style == "stdio_weak"
+  chip_logging_style_stdio_with_timestamps =
+      chip_logging_style == "stdio_with_timestamps"
+
+  chip_config_memory_management_malloc =
+      chip_config_memory_management == "malloc"
+  chip_config_memory_management_simple =
+      chip_config_memory_management == "simple"
+  chip_config_memory_management_platform =
+      chip_config_memory_management == "platform"
+
+  # TODO - Move CHIP_PROJECT_CONFIG_INCLUDE, CHIP_PLATFORM_CONFIG_INCLUDE here.
+  # Currently those are also used from src/system.
+  defines = [
+    "CHIP_FUZZING_ENABLED=false",
+    "CHIP_CONFIG_TEST=${chip_build_tests}",
+    "CHIP_ERROR_LOGGING=${chip_error_logging}",
+    "CHIP_PROGRESS_LOGGING=${chip_progress_logging}",
+    "CHIP_DETAIL_LOGGING=${chip_detail_logging}",
+    "CHIP_CONFIG_SHORT_ERROR_STR=${chip_config_short_error_str}",
+    "CHIP_CONFIG_ENABLE_ARG_PARSER=${chip_config_enable_arg_parser}",
+    "CHIP_TARGET_STYLE_UNIX=${chip_target_style_unix}",
+    "CHIP_TARGET_STYLE_EMBEDDED=${chip_target_style_embedded}",
+    "CHIP_LOGGING_STYLE_ANDROID=${chip_logging_style_android}",
+    "CHIP_LOGGING_STYLE_EXTERNAL=${chip_logging_style_external}",
+    "CHIP_LOGGING_STYLE_STDIO=${chip_logging_style_stdio}",
+    "CHIP_LOGGING_STYLE_STDIO_WEAK=${chip_logging_style_stdio_weak}",
+    "CHIP_LOGGING_STYLE_STDIO_WITH_TIMESTAMPS=${chip_logging_style_stdio_with_timestamps}",
+    "CHIP_CONFIG_MEMORY_MGMT_MALLOC=${chip_config_memory_management_malloc}",
+    "HAVE_MALLOC=${chip_config_memory_management_malloc}",
+    "HAVE_FREE=${chip_config_memory_management_malloc}",
+    "HAVE_NEW=false",
+    "CHIP_CONFIG_MEMORY_MGMT_SIMPLE=${chip_config_memory_management_simple}",
+    "CHIP_CONFIG_MEMORY_MGMT_PLATFORM=${chip_config_memory_management_platform}",
+    "CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING=true",
+    "CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES=false",
+  ]
+}
+
+source_set("chip_config_header") {
+  sources = [
+    "CHIPConfig.h",
+    "CHIPEventLoggingConfig.h",
+    "CHIPTimeConfig.h",
+  ]
+
+  public_configs = [
+    "${chip_root}/src:includes",
+    "${chip_root}/src/lib:includes",
+  ]
+
+  public_deps = [
+    ":chip_buildconfig",
+    "${chip_root}/src/ble:ble_config_header",
+    "${chip_root}/src/system:system_config_header",
+  ]
+}
+
+static_library("core") {
+  output_name = "libChipCore"
+
+  sources = [
+    "CHIPCallback.h",
+    "CHIPCircularTLVBuffer.cpp",
+    "CHIPCircularTLVBuffer.h",
+    "CHIPCore.h",
+    "CHIPEncoding.h",
+    "CHIPError.cpp",
+    "CHIPError.h",
+    "CHIPKeyIds.cpp",
+    "CHIPKeyIds.h",
+    "CHIPTLV.h",
+    "CHIPTLVDebug.cpp",
+    "CHIPTLVReader.cpp",
+    "CHIPTLVTags.h",
+    "CHIPTLVTypes.h",
+    "CHIPTLVUpdater.cpp",
+    "CHIPTLVUtilities.cpp",
+    "CHIPTLVWriter.cpp",
+  ]
+
+  public_deps = [
+    ":chip_config_header",
+    "${chip_root}/src/ble",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/system",
+    "${nlio_root}:nlio",
+  ]
+
+  allow_circular_includes_from = [
+    "${chip_root}/src/ble",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/system",
+  ]
+}

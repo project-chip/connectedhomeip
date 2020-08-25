@@ -1,0 +1,299 @@
+[.text-center]
+= Project Connected Home over IP Software
+:toc: macro
+:toclevels: 7
+:sectnumlevels: 7
+:sectanchors:
+:sectlinks:
+
+:plusplus: ++
+
+:sectnums!:
+
+== Best Practices, Coding Conventions, and Style
+
+[.text-center]
+_Revision 2_ +
+_2020-07-09_
+
+[.text-center]
+*Status:* [red]*Approved* / [red]*Active*
+
+toc::[]
+
+== Typographic and Syntactic Conventions
+
+The following syntactic conventions are used throughout this document:
+
+_shall_::
+
+is used to indicate a mandatory rule or guideline that must be adhered
+to without exception to claim compliance with this specification.
+
+_should_::
+
+is used to indicate a rule or guideline that serves as a strong
+preference to suggested practice and is to be followed in the absence of
+a compelling reason to do otherwise.
+
+_may_::
+
+is used to indicate a rule or guideline that serves as a reference to
+suggested practice.
+
+== Introduction
+
+There are likely as many unique combinations of software engineering and
+development standards, conventions, and practices as there organizations
+that do such work. This document pulls together those that Project
+Connected Home over IP believes best for our organization, its efforts,
+and products that consume those efforts, with a particular emphasis on
+embedded systems with C or C{plusplus} language development and runtime
+environments.
+
+This document and requirements should be considered canonical for all
+Project Connected Home over IP shared infrastructure software, including
+both RTOS-based and non-RTOS-based projects on both tightly- and
+loosely-constrained system platforms.
+
+The document is broadly categorized at the highest level into:
+
+* Best Practices and Conventions
+* Format and Style
+
+And, within conventions, further sub-categorized into those that apply
+to:
+
+* Tightly-constrained
+* Loosely-constrained
+
+system platforms. Applicability to tightly-constrained systems also
+generally applies to shared infrastructure software that is used on both
+tightly- and loosely-constrained systems.
+
+link:#id.jzphr1iiku89[Figure 1 below] attempts to illustrate both
+qualitative and quantitative applicability of these guidelines to
+Project Connected Home over IP software.
+
+Generally, product-specific applications have the greatest flexibility
+and latitude in applying these guidelines to their software. Whereas,
+shared infrastructure bears the least flexibility and bears the greatest
+adherence to these guidelines.
+
+image:CODING_STYLE_GUIDE-figure1.png[Figure 1. Graphical summary of the
+qualitative and quantitative applicability to Project CHIP software.]
+
+[[id.jzphr1iiku89]]
+
+[.text-center]
+*Figure 1.* Graphical summary of the qualitative and quantitative
+applicability to Project CHIP software.
+
+:sectnums:
+
+== Standards
+
+Project CHIP embedded software development adopts the minimum C and C{plusplus}
+standards listed in Table 2.1 below.
+
+[[t.4d8bfeef046f29261fc72f1a903d6d10a909957a]][[t.2]]
+
+[cols=3,options="header"]
+|===
+|Language |Minimum Standard |Aliases
+
+|C|ISO9899:1999|ISO C99, C99
+|C{plusplus}|ISO14882:2011|ISO C{plusplus}11, C{plusplus}11
+|===
+[.text-center]
+*Table 2.1.* C and C{plusplus} language minimum standards adopted by Project CHIP
+software.
+
+Product-specific software may elect to use later standards to the extent
+their software is not broadly shared inside or outside Project CHIP.
+
+=== C
+
+Project CHIP embedded software development uses and enforces the
+ISO9899:1999 (aka ISO C99, C99) C language standard as the minimum.
+
+Wherever possible, particularly in non-product-specific,
+shared-infrastructure software, toolchain-specific (e.g GCC/GNU)
+extensions or the use of later standards shall be avoided or shall be
+leveraged through toolchain-compatibility preprocessor macros.
+
+==== Motivation and Rationale
+
+At the time of this writing, the C99 standard has been out for over 20
+years. Project CHIP and both the new and contributed source code that
+comprise it have only existed for the last seven to eight of those
+20-plus years.
+
+This is beyond more than adequate time for this standard to be pervasive
+throughout any toolchain vendor’s C compiler and saves team members from
+worrying about ISO9899:1990 (aka ISO C90, C90) portability issues that
+have long-since been solved by C99.
+
+=== C{plusplus}
+
+Project CHIP embedded software development uses the ISO14882:2011 (aka
+ISO C{plusplus}11) language standard as a baseline for source code
+compatibility. Conformance with other standards, for example, ISO14882:1998
+(aka ISO C{plusplus}98), may be additionally required in cases where wider
+portability is necessary, but in all cases, ISO C{plusplus}11 is the baseline
+requirement.
+
+Wherever possible, particularly in non-product-specific,
+shared-infrastructure software, toolchain-specific (e.g GCC/GNU)
+extensions or the use of later standards shall be avoided or shall be
+leveraged through toolchain-compatibility preprocessor macros.
+
+==== Motivation and Rationale
+
+At the time of this writing, the C{plusplus}11 standard has been out for over
+seven years in one form or another and has been twice supplanted, once
+by C{plusplus}14 and again by C{plusplus}17. Project CHIP and the source code it has
+produced are nearly concurrent with C{plusplus}11.
+
+This is beyond more than adequate time for this standard to be pervasive
+throughout any toolchain vendor’s C{plusplus} compiler and saves team members
+from worrying about portability issues that have long-since been solved
+by C{plusplus}11.
+
+By contrast, ISO14882:2014 (aka ISO C{plusplus}14, C{plusplus}14) and ISO14882:2017 (aka
+ISO C{plusplus}17, C{plusplus}17), are still insufficiently broad and pervasive in their
+toolchain support to warrant the introduction of dependencies on these
+standards across all software.
+
+Note, that while C{plusplus}11 is the C{plusplus} language bar, per Figure 1, embrace of
+C{plusplus}11 language- and library-specific features should be approached
+thoughtfully and carefully, depending on the deployment context. A
+loosely-constrained embedded Linux or Darwin application may want a
+broad embrace of C{plusplus}11 language and library features whereas a
+tightly-constrained piece of shared infrastructure may want to eschew
+C{plusplus}11 entirely or conditionally depend on language-specific features,
+where appropriate.
+
+That said, suitable portability mnemonics, for example, via the C
+preprocessor should be used where possible and appropriate to maximize
+code portability, particularly for shared embedded product software. An
+example of such a portability mnemonic is shown in Listing 2.1 below.
+
+[source,C]
+----
+#ifdef __cplusplus
+# if __cplusplus >= 201103L
+# define __chipFINAL final
+# else
+# define __chipFINAL
+# endif
+#else
+#define __chipFINAL
+#endif
+----
+[.text-center]
+*Listing 2.1.* Using the C preprocessor to provide a portability mnemonic
+for the C{plusplus}11 and later final keyword.
+
+== Conventions and Best Practices
+
+=== Common
+
+The following sections summarize those best practices that are
+independent of particular nuances of either the C or C{plusplus} languages.
+
+==== When in Rome
+
+The most important convention and practice in the Project CHIP embedded
+software is "_When in Rome..._", per the quote below.
+
+[quote, St. Ambrose]
+____
+If you should be in Rome, live in the Roman manner; if you should be
+elsewhere, live as they do there.
+____
+
+===== Motivation and Rationale
+
+At this stage in the work group’s and the team’s life cycle, it is rare
+the project or subsystem that is entirely new and built from scratch.
+More often than not, development will involve extending, enhancing, and
+fixing existing code in existing projects.
+
+When in this situation, it is mandatory you observe how things are done
+in this context and do the best that you can to follow the prevailing
+conventions present. Not doing so can lead to readability and
+maintenance problems down the line and will likely earn you the
+disapprobation of the code’s _owner_ or other team members.
+
+Your extensions or fixes to existing code should be *indistinguishable*,
+stylistically, from the original code such that the only way to
+ascertain ownership and responsibility is to use the source code control
+system’s change attribution (aka _blame_) feature.
+
+If you find the conventions so foreign or otherwise confusing, it may be
+best to let whoever owns the file make the necessary changes or seek the
+counsel of others in the group to find out what the right thing to do
+is. Never just start changing code wholesale for personal reasons
+without consulting others first.
+
+==== Language-independent
+
+===== Commenting Out or Disabling Code
+
+Unused code shall not be disabled by commenting it out with C- or
+C{plusplus}-style comments or with preprocessor `#if 0 ... #endif` semantics.
+
+====== Motivation and Rationale
+
+Code should either be actively maintained and "in" the source base for a
+purpose or removed entirely. Code that is disabled in this way is
+generally sloppy and does not convey a sense of certainty and direction
+in the code.
+
+Anyone who is interested in the history of a particular source code file
+should use the source code control system to browse it.
+
+Code that is debug- or test-only should be moved to a conditionally
+compiled test source file or conditionalized with an appropriate
+`WITH_DEBUG`, `WANT_DEBUG`, `WITH_TESTS`, `WANT_TESTS`, or some similar such
+preprocessor mnemonic that can be asserted from the build system.
+
+:sectnums!:
+
+== Recommended Reading
+
+While the following references and reading are not part of the formal
+best practices, coding conventions, and style cannon, they are
+informative and useful guides for improving the style and quality of the
+code you write:
+
+. Jet Propulsion Laboratory.
+http://lars-lab.jpl.nasa.gov/JPL_Coding_Standard_C.pdf[JPL
+Institutional Coding Standard for the C Programming Language.] Version
+1.0. March 3, 2009.
+. Jet Propulsion Laboratory.
+http://pixelscommander.com/wp-content/uploads/2014/12/P10.pdf[The
+Power of Ten – Rules for Developing Safety Critical Code]. December
+2014.
+. Meyers, Scott. Effective C{plusplus}: 55 Specific Ways to Improve Your
+Programs and Designs. Third Edition. 2005.
+. Meyers, Scott. More Effective C{plusplus}: 35 New Ways to Improve Your
+Programs and Designs. 1996.
+. Meyers. Scott. https://www.artima.com/shop/effective_cpp_in_an_embedded_environment[Effective C{plusplus} in an Embedded Environment]. 2015.
+. Motor Industry Software Reliability Association. Guidelines for the
+Use of the C Language in Critical Systems. March 2013.
+. Motor Industry Software Reliability Association. Guidelines for the
+Use of the C{plusplus} Language in Critical Systems. June 2008.
+
+== Revision History
+
+[cols="^1,^1,<2,<3",options="header"]
+|===
+|Revision |Date |Modified By |Description
+|2 |2020-07-09 |Grant Erickson |Added Common > Language-independent > Commenting Out or Disabling Code
+|1 |2020-07-08 |Grant Erickson |Initial revision.
+|===
+
+[.text-center]
+_Project Connect Home over IP Public Information_

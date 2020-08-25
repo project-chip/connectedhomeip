@@ -43,6 +43,7 @@
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/Tuple.h>
 #include <transport/UDP.h>
 
 #include "DataModelHandler.h"
@@ -54,7 +55,7 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
 
-constexpr NodeId kLocalNodeId = 12344321;
+extern const NodeId kLocalNodeId = 12344321;
 extern LEDWidget statusLED; // In wifi-echo.cpp
 
 namespace {
@@ -134,7 +135,7 @@ class EchoServerCallback : public SecureSessionMgrCallback
 {
 public:
     void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
-                           SecureSessionMgr * mgr) override
+                           SecureSessionMgrBase * mgr) override
     {
         CHIP_ERROR err;
         const size_t data_len = buffer->DataLength();
@@ -158,7 +159,7 @@ public:
         // port from data model processing.
         if (ContentMayBeADataModelMessage(buffer))
         {
-            HandleDataModelMessage(buffer);
+            HandleDataModelMessage(header, buffer, mgr);
             buffer = NULL;
         }
         else
@@ -191,24 +192,15 @@ public:
         }
     }
 
-    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * mgr) override
+    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgrBase * mgr) override
     {
         ESP_LOGE(TAG, "ERROR: %s\n Got UDP error", ErrorStr(error));
         statusLED.BlinkOnError();
     }
 
-    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override
+    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override
     {
-        CHIP_ERROR err;
-
         ESP_LOGI(TAG, "Received a new connection.");
-
-        err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key,
-                                                                   sizeof(local_private_key));
-        VerifyOrExit(err == CHIP_NO_ERROR, ESP_LOGE(TAG, "Failed to setup encryption"));
-
-    exit:
-        return;
     }
 
 private:
@@ -237,25 +229,34 @@ private:
     }
 };
 
-static EchoServerCallback gCallbacks;
+EchoServerCallback gCallbacks;
+
+SecureSessionMgr<Transport::UDP, // IPV6
+                 Transport::UDP  // IPV4
+                 >
+    sessions;
 
 } // namespace
 
-// The echo server assumes the platform's networking has been setup already
-void setupTransport(IPAddressType type, SecureSessionMgr * transport)
+void PairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId, SecurePairingSession * pairing)
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
-    struct netif * netif = NULL;
+    Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
+    sessions.NewPairing(peerNodeId, peer, peerKeyId, localKeyId, pairing);
+}
 
-    if (type == kIPAddressType_IPv6)
-    {
-        tcpip_adapter_get_netif(TCPIP_ADAPTER_IF_AP, (void **) &netif);
-    }
+// The echo server assumes the platform's networking has been setup already
+void startServer()
+{
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    struct netif * ipV6NetIf = NULL;
+    tcpip_adapter_get_netif(TCPIP_ADAPTER_IF_AP, (void **) &ipV6NetIf);
 
-    err = transport->Init(kLocalNodeId, &DeviceLayer::InetLayer, UdpListenParameters().SetAddressType(type).SetInterfaceId(netif));
+    err = sessions.Init(kLocalNodeId, &DeviceLayer::SystemLayer,
+                        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6).SetInterfaceId(ipV6NetIf),
+                        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv4));
     SuccessOrExit(err);
 
-    transport->SetDelegate(&gCallbacks);
+    sessions.SetDelegate(&gCallbacks);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -266,11 +267,4 @@ exit:
     {
         ESP_LOGI(TAG, "Echo Server Listening...");
     }
-}
-
-// The echo server assumes the platform's networking has been setup already
-void startServer(SecureSessionMgr * transport_ipv4, SecureSessionMgr * transport_ipv6)
-{
-    setupTransport(kIPAddressType_IPv6, transport_ipv6);
-    setupTransport(kIPAddressType_IPv4, transport_ipv4);
 }

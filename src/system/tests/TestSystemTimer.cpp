@@ -46,9 +46,9 @@
 #include <lwip/tcpip.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #include <sys/select.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #include <errno.h>
 #include <stdint.h>
@@ -59,7 +59,7 @@ using namespace chip::System;
 
 static void ServiceEvents(Layer & aLayer, ::timeval & aSleepTime)
 {
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     fd_set readFDs, writeFDs, exceptFDs;
     int numFDs = 0;
 
@@ -76,13 +76,13 @@ static void ServiceEvents(Layer & aLayer, ::timeval & aSleepTime)
         printf("select failed: %s\n", ErrorStr(MapErrorPOSIX(errno)));
         return;
     }
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
     if (aLayer.State() == kLayerState_Initialized)
     {
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
         aLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         if (aLayer.State() == kLayerState_Initialized)
@@ -236,13 +236,13 @@ static nlTestSuite kTheSuite =
 };
 // clang-format on
 
+static Layer sLayer;
+
 /**
  *  Set up the test suite.
  */
 static int TestSetup(void * aContext)
 {
-    static Layer sLayer;
-
     TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
     void * lLayerContext   = NULL;
 

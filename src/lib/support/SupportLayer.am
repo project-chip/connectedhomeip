@@ -28,6 +28,8 @@ CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES                        = \
     @top_builddir@/src/lib/support/CHIPArgParser.cpp           \
     @top_builddir@/src/lib/support/CHIPCounter.cpp             \
     @top_builddir@/src/lib/support/CHIPFaultInjection.cpp      \
+    @top_builddir@/src/lib/support/CHIPMem-Malloc.cpp          \
+    @top_builddir@/src/lib/support/CHIPMem-SimpleAlloc.cpp     \
     @top_builddir@/src/lib/support/ErrorStr.cpp                \
     @top_builddir@/src/lib/support/FibonacciUtils.cpp          \
     @top_builddir@/src/lib/support/logging/CHIPLogging.cpp     \
@@ -47,6 +49,7 @@ CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES                        = \
     @top_builddir@/src/lib/support/CHIPArgParser.hpp           \
     @top_builddir@/src/lib/support/CHIPCounter.h               \
     @top_builddir@/src/lib/support/CHIPFaultInjection.h        \
+    @top_builddir@/src/lib/support/CHIPMem.h                   \
     @top_builddir@/src/lib/support/CodeUtils.h                 \
     @top_builddir@/src/lib/support/DLLUtil.h                   \
     @top_builddir@/src/lib/support/ErrorStr.h                  \
@@ -54,6 +57,7 @@ CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES                        = \
     @top_builddir@/src/lib/support/FlagUtils.hpp               \
     @top_builddir@/src/lib/support/logging/CHIPLogging.h       \
     @top_builddir@/src/lib/support/Base64.h                    \
+    @top_builddir@/src/lib/support/BufBound.h                  \
     @top_builddir@/src/lib/support/PersistedCounter.h          \
     @top_builddir@/src/lib/support/RandUtils.h                 \
     @top_builddir@/src/lib/support/TestUtils.h                 \

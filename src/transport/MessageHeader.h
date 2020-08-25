@@ -24,6 +24,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string.h>
 
 #include <core/CHIPError.h>
 #include <core/Optional.h>
@@ -34,11 +35,19 @@ namespace chip {
 typedef uint64_t NodeId;
 
 constexpr NodeId kUndefinedNodeId = 0xFFFFFFFFFFFFFFFFll;
+constexpr size_t kMaxTagLen       = 16;
 
 /** Handles encoding/decoding of CHIP message headers */
 class MessageHeader
 {
 public:
+    enum class EncryptionType
+    {
+        kAESCCMTagLen8  = 0,
+        kAESCCMTagLen12 = 1,
+        kAESCCMTagLen16 = 2,
+    };
+
     /**
      * Gets the source node id in the current message.
      *
@@ -54,6 +63,13 @@ public:
     const Optional<NodeId> & GetDestinationNodeId() const { return mDestinationNodeId; }
 
     /**
+     * Gets the vendor id in the current message.
+     *
+     * NOTE: the vendor id is optional and may be missing.
+     */
+    const Optional<uint16_t> & GetVendorId() const { return mVendorId; }
+
+    /**
      * Gets the message id set in the header.
      *
      * Message IDs are expecte to monotonically increase by one for each mesage
@@ -61,17 +77,28 @@ public:
      */
     uint32_t GetMessageId() const { return mMessageId; }
 
+    /** Get the length of encrypted payload. */
+    uint16_t GetPayloadLength() const { return mPayloadLength; }
+
     /** Get the secure msg type from this header. */
-    uint16_t GetSecureMsgType(void) const { return mSecureMsgType; }
+    uint8_t GetMessageType(void) const { return mMessageType; }
+
+    /** Check if it's a secure session control message. */
+    bool IsSecureSessionControlMsg(void) const { return mSecureSessionControlMsg; }
 
     /** Get the Session ID from this header. */
-    uint32_t GetSecureSessionID(void) const { return mSecureSessionID; }
+    uint16_t GetExchangeID(void) const { return mExchangeID; }
 
-    /** Get the initialization vector from this header. */
-    uint64_t GetIV(void) const { return mIV; }
+    /** Get the Protocol ID from this header. */
+    uint16_t GetProtocolID(void) const { return mProtocolID; }
 
-    /** Get the message auth tag from this header. */
-    uint64_t GetTag(void) const { return mTag; }
+    /** Get the Encryption Key ID from this header. */
+    uint16_t GetEncryptionKeyID(void) const { return mEncryptionKeyID; }
+
+    /** Get the MAC tag length. */
+    size_t GetTagLength(void) const { return TagLenForEncryptionType(mEncryptionType); }
+
+    const uint8_t * GetTag(void) const { return &mTag[0]; }
 
     /** Set the message id for this header. */
     MessageHeader & SetMessageId(uint32_t id)
@@ -128,31 +155,81 @@ public:
         return *this;
     }
 
-    /** Set the secure message type for this header. */
-    MessageHeader & SetSecureMsgType(uint16_t type)
+    /** Set the vendor id for this header. */
+    MessageHeader & SetVendorId(uint16_t id)
     {
-        mSecureMsgType = type;
+        mVendorId.SetValue(id);
+
+        return *this;
+    }
+
+    /** Set the vendor id for this header. */
+    MessageHeader & SetVendorId(Optional<uint16_t> id)
+    {
+        mVendorId = id;
+
+        return *this;
+    }
+
+    /** Clear the vendor id for this header. */
+    MessageHeader & ClearVendorId()
+    {
+        mVendorId.ClearValue();
+
+        return *this;
+    }
+
+    /** Set the secure message type for this header. */
+    MessageHeader & SetPayloadLength(uint16_t len)
+    {
+        mPayloadLength = len;
+        return *this;
+    }
+
+    /** Set the secure message type for this header. */
+    MessageHeader & SetMessageType(uint8_t type)
+    {
+        mMessageType = type;
+        return *this;
+    }
+
+    MessageHeader & SetSecureSessionControlMsg()
+    {
+        mSecureSessionControlMsg = true;
         return *this;
     }
 
     /** Set the security session ID for this header. */
-    MessageHeader & SetSessionID(uint32_t id)
+    MessageHeader & SetExchangeID(uint16_t id)
     {
-        mSecureSessionID = id;
+        mExchangeID = id;
         return *this;
     }
 
-    /** Set the initialization vector for this header. */
-    MessageHeader & SetIV(uint64_t IV)
+    /** Set the Protocol ID for this header. */
+    MessageHeader & SetProtocolID(uint16_t id)
     {
-        mIV = IV;
+        mProtocolID = id;
+        return *this;
+    }
+
+    /** Set the Encryption Key ID for this header. */
+    MessageHeader & SetEncryptionKeyID(uint16_t id)
+    {
+        mEncryptionKeyID = id;
         return *this;
     }
 
     /** Set the message auth tag for this header. */
-    MessageHeader & SetTag(uint64_t tag)
+    MessageHeader & SetTag(EncryptionType encType, uint8_t * tag, size_t len)
     {
-        mTag = tag;
+        const size_t tagLen = TagLenForEncryptionType(encType);
+        if (tagLen > 0 && tagLen <= kMaxTagLen && len == tagLen)
+        {
+            mEncryptionType = encType;
+            memcpy(&mTag, tag, tagLen);
+        }
+
         return *this;
     }
 
@@ -163,6 +240,14 @@ public:
      * @return the number of bytes needed in a buffer to be able to Encode.
      */
     size_t EncodeSizeBytes() const;
+
+    /**
+     * A call to `Encode` will require at least this many bytes on the current
+     * object to be successful.
+     *
+     * @return the number of bytes needed in a buffer to be able to Encode.
+     */
+    size_t EncryptedHeaderSizeBytes() const;
 
     /**
      * Decodes a header from the given buffer.
@@ -185,7 +270,7 @@ public:
      *
      * @param data - the buffer to write to
      * @param size - space available in the buffer (in bytes)
-     * @param decode_size - number of bytes written to the buffer.
+     * @param encode_size - number of bytes written to the buffer.
      *
      * @return CHIP_NO_ERROR on success.
      *
@@ -194,9 +279,74 @@ public:
      */
     CHIP_ERROR Encode(uint8_t * data, size_t size, size_t * encode_size) const;
 
+    /**
+     * Decodes the encrypted header fields from the given buffer.
+     *
+     * @param data - the buffer to read from
+     * @param size - bytes available in the buffer
+     * @param decode_size - number of bytes read from the buffer to decode the
+     *                      object
+     *
+     * @return CHIP_NO_ERROR on success.
+     *
+     * Possible failures:
+     *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
+     *    CHIP_ERROR_VERSION_MISMATCH if header version is not supported.
+     */
+    CHIP_ERROR DecodeEncryptedHeader(const uint8_t * data, size_t size, size_t * decode_size);
+
+    /**
+     * Decodes the Message Authentication Tag from the given buffer.
+     *
+     * @param data - the buffer to read from
+     * @param size - bytes available in the buffer
+     * @param decode_size - number of bytes read from the buffer to decode the
+     *                      object
+     *
+     * @return CHIP_NO_ERROR on success.
+     *
+     * Possible failures:
+     *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
+     *    CHIP_ERROR_VERSION_MISMATCH if header version is not supported.
+     */
+    CHIP_ERROR DecodeMACTag(const uint8_t * data, size_t size, size_t * decode_size);
+
+    /**
+     * Encodes the encrypted part of the header into the given buffer.
+     *
+     * @param data - the buffer to write to
+     * @param size - space available in the buffer (in bytes)
+     * @param encode_size - number of bytes written to the buffer.
+     *
+     * @return CHIP_NO_ERROR on success.
+     *
+     * Possible failures:
+     *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
+     */
+    CHIP_ERROR EncodeEncryptedHeader(uint8_t * data, size_t size, size_t * encode_size) const;
+
+    /**
+     * Encodes the Messae Authentication Tag into the given buffer.
+     *
+     * @param data - the buffer to write to
+     * @param size - space available in the buffer (in bytes)
+     * @param encode_size - number of bytes written to the buffer.
+     *
+     * @return CHIP_NO_ERROR on success.
+     *
+     * Possible failures:
+     *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
+     */
+    CHIP_ERROR EncodeMACTag(uint8_t * data, size_t size, size_t * encode_size) const;
+
 private:
+    size_t TagLenForEncryptionType(EncryptionType encType) const;
+
     /// Represents the current encode/decode header version
     static constexpr int kHeaderVersion = 2;
+
+    /// Represents encryption type used for encrypting current packet
+    EncryptionType mEncryptionType = EncryptionType::kAESCCMTagLen8;
 
     /// Value expected to be incremented for each message sent.
     uint32_t mMessageId = 0;
@@ -207,17 +357,36 @@ private:
     /// Intended recipient of the message.
     Optional<NodeId> mDestinationNodeId;
 
-    /// Packet type (application data, security control packets, e.g. pairing, configuration, rekey etc)
-    uint16_t mSecureMsgType = 0;
+    /// Encryption Key ID
+    uint16_t mEncryptionKeyID = 0;
+
+    /// Length of application data (payload)
+    uint16_t mPayloadLength = 0;
+
+    /// Header structure for exchange information
+    uint8_t mExchangeHeader = 0;
+
+    /// Packet type (application data, security control packets, e.g. pairing,
+    /// configuration, rekey etc)
+    uint8_t mMessageType = 0;
+
+    /// Is this packet a control message for secure channel
+    bool mSecureSessionControlMsg = false;
 
     /// Security session identifier
-    uint32_t mSecureSessionID = 0;
+    uint16_t mExchangeID = 0;
 
-    /// Initialization vector used for encryption of the message.
-    uint64_t mIV = 0;
+    /// Vendor identifier
+    Optional<uint16_t> mVendorId;
+
+    /// Protocol identifier
+    uint16_t mProtocolID = 0;
 
     /// Message authentication tag generated at encryption of the message.
-    uint64_t mTag = 0;
+    uint8_t mTag[kMaxTagLen];
+
+    /// Message header read from the message.
+    uint16_t mHeader = 0;
 };
 
 } // namespace chip

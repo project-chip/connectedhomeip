@@ -32,6 +32,7 @@
 
 #include <nlunit-test.h>
 #include <support/CodeUtils.h>
+#include <support/TestUtils.h>
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -273,22 +274,36 @@ static void TestConfigurationMgr_ServiceConfig(nlTestSuite * inSuite, void * inC
     NL_TEST_ASSERT(inSuite, memcmp(buf, serviceConfig, serviceConfigLen) == 0);
 }
 
-static void TestConfigurationMgr_PairingCode(nlTestSuite * inSuite, void * inContext)
+static void TestConfigurationMgr_SetupPinCode(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    char buf[64];
-    size_t pairingCodeLen    = 0;
-    const char * pairingCode = "016CB664A86A888D";
+    const uint32_t setSetupPinCode = 34567890;
+    uint32_t getSetupPinCode       = 0;
 
-    err = ConfigurationMgr().StorePairingCode(pairingCode, strlen(pairingCode));
+    err = ConfigurationMgr().StoreSetupPinCode(setSetupPinCode);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ConfigurationMgr().GetPairingCode(buf, 64, pairingCodeLen);
+    err = ConfigurationMgr().GetSetupPinCode(getSetupPinCode);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, pairingCodeLen == strlen(pairingCode));
-    NL_TEST_ASSERT(inSuite, strcmp(buf, "016CB664A86A888D") == 0);
+    NL_TEST_ASSERT(inSuite, getSetupPinCode == setSetupPinCode);
+}
+
+static void TestConfigurationMgr_SetupDiscriminator(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    const uint32_t setSetupDiscriminator = 0xBA0;
+    uint32_t getSetupDiscriminator       = 0;
+
+    err = ConfigurationMgr().StoreSetupDiscriminator(setSetupDiscriminator);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetSetupDiscriminator(getSetupDiscriminator);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, getSetupDiscriminator == setSetupDiscriminator);
 }
 
 static void TestConfigurationMgr_PairedAccountId(nlTestSuite * inSuite, void * inContext)
@@ -344,6 +359,24 @@ static void TestConfigurationMgr_ServiceProvisioningData(nlTestSuite * inSuite, 
         0xFF, 0xFB, 0xB1, 0xD4, 0x1C, 0x78, 0x40, 0xDA, 0x2C, 0xD8, 0x40, 0x18, 0x18, 0x18, 0x02, 0x40
     };
 
+    // Test write/clear
+    err = ConfigurationMgr().StoreServiceProvisioningData(7212064004600625234, serviceConfig, sizeof(serviceConfig), accountId,
+                                                          strlen(accountId));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().ClearServiceProvisioningData();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetServiceId(serviceId);
+    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetPairedAccountId(account, 64, accountIdLen);
+    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetServiceConfig(buf, 512, serviceConfigLen);
+    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+
+    // Test write/read
     err = ConfigurationMgr().StoreServiceProvisioningData(7212064004600625234, serviceConfig, sizeof(serviceConfig), accountId,
                                                           strlen(accountId));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -363,58 +396,6 @@ static void TestConfigurationMgr_ServiceProvisioningData(nlTestSuite * inSuite, 
     NL_TEST_ASSERT(inSuite, memcmp(buf, serviceConfig, serviceConfigLen) == 0);
 }
 
-static void TestConfigurationMgr_ClearServiceProvisioningData(nlTestSuite * inSuite, void * inContext)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    uint64_t serviceId;
-
-    char account[64];
-    size_t accountIdLen    = 0;
-    const char * accountId = "USER_016CB664A86A888D";
-
-    uint8_t buf[1024];
-    size_t serviceConfigLen              = 0;
-    const static uint8_t serviceConfig[] = {
-        0x1B, 0x23, 0x26, 0x05, 0x7F, 0xFF, 0xFF, 0x52, 0x37, 0x06, 0x27, 0x11, 0x01, 0x00, 0x00, 0x00, 0x00, 0x30, 0xB4, 0x18,
-        0x18, 0x24, 0x07, 0x02, 0x26, 0x08, 0x25, 0x00, 0x5A, 0x23, 0x30, 0x0A, 0x39, 0x04, 0x9E, 0xC7, 0x77, 0xC5, 0xA4, 0x13,
-        0x31, 0xF7, 0x72, 0x2E, 0x27, 0xC2, 0x86, 0x3D, 0xC5, 0x2E, 0xD5, 0xD2, 0x3C, 0xCF, 0x7E, 0x06, 0xE3, 0x48, 0x53, 0x87,
-        0xE8, 0x4D, 0xB0, 0x27, 0x07, 0x58, 0x4A, 0x38, 0xB4, 0xF3, 0xB2, 0x47, 0x94, 0x45, 0x58, 0x65, 0x80, 0x08, 0x17, 0x6B,
-        0x8E, 0x4F, 0x07, 0x41, 0xA3, 0x3D, 0x5D, 0xCE, 0x76, 0x86, 0x35, 0x83, 0x29, 0x01, 0x18, 0x35, 0x82, 0x29, 0x01, 0x24,
-        0x02, 0x05, 0x18, 0x35, 0x84, 0x29, 0x01, 0x36, 0x02, 0x04, 0x02, 0x04, 0x01, 0x18, 0x18, 0x35, 0x81, 0x30, 0x02, 0x08,
-        0x42, 0xBD, 0x2C, 0x6B, 0x5B, 0x3A, 0x18, 0x16, 0x18, 0x35, 0x80, 0x30, 0x02, 0x08, 0x44, 0xE3, 0x40, 0x38, 0xA9, 0xD4,
-        0xB5, 0xA7, 0x18, 0x35, 0x0C, 0x30, 0x01, 0x19, 0x00, 0xA6, 0x5D, 0x54, 0xD5, 0x00, 0x00, 0x04, 0x00, 0x01, 0x00, 0x30,
-        0x01, 0x08, 0x79, 0x55, 0x9F, 0x15, 0x1F, 0x66, 0x3D, 0x8F, 0x24, 0x02, 0x05, 0x37, 0x03, 0x27, 0x13, 0x02, 0x00, 0x00,
-        0xEE, 0xEE, 0x30, 0xB4, 0x18, 0x18, 0x26, 0x04, 0x80, 0x41, 0x1B, 0x23, 0x26, 0x05, 0x7F, 0xFF, 0xFF, 0x52, 0x37, 0x06,
-        0x27, 0x11, 0x01, 0x00, 0x00, 0x00, 0x00, 0x30, 0xB4, 0x18, 0x18, 0x24, 0x07, 0x02, 0x26, 0x08, 0x25, 0x00, 0x5A, 0x23,
-        0x30, 0x0A, 0x39, 0x04, 0x9E, 0xC7, 0x77, 0xC5, 0xA4, 0x13, 0x31, 0xF7, 0x72, 0x2E, 0x27, 0xC2, 0x86, 0x3D, 0xC5, 0x2E,
-        0xD5, 0xD2, 0x3C, 0xCF, 0x7E, 0x06, 0xE3, 0x48, 0x53, 0x87, 0xE8, 0x4D, 0xB0, 0x27, 0x07, 0x58, 0x4A, 0x38, 0xB4, 0xF3,
-        0xB2, 0x47, 0x94, 0x45, 0x58, 0x65, 0x80, 0x08, 0x17, 0x6B, 0x8E, 0x4F, 0x07, 0x41, 0xA3, 0x3D, 0x5D, 0xCE, 0x76, 0x86,
-        0x35, 0x83, 0x29, 0x01, 0x18, 0x35, 0x82, 0x29, 0x01, 0x24, 0x02, 0x05, 0x18, 0x35, 0x84, 0x29, 0x01, 0x36, 0x02, 0x04,
-        0x02, 0x04, 0x01, 0x18, 0x18, 0x35, 0x81, 0x30, 0x02, 0x08, 0x42, 0xBD, 0x2C, 0x6B, 0x5B, 0x3A, 0x18, 0x16, 0x18, 0x35,
-        0x80, 0x30, 0x02, 0x08, 0x44, 0xE3, 0x40, 0x38, 0xA9, 0xD4, 0xB5, 0xA7, 0x18, 0x35, 0x0C, 0x30, 0x01, 0x19, 0x00, 0xA6,
-        0x5D, 0x54, 0xF5, 0xAE, 0x5D, 0x63, 0xEB, 0x69, 0xD8, 0xDB, 0xCB, 0xE2, 0x20, 0x0C, 0xD5, 0x6F, 0x43, 0x5E, 0x96, 0xA8,
-        0x54, 0xB2, 0x74, 0x30, 0x02, 0x19, 0x00, 0xE0, 0x37, 0x02, 0x8B, 0xB3, 0x04, 0x06, 0xDD, 0xBD, 0x28, 0xAA, 0xC4, 0xF1,
-        0xFF, 0xFB, 0xB1, 0xD4, 0x1C, 0x78, 0x40, 0xDA, 0x2C, 0xD8, 0x40, 0x18, 0x18, 0x18, 0x02, 0x40
-    };
-
-    err = ConfigurationMgr().StoreServiceProvisioningData(7212064004600625234, serviceConfig, sizeof(serviceConfig), accountId,
-                                                          strlen(accountId));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = ConfigurationMgr().ClearServiceProvisioningData();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = ConfigurationMgr().GetServiceId(serviceId);
-    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
-
-    err = ConfigurationMgr().GetPairedAccountId(account, 64, accountIdLen);
-    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
-
-    err = ConfigurationMgr().GetServiceConfig(buf, 512, serviceConfigLen);
-    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
-}
-
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -432,12 +413,12 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ConfigurationMgr::ManufacturerDeviceIntermediateCACerts",
                 TestConfigurationMgr_ManufacturerDeviceIntermediateCACerts),
     NL_TEST_DEF("Test ConfigurationMgr::ManufacturerDevicePrivateKey", TestConfigurationMgr_ManufacturerDevicePrivateKey),
-    NL_TEST_DEF("Test ConfigurationMgr::PairingCode", TestConfigurationMgr_PairingCode),
+    NL_TEST_DEF("Test ConfigurationMgr::SetupPinCode", TestConfigurationMgr_SetupPinCode),
+    NL_TEST_DEF("Test ConfigurationMgr::SetupDiscriminator", TestConfigurationMgr_SetupDiscriminator),
     NL_TEST_DEF("Test ConfigurationMgr::FabricId", TestConfigurationMgr_FabricId),
     NL_TEST_DEF("Test ConfigurationMgr::ServiceConfig", TestConfigurationMgr_ServiceConfig),
     NL_TEST_DEF("Test ConfigurationMgr::PairedAccountId", TestConfigurationMgr_PairedAccountId),
     NL_TEST_DEF("Test ConfigurationMgr::ServiceProvisioningData", TestConfigurationMgr_ServiceProvisioningData),
-    NL_TEST_DEF("Test ConfigurationMgr::ClearServiceProvisioningData", TestConfigurationMgr_ClearServiceProvisioningData),
     NL_TEST_SENTINEL()
 };
 
@@ -448,4 +429,9 @@ int TestConfigurationMgr(void)
     // Run test suit againt one context.
     nlTestRunner(&theSuite, NULL);
     return nlTestRunnerStats(&theSuite);
+}
+
+static void __attribute__((constructor)) TestConfigurationMgrCtor(void)
+{
+    VerifyOrDie(RegisterUnitTests(&TestConfigurationMgr) == CHIP_NO_ERROR);
 }

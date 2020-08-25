@@ -17,17 +17,18 @@
 #
 
 import argparse
-import attr
 import coloredlogs
 import csv
+import datetime
 import github
+import github_fetch_artifacts
 import io
 import logging
 import os
+import re
 import stat
 import subprocess
-
-import ci_fetch_artifacts
+import zipfile
 
 
 class SectionChange:
@@ -47,7 +48,8 @@ class ComparisonResult:
     self.sectionChanges = []
 
 
-SECTIONS_TO_WATCH = set(['.rodata', '.text', '.flash.rodata', '.flash.text', '.bss', '.data'])
+SECTIONS_TO_WATCH = set(
+    ['.rodata', '.text', '.flash.rodata', '.flash.text', '.bss', '.data'])
 
 
 def filesInDirectory(dirName):
@@ -86,7 +88,7 @@ def writeFileBloatReport(f, baselineName, buildName):
       section, vm, f = row
       if (section in SECTIONS_TO_WATCH) or (vm not in ['0', 'vmsize']):
         result.sectionChanges.append(SectionChange(section, int(f), int(vm)))
-  except:
+  except Exception:
     pass
 
   return result
@@ -153,8 +155,10 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
   compareTable = 'File | Section | File | VM\n---- | ---- | ----- | ---- \n'
   for file in compare_results:
     for change in file.sectionChanges:
-      compareTable += '{0} | {1} | {2} | {3}\n'.format(
-          file.fileName, change.section, change.fileChange, change.vmChange)
+      compareTable += '{0} | {1} | {2} | {3}\n'.format(file.fileName,
+                                                       change.section,
+                                                       change.fileChange,
+                                                       change.vmChange)
 
   # NOTE: PRs are issues with attached patches, hence the API naming
   pull.create_issue_comment("""{title}
@@ -169,45 +173,48 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
 ```
 
 </details>
-""".format(
-    title=titleHeading,
-    table=compareTable,
-    jobName=job_name,
-    rawReportText=rawText))
+""".format(title=titleHeading, table=compareTable, rawReportText=rawText))
 
+
+def getPullRequestBaseSha(githubToken,  githubRepo, pullRequestNumber):
+  """Figure out the SHA for the base of a pull request"""
+  api = github.Github(githubToken)
+  repo = api.get_repo(githubRepo)
+  pull = repo.get_pull(pullRequestNumber)
+
+  return pull.base.sha
+
+def cleanDir(name):
+  """Ensures a clean directory with the given name exists. Only handles files"""
+  if os.path.exists(name):
+    for fname in os.listdir(name):
+      path = os.path.join(name, fname)
+      if os.path.isfile(path):
+        os.unlink(path)
+  else:
+    os.mkdir(name)
+
+
+def downloadArtifact(artifact, dirName):
+  """Extract an artifact into a directory."""
+  zipFile = zipfile.ZipFile(io.BytesIO(artifact.downloadBlob()), 'r')	
+  logging.info('Extracting zip file to %r' % dirName)	
+  zipFile.extractall(dirName)
 
 def main():
   """Main task if executed standalone."""
   parser = argparse.ArgumentParser(description='Fetch master build artifacts.')
-  parser.add_argument('--token', type=str, help='API token to use')
   parser.add_argument(
-      '--job', type=str, help='From what job to fetch artifacts from')
-  parser.add_argument(
-      '--artifact-download-dir',
+      '--output-dir',
       type=str,
       default='.',
       help='Where to download the artifacts')
-  parser.add_argument(
-      '--build-output-dir',
-      type=str,
-      default='.',
-      help='Generated build files directory to use to compare for bloat')
-  parser.add_argument(
-      '--report-file',
-      type=str,
-      default='report.txt',
-      help='From what job to fetch artifacts from')
   parser.add_argument(
       '--github-api-token',
       type=str,
       help='Github API token to upload the report as a comment')
   parser.add_argument(
       '--github-repository', type=str, help='Repository to use for PR comments')
-  parser.add_argument(
-      '--github-comment-pr-number',
-      type=str,
-      default=None,
-      help='To what PR to comment in github')
   parser.add_argument(
       '--log-level',
       default=logging.INFO,
@@ -221,27 +228,89 @@ def main():
       format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
   coloredlogs.install()
 
-  if not args.token or not args.job:
-    logging.error(
-        'Required arguments missing. Please specify at least job and token.')
+  if not args.github_api_token:
+    logging.error('Required arguments missing: github api token is required.')
     return
 
-  try:
-    ci_fetch_artifacts.fetchArtifactsForJob(args.token, args.job,
-                                            args.artifact_download_dir)
-  except Exception as e:
-    logging.warning('Failed to fetch artifacts: %r', e)
+  # all known artifacts
+  artifacts = [a for a in github_fetch_artifacts.getAllArtifacts(args.github_api_token, args.github_repository)]
 
-  compareResults = generateBloatReport(
-      args.report_file,
-      args.artifact_download_dir,
-      args.build_output_dir,
-      title="Bloat report for job '%s'" % args.job)
+  # process newest artifacts first
+  artifacts.sort(key = lambda x: x.created_at, reverse=True)
 
-  if args.github_api_token and args.github_repository and args.github_comment_pr_number:
-    sendFileAsPrComment(args.job, args.report_file, args.github_api_token,
-                        args.github_repository,
-                        int(args.github_comment_pr_number), compareResults)
+  current_time = datetime.datetime.now()
+  seen_names = set()
+  pull_artifact_re = re.compile('^(.*)-pull-(\\d+)$')
+  for a in artifacts:
+    # logs cleanup after 3 days
+    is_log = a.name.endswith('-logs')
+
+    if (current_time - a.created_at).days > 30 or (is_log and (current_time - a.created_at).days > 3):
+      logging.info('Old artifact: %s' % a.name)
+      a.delete()
+      continue
+
+    if a.name.endswith('-logs'):
+      # logs names are duplicate, however that is fine
+      continue
+
+
+    if a.name in seen_names:
+      logging.info('Artifact name already seen before: %s' % a.name)
+      a.delete()
+      continue
+
+    seen_names.add(a.name)
+
+    m = pull_artifact_re.match(a.name)
+    if not m:
+      logging.info('Non-PR artifact found: %r from %r' % (a.name, a.created_at))
+      continue
+
+    prefix = m.group(1)
+    pull_number = int(m.group(2))
+
+    logging.info('Processing PR %s via artifact %r' % (pull_number, a.name))
+
+    try:
+      base_sha = getPullRequestBaseSha(args.github_api_token, args.github_repository, pull_number)
+
+      base_artifact_name = '%s-%s' % (prefix, base_sha)
+
+      base_artifacts = [v for v in artifacts if v.name == base_artifact_name]
+      if len(base_artifacts) != 1:
+        raise Exception('Did not find exactly one artifact for %s: %r' % (base_artifact_name, [v.name for v in base_artifacts]))
+
+      b = base_artifacts[0]
+
+      logging.info('Diff will be against artifact %r' % b.name)
+
+      aOutput = os.path.join(args.output_dir, 'pull_artifact')
+      bOutput = os.path.join(args.output_dir, 'master_artifact')
+
+      cleanDir(aOutput)
+      cleanDir(bOutput)
+
+      downloadArtifact(a, aOutput)
+      downloadArtifact(b, bOutput)
+
+      report_name = os.path.join(aOutput, 'report.csv')
+
+      results = generateBloatReport(report_name, bOutput, aOutput)
+
+      sendFileAsPrComment(prefix, report_name, args.github_api_token,
+                          args.github_repository,	pull_number, results)
+
+      # If running over a top level directory, ensure git sees no output
+      cleanDir(aOutput)
+      cleanDir(bOutput)
+
+      # Output processed.
+      a.delete()
+
+    except Exception as e:
+      logging.warning('Failed to process bloat report: %r', e)
+
 
 
 if __name__ == '__main__':

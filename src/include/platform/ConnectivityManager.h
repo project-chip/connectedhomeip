@@ -25,6 +25,12 @@
 #define CONNECTIVITY_MANAGER_H
 
 namespace chip {
+
+namespace Ble {
+class BleLayer;
+class BLEEndPoint;
+} // namespace Ble
+
 namespace DeviceLayer {
 
 namespace Internal {
@@ -75,13 +81,6 @@ public:
         kThreadMode_ApplicationControlled = 1,
         kThreadMode_Disabled              = 2,
         kThreadMode_Enabled               = 3,
-    };
-
-    enum ServiceTunnelMode
-    {
-        kServiceTunnelMode_NotSupported = 0,
-        kServiceTunnelMode_Disabled     = 1,
-        kServiceTunnelMode_Enabled      = 2,
     };
 
     enum CHIPoBLEServiceMode
@@ -143,18 +142,12 @@ public:
     bool HaveIPv4InternetConnectivity(void);
     bool HaveIPv6InternetConnectivity(void);
 
-    // Service tunnel methods
-    ServiceTunnelMode GetServiceTunnelMode(void);
-    CHIP_ERROR SetServiceTunnelMode(ServiceTunnelMode val);
-    bool IsServiceTunnelConnected(void);
-    bool IsServiceTunnelRestricted(void);
-    bool HaveServiceConnectivityViaTunnel(void);
-
     // Service connectivity methods
     bool HaveServiceConnectivity(void);
 
     // CHIPoBLE service methods
-    typedef void (*BleConnectionReceivedFunct)(BLEEndPoint * endpoint);
+    Ble::BleLayer * GetBleLayer();
+    typedef void (*BleConnectionReceivedFunct)(Ble::BLEEndPoint * endpoint);
     void AddCHIPoBLEConnectionHandler(BleConnectionReceivedFunct handler);
     void RemoveCHIPoBLEConnectionHandler(void);
     CHIPoBLEServiceMode GetCHIPoBLEServiceMode(void);
@@ -177,7 +170,6 @@ public:
     // Support methods
     static const char * WiFiStationModeToStr(WiFiStationMode mode);
     static const char * WiFiAPModeToStr(WiFiAPMode mode);
-    static const char * ServiceTunnelModeToStr(ServiceTunnelMode mode);
     static const char * CHIPoBLEServiceModeToStr(CHIPoBLEServiceMode mode);
 
 private:
@@ -251,10 +243,9 @@ extern ConnectivityManagerImpl & ConnectivityMgrImpl(void);
  */
 #ifdef EXTERNAL_CONNECTIVITYMANAGERIMPL_HEADER
 #include EXTERNAL_CONNECTIVITYMANAGERIMPL_HEADER
-#else
+#elif defined(CHIP_DEVICE_LAYER_TARGET)
 #define CONNECTIVITYMANAGERIMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/ConnectivityManagerImpl.h>
 #include CONNECTIVITYMANAGERIMPL_HEADER
-#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -354,11 +345,6 @@ inline CHIP_ERROR ConnectivityManager::GetAndLogWifiStatsCounters(void)
     return static_cast<ImplClass *>(this)->_GetAndLogWifiStatsCounters();
 }
 
-inline bool ConnectivityManager::HaveServiceConnectivityViaTunnel(void)
-{
-    return static_cast<ImplClass *>(this)->_HaveServiceConnectivityViaTunnel();
-}
-
 inline bool ConnectivityManager::HaveIPv4InternetConnectivity(void)
 {
     return static_cast<ImplClass *>(this)->_HaveIPv4InternetConnectivity();
@@ -367,26 +353,6 @@ inline bool ConnectivityManager::HaveIPv4InternetConnectivity(void)
 inline bool ConnectivityManager::HaveIPv6InternetConnectivity(void)
 {
     return static_cast<ImplClass *>(this)->_HaveIPv6InternetConnectivity();
-}
-
-inline ConnectivityManager::ServiceTunnelMode ConnectivityManager::GetServiceTunnelMode(void)
-{
-    return static_cast<ImplClass *>(this)->_GetServiceTunnelMode();
-}
-
-inline CHIP_ERROR ConnectivityManager::SetServiceTunnelMode(ServiceTunnelMode val)
-{
-    return static_cast<ImplClass *>(this)->_SetServiceTunnelMode(val);
-}
-
-inline bool ConnectivityManager::IsServiceTunnelConnected(void)
-{
-    return static_cast<ImplClass *>(this)->_IsServiceTunnelConnected();
-}
-
-inline bool ConnectivityManager::IsServiceTunnelRestricted(void)
-{
-    return static_cast<ImplClass *>(this)->_IsServiceTunnelRestricted();
 }
 
 inline bool ConnectivityManager::HaveServiceConnectivity(void)
@@ -452,6 +418,11 @@ inline void ConnectivityManager::ErasePersistentInfo(void)
 inline bool ConnectivityManager::HaveServiceConnectivityViaThread(void)
 {
     return static_cast<ImplClass *>(this)->_HaveServiceConnectivityViaThread();
+}
+
+inline Ble::BleLayer * ConnectivityManager::GetBleLayer(void)
+{
+    return static_cast<ImplClass *>(this)->_GetBleLayer();
 }
 
 inline void ConnectivityManager::AddCHIPoBLEConnectionHandler(BleConnectionReceivedFunct handler)
@@ -544,11 +515,6 @@ inline const char * ConnectivityManager::WiFiAPModeToStr(WiFiAPMode mode)
     return ImplClass::_WiFiAPModeToStr(mode);
 }
 
-inline const char * ConnectivityManager::ServiceTunnelModeToStr(ServiceTunnelMode mode)
-{
-    return ImplClass::_ServiceTunnelModeToStr(mode);
-}
-
 inline const char * ConnectivityManager::CHIPoBLEServiceModeToStr(CHIPoBLEServiceMode mode)
 {
     return ImplClass::_CHIPoBLEServiceModeToStr(mode);
@@ -581,5 +547,5 @@ inline void ConnectivityManager::OnWiFiStationProvisionChange(void)
 
 } // namespace DeviceLayer
 } // namespace chip
-
+#endif // defined(CHIP_DEVICE_LAYER_TARGET)
 #endif // CONNECTIVITY_MANAGER_H

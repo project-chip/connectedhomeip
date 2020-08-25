@@ -32,6 +32,8 @@
 using namespace chip;
 using namespace std;
 
+namespace {
+
 void TestRendezvousFlags(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload inPayload = GetDefaultPayload();
@@ -39,7 +41,7 @@ void TestRendezvousFlags(nlTestSuite * inSuite, void * inContext)
     inPayload.rendezvousInformation = RendezvousInformationFlags::kNone;
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kSoftAP;
+    inPayload.rendezvousInformation = RendezvousInformationFlags::kWiFi;
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
     inPayload.rendezvousInformation = RendezvousInformationFlags::kBLE;
@@ -302,7 +304,7 @@ void TestExtractPayload(nlTestSuite * inSuite, void * inContext)
  *  Test Suite that lists all the test functions.
  */
 // clang-format off
-static const nlTest sTests[] =
+const nlTest sTests[] =
 {
     NL_TEST_DEF("Test Rendezvous Flags",                                            TestRendezvousFlags),
     NL_TEST_DEF("Test Base 41",                                                     TestBase41),
@@ -325,6 +327,8 @@ struct TestContext
 {
     nlTestSuite * mSuite;
 };
+
+} // namespace
 
 /**
  *  Main

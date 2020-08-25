@@ -1,6 +1,8 @@
 # Connected Home over IP
 
-[![project-chip](https://circleci.com/gh/project-chip/connectedhomeip.svg?style=shield&circle-token=7318eddc58468689cd2ae9c5c82fe8dcf24902f6)](https://app.circleci.com/pipelines/github/project-chip/connectedhomeip?branch=master)
+![Main](https://github.com/project-chip/connectedhomeip/workflows/Builds/badge.svg)
+![Examples](https://github.com/project-chip/connectedhomeip/workflows/Examples/badge.svg)
+![QEMU](https://github.com/project-chip/connectedhomeip/workflows/QEMU/badge.svg)
 
 # What is Project Connected Home over IP?
 

@@ -85,6 +85,8 @@ public:
     ~Cancelable() { Cancel(); };
 };
 
+typedef void (*CallFn)(void *);
+
 /**
  *  @class Callback
  *
@@ -107,7 +109,6 @@ public:
  *     parameter at Callback registration time.
  *
  */
-typedef void (*CallFn)(void *);
 template <class T = CallFn>
 class Callback : private Cancelable
 {

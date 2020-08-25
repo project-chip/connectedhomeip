@@ -1,12 +1,12 @@
-# start with Ubuntu 18.04LTS
-FROM ubuntu:bionic
+# start with Ubuntu 20.04LTS
+FROM ubuntu:focal
 
 VOLUME "/var/source"
 
 # base build and check tools and libraries layer
 RUN set -x \
     && apt-get update \
-    && apt-get install -fy \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
     git \
     curl \
     jq \
@@ -16,19 +16,19 @@ RUN set -x \
     libtool \
     pkg-config \
     g++ \
-    clang-9 \
-    clang-format-9 \
-    clang-tidy-9 \
+    clang \
+    clang-format \
+    clang-tidy \
+    cmake \
     lcov \
     shellcheck \
     libssl-dev \
     unzip \
     wget \
     libmbedtls-dev \
-    python-pip \
     python3 \
     python3-pip \
-    libusb-1.0 \
+    libusb-1.0-0 \
     libncurses5-dev \
     libncursesw5-dev \
     libnspr4-dev \
@@ -39,25 +39,42 @@ RUN set -x \
     zlib1g-dev \
     libglib2.0-dev \
     libpixman-1-dev \
+    libdbus-1-dev \
+    libdbus-glib-1-dev \
+    libical-dev \
+    libudev-dev \
+    libusb-dev \
+    libreadline-dev \
+    systemd \
+    udev \
     ninja-build \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
+# Python 2 and PIP
 RUN set -x \
-    && pip3 install circleci attrs coloredlogs PyGithub \
+   && apt-get update \
+   && DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common \
+   && add-apt-repository universe \
+   && DEBIAN_FRONTEND=noninteractive apt-get install -y python python2 \
+   && curl https://bootstrap.pypa.io/get-pip.py --output get-pip.py \
+   && python2 get-pip.py \
+   && rm -rf /var/lib/apt/lists/ \
+   && : # last line
+
+RUN set -x \
+    && pip3 install circleci attrs coloredlogs PyGithub pygit \
     && : # last line
 
-# Install newer cmake toolchain
+# build and install gn
 RUN set -x \
-    && wget https://cmake.org/files/v3.17/cmake-3.17.2.tar.gz \
-    && tar xzf cmake-3.17.2.tar.gz \
-    && cd cmake-3.17.2 \
-    && ./bootstrap \
-    && make \
-    && make install \
+    && git clone https://gn.googlesource.com/gn \
+    && cd gn \
+    && python3 build/gen.py \
+    && ninja -C out \
+    && cp out/gn /usr/local/bin \
     && cd .. \
-    && rm -rf cmake-3.17.2 \
-    && rm cmake-3.17.2.tar.gz \
+    && rm -rf gn \
     && : # last line
 
 # Install bloat comparison tools

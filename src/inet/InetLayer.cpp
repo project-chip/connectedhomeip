@@ -67,10 +67,14 @@
 #include <unistd.h>
 #ifdef __ANDROID__
 #include <ifaddrs-android.h>
-#else
+#elif CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 #include <ifaddrs.h>
-#endif // __ANDROID__
+#endif
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+#include <net/net_if.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
 namespace chip {
 namespace Inet {
@@ -93,10 +97,6 @@ void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
     RawEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumRawEps],
                                      aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumRawEps]);
 #endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-    TunEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumTunEps],
-                                     aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumTunEps]);
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
 }
 
 /**
@@ -448,14 +448,14 @@ INET_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if !LWIP_IPV6
     err = INET_ERROR_NOT_IMPLEMENTED;
-    goto out;
+    goto exit;
 #endif //! LWIP_IPV6
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     if (llAddr == NULL)
     {
         err = INET_ERROR_BAD_ARGS;
-        goto out;
+        goto exit;
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -469,7 +469,7 @@ INET_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
             if (ip6_addr_isvalid(netif_ip6_addr_state(intf, j)) && ip6_addr_islinklocal(netif_ip6_addr(intf, j)))
             {
                 (*llAddr) = IPAddress::FromIPv6(*netif_ip6_addr(intf, j));
-                goto out;
+                goto exit;
             }
         }
         if (link != NULL)
@@ -480,7 +480,7 @@ INET_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
     struct ifaddrs * ifaddr;
     int rv;
     rv = getifaddrs(&ifaddr);
@@ -511,9 +511,22 @@ INET_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
     {
         err = INET_ERROR_ADDRESS_NOT_FOUND;
     }
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
-out:
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+    net_if * iface;
+    in6_addr * ip6_addr;
+
+    iface = (link == INET_NULL_INTERFACEID) ? net_if_get_default() : net_if_get_by_index(link);
+    VerifyOrExit(iface != nullptr, err = INET_ERROR_ADDRESS_NOT_FOUND);
+
+    ip6_addr = net_if_ipv6_get_ll(iface, NET_ADDR_PREFERRED);
+    VerifyOrExit(ip6_addr != nullptr, err = INET_ERROR_ADDRESS_NOT_FOUND);
+
+    *llAddr = IPAddress::FromIPv6(*ip6_addr);
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+
+exit:
     return err;
 }
 
@@ -646,48 +659,6 @@ exit:
     return err;
 }
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-/**
- *  Creates a new TunEndPoint object.
- *
- *  @note
- *    This function gets a free TunEndPoint object from a pre-allocated pool
- *    and also calls the explicit initializer on the new object.
- *
- *  @param[in,out]  retEndPoint    A pointer to a pointer of the TunEndPoint object that is
- *                                 a return parameter upon completion of the object creation.
- *                                 *retEndPoint is NULL if creation fails.
- *
- *  @retval  #INET_ERROR_INCORRECT_STATE  If the InetLayer object is not initialized.
- *  @retval  #INET_ERROR_NO_ENDPOINTS     If the InetLayer TunEndPoint pool is full and no new
- *                                        ones can be created.
- *  @retval  #INET_NO_ERROR               On success.
- *
- */
-INET_ERROR InetLayer::NewTunEndPoint(TunEndPoint ** retEndPoint)
-{
-    INET_ERROR err = INET_NO_ERROR;
-    *retEndPoint   = NULL;
-
-    VerifyOrExit(State == kState_Initialized, err = INET_ERROR_INCORRECT_STATE);
-
-    *retEndPoint = TunEndPoint::sPool.TryCreate(*mSystemLayer);
-    if (*retEndPoint != NULL)
-    {
-        (*retEndPoint)->Init(this);
-        SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumTunEps);
-    }
-    else
-    {
-        ChipLogError(Inet, "%s endpoint pool FULL", "Tun");
-        err = INET_ERROR_NO_ENDPOINTS;
-    }
-
-exit:
-    return err;
-}
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
 
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
 /**
@@ -1113,12 +1084,6 @@ chip::System::Error InetLayer::HandleInetLayerEvent(chip::System::Object & aTarg
         break;
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-    case kInetEvent_TunDataReceived:
-        static_cast<TunEndPoint &>(aTarget).HandleDataReceived(reinterpret_cast<chip::System::PacketBuffer *>(aArgument));
-        break;
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
-
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
     case kInetEvent_DNSResolveComplete:
         static_cast<DNSResolver &>(aTarget).HandleResolveComplete();
@@ -1191,15 +1156,6 @@ void InetLayer::PrepareSelect(int & nfds, fd_set * readfds, fd_set * writefds, f
             lEndPoint->PrepareIO().SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
     }
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-    for (size_t i = 0; i < TunEndPoint::sPool.Size(); i++)
-    {
-        TunEndPoint * lEndPoint = TunEndPoint::sPool.Get(*mSystemLayer, i);
-        if ((lEndPoint != NULL) && lEndPoint->IsCreatedByInetLayer(*this))
-            lEndPoint->PrepareIO().SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
-    }
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
 }
 
 /**
@@ -1273,17 +1229,6 @@ void InetLayer::HandleSelectResult(int selectRes, fd_set * readfds, fd_set * wri
         }
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-        for (size_t i = 0; i < TunEndPoint::sPool.Size(); i++)
-        {
-            TunEndPoint * lEndPoint = TunEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != NULL) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->mPendingIO = SocketEvents::FromFDs(lEndPoint->mSocket, readfds, writefds, exceptfds);
-            }
-        }
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
-
         // Now call each active endpoint to handle its pending I/O.
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
         for (size_t i = 0; i < RawEndPoint::sPool.Size(); i++)
@@ -1317,17 +1262,6 @@ void InetLayer::HandleSelectResult(int selectRes, fd_set * readfds, fd_set * wri
             }
         }
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-        for (size_t i = 0; i < TunEndPoint::sPool.Size(); i++)
-        {
-            TunEndPoint * lEndPoint = TunEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != NULL) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->HandlePendingIO();
-            }
-        }
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
     }
 }
 

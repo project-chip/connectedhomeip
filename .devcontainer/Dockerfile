@@ -1,3 +1,17 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 ARG BUILD_VERSION
 
 # All tools required for compilation belong in chip-build, forms "truth" for CHIP build tooling
@@ -18,7 +32,7 @@ RUN apt-get -fy install git vim emacs sudo \
     iproute2 procps lsb-release \
     bash-completion \
     build-essential cmake cppcheck valgrind \
-    wget curl telnet bsdtar \
+    wget curl telnet \
     docker.io \
     iputils-ping net-tools
 RUN groupadd -g $USER_GID $USERNAME
@@ -26,11 +40,10 @@ RUN useradd -s /bin/bash -u $USER_UID -g $USER_GID -G docker -m $USERNAME
 RUN echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME
 RUN chmod 0440 /etc/sudoers.d/$USERNAME
 
-RUN ln -s /usr/bin/clang-format-9 /usr/local/bin/clang-format
-
 RUN mkdir -p /var/downloads
 RUN cd /var/downloads
-RUN curl -JL https://github.com/microsoft/vscode-cpptools/releases/download/0.27.0/cpptools-linux.vsix | bsdtar -xvf - extension
+RUN curl -JL https://github.com/microsoft/vscode-cpptools/releases/download/0.27.0/cpptools-linux.vsix > extension.zip
+RUN unzip extension.zip
 RUN mkdir -p /home/$USERNAME/.vscode-server/extensions
 RUN mv extension /home/$USERNAME/.vscode-server/extensions/ms-vscode.cpptools-0.27.0
 RUN mkdir -p /home/$USERNAME/bin

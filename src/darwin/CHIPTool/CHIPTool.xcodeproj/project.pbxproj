@@ -9,13 +9,14 @@
 /* Begin PBXBuildFile section */
 		0C47BE4424885B97005E97F6 /* CHIPViewControllerBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 0C47BE4324885B97005E97F6 /* CHIPViewControllerBase.m */; };
 		0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0CA0E0CE248599BB009087B9 /* OnOffViewController.m */; };
-		1E87C7B624A5E74E00457C90 /* BLEConnectionController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E87C7B524A5E74E00457C90 /* BLEConnectionController.m */; };
 		991DC091247747F500C13860 /* EchoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 991DC090247747F500C13860 /* EchoViewController.m */; };
 		B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A620244E1D0600C7C0E1 /* AppDelegate.m */; };
 		B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A623244E1D0600C7C0E1 /* SceneDelegate.m */; };
 		B204A627244E1D0600C7C0E1 /* QRCodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A626244E1D0600C7C0E1 /* QRCodeViewController.m */; };
 		B204A62C244E1D0700C7C0E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B204A62B244E1D0700C7C0E1 /* Assets.xcassets */; };
 		B204A632244E1D0700C7C0E1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A631244E1D0700C7C0E1 /* main.m */; };
+		B2946A4224C99D53005C87D0 /* WifiViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2946A4124C99D53005C87D0 /* WifiViewController.m */; };
+		B2946A9B24C9A7BF005C87D0 /* DefaultsUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */; };
 		B2F53AEB245B0D140010745E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B2F53AE9245B0D140010745E /* LaunchScreen.storyboard */; };
 		B2F53AEE245B0D1A0010745E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B2F53AEC245B0D190010745E /* Main.storyboard */; };
 		B2F53AEF245B0D910010745E /* CHIP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2E0D7BE245B0C59003C5B48 /* CHIP.framework */; };
@@ -50,8 +51,6 @@
 		0C47BE4324885B97005E97F6 /* CHIPViewControllerBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHIPViewControllerBase.m; sourceTree = "<group>"; };
 		0CA0E0CD248599BB009087B9 /* OnOffViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OnOffViewController.h; sourceTree = "<group>"; };
 		0CA0E0CE248599BB009087B9 /* OnOffViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OnOffViewController.m; sourceTree = "<group>"; };
-		1E87C7B424A5E57100457C90 /* BLEConnectionController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLEConnectionController.h; sourceTree = "<group>"; };
-		1E87C7B524A5E74E00457C90 /* BLEConnectionController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLEConnectionController.m; sourceTree = "<group>"; };
 		515C401824868BF0004C4DB3 /* CHIPViewControllerBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPViewControllerBase.h; sourceTree = "<group>"; };
 		991DC08F247747F500C13860 /* EchoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EchoViewController.h; sourceTree = "<group>"; };
 		991DC090247747F500C13860 /* EchoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EchoViewController.m; sourceTree = "<group>"; };
@@ -67,6 +66,10 @@
 		B204A631244E1D0700C7C0E1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		B204A637244E1D0700C7C0E1 /* CHIPToolTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CHIPToolTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B204A63D244E1D0700C7C0E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B2946A4024C99D53005C87D0 /* WifiViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WifiViewController.h; sourceTree = "<group>"; };
+		B2946A4124C99D53005C87D0 /* WifiViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WifiViewController.m; sourceTree = "<group>"; };
+		B2946A9924C9A7BF005C87D0 /* DefaultsUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DefaultsUtils.h; sourceTree = "<group>"; };
+		B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DefaultsUtils.m; sourceTree = "<group>"; };
 		B2E0D7BE245B0C59003C5B48 /* CHIP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CHIP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2F53AEA245B0D140010745E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = UI/Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B2F53AED245B0D190010745E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = UI/Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -96,8 +99,6 @@
 			children = (
 				B204A625244E1D0600C7C0E1 /* QRCodeViewController.h */,
 				B204A626244E1D0600C7C0E1 /* QRCodeViewController.m */,
-				1E87C7B424A5E57100457C90 /* BLEConnectionController.h */,
-				1E87C7B524A5E74E00457C90 /* BLEConnectionController.m */,
 			);
 			path = QRCode;
 			sourceTree = "<group>";
@@ -161,9 +162,12 @@
 				B204A622244E1D0600C7C0E1 /* SceneDelegate.h */,
 				B204A623244E1D0600C7C0E1 /* SceneDelegate.m */,
 				B204A61F244E1D0600C7C0E1 /* AppDelegate.h */,
+				B2946A3F24C99D21005C87D0 /* Wifi */,
 				0C79937824858B3B0047A373 /* QRCode */,
 				0C79937924858B4F0047A373 /* Echo client */,
 				0CA0E0D0248599C4009087B9 /* OnOffCluster */,
+				B2946A9924C9A7BF005C87D0 /* DefaultsUtils.h */,
+				B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */,
 			);
 			path = CHIPTool;
 			sourceTree = "<group>";
@@ -174,6 +178,15 @@
 				B204A63D244E1D0700C7C0E1 /* Info.plist */,
 			);
 			path = CHIPToolTests;
+			sourceTree = "<group>";
+		};
+		B2946A3F24C99D21005C87D0 /* Wifi */ = {
+			isa = PBXGroup;
+			children = (
+				B2946A4024C99D53005C87D0 /* WifiViewController.h */,
+				B2946A4124C99D53005C87D0 /* WifiViewController.m */,
+			);
+			path = Wifi;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -221,7 +234,7 @@
 		B204A614244E1D0600C7C0E1 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1140;
+				LastUpgradeCheck = 1150;
 				ORGANIZATIONNAME = CHIP;
 				TargetAttributes = {
 					B204A61B244E1D0600C7C0E1 = {
@@ -278,11 +291,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				B204A627244E1D0600C7C0E1 /* QRCodeViewController.m in Sources */,
+				B2946A9B24C9A7BF005C87D0 /* DefaultsUtils.m in Sources */,
 				991DC091247747F500C13860 /* EchoViewController.m in Sources */,
 				B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */,
-				1E87C7B624A5E74E00457C90 /* BLEConnectionController.m in Sources */,
 				B204A632244E1D0700C7C0E1 /* main.m in Sources */,
 				B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */,
+				B2946A4224C99D53005C87D0 /* WifiViewController.m in Sources */,
 				0C47BE4424885B97005E97F6 /* CHIPViewControllerBase.m in Sources */,
 				0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */,
 			);
@@ -444,7 +458,6 @@
 		B204A64C244E1D0700C7C0E1 /* Debug iOS */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -468,7 +481,6 @@
 		B204A64D244E1D0700C7C0E1 /* Release iOS */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;

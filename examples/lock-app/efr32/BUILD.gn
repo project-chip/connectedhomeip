@@ -1,0 +1,111 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/defaults.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
+
+assert(current_os == "freertos")
+
+efr32_project_dir = "${chip_root}/examples/lock-app/efr32"
+
+efr32_sdk("sdk") {
+  include_dirs = [
+    "${chip_root}/src/platform/EFR32",
+    "${efr32_project_dir}/include/",
+    "${efr32_project_dir}/src/",
+    "${efr32_project_dir}/src/platform/${efr32_family}/${efr32_board}",
+  ]
+
+  sources = [
+    "${efr32_project_dir}/include/CHIPProjectConfig.h",
+    "${efr32_project_dir}/include/FreeRTOSConfig.h",
+    "${efr32_project_dir}/src/platform/${efr32_family}/${efr32_board}/hal-config.h",
+  ]
+
+  defines = []
+  if (is_debug) {
+    defines += [ "BUILD_RELEASE=0" ]
+  } else {
+    defines += [ "BUILD_RELEASE=1" ]
+  }
+
+  defines += [ "BOARD_ID=${efr32_board}" ]
+}
+
+executable("lock_app") {
+  include_dirs = []
+  defines = []
+  output_name = "chip-efr32-lock-example.out"
+
+  public_deps = [
+    ":sdk",
+    "${chip_root}/src/lib",
+    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
+    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+    "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
+    "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+  ]
+
+  include_dirs += [
+    "${efr32_project_dir}/include/",
+    "${chip_root}/src/app/util",
+  ]
+
+  sources = [
+    "${chip_root}/src/app/clusters/on-off-server/on-off.c",
+    "${chip_root}/src/app/util/attribute-size.c",
+    "${chip_root}/src/app/util/attribute-storage.c",
+    "${chip_root}/src/app/util/attribute-table.c",
+    "${chip_root}/src/app/util/chip-response.cpp",
+    "${chip_root}/src/app/util/client-api.c",
+    "${chip_root}/src/app/util/ember-print.cpp",
+    "${chip_root}/src/app/util/message.c",
+    "${chip_root}/src/app/util/process-cluster-message.c",
+    "${chip_root}/src/app/util/process-global-message.c",
+    "${chip_root}/src/app/util/util.c",
+    "src/AppTask.cpp",
+    "src/BoltLockManager.cpp",
+    "src/ButtonHandler.cpp",
+    "src/DataModelHandler.cpp",
+    "src/LEDWidget.cpp",
+    "src/Server.cpp",
+    "src/gen/call-command-handler.c",
+    "src/gen/callback-stub.c",
+    "src/gen/znet-bookkeeping.c",
+    "src/main.cpp",
+    "src/platform/${efr32_family}/${efr32_board}/hal-config.h",
+    "src/platform/${efr32_family}/${efr32_board}/init_board.c",
+    "src/platform/${efr32_family}/${efr32_board}/init_mcu.c",
+  ]
+
+  output_dir = root_out_dir
+
+  if (efr32_family == "efr32mg12") {
+    ldscript = "${efr32_project_dir}/ldscripts/efr32-lock-example-MG12P.ld"
+  } else if (efr32_family == "efr32mg21") {
+    ldscript = "${efr32_project_dir}/ldscripts/efr32-lock-example-MG21.ld"
+  }
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+}
+
+group("efr32") {
+  deps = [ ":lock_app" ]
+}
+
+group("default") {
+  deps = [ ":efr32" ]
+}

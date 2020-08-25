@@ -169,9 +169,9 @@ Error Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, voi
         lTimer->mNextTimer = this;
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     lLayer.WakeSelect();
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
     return CHIP_SYSTEM_NO_ERROR;
 }
@@ -191,9 +191,9 @@ Error Timer::ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     err = lLayer.PostEvent(*this, chip::System::kEvent_ScheduleWork, 0);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     lLayer.WakeSelect();
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
     return err;
 }

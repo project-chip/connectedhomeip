@@ -42,7 +42,7 @@ libInetLayer_a_CPPFLAGS             = \
     -I$(top_srcdir)/src/system        \
     -I$(top_srcdir)/src/lib           \
     -I$(top_srcdir)/src/lib/core      \
-    $(nl_InetLayer_CPPFLAGS)          \
+    $(chip_InetLayer_CPPFLAGS)        \
     $(NLASSERT_CPPFLAGS)              \
     $(NLFAULTINJECTION_CPPFLAGS)      \
     $(NLIO_CPPFLAGS)                  \

@@ -122,9 +122,9 @@ EXTRA_SRCS += \
     $(EFR32_SDK_ROOT)/util/third_party/segger/systemview/SEGGER/SEGGER_RTT.c
 
 STD_INC_DIRS += \
-    $(CHIP_ROOT)/src/include/platform/EFR32                                                 \
+    $(CHIP_ROOT)/src/include/platform                                                       \
+    $(CHIP_ROOT)/src/platform/EFR32                                                         \
     $(FREERTOS_ROOT)/Source/include                                                         \
-    $(FREERTOS_ROOT)/Source/portable/GCC/ARM_CM3                                            \
     $(EFR32_SDK_ROOT)                                                                       \
     $(EFR32_SDK_ROOT)/hardware/kit/common/bsp                                               \
     $(EFR32_SDK_ROOT)/hardware/kit/common/drivers                                           \
@@ -160,12 +160,14 @@ STD_INC_DIRS += \
 
 ifeq ($(EFR32FAMILY), efr32mg12)
 STD_INC_DIRS += \
+    $(FREERTOS_ROOT)/Source/portable/GCC/ARM_CM4F                                           \
     $(EFR32_SDK_ROOT)/hardware/kit/EFR32MG12_$(BOARD)/config                                \
     $(EFR32_SDK_ROOT)/platform/Device/SiliconLabs/EFR32MG12P/Include                        \
     $(EFR32_SDK_ROOT)/platform/radio/rail_lib/chip/efr32/efr32xg1x
 else
 ifeq ($(EFR32FAMILY), efr32mg21)
 STD_INC_DIRS += \
+    $(FREERTOS_ROOT)/Source/portable/GCC/ARM_CM3                                            \
     $(EFR32_SDK_ROOT)/hardware/kit/EFR32MG21_$(BOARD)/config                                \
     $(EFR32_SDK_ROOT)/platform/Device/SiliconLabs/EFR32MG21/Include                         \
     $(EFR32_SDK_ROOT)/platform/radio/rail_lib/chip/efr32/efr32xg2x
@@ -190,7 +192,7 @@ OBJS_DIR = $(OUTPUT_DIR)/objs
 DEPS_DIR = $(OUTPUT_DIR)/deps
 
 ifeq ($(EFR32FAMILY), efr32mg12)
-FLOAT_ABI = -mfloat-abi=soft
+FLOAT_ABI = -mfloat-abi=softfp
 FLOAT_FPU = -mfpu=fpv4-sp-d16
 else
 ifeq ($(EFR32FAMILY), efr32mg21)
@@ -252,13 +254,15 @@ ifeq ($(EFR32FAMILY), efr32mg12)
 STD_LIBS += \
     $(EFR32_SDK_ROOT)/protocol/bluetooth/lib/EFR32MG12P/GCC/libbluetooth.a \
     $(EFR32_SDK_ROOT)/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg12_gcc_release.a \
-    $(EFR32_SDK_ROOT)/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a
+    $(EFR32_SDK_ROOT)/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a \
+    $(EFR32_SDK_ROOT)/protocol/bluetooth/lib/EFR32MG12P/GCC/libmbedtls.a
 else
 ifeq ($(EFR32FAMILY), efr32mg21)
 STD_LIBS += \
     $(EFR32_SDK_ROOT)/protocol/bluetooth/lib/EFR32MG21/GCC/libbluetooth.a \
     $(EFR32_SDK_ROOT)/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg21_gcc_release.a \
-    $(EFR32_SDK_ROOT)/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a
+    $(EFR32_SDK_ROOT)/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a \
+    $(EFR32_SDK_ROOT)/protocol/bluetooth/lib/EFR32MG21/GCC/libmbedtls.a
 endif
 endif
 

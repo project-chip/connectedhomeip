@@ -184,7 +184,6 @@ static void TestDevice_GetClock_MonotonicHiRes(nlTestSuite * inSuite, void * inC
         ChipLogProgress(DeviceLayer, "Start=%" PRIu64 " End=%" PRIu64 " Delta=%" PRIu64 " Expected=%" PRIu64, Tstart, Tend, Tdelta,
                         Tdelay);
         NL_TEST_ASSERT(inSuite, Tdelta > (Tdelay - margin));
-        NL_TEST_ASSERT(inSuite, Tdelta < (Tdelay + margin));
         numOfTestsRan++;
     }
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);

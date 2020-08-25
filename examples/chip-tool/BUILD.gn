@@ -1,0 +1,72 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/gn/chip/tools.gni")
+
+assert(chip_build_tools)
+
+executable("chip-standalone-demo") {
+  sources = [ "main.cpp" ]
+
+  if (is_debug) {
+    defines = [ "BUILD_RELEASE=0" ]
+  } else {
+    defines = [ "BUILD_RELEASE=1" ]
+  }
+
+  public_deps = [ "${chip_root}/src/lib" ]
+
+  output_dir = root_out_dir
+}
+
+executable("chip-standalone-server") {
+  sources = [
+    "${chip_root}/src/app/clusters/on-off-server/on-off.c",
+    "${chip_root}/src/app/util/attribute-size.c",
+    "${chip_root}/src/app/util/attribute-storage.c",
+    "${chip_root}/src/app/util/attribute-table.c",
+    "${chip_root}/src/app/util/chip-response.cpp",
+    "${chip_root}/src/app/util/client-api.c",
+    "${chip_root}/src/app/util/ember-print.cpp",
+    "${chip_root}/src/app/util/message.c",
+    "${chip_root}/src/app/util/process-cluster-message.c",
+    "${chip_root}/src/app/util/process-global-message.c",
+    "${chip_root}/src/app/util/util.c",
+    "gen/call-command-handler.c",
+    "gen/callback-stub.c",
+    "gen/znet-bookkeeping.c",
+    "server.cpp",
+  ]
+
+  include_dirs = [
+    ".",
+    "${chip_root}/src/app/util",
+  ]
+
+  if (is_debug) {
+    defines = [ "BUILD_RELEASE=0" ]
+  } else {
+    defines = [ "BUILD_RELEASE=1" ]
+  }
+
+  public_deps = [ "${chip_root}/src/lib" ]
+
+  output_dir = root_out_dir
+}
+
+group("chip-tool") {
+  deps = [ ":chip-standalone-demo" ]
+}

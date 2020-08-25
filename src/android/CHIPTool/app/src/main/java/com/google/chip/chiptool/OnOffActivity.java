@@ -50,7 +50,7 @@ public class OnOffActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public View onCreateView(
         LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-      View inflated = inflater.inflate(R.xml.on_off_fragment, container, false);
+      View inflated = inflater.inflate(R.layout.on_off_fragment, container, false);
 
       inflated.findViewById(R.id.send_on_request).setOnClickListener(activity);
 
@@ -66,8 +66,6 @@ public class OnOffActivity extends AppCompatActivity implements View.OnClickList
                   activity.finish();
                 }
               });
-
-      ConnectionStatusFragment.updateStatus(activity);
       return inflated;
     }
 
@@ -78,9 +76,5 @@ public class OnOffActivity extends AppCompatActivity implements View.OnClickList
   }
 
   @Override
-  public void onClick(View view) {
-    if (view.getId() == R.id.send_echo_request) {
-      ConnectionStatusFragment.updateStatus(this);
-    }
-  }
+  public void onClick(View view) {}
 }

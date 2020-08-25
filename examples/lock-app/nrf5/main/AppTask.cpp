@@ -33,12 +33,24 @@
 #include "FreeRTOS.h"
 
 #include <platform/CHIPDeviceLayer.h>
+#if CHIP_ENABLE_OPENTHREAD
+#include <platform/OpenThread/OpenThreadUtils.h>
+#include <platform/ThreadStackManager.h>
+#include <platform/internal/DeviceNetworkInfo.h>
+#include <platform/nRF5/ThreadStackManagerImpl.h>
+#endif
+#include <support/ErrorStr.h>
+#include <system/SystemClock.h>
+
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <setup_payload/SetupPayload.h>
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
+#define EXAMPLE_VENDOR_ID 0xabcd
 
 APP_TIMER_DEF(sFunctionTimer);
 
@@ -52,6 +64,8 @@ static LEDWidget sLockLED;
 static LEDWidget sUnusedLED;
 static LEDWidget sUnusedLED_1;
 
+static LEDWidget sLockStatusLED;
+
 static bool sIsThreadProvisioned     = false;
 static bool sIsThreadEnabled         = false;
 static bool sIsThreadAttached        = false;
@@ -62,7 +76,6 @@ static bool sHaveServiceConnectivity = false;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
-chip::SecureSessionMgr sTransportIPv6;
 
 int AppTask::StartAppTask()
 {
@@ -96,6 +109,9 @@ int AppTask::Init()
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
 
+    sLockStatusLED.Init(LOCK_STATE_LED_GPIO);
+    sLockStatusLED.Set(!BoltLockMgr().IsUnlocked());
+
     sUnusedLED.Init(BSP_LED_2);
     sUnusedLED_1.Init(BSP_LED_3);
 
@@ -103,6 +119,9 @@ int AppTask::Init()
     static app_button_cfg_t sButtons[] = {
         { LOCK_BUTTON, APP_BUTTON_ACTIVE_LOW, BUTTON_PULL, ButtonEventHandler },
         { FUNCTION_BUTTON, APP_BUTTON_ACTIVE_LOW, BUTTON_PULL, ButtonEventHandler },
+#if CHIP_ENABLE_OPENTHREAD
+        { JOIN_BUTTON, APP_BUTTON_ACTIVE_LOW, BUTTON_PULL, ButtonEventHandler },
+#endif
     };
 
     ret = app_button_init(sButtons, ARRAY_SIZE(sButtons), pdMS_TO_TICKS(FUNCTION_BUTTON_DEBOUNCE_PERIOD_MS));
@@ -150,24 +169,124 @@ int AppTask::Init()
         APP_ERROR_HANDLER(NRF_ERROR_NULL);
     }
 
-    // Init ZCL Data Model
-    InitDataModelHandler();
-    StartServer(&sTransportIPv6);
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        chip::SetupPayload payload;
+        uint32_t setUpPINCode       = 0;
+        uint32_t setUpDiscriminator = 0;
+
+        err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
+        if (err != CHIP_NO_ERROR)
+        {
+            NRF_LOG_INFO("ConfigurationMgr().GetSetupPinCode() failed: %s", chip::ErrorStr(err));
+        }
+
+        err = ConfigurationMgr().GetSetupDiscriminator(setUpDiscriminator);
+        if (err != CHIP_NO_ERROR)
+        {
+            NRF_LOG_INFO("ConfigurationMgr().GetSetupDiscriminator() failed: %s", chip::ErrorStr(err));
+        }
+
+        payload.version       = 1;
+        payload.vendorID      = EXAMPLE_VENDOR_ID;
+        payload.productID     = 1;
+        payload.setUpPINCode  = setUpPINCode;
+        payload.discriminator = setUpDiscriminator;
+        chip::QRCodeSetupPayloadGenerator generator(payload);
+
+        // TODO: Usage of STL will significantly increase the image size, this should be changed to more efficient method for
+        // generating payload
+        std::string result;
+        err = generator.payloadBase41Representation(result);
+        if (err != CHIP_NO_ERROR)
+        {
+            NRF_LOG_ERROR("Failed to generate QR Code");
+        }
+
+        NRF_LOG_INFO("SetupPINCode: [%" PRIu32 "]", setUpPINCode);
+        // There might be whitespace in setup QRCode, add brackets to make it clearer.
+        NRF_LOG_INFO("SetupQRCode:  [%s]", result.c_str());
+    }
 
     return ret;
+}
+
+void AppTask::HandleBLEConnectionOpened(chip::Ble::BLEEndPoint * endPoint)
+{
+    ChipLogProgress(DeviceLayer, "AppTask: Connection opened");
+
+    GetAppTask().mBLEEndPoint    = endPoint;
+    endPoint->OnMessageReceived  = AppTask::HandleBLEMessageReceived;
+    endPoint->OnConnectionClosed = AppTask::HandleBLEConnectionClosed;
+}
+
+void AppTask::HandleBLEConnectionClosed(chip::Ble::BLEEndPoint * endPoint, BLE_ERROR err)
+{
+    ChipLogProgress(DeviceLayer, "AppTask: Connection closed");
+
+    GetAppTask().mBLEEndPoint = nullptr;
+}
+
+void AppTask::HandleBLEMessageReceived(chip::Ble::BLEEndPoint * endPoint, chip::System::PacketBuffer * buffer)
+{
+#if CHIP_ENABLE_OPENTHREAD
+    uint16_t bufferLen = buffer->DataLength();
+    uint8_t * data     = buffer->Start();
+    chip::DeviceLayer::Internal::DeviceNetworkInfo networkInfo;
+    ChipLogProgress(DeviceLayer, "AppTask: Receive message size %u", bufferLen);
+
+    memcpy(networkInfo.ThreadNetworkName, data, sizeof(networkInfo.ThreadNetworkName));
+    data += sizeof(networkInfo.ThreadNetworkName);
+
+    memcpy(networkInfo.ThreadExtendedPANId, data, sizeof(networkInfo.ThreadExtendedPANId));
+    data += sizeof(networkInfo.ThreadExtendedPANId);
+
+    memcpy(networkInfo.ThreadMeshPrefix, data, sizeof(networkInfo.ThreadMeshPrefix));
+    data += sizeof(networkInfo.ThreadMeshPrefix);
+
+    memcpy(networkInfo.ThreadNetworkKey, data, sizeof(networkInfo.ThreadNetworkKey));
+    data += sizeof(networkInfo.ThreadNetworkKey);
+
+    memcpy(networkInfo.ThreadPSKc, data, sizeof(networkInfo.ThreadPSKc));
+    data += sizeof(networkInfo.ThreadPSKc);
+
+    networkInfo.ThreadPANId = data[0] | (data[1] << 8);
+    data += sizeof(networkInfo.ThreadPANId);
+    networkInfo.ThreadChannel = data[0];
+    data += sizeof(networkInfo.ThreadChannel);
+
+    networkInfo.FieldPresent.ThreadExtendedPANId = *data;
+    data++;
+    networkInfo.FieldPresent.ThreadMeshPrefix = *data;
+    data++;
+    networkInfo.FieldPresent.ThreadPSKc = *data;
+    data++;
+    networkInfo.NetworkId              = 0;
+    networkInfo.FieldPresent.NetworkId = true;
+
+    ThreadStackMgr().SetThreadEnabled(false);
+    ThreadStackMgr().SetThreadProvision(networkInfo);
+    ThreadStackMgr().SetThreadEnabled(true);
+#endif
+    endPoint->Close();
+    chip::System::PacketBuffer::Free(buffer);
 }
 
 void AppTask::AppTaskMain(void * pvParameter)
 {
     ret_code_t ret;
     AppEvent event;
+    uint64_t mLastChangeTimeUS = 0;
 
     ret = sAppTask.Init();
     if (ret != NRF_SUCCESS)
     {
-        NRF_LOG_INFO("AppTask.Init() failed");
+        NRF_LOG_INFO("AppTask.Init() failed: %s", chip::ErrorStr(ret));
         APP_ERROR_HANDLER(ret);
     }
+
+    chip::DeviceLayer::ConnectivityMgr().AddCHIPoBLEConnectionHandler(&AppTask::HandleBLEConnectionOpened);
+    SetDeviceName("LockDemo._chip._udp.local.");
 
     while (true)
     {
@@ -233,6 +352,18 @@ void AppTask::AppTaskMain(void * pvParameter)
         sLockLED.Animate();
         sUnusedLED.Animate();
         sUnusedLED_1.Animate();
+
+        sLockStatusLED.Set(!BoltLockMgr().IsUnlocked());
+        sLockStatusLED.Animate();
+
+        uint64_t nowUS            = chip::System::Platform::Layer::GetClock_Monotonic();
+        uint64_t nextChangeTimeUS = mLastChangeTimeUS + 5 * 1000 * 1000UL;
+
+        if (nowUS > nextChangeTimeUS)
+        {
+            PublishService();
+            mLastChangeTimeUS = nowUS;
+        }
     }
 }
 
@@ -275,14 +406,29 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
 }
 
+#if CHIP_ENABLE_OPENTHREAD
+void AppTask::JoinHandler(AppEvent * aEvent)
+{
+    if (aEvent->ButtonEvent.PinNo != JOIN_BUTTON)
+        return;
+
+    CHIP_ERROR error = ThreadStackMgr().JoinerStart();
+    NRF_LOG_INFO("Thread joiner triggered: %s", chip::ErrorStr(error));
+}
+#endif
+
 void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 {
-    if (pin_no != LOCK_BUTTON && pin_no != FUNCTION_BUTTON)
+    if (pin_no != LOCK_BUTTON
+#if CHIP_ENABLE_OPENTHREAD
+        && pin_no != JOIN_BUTTON
+#endif
+        && pin_no != FUNCTION_BUTTON)
     {
         return;
     }
 
-    AppEvent button_event;
+    AppEvent button_event           = {};
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.PinNo  = pin_no;
     button_event.ButtonEvent.Action = button_action;
@@ -294,6 +440,16 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
     else if (pin_no == FUNCTION_BUTTON)
     {
         button_event.Handler = FunctionHandler;
+    }
+#if CHIP_ENABLE_OPENTHREAD
+    else if (pin_no == JOIN_BUTTON && button_action == APP_BUTTON_RELEASE)
+    {
+        button_event.Handler = JoinHandler;
+    }
+#endif
+    else
+    {
+        return;
     }
 
     sAppTask.PostEvent(&button_event);

@@ -72,7 +72,7 @@ INSTALLFLAGS                := -C -v
 # Utility Functions
 # ==================================================
 
-QuoteChar = "
+QuoteChar = "# " # the '# "' added here to allow syntax coloring to work in emacs ;)
 MBEDTLS_CONFIG_PATH = -DMBEDTLS_CONFIG_FILE='"mbedtls/esp_config.h"'
 
 DoubleQuoteStr = $(QuoteChar)$(subst $(QuoteChar),\$(QuoteChar),$(subst $(MBEDTLS_CONFIG_PATH),,$(subst \,\\,$(1))))$(QuoteChar)
@@ -193,15 +193,11 @@ $(OUTPUT_DIR) :
 	echo "MKDIR $@"
 	@mkdir -p "$@"
 
-build-chip : configure-chip
-	echo "BUILD CHIP..."
-	MAKEFLAGS= make -C $(OUTPUT_DIR) --no-print-directory all
-
-install-chip : | build-chip
+install-chip : configure-chip
 	echo "INSTALL CHIP..."
 	MAKEFLAGS= make -C $(OUTPUT_DIR) --no-print-directory install
 
-build : build-chip install-chip
+build : install-chip
 	echo "CHIP built and installed..."
 	cp ${OUTPUT_DIR}/lib/libCHIP.a ${OUTPUT_DIR}/libchip.a
 

@@ -93,9 +93,6 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     TCPEndPoint * testTCPEP = NULL;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-    TunEndPoint * testTunEP = NULL;
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
     INET_ERROR err         = INET_NO_ERROR;
     IPAddress testDestAddr = IPAddress::Any;
     char testHostName[20]  = "www.nest.com";
@@ -109,11 +106,6 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
     err = gInet.NewUDPEndPoint(&testUDPEP);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-    err = gInet.NewTunEndPoint(&testTunEP);
-    NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     err = gInet.NewTCPEndPoint(&testTCPEP);
@@ -317,10 +309,7 @@ static void TestInetEndPoint(nlTestSuite * inSuite, void * inContext)
 #if INET_CONFIG_ENABLE_IPV4
     RawEndPoint * testRaw4EP = NULL;
 #endif // INET_CONFIG_ENABLE_IPV4
-    UDPEndPoint * testUDPEP = NULL;
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-    TunEndPoint * testTunEP = NULL;
-#endif
+    UDPEndPoint * testUDPEP  = NULL;
     TCPEndPoint * testTCPEP1 = NULL;
     PacketBuffer * buf       = PacketBuffer::New();
     bool didBind             = false;
@@ -337,11 +326,6 @@ static void TestInetEndPoint(nlTestSuite * inSuite, void * inContext)
 
     err = gInet.NewUDPEndPoint(&testUDPEP);
     NL_TEST_ASSERT(inSuite, err == INET_NO_ERROR);
-
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-    err = gInet.NewTunEndPoint(&testTunEP);
-    NL_TEST_ASSERT(inSuite, err == INET_NO_ERROR);
-#endif
 
     err = gInet.NewTCPEndPoint(&testTCPEP1);
     NL_TEST_ASSERT(inSuite, err == INET_NO_ERROR);
@@ -488,21 +472,6 @@ static void TestInetEndPoint(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_IPV4
 
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-    // TunEndPoint special cases to cover the error branch
-    testTunEP->Init(&gInet);
-    InterfaceId tunId = testTunEP->GetTunnelInterfaceId();
-    NL_TEST_ASSERT(inSuite, tunId == INET_NULL_INTERFACEID);
-    NL_TEST_ASSERT(inSuite, !testTunEP->IsInterfaceUp());
-    err = testTunEP->InterfaceUp();
-    NL_TEST_ASSERT(inSuite, err != INET_NO_ERROR);
-    err = testTunEP->InterfaceDown();
-    NL_TEST_ASSERT(inSuite, err != INET_NO_ERROR);
-    err = testTunEP->Send(buf);
-    NL_TEST_ASSERT(inSuite, err != INET_NO_ERROR);
-    testTunEP->Free();
-#endif
-
     testTCPEP1->Shutdown();
 }
 
@@ -511,9 +480,6 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 {
     RawEndPoint * testRawEP = NULL;
     UDPEndPoint * testUDPEP = NULL;
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-    TunEndPoint * testTunEP = NULL;
-#endif
     TCPEndPoint * testTCPEP = NULL;
     INET_ERROR err;
     char numTimersTest[CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1];
@@ -525,12 +491,6 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
     for (int i = 0; i < INET_CONFIG_NUM_UDP_ENDPOINTS + 1; i++)
         err = gInet.NewUDPEndPoint(&testUDPEP);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_NO_ENDPOINTS);
-
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-    for (int i = 0; i < INET_CONFIG_NUM_TUN_ENDPOINTS + 1; i++)
-        err = gInet.NewTunEndPoint(&testTunEP);
-    NL_TEST_ASSERT(inSuite, err == INET_ERROR_NO_ENDPOINTS);
-#endif
 
     for (int i = 0; i < INET_CONFIG_NUM_TCP_ENDPOINTS + 1; i++)
         err = gInet.NewTCPEndPoint(&testTCPEP);

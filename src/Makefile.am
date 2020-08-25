@@ -56,6 +56,32 @@ MAYBE_QRCODETOOL_SUBDIR           = \
     $(NULL)
 endif
 
+SETUP_PAYLOAD_SUBDIRS             = \
+    setup_payload/java              \
+    $(NULL)
+
+MAYBE_SETUP_PAYLOAD_SUBDIRS       = \
+    $(NULL)
+
+if CHIP_WITH_ANDROID
+MAYBE_SETUP_PAYLOAD_SUBDIRS      += \
+    $(SETUP_PAYLOAD_SUBDIRS)        \
+    $(NULL)
+endif # CHIP_WITH_ANDROID
+
+CONTROLLER_SUBDIRS                = \
+    controller/java                 \
+    $(NULL)
+
+MAYBE_CONTROLLER_SUBDIRS          = \
+    $(NULL)
+
+if CHIP_WITH_ANDROID
+MAYBE_CONTROLLER_SUBDIRS         += \
+    $(CONTROLLER_SUBDIRS)           \
+    $(NULL)
+endif # CHIP_WITH_ANDROID
+
 # Always package (e.g. for 'make dist') these subdirectories.
 
 DIST_SUBDIRS                      = \
@@ -67,6 +93,8 @@ DIST_SUBDIRS                      = \
     inet                            \
     lib                             \
     setup_payload                   \
+    $(CONTROLLER_SUBDIRS)           \
+    $(SETUP_PAYLOAD_SUBDIRS)        \
     crypto                          \
     platform                        \
     qrcodetool                      \
@@ -82,7 +110,9 @@ SUBDIRS                           = \
     system                          \
     inet                            \
     lib                             \
+    $(MAYBE_CONTROLLER_SUBDIRS)     \
     setup_payload                   \
+    $(MAYBE_SETUP_PAYLOAD_SUBDIRS)  \
     crypto                          \
     transport                       \
     $(MAYBE_BLE_SUBDIRS)            \

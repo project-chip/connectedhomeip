@@ -62,7 +62,7 @@ public:
     static const Key kConfigKey_MfrDevicePrivateKey;
     static const Key kConfigKey_ProductRevision;
     static const Key kConfigKey_ManufacturingDate;
-    static const Key kConfigKey_PairingCode;
+    static const Key kConfigKey_SetupPinCode;
     static const Key kConfigKey_FabricId;
     static const Key kConfigKey_ServiceConfig;
     static const Key kConfigKey_PairedAccountId;
@@ -76,6 +76,7 @@ public:
     static const Key kConfigKey_OperationalDeviceCert;
     static const Key kConfigKey_OperationalDeviceICACerts;
     static const Key kConfigKey_OperationalDevicePrivateKey;
+    static const Key kConfigKey_SetupDiscriminator;
 
     static const char kGroupKeyNamePrefix[];
 

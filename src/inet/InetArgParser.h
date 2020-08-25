@@ -26,6 +26,8 @@
 #ifndef INETARGPARSER_H_
 #define INETARGPARSER_H_
 
+#include <core/CHIPConfig.h>
+
 #if CHIP_CONFIG_ENABLE_ARG_PARSER
 
 #include <support/CHIPArgParser.hpp>

@@ -1,0 +1,151 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/nlassert.gni")
+import("//build_overrides/nlfaultinjection.gni")
+import("//build_overrides/nlio.gni")
+
+import("${chip_root}/gn/chip/buildconfig_header.gni")
+import("${chip_root}/gn/chip/tests.gni")
+import("${chip_root}/src/platform/device.gni")
+import("inet.gni")
+
+declare_args() {
+  # Extra header to include in SystemConfig.h for project.
+  chip_inet_project_config_include = ""
+}
+
+buildconfig_header("inet_buildconfig") {
+  header = "InetBuildConfig.h"
+  header_dir = "inet"
+
+  defines = [
+    "INET_CONFIG_TEST=${chip_build_tests}",
+    "INET_CONFIG_ENABLE_IPV4=${chip_inet_config_enable_ipv4}",
+    "INET_CONFIG_ENABLE_DNS_RESOLVER=${chip_inet_config_enable_dns_resolver}",
+    "INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS=${chip_inet_config_enable_async_dns_sockets}",
+    "INET_CONFIG_ENABLE_RAW_ENDPOINT=${chip_inet_config_enable_raw_endpoint}",
+    "INET_CONFIG_ENABLE_TCP_ENDPOINT=${chip_inet_config_enable_tcp_endpoint}",
+    "INET_CONFIG_ENABLE_UDP_ENDPOINT=${chip_inet_config_enable_udp_endpoint}",
+    "HAVE_LWIP_RAW_BIND_NETIF=true",
+  ]
+
+  if (chip_inet_project_config_include != "") {
+    defines +=
+        [ "INET_PROJECT_CONFIG_INCLUDE=${chip_inet_project_config_include}" ]
+  }
+  if (chip_inet_platform_config_include != "") {
+    defines +=
+        [ "INET_PLATFORM_CONFIG_INCLUDE=${chip_inet_platform_config_include}" ]
+  }
+}
+
+source_set("inet_config_header") {
+  sources = [ "InetConfig.h" ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+
+  public_deps = [
+    ":inet_buildconfig",
+    "${chip_root}/src/system:system_config_header",
+  ]
+}
+
+static_library("inet") {
+  output_name = "libInetLayer"
+
+  sources = [
+    "EndPointBasis.cpp",
+    "EndPointBasis.h",
+    "IANAConstants.h",
+    "IPAddress-StringFuncts.cpp",
+    "IPAddress.cpp",
+    "IPAddress.h",
+    "IPEndPointBasis.cpp",
+    "IPEndPointBasis.h",
+    "IPPrefix.cpp",
+    "IPPrefix.h",
+    "Inet.h",
+    "InetArgParser.cpp",
+    "InetArgParser.h",
+    "InetError.cpp",
+    "InetError.h",
+    "InetFaultInjection.h",
+    "InetInterface.cpp",
+    "InetInterface.h",
+    "InetLayer.cpp",
+    "InetLayer.h",
+    "InetLayerBasis.cpp",
+    "InetLayerBasis.h",
+    "InetLayerEvents.h",
+    "InetUtils.cpp",
+    "arpa-inet-compatibility.h",
+  ]
+
+  public_deps = [
+    ":inet_config_header",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/system",
+    "${nlio_root}:nlio",
+  ]
+
+  if (chip_inet_config_enable_raw_endpoint) {
+    sources += [
+      "RawEndPoint.cpp",
+      "RawEndPoint.h",
+    ]
+  }
+
+  if (chip_inet_config_enable_tcp_endpoint) {
+    sources += [
+      "TCPEndPoint.cpp",
+      "TCPEndPoint.h",
+    ]
+  }
+
+  if (chip_inet_config_enable_udp_endpoint) {
+    sources += [
+      "UDPEndPoint.cpp",
+      "UDPEndPoint.h",
+    ]
+  }
+
+  if (chip_inet_config_enable_dns_resolver) {
+    sources += [
+      "DNSResolver.cpp",
+      "DNSResolver.h",
+    ]
+  }
+
+  if (chip_inet_config_enable_async_dns_sockets) {
+    sources += [
+      "AsyncDNSResolverSockets.cpp",
+      "AsyncDNSResolverSockets.h",
+    ]
+  }
+
+  if (chip_with_nlfaultinjection) {
+    sources += [ "InetFaultInjection.cpp" ]
+    public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
+  }
+
+  include_dirs = []
+  if (current_os == "android") {
+    include_dirs += [
+      "${chip_root}/third_party/android/platform-libcore/android-platform-libcore/luni/src/main/native",
+      "${chip_root}/third_party/android/platform-libcore/android-platform-libcore/include",
+    ]
+  }
+}

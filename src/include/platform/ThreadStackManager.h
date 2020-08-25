@@ -24,6 +24,8 @@
 #ifndef THREAD_STACK_MANAGER_H
 #define THREAD_STACK_MANAGER_H
 
+//#include <platform/PlatformManager.h>
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -34,8 +36,11 @@ class ConfigurationManagerImpl;
 namespace Internal {
 class DeviceNetworkInfo;
 class DeviceControlServer;
+class BLEManagerImpl;
 template <class>
 class GenericPlatformManagerImpl;
+template <class>
+class GenericConfigurationManagerImpl;
 template <class>
 class GenericPlatformManagerImpl_FreeRTOS;
 template <class>
@@ -67,20 +72,24 @@ public:
     void LockThreadStack(void);
     bool TryLockThreadStack(void);
     void UnlockThreadStack(void);
-    bool HaveRouteToAddress(const IPAddress & destAddr);
+    bool HaveRouteToAddress(const Inet::IPAddress & destAddr);
     CHIP_ERROR GetAndLogThreadStatsCounters(void);
     CHIP_ERROR GetAndLogThreadTopologyMinimal(void);
     CHIP_ERROR GetAndLogThreadTopologyFull(void);
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
 
-    void FactoryReset(void);
+    CHIP_ERROR JoinerStart(void);
+    CHIP_ERROR SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo);
+    CHIP_ERROR SetThreadEnabled(bool val);
 
 private:
     // ===== Members for internal use by the following friends.
 
     friend class PlatformManagerImpl;
     friend class ConfigurationManagerImpl;
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     friend class Internal::BLEManagerImpl;
+#endif
     friend class Internal::DeviceControlServer;
     template <class>
     friend class Internal::GenericPlatformManagerImpl;
@@ -101,11 +110,9 @@ private:
 
     void OnPlatformEvent(const ChipDeviceEvent * event);
     bool IsThreadEnabled(void);
-    CHIP_ERROR SetThreadEnabled(bool val);
     bool IsThreadProvisioned(void);
     bool IsThreadAttached(void);
     CHIP_ERROR GetThreadProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials);
-    CHIP_ERROR SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo);
     void ErasePersistentInfo(void);
     ConnectivityManager::ThreadDeviceType GetThreadDeviceType(void);
     CHIP_ERROR SetThreadDeviceType(ConnectivityManager::ThreadDeviceType threadRole);
@@ -151,10 +158,9 @@ extern ThreadStackManagerImpl & ThreadStackMgrImpl(void);
  */
 #ifdef EXTERNAL_THREADSTACKMANAGERIMPL_HEADER
 #include EXTERNAL_THREADSTACKMANAGERIMPL_HEADER
-#else
+#elif defined(CHIP_DEVICE_LAYER_TARGET)
 #define THREADSTACKMANAGERIMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/ThreadStackManagerImpl.h>
 #include THREADSTACKMANAGERIMPL_HEADER
-#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -297,7 +303,13 @@ inline CHIP_ERROR ThreadStackManager::GetPrimary802154MACAddress(uint8_t * buf)
     return static_cast<ImplClass *>(this)->_GetPrimary802154MACAddress(buf);
 }
 
+inline CHIP_ERROR ThreadStackManager::JoinerStart(void)
+{
+    return static_cast<ImplClass *>(this)->_JoinerStart();
+}
+
 } // namespace DeviceLayer
 } // namespace chip
 
+#endif // defined(CHIP_DEVICE_LAYER_TARGET)
 #endif // THREAD_STACK_MANAGER_H

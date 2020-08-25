@@ -52,6 +52,7 @@ EXTRA_DIST                               = \
     bootstrap                              \
     bootstrap-configure                    \
     repos.conf                             \
+    .gitmodules                            \
     $(srcdir)/build/autoconf               \
     $(srcdir)/config                       \
     $(srcdir)/config/efr32                 \
@@ -191,6 +192,13 @@ $(builddir)/.local-version.min: $(builddir)/.local-version
 
 DISTCHECK_CONFIGURE_FLAGS = `chmod u+w ../.. ../../third_party`
 
+#
+# BlueZ is not well set-up without patching to handle 'make distcheck';
+# disable it for that target.
+#
+
+DISTCHECK_CONFIGURE_FLAGS += --without-bluez
+
 all-recursive check-recursive coverage-recursive install-recursive pretty-recursive pretty-check-recursive dist distcheck distdir install-headers: $(BUILT_SOURCES)
 
 dist-hook: $(distdir)/.dist-version
@@ -206,6 +214,14 @@ dist-hook: $(distdir)/.dist-version
 #
 distclean-local:
 	$(MAKE) -C $(srcdir) -f Makefile-bootstrap clean-repos
+
+#
+# Top-level convenience target for making documentation.
+#
+
+.PHONY: doc
+doc: $(BUILT_SOURCES)
+	$(MAKE) -C docs $(@)
 
 #
 # Top-level convenience target for making a documentation-only

@@ -52,8 +52,7 @@ public:
      *
      */
     template <class T>
-    void SetMessageReceiveHandler(void (*handler)(const MessageHeader &, const PeerAddress &, System::PacketBuffer *, T *),
-                                  T * param)
+    void SetMessageReceiveHandler(void (*handler)(MessageHeader &, const PeerAddress &, System::PacketBuffer *, T *), T * param)
     {
         mMessageReceivedArgument = param;
         OnMessageReceived        = reinterpret_cast<MessageReceiveHandler>(handler);
@@ -69,11 +68,11 @@ public:
     virtual CHIP_ERROR SendMessage(const MessageHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) = 0;
 
     /**
-     * Get the path that this transport is associated with.
+     * Determine if this transport can SendMessage to the specified peer address.
      *
-     * Within a system, only one transport should be associated with a path.
+     * Generally it is expected that a transport can send to any peer from which it receives a message.
      */
-    virtual Type GetType() = 0;
+    virtual bool CanSendToPeer(const Transport::PeerAddress & address) = 0;
 
 protected:
     /**

@@ -59,12 +59,8 @@ static void TestPlatformMgr_StartEventLoopTask(nlTestSuite * inSuite, void * inC
 static void TestPlatformMgr_TryLockChipStack(nlTestSuite * inSuite, void * inContext)
 {
     bool locked = PlatformMgr().TryLockChipStack();
-    NL_TEST_ASSERT(inSuite, locked);
-
-    PlatformMgr().LockChipStack();
-    locked = PlatformMgr().TryLockChipStack();
-    PlatformMgr().UnlockChipStack();
-    NL_TEST_ASSERT(inSuite, locked);
+    if (locked)
+        PlatformMgr().UnlockChipStack();
 }
 
 static int sEventRecieved = 0;

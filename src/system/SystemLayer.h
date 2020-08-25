@@ -38,6 +38,8 @@
 
 // Include dependent headers
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#include <system/SystemWakeEvent.h>
+
 #include <sys/select.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -146,11 +148,11 @@ public:
 
     Error ScheduleWork(TimerCompleteFunct aComplete, void * aAppState);
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     void PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet, fd_set * aExceptionSet, struct timeval & aSleepTime);
     void HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteSet, fd_set * aExceptionSet);
     void WakeSelect(void);
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     typedef Error (*EventHandler)(Object & aTarget, EventType aEventType, uintptr_t aArgument);
@@ -187,14 +189,12 @@ private:
     bool mTimerComplete;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    int mWakePipeIn;
-    int mWakePipeOut;
-
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    SystemWakeEvent mWakeEvent;
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     pthread_t mHandleSelectThread;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     static Error HandleSystemLayerEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument);

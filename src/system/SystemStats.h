@@ -31,6 +31,7 @@
 
 // Include configuration headers
 #include <core/CHIPConfig.h>
+#include <inet/InetConfig.h>
 
 // Include dependent headers
 #include <support/DLLUtil.h>
@@ -66,9 +67,6 @@ enum
 #if INET_CONFIG_NUM_UDP_ENDPOINTS
     kInetLayer_NumUDPEps,
 #endif
-#if INET_CONFIG_NUM_TUN_ENDPOINTS
-    kInetLayer_NumTunEps,
-#endif
 #if INET_CONFIG_NUM_DNS_RESOLVERS
     kInetLayer_NumDNSResolvers,
 #endif
@@ -76,10 +74,6 @@ enum
     kExchangeMgr_NumUMHandlers,
     kExchangeMgr_NumBindings,
     kMessageLayer_NumConnections,
-#if CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
-    kServiceMgr_NumRequests,
-#endif
-
     kNumEntries
 };
 

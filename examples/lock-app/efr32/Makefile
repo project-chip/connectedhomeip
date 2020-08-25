@@ -80,10 +80,26 @@ SRCS = \
     $(PROJECT_ROOT)/src/main.cpp                                                             \
     $(PROJECT_ROOT)/src/LEDWidget.cpp                                                        \
     $(PROJECT_ROOT)/src/AppTask.cpp                                                          \
+    $(PROJECT_ROOT)/src/BoltLockManager.cpp                                                  \
     $(PROJECT_ROOT)/src/ButtonHandler.cpp                                                    \
-    $(PROJECT_ROOT)/src/init_mcu.c                                                           \
-    $(PROJECT_ROOT)/src/init_board.c                                                         \
-    $(EFR32_SDK_ROOT)/hardware/kit/common/bsp/bsp_bcc.c                                      \
+    $(PROJECT_ROOT)/src/DataModelHandler.cpp                                                 \
+    $(PROJECT_ROOT)/src/Server.cpp                                                           \
+    $(PROJECT_ROOT)/src/platform/$(EFR32FAMILY)/$(BOARD)/init_mcu.c                          \
+    $(PROJECT_ROOT)/src/platform/$(EFR32FAMILY)/$(BOARD)/init_board.c                        \
+    $(PROJECT_ROOT)/src/gen/call-command-handler.c                                           \
+    $(PROJECT_ROOT)/src/gen/callback-stub.c                                                  \
+    $(PROJECT_ROOT)/src/gen/znet-bookkeeping.c                                               \
+    $(CHIP_ROOT)/src/app/util/attribute-size.c                                               \
+    $(CHIP_ROOT)/src/app/util/attribute-storage.c                                            \
+    $(CHIP_ROOT)/src/app/util/attribute-table.c                                              \
+    $(CHIP_ROOT)/src/app/util/chip-response.cpp                                              \
+    $(CHIP_ROOT)/src/app/util/client-api.c                                                   \
+    $(CHIP_ROOT)/src/app/util/ember-print.cpp                                                \
+    $(CHIP_ROOT)/src/app/util/message.c                                                      \
+    $(CHIP_ROOT)/src/app/util/process-cluster-message.c                                      \
+    $(CHIP_ROOT)/src/app/util/process-global-message.c                                       \
+    $(CHIP_ROOT)/src/app/util/util.c                                                         \
+    $(CHIP_ROOT)/src/app/clusters/on-off-server/on-off.c                                     \
     $(EFR32_SDK_ROOT)/hardware/kit/common/bsp/bsp_init.c                                     \
     $(EFR32_SDK_ROOT)/hardware/kit/common/bsp/bsp_stk.c                                      \
     $(EFR32_SDK_ROOT)/hardware/kit/common/bsp/bsp_stk_leds.c                                 \
@@ -110,18 +126,20 @@ SRCS = \
     $(EFR32_SDK_ROOT)/platform/service/mpu/src/sl_mpu.c                                      \
     $(EFR32_SDK_ROOT)/platform/service/sleeptimer/src/sl_sleeptimer.c                        \
     $(EFR32_SDK_ROOT)/platform/service/sleeptimer/src/sl_sleeptimer_hal_rtcc.c               \
-    $(EFR32_SDK_ROOT)/hardware/kit/common/drivers/mx25flash_spi.c                            \
     $(EFR32_SDK_ROOT)/hardware/kit/common/drivers/retargetio.c                               \
     $(EFR32_SDK_ROOT)/hardware/kit/common/drivers/retargetserial.c                           \
 
 INC_DIRS = \
     $(PROJECT_ROOT)                                                                       \
+    $(PROJECT_ROOT)/src/                                                                  \
+    $(PROJECT_ROOT)/src/platform/$(EFR32FAMILY)/$(BOARD)                                  \
     $(PROJECT_ROOT)/include                                                               \
     $(PROJECT_ROOT)/traits/include                                                        \
     $(PROJECT_ROOT)/schema/include                                                        \
     $(CHIP_ROOT)/src/include/                                                             \
     $(CHIP_ROOT)/src/lib                                                                  \
     $(CHIP_ROOT)/src/                                                                     \
+    $(CHIP_ROOT)/src/app/util                                                             \
     $(CHIP_ROOT)/src/system                                                               \
     $(EFR32_SDK_ROOT)                                                                     \
     $(EFR32_SDK_ROOT)/platform/radio/rail_lib/common                                      \
@@ -149,10 +167,12 @@ INC_DIRS = \
     $(EFR32_SDK_ROOT)/util/plugin/plugin-common/fem-control                               \
     $(EFR32_SDK_ROOT)/hardware/kit/common/drivers/                                        \
     $(EFR32_SDK_ROOT)/hardware/kit/common/halconfig/                                      \
+    $(EFR32_SDK_ROOT)/util/third_party/mbedtls/sl_crypto/include                          \
 
 # Board specfic SRCs and INCs
 ifeq ($(EFR32FAMILY), efr32mg12)
 SRCS += \
+    $(EFR32_SDK_ROOT)/hardware/kit/common/drivers/mx25flash_spi.c                            \
     $(EFR32_SDK_ROOT)/platform/Device/SiliconLabs/EFR32MG12P/Source/system_efr32mg12p.c      \
     $(EFR32_SDK_ROOT)/platform/Device/SiliconLabs/EFR32MG12P/Source/GCC/startup_efr32mg12p.c
 INC_DIRS += \
@@ -163,10 +183,12 @@ else
 ifeq ($(EFR32FAMILY), efr32mg21)
 SRCS += \
     $(EFR32_SDK_ROOT)/platform/Device/SiliconLabs/EFR32MG21/Source/system_efr32mg21.c      \
-    $(EFR32_SDK_ROOT)/platform/Device/SiliconLabs/EFR32MG21/Source/GCC/startup_efr32mg21.c
+    $(EFR32_SDK_ROOT)/platform/Device/SiliconLabs/EFR32MG21/Source/GCC/startup_efr32mg21.c \
+    $(EFR32_SDK_ROOT)/platform/emlib/src/em_se.c                                           
 INC_DIRS += \
+    $(EFR32_SDK_ROOT)/util/third_party/mbedtls/include                                     \
     $(EFR32_SDK_ROOT)/hardware/kit/EFR32MG21_$(BOARD)/config                               \
-    $(EFR32_SDK_ROOT)/platform/Device/SiliconLabs/EFR32MG21/Include
+    $(EFR32_SDK_ROOT)/platform/Device/SiliconLabs/EFR32MG21/Include                    
 LINKER_SCRIPT=./ldscripts/$(APP)-MG21.ld
 endif
 endif
@@ -186,6 +208,8 @@ ifeq ($(SHOW_QR_CODE), 1)
 endif
 
 DEFINES += \
+  $(BOARD)=1                                            \
+  BOARD_ID=$(BOARD)                                     \
   HARD_FAULT_LOG_ENABLE                                 \
   RETARGET_VCOM                                         \
   RETARGET_USART0                                       \

@@ -1,0 +1,290 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
+import("//build/config/compiler/compiler.gni")
+import("//build/config/target.gni")
+
+declare_args() {
+  # Enable -Werror. This can be disabled if using a different compiler
+  # with unfixed or unsupported wanings.
+  treat_warnings_as_errors = true
+}
+
+_is_embedded_arm = current_os != "ios" && current_os != "mac_os" &&
+                   (current_cpu == "arm" || current_cpu == "arm64")
+
+if (_is_embedded_arm) {
+  import("//build/config/arm.gni")
+} else if (current_cpu == "x86" || current_cpu == "x86_64") {
+  import("//build/config/x86.gni")
+}
+
+config("release") {
+  defines = [ "NDEBUG" ]
+}
+
+config("debug_default") {
+  if (!is_debug) {
+    configs = [ ":release" ]
+  }
+}
+
+config("abi_default") {
+  cflags = []
+  if (_is_embedded_arm) {
+    if (arm_arch != "") {
+      cflags += [ "-march=${arm_arch}" ]
+    }
+    if (arm_cpu != "") {
+      cflags += [ "-mcpu=${arm_cpu}" ]
+    }
+    if (arm_tune != "") {
+      cflags += [ "-mtune=${arm_tune}" ]
+    }
+    if (arm_abi != "") {
+      cflags += [ "-mabi=${arm_abi}" ]
+    }
+    if (arm_fpu != "") {
+      cflags += [ "-mfpu=${arm_fpu}" ]
+    }
+    if (arm_float_abi != "") {
+      cflags += [ "-mfloat-abi=${arm_float_abi}" ]
+    }
+    if (arm_use_thumb) {
+      cflags += [ "-mthumb" ]
+    }
+  } else if (current_cpu == "x86" || current_cpu == "x86_64") {
+    if (x86_arch != "") {
+      cflags += [ "-march=${x86_arch}" ]
+    }
+    if (x86_cpu != "") {
+      cflags += [ "-mcpu=${x86_cpu}" ]
+    }
+    if (x86_tune != "") {
+      cflags += [ "-mtune=${x86_tune}" ]
+    }
+
+    if (current_cpu == "x86_64") {
+      cflags += [
+        "-msse4.2",
+        "-mpopcnt",
+        "-m64",
+      ]
+    } else if (current_cpu == "x86") {
+      cflags += [
+        "-mssse3",
+        "-mfpmath=sse",
+        "-m32",
+      ]
+    }
+  }
+  ldflags = cflags
+}
+
+config("target_default") {
+  if (current_toolchain == default_toolchain) {
+    defines = target_defines
+    cflags = target_cflags
+    cflags_c = target_cflags_c
+    cflags_cc = target_cflags_cc
+    ldflags = target_ldflags
+  }
+}
+
+config("optimize_zero") {
+  cflags = [ "-O0" ]
+  ldflags = cflags
+}
+
+config("optimize_default") {
+  if (is_debug) {
+    if (optimize_debug) {
+      configs = [ "$dir_pw_build:optimize_debugging" ]
+    } else {
+      configs = [ ":optimize_zero" ]
+    }
+  } else {
+    if (optimize_for_size) {
+      configs = [ "$dir_pw_build:optimize_size" ]
+    } else {
+      configs = [ "$dir_pw_build:optimize_speed" ]
+    }
+
+    if (current_os != "mac") {
+      ldflags = [
+        "-Wl,-O2",
+        "-Wl,--gc-sections",
+      ]
+    }
+  }
+}
+
+config("disabled_warnings") {
+  cflags = [
+    "-Wno-deprecated-declarations",
+    "-Wno-unknown-warning-option",
+  ]
+  cflags_cc = [
+    "-Wno-non-virtual-dtor",
+    "-Wno-deprecated-copy",
+  ]
+  if (!is_clang) {
+    cflags += [
+      "-Wno-psabi",
+      "-Wno-cast-function-type",
+      "-Wno-maybe-uninitialized",
+    ]
+  }
+}
+
+config("strict_warnings") {
+  cflags = [ "-Wall" ]
+
+  ldflags = []
+
+  if (treat_warnings_as_errors) {
+    cflags += [ "-Werror" ]
+    ldflags += [ "-Werror" ]
+  }
+
+  if (is_clang) {
+    cflags += [ "-Wimplicit-fallthrough" ]
+  }
+}
+
+config("warnings_default") {
+  configs = [
+    ":strict_warnings",
+    ":disabled_warnings",
+  ]
+
+  if (current_os != "mac" && current_os != "ios") {
+    ldflags = [ "-Wl,--fatal-warnings" ]
+  }
+}
+
+config("symbols_default") {
+  cflags = [ "-g${symbol_level}" ]
+}
+
+config("gnu11") {
+  cflags_c = [ "-std=gnu11" ]
+  cflags_cc = [ "-std=gnu++11" ]
+}
+
+config("std_default") {
+  configs = [ ":gnu11" ]
+}
+
+config("cosmetic_default") {
+  configs = [ "$dir_pw_build:colorize_output" ]
+}
+
+config("runtime_default") {
+  if (is_clang) {
+    configs = [
+      "$dir_pw_toolchain/host_clang:no_system_libcpp",
+      "$dir_pw_toolchain/host_clang:xcode_sysroot",
+    ]
+  }
+  if (current_os == "linux") {
+    libs = [
+      "dl",
+      "pthread",
+      "rt",
+    ]
+  }
+}
+
+config("sanitize_default") {
+}
+
+config("fuzzing_default") {
+}
+
+config("no_rtti") {
+  cflags_cc = [ "-fno-rtti" ]
+}
+
+config("rtti") {
+  cflags_cc = [ "-frtti" ]
+}
+
+config("rtti_default") {
+  configs = [ ":no_rtti" ]
+}
+
+config("no_exceptions") {
+  cflags = [ "-fno-exceptions" ]
+}
+
+config("exceptions") {
+  cflags = [ "-fexceptions" ]
+}
+
+config("exceptions_default") {
+  configs = [ ":no_exceptions" ]
+}
+
+config("unwind_tables_default") {
+  cflags = [
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+  ]
+}
+
+config("size_default") {
+  cflags = [
+    "-fno-common",
+    "-ffunction-sections",
+    "-fdata-sections",
+  ]
+}
+
+config("stack_protector_default") {
+  cflags = [ "-fno-stack-protector" ]
+}
+
+config("pic_default") {
+  if (enable_pic) {
+    cflags = [ "-fPIC" ]
+    ldflags = cflags
+  }
+}
+
+config("pie_default") {
+  if (enable_pie) {
+    ldflags = [ "-pie" ]
+  }
+}
+
+config("aliasing_default") {
+  cflags = [ "-fno-strict-aliasing" ]
+}
+
+config("specs_default") {
+  if (current_cpu == "arm" && current_os == "freertos") {
+    cflags = [
+      "--specs=nosys.specs",
+      "--specs=nano.specs",
+    ]
+
+    libs = [ "nosys" ]
+
+    ldflags = cflags
+  }
+}

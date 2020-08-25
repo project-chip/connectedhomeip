@@ -60,14 +60,23 @@ libCHIP_a_CPPFLAGS                  =                         \
     -I$(top_srcdir)/src                                       \
     -I$(top_srcdir)/src/include                               \
     -I$(top_srcdir)/src/lib                                   \
-    -I$(top_srcdir)/src/app/chip-zcl                          \
+    -I$(top_srcdir)/src/app/util                              \
     -I$(top_srcdir)/src/app/gen                               \
+    $(chip_InetLayer_CPPFLAGS)                                \
     $(NLASSERT_CPPFLAGS)                                      \
     $(NLFAULTINJECTION_CPPFLAGS)                              \
     $(NLIO_CPPFLAGS)                                          \
     $(LWIP_CPPFLAGS)                                          \
     $(SOCKETS_CPPFLAGS)                                       \
+    $(OT_BR_POSIX_CPPFLAGS)                                   \
+    $(DBUS_CFLAGS)                                            \
     $(NULL)
+
+if CHIP_DEVICE_LAYER_TARGET_LINUX
+libCHIP_a_CPPFLAGS                                         += \
+    $(GIO_CFLAGS)                                             \
+    $(NULL)
+endif
 
 libCHIP_a_SOURCES                   = $(CHIP_BUILD_SYSTEM_LAYER_SOURCE_FILES)
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_INET_LAYER_SOURCE_FILES)

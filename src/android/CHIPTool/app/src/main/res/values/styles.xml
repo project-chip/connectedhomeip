@@ -7,4 +7,6 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="title_text" parent="TextAppearance.AppCompat.Title" />
+    <style name="info_text" parent="TextAppearance.AppCompat.Medium" />
 </resources>

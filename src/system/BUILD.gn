@@ -1,0 +1,155 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/nlassert.gni")
+import("//build_overrides/nlfaultinjection.gni")
+
+import("${chip_root}/gn/chip/buildconfig_header.gni")
+import("${chip_root}/gn/chip/tests.gni")
+import("${chip_root}/src/platform/device.gni")
+import("system.gni")
+
+declare_args() {
+  # Extra header to include in CHIPConfig.h for project.
+  # TODO - This should probably be in src/core but src/system also uses it.
+  chip_project_config_include = "<CHIPProjectConfig.h>"
+
+  # Extra header to include in SystemConfig.h for project.
+  chip_system_project_config_include = "<SystemProjectConfig.h>"
+
+  # Extra include dirs for project configs.
+  chip_project_config_include_dirs = []
+}
+
+if (chip_project_config_include_dirs == [] &&
+    chip_project_config_include == "<CHIPProjectConfig.h>" &&
+    chip_system_project_config_include == "<SystemProjectConfig.h>") {
+  chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
+}
+
+buildconfig_header("system_buildconfig") {
+  header = "SystemBuildConfig.h"
+  header_dir = "system"
+
+  config_device_layer = chip_device_platform != "none"
+  chip_system_config_posix_locking = chip_system_config_locking == "posix"
+  chip_system_config_freertos_locking = chip_system_config_locking == "freertos"
+  chip_system_config_no_locking = chip_system_config_locking == "none"
+  have_clock_gettime = chip_system_config_clock == "clock_gettime"
+  have_clock_settime = have_clock_gettime
+  have_gettimeofday = chip_system_config_clock == "gettimeofday"
+
+  defines = [
+    "CONFIG_DEVICE_LAYER=${config_device_layer}",
+    "CHIP_SYSTEM_CONFIG_TEST=${chip_build_tests}",
+    "CHIP_WITH_NLFAULTINJECTION=${chip_with_nlfaultinjection}",
+    "CHIP_SYSTEM_CONFIG_USE_LWIP=${chip_system_config_use_lwip}",
+    "CHIP_SYSTEM_CONFIG_USE_SOCKETS=${chip_system_config_use_sockets}",
+    "CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK=false",
+    "CHIP_SYSTEM_CONFIG_POSIX_LOCKING=${chip_system_config_posix_locking}",
+    "CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING=${chip_system_config_freertos_locking}",
+    "CHIP_SYSTEM_CONFIG_NO_LOCKING=${chip_system_config_no_locking}",
+    "CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS=${chip_system_config_provide_statistics}",
+    "HAVE_CLOCK_GETTIME=${have_clock_gettime}",
+    "HAVE_CLOCK_SETTIME=${have_clock_settime}",
+    "HAVE_GETTIMEOFDAY=${have_gettimeofday}",
+    "HAVE_SYS_TIME_H=true",
+    "HAVE_NETINET_ICMP6_H=true",
+    "HAVE_ICMP6_FILTER=true",
+    "CONFIG_HAVE_VCBPRINTF=false",
+    "CONFIG_HAVE_VSNPRINTF_EX=false",
+    "HAVE_SYS_SOCKET_H=${chip_system_config_use_sockets}",
+  ]
+
+  if (chip_project_config_include != "") {
+    defines += [ "CHIP_PROJECT_CONFIG_INCLUDE=${chip_project_config_include}" ]
+  }
+  if (chip_platform_config_include != "") {
+    defines +=
+        [ "CHIP_PLATFORM_CONFIG_INCLUDE=${chip_platform_config_include}" ]
+  }
+  if (chip_system_project_config_include != "") {
+    defines += [
+      "SYSTEM_PROJECT_CONFIG_INCLUDE=${chip_system_project_config_include}",
+    ]
+  }
+  if (chip_system_platform_config_include != "") {
+    defines += [
+      "SYSTEM_PLATFORM_CONFIG_INCLUDE=${chip_system_platform_config_include}",
+    ]
+  }
+}
+
+config("system_config") {
+  include_dirs = chip_project_config_include_dirs
+}
+
+source_set("system_config_header") {
+  sources = [ "SystemConfig.h" ]
+
+  public_configs = [
+    ":system_config",
+    "${chip_root}/src:includes",
+  ]
+
+  public_deps = [ ":system_buildconfig" ]
+
+  if (chip_system_config_use_lwip) {
+    public_deps += [ "${chip_root}/src/lwip" ]
+  }
+}
+
+static_library("system") {
+  output_name = "libSystemLayer"
+
+  sources = [
+    "SystemAlignSize.h",
+    "SystemClock.cpp",
+    "SystemClock.h",
+    "SystemConfig.h",
+    "SystemError.cpp",
+    "SystemError.h",
+    "SystemEvent.h",
+    "SystemFaultInjection.h",
+    "SystemLayer.cpp",
+    "SystemLayer.h",
+    "SystemLayerPrivate.h",
+    "SystemMutex.cpp",
+    "SystemMutex.h",
+    "SystemObject.cpp",
+    "SystemObject.h",
+    "SystemPacketBuffer.cpp",
+    "SystemPacketBuffer.h",
+    "SystemStats.cpp",
+    "SystemStats.h",
+    "SystemTimer.cpp",
+    "SystemTimer.h",
+    "SystemWakeEvent.cpp",
+    "SystemWakeEvent.h",
+    "TimeSource.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/support",
+    "${nlassert_root}:nlassert",
+  ]
+
+  allow_circular_includes_from = [ "${chip_root}/src/lib/support" ]
+
+  if (chip_with_nlfaultinjection) {
+    sources += [ "SystemFaultInjection.cpp" ]
+    public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
+  }
+}

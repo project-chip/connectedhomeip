@@ -511,7 +511,7 @@ menu "CHIP Device Layer"
 
         config BLE_FAST_ADVERTISING_INTERVAL
             int "Fast Advertising Interval"
-            default 800
+            default 320
             depends on ENABLE_CHIPOBLE
             help
                 The interval (in units of 0.625ms) at which the device will send BLE advertisements while
@@ -652,20 +652,27 @@ menu "CHIP Device Layer"
 
                 This option is for testing only and should not be enabled in production releases.
 
-        config USE_TEST_PAIRING_CODE
-            string "Use Test Pairing Code"
-            default "CHIPUS"
+        config USE_TEST_SETUP_PIN_CODE
+            int "Use Test Setup Pin Code"
+            range 0 99999999
+            default 12345678
             help
-                Specifies a hard-coded device pairing code to be used if none is found in CHIP NV storage.
-                Setting the value to an empty string disables the feature.
+                Specifies a hard-coded device setup pin code to be used if none is found in CHIP NV storage.
+                Setting the value to 0 disables the feature.
 
-                Note that any string up to 15 characters can be used here.  However, the code within
-                the CHIP commissioner mobile application that orchestrates the device pairing process
-                expects this string to end with a valid Verhoeff check character, and will reject any
-                input that does not.
+                Note that any decimal integer number between 00000000 and 99999999 can be used here.
 
-                Other valid but memorable 6 character pairing codes include: TESTEM, MAXBUX, TRYAGN
-                and CHIPHW.
+                This option is for testing only and should not be enabled in production releases.
+
+        config USE_TEST_SETUP_DISCRIMINATOR
+            hex "Use Test Setup discriminator"
+            range 0x000 0xFFF
+            default 0xF00
+            help
+                Specifies a hard-coded device discriminator to be used if none is found in CHIP NV storage.
+                Setting the value to 0x0 disables the feature.
+
+                Note that any integer number between 0x000 and 0xFFF can be used here.
 
                 This option is for testing only and should not be enabled in production releases.
 

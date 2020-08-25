@@ -19,4 +19,4 @@
 set -x
 env
 
-make VERBOSE=1 -C examples/lock-app/nrf5
+make -j VERBOSE=1 -C examples/lock-app/nrf5

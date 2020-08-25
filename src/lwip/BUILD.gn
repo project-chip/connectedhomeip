@@ -1,0 +1,108 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/lwip.gni")
+
+import("${chip_root}/gn/chip/buildconfig_header.gni")
+import("${lwip_root}/lwip.gni")
+
+declare_args() {
+  # Enable lwIP debugging.
+  lwip_debug = is_debug
+
+  # lwIP platform: standalone, freertos.
+  lwip_platform = ""
+}
+
+if (lwip_platform == "") {
+  if (current_os != "freertos") {
+    lwip_platform = "standalone"
+  }
+}
+
+assert(lwip_platform == "standalone" || lwip_platform == "nrf5" ||
+           lwip_platform == "efr32",
+       "Unsupported lwIP platform: ${lwip_platform}")
+
+if (lwip_platform == "nrf5") {
+  import("//build_overrides/nrf5_sdk.gni")
+} else if (lwip_platform == "efr32") {
+  import("//build_overrides/efr32_sdk.gni")
+}
+
+buildconfig_header("lwip_buildconfig") {
+  header = "lwip_buildconfig.h"
+  header_dir = "lwip"
+
+  # Automatically enable LWIP_DEBUG for internal is_debug builds.
+  if (lwip_debug) {
+    lwip_debug = 1
+  } else {
+    lwip_debug = 0
+  }
+  defines = [
+    "LWIP_DEBUG=${lwip_debug}",
+    "HAVE_LWIP_UDP_BIND_NETIF=1",
+  ]
+
+  if (current_os == "android") {
+    defines += [ "LWIP_NO_STDINT_H=1" ]
+  }
+}
+
+config("lwip_config") {
+  include_dirs = [ lwip_platform ]
+
+  if (lwip_platform != "standalone") {
+    include_dirs += [ "freertos" ]
+  }
+}
+
+lwip_target("lwip") {
+  public = [
+    "${lwip_platform}/arch/cc.h",
+    "${lwip_platform}/arch/perf.h",
+    "${lwip_platform}/lwipopts.h",
+  ]
+
+  sources = []
+
+  if (lwip_platform == "standalone") {
+    public += [ "standalone/arch/sys_arch.h" ]
+    sources += [ "standalone/sys_arch.c" ]
+  } else {
+    public += [
+      "${lwip_platform}/lwippools.h",
+      "freertos/arch/sys_arch.h",
+    ]
+    sources += [ "freertos/sys_arch.c" ]
+  }
+
+  public_deps = [ ":lwip_buildconfig" ]
+  if (lwip_platform == "nrf5") {
+    public_deps += [ "${nrf5_sdk_build_root}:nrf5_sdk" ]
+  } else if (lwip_platform == "efr32") {
+    public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
+  }
+
+  public_configs = [
+    ":lwip_config",
+    "${chip_root}/src:includes",
+  ]
+}
+
+group("all") {
+  deps = [ ":lwip_all" ]
+}

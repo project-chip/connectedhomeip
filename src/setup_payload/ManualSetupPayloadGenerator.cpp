@@ -23,12 +23,14 @@
 
 #include "ManualSetupPayloadGenerator.h"
 
+#include <inttypes.h>
+
 #include <support/logging/CHIPLogging.h>
 #include <support/verhoeff/Verhoeff.h>
 
 using namespace chip;
 
-static uint32_t shortPayloadRepresentation(SetupPayload payload)
+static uint32_t shortPayloadRepresentation(const SetupPayload & payload)
 {
     int offset      = 1;
     uint32_t result = payload.requiresCustomFlow ? 1 : 0;
@@ -38,14 +40,14 @@ static uint32_t shortPayloadRepresentation(SetupPayload payload)
     return result;
 }
 
-static string decimalStringWithPadding(uint32_t number, int minLength)
+static std::string decimalStringWithPadding(uint32_t number, int minLength)
 {
     char buf[minLength + 1];
-    snprintf(buf, sizeof(buf), "%0*u", minLength, number);
-    return string(buf);
+    snprintf(buf, sizeof(buf), "%0*" PRIu32, minLength, number);
+    return std::string(buf);
 }
 
-CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(string & outDecimalString)
+CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(std::string & outDecimalString)
 {
     if (!mSetupPayload.isValidManualCode())
     {
@@ -53,8 +55,8 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(strin
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    uint32_t shortDecimal = shortPayloadRepresentation(mSetupPayload);
-    string decimalString  = decimalStringWithPadding(shortDecimal, kManualSetupShortCodeCharLength);
+    uint32_t shortDecimal     = shortPayloadRepresentation(mSetupPayload);
+    std::string decimalString = decimalStringWithPadding(shortDecimal, kManualSetupShortCodeCharLength);
 
     if (mSetupPayload.requiresCustomFlow)
     {

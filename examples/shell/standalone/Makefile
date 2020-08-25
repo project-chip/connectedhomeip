@@ -38,6 +38,7 @@ SRCS = \
     $(PROJECT_ROOT)/main.cpp \
     $(PROJECT_ROOT)/cmd_misc.cpp \
     $(PROJECT_ROOT)/cmd_base64.cpp \
+    $(PROJECT_ROOT)/cmd_device.cpp \
     $(NULL)
 
 INC_DIRS = \

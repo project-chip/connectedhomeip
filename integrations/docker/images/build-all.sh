@@ -23,5 +23,5 @@
 
 find . -name Dockerfile | while read -r dockerfile; do
     dir=${dockerfile%/*}
-    (cd "$dir" && ./build.sh) || exit $?
+    (cd "$dir" && ./build.sh "$@") || exit $?
 done

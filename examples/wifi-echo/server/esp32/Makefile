@@ -24,9 +24,10 @@ PROJECT_NAME := chip-wifi-echo
 EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/third_party/connectedhomeip/config/esp32/components \
                         $(PROJECT_PATH)/../../../common/m5stack-tft/repo/components \
                         $(PROJECT_PATH)/../../../common/QRCode \
+                        $(PROJECT_PATH)/../../../common/screen-framework \
 
 CXXFLAGS += -std=c++11 -Os
 CPPFLAGS += -Os
-CLAGS += -Os
+CFLAGS += -Os
 
 include $(IDF_PATH)/make/project.mk

@@ -42,7 +42,9 @@ lib_LIBRARIES                                         = \
     $(NULL)
 
 libSupportTests_a_SOURCES                             = \
+    TestBufBound.cpp                                    \
     TestCHIPArgParser.cpp                               \
+    TestCHIPMem.cpp                                     \
     TestErrorStr.cpp                                    \
     TestTimeUtils.cpp                                   \
     $(NULL)
@@ -83,10 +85,12 @@ COMMON_LDADD                                          = \
 
 # Test applications that should be run when the 'check' target is run.
 check_PROGRAMS                                        = \
+    TestBufBound                                        \
     TestCHIPArgParser                                   \
     TestErrorStr                                        \
     TestTimeUtils                                       \
     TestCHIPCounter                                     \
+    TestCHIPMem                                         \
     TestPersistedCounter                                \
     $(NULL)
 
@@ -105,6 +109,9 @@ TESTS_ENVIRONMENT                                     = \
 
 # Source, compiler, and linker options for test programs.
 
+TestBufBound_SOURCES                                  = TestBufBoundDriver.cpp
+TestBufBound_LDADD                                    = $(COMMON_LDADD)
+
 TestCHIPArgParser_SOURCES                             = TestCHIPArgParserDriver.cpp
 TestCHIPArgParser_LDADD                               = $(COMMON_LDADD)
 
@@ -117,9 +124,14 @@ TestErrorStr_LDADD                                    = $(COMMON_LDADD)
 TestCHIPCounter_SOURCES                               = TestCHIPCounter.cpp
 TestCHIPCounter_LDADD                                 = $(COMMON_LDADD)
 
+TestCHIPMem_SOURCES                                   = TestCHIPMemDriver.cpp
+TestCHIPMem_LDADD                                     = $(COMMON_LDADD)
+
 TestPersistedCounter_SOURCES                          = \
-    TestPersistedCounter.cpp                            \
-    TestPersistedStorageImplementation.cpp
+   TestPersistedCounter.cpp                             \
+   TestPersistedStorageImplementation.cpp               \
+   $(NULL)
+
 TestPersistedCounter_LDADD                            = $(COMMON_LDADD)
 
 # Foreign make dependencies
@@ -129,6 +141,7 @@ NLFOREIGN_FILE_DEPENDENCIES                           = \
    $(NULL)
 
 NLFOREIGN_SUBDIR_DEPENDENCIES                         = \
+   $(top_builddir)/src/include                          \
    $(LWIP_FOREIGN_SUBDIR_DEPENDENCY)                    \
    $(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY)             \
    $(NULL)

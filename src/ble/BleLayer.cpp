@@ -297,13 +297,15 @@ BleLayer::BleLayer()
     mState = kState_NotInitialized;
 }
 
-BLE_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleApplicationDelegate * appDelegate,
-                         chip::System::Layer * systemLayer)
+BLE_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleConnectionDelegate * connDelegate,
+                         BleApplicationDelegate * appDelegate, chip::System::Layer * systemLayer)
 {
     BLE_ERROR err = BLE_NO_ERROR;
 
     Ble::RegisterLayerErrorFormatter();
 
+    // It is totally valid to not have a connDelegate. In this case the client application
+    // will take care of the connection steps.
     VerifyOrExit(platformDelegate != NULL, err = BLE_ERROR_BAD_ARGS);
     VerifyOrExit(appDelegate != NULL, err = BLE_ERROR_BAD_ARGS);
     VerifyOrExit(systemLayer != NULL, err = BLE_ERROR_BAD_ARGS);
@@ -313,6 +315,7 @@ BLE_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleApplicationD
         return BLE_ERROR_INCORRECT_STATE;
     }
 
+    mConnectionDelegate  = connDelegate;
     mPlatformDelegate    = platformDelegate;
     mApplicationDelegate = appDelegate;
     mSystemLayer         = systemLayer;
@@ -327,6 +330,12 @@ BLE_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleApplicationD
 
 exit:
     return err;
+}
+
+BLE_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleApplicationDelegate * appDelegate,
+                         chip::System::Layer * systemLayer)
+{
+    return Init(platformDelegate, NULL, appDelegate, systemLayer);
 }
 
 BLE_ERROR BleLayer::Shutdown()
@@ -358,6 +367,24 @@ BLE_ERROR BleLayer::Shutdown()
     }
 
     return BLE_NO_ERROR;
+}
+
+BLE_ERROR BleLayer::NewBleConnection(void * appState, const uint16_t connDiscriminator,
+                                     BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
+                                     BleConnectionDelegate::OnConnectionErrorFunct onConnectionError)
+{
+    BLE_ERROR err = BLE_NO_ERROR;
+
+    VerifyOrExit(mState == kState_Initialized, err = BLE_ERROR_INCORRECT_STATE);
+    VerifyOrExit(connDiscriminator != 0, err = BLE_ERROR_BAD_ARGS);
+    VerifyOrExit(mConnectionDelegate != nullptr, err = BLE_ERROR_INCORRECT_STATE);
+
+    mConnectionDelegate->OnConnectionComplete = onConnectionComplete;
+    mConnectionDelegate->OnConnectionError    = onConnectionError;
+    mConnectionDelegate->NewConnection(this, appState, connDiscriminator);
+
+exit:
+    return err;
 }
 
 BLE_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose)

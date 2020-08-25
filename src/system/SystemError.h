@@ -186,6 +186,7 @@ extern const char * DescribeErrorPOSIX(Error code);
 extern bool IsErrorPOSIX(Error code);
 extern void RegisterPOSIXErrorFormatter(void);
 extern bool FormatPOSIXError(char * buf, uint16_t bufSize, int32_t err);
+extern Error MapErrorZephyr(int code);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 

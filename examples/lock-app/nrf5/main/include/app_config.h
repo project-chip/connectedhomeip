@@ -113,7 +113,7 @@
 #define BUTTON_ENABLED 1
 
 #define GPIOTE_ENABLED 1
-#define GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS 2
+#define GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS 3
 
 #define APP_TIMER_CONFIG_OP_QUEUE_SIZE 10
 
@@ -121,10 +121,12 @@
 
 #define LOCK_BUTTON BUTTON_2
 #define FUNCTION_BUTTON BUTTON_1
+#define JOIN_BUTTON BUTTON_4
 #define FUNCTION_BUTTON_DEBOUNCE_PERIOD_MS 50
 
 #define SYSTEM_STATE_LED BSP_LED_0
 #define LOCK_STATE_LED BSP_LED_1
+#define LOCK_STATE_LED_GPIO 3
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.

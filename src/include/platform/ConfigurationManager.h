@@ -25,6 +25,8 @@
 #ifndef CONFIGURATION_MANAGER_H
 #define CONFIGURATION_MANAGER_H
 
+#include <cstdint>
+
 #include <platform/PersistedStorage.h>
 
 namespace chip {
@@ -55,7 +57,7 @@ public:
 
     enum
     {
-        kMaxPairingCodeLength      = 15,
+        kMaxPairingCodeLength      = 16,
         kMaxSerialNumberLength     = 32,
         kMaxFirmwareRevisionLength = 32,
     };
@@ -78,7 +80,8 @@ public:
     CHIP_ERROR GetManufacturerDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen);
     CHIP_ERROR GetManufacturerDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen);
     CHIP_ERROR GetManufacturerDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen);
-    CHIP_ERROR GetPairingCode(char * buf, size_t bufSize, size_t & pairingCodeLen);
+    CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode);
+    CHIP_ERROR GetSetupDiscriminator(uint32_t & setupDiscriminator);
     CHIP_ERROR GetServiceId(uint64_t & serviceId);
     CHIP_ERROR GetFabricId(uint64_t & fabricId);
     CHIP_ERROR GetServiceConfig(uint8_t * buf, size_t bufSize, size_t & serviceConfigLen);
@@ -100,7 +103,8 @@ public:
     CHIP_ERROR StoreManufacturerDeviceCertificate(const uint8_t * cert, size_t certLen);
     CHIP_ERROR StoreManufacturerDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen);
     CHIP_ERROR StoreManufacturerDevicePrivateKey(const uint8_t * key, size_t keyLen);
-    CHIP_ERROR StorePairingCode(const char * pairingCode, size_t pairingCodeLen);
+    CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode);
+    CHIP_ERROR StoreSetupDiscriminator(uint32_t setupDiscriminator);
     CHIP_ERROR StoreServiceProvisioningData(uint64_t serviceId, const uint8_t * serviceConfig, size_t serviceConfigLen,
                                             const char * accountId, size_t accountIdLen);
     CHIP_ERROR ClearServiceProvisioningData();
@@ -138,8 +142,8 @@ private:
     template <class>
     friend class ::chip::DeviceLayer::Internal::GenericPlatformManagerImpl_POSIX;
     // Parentheses used to fix clang parsing issue with these declarations
-    friend CHIP_ERROR ::chip::Platform::PersistedStorage::Read(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
-    friend CHIP_ERROR ::chip::Platform::PersistedStorage::Write(::chip::Platform::PersistedStorage::Key key, uint32_t value);
+    friend CHIP_ERROR(::chip::Platform::PersistedStorage::Read)(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
+    friend CHIP_ERROR(::chip::Platform::PersistedStorage::Write)(::chip::Platform::PersistedStorage::Key key, uint32_t value);
 
     using ImplClass = ::chip::DeviceLayer::ConfigurationManagerImpl;
 
@@ -190,10 +194,9 @@ extern ConfigurationManagerImpl & ConfigurationMgrImpl(void);
  */
 #ifdef EXTERNAL_CONFIGURATIONMANAGERIMPL_HEADER
 #include EXTERNAL_CONFIGURATIONMANAGERIMPL_HEADER
-#else
+#elif defined(CHIP_DEVICE_LAYER_TARGET)
 #define CONFIGURATIONMANAGERIMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/ConfigurationManagerImpl.h>
 #include CONFIGURATIONMANAGERIMPL_HEADER
-#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -293,9 +296,14 @@ inline CHIP_ERROR ConfigurationManager::GetManufacturerDevicePrivateKey(uint8_t 
     return static_cast<ImplClass *>(this)->_GetManufacturerDevicePrivateKey(buf, bufSize, keyLen);
 }
 
-inline CHIP_ERROR ConfigurationManager::GetPairingCode(char * buf, size_t bufSize, size_t & pairingCodeLen)
+inline CHIP_ERROR ConfigurationManager::GetSetupPinCode(uint32_t & setupPinCode)
 {
-    return static_cast<ImplClass *>(this)->_GetPairingCode(buf, bufSize, pairingCodeLen);
+    return static_cast<ImplClass *>(this)->_GetSetupPinCode(setupPinCode);
+}
+
+inline CHIP_ERROR ConfigurationManager::GetSetupDiscriminator(uint32_t & setupDiscriminator)
+{
+    return static_cast<ImplClass *>(this)->_GetSetupDiscriminator(setupDiscriminator);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetServiceId(uint64_t & serviceId)
@@ -392,9 +400,14 @@ inline CHIP_ERROR ConfigurationManager::StoreManufacturerDevicePrivateKey(const 
     return static_cast<ImplClass *>(this)->_StoreManufacturerDevicePrivateKey(key, keyLen);
 }
 
-inline CHIP_ERROR ConfigurationManager::StorePairingCode(const char * pairingCode, size_t pairingCodeLen)
+inline CHIP_ERROR ConfigurationManager::StoreSetupPinCode(uint32_t setupPinCode)
 {
-    return static_cast<ImplClass *>(this)->_StorePairingCode(pairingCode, pairingCodeLen);
+    return static_cast<ImplClass *>(this)->_StoreSetupPinCode(setupPinCode);
+}
+
+inline CHIP_ERROR ConfigurationManager::StoreSetupDiscriminator(uint32_t setupDiscriminator)
+{
+    return static_cast<ImplClass *>(this)->_StoreSetupDiscriminator(setupDiscriminator);
 }
 
 inline CHIP_ERROR ConfigurationManager::StoreServiceProvisioningData(uint64_t serviceId, const uint8_t * serviceConfig,
@@ -525,8 +538,9 @@ inline void ConfigurationManager::UseManufacturerCredentialsAsOperational(bool v
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
-
 } // namespace DeviceLayer
 } // namespace chip
+
+#endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
 #endif // CONFIGURATION_MANAGER_H

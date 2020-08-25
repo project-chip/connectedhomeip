@@ -22,58 +22,60 @@
 
 #include "esp_log.h"
 #include <system/SystemPacketBuffer.h>
+#include <transport/MessageHeader.h>
 
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
 
-extern "C" {
-#include "chip-zcl/chip-zcl.h"
-#include "gen/gen-cluster-id.h"
-#include "gen/gen-types.h"
-}
+#include "attribute-storage.h"
+#include "gen/attribute-id.h"
+#include "gen/cluster-id.h"
+#include "gen/znet-bookkeeping.h"
+#include "util.h"
+#include <app/chip-zcl-zpro-codec.h>
 
 using namespace ::chip;
-
-extern LEDWidget statusLED; // In wifi-echo.cpp
 
 static const char * TAG = "data_model_server";
 
 void InitDataModelHandler()
 {
-    chipZclEndpointInit();
+    emberAfEndpointConfigure();
+    emAfInit();
 }
 
-void HandleDataModelMessage(System::PacketBuffer * buffer)
+void HandleDataModelMessage(const MessageHeader & header, System::PacketBuffer * buffer, SecureSessionMgrBase * mgr)
 {
-    ChipZclStatus_t zclStatus = chipZclProcessIncoming((ChipZclBuffer_t *) buffer);
-    if (zclStatus == CHIP_ZCL_STATUS_SUCCESS)
+    EmberApsFrame frame;
+    bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) > 0;
+    if (ok)
+    {
+        ESP_LOGI(TAG, "APS frame processing success!");
+    }
+    else
+    {
+        ESP_LOGI(TAG, "APS frame processing failure");
+        System::PacketBuffer::Free(buffer);
+        return;
+    }
+
+    ChipResponseDestination responseDest(header.GetSourceNodeId().Value(), mgr);
+    uint8_t * message;
+    uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
+    ok                  = emberAfProcessMessage(&frame,
+                               0, // type
+                               message, messageLen,
+                               &responseDest, // source identifier
+                               NULL);
+
+    System::PacketBuffer::Free(buffer);
+
+    if (ok)
     {
         ESP_LOGI(TAG, "Data model processing success!");
     }
     else
     {
-        ESP_LOGI(TAG, "Data model processing failure: %d", zclStatus);
+        ESP_LOGI(TAG, "Data model processing failure");
     }
-    System::PacketBuffer::Free(buffer);
 }
-
-extern "C" {
-void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
-{
-    if (clusterId != CHIP_ZCL_CLUSTER_ON_OFF)
-    {
-        ESP_LOGI(TAG, "Unknown cluster ID: %d", clusterId);
-        return;
-    }
-
-    if (attributeId != CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF)
-    {
-        ESP_LOGI(TAG, "Unknown attribute ID: %d", attributeId);
-        return;
-    }
-
-    // At this point we can assume that value points to a boolean value.
-    statusLED.Set(*value);
-}
-} // extern "C"

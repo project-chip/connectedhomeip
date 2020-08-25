@@ -47,9 +47,10 @@ namespace Crypto {
 
 typedef struct
 {
-    bool initialized;
-    mbedtls_ctr_drbg_context drbg_ctxt;
-    mbedtls_entropy_context entropy;
+    bool mInitialized;
+    bool mDRBGSeeded;
+    mbedtls_ctr_drbg_context mDRBGCtxt;
+    mbedtls_entropy_context mEntropy;
 } EntropyContext;
 
 static EntropyContext gsEntropyContext;
@@ -297,37 +298,49 @@ exit:
 
 static EntropyContext * get_entropy_context()
 {
-    EntropyContext * context = NULL;
-    int status               = 0;
+    if (!gsEntropyContext.mInitialized)
+    {
+        mbedtls_entropy_init(&gsEntropyContext.mEntropy);
+        mbedtls_ctr_drbg_init(&gsEntropyContext.mDRBGCtxt);
 
-    VerifyOrExit(!gsEntropyContext.initialized, context = &gsEntropyContext);
+        gsEntropyContext.mInitialized = true;
+    }
 
-    mbedtls_entropy_init(&gsEntropyContext.entropy);
-    mbedtls_ctr_drbg_init(&gsEntropyContext.drbg_ctxt);
+    return &gsEntropyContext;
+}
 
-    status = mbedtls_ctr_drbg_seed(&gsEntropyContext.drbg_ctxt, mbedtls_entropy_func, &gsEntropyContext.entropy, NULL, 0);
-    VerifyOrExit(status == 0, _log_mbedTLS_error(status));
+static mbedtls_ctr_drbg_context * get_drbg_context()
+{
+    EntropyContext * context = get_entropy_context();
 
-    gsEntropyContext.initialized = true;
+    mbedtls_ctr_drbg_context * drbgCtxt = &context->mDRBGCtxt;
 
-    context = &gsEntropyContext;
+    if (!context->mDRBGSeeded)
+    {
+        int status = mbedtls_ctr_drbg_seed(drbgCtxt, mbedtls_entropy_func, &context->mEntropy, NULL, 0);
+        VerifyOrExit(status == 0, _log_mbedTLS_error(status));
+
+        context->mDRBGSeeded = true;
+    }
+
+    return drbgCtxt;
 
 exit:
-    return context;
+    return nullptr;
 }
 
 CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold)
 {
     CHIP_ERROR error              = CHIP_NO_ERROR;
     int result                    = 0;
-    EntropyContext * entropy_ctxt = NULL;
+    EntropyContext * entropy_ctxt = nullptr;
 
-    VerifyOrExit(fn_source != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(fn_source != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     entropy_ctxt = get_entropy_context();
-    VerifyOrExit(entropy_ctxt != NULL, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(entropy_ctxt != nullptr, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_entropy_add_source(&entropy_ctxt->entropy, fn_source, p_source, threshold, MBEDTLS_ENTROPY_SOURCE_STRONG);
+    result = mbedtls_entropy_add_source(&entropy_ctxt->mEntropy, fn_source, p_source, threshold, MBEDTLS_ENTROPY_SOURCE_STRONG);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 exit:
     return error;
@@ -335,17 +348,18 @@ exit:
 
 CHIP_ERROR DRBG_get_bytes(unsigned char * out_buffer, const size_t out_length)
 {
-    CHIP_ERROR error              = CHIP_NO_ERROR;
-    int result                    = 0;
-    EntropyContext * entropy_ctxt = NULL;
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
 
-    VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    mbedtls_ctr_drbg_context * drbg_ctxt = nullptr;
+
+    VerifyOrExit(out_buffer != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    entropy_ctxt = get_entropy_context();
-    VerifyOrExit(entropy_ctxt != NULL, error = CHIP_ERROR_INTERNAL);
+    drbg_ctxt = get_drbg_context();
+    VerifyOrExit(drbg_ctxt != nullptr, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_ctr_drbg_random(&entropy_ctxt->drbg_ctxt, out_buffer, out_length);
+    result = mbedtls_ctr_drbg_random(drbg_ctxt, out_buffer, out_length);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -495,6 +509,314 @@ exit:
     mbedtls_mpi_free(&mpi_privkey);
     _log_mbedTLS_error(result);
     return error;
+}
+
+void ClearSecretData(uint8_t * buf, uint32_t len)
+{
+    memset(buf, 0, len);
+}
+
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    memset(&context, 0, sizeof(context));
+    mbedtls_ecp_group_init(&context.curve);
+    result = mbedtls_ecp_group_load(&context.curve, MBEDTLS_ECP_DP_SECP256R1);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    context.md_info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
+    VerifyOrExit(context.md_info != NULL, error = CHIP_ERROR_INTERNAL);
+
+    mbedtls_ecp_point_init(&context.M);
+    mbedtls_ecp_point_init(&context.N);
+    mbedtls_ecp_point_init(&context.X);
+    mbedtls_ecp_point_init(&context.Y);
+    mbedtls_ecp_point_init(&context.L);
+    mbedtls_ecp_point_init(&context.V);
+    mbedtls_ecp_point_init(&context.Z);
+    M = &context.M;
+    N = &context.N;
+    X = &context.X;
+    Y = &context.Y;
+    L = &context.L;
+    V = &context.V;
+    Z = &context.Z;
+
+    mbedtls_mpi_init(&context.w0);
+    mbedtls_mpi_init(&context.w1);
+    mbedtls_mpi_init(&context.xy);
+    mbedtls_mpi_init(&context.tempbn);
+    w0     = &context.w0;
+    w1     = &context.w1;
+    xy     = &context.xy;
+    tempbn = &context.tempbn;
+
+    G     = &context.curve.G;
+    order = &context.curve.N;
+
+    return error;
+
+exit:
+    _log_mbedTLS_error(result);
+
+    FreeImpl();
+    return error;
+}
+
+void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl(void)
+{
+    mbedtls_ecp_point_free(&context.M);
+    mbedtls_ecp_point_free(&context.N);
+    mbedtls_ecp_point_free(&context.X);
+    mbedtls_ecp_point_free(&context.Y);
+    mbedtls_ecp_point_free(&context.L);
+    mbedtls_ecp_point_free(&context.Z);
+    mbedtls_ecp_point_free(&context.V);
+
+    mbedtls_mpi_free(&context.w0);
+    mbedtls_mpi_free(&context.w1);
+    mbedtls_mpi_free(&context.xy);
+    mbedtls_mpi_free(&context.tempbn);
+
+    mbedtls_ecp_group_free(&context.curve);
+}
+
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const unsigned char * key, size_t key_len, const unsigned char * in, size_t in_len,
+                                              unsigned char * out)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    mbedtls_md_context_t hmac_ctx;
+    mbedtls_md_init(&hmac_ctx);
+    result = mbedtls_md_setup(&hmac_ctx, context.md_info, 1);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_md_hmac_starts(&hmac_ctx, key, key_len);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_md_hmac_update(&hmac_ctx, in, in_len);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_md_hmac_finish(&hmac_ctx, out);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    return error;
+
+exit:
+    _log_mbedTLS_error(result);
+
+    mbedtls_md_free(&hmac_ctx);
+    return error;
+}
+
+/**
+ * This function implements constant time memcmp. It's good practice
+ * to use constant time functions for cryptographic functions.
+ */
+static inline int constant_time_memcmp(const void * a, const void * b, size_t n)
+{
+    const unsigned char * A = (const unsigned char *) a;
+    const unsigned char * B = (const unsigned char *) b;
+    unsigned char diff      = 0;
+
+    for (size_t i = 0; i < n; i++)
+    {
+        diff |= (A[i] ^ B[i]);
+    }
+
+    return diff;
+}
+
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::MacVerify(const unsigned char * key, size_t key_len, const unsigned char * mac,
+                                                    size_t mac_len, const unsigned char * in, size_t in_len)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    unsigned char computed_mac[kSHA256_Hash_Length];
+
+    VerifyOrExit(mac_len == kSHA256_Hash_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    error = Mac(key, key_len, in, in_len, computed_mac);
+    SuccessOrExit(error);
+
+    VerifyOrExit(constant_time_memcmp(mac, computed_mac, kSHA256_Hash_Length) == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    _log_mbedTLS_error(result);
+    return error;
+}
+
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FELoad(const unsigned char * in, size_t in_len, void * fe)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    result = mbedtls_mpi_read_binary((mbedtls_mpi *) fe, in, in_len);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_mpi_mod_mpi((mbedtls_mpi *) fe, (mbedtls_mpi *) fe, (const mbedtls_mpi *) order);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    _log_mbedTLS_error(result);
+    return error;
+}
+
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEWrite(const void * fe, unsigned char * out, size_t out_len)
+{
+    if (mbedtls_mpi_write_binary((const mbedtls_mpi *) fe, out, out_len) != 0)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEGenerate(void * fe)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    result = mbedtls_ecp_gen_privkey(&context.curve, (mbedtls_mpi *) fe, ECDSA_sign_rng, nullptr);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    _log_mbedTLS_error(result);
+    return error;
+}
+
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEMul(void * fer, const void * fe1, const void * fe2)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    result = mbedtls_mpi_mul_mpi((mbedtls_mpi *) fer, (const mbedtls_mpi *) fe1, (const mbedtls_mpi *) fe2);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_mpi_mod_mpi((mbedtls_mpi *) fer, (mbedtls_mpi *) fer, (const mbedtls_mpi *) order);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    _log_mbedTLS_error(result);
+    return error;
+}
+
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointLoad(const unsigned char * in, size_t in_len, void * R)
+{
+    if (mbedtls_ecp_point_read_binary(&context.curve, (mbedtls_ecp_point *) R, in, in_len) != 0)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointWrite(const void * R, unsigned char * out, size_t out_len)
+{
+    memset(out, 0, out_len);
+    size_t mbedtls_out_len = out_len;
+
+    if (mbedtls_ecp_point_write_binary(&context.curve, (const mbedtls_ecp_point *) R, MBEDTLS_ECP_PF_UNCOMPRESSED, &mbedtls_out_len,
+                                       out, out_len) != 0)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointMul(void * R, const void * P1, const void * fe1)
+{
+    if (mbedtls_ecp_mul(&context.curve, (mbedtls_ecp_point *) R, (const mbedtls_mpi *) fe1, (const mbedtls_ecp_point *) P1,
+                        ECDSA_sign_rng, nullptr) != 0)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointAddMul(void * R, const void * P1, const void * fe1, const void * P2,
+                                                      const void * fe2)
+{
+
+    if (mbedtls_ecp_muladd(&context.curve, (mbedtls_ecp_point *) R, (const mbedtls_mpi *) fe1, (const mbedtls_ecp_point *) P1,
+                           (const mbedtls_mpi *) fe2, (const mbedtls_ecp_point *) P2) != 0)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointInvert(void * R)
+{
+    mbedtls_ecp_point * Rp = (mbedtls_ecp_point *) R;
+    if (mbedtls_mpi_sub_mpi(&Rp->Y, &context.curve.P, &Rp->Y) != 0)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointCofactorMul(void * R)
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(unsigned char * Lout, size_t * L_len, const unsigned char * w1in,
+                                                   size_t w1in_len)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    mbedtls_ecp_group curve;
+    mbedtls_mpi w1_bn;
+    mbedtls_ecp_point Ltemp;
+
+    mbedtls_ecp_group_init(&curve);
+    mbedtls_mpi_init(&w1_bn);
+    mbedtls_ecp_point_init(&Ltemp);
+
+    result = mbedtls_ecp_group_load(&curve, MBEDTLS_ECP_DP_SECP256R1);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_mpi_read_binary(&w1_bn, w1in, w1in_len);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_mpi_mod_mpi(&w1_bn, &w1_bn, &curve.N);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_ecp_mul(&curve, &Ltemp, &w1_bn, &curve.G, ECDSA_sign_rng, nullptr);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    memset(Lout, 0, *L_len);
+
+    result = mbedtls_ecp_point_write_binary(&curve, &Ltemp, MBEDTLS_ECP_PF_UNCOMPRESSED, L_len, Lout, *L_len);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    _log_mbedTLS_error(result);
+    mbedtls_ecp_point_free(&Ltemp);
+    mbedtls_mpi_free(&w1_bn);
+    mbedtls_ecp_group_free(&curve);
+
+    return error;
+}
+
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
+{
+    if (mbedtls_ecp_check_pubkey(&context.curve, (mbedtls_ecp_point *) R) != 0)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Crypto

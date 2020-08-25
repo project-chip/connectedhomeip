@@ -213,7 +213,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SetupPayload::addOptionalVendorData(OptionalQRCodeInfo info)
+CHIP_ERROR SetupPayload::addOptionalVendorData(const OptionalQRCodeInfo & info)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(IsVendorTag(info.tag), err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -223,7 +223,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SetupPayload::addOptionalExtensionData(OptionalQRCodeInfoExtension info)
+CHIP_ERROR SetupPayload::addOptionalExtensionData(const OptionalQRCodeInfoExtension & info)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(IsCHIPTag(info.tag), err = CHIP_ERROR_INVALID_ARGUMENT);

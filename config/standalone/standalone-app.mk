@@ -208,6 +208,8 @@ $(APP_EXE) : $(OBJS) $(STD_LINK_PREREQUISITES) | $(OUTPUT_DIR)
 # Individual build rules for each application source file
 $(foreach file,$(filter %.c,$(ALL_SRCS)),$(call CCRule,$(file)))
 $(foreach file,$(filter %.cpp,$(ALL_SRCS)),$(call CXXRule,$(file)))
+$(foreach file,$(filter %.m,$(ALL_SRCS)),$(call CCRule,$(file)))
+$(foreach file,$(filter %.mm,$(ALL_SRCS)),$(call CXXRule,$(file)))
 $(foreach file,$(filter %.S,$(ALL_SRCS)),$(call ASRule,$(file)))
 $(foreach file,$(filter %.s,$(ALL_SRCS)),$(call ASRule,$(file)))
 

@@ -1,0 +1,53 @@
+{
+    "configurations": [
+        {
+            "name": "gcc debug (GN)",
+            "compileCommands": "${workspaceFolder}/out/debug/compile_commands.gcc.json",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "gcc-x64",
+            "browse": {
+                "path": ["${workspaceFolder}/out/debug/"],
+                "limitSymbolsToIncludedHeaders": true
+            }
+        },
+        {
+            "name": "clang debug (GN)",
+            "compileCommands": "${workspaceFolder}/out/debug/compile_commands.clang.json",
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "clang-x64",
+            "browse": {
+                "path": ["${workspaceFolder}/out/debug/"],
+                "limitSymbolsToIncludedHeaders": true
+            }
+        },
+        {
+            "name": "gcc MbedTLS debug (GN)",
+            "compileCommands": "${workspaceFolder}/out/debug/compile_commands.mbedtls.json",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "gcc-x64",
+            "browse": {
+                "path": ["${workspaceFolder}/out/debug/"],
+                "limitSymbolsToIncludedHeaders": true
+            }
+        },
+        {
+            "name": "nRF5 examples debug (GN)",
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "gcc-x64",
+            "compileCommands": "${workspaceFolder}/out/debug/compile_commands.nrf5.json",
+            "compilerPath": "/var/gcc-arm-none-eabi-9-2019-q4-major/bin/arm-none-eabi-gcc",
+            "browse": {
+                "path": ["${workspaceFolder}/out/debug/"],
+                "limitSymbolsToIncludedHeaders": true
+            }
+        }
+    ],
+    "version": 4
+}

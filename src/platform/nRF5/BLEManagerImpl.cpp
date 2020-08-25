@@ -253,6 +253,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * devName)
     }
     else
     {
+        // FIXME: the name should be derived from factory data
         snprintf(devNameBuf, sizeof(devNameBuf), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, (uint32_t) 0);
         devNameBuf[kMaxDeviceNameLength] = 0;
     }

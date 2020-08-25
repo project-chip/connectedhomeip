@@ -67,28 +67,32 @@
  * parallelism with IPv4 and create the alias to the availabile
  * definitions.
  */
-#if !defined(IPV6_ADD_MEMBERSHIP) && defined(IPV6_JOIN_GROUP)
-#define INET_IPV6_ADD_MEMBERSHIP IPV6_JOIN_GROUP
-#elif defined(IPV6_ADD_MEMBERSHIP)
+#if defined(IPV6_ADD_MEMBERSHIP)
 #define INET_IPV6_ADD_MEMBERSHIP IPV6_ADD_MEMBERSHIP
-#else
+#elif defined(IPV6_JOIN_GROUP)
+#define INET_IPV6_ADD_MEMBERSHIP IPV6_JOIN_GROUP
+#elif !__ZEPHYR__
 #error                                                                                                                             \
     "Neither IPV6_ADD_MEMBERSHIP nor IPV6_JOIN_GROUP are defined which are required for generalized IPv6 multicast group support."
-#endif // !defined(IPV6_ADD_MEMBERSHIP) && defined(IPV6_JOIN_GROUP)
+#endif // IPV6_ADD_MEMBERSHIP
 
-#if !defined(IPV6_DROP_MEMBERSHIP) && defined(IPV6_LEAVE_GROUP)
-#define INET_IPV6_DROP_MEMBERSHIP IPV6_LEAVE_GROUP
-#elif defined(IPV6_DROP_MEMBERSHIP)
+#if defined(IPV6_DROP_MEMBERSHIP)
 #define INET_IPV6_DROP_MEMBERSHIP IPV6_DROP_MEMBERSHIP
-#else
+#elif defined(IPV6_LEAVE_GROUP)
+#define INET_IPV6_DROP_MEMBERSHIP IPV6_LEAVE_GROUP
+#elif !__ZEPHYR__
 #error                                                                                                                             \
     "Neither IPV6_DROP_MEMBERSHIP nor IPV6_LEAVE_GROUP are defined which are required for generalized IPv6 multicast group support."
-#endif // !defined(IPV6_DROP_MEMBERSHIP) && defined(IPV6_LEAVE_GROUP)
+#endif // IPV6_DROP_MEMBERSHIP
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #define INET_PORTSTRLEN 6
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
+#include "ZephyrSocket.h"
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
 
 namespace chip {
 namespace Inet {
@@ -209,6 +213,7 @@ exit:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if IP_MULTICAST_LOOP || IPV6_MULTICAST_LOOP
 static INET_ERROR SocketsSetMulticastLoopback(int aSocket, bool aLoopback, int aProtocol, int aOption)
 {
     INET_ERROR lRetval = INET_NO_ERROR;
@@ -221,9 +226,11 @@ static INET_ERROR SocketsSetMulticastLoopback(int aSocket, bool aLoopback, int a
 exit:
     return (lRetval);
 }
+#endif // IP_MULTICAST_LOOP || IPV6_MULTICAST_LOOP
 
 static INET_ERROR SocketsSetMulticastLoopback(int aSocket, IPVersion aIPVersion, bool aLoopback)
 {
+#ifdef IPV6_MULTICAST_LOOP
     INET_ERROR lRetval;
 
     switch (aIPVersion)
@@ -245,6 +252,9 @@ static INET_ERROR SocketsSetMulticastLoopback(int aSocket, IPVersion aIPVersion,
     }
 
     return (lRetval);
+#else  // IPV6_MULTICAST_LOOP
+    return INET_ERROR_NOT_SUPPORTED;
+#endif // IPV6_MULTICAST_LOOP
 }
 
 #if INET_CONFIG_ENABLE_IPV4
@@ -285,6 +295,7 @@ exit:
 }
 #endif // INET_CONFIG_ENABLE_IPV4
 
+#if INET_IPV6_ADD_MEMBERSHIP || INET_IPV6_DROP_MEMBERSHIP
 static INET_ERROR SocketsIPv6JoinLeaveMulticastGroup(int aSocket, InterfaceId aInterfaceId, const IPAddress & aAddress,
                                                      int aCommand)
 {
@@ -302,6 +313,26 @@ static INET_ERROR SocketsIPv6JoinLeaveMulticastGroup(int aSocket, InterfaceId aI
 exit:
     return (lRetval);
 }
+#endif // INET_IPV6_ADD_MEMBERSHIP || INET_IPV6_DROP_MEMBERSHIP
+
+static INET_ERROR SocketsIPv6JoinMulticastGroup(int aSocket, InterfaceId aInterfaceId, const IPAddress & aAddress)
+{
+#if INET_IPV6_ADD_MEMBERSHIP
+    return SocketsIPv6JoinLeaveMulticastGroup(aSocket, aInterfaceId, aAddress, INET_IPV6_ADD_MEMBERSHIP);
+#else
+    return INET_ERROR_NOT_SUPPORTED;
+#endif
+}
+
+static INET_ERROR SocketsIPv6LeaveMulticastGroup(int aSocket, InterfaceId aInterfaceId, const IPAddress & aAddress)
+{
+#if INET_IPV6_DROP_MEMBERSHIP
+    return SocketsIPv6JoinLeaveMulticastGroup(aSocket, aInterfaceId, aAddress, INET_IPV6_DROP_MEMBERSHIP);
+#else
+    return INET_ERROR_NOT_SUPPORTED;
+#endif
+}
+
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 /**
@@ -328,9 +359,6 @@ INET_ERROR IPEndPointBasis::SetMulticastLoopback(IPVersion aIPVersion, bool aLoo
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if !HAVE_LWIP_MULTICAST_LOOP
-#pragma message "\n \
-The version of LwIP appears older than that required for multicast loopback support.\n \
-Please upgrade your version of LwIP for SetMulticastLoopback support."
     lRetval = INET_ERROR_NOT_SUPPORTED;
 #else
     if (aLoopback)
@@ -436,9 +464,7 @@ INET_ERROR IPEndPointBasis::JoinMulticastGroup(InterfaceId aInterfaceId, const I
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_IPV4 && LWIP_IGMP
         lRetval = LwIPIPv4JoinLeaveMulticastGroup(aInterfaceId, aAddress, igmp_joingroup_netif);
-#else // LWIP_IPV4 && LWIP_IGMP
-#pragma message "\n \
-Please enable LWIP_IPV4 and LWIP_IGMP for IPv4 JoinMulticastGroup and LeaveMulticastGroup support."
+#else  // LWIP_IPV4 && LWIP_IGMP
         lRetval = INET_ERROR_NOT_SUPPORTED;
 #endif // LWIP_IPV4 && LWIP_IGMP
         SuccessOrExit(lRetval);
@@ -456,16 +482,14 @@ Please enable LWIP_IPV4 and LWIP_IGMP for IPv4 JoinMulticastGroup and LeaveMulti
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
         lRetval = LwIPIPv6JoinLeaveMulticastGroup(aInterfaceId, aAddress, mld6_joingroup_netif);
-#else // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
-#pragma message "\n \
-Please enable LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6 for IPv6 JoinMulticastGroup and LeaveMulticastGroup support."
+#else  // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
         lRetval = INET_ERROR_NOT_SUPPORTED;
 #endif // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
         SuccessOrExit(lRetval);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-        lRetval = SocketsIPv6JoinLeaveMulticastGroup(mSocket, aInterfaceId, aAddress, INET_IPV6_ADD_MEMBERSHIP);
+        lRetval = SocketsIPv6JoinMulticastGroup(mSocket, aInterfaceId, aAddress);
         SuccessOrExit(lRetval);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
     }
@@ -525,9 +549,7 @@ INET_ERROR IPEndPointBasis::LeaveMulticastGroup(InterfaceId aInterfaceId, const 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_IPV4 && LWIP_IGMP
         lRetval = LwIPIPv4JoinLeaveMulticastGroup(aInterfaceId, aAddress, igmp_leavegroup_netif);
-#else // LWIP_IPV4 && LWIP_IGMP
-#pragma message "\n \
-Please enable LWIP_IPV4 and LWIP_IGMP for IPv4 JoinMulticastGroup and LeaveMulticastGroup support."
+#else  // LWIP_IPV4 && LWIP_IGMP
         lRetval = INET_ERROR_NOT_SUPPORTED;
 #endif // LWIP_IPV4 && LWIP_IGMP
         SuccessOrExit(lRetval);
@@ -545,16 +567,14 @@ Please enable LWIP_IPV4 and LWIP_IGMP for IPv4 JoinMulticastGroup and LeaveMulti
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
         lRetval = LwIPIPv6JoinLeaveMulticastGroup(aInterfaceId, aAddress, mld6_leavegroup_netif);
-#else // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
-#pragma message "\n \
-Please enable LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6 for IPv6 JoinMulticastGroup and LeaveMulticastGroup support."
+#else  // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
         lRetval = INET_ERROR_NOT_SUPPORTED;
 #endif // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
         SuccessOrExit(lRetval);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-        lRetval = SocketsIPv6JoinLeaveMulticastGroup(mSocket, aInterfaceId, aAddress, INET_IPV6_DROP_MEMBERSHIP);
+        lRetval = SocketsIPv6LeaveMulticastGroup(mSocket, aInterfaceId, aAddress);
         SuccessOrExit(lRetval);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
     }
@@ -665,7 +685,6 @@ INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress,
 
         sa.sin6_family   = AF_INET6;
         sa.sin6_port     = htons(aPort);
-        sa.sin6_flowinfo = 0;
         sa.sin6_addr     = aAddress.ToIPv6();
         sa.sin6_scope_id = aInterfaceId;
 
@@ -795,7 +814,6 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     {
         peerSockAddr.in6.sin6_family   = AF_INET6;
         peerSockAddr.in6.sin6_port     = htons(aPktInfo->DestPort);
-        peerSockAddr.in6.sin6_flowinfo = 0;
         peerSockAddr.in6.sin6_addr     = aPktInfo->DestAddress.ToIPv6();
         peerSockAddr.in6.sin6_scope_id = aPktInfo->Interface;
         msgHeader.msg_namelen          = sizeof(sockaddr_in6);
@@ -870,10 +888,9 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
 #endif // !defined(IPV6_PKTINFO)
         }
 
-#else // !(defined(IP_PKTINFO) && defined(IPV6_PKTINFO))
-
+#else  // !(defined(IP_PKTINFO) && defined(IPV6_PKTINFO))
+        IgnoreUnusedVariable(controlData);
         ExitNow(res = INET_ERROR_NOT_SUPPORTED);
-
 #endif // !(defined(IP_PKTINFO) && defined(IPV6_PKTINFO))
     }
 
@@ -1124,7 +1141,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-INET_ERROR IPEndPointBasis::ConfigureProtocol(IPAddressType aAddressType, nw_parameters_t aParameters)
+INET_ERROR IPEndPointBasis::ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters)
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -1154,7 +1171,8 @@ INET_ERROR IPEndPointBasis::ConfigureProtocol(IPAddressType aAddressType, nw_par
     return res;
 }
 
-INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress, uint16_t aPort, nw_parameters_t aParameters)
+INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort,
+                                 const nw_parameters_t & aParameters)
 {
     INET_ERROR res         = INET_NO_ERROR;
     nw_endpoint_t endpoint = nullptr;
@@ -1164,7 +1182,8 @@ INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress,
     res = ConfigureProtocol(aAddressType, aParameters);
     SuccessOrExit(res);
 
-    res = GetEndPoint(endpoint, aAddress, aPort);
+    res = GetEndPoint(endpoint, aAddressType, aAddress, aPort);
+    nw_parameters_set_local_endpoint(aParameters, endpoint);
     nw_release(endpoint);
     SuccessOrExit(res);
 
@@ -1230,7 +1249,7 @@ exit:
     return res;
 }
 
-void IPEndPointBasis::HandleDataReceived(nw_connection_t aConnection)
+void IPEndPointBasis::HandleDataReceived(const nw_connection_t & aConnection)
 {
 
     nw_connection_receive_completion_t handler =
@@ -1279,7 +1298,7 @@ void IPEndPointBasis::HandleDataReceived(nw_connection_t aConnection)
     nw_connection_receive_message(aConnection, handler);
 }
 
-void IPEndPointBasis::GetPacketInfo(nw_connection_t aConnection, IPPacketInfo & aPacketInfo)
+void IPEndPointBasis::GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo)
 {
     nw_path_t path              = nw_connection_copy_current_path(aConnection);
     nw_endpoint_t dest_endpoint = nw_path_copy_effective_local_endpoint(path);
@@ -1292,20 +1311,29 @@ void IPEndPointBasis::GetPacketInfo(nw_connection_t aConnection, IPPacketInfo & 
     aPacketInfo.DestPort    = nw_endpoint_get_port(dest_endpoint);
 }
 
-INET_ERROR IPEndPointBasis::GetEndPoint(nw_endpoint_t & aEndPoint, const IPAddress aAddress, uint16_t aPort)
+INET_ERROR IPEndPointBasis::GetEndPoint(nw_endpoint_t & aEndPoint, const IPAddressType aAddressType, const IPAddress & aAddress,
+                                        uint16_t aPort)
 {
     INET_ERROR res = INET_NO_ERROR;
-
     char addrStr[INET6_ADDRSTRLEN];
-    aAddress.ToString(addrStr, sizeof(addrStr));
-
     char portStr[INET_PORTSTRLEN];
+
+    // Note: aAddress.ToString will return the IPv6 Any address if the address type is Any, but that's not what
+    // we want if the locale endpoint is IPv4.
+    if (aAddressType == kIPAddressType_IPv4 && aAddress.Type() == kIPAddressType_Any)
+    {
+        const IPAddress anyAddr = IPAddress::FromIPv4(aAddress.ToIPv4());
+        anyAddr.ToString(addrStr, sizeof(addrStr));
+    }
+    else
+    {
+        aAddress.ToString(addrStr, sizeof(addrStr));
+    }
+
     snprintf(portStr, sizeof(portStr), "%u", aPort);
 
-    nw_endpoint_t endpoint = nw_endpoint_create_host(addrStr, portStr);
-    VerifyOrExit(endpoint != NULL, res = INET_ERROR_BAD_ARGS);
-
-    aEndPoint = endpoint;
+    aEndPoint = nw_endpoint_create_host(addrStr, portStr);
+    VerifyOrExit(aEndPoint != NULL, res = INET_ERROR_BAD_ARGS);
 
 exit:
     return res;
@@ -1321,7 +1349,8 @@ INET_ERROR IPEndPointBasis::GetConnection(const IPPacketInfo * aPktInfo)
 
     if (mConnection)
     {
-        nw_endpoint_t remote_endpoint  = nw_connection_copy_endpoint(mConnection);
+        nw_path_t path                 = nw_connection_copy_current_path(mConnection);
+        nw_endpoint_t remote_endpoint  = nw_path_copy_effective_remote_endpoint(path);
         const IPAddress remote_address = IPAddress::FromSockAddr(*nw_endpoint_get_address(remote_endpoint));
         const uint16_t remote_port     = nw_endpoint_get_port(remote_endpoint);
         const bool isDifferentEndPoint = aPktInfo->DestPort != remote_port || aPktInfo->DestAddress != remote_address;
@@ -1331,7 +1360,7 @@ INET_ERROR IPEndPointBasis::GetConnection(const IPPacketInfo * aPktInfo)
     }
     SuccessOrExit(res);
 
-    res = GetEndPoint(endpoint, aPktInfo->DestAddress, aPktInfo->DestPort);
+    res = GetEndPoint(endpoint, mAddrType, aPktInfo->DestAddress, aPktInfo->DestPort);
     SuccessOrExit(res);
 
     connection = nw_connection_create(endpoint, mParameters);

@@ -59,6 +59,7 @@
 #include <system/SystemPacketBuffer.h>
 
 #include <ble/BleApplicationDelegate.h>
+#include <ble/BleConnectionDelegate.h>
 #include <ble/BleError.h>
 #include <ble/BlePlatformDelegate.h>
 #include <ble/BleUUID.h>
@@ -248,8 +249,13 @@ public:
     BleLayer(void);
 
     BLE_ERROR Init(BlePlatformDelegate * platformDelegate, BleApplicationDelegate * appDelegate, chip::System::Layer * systemLayer);
+    BLE_ERROR Init(BlePlatformDelegate * platformDelegate, BleConnectionDelegate * connDelegate,
+                   BleApplicationDelegate * appDelegate, chip::System::Layer * systemLayer);
     BLE_ERROR Shutdown(void);
 
+    BLE_ERROR NewBleConnection(void * appState, const uint16_t connDiscriminator,
+                               BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
+                               BleConnectionDelegate::OnConnectionErrorFunct onConnectionError);
     BLE_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
 
     chip::System::Error ScheduleWork(chip::System::Layer::TimerCompleteFunct aComplete, void * aAppState)
@@ -333,6 +339,7 @@ private:
     // UUID of CHIP service characteristic used for peripheral indications.
     static const ChipBleUUID CHIP_BLE_CHAR_2_ID;
 
+    BleConnectionDelegate * mConnectionDelegate;
     BlePlatformDelegate * mPlatformDelegate;
     BleApplicationDelegate * mApplicationDelegate;
     chip::System::Layer * mSystemLayer;

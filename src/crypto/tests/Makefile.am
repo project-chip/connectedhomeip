@@ -33,6 +33,15 @@ noinst_HEADERS                                 = \
     HKDF_SHA256_test_vectors.h                   \
     ECDH_P256_test_vectors.h                     \
     PBKDF2_SHA256_test_vectors.h                 \
+    SPAKE2P_FE_RW_test_vectors.h                 \
+    SPAKE2P_HMAC_test_vectors.h                  \
+    SPAKE2P_POINT_MUL_ADD_test_vectors.h         \
+    SPAKE2P_POINT_MUL_test_vectors.h             \
+    SPAKE2P_POINT_RW_test_vectors.h              \
+    PBKDF2_SHA256_test_vectors.h                 \
+    SPAKE2P_POINT_VALID_test_vectors.h           \
+    SPAKE2P_FE_MUL_test_vectors.h                \
+    SPAKE2P_RFC_test_vectors.h                   \
     $(NULL)
 
 #
@@ -62,9 +71,7 @@ dist_libCryptoLayerTests_a_HEADERS             = \
 AM_CPPFLAGS                                    = \
     -I$(top_srcdir)/src/                         \
     -I$(top_srcdir)/src/lib                      \
-    -I$(top_srcdir)/src/system                   \
     -I$(top_srcdir)/src/include/                 \
-    -I$(top_srcdir)/src/crypto                   \
     $(LWIP_CPPFLAGS)                             \
     $(NLASSERT_CPPFLAGS)                         \
     $(NLUNIT_TEST_CPPFLAGS)                      \

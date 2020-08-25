@@ -1,1 +1,0 @@
-EXTRA_DIST+=core-message-dispatch/dispatch.c core-message-dispatch/dispatch.h

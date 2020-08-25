@@ -15,8 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/*******************************************************************************
+/******************************************************************************
  * @file
  * @brief hal-config-app-common.h
  *******************************************************************************
@@ -48,11 +47,6 @@
 #define HAL_PTI_ENABLE (1)
 #define HAL_PTI_MODE (HAL_PTI_MODE_UART)
 #define HAL_PTI_BAUD_RATE (1600000)
-
-#ifdef BSP_CLK_LFXO_CTUNE
-#undef BSP_CLK_LFXO_CTUNE
-#endif
-#define BSP_CLK_LFXO_CTUNE (32)
 
 #define HAL_PA_RAMP (10)
 #define HAL_PA_2P4_LOWPOWER (0)

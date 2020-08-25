@@ -905,36 +905,6 @@ NL_ENABLE_DOCS([auto],[NO])
 AM_CONDITIONAL(CHIP_BUILD_DOCS, [test "${nl_cv_build_docs}" = "yes"])
 
 #
-# OpenThread
-#
-
-NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
-    [OpenThread],
-    [OPENTHREAD],
-    [openthread],
-    [],
-    [
-        AC_MSG_NOTICE([No internal OpenThread support yet!])
-        with_openthread=no
-    ],
-    [
-        # Check for required OpenThread headers.
-        AC_CHECK_HEADERS([openthread/dataset.h] [openthread/dataset_ftd.h] [openthread/error.h] [openthread/icmp6.h] [openthread/instance.h] [openthread/ip6.h] [openthread/link.h] [openthread/message.h] [openthread/netdata.h] [openthread/tasklet.h] [openthread/thread.h],
-        [],
-        [
-            AC_MSG_ERROR(The nlio header "$ac_header" is required but cannot be found.)
-        ])
-    ]
-)
-AM_CONDITIONAL([CHIP_ENABLE_OPENTHREAD], [test "${with_openthread}" != "no"])
-if test "${with_openthread}" != "no"; then
-    CHIP_ENABLE_OPENTHREAD=1
-else
-    CHIP_ENABLE_OPENTHREAD=0
-fi
-AC_DEFINE_UNQUOTED([CHIP_ENABLE_OPENTHREAD],[${CHIP_ENABLE_OPENTHREAD}],[Define to 1 if you want to enable OpenThread.])
-
-#
 # Network Technology Layer
 #
 AC_MSG_CHECKING([network layer])
@@ -996,11 +966,11 @@ AC_DEFINE_UNQUOTED([CONFIG_NETWORK_LAYER_INET],[${CONFIG_NETWORK_LAYER_INET}],[D
 AC_MSG_CHECKING([device layer])
 AC_ARG_WITH(device-layer,
     [AS_HELP_STRING([--with-device-layer=LAYER],
-        [Specify the target environment for the CHIP Device Layer.  Choose one of: efr32, esp32, nrf5, linux, or none @<:@default=none@:>@.])],
+        [Specify the target environment for the CHIP Device Layer.  Choose one of: auto, darwin, efr32, esp32, nrf5, k32w, nrfconnect, linux, or none @<:@default=auto@:>@.])],
     [
         case "${with_device_layer}" in
 
-        efr32|esp32|nrf5|linux|none)
+        auto|darwin|efr32|esp32|nrf5|k32w|nrfconnect|linux|none)
             ;;
 
         *)
@@ -1009,20 +979,48 @@ AC_ARG_WITH(device-layer,
 
         esac
     ],
-    [with_device_layer=none])
+    [with_device_layer=auto])
 AC_MSG_RESULT(${with_device_layer})
 
 # Disable all device layer targets by default
-CHIP_DEVICE_LAYER_TARGET_LINUX=0
+CHIP_DEVICE_LAYER_TARGET_DARWIN=0
+CHIP_DEVICE_LAYER_TARGET_EFR32=0
 CHIP_DEVICE_LAYER_TARGET_ESP32=0
 CHIP_DEVICE_LAYER_TARGET_NRF5=0
-CHIP_DEVICE_LAYER_TARGET_EFR32=0
+CHIP_DEVICE_LAYER_TARGET_K32W=0
+CHIP_DEVICE_LAYER_TARGET_LINUX=0
+CHIP_DEVICE_LAYER_TARGET_NRFCONNECT=0
+
+if test "${with_device_layer}" = "auto"; then
+    case ${target_os} in
+
+	*darwin*)
+            with_device_layer=darwin
+	    ;;
+
+	*linux*)
+            with_device_layer=linux
+	    ;;
+
+	*)
+            with_device_layer=none
+	    ;;
+
+    esac
+fi
 
 case "${with_device_layer}" in
-linux)
+
+darwin)
       CONFIG_DEVICE_LAYER=1
-      CHIP_DEVICE_LAYER_TARGET=Linux
-      CHIP_DEVICE_LAYER_TARGET_LINUX=1
+      CHIP_DEVICE_LAYER_TARGET=Darwin
+      CHIP_DEVICE_LAYER_TARGET_DARWIN=1
+      ;;
+
+efr32)
+      CONFIG_DEVICE_LAYER=1
+      CHIP_DEVICE_LAYER_TARGET=EFR32
+      CHIP_DEVICE_LAYER_TARGET_EFR32=1
       ;;
 
 esp32)
@@ -1035,12 +1033,27 @@ nrf5)
       CONFIG_DEVICE_LAYER=1
       CHIP_DEVICE_LAYER_TARGET=nRF5
       CHIP_DEVICE_LAYER_TARGET_NRF5=1
+      CFLAGS="${CFLAGS} -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb -mabi=aapcs"
+      CXXFLAGS="${CXXFLAGS} -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb -mabi=aapcs"
+      ;;
+      
+       
+k32w)
+      CONFIG_DEVICE_LAYER=1
+      CHIP_DEVICE_LAYER_TARGET=K32W
+      CHIP_DEVICE_LAYER_TARGET_K32W=1
       ;;
 
-efr32)
+nrfconnect)
       CONFIG_DEVICE_LAYER=1
-      CHIP_DEVICE_LAYER_TARGET=EFR32
-      CHIP_DEVICE_LAYER_TARGET_EFR32=1
+      CHIP_DEVICE_LAYER_TARGET=nrfconnect
+      CHIP_DEVICE_LAYER_TARGET_NRFCONNECT=1
+      ;;
+
+linux)
+      CONFIG_DEVICE_LAYER=1
+      CHIP_DEVICE_LAYER_TARGET=Linux
+      CHIP_DEVICE_LAYER_TARGET_LINUX=1
       ;;
 
 none)
@@ -1056,6 +1069,10 @@ AC_DEFINE_UNQUOTED([CONFIG_DEVICE_LAYER],[${CONFIG_DEVICE_LAYER}],[Define to 1 i
 AC_SUBST(CHIP_DEVICE_LAYER_TARGET)
 AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET],[${CHIP_DEVICE_LAYER_TARGET}],[Target platform name for CHIP Device Layer.])
 
+AC_SUBST(CHIP_DEVICE_LAYER_TARGET_DARWIN)
+AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_DARWIN],    [test "${CHIP_DEVICE_LAYER_TARGET_DARWIN}" = 1])
+AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_DARWIN],[${CHIP_DEVICE_LAYER_TARGET_DARWIN}],[Define to 1 if you want to build the CHIP Device Layer for Darwin platforms.])
+
 AC_SUBST(CHIP_DEVICE_LAYER_TARGET_EFR32)
 AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_EFR32],    [test "${CHIP_DEVICE_LAYER_TARGET_EFR32}" = 1])
 AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_EFR32],[${CHIP_DEVICE_LAYER_TARGET_EFR32}],[Define to 1 if you want to build the CHIP Device Layer for Silicon Labs EFR32 platforms.])
@@ -1067,6 +1084,14 @@ AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_ESP32],[${CHIP_DEVICE_LAYER_TARGET_
 AC_SUBST(CHIP_DEVICE_LAYER_TARGET_NRF5)
 AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_NRF5],    [test "${CHIP_DEVICE_LAYER_TARGET_NRF5}" = 1])
 AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_NRF5],[${CHIP_DEVICE_LAYER_TARGET_NRF5}],[Define to 1 if you want to build the CHIP Device Layer for Nordic nRF5* platforms.])
+
+AC_SUBST(CHIP_DEVICE_LAYER_TARGET_K32W)
+AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_K32W],    [test "${CHIP_DEVICE_LAYER_TARGET_K32W}" = 1])
+AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_K32W],[${CHIP_DEVICE_LAYER_TARGET_K32W}],[Define to 1 if you want to build the CHIP Device Layer for NXP K32W platforms.])
+
+AC_SUBST(CHIP_DEVICE_LAYER_TARGET_NRFCONNECT)
+AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_NRFCONNECT],    [test "${CHIP_DEVICE_LAYER_TARGET_NRFCONNECT}" = 1])
+AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_NRFCONNECT],[${CHIP_DEVICE_LAYER_TARGET_NRFCONNECT}],[Define to 1 if you want to build the CHIP Device Layer for Nordic nRF Connect platforms.])
 
 AC_SUBST(CHIP_DEVICE_LAYER_TARGET_LINUX)
 AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_LINUX],    [test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1])
@@ -1091,6 +1116,11 @@ if test "${CONFIG_DEVICE_LAYER}" = 1; then
     AC_DEFINE_UNQUOTED([CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE],
                        [<platform/${CHIP_DEVICE_LAYER_TARGET}/CHIPDevicePlatformConfig.h>],
                        [Path to CHIP Device Layer platform config header file])
+fi
+
+if test ${CHIP_DEVICE_LAYER_TARGET_DARWIN} = 1 && test ${CONFIG_NETWORK_LAYER_BLE} = 1; then
+    AC_CHECK_HEADER([CoreBluetooth/CoreBluetooth.h])
+    LDFLAGS="${LDFLAGS} -framework Foundation -framework CoreBluetooth"
 fi
 
 #
@@ -1506,6 +1536,90 @@ AC_MSG_NOTICE([checking package dependencies])
 AC_PATH_PROG([PKG_CONFIG],[pkg-config])
 
 #
+# Chip over Ble over Bluez Peripheral support
+#
+
+# Only a concern when the BLE layer is enabled.
+
+CONFIG_BLE_PLATFORM_BLUEZ=0
+enable_chipoble_bluez="no"
+
+NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
+  [BlueZ],
+  [BLUEZ],
+  [bluez],
+  [-lgdbus-internal -lshared-glib],
+  [
+  # actions if not external
+  # At this time, enable this only for linux, and only if the tests are enabled
+      if test "${nl_cv_build_tests}" = "yes" && test "${CONFIG_NETWORK_LAYER_BLE}" = 1 && test "${with_device_layer}" = "linux"; then
+      case "${target}" in
+
+          *linux*)
+              if test "x${HAVE_CXX11}" == "0"; then
+                AC_MSG_ERROR([BlueZ support requires C++11 compiler])
+              fi
+              CONFIG_BLE_PLATFORM_BLUEZ=1
+              enable_chipoble_bluez="yes"
+              ;;
+
+          *)
+              CONFIG_BLE_PLATFORM_BLUEZ=0
+              enable_chipoble_bluez="no"
+              ;;
+
+          esac
+      fi
+  ]
+)
+
+# Depending on whether bluez has been configured for an internal
+# location, its directory stem within this package needs to be set
+# accordingly. In addition, if the location is internal, then we need
+# to attempt to pull it down using the bootstrap makefile.
+
+if test "${nl_with_bluez}" = "internal" && test "${enable_chipoble_bluez}" = "yes"; then
+    maybe_bluez_dirstem="bluez/repo"
+    bluez_dirstem="third_party/${maybe_bluez_dirstem}"
+
+    AC_MSG_NOTICE([attempting to create internal ${bluez_dirstem}])
+
+    ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${bluez_dirstem}
+
+    if test $? -ne 0; then
+        AC_MSG_ERROR([failed to create ${bluez_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
+    fi
+
+    echo "  BOOTSTRAP    ${bluez_dirstem}"
+
+    (cd ${srcdir}/${bluez_dirstem} && ./bootstrap)
+
+else
+    maybe_bluez_dirstem=""
+fi
+
+AC_SUBST(BLUEZ_SUBDIRS, [${maybe_bluez_dirstem}])
+AM_CONDITIONAL([CHIP_WITH_BLUEZ_INTERNAL], [test "${nl_with_bluez}" = "internal"])
+
+AM_CONDITIONAL([CONFIG_BLE_PLATFORM_BLUEZ], [test "${enable_chipoble_bluez}" = "yes"])
+AC_DEFINE_UNQUOTED([CONFIG_BLE_PLATFORM_BLUEZ],[${CONFIG_BLE_PLATFORM_BLUEZ}],[Define to 1 if you want to enable Chip over Ble over bluez.])
+
+if test "${enable_chipoble_bluez}" = "yes"; then
+    PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.28, dummy=yes,
+				AC_MSG_ERROR(GLib >= 2.28 is required))
+    AC_SUBST(GLIB_CFLAGS)
+    AC_SUBST(GLIB_LIBS)
+
+    PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.6, dummy=yes,
+				AC_MSG_ERROR(D-Bus >= 1.6 is required))
+    AC_SUBST(DBUS_CFLAGS)
+    AC_SUBST(DBUS_LIBS)
+
+    AX_CHECK_COMPILER_OPTIONS([C],   ${GLIB_CFLAGS} ${DBUS_CFLAGS})
+    AX_CHECK_COMPILER_OPTIONS([C++], ${GLIB_CFLAGS} ${DBUS_CFLAGS})
+fi
+
+#
 # OpenSSL
 #
 
@@ -1529,7 +1643,7 @@ fi
 AM_CONDITIONAL([CHIP_WITH_OPENSSL], [test "${nl_with_openssl}" != "no"])
 
 if test "${nl_with_openssl}" = "no"; then
-    AC_DEFINE([CHIP_WITH_OPENSSL], [0], [Define to 1 to build CHIP with OpenSSL])
+    AC_DEFINE([CHIP_WITH_OPENSSL], [0], [Define to 0 to build CHIP without OpenSSL])
 else
     AC_DEFINE([CHIP_WITH_OPENSSL], [1], [Define to 1 to build CHIP with OpenSSL])
 fi
@@ -1599,10 +1713,111 @@ AM_CONDITIONAL([CHIP_WITH_MBEDTLS_INTERNAL], [test "${nl_with_mbedtls}" = "inter
 AM_CONDITIONAL([CHIP_WITH_MBEDTLS], [test "${nl_with_mbedtls}" != "no"])
 
 if test "${nl_with_mbedtls}" = "no"; then
-    AC_DEFINE([CHIP_WITH_MBEDTLS], [0], [Define to 1 to build CHIP with mbedTLS])
+    AC_DEFINE([CHIP_WITH_MBEDTLS], [0], [Define to 0 to build CHIP without mbedTLS])
 else
     AC_DEFINE([CHIP_WITH_MBEDTLS], [1], [Define to 1 to build CHIP with mbedTLS])
 fi
+
+#
+# OpenThread
+#
+
+NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
+    [OpenThread],
+    [OPENTHREAD],
+    [openthread],
+    [],
+    [
+        # use absolute path to support build out of source tree
+        chip_srcdir="$(cd ${srcdir} && pwd)"
+
+        # bootstrap
+        test -f ${chip_srcdir}/third_party/openthread/repo/configure || (cd ${chip_srcdir}/third_party/openthread/repo && ./bootstrap)
+
+        case "${with_device_layer}" in
+        nrf5)
+            OPENTHREAD_CPPFLAGS="-I\${abs_top_srcdir}/third_party/openthread/repo/include"
+            OPENTHREAD_LDFLAGS="-L${ac_pwd}/third_party/openthread"
+            OPENTHREAD_LIBS="-lopenthread-cli-ftd \
+                -lopenthread-ftd \
+                -lopenthread-platform-utils \
+                -lopenthread-nrf52840-transport \
+                -lopenthread-nrf52840-softdevice-sdk \
+                -lnordicsemi-nrf52840-radio-driver-softdevice \
+                \${NRF5_SDK_ROOT}/external/openthread/nrf_security/lib/libmbedcrypto_glue.a \
+                \${NRF5_SDK_ROOT}/external/openthread/nrf_security/lib/libmbedcrypto_glue_cc310.a \
+                \${NRF5_SDK_ROOT}/external/openthread/nrf_security/lib/libmbedcrypto_glue_vanilla.a \
+                \${NRF5_SDK_ROOT}/external/openthread/nrf_security/lib/libmbedcrypto_cc310_backend.a \
+                \${NRF5_SDK_ROOT}/external/openthread/nrf_security/lib/libmbedcrypto_vanilla_backend.a \
+                \${NRF5_SDK_ROOT}/external/openthread/nrf_security/lib/libmbedtls_base_vanilla.a \
+                \${NRF5_SDK_ROOT}/external/openthread/nrf_security/lib/libmbedtls_tls_vanilla.a \
+                \${NRF5_SDK_ROOT}/external/openthread/nrf_security/lib/libmbedtls_x509_vanilla.a \
+                \${NRF5_SDK_ROOT}/external/openthread/nrf_security/lib/libnrf_cc310_platform_0.9.1.a"
+
+            # private definitions
+            ot_cppflags="-Wno-expansion-to-defined \
+                -I${chip_srcdir}/third_party/openthread/repo/examples/platforms/nrf528xx/nrf52840 \
+                -I${chip_srcdir}/third_party/openthread/repo/third_party/NordicSemiconductor/libraries/nrf_security/config \
+                -I${chip_srcdir}/third_party/openthread/repo/third_party/NordicSemiconductor/libraries/nrf_security/include \
+                -I${chip_srcdir}/third_party/openthread/repo/third_party/NordicSemiconductor/libraries/nrf_security/mbedtls_plat_config \
+                -I${chip_srcdir}/third_party/openthread/repo/third_party/NordicSemiconductor/libraries/nrf_security/nrf_cc310_plat/include \
+                -I${chip_srcdir}/third_party/mbedtls/repo/include \
+                -DMBEDTLS_CONFIG_FILE=\<nrf-config.h\> \
+                -DMBEDTLS_USER_CONFIG_FILE=\<nrf52840-mbedtls-config.h\> \
+                -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE=\<openthread-core-nrf52840-config.h\> \
+                -DOPENTHREAD_CORE_CONFIG_PLATFORM_CHECK_FILE=\<openthread-core-nrf52840-config-check.h\> \
+                -DOPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1 \
+                -DOPENTHREAD_CONFIG_JOINER_ENABLE=1 \
+                -DOPENTHREAD_CONFIG_NCP_UART_ENABLE=1 \
+                -DOPENTHREAD_CONFIG_IP6_SLAAC_ENABLE=1 \
+                -DUART_AS_SERIAL_TRANSPORT=1"
+
+            (mkdir -p ${ac_pwd}/third_party/openthread \
+             && cd ${ac_pwd}/third_party/openthread \
+             && CPPFLAGS="${ot_cppflags}" CFLAGS="${CFLAGS}" CXXFLAGS="${CXXFLAGS}" ${chip_srcdir}/third_party/openthread/repo/configure \
+             --disable-builtin-mbedtls \
+             --disable-docs \
+             --disable-executable \
+             --disable-tools \
+             --enable-cli \
+             --enable-ftd \
+             --host=arm-none-eabi \
+             --prefix=${prefix} \
+             --exec-prefix=${exec_prefix} \
+             --with-examples=nrf52840)
+
+            if test $? != 0; then
+                AC_MSG_ERROR([Failed to configure OpenThread!])
+            fi
+
+            maybe_openthread_dirstem="openthread"
+            ;;
+
+        *)
+            AC_MSG_NOTICE([No internal OpenThread support yet!])
+            nl_with_openthread=no
+            with_openthread=no
+            ;;
+        esac
+    ],
+    [
+        # Check for required OpenThread headers.
+        AC_CHECK_HEADERS([openthread/dataset.h] [openthread/dataset_ftd.h] [openthread/error.h] [openthread/icmp6.h] [openthread/instance.h] [openthread/ip6.h] [openthread/link.h] [openthread/message.h] [openthread/netdata.h] [openthread/tasklet.h] [openthread/thread.h],
+        [],
+        [
+            AC_MSG_ERROR(The OpenThread header "$ac_header" is required but cannot be found.)
+        ])
+        maybe_openthread_dirstem=""
+    ]
+)
+AC_SUBST(OPENTHREAD_SUBDIRS, [${maybe_openthread_dirstem}])
+AM_CONDITIONAL([CHIP_ENABLE_OPENTHREAD], [test "${nl_with_openthread}" != "no"])
+if test "${nl_with_openthread}" != "no"; then
+    CHIP_ENABLE_OPENTHREAD=1
+else
+    CHIP_ENABLE_OPENTHREAD=0
+fi
+AC_DEFINE_UNQUOTED([CHIP_ENABLE_OPENTHREAD],[${CHIP_ENABLE_OPENTHREAD}],[Define to 1 if you want to enable OpenThread.])
 
 #
 # LwIP
@@ -1773,7 +1988,7 @@ AM_CONDITIONAL([CHIP_WITH_NLFAULTINJECTION], [test "${nl_with_nlfaultinjection}"
 AM_CONDITIONAL([CHIP_WITH_NLFAULTINJECTION_INTERNAL], [test "${nl_with_nlfaultinjection}" = "internal"])
 
 if test "${nl_with_nlfaultinjection}" = "no"; then
-    AC_DEFINE([CHIP_WITH_NLFAULTINJECTION], [0], [Define to 1 to build CHIP with nlFaultInjection features])
+    AC_DEFINE([CHIP_WITH_NLFAULTINJECTION], [0], [Define to 0 to build CHIP without nlFaultInjection features])
 else
     AC_DEFINE([CHIP_WITH_NLFAULTINJECTION], [1], [Define to 1 to build CHIP with nlFaultInjection features])
 fi
@@ -1784,6 +1999,55 @@ if test "${nl_cv_build_tests}" = "yes"; then
     fi
 fi
 
+#
+# otbr-client
+#
+
+NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
+    [ot_br_posix],
+    [OT_BR_POSIX],
+    [ot_br_posix],
+    [-lot_br_client],
+    [
+        OT_BR_POSIX_CPPFLAGS="-I\${abs_top_srcdir}/third_party/ot-br-posix/repo/include/ -I\${abs_top_srcdir}/third_party/ot-br-posix/repo/src/"
+        OT_BR_POSIX_LDFLAGS="-L${ac_pwd}/third_party/ot-br-posix/"
+        OT_BR_POSIX_LIBS="-lot_br_client"
+    ],
+    [
+        # Check for required nlfaultinjection headers.
+        AC_LANG_PUSH([C++])
+        AC_CHECK_HEADERS([dbus/client/thread_api_dbus.hpp],
+        [],
+        [
+            AC_MSG_ERROR(The OpenThread border router header "$ac_header" is required but cannot be found.)
+        ])
+        AC_LANG_POP([C++])
+    ]
+)
+
+AC_MSG_NOTICE("nl_with_ot_br_posix=${nl_with_ot_br_posix}")
+
+if test "${nl_with_ot_br_posix}" = "internal" && test "${with_device_layer}" = "linux"; then
+    maybe_ot_br_posix_dirstem="ot-br-posix"
+    ot_br_posix_dirstem="third_party/${maybe_ot_br_posix_dirstem}/repo"
+
+    AC_MSG_NOTICE([attempting to create internal ${ot_br_posix_dirstem}])
+
+    ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${ot_br_posix_dirstem}
+
+    if test $? -ne 0; then
+        AC_MSG_ERROR([failed to create ${ot_br_posix_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
+    fi
+
+    PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.4)
+    AC_SUBST([DBUS_CFLAGS])
+    AC_SUBST([DBUS_LIBS])
+else
+    maybe_ot_br_posix_dirstem=
+fi
+
+AC_SUBST(OT_BR_POSIX_SUBDIRS, [${maybe_ot_br_posix_dirstem}])
+AM_CONDITIONAL([CHIP_WITH_OT_BR_POSIX], [test "${nl_with_ot_br_posix}" != "no"])
 
 #
 # Nlunit-test
@@ -1864,6 +2128,61 @@ if test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1; then
         ]
     )
 fi
+
+#
+#
+# GIO
+#
+
+CHIP_ENABLE_GIO=0
+
+if test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1; then
+    PKG_CHECK_MODULES([GIO], [gio-2.0])
+
+    # Check for GIO library is available.
+    AC_CHECK_LIB([gio-2.0], [g_bus_get_sync],
+    [
+        CHIP_ENABLE_GIO=1
+        AC_DEFINE([CHIP_WITH_GIO], [1], [Define to 1 to build CHIP with GIO])
+    ],
+    [
+        CHIP_ENABLE_GIO=0
+        AC_DEFINE([CHIP_WITH_GIO], [0], [Define to 0 to build CHIP without GIO])
+    ]
+    )
+
+    PKG_CHECK_MODULES([GIO_UNIX], [gio-unix-2.0])
+
+    AC_CHECK_PROG(GDBUSCODEGEN, gdbus-codegen, gdbus-codegen)
+fi
+
+#
+#
+# WPA
+#
+
+CONFIG_WIFI_PLATFORM_WPA=0
+enable_chipwifi_wpa="no"
+
+# At this time, enable this only for linux, and only if the GIO package are installed. Currently, WiFi and Thread
+# are depending on the gdbus-internal configured by internal BLuez package.
+# TODO: Refacrot BLuez to use common gdbus lib from GIO.
+
+if test "${with_device_layer}" = "linux" && test "${CHIP_ENABLE_GIO}" = 1 && test "${CONFIG_BLE_PLATFORM_BLUEZ}" = 1; then
+case "${target}" in
+    *linux*)
+        CONFIG_WIFI_PLATFORM_WPA=1
+        enable_chipwifi_wpa="yes"
+        ;;
+    *)
+        CONFIG_WIFI_PLATFORM_WPA=0
+        enable_chipwifi_wpa="no"
+        ;;
+    esac
+fi
+
+AM_CONDITIONAL([CONFIG_WIFI_PLATFORM_WPA], [test "${enable_chipwifi_wpa}" = "yes"])
+AC_DEFINE_UNQUOTED([CHIP_DEVICE_CONFIG_ENABLE_WPA],[${CONFIG_WIFI_PLATFORM_WPA}],[Define to 1 if you want to enable WPA support for wpa_supplicant.])
 
 #
 # Sockets
@@ -2078,9 +2397,9 @@ AC_SUBST(CRYPTO_CPPFLAGS)
 AC_SUBST(CRYPTO_LDFLAGS)
 AC_SUBST(CRYPTO_LIBS)
 
-CPPFLAGS="${CPPFLAGS} ${CRYPTO_CPPFLAGS}"
-LDFLAGS="${LDFLAGS} ${CRYPTO_LDFLAGS}"
-LIBS="${LIBS} ${CRYPTO_LIBS}"
+CPPFLAGS="${CPPFLAGS} ${CRYPTO_CPPFLAGS} ${OPENTHREAD_CPPFLAGS}"
+LDFLAGS="${LDFLAGS} ${CRYPTO_LDFLAGS} ${OPENTHREAD_LDFLAGS}"
+LIBS="${LIBS} ${CRYPTO_LIBS} ${OPENTHREAD_LIBS}"
 
 # Add any code coverage CPPFLAGS, LDFLAGS, and LIBS
 
@@ -2129,6 +2448,10 @@ AC_CONFIG_SUBDIRS([third_party/nlfaultinjection/repo])
 AC_SUBST(NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY,["${ac_pwd}/third_party/nlfaultinjection/repo/src"])
 fi
 
+if test "${nl_with_bluez}" = "internal" && test "${enable_chipoble_bluez}" = "yes"; then
+AC_CONFIG_SUBDIRS([third_party/bluez/repo])
+fi
+
 if test "${nl_with_mbedtls}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/mbedtls/repo])
 fi
@@ -2147,15 +2470,15 @@ examples/Makefile
 third_party/Makefile
 third_party/lwip/Makefile
 third_party/mbedtls/Makefile
+third_party/ot-br-posix/Makefile
 src/Makefile
 src/include/Makefile
 src/app/Makefile
-src/app/chip-zcl/Makefile
-src/app/gen/Makefile
-src/app/plugin/Makefile
-src/app/plugin/tests/Makefile
+src/app/clusters/Makefile
+src/app/util/Makefile
 src/ble/Makefile
 src/ble/tests/Makefile
+src/controller/java/Makefile
 src/crypto/Makefile
 src/crypto/tests/Makefile
 src/lwip/Makefile
@@ -2163,6 +2486,7 @@ src/lwip/tests/Makefile
 src/system/Makefile
 src/system/tests/Makefile
 src/setup_payload/Makefile
+src/setup_payload/java/Makefile
 src/setup_payload/tests/Makefile
 src/inet/Makefile
 src/inet/tests/Makefile
@@ -2246,6 +2570,8 @@ AC_MSG_NOTICE([
   Doxygen                                          : ${DOXYGEN:--}
   GraphViz dot                                     : ${DOT:--}
   PERL                                             : ${PERL:--}
+  CHIP over BlueZ support                          : ${enable_chipoble_bluez:--}
+  BlueZ source                                     : ${nl_with_bluez:--}
   Valgrind                                         : ${VALGRIND:--}
   LwIP source                                      : ${nl_with_lwip:--}
   LwIP compile flags                               : ${LWIP_CPPFLAGS:--}
@@ -2256,6 +2582,10 @@ AC_MSG_NOTICE([
   mbedTLS compile flags                            : ${MBEDTLS_CPPFLAGS:--}
   mbedTLS link flags                               : ${MBEDTLS_LDFLAGS:--}
   mbedTLS link libraries                           : ${MBEDTLS_LIBS:--}
+  OpenThread source                                : ${nl_with_openthread}
+  OpenThread compile flags                         : ${OPENTHREAD_CPPFLAGS:--}
+  OpenThread link flags                            : ${OPENTHREAD_LDFLAGS:--}
+  OpenThread link libraries                        : ${OPENTHREAD_LIBS:--}
   OpenSSL source                                   : ${nl_with_openssl}
   OpenSSL compile flags                            : ${OPENSSL_CPPFLAGS:--}
   OpenSSL link flags                               : ${OPENSSL_LDFLAGS:--}
@@ -2287,6 +2617,10 @@ AC_MSG_NOTICE([
   PThreads compile flags                           : ${PTHREAD_CFLAGS:--}
   PThreads link libraries                          : ${PTHREAD_LIBS:--}
   IniPP compile flags                              : ${INIPP_CPPFLAGS:--}
+  GIO compile flags                                : ${GIO_CFLAGS:--}
+  GIO link flags                                   : ${GIO_LIBS:--}
+  GIO UNIX compile flags                           : ${GIO_UNIX_CFLAGS:--}
+  GIO UNIX link flags                              : ${GIO_UNIX_LIBS:--}
   C Preprocessor                                   : ${CPP}
   C Compiler                                       : ${CC}
   C++ Preprocessor                                 : ${CXXCPP}

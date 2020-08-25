@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 30
@@ -15,7 +17,7 @@ android {
 
         // NOTE: This build assumes CHIP was configured and built for armeabi-v7a. Deal with
         // other archs later when build is sane.
-        ndk {abiFilters 'armeabi-v7a'}
+        //  ndk {abiFilters 'armeabi-v7a'}
     }
 
     buildTypes {
@@ -24,12 +26,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    externalNativeBuild {
-        cmake {
-            path file('CMakeLists.txt')
-        }
-    }
-    ndkVersion '21.3.6528147'
 
     configurations.all {
         resolutionStrategy.eachDependency {DependencyResolveDetails details ->
@@ -44,13 +40,22 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation fileTree(dir: "libs", include: ["*.jar", "*.so"])
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.preference:preference:1.1.1'
     implementation "com.google.android.gms:play-services-vision:20.1.0"
     implementation "androidx.annotation:annotation:1.1.0"
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.0'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.3.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation "androidx.core:core-ktx:1.3.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "androidx.work:work-runtime:2.3.3"
+    implementation 'com.google.code.gson:gson:2.8.5'
 }
-
+repositories {
+    mavenCentral()
+}

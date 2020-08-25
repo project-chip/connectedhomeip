@@ -31,6 +31,7 @@
 
 #include <ble/BLEEndPoint.h>
 #include <ble/BleApplicationDelegate.h>
+#include <ble/BleConnectionDelegate.h>
 #include <ble/BleError.h>
 #include <ble/BleLayer.h>
 #include <ble/BlePlatformDelegate.h>

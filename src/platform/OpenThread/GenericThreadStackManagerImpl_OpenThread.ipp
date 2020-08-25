@@ -29,7 +29,9 @@
 #include <openthread/cli.h>
 #include <openthread/dataset.h>
 #include <openthread/dataset_ftd.h>
+#include <openthread/joiner.h>
 #include <openthread/link.h>
+#include <openthread/netdata.h>
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
 #include <openthread/thread_ftd.h>
@@ -37,6 +39,8 @@
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/DeviceNetworkInfo.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 extern "C" void otSysProcessDrivers(otInstance * aInstance);
@@ -188,6 +192,57 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadEnable
     }
 
 exit:
+    Impl()->UnlockThreadStack();
+
+    return MapOpenThreadError(otErr);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvision(const DeviceNetworkInfo & netInfo)
+{
+    otError otErr = OT_ERROR_FAILED;
+    otOperationalDataset newDataset;
+
+    // Form a Thread operational dataset from the given network parameters.
+    memset(&newDataset, 0, sizeof(newDataset));
+    newDataset.mComponents.mIsActiveTimestampPresent  = true;
+    newDataset.mComponents.mIsPendingTimestampPresent = true;
+    if (netInfo.ThreadNetworkName[0] != 0)
+    {
+        strncpy((char *) newDataset.mNetworkName.m8, netInfo.ThreadNetworkName, sizeof(newDataset.mNetworkName.m8));
+        newDataset.mComponents.mIsNetworkNamePresent = true;
+    }
+    if (netInfo.FieldPresent.ThreadExtendedPANId)
+    {
+        memcpy(newDataset.mExtendedPanId.m8, netInfo.ThreadExtendedPANId, sizeof(newDataset.mExtendedPanId.m8));
+        newDataset.mComponents.mIsExtendedPanIdPresent = true;
+    }
+    if (netInfo.FieldPresent.ThreadMeshPrefix)
+    {
+        memcpy(newDataset.mMeshLocalPrefix.m8, netInfo.ThreadMeshPrefix, sizeof(newDataset.mMeshLocalPrefix.m8));
+        newDataset.mComponents.mIsMeshLocalPrefixPresent = true;
+    }
+    memcpy(newDataset.mMasterKey.m8, netInfo.ThreadNetworkKey, sizeof(newDataset.mMasterKey.m8));
+    newDataset.mComponents.mIsMasterKeyPresent = true;
+    if (netInfo.FieldPresent.ThreadPSKc)
+    {
+        memcpy(newDataset.mPskc.m8, netInfo.ThreadPSKc, sizeof(newDataset.mPskc.m8));
+        newDataset.mComponents.mIsPskcPresent = true;
+    }
+    if (netInfo.ThreadPANId != kThreadPANId_NotSpecified)
+    {
+        newDataset.mPanId                      = netInfo.ThreadPANId;
+        newDataset.mComponents.mIsPanIdPresent = true;
+    }
+    if (netInfo.ThreadChannel != kThreadChannel_NotSpecified)
+    {
+        newDataset.mChannel                      = netInfo.ThreadChannel;
+        newDataset.mComponents.mIsChannelPresent = true;
+    }
+
+    // Set the dataset as the active dataset for the node.
+    Impl()->LockThreadStack();
+    otErr = otDatasetSetActive(mOTInst, &newDataset);
     Impl()->UnlockThreadStack();
 
     return MapOpenThreadError(otErr);
@@ -730,7 +785,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
         VerifyOrExit(otInst != NULL, err = MapOpenThreadError(OT_ERROR_FAILED));
     }
 
+#ifndef __ZEPHYR__
     otCliUartInit(otInst);
+#endif
 
     mOTInst = otInst;
 
@@ -749,9 +806,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
         VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
     }
 
-    // Disable automatic assignment of Thread advertised addresses.
-#if OPENTHREAD_CONFIG_ENABLE_SLAAC
-    otIp6SetSlaacEnabled(otInst, false);
+    // Enable automatic assignment of Thread advertised addresses.
+#if OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE
+    otIp6SetSlaacEnabled(otInst, true);
 #endif
 
     // If the Thread stack has been provisioned, but is not currently enabled, enable it now.
@@ -817,6 +874,72 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo(v
     otThreadSetEnabled(mOTInst, false);
     otInstanceErasePersistentInfo(mOTInst);
     Impl()->UnlockThreadStack();
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnJoinerComplete(otError aError, void * aContext)
+{
+    static_cast<GenericThreadStackManagerImpl_OpenThread *>(aContext)->OnJoinerComplete(aError);
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnJoinerComplete(otError aError)
+{
+    ChipLogProgress(DeviceLayer, "Join Thread network: %s", otThreadErrorToString(aError));
+
+    if (aError == OT_ERROR_NONE)
+    {
+        otError error = otThreadSetEnabled(mOTInst, true);
+
+        ChipLogProgress(DeviceLayer, "Start Thread network: %s", otThreadErrorToString(error));
+    }
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_JoinerStart(void)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    Impl()->LockThreadStack();
+    VerifyOrExit(!otDatasetIsCommissioned(mOTInst) && otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED,
+                 error = MapOpenThreadError(OT_ERROR_INVALID_STATE));
+    VerifyOrExit(otJoinerGetState(mOTInst) == OT_JOINER_STATE_IDLE, error = MapOpenThreadError(OT_ERROR_BUSY));
+
+    if (!otIp6IsEnabled(mOTInst))
+    {
+        SuccessOrExit(error = MapOpenThreadError(otIp6SetEnabled(mOTInst, true)));
+    }
+
+    {
+        otJoinerDiscerner discerner;
+        uint32_t discriminator;
+
+        SuccessOrExit(error = ConfigurationMgr().GetSetupDiscriminator(discriminator));
+        discerner.mLength = 12;
+        discerner.mValue  = discriminator;
+
+        ChipLogProgress(DeviceLayer, "Joiner Discerner: %u", discriminator);
+        otJoinerSetDiscerner(mOTInst, &discerner);
+    }
+
+    {
+        otJoinerPskd pskd;
+        uint32_t pincode;
+
+        SuccessOrExit(error = ConfigurationMgr().GetSetupPinCode(pincode));
+        snprintf(pskd.m8, sizeof(pskd.m8) - 1, "%09" PRIu32, pincode);
+
+        ChipLogProgress(DeviceLayer, "Joiner PSKd: %s", pskd.m8);
+        error = MapOpenThreadError(otJoinerStart(mOTInst, pskd.m8, NULL, NULL, NULL, NULL, NULL,
+                                                 &GenericThreadStackManagerImpl_OpenThread::OnJoinerComplete, this));
+    }
+
+exit:
+    Impl()->UnlockThreadStack();
+
+    ChipLogProgress(DeviceLayer, "Joiner start: %s", chip::ErrorStr(error));
+
+    return error;
 }
 
 } // namespace Internal

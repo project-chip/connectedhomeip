@@ -29,7 +29,7 @@
 #import <Foundation/Foundation.h>
 #import <os/log.h>
 
-#include <support/CHIPLogging.h>
+#include <support/logging/CHIPLogging.h>
 
 #if CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING
 

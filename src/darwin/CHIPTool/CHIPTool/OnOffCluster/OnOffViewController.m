@@ -15,14 +15,6 @@
  *    limitations under the License.
  */
 
-//
-//  OnOffViewController.m
-//  CHIPTool
-//
-//  Created by Bhaskar on 6/1/20.
-//  Copyright © 2020 CHIP. All rights reserved.
-//
-
 #import "OnOffViewController.h"
 #import <CHIP/CHIP.h>
 
@@ -65,8 +57,6 @@
     [self reconnectIfNeeded];
 
     [self.onOff lightOn];
-
-    [self postResult:@"Turning light on"];
 }
 
 - (IBAction)offButtonTapped:(id)sender
@@ -74,8 +64,6 @@
     [self reconnectIfNeeded];
 
     [self.onOff lightOff];
-
-    [self postResult:@"Turning light off"];
 }
 
 - (IBAction)toggleButtonTapped:(id)sender
@@ -83,8 +71,6 @@
     [self reconnectIfNeeded];
 
     [self.onOff toggleLight];
-
-    [self postResult:@"Toggling light"];
 }
 
 @end

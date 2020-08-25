@@ -1,0 +1,107 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+declare_args() {
+  # Use a different target, such as a prebuilt MbedTLS.
+  mbedtls_target = ""
+}
+
+if (mbedtls_target != "") {
+  group("mbedtls") {
+    public_deps = [ mbedtls_target ]
+  }
+} else {
+  config("mbedtls_config") {
+    include_dirs = [ "repo/include" ]
+  }
+
+  static_library("mbedtls") {
+    sources = [
+      "repo/library/aes.c",
+      "repo/library/aesni.c",
+      "repo/library/arc4.c",
+      "repo/library/asn1parse.c",
+      "repo/library/asn1write.c",
+      "repo/library/base64.c",
+      "repo/library/bignum.c",
+      "repo/library/blowfish.c",
+      "repo/library/camellia.c",
+      "repo/library/ccm.c",
+      "repo/library/certs.c",
+      "repo/library/chacha20.c",
+      "repo/library/chachapoly.c",
+      "repo/library/cipher.c",
+      "repo/library/cipher_wrap.c",
+      "repo/library/ctr_drbg.c",
+      "repo/library/debug.c",
+      "repo/library/des.c",
+      "repo/library/dhm.c",
+      "repo/library/ecdh.c",
+      "repo/library/ecdsa.c",
+      "repo/library/ecp.c",
+      "repo/library/ecp_curves.c",
+      "repo/library/entropy.c",
+      "repo/library/entropy_poll.c",
+      "repo/library/error.c",
+      "repo/library/gcm.c",
+      "repo/library/hkdf.c",
+      "repo/library/hmac_drbg.c",
+      "repo/library/md.c",
+      "repo/library/md5.c",
+      "repo/library/md_wrap.c",
+      "repo/library/oid.c",
+      "repo/library/pem.c",
+      "repo/library/pk.c",
+      "repo/library/pk_wrap.c",
+      "repo/library/pkcs12.c",
+      "repo/library/pkcs5.c",
+      "repo/library/pkparse.c",
+      "repo/library/pkwrite.c",
+      "repo/library/platform.c",
+      "repo/library/platform_util.c",
+      "repo/library/poly1305.c",
+      "repo/library/ripemd160.c",
+      "repo/library/rsa.c",
+      "repo/library/rsa_internal.c",
+      "repo/library/sha1.c",
+      "repo/library/sha256.c",
+      "repo/library/sha512.c",
+      "repo/library/ssl_cache.c",
+      "repo/library/ssl_ciphersuites.c",
+      "repo/library/ssl_cli.c",
+      "repo/library/ssl_cookie.c",
+      "repo/library/ssl_srv.c",
+      "repo/library/ssl_ticket.c",
+      "repo/library/ssl_tls.c",
+      "repo/library/version.c",
+      "repo/library/version_features.c",
+      "repo/library/x509.c",
+      "repo/library/x509_create.c",
+      "repo/library/x509_crl.c",
+      "repo/library/x509_csr.c",
+      "repo/library/x509write_crt.c",
+      "repo/library/x509write_csr.c",
+      "repo/library/xtea.c",
+    ]
+
+    if (current_os != "freertos") {
+      sources += [ "repo/library/timing.c" ]
+    }
+
+    public_configs = [ ":mbedtls_config" ]
+
+    output_name = "libmbedtls"
+    output_dir = "${root_out_dir}/lib"
+  }
+}
