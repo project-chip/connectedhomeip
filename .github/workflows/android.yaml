@@ -47,4 +47,6 @@ jobs:
           export PATH=$PATH:/usr/local/share/android-ndk-r21b/toolchains/llvm/prebuilt/linux-x86_64/bin/
           scripts/build/gn_gen.sh --args="$GN_ARGS"
       - name: Run Build
-        run: scripts/build/gn_build.sh
+        run: |
+          export PATH=$PATH:/usr/local/share/android-ndk-r21b/toolchains/llvm/prebuilt/linux-x86_64/bin/
+          scripts/build/gn_build.sh
