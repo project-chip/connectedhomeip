@@ -293,7 +293,7 @@ gn path out/host //src/transport/tests:tests //src/system
 You can specify these gn arguments in the `--args=` section of the command to
 customize your build.
 
--   `chip_device_config_use_test_setup_pin_code`: The setup pincode of the 
+-   `chip_device_config_use_test_setup_pin_code`: The setup pincode of the
     device if not found in the storage.
 -   `chip_device_config_use_test_setup_discriminator`: The discriminator of the
     device if not found in the storage.
