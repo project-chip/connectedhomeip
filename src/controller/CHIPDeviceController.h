@@ -52,8 +52,10 @@ typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, v
 };
 
 class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback,
-                                        public SecurePairingSessionDelegate,
-                                        public Transport::BLECallbackHandler
+#if CONFIG_NETWORK_LAYER_BLE
+                                        public Transport::BLECallbackHandler,
+#endif
+                                        public SecurePairingSessionDelegate
 {
     friend class ChipDeviceControllerCallback;
 
@@ -213,11 +215,13 @@ public:
 
     void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
 
+#if CONFIG_NETWORK_LAYER_BLE
     //////////// BLECallbackHandler Implementation ///////////////
     void OnBLEConnectionError(BLE_ERROR err) override;
     void OnBLEConnectionComplete(BLE_ERROR err) override;
     void OnBLEConnectionClosed(BLE_ERROR err) override;
     void OnBLEPacketReceived(PacketBuffer * buffer) override;
+#endif
 
 private:
 #if CONFIG_NETWORK_LAYER_BLE

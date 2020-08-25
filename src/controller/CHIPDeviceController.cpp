@@ -484,6 +484,8 @@ void ChipDeviceController::OnMessageReceived(const MessageHeader & header, Trans
     }
 }
 
+#if CONFIG_NETWORK_LAYER_BLE
+
 void ChipDeviceController::OnBLEConnectionError(BLE_ERROR err)
 {
     if (mOnError)
@@ -520,6 +522,8 @@ void ChipDeviceController::OnBLEPacketReceived(PacketBuffer * buffer)
         mOnComplete.Response(this, mAppReqState, buffer);
     }
 }
+
+#endif // CONFIG_NETWORK_LAYER_BLE
 
 } // namespace DeviceController
 } // namespace chip
