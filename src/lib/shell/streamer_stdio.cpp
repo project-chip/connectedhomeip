@@ -31,7 +31,7 @@
 namespace chip {
 namespace Shell {
 
-#ifndef SHELL_STREAMER_SPECIFIC
+#ifndef SHELL_STREAMER_APP_SPECIFIC
 
 static struct termios the_original_stdin_termios;
 
@@ -82,7 +82,7 @@ streamer_t * streamer_get(void)
     return &streamer_stdio;
 }
 
-#endif //#ifndef SHELL_STREAMER_SPECIFIC
+#endif //#ifndef SHELL_STREAMER_APP_SPECIFIC
 
 } // namespace Shell
 } // namespace chip

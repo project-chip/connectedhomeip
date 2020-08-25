@@ -27,10 +27,6 @@ extern "C" {
 #include "gen/gen-types.h"
 }
 
-//#include <logging/log.h>
-
-// LOG_MODULE_DECLARE(app);
-
 extern "C" void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId,
                                                    uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
                                                    uint8_t * value)

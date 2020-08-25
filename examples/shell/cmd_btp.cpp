@@ -17,7 +17,7 @@
 
 #include <core/CHIPCore.h>
 
-#if CONFIG_NETWORK_LAYER_BLE > 0
+#if CONFIG_NETWORK_LAYER_BLE
 
 #include <platform/CHIPDeviceLayer.h>
 #include <shell/shell.h>
@@ -88,13 +88,13 @@ int cmd_btp_scan(int argc, char ** argv)
     if (strcmp(argv[0], "start") == 0)
     {
         streamer_printf(sout, "Starting scanning over BLE");
-        // start scanning
+        // TODO: start scanning
         SuccessOrExit(error = CHIP_NO_ERROR);
     }
     else if (strcmp(argv[0], "stop") == 0)
     {
         streamer_printf(sout, "Stopping scanning over BLE");
-        // stop scanning
+        // TODO: stop scanning
         SuccessOrExit(error = CHIP_NO_ERROR);
     }
     else
@@ -169,7 +169,7 @@ static const shell_command_t cmds_btp[] = {
 
 void cmd_btp_init(void)
 {
-#if CONFIG_NETWORK_LAYER_BLE > 0
+#if CONFIG_NETWORK_LAYER_BLE
     // CHIP_ERROR error = CHIP_NO_ERROR;
 
     // Register `device` subcommands with the local shell dispatcher.
@@ -178,5 +178,5 @@ void cmd_btp_init(void)
     // Register the root `btp` command with the top-level shell.
     shell_register(&cmds_btp_root, 1);
 
-#endif // CONFIG_DEVICE_LAYER
+#endif // CONFIG_NETWORK_LAYER_BLE
 }
