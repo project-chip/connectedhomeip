@@ -30,7 +30,6 @@
 #include "SetupPayload.h"
 
 #include <string>
-using namespace std;
 
 #ifndef _QR_CODE_SETUP_PAYLOAD_GENERATOR_
 #define _QR_CODE_SETUP_PAYLOAD_GENERATOR_
@@ -58,7 +57,7 @@ public:
      *               that an error occurred preventing the function from
      *               producing the requested string.
      */
-    CHIP_ERROR payloadBase41Representation(string & base41Representation);
+    CHIP_ERROR payloadBase41Representation(std::string & base41Representation);
 
     /**
      * This function is called to encode the binary data of a payload to a
@@ -82,7 +81,7 @@ public:
      *               that an error occurred preventing the function from
      *               producing the requested string.
      */
-    CHIP_ERROR payloadBase41Representation(string & base41Representation, uint8_t * tlvDataStart, size_t tlvDataStartSize);
+    CHIP_ERROR payloadBase41Representation(std::string & base41Representation, uint8_t * tlvDataStart, size_t tlvDataStartSize);
 
 private:
     CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t maxLen,

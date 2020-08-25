@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/jlink.gni")
 import("//build_overrides/nrf5_sdk.gni")
+import("//build_overrides/openthread.gni")
 
 declare_args() {
   # Location of the nRF5 SDK.
-  nrf5_sdk_root = ""
-}
-
-if (nrf5_sdk_root == "") {
   nrf5_sdk_root = getenv("NRF5_SDK_ROOT")
 }
 
@@ -29,7 +27,7 @@ assert(nrf5_sdk_root != "", "nrf5_sdk_root must be specified")
 #
 # Parameters:
 #   nrf5_sdk_root - The location of the nRF SDK.
-#   sources - The sources files to build.
+#   sources - Extra source files to build.
 template("nrf5_sdk") {
   if (defined(invoker.nrf5_sdk_root)) {
     nrf5_sdk_root = invoker.nrf5_sdk_root
@@ -66,7 +64,10 @@ template("nrf5_sdk") {
       "${nrf5_sdk_root}/components/libraries/mem_manager",
       "${nrf5_sdk_root}/components/libraries/mutex",
       "${nrf5_sdk_root}/components/libraries/queue",
+      "${nrf5_sdk_root}/components/libraries/usbd",
+      "${nrf5_sdk_root}/components/libraries/usbd/class/cdc",
       "${nrf5_sdk_root}/components/libraries/ringbuf",
+      "${nrf5_sdk_root}/components/libraries/bootloader/dfu",
       "${nrf5_sdk_root}/components/libraries/stack_info",
       "${nrf5_sdk_root}/components/libraries/strerror",
       "${nrf5_sdk_root}/components/libraries/timer",
@@ -75,7 +76,6 @@ template("nrf5_sdk") {
       "${nrf5_sdk_root}/components/softdevice/s140/headers",
       "${nrf5_sdk_root}/components/softdevice/s140/headers/nrf52",
       "${nrf5_sdk_root}/components/softdevice/mbr/nrf52840/headers",
-      "${nrf5_sdk_root}/components/thread/freertos_mbedtls_mutex",
       "${nrf5_sdk_root}/components/toolchain/cmsis/include",
       "${nrf5_sdk_root}/config/nrf52840/config",
       "${nrf5_sdk_root}/external/fprintf",
@@ -83,7 +83,10 @@ template("nrf5_sdk") {
       "${nrf5_sdk_root}/external/freertos/portable/CMSIS/nrf52",
       "${nrf5_sdk_root}/external/freertos/portable/GCC/nrf52",
       "${nrf5_sdk_root}/external/freertos/source/include",
-      "${nrf5_sdk_root}/external/segger_rtt",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/config",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/mbedtls_plat_config",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/nrf_cc310_plat/include",
       "${nrf5_sdk_root}/integration/nrfx",
       "${nrf5_sdk_root}/integration/nrfx/legacy",
       "${nrf5_sdk_root}/modules/nrfx",
@@ -93,6 +96,19 @@ template("nrf5_sdk") {
     ]
 
     lib_dirs = [ "${nrf5_sdk_root}/modules/nrfx/mdk" ]
+
+    libs = [
+      "${nrf5_sdk_root}/external/openthread/nrf_security/lib/libmbedcrypto_glue.a",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/lib/libmbedcrypto_glue.a",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/lib/libmbedcrypto_glue_cc310.a",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/lib/libmbedcrypto_glue_vanilla.a",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/lib/libmbedcrypto_cc310_backend.a",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/lib/libmbedcrypto_vanilla_backend.a",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/lib/libmbedtls_base_vanilla.a",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/lib/libmbedtls_tls_vanilla.a",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/lib/libmbedtls_x509_vanilla.a",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/lib/libnrf_cc310_platform_0.9.1.a",
+    ]
 
     defines = [
       "NRF52840_XXAA",
@@ -105,6 +121,16 @@ template("nrf5_sdk") {
       "SOFTDEVICE_PRESENT",
       "PRINTF_DISABLE_SUPPORT_EXPONENTIAL",
       "S140",
+      "ENABLE_FEM",
+      "FREERTOS",
+      "MBEDTLS_CONFIG_FILE=\"nrf-config.h\"",
+      "MBEDTLS_USER_CONFIG_FILE=\"nrf52840-mbedtls-config.h\"",
+      "MULTIPROTOCOL_802154_CONFIG_PRESENT",
+      "NRFX_PRS_ENABLED=0",
+      "NRF_SD_BLE_API_VERSION=7",
+      "UART0_ENABLED=0",
+      "UART1_ENABLED=1",
+      "SOFTDEVICE_PRESENT=1",
     ]
     if (defined(invoker.defines)) {
       defines += invoker.defines
@@ -117,8 +143,14 @@ template("nrf5_sdk") {
   }
 
   # TODO - Break up this monolith and make it configurable.
-  static_library(sdk_target_name) {
-    sources = [
+  source_set(sdk_target_name) {
+    forward_variables_from(invoker, "*")
+
+    if (!defined(sources)) {
+      sources = []
+    }
+
+    sources += [
       "${nrf5_sdk_root}/components/ble/common/ble_advdata.c",
       "${nrf5_sdk_root}/components/ble/common/ble_advdata.h",
       "${nrf5_sdk_root}/components/ble/common/ble_srv_common.c",
@@ -128,9 +160,7 @@ template("nrf5_sdk") {
       "${nrf5_sdk_root}/components/boards/boards.c",
       "${nrf5_sdk_root}/components/boards/boards.h",
       "${nrf5_sdk_root}/components/boards/pca10056.h",
-      "${nrf5_sdk_root}/components/boards/pca10056.h",
       "${nrf5_sdk_root}/components/libraries/atomic/nrf_atomic.c",
-      "${nrf5_sdk_root}/components/libraries/atomic/nrf_atomic.h",
       "${nrf5_sdk_root}/components/libraries/atomic/nrf_atomic.h",
       "${nrf5_sdk_root}/components/libraries/atomic/nrf_atomic_internal.h",
       "${nrf5_sdk_root}/components/libraries/atomic_fifo/nrf_atfifo.c",
@@ -138,6 +168,7 @@ template("nrf5_sdk") {
       "${nrf5_sdk_root}/components/libraries/atomic_fifo/nrf_atfifo_internal.h",
       "${nrf5_sdk_root}/components/libraries/balloc/nrf_balloc.c",
       "${nrf5_sdk_root}/components/libraries/balloc/nrf_balloc.h",
+      "${nrf5_sdk_root}/components/libraries/bootloader/dfu/nrf_dfu_trigger_usb.h",
       "${nrf5_sdk_root}/components/libraries/button/app_button.c",
       "${nrf5_sdk_root}/components/libraries/button/app_button.h",
       "${nrf5_sdk_root}/components/libraries/crc16/crc16.c",
@@ -150,20 +181,16 @@ template("nrf5_sdk") {
       "${nrf5_sdk_root}/components/libraries/fds/fds_internal_defs.h",
       "${nrf5_sdk_root}/components/libraries/fstorage/nrf_fstorage.c",
       "${nrf5_sdk_root}/components/libraries/fstorage/nrf_fstorage.h",
-      "${nrf5_sdk_root}/components/libraries/fstorage/nrf_fstorage.h",
       "${nrf5_sdk_root}/components/libraries/fstorage/nrf_fstorage_sd.c",
       "${nrf5_sdk_root}/components/libraries/fstorage/nrf_fstorage_sd.h",
       "${nrf5_sdk_root}/components/libraries/log/nrf_log.h",
       "${nrf5_sdk_root}/components/libraries/log/nrf_log_backend_interface.h",
       "${nrf5_sdk_root}/components/libraries/log/nrf_log_backend_rtt.h",
-      "${nrf5_sdk_root}/components/libraries/log/nrf_log_backend_rtt.h",
       "${nrf5_sdk_root}/components/libraries/log/nrf_log_backend_uart.h",
-      "${nrf5_sdk_root}/components/libraries/log/nrf_log_ctrl.h",
       "${nrf5_sdk_root}/components/libraries/log/nrf_log_ctrl.h",
       "${nrf5_sdk_root}/components/libraries/log/nrf_log_default_backends.h",
       "${nrf5_sdk_root}/components/libraries/log/nrf_log_instance.h",
       "${nrf5_sdk_root}/components/libraries/log/nrf_log_str_formatter.h",
-      "${nrf5_sdk_root}/components/libraries/log/nrf_log_types.h",
       "${nrf5_sdk_root}/components/libraries/log/nrf_log_types.h",
       "${nrf5_sdk_root}/components/libraries/log/src/nrf_log_backend_rtt.c",
       "${nrf5_sdk_root}/components/libraries/log/src/nrf_log_backend_serial.c",
@@ -186,26 +213,32 @@ template("nrf5_sdk") {
       "${nrf5_sdk_root}/components/libraries/timer/app_timer.h",
       "${nrf5_sdk_root}/components/libraries/timer/app_timer_freertos.c",
       "${nrf5_sdk_root}/components/libraries/uart/retarget.c",
+      "${nrf5_sdk_root}/components/libraries/usbd/app_usbd.h",
+      "${nrf5_sdk_root}/components/libraries/usbd/app_usbd_class_base.h",
+      "${nrf5_sdk_root}/components/libraries/usbd/app_usbd_core.h",
+      "${nrf5_sdk_root}/components/libraries/usbd/app_usbd_descriptor.h",
+      "${nrf5_sdk_root}/components/libraries/usbd/app_usbd_langid.h",
+      "${nrf5_sdk_root}/components/libraries/usbd/app_usbd_request.h",
+      "${nrf5_sdk_root}/components/libraries/usbd/app_usbd_serial_num.h",
+      "${nrf5_sdk_root}/components/libraries/usbd/app_usbd_types.h",
+      "${nrf5_sdk_root}/components/libraries/usbd/class/cdc/acm/app_usbd_cdc_acm.h",
+      "${nrf5_sdk_root}/components/libraries/usbd/class/cdc/acm/app_usbd_cdc_acm_internal.h",
+      "${nrf5_sdk_root}/components/libraries/usbd/class/cdc/app_usbd_cdc_desc.h",
+      "${nrf5_sdk_root}/components/libraries/usbd/class/cdc/app_usbd_cdc_types.h",
       "${nrf5_sdk_root}/components/libraries/util/app_error.c",
       "${nrf5_sdk_root}/components/libraries/util/app_error.h",
       "${nrf5_sdk_root}/components/libraries/util/app_error_handler_gcc.c",
       "${nrf5_sdk_root}/components/libraries/util/app_error_weak.c",
       "${nrf5_sdk_root}/components/libraries/util/app_error_weak.h",
-      "${nrf5_sdk_root}/components/libraries/util/app_error_weak.h",
-      "${nrf5_sdk_root}/components/libraries/util/app_util.h",
       "${nrf5_sdk_root}/components/libraries/util/app_util.h",
       "${nrf5_sdk_root}/components/libraries/util/app_util_platform.c",
       "${nrf5_sdk_root}/components/libraries/util/app_util_platform.h",
       "${nrf5_sdk_root}/components/libraries/util/nordic_common.h",
-      "${nrf5_sdk_root}/components/libraries/util/nordic_common.h",
       "${nrf5_sdk_root}/components/libraries/util/nrf_assert.c",
-      "${nrf5_sdk_root}/components/libraries/util/nrf_assert.h",
       "${nrf5_sdk_root}/components/libraries/util/nrf_assert.h",
       "${nrf5_sdk_root}/components/libraries/util/nrf_bitmask.h",
       "${nrf5_sdk_root}/components/libraries/util/sdk_common.h",
       "${nrf5_sdk_root}/components/libraries/util/sdk_errors.h",
-      "${nrf5_sdk_root}/components/libraries/util/sdk_errors.h",
-      "${nrf5_sdk_root}/components/libraries/util/sdk_macros.h",
       "${nrf5_sdk_root}/components/libraries/util/sdk_macros.h",
       "${nrf5_sdk_root}/components/libraries/util/sdk_os.h",
       "${nrf5_sdk_root}/components/libraries/util/sdk_resources.h",
@@ -218,7 +251,6 @@ template("nrf5_sdk") {
       "${nrf5_sdk_root}/components/softdevice/s140/headers/ble.h",
       "${nrf5_sdk_root}/components/softdevice/s140/headers/ble_err.h",
       "${nrf5_sdk_root}/components/softdevice/s140/headers/ble_gap.h",
-      "${nrf5_sdk_root}/components/softdevice/s140/headers/ble_gatt.h",
       "${nrf5_sdk_root}/components/softdevice/s140/headers/ble_gatt.h",
       "${nrf5_sdk_root}/components/softdevice/s140/headers/ble_gattc.h",
       "${nrf5_sdk_root}/components/softdevice/s140/headers/ble_gatts.h",
@@ -234,7 +266,6 @@ template("nrf5_sdk") {
       "${nrf5_sdk_root}/components/softdevice/s140/headers/nrf_sd_def.h",
       "${nrf5_sdk_root}/components/softdevice/s140/headers/nrf_sdm.h",
       "${nrf5_sdk_root}/components/softdevice/s140/headers/nrf_soc.h",
-      "${nrf5_sdk_root}/components/softdevice/s140/headers/nrf_soc.h",
       "${nrf5_sdk_root}/components/softdevice/s140/headers/nrf_svc.h",
       "${nrf5_sdk_root}/components/toolchain/cmsis/include/cmsis_gcc.h",
       "${nrf5_sdk_root}/components/toolchain/cmsis/include/core_cm4.h",
@@ -244,9 +275,7 @@ template("nrf5_sdk") {
       "${nrf5_sdk_root}/config/nrf52840/config/sdk_config.h",
       "${nrf5_sdk_root}/external/fprintf/nrf_fprintf.c",
       "${nrf5_sdk_root}/external/fprintf/nrf_fprintf.h",
-      "${nrf5_sdk_root}/external/fprintf/nrf_fprintf.h",
       "${nrf5_sdk_root}/external/fprintf/nrf_fprintf_format.c",
-      "${nrf5_sdk_root}/external/fprintf/nrf_fprintf_format.h",
       "${nrf5_sdk_root}/external/fprintf/nrf_fprintf_format.h",
       "${nrf5_sdk_root}/external/freertos/portable/CMSIS/nrf52/port_cmsis.c",
       "${nrf5_sdk_root}/external/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c",
@@ -260,18 +289,14 @@ template("nrf5_sdk") {
       "${nrf5_sdk_root}/external/freertos/source/include/deprecated_definitions.h",
       "${nrf5_sdk_root}/external/freertos/source/include/event_groups.h",
       "${nrf5_sdk_root}/external/freertos/source/include/list.h",
-      "${nrf5_sdk_root}/external/freertos/source/include/list.h",
       "${nrf5_sdk_root}/external/freertos/source/include/mpu_wrappers.h",
       "${nrf5_sdk_root}/external/freertos/source/include/portable.h",
       "${nrf5_sdk_root}/external/freertos/source/include/projdefs.h",
-      "${nrf5_sdk_root}/external/freertos/source/include/queue.h",
       "${nrf5_sdk_root}/external/freertos/source/include/queue.h",
       "${nrf5_sdk_root}/external/freertos/source/include/semphr.h",
       "${nrf5_sdk_root}/external/freertos/source/include/stack_macros.h",
       "${nrf5_sdk_root}/external/freertos/source/include/stream_buffer.h",
       "${nrf5_sdk_root}/external/freertos/source/include/task.h",
-      "${nrf5_sdk_root}/external/freertos/source/include/task.h",
-      "${nrf5_sdk_root}/external/freertos/source/include/timers.h",
       "${nrf5_sdk_root}/external/freertos/source/include/timers.h",
       "${nrf5_sdk_root}/external/freertos/source/list.c",
       "${nrf5_sdk_root}/external/freertos/source/portable/MemMang/heap_3.c",
@@ -279,37 +304,93 @@ template("nrf5_sdk") {
       "${nrf5_sdk_root}/external/freertos/source/stream_buffer.c",
       "${nrf5_sdk_root}/external/freertos/source/tasks.c",
       "${nrf5_sdk_root}/external/freertos/source/timers.c",
-      "${nrf5_sdk_root}/external/segger_rtt/SEGGER_RTT.c",
-      "${nrf5_sdk_root}/external/segger_rtt/SEGGER_RTT.h",
-      "${nrf5_sdk_root}/external/segger_rtt/SEGGER_RTT_Conf.h",
-      "${nrf5_sdk_root}/external/segger_rtt/SEGGER_RTT_Conf.h",
-      "${nrf5_sdk_root}/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c",
-      "${nrf5_sdk_root}/external/segger_rtt/SEGGER_RTT_printf.c",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/config/nrf-config.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/aes.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/aes_alt.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/asn1.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/bignum.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/ccm.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/ccm_alt.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/certs.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/check_config.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/cipher.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/cmac.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/cmac_alt.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/ctr_drbg.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/debug.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/dhm.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/dhm_alt.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/ecdh.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/ecdsa.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/ecp.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/ecp_alt.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/entropy.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/entropy_poll.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/error.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/hkdf.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/md.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/net_sockets.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/pem.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/pk.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/pkcs5.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/platform.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/platform_alt.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/platform_util.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/sha256.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/sha256_alt.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/ssl.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/ssl_ciphersuites.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/ssl_cookie.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/threading.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/threading_alt.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/x509.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/x509_crl.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/include/mbedtls/x509_crt.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/mbedtls_plat_config/nrf52840-mbedtls-config.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/nrf_cc310_plat/include/nrf_cc310_platform_abort.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/nrf_cc310_plat/include/nrf_cc310_platform_defines.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/nrf_cc310_plat/include/nrf_cc310_platform_mutex.h",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/nrf_cc310_plat/src/nrf_cc310_platform_abort_freertos.c",
+      "${nrf5_sdk_root}/external/openthread/nrf_security/nrf_cc310_plat/src/nrf_cc310_platform_mutex_freertos.c",
       "${nrf5_sdk_root}/integration/nrfx/legacy/apply_old_config.h",
       "${nrf5_sdk_root}/integration/nrfx/legacy/nrf_drv_clock.c",
       "${nrf5_sdk_root}/integration/nrfx/legacy/nrf_drv_clock.h",
       "${nrf5_sdk_root}/integration/nrfx/legacy/nrf_drv_gpiote.h",
+      "${nrf5_sdk_root}/integration/nrfx/legacy/nrf_drv_power.h",
       "${nrf5_sdk_root}/integration/nrfx/legacy/nrf_drv_rng.c",
+      "${nrf5_sdk_root}/integration/nrfx/legacy/nrf_drv_usbd.h",
+      "${nrf5_sdk_root}/integration/nrfx/legacy/nrf_drv_usbd_errata.h",
       "${nrf5_sdk_root}/integration/nrfx/nrfx_config.h",
       "${nrf5_sdk_root}/integration/nrfx/nrfx_glue.h",
       "${nrf5_sdk_root}/integration/nrfx/nrfx_log.h",
       "${nrf5_sdk_root}/modules/nrfx/drivers/include/nrfx_clock.h",
       "${nrf5_sdk_root}/modules/nrfx/drivers/include/nrfx_gpiote.h",
+      "${nrf5_sdk_root}/modules/nrfx/drivers/include/nrfx_power.h",
       "${nrf5_sdk_root}/modules/nrfx/drivers/include/nrfx_power_clock.h",
-      "${nrf5_sdk_root}/modules/nrfx/drivers/include/nrfx_power_clock.h",
+      "${nrf5_sdk_root}/modules/nrfx/drivers/include/nrfx_spis.h",
+      "${nrf5_sdk_root}/modules/nrfx/drivers/include/nrfx_usbd.h",
       "${nrf5_sdk_root}/modules/nrfx/drivers/nrfx_common.h",
-      "${nrf5_sdk_root}/modules/nrfx/drivers/nrfx_errors.h",
       "${nrf5_sdk_root}/modules/nrfx/drivers/nrfx_errors.h",
       "${nrf5_sdk_root}/modules/nrfx/drivers/src/nrfx_clock.c",
       "${nrf5_sdk_root}/modules/nrfx/drivers/src/nrfx_gpiote.c",
+      "${nrf5_sdk_root}/modules/nrfx/drivers/src/nrfx_power.c",
       "${nrf5_sdk_root}/modules/nrfx/drivers/src/nrfx_uart.c",
       "${nrf5_sdk_root}/modules/nrfx/drivers/src/nrfx_uarte.c",
+      "${nrf5_sdk_root}/modules/nrfx/drivers/src/nrfx_usbd_errata.h",
       "${nrf5_sdk_root}/modules/nrfx/drivers/src/prs/nrfx_prs.c",
       "${nrf5_sdk_root}/modules/nrfx/hal/nrf_clock.h",
+      "${nrf5_sdk_root}/modules/nrfx/hal/nrf_egu.h",
       "${nrf5_sdk_root}/modules/nrfx/hal/nrf_gpio.h",
       "${nrf5_sdk_root}/modules/nrfx/hal/nrf_gpiote.h",
+      "${nrf5_sdk_root}/modules/nrfx/hal/nrf_power.h",
+      "${nrf5_sdk_root}/modules/nrfx/hal/nrf_ppi.h",
+      "${nrf5_sdk_root}/modules/nrfx/hal/nrf_radio.h",
       "${nrf5_sdk_root}/modules/nrfx/hal/nrf_rtc.h",
-      "${nrf5_sdk_root}/modules/nrfx/mdk/compiler_abstraction.h",
+      "${nrf5_sdk_root}/modules/nrfx/hal/nrf_spis.h",
+      "${nrf5_sdk_root}/modules/nrfx/hal/nrf_temp.h",
+      "${nrf5_sdk_root}/modules/nrfx/hal/nrf_timer.h",
+      "${nrf5_sdk_root}/modules/nrfx/hal/nrf_uart.h",
+      "${nrf5_sdk_root}/modules/nrfx/hal/nrf_usbd.h",
       "${nrf5_sdk_root}/modules/nrfx/mdk/compiler_abstraction.h",
       "${nrf5_sdk_root}/modules/nrfx/mdk/gcc_startup_nrf52840.S",
       "${nrf5_sdk_root}/modules/nrfx/mdk/nrf.h",
@@ -328,10 +409,17 @@ template("nrf5_sdk") {
       "${nrf5_sdk_root}/modules/nrfx/soc/nrfx_irqs.h",
       "${nrf5_sdk_root}/modules/nrfx/soc/nrfx_irqs_nrf52840.h",
     ]
-    if (defined(invoker.sources)) {
-      sources += invoker.sources
+
+    public_deps = [
+      "${segger_rtt_root}:segger_rtt",
+      "${segger_rtt_root}:segger_rtt_printf",
+      "${segger_rtt_root}:segger_rtt_syscalls",
+    ]
+
+    if (!defined(public_configs)) {
+      public_configs = []
     }
 
-    public_configs = [ ":${sdk_target_name}_config" ]
+    public_configs += [ ":${sdk_target_name}_config" ]
   }
 }

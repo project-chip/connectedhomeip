@@ -24,7 +24,7 @@ import("${chip_root}/src/lib/core/core.gni")
 action("gen_chip_version") {
   script = "${chip_root}/scripts/gen_chip_version.py"
 
-  version_file = "${target_gen_dir}/include/CHIPVersion.h"
+  version_file = "${root_gen_dir}/include/CHIPVersion.h"
   outputs = [ version_file ]
   args = [
     "--output_file=" + rebase_path(version_file, root_build_dir),
@@ -39,16 +39,6 @@ source_set("chip_version_header") {
   sources = get_target_outputs(":gen_chip_version")
 
   deps = [ ":gen_chip_version" ]
-}
-
-config("support_config") {
-  configs = [
-    "${chip_root}/src:includes",
-    "${chip_root}/src/lib:includes",
-    "${chip_root}/src/system:system_config",
-  ]
-
-  include_dirs = [ "${target_gen_dir}/include" ]
 }
 
 support_headers = [
@@ -107,7 +97,11 @@ static_library("support") {
     "${chip_root}/src/inet:inet_config_header",
   ]
 
-  public_configs = [ ":support_config" ]
+  public_configs = [
+    "${chip_root}/src:includes",
+    "${chip_root}/src/lib:includes",
+    "${chip_root}/src/system:system_config",
+  ]
 
   if (chip_config_memory_management == "simple") {
     sources += [ "CHIPMem-SimpleAlloc.cpp" ]
@@ -125,5 +119,5 @@ static_library("support") {
 copy("support_headers") {
   sources = support_headers
 
-  outputs = [ "${target_gen_dir}/include/support/{{source_file_part}}" ]
+  outputs = [ "${root_gen_dir}/include/support/{{source_file_part}}" ]
 }

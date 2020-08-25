@@ -108,10 +108,7 @@ void GenericConnectivityManagerImpl_Thread<ImplClass>::UpdateServiceConnectivity
             event.Type = DeviceEventType::kServiceConnectivityChange;
             event.ServiceConnectivityChange.ViaThread.Result =
                 (haveServiceConnectivity) ? kConnectivity_Established : kConnectivity_Lost;
-            event.ServiceConnectivityChange.ViaTunnel.Result = kConnectivity_NoChange;
-            event.ServiceConnectivityChange.Overall.Result   = (Impl()->HaveServiceConnectivityViaTunnel())
-                ? kConnectivity_NoChange
-                : event.ServiceConnectivityChange.ViaThread.Result;
+            event.ServiceConnectivityChange.Overall.Result   = event.ServiceConnectivityChange.ViaThread.Result;
             PlatformMgr().PostEvent(&event);
         }
     }

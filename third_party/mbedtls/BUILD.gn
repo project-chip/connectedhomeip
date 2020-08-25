@@ -24,15 +24,6 @@ if (mbedtls_target != "") {
 } else {
   config("mbedtls_config") {
     include_dirs = [ "repo/include" ]
-
-    if (current_os == "freertos") {
-      defines = [
-        "MBEDTLS_NO_PLATFORM_ENTROPY",
-        "MBEDTLS_TEST_NULL_ENTROPY",
-        "MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES",
-      ]
-      cflags = [ "-Wno-cpp" ]
-    }
   }
 
   static_library("mbedtls") {
@@ -109,5 +100,8 @@ if (mbedtls_target != "") {
     }
 
     public_configs = [ ":mbedtls_config" ]
+
+    output_name = "libmbedtls"
+    output_dir = "${root_out_dir}/lib"
   }
 }

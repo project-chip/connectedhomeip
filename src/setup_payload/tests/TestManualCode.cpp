@@ -36,6 +36,8 @@
 
 using namespace chip;
 
+namespace {
+
 bool CheckGenerator(SetupPayload payload, string expectedResult)
 {
     string result;
@@ -496,7 +498,7 @@ void TestShortCodeCharLengths(nlTestSuite * inSuite, void * inContext)
  *  Test Suite that lists all the Test functions.
  */
 // clang-format off
-static const nlTest sTests[] =
+const nlTest sTests[] =
 {
     NL_TEST_DEF("Generate Decimal Representation from Partial Payload",                 TestDecimalRepresentation_PartialPayload),
     NL_TEST_DEF("Generate Decimal Representation from Partial Payload (Custom Flow)",   TestDecimalRepresentation_PartialPayload_RequiresCustomFlow),
@@ -528,6 +530,8 @@ struct TestContext
 {
     nlTestSuite * mSuite;
 };
+
+} // namespace
 
 /**
  *  Main

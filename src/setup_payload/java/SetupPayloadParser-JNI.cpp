@@ -1,6 +1,8 @@
 #include "ManualSetupPayloadParser.h"
 #include "QRCodeSetupPayloadParser.h"
 
+#include <vector>
+
 #include <jni.h>
 
 using namespace chip;
@@ -62,7 +64,7 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
     jmethodID addOptionalInfoMid =
         env->GetMethodID(setupPayloadClass, "addOptionalQRCodeInfo", "(Lchip/setuppayload/OptionalQRCodeInfo;)V");
 
-    vector<OptionalQRCodeInfo> optional_info = payload.getAllOptionalVendorData();
+    std::vector<OptionalQRCodeInfo> optional_info = payload.getAllOptionalVendorData();
     for (OptionalQRCodeInfo & info : optional_info)
     {
 

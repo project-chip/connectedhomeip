@@ -26,6 +26,7 @@ chip_test_suite("tests") {
     "NetworkTestHelpers.h",
     "TestMessageHeader.cpp",
     "TestPeerConnections.cpp",
+    "TestSecurePairingSession.cpp",
     "TestSecureSession.cpp",
     "TestSecureSessionMgr.cpp",
     "TestTransportLayer.h",
@@ -45,6 +46,7 @@ chip_test_suite("tests") {
   tests = [
     "TestMessageHeader",
     "TestPeerConnections",
+    "TestSecurePairingSession",
     "TestSecureSession",
     "TestSecureSessionMgr",
   ]

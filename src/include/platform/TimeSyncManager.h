@@ -38,7 +38,6 @@ namespace DeviceLayer {
 
 class PlatformManagerImpl;
 namespace Internal {
-extern CHIP_ERROR InitServiceDirectoryManager(void);
 template <class>
 class GenericPlatformManagerImpl;
 template <class>
@@ -78,24 +77,16 @@ private:
     friend class Internal::GenericPlatformManagerImpl;
     template <class>
     friend class Internal::GenericPlatformManagerImpl_FreeRTOS;
-    friend CHIP_ERROR Internal::InitServiceDirectoryManager();
     friend TimeSyncManager & TimeSyncMgr(void);
 
     static TimeSyncManager sInstance;
 
     CHIP_ERROR Init();
     void OnPlatformEvent(const ChipDeviceEvent * event);
-#if CHIP_DEVICE_CONFIG_ENABLE_SERVICE_DIRECTORY_TIME_SYNC
-    static void MarkServiceDirRequestStart();
-    static void ProcessServiceDirTimeData(uint64_t timeQueryReceiptMsec, uint32_t timeProcessMsec);
-#endif
 
     // ===== Private members for use by this class only.
 
     uint64_t mLastSyncTimeMS; // in monotonic time
-#if CHIP_DEVICE_CONFIG_ENABLE_SERVICE_DIRECTORY_TIME_SYNC
-    uint64_t mServiceDirTimeSyncStartUS;
-#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
     ::chip::Binding * mTimeSyncBinding;
 #endif

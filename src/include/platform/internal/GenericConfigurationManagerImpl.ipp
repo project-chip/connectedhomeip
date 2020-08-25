@@ -148,12 +148,10 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareBuildTime(uin
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO: Allow build time to be overridden by compile-time config (e.g. CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME).
-
-    err = ParseCompilerDateStr(__DATE__, year, month, dayOfMonth);
+    err = ParseCompilerDateStr(CHIP_DEVICE_CONFIG_FIRWMARE_BUILD_DATE, year, month, dayOfMonth);
     SuccessOrExit(err);
 
-    err = Parse24HourTimeStr(__TIME__, hour, minute, second);
+    err = Parse24HourTimeStr(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME, hour, minute, second);
     SuccessOrExit(err);
 
 exit:
@@ -555,7 +553,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSetupPinCode(uint32_t
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         setupPinCode = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
-        ChipLogProgress(DeviceLayer, "Setup PIN code not found; using default: %08u", CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE);
+        ChipLogProgress(DeviceLayer, "Setup PIN code not found; using default: %09u", CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE);
         err = CHIP_NO_ERROR;
     }
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE

@@ -19,57 +19,15 @@ on:
     pull_request:
 
 jobs:
-    esp32:
-        name: ESP32
-
-        env:
-            BUILD_TYPE: esp32
-
-        runs-on: ubuntu-latest
-
-        container:
-            image: connectedhomeip/chip-build-esp32:0.4.1
-            volumes:
-                - "/tmp/bloat_reports:/tmp/bloat_reports"
-                - "/tmp/output_binaries:/tmp/output_binaries"
-
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v2
-              # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
-              with:
-                  fetch-depth: 0
-                  submodules: true
-            - name: Build example Echo App
-              run: scripts/examples/esp_echo_app.sh
-            - name: Copy aside build products
-              run: |
-                  mkdir -p example_binaries/$BUILD_TYPE-build
-                  cp examples/wifi-echo/server/esp32/build/chip-wifi-echo.elf \
-                     example_binaries/$BUILD_TYPE-build/chip-wifi-echo.elf
-            - name: Binary artifact suffix
-              id: outsuffix
-              uses: haya14busa/action-cond@v1.0.0
-              with:
-                  cond: ${{ github.event.pull_request.number == '' }}
-                  if_true: "${{ github.sha }}"
-                  if_false: "pull-${{ github.event.pull_request.number }}"
-            - name: Copy aside bloat report & binaries
-              run: |
-                  cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
-            - name: Uploading Binaries
-              uses: actions/upload-artifact@v1
-              with:
-                  name:
-                      ${{ env.BUILD_TYPE }}-example-build-${{
-                      steps.outsuffix.outputs.value }}
-                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
-
+    # TODO ESP32 https://github.com/project-chip/connectedhomeip/issues/1510
     nrf:
         name: nRF
 
         env:
-            BUILD_TYPE: nrf
+            BUILD_TYPE: gn_nrf
+            BUILD_VERSION: 0.2.14
+            BUILD_IMAGE: chip-build-nrf-platform
+            BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
 
@@ -86,13 +44,16 @@ jobs:
               with:
                   fetch-depth: 0
                   submodules: true
+            - name: Bootstrap
+              run: scripts/build/gn_bootstrap.sh
             - name: Build example nRF5 Lock App
-              run: scripts/examples/nrf_lock_app.sh
-            - name: Copy aside build products
-              run: |
-                  mkdir -p example_binaries/nrf-build
-                  cp examples/lock-app/nrf5/build/chip-nrf52840-lock-example.out       \
-                     example_binaries/$BUILD_TYPE-build/chip-nrf52840-lock-example.out
+              run:
+                  scripts/examples/gn_nrf_example.sh examples/lock-app/nrf5
+                  out/lock_app_debug
+            - name: Build example nRF5 Lighting App
+              run:
+                  scripts/examples/gn_nrf_example.sh examples/lighting-app/nrf5
+                  out/lighting_app_debug
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
@@ -100,68 +61,24 @@ jobs:
                   cond: ${{ github.event.pull_request.number == '' }}
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
-            - name: Copy aside bloat report & binaries
-              run: |
-                  cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
             - name: Uploading Binaries
-              uses: actions/upload-artifact@v1
+              uses: actions/upload-artifact@v2
               with:
                   name:
                       ${{ env.BUILD_TYPE }}-example-build-${{
                       steps.outsuffix.outputs.value }}
-                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
-
-    nrfconnect:
-        name: nRF Connect SDK
-
-        env:
-            BUILD_TYPE: nrfconnect
-
-        runs-on: ubuntu-latest
-
-        container:
-            image: connectedhomeip/chip-build-nrf-platform:0.4.1
-            volumes:
-                - "/tmp/bloat_reports:/tmp/bloat_reports"
-                - "/tmp/output_binaries:/tmp/output_binaries"
-
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v2
-              # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
-              with:
-                  fetch-depth: 0
-                  submodules: true
-            - name: Build example nRF Connect SDK Lock App
-              run: scripts/examples/nrfconnect_lock_app.sh
-            - name: Copy aside build products
-              run: |
-                  mkdir -p example_binaries/$BUILD_TYPE-build
-                  cp examples/lock-app/nrfconnect/build/zephyr/zephyr.elf       \
-                     example_binaries/$BUILD_TYPE-build/chip-nrf52840-lock-example.elf
-            - name: Binary artifact suffix
-              id: outsuffix
-              uses: haya14busa/action-cond@v1.0.0
-              with:
-                  cond: ${{ github.event.pull_request.number == '' }}
-                  if_true: "${{ github.sha }}"
-                  if_false: "pull-${{ github.event.pull_request.number }}"
-            - name: Copy aside bloat report & binaries
-              run: |
-                  cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
-            - name: Uploading Binaries
-              uses: actions/upload-artifact@v1
-              with:
-                  name:
-                      ${{ env.BUILD_TYPE }}-example-build-${{
-                      steps.outsuffix.outputs.value }}
-                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
-        
+                  path: |
+                      out/lock_app_debug/chip-nrf52840-lock-example
+                      out/lighting_app_debug/chip-nrf52840-lighting-example
+    # TODO: NRF Connect https://github.com/project-chip/connectedhomeip/issues/2225
     linux-standalone:
         name: Linux Standalone
 
         env:
-            BUILD_TYPE: linux
+            BUILD_TYPE: gn_linux
+            BUILD_VERSION: 0.2.14
+            BUILD_IMAGE: chip-build
+            BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
 
@@ -178,15 +95,16 @@ jobs:
               with:
                   fetch-depth: 0
                   submodules: true
+            - name: Bootstrap
+              run: scripts/build/gn_bootstrap.sh
             - name: Build example Standalone Echo Client
-              run: scripts/examples/standalone_echo_client.sh
+              run:
+                  scripts/examples/gn_build_example.sh examples/chip-tool
+                  out/chip_tool_debug
             - name: Build example Standalone Shell
-              run: scripts/examples/standalone_shell.sh
-            - name: Preserve artifacts
-              run: |
-                  mkdir -p example_binaries/$BUILD_TYPE-build
-                  cp examples/chip-tool/build/chip-standalone-demo.out \
-                     example_binaries/$BUILD_TYPE-build/chip-standalone-demo.out
+              run:
+                  scripts/examples/gn_build_example.sh examples/shell
+                  out/shell_debug
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
@@ -194,13 +112,12 @@ jobs:
                   cond: ${{ github.event.pull_request.number == '' }}
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
-            - name: Copy aside bloat report & binaries
-              run: |
-                  cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
             - name: Uploading Binaries
-              uses: actions/upload-artifact@v1
+              uses: actions/upload-artifact@v2
               with:
                   name:
                       ${{ env.BUILD_TYPE }}-example-build-${{
                       steps.outsuffix.outputs.value }}
-                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
+                  path: |
+                      out/chip_tool_debug/chip-standalone-demo
+                      out/shell_debug/chip-shell

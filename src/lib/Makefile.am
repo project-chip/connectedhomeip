@@ -60,7 +60,7 @@ libCHIP_a_CPPFLAGS                  =                         \
     -I$(top_srcdir)/src                                       \
     -I$(top_srcdir)/src/include                               \
     -I$(top_srcdir)/src/lib                                   \
-    -I$(top_srcdir)/src/app/chip-zcl                          \
+    -I$(top_srcdir)/src/app/util                              \
     -I$(top_srcdir)/src/app/gen                               \
     $(chip_InetLayer_CPPFLAGS)                                \
     $(NLASSERT_CPPFLAGS)                                      \

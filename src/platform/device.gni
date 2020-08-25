@@ -15,57 +15,73 @@
 import("//build_overrides/chip.gni")
 
 declare_args() {
-  # Device platform layer: freertos, nrf5, efr32, none.
-  device_platform = "auto"
+  # Device platform layer: darwin, linux, freertos, nrf5, efr32, external, none.
+  chip_device_platform = "auto"
+  chip_platform_target = ""
 }
 
-if (device_platform == "auto") {
+if (chip_device_platform == "auto") {
   if (current_os == "mac" || current_os == "ios") {
-    device_platform = "darwin"
+    chip_device_platform = "darwin"
   } else if (current_os == "linux") {
-    # FIXME: enable openthread on nrf5 gn build
-    device_platform = "linux"
+    chip_device_platform = "linux"
   } else {
-    device_platform = "none"
+    chip_device_platform = "none"
   }
 }
 
 declare_args() {
   # Enable openthread support.
-  chip_enable_openthread = (device_platform == "linux")
+  chip_enable_openthread =
+      chip_device_platform == "linux" || chip_device_platform == "nrf5" ||
+      chip_device_platform == "efr32"
+
+  # Enable wifi support.
+  chip_enable_wifi = chip_device_platform == "linux"
 }
 
-device_layer = "none"
-if (device_platform == "darwin") {
-  device_layer = "Darwin"
-} else if (device_platform == "linux") {
-  device_layer = "Linux"
-} else if (device_platform == "nrf5") {
-  device_layer = "nRF5"
-} else if (device_platform == "efr32") {
-  device_layer = "EFR32"
+_chip_device_layer = "none"
+if (chip_device_platform == "darwin") {
+  _chip_device_layer = "Darwin"
+} else if (chip_device_platform == "linux") {
+  _chip_device_layer = "Linux"
+} else if (chip_device_platform == "nrf5") {
+  _chip_device_layer = "nRF5"
+} else if (chip_device_platform == "efr32") {
+  _chip_device_layer = "EFR32"
 }
 
-ble_platform_config_include = ""
-chip_device_platform_config_include = ""
-chip_platform_config_include = ""
-inet_platform_config_include = ""
-system_platform_config_include = ""
+if (chip_device_platform != "external") {
+  chip_ble_platform_config_include = ""
+  chip_device_platform_config_include = ""
+  chip_platform_config_include = ""
+  chip_inet_platform_config_include = ""
+  chip_system_platform_config_include = ""
+} else {
+  declare_args() {
+    chip_ble_platform_config_include = ""
+    chip_device_platform_config_include = ""
+    chip_platform_config_include = ""
+    chip_inet_platform_config_include = ""
+    chip_system_platform_config_include = ""
+  }
+}
 
-if (device_layer != "none") {
-  ble_platform_config_include =
-      "<platform/" + device_layer + "/BlePlatformConfig.h>"
+if (_chip_device_layer != "none" && chip_device_platform != "external") {
+  chip_ble_platform_config_include =
+      "<platform/" + _chip_device_layer + "/BlePlatformConfig.h>"
   chip_device_platform_config_include =
-      "<platform/" + device_layer + "/CHIPDevicePlatformConfig.h>"
+      "<platform/" + _chip_device_layer + "/CHIPDevicePlatformConfig.h>"
   chip_platform_config_include =
-      "<platform/" + device_layer + "/CHIPPlatformConfig.h>"
-  inet_platform_config_include =
-      "<platform/" + device_layer + "/InetPlatformConfig.h>"
-  system_platform_config_include =
-      "<platform/" + device_layer + "/SystemPlatformConfig.h>"
+      "<platform/" + _chip_device_layer + "/CHIPPlatformConfig.h>"
+  chip_inet_platform_config_include =
+      "<platform/" + _chip_device_layer + "/InetPlatformConfig.h>"
+  chip_system_platform_config_include =
+      "<platform/" + _chip_device_layer + "/SystemPlatformConfig.h>"
 }
 
-assert((current_os != "freertos" && device_platform == "none") ||
-           device_platform == "darwin" || device_platform == "nrf5" ||
-           device_platform == "linux" || device_platform == "efr32",
-       "Please select a valid value for device_platform")
+assert((current_os != "freertos" && chip_device_platform == "none") ||
+           chip_device_platform == "darwin" || chip_device_platform == "nrf5" ||
+           chip_device_platform == "efr32" || chip_device_platform == "linux" ||
+           chip_device_platform == "external",
+       "Please select a valid value for chip_device_platform")

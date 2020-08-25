@@ -17,6 +17,7 @@
  */
 
 #include <assert.h>
+#include <chrono>
 #include <errno.h>
 #include <iostream>
 #include <new>
@@ -39,14 +40,15 @@
 
 #include <controller/CHIPDeviceController.h>
 
-extern "C" {
-#include "chip-zcl/chip-zcl.h"
-} // extern "C"
-
-#include "chip-zcl/chip-zcl-zpro-codec.h"
+#include <app/chip-zcl-zpro-codec.h>
 
 // Delay, in seconds, between sends for the echo case.
 #define SEND_DELAY 5
+
+// Limits on endpoint values.  Could be wrong, if we start using endpoint 0 for
+// something.
+#define CHIP_ZCL_ENDPOINT_MIN 0x01
+#define CHIP_ZCL_ENDPOINT_MAX 0xF0
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -56,43 +58,108 @@ using namespace ::chip::Inet;
 //       knowing its id, because the ID can be learned on the first response that is received.
 constexpr NodeId kLocalDeviceId  = 112233;
 constexpr NodeId kRemoteDeviceId = 12344321;
+constexpr std::chrono::seconds kWaitingForResponseTimeout(1);
 
-static const unsigned char local_private_key[] = { 0x00, 0xd1, 0x90, 0xd9, 0xb3, 0x95, 0x1c, 0x5f, 0xa4, 0xe7, 0x47,
-                                                   0x92, 0x5b, 0x0a, 0xa9, 0xa7, 0xc1, 0x1c, 0xe7, 0x06, 0x10, 0xe2,
-                                                   0xdd, 0x16, 0x41, 0x52, 0x55, 0xb7, 0xb8, 0x80, 0x8d, 0x87, 0xa1 };
-
-static const unsigned char remote_public_key[] = { 0x04, 0xe2, 0x07, 0x64, 0xff, 0x6f, 0x6a, 0x91, 0xd9, 0xc2, 0xc3, 0x0a, 0xc4,
-                                                   0x3c, 0x56, 0x4b, 0x42, 0x8a, 0xf3, 0xb4, 0x49, 0x29, 0x39, 0x95, 0xa2, 0xf7,
-                                                   0x02, 0x8c, 0xa5, 0xce, 0xf3, 0xc9, 0xca, 0x24, 0xc5, 0xd4, 0x5c, 0x60, 0x79,
-                                                   0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
-                                                   0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
-
-static const char * PAYLOAD = "Message from Standalone CHIP echo client!";
-bool isDeviceConnected      = false;
+static const char * PAYLOAD    = "Message from Standalone CHIP echo client!";
+bool isDeviceConnected         = false;
+static bool waitingForResponse = true;
 
 // Device Manager Callbacks
 static void OnConnect(DeviceController::ChipDeviceController * controller, Transport::PeerConnectionState * state,
                       void * appReqState)
 {
     isDeviceConnected = true;
+}
 
-    if (state != NULL)
+static bool ContentMayBeADataModelMessage(System::PacketBuffer * buffer)
+{
+    // A data model message has a first byte whose value is always one of  0x00,
+    // 0x01, 0x02, 0x03.
+    return buffer->DataLength() > 0 && buffer->Start()[0] < 0x04;
+}
+
+// This function consumes (i.e. frees) the buffer.
+static void HandleDataModelMessage(System::PacketBuffer * buffer)
+{
+    EmberApsFrame frame;
+    if (extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) == 0)
     {
-        CHIP_ERROR err = controller->ManualKeyExchange(state, remote_public_key, sizeof(remote_public_key), local_private_key,
-                                                       sizeof(local_private_key));
-
-        if (err != CHIP_NO_ERROR)
-        {
-            fprintf(stderr, "Failed to exchange keys\n");
-        }
+        printf("APS frame processing failure!\n");
+        System::PacketBuffer::Free(buffer);
+        return;
     }
+
+    printf("APS frame processing success!\n");
+    uint8_t * message;
+    uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
+
+    VerifyOrExit(messageLen >= 3, printf("Unexpected response length: %d\n", messageLen));
+    // Bit 3 of the frame control byte set means direction is server to client.
+    // We expect no other bits to be set.
+    VerifyOrExit(message[0] == 8, printf("Unexpected frame control byte: 0x%02x\n", message[0]));
+    VerifyOrExit(message[1] == 1, printf("Unexpected sequence number: %d\n", message[1]));
+
+    // message[2] is the command id.
+    switch (message[2])
+    {
+    case 0x0b: {
+        // Default Response command.  Remaining bytes are the command id of the
+        // command that's being responded to and a status code.
+        VerifyOrExit(messageLen == 5, printf("Unexpected response length: %d\n", messageLen));
+        printf("Got default response to command '0x%02x' for cluster '0x%02x'.  Status is '0x%02x'.\n", message[3], frame.clusterId,
+               message[4]);
+        break;
+    }
+    case 0x01: {
+        // Read Attributes Response command.  Remaining bytes are a list of
+        // (attr id, 0, attr type, attr value) or (attr id, failure status)
+        // tuples.
+        //
+        // But for now we only support one attribute value, and that value is a
+        // boolean.
+        VerifyOrExit(messageLen >= 6, printf("Unexpected response length for Read Attributes command: %d\n", messageLen));
+        uint16_t attr_id;
+        memcpy(&attr_id, message + 3, sizeof(attr_id));
+        if (message[5] == 0)
+        {
+            // FIXME: Should we have a mapping of type ids to types, based on
+            // table 2.6.2.2 in Rev 8 of the ZCL spec?  0x10 is "Boolean".
+            VerifyOrExit(messageLen == 8,
+                         printf("Unexpected response length for successful Read Attributes command: %d\n", messageLen));
+            printf("Read attribute '0x%04x' for cluster '0x%02x'.  Type is '0x%02x', value is '0x%02x'.\n", attr_id,
+                   frame.clusterId, message[6], message[7]);
+        }
+        else
+        {
+            VerifyOrExit(messageLen == 6,
+                         printf("Unexpected response length for failed Read Attributes command: %d\n", messageLen));
+            printf("Reading attribute '0x%04x' for cluster '0x%02x' failed with status '0x%02x'.\n", attr_id, frame.clusterId,
+                   message[5]);
+        }
+        break;
+    }
+    default: {
+        printf("Unexpected command '0x%02x'.\n", message[2]);
+        break;
+    }
+    }
+
+exit:
+    System::PacketBuffer::Free(buffer);
 }
 
 static void OnMessage(DeviceController::ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * buffer)
 {
-    size_t data_len = buffer->DataLength();
+    size_t data_len    = buffer->DataLength();
+    waitingForResponse = false;
 
     printf("Message received: %zu bytes\n", data_len);
+
+    if (ContentMayBeADataModelMessage(buffer))
+    {
+        HandleDataModelMessage(buffer);
+        return;
+    }
 
     // attempt to print the incoming message
     char msg_buffer[data_len];
@@ -115,6 +182,7 @@ static void OnMessage(DeviceController::ChipDeviceController * deviceController,
 static void OnError(DeviceController::ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR error,
                     const IPPacketInfo * pi)
 {
+    waitingForResponse = false;
     printf("ERROR: %s\n Got error\n", ErrorStr(error));
 }
 
@@ -128,7 +196,10 @@ void ShowUsage(const char * executable)
             "    echo device-ip-address device-port\n"
             "    off device-ip-address device-port endpoint-id\n"
             "    on device-ip-address device-port endpoint-id\n"
-            "    toggle device-ip-address device-port endpoint-id\n",
+            "    toggle device-ip-address device-port endpoint-id\n"
+            "    read device-ip-address device-port endpoint-id attr-name\n"
+            "  Supported attribute names for the 'read' command:\n"
+            "    onoff -- OnOff attribute from the On/Off cluster\n",
             executable);
 }
 
@@ -137,6 +208,7 @@ enum class Command
     Off,
     On,
     Toggle,
+    Read,
     Echo,
     EchoBle,
 };
@@ -172,6 +244,12 @@ bool DetermineCommand(int argc, char * argv[], Command * command)
         return argc == 5;
     }
 
+    if (EqualsLiteral(argv[1], "read"))
+    {
+        *command = Command::Read;
+        return argc == 6;
+    }
+
     if (EqualsLiteral(argv[1], "echo"))
     {
         *command = Command::Echo;
@@ -184,7 +262,7 @@ bool DetermineCommand(int argc, char * argv[], Command * command)
         return argc == 4;
     }
 
-    fprintf(stderr, "Unknown command: %s\n", argv[3]);
+    fprintf(stderr, "Unknown command: %s\n", argv[1]);
     return false;
 }
 
@@ -195,6 +273,8 @@ struct CommandArgs
     uint16_t discriminator;
     uint32_t setupPINCode;
     uint8_t endpointId;
+    // attrName is only used for Read commands.
+    const char * attrName;
 };
 
 bool DetermineArgsBle(char * argv[], CommandArgs * commandArgs)
@@ -262,7 +342,17 @@ bool DetermineCommandArgs(char * argv[], Command command, CommandArgs * commandA
     case Command::On:
     case Command::Off:
     case Command::Toggle:
-        return DetermineArgsOnOff(argv, commandArgs);
+    case Command::Read: {
+        if (!DetermineArgsOnOff(argv, commandArgs))
+        {
+            return false;
+        }
+        if (command == Command::Read)
+        {
+            commandArgs->attrName = argv[5];
+        }
+        return true;
+    }
     }
 
     fprintf(stderr, "Need to define arg handling for command '%d'\n", int(command));
@@ -296,7 +386,7 @@ void DoEcho(DeviceController::ChipDeviceController * controller, const char * id
 
 void DoEchoBle(DeviceController::ChipDeviceController * controller, const uint16_t discriminator)
 {
-    char name[4];
+    char name[6];
     snprintf(name, sizeof(name), "%u", discriminator);
     DoEcho(controller, "");
 }
@@ -313,8 +403,10 @@ void DoEchoIP(DeviceController::ChipDeviceController * controller, const IPAddre
 
 // Handle the on/off/toggle case, where we are sending a ZCL command and not
 // expecting a response at all.
-void DoOnOff(DeviceController::ChipDeviceController * controller, Command command, uint8_t endpoint)
+void DoOnOff(DeviceController::ChipDeviceController * controller, Command command, const CommandArgs & commandArgs)
 {
+    const uint8_t endpoint = commandArgs.endpointId;
+
     // Make sure our buffer is big enough, but this will need a better setup!
     static const size_t bufferSize = 1024;
     auto * buffer                  = System::PacketBuffer::NewWithAvailableSize(bufferSize);
@@ -330,6 +422,14 @@ void DoOnOff(DeviceController::ChipDeviceController * controller, Command comman
         break;
     case Command::Toggle:
         dataLength = encodeToggleCommand(buffer->Start(), bufferSize, endpoint);
+        break;
+    case Command::Read:
+        if (!EqualsLiteral(commandArgs.attrName, "onoff"))
+        {
+            fprintf(stderr, "Don't know how to read '%s' attribute\n", commandArgs.attrName);
+            return;
+        }
+        dataLength = encodeReadOnOffCommand(buffer->Start(), bufferSize, endpoint);
         break;
     default:
         fprintf(stderr, "Unknown command: %d\n", int(command));
@@ -349,6 +449,20 @@ void DoOnOff(DeviceController::ChipDeviceController * controller, Command comman
 #endif
 
     controller->SendMessage(NULL, buffer);
+    // FIXME: waitingForResponse is being written on other threads, presumably.
+    // We probably need some more synchronization here.
+    auto start = std::chrono::system_clock::now();
+    while (waitingForResponse &&
+           std::chrono::duration_cast<std::chrono::minutes>(std::chrono::system_clock::now() - start) < kWaitingForResponseTimeout)
+    {
+        // Just poll for the response.
+        sleep(1);
+    }
+
+    if (waitingForResponse)
+    {
+        fprintf(stderr, "No response from device.");
+    }
 }
 
 CHIP_ERROR ExecuteCommand(DeviceController::ChipDeviceController * controller, Command command, CommandArgs & commandArgs)
@@ -364,17 +478,17 @@ CHIP_ERROR ExecuteCommand(DeviceController::ChipDeviceController * controller, C
         break;
 
     case Command::Echo:
-        err =
-            controller->ConnectDevice(kRemoteDeviceId, commandArgs.hostAddr, NULL, OnConnect, OnMessage, OnError, commandArgs.port);
+        err = controller->ConnectDeviceWithoutSecurePairing(kRemoteDeviceId, commandArgs.hostAddr, NULL, OnConnect, OnMessage,
+                                                            OnError, commandArgs.port);
         VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to connect to the device"));
         DoEchoIP(controller, commandArgs.hostAddr, commandArgs.port);
         break;
 
     default:
-        err =
-            controller->ConnectDevice(kRemoteDeviceId, commandArgs.hostAddr, NULL, OnConnect, OnMessage, OnError, commandArgs.port);
+        err = controller->ConnectDeviceWithoutSecurePairing(kRemoteDeviceId, commandArgs.hostAddr, NULL, OnConnect, OnMessage,
+                                                            OnError, commandArgs.port);
         VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to connect to the device"));
-        DoOnOff(controller, command, commandArgs.endpointId);
+        DoOnOff(controller, command, commandArgs);
         controller->ServiceEventSignal();
         break;
     }

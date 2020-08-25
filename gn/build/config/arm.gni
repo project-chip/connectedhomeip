@@ -12,29 +12,55 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-assert(current_cpu == "arm" || current_cpu == "arm64")
+if (current_cpu == "arm" || current_cpu == "arm64") {
+  declare_args() {
+    # Build file to import for ARM defaults.
+    arm_platform_config = ""
+  }
 
-if (current_cpu == "arm") {
+  # Allow platforms to override how ARM architecture flags are chosen by
+  # providing a file to import.
+  if (arm_platform_config != "") {
+    _platform_defaults = {
+      import(arm_platform_config)
+    }
+  }
+
+  _defaults = {
+    arm_arch = ""
+    arm_cpu = ""
+    arm_tune = ""
+    arm_fpu = ""
+    arm_float_abi = ""
+    arm_abi = ""
+    arm_use_thumb = true
+
+    # Update defaults with platform values, if any.
+    if (arm_platform_config != "") {
+      forward_variables_from(_platform_defaults, "*")
+    }
+  }
+
   declare_args() {
     # ARM architecture (value for -march flag).
-    arm_arch = ""
+    arm_arch = _defaults.arm_arch
 
     # ARM CPU (value for -mcpu flag).
-    arm_cpu = ""
+    arm_cpu = _defaults.arm_cpu
 
     # ARM tuning (value for -mtune flag).
-    arm_tune = ""
+    arm_tune = _defaults.arm_tune
 
     # ARM FPU (value for -mfpu flag).
-    arm_fpu = ""
+    arm_fpu = _defaults.arm_fpu
 
-    # ARM float ABI (value for -mfloat-api flag).
-    arm_float_abi = ""
+    # ARM float ABI (value for -mfloat-abi flag).
+    arm_float_abi = _defaults.arm_float_abi
 
-    # ARM ABI (value for -mapi flag).
-    arm_abi = ""
+    # ARM ABI (value for -mabi flag).
+    arm_abi = _defaults.arm_abi
 
     # ARM thumb instruction set (value for -mthumb flag).
-    arm_use_thumb = true
+    arm_use_thumb = _defaults.arm_use_thumb
   }
 }

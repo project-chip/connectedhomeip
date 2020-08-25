@@ -33,6 +33,8 @@
 #include <support/DLLUtil.h>
 #include <support/ErrorStr.h>
 
+#include <core/CHIPConfig.h>
+
 // Include local headers
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/err.h>

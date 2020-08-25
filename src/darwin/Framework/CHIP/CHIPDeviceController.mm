@@ -17,7 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-#include "chip-zcl/chip-zcl-zpro-codec.h"
+#include <app/chip-zcl-zpro-codec.h>
 
 #import "CHIPDeviceController.h"
 #import "CHIPError.h"
@@ -52,14 +52,17 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
 // queue used to call select on the system and inet layer fds., remove this with NW Framework.
 // primarily used to not block the work queue
 @property (atomic, readonly) dispatch_queue_t chipSelectQueue;
-// queue used to signal callbacks to the application
-@property (readwrite) dispatch_queue_t appCallbackQueue;
-@property (readwrite) ControllerOnConnectedBlock onConnectedHandler;
-@property (readwrite) ControllerOnMessageBlock onMessageHandler;
-@property (readwrite) ControllerOnErrorBlock onErrorHandler;
+/**
+ *  The Controller delegate.
+ *  Note: Getter is not thread safe.
+ */
+@property (readonly, weak, nonatomic) id<CHIPDeviceControllerDelegate> delegate;
+
+/**
+ * The delegate queue where delegate callbacks will run
+ */
+@property (readonly, nonatomic) dispatch_queue_t delegateQueue;
 @property (readonly) chip::DeviceController::ChipDeviceController * cppController;
-@property (readwrite) NSData * localKey;
-@property (readwrite) NSData * peerKey;
 
 @end
 
@@ -110,13 +113,6 @@ static void onConnected(
     [controller _dispatchAsyncConnectBlock];
 }
 
-static void doKeyExchange(
-    chip::DeviceController::ChipDeviceController * cppController, chip::Transport::PeerConnectionState * state, void * appReqState)
-{
-    CHIPDeviceController * controller = (__bridge CHIPDeviceController *) appReqState;
-    [controller _manualKeyExchange:state];
-}
-
 static void onMessageReceived(
     chip::DeviceController::ChipDeviceController * deviceController, void * appReqState, chip::System::PacketBuffer * buffer)
 {
@@ -150,68 +146,48 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 - (void)_dispatchAsyncErrorBlock:(NSError *)error
 {
     CHIP_LOG_METHOD_ENTRY();
-    // to avoid retaining "self"
-    ControllerOnErrorBlock onErrorHandler = self.onErrorHandler;
 
-    dispatch_async(_appCallbackQueue, ^() {
-        onErrorHandler(error);
-    });
+    id<CHIPDeviceControllerDelegate> strongDelegate = [self delegate];
+    if (strongDelegate && [self delegateQueue]) {
+        dispatch_async(self.delegateQueue, ^{
+            [strongDelegate deviceControllerOnError:error];
+        });
+    }
 }
 
 - (void)_dispatchAsyncMessageBlock:(NSData *)data
 {
     CHIP_LOG_METHOD_ENTRY();
-    // to avoid retaining "self"
-    ControllerOnMessageBlock onMessageHandler = self.onMessageHandler;
 
-    dispatch_async(_appCallbackQueue, ^() {
-        onMessageHandler(data);
-    });
+    id<CHIPDeviceControllerDelegate> strongDelegate = [self delegate];
+    if (strongDelegate && [self delegateQueue]) {
+        dispatch_async(self.delegateQueue, ^{
+            [strongDelegate deviceControllerOnMessage:data];
+        });
+    }
 }
 
 - (void)_dispatchAsyncConnectBlock
 {
     CHIP_LOG_METHOD_ENTRY();
-    // to avoid retaining "self"
-    ControllerOnConnectedBlock onConnectedHandler = self.onConnectedHandler;
 
-    dispatch_async(_appCallbackQueue, ^() {
-        onConnectedHandler();
-    });
-}
-
-- (void)_manualKeyExchange:(chip::Transport::PeerConnectionState *)state
-{
-    [self.lock lock];
-    const unsigned char * local_key_bytes = (const unsigned char *) [self.localKey bytes];
-    const unsigned char * peer_key_bytes = (const unsigned char *) [self.peerKey bytes];
-
-    CHIP_ERROR err
-        = self.cppController->ManualKeyExchange(state, peer_key_bytes, self.peerKey.length, local_key_bytes, self.localKey.length);
-    [self.lock unlock];
-
-    if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Failed to exchange keys");
-        [self _dispatchAsyncErrorBlock:[CHIPError errorForCHIPErrorCode:err]];
+    id<CHIPDeviceControllerDelegate> strongDelegate = [self delegate];
+    if (strongDelegate && [self delegateQueue]) {
+        dispatch_async(self.delegateQueue, ^{
+            [strongDelegate deviceControllerOnConnected];
+        });
     }
 }
 
-- (BOOL)connect:(NSString *)ipAddress
-      local_key:(NSData *)local_key
-       peer_key:(NSData *)peer_key
-          error:(NSError * __autoreleasing *)error
+- (BOOL)connect:(NSString *)ipAddress error:(NSError * __autoreleasing *)error
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // cache the keys before calling connect (because connect invokes the manual key exchange)
-    self.localKey = local_key.copy;
-    self.peerKey = peer_key.copy;
 
     [self.lock lock];
     chip::Inet::IPAddress addr;
     chip::Inet::IPAddress::FromString([ipAddress UTF8String], addr);
     err = self.cppController->ConnectDevice(
-        kRemoteDeviceId, addr, (__bridge void *) self, doKeyExchange, onMessageReceived, onInternalError, CHIP_PORT);
+        kRemoteDeviceId, addr, (__bridge void *) self, nil, onMessageReceived, onInternalError, CHIP_PORT);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
@@ -236,6 +212,32 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     [self.lock lock];
     err = self.cppController->ConnectDevice(
         kRemoteDeviceId, discriminator, setupPINCode, (__bridge void *) self, onConnected, onMessageReceived, onInternalError);
+    [self.lock unlock];
+
+    if (err != CHIP_NO_ERROR) {
+        CHIP_LOG_ERROR("Error(%d): %@, connect failed", err, [CHIPError errorForCHIPErrorCode:err]);
+        if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:err];
+        }
+        return NO;
+    }
+
+    // Start the IO pump
+    dispatch_async(_chipSelectQueue, ^() {
+        self.cppController->ServiceEvents();
+    });
+    return YES;
+}
+
+- (BOOL)connectWithoutSecurePairing:(NSString *)ipAddress error:(NSError * __autoreleasing *)error
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    [self.lock lock];
+    chip::Inet::IPAddress addr;
+    chip::Inet::IPAddress::FromString([ipAddress UTF8String], addr);
+    err = self.cppController->ConnectDeviceWithoutSecurePairing(
+        kRemoteDeviceId, addr, (__bridge void *) self, onConnected, onMessageReceived, onInternalError);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
@@ -375,15 +377,85 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     return isConnected ? YES : NO;
 }
 
-- (void)registerCallbacks:appCallbackQueue
-              onConnected:(ControllerOnConnectedBlock)onConnected
-                onMessage:(ControllerOnMessageBlock)onMessage
-                  onError:(ControllerOnErrorBlock)onError
++ (BOOL)isDataModelCommand:(NSData * _Nonnull)message
 {
-    self.appCallbackQueue = appCallbackQueue;
-    self.onConnectedHandler = onConnected;
-    self.onMessageHandler = onMessage;
-    self.onErrorHandler = onError;
+    if (message.length == 0) {
+        return NO;
+    }
+
+    UInt8 * bytes = (UInt8 *) message.bytes;
+    return bytes[0] < 0x04 ? YES : NO;
+}
+
++ (NSString *)commandToString:(NSData * _Nonnull)response
+{
+    if ([CHIPDeviceController isDataModelCommand:response] == NO) {
+        return @"Response is not a CHIP command";
+    }
+
+    uint8_t * bytes = (uint8_t *) response.bytes;
+
+    EmberApsFrame frame;
+    if (extractApsFrame(bytes, response.length, &frame) == 0) {
+        return @"Response is not an APS frame";
+    }
+
+    uint8_t * message;
+    uint16_t messageLen = extractMessage(bytes, response.length, &message);
+    if (messageLen != 5) {
+        // Not a Default Response command for sure.
+        return @"Unexpected response length";
+    }
+
+    if (message[0] != 8) {
+        // Unexpected control byte
+        return [NSString stringWithFormat:@"Control byte value '0x%02x' is not expected", message[0]];
+    }
+
+    // message[1] is the sequence counter; just ignore it for now.
+
+    if (message[2] != 0x0b) {
+        // Not a Default Response command id
+        return [NSString stringWithFormat:@"Command id '0x%02x' is not the Default Response command id (0x0b)", message[2]];
+    }
+
+    if (frame.clusterId != 0x06) {
+        // Not On/Off cluster
+        return [NSString stringWithFormat:@"Cluster id '0x%02x' is not the on/off cluster id (0x06)", frame.clusterId];
+    }
+
+    NSString * command;
+    if (message[3] == 0) {
+        command = @"off";
+    } else if (message[3] == 1) {
+        command = @"on";
+    } else if (message[3] == 2) {
+        command = @"toggle";
+    } else {
+        return [NSString stringWithFormat:@"Command '0x%02x' is unknown", message[3]];
+    }
+
+    NSString * status;
+    if (message[4] == 0) {
+        status = @"succeeded";
+    } else {
+        status = @"failed";
+    }
+
+    return [NSString stringWithFormat:@"Sending '%@' command %@", command, status];
+}
+
+- (void)setDelegate:(id<CHIPDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
+{
+    [self.lock lock];
+    if (delegate && queue) {
+        self->_delegate = delegate;
+        self->_delegateQueue = queue;
+    } else {
+        self->_delegate = nil;
+        self->_delegateQueue = NULL;
+    }
+    [self.lock unlock];
 }
 
 @end

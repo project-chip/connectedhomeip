@@ -48,8 +48,7 @@ enum
     kInetEvent_TCPError              = _INET_CONFIG_EVENT(4), /**< The event for an error on a TCP connection */
     kInetEvent_UDPDataReceived       = _INET_CONFIG_EVENT(5), /**< The event for data reception over UDP */
     kInetEvent_DNSResolveComplete    = _INET_CONFIG_EVENT(6), /**< The event for DNS name resolution completion */
-    kInetEvent_TunDataReceived       = _INET_CONFIG_EVENT(7), /**< The event for data reception over a chip tunnel */
-    kInetEvent_RawDataReceived       = _INET_CONFIG_EVENT(8)  /**< The event for data reception over an InetLayer raw endpoint */
+    kInetEvent_RawDataReceived       = _INET_CONFIG_EVENT(7)  /**< The event for data reception over an InetLayer raw endpoint */
 };
 
 /**

@@ -18,6 +18,7 @@
 package com.google.chip.chiptool.echoclient
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,8 +26,8 @@ import androidx.fragment.app.Fragment
 import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
-import kotlinx.android.synthetic.main.send_command_fragment.*
-import kotlinx.android.synthetic.main.send_command_fragment.view.*
+import kotlinx.android.synthetic.main.echo_client_fragment.*
+import kotlinx.android.synthetic.main.echo_client_fragment.view.*
 
 /** Sends echo messages to the CHIP device. */
 class EchoClientFragment : Fragment(), ChipDeviceController.CompletionListener {
@@ -39,21 +40,12 @@ class EchoClientFragment : Fragment(), ChipDeviceController.CompletionListener {
       container: ViewGroup?,
       savedInstanceState: Bundle?
   ): View {
-    return inflater.inflate(R.layout.send_command_fragment, container, false).apply {
+    return inflater.inflate(R.layout.echo_client_fragment, container, false).apply {
       deviceController.setCompletionListener(this@EchoClientFragment)
 
       inputTextEd.hint = requireContext().getString(R.string.echo_input_hint_text)
 
       sendCommandBtn.setOnClickListener { onSendCommandClick() }
-    }
-  }
-
-  private fun onSendCommandClick() {
-    if (deviceController.isConnected) {
-      sendEcho()
-    } else {
-      commandStatusTv.text = requireContext().getString(R.string.echo_status_connecting)
-      deviceController.beginConnectDevice(ipAddressEd.text.toString())
     }
   }
 
@@ -65,6 +57,20 @@ class EchoClientFragment : Fragment(), ChipDeviceController.CompletionListener {
     commandStatusTv.text = requireContext().getString(R.string.echo_status_response, message)
   }
 
+  override fun onError(error: Throwable) {
+    Log.d(TAG, "onError: $error")
+  }
+
+  private fun onSendCommandClick() {
+    if (deviceController.isConnected) {
+      sendEcho()
+    } else {
+      commandStatusTv.text = requireContext().getString(R.string.echo_status_connecting)
+      deviceController.disconnectDevice()
+      deviceController.beginConnectDevice(ipAddressEd.text.toString())
+    }
+  }
+
   private fun sendEcho() {
     commandStatusTv.text = requireContext().getString(R.string.echo_status_sending_message)
 
@@ -74,7 +80,7 @@ class EchoClientFragment : Fragment(), ChipDeviceController.CompletionListener {
   }
 
   companion object {
-
+    private const val TAG = "EchoClientFragment"
     private const val DEFAULT_ECHO_MSG = "Hello! from the Android CHIP demo app"
 
     fun newInstance(): EchoClientFragment = EchoClientFragment()

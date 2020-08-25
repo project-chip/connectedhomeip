@@ -46,6 +46,8 @@ using chip::ErrorStr;
 using namespace chip::System;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+namespace {
+
 struct TestContext
 {
     SystemWakeEvent mWakeEvent;
@@ -66,16 +68,14 @@ struct TestContext
     }
 };
 
-// Test input data.
-
-static void TestOpen(nlTestSuite * inSuite, void * aContext)
+void TestOpen(nlTestSuite * inSuite, void * aContext)
 {
     TestContext & lContext = *static_cast<TestContext *>(aContext);
     NL_TEST_ASSERT(inSuite, lContext.mWakeEvent.GetNotifFD() >= 0);
     NL_TEST_ASSERT(inSuite, lContext.SelectWakeEvent() == 0);
 }
 
-static void TestNotify(nlTestSuite * inSuite, void * aContext)
+void TestNotify(nlTestSuite * inSuite, void * aContext)
 {
     TestContext & lContext = *static_cast<TestContext *>(aContext);
     NL_TEST_ASSERT(inSuite, lContext.SelectWakeEvent() == 0);
@@ -90,7 +90,7 @@ static void TestNotify(nlTestSuite * inSuite, void * aContext)
     NL_TEST_ASSERT(inSuite, FD_ISSET(lContext.mWakeEvent.GetNotifFD(), &lContext.mReadSet));
 }
 
-static void TestConfirm(nlTestSuite * inSuite, void * aContext)
+void TestConfirm(nlTestSuite * inSuite, void * aContext)
 {
     TestContext & lContext = *static_cast<TestContext *>(aContext);
 
@@ -105,14 +105,14 @@ static void TestConfirm(nlTestSuite * inSuite, void * aContext)
 }
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-static void * WaitForEvent(void * aContext)
+void * WaitForEvent(void * aContext)
 {
     TestContext & lContext = *static_cast<TestContext *>(aContext);
     // wait 5 seconds
     return reinterpret_cast<void *>(lContext.SelectWakeEvent(timeval{ 5, 0 }));
 }
 
-static void TestBlockingSelect(nlTestSuite * inSuite, void * aContext)
+void TestBlockingSelect(nlTestSuite * inSuite, void * aContext)
 {
     TestContext & lContext = *static_cast<TestContext *>(aContext);
 
@@ -126,10 +126,10 @@ static void TestBlockingSelect(nlTestSuite * inSuite, void * aContext)
     NL_TEST_ASSERT(inSuite, selectResult == reinterpret_cast<void *>(1));
 }
 #else  // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-static void TestBlockingSelect(nlTestSuite *, void *) {}
+void TestBlockingSelect(nlTestSuite *, void *) {}
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-static void TestClose(nlTestSuite * inSuite, void * aContext)
+void TestClose(nlTestSuite * inSuite, void * aContext)
 {
     TestContext & lContext = *static_cast<TestContext *>(aContext);
     lContext.mWakeEvent.Close();
@@ -140,6 +140,7 @@ static void TestClose(nlTestSuite * inSuite, void * aContext)
     NL_TEST_ASSERT(inSuite, lContext.mWakeEvent.Open() == CHIP_SYSTEM_NO_ERROR);
     NL_TEST_ASSERT(inSuite, notifFD < 0);
 }
+} // namespace
 
 // Test Suite
 

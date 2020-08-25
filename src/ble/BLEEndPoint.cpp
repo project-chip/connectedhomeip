@@ -765,6 +765,8 @@ BLE_ERROR BLEEndPoint::SendNextMessage()
     VerifyOrExit(PrepareNextFragment(data, sentAck), err = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT);
     data = NULL; // Ownership passed to fragmenter's tx buf on PrepareNextFragment success.
 
+    /*
+     // Todo: reenabled it after integrating fault injection
     // Send first message fragment over the air.
     CHIP_FAULT_INJECT(chip::FaultInjection::kFault_CHIPOBLESend, {
         if (mRole == kBleRole_Central)
@@ -777,6 +779,7 @@ BLE_ERROR BLEEndPoint::SendNextMessage()
         }
         ExitNow();
     });
+     */
     err = SendCharacteristic(mBtpEngine.TxPacket());
     SuccessOrExit(err);
 

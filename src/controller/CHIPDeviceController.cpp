@@ -20,7 +20,7 @@
 /**
  *    @file
  *      Implementation of CHIP Device Controller, a common class
- *      that implements discovery, pairing and provisioning of Weave
+ *      that implements discovery, pairing and provisioning of CHIP
  *      devices.
  *
  */
@@ -52,6 +52,9 @@ namespace chip {
 namespace DeviceController {
 
 using namespace chip::Encoding;
+
+static constexpr uint32_t kSpake2p_Iteration_Count = 50000;
+static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Exchange Salt";
 
 ChipDeviceController::ChipDeviceController()
 {
@@ -146,6 +149,72 @@ exit:
     return err;
 }
 
+CHIP_ERROR ChipDeviceController::OnNewMessageForPeer(System::PacketBuffer * msgBuf)
+{
+    return SendMessage(mAppReqState, msgBuf);
+}
+
+void ChipDeviceController::OnPairingError(CHIP_ERROR error)
+{
+    ChipLogError(Controller, "Failed to pair with accessory. Error %d", error);
+    mPairingInProgress = false;
+
+    if (mOnError != nullptr)
+    {
+        mOnError(this, mAppReqState, error, nullptr);
+    }
+}
+
+void ChipDeviceController::OnPairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId)
+{
+    ChipLogProgress(Controller, "Successfully paired with accessory. Key Id %d", peerKeyId);
+    mPairingInProgress = false;
+
+    if (mPairingComplete != nullptr)
+    {
+        mPeerKeyId        = peerKeyId;
+        mLocalPairedKeyId = localKeyId;
+        ChipLogProgress(Controller, "Calling mPairingComplete");
+        mPairingComplete(this, nullptr, mAppReqState);
+    }
+}
+
+void ChipDeviceController::PairingMessageHandler(ChipDeviceController * controller, void * appReqState,
+                                                 System::PacketBuffer * payload)
+{
+    if (controller->mPairingInProgress)
+    {
+        MessageHeader header;
+        size_t headerSize = 0;
+        CHIP_ERROR err    = header.Decode(payload->Start(), payload->DataLength(), &headerSize);
+        SuccessOrExit(err);
+
+        payload->ConsumeHead(headerSize);
+        controller->mPairingSession.HandlePeerMessage(header, payload);
+    }
+    else if (controller->mAppMsgHandler != nullptr)
+    {
+        controller->mAppMsgHandler(controller, appReqState, payload);
+    }
+
+exit:
+    return;
+}
+
+void ChipDeviceController::BLEConnectionHandler(ChipDeviceController * controller, Transport::PeerConnectionState * state,
+                                                void * appReqState)
+{
+    ChipLogProgress(Controller, "Starting pairing session");
+    controller->mPairingInProgress = true;
+    CHIP_ERROR err                 = controller->mPairingSession.Pair(
+        controller->mSetupPINCode, kSpake2p_Iteration_Count, (const unsigned char *) kSpake2pKeyExchangeSalt,
+        strlen(kSpake2pKeyExchangeSalt), Optional<NodeId>::Value(controller->mLocalDeviceId), controller->mNextKeyId++, controller);
+    SuccessOrExit(err);
+
+exit:
+    return;
+}
+
 CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const uint16_t discriminator, const uint32_t setupPINCode,
                                                void * appReqState, NewConnectionHandler onConnected,
                                                MessageReceiveHandler onMessageReceived, ErrorHandler onError)
@@ -155,23 +224,35 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const uint
 #if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
     Transport::BLE * transport;
 
+    ChipLogProgress(Controller, "Received new pairing request");
+    ChipLogProgress(Controller, "mState %d. mConState %d", mState, mConState);
     VerifyOrExit(mState == kState_Initialized && mConState == kConnectionState_NotConnected, err = CHIP_ERROR_INCORRECT_STATE);
+
+    if (mPairingInProgress)
+    {
+        ChipLogError(Controller, "Pairing was already is progress. This will restart pairing.");
+    }
 
     mRemoteDeviceId  = Optional<NodeId>::Value(remoteDeviceId);
     mAppReqState     = appReqState;
-    mOnNewConnection = onConnected;
+    mPairingComplete = onConnected;
+    mOnNewConnection = BLEConnectionHandler;
+    mAppMsgHandler   = onMessageReceived;
+
+    mSetupPINCode = setupPINCode;
 
     transport = new Transport::BLE();
     err       = transport->Init(Transport::BleConnectionParameters(this, DeviceLayer::ConnectivityMgr().GetBleLayer())
                               .SetDiscriminator(discriminator)
                               .SetSetupPINCode(setupPINCode));
     SuccessOrExit(err);
+
     mUnsecuredTransport = transport->Retain();
 
     // connected state before 'OnConnect'
     mConState = kConnectionState_Connected;
 
-    mOnComplete.Response = onMessageReceived;
+    mOnComplete.Response = PairingMessageHandler;
     mOnError             = onError;
 
     if (err != CHIP_NO_ERROR)
@@ -188,9 +269,10 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
-                                               NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
-                                               ErrorHandler onError, uint16_t devicePort)
+CHIP_ERROR ChipDeviceController::ConnectDeviceUsingPairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
+                                                           NewConnectionHandler onConnected,
+                                                           MessageReceiveHandler onMessageReceived, ErrorHandler onError,
+                                                           uint16_t devicePort, uint16_t localKeyId, SecurePairingSession * pairing)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -213,16 +295,22 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress 
 
     mSessionManager->SetDelegate(this);
 
-    // connected state before 'OnConnect' so that key exchange is accepted
-    mConState = kConnectionState_Connected;
-
-    err = mSessionManager->Connect(remoteDeviceId, Transport::PeerAddress::UDP(deviceAddr, devicePort));
-    SuccessOrExit(err);
+    mConState = kConnectionState_SecureConnected;
 
     mOnComplete.Response = onMessageReceived;
     mOnError             = onError;
 
+    err = mSessionManager->NewPairing(mRemoteDeviceId,
+                                      Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(deviceAddr, devicePort)),
+                                      mPeerKeyId, localKeyId, pairing);
+    SuccessOrExit(err);
+
     mMessageNumber = 1;
+
+    if (mOnNewConnection)
+    {
+        mOnNewConnection(this, NULL, mAppReqState);
+    }
 
 exit:
 
@@ -238,24 +326,22 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::ManualKeyExchange(Transport::PeerConnectionState * state, const unsigned char * remote_public_key,
-                                                   const size_t public_key_length, const unsigned char * local_private_key,
-                                                   const size_t private_key_length)
+CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
+                                               NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
+                                               ErrorHandler onError, uint16_t devicePort)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    return ConnectDeviceUsingPairing(remoteDeviceId, deviceAddr, appReqState, onConnected, onMessageReceived, onError, devicePort,
+                                     mLocalPairedKeyId, &mPairingSession);
+}
 
-    if (!IsConnected() || mSessionManager == NULL)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, public_key_length, local_private_key,
-                                                               private_key_length);
-    SuccessOrExit(err);
-    mConState = kConnectionState_SecureConnected;
-
-exit:
-    return err;
+CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
+                                                                   NewConnectionHandler onConnected,
+                                                                   MessageReceiveHandler onMessageReceived, ErrorHandler onError,
+                                                                   uint16_t devicePort)
+{
+    SecurePairingUsingTestSecret pairing;
+    return ConnectDeviceUsingPairing(remoteDeviceId, deviceAddr, appReqState, onConnected, onMessageReceived, onError, devicePort,
+                                     0, &pairing);
 }
 
 CHIP_ERROR ChipDeviceController::PopulatePeerAddress(Transport::PeerAddress & peerAddress)
@@ -375,10 +461,7 @@ void ChipDeviceController::ClearRequestState()
     }
 }
 
-void ChipDeviceController::OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
-{
-    mOnNewConnection(this, state, mAppReqState);
-}
+void ChipDeviceController::OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
 
 void ChipDeviceController::OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
                                              System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr)
@@ -398,6 +481,43 @@ void ChipDeviceController::OnMessageReceived(const MessageHeader & header, Trans
     if (IsSecurelyConnected() && mOnComplete.Response != NULL)
     {
         mOnComplete.Response(this, mAppReqState, msgBuf);
+    }
+}
+
+void ChipDeviceController::OnBLEConnectionError(BLE_ERROR err)
+{
+    if (mOnError)
+    {
+        mOnError(this, mAppReqState, err, NULL);
+    }
+}
+
+void ChipDeviceController::OnBLEConnectionComplete(BLE_ERROR err)
+{
+    ChipLogDetail(Controller, "BLE Connection complete");
+
+    if (mOnNewConnection)
+    {
+        mOnNewConnection(this, NULL, mAppReqState);
+    }
+}
+
+void ChipDeviceController::OnBLEConnectionClosed(BLE_ERROR err)
+{
+    ChipLogDetail(Controller, "BLE Connection closed");
+
+    // TODO: determine if connection closed is really to be treated as an error.
+    if (mOnError)
+    {
+        mOnError(this, mAppReqState, err, NULL);
+    }
+}
+
+void ChipDeviceController::OnBLEPacketReceived(PacketBuffer * buffer)
+{
+    if (mOnComplete.Response)
+    {
+        mOnComplete.Response(this, mAppReqState, buffer);
     }
 }
 

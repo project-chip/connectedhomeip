@@ -41,7 +41,7 @@ template("gcc_toolchain") {
     }
 
     is_host_toolchain = invoker_toolchain_args.current_os == host_os
-    link_group = true
+    link_group = invoker_toolchain_args.current_os != "mac"
 
     defaults = {
       forward_variables_from(invoker_toolchain_args, "*")

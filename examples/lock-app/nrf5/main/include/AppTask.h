@@ -29,6 +29,8 @@
 #include "AppEvent.h"
 #include "BoltLockManager.h"
 
+#include <ble/BLEEndPoint.h>
+
 class AppTask
 {
 public:
@@ -58,6 +60,10 @@ private:
     static void ButtonEventHandler(uint8_t pin_no, uint8_t button_action);
     static void TimerEventHandler(void * p_context);
 
+    static void HandleBLEConnectionOpened(chip::Ble::BLEEndPoint * endPoint);
+    static void HandleBLEConnectionClosed(chip::Ble::BLEEndPoint * endPoint, BLE_ERROR err);
+    static void HandleBLEMessageReceived(chip::Ble::BLEEndPoint * endPoint, chip::System::PacketBuffer * buffer);
+
     void StartTimer(uint32_t aTimeoutInMs);
 
     enum Function_t
@@ -71,6 +77,7 @@ private:
 
     Function_t mFunction;
     bool mFunctionTimerActive;
+    chip::Ble::BLEEndPoint * mBLEEndPoint;
 
     static AppTask sAppTask;
 };

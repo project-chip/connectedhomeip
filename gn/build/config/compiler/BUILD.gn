@@ -16,9 +16,21 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
 import("//build/config/compiler/compiler.gni")
+import("//build/config/target.gni")
 
-if (current_cpu == "arm") {
+declare_args() {
+  # Enable -Werror. This can be disabled if using a different compiler
+  # with unfixed or unsupported wanings.
+  treat_warnings_as_errors = true
+}
+
+_is_embedded_arm = current_os != "ios" && current_os != "mac_os" &&
+                   (current_cpu == "arm" || current_cpu == "arm64")
+
+if (_is_embedded_arm) {
   import("//build/config/arm.gni")
+} else if (current_cpu == "x86" || current_cpu == "x86_64") {
+  import("//build/config/x86.gni")
 }
 
 config("release") {
@@ -33,7 +45,7 @@ config("debug_default") {
 
 config("abi_default") {
   cflags = []
-  if (current_cpu == "arm") {
+  if (_is_embedded_arm) {
     if (arm_arch != "") {
       cflags += [ "-march=${arm_arch}" ]
     }
@@ -55,8 +67,42 @@ config("abi_default") {
     if (arm_use_thumb) {
       cflags += [ "-mthumb" ]
     }
+  } else if (current_cpu == "x86" || current_cpu == "x86_64") {
+    if (x86_arch != "") {
+      cflags += [ "-march=${x86_arch}" ]
+    }
+    if (x86_cpu != "") {
+      cflags += [ "-mcpu=${x86_cpu}" ]
+    }
+    if (x86_tune != "") {
+      cflags += [ "-mtune=${x86_tune}" ]
+    }
+
+    if (current_cpu == "x86_64") {
+      cflags += [
+        "-msse4.2",
+        "-mpopcnt",
+        "-m64",
+      ]
+    } else if (current_cpu == "x86") {
+      cflags += [
+        "-mssse3",
+        "-mfpmath=sse",
+        "-m32",
+      ]
+    }
   }
   ldflags = cflags
+}
+
+config("target_default") {
+  if (current_toolchain == default_toolchain) {
+    defines = target_defines
+    cflags = target_cflags
+    cflags_c = target_cflags_c
+    cflags_cc = target_cflags_cc
+    ldflags = target_ldflags
+  }
 }
 
 config("optimize_zero") {
@@ -90,6 +136,7 @@ config("optimize_default") {
 config("disabled_warnings") {
   cflags = [
     "-Wno-deprecated-declarations",
+    "-Wno-unknown-warning-option",
   ]
   cflags_cc = [
     "-Wno-non-virtual-dtor",
@@ -100,16 +147,23 @@ config("disabled_warnings") {
       "-Wno-psabi",
       "-Wno-cast-function-type",
       "-Wno-maybe-uninitialized",
-      "-Wno-unknown-warning-option",
     ]
   }
 }
 
 config("strict_warnings") {
-  cflags = [
-    "-Wall",
-    "-Werror",
-  ]
+  cflags = [ "-Wall" ]
+
+  ldflags = []
+
+  if (treat_warnings_as_errors) {
+    cflags += [ "-Werror" ]
+    ldflags += [ "-Werror" ]
+  }
+
+  if (is_clang) {
+    cflags += [ "-Wimplicit-fallthrough" ]
+  }
 }
 
 config("warnings_default") {
@@ -118,7 +172,7 @@ config("warnings_default") {
     ":disabled_warnings",
   ]
 
-  if (current_os != "mac") {
+  if (current_os != "mac" && current_os != "ios") {
     ldflags = [ "-Wl,--fatal-warnings" ]
   }
 }

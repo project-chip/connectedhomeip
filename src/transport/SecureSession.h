@@ -57,6 +57,20 @@ public:
 
     /**
      * @brief
+     *   Derive a shared key. The derived key will be used for encryting/decrypting
+     *   data exchanged on the secure channel.
+     *
+     * @param remote_public_key  A pointer to peer's public key
+     * @param public_key_length  Length of remote_public_key
+     * @param local_private_key  A pointer to local private key
+     * @param private_key_length Length of local_private_key
+     * @return CHIP_ERROR        The result of key derivation
+     */
+    CHIP_ERROR InitFromSecret(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
+                              const size_t salt_length, const unsigned char * info, const size_t info_length);
+
+    /**
+     * @brief
      *   Encrypt the input data using keys established in the secure channel
      *
      * @param input Unencrypted input data
@@ -93,29 +107,18 @@ public:
      */
     void Reset(void);
 
-    /**
-     * @brief
-     *   The keypair for the secure channel. This is a utility function that will be used
-     *   until we have automatic key exchange in place. The function is useful only for
-     *   example applications for now. It will eventually be removed.
-     *
-     * @param remote_public_key  A pointer to peer's public key
-     * @param public_key_length  Length of remote_public_key
-     * @param local_private_key  A pointer to local private key
-     * @param private_key_length Length of local_private_key
-     * @return CHIP_ERROR        The result of key derivation
-     */
-    [[deprecated("Available until actual key exchange is implemented")]] CHIP_ERROR
-    TemporaryManualKeyExchange(const unsigned char * remote_public_key, const size_t public_key_length,
-                               const unsigned char * local_private_key, const size_t private_key_length);
-
 private:
     static constexpr size_t kAES_CCM128_Key_Length = 16;
 
     bool mKeyAvailable;
     uint8_t mKey[kAES_CCM128_Key_Length];
 
-    static uint64_t GetIV(const MessageHeader & header);
+    static CHIP_ERROR GetIV(const MessageHeader & header, uint8_t * iv, size_t len);
+
+    // Use unencrypted header as additional authenticated data (AAD) during encryption and decryption.
+    // The encryption operations includes AAD when message authentication tag is generated. This tag
+    // is used at the time of decryption to integrity check the received data.
+    static CHIP_ERROR GetAdditionalAuthData(const MessageHeader & header, uint8_t * aad, size_t & len);
 };
 
 } // namespace chip

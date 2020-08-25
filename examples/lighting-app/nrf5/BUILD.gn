@@ -14,6 +14,7 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/nrf5_sdk.gni")
+import("//build_overrides/openthread.gni")
 
 import("${nrf5_sdk_build_root}/nrf5_sdk.gni")
 
@@ -28,6 +29,7 @@ nrf5_sdk("sdk") {
     "${nrf5_platform_dir}/app/project_include",
     "${nrf5_platform_dir}/util/include",
     "${nrf5_platform_dir}/app/include",
+    "${chip_root}/src/app/util",
   ]
 
   sources = [
@@ -52,29 +54,50 @@ nrf5_sdk("sdk") {
 executable("lighting_app") {
   output_name = "chip-nrf52840-lighting-example"
 
-  public_deps = [
-    ":sdk",
-    "${chip_root}/src/lib",
-  ]
-
   sources = [
+    "${chip_root}/src/app/clusters/on-off-server/on-off.c",
+    "${chip_root}/src/app/util/attribute-size.c",
+    "${chip_root}/src/app/util/attribute-storage.c",
+    "${chip_root}/src/app/util/attribute-table.c",
+    "${chip_root}/src/app/util/chip-response.cpp",
+    "${chip_root}/src/app/util/client-api.c",
+    "${chip_root}/src/app/util/ember-print.cpp",
+    "${chip_root}/src/app/util/message.c",
+    "${chip_root}/src/app/util/process-cluster-message.c",
+    "${chip_root}/src/app/util/process-global-message.c",
+    "${chip_root}/src/app/util/util.c",
     "${nrf5_platform_dir}/app/Server.cpp",
     "${nrf5_platform_dir}/app/chipinit.cpp",
     "${nrf5_platform_dir}/app/include/Server.h",
     "${nrf5_platform_dir}/app/include/chipinit.h",
     "${nrf5_platform_dir}/app/support/CXXExceptionStubs.cpp",
-    "${nrf5_platform_dir}/app/support/FreeRTOSNewlibLockSupport.c",
     "${nrf5_platform_dir}/app/support/nRF5Sbrk.c",
     "${nrf5_platform_dir}/util/LEDWidget.cpp",
     "${nrf5_platform_dir}/util/include/LEDWidget.h",
     "main/AppTask.cpp",
     "main/DataModelHandler.cpp",
     "main/LightingManager.cpp",
+    "main/gen/call-command-handler.c",
+    "main/gen/callback-stub.c",
+    "main/gen/znet-bookkeeping.c",
     "main/include/AppEvent.h",
     "main/include/AppTask.h",
     "main/include/DataModelHandler.h",
     "main/include/LightingManager.h",
     "main/main.cpp",
+  ]
+
+  deps = [
+    ":sdk",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+    "${chip_root}/third_party/openthread/platforms/nrf528xx:libnordicsemi_nrf52840_radio_driver_softdevice",
+    "${chip_root}/third_party/openthread/platforms/nrf528xx:libopenthread-nrf52840-softdevice-sdk",
+    "${nrf5_platform_dir}/app/support:freertos_debugging_hooks",
+    "${nrf5_platform_dir}/app/support:freertos_newlib_lock_support",
+    "${nrf5_platform_dir}/app/support:freertos_newlib_lock_support_test",
+    "${openthread_root}:libopenthread-cli-ftd",
+    "${openthread_root}:libopenthread-ftd",
   ]
 
   output_dir = root_out_dir
@@ -86,4 +109,8 @@ executable("lighting_app") {
 
 group("nrf5") {
   deps = [ ":lighting_app" ]
+}
+
+group("default") {
+  deps = [ ":nrf5" ]
 }

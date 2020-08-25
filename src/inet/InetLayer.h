@@ -74,10 +74,6 @@
 #include <inet/UDPEndPoint.h>
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-#include <inet/TunEndPoint.h>
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
-
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #if INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 #include <inet/AsyncDNSResolverSockets.h>
@@ -160,10 +156,6 @@ class DLL_EXPORT InetLayer
     friend class UDPEndPoint;
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-    friend class TunEndPoint;
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
-
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #if INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
     friend class AsyncDNSResolverSockets;
@@ -201,10 +193,6 @@ public:
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
     INET_ERROR NewUDPEndPoint(UDPEndPoint ** retEndPoint);
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-    INET_ERROR NewTunEndPoint(TunEndPoint ** retEndPoint);
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
 
     // DNS Resolution
 
@@ -261,9 +249,6 @@ public:
     inline static bool IsDroppableEvent(chip::System::EventType type)
     {
         return
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-            type == kInetEvent_TunDataReceived ||
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
             type == kInetEvent_UDPDataReceived ||
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT

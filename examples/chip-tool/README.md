@@ -17,6 +17,7 @@ Building the example application is quite straightforward.
 -   In the root of the example directory, run `make`.
 
           $ make
+          $ make -f server.mk
 
 -   After the application is built, it can be found in the build directory as
     `chip-standalone-demo.out`

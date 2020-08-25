@@ -38,7 +38,7 @@
 // This c file provides stubs for all callbacks. These stubs
 // will be used in the case where user defined implementations
 // of the callbacks have not been provided.
-#include "../af.h"
+#include "af.h"
 #include <assert.h>
 //#include "hal/hal.h"
 //#include EMBER_AF_API_NETWORK_STEERING
@@ -1191,7 +1191,7 @@ void emberAfOtaClientVersionInfoCallback(EmberAfOtaImageId * currentImageInfo, u
     /* This is commented out since the #defines below are not defined.
 
       if (currentImageInfo != NULL) {
-        MEMSET(currentImageInfo, 0, sizeof(EmberAfOtaImageId));
+        memset(currentImageInfo, 0, sizeof(EmberAfOtaImageId));
         currentImageInfo->manufacturerId  = EMBER_AF_MANUFACTURER_CODE;
         currentImageInfo->imageTypeId     = EMBER_AF_IMAGE_TYPE_ID;
         currentImageInfo->firmwareVersion = EMBER_AF_CUSTOM_FIRMWARE_VERSION;
@@ -2474,4 +2474,4 @@ void halRadioPowerUpHandler(void) {}
  * @param enter        True if entering idle/sleep, False if exiting
  * @param sleepMode    Idle/sleep mode
  */
-void halSleepCallback(boolean enter, SleepModes sleepMode) {}
+void halSleepCallback(bool enter, SleepModes sleepMode) {}

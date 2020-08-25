@@ -38,9 +38,25 @@ SRCS = \
     $(PROJECT_ROOT)/main/AppTask.cpp \
     $(PROJECT_ROOT)/main/BoltLockManager.cpp \
     $(PROJECT_ROOT)/main/DataModelHandler.cpp \
+    $(PROJECT_ROOT)/main/gen/call-command-handler.c \
+    $(PROJECT_ROOT)/main/gen/callback-stub.c \
+    $(PROJECT_ROOT)/main/gen/znet-bookkeeping.c \
+    $(CHIP_ROOT)/src/app/util/attribute-size.c \
+    $(CHIP_ROOT)/src/app/util/attribute-storage.c \
+    $(CHIP_ROOT)/src/app/util/attribute-table.c \
+    $(CHIP_ROOT)/src/app/util/chip-response.cpp \
+    $(CHIP_ROOT)/src/app/util/client-api.c \
+    $(CHIP_ROOT)/src/app/util/ember-print.cpp \
+    $(CHIP_ROOT)/src/app/util/message.c \
+    $(CHIP_ROOT)/src/app/util/process-cluster-message.c \
+    $(CHIP_ROOT)/src/app/util/process-global-message.c \
+    $(CHIP_ROOT)/src/app/util/util.c \
+    $(CHIP_ROOT)/src/app/clusters/on-off-server/on-off.c \
     $(NRF5_PLATFORM_DIR)/app/support/CXXExceptionStubs.cpp \
     $(NRF5_PLATFORM_DIR)/app/support/nRF5Sbrk.c \
+    $(NRF5_PLATFORM_DIR)/app/support/FreeRTOSDebuggingHooks.c \
     $(NRF5_PLATFORM_DIR)/app/support/FreeRTOSNewlibLockSupport.c \
+    $(NRF5_PLATFORM_DIR)/app/support/FreeRTOSNewlibLockSupport_test.c \
     $(NRF5_PLATFORM_DIR)/app/Server.cpp \
     $(NRF5_PLATFORM_DIR)/app/chipinit.cpp \
     $(NRF5_PLATFORM_DIR)/util/LEDWidget.cpp \
@@ -114,9 +130,11 @@ INC_DIRS = \
     $(PROJECT_ROOT)/main/schema/include \
     $(PROJECT_ROOT)/third_party/printf \
     $(CHIP_OUTPUT_DIR)/third_party/openthread/include \
+    $(CHIP_ROOT)/examples/platform \
     $(CHIP_ROOT)/src/include/ \
     $(CHIP_ROOT)/src/lib \
     $(CHIP_ROOT)/src/ \
+    $(CHIP_ROOT)/src/app/util \
     $(CHIP_ROOT)/src/system \
     $(CHIP_ROOT)/third_party/openthread/repo/include \
     $(NRF5_PLATFORM_DIR)/app/include \

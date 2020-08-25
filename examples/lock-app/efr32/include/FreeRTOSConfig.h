@@ -186,7 +186,7 @@ runs at 32768/8=4096Hz.  Ensure the tick rate is a multiple of the clock. */
 #define configUSE_TIMERS (1)
 #define configTIMER_TASK_PRIORITY (configMAX_PRIORITIES - 1) /* Highest priority */
 #define configTIMER_QUEUE_LENGTH (10)
-#define configTIMER_TASK_STACK_DEPTH (configMINIMAL_STACK_SIZE)
+#define configTIMER_TASK_STACK_DEPTH (1024)
 
 /* Cortex-M specific definitions. */
 #ifdef __NVIC_PRIO_BITS

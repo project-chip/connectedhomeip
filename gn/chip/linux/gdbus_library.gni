@@ -1,0 +1,98 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+glib_config = rebase_path(":glib")
+gen_dbus_wrapper = rebase_path("gen_gdbus_wrapper.py")
+
+# Runs gdbus-codegen and defines the resulting library.
+#
+# Parameters:
+#   sources - The dbux XML files.
+#   dbus_out_dir - Subdirectory for generated files within root_gen_dir.
+#   replace_config_header - Replace the config header.
+template("gdbus_library") {
+  library_name = target_name
+  visibility = [ ":${library_name}" ]
+
+  assert(defined(invoker.sources), "Please specify sources")
+  assert(defined(invoker.dbus_out_dir), "Please specify dbus_out_dir")
+
+  dbus_out_dir = invoker.dbus_out_dir
+  dbus_gen_dir = "${root_gen_dir}/${dbus_out_dir}"
+
+  config("${library_name}_config") {
+    include_dirs = [ root_gen_dir ]
+  }
+
+  dbus_sources = []
+  foreach(xml, invoker.sources) {
+    name = get_path_info(xml, "name")
+    dbus_sources += [
+      "${dbus_gen_dir}/${name}.c",
+      "${dbus_gen_dir}/${name}.h",
+    ]
+  }
+
+  action_foreach("${library_name}_gen") {
+    script = gen_dbus_wrapper
+
+    sources = invoker.sources
+
+    source_file = "$dbus_gen_dir/{{source_name_part}}.c"
+    header_file = "$dbus_gen_dir/{{source_name_part}}.h"
+
+    outputs = [
+      source_file,
+      header_file,
+    ]
+
+    args = [
+      "--input",
+      "{{source}}",
+      "--output_c",
+      rebase_path(source_file, root_build_dir),
+      "--output_h",
+      rebase_path(header_file, root_build_dir),
+    ]
+
+    if (defined(invoker.c_namespace)) {
+      args += [
+        "--c-namespace",
+        invoker.c_namespace,
+      ]
+    }
+  }
+
+  static_library(library_name) {
+    forward_variables_from(invoker,
+                           [
+                             "defines",
+                             "testonly",
+                           ])
+    sources = dbus_sources
+    deps = [ ":${library_name}_gen" ]
+
+    public_configs = [
+      ":${library_name}_config",
+      glib_config,
+    ]
+
+    visibility = []
+    if (defined(invoker.visibility)) {
+      visibility = invoker.visibility
+    } else {
+      visibility = [ "*" ]
+    }
+  }
+}

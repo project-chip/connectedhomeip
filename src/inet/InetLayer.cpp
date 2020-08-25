@@ -97,10 +97,6 @@ void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
     RawEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumRawEps],
                                      aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumRawEps]);
 #endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-    TunEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumTunEps],
-                                     aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumTunEps]);
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
 }
 
 /**
@@ -664,48 +660,6 @@ exit:
 }
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-/**
- *  Creates a new TunEndPoint object.
- *
- *  @note
- *    This function gets a free TunEndPoint object from a pre-allocated pool
- *    and also calls the explicit initializer on the new object.
- *
- *  @param[in,out]  retEndPoint    A pointer to a pointer of the TunEndPoint object that is
- *                                 a return parameter upon completion of the object creation.
- *                                 *retEndPoint is NULL if creation fails.
- *
- *  @retval  #INET_ERROR_INCORRECT_STATE  If the InetLayer object is not initialized.
- *  @retval  #INET_ERROR_NO_ENDPOINTS     If the InetLayer TunEndPoint pool is full and no new
- *                                        ones can be created.
- *  @retval  #INET_NO_ERROR               On success.
- *
- */
-INET_ERROR InetLayer::NewTunEndPoint(TunEndPoint ** retEndPoint)
-{
-    INET_ERROR err = INET_NO_ERROR;
-    *retEndPoint   = NULL;
-
-    VerifyOrExit(State == kState_Initialized, err = INET_ERROR_INCORRECT_STATE);
-
-    *retEndPoint = TunEndPoint::sPool.TryCreate(*mSystemLayer);
-    if (*retEndPoint != NULL)
-    {
-        (*retEndPoint)->Init(this);
-        SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumTunEps);
-    }
-    else
-    {
-        ChipLogError(Inet, "%s endpoint pool FULL", "Tun");
-        err = INET_ERROR_NO_ENDPOINTS;
-    }
-
-exit:
-    return err;
-}
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
-
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
 /**
  *  Perform an IP address resolution of a specified hostname.
@@ -1130,12 +1084,6 @@ chip::System::Error InetLayer::HandleInetLayerEvent(chip::System::Object & aTarg
         break;
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-    case kInetEvent_TunDataReceived:
-        static_cast<TunEndPoint &>(aTarget).HandleDataReceived(reinterpret_cast<chip::System::PacketBuffer *>(aArgument));
-        break;
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
-
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
     case kInetEvent_DNSResolveComplete:
         static_cast<DNSResolver &>(aTarget).HandleResolveComplete();
@@ -1208,15 +1156,6 @@ void InetLayer::PrepareSelect(int & nfds, fd_set * readfds, fd_set * writefds, f
             lEndPoint->PrepareIO().SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
     }
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-    for (size_t i = 0; i < TunEndPoint::sPool.Size(); i++)
-    {
-        TunEndPoint * lEndPoint = TunEndPoint::sPool.Get(*mSystemLayer, i);
-        if ((lEndPoint != NULL) && lEndPoint->IsCreatedByInetLayer(*this))
-            lEndPoint->PrepareIO().SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
-    }
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
 }
 
 /**
@@ -1290,17 +1229,6 @@ void InetLayer::HandleSelectResult(int selectRes, fd_set * readfds, fd_set * wri
         }
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-        for (size_t i = 0; i < TunEndPoint::sPool.Size(); i++)
-        {
-            TunEndPoint * lEndPoint = TunEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != NULL) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->mPendingIO = SocketEvents::FromFDs(lEndPoint->mSocket, readfds, writefds, exceptfds);
-            }
-        }
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
-
         // Now call each active endpoint to handle its pending I/O.
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
         for (size_t i = 0; i < RawEndPoint::sPool.Size(); i++)
@@ -1334,17 +1262,6 @@ void InetLayer::HandleSelectResult(int selectRes, fd_set * readfds, fd_set * wri
             }
         }
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_TUN_ENDPOINT
-        for (size_t i = 0; i < TunEndPoint::sPool.Size(); i++)
-        {
-            TunEndPoint * lEndPoint = TunEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != NULL) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->HandlePendingIO();
-            }
-        }
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
     }
 }
 

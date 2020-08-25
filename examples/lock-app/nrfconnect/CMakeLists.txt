@@ -20,7 +20,7 @@ get_filename_component(CHIP_ROOT ${CHIP_ROOT} REALPATH)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHIP_ROOT}/config/nrfconnect/)
 
 # Make sure all components can see our mbedtls config
-include_directories(AFTER main/include)
+include_directories(AFTER main/include ${CHIP_ROOT}/src/app/util main)
 
 include(nrfconnect-app)
 
@@ -31,4 +31,18 @@ target_sources(app PRIVATE
                main/DataModelHandler.cpp
                main/main.cpp
                main/LEDWidget.cpp
-               main/Server.cpp)
+               main/Server.cpp
+               main/gen/call-command-handler.c
+               main/gen/callback-stub.c
+               main/gen/znet-bookkeeping.c
+               ${CHIP_ROOT}/src/app/util/attribute-size.c
+               ${CHIP_ROOT}/src/app/util/attribute-storage.c
+               ${CHIP_ROOT}/src/app/util/attribute-table.c
+               ${CHIP_ROOT}/src/app/util/chip-response.cpp
+               ${CHIP_ROOT}/src/app/util/client-api.c
+               ${CHIP_ROOT}/src/app/util/ember-print.cpp
+               ${CHIP_ROOT}/src/app/util/message.c
+               ${CHIP_ROOT}/src/app/util/process-cluster-message.c
+               ${CHIP_ROOT}/src/app/util/process-global-message.c
+               ${CHIP_ROOT}/src/app/util/util.c
+               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off.c)

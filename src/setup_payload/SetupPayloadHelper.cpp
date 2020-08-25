@@ -42,11 +42,11 @@ enum SetupPayloadKey
 struct SetupPayloadParameter
 {
     SetupPayloadKey key;
-    string stringValue;
+    std::string stringValue;
     uint64_t uintValue;
 };
 
-static CHIP_ERROR resolveSetupPayloadParameter(SetupPayloadParameter & parameter, string key, string value)
+static CHIP_ERROR resolveSetupPayloadParameter(SetupPayloadParameter & parameter, std::string key, std::string value)
 {
     bool isUnsignedInt   = true;
     bool shouldHaveValue = true;
@@ -139,16 +139,16 @@ static CHIP_ERROR addParameter(SetupPayload & setupPayload, SetupPayloadParamete
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR loadPayloadFromFile(SetupPayload & setupPayload, string filePath)
+CHIP_ERROR loadPayloadFromFile(SetupPayload & setupPayload, std::string filePath)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ifstream fileStream(filePath);
+    std::ifstream fileStream(filePath);
     VerifyOrExit(!fileStream.fail(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     while (fileStream)
     {
-        string key;
-        string value;
+        std::string key;
+        std::string value;
         SetupPayloadParameter parameter;
 
         getline(fileStream, key, ' ');
@@ -169,7 +169,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR generateQRCodeFromFilePath(string filePath, string & outCode)
+CHIP_ERROR generateQRCodeFromFilePath(std::string filePath, std::string & outCode)
 {
     SetupPayload setupPayload;
     CHIP_ERROR err = loadPayloadFromFile(setupPayload, filePath);
@@ -182,7 +182,7 @@ CHIP_ERROR generateQRCodeFromFilePath(string filePath, string & outCode)
     return err;
 }
 
-CHIP_ERROR generateManualCodeFromFilePath(string filePath, string & outCode)
+CHIP_ERROR generateManualCodeFromFilePath(std::string filePath, std::string & outCode)
 {
     SetupPayload setupPayload;
     CHIP_ERROR err = loadPayloadFromFile(setupPayload, filePath);

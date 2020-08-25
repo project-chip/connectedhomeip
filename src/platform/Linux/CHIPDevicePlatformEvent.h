@@ -51,8 +51,12 @@ enum PublicPlatformSpecificEventTypes
 enum InternalPlatformSpecificEventTypes
 {
     kPlatformLinuxEvent = kRange_InternalPlatformSpecific,
-    kPlatformLinuxBleC1WriteEvent,
-    kPlatformLinuxBleOutOfBuffersEvent,
+    kPlatformLinuxBLEC1WriteEvent,
+    kPlatformLinuxBLEOutOfBuffersEvent,
+    kPlatformLinuxBLEPeripheralRegisterAppComplete,
+    kPlatformLinuxBLEPeripheralAdvConfiguredComplete,
+    kPlatformLinuxBLEPeripheralAdvStartComplete,
+    kPlatformLinuxBLEPeripheralAdvStopComplete
 };
 
 } // namespace DeviceEventType
@@ -60,15 +64,30 @@ enum InternalPlatformSpecificEventTypes
 /**
  * Represents platform-specific event information for Linux platforms.
  */
-struct ChipDevicePlatformEvent final
+struct ChipDevicePlatformEvent
 {
     union
     {
         struct
         {
-            uint16_t ConnId;
-            ::chip::System::PacketBuffer * Data;
-        } BleC1WriteEvent;
+            bool mIsSuccess;
+            void * mpAppstate;
+        } BLEPeripheralRegisterAppComplete;
+        struct
+        {
+            bool mIsSuccess;
+            void * mpAppstate;
+        } BLEPeripheralAdvConfiguredComplete;
+        struct
+        {
+            bool mIsSuccess;
+            void * mpAppstate;
+        } BLEPeripheralAdvStartComplete;
+        struct
+        {
+            bool mIsSuccess;
+            void * mpAppstate;
+        } BLEPeripheralAdvStopComplete;
     };
 };
 

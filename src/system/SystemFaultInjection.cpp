@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include <system/SystemConfig.h>
+
 /**
  *    @file
  *      Implementation of the fault-injection utilities for CHIP System Layer.

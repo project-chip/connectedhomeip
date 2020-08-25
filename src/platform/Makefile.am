@@ -58,7 +58,6 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_BLE.ipp \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_NoBLE.h \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_NoThread.h \
-    @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_NoTunnel.h \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_NoWiFi.h \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_Thread.h \
     @top_srcdir@/src/include/platform/internal/GenericConnectivityManagerImpl_Thread.ipp \
@@ -114,6 +113,17 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/platform/ESP32/NetworkProvisioningServerImpl.h \
     @top_srcdir@/src/platform/ESP32/ESP32Utils.h \
     @top_srcdir@/src/platform/ESP32/ESP32Config.h \
+    @top_srcdir@/src/platform/K32W/CHIPDevicePlatformConfig.h \
+    @top_srcdir@/src/platform/K32W/GroupKeyStoreImpl.h \
+    @top_srcdir@/src/platform/K32W/k32w-chip-mbedtls-config.h \
+    @top_srcdir@/src/platform/K32W/K32WConfig.h \
+    @top_srcdir@/src/platform/K32W/ConnectivityManagerImpl.h \
+    @top_srcdir@/src/platform/K32W/BLEManagerImpl.h \
+    @top_srcdir@/src/platform/K32W/ConfigurationManagerImpl.h \
+    @top_srcdir@/src/platform/K32W/PlatformManagerImpl.h \
+    @top_srcdir@/src/platform/K32W/SoftwareUpdateManagerImpl.h \
+    @top_srcdir@/src/platform/K32W/CHIPDevicePlatformEvent.h \
+    @top_srcdir@/src/platform/K32W/NetworkProvisioningServerImpl.h \
     @top_srcdir@/src/platform/Linux/BLEManagerImpl.h \
     @top_srcdir@/src/platform/Linux/BlePlatformConfig.h \
     @top_srcdir@/src/platform/Linux/CHIPLinuxStorage.h \
@@ -146,6 +156,7 @@ libDeviceLayer_a_CPPFLAGS               = \
     $(SOCKETS_CPPFLAGS)                   \
     $(NULL)
 
+nodist_libDeviceLayer_a_SOURCES         = $(NULL)
 libDeviceLayer_a_SOURCES                = \
     PersistedStorage.cpp                  \
     SystemEventSupport.cpp                \
@@ -229,8 +240,9 @@ Linux/gen/DbusBluez.c: Linux/dbus/org.bluez.xml
 	$(GDBUSCODEGEN) $(GDBUSCODEGENOPTS) --body --output $@ $<
 	sed -i 's/config\.h/BuildConfig.h/g' $@
 
-libDeviceLayer_a_SOURCES               += \
+nodist_libDeviceLayer_a_SOURCES        += \
     Linux/gen/DbusBluez.c                 \
+    Linux/CHIPBluezHelper.cpp             \
     $(NULL)
 
 endif #CONFIG_BLE_PLATFORM_BLUEZ
@@ -245,28 +257,28 @@ BUILT_SOURCES                          += \
     Linux/gen/DBusWpaNetwork.c            \
     $(NULL)
 
-Linux/gen/DBusWpa.h: Linux/dbus/wpa.xml
+Linux/gen/DBusWpa.h: Linux/dbus/DBusWpa.xml
 	gdbus-codegen --header --output $@ --c-namespace Wpa $<
 
-Linux/gen/DBusWpaInterface.h: Linux/dbus/wpa_interface.xml
+Linux/gen/DBusWpaInterface.h: Linux/dbus/DBusWpaInterface.xml
 	gdbus-codegen --header --output $@ --c-namespace Wpa $<
 
-Linux/gen/DBusWpaNetwork.h: Linux/dbus/wpa_network.xml
+Linux/gen/DBusWpaNetwork.h: Linux/dbus/DBusWpaNetwork.xml
 	gdbus-codegen --header --output $@ --c-namespace Wpa $<
 
-Linux/gen/DBusWpa.c: Linux/dbus/wpa.xml
+Linux/gen/DBusWpa.c: Linux/dbus/DBusWpa.xml
 	gdbus-codegen --body --output $@ --c-namespace Wpa $<
 	sed -i 's/config\.h/BuildConfig.h/g' $@
 
-Linux/gen/DBusWpaInterface.c: Linux/dbus/wpa_interface.xml
+Linux/gen/DBusWpaInterface.c: Linux/dbus/DBusWpaInterface.xml
 	gdbus-codegen --body --output $@ --c-namespace Wpa $<
 	sed -i 's/config\.h/BuildConfig.h/g' $@
 
-Linux/gen/DBusWpaNetwork.c: Linux/dbus/wpa_network.xml
+Linux/gen/DBusWpaNetwork.c: Linux/dbus/DBusWpaNetwork.xml
 	gdbus-codegen --body --output $@ --c-namespace Wpa $<
 	sed -i 's/config\.h/BuildConfig.h/g' $@
 
-libDeviceLayer_a_SOURCES               += \
+nodist_libDeviceLayer_a_SOURCES        += \
     Linux/gen/DBusWpa.c                   \
     Linux/gen/DBusWpaInterface.c          \
     Linux/gen/DBusWpaNetwork.c            \
@@ -361,6 +373,10 @@ endif # CHIP_DEVICE_LAYER_TARGET_ESP32
 
 if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 
+SUBDIRS                                +=       \
+    tests                                       \
+    $(NULL)
+
 libDeviceLayer_a_SOURCES               +=       \
     nrfconnect/BLEManagerImpl.cpp               \
     nrfconnect/ConfigurationManagerImpl.cpp     \
@@ -378,6 +394,26 @@ libDeviceLayer_a_SOURCES               +=       \
 endif
 
 endif # CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+
+if CHIP_DEVICE_LAYER_TARGET_K32W
+
+libDeviceLayer_a_SOURCES               +=       \
+    K32W/BLEManagerImpl.cpp                     \
+    K32W/ConfigurationManagerImpl.cpp           \
+    K32W/PlatformManagerImpl.cpp                \
+    K32W/ConnectivityManagerImpl.cpp            \
+    K32W/K32WConfig.cpp                         \
+    K32W/Logging.cpp                            \
+    FreeRTOS/SystemTimeSupport.cpp              \
+    $(NULL)
+
+if CHIP_ENABLE_OPENTHREAD
+libDeviceLayer_a_SOURCES               +=       \
+    K32W/ThreadStackManagerImpl.cpp             \
+    $(NULL)
+endif
+
+endif # CHIP_DEVICE_LAYER_TARGET_K32W
 
 endif # CONFIG_DEVICE_LAYER
 
