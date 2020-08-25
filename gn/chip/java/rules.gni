@@ -31,6 +31,11 @@ template("java_library") {
   } else {
     _jar_name += ".jar"
   }
+  
+  _javac_flags = []
+  if (defined(invoker.javac_flags)) {
+    _javac_flags = invoker.javac_flags
+  }
 
   # What files will be compiled
   _java_files = invoker.sources
@@ -57,10 +62,12 @@ template("java_library") {
     script = javac_runner
 
     args = [
-      _class_dir, rebase_path(_class_list_file, root_build_dir),
+      "--classdir", _class_dir,
+      "--outfile", rebase_path(_class_list_file, root_build_dir),
+      "--",
       "-d", _class_dir,
       "@" + rebase_path(_java_sources_file, root_build_dir),
-    ]
+    ] + _javac_flags
   }
 
   # Bundles all files within the 'class directory' into a jar file

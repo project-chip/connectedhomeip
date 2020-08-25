@@ -16,9 +16,9 @@
 # Copyright 2015 The Chromium Authors. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
-
 """Wrapper script to run javac command as an action with gn."""
 
+import argparse
 import glob
 import os
 import subprocess
@@ -44,9 +44,9 @@ def FindCommand(command):
   """Looks up for |command| in PATH.
 
   Args:
-    command: name of the command to lookup, if command is a relative or
-      absolute path (i.e. contains some path separator) then only that
-      path will be tested.
+    command: name of the command to lookup, if command is a relative or absolute
+      path (i.e. contains some path separator) then only that path will be
+      tested.
 
   Returns:
     Full path to command or None if the command was not found.
@@ -85,25 +85,32 @@ def main():
     sys.stderr.write('javac: command not found\n')
     sys.exit(EXIT_FAILURE)
 
-  args = sys.argv[1:]
-  if len(args) < 3:
-    sys.stderr.write('usage: %s <classdir> <outfile> [javac_args]...\n' % sys.argv[0])
-    sys.exit(EXIT_FAILURE)
+  parser = argparse.ArgumentParser('Javac runner')
+  parser.add_argument(
+      '--classdir',
+      dest='classdir',
+      required=True,
+      help='Directory that will contain class files')
+  parser.add_argument(
+      '--outfile',
+      dest='outfile',
+      required=True,
+      help='Output file containing a list of classes')
+  parser.add_argument(
+      'rest', metavar='JAVAC_ARGS', nargs='*', help='Argumets to pass to javac')
 
-  classdir = args[0]
-  outfile = args[1]
-
-  retcode = subprocess.check_call([java_path] + args[2:])
+  args = parser.parse_args()
+  retcode = subprocess.check_call([java_path] + args.rest)
   if retcode != EXIT_SUCCESS:
     return retcode
 
-  with open(outfile, 'wt') as f:
-    prefixlen = len(classdir) + 1
-    for root, dirnames, filenames in os.walk(classdir):
+  with open(args.outfile, 'wt') as f:
+    prefixlen = len(args.classdir) + 1
+    for root, dirnames, filenames in os.walk(args.classdir):
       for filename in filenames:
-          if filename.endswith('.class'):
-              f.write(os.path.join(root[prefixlen:], filename))
-              f.write("\n")
+        if filename.endswith('.class'):
+          f.write(os.path.join(root[prefixlen:], filename))
+          f.write('\n')
 
   return EXIT_SUCCESS
 
