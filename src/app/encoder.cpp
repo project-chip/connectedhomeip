@@ -29,7 +29,7 @@ extern "C" {
 
 static uint16_t doEncodeApsFrame(BufBound & buf, uint16_t profileID, uint16_t clusterId, uint8_t sourceEndpoint,
                                  uint8_t destinationEndpoint, EmberApsOption options, uint16_t groupId, uint8_t sequence,
-                                 uint8_t radius)
+                                 uint8_t radius, bool isMeasuring)
 {
 
     uint8_t control_byte = 0;
@@ -43,27 +43,32 @@ static uint16_t doEncodeApsFrame(BufBound & buf, uint16_t profileID, uint16_t cl
     buf.Put(sequence);
     buf.Put(radius);
 
-    if (!buf.Fit() && buf.Size() > 0)
+    uint16_t result = 0;
+    if (isMeasuring)
     {
-        ChipLogError(Zcl, "Could not encode buffer due to insufficient space");
+        result = buf.Written();
+        ChipLogProgress(Zcl, "Measured buffer size %d", result);
     }
     else
     {
-        ChipLogProgress(Zcl, "Successfully encoded APS frame of size %d bytes", buf.Written());
+        result = buf.Fit() ? buf.Written() : 0;
+        if (result > 0)
+        {
+            ChipLogProgress(Zcl, "Successfully encoded %d bytes", result);
+        }
+        else
+        {
+            ChipLogError(Zcl, "Error encoding APS frame");
+        }
     }
-
-    return (buf.Fit() || buf.Size() == 0) ? buf.Written() : 0; // 0 size buffer implies measure case.
+    return result;
 }
 
 uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame)
 {
-    if (buffer == nullptr)
-    {
-        buf_length = 0; // This is the measuring case.
-    }
     BufBound buf = BufBound(buffer, buf_length);
     return doEncodeApsFrame(buf, apsFrame->profileId, apsFrame->clusterId, apsFrame->sourceEndpoint, apsFrame->destinationEndpoint,
-                            apsFrame->options, apsFrame->groupId, apsFrame->sequence, apsFrame->radius);
+                            apsFrame->options, apsFrame->groupId, apsFrame->sequence, apsFrame->radius, !buffer);
 }
 
 uint32_t _encodeOnOffCommand(uint8_t * buffer, uint32_t buf_length, uint8_t command, uint8_t destination_endpoint)
@@ -73,18 +78,15 @@ uint32_t _encodeOnOffCommand(uint8_t * buffer, uint32_t buf_length, uint8_t comm
     // pick source and destination end points as 1 for now.
     // Profile is 65535 because that matches our simple generated code, but we
     // should sort out the profile situation.
-
-    if (buffer == nullptr)
+    if (!buffer)
     {
-        buf_length = 0; // This is the measuring case.
+        return 0;
     }
-
     BufBound buf = BufBound(buffer, buf_length);
-    result       = doEncodeApsFrame(buf, 65535, 6, 1, destination_endpoint, 0, 0, 0, 0);
+    result       = doEncodeApsFrame(buf, 65535, 6, 1, destination_endpoint, 0, 0, 0, 0, false);
     if (result == 0)
     {
         ChipLogError(Zcl, "Error encoding aps frame result %" PRIu32 "\n", result);
-        result = 0;
         return result;
     }
 
@@ -96,7 +98,7 @@ uint32_t _encodeOnOffCommand(uint8_t * buffer, uint32_t buf_length, uint8_t comm
     // Transaction sequence number.  Just pick something.
     buf.Put(0x1);
 
-    buf.Put(&command, sizeof(uint8_t));
+    buf.Put(command);
 
     result = buf.Fit() ? buf.Written() : 0;
     if (result == 0)
@@ -124,18 +126,22 @@ uint32_t encodeToggleCommand(uint8_t * buffer, uint32_t buf_length, uint8_t dest
 uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t cluster_id,
                                      uint16_t * attr_ids, uint16_t attr_id_count)
 {
-    if (buffer == nullptr)
+    if (!buffer)
     {
-        buf_length = 0; // This is the measuring case.
+        return 0;
     }
+
     BufBound buf    = BufBound(buffer, buf_length);
-    uint16_t result = doEncodeApsFrame(buf, 65535, 6, 1, destination_endpoint, 0, 0, 0, 0);
+    uint16_t result = doEncodeApsFrame(buf, 65535, 6, 1, destination_endpoint, 0, 0, 0, 0, false);
     if (result == 0)
     {
         ChipLogError(Zcl, "Error encoding read attributes aps frame\n");
         return 0;
     }
 
+    // This is a global command, so the low bits are 0b00.  The command is
+    // standard, so does not need a manufacturer code, and we're sending client
+    // to server, so all the remaining bits are 0.
     uint8_t frameControl = 0x00;
     buf.Put(frameControl);
 
