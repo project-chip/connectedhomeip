@@ -25,12 +25,14 @@ shared_library("jni") {
   deps = [
     "//src/lib",
   ]
+
+  output_dir = "${root_out_dir}/lib"
 }
 
 java_library("java") {
   output_name = "CHIPController.jar"
 
-  deps = [
+  data_deps = [
     ":jni",
   ]
 

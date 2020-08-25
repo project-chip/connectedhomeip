@@ -45,6 +45,11 @@ template("java_library") {
     _deps = invoker.deps
   }
 
+  _data_deps = []
+  if (defined(invoker.data_deps)) {
+    _data_deps = invoker.data_deps
+  }
+
   # What files will be compiled
   _java_files = invoker.sources
 
@@ -84,6 +89,8 @@ template("java_library") {
     deps = [
       ":$_javac_target_name",
     ] + _deps
+
+    data_deps = _data_deps
 
     outputs = [
       _jar_output,
