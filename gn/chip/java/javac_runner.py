@@ -19,7 +19,6 @@
 """Wrapper script to run javac command as an action with gn."""
 
 import argparse
-import glob
 import os
 import subprocess
 import sys
