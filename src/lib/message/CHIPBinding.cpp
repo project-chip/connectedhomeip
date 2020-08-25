@@ -838,7 +838,7 @@ void Binding::HandleBindingReady()
 /**
  * Transition the Binding to the Failed state.
  */
-void Binding::HandleBindingFailed(CHIP_ERROR err, Profiles::StatusReporting::StatusReport * statusReport, bool raiseEvents)
+void Binding::HandleBindingFailed(CHIP_ERROR err, Protocols::StatusReporting::StatusReport * statusReport, bool raiseEvents)
 {
     InEventParam inParam;
     OutEventParam outParam;
@@ -864,7 +864,7 @@ void Binding::HandleBindingFailed(CHIP_ERROR err, Profiles::StatusReporting::Sta
                   (eventType == kEvent_BindingFailed) ? "Binding" : "Prepare", mPeerNodeId,
                   (err == CHIP_ERROR_STATUS_REPORT_RECEIVED && statusReport != NULL) ? "Status Report received: " : "",
                   (err == CHIP_ERROR_STATUS_REPORT_RECEIVED && statusReport != NULL)
-                      ? StatusReportStr(statusReport->mProfileId, statusReport->mStatusCode)
+                      ? StatusReportStr(statusReport->mProtocolId, statusReport->mStatusCode)
                       : ErrorStr(err));
 
     // Reset the binding and enter the Failed state.
@@ -1015,7 +1015,7 @@ void Binding::OnSecureSessionReady(ChipSecurityManager * sm, ChipConnection * co
  * Invoked when security session establishment fails.
  */
 void Binding::OnSecureSessionFailed(ChipSecurityManager * sm, ChipConnection * con, void * reqState, CHIP_ERROR localErr,
-                                    uint64_t peerNodeId, Profiles::StatusReporting::StatusReport * statusReport)
+                                    uint64_t peerNodeId, Protocols::StatusReporting::StatusReport * statusReport)
 {
     Binding * _this = (Binding *) reqState;
 
@@ -1672,7 +1672,7 @@ Binding::Configuration & Binding::Configuration::Security_SharedCASESession(void
 Binding::Configuration & Binding::Configuration::Security_SharedCASESession(uint64_t aRouterNodeId)
 {
 #if CHIP_CONFIG_ENABLE_CASE_INITIATOR
-    // This is also defined in CHIP/Profiles/ServiceDirectory.h, but this is in CHIP Core
+    // This is also defined in CHIP/Protocols/ServiceDirectory.h, but this is in CHIP Core
     // TODO: move this elsewhere.
     static const uint64_t kServiceEndpoint_CoreRouter = 0x18B4300200000012ull;
 

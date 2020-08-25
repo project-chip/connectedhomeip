@@ -25,6 +25,10 @@
 #ifndef CHIP_DEVICE_CONFIG_H
 #define CHIP_DEVICE_CONFIG_H
 
+#if CHIP_SEPARATE_CONFIG_H
+#include <platform/CHIPDeviceBuildConfig.h>
+#endif
+
 #include <core/CHIPConfig.h>
 
 /* Include a project-specific configuration file, if defined.

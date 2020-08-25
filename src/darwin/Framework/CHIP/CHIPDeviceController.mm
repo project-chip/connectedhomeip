@@ -229,6 +229,32 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     return YES;
 }
 
+- (BOOL)connectWithoutSecurePairing:(NSString *)ipAddress error:(NSError * __autoreleasing *)error
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    [self.lock lock];
+    chip::Inet::IPAddress addr;
+    chip::Inet::IPAddress::FromString([ipAddress UTF8String], addr);
+    err = self.cppController->ConnectDeviceWithoutSecurePairing(
+        kRemoteDeviceId, addr, (__bridge void *) self, onConnected, onMessageReceived, onInternalError);
+    [self.lock unlock];
+
+    if (err != CHIP_NO_ERROR) {
+        CHIP_LOG_ERROR("Error(%d): %@, connect failed", err, [CHIPError errorForCHIPErrorCode:err]);
+        if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:err];
+        }
+        return NO;
+    }
+
+    // Start the IO pump
+    dispatch_async(_chipSelectQueue, ^() {
+        self.cppController->ServiceEvents();
+    });
+    return YES;
+}
+
 - (AddressInfo *)getAddressInfo
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

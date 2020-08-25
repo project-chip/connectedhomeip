@@ -118,7 +118,7 @@
 
 namespace chip {
 
-namespace Profiles {
+namespace Protocols {
 
 /**
  *  @class RetainedPacketBuffer
@@ -344,7 +344,7 @@ private:
     void * theAppState;
 };
 
-} // namespace Profiles
+} // namespace Protocols
 } // namespace chip
 
 #endif // _CHIP_MESSAGE_H

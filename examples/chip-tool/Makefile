@@ -53,6 +53,11 @@ DEFINES = \
 
 CXXFLAGS += -std=c++11
 
+# Until https://github.com/project-chip/connectedhomeip/issues/2284 is
+# fixed, CHIPDeviceController.h pulls in openssl headers, so we need
+# to make sure our include path contains those.
+CFLAGS += $(shell pkg-config --cflags openssl)
+
 ifdef BUILD_RELEASE
     DEFINES += BUILD_RELEASE=1
 else

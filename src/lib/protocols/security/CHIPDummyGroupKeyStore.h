@@ -30,7 +30,7 @@
 #include "CHIPApplicationKeys.h"
 
 namespace chip {
-namespace Profiles {
+namespace Protocols {
 namespace Security {
 namespace AppKeys {
 
@@ -65,7 +65,7 @@ private:
 
 } // namespace AppKeys
 } // namespace Security
-} // namespace Profiles
+} // namespace Protocols
 } // namespace chip
 
 #endif /* CHIPDUMMYGROUPKEYSTORE_H_ */

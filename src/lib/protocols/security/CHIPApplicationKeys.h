@@ -30,7 +30,7 @@
 #include <core/CHIPCore.h>
 
 /**
- *   @namespace chip::Profiles::Security::AppKeys
+ *   @namespace chip::Protocols::Security::AppKeys
  *
  *   @brief
  *     This namespace includes all interfaces within CHIP for the CHIP
@@ -38,7 +38,7 @@
  */
 
 namespace chip {
-namespace Profiles {
+namespace Protocols {
 namespace Security {
 namespace AppKeys {
 
@@ -170,7 +170,7 @@ extern CHIP_ERROR LogGroupKeys(GroupKeyStoreBase * groupKeyStore);
 
 } // namespace AppKeys
 } // namespace Security
-} // namespace Profiles
+} // namespace Protocols
 } // namespace chip
 
 #endif /* CHIPAPPLICATIONKEYS_H_ */

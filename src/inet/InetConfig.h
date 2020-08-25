@@ -36,6 +36,10 @@
 #ifndef INETCONFIG_H
 #define INETCONFIG_H
 
+#if CHIP_SEPARATE_CONFIG_H
+#include <inet/InetBuildConfig.h>
+#endif
+
 /*--- Include configuration headers ---*/
 #include <system/SystemConfig.h>
 
