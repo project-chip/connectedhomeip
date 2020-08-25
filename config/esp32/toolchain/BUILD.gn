@@ -17,18 +17,18 @@ import("//build_overrides/chip.gni")
 import("//build/toolchain/gcc_toolchain.gni")
 
 declare_args() {
-  ar_ext  = ""
-  cc_ext  = ""
+  ar_ext = ""
+  cc_ext = ""
   cxx_ext = ""
   cpu_ext = ""
 }
 
 gcc_toolchain("esp32") {
-  ar  = ar_ext
-  cc  = cc_ext
+  ar = ar_ext
+  cc = cc_ext
   cxx = cxx_ext
 
-toolchain_args = {
+  toolchain_args = {
     current_os = "freertos"
     current_cpu = cpu_ext
     is_clang = false

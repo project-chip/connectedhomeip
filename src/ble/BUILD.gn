@@ -37,12 +37,12 @@ buildconfig_header("ble_buildconfig") {
         [ "BLE_PROJECT_CONFIG_INCLUDE=${chip_ble_project_config_include}" ]
   }
   if (chip_ble_project_config_include != "") {
-       defines +=
-           [ "BLE_PLATFORM_CONFIG_INCLUDE=${chip_ble_platform_config_include}" ]
+    defines +=
+        [ "BLE_PLATFORM_CONFIG_INCLUDE=${chip_ble_platform_config_include}" ]
   }
   if (chip_device_platform == "esp32") {
-       defines +=
-           [ "BLE_PLATFORM_CONFIG_INCLUDE=${chip_ble_platform_config_include}" ]
+    defines +=
+        [ "BLE_PLATFORM_CONFIG_INCLUDE=${chip_ble_platform_config_include}" ]
   }
 }
 

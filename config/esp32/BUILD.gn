@@ -27,10 +27,6 @@ config("esp32_config") {
 }
 
 group("esp32") {
-  deps = [
-     "${chip_root}/src/lib"
-  ]
-  public_configs = [
-     ":esp32_config"
-  ]
+  deps = [ "${chip_root}/src/lib" ]
+  public_configs = [ ":esp32_config" ]
 }

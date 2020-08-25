@@ -49,18 +49,14 @@ buildconfig_header("lwip_buildconfig") {
   # Automatically enable LWIP_DEBUG for internal is_debug builds.
   defines = []
   if (lwip_platform != "esp32") {
-     if (lwip_debug) {
-        lwip_debug = 1
-     } else {
-        lwip_debug = 0
-     }
-     defines += [
-       "LWIP_DEBUG=${lwip_debug}",
-     ]
+    if (lwip_debug) {
+      lwip_debug = 1
+    } else {
+      lwip_debug = 0
+    }
+    defines += [ "LWIP_DEBUG=${lwip_debug}" ]
   }
-  defines += [
-    "HAVE_LWIP_UDP_BIND_NETIF=1",
-  ]
+  defines += [ "HAVE_LWIP_UDP_BIND_NETIF=1" ]
 
   if (current_os == "android") {
     defines += [ "LWIP_NO_STDINT_H=1" ]
