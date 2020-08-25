@@ -60,8 +60,8 @@ public:
     uint16_t ExchangeId; /**< The Exchange identifier for the ExchangeContext */
     uint32_t ProfileId;  /**< The Profile identifier of the CHIP message */
     uint8_t MessageType; /**< The Message type for the specified CHIP profile */
-    uint32_t AckMsgId; /**< Optional; Message identifier being acknowledged.
-                            Specified when requiring acknowledgments. */
+    uint32_t AckMsgId;   /**< Optional; Message identifier being acknowledged.
+                              Specified when requiring acknowledgments. */
 };
 
 /**
@@ -116,7 +116,7 @@ public:
     uint16_t KeyId;           /**< Encryption key to use when sending a message. */
     uint32_t RetransInterval; /**< Time between retransmissions (in milliseconds); 0 disables retransmissions. */
     Timeout ResponseTimeout;  /**< Maximum time to wait for response (in milliseconds); 0 disables response timeout. */
-    RMPConfig mRMPConfig; /**< RMP configuration. */
+    RMPConfig mRMPConfig;     /**< RMP configuration. */
     enum
     {
         kSendFlag_AutoRetrans    = 0x0001, /**< Used to indicate that automatic retransmission is enabled. */

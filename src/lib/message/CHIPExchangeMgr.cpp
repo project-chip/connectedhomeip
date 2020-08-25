@@ -102,7 +102,7 @@ CHIP_ERROR ChipExchangeManager::Init(ChipMessageLayer * msgLayer)
     msgLayer->ExchangeMgr       = this;
     msgLayer->OnMessageReceived = HandleMessageReceived;
     msgLayer->OnAcceptError     = HandleAcceptError;
-    mRMPTimerInterval = CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD; // CRMP Timer tick period
+    mRMPTimerInterval           = CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD; // CRMP Timer tick period
 
     memset(RetransTable, 0, sizeof(RetransTable));
 
@@ -628,9 +628,9 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
     UnsolicitedMessageHandler * matchingUMH = NULL;
     ExchangeContext * ec                    = NULL;
     ChipConnection * msgCon                 = NULL;
-    const uint8_t * p        = NULL;
-    uint32_t PauseTimeMillis = 0;
-    uint64_t DelayedNodeId   = 0;
+    const uint8_t * p                       = NULL;
+    uint32_t PauseTimeMillis                = 0;
+    uint64_t DelayedNodeId                  = 0;
     bool dupMsg;
     bool msgNeedsAck;
     bool sendAckAndCloseExchange;
