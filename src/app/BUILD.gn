@@ -27,8 +27,8 @@ static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
-    "decoder.c",
-    "encoder.c",
+    "decoder.cpp",
+    "encoder.cpp",
   ]
 
   public_deps = [
