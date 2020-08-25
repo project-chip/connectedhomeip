@@ -12,15 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
 import("//${chip_root}/gn/chip/tests.gni")
+import("//build_overrides/chip.gni")
 
 assert(current_os == "zephyr")
 
 group("nrfconnect") {
-  deps = [
-    "${chip_root}/src/lib",
-  ]
+  deps = [ "${chip_root}/src/lib" ]
 }
 
 if (chip_build_tests) {
