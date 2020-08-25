@@ -444,8 +444,8 @@ void Binding::ResetConfig()
 
     mTransportOption            = kTransport_NotSpecified;
     mDefaultResponseTimeoutMsec = 0;
-    mDefaultRMPConfig = gDefaultRMPConfig;
-    mUDPPathMTU = CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE;
+    mDefaultRMPConfig           = gDefaultRMPConfig;
+    mUDPPathMTU                 = CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE;
 
     mSecurityOption = kSecurityOption_NotSpecified;
     mKeyId          = ChipKeyId::kNone;

@@ -421,8 +421,8 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
 CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf, uint16_t sendFlags,
                                         ChipMessageInfo * msgInfo, void * msgCtxt)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    bool sendCalled = false;
+    CHIP_ERROR err                                 = CHIP_NO_ERROR;
+    bool sendCalled                                = false;
     ChipExchangeManager::RetransTableEntry * entry = NULL;
 
 #if CHIP_RETAIN_LOGGING
@@ -1284,7 +1284,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo * msgInfo, const ChipE
 CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo * msgInfo, const ChipExchangeHeader * exchHeader, PacketBuffer * msgBuf,
                                           ExchangeContext::MessageReceiveFunct umhandler)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
     const uint8_t * p        = NULL;
     uint32_t PauseTimeMillis = 0;
 
