@@ -53,14 +53,14 @@ RUN set -x \
 
 # Python 2 and PIP
 RUN set -x \
-   && apt-get update \
-   && DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common \
-   && add-apt-repository universe \
-   && DEBIAN_FRONTEND=noninteractive apt-get install -y python python2 \
-   && curl https://bootstrap.pypa.io/get-pip.py --output get-pip.py \
-   && python2 get-pip.py \
-   && rm -rf /var/lib/apt/lists/ \
-   && : # last line
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common \
+    && add-apt-repository universe \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y python python2 \
+    && curl https://bootstrap.pypa.io/get-pip.py --output get-pip.py \
+    && python2 get-pip.py \
+    && rm -rf /var/lib/apt/lists/ \
+    && : # last line
 
 RUN set -x \
     && pip3 install circleci attrs coloredlogs PyGithub pygit \
@@ -83,7 +83,7 @@ RUN set -x \
     && mkdir -p bloaty/build \
     && cd bloaty/build \
     && cmake ../ \
-    && make -j \
+    && make \
     && make install \
     && cd ../.. \
     && rm -rf bloaty \
