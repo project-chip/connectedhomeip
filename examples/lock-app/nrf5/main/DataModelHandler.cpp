@@ -26,26 +26,23 @@
 #include "DataModelHandler.h"
 #include "nrf_log.h"
 
-#include "chip-zcl/chip-zcl.h"
-
-extern "C" {
-#include "gen/gen-cluster-id.h"
-#include "gen/gen-types.h"
-}
+#include "af-types.h"
+#include "gen/attribute-id.h"
+#include "gen/cluster-id.h"
 
 using namespace ::chip;
 
-extern "C" void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId,
+extern "C" void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
                                                    uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
                                                    uint8_t * value)
 {
-    if (clusterId != CHIP_ZCL_CLUSTER_ON_OFF)
+    if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
     {
         NRF_LOG_INFO("Unknown cluster ID: %d", clusterId);
         return;
     }
 
-    if (attributeId != CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF)
+    if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
     {
         NRF_LOG_INFO("Unknown attribute ID: %d", attributeId);
         return;

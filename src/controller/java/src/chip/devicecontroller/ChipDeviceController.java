@@ -43,12 +43,24 @@ public class ChipDeviceController {
     beginSendMessage(deviceControllerPtr, message);
   }
 
+  public void beginSendCommand(ChipCommandType command) {
+    beginSendCommand(deviceControllerPtr, command);
+  }
+
+  public boolean disconnectDevice() {
+    return disconnectDevice(deviceControllerPtr);
+  }
+
   public void onConnectDeviceComplete() {
     completionListener.onConnectDeviceComplete();
   }
 
   public void onSendMessageComplete(String message) {
     completionListener.onSendMessageComplete(message);
+  }
+
+  public void onError(Throwable error) {
+    completionListener.onError(error);
   }
 
   private native long newDeviceController();
@@ -58,6 +70,10 @@ public class ChipDeviceController {
   private native boolean isConnected(long deviceControllerPtr);
 
   private native void beginSendMessage(long deviceControllerPtr, String message);
+
+  private native void beginSendCommand(long deviceControllerPtr, ChipCommandType command);
+
+  private native boolean disconnectDevice(long deviceControllerPtr);
 
   private native void deleteDeviceController(long deviceControllerPtr);
 
@@ -82,5 +98,8 @@ public class ChipDeviceController {
 
     /** Notifies the completion of "SendMessage" echo command. */
     void onSendMessageComplete(String message);
+
+    /** Notifies the listener of the error. */
+    void onError(Throwable error);
   }
 }

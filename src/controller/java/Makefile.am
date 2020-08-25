@@ -32,17 +32,17 @@ EXTRA_DIST                                   = \
 
 lib_LTLIBRARIES                              = libCHIPController.la
 
-libCHIPController_la_CPPFLAGS                = \
-    -I$(top_srcdir)/src                        \
-    -I$(top_srcdir)/src/lib                    \
-    -I$(top_srcdir)/src/lib/core               \
-    -I$(top_srcdir)/src/controller             \
-    -I$(top_srcdir)/src/system                 \
-    -I$(top_srcdir)/src/include                \
-    $(NLASSERT_CPPFLAGS)                       \
-    $(JNI_CPPFLAGS)                            \
-    $(LWIP_CPPFLAGS)                           \
-    $(SOCKETS_CPPFLAGS)                        \
+libCHIPController_la_CPPFLAGS                              = \
+    -I$(top_srcdir)/src                                      \
+    -I$(top_srcdir)/src/lib                                  \
+    -I$(top_srcdir)/src/lib/core                             \
+    -I$(top_srcdir)/src/controller                           \
+    -I$(top_srcdir)/src/system                               \
+    -I$(top_srcdir)/src/include                              \
+    $(NLASSERT_CPPFLAGS)                                     \
+    $(JNI_CPPFLAGS)                                          \
+    $(LWIP_CPPFLAGS)                                         \
+    $(SOCKETS_CPPFLAGS)                                      \
     $(NULL)
 
 libCHIPController_la_CXXFLAGS                = \
@@ -83,7 +83,8 @@ JARS                                         = \
 
 CHIPController_jar_JAVA_SRCS                                 = \
     chip/devicecontroller/ChipDeviceController.java            \
-		chip/devicecontroller/ChipDeviceControllerException.java   \
+    chip/devicecontroller/ChipDeviceControllerException.java   \
+    chip/devicecontroller/ChipCommandType.java                 \
     $(NULL)
 
 CHIPController_jar_JFLAGS                    = -source 8 -target 8

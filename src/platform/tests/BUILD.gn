@@ -17,7 +17,7 @@ import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
-if (device_platform != "none") {
+if (chip_device_platform != "none") {
   import("${chip_root}/gn/chip/chip_test_suite.gni")
 
   chip_test_suite("tests") {

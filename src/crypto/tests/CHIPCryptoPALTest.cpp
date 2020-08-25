@@ -24,7 +24,6 @@
 #include "Hash_SHA256_test_vectors.h"
 #include "PBKDF2_SHA256_test_vectors.h"
 
-#if CHIP_CRYPTO_OPENSSL
 #include "SPAKE2P_FE_MUL_test_vectors.h"
 #include "SPAKE2P_FE_RW_test_vectors.h"
 #include "SPAKE2P_HMAC_test_vectors.h"
@@ -33,7 +32,6 @@
 #include "SPAKE2P_POINT_RW_test_vectors.h"
 #include "SPAKE2P_POINT_VALID_test_vectors.h"
 #include "SPAKE2P_RFC_test_vectors.h"
-#endif
 
 #include <crypto/CHIPCryptoPAL.h>
 
@@ -913,7 +911,6 @@ static void TestPBKDF2_SHA256_TestVectors(nlTestSuite * inSuite, void * inContex
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
-#if CHIP_CRYPTO_OPENSSL
 static void TestSPAKE2P_spake2p_FEMul(nlTestSuite * inSuite, void * inContext)
 {
     unsigned char fe_out[kMAX_FE_Length];
@@ -1286,10 +1283,10 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
     NL_TEST_ASSERT(inSuite, numOfTestsRan == numOfTestVectors);
 }
-#endif
+
 namespace chip {
 namespace Logging {
-void LogV(uint8_t module, uint8_t category, const char * format, va_list argptr)
+void __attribute__((weak)) LogV(uint8_t module, uint8_t category, const char * format, va_list argptr)
 {
     (void) module, (void) category;
     vfprintf(stderr, format, argptr);
@@ -1337,7 +1334,6 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ECDH sample vectors", TestECDH_SampleInputVectors),
     NL_TEST_DEF("Test adding entropy sources", TestAddEntropySources),
     NL_TEST_DEF("Test PBKDF2 SHA256", TestPBKDF2_SHA256_TestVectors),
-#if CHIP_CRYPTO_OPENSSL
     NL_TEST_DEF("Test Spake2p_spake2p FEMul", TestSPAKE2P_spake2p_FEMul),
     NL_TEST_DEF("Test Spake2p_spake2p FELoad/FEWrite", TestSPAKE2P_spake2p_FELoadWrite),
     NL_TEST_DEF("Test Spake2p_spake2p Mac", TestSPAKE2P_spake2p_Mac),
@@ -1346,7 +1342,6 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Spake2p_spake2p PointLoad/PointWrite", TestSPAKE2P_spake2p_PointLoadWrite),
     NL_TEST_DEF("Test Spake2p_spake2p PointIsValid", TestSPAKE2P_spake2p_PointIsValid),
     NL_TEST_DEF("Test Spake2+ against RFC test vectors", TestSPAKE2P_RFC),
-#endif
     NL_TEST_SENTINEL()
 };
 

@@ -124,6 +124,12 @@ restylers:
           - "**/*.m"
           - "**/*.mm"
       interpreters: []
+    - name: gn
+      image: restyled/restyler-gn:v1
+      enabled: true
+      include:
+          - "**/*.gn"
+          - "**/*.gni"
     - name: prettier-json
       image: restyled/restyler-prettier:v1.19.1-2
       enabled: true

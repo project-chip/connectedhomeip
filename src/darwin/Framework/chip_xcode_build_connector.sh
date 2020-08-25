@@ -25,97 +25,94 @@ die() {
     exit 1
 }
 
+set -e
+
+mkdir -p "$TEMP_DIR"
 export >"$TEMP_DIR/env.sh"
 
-export PKG_CONFIG_PATH="/usr/local/opt/openssl@1.1/lib/pkgconfig"
-
-set -ex
-
-if [ "$ARCHS" = arm64 ]; then
-    target=aarch64-apple-darwin
-else
-    target=$ARCHS-apple-darwin
-fi
+set -x
 
 # these should be set by the Xcode project
 CHIP_ROOT=${CHIP_ROOT:-"$SRCROOT/../../.."}
 CHIP_ROOT=$(cd "$CHIP_ROOT" && pwd)
-CHIP_PREFIX=${CHIP_PREFIX:-"$BUILT_PRODUCTS_DIR"}
 
 [[ -d ${CHIP_ROOT} ]] || die Please set CHIP_ROOT to the location of the CHIP directory
 
-DEFINES=()
-# lots of environment variables passed by xcode to this script
-if [[ ${CONFIGURATION} == Debug* ]]; then
-    configure_OPTIONS+=(--enable-debug)
-    DEFINES+=(-UNDEBUG)
-else
-    DEFINES+=(-UDEBUG)
-fi
+declare -a DEFINES=()
+# lots of environment variables passed by Xcode to this script
+read -r -a DEFINES <<<"$GCC_PREPROCESSOR_DEFINITIONS"
 
-read -r -a GCC_PREPROCESSOR_DEFINITIONS <<<"$GCC_PREPROCESSOR_DEFINITIONS"
+declare target_defines=
+for define in "${DEFINES[@]}"; do
 
-DEFINES+=("${GCC_PREPROCESSOR_DEFINITIONS[@]/#/-D}")
+    # skip over those that GN does for us
+    case "$define" in
+        CHIP_LOGGING_STYLE*)
+            continue
+            ;;
+        CHIP_DEVICE_LAYER*)
+            continue
+            ;;
+        CHIP_*_CONFIG_INCLUDE)
+            continue
+            ;;
+        CHIP_SYSTEM_CONFIG_*)
+            continue
+            ;;
+        CONFIG_NETWORK_LAYER*)
+            continue
+            ;;
+        CHIP_CRYPTO_*)
+            continue
+            ;;
+    esac
+    target_defines+=,\"${define//\"/\\\"}\"
+done
+target_defines=[${target_defines:1}]
 
-ARCH_FLAGS="-arch $ARCHS"
-SYSROOT_FLAGS="-isysroot $SDK_DIR"
-COMPILER_FLAGS="$ARCH_FLAGS $SYSROOT_FLAGS ${DEFINES[*]}"
-
-configure_OPTIONS+=(
-    CPP="cc -E"
-    CPPFLAGS="$COMPILER_FLAGS"
-    CFLAGS="$COMPILER_FLAGS"
-    CXXFLAGS="$COMPILER_FLAGS"
-    OBJCFLAGS="$COMPILER_FLAGS"
-    OBJCXXFLAGS="$COMPILER_FLAGS"
-    LDFLAGS="$ARCH_FLAGS"
+declare -a args=(
+    'chip_crypto="mbedtls"'
+    'chip_build_tools=false'
+    'chip_build_tests=false'
+    'chip_logging_style="external"'
+    'chip_ble_project_config_include=""'
+    'chip_device_project_config_include=""'
+    'chip_inet_project_config_include=""'
+    'chip_system_project_config_include=""'
+    'target_cpu="'"$ARCHS"'"'
+    'target_defines='"$target_defines"
+    'default_configs_cosmetic=[]'
+    'target_cflags=["-target","'"$ARCHS"'-'"$LLVM_TARGET_TRIPLE_VENDOR"'-'"$LLVM_TARGET_TRIPLE_OS_VERSION"'", "-DNDEBUG"]'
 )
 
+if [[ ${CONFIGURATION} != Debug* ]]; then
+    args+='is_debug=true'
+fi
+
 [[ ${PLATFORM_FAMILY_NAME} == iOS ]] && {
-    configure_OPTIONS+=(--with-chip-project-includes="$CHIP_ROOT"/config/ios)
+    args+=(
+        'target_os="ios"'
+        'import("//config/ios/args.gni")'
+    )
 }
 
 [[ ${PLATFORM_FAMILY_NAME} == macOS ]] && {
-    configure_OPTIONS+=(--with-chip-project-includes="$CHIP_ROOT"/config/standalone)
+    args+=(
+        'target_os="mac"'
+        'chip_project_config_include_dirs=["'"$CHIP_ROOT"'/config/standalone"]'
+        'import("'"$CHIP_ROOT"'/config/standalone/args.gni")'
+    )
 }
 
-configure_OPTIONS+=(
-    --prefix="$CHIP_PREFIX"
-    --target="$target"
-    --host="$target"
-    --disable-docs
-    --disable-java
-    --disable-python
-    --disable-shared
-    --disable-tests
-    --disable-tools
-    --with-device-layer=darwin
-    --with-logging-style=external
-    --with-chip-system-project-includes=no
-    --with-chip-inet-project-includes=no
-    --with-chip-ble-project-includes=no
-    --with-chip-warm-project-includes=no
-    --with-chip-device-project-includes=no
-    --with-crypto=mbedtls
-)
-
 (
+    # activate.sh isn't 'set -e' safe
+    cd "$CHIP_ROOT" # pushd and popd because we need the env vars from activate
+    set +ex
+    PW_ENVSETUP_QUIET=1 . scripts/activate.sh
+    set -ex
+
     cd "$TEMP_DIR"
-
-    if [[ ! -x config.status || ${here}/${me} -nt config.status ]]; then
-        "$CHIP_ROOT"/bootstrap-configure -C "${configure_OPTIONS[@]}"
-    else
-        while IFS= read -r -d '' makefile_am; do
-            [[ ${makefile_am} -ot ${makefile_am/.am/.in} ]] || {
-                "$CHIP_ROOT"/bootstrap -w make
-                break
-            }
-        done < <(find "$CHIP_ROOT" -name Makefile.am)
-    fi
-
-    make V=1 install-data                   # all the headers
-    make V=1 -C src/lib install             # libCHIP.a
-    make V=1 -C src/platform install        # libDeviceLayer.a
-    make V=1 -C src/setup_payload install   # libSetupPayload.a
-    make V=1 -C third_party/mbedtls install # libmbedtls.a
+    # [[ -f out/build.ninja ]] ?
+    gn --root="$CHIP_ROOT" gen --check out --args="${args[*]}"
+    ninja -v -C out
 )

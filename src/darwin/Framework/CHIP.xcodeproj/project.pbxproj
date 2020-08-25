@@ -7,8 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1E3DE6E124AF86F50028DC40 /* libDeviceLayer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E3DE6E024AF86F50028DC40 /* libDeviceLayer.a */; };
-		2C4DF09E248B2C60009307CB /* libmbedtls.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C4DF09D248B2C60009307CB /* libmbedtls.a */; };
+		2C4DF09E248B2C60009307CB /* libmbedtls.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C4DF09D248B2C60009307CB /* libmbedtls.a */; settings = {ATTRIBUTES = (Required, ); }; };
 		515C401C2486BF43004C4DB3 /* CHIPOnOff.mm in Sources */ = {isa = PBXBuildFile; fileRef = 515C401A2486BF43004C4DB3 /* CHIPOnOff.mm */; };
 		515C401D2486BF43004C4DB3 /* CHIPOnOff.h in Headers */ = {isa = PBXBuildFile; fileRef = 515C401B2486BF43004C4DB3 /* CHIPOnOff.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		991DC0842475F45400C13860 /* CHIPDeviceController.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC0822475F45400C13860 /* CHIPDeviceController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -26,7 +25,6 @@
 		B2E0D7B9245B0B5C003C5B48 /* CHIPSetupPayload.mm in Sources */ = {isa = PBXBuildFile; fileRef = B2E0D7B0245B0B5C003C5B48 /* CHIPSetupPayload.mm */; };
 		B2F53AF2245B0DCF0010745E /* CHIPSetupPayloadParserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B2F53AF1245B0DCF0010745E /* CHIPSetupPayloadParserTests.m */; };
 		BA09EB43247477BA00605257 /* libCHIP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BA09EB3F2474762900605257 /* libCHIP.a */; };
-		BA09EB44247477BC00605257 /* libSetupPayload.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BA09EB402474762900605257 /* libSetupPayload.a */; };
 		BA107AEF2470CFBB004287EB /* chip_xcode_build_connector.sh in Resources */ = {isa = PBXBuildFile; fileRef = BA107AEE2470CFBB004287EB /* chip_xcode_build_connector.sh */; };
 		C4C222C02475A38700984173 /* CHIPLogging.mm in Sources */ = {isa = PBXBuildFile; fileRef = C4C222BF2475A38700984173 /* CHIPLogging.mm */; };
 /* End PBXBuildFile section */
@@ -42,7 +40,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		1E3DE6E024AF86F50028DC40 /* libDeviceLayer.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libDeviceLayer.a; path = lib/libDeviceLayer.a; sourceTree = BUILD_PRODUCT_DIR; };
 		2C4DF09D248B2C60009307CB /* libmbedtls.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedtls.a; path = lib/libmbedtls.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		515C401A2486BF43004C4DB3 /* CHIPOnOff.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPOnOff.mm; sourceTree = "<group>"; };
 		515C401B2486BF43004C4DB3 /* CHIPOnOff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPOnOff.h; sourceTree = "<group>"; };
@@ -64,7 +61,6 @@
 		B2E0D7B0245B0B5C003C5B48 /* CHIPSetupPayload.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPSetupPayload.mm; sourceTree = "<group>"; };
 		B2F53AF1245B0DCF0010745E /* CHIPSetupPayloadParserTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHIPSetupPayloadParserTests.m; sourceTree = "<group>"; };
 		BA09EB3F2474762900605257 /* libCHIP.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCHIP.a; path = lib/libCHIP.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		BA09EB402474762900605257 /* libSetupPayload.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSetupPayload.a; path = lib/libSetupPayload.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA107AEE2470CFBB004287EB /* chip_xcode_build_connector.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = chip_xcode_build_connector.sh; sourceTree = "<group>"; };
 		C4C222BF2475A38700984173 /* CHIPLogging.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPLogging.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -74,10 +70,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1E3DE6E124AF86F50028DC40 /* libDeviceLayer.a in Frameworks */,
 				BA09EB43247477BA00605257 /* libCHIP.a in Frameworks */,
 				2C4DF09E248B2C60009307CB /* libmbedtls.a in Frameworks */,
-				BA09EB44247477BC00605257 /* libSetupPayload.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -149,8 +143,6 @@
 			children = (
 				2C4DF09D248B2C60009307CB /* libmbedtls.a */,
 				BA09EB3F2474762900605257 /* libCHIP.a */,
-				BA09EB402474762900605257 /* libSetupPayload.a */,
-				1E3DE6E024AF86F50028DC40 /* libDeviceLayer.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -365,7 +357,6 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					HAVE_CONFIG_H,
 					"DEBUG=1",
 					"$(inherited)",
 				);
@@ -423,7 +414,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = HAVE_CONFIG_H;
+				GCC_PREPROCESSOR_DEFINITIONS = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -443,7 +434,6 @@
 		B20252A22459E34F00F97062 /* Debug macOS */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CHIP_PREFIX = "$(BUILT_PRODUCTS_DIR)";
 				CHIP_ROOT = "$(SRCROOT)/../../..";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
@@ -452,7 +442,30 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				HEADER_SEARCH_PATHS = "$(CHIP_PREFIX)/include";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"CHIP_PROJECT_CONFIG_INCLUDE=<CHIPProjectConfig.h>",
+					"CHIP_PLATFORM_CONFIG_INCLUDE=<platform/Darwin/CHIPPlatformConfig.h>",
+					"CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE=<platform/Darwin/CHIPDevicePlatformConfig.h>",
+					CONFIG_NETWORK_LAYER_INET,
+					CONFIG_NETWORK_LAYER_BLE,
+					"CHIP_LOGGING_STYLE_EXTERNAL=1",
+					"CHIP_DEVICE_LAYER_TARGET=Darwin",
+					"CHIP_DEVICE_LAYER_TARGET_DARWIN=1",
+					"CHIP_DEVICE_LAYER_TARGET_LINUX=0",
+					"CHIP_DEVICE_LAYER_TARGET_NRF5=0",
+					"CHIP_DEVICE_LAYER_TARGET_EFR32=0",
+					CHIP_CRYPTO_MBEDTLS,
+					"CHIP_SYSTEM_CONFIG_USE_SOCKETS=1",
+					"$(inherited)",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(CHIP_ROOT)/src",
+					"$(CHIP_ROOT)/src/include",
+					"$(CHIP_ROOT)/src/lib",
+					"$(CHIP_ROOT)/config/standalone",
+					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
+					"$(CHIP_ROOT)/third_party/mbedtls/repo/include",
+				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -460,7 +473,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "$(CHIP_PREFIX)/lib";
+				LIBRARY_SEARCH_PATHS = "$(TEMP_DIR)/out/lib";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
 				"OTHER_LDFLAGS[arch=*]" = (
@@ -480,7 +493,6 @@
 		B20252A32459E34F00F97062 /* Release macOS */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CHIP_PREFIX = "$(BUILT_PRODUCTS_DIR)";
 				CHIP_ROOT = "$(SRCROOT)/../../..";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
@@ -489,7 +501,31 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				HEADER_SEARCH_PATHS = "$(CHIP_PREFIX)/include";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"CHIP_PROJECT_CONFIG_INCLUDE=<CHIPProjectConfig.h>",
+					"CHIP_PLATFORM_CONFIG_INCLUDE=<platform/Darwin/CHIPPlatformConfig.h>",
+					"CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE=<platform/Darwin/CHIPDevicePlatformConfig.h>",
+					CONFIG_NETWORK_LAYER_INET,
+					CONFIG_NETWORK_LAYER_BLE,
+					"CHIP_LOGGING_STYLE_EXTERNAL=1",
+					"CHIP_DEVICE_LAYER_TARGET=Darwin",
+					"CHIP_DEVICE_LAYER_TARGET_DARWIN=1",
+					"CHIP_DEVICE_LAYER_TARGET_LINUX=0",
+					"CHIP_DEVICE_LAYER_TARGET_NRF5=0",
+					"CHIP_DEVICE_LAYER_TARGET_EFR32=0",
+					CHIP_CRYPTO_MBEDTLS,
+					"CHIP_SYSTEM_CONFIG_USE_SOCKETS=1",
+					"$(inherited)",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(CHIP_ROOT)/src",
+					"$(CHIP_ROOT)/src/include",
+					"$(CHIP_ROOT)/src/lib",
+					"$(CHIP_ROOT)/src/app",
+					"$(CHIP_ROOT)/config/standalone",
+					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
+					"$(CHIP_ROOT)/third_party/mbedtls/repo/include",
+				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -497,7 +533,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "$(CHIP_PREFIX)/lib";
+				LIBRARY_SEARCH_PATHS = "$(TEMP_DIR)/out/lib";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
 				"OTHER_LDFLAGS[arch=*]" = (
@@ -590,7 +626,6 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					HAVE_CONFIG_H,
 					"DEBUG=1",
 					"$(inherited)",
 				);
@@ -614,7 +649,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = arm64;
-				CHIP_PREFIX = "$(BUILT_PRODUCTS_DIR)";
 				CHIP_ROOT = "$(SRCROOT)/../../..";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
@@ -623,7 +657,31 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				HEADER_SEARCH_PATHS = "$(CHIP_PREFIX)/include";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"CHIP_PROJECT_CONFIG_INCLUDE=<CHIPProjectConfig.h>",
+					"CHIP_PLATFORM_CONFIG_INCLUDE=<platform/Darwin/CHIPPlatformConfig.h>",
+					"CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE=<platform/Darwin/CHIPDevicePlatformConfig.h>",
+					CONFIG_NETWORK_LAYER_INET,
+					CONFIG_NETWORK_LAYER_BLE,
+					"CHIP_LOGGING_STYLE_EXTERNAL=1",
+					"CHIP_DEVICE_LAYER_TARGET=Darwin",
+					"CHIP_DEVICE_LAYER_TARGET_DARWIN=1",
+					"CHIP_DEVICE_LAYER_TARGET_LINUX=0",
+					"CHIP_DEVICE_LAYER_TARGET_NRF5=0",
+					"CHIP_DEVICE_LAYER_TARGET_EFR32=0",
+					CHIP_CRYPTO_MBEDTLS,
+					"CHIP_SYSTEM_CONFIG_USE_SOCKETS=1",
+					"$(inherited)",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(CHIP_ROOT)/src",
+					"$(CHIP_ROOT)/src/include",
+					"$(CHIP_ROOT)/src/lib",
+					"$(CHIP_ROOT)/src/app",
+					"$(CHIP_ROOT)/config/ios",
+					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
+					"$(CHIP_ROOT)/third_party/mbedtls/repo/include",
+				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
@@ -632,7 +690,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "$(CHIP_PREFIX)/lib";
+				LIBRARY_SEARCH_PATHS = "$(TEMP_DIR)/out/lib";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
 				"OTHER_LDFLAGS[sdk=*]" = (
@@ -706,7 +764,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = HAVE_CONFIG_H;
+				GCC_PREPROCESSOR_DEFINITIONS = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -728,7 +786,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = arm64;
-				CHIP_PREFIX = "$(BUILT_PRODUCTS_DIR)";
 				CHIP_ROOT = "$(SRCROOT)/../../..";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
@@ -737,7 +794,31 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				HEADER_SEARCH_PATHS = "$(CHIP_PREFIX)/include";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"CHIP_PROJECT_CONFIG_INCLUDE=<CHIPProjectConfig.h>",
+					"CHIP_PLATFORM_CONFIG_INCLUDE=<platform/Darwin/CHIPPlatformConfig.h>",
+					"CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE=<platform/Darwin/CHIPDevicePlatformConfig.h>",
+					CONFIG_NETWORK_LAYER_INET,
+					CONFIG_NETWORK_LAYER_BLE,
+					"CHIP_LOGGING_STYLE_EXTERNAL=1",
+					"CHIP_DEVICE_LAYER_TARGET=Darwin",
+					"CHIP_DEVICE_LAYER_TARGET_DARWIN=1",
+					"CHIP_DEVICE_LAYER_TARGET_LINUX=0",
+					"CHIP_DEVICE_LAYER_TARGET_NRF5=0",
+					"CHIP_DEVICE_LAYER_TARGET_EFR32=0",
+					CHIP_CRYPTO_MBEDTLS,
+					"CHIP_SYSTEM_CONFIG_USE_SOCKETS=1",
+					"$(inherited)",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(CHIP_ROOT)/src",
+					"$(CHIP_ROOT)/src/include",
+					"$(CHIP_ROOT)/src/lib",
+					"$(CHIP_ROOT)/src/app",
+					"$(CHIP_ROOT)/config/ios",
+					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
+					"$(CHIP_ROOT)/third_party/mbedtls/repo/include",
+				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
@@ -746,7 +827,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "$(CHIP_PREFIX)/lib";
+				LIBRARY_SEARCH_PATHS = "$(TEMP_DIR)/out/lib";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
 				"OTHER_LDFLAGS[arch=*]" = (

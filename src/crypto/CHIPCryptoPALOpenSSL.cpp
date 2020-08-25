@@ -785,28 +785,41 @@ void ClearSecretData(uint8_t * buf, uint32_t len)
     {                                                                                                                              \
         _point_ = EC_POINT_new(context.curve);                                                                                     \
         VerifyOrExit(_point_ != NULL, error = CHIP_ERROR_INTERNAL);                                                                \
-    } while (0);
+    } while (0)
 
 #define init_bn(_bn_)                                                                                                              \
     do                                                                                                                             \
     {                                                                                                                              \
         _bn_ = BN_new();                                                                                                           \
         VerifyOrExit(_bn_ != NULL, error = CHIP_ERROR_INTERNAL);                                                                   \
-    } while (0);
+    } while (0)
 
-#define free_point(_point_) EC_POINT_clear_free((EC_POINT *) _point_);
+#define free_point(_point_)                                                                                                        \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (_point_ != nullptr)                                                                                                    \
+        {                                                                                                                          \
+            EC_POINT_clear_free((EC_POINT *) _point_);                                                                             \
+        }                                                                                                                          \
+    } while (0)
 
-#define free_bn(_bn_) BN_clear_free((BIGNUM *) _bn_);
+#define free_bn(_bn_)                                                                                                              \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (_bn_ != nullptr)                                                                                                       \
+        {                                                                                                                          \
+            BN_clear_free((BIGNUM *) _bn_);                                                                                        \
+        }                                                                                                                          \
+    } while (0)
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
 {
     CHIP_ERROR error  = CHIP_ERROR_INTERNAL;
     int error_openssl = 0;
 
-    context.curve    = NULL;
-    context.bn_ctx   = NULL;
-    context.hash_ctx = NULL;
-    context.hash     = NULL;
+    context.curve   = NULL;
+    context.bn_ctx  = NULL;
+    context.md_info = NULL;
 
     context.curve = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
     VerifyOrExit(context.curve != NULL, error = CHIP_ERROR_INTERNAL);
@@ -817,17 +830,23 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
     context.bn_ctx = BN_CTX_secure_new();
     VerifyOrExit(context.bn_ctx != NULL, error = CHIP_ERROR_INTERNAL);
 
-    context.hash = EVP_sha256();
-    VerifyOrExit(context.hash != NULL, error = CHIP_ERROR_INTERNAL);
+    context.md_info = EVP_sha256();
+    VerifyOrExit(context.md_info != NULL, error = CHIP_ERROR_INTERNAL);
 
-    context.hash_ctx = EVP_MD_CTX_new();
-    VerifyOrExit(context.hash_ctx != NULL, error = CHIP_ERROR_INTERNAL);
-    error_openssl = EVP_DigestInit(context.hash_ctx, context.hash);
-    VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
+    init_point(M);
+    init_point(N);
+    init_point(X);
+    init_point(Y);
+    init_point(L);
+    init_point(V);
+    init_point(Z);
+    init_bn(w0);
+    init_bn(w1);
+    init_bn(xy);
+    init_bn(tempbn);
+    init_bn(order);
 
-    init_point(M) init_point(N) init_point(X) init_point(Y) init_point(L) init_point(V) init_point(Z) init_bn(w0) init_bn(w1)
-        init_bn(xy) init_bn(tempbn) init_bn(order) error_openssl =
-            EC_GROUP_get_order(context.curve, (BIGNUM *) order, context.bn_ctx);
+    error_openssl = EC_GROUP_get_order(context.curve, (BIGNUM *) order, context.bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -837,12 +856,28 @@ exit:
 
 void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl(void)
 {
-    EC_GROUP_clear_free(context.curve);
-    BN_CTX_free(context.bn_ctx);
-    EVP_MD_CTX_free(context.hash_ctx);
+    if (context.curve != nullptr)
+    {
+        EC_GROUP_clear_free(context.curve);
+    }
 
-    free_point(M) free_point(N) free_point(X) free_point(Y) free_point(L) free_point(V) free_point(Z) free_bn(w0) free_bn(w1)
-        free_bn(xy) free_bn(tempbn) free_bn(order)
+    if (context.bn_ctx != nullptr)
+    {
+        BN_CTX_free(context.bn_ctx);
+    }
+
+    free_point(M);
+    free_point(N);
+    free_point(X);
+    free_point(Y);
+    free_point(L);
+    free_point(V);
+    free_point(Z);
+    free_bn(w0);
+    free_bn(w1);
+    free_bn(xy);
+    free_bn(tempbn);
+    free_bn(order);
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const unsigned char * key, size_t key_len, const unsigned char * in, size_t in_len,
@@ -855,7 +890,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const unsigned char * key, size_t 
     HMAC_CTX * mac_ctx = HMAC_CTX_new();
     VerifyOrExit(mac_ctx != NULL, error = CHIP_ERROR_INTERNAL);
 
-    error_openssl = HMAC_Init_ex(mac_ctx, key, key_len, context.hash, NULL);
+    error_openssl = HMAC_Init_ex(mac_ctx, key, key_len, context.md_info, NULL);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error_openssl = HMAC_Update(mac_ctx, in, in_len);

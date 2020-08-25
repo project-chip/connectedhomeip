@@ -17,11 +17,10 @@
 
 #include "Server.h"
 
-#include "chip-zcl/chip-zcl.h"
-extern "C" {
-#include "gen/gen-cluster-id.h"
-#include "gen/gen-types.h"
-}
+#include "attribute-storage.h"
+#include "gen/znet-bookkeeping.h"
+#include "util.h"
+#include <app/chip-zcl-zpro-codec.h>
 
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
@@ -51,16 +50,6 @@ namespace {
 #define EXAMPLE_SERVER_NODEID 0x3546526e
 #endif // EXAMPLE_SERVER_NODEID
 
-const uint8_t local_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f,
-                                      0x11, 0x0e, 0x34, 0x15, 0x81, 0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65,
-                                      0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
-
-const uint8_t remote_public_key[] = { 0x04, 0x30, 0x77, 0x2c, 0xe7, 0xd4, 0x0a, 0xf2, 0xf3, 0x19, 0xbd, 0xfb, 0x1f,
-                                      0xcc, 0x88, 0xd9, 0x83, 0x25, 0x89, 0xf2, 0x09, 0xf3, 0xab, 0xe4, 0x33, 0xb6,
-                                      0x7a, 0xff, 0x73, 0x3b, 0x01, 0x35, 0x34, 0x92, 0x73, 0x14, 0x59, 0x0b, 0xbd,
-                                      0x44, 0x72, 0x1b, 0xcd, 0xb9, 0x02, 0x53, 0xd9, 0xaf, 0xcc, 0x1a, 0xcd, 0xae,
-                                      0xe8, 0x87, 0x2e, 0x52, 0x3b, 0x98, 0xf0, 0xa1, 0x88, 0x4a, 0xe3, 0x03, 0x75 };
-
 class ServerCallback : public SecureSessionMgrCallback
 {
 public:
@@ -80,7 +69,7 @@ public:
 
         LOG_INF("Packet received from %s: %zu bytes", log_strdup(src_addr), static_cast<size_t>(data_len));
 
-        HandleDataModelMessage(buffer);
+        HandleDataModelMessage(header, buffer, mgr);
         buffer = nullptr;
 
     exit:
@@ -94,15 +83,7 @@ public:
 
     void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override
     {
-        CHIP_ERROR err;
-
         LOG_INF("Received a new connection.");
-
-        err = state->GetSecureSession().TemporaryManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key,
-                                                                   sizeof(local_private_key));
-
-        if (err != CHIP_NO_ERROR)
-            LOG_INF("Failed to setup encryption");
     }
 
 private:
@@ -113,20 +94,41 @@ private:
      * @param [in] buffer The buffer holding the message.  This function guarantees
      *                    that it will free the buffer before returning.
      */
-    void HandleDataModelMessage(System::PacketBuffer * buffer)
+    void HandleDataModelMessage(const MessageHeader & header, System::PacketBuffer * buffer, SecureSessionMgrBase * mgr)
     {
-        ChipZclStatus_t zclStatus = chipZclProcessIncoming((ChipZclBuffer_t *) buffer);
-
-        if (zclStatus == CHIP_ZCL_STATUS_SUCCESS)
-            LOG_INF("Data model processing success!");
+        EmberApsFrame frame;
+        bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) > 0;
+        if (ok)
+        {
+            LOG_INF("APS frame processing success!");
+        }
         else
-            LOG_INF("Data model processing failure: %d", zclStatus);
+        {
+            LOG_INF("Aps frame processing failure!");
+            System::PacketBuffer::Free(buffer);
+            return;
+        }
+
+        ChipResponseDestination responseDest(header.GetSourceNodeId().Value(), mgr);
+        uint8_t * message;
+        uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
+        ok                  = emberAfProcessMessage(&frame,
+                                   0, // type
+                                   message, messageLen,
+                                   &responseDest, // source identifier
+                                   NULL);
 
         System::PacketBuffer::Free(buffer);
+
+        if (ok)
+            LOG_INF("Data model processing success!");
+        else
+            LOG_INF("Data model processing failure!");
     }
 };
 
 static ServerCallback gCallbacks;
+static SecurePairingUsingTestSecret gTestPairing;
 
 } // namespace
 
@@ -134,10 +136,15 @@ static ServerCallback gCallbacks;
 void StartServer(DemoSessionManager * sessions)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
 
     err = sessions->Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::SystemLayer,
                          UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
     SuccessOrExit(err);
+
+    err = sessions->NewPairing(Optional<NodeId>::Value(kUndefinedNodeId), peer, 0, 0, &gTestPairing);
+    SuccessOrExit(err);
+
     sessions->SetDelegate(&gCallbacks);
 
 exit:
@@ -149,5 +156,6 @@ exit:
 
 void InitDataModelHandler()
 {
-    chipZclEndpointInit();
+    emberAfEndpointConfigure();
+    emAfInit();
 }

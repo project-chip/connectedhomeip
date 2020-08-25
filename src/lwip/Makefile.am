@@ -130,6 +130,21 @@ EXTRA_DIST                                                                     =
 
 endif # CHIP_LWIP_TARGET_EFR32
 
+if CHIP_LWIP_TARGET_K32W
+
+liblwip_TARGET_SOURCES                                                         = \
+    freertos/sys_arch.c                                                          \
+    $(NULL)
+
+EXTRA_DIST                                                                     = \
+    freertos/arch                                                                \
+    k32w/arch                                                                    \
+    k32w/lwipopts.h                                                              \
+    k32w/lwippools.h                                                             \
+    $(NULL)
+
+endif # CHIP_LWIP_TARGET_K32W
+
 liblwip_a_SOURCES                                                              = \
     $(liblwip_API_SOURCES)                                                       \
     $(liblwip_CORE_SOURCES)                                                      \

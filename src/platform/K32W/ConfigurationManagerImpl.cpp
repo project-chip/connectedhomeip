@@ -26,28 +26,18 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/internal/GenericConfigurationManagerImpl.ipp>
-
 #include <platform/ConfigurationManager.h>
-#include <platform/K32W/GroupKeyStoreImpl.h>
 #include <platform/K32W/K32WConfig.h>
-#include <platform/Profiles/security/CHIPApplicationKeys.h>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include "fsl_reset.h"
 
 namespace chip {
 namespace DeviceLayer {
 
-using namespace ::chip::Profiles::Security::AppKeys;
-using namespace ::chip::Profiles::DeviceDescription;
 using namespace ::chip::DeviceLayer::Internal;
 
-namespace {
-
-// Singleton instance of CHIP Group Key Store.
-GroupKeyStoreImpl gGroupKeyStore;
-
-} // unnamed namespace
+// TODO: Define a Singleton instance of CHIP Group Key Store here
 
 /** Singleton instance of the ConfigurationManager implementation object.
  */
@@ -62,9 +52,7 @@ CHIP_ERROR ConfigurationManagerImpl::_Init()
     err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_Init();
     SuccessOrExit(err);
 
-    // Initialize the global GroupKeyStore object.
-    err = gGroupKeyStore.Init();
-    SuccessOrExit(err);
+    // TODO: Initialize the global GroupKeyStore object here
 
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
     if (_GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
@@ -76,24 +64,6 @@ CHIP_ERROR ConfigurationManagerImpl::_Init()
 
 exit:
     return err;
-}
-
-WEAVE_ERROR
-ConfigurationManagerImpl::_GetDeviceDescriptor(::nl::Weave::Profiles::DeviceDescription::WeaveDeviceDescriptor & deviceDesc)
-{
-    WEAVE_ERROR err;
-
-    // Call the generic version of _GetDeviceDescriptor() supplied by the base class.
-    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_GetDeviceDescriptor(deviceDesc);
-    SuccessOrExit(err);
-
-exit:
-    return err;
-}
-
-::chip::Profiles::Security::AppKeys::GroupKeyStoreBase * ConfigurationManagerImpl::_GetGroupKeyStore()
-{
-    return &gGroupKeyStore;
 }
 
 bool ConfigurationManagerImpl::_CanFactoryReset()
@@ -150,13 +120,12 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     err = FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", nl::ErrorStr(err));
+        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-    ChipLogProgress(DeviceLayer, "Clearing Thread provision");
-    ThreadStackMgr().ClearThreadProvision();
+    ThreadStackMgr().ErasePersistentInfo();
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 

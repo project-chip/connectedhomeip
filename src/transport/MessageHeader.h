@@ -83,11 +83,17 @@ public:
     /** Get the secure msg type from this header. */
     uint8_t GetMessageType(void) const { return mMessageType; }
 
+    /** Check if it's a secure session control message. */
+    bool IsSecureSessionControlMsg(void) const { return mSecureSessionControlMsg; }
+
     /** Get the Session ID from this header. */
     uint16_t GetExchangeID(void) const { return mExchangeID; }
 
     /** Get the Protocol ID from this header. */
     uint16_t GetProtocolID(void) const { return mProtocolID; }
+
+    /** Get the Encryption Key ID from this header. */
+    uint16_t GetEncryptionKeyID(void) const { return mEncryptionKeyID; }
 
     /** Get the MAC tag length. */
     size_t GetTagLength(void) const { return TagLenForEncryptionType(mEncryptionType); }
@@ -187,6 +193,12 @@ public:
         return *this;
     }
 
+    MessageHeader & SetSecureSessionControlMsg()
+    {
+        mSecureSessionControlMsg = true;
+        return *this;
+    }
+
     /** Set the security session ID for this header. */
     MessageHeader & SetExchangeID(uint16_t id)
     {
@@ -195,9 +207,16 @@ public:
     }
 
     /** Set the Protocol ID for this header. */
-    MessageHeader & SetProtcolID(uint16_t id)
+    MessageHeader & SetProtocolID(uint16_t id)
     {
         mProtocolID = id;
+        return *this;
+    }
+
+    /** Set the Encryption Key ID for this header. */
+    MessageHeader & SetEncryptionKeyID(uint16_t id)
+    {
+        mEncryptionKeyID = id;
         return *this;
     }
 
@@ -350,6 +369,9 @@ private:
     /// Packet type (application data, security control packets, e.g. pairing,
     /// configuration, rekey etc)
     uint8_t mMessageType = 0;
+
+    /// Is this packet a control message for secure channel
+    bool mSecureSessionControlMsg = false;
 
     /// Security session identifier
     uint16_t mExchangeID = 0;

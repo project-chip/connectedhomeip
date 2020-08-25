@@ -12,62 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
+import("//build_overrides/jlink.gni")
 import("//build_overrides/mbedtls.gni")
+
+import("efr32_board.gni")
 
 declare_args() {
   # Location of the efr32 SDK.
   efr32_sdk_root = ""
-
-  # EFR32 board used
-  efr32_board = ""
-
-  # EFR32 chip family
-  efr32_family = ""
-
-  # EFR32 MCU
-  efr32_mcu = ""
 }
-
-if (efr32_board == "") {
-  efr32_board = getenv("EFR32_BOARD")
-}
-
-assert(efr32_board != "", "The EFR32_BOARD env must be specified")
 
 if (efr32_sdk_root == "") {
   efr32_sdk_root = getenv("EFR32_SDK_ROOT")
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
-
-# Differentiate between boards
-# - BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
-# - BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-# - BRD4166A / SLTB004A    / Thunderboard Sense 2 / 2.4GHz@10dBm
-# - BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm, 915MHz@19dBm, 868MHz@19dBm
-# - BRD4180A / SLWSTK6006A / MG21 Module / 2.4GHz@20dBm
-
-if (efr32_board == "BRD4304A") {
-  efr32_family = "efr32mg12"
-  efr32_mcu = "EFR32MG12P432F1024GM48"
-} else if (efr32_board == "BRD4161A") {
-  efr32_family = "efr32mg12"
-  efr32_mcu = "EFR32MG12P432F1024GL125"
-} else if (efr32_board == "BRD4166A") {
-  efr32_family = "efr32mg12"
-  efr32_mcu = "EFR32MG12P332F1024GL125"
-} else if (efr32_board == "BRD4170A") {
-  efr32_family = "efr32mg12"
-  efr32_mcu = "EFR32MG12P433F1024GM68"
-} else if (efr32_board == "BRD4180A") {
-  efr32_family = "efr32mg21"
-  efr32_mcu = "EFR32MG21A020F1024IM32"
-} else {
-  print(
-      "Please provide a valid value for EFR32_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4166A, BRD4170A or BRD4180A)")
-  assert(false, "The board ${efr32_board} is unsupported as for now.")
-}
 
 # Defines an efr32 SDK build target.
 #
@@ -120,8 +81,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/radio/rail_lib/protocol/ieee802154",
       "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/rf/common/cortex",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions",
-      "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER",
-      "${efr32_sdk_root}/util/third_party/segger/systemview/Config",
       "${efr32_sdk_root}/util/plugin/plugin-common/fem-control",
       "${efr32_sdk_root}/protocol/bluetooth/ble_stack/inc/soc",
       "${efr32_sdk_root}/protocol/bluetooth/ble_stack/inc/common",
@@ -132,8 +91,8 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/sleeptimer/config",
       "${efr32_sdk_root}/platform/common/inc",
       "${efr32_sdk_root}/platform/emdrv/nvm3/inc",
-
       "${efr32_sdk_root}/util/third_party/mbedtls/include",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/include",
       "${mbedtls_root}/repo/include",
     ]
 
@@ -168,8 +127,9 @@ template("efr32_sdk") {
     }
 
     defines = [
-"__STARTUP_CLEAR_BSS",
-
+      "MBEDTLS_CONFIG_FILE=\"mbedtls-config.h\"",
+      "MBEDTLS_USER_CONFIG_FILE=\"efr32-chip-mbedtls-config.h\"",
+      "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
       "RETARGET_VCOM",
       "RETARGET_USART0",
@@ -178,7 +138,15 @@ template("efr32_sdk") {
       "EFR32_LOG_ENABLED=1",
       "NVM3_DEFAULT_NVM_SIZE=40960",
       "EFR32_OPENTHREAD_API",
+      "NVIC_CONFIG=<platform/base/hal/micro/cortexm3/efm32/nvic-config.h>",
+      "PHY=EMBER_PHY_RAIL",
+      "CORTEXM3",
+      "MICRO=EMBER_MICRO_CORTEXM3_EFR32",
+      "PLAT=EMBER_PLATFORM_CORTEXM3",
+      "MBEDTLS_CONFIG_FILE=\"mbedtls-config.h\"",
+      "MBEDTLS_USER_CONFIG_FILE=\"efr32-chip-mbedtls-config.h\"",
       "${efr32_mcu}",
+      "${efr32_board}=1",
     ]
     if (defined(invoker.defines)) {
       defines += invoker.defines
@@ -187,12 +155,12 @@ template("efr32_sdk") {
 
   source_set(sdk_target_name) {
     sources = [
+      "${chip_root}/third_party/mbedtls/repo/include/mbedtls/platform.h",
       "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_bcc.c",
       "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_init.c",
       "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_stk.c",
       "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_stk_leds.c",
       "${efr32_sdk_root}/hardware/kit/common/drivers/mx25flash_spi.c",
-      "${efr32_sdk_root}/hardware/kit/common/drivers/retargetio.c",
       "${efr32_sdk_root}/hardware/kit/common/drivers/retargetserial.c",
       "${efr32_sdk_root}/platform/emdrv/dmadrv/src/dmadrv.c",
       "${efr32_sdk_root}/platform/emdrv/gpiointerrupt/src/gpiointerrupt.c",
@@ -213,6 +181,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/emlib/src/em_msc.c",
       "${efr32_sdk_root}/platform/emlib/src/em_rmu.c",
       "${efr32_sdk_root}/platform/emlib/src/em_rtcc.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_se.c",
       "${efr32_sdk_root}/platform/emlib/src/em_system.c",
       "${efr32_sdk_root}/platform/emlib/src/em_timer.c",
       "${efr32_sdk_root}/platform/emlib/src/em_usart.c",
@@ -229,7 +198,79 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/Source/queue.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/tasks.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/timers.c",
-      "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER/SEGGER_RTT.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/aes.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/aesni.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/arc4.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/asn1parse.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/asn1write.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/base64.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/bignum.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/blowfish.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/camellia.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ccm.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/certs.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/cipher.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/cipher_wrap.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ctr_drbg.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/debug.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/des.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/dhm.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ecdh.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ecdsa.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ecjpake.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ecp.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ecp_curves.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/entropy.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/entropy_poll.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/error.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/gcm.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/hmac_drbg.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/md.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/md5.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/md_wrap.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/oid.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/pem.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/pk.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/pk_wrap.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/pkcs12.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/pkcs5.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/pkparse.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/pkwrite.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/platform.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ripemd160.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/rsa.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/rsa_internal.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/sha1.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/sha256.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/sha512.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_cache.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_ciphersuites.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_cli.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_cookie.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_srv.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_ticket.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_tls.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/threading.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/timing.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/version.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/version_features.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/x509.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/x509_create.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/x509_crl.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/x509_csr.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/x509write_crt.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/x509write_csr.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/xtea.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/aes_aes.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/crypto_aes.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/crypto_ble.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/crypto_ecp.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/crypto_management.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/crypto_sha.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/shax.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/sl_crypto/src/trng.c",
+      "${mbedtls_root}/repo/library/hkdf.c",
+      "${mbedtls_root}/repo/library/platform_util.c",
     ]
 
     if (efr32_family == "efr32mg12") {
@@ -245,6 +286,12 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/util/third_party/freertos/Source/portable/GCC/ARM_CM3/port.c",
       ]
     }
+
+    public_deps = [
+      "${segger_rtt_root}:segger_rtt",
+      "${segger_rtt_root}:segger_rtt_printf",
+      "${segger_rtt_root}:segger_rtt_syscalls",
+    ]
 
     if (defined(invoker.sources)) {
       sources += invoker.sources

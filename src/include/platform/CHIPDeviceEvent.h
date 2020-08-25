@@ -124,13 +124,6 @@ enum PublicEventTypes
     kInternetConnectivityChange,
 
     /**
-     * Service Tunnel State Change
-     *
-     * Signals a change in connectivity of the device's IP tunnel to a chip-enabled service.
-     */
-    kServiceTunnelStateChange,
-
-    /**
      * Service Connectivity Change
      *
      * Signals a change in the device's ability to communicate with a chip-enabled service.
@@ -270,10 +263,9 @@ typedef void (*AsyncWorkFunct)(intptr_t arg);
  */
 #ifdef EXTERNAL_CHIPDEVICEPLATFORMEVENT_HEADER
 #include EXTERNAL_CHIPDEVICEPLATFORMEVENT_HEADER
-#else
+#elif defined(CHIP_DEVICE_LAYER_TARGET)
 #define CHIPDEVICEPLATFORMEVENT_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/CHIPDevicePlatformEvent.h>
 #include CHIPDEVICEPLATFORMEVENT_HEADER
-#endif
 
 #include <ble/BleConfig.h>
 #include <system/SystemPacketBuffer.h>
@@ -317,19 +309,10 @@ struct ChipDeviceEvent final
         } InternetConnectivityChange;
         struct
         {
-            ConnectivityChange Result;
-            bool IsRestricted;
-        } ServiceTunnelStateChange;
-        struct
-        {
             struct
             {
                 ConnectivityChange Result;
             } Overall;
-            struct
-            {
-                ConnectivityChange Result;
-            } ViaTunnel;
             struct
             {
                 ConnectivityChange Result;
@@ -412,4 +395,5 @@ struct ChipDeviceEvent final
 } // namespace DeviceLayer
 } // namespace chip
 
+#endif // defined(CHIP_DEVICE_LAYER_TARGET)
 #endif // CHIP_DEVICE_EVENT_H

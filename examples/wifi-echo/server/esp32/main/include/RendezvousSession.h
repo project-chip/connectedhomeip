@@ -18,13 +18,14 @@
 #include "BluetoothWidget.h"
 
 #include <platform/CHIPDeviceLayer.h>
+#include <transport/SecurePairingSession.h>
 
 using namespace ::chip;
 
-class RendezvousSession
+class RendezvousSession : public SecurePairingSessionDelegate
 {
 public:
-    RendezvousSession(BluetoothWidget * virtualLed);
+    RendezvousSession(BluetoothWidget * virtualLed, uint32_t setUpPINCode, NodeId myNodeId);
     CHIP_ERROR Send(const char * msg);
 
 private:
@@ -32,6 +33,17 @@ private:
     static void HandleConnectionClosed(Ble::BLEEndPoint * endPoint, BLE_ERROR err);
     static void HandleMessageReceived(Ble::BLEEndPoint * endPoint, System::PacketBuffer * buffer);
 
+    virtual CHIP_ERROR OnNewMessageForPeer(System::PacketBuffer * msgBuf);
+    virtual void OnPairingError(CHIP_ERROR error);
+    virtual void OnPairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId);
+
     static BluetoothWidget * mVirtualLed;
     static Ble::BLEEndPoint * mEndPoint;
+
+    static SecurePairingSession mPairing;
+    static bool mPairingInProgress;
+
+    bool mPaired           = false;
+    uint32_t mSetUpPINCode = 0;
+    NodeId mNodeId;
 };

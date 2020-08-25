@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/lwip.gni")
 
+import("${chip_root}/gn/chip/buildconfig_header.gni")
 import("${lwip_root}/lwip.gni")
 
 declare_args() {
@@ -41,15 +42,27 @@ if (lwip_platform == "nrf5") {
   import("//build_overrides/efr32_sdk.gni")
 }
 
-config("lwip_config") {
+buildconfig_header("lwip_buildconfig") {
+  header = "lwip_buildconfig.h"
+  header_dir = "lwip"
+
   # Automatically enable LWIP_DEBUG for internal is_debug builds.
   if (lwip_debug) {
     lwip_debug = 1
   } else {
     lwip_debug = 0
   }
-  defines = [ "LWIP_DEBUG=${lwip_debug}" ]
+  defines = [
+    "LWIP_DEBUG=${lwip_debug}",
+    "HAVE_LWIP_UDP_BIND_NETIF=1",
+  ]
 
+  if (current_os == "android") {
+    defines += [ "LWIP_NO_STDINT_H=1" ]
+  }
+}
+
+config("lwip_config") {
   include_dirs = [ lwip_platform ]
 
   if (lwip_platform != "standalone") {
@@ -77,14 +90,17 @@ lwip_target("lwip") {
     sources += [ "freertos/sys_arch.c" ]
   }
 
-  public_deps = []
+  public_deps = [ ":lwip_buildconfig" ]
   if (lwip_platform == "nrf5") {
     public_deps += [ "${nrf5_sdk_build_root}:nrf5_sdk" ]
   } else if (lwip_platform == "efr32") {
     public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
   }
 
-  public_configs = [ ":lwip_config" ]
+  public_configs = [
+    ":lwip_config",
+    "${chip_root}/src:includes",
+  ]
 }
 
 group("all") {

@@ -17,10 +17,13 @@
  */
 package com.google.chip.chiptool
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.google.chip.chiptool.commissioner.CommissionerActivity
 import com.google.chip.chiptool.echoclient.EchoClientFragment
+import com.google.chip.chiptool.clusterclient.OnOffClientFragment
 import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
@@ -51,12 +54,25 @@ class CHIPToolActivity :
     showFragment(BarcodeFragment.newInstance())
   }
 
+  override fun handleCommissioningClicked() {
+    var intent = Intent(this, CommissionerActivity::class.java)
+    startActivityForResult(intent, REQUEST_CODE_COMMISSIONING)
+  }
+
   override fun handleEchoClientClicked() {
     showFragment(EchoClientFragment.newInstance())
   }
 
   override fun handleOnOffClicked() {
-    TODO("Not yet implemented")
+    showFragment(OnOffClientFragment.newInstance())
+  }
+
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+
+    // Simply ignore the commissioning result.
+
+    // TODO: tracking commissioned devices.
   }
 
   private fun showFragment(fragment: Fragment) {
@@ -65,5 +81,9 @@ class CHIPToolActivity :
         .replace(R.id.fragment_container, fragment, fragment.javaClass.simpleName)
         .addToBackStack(null)
         .commit()
+  }
+
+  companion object {
+    var REQUEST_CODE_COMMISSIONING = 0xB003
   }
 }

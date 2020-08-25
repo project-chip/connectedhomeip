@@ -36,6 +36,10 @@
 #ifndef BLECONFIG_H_
 #define BLECONFIG_H_
 
+#if CHIP_SEPARATE_CONFIG_H
+#include <ble/BleBuildConfig.h>
+#endif
+
 #include <system/SystemConfig.h>
 
 /* Include a project-specific configuration file, if defined.

@@ -59,10 +59,61 @@ public:
 
         for (size_t i = 0; i < kMaxConnectionCount; i++)
         {
-            if (!mStates[i].GetPeerAddress().IsInitialized())
+            if (!mStates[i].IsInitialized())
             {
                 mStates[i] = PeerConnectionState(address);
                 mStates[i].SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs());
+
+                if (state)
+                {
+                    *state = &mStates[i];
+                }
+
+                err = CHIP_NO_ERROR;
+                break;
+            }
+        }
+
+        return err;
+    }
+
+    /**
+     * Allocates a new peer connection state state object out of the internal resource pool.
+     *
+     * @param peerNode represents optional peer Node's ID
+     * @param peerKeyId represents the encryption key ID assigned by peer node
+     * @param localKeyId represents the encryption key ID assigned by local node
+     * @param state [out] will contain the connection state if one was available. May be null if no return value is desired.
+     *
+     * @note the newly created state will have an 'active' time set based on the current time source.
+     *
+     * @returns CHIP_NO_ERROR if state could be initialized. May fail if maximum connection count
+     *          has been reached (with CHIP_ERROR_NO_MEMORY).
+     */
+    CHECK_RETURN_VALUE
+    CHIP_ERROR CreateNewPeerConnectionState(const Optional<NodeId> & peerNode, uint16_t peerKeyId, uint16_t localKeyId,
+                                            PeerConnectionState ** state)
+    {
+        CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
+
+        if (state)
+        {
+            *state = nullptr;
+        }
+
+        for (size_t i = 0; i < kMaxConnectionCount; i++)
+        {
+            if (!mStates[i].IsInitialized())
+            {
+                mStates[i] = PeerConnectionState();
+                mStates[i].SetPeerKeyID(peerKeyId);
+                mStates[i].SetLocalKeyID(localKeyId);
+                mStates[i].SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs());
+
+                if (peerNode.HasValue())
+                {
+                    mStates[i].SetPeerNodeId(peerNode.Value());
+                }
 
                 if (state)
                 {
@@ -115,7 +166,7 @@ public:
         *state = nullptr;
         for (size_t i = 0; i < kMaxConnectionCount; i++)
         {
-            if (!mStates[i].GetPeerAddress().IsInitialized())
+            if (!mStates[i].IsInitialized())
             {
                 continue;
             }
@@ -123,6 +174,72 @@ public:
             {
                 *state = &mStates[i];
                 break;
+            }
+        }
+        return *state != nullptr;
+    }
+
+    /**
+     * Get a peer connection state given a Node Id and Peer's Encryption Key Id.
+     *
+     * @param nodeId is the connection to find (based on nodeId). Note that initial connections
+     *        do not have a node id set. Use this if you know the node id should be set.
+     * @param peerKeyId Encryption key ID used by the peer node.
+     * @param state [out] the connection if found, null otherwise. MUST not be null.
+     *
+     * @return true if a corresponding state was found.
+     */
+    CHECK_RETURN_VALUE
+    bool FindPeerConnectionState(Optional<NodeId> nodeId, uint16_t peerKeyId, PeerConnectionState ** state)
+    {
+        *state = nullptr;
+        for (size_t i = 0; i < kMaxConnectionCount; i++)
+        {
+            if (!mStates[i].IsInitialized())
+            {
+                continue;
+            }
+            if (mStates[i].GetPeerKeyID() == peerKeyId)
+            {
+                if (!nodeId.HasValue() || mStates[i].GetPeerNodeId() == kUndefinedNodeId ||
+                    mStates[i].GetPeerNodeId() == nodeId.Value())
+                {
+                    *state = &mStates[i];
+                    break;
+                }
+            }
+        }
+        return *state != nullptr;
+    }
+
+    /**
+     * Get a peer connection state given a Node Id and Peer's Encryption Key Id.
+     *
+     * @param nodeId is the connection to find (based on peer nodeId). Note that initial connections
+     *        do not have a node id set. Use this if you know the node id should be set.
+     * @param localKeyId Encryption key ID used by the local node.
+     * @param state [out] the connection if found, null otherwise. MUST not be null.
+     *
+     * @return true if a corresponding state was found.
+     */
+    CHECK_RETURN_VALUE
+    bool FindPeerConnectionStateByLocalKey(Optional<NodeId> nodeId, uint16_t localKeyId, PeerConnectionState ** state)
+    {
+        *state = nullptr;
+        for (size_t i = 0; i < kMaxConnectionCount; i++)
+        {
+            if (!mStates[i].IsInitialized())
+            {
+                continue;
+            }
+            if (mStates[i].GetLocalKeyID() == localKeyId)
+            {
+                if (!nodeId.HasValue() || mStates[i].GetPeerNodeId() == kUndefinedNodeId ||
+                    mStates[i].GetPeerNodeId() == nodeId.Value())
+                {
+                    *state = &mStates[i];
+                    break;
+                }
             }
         }
         return *state != nullptr;

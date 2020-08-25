@@ -26,7 +26,7 @@
 #ifndef PLATFORM_MANAGER_IMPL_H
 #define PLATFORM_MANAGER_IMPL_H
 
-#include <platform/internal/FreeRTOS/GenericPlatformManagerImpl_FreeRTOS.h>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
 
 namespace chip {
 namespace DeviceLayer {

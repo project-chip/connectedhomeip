@@ -63,18 +63,18 @@ void __cxa_rethrow()
     abort();
 }
 
-void * __cxa_begin_catch(void *)
-{
-    abort();
-}
+// void * __cxa_begin_catch(void *)
+// {
+//     abort();
+// }
 
-void __cxa_end_catch()
-{
-    abort();
-}
+// void __cxa_end_catch()
+// {
+//     abort();
+// }
 
-void * __cxa_get_exception_ptr(void *)
-{
-    abort();
-}
+// void * __cxa_get_exception_ptr(void *)
+// {
+//     abort();
+// }
 }

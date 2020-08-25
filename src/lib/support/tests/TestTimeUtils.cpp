@@ -36,7 +36,7 @@
 
 using namespace chip;
 
-void Abort()
+static void Abort()
 {
     abort();
 }

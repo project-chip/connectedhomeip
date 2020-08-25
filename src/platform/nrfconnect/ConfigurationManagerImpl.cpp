@@ -99,7 +99,9 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     ThreadStackMgr().ErasePersistentInfo();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
+#if CONFIG_REBOOT
     sys_reboot(SYS_REBOOT_WARM);
+#endif
 }
 
 } // namespace DeviceLayer

@@ -58,7 +58,6 @@ CHIP_BUILD_INET_LAYER_HEADER_FILES                         = \
     @top_builddir@/src/inet/InetLayerEvents.h                \
     @top_builddir@/src/inet/RawEndPoint.h                    \
     @top_builddir@/src/inet/TCPEndPoint.h                    \
-    @top_builddir@/src/inet/TunEndPoint.h                    \
     @top_builddir@/src/inet/UDPEndPoint.h                    \
     @top_builddir@/src/inet/ZephyrSocket.h                   \
     $(NULL)
@@ -78,10 +77,6 @@ endif # INET_WANT_ENDPOINT_TCP
 if INET_WANT_ENDPOINT_UDP
 CHIP_BUILD_INET_LAYER_SOURCE_FILES += @top_builddir@/src/inet/UDPEndPoint.cpp
 endif # INET_WANT_ENDPOINT_UDP
-
-if INET_WANT_ENDPOINT_TUN
-CHIP_BUILD_INET_LAYER_SOURCE_FILES += @top_builddir@/src/inet/TunEndPoint.cpp
-endif # INET_WANT_ENDPOINT_TUN
 
 if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 if INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS

@@ -59,6 +59,8 @@ using ::chip::System::PacketBuffer;
 using ::chip::System::pbuf;
 #endif
 
+namespace {
+
 // Test input vector format.
 
 struct TestContext
@@ -74,7 +76,7 @@ struct TestContext
 // Test input data.
 
 // clang-format off
-static struct TestContext sContext[] =
+struct TestContext sContext[] =
 {
       { 0,      0,                               NULL, NULL, NULL, NULL },
       { 0,      10,                              NULL, NULL, NULL, NULL },
@@ -84,11 +86,11 @@ static struct TestContext sContext[] =
 };
 // clang-format on
 
-static const uint16_t sLengths[] = { 0, 1, 10, 128, CHIP_SYSTEM_PACKETBUFFER_SIZE, UINT16_MAX };
+const uint16_t sLengths[] = { 0, 1, 10, 128, CHIP_SYSTEM_PACKETBUFFER_SIZE, UINT16_MAX };
 
 // Number of test context examples.
-static const size_t kTestElements = sizeof(sContext) / sizeof(struct TestContext);
-static const size_t kTestLengths  = sizeof(sLengths) / sizeof(uint16_t);
+const size_t kTestElements = sizeof(sContext) / sizeof(struct TestContext);
+const size_t kTestLengths  = sizeof(sLengths) / sizeof(uint16_t);
 
 // Utility functions.
 
@@ -98,7 +100,7 @@ static const size_t kTestLengths  = sizeof(sLengths) / sizeof(uint16_t);
 /**
  *  Free allocated test buffer memory.
  */
-static void BufferFree(struct TestContext * theContext)
+void BufferFree(struct TestContext * theContext)
 {
     if (theContext->buf != NULL)
     {
@@ -110,7 +112,7 @@ static void BufferFree(struct TestContext * theContext)
 /**
  *  Allocate memory for a test buffer and configure according to test context.
  */
-static void BufferAlloc(struct TestContext * theContext)
+void BufferAlloc(struct TestContext * theContext)
 {
     const size_t lInitialSize = CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + theContext->reserved_size;
     const size_t lAllocSize   = CHIP_SYSTEM_PACKETBUFFER_SIZE;
@@ -168,7 +170,7 @@ static void BufferAlloc(struct TestContext * theContext)
 /**
  *  Setup buffer layout as it is used by PacketBuffer class.
  */
-static PacketBuffer * PrepareTestBuffer(struct TestContext * theContext)
+PacketBuffer * PrepareTestBuffer(struct TestContext * theContext)
 {
     BufferAlloc(theContext);
 
@@ -185,7 +187,7 @@ static PacketBuffer * PrepareTestBuffer(struct TestContext * theContext)
 /**
  *  Test PacketBuffer::Start() function.
  */
-static void CheckStart(nlTestSuite * inSuite, void * inContext)
+void CheckStart(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theContext = (struct TestContext *) (inContext);
 
@@ -210,7 +212,7 @@ static void CheckStart(nlTestSuite * inSuite, void * inContext)
  *               adjusted according to the offset value passed into the
  *               SetStart() method.
  */
-static void CheckSetStart(nlTestSuite * inSuite, void * inContext)
+void CheckSetStart(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theContext          = (struct TestContext *) (inContext);
     static const ptrdiff_t sSizePacketBuffer = CHIP_SYSTEM_PACKETBUFFER_SIZE;
@@ -271,7 +273,7 @@ static void CheckSetStart(nlTestSuite * inSuite, void * inContext)
 /**
  *  Test PacketBuffer::DataLength() function.
  */
-static void CheckDataLength(nlTestSuite * inSuite, void * inContext)
+void CheckDataLength(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theContext = (struct TestContext *) (inContext);
 
@@ -298,7 +300,7 @@ static void CheckDataLength(nlTestSuite * inSuite, void * inContext)
  *               other one being passed as the head of the chain. After calling
  *               the method verify that data lenghts were correctly adjusted.
  */
-static void CheckSetDataLength(nlTestSuite * inSuite, void * inContext)
+void CheckSetDataLength(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theFirstContext = static_cast<struct TestContext *>(inContext);
 
@@ -378,7 +380,7 @@ static void CheckSetDataLength(nlTestSuite * inSuite, void * inContext)
 /**
  *  Test PacketBuffer::TotalLength() function.
  */
-static void CheckTotalLength(nlTestSuite * inSuite, void * inContext)
+void CheckTotalLength(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theContext = (struct TestContext *) (inContext);
 
@@ -395,7 +397,7 @@ static void CheckTotalLength(nlTestSuite * inSuite, void * inContext)
 /**
  *  Test PacketBuffer::MaxDataLength() function.
  */
-static void CheckMaxDataLength(nlTestSuite * inSuite, void * inContext)
+void CheckMaxDataLength(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theContext = (struct TestContext *) (inContext);
 
@@ -412,7 +414,7 @@ static void CheckMaxDataLength(nlTestSuite * inSuite, void * inContext)
 /**
  *  Test PacketBuffer::AvailableDataLength() function.
  */
-static void CheckAvailableDataLength(nlTestSuite * inSuite, void * inContext)
+void CheckAvailableDataLength(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theContext = (struct TestContext *) (inContext);
 
@@ -430,7 +432,7 @@ static void CheckAvailableDataLength(nlTestSuite * inSuite, void * inContext)
 /**
  *  Test PacketBuffer::ReservedSize() function.
  */
-static void CheckReservedSize(nlTestSuite * inSuite, void * inContext)
+void CheckReservedSize(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theContext = (struct TestContext *) (inContext);
 
@@ -463,7 +465,7 @@ static void CheckReservedSize(nlTestSuite * inSuite, void * inContext)
  *               This test function tests linking any combination of three
  *               buffer-configurations passed within inContext.
  */
-static void CheckAddToEnd(nlTestSuite * inSuite, void * inContext)
+void CheckAddToEnd(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theFirstContext = static_cast<struct TestContext *>(inContext);
 
@@ -529,7 +531,7 @@ static void CheckAddToEnd(nlTestSuite * inSuite, void * inContext)
  *               on the first buffer to unlink the second buffer. After the call,
  *               verify correct internal state of the first buffer.
  */
-static void CheckDetachTail(nlTestSuite * inSuite, void * inContext)
+void CheckDetachTail(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theFirstContext = static_cast<struct TestContext *>(inContext);
 
@@ -577,7 +579,7 @@ static void CheckDetachTail(nlTestSuite * inSuite, void * inContext)
  *               the chain. After calling the method, verify correctly adjusted
  *               state of the first buffer.
  */
-static void CheckCompactHead(nlTestSuite * inSuite, void * inContext)
+void CheckCompactHead(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theFirstContext = static_cast<struct TestContext *>(inContext);
 
@@ -661,7 +663,7 @@ static void CheckCompactHead(nlTestSuite * inSuite, void * inContext)
  *               the internal state of the buffer has been correctly
  *               adjusted according to the value passed into the method.
  */
-static void CheckConsumeHead(nlTestSuite * inSuite, void * inContext)
+void CheckConsumeHead(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theContext = (struct TestContext *) (inContext);
 
@@ -708,7 +710,7 @@ static void CheckConsumeHead(nlTestSuite * inSuite, void * inContext)
  *               method, verify correctly adjusted the state of the first
  *               buffer and appropriate return pointer from the method's call.
  */
-static void CheckConsume(nlTestSuite * inSuite, void * inContext)
+void CheckConsume(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theFirstContext = static_cast<struct TestContext *>(inContext);
 
@@ -794,7 +796,7 @@ static void CheckConsume(nlTestSuite * inSuite, void * inContext)
  *               Then, verify that EnsureReservedSize() method correctly
  *               retrieves the amount of the reserved space.
  */
-static void CheckEnsureReservedSize(nlTestSuite * inSuite, void * inContext)
+void CheckEnsureReservedSize(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theContext = (struct TestContext *) (inContext);
 
@@ -840,7 +842,7 @@ static void CheckEnsureReservedSize(nlTestSuite * inSuite, void * inContext)
  *               required payload shift. Then, verify that AlignPayload()
  *               method correctly aligns the payload start pointer.
  */
-static void CheckAlignPayload(nlTestSuite * inSuite, void * inContext)
+void CheckAlignPayload(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theContext = (struct TestContext *) (inContext);
 
@@ -886,7 +888,7 @@ static void CheckAlignPayload(nlTestSuite * inSuite, void * inContext)
 /**
  *  Test PacketBuffer::Next() function.
  */
-static void CheckNext(nlTestSuite * inSuite, void * inContext)
+void CheckNext(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theFirstContext = static_cast<struct TestContext *>(inContext);
 
@@ -921,7 +923,7 @@ static void CheckNext(nlTestSuite * inSuite, void * inContext)
 /**
  *  Test PacketBuffer::AddRef() function.
  */
-static void CheckAddRef(nlTestSuite * inSuite, void * inContext)
+void CheckAddRef(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theContext = (struct TestContext *) (inContext);
 
@@ -946,7 +948,7 @@ static void CheckAddRef(nlTestSuite * inSuite, void * inContext)
  *               returns NULL. Otherwise, check for correctness of initializing
  *               the new buffer's internal state. Finally, free the buffer.
  */
-static void CheckNewWithAvailableSizeAndFree(nlTestSuite * inSuite, void * inContext)
+void CheckNewWithAvailableSizeAndFree(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theContext = (struct TestContext *) (inContext);
     PacketBuffer * buffer;
@@ -1000,7 +1002,7 @@ static void CheckNewWithAvailableSizeAndFree(nlTestSuite * inSuite, void * inCon
  *               the chain and verify correctly adjusted states of the two
  *               buffers.
  */
-static void CheckFree(nlTestSuite * inSuite, void * inContext)
+void CheckFree(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theFirstContext = static_cast<struct TestContext *>(inContext);
 
@@ -1077,7 +1079,7 @@ static void CheckFree(nlTestSuite * inSuite, void * inContext)
  *               FreeHead() on the first buffer in the chain and verify that
  *               the method returned pointer to the second buffer.
  */
-static void CheckFreeHead(nlTestSuite * inSuite, void * inContext)
+void CheckFreeHead(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theFirstContext = static_cast<struct TestContext *>(inContext);
 
@@ -1116,7 +1118,7 @@ static void CheckFreeHead(nlTestSuite * inSuite, void * inContext)
 /**
  *  Test PacketBuffer::BuildFreeList() function.
  */
-static void CheckBuildFreeList(nlTestSuite * inSuite, void * inContext)
+void CheckBuildFreeList(nlTestSuite * inSuite, void * inContext)
 {
     // BuildFreeList() is a private method called automatically.
     (void) inSuite;
@@ -1127,7 +1129,7 @@ static void CheckBuildFreeList(nlTestSuite * inSuite, void * inContext)
  *   Test Suite. It lists all the test functions.
  */
 // clang-format off
-static const nlTest sTests[] =
+const nlTest sTests[] =
 {
     NL_TEST_DEF("PacketBuffer::NewWithAvailableSize&PacketBuffer::Free", CheckNewWithAvailableSizeAndFree),
     NL_TEST_DEF("PacketBuffer::Start",                          CheckStart),
@@ -1161,7 +1163,7 @@ static const nlTest sTests[] =
  *  This is a work-around to initiate PacketBuffer protected class instance's data and set it to a known state, before an instance
  *  is created.
  */
-static int TestSetup(void * inContext)
+int TestSetup(void * inContext)
 {
     struct TestContext * theContext = reinterpret_cast<TestContext *>(inContext);
 
@@ -1179,7 +1181,7 @@ static int TestSetup(void * inContext)
  *
  *  Free memory reserved at TestSetup.
  */
-static int TestTeardown(void * inContext)
+int TestTeardown(void * inContext)
 {
     struct TestContext * theContext = reinterpret_cast<TestContext *>(inContext);
 
@@ -1191,6 +1193,8 @@ static int TestTeardown(void * inContext)
 
     return (SUCCESS);
 }
+
+} // namespace
 
 int TestSystemPacketBuffer(void)
 {

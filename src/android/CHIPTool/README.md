@@ -72,7 +72,8 @@ comes with the Android NDK does not depend on any system-specific JNI header
 files (e.g. jni_md.h). Thus only the top-level include directory is needed.
 
 7. Then run '../connectedhomeip/configure --host=\$TARGET --with-crypto=mbedtls
-   --enable-tests=no --enable-shared --with-device-layer=none'
+   --enable-tests=no --enable-shared --with-device-layer=none
+   --with-chip-project-includes=../connectedhomeip/config/android'
 
 8. Finally 'make'
 
@@ -89,8 +90,16 @@ jniLibs/arm64-v8a
 
 10. You will also need the "libc++\_shared.so" file in the jniLibs folder. This
     file comes packaged with Android NDK and can be found under
-    $ANDROID_NDK_HOME/sources/cxx-stl/llvm-libc++/libs/$TARGET
+    `$ANDROID_NDK_HOME/sources/cxx-stl/llvm-libc++/libs/$TARGET`.
 
-(Eventually hoping to not have to include this .so, but that needs some more
-tweaking of the Android automake build rules. Include it in the interim to be
-able to build the Android app).
+    (Eventually hoping to not have to include this .so, but that needs some more
+    tweaking of the Android automake build rules. Include it in the interim to
+    be able to build the Android app).
+
+11. Build OT Commissioner
+
+    ```shell
+    git submodule update --init --recursive third_party/ot-commissioner/repo
+    ./third_party/ot-commissioner/build-android-libs.sh
+    ## JAR and .so libraries will be copy to target directories.
+    ```

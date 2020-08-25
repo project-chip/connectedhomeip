@@ -33,6 +33,7 @@
 #include <core/CHIPTLV.h>
 #include <support/DLLUtil.h>
 #include <transport/BLE.h>
+#include <transport/SecurePairingSession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/UDP.h>
 
@@ -50,7 +51,9 @@ typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * app
 typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
 };
 
-class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback
+class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback,
+                                        public SecurePairingSessionDelegate,
+                                        public Transport::BLECallbackHandler
 {
     friend class ChipDeviceControllerCallback;
 
@@ -105,20 +108,45 @@ public:
 
     /**
      * @brief
-     *   The keypair for the secure channel. This is a utility function that will be used
-     *   until we have automatic key exchange in place. The function is useful only for
-     *   example applications for now. It will eventually be removed.
+     *   Connect to a CHIP device at a given address and an optional port. This is a test only API
+     *   that bypasses Rendezvous and Secure Pairing process.
      *
-     * @param state  Peer connection for which to establish the key
-     * @param remote_public_key  A pointer to peer's public key
-     * @param public_key_length  Length of remote_public_key
-     * @param local_private_key  A pointer to local private key
-     * @param private_key_length Length of local_private_key
-     * @return CHIP_ERROR        The result of key derivation
+     * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] deviceAddr            The IPAddress of the requested Device
+     * @param[in] appReqState           Application specific context to be passed back when a message is received or on error
+     * @param[in] onConnected           Callback for when the connection is established
+     * @param[in] onMessageReceived     Callback for when a message is received
+     * @param[in] onError               Callback for when an error occurs
+     * @param[in] devicePort            [Optional] The CHIP Device's port, defaults to CHIP_PORT
+     * @return CHIP_ERROR           The connection status
      */
-    CHIP_ERROR ManualKeyExchange(Transport::PeerConnectionState * state, const unsigned char * remote_public_key,
-                                 const size_t public_key_length, const unsigned char * local_private_key,
-                                 const size_t private_key_length);
+    [[deprecated("Available until Rendezvous is implemented")]] CHIP_ERROR
+    ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
+                                      NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
+                                      ErrorHandler onError, uint16_t devicePort = CHIP_PORT);
+
+    /**
+     * @brief
+     *   Called when pairing session generates a new message that should be sent to peer.
+     *
+     * @param msgBuf the new message that should be sent to the peer
+     */
+    virtual CHIP_ERROR OnNewMessageForPeer(System::PacketBuffer * msgBuf) override;
+
+    /**
+     * @brief
+     *   Called when pairing fails with an error
+     *
+     * @param error error code
+     */
+    virtual void OnPairingError(CHIP_ERROR error) override;
+
+    /**
+     * @brief
+     *   Called when the pairing is complete and the new secure session has been established
+     *
+     */
+    virtual void OnPairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId) override;
 
     /**
      * @brief
@@ -180,10 +208,16 @@ public:
      */
     CHIP_ERROR ServiceEventSignal();
 
-    virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                   System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr);
+    void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
+                           SecureSessionMgrBase * mgr) override;
 
-    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr);
+    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
+
+    //////////// BLECallbackHandler Implementation ///////////////
+    void OnBLEConnectionError(BLE_ERROR err) override;
+    void OnBLEConnectionComplete(BLE_ERROR err) override;
+    void OnBLEConnectionClosed(BLE_ERROR err) override;
+    void OnBLEPacketReceived(PacketBuffer * buffer) override;
 
 private:
 #if CONFIG_NETWORK_LAYER_BLE
@@ -220,6 +254,8 @@ private:
 
     ErrorHandler mOnError;
     NewConnectionHandler mOnNewConnection;
+    NewConnectionHandler mPairingComplete = nullptr;
+    MessageReceiveHandler mAppMsgHandler  = nullptr;
     System::PacketBuffer * mCurReqMsg;
 
     NodeId mLocalDeviceId;
@@ -228,8 +264,26 @@ private:
     Optional<NodeId> mRemoteDeviceId;
     uint32_t mMessageNumber = 0;
 
+    SecurePairingSession mPairingSession;
+    uint16_t mNextKeyId     = 0;
+    bool mPairingInProgress = false;
+
+    uint32_t mSetupPINCode     = 0;
+    uint16_t mPeerKeyId        = 0;
+    uint16_t mLocalPairedKeyId = 0;
+
     void ClearRequestState();
     void ClearOpState();
+
+    static void PairingMessageHandler(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
+
+    static void BLEConnectionHandler(ChipDeviceController * deviceController, Transport::PeerConnectionState * state,
+                                     void * appReqState);
+
+    CHIP_ERROR ConnectDeviceUsingPairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
+                                         NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
+                                         ErrorHandler onError, uint16_t devicePort, uint16_t localKeyId,
+                                         SecurePairingSession * pairing);
 };
 
 } // namespace DeviceController

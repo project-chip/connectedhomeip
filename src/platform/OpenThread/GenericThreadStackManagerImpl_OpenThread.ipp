@@ -806,9 +806,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
         VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
     }
 
-    // Disable automatic assignment of Thread advertised addresses.
-#if OPENTHREAD_CONFIG_ENABLE_SLAAC
-    otIp6SetSlaacEnabled(otInst, false);
+    // Enable automatic assignment of Thread advertised addresses.
+#if OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE
+    otIp6SetSlaacEnabled(otInst, true);
 #endif
 
     // If the Thread stack has been provisioned, but is not currently enabled, enable it now.
@@ -927,9 +927,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_JoinerStart(voi
         uint32_t pincode;
 
         SuccessOrExit(error = ConfigurationMgr().GetSetupPinCode(pincode));
-        snprintf(pskd.m8, sizeof(pskd.m8) - 1, "%u", pincode);
+        snprintf(pskd.m8, sizeof(pskd.m8) - 1, "%09" PRIu32, pincode);
 
-        ChipLogProgress(DeviceLayer, "Joiner PSKd: %u", pincode);
+        ChipLogProgress(DeviceLayer, "Joiner PSKd: %s", pskd.m8);
         error = MapOpenThreadError(otJoinerStart(mOTInst, pskd.m8, NULL, NULL, NULL, NULL, NULL,
                                                  &GenericThreadStackManagerImpl_OpenThread::OnJoinerComplete, this));
     }

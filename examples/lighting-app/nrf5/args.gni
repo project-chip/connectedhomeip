@@ -14,18 +14,7 @@
 
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/src/platform/nRF5/args.gni")
+import("${chip_root}/examples/platform/nrf528xx/args.gni")
 
 # SDK target. This is overriden to add our SDK app_config.h & defines.
 nrf5_sdk_target = get_label_info(":sdk", "label_no_toolchain")
-
-arm_arch = "armv7e-m"
-arm_float_abi = "hard"
-arm_cpu = "cortex-m4"
-arm_fpu = "fpv4-sp-d16"
-
-ble_project_config_include = "<CHIPProjectConfig.h>"
-chip_device_project_config_include = "<CHIPProjectConfig.h>"
-chip_project_config_include = "<CHIPProjectConfig.h>"
-inet_project_config_include = "<CHIPProjectConfig.h>"
-system_project_config_include = "<CHIPProjectConfig.h>"

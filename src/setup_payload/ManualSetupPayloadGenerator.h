@@ -40,7 +40,6 @@
 
 #include <string>
 
-using namespace std;
 namespace chip {
 
 class ManualSetupPayloadGenerator
@@ -52,7 +51,7 @@ public:
     ManualSetupPayloadGenerator(const SetupPayload & payload) : mSetupPayload(payload){};
 
     // Populates decimal string representation of the payload into outDecimalString
-    CHIP_ERROR payloadDecimalStringRepresentation(string & outDecimalString);
+    CHIP_ERROR payloadDecimalStringRepresentation(std::string & outDecimalString);
 };
 
 }; // namespace chip

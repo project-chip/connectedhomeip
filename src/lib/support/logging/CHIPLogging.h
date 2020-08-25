@@ -101,7 +101,6 @@ enum LogModule
     kLogModule_SoftwareUpdate,
     kLogModule_TokenPairing,
     kLogModule_TimeService,
-    kLogModule_chipTunnel,
     kLogModule_Heartbeat,
     kLogModule_chipSystemLayer,
     kLogModule_EventLogging,
@@ -298,7 +297,7 @@ extern void SetLogFilter(uint8_t category);
 
 #if _CHIP_USE_LOGGING
 
-#define ChipLoggingchipPrefixLen 6
+#define ChipLoggingChipPrefixLen 6
 #define ChipLoggingModuleNameLen 3
 #define ChipLoggingMessageSeparatorLen 2
 #define ChipLoggingMessageTrailerLen 2
@@ -307,7 +306,7 @@ extern void SetLogFilter(uint8_t category);
 
 extern void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const char * msg);
 extern void GetModuleName(char * buf, uint8_t module);
-void PrintMessagePrefix(uint8_t module);
+extern void PrintMessagePrefix(uint8_t module);
 
 #else
 
@@ -323,17 +322,7 @@ static inline void GetModuleName(char * buf, uint8_t module)
 
 #endif // _CHIP_USE_LOGGING
 
-#if CHIP_LOG_FILTERING
-
-extern uint8_t gLogFilter;
-
-#define IsCategoryEnabled(CAT) ((CAT) <= gLogFilter)
-
-#else // CHIP_LOG_FILTERING
-
-#define IsCategoryEnabled(CAT) (true)
-
-#endif // CHIP_LOG_FILTERING
+extern bool IsCategoryEnabled(uint8_t CAT);
 
 /**
  *  @def ChipLogIfFalse(aCondition)

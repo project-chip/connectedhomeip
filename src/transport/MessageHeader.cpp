@@ -73,6 +73,8 @@ constexpr uint16_t kFlagDestinationNodeIdPresent = 0x0100;
 constexpr uint16_t kFlagSourceNodeIdPresent = 0x0200;
 /// Header flag specifying that a source vendor id is included in the header.
 constexpr uint16_t kFlagVendorIdPresent = 0x0400;
+/// Header flag specifying that it is a control message for secure session.
+constexpr uint16_t kFlagSecureSessionControlMessage = 0x0800;
 
 /// Mask to extract just the version part from a 16bit header prefix.
 constexpr uint16_t kVersionMask = 0xF000;
@@ -145,7 +147,8 @@ CHIP_ERROR MessageHeader::Decode(const uint8_t * data, size_t size, size_t * dec
     version = ((mHeader & kVersionMask) >> kVersionShift);
     VerifyOrExit(version == kHeaderVersion, err = CHIP_ERROR_VERSION_MISMATCH);
 
-    mEncryptionType = (EncryptionType)((mHeader & kEncryptionTypeMask) >> kEncryptionTypeShift);
+    mEncryptionType          = (EncryptionType)((mHeader & kEncryptionTypeMask) >> kEncryptionTypeShift);
+    mSecureSessionControlMsg = mHeader & kFlagSecureSessionControlMessage;
 
     mMessageId = LittleEndian::Read32(p);
 
@@ -253,6 +256,11 @@ CHIP_ERROR MessageHeader::Encode(uint8_t * data, size_t size, size_t * encode_si
     }
 
     header |= (((uint16_t) mEncryptionType << kEncryptionTypeShift) & kEncryptionTypeMask);
+
+    if (mSecureSessionControlMsg)
+    {
+        header |= kFlagSecureSessionControlMessage;
+    }
 
     LittleEndian::Write16(p, header);
     LittleEndian::Write32(p, mMessageId);

@@ -49,7 +49,7 @@ typedef enum
 {
     kFault_DNSResolverNew,  /**< Fail the allocation of a DNSResolver object */
     kFault_Send,            /**< Fail sending a message over TCP or UDP */
-    kFault_SendNonCritical, /**< Fail sending a UDP message returning an error considered non-critical by WRMP */
+    kFault_SendNonCritical, /**< Fail sending a UDP message returning an error considered non-critical by RMP */
     kFault_NumItems,
 } InetFaultInjectionID;
 

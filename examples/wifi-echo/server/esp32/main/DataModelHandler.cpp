@@ -22,18 +22,17 @@
 
 #include "esp_log.h"
 #include <system/SystemPacketBuffer.h>
+#include <transport/MessageHeader.h>
 
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
 
-extern "C" {
 #include "attribute-storage.h"
-#include "chip-zcl/chip-zcl-zpro-codec.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
 #include "gen/znet-bookkeeping.h"
 #include "util.h"
-}
+#include <app/chip-zcl-zpro-codec.h>
 
 using namespace ::chip;
 
@@ -45,10 +44,10 @@ void InitDataModelHandler()
     emAfInit();
 }
 
-void HandleDataModelMessage(System::PacketBuffer * buffer)
+void HandleDataModelMessage(const MessageHeader & header, System::PacketBuffer * buffer, SecureSessionMgrBase * mgr)
 {
     EmberApsFrame frame;
-    bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame);
+    bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) > 0;
     if (ok)
     {
         ESP_LOGI(TAG, "APS frame processing success!");
@@ -60,12 +59,13 @@ void HandleDataModelMessage(System::PacketBuffer * buffer)
         return;
     }
 
+    ChipResponseDestination responseDest(header.GetSourceNodeId().Value(), mgr);
     uint8_t * message;
     uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
     ok                  = emberAfProcessMessage(&frame,
                                0, // type
                                message, messageLen,
-                               0, // source node id
+                               &responseDest, // source identifier
                                NULL);
 
     System::PacketBuffer::Free(buffer);

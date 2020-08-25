@@ -30,7 +30,6 @@
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
-#include <platform/internal/GenericConnectivityManagerImpl_NoTunnel.h>
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 #include <support/FlagUtils.hpp>
 
@@ -60,8 +59,7 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 #else
                                       public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>,
 #endif
-                                      public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl>,
-                                      public Internal::GenericConnectivityManagerImpl_NoTunnel<ConnectivityManagerImpl>
+                                      public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl>
 {
     // Allow the ConnectivityManager interface class to delegate method calls to
     // the implementation methods provided by this class.

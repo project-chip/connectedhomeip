@@ -15,7 +15,7 @@
 	url = https://github.com/nestlabs/nlio.git
 	branch = master
 	ignore = dirty
-	commit = dbb78fb4f188bb09ba51626341e1dffa636aa0da
+	commit = 8a4048faf7c84c6c9e3c9b3e79f7dc48d5d69f71
 [submodule "nlunit-test"]
 	path = third_party/nlunit-test/repo
 	url = https://github.com/nestlabs/nlunit-test.git
@@ -39,28 +39,40 @@
 	url = https://github.com/jeremyjh/ESP32_TFT_library.git
 	branch = master
 	ignore = dirty
-	commit = 42cadf2de25fa7e9b5d5d5189e90756cf9938df2
+	commit = a1ece2c500cf179db8f0c7dbc7bb8f3ace562142
 [submodule "pigweed"]
 	path = third_party/pigweed/repo
 	url = https://pigweed.googlesource.com/pigweed/pigweed
 	branch = master
 	ignore = dirty
-	commit = ab1851d75e981378fc2bfe99855a2f7c8a887086
+	commit = 22dd0b0b486810b64bf528a38651c8d8c7b8274c
 [submodule "openthread"]
 	path = third_party/openthread/repo
 	url = https://github.com/openthread/openthread.git
 	branch = master
 	ignore = dirty
-	commit = 5e9b2818eb9811b957f74ba8ad64f00fb62e8ea0
+	commit = 6886ff1e4c5dcf1bdc6ac7a067a81debff113938
 [submodule "ot-br-posix"]
 	path = third_party/ot-br-posix/repo
 	url = https://github.com/openthread/ot-br-posix.git
 	branch = master
 	ignore = dirty
-	commit = 3e7580c2d11c610ac7e65b89754dcc18b5b49da2
+	commit = ecc25701117fc99c6630584dc98294527a145f7d
 [submodule "bluez"]
 	path = third_party/bluez/repo
 	url = git://git.kernel.org/pub/scm/bluetooth/bluez.git
 	branch = master
 	ignore = dirty
-	commit = 18e137db73e2ae6d307e62ac8430f7326efdb0c3
+	commit = 8ecfe3221a699f7e1d731a16a4da8e5c349bf754
+[submodule "ot-commissioner"]
+	path = third_party/ot-commissioner/repo
+	url = https://github.com/openthread/ot-commissioner
+	branch = master
+	ignore = dirty
+	commit = ad96e6f6f5b1915844ba4481bf8d0b66af91175e
+[submodule "cirque"]
+	path = third_party/cirque/repo
+	url = https://github.com/openweave/cirque.git
+	branch = master
+	ignore = dirty
+	commit = f0214d37db6e7c91dce393493ca249129c442e6d

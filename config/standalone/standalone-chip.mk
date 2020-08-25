@@ -98,6 +98,7 @@ CHIP_CONFIGURE_OPTIONS = \
     --with-network-layer=all \
     --with-target-network=sockets \
     --with-inet-endpoint="tcp udp" \
+    --with-device-layer=linux \
     --disable-tests \
     --disable-tools \
     --disable-docs \
@@ -139,7 +140,10 @@ STD_LIBS += \
     -lInetLayer \
     -lnlfaultinjection \
     -lSupportLayer \
-    -lSystemLayer
+    -lSystemLayer \
+    -lDeviceLayer \
+    -lCHIPDataModel \
+    -lCHIP
 
 STD_LIBS += $(shell pkg-config --libs openssl)
 
@@ -165,7 +169,8 @@ STD_LINK_PREREQUISITES += \
     $(CHIP_OUTPUT_DIR)/lib/libInetLayer.a \
     $(CHIP_OUTPUT_DIR)/lib/libnlfaultinjection.a \
     $(CHIP_OUTPUT_DIR)/lib/libSupportLayer.a \
-    $(CHIP_OUTPUT_DIR)/lib/libSystemLayer.a
+    $(CHIP_OUTPUT_DIR)/lib/libSystemLayer.a \
+    $(CHIP_OUTPUT_DIR)/lib/libCHIPDataModel.a
 
 ifeq ($(findstring linux,$(CHIP_HOST_ARCH)),linux)
 STD_LINK_PREREQUISITES += $(CHIP_OUTPUT_DIR)/lib/libot_br_client.a

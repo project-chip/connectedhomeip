@@ -79,7 +79,6 @@ static const char ModuleNames[] = "-\0\0" // None
                                   "SWU"   // SoftwareUpdate
                                   "TP\0"  // TokenPairing
                                   "TS\0"  // TimeServices
-                                  "TUN"   // chipTunnel
                                   "HB\0"  // Heartbeat
                                   "CSL"   // chipSystemLayer
                                   "EVL"   // Event Logging
@@ -149,12 +148,6 @@ exit:
 #endif // CHIP_LOGGING_STYLE_STDIO_WITH_TIMESTAMPS
 }
 
-#if CHIP_LOG_FILTERING
-
-uint8_t gLogFilter = kLogCategory_Max;
-
-#endif // CHIP_LOG_FILTERING
-
 /**
  * Log, to the platform-specified mechanism, the specified log
  * message, @a msg, for the specified module, @a module, in the
@@ -188,21 +181,41 @@ DLL_EXPORT void Log(uint8_t module, uint8_t category, const char * msg, ...)
     va_end(v);
 }
 
+#if CHIP_LOG_FILTERING
+uint8_t gLogFilter = kLogCategory_Max;
+DLL_EXPORT bool IsCategoryEnabled(uint8_t category)
+{
+    return (category <= gLogFilter);
+}
+
 DLL_EXPORT uint8_t GetLogFilter()
 {
-#if CHIP_LOG_FILTERING
     return gLogFilter;
-#else
-    return kLogCategory_Max;
-#endif
 }
 
 DLL_EXPORT void SetLogFilter(uint8_t category)
 {
-#if CHIP_LOG_FILTERING
     gLogFilter = category;
-#endif
 }
+
+#else  // CHIP_LOG_FILTERING
+
+DLL_EXPORT bool IsCategoryEnabled(uint8_t category)
+{
+    (void) category;
+    return true;
+}
+
+DLL_EXPORT uint8_t GetLogFilter()
+{
+    return kLogCategory_Max;
+}
+
+DLL_EXPORT void SetLogFilter(uint8_t category)
+{
+    (void) category;
+}
+#endif // CHIP_LOG_FILTERING
 
 #endif /* _CHIP_USE_LOGGING */
 

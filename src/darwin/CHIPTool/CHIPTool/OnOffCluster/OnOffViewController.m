@@ -57,8 +57,6 @@
     [self reconnectIfNeeded];
 
     [self.onOff lightOn];
-
-    [self postResult:@"Turning light on"];
 }
 
 - (IBAction)offButtonTapped:(id)sender
@@ -66,8 +64,6 @@
     [self reconnectIfNeeded];
 
     [self.onOff lightOff];
-
-    [self postResult:@"Turning light off"];
 }
 
 - (IBAction)toggleButtonTapped:(id)sender
@@ -75,8 +71,6 @@
     [self reconnectIfNeeded];
 
     [self.onOff toggleLight];
-
-    [self postResult:@"Toggling light"];
 }
 
 @end

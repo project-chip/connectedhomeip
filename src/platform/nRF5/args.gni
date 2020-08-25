@@ -12,14 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-device_platform = "nrf5"
+import("//build_overrides/chip.gni")
+import("//build_overrides/nrf5_sdk.gni")
+import("//build_overrides/openthread.gni")
+
+chip_device_platform = "nrf5"
 
 lwip_platform = "nrf5"
 lwip_ipv6 = true
 lwip_ipv4 = false
 lwip_api = true
 
-inet_config_enable_ipv4 = false
-inet_config_enable_dns_resolver = false
+chip_inet_config_enable_ipv4 = false
+chip_inet_config_enable_dns_resolver = false
 
 chip_build_tests = false
+
+mbedtls_target = "${chip_root}/third_party/nrf5_sdk"
+openthread_external_mbedtls = mbedtls_target
+
+openthread_project_core_config_file = "openthread-core-nrf52840-config.h"
+openthread_core_config_platform_check_file =
+    "openthread-core-nrf52840-config-check.h"
+openthread_core_config_deps = [ "${chip_root}/third_party/openthread/platforms/nrf528xx:openthread_core_config_nrf52840" ]
+
+openthread_external_platform = "${chip_root}/third_party/openthread/platforms/nrf528xx:libopenthread-nrf52840-softdevice-sdk"

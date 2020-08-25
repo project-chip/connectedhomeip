@@ -33,6 +33,7 @@
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <inet/InetFaultInjection.h>
 #include <support/CHIPFaultInjection.h>
@@ -230,7 +231,7 @@ FaultInjectionOptions::FaultInjectionOptions()
         "  --extra-cleanup-time\n"
         "       Allow extra time before asserting resource leaks; this is useful when\n"
         "       running fault-injection tests to let the system free stale ExchangeContext\n"
-        "       instances after WRMP has exhausted all retransmission; a failed WRMP transmission\n"
+        "       instances after RMP has exhausted all retransmission; a failed RMP transmission\n"
         "       should fail a normal happy-sequence test, but not necessarily a fault-injection test.\n"
         "       The value is in milliseconds; a common value is 10000.\n"
         "\n"

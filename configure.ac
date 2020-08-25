@@ -966,11 +966,11 @@ AC_DEFINE_UNQUOTED([CONFIG_NETWORK_LAYER_INET],[${CONFIG_NETWORK_LAYER_INET}],[D
 AC_MSG_CHECKING([device layer])
 AC_ARG_WITH(device-layer,
     [AS_HELP_STRING([--with-device-layer=LAYER],
-        [Specify the target environment for the CHIP Device Layer.  Choose one of: auto, darwin, efr32, esp32, nrf5, nrfconnect, linux, or none @<:@default=auto@:>@.])],
+        [Specify the target environment for the CHIP Device Layer.  Choose one of: auto, darwin, efr32, esp32, nrf5, k32w, nrfconnect, linux, or none @<:@default=auto@:>@.])],
     [
         case "${with_device_layer}" in
 
-        auto|darwin|efr32|esp32|nrf5|nrfconnect|linux|none)
+        auto|darwin|efr32|esp32|nrf5|k32w|nrfconnect|linux|none)
             ;;
 
         *)
@@ -987,6 +987,7 @@ CHIP_DEVICE_LAYER_TARGET_DARWIN=0
 CHIP_DEVICE_LAYER_TARGET_EFR32=0
 CHIP_DEVICE_LAYER_TARGET_ESP32=0
 CHIP_DEVICE_LAYER_TARGET_NRF5=0
+CHIP_DEVICE_LAYER_TARGET_K32W=0
 CHIP_DEVICE_LAYER_TARGET_LINUX=0
 CHIP_DEVICE_LAYER_TARGET_NRFCONNECT=0
 
@@ -1035,6 +1036,13 @@ nrf5)
       CFLAGS="${CFLAGS} -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb -mabi=aapcs"
       CXXFLAGS="${CXXFLAGS} -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb -mabi=aapcs"
       ;;
+      
+       
+k32w)
+      CONFIG_DEVICE_LAYER=1
+      CHIP_DEVICE_LAYER_TARGET=K32W
+      CHIP_DEVICE_LAYER_TARGET_K32W=1
+      ;;
 
 nrfconnect)
       CONFIG_DEVICE_LAYER=1
@@ -1076,6 +1084,10 @@ AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_ESP32],[${CHIP_DEVICE_LAYER_TARGET_
 AC_SUBST(CHIP_DEVICE_LAYER_TARGET_NRF5)
 AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_NRF5],    [test "${CHIP_DEVICE_LAYER_TARGET_NRF5}" = 1])
 AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_NRF5],[${CHIP_DEVICE_LAYER_TARGET_NRF5}],[Define to 1 if you want to build the CHIP Device Layer for Nordic nRF5* platforms.])
+
+AC_SUBST(CHIP_DEVICE_LAYER_TARGET_K32W)
+AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_K32W],    [test "${CHIP_DEVICE_LAYER_TARGET_K32W}" = 1])
+AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_K32W],[${CHIP_DEVICE_LAYER_TARGET_K32W}],[Define to 1 if you want to build the CHIP Device Layer for NXP K32W platforms.])
 
 AC_SUBST(CHIP_DEVICE_LAYER_TARGET_NRFCONNECT)
 AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_NRFCONNECT],    [test "${CHIP_DEVICE_LAYER_TARGET_NRFCONNECT}" = 1])
@@ -1757,6 +1769,7 @@ NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
                 -DOPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1 \
                 -DOPENTHREAD_CONFIG_JOINER_ENABLE=1 \
                 -DOPENTHREAD_CONFIG_NCP_UART_ENABLE=1 \
+                -DOPENTHREAD_CONFIG_IP6_SLAAC_ENABLE=1 \
                 -DUART_AS_SERIAL_TRANSPORT=1"
 
             (mkdir -p ${ac_pwd}/third_party/openthread \
@@ -2152,7 +2165,7 @@ CONFIG_WIFI_PLATFORM_WPA=0
 enable_chipwifi_wpa="no"
 
 # At this time, enable this only for linux, and only if the GIO package are installed. Currently, WiFi and Thread
-# are depending on the gdbus-internal configured by internal BLuez package. 
+# are depending on the gdbus-internal configured by internal BLuez package.
 # TODO: Refacrot BLuez to use common gdbus lib from GIO.
 
 if test "${with_device_layer}" = "linux" && test "${CHIP_ENABLE_GIO}" = 1 && test "${CONFIG_BLE_PLATFORM_BLUEZ}" = 1; then
@@ -2461,11 +2474,8 @@ third_party/ot-br-posix/Makefile
 src/Makefile
 src/include/Makefile
 src/app/Makefile
-src/app/chip-zcl/Makefile
-src/app/chip-zcl-zpro/Makefile
-src/app/gen/Makefile
-src/app/plugin/Makefile
-src/app/plugin/tests/Makefile
+src/app/clusters/Makefile
+src/app/util/Makefile
 src/ble/Makefile
 src/ble/tests/Makefile
 src/controller/java/Makefile
