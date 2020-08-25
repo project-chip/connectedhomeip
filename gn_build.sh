@@ -99,7 +99,7 @@ else
 fi
 
 opts=$(getopt --longoptions "pincode:,discriminator:" -n "$0" --options "" -- "$@")
-eval set --$opts
+eval set --"$opts"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
