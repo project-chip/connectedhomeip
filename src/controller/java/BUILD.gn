@@ -16,15 +16,11 @@ import("//build_overrides/chip.gni")
 import("//gn/chip/java/rules.gni")
 
 shared_library("jni") {
-  output_name="libCHIPController"
+  output_name = "libCHIPController"
 
-  sources = [
-    "CHIPDeviceController-JNI.cpp",
-  ]
+  sources = [ "CHIPDeviceController-JNI.cpp" ]
 
-  deps = [
-    "//src/lib",
-  ]
+  deps = [ "//src/lib" ]
 
   output_dir = "${root_out_dir}/lib"
 }
@@ -32,19 +28,15 @@ shared_library("jni") {
 java_library("java") {
   output_name = "CHIPController.jar"
 
-  data_deps = [
-    ":jni",
-  ]
+  data_deps = [ ":jni" ]
 
   sources = [
+    "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
-    "src/chip/devicecontroller/ChipCommandType.java",
   ]
 
-  javac_flags = [
-    "-Xlint:deprecation",
-  ]
+  javac_flags = [ "-Xlint:deprecation" ]
 
   # TODO: add classpath support (we likely need to add something like
   #  ..../platforms/android-21/android.jar to access BLE items)
