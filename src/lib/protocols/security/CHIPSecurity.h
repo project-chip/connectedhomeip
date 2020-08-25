@@ -31,7 +31,7 @@
 #include <core/CHIPVendorIdentifiers.hpp>
 
 /**
- *   @namespace chip::Profiles::Security
+ *   @namespace chip::Protocols::Security
  *
  *   @brief
  *     This namespace includes all interfaces within CHIP for the
@@ -39,10 +39,10 @@
  */
 
 namespace chip {
-namespace Profiles {
+namespace Protocols {
 namespace Security {
 
-// Message Types for CHIP Security Profile
+// Message Types for CHIP Security Protocol
 //
 enum
 {
@@ -99,11 +99,11 @@ enum
     kChipMsgCounterSyncRespMsgSize = 4, // The size of the message counter synchronization response message.
 };
 
-// Data Element Tags for the CHIP Security Profile
+// Data Element Tags for the CHIP Security Protocol
 //
 enum
 {
-    // ---- Top-level Profile-Specific Tags ----
+    // ---- Top-level Protocol-Specific Tags ----
     kTag_ChipCertificate                = 1, // [ structure ] A CHIP certificate.
     kTag_EllipticCurvePrivateKey        = 2, // [ structure ] An elliptic curve private key.
     kTag_RSAPrivateKey                  = 3, // [ structure ] An RSA private key.
@@ -338,7 +338,7 @@ enum
 };
 
 } // namespace Security
-} // namespace Profiles
+} // namespace Protocols
 } // namespace chip
 
 #endif /* CHIPSECURITY_H_ */
