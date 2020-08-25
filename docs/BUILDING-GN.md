@@ -288,6 +288,16 @@ To find dependency paths:
 gn path out/host //src/transport/tests:tests //src/system
 ```
 
+### Useful gn arguments
+
+You can specify these gn arguments in the `--args=` section of the command to
+customize your build.
+
+-   `chip_device_config_use_test_setup_pin_code`: The setup pincode of the 
+    device if not found in the storage.
+-   `chip_device_config_use_test_setup_discriminator`: The discriminator of the
+    device if not found in the storage.
+
 ## Maintaining CHIP
 
 If you make any change to the GN build system, the next build will regenerate
