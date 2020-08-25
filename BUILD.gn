@@ -36,7 +36,6 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       "${chip_root}/src/app",
       "${chip_root}/src/ble",
       "${chip_root}/src/controller",
-      "${chip_root}/src/controller:java",
       "${chip_root}/src/crypto",
       "${chip_root}/src/inet",
       "${chip_root}/src/lib",
@@ -67,6 +66,12 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
         "${chip_root}/examples/shell",
         "${chip_root}/src/qrcodetool",
         "${chip_root}/src/setup_payload",
+      ]
+    }
+
+    if (compile_java) {
+      deps += [
+        "${chip_root}/src/controller:java",
       ]
     }
   }

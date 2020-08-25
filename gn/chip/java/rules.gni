@@ -23,6 +23,8 @@ jar_runner = "//gn/chip/java/jar_runner.py"
 #   output_name: File name for the output .jar (not including extension).
 #     Defaults to the input .jar file name.
 #
+#   javac_flags: additional flags to pass to the javac compiler
+#
 template("java_library") {
   # Figure out the output name
   _jar_name = target_name
@@ -50,7 +52,7 @@ template("java_library") {
 
   # Compiles the given files into a directory and generates a 'class list'
   _javac_target_name = target_name + "__javac"
-  _class_dir = rebase_path(target_gen_dir, root_build_dir) + "/classes"
+  _class_dir = rebase_path(target_out_dir, root_build_dir) + "/classes"
   _class_list_file = "$target_gen_dir/$target_name.classlist"
   action(_javac_target_name) {
     sources = rebase_path(_java_files, root_build_dir)
@@ -71,20 +73,21 @@ template("java_library") {
   }
 
   # Bundles all files within the 'class directory' into a jar file
+  _jar_output = "$root_build_dir/lib/$_jar_name"
   action(target_name) {
     deps = [
       ":$_javac_target_name",
     ]
 
     outputs = [
-      "$target_gen_dir/$_jar_name",
+      _jar_output,
     ]
 
     script = jar_runner
 
     args = [
       "cf",
-      rebase_path("$target_gen_dir/$_jar_name", root_build_dir),
+      rebase_path(_jar_output, root_build_dir),
       "-C", _class_dir, "."
     ]
   }
