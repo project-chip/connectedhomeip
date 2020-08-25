@@ -15,7 +15,6 @@
 javac_runner = "//gn/chip/java/javac_runner.py"
 jar_runner = "//gn/chip/java/jar_runner.py"
 
-
 # Declare a java library target
 #
 #   sources: List of .java files included in this library.
@@ -33,7 +32,7 @@ template("java_library") {
   } else {
     _jar_name += ".jar"
   }
-  
+
   # Additional flags
   _javac_flags = []
   if (defined(invoker.javac_flags)) {
@@ -53,7 +52,6 @@ template("java_library") {
   # What files will be compiled
   _java_files = invoker.sources
 
-
   # Generates a .java file containing all sources to be compiled
   _java_sources_file = "$target_gen_dir/$target_name.sources"
   if (defined(invoker.java_sources_file)) {
@@ -68,40 +66,39 @@ template("java_library") {
   action(_javac_target_name) {
     sources = _java_files
 
-    outputs = [
-      _class_list_file
-    ]
+    outputs = [ _class_list_file ]
 
     script = javac_runner
 
     args = [
-      "--classdir", _class_dir,
-      "--outfile", rebase_path(_class_list_file, root_build_dir),
-      "--",
-      "-d", _class_dir,
-      "@" + rebase_path(_java_sources_file, root_build_dir),
-    ] + _javac_flags
+             "--classdir",
+             _class_dir,
+             "--outfile",
+             rebase_path(_class_list_file, root_build_dir),
+             "--",
+             "-d",
+             _class_dir,
+             "@" + rebase_path(_java_sources_file, root_build_dir),
+           ] + _javac_flags
   }
 
   # Bundles all files within the 'class directory' into a jar file
   _jar_output = "$root_build_dir/lib/$_jar_name"
   action(target_name) {
-    deps = [
-      ":$_javac_target_name",
-    ] + _deps
+    deps = [ ":$_javac_target_name" ] + _deps
 
     data_deps = _data_deps
 
-    outputs = [
-      _jar_output,
-    ]
+    outputs = [ _jar_output ]
 
     script = jar_runner
 
     args = [
       "cf",
       rebase_path(_jar_output, root_build_dir),
-      "-C", _class_dir, "."
+      "-C",
+      _class_dir,
+      ".",
     ]
   }
 }
