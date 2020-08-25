@@ -15,8 +15,6 @@
 declare_args() {
   # Debug build. Set this to false to remove development features.
   is_debug = true
-
-  compile_java = target_os == "android"
 }
 
 if (target_os == "") {
