@@ -56,26 +56,26 @@ bool emberAfPluginIdentifyStopFeedbackCallback(uint8_t endpoint)
     return false;
 }
 
-/** @brief Barrier Control Cluster Barrier Control Stop
- *
- *
- *
- */
-bool emberAfBarrierControlClusterBarrierControlStopCallback(void)
-{
-    return false;
-}
+// /** @brief Barrier Control Cluster Barrier Control Stop
+//  *
+//  *
+//  *
+//  */
+// bool emberAfBarrierControlClusterBarrierControlStopCallback(void)
+// {
+//     return false;
+// }
 
-/** @brief Barrier Control Cluster Barrier Control Go To Percent
- *
- *
- *
- * @param percentOpen   Ver.: always
- */
-bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(uint8_t percentOpen)
-{
-    return false;
-}
+// /** @brief Barrier Control Cluster Barrier Control Go To Percent
+//  *
+//  *
+//  *
+//  * @param percentOpen   Ver.: always
+//  */
+// bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(uint8_t percentOpen)
+// {
+//     return false;
+// }
 
 /** @brief Basic Cluster Reset To Factory Defaults
  *
@@ -952,7 +952,7 @@ EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(uint8_t end
 // void emberAfIdentifyClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId) {}
 // void emberAfIdentifyClusterServerInitCallback(uint8_t endpoint) {}
 
-void emberAfPluginBarrierControlServerInitCallback(void) {}
+void emberAfLevelControlClusterServerInitCallback(uint8_t endpoint) {}
 
 void emberAfPluginDoorLockServerInitCallback(void) {}
 void emberAfPluginReportingInitCallback(void) {}
