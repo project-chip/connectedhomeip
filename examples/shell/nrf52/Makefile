@@ -57,12 +57,11 @@ SRCS = \
     $(PROJECT_ROOT)/cmd_base64.cpp \
     $(PROJECT_ROOT)/cmd_btp.cpp \
     $(PROJECT_ROOT)/cmd_device.cpp \
-    $(PROJECT_ROOT)/data_model_handler.cpp \
     $(PROJECT_ROOT)/test_identity.cpp \
     $(NRF5_PLATFORM_DIR)/app/support/CXXExceptionStubs.cpp \
     $(NRF5_PLATFORM_DIR)/app/support/nRF5Sbrk.c \
     $(NRF5_PLATFORM_DIR)/app/support/FreeRTOSNewlibLockSupport.c \
-    $(NRF5_PLATFORM_DIR)/app/Server.cpp \
+    $(NRF5_PLATFORM_DIR)/app/support/FreeRTOSDebuggingHooks.c \
     $(NRF5_PLATFORM_DIR)/app/chipinit.cpp \
     $(NRF5_PLATFORM_DIR)/util/streamer/streamer_nrf5.cpp \
     $(NRF5_SDK_ROOT)/components/ble/common/ble_advdata.c \
