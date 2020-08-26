@@ -19,5 +19,4 @@ import("//build_overrides/chip.gni")
 
 # ESP32 has its own mbedtls, so nothing to do, just provide a target
 group("mbedtls") {
-
 }
