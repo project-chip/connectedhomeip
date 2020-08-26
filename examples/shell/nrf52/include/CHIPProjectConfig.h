@@ -139,4 +139,7 @@
 #define CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE chip::Profiles::DataManagement::Debug
 #endif // BUILD_RELEASE
 
+// Enable support functions for parsing command-line arguments
+#define CHIP_CONFIG_ENABLE_ARG_PARSER 1
+
 #endif // CHIP_PROJECT_CONFIG_H

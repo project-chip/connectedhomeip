@@ -132,12 +132,7 @@ SRCS = \
 
 INC_DIRS = \
     $(PROJECT_ROOT) \
-    $(PROJECT_ROOT)/include \
     $(PROJECT_ROOT)/nrf52/include \
-    $(PROJECT_ROOT)/main \
-    $(PROJECT_ROOT)/main/include \
-    $(PROJECT_ROOT)/main/traits/include \
-    $(PROJECT_ROOT)/main/schema/include \
     $(PROJECT_ROOT)/third_party/printf \
     $(CHIP_ROOT)/src/ \
     $(CHIP_ROOT)/src/lib \
@@ -249,8 +244,7 @@ else
     CHIP_DEFINES += CHIP_CONFIG_LOG_LEVEL=OT_LOG_LEVEL_INFO
 endif
 
-#CHIP_PROJECT_CONFIG = $(PROJECT_ROOT)/include/CHIPProjectConfig.h
-CHIP_PROJECT_CONFIG = $(NRF5_PLATFORM_DIR)/app/project_include/CHIPProjectConfig.h
+CHIP_PROJECT_CONFIG = $(PROJECT_ROOT)/nrf52/include/CHIPProjectConfig.h
 
 LINKER_SCRIPT = $(NRF5_PLATFORM_DIR)/app/ldscripts/chip-nrf52840-example.ld
 
