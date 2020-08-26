@@ -15,27 +15,8 @@
 # Options from standalone-chip.mk that differ from configure defaults. These
 # options are used from examples/.
 
-#import("//build_overrides/chip.gni")
+import("//build_overrides/chip.gni")
 
-chip_device_platform = "esp32"
-
-chip_project_config_include = ""
-chip_system_project_config_include = ""
-chip_ble_project_config_include = ""
-
-mbedtls_target = "//mbedtls:mbedtls"
-lwip_platform = "esp32"
-lwip_ipv6 = true
-lwip_ipv4 = true
-lwip_api = true
-
-chip_build_tests = false
-chip_inet_config_enable_raw_endpoint = false
-chip_inet_config_enable_dns_resolver = false
-
-#Enabling this causes some error
-#chip_inet_config_enable_tun_endpoint = false
-chip_inet_config_enable_tcp_endpoint = true
-chip_inet_config_enable_udp_endpoint = true
-
-custom_toolchain = "//third_party/connectedhomeip/config/esp32/toolchain:esp32"
+# ESP32 has its own mbedtls, so nothing to do, just provide a target
+group("mbedtls") {
+}

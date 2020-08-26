@@ -21,6 +21,8 @@ lwip_ipv6 = true
 lwip_ipv4 = true
 lwip_api = true
 
+mbedtls_target = "//mbedtls:mbedtls"
+
 chip_build_tests = false
 chip_inet_config_enable_raw_endpoint = false
 chip_inet_config_enable_dns_resolver = false
