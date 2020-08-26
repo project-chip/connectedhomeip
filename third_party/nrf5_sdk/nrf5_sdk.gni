@@ -129,8 +129,6 @@ template("nrf5_sdk") {
       "MULTIPROTOCOL_802154_CONFIG_PRESENT",
       "NRFX_PRS_ENABLED=0",
       "NRF_SD_BLE_API_VERSION=7",
-      "UART0_ENABLED=0",
-      "UART1_ENABLED=1",
       "SOFTDEVICE_PRESENT=1",
     ]
     if (defined(invoker.defines)) {
