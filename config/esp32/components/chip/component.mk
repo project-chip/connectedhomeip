@@ -153,9 +153,6 @@ COMPONENT_ADD_INCLUDEDIRS 	 = project-config \
 COMPONENT_ADD_LDFLAGS        = -L$(OUTPUT_DIR)/lib/ \
                                -lCHIP
 
-ifneq (,$(findstring CHIP_SUPPORT_FOREIGN_TEST_DRIVERS,$(CXXFLAGS)))
-COMPONENT_ADD_LDFLAGS       += -lnlfaultinjection
-endif
 
 # Tell the ESP-IDF build system that the CHIP component defines its own build
 # and clean targets.
