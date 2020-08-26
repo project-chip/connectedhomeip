@@ -16,11 +16,7 @@ import("//build_overrides/chip.gni")
 
 chip_device_platform = "esp32"
 
-lwip_platform = "esp32"
-lwip_ipv6 = true
-lwip_ipv4 = true
-lwip_api = true
-
+lwip_platform = "external"
 mbedtls_target = "//mbedtls:mbedtls"
 
 chip_build_tests = false

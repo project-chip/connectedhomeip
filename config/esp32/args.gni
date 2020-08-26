@@ -24,10 +24,7 @@ chip_system_project_config_include = ""
 chip_ble_project_config_include = ""
 
 mbedtls_target = "//mbedtls:mbedtls"
-lwip_platform = "esp32"
-lwip_ipv6 = true
-lwip_ipv4 = true
-lwip_api = true
+lwip_platform = "external"
 
 chip_build_tests = false
 chip_inet_config_enable_raw_endpoint = false
