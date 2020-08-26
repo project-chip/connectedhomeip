@@ -15,38 +15,40 @@
 name: Android
 
 on:
-  push:
-  pull_request:
+    push:
+    pull_request:
 
 jobs:
-  build:
-    name: Build
+    build:
+        name: Build
 
-    env:
-      BUILD_VERSION: 0.2.18
-      BUILD_IMAGE: chip-build-openssl
-      BUILD_ORG: connectedhomeip
+        strategy:
+            matrix:
+                type: [arm, arm64]
 
-    runs-on: ubuntu-latest
+        env:
+            BUILD_TYPE: ${{ matrix.type }}
 
-    container:
-      image: connectedhomeip/chip-build-android:0.4.2
-      volumes:
-        - "/tmp/log_output:/tmp/test_logs"
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          submodules: true
-      - name: Bootstrap
-        run: scripts/build/gn_bootstrap.sh
-      - name: Setup Build
-        run: |
-          GN_ARGS='is_clang=true target_os="android" target_cpu="arm"'
-          export PATH=$PATH:/usr/local/share/android-ndk-r21b/toolchains/llvm/prebuilt/linux-x86_64/bin/
-          scripts/build/gn_gen.sh --args="$GN_ARGS"
-      - name: Run Build
-        run: |
-          export PATH=$PATH:/usr/local/share/android-ndk-r21b/toolchains/llvm/prebuilt/linux-x86_64/bin/
-          scripts/build/gn_build.sh
+        container:
+            image: connectedhomeip/chip-build-android:0.4.2
+            volumes:
+                - "/tmp/log_output:/tmp/test_logs"
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  submodules: true
+            - name: Bootstrap
+              run: scripts/build/gn_bootstrap.sh
+            - name: Setup Build
+              run: |
+                  GN_ARGS='is_clang=true target_os="android" target_cpu="${BUILD_TYPE}"'
+                  export PATH=$PATH:/usr/local/share/android-ndk-r21b/toolchains/llvm/prebuilt/linux-x86_64/bin/
+                  scripts/build/gn_gen.sh --args="$GN_ARGS"
+            - name: Run Build
+              run: |
+                  export PATH=$PATH:/usr/local/share/android-ndk-r21b/toolchains/llvm/prebuilt/linux-x86_64/bin/
+                  scripts/build/gn_build.sh
