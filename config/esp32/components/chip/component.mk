@@ -206,10 +206,10 @@ install-chip :
 	echo "import(\"//args.gni\")"          >> $(OUTPUT_DIR)/args.gn
 	echo target_cflags_c  = [$(foreach word,$(CHIP_CFLAGS),\"$(word)\",)] | sed -e 's/=\"/=\\"/g;s/\"\"/\\"\"/g;'  >> $(OUTPUT_DIR)/args.gn
 	echo target_cflags_cc = [$(foreach word,$(CHIP_CXXFLAGS),\"$(word)\",)] | sed -e 's/=\"/=\\"/g;s/\"\"/\\"\"/g;'   >> $(OUTPUT_DIR)/args.gn
-	echo ar_ext = \"$(AR)\"                >> $(OUTPUT_DIR)/args.gn
-	echo cc_ext = \"$(CC)\"                >> $(OUTPUT_DIR)/args.gn
-	echo cxx_ext = \"$(CXX)\"              >> $(OUTPUT_DIR)/args.gn
-	echo cpu_ext = \"esp32\"               >> $(OUTPUT_DIR)/args.gn
+	echo esp32_ar = \"$(AR)\"                >> $(OUTPUT_DIR)/args.gn
+	echo esp32_cc = \"$(CC)\"                >> $(OUTPUT_DIR)/args.gn
+	echo esp32_cxx = \"$(CXX)\"              >> $(OUTPUT_DIR)/args.gn
+	echo esp32_cpu = \"esp32\"               >> $(OUTPUT_DIR)/args.gn
 	echo "Written file $(OUTPUT_DIR)/args.gn"
 #	MAKEFLAGS= make -C $(OUTPUT_DIR) --no-print-directory install
 	cd $(COMPONENT_PATH); gn gen $(OUTPUT_DIR)
