@@ -115,4 +115,3 @@ if (lwip_target == "external") {
     deps = [ ":lwip_all" ]
   }
 }
-
