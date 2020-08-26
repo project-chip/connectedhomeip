@@ -137,8 +137,10 @@ template("flashable_executable") {
     deps = [ ":$image_target" ]
 
     args = [
-      "--output", rebase_path(flasher_script, root_build_dir),
-      "--image", rebase_path(flasher_image, root_build_dir),
+      "--output",
+      rebase_path(flasher_script, root_build_dir),
+      "--image",
+      rebase_path(flasher_image, root_build_dir),
     ]
     script = "make_flasher.py"
   }
