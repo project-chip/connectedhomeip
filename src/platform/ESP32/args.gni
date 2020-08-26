@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 chip_device_platform = "esp32"
 
 lwip_platform = "esp32"
+lwip_target = "external"
 lwip_ipv6 = true
 lwip_ipv4 = true
 lwip_api = true

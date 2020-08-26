@@ -24,6 +24,9 @@ declare_args() {
 
   # lwIP platform: standalone, freertos.
   lwip_platform = ""
+
+  # lwIP target: external, internal(default)
+  lwip_target = ""
 }
 
 if (lwip_platform == "") {
@@ -32,8 +35,8 @@ if (lwip_platform == "") {
   }
 }
 
-assert(lwip_platform == "standalone" || lwip_platform == "nrf5" ||
-           lwip_platform == "esp32" || lwip_platform == "efr32",
+assert(lwip_target == "external" || lwip_platform == "standalone" ||
+           lwip_platform == "nrf5" || lwip_platform == "efr32",
        "Unsupported lwIP platform: ${lwip_platform}")
 
 if (lwip_platform == "nrf5") {
@@ -48,7 +51,7 @@ buildconfig_header("lwip_buildconfig") {
 
   # Automatically enable LWIP_DEBUG for internal is_debug builds.
   defines = []
-  if (lwip_platform != "esp32") {
+  if (lwip_target != "external") {
     if (lwip_debug) {
       lwip_debug = 1
     } else {
@@ -63,47 +66,53 @@ buildconfig_header("lwip_buildconfig") {
   }
 }
 
-config("lwip_config") {
-  include_dirs = [ lwip_platform ]
-
-  if (lwip_platform != "standalone") {
-    include_dirs += [ "freertos" ]
+if (lwip_target == "external") {
+  group("all") {
+    public_deps = [ ":lwip_buildconfig" ]
   }
-}
+} else {
+  config("lwip_config") {
+    include_dirs = [ lwip_platform ]
 
-lwip_target("lwip") {
-  public = [
-    "${lwip_platform}/arch/cc.h",
-    "${lwip_platform}/arch/perf.h",
-    "${lwip_platform}/lwipopts.h",
-  ]
+    if (lwip_platform != "standalone") {
+      include_dirs += [ "freertos" ]
+    }
+  }
 
-  sources = []
-
-  if (lwip_platform == "standalone") {
-    public += [ "standalone/arch/sys_arch.h" ]
-    sources += [ "standalone/sys_arch.c" ]
-  } else {
-    public += [
-      "${lwip_platform}/lwippools.h",
-      "freertos/arch/sys_arch.h",
+  lwip_target("lwip") {
+    public = [
+      "${lwip_platform}/arch/cc.h",
+      "${lwip_platform}/arch/perf.h",
+      "${lwip_platform}/lwipopts.h",
     ]
-    sources += [ "freertos/sys_arch.c" ]
-  }
 
-  public_deps = [ ":lwip_buildconfig" ]
-  if (lwip_platform == "nrf5") {
-    public_deps += [ "${nrf5_sdk_build_root}:nrf5_sdk" ]
-  } else if (lwip_platform == "efr32") {
-    public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
-  }
+    sources = []
 
-  public_configs = [
-    ":lwip_config",
-    "${chip_root}/src:includes",
-  ]
+    if (lwip_platform == "standalone") {
+      public += [ "standalone/arch/sys_arch.h" ]
+      sources += [ "standalone/sys_arch.c" ]
+    } else {
+      public += [
+        "${lwip_platform}/lwippools.h",
+        "freertos/arch/sys_arch.h",
+      ]
+      sources += [ "freertos/sys_arch.c" ]
+    }
+
+    public_deps = [ ":lwip_buildconfig" ]
+    if (lwip_platform == "nrf5") {
+      public_deps += [ "${nrf5_sdk_build_root}:nrf5_sdk" ]
+    } else if (lwip_platform == "efr32") {
+      public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
+    }
+
+    public_configs = [
+      ":lwip_config",
+      "${chip_root}/src:includes",
+    ]
+  }
+  group("all") {
+    deps = [ ":lwip_all" ]
+  }
 }
 
-group("all") {
-  deps = [ ":lwip_all" ]
-}

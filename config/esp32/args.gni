@@ -24,6 +24,7 @@ chip_system_project_config_include = ""
 chip_ble_project_config_include = ""
 
 lwip_platform = "esp32"
+lwip_target = "external"
 lwip_ipv6 = true
 lwip_ipv4 = true
 lwip_api = true
