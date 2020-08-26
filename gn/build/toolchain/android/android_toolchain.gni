@@ -14,9 +14,7 @@
 
 import("//build/toolchain/gcc_toolchain.gni")
 
-
 template("android_clang_toolchain") {
-
   if (current_cpu == "arm") {
     _tool_name_root = "armv7a-linux-androideabi${invoker.api_level}-"
     _toolchain_args = {
@@ -50,13 +48,13 @@ template("android_clang_toolchain") {
   }
 
   _android_toolchain_args = {
-      current_os = "android"
-      is_clang = true
+    current_os = "android"
+    is_clang = true
 
-      forward_variables_from(_toolchain_args, "*")
-      if (defined(invoker.toolchain_args)) {
-        forward_variables_from(invoker.toolchain_args, "*")
-      }
+    forward_variables_from(_toolchain_args, "*")
+    if (defined(invoker.toolchain_args)) {
+      forward_variables_from(invoker.toolchain_args, "*")
+    }
   }
 
   gcc_toolchain(target_name) {
