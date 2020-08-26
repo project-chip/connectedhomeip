@@ -54,9 +54,9 @@ nrf5_sdk("sdk") {
 executable("shell_nrf5") {
   output_name = "shell-nrf52840"
 
-  include_dirs = [ 
+  include_dirs = [
     "${chip_root}/src/lib/shell",
-    "${nrf5_sdk_root}/components/libraries/uart"
+    "${nrf5_sdk_root}/components/libraries/uart",
   ]
 
   sources = [
@@ -68,13 +68,13 @@ executable("shell_nrf5") {
     "${nrf5_platform_dir}/util/LEDWidget.cpp",
     "${nrf5_platform_dir}/util/include/LEDWidget.h",
     "${nrf5_platform_dir}/util/streamer/streamer_nrf5.cpp",
-    "${project_dir}/main.cpp",
-    "${project_dir}/cmd_misc.cpp",
     "${project_dir}/cmd_base64.cpp",
     "${project_dir}/cmd_btp.cpp",
     "${project_dir}/cmd_device.cpp",
+    "${project_dir}/cmd_misc.cpp",
+    "${project_dir}/main.cpp",
+    "${project_dir}/nrf52/include/CHIPProjectConfig.h",
     "${project_dir}/test_identity.cpp",
-    "${project_dir}/nrf52/include/CHIPProjectConfig.h"
   ]
 
   deps = [
@@ -97,7 +97,10 @@ executable("shell_nrf5") {
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
 
-  defines = [ "NRF_SHELL_STREAMER", "SHELL_STREAMER_APP_SPECIFIC" ]
+  defines = [
+    "NRF_SHELL_STREAMER",
+    "SHELL_STREAMER_APP_SPECIFIC",
+  ]
 }
 
 group("nrf5") {
