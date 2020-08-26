@@ -17,6 +17,8 @@ import("//build_overrides/nrf5_sdk.gni")
 import("//build_overrides/openthread.gni")
 
 import("${nrf5_sdk_build_root}/nrf5_sdk.gni")
+import("${nrf5_sdk_build_root}/nrf5_executable.gni")
+flashing_script_generator = "${nrf5_sdk_build_root}/gen_flashing_script.py"
 
 assert(current_os == "freertos")
 
@@ -51,7 +53,7 @@ nrf5_sdk("sdk") {
   defines += [ "USE_APP_CONFIG" ]
 }
 
-executable("lighting_app") {
+nrf5_executable("lighting_app") {
   output_name = "chip-nrf52840-lighting-example"
 
   sources = [
@@ -107,8 +109,25 @@ executable("lighting_app") {
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
 }
 
+gen_flashing_script("softdevice_script") {
+  flashing_script_name = "$root_build_dir/chip-nrf52840-softdevice.flash.py"
+  flashing_action = [
+    "flash",
+    "--wildcard",
+    "${nrf5_sdk_root}/components/softdevice/s140/hex/s140_nrf52_*_softdevice.hex",
+  ]
+}
+
+gen_erasing_script("erase_script") {
+  erasing_script_name = "$root_build_dir/chip-nrf52840.erase.py"
+}
+
 group("nrf5") {
-  deps = [ ":lighting_app" ]
+  deps = [
+    ":lighting_app",
+    ":erase_script",
+    ":softdevice_script",
+  ]
 }
 
 group("default") {
