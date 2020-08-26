@@ -1902,6 +1902,11 @@ typedef struct
 #define MAIN_FUNCTION_PARAMETERS void
 #define MAIN_FUNCTION_ARGUMENTS
 
+/**
+ * @brief assume millisecond ticks
+ */
+#define MILLISECOND_TICKS_PER_SECOND 1000
+
 // Stubs to just silence some compile errors
 
 #define emberAfPrintEnabled(...) false
