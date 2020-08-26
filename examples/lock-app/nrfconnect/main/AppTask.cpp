@@ -363,7 +363,7 @@ void AppTask::JoinerHandler(AppEvent * aEvent)
     error = ThreadStackMgr().JoinerStart();
 #endif
 
-    LOG_INF("Thread joiner triggering result: %s", chip::ErrorStr(error));
+    LOG_INF("Thread joiner triggering result: %s", log_strdup(chip::ErrorStr(error)));
 }
 
 void AppTask::CancelTimer()
