@@ -51,7 +51,100 @@ nrf5_sdk("sdk") {
   defines += [ "USE_APP_CONFIG" ]
 }
 
-executable("lock_app") {
+# Convert a binary to a target format using objcopy.
+# TODO: This is not specific to nrf5; it could be shared by any
+#       similar toolchain. The `command_wrapper.py` script is
+#       merely a workaround for GN's requirement that actions
+#       run Python scripts rather than arbitrary programs.
+#
+template("objcopy_convert") {
+  forward_variables_from(invoker,
+                         [
+                           "conversion_input",
+                           "conversion_output",
+                           "conversion_target_format",
+                           "deps",
+                           "objcopy",
+                         ])
+
+  action(target_name) {
+    inputs = [ conversion_input ]
+    outputs = [ conversion_output ]
+
+    args = [
+      objcopy,
+      "-O",
+      conversion_target_format,
+      rebase_path(conversion_input, root_build_dir),
+      rebase_path(conversion_output, root_build_dir),
+    ]
+    script = rebase_path("command_wrapper.py")
+  }
+}
+
+# Build target for an executable, converted to the preferred form for flashing,
+# plus a script that performs the flashing operation.
+#
+# The intent is that every flashable (or testable) build target in CHIP will
+# ultimately be flashable/runnable in a consistent way — by a script as here,
+# or by a common tool using consistently generated metadata — with platform
+# and build-target details encapsulated.
+#
+# TODO:
+#
+# Currently all of this flashable_executable() is GN-target-independent but
+# not toolchain- or platform-independent. Flash script generation could evolve
+# to be platform-independent by having `make_flasher.py` be part of the platform.
+# Objcopy could also be wrapped in a platform-specific script to encapsulate
+# the target format.
+#
+# This is loosely inspired by Fuchsia's template("image_binary"). However,
+# Fuchsia uses a wrapper around GN toolchains to deal with the problem of
+# things like `objcopy` not being first-class tools in GN with composable
+# configuration, and that does not seem compatible with Pigweed's toolchain
+# utilities.
+
+template("flashable_executable") {
+  executable_target = "$target_name.executable"
+  executable_name = invoker.output_name
+
+  image_target = "$target_name.image"
+  image_name = executable_name + ".hex"
+  image_format = "ihex"
+
+  flasher_target = target_name
+  flasher_name = executable_name + ".flash.py"
+
+  executable(executable_target) {
+    forward_variables_from(invoker, "*")
+  }
+
+  objcopy_convert(image_target) {
+    conversion_input = "${root_build_dir}/${executable_name}"
+    conversion_output = "${root_build_dir}/${image_name}"
+    conversion_target_format = image_format
+    deps = [ ":$executable_target" ]
+
+    # TODO: This shouldn't be here.
+    objcopy = "arm-none-eabi-objcopy"
+  }
+
+  action(flasher_target) {
+    flasher_script = "$root_build_dir/${flasher_name}"
+    flasher_image = "${root_build_dir}/${image_name}"
+
+    outputs = [ flasher_script ]
+    deps = [ ":$image_target" ]
+
+    args = [
+      "--output", rebase_path(flasher_script, root_build_dir),
+      "--image", rebase_path(flasher_image, root_build_dir),
+    ]
+    script = "make_flasher.py"
+  }
+}
+
+flashable_executable("lock_app") {
   output_name = "chip-nrf52840-lock-example"
 
   sources = [
