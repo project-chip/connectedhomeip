@@ -30,6 +30,10 @@ import stat
 import subprocess
 import zipfile
 
+LOG_KEEP_DAYS = 3
+BINARY_KEEP_DAYS = 30
+BINARY_MAX_COUNT = 20
+
 
 class SectionChange:
   """Describes delta changes to a specific section"""
@@ -241,11 +245,26 @@ def main():
   current_time = datetime.datetime.now()
   seen_names = set()
   pull_artifact_re = re.compile('^(.*)-pull-(\\d+)$')
+  binary_count = 0
   for a in artifacts:
     # logs cleanup after 3 days
     is_log = a.name.endswith('-logs')
 
-    if (current_time - a.created_at).days > 30 or (is_log and (current_time - a.created_at).days > 3):
+    if not is_log:
+      binary_count = binary_count + 1
+
+    need_delete = False
+    if (current_time - a.created_at).days > BINARY_KEEP_DAYS:
+      # Do not keep binary builds forever
+      need_delete = True
+    elif not is_log and binary_count > BINARY_MAX_COUNT:
+      # Keep a maximum number of binary packages
+      need_delete = True
+    elif is_log and (current_time - a.created_at).days > LOG_KEEP_DAYS):
+      # Logs are kept even shorter
+      need_delete = True
+    
+    if need_delete:
       logging.info('Old artifact: %s' % a.name)
       a.delete()
       continue
