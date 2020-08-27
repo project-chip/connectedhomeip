@@ -43,4 +43,10 @@ void emberAfPrintln(int category, const char * format, ...);
  * */
 void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, bool withSpace);
 
+/**
+ * @brief Prints a strings
+ * @param category - Currently ignored as zcl categories do not map to chip categories. Defaults to kLogCategory_Progress.
+ * @param string - Buffer to print as a string
+ * */
+void emberAfPrintString(int category, const uint8_t * string);
 #endif // EMBER_PRINT

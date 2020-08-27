@@ -39,7 +39,7 @@
  ******************************************************************************/
 
 #include "scenes-client.h"
-#include "../../include/af.h"
+#include "af.h"
 
 bool emberAfScenesClusterAddSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId)
 {
