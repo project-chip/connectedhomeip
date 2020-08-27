@@ -21,7 +21,7 @@ An example application showing the use
 
 ## Introduction
 
-![nrf52840 DK](doc/images/nrf52840-dk.jpg)
+![nrf52840 DK](../../platform/nrf528xx/doc/images/nrf52840-dk.jpg)
 
 The nRF52840 lighting example application provides a working demonstration of a
 connected lighting device, built using CHIP, and the Nordic nRF5 SDK. The
