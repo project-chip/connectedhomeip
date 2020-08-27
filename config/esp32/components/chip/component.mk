@@ -149,7 +149,8 @@ COMPONENT_ADD_INCLUDEDIRS 	 = project-config \
 COMPONENT_ADD_LDFLAGS        = -L$(OUTPUT_DIR)/lib/ \
                                -lCHIP
 
-CHIP_BUILD_WITH_GN ?=
+CHIP_BUILD_WITH_GN ?= ""
+
 ifeq ($(CHIP_BUILD_WITH_GN),y)
 COMPONENT_ADD_INCLUDEDIRS +=   $(REL_OUTPUT_DIR)/src/include \
                                $(REL_CHIP_ROOT)/third_party/nlassert/repo/include \
