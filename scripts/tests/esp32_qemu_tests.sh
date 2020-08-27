@@ -35,7 +35,8 @@ fi
 # Currently only crypto, inet, and system tests are configured to run on QEMU.
 # The specific qualifiers will be removed, once all CHIP unit tests are
 # updated to run on QEMU.
-idf make V=1 -C "$chip_dir"/src/test_driver/esp32/build/chip/src/crypto check
-idf make V=1 -C "$chip_dir"/src/test_driver/esp32/build/chip/src/inet check
-idf make V=1 -C "$chip_dir"/src/test_driver/esp32/build/chip/src/system check
-idf make V=1 -C "$chip_dir"/src/test_driver/esp32/build/chip/src/transport check
+"$chip_dir"/src/crypto/tests/qemu_crypto_tests.sh "$chip_dir" "$chip_dir"/src/test_driver/esp32/build/
+"$chip_dir"/src/inet/tests/qemu_inet_tests.sh "$chip_dir" "$chip_dir"/src/test_driver/esp32/build/
+"$chip_dir"/src/system/tests/qemu_system_tests.sh "$chip_dir" "$chip_dir"/src/test_driver/esp32/build/
+"$chip_dir"/src/transport/tests/qemu_transport_tests.sh "$chip_dir" "$chip_dir"/src/test_driver/esp32/build/
+
