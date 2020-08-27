@@ -26,85 +26,65 @@
 #include <stdio.h>
 #include <string.h>
 #include <support/logging/CHIPLogging.h>
+#include <core/CHIPEncoding.h>
+
+template<int N>
+struct Reader {};
+
+template<> struct Reader<1> {
+    static uint8_t read(const uint8_t*& p) {
+        return chip::Encoding::Read8(p);
+    }
+};
+
+template<> struct Reader<2> {
+    static uint16_t read(const uint8_t*& p) {
+        return chip::Encoding::LittleEndian::Read16(p);
+    }
+};
 
 extern "C" {
 
 uint16_t extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * outApsFrame)
 {
-
     if (buffer == NULL || buf_length == 0 || outApsFrame == NULL)
     {
         ChipLogError(Zcl, "Error extracting APS frame. invalid inputs");
         return 0;
     }
+
+    const uint8_t * read_ptr = buffer;
+
     // Skip first byte, because that's the always-0 frame control.
-    uint8_t nextByteToRead = 1;
+    ++read_ptr;
+    --buf_length;
 
-    if (nextByteToRead >= buf_length)
-    {
-        ChipLogError(Zcl, "Error extracting APS frame after reading first byte");
-        return 0;
-    }
-    memcpy(&outApsFrame->profileId, buffer + nextByteToRead, sizeof(outApsFrame->profileId));
-    nextByteToRead += sizeof(outApsFrame->profileId);
+#define TRY_READ(fieldName, fieldSize)                                  \
+    do {                                                                \
+        static_assert(sizeof(outApsFrame->fieldName) == fieldSize,      \
+                      "incorrect size for " #fieldName);                \
+        if (buf_length < fieldSize)                                     \
+        {                                                               \
+            ChipLogError(Zcl, "Missing " #fieldName                     \
+                         " when extracting APS frame");                 \
+            return 0;                                                   \
+        }                                                               \
+        outApsFrame->fieldName = Reader<fieldSize>::read(read_ptr);     \
+        buf_length -= fieldSize;                                        \
+    } while (0)
 
-    if (nextByteToRead >= buf_length)
-    {
-        ChipLogError(Zcl, "Error extracting APS frame after reading profileId");
-        return 0;
-    }
-    memcpy(&outApsFrame->clusterId, buffer + nextByteToRead, sizeof(outApsFrame->clusterId));
-    nextByteToRead += sizeof(outApsFrame->clusterId);
+    TRY_READ(profileId, 2);
+    TRY_READ(clusterId, 2);
+    TRY_READ(sourceEndpoint, 1);
+    TRY_READ(destinationEndpoint, 1);
+    TRY_READ(options, 2);
+    TRY_READ(groupId, 2);
+    TRY_READ(sequence, 1);
+    TRY_READ(radius, 1);
 
-    if (nextByteToRead >= buf_length)
-    {
-        ChipLogError(Zcl, "Error extracting APS frame after reading clusterId");
-        return 0;
-    }
-    memcpy(&outApsFrame->sourceEndpoint, buffer + nextByteToRead, sizeof(outApsFrame->sourceEndpoint));
-    nextByteToRead += sizeof(outApsFrame->sourceEndpoint);
-
-    if (nextByteToRead >= buf_length)
-    {
-        ChipLogError(Zcl, "Error extracting APS frame after reading sourceEndpoint");
-        return 0;
-    }
-    memcpy(&outApsFrame->destinationEndpoint, buffer + nextByteToRead, sizeof(outApsFrame->destinationEndpoint));
-    nextByteToRead += sizeof(outApsFrame->destinationEndpoint);
-
-    if (nextByteToRead >= buf_length)
-    {
-        ChipLogError(Zcl, "Error extracting APS frame after reading destinationEndpoint");
-        return 0;
-    }
-    memcpy(&outApsFrame->options, buffer + nextByteToRead, sizeof(outApsFrame->options));
-    nextByteToRead += sizeof(outApsFrame->options);
-
-    if (nextByteToRead >= buf_length)
-    {
-        ChipLogError(Zcl, "Error extracting APS frame after reading options");
-        return 0;
-    }
-    memcpy(&outApsFrame->groupId, buffer + nextByteToRead, sizeof(outApsFrame->groupId));
-    nextByteToRead += sizeof(outApsFrame->groupId);
-
-    if (nextByteToRead >= buf_length)
-    {
-        ChipLogError(Zcl, "Error extracting APS frame after reading groupId");
-        return 0;
-    }
-    memcpy(&outApsFrame->sequence, buffer + nextByteToRead, sizeof(outApsFrame->sequence));
-    nextByteToRead += sizeof(outApsFrame->sequence);
-
-    if (nextByteToRead >= buf_length)
-    {
-        ChipLogError(Zcl, "Error extracting APS frame after reading sequence");
-        return 0;
-    }
-    memcpy(&outApsFrame->radius, buffer + nextByteToRead, sizeof(outApsFrame->radius));
-    nextByteToRead += sizeof(outApsFrame->radius);
-
-    return nextByteToRead;
+#under TRY_READ
+    
+    return read_ptr - buffer;
 }
 
 void printApsFrame(EmberApsFrame * frame)

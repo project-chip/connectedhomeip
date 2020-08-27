@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/nlio.gni")
 
 config("app_config") {
   include_dirs = [
@@ -35,6 +36,7 @@ static_library("app") {
     ":codec_headers",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/system",
+    "${nlio_root}:nlio",
   ]
 
   public_configs = [

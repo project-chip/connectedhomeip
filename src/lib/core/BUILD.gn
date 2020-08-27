@@ -116,6 +116,7 @@ static_library("core") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
     "${chip_root}/src/system",
+    "${chip_root}/src/app",
     "${nlio_root}:nlio",
   ]
 
@@ -125,5 +126,6 @@ static_library("core") {
     "${chip_root}/src/inet",
     "${chip_root}/src/platform",
     "${chip_root}/src/system",
+    "${chip_root}/src/app",
   ]
 }
