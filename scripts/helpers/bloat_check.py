@@ -32,7 +32,13 @@ import zipfile
 
 LOG_KEEP_DAYS = 3
 BINARY_KEEP_DAYS = 30
-BINARY_MAX_COUNT = 20
+
+# Count is reasonably large because each build has multiple artifacts
+# Currently (Sep 2020) each build has 4 artifacts:
+#   gn-nrf, gn-linux, examples-esp32, example-nrf
+#
+# We should eventually remove the non-gn version to save space.
+BINARY_MAX_COUNT = 80
 
 
 class SectionChange:
@@ -260,12 +266,12 @@ def main():
     elif not is_log and binary_count > BINARY_MAX_COUNT:
       # Keep a maximum number of binary packages
       need_delete = True
-    elif is_log and (current_time - a.created_at).days > LOG_KEEP_DAYS):
+    elif is_log and (current_time - a.created_at).days > LOG_KEEP_DAYS:
       # Logs are kept even shorter
       need_delete = True
     
     if need_delete:
-      logging.info('Old artifact: %s' % a.name)
+      logging.info('Old artifact: %s from %r' % (a.name, a.created_at))
       a.delete()
       continue
 
