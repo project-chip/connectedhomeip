@@ -23,4 +23,4 @@
 export abs_top_srcdir=$1
 export abs_top_builddir=$2
 export QEMU_TEST_TARGET=libSystemLayerTests.a
-$(abs_top_srcdir)/scripts/tools/qemu_run_test.sh
+$abs_top_srcdir/scripts/tools/qemu_run_test.sh
