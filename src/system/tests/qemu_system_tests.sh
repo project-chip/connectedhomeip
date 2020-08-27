@@ -20,4 +20,7 @@
 #      Execute system tests by setting the correct environment
 #
 
-abs_top_srcdir=$1 abs_top_builddir=$2 QEMU_TEST_TARGET=libSystemLayerTests.a $(abs_top_srcdir)/scripts/tools/qemu_run_test.sh
+export abs_top_srcdir=$1
+export abs_top_builddir=$2
+export QEMU_TEST_TARGET=libSystemLayerTests.a
+$(abs_top_srcdir)/scripts/tools/qemu_run_test.sh
