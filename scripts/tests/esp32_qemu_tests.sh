@@ -35,8 +35,8 @@ fi
 # Currently only crypto, inet, and system tests are configured to run on QEMU.
 # The specific qualifiers will be removed, once all CHIP unit tests are
 # updated to run on QEMU.
-"$chip_dir"/src/crypto/tests/qemu_crypto_tests.sh "$chip_dir" "$chip_dir"/src/test_driver/esp32/build/
-"$chip_dir"/src/inet/tests/qemu_inet_tests.sh "$chip_dir" "$chip_dir"/src/test_driver/esp32/build/
-"$chip_dir"/src/system/tests/qemu_system_tests.sh "$chip_dir" "$chip_dir"/src/test_driver/esp32/build/
-"$chip_dir"/src/transport/tests/qemu_transport_tests.sh "$chip_dir" "$chip_dir"/src/test_driver/esp32/build/
+"$chip_dir"/src/crypto/tests/qemu_crypto_tests.sh "$chip_dir" "$chip_dir"/src/test_driver/esp32/build/chip/
+"$chip_dir"/src/inet/tests/qemu_inet_tests.sh "$chip_dir" "$chip_dir"/src/test_driver/esp32/build/chip/
+"$chip_dir"/src/system/tests/qemu_system_tests.sh "$chip_dir" "$chip_dir"/src/test_driver/esp32/build/chip/
+"$chip_dir"/src/transport/tests/qemu_transport_tests.sh "$chip_dir" "$chip_dir"/src/test_driver/esp32/build/chip/
 
