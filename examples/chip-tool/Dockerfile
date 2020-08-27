@@ -18,7 +18,6 @@
 from generic_node_image
 
 COPY out/debug/chip-tool /usr/bin/
-COPY out/debug/chip-tool-server /usr/bin/
 COPY entrypoint.sh /
 
 ENTRYPOINT ["/entrypoint.sh", "tool"]

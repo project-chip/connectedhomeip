@@ -12,22 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
+# The location of the build configuration file.
+buildconfig = "//build/config/BUILDCONFIG.gn"
 
-import("${chip_root}/gn/chip/tools.gni")
+# CHIP uses angle bracket includes.
+check_system_includes = true
 
-assert(chip_build_tools)
+# Allow loading paths relative to //gn.
+secondary_source = "//third_party/connectedhomeip/gn/"
 
-executable("chip-tool") {
-  sources = [ "main.cpp" ]
-
-  if (is_debug) {
-    defines = [ "BUILD_RELEASE=0" ]
-  } else {
-    defines = [ "BUILD_RELEASE=1" ]
-  }
-
-  public_deps = [ "${chip_root}/src/lib" ]
-
-  output_dir = root_out_dir
+default_args = {
+  import("//args.gni")
 }
