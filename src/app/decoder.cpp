@@ -83,7 +83,7 @@ uint16_t extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * 
     TRY_READ(radius, 1);
 
 #under TRY_READ
-    
+
     return read_ptr - buffer;
 }
 
