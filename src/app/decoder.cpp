@@ -23,24 +23,26 @@
 //                            InterPanHeader *interPanHeader)
 
 #include <app/chip-zcl-zpro-codec.h>
+#include <core/CHIPEncoding.h>
 #include <stdio.h>
 #include <string.h>
 #include <support/logging/CHIPLogging.h>
-#include <core/CHIPEncoding.h>
 
-template<int N>
-struct Reader {};
-
-template<> struct Reader<1> {
-    static uint8_t read(const uint8_t*& p) {
-        return chip::Encoding::Read8(p);
-    }
+template <int N>
+struct Reader
+{
 };
 
-template<> struct Reader<2> {
-    static uint16_t read(const uint8_t*& p) {
-        return chip::Encoding::LittleEndian::Read16(p);
-    }
+template <>
+struct Reader<1>
+{
+    static uint8_t read(const uint8_t *& p) { return chip::Encoding::Read8(p); }
+};
+
+template <>
+struct Reader<2>
+{
+    static uint16_t read(const uint8_t *& p) { return chip::Encoding::LittleEndian::Read16(p); }
 };
 
 extern "C" {
@@ -59,18 +61,17 @@ uint16_t extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * 
     ++read_ptr;
     --buf_length;
 
-#define TRY_READ(fieldName, fieldSize)                                  \
-    do {                                                                \
-        static_assert(sizeof(outApsFrame->fieldName) == fieldSize,      \
-                      "incorrect size for " #fieldName);                \
-        if (buf_length < fieldSize)                                     \
-        {                                                               \
-            ChipLogError(Zcl, "Missing " #fieldName                     \
-                         " when extracting APS frame");                 \
-            return 0;                                                   \
-        }                                                               \
-        outApsFrame->fieldName = Reader<fieldSize>::read(read_ptr);     \
-        buf_length -= fieldSize;                                        \
+#define TRY_READ(fieldName, fieldSize)                                                                                             \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        static_assert(sizeof(outApsFrame->fieldName) == fieldSize, "incorrect size for " #fieldName);                              \
+        if (buf_length < fieldSize)                                                                                                \
+        {                                                                                                                          \
+            ChipLogError(Zcl, "Missing " #fieldName " when extracting APS frame");                                                 \
+            return 0;                                                                                                              \
+        }                                                                                                                          \
+        outApsFrame->fieldName = Reader<fieldSize>::read(read_ptr);                                                                \
+        buf_length -= fieldSize;                                                                                                   \
     } while (0)
 
     TRY_READ(profileId, 2);
