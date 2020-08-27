@@ -27,7 +27,11 @@ EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/third_party/connectedhomeip/config/esp32
                         $(PROJECT_PATH)/../../../common/screen-framework \
 
 CXXFLAGS += -std=c++11 -Os
-CPPFLAGS += -Os -DCHIP_SEPARATE_CONFIG_H
+CPPFLAGS += -Os
 CFLAGS += -Os
 
+CHIP_BUILD_WITH_GN ?=
+ifeq ($(CHIP_BUILD_WITH_GN),y)
+CPPFLAGS += -DCHIP_SEPARATE_CONFIG_H
+endif
 include $(IDF_PATH)/make/project.mk

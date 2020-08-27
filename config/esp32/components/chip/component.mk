@@ -141,18 +141,30 @@ COMPONENT_ADD_INCLUDEDIRS 	 = project-config \
                                $(REL_CHIP_ROOT)/src/include/ \
                                $(REL_CHIP_ROOT)/src/lib \
                                $(REL_CHIP_ROOT)/src/ \
-                               $(REL_OUTPUT_DIR)/src/include \
                                $(REL_CHIP_ROOT)/src/system \
                                $(IDF_PATH)/components/mbedtls/mbedtls/include \
-                               $(REL_CHIP_ROOT)/src/app \
-                               $(REL_CHIP_ROOT)/third_party/nlassert/repo/include \
-                               $(REL_OUTPUT_DIR)/gen/third_party/connectedhomeip/src/app/include \
-                               $(REL_OUTPUT_DIR)/gen/include
+                               $(REL_CHIP_ROOT)/src/app
 
 # Linker flags to be included when building other components that use CHIP.
 COMPONENT_ADD_LDFLAGS        = -L$(OUTPUT_DIR)/lib/ \
                                -lCHIP
 
+CHIP_BUILD_WITH_GN ?=
+ifeq ($(CHIP_BUILD_WITH_GN),y)
+COMPONENT_ADD_INCLUDEDIRS +=   $(REL_OUTPUT_DIR)/src/include \
+                               $(REL_CHIP_ROOT)/third_party/nlassert/repo/include \
+                               $(REL_OUTPUT_DIR)/gen/third_party/connectedhomeip/src/app/include \
+                               $(REL_OUTPUT_DIR)/gen/include
+else # CHIP_BUILD_WITH_GN == y
+COMPONENT_ADD_LDFLAGS +=       -lInetLayer \
+                               -lSystemLayer \
+                               -lDeviceLayer \
+                               -lChipCrypto \
+                               -lSetupPayload
+ifneq (,$(findstring CHIP_SUPPORT_FOREIGN_TEST_DRIVERS,$(CXXFLAGS)))
+COMPONENT_ADD_LDFLAGS       += -lnlfaultinjection
+endif
+endif # CHIP_BUILD_WITH_GN == y
 
 # Tell the ESP-IDF build system that the CHIP component defines its own build
 # and clean targets.
@@ -197,7 +209,7 @@ fix_cflags = $(filter-out -DHAVE_CONFIG_H,\
 CHIP_CFLAGS = $(call fix_cflags,$(CFLAGS) $(CPPFLAGS))
 CHIP_CXXFLAGS = $(call fix_cflags,$(CXXFLAGS) $(CPPFLAGS))
 
-install-chip : $(OUTPUT_DIR)
+install-chip-with-gn : $(OUTPUT_DIR)
 	echo "INSTALL CHIP..."
 	echo                                   > $(OUTPUT_DIR)/args.gn
 	echo "import(\"//args.gni\")"          >> $(OUTPUT_DIR)/args.gn
@@ -212,6 +224,15 @@ install-chip : $(OUTPUT_DIR)
 	cd $(COMPONENT_PATH); gn gen $(OUTPUT_DIR)
 	cd $(COMPONENT_PATH); ninja -C $(OUTPUT_DIR) esp32
 
+install-chip-with-automake: configure-chip
+	echo "INSTALL CHIP..."
+	MAKEFLAGS= make -C $(OUTPUT_DIR) --no-print-directory install
+
+ifeq ($(CHIP_BUILD_WITH_GN),y)
+install-chip: install-chip-with-gn
+else
+install-chip: install-chip-with-automake
+endif
 
 build : install-chip
 	echo "CHIP built and installed..."
