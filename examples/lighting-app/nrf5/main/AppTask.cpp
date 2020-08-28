@@ -22,7 +22,8 @@
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
 #include "LightingManager.h"
-#include "Server.h"
+#include "server.h"
+#include "service.h"
 
 #include "app_button.h"
 #include "app_config.h"
@@ -76,6 +77,7 @@ bool sHaveServiceConnectivity = false;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
+DemoSessionManager sessions;
 
 int AppTask::StartAppTask()
 {
@@ -101,6 +103,10 @@ int AppTask::StartAppTask()
 int AppTask::Init()
 {
     ret_code_t ret;
+
+    // Init ZCL Data Model
+    InitDataModelHandler();
+    StartServer(&sessions);
 
     // Initialize LEDs
     sStatusLED.Init(SYSTEM_STATE_LED);

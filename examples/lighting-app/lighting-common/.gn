@@ -12,29 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
+# The location of the build configuration file.
+buildconfig = "//build/config/BUILDCONFIG.gn"
 
-config("includes") {
-  include_dirs = [ ".", "include" ]
-}
+# CHIP uses angle bracket includes.
+check_system_includes = true
 
-static_library("lock-common") {
-  output_name = "lock-common"
+# Allow loading paths relative to //gn.
+secondary_source = "//third_party/connectedhomeip/gn/"
 
-  sources = [
-    "DataModelHandler.cpp",
-    "gen/call-command-handler.c",
-    "gen/callback-stub.c",
-    "gen/znet-bookkeeping.c",
-  ]
-
-  deps = [
-    "${chip_root}/src/lib",
-  ]
-
-  public_configs = [
-    ":includes",
-  ]
-
-  output_dir = root_out_dir
+default_args = {
+  import("//args.gni")
 }

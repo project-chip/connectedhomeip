@@ -14,11 +14,6 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/UDP.h>
 
-#include "attribute-storage.h"
-#include "gen/znet-bookkeeping.h"
-#include "util.h"
-#include <app/chip-zcl-zpro-codec.h>
-
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
@@ -31,6 +26,7 @@ using namespace ::chip::DeviceLayer;
 
 // Transport Callbacks
 namespace {
+extern "C" void HandleDataModelMessage(const MessageHeader & header, System::PacketBuffer * buffer, SecureSessionMgrBase * mgr);
 
 class ServerCallback : public SecureSessionMgrCallback
 {
@@ -65,50 +61,6 @@ public:
     virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
     {
         ChipLogProgress(App, "Received a new connection.");
-    }
-
-private:
-    /**
-     * Handle a message that should be processed via our data model processing
-     * codepath.
-     *
-     * @param [in] buffer The buffer holding the message.  This function guarantees
-     *                    that it will free the buffer before returning.
-     */
-    void HandleDataModelMessage(const MessageHeader & header, System::PacketBuffer * buffer, SecureSessionMgrBase * mgr)
-    {
-        EmberApsFrame frame;
-        bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) > 0;
-        if (ok)
-        {
-            ChipLogProgress(App, "APS frame processing success!");
-        }
-        else
-        {
-            ChipLogProgress(App, "APS frame processing failure!");
-            System::PacketBuffer::Free(buffer);
-            return;
-        }
-
-        ChipResponseDestination responseDest(header.GetSourceNodeId().Value(), mgr);
-        uint8_t * message;
-        uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
-        ok                  = emberAfProcessMessage(&frame,
-                                   0, // type
-                                   message, messageLen,
-                                   &responseDest, // source identifier
-                                   NULL);
-
-        System::PacketBuffer::Free(buffer);
-
-        if (ok)
-        {
-            ChipLogProgress(App, "Data model processing success!");
-        }
-        else
-        {
-            ChipLogProgress(App, "Data model processing failure!");
-        }
     }
 };
 

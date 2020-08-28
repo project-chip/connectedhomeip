@@ -13,28 +13,3 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
-config("includes") {
-  include_dirs = [ ".", "include" ]
-}
-
-static_library("lock-common") {
-  output_name = "lock-common"
-
-  sources = [
-    "DataModelHandler.cpp",
-    "gen/call-command-handler.c",
-    "gen/callback-stub.c",
-    "gen/znet-bookkeeping.c",
-  ]
-
-  deps = [
-    "${chip_root}/src/lib",
-  ]
-
-  public_configs = [
-    ":includes",
-  ]
-
-  output_dir = root_out_dir
-}
