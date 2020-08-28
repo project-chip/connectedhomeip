@@ -91,6 +91,6 @@ exit:
     }
     else
     {
-        ChipLogProgress(App, "Lock Server Listening...");
+        ChipLogProgress(App, "Server Listening...");
     }
 }
