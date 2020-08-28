@@ -16,12 +16,12 @@
  */
 
 #include <core/CHIPCore.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #if CHIP_ENABLE_OPENTHREAD
 
 #include <stdio.h>
 
-#include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>
 #include <shell/shell.h>
 #include <support/CHIPArgParser.hpp>
@@ -34,6 +34,9 @@
 #include <openthread/ip6.h>
 #include <openthread/link.h>
 #include <openthread/thread.h>
+#else
+#include <sys/types.h>
+#include <unistd.h>
 #endif
 
 using namespace chip;
@@ -67,7 +70,16 @@ int cmd_otcli_dispatch(int argc, char ** argv)
     int i                     = 0;
 
 #if CHIP_TARGET_STYLE_UNIX
+    uid_t euid         = geteuid();
     char ctl_command[] = "/usr/local/sbin/ot-ctl ";
+
+    // Must run as sudo.
+    if (euid != 0)
+    {
+        streamer_printf(streamer_get(), "Error otcli: requires running chip-shell as sudo\n\r");
+        VerifyOrExit(euid == 0, error = CHIP_ERROR_INCORRECT_STATE);
+    }
+
     memcpy(buff, ctl_command, sizeof(ctl_command));
     buff_ptr += sizeof(ctl_command) - 1;
 #endif
