@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "AppEvent.h"
+struct AppEvent;
 
 class BoltLockManager
 {

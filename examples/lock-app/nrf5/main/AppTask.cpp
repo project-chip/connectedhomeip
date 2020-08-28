@@ -21,7 +21,8 @@
 #include "AppEvent.h"
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
-#include "Server.h"
+#include "server.h"
+#include "service.h"
 
 #include "app_button.h"
 #include "app_config.h"
@@ -45,6 +46,8 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <lib/support/logging/CHIPLogging.h>
+
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_TASK_STACK_SIZE (4096)
@@ -53,6 +56,8 @@
 #define EXAMPLE_VENDOR_ID 0xabcd
 
 APP_TIMER_DEF(sFunctionTimer);
+
+DemoSessionManager sessions;
 
 static SemaphoreHandle_t sCHIPEventLock;
 
@@ -84,7 +89,7 @@ int AppTask::StartAppTask()
     sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
     if (sAppEventQueue == NULL)
     {
-        NRF_LOG_INFO("Failed to allocate app event queue");
+        ChipLogError(App, "Failed to allocate app event queue");
         ret = NRF_ERROR_NULL;
         APP_ERROR_HANDLER(ret);
     }
@@ -102,6 +107,10 @@ int AppTask::StartAppTask()
 int AppTask::Init()
 {
     ret_code_t ret;
+
+    // Init ZCL Data Model
+    InitDataModelHandler();
+    StartServer(&sessions);
 
     // Initialize LEDs
     sStatusLED.Init(SYSTEM_STATE_LED);
@@ -127,14 +136,14 @@ int AppTask::Init()
     ret = app_button_init(sButtons, ARRAY_SIZE(sButtons), pdMS_TO_TICKS(FUNCTION_BUTTON_DEBOUNCE_PERIOD_MS));
     if (ret != NRF_SUCCESS)
     {
-        NRF_LOG_INFO("app_button_init() failed");
+        ChipLogError(App, "app_button_init() failed");
         APP_ERROR_HANDLER(ret);
     }
 
     ret = app_button_enable();
     if (ret != NRF_SUCCESS)
     {
-        NRF_LOG_INFO("app_button_enable() failed");
+        ChipLogError(App, "app_button_enable() failed");
         APP_ERROR_HANDLER(ret);
     }
 
@@ -142,21 +151,21 @@ int AppTask::Init()
     ret = app_timer_init();
     if (ret != NRF_SUCCESS)
     {
-        NRF_LOG_INFO("app_timer_init() failed");
+        ChipLogError(App, "app_timer_init() failed");
         APP_ERROR_HANDLER(ret);
     }
 
     ret = app_timer_create(&sFunctionTimer, APP_TIMER_MODE_SINGLE_SHOT, TimerEventHandler);
     if (ret != NRF_SUCCESS)
     {
-        NRF_LOG_INFO("app_timer_create() failed");
+        ChipLogError(App, "app_timer_create() failed");
         APP_ERROR_HANDLER(ret);
     }
 
     ret = BoltLockMgr().Init();
     if (ret != NRF_SUCCESS)
     {
-        NRF_LOG_INFO("BoltLockMgr().Init() failed");
+        ChipLogError(App, "BoltLockMgr().Init() failed");
         APP_ERROR_HANDLER(ret);
     }
 
@@ -165,7 +174,7 @@ int AppTask::Init()
     sCHIPEventLock = xSemaphoreCreateMutex();
     if (sCHIPEventLock == NULL)
     {
-        NRF_LOG_INFO("xSemaphoreCreateMutex() failed");
+        ChipLogError(App, "xSemaphoreCreateMutex() failed");
         APP_ERROR_HANDLER(NRF_ERROR_NULL);
     }
 
@@ -178,13 +187,13 @@ int AppTask::Init()
         err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
         if (err != CHIP_NO_ERROR)
         {
-            NRF_LOG_INFO("ConfigurationMgr().GetSetupPinCode() failed: %s", chip::ErrorStr(err));
+            ChipLogError(App, "ConfigurationMgr().GetSetupPinCode() failed: %s", chip::ErrorStr(err));
         }
 
         err = ConfigurationMgr().GetSetupDiscriminator(setUpDiscriminator);
         if (err != CHIP_NO_ERROR)
         {
-            NRF_LOG_INFO("ConfigurationMgr().GetSetupDiscriminator() failed: %s", chip::ErrorStr(err));
+            ChipLogError(App, "ConfigurationMgr().GetSetupDiscriminator() failed: %s", chip::ErrorStr(err));
         }
 
         payload.version       = 1;
@@ -200,12 +209,12 @@ int AppTask::Init()
         err = generator.payloadBase41Representation(result);
         if (err != CHIP_NO_ERROR)
         {
-            NRF_LOG_ERROR("Failed to generate QR Code");
+            ChipLogError(App, "Failed to generate QR Code");
         }
 
-        NRF_LOG_INFO("SetupPINCode: [%" PRIu32 "]", setUpPINCode);
+        ChipLogProgress(App, "SetupPINCode: [%" PRIu32 "]", setUpPINCode);
         // There might be whitespace in setup QRCode, add brackets to make it clearer.
-        NRF_LOG_INFO("SetupQRCode:  [%s]", result.c_str());
+        ChipLogProgress(App, "SetupQRCode:  [%s]", result.c_str());
     }
 
     return ret;
@@ -213,7 +222,7 @@ int AppTask::Init()
 
 void AppTask::HandleBLEConnectionOpened(chip::Ble::BLEEndPoint * endPoint)
 {
-    ChipLogProgress(DeviceLayer, "AppTask: Connection opened");
+    ChipLogProgress(App, "AppTask: Connection opened");
 
     GetAppTask().mBLEEndPoint    = endPoint;
     endPoint->OnMessageReceived  = AppTask::HandleBLEMessageReceived;
@@ -222,7 +231,7 @@ void AppTask::HandleBLEConnectionOpened(chip::Ble::BLEEndPoint * endPoint)
 
 void AppTask::HandleBLEConnectionClosed(chip::Ble::BLEEndPoint * endPoint, BLE_ERROR err)
 {
-    ChipLogProgress(DeviceLayer, "AppTask: Connection closed");
+    ChipLogProgress(App, "AppTask: Connection closed");
 
     GetAppTask().mBLEEndPoint = nullptr;
 }
@@ -281,7 +290,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     ret = sAppTask.Init();
     if (ret != NRF_SUCCESS)
     {
-        NRF_LOG_INFO("AppTask.Init() failed: %s", chip::ErrorStr(ret));
+        ChipLogError(App, "AppTask.Init() failed: %s", chip::ErrorStr(ret));
         APP_ERROR_HANDLER(ret);
     }
 
@@ -401,7 +410,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
 
         if (!initiated)
         {
-            NRF_LOG_INFO("Action is already in progress or active.");
+            ChipLogProgress(App, "Action is already in progress or active.");
         }
     }
 }
@@ -413,7 +422,7 @@ void AppTask::JoinHandler(AppEvent * aEvent)
         return;
 
     CHIP_ERROR error = ThreadStackMgr().JoinerStart();
-    NRF_LOG_INFO("Thread joiner triggered: %s", chip::ErrorStr(error));
+    ChipLogProgress(App, "Thread joiner triggered: %s", chip::ErrorStr(error));
 }
 #endif
 
@@ -472,7 +481,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT, initiate factory reset
     if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
     {
-        NRF_LOG_INFO("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_TRIGGER_TIMEOUT);
+        ChipLogProgress(App, "Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_TRIGGER_TIMEOUT);
 
         // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to cancel, if required.
         sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
@@ -524,7 +533,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         {
             sAppTask.CancelTimer();
             sAppTask.mFunction = kFunction_NoneSelected;
-            NRF_LOG_INFO("Software update is not implemented");
+            ChipLogProgress(App, "Software update is not implemented");
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
@@ -539,7 +548,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             // Change the function to none selected since factory reset has been canceled.
             sAppTask.mFunction = kFunction_NoneSelected;
 
-            NRF_LOG_INFO("Factory Reset has been Canceled");
+            ChipLogProgress(App, "Factory Reset has been Canceled");
         }
     }
 }
@@ -551,7 +560,7 @@ void AppTask::CancelTimer()
     ret = app_timer_stop(sFunctionTimer);
     if (ret != NRF_SUCCESS)
     {
-        NRF_LOG_INFO("app_timer_stop() failed");
+        ChipLogError(App, "app_timer_stop() failed");
         APP_ERROR_HANDLER(ret);
     }
 
@@ -565,7 +574,7 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     ret = app_timer_start(sFunctionTimer, pdMS_TO_TICKS(aTimeoutInMs), this);
     if (ret != NRF_SUCCESS)
     {
-        NRF_LOG_INFO("app_timer_start() failed");
+        ChipLogError(App, "app_timer_start() failed");
         APP_ERROR_HANDLER(ret);
     }
 
@@ -578,11 +587,11 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
     // and start flashing the LEDs rapidly to indicate action initiation.
     if (aAction == BoltLockManager::LOCK_ACTION)
     {
-        NRF_LOG_INFO("Lock Action has been initiated")
+        ChipLogProgress(App, "Lock Action has been initiated");
     }
     else if (aAction == BoltLockManager::UNLOCK_ACTION)
     {
-        NRF_LOG_INFO("Unlock Action has been initiated")
+        ChipLogProgress(App, "Unlock Action has been initiated");
     }
 
     sLockLED.Blink(50, 50);
@@ -595,13 +604,13 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
     // Turn off the lock LED if in an UNLOCKED state.
     if (aAction == BoltLockManager::LOCK_ACTION)
     {
-        NRF_LOG_INFO("Lock Action has been completed")
+        ChipLogProgress(App, "Lock Action has been completed");
 
         sLockLED.Set(true);
     }
     else if (aAction == BoltLockManager::UNLOCK_ACTION)
     {
-        NRF_LOG_INFO("Unlock Action has been completed")
+        ChipLogProgress(App, "Unlock Action has been completed");
 
         sLockLED.Set(false);
     }
@@ -623,7 +632,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
     {
         if (!xQueueSend(sAppEventQueue, aEvent, 1))
         {
-            NRF_LOG_INFO("Failed to post event to app task event queue");
+            ChipLogProgress(App, "Failed to post event to app task event queue");
         }
     }
 }
@@ -636,6 +645,6 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
     else
     {
-        NRF_LOG_INFO("Event received with no handler. Dropping event.");
+        ChipLogProgress(App, "Event received with no handler. Dropping event.");
     }
 }
