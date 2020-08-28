@@ -1,7 +1,8 @@
 
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #
+#    Copyright (c) 2020 Project CHIP Authors
 #    Copyright (c) 2016-2017 Nest Labs, Inc.
 #    All rights reserved.
 #

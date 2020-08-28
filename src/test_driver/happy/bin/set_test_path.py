@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 #
+#    Copyright (c) 2020 Project CHIP Authors
 #    Copyright (c) 2017 Nest Labs, Inc.
 #    All rights reserved.
 #
@@ -38,11 +39,11 @@ path_parts = path.split('/')
 happy_idx = path_parts.index('happy')
 wrapper_home = '/'.join(str(x) for x in path_parts[0:happy_idx+1])
 
-wrapper_dirs = [ ".",
-                 wrapper_home,
-                 wrapper_home + "/test-templates",
-                 wrapper_home + "/lib",
-                 wrapper_home + "/bin" ]
+wrapper_dirs = [".",
+                wrapper_home,
+                wrapper_home + "/test-templates",
+                wrapper_home + "/lib",
+                wrapper_home + "/bin"]
 
 for wrapper_dir in wrapper_dirs:
     if os.path.exists(wrapper_dir):
