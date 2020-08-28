@@ -15,36 +15,36 @@
 import("//build/toolchain/gcc_toolchain.gni")
 
 template("android_clang_toolchain") {
-  if (current_cpu == "arm") {
+  _invoker_toolchain_args = invoker.toolchain_args
+  
+  if (_invoker_toolchain_args.current_cpu == "arm") {
     _tool_name_root = "armv7a-linux-androideabi${invoker.api_level}-"
     _toolchain_args = {
-      current_cpu = "arm"
       arm_arch = "armv7-a"
       arm_fpu = "vfpv3-d16"
       arm_float_abi = "softfp"
     }
-  } else if (current_cpu == "arm64") {
+  } else if (_invoker_toolchain_args.current_cpu == "arm64") {
     _tool_name_root = "aarch64-linux-android${invoker.api_level}-"
     _toolchain_args = {
-      current_cpu = "arm64"
       arm_arch = "armv8-a"
       arm_fpu = "vfpv3-d16"
       arm_float_abi = "softfp"
     }
-  } else if (current_cpu == "x86_64") {
+  } else if (_invoker_toolchain_args.current_cpu == "x86_64") {
     _tool_name_root = "x86_64-linux-android${invoker.api_level}-"
     _toolchain_args = {
-      current_cpu = "x86_64"
       x86_arch = "x86-64"
       x86_tune = "intel"
     }
-  } else if (current_cpu == "x86") {
+  } else if (_invoker_toolchain_args.current_cpu == "x86") {
     _tool_name_root = "i686-linux-android${invoker.api_level}-"
     _toolchain_args = {
-      current_cpu = "x86"
       x86_arch = "i686"
       x86_tune = "intel"
     }
+  } else {
+    assert(false, "Unknown/invalid current_cpu value in toolchain_args::current_cpu for android_clang_toolchain")
   }
 
   _android_toolchain_args = {
@@ -52,9 +52,7 @@ template("android_clang_toolchain") {
     is_clang = true
 
     forward_variables_from(_toolchain_args, "*")
-    if (defined(invoker.toolchain_args)) {
-      forward_variables_from(invoker.toolchain_args, "*")
-    }
+    forward_variables_from(_invoker_toolchain_args, "*")
   }
 
   gcc_toolchain(target_name) {
