@@ -23,6 +23,9 @@ static_library("lock-common") {
 
   sources = [
     "DataModelHandler.cpp",
+    "main/gen/call-command-handler.c",
+    "main/gen/callback-stub.c",
+    "main/gen/znet-bookkeeping.c",
   ]
 
   deps = [
