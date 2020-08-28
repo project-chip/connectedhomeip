@@ -77,7 +77,8 @@ int cmd_otcli_dispatch(int argc, char ** argv)
     if (euid != 0)
     {
         streamer_printf(streamer_get(), "Error otcli: requires running chip-shell as sudo\n\r");
-        VerifyOrExit(euid == 0, error = CHIP_ERROR_INCORRECT_STATE);
+        error = CHIP_ERROR_INCORRECT_STATE;
+        ExitNow();
     }
 
     memcpy(buff, ctl_command, sizeof(ctl_command));
@@ -91,23 +92,16 @@ int cmd_otcli_dispatch(int argc, char ** argv)
         size_t arg_len = strlen(argv[i]);
 
         /* Make sure that the next argument won't overflow the buffer */
-        if (buff_ptr + arg_len < buff + kMaxLineLength)
-        {
-            strncpy(buff_ptr, argv[i], arg_len);
-            buff_ptr += arg_len;
+        VerifyOrExit(buff_ptr + arg_len < buff + kMaxLineLength, error = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-            /* Make sure that there is enough buffer for a space char */
-            if (buff_ptr + sizeof(char) < buff + kMaxLineLength)
-            {
-                strncpy(buff_ptr, " ", sizeof(char));
-                buff_ptr++;
-            }
-        }
-        else
+        strncpy(buff_ptr, argv[i], arg_len);
+        buff_ptr += arg_len;
+
+        /* Make sure that there is enough buffer for a space char */
+        if (buff_ptr + sizeof(char) < buff + kMaxLineLength)
         {
-            /* Ignore the rest of the parameters since they won't fit and give it a shot */
-            ChipLogProgress(chipTool, "otcli truncates some parameters.\n");
-            break;
+            strncpy(buff_ptr, " ", sizeof(char));
+            buff_ptr++;
         }
     }
     buff_ptr = 0;
