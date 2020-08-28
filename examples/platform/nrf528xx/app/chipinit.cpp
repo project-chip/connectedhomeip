@@ -51,12 +51,8 @@ extern "C" {
 #include <platform/CHIPDeviceLayer.h>
 #include <support/logging/CHIPLogging.h>
 
-#include "Server.h"
-
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
-
-DemoSessionManager sessions;
 
 #if CHIP_ENABLE_OPENTHREAD
 static void * ot_calloc(size_t n, size_t size)
@@ -145,10 +141,6 @@ ret_code_t ChipInit()
         APP_ERROR_HANDLER(ret);
     }
 #endif // CHIP_ENABLE_OPENTHREAD
-
-    // Init ZCL Data Model
-    InitDataModelHandler();
-    StartServer(&sessions);
 
     return ret;
 }

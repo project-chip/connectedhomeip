@@ -15,20 +15,10 @@
  *    limitations under the License.
  */
 
-#ifndef NRF5_COMMON_SERVER_H
-#define NRF5_COMMON_SERVER_H
+#ifndef NRF5_COMMON_SERVICE_H
+#define NRF5_COMMON_SERVICE_H
 
-#include <inet/IPAddress.h>
-#include <inet/InetLayer.h>
-#include <system/SystemPacketBuffer.h>
-#include <transport/SecureSessionMgr.h>
-#include <transport/UDP.h>
-
-using DemoSessionManager = chip::SecureSessionMgr<chip::Transport::UDP>;
-
-void StartServer(DemoSessionManager * sessions);
-void InitDataModelHandler();
 void SetDeviceName(const char * newDeviceName);
 void PublishService();
 
-#endif // NRF5_COMMON_SERVER_H
+#endif // NRF5_COMMON_SERVICE_H

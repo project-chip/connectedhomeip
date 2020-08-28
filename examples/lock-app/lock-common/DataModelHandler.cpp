@@ -20,15 +20,20 @@
  *   This file implements the handler for data model messages.
  */
 
+#include <lib/support/logging/CHIPLogging.h>
+#include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
 #include "BoltLockManager.h"
 #include "DataModelHandler.h"
-#include "nrf_log.h"
 
 #include "af-types.h"
+#include "attribute-storage.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
+#include "gen/znet-bookkeeping.h"
+#include "util.h"
+#include <app/chip-zcl-zpro-codec.h>
 
 using namespace ::chip;
 
@@ -38,13 +43,13 @@ extern "C" void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClus
 {
     if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
     {
-        NRF_LOG_INFO("Unknown cluster ID: %d", clusterId);
+        ChipLogProgress(App, "Unknown cluster ID: %d", clusterId);
         return;
     }
 
     if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
     {
-        NRF_LOG_INFO("Unknown attribute ID: %d", attributeId);
+        ChipLogProgress(App, "Unknown attribute ID: %d", attributeId);
         return;
     }
 
@@ -56,4 +61,10 @@ extern "C" void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClus
     {
         BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
     }
+}
+
+void InitDataModelHandler()
+{
+    emberAfEndpointConfigure();
+    emAfInit();
 }
