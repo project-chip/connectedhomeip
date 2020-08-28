@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+
 # Convert a binary to a target format using objcopy.
 
 template("objcopy_convert") {
@@ -35,7 +37,7 @@ template("objcopy_convert") {
       rebase_path(conversion_input, root_build_dir),
       rebase_path(conversion_output, root_build_dir),
     ]
-    script = "//build/gn_run_binary.py"
+    script = "${chip_root}/gn/build/gn_run_binary.py"
   }
 }
 
@@ -118,8 +120,8 @@ template("flashable_executable") {
     objcopy = invoker.objcopy
 
     objcopy_convert(image_target) {
-      conversion_input = "${root_build_dir}/${invoker.output_name}"
-      conversion_output = "${root_build_dir}/${image_name}"
+      conversion_input = "${root_out_dir}/${invoker.output_name}"
+      conversion_output = "${root_out_dir}/${image_name}"
       conversion_target_format = image_format
       deps = [ ":$executable_target" ]
     }
@@ -134,11 +136,11 @@ template("flashable_executable") {
 
     gen_flashing_script("$target_name.flashing") {
       flashing_script_generator = invoker.flashing_script_generator
-      flashing_script_name = "$root_build_dir/${invoker.flashing_script_name}"
+      flashing_script_name = "$root_out_dir/${invoker.flashing_script_name}"
       flashing_action = [
         "flash",
         "--script-relative",
-        rebase_path("${root_build_dir}/${image_name}", root_build_dir),
+        image_name,
       ]
       deps = [ ":$image_target" ]
     }
