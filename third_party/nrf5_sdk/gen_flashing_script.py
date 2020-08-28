@@ -12,91 +12,50 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.!/usr/bin/env python
 
-"""Generate scripts to flash or erase an NRF5 device.
-"""
+"""Generate script to flash or erase an NRF5 device."""
 
 import argparse
 import glob
 import os
 import stat
 import sys
-import textwrap
 
-DEFAULT_NRFJPROG = "nrfjprog"
-DEFAULT_NRF_FAMILY = "nrf52"
+SCRIPT = """#!/usr/bin/env python
 
+import sys
 
-def generate_script(output_filename, body):
-    """Write a Python script with boilerplate plus the given `body`."""
-    try:
-        with open(output_filename, 'w') as f:
-            f.write('#!/usr/bin/env python' + textwrap.dedent("""
+SCRIPTS_DIR = "{scripts_dir}"
+DEFAULTS = {{
+{defaults}
+}}
 
-                import os
-                import subprocess
-                import sys
+sys.path.append(SCRIPTS_DIR)
+import nrf5_firmware_utils
 
-                """))
-            f.write(body)
-        os.chmod(output_filename, (stat.S_IXUSR | stat.S_IRUSR | stat.S_IWUSR
-                                | stat.S_IXGRP | stat.S_IRGRP
-                                | stat.S_IXOTH | stat.S_IROTH))
-    except Exception as e:
-        print(e, sys.stderr)
-        return 1
-    return 0
+if __name__ == '__main__':
+    sys.exit(nrf5_firmware_utils.flash_command(sys.argv, DEFAULTS))
+"""
 
 
-def format_subprocess(arguments):
-    """Return a string containing Python code to call a subprocess."""
-    t = 'subprocess.check_call([\n'
-    for a in arguments:
-        t += '  ' + a + ',\n'
-    t += '  ])\n'
-    return t
+def format_key_value(dictionary, key):
+    """Format a key-value pair for the script dictionary."""
+    if dictionary.get(key):
+        return '  {}: {},\n'.format(repr(key), repr(dictionary[key]))
+    return ''
 
 
-def format_nrfjprog(args, options):
-    """Return a string containing Python code to call nrfjprog."""
-    return format_subprocess(
-        [repr(args.nrfjprog), '"--family"', repr(args.family)]
-        + options)
-
-
-def generate_flash_script(args):
-    """Generate a script to flash an image."""
-    image = args.image
-    if args.script_relative:
-        # Have the generated script refer to the named image file
-        # in the same directory as the script.
-        image = (
-            "os.path.join(os.path.dirname(sys.argv[0]), \"{name}\")".format(
-                name=image))
-    elif args.wildcard:
-        # The image name is a glob wildcard that must expand to exactly one
-        # file name.
-        files = glob.glob(image)
-        if len(files) == 0:
-            print('No match for image pattern: {}'.format(image))
-            return 1
-        if len(files) > 1:
-            print('Ambiguous image pattern: {}'.format(image))
-            return 1
-        image = repr(files[0])
-    else:
-        image = repr(image)
-    body = format_nrfjprog(args, ['"--program"', image, '"--sectorerase"'])
-    body += format_nrfjprog(args, ['"--reset"'])
-    return generate_script(args.output, body)
-
-
-def generate_erase_script(args):
-    """Generate a script to erase a device."""
-    body = format_nrfjprog(args, ['"--eraseall"'])
-    return generate_script(args.output, body)
+def unglob(filename):
+    """Try for a unique a glob pattern result if the file doesn't exist."""
+    if os.path.exists(filename):
+        return filename
+    files = glob.glob(filename)
+    if len(files) == 1:
+        return files[0]
+    return filename
 
 
 def main(argv):
+    """Generate script to flash or erase an NRF5 device."""
     parser = argparse.ArgumentParser(description='Generate a flashing script')
     parser.add_argument(
         '--output',
@@ -104,41 +63,50 @@ def main(argv):
         required=True,
         help='flashing script name')
     parser.add_argument(
-        '--family',
-        metavar='FAMILY',
-        default=DEFAULT_NRF_FAMILY,
-        help='device family')
+        '--scripts-dir',
+        metavar='DIR',
+        required=True,
+        help='nrf5 script utilities directory')
     parser.add_argument(
         '--nrfjprog',
         metavar='FILENAME',
-        default=DEFAULT_NRFJPROG,
         help='nrfjprog command')
-    subparsers = parser.add_subparsers(
-        title='subcommands', required=True, dest='function',
-        metavar='SUBCOMMAND', help='sub-command help')
+    parser.add_argument(
+        '--family',
+        metavar='FAMILY',
+        help='device family')
+    parser.add_argument(
+        '--softdevice',
+        metavar='GLOB',
+        help='softdevice file pattern')
+    parser.add_argument(
+        '--application',
+        metavar='FILENAME',
+        help='program to flash')
 
-    # Flashing script.
-    parser_flash = subparsers.add_parser(
-        'flash', help='Generate a script to flash an image')
-    parser_flash_image = parser_flash.add_mutually_exclusive_group()
-    parser_flash_image.add_argument(
-        '--script-relative',
-        action='store_true',
-        help='Image is in the output script directory')
-    parser_flash_image.add_argument(
-        '--wildcard',
-        action='store_true',
-        help='Find the image by pattern at generation')
-    parser_flash.add_argument(
-        'image', metavar='IMAGE', help='image file to flash')
-    parser_flash.set_defaults(func=generate_flash_script)
-
-    # Device erase script.
-    parser_erase = subparsers.add_parser(
-        'erase', help='Generate a script to erase device')
-    parser_erase.set_defaults(func=generate_erase_script)
     args = parser.parse_args(argv)
-    return args.func(args)
+    options = vars(args)
+    if options['softdevice']:
+        options['softdevice'] = unglob(options['softdevice'])
+
+    defaults = ''
+    defaults += format_key_value(options, 'nrfjprog')
+    defaults += format_key_value(options, 'family')
+    defaults += format_key_value(options, 'softdevice')
+    defaults += format_key_value(options, 'application')
+
+    script = SCRIPT.format(scripts_dir=args.scripts_dir, defaults=defaults)
+    try:
+        with open(args.output, 'w') as script_file:
+            script_file.write(script)
+        os.chmod(args.output, (stat.S_IXUSR | stat.S_IRUSR | stat.S_IWUSR
+                             | stat.S_IXGRP | stat.S_IRGRP
+                             | stat.S_IXOTH | stat.S_IROTH))
+    except OSError as exception:
+        print(exception, sys.stderr)
+        return 1
+
+    return 0
 
 
 if __name__ == '__main__':

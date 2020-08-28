@@ -137,10 +137,14 @@ template("flashable_executable") {
     gen_flashing_script("$target_name.flashing") {
       flashing_script_generator = invoker.flashing_script_generator
       flashing_script_name = "$root_out_dir/${invoker.flashing_script_name}"
-      flashing_action = [
-        "flash",
-        "--script-relative",
-        image_name,
+      if (defined(invoker.flashing_options)) {
+        flashing_action = invoker.flashing_options
+      } else {
+        flashing_action = []
+      }
+      flashing_action += [
+        "--application",
+        rebase_path(image_name, "", root_out_dir)
       ]
       deps = [ ":$image_target" ]
     }
