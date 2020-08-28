@@ -16,7 +16,7 @@ import("//build/toolchain/gcc_toolchain.gni")
 
 template("android_clang_toolchain") {
   _invoker_toolchain_args = invoker.toolchain_args
-  
+
   if (_invoker_toolchain_args.current_cpu == "arm") {
     _tool_name_root = "armv7a-linux-androideabi${invoker.api_level}-"
     _toolchain_args = {
@@ -44,7 +44,9 @@ template("android_clang_toolchain") {
       x86_tune = "intel"
     }
   } else {
-    assert(false, "Unknown/invalid current_cpu value in toolchain_args::current_cpu for android_clang_toolchain")
+    assert(
+        false,
+        "Unknown/invalid current_cpu value in toolchain_args::current_cpu for android_clang_toolchain")
   }
 
   _android_toolchain_args = {
