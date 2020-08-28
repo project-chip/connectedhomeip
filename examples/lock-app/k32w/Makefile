@@ -56,6 +56,7 @@ SRCS = \
     $(K32W061_SDK_ROOT)/middleware/wireless/framework/GPIO/GPIO_Adapter.c \
     $(K32W061_SDK_ROOT)/middleware/wireless/framework/TimersManager/Source/TimersManager.c \
     $(K32W061_SDK_ROOT)/middleware/wireless/framework/TimersManager/Source/TMR_Adapter.c \
+    $(K32W061_SDK_ROOT)/boards/k32w061dk6/wireless_examples/openthread/reed/bm/board_utility.c \
     $(K32W061_SDK_ROOT)/boards/k32w061dk6/wireless_examples/openthread/reed/bm/board.c \
     $(K32W061_SDK_ROOT)/boards/k32w061dk6/wireless_examples/openthread/reed/bm/hardware_init.c \
     $(K32W061_SDK_ROOT)/devices/K32W061/drivers/fsl_common.c \
@@ -91,11 +92,11 @@ INC_DIRS = \
     $(CHIP_ROOT)/src/system
 
 LIBS = \
-    $(K32W061_SDK_ROOT)/middleware/wireless/openthread/openthread/output/k32w061/lib/libopenthread-cli-ftd.a \
-    $(K32W061_SDK_ROOT)/middleware/wireless/openthread/openthread/output/k32w061/lib/libopenthread-ftd.a \
-    $(K32W061_SDK_ROOT)/middleware/wireless/openthread/openthread/output/k32w061/lib/libopenthread-k32w061_plat.a \
-    $(K32W061_SDK_ROOT)/middleware/wireless/openthread/openthread/output/k32w061/lib/libopenthread-k32w061_sdk.a \
-    $(K32W061_SDK_ROOT)/middleware/wireless/openthread/openthread/output/k32w061/lib/libmbedcrypto.a \
+    -lopenthread-cli-ftd \
+    -lopenthread-ftd \
+    -lopenthread-k32w061_plat \
+    -lopenthread-k32w061_sdk \
+    -lmbedcrypto \
     $(K32W061_SDK_ROOT)/middleware/wireless/ieee-802.15.4/lib/libMiniMac.a \
     $(K32W061_SDK_ROOT)/middleware/wireless/framework/XCVR/lib/libRadio.a \
     $(K32W061_SDK_ROOT)/middleware/wireless/framework/PDM/Library/libPDM.a \
@@ -116,7 +117,7 @@ DEFINES = \
     osCustomStartup=1 \
     OM15082=1\
     gKBD_KeysCount_c=3 \
-    gLEDsOnTargetBoardCnt_c=4 \
+    gLEDsOnTargetBoardCnt_c=2 \
     gLED_InvertedMode_d=1 \
     ENABLE_RAM_VECTOR_TABLE=1 \
     gTMR_Enabled_d=1 \
