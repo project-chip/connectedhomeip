@@ -24,8 +24,8 @@
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
-#include "BoltLockManager.h"
 #include "DataModelHandler.h"
+#include "LightingManager.h"
 
 #include "af-types.h"
 #include "attribute-storage.h"
@@ -55,11 +55,11 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clust
 
     if (*value)
     {
-        BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
+        LightingMgr().InitiateAction(LightingManager::ON_ACTION);
     }
     else
     {
-        BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
+        LightingMgr().InitiateAction(LightingManager::OFF_ACTION);
     }
 }
 

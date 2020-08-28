@@ -18,8 +18,8 @@ config("includes") {
   include_dirs = [ ".", "include" ]
 }
 
-static_library("lock-common") {
-  output_name = "lock-common"
+static_library("lighting-common") {
+  output_name = "lighting-common"
 
   sources = [
     "DataModelHandler.cpp",
