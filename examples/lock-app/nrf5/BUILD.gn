@@ -110,7 +110,7 @@ nrf5_executable("lock_app") {
 }
 
 gen_flashing_script("softdevice_script") {
-  flashing_script_name = "$root_build_dir/chip-nrf52840-softdevice.flash.py"
+  flashing_script_name = "$root_out_dir/chip-nrf52840-softdevice.flash.py"
   flashing_action = [
     "flash",
     "--wildcard",
@@ -119,7 +119,7 @@ gen_flashing_script("softdevice_script") {
 }
 
 gen_erasing_script("erase_script") {
-  erasing_script_name = "$root_build_dir/chip-nrf52840.erase.py"
+  erasing_script_name = "$root_out_dir/chip-nrf52840.erase.py"
 }
 
 group("nrf5") {
