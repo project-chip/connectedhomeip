@@ -29,7 +29,7 @@ if (chip_device_platform == "nrf5") {
   import("//build_overrides/nrf5_sdk.gni")
 }
 
-if (chip_device_platform != "none" && chip_device_platform != "external") {
+if (chip_device_platform != "none") {
   declare_args() {
     # Extra header to include in CHIPDeviceConfig.h for project.
     chip_device_project_config_include = ""
@@ -93,7 +93,9 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       ]
     }
   }
+}
 
+if (chip_device_platform != "none" && chip_device_platform != "external") {
   config("platform_config") {
     if (chip_device_platform == "darwin") {
       frameworks = [
