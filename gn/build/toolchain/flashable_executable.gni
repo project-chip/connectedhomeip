@@ -43,12 +43,13 @@ template("objcopy_convert") {
 
 # Build a script to perform a device flashing operation.
 #
-# This presupposes the existence of a Python script to perfom the action,
-# with at least an `--output SCRIPT` option. Further templates below assume
-# at least the addional subcommands,
-#
-#   python flashing_script_generator.py --output SCRIPT flash [--script-relative] IMAGE
-#   python flashing_script_generator.py --output SCRIPT erase
+# This requires a Python script, given by flashing_script_generator,
+# to construct the resulting flashing script, given by flashing_script_name.
+# As used by flashable_executable(), the generator script requires two options,
+#   --output SCRIPT       - The generated script
+#   --application IMAGE   - The file to be flashed
+# plus any platform- or target-specific options as passed in by
+# flashable_excutable()'s flasing_options.
 
 template("gen_flashing_script") {
   forward_variables_from(invoker,

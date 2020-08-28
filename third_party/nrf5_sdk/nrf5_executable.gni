@@ -20,18 +20,14 @@ template("nrf5_executable") {
   objcopy = "arm-none-eabi-objcopy"
 
   flashing_script_generator =
-      "${invoker.flashing_script_utils_dir}/gen_flashing_script.py"
+      "${invoker.nrf5_sdk_build_root}/gen_flashing_script.py"
   flashing_script_name = invoker.output_name + ".flash.py"
   flashing_options = [
     "--scripts-dir",
-    rebase_path(invoker.flashing_script_utils_dir),
+    rebase_path(invoker.nrf5_sdk_build_root),
+    "--softdevice",
+    "${invoker.nrf5_sdk_root}/components/softdevice/s140/hex/s140_nrf52_${invoker.nrf5_sdk_version}_softdevice.hex",
   ]
-  if (defined(invoker.softdevice)) {
-    flashing_options += [
-      "--softdevice",
-      invoker.softdevice
-    ]
-  }
 
   flashable_executable(target_name) {
     forward_variables_from(invoker, "*")

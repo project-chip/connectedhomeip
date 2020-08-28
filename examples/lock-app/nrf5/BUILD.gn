@@ -18,7 +18,6 @@ import("//build_overrides/openthread.gni")
 
 import("${nrf5_sdk_build_root}/nrf5_sdk.gni")
 import("${nrf5_sdk_build_root}/nrf5_executable.gni")
-flashing_script_utils_dir = nrf5_sdk_build_root
 
 assert(current_os == "freertos")
 
@@ -107,12 +106,10 @@ nrf5_executable("lock_app") {
   ldscript = "${nrf5_platform_dir}/app/ldscripts/chip-nrf52840-example.ld"
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
-
-  softdevice = "${nrf5_sdk_root}/components/softdevice/s140/hex/s140_nrf52_*_softdevice.hex"
 }
 
 group("nrf5") {
-  deps = [ ":lock_app", ]
+  deps = [ ":lock_app" ]
 }
 
 group("default") {

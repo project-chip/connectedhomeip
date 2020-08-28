@@ -14,27 +14,72 @@
 # limitations under the License.!/usr/bin/env python
 
 
-"""Flash and/or erase an NRF5 device.
+"""Flash an NRF5 device.
 
 This is layered so that a caller can perform individual operations
 or operations according to a command line.
 """
 
 import argparse
-import glob
-import os
 import subprocess
 import sys
 
-DEFAULTS = {
-    'application': None,
-    'eraseall': False,
-    'family': None,
-    'nrfjprog': 'nrfjprog',
-    'reset': None,
-    'softdevice': None,
-    'skip_softdevice': False,
-    'verbose': 0,
+# These are the keys that can be use to initalize a Flasher
+# and/or passed as command line options via parse_argv().
+
+OPTIONS = {
+    # Script configuration options.
+    'verbose': {
+        'help': 'Report more verbosely',
+        'default': 0,
+        'argument': {'action': 'count'},
+        # Levels:
+        #   0   - error message
+        #   1   - action to be taken
+        #   2   - results of action, even if successful
+        #   3+  - details
+    },
+
+    # Tool configuration options.
+    'nrfjprog': {
+        'help': 'File name of the nrfjprog executable',
+        'default': 'nrfjprog',
+        'argument': {'metavar': 'FILENAME'},
+    },
+
+    # Device configuration options.
+    'family': {
+        'help': 'NRF5 device famity',
+        'default': None,
+        'argument': {'metavar': 'FAMILY'},
+    },
+
+    # Action control.
+    'eraseall': {
+        'help': 'Erase device before flashing',
+        'default': False,
+        'argument': {'action': 'store_true'},
+    },
+    'softdevice': {
+        'help': 'Softdevice image file name',
+        'default': None,
+        'argument': {'metavar': 'FILENAME'},
+    },
+    'skip-softdevice': {
+        'help': 'Do not flash softdevice even if softdevice is set',
+        'default': False,
+        'argument': {'action': 'store_true'},
+    },
+    'application': {
+        'help': 'Application image file name',
+        'default': None,
+        'argument': {'metavar': 'FILENAME'},
+    },
+    'reset': {
+        'help': 'Reset device after flashing',
+        'default': None,    # Reset if application was flashed.
+        'argument': {'action': 'store_true'},
+    },
 }
 
 
@@ -42,7 +87,7 @@ class Flasher:
     """Manage nrf5 flashing."""
 
     def __init__(self, options=None):
-        self.options = DEFAULTS
+        self.options = {key: info['default'] for key, info in OPTIONS.items()}
         if options:
             self.options.update(options)
         self.err = 0
@@ -53,11 +98,6 @@ class Flasher:
 
     def log(self, level, *args):
         """Optionally log a message to stderr."""
-        # Levels:
-        #   0   - error message
-        #   1   - action to be taken
-        #   2   - results of action, even if successful
-        #   3   - details
         if self.options['verbose'] >= level:
             print(*args, file=sys.stderr)
 
@@ -81,65 +121,22 @@ class Flasher:
             self.log(2, 'Erased all')
         return self
 
-    def _find_softdevice(self, softdevice):
-        """Find the softdevice file to flash."""
-        if os.path.exists(softdevice):
-            return softdevice
-        self.log(3, 'Trying glob', softdevice)
-        files = glob.glob(softdevice)
-        if len(files) < 1:
-            self.log(0, 'FAILED: no match for softdevice pattern:', softdevice)
-            return None
-        if len(files) > 1:
-            self.log(0, 'FAILED: ambiguous softdevice pattern', softdevice)
-            return None
-        return files[0]
-
-    def _verify_softdevice(self, softdevice):
-        """Verify softdevice (internal)."""
-        self.log(1, 'Verify softdevice', softdevice)
-        if self.nrfjprog(['--quiet', '--verify', softdevice]).err:
-            self.log(2, 'Not verified', softdevice)
+    def verify(self, image):
+        """Verify image."""
+        self.log(1, 'Verify ', image)
+        if self.nrfjprog(['--quiet', '--verify', image]).err:
+            self.log(2, 'Not verified', image)
         else:
-            self.log(2, 'Verified', softdevice)
-        return self.err
-
-    def verify_softdevice(self, softdevice=None):
-        """Verify softdevice."""
-        if not softdevice:
-            softdevice = self.options['softdevice']
-        softdevice = self._find_softdevice(softdevice)
-        if softdevice:
-            self._verify_softdevice(softdevice)
+            self.log(2, 'Verified', image)
         return self
 
-    def _flash_softdevice(self, softdevice):
-        """Flash softdevice (internal)."""
-        self.log(1, 'Flash softdevice', softdevice)
-        if self.nrfjprog(['--program', softdevice, '-sectorerase']).err:
-            self.log(0, 'FAILED: flash softdevice', softdevice)
+    def flash(self, image):
+        """Flash image."""
+        self.log(1, 'Flash', image)
+        if self.nrfjprog(['--program', image, '--sectorerase']).err:
+            self.log(0, 'FAILED: flash', image)
         else:
-            self.log(2, 'Flashed softdevice', softdevice)
-        return self.err
-
-    def flash_softdevice(self, softdevice=None):
-        """Flash softdevice."""
-        if not softdevice:
-            softdevice = self.options['softdevice']
-        softdevice = self._find_softdevice(softdevice)
-        if softdevice:
-            self._flash_softdevice(softdevice)
-        return self
-
-    def flash_application(self, application=None):
-        """Flash application program."""
-        if not application:
-            application = self.options['application']
-        self.log(1, 'Flash', application)
-        if self.nrfjprog(['--program', application, '-sectorerase']).err:
-            self.log(0, 'FAILED: flash', application)
-        else:
-            self.log(2, 'Flashed', application)
+            self.log(2, 'Flashed', image)
         return self
 
     def reset(self):
@@ -151,7 +148,7 @@ class Flasher:
             self.log(2, 'Reset complete')
         return self
 
-    def flash(self):
+    def actions(self):
         """Perform actions on the device according to self.options."""
         self.log(3, 'OPTIONS:', self.options)
 
@@ -161,14 +158,13 @@ class Flasher:
 
         softdevice = self.options['softdevice']
         if softdevice and not self.options['skip_softdevice']:
-            softdevice = self._find_softdevice(softdevice)
-            if self._verify_softdevice(softdevice):
-                if self._flash_softdevice(softdevice):
+            if self.verify(softdevice).err:
+                if self.flash(softdevice).err:
                     return self
 
         application = self.options['application']
         if application:
-            if self.flash_application(application).err:
+            if self.flash(application).err:
                 return self
             if self.options['reset'] is None:
                 self.options['reset'] = True
@@ -181,62 +177,23 @@ class Flasher:
 
     def parse_argv(self, argv):
         """Handle command line options."""
-        parser = argparse.ArgumentParser(description='Generate flash script')
+        parser = argparse.ArgumentParser(description='Flash device')
 
-        parser.add_argument(
-            '--verbose', '-v',
-            action='count',
-            default=self.options['verbose'],
-            help='')
+        # Command line options mirroring Flasher options.
+        for key, info in OPTIONS.items():
+            parser.add_argument('--' + key,
+                                help=info['help'],
+                                default=self.options[key],
+                                **info['argument'])
 
-        # Tool configuration options.
+        # Additional command line options.
 
-        parser.add_argument(
-            '--nrfjprog',
-            metavar='FILENAME',
-            default=self.options['nrfjprog'],
-            help='nrfjprog command')
-
-        # Device configuration options.
-
-        parser.add_argument(
-            '--family', '-f',
-            metavar='FAMILY',
-            default=self.options['family'],
-            help='device family')
-
-        # Softdevice options.
-
-        parser.add_argument(
-            '--softdevice',
-            metavar='GLOB',
-            default=self.options['softdevice'],
-            help='softdevice file pattern')
-        parser.add_argument(
-            '--skip-softdevice',
-            action='store_true',
-            default=self.options['skip_softdevice'],
-            help='do not flash softdevice even if --softdevice is present')
-
-        parser.add_argument(
-            '--reset', '-r',
-            action='store_true',
-            default=self.options['reset'],
-            help='reset device after flashing')
+        # 'reset' is a three-way switch; if None, action() will reset the
+        # device if and only if an application image is flashed.
         parser.add_argument(
             '--skip-reset',
             dest='reset', action='store_false',
-            help='do not reset device after flashing')
-        parser.add_argument(
-            '--application',
-            metavar='FILENAME',
-            default=self.options['application'],
-            help='application to flash')
-        parser.add_argument(
-            '--eraseall', '-e',
-            action='store_true',
-            default=self.options['eraseall'],
-            help='erase device before flashing')
+            help='Do not reset device after flashing')
 
         args = parser.parse_args(argv[1:])
         self.options.update(vars(args))
@@ -245,7 +202,7 @@ class Flasher:
 
 def flash_command(argv, defaults=None):
     """Perform device actions according to the command line and defaults."""
-    return Flasher(defaults).parse_argv(argv).flash().status()
+    return Flasher(defaults).parse_argv(argv).actions().status()
 
 
 if __name__ == '__main__':

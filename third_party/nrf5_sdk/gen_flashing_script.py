@@ -15,7 +15,6 @@
 """Generate script to flash or erase an NRF5 device."""
 
 import argparse
-import glob
 import os
 import stat
 import sys
@@ -24,7 +23,7 @@ SCRIPT = """#!/usr/bin/env python
 
 import sys
 
-SCRIPTS_DIR = "{scripts_dir}"
+SCRIPTS_DIR = '{scripts_dir}'
 DEFAULTS = {{
 {defaults}
 }}
@@ -35,23 +34,6 @@ import nrf5_firmware_utils
 if __name__ == '__main__':
     sys.exit(nrf5_firmware_utils.flash_command(sys.argv, DEFAULTS))
 """
-
-
-def format_key_value(dictionary, key):
-    """Format a key-value pair for the script dictionary."""
-    if dictionary.get(key):
-        return '  {}: {},\n'.format(repr(key), repr(dictionary[key]))
-    return ''
-
-
-def unglob(filename):
-    """Try for a unique a glob pattern result if the file doesn't exist."""
-    if os.path.exists(filename):
-        return filename
-    files = glob.glob(filename)
-    if len(files) == 1:
-        return files[0]
-    return filename
 
 
 def main(argv):
@@ -86,16 +68,14 @@ def main(argv):
 
     args = parser.parse_args(argv)
     options = vars(args)
-    if options['softdevice']:
-        options['softdevice'] = unglob(options['softdevice'])
 
-    defaults = ''
-    defaults += format_key_value(options, 'nrfjprog')
-    defaults += format_key_value(options, 'family')
-    defaults += format_key_value(options, 'softdevice')
-    defaults += format_key_value(options, 'application')
+    defaults = []
+    for key in ['nrfjprog', 'family', 'softdevice', 'application']:
+        if options.get(key):
+            defaults.append('  {}: {},'.format(repr(key), repr(options[key])))
 
-    script = SCRIPT.format(scripts_dir=args.scripts_dir, defaults=defaults)
+    script = SCRIPT.format(
+        scripts_dir=args.scripts_dir, defaults='\n'.join(defaults))
     try:
         with open(args.output, 'w') as script_file:
             script_file.write(script)
