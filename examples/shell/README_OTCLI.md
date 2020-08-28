@@ -1,23 +1,27 @@
 # CHIP Shell - OpenThread CLI pass-through
 
-The CHIP Shell CLI can execute pass-through commands to the [OpenThread cli](../../third_party/openthread/repo/src/cli/README.md) directly.
+The CHIP Shell CLI can execute pass-through commands to the
+[OpenThread cli](../../third_party/openthread/repo/src/cli/README.md) directly.
 
 ## Setup
 
 ### Embedded
 
-On embedded platforms, the otcli commands are available simply when OpenThread support is enabled.
+On embedded platforms, the otcli commands are available simply when OpenThread
+support is enabled.
 
 ### Linux
 
-On embedded Linux platforms, otcli commands require installation of some OpenThread daemons:
+On embedded Linux platforms, otcli commands require installation of some
+OpenThread daemons:
 
 ```
 # Start Border Router agent
 sudo /usr/local/sbin/otbr-agent -d6 -v -I wpan0 spinel+hdlc+forkpty:///usr/local/bin/ot-rcp\?forkpty-arg=5
 ```
 
-If this command is not available, the follow instructions will build and install it:
+If this command is not available, the follow instructions will build and install
+it:
 
 ```
 # Build OpenThread Interface (simulation used as example -- alternatively could be RCP hardware)
