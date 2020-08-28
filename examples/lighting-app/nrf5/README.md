@@ -1,11 +1,11 @@
-# CHIP nRF52840 Lock Example Application
+# CHIP nRF52840 Lighting Example Application
 
 An example application showing the use
 [CHIP](https://github.com/project-chip/connectedhomeip) on the Nordic nRF52840.
 
 <hr>
 
--   [CHIP nRF52840 Lighting Example Application](#chip-nrf52840-lock-example-application)
+-   [CHIP nRF52840 Lighting Example Application](#chip-nrf52840-lighting-example-application)
     -   [Introduction](#introduction)
     -   [Device UI](#device-ui)
     -   [Building](#building)
@@ -74,13 +74,10 @@ pending reset. Holding the button past 6 seconds will cause the device to reset
 its persistent configuration and initiate a reboot. The reset action can be
 cancelled by releasing the button at any point before the 6 second limit.
 
-**LED #2** shows the state of the simulated lock bolt. When the LED is lit the
-bolt is extended (i.e. door locked); when not lit, the bolt is retracted (door
-unlocked). The LED will flash whenever the simulated bolt is in motion from one
-position to another.
+**LED #2** shows the state of the lighting.
 
-**Button #2** can be used to change the state of the simulated bolt. This can be
-used to mimick a user manually operating the lock. The button behaves as a
+**Button #2** can be used to change the state of the lighting. This can be used
+to mimick a user manually switching the lighting. The button behaves as a
 toggle, swapping the state every time it is pressed.
 
 The remaining two LEDs and buttons (#3 and #4) are unused.
@@ -101,20 +98,20 @@ commands in a devcontainer shell.
         # CAUTION: the following step will delete any unstaged files
         $ git clean -Xdf
 
-        $ cd examples/lock-app/nrf5
+        $ cd examples/lighting-app/nrf5
         $ make clean
         $ make
 
 Other alternatives:
 
--   Run `Build nRF5 Lock App` VSCode task.
+-   Run `Build nRF5 Lighting App` VSCode task.
 
 -   Run the `GN build` VSCode task. This does not require a clean tree.
 
 -   Build manually with GN:
 
             $ source scripts/activate.sh
-            $ cd examples/lock-app/nrf5
+            $ cd examples/lighting-app/nrf5
             $ gn gen out/debug
             $ ninja -C out/debug
 
@@ -162,7 +159,7 @@ Other alternatives:
 
 *   Run make to build the application
 
-          $ cd ~/connectedhomeip/examples/lock-app/nrf5
+          $ cd ~/connectedhomeip/examples/lighting-app/nrf5
           $ make clean
           $ make
 
@@ -171,7 +168,7 @@ Other alternatives:
           $ cd ~/connectedhomeip
           $ git submodule update --init
           $ source scripts/activate.sh
-          $ cd examples/lock-app/nrf5
+          $ cd examples/lighting-app/nrf5
           $ gn gen out/debug
           $ ninja -C out/debug
 
@@ -190,7 +187,7 @@ should be erased and the Nordic SoftDevice image installed.
 
 *   Use the Makefile to erase the flash and program the Nordic SoftDevice image.
 
-          $ cd ~/connectedhomeip/examples/lock-app/nrf5
+          $ cd ~/connectedhomeip/examples/lighting-app/nrf5
           $ make erase
           $ make flash-softdevice
 
@@ -205,7 +202,7 @@ and application again.
 
 To flash the example app, run the following commands:
 
-        $ cd ~/connectedhomeip/examples/lock-app/nrf5
+        $ cd ~/connectedhomeip/examples/lighting-app/nrf5
         $ make flash-app
 
 > The [VSCode devcontainer](#using-chips-vscode-devcontainer) cannot communicate
