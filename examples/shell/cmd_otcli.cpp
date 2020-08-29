@@ -105,7 +105,7 @@ int cmd_otcli_dispatch(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    int pid, status;
+    int pid;
     uid_t euid         = geteuid();
     char ctl_command[] = "/usr/local/sbin/ot-ctl";
 
@@ -128,13 +128,18 @@ int cmd_otcli_dispatch(int argc, char ** argv)
         // Child process to execute the command with provided arguments
         --argv; // Restore access to entry [0] containing the command;
         argv[0] = ctl_command;
-        execv(ctl_command, argv);
-        exit(0);
+        if (execvp(ctl_command, argv) < 0)
+        {
+            streamer_printf(streamer_get(), "Error exec %s: %s\n", ctl_command, strerror(errno));
+        }
+        exit(errno);
     }
     else
     {
         // Parent process to wait on child.
-        error = (waitpid(pid, &status, 0) == -1) ? CHIP_ERROR_INCORRECT_STATE : CHIP_NO_ERROR;
+        int status;
+        wait(&status);
+        error = (status) ? CHIP_ERROR_INCORRECT_STATE : CHIP_NO_ERROR;
     }
 
 exit:
