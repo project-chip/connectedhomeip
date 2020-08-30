@@ -107,13 +107,14 @@ function(chip_configure TARGET_NAME)
         --disable-docs
         --disable-java
         --disable-device-manager
-        --with-mbedtls=${ZEPHYR_BASE}/../modules/crypto/mbedtls
         --with-crypto=mbedtls
     )
     
     append_if(CHIP_CONFIGURE_ARGS CONFIG_NET_L2_OPENTHREAD --with-openthread=${ZEPHYR_BASE}/../modules/lib/openthread)
+    append_if(CHIP_CONFIGURE_ARGS CONFIG_NORDIC_SECURITY_BACKEND --with-mbedtls=${ZEPHYR_BASE}/../mbedtls)
     append_if_not(CHIP_CONFIGURE_ARGS CHIP_BUILD_TESTS --disable-tests)
     append_if_not(CHIP_CONFIGURE_ARGS CONFIG_NET_IPV4 --disable-ipv4)
+    append_if_not(CHIP_CONFIGURE_ARGS CONFIG_NORDIC_SECURITY_BACKEND --with-mbedtls=${ZEPHYR_BASE}/../modules/crypto/mbedtls)
 
     # Define target
     ExternalProject_Add(

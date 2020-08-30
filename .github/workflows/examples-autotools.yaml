@@ -74,7 +74,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.4.1
+            image: connectedhomeip/chip-build-nrf-platform:0.4.2
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"

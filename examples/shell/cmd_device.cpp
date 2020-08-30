@@ -19,6 +19,8 @@
 
 #if CONFIG_DEVICE_LAYER
 
+#include <inttypes.h>
+
 #include <platform/CHIPDeviceLayer.h>
 #include <shell/shell.h>
 #include <support/CHIPArgParser.hpp>

@@ -419,7 +419,7 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
     else if (emberAfNetworkIndexFromEndpointIndex(index) != cmd->networkIndex)
     {
         emberAfDebugPrint("Drop cluster 0x%2x command 0x%x", cmd->apsFrame->clusterId, cmd->commandId);
-        emberAfDebugPrint(" for endpoint 0x%x due to wrong %p: ", cmd->apsFrame->destinationEndpoint, "network");
+        emberAfDebugPrint(" for endpoint 0x%x due to wrong %s: ", cmd->apsFrame->destinationEndpoint, "network");
         emberAfDebugPrintln("%d", cmd->networkIndex);
         return false;
     }
@@ -428,16 +428,16 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
               (EMBER_MAXIMUM_STANDARD_PROFILE_ID < emberAfProfileIdFromIndex(index))))
     {
         emberAfDebugPrint("Drop cluster 0x%2x command 0x%x", cmd->apsFrame->clusterId, cmd->commandId);
-        emberAfDebugPrint(" for endpoint 0x%x due to wrong %p: ", cmd->apsFrame->destinationEndpoint, "profile");
-        emberAfDebugPrintln("0x%2x", cmd->apsFrame->profileId);
+        emberAfDebugPrint(" for endpoint 0x%x due to wrong %s: ", cmd->apsFrame->destinationEndpoint, "profile");
+        emberAfDebugPrintln("0x%02x", cmd->apsFrame->profileId);
         return false;
     }
     else if ((cmd->type == EMBER_INCOMING_MULTICAST || cmd->type == EMBER_INCOMING_MULTICAST_LOOPBACK) &&
              !emberAfGroupsClusterEndpointInGroupCallback(cmd->apsFrame->destinationEndpoint, cmd->apsFrame->groupId))
     {
         emberAfDebugPrint("Drop cluster 0x%2x command 0x%x", cmd->apsFrame->clusterId, cmd->commandId);
-        emberAfDebugPrint(" for endpoint 0x%x due to wrong %p: ", cmd->apsFrame->destinationEndpoint, "group");
-        emberAfDebugPrintln("0x%2x", cmd->apsFrame->groupId);
+        emberAfDebugPrint(" for endpoint 0x%x due to wrong %s: ", cmd->apsFrame->destinationEndpoint, "group");
+        emberAfDebugPrintln("0x%02x", cmd->apsFrame->groupId);
         return false;
     }
     else

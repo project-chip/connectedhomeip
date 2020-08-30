@@ -19,16 +19,16 @@
 
 /**
  *    @file
- *      The defines constants for the CHIP Common Profile, present in
+ *      The defines constants for the CHIP Common Protocol, present in
  *      every CHIP device.
  *
  */
 
-#ifndef _COMMON_PROFILE_H
-#define _COMMON_PROFILE_H
+#ifndef _COMMON_PROTOCOL_H
+#define _COMMON_PROTOCOL_H
 
 /**
- *   @namespace chip::Profiles::Common
+ *   @namespace chip::Protocols::Common
  *
  *   @brief
  *     This namespace includes all interfaces within CHIP for the
@@ -38,7 +38,7 @@
  */
 
 namespace chip {
-namespace Profiles {
+namespace Protocols {
 namespace Common {
 
 /**
@@ -55,7 +55,7 @@ enum
 };
 
 /**
- * Common Profile Status Codes
+ * Common Protocol Status Codes
  */
 enum
 {
@@ -81,7 +81,7 @@ enum
 };
 
 /**
- * Common Profile MIME file type
+ * Common Protocol MIME file type
  */
 enum
 {
@@ -94,33 +94,33 @@ enum
  * @var   kTag_SystemErrorCode
  * @brief [uint] System-specific error.
  *
- * Tag Category: Profile-specific.  Constraints: none
+ * Tag Category: Protocol-specific.  Constraints: none
  *
  * @var   kTag_SchemaVersion
  * @brief [uint] Schema revision.
  *
- * Tag Category: Profile-specific.  Constraints: 0-255
+ * Tag Category: Protocol-specific.  Constraints: 0-255
  *
  * @var   kTag_MIMEType
  * @brief [uint] MIME type.
  *
- * Tag Category: Profile-agnostic.  Constraints: none
+ * Tag Category: Protocol-agnostic.  Constraints: none
  */
 
 /**
- * Common Profile Data Tags
+ * Common Protocol Data Tags
  */
 enum
 {
     //                                      Value       Tag Category      Element Type      Constraints  Description
     //                                      ------------------------------------------------------------------------
-    kTag_SystemErrorCode = 0x0001, // Profile-specific  Unsigned Integer  -            System-specific error
-    kTag_SchemaVersion   = 0x0002, // Profile-specific  Unsigned Integer  0-255        Schema revision
-    kTag_MIMEType        = 0x0004, // Profile-agnostic  Unsigned Integer  -            MIME type
+    kTag_SystemErrorCode = 0x0001, // Protocol-specific  Unsigned Integer  -            System-specific error
+    kTag_SchemaVersion   = 0x0002, // Protocol-specific  Unsigned Integer  0-255        Schema revision
+    kTag_MIMEType        = 0x0004, // Protocol-agnostic  Unsigned Integer  -            MIME type
 };
 
 } // namespace Common
-} // namespace Profiles
+} // namespace Protocols
 } // namespace chip
 
-#endif // _COMMON_PROFILE_H
+#endif // _COMMON_PROTOCOL_H

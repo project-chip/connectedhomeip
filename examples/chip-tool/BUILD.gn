@@ -18,7 +18,7 @@ import("${chip_root}/gn/chip/tools.gni")
 
 assert(chip_build_tools)
 
-executable("chip-standalone-demo") {
+executable("chip-tool") {
   sources = [ "main.cpp" ]
 
   if (is_debug) {
@@ -32,7 +32,7 @@ executable("chip-standalone-demo") {
   output_dir = root_out_dir
 }
 
-executable("chip-standalone-server") {
+executable("chip-tool-server") {
   sources = [
     "${chip_root}/src/app/clusters/on-off-server/on-off.c",
     "${chip_root}/src/app/util/attribute-size.c",
@@ -65,8 +65,4 @@ executable("chip-standalone-server") {
   public_deps = [ "${chip_root}/src/lib" ]
 
   output_dir = root_out_dir
-}
-
-group("chip-tool") {
-  deps = [ ":chip-standalone-demo" ]
 }

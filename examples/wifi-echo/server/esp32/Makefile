@@ -30,4 +30,10 @@ CXXFLAGS += -std=c++11 -Os
 CPPFLAGS += -Os
 CFLAGS += -Os
 
+CHIP_BUILD_WITH_GN ?= ""
+
+ifeq ($(CHIP_BUILD_WITH_GN),y)
+CPPFLAGS += -DCHIP_SEPARATE_CONFIG_H
+endif
+export CHIP_BUILD_WITH_GN
 include $(IDF_PATH)/make/project.mk

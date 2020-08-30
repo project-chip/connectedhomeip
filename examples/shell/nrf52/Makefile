@@ -57,6 +57,7 @@ SRCS = \
     $(PROJECT_ROOT)/cmd_base64.cpp \
     $(PROJECT_ROOT)/cmd_btp.cpp \
     $(PROJECT_ROOT)/cmd_device.cpp \
+    $(PROJECT_ROOT)/cmd_otcli.cpp \
     $(PROJECT_ROOT)/test_identity.cpp \
     $(NRF5_PLATFORM_DIR)/app/support/CXXExceptionStubs.cpp \
     $(NRF5_PLATFORM_DIR)/app/support/nRF5Sbrk.c \

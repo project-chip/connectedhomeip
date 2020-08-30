@@ -24,6 +24,7 @@ executable("chip-shell") {
     "cmd_btp.cpp",
     "cmd_device.cpp",
     "cmd_misc.cpp",
+    "cmd_otcli.cpp",
     "main.cpp",
   ]
 

@@ -42,6 +42,7 @@ lib_LIBRARIES                         = libCHIPDataModel.a
 libCHIPDataModel_a_CPPFLAGS           = \
     -I$(top_srcdir)/src                 \
     -I$(top_srcdir)/src/lib             \
+    $(NLIO_CPPFLAGS)                    \
     $(NULL)
 
 libCHIPDataModel_a_SOURCES            = \

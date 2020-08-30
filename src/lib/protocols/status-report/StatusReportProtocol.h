@@ -33,14 +33,14 @@
  *
  */
 
-#ifndef _STATUS_REPORT_PROFILE_H
-#define _STATUS_REPORT_PROFILE_H
+#ifndef _STATUS_REPORT_PROTOCOL_H
+#define _STATUS_REPORT_PROTOCOL_H
 
 #include <message/CHIPMessageLayer.h>
 #include <support/DLLUtil.h>
 
 /**
- *   @namespace chip::Profiles::StatusReporting
+ *   @namespace chip::Protocols::StatusReporting
  *
  *   @brief
  *     This namespace includes all interfaces within CHIP for the
@@ -49,7 +49,7 @@
  */
 
 namespace chip {
-namespace Profiles {
+namespace Protocols {
 namespace StatusReporting {
 
 /*
@@ -64,7 +64,7 @@ public:
     StatusReport(void);
     ~StatusReport(void);
 
-    CHIP_ERROR init(uint32_t aProfileId, uint16_t aCode, ReferencedTLVData * aInfo = NULL);
+    CHIP_ERROR init(uint32_t aProtocolId, uint16_t aCode, ReferencedTLVData * aInfo = NULL);
 
     /*
      * this version of the intializer is provided as a convenience in
@@ -93,14 +93,14 @@ public:
 
     // data members
 
-    uint32_t mProfileId;
+    uint32_t mProtocolId;
     uint16_t mStatusCode;
     CHIP_ERROR mError;
     ReferencedTLVData mAdditionalInfo;
 };
 
 } // namespace StatusReporting
-} // namespace Profiles
+} // namespace Protocols
 } // namespace chip
 
-#endif // _STATUS_REPORT_PROFILE_H
+#endif // _STATUS_REPORT_PROTOCOL_H

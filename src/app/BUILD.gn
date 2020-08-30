@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/nlio.gni")
 
 config("app_config") {
   include_dirs = [
@@ -27,14 +28,15 @@ static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
-    "decoder.c",
-    "encoder.c",
+    "decoder.cpp",
+    "encoder.cpp",
   ]
 
   public_deps = [
     ":codec_headers",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/system",
+    "${nlio_root}:nlio",
   ]
 
   public_configs = [

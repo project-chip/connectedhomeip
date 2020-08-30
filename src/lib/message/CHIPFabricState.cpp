@@ -36,16 +36,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <Profiles/fabric-provisioning/FabricProvisioning.h>
-#include <Profiles/security/CHIPDummyGroupKeyStore.h>
-#include <Profiles/security/CHIPSecurity.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPKeyIds.h>
 #include <core/CHIPTLV.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <message/CHIPFabricState.h>
-#include <profiles/CHIPProfiles.h>
+#include <protocols/CHIPProtocols.h>
+#include <protocols/fabric-provisioning/FabricProvisioning.h>
+#include <protocols/security/CHIPDummyGroupKeyStore.h>
+#include <protocols/security/CHIPSecurity.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 #include <support/crypto/CHIPRNG.h>
@@ -69,10 +69,10 @@ namespace chip {
 using namespace chip::TLV;
 using namespace chip::Encoding;
 using namespace chip::Crypto;
-using namespace chip::Profiles;
-using namespace chip::Profiles::FabricProvisioning;
-using namespace chip::Profiles::Security;
-using namespace chip::Profiles::Security::AppKeys;
+using namespace chip::Protocols;
+using namespace chip::Protocols::FabricProvisioning;
+using namespace chip::Protocols::Security;
+using namespace chip::Protocols::Security::AppKeys;
 
 #if CHIP_CONFIG_SECURITY_TEST_MODE
 #pragma message "\n \
@@ -657,7 +657,7 @@ CHIP_ERROR ChipFabricState::SuspendSession(uint16_t keyId, uint64_t peerNodeId, 
         writer.Init(buf, bufSize);
 
         // Begin encoding a Security:SerializedSession TLV structure.
-        err = writer.StartContainer(ProfileTag(kChipProfile_Security, kTag_SerializedSession), kTLVType_Structure, container);
+        err = writer.StartContainer(ProfileTag(kChipProtocol_Security, kTag_SerializedSession), kTLVType_Structure, container);
         SuccessOrExit(err);
 
         // Encode various information about the session, in tag order.
@@ -766,7 +766,7 @@ CHIP_ERROR ChipFabricState::RestoreSession(uint8_t * serializedSession, uint16_t
     reader.Init(serializedSession, serializedSessionLen);
 
     // Look for and enter the Security:SerializedSession TLV structure.
-    err = reader.Next(kTLVType_Structure, ProfileTag(kChipProfile_Security, kTag_SerializedSession));
+    err = reader.Next(kTLVType_Structure, ProfileTag(kChipProtocol_Security, kTag_SerializedSession));
     SuccessOrExit(err);
     err = reader.EnterContainer(container);
     SuccessOrExit(err);
@@ -1067,10 +1067,8 @@ void ChipFabricState::OnMsgCounterSyncRespRcvd(uint64_t peerNodeId, uint32_t pee
             PeerStates.GroupKeyRcvFlags[peerIndex]     = ChipSessionState::kReceiveFlags_MessageIdSynchronized;
             PeerStates.MaxGroupKeyMsgIdRcvd[peerIndex] = peerMsgId;
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
             // Clear MsgCounterSyncReq flag for all pending messages to that peer.
             MessageLayer->ExchangeMgr->ClearMsgCounterSyncReq(peerNodeId);
-#endif
         }
     }
 
@@ -1490,7 +1488,7 @@ CHIP_ERROR ChipFabricState::GetFabricState(uint8_t * buf, uint32_t bufSize, uint
 
     writer.Init(buf, bufSize);
 
-    err = writer.StartContainer(ProfileTag(kChipProfile_FabricProvisioning, kTag_FabricConfig), kTLVType_Structure, containerType);
+    err = writer.StartContainer(ProfileTag(kChipProtocol_FabricProvisioning, kTag_FabricConfig), kTLVType_Structure, containerType);
     SuccessOrExit(err);
 
     err = writer.Put(ContextTag(kTag_FabricId), FabricId);
@@ -1565,7 +1563,7 @@ CHIP_ERROR ChipFabricState::JoinExistingFabric(const uint8_t * fabricState, uint
 
     reader.Init(fabricState, fabricStateLen);
 
-    err = reader.Next(kTLVType_Structure, ProfileTag(kChipProfile_FabricProvisioning, kTag_FabricConfig));
+    err = reader.Next(kTLVType_Structure, ProfileTag(kChipProtocol_FabricProvisioning, kTag_FabricConfig));
     SuccessOrExit(err);
 
     {

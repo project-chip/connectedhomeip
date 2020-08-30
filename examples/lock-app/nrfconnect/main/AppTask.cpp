@@ -26,6 +26,8 @@
 
 #include <dk_buttons_and_leds.h>
 #include <logging/log.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <setup_payload/SetupPayload.h>
 #include <zephyr.h>
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
@@ -33,6 +35,7 @@
 #define APP_EVENT_QUEUE_SIZE 10
 #define BUTTON_PUSH_EVENT 1
 #define BUTTON_RELEASE_EVENT 0
+#define EXAMPLE_VENDOR_ID 0xabcd
 
 LOG_MODULE_DECLARE(app);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
@@ -86,7 +89,49 @@ int AppTask::Init()
     // Init ZCL Data Model
     InitDataModelHandler();
     StartServer(&sSessions);
+    PrintQRCode();
+
     return 0;
+}
+
+void AppTask::PrintQRCode() const
+{
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    uint32_t setUpPINCode       = 0;
+    uint32_t setUpDiscriminator = 0;
+
+    err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_INF("ConfigurationMgr().GetSetupPinCode() failed: %s", log_strdup(chip::ErrorStr(err)));
+    }
+
+    err = ConfigurationMgr().GetSetupDiscriminator(setUpDiscriminator);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_INF("ConfigurationMgr().GetSetupDiscriminator() failed: %s", log_strdup(chip::ErrorStr(err)));
+    }
+
+    chip::SetupPayload payload;
+    payload.version       = 1;
+    payload.vendorID      = EXAMPLE_VENDOR_ID;
+    payload.productID     = 1;
+    payload.setUpPINCode  = setUpPINCode;
+    payload.discriminator = setUpDiscriminator;
+    chip::QRCodeSetupPayloadGenerator generator(payload);
+
+    // TODO: Usage of STL will significantly increase the image size, this should be changed to more efficient method for
+    // generating payload
+    std::string result;
+    err = generator.payloadBase41Representation(result);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("Failed to generate QR Code");
+    }
+
+    LOG_INF("SetupPINCode: [%" PRIu32 "]", setUpPINCode);
+    // There might be whitespace in setup QRCode, add brackets to make it clearer.
+    LOG_INF("SetupQRCode:  [%s]", log_strdup(result.c_str()));
 }
 
 int AppTask::StartApp()
@@ -318,7 +363,7 @@ void AppTask::JoinerHandler(AppEvent * aEvent)
     error = ThreadStackMgr().JoinerStart();
 #endif
 
-    LOG_INF("Thread joiner triggering result: %s", chip::ErrorStr(error));
+    LOG_INF("Thread joiner triggering result: %s", log_strdup(chip::ErrorStr(error)));
 }
 
 void AppTask::CancelTimer()

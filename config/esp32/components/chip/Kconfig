@@ -77,15 +77,6 @@ menu "CHIP Core"
 
                 This value can be overridden by the application at runtime.
 
-        config SHORT_ERROR_STR
-            bool "Use Short Error Strings"
-            default n
-            help
-                Configure the CHIP ErrorStr() function to return short error strings
-                containing only the error, without any descriptive text.
-
-                This option is generally used to reduce flash usage.
-
         # TODO: add log level selection
 
     endmenu # "General Options"

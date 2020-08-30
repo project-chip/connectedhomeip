@@ -28,16 +28,16 @@
  */
 
 #include "CHIPServerBase.h"
-#include <Profiles/common/CommonProfile.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPTLV.h>
-#include <profiles/CHIPProfiles.h>
+#include <protocols/CHIPProtocols.h>
+#include <protocols/common/CommonProtocol.h>
 #include <support/CodeUtils.h>
 
 namespace chip {
 
-using namespace chip::Profiles;
+using namespace chip::Protocols;
 using namespace chip::Encoding;
 using namespace chip::TLV;
 
@@ -69,7 +69,7 @@ bool ChipServerBase::EnforceAccessControl(ExchangeContext * ec, uint32_t msgProf
     // Reject all messages if the application hasn't specified a delegate object.
     if (delegate == NULL)
     {
-        ChipServerBase::SendStatusReport(ec, kChipProfile_Common, Common::kStatus_InternalError, CHIP_NO_ERROR);
+        ChipServerBase::SendStatusReport(ec, kChipProtocol_Common, Common::kStatus_InternalError, CHIP_NO_ERROR);
         return false;
     }
 
@@ -97,7 +97,7 @@ bool ChipServerBase::EnforceAccessControl(ExchangeContext * ec, uint32_t msgProf
         {
             uint16_t statusCode = (msgInfo->PeerAuthMode == kChipAuthMode_None) ? Common::kStatus_AuthenticationRequired
                                                                                 : Common::kStatus_AccessDenied;
-            ChipServerBase::SendStatusReport(ec, kChipProfile_Common, statusCode, CHIP_NO_ERROR);
+            ChipServerBase::SendStatusReport(ec, kChipProtocol_Common, statusCode, CHIP_NO_ERROR);
         }
 
         // Tell the caller the message should NOT be accepted.
@@ -176,7 +176,7 @@ CHIP_ERROR ChipServerBase::SendStatusReport(ExchangeContext * ec, uint32_t statu
         err = statusWriter.StartContainer(AnonymousTag, kTLVType_Structure, outerContainerType);
         SuccessOrExit(err);
 
-        err = statusWriter.Put(ProfileTag(kChipProfile_Common, Common::kTag_SystemErrorCode), (uint32_t) sysError);
+        err = statusWriter.Put(ProfileTag(kChipProtocol_Common, Common::kTag_SystemErrorCode), (uint32_t) sysError);
         SuccessOrExit(err);
 
         err = statusWriter.EndContainer(outerContainerType);
@@ -186,7 +186,7 @@ CHIP_ERROR ChipServerBase::SendStatusReport(ExchangeContext * ec, uint32_t statu
         SuccessOrExit(err);
     }
 
-    err     = ec->SendMessage(kChipProfile_Common, Common::kMsgType_StatusReport, respBuf, sendFlags);
+    err     = ec->SendMessage(kChipProtocol_Common, Common::kMsgType_StatusReport, respBuf, sendFlags);
     respBuf = NULL;
 
 exit:

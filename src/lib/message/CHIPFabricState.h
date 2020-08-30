@@ -37,8 +37,8 @@
 
 #include <inttypes.h>
 
-#include <Profiles/security/CHIPApplicationKeys.h>
 #include <core/CHIPKeyIds.h>
+#include <protocols/security/CHIPApplicationKeys.h>
 #include <support/CHIPCounter.h>
 #include <support/DLLUtil.h>
 #include <support/FlagUtils.hpp>
@@ -520,7 +520,7 @@ public:
     const char * PairingCode;
     uint16_t DefaultSubnet;
     uint8_t State; // [READ ONLY] State of the CHIP Fabric State object
-    chip::Profiles::Security::AppKeys::GroupKeyStoreBase * GroupKeyStore;
+    chip::Protocols::Security::AppKeys::GroupKeyStoreBase * GroupKeyStore;
 
 #if CHIP_CONFIG_SECURITY_TEST_MODE
     uint64_t DebugFabricId;
@@ -535,7 +535,7 @@ public:
 #endif
 
     CHIP_ERROR Init(void);
-    CHIP_ERROR Init(chip::Profiles::Security::AppKeys::GroupKeyStoreBase * groupKeyStore);
+    CHIP_ERROR Init(chip::Protocols::Security::AppKeys::GroupKeyStoreBase * groupKeyStore);
     CHIP_ERROR Shutdown(void);
 
     CHIP_ERROR AllocSessionKey(uint64_t peerNodeId, uint16_t keyId, ChipConnection * boundCon, ChipSessionKey *& sessionKey);

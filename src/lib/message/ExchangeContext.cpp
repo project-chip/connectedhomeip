@@ -33,12 +33,12 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <Profiles/common/CommonProfile.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <message/CHIPExchangeMgr.h>
 #include <message/CHIPSecurityMgr.h>
-#include <profiles/CHIPProfiles.h>
+#include <protocols/CHIPProtocols.h>
+#include <protocols/common/CommonProtocol.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <support/FlagUtils.hpp>
@@ -134,7 +134,6 @@ void ExchangeContext::SetConnectionClosed(bool inConnectionClosed)
     SetFlag(mFlags, static_cast<uint16_t>(kFlagConnectionClosed), inConnectionClosed);
 }
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 /**
  *  Determine whether there is already an acknowledgment pending to be sent
  *  to the peer on this exchange.
@@ -238,11 +237,10 @@ bool ExchangeContext::ShouldDropAck(void) const
 
 static inline bool IsRMPControlMessage(uint32_t profileId, uint8_t msgType)
 {
-    return (profileId == chip::Profiles::kChipProfile_Common &&
-            (msgType == chip::Profiles::Common::kMsgType_RMP_Throttle_Flow ||
-             msgType == chip::Profiles::Common::kMsgType_RMP_Delayed_Delivery));
+    return (profileId == chip::Protocols::kChipProtocol_Common &&
+            (msgType == chip::Protocols::Common::kMsgType_RMP_Throttle_Flow ||
+             msgType == chip::Protocols::Common::kMsgType_RMP_Delayed_Delivery));
 }
-#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
 /**
  *  Set whether a response is expected on this exchange.
@@ -423,11 +421,9 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
 CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf, uint16_t sendFlags,
                                         ChipMessageInfo * msgInfo, void * msgCtxt)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    bool sendCalled = false;
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
+    CHIP_ERROR err                                 = CHIP_NO_ERROR;
+    bool sendCalled                                = false;
     ChipExchangeManager::RetransTableEntry * entry = NULL;
-#endif
 
 #if CHIP_RETAIN_LOGGING
     uint16_t payloadLen = msgBuf->DataLength();
@@ -440,8 +436,6 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
     // originally generated it tries to close it as a result of
     // an error arising below. at the end, we have to close it.
     AddRef();
-
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
     // If sending via UDP and the auto-request ACK feature is enabled, automatically
     // request an acknowledgment, UNLESS the NoAutoRequestAck send flag has been specified.
@@ -458,17 +452,6 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
 
     // Abort early if Throttle is already set;
     VerifyOrExit(mRMPThrottleTimeout == 0, err = CHIP_ERROR_SEND_THROTTLED);
-
-#else // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-
-    // If CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING == 0, then
-    // kSendFlag_RequestAck should not be set.
-    if (sendFlags & kSendFlag_RequestAck)
-    {
-        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
     // Set the Message Protocol Version
     if (kChipMessageVersion_Unspecified == mMsgProtocolVersion)
@@ -540,8 +523,6 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
     }
     else
     {
-
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         if (sendFlags & kSendFlag_RequestAck)
         {
             err = ExchangeMgr->MessageLayer->SelectDestNodeIdAndAddress(msgInfo->DestNodeId, PeerAddr);
@@ -564,7 +545,6 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
             CHIP_FAULT_INJECT(FaultInjection::kFault_RMPDoubleTx, entry->nextRetransTime = 0; ExchangeMgr->RMPStartTimer());
         }
         else
-#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         {
             err        = ExchangeMgr->MessageLayer->SendMessage(PeerAddr, PeerPort, PeerIntf, msgInfo, msgBuf);
             msgBuf     = NULL;
@@ -624,8 +604,8 @@ CHIP_ERROR ExchangeContext::SendCommonNullMessage(void)
     VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     // Send the null message
-    err =
-        SendMessage(chip::Profiles::kChipProfile_Common, chip::Profiles::Common::kMsgType_Null, msgBuf, kSendFlag_NoAutoRequestAck);
+    err    = SendMessage(chip::Protocols::kChipProtocol_Common, chip::Protocols::Common::kMsgType_Null, msgBuf,
+                      kSendFlag_NoAutoRequestAck);
     msgBuf = NULL;
 
 exit:
@@ -678,7 +658,6 @@ CHIP_ERROR ExchangeContext::EncodeExchHeader(ChipExchangeHeader * exchangeHeader
     exchangeHeader->Flags = (IsInitiator() || (sendFlags & kSendFlag_FromInitiator)) ? kChipExchangeFlag_Initiator : 0;
 
     // RMP PreProcess Checks and Flag setting
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     // If there is a pending acknowledgment piggyback it on this message.
     // If there is no pending acknowledgment piggyback the last Ack that was sent.
     //   - HasPeerRequestedAck() is used to verify that AckId field is valid
@@ -707,7 +686,6 @@ CHIP_ERROR ExchangeContext::EncodeExchHeader(ChipExchangeHeader * exchangeHeader
     {
         exchangeHeader->Flags |= kChipExchangeFlag_NeedsAck;
     }
-#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
     err = ChipExchangeManager::PrependHeader(exchangeHeader, msgBuf);
 
@@ -736,7 +714,6 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     OnConnectionClosed      = NULL;
     OnKeyError              = NULL;
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
     ExchangeMgr->RMPExpireTicks();
 
@@ -756,7 +733,6 @@ void ExchangeContext::DoClose(bool clearRetransTable)
 
     // Schedule next physical wakeup
     ExchangeMgr->RMPStartTimer();
-#endif
 
     // Cancel the response timer.
     CancelResponseTimer();
@@ -940,7 +916,6 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
         ec->OnResponseTimeout(ec);
 }
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 bool ExchangeContext::RMPCheckAndRemRetransTable(uint32_t ackMsgId, void ** rCtxt)
 {
     bool res = false;
@@ -1046,7 +1021,7 @@ CHIP_ERROR ExchangeContext::RMPSendThrottleFlow(uint32_t pauseTimeMillis)
     // Send a Throttle Flow message to the peer.  Throttle Flow messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = SendMessage(Profiles::kChipProfile_Common, Profiles::Common::kMsgType_RMP_Throttle_Flow, msgBuf,
+    err = SendMessage(Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Throttle_Flow, msgBuf,
                       kSendFlag_NoAutoRequestAck);
 
 exit:
@@ -1104,7 +1079,7 @@ CHIP_ERROR ExchangeContext::RMPSendDelayedDelivery(uint32_t pauseTimeMillis, uin
     // Send a Delayed Delivery message to the peer.  Delayed Delivery messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = SendMessage(Profiles::kChipProfile_Common, Profiles::Common::kMsgType_RMP_Delayed_Delivery, msgBuf,
+    err = SendMessage(Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Delayed_Delivery, msgBuf,
                       kSendFlag_NoAutoRequestAck);
 
 exit:
@@ -1277,7 +1252,6 @@ CHIP_ERROR ExchangeContext::HandleThrottleFlow(uint32_t PauseTimeMillis)
     ExchangeMgr->RMPStartTimer();
     return CHIP_NO_ERROR;
 }
-#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
 /**
  * @overload
@@ -1310,11 +1284,9 @@ CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo * msgInfo, const ChipE
 CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo * msgInfo, const ChipExchangeHeader * exchHeader, PacketBuffer * msgBuf,
                                           ExchangeContext::MessageReceiveFunct umhandler)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
+    CHIP_ERROR err           = CHIP_NO_ERROR;
     const uint8_t * p        = NULL;
     uint32_t PauseTimeMillis = 0;
-#endif
 
     // We hold a reference to the ExchangeContext here to
     // guard against Close() calls(decrementing the reference
@@ -1322,7 +1294,6 @@ CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo * msgInfo, const ChipE
     // layer has completed its work on the ExchangeContext.
     AddRef();
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     if (exchHeader->Flags & kChipExchangeFlag_AckId)
     {
         err = RMPHandleRcvdAck(exchHeader, msgInfo);
@@ -1340,7 +1311,6 @@ CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo * msgInfo, const ChipE
             err = RMPHandleNeedsAck(msgInfo);
         }
     }
-#endif
 
     // If the message is a duplicate and duplicates are not allowed for this exchange.
     if ((msgInfo->Flags & kChipMessageFlag_DuplicateMessage) && !AllowDuplicateMsgs)
@@ -1349,20 +1319,18 @@ CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo * msgInfo, const ChipE
     }
 
     // Received Flow Throttle
-    if (exchHeader->ProfileId == chip::Profiles::kChipProfile_Common &&
-        exchHeader->MessageType == chip::Profiles::Common::kMsgType_RMP_Throttle_Flow)
+    if (exchHeader->ProfileId == chip::Protocols::kChipProtocol_Common &&
+        exchHeader->MessageType == chip::Protocols::Common::kMsgType_RMP_Throttle_Flow)
     {
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         // Extract PauseTimeMillis from msgBuf
         p               = msgBuf->Start();
         PauseTimeMillis = LittleEndian::Read32(p);
         HandleThrottleFlow(PauseTimeMillis);
         ExitNow(err = CHIP_NO_ERROR);
-#endif
     }
     // Return and not pass this to Application if Common::Null Msg Type
-    else if ((exchHeader->ProfileId == chip::Profiles::kChipProfile_Common) &&
-             (exchHeader->MessageType == chip::Profiles::Common::kMsgType_Null))
+    else if ((exchHeader->ProfileId == chip::Protocols::kChipProtocol_Common) &&
+             (exchHeader->MessageType == chip::Protocols::Common::kMsgType_Null))
     {
         ExitNow(err = CHIP_NO_ERROR);
     }

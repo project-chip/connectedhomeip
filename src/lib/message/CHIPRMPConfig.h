@@ -31,18 +31,6 @@ namespace chip {
 // clang-format off
 
 /**
- *  @def CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
- *
- *  @brief
- *    If set to (1), use of the RMP implementation is
- *    enabled. Default value is (1) or enabled.
- *
- */
-#ifndef CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-#define CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING              1
-#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-
-/**
  *  @def CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD
  *
  *  @brief
