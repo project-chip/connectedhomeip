@@ -66,4 +66,3 @@ executable("chip-tool-server") {
 
   output_dir = root_out_dir
 }
-

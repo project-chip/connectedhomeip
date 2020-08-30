@@ -16,11 +16,11 @@ Building the example application is quite straightforward.
 
 ### gn
 
-- From the top-level of the chip repo, run `./gn_build.sh`
+-   From the top-level of the chip repo, run `./gn_build.sh`
 
-          $ ./gn_build.sh
+            $ ./gn_build.sh
 
-- Or from the `examples/chip-tool` directory:
+-   Or from the `examples/chip-tool` directory:
 
 ```
 source third_party/connectedhomeip/scripts/activate.sh
@@ -28,8 +28,8 @@ gn gen out/debug
 ninja -C out/debug
 ```
 
-- After the application is built, it can be found in the build directory as
-  `out/debug/standalone/chip-tool`
+-   After the application is built, it can be found in the build directory as
+    `out/debug/standalone/chip-tool`
 
 ### autotools
 
@@ -38,15 +38,17 @@ ninja -C out/debug
           $ make
           $ make -f server.mk
 
--   After the application is built, it can be found in the build directory as `chip-tool`.
+-   After the application is built, it can be found in the build directory as
+    `chip-tool`.
 
 ## Using the Client to Request an Echo
 
 ### Ping a device over BLE
 
-To initiate a client echo request to a BLE device, run the built executable
-and pass it the discriminator and pairing code of the remote device. The command
-below uses the default values hard-coded into the debug versions of the ESP32 wifi-echo app:
+To initiate a client echo request to a BLE device, run the built executable and
+pass it the discriminator and pairing code of the remote device. The command
+below uses the default values hard-coded into the debug versions of the ESP32
+wifi-echo app:
 
           $ chip-tool echo-ble 3840 12345678
 
