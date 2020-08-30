@@ -106,7 +106,7 @@ void EchoDeviceCallbacks::PostAttributeChangeCallback(uint8_t endpoint, EmberAfC
         ESP_LOGI(TAG, "Unknown attribute ID: %d", attributeId);
         return;
     }
-    ESP_LOGI(TAG, "Got the post attribute callback");
+    ESP_LOGI(TAG, "Got the post attribute callback with value %d", *value);
     // At this point we can assume that value points to a bool value.
     statusLED.Set(*value);
     ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));

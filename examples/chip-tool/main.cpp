@@ -435,6 +435,7 @@ void DoOnOff(DeviceController::ChipDeviceController * controller, Command comman
         fprintf(stderr, "Unknown command: %d\n", int(command));
         return;
     }
+    ChipLogProgress(Zcl, "Encoded data of length %d", dataLength);
     buffer->SetDataLength(dataLength);
 
 #ifdef DEBUG

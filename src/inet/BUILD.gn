@@ -97,6 +97,7 @@ static_library("inet") {
   public_deps = [
     ":inet_config_header",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lwip",
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
   ]

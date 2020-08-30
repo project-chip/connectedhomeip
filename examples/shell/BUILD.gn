@@ -23,6 +23,7 @@ executable("chip-shell") {
     "cmd_base64.cpp",
     "cmd_device.cpp",
     "cmd_misc.cpp",
+    "cmd_otcli.cpp",
     "main.cpp",
   ]
 
