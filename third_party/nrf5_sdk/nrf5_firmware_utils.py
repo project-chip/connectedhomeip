@@ -33,7 +33,7 @@ optional arguments:
 configuration:
   --verbose           Report more verbosely
   --nrfjprog FILE     File name of the nrfjprog executable
-  --family FAMILY     NRF5 device famity
+  --family FAMILY     NRF5 device family
 
 operations:
   --eraseall          Erase device before flashing
@@ -79,7 +79,7 @@ OPTIONS = {
 
         # Device configuration options.
         'family': {
-            'help': 'NRF5 device famity',
+            'help': 'NRF5 device family',
             'default': None,
             'argument': {
                 'metavar': 'FAMILY'
