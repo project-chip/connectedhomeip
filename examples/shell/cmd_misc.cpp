@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 
-#include <shell/shell.h>
+#include <lib/shell/shell.h>
 
-#include <core/CHIPCore.h>
-#include <support/Base64.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CodeUtils.h>
-#include <support/RandUtils.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/Base64.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/RandUtils.h>
 
 #include <inttypes.h>
 #include <stdarg.h>

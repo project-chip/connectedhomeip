@@ -59,4 +59,12 @@ libChipShell_a_SOURCES                                           += \
 
 endif
 
+if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+
+libChipShell_a_SOURCES                                           += \
+    streamer_zephyr.cpp                                             \
+    $(NULL)
+
+endif
+
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

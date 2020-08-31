@@ -80,7 +80,7 @@ function(chip_configure TARGET_NAME)
     chip_gn_arg_string(GN_ARGS "zephyr_cc = \"${CMAKE_C_COMPILER}\"")
     chip_gn_arg_string(GN_ARGS "zephyr_cxx = \"${CMAKE_CXX_COMPILER}\"")
 
-    if (NOT "${CHIP_PROJECT_CONFIG}" STREQUAL "")
+    if (CHIP_PROJECT_CONFIG)
         chip_gn_arg_string(GN_ARGS "chip_project_config_include = \"<${CHIP_PROJECT_CONFIG}>\"")
         chip_gn_arg_string(GN_ARGS "chip_system_project_config_include = \"<${CHIP_PROJECT_CONFIG}>\"")
     endif ()
