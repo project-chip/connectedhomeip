@@ -152,6 +152,10 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
 
     comment.delete()
 
+  if compare_results.len() == 0:
+    logging.info('No results to report')
+    return
+
   compareTable = 'File | Section | File | VM\n---- | ---- | ----- | ---- \n'
   for file in compare_results:
     for change in file.sectionChanges:
@@ -197,8 +201,8 @@ def cleanDir(name):
 
 def downloadArtifact(artifact, dirName):
   """Extract an artifact into a directory."""
-  zipFile = zipfile.ZipFile(io.BytesIO(artifact.downloadBlob()), 'r')	
-  logging.info('Extracting zip file to %r' % dirName)	
+  zipFile = zipfile.ZipFile(io.BytesIO(artifact.downloadBlob()), 'r')
+  logging.info('Extracting zip file to %r' % dirName)
   zipFile.extractall(dirName)
 
 def main():
