@@ -78,6 +78,7 @@ executable("lock_app") {
     "main/BoltLockManager.cpp",
     "main/include/AppEvent.h",
     "main/include/AppTask.h",
+    "main/include/BoltLockManager.h",
     "main/main.cpp",
   ]
 

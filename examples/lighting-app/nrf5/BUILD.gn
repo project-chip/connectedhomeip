@@ -78,6 +78,7 @@ executable("lighting_app") {
     "main/LightingManager.cpp",
     "main/include/AppEvent.h",
     "main/include/AppTask.h",
+    "main/include/LightingManager.h",
     "main/main.cpp",
   ]
 

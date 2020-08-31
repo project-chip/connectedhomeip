@@ -19,10 +19,9 @@
 #ifndef LOCK_MANAGER_H
 #define LOCK_MANAGER_H
 
+#include <AppEvent.h>
 #include <stdbool.h>
 #include <stdint.h>
-
-struct AppEvent;
 
 class BoltLockManager
 {

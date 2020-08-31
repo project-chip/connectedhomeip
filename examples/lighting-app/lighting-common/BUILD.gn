@@ -18,9 +18,7 @@ config("includes") {
   include_dirs = [ ".", "include" ]
 }
 
-static_library("lighting-common") {
-  output_name = "lighting-common"
-
+source_set("lighting-common") {
   sources = [
     "DataModelHandler.cpp",
     "gen/call-command-handler.c",
@@ -33,8 +31,6 @@ static_library("lighting-common") {
   ]
 
   public_configs = [
-    ":includes",
+      ":includes"
   ]
-
-  output_dir = root_out_dir
 }
