@@ -59,6 +59,8 @@ void emAfTick(void)
     emberAfTick();             // Global
 }
 
+void emAfResetAttributes(uint8_t endpointId) {}
+
 // Marker function declarations.
 void emberAfMarkBuffersCallback(void);         // Global
 void emberAfPluginNetworkSteeringMarker(void); // Plugin: network-steering
@@ -68,8 +70,6 @@ void emAfMarkBuffers(void)
     emberAfMarkBuffersCallback();         // Global
     emberAfPluginNetworkSteeringMarker(); // Plugin: network-steering
 }
-
-void emAfResetAttributes(uint8_t endpointId) {}
 
 // PreCommandReceived function declarations.
 bool emberAfPreCommandReceivedCallback(EmberAfClusterCommand * cmd); // Global
