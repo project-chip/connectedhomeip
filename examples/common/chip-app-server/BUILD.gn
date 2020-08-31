@@ -15,23 +15,20 @@
 import("//build_overrides/chip.gni")
 
 config("includes") {
-  include_dirs = [ ".", "include" ]
+  include_dirs = [
+    ".",
+    "include",
+  ]
 }
 
 static_library("chip-app-server") {
   output_name = "chip-app-server"
 
-  sources = [
-    "server.cpp",
-  ]
+  sources = [ "server.cpp" ]
 
-  deps = [
-    "${chip_root}/src/lib",
-  ]
+  deps = [ "${chip_root}/src/lib" ]
 
-  public_configs = [
-    ":includes",
-  ]
+  public_configs = [ ":includes" ]
 
   output_dir = root_out_dir
 }
