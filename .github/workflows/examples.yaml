@@ -118,7 +118,7 @@ jobs:
                       ${{ env.BUILD_TYPE }}-example-build-${{
                       steps.outsuffix.outputs.value }}
                   path: |
-                      out/chip_tool_debug/chip-standalone-demo
+                      out/chip_tool_debug/chip-tool
                       out/shell_debug/chip-shell
     efr32:
         name: EFR32

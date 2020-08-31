@@ -22,7 +22,7 @@
  *
  */
 
-#include "CHIPDeviceController.h"
+#include <controller/CHIPDeviceController.h>
 
 #include <jni.h>
 #include <pthread.h>
@@ -33,6 +33,11 @@
 extern "C" {
 #include <app/chip-zcl-zpro-codec.h>
 } // extern "C"
+
+// Choose an approximation of PTHREAD_NULL if pthread.h doesn't define one.
+#ifndef PTHREAD_NULL
+#define PTHREAD_NULL 0
+#endif // PTHREAD_NULL
 
 using namespace chip;
 using namespace chip::DeviceController;
@@ -54,7 +59,6 @@ using namespace chip::DeviceController;
 
 static void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState);
 static void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
-static void HandleSimpleOperationComplete(ChipDeviceController * deviceController, void * appReqState);
 static void HandleError(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err, const IPPacketInfo * pktInfo);
 static void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow);
 static void * IOThreadMain(void * arg);
@@ -339,67 +343,6 @@ JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong devic
         deviceController->Shutdown();
         delete deviceController;
     }
-}
-
-void HandleSimpleOperationComplete(ChipDeviceController * deviceController, void * appReqState)
-{
-    JNIEnv * env;
-    jclass deviceControllerCls;
-    jmethodID methodID;
-    char methodName[128];
-    jobject self   = (jobject) deviceController->AppState;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    ChipLogProgress(Controller, "Received response to %s request", (const char *) appReqState);
-
-    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
-
-    deviceControllerCls = env->GetObjectClass(self);
-    VerifyOrExit(deviceControllerCls != NULL, err = CDC_JNI_ERROR_TYPE_NOT_FOUND);
-
-    snprintf(methodName, sizeof(methodName) - 1, "on%sComplete", (const char *) appReqState);
-    methodName[sizeof(methodName) - 1] = 0;
-    methodID                           = env->GetMethodID(deviceControllerCls, methodName, "()V");
-    VerifyOrExit(methodID != NULL, err = CDC_JNI_ERROR_METHOD_NOT_FOUND);
-
-    ChipLogProgress(Controller, "Calling Java %s method", methodName);
-
-    env->ExceptionClear();
-    env->CallVoidMethod(self, methodID);
-    VerifyOrExit(!env->ExceptionCheck(), err = CDC_JNI_ERROR_EXCEPTION_THROWN);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        const char * functName = __FUNCTION__;
-
-        if (err == CDC_JNI_ERROR_EXCEPTION_THROWN)
-        {
-            ChipLogError(Controller, "Java Exception thrown in %s", functName);
-            env->ExceptionDescribe();
-        }
-        else
-        {
-            const char * errStr;
-            switch (err)
-            {
-            case CDC_JNI_ERROR_TYPE_NOT_FOUND:
-                errStr = "JNI type not found";
-                break;
-            case CDC_JNI_ERROR_METHOD_NOT_FOUND:
-                errStr = "JNI method not found";
-                break;
-            case CDC_JNI_ERROR_FIELD_NOT_FOUND:
-                errStr = "JNI field not found";
-                break;
-            default:
-                errStr = ErrorStr(err);
-                break;
-            }
-            ChipLogError(Controller, "Error in %s : %s", functName, errStr);
-        }
-    }
-    env->ExceptionClear();
 }
 
 void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState) {}

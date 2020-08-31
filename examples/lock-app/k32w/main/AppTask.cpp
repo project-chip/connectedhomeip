@@ -41,8 +41,6 @@ static QueueHandle_t sAppEventQueue;
 
 static LEDWidget sStatusLED;
 static LEDWidget sLockLED;
-static LEDWidget sUnusedLED;
-static LEDWidget sUnusedLED_1;
 
 static bool sIsThreadProvisioned     = false;
 static bool sIsThreadEnabled         = false;
@@ -86,9 +84,6 @@ int AppTask::Init()
 
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
-
-    sUnusedLED.Init(LED3);
-    sUnusedLED_1.Init(LED4);
 
     /* intialize the Keyboard and button press calback */
     KBD_Init(KBD_Callback);
@@ -212,8 +207,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 
         sStatusLED.Animate();
         sLockLED.Animate();
-        sUnusedLED.Animate();
-        sUnusedLED_1.Animate();
 
         HandleKeyboard();
     }
@@ -326,10 +319,6 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
             sLockLED.Set(true);
         }
 
-        /* turn off LEDS used for RESET indication */
-        sUnusedLED_1.Set(false);
-        sUnusedLED.Set(false);
-
         K32W_LOG("Factory Reset was cancelled!");
     }
     else
@@ -356,13 +345,9 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
         /* LEDs will start blinking to signal that a Factory Reset was scheduled */
         sStatusLED.Set(false);
         sLockLED.Set(false);
-        sUnusedLED_1.Set(false);
-        sUnusedLED.Set(false);
 
         sStatusLED.Blink(500);
         sLockLED.Blink(500);
-        sUnusedLED.Blink(500);
-        sUnusedLED_1.Blink(500);
 
         sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
     }

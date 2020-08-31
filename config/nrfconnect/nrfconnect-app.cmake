@@ -54,8 +54,8 @@ include(chip-lib)
 
 set(CHIP_COMMON_FLAGS
     -D_SYS__PTHREADTYPES_H_
+    -DMBEDTLS_CONFIG_FILE="<nrf-config.h>"
     -isystem${ZEPHYR_BASE}/include/posix
-    -isystem${ZEPHYR_BASE}/../modules/crypto/mbedtls/configs
 )
 
 set(CHIP_OUTPUT_LIBRARIES
@@ -66,6 +66,7 @@ set(CHIP_OUTPUT_LIBRARIES
     ${CHIP_OUTPUT_DIR}/lib/libBleLayer.a
     ${CHIP_OUTPUT_DIR}/lib/libDeviceLayer.a
     ${CHIP_OUTPUT_DIR}/lib/libCHIPDataModel.a
+    ${CHIP_OUTPUT_DIR}/lib/libSetupPayload.a
 )
 
 # ==================================================

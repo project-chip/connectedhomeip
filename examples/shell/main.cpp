@@ -35,12 +35,14 @@ using namespace chip::Shell;
 void cmd_misc_init();
 void cmd_base64_init();
 void cmd_device_init();
+void cmd_otcli_init();
 
 int main(void)
 {
     cmd_misc_init();
     cmd_base64_init();
     cmd_device_init();
+    cmd_otcli_init();
 
     shell_task(NULL);
 }
