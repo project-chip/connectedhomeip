@@ -27,8 +27,8 @@ set -x
 env
 
 if [ -z "$3" ]; then
-    gn gen --root="$1" --args="efr32_sdk_root=\"$EFR32_SDK_ROOT\"" "$2"/$EFR32_BOARD/
-    ninja -v -C "$2"/$EFR32_BOARD/
+    gn gen --root="$1" --args="efr32_sdk_root=\"$EFR32_SDK_ROOT\"" "$2"/"$EFR32_BOARD"/
+    ninja -v -C "$2"/"$EFR32_BOARD"/
 else
     gn gen --root="$1" --args="efr32_sdk_root=\"$EFR32_SDK_ROOT\" efr32_board=\"$3\"" "$2/$3"
     ninja -v -C "$2/$3"
@@ -36,8 +36,8 @@ fi
 
 # Post build step since Pigweed doesn't seems to support objcopy yet.
 if [ -z "$3" ]; then
-    arm-none-eabi-objcopy -O srec ./"$2"/$EFR32_BOARD/chip-efr32-lock-example.out ./"$2"/$EFR32_BOARD/chip-efr32-lock-example.s37
-    arm-none-eabi-size ./"$2"/$EFR32_BOARD/chip-efr32-lock-example.s37
+    arm-none-eabi-objcopy -O srec ./"$2"/"$EFR32_BOARD"/chip-efr32-lock-example.out ./"$2"/"$EFR32_BOARD"/chip-efr32-lock-example.s37
+    arm-none-eabi-size ./"$2"/"$EFR32_BOARD"/chip-efr32-lock-example.s37
 else
     arm-none-eabi-objcopy -O srec ./"$2"/"$3"/chip-efr32-lock-example.out ./"$2"/"$3"/chip-efr32-lock-example.s37
     arm-none-eabi-size ./"$2"/"$3"/chip-efr32-lock-example.s37
