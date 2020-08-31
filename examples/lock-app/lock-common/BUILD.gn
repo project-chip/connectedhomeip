@@ -15,7 +15,10 @@
 import("//build_overrides/chip.gni")
 
 config("includes") {
-  include_dirs = [ ".", "include" ]
+  include_dirs = [
+    ".",
+    "include",
+  ]
 }
 
 source_set("lock-common") {
@@ -26,11 +29,7 @@ source_set("lock-common") {
     "gen/znet-bookkeeping.c",
   ]
 
-  deps = [
-    "${chip_root}/src/lib",
-  ]
+  deps = [ "${chip_root}/src/lib" ]
 
-  public_configs = [
-      ":includes"
-  ]
+  public_configs = [ ":includes" ]
 }
