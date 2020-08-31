@@ -19,6 +19,12 @@ import os
 import stat
 import sys
 
+# Script to generate. This is a minimal wrapper around nrf_firmware_utils.
+# The substitutions are:
+#   scripts_dir - The location of nrf5_firmware_utils.
+#   defaults    - Options passed to nrf5_firmware_utils, including
+#                 in particular the image file to flash.
+
 SCRIPT = """#!/usr/bin/env python
 
 import sys
@@ -32,9 +38,11 @@ sys.path.append(SCRIPTS_DIR)
 import nrf5_firmware_utils
 
 if __name__ == '__main__':
-    sys.exit(nrf5_firmware_utils.flash_command(sys.argv, DEFAULTS))
+    sys.exit(nrf5_firmware_utils.flash_command(sys.argv[1:], DEFAULTS))
 """
 
+
+# Generate flashing script.
 
 def main(argv):
     """Generate script to flash or erase an NRF5 device."""

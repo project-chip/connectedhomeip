@@ -45,18 +45,19 @@ template("objcopy_convert") {
 #
 # This requires a Python script, given by flashing_script_generator,
 # to construct the resulting flashing script, given by flashing_script_name.
+#
 # As used by flashable_executable(), the generator script requires two options,
 #   --output SCRIPT       - The generated script
 #   --application IMAGE   - The file to be flashed
 # plus any platform- or target-specific options as passed in by
-# flashable_excutable()'s flasing_options.
+# flashable_executable()'s flashing_options.
 
 template("gen_flashing_script") {
   forward_variables_from(invoker,
                          [
                            "flashing_script_generator",
                            "flashing_script_name",
-                           "flashing_action",
+                           "flashing_options",
                            "deps",
                          ])
 
@@ -67,23 +68,9 @@ template("gen_flashing_script") {
       "--output",
       rebase_path(flashing_script_name, root_build_dir),
     ]
-    args += flashing_action
+    args += flashing_options
 
     script = flashing_script_generator
-  }
-}
-
-# Build a script to erase a device.
-
-template("gen_erasing_script") {
-  forward_variables_from(invoker,
-                         [
-                           "flashing_script_generator",
-                           "erasing_script_name",
-                         ])
-  gen_flashing_script(target_name) {
-    flashing_script_name = erasing_script_name
-    flashing_action = ["erase"]
   }
 }
 
@@ -139,11 +126,11 @@ template("flashable_executable") {
       flashing_script_generator = invoker.flashing_script_generator
       flashing_script_name = "$root_out_dir/${invoker.flashing_script_name}"
       if (defined(invoker.flashing_options)) {
-        flashing_action = invoker.flashing_options
+        flashing_options = invoker.flashing_options
       } else {
-        flashing_action = []
+        flashing_options = []
       }
-      flashing_action += [
+      flashing_options += [
         "--application",
         rebase_path(image_name, "", root_out_dir)
       ]
