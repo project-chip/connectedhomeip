@@ -7,9 +7,12 @@ board.
 <hr>
 
 -   [CHIP K32W Lock Example Application](#chip-k32w-lock-example-application) -
-    [Introduction](#introduction) - [Device UI](#device-ui) -
-    [Building](#building) - [Flashing and debugging](#flashdebug)
-    <hr>
+-   [Introduction](#introduction)
+-   [Device UI](#device-ui) -
+-   [Building](#building)
+- [Flashing and debugging](#flashdebug)
+
+<hr>
 
 <a name="intro"></a>
 
@@ -129,6 +132,8 @@ pycryptodome           3.9.8
 
 The resulting elf file can be found in the build directory and it's named
 chip-k32w061-lock-example.elf.
+
+<a name="flashdebug"></a>
 
 ## Flashing and debugging
 

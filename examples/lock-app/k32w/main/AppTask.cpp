@@ -20,8 +20,10 @@
 #include "AppTask.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
+#include "support/ErrorStr.h"
 
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/internal/DeviceNetworkInfo.h>
 
 #include "Keyboard.h"
 #include "LED.h"
@@ -214,7 +216,8 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 {
-    if ((pin_no != RESET_BUTTON) && (pin_no != LOCK_BUTTON) && (pin_no != OTA_BUTTON))
+    if ((pin_no != RESET_BUTTON) && (pin_no != LOCK_BUTTON) &&
+       (pin_no != JOIN_BUTTON))
     {
         return;
     }
@@ -232,9 +235,9 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
     {
         button_event.Handler = LockActionEventHandler;
     }
-    else if (pin_no == OTA_BUTTON)
+    else if (pin_no == JOIN_BUTTON)
     {
-        button_event.Handler = OtaHandler;
+        button_event.Handler = JoinHandler;
     }
 
     sAppTask.PostEvent(&button_event);
@@ -271,7 +274,7 @@ void AppTask::HandleKeyboard(void)
             ButtonEventHandler(LOCK_BUTTON, LOCK_BUTTON_PUSH);
             break;
         case gKBD_EventPB3_c:
-            ButtonEventHandler(OTA_BUTTON, OTA_BUTTON_PUSH);
+            ButtonEventHandler(JOIN_BUTTON, JOIN_BUTTON_PUSH);
             break;
         default:
             break;
@@ -398,18 +401,68 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::OtaHandler(AppEvent * aEvent)
+void AppTask::ThreadStart()
 {
-    if (aEvent->ButtonEvent.PinNo != OTA_BUTTON)
+    chip::DeviceLayer::Internal::DeviceNetworkInfo networkInfo;
+
+    memset(networkInfo.ThreadNetworkName, 0, chip::DeviceLayer::Internal::kMaxThreadNetworkNameLength + 1);
+    memcpy(networkInfo.ThreadNetworkName, "OpenThread", 10);
+
+    networkInfo.ThreadExtendedPANId[0] = 0xde;
+    networkInfo.ThreadExtendedPANId[1] = 0xad;
+    networkInfo.ThreadExtendedPANId[2] = 0x00;
+    networkInfo.ThreadExtendedPANId[3] = 0xbe;
+    networkInfo.ThreadExtendedPANId[4] = 0xef;
+    networkInfo.ThreadExtendedPANId[5] = 0x00;
+    networkInfo.ThreadExtendedPANId[6] = 0xca;
+    networkInfo.ThreadExtendedPANId[7] = 0xfe;
+
+    networkInfo.ThreadNetworkKey[0]  = 0x00;
+    networkInfo.ThreadNetworkKey[1]  = 0x11;
+    networkInfo.ThreadNetworkKey[2]  = 0x22;
+    networkInfo.ThreadNetworkKey[3]  = 0x33;
+    networkInfo.ThreadNetworkKey[4]  = 0x44;
+    networkInfo.ThreadNetworkKey[5]  = 0x55;
+    networkInfo.ThreadNetworkKey[6]  = 0x66;
+    networkInfo.ThreadNetworkKey[7]  = 0x77;
+    networkInfo.ThreadNetworkKey[8]  = 0x88;
+    networkInfo.ThreadNetworkKey[9]  = 0x99;
+    networkInfo.ThreadNetworkKey[10] = 0xAA;
+    networkInfo.ThreadNetworkKey[11] = 0xBB;
+    networkInfo.ThreadNetworkKey[12] = 0xCC;
+    networkInfo.ThreadNetworkKey[13] = 0xDD;
+    networkInfo.ThreadNetworkKey[14] = 0xEE;
+    networkInfo.ThreadNetworkKey[15] = 0xFF;
+
+    networkInfo.ThreadPANId = 0xabcd;
+    networkInfo.ThreadChannel = 15;
+
+    networkInfo.FieldPresent.ThreadExtendedPANId = true;
+    networkInfo.FieldPresent.ThreadMeshPrefix = false;
+    networkInfo.FieldPresent.ThreadPSKc = false;
+    networkInfo.NetworkId              = 0;
+    networkInfo.FieldPresent.NetworkId = true;
+
+    ThreadStackMgr().SetThreadEnabled(false);
+    ThreadStackMgr().SetThreadProvision(networkInfo);
+    ThreadStackMgr().SetThreadEnabled(true);
+}
+
+void AppTask::JoinHandler(AppEvent * aEvent)
+{
+    if (aEvent->ButtonEvent.PinNo != JOIN_BUTTON)
         return;
 
     if (sAppTask.mFunction != kFunction_NoneSelected)
     {
-        K32W_LOG("Another function is scheduled. Could not initiate Software Update!");
+        K32W_LOG("Another function is scheduled. Could not initiate Thread Join!");
         return;
     }
 
-    // TODO: Add OTA support
+    /* hard-code Thread Commissioning Parameters for the moment.
+     * In a future PR, these parameters will be sent via BLE.
+     */
+    ThreadStart();
 }
 
 void AppTask::CancelTimer()
