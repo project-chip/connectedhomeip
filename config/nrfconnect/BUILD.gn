@@ -12,19 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Crypto implementation: mbedtls, openssl.
-  chip_crypto = ""
+import("//build_overrides/chip.gni")
+
+import("//${chip_root}/gn/chip/tests.gni")
+
+assert(current_os == "zephyr")
+
+group("dummy") {
 }
 
-if (chip_crypto == "") {
-  if (current_os == "android" || current_os == "freertos" ||
-      current_os == "zephyr") {
-    chip_crypto = "mbedtls"
-  } else {
-    chip_crypto = "openssl"
-  }
+group("nrfconnect") {
+  deps = [ "${chip_root}/src/lib" ]
 }
 
-assert(chip_crypto == "mbedtls" || chip_crypto == "openssl",
-       "Please select a valid crypto implementation: mbedtls, openssl")
+group("default") {
+  deps = [ ":nrfconnect" ]
+}
