@@ -22,7 +22,8 @@ group("dummy") {
 }
 
 group("nrfconnect") {
-  deps = [ "${chip_root}/src/lib" ]
+  deps = [ "${chip_root}/src/lib",
+           "${chip_root}/src/lib/shell" ]
 }
 
 group("default") {
