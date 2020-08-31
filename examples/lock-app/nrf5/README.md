@@ -36,10 +36,10 @@ The lock example is intended to serve both as a means to explore the workings of
 CHIP, as well as a template for creating real products based on the Nordic
 platform.
 
-The example application builds upon the CHIP. A top-level BUILD.gn or
-Makefile orchestrates the entire build process, including building CHIP,
-and select files from the nRF5 SDK. The resultant image file can be flashed
-directly onto the Nordic dev kit hardware.
+The example application builds upon the CHIP. A top-level BUILD.gn or Makefile
+orchestrates the entire build process, including building CHIP, and select files
+from the nRF5 SDK. The resultant image file can be flashed directly onto the
+Nordic dev kit hardware.
 
 <a name="device-ui"></a>
 
