@@ -22,7 +22,6 @@ jobs:
     # TODO ESP32 https://github.com/project-chip/connectedhomeip/issues/1510
     nrf:
         name: nRF
-
         env:
             BUILD_TYPE: gn_nrf
             BUILD_VERSION: 0.2.14
@@ -119,5 +118,88 @@ jobs:
                       ${{ env.BUILD_TYPE }}-example-build-${{
                       steps.outsuffix.outputs.value }}
                   path: |
-                      out/chip_tool_debug/chip-standalone-demo
+                      out/chip_tool_debug/chip-tool
                       out/shell_debug/chip-shell
+    efr32:
+        name: EFR32
+        env:
+            EFR32_BOARD: BRD4161A
+            BUILD_TYPE: gn_efr32
+            BUILD_VERSION: 0.2.14
+
+        runs-on: ubuntu-latest
+
+        container:
+            image: connectedhomeip/chip-build-efr32:0.4.1
+            volumes:
+                - "/tmp/bloat_reports:/tmp/bloat_reports"
+                - "/tmp/output_binaries:/tmp/output_binaries"
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
+              with:
+                  fetch-depth: 0
+                  submodules: true
+            - name: Build example EFR32 Lock App for BRD4161A
+              run: scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/ out/lock_app_debug BRD4161A
+            - name: Binary artifact suffix
+              id: outsuffix
+              uses: haya14busa/action-cond@v1.0.0
+              with:
+                  cond: ${{ github.event.pull_request.number == '' }}
+                  if_true: "${{ github.sha }}"
+                  if_false: "pull-${{ github.event.pull_request.number }}"
+            - name: Uploading Binaries
+              uses: actions/upload-artifact@v2
+              with:
+                  name:
+                      ${{ env.BUILD_TYPE }}-example-build-${{
+                      steps.outsuffix.outputs.value }}
+                  path: |
+                      out/lock_app_debug/BRD4161A/chip-efr32-lock-example.out
+
+    nrfconnect:
+        name: nRF Connect SDK
+        env:
+            BUILD_TYPE: nrfconnect
+
+        runs-on: ubuntu-latest
+
+        container:
+            image: connectedhomeip/chip-build-nrf-platform:0.4.2
+            volumes:
+                - "/tmp/bloat_reports:/tmp/bloat_reports"
+                - "/tmp/output_binaries:/tmp/output_binaries"
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
+              with:
+                  fetch-depth: 0
+                  submodules: true
+            - name: Build example nRF Connect SDK Lock App
+              run: scripts/examples/nrfconnect_lock_app.sh
+            - name: Copy aside build products
+              run: |
+                  mkdir -p example_binaries/$BUILD_TYPE-build
+                  cp examples/lock-app/nrfconnect/build/zephyr/zephyr.elf       \
+                      example_binaries/$BUILD_TYPE-build/chip-nrf52840-lock-example.elf
+            - name: Binary artifact suffix
+              id: outsuffix
+              uses: haya14busa/action-cond@v1.0.0
+              with:
+                  cond: ${{ github.event.pull_request.number == '' }}
+                  if_true: "${{ github.sha }}"
+                  if_false: "pull-${{ github.event.pull_request.number }}"
+            - name: Copy aside bloat report & binaries
+              run: |
+                  cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
+            - name: Uploading Binaries
+              uses: actions/upload-artifact@v1
+              with:
+                  name:
+                      ${{ env.BUILD_TYPE }}-example-build-${{
+                      steps.outsuffix.outputs.value }}
+                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build

@@ -80,7 +80,7 @@
 - (NSArray<CHIPOptionalQRCodeInfo *> *)getAllOptionalVendorData:(NSError * __autoreleasing *)error
 {
     NSMutableArray<CHIPOptionalQRCodeInfo *> * allOptionalData = [NSMutableArray new];
-    vector<chip::OptionalQRCodeInfo> chipOptionalData = _chipSetupPayload.getAllOptionalVendorData();
+    std::vector<chip::OptionalQRCodeInfo> chipOptionalData = _chipSetupPayload.getAllOptionalVendorData();
     for (chip::OptionalQRCodeInfo chipInfo : chipOptionalData) {
         CHIPOptionalQRCodeInfo * info = [CHIPOptionalQRCodeInfo new];
         info.tag = [NSNumber numberWithUnsignedChar:chipInfo.tag];

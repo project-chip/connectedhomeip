@@ -26,6 +26,8 @@
 
 #include <platform/CHIPDeviceEvent.h>
 
+#include <bluetooth/bluetooth.h>
+
 namespace chip {
 namespace System {
 class PacketBuffer;

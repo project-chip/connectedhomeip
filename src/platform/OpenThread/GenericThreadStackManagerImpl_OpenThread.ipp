@@ -711,7 +711,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
             otErr               = otThreadGetChildInfoById(mOTInst, neighbor->mRloc16, child);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 
-            snprintf(printBuf, TELEM_PRINT_BUFFER_SIZE, ", Timeout: %10lu NetworkDataVersion: %3d", child->mTimeout,
+            snprintf(printBuf, TELEM_PRINT_BUFFER_SIZE, ", Timeout: %10" PRIu32 " NetworkDataVersion: %3" PRIu8, child->mTimeout,
                      child->mNetworkDataVersion);
         }
         else

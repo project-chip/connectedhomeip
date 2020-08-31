@@ -209,11 +209,8 @@ private:
     void HandleSessionError(CHIP_ERROR err, PacketBuffer * statusReportMsgBuf);
     static void HandleConnectionClosed(ExchangeContext * ec, ChipConnection * con, CHIP_ERROR conErr);
     static CHIP_ERROR SendStatusReport(CHIP_ERROR localError, ExchangeContext * ec);
-
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     static void RMPHandleAckRcvd(ExchangeContext * ec, void * msgCtxt);
     static void RMPHandleSendError(ExchangeContext * ec, CHIP_ERROR err, void * msgCtxt);
-#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
     void Reset(void);
 

@@ -151,9 +151,7 @@ void ChipSecurityManager::HandleUnsolicitedMessage(ExchangeContext * ec, const I
         ExitNow(err = CHIP_ERROR_SECURITY_MANAGER_BUSY);
     });
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     if (!ec->HasPeerRequestedAck())
-#endif
     {
         // Reject the request if it did not arrive over a connection.
         VerifyOrExit(ec->Con != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -433,7 +431,6 @@ CHIP_ERROR ChipSecurityManager::NewSessionExchange(uint64_t peerNodeId, IPAddres
     }
     else
     {
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         VerifyOrExit(peerNodeId != kNodeIdNotSpecified && peerNodeId != kAnyNodeId, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         mEC = ExchangeManager->NewContext(peerNodeId, peerAddr, peerPort, INET_NULL_INTERFACEID, this);
@@ -441,10 +438,6 @@ CHIP_ERROR ChipSecurityManager::NewSessionExchange(uint64_t peerNodeId, IPAddres
 
         mEC->OnAckRcvd   = RMPHandleAckRcvd;
         mEC->OnSendError = RMPHandleSendError;
-#else
-        // Reject the request if no connection has been specified.
-        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
-#endif
     }
 
 exit:
@@ -741,11 +734,7 @@ CHIP_ERROR ChipSecurityManager::SendStatusReport(CHIP_ERROR localErr, ExchangeCo
     }
     else
     {
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         sendFlags = ExchangeContext::kSendFlag_RequestAck;
-#else
-        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
-#endif
     }
 
     // TODO: map CASE errors
@@ -925,8 +914,6 @@ void ChipSecurityManager::HandleIdleSessionTimeout(System::Layer * aLayer, void 
     }
 }
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-
 void ChipSecurityManager::RMPHandleAckRcvd(ExchangeContext * ec, void * msgCtxt)
 {
     ChipLogProgress(SecurityManager, "%s", __FUNCTION__);
@@ -939,8 +926,6 @@ void ChipSecurityManager::RMPHandleSendError(ExchangeContext * ec, CHIP_ERROR er
 
     secMgr->HandleSessionError(err, NULL);
 }
-
-#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
 void ChipSecurityManager::AsyncNotifySecurityManagerAvailable()
 {

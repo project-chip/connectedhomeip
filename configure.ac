@@ -1042,6 +1042,8 @@ k32w)
       CONFIG_DEVICE_LAYER=1
       CHIP_DEVICE_LAYER_TARGET=K32W
       CHIP_DEVICE_LAYER_TARGET_K32W=1
+      CFLAGS="${CFLAGS} -mcpu=cortex-m4 -mfloat-abi=soft -mthumb"
+      CXXFLAGS="${CXXFLAGS} -mcpu=cortex-m4 -mfloat-abi=soft -mthumb"
       ;;
 
 nrfconnect)
@@ -1785,6 +1787,88 @@ NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
              --prefix=${prefix} \
              --exec-prefix=${exec_prefix} \
              --with-examples=nrf52840)
+
+            if test $? != 0; then
+                AC_MSG_ERROR([Failed to configure OpenThread!])
+            fi
+
+            maybe_openthread_dirstem="openthread"
+            ;;
+
+        k32w)
+            OPENTHREAD_CPPFLAGS="-I\${abs_top_srcdir}/third_party/openthread/repo/include"
+            OPENTHREAD_LDFLAGS="-L${ac_pwd}/third_party/openthread"
+            OPENTHREAD_LIBS="-lopenthread-cli-ftd \
+                -lopenthread-ftd \
+                -lopenthread-platform-utils \
+                -lopenthread-mtd \
+                -lopenthread-k32w061_plat\
+                -lopenthread-k32w061_sdk \
+                -lmbedcrypto \
+                \${K32W061_SDK_ROOT}/middleware/wireless/ieee-802.15.4/lib/libMiniMac.a \
+                \${K32W061_SDK_ROOT}/middleware/wireless/framework/XCVR/lib/libRadio.a \
+                \${K32W061_SDK_ROOT}/middleware/wireless/framework/PDM/Library/libPDM.a "
+
+            # private definitions
+            ot_cppflags="-Wno-expansion-to-defined \
+                -I${chip_srcdir}/third_party/openthread/repo/examples/platforms/k32w/k32w061 \
+                -I${chip_srcdir}/third_party/openthread/repo/examples/platforms \
+                -I${chip_srcdir}/third_party/openthread/repo/include \
+                -I${chip_srcdir}/third_party/openthread/repo/src/core \
+                -I${chip_srcdir}/third_party/mbedtls/repo/include \
+                -I${chip_srcdir}/third_party/mbedtls/repo/ \
+                -I${K32W061_SDK_ROOT}/middleware/mbedtls/port/ksdk \
+                -I${K32W061_SDK_ROOT}/middleware/mbedtls/repo/include/mbedtls \
+                -I${K32W061_SDK_ROOT}/middleware/wireless/ieee-802.15.4/uMac/Include \
+                -I${K32W061_SDK_ROOT}/middleware/wireless/framework/Common \
+                -I${K32W061_SDK_ROOT}/middleware/wireless/framework/XCVR/DK6/Build/Include \
+                -I${K32W061_SDK_ROOT}/middleware/wireless/framework/XCVR/DK6 \
+                -I${K32W061_SDK_ROOT}/middleware/wireless/framework/SerialManager/Source \
+                -I${K32W061_SDK_ROOT}/middleware/wireless/framework/TimersManager/Source \
+                -I${K32W061_SDK_ROOT}/components/serial_manager \
+                -I${K32W061_SDK_ROOT}/components/uart \
+                -I${K32W061_SDK_ROOT}/devices/K32W061 \
+                -I${K32W061_SDK_ROOT}/devices/K32W061/drivers \
+                -I${K32W061_SDK_ROOT}/devices/K32W061/utilities \
+                -I${K32W061_SDK_ROOT}/devices/K32W061/utilities/debug_console \
+                -I${K32W061_SDK_ROOT}/devices/K32W061/utilities/str \
+                -I${K32W061_SDK_ROOT}/boards/k32w061dk6/wireless_examples/openthread/enablement \
+                -I${K32W061_SDK_ROOT}/CMSIS/Include \
+                -I${K32W061_SDK_ROOT}/rtos/amazon-freertos/lib/include \
+                -I${K32W061_SDK_ROOT}/rtos/amazon-freertos/lib/include/private \
+                -I${K32W061_SDK_ROOT}/rtos/amazon-freertos/template_application/ARM_CM3 \
+                -I${K32W061_SDK_ROOT}/rtos/amazon-freertos/lib/FreeRTOS/portable/GCC/ARM_CM3 \
+                -I${K32W061_SDK_ROOT}/rtos/amazon-freertos/lib/third_party/unity/src \
+                -DCPU_K32W061HN \
+                -DCPU_JN518X \
+                -DCPU_JN518X_REV=2 \
+                -DJENNIC_CHIP_FAMILY_JN518x \
+                -DJENNIC_CHIP_FAMILY_NAME=_JN518x \
+                -DSDK_DEBUGCONSOLE=0 \
+                -DUSE_RTOS=1 \
+                -DOPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1 \
+                -DOPENTHREAD_CONFIG_HEAP_INTERNAL_SIZE=16 \
+                -DOPENTHREAD_CONFIG_JOINER_ENABLE=1 \
+                -DOPENTHREAD_CONFIG_IP6_SLAAC_ENABLE=1 \
+                -DMBEDTLS_THREADING_C=1 \
+                -DMBEDTLS_THREADING_ALT=1 \
+                -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE=\<openthread-core-k32w061-config.h\> \
+                -DMBEDTLS_USER_CONFIG_FILE=\<k32w061-mbedtls-config.h\> "
+
+            (mkdir -p ${ac_pwd}/third_party/openthread \
+             && cd ${ac_pwd}/third_party/openthread \
+             && CPPFLAGS="${ot_cppflags}" CFLAGS="${CFLAGS}" CXXFLAGS="${CXXFLAGS}" ${chip_srcdir}/third_party/openthread/repo/configure \
+             --disable-docs \
+             --disable-executable \
+             --disable-tools \
+             --disable-tests \
+             --enable-cli \
+             --enable-ftd \
+             --enable-mtd \
+             --host=arm-none-eabi \
+             --prefix=${prefix} \
+             --exec-prefix=${exec_prefix} \
+             --with-examples=k32w061)
 
             if test $? != 0; then
                 AC_MSG_ERROR([Failed to configure OpenThread!])

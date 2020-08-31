@@ -62,14 +62,6 @@ set(CHIP_COMMON_FLAGS
 
 set(CHIP_OUTPUT_LIBRARIES
     ${CHIP_OUTPUT_DIR}/lib/libCHIP.a
-    ${CHIP_OUTPUT_DIR}/lib/libInetLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libSystemLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libSupportLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libBleLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libDeviceLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libCHIPDataModel.a
-    ${CHIP_OUTPUT_DIR}/lib/libnlunit-test.a
-    ${CHIP_OUTPUT_DIR}/lib/libnlfaultinjection.a
 )
 
 set(CHIP_OUTPUT_TESTS
@@ -84,6 +76,8 @@ set(CHIP_OUTPUT_TESTS
 # ==================================================
 # Setup CHIP build (including unit tests)
 # ==================================================
+project(AllChipTests)
+enable_testing()
 
 chip_configure(ChipConfig
     BUILD_TESTS
@@ -93,17 +87,13 @@ chip_configure(ChipConfig
 )
 
 chip_build(ChipLib ChipConfig
-    BUILD_COMMAND make --no-print-directory V=${CMAKE_AUTOGEN_VERBOSE} install-headers install-exec
+    BUILD_COMMAND ninja
     BUILD_ARTIFACTS ${CHIP_OUTPUT_LIBRARIES}
 )
 
 # ==================================================
 # Build 'all tests' runner
 # ==================================================
-project(AllChipTests)
-enable_testing()
-
-target_compile_definitions(app PRIVATE HAVE_CONFIG_H)
 target_sources(app PRIVATE main/runner.cpp)
 target_link_options(app PUBLIC -Wl,--whole-archive ${CHIP_OUTPUT_TESTS} -Wl,--no-whole-archive)
 target_link_libraries(app PUBLIC ChipLib $<TARGET_FILE:kernel>)

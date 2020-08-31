@@ -17,6 +17,8 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/gn/chip/chip_test.gni")
 import("${chip_root}/gn/chip/chip_test_group.gni")
 
+assert(current_os != "zephyr")
+
 chip_test("TestLwIP") {
   sources = [ "tests.c" ]
   deps = [ "${chip_root}/src/lwip" ]

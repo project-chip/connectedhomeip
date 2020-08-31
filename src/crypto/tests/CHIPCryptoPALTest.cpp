@@ -1157,7 +1157,7 @@ private:
 
 static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
 {
-    CHIP_ERROR error;
+    CHIP_ERROR error = CHIP_NO_ERROR;
     unsigned char L[kMAX_Point_Length];
     size_t L_len = sizeof(L);
     unsigned char Z[kMAX_Point_Length];
@@ -1177,6 +1177,10 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
 
     int numOfTestVectors = ArraySize(rfc_tvs);
     int numOfTestsRan    = 0;
+    // static_assert(sizeof(Spake2p_Context) < 1024, "Allocate more bytes for Spake2p Context");
+    // printf("Sizeof spake2pcontext %lu\n", sizeof(Spake2p_Context));
+    // printf("Sizeof mbedtls_sha256_context %lu\n", sizeof(mbedtls_sha256_context));
+    // printf("Sizeof SHA256_CTX %lu\n", sizeof(SHA256_CTX));
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
         const struct spake2p_rfc_tv * vector = rfc_tvs[vectorIndex];

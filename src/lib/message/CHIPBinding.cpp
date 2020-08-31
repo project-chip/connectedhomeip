@@ -444,10 +444,8 @@ void Binding::ResetConfig()
 
     mTransportOption            = kTransport_NotSpecified;
     mDefaultResponseTimeoutMsec = 0;
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    mDefaultRMPConfig = gDefaultRMPConfig;
-#endif
-    mUDPPathMTU = CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE;
+    mDefaultRMPConfig           = gDefaultRMPConfig;
+    mUDPPathMTU                 = CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE;
 
     mSecurityOption = kSecurityOption_NotSpecified;
     mKeyId          = ChipKeyId::kNone;
@@ -1217,8 +1215,6 @@ CHIP_ERROR Binding::NewExchangeContext(chip::ExchangeContext *& appExchangeConte
     appExchangeContext = mExchangeManager->NewContext(mPeerNodeId, mPeerAddress, mPeerPort, mInterfaceId, NULL);
     VerifyOrExit(NULL != appExchangeContext, err = CHIP_ERROR_NO_MEMORY);
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-
     // Set the default RMP configuration in the new exchange.
     appExchangeContext->mRMPConfig = mDefaultRMPConfig;
 
@@ -1229,8 +1225,6 @@ CHIP_ERROR Binding::NewExchangeContext(chip::ExchangeContext *& appExchangeConte
         // include a request for acknowledgment.
         appExchangeContext->SetAutoRequestAck(true);
     }
-
-#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
     // If using a connection-oriented transport...
     if (mTransportOption == kTransport_TCP || mTransportOption == kTransport_ExistingConnection)
@@ -1531,11 +1525,7 @@ Binding::Configuration & Binding::Configuration::Transport_UDP()
  */
 Binding::Configuration & Binding::Configuration::Transport_UDP_RMP()
 {
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     mBinding.mTransportOption = kTransport_UDP_RMP;
-#else  // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    mError = CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     return *this;
 }
 
@@ -1562,12 +1552,7 @@ Binding::Configuration & Binding::Configuration::Transport_UDP_PathMTU(uint32_t 
  */
 Binding::Configuration & Binding::Configuration::Transport_DefaultRMPConfig(const chip::RMPConfig & aRMPConfig)
 {
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     mBinding.mDefaultRMPConfig = aRMPConfig;
-#else  // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    IgnoreUnusedVariable(aRMPConfig);
-    mError = CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     return *this;
 }
 
@@ -1840,11 +1825,7 @@ Binding::Configuration & Binding::Configuration::ConfigureFromMessage(const chip
     {
         if (aMsgInfo->Flags & kChipMessageFlag_PeerRequestedAck)
         {
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
             Transport_UDP_RMP();
-#else
-            mError = CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         }
         else
         {

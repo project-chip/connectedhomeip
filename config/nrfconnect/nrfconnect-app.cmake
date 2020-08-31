@@ -54,25 +54,21 @@ include(chip-lib)
 
 set(CHIP_COMMON_FLAGS
     -D_SYS__PTHREADTYPES_H_
+    -DMBEDTLS_CONFIG_FILE=<nrf-config.h>
     -isystem${ZEPHYR_BASE}/include/posix
-    -isystem${ZEPHYR_BASE}/../modules/crypto/mbedtls/configs
+    -isystem${ZEPHYR_BASE}/../mbedtls/include
+    -I${CMAKE_CURRENT_SOURCE_DIR}/main/include
 )
 
 set(CHIP_OUTPUT_LIBRARIES
     ${CHIP_OUTPUT_DIR}/lib/libCHIP.a
-    ${CHIP_OUTPUT_DIR}/lib/libInetLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libSystemLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libSupportLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libBleLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libDeviceLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libCHIPDataModel.a
 )
 
 # ==================================================
 # Setup CHIP build
 # ==================================================
 
-chip_configure(ChipConfig 
+chip_configure(ChipConfig
     ARCH arm-none-eabi
     CFLAGS ${CHIP_COMMON_FLAGS} --specs=nosys.specs
     CXXFLAGS ${CHIP_COMMON_FLAGS}
@@ -80,7 +76,7 @@ chip_configure(ChipConfig
 )
 
 chip_build(ChipLib ChipConfig
-    BUILD_COMMAND make --no-print-directory install V=${CMAKE_AUTOGEN_VERBOSE}
+    BUILD_COMMAND ninja
     BUILD_ARTIFACTS ${CHIP_OUTPUT_LIBRARIES}
 )
 
@@ -88,5 +84,5 @@ chip_build(ChipLib ChipConfig
 # Configure application
 # ==================================================
 
-target_compile_definitions(app PRIVATE HAVE_CONFIG_H)
 target_link_libraries(app PUBLIC -Wl,--start-group ChipLib -Wl,--end-group)
+target_compile_definitions(app PRIVATE CHIP_SEPARATE_CONFIG_H)

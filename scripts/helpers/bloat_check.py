@@ -30,6 +30,16 @@ import stat
 import subprocess
 import zipfile
 
+LOG_KEEP_DAYS = 3
+BINARY_KEEP_DAYS = 30
+
+# Count is reasonably large because each build has multiple artifacts
+# Currently (Sep 2020) each build has 4 artifacts:
+#   gn-nrf, gn-linux, examples-esp32, example-nrf
+#
+# We should eventually remove the non-gn version to save space.
+BINARY_MAX_COUNT = 80
+
 
 class SectionChange:
   """Describes delta changes to a specific section"""
@@ -152,6 +162,10 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
 
     comment.delete()
 
+  if compare_results.len() == 0:
+    logging.info('No results to report')
+    return
+
   compareTable = 'File | Section | File | VM\n---- | ---- | ----- | ---- \n'
   for file in compare_results:
     for change in file.sectionChanges:
@@ -197,8 +211,8 @@ def cleanDir(name):
 
 def downloadArtifact(artifact, dirName):
   """Extract an artifact into a directory."""
-  zipFile = zipfile.ZipFile(io.BytesIO(artifact.downloadBlob()), 'r')	
-  logging.info('Extracting zip file to %r' % dirName)	
+  zipFile = zipfile.ZipFile(io.BytesIO(artifact.downloadBlob()), 'r')
+  logging.info('Extracting zip file to %r' % dirName)
   zipFile.extractall(dirName)
 
 def main():
@@ -241,12 +255,27 @@ def main():
   current_time = datetime.datetime.now()
   seen_names = set()
   pull_artifact_re = re.compile('^(.*)-pull-(\\d+)$')
+  binary_count = 0
   for a in artifacts:
     # logs cleanup after 3 days
     is_log = a.name.endswith('-logs')
 
-    if (current_time - a.created_at).days > 30 or (is_log and (current_time - a.created_at).days > 3):
-      logging.info('Old artifact: %s' % a.name)
+    if not is_log:
+      binary_count = binary_count + 1
+
+    need_delete = False
+    if (current_time - a.created_at).days > BINARY_KEEP_DAYS:
+      # Do not keep binary builds forever
+      need_delete = True
+    elif not is_log and binary_count > BINARY_MAX_COUNT:
+      # Keep a maximum number of binary packages
+      need_delete = True
+    elif is_log and (current_time - a.created_at).days > LOG_KEEP_DAYS:
+      # Logs are kept even shorter
+      need_delete = True
+    
+    if need_delete:
+      logging.info('Old artifact: %s from %r' % (a.name, a.created_at))
       a.delete()
       continue
 

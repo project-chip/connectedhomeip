@@ -15,7 +15,7 @@
 import("//build_overrides/chip.gni")
 
 declare_args() {
-  # Device platform layer: darwin, linux, freertos, nrf5, efr32, external, none.
+  # Device platform layer: darwin, efr32, esp32, external, freertos, linux, nrf5, nrfconnect, none.
   chip_device_platform = "auto"
   chip_platform_target = ""
 }
@@ -43,12 +43,16 @@ declare_args() {
 _chip_device_layer = "none"
 if (chip_device_platform == "darwin") {
   _chip_device_layer = "Darwin"
+} else if (chip_device_platform == "efr32") {
+  _chip_device_layer = "EFR32"
+} else if (chip_device_platform == "esp32") {
+  _chip_device_layer = "ESP32"
 } else if (chip_device_platform == "linux") {
   _chip_device_layer = "Linux"
 } else if (chip_device_platform == "nrf5") {
   _chip_device_layer = "nRF5"
-} else if (chip_device_platform == "efr32") {
-  _chip_device_layer = "EFR32"
+} else if (chip_device_platform == "nrfconnect") {
+  _chip_device_layer = "nrfconnect"
 }
 
 if (chip_device_platform != "external") {
@@ -80,8 +84,10 @@ if (_chip_device_layer != "none" && chip_device_platform != "external") {
       "<platform/" + _chip_device_layer + "/SystemPlatformConfig.h>"
 }
 
-assert((current_os != "freertos" && chip_device_platform == "none") ||
-           chip_device_platform == "darwin" || chip_device_platform == "nrf5" ||
-           chip_device_platform == "efr32" || chip_device_platform == "linux" ||
-           chip_device_platform == "external",
-       "Please select a valid value for chip_device_platform")
+assert(
+    (current_os != "freertos" && chip_device_platform == "none") ||
+        chip_device_platform == "darwin" || chip_device_platform == "efr32" ||
+        chip_device_platform == "esp32" || chip_device_platform == "external" ||
+        chip_device_platform == "linux" || chip_device_platform == "nrf5" ||
+        chip_device_platform == "nrfconnect",
+    "Please select a valid value for chip_device_platform")

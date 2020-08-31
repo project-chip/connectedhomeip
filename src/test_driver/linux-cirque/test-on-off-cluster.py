@@ -79,13 +79,13 @@ class TestOnOffCluster(CHIPVirtualHome):
 
         for ip in server_ip_address:
             output = self.execute_device_cmd(
-                tool_device_id, "chip-standalone-demo on {} {} 1".format(ip, CHIP_PORT))
+                tool_device_id, "chip-tool on {} {} 1".format(ip, CHIP_PORT))
             self.assertFalse(self.sequenceMatch(
                 output['output'], ["No response from device."]))
         time.sleep(1)
         for ip in server_ip_address:
             output = self.execute_device_cmd(
-                tool_device_id, "chip-standalone-demo off {} {} 1".format(ip, CHIP_PORT))
+                tool_device_id, "chip-tool off {} {} 1".format(ip, CHIP_PORT))
             self.assertFalse(self.sequenceMatch(
                 output['output'], ["No response from device."]))
 
