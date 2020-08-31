@@ -33,7 +33,7 @@ platform.
 
 ### Note
 
-A concensus within the CHIP organization was reached to move from Make/Automake
+A consensus within the CHIP organization was reached to move from Make/Automake
 to the GN/Ninja build system. As a result we are no longer supporting Make
 inside the lock-app example. While the Makefile can stil be used to compile the
 example, the output binary will be lacking key features (e.g. OpenThread).
@@ -196,7 +196,7 @@ combination with JLinkRTTClient as follows:
 
 ### Notes
 
--   Depending on your network settings your router might not provide natif ipv6
+-   Depending on your network settings your router might not provide native ipv6
     addresses to your devices (Border router / PC). If this is the case, you
     need to add a static ipv6 addresses on both device and then a ipv6 route to
     the border router on your PC
