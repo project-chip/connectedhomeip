@@ -230,6 +230,7 @@ install-chip-with-automake: configure-chip
 
 ifeq ($(CHIP_BUILD_WITH_GN),y)
 install-chip: install-chip-with-gn
+SHELL=/bin/bash
 else
 install-chip: install-chip-with-automake
 endif
