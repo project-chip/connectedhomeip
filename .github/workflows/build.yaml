@@ -24,7 +24,7 @@ jobs:
 
         strategy:
             matrix:
-                type: [main, clang, linux-embedded, mbedtls]
+                type: [main, clang, mbedtls]
         env:
             BUILD_TYPE: ${{ matrix.type }}
             BUILD_VERSION: 0.2.18
@@ -50,7 +50,6 @@ jobs:
                   case $BUILD_TYPE in
                      "main") GN_ARGS='';;
                      "clang") GN_ARGS='is_clang=true';;
-                     "linux-embedded") GN_ARGS='import("//src/platform/Linux/args.gni")';;
                      "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
                      *) ;;
                   esac
