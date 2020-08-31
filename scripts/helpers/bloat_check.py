@@ -152,6 +152,10 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
 
     comment.delete()
 
+  if compare_results.len() == 0:
+    logging.info('No results to report')
+    return
+
   compareTable = 'File | Section | File | VM\n---- | ---- | ----- | ---- \n'
   for file in compare_results:
     for change in file.sectionChanges:
@@ -161,7 +165,7 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
                                                        change.vmChange)
 
   # NOTE: PRs are issues with attached patches, hence the API naming
-  pull.create_issue_comment("""{title}
+  pull.create_issue_comment("""{title} {len}
 
   {table}
 
@@ -173,7 +177,7 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
 ```
 
 </details>
-""".format(title=titleHeading, table=compareTable, rawReportText=rawText))
+""".format(len=compare_results.len(), title=titleHeading, table=compareTable, rawReportText=rawText))
 
 
 def getPullRequestBaseSha(githubToken,  githubRepo, pullRequestNumber):
@@ -197,8 +201,8 @@ def cleanDir(name):
 
 def downloadArtifact(artifact, dirName):
   """Extract an artifact into a directory."""
-  zipFile = zipfile.ZipFile(io.BytesIO(artifact.downloadBlob()), 'r')	
-  logging.info('Extracting zip file to %r' % dirName)	
+  zipFile = zipfile.ZipFile(io.BytesIO(artifact.downloadBlob()), 'r')
+  logging.info('Extracting zip file to %r' % dirName)
   zipFile.extractall(dirName)
 
 def main():
