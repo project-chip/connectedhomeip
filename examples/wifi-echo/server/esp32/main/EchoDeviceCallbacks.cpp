@@ -27,6 +27,7 @@
 #include "RendezvousSession.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include "esp_netif.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
 
@@ -56,11 +57,11 @@ void EchoDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, int
         ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
         if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
         {
-            tcpip_adapter_ip_info_t ipInfo;
-            if (tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ipInfo) == ESP_OK)
+            esp_netif_ip_info_t ipInfo;
+            if (esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"), &ipInfo) == ESP_OK)
             {
                 char ipAddrStr[INET_ADDRSTRLEN];
-                IPAddress::FromIPv4(ipInfo.ip).ToString(ipAddrStr, sizeof(ipAddrStr));
+                esp_ip4addr_ntoa(&ipInfo.ip, ipAddrStr, sizeof(ipAddrStr));
                 ESP_LOGI(TAG, "Server ready at: %s:%d", ipAddrStr, CHIP_PORT);
 
                 // Since the commissioner device does not yet have a mechanism to discover the IP address
