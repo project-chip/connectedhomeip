@@ -221,8 +221,7 @@ install-chip-with-gn : $(OUTPUT_DIR)
 	echo esp32_cxx = \"$(CXX)\"              >> $(OUTPUT_DIR)/args.gn
 	echo esp32_cpu = \"esp32\"               >> $(OUTPUT_DIR)/args.gn
 	echo "Written file $(OUTPUT_DIR)/args.gn"
-#	MAKEFLAGS= make -C $(OUTPUT_DIR) --no-print-directory install
-	cd $(COMPONENT_PATH); gn gen $(OUTPUT_DIR)
+	cd $(CHIP_ROOT) && PW_ENVSETUP_QUIET=1 . scripts/activate.sh && cd $(COMPONENT_PATH) && gn gen $(OUTPUT_DIR)
 	cd $(COMPONENT_PATH); ninja -C $(OUTPUT_DIR) esp32
 
 install-chip-with-automake: configure-chip
@@ -231,6 +230,7 @@ install-chip-with-automake: configure-chip
 
 ifeq ($(CHIP_BUILD_WITH_GN),y)
 install-chip: install-chip-with-gn
+SHELL=/bin/bash
 else
 install-chip: install-chip-with-automake
 endif
