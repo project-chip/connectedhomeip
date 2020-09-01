@@ -46,6 +46,8 @@
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL_TICKS_PER_SECOND 32
 #endif
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif // #ifdef __cplusplus

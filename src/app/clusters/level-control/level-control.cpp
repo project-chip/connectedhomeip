@@ -38,11 +38,11 @@
  *******************************************************************************
  ******************************************************************************/
 
-// this file contains all the common includes for clusters in the util
-#include "af.h"
-
 // clusters specific header
 #include "level-control.h"
+
+// this file contains all the common includes for clusters in the util
+#include <app/util/af.h>
 
 #ifdef EMBER_AF_PLUGIN_REPORTING
 #include <app/reporting/reporting.h>
@@ -114,12 +114,12 @@ static void reallyUpdateCoupledColorTemp(uint8_t endpoint);
 
 static void schedule(uint8_t endpoint, uint32_t delayMs)
 {
-    // emberAfScheduleServerTickExtended(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID, delayMs, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP);
+    emberAfScheduleServerTickExtended(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID, delayMs, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP);
 }
 
 static void deactivate(uint8_t endpoint)
 {
-    // emberAfDeactivateServerTick(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID);
+    emberAfDeactivateServerTick(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID);
 }
 
 static EmberAfLevelControlState * getState(uint8_t endpoint)
@@ -652,16 +652,34 @@ static void moveHandler(uint8_t commandId, uint8_t moveMode, uint8_t rate, uint8
         }
     }
 
-    // If the Rate field is 0xFF, the device should move as fast as it is able.
-    // Otherwise, the rate is in units per second.
+    // If the Rate field is 0xFF, the device should move at the default move rate, if available,
+    // Otherwise, move as fast as possible
     if (rate == 0xFF)
     {
-        state->eventDurationMs = FASTEST_TRANSITION_TIME_MS;
+        uint16_t defaultMoveRate;
+        status = emberAfReadServerAttribute(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_DEFAULT_MOVE_RATE_ATTRIBUTE_ID,
+                                            (uint8_t *) &defaultMoveRate, sizeof(defaultMoveRate));
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            emberAfLevelControlClusterPrintln("ERR: reading default move rate %x", status);
+            state->eventDurationMs = FASTEST_TRANSITION_TIME_MS;
+        }
+        else
+        {
+            // nonsensical case, means "don't move", so we're done
+            if (defaultMoveRate == 0)
+            {
+                status = EMBER_ZCL_STATUS_SUCCESS;
+                goto send_default_response;
+            }
+            state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / defaultMoveRate;
+        }
     }
     else
     {
-        state->eventDurationMs = 1000 / rate;
+        state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / rate;
     }
+
     state->transitionTimeMs = difference * state->eventDurationMs;
     state->elapsedTimeMs    = 0;
 
