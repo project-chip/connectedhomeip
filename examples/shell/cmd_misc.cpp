@@ -66,5 +66,5 @@ static shell_command_t cmds_misc[] = {
 
 void cmd_misc_init(void)
 {
-    shell_register(cmds_misc, ARRAY_SIZE(cmds_misc));
+    shell_register(cmds_misc, ArraySize(cmds_misc));
 }
