@@ -43,9 +43,11 @@ example, the output binary will be lacking key features (e.g. OpenThread).
 
             $ export EFR32_SDK_ROOT=<Path to cloned git repo>
 
--   Download the [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
+-   Download the
+    [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
     command line tool, and ensure that `commander` is your shell search path.
-    (For Mac OS X, `commander` is located inside `Commander.app/Contents/MacOS/`.)
+    (For Mac OS X, `commander` is located inside
+    `Commander.app/Contents/MacOS/`.)
 
 -   Download and install a suitable ARM gcc tool chain:
     [GNU Arm Embedded Toolchain 9-2019-q4-major](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
@@ -110,13 +112,13 @@ example, the output binary will be lacking key features (e.g. OpenThread).
 
 ## Flashing the Application
 
-*   With Ninja
+-   With Ninja
 
-    - From CHIP root,
+    -   From CHIP root,
 
-            $ python out/lock_app_debug/BRD4161A/chip-efr32-lock-example.out.flash.py
+              $ python out/lock_app_debug/BRD4161A/chip-efr32-lock-example.out.flash.py
 
-*   With Make (_deprecated_)
+-   With Make (_deprecated_)
 
     -   To rebuild the image and flash the example app:
 
@@ -131,7 +133,7 @@ example, the output binary will be lacking key features (e.g. OpenThread).
 
             $ make BOARD=BRD4161A flash-app
 
-*   Or with the Ozone debugger, just load the .out file.
+-   Or with the Ozone debugger, just load the .out file.
 
 <a name="view-logging"></a>
 
