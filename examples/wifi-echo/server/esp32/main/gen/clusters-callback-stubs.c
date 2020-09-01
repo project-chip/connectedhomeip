@@ -718,110 +718,6 @@ bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(uint16_t zoneStat
     return false;
 }
 
-/** @brief Level Control Cluster Move
- *
- *
- *
- * @param moveMode   Ver.: always
- * @param rate   Ver.: always
- * @param optionMask   Ver.: since zcl6-errata-14-0129-15
- * @param optionOverride   Ver.: since zcl6-errata-14-0129-15
- */
-bool emberAfLevelControlClusterMoveCallback(uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride)
-{
-    return false;
-}
-
-/** @brief Level Control Cluster Move To Level
- *
- *
- *
- * @param level   Ver.: always
- * @param transitionTime   Ver.: always
- * @param optionMask   Ver.: since zcl6-errata-14-0129-15
- * @param optionOverride   Ver.: since zcl6-errata-14-0129-15
- */
-bool emberAfLevelControlClusterMoveToLevelCallback(uint8_t level, uint16_t transitionTime, uint8_t optionMask,
-                                                   uint8_t optionOverride)
-{
-    return false;
-}
-
-/** @brief Level Control Cluster Move To Level With On Off
- *
- *
- *
- * @param level   Ver.: always
- * @param transitionTime   Ver.: always
- */
-bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(uint8_t level, uint16_t transitionTime)
-{
-    return false;
-}
-
-/** @brief Level Control Cluster Move With On Off
- *
- *
- *
- * @param moveMode   Ver.: always
- * @param rate   Ver.: always
- */
-bool emberAfLevelControlClusterMoveWithOnOffCallback(uint8_t moveMode, uint8_t rate)
-{
-    return false;
-}
-
-/** @brief Level Control Cluster Step
- *
- *
- *
- * @param stepMode   Ver.: always
- * @param stepSize   Ver.: always
- * @param transitionTime   Ver.: always
- * @param optionMask   Ver.: since zcl6-errata-14-0129-15
- * @param optionOverride   Ver.: since zcl6-errata-14-0129-15
- */
-bool emberAfLevelControlClusterStepCallback(uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask,
-                                            uint8_t optionOverride)
-{
-    return false;
-}
-
-/** @brief Level Control Cluster Stop
- *
- *
- *
- * @param optionMask   Ver.: since zcl6-errata-14-0129-15
- * @param optionOverride   Ver.: since zcl6-errata-14-0129-15
- */
-bool emberAfLevelControlClusterStopCallback(uint8_t optionMask, uint8_t optionOverride)
-{
-    return false;
-}
-
-/** @brief Level Control Cluster Step With On Off
- *
- *
- *
- * @param stepMode   Ver.: always
- * @param stepSize   Ver.: always
- * @param transitionTime   Ver.: always
- */
-bool emberAfLevelControlClusterStepWithOnOffCallback(uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime)
-{
-    return false;
-}
-
-/** @brief Level Control Cluster Stop With On Off
- *
- *
- *
- */
-bool emberAfLevelControlClusterStopWithOnOffCallback(void)
-{
-    return false;
-}
-
 /** @brief Scenes Cluster Add Scene
  *
  *
@@ -1011,8 +907,11 @@ EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(uint8_t end
 {
     return EMBER_ZCL_STATUS_SUCCESS;
 }
-***@param status Ver. : always * @param groupId Ver. : always * @param sceneId Ver. : always * /
-    void emberAfPollControlClusterServerInitCallback(uint8_t endpoint) {}
+
+void emberAfPluginDoorLockServerInitCallback(void) {}
+void emberAfPluginReportingInitCallback(void) {}
+void emberAfPollControlClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId) {}
+void emberAfPollControlClusterServerInitCallback(uint8_t endpoint) {}
 void emberAfPluginPollControlServerStackStatusCallback(EmberStatus status) {}
 EmberAfStatus emberAfPollControlClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
                                                                          EmberAfAttributeType attributeType, uint8_t size,
