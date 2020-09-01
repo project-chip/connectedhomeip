@@ -1897,6 +1897,12 @@ typedef struct
 #define BYTE_7(n) BYTE_0((n) >> 56)
 
 /**
+ * @brief Returns the value built from the two \c uint8_t
+ * values \c high and \c low.
+ */
+#define HIGH_LOW_TO_INT(high, low) (((uint16_t)(((uint16_t)(high)) << 8)) + ((uint16_t)((low) &0xFF)))
+
+/**
  * @brief The kind of arguments the main function takes
  */
 #define MAIN_FUNCTION_PARAMETERS void

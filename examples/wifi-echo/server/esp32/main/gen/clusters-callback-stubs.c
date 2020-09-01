@@ -561,30 +561,6 @@ bool emberAfDoorLockClusterUnlockWithTimeoutCallback(uint16_t timeoutInSeconds, 
     return false;
 }
 
-/** @brief Groups Cluster Add Group
- *
- *
- *
- * @param groupId   Ver.: always
- * @param groupName   Ver.: always
- */
-bool emberAfGroupsClusterAddGroupCallback(uint16_t groupId, uint8_t * groupName)
-{
-    return false;
-}
-
-/** @brief Groups Cluster Add Group If Identifying
- *
- *
- *
- * @param groupId   Ver.: always
- * @param groupName   Ver.: always
- */
-bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(uint16_t groupId, uint8_t * groupName)
-{
-    return false;
-}
-
 /** @brief Groups Cluster Add Group Response
  *
  *
@@ -593,18 +569,6 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(uint16_t groupId, uint8_t
  * @param groupId   Ver.: always
  */
 bool emberAfGroupsClusterAddGroupResponseCallback(uint8_t status, uint16_t groupId)
-{
-    return false;
-}
-
-/** @brief Groups Cluster Get Group Membership
- *
- *
- *
- * @param groupCount   Ver.: always
- * @param groupList   Ver.: always
- */
-bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t * groupList)
 {
     return false;
 }
@@ -622,27 +586,6 @@ bool emberAfGroupsClusterGetGroupMembershipResponseCallback(uint8_t capacity, ui
     return false;
 }
 
-/** @brief Groups Cluster Remove All Groups
- *
- *
- *
- */
-bool emberAfGroupsClusterRemoveAllGroupsCallback(void)
-{
-    return false;
-}
-
-/** @brief Groups Cluster Remove Group
- *
- *
- *
- * @param groupId   Ver.: always
- */
-bool emberAfGroupsClusterRemoveGroupCallback(uint16_t groupId)
-{
-    return false;
-}
-
 /** @brief Groups Cluster Remove Group Response
  *
  *
@@ -651,17 +594,6 @@ bool emberAfGroupsClusterRemoveGroupCallback(uint16_t groupId)
  * @param groupId   Ver.: always
  */
 bool emberAfGroupsClusterRemoveGroupResponseCallback(uint8_t status, uint16_t groupId)
-{
-    return false;
-}
-
-/** @brief Groups Cluster View Group
- *
- *
- *
- * @param groupId   Ver.: always
- */
-bool emberAfGroupsClusterViewGroupCallback(uint16_t groupId)
 {
     return false;
 }
@@ -893,7 +825,6 @@ bool emberAfScenesClusterViewSceneResponseCallback(uint8_t status, uint16_t grou
 void emberAfColorControlClusterServerInitCallback(uint8_t endpoint) {}
 
 void emberAfDoorLockClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId) {}
-void emberAfGroupsClusterServerInitCallback(uint8_t endpoint) {}
 void emberAfIasZoneClusterClientInitCallback(uint8_t endpoint) {}
 void emberAfIasZoneClusterServerInitCallback(uint8_t endpoint) {}
 void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination,
