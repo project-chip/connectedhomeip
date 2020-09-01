@@ -40,7 +40,7 @@
 #define SILABS_AF_ENDPOINT_CONFIG
 
 // Fixed number of defined endpoints
-#define FIXED_ENDPOINT_COUNT (1)
+#define FIXED_ENDPOINT_COUNT (2)
 
 // Generated attributes
 #define GENERATED_ATTRIBUTES                                                                                                       \
@@ -262,12 +262,16 @@
                  CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION),                                                                     \
                 emberAfFuncArrayIasZoneClusterServer,                                                                              \
             },                                                                                                                     \
+            {                                                                                                                      \
+                0x0006, (EmberAfAttributeMetadata *) &(generatedAttributes[18]), 1,                                                \
+                1,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayOnOffClusterServer,               \
+            },                                                                                                                     \
     }
 
 // Endpoint types
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { (EmberAfCluster *) &(generatedClusters[0]), 22, 84 },                                                                    \
+        { (EmberAfCluster *) &(generatedClusters[0]), 22, 84 }, { (EmberAfCluster *) &(generatedClusters[22]), 1, 1 },             \
     }
 
 // Cluster manufacturer codes
@@ -294,42 +298,42 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (6)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE 84
+#define ATTRIBUTE_MAX_SIZE 85
 
 // Array of endpoints that are supported
 #define FIXED_ENDPOINT_ARRAY                                                                                                       \
     {                                                                                                                              \
-        1                                                                                                                          \
+        1, 2                                                                                                                       \
     }
 
 // Array of profile ids
 #define FIXED_PROFILE_IDS                                                                                                          \
     {                                                                                                                              \
-        65535                                                                                                                      \
+        65535, 65535                                                                                                               \
     }
 
 // Array of device ids
 #define FIXED_DEVICE_IDS                                                                                                           \
     {                                                                                                                              \
-        65535                                                                                                                      \
+        65535, 65535                                                                                                               \
     }
 
 // Array of device versions
 #define FIXED_DEVICE_VERSIONS                                                                                                      \
     {                                                                                                                              \
-        1                                                                                                                          \
+        1, 1                                                                                                                       \
     }
 
 // Array of endpoint types supported on each endpoint
 #define FIXED_ENDPOINT_TYPES                                                                                                       \
     {                                                                                                                              \
-        0                                                                                                                          \
+        0, 1                                                                                                                       \
     }
 
 // Array of networks supported on each endpoint
 #define FIXED_NETWORKS                                                                                                             \
     {                                                                                                                              \
-        0                                                                                                                          \
+        0, 0                                                                                                                       \
     }
 
 #define EMBER_AF_GENERATED_PLUGIN_INIT_FUNCTION_DECLARATIONS                                                                       \
