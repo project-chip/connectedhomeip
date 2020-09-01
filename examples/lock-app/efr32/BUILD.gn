@@ -21,19 +21,20 @@ import("${efr32_sdk_build_root}/efr32_sdk.gni")
 assert(current_os == "freertos")
 
 efr32_project_dir = "${chip_root}/examples/lock-app/efr32"
+examples_plat_dir = "${chip_root}/examples/platform/efr32"
 
 efr32_sdk("sdk") {
   include_dirs = [
     "${chip_root}/src/platform/EFR32",
     "${efr32_project_dir}/include/",
     "${efr32_project_dir}/src/",
-    "${efr32_project_dir}/src/platform/${efr32_family}/${efr32_board}",
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}",
   ]
 
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
     "${efr32_project_dir}/include/FreeRTOSConfig.h",
-    "${efr32_project_dir}/src/platform/${efr32_family}/${efr32_board}/hal-config.h",
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}/hal-config.h",
   ]
 
   defines = []
@@ -63,6 +64,7 @@ efr32_executable("lock_app") {
   include_dirs += [
     "${efr32_project_dir}/include/",
     "${chip_root}/src/app/util",
+    "${examples_plat_dir}/",
   ]
 
   sources = [
@@ -87,9 +89,9 @@ efr32_executable("lock_app") {
     "src/gen/callback-stub.c",
     "src/gen/znet-bookkeeping.c",
     "src/main.cpp",
-    "src/platform/${efr32_family}/${efr32_board}/hal-config.h",
-    "src/platform/${efr32_family}/${efr32_board}/init_board.c",
-    "src/platform/${efr32_family}/${efr32_board}/init_mcu.c",
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}/hal-config.h",
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
   ]
 
   output_dir = root_out_dir
