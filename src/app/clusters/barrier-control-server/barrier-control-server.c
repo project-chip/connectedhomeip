@@ -39,16 +39,12 @@
  ******************************************************************************/
 
 #include "barrier-control-server.h"
-#include "af.h"
+#include <app/util/af.h>
 
 #include <assert.h>
 
-#ifndef MILLISECOND_TICKS_PER_DECISECOND
-#define MILLISECOND_TICKS_PER_DECISECOND 1000
-#endif
-
 // We need this for initializating default reporting configurations.
-//#include "app/framework/plugin/reporting/reporting.h"
+#include <app/reporting/reporting.h>
 
 typedef struct
 {
