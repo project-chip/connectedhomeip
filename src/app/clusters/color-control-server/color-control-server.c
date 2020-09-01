@@ -38,11 +38,12 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "app/framework/include/af.h"
-#include "app/framework/util/attribute-storage.h"
+#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
+#include <assert.h>
 
 #ifdef EMBER_AF_PLUGIN_REPORTING
-#include "app/framework/plugin/reporting/reporting.h"
+#include <app/reporting/reporting.h>
 #endif
 
 #define COLOR_TEMP_CONTROL emberAfPluginColorControlServerTempTransitionEventControl

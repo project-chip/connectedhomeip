@@ -65,14 +65,6 @@ void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint) {}
  */
 void emberAfPluginLevelControlClusterServerPostInitCallback(uint8_t endpoint) {}
 
-/** @brief Level Control Coupled Color Temp Change
- *
- * Adjust Color Control cluster Color Temperature in response to a change in
- * Level Control cluster CurrentLevel.
- *
- * @param endpoint Endpoint that is being initialized  Ver.: always
- */
-void emberAfPluginLevelControlCoupledColorTempChangeCallback(uint8_t endpoint) {}
 
 /** @brief Get Group Name
  *
