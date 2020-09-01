@@ -56,7 +56,7 @@ int cmd_base64_decode(int argc, char ** argv)
     uint8_t binary[256];
 
     VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    binarySize = Base64Decode(argv[0], sizeof(argv[0]), binary);
+    binarySize = Base64Decode(argv[0], strlen(argv[0]), binary);
     streamer_print_hex(sout, binary, binarySize);
     streamer_printf(sout, "\n\r");
 
