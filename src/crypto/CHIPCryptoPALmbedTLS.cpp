@@ -85,9 +85,9 @@ static bool _isValidKeyLength(size_t length)
     return false;
 }
 
-CHIP_ERROR AES_CCM_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad, size_t aad_length,
-                           const unsigned char * key, size_t key_length, const unsigned char * iv, size_t iv_length,
-                           unsigned char * ciphertext, unsigned char * tag, size_t tag_length)
+CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
+                           const uint8_t * key, size_t key_length, const uint8_t * iv, size_t iv_length,
+                           uint8_t * ciphertext, uint8_t * tag, size_t tag_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 1;
@@ -123,9 +123,9 @@ exit:
     return error;
 }
 
-CHIP_ERROR AES_CCM_decrypt(const unsigned char * ciphertext, size_t ciphertext_len, const unsigned char * aad, size_t aad_len,
-                           const unsigned char * tag, size_t tag_length, const unsigned char * key, size_t key_length,
-                           const unsigned char * iv, size_t iv_length, unsigned char * plaintext)
+CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, const uint8_t * aad, size_t aad_len,
+                           const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length,
+                           const uint8_t * iv, size_t iv_length, uint8_t * plaintext)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 1;
@@ -161,7 +161,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR Hash_SHA256(const unsigned char * data, const size_t data_length, unsigned char * out_buffer)
+CHIP_ERROR Hash_SHA256(const uint8_t * data, const size_t data_length, uint8_t * out_buffer)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -201,7 +201,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR Hash_SHA256_stream::AddData(const unsigned char * data, const size_t data_length)
+CHIP_ERROR Hash_SHA256_stream::AddData(const uint8_t * data, const size_t data_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -215,7 +215,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR Hash_SHA256_stream::Finish(unsigned char * out_buffer)
+CHIP_ERROR Hash_SHA256_stream::Finish(uint8_t * out_buffer)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -234,8 +234,8 @@ void Hash_SHA256_stream::Clear(void)
     memset(this, 0, sizeof(*this));
 }
 
-CHIP_ERROR HKDF_SHA256(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
-                       const size_t salt_length, const unsigned char * info, const size_t info_length, unsigned char * out_buffer,
+CHIP_ERROR HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt,
+                       const size_t salt_length, const uint8_t * info, const size_t info_length, uint8_t * out_buffer,
                        size_t out_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -267,8 +267,8 @@ exit:
     return error;
 }
 
-CHIP_ERROR pbkdf2_sha256(const unsigned char * password, size_t plen, const unsigned char * salt, size_t slen,
-                         unsigned int iteration_count, uint32_t key_length, unsigned char * output)
+CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
+                         unsigned int iteration_count, uint32_t key_length, uint8_t * output)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -359,7 +359,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR DRBG_get_bytes(unsigned char * out_buffer, const size_t out_length)
+CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -379,17 +379,17 @@ exit:
     return error;
 }
 
-static int ECDSA_sign_rng(void * ctxt, unsigned char * out_buffer, size_t out_length)
+static int ECDSA_sign_rng(void * ctxt, uint8_t * out_buffer, size_t out_length)
 {
     return (chip::Crypto::DRBG_get_bytes(out_buffer, out_length) == CHIP_NO_ERROR) ? 0 : 1;
 }
 
-CHIP_ERROR ECDSA_sign_msg(const unsigned char * msg, const size_t msg_length, const unsigned char * private_key,
-                          const size_t private_key_length, unsigned char * out_signature, size_t & out_signature_length)
+CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const uint8_t * private_key,
+                          const size_t private_key_length, uint8_t * out_signature, size_t & out_signature_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
-    unsigned char hash[NUM_BYTES_IN_SHA256_HASH];
+    uint8_t hash[NUM_BYTES_IN_SHA256_HASH];
 
     mbedtls_ecp_keypair keypair;
     mbedtls_ecp_keypair_init(&keypair);
@@ -427,13 +427,13 @@ exit:
     return error;
 }
 
-CHIP_ERROR ECDSA_validate_msg_signature(const unsigned char * msg, const size_t msg_length, const unsigned char * public_key,
-                                        const size_t public_key_length, const unsigned char * signature,
+CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const uint8_t * public_key,
+                                        const size_t public_key_length, const uint8_t * signature,
                                         const size_t signature_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
-    unsigned char hash[NUM_BYTES_IN_SHA256_HASH];
+    uint8_t hash[NUM_BYTES_IN_SHA256_HASH];
 
     mbedtls_ecp_keypair keypair;
     mbedtls_ecp_keypair_init(&keypair);
@@ -470,9 +470,9 @@ exit:
     return error;
 }
 
-CHIP_ERROR ECDH_derive_secret(const unsigned char * remote_public_key, const size_t remote_public_key_length,
-                              const unsigned char * local_private_key, const size_t local_private_key_length,
-                              unsigned char * out_secret, size_t & out_secret_length)
+CHIP_ERROR ECDH_derive_secret(const uint8_t * remote_public_key, const size_t remote_public_key_length,
+                              const uint8_t * local_private_key, const size_t local_private_key_length,
+                              uint8_t * out_secret, size_t & out_secret_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -624,8 +624,8 @@ void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl(void)
     mbedtls_ecp_group_free(&context->curve);
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const unsigned char * key, size_t key_len, const unsigned char * in, size_t in_len,
-                                              unsigned char * out)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len,
+                                              uint8_t * out)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -662,9 +662,9 @@ exit:
  */
 static inline int constant_time_memcmp(const void * a, const void * b, size_t n)
 {
-    const unsigned char * A = (const unsigned char *) a;
-    const unsigned char * B = (const unsigned char *) b;
-    unsigned char diff      = 0;
+    const uint8_t * A = (const uint8_t *) a;
+    const uint8_t * B = (const uint8_t *) b;
+    uint8_t diff      = 0;
 
     for (size_t i = 0; i < n; i++)
     {
@@ -674,13 +674,13 @@ static inline int constant_time_memcmp(const void * a, const void * b, size_t n)
     return diff;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::MacVerify(const unsigned char * key, size_t key_len, const unsigned char * mac,
-                                                    size_t mac_len, const unsigned char * in, size_t in_len)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac,
+                                                    size_t mac_len, const uint8_t * in, size_t in_len)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
 
-    unsigned char computed_mac[kSHA256_Hash_Length];
+    uint8_t computed_mac[kSHA256_Hash_Length];
 
     VerifyOrExit(mac_len == kSHA256_Hash_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -694,7 +694,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FELoad(const unsigned char * in, size_t in_len, void * fe)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FELoad(const uint8_t * in, size_t in_len, void * fe)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -710,7 +710,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEWrite(const void * fe, unsigned char * out, size_t out_len)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEWrite(const void * fe, uint8_t * out, size_t out_len)
 {
     if (mbedtls_mpi_write_binary((const mbedtls_mpi *) fe, out, out_len) != 0)
     {
@@ -751,7 +751,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointLoad(const unsigned char * in, size_t in_len, void * R)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointLoad(const uint8_t * in, size_t in_len, void * R)
 {
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
@@ -763,7 +763,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointLoad(const unsigned char * in, si
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointWrite(const void * R, unsigned char * out, size_t out_len)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointWrite(const void * R, uint8_t * out, size_t out_len)
 {
     memset(out, 0, out_len);
     size_t mbedtls_out_len = out_len;
@@ -824,7 +824,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointCofactorMul(void * R)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(unsigned char * Lout, size_t * L_len, const unsigned char * w1in,
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in,
                                                    size_t w1in_len)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;

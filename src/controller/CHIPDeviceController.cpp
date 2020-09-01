@@ -213,7 +213,7 @@ void ChipDeviceController::BLEConnectionHandler(ChipDeviceController * controlle
     ChipLogProgress(Controller, "Starting pairing session");
     controller->mPairingInProgress = true;
     CHIP_ERROR err                 = controller->mPairingSession.Pair(
-        controller->mSetupPINCode, kSpake2p_Iteration_Count, (const unsigned char *) kSpake2pKeyExchangeSalt,
+        controller->mSetupPINCode, kSpake2p_Iteration_Count, (const uint8_t *) kSpake2pKeyExchangeSalt,
         strlen(kSpake2pKeyExchangeSalt), Optional<NodeId>::Value(controller->mLocalDeviceId), controller->mNextKeyId++, controller);
     SuccessOrExit(err);
 
