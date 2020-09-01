@@ -221,8 +221,8 @@ CHIP_ERROR Spake2p::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t *
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     uint8_t point_buffer[kMAX_Point_Length];
-    void * MN              = NULL; // Choose N if a prover, M if a verifier
-    void * XY              = NULL; // Choose Y if a prover, X if a verifier
+    void * MN        = NULL; // Choose N if a prover, M if a verifier
+    void * XY        = NULL; // Choose Y if a prover, X if a verifier
     uint8_t * Kcaorb = NULL; // Choose Kca if a prover, Kcb if a verifier
 
     VerifyOrExit(*out_len >= hash_size, error = CHIP_ERROR_INTERNAL);
@@ -326,9 +326,8 @@ exit:
 
 CHIP_ERROR Spake2p::GenerateKeys(void)
 {
-    CHIP_ERROR error                               = CHIP_ERROR_INTERNAL;
-    static const uint8_t info_keyconfirm[16] = { 'C', 'o', 'n', 'f', 'i', 'r', 'm', 'a',
-                                                       't', 'i', 'o', 'n', 'K', 'e', 'y', 's' };
+    CHIP_ERROR error                         = CHIP_ERROR_INTERNAL;
+    static const uint8_t info_keyconfirm[16] = { 'C', 'o', 'n', 'f', 'i', 'r', 'm', 'a', 't', 'i', 'o', 'n', 'K', 'e', 'y', 's' };
 
     error = HashFinalize(Kae);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
@@ -345,7 +344,7 @@ CHIP_ERROR Spake2p::KeyConfirm(const uint8_t * in, size_t in_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     uint8_t point_buffer[kP256_Point_Length];
-    void * XY              = NULL; // Choose X if a prover, Y if a verifier
+    void * XY        = NULL; // Choose X if a prover, Y if a verifier
     uint8_t * Kcaorb = NULL; // Choose Kcb if a prover, Kca if a verifier
 
     VerifyOrExit(state == CHIP_SPAKE2P_STATE::CHIP_SPAKE2P_STATE_R2, error = CHIP_ERROR_INTERNAL);
@@ -429,8 +428,8 @@ exit:
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::KDF(const uint8_t * ikm, const size_t ikm_len, const uint8_t * salt,
-                                              const size_t salt_len, const uint8_t * info, const size_t info_len,
-                                              uint8_t * out, size_t out_len)
+                                              const size_t salt_len, const uint8_t * info, const size_t info_len, uint8_t * out,
+                                              size_t out_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
 

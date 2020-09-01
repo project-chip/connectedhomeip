@@ -140,8 +140,8 @@ public:
     CHIP_ERROR HandlePeerMessage(MessageHeader & header, System::PacketBuffer * msg);
 
 private:
-    CHIP_ERROR Init(uint32_t setupCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                    Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
+    CHIP_ERROR Init(uint32_t setupCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen, Optional<NodeId> myNodeId,
+                    uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
 
     CHIP_ERROR HandleCompute_pA(const MessageHeader & header, System::PacketBuffer * msg);
     CHIP_ERROR HandleCompute_pB_cB(const MessageHeader & header, System::PacketBuffer * msg);
@@ -215,8 +215,8 @@ public:
     {
         const char * secret = "Test secret for key derivation";
         size_t secretLen    = strlen(secret);
-        return session.InitFromSecret((const uint8_t *) secret, secretLen, (const uint8_t *) "", 0,
-                                      (const uint8_t *) secret, secretLen);
+        return session.InitFromSecret((const uint8_t *) secret, secretLen, (const uint8_t *) "", 0, (const uint8_t *) secret,
+                                      secretLen);
     }
 
     CHIP_ERROR HandlePeerMessage(const MessageHeader & header, System::PacketBuffer * msg) { return CHIP_NO_ERROR; }
