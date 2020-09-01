@@ -31,11 +31,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
+/*****************************************************************************
  * @file
  * @brief Interface for the application event mechanism
  *******************************************************************************
-   ******************************************************************************/
+ ******************************************************************************/
 
 #ifndef SILABS_AF_EVENT_H
 #define SILABS_AF_EVENT_H
@@ -47,9 +47,9 @@
 #define MAX_TIMER_MILLISECONDS_HOST (MAX_TIMER_UNITS_HOST * MILLISECOND_TICKS_PER_MINUTE)
 
 #if !defined(ATTRIBUTE_STORAGE_CONFIGURATION) && defined(EMBER_TEST)
-  #include "af-event-test.h"
+#include "af-event-test.h"
 #else
-  #include "af-gen-event.h"
+#include "af-gen-event.h"
 #endif
 
 // Task ids referenced in the sleep code
@@ -63,16 +63,13 @@ extern EmberEventData emAfEvents[];
 
 // A function used to retrieve the proper NCP timer duration and unit based on a given
 // passed number of milliseconds.
-void emAfGetTimerDurationAndUnitFromMS(uint32_t durationMs,
-                                       uint16_t *duration,
-                                       EmberEventUnits *units);
+void emAfGetTimerDurationAndUnitFromMS(uint32_t durationMs, uint16_t * duration, EmberEventUnits * units);
 
 // A function (inverse of the above) to retrieve the number of milliseconds
 // represented by a given timer duration and unit.
-uint32_t emAfGetMSFromTimerDurationAndUnit(uint16_t duration,
-                                           EmberEventUnits units);
+uint32_t emAfGetMSFromTimerDurationAndUnit(uint16_t duration, EmberEventUnits units);
 
-//A function to initialize the Event mechanism used to drive the application framework.
+// A function to initialize the Event mechanism used to drive the application framework.
 void emAfInitEvents(void);
 
 const char * emberAfGetEventString(uint8_t index);
