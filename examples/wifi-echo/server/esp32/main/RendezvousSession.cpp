@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "RendezvousMessageHandler.h"
 #include "RendezvousSession.h"
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -22,8 +23,6 @@
 #include <system/SystemPacketBuffer.h>
 
 using namespace ::chip;
-
-extern CHIP_ERROR SetWiFiStationProvisioning(char * ssid, char * key);
 
 BluetoothWidget * RendezvousSession::mVirtualLed;
 
@@ -131,32 +130,11 @@ void RendezvousSession::HandleMessageReceived(Ble::BLEEndPoint * endPoint, Packe
     }
     else
     {
-        const size_t bufferLen = buffer->DataLength();
-        char msg[bufferLen];
-        msg[bufferLen] = 0;
-        memcpy(msg, buffer->Start(), bufferLen);
-
-        ChipLogProgress(Ble, "RendezvousSession: Receive message: %s", msg);
-
-        if ((bufferLen > 3) && (msg[0] == msg[1]) && (msg[0] == msg[bufferLen - 1]))
+        // When paired, offer the RendezvousMessageHandler a chance to process the message.
+        CHIP_ERROR err = RendezvousMessageHandler::HandleMessageReceived(buffer);
+        if (err == CHIP_ERROR_INVALID_MESSAGE_TYPE)
         {
-            // WiFi credentials, of the form ‘::SSID:password:’, where ‘:’ can be any single ASCII character.
-            msg[1]      = 0;
-            char * ssid = strtok(&msg[2], msg);
-            char * key  = strtok(NULL, msg);
-            if (ssid && key)
-            {
-                ChipLogProgress(Ble, "RendezvousSession: SSID: %s, key: %s", ssid, key);
-                SetWiFiStationProvisioning(ssid, key);
-            }
-            else
-            {
-                ChipLogError(Ble, "RendezvousSession: SSID: %p, key: %p", ssid, key);
-            }
-        }
-        else
-        {
-            // Echo.
+            // If the handler did not recognize the message, treat it as an echo request.
             mEndPoint->Send(buffer);
         }
     }
