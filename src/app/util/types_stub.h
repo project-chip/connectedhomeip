@@ -1919,4 +1919,7 @@ typedef struct
  */
 #define READBITS(reg, bits) ((reg) & (bits))
 
+#define MILLISECOND_TICKS_PER_SECOND 1000
+#define MILLISECOND_TICKS_PER_DECISECOND (MILLISECOND_TICKS_PER_SECOND / 10)
+
 #endif // TYPES_STUB_H
