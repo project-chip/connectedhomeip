@@ -624,7 +624,7 @@ void cmd_device_init(void)
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     // Register `device` subcommands with the local shell dispatcher.
-    sShellDeviceSubcommands.RegisterCommands(cmds_device, ARRAY_SIZE(cmds_device));
+    sShellDeviceSubcommands.RegisterCommands(cmds_device, ArraySize(cmds_device));
 
     // Register the root `base64` command with the top-level shell.
     shell_register(&cmds_base64_root, 1);

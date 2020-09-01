@@ -23,6 +23,7 @@
 #include "CHIPVersion.h"
 
 #include "shell.h"
+#include <support/CodeUtils.h>
 
 #include <assert.h>
 #include <ctype.h>
@@ -67,7 +68,7 @@ static shell_command_t cmds[] = {
 
 void Shell::RegisterDefaultCommands()
 {
-    RegisterCommands(cmds, ARRAY_SIZE(cmds));
+    RegisterCommands(cmds, ArraySize(cmds));
 }
 
 } // namespace Shell

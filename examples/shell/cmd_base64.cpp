@@ -105,7 +105,7 @@ static const shell_command_t cmds_base64[] = {
 void cmd_base64_init(void)
 {
     // Register `base64` subcommands with the local shell dispatcher.
-    theShellBase64.RegisterCommands(cmds_base64, ARRAY_SIZE(cmds_base64));
+    theShellBase64.RegisterCommands(cmds_base64, ArraySize(cmds_base64));
 
     // Register the root `base64` command with the top-level shell.
     shell_register(&cmds_base64_root, 1);

@@ -25,11 +25,11 @@
 
 #include <stdio.h>
 
+#include <lib/shell/shell.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/ThreadStackManager.h>
-#include <shell/shell.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
 
 #if CHIP_TARGET_STYLE_EMBEDDED
 #include <openthread/cli.h>
@@ -167,7 +167,7 @@ void cmd_otcli_init(void)
 {
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_TARGET_STYLE_EMBEDDED
-    otCliConsoleInit(GetOtInstance(), &OnOtCliInitialized, NULL);
+    otCliConsoleInit(otInstanceInitSingle(), &OnOtCliInitialized, NULL);
 #endif
 
     // Register the root otcli command with the top-level shell.

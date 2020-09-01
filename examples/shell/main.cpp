@@ -39,6 +39,9 @@ void cmd_otcli_init();
 
 int main(void)
 {
+    // Initialize the default streamer that was linked.
+    streamer_init(streamer_get());
+
     cmd_misc_init();
     cmd_base64_init();
     cmd_device_init();
