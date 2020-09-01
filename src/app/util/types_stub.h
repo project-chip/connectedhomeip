@@ -1928,4 +1928,10 @@ typedef struct
 #define MILLISECOND_TICKS_PER_SECOND 1000
 #define MILLISECOND_TICKS_PER_DECISECOND (MILLISECOND_TICKS_PER_SECOND / 10)
 
+#define emberEventControlSetDelayMS(control, delay) (void) 0
+#define emberEventControlSetInactive(control) (void) 0
+#define emberAfPluginColorControlServerComputePwmFromXyCallback(endpoint) (void) 0
+#define emberAfPluginColorControlServerComputePwmFromHsvCallback(endpoint) (void) 0
+#define emberAfPluginColorControlServerComputePwmFromTempCallback(endpoint) (void) 0
+
 #endif // TYPES_STUB_H

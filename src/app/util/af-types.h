@@ -1977,6 +1977,8 @@ typedef struct
 #define EMBER_AF_PERMIT_JOIN_FOREVER 0xFF
 #define EMBER_AF_PERMIT_JOIN_MAX_TIMEOUT 0xFE
 
+#define MAX_INT16U_VALUE (0xFFFF)
+
 /**
  * @brief The overhead of the ZDO response.
  *   1 byte for the sequence and 1 byte for the status code.
