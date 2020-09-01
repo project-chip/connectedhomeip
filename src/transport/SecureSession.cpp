@@ -70,9 +70,9 @@ exit:
     return error;
 }
 
-CHIP_ERROR SecureSession::Init(const uint8_t * remote_public_key, const size_t public_key_length,
-                               const uint8_t * local_private_key, const size_t private_key_length, const uint8_t * salt,
-                               const size_t salt_length, const uint8_t * info, const size_t info_length)
+CHIP_ERROR SecureSession::Init(const uint8_t * remote_public_key, const size_t public_key_length, const uint8_t * local_private_key,
+                               const size_t private_key_length, const uint8_t * salt, const size_t salt_length,
+                               const uint8_t * info, const size_t info_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     uint8_t secret[kMax_ECDH_Secret_Length];
@@ -170,8 +170,7 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
     error = GetAdditionalAuthData(header, AAD, aadLen);
     SuccessOrExit(error);
 
-    error = AES_CCM_encrypt(input, input_length, AAD, aadLen, mKey, sizeof(mKey), IV, sizeof(IV), output,
-                            tag, taglen);
+    error = AES_CCM_encrypt(input, input_length, AAD, aadLen, mKey, sizeof(mKey), IV, sizeof(IV), output, tag, taglen);
     SuccessOrExit(error);
 
     header.SetTag(encType, tag, taglen);
@@ -180,8 +179,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, uint8_t * output,
-                                  const MessageHeader & header)
+CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const MessageHeader & header)
 {
     CHIP_ERROR error    = CHIP_NO_ERROR;
     size_t taglen       = header.GetTagLength();
@@ -201,8 +199,7 @@ CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, ui
     error = GetAdditionalAuthData(header, AAD, aadLen);
     SuccessOrExit(error);
 
-    error = AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKey, sizeof(mKey),
-                            IV, sizeof(IV), output);
+    error = AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKey, sizeof(mKey), IV, sizeof(IV), output);
 exit:
     return error;
 }

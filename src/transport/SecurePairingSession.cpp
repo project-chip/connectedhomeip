@@ -65,8 +65,7 @@ CHIP_ERROR SecurePairingSession::Init(uint32_t setupCode, uint32_t pbkdf2IterCou
     err = mSpake2p.Init((const uint8_t *) kSpake2pContext, strlen(kSpake2pContext));
     SuccessOrExit(err);
 
-    err = pbkdf2_sha256((const uint8_t *) &setupCode, sizeof(setupCode), salt, saltLen, pbkdf2IterCount, sizeof(mWS),
-                        &mWS[0][0]);
+    err = pbkdf2_sha256((const uint8_t *) &setupCode, sizeof(setupCode), salt, saltLen, pbkdf2IterCount, sizeof(mWS), &mWS[0][0]);
     SuccessOrExit(err);
 
     if (mDelegate != nullptr)
@@ -137,9 +136,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt,
-                                      size_t saltLen, Optional<NodeId> myNodeId, uint16_t myKeyId,
-                                      SecurePairingSessionDelegate * delegate)
+CHIP_ERROR SecurePairingSession::Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
+                                      Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate)
 {
     uint8_t X[kMAX_Point_Length];
     size_t X_len = sizeof(X);
@@ -149,8 +147,8 @@ CHIP_ERROR SecurePairingSession::Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2
     CHIP_ERROR err = Init(peerSetUpPINCode, pbkdf2IterCount, salt, saltLen, myNodeId, myKeyId, delegate);
     SuccessOrExit(err);
 
-    err = mSpake2p.BeginProver((const uint8_t *) "", 0, (const uint8_t *) "", 0, &mWS[0][0], kSpake2p_WS_Length,
-                               &mWS[1][0], kSpake2p_WS_Length);
+    err = mSpake2p.BeginProver((const uint8_t *) "", 0, (const uint8_t *) "", 0, &mWS[0][0], kSpake2p_WS_Length, &mWS[1][0],
+                               kSpake2p_WS_Length);
     SuccessOrExit(err);
 
     err = mSpake2p.ComputeRoundOne(X, &X_len);
@@ -219,8 +217,8 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pA(const MessageHeader & header, 
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(buf_len == kMAX_Point_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    err = mSpake2p.BeginVerifier((const uint8_t *) "", 0, (const uint8_t *) "", 0, &mWS[0][0], kSpake2p_WS_Length,
-                                 mPoint, sizeof(mPoint));
+    err = mSpake2p.BeginVerifier((const uint8_t *) "", 0, (const uint8_t *) "", 0, &mWS[0][0], kSpake2p_WS_Length, mPoint,
+                                 sizeof(mPoint));
     SuccessOrExit(err);
 
     err = mSpake2p.ComputeRoundOne(Y, &Y_len);

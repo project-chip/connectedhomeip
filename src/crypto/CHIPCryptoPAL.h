@@ -106,8 +106,8 @@ enum class CHIP_SPAKE2P_ROLE
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  * */
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * key, size_t key_length, const uint8_t * iv, size_t iv_length,
-                           uint8_t * ciphertext, uint8_t * tag, size_t tag_length);
+                           const uint8_t * key, size_t key_length, const uint8_t * iv, size_t iv_length, uint8_t * ciphertext,
+                           uint8_t * tag, size_t tag_length);
 
 /**
  * @brief A function that implements AES-CCM decryption
@@ -126,8 +126,8 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
  **/
 
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length,
-                           const uint8_t * iv, size_t iv_length, uint8_t * plaintext);
+                           const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length, const uint8_t * iv,
+                           size_t iv_length, uint8_t * plaintext);
 
 /**
  * @brief A function that implements SHA-256 hash
@@ -176,9 +176,8 @@ private:
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 
-CHIP_ERROR HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt,
-                       const size_t salt_length, const uint8_t * info, const size_t info_length, uint8_t * out_buffer,
-                       size_t out_length);
+CHIP_ERROR HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
+                       const uint8_t * info, const size_t info_length, uint8_t * out_buffer, size_t out_length);
 
 /**
  * @brief A cryptographically secure random number generator based on NIST SP800-90A
@@ -216,8 +215,7 @@ CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ui
  * @return Returns a CHIP_NO_ERROR on successful verification, a CHIP_ERROR otherwise
  **/
 CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const uint8_t * public_key,
-                                        const size_t public_key_length, const uint8_t * signature,
-                                        const size_t signature_length);
+                                        const size_t public_key_length, const uint8_t * signature, const size_t signature_length);
 
 /** @brief A function to derive a shared secret using ECDH
  * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
@@ -232,8 +230,8 @@ CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_le
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 CHIP_ERROR ECDH_derive_secret(const uint8_t * remote_public_key, const size_t remote_public_key_length,
-                              const uint8_t * local_private_key, const size_t local_private_key_length,
-                              uint8_t * out_secret, size_t & out_secret_length);
+                              const uint8_t * local_private_key, const size_t local_private_key_length, uint8_t * out_secret,
+                              size_t & out_secret_length);
 
 /** @brief Entropy callback function
  * @param data Callback-specific data pointer
@@ -262,8 +260,8 @@ CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t 
  * @param output output buffer where the key will be written
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
-                         unsigned int iteration_count, uint32_t key_length, uint8_t * output);
+CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen, unsigned int iteration_count,
+                         uint32_t key_length, uint8_t * output);
 /**
  * The below class implements the draft 01 version of the Spake2+ protocol as
  * defined in https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html.
@@ -318,8 +316,7 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR BeginVerifier(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
-                             size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * Lin,
-                             size_t Lin_len);
+                             size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * Lin, size_t Lin_len);
 
     /**
      * @brief Start the Spake2+ process as a prover (i.e. a commisioner).
@@ -336,8 +333,7 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR BeginProver(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
-                           size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in,
-                           size_t w1in_len);
+                           size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in, size_t w1in_len);
 
     /**
      * @brief Compute the first round of the protocol.
@@ -588,8 +584,7 @@ protected:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len,
-                           uint8_t * out) = 0;
+    virtual CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out) = 0;
 
     /**
      * @brief Verify a message authentication code.
@@ -603,8 +598,8 @@ protected:
      *
      *  @return Returns a CHIP_ERROR when the MAC doesn't validate, CHIP_NO_ERROR otherwise.
      **/
-    virtual CHIP_ERROR MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len,
-                                 const uint8_t * in, size_t in_len) = 0;
+    virtual CHIP_ERROR MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len, const uint8_t * in,
+                                 size_t in_len) = 0;
 
     /**
      * @brief Derive an key of length out_len.
@@ -652,8 +647,8 @@ public:
     virtual ~Spake2p_P256_SHA256_HKDF_HMAC(void) { FreeImpl(); }
 
     CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out);
-    CHIP_ERROR MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len,
-                         const uint8_t * in, size_t in_len);
+    CHIP_ERROR MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len, const uint8_t * in,
+                         size_t in_len);
     CHIP_ERROR FELoad(const uint8_t * in, size_t in_len, void * fe);
     CHIP_ERROR FEWrite(const void * fe, uint8_t * out, size_t out_len);
     CHIP_ERROR FEGenerate(void * fe);

@@ -51,9 +51,9 @@ public:
      * @param private_key_length Length of local_private_key
      * @return CHIP_ERROR        The result of key derivation
      */
-    CHIP_ERROR Init(const uint8_t * remote_public_key, const size_t public_key_length,
-                    const uint8_t * local_private_key, const size_t private_key_length, const uint8_t * salt,
-                    const size_t salt_length, const uint8_t * info, const size_t info_length);
+    CHIP_ERROR Init(const uint8_t * remote_public_key, const size_t public_key_length, const uint8_t * local_private_key,
+                    const size_t private_key_length, const uint8_t * salt, const size_t salt_length, const uint8_t * info,
+                    const size_t info_length);
 
     /**
      * @brief
@@ -66,8 +66,8 @@ public:
      * @param private_key_length Length of local_private_key
      * @return CHIP_ERROR        The result of key derivation
      */
-    CHIP_ERROR InitFromSecret(const uint8_t * secret, const size_t secret_length, const uint8_t * salt,
-                              const size_t salt_length, const uint8_t * info, const size_t info_length);
+    CHIP_ERROR InitFromSecret(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
+                              const uint8_t * info, const size_t info_length);
 
     /**
      * @brief
