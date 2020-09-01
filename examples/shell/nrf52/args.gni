@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//../build_overrides/chip.gni")
+#import("//../build_overrides/chip.gni")
 
-import("${chip_root}/examples/platform/nrf528xx/args.gni")
+import("//third_party/connectedhomeip/examples/platform/nrf528xx/args.gni")
 
 chip_config_enable_arg_parser = true
 

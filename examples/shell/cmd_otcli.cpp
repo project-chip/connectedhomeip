@@ -158,6 +158,13 @@ static int OnOtCliInitialized(const char * aBuf, uint16_t aBufLength, void * aCo
 }
 #endif
 
+#if CHIP_TARGET_STYLE_EMBEDDED
+static otInstance * GetOtInstance()
+{
+    return ThreadStackMgrImpl().OTInstance();
+}
+#endif // CHIP_TARGET_STYLE_EMBEDDED
+
 #endif // CHIP_ENABLE_OPENTHREAD
 
 void cmd_otcli_init(void)
