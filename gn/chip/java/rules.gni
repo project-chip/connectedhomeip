@@ -34,9 +34,12 @@ template("java_library") {
   }
 
   # Additional flags
-  _javac_flags = []
+  _javac_flags = [
+    "-Werror",
+    "-Xlint:all",
+  ]
   if (defined(invoker.javac_flags)) {
-    _javac_flags = invoker.javac_flags
+    _javac_flags += invoker.javac_flags
   }
 
   _deps = []
@@ -83,7 +86,7 @@ template("java_library") {
   }
 
   # Bundles all files within the 'class directory' into a jar file
-  _jar_output = "$root_build_dir/lib/$_jar_name"
+  _jar_output = "$root_out_dir/lib/$_jar_name"
   action(target_name) {
     deps = [ ":$_javac_target_name" ] + _deps
 
