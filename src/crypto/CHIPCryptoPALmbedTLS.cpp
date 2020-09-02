@@ -114,8 +114,9 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     // Encrypt
-    result = mbedtls_ccm_encrypt_and_tag(&context, plaintext_length, Uint8::to_const_uchar(iv), iv_length, Uint8::to_const_uchar(aad), aad_length, Uint8::to_const_uchar(plaintext), Uint8::to_uchar(ciphertext), Uint8::to_uchar(tag),
-                                         tag_length);
+    result = mbedtls_ccm_encrypt_and_tag(&context, plaintext_length, Uint8::to_const_uchar(iv), iv_length,
+                                         Uint8::to_const_uchar(aad), aad_length, Uint8::to_const_uchar(plaintext),
+                                         Uint8::to_uchar(ciphertext), Uint8::to_uchar(tag), tag_length);
     _log_mbedTLS_error(result);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
@@ -152,8 +153,9 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, co
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     // Decrypt
-    result =
-        mbedtls_ccm_auth_decrypt(&context, ciphertext_len, Uint8::to_const_uchar(iv), iv_length, Uint8::to_const_uchar(aad), aad_len, Uint8::to_const_uchar(ciphertext), Uint8::to_uchar(plaintext), Uint8::to_const_uchar(tag), tag_length);
+    result = mbedtls_ccm_auth_decrypt(&context, ciphertext_len, Uint8::to_const_uchar(iv), iv_length, Uint8::to_const_uchar(aad),
+                                      aad_len, Uint8::to_const_uchar(ciphertext), Uint8::to_uchar(plaintext),
+                                      Uint8::to_const_uchar(tag), tag_length);
     _log_mbedTLS_error(result);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
@@ -259,7 +261,8 @@ CHIP_ERROR HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const
     md = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
     VerifyOrExit(md != NULL, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_hkdf(md, Uint8::to_const_uchar(salt), salt_length, Uint8::to_const_uchar(secret), secret_length, Uint8::to_const_uchar(info), info_length, Uint8::to_uchar(out_buffer), out_length);
+    result = mbedtls_hkdf(md, Uint8::to_const_uchar(salt), salt_length, Uint8::to_const_uchar(secret), secret_length,
+                          Uint8::to_const_uchar(info), info_length, Uint8::to_uchar(out_buffer), out_length);
     _log_mbedTLS_error(result);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
@@ -294,7 +297,8 @@ CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * 
     result = mbedtls_md_setup(&md_ctxt, md_info, use_hmac);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_pkcs5_pbkdf2_hmac(&md_ctxt, Uint8::to_const_uchar(password), plen, Uint8::to_const_uchar(salt), slen, iteration_count, key_length, Uint8::to_uchar(output));
+    result = mbedtls_pkcs5_pbkdf2_hmac(&md_ctxt, Uint8::to_const_uchar(password), plen, Uint8::to_const_uchar(salt), slen,
+                                       iteration_count, key_length, Uint8::to_uchar(output));
 
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
@@ -416,8 +420,8 @@ CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ui
     result = mbedtls_sha256_ret(Uint8::to_const_uchar(msg), msg_length, hash, 0);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_ecdsa_write_signature(&ecdsa_ctxt, MBEDTLS_MD_SHA256, hash, sizeof(hash), Uint8::to_uchar(out_signature), &out_signature_length,
-                                           ECDSA_sign_rng, NULL);
+    result = mbedtls_ecdsa_write_signature(&ecdsa_ctxt, MBEDTLS_MD_SHA256, hash, sizeof(hash), Uint8::to_uchar(out_signature),
+                                           &out_signature_length, ECDSA_sign_rng, NULL);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -504,7 +508,8 @@ CHIP_ERROR ECDH_derive_secret(const uint8_t * remote_public_key, const size_t re
     result = mbedtls_mpi_read_binary(&mpi_privkey, Uint8::to_const_uchar(local_private_key), local_private_key_length);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    result = mbedtls_ecp_point_read_binary(&ecp_grp, &ecp_pubkey, Uint8::to_const_uchar(remote_public_key), remote_public_key_length);
+    result =
+        mbedtls_ecp_point_read_binary(&ecp_grp, &ecp_pubkey, Uint8::to_const_uchar(remote_public_key), remote_public_key_length);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     result = mbedtls_ecdh_compute_shared(&ecp_grp, &mpi_secret, &ecp_pubkey, &mpi_privkey, ECDSA_sign_rng, NULL);
