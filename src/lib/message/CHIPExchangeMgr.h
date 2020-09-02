@@ -318,7 +318,7 @@ private:
     // Trickle-controlled retransmissions:
     uint32_t backoff;               // backoff for sampling the numner of messages
     uint8_t msgsReceived;           // number of messages heard during the backoff period
-    uint8_t rebroadcastThreshold;   // re-broadcast threshold 
+    uint8_t rebroadcastThreshold;   // re-broadcast threshold
     uint16_t mFlags;                // Internal state flags
 
     CHIP_ERROR ResendMessage(void);
