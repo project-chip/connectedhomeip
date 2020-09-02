@@ -880,17 +880,17 @@ CHIP_ERROR ExchangeContext::StartTimerT()
     }
 
     // range from 1 to RetransInterval
-    backoff = 1 + (GetRandU32() % (RetransInterval-1));
+    backoff      = 1 + (GetRandU32() % (RetransInterval - 1));
     msgsReceived = 0;
     ChipLogDetail(ExchangeManager, "Trickle new interval");
     return ExchangeMgr->MessageLayer->SystemLayer->StartTimer(backoff, TimerTau, this);
 }
 
-void ExchangeContext::TimerT(System::Layer* aSystemLayer, void* aAppState, System::Error aError)
+void ExchangeContext::TimerT(System::Layer * aSystemLayer, void * aAppState, System::Error aError)
 {
-    ExchangeContext* client = reinterpret_cast<ExchangeContext*>(aAppState);
+    ExchangeContext * client = reinterpret_cast<ExchangeContext *>(aAppState);
 
-    if ( (aSystemLayer == NULL) || (aAppState == NULL) || (aError != CHIP_SYSTEM_NO_ERROR))
+    if ((aSystemLayer == NULL) || (aAppState == NULL) || (aError != CHIP_SYSTEM_NO_ERROR))
     {
         return;
     }
@@ -900,11 +900,11 @@ void ExchangeContext::TimerT(System::Layer* aSystemLayer, void* aAppState, Syste
     }
 }
 
-void ExchangeContext::TimerTau(System::Layer* aSystemLayer, void* aAppState, System::Error aError)
+void ExchangeContext::TimerTau(System::Layer * aSystemLayer, void * aAppState, System::Error aError)
 {
-    ExchangeContext* ec = reinterpret_cast<ExchangeContext*>(aAppState);
+    ExchangeContext * ec = reinterpret_cast<ExchangeContext *>(aAppState);
 
-    if ( (aSystemLayer == NULL) || (aAppState == NULL) || (aError != CHIP_SYSTEM_NO_ERROR))
+    if ((aSystemLayer == NULL) || (aAppState == NULL) || (aError != CHIP_SYSTEM_NO_ERROR))
     {
         return;
     }
@@ -960,7 +960,7 @@ bool ExchangeContext::MatchExchange(ChipConnection * msgCon, const ChipMessageIn
  */
 void ExchangeContext::TeardownTrickleRetransmit()
 {
-    System::Layer* lSystemLayer = ExchangeMgr->MessageLayer->SystemLayer;
+    System::Layer * lSystemLayer = ExchangeMgr->MessageLayer->SystemLayer;
     if (lSystemLayer == NULL)
     {
         // this is an assertion error, which shall never happen
@@ -974,8 +974,8 @@ void ExchangeContext::TeardownTrickleRetransmit()
         PacketBuffer::Free(msg);
     }
 
-    msg = NULL;
-    backoff = 0;
+    msg             = NULL;
+    backoff         = 0;
     RetransInterval = 0;
 }
 

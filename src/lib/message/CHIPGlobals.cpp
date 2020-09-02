@@ -30,8 +30,8 @@
 
 namespace chip {
 
-DLL_EXPORT ChipFabricState     FabricState;
-DLL_EXPORT ChipMessageLayer    MessageLayer;
+DLL_EXPORT ChipFabricState FabricState;
+DLL_EXPORT ChipMessageLayer MessageLayer;
 DLL_EXPORT ChipExchangeManager ExchangeMgr;
 
 } // namespace chip
