@@ -36,7 +36,9 @@ using namespace chip::DeviceLayer;
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+#define JOINER_START_TRIGGER_TIMEOUT 1500
 #endif
+
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_TASK_STACK_SIZE (4096)
@@ -318,25 +320,9 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
 }
 
-#if CHIP_ENABLE_OPENTHREAD
-void AppTask::JoinHandler(AppEvent * aEvent)
-{
-    assert(aEvent != NULL);
-    if (aEvent->ButtonEvent.ButtonIdx != APP_JOIN_BUTTON)
-        return;
-
-    CHIP_ERROR error = ThreadStackMgr().JoinerStart();
-    EFR32_LOG("Thread joiner triggered: %s", chip::ErrorStr(error));
-}
-#endif
-
 void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
 {
-    if (btnIdx != APP_LOCK_BUTTON
-#if CHIP_ENABLE_OPENTHREAD
-        && btnIdx != APP_JOIN_BUTTON
-#endif
-        && btnIdx != APP_FUNCTION_BUTTON)
+    if (btnIdx != APP_LOCK_BUTTON && btnIdx != APP_FUNCTION_BUTTON)
     {
         return;
     }
@@ -356,13 +342,6 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
         button_event.Handler = FunctionHandler;
         sAppTask.PostEvent(&button_event);
     }
-#if CHIP_ENABLE_OPENTHREAD
-    else if (btnIdx == APP_JOIN_BUTTON)
-    {
-        button_event.Handler = JoinHandler;
-        sAppTask.PostEvent(&button_event);
-    }
-#endif
 }
 
 void AppTask::TimerEventHandler(TimerHandle_t xTimer)
@@ -385,7 +364,16 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     // initiate factory reset
     if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
     {
-        EFR32_LOG("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_TRIGGER_TIMEOUT);
+#if CHIP_ENABLE_OPENTHREAD
+        EFR32_LOG("Release button now to Start Thread Joiner");
+        EFR32_LOG("Hold to trigger Factory Reset");
+        sAppTask.mFunction = kFunction_Joiner;
+        sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
+    }
+    else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_Joiner)
+    {
+#endif
+        EFR32_LOG("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
 
         // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
         // cancel, if required.
@@ -403,7 +391,9 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
-        EFR32_LOG("Factory Reset is not supported at this time.");
+        // Actually trigger Factory Reset
+        sAppTask.mFunction = kFunction_NoneSelected;
+        ConfigurationMgr().InitiateFactoryReset();
     }
 }
 
@@ -425,7 +415,11 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     {
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
         {
+#if CHIP_ENABLE_OPENTHREAD
+            sAppTask.StartTimer(JOINER_START_TRIGGER_TIMEOUT);
+#else
             sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
+#endif
 
             sAppTask.mFunction = kFunction_SoftwareUpdate;
         }
@@ -440,8 +434,18 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
 
             sAppTask.mFunction = kFunction_NoneSelected;
 
-            EFR32_LOG("Software Update is not supported at this time");
+            EFR32_LOG("Software Update currently not supported.");
         }
+#if CHIP_ENABLE_OPENTHREAD
+        else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_Joiner)
+        {
+            sAppTask.CancelTimer();
+            sAppTask.mFunction = kFunction_NoneSelected;
+
+            CHIP_ERROR error = ThreadStackMgr().JoinerStart();
+            EFR32_LOG("Thread joiner triggered: %s", chip::ErrorStr(error));
+        }
+#endif
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
             // Set lock status LED back to show state of lock.
