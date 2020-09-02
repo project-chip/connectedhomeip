@@ -19,7 +19,10 @@
 
 #if CONFIG_NETWORK_LAYER_BLE
 
+#if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
+#endif
+
 #include <shell/shell.h>
 #include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>

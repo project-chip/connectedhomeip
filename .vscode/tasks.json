@@ -147,23 +147,6 @@
             "problemMatcher": ["$gcc"]
         },
         {
-            "label": "Build nRF5 Shell App",
-            "type": "shell",
-            "command": "scripts/examples/nrf_shell.sh",
-            "options": { "env": { "VERBOSE": "1" } },
-            "group": "none",
-            "dependsOn": "Clean Tree",
-            "problemMatcher": ["$gcc"]
-        },
-        {
-            "label": "Build nRF5 Light App",
-            "type": "shell",
-            "command": "scripts/examples/nrf_light_app.sh",
-            "group": "none",
-            "dependsOn": "Clean Tree",
-            "problemMatcher": ["$gcc"]
-        },
-        {
             "label": "Build openSSL crypto Tests",
             "type": "shell",
             "command": "scripts/tests/openssl_tests.sh",

@@ -14,8 +14,7 @@
         "${workspaceFolder}/src/lib/**",
         "${workspaceFolder}/src/system/**",
         "${workspaceFolder}/third_party/nlassert/repo/include/**",
-        "${workspaceFolder}/third_party/nlio/repo/include/**",
-        "${NRF5_SDK_ROOT}/**"
+        "${workspaceFolder}/third_party/nlio/repo/include/**"
     ],
     "[cpp]": {
         "editor.defaultFormatter": "xaver.clang-format"

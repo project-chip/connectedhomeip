@@ -63,63 +63,6 @@
                     "ignoreFailures": true
                 }
             ]
-        },
-        {
-            "name": "Debug nRF5 Lock App",
-            "type": "cortex-debug",
-            "request": "launch",
-            "servertype": "jlink",
-            "cwd": "${workspaceFolder}",
-            "executable": "${workspaceFolder}/examples/lock-app/nrf5/build/chip-nrf52840-lock-example.out",
-            "device": "nRF52840_xxAA",
-            "interface": "swd",
-            "ipAddress": null,
-            "serialNumber": null,
-            "windows": {
-                "svdFile": "C:\\Program Files (x86)\\IAR Systems\\Embedded Workbench 7.5\\arm\\config\\debugger\\NordicSemi\\nrf52.svd"
-            },
-            "runToMain": false,
-            "linux": {
-                "armToolchainPath": "/opt/gcc-arm-none-eabi-9-2019-q4-major/bin"
-            }
-        },
-        {
-            "name": "Debug nRF5 Shell App",
-            "type": "cortex-debug",
-            "request": "launch",
-            "servertype": "jlink",
-            "cwd": "${workspaceFolder}",
-            "executable": "${workspaceFolder}/examples/shell/build/chip-shell-nrf528xx.out",
-            "device": "nRF52840_xxAA",
-            "interface": "swd",
-            "ipAddress": null,
-            "serialNumber": null,
-            "windows": {
-                "svdFile": "C:\\Program Files (x86)\\IAR Systems\\Embedded Workbench 7.5\\arm\\config\\debugger\\NordicSemi\\nrf52.svd"
-            },
-            "runToMain": false,
-            "linux": {
-                "armToolchainPath": "/opt/gcc-arm-none-eabi-9-2019-q4-major/bin"
-            }
-        },
-        {
-            "name": "Debug nRF5 Light App",
-            "type": "cortex-debug",
-            "request": "launch",
-            "servertype": "jlink",
-            "cwd": "${workspaceFolder}",
-            "executable": "${workspaceFolder}/examples/lighting-app/nrf5/build/chip-nrf52840-lighting-example.out",
-            "device": "nRF52840_xxAA",
-            "interface": "swd",
-            "ipAddress": null,
-            "serialNumber": null,
-            "windows": {
-                "svdFile": "C:\\Program Files (x86)\\IAR Systems\\Embedded Workbench 7.5\\arm\\config\\debugger\\NordicSemi\\nrf52.svd"
-            },
-            "runToMain": false,
-            "linux": {
-                "armToolchainPath": "/opt/gcc-arm-none-eabi-9-2019-q4-major/bin"
-            }
         }
     ]
 }
