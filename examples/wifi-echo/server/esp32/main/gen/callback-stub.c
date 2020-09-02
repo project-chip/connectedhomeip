@@ -65,7 +65,6 @@ void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint) {}
  */
 void emberAfPluginLevelControlClusterServerPostInitCallback(uint8_t endpoint) {}
 
-
 /** @brief Get Group Name
  *
  * This function returns the name of a group with the provided group ID, should
