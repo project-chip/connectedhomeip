@@ -339,14 +339,14 @@ public:
      */
     CHIP_ERROR EncodeMACTag(uint8_t * data, size_t size, size_t * encode_size) const;
 
-private:
     size_t TagLenForEncryptionType(EncryptionType encType) const;
 
+private:
     /// Represents the current encode/decode header version
     static constexpr int kHeaderVersion = 2;
 
     /// Represents encryption type used for encrypting current packet
-    EncryptionType mEncryptionType = EncryptionType::kAESCCMTagLen8;
+    EncryptionType mEncryptionType = EncryptionType::kAESCCMTagLen16;
 
     /// Value expected to be incremented for each message sent.
     uint32_t mMessageId = 0;
