@@ -86,6 +86,7 @@ function(chip_configure TARGET_NAME)
 
     chip_gn_arg_bool_if(CONFIG_NET_L2_OPENTHREAD GN_ARGS "chip_enable_openthread")
     chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_build_tests")
+    chip_gn_arg_bool_if(CONFIG_CHIP_LIB_SHELL    GN_ARGS "chip_build_libshell")
 
     file(
         GENERATE OUTPUT ${CHIP_OUTPUT_DIR}/args.gn
