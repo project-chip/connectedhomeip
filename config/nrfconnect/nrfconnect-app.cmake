@@ -41,6 +41,13 @@ if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/dts.overlay")
     set(DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/dts.overlay")
 endif()
 
+# Set Kconfig root
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/Kconfig)
+    set(KCONFIG_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/Kconfig)
+else()
+    set(KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/Kconfig)
+endif()
+
 # ==================================================
 # Load NCS/Zephyr build system
 # ==================================================
@@ -61,6 +68,11 @@ set(CHIP_COMMON_FLAGS
     -I${CMAKE_CURRENT_SOURCE_DIR}/main/include
 )
 
+set(CHIP_LIBRARIES ${CHIP_OUTPUT_DIR}/lib/libCHIP.a)
+if (CONFIG_CHIP_LIB_SHELL)
+    list(APPEND CHIP_LIBRARIES ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/lib/shell/lib/libCHIPShell.a)
+endif()
+
 find_file(CHIP_PROJECT_CONFIG 
     CHIPProjectConfig.h
     PATHS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/main/include
@@ -80,7 +92,7 @@ chip_configure(ChipConfig
 
 chip_build(ChipLib ChipConfig
     BUILD_COMMAND ninja
-    BUILD_ARTIFACTS ${CHIP_OUTPUT_DIR}/lib/libCHIP.a ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/lib/shell/lib/libCHIPShell.a
+    BUILD_ARTIFACTS ${CHIP_LIBRARIES}
 )
 
 # ==================================================

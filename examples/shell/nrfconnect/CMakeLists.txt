@@ -15,7 +15,7 @@
 #
 cmake_minimum_required(VERSION 3.13.1)
 
-get_filename_component(APP_ROOT .. REALPATH)
+get_filename_component(APP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/.. REALPATH)
 get_filename_component(CHIP_ROOT ${APP_ROOT}/third_party/connectedhomeip REALPATH)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHIP_ROOT}/config/nrfconnect/)
