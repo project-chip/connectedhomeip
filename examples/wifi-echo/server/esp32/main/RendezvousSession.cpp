@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include "RendezvousMessageHandler.h"
 #include "RendezvousSession.h"
+#include "RendezvousMessageHandler.h"
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
