@@ -26,7 +26,6 @@
 #ifndef _CHIPSAFECASTS_H
 #define _CHIPSAFECASTS_H
 
-
 #include <limits.h>
 #include <nlassert.h>
 #include <stdint.h>
@@ -42,13 +41,13 @@ namespace Uint8 {
  *
  * @return The typecast value
  */
-inline uint8_t* from_uchar(unsigned char * in)
+inline uint8_t * from_uchar(unsigned char * in)
 {
     nlSTATIC_ASSERT_PRINT(CHAR_BIT == 8, "Can't type cast unsigned char array as uint8_t array");
 #ifdef __cplusplus
     return reinterpret_cast<uint8_t *>(in);
 #else
-    return (uint8_t *)in;
+    return (uint8_t *) in;
 #endif
 }
 
@@ -59,16 +58,15 @@ inline uint8_t* from_uchar(unsigned char * in)
  *
  * @return The typecast value
  */
-inline const uint8_t* from_const_uchar(const unsigned char * in)
+inline const uint8_t * from_const_uchar(const unsigned char * in)
 {
     nlSTATIC_ASSERT_PRINT(CHAR_BIT == 8, "Can't type cast unsigned char array as uint8_t array");
 #ifdef __cplusplus
     return reinterpret_cast<const uint8_t *>(in);
 #else
-    return (const uint8_t *)in;
+    return (const uint8_t *) in;
 #endif
 }
-
 
 /**
  * Safely typecast a pointer to char to uint8_t
@@ -77,13 +75,13 @@ inline const uint8_t* from_const_uchar(const unsigned char * in)
  *
  * @return The typecast value
  */
-inline uint8_t* from_char(char * in)
+inline uint8_t * from_char(char * in)
 {
     nlSTATIC_ASSERT_PRINT(CHAR_BIT == 8, "Can't type cast char array as uint8_t array");
 #ifdef __cplusplus
     return reinterpret_cast<uint8_t *>(in);
 #else
-    return (uint8_t *)in;
+    return (uint8_t *) in;
 #endif
 }
 
@@ -94,13 +92,13 @@ inline uint8_t* from_char(char * in)
  *
  * @return The typecast value
  */
-inline const uint8_t* from_const_char(const char * in)
+inline const uint8_t * from_const_char(const char * in)
 {
     nlSTATIC_ASSERT_PRINT(CHAR_BIT == 8, "Can't type cast char array as uint8_t array");
 #ifdef __cplusplus
     return reinterpret_cast<const uint8_t *>(in);
 #else
-    return (const uint8_t *)in;
+    return (const uint8_t *) in;
 #endif
 }
 
@@ -117,7 +115,7 @@ inline unsigned char * to_uchar(uint8_t * in)
 #ifdef __cplusplus
     return reinterpret_cast<unsigned char *>(in);
 #else
-    return (unsigned char *)in;
+    return (unsigned char *) in;
 #endif
 }
 
@@ -134,7 +132,7 @@ inline const unsigned char * to_const_uchar(const uint8_t * in)
 #ifdef __cplusplus
     return reinterpret_cast<const unsigned char *>(in);
 #else
-    return (const unsigned char *)in;
+    return (const unsigned char *) in;
 #endif
 }
 
@@ -151,7 +149,7 @@ inline char * to_char(uint8_t * in)
 #ifdef __cplusplus
     return reinterpret_cast<char *>(in);
 #else
-    return (char *)in;
+    return (char *) in;
 #endif
 }
 
@@ -168,7 +166,7 @@ inline const char * to_const_char(const uint8_t * in)
 #ifdef __cplusplus
     return reinterpret_cast<const char *>(in);
 #else
-    return (const char *)in;
+    return (const char *) in;
 #endif
 }
 
