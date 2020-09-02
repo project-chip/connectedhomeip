@@ -72,8 +72,6 @@ static int sBluezFD[2];
 static GMainLoop * sBluezMainLoop = NULL;
 static pthread_t sBluezThread;
 static BluezConnection * GetBluezConnectionViaDevice(BluezEndpoint * apEndpoint);
-static BluezConnection * BluezCharacteristicGetBluezConnection(BluezGattCharacteristic1 * aChar, GVariant * aOptions,
-                                                               BluezEndpoint * apEndpoint);
 
 static gboolean BluezAdvertisingRelease(BluezLEAdvertisement1 * aAdv, GDBusMethodInvocation * aInvocation, gpointer apClosure)
 {
@@ -99,7 +97,6 @@ static BluezLEAdvertisement1 * BluezAdvertisingCreate(BluezEndpoint * apEndpoint
     gchar * localName;
     GVariantBuilder serviceDataBuilder;
     GVariantBuilder serviceUUIDsBuilder;
-    uint16_t offset;
     char * debugStr;
     const gchar * array[1];
 
@@ -116,7 +113,6 @@ static BluezLEAdvertisement1 * BluezAdvertisingCreate(BluezEndpoint * apEndpoint
 
     g_variant_builder_init(&serviceDataBuilder, G_VARIANT_TYPE("a{sv}"));
     g_variant_builder_init(&serviceUUIDsBuilder, G_VARIANT_TYPE("as"));
-    offset = 0;
 
     g_variant_builder_add(
         &serviceDataBuilder, "{sv}", apEndpoint->mpAdvertisingUUID,
@@ -170,7 +166,7 @@ static void BluezAdvStartDone(GObject * aObject, GAsyncResult * aResult, gpointe
     BluezLEAdvertisingManager1 * advMgr = BLUEZ_LEADVERTISING_MANAGER1(aObject);
     GError * error                      = NULL;
     BluezEndpoint * endpoint            = static_cast<BluezEndpoint *>(apClosure);
-    gboolean success;
+    gboolean success                    = FALSE;
 
     VerifyOrExit(endpoint != NULL, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
 
@@ -196,7 +192,7 @@ static void BluezAdvStopDone(GObject * aObject, GAsyncResult * aResult, gpointer
     BluezLEAdvertisingManager1 * advMgr = BLUEZ_LEADVERTISING_MANAGER1(aObject);
     BluezEndpoint * endpoint            = static_cast<BluezEndpoint *>(apClosure);
     GError * error                      = NULL;
-    gboolean success;
+    gboolean success                    = FALSE;
 
     VerifyOrExit(endpoint != NULL, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
 
@@ -223,11 +219,7 @@ exit:
 
 static gboolean BluezAdvSetup(void * apClosure)
 {
-    GDBusObject * adapter;
-    BluezEndpoint * endpoint            = static_cast<BluezEndpoint *>(apClosure);
-    BluezLEAdvertisingManager1 * advMgr = NULL;
-    GVariantBuilder optionsBuilder;
-    GVariant * options;
+    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apClosure);
     BluezLEAdvertisement1 * adv;
 
     VerifyOrExit(endpoint != NULL, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
@@ -248,7 +240,6 @@ static gboolean BluezAdvStart(void * apClosure)
     BluezLEAdvertisingManager1 * advMgr = NULL;
     GVariantBuilder optionsBuilder;
     GVariant * options;
-    BluezLEAdvertisement1 * adv;
     BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apClosure);
 
     VerifyOrExit(endpoint != NULL, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
@@ -277,9 +268,6 @@ static gboolean BluezAdvStop(void * apClosure)
     GDBusObject * adapter;
     BluezEndpoint * endpoint            = static_cast<BluezEndpoint *>(apClosure);
     BluezLEAdvertisingManager1 * advMgr = NULL;
-    GVariantBuilder optionsBuilder;
-    GVariant * options;
-    BluezLEAdvertisement1 * adv;
 
     VerifyOrExit(endpoint != NULL, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
     VerifyOrExit(endpoint->mIsAdvertising,
@@ -291,9 +279,6 @@ static gboolean BluezAdvStop(void * apClosure)
 
     advMgr = bluez_object_get_leadvertising_manager1(BLUEZ_OBJECT(adapter));
     VerifyOrExit(advMgr != NULL, ChipLogProgress(DeviceLayer, "FAIL: NULL advMgr in %s", __func__));
-
-    g_variant_builder_init(&optionsBuilder, G_VARIANT_TYPE("a{sv}"));
-    options = g_variant_builder_end(&optionsBuilder);
 
     bluez_leadvertising_manager1_call_unregister_advertisement(advMgr, endpoint->mpAdvPath, NULL, BluezAdvStopDone, apClosure);
 
@@ -311,6 +296,7 @@ static gboolean BluezCharacteristicReadValue(BluezGattCharacteristic1 * aChar, G
     return TRUE;
 }
 
+#if CHIP_BLUEZ_CHAR_WRITE_VALUE
 static gboolean BluezCharacteristicWriteValue(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
                                               GVariant * aValue, GVariant * aOptions, gpointer apClosure)
 {
@@ -341,6 +327,7 @@ static gboolean BluezCharacteristicWriteValue(BluezGattCharacteristic1 * aChar, 
 exit:
     return isSuccess ? TRUE : FALSE;
 }
+#endif
 
 static gboolean BluezCharacteristicWriteValueError(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
                                                    GVariant * aValue, GVariant * aOptions, gpointer apClosure)
@@ -348,7 +335,6 @@ static gboolean BluezCharacteristicWriteValueError(BluezGattCharacteristic1 * aC
     ChipLogProgress(DeviceLayer, "BluezCharacteristicWriteValueError");
     g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.NotSupported",
                                                "Write for characteristic is unsupported");
-exit:
     return TRUE;
 }
 
@@ -877,11 +863,9 @@ exit:
 static void BluezHandleAdvertisementFromDevice(BluezDevice1 * aDevice)
 {
     const char * address   = bluez_device1_get_address(aDevice);
-    int16_t rssi           = bluez_device1_get_rssi(aDevice);
     GVariant * serviceData = bluez_device1_get_service_data(aDevice);
     GVariant * entry;
     GVariantIter iter;
-    ChipAdvType type;
     BluezAddress * src;
     const uint8_t * tmpBuf;
     uint8_t * buf;
@@ -896,7 +880,7 @@ static void BluezHandleAdvertisementFromDevice(BluezDevice1 * aDevice)
     src = g_new0(BluezAddress, 1);
 
     BluezStringAddressToCHIPAddress(address, src);
-    type     = ChipAdvType::BLUEZ_ADV_TYPE_CONNECTABLE;
+
     debugStr = g_variant_print(serviceData, TRUE);
     ChipLogProgress(DeviceLayer, "TRACE: Device %s Service data: %s", address, debugStr);
     g_free(debugStr);
@@ -965,39 +949,7 @@ static void BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClient * aMa
     VerifyOrExit(endpoint != NULL, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
     VerifyOrExit(endpoint->mpAdapter != NULL, ChipLogProgress(DeviceLayer, "FAIL: NULL endpoint->mpAdapter in %s", __func__));
 
-    if (strcmp(g_dbus_proxy_get_interface_name(aInterface), CHARACTERISTIC_INTERFACE) == 0)
-    {
-        BluezGattCharacteristic1 * chr = BLUEZ_GATT_CHARACTERISTIC1(aInterface);
-        BluezConnection * conn         = BluezCharacteristicGetBluezConnection(chr, NULL, endpoint);
-
-        if (conn)
-        {
-            GVariantIter iter;
-            GVariant * value;
-            char * key;
-
-            g_variant_iter_init(&iter, aChangedProperties);
-            while (g_variant_iter_next(&iter, "{&sv}", &key, &value))
-            {
-                if (strcmp(key, "Value") == 0)
-                {
-                    gconstpointer data;
-                    uint8_t * buf;
-                    size_t len;
-
-                    data = g_variant_get_fixed_array(value, &len, sizeof(uint8_t));
-
-                    /* TODO why is otPlat API limited to 255 bytes? */
-                    if (len > 255)
-                        len = 255;
-
-                    buf = (uint8_t *) g_memdup(data, len);
-                }
-                g_variant_unref(value);
-            }
-        }
-    }
-    else if (strcmp(g_dbus_proxy_get_interface_name(aInterface), DEVICE_INTERFACE) == 0)
+    if (strcmp(g_dbus_proxy_get_interface_name(aInterface), DEVICE_INTERFACE) == 0)
     {
         BluezDevice1 * device = BLUEZ_DEVICE1(aInterface);
         GVariantIter iter;
@@ -1169,7 +1121,7 @@ static BluezGattService1 * BluezServiceCreate(gpointer apClosure)
 
 static void bluezObjectsSetup(BluezEndpoint * apEndpoint)
 {
-    GList * objects;
+    GList * objects = NULL;
     GList * l;
     char * expectedPath = NULL;
 
@@ -1229,6 +1181,7 @@ static BluezConnection * GetBluezConnectionViaDevice(BluezEndpoint * apEndpoint)
     return retval;
 }
 
+#if CHIP_BLUEZ_CENTRAL_SUPPORT
 static BluezConnection * BluezCharacteristicGetBluezConnection(BluezGattCharacteristic1 * aChar, GVariant * aOptions,
                                                                BluezEndpoint * apEndpoint)
 {
@@ -1239,7 +1192,7 @@ static BluezConnection * BluezCharacteristicGetBluezConnection(BluezGattCharacte
 
     VerifyOrExit(apEndpoint != NULL, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
     VerifyOrExit(apEndpoint->mIsCentral, );
-    ChipLogProgress(DeviceLayer, "loopup BluezCharacteristicGetBluezConnection");
+
     /* TODO Unfortunately StartNotify/StopNotify doesn't provide info about
      * peer device in call params so we need look this up ourselves.
      */
@@ -1300,6 +1253,7 @@ static BluezConnection * BluezCharacteristicGetBluezConnection(BluezGattCharacte
 exit:
     return retval;
 }
+#endif //CHIP_BLUEZ_CENTRAL_SUPPORT
 
 void EndpointCleanup(BluezEndpoint * apEndpoint)
 {
@@ -1423,6 +1377,7 @@ exit:
     return;
 }
 
+#if CHIP_BLUEZ_NAME_MONITOR
 static void BluezOnNameAcquired(GDBusConnection * aConn, const gchar * aName, gpointer apClosure)
 {
     ChipLogProgress(DeviceLayer, "TRACE: Owning name: Acquired %s", aName);
@@ -1432,12 +1387,12 @@ static void BluezOnNameLost(GDBusConnection * aConn, const gchar * aName, gpoint
 {
     ChipLogProgress(DeviceLayer, "TRACE: Owning name: lost %s", aName);
 }
+#endif
 
 static void * BluezMainLoop(void * apClosure)
 {
     GDBusObjectManager * manager;
-    GError * error = NULL;
-    guint id;
+    GError * error           = NULL;
     GDBusConnection * conn   = NULL;
     BluezEndpoint * endpoint = (BluezEndpoint *) apClosure;
     VerifyOrExit(endpoint != NULL, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
@@ -1477,7 +1432,6 @@ static void * BluezMainLoop(void * apClosure)
     g_main_loop_run(sBluezMainLoop);
     ChipLogProgress(DeviceLayer, "TRACE: Bluez mainloop stopping %s", __func__);
 
-    g_bus_unown_name(id);
     BluezObjectsCleanup(endpoint);
 
 exit:
@@ -1631,7 +1585,7 @@ CHIP_ERROR StartBluezAdv(void * apAppState)
 CHIP_ERROR StopBluezAdv(void * apAppState)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    if (!BluezRunOnBluezThread(BluezAdvSetup, apAppState))
+    if (!BluezRunOnBluezThread(BluezAdvStop, apAppState))
     {
         err = CHIP_ERROR_INCORRECT_STATE;
         ChipLogError(Ble, "Failed to schedule BluezAdvStop() on CHIPoBluez thread");

@@ -57,6 +57,17 @@ if (chip_device_platform != "none") {
       # FIXME: TestThreadStackMgr requires ot-br-posix daemon to be running
       # tests += [ "TestThreadStackMgr" ]
     }
+
+    if (chip_enable_ble) {
+      sources += [
+        "TestCHIPoBLEStackMgr.cpp",
+        "TestCHIPoBLEStackMgr.h",
+        "TestCHIPoBLEStackMgrDriver.cpp",
+      ]
+
+      # FIXME: TestCHIPoBLEStackMgr requires bluetoothd daemon to be running
+      tests += [ "TestCHIPoBLEStackMgr" ]
+    }
   }
 } else {
   import("${chip_root}/gn/chip/chip_test_group.gni")

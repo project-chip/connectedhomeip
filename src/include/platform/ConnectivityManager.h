@@ -24,6 +24,8 @@
 #ifndef CONNECTIVITY_MANAGER_H
 #define CONNECTIVITY_MANAGER_H
 
+#include <support/CodeUtils.h>
+
 namespace chip {
 
 namespace Ble {

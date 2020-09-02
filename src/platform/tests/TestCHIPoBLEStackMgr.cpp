@@ -21,7 +21,6 @@
 #include <memory>
 #include <support/CodeUtils.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include "platform/PlatformManager.h"
 #include "platform/internal/BLEManager.h"
 
@@ -46,7 +45,7 @@ void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg
     }
 }
 
-int TestCHIPoBLEStackManager(void)
+int TestCHIPoBLEStackManager()
 {
     chip::DeviceLayer::PlatformMgrImpl().InitChipStack();
 
@@ -59,10 +58,10 @@ int TestCHIPoBLEStackManager(void)
     chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(
         chip::DeviceLayer::ConnectivityManager::kCHIPoBLEServiceMode_Enabled);
 
-    ChipLogProgress(DeviceLayer, "Start Chip Over Ble task done");
+    ChipLogProgress(DeviceLayer, "Start Chip Over Ble stack Done");
 
     chip::DeviceLayer::PlatformMgrImpl().RunEventLoop();
+    ChipLogProgress(DeviceLayer, "Start EventLoop");
 
-    return -1;
+    return 0;
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

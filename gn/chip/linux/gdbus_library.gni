@@ -72,6 +72,20 @@ template("gdbus_library") {
         invoker.c_namespace,
       ]
     }
+
+    if (defined(invoker.interface_prefix)) {
+      args += [
+        "--interface-prefix",
+        invoker.interface_prefix,
+      ]
+    }
+
+    if (defined(invoker.c_generate_object_manager)) {
+      args += [
+        "--c-generate-object-manager",
+        invoker.c_generate_object_manager,
+      ]
+    }
   }
 
   static_library(library_name) {
