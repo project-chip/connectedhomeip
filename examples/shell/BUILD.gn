@@ -14,9 +14,7 @@
 
 import("//build_overrides/chip.gni")
 
-
-if (chip_device_platform == "nrf5") # nordic device layer
-{
+if (chip_device_platform == "nrf5") {  # nordic device layer
   import("//build_overrides/nrf5_sdk.gni")
   import("//build_overrides/openthread.gni")
 
@@ -24,7 +22,7 @@ if (chip_device_platform == "nrf5") # nordic device layer
 
   assert(current_os == "freertos")
 
-  target_defines=["OPENTHREAD_CONFIG_CLI_TRANSPORT=2"]
+  target_defines = [ "OPENTHREAD_CONFIG_CLI_TRANSPORT=2" ]
 
   nrf5_platform_dir = "${chip_root}/examples/platform/nrf528xx"
   project_dir = "."
@@ -107,7 +105,7 @@ if (chip_device_platform == "nrf5") # nordic device layer
     defines = [
       "NRF_SHELL_STREAMER",
       "SHELL_STREAMER_APP_SPECIFIC",
-      "OPENTHREAD_CONFIG_CLI_TRANSPORT=2"
+      "OPENTHREAD_CONFIG_CLI_TRANSPORT=2",
     ]
   }
 
@@ -118,13 +116,11 @@ if (chip_device_platform == "nrf5") # nordic device layer
   group("default") {
     deps = [ ":nrf5" ]
   }
-}
-else
-{
+} else {
   import("${chip_root}/gn/chip/tools.gni")
 
   assert(chip_build_tools)
-  
+
   executable("chip-shell") {
     sources = [
       "cmd_base64.cpp",
@@ -134,20 +130,19 @@ else
       "cmd_otcli.cpp",
       "main.cpp",
     ]
-  
+
     public_deps = [ "${chip_root}/src/lib/shell" ]
-  
+
     if (is_debug) {
       defines = [ "BUILD_RELEASE=0" ]
     } else {
       defines = [ "BUILD_RELEASE=1" ]
     }
-  
+
     output_dir = root_out_dir
   }
-  
+
   group("shell") {
     deps = [ ":chip-shell" ]
   }
-  
 }
