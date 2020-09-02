@@ -21,4 +21,11 @@ source "Kconfig.zephyr"
 config CHIP_LIB_SHELL
 	bool "Enable CHIP's shell library"
 	help
-		Link the application with the library containing CHIP shell commands
+	  Link the application with the library containing CHIP shell commands
+
+config MULTIPROTOCOL
+	bool "Enable multiprotocol support"
+	select NRF_802154_MULTIPROTOCOL_SUPPORT
+	depends on BT && NET_L2_OPENTHREAD
+	help
+	  Enable multiprotocol in the nRF 802.15.4 radio driver
