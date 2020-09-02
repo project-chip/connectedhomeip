@@ -26,11 +26,11 @@
 #ifndef CHIP_GLOBALS_H_
 #define CHIP_GLOBALS_H_
 
-#include <core/CHIPCore.h>
 #include <core/CHIPConfig.h>
-#include <message/CHIPMessageLayer.h>
-#include <message/CHIPFabricState.h>
+#include <core/CHIPCore.h>
 #include <message/CHIPExchangeMgr.h>
+#include <message/CHIPFabricState.h>
+#include <message/CHIPMessageLayer.h>
 
 namespace chip {
 
