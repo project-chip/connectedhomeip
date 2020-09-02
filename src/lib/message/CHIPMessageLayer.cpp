@@ -2033,7 +2033,7 @@ void ChipMessageLayer::Encrypt_AES128CTRSHA1(const ChipMessageInfo * msgInfo, co
 void ChipMessageLayer::ComputeIntegrityCheck_AES128CTRSHA1(const ChipMessageInfo * msgInfo, const uint8_t * key,
                                                            const uint8_t * inData, uint16_t inLen, uint8_t * outBuf)
 {
-// TODO:: reimplement with chip crypto lib
+// TODO(#2093):: reimplement with chip crypto lib
 #if 0
     HMACSHA1 hmacSHA1;
     uint8_t encodedBuf[2 * sizeof(uint64_t) + sizeof(uint16_t) + sizeof(uint32_t)];
