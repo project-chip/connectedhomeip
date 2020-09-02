@@ -34,7 +34,7 @@ static_library("message") {
     "CHIPFabricState.cpp",
     "CHIPFabricState.h",
     "CHIPGlobals.cpp",
-    "CHIPGlobals.h",    
+    "CHIPGlobals.h",
     "CHIPMessageLayer.cpp",
     "CHIPMessageLayer.h",
     "CHIPRMPConfig.h",
