@@ -40,8 +40,6 @@ namespace DeviceLayer {
 namespace Internal {
 
 namespace {
-const uint8_t UUID_CHIPoBLEService[]       = { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
-                                         0x00, 0x10, 0x00, 0x00, 0xAF, 0xFE, 0x00, 0x00 };
 const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
 const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
@@ -105,7 +103,6 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
-exit:
     return err;
 }
 
@@ -184,7 +181,6 @@ CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aNodeId, bool aIsCentral)
     mpBleAddr  = NULL;
     mIsCentral = aIsCentral;
 
-exit:
     return err;
 }
 
@@ -246,7 +242,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         ClearFlag(mFlags, kFlag_AdvertisingConfigured);
 
         DriveBLEState();
-
+        break;
     default:
         break;
     }
@@ -426,10 +422,9 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(void * data)
 {
     CHIP_ERROR err               = CHIP_NO_ERROR;
     BluezConnection * connection = static_cast<BluezConnection *>(data);
-    const char * msg             = NULL;
 
-    VerifyOrExit(connection != NULL, msg = "Connection is NULL in HandleTXCharCCCDWrite");
-    VerifyOrExit(connection->mpC2 != NULL, msg = "C2 is NULL in HandleTXCharCCCDWrite");
+    VerifyOrExit(connection != NULL, ChipLogProgress(DeviceLayer, "Connection is NULL in HandleTXCharCCCDWrite"));
+    VerifyOrExit(connection->mpC2 != NULL, ChipLogProgress(DeviceLayer, "C2 is NULL in HandleTXCharCCCDWrite"));
 
     // Post an event to the Chip queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
     // whether the client is enabling or disabling indications.

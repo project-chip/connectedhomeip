@@ -47,9 +47,11 @@ if (chip_device_platform != "none") {
 
     chip_with_gio = chip_enable_wifi
     chip_device_config_enable_wpa = chip_enable_wifi
+    chip_device_config_enable_chipoble = chip_enable_ble
 
     defines = [
       "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}",
+      "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_device_config_enable_chipoble}",
       "CHIP_ENABLE_OPENTHREAD=${chip_enable_openthread}",
       "CHIP_WITH_GIO=${chip_with_gio}",
       "OPENTHREAD_CONFIG_ENABLE_TOBLE=false",
@@ -259,6 +261,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Linux/BLEManagerImpl.cpp",
         "Linux/BLEManagerImpl.h",
         "Linux/BlePlatformConfig.h",
+        "Linux/CHIPBluezHelper.cpp",
+        "Linux/CHIPBluezHelper.h",
         "Linux/CHIPDevicePlatformConfig.h",
         "Linux/CHIPDevicePlatformEvent.h",
         "Linux/CHIPLinuxStorage.cpp",
@@ -289,7 +293,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       }
 
       if (chip_enable_wifi) {
-        public_deps += [ "Linux/dbus" ]
+        public_deps += [ "Linux/dbus/wpa" ]
+      }
+
+      if (chip_enable_ble) {
+        public_deps += [ "Linux/dbus/bluez" ]
       }
 
       public_deps += [ "${chip_root}/third_party/inipp" ]
