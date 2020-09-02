@@ -28,9 +28,6 @@ if (efr32_board == "BRD4166A") {
   show_qr_code = false
 }
 
-
-
-
 efr32_sdk("sdk") {
   include_dirs = [
     "${chip_root}/src/platform/EFR32",
@@ -78,6 +75,7 @@ efr32_executable("lock_app") {
   ]
 
   sources = [
+    "${chip_root}/examples/common/QRCode/repo/c/qrcodegen.c",
     "${chip_root}/src/app/clusters/on-off-server/on-off.c",
     "${chip_root}/src/app/util/attribute-size.c",
     "${chip_root}/src/app/util/attribute-storage.c",
@@ -99,16 +97,15 @@ efr32_executable("lock_app") {
     "src/DataModelHandler.cpp",
     "src/LEDWidget.cpp",
     "src/Server.cpp",
+    "src/display/lcd.c",
     "src/gen/call-command-handler.c",
     "src/gen/callback-stub.c",
     "src/gen/znet-bookkeeping.c",
     "src/main.cpp",
-    "src/display/lcd.c",
-    "${chip_root}/examples/common/QRCode/repo/c/qrcodegen.c",
   ]
 
   if (show_qr_code) {
-    defines += ["DISPLAY_ENABLED"]
+    defines += [ "DISPLAY_ENABLED" ]
   }
   output_dir = root_out_dir
 
