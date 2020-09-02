@@ -28,6 +28,7 @@
  *
  */
 
+#include <core/CHIPSafeCasts.h>
 #include <support/BufBound.h>
 #include <support/CodeUtils.h>
 #include <transport/SecurePairingSession.h>
@@ -62,10 +63,10 @@ CHIP_ERROR SecurePairingSession::Init(uint32_t setupCode, uint32_t pbkdf2IterCou
     VerifyOrExit(saltLen > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(delegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = mSpake2p.Init((const uint8_t *) kSpake2pContext, strlen(kSpake2pContext));
+    err = mSpake2p.Init(Uint8::from_const_char(kSpake2pContext), strlen(kSpake2pContext));
     SuccessOrExit(err);
 
-    err = pbkdf2_sha256((const uint8_t *) &setupCode, sizeof(setupCode), salt, saltLen, pbkdf2IterCount, sizeof(mWS), &mWS[0][0]);
+    err = pbkdf2_sha256(reinterpret_cast<const uint8_t *> (&setupCode), sizeof(setupCode), salt, saltLen, pbkdf2IterCount, sizeof(mWS), &mWS[0][0]);
     SuccessOrExit(err);
 
     if (mDelegate != nullptr)

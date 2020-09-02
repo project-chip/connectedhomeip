@@ -34,6 +34,7 @@
 #include <openssl/rand.h>
 #include <openssl/sha.h>
 
+#include <core/CHIPSafeCasts.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -159,7 +160,7 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in key + iv
-    result = EVP_EncryptInit_ex(context, NULL, NULL, key, iv);
+    result = EVP_EncryptInit_ex(context, NULL, NULL, Uint8::to_const_uchar(key), Uint8::to_const_uchar(iv));
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in plain text length
@@ -169,12 +170,12 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     // Pass in AAD
     if (aad_length > 0 && aad != NULL)
     {
-        result = EVP_EncryptUpdate(context, NULL, &bytesWritten, aad, aad_length);
+        result = EVP_EncryptUpdate(context, NULL, &bytesWritten, Uint8::to_const_uchar(aad), aad_length);
         VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
     }
 
     // Encrypt
-    result = EVP_EncryptUpdate(context, ciphertext, &bytesWritten, plaintext, plaintext_length);
+    result = EVP_EncryptUpdate(context, Uint8::to_uchar(ciphertext), &bytesWritten, Uint8::to_const_uchar(plaintext), plaintext_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
     ciphertext_length = bytesWritten;
 
@@ -184,7 +185,7 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     ciphertext_length += bytesWritten;
 
     // Get tag
-    result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_GET_TAG, tag_length, tag);
+    result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_GET_TAG, tag_length, Uint8::to_uchar(tag));
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -235,7 +236,7 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in key + iv
-    result = EVP_DecryptInit_ex(context, NULL, NULL, key, iv);
+    result = EVP_DecryptInit_ex(context, NULL, NULL, Uint8::to_const_uchar(key), Uint8::to_const_uchar(iv));
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in cipher text length
@@ -245,12 +246,12 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     // Pass in aad
     if (aad_length > 0 && aad != NULL)
     {
-        result = EVP_DecryptUpdate(context, NULL, &bytesOutput, aad, aad_length);
+        result = EVP_DecryptUpdate(context, NULL, &bytesOutput, Uint8::to_const_uchar(aad), aad_length);
         VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
     }
 
     // Pass in ciphertext. We wont get anything if validation fails.
-    result = EVP_DecryptUpdate(context, plaintext, &bytesOutput, ciphertext, ciphertext_length);
+    result = EVP_DecryptUpdate(context, Uint8::to_uchar(plaintext), &bytesOutput, Uint8::to_const_uchar(ciphertext), ciphertext_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -271,7 +272,7 @@ CHIP_ERROR Hash_SHA256(const uint8_t * data, const size_t data_length, uint8_t *
 
     VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    SHA256(data, data_length, out_buffer);
+    SHA256(data, data_length, Uint8::to_uchar(out_buffer));
 
 exit:
     return error;
@@ -308,7 +309,7 @@ CHIP_ERROR Hash_SHA256_stream::AddData(const uint8_t * data, const size_t data_l
 
     SHA256_CTX * context = to_inner_hash_sha256_context(&mContext);
 
-    result = SHA256_Update(context, data, data_length);
+    result = SHA256_Update(context, Uint8::to_const_uchar(data), data_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -322,7 +323,7 @@ CHIP_ERROR Hash_SHA256_stream::Finish(uint8_t * out_buffer)
 
     SHA256_CTX * context = to_inner_hash_sha256_context(&mContext);
 
-    result = SHA256_Final(out_buffer, context);
+    result = SHA256_Final(Uint8::to_uchar(out_buffer), context);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -364,23 +365,23 @@ CHIP_ERROR HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const
     result = EVP_PKEY_CTX_set_hkdf_md(context, EVP_sha256());
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
-    result = EVP_PKEY_CTX_set1_hkdf_key(context, secret, secret_length);
+    result = EVP_PKEY_CTX_set1_hkdf_key(context, Uint8::to_const_uchar(secret), secret_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     if (salt_length > 0 && salt != NULL)
     {
-        result = EVP_PKEY_CTX_set1_hkdf_salt(context, salt, salt_length);
+        result = EVP_PKEY_CTX_set1_hkdf_salt(context, Uint8::to_const_uchar(salt), salt_length);
         VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
     }
 
-    result = EVP_PKEY_CTX_add1_hkdf_info(context, info, info_length);
+    result = EVP_PKEY_CTX_add1_hkdf_info(context, Uint8::to_const_uchar(info), info_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     result = EVP_PKEY_CTX_hkdf_mode(context, EVP_PKEY_HKDEF_MODE_EXTRACT_AND_EXPAND);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Get the OKM (Output Key Material)
-    result = EVP_PKEY_derive(context, out_buffer, &out_length);
+    result = EVP_PKEY_derive(context, Uint8::to_uchar(out_buffer), &out_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -408,7 +409,7 @@ CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * 
     md = _digestForType(DigestType::SHA256);
     VerifyOrExit(md != NULL, error = CHIP_ERROR_INTERNAL);
 
-    result = PKCS5_PBKDF2_HMAC((const char *) password, plen, salt, slen, iteration_count, md, key_length, output);
+    result = PKCS5_PBKDF2_HMAC(Uint8::to_const_char(password), plen, Uint8::to_const_uchar(salt), slen, iteration_count, md, key_length, Uint8::to_uchar(output));
 
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
@@ -434,7 +435,7 @@ CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
     VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    result = RAND_priv_bytes(out_buffer, out_length);
+    result = RAND_priv_bytes(Uint8::to_uchar(out_buffer), out_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -472,7 +473,7 @@ CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ui
     ec_key = EC_KEY_new_by_curve_name(nid);
     VerifyOrExit(ec_key != NULL, error = CHIP_ERROR_INTERNAL);
 
-    pvt_key = BN_bin2bn(private_key, private_key_length, pvt_key);
+    pvt_key = BN_bin2bn(Uint8::to_const_uchar(private_key), private_key_length, pvt_key);
     VerifyOrExit(pvt_key != NULL, error = CHIP_ERROR_INTERNAL);
 
     result = EC_KEY_set_private_key(ec_key, pvt_key);
@@ -490,7 +491,7 @@ CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ui
     result = EVP_DigestSignInit(context, NULL, md, NULL, signing_key);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
-    result = EVP_DigestSignUpdate(context, msg, msg_length);
+    result = EVP_DigestSignUpdate(context, Uint8::to_const_uchar(msg), msg_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Call the EVP_DigestSignFinal with a NULL param to get length of the signature.
@@ -499,7 +500,7 @@ CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ui
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(out_signature_length >= out_length, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    result = EVP_DigestSignFinal(context, out_signature, &out_length);
+    result = EVP_DigestSignFinal(context, Uint8::to_uchar(out_signature), &out_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
     // This should not happen due to the check above. But check this nonetheless
     VerifyOrExit(out_signature_length >= out_length, error = CHIP_ERROR_INTERNAL);
@@ -575,7 +576,7 @@ CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_le
     key_point = EC_POINT_new(ec_group);
     VerifyOrExit(key_point != NULL, error = CHIP_ERROR_INTERNAL);
 
-    result = EC_POINT_oct2point(ec_group, key_point, public_key, public_key_length, NULL);
+    result = EC_POINT_oct2point(ec_group, key_point, Uint8::to_const_uchar(public_key), public_key_length, NULL);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     ec_key = EC_KEY_new_by_curve_name(nid);
@@ -599,10 +600,10 @@ CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_le
     result = EVP_DigestVerifyInit(md_context, NULL, md, NULL, verification_key);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
-    result = EVP_DigestVerifyUpdate(md_context, msg, msg_length);
+    result = EVP_DigestVerifyUpdate(md_context, Uint8::to_const_uchar(msg), msg_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
-    result = EVP_DigestVerifyFinal(md_context, signature, signature_length);
+    result = EVP_DigestVerifyFinal(md_context, Uint8::to_const_uchar(signature), signature_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INVALID_SIGNATURE);
     error = CHIP_NO_ERROR;
 
@@ -659,7 +660,7 @@ static CHIP_ERROR _create_evp_key_from_binary_p256_key(const uint8_t * key, cons
     ec_key = EC_KEY_new_by_curve_name(nid);
     VerifyOrExit(ec_key != NULL, error = CHIP_ERROR_INTERNAL);
 
-    big_num_key = BN_bin2bn(key, key_length, NULL);
+    big_num_key = BN_bin2bn(Uint8::to_const_uchar(key), key_length, NULL);
     VerifyOrExit(big_num_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     if (isPrivateKey)
@@ -742,10 +743,10 @@ CHIP_ERROR ECDH_derive_secret(const uint8_t * remote_public_key, const size_t re
     VerifyOrExit(out_secret != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_secret_length >= kMax_ECDH_Secret_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = _create_evp_key_from_binary_p256_key(local_private_key, local_private_key_length, &local_key, true);
+    error = _create_evp_key_from_binary_p256_key(Uint8::to_const_uchar(local_private_key), local_private_key_length, &local_key, true);
     SuccessOrExit(error);
 
-    error = _create_evp_key_from_binary_p256_key(remote_public_key, remote_public_key_length, &remote_key, false);
+    error = _create_evp_key_from_binary_p256_key(Uint8::to_const_uchar(remote_public_key), remote_public_key_length, &remote_key, false);
     SuccessOrExit(error);
 
     context = EVP_PKEY_CTX_new(local_key, NULL);
@@ -758,7 +759,7 @@ CHIP_ERROR ECDH_derive_secret(const uint8_t * remote_public_key, const size_t re
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     out_buf_length = out_secret_length;
-    result         = EVP_PKEY_derive(context, out_secret, &out_buf_length);
+    result         = EVP_PKEY_derive(context, Uint8::to_uchar(out_secret), &out_buf_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(out_secret_length >= out_buf_length, error = CHIP_ERROR_INTERNAL);
     out_secret_length = out_buf_length;
@@ -919,14 +920,14 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const uint8_t * key, size_t key_le
     HMAC_CTX * mac_ctx = HMAC_CTX_new();
     VerifyOrExit(mac_ctx != NULL, error = CHIP_ERROR_INTERNAL);
 
-    error_openssl = HMAC_Init_ex(mac_ctx, key, key_len, context->md_info, NULL);
+    error_openssl = HMAC_Init_ex(mac_ctx, Uint8::to_const_uchar(key), key_len, context->md_info, NULL);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
-    error_openssl = HMAC_Update(mac_ctx, in, in_len);
+    error_openssl = HMAC_Update(mac_ctx, Uint8::to_const_uchar(in), in_len);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     mac_out_len   = hash_size;
-    error_openssl = HMAC_Final(mac_ctx, out, &mac_out_len);
+    error_openssl = HMAC_Final(mac_ctx, Uint8::to_uchar(out), &mac_out_len);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -960,7 +961,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FELoad(const uint8_t * in, size_t in_l
 
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
-    BN_bin2bn(in, in_len, bn_fe);
+    BN_bin2bn(Uint8::to_const_uchar(in), in_len, bn_fe);
     error_openssl = BN_mod(bn_fe, bn_fe, (BIGNUM *) order, context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
@@ -972,7 +973,7 @@ exit:
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEWrite(const void * fe, uint8_t * out, size_t out_len)
 {
     CHIP_ERROR error        = CHIP_ERROR_INTERNAL;
-    unsigned int bn_out_len = BN_bn2binpad((BIGNUM *) fe, out, out_len);
+    unsigned int bn_out_len = BN_bn2binpad((BIGNUM *) fe, Uint8::to_uchar(out), out_len);
 
     VerifyOrExit(bn_out_len == out_len, error = CHIP_ERROR_INTERNAL);
 
@@ -1016,7 +1017,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointLoad(const uint8_t * in, size_t i
 
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
-    error_openssl = EC_POINT_oct2point(context->curve, (EC_POINT *) R, in, in_len, context->bn_ctx);
+    error_openssl = EC_POINT_oct2point(context->curve, (EC_POINT *) R, Uint8::to_const_uchar(in), in_len, context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -1030,7 +1031,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointWrite(const void * R, uint8_t * o
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
     size_t ec_out_len =
-        EC_POINT_point2oct(context->curve, (EC_POINT *) R, POINT_CONVERSION_UNCOMPRESSED, out, out_len, context->bn_ctx);
+        EC_POINT_point2oct(context->curve, (EC_POINT *) R, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(out), out_len, context->bn_ctx);
     VerifyOrExit(ec_out_len == out_len, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -1116,14 +1117,14 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_le
     Lout_point = EC_POINT_new(context->curve);
     VerifyOrExit(Lout_point != NULL, error = CHIP_ERROR_INTERNAL);
 
-    BN_bin2bn(w1in, w1in_len, w1_bn);
+    BN_bin2bn(Uint8::to_const_uchar(w1in), w1in_len, w1_bn);
     error_openssl = BN_mod(w1_bn, w1_bn, (BIGNUM *) order, context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error_openssl = EC_POINT_mul(context->curve, Lout_point, w1_bn, NULL, NULL, context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
-    *L_len = EC_POINT_point2oct(context->curve, Lout_point, POINT_CONVERSION_UNCOMPRESSED, Lout, *L_len, context->bn_ctx);
+    *L_len = EC_POINT_point2oct(context->curve, Lout_point, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(Lout), *L_len, context->bn_ctx);
     VerifyOrExit(*L_len != 0, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
