@@ -41,11 +41,25 @@ def main(argv):
                         default=None,
                         help="Prefix APIs with C namespace")
 
+    parser.add_argument("--interface-prefix",
+                        default=None,
+                        help="Add interface prefix")
+
+    parser.add_argument("--c-generate-object-manager",
+                        default=None,
+                        help="Generate object manager")
+
     options = parser.parse_args(argv)
 
     extra_args = []
     if options.c_namespace:
         extra_args += ["--c-namespace", options.c_namespace]
+
+    if options.interface_prefix:
+        extra_args += ["--interface-prefix", options.interface_prefix]
+
+    if options.c_generate_object_manager:
+        extra_args += ["--c-generate-object-manager"]
 
     if options.output_c:
         gdbus_args = ["gdbus-codegen", "--body", "--output", options.output_c

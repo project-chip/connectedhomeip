@@ -25,6 +25,9 @@
 #ifndef BLE_MANAGER_H
 #define BLE_MANAGER_H
 
+#include <platform/ConnectivityManager.h>
+#include <support/CodeUtils.h>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 namespace chip {
@@ -178,6 +181,5 @@ inline chip::Ble::BleLayer * BLEManager::GetBleLayer(void) const
 } // namespace chip
 
 #endif // defined(CHIP_DEVICE_LAYER_TARGET)
-
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #endif // BLE_MANAGER_H
