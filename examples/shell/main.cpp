@@ -23,6 +23,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/RandUtils.h>
 
+#include <cassert>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -40,7 +41,7 @@ void cmd_otcli_init();
 int main(void)
 {
     // Initialize the default streamer that was linked.
-    streamer_init(streamer_get());
+    assert(streamer_init(streamer_get()) == 0);
 
     cmd_misc_init();
     cmd_base64_init();

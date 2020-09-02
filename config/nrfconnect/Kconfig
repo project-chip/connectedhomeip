@@ -19,6 +19,6 @@ mainmenu "CHIP application"
 source "Kconfig.zephyr"
 
 config CHIP_LIB_SHELL
-    bool "Enable CHIP's shell library"
-    help
-        Link the application with the library containing CHIP shell commands
+	bool "Enable CHIP's shell library"
+	help
+		Link the application with the library containing CHIP shell commands
