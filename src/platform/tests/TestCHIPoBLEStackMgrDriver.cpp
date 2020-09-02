@@ -15,11 +15,14 @@
  *    limitations under the License.
  */
 
+#include <stdlib.h>
 #include "TestCHIPoBLEStackMgr.h"
 
-int main()
+int main(int argc, char *argv[])
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    TestCHIPoBLEStackManager();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    if (argc == 2 && atoi(argv[1]) == 1)
+    {
+        return TestCHIPoBLEStackManager();
+    }
+    return 0;
 }

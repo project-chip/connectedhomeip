@@ -200,18 +200,9 @@ endif # CHIP_DEVICE_LAYER_TARGET_DARWIN
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
 
-libDeviceLayer_a_CPPFLAGS              += \
-    -I$(builddir)/Linux/gen               \
-    $(NULL)
-
 SUBDIRS                                += tests
 
-.PHONY: gen
-gen:
-	mkdir -p Linux/gen
-
 BUILT_SOURCES                         = \
-    Linux/gen                           \
     $(NULL)
 
 libDeviceLayer_a_CPPFLAGS              += \
@@ -223,8 +214,8 @@ libDeviceLayer_a_CPPFLAGS              += \
 if CONFIG_BLE_PLATFORM_BLUEZ
 
 BUILT_SOURCES                         += \
-    Linux/gen/DbusBluez.h                      \
-    Linux/gen/DbusBluez.c                      \
+    Linux/dbus/bluez/DbusBluez.h                      \
+    Linux/dbus/bluez/DbusBluez.c                      \
     $(NULL)
 
 GDBUSCODEGENOPTS                          = \
@@ -233,15 +224,15 @@ GDBUSCODEGENOPTS                          = \
     --c-generate-object-manager             \
     $(NULL)
 
-Linux/gen/DbusBluez.h: Linux/dbus/org.bluez.xml
+Linux/dbus/bluez/DbusBluez.h: Linux/dbus/bluez/org.bluez.xml
 	$(GDBUSCODEGEN) $(GDBUSCODEGENOPTS) --header --output $@ $<
 
-Linux/gen/DbusBluez.c: Linux/dbus/org.bluez.xml
+Linux/dbus/bluez/DbusBluez.c: Linux/dbus/bluez/org.bluez.xml
 	$(GDBUSCODEGEN) $(GDBUSCODEGENOPTS) --body --output $@ $<
 	sed -i 's/config\.h/BuildConfig.h/g' $@
 
 nodist_libDeviceLayer_a_SOURCES        += \
-    Linux/gen/DbusBluez.c                 \
+    Linux/dbus/bluez/DbusBluez.c                 \
     Linux/CHIPBluezHelper.cpp             \
     $(NULL)
 
@@ -249,39 +240,39 @@ endif #CONFIG_BLE_PLATFORM_BLUEZ
 
 if CONFIG_WIFI_PLATFORM_WPA
 BUILT_SOURCES                          += \
-    Linux/gen/DBusWpa.h                   \
-    Linux/gen/DBusWpaInterface.h          \
-    Linux/gen/DBusWpaNetwork.h            \
-    Linux/gen/DBusWpa.c                   \
-    Linux/gen/DBusWpaInterface.c          \
-    Linux/gen/DBusWpaNetwork.c            \
+    Linux/dbus/wpa/DBusWpa.h                   \
+    Linux/dbus/wpa/DBusWpaInterface.h          \
+    Linux/dbus/wpa/DBusWpaNetwork.h            \
+    Linux/dbus/wpa/DBusWpa.c                   \
+    Linux/dbus/wpa/DBusWpaInterface.c          \
+    Linux/dbus/wpa/DBusWpaNetwork.c            \
     $(NULL)
 
-Linux/gen/DBusWpa.h: Linux/dbus/DBusWpa.xml
+Linux/dbus/wpa/DBusWpa.h: Linux/dbus/wpa/DBusWpa.xml
 	gdbus-codegen --header --output $@ --c-namespace Wpa $<
 
-Linux/gen/DBusWpaInterface.h: Linux/dbus/DBusWpaInterface.xml
+Linux/dbus/wpa/DBusWpaInterface.h: Linux/dbus/wpa/DBusWpaInterface.xml
 	gdbus-codegen --header --output $@ --c-namespace Wpa $<
 
-Linux/gen/DBusWpaNetwork.h: Linux/dbus/DBusWpaNetwork.xml
+Linux/dbus/wpa/DBusWpaNetwork.h: Linux/dbus/wpa/DBusWpaNetwork.xml
 	gdbus-codegen --header --output $@ --c-namespace Wpa $<
 
-Linux/gen/DBusWpa.c: Linux/dbus/DBusWpa.xml
+Linux/dbus/wpa/DBusWpa.c: Linux/dbus/wpa/DBusWpa.xml
 	gdbus-codegen --body --output $@ --c-namespace Wpa $<
 	sed -i 's/config\.h/BuildConfig.h/g' $@
 
-Linux/gen/DBusWpaInterface.c: Linux/dbus/DBusWpaInterface.xml
+Linux/dbus/wpa/DBusWpaInterface.c: Linux/dbus/wpa/DBusWpaInterface.xml
 	gdbus-codegen --body --output $@ --c-namespace Wpa $<
 	sed -i 's/config\.h/BuildConfig.h/g' $@
 
-Linux/gen/DBusWpaNetwork.c: Linux/dbus/DBusWpaNetwork.xml
+Linux/dbus/wpa/DBusWpaNetwork.c: Linux/dbus/wpa/DBusWpaNetwork.xml
 	gdbus-codegen --body --output $@ --c-namespace Wpa $<
 	sed -i 's/config\.h/BuildConfig.h/g' $@
 
 nodist_libDeviceLayer_a_SOURCES        += \
-    Linux/gen/DBusWpa.c                   \
-    Linux/gen/DBusWpaInterface.c          \
-    Linux/gen/DBusWpaNetwork.c            \
+    Linux/dbus/wpa/DBusWpa.c                   \
+    Linux/dbus/wpa/DBusWpaInterface.c          \
+    Linux/dbus/wpa/DBusWpaNetwork.c            \
     $(NULL)
 endif # CONFIG_WIFI_PLATFORM_WPA
 

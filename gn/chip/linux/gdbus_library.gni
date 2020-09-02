@@ -70,6 +70,22 @@ template("gdbus_library") {
       args += [
         "--c-namespace",
         invoker.c_namespace,
+        "--c-namespace",
+        invoker.c_namespace,
+      ]
+    }
+
+    if (defined(invoker.interface_prefix)) {
+      args += [
+        "--interface-prefix",
+        invoker.interface_prefix,
+      ]
+    }
+
+    if (defined(invoker.c_generate_object_manager)) {
+      args += [
+        "--c-generate-object-manager",
+        invoker.c_generate_object_manager,
       ]
     }
   }

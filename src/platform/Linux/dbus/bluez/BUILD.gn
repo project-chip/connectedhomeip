@@ -16,14 +16,14 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/gn/chip/linux/gdbus_library.gni")
 
-gdbus_library("dbus") {
+
+gdbus_library("bluez") {
   sources = [
-    "DBusWpa.xml",
-    "DBusWpaInterface.xml",
-    "DBusWpaNetwork.xml",
+    "org.bluez.xml"
   ]
 
-  c_namespace = "Wpa"
-
-  dbus_out_dir = "platform/Linux/dbus"
+  c_namespace = "Bluez"
+  interface_prefix = "org.bluez"
+  c_generate_object_manager = "Yes"
+  dbus_out_dir = "platform/Linux/dbus/bluez"
 }
