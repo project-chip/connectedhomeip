@@ -169,6 +169,7 @@ public:
     CHIP_ERROR SendCommonNullMessage(void);
     CHIP_ERROR EncodeExchHeader(ChipExchangeHeader * exchangeHeader, uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf,
                                 uint16_t sendFlags);
+    void TeardownTrickleRetransmit(void);
 
     /**
      * This function is the application callback for handling a received CHIP message.
@@ -300,6 +301,7 @@ public:
     void Close(void);
     void Abort(void);
     void Release(void);
+    CHIP_ERROR StartTimerT(void);
 
     enum
     {
@@ -311,13 +313,19 @@ public:
     void GetPeerDescription(char * buf, uint32_t bufSize) const;
 
 private:
-    PacketBuffer * msg; // If we are re-transmitting, then this is the pointer to the message being retransmitted
+    PacketBuffer * msg;  // If we are re-transmitting, then this is the pointer to the message being retransmitted
 
-    uint16_t mFlags; // Internal state flags
+    // Trickle-controlled retransmissions:
+    uint32_t backoff;               // backoff for sampling the numner of messages
+    uint8_t msgsReceived;           // number of messages heard during the backoff period
+    uint8_t rebroadcastThreshold;   // re-broadcast threshold 
+    uint16_t mFlags;                // Internal state flags
 
     CHIP_ERROR ResendMessage(void);
     bool MatchExchange(ChipConnection * msgCon, const ChipMessageInfo * msgInfo, const ChipExchangeHeader * exchangeHeader);
     static void CancelRetransmissionTimer(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
+    static void TimerTau(System::Layer* aSystemLayer, void* aAppState, System::Error aError);
+    static void TimerT(System::Layer* aSystemLayer, void* aAppState, System::Error aError);
 
     CHIP_ERROR StartResponseTimer(void);
     void CancelResponseTimer(void);

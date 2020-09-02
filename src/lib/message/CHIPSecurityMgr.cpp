@@ -914,6 +914,11 @@ void ChipSecurityManager::HandleIdleSessionTimeout(System::Layer * aLayer, void 
     }
 }
 
+void ChipSecurityManager::OnEncryptedMsgRcvd(uint16_t sessionKeyId, uint64_t peerNodeId, uint8_t encType)
+{
+    // TODO: implement against SCTT defined security protocol
+}
+
 void ChipSecurityManager::RMPHandleAckRcvd(ExchangeContext * ec, void * msgCtxt)
 {
     ChipLogProgress(SecurityManager, "%s", __FUNCTION__);
