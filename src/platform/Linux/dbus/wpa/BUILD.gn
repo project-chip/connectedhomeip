@@ -14,16 +14,16 @@
 
 import("//build_overrides/chip.gni")
 
-config("includes") {
-  include_dirs = [
-    "include",
-    ".",
-    "${root_gen_dir}/include",
+import("${chip_root}/gn/chip/linux/gdbus_library.gni")
+
+gdbus_library("wpa") {
+  sources = [
+    "DBusWpa.xml",
+    "DBusWpaInterface.xml",
+    "DBusWpaNetwork.xml",
   ]
 
-  defines = [ "CHIP_SEPARATE_CONFIG_H=1" ]
-
-  if (current_os == "linux") {
-    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1" ]
-  }
+  c_namespace = "Wpa"
+  c_generate_object_manager = false
+  dbus_out_dir = "platform/Linux/dbus/wpa"
 }

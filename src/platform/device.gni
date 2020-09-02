@@ -38,6 +38,9 @@ declare_args() {
 
   # Enable wifi support.
   chip_enable_wifi = chip_device_platform == "linux"
+
+  # Enable ble support.
+  chip_enable_ble = chip_device_platform == "linux"
 }
 
 _chip_device_layer = "none"

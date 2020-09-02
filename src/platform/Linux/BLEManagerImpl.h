@@ -33,6 +33,7 @@ namespace DeviceLayer {
 namespace Internal {
 
 using namespace chip::Ble;
+using namespace chip::Ble;
 
 void HandleIncomingBleConnection(BLEEndPoint * bleEP);
 
@@ -65,7 +66,7 @@ struct BLEAdvConfig
     uint8_t mPairingStatus;
     ChipAdvType mType;
     uint16_t mDuration;
-    char * mpAdvertisingUUID;
+    const char * mpAdvertisingUUID;
 };
 
 /**

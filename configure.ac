@@ -1561,8 +1561,8 @@ NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
               if test "x${HAVE_CXX11}" == "0"; then
                 AC_MSG_ERROR([BlueZ support requires C++11 compiler])
               fi
-              CONFIG_BLE_PLATFORM_BLUEZ=1
-              enable_chipoble_bluez="yes"
+              CONFIG_BLE_PLATFORM_BLUEZ=0
+              enable_chipoble_bluez="no"
               ;;
 
           *)
