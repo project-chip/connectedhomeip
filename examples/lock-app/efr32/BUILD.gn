@@ -15,6 +15,7 @@
 import("//build/config/defaults.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
+import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 assert(current_os == "freertos")
@@ -45,7 +46,7 @@ efr32_sdk("sdk") {
   defines += [ "BOARD_ID=${efr32_board}" ]
 }
 
-executable("lock_app") {
+efr32_executable("lock_app") {
   include_dirs = []
   defines = []
   output_name = "chip-efr32-lock-example.out"
