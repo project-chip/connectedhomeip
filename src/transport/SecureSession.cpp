@@ -150,10 +150,14 @@ exit:
 CHIP_ERROR SecureSession::Encrypt(const unsigned char * input, size_t input_length, unsigned char * output, MessageHeader & header)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    uint64_t tag     = 0;
     uint8_t IV[kAESCCMIVLen];
     uint8_t AAD[kMaxAADLen];
     size_t aadLen = sizeof(AAD);
+
+    MessageHeader::EncryptionType encType = MessageHeader::EncryptionType::kAESCCMTagLen16;
+
+    const size_t taglen = header.TagLenForEncryptionType(encType);
+    uint8_t tag[taglen];
 
     VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     VerifyOrExit(input != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -167,10 +171,10 @@ CHIP_ERROR SecureSession::Encrypt(const unsigned char * input, size_t input_leng
     SuccessOrExit(error);
 
     error = AES_CCM_encrypt(input, input_length, AAD, aadLen, mKey, sizeof(mKey), (const unsigned char *) IV, sizeof(IV), output,
-                            (unsigned char *) &tag, sizeof(tag));
+                            (unsigned char *) tag, taglen);
     SuccessOrExit(error);
 
-    header.SetTag(MessageHeader::EncryptionType::kAESCCMTagLen8, (uint8_t *) &tag, sizeof(tag));
+    header.SetTag(encType, tag, taglen);
 
 exit:
     return error;

@@ -16,7 +16,10 @@
  */
 
 #include <core/CHIPCore.h>
+
+#if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
+#endif
 
 #if CHIP_ENABLE_OPENTHREAD
 

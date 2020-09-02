@@ -7,9 +7,11 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
 -   [CHIP EFR32 Lock Example](#chip-efr32-lock-example)
     -   [Introduction](#introduction)
     -   [Building](#building)
-    -   [Initializing the EFR32 module](#initializing-the-efr32-module)
+        -   [Note](#note)
     -   [Flashing the Application](#flashing-the-application)
     -   [Viewing Logging Output](#viewing-logging-output)
+    -   [Running the Complete Example](#running-the-complete-example)
+        -   [Notes](#notes)
 
 <hr>
 
@@ -18,40 +20,34 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
 ## Introduction
 
 The EFR32 lock example provides a baseline demonstration of a door lock device,
-built using CHIP and the Silicon Labs gecko SDK. The example is currently very
-basic and only supports responding to button presses to indicate the state of
-the lock and view logging from the device. It doesn't currently support any over
-the air connectivity via, BLE or OT.
+built using CHIP and the Silicon Labs gecko SDK. The example currently support
+OpenThread. The BLE feature is still a work in progress.
 
-Eventually, the lock example is intended to serve both as a means to explore the
-workings of CHIP as well as a template for creating real products based on the
-Silicon Labs platform.
-
-A top-level Makefile orchestrates the entire build process, including building
-CHIP, FreeRTOS, and select files from the Silicon Labs SDK. The resultant image
-file can be flashed directly onto the Silicon Labs WSTK kit hardware.
+The lock example is intended to serve both as a means to explore the workings of
+CHIP as well as a template for creating real products based on the Silicon Labs
+platform.
 
 <a name="building"></a>
 
 ## Building
 
--   Download and install the
-    [Silicon Labs Simplicity Studio and SDK for Thread and Zigbee version v2.7](https://www.silabs.com/products/development-tools/software/simplicity-studio)
+### Note
 
-Install SimplicityStudio or extract the SimplicityStudio archive to where you
-want to install Simplicity Studio and follow the instructions in README.txt
-found within the extracted archive to complete installation.
+A consensus within the CHIP organization was reached to move from Make/Automake
+to the GN/Ninja build system. As a result we are no longer supporting Make
+inside the lock-app example. While the Makefile can stil be used to compile the
+example, the output binary will be lacking key features (e.g. OpenThread).
 
-On OSX, be sure to rename `/Applications/Simplicity Studio.app/` to something
-without a "space". For example, rename it to
-`/Applications/Simplicity_Studio.app/`
+-   Download the [sdk_support](https://github.com/SiliconLabs/sdk_support) from
+    GitHub and export the path with :
 
-In Simplicity Studio from the Launcher perspective click on the "Update
-Software" button. The Package Manager window will Open. Ensure that the
-following SDKs are installed (as of January 2020).
+            $ export EFR32_SDK_ROOT=<Path to cloned git repo>
 
--   Bluetooth 2.13.0.0
--   Flex 2.7.0.0
+-   Download the
+    [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
+    command line tool, and ensure that `commander` is your shell search path.
+    (For Mac OS X, `commander` is located inside
+    `Commander.app/Contents/MacOS/`.)
 
 -   Download and install a suitable ARM gcc tool chain:
     [GNU Arm Embedded Toolchain 9-2019-q4-major](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
@@ -59,10 +55,10 @@ following SDKs are installed (as of January 2020).
 -   Install some additional tools(likely already present for CHIP developers):
 
            # Linux
-           $ sudo apt-get install git make automake libtool ccache libwebkitgtk-1.0-0
+           $ sudo apt-get install git make automake libtool ccache libwebkitgtk-1.0-0 ninja
 
            # Mac OS X
-           $ brew install automake libtool ccache
+           $ brew install automake libtool ccache ninja
 
 -   To build for an MG21 part make the following changes to the
     platform/CMSIS/Include/core_cm33.h file within the Silicon Labs SDK. Copy
@@ -90,11 +86,6 @@ following SDKs are installed (as of January 2020).
 
 *   Build the example application:
 
-    -   With Make
-
-             $ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
-             $ make BOARD=BRD4161A
-
     -   With Ninja
 
               $ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
@@ -102,40 +93,32 @@ following SDKs are installed (as of January 2020).
               <From CHIP root>
               $ ./scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/ out/lock_app_debug
 
+    -   With Make _deprecated_
+
+             $ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
+             $ make BOARD=BRD4161A
+
 -   To delete generated executable, libraries and object files use:
-
-    -   With Make
-
-             $ make BOARD=BRD4161A clean
 
     -   With Ninja
 
-              $ rm -rf ./out/lock_app_debug
+            $ rm -rf ./out/lock_app_debug
 
-<a name="initializing"></a>
+    -   With Make _deprecated_
 
-## Initializing the EFR32 module
-
-The example application is designed to run on the Silicon Labs SDK development
-kit. Prior to installing the application, the device's flash memory should be
-erased.
-
--   Connect the host machine to the J-Link Interface MCU USB connector on the
-    EFR32 WSTK.
-
--   Use the Makefile to erase the flash:
-
-          $ make BOARD=BRD4161A erase
-
--   To erase a specific device using its serial number:
-
-          $ make BOARD=BRD4161A SERIALNO=440113717 erase
+             $ make BOARD=BRD4161A clean
 
 <a name="flashing"></a>
 
 ## Flashing the Application
 
--   With Make
+-   With Ninja
+
+    -   From CHIP root,
+
+              $ python out/lock_app_debug/BRD4161A/chip-efr32-lock-example.out.flash.py
+
+-   With Make (_deprecated_)
 
     -   To rebuild the image and flash the example app:
 
@@ -150,13 +133,7 @@ erased.
 
             $ make BOARD=BRD4161A flash-app
 
-*   With Ninja
-    -   To Flash directly the board with the .s37 binary please follows
-        instruction
-        [here](https://www.silabs.com/community/mcu/32-bit/knowledge-base.entry.html/2014/10/22/using_jlink_commande-YYdy).
-        **However** do **NOT** erase the flash since it will erase the
-        bootloader and the example is not standalone as for now.
-    -   Or with the Ozone debugger, just load the .out file.
+-   Or with the Ozone debugger, just load the .out file.
 
 <a name="view-logging"></a>
 
@@ -205,3 +182,36 @@ combination with JLinkRTTClient as follows:
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
           $ JLinkRTTClient
+
+<a name="running-complete-example"></a>
+
+## Running the Complete Example
+
+-   Once the example is flashed on the board, you should be able to establish a
+    connection with an OpenThread border router. See
+    [OpenThread Border Router](https://openthread.io/guides/border-router) for
+    more information on how to setup a border router. Take note that the RCP
+    code is available directly through
+    [Simplicity Studio 5](https://www.silabs.com/products/development-tools/software/simplicity-studio/simplicity-studio-5)
+    under File->New->Project Wizard->Examples->Thread : ot-rcp
+-   Once said connectection is established (you can verify that with the command
+    `router table` using a serial terminal (screen / minicom etc.) on the board
+    running the lock-app example)
+-   Using chip-tool you can now control the lock status with on/off command such
+    as `chip-tool on <ipv6 address of the node> 11095 1`
+
+### Notes
+
+-   Depending on your network settings your router might not provide native ipv6
+    addresses to your devices (Border router / PC). If this is the case, you
+    need to add a static ipv6 addresses on both device and then a ipv6 route to
+    the border router on your PC
+
+          # On Border Router :
+          $ sudo ip addr add dev <Network interface> 2002::2/64
+
+          # On PC (Linux) :
+          $ sudo ip addr add dev <Network interface> 2002::1/64
+
+          # Add Ipv6 route on PC (Linux)
+          $ sudo ip route add <Thread ipv6 prefix>/64 via 2002::2

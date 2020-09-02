@@ -40,30 +40,238 @@
 #define SILABS_AF_ENDPOINT_CONFIG
 
 // Fixed number of defined endpoints
-#define FIXED_ENDPOINT_COUNT (1)
+#define FIXED_ENDPOINT_COUNT (2)
 
 // Generated attributes
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
-        { 0x0000, ZCL_BOOLEAN_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },      /* 0 / On/off / on/off*/                     \
-            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 1 / On/off / cluster revision*/           \
+        {                                                                                                                          \
+            0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_CLIENT | ATTRIBUTE_MASK_SINGLETON), { (uint8_t *) 0x0001 }       \
+        }, /* 0 / Basic / cluster revision*/                                                                                       \
+            {                                                                                                                      \
+                0x0000, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (ATTRIBUTE_MASK_SINGLETON), { (uint8_t *) 0x03 }                              \
+            }, /* 1 / Basic / ZCL version*/                                                                                        \
+            {                                                                                                                      \
+                0x0007, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, (ATTRIBUTE_MASK_SINGLETON), { (uint8_t *) 0x00 }                              \
+            }, /* 2 / Basic / power source*/                                                                                       \
+            {                                                                                                                      \
+                0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_SINGLETON), { (uint8_t *) 0x0001 }                           \
+            }, /* 3 / Basic / cluster revision*/                                                                                   \
+            {                                                                                                                      \
+                0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_CLIENT), { (uint8_t *) 0x0001 }                              \
+            }, /* 4 / Identify / cluster revision*/                                                                                \
+            {                                                                                                                      \
+                0x0000, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_WRITABLE), { (uint8_t *) 0x0000 }                            \
+            },                                                                        /* 5 / Identify / identify time*/            \
+            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 6 / Identify / cluster revision*/         \
+            {                                                                                                                      \
+                0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_CLIENT), { (uint8_t *) 0x0001 }                              \
+            },                                                                        /* 7 / Groups / cluster revision*/           \
+            { 0x0000, ZCL_BITMAP8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },  /* 8 / Groups / name support*/               \
+            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 9 / Groups / cluster revision*/           \
+            {                                                                                                                      \
+                0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_CLIENT), { (uint8_t *) 0x0001 }                              \
+            },                                                                        /* 10 / Scenes / cluster revision*/          \
+            { 0x0000, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },    /* 11 / Scenes / scene count*/               \
+            { 0x0001, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },    /* 12 / Scenes / current scene*/             \
+            { 0x0002, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000 } }, /* 13 / Scenes / current group*/             \
+            { 0x0003, ZCL_BOOLEAN_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },  /* 14 / Scenes / scene valid*/               \
+            { 0x0004, ZCL_BITMAP8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },  /* 15 / Scenes / name support*/              \
+            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 16 / Scenes / cluster revision*/          \
+            {                                                                                                                      \
+                0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_CLIENT), { (uint8_t *) 0x0001 }                              \
+            },                                                                        /* 17 / On/off / cluster revision*/          \
+            { 0x0000, ZCL_BOOLEAN_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },  /* 18 / On/off / on/off*/                    \
+            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 19 / On/off / cluster revision*/          \
+            {                                                                                                                      \
+                0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_CLIENT), { (uint8_t *) 0x0001 }                              \
+            }, /* 20 / On/off Switch Configuration / cluster revision*/                                                            \
+            {                                                                                                                      \
+                0x0000, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 }                                                  \
+            }, /* 21 / On/off Switch Configuration / switch type*/                                                                 \
+            {                                                                                                                      \
+                0x0010, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, (ATTRIBUTE_MASK_WRITABLE), { (uint8_t *) 0x00 }                               \
+            }, /* 22 / On/off Switch Configuration / switch actions*/                                                              \
+            {                                                                                                                      \
+                0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 }                                               \
+            }, /* 23 / On/off Switch Configuration / cluster revision*/                                                            \
+            {                                                                                                                      \
+                0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_CLIENT), { (uint8_t *) 0x0001 }                              \
+            },                                                                        /* 24 / Level Control / cluster revision*/   \
+            { 0x0000, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },    /* 25 / Level Control / current level*/      \
+            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 26 / Level Control / cluster revision*/   \
+            {                                                                                                                      \
+                0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_CLIENT), { (uint8_t *) 0x0001 }                              \
+            },                                                                        /* 27 / Door Lock / cluster revision*/       \
+            { 0x0000, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },    /* 28 / Door Lock / lock state*/             \
+            { 0x0001, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },    /* 29 / Door Lock / lock type*/              \
+            { 0x0002, ZCL_BOOLEAN_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },  /* 30 / Door Lock / actuator enabled*/       \
+            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 31 / Door Lock / cluster revision*/       \
+            {                                                                                                                      \
+                0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_CLIENT), { (uint8_t *) 0x0001 }                              \
+            }, /* 32 / Barrier Control / cluster revision*/                                                                        \
+            {                                                                                                                      \
+                0x0001, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 }                                                  \
+            }, /* 33 / Barrier Control / barrier moving state*/                                                                    \
+            {                                                                                                                      \
+                0x0002, ZCL_BITMAP16_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000 }                                             \
+            }, /* 34 / Barrier Control / barrier safety status*/                                                                   \
+            {                                                                                                                      \
+                0x0003, ZCL_BITMAP8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 }                                                \
+            }, /* 35 / Barrier Control / barrier capabilities*/                                                                    \
+            { 0x000A, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00UL } },  /* 36 / Barrier Control / barrier position*/ \
+            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 37 / Barrier Control / cluster revision*/ \
+            {                                                                                                                      \
+                0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_CLIENT), { (uint8_t *) 0x0001 }                              \
+            },                                                                        /* 38 / Color Control / cluster revision*/   \
+            { 0x0003, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x616B } }, /* 39 / Color Control / current x*/          \
+            { 0x0004, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x607D } }, /* 40 / Color Control / current y*/          \
+            {                                                                                                                      \
+                0x000F, ZCL_BITMAP8_ATTRIBUTE_TYPE, 1, (ATTRIBUTE_MASK_WRITABLE), { (uint8_t *) 0x00 }                             \
+            }, /* 41 / Color Control / color control options*/                                                                     \
+            {                                                                                                                      \
+                0x400D, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000UL }                                             \
+            }, /* 42 / Color Control / couple color temp to level min-mireds*/                                                     \
+            {                                                                                                                      \
+                0x4010, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_WRITABLE), { (uint8_t *) 0x0000UL }                          \
+            }, /* 43 / Color Control / start up color temperature mireds*/                                                         \
+            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 44 / Color Control / cluster revision*/   \
+            {                                                                                                                      \
+                0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_CLIENT), { (uint8_t *) 0x0001 }                              \
+            },                                                                          /* 45 / IAS Zone / cluster revision*/      \
+            { 0x0000, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },      /* 46 / IAS Zone / zone state*/            \
+            { 0x0001, ZCL_ENUM16_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000 } },   /* 47 / IAS Zone / zone type*/             \
+            { 0x0002, ZCL_BITMAP16_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000 } }, /* 48 / IAS Zone / zone status*/           \
+            {                                                                                                                      \
+                0x0010, ZCL_IEEE_ADDRESS_ATTRIBUTE_TYPE, 8, (ATTRIBUTE_MASK_WRITABLE), { NULL }                                    \
+            },                                                                        /* 49 / IAS Zone / IAS CIE address*/         \
+            { 0x0011, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0xFF } },    /* 50 / IAS Zone / Zone ID*/                 \
+            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 51 / IAS Zone / cluster revision*/        \
     }
 
 // Cluster function static arrays
-#define GENERATED_FUNCTION_ARRAYS
+#define GENERATED_FUNCTION_ARRAYS                                                                                                  \
+    const EmberAfGenericClusterFunction emberAfFuncArrayIdentifyClusterServer[] = {                                                \
+        (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerInitCallback,                                                  \
+        (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerAttributeChangedCallback                                       \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction emberAfFuncArrayGroupsClusterServer[]       = { (                                          \
+        EmberAfGenericClusterFunction) emberAfGroupsClusterServerInitCallback };                                             \
+    const EmberAfGenericClusterFunction emberAfFuncArrayScenesClusterServer[]       = { (                                          \
+        EmberAfGenericClusterFunction) emberAfScenesClusterServerInitCallback };                                             \
+    const EmberAfGenericClusterFunction emberAfFuncArrayOnOffClusterServer[]        = { (                                          \
+        EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback };                                             \
+    const EmberAfGenericClusterFunction emberAfFuncArrayLevelControlClusterServer[] = { (                                          \
+        EmberAfGenericClusterFunction) emberAfLevelControlClusterServerInitCallback };                                             \
+    const EmberAfGenericClusterFunction emberAfFuncArrayDoorLockClusterServer[]     = { (                                          \
+        EmberAfGenericClusterFunction) emberAfDoorLockClusterServerAttributeChangedCallback };                                 \
+    const EmberAfGenericClusterFunction emberAfFuncArrayColorControlClusterServer[] = { (                                          \
+        EmberAfGenericClusterFunction) emberAfColorControlClusterServerInitCallback };                                             \
+    const EmberAfGenericClusterFunction emberAfFuncArrayIasZoneClusterClient[]      = { (                                          \
+        EmberAfGenericClusterFunction) emberAfIasZoneClusterClientInitCallback };                                             \
+    const EmberAfGenericClusterFunction emberAfFuncArrayIasZoneClusterServer[]      = {                                            \
+        (EmberAfGenericClusterFunction) emberAfIasZoneClusterServerInitCallback,                                              \
+        (EmberAfGenericClusterFunction) emberAfIasZoneClusterServerMessageSentCallback,                                       \
+        (EmberAfGenericClusterFunction) emberAfIasZoneClusterServerPreAttributeChangedCallback                                \
+    };
 
 // Clusters definitions
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         {                                                                                                                          \
-            0x0006, (EmberAfAttributeMetadata *) &(generatedAttributes[0]), 2, 3, (CLUSTER_MASK_SERVER), NULL,                     \
+            0x0000, (EmberAfAttributeMetadata *) &(generatedAttributes[0]), 1, 0, (CLUSTER_MASK_CLIENT), NULL,                     \
         },                                                                                                                         \
+            {                                                                                                                      \
+                0x0000, (EmberAfAttributeMetadata *) &(generatedAttributes[1]), 3, 0, (CLUSTER_MASK_SERVER), NULL,                 \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0003, (EmberAfAttributeMetadata *) &(generatedAttributes[4]), 1, 2, (CLUSTER_MASK_CLIENT), NULL,                 \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0003,                                                                                                            \
+                (EmberAfAttributeMetadata *) &(generatedAttributes[5]),                                                            \
+                2,                                                                                                                 \
+                4,                                                                                                                 \
+                (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION | CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION),                      \
+                emberAfFuncArrayIdentifyClusterServer,                                                                             \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0004, (EmberAfAttributeMetadata *) &(generatedAttributes[7]), 1, 2, (CLUSTER_MASK_CLIENT), NULL,                 \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0004, (EmberAfAttributeMetadata *) &(generatedAttributes[8]), 2,                                                 \
+                3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),     emberAfFuncArrayGroupsClusterServer,               \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0005, (EmberAfAttributeMetadata *) &(generatedAttributes[10]), 1, 2, (CLUSTER_MASK_CLIENT), NULL,                \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0005, (EmberAfAttributeMetadata *) &(generatedAttributes[11]), 6,                                                \
+                8,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayScenesClusterServer,              \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0006, (EmberAfAttributeMetadata *) &(generatedAttributes[17]), 1, 2, (CLUSTER_MASK_CLIENT), NULL,                \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0006, (EmberAfAttributeMetadata *) &(generatedAttributes[18]), 2,                                                \
+                3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayOnOffClusterServer,               \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0007, (EmberAfAttributeMetadata *) &(generatedAttributes[20]), 1, 2, (CLUSTER_MASK_CLIENT), NULL,                \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0007, (EmberAfAttributeMetadata *) &(generatedAttributes[21]), 3, 4, (CLUSTER_MASK_SERVER), NULL,                \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0008, (EmberAfAttributeMetadata *) &(generatedAttributes[24]), 1, 2, (CLUSTER_MASK_CLIENT), NULL,                \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0008, (EmberAfAttributeMetadata *) &(generatedAttributes[25]), 2,                                                \
+                3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayLevelControlClusterServer,        \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0101, (EmberAfAttributeMetadata *) &(generatedAttributes[27]), 1, 2, (CLUSTER_MASK_CLIENT), NULL,                \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0101, (EmberAfAttributeMetadata *) &(generatedAttributes[28]),         4,                                        \
+                5,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION), emberAfFuncArrayDoorLockClusterServer,    \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0103, (EmberAfAttributeMetadata *) &(generatedAttributes[32]), 1, 2, (CLUSTER_MASK_CLIENT), NULL,                \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0103, (EmberAfAttributeMetadata *) &(generatedAttributes[33]), 5, 7, (CLUSTER_MASK_SERVER), NULL,                \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0300, (EmberAfAttributeMetadata *) &(generatedAttributes[38]), 1, 2, (CLUSTER_MASK_CLIENT), NULL,                \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0300, (EmberAfAttributeMetadata *) &(generatedAttributes[39]), 6,                                                \
+                11,     (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayColorControlClusterServer,        \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0500, (EmberAfAttributeMetadata *) &(generatedAttributes[45]), 1,                                                \
+                2,      (CLUSTER_MASK_CLIENT | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayIasZoneClusterClient,             \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0500,                                                                                                            \
+                (EmberAfAttributeMetadata *) &(generatedAttributes[46]),                                                           \
+                6,                                                                                                                 \
+                16,                                                                                                                \
+                (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION | CLUSTER_MASK_MESSAGE_SENT_FUNCTION |                           \
+                 CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION),                                                                     \
+                emberAfFuncArrayIasZoneClusterServer,                                                                              \
+            },                                                                                                                     \
+            {                                                                                                                      \
+                0x0006, (EmberAfAttributeMetadata *) &(generatedAttributes[18]), 1,                                                \
+                1,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayOnOffClusterServer,               \
+            },                                                                                                                     \
     }
 
 // Endpoint types
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { (EmberAfCluster *) &(generatedClusters[0]), 1, 3 },                                                                      \
+        { (EmberAfCluster *) &(generatedClusters[0]), 22, 84 }, { (EmberAfCluster *) &(generatedClusters[22]), 1, 1 },             \
     }
 
 // Cluster manufacturer codes
@@ -85,62 +293,254 @@
 #define GENERATED_ATTRIBUTE_MANUFACTURER_CODE_COUNT (0)
 
 // Largest attribute size is needed for various buffers
-#define ATTRIBUTE_LARGEST (2)
+#define ATTRIBUTE_LARGEST (8)
 // Total size of singleton attributes
-#define ATTRIBUTE_SINGLETONS_SIZE (0)
+#define ATTRIBUTE_SINGLETONS_SIZE (6)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE 3
+#define ATTRIBUTE_MAX_SIZE 85
 
 // Array of endpoints that are supported
 #define FIXED_ENDPOINT_ARRAY                                                                                                       \
     {                                                                                                                              \
-        1                                                                                                                          \
+        1, 2                                                                                                                       \
     }
 
 // Array of profile ids
 #define FIXED_PROFILE_IDS                                                                                                          \
     {                                                                                                                              \
-        65535                                                                                                                      \
+        65535, 65535                                                                                                               \
     }
 
 // Array of device ids
 #define FIXED_DEVICE_IDS                                                                                                           \
     {                                                                                                                              \
-        65535                                                                                                                      \
+        65535, 65535                                                                                                               \
     }
 
 // Array of device versions
 #define FIXED_DEVICE_VERSIONS                                                                                                      \
     {                                                                                                                              \
-        1                                                                                                                          \
+        1, 1                                                                                                                       \
     }
 
 // Array of endpoint types supported on each endpoint
 #define FIXED_ENDPOINT_TYPES                                                                                                       \
     {                                                                                                                              \
-        0                                                                                                                          \
+        0, 1                                                                                                                       \
     }
 
 // Array of networks supported on each endpoint
 #define FIXED_NETWORKS                                                                                                             \
     {                                                                                                                              \
-        0                                                                                                                          \
+        0, 0                                                                                                                       \
     }
 
-#define EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_DECLARATIONS                                                               \
-    void emberAfPluginNetworkSteeringStackStatusCallback(EmberStatus status);
+#define EMBER_AF_GENERATED_PLUGIN_INIT_FUNCTION_DECLARATIONS                                                                       \
+    void emberAfPluginReportingInitCallback(void);                                                                                 \
+    void emberAfPluginBarrierControlServerInitCallback(void);                                                                      \
+    void emberAfPluginDoorLockServerInitCallback(void);
 
-#define EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_CALLS emberAfPluginNetworkSteeringStackStatusCallback(status);
+#define EMBER_AF_GENERATED_PLUGIN_INIT_FUNCTION_CALLS                                                                              \
+    emberAfPluginReportingInitCallback();                                                                                          \
+    emberAfPluginBarrierControlServerInitCallback();                                                                               \
+    emberAfPluginDoorLockServerInitCallback();
+
+#define EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_DECLARATIONS                                                               \
+    void emberAfPluginReportingStackStatusCallback(EmberStatus status);                                                            \
+    void emberAfPluginNetworkSteeringStackStatusCallback(EmberStatus status);                                                      \
+    void emberAfPluginIasZoneServerStackStatusCallback(EmberStatus status);
+
+#define EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_CALLS                                                                      \
+    emberAfPluginReportingStackStatusCallback(status);                                                                             \
+    emberAfPluginNetworkSteeringStackStatusCallback(status);                                                                       \
+    emberAfPluginIasZoneServerStackStatusCallback(status);
+
+#define EMBER_AF_GENERATED_PLUGIN_ZDO_MESSAGE_RECEIVED_FUNCTION_DECLARATIONS                                                       \
+    void emberAfPluginIasZoneClientZdoMessageReceivedCallback(EmberNodeId sender, EmberApsFrame * apsFrame, uint8_t * message,     \
+                                                              uint16_t length);
+
+#define EMBER_AF_GENERATED_PLUGIN_ZDO_MESSAGE_RECEIVED_FUNCTION_CALLS                                                              \
+    emberAfPluginIasZoneClientZdoMessageReceivedCallback(sender, apsFrame, message, length);
 
 // Generated data for the command discovery
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
-        { 0x0006, 0x00, COMMAND_MASK_INCOMING_SERVER },     /* On/off / Off */                                                     \
-            { 0x0006, 0x01, COMMAND_MASK_INCOMING_SERVER }, /* On/off / On */                                                      \
-            { 0x0006, 0x02, COMMAND_MASK_INCOMING_SERVER }, /* On/off / Toggle */                                                  \
+        { 0x0000, 0x00, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER },     /* Basic / ResetToFactoryDefaults */    \
+            { 0x0003, 0x00, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Identify / Identify */               \
+            { 0x0003, 0x00, COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* Identify / IdentifyQueryResponse */  \
+            { 0x0003, 0x01, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Identify / IdentifyQuery */          \
+            { 0x0004, 0x00, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Groups / AddGroup */                 \
+            { 0x0004, 0x00, COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* Groups / AddGroupResponse */         \
+            { 0x0004, 0x01, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Groups / ViewGroup */                \
+            { 0x0004, 0x01, COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* Groups / ViewGroupResponse */        \
+            { 0x0004, 0x02, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Groups / GetGroupMembership */       \
+            { 0x0004, 0x02,                                                                                                        \
+              COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* Groups / GetGroupMembershipResponse */             \
+            { 0x0004, 0x03, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Groups / RemoveGroup */              \
+            { 0x0004, 0x03, COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* Groups / RemoveGroupResponse */      \
+            { 0x0004, 0x04, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Groups / RemoveAllGroups */          \
+            { 0x0004, 0x05, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Groups / AddGroupIfIdentifying */    \
+            { 0x0005, 0x00, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Scenes / AddScene */                 \
+            { 0x0005, 0x00, COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* Scenes / AddSceneResponse */         \
+            { 0x0005, 0x01, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Scenes / ViewScene */                \
+            { 0x0005, 0x01, COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* Scenes / ViewSceneResponse */        \
+            { 0x0005, 0x02, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Scenes / RemoveScene */              \
+            { 0x0005, 0x02, COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* Scenes / RemoveSceneResponse */      \
+            { 0x0005, 0x03, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Scenes / RemoveAllScenes */          \
+            { 0x0005, 0x03, COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* Scenes / RemoveAllScenesResponse */  \
+            { 0x0005, 0x04, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Scenes / StoreScene */               \
+            { 0x0005, 0x04, COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* Scenes / StoreSceneResponse */       \
+            { 0x0005, 0x05, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Scenes / RecallScene */              \
+            { 0x0005, 0x06, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Scenes / GetSceneMembership */       \
+            { 0x0005, 0x06,                                                                                                        \
+              COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* Scenes / GetSceneMembershipResponse */             \
+            { 0x0005, 0x40, COMMAND_MASK_OUTGOING_CLIENT },                  /* Scenes / EnhancedAddScene */                       \
+            { 0x0005, 0x40, COMMAND_MASK_OUTGOING_SERVER },                  /* Scenes / EnhancedAddSceneResponse */               \
+            { 0x0005, 0x41, COMMAND_MASK_OUTGOING_CLIENT },                  /* Scenes / EnhancedViewScene */                      \
+            { 0x0005, 0x41, COMMAND_MASK_OUTGOING_SERVER },                  /* Scenes / EnhancedViewSceneResponse */              \
+            { 0x0005, 0x42, COMMAND_MASK_OUTGOING_CLIENT },                  /* Scenes / CopyScene */                              \
+            { 0x0005, 0x42, COMMAND_MASK_OUTGOING_SERVER },                  /* Scenes / CopySceneResponse */                      \
+            { 0x0006, 0x00, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* On/off / Off */                      \
+            { 0x0006, 0x01, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* On/off / On */                       \
+            { 0x0006, 0x02, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* On/off / Toggle */                   \
+            { 0x0008, 0x00, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Level Control / MoveToLevel */       \
+            { 0x0008, 0x01, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Level Control / Move */              \
+            { 0x0008, 0x02, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Level Control / Step */              \
+            { 0x0008, 0x03, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Level Control / Stop */              \
+            { 0x0008, 0x04,                                                                                                        \
+              COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Level Control / MoveToLevelWithOnOff */            \
+            { 0x0008, 0x05, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Level Control / MoveWithOnOff */     \
+            { 0x0008, 0x06, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Level Control / StepWithOnOff */     \
+            { 0x0008, 0x07, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Level Control / StopWithOnOff */     \
+            { 0x000B, 0x00, COMMAND_MASK_INCOMING_SERVER }, /* RSSI Location / SetAbsoluteLocation */                              \
+            { 0x000B, 0x00, COMMAND_MASK_INCOMING_CLIENT }, /* RSSI Location / DeviceConfigurationResponse */                      \
+            { 0x000B, 0x01, COMMAND_MASK_INCOMING_SERVER }, /* RSSI Location / SetDeviceConfiguration */                           \
+            { 0x000B, 0x01, COMMAND_MASK_INCOMING_CLIENT }, /* RSSI Location / LocationDataResponse */                             \
+            { 0x000B, 0x02, COMMAND_MASK_INCOMING_SERVER }, /* RSSI Location / GetDeviceConfiguration */                           \
+            { 0x000B, 0x02, COMMAND_MASK_INCOMING_CLIENT }, /* RSSI Location / LocationDataNotification */                         \
+            { 0x000B, 0x03, COMMAND_MASK_INCOMING_SERVER }, /* RSSI Location / GetLocationData */                                  \
+            { 0x000B, 0x03, COMMAND_MASK_INCOMING_CLIENT }, /* RSSI Location / CompactLocationDataNotification */                  \
+            { 0x000B, 0x04, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* RSSI Location / RssiResponse */      \
+            { 0x000B, 0x04, COMMAND_MASK_INCOMING_CLIENT },                                /* RSSI Location / RssiPing */          \
+            { 0x000B, 0x05, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* RSSI Location / SendPings */         \
+            { 0x000B, 0x05, COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* RSSI Location / RssiRequest */       \
+            { 0x000B, 0x06,                                                                                                        \
+              COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* RSSI Location / ReportRssiMeasurements */          \
+            { 0x000B, 0x06,                                                                                                        \
+              COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* RSSI Location / AnchorNodeAnnounce */              \
+            { 0x000B, 0x07,                                                                                                        \
+              COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* RSSI Location / RequestOwnLocation */              \
+            { 0x0015, 0x01, COMMAND_MASK_INCOMING_SERVER },                  /* Commissioning / SaveStartupParameters */           \
+            { 0x0016, 0x00, COMMAND_MASK_INCOMING_SERVER },                  /* Partition / TransferPartitionedFrame */            \
+            { 0x0016, 0x00, COMMAND_MASK_INCOMING_CLIENT },                  /* Partition / MultipleAck */                         \
+            { 0x0016, 0x01, COMMAND_MASK_INCOMING_SERVER },                  /* Partition / ReadHandshakeParam */                  \
+            { 0x0016, 0x01, COMMAND_MASK_INCOMING_CLIENT },                  /* Partition / ReadHandshakeParamResponse */          \
+            { 0x0016, 0x02, COMMAND_MASK_INCOMING_SERVER },                  /* Partition / WriteHandshakeParam */                 \
+            { 0x001A, 0x00, COMMAND_MASK_INCOMING_CLIENT },                  /* Power Profile / PowerProfileNotification */        \
+            { 0x001A, 0x00, COMMAND_MASK_INCOMING_SERVER },                  /* Power Profile / PowerProfileRequest */             \
+            { 0x001A, 0x01, COMMAND_MASK_INCOMING_CLIENT },                  /* Power Profile / PowerProfileResponse */            \
+            { 0x001A, 0x01, COMMAND_MASK_INCOMING_SERVER },                  /* Power Profile / PowerProfileStateRequest */        \
+            { 0x001A, 0x02, COMMAND_MASK_INCOMING_CLIENT },                  /* Power Profile / PowerProfileStateResponse */       \
+            { 0x001A, 0x02, COMMAND_MASK_INCOMING_SERVER },                  /* Power Profile / GetPowerProfilePriceResponse */    \
+            { 0x001A, 0x03,                                                                                                        \
+              COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* Power Profile / GetPowerProfilePrice */            \
+            { 0x001A, 0x03, COMMAND_MASK_INCOMING_SERVER },                  /* Power Profile / GetOverallSchedulePriceResponse */ \
+            { 0x001A, 0x04, COMMAND_MASK_INCOMING_CLIENT },                  /* Power Profile / PowerProfilesStateNotification */  \
+            { 0x001A, 0x04, COMMAND_MASK_INCOMING_SERVER }, /* Power Profile / EnergyPhasesScheduleNotification */                 \
+            { 0x001A, 0x05,                                                                                                        \
+              COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* Power Profile / GetOverallSchedulePrice */         \
+            { 0x001A, 0x05, COMMAND_MASK_INCOMING_SERVER },                  /* Power Profile / EnergyPhasesScheduleResponse */    \
+            { 0x001A, 0x06, COMMAND_MASK_INCOMING_CLIENT },                  /* Power Profile / EnergyPhasesScheduleRequest */     \
+            { 0x001A, 0x06, COMMAND_MASK_INCOMING_SERVER }, /* Power Profile / PowerProfileScheduleConstraintsRequest */           \
+            { 0x001A, 0x07, COMMAND_MASK_INCOMING_CLIENT }, /* Power Profile / EnergyPhasesScheduleStateResponse */                \
+            { 0x001A, 0x07, COMMAND_MASK_INCOMING_SERVER }, /* Power Profile / EnergyPhasesScheduleStateRequest */                 \
+            { 0x001A, 0x08, COMMAND_MASK_INCOMING_CLIENT }, /* Power Profile / EnergyPhasesScheduleStateNotification */            \
+            { 0x001A, 0x08, COMMAND_MASK_INCOMING_SERVER }, /* Power Profile / GetPowerProfilePriceExtendedResponse */             \
+            { 0x001A, 0x09, COMMAND_MASK_INCOMING_CLIENT }, /* Power Profile / PowerProfileScheduleConstraintsNotification */      \
+            { 0x001A, 0x0A, COMMAND_MASK_INCOMING_CLIENT }, /* Power Profile / PowerProfileScheduleConstraintsResponse */          \
+            { 0x001A, 0x0B,                                                                                                        \
+              COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* Power Profile / GetPowerProfilePriceExtended */    \
+            { 0x001B, 0x01, COMMAND_MASK_INCOMING_SERVER },                  /* Appliance Control / SignalState */                 \
+            { 0x0020, 0x02, COMMAND_MASK_OUTGOING_CLIENT },                  /* Poll Control / SetLongPollInterval */              \
+            { 0x0020, 0x03, COMMAND_MASK_OUTGOING_CLIENT },                  /* Poll Control / SetShortPollInterval */             \
+            { 0x0101, 0x00, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / LockDoor */              \
+            { 0x0101, 0x00, COMMAND_MASK_OUTGOING_SERVER },                                /* Door Lock / LockDoorResponse */      \
+            { 0x0101, 0x01, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / UnlockDoor */            \
+            { 0x0101, 0x01, COMMAND_MASK_OUTGOING_SERVER },                                /* Door Lock / UnlockDoorResponse */    \
+            { 0x0101, 0x03, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / UnlockWithTimeout */     \
+            { 0x0101, 0x04, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / GetLogRecord */          \
+            { 0x0101, 0x05, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / SetPin */                \
+            { 0x0101, 0x06, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / GetPin */                \
+            { 0x0101, 0x07, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / ClearPin */              \
+            { 0x0101, 0x08, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / ClearAllPins */          \
+            { 0x0101, 0x0B, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / SetWeekdaySchedule */    \
+            { 0x0101, 0x0C, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / GetWeekdaySchedule */    \
+            { 0x0101, 0x0D, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / ClearWeekdaySchedule */  \
+            { 0x0101, 0x0E, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / SetYeardaySchedule */    \
+            { 0x0101, 0x0F, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / GetYeardaySchedule */    \
+            { 0x0101, 0x10, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / ClearYeardaySchedule */  \
+            { 0x0101, 0x11, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / SetHolidaySchedule */    \
+            { 0x0101, 0x12, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / GetHolidaySchedule */    \
+            { 0x0101, 0x13, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / ClearHolidaySchedule */  \
+            { 0x0101, 0x14, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / SetUserType */           \
+            { 0x0101, 0x15, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / GetUserType */           \
+            { 0x0101, 0x16, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / SetRfid */               \
+            { 0x0101, 0x17, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / GetRfid */               \
+            { 0x0101, 0x18, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / ClearRfid */             \
+            { 0x0101, 0x19, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Door Lock / ClearAllRfids */         \
+            { 0x0102, 0x00, COMMAND_MASK_INCOMING_SERVER }, /* Window Covering / WindowCoveringUpOpen */                           \
+            { 0x0102, 0x01, COMMAND_MASK_INCOMING_SERVER }, /* Window Covering / WindowCoveringDownClose */                        \
+            { 0x0102, 0x02, COMMAND_MASK_INCOMING_SERVER }, /* Window Covering / WindowCoveringStop */                             \
+            { 0x0102, 0x04, COMMAND_MASK_INCOMING_SERVER }, /* Window Covering / WindowCoveringGoToLiftValue */                    \
+            { 0x0102, 0x05, COMMAND_MASK_INCOMING_SERVER }, /* Window Covering / WindowCoveringGoToLiftPercentage */               \
+            { 0x0102, 0x07, COMMAND_MASK_INCOMING_SERVER }, /* Window Covering / WindowCoveringGoToTiltValue */                    \
+            { 0x0102, 0x08, COMMAND_MASK_INCOMING_SERVER }, /* Window Covering / WindowCoveringGoToTiltPercentage */               \
+            { 0x0103, 0x00,                                                                                                        \
+              COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Barrier Control / BarrierControlGoToPercent */     \
+            { 0x0103, 0x01,                                                                                                        \
+              COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Barrier Control / BarrierControlStop */            \
+            { 0x0201, 0x00, COMMAND_MASK_INCOMING_SERVER },                  /* Thermostat / SetpointRaiseLower */                 \
+            { 0x0201, 0x01, COMMAND_MASK_INCOMING_SERVER },                  /* Thermostat / SetWeeklySchedule */                  \
+            { 0x0201, 0x02, COMMAND_MASK_INCOMING_SERVER },                  /* Thermostat / GetWeeklySchedule */                  \
+            { 0x0201, 0x03, COMMAND_MASK_INCOMING_SERVER },                  /* Thermostat / ClearWeeklySchedule */                \
+            { 0x0201, 0x04, COMMAND_MASK_INCOMING_SERVER },                  /* Thermostat / GetRelayStatusLog */                  \
+            { 0x0300, 0x00, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Color Control / MoveToHue */         \
+            { 0x0300, 0x01, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Color Control / MoveHue */           \
+            { 0x0300, 0x02, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Color Control / StepHue */           \
+            { 0x0300, 0x03, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Color Control / MoveToSaturation */  \
+            { 0x0300, 0x04, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Color Control / MoveSaturation */    \
+            { 0x0300, 0x05, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Color Control / StepSaturation */    \
+            { 0x0300, 0x06,                                                                                                        \
+              COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Color Control / MoveToHueAndSaturation */          \
+            { 0x0300, 0x07, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Color Control / MoveToColor */       \
+            { 0x0300, 0x08, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Color Control / MoveColor */         \
+            { 0x0300, 0x09, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Color Control / StepColor */         \
+            { 0x0300, 0x0A, COMMAND_MASK_INCOMING_SERVER }, /* Color Control / MoveToColorTemperature */                           \
+            { 0x0300, 0x47, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Color Control / StopMoveStep */      \
+            { 0x0300, 0x4B, COMMAND_MASK_INCOMING_SERVER }, /* Color Control / MoveColorTemperature */                             \
+            { 0x0300, 0x4C, COMMAND_MASK_INCOMING_SERVER }, /* Color Control / StepColorTemperature */                             \
+            { 0x0500, 0x00, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* IAS Zone / ZoneEnrollResponse */     \
+            { 0x0500, 0x00,                                                                                                        \
+              COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* IAS Zone / ZoneStatusChangeNotification */         \
+            { 0x0500, 0x01, COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* IAS Zone / ZoneEnrollRequest */      \
+            { 0x0800, 0x00, COMMAND_MASK_INCOMING_CLIENT }, /* Key Establishment / InitiateKeyEstablishmentResponse */             \
+            { 0x0800, 0x00, COMMAND_MASK_INCOMING_SERVER }, /* Key Establishment / InitiateKeyEstablishmentRequest */              \
+            { 0x0800, 0x01, COMMAND_MASK_INCOMING_CLIENT }, /* Key Establishment / EphemeralDataResponse */                        \
+            { 0x0800, 0x01, COMMAND_MASK_INCOMING_SERVER }, /* Key Establishment / EphemeralDataRequest */                         \
+            { 0x0800, 0x02, COMMAND_MASK_INCOMING_CLIENT }, /* Key Establishment / ConfirmKeyDataResponse */                       \
+            { 0x0800, 0x02, COMMAND_MASK_INCOMING_SERVER }, /* Key Establishment / ConfirmKeyDataRequest */                        \
+            { 0x0B02, 0x00, COMMAND_MASK_INCOMING_SERVER }, /* Appliance Events and Alert / GetAlerts */                           \
+            { 0x0B02, 0x00, COMMAND_MASK_INCOMING_CLIENT }, /* Appliance Events and Alert / GetAlertsResponse */                   \
+            { 0x0B02, 0x01, COMMAND_MASK_INCOMING_CLIENT }, /* Appliance Events and Alert / AlertsNotification */                  \
+            { 0x0B02, 0x02, COMMAND_MASK_INCOMING_CLIENT }, /* Appliance Events and Alert / EventsNotification */                  \
+            { 0x0B03, 0x00, COMMAND_MASK_INCOMING_SERVER }, /* Appliance Statistics / LogRequest */                                \
+            { 0x0B03, 0x00, COMMAND_MASK_INCOMING_CLIENT }, /* Appliance Statistics / LogNotification */                           \
+            { 0x0B03, 0x01, COMMAND_MASK_INCOMING_CLIENT }, /* Appliance Statistics / LogResponse */                               \
+            { 0x0B03, 0x02, COMMAND_MASK_INCOMING_CLIENT }, /* Appliance Statistics / LogQueueResponse */                          \
+            { 0x0B03, 0x03, COMMAND_MASK_INCOMING_CLIENT }, /* Appliance Statistics / StatisticsAvailable */                       \
     }
-#define EMBER_AF_GENERATED_COMMAND_COUNT (3)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (160)
 
 // Command manufacturer codes
 #define GENERATED_COMMAND_MANUFACTURER_CODES                                                                                       \
@@ -155,6 +555,10 @@
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS                                                                               \
     {                                                                                                                              \
         { EMBER_ZCL_REPORTING_DIRECTION_REPORTED, 1, 0x0006, 0x0000, CLUSTER_MASK_SERVER, 0x0000, 1, 65534, 0 },                   \
+            { EMBER_ZCL_REPORTING_DIRECTION_REPORTED, 1, 0x0008, 0x0000, CLUSTER_MASK_SERVER, 0x0000, 1, 65534, 0 },               \
+            { EMBER_ZCL_REPORTING_DIRECTION_REPORTED, 1, 0x0101, 0x0000, CLUSTER_MASK_SERVER, 0x0000, 1, 65534, 0 },               \
+            { EMBER_ZCL_REPORTING_DIRECTION_REPORTED, 1, 0x0300, 0x0003, CLUSTER_MASK_SERVER, 0x0000, 1, 65534, 0 },               \
+            { EMBER_ZCL_REPORTING_DIRECTION_REPORTED, 1, 0x0300, 0x0004, CLUSTER_MASK_SERVER, 0x0000, 1, 65534, 0 },               \
     }
-#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (1)
+#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (5)
 #endif // SILABS_AF_ENDPOINT_CONFIG

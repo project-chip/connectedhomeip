@@ -39,9 +39,40 @@
 // will be used in the case where user defined implementations
 // of the callbacks have not been provided.
 #include "af.h"
+#include "callback.h"
+
 #include <assert.h>
 //#include "hal/hal.h"
 //#include EMBER_AF_API_NETWORK_STEERING
+
+/** @brief On/off Cluster Server Post Init
+ *
+ * Following resolution of the On/Off state at startup for this endpoint,
+ * perform any additional initialization needed; e.g., synchronize hardware
+ * state.
+ *
+ * @param endpoint Endpoint that is being initialized  Ver.: always
+ */
+void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint) {}
+
+/** @brief Level Control Cluster Server Post Init
+ *
+ * Following resolution of the Current Level at startup for this endpoint,
+ * perform any additional initialization needed; e.g., synchronize hardware
+ * state.
+ *
+ * @param endpoint Endpoint that is being initialized  Ver.: always
+ */
+void emberAfPluginLevelControlClusterServerPostInitCallback(uint8_t endpoint) {}
+
+/** @brief Level Control Coupled Color Temp Change
+ *
+ * Adjust Color Control cluster Color Temperature in response to a change in
+ * Level Control cluster CurrentLevel.
+ *
+ * @param endpoint Endpoint that is being initialized  Ver.: always
+ */
+void emberAfPluginLevelControlCoupledColorTempChangeCallback(uint8_t endpoint) {}
 
 /** @brief Add To Current App Tasks
  *
@@ -896,17 +927,6 @@ bool emberAfKeyEstablishmentCallback(EmberAfKeyEstablishmentNotifyMessage status
     return true;
 }
 
-/** @brief On/off Cluster Level Control Effect
- *
- * This is called by the framework when the on/off cluster initiates a command
- * that must effect a level control change. The implementation assumes that the
- * client will handle any effect on the On/Off Cluster.
- *
- * @param endpoint   Ver.: always
- * @param newValue   Ver.: always
- */
-void emberAfOnOffClusterLevelControlEffectCallback(uint8_t endpoint, bool newValue) {}
-
 /** @brief Main Init
  *
  * This function is called from the application's main function. It gives the
@@ -1099,7 +1119,8 @@ EmberAfImageVerifyStatus emberAfOtaClientCustomVerifyCallback(bool newVerificati
     // 2) EMBER_AF_IMAGE_BAD  - the image is not valid
     // 3) EMBER_AF_IMAGE_VERIFY_IN_PROGRESS - the image is valid so far, but more
     //      checks are needed.  This callback shall be re-executed later to
-    //      continue verification.  This allows other code in the framework to run.
+    //      continue verification.  This allows other code in the framework to
+    //      run.
     return EMBER_AF_IMAGE_GOOD;
 }
 
@@ -1290,10 +1311,11 @@ bool emberAfOtaServerIncomingMessageRawCallback(EmberAfClusterCommand * message)
 uint8_t emberAfOtaServerQueryCallback(const EmberAfOtaImageId * currentImageId, uint16_t * hardwareVersion,
                                       EmberAfOtaImageId * nextUpgradeImageId)
 {
-    // If a new software image is available, this function should return EMBER_ZCL_STATUS_SUCCESS
-    // and populate the 'nextUpgradeImageId' structure with the appropriate values.
-    // If no new software image is available (i.e. the client should not download a firmware image)
-    // then the server should return EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE.
+    // If a new software image is available, this function should return
+    // EMBER_ZCL_STATUS_SUCCESS and populate the 'nextUpgradeImageId' structure
+    // with the appropriate values. If no new software image is available (i.e.
+    // the client should not download a firmware image) then the server should
+    // return EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE.
     return EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE;
 }
 
@@ -1382,7 +1404,8 @@ bool emberAfOtaServerUpgradeEndRequestCallback(EmberNodeId source, uint8_t statu
 EmberAfOtaStorageStatus emberAfOtaStorageCheckTempDataCallback(uint32_t * currentOffset, uint32_t * totalImageSize,
                                                                EmberAfOtaImageId * newFileInfo)
 {
-    // If the image data cannot be successfully verified, an error should be returned.
+    // If the image data cannot be successfully verified, an error should be
+    // returned.
     return EMBER_AF_OTA_STORAGE_ERROR;
 }
 
@@ -1419,8 +1442,8 @@ void emberAfOtaStorageCloseCallback(void)
  */
 void emberAfOtaStorageDriverDownloadFinishCallback(uint32_t offset)
 {
-    // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
-    // Please implement me.
+    // The storage driver and the rest of the OTA bootload code will not function
+    // correctly unless it is implemnted. Please implement me.
     assert(false);
 }
 
@@ -1431,8 +1454,8 @@ void emberAfOtaStorageDriverDownloadFinishCallback(uint32_t offset)
  */
 bool emberAfOtaStorageDriverInitCallback(void)
 {
-    // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
-    // Please implement me.
+    // The storage driver and the rest of the OTA bootload code will not function
+    // correctly unless it is implemnted. Please implement me.
     assert(false);
     return false;
 }
@@ -1446,8 +1469,8 @@ bool emberAfOtaStorageDriverInitCallback(void)
  */
 EmberAfOtaStorageStatus emberAfOtaStorageDriverInvalidateImageCallback(void)
 {
-    // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
-    // Please implement me.
+    // The storage driver and the rest of the OTA bootload code will not function
+    // correctly unless it is implemnted. Please implement me.
     assert(false);
     return EMBER_AF_OTA_STORAGE_ERROR;
 }
@@ -1479,8 +1502,8 @@ EmberAfOtaStorageStatus emberAfOtaStorageDriverPrepareToResumeDownloadCallback(v
  */
 bool emberAfOtaStorageDriverReadCallback(uint32_t offset, uint32_t length, uint8_t * returnData)
 {
-    // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
-    // Please implement me.
+    // The storage driver and the rest of the OTA bootload code will not function
+    // correctly unless it is implemnted. Please implement me.
     assert(false);
     return false;
 }
@@ -1494,8 +1517,8 @@ bool emberAfOtaStorageDriverReadCallback(uint32_t offset, uint32_t length, uint8
  */
 uint32_t emberAfOtaStorageDriverRetrieveLastStoredOffsetCallback(void)
 {
-    // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
-    // Please implement me.
+    // The storage driver and the rest of the OTA bootload code will not function
+    // correctly unless it is implemnted. Please implement me.
     assert(false);
     return 0;
 }
@@ -1514,8 +1537,8 @@ uint32_t emberAfOtaStorageDriverRetrieveLastStoredOffsetCallback(void)
  */
 bool emberAfOtaStorageDriverWriteCallback(const uint8_t * dataToWrite, uint32_t offset, uint32_t length)
 {
-    // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
-    // Please implement me.
+    // The storage driver and the rest of the OTA bootload code will not function
+    // correctly unless it is implemnted. Please implement me.
     assert(false);
     return false;
 }
@@ -1592,10 +1615,11 @@ EmberAfOtaStorageStatus emberAfOtaStorageInitCallback(void)
  */
 EmberAfOtaImageId emberAfOtaStorageIteratorFirstCallback(void)
 {
-    // It is expected that the storage module maintain its own internal iterator that the 'first' and 'next' functions will
-    // manipulate.
+    // It is expected that the storage module maintain its own internal iterator
+    // that the 'first' and 'next' functions will manipulate.
 
-    // If there are no images at all, this function should return the invalid image id.
+    // If there are no images at all, this function should return the invalid
+    // image id.
     return emberAfInvalidImageId;
 }
 
@@ -1608,10 +1632,11 @@ EmberAfOtaImageId emberAfOtaStorageIteratorFirstCallback(void)
  */
 EmberAfOtaImageId emberAfOtaStorageIteratorNextCallback(void)
 {
-    // It is expected that the storage module maintain its own internal iterator that the 'first' and 'next' functions will
-    // manipulate.
+    // It is expected that the storage module maintain its own internal iterator
+    // that the 'first' and 'next' functions will manipulate.
 
-    // If there are no more images, this function should return the invalid image id.
+    // If there are no more images, this function should return the invalid image
+    // id.
     return emberAfInvalidImageId;
 }
 
@@ -1658,7 +1683,8 @@ EmberAfOtaStorageStatus emberAfOtaStorageReadImageDataCallback(const EmberAfOtaI
  */
 EmberAfOtaImageId emberAfOtaStorageSearchCallback(uint16_t manufacturerId, uint16_t imageTypeId, const uint16_t * hardwareVersion)
 {
-    // If no image is found that matches the search criteria, this function should return the invalid image id.
+    // If no image is found that matches the search criteria, this function should
+    // return the invalid image id.
     return emberAfInvalidImageId;
 }
 
@@ -1752,9 +1778,9 @@ bool emberAfPerformingKeyEstablishmentCallback(void)
 
 /** @brief Get Distributed Key
  *
- * This callback is fired when the Network Steering plugin needs to set the distributed
- * key. The application set the distributed key from Zigbee Alliance thru this callback
- * or the network steering will use the default test key.
+ * This callback is fired when the Network Steering plugin needs to set the
+ * distributed key. The application set the distributed key from Zigbee Alliance
+ * thru this callback or the network steering will use the default test key.
  *
  * @param pointer to the distributed key struct
  * @return true if the key is loaded successfully, otherwise false.
@@ -2281,24 +2307,6 @@ void emberAfSetSourceRouteOverheadCallback(EmberNodeId destination, uint8_t over
  * @param utcTime   Ver.: always
  */
 void emberAfSetTimeCallback(uint32_t utcTime) {}
-
-// Ifdef out emberAfOnOffClusterSetValueCallback, since it's implemented by
-// on-off.c
-#if 0
-/** @brief On/off Cluster Set Value
- *
- * This function is called when the on/off value needs to be set, either through
- * normal channels or as a result of a level change.
- *
- * @param endpoint   Ver.: always
- * @param command   Ver.: always
- * @param initiatedByLevelChange   Ver.: always
- */
-EmberAfStatus emberAfOnOffClusterSetValueCallback(uint8_t endpoint, uint8_t command, bool initiatedByLevelChange)
-{
-    return EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND;
-}
-#endif
 
 /** @brief Set Wake Timeout Bitmask
  *

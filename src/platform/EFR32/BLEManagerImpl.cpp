@@ -524,7 +524,7 @@ void BLEManagerImpl::DriveBLEState(void)
     }
 
     // Otherwise, stop advertising if it is enabled.
-    else if (GetFlag(mFlags, kFlag_AdvertisingEnabled))
+    else if (GetFlag(mFlags, kFlag_Advertising))
     {
         err = StopAdvertising();
         SuccessOrExit(err);
@@ -621,6 +621,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     err = ConfigureAdvertisingData();
     SuccessOrExit(err);
 
+    SetFlag(mFlags, kFlag_Advertising, true);
     ClearFlag(mFlags, kFlag_RestartAdvertising);
 
     interval_min = interval_max =
@@ -720,7 +721,7 @@ void BLEManagerImpl::HandleConnectionCloseEvent(volatile struct gecko_cmd_packet
 
         // Arrange to re-enable connectable advertising in case it was disabled due to the
         // maximum connection limit being reached.
-        ClearFlag(mFlags, kFlag_Advertising);
+        SetFlag(mFlags, kFlag_RestartAdvertising, true);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 }
