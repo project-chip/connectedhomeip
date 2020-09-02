@@ -79,6 +79,9 @@ efr32_executable("lock_app") {
     "${chip_root}/src/app/util/process-cluster-message.c",
     "${chip_root}/src/app/util/process-global-message.c",
     "${chip_root}/src/app/util/util.c",
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}/hal-config.h",
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
     "src/AppTask.cpp",
     "src/BoltLockManager.cpp",
     "src/ButtonHandler.cpp",
@@ -89,9 +92,6 @@ efr32_executable("lock_app") {
     "src/gen/callback-stub.c",
     "src/gen/znet-bookkeeping.c",
     "src/main.cpp",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}/hal-config.h",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
   ]
 
   output_dir = root_out_dir
