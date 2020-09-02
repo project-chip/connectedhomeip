@@ -127,26 +127,6 @@ CHIP_ERROR BLEManagerImpl::_PlatformInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-#if NRF_LOG_ENABLED
-
-    // Initialize logging component
-    err = NRF_LOG_INIT(LogTimestamp, 1000);
-    SuccessOrExit(err);
-
-    // Initialize logging backends
-    NRF_LOG_DEFAULT_BACKENDS_INIT();
-#endif
-
-    NRF_LOG_INFO("==================================================");
-    NRF_LOG_INFO("chip-nrf52840-lock-example starting");
-#if BUILD_RELEASE
-    NRF_LOG_INFO("*** PSEUDO-RELEASE BUILD ***");
-#else
-    NRF_LOG_INFO("*** DEVELOPMENT BUILD ***");
-#endif
-    NRF_LOG_INFO("==================================================");
-    NRF_LOG_FLUSH();
-
 #if defined(SOFTDEVICE_PRESENT)
 
     err = nrf_sdh_enable_request();
@@ -191,6 +171,9 @@ CHIP_ERROR BLEManagerImpl::_Init()
     {
         mSubscribedConIds[i] = BLE_CONNECTION_UNINITIALIZED;
     }
+
+    NRF_LOG_INFO("Starting BLE initialization");
+    NRF_LOG_FLUSH();
 
     // Initialize the CHIP BleLayer.
     err = BleLayer::Init(this, this, &SystemLayer);

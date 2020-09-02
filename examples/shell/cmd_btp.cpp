@@ -89,13 +89,11 @@ int cmd_btp_scan(int argc, char ** argv)
     {
         streamer_printf(sout, "Starting scanning over BLE");
         // TODO: start scanning
-        SuccessOrExit(error = CHIP_NO_ERROR);
     }
     else if (strcmp(argv[0], "stop") == 0)
     {
         streamer_printf(sout, "Stopping scanning over BLE");
         // TODO: stop scanning
-        SuccessOrExit(error = CHIP_NO_ERROR);
     }
     else
     {
@@ -120,13 +118,11 @@ int cmd_btp_connect(int argc, char ** argv)
     {
         streamer_printf(sout, "Connecting to the device over BLE");
         // connecting
-        SuccessOrExit(error = CHIP_NO_ERROR);
     }
     else if (strcmp(argv[0], "stop") == 0)
     {
         streamer_printf(sout, "Disconnecting from the device");
         // disconnecting
-        SuccessOrExit(error = CHIP_NO_ERROR);
     }
     else
     {
