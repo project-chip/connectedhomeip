@@ -50,6 +50,10 @@
 //#include "hal/hal.h"
 //#include EMBER_AF_API_NETWORK_STEERING
 
+#ifdef __cplusplus
+extern "C" {
+#endif // #ifdef __cplusplus
+
 /** @name Non-Cluster Related Callbacks */
 // @{
 /** @brief Add To Current App Tasks
@@ -23774,4 +23778,8 @@ void halSleepCallback(bool enter, SleepModes sleepMode);
 /** @} END HAL Library Plugin Callbacks */
 
 /** @} END addtogroup */
+#ifdef __cplusplus
+}
+#endif // #ifdef __cplusplus
+
 #endif // SILABS_EMBER_AF_CALLBACK_PROTOTYPES

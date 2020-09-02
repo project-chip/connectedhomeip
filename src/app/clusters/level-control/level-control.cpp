@@ -38,19 +38,21 @@
  *******************************************************************************
  ******************************************************************************/
 
-// this file contains all the common includes for clusters in the util
-#include "app/framework/include/af.h"
-
 // clusters specific header
 #include "level-control.h"
 
+// this file contains all the common includes for clusters in the util
+#include <app/util/af.h>
+
 #ifdef EMBER_AF_PLUGIN_REPORTING
-#include "app/framework/plugin/reporting/reporting.h"
+#include <app/reporting/reporting.h>
 #endif
 
 #ifdef EMBER_AF_PLUGIN_ZLL_LEVEL_CONTROL_SERVER
 #include "app/framework/plugin/zll-level-control-server/zll-level-control-server.h"
 #endif // EMBER_AF_PLUGIN_ZLL_LEVEL_CONTROL_SERVER
+
+#include <assert.h>
 
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL_ATTRIBUTE
 static bool areStartUpLevelControlServerAttributesTokenized(uint8_t endpoint);
@@ -145,7 +147,7 @@ static void reallyUpdateCoupledColorTemp(uint8_t endpoint)
 }
 #endif // LEVEL...OPTIONS_ATTRIBUTE && COLOR...SERVER_TEMP
 
-void emberAfLevelControlClusterServerTickCallback(uint8_t endpoint)
+extern "C" void emberAfLevelControlClusterServerTickCallback(uint8_t endpoint)
 {
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
@@ -386,8 +388,8 @@ static bool shouldExecuteIfOff(uint8_t endpoint, uint8_t commandId, uint8_t opti
 #endif
 }
 
-bool emberAfLevelControlClusterMoveToLevelCallback(uint8_t level, uint16_t transitionTime, uint8_t optionMask,
-                                                   uint8_t optionOverride)
+extern "C" bool emberAfLevelControlClusterMoveToLevelCallback(uint8_t level, uint16_t transitionTime, uint8_t optionMask,
+                                                              uint8_t optionOverride)
 {
     emberAfLevelControlClusterPrintln("%pMOVE_TO_LEVEL %x %2x %x %x", "RX level-control:", level, transitionTime, optionMask,
                                       optionOverride);
@@ -396,7 +398,7 @@ bool emberAfLevelControlClusterMoveToLevelCallback(uint8_t level, uint16_t trans
     return true;
 }
 
-bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(uint8_t level, uint16_t transitionTime)
+extern "C" bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(uint8_t level, uint16_t transitionTime)
 {
     emberAfLevelControlClusterPrintln("%pMOVE_TO_LEVEL_WITH_ON_OFF %x %2x", "RX level-control:", level, transitionTime);
     moveToLevelHandler(ZCL_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND_ID, level, transitionTime, 0xFF, 0xFF,
@@ -404,43 +406,43 @@ bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(uint8_t level, uint1
     return true;
 }
 
-bool emberAfLevelControlClusterMoveCallback(uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride)
+extern "C" bool emberAfLevelControlClusterMoveCallback(uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride)
 {
     emberAfLevelControlClusterPrintln("%pMOVE %x %x", "RX level-control:", moveMode, rate);
     moveHandler(ZCL_MOVE_COMMAND_ID, moveMode, rate, optionMask, optionOverride);
     return true;
 }
 
-bool emberAfLevelControlClusterMoveWithOnOffCallback(uint8_t moveMode, uint8_t rate)
+extern "C" bool emberAfLevelControlClusterMoveWithOnOffCallback(uint8_t moveMode, uint8_t rate)
 {
     emberAfLevelControlClusterPrintln("%pMOVE_WITH_ON_OFF %x %x", "RX level-control:", moveMode, rate);
     moveHandler(ZCL_MOVE_WITH_ON_OFF_COMMAND_ID, moveMode, rate, 0xFF, 0xFF);
     return true;
 }
 
-bool emberAfLevelControlClusterStepCallback(uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask,
-                                            uint8_t optionOverride)
+extern "C" bool emberAfLevelControlClusterStepCallback(uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime,
+                                                       uint8_t optionMask, uint8_t optionOverride)
 {
     emberAfLevelControlClusterPrintln("%pSTEP %x %x %2x", "RX level-control:", stepMode, stepSize, transitionTime);
     stepHandler(ZCL_STEP_COMMAND_ID, stepMode, stepSize, transitionTime, optionMask, optionOverride);
     return true;
 }
 
-bool emberAfLevelControlClusterStepWithOnOffCallback(uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime)
+extern "C" bool emberAfLevelControlClusterStepWithOnOffCallback(uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime)
 {
     emberAfLevelControlClusterPrintln("%pSTEP_WITH_ON_OFF %x %x %2x", "RX level-control:", stepMode, stepSize, transitionTime);
     stepHandler(ZCL_STEP_WITH_ON_OFF_COMMAND_ID, stepMode, stepSize, transitionTime, 0xFF, 0xFF);
     return true;
 }
 
-bool emberAfLevelControlClusterStopCallback(uint8_t optionMask, uint8_t optionOverride)
+extern "C" bool emberAfLevelControlClusterStopCallback(uint8_t optionMask, uint8_t optionOverride)
 {
     emberAfLevelControlClusterPrintln("%pSTOP", "RX level-control:");
     stopHandler(ZCL_STOP_COMMAND_ID, optionMask, optionOverride);
     return true;
 }
 
-bool emberAfLevelControlClusterStopWithOnOffCallback(void)
+extern "C" bool emberAfLevelControlClusterStopWithOnOffCallback(void)
 {
     emberAfLevelControlClusterPrintln("%pSTOP_WITH_ON_OFF", "RX level-control:");
     stopHandler(ZCL_STOP_WITH_ON_OFF_COMMAND_ID, 0xFF, 0xFF);
@@ -483,11 +485,11 @@ static void moveToLevelHandler(uint8_t commandId, uint8_t level, uint16_t transi
 
     // Move To Level commands cause the device to move from its current level to
     // the specified level at the specified rate.
-    if (MAX_LEVEL < level)
+    if (MAX_LEVEL <= level)
     {
         state->moveToLevel = MAX_LEVEL;
     }
-    else if (level < MIN_LEVEL)
+    else if (level <= MIN_LEVEL)
     {
         state->moveToLevel = MIN_LEVEL;
     }
@@ -595,7 +597,7 @@ static void moveHandler(uint8_t commandId, uint8_t moveMode, uint8_t rate, uint8
         goto send_default_response;
     }
 
-    if (!shouldExecuteIfOff(endpoint, commandId, optionMask, optionOverride))
+    if (rate == 0 || !shouldExecuteIfOff(endpoint, commandId, optionMask, optionOverride))
     {
         status = EMBER_ZCL_STATUS_SUCCESS;
         goto send_default_response;
@@ -650,16 +652,34 @@ static void moveHandler(uint8_t commandId, uint8_t moveMode, uint8_t rate, uint8
         }
     }
 
-    // If the Rate field is 0xFF, the device should move as fast as it is able.
-    // Otherwise, the rate is in units per second.
+    // If the Rate field is 0xFF, the device should move at the default move rate, if available,
+    // Otherwise, move as fast as possible
     if (rate == 0xFF)
     {
-        state->eventDurationMs = FASTEST_TRANSITION_TIME_MS;
+        uint16_t defaultMoveRate;
+        status = emberAfReadServerAttribute(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_DEFAULT_MOVE_RATE_ATTRIBUTE_ID,
+                                            (uint8_t *) &defaultMoveRate, sizeof(defaultMoveRate));
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            emberAfLevelControlClusterPrintln("ERR: reading default move rate %x", status);
+            state->eventDurationMs = FASTEST_TRANSITION_TIME_MS;
+        }
+        else
+        {
+            // nonsensical case, means "don't move", so we're done
+            if (defaultMoveRate == 0)
+            {
+                status = EMBER_ZCL_STATUS_SUCCESS;
+                goto send_default_response;
+            }
+            state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / defaultMoveRate;
+        }
     }
     else
     {
         state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / rate;
     }
+
     state->transitionTimeMs = difference * state->eventDurationMs;
     state->elapsedTimeMs    = 0;
 
@@ -904,7 +924,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(uint8_t endpoint, bool newVal
     }
 }
 
-void emberAfLevelControlClusterServerInitCallback(uint8_t endpoint)
+extern "C" void emberAfLevelControlClusterServerInitCallback(uint8_t endpoint)
 {
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL_ATTRIBUTE
     // StartUp behavior relies StartUpCurrentLevel attributes being tokenized.
