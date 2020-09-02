@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//gn/build/config/android_abi.gni")
 import("//gn/chip/java/rules.gni")
 
 shared_library("jni") {
@@ -25,7 +26,7 @@ shared_library("jni") {
     "//src/setup_payload",
   ]
 
-  output_dir = "${root_out_dir}/lib"
+  output_dir = "${root_out_dir}/lib/jni/${android_abi}"
 }
 
 java_library("java") {
