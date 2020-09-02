@@ -33,23 +33,25 @@ bool emberAfIdentifyClusterIdentifyQueryResponseCallback(uint16_t timeout)
     return false;
 }
 
-/** @brief Barrier Control Cluster Barrier Control Stop
+/** @brief Identify Cluster Start Feedback Callback
  *
  *
  *
+ * @param endpoint Endpoint id
+ * @param identifyTime Identify time
  */
-bool emberAfBarrierControlClusterBarrierControlStopCallback(void)
+bool emberAfPluginIdentifyStartFeedbackCallback(uint8_t endpoint, uint16_t identifyTime)
 {
     return false;
 }
 
-/** @brief Barrier Control Cluster Barrier Control Go To Percent
+/** @brief Identify Cluster Stop Feedback Callback
  *
  *
  *
- * @param percentOpen   Ver.: always
+ * @param endpoint Endpoint id
  */
-bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(uint8_t percentOpen)
+bool emberAfPluginIdentifyStopFeedbackCallback(uint8_t endpoint)
 {
     return false;
 }
@@ -716,27 +718,6 @@ bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(uint16_t zoneStat
     return false;
 }
 
-/** @brief Identify Cluster Identify
- *
- *
- *
- * @param identifyTime   Ver.: always
- */
-bool emberAfIdentifyClusterIdentifyCallback(uint16_t identifyTime)
-{
-    return false;
-}
-
-/** @brief Identify Cluster Identify Query
- *
- *
- *
- */
-bool emberAfIdentifyClusterIdentifyQueryCallback(void)
-{
-    return false;
-}
-
 /** @brief Scenes Cluster Add Scene
  *
  *
@@ -926,10 +907,6 @@ EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(uint8_t end
 {
     return EMBER_ZCL_STATUS_SUCCESS;
 }
-void emberAfIdentifyClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId) {}
-void emberAfIdentifyClusterServerInitCallback(uint8_t endpoint) {}
-
-void emberAfPluginBarrierControlServerInitCallback(void) {}
 
 void emberAfPluginDoorLockServerInitCallback(void) {}
 void emberAfPluginReportingInitCallback(void) {}

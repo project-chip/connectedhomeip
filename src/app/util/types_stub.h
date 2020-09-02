@@ -1907,4 +1907,19 @@ typedef struct
 #define emberAfPrintEnabled(...) false
 
 #define emberAfPrintActiveArea EMBER_AF_PRINT_CORE
+
+/**
+ * @brief Returns the value of \c bit within the register or byte \c reg.
+ */
+#define READBIT(reg, bit) ((reg) & (BIT(bit)))
+
+/**
+ * @brief Returns the value of the bitmask \c bits within
+ * the register or byte \c reg.
+ */
+#define READBITS(reg, bits) ((reg) & (bits))
+
+#define MILLISECOND_TICKS_PER_SECOND 1000
+#define MILLISECOND_TICKS_PER_DECISECOND (MILLISECOND_TICKS_PER_SECOND / 10)
+
 #endif // TYPES_STUB_H
