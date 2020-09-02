@@ -16,6 +16,7 @@
  */
 
 #include "RendezvousMessageHandler.h"
+#include <platform/ESP32/ESP32Utils.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
@@ -27,18 +28,23 @@ extern CHIP_ERROR SetWiFiStationProvisioning(char * ssid, char * key);
 CHIP_ERROR RendezvousMessageHandler::HandleMessageReceived(System::PacketBuffer * buffer)
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
-    const size_t bufferLen = buffer->DataLength();
+    bool isWiFiCredentials = false;
     char * key             = nullptr;
     char * ssid            = nullptr;
-    char msg[bufferLen];
-
-    msg[bufferLen] = 0;
-    memcpy(msg, buffer->Start(), bufferLen);
-    ChipLogProgress(NetworkProvisioning, "RendezvousMessageHandler: Receive message: %s", msg);
 
     // Pending definition of an actual message format, WiFi credentials have the form
     // ‘::SSID:password:’, where ‘:’ can be any single ASCII character.
-    bool isWiFiCredentials = ((bufferLen > 3) && (msg[0] == msg[1]) && (msg[0] == msg[bufferLen - 1]));
+    constexpr size_t maxBufferLen =
+        4 + chip::DeviceLayer::Internal::kMaxWiFiSSIDLength + chip::DeviceLayer::Internal::kMaxWiFiKeyLength;
+    char msg[maxBufferLen];
+
+    const size_t bufferLen = buffer->DataLength();
+    VerifyOrExit(bufferLen < sizeof msg, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    memcpy(msg, buffer->Start(), bufferLen);
+    msg[bufferLen] = 0;
+    ChipLogProgress(NetworkProvisioning, "RendezvousMessageHandler: Receive message: %s", msg);
+
+    isWiFiCredentials = ((bufferLen > 3) && (msg[0] == msg[1]) && (msg[0] == msg[bufferLen - 1]));
     VerifyOrExit(isWiFiCredentials, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     msg[1] = 0;
