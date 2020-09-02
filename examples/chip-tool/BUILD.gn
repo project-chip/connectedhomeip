@@ -38,6 +38,7 @@ executable("chip-tool-server") {
     "${chip_root}/src/app/util/attribute-size.c",
     "${chip_root}/src/app/util/attribute-storage.c",
     "${chip_root}/src/app/util/attribute-table.c",
+    "${chip_root}/src/app/util/binding-table.cpp",
     "${chip_root}/src/app/util/chip-response.cpp",
     "${chip_root}/src/app/util/client-api.c",
     "${chip_root}/src/app/util/ember-print.cpp",

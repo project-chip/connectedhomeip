@@ -45,7 +45,8 @@
 // * Copyright 2010 by Ember Corporation. All rights reserved.              *80*
 // *******************************************************************
 
-#include "app/framework/include/af.h"
+#include <app/util/af.h>
+#include <app/util/binding-table.h>
 
 static bool isGroupPresent(uint8_t endpoint, uint16_t groupId);
 
@@ -385,7 +386,7 @@ bool emberAfGroupsClusterEndpointInGroupCallback(uint8_t endpoint, uint16_t grou
 
 void emberAfGroupsClusterClearGroupTableCallback(uint8_t endpoint)
 {
-    uint8_t i, networkIndex = emberGetCurrentNetwork();
+    uint8_t i, networkIndex = 0 /* emberGetCurrentNetwork() */;
     for (i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
     {
         EmberBindingTableEntry binding;
