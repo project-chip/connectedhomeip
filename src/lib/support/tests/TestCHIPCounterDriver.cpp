@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,28 +18,18 @@
 
 /**
  *    @file
- *      This file declares test entry points for CHIP support library
- *      unit tests.
+ *      Unit tests driver for the Chip Counter API.
  *
  */
 
-#ifndef TESTSUPPORT_H
-#define TESTSUPPORT_H
+#include "TestSupport.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <nlunit-test.h>
 
-int TestCHIPArgParser(void);
-int TestErrorStr(void);
-int TestTimeUtils(void);
-int TestMemAlloc(void);
-int TestBufBound(void);
-int TestCHIPCounter(void);
-int TestPersistedCounter(int argc, char * argv[]);
+int main(int argc, char * argv[])
+{
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nl_test_set_output_style(OUTPUT_CSV);
 
-#ifdef __cplusplus
+    return TestCHIPCounter();
 }
-#endif
-
-#endif // TESTSUPPORT_H
