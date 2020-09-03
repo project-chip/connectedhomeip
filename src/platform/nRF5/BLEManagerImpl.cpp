@@ -106,18 +106,6 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 #define CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY 3
 #endif // CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
 
-#if defined(SOFTDEVICE_PRESENT)
-
-static void OnSoCEvent(uint32_t sys_evt, void * p_context)
-{
-#if CHIP_ENABLE_OPENTHREAD
-    otSysSoftdeviceSocEvtHandler(sys_evt);
-#endif
-    UNUSED_PARAMETER(p_context);
-}
-
-#endif // defined(SOFTDEVICE_PRESENT)
-
 static uint32_t LogTimestamp(void)
 {
     return 0;
@@ -125,36 +113,14 @@ static uint32_t LogTimestamp(void)
 
 CHIP_ERROR BLEManagerImpl::_PlatformInit()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-#if defined(SOFTDEVICE_PRESENT)
-
-    err = nrf_sdh_enable_request();
-    SuccessOrExit(err);
-
-    while (!nrf_sdh_is_enabled())
+    if (!nrf_sdh_is_enabled())
     {
+        return CHIP_ERROR_WELL_UNINITIALIZED;
     }
-
-    // Register a handler for SOC events.
-    NRF_SDH_SOC_OBSERVER(m_soc_observer, NRF_SDH_SOC_STACK_OBSERVER_PRIO, OnSoCEvent, NULL);
-
+    else
     {
-        uint32_t appRAMStart = 0;
-
-        // Configure the BLE stack using the default settings.
-        // Fetch the start address of the application RAM.
-        err = nrf_sdh_ble_default_cfg_set(CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG, &appRAMStart);
-        SuccessOrExit(err);
-
-        // Enable BLE stack.
-        err = nrf_sdh_ble_enable(&appRAMStart);
-        SuccessOrExit(err);
+        return CHIP_NO_ERROR;
     }
-#endif // defined(SOFTDEVICE_PRESENT)
-
-exit:
-    return err;
 }
 
 CHIP_ERROR BLEManagerImpl::_Init()
