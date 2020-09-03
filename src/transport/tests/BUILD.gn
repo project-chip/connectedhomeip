@@ -48,6 +48,6 @@ chip_test_suite("tests") {
     "TestSecurePairingSession",
     "TestSecureSession",
     "TestSecureSessionMgr",
-    "TestUDP"
+    "TestUDP",
   ]
 }

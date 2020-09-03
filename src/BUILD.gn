@@ -44,8 +44,8 @@ if (chip_build_tests) {
 
     if (current_os != "zephyr") {
       deps += [
-        "${chip_root}/src/lwip/tests",
         "${chip_root}/src/lib/shell/tests",
+        "${chip_root}/src/lwip/tests",
       ]
     }
   }
