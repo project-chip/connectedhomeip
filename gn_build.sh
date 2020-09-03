@@ -69,9 +69,21 @@ echo 'To build a custom build (for help run "gn args --list out/debug")'
 echo gn args "$CHIP_ROOT/out/custom"
 echo ninja -C "$CHIP_ROOT/out/custom"
 
+extra_args=""
+
+# Android NDK setup
+android_ndk_args=""
+
+if [[ -d "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin" ]]; then
+    android_ndk_args+="android_ndk_root=\"$ANDROID_NDK_HOME\""
+    extra_args+=" $android_ndk_args enable_android_builds=true"
+else
+    echo
+    echo "Hint: Set \$ANDROID_NDK_HOME to enable building for Android"
+fi
+
 # nRF5 SDK setup
 nrf5_sdk_args=""
-extra_args=""
 
 if [[ -d "$NRF5_SDK_ROOT/components/libraries" ]]; then
     nrf5_sdk_args+="nrf5_sdk_root=\"$NRF5_SDK_ROOT\""

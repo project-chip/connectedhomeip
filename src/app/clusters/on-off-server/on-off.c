@@ -42,7 +42,7 @@
 #include "af.h"
 
 #ifdef EMBER_AF_PLUGIN_REPORTING
-#include "app/framework/plugin/reporting/reporting.h"
+#include <app/reporting/reporting.h>
 #endif
 
 #ifdef EMBER_AF_PLUGIN_SCENES

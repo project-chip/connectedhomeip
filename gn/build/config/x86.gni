@@ -30,7 +30,6 @@ if (current_cpu == "x86" || current_cpu == "x86_64") {
     x86_arch = ""
     x86_cpu = ""
     x86_tune = ""
-    x86_sysroot = ""
 
     # Update defaults with platform values, if any.
     if (x86_platform_config != "") {
@@ -47,8 +46,5 @@ if (current_cpu == "x86" || current_cpu == "x86_64") {
 
     # ARM tuning (value for -mtune flag).
     x86_tune = _defaults.x86_tune
-
-    # ARM sysroot (value for --sysroot flag).
-    x86_sysroot = _defaults.x86_sysroot
   }
 }

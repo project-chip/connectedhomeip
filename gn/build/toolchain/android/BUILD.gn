@@ -15,18 +15,34 @@
 
 import("android_toolchain.gni")
 
-if (current_cpu == "arm") {
-  android_arm_toolchain("armv7_clang") {
-    toolchain_args = {
-      is_clang = true
-    }
+android_clang_toolchain("android_arm") {
+  # TODO: Drop API level to 21 after getifaddrs issue fixed
+  api_level = "24"
+  toolchain_args = {
+    current_cpu = "arm"
   }
-} else if (current_cpu == "x86_64") {
-  android_x86_64_toolchain("x86_64_clang") {
-    toolchain_args = {
-      is_clang = true
-    }
+}
+
+android_clang_toolchain("android_arm64") {
+  # TODO: Drop API level to 21 after getifaddrs issue fixed
+  api_level = "24"
+  toolchain_args = {
+    current_cpu = "arm64"
   }
-} else {
-  assert(false, "Unknown target cpu ${current_cpu}")
+}
+
+android_clang_toolchain("android_x64") {
+  # TODO: Drop API level to 21 after getifaddrs issue fixed
+  api_level = "24"
+  toolchain_args = {
+    current_cpu = "x64"
+  }
+}
+
+android_clang_toolchain("android_x86") {
+  # TODO: Drop API level to 21 after getifaddrs issue fixed
+  api_level = "24"
+  toolchain_args = {
+    current_cpu = "x86"
+  }
 }

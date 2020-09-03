@@ -55,13 +55,13 @@ const size_t kMAX_Hash_SHA256_Context_Size = 256;
  * Spake2+ parameters for P256
  * Defined in https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html#name-ciphersuites
  */
-const unsigned char spake2p_M_p256[65] = {
+const uint8_t spake2p_M_p256[65] = {
     0x04, 0x88, 0x6e, 0x2f, 0x97, 0xac, 0xe4, 0x6e, 0x55, 0xba, 0x9d, 0xd7, 0x24, 0x25, 0x79, 0xf2, 0x99,
     0x3b, 0x64, 0xe1, 0x6e, 0xf3, 0xdc, 0xab, 0x95, 0xaf, 0xd4, 0x97, 0x33, 0x3d, 0x8f, 0xa1, 0x2f, 0x5f,
     0xf3, 0x55, 0x16, 0x3e, 0x43, 0xce, 0x22, 0x4e, 0x0b, 0x0e, 0x65, 0xff, 0x02, 0xac, 0x8e, 0x5c, 0x7b,
     0xe0, 0x94, 0x19, 0xc7, 0x85, 0xe0, 0xca, 0x54, 0x7d, 0x55, 0xa1, 0x2e, 0x2d, 0x20,
 };
-const unsigned char spake2p_N_p256[65] = {
+const uint8_t spake2p_N_p256[65] = {
     0x04, 0xd8, 0xbb, 0xd6, 0xc6, 0x39, 0xc6, 0x29, 0x37, 0xb0, 0x4d, 0x99, 0x7f, 0x38, 0xc3, 0x77, 0x07,
     0x19, 0xc6, 0x29, 0xd7, 0x01, 0x4d, 0x49, 0xa2, 0x4b, 0x4f, 0x98, 0xba, 0xa1, 0x29, 0x2b, 0x49, 0x07,
     0xd6, 0x0a, 0xa6, 0xbf, 0xad, 0xe4, 0x50, 0x08, 0xa6, 0x36, 0x33, 0x7f, 0x51, 0x68, 0xc6, 0x4d, 0x9b,
@@ -71,26 +71,24 @@ const unsigned char spake2p_N_p256[65] = {
 /**
  * Spake2+ state machine to ensure proper execution of the protocol.
  */
-enum
+enum class CHIP_SPAKE2P_STATE : uint8_t
 {
-    CHIP_SPAKE2P_STATE_PREINIT = 0, // Before any initialization
-    CHIP_SPAKE2P_STATE_INIT,        // First initialization
-    CHIP_SPAKE2P_STATE_STARTED,     // Prover & Verifier starts
-    CHIP_SPAKE2P_STATE_R1,          // Round one complete
-    CHIP_SPAKE2P_STATE_R2,          // Round two complete
-    CHIP_SPAKE2P_STATE_KC,          // Key confirmation complete
+    PREINIT = 0, // Before any initialization
+    INIT,        // First initialization
+    STARTED,     // Prover & Verifier starts
+    R1,          // Round one complete
+    R2,          // Round two complete
+    KC,          // Key confirmation complete
 };
-typedef unsigned char CHIP_SPAKE2P_STATE;
 
 /**
  * Spake2+ role.
  */
-enum
+enum class CHIP_SPAKE2P_ROLE : uint8_t
 {
-    CHIP_SPAKE2P_VERIFIER = 0, // Accessory
-    CHIP_SPAKE2P_PROVER   = 1, // Commissioner
+    VERIFIER = 0, // Accessory
+    PROVER   = 1, // Commissioner
 };
-typedef unsigned char CHIP_SPAKE2P_ROLE;
 
 /**
  * @brief A function that implements AES-CCM encryption
@@ -107,9 +105,9 @@ typedef unsigned char CHIP_SPAKE2P_ROLE;
  * @param tag_length Expected length of tag
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  * */
-CHIP_ERROR AES_CCM_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad, size_t aad_length,
-                           const unsigned char * key, size_t key_length, const unsigned char * iv, size_t iv_length,
-                           unsigned char * ciphertext, unsigned char * tag, size_t tag_length);
+CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
+                           const uint8_t * key, size_t key_length, const uint8_t * iv, size_t iv_length, uint8_t * ciphertext,
+                           uint8_t * tag, size_t tag_length);
 
 /**
  * @brief A function that implements AES-CCM decryption
@@ -127,9 +125,9 @@ CHIP_ERROR AES_CCM_encrypt(const unsigned char * plaintext, size_t plaintext_len
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 
-CHIP_ERROR AES_CCM_decrypt(const unsigned char * ciphertext, size_t ciphertext_length, const unsigned char * aad, size_t aad_length,
-                           const unsigned char * tag, size_t tag_length, const unsigned char * key, size_t key_length,
-                           const unsigned char * iv, size_t iv_length, unsigned char * plaintext);
+CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length, const uint8_t * aad, size_t aad_length,
+                           const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length, const uint8_t * iv,
+                           size_t iv_length, uint8_t * plaintext);
 
 /**
  * @brief A function that implements SHA-256 hash
@@ -139,7 +137,7 @@ CHIP_ERROR AES_CCM_decrypt(const unsigned char * ciphertext, size_t ciphertext_l
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 
-CHIP_ERROR Hash_SHA256(const unsigned char * data, const size_t data_length, unsigned char * out_buffer);
+CHIP_ERROR Hash_SHA256(const uint8_t * data, const size_t data_length, uint8_t * out_buffer);
 
 /**
  * @brief A class that defines stream based implementation of SHA-256 hash
@@ -157,8 +155,8 @@ public:
     ~Hash_SHA256_stream(void);
 
     CHIP_ERROR Begin(void);
-    CHIP_ERROR AddData(const unsigned char * data, const size_t data_length);
-    CHIP_ERROR Finish(unsigned char * out_buffer);
+    CHIP_ERROR AddData(const uint8_t * data, const size_t data_length);
+    CHIP_ERROR Finish(uint8_t * out_buffer);
     void Clear(void);
 
 private:
@@ -178,9 +176,8 @@ private:
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 
-CHIP_ERROR HKDF_SHA256(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
-                       const size_t salt_length, const unsigned char * info, const size_t info_length, unsigned char * out_buffer,
-                       size_t out_length);
+CHIP_ERROR HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
+                       const uint8_t * info, const size_t info_length, uint8_t * out_buffer, size_t out_length);
 
 /**
  * @brief A cryptographically secure random number generator based on NIST SP800-90A
@@ -188,7 +185,7 @@ CHIP_ERROR HKDF_SHA256(const unsigned char * secret, const size_t secret_length,
  * @param out_length Number of random bytes to generate
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR DRBG_get_bytes(unsigned char * out_buffer, const size_t out_length);
+CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length);
 
 /**
  * @brief A function to sign a msg using ECDSA
@@ -202,8 +199,8 @@ CHIP_ERROR DRBG_get_bytes(unsigned char * out_buffer, const size_t out_length);
  * @param out_signature_length Length of out buffer
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR ECDSA_sign_msg(const unsigned char * msg, const size_t msg_length, const unsigned char * private_key,
-                          const size_t private_key_length, unsigned char * out_signature, size_t & out_signature_length);
+CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const uint8_t * private_key,
+                          const size_t private_key_length, uint8_t * out_signature, size_t & out_signature_length);
 
 /**
  * @brief A function to sign a msg using ECDSA
@@ -217,9 +214,8 @@ CHIP_ERROR ECDSA_sign_msg(const unsigned char * msg, const size_t msg_length, co
  * @param signature_length Length of signature
  * @return Returns a CHIP_NO_ERROR on successful verification, a CHIP_ERROR otherwise
  **/
-CHIP_ERROR ECDSA_validate_msg_signature(const unsigned char * msg, const size_t msg_length, const unsigned char * public_key,
-                                        const size_t public_key_length, const unsigned char * signature,
-                                        const size_t signature_length);
+CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const uint8_t * public_key,
+                                        const size_t public_key_length, const uint8_t * signature, const size_t signature_length);
 
 /** @brief A function to derive a shared secret using ECDH
  * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
@@ -233,9 +229,9 @@ CHIP_ERROR ECDSA_validate_msg_signature(const unsigned char * msg, const size_t 
  * @param out_secret_length Length of out_secret
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR ECDH_derive_secret(const unsigned char * remote_public_key, const size_t remote_public_key_length,
-                              const unsigned char * local_private_key, const size_t local_private_key_length,
-                              unsigned char * out_secret, size_t & out_secret_length);
+CHIP_ERROR ECDH_derive_secret(const uint8_t * remote_public_key, const size_t remote_public_key_length,
+                              const uint8_t * local_private_key, const size_t local_private_key_length, uint8_t * out_secret,
+                              size_t & out_secret_length);
 
 /** @brief Entropy callback function
  * @param data Callback-specific data pointer
@@ -244,7 +240,7 @@ CHIP_ERROR ECDH_derive_secret(const unsigned char * remote_public_key, const siz
  * @param olen The actual amount of data that was written to output buffer
  * @return 0 if success
  */
-typedef int (*entropy_source)(void * data, unsigned char * output, size_t len, size_t * olen);
+typedef int (*entropy_source)(void * data, uint8_t * output, size_t len, size_t * olen);
 
 /** @brief A function to add entropy sources to crypto library
  * @param fn_source Function pointer to the entropy source
@@ -264,8 +260,8 @@ CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t 
  * @param output output buffer where the key will be written
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR pbkdf2_sha256(const unsigned char * password, size_t plen, const unsigned char * salt, size_t slen,
-                         unsigned int iteration_count, uint32_t key_length, unsigned char * output);
+CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen, unsigned int iteration_count,
+                         uint32_t key_length, uint8_t * output);
 /**
  * The below class implements the draft 01 version of the Spake2+ protocol as
  * defined in https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html.
@@ -303,7 +299,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Init(const unsigned char * context, size_t context_len);
+    CHIP_ERROR Init(const uint8_t * context, size_t context_len);
 
     /**
      * @brief Start the Spake2+ process as a verifier (i.e. an accessory being provisioned).
@@ -319,9 +315,8 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR BeginVerifier(const unsigned char * my_identity, size_t my_identity_len, const unsigned char * peer_identity,
-                             size_t peer_identity_len, const unsigned char * w0in, size_t w0in_len, const unsigned char * Lin,
-                             size_t Lin_len);
+    CHIP_ERROR BeginVerifier(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
+                             size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * Lin, size_t Lin_len);
 
     /**
      * @brief Start the Spake2+ process as a prover (i.e. a commisioner).
@@ -337,9 +332,8 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR BeginProver(const unsigned char * my_identity, size_t my_identity_len, const unsigned char * peer_identity,
-                           size_t peer_identity_len, const unsigned char * w0in, size_t w0in_len, const unsigned char * w1in,
-                           size_t w1in_len);
+    CHIP_ERROR BeginProver(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
+                           size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in, size_t w1in_len);
 
     /**
      * @brief Compute the first round of the protocol.
@@ -349,7 +343,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ComputeRoundOne(unsigned char * out, size_t * out_len);
+    CHIP_ERROR ComputeRoundOne(uint8_t * out, size_t * out_len);
 
     /**
      * @brief Compute the second round of the protocol.
@@ -361,7 +355,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ComputeRoundTwo(const unsigned char * in, size_t in_len, unsigned char * out, size_t * out_len);
+    CHIP_ERROR ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t * out, size_t * out_len);
 
     /**
      * @brief Confirm that each party computed the same keys.
@@ -371,7 +365,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR KeyConfirm(const unsigned char * in, size_t in_len);
+    CHIP_ERROR KeyConfirm(const uint8_t * in, size_t in_len);
 
     /**
      * @brief Return the shared secret.
@@ -381,9 +375,9 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR GetKeys(unsigned char * out, size_t * out_len);
+    CHIP_ERROR GetKeys(uint8_t * out, size_t * out_len);
 
-    CHIP_ERROR InternalHash(const unsigned char * in, size_t in_len);
+    CHIP_ERROR InternalHash(const uint8_t * in, size_t in_len);
     CHIP_ERROR WriteMN(void);
     CHIP_ERROR GenerateKeys(void);
 
@@ -396,7 +390,7 @@ public:
      *
      *  @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR FELoad(const unsigned char * in, size_t in_len, void * fe) = 0;
+    virtual CHIP_ERROR FELoad(const uint8_t * in, size_t in_len, void * fe) = 0;
 
     /**
      * @brief Write a field element in big-endian format.
@@ -407,7 +401,7 @@ public:
      *
      *  @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR FEWrite(const void * fe, unsigned char * out, size_t out_len) = 0;
+    virtual CHIP_ERROR FEWrite(const void * fe, uint8_t * out, size_t out_len) = 0;
 
     /**
      * @brief Generate a field element.
@@ -442,7 +436,7 @@ public:
      *
      *  @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR PointLoad(const unsigned char * in, size_t in_len, void * R) = 0;
+    virtual CHIP_ERROR PointLoad(const uint8_t * in, size_t in_len, void * R) = 0;
 
     /**
      * @brief Write a point in 0x04 || X || Y format
@@ -453,7 +447,7 @@ public:
      *
      *  @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR PointWrite(const void * R, unsigned char * out, size_t out_len) = 0;
+    virtual CHIP_ERROR PointWrite(const void * R, uint8_t * out, size_t out_len) = 0;
 
     /**
      * @brief Scalar multiplication, R = fe1 * P1.
@@ -516,7 +510,7 @@ public:
      *
      *   @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR ComputeL(unsigned char * Lout, size_t * L_len, const unsigned char * w1in, size_t w1in_len) = 0;
+    virtual CHIP_ERROR ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len) = 0;
 
     void * M;
     void * N;
@@ -568,7 +562,7 @@ protected:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Hash(const unsigned char * in, size_t in_len) = 0;
+    virtual CHIP_ERROR Hash(const uint8_t * in, size_t in_len) = 0;
 
     /**
      * @brief Return the hash.
@@ -577,7 +571,7 @@ protected:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR HashFinalize(unsigned char * out) = 0;
+    virtual CHIP_ERROR HashFinalize(uint8_t * out) = 0;
 
     /**
      * @brief Generate a message authentication code.
@@ -590,8 +584,7 @@ protected:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Mac(const unsigned char * key, size_t key_len, const unsigned char * in, size_t in_len,
-                           unsigned char * out) = 0;
+    virtual CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out) = 0;
 
     /**
      * @brief Verify a message authentication code.
@@ -605,8 +598,8 @@ protected:
      *
      *  @return Returns a CHIP_ERROR when the MAC doesn't validate, CHIP_NO_ERROR otherwise.
      **/
-    virtual CHIP_ERROR MacVerify(const unsigned char * key, size_t key_len, const unsigned char * mac, size_t mac_len,
-                                 const unsigned char * in, size_t in_len) = 0;
+    virtual CHIP_ERROR MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len, const uint8_t * in,
+                                 size_t in_len) = 0;
 
     /**
      * @brief Derive an key of length out_len.
@@ -622,20 +615,20 @@ protected:
      *
      * @return Returns a CHIP_ERROR when the MAC doesn't validate, CHIP_NO_ERROR otherwise.
      **/
-    virtual CHIP_ERROR KDF(const unsigned char * ikm, const size_t ikm_len, const unsigned char * salt, const size_t salt_len,
-                           const unsigned char * info, const size_t info_len, unsigned char * out, size_t out_len) = 0;
+    virtual CHIP_ERROR KDF(const uint8_t * ikm, const size_t ikm_len, const uint8_t * salt, const size_t salt_len,
+                           const uint8_t * info, const size_t info_len, uint8_t * out, size_t out_len) = 0;
 
     CHIP_SPAKE2P_ROLE role;
     CHIP_SPAKE2P_STATE state;
     size_t fe_size;
     size_t hash_size;
     size_t point_size;
-    unsigned char Kcab[kMAX_Hash_Length];
-    unsigned char Kae[kMAX_Hash_Length];
-    unsigned char * Kca;
-    unsigned char * Kcb;
-    unsigned char * Ka;
-    unsigned char * Ke;
+    uint8_t Kcab[kMAX_Hash_Length];
+    uint8_t Kae[kMAX_Hash_Length];
+    uint8_t * Kca;
+    uint8_t * Kcb;
+    uint8_t * Ka;
+    uint8_t * Ke;
 };
 
 struct Spake2pOpaqueContext
@@ -653,29 +646,29 @@ public:
 
     virtual ~Spake2p_P256_SHA256_HKDF_HMAC(void) { FreeImpl(); }
 
-    CHIP_ERROR Mac(const unsigned char * key, size_t key_len, const unsigned char * in, size_t in_len, unsigned char * out);
-    CHIP_ERROR MacVerify(const unsigned char * key, size_t key_len, const unsigned char * mac, size_t mac_len,
-                         const unsigned char * in, size_t in_len);
-    CHIP_ERROR FELoad(const unsigned char * in, size_t in_len, void * fe);
-    CHIP_ERROR FEWrite(const void * fe, unsigned char * out, size_t out_len);
+    CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out);
+    CHIP_ERROR MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len, const uint8_t * in,
+                         size_t in_len);
+    CHIP_ERROR FELoad(const uint8_t * in, size_t in_len, void * fe);
+    CHIP_ERROR FEWrite(const void * fe, uint8_t * out, size_t out_len);
     CHIP_ERROR FEGenerate(void * fe);
     CHIP_ERROR FEMul(void * fer, const void * fe1, const void * fe2);
 
-    CHIP_ERROR PointLoad(const unsigned char * in, size_t in_len, void * R);
-    CHIP_ERROR PointWrite(const void * R, unsigned char * out, size_t out_len);
+    CHIP_ERROR PointLoad(const uint8_t * in, size_t in_len, void * R);
+    CHIP_ERROR PointWrite(const void * R, uint8_t * out, size_t out_len);
     CHIP_ERROR PointMul(void * R, const void * P1, const void * fe1);
     CHIP_ERROR PointAddMul(void * R, const void * P1, const void * fe1, const void * P2, const void * fe2);
     CHIP_ERROR PointInvert(void * R);
     CHIP_ERROR PointCofactorMul(void * R);
     CHIP_ERROR PointIsValid(void * R);
-    CHIP_ERROR ComputeL(unsigned char * Lout, size_t * L_len, const unsigned char * w1in, size_t w1in_len);
+    CHIP_ERROR ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len);
 
 protected:
     CHIP_ERROR InitImpl();
-    CHIP_ERROR Hash(const unsigned char * in, size_t in_len);
-    CHIP_ERROR HashFinalize(unsigned char * out);
-    CHIP_ERROR KDF(const unsigned char * secret, const size_t secret_length, const unsigned char * salt, const size_t salt_length,
-                   const unsigned char * info, const size_t info_length, unsigned char * out, size_t out_length);
+    CHIP_ERROR Hash(const uint8_t * in, size_t in_len);
+    CHIP_ERROR HashFinalize(uint8_t * out);
+    CHIP_ERROR KDF(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
+                   const uint8_t * info, const size_t info_length, uint8_t * out, size_t out_length);
 
 private:
     /**

@@ -1400,3 +1400,19 @@ uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel)
         return channel | ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_0;
     }
 }
+
+EmberStatus emberAfScheduleServerTick(uint8_t endpoint, EmberAfClusterId clusterId, uint32_t delayMs)
+{
+    return EMBER_SUCCESS; // Stub for now.
+}
+
+EmberStatus emberAfScheduleServerTickExtended(uint8_t endpoint, EmberAfClusterId clusterId, uint32_t delayMs,
+                                              EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl)
+{
+    return EMBER_SUCCESS; // Stub for now.
+}
+
+EmberStatus emberAfDeactivateServerTick(uint8_t endpoint, EmberAfClusterId clusterId)
+{
+    return EMBER_SUCCESS; // Stub for now.
+}

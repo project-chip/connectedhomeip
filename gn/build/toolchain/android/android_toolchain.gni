@@ -12,47 +12,45 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/android/config.gni")
 import("//build/toolchain/gcc_toolchain.gni")
 
-template("android_arm_toolchain") {
-  gcc_toolchain(target_name) {
-    # TODO : arm64
-    # TODO: Drop API level to 21 after getifaddrs issue fixed
-    _tool_name_root = "armv7a-linux-androideabi24-"
+template("android_clang_toolchain") {
+  _invoker_toolchain_args = invoker.toolchain_args
 
-    toolchain_args = {
-      current_cpu = "arm"
-      arm_arch = "armv7-a"
-      arm_fpu = "vfpv3-d16"
-      arm_float_abi = "softfp"
-      current_os = "android"
-      is_clang = true
-
-      forward_variables_from(invoker.toolchain_args, "*")
-    }
-    ar = "llvm-ar"
-    cc = _tool_name_root + "clang"
-    cxx = _tool_name_root + "clang++"
+  if (_invoker_toolchain_args.current_cpu == "arm") {
+    _tool_name_root = "armv7a-linux-androideabi${invoker.api_level}-"
+  } else if (_invoker_toolchain_args.current_cpu == "arm64") {
+    _tool_name_root = "aarch64-linux-android${invoker.api_level}-"
+  } else if (_invoker_toolchain_args.current_cpu == "x64") {
+    _tool_name_root = "x86_64-linux-android${invoker.api_level}-"
+  } else if (_invoker_toolchain_args.current_cpu == "x86") {
+    _tool_name_root = "i686-linux-android${invoker.api_level}-"
+  } else {
+    assert(
+        false,
+        "Unknown/invalid current_cpu value in toolchain_args::current_cpu for android_clang_toolchain")
   }
-}
 
-template("android_x86_64_toolchain") {
-  gcc_toolchain(target_name) {
-    # TODO : x86
-    # TODO: Drop API level to 21 after getifaddrs issue fixed
-    _tool_name_root = "x86_64-linux-android24-"
+  _android_toolchain_args = {
+    current_os = "android"
+    is_clang = true
 
-    toolchain_args = {
-      current_cpu = "x86_64"
-      x86_arch = "x86-64"
-      x86_tune = "intel"
-      current_os = "android"
-      is_clang = true
+    forward_variables_from(_invoker_toolchain_args, "*")
+  }
 
-      forward_variables_from(invoker.toolchain_args, "*")
+  _ndk_prefix = ""
+  if (android_ndk_root != "") {
+    if (host_os == "linux" && host_cpu == "x64") {
+      _ndk_prefix =
+          "${android_ndk_root}/toolchains/llvm/prebuilt/linux-x86_64/bin/"
     }
+  }
+
+  gcc_toolchain(target_name) {
+    toolchain_args = _android_toolchain_args
     ar = "llvm-ar"
-    cc = _tool_name_root + "clang"
-    cxx = _tool_name_root + "clang++"
+    cc = _ndk_prefix + _tool_name_root + "clang"
+    cxx = _ndk_prefix + _tool_name_root + "clang++"
   }
 }

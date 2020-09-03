@@ -35,10 +35,10 @@ The lighting example is intended to serve both as a means to explore the
 workings of CHIP, as well as a template for creating real products based on the
 Nordic platform.
 
-The example application builds upon the CHIP. A top-level Makefile orchestrates
-the entire build process, including building CHIP, and select files from the
-nRF5 SDK. The resultant image file can be flashed directly onto the Nordic dev
-kit hardware.
+The example application builds upon the CHIP. A top-level BUILD.gn or Makefile
+orchestrates the entire build process, including building CHIP, and select files
+from the nRF5 SDK. The resultant image file can be flashed directly onto the
+Nordic dev kit hardware.
 
 <a name="device-ui"></a>
 
@@ -157,13 +157,7 @@ Other alternatives:
           $ cd ~
           $ git clone https://github.com/project-chip/connectedhomeip.git
 
-*   Run make to build the application
-
-          $ cd ~/connectedhomeip/examples/lighting-app/nrf5
-          $ make clean
-          $ make
-
-*   Or, run GN to build the application
+*   Run GN to build the application
 
           $ cd ~/connectedhomeip
           $ git submodule update --init
@@ -171,6 +165,12 @@ Other alternatives:
           $ cd examples/lighting-app/nrf5
           $ gn gen out/debug
           $ ninja -C out/debug
+
+*   Or, run make to build the application
+
+          $ cd ~/connectedhomeip/examples/lighting-app/nrf5
+          $ make clean
+          $ make
 
 <a name="initializing"></a>
 
@@ -185,7 +185,17 @@ should be erased and the Nordic SoftDevice image installed.
     nRF52840 DK. The Interface MCU connector is the one on the _short_ side of
     the board.
 
-*   Use the Makefile to erase the flash and program the Nordic SoftDevice image.
+*   If you are using the GN build, the flashing script will install the
+    SoftDevice image if it is not already present. If you prefer to do so
+    manually first, to verify your board function, run:
+
+          $ python \
+              ~/connectedhomeip/third_party/nrf5_sdk/nrf5_firmware_utils.py \
+              --eraseall \
+              --application $NRF5_SDK_ROOT/components/softdevice/s140/hex/s140_nrf52_*_softdevice.hex
+
+*   Or, use the Makefile to erase the flash and program the Nordic SoftDevice
+    image.
 
           $ cd ~/connectedhomeip/examples/lighting-app/nrf5
           $ make erase
@@ -201,6 +211,11 @@ and application again.
 ## Flashing the Application
 
 To flash the example app, run the following commands:
+
+        $ cd ~/connectedhomeip/examples/lighting-app/nrf5
+        $ python out/debug/chip-nrf52840-lighting-example.flash.py
+
+Or, if you are using the Makefile build,
 
         $ cd ~/connectedhomeip/examples/lighting-app/nrf5
         $ make flash-app

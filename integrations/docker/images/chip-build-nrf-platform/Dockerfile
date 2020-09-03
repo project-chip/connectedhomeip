@@ -50,7 +50,7 @@ RUN set -x \
     # nRF Connect SDK [master - Aug 27th] sources & requirements
     && (mkdir /var/ncs && cd /var/ncs \
     && pip3 install --no-cache-dir setuptools wheel cmake west \
-    && west init -m https://github.com/nrfconnect/sdk-nrf --mr 223cfe2067a2e7382970fb5030653c9117da159b \
+    && west init -m https://github.com/nrfconnect/sdk-nrf --mr 83764f01f04f58c80bb1ae1d3e0a640496f79b49 \
     && west update \
     && pip3 install --no-cache-dir -r zephyr/scripts/requirements.txt \
     && pip3 install --no-cache-dir -r nrf/scripts/requirements.txt \

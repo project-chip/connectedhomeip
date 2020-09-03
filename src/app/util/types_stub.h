@@ -1897,6 +1897,12 @@ typedef struct
 #define BYTE_7(n) BYTE_0((n) >> 56)
 
 /**
+ * @brief Returns the value built from the two \c uint8_t
+ * values \c high and \c low.
+ */
+#define HIGH_LOW_TO_INT(high, low) (((uint16_t)(((uint16_t)(high)) << 8)) + ((uint16_t)((low) &0xFF)))
+
+/**
  * @brief The kind of arguments the main function takes
  */
 #define MAIN_FUNCTION_PARAMETERS void
@@ -1907,4 +1913,25 @@ typedef struct
 #define emberAfPrintEnabled(...) false
 
 #define emberAfPrintActiveArea EMBER_AF_PRINT_CORE
+
+/**
+ * @brief Returns the value of \c bit within the register or byte \c reg.
+ */
+#define READBIT(reg, bit) ((reg) & (BIT(bit)))
+
+/**
+ * @brief Returns the value of the bitmask \c bits within
+ * the register or byte \c reg.
+ */
+#define READBITS(reg, bits) ((reg) & (bits))
+
+#define MILLISECOND_TICKS_PER_SECOND 1000
+#define MILLISECOND_TICKS_PER_DECISECOND (MILLISECOND_TICKS_PER_SECOND / 10)
+
+#define emberEventControlSetDelayMS(control, delay) (void) 0
+#define emberEventControlSetInactive(control) (void) 0
+#define emberAfPluginColorControlServerComputePwmFromXyCallback(endpoint) (void) 0
+#define emberAfPluginColorControlServerComputePwmFromHsvCallback(endpoint) (void) 0
+#define emberAfPluginColorControlServerComputePwmFromTempCallback(endpoint) (void) 0
+
 #endif // TYPES_STUB_H

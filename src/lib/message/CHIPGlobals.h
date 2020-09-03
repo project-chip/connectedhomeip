@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,12 +17,27 @@
  *    limitations under the License.
  */
 
-#ifndef __SAMPLE_QR_CODE_H
-#define __SAMPLE_QR_CODE_H
+/**
+ *    @file
+ *      Extern declarations for various CHIP global objects.
+ *
+ */
 
-#define SAMPLE_QR_CODE_WIDTH 128
-#define SAMPLE_QR_CODE_HEIGHT 128
+#ifndef CHIP_GLOBALS_H_
+#define CHIP_GLOBALS_H_
 
-extern unsigned char sample_qr_code_bits[];
+#include <core/CHIPConfig.h>
+#include <core/CHIPCore.h>
+#include <message/CHIPExchangeMgr.h>
+#include <message/CHIPFabricState.h>
+#include <message/CHIPMessageLayer.h>
 
-#endif /* __SAMPLE_QR_CODE_H */
+namespace chip {
+
+extern ChipFabricState FabricState;
+extern ChipMessageLayer MessageLayer;
+extern ChipExchangeManager ExchangeMgr;
+
+} // namespace chip
+
+#endif /* CHIP_GLOBALS_H_ */

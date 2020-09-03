@@ -96,7 +96,7 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const unsigned char * salt, size_t saltLen,
+    CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                               Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
 
     /**
@@ -113,7 +113,7 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const unsigned char * salt, size_t saltLen,
+    CHIP_ERROR Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                     Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
 
     /**
@@ -127,7 +127,7 @@ public:
      *                    initialized once pairing is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    virtual CHIP_ERROR DeriveSecureSession(const unsigned char * info, size_t info_len, SecureSession & session);
+    virtual CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session);
 
     /**
      * @brief
@@ -140,8 +140,8 @@ public:
     CHIP_ERROR HandlePeerMessage(MessageHeader & header, System::PacketBuffer * msg);
 
 private:
-    CHIP_ERROR Init(uint32_t setupCode, uint32_t pbkdf2IterCount, const unsigned char * salt, size_t saltLen,
-                    Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
+    CHIP_ERROR Init(uint32_t setupCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen, Optional<NodeId> myNodeId,
+                    uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
 
     CHIP_ERROR HandleCompute_pA(const MessageHeader & header, System::PacketBuffer * msg);
     CHIP_ERROR HandleCompute_pB_cB(const MessageHeader & header, System::PacketBuffer * msg);
@@ -199,24 +199,24 @@ public:
 
     ~SecurePairingUsingTestSecret(void) {}
 
-    CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const unsigned char * salt, size_t saltLen,
+    CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                               Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate)
     {
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const unsigned char * salt, size_t saltLen,
+    CHIP_ERROR Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                     Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate)
     {
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR DeriveSecureSession(const unsigned char * info, size_t info_len, SecureSession & session)
+    CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session)
     {
         const char * secret = "Test secret for key derivation";
         size_t secretLen    = strlen(secret);
-        return session.InitFromSecret((const unsigned char *) secret, secretLen, (const unsigned char *) "", 0,
-                                      (const unsigned char *) secret, secretLen);
+        return session.InitFromSecret((const uint8_t *) secret, secretLen, (const uint8_t *) "", 0, (const uint8_t *) secret,
+                                      secretLen);
     }
 
     CHIP_ERROR HandlePeerMessage(const MessageHeader & header, System::PacketBuffer * msg) { return CHIP_NO_ERROR; }

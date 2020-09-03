@@ -1,7 +1,6 @@
-/*
+/**
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,21 +15,30 @@
  *    limitations under the License.
  */
 
-#ifndef INIT_LCD_H
-#define INIT_LCD_H
+/**
+ * @file API declarations for a binding table.
+ */
+
+#ifndef BINDING_TABLE_H
+#define BINDING_TABLE_H
+
+#include <app/util/af-types.h>
+
+// Should this be configurable by the app somehow?
+#define BINDING_TABLE_SIZE 10
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif // __cplusplus
 
-#include "AppConfig.h"
-#include "board_features.h"
-#define MAX_STR_LEN 48
+EmberStatus emberGetBinding(uint8_t index, EmberBindingTableEntry * result);
 
-void initLCD(void);
+EmberStatus emberSetBinding(uint8_t index, EmberBindingTableEntry * result);
+
+EmberStatus emberDeleteBinding(uint8_t index);
 
 #ifdef __cplusplus
-}
-#endif
+} // extern "C"
+#endif // __cplusplus
 
-#endif // INIT_LCD_H
+#endif // BINDING_TABLE_H

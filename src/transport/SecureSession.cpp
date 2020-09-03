@@ -44,8 +44,8 @@ using namespace Crypto;
 
 SecureSession::SecureSession() : mKeyAvailable(false) {}
 
-CHIP_ERROR SecureSession::InitFromSecret(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
-                                         const size_t salt_length, const unsigned char * info, const size_t info_length)
+CHIP_ERROR SecureSession::InitFromSecret(const uint8_t * secret, const size_t secret_length, const uint8_t * salt,
+                                         const size_t salt_length, const uint8_t * info, const size_t info_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
@@ -70,9 +70,9 @@ exit:
     return error;
 }
 
-CHIP_ERROR SecureSession::Init(const unsigned char * remote_public_key, const size_t public_key_length,
-                               const unsigned char * local_private_key, const size_t private_key_length, const unsigned char * salt,
-                               const size_t salt_length, const unsigned char * info, const size_t info_length)
+CHIP_ERROR SecureSession::Init(const uint8_t * remote_public_key, const size_t public_key_length, const uint8_t * local_private_key,
+                               const size_t private_key_length, const uint8_t * salt, const size_t salt_length,
+                               const uint8_t * info, const size_t info_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     uint8_t secret[kMax_ECDH_Secret_Length];
@@ -147,13 +147,17 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureSession::Encrypt(const unsigned char * input, size_t input_length, unsigned char * output, MessageHeader & header)
+CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, MessageHeader & header)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    uint64_t tag     = 0;
     uint8_t IV[kAESCCMIVLen];
     uint8_t AAD[kMaxAADLen];
     size_t aadLen = sizeof(AAD);
+
+    MessageHeader::EncryptionType encType = MessageHeader::EncryptionType::kAESCCMTagLen16;
+
+    const size_t taglen = header.TagLenForEncryptionType(encType);
+    uint8_t tag[taglen];
 
     VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     VerifyOrExit(input != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -166,18 +170,16 @@ CHIP_ERROR SecureSession::Encrypt(const unsigned char * input, size_t input_leng
     error = GetAdditionalAuthData(header, AAD, aadLen);
     SuccessOrExit(error);
 
-    error = AES_CCM_encrypt(input, input_length, AAD, aadLen, mKey, sizeof(mKey), (const unsigned char *) IV, sizeof(IV), output,
-                            (unsigned char *) &tag, sizeof(tag));
+    error = AES_CCM_encrypt(input, input_length, AAD, aadLen, mKey, sizeof(mKey), IV, sizeof(IV), output, tag, taglen);
     SuccessOrExit(error);
 
-    header.SetTag(MessageHeader::EncryptionType::kAESCCMTagLen8, (uint8_t *) &tag, sizeof(tag));
+    header.SetTag(encType, tag, taglen);
 
 exit:
     return error;
 }
 
-CHIP_ERROR SecureSession::Decrypt(const unsigned char * input, size_t input_length, unsigned char * output,
-                                  const MessageHeader & header)
+CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const MessageHeader & header)
 {
     CHIP_ERROR error    = CHIP_NO_ERROR;
     size_t taglen       = header.GetTagLength();
@@ -197,8 +199,7 @@ CHIP_ERROR SecureSession::Decrypt(const unsigned char * input, size_t input_leng
     error = GetAdditionalAuthData(header, AAD, aadLen);
     SuccessOrExit(error);
 
-    error = AES_CCM_decrypt(input, input_length, AAD, aadLen, (const unsigned char *) tag, taglen, mKey, sizeof(mKey),
-                            (const unsigned char *) IV, sizeof(IV), output);
+    error = AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKey, sizeof(mKey), IV, sizeof(IV), output);
 exit:
     return error;
 }

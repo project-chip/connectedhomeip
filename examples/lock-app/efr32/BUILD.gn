@@ -15,24 +15,31 @@
 import("//build/config/defaults.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
+import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 assert(current_os == "freertos")
 
 efr32_project_dir = "${chip_root}/examples/lock-app/efr32"
+examples_plat_dir = "${chip_root}/examples/platform/efr32"
+
+show_qr_code = true
+if (efr32_board == "BRD4166A") {
+  show_qr_code = false
+}
 
 efr32_sdk("sdk") {
   include_dirs = [
     "${chip_root}/src/platform/EFR32",
     "${efr32_project_dir}/include/",
     "${efr32_project_dir}/src/",
-    "${efr32_project_dir}/src/platform/${efr32_family}/${efr32_board}",
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}",
   ]
 
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
     "${efr32_project_dir}/include/FreeRTOSConfig.h",
-    "${efr32_project_dir}/src/platform/${efr32_family}/${efr32_board}/hal-config.h",
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}/hal-config.h",
   ]
 
   defines = []
@@ -45,7 +52,7 @@ efr32_sdk("sdk") {
   defines += [ "BOARD_ID=${efr32_board}" ]
 }
 
-executable("lock_app") {
+efr32_executable("lock_app") {
   include_dirs = []
   defines = []
   output_name = "chip-efr32-lock-example.out"
@@ -53,6 +60,7 @@ executable("lock_app") {
   public_deps = [
     ":sdk",
     "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
     "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
@@ -62,13 +70,17 @@ executable("lock_app") {
   include_dirs += [
     "${efr32_project_dir}/include/",
     "${chip_root}/src/app/util",
+    "${examples_plat_dir}/",
+    "${chip_root}/examples/common/QRCode/repo/c",
   ]
 
   sources = [
+    "${chip_root}/examples/common/QRCode/repo/c/qrcodegen.c",
     "${chip_root}/src/app/clusters/on-off-server/on-off.c",
     "${chip_root}/src/app/util/attribute-size.c",
     "${chip_root}/src/app/util/attribute-storage.c",
     "${chip_root}/src/app/util/attribute-table.c",
+    "${chip_root}/src/app/util/binding-table.cpp",
     "${chip_root}/src/app/util/chip-response.cpp",
     "${chip_root}/src/app/util/client-api.c",
     "${chip_root}/src/app/util/ember-print.cpp",
@@ -76,21 +88,25 @@ executable("lock_app") {
     "${chip_root}/src/app/util/process-cluster-message.c",
     "${chip_root}/src/app/util/process-global-message.c",
     "${chip_root}/src/app/util/util.c",
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}/hal-config.h",
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
     "src/AppTask.cpp",
     "src/BoltLockManager.cpp",
     "src/ButtonHandler.cpp",
     "src/DataModelHandler.cpp",
     "src/LEDWidget.cpp",
     "src/Server.cpp",
+    "src/display/lcd.c",
     "src/gen/call-command-handler.c",
     "src/gen/callback-stub.c",
     "src/gen/znet-bookkeeping.c",
     "src/main.cpp",
-    "src/platform/${efr32_family}/${efr32_board}/hal-config.h",
-    "src/platform/${efr32_family}/${efr32_board}/init_board.c",
-    "src/platform/${efr32_family}/${efr32_board}/init_mcu.c",
   ]
 
+  if (show_qr_code) {
+    defines += [ "DISPLAY_ENABLED" ]
+  }
   output_dir = root_out_dir
 
   if (efr32_family == "efr32mg12") {

@@ -50,7 +50,7 @@
 
 namespace chip {
 
-using namespace nl;
+using namespace chip;
 using namespace chip::Protocols;
 using namespace chip::Encoding;
 

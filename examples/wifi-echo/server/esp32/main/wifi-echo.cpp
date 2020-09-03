@@ -98,7 +98,8 @@ extern void startClient(void);
 
 #endif // CONFIG_HAVE_DISPLAY
 
-LEDWidget statusLED;
+LEDWidget statusLED1;
+LEDWidget statusLED2;
 BluetoothWidget bluetoothLED;
 WiFiWidget wifiLED;
 
@@ -463,7 +464,10 @@ extern "C" void app_main()
 
     SetupPretendDevices();
 
-    statusLED.Init(STATUS_LED_GPIO_NUM);
+    statusLED1.Init(STATUS_LED_GPIO_NUM);
+    // Our second LED doesn't map to any physical LEDs so far, just to virtual
+    // "LED"s on devices with screens.
+    statusLED2.Init(GPIO_NUM_MAX);
     bluetoothLED.Init();
     wifiLED.Init();
 
@@ -549,7 +553,11 @@ extern "C" void app_main()
     {
         int vled1 = ScreenManager::AddVLED(TFT_GREEN);
         int vled2 = ScreenManager::AddVLED(TFT_RED);
-        statusLED.SetVLED(vled1, vled2);
+        statusLED1.SetVLED(vled1, vled2);
+
+        int vled3 = ScreenManager::AddVLED(TFT_CYAN);
+        int vled4 = ScreenManager::AddVLED(TFT_ORANGE);
+        statusLED2.SetVLED(vled3, vled4);
 
         bluetoothLED.SetVLED(ScreenManager::AddVLED(TFT_BLUE));
         wifiLED.SetVLED(ScreenManager::AddVLED(TFT_YELLOW));
