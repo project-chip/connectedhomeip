@@ -71,4 +71,9 @@ void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, b
         emberAfPrint(EMBER_AF_PRINT_CORE, "NULL");
     }
 }
+
+void emberAfPrintString(int category, const uint8_t * string)
+{
+    emberAfPrint(category, "%s", string);
+}
 }

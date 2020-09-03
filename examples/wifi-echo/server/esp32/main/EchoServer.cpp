@@ -56,7 +56,7 @@ using namespace ::chip::Inet;
 using namespace ::chip::Transport;
 
 extern const NodeId kLocalNodeId = 12344321;
-extern LEDWidget statusLED; // In wifi-echo.cpp
+extern LEDWidget statusLED1; // In wifi-echo.cpp
 
 namespace {
 
@@ -195,7 +195,7 @@ public:
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgrBase * mgr) override
     {
         ESP_LOGE(TAG, "ERROR: %s\n Got UDP error", ErrorStr(error));
-        statusLED.BlinkOnError();
+        statusLED1.BlinkOnError();
     }
 
     void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override

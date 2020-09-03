@@ -39,6 +39,8 @@
 // will be used in the case where user defined implementations
 // of the callbacks have not been provided.
 #include "af.h"
+#include "callback.h"
+
 #include <assert.h>
 //#include "hal/hal.h"
 //#include EMBER_AF_API_NETWORK_STEERING
@@ -52,6 +54,49 @@
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
 void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint) {}
+
+/** @brief Level Control Cluster Server Post Init
+ *
+ * Following resolution of the Current Level at startup for this endpoint,
+ * perform any additional initialization needed; e.g., synchronize hardware
+ * state.
+ *
+ * @param endpoint Endpoint that is being initialized  Ver.: always
+ */
+void emberAfPluginLevelControlClusterServerPostInitCallback(uint8_t endpoint) {}
+
+/** @brief Get Group Name
+ *
+ * This function returns the name of a group with the provided group ID, should
+ * it exist.
+ *
+ * @param endpoint Endpoint Ver.: always
+ * @param groupId Group ID Ver.: always
+ * @param groupName Group Name Ver.: always
+ */
+void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
+
+/** @brief Group Names Supported
+ *
+ * This function is called by the framework when it is necessary to determine
+ * whether or not group names are supported.
+ *
+ * @param endpoint The endpoint. Ver.: always
+ */
+bool emberAfPluginGroupsServerGroupNamesSupportedCallback(uint8_t endpoint)
+{
+    return false;
+}
+
+/** @brief Set Group Name
+ *
+ * This function sets the name of a group with the provided group ID.
+ *
+ * @param endpoint Endpoint Ver.: always
+ * @param groupId Group ID Ver.: always
+ * @param groupName Group Name Ver.: always
+ */
+void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
 
 /** @brief Add To Current App Tasks
  *
@@ -137,15 +182,6 @@ bool emberAfAttributeWriteAccessCallback(uint8_t endpoint, EmberAfClusterId clus
 {
     return true;
 }
-
-/** @brief Groups Cluster Clear Group Table
- *
- * This function is called by the framework when the application should clear
- * the group table.
- *
- * @param endpoint The endpoint.  Ver.: always
- */
-void emberAfGroupsClusterClearGroupTableCallback(uint8_t endpoint) {}
 
 /** @brief Clear Report Table
  *
@@ -350,20 +386,6 @@ void emberAfEepromNoteInitializedStateCallback(bool state) {}
  *
  */
 void emberAfEepromShutdownCallback(void) {}
-
-/** @brief Groups Cluster Endpoint In Group
- *
- * This function is called by the framework when it needs to determine if an
- * endpoint is a member of a group.  The application should return true if the
- * endpoint is a member of the group and false otherwise.
- *
- * @param endpoint The endpoint.  Ver.: always
- * @param groupId The group identifier.  Ver.: always
- */
-bool emberAfGroupsClusterEndpointInGroupCallback(uint8_t endpoint, uint16_t groupId)
-{
-    return false;
-}
 
 /** @brief External Attribute Read
  *
@@ -905,17 +927,6 @@ bool emberAfKeyEstablishmentCallback(EmberAfKeyEstablishmentNotifyMessage status
 {
     return true;
 }
-
-/** @brief On/off Cluster Level Control Effect
- *
- * This is called by the framework when the on/off cluster initiates a command
- * that must effect a level control change. The implementation assumes that the
- * client will handle any effect on the On/Off Cluster.
- *
- * @param endpoint   Ver.: always
- * @param newValue   Ver.: always
- */
-void emberAfOnOffClusterLevelControlEffectCallback(uint8_t endpoint, bool newValue) {}
 
 /** @brief Main Init
  *
@@ -2297,24 +2308,6 @@ void emberAfSetSourceRouteOverheadCallback(EmberNodeId destination, uint8_t over
  * @param utcTime   Ver.: always
  */
 void emberAfSetTimeCallback(uint32_t utcTime) {}
-
-// Ifdef out emberAfOnOffClusterSetValueCallback, since it's implemented by
-// on-off.c
-#if 0
-/** @brief On/off Cluster Set Value
- *
- * This function is called when the on/off value needs to be set, either through
- * normal channels or as a result of a level change.
- *
- * @param endpoint   Ver.: always
- * @param command   Ver.: always
- * @param initiatedByLevelChange   Ver.: always
- */
-EmberAfStatus emberAfOnOffClusterSetValueCallback(uint8_t endpoint, uint8_t command, bool initiatedByLevelChange)
-{
-    return EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND;
-}
-#endif
 
 /** @brief Set Wake Timeout Bitmask
  *

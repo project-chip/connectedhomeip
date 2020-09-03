@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/openthread.gni")
 
@@ -20,15 +21,15 @@ import("${efr32_sdk_build_root}/efr32_board.gni")
 config("openthread_efr32_config") {
   include_dirs = [ "${openthread_root}/examples/platforms/${efr32_family}" ]
 
-  defines = [ "RADIO_CONFIG_DMP_SUPPORT=1" ]
+  defines = [ 
+    "RADIO_CONFIG_DMP_SUPPORT=1",
+    "${efr32_board}=1" 
+  ]
 
-  if (efr32_board == "BRD4161A") {
-    include_dirs +=
-        [ "${openthread_root}/examples/platforms/${efr32_family}/brd4161a" ]
-  } else if (efr32_board == "BRD4166A") {
-    include_dirs +=
-        [ "${openthread_root}/examples/platforms/${efr32_family}/brd4166a" ]
-  }
+  include_dirs += [ 
+    "${chip_root}/examples/platform/efr32",
+    "${chip_root}/examples/platform/efr32/${efr32_family}/${efr32_board}",
+  ]
 }
 
 source_set("openthread_core_config_efr32") {

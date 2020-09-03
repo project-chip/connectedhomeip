@@ -12,17 +12,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Flash an NRF5 device.
+"""Flash an EFR32 device.
 
 This is layered so that a caller can perform individual operations
 through a `Flasher` instance, or operations according to a command line.
 For `Flasher`, see the class documentation. For the parse_command()
 interface or standalone execution:
 
-usage: nrf5_firmware_utils.py [-h] [--verbose] [--erase] [--application FILE]
-                              [--verify-application] [--reset] [--skip-reset]
-                              [--nrfjprog FILE] [--family FAMILY]
-                              [--softdevice FILE] [--skip-softdevice]
+usage: efr32_firmware_utils.py [-h] [--verbose] [--erase] [--application FILE]
+                               [--verify-application] [--reset] [--skip-reset]
+                               [--commander FILE]
 
 Flash device
 
@@ -31,8 +30,7 @@ optional arguments:
 
 configuration:
   --verbose             Report more verbosely
-  --nrfjprog FILE       File name of the nrfjprog executable
-  --family FAMILY       NRF5 device famity
+  --commander FILE      File name of the commander executable
 
 operations:
   --erase               Erase device
@@ -40,8 +38,6 @@ operations:
   --verify-application  Verify the image after flashing
   --reset               Reset device after flashing
   --skip-reset          Do not reset device after flashing
-  --softdevice FILE     Softdevice image file name
-  --skip-softdevice     Do not flash softdevice even if softdevice is set
 """
 
 import argparse
@@ -118,48 +114,20 @@ OPTIONS = {
     },
 }
 
-# Additional options that can be use to configure an `NRF5Flasher`
+# Additional options that can be use to configure an `EFR32Flasher`
 # object (as dictionary keys) and/or passed as command line options.
-NRF5_OPTIONS = {
+EFR32_OPTIONS = {
     # Configuration options define properties used in flashing operations.
     'configuration': {
         # Tool configuration options.
-        'nrfjprog': {
-            'help': 'File name of the nrfjprog executable',
-            'default': 'nrfjprog',
+        'commander': {
+            'help': 'File name of the commander executable',
+            'default': 'commander',
             'argument': {
                 'metavar': 'FILE'
-            },
-        },
-
-        # Device configuration options.
-        'family': {
-            'help': 'NRF5 device family',
-            'default': None,
-            'argument': {
-                'metavar': 'FAMILY'
             },
         },
     },
-
-    # Action control options specify operations that Flasher.action() or
-    # the function interface flash_command() will perform.
-    'operations': {
-        'softdevice': {
-            'help': 'Softdevice image file name',
-            'default': None,
-            'argument': {
-                'metavar': 'FILE'
-            },
-        },
-        'skip-softdevice': {
-            'help': 'Do not flash softdevice even if softdevice is set',
-            'default': False,
-            'argument': {
-                'action': 'store_true'
-            },
-        },
-    }
 }
 
 
@@ -269,55 +237,51 @@ class Flasher:
         return 0
 
 
-class NRF5Flasher(Flasher):
-    """Manage nrf5 flashing."""
+class EFR32Flasher(Flasher):
+    """Manage efr32 flashing."""
 
     def __init__(self, options=None):
         super().__init__(options)
-        self.define_options(NRF5_OPTIONS)
+        self.define_options(EFR32_OPTIONS)
 
-    def nrfjprog(self, arguments):
-        """Run nrfjprog."""
-        command = [self.options['nrfjprog']]
-        family = self.options['family']
-        if family:
-            command += ['--family', family]
+    def commander(self, arguments):
+        """Run commander."""
+        command = [self.options['commander']]
         command += arguments
         self.log(3, 'Execute:', *command)
         self.err = subprocess.call(command)
         return self
 
-    def nrfjprog_logging(self,
-                         arguments,
-                         name,
-                         pass_message=None,
-                         fail_message=None,
-                         fail_level=0):
-        """Run nrfjprog with log messages."""
+    def commander_logging(self,
+                          arguments,
+                          name,
+                          pass_message=None,
+                          fail_message=None,
+                          fail_level=0):
+        """Run commander with log messages."""
         self.log(1, name)
-        if self.nrfjprog(arguments).err:
+        if self.commander(arguments).err:
             self.log(fail_level, fail_message or ('FAILED: ' + name))
         else:
             self.log(2, pass_message or (name + ' complete'))
         return self
 
     def erase(self):
-        """Perform nrfjprog --eraseall"""
-        return self.nrfjprog_logging(['--eraseall'], 'Erase all')
+        """Perform `commander device masserase`."""
+        return self.commander_logging(['device', 'masserase'], 'Erase device')
 
     def verify(self, image):
         """Verify image."""
-        return self.nrfjprog_logging(['--quiet', '--verify', image], 'Verify',
-                                     'Verified', 'Not verified', 2)
+        return self.commander_logging(['verify', image], 'Verify', 'Verified',
+                                      'Not verified', 2)
 
     def flash(self, image):
         """Flash image."""
-        return self.nrfjprog_logging(['--program', image, '--sectorerase'],
-                                     'Flash', 'Flashed')
+        return self.commander_logging(['flash', image], 'Flash', 'Flashed')
 
     def reset(self):
         """Reset the device."""
-        return self.nrfjprog_logging(['--reset'], 'Reset')
+        return self.commander_logging(['device', 'reset'], 'Reset')
 
     def actions(self):
         """Perform actions on the device according to self.options."""
@@ -326,12 +290,6 @@ class NRF5Flasher(Flasher):
         if self.options['erase']:
             if self.erase().err:
                 return self
-
-        softdevice = self.options['softdevice']
-        if softdevice and not self.options['skip-softdevice']:
-            if self.verify(softdevice).err:
-                if self.flash(softdevice).err:
-                    return self
 
         application = self.options['application']
         if application:
@@ -352,7 +310,7 @@ class NRF5Flasher(Flasher):
 
 def flash_command(argv, defaults=None):
     """Perform device actions according to the command line and defaults."""
-    return NRF5Flasher(defaults).parse_argv(argv).actions().status()
+    return EFR32Flasher(defaults).parse_argv(argv).actions().status()
 
 
 if __name__ == '__main__':
