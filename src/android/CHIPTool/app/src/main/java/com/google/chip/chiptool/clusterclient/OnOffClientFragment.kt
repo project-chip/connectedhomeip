@@ -41,6 +41,14 @@ class OnOffClientFragment : Fragment(), ChipDeviceController.CompletionListener 
     commandStatusTv.text = requireContext().getString(R.string.echo_status_response, message)
   }
 
+  override fun onNotifyChipConnectionClosed() {
+    Log.d(TAG, "onNotifyChipConnectionClosed")
+  }
+
+  override fun onCloseBleComplete() {
+    Log.d(TAG, "onCloseBleComplete")
+  }
+
   override fun onError(error: Throwable) {
     Log.d(TAG, "onError: $error")
   }
@@ -69,12 +77,13 @@ class OnOffClientFragment : Fragment(), ChipDeviceController.CompletionListener 
   }
 
   private fun sendCommand() {
-    commandType ?: run {
+    val chipCommandType = commandType ?: run {
       Log.e(TAG, "No ChipCommandType specified.")
       return
     }
 
-    commandStatusTv.text = requireContext().getString(R.string.echo_status_sending_message)
+    commandStatusTv.text =
+        requireContext().getString(R.string.send_command_type_label_text, chipCommandType.name)
 
     deviceController.beginSendCommand(commandType)
   }
