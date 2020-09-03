@@ -81,9 +81,7 @@ template("gdbus_library") {
     }
 
     if (invoker.c_generate_object_manager) {
-      args += [
-        "--c-generate-object-manager"
-      ]
+      args += [ "--c-generate-object-manager" ]
     }
   }
 
