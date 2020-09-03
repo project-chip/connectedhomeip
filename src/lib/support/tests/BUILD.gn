@@ -45,6 +45,6 @@ chip_test_suite("tests") {
     "TestTimeUtils",
     "TestCHIPMem",
     "TestCHIPCounter",
-    "TestPersistedCounter"
+    "TestPersistedCounter",
   ]
 }
