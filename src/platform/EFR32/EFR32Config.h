@@ -139,6 +139,7 @@ protected:
 
 private:
     static CHIP_ERROR MapNvm3Error(Ecode_t nvm3Res);
+    static void OnExit(void);
 };
 
 } // namespace Internal
