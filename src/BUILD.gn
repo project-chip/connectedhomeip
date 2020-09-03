@@ -22,5 +22,4 @@ config("includes") {
   ]
 
   defines = [ "CHIP_SEPARATE_CONFIG_H=1" ]
-
 }
