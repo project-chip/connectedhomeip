@@ -299,7 +299,7 @@ exit:
 static INET_ERROR SocketsIPv6JoinLeaveMulticastGroup(int aSocket, InterfaceId aInterfaceId, const IPAddress & aAddress,
                                                      int aCommand)
 {
-    INET_ERROR lRetval = INET_NO_ERROR;
+    INET_ERROR lRetval          = INET_NO_ERROR;
     const unsigned int lIfIndex = static_cast<unsigned int>(aInterfaceId);
     struct ipv6_mreq lMulticastRequest;
 

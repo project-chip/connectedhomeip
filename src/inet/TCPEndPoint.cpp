@@ -441,7 +441,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
     int flags = fcntl(mSocket, F_GETFL, 0);
     fcntl(mSocket, F_SETFL, flags | O_NONBLOCK);
 
-    socklen_t sockaddrsize             = 0;
+    socklen_t sockaddrsize       = 0;
     const sockaddr * sockaddrptr = NULL;
 
     union
@@ -1317,7 +1317,8 @@ INET_ERROR TCPEndPoint::DriveSending()
             break;
         }
 
-        if (lenSentRaw < 0 || lenSentRaw > bufLen) {
+        if (lenSentRaw < 0 || lenSentRaw > bufLen)
+        {
             err = INET_ERROR_INCORRECT_STATE;
             break;
         }
@@ -2561,7 +2562,7 @@ void TCPEndPoint::HandleIncomingConnection()
  */
 INET_ERROR TCPEndPoint::CheckConnectionProgress(bool & isProgressing)
 {
-    INET_ERROR err       = INET_NO_ERROR;
+    INET_ERROR err          = INET_NO_ERROR;
     int currPendingBytesRaw = 0;
     uint32_t currPendingBytes; // Will be initialized once we know it's safe.
 
@@ -2572,14 +2573,14 @@ INET_ERROR TCPEndPoint::CheckConnectionProgress(bool & isProgressing)
         ExitNow(err = chip::System::MapErrorPOSIX(errno));
     }
 
-    if (currPendingBytesRaw < 0 || currPendingBytesRaw > UINT32_MAX) {
+    if (currPendingBytesRaw < 0 || currPendingBytesRaw > UINT32_MAX)
+    {
         ExitNow(err = INET_ERROR_INCORRECT_STATE);
     }
 
     currPendingBytes = static_cast<uint32_t>(currPendingBytesRaw);
 
-    if ((currPendingBytes != 0) &&
-        (mBytesWrittenSinceLastProbe + mLastTCPKernelSendQueueLen == currPendingBytes))
+    if ((currPendingBytes != 0) && (mBytesWrittenSinceLastProbe + mLastTCPKernelSendQueueLen == currPendingBytes))
     {
         // No progress has been made
 

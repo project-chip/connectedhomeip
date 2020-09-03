@@ -32,8 +32,8 @@
 #include <signal.h>
 #include <stdint.h>
 #include <string.h>
-#include <unistd.h>
 #include <type_traits>
+#include <unistd.h>
 
 #include <CHIPVersion.h>
 
@@ -597,8 +597,8 @@ static void HandleTCPDataSent(TCPEndPoint * aEndPoint, uint16_t len)
 static void HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBuffer * aBuffer)
 {
     const uint32_t lFirstValueReceived = sTestState.mStats.mReceive.mActual;
-    const uint8_t lFirstValue = uint8_t(lFirstValueReceived);
-    const bool lCheckBuffer   = true;
+    const uint8_t lFirstValue          = uint8_t(lFirstValueReceived);
+    const bool lCheckBuffer            = true;
     IPAddress lPeerAddress;
     uint16_t lPeerPort;
     char lPeerAddressBuffer[INET6_ADDRSTRLEN];

@@ -705,7 +705,8 @@ INET_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint8_t maxAddrs
                                          DNSResolveCompleteFunct onComplete, void * appState)
 {
     size_t hostNameLength = strlen(hostName);
-    if (hostNameLength > UINT16_MAX) {
+    if (hostNameLength > UINT16_MAX)
+    {
         return INET_ERROR_HOST_NAME_TOO_LONG;
     }
     return ResolveHostAddress(hostName, static_cast<uint16_t>(hostNameLength), maxAddrs, addrArray, onComplete, appState);

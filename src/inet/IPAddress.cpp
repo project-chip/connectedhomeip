@@ -387,9 +387,12 @@ IPAddress IPAddress::MakeIPv6Multicast(uint8_t aFlags, uint8_t aScope,
     IPAddress addr;
 
     addr.Addr[0] = htonl((0xFF000000U | lFlagsAndScope) | (uint32_t(aGroupId[0]) << 8) | (uint32_t(aGroupId[1]) << 0));
-    addr.Addr[1] = htonl((uint32_t(aGroupId[2]) << 24) | (uint32_t(aGroupId[3]) << 16) | (uint32_t(aGroupId[4]) << 8) | (uint32_t(aGroupId[5]) << 0));
-    addr.Addr[2] = htonl((uint32_t(aGroupId[6]) << 24) | (uint32_t(aGroupId[7]) << 16) | (uint32_t(aGroupId[8]) << 8) | (uint32_t(aGroupId[9]) << 0));
-    addr.Addr[3] = htonl((uint32_t(aGroupId[10]) << 24) | (uint32_t(aGroupId[11]) << 16) | (uint32_t(aGroupId[12]) << 8) | (uint32_t(aGroupId[13]) << 0));
+    addr.Addr[1] = htonl((uint32_t(aGroupId[2]) << 24) | (uint32_t(aGroupId[3]) << 16) | (uint32_t(aGroupId[4]) << 8) |
+                         (uint32_t(aGroupId[5]) << 0));
+    addr.Addr[2] = htonl((uint32_t(aGroupId[6]) << 24) | (uint32_t(aGroupId[7]) << 16) | (uint32_t(aGroupId[8]) << 8) |
+                         (uint32_t(aGroupId[9]) << 0));
+    addr.Addr[3] = htonl((uint32_t(aGroupId[10]) << 24) | (uint32_t(aGroupId[11]) << 16) | (uint32_t(aGroupId[12]) << 8) |
+                         (uint32_t(aGroupId[13]) << 0));
 
     return addr;
 }

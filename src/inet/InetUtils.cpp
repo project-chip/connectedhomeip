@@ -86,11 +86,10 @@ DLL_EXPORT INET_ERROR ParseHostAndPort(const char * aString, uint16_t aStringLen
             return INET_ERROR_INVALID_HOST_NAME;
 
         // Return the IPv6 address.
-        aHost    = aString + 1;
+        aHost = aString + 1;
         // Cast is safe because we know p != aString, so p >= aHost, and at the
         // same time p - aString < aStringLen, which is uint16_t.
-        static_assert(std::is_same<decltype(aStringLen), uint16_t>::value,
-                      "String length might be too big");
+        static_assert(std::is_same<decltype(aStringLen), uint16_t>::value, "String length might be too big");
         aHostLen = static_cast<uint16_t>(p - aHost);
 
         // Skip the end bracket.
@@ -115,11 +114,10 @@ DLL_EXPORT INET_ERROR ParseHostAndPort(const char * aString, uint16_t aStringLen
             p = end;
 
         // Return the host/address portion.
-        aHost    = aString;
+        aHost = aString;
         // Cast is safe because we know p - aString < aStringLen, which is
         // uint16_t.
-        static_assert(std::is_same<decltype(aStringLen), uint16_t>::value,
-                      "String length might be too big");
+        static_assert(std::is_same<decltype(aStringLen), uint16_t>::value, "String length might be too big");
         aHostLen = static_cast<uint16_t>(p - aString);
     }
 
