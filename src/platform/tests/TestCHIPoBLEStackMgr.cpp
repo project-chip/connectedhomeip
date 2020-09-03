@@ -65,4 +65,3 @@ int TestCHIPoBLEStackManager()
 
     return 0;
 }
-
