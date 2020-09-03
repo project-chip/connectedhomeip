@@ -19,7 +19,6 @@ package chip.devicecontroller;
 
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
-import android.os.Build;
 import android.util.Log;
 
 /** Controller to interact with the CHIP device. */
