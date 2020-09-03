@@ -24,7 +24,6 @@
 #ifndef CHIP_TEST_CHIP_BLE_STACK_MGR_H
 #define CHIP_TEST_CHIP_BLE_STACK_MGR_H
 
-
 int TestCHIPoBLEStackManager();
 
 #endif // CHIP_TEST_CHIP_BLE_STACK_MGR_H

@@ -161,7 +161,7 @@ struct BluezEndpoint
     uint32_t mNodeId;
     bool mIsNotify;
     bool mIsCentral;
-    char* mpAdvertisingUUID;
+    char * mpAdvertisingUUID;
     CHIPServiceData * mpChipServiceData;
     ChipAdvType mType;  ///< Advertisement type.
     uint16_t mDuration; ///< Advertisement interval (in ms).

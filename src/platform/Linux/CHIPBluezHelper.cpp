@@ -168,7 +168,7 @@ static void BluezAdvStartDone(GObject * aObject, GAsyncResult * aResult, gpointe
     BluezLEAdvertisingManager1 * advMgr = BLUEZ_LEADVERTISING_MANAGER1(aObject);
     GError * error                      = NULL;
     BluezEndpoint * endpoint            = static_cast<BluezEndpoint *>(apClosure);
-    gboolean success = FALSE;
+    gboolean success                    = FALSE;
 
     VerifyOrExit(endpoint != NULL, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
 
@@ -194,7 +194,7 @@ static void BluezAdvStopDone(GObject * aObject, GAsyncResult * aResult, gpointer
     BluezLEAdvertisingManager1 * advMgr = BLUEZ_LEADVERTISING_MANAGER1(aObject);
     BluezEndpoint * endpoint            = static_cast<BluezEndpoint *>(apClosure);
     GError * error                      = NULL;
-    gboolean success = FALSE;
+    gboolean success                    = FALSE;
 
     VerifyOrExit(endpoint != NULL, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
 
@@ -221,7 +221,7 @@ exit:
 
 static gboolean BluezAdvSetup(void * apClosure)
 {
-    BluezEndpoint * endpoint            = static_cast<BluezEndpoint *>(apClosure);
+    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apClosure);
     BluezLEAdvertisement1 * adv;
 
     VerifyOrExit(endpoint != NULL, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
@@ -270,7 +270,7 @@ static gboolean BluezAdvStop(void * apClosure)
     GDBusObject * adapter;
     BluezEndpoint * endpoint            = static_cast<BluezEndpoint *>(apClosure);
     BluezLEAdvertisingManager1 * advMgr = NULL;
-    //GVariantBuilder optionsBuilder;
+    // GVariantBuilder optionsBuilder;
 
     VerifyOrExit(endpoint != NULL, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
     VerifyOrExit(endpoint->mIsAdvertising,
@@ -283,8 +283,8 @@ static gboolean BluezAdvStop(void * apClosure)
     advMgr = bluez_object_get_leadvertising_manager1(BLUEZ_OBJECT(adapter));
     VerifyOrExit(advMgr != NULL, ChipLogProgress(DeviceLayer, "FAIL: NULL advMgr in %s", __func__));
 
-    //g_variant_builder_init(&optionsBuilder, G_VARIANT_TYPE("a{sv}"));
-    //options = g_variant_builder_end(&optionsBuilder);
+    // g_variant_builder_init(&optionsBuilder, G_VARIANT_TYPE("a{sv}"));
+    // options = g_variant_builder_end(&optionsBuilder);
 
     bluez_leadvertising_manager1_call_unregister_advertisement(advMgr, endpoint->mpAdvPath, NULL, BluezAdvStopDone, apClosure);
 
@@ -868,8 +868,8 @@ exit:
 
 static void BluezHandleAdvertisementFromDevice(BluezDevice1 * aDevice)
 {
-    const char * address   = bluez_device1_get_address(aDevice);
-    //int16_t rssi           = bluez_device1_get_rssi(aDevice);
+    const char * address = bluez_device1_get_address(aDevice);
+    // int16_t rssi           = bluez_device1_get_rssi(aDevice);
     GVariant * serviceData = bluez_device1_get_service_data(aDevice);
     GVariant * entry;
     GVariantIter iter;
@@ -983,7 +983,7 @@ static void BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClient * aMa
                         len = 255;
 
                     buf = (uint8_t *) g_memdup(data, len);
-                     ChipLogProgress(DeviceLayer, "buf addr is %p", buf);
+                    ChipLogProgress(DeviceLayer, "buf addr is %p", buf);
                 }
                 g_variant_unref(value);
             }
@@ -1430,7 +1430,7 @@ static void BluezOnNameLost(GDBusConnection * aConn, const gchar * aName, gpoint
 static void * BluezMainLoop(void * apClosure)
 {
     GDBusObjectManager * manager;
-    GError * error = NULL;
+    GError * error           = NULL;
     GDBusConnection * conn   = NULL;
     BluezEndpoint * endpoint = (BluezEndpoint *) apClosure;
     VerifyOrExit(endpoint != NULL, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));

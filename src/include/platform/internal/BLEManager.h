@@ -180,5 +180,4 @@ inline chip::Ble::BleLayer * BLEManager::GetBleLayer(void) const
 
 #endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
-
 #endif // BLE_MANAGER_H

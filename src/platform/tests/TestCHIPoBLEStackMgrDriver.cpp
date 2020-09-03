@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
-#include <stdlib.h>
 #include "TestCHIPoBLEStackMgr.h"
+#include <stdlib.h>
 
-int main(int argc, char *argv[])
+int main(int argc, char * argv[])
 {
     if (argc == 2 && atoi(argv[1]) == 1)
     {
