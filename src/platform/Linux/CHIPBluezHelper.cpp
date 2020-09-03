@@ -1253,7 +1253,7 @@ static BluezConnection * BluezCharacteristicGetBluezConnection(BluezGattCharacte
 exit:
     return retval;
 }
-#endif //CHIP_BLUEZ_CENTRAL_SUPPORT
+#endif // CHIP_BLUEZ_CENTRAL_SUPPORT
 
 void EndpointCleanup(BluezEndpoint * apEndpoint)
 {
