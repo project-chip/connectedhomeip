@@ -20,7 +20,7 @@ gdbus_library("wpa") {
   sources = [
     "DBusWpa.xml",
     "DBusWpaInterface.xml",
-    "DBusWpaNetwork.xml"
+    "DBusWpaNetwork.xml",
   ]
 
   c_namespace = "Wpa"

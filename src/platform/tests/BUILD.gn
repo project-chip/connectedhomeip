@@ -60,10 +60,11 @@ if (chip_device_platform != "none") {
 
     if (chip_enable_ble) {
       sources += [
-        "TestCHIPoBLEStackMgrDriver.cpp",
         "TestCHIPoBLEStackMgr.cpp",
         "TestCHIPoBLEStackMgr.h",
+        "TestCHIPoBLEStackMgrDriver.cpp",
       ]
+
       # FIXME: TestCHIPoBLEStackMgr requires bluetoothd daemon to be running
       tests += [ "TestCHIPoBLEStackMgr" ]
     }

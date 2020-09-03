@@ -260,9 +260,9 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       sources += [
         "Linux/BLEManagerImpl.cpp",
         "Linux/BLEManagerImpl.h",
-                "Linux/BlePlatformConfig.h",
-                        "Linux/CHIPBluezHelper.cpp",
-                        "Linux/CHIPBluezHelper.h",
+        "Linux/BlePlatformConfig.h",
+        "Linux/CHIPBluezHelper.cpp",
+        "Linux/CHIPBluezHelper.h",
         "Linux/CHIPDevicePlatformConfig.h",
         "Linux/CHIPDevicePlatformEvent.h",
         "Linux/CHIPLinuxStorage.cpp",
