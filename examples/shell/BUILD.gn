@@ -27,7 +27,10 @@ executable("chip-shell") {
     "main.cpp",
   ]
 
-  public_deps = [ "${chip_root}/src/lib/shell" ]
+  public_deps = [
+    "${chip_root}/src/lib/shell",
+    "${chip_root}/src/platform",
+  ]
 
   if (is_debug) {
     defines = [ "BUILD_RELEASE=0" ]
