@@ -864,7 +864,7 @@ exit:
 
 static void BluezHandleAdvertisementFromDevice(BluezDevice1 * aDevice)
 {
-    const char * address  = bluez_device1_get_address(aDevice);
+    const char * address   = bluez_device1_get_address(aDevice);
     GVariant * serviceData = bluez_device1_get_service_data(aDevice);
     GVariant * entry;
     GVariantIter iter;
