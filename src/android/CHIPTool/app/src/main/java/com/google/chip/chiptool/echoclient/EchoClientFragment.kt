@@ -57,6 +57,14 @@ class EchoClientFragment : Fragment(), ChipDeviceController.CompletionListener {
     commandStatusTv.text = requireContext().getString(R.string.echo_status_response, message)
   }
 
+  override fun onNotifyChipConnectionClosed() {
+    Log.d(TAG, "onNotifyChipConnectionClosed")
+  }
+
+  override fun onCloseBleComplete() {
+    Log.d(TAG, "onCloseBleComplete")
+  }
+
   override fun onError(error: Throwable) {
     Log.d(TAG, "onError: $error")
   }

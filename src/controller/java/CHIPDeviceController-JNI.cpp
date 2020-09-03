@@ -22,7 +22,10 @@
  *
  */
 
-#include <controller/CHIPDeviceController.h>
+#include "AndroidBleApplicationDelegate.h"
+#include "AndroidBleConnectionDelegate.h"
+#include "AndroidBlePlatformDelegate.h"
+#include "CHIPDeviceController.h"
 
 #include <jni.h>
 #include <pthread.h>
@@ -59,8 +62,17 @@ using namespace chip::DeviceController;
 
 static void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState);
 static void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
+static void HandleNotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj);
+static bool HandleSendCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId,
+                                     const uint8_t * characteristicData, uint32_t characteristicDataLen);
+static bool HandleSubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId);
+static bool HandleUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId);
+static bool HandleCloseConnection(BLE_CONNECTION_OBJECT connObj);
+static uint16_t HandleGetMTU(BLE_CONNECTION_OBJECT connObj);
 static void HandleError(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err, const IPPacketInfo * pktInfo);
+static void HandleNewConnection(void * appState, const uint16_t discriminator);
 static void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow);
+static void ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * cbName);
 static void * IOThreadMain(void * arg);
 static CHIP_ERROR GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls);
 static CHIP_ERROR N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArrayLen, jbyteArray & outArray);
@@ -71,10 +83,17 @@ static CHIP_ERROR N2J_NewStringUTF(JNIEnv * env, const char * inStr, size_t inSt
 static JavaVM * sJVM;
 static System::Layer sSystemLayer;
 static InetLayer sInetLayer;
+#if CONFIG_NETWORK_LAYER_BLE
+static BleLayer sBleLayer;
+static AndroidBleApplicationDelegate sBleApplicationDelegate;
+static AndroidBlePlatformDelegate sBlePlatformDelegate;
+static AndroidBleConnectionDelegate sBleConnectionDelegate;
+#endif
 static pthread_mutex_t sStackLock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_t sIOThread        = PTHREAD_NULL;
 static bool sShutdown             = false;
 
+static jclass sAndroidChipStackCls              = NULL;
 static jclass sChipDeviceControllerCls          = NULL;
 static jclass sChipDeviceControllerExceptionCls = NULL;
 
@@ -104,6 +123,8 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     // Get various class references need by the API.
     err = GetClassRef(env, "chip/devicecontroller/ChipDeviceController", sChipDeviceControllerCls);
     SuccessOrExit(err);
+    err = GetClassRef(env, "chip/devicecontroller/AndroidChipStack", sAndroidChipStackCls);
+    SuccessOrExit(err);
     err = GetClassRef(env, "chip/devicecontroller/ChipDeviceControllerException", sChipDeviceControllerExceptionCls);
     SuccessOrExit(err);
     ChipLogProgress(Controller, "Java class references loaded.");
@@ -122,6 +143,29 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     // Initialize the CHIP Inet layer.
     err = sInetLayer.Init(sSystemLayer, NULL);
     SuccessOrExit(err);
+    ChipLogProgress(Controller, "Inet layer initialized.");
+
+#if CONFIG_NETWORK_LAYER_BLE
+    ChipLogProgress(Controller, "BLE Layer being configured.");
+
+    // Initialize the BleApplicationDelegate
+    sBleApplicationDelegate.SetNotifyChipConnectionClosedCallback(HandleNotifyChipConnectionClosed);
+    // Initialize the BlePlatformDelegate
+    sBlePlatformDelegate.SetSendWriteRequestCallback(HandleSendCharacteristic);
+    sBlePlatformDelegate.SetSubscribeCharacteristicCallback(HandleSubscribeCharacteristic);
+    sBlePlatformDelegate.SetUnsubscribeCharacteristicCallback(HandleUnsubscribeCharacteristic);
+    sBlePlatformDelegate.SetCloseConnectionCallback(HandleCloseConnection);
+    sBlePlatformDelegate.SetGetMTUCallback(HandleGetMTU);
+
+    sBleConnectionDelegate.SetNewConnectionCallback(HandleNewConnection);
+
+    ChipLogProgress(Controller, "Asking for BLE Layer initialization.");
+    // Initialize the BleLayer object.
+    err = sBleLayer.Init(&sBlePlatformDelegate, &sBleConnectionDelegate, &sBleApplicationDelegate, &sSystemLayer);
+    SuccessOrExit(err);
+
+    ChipLogProgress(Controller, "BLE was initialized.");
+#endif
 
     // Create and start the IO thread.
     sShutdown  = false;
@@ -149,6 +193,10 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
         sSystemLayer.WakeSelect();
         pthread_join(sIOThread, NULL);
     }
+
+#if CONFIG_NETWORK_LAYER_BLE
+    sBleLayer.Shutdown();
+#endif
 
     sSystemLayer.Shutdown();
     sInetLayer.Shutdown();
@@ -197,7 +245,35 @@ exit:
     return result;
 }
 
-JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong deviceControllerPtr, jstring deviceAddr)
+JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong deviceControllerPtr, jint discriminator, jlong pinCode)
+{
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
+
+    ChipLogProgress(Controller, "beginConnectDevice() called with discriminator and pincode on 0x%08lX", (long) self);
+
+    pthread_mutex_lock(&sStackLock);
+    sBleLayer.mAppState = (void *) self;
+    err                 = deviceController->ConnectDevice(BLEDeviceConnectionParameters()
+                                              .SetRemoteDeviceId(kRemoteDeviceId)
+                                              .SetDiscriminator(discriminator)
+                                              .SetSetupPINCode(pinCode)
+                                              .SetAppReqState((void *) self)
+                                              .SetOnConnected(HandleKeyExchange)
+                                              .SetOnMessageReceived(HandleEchoResponse)
+                                              .SetOnError(HandleError)
+                                              .SetBleLayer(&sBleLayer));
+
+    pthread_mutex_unlock(&sStackLock);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to connect to device.");
+        ThrowError(env, err);
+    }
+}
+
+JNI_METHOD(void, beginConnectDeviceIp)(JNIEnv * env, jobject self, jlong deviceControllerPtr, jstring deviceAddr)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
@@ -382,6 +458,261 @@ exit:
     System::PacketBuffer::Free(payload);
 }
 
+void HandleNotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env;
+    jmethodID method;
+    intptr_t tmpConnObj;
+
+    ChipLogProgress(Controller, "Received NotifyChipConnectionClosed");
+
+    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+
+    method = env->GetStaticMethodID(sAndroidChipStackCls, "onNotifyChipConnectionClosed", "(I)V");
+    VerifyOrExit(method != NULL, err = CDC_JNI_ERROR_METHOD_NOT_FOUND);
+
+    ChipLogProgress(Controller, "Calling Java NotifyChipConnectionClosed");
+
+    env->ExceptionClear();
+    tmpConnObj = reinterpret_cast<intptr_t>(connObj);
+    env->CallStaticVoidMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj));
+    VerifyOrExit(!env->ExceptionCheck(), err = CDC_JNI_ERROR_EXCEPTION_THROWN);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ReportError(env, err, __FUNCTION__);
+    }
+    env->ExceptionClear();
+}
+
+bool HandleSendCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId,
+                              const uint8_t * characteristicData, uint32_t characteristicDataLen)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env;
+    jbyteArray svcIdObj;
+    jbyteArray charIdObj;
+    jbyteArray characteristicDataObj;
+    jmethodID method;
+    intptr_t tmpConnObj;
+    bool rc = false;
+
+    ChipLogProgress(Controller, "Received SendCharacteristic");
+
+    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+
+    err = N2J_ByteArray(env, svcId, 16, svcIdObj);
+    SuccessOrExit(err);
+
+    err = N2J_ByteArray(env, charId, 16, charIdObj);
+    SuccessOrExit(err);
+
+    err = N2J_ByteArray(env, characteristicData, characteristicDataLen, characteristicDataObj);
+    SuccessOrExit(err);
+
+    method = env->GetStaticMethodID(sAndroidChipStackCls, "onSendCharacteristic", "(I[B[B[B)Z");
+    VerifyOrExit(method != NULL, err = CDC_JNI_ERROR_METHOD_NOT_FOUND);
+
+    ChipLogProgress(Controller, "Calling Java SendCharacteristic");
+
+    env->ExceptionClear();
+    tmpConnObj = reinterpret_cast<intptr_t>(connObj);
+    rc = (bool) env->CallStaticBooleanMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj), svcIdObj, charIdObj,
+                                             characteristicDataObj);
+    VerifyOrExit(!env->ExceptionCheck(), err = CDC_JNI_ERROR_EXCEPTION_THROWN);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ReportError(env, err, __FUNCTION__);
+        rc = false;
+    }
+    env->ExceptionClear();
+
+    return rc;
+}
+
+bool HandleSubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env;
+    jbyteArray svcIdObj;
+    jbyteArray charIdObj;
+    jmethodID method;
+    intptr_t tmpConnObj;
+    bool rc = false;
+
+    ChipLogProgress(Controller, "Received SubscribeCharacteristic");
+
+    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+
+    err = N2J_ByteArray(env, svcId, 16, svcIdObj);
+    SuccessOrExit(err);
+
+    err = N2J_ByteArray(env, charId, 16, charIdObj);
+    SuccessOrExit(err);
+
+    method = env->GetStaticMethodID(sAndroidChipStackCls, "onSubscribeCharacteristic", "(I[B[B)Z");
+    VerifyOrExit(method != NULL, err = CDC_JNI_ERROR_METHOD_NOT_FOUND);
+
+    ChipLogProgress(Controller, "Calling Java SubscribeCharacteristic");
+
+    env->ExceptionClear();
+    tmpConnObj = reinterpret_cast<intptr_t>(connObj);
+    rc = (bool) env->CallStaticBooleanMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj), svcIdObj, charIdObj);
+    VerifyOrExit(!env->ExceptionCheck(), err = CDC_JNI_ERROR_EXCEPTION_THROWN);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ReportError(env, err, __FUNCTION__);
+        rc = false;
+    }
+    env->ExceptionClear();
+
+    return rc;
+}
+
+bool HandleUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env;
+    jbyteArray svcIdObj;
+    jbyteArray charIdObj;
+    jmethodID method;
+    intptr_t tmpConnObj;
+    bool rc = false;
+
+    ChipLogProgress(Controller, "Received UnsubscribeCharacteristic");
+
+    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+
+    err = N2J_ByteArray(env, svcId, 16, svcIdObj);
+    SuccessOrExit(err);
+
+    err = N2J_ByteArray(env, charId, 16, charIdObj);
+    SuccessOrExit(err);
+
+    method = env->GetStaticMethodID(sAndroidChipStackCls, "onUnsubscribeCharacteristic", "(I[B[B)Z");
+    VerifyOrExit(method != NULL, err = CDC_JNI_ERROR_METHOD_NOT_FOUND);
+
+    ChipLogProgress(Controller, "Calling Java UnsubscribeCharacteristic");
+
+    env->ExceptionClear();
+    tmpConnObj = reinterpret_cast<intptr_t>(connObj);
+    rc = (bool) env->CallStaticBooleanMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj), svcIdObj, charIdObj);
+    VerifyOrExit(!env->ExceptionCheck(), err = CDC_JNI_ERROR_EXCEPTION_THROWN);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ReportError(env, err, __FUNCTION__);
+        rc = false;
+    }
+    env->ExceptionClear();
+
+    return rc;
+}
+
+bool HandleCloseConnection(BLE_CONNECTION_OBJECT connObj)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env;
+    jmethodID method;
+    intptr_t tmpConnObj;
+    bool rc = false;
+
+    ChipLogProgress(Controller, "Received CloseConnection");
+
+    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+
+    method = env->GetStaticMethodID(sAndroidChipStackCls, "onCloseConnection", "(I)Z");
+    VerifyOrExit(method != NULL, err = CDC_JNI_ERROR_METHOD_NOT_FOUND);
+
+    ChipLogProgress(Controller, "Calling Java CloseConnection");
+
+    env->ExceptionClear();
+    tmpConnObj = reinterpret_cast<intptr_t>(connObj);
+    rc         = (bool) env->CallStaticBooleanMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj));
+    VerifyOrExit(!env->ExceptionCheck(), err = CDC_JNI_ERROR_EXCEPTION_THROWN);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ReportError(env, err, __FUNCTION__);
+        rc = false;
+    }
+    env->ExceptionClear();
+    return rc;
+}
+
+uint16_t HandleGetMTU(BLE_CONNECTION_OBJECT connObj)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env;
+    jmethodID method;
+    intptr_t tmpConnObj;
+    uint16_t mtu = 0;
+
+    ChipLogProgress(Controller, "Received GetMTU");
+
+    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+
+    method = env->GetStaticMethodID(sAndroidChipStackCls, "onGetMTU", "(I)I");
+    VerifyOrExit(method != NULL, err = CDC_JNI_ERROR_METHOD_NOT_FOUND);
+
+    ChipLogProgress(Controller, "Calling Java onGetMTU");
+
+    env->ExceptionClear();
+    tmpConnObj = reinterpret_cast<intptr_t>(connObj);
+    mtu        = (int16_t) env->CallStaticIntMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj));
+    VerifyOrExit(!env->ExceptionCheck(), err = CDC_JNI_ERROR_EXCEPTION_THROWN);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ReportError(env, err, __FUNCTION__);
+        mtu = 0;
+    }
+    env->ExceptionClear();
+
+    return mtu;
+}
+
+void HandleNewConnection(void * appState, const uint16_t discriminator)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env;
+    jmethodID method;
+    jclass deviceControllerCls;
+    jobject self = (jobject) appState;
+
+    ChipLogProgress(Controller, "Received New Connection");
+
+    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+
+    deviceControllerCls = env->GetObjectClass(self);
+    VerifyOrExit(deviceControllerCls != NULL, err = CDC_JNI_ERROR_TYPE_NOT_FOUND);
+
+    method = env->GetMethodID(deviceControllerCls, "onConnectDeviceComplete", "()V");
+    VerifyOrExit(method != NULL, err = CDC_JNI_ERROR_METHOD_NOT_FOUND);
+
+    ChipLogProgress(Controller, "Calling Java onConnectDeviceComplete");
+
+    env->ExceptionClear();
+    env->CallVoidMethod(self, method);
+    VerifyOrExit(!env->ExceptionCheck(), err = CDC_JNI_ERROR_EXCEPTION_THROWN);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ReportError(env, err, __FUNCTION__);
+    }
+    env->ExceptionClear();
+}
+
 void HandleError(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err, const IPPacketInfo * pktInfo)
 {
     JNIEnv * env;
@@ -472,6 +803,35 @@ void * IOThreadMain(void * arg)
     sJVM->DetachCurrentThread();
 
     return NULL;
+}
+
+void ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * functName)
+{
+    if (cbErr == CDC_JNI_ERROR_EXCEPTION_THROWN)
+    {
+        ChipLogError(Controller, "Java exception thrown in %s", functName);
+        env->ExceptionDescribe();
+    }
+    else
+    {
+        const char * errStr;
+        switch (cbErr)
+        {
+        case CDC_JNI_ERROR_TYPE_NOT_FOUND:
+            errStr = "JNI type not found";
+            break;
+        case CDC_JNI_ERROR_METHOD_NOT_FOUND:
+            errStr = "JNI method not found";
+            break;
+        case CDC_JNI_ERROR_FIELD_NOT_FOUND:
+            errStr = "JNI field not found";
+            break;
+        default:
+            errStr = ErrorStr(cbErr);
+            break;
+        }
+        ChipLogError(Controller, "Error in %s : %s", functName, errStr);
+    }
 }
 
 void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow)

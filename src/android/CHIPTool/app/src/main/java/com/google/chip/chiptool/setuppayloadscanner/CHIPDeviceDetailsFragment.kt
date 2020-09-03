@@ -19,16 +19,18 @@
 package com.google.chip.chiptool.setuppayloadscanner
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.R
 import kotlinx.android.synthetic.main.chip_device_info_fragment.view.*
 
 /** Show the [CHIPDeviceInfo]. */
-class CHIPDeviceDetailsFragment : Fragment() {
+class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionListener {
 
     private lateinit var deviceInfo: CHIPDeviceInfo
 
@@ -46,6 +48,7 @@ class CHIPDeviceDetailsFragment : Fragment() {
             vendorIdTv.text = "${deviceInfo.vendorId}"
             productIdTv.text = "${deviceInfo.productId}"
             setupCodeTv.text = "${deviceInfo.setupPinCode}"
+            discriminatorTv.text = "${deviceInfo.discriminator}"
 
             if (deviceInfo.optionalQrCodeInfoMap.isEmpty()) {
                 vendorTagsLabelTv.visibility = View.GONE
@@ -61,10 +64,40 @@ class CHIPDeviceDetailsFragment : Fragment() {
                     vendorTagsContainer.addView(tv)
                 }
             }
+
+            ble_rendezvous_btn.setOnClickListener { onRendezvousBleClicked() }
+            softap_rendezvous_btn.setOnClickListener { onRendezvousSoftApClicked() }
         }
     }
 
+    private fun onRendezvousBleClicked() { }
+
+    override fun onConnectDeviceComplete() {
+        Log.d(TAG, "TODO: Retrieve Wi-Fi credentials and send to device.")
+    }
+
+    override fun onCloseBleComplete() {
+        Log.d(TAG, "onCloseBleComplete")
+    }
+
+    override fun onNotifyChipConnectionClosed() {
+        Log.d(TAG, "onNotifyChipConnectionClosed")
+    }
+
+    override fun onSendMessageComplete(message: String?) {
+        Log.d(TAG, "Echo message received: $message")
+    }
+
+    override fun onError(error: Throwable?) {
+        Log.d(TAG, "onError: $error")
+    }
+
+    private fun onRendezvousSoftApClicked() {
+        // TODO: once rendezvous over hotspot is ready in CHIP
+    }
+
     companion object {
+        private const val TAG = "CHIPDeviceDetailsFragment"
         private const val ARG_DEVICE_INFO = "device_info"
 
         @JvmStatic fun newInstance(deviceInfo: CHIPDeviceInfo): CHIPDeviceDetailsFragment {
