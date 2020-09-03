@@ -412,7 +412,7 @@ template("nrf5_sdk") {
     ]
 
     public_deps = [
-      "${openthread_root}/src/core:libopenthread_core_headers",
+      "${openthread_root}/include/openthread:openthread_config",
       "${segger_rtt_root}:segger_rtt",
       "${segger_rtt_root}:segger_rtt_printf",
       "${segger_rtt_root}:segger_rtt_syscalls",
