@@ -35,10 +35,10 @@ COMPONENT_SRCDIRS :=                                                      \
   ../third_party/connectedhomeip/src/app/clusters/color-control-server    \
   ../third_party/connectedhomeip/src/app/clusters/scenes                 \
  ../third_party/connectedhomeip/src/app/clusters/basic                  \
+  ../third_party/connectedhomeip/src/app/reporting                       \
 #  ../third_party/connectedhomeip/src/app/clusters/door-lock-server       \
 #  ../third_party/connectedhomeip/src/app/clusters/ias-zone-client        \
 #  ../third_party/connectedhomeip/src/app/clusters/ias-zone-server        \
-#  ../third_party/connectedhomeip/src/app/reporting                       \
 
 
 COMPONENT_EXTRA_INCLUDES := $(PROJECT_PATH)/third_party/connectedhomeip/src/app/util \

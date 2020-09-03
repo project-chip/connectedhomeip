@@ -37,6 +37,14 @@
  *******************************************************************************
  ******************************************************************************/
 
+#ifndef REPORTING_H
+#define REPORTING_H
+
+#include <app/util/af-types.h>
+#include <app/util/types_stub.h>
+#include <stdbool.h>
+#include <stdint.h>
+
 // The default reporting will generate a table that is mandatory
 // but user may still allocate some table for adding more reporting over
 // the air or by cli as part of reporting plugin.
@@ -65,3 +73,4 @@ bool emAfPluginReportingDoEntriesMatch(const EmberAfPluginReportingEntry * const
 uint8_t emAfPluginReportingConditionallyAddReportingEntry(EmberAfPluginReportingEntry * newEntry);
 void emberAfPluginReportingLoadReportingConfigDefaults(void);
 bool emberAfPluginReportingGetReportingConfigDefaults(EmberAfPluginReportingEntry * defaultConfiguration);
+#endif
