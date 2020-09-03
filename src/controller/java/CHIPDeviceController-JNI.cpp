@@ -519,8 +519,8 @@ bool HandleSendCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svc
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(connObj);
-    rc         = (bool) env->CallStaticBooleanMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj), svcIdObj, charIdObj,
-                                                     characteristicDataObj);
+    rc = (bool) env->CallStaticBooleanMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj), svcIdObj, charIdObj,
+                                             characteristicDataObj);
     VerifyOrExit(!env->ExceptionCheck(), err = CDC_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -561,7 +561,7 @@ bool HandleSubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t 
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(connObj);
-    rc         = (bool) env->CallStaticBooleanMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj), svcIdObj, charIdObj);
+    rc = (bool) env->CallStaticBooleanMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj), svcIdObj, charIdObj);
     VerifyOrExit(!env->ExceptionCheck(), err = CDC_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -602,7 +602,7 @@ bool HandleUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(connObj);
-    rc         = (bool) env->CallStaticBooleanMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj), svcIdObj, charIdObj);
+    rc = (bool) env->CallStaticBooleanMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj), svcIdObj, charIdObj);
     VerifyOrExit(!env->ExceptionCheck(), err = CDC_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:

@@ -47,7 +47,7 @@ bool AndroidBlePlatformDelegate::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT
     if (UnsubscribeCharacteristicCb)
     {
         rc = UnsubscribeCharacteristicCb(connObj, static_cast<const uint8_t *>(svcId->bytes),
-					                               static_cast<const uint8_t *>(charId->bytes));
+                                         static_cast<const uint8_t *>(charId->bytes));
     }
     return rc;
 }

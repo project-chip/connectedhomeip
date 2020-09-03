@@ -25,12 +25,12 @@
 using namespace chip::Ble;
 using chip::System::PacketBuffer;
 
-typedef bool (* SendWriteRequestCallback)(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId,
-                                          const uint8_t * data, uint32_t dataLen);
-typedef bool (* SubscribeCharacteristicCallback)(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId);
-typedef bool (* UnsubscribeCharacteristicCallback)(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId);
-typedef bool (* CloseConnectionCallback)(BLE_CONNECTION_OBJECT connObj);
-typedef uint16_t (* GetMTUCallback)(BLE_CONNECTION_OBJECT connObj);
+typedef bool (*SendWriteRequestCallback)(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId,
+                                         const uint8_t * data, uint32_t dataLen);
+typedef bool (*SubscribeCharacteristicCallback)(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId);
+typedef bool (*UnsubscribeCharacteristicCallback)(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId);
+typedef bool (*CloseConnectionCallback)(BLE_CONNECTION_OBJECT connObj);
+typedef uint16_t (*GetMTUCallback)(BLE_CONNECTION_OBJECT connObj);
 
 class AndroidBlePlatformDelegate : public BlePlatformDelegate
 {
