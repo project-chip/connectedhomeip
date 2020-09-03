@@ -12,13 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# The location of the build configuration file.
-buildconfig = "//build/config/BUILDCONFIG.gn"
+import("//build_overrides/chip.gni")
 
-# CHIP uses angle bracket includes.
-check_system_includes = true
+import("${chip_root}/examples/platform/nrf528xx/args.gni")
 
-# Allow loading paths relative to //gn.
-secondary_source = "//third_party/connectedhomeip/gn/"
-
-
+# SDK target. This is overriden to add our SDK app_config.h & defines.
+nrf5_sdk_target = get_label_info(":sdk", "label_no_toolchain")
