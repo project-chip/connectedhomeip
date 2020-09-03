@@ -37,11 +37,6 @@
 #include <sys/eventfd.h>
 #endif
 
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-result"
-#endif
-
 namespace chip {
 namespace System {
 
@@ -71,25 +66,42 @@ Error SystemWakeEvent::Open()
     return CHIP_SYSTEM_NO_ERROR;
 }
 
-void SystemWakeEvent::Close()
+Error SystemWakeEvent::Close()
 {
-    ::close(mFDs[FD_WRITE]);
-    ::close(mFDs[FD_READ]);
+    int res = 0;
+
+    res |= ::close(mFDs[FD_WRITE]);
+    res |= ::close(mFDs[FD_READ]);
     mFDs[FD_READ] = mFDs[FD_WRITE] = -1;
+
+    if (res < 0)
+    {
+        return chip::System::MapErrorPOSIX(errno);
+    }
+
+    return CHIP_SYSTEM_NO_ERROR;
 }
 
-void SystemWakeEvent::Confirm()
+Error SystemWakeEvent::Confirm()
 {
     uint8_t buffer[128];
 
     while (::read(mFDs[FD_READ], buffer, sizeof(buffer)) == sizeof(buffer))
         continue;
+
+    return CHIP_SYSTEM_NO_ERROR;
 }
 
-void SystemWakeEvent::Notify()
+Error SystemWakeEvent::Notify()
 {
     char byte = 1;
-    ::write(mFDs[FD_WRITE], &byte, 1);
+
+    if (::write(mFDs[FD_WRITE], &byte, 1) < 0)
+    {
+        return chip::System::MapErrorPOSIX(errno);
+    }
+
+    return CHIP_SYSTEM_NO_ERROR;
 }
 
 #else // CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
@@ -106,31 +118,46 @@ Error SystemWakeEvent::Open()
     return CHIP_SYSTEM_NO_ERROR;
 }
 
-void SystemWakeEvent::Close()
+Error SystemWakeEvent::Close()
 {
-    ::close(mFD);
-    mFD = -1;
+    int res = ::close(mFD);
+    mFD     = -1;
+
+    if (res < 0)
+    {
+        return chip::System::MapErrorPOSIX(errno);
+    }
+
+    return CHIP_SYSTEM_NO_ERROR;
 }
 
-void SystemWakeEvent::Confirm()
+Error SystemWakeEvent::Confirm()
 {
     uint64_t value;
-    ::read(mFD, &value, sizeof(value));
+
+    if (::read(mFD, &value, sizeof(value)) < 0)
+    {
+        return chip::System::MapErrorPOSIX(errno);
+    }
+
+    return CHIP_SYSTEM_NO_ERROR;
 }
 
-void SystemWakeEvent::Notify()
+Error SystemWakeEvent::Notify()
 {
     uint64_t value = 1;
-    ::write(mFD, &value, sizeof(value));
+
+    if (::write(mFD, &value, sizeof(value)) < 0)
+    {
+        return chip::System::MapErrorPOSIX(errno);
+    }
+
+    return CHIP_SYSTEM_NO_ERROR;
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
 
 } // namespace System
 } // namespace chip
-
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
