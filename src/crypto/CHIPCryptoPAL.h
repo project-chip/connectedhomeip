@@ -71,23 +71,23 @@ const uint8_t spake2p_N_p256[65] = {
 /**
  * Spake2+ state machine to ensure proper execution of the protocol.
  */
-enum class CHIP_SPAKE2P_STATE
+enum class CHIP_SPAKE2P_STATE : uint8_t
 {
-    CHIP_SPAKE2P_STATE_PREINIT = 0, // Before any initialization
-    CHIP_SPAKE2P_STATE_INIT,        // First initialization
-    CHIP_SPAKE2P_STATE_STARTED,     // Prover & Verifier starts
-    CHIP_SPAKE2P_STATE_R1,          // Round one complete
-    CHIP_SPAKE2P_STATE_R2,          // Round two complete
-    CHIP_SPAKE2P_STATE_KC,          // Key confirmation complete
+    PREINIT = 0, // Before any initialization
+    INIT,        // First initialization
+    STARTED,     // Prover & Verifier starts
+    R1,          // Round one complete
+    R2,          // Round two complete
+    KC,          // Key confirmation complete
 };
 
 /**
  * Spake2+ role.
  */
-enum class CHIP_SPAKE2P_ROLE
+enum class CHIP_SPAKE2P_ROLE : uint8_t
 {
-    CHIP_SPAKE2P_VERIFIER = 0, // Accessory
-    CHIP_SPAKE2P_PROVER   = 1, // Commissioner
+    VERIFIER = 0, // Accessory
+    PROVER   = 1, // Commissioner
 };
 
 /**
