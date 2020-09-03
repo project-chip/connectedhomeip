@@ -33,6 +33,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
+#include <type_traits>
 
 #include <CHIPVersion.h>
 
@@ -595,13 +596,17 @@ static void HandleTCPDataSent(TCPEndPoint * aEndPoint, uint16_t len)
 
 static void HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBuffer * aBuffer)
 {
-    const uint8_t lFirstValue = sTestState.mStats.mReceive.mActual;
+    const uint32_t lFirstValueReceived = sTestState.mStats.mReceive.mActual;
+    const uint8_t lFirstValue = uint8_t(lFirstValueReceived);
     const bool lCheckBuffer   = true;
     IPAddress lPeerAddress;
     uint16_t lPeerPort;
     char lPeerAddressBuffer[INET6_ADDRSTRLEN];
     bool lCheckPassed;
     INET_ERROR lStatus = INET_NO_ERROR;
+
+    // Check that we did not lose information in our narrowing cast.
+    VerifyOrExit(lFirstValue == lFirstValueReceived, lStatus = INET_ERROR_UNEXPECTED_EVENT);
 
     VerifyOrExit(aEndPoint != NULL, lStatus = INET_ERROR_BAD_ARGS);
     VerifyOrExit(aBuffer != NULL, lStatus = INET_ERROR_BAD_ARGS);
@@ -860,14 +865,15 @@ static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
         }
         else if ((gOptFlags & kOptFlagUseTCPIP) == kOptFlagUseTCPIP)
         {
-            const uint8_t lFirstValue = sTestState.mStats.mTransmit.mActual;
+            const uint32_t lFirstValue = sTestState.mStats.mTransmit.mActual;
+            VerifyOrExit(lFirstValue < 256u, lStatus = INET_ERROR_UNEXPECTED_EVENT);
 
             // For TCP, we'll send one byte stream of
             // sTestState.mStats.mTransmit.mExpected in n aSize or
             // smaller transactions, patterned from zero to
             // sTestState.mStats.mTransmit.mExpected - 1.
 
-            lBuffer = Common::MakeDataBuffer(aSize, lFirstValue);
+            lBuffer = Common::MakeDataBuffer(aSize, uint8_t(lFirstValue));
             VerifyOrExit(lBuffer != NULL, lStatus = INET_ERROR_NO_MEMORY);
 
             lStatus = sTCPIPEndPoint->Send(lBuffer);
@@ -904,7 +910,10 @@ void DriveSend(void)
             const uint32_t lRemaining = (sTestState.mStats.mTransmit.mExpected - sTestState.mStats.mTransmit.mActual);
             const uint32_t lSendSize  = chip::min(lRemaining, static_cast<uint32_t>(gSendSize));
 
-            lStatus = DriveSendForDestination(sDestinationAddress, lSendSize);
+            // gSendSize is uint16_t, so this cast is safe: the value has to be
+            // in the uint16_t range.
+            static_assert(std::is_same<decltype(gSendSize), uint16_t>::value, "Unexpected type for gSendSize");
+            lStatus = DriveSendForDestination(sDestinationAddress, uint16_t(lSendSize));
             SuccessOrExit(lStatus);
 
             sTestState.mStats.mTransmit.mActual += lSendSize;

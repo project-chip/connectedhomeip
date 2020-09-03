@@ -202,12 +202,12 @@ static void TestParseHost(nlTestSuite * inSuite, void * inContext)
 
     for (int i = 0; i < 7; i++)
     {
-        err = ParseHostPortAndInterface(correctHostName[i], strlen(correctHostName[i]), host, hostlen, port, intf, intflen);
+        err = ParseHostPortAndInterface(correctHostName[i], uint16_t(strlen(correctHostName[i])), host, hostlen, port, intf, intflen);
         NL_TEST_ASSERT(inSuite, err == INET_NO_ERROR);
     }
     for (int i = 0; i < 4; i++)
     {
-        err = ParseHostPortAndInterface(invalidHostName[i], strlen(invalidHostName[i]), host, hostlen, port, intf, intflen);
+        err = ParseHostPortAndInterface(invalidHostName[i], uint16_t(strlen(invalidHostName[i])), host, hostlen, port, intf, intflen);
         NL_TEST_ASSERT(inSuite, err == INET_ERROR_INVALID_HOST_NAME);
     }
 }

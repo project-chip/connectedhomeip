@@ -441,7 +441,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
     int flags = fcntl(mSocket, F_GETFL, 0);
     fcntl(mSocket, F_SETFL, flags | O_NONBLOCK);
 
-    int sockaddrsize             = 0;
+    socklen_t sockaddrsize             = 0;
     const sockaddr * sockaddrptr = NULL;
 
     union
@@ -1150,7 +1150,7 @@ void TCPEndPoint::SetIdleTimeout(uint32_t timeoutMS)
 
     if (newIdleTimeout > UINT16_MAX)
         newIdleTimeout = UINT16_MAX;
-    mIdleTimeout = mRemainingIdleTime = newIdleTimeout;
+    mIdleTimeout = mRemainingIdleTime = static_cast<uint16_t>(newIdleTimeout);
 
     if (!isIdleTimerRunning && mIdleTimeout)
     {
@@ -1308,14 +1308,22 @@ INET_ERROR TCPEndPoint::DriveSending()
     {
         uint16_t bufLen = mSendQueue->DataLength();
 
-        ssize_t lenSent = send(mSocket, mSendQueue->Start(), (size_t) bufLen, sendFlags);
+        ssize_t lenSentRaw = send(mSocket, mSendQueue->Start(), bufLen, sendFlags);
 
-        if (lenSent == -1)
+        if (lenSentRaw == -1)
         {
             if (errno != EAGAIN && errno != EWOULDBLOCK)
                 err = (errno == EPIPE) ? INET_ERROR_PEER_DISCONNECTED : chip::System::MapErrorPOSIX(errno);
             break;
         }
+
+        if (lenSentRaw < 0 || lenSentRaw > bufLen) {
+            err = INET_ERROR_INCORRECT_STATE;
+            break;
+        }
+
+        // Cast is safe because bufLen is uint16_t.
+        uint16_t lenSent = static_cast<uint16_t>(lenSentRaw);
 
         // Mark the connection as being active.
         MarkActive();
@@ -1326,7 +1334,7 @@ INET_ERROR TCPEndPoint::DriveSending()
             mSendQueue = PacketBuffer::FreeHead(mSendQueue);
 
         if (OnDataSent != NULL)
-            OnDataSent(this, (uint16_t) lenSent);
+            OnDataSent(this, lenSent);
 
 #if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
         // TCP Send is not Idle; Set state and notify if needed
@@ -2554,17 +2562,24 @@ void TCPEndPoint::HandleIncomingConnection()
 INET_ERROR TCPEndPoint::CheckConnectionProgress(bool & isProgressing)
 {
     INET_ERROR err       = INET_NO_ERROR;
-    int currPendingBytes = 0;
+    int currPendingBytesRaw = 0;
+    uint32_t currPendingBytes; // Will be initialized once we know it's safe.
 
     // Fetch the bytes pending successful transmission in the TCP out queue.
 
-    if (ioctl(mSocket, TIOCOUTQ, &currPendingBytes) < 0)
+    if (ioctl(mSocket, TIOCOUTQ, &currPendingBytesRaw) < 0)
     {
         ExitNow(err = chip::System::MapErrorPOSIX(errno));
     }
 
+    if (currPendingBytesRaw < 0 || currPendingBytesRaw > UINT32_MAX) {
+        ExitNow(err = INET_ERROR_INCORRECT_STATE);
+    }
+
+    currPendingBytes = static_cast<uint32_t>(currPendingBytesRaw);
+
     if ((currPendingBytes != 0) &&
-        (mBytesWrittenSinceLastProbe + mLastTCPKernelSendQueueLen == static_cast<uint32_t>(currPendingBytes)))
+        (mBytesWrittenSinceLastProbe + mLastTCPKernelSendQueueLen == currPendingBytes))
     {
         // No progress has been made
 

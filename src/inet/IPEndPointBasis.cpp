@@ -300,7 +300,7 @@ static INET_ERROR SocketsIPv6JoinLeaveMulticastGroup(int aSocket, InterfaceId aI
                                                      int aCommand)
 {
     INET_ERROR lRetval = INET_NO_ERROR;
-    const int lIfIndex = static_cast<int>(aInterfaceId);
+    const unsigned int lIfIndex = static_cast<unsigned int>(aInterfaceId);
     struct ipv6_mreq lMulticastRequest;
 
     memset(&lMulticastRequest, 0, sizeof(lMulticastRequest));

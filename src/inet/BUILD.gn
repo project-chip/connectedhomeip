@@ -142,6 +142,8 @@ static_library("inet") {
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
   }
 
+  cflags = [ "-Werror=conversion" ]
+
   include_dirs = []
   if (current_os == "android") {
     include_dirs += [
