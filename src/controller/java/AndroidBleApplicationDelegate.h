@@ -16,17 +16,25 @@
  *
  */
 
-package com.google.chip.chiptool.setuppayloadscanner
+#ifndef ANDROID_BLE_APPLICATION_DELEGATE_H
+#define ANDROID_BLE_APPLICATION_DELEGATE_H
 
-import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+#include <ble/BleApplicationDelegate.h>
 
-/** Class to hold the CHIP device information. */
-@Parcelize data class CHIPDeviceInfo(
-    val version: Int,
-    val vendorId: Int,
-    val productId: Int,
-    val discriminator: Int,
-    val setupPinCode: Long,
-    val optionalQrCodeInfoMap: Map<Int, QrCodeInfo>
-) : Parcelable
+using namespace chip::Ble;
+
+typedef void (*NotifyChipConnectionClosedCallback)(BLE_CONNECTION_OBJECT connObj);
+
+class AndroidBleApplicationDelegate : public BleApplicationDelegate
+{
+public:
+    NotifyChipConnectionClosedCallback NotifyChipConnectionClosedCb;
+
+    AndroidBleApplicationDelegate();
+
+    void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj);
+
+    void SetNotifyChipConnectionClosedCallback(NotifyChipConnectionClosedCallback cb);
+};
+
+#endif /* ANDROID_BLE_APPLICATION_DELEGATE_H */

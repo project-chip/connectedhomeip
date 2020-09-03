@@ -6,6 +6,7 @@
     <string name="chip_device_info_version_label">Version:</string>
     <string name="chip_device_info_vendor_id_label">Vendor ID:</string>
     <string name="chip_device_info_product_id_label">Product ID:</string>
+    <string name="chip_device_info_discriminator_label">Discriminator:</string>
     <string name="chip_device_info_setup_code_label">Setup PIN Code:</string>
     <string name="chip_device_info_optional_vendor_tags_label">Optional Vendor tags:</string>
     <string name="camera_permission_missing_alert_title">Camera permission missing</string>
@@ -28,6 +29,9 @@
     <string name="send_command_on_btn_text">On</string>
     <string name="send_command_off_btn_text">Off</string>
     <string name="send_command_toggle_btn_text">Toggle</string>
+    <string name="send_command_type_label_text">%s command sent!</string>
+    <string name="rendezvous_over_ble_btn_text">Rendezvous over BLE</string>
+    <string name="rendezvous_over_soft_ap_btn_text">Rendezvous over Soft AP</string>
 
     <string name="commissioner_commissioning">Commissioning</string>
     <string name="commissioner_name">Commissioner</string>
