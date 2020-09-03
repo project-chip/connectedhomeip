@@ -26,6 +26,8 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
+#include <algorithm>
+#include <limits.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -59,15 +61,16 @@ char * IPAddress::ToString(char * buf, uint32_t bufSize) const
         ip6addr_ntoa_r(&ip6_addr, buf, (int) bufSize);
     }
 #else // !CHIP_SYSTEM_CONFIG_USE_LWIP
+    bufSize = std::min(std::numeric_limits<socklen_t>::max(), bufSize);
 #if INET_CONFIG_ENABLE_IPV4
     if (IsIPv4())
     {
-        buf = (char *) inet_ntop(AF_INET, (const void *) &Addr[3], buf, bufSize);
+        buf = (char *) inet_ntop(AF_INET, (const void *) &Addr[3], buf, static_cast<socklen_t>(bufSize));
     }
     else
 #endif // INET_CONFIG_ENABLE_IPV4
     {
-        buf = (char *) inet_ntop(AF_INET6, (const void *) Addr, buf, bufSize);
+        buf = (char *) inet_ntop(AF_INET6, (const void *) Addr, buf, static_cast<socklen_t>(bufSize));
     }
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 

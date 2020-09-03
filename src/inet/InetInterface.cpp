@@ -1125,20 +1125,20 @@ uint8_t NetmaskToPrefixLength(const uint8_t * netmask, uint16_t netmaskLen)
 {
     uint8_t prefixLen = 0;
 
-    for (uint16_t i = 0; i < netmaskLen; i++, prefixLen += 8)
+    for (uint16_t i = 0; i < netmaskLen; i++, prefixLen = static_cast<uint8_t>(prefixLen + 8u))
     {
         uint8_t b = netmask[i];
         if (b != 0xFF)
         {
             if ((b & 0xF0) == 0xF0)
-                prefixLen += 4;
+                prefixLen = static_cast<uint8_t>(prefixLen + 4u);
             else
-                b = b >> 4;
+                b = static_cast<uint8_t>(b >> 4);
 
             if ((b & 0x0C) == 0x0C)
-                prefixLen += 2;
+                prefixLen = static_cast<uint8_t>(prefixLen + 2u);
             else
-                b = b >> 2;
+                b = static_cast<uint8_t>(b >> 2);
 
             if ((b & 0x02) == 0x02)
                 prefixLen++;

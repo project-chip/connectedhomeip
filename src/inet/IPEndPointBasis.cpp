@@ -36,6 +36,7 @@
 #include <inet/InetLayer.h>
 
 #include <support/CodeUtils.h>
+#include <support/SafeInt.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if INET_CONFIG_ENABLE_IPV4
@@ -299,9 +300,14 @@ exit:
 static INET_ERROR SocketsIPv6JoinLeaveMulticastGroup(int aSocket, InterfaceId aInterfaceId, const IPAddress & aAddress,
                                                      int aCommand)
 {
-    INET_ERROR lRetval = INET_NO_ERROR;
-    const int lIfIndex = static_cast<int>(aInterfaceId);
+    INET_ERROR lRetval          = INET_NO_ERROR;
+    const unsigned int lIfIndex = static_cast<unsigned int>(aInterfaceId);
     struct ipv6_mreq lMulticastRequest;
+
+    // Check whether that cast we did was actually safe.  We can't VerifyOrExit
+    // before declaring variables, and can't reassign lIfIndex without making it
+    // non-const, so have to do things in this order.
+    VerifyOrExit(CanCastTo<unsigned int>(aInterfaceId), lRetval = INET_ERROR_UNEXPECTED_EVENT);
 
     memset(&lMulticastRequest, 0, sizeof(lMulticastRequest));
     lMulticastRequest.ipv6mr_interface = lIfIndex;
@@ -860,8 +866,13 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
             controlHdr->cmsg_len   = CMSG_LEN(sizeof(in_pktinfo));
 
             struct in_pktinfo * pktInfo = (struct in_pktinfo *) CMSG_DATA(controlHdr);
-            pktInfo->ipi_ifindex        = intfId;
-            pktInfo->ipi_spec_dst       = aPktInfo->SrcAddress.ToIPv4();
+            if (!CanCastTo<decltype(pktInfo->ipi_ifindex)>(intfId))
+            {
+                ExitNow(res = INET_ERROR_NOT_SUPPORTED);
+            }
+
+            pktInfo->ipi_ifindex  = static_cast<decltype(pktInfo->ipi_ifindex)>(intfId);
+            pktInfo->ipi_spec_dst = aPktInfo->SrcAddress.ToIPv4();
 
             msgHeader.msg_controllen = CMSG_SPACE(sizeof(in_pktinfo));
 #else  // !defined(IP_PKTINFO)
@@ -1103,8 +1114,13 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
                 if (controlHdr->cmsg_level == IPPROTO_IP && controlHdr->cmsg_type == IP_PKTINFO)
                 {
                     struct in_pktinfo * inPktInfo = (struct in_pktinfo *) CMSG_DATA(controlHdr);
-                    lPacketInfo.Interface         = inPktInfo->ipi_ifindex;
-                    lPacketInfo.DestAddress       = IPAddress::FromIPv4(inPktInfo->ipi_addr);
+                    if (!CanCastTo<InterfaceId>(inPktInfo->ipi_ifindex))
+                    {
+                        lStatus = INET_ERROR_INCORRECT_STATE;
+                        break;
+                    }
+                    lPacketInfo.Interface   = static_cast<InterfaceId>(inPktInfo->ipi_ifindex);
+                    lPacketInfo.DestAddress = IPAddress::FromIPv4(inPktInfo->ipi_addr);
                     continue;
                 }
 #endif // defined(IP_PKTINFO)

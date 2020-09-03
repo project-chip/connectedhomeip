@@ -25,7 +25,12 @@
 #ifndef BLE_PLATFORM_CONFIG_H
 #define BLE_PLATFORM_CONFIG_H
 
+// The zephyr headers trigger -Wconversion warnings, so disable those while
+// including those headers.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
 #include <bluetooth/bluetooth.h>
+#pragma GCC diagnostic pop
 
 // ==================== Platform Adaptations ====================
 

@@ -26,7 +26,12 @@
 
 #include <platform/CHIPDeviceEvent.h>
 
+// The zephyr headers trigger -Wconversion warnings, so disable those while
+// including those headers.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
 #include <bluetooth/bluetooth.h>
+#pragma GCC diagnostic pop
 
 namespace chip {
 namespace System {
