@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Build CHIP tools.
-  chip_build_tools = current_os != "freertos" && current_os != "android"
+if (current_cpu == "arm") {
+  arm_arch = "armv7-a"
+  arm_fpu = "vfpv3-d16"
+  arm_float_abi = "softfp"
+} else if (current_cpu == "arm64") {
+  arm_arch = "armv8-a"
 }
