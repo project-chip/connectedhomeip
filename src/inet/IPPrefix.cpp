@@ -65,7 +65,7 @@ bool IPPrefix::MatchAddress(const IPAddress & addr) const
     uint8_t l = (Length <= 128) ? Length : 128;
     int i;
 
-    for (i = 0; l >= 32; i++, l -= 32)
+    for (i = 0; l >= 32; i++, l = static_cast<uint8_t>(l - 32u))
         if (IPAddr.Addr[i] != addr.Addr[i])
             return false;
 
