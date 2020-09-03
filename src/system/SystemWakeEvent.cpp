@@ -85,9 +85,16 @@ Error SystemWakeEvent::Close()
 Error SystemWakeEvent::Confirm()
 {
     uint8_t buffer[128];
+    int res;
 
-    while (::read(mFDs[FD_READ], buffer, sizeof(buffer)) == sizeof(buffer))
-        continue;
+    do
+    {
+        res = ::read(mFDs[FD_READ], buffer, sizeof(buffer));
+        if (res < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
+        {
+            return chip::System::MapErrorPOSIX(errno);
+        }
+    } while (res == sizeof(buffer));
 
     return CHIP_SYSTEM_NO_ERROR;
 }
@@ -96,7 +103,7 @@ Error SystemWakeEvent::Notify()
 {
     char byte = 1;
 
-    if (::write(mFDs[FD_WRITE], &byte, 1) < 0)
+    if (::write(mFDs[FD_WRITE], &byte, 1) < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
     {
         return chip::System::MapErrorPOSIX(errno);
     }
@@ -135,7 +142,7 @@ Error SystemWakeEvent::Confirm()
 {
     uint64_t value;
 
-    if (::read(mFD, &value, sizeof(value)) < 0)
+    if (::read(mFD, &value, sizeof(value)) < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
     {
         return chip::System::MapErrorPOSIX(errno);
     }
@@ -147,7 +154,7 @@ Error SystemWakeEvent::Notify()
 {
     uint64_t value = 1;
 
-    if (::write(mFD, &value, sizeof(value)) < 0)
+    if (::write(mFD, &value, sizeof(value)) < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
     {
         return chip::System::MapErrorPOSIX(errno);
     }
