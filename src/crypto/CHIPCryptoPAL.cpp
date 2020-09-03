@@ -85,7 +85,7 @@ Spake2p::Spake2p(size_t _fe_size, size_t _point_size, size_t _hash_size)
 CHIP_ERROR Spake2p::Init(const uint8_t * context, size_t context_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-    state            = CHIP_SPAKE2P_STATE::CHIP_SPAKE2P_STATE_PREINIT;
+    state            = CHIP_SPAKE2P_STATE::PREINIT;
 
     error = InitImpl();
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
@@ -99,7 +99,7 @@ CHIP_ERROR Spake2p::Init(const uint8_t * context, size_t context_len)
     error = InternalHash(context, context_len);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
-    state = CHIP_SPAKE2P_STATE::CHIP_SPAKE2P_STATE_INIT;
+    state = CHIP_SPAKE2P_STATE::INIT;
     error = CHIP_NO_ERROR;
 exit:
     return error;
@@ -124,7 +124,7 @@ CHIP_ERROR Spake2p::BeginVerifier(const uint8_t * my_identity, size_t my_identit
                                   size_t Lin_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-    VerifyOrExit(state == CHIP_SPAKE2P_STATE::CHIP_SPAKE2P_STATE_INIT, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(state == CHIP_SPAKE2P_STATE::INIT, error = CHIP_ERROR_INTERNAL);
 
     error = InternalHash(peer_identity, peer_identity_len);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
@@ -141,8 +141,8 @@ CHIP_ERROR Spake2p::BeginVerifier(const uint8_t * my_identity, size_t my_identit
     error = PointLoad(Lin, Lin_len, L);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
-    state = CHIP_SPAKE2P_STATE::CHIP_SPAKE2P_STATE_STARTED;
-    role  = CHIP_SPAKE2P_ROLE::CHIP_SPAKE2P_VERIFIER;
+    state = CHIP_SPAKE2P_STATE::STARTED;
+    role  = CHIP_SPAKE2P_ROLE::VERIFIER;
     error = CHIP_NO_ERROR;
 exit:
     return error;
@@ -153,7 +153,7 @@ CHIP_ERROR Spake2p::BeginProver(const uint8_t * my_identity, size_t my_identity_
                                 size_t w1in_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-    VerifyOrExit(state == CHIP_SPAKE2P_STATE::CHIP_SPAKE2P_STATE_INIT, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(state == CHIP_SPAKE2P_STATE::INIT, error = CHIP_ERROR_INTERNAL);
 
     error = InternalHash(my_identity, my_identity_len);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
@@ -172,8 +172,8 @@ CHIP_ERROR Spake2p::BeginProver(const uint8_t * my_identity, size_t my_identity_
 
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
-    state = CHIP_SPAKE2P_STATE::CHIP_SPAKE2P_STATE_STARTED;
-    role  = CHIP_SPAKE2P_ROLE::CHIP_SPAKE2P_PROVER;
+    state = CHIP_SPAKE2P_STATE::STARTED;
+    role  = CHIP_SPAKE2P_ROLE::PROVER;
     error = CHIP_NO_ERROR;
 exit:
     return error;
@@ -185,18 +185,18 @@ CHIP_ERROR Spake2p::ComputeRoundOne(uint8_t * out, size_t * out_len)
     void * MN        = NULL; // Choose M if a prover, N if a verifier
     void * XY        = NULL; // Choose X if a prover, Y if a verifier
 
-    VerifyOrExit(state == CHIP_SPAKE2P_STATE::CHIP_SPAKE2P_STATE_STARTED, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(state == CHIP_SPAKE2P_STATE::STARTED, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(*out_len >= point_size, error = CHIP_ERROR_INTERNAL);
 
     error = FEGenerate(xy);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
-    if (role == CHIP_SPAKE2P_ROLE::CHIP_SPAKE2P_PROVER)
+    if (role == CHIP_SPAKE2P_ROLE::PROVER)
     {
         MN = M;
         XY = X;
     }
-    else if (role == CHIP_SPAKE2P_ROLE::CHIP_SPAKE2P_VERIFIER)
+    else if (role == CHIP_SPAKE2P_ROLE::VERIFIER)
     {
         MN = N;
         XY = Y;
@@ -210,7 +210,7 @@ CHIP_ERROR Spake2p::ComputeRoundOne(uint8_t * out, size_t * out_len)
     error = PointWrite(XY, out, *out_len);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
-    state = CHIP_SPAKE2P_STATE::CHIP_SPAKE2P_STATE_R1;
+    state = CHIP_SPAKE2P_STATE::R1;
     error = CHIP_NO_ERROR;
 exit:
     *out_len = point_size;
@@ -226,10 +226,10 @@ CHIP_ERROR Spake2p::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t *
     uint8_t * Kcaorb = NULL; // Choose Kca if a prover, Kcb if a verifier
 
     VerifyOrExit(*out_len >= hash_size, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(state == CHIP_SPAKE2P_STATE::CHIP_SPAKE2P_STATE_R1, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(state == CHIP_SPAKE2P_STATE::R1, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(in_len == point_size, error = CHIP_ERROR_INTERNAL);
 
-    if (role == CHIP_SPAKE2P_ROLE::CHIP_SPAKE2P_PROVER)
+    if (role == CHIP_SPAKE2P_ROLE::PROVER)
     {
         error = PointWrite(X, point_buffer, point_size);
         VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
@@ -244,7 +244,7 @@ CHIP_ERROR Spake2p::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t *
         XY     = Y;
         Kcaorb = Kca;
     }
-    else if (role == CHIP_SPAKE2P_ROLE::CHIP_SPAKE2P_VERIFIER)
+    else if (role == CHIP_SPAKE2P_ROLE::VERIFIER)
     {
         error = InternalHash(in, in_len);
         VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
@@ -280,14 +280,14 @@ CHIP_ERROR Spake2p::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t *
     error = PointCofactorMul(Z);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
-    if (role == CHIP_SPAKE2P_ROLE::CHIP_SPAKE2P_PROVER)
+    if (role == CHIP_SPAKE2P_ROLE::PROVER)
     {
         error = FEMul(tempbn, w1, w0);
         VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
         error = PointAddMul(V, XY, w1, MN, tempbn);
         VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
     }
-    else if (role == CHIP_SPAKE2P_ROLE::CHIP_SPAKE2P_VERIFIER)
+    else if (role == CHIP_SPAKE2P_ROLE::VERIFIER)
     {
         error = PointMul(V, L, xy);
         VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
@@ -317,7 +317,7 @@ CHIP_ERROR Spake2p::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t *
     error = Mac(Kcaorb, hash_size / 2, in, in_len, out);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
-    state = CHIP_SPAKE2P_STATE::CHIP_SPAKE2P_STATE_R2;
+    state = CHIP_SPAKE2P_STATE::R2;
     error = CHIP_NO_ERROR;
 exit:
     *out_len = hash_size;
@@ -347,14 +347,14 @@ CHIP_ERROR Spake2p::KeyConfirm(const uint8_t * in, size_t in_len)
     void * XY        = NULL; // Choose X if a prover, Y if a verifier
     uint8_t * Kcaorb = NULL; // Choose Kcb if a prover, Kca if a verifier
 
-    VerifyOrExit(state == CHIP_SPAKE2P_STATE::CHIP_SPAKE2P_STATE_R2, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(state == CHIP_SPAKE2P_STATE::R2, error = CHIP_ERROR_INTERNAL);
 
-    if (role == CHIP_SPAKE2P_ROLE::CHIP_SPAKE2P_PROVER)
+    if (role == CHIP_SPAKE2P_ROLE::PROVER)
     {
         XY     = X;
         Kcaorb = Kcb;
     }
-    else if (role == CHIP_SPAKE2P_ROLE::CHIP_SPAKE2P_VERIFIER)
+    else if (role == CHIP_SPAKE2P_ROLE::VERIFIER)
     {
         XY     = Y;
         Kcaorb = Kca;
@@ -368,7 +368,7 @@ CHIP_ERROR Spake2p::KeyConfirm(const uint8_t * in, size_t in_len)
     error = MacVerify(Kcaorb, hash_size / 2, in, in_len, point_buffer, point_size);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
-    state = CHIP_SPAKE2P_STATE::CHIP_SPAKE2P_STATE_KC;
+    state = CHIP_SPAKE2P_STATE::KC;
     error = CHIP_NO_ERROR;
 exit:
     return error;
@@ -378,7 +378,7 @@ CHIP_ERROR Spake2p::GetKeys(uint8_t * out, size_t * out_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
 
-    VerifyOrExit(state == CHIP_SPAKE2P_STATE::CHIP_SPAKE2P_STATE_KC, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(state == CHIP_SPAKE2P_STATE::KC, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(*out_len >= hash_size / 2, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     memcpy(out, Ke, hash_size / 2);
