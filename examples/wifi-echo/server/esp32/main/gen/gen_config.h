@@ -375,7 +375,6 @@
 #define EMBER_AF_PLUGIN_SCENES
 // User options for plugin Scenes Server Cluster
 #define EMBER_AF_PLUGIN_SCENES_TABLE_SIZE 3
-#define EMBER_AF_PLUGIN_SCENES_USE_TOKENS
 
 // Use this macro to check if Scenes Client Cluster plugin is included
 #define EMBER_AF_PLUGIN_SCENES_CLIENT

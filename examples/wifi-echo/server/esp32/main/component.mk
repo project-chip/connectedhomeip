@@ -32,12 +32,12 @@ COMPONENT_SRCDIRS :=                                                      \
   ../third_party/connectedhomeip/src/app/clusters/scenes-client          \
   ../third_party/connectedhomeip/src/app/clusters/groups-server           \
   ../third_party/connectedhomeip/src/app/clusters/color-control-server    \
+  ../third_party/connectedhomeip/src/app/clusters/scenes                 \
 #  ../third_party/connectedhomeip/src/app/clusters/basic                  \
 #  ../third_party/connectedhomeip/src/app/clusters/door-lock-server       \
 #  ../third_party/connectedhomeip/src/app/clusters/groups-client          \
 #  ../third_party/connectedhomeip/src/app/clusters/ias-zone-client        \
 #  ../third_party/connectedhomeip/src/app/clusters/ias-zone-server        \
-#  ../third_party/connectedhomeip/src/app/clusters/scenes                 \
 #  ../third_party/connectedhomeip/src/app/reporting                       \
 
 

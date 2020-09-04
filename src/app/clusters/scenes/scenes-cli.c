@@ -37,9 +37,8 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "app/framework/include/af.h"
-#include "app/util/serial/command-interpreter2.h"
 #include "scenes.h"
+#include <app/util/af.h>
 
 void emAfPluginScenesServerClear(void);
 

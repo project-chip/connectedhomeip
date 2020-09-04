@@ -433,22 +433,6 @@ bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(uint16_t zoneStat
     return false;
 }
 
-/** @brief Scenes Cluster Add Scene
- *
- *
- *
- * @param groupId   Ver.: always
- * @param sceneId   Ver.: always
- * @param transitionTime   Ver.: always
- * @param sceneName   Ver.: always
- * @param extensionFieldSets   Ver.: always
- */
-bool emberAfScenesClusterAddSceneCallback(uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
-                                          uint8_t * extensionFieldSets)
-{
-    return false;
-}
-
 /** @brief Scenes Cluster Add Scene Response
  *
  *
@@ -458,17 +442,6 @@ bool emberAfScenesClusterAddSceneCallback(uint16_t groupId, uint8_t sceneId, uin
  * @param sceneId   Ver.: always
  */
 bool emberAfScenesClusterAddSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId)
-{
-    return false;
-}
-
-/** @brief Scenes Cluster Get Scene Membership
- *
- *
- *
- * @param groupId   Ver.: always
- */
-bool emberAfScenesClusterGetSceneMembershipCallback(uint16_t groupId)
 {
     return false;
 }
@@ -489,30 +462,6 @@ bool emberAfScenesClusterGetSceneMembershipResponseCallback(uint8_t status, uint
     return false;
 }
 
-/** @brief Scenes Cluster Recall Scene
- *
- *
- *
- * @param groupId   Ver.: always
- * @param sceneId   Ver.: always
- * @param transitionTime   Ver.: since zcl-7.0-07-5123-07
- */
-bool emberAfScenesClusterRecallSceneCallback(uint16_t groupId, uint8_t sceneId, uint16_t transitionTime)
-{
-    return false;
-}
-
-/** @brief Scenes Cluster Remove All Scenes
- *
- *
- *
- * @param groupId   Ver.: always
- */
-bool emberAfScenesClusterRemoveAllScenesCallback(uint16_t groupId)
-{
-    return false;
-}
-
 /** @brief Scenes Cluster Remove All Scenes Response
  *
  *
@@ -521,18 +470,6 @@ bool emberAfScenesClusterRemoveAllScenesCallback(uint16_t groupId)
  * @param groupId   Ver.: always
  */
 bool emberAfScenesClusterRemoveAllScenesResponseCallback(uint8_t status, uint16_t groupId)
-{
-    return false;
-}
-
-/** @brief Scenes Cluster Remove Scene
- *
- *
- *
- * @param groupId   Ver.: always
- * @param sceneId   Ver.: always
- */
-bool emberAfScenesClusterRemoveSceneCallback(uint16_t groupId, uint8_t sceneId)
 {
     return false;
 }
@@ -550,18 +487,6 @@ bool emberAfScenesClusterRemoveSceneResponseCallback(uint8_t status, uint16_t gr
     return false;
 }
 
-/** @brief Scenes Cluster Store Scene
- *
- *
- *
- * @param groupId   Ver.: always
- * @param sceneId   Ver.: always
- */
-bool emberAfScenesClusterStoreSceneCallback(uint16_t groupId, uint8_t sceneId)
-{
-    return false;
-}
-
 /** @brief Scenes Cluster Store Scene Response
  *
  *
@@ -571,18 +496,6 @@ bool emberAfScenesClusterStoreSceneCallback(uint16_t groupId, uint8_t sceneId)
  * @param sceneId   Ver.: always
  */
 bool emberAfScenesClusterStoreSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId)
-{
-    return false;
-}
-
-/** @brief Scenes Cluster View Scene
- *
- *
- *
- * @param groupId   Ver.: always
- * @param sceneId   Ver.: always
- */
-bool emberAfScenesClusterViewSceneCallback(uint16_t groupId, uint8_t sceneId)
 {
     return false;
 }
@@ -632,7 +545,6 @@ EmberAfStatus emberAfPollControlClusterServerPreAttributeChangedCallback(uint8_t
 {
     return EMBER_ZCL_STATUS_SUCCESS;
 }
-void emberAfScenesClusterServerInitCallback(uint8_t endpoint) {}
 
 void emberAfPluginIasZoneClientZdoCallback(EmberNodeId emberNodeId, EmberApsFrame * apsFrame, uint8_t * message, uint16_t length) {}
 
