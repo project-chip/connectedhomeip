@@ -26,8 +26,6 @@ static_library("protocols") {
   output_name = "libChipProtocols"
 
   sources = [
-    "CHIPServerBase.cpp",
-    "CHIPServerBase.h",
     "common/CHIPMessage.cpp",
     "common/CHIPMessage.h",
     "common/RetainedPacketBuffer.cpp",

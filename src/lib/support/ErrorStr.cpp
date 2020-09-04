@@ -27,9 +27,9 @@
 #define __STDC_FORMAT_MACROS
 #endif
 
+#include "ErrorStr.h"
 #include <inttypes.h>
 #include <stdio.h>
-
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
 

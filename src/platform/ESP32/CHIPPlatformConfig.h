@@ -75,6 +75,12 @@
 
 #define CHIP_CONFIG_ENABLE_PROVISIONING_BUNDLE_SUPPORT 0
 
+// ==================== General Configuration Overrides ====================
+
+#ifndef CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD
+#define CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD 50
+#endif // CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD
+
 // ==================== Kconfig Overrides ====================
 
 // The following values are configured via the ESP-IDF Kconfig mechanism.

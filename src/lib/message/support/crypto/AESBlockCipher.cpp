@@ -26,10 +26,10 @@
  *
  */
 
-#include <string.h>
-
 #include "AESBlockCipher.h"
 #include "CHIPCrypto.h"
+
+#include <string.h>
 
 namespace chip {
 namespace Platform {
