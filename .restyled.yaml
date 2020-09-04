@@ -56,7 +56,6 @@ exclude:
     - "examples/lock-app/efr32/third_party/**"
     - "build/**/*"
     - "autom4te.cache/**/*"
-    - "scripts/tests/save_logs.sh" # quotes $(...) in a for loop
 
 # Restylers to run, and how
 restylers:
