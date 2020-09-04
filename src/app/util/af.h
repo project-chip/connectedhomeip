@@ -1083,16 +1083,6 @@ EmberStatus emberAfDeactivateServerTick(uint8_t endpoint, EmberAfClusterId clust
  */
 EmberStatus emberAfEventControlSetDelayMS(EmberEventControl * control, uint32_t delayMs);
 
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-/**
- * @brief Sets the ::EmberEventControl to run "delayMs" milliseconds in the
- * future.  See ::emberAfEventControlSetDelayMS.
- */
-EmberStatus emberAfEventControlSetDelay(EmberEventControl * eventControl, uint32_t delayMs);
-#else
-#define emberAfEventControlSetDelay(control, delayMs) emberAfEventControlSetDelayMS(control, delayMs)
-#endif
-
 /**
  * @brief Sets the ::EmberEventControl to run "delayQs" quarter seconds in the
  * future.  The 'quarter seconds' are actually 256 milliseconds long.  This
