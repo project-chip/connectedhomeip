@@ -127,9 +127,6 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     # Enable building chip with gcc & mbedtls.
     enable_host_gcc_mbedtls_build = enable_default_builds
 
-    # Enable building chip for linux embedded.
-    enable_linux_embedded_build = enable_default_builds && host_os == "linux"
-
     # Build the chip-tool example.
     enable_standalone_chip_tool_build = enable_default_builds
 
@@ -173,13 +170,6 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
     chip_build("android_x86") {
       toolchain = "//build/toolchain/android:android_x86"
-    }
-  }
-
-  if (host_os == "linux") {
-    chip_build("linux_embedded") {
-      toolchain =
-          "${chip_root}/config/linux/toolchain:linux_${host_cpu}_gcc_embedded"
     }
   }
 
@@ -230,9 +220,6 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
         ":all_android_x86",
       ]
     }
-    if (enable_linux_embedded_build) {
-      deps += [ ":all_linux_embedded" ]
-    }
     if (enable_standalone_chip_tool_build) {
       deps += [ ":standalone_chip_tool" ]
     }
@@ -261,9 +248,6 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       }
       if (enable_host_gcc_mbedtls_build) {
         deps += [ ":check_host_gcc_mbedtls" ]
-      }
-      if (enable_linux_embedded_build) {
-        deps += [ ":check_linux_embedded" ]
       }
     }
   }
