@@ -902,6 +902,43 @@ static void TestPBKDF2_SHA256_TestVectors(nlTestSuite * inSuite, void * inContex
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
+static void TestP256_Keygen(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t pubkey[65], privkey[32];
+    size_t pubkey_len = sizeof(pubkey);
+    size_t privkey_len = sizeof(privkey);
+
+    NL_TEST_ASSERT(inSuite, GenP256Keypair(nullptr, &pubkey_len, nullptr, &privkey_len) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, GenP256Keypair(pubkey, &pubkey_len, nullptr, &privkey_len) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, GenP256Keypair(pubkey, nullptr, privkey, &privkey_len) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, GenP256Keypair(pubkey, &pubkey_len, privkey, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
+
+    privkey_len = 0;
+    NL_TEST_ASSERT(inSuite, GenP256Keypair(pubkey, &pubkey_len, privkey, &privkey_len) == CHIP_ERROR_INVALID_ARGUMENT);
+
+    privkey_len = sizeof(privkey) - 1;
+    NL_TEST_ASSERT(inSuite, GenP256Keypair(pubkey, &pubkey_len, privkey, &privkey_len) != CHIP_NO_ERROR);
+
+    privkey_len = sizeof(privkey);
+    pubkey_len = 0;
+    NL_TEST_ASSERT(inSuite, GenP256Keypair(pubkey, &pubkey_len, privkey, &privkey_len) == CHIP_ERROR_INVALID_ARGUMENT);
+
+    pubkey_len = sizeof(pubkey);
+    privkey_len = sizeof(privkey);
+    NL_TEST_ASSERT(inSuite, GenP256Keypair(pubkey, &pubkey_len, privkey, &privkey_len) == CHIP_NO_ERROR);
+
+    const char * msg = "Test Message for Keygen";
+    const uint8_t * test_msg = Uint8::from_const_char(msg);
+    size_t msglen = strlen(msg);
+    uint8_t test_sig[kMax_ECDSA_Signature_Length];
+    size_t siglen = sizeof(test_sig);
+
+    NL_TEST_ASSERT(inSuite, ECDSA_sign_msg(test_msg, msglen, privkey, privkey_len, test_sig, siglen) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, ECDSA_validate_msg_signature(test_msg, msglen, pubkey, pubkey_len, test_sig, siglen) == CHIP_NO_ERROR);
+
+}
+
 static void TestSPAKE2P_spake2p_FEMul(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t fe_out[kMAX_FE_Length];
@@ -1329,6 +1366,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ECDH sample vectors", TestECDH_SampleInputVectors),
     NL_TEST_DEF("Test adding entropy sources", TestAddEntropySources),
     NL_TEST_DEF("Test PBKDF2 SHA256", TestPBKDF2_SHA256_TestVectors),
+    NL_TEST_DEF("Test P256 Keygen", TestP256_Keygen),
     NL_TEST_DEF("Test Spake2p_spake2p FEMul", TestSPAKE2P_spake2p_FEMul),
     NL_TEST_DEF("Test Spake2p_spake2p FELoad/FEWrite", TestSPAKE2P_spake2p_FELoadWrite),
     NL_TEST_DEF("Test Spake2p_spake2p Mac", TestSPAKE2P_spake2p_Mac),
