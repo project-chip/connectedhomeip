@@ -46,4 +46,3 @@ CHIP_ERROR GetSecureRandomData(uint8_t *buf, uint16_t len)
 } // namespace Security
 } // namespace Platform
 } // namespace chip
-
