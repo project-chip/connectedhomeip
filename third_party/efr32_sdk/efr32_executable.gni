@@ -40,6 +40,11 @@ template("efr32_executable") {
   flashing_script_name = output_base_name + ".flash.py"
   flashing_options = [ "efr32" ]
 
+  # Add .out extension to the original generate binary for debbuging purpose with ozone debbugger
+  # we add it at the end so the ,out doesn't polluate the other files names
+  # TODO find a more elegante way to get the ,out extension on the original binary file
+  invoker.output_name = invoker.output_name +".out"
+
   flashable_executable(target_name) {
     forward_variables_from(invoker, "*")
     data_deps = [ ":${flashing_runtime_target}" ]

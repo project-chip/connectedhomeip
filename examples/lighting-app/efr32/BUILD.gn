@@ -20,16 +20,8 @@ import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 assert(current_os == "freertos")
 
-efr32_project_dir = "${chip_root}/examples/lock-app/efr32"
+efr32_project_dir = "${chip_root}/examples/lighting-app/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/efr32"
-
-show_qr_code = true
-
-# BRD4166A --> ThunderBoard Sense 2 (No LCD)
-# BRD4180A --> GPIO Conflict with Radio and LCD
-if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
-  show_qr_code = false
-}
 
 efr32_sdk("sdk") {
   include_dirs = [
@@ -55,15 +47,15 @@ efr32_sdk("sdk") {
   defines += [ "BOARD_ID=${efr32_board}" ]
 }
 
-efr32_executable("lock_app") {
+
+efr32_executable("lighting_app") {
   include_dirs = []
   defines = []
-  output_name = "chip-efr32-lock-example"
+  output_name = "chip-efr32-lighting-example"
 
   public_deps = [
     ":sdk",
     "${chip_root}/src/lib",
-    "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
     "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
@@ -74,13 +66,10 @@ efr32_executable("lock_app") {
     "${efr32_project_dir}/include/",
     "${chip_root}/src/app/util",
     "${examples_plat_dir}/",
-    "${chip_root}/examples/common/QRCode/repo/c",
   ]
 
   sources = [
-    "${chip_root}/examples/common/QRCode/repo/c/qrcodegen.c",
     "${chip_root}/src/app/clusters/on-off-server/on-off.c",
-    "${chip_root}/src/app/util/af-event.cpp",
     "${chip_root}/src/app/util/attribute-size.c",
     "${chip_root}/src/app/util/attribute-storage.c",
     "${chip_root}/src/app/util/attribute-table.c",
@@ -96,7 +85,7 @@ efr32_executable("lock_app") {
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
     "src/AppTask.cpp",
-    "src/BoltLockManager.cpp",
+    "src/LightingManager.cpp",
     "src/ButtonHandler.cpp",
     "src/DataModelHandler.cpp",
     "src/LEDWidget.cpp",
@@ -107,24 +96,19 @@ efr32_executable("lock_app") {
     "src/main.cpp",
   ]
 
-  if (show_qr_code) {
-    sources += [ "src/display/lcd.c" ]
-
-    defines += [ "DISPLAY_ENABLED" ]
-  }
   output_dir = root_out_dir
 
   if (efr32_family == "efr32mg12") {
-    ldscript = "${efr32_project_dir}/ldscripts/efr32-lock-example-MG12P.ld"
+    ldscript = "${efr32_project_dir}/ldscripts/efr32-light-example-MG12P.ld"
   } else if (efr32_family == "efr32mg21") {
-    ldscript = "${efr32_project_dir}/ldscripts/efr32-lock-example-MG21.ld"
+    ldscript = "${efr32_project_dir}/ldscripts/efr32-light-example-MG21.ld"
   }
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
 }
 
 group("efr32") {
-  deps = [ ":lock_app" ]
+  deps = [ ":lighting_app" ]
 }
 
 group("default") {
