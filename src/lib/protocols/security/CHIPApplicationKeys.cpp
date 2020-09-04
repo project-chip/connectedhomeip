@@ -38,7 +38,6 @@ namespace Protocols {
 namespace Security {
 namespace AppKeys {
 
-
 /**
  * Get application group master key ID given application group global ID.
  *
@@ -59,7 +58,7 @@ namespace AppKeys {
  *                               key store APIs.
  *
  */
-CHIP_ERROR GetAppGroupMasterKeyId(uint32_t groupGlobalId, GroupKeyStoreBase *groupKeyStore, uint32_t& groupMasterKeyId)
+CHIP_ERROR GetAppGroupMasterKeyId(uint32_t groupGlobalId, GroupKeyStoreBase * groupKeyStore, uint32_t & groupMasterKeyId)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -74,7 +73,7 @@ CHIP_ERROR LogGroupKeys(GroupKeyStoreBase * groupKeyStore)
  */
 void GroupKeyStoreBase::Init(void)
 {
-    LastUsedEpochKeyId = ChipKeyId::kNone;
+    LastUsedEpochKeyId    = ChipKeyId::kNone;
     NextEpochKeyStartTime = UINT32_MAX;
 }
 
@@ -87,7 +86,7 @@ void GroupKeyStoreBase::Init(void)
  */
 void GroupKeyStoreBase::OnEpochKeysChange(void)
 {
-    LastUsedEpochKeyId = ChipKeyId::kNone;
+    LastUsedEpochKeyId    = ChipKeyId::kNone;
     NextEpochKeyStartTime = UINT32_MAX;
 }
 
@@ -104,7 +103,7 @@ void GroupKeyStoreBase::OnEpochKeysChange(void)
  *                                   an accurate time source.
  * @retval other                     Other Weave or platform error codes.
  */
-CHIP_ERROR GroupKeyStoreBase::GetCurrentUTCTime(uint32_t& utcTime)
+CHIP_ERROR GroupKeyStoreBase::GetCurrentUTCTime(uint32_t & utcTime)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -127,7 +126,7 @@ CHIP_ERROR GroupKeyStoreBase::GetCurrentUTCTime(uint32_t& utcTime)
  *                               key store APIs.
  *
  */
-CHIP_ERROR GroupKeyStoreBase::GetCurrentAppKeyId(uint32_t keyId, uint32_t& curKeyId)
+CHIP_ERROR GroupKeyStoreBase::GetCurrentAppKeyId(uint32_t keyId, uint32_t & curKeyId)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -149,7 +148,7 @@ CHIP_ERROR GroupKeyStoreBase::GetCurrentAppKeyId(uint32_t keyId, uint32_t& curKe
  *                               key store APIs.
  *
  */
-CHIP_ERROR GroupKeyStoreBase::GetGroupKey(uint32_t keyId, ChipGroupKey& groupKey)
+CHIP_ERROR GroupKeyStoreBase::GetGroupKey(uint32_t keyId, ChipGroupKey & groupKey)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -171,7 +170,7 @@ CHIP_ERROR GroupKeyStoreBase::GetGroupKey(uint32_t keyId, ChipGroupKey& groupKey
  *                               key store APIs.
  *
  */
-CHIP_ERROR GroupKeyStoreBase::DeriveFabricOrClientRootKey(uint32_t rootKeyId, ChipGroupKey& rootKey)
+CHIP_ERROR GroupKeyStoreBase::DeriveFabricOrClientRootKey(uint32_t rootKeyId, ChipGroupKey & rootKey)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -193,7 +192,7 @@ CHIP_ERROR GroupKeyStoreBase::DeriveFabricOrClientRootKey(uint32_t rootKeyId, Ch
  *                               key store APIs.
  *
  */
-CHIP_ERROR GroupKeyStoreBase::DeriveIntermediateKey(uint32_t keyId, ChipGroupKey& intermediateKey)
+CHIP_ERROR GroupKeyStoreBase::DeriveIntermediateKey(uint32_t keyId, ChipGroupKey & intermediateKey)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -230,11 +229,9 @@ CHIP_ERROR GroupKeyStoreBase::DeriveIntermediateKey(uint32_t keyId, ChipGroupKey
  *                                  key store APIs.
  *
  */
-CHIP_ERROR GroupKeyStoreBase::DeriveApplicationKey(uint32_t& keyId,
-                                                    const uint8_t *keySalt, uint8_t saltLen,
-                                                    const uint8_t *keyDiversifier, uint8_t diversifierLen,
-                                                    uint8_t *appKey, uint8_t keyBufSize, uint8_t keyLen,
-                                                    uint32_t& appGroupGlobalId)
+CHIP_ERROR GroupKeyStoreBase::DeriveApplicationKey(uint32_t & keyId, const uint8_t * keySalt, uint8_t saltLen,
+                                                   const uint8_t * keyDiversifier, uint8_t diversifierLen, uint8_t * appKey,
+                                                   uint8_t keyBufSize, uint8_t keyLen, uint32_t & appGroupGlobalId)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

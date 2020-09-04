@@ -45,7 +45,7 @@ namespace Crypto {
  * @retval  false     otherwise.
  *
  */
-bool ConstantTimeCompare(const uint8_t *buf1, const uint8_t *buf2, uint16_t len)
+bool ConstantTimeCompare(const uint8_t * buf1, const uint8_t * buf2, uint16_t len)
 {
     uint8_t c = 0;
     for (uint16_t i = 0; i < len; i++)

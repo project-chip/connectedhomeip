@@ -23,8 +23,8 @@
  *
  */
 
-#include <core/CHIPCore.h>
 #include "CHIPDummyGroupKeyStore.h"
+#include <core/CHIPCore.h>
 
 namespace chip {
 namespace Protocols {
@@ -36,12 +36,12 @@ DummyGroupKeyStore::DummyGroupKeyStore(void)
     Init();
 }
 
-CHIP_ERROR DummyGroupKeyStore::RetrieveGroupKey(uint32_t keyId, ChipGroupKey& key)
+CHIP_ERROR DummyGroupKeyStore::RetrieveGroupKey(uint32_t keyId, ChipGroupKey & key)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR DummyGroupKeyStore::StoreGroupKey(const ChipGroupKey& key)
+CHIP_ERROR DummyGroupKeyStore::StoreGroupKey(const ChipGroupKey & key)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -56,7 +56,7 @@ CHIP_ERROR DummyGroupKeyStore::DeleteGroupKeysOfAType(uint32_t keyType)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR DummyGroupKeyStore::EnumerateGroupKeys(uint32_t keyType, uint32_t *keyIds, uint8_t keyIdsArraySize, uint8_t & keyCount)
+CHIP_ERROR DummyGroupKeyStore::EnumerateGroupKeys(uint32_t keyType, uint32_t * keyIds, uint8_t keyIdsArraySize, uint8_t & keyCount)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -76,7 +76,7 @@ CHIP_ERROR DummyGroupKeyStore::StoreLastUsedEpochKeyId(void)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR DummyGroupKeyStore::GetCurrentUTCTime(uint32_t& utcTime)
+CHIP_ERROR DummyGroupKeyStore::GetCurrentUTCTime(uint32_t & utcTime)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

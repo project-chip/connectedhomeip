@@ -46,7 +46,7 @@ RetainedPacketBuffer::RetainedPacketBuffer(void)
  *                                     copied.
  *
  */
-RetainedPacketBuffer::RetainedPacketBuffer(const RetainedPacketBuffer &aRetainedPacketBuffer)
+RetainedPacketBuffer::RetainedPacketBuffer(const RetainedPacketBuffer & aRetainedPacketBuffer)
 {
     mBuffer = NULL;
 
@@ -81,7 +81,7 @@ RetainedPacketBuffer::~RetainedPacketBuffer(void)
  *  @return a read-only reference to the current object.
  *
  */
-RetainedPacketBuffer &RetainedPacketBuffer::operator =(const RetainedPacketBuffer &aRetainedPacketBuffer)
+RetainedPacketBuffer & RetainedPacketBuffer::operator=(const RetainedPacketBuffer & aRetainedPacketBuffer)
 {
     if (this != &aRetainedPacketBuffer)
         Retain(aRetainedPacketBuffer.mBuffer);
@@ -107,7 +107,7 @@ bool RetainedPacketBuffer::IsRetaining(void) const
  *  buffer associated with this object.
  *
  */
-void RetainedPacketBuffer::Retain(System::PacketBuffer *aBuffer)
+void RetainedPacketBuffer::Retain(System::PacketBuffer * aBuffer)
 {
     if (aBuffer != NULL)
     {

@@ -45,9 +45,9 @@ static char sErrorStr[CHIP_CONFIG_ERROR_STR_SIZE];
  */
 static ErrorFormatter * sErrorFormatterList = NULL;
 
-DLL_EXPORT const char *StatusReportStr(uint32_t protocolId, uint16_t statusCode)
+DLL_EXPORT const char * StatusReportStr(uint32_t protocolId, uint16_t statusCode)
 {
-    (void)snprintf(sErrorStr, sizeof(sErrorStr), "0x%" PRIx32 " 0x%" PRIx16, protocolId, statusCode);
+    (void) snprintf(sErrorStr, sizeof(sErrorStr), "0x%" PRIx32 " 0x%" PRIx16, protocolId, statusCode);
 
     return sErrorStr;
 }
