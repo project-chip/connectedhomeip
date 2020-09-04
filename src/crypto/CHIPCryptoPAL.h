@@ -262,6 +262,16 @@ CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t 
  **/
 CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen, unsigned int iteration_count,
                          uint32_t key_length, uint8_t * output);
+
+/** @brief Generate a new keypair for ECP256 curve.
+ * @param pubkey Generated public key
+ * @param pklen length of pubkey buffer
+ * @param privkey Generated private key
+ * @param pklen length of privkey buffer
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR GenP256Keypair(uint8_t * pubkey, size_t * pklen, uint8_t * privkey, size_t * pvlen);
+
 /**
  * The below class implements the draft 01 version of the Spake2+ protocol as
  * defined in https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html.

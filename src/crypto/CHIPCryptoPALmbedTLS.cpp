@@ -533,6 +533,42 @@ void ClearSecretData(uint8_t * buf, uint32_t len)
     memset(buf, 0, len);
 }
 
+CHIP_ERROR GenP256Keypair(uint8_t * pubkey, size_t * pklen, uint8_t * privkey, size_t * pvlen)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+    int privkey_size = 0;
+
+    mbedtls_ecp_keypair keypair;
+    mbedtls_ecp_keypair_init(&keypair);
+
+    VerifyOrExit(pubkey != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(pklen != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(*pklen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(privkey != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(pvlen != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(*pvlen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_ecp_gen_key(MBEDTLS_ECP_DP_SECP256R1, &keypair, ECDSA_sign_rng, nullptr);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_ecp_point_write_binary(&keypair.grp, &keypair.Q, MBEDTLS_ECP_PF_UNCOMPRESSED, pklen, Uint8::to_uchar(pubkey), *pklen);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    privkey_size = mbedtls_mpi_size(&keypair.d);
+    VerifyOrExit(privkey_size <= *pvlen, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_mpi_write_binary(&keypair.d, Uint8::to_uchar(privkey), privkey_size);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    *pvlen = privkey_size;
+
+exit:
+    mbedtls_ecp_keypair_free(&keypair);
+    _log_mbedTLS_error(result);
+    return error;
+}
+
 typedef struct Spake2p_Context
 {
     mbedtls_ecp_group curve;
