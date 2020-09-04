@@ -15,9 +15,7 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/platform/device.gni")
 
-if (chip_device_platform == "nrf5")
-{
-
+if (chip_device_platform == "nrf5") {
   import("//build_overrides/nrf5_sdk.gni")
   import("${nrf5_sdk_build_root}/nrf5_sdk.gni")
 
@@ -57,7 +55,10 @@ if (chip_device_platform == "nrf5")
       defines += [ "BUILD_RELEASE=1" ]
     }
 
-    defines += [ "USE_APP_CONFIG", "OPENTHREAD_CONFIG_CLI_TRANSPORT=2" ]
+    defines += [
+      "USE_APP_CONFIG",
+      "OPENTHREAD_CONFIG_CLI_TRANSPORT=2",
+    ]
   }
 
   executable("shell_nrf5") {
@@ -120,10 +121,7 @@ if (chip_device_platform == "nrf5")
   group("default") {
     deps = [ ":nrf5" ]
   }
-
-}
-else
-{
+} else {
   import("${chip_root}/gn/chip/tools.gni")
 
   assert(chip_build_tools)
