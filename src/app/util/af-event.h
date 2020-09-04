@@ -40,20 +40,19 @@
 #ifndef SILABS_AF_EVENT_H
 #define SILABS_AF_EVENT_H
 
-#include "../include/af.h"
-#include "stack/include/event.h"
+#include "af.h"
 
 #define MAX_TIMER_UNITS_HOST 0x7fff
 #define MAX_TIMER_MILLISECONDS_HOST (MAX_TIMER_UNITS_HOST * MILLISECOND_TICKS_PER_MINUTE)
 
-#if !defined(ATTRIBUTE_STORAGE_CONFIGURATION) && defined(EMBER_TEST)
-#include "af-event-test.h"
-#else
-#include "af-gen-event.h"
-#endif
-
-// Task ids referenced in the sleep code
-extern EmberTaskId emAfTaskId;
+/** @brief Complete events with a control and a handler procedure.
+ *
+ * An application typically creates an array of events
+ * along with their handlers.
+ * The main loop passes the array to ::emberRunEvents() to call
+ * the handlers of any events whose time has arrived.
+ */
+typedef struct EmberEventData EmberEventData;
 
 extern uint16_t emAfAppEventContextLength;
 extern EmberAfEventContext emAfAppEventContext[];
@@ -68,9 +67,6 @@ void emAfGetTimerDurationAndUnitFromMS(uint32_t durationMs, uint16_t * duration,
 // A function (inverse of the above) to retrieve the number of milliseconds
 // represented by a given timer duration and unit.
 uint32_t emAfGetMSFromTimerDurationAndUnit(uint16_t duration, EmberEventUnits units);
-
-// A function to initialize the Event mechanism used to drive the application framework.
-void emAfInitEvents(void);
 
 const char * emberAfGetEventString(uint8_t index);
 
