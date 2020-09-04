@@ -44,13 +44,11 @@ exclude:
     - ".github/**/*" # https://github.com/restyled-io/restyler/issues/73
     - ".github/*" # https://github.com/restyled-io/restyler/issues/73
     - "third_party/**/*"
-    - "third_party/**"
     - "third_party/*"
-    - "third_party"
+    - "third_party/**"
     - "**/third_party/**/*"
     - "**/third_party/*"
     - "**/third_party/**"
-    - "**/third_party/**/*"
     - "examples/lock-app/efr32/third_party/**/*"
     - "examples/lock-app/efr32/third_party/*"
     - "examples/lock-app/efr32/third_party/**"
@@ -61,14 +59,17 @@ exclude:
 restylers:
     - name: whitespace
       enabled: true
-      image: restyled/restyler-whitespace:v0.1.0.0-2
+      image: restyled/restyler-whitespace:v0.1.0.1
       command:
           - whitespace
       arguments: []
       include:
           - "**/Dockerfile"
+          - ".**/Dockerfile"
           - "**/*.yml"
           - "**/*.yaml"
+          - ".**/*.yml"
+          - ".**/*.yaml"
           - "**/*.sh"
           - "**/*.c"
           - "**/*.cc"
@@ -86,6 +87,8 @@ restylers:
           - "**/*.java"
           - "**/*.js"
           - "**/*.json"
+          - ".**/*.js"
+          - ".**/*.json"
           - "**/*.m"
           - "**/*.mm"
     - name: google-java-format
@@ -138,6 +141,7 @@ restylers:
       arguments: []
       include:
           - "**/*.json"
+          - ".**/*.json"
       interpreters: []
     - name: prettier-markdown
       image: restyled/restyler-prettier:v1.19.1-2
