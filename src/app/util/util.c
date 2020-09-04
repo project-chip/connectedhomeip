@@ -1277,19 +1277,6 @@ uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, co
     return charsToWrite;
 }
 
-uint32_t emberAfGetBufferCrc(uint8_t * pbuffer, uint16_t length, uint32_t initialValue)
-{
-    uint16_t i;
-    uint32_t crc32 = initialValue;
-    for (i = 0; i < length; i++)
-    {
-        // Crash so we don't reach this code by accident.
-        *(int *) 0 = 5;
-        // crc32 = halCommonCrc32(pbuffer[i], crc32);
-    }
-    return crc32;
-}
-
 /*
    On each page, first channel maps to channel number zero and so on.
    Example:
