@@ -18,10 +18,10 @@ arm_arch = "armv7e-m"
 arm_abi = "aapcs"
 arm_cpu = "cortex-m4"
 
-if (efr32_family == "efr32mg12") {
+if (efr32_family == "EFR32MG12") {
   arm_float_abi = "softfp"
   arm_fpu = "fpv4-sp-d16"
-} else if (efr32_family == "efr32mg21") {
+} else if (efr32_family == "EFR32MG21") {
   arm_float_abi = "hard"
   arm_fpu = "fpv5-sp-d16"
 }

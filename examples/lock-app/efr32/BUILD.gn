@@ -24,7 +24,10 @@ efr32_project_dir = "${chip_root}/examples/lock-app/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/efr32"
 
 show_qr_code = true
-if (efr32_board == "BRD4166A") {
+
+# BRD4166A --> ThunderBoard Sense 2 (No LCD)
+# BRD4180A --> GPIO Conflict with Radio and LCD
+if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
   show_qr_code = false
 }
 
@@ -97,7 +100,6 @@ efr32_executable("lock_app") {
     "src/DataModelHandler.cpp",
     "src/LEDWidget.cpp",
     "src/Server.cpp",
-    "src/display/lcd.c",
     "src/gen/call-command-handler.c",
     "src/gen/callback-stub.c",
     "src/gen/znet-bookkeeping.c",
@@ -105,13 +107,15 @@ efr32_executable("lock_app") {
   ]
 
   if (show_qr_code) {
+    sources += [ "src/display/lcd.c", ]
+
     defines += [ "DISPLAY_ENABLED" ]
   }
   output_dir = root_out_dir
 
-  if (efr32_family == "efr32mg12") {
+  if (efr32_family == "EFR32MG12") {
     ldscript = "${efr32_project_dir}/ldscripts/efr32-lock-example-MG12P.ld"
-  } else if (efr32_family == "efr32mg21") {
+  } else if (efr32_family == "EFR32MG21") {
     ldscript = "${efr32_project_dir}/ldscripts/efr32-lock-example-MG21.ld"
   }
 
