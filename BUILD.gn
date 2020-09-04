@@ -58,7 +58,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
 
     if (chip_build_tests) {
-      deps += [ ":tests" ]
+      deps += [ "//src:tests" ]
     }
 
     if (chip_build_tools) {
@@ -78,26 +78,8 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
   }
 
   if (chip_build_tests) {
-    import("${chip_root}/gn/chip/chip_test_group.gni")
-
-    chip_test_group("tests") {
-      deps = [
-        "${chip_root}/src/ble/tests",
-        "${chip_root}/src/crypto/tests",
-        "${chip_root}/src/inet/tests",
-        "${chip_root}/src/lib/core/tests",
-        "${chip_root}/src/lib/shell/tests",
-        "${chip_root}/src/lib/support/tests",
-        "${chip_root}/src/lwip/tests",
-        "${chip_root}/src/platform/tests",
-        "${chip_root}/src/setup_payload/tests",
-        "${chip_root}/src/system/tests",
-        "${chip_root}/src/transport/tests",
-      ]
-    }
-
     group("check") {
-      deps = [ ":tests_run" ]
+      deps = [ "//src:tests_run" ]
     }
   }
 } else {

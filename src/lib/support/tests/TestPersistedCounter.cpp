@@ -185,22 +185,19 @@ static HelpOptions gHelpOptions(TOOL_NAME, "Usage: " TOOL_NAME " [<options...>]\
 
 static OptionSet * gOptionSets[] = { &gHelpOptions, NULL };
 
-int main(int argc, char * argv[])
+extern "C" int TestPersistedCounter(int argc, char * argv[])
 {
     TestPersistedCounterContext context;
 
     if (!ParseArgsFromEnvVar(TOOL_NAME, TOOL_OPTIONS_ENV_VAR_NAME, gOptionSets, NULL, true) ||
         !ParseArgs(TOOL_NAME, argc, argv, gOptionSets))
     {
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     nlTestSuite theSuite = { "chip-persisted-storage", &sTests[0], TestSetup, TestTeardown };
 
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nl_test_set_output_style(OUTPUT_CSV);
-
-    // Run test suit against one context
+    // Run test suite against one context
     nlTestRunner(&theSuite, &context);
 
     return nlTestRunnerStats(&theSuite);

@@ -16,7 +16,20 @@
  *    limitations under the License.
  */
 
-// Zephyr native_posix applications are built with posix_cheats.h header file which defines
-// 'main' as 'zephyr_app_main' and that breaks autoconf build and instructions like AC_LINK_IFELSE.
-// This header may be injected to workaround the issue.
-#undef main
+/**
+ *    @file
+ *      Unit tests driver for the Chip Counter API.
+ *
+ */
+
+#include "TestSupport.h"
+
+#include <nlunit-test.h>
+
+int main(int argc, char * argv[])
+{
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nl_test_set_output_style(OUTPUT_CSV);
+
+    return TestCHIPCounter();
+}

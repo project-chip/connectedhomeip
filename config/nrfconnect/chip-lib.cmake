@@ -81,11 +81,20 @@ function(chip_configure TARGET_NAME)
     chip_gn_arg_string(GN_ARGS "zephyr_cxx = \"${CMAKE_CXX_COMPILER}\"")
 
     if (NOT "${CHIP_PROJECT_CONFIG}" STREQUAL "")
-    chip_gn_arg_string(GN_ARGS "chip_project_config_include = \"<${CHIP_PROJECT_CONFIG}>\"")
+        chip_gn_arg_string(GN_ARGS "chip_project_config_include = \"<${CHIP_PROJECT_CONFIG}>\"")
+        chip_gn_arg_string(GN_ARGS "chip_system_project_config_include = \"<${CHIP_PROJECT_CONFIG}>\"")
+    endif ()
+
+    if ("${BOARD}" STREQUAL "native_posix")
+        chip_gn_arg_string(GN_ARGS "target_cpu = \"x86\"")
     endif ()
 
     chip_gn_arg_bool_if(CONFIG_NET_L2_OPENTHREAD GN_ARGS "chip_enable_openthread")
+    chip_gn_arg_bool_if(CONFIG_NET_IPV4          GN_ARGS "chip_inet_config_enable_ipv4")
     chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_build_tests")
+    chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_inet_config_enable_raw_endpoint")
+    chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_inet_config_enable_tcp_endpoint")
+    chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_inet_config_enable_dns_resolver")
 
     file(
         GENERATE OUTPUT ${CHIP_OUTPUT_DIR}/args.gn
@@ -138,9 +147,19 @@ function(chip_build TARGET_NAME BASE_TARGET_NAME)
         ${CHIP_OUTPUT_DIR}/gen/third_party/connectedhomeip/src/lib/support/include
         ${CHIP_OUTPUT_DIR}/gen/third_party/connectedhomeip/src/app/include
     )
-    target_link_directories(${TARGET_NAME} INTERFACE ${CHIP_OUTPUT_DIR}/lib)
+    target_link_directories(${TARGET_NAME} INTERFACE
+        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/lib/support/tests/lib
+        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/lib/core/tests/lib
+        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/transport/tests/lib
+        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/setup_payload/tests/lib
+        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/system/tests/lib
+        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/platform/tests/lib
+        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/crypto/tests/lib
+        ${CHIP_OUTPUT_DIR}/lib
+    )
     target_link_libraries(${TARGET_NAME} INTERFACE -Wl,--start-group ${CHIP_BUILD_ARTIFACTS} -Wl,--end-group)
 
     add_dependencies(${TARGET_NAME}Build ${BASE_TARGET_NAME})
     add_dependencies(${TARGET_NAME} ${TARGET_NAME}Build)
+    add_dependencies(${TARGET_NAME}Build kernel)
 endfunction()

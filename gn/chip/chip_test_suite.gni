@@ -36,7 +36,9 @@ template("chip_test_suite") {
   if (defined(invoker.tests)) {
     foreach(_test, invoker.tests) {
       chip_test(_test) {
-        sources = [ "${_test}Driver.cpp" ]
+        if (current_os != "zephyr") {
+          sources = [ "${_test}Driver.cpp" ]
+        }
 
         public_deps = [ ":${_suite_name}_common" ]
       }
@@ -48,7 +50,9 @@ template("chip_test_suite") {
   if (defined(invoker.c_tests)) {
     foreach(_test, invoker.c_tests) {
       chip_test(_test) {
-        sources = [ "${_test}Driver.c" ]
+        if (current_os != "zephyr") {
+          sources = [ "${_test}Driver.c" ]
+        }
 
         public_deps = [ ":${_suite_name}_common" ]
       }

@@ -23,14 +23,20 @@ assert(chip_build_tests)
 template("chip_test") {
   _test_name = target_name
 
-  _test_output_dir = "${root_out_dir}/tests"
-  if (defined(invoker.output_dir)) {
-    _test_output_dir = invoker.output_dir
-  }
+  if (current_os != "zephyr") {
+    _test_output_dir = "${root_out_dir}/tests"
+    if (defined(invoker.output_dir)) {
+      _test_output_dir = invoker.output_dir
+    }
 
-  executable(_test_name) {
-    forward_variables_from(invoker, "*", [ "output_dir" ])
-    output_dir = _test_output_dir
+    executable(_test_name) {
+      forward_variables_from(invoker, "*", [ "output_dir" ])
+      output_dir = _test_output_dir
+    }
+  } else {
+    group(_test_name) {
+      forward_variables_from(invoker, "*", [ "output_dir" ])
+    }
   }
 
   # Only execute tests when current_os == host_os

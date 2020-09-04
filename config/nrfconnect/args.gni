@@ -21,18 +21,10 @@ chip_logging_style = "external"
 
 chip_config_network_layer_ble = true
 
-chip_project_config_include = "<CHIPProjectConfig.h>"
-chip_ble_project_config_include = chip_project_config_include
-chip_device_project_config_include = chip_project_config_include
-chip_inet_project_config_include = chip_project_config_include
-chip_system_project_config_include = chip_project_config_include
-
 chip_build_tests = false
-chip_inet_config_enable_tun_endpoint = chip_build_tests
-chip_inet_config_enable_raw_endpoint = chip_build_tests
-chip_inet_config_enable_tcp_endpoint = chip_build_tests
-chip_inet_config_enable_dns_resolver = chip_build_tests
-chip_inet_config_enable_ipv4 = chip_build_tests
-custom_toolchain = "//toolchain:zephyr"
 
+chip_project_config_include = "<CHIPProjectConfig.h>"
+chip_system_project_config_include = "<CHIPProjectConfig.h>"
+
+custom_toolchain = "//toolchain:zephyr"
 mbedtls_target = "//:dummy"
