@@ -826,12 +826,12 @@ CHIP_ERROR GenP256Keypair(uint8_t * pubkey, size_t * pklen, uint8_t * privkey, s
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     {
-        size_t pubkey_size = 0;
+        size_t pubkey_size          = 0;
         const EC_POINT * pubkey_ecp = EC_KEY_get0_public_key(ec_key);
         VerifyOrExit(pubkey_ecp != nullptr, error = CHIP_ERROR_INTERNAL);
 
-        pubkey_size = EC_POINT_point2oct(group, pubkey_ecp, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(pubkey),
-                                         *pklen, nullptr);
+        pubkey_size =
+            EC_POINT_point2oct(group, pubkey_ecp, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(pubkey), *pklen, nullptr);
         pubkey_ecp = nullptr;
 
         VerifyOrExit(pubkey_size <= *pklen, error = CHIP_ERROR_INTERNAL);
@@ -839,12 +839,12 @@ CHIP_ERROR GenP256Keypair(uint8_t * pubkey, size_t * pklen, uint8_t * privkey, s
     }
 
     {
-        int privkey_size = 0;
+        int privkey_size          = 0;
         const BIGNUM * privkey_bn = EC_KEY_get0_private_key(ec_key);
         VerifyOrExit(privkey_bn != nullptr, error = CHIP_ERROR_INTERNAL);
 
         privkey_size = BN_bn2binpad(privkey_bn, Uint8::to_uchar(privkey), *pvlen);
-        privkey_bn = nullptr;
+        privkey_bn   = nullptr;
 
         VerifyOrExit(privkey_size > 0, error = CHIP_ERROR_INTERNAL);
         VerifyOrExit(privkey_size <= *pvlen, error = CHIP_ERROR_INTERNAL);
