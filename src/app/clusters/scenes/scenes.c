@@ -39,8 +39,8 @@
  ******************************************************************************/
 
 #include "scenes.h"
-#include <app/util/af.h>
 #include "../../util/common.h"
+#include <app/util/af.h>
 
 #ifdef EMBER_AF_PLUGIN_ZLL_SCENES_SERVER
 #include "../zll-scenes-server/zll-scenes-server.h"
@@ -999,7 +999,7 @@ kickout:
 bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, uint16_t groupId, uint8_t sceneId)
 {
     EmberAfSceneTableEntry entry = {};
-    EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
+    EmberAfStatus status         = EMBER_ZCL_STATUS_NOT_FOUND;
     EmberStatus sendStatus;
     bool enhanced    = (cmd->commandId == ZCL_ENHANCED_VIEW_SCENE_COMMAND_ID);
     uint8_t endpoint = cmd->apsFrame->destinationEndpoint;
