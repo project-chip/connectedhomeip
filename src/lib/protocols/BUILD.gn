@@ -27,21 +27,19 @@ static_library("protocols") {
 
   sources = [
     "CHIPServerBase.cpp",
-    "CHIPServerBase.h",      
+    "CHIPServerBase.h",
     "common/CHIPMessage.cpp",
-    "common/CHIPMessage.h",    
+    "common/CHIPMessage.h",
     "common/RetainedPacketBuffer.cpp",
     "security/CHIPApplicationKeys.cpp",
     "security/CHIPApplicationKeys.h",
     "security/CHIPDummyGroupKeyStore.cpp",
     "security/CHIPDummyGroupKeyStore.h",
     "status-report/StatusReportProtocol.cpp",
-    "status-report/StatusReportProtocol.h",    
+    "status-report/StatusReportProtocol.h",
   ]
 
-  public_deps = [
-    "${chip_root}/src/lib/core",
-  ]
+  public_deps = [ "${chip_root}/src/lib/core" ]
 
   public_configs = [ ":includes" ]
 }
