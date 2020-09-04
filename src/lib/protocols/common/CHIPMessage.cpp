@@ -40,7 +40,7 @@ using namespace chip::Protocols;
  * @param aBuffer  A message buffer to iterate over.
  */
 
-MessageIterator::MessageIterator(PacketBuffer *aBuffer)
+MessageIterator::MessageIterator(PacketBuffer * aBuffer)
 {
     Retain(aBuffer);
 
@@ -54,7 +54,7 @@ MessageIterator::MessageIterator(PacketBuffer *aBuffer)
  * @retval CHIP_ERROR_BUFFER_TOO_SMALL If we're running past the end of the buffer.
  */
 
-CHIP_ERROR MessageIterator::readByte(uint8_t *aDestination)
+CHIP_ERROR MessageIterator::readByte(uint8_t * aDestination)
 {
     CHIP_ERROR err = CHIP_ERROR_BUFFER_TOO_SMALL;
 
@@ -75,7 +75,7 @@ CHIP_ERROR MessageIterator::readByte(uint8_t *aDestination)
  * @retval CHIP_ERROR_BUFFER_TOO_SMALL If we're running past the end of the buffer.
  */
 
-CHIP_ERROR MessageIterator::read16(uint16_t *aDestination)
+CHIP_ERROR MessageIterator::read16(uint16_t * aDestination)
 {
     CHIP_ERROR err = CHIP_ERROR_BUFFER_TOO_SMALL;
 
@@ -96,7 +96,7 @@ CHIP_ERROR MessageIterator::read16(uint16_t *aDestination)
  * @retval CHIP_ERROR_BUFFER_TOO_SMALL If we're running past the end of the buffer.
  */
 
-CHIP_ERROR MessageIterator::read32(uint32_t *aDestination)
+CHIP_ERROR MessageIterator::read32(uint32_t * aDestination)
 {
     CHIP_ERROR err = CHIP_ERROR_BUFFER_TOO_SMALL;
 
@@ -117,15 +117,15 @@ CHIP_ERROR MessageIterator::read32(uint32_t *aDestination)
  * @retval CHIP_ERROR_BUFFER_TOO_SMALL If we're running past the end of the buffer.
  */
 
-CHIP_ERROR MessageIterator::read64(uint64_t *aDestination)
+CHIP_ERROR MessageIterator::read64(uint64_t * aDestination)
 {
     CHIP_ERROR err = CHIP_ERROR_BUFFER_TOO_SMALL;
-    uint8_t *p;
+    uint8_t * p;
 
     if (hasData(8))
     {
         err = CHIP_NO_ERROR;
-        p = (uint8_t *)aDestination;
+        p   = (uint8_t *) aDestination;
 
         for (int i = 0; i < 8; i++)
             readByte(p++);
@@ -142,7 +142,7 @@ CHIP_ERROR MessageIterator::read64(uint64_t *aDestination)
  * @retval CHIP_ERROR_BUFFER_TOO_SMALL If we're running past the end of the buffer.
  */
 
-CHIP_ERROR MessageIterator::readString(uint16_t aLength, char* aString)
+CHIP_ERROR MessageIterator::readString(uint16_t aLength, char * aString)
 {
     CHIP_ERROR err = CHIP_ERROR_BUFFER_TOO_SMALL;
 
@@ -168,7 +168,7 @@ CHIP_ERROR MessageIterator::readString(uint16_t aLength, char* aString)
  * @retval CHIP_ERROR_BUFFER_TOO_SMALL If we're running past the end of the buffer.
  */
 
-CHIP_ERROR MessageIterator::readBytes(uint16_t aLength, uint8_t* aByteString)
+CHIP_ERROR MessageIterator::readBytes(uint16_t aLength, uint8_t * aByteString)
 {
     CHIP_ERROR err = CHIP_ERROR_BUFFER_TOO_SMALL;
 
@@ -262,7 +262,7 @@ CHIP_ERROR MessageIterator::write32(uint32_t aValue)
 CHIP_ERROR MessageIterator::write64(uint64_t aValue)
 {
     CHIP_ERROR err = CHIP_ERROR_BUFFER_TOO_SMALL;
-    uint8_t *p = (uint8_t *)&aValue;
+    uint8_t * p    = (uint8_t *) &aValue;
 
     if (hasRoom(8))
     {
@@ -283,7 +283,7 @@ CHIP_ERROR MessageIterator::write64(uint64_t aValue)
  * @retval CHIP_ERROR_BUFFER_TOO_SMALL If we're running past the end of the buffer.
  */
 
-CHIP_ERROR MessageIterator::writeString(uint16_t aLength, char *aString)
+CHIP_ERROR MessageIterator::writeString(uint16_t aLength, char * aString)
 {
     CHIP_ERROR err = CHIP_ERROR_BUFFER_TOO_SMALL;
 
@@ -310,7 +310,7 @@ CHIP_ERROR MessageIterator::writeString(uint16_t aLength, char *aString)
  * @retval CHIP_ERROR_BUFFER_TOO_SMALL If we're running past the end of the buffer.
  */
 
-CHIP_ERROR MessageIterator::writeBytes(uint16_t aLength, uint8_t *aByteString)
+CHIP_ERROR MessageIterator::writeBytes(uint16_t aLength, uint8_t * aByteString)
 {
     CHIP_ERROR err = CHIP_ERROR_BUFFER_TOO_SMALL;
 
@@ -333,7 +333,7 @@ CHIP_ERROR MessageIterator::writeBytes(uint16_t aLength, uint8_t *aByteString)
  * Increment a message iterator by 1 if there's room.
  */
 
-MessageIterator& MessageIterator::operator ++(void)
+MessageIterator & MessageIterator::operator++(void)
 {
     if (hasRoom(1))
         ++thePoint;
@@ -348,7 +348,7 @@ MessageIterator& MessageIterator::operator ++(void)
  *                 room, or else slammed right up against the end if there's not.
  */
 
-MessageIterator& MessageIterator::operator +(uint16_t inc)
+MessageIterator & MessageIterator::operator+(uint16_t inc)
 {
     if (hasRoom(inc))
         thePoint += inc;
@@ -366,7 +366,7 @@ MessageIterator& MessageIterator::operator +(uint16_t inc)
  *                 room, or else slammed right up against the beginning if there's not.
  */
 
-MessageIterator& MessageIterator::operator -(uint16_t dec)
+MessageIterator & MessageIterator::operator-(uint16_t dec)
 {
     if (mBuffer->DataLength() > dec)
         thePoint -= dec;
@@ -379,16 +379,16 @@ MessageIterator& MessageIterator::operator -(uint16_t dec)
  * @param aMessageIterator  Another message iterator to compare with.
  */
 
-bool MessageIterator::operator==(const MessageIterator &aMessageIterator)
+bool MessageIterator::operator==(const MessageIterator & aMessageIterator)
 {
-    return(thePoint == aMessageIterator.thePoint && mBuffer == aMessageIterator.mBuffer);
+    return (thePoint == aMessageIterator.thePoint && mBuffer == aMessageIterator.mBuffer);
 }
 
 /**
  * @param aMessageIterator  Another message iterator to compare with.
  */
 
-bool MessageIterator::operator!=(const MessageIterator &aMessageIterator)
+bool MessageIterator::operator!=(const MessageIterator & aMessageIterator)
 {
     return !(thePoint == aMessageIterator.thePoint && mBuffer == aMessageIterator.mBuffer);
 }
@@ -397,7 +397,7 @@ bool MessageIterator::operator!=(const MessageIterator &aMessageIterator)
  * @return  What we're looking at in the buffer.
  */
 
-uint8_t& MessageIterator::operator *(void)
+uint8_t & MessageIterator::operator*(void)
 {
     return *thePoint;
 }
@@ -455,12 +455,11 @@ void MessageIterator::finishWriting(void)
  * The no-arg constructor for referenced strings.
  */
 
-ReferencedString::ReferencedString(void) :
-    RetainedPacketBuffer()
+ReferencedString::ReferencedString(void) : RetainedPacketBuffer()
 {
     theLength = 0;
     theString = NULL;
-    isShort = false;
+    isShort   = false;
 }
 
 /***
@@ -477,7 +476,7 @@ ReferencedString::ReferencedString(void) :
  * @retval #CHIP_ERROR_INVALID_STRING_LENGTH The supplied string is too long
  */
 
-CHIP_ERROR ReferencedString::init(uint16_t aLength, char *aString, System::PacketBuffer *aBuffer)
+CHIP_ERROR ReferencedString::init(uint16_t aLength, char * aString, System::PacketBuffer * aBuffer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -490,7 +489,7 @@ CHIP_ERROR ReferencedString::init(uint16_t aLength, char *aString, System::Packe
 
         theLength = aLength;
         theString = aString;
-        isShort = false;
+        isShort   = false;
     }
 
     return err;
@@ -513,7 +512,7 @@ CHIP_ERROR ReferencedString::init(uint16_t aLength, char *aString, System::Packe
  * @retval #CHIP_NO_ERROR Unconditionally
  */
 
-CHIP_ERROR ReferencedString::init(uint16_t aLength, char *aString)
+CHIP_ERROR ReferencedString::init(uint16_t aLength, char * aString)
 {
     theLength = aLength;
     theString = aString;
@@ -529,15 +528,16 @@ CHIP_ERROR ReferencedString::init(uint16_t aLength, char *aString)
  * @fn CHIP_ERROR ReferencedString::init(uint8_t aLength, char *aString, System::PacketBuffer *aBuffer)
  * @overload
  */
-CHIP_ERROR ReferencedString::init(uint8_t aLength, char *aString, System::PacketBuffer *aBuffer)
+CHIP_ERROR ReferencedString::init(uint8_t aLength, char * aString, System::PacketBuffer * aBuffer)
 {
-    if (aLength > (aBuffer->AvailableDataLength() - aBuffer->DataLength())) return CHIP_ERROR_INVALID_STRING_LENGTH;
+    if (aLength > (aBuffer->AvailableDataLength() - aBuffer->DataLength()))
+        return CHIP_ERROR_INVALID_STRING_LENGTH;
 
     Retain(aBuffer);
 
-    theLength = (uint16_t)aLength;
+    theLength = (uint16_t) aLength;
     theString = aString;
-    isShort = true;
+    isShort   = true;
 
     return CHIP_NO_ERROR;
 }
@@ -547,7 +547,7 @@ CHIP_ERROR ReferencedString::init(uint8_t aLength, char *aString, System::Packet
  * @overload
  */
 
-CHIP_ERROR ReferencedString::init(uint8_t aLength, char *aString)
+CHIP_ERROR ReferencedString::init(uint8_t aLength, char * aString)
 {
     theLength = (uint16_t) aLength;
     theString = aString;
@@ -564,12 +564,12 @@ CHIP_ERROR ReferencedString::init(uint8_t aLength, char *aString)
  * @return     CHIP_ERROR
  */
 
-CHIP_ERROR ReferencedString::pack(MessageIterator &i)
+CHIP_ERROR ReferencedString::pack(MessageIterator & i)
 {
     CHIP_ERROR e;
 
     if (isShort)
-        e = i.writeByte((uint8_t)theLength);
+        e = i.writeByte((uint8_t) theLength);
 
     else
         e = i.write16(theLength);
@@ -589,13 +589,13 @@ CHIP_ERROR ReferencedString::pack(MessageIterator &i)
  *                                           (this should never happen).
  */
 
-CHIP_ERROR ReferencedString::parse(MessageIterator &i, ReferencedString &aString)
+CHIP_ERROR ReferencedString::parse(MessageIterator & i, ReferencedString & aString)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint16_t len = 0;
+    uint16_t len   = 0;
 
     if (aString.isShort)
-        i.readByte((uint8_t *)&len);
+        i.readByte((uint8_t *) &len);
 
     else
         i.read16(&len);
@@ -603,7 +603,7 @@ CHIP_ERROR ReferencedString::parse(MessageIterator &i, ReferencedString &aString
     if (i.hasRoom(len))
     {
         aString.theLength = len;
-        aString.theString = (char *)i.thePoint;
+        aString.theString = (char *) i.thePoint;
         aString.Retain(i.GetBuffer());
 
         // we need to skip over the string
@@ -624,7 +624,7 @@ CHIP_ERROR ReferencedString::parse(MessageIterator &i, ReferencedString &aString
  * @retval false The strings are not equal.
  */
 
-bool ReferencedString::operator== (const ReferencedString &aReferencedString) const
+bool ReferencedString::operator==(const ReferencedString & aReferencedString) const
 {
     bool result = false;
 
@@ -648,7 +648,7 @@ exit:
  * @return  A printable string
  */
 
-char *ReferencedString::printString(void)
+char * ReferencedString::printString(void)
 {
     theString[theLength] = 0;
 
@@ -665,14 +665,13 @@ char *ReferencedString::printString(void)
  * here in order to be useful.
  */
 
-ReferencedTLVData::ReferencedTLVData(void) :
-    RetainedPacketBuffer()
+ReferencedTLVData::ReferencedTLVData(void) : RetainedPacketBuffer()
 {
-    theLength = 0;
-    theMaxLength = 0;
-    theData = NULL;
+    theLength        = 0;
+    theMaxLength     = 0;
+    theData          = NULL;
     theWriteCallback = NULL;
-    theAppState = NULL;
+    theAppState      = NULL;
 }
 
 /**
@@ -688,16 +687,16 @@ ReferencedTLVData::ReferencedTLVData(void) :
  * @retval #CHIP_NO_ERROR Unconditionally
  */
 
-CHIP_ERROR ReferencedTLVData::init(System::PacketBuffer *aBuffer)
+CHIP_ERROR ReferencedTLVData::init(System::PacketBuffer * aBuffer)
 {
     Retain(aBuffer);
 
-    theData = mBuffer->Start();
-    theLength = mBuffer->DataLength();
+    theData      = mBuffer->Start();
+    theLength    = mBuffer->DataLength();
     theMaxLength = mBuffer->MaxDataLength();
 
     theWriteCallback = NULL;
-    theAppState = NULL;
+    theAppState      = NULL;
 
     return CHIP_NO_ERROR;
 }
@@ -714,20 +713,20 @@ CHIP_ERROR ReferencedTLVData::init(System::PacketBuffer *aBuffer)
  * @param [in] i           A message iterator pointing to TLV to be extracted.
  *
  * @retval #CHIP_NO_ERROR Unconditionally
-*/
+ */
 
-CHIP_ERROR ReferencedTLVData::init(MessageIterator &i)
+CHIP_ERROR ReferencedTLVData::init(MessageIterator & i)
 {
-    System::PacketBuffer *theBuffer = i.GetBuffer();
+    System::PacketBuffer * theBuffer = i.GetBuffer();
 
     Retain(theBuffer);
 
-    theData = i.thePoint;
-    theLength = theBuffer->DataLength() - (i.thePoint - mBuffer->Start());
+    theData      = i.thePoint;
+    theLength    = theBuffer->DataLength() - (i.thePoint - mBuffer->Start());
     theMaxLength = theBuffer->MaxDataLength();
 
     theWriteCallback = NULL;
-    theAppState = NULL;
+    theAppState      = NULL;
 
     return CHIP_NO_ERROR;
 }
@@ -752,16 +751,16 @@ CHIP_ERROR ReferencedTLVData::init(MessageIterator &i)
  * @retval #CHIP_NO_ERROR Unconditionally
  */
 
-CHIP_ERROR ReferencedTLVData::init(uint16_t aLength, uint16_t aMaxLength, uint8_t *aByteString)
+CHIP_ERROR ReferencedTLVData::init(uint16_t aLength, uint16_t aMaxLength, uint8_t * aByteString)
 {
-    theLength = aLength;
+    theLength    = aLength;
     theMaxLength = aMaxLength;
-    theData = aByteString;
+    theData      = aByteString;
 
     Release();
 
     theWriteCallback = NULL;
-    theAppState = NULL;
+    theAppState      = NULL;
 
     return CHIP_NO_ERROR;
 }
@@ -789,23 +788,23 @@ CHIP_ERROR ReferencedTLVData::init(uint16_t aLength, uint16_t aMaxLength, uint8_
  * @retval #CHIP_ERROR_INVALID_ARGUMENT If the write callback is not supplied.
  */
 
-CHIP_ERROR ReferencedTLVData::init(TLVWriteCallback aWriteCallback, void *anAppState)
+CHIP_ERROR ReferencedTLVData::init(TLVWriteCallback aWriteCallback, void * anAppState)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (aWriteCallback != NULL)
     {
         theWriteCallback = aWriteCallback;
-        theAppState = anAppState;
+        theAppState      = anAppState;
     }
 
     else
         err = CHIP_ERROR_INVALID_ARGUMENT;
 
-    theLength = 0;
+    theLength    = 0;
     theMaxLength = 0;
-    theData = NULL;
-    mBuffer = NULL;
+    theData      = NULL;
+    mBuffer      = NULL;
 
     return err;
 }
@@ -824,13 +823,13 @@ void ReferencedTLVData::free(void)
      */
 
     theWriteCallback = NULL;
-    theAppState = NULL;
+    theAppState      = NULL;
 
     // and the rest of it for good measure
 
-    theLength = 0;
+    theLength    = 0;
     theMaxLength = 0;
-    theData = NULL;
+    theData      = NULL;
 }
 
 /**
@@ -858,11 +857,11 @@ bool ReferencedTLVData::isFree(void)
  * return an error and so fails silently.
  */
 
-CHIP_ERROR ReferencedTLVData::pack(MessageIterator &i, uint32_t maxLen)
+CHIP_ERROR ReferencedTLVData::pack(MessageIterator & i, uint32_t maxLen)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    System::PacketBuffer *theBuffer = i.GetBuffer();
-    uint16_t oldDataLength = theBuffer->DataLength();
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    System::PacketBuffer * theBuffer = i.GetBuffer();
+    uint16_t oldDataLength           = theBuffer->DataLength();
     TLVWriter writer;
 
     if (theWriteCallback != NULL)
@@ -899,9 +898,9 @@ CHIP_ERROR ReferencedTLVData::pack(MessageIterator &i, uint32_t maxLen)
  * @retval #CHIP_NO_ERROR Unconditionally
  */
 
-CHIP_ERROR ReferencedTLVData::parse(MessageIterator &i, ReferencedTLVData &aTarget)
+CHIP_ERROR ReferencedTLVData::parse(MessageIterator & i, ReferencedTLVData & aTarget)
 {
-    PacketBuffer *buff = i.GetBuffer();
+    PacketBuffer * buff = i.GetBuffer();
 
     aTarget.Retain(buff);
 
@@ -932,7 +931,7 @@ CHIP_ERROR ReferencedTLVData::parse(MessageIterator &i, ReferencedTLVData &aTarg
  * @retval false The objects strings are not equal.
  */
 
-bool ReferencedTLVData::operator== (const ReferencedTLVData &another) const
+bool ReferencedTLVData::operator==(const ReferencedTLVData & another) const
 {
     bool result = false;
 

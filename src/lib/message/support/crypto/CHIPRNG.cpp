@@ -33,12 +33,12 @@ namespace Platform {
 namespace Security {
 
 CHIP_ERROR InitSecureRandomDataSource(chip::Crypto::EntropyFunct entropyFunct, uint16_t entropyLen,
-                                             const uint8_t * personalizationData, uint16_t perDataLen)
+                                      const uint8_t * personalizationData, uint16_t perDataLen)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR GetSecureRandomData(uint8_t *buf, uint16_t len)
+CHIP_ERROR GetSecureRandomData(uint8_t * buf, uint16_t len)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

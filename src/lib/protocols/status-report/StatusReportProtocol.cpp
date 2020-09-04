@@ -24,9 +24,9 @@
  */
 
 #include <core/CHIPCore.h>
-#include <support/CodeUtils.h>
 #include <protocols/CHIPProtocols.h>
 #include <protocols/common/CommonProtocol.h>
+#include <support/CodeUtils.h>
 
 #include "StatusReportProtocol.h"
 
@@ -43,21 +43,21 @@ StatusReport::StatusReport(void)
 {
     mProtocolId = 0;
     mStatusCode = 0;
-    mError = CHIP_NO_ERROR;
+    mError      = CHIP_NO_ERROR;
 }
 
 StatusReport::~StatusReport(void)
 {
     mProtocolId = 0;
     mStatusCode = 0;
-    mError = CHIP_NO_ERROR;
+    mError      = CHIP_NO_ERROR;
 }
 
-CHIP_ERROR StatusReport::init(uint32_t aProfileId, uint16_t aCode, ReferencedTLVData *aInfo)
+CHIP_ERROR StatusReport::init(uint32_t aProfileId, uint16_t aCode, ReferencedTLVData * aInfo)
 {
     mProtocolId = aProfileId;
     mStatusCode = aCode;
-    mError = CHIP_NO_ERROR;
+    mError      = CHIP_NO_ERROR;
 
     if (aInfo)
         mAdditionalInfo = *aInfo;
@@ -77,13 +77,13 @@ CHIP_ERROR StatusReport::init(CHIP_ERROR aError)
     {
         mProtocolId = kChipProtocol_Common;
         mStatusCode = kStatus_InternalError;
-        mError = aError;
+        mError      = aError;
     }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR StatusReport::pack(PacketBuffer *aBuffer, uint32_t maxLen)
+CHIP_ERROR StatusReport::pack(PacketBuffer * aBuffer, uint32_t maxLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     MessageIterator i(aBuffer);
@@ -140,10 +140,10 @@ exit:
 
 inline uint16_t StatusReport::packedLength(void)
 {
-    return sizeof(mProtocolId)+sizeof(mStatusCode)+mAdditionalInfo.theLength;
+    return sizeof(mProtocolId) + sizeof(mStatusCode) + mAdditionalInfo.theLength;
 }
 
-CHIP_ERROR StatusReport::parse(PacketBuffer *aBuffer, StatusReport &aDestination)
+CHIP_ERROR StatusReport::parse(PacketBuffer * aBuffer, StatusReport & aDestination)
 {
     CHIP_ERROR err;
     MessageIterator i(aBuffer);
@@ -160,7 +160,7 @@ exit:
     return err;
 }
 
-bool StatusReport::operator == (const StatusReport &another) const
+bool StatusReport::operator==(const StatusReport & another) const
 {
     return ((mProtocolId == another.mProtocolId) && (mStatusCode == another.mStatusCode));
 }
@@ -172,7 +172,7 @@ bool StatusReport::operator == (const StatusReport &another) const
 
 bool StatusReport::success(void)
 {
-    return(mProtocolId == kChipProtocol_Common && mStatusCode == kStatus_Success);
+    return (mProtocolId == kChipProtocol_Common && mStatusCode == kStatus_Success);
 }
 
 CHIP_ERROR StatusReport::StartMetaData(chip::TLV::TLVWriter & aWriter)

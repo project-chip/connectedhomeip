@@ -31,8 +31,8 @@
 #include "CHIPProtocols.h"
 
 #include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
 #include <core/CHIPEncoding.h>
+#include <core/CHIPTLV.h>
 #include <protocols/common/CommonProtocol.h>
 #include <support/CodeUtils.h>
 
@@ -64,8 +64,8 @@ using namespace chip::TLV;
  * @retval true             If the message should be accepted and processed as normal.
  * @retval false            If message processing should stop and the message the should be discarded.
  */
-bool ChipServerBase::EnforceAccessControl(ExchangeContext *ec, uint32_t msgProfileId, uint8_t msgType,
-        const ChipMessageInfo *msgInfo, ChipServerDelegateBase *delegate)
+bool ChipServerBase::EnforceAccessControl(ExchangeContext * ec, uint32_t msgProfileId, uint8_t msgType,
+                                          const ChipMessageInfo * msgInfo, ChipServerDelegateBase * delegate)
 {
     // Reject all messages if the application hasn't specified a delegate object.
     if (delegate == NULL)
@@ -96,8 +96,8 @@ bool ChipServerBase::EnforceAccessControl(ExchangeContext *ec, uint32_t msgProfi
         if (res != ChipServerDelegateBase::kAccessControlResult_Rejected_RespSent &&
             res != ChipServerDelegateBase::kAccessControlResult_Rejected_Silent)
         {
-            uint16_t statusCode = (msgInfo->PeerAuthMode == kChipAuthMode_None)
-                    ? Common::kStatus_AuthenticationRequired : Common::kStatus_AccessDenied;
+            uint16_t statusCode = (msgInfo->PeerAuthMode == kChipAuthMode_None) ? Common::kStatus_AuthenticationRequired
+                                                                                : Common::kStatus_AccessDenied;
             ChipServerBase::SendStatusReport(ec, kChipProtocol_Common, statusCode, CHIP_NO_ERROR);
         }
 
@@ -122,7 +122,8 @@ bool ChipServerBase::EnforceAccessControl(ExchangeContext *ec, uint32_t msgProfi
  *                                 with the status code.
  *
  */
-CHIP_ERROR ChipServerBase::SendStatusReport(ExchangeContext *ec, uint32_t statusProfileId, uint16_t statusCode, CHIP_ERROR sysError)
+CHIP_ERROR ChipServerBase::SendStatusReport(ExchangeContext * ec, uint32_t statusProfileId, uint16_t statusCode,
+                                            CHIP_ERROR sysError)
 {
     const uint16_t sendFlags = 0;
 
@@ -148,12 +149,14 @@ CHIP_ERROR ChipServerBase::SendStatusReport(ExchangeContext *ec, uint32_t status
  *                                 status report being sent.
  *
  */
-CHIP_ERROR ChipServerBase::SendStatusReport(ExchangeContext *ec, uint32_t statusProfileId, uint16_t statusCode, CHIP_ERROR sysError, uint16_t sendFlags)
+CHIP_ERROR ChipServerBase::SendStatusReport(ExchangeContext * ec, uint32_t statusProfileId, uint16_t statusCode,
+                                            CHIP_ERROR sysError, uint16_t sendFlags)
 {
-    CHIP_ERROR     err;
-    PacketBuffer*   respBuf;
-    uint8_t*        p;
-    uint8_t         respLen = 18; // sizeof(statusProfileId) + sizeof(statusCode) + StartContainer(1) + kTag_SystemErrorCode TLV Len (10), EndContainer (1)
+    CHIP_ERROR err;
+    PacketBuffer * respBuf;
+    uint8_t * p;
+    uint8_t respLen = 18; // sizeof(statusProfileId) + sizeof(statusCode) + StartContainer(1) + kTag_SystemErrorCode TLV Len (10),
+                          // EndContainer (1)
 
     respBuf = PacketBuffer::NewWithAvailableSize(respLen);
     VerifyOrExit(respBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
@@ -184,7 +187,7 @@ CHIP_ERROR ChipServerBase::SendStatusReport(ExchangeContext *ec, uint32_t status
         SuccessOrExit(err);
     }
 
-    err = ec->SendMessage(kChipProtocol_Common, Common::kMsgType_StatusReport, respBuf, sendFlags);
+    err     = ec->SendMessage(kChipProtocol_Common, Common::kMsgType_StatusReport, respBuf, sendFlags);
     respBuf = NULL;
 
 exit:
@@ -225,8 +228,8 @@ exit:
  *                          is expected to represent the final assessment of access control policy for the
  *                          message.
  */
-void ChipServerDelegateBase::EnforceAccessControl(ExchangeContext *ec, uint32_t msgProfileId, uint8_t msgType,
-        const ChipMessageInfo *msgInfo, AccessControlResult& result)
+void ChipServerDelegateBase::EnforceAccessControl(ExchangeContext * ec, uint32_t msgProfileId, uint8_t msgType,
+                                                  const ChipMessageInfo * msgInfo, AccessControlResult & result)
 {
     // Mark the result as 'Final', confirming that the subclass properly called up to the base class.
     result |= kAccessControlResult_IsFinal;

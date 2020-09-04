@@ -79,7 +79,7 @@ protected:
     AES128BlockCipher(void);
     ~AES128BlockCipher(void);
 
-   uint8_t mKey[kKeyLength];
+    uint8_t mKey[kKeyLength];
 };
 
 class DLL_EXPORT AES128BlockCipherEnc : public AES128BlockCipher
