@@ -23,12 +23,11 @@
  *      profile.
  */
 
+#include "StatusReportProtocol.h"
 #include <core/CHIPCore.h>
 #include <protocols/CHIPProtocols.h>
 #include <protocols/common/CommonProtocol.h>
 #include <support/CodeUtils.h>
-
-#include "StatusReportProtocol.h"
 
 using namespace chip;
 using namespace chip::TLV;

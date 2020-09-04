@@ -552,7 +552,9 @@ CHIP_ERROR ChipConnection::SendMessage(ChipMessageInfo * msgInfo, PacketBuffer *
     else
 #endif
     {
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
         res = mTcpEndPoint->Send(msgBuf, true);
+#endif
     }
     msgBuf = NULL;
 
@@ -604,7 +606,9 @@ CHIP_ERROR ChipConnection::Shutdown()
     if (State == kState_Connected)
     {
         State = kState_SendShutdown;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
         mTcpEndPoint->Shutdown();
+#endif
     }
 
     return CHIP_NO_ERROR;
@@ -794,7 +798,11 @@ CHIP_ERROR ChipConnection::EnableKeepAlive(uint16_t interval, uint16_t timeoutCo
     if (!StateAllowsSend())
         return CHIP_ERROR_INCORRECT_STATE;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     return mTcpEndPoint->EnableKeepAlive(interval, timeoutCount);
+#endif
+
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 /**
@@ -830,7 +838,11 @@ CHIP_ERROR ChipConnection::DisableKeepAlive()
     if (!StateAllowsSend())
         return CHIP_ERROR_INCORRECT_STATE;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     return mTcpEndPoint->DisableKeepAlive();
+#endif
+
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 /**
@@ -876,7 +888,11 @@ CHIP_ERROR ChipConnection::SetUserTimeout(uint32_t userTimeoutMillis)
     if (!StateAllowsSend())
         return CHIP_ERROR_INCORRECT_STATE;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     return mTcpEndPoint->SetUserTimeout(userTimeoutMillis);
+#endif
+
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 /**
@@ -930,7 +946,9 @@ CHIP_ERROR ChipConnection::SetIdleTimeout(uint32_t timeoutMS)
     else
 #endif
     {
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
         mTcpEndPoint->SetIdleTimeout(timeoutMS);
+#endif
     }
 
     return CHIP_NO_ERROR;
@@ -960,6 +978,7 @@ void ChipConnection::DoClose(CHIP_ERROR err, uint8_t flags)
         else
 #endif
         {
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
             if (mTcpEndPoint != NULL)
             {
                 if (err == CHIP_NO_ERROR)
@@ -969,7 +988,7 @@ void ChipConnection::DoClose(CHIP_ERROR err, uint8_t flags)
                 mTcpEndPoint->Free();
                 mTcpEndPoint = NULL;
             }
-
+#endif
 #if CHIP_CONFIG_ENABLE_DNS_RESOLVER
             // Cancel any outstanding DNS query that may still be active.  (This situation can
             // arise if the application initiates a connection to a peer using a DNS name and
@@ -1085,6 +1104,7 @@ void ChipConnection::StartSession()
 
 CHIP_ERROR ChipConnection::StartConnect()
 {
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR err;
 
     // TODO: this is wrong. PeerNodeId should only be set once we have a successful connection (including security).
@@ -1139,8 +1159,13 @@ CHIP_ERROR ChipConnection::StartConnect()
 #endif
     // Initiate the TCP connection.
     return mTcpEndPoint->Connect(PeerAddr, PeerPort, mTargetInterface);
+
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif //INET_CONFIG_ENABLE_TCP_ENDPOINT
 }
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 void ChipConnection::HandleConnectComplete(TCPEndPoint * endPoint, INET_ERROR conRes)
 {
     ChipConnection * con = (ChipConnection *) endPoint->AppState;
@@ -1405,6 +1430,7 @@ void ChipConnection::HandleTcpConnectionClosed(TCPEndPoint * endPoint, INET_ERRO
         err = CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY;
     con->DoClose(err, 0);
 }
+#endif // #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 void ChipConnection::HandleSecureSessionEstablished(ChipSecurityManager * sm, ChipConnection * con, void * reqState,
                                                     uint16_t sessionKeyId, uint64_t peerNodeId, uint8_t encType)
@@ -1450,7 +1476,9 @@ void ChipConnection::Init(ChipMessageLayer * msgLayer)
     OnConnectionClosed    = DefaultConnectionClosedHandler;
     OnReceiveError        = NULL;
     memset(&mPeerAddrs, 0, sizeof(mPeerAddrs));
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     mTcpEndPoint = NULL;
+#endif
 #if CONFIG_NETWORK_LAYER_BLE
     mBleEndPoint = NULL;
 #endif
@@ -1482,6 +1510,7 @@ void ChipConnection::DefaultConnectionClosedHandler(ChipConnection * con, CHIP_E
     con->Close();
 }
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 void ChipConnection::MakeConnectedTcp(TCPEndPoint * endPoint, const IPAddress & localAddr, const IPAddress & peerAddr)
 {
     mTcpEndPoint                 = endPoint;
@@ -1518,6 +1547,7 @@ void ChipConnection::MakeConnectedTcp(TCPEndPoint * endPoint, const IPAddress & 
 
     State = kState_Connected;
 }
+#endif
 
 #if CONFIG_NETWORK_LAYER_BLE
 
@@ -1708,7 +1738,6 @@ void ChipConnection::MakeConnectedBle(BLEEndPoint * endPoint)
 
     mRefCount++;
 }
-
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 void ChipConnection::DisconnectOnError(CHIP_ERROR err)

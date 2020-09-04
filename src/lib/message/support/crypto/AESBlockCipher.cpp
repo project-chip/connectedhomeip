@@ -26,16 +26,18 @@
  *
  */
 
-#include <string.h>
-
 #include "AESBlockCipher.h"
 #include "CHIPCrypto.h"
+
+#include <string.h>
 
 namespace chip {
 namespace Platform {
 namespace Security {
 
 using namespace chip::Crypto;
+
+// TODO(#2093):: Implement the functions within this file with chip crypto promitives
 
 AES128BlockCipher::AES128BlockCipher()
 {
@@ -52,25 +54,13 @@ void AES128BlockCipher::Reset()
     ClearSecretData((uint8_t *) &mKey, sizeof(mKey));
 }
 
-void AES128BlockCipherEnc::SetKey(const uint8_t * key)
-{
-    // AES_set_encrypt_key(key, kKeyLengthBits, &mKey);
-}
+void AES128BlockCipherEnc::SetKey(const uint8_t * key) {}
 
-void AES128BlockCipherEnc::EncryptBlock(const uint8_t * inBlock, uint8_t * outBlock)
-{
-    // AES_encrypt(inBlock, outBlock, &mKey);
-}
+void AES128BlockCipherEnc::EncryptBlock(const uint8_t * inBlock, uint8_t * outBlock) {}
 
-void AES128BlockCipherDec::SetKey(const uint8_t * key)
-{
-    // AES_set_decrypt_key(key, kKeyLengthBits, &mKey);
-}
+void AES128BlockCipherDec::SetKey(const uint8_t * key) {}
 
-void AES128BlockCipherDec::DecryptBlock(const uint8_t * inBlock, uint8_t * outBlock)
-{
-    // AES_decrypt(inBlock, outBlock, &mKey);
-}
+void AES128BlockCipherDec::DecryptBlock(const uint8_t * inBlock, uint8_t * outBlock) {}
 
 AES256BlockCipher::AES256BlockCipher()
 {
@@ -87,25 +77,13 @@ void AES256BlockCipher::Reset()
     ClearSecretData((uint8_t *) &mKey, sizeof(mKey));
 }
 
-void AES256BlockCipherEnc::SetKey(const uint8_t * key)
-{
-    // AES_set_encrypt_key(key, kKeyLengthBits, &mKey);
-}
+void AES256BlockCipherEnc::SetKey(const uint8_t * key) {}
 
-void AES256BlockCipherEnc::EncryptBlock(const uint8_t * inBlock, uint8_t * outBlock)
-{
-    // AES_encrypt(inBlock, outBlock, &mKey);
-}
+void AES256BlockCipherEnc::EncryptBlock(const uint8_t * inBlock, uint8_t * outBlock) {}
 
-void AES256BlockCipherDec::SetKey(const uint8_t * key)
-{
-    // AES_set_decrypt_key(key, kKeyLengthBits, &mKey);
-}
+void AES256BlockCipherDec::SetKey(const uint8_t * key) {}
 
-void AES256BlockCipherDec::DecryptBlock(const uint8_t * inBlock, uint8_t * outBlock)
-{
-    // AES_decrypt(inBlock, outBlock, &mKey);
-}
+void AES256BlockCipherDec::DecryptBlock(const uint8_t * inBlock, uint8_t * outBlock) {}
 
 } // namespace Security
 } // namespace Platform

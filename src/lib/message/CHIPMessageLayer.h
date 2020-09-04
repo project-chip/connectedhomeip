@@ -30,6 +30,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <inet/InetLayer.h>
 #include <message/CHIPFabricState.h>
 #include <support/DLLUtil.h>
 #include <system/SystemStats.h>
@@ -288,7 +289,9 @@ public:
     CHIP_ERROR ResetUserTimeout(void);
     uint16_t LogId(void) const { return static_cast<uint16_t>(reinterpret_cast<intptr_t>(this)); }
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     TCPEndPoint * GetTCPEndPoint(void) const { return mTcpEndPoint; }
+#endif
 
     /**
      *  This function is the application callback that is invoked when a connection setup is complete.
@@ -349,7 +352,9 @@ private:
     } DoCloseFlags;
 
     IPAddress mPeerAddrs[CHIP_CONFIG_CONNECT_IP_ADDRS];
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     TCPEndPoint * mTcpEndPoint;
+#endif
     InterfaceId mTargetInterface;
     uint32_t mConnectTimeout;
     uint8_t mRefCount;
@@ -365,7 +370,6 @@ private:
     uint8_t mFlags; /**< Various flags associated with the connection. */
 
     void Init(ChipMessageLayer * msgLayer);
-    void MakeConnectedTcp(TCPEndPoint * endPoint, const IPAddress & localAddr, const IPAddress & peerAddr);
     CHIP_ERROR StartConnect(void);
     void DoClose(CHIP_ERROR err, uint8_t flags);
     CHIP_ERROR TryNextPeerAddress(CHIP_ERROR lastErr);
@@ -379,9 +383,12 @@ private:
     CHIP_ERROR StartConnectToAddressLiteral(const char * peerAddr, size_t peerAddrLen);
 
     static void HandleResolveComplete(void * appState, INET_ERROR err, uint8_t addrCount, IPAddress * addrArray);
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    void MakeConnectedTcp(TCPEndPoint * endPoint, const IPAddress & localAddr, const IPAddress & peerAddr);
     static void HandleConnectComplete(TCPEndPoint * endPoint, INET_ERROR conRes);
     static void HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * data);
     static void HandleTcpConnectionClosed(TCPEndPoint * endPoint, INET_ERROR err);
+#endif
     static void HandleSecureSessionEstablished(ChipSecurityManager * sm, ChipConnection * con, void * reqState,
                                                uint16_t sessionKeyId, uint64_t peerNodeId, uint8_t encType);
     static void HandleSecureSessionError(ChipSecurityManager * sm, ChipConnection * con, void * reqState, CHIP_ERROR localErr,
@@ -638,7 +645,9 @@ private:
         kFlag_ForceRefreshUDPEndPoints = 0x10,
     };
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     TCPEndPoint * mIPv6TCPListen;
+#endif
     UDPEndPoint * mIPv6UDP;
     ChipConnection mConPool[CHIP_CONFIG_MAX_CONNECTIONS];
     uint8_t mFlags;
@@ -656,7 +665,9 @@ private:
 
 #if INET_CONFIG_ENABLE_IPV4
     UDPEndPoint * mIPv4UDP;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT    
     TCPEndPoint * mIPv4TCPListen;
+#endif
 #endif // INET_CONFIG_ENABLE_IPV4
 
 #if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
@@ -679,8 +690,10 @@ private:
 
     void CloseListeningEndpoints(void);
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR RefreshEndpoint(TCPEndPoint *& endPoint, bool enable, const char * name, IPAddressType addrType, IPAddress addr,
                                uint16_t port);
+#endif
     CHIP_ERROR RefreshEndpoint(UDPEndPoint *& endPoint, bool enable, const char * name, IPAddressType addrType, IPAddress addr,
                                uint16_t port, InterfaceId intfId);
 
@@ -699,9 +712,11 @@ private:
 
     static void HandleUDPMessage(UDPEndPoint * endPoint, PacketBuffer * msg, const IPPacketInfo * pktInfo);
     static void HandleUDPReceiveError(UDPEndPoint * endPoint, INET_ERROR err, const IPPacketInfo * pktInfo);
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     static void HandleIncomingTcpConnection(TCPEndPoint * listeningEndPoint, TCPEndPoint * conEndPoint, const IPAddress & peerAddr,
                                             uint16_t peerPort);
     static void HandleAcceptError(TCPEndPoint * endPoint, INET_ERROR err);
+#endif
     static void Encrypt_AES128CTRSHA1(const ChipMessageInfo * msgInfo, const uint8_t * key, const uint8_t * inData, uint16_t inLen,
                                       uint8_t * outBuf);
     static void ComputeIntegrityCheck_AES128CTRSHA1(const ChipMessageInfo * msgInfo, const uint8_t * key, const uint8_t * inData,

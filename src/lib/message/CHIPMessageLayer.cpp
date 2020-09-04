@@ -155,11 +155,16 @@ CHIP_ERROR ChipMessageLayer::Init(InitContext * context)
     SetEphemeralUDPPortEnabled(context->enableEphemeralUDPPort);
 #endif
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     mIPv6TCPListen = NULL;
+#endif
+
     mIPv6UDP       = NULL;
 
 #if INET_CONFIG_ENABLE_IPV4
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT     
     mIPv4TCPListen = NULL;
+#endif
     mIPv4UDP       = NULL;
 #endif // INET_CONFIG_ENABLE_IPV4
 
@@ -1618,6 +1623,7 @@ void ChipMessageLayer::HandleIncomingBleConnection(BLEEndPoint * bleEP)
 }
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 void ChipMessageLayer::HandleIncomingTcpConnection(TCPEndPoint * listeningEP, TCPEndPoint * conEP, const IPAddress & peerAddr,
                                                    uint16_t peerPort)
 {
@@ -1705,6 +1711,7 @@ void ChipMessageLayer::HandleAcceptError(TCPEndPoint * ep, INET_ERROR err)
     if (msgLayer->OnAcceptError != NULL)
         msgLayer->OnAcceptError(msgLayer, err);
 }
+#endif /* INET_CONFIG_ENABLE_TCP_ENDPOINT */
 
 /**
  *  Refresh the InetLayer endpoints based on the current state of the system's network interfaces.
@@ -1754,6 +1761,7 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoints()
 
 #endif // CHIP_CONFIG_ENABLE_TARGETED_LISTEN
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // ================================================================================
     // Enable / disable TCP listening endpoints...
     // ================================================================================
@@ -1763,7 +1771,6 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoints()
         const bool listenIPv6TCP = (listenTCP && listenIPv6);
 
 #if INET_CONFIG_ENABLE_IPV4
-
         const bool listenIPv4TCP = (listenTCP && listenIPv4);
 
         // Enable / disable the CHIP IPv4 TCP listening endpoint
@@ -1774,7 +1781,6 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoints()
         err =
             RefreshEndpoint(mIPv4TCPListen, listenIPv4TCP, "CHIP IPv4 TCP listen", kIPAddressType_IPv4, listenIPv4Addr, CHIP_PORT);
         SuccessOrExit(err);
-
 #endif // INET_CONFIG_ENABLE_IPV4
 
         // Enable / disable the CHIP IPv6 TCP listening endpoint
@@ -1787,7 +1793,6 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoints()
         SuccessOrExit(err);
 
 #if CHIP_CONFIG_ENABLE_UNSECURED_TCP_LISTEN
-
         // Enable / disable the Unsecured IPv6 TCP listening endpoint
         //
         // The Unsecured IPv6 TCP listening endpoint is use to listen for incoming IPv6 TCP connections
@@ -1798,9 +1803,9 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoints()
         err = RefreshEndpoint(mUnsecuredIPv6TCPListen, listenUnsecuredIPv6TCP, "unsecured IPv6 TCP listen", kIPAddressType_IPv6,
                               listenIPv6Addr, CHIP_UNSECURED_PORT);
         SuccessOrExit(err);
-
 #endif // CHIP_CONFIG_ENABLE_UNSECURED_TCP_LISTEN
     }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     // ================================================================================
     // Enable / disable UDP endpoints...
@@ -1907,6 +1912,7 @@ exit:
     return err;
 }
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 CHIP_ERROR ChipMessageLayer::RefreshEndpoint(TCPEndPoint *& endPoint, bool enable, const char * name, IPAddressType addrType,
                                              IPAddress addr, uint16_t port)
 {
@@ -1958,6 +1964,7 @@ exit:
     }
     return err;
 }
+#endif /* INET_CONFIG_ENABLE_TCP_ENDPOINT */
 
 CHIP_ERROR ChipMessageLayer::RefreshEndpoint(UDPEndPoint *& endPoint, bool enable, const char * name, IPAddressType addrType,
                                              IPAddress addr, uint16_t port, InterfaceId intfId)
@@ -2097,11 +2104,13 @@ void ChipMessageLayer::CloseListeningEndpoints(void)
 {
     ChipBindLog("Closing endpoints");
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (mIPv6TCPListen != NULL)
     {
         mIPv6TCPListen->Free();
         mIPv6TCPListen = NULL;
     }
+#endif
 
     if (mIPv6UDP != NULL)
     {
@@ -2140,12 +2149,13 @@ void ChipMessageLayer::CloseListeningEndpoints(void)
 #endif // CHIP_CONFIG_ENABLE_UNSECURED_TCP_LISTEN
 
 #if INET_CONFIG_ENABLE_IPV4
-
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (mIPv4TCPListen != NULL)
     {
         mIPv4TCPListen->Free();
         mIPv4TCPListen = NULL;
     }
+#endif
 
     if (mIPv4UDP != NULL)
     {
