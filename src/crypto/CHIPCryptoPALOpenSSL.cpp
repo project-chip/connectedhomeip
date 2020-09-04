@@ -847,7 +847,6 @@ CHIP_ERROR GenP256Keypair(uint8_t * pubkey, size_t * pklen, uint8_t * privkey, s
         privkey_bn   = nullptr;
 
         VerifyOrExit(privkey_size > 0, error = CHIP_ERROR_INTERNAL);
-        VerifyOrExit(privkey_size <= *pvlen, error = CHIP_ERROR_INTERNAL);
         *pvlen = privkey_size;
     }
 
