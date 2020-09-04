@@ -43,6 +43,14 @@ static_library("message") {
     "CHIPServerBase.cpp",
     "CHIPServerBase.h",
     "ExchangeContext.cpp",
+    "support/crypto/AESBlockCipher.cpp",
+    "support/crypto/AESBlockCipher.h",
+    "support/crypto/CHIPCrypto.cpp",
+    "support/crypto/CHIPCrypto.h",
+    "support/crypto/CHIPRNG.cpp",
+    "support/crypto/CHIPRNG.h",
+    "support/crypto/CTRMode.cpp",
+    "support/crypto/CTRMode.h",
   ]
 
   public_deps = [
@@ -51,13 +59,14 @@ static_library("message") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",
     "${chip_root}/src/inet:inet_config_header",
-    "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/lib/protocols",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/platform",
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
   ]
+
+  allow_circular_includes_from = [ "${chip_root}/src/lib/protocols" ]
 
   public_configs = [ ":includes" ]
 }

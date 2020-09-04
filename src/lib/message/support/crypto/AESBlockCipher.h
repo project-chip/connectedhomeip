@@ -79,19 +79,7 @@ protected:
     AES128BlockCipher(void);
     ~AES128BlockCipher(void);
 
-#if CHIP_CRYPTO_OPENSSL
-    AES_KEY mKey;
-#elif CHIP_CONFIG_AES_IMPLEMENTATION_AESNI
-    __m128i mKey[kRoundCount + 1];
-#elif CHIP_CRYPTO_MBEDTLS
-    mbedtls_aes_context mCtx;
-#elif CHIP_CONFIG_AES_USE_EXPANDED_KEY
-    uint8_t mKey[kBlockLength * (kRoundCount + 1)];
-#elif defined(CHIP_AES_128_CTX_PLATFORM)
-    CHIP_AES_128_CTX_PLATFORM mCtx;
-#else
     uint8_t mKey[kKeyLength];
-#endif
 };
 
 class DLL_EXPORT AES128BlockCipherEnc : public AES128BlockCipher
@@ -125,19 +113,7 @@ protected:
     AES256BlockCipher(void);
     ~AES256BlockCipher(void);
 
-#if CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL
-    AES_KEY mKey;
-#elif CHIP_CONFIG_AES_IMPLEMENTATION_AESNI
-    __m128i mKey[kRoundCount + 1];
-#elif CHIP_CRYPTO_MBEDTLS
-    mbedtls_aes_context mCtx;
-#elif CHIP_CONFIG_AES_USE_EXPANDED_KEY
-    uint8_t mKey[kBlockLength * (kRoundCount + 1)];
-#elif defined(CHIP_AES_256_CTX_PLATFORM)
-    CHIP_AES_256_CTX_PLATFORM mCtx;
-#else
     uint8_t mKey[kKeyLength];
-#endif
 };
 
 class DLL_EXPORT AES256BlockCipherEnc : public AES256BlockCipher
