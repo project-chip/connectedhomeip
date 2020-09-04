@@ -51,6 +51,7 @@ support_headers = [
   "FibonacciUtils.h",
   "PersistedCounter.h",
   "RandUtils.h",
+  "SafeInt.h",
   "TestUtils.h",
   "TimeUtils.h",
   "logging/CHIPLogging.h",
