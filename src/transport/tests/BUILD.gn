@@ -31,7 +31,6 @@ chip_test_suite("tests") {
     "TestSecureSessionMgr.cpp",
     "TestTransportLayer.h",
     "TestUDP.cpp",
-    "TestUDPDriver.cpp",
   ]
 
   public_deps = [
@@ -49,5 +48,6 @@ chip_test_suite("tests") {
     "TestSecurePairingSession",
     "TestSecureSession",
     "TestSecureSessionMgr",
+    "TestUDP",
   ]
 }

@@ -39,7 +39,7 @@
 #include "init_mcu.h"
 
 #if DISPLAY_ENABLED
-#include "init_lcd.h"
+#include "lcd.h"
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD

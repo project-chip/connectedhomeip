@@ -134,7 +134,7 @@ NRF5_OPTIONS = {
 
         # Device configuration options.
         'family': {
-            'help': 'NRF5 device famity',
+            'help': 'NRF5 device family',
             'default': None,
             'argument': {
                 'metavar': 'FAMILY'

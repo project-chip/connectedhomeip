@@ -13,8 +13,8 @@
 == Best Practices, Coding Conventions, and Style
 
 [.text-center]
-_Revision 2_ +
-_2020-07-09_
+_Revision 3_ +
+_2020-09-01_
 
 [.text-center]
 *Status:* [red]*Approved* / [red]*Active*
@@ -259,6 +259,31 @@ compiled test source file or conditionalized with an appropriate
 `WITH_DEBUG`, `WANT_DEBUG`, `WITH_TESTS`, `WANT_TESTS`, or some similar such
 preprocessor mnemonic that can be asserted from the build system.
 
+===== Use C _stdint.h_ or C{plusplus} _cstdint_ for Plain Old Data Types
+
+Standard, scalar data types defined in _stdint.h_ \(C) or _cstdint_ (C{plusplus})
+should be used for basic signed and unsigned integer types, especially
+when size and serialization to non-volatile storage or across a network
+is concerned.
+
+Examples of these are: `uint8_t`, `int8_t`, etc.
+
+====== Motivation and Rationale
+
+These types have been effectively standardized since C99 and should be
+available on every platform and provide more neutral portability than
+OS-specific types such as `u8`, `UInt8`, etc. Moreover, because these are
+pervasive, you do not need to spend any time and energy as a developer
+and engineer creating more such types on your own—the compiler vendors
+have already done the hard work for you.
+
+Additionally, using traditional scalar types such as `char`, `int`, `short`, or
+`long` have portability issues where data width is concerned because these
+types are either signed- or sized-differently on different processor
+architectures and and ABIs for those architectures. For example, a char is signed
+on some architectures and unsigned on others and a long is 32-bits on some
+architectures and 64-bits on others.
+
 :sectnums!:
 
 == Recommended Reading
@@ -291,6 +316,7 @@ Use of the C{plusplus} Language in Critical Systems. June 2008.
 [cols="^1,^1,<2,<3",options="header"]
 |===
 |Revision |Date |Modified By |Description
+|3 |2020-09-01 |Grant Erickson |Added Common > Language-independent > Use C _stdint.h_ or C{plusplus} _cstdint_ for Plain Old Data Types
 |2 |2020-07-09 |Grant Erickson |Added Common > Language-independent > Commenting Out or Disabling Code
 |1 |2020-07-08 |Grant Erickson |Initial revision.
 |===

@@ -37,6 +37,7 @@
 
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
+#include <core/CHIPSafeCasts.h>
 #include <support/Base64.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -213,7 +214,7 @@ void ChipDeviceController::BLEConnectionHandler(ChipDeviceController * controlle
     ChipLogProgress(Controller, "Starting pairing session");
     controller->mPairingInProgress = true;
     CHIP_ERROR err                 = controller->mPairingSession.Pair(
-        controller->mSetupPINCode, kSpake2p_Iteration_Count, (const unsigned char *) kSpake2pKeyExchangeSalt,
+        controller->mSetupPINCode, kSpake2p_Iteration_Count, Uint8::from_const_char(kSpake2pKeyExchangeSalt),
         strlen(kSpake2pKeyExchangeSalt), Optional<NodeId>::Value(controller->mLocalDeviceId), controller->mNextKeyId++, controller);
     SuccessOrExit(err);
 

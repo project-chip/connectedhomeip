@@ -24,10 +24,10 @@ jobs:
 
         strategy:
             matrix:
-                type: [arm, arm64]
+                type: [arm, arm64, x64]
 
         env:
-            BUILD_TYPE: ${{ matrix.type }}
+            BUILD_TYPE: android_${{ matrix.type }}
 
         runs-on: ubuntu-latest
 
@@ -45,10 +45,8 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Setup Build
               run: |
-                  GN_ARGS="is_clang=true target_os=\"android\" target_cpu=\"${BUILD_TYPE}\""
-                  export PATH=$PATH:/usr/local/share/android-ndk-r21b/toolchains/llvm/prebuilt/linux-x86_64/bin/
+                  GN_ARGS="is_clang=true target_os=\"android\" target_cpu=\"${{ matrix.type }}\" android_ndk_root=\"/usr/local/share/android-ndk-r21b\""
                   scripts/build/gn_gen.sh --args="$GN_ARGS"
             - name: Run Build
               run: |
-                  export PATH=$PATH:/usr/local/share/android-ndk-r21b/toolchains/llvm/prebuilt/linux-x86_64/bin/
                   scripts/build/gn_build.sh

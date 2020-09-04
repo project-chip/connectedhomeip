@@ -13,6 +13,6 @@
 # limitations under the License.
 
 declare_args() {
-  # Build CHIP tools.
-  chip_build_tools = current_os != "freertos" && current_os != "android"
+  # Location of the Android NDK.
+  android_ndk_root = ""
 }

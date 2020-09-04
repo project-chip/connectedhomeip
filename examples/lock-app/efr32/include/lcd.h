@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,30 +16,23 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file declares test entry points for CHIP support library
- *      unit tests.
- *
- */
-
-#ifndef TESTSUPPORT_H
-#define TESTSUPPORT_H
+#ifndef INIT_LCD_H
+#define INIT_LCD_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int TestCHIPArgParser(void);
-int TestErrorStr(void);
-int TestTimeUtils(void);
-int TestMemAlloc(void);
-int TestBufBound(void);
-int TestCHIPCounter(void);
-int TestPersistedCounter(int argc, char * argv[]);
+#include "AppConfig.h"
+#include "board_features.h"
+
+#define MAX_STR_LEN 48
+
+void initLCD(void);
+void LCDWriteQRCode(uint8_t * text);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // TESTSUPPORT_H
+#endif // INIT_LCD_H

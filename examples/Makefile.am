@@ -34,14 +34,13 @@ PRETTY_FILES                                                  = \
     lock-app/efr32/include/LEDWidget.h                          \
     lock-app/efr32/include/AppTask.h                            \
     lock-app/efr32/include/CHIPProjectConfig.h                  \
-    lock-app/efr32/include/sample_qr_code.h                     \
     lock-app/efr32/include/BoltLockManager.h                    \
     lock-app/efr32/include/AppConfig.h                          \
     lock-app/efr32/include/ble-configuration.h                  \
     lock-app/efr32/include/init_board.h                         \
     lock-app/efr32/include/init_mcu.h                           \
     lock-app/efr32/include/hal-config-app-common.h              \
-    lock-app/efr32/include/init_lcd.h                           \
+    lock-app/efr32/include/lcd.h                           \
     lock-app/efr32/include/FreeRTOSConfig.h                     \
     lock-app/efr32/include/hal-config.h                         \
     lock-app/efr32/include/board_features.h                     \
@@ -49,7 +48,6 @@ PRETTY_FILES                                                  = \
     lock-app/efr32/include/ButtonHandler.h                      \
     lock-app/efr32/src/main.cpp                                 \
     lock-app/efr32/src/display/init_lcd.c                       \
-    lock-app/efr32/src/display/sample_qr_code.c                 \
     lock-app/efr32/src/AppTask.cpp                              \
     lock-app/efr32/src/LEDWidget.cpp                            \
     lock-app/efr32/src/ButtonHandler.cpp                        \

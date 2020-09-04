@@ -33,23 +33,25 @@ bool emberAfIdentifyClusterIdentifyQueryResponseCallback(uint16_t timeout)
     return false;
 }
 
-/** @brief Barrier Control Cluster Barrier Control Stop
+/** @brief Identify Cluster Start Feedback Callback
  *
  *
  *
+ * @param endpoint Endpoint id
+ * @param identifyTime Identify time
  */
-bool emberAfBarrierControlClusterBarrierControlStopCallback(void)
+bool emberAfPluginIdentifyStartFeedbackCallback(uint8_t endpoint, uint16_t identifyTime)
 {
     return false;
 }
 
-/** @brief Barrier Control Cluster Barrier Control Go To Percent
+/** @brief Identify Cluster Stop Feedback Callback
  *
  *
  *
- * @param percentOpen   Ver.: always
+ * @param endpoint Endpoint id
  */
-bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(uint8_t percentOpen)
+bool emberAfPluginIdentifyStopFeedbackCallback(uint8_t endpoint)
 {
     return false;
 }
@@ -60,223 +62,6 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(uint8_t perce
  *
  */
 bool emberAfBasicClusterResetToFactoryDefaultsCallback(void)
-{
-    return false;
-}
-
-/** @brief Color Control Cluster Move Color
- *
- *
- *
- * @param rateX   Ver.: always
- * @param rateY   Ver.: always
- * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
- * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
- */
-bool emberAfColorControlClusterMoveColorCallback(int16_t rateX, int16_t rateY, uint8_t optionsMask, uint8_t optionsOverride)
-{
-    return false;
-}
-
-/** @brief Color Control Cluster Move Color Temperature
- *
- *
- *
- * @param moveMode   Ver.: always
- * @param rate   Ver.: always
- * @param colorTemperatureMinimum   Ver.: always
- * @param colorTemperatureMaximum   Ver.: always
- * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
- * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
- */
-bool emberAfColorControlClusterMoveColorTemperatureCallback(uint8_t moveMode, uint16_t rate, uint16_t colorTemperatureMinimum,
-                                                            uint16_t colorTemperatureMaximum, uint8_t optionsMask,
-                                                            uint8_t optionsOverride)
-{
-    return false;
-}
-
-/** @brief Color Control Cluster Move To Color
- *
- *
- *
- * @param colorX   Ver.: always
- * @param colorY   Ver.: always
- * @param transitionTime   Ver.: always
- * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
- * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
- */
-bool emberAfColorControlClusterMoveToColorCallback(uint16_t colorX, uint16_t colorY, uint16_t transitionTime, uint8_t optionsMask,
-                                                   uint8_t optionsOverride)
-{
-    return false;
-}
-
-/** @brief Color Control Cluster Move Hue
- *
- *
- *
- * @param moveMode   Ver.: always
- * @param rate   Ver.: always
- * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
- * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
- */
-bool emberAfColorControlClusterMoveHueCallback(uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride)
-{
-    return false;
-}
-
-/** @brief Color Control Cluster Move Saturation
- *
- *
- *
- * @param moveMode   Ver.: always
- * @param rate   Ver.: always
- * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
- * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
- */
-bool emberAfColorControlClusterMoveSaturationCallback(uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride)
-{
-    return false;
-}
-
-/** @brief Color Control Cluster Move To Color Temperature
- *
- *
- *
- * @param colorTemperature   Ver.: always
- * @param transitionTime   Ver.: always
- * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
- * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
- */
-bool emberAfColorControlClusterMoveToColorTemperatureCallback(uint16_t colorTemperature, uint16_t transitionTime,
-                                                              uint8_t optionsMask, uint8_t optionsOverride)
-{
-    return false;
-}
-
-/** @brief Color Control Cluster Move To Hue And Saturation
- *
- *
- *
- * @param hue   Ver.: always
- * @param saturation   Ver.: always
- * @param transitionTime   Ver.: always
- * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
- * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
- */
-bool emberAfColorControlClusterMoveToHueAndSaturationCallback(uint8_t hue, uint8_t saturation, uint16_t transitionTime,
-                                                              uint8_t optionsMask, uint8_t optionsOverride)
-{
-    return false;
-}
-
-/** @brief Color Control Cluster Move To Hue
- *
- *
- *
- * @param hue   Ver.: always
- * @param direction   Ver.: always
- * @param transitionTime   Ver.: always
- * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
- * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
- */
-bool emberAfColorControlClusterMoveToHueCallback(uint8_t hue, uint8_t direction, uint16_t transitionTime, uint8_t optionsMask,
-                                                 uint8_t optionsOverride)
-{
-    return false;
-}
-
-/** @brief Color Control Cluster Move To Saturation
- *
- *
- *
- * @param saturation   Ver.: always
- * @param transitionTime   Ver.: always
- * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
- * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
- */
-bool emberAfColorControlClusterMoveToSaturationCallback(uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
-                                                        uint8_t optionsOverride)
-{
-    return false;
-}
-
-/** @brief Color Control Cluster Step Color
- *
- *
- *
- * @param stepX   Ver.: always
- * @param stepY   Ver.: always
- * @param transitionTime   Ver.: always
- * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
- * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
- */
-bool emberAfColorControlClusterStepColorCallback(int16_t stepX, int16_t stepY, uint16_t transitionTime, uint8_t optionsMask,
-                                                 uint8_t optionsOverride)
-{
-    return false;
-}
-
-/** @brief Color Control Cluster Step Color Temperature
- *
- *
- *
- * @param stepMode   Ver.: always
- * @param stepSize   Ver.: always
- * @param transitionTime   Ver.: always
- * @param colorTemperatureMinimum   Ver.: always
- * @param colorTemperatureMaximum   Ver.: always
- * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
- * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
- */
-bool emberAfColorControlClusterStepColorTemperatureCallback(uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime,
-                                                            uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum,
-                                                            uint8_t optionsMask, uint8_t optionsOverride)
-{
-    return false;
-}
-
-/** @brief Color Control Cluster Step Hue
- *
- *
- *
- * @param stepMode   Ver.: always
- * @param stepSize   Ver.: always
- * @param transitionTime   Ver.: always
- * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
- * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
- */
-bool emberAfColorControlClusterStepHueCallback(uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask,
-                                               uint8_t optionsOverride)
-{
-    return false;
-}
-
-/** @brief Color Control Cluster Step Saturation
- *
- *
- *
- * @param stepMode   Ver.: always
- * @param stepSize   Ver.: always
- * @param transitionTime   Ver.: always
- * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
- * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
- */
-bool emberAfColorControlClusterStepSaturationCallback(uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime,
-                                                      uint8_t optionsMask, uint8_t optionsOverride)
-{
-    return false;
-}
-
-/** @brief Color Control Cluster Stop Move Step
- *
- *
- *
- * @param optionsMask   Ver.: since zcl6-errata-14-0129-15
- * @param optionsOverride   Ver.: since zcl6-errata-14-0129-15
- */
-bool emberAfColorControlClusterStopMoveStepCallback(uint8_t optionsMask, uint8_t optionsOverride)
 {
     return false;
 }
@@ -559,30 +344,6 @@ bool emberAfDoorLockClusterUnlockWithTimeoutCallback(uint16_t timeoutInSeconds, 
     return false;
 }
 
-/** @brief Groups Cluster Add Group
- *
- *
- *
- * @param groupId   Ver.: always
- * @param groupName   Ver.: always
- */
-bool emberAfGroupsClusterAddGroupCallback(uint16_t groupId, uint8_t * groupName)
-{
-    return false;
-}
-
-/** @brief Groups Cluster Add Group If Identifying
- *
- *
- *
- * @param groupId   Ver.: always
- * @param groupName   Ver.: always
- */
-bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(uint16_t groupId, uint8_t * groupName)
-{
-    return false;
-}
-
 /** @brief Groups Cluster Add Group Response
  *
  *
@@ -591,18 +352,6 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(uint16_t groupId, uint8_t
  * @param groupId   Ver.: always
  */
 bool emberAfGroupsClusterAddGroupResponseCallback(uint8_t status, uint16_t groupId)
-{
-    return false;
-}
-
-/** @brief Groups Cluster Get Group Membership
- *
- *
- *
- * @param groupCount   Ver.: always
- * @param groupList   Ver.: always
- */
-bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t * groupList)
 {
     return false;
 }
@@ -620,27 +369,6 @@ bool emberAfGroupsClusterGetGroupMembershipResponseCallback(uint8_t capacity, ui
     return false;
 }
 
-/** @brief Groups Cluster Remove All Groups
- *
- *
- *
- */
-bool emberAfGroupsClusterRemoveAllGroupsCallback(void)
-{
-    return false;
-}
-
-/** @brief Groups Cluster Remove Group
- *
- *
- *
- * @param groupId   Ver.: always
- */
-bool emberAfGroupsClusterRemoveGroupCallback(uint16_t groupId)
-{
-    return false;
-}
-
 /** @brief Groups Cluster Remove Group Response
  *
  *
@@ -649,17 +377,6 @@ bool emberAfGroupsClusterRemoveGroupCallback(uint16_t groupId)
  * @param groupId   Ver.: always
  */
 bool emberAfGroupsClusterRemoveGroupResponseCallback(uint8_t status, uint16_t groupId)
-{
-    return false;
-}
-
-/** @brief Groups Cluster View Group
- *
- *
- *
- * @param groupId   Ver.: always
- */
-bool emberAfGroupsClusterViewGroupCallback(uint16_t groupId)
 {
     return false;
 }
@@ -712,27 +429,6 @@ bool emberAfIasZoneClusterZoneEnrollResponseCallback(uint8_t enrollResponseCode,
  */
 bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(uint16_t zoneStatus, uint8_t extendedStatus, uint8_t zoneId,
                                                                uint16_t delay)
-{
-    return false;
-}
-
-/** @brief Identify Cluster Identify
- *
- *
- *
- * @param identifyTime   Ver.: always
- */
-bool emberAfIdentifyClusterIdentifyCallback(uint16_t identifyTime)
-{
-    return false;
-}
-
-/** @brief Identify Cluster Identify Query
- *
- *
- *
- */
-bool emberAfIdentifyClusterIdentifyQueryCallback(void)
 {
     return false;
 }
@@ -909,10 +605,8 @@ bool emberAfScenesClusterViewSceneResponseCallback(uint8_t status, uint16_t grou
 }
 
 // endpoint_config.h callbacks, grep'd from SDK, comment these out as clusters come in
-void emberAfColorControlClusterServerInitCallback(uint8_t endpoint) {}
 
 void emberAfDoorLockClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId) {}
-void emberAfGroupsClusterServerInitCallback(uint8_t endpoint) {}
 void emberAfIasZoneClusterClientInitCallback(uint8_t endpoint) {}
 void emberAfIasZoneClusterServerInitCallback(uint8_t endpoint) {}
 void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination,
@@ -926,10 +620,6 @@ EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(uint8_t end
 {
     return EMBER_ZCL_STATUS_SUCCESS;
 }
-void emberAfIdentifyClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId) {}
-void emberAfIdentifyClusterServerInitCallback(uint8_t endpoint) {}
-
-void emberAfPluginBarrierControlServerInitCallback(void) {}
 
 void emberAfPluginDoorLockServerInitCallback(void) {}
 void emberAfPluginReportingInitCallback(void) {}

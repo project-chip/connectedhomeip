@@ -24,6 +24,10 @@ if (chip_device_platform == "nrf5")
   import("//build_overrides/openthread.gni")
 
   assert(current_os == "freertos")
+  public_deps = [
+    "${chip_root}/src/lib/shell",
+    "${chip_root}/src/platform",
+  ]
 
   nrf5_platform_dir = "${chip_root}/examples/platform/nrf528xx"
   project_dir = "."

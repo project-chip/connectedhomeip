@@ -65,14 +65,38 @@ void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint) {}
  */
 void emberAfPluginLevelControlClusterServerPostInitCallback(uint8_t endpoint) {}
 
-/** @brief Level Control Coupled Color Temp Change
+/** @brief Get Group Name
  *
- * Adjust Color Control cluster Color Temperature in response to a change in
- * Level Control cluster CurrentLevel.
+ * This function returns the name of a group with the provided group ID, should
+ * it exist.
  *
- * @param endpoint Endpoint that is being initialized  Ver.: always
+ * @param endpoint Endpoint Ver.: always
+ * @param groupId Group ID Ver.: always
+ * @param groupName Group Name Ver.: always
  */
-void emberAfPluginLevelControlCoupledColorTempChangeCallback(uint8_t endpoint) {}
+void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
+
+/** @brief Group Names Supported
+ *
+ * This function is called by the framework when it is necessary to determine
+ * whether or not group names are supported.
+ *
+ * @param endpoint The endpoint. Ver.: always
+ */
+bool emberAfPluginGroupsServerGroupNamesSupportedCallback(uint8_t endpoint)
+{
+    return false;
+}
+
+/** @brief Set Group Name
+ *
+ * This function sets the name of a group with the provided group ID.
+ *
+ * @param endpoint Endpoint Ver.: always
+ * @param groupId Group ID Ver.: always
+ * @param groupName Group Name Ver.: always
+ */
+void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
 
 /** @brief Add To Current App Tasks
  *
@@ -158,15 +182,6 @@ bool emberAfAttributeWriteAccessCallback(uint8_t endpoint, EmberAfClusterId clus
 {
     return true;
 }
-
-/** @brief Groups Cluster Clear Group Table
- *
- * This function is called by the framework when the application should clear
- * the group table.
- *
- * @param endpoint The endpoint.  Ver.: always
- */
-void emberAfGroupsClusterClearGroupTableCallback(uint8_t endpoint) {}
 
 /** @brief Clear Report Table
  *
@@ -371,20 +386,6 @@ void emberAfEepromNoteInitializedStateCallback(bool state) {}
  *
  */
 void emberAfEepromShutdownCallback(void) {}
-
-/** @brief Groups Cluster Endpoint In Group
- *
- * This function is called by the framework when it needs to determine if an
- * endpoint is a member of a group.  The application should return true if the
- * endpoint is a member of the group and false otherwise.
- *
- * @param endpoint The endpoint.  Ver.: always
- * @param groupId The group identifier.  Ver.: always
- */
-bool emberAfGroupsClusterEndpointInGroupCallback(uint8_t endpoint, uint16_t groupId)
-{
-    return false;
-}
 
 /** @brief External Attribute Read
  *

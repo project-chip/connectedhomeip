@@ -37,9 +37,19 @@
  *******************************************************************************
  ******************************************************************************/
 
+#ifndef SCENES_CLIENT_H
+#define SCENES_CLIENT_H
+
+#include <stdbool.h>
+#include <stdint.h>
+
+#include "af-types.h"
+
 bool emberAfPluginScenesClientParseAddSceneResponse(const EmberAfClusterCommand * cmd, uint8_t status, uint16_t groupId,
                                                     uint8_t sceneId);
 
 bool emberAfPluginScenesClientParseViewSceneResponse(const EmberAfClusterCommand * cmd, uint8_t status, uint16_t groupId,
                                                      uint8_t sceneId, uint16_t transitionTime, const uint8_t * sceneName,
                                                      const uint8_t * extensionFieldSets);
+
+#endif

@@ -1,6 +1,8 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2013-2017 Nest Labs, Inc.
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,28 +19,19 @@
 
 /**
  *    @file
- *      This file declares test entry points for CHIP support library
- *      unit tests.
+ *      This file implements CHIP node state globals.
  *
  */
 
-#ifndef TESTSUPPORT_H
-#define TESTSUPPORT_H
+#include <support/DLLUtil.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <core/CHIPCore.h>
+#include <message/CHIPGlobals.h>
 
-int TestCHIPArgParser(void);
-int TestErrorStr(void);
-int TestTimeUtils(void);
-int TestMemAlloc(void);
-int TestBufBound(void);
-int TestCHIPCounter(void);
-int TestPersistedCounter(int argc, char * argv[]);
+namespace chip {
 
-#ifdef __cplusplus
-}
-#endif
+DLL_EXPORT ChipFabricState FabricState;
+DLL_EXPORT ChipMessageLayer MessageLayer;
+DLL_EXPORT ChipExchangeManager ExchangeMgr;
 
-#endif // TESTSUPPORT_H
+} // namespace chip

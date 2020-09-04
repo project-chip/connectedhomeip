@@ -65,6 +65,8 @@ FREERTOSCONFIG_DIR := $(PROJECT_ROOT)/include
 
 GECKO_SDK_SUITE_DIR    := $(EFR32_SDK_ROOT)/..
 
+EXAMPLES_PLAT_DIR := $(PROJECT_ROOT)/../../platform/efr32
+
 all : |
 
 BUILD_SUPPORT_DIR := $(CHIP_ROOT)/config/efr32
@@ -84,11 +86,11 @@ SRCS = \
     $(PROJECT_ROOT)/src/ButtonHandler.cpp                                                    \
     $(PROJECT_ROOT)/src/DataModelHandler.cpp                                                 \
     $(PROJECT_ROOT)/src/Server.cpp                                                           \
-    $(PROJECT_ROOT)/src/platform/$(EFR32FAMILY)/$(BOARD)/init_mcu.c                          \
-    $(PROJECT_ROOT)/src/platform/$(EFR32FAMILY)/$(BOARD)/init_board.c                        \
     $(PROJECT_ROOT)/src/gen/call-command-handler.c                                           \
     $(PROJECT_ROOT)/src/gen/callback-stub.c                                                  \
     $(PROJECT_ROOT)/src/gen/znet-bookkeeping.c                                               \
+    $(EXAMPLES_PLAT_DIR)/$(EFR32FAMILY)/$(BOARD)/init_mcu.c                                  \
+    $(EXAMPLES_PLAT_DIR)/$(EFR32FAMILY)/$(BOARD)/init_board.c                                \
     $(CHIP_ROOT)/src/app/util/attribute-size.c                                               \
     $(CHIP_ROOT)/src/app/util/attribute-storage.c                                            \
     $(CHIP_ROOT)/src/app/util/attribute-table.c                                              \
@@ -132,10 +134,11 @@ SRCS = \
 INC_DIRS = \
     $(PROJECT_ROOT)                                                                       \
     $(PROJECT_ROOT)/src/                                                                  \
-    $(PROJECT_ROOT)/src/platform/$(EFR32FAMILY)/$(BOARD)                                  \
     $(PROJECT_ROOT)/include                                                               \
     $(PROJECT_ROOT)/traits/include                                                        \
     $(PROJECT_ROOT)/schema/include                                                        \
+    $(EXAMPLES_PLAT_DIR)                                                                  \
+    $(EXAMPLES_PLAT_DIR)/$(EFR32FAMILY)/$(BOARD)                                          \
     $(CHIP_ROOT)/src/include/                                                             \
     $(CHIP_ROOT)/src/lib                                                                  \
     $(CHIP_ROOT)/src/                                                                     \

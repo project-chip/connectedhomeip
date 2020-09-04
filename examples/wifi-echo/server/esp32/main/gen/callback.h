@@ -2420,6 +2420,10 @@ bool emberAfIdentifyClusterTriggerEffectCallback(uint8_t effectId, uint8_t effec
  */
 bool emberAfIdentifyClusterUpdateCommissionStateCallback(uint8_t action, uint8_t commissionStateMask);
 
+bool emberAfPluginIdentifyStartFeedbackCallback(uint8_t endpoint, uint16_t identifyTime);
+
+bool emberAfPluginIdentifyStopFeedbackCallback(uint8_t endpoint);
+
 /** @} END Identify Cluster Callbacks */
 
 /** @name Groups Cluster Callbacks */
@@ -2665,6 +2669,37 @@ bool emberAfGroupsClusterViewGroupCallback(uint16_t groupId);
 bool emberAfGroupsClusterViewGroupResponseCallback(uint8_t status, uint16_t groupId, uint8_t * groupName);
 
 /** @} END Groups Cluster Callbacks */
+
+/** @name Groups Server Cluster Plugin Callbacks */
+// @{
+
+/** @brief Get Group Name
+ *
+ * This function returns the name of a group with the provided group ID, should
+ * it exist.
+ *
+ * @param endpoint Endpoint Ver.: always
+ * @param groupId Group ID Ver.: always
+ * @param groupName Group Name Ver.: always
+ */
+void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName);
+/** @brief Set Group Name
+ *
+ * This function sets the name of a group with the provided group ID.
+ *
+ * @param endpoint Endpoint Ver.: always
+ * @param groupId Group ID Ver.: always
+ * @param groupName Group Name Ver.: always
+ */
+void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName);
+/** @brief Group Names Supported
+ *
+ * This function returns whether or not group names are supported.
+ *
+ * @param endpoint Endpoint Ver.: always
+ */
+bool emberAfPluginGroupsServerGroupNamesSupportedCallback(uint8_t endpoint);
+/** @} END Groups Server Cluster Plugin Callbacks */
 
 /** @name Scenes Cluster Callbacks */
 // @{

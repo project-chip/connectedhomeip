@@ -162,6 +162,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       ":platform_buildconfig",
       "${chip_root}/src/ble",
       "${chip_root}/src/inet",
+      "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/core:chip_config_header",
       "${chip_root}/src/lib/support",
       "${nlio_root}:nlio",

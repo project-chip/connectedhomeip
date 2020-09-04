@@ -37,8 +37,8 @@ using ::chip::System::Error;
 class SystemWakeEvent
 {
 public:
-    Error Open(); /**< Initialize the pipeline */
-    void Close(); /**< Close both ends of the pipeline. */
+    Error Open();  /**< Initialize the pipeline */
+    Error Close(); /**< Close both ends of the pipeline. */
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
     int GetNotifFD() const { return mFDs[FD_READ]; }
@@ -46,8 +46,8 @@ public:
     int GetNotifFD() const { return mFD; }
 #endif
 
-    void Notify();  /**< Set the event. */
-    void Confirm(); /**< Clear the event. */
+    Error Notify();  /**< Set the event. */
+    Error Confirm(); /**< Clear the event. */
 
 private:
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE

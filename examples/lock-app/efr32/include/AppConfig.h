@@ -25,19 +25,13 @@
 // EFR32 WSTK Buttons
 #define PB0 0
 #define PB1 1
-// TODO There is no set 3rd push button on the WSTK keep.
-// Keep this for function button future use
-#define PB2 2
 
 // EFR32 WSTK LEDs
 #define BSP_LED_0 0
 #define BSP_LED_1 1
 
-#define APP_JOIN_BUTTON PB0
 #define APP_LOCK_BUTTON PB1
-// TODO Currently no Function Button for EFR32,
-// OTA not implemented but keep for future use. (Reused PB0 for Join button)
-#define APP_FUNCTION_BUTTON PB2
+#define APP_FUNCTION_BUTTON PB0
 #define APP_BUTTON_DEBOUNCE_PERIOD_MS 50
 
 #define APP_BUTTON_PRESSED 0

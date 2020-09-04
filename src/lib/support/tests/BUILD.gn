@@ -35,6 +35,7 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/platform",
     "${nlunit_test_root}:nlunit-test",
   ]
 
@@ -44,5 +45,7 @@ chip_test_suite("tests") {
     "TestCHIPArgParser",
     "TestTimeUtils",
     "TestCHIPMem",
+    "TestCHIPCounter",
+    "TestPersistedCounter",
   ]
 }
