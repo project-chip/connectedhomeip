@@ -549,8 +549,8 @@ CHIP_ERROR GenP256Keypair(P256PublicKey * pubkey, P256PrivateKey * privkey)
     result = mbedtls_ecp_gen_key(MBEDTLS_ECP_DP_SECP256R1, &keypair, ECDSA_sign_rng, nullptr);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_ecp_point_write_binary(&keypair.grp, &keypair.Q, MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_size, Uint8::to_uchar(pubkey->bytes),
-                                            sizeof(pubkey->bytes));
+    result = mbedtls_ecp_point_write_binary(&keypair.grp, &keypair.Q, MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_size,
+                                            Uint8::to_uchar(pubkey->bytes), sizeof(pubkey->bytes));
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(pubkey_size == sizeof(pubkey->bytes), error = CHIP_ERROR_INVALID_ARGUMENT);
 
