@@ -37,26 +37,48 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include PLATFORM_HEADER // Micro and compiler specific typedefs and macros
 #include "af-event.h"
-#include "../include/af.h"
-#include "../security/crypto-state.h"
-#include "app/framework/util/service-discovery.h"
-#include "callback.h"
-#include "stack/include/error.h"
-#ifdef EMBER_AF_PLUGIN_FRAGMENTATION
-#include "app/framework/plugin/fragmentation/fragmentation.h"
-#endif
 
-#include "app/framework/plugin/test-harness/test-harness.h"
+#include "af.h"
+#include "attribute-storage.h"
+#include "gen/callback.h"
 
-#include "app/framework/util/attribute-storage.h"
+#define EMBER_MAX_EVENT_CONTROL_DELAY_MS (UINT32_MAX / 2)
+#define EMBER_MAX_EVENT_CONTROL_DELAY_QS (EMBER_MAX_EVENT_CONTROL_DELAY_MS >> 8)
+#define EMBER_MAX_EVENT_CONTROL_DELAY_MINUTES (EMBER_MAX_EVENT_CONTROL_DELAY_MS >> 16)
+
+// stub these for af-gen-event.h
+#define emberAfPushEndPointNetworkIndex(x) (void) 0
+#define emberAfPopNetworkIndex(x) (void) 0
+
+/** @brief Sets this ::EmberEventControl as inactive (no pending event).
+ */
+#define emberEventControlSetInactive(control)                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        (control).status = EMBER_EVENT_INACTIVE;                                                                                   \
+    } while (0)
+
+/** @brief Sets this ::EmberEventControl as inactive (no pending event).
+ */
+#define emberEventControlSetActive(control)                                                                                        \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        (control).status = EMBER_EVENT_ZERO_DELAY;                                                                                 \
+    } while (0)
+
+#include "gen/af-gen-event.h"
+
+struct EmberEventData
+{
+    /** The control structure for the event. */
+    EmberEventControl * control;
+    /** The procedure to call when the event fires. */
+    void (*handler)(void);
+};
 
 // *****************************************************************************
 // Globals
-
-// Task ids used to run events through idling
-EmberTaskId emAfTaskId;
 
 #ifdef EMBER_AF_GENERATED_EVENT_CODE
 EMBER_AF_GENERATED_EVENT_CODE
@@ -67,56 +89,27 @@ uint16_t emAfAppEventContextLength        = EMBER_AF_EVENT_CONTEXT_LENGTH;
 EmberAfEventContext emAfAppEventContext[] = { EMBER_AF_GENERATED_EVENT_CONTEXT };
 #endif // EMBER_AF_GENERATED_EVENT_CONTEXT
 
-const char * emAfEventStrings[] = { EM_AF_SERVICE_DISCOVERY_EVENT_STRINGS
+const char * emAfEventStrings[] = {
 
 #ifdef EMBER_AF_GENERATED_EVENTS
-                                        EMBER_AF_GENERATED_EVENT_STRINGS
+    EMBER_AF_GENERATED_EVENT_STRINGS
 #endif
 
-#ifdef EMBER_AF_PLUGIN_FRAGMENTATION
-                                            EMBER_AF_FRAGMENTATION_EVENT_STRINGS
-#endif
+};
 
-                                                EMBER_AF_TEST_HARNESS_EVENT_STRINGS };
-
-EmberEventData emAfEvents[] = { EM_AF_SERVICE_DISCOVERY_EVENTS
+EmberEventData emAfEvents[] = {
 
 #ifdef EMBER_AF_GENERATED_EVENTS
-                                    EMBER_AF_GENERATED_EVENTS
+    EMBER_AF_GENERATED_EVENTS
 #endif
 
-#ifdef EMBER_AF_PLUGIN_FRAGMENTATION
-                                        EMBER_AF_FRAGMENTATION_EVENTS
-#endif
-
-                                            EMBER_KEY_ESTABLISHMENT_TEST_HARNESS_EVENT
-
-                                { NULL, NULL } };
+    { NULL, NULL }
+};
 
 const char emAfStackEventString[] = "Stack";
 
 // *****************************************************************************
 // Functions
-
-// A function used to initialize events for idling
-void emAfInitEvents(void)
-{
-    emberTaskEnableIdling(true);
-    emAfTaskId = emberTaskInit(emAfEvents);
-}
-
-void emberAfRunEvents(void)
-{
-    // Don't run events while crypto operation is in progress
-    // (BUGZID: 12127)
-    if (emAfIsCryptoOperationInProgress())
-    {
-        // DEBUG Bugzid: 11944
-        emberAfCoreFlush();
-        return;
-    }
-    emberRunTask(emAfTaskId);
-}
 
 const char * emberAfGetEventString(uint8_t index)
 {
@@ -141,13 +134,9 @@ static EmberAfEventContext * findEventContext(uint8_t endpoint, EmberAfClusterId
 
 EmberStatus emberAfEventControlSetDelayMS(EmberEventControl * control, uint32_t delayMs)
 {
-    if (delayMs == 0)
+    if (delayMs <= EMBER_MAX_EVENT_CONTROL_DELAY_MS)
     {
-        emberEventControlSetActive(*control);
-    }
-    else if (delayMs <= EMBER_MAX_EVENT_CONTROL_DELAY_MS)
-    {
-        emberEventControlSetDelayMS(*control, delayMs);
+        // TODO: set a CHIP timer here emberEventControlSetDelayMS(*control, delayMs);
     }
     else
     {
@@ -229,16 +218,6 @@ EmberStatus emberAfScheduleServerTick(uint8_t endpoint, EmberAfClusterId cluster
     return emberAfScheduleServerTickExtended(endpoint, clusterId, delayMs, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP);
 }
 
-uint32_t emberAfMsToNextEventExtended(uint32_t maxMs, uint8_t * returnIndex)
-{
-    return emberMsToNextEventExtended(emAfEvents, maxMs, returnIndex);
-}
-
-uint32_t emberAfMsToNextEvent(uint32_t maxMs)
-{
-    return emberAfMsToNextEventExtended(maxMs, NULL);
-}
-
 EmberStatus emberAfDeactivateClusterTick(uint8_t endpoint, EmberAfClusterId clusterId, bool isClient)
 {
     EmberAfEventContext * context = findEventContext(endpoint, clusterId, isClient);
@@ -306,7 +285,7 @@ uint32_t emAfGetMSFromTimerDurationAndUnit(uint16_t duration, EmberEventUnits un
     }
     else
     {
-        ms = MAX_INT32U_VALUE;
+        ms = UINT32_MAX;
     }
     return ms;
 }
