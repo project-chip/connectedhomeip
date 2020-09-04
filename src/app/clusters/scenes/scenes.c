@@ -39,7 +39,7 @@
  ******************************************************************************/
 
 #include "scenes.h"
-#include "../../include/af.h"
+#include <app/util/af.h>
 #include "../../util/common.h"
 
 #ifdef EMBER_AF_PLUGIN_ZLL_SCENES_SERVER
@@ -642,7 +642,7 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(uint8_t endpoint, uin
 
 void emberAfScenesClusterClearSceneTableCallback(uint8_t endpoint)
 {
-    uint8_t i, networkIndex = emberGetCurrentNetwork();
+    uint8_t i, networkIndex = 0 /* emberGetCurrentNetwork() */;
     for (i = 0; i < EMBER_AF_PLUGIN_SCENES_TABLE_SIZE; i++)
     {
         EmberAfSceneTableEntry entry;
@@ -998,7 +998,7 @@ kickout:
 
 bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, uint16_t groupId, uint8_t sceneId)
 {
-    EmberAfSceneTableEntry entry;
+    EmberAfSceneTableEntry entry = {};
     EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
     EmberStatus sendStatus;
     bool enhanced    = (cmd->commandId == ZCL_ENHANCED_VIEW_SCENE_COMMAND_ID);
