@@ -49,6 +49,7 @@ if (chip_device_platform != "none") {
     chip_device_config_enable_wpa = chip_enable_wifi
 
     defines = [
+      "CHIP_ENABLE_MESSAGE_LAYER=1",
       "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}",
       "CHIP_ENABLE_OPENTHREAD=${chip_enable_openthread}",
       "CHIP_WITH_GIO=${chip_with_gio}",
@@ -164,6 +165,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "${chip_root}/src/inet",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/core:chip_config_header",
+      "${chip_root}/src/lib/message",      
       "${chip_root}/src/lib/support",
       "${nlio_root}:nlio",
     ]

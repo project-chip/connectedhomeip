@@ -13,31 +13,35 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/nlio.gni")
+
+import("${chip_root}/gn/chip/tests.gni")
+import("${chip_root}/src/inet/inet.gni")
 
 config("includes") {
   include_dirs = [ "." ]
 }
 
-static_library("lib") {
-  public_deps = [
-    "${chip_root}/src/app",
-    "${chip_root}/src/ble",
-    "${chip_root}/src/controller",
-    "${chip_root}/src/crypto",
-    "${chip_root}/src/inet",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/message",
-    "${chip_root}/src/lib/protocols",    
-    "${chip_root}/src/lib/support",
-    "${chip_root}/src/platform",
-    "${chip_root}/src/setup_payload",
-    "${chip_root}/src/system",
-    "${chip_root}/src/transport",
+static_library("protocols") {
+  output_name = "libChipProtocols"
+
+  sources = [
+    "CHIPServerBase.cpp",
+    "CHIPServerBase.h",      
+    "common/CHIPMessage.cpp",
+    "common/CHIPMessage.h",    
+    "common/RetainedPacketBuffer.cpp",
+    "security/CHIPApplicationKeys.cpp",
+    "security/CHIPApplicationKeys.h",
+    "security/CHIPDummyGroupKeyStore.cpp",
+    "security/CHIPDummyGroupKeyStore.h",
+    "status-report/StatusReportProtocol.cpp",
+    "status-report/StatusReportProtocol.h",    
   ]
 
-  output_name = "libCHIP"
+  public_deps = [
+    "${chip_root}/src/lib/core",
+  ]
 
-  output_dir = "${root_out_dir}/lib"
-
-  complete_static_lib = true
+  public_configs = [ ":includes" ]
 }

@@ -117,7 +117,6 @@
     } while (0)
 
 namespace chip {
-
 namespace Protocols {
 
 /**

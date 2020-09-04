@@ -23,6 +23,7 @@
 
 #include <ble/BleLayer.h>
 #include <core/CHIPCore.h>
+#include <message/CHIPGlobals.h>
 #include <platform/CHIPDeviceError.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/ConnectivityManager.h>
@@ -40,6 +41,11 @@ namespace chip {
 namespace DeviceLayer {
 
 struct ChipDeviceEvent;
+
+using chip::FabricState;
+using chip::MessageLayer;
+using chip::ExchangeMgr;
+
 extern chip::System::Layer SystemLayer;
 extern Inet::InetLayer InetLayer;
 

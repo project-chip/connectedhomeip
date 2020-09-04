@@ -38,6 +38,7 @@
 
 #include <message/CHIPMessageLayer.h>
 #include <support/DLLUtil.h>
+#include <protocols/common/CHIPMessage.h>
 
 /**
  *   @namespace chip::Protocols::StatusReporting
