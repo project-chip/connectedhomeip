@@ -20,5 +20,3 @@ check_system_includes = true
 
 # Allow loading paths relative to //gn.
 secondary_source = "//third_party/connectedhomeip/gn/"
-
-
