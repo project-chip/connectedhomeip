@@ -537,7 +537,8 @@ CHIP_ERROR GenP256Keypair(uint8_t * pubkey, size_t * pklen, uint8_t * privkey, s
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
-    int privkey_size = 0;
+
+    size_t privkey_size = 0;
 
     mbedtls_ecp_keypair keypair;
     mbedtls_ecp_keypair_init(&keypair);
