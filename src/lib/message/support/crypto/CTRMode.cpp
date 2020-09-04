@@ -28,10 +28,10 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
-#include <stdint.h>
-#include <string.h>
 
 #include "CTRMode.h"
+#include <stdint.h>
+#include <string.h>
 
 namespace chip {
 namespace Crypto {

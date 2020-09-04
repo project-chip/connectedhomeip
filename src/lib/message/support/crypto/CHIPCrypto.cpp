@@ -23,9 +23,8 @@
  *
  */
 
-#include <string.h>
-
 #include "CHIPCrypto.h"
+#include <string.h>
 
 namespace chip {
 namespace Crypto {

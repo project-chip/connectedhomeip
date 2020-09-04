@@ -24,9 +24,8 @@
  *
  */
 
-#include <core/CHIPCore.h>
-
 #include "CHIPMessage.h"
+#include <core/CHIPCore.h>
 
 using namespace chip;
 using namespace chip::TLV;

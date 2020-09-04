@@ -157,7 +157,7 @@
  *    #CHIP_CONFIG_USE_MICRO_ECC.
  */
 #ifndef CHIP_CONFIG_USE_OPENSSL_ECC
-#define CHIP_CONFIG_USE_OPENSSL_ECC                        1
+#define CHIP_CONFIG_USE_OPENSSL_ECC                        0
 #endif // CHIP_CONFIG_USE_OPENSSL_ECC
 
 /**
@@ -876,7 +876,7 @@
  *
  */
 #ifndef CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL
-#define CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL            1
+#define CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL            0
 #endif // CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL
 
 /**
@@ -902,7 +902,8 @@
       CHIP_CONFIG_HASH_IMPLEMENTATION_MINCRYPT + \
       CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL  + \
       CHIP_CONFIG_HASH_IMPLEMENTATION_MBEDTLS) != 1)
-#error "Please assert exactly one CHIP_CONFIG_HASH_IMPLEMENTATION_... option."
+// TODO(#2093): Need to reimplement with CHIP defined crypto primitives 
+// #error "Please assert exactly one CHIP_CONFIG_HASH_IMPLEMENTATION_... option."
 #endif
 
 

@@ -28,10 +28,9 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include "CHIPApplicationKeys.h"
 #include <core/CHIPCore.h>
 #include <core/CHIPKeyIds.h>
-
-#include "CHIPApplicationKeys.h"
 
 namespace chip {
 namespace Protocols {
