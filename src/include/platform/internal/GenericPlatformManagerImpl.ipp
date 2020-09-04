@@ -61,7 +61,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
     }
     SuccessOrExit(err);
 
-    // Initialize the CHIP system layer.
+    // Initialize the CHIP System Layer.
     new (&SystemLayer) System::Layer();
     err = SystemLayer.Init(NULL);
     if (err != CHIP_SYSTEM_NO_ERROR)
@@ -70,7 +70,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
     }
     SuccessOrExit(err);
 
-    // Initialize the CHIP Inet layer.
+    // Initialize the CHIP Inet Layer.
     new (&InetLayer) Inet::InetLayer();
     err = InetLayer.Init(SystemLayer, NULL);
     if (err != INET_NO_ERROR)
@@ -79,9 +79,47 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
     }
     SuccessOrExit(err);
 
-    // TODO Perform dynamic configuration of the core CHIP objects based on stored settings.
+#if CHIP_ENABLE_MESSAGE_LAYER
+    // Initialize the CHIP Fabric State object.
+    new (&FabricState) ChipFabricState();
+    err = FabricState.Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "FabricState initialization failed: %s", ErrorStr(err));
+    }
+    SuccessOrExit(err);
 
-    // Initialize the CHIP BLE manager.
+    FabricState.DefaultSubnet = kChipSubnetId_PrimaryWiFi;
+
+    {
+        ChipMessageLayer::InitContext initContext;
+        initContext.systemLayer = &SystemLayer;
+        initContext.inet = &InetLayer;
+        initContext.listenTCP = true;
+        initContext.listenUDP = true;
+        initContext.fabricState = &FabricState;
+
+        // Initialize the CHIP Message Layer.
+        new (&MessageLayer) ChipMessageLayer();
+        err = MessageLayer.Init(&initContext);
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(DeviceLayer, "MessageLayer initialization failed: %s", ErrorStr(err));
+        }
+        SuccessOrExit(err);
+    }
+
+    // Hook the MessageLayer activity changed callback.
+    MessageLayer.SetSignalMessageLayerActivityChanged(ImplClass::HandleMessageLayerActivityChanged);
+
+    // Initialize the CHIP Exchange Manager.
+    err = ExchangeMgr.Init(&MessageLayer);
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(DeviceLayer, "ExchangeMgr initialization failed: %s", ErrorStr(err));
+    }
+    SuccessOrExit(err);
+#endif
+
+    // Initialize the CHIP BLE Manager.
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     err = BLEMgr().Init();
     if (err != CHIP_NO_ERROR)

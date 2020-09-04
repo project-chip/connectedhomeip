@@ -37,6 +37,7 @@
 #define _STATUS_REPORT_PROTOCOL_H
 
 #include <message/CHIPMessageLayer.h>
+#include <protocols/common/CHIPMessage.h>
 #include <support/DLLUtil.h>
 
 /**

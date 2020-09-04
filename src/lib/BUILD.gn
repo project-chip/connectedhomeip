@@ -26,6 +26,8 @@ static_library("lib") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/message",
+    "${chip_root}/src/lib/protocols",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
     "${chip_root}/src/setup_payload",
