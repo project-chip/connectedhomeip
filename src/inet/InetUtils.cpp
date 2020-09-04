@@ -211,7 +211,7 @@ DLL_EXPORT INET_ERROR ParseHostPortAndInterface(const char * aString, uint16_t a
         {
             aInterface    = end - i + 1;
             aInterfaceLen = static_cast<uint16_t>(i - 1);
-            aStringLen = static_cast<uint16_t>(aStringLen - i);
+            aStringLen    = static_cast<uint16_t>(aStringLen - i);
             break;
         }
         if (ch == ':' || ch == ']')
