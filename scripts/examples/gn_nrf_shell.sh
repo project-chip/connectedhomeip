@@ -26,6 +26,6 @@ set -e
 set -x
 env
 
-gn gen --root=$CHIP_ROOT/examples/shell --args='target_os="freertos" target_cpu="arm" import("//nrf5_args.gni")' out/nrf5
+gn gen --root="$CHIP_ROOT"/examples/shell --args='target_os="freertos" target_cpu="arm" import("//nrf5_args.gni")' out/nrf5
 
 ninja -v -C out/nrf5
