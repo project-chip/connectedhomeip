@@ -44,6 +44,9 @@ const size_t kMAX_FE_Length              = kP256_FE_Length;
 const size_t kMAX_Point_Length           = kP256_Point_Length;
 const size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
 
+const size_t kP256_PrivateKey_Length = 32;
+const size_t kP256_PublicKey_Length  = 65;
+
 /* These sizes are hardcoded here to remove header dependency on underlying crypto library
  * in a public interface file. The validity of these sizes is verified by static_assert in
  * the implementation files.
@@ -89,6 +92,16 @@ enum class CHIP_SPAKE2P_ROLE : uint8_t
     VERIFIER = 0, // Accessory
     PROVER   = 1, // Commissioner
 };
+
+typedef struct P256PrivateKey
+{
+    uint8_t bytes[kP256_PrivateKey_Length];
+} P256PrivateKey;
+
+typedef struct P256PublicKey
+{
+    uint8_t bytes[kP256_PublicKey_Length];
+} P256PublicKey;
 
 /**
  * @brief A function that implements AES-CCM encryption
@@ -265,12 +278,10 @@ CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * 
 
 /** @brief Generate a new keypair for ECP256 curve.
  * @param pubkey Generated public key
- * @param pklen length of pubkey buffer
  * @param privkey Generated private key
- * @param pklen length of privkey buffer
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR GenP256Keypair(uint8_t * pubkey, size_t * pklen, uint8_t * privkey, size_t * pvlen);
+CHIP_ERROR GenP256Keypair(P256PublicKey * pubkey, P256PrivateKey * privkey);
 
 /**
  * The below class implements the draft 01 version of the Spake2+ protocol as
