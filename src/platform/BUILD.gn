@@ -165,7 +165,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "${chip_root}/src/inet",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/core:chip_config_header",
-      "${chip_root}/src/lib/message",      
+      "${chip_root}/src/lib/message",
       "${chip_root}/src/lib/support",
       "${nlio_root}:nlio",
     ]
