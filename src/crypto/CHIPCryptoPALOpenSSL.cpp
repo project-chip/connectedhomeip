@@ -826,9 +826,9 @@ CHIP_ERROR GenP256Keypair(P256PublicKey * pubkey, P256PrivateKey * privkey)
         const EC_POINT * pubkey_ecp = EC_KEY_get0_public_key(ec_key);
         VerifyOrExit(pubkey_ecp != nullptr, error = CHIP_ERROR_INTERNAL);
 
-        pubkey_size =
-            EC_POINT_point2oct(group, pubkey_ecp, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(pubkey->bytes), sizeof(pubkey->bytes), nullptr);
-        pubkey_ecp = nullptr;
+        pubkey_size = EC_POINT_point2oct(group, pubkey_ecp, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(pubkey->bytes),
+                                         sizeof(pubkey->bytes), nullptr);
+        pubkey_ecp  = nullptr;
 
         VerifyOrExit(pubkey_size == sizeof(pubkey->bytes), error = CHIP_ERROR_INTERNAL);
     }
