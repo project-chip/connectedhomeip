@@ -28,9 +28,9 @@
 #endif
 
 #include "ErrorStr.h"
+#include <core/CHIPCore.h>
 #include <inttypes.h>
 #include <stdio.h>
-#include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
 
 namespace chip {
