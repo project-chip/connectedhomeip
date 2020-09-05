@@ -902,7 +902,7 @@
       CHIP_CONFIG_HASH_IMPLEMENTATION_MINCRYPT + \
       CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL  + \
       CHIP_CONFIG_HASH_IMPLEMENTATION_MBEDTLS) != 1)
-// TODO(#2093): Need to reimplement with CHIP defined crypto primitives 
+// TODO(#2093): Need to reimplement with CHIP defined crypto primitives
 // #error "Please assert exactly one CHIP_CONFIG_HASH_IMPLEMENTATION_... option."
 #endif
 
