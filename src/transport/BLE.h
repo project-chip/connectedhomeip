@@ -84,12 +84,24 @@ public:
         return *this;
     }
 
+    bool HasMacAddress() const { return mHasMacAddress; };
+    const uint8_t (&GetMacAddress())[6] { return mMacAddress; };
+    BleConnectionParameters & SetMacAddress(const uint8_t (&macAddress)[6])
+    {
+        memcpy(mMacAddress, macAddress, sizeof(mMacAddress));
+        mHasMacAddress = true;
+
+        return *this;
+    }
+
 private:
     BLECallbackHandler * mCallbackHandler = nullptr;
     Ble::BleLayer * mLayer                = nullptr; ///< Associated ble layer
     BLE_CONNECTION_OBJECT mConnectionObj  = 0;       ///< the target peripheral BLE_CONNECTION_OBJECT
     uint16_t mDiscriminator               = 0;       ///< the target peripheral discriminator
     uint32_t mSetupPINCode                = 0;       ///< the target peripheral setup PIN Code
+    uint8_t mMacAddress[6]                = {};      ///< the target peripheral mac address
+    bool mHasMacAddress                   = false;
 };
 
 /** Implements a transport using BLE.
@@ -131,6 +143,7 @@ public:
 private:
     CHIP_ERROR InitInternal(Ble::BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj);
     CHIP_ERROR DelegateConnection(Ble::BleLayer * bleLayer, const uint16_t connDiscriminator);
+    CHIP_ERROR DelegateConnection(Ble::BleLayer * bleLayer, const uint8_t (&connMacAddress)[6]);
 
     // Those functions are BLEConnectionDelegate callbacks used when the connection
     // parameters used a name instead of a BLE_CONNECTION_OBJECT.

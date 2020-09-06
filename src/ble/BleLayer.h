@@ -256,6 +256,9 @@ public:
     BLE_ERROR NewBleConnection(void * appState, const uint16_t connDiscriminator,
                                BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
                                BleConnectionDelegate::OnConnectionErrorFunct onConnectionError);
+    BLE_ERROR NewBleConnection(void * appState, const uint8_t (&connMacAddress)[6],
+                               BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
+                               BleConnectionDelegate::OnConnectionErrorFunct onConnectionError);
     BLE_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
 
     chip::System::Error ScheduleWork(chip::System::Layer::TimerCompleteFunct aComplete, void * aAppState)
