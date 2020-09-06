@@ -77,6 +77,13 @@ public:
         return *this;
     }
 
+    const BLEMacAddress & GetMacAddress() const { return macAddress; }
+    BLEDeviceConnectionParameters & SetMacAddress(const BLEMacAddress & value)
+    {
+        memcpy(macAddress, value, sizeof(macAddress));
+        return *this;
+    }
+
     void * GetAppReqState() const { return appReqState; }
     BLEDeviceConnectionParameters & SetAppReqState(void * value)
     {
@@ -116,6 +123,7 @@ private:
     NodeId remoteDeviceId                   = 0;
     uint16_t discriminator                  = 0;
     uint32_t setupPINCode                   = 0;
+    BLEMacAddress macAddress                = {};
     void * appReqState                      = nullptr;
     NewConnectionHandler onConnected        = nullptr;
     MessageReceiveHandler onMessageReceived = nullptr;
@@ -165,6 +173,32 @@ public:
         return ConnectDevice(BLEDeviceConnectionParameters()
                                  .SetRemoteDeviceId(remoteDeviceId)
                                  .SetDiscriminator(discriminator)
+                                 .SetSetupPINCode(setupPINCode)
+                                 .SetAppReqState(appReqState)
+                                 .SetOnConnected(onConnected)
+                                 .SetOnMessageReceived(onMessageReceived)
+                                 .SetOnError(onError));
+    }
+
+    /**
+     * @brief
+     *   Connect to a CHIP device with a given mac address for Rendezvous
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] macAddress            The mac address of the requested Device
+     * @param[in] setupPINCode          The setup PIN code of the requested Device
+     * @param[in] appReqState           Application specific context to be passed back when a message is received or on error
+     * @param[in] onConnected           Callback for when the connection is established
+     * @param[in] onMessageReceived     Callback for when a message is received
+     * @param[in] onError               Callback for when an error occurs
+     * @return CHIP_ERROR               The connection status
+     */
+    CHIP_ERROR ConnectDevice(NodeId remoteDeviceId, BLEMacAddress & macAddress, const uint32_t setupPINCode, void * appReqState,
+                             NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived, ErrorHandler onError)
+    {
+        return ConnectDevice(BLEDeviceConnectionParameters()
+                                 .SetRemoteDeviceId(remoteDeviceId)
+                                 .SetMacAddress(macAddress)
                                  .SetSetupPINCode(setupPINCode)
                                  .SetAppReqState(appReqState)
                                  .SetOnConnected(onConnected)

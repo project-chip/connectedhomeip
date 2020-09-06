@@ -228,6 +228,7 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(const BLEDeviceConnectionParamete
 
 #if CONFIG_NETWORK_LAYER_BLE
     Transport::BLE * transport;
+    Transport::BleConnectionParameters bleConnectionParameters(this, params.GetBleLayer());
 
     ChipLogProgress(Controller, "Received new pairing request");
     ChipLogProgress(Controller, "mState %d. mConState %d", mState, mConState);
@@ -248,9 +249,16 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(const BLEDeviceConnectionParamete
     mSetupPINCode = params.GetSetupPINCode();
 
     transport = new Transport::BLE();
-    err       = transport->Init(Transport::BleConnectionParameters(this, params.GetBleLayer())
-                              .SetDiscriminator(params.GetDiscriminator())
-                              .SetSetupPINCode(params.GetSetupPINCode()));
+    bleConnectionParameters.SetSetupPINCode(params.GetSetupPINCode());
+    if (params.GetDiscriminator() != 0)
+    {
+        bleConnectionParameters.SetDiscriminator(params.GetDiscriminator());
+    }
+    else
+    {
+        bleConnectionParameters.SetMacAddress(params.GetMacAddress());
+    }
+    err = transport->Init(bleConnectionParameters);
     SuccessOrExit(err);
 
     mUnsecuredTransport = transport->Retain();
