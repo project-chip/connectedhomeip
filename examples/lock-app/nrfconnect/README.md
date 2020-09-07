@@ -95,19 +95,30 @@ The remaining two LEDs (#3 and #4) and button #4 are unused.
 
 ### Using Docker container
 
-The easiest way to get started with the example is to use nRF Connect SDK Docker image for CHIP applications. Run the following commands to start a Docker container:
+The easiest way to get started with the example is to use nRF Connect SDK Docker
+image for CHIP applications. Run the following commands to start a Docker
+container:
 
         $ mkdir ~/nrfconnect
         $ mkdir ~/connectedhomeip
         $ docker run --rm -it --privileged -v /dev:/dev -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip nordicsemi/nrfconnect-chip
 
 > **Note**:
-> - `~/nrfconnect` can be replaced with an absolute path to nRF Connect SDK source directory in case you have it already installed.
-> - Likewise, `~/connectedhomeip` can be replaced with an absolute path to CHIP source directory.
-> - `-privileged -v /dev:/dev` parameters can be omitted if you're not planning to flash the example onto hardware. The parameter gives the container full access to devices on your system.
-> - `--rm` flag can be omitted if you don't want the container to be auto-removed when you exit the container shell session.
+>
+> -   `~/nrfconnect` can be replaced with an absolute path to nRF Connect SDK
+>     source directory in case you have it already installed.
+> -   Likewise, `~/connectedhomeip` can be replaced with an absolute path to
+>     CHIP source directory.
+> -   `-privileged -v /dev:/dev` parameters can be omitted if you're not
+>     planning to flash the example onto hardware. The parameter gives the
+>     container full access to devices on your system.
+> -   `--rm` flag can be omitted if you don't want the container to be
+>     auto-removed when you exit the container shell session.
 
-If you use the container for the first time and you don't have nRF Connect SDK and CHIP sources downloaded yet, run `setup` command in the container to pull the sources into directories mounted as `/var/ncs` and `/var/chip`, respectively:
+If you use the container for the first time and you don't have nRF Connect SDK
+and CHIP sources downloaded yet, run `setup` command in the container to pull
+the sources into directories mounted as `/var/ncs` and `/var/chip`,
+respectively:
 
         $ setup
         /var/ncs repository is empty. Do you wish to check out nRF Connect SDK sources [master]? [Y/N] y
@@ -115,12 +126,16 @@ If you use the container for the first time and you don't have nRF Connect SDK a
         /var/chip repository is empty. Do you wish to check out Project CHIP sources [master]? [Y/N] y
         ...
 
-Now you may build the example by running the commands below in the Docker container:
+Now you may build the example by running the commands below in the Docker
+container:
 
         $ cd /var/chip/examples/lock-app/nrfconnect
         $ west build -b nrf52840dk_nrf52840
 
-If the build succeeds, the binary will be available under `/var/chip/examples/lock-app/nrfconnect/build/zephyr/zephyr.hex`. Note that other operations described in this document like flashing or debugging can also be done in the container.
+If the build succeeds, the binary will be available under
+`/var/chip/examples/lock-app/nrfconnect/build/zephyr/zephyr.hex`. Note that
+other operations described in this document like flashing or debugging can also
+be done in the container.
 
 ### Using native shell
 
@@ -167,7 +182,10 @@ After a successful build, the binary will be available under
 
 ### Troubleshooting
 
-If the example fails to build on your system make sure that you use a recent version of nRF Connect SDK. Please refer to [this section](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html#updating-the-repositories) in the user guide to learn how to update nRF Connect SDK repository.
+If the example fails to build on your system make sure that you use a recent
+version of nRF Connect SDK. Please refer to
+[this section](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html#updating-the-repositories)
+in the user guide to learn how to update nRF Connect SDK repository.
 
 ## Configuring the example
 
