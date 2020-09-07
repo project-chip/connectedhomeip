@@ -49,7 +49,7 @@ public:
     SecurePairingSession & GetPairingSession() { return mPairingSession; };
 
     //////////// SecurePairingSessionDelegate Implementation ///////////////
-    virtual CHIP_ERROR SendMessage(System::PacketBuffer * buffer) override;
+    virtual CHIP_ERROR SendMessage(System::PacketBuffer * msgBuf) override;
     virtual void OnPairingError(CHIP_ERROR err) override;
     virtual void OnPairingComplete() override;
 
@@ -60,16 +60,23 @@ public:
     void OnRendezvousMessageReceived(PacketBuffer * buffer) override;
 
 private:
+    CHIP_ERROR SendPairingMessage(System::PacketBuffer * msgBug);
+    CHIP_ERROR HandlePairingMessage(System::PacketBuffer * msgBug);
     CHIP_ERROR Pair(Optional<NodeId> nodeId, uint32_t setupPINCode);
     CHIP_ERROR WaitForPairing(Optional<NodeId> nodeId, uint32_t setupPINCode);
+
+    CHIP_ERROR SendSecureMessage(System::PacketBuffer * msgBug);
+    CHIP_ERROR HandleSecureMessage(System::PacketBuffer * msgBuf);
 
     Transport::Base * mTransport          = nullptr; ///< Underlying transport
     RendezvousSessionDelegate * mDelegate = nullptr; ///< Underlying transport events
     const RendezvousParameters mParams;              ///< Rendezvous configuration
 
     SecurePairingSession mPairingSession;
-    uint16_t mNextKeyId     = 0;
-    bool mPairingInProgress = false;
+    SecureSession mSecureSession;
+    bool mPairingInProgress      = false;
+    uint32_t mSecureMessageIndex = 0;
+    uint16_t mNextKeyId          = 0;
 };
 
 } // namespace chip
