@@ -29,6 +29,7 @@
 #ifndef __CHIPDEVICECONTROLLER_H
 #define __CHIPDEVICECONTROLLER_H
 
+#include <ble/BleMacAddr.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/DLLUtil.h>
@@ -112,10 +113,18 @@ public:
         return *this;
     }
 
+    Optional<Ble::MacAddr> GetMacAddr() const { return addr; }
+    BLEDeviceConnectionParameters & SetMacAddr(const Ble::MacAddr & value)
+    {
+        addr.SetValue(value);
+        return *this;
+    }
+
 private:
-    NodeId remoteDeviceId                   = 0;
-    uint16_t discriminator                  = 0;
-    uint32_t setupPINCode                   = 0;
+    NodeId remoteDeviceId  = 0;
+    uint16_t discriminator = 0;
+    uint32_t setupPINCode  = 0;
+    Optional<Ble::MacAddr> addr;
     void * appReqState                      = nullptr;
     NewConnectionHandler onConnected        = nullptr;
     MessageReceiveHandler onMessageReceived = nullptr;

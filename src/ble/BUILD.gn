@@ -68,6 +68,7 @@ if (chip_config_network_layer_ble) {
       "BleError.h",
       "BleLayer.cpp",
       "BleLayer.h",
+      "BleMacAddr.h",
       "BlePlatformDelegate.h",
       "BleUUID.cpp",
       "BleUUID.h",

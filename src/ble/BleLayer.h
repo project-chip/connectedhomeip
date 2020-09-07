@@ -61,6 +61,7 @@
 #include <ble/BleApplicationDelegate.h>
 #include <ble/BleConnectionDelegate.h>
 #include <ble/BleError.h>
+#include <ble/BleMacAddr.h>
 #include <ble/BlePlatformDelegate.h>
 #include <ble/BleUUID.h>
 
@@ -254,6 +255,9 @@ public:
     BLE_ERROR Shutdown(void);
 
     BLE_ERROR NewBleConnection(void * appState, const uint16_t connDiscriminator,
+                               BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
+                               BleConnectionDelegate::OnConnectionErrorFunct onConnectionError);
+    BLE_ERROR NewBleConnection(void * appState, const Ble::MacAddr & macAddr,
                                BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
                                BleConnectionDelegate::OnConnectionErrorFunct onConnectionError);
     BLE_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);

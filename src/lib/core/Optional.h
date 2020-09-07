@@ -22,6 +22,9 @@
  *
  */
 
+#ifndef CHIP_LIB_CORE_OPTIONAL_H_
+#define CHIP_LIB_CORE_OPTIONAL_H_
+
 #include <assert.h>
 
 namespace chip {
@@ -82,3 +85,5 @@ private:
 };
 
 } // namespace chip
+
+#endif // CHIP_LIB_CORE_OPTIONAL_H_

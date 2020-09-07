@@ -51,19 +51,6 @@
 #include <support/crypto/CHIPRNG.h>
 #include <support/logging/CHIPLogging.h>
 
-#if HAVE_NEW
-#include <new>
-#else
-inline void * operator new(size_t, void * p) throw()
-{
-    return p;
-}
-inline void * operator new[](size_t, void * p) throw()
-{
-    return p;
-}
-#endif
-
 namespace chip {
 
 using namespace chip::TLV;

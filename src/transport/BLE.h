@@ -34,6 +34,7 @@
 #include <ble/BleError.h>
 #include <ble/BleLayer.h>
 #include <core/CHIPCore.h>
+#include <core/Optional.h>
 #include <support/DLLUtil.h>
 #include <transport/Base.h>
 
@@ -84,12 +85,21 @@ public:
         return *this;
     }
 
+    bool HasMacAddr() const { return mMacAddr.HasValue(); }
+    Ble::MacAddr GetMacAddr() const { return mMacAddr.Value(); }
+    BleConnectionParameters & SetMacAddr(const Ble::MacAddr & macAddr)
+    {
+        mMacAddr.SetValue(macAddr);
+        return *this;
+    }
+
 private:
     BLECallbackHandler * mCallbackHandler = nullptr;
     Ble::BleLayer * mLayer                = nullptr; ///< Associated ble layer
     BLE_CONNECTION_OBJECT mConnectionObj  = 0;       ///< the target peripheral BLE_CONNECTION_OBJECT
     uint16_t mDiscriminator               = 0;       ///< the target peripheral discriminator
     uint32_t mSetupPINCode                = 0;       ///< the target peripheral setup PIN Code
+    Optional<Ble::MacAddr> mMacAddr;
 };
 
 /** Implements a transport using BLE.
@@ -131,6 +141,7 @@ public:
 private:
     CHIP_ERROR InitInternal(Ble::BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj);
     CHIP_ERROR DelegateConnection(Ble::BleLayer * bleLayer, const uint16_t connDiscriminator);
+    CHIP_ERROR DelegateConnection(Ble::BleLayer * bleLayer, const Ble::MacAddr & macAddr);
 
     // Those functions are BLEConnectionDelegate callbacks used when the connection
     // parameters used a name instead of a BLE_CONNECTION_OBJECT.

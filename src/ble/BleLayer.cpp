@@ -387,6 +387,23 @@ exit:
     return err;
 }
 
+BLE_ERROR BleLayer::NewBleConnection(void * appState, const Ble::MacAddr & macAddr,
+                                     BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
+                                     BleConnectionDelegate::OnConnectionErrorFunct onConnectionError)
+{
+    BLE_ERROR err = BLE_NO_ERROR;
+
+    VerifyOrExit(mState == kState_Initialized, err = BLE_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mConnectionDelegate != nullptr, err = BLE_ERROR_INCORRECT_STATE);
+
+    mConnectionDelegate->OnConnectionComplete = onConnectionComplete;
+    mConnectionDelegate->OnConnectionError    = onConnectionError;
+    mConnectionDelegate->NewConnection(this, appState, macAddr);
+
+exit:
+    return err;
+}
+
 BLE_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose)
 {
     *retEndPoint = NULL;

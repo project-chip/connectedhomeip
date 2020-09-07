@@ -34,6 +34,7 @@
 #include <ble/BleConnectionDelegate.h>
 #include <ble/BleError.h>
 #include <ble/BleLayer.h>
+#include <ble/BleMacAddr.h>
 #include <ble/BlePlatformDelegate.h>
 #include <ble/BleUUID.h>
 #include <ble/BtpEngine.h>

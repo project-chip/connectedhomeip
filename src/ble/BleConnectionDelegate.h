@@ -26,6 +26,7 @@
 
 #include <ble/BleConfig.h>
 #include <ble/BleError.h>
+#include <ble/BleMacAddr.h>
 
 #include <support/DLLUtil.h>
 
@@ -52,6 +53,10 @@ public:
     // Call this function to delegate the connection steps required to get a BLE_CONNECTION_OBJECT
     // out of a peripheral discriminator.
     virtual void NewConnection(BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator) = 0;
+
+    // Call this function to delegate the connection steps required to get a BLE_CONNECTION_OBJECT
+    // out of a BLE mac address.
+    virtual void NewConnection(BleLayer * bleLayer, void * appState, const MacAddr & macAddr) = 0;
 };
 
 } /* namespace Ble */
