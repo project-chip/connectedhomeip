@@ -25,15 +25,16 @@
 #include <system/SystemPacketBuffer.h>
 
 #include "BoltLockManager.h"
+
 #include "DataModelHandler.h"
 
-#include "af-types.h"
-#include "attribute-storage.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
 #include "gen/znet-bookkeeping.h"
-#include "util.h"
 #include <app/chip-zcl-zpro-codec.h>
+#include <app/util/af-types.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/util.h>
 
 using namespace ::chip;
 
@@ -65,7 +66,7 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clust
 
 /**
  * Handle a message that should be processed via our data model processing
- * codepath.
+ * codepath. This function will free the packet buffer.
  *
  * @param [in] buffer The buffer holding the message.  This function guarantees
  *                    that it will free the buffer before returning.
@@ -105,10 +106,10 @@ void HandleDataModelMessage(const MessageHeader & header, System::PacketBuffer *
         ChipLogProgress(App, "Data model processing failure!");
     }
 }
-}
 
 void InitDataModelHandler()
 {
     emberAfEndpointConfigure();
     emAfInit();
+}
 }

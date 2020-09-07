@@ -23,9 +23,18 @@
 #ifndef DATA_MODEL_HANDLER_H
 #define DATA_MODEL_HANDLER_H
 
-#include "app/util/util.h"
+#include <system/SystemPacketBuffer.h>
+#include <transport/MessageHeader.h>
+#include <transport/SecureSessionMgr.h>
 
 extern "C" {
+/**
+ * Handle a message that should be processed via our data model processing
+ * codepath.
+ *
+ * @param [in] buffer The buffer holding the message.  This function guarantees
+ *                    that it will free the buffer before returning.
+ */
 void HandleDataModelMessage(const chip::MessageHeader & header, chip::System::PacketBuffer * buffer,
                             chip::SecureSessionMgrBase * mgr);
 void InitDataModelHandler();

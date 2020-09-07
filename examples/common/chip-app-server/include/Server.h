@@ -26,6 +26,12 @@
 
 using DemoSessionManager = chip::SecureSessionMgr<chip::Transport::UDP>;
 
-void StartServer(DemoSessionManager * sessions);
+/**
+ * Initialize DataModelHandler and start CHIP datamodel server, the server
+ * assumes the platform's networking has been setup already.
+ *
+ * @param [in] sessions The demo's session manager.
+ */
+void InitServer(DemoSessionManager * sessions);
 
 #endif // CHIP_APP_SERVER_SERVER_H

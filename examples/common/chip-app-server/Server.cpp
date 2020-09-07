@@ -31,6 +31,8 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/UDP.h>
 
+#include <DataModelHandler.h>
+
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
@@ -41,10 +43,8 @@ using namespace ::chip::DeviceLayer;
 #define EXAMPLE_SERVER_NODEID 12344321
 #endif // EXAMPLE_SERVER_NODEID
 
-extern "C" void HandleDataModelMessage(const MessageHeader & header, System::PacketBuffer * buffer, SecureSessionMgrBase * mgr);
 // Transport Callbacks
 namespace {
-
 class ServerCallback : public SecureSessionMgrCallback
 {
 public:
@@ -68,7 +68,8 @@ public:
         buffer = NULL;
 
     exit:
-        // SendTo calls Free on the buffer without an AddRef, if SendTo was not called, free the buffer.
+        // HandleDataModelMessage calls Free on the buffer without an AddRef, if HandleDataModelMessage was not called, free the
+        // buffer.
         if (buffer != NULL)
         {
             System::PacketBuffer::Free(buffer);
@@ -86,11 +87,14 @@ SecurePairingUsingTestSecret gTestPairing;
 
 } // namespace
 
-// The echo server assumes the platform's networking has been setup already
-void StartServer(DemoSessionManager * sessions)
+// The function will initialize datamodel handler and then start the server
+// The server assumes the platform's networking has been setup already
+void InitServer(DemoSessionManager * sessions)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
+
+    InitDataModelHandler();
 
     err = sessions->Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::SystemLayer,
                          UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
