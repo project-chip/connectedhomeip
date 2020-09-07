@@ -24,7 +24,7 @@ config("includes") {
 static_library("chip-app-server") {
   output_name = "chip-app-server"
 
-  sources = [ "server.cpp" ]
+  sources = [ "Server.cpp" ]
 
   deps = [ "${chip_root}/src/lib" ]
 
