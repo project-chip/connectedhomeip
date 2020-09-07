@@ -15,6 +15,11 @@
  *    limitations under the License.
  */
 
+/**
+ * @file
+ *   This file implements the service publishing code for example usage.
+ */
+
 #include "service.h"
 
 #include "FreeRTOS.h"
