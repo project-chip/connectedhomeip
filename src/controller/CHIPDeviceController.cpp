@@ -313,17 +313,16 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(mRemoteDeviceId.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(IsSecurelyConnected(), err = CHIP_ERROR_INCORRECT_STATE);
 
     mAppReqState = appReqState;
 
     if (mRendezvousSession != NULL)
     {
-        VerifyOrExit(IsConnected(), err = CHIP_ERROR_INCORRECT_STATE);
         err = mRendezvousSession->SendMessage(buffer);
     }
     else
     {
-        VerifyOrExit(IsSecurelyConnected(), err = CHIP_ERROR_INCORRECT_STATE);
         err = mSessionManager->SendMessage(mRemoteDeviceId.Value(), buffer);
     }
 exit:
@@ -405,6 +404,7 @@ void ChipDeviceController::OnRendezvousError(CHIP_ERROR err)
 void ChipDeviceController::OnRendezvousConnectionOpened()
 {
     mPairingSession = mRendezvousSession->GetPairingSession();
+    mConState       = kConnectionState_SecureConnected;
 
     if (mOnNewConnection)
     {
