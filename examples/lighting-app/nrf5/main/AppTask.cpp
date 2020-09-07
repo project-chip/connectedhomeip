@@ -22,8 +22,8 @@
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
 #include "LightingManager.h"
-#include "server.h"
-#include "service.h"
+#include "Server.h"
+#include "Service.h"
 
 #include "app_button.h"
 #include "app_config.h"

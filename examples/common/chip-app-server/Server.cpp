@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "server.h"
+#include "Server.h"
 
 #include <string.h>
 

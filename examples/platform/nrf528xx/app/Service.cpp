@@ -20,7 +20,7 @@
  *   This file implements the service publishing code for example usage.
  */
 
-#include "service.h"
+#include "Service.h"
 
 #include "FreeRTOS.h"
 #include "nrf_log.h"
