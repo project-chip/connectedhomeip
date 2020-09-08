@@ -838,7 +838,7 @@ CHIP_ERROR GenECPKeypair(ECPKey & pubkey, ECPKey & privkey)
         const EC_POINT * pubkey_ecp = EC_KEY_get0_public_key(ec_key);
         VerifyOrExit(pubkey_ecp != nullptr, error = CHIP_ERROR_INTERNAL);
 
-        pubkey_size = EC_POINT_point2oct(group, pubkey_ecp, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(pubkey.Value()),
+        pubkey_size = EC_POINT_point2oct(group, pubkey_ecp, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(pubkey),
                                          pubkey.Length(), nullptr);
         pubkey_ecp  = nullptr;
 
@@ -850,7 +850,7 @@ CHIP_ERROR GenECPKeypair(ECPKey & pubkey, ECPKey & privkey)
         const BIGNUM * privkey_bn = EC_KEY_get0_private_key(ec_key);
         VerifyOrExit(privkey_bn != nullptr, error = CHIP_ERROR_INTERNAL);
 
-        privkey_size = BN_bn2binpad(privkey_bn, Uint8::to_uchar(privkey.Value()), privkey.Length());
+        privkey_size = BN_bn2binpad(privkey_bn, Uint8::to_uchar(privkey), privkey.Length());
         privkey_bn   = nullptr;
 
         VerifyOrExit(privkey_size > 0, error = CHIP_ERROR_INTERNAL);
