@@ -19,7 +19,13 @@ import("${chip_root}/gn/chip/tools.gni")
 assert(chip_build_tools)
 
 executable("chip-tool") {
-  sources = [ "main.cpp" ]
+  sources = [
+    "commands/common/Command.cpp",
+    "commands/common/EchoCommand.cpp",
+    "commands/common/ModelCommand.cpp",
+    "commands/common/NetworkCommand.cpp",
+    "main.cpp",
+  ]
 
   if (is_debug) {
     defines = [ "BUILD_RELEASE=0" ]
