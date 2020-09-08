@@ -918,8 +918,7 @@ static void TestP256_Keygen(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, ECDSA_sign_msg(test_msg, msglen, privkey, privkey.Length(), test_sig, siglen) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   ECDSA_validate_msg_signature(test_msg, msglen, pubkey, pubkey.Length(), test_sig, siglen) ==
-                       CHIP_NO_ERROR);
+                   ECDSA_validate_msg_signature(test_msg, msglen, pubkey, pubkey.Length(), test_sig, siglen) == CHIP_NO_ERROR);
 }
 
 static void TestSPAKE2P_spake2p_FEMul(nlTestSuite * inSuite, void * inContext)

@@ -838,9 +838,9 @@ CHIP_ERROR GenECPKeypair(ECPKey & pubkey, ECPKey & privkey)
         const EC_POINT * pubkey_ecp = EC_KEY_get0_public_key(ec_key);
         VerifyOrExit(pubkey_ecp != nullptr, error = CHIP_ERROR_INTERNAL);
 
-        pubkey_size = EC_POINT_point2oct(group, pubkey_ecp, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(pubkey),
-                                         pubkey.Length(), nullptr);
-        pubkey_ecp  = nullptr;
+        pubkey_size =
+            EC_POINT_point2oct(group, pubkey_ecp, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(pubkey), pubkey.Length(), nullptr);
+        pubkey_ecp = nullptr;
 
         VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INTERNAL);
     }
