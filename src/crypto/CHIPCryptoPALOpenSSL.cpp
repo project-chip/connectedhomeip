@@ -853,7 +853,8 @@ CHIP_ERROR GenECPKeypair(ECPKey & pubkey, ECPKey & privkey)
         privkey_size = BN_bn2binpad(privkey_bn, Uint8::to_uchar(privkey.Value()), privkey.Length());
         privkey_bn   = nullptr;
 
-        VerifyOrExit(privkey_size == privkey.Length(), error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(privkey_size > 0, error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit((size_t)privkey_size == privkey.Length(), error = CHIP_ERROR_INTERNAL);
     }
 
 exit:
