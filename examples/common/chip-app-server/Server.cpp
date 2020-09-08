@@ -100,6 +100,7 @@ void InitServer(DemoSessionManager * sessions)
                          UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
     SuccessOrExit(err);
 
+    // TODO: ESP32 echo server supports actual pairing, needs to investigate how to share this with ESP32
     err = sessions->NewPairing(Optional<NodeId>::Value(kUndefinedNodeId), peer, 0, 0, &gTestPairing);
     SuccessOrExit(err);
 
