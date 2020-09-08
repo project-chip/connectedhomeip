@@ -352,7 +352,7 @@ class BLEManagerImpl final : public BLEManager,
     bool UnsetSubscribed(uint16_t conId);
     bool IsSubscribed(uint16_t conId);
 
-    static void bleprph_host_task(void *param);
+    static void bleprph_host_task(void * param);
     static void bleprph_on_sync(void);
     static void bleprph_on_reset(int);
     static const struct ble_gatt_svc_def CHIPoBLEGATTAttrs[];

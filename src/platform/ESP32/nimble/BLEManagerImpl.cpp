@@ -264,13 +264,12 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         HandleConnectionError(event->CHIPoBLEConnectionError.ConId, event->CHIPoBLEConnectionError.Reason);
         break;
 
-    case DeviceEventType::kCHIPoBLEConnectionEstablished:
-        {
-            ChipDeviceEvent event;
-            event.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-            PlatformMgr().PostEvent(&event);
-        }
-        break;
+    case DeviceEventType::kCHIPoBLEConnectionEstablished: {
+        ChipDeviceEvent event;
+        event.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
+        PlatformMgr().PostEvent(&event);
+    }
+    break;
 
     case DeviceEventType::kFabricMembershipChange:
     case DeviceEventType::kServiceProvisioningChange:
@@ -433,7 +432,7 @@ void BLEManagerImpl::DriveBLEState(void)
             // Configure advertising data if it hasn't been done yet.  This is an asynchronous step which
             // must complete before advertising can be started.  When that happens, this method will
             // be called again, and execution will proceed to the code below.
-            if (!GetFlag(mFlags, kFlag_AdvertisingConfigured) )
+            if (!GetFlag(mFlags, kFlag_AdvertisingConfigured))
             {
                 err = ConfigureAdvertisingData();
                 if (err != CHIP_NO_ERROR)
@@ -467,7 +466,6 @@ void BLEManagerImpl::DriveBLEState(void)
                     PlatformMgr().PostEvent(&advChange);
                 }
             }
-
         }
     }
 
@@ -518,13 +516,14 @@ void BLEManagerImpl::bleprph_on_sync(void)
     uint8_t own_addr_type = BLE_OWN_ADDR_PUBLIC;
 
     rc = ble_hs_id_infer_auto(0, &own_addr_type);
-    if (rc != 0) {
+    if (rc != 0)
+    {
         ESP_LOGE(TAG, "Error determining address type; rc=%d\n", rc);
         return;
     }
 }
 
-void BLEManagerImpl::bleprph_host_task(void *param)
+void BLEManagerImpl::bleprph_host_task(void * param)
 {
     ESP_LOGD(TAG, "BLE Host Task Started");
     /* This function will return only when nimble_port_stop() is executed */
@@ -550,19 +549,19 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     nimble_port_init();
 
     /* Initialize the NimBLE host configuration. */
-    ble_hs_cfg.reset_cb = bleprph_on_reset;
-    ble_hs_cfg.sync_cb = bleprph_on_sync;
+    ble_hs_cfg.reset_cb        = bleprph_on_reset;
+    ble_hs_cfg.sync_cb         = bleprph_on_sync;
     ble_hs_cfg.store_status_cb = ble_store_util_status_rr;
 
-   // DriveBLEState();
+    // DriveBLEState();
 
-   /* ble_svc_gap_init();
-    ble_svc_gatt_init();
+    /* ble_svc_gap_init();
+     ble_svc_gatt_init();
 
-    err = ble_gatts_count_cfg(CHIPoBLEGATTAttrs);
-    SuccessOrExit(err);
-    err = ble_gatts_add_svcs(CHIPoBLEGATTAttrs);
-    SuccessOrExit(err);*/
+     err = ble_gatts_count_cfg(CHIPoBLEGATTAttrs);
+     SuccessOrExit(err);
+     err = ble_gatts_add_svcs(CHIPoBLEGATTAttrs);
+     SuccessOrExit(err);*/
     // Register the CHIPoBLE GATT attributes with the ESP BLE layer if needed.
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled)
     {
@@ -585,11 +584,10 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
 
         SetFlag(mFlags, kFlag_ControlOpInProgress);
 
-        //ExitNow();
+        // ExitNow();
     }
 
     nimble_port_freertos_init(bleprph_host_task);
-
 
 exit:
     return err;
@@ -655,8 +653,7 @@ void BLEManagerImpl::HandleRXCharWrite(struct ble_gatt_char_context * param)
     PacketBuffer * buf = NULL;
     uint16_t data_len  = 0;
 
-    ESP_LOGD(TAG, "Write request received for CHIPoBLE RX characteristic con %u %u",
-             param->conn_handle, param->attr_handle);
+    ESP_LOGD(TAG, "Write request received for CHIPoBLE RX characteristic con %u %u", param->conn_handle, param->attr_handle);
 
     // Copy the data to a PacketBuffer.
     buf = PacketBuffer::New(0);
@@ -761,7 +758,8 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(struct ble_gap_event * gapEvent)
         PlatformMgr().PostEvent(&event);
     }
 
-    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", (indicationsEnabled || notificationsEnabled) ? "subscribe" : "unsubscribe");
+    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received",
+                    (indicationsEnabled || notificationsEnabled) ? "subscribe" : "unsubscribe");
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -972,9 +970,8 @@ exit:
 int BLEManagerImpl::gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt * ctxt, void * arg)
 {
     struct ble_gatt_char_context param = { 0 };
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipLogError(DeviceLayer, "Inside gatt_svr_chr_access...ctxt->op = %d",
-                 ctxt->op);
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    ChipLogError(DeviceLayer, "Inside gatt_svr_chr_access...ctxt->op = %d", ctxt->op);
 
     switch (ctxt->op)
     {
