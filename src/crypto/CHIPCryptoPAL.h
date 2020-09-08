@@ -103,7 +103,7 @@ class ECPKey
 public:
     virtual SupportedECPKeyTypes Type() = 0;
     virtual size_t Length()             = 0;
-    virtual operator uint8_t*()         = 0;
+    virtual operator uint8_t *()        = 0;
 };
 
 class P256PrivateKey : public ECPKey
@@ -111,7 +111,7 @@ class P256PrivateKey : public ECPKey
 public:
     SupportedECPKeyTypes Type() override { return SupportedECPKeyTypes::ECP256R1; }
     size_t Length() override { return kP256_PrivateKey_Length; }
-    operator uint8_t*() override { return bytes; }
+    operator uint8_t *() override { return bytes; }
 
 private:
     uint8_t bytes[kP256_PrivateKey_Length];
@@ -122,7 +122,7 @@ class P256PublicKey : public ECPKey
 public:
     SupportedECPKeyTypes Type() override { return SupportedECPKeyTypes::ECP256R1; }
     size_t Length() override { return kP256_PublicKey_Length; }
-    operator uint8_t*() override { return bytes; }
+    operator uint8_t *() override { return bytes; }
 
 private:
     uint8_t bytes[kP256_PublicKey_Length];
