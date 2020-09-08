@@ -915,10 +915,10 @@ static void TestP256_Keygen(nlTestSuite * inSuite, void * inContext)
     uint8_t test_sig[kMax_ECDSA_Signature_Length];
     size_t siglen = sizeof(test_sig);
 
-    NL_TEST_ASSERT(inSuite, ECDSA_sign_msg(test_msg, msglen, privkey.Value(), privkey.Length(), test_sig, siglen) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ECDSA_sign_msg(test_msg, msglen, privkey, privkey.Length(), test_sig, siglen) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   ECDSA_validate_msg_signature(test_msg, msglen, pubkey.Value(), pubkey.Length(), test_sig, siglen) ==
+                   ECDSA_validate_msg_signature(test_msg, msglen, pubkey, pubkey.Length(), test_sig, siglen) ==
                        CHIP_NO_ERROR);
 }
 

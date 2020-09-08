@@ -562,13 +562,13 @@ CHIP_ERROR GenECPKeypair(ECPKey & pubkey, ECPKey & privkey)
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     result = mbedtls_ecp_point_write_binary(&keypair.grp, &keypair.Q, MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_size,
-                                            Uint8::to_uchar(pubkey.Value()), pubkey.Length());
+                                            Uint8::to_uchar(pubkey), pubkey.Length());
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INVALID_ARGUMENT);
 
     VerifyOrExit(mbedtls_mpi_size(&keypair.d) == privkey.Length(), error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    result = mbedtls_mpi_write_binary(&keypair.d, Uint8::to_uchar(privkey.Value()), privkey.Length());
+    result = mbedtls_mpi_write_binary(&keypair.d, Uint8::to_uchar(privkey), privkey.Length());
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
 exit:
