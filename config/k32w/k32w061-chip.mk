@@ -77,7 +77,7 @@ CHIP_CXXFLAGS = $(STD_CXXFLAGS) $(CXXFLAGS)
 CHIP_CONFIGURE_OPTIONS = \
     -C AR="$(AR)" AS="$(AS)" CC="$(CCACHE) $(CC)" CXX="$(CCACHE) $(CXX)" \
     LD="$(LD)" OBJCOPY="$(OBJCOPY)" RANLIB="$(RANLIB)" INSTALL="$(INSTALL) $(INSTALLFLAGS)" \
-    CPPFLAGS="$(CHIP_CPPFLAGS)" \
+    CPPFLAGS="$(CHIP_CPPFLAGS) -imacros $(CHIP_ROOT)/third_party/openthread/repo/examples/platforms/k32w/k32w061/k32w061-sdk-config.h" \
     CXXFLAGS="$(CHIP_CXXFLAGS)" \
     --prefix=$(CHIP_OUTPUT_DIR) \
     --exec-prefix=$(CHIP_OUTPUT_DIR) \

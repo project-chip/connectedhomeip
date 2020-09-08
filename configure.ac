@@ -1846,6 +1846,8 @@ NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
                 -DJENNIC_CHIP_FAMILY_NAME=_JN518x \
                 -DSDK_DEBUGCONSOLE=0 \
                 -DUSE_RTOS=1 \
+                -DFSL_RTOS_FREE_RTOS=1 \
+                -DMBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT=1  \
                 -DOPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1 \
                 -DOPENTHREAD_CONFIG_HEAP_INTERNAL_SIZE=16 \
                 -DOPENTHREAD_CONFIG_JOINER_ENABLE=1 \
@@ -1857,7 +1859,7 @@ NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
 
             (mkdir -p ${ac_pwd}/third_party/openthread \
              && cd ${ac_pwd}/third_party/openthread \
-             && CPPFLAGS="${ot_cppflags}" CFLAGS="${CFLAGS}" CXXFLAGS="${CXXFLAGS}" ${chip_srcdir}/third_party/openthread/repo/configure \
+             && CPPFLAGS="${ot_cppflags}" CFLAGS="${CFLAGS}" CXXFLAGS="${CXXFLAGS} -Og -g" ${chip_srcdir}/third_party/openthread/repo/configure \
              --disable-docs \
              --disable-executable \
              --disable-tools \

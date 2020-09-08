@@ -35,12 +35,6 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 #include <support/FlagUtils.hpp>
 
-namespace nl {
-namespace Inet {
-class IPAddress;
-} // namespace Inet
-} // namespace nl
-
 namespace chip {
 namespace DeviceLayer {
 
