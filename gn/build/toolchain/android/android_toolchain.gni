@@ -41,10 +41,23 @@ template("android_clang_toolchain") {
 
   _ndk_prefix = ""
   if (android_ndk_root != "") {
-    if (host_os == "linux" && host_cpu == "x64") {
-      _ndk_prefix =
-          "${android_ndk_root}/toolchains/llvm/prebuilt/linux-x86_64/bin/"
+    _ndk_host_os = ""
+    if (host_os == "linux") {
+      _ndk_host_os = "linux"
+    } else if (host_os == "mac") {
+      _ndk_host_os = "darwin"
+    } else if (host_os == "win") {
+      _ndk_host_os = "windows"
     }
+
+    _ndk_host_cpu = ""
+    if (host_cpu == "x64") {
+      _ndk_host_cpu = "-x86_64"
+    }
+
+    _ndk_host = _ndk_host_os + _ndk_host_cpu
+    _ndk_prefix =
+        "${android_ndk_root}/toolchains/llvm/prebuilt/${_ndk_host}/bin/"
   }
 
   gcc_toolchain(target_name) {
