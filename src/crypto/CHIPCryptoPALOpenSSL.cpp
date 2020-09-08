@@ -854,7 +854,7 @@ CHIP_ERROR GenECPKeypair(ECPKey & pubkey, ECPKey & privkey)
         privkey_bn   = nullptr;
 
         VerifyOrExit(privkey_size > 0, error = CHIP_ERROR_INTERNAL);
-        VerifyOrExit((size_t)privkey_size == privkey.Length(), error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit((size_t) privkey_size == privkey.Length(), error = CHIP_ERROR_INTERNAL);
     }
 
 exit:
