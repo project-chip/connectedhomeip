@@ -281,7 +281,7 @@ CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * 
  * @param privkey Generated private key
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR GenP256Keypair(P256PublicKey * pubkey, P256PrivateKey * privkey);
+CHIP_ERROR GenP256Keypair(P256PublicKey & pubkey, P256PrivateKey & privkey);
 
 /**
  * The below class implements the draft 01 version of the Spake2+ protocol as

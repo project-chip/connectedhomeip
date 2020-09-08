@@ -533,7 +533,7 @@ void ClearSecretData(uint8_t * buf, uint32_t len)
     memset(buf, 0, len);
 }
 
-CHIP_ERROR GenP256Keypair(P256PublicKey * pubkey, P256PrivateKey * privkey)
+CHIP_ERROR GenP256Keypair(P256PublicKey & pubkey, P256PrivateKey & privkey)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -543,20 +543,17 @@ CHIP_ERROR GenP256Keypair(P256PublicKey * pubkey, P256PrivateKey * privkey)
     mbedtls_ecp_keypair keypair;
     mbedtls_ecp_keypair_init(&keypair);
 
-    VerifyOrExit(pubkey != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(privkey != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-
     result = mbedtls_ecp_gen_key(MBEDTLS_ECP_DP_SECP256R1, &keypair, CryptoRNG, nullptr);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     result = mbedtls_ecp_point_write_binary(&keypair.grp, &keypair.Q, MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_size,
-                                            Uint8::to_uchar(pubkey->bytes), sizeof(pubkey->bytes));
+                                            Uint8::to_uchar(pubkey.bytes), sizeof(pubkey.bytes));
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(pubkey_size == sizeof(pubkey->bytes), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(pubkey_size == sizeof(pubkey.bytes), error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(mbedtls_mpi_size(&keypair.d) == sizeof(privkey->bytes), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(mbedtls_mpi_size(&keypair.d) == sizeof(privkey.bytes), error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    result = mbedtls_mpi_write_binary(&keypair.d, Uint8::to_uchar(privkey->bytes), sizeof(privkey->bytes));
+    result = mbedtls_mpi_write_binary(&keypair.d, Uint8::to_uchar(privkey.bytes), sizeof(privkey.bytes));
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
 exit:
