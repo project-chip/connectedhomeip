@@ -797,7 +797,7 @@ void ClearSecretData(uint8_t * buf, uint32_t len)
     memset(buf, 0, len);
 }
 
-CHIP_ERROR GenP256Keypair(P256PublicKey * pubkey, P256PrivateKey * privkey)
+CHIP_ERROR GenP256Keypair(P256PublicKey & pubkey, P256PrivateKey & privkey)
 {
     ERR_clear_error();
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -805,9 +805,6 @@ CHIP_ERROR GenP256Keypair(P256PublicKey * pubkey, P256PrivateKey * privkey)
     int nid          = NID_undef;
     EC_KEY * ec_key  = nullptr;
     EC_GROUP * group = nullptr;
-
-    VerifyOrExit(pubkey != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(privkey != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     nid = _nidForCurve(ECName::P256v1);
     VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -826,11 +823,11 @@ CHIP_ERROR GenP256Keypair(P256PublicKey * pubkey, P256PrivateKey * privkey)
         const EC_POINT * pubkey_ecp = EC_KEY_get0_public_key(ec_key);
         VerifyOrExit(pubkey_ecp != nullptr, error = CHIP_ERROR_INTERNAL);
 
-        pubkey_size = EC_POINT_point2oct(group, pubkey_ecp, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(pubkey->bytes),
-                                         sizeof(pubkey->bytes), nullptr);
+        pubkey_size = EC_POINT_point2oct(group, pubkey_ecp, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(pubkey.bytes),
+                                         sizeof(pubkey.bytes), nullptr);
         pubkey_ecp  = nullptr;
 
-        VerifyOrExit(pubkey_size == sizeof(pubkey->bytes), error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(pubkey_size == sizeof(pubkey.bytes), error = CHIP_ERROR_INTERNAL);
     }
 
     {
@@ -838,10 +835,10 @@ CHIP_ERROR GenP256Keypair(P256PublicKey * pubkey, P256PrivateKey * privkey)
         const BIGNUM * privkey_bn = EC_KEY_get0_private_key(ec_key);
         VerifyOrExit(privkey_bn != nullptr, error = CHIP_ERROR_INTERNAL);
 
-        privkey_size = BN_bn2binpad(privkey_bn, Uint8::to_uchar(privkey->bytes), sizeof(privkey->bytes));
+        privkey_size = BN_bn2binpad(privkey_bn, Uint8::to_uchar(privkey.bytes), sizeof(privkey.bytes));
         privkey_bn   = nullptr;
 
-        VerifyOrExit(privkey_size == sizeof(privkey->bytes), error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(privkey_size == sizeof(privkey.bytes), error = CHIP_ERROR_INTERNAL);
     }
 
 exit:
