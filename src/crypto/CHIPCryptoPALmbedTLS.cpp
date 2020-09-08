@@ -537,10 +537,10 @@ mbedtls_ecp_group_id MapECPGroupId(SupportedECPKeyTypes keyType)
 {
     switch (keyType)
     {
-        case SupportedECPKeyTypes::ECP256R1:
-            return MBEDTLS_ECP_DP_SECP256R1;
-        default:
-            return MBEDTLS_ECP_DP_NONE;
+    case SupportedECPKeyTypes::ECP256R1:
+        return MBEDTLS_ECP_DP_SECP256R1;
+    default:
+        return MBEDTLS_ECP_DP_NONE;
     }
 }
 
