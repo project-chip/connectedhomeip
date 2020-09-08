@@ -52,7 +52,8 @@ enum class DigestType
 
 enum class ECName
 {
-    P256v1
+    None = 0,
+    P256v1 = 1,
 };
 
 nlSTATIC_ASSERT_PRINT(kMax_ECDH_Secret_Length >= 32, "ECDH shared secret is too short");
@@ -797,7 +798,18 @@ void ClearSecretData(uint8_t * buf, uint32_t len)
     memset(buf, 0, len);
 }
 
-CHIP_ERROR GenP256Keypair(P256PublicKey & pubkey, P256PrivateKey & privkey)
+ECName MapECName(SupportedECPKeyTypes keyType)
+{
+    switch (keyType)
+    {
+        case SupportedECPKeyTypes::ECP256R1:
+            return ECName::P256v1;
+        default:
+            return ECName::None;
+    }
+}
+
+CHIP_ERROR GenECPKeypair(ECPKey & pubkey, ECPKey & privkey)
 {
     ERR_clear_error();
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -805,8 +817,11 @@ CHIP_ERROR GenP256Keypair(P256PublicKey & pubkey, P256PrivateKey & privkey)
     int nid          = NID_undef;
     EC_KEY * ec_key  = nullptr;
     EC_GROUP * group = nullptr;
+    ECName curve     = MapECName(pubkey.Type());
 
-    nid = _nidForCurve(ECName::P256v1);
+    VerifyOrExit(curve == MapECName(privkey.Type()), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    nid = _nidForCurve(curve);
     VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     ec_key = EC_KEY_new_by_curve_name(nid);
@@ -823,11 +838,11 @@ CHIP_ERROR GenP256Keypair(P256PublicKey & pubkey, P256PrivateKey & privkey)
         const EC_POINT * pubkey_ecp = EC_KEY_get0_public_key(ec_key);
         VerifyOrExit(pubkey_ecp != nullptr, error = CHIP_ERROR_INTERNAL);
 
-        pubkey_size = EC_POINT_point2oct(group, pubkey_ecp, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(pubkey.bytes),
-                                         sizeof(pubkey.bytes), nullptr);
+        pubkey_size = EC_POINT_point2oct(group, pubkey_ecp, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(pubkey.Value()),
+                                         pubkey.Length(), nullptr);
         pubkey_ecp  = nullptr;
 
-        VerifyOrExit(pubkey_size == sizeof(pubkey.bytes), error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INTERNAL);
     }
 
     {
@@ -835,10 +850,10 @@ CHIP_ERROR GenP256Keypair(P256PublicKey & pubkey, P256PrivateKey & privkey)
         const BIGNUM * privkey_bn = EC_KEY_get0_private_key(ec_key);
         VerifyOrExit(privkey_bn != nullptr, error = CHIP_ERROR_INTERNAL);
 
-        privkey_size = BN_bn2binpad(privkey_bn, Uint8::to_uchar(privkey.bytes), sizeof(privkey.bytes));
+        privkey_size = BN_bn2binpad(privkey_bn, Uint8::to_uchar(privkey.Value()), privkey.Length());
         privkey_bn   = nullptr;
 
-        VerifyOrExit(privkey_size == sizeof(privkey.bytes), error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(privkey_size == privkey.Length(), error = CHIP_ERROR_INTERNAL);
     }
 
 exit:

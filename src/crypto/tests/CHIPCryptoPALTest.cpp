@@ -907,7 +907,7 @@ static void TestP256_Keygen(nlTestSuite * inSuite, void * inContext)
     P256PublicKey pubkey;
     P256PrivateKey privkey;
 
-    NL_TEST_ASSERT(inSuite, GenP256Keypair(pubkey, privkey) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, GenECPKeypair(pubkey, privkey) == CHIP_NO_ERROR);
 
     const char * msg         = "Test Message for Keygen";
     const uint8_t * test_msg = Uint8::from_const_char(msg);
@@ -916,10 +916,10 @@ static void TestP256_Keygen(nlTestSuite * inSuite, void * inContext)
     size_t siglen = sizeof(test_sig);
 
     NL_TEST_ASSERT(inSuite,
-                   ECDSA_sign_msg(test_msg, msglen, privkey.bytes, sizeof(privkey.bytes), test_sig, siglen) == CHIP_NO_ERROR);
+                   ECDSA_sign_msg(test_msg, msglen, privkey.Value(), privkey.Length(), test_sig, siglen) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   ECDSA_validate_msg_signature(test_msg, msglen, pubkey.bytes, sizeof(pubkey.bytes), test_sig, siglen) ==
+                   ECDSA_validate_msg_signature(test_msg, msglen, pubkey.Value(), pubkey.Length(), test_sig, siglen) ==
                        CHIP_NO_ERROR);
 }
 
