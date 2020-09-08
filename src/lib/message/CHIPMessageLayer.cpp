@@ -162,7 +162,7 @@ CHIP_ERROR ChipMessageLayer::Init(InitContext * context)
     mIPv6UDP       = NULL;
 
 #if INET_CONFIG_ENABLE_IPV4
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT     
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     mIPv4TCPListen = NULL;
 #endif
     mIPv4UDP       = NULL;
