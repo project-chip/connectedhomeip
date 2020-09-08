@@ -159,13 +159,13 @@ CHIP_ERROR ChipMessageLayer::Init(InitContext * context)
     mIPv6TCPListen = NULL;
 #endif
 
-    mIPv6UDP       = NULL;
+    mIPv6UDP = NULL;
 
 #if INET_CONFIG_ENABLE_IPV4
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     mIPv4TCPListen = NULL;
 #endif
-    mIPv4UDP       = NULL;
+    mIPv4UDP = NULL;
 #endif // INET_CONFIG_ENABLE_IPV4
 
 #if CHIP_CONFIG_ENABLE_TARGETED_LISTEN
