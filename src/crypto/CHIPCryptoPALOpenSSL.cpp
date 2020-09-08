@@ -52,7 +52,7 @@ enum class DigestType
 
 enum class ECName
 {
-    None = 0,
+    None   = 0,
     P256v1 = 1,
 };
 
@@ -802,10 +802,10 @@ ECName MapECName(SupportedECPKeyTypes keyType)
 {
     switch (keyType)
     {
-        case SupportedECPKeyTypes::ECP256R1:
-            return ECName::P256v1;
-        default:
-            return ECName::None;
+    case SupportedECPKeyTypes::ECP256R1:
+        return ECName::P256v1;
+    default:
+        return ECName::None;
     }
 }
 
