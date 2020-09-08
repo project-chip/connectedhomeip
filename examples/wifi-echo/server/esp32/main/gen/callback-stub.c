@@ -98,6 +98,18 @@ bool emberAfPluginGroupsServerGroupNamesSupportedCallback(uint8_t endpoint)
  */
 void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
 
+/** @brief Basic Cluster Reset To Factory Defaults
+ *
+ * This function is called by the Basic server plugin when a request to
+ * reset to factory defaults is received. The plugin will reset attributes
+ * managed by the framework to their default values.
+ * The application should perform any other necessary reset-related operations
+ * in this callback, including resetting any externally-stored attributes.
+ *
+ * @param endpoint Endpoint that is being initialized  Ver.: always
+ */
+void emberAfPluginBasicResetToFactoryDefaultsCallback(uint8_t endpoint) {}
+
 /** @brief Add To Current App Tasks
  *
  * This function is only useful to sleepy end devices.  This function will note

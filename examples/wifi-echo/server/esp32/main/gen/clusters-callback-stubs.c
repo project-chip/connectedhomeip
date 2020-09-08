@@ -56,16 +56,6 @@ bool emberAfPluginIdentifyStopFeedbackCallback(uint8_t endpoint)
     return false;
 }
 
-/** @brief Basic Cluster Reset To Factory Defaults
- *
- *
- *
- */
-bool emberAfBasicClusterResetToFactoryDefaultsCallback(void)
-{
-    return false;
-}
-
 /** @brief Door Lock Cluster Clear All Pins
  *
  *
