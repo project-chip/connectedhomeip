@@ -93,15 +93,40 @@ enum class CHIP_SPAKE2P_ROLE : uint8_t
     PROVER   = 1, // Commissioner
 };
 
-typedef struct P256PrivateKey
+enum class SupportedECPKeyTypes : uint8_t
 {
-    uint8_t bytes[kP256_PrivateKey_Length];
-} P256PrivateKey;
+    ECP256R1 = 0,
+};
 
-typedef struct P256PublicKey
+class ECPKey
 {
+public:
+    virtual SupportedECPKeyTypes Type() = 0;
+    virtual size_t Length() = 0;
+    virtual uint8_t * Value() = 0;
+};
+
+class P256PrivateKey : public ECPKey
+{
+public:
+    SupportedECPKeyTypes Type() override { return SupportedECPKeyTypes::ECP256R1; }
+    size_t Length() override { return kP256_PrivateKey_Length; }
+    uint8_t * Value() override { return bytes; }
+
+private:
+    uint8_t bytes[kP256_PrivateKey_Length];
+};
+
+class P256PublicKey : public ECPKey
+{
+public:
+    SupportedECPKeyTypes Type() override { return SupportedECPKeyTypes::ECP256R1; }
+    size_t Length() override { return kP256_PublicKey_Length; }
+    uint8_t * Value() override { return bytes; }
+
+private:
     uint8_t bytes[kP256_PublicKey_Length];
-} P256PublicKey;
+};
 
 /**
  * @brief A function that implements AES-CCM encryption
@@ -281,7 +306,7 @@ CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * 
  * @param privkey Generated private key
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR GenP256Keypair(P256PublicKey & pubkey, P256PrivateKey & privkey);
+CHIP_ERROR GenECPKeypair(ECPKey & pubkey, ECPKey & privkey);
 
 /**
  * The below class implements the draft 01 version of the Spake2+ protocol as
