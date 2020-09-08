@@ -120,11 +120,10 @@ template("efr32_sdk") {
       "MICRO=EMBER_MICRO_CORTEXM3_EFR32",
       "PLAT=EMBER_PLATFORM_CORTEXM3",
       "${efr32_mcu}",
-      "${efr32_family}",
       "${efr32_board}=1",
     ]
 
-    if (efr32_family == "EFR32MG12") {
+    if (efr32_family == "efr32mg12") {
       include_dirs += [
         "${efr32_sdk_root}/hardware/kit/EFR32MG12_${efr32_board}/config",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG12P/Include",
@@ -138,19 +137,19 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a",
         "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG12P/GCC/libmbedtls.a",
       ]
-    } else if (efr32_family == "EFR32MG21") {
+    } else if (efr32_family == "efr32mg21") {
       include_dirs += [
         "${efr32_sdk_root}/hardware/kit/EFR32MG21_${efr32_board}/config",
-        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG21/Include",
+        "${efr32_sdk_root}/platform/Device/SiliconLabs/efr32mg21/Include",
         "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/efr32xg2x",
         "${efr32_sdk_root}/util/third_party/freertos/Source/portable/GCC/ARM_CM3",
       ]
 
       libs += [
-        "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG21/GCC/libbluetooth.a",
+        "${efr32_sdk_root}/protocol/bluetooth/lib/efr32mg21/GCC/libbluetooth.a",
         "${efr32_sdk_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg21_gcc_release.a",
         "${efr32_sdk_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
-        "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG21/GCC/libmbedtls.a",
+        "${efr32_sdk_root}/protocol/bluetooth/lib/efr32mg21/GCC/libmbedtls.a",
       ]
 
       defines += ["EFR32_SERIES2_CONFIG1_MICRO",]
@@ -307,17 +306,17 @@ template("efr32_sdk") {
       }
     }
 
-    if (efr32_family == "EFR32MG12") {
+    if (efr32_family == "efr32mg12") {
       sources += [
         "${efr32_sdk_root}/hardware/kit/common/drivers/mx25flash_spi.c",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG12P/Source/GCC/startup_efr32mg12p.c",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG12P/Source/system_efr32mg12p.c",
         "${efr32_sdk_root}/util/third_party/freertos/Source/portable/GCC/ARM_CM4F/port.c",
       ]
-    } else if (efr32_family == "EFR32MG21") {
+    } else if (efr32_family == "efr32mg21") {
       sources += [
-        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG21/Source/GCC/startup_efr32mg21.c",
-        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG21/Source/system_efr32mg21.c",
+        "${efr32_sdk_root}/platform/Device/SiliconLabs/efr32mg21/Source/GCC/startup_efr32mg21.c",
+        "${efr32_sdk_root}/platform/Device/SiliconLabs/efr32mg21/Source/system_efr32mg21.c",
         "${efr32_sdk_root}/util/third_party/freertos/Source/portable/GCC/ARM_CM3/port.c",
       ]
     }

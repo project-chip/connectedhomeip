@@ -113,9 +113,9 @@ efr32_executable("lock_app") {
   }
   output_dir = root_out_dir
 
-  if (efr32_family == "EFR32MG12") {
+  if (efr32_family == "efr32mg12") {
     ldscript = "${efr32_project_dir}/ldscripts/efr32-lock-example-MG12P.ld"
-  } else if (efr32_family == "EFR32MG21") {
+  } else if (efr32_family == "efr32mg21") {
     ldscript = "${efr32_project_dir}/ldscripts/efr32-lock-example-MG21.ld"
   }
 

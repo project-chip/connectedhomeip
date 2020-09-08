@@ -55,13 +55,10 @@
 #define MBEDTLS_SHA256_C
 #define MBEDTLS_CIPHER_MODE_CTR
 
-#ifdef EFR32MG12
-
+#if (BRD4161A || BRD4163A || BRD4164A || BRD4166A || BRD4170A || BRD4304A)
 #define MBEDTLS_TRNG_C
 #define TRNG_PRESENT
-#endif // EFR32MG12
-
-#ifdef EFR32MG21
+#elif BRD4180A
 #define MBEDTLS_SHA1_ALT
 #define MBEDTLS_SHA1_PROCESS_ALT
 #define MBEDTLS_SHA256_ALT
@@ -82,7 +79,7 @@
 #define MBEDTLS_ECDSA_SIGN_ALT
 #define MBEDTLS_ECDSA_VERIFY_ALT
 #endif /* EFR32xG21B or curve25519 not enabled */
-#endif // EFR32MG21
+#endif // BOARD Selection
 
 /**
  * \def MBEDTLS_AES_ALT
