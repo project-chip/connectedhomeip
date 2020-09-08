@@ -216,8 +216,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 {
-    if ((pin_no != RESET_BUTTON) && (pin_no != LOCK_BUTTON) &&
-       (pin_no != JOIN_BUTTON))
+    if ((pin_no != RESET_BUTTON) && (pin_no != LOCK_BUTTON) && (pin_no != JOIN_BUTTON))
     {
         return;
     }
@@ -434,14 +433,14 @@ void AppTask::ThreadStart()
     networkInfo.ThreadNetworkKey[14] = 0xEE;
     networkInfo.ThreadNetworkKey[15] = 0xFF;
 
-    networkInfo.ThreadPANId = 0xabcd;
+    networkInfo.ThreadPANId   = 0xabcd;
     networkInfo.ThreadChannel = 15;
 
     networkInfo.FieldPresent.ThreadExtendedPANId = true;
-    networkInfo.FieldPresent.ThreadMeshPrefix = false;
-    networkInfo.FieldPresent.ThreadPSKc = false;
-    networkInfo.NetworkId              = 0;
-    networkInfo.FieldPresent.NetworkId = true;
+    networkInfo.FieldPresent.ThreadMeshPrefix    = false;
+    networkInfo.FieldPresent.ThreadPSKc          = false;
+    networkInfo.NetworkId                        = 0;
+    networkInfo.FieldPresent.NetworkId           = true;
 
     ThreadStackMgr().SetThreadEnabled(false);
     ThreadStackMgr().SetThreadProvision(networkInfo);

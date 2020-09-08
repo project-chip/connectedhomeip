@@ -40,7 +40,7 @@ using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging;
 
-extern "C" void *pvPortCalloc(size_t num, size_t size);
+extern "C" void * pvPortCalloc(size_t num, size_t size);
 
 #include <AppTask.h>
 
