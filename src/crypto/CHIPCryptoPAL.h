@@ -102,8 +102,8 @@ class ECPKey
 {
 public:
     virtual SupportedECPKeyTypes Type() = 0;
-    virtual size_t Length() = 0;
-    virtual uint8_t * Value() = 0;
+    virtual size_t Length()             = 0;
+    virtual uint8_t * Value()           = 0;
 };
 
 class P256PrivateKey : public ECPKey
