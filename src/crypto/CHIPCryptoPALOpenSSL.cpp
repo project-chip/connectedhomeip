@@ -809,7 +809,7 @@ ECName MapECName(SupportedECPKeyTypes keyType)
     }
 }
 
-CHIP_ERROR GenECPKeypair(ECPKey & pubkey, ECPKey & privkey)
+CHIP_ERROR NewECPKeypair(ECPKey & pubkey, ECPKey & privkey)
 {
     ERR_clear_error();
     CHIP_ERROR error = CHIP_NO_ERROR;

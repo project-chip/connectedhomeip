@@ -301,12 +301,12 @@ CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t 
 CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen, unsigned int iteration_count,
                          uint32_t key_length, uint8_t * output);
 
-/** @brief Generate a new keypair for ECP256 curve.
+/** @brief Generate a new ECP keypair.
  * @param pubkey Generated public key
  * @param privkey Generated private key
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR GenECPKeypair(ECPKey & pubkey, ECPKey & privkey);
+CHIP_ERROR NewECPKeypair(ECPKey & pubkey, ECPKey & privkey);
 
 /**
  * The below class implements the draft 01 version of the Spake2+ protocol as

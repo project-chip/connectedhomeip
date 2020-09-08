@@ -907,7 +907,7 @@ static void TestP256_Keygen(nlTestSuite * inSuite, void * inContext)
     P256PublicKey pubkey;
     P256PrivateKey privkey;
 
-    NL_TEST_ASSERT(inSuite, GenECPKeypair(pubkey, privkey) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, NewECPKeypair(pubkey, privkey) == CHIP_NO_ERROR);
 
     const char * msg         = "Test Message for Keygen";
     const uint8_t * test_msg = Uint8::from_const_char(msg);

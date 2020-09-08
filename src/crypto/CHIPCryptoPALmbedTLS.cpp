@@ -544,7 +544,7 @@ mbedtls_ecp_group_id MapECPGroupId(SupportedECPKeyTypes keyType)
     }
 }
 
-CHIP_ERROR GenECPKeypair(ECPKey & pubkey, ECPKey & privkey)
+CHIP_ERROR NewECPKeypair(ECPKey & pubkey, ECPKey & privkey)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
