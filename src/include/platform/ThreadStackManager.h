@@ -38,6 +38,8 @@ class DeviceNetworkInfo;
 class DeviceControlServer;
 class BLEManagerImpl;
 template <class>
+class GenericBLEManagerImpl_Zephyr;
+template <class>
 class GenericPlatformManagerImpl;
 template <class>
 class GenericConfigurationManagerImpl;
@@ -89,6 +91,8 @@ private:
     friend class ConfigurationManagerImpl;
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     friend class Internal::BLEManagerImpl;
+    template <class>
+    friend class Internal::GenericBLEManagerImpl_Zephyr;
 #endif
     friend class Internal::DeviceControlServer;
     template <class>
