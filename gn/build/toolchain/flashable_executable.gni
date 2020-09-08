@@ -59,6 +59,7 @@ template("gen_flashing_script") {
                            "flashing_script_name",
                            "flashing_options",
                            "deps",
+                           "data_deps",
                          ])
 
   action(target_name) {
@@ -134,7 +135,7 @@ template("flashable_executable") {
         "--application",
         rebase_path(image_name, "", root_out_dir),
       ]
-      deps = [ ":$image_target" ]
+      data_deps = [ ":$image_target" ]
     }
   }
 
