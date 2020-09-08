@@ -77,8 +77,9 @@ void initBoard(void)
 
 void initVcomEnable(void)
 {
-#warning                                                                                                                           \
-    "WARNING: This radio board uses the same GPIO pin to enable the VCOM port, the LCD display and the temperature sensor! Enabling any of these features might disrupt the serial pins of the EXP header!"
+
+// "WARNING: This radio board uses the same GPIO pin to enable the VCOM port, the LCD display and the temperature sensor! Enabling
+// any of these features might disrupt the serial pins of the EXP header!"
 #if defined(HAL_I2CSENSOR_ENABLE) || defined(HAL_SPIDISPLAY_ENABLE) || defined(HAL_VCOM_ENABLE)
 #if HAL_I2CSENSOR_ENABLE || HAL_SPIDISPLAY_ENABLE || HAL_VCOM_ENABLE
 #define COMMON_ENABLE 1
