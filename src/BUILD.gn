@@ -24,6 +24,10 @@ config("includes") {
   ]
 
   defines = [ "CHIP_SEPARATE_CONFIG_H=1" ]
+
+  if (current_os == "linux") {
+    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1" ]
+  }
 }
 
 if (chip_build_tests) {
