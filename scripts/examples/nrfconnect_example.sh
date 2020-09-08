@@ -16,8 +16,19 @@
 #    limitations under the License.
 #
 
+cd "$(dirname $0)/../../examples"
+
+APP="$1"
+
+if [[ ! -f "$APP/nrfconnect/CMakeLists.txt" ]]; then
+    echo "Usage: $0 <application>" >&2
+    echo "Applications:" >&2
+    ls */nrfconnect/CMakeLists.txt | awk -F/ '{print "  "$1}' >&2
+    exit 1
+fi
+
 set -x
 [[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh"
 env
 
-west build -b nrf52840dk_nrf52840 -d examples/shell/nrfconnect/build examples/shell/nrfconnect
+west build -b nrf52840dk_nrf52840 -d "$APP/nrfconnect/build" "$APP/nrfconnect"
