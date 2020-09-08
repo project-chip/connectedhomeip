@@ -10,7 +10,7 @@ board.
 -   [Introduction](#introduction)
 -   [Device UI](#device-ui) -
 -   [Building](#building)
-- [Flashing and debugging](#flashdebug)
+-   [Flashing and debugging](#flashdebug)
 
 <hr>
 
