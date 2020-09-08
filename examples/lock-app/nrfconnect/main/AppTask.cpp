@@ -17,10 +17,10 @@
  */
 
 #include "AppTask.h"
+#include "AppConfig.h"
 #include "BoltLockManager.h"
 #include "LEDWidget.h"
 #include "Server.h"
-#include "app_config.h"
 
 #include <platform/CHIPDeviceLayer.h>
 
