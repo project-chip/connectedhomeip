@@ -18,11 +18,19 @@ import("//${chip_root}/gn/chip/tests.gni")
 
 assert(current_os == "zephyr")
 
+declare_args() {
+  chip_build_libshell = false
+}
+
 group("dummy") {
 }
 
 group("nrfconnect") {
   deps = [ "${chip_root}/src/lib" ]
+
+  if (chip_build_libshell) {
+    deps += [ "${chip_root}/src/lib/shell" ]
+  }
 }
 
 group("default") {

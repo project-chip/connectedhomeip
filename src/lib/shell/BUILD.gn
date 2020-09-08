@@ -32,6 +32,10 @@ static_library("shell") {
     sources += [ "streamer_stdio.cpp" ]
   }
 
+  if (current_os == "zephyr") {
+    sources += [ "streamer_zephyr.cpp" ]
+  }
+
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",

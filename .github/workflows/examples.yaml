@@ -181,11 +181,15 @@ jobs:
                   submodules: true
             - name: Build example nRF Connect SDK Lock App
               run: scripts/examples/nrfconnect_lock_app.sh
+            - name: Build example nRF Connect SDK Shell
+              run: scripts/examples/nrfconnect_shell.sh
             - name: Copy aside build products
               run: |
-                  mkdir -p example_binaries/$BUILD_TYPE-build
-                  cp examples/lock-app/nrfconnect/build/zephyr/zephyr.elf       \
-                      example_binaries/$BUILD_TYPE-build/chip-nrf52840-lock-example.elf
+                  mkdir -p /tmp/output_binaries/$BUILD_TYPE-build
+                  cp examples/lock-app/nrfconnect/build/zephyr/zephyr.elf \
+                      /tmp/output_binaries/$BUILD_TYPE-build/chip-lock.elf
+                  cp examples/shell/nrfconnect/build/zephyr/zephyr.elf \
+                      /tmp/output_binaries/$BUILD_TYPE-build/chip-shell.elf
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
@@ -193,9 +197,6 @@ jobs:
                   cond: ${{ github.event.pull_request.number == '' }}
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
-            - name: Copy aside bloat report & binaries
-              run: |
-                  cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
             - name: Uploading Binaries
               uses: actions/upload-artifact@v1
               with:
