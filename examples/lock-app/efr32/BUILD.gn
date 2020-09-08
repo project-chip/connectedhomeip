@@ -107,7 +107,7 @@ efr32_executable("lock_app") {
   ]
 
   if (show_qr_code) {
-    sources += [ "src/display/lcd.c", ]
+    sources += [ "src/display/lcd.c" ]
 
     defines += [ "DISPLAY_ENABLED" ]
   }
