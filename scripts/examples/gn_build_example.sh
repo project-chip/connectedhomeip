@@ -24,23 +24,25 @@ source "$CHIP_ROOT/scripts/activate.sh"
 
 GN_ARGS=()
 
-EXAMPLE_DIR=$1; shift
-OUTPUT_DIR=$1; shift
+EXAMPLE_DIR=$1
+shift
+OUTPUT_DIR=$1
+shift
 
 NINJA_VERBOSE=
 for arg; do
-        case $arg in
-                -v)
-                        NINJA_VERBOSE=-v
-                        ;;
-                *=*)
-                        GN_ARGS+=("$arg")
-                        ;;
-                *)
-                        echo >&2 "invalid argument: $arg"
-                        exit 2
-                        ;;
-        esac
+    case $arg in
+        -v)
+            NINJA_VERBOSE=-v
+            ;;
+        *=*)
+            GN_ARGS+=("$arg")
+            ;;
+        *)
+            echo >&2 "invalid argument: $arg"
+            exit 2
+            ;;
+    esac
 done
 
 set -e
