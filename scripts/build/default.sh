@@ -18,9 +18,13 @@
 
 CHIP_ROOT="$(dirname "$0")/../.."
 
+set -x
+
 PW_ENVSETUP_QUIET=1 source "$CHIP_ROOT/scripts/activate.sh"
 
 set -e
+
+env
 
 gn gen out/default
 

@@ -16,6 +16,6 @@
 # limitations under the License.
 #
 
-set -e
+set -ex
 
 rm -rf out/

@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-set -e
+set -x
 
 git clean -Xdf
 
