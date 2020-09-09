@@ -166,7 +166,7 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
     // Let the application know that a log message has been emitted.
     DeviceLayer::OnLogOutput();
 
-#endif // NRF_LOG_ENABLED
+#endif // K32W_LOG_ENABLED
 }
 
 } // namespace Logging
@@ -203,7 +203,7 @@ extern "C" void LwIPLog(const char * msg, ...)
     // Let the application know that a log message has been emitted.
     DeviceLayer::OnLogOutput();
 
-#endif // NRF_LOG_ENABLED
+#endif // K32W_LOG_ENABLED
 
     va_end(v);
 }
@@ -240,7 +240,7 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
 
     // Let the application know that a log message has been emitted.
     DeviceLayer::OnLogOutput();
-#endif // NRF_LOG_ENABLED
+#endif // K32W_LOG_ENABLED
 
     va_end(v);
 }

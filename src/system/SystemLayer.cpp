@@ -153,7 +153,8 @@ Error Layer::Shutdown()
     SuccessOrExit(lReturn);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    mWakeEvent.Close();
+    lReturn = mWakeEvent.Close();
+    SuccessOrExit(lReturn);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
     for (size_t i = 0; i < Timer::sPool.Size(); ++i)
@@ -653,6 +654,7 @@ void Layer::PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet,
 void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteSet, fd_set * aExceptionSet)
 {
     pthread_t lThreadSelf;
+    Error lReturn;
 
     if (this->State() != kLayerState_Initialized)
         return;
@@ -668,7 +670,13 @@ void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteS
     {
         // If we woke because of someone writing to the wake event, clear the event before returning.
         if (FD_ISSET(this->mWakeEvent.GetNotifFD(), aReadSet))
-            this->mWakeEvent.Confirm();
+        {
+            lReturn = this->mWakeEvent.Confirm();
+            if (lReturn != CHIP_SYSTEM_NO_ERROR)
+            {
+                ChipLogError(chipSystemLayer, "System wake event confirm failed: %s", ErrorStr(lReturn));
+            }
+        }
     }
 
     const Timer::Epoch kCurrentEpoch = Timer::GetCurrentEpoch();
@@ -706,6 +714,8 @@ void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteS
  */
 void Layer::WakeSelect()
 {
+    Error lReturn;
+
     if (this->State() != kLayerState_Initialized)
         return;
 
@@ -717,7 +727,11 @@ void Layer::WakeSelect()
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
     // Send notification to wake up the select call.
-    this->mWakeEvent.Notify();
+    lReturn = this->mWakeEvent.Notify();
+    if (lReturn != CHIP_SYSTEM_NO_ERROR)
+    {
+        ChipLogError(chipSystemLayer, "System wake event notify failed: %s", ErrorStr(lReturn));
+    }
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK

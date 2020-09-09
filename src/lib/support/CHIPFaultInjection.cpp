@@ -38,11 +38,8 @@ static class nl::FaultInjection::Manager sChipFaultInMgr;
 static const nl::FaultInjection::Name sManagerName  = "chip";
 static const nl::FaultInjection::Name sFaultNames[] = {
     "AllocExchangeContext", "DropIncomingUDPMsg",   "DropOutgoingUDPMsg", "AllocBinding", "SendAlarm",
-    "HandleAlarm",          "FuzzExchangeHeaderTx",
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
-    "WRMDoubleTx",          "WRMSendError",
-#endif // WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
-    "BDXBadBlockCounter",   "BDXAllocTransfer",     "CASEKeyConfirm",     "SecMgrBusy",
+    "HandleAlarm",          "FuzzExchangeHeaderTx", "RMPDoubleTx",        "RMPSendError", "BDXBadBlockCounter",
+    "BDXAllocTransfer",     "CASEKeyConfirm",       "SecMgrBusy",
 #if CONFIG_NETWORK_LAYER_BLE
     "CHIPOBLESend",
 #endif // CONFIG_NETWORK_LAYER_BLE

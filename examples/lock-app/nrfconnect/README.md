@@ -9,6 +9,8 @@ An example application showing the use
     -   [Introduction](#introduction)
     -   [Device UI](#device-ui)
     -   [Building](#building)
+        -   [Using Docker container](#using-docker-container)
+        -   [Using Native Shell](#using-native-shell)
     -   [Configuring the example](#configuring-the-example)
     -   [Flashing and debugging](#flashing-and-debugging)
     -   [Accessing the command line](#accessing-the-command-line)
@@ -20,7 +22,7 @@ An example application showing the use
 
 ## Introduction
 
-![nrf52840 DK](doc/images/nrf52840-dk.jpg)
+![nrf52840 DK](../../platform/nrf528xx/doc/images/nrf52840-dk.jpg)
 
 The nRF52840 lock example application provides a working demonstration of a
 connected door lock device, built using CHIP, and the Nordic nRF Connect. The
@@ -91,6 +93,52 @@ The remaining two LEDs (#3 and #4) and button #4 are unused.
 
 ## Building
 
+### Using Docker container
+
+The easiest way to get started with the example is to use nRF Connect SDK Docker
+image for CHIP applications. Run the following commands to start a Docker
+container:
+
+        $ mkdir ~/nrfconnect
+        $ mkdir ~/connectedhomeip
+        $ docker run --rm -it --privileged -v /dev:/dev -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip nordicsemi/nrfconnect-chip
+
+> **Note**:
+>
+> -   `~/nrfconnect` can be replaced with an absolute path to nRF Connect SDK
+>     source directory in case you have it already installed.
+> -   Likewise, `~/connectedhomeip` can be replaced with an absolute path to
+>     CHIP source directory.
+> -   `-privileged -v /dev:/dev` parameters can be omitted if you're not
+>     planning to flash the example onto hardware. The parameter gives the
+>     container full access to devices on your system.
+> -   `--rm` flag can be omitted if you don't want the container to be
+>     auto-removed when you exit the container shell session.
+
+If you use the container for the first time and you don't have nRF Connect SDK
+and CHIP sources downloaded yet, run `setup` command in the container to pull
+the sources into directories mounted as `/var/ncs` and `/var/chip`,
+respectively:
+
+        $ setup
+        /var/ncs repository is empty. Do you wish to check out nRF Connect SDK sources [master]? [Y/N] y
+        ...
+        /var/chip repository is empty. Do you wish to check out Project CHIP sources [master]? [Y/N] y
+        ...
+
+Now you may build the example by running the commands below in the Docker
+container:
+
+        $ cd /var/chip/examples/lock-app/nrfconnect
+        $ west build -b nrf52840dk_nrf52840
+
+If the build succeeds, the binary will be available under
+`/var/chip/examples/lock-app/nrfconnect/build/zephyr/zephyr.hex`. Note that
+other operations described in this document like flashing or debugging can also
+be done in the container.
+
+### Using native shell
+
 Before building the example,
 [download the nRF Connect SDK and install all requirements](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html).
 
@@ -100,11 +148,15 @@ installing and configuring it.
 Download and install the
 [nRF Command Line Tools](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Command-Line-Tools).
 
+Download and install [GN meta-build system](https://gn.googlesource.com/gn/).
+
 Make sure that you source the following file:
 
         $ source <ncs-dir>/zephyr/zephyr-env.sh
 
-> **Note:** Ensure that `$ZEPHYR_BASE`, `$GNUARMEMB_TOOLCHAIN_PATH`, and
+> **Note:**
+>
+> Ensure that `$ZEPHYR_BASE`, `$GNUARMEMB_TOOLCHAIN_PATH`, and
 > `$ZEPHYR_TOOLCHAIN_VARIANT` environment variables are set in your current
 > terminal before building. `$GNUARMEMB_TOOLCHAIN_PATH` and
 > `$ZEPHYR_TOOLCHAIN_VARIANT` must be set manually.
@@ -115,8 +167,6 @@ recommended tool for building and flashing the device is
 
 The following commands will build the `lock-app` example:
 
-        $ cd ~/connectedhomeip
-        $ ./bootstrap
         $ cd ~/connectedhomeip/examples/lock-app/nrfconnect
 
         # If this is a first time build or if `build` directory was deleted
@@ -129,6 +179,13 @@ After a successful build, the binary will be available under
 `<example-dir>/build/zephyr/zephyr.hex`
 
 <a name="configuring"></a>
+
+### Troubleshooting
+
+If the example fails to build on your system make sure that you use a recent
+version of nRF Connect SDK. Please refer to
+[this section](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html#updating-the-repositories)
+in the user guide to learn how to update nRF Connect SDK repository.
 
 ## Configuring the example
 

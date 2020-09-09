@@ -419,7 +419,7 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
     else if (emberAfNetworkIndexFromEndpointIndex(index) != cmd->networkIndex)
     {
         emberAfDebugPrint("Drop cluster 0x%2x command 0x%x", cmd->apsFrame->clusterId, cmd->commandId);
-        emberAfDebugPrint(" for endpoint 0x%x due to wrong %p: ", cmd->apsFrame->destinationEndpoint, "network");
+        emberAfDebugPrint(" for endpoint 0x%x due to wrong %s: ", cmd->apsFrame->destinationEndpoint, "network");
         emberAfDebugPrintln("%d", cmd->networkIndex);
         return false;
     }
@@ -428,16 +428,16 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
               (EMBER_MAXIMUM_STANDARD_PROFILE_ID < emberAfProfileIdFromIndex(index))))
     {
         emberAfDebugPrint("Drop cluster 0x%2x command 0x%x", cmd->apsFrame->clusterId, cmd->commandId);
-        emberAfDebugPrint(" for endpoint 0x%x due to wrong %p: ", cmd->apsFrame->destinationEndpoint, "profile");
-        emberAfDebugPrintln("0x%2x", cmd->apsFrame->profileId);
+        emberAfDebugPrint(" for endpoint 0x%x due to wrong %s: ", cmd->apsFrame->destinationEndpoint, "profile");
+        emberAfDebugPrintln("0x%02x", cmd->apsFrame->profileId);
         return false;
     }
     else if ((cmd->type == EMBER_INCOMING_MULTICAST || cmd->type == EMBER_INCOMING_MULTICAST_LOOPBACK) &&
              !emberAfGroupsClusterEndpointInGroupCallback(cmd->apsFrame->destinationEndpoint, cmd->apsFrame->groupId))
     {
         emberAfDebugPrint("Drop cluster 0x%2x command 0x%x", cmd->apsFrame->clusterId, cmd->commandId);
-        emberAfDebugPrint(" for endpoint 0x%x due to wrong %p: ", cmd->apsFrame->destinationEndpoint, "group");
-        emberAfDebugPrintln("0x%2x", cmd->apsFrame->groupId);
+        emberAfDebugPrint(" for endpoint 0x%x due to wrong %s: ", cmd->apsFrame->destinationEndpoint, "group");
+        emberAfDebugPrintln("0x%02x", cmd->apsFrame->groupId);
         return false;
     }
     else
@@ -1277,19 +1277,6 @@ uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, co
     return charsToWrite;
 }
 
-uint32_t emberAfGetBufferCrc(uint8_t * pbuffer, uint16_t length, uint32_t initialValue)
-{
-    uint16_t i;
-    uint32_t crc32 = initialValue;
-    for (i = 0; i < length; i++)
-    {
-        // Crash so we don't reach this code by accident.
-        *(int *) 0 = 5;
-        // crc32 = halCommonCrc32(pbuffer[i], crc32);
-    }
-    return crc32;
-}
-
 /*
    On each page, first channel maps to channel number zero and so on.
    Example:
@@ -1399,4 +1386,20 @@ uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel)
         // as case 0 to make MISRA happy.
         return channel | ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_0;
     }
+}
+
+EmberStatus emberAfScheduleServerTick(uint8_t endpoint, EmberAfClusterId clusterId, uint32_t delayMs)
+{
+    return EMBER_SUCCESS; // Stub for now.
+}
+
+EmberStatus emberAfScheduleServerTickExtended(uint8_t endpoint, EmberAfClusterId clusterId, uint32_t delayMs,
+                                              EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl)
+{
+    return EMBER_SUCCESS; // Stub for now.
+}
+
+EmberStatus emberAfDeactivateServerTick(uint8_t endpoint, EmberAfClusterId clusterId)
+{
+    return EMBER_SUCCESS; // Stub for now.
 }

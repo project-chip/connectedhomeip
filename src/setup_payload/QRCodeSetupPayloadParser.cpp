@@ -34,7 +34,7 @@
 #include <core/CHIPError.h>
 #include <core/CHIPTLVData.hpp>
 #include <core/CHIPTLVUtilities.hpp>
-#include <profiles/CHIPProfiles.h>
+#include <protocols/CHIPProtocols.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 
@@ -261,7 +261,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::parseTLVFields(SetupPayload & outPayload, u
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLVReader rootReader;
     rootReader.Init(tlvDataStart, tlvDataLengthInBytes);
-    rootReader.ImplicitProfileId = chip::Profiles::kChipProfile_ServiceProvisioning;
+    rootReader.ImplicitProfileId = chip::Protocols::kChipProtocol_ServiceProvisioning;
     err                          = rootReader.Next();
     SuccessOrExit(err);
 

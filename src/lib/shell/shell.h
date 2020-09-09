@@ -33,7 +33,7 @@
 #endif // CHIP_SHELL_PROMPT
 
 #ifndef CHIP_SHELL_MAX_MODULES
-#define CHIP_SHELL_MAX_MODULES 4
+#define CHIP_SHELL_MAX_MODULES 10
 #endif // CHIP_SHELL_MAX_MODULES
 
 #ifndef CHIP_SHELL_MAX_LINE_SIZE
@@ -46,9 +46,6 @@
 
 namespace chip {
 namespace Shell {
-
-/// Counts number of elements inside the array
-#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 /**
  * Callback to execute an individual shell command.

@@ -27,10 +27,10 @@
 #ifndef CHIPSECURITYMANAGER_H_
 #define CHIPSECURITYMANAGER_H_
 
-#include <Profiles/common/CHIPMessage.h>
-#include <Profiles/status-report/StatusReportProfile.h>
 #include <core/CHIPError.h>
 #include <message/CHIPExchangeMgr.h>
+#include <protocols/common/CHIPMessage.h>
+#include <protocols/status-report/StatusReportProtocol.h>
 #include <support/DLLUtil.h>
 
 /**
@@ -76,7 +76,7 @@ extern void OnTimeConsumingCryptoDone(void);
 } // namespace Security
 } // namespace Platform
 
-using chip::Profiles::StatusReporting::StatusReport;
+using chip::Protocols::StatusReporting::StatusReport;
 
 class DLL_EXPORT ChipSecurityManager
 {
@@ -209,11 +209,8 @@ private:
     void HandleSessionError(CHIP_ERROR err, PacketBuffer * statusReportMsgBuf);
     static void HandleConnectionClosed(ExchangeContext * ec, ChipConnection * con, CHIP_ERROR conErr);
     static CHIP_ERROR SendStatusReport(CHIP_ERROR localError, ExchangeContext * ec);
-
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     static void RMPHandleAckRcvd(ExchangeContext * ec, void * msgCtxt);
     static void RMPHandleSendError(ExchangeContext * ec, CHIP_ERROR err, void * msgCtxt);
-#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
     void Reset(void);
 

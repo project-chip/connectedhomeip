@@ -209,9 +209,6 @@ void Shell::TaskLoop(void * arg)
     char * argv[CHIP_SHELL_MAX_TOKENS];
     char line[CHIP_SHELL_MAX_LINE_SIZE];
 
-    // Initialize the default streamer that was linked.
-    streamer_init(streamer_get());
-
     theShellRoot.RegisterDefaultCommands();
 
     while (1)

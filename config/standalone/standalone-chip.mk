@@ -98,7 +98,6 @@ CHIP_CONFIGURE_OPTIONS = \
     --with-network-layer=all \
     --with-target-network=sockets \
     --with-inet-endpoint="tcp udp" \
-    --with-device-layer=linux \
     --disable-tests \
     --disable-tools \
     --disable-docs \

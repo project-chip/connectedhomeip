@@ -130,6 +130,10 @@ public:
      * @brief whether the input fit in the buffer
      */
     bool Fit() { return mLen >= mWritten; }
+    /*
+     * @brief Size of the buffer
+     */
+    size_t Size() { return mLen; }
 };
 
 } // namespace chip

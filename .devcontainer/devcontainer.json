@@ -1,6 +1,11 @@
 {
     "name": "CHIP Ubuntu Development Environment",
-    "runArgs": ["--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined"],
+    "runArgs": [
+        "--cap-add=SYS_PTRACE",
+        "--security-opt",
+        "seccomp=unconfined",
+        "--network=host"
+    ],
     "mounts": [
         "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
     ],
@@ -8,7 +13,7 @@
         "dockerfile": "Dockerfile",
         "args": {
             //  "BUILD_VERSION": "$(cat integrations/docker/images/chip-build/version)" // trying to get this to work
-            "BUILD_VERSION": "0.4.0"
+            "BUILD_VERSION": "0.4.2"
         }
     },
     "remoteUser": "vscode",

@@ -454,7 +454,6 @@
 					"CHIP_DEVICE_LAYER_TARGET_LINUX=0",
 					"CHIP_DEVICE_LAYER_TARGET_NRF5=0",
 					"CHIP_DEVICE_LAYER_TARGET_EFR32=0",
-					CHIP_CRYPTO_MBEDTLS,
 					"CHIP_SYSTEM_CONFIG_USE_SOCKETS=1",
 					"$(inherited)",
 				);
@@ -464,7 +463,6 @@
 					"$(CHIP_ROOT)/src/lib",
 					"$(CHIP_ROOT)/config/standalone",
 					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
-					"$(CHIP_ROOT)/third_party/mbedtls/repo/include",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -513,7 +511,6 @@
 					"CHIP_DEVICE_LAYER_TARGET_LINUX=0",
 					"CHIP_DEVICE_LAYER_TARGET_NRF5=0",
 					"CHIP_DEVICE_LAYER_TARGET_EFR32=0",
-					CHIP_CRYPTO_MBEDTLS,
 					"CHIP_SYSTEM_CONFIG_USE_SOCKETS=1",
 					"$(inherited)",
 				);
@@ -524,7 +521,6 @@
 					"$(CHIP_ROOT)/src/app",
 					"$(CHIP_ROOT)/config/standalone",
 					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
-					"$(CHIP_ROOT)/third_party/mbedtls/repo/include",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -669,7 +665,6 @@
 					"CHIP_DEVICE_LAYER_TARGET_LINUX=0",
 					"CHIP_DEVICE_LAYER_TARGET_NRF5=0",
 					"CHIP_DEVICE_LAYER_TARGET_EFR32=0",
-					CHIP_CRYPTO_MBEDTLS,
 					"CHIP_SYSTEM_CONFIG_USE_SOCKETS=1",
 					"$(inherited)",
 				);
@@ -680,7 +675,6 @@
 					"$(CHIP_ROOT)/src/app",
 					"$(CHIP_ROOT)/config/ios",
 					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
-					"$(CHIP_ROOT)/third_party/mbedtls/repo/include",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -806,7 +800,6 @@
 					"CHIP_DEVICE_LAYER_TARGET_LINUX=0",
 					"CHIP_DEVICE_LAYER_TARGET_NRF5=0",
 					"CHIP_DEVICE_LAYER_TARGET_EFR32=0",
-					CHIP_CRYPTO_MBEDTLS,
 					"CHIP_SYSTEM_CONFIG_USE_SOCKETS=1",
 					"$(inherited)",
 				);
@@ -817,7 +810,6 @@
 					"$(CHIP_ROOT)/src/app",
 					"$(CHIP_ROOT)/config/ios",
 					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
-					"$(CHIP_ROOT)/third_party/mbedtls/repo/include",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";

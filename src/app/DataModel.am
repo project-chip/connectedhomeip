@@ -25,6 +25,6 @@
 #
 
 CHIP_BUILD_DATA_MODEL_SOURCE_FILES                    = \
-    @top_builddir@/src/app/encoder.c                    \
-    @top_builddir@/src/app/decoder.c                    \
+    @top_builddir@/src/app/encoder.cpp                    \
+    @top_builddir@/src/app/decoder.cpp                    \
     $(NULL)

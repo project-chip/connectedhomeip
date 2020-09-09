@@ -39,9 +39,76 @@
 // will be used in the case where user defined implementations
 // of the callbacks have not been provided.
 #include "af.h"
+#include "callback.h"
+
 #include <assert.h>
 //#include "hal/hal.h"
 //#include EMBER_AF_API_NETWORK_STEERING
+
+/** @brief On/off Cluster Server Post Init
+ *
+ * Following resolution of the On/Off state at startup for this endpoint,
+ * perform any additional initialization needed; e.g., synchronize hardware
+ * state.
+ *
+ * @param endpoint Endpoint that is being initialized  Ver.: always
+ */
+void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint) {}
+
+/** @brief Level Control Cluster Server Post Init
+ *
+ * Following resolution of the Current Level at startup for this endpoint,
+ * perform any additional initialization needed; e.g., synchronize hardware
+ * state.
+ *
+ * @param endpoint Endpoint that is being initialized  Ver.: always
+ */
+void emberAfPluginLevelControlClusterServerPostInitCallback(uint8_t endpoint) {}
+
+/** @brief Get Group Name
+ *
+ * This function returns the name of a group with the provided group ID, should
+ * it exist.
+ *
+ * @param endpoint Endpoint Ver.: always
+ * @param groupId Group ID Ver.: always
+ * @param groupName Group Name Ver.: always
+ */
+void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
+
+/** @brief Group Names Supported
+ *
+ * This function is called by the framework when it is necessary to determine
+ * whether or not group names are supported.
+ *
+ * @param endpoint The endpoint. Ver.: always
+ */
+bool emberAfPluginGroupsServerGroupNamesSupportedCallback(uint8_t endpoint)
+{
+    return false;
+}
+
+/** @brief Set Group Name
+ *
+ * This function sets the name of a group with the provided group ID.
+ *
+ * @param endpoint Endpoint Ver.: always
+ * @param groupId Group ID Ver.: always
+ * @param groupName Group Name Ver.: always
+ */
+void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
+
+/** @brief Basic Cluster Reset To Factory Defaults
+ *
+ * This function is called by the Basic server plugin when a request to
+ * reset to factory defaults is received. The plugin will reset attributes
+ * managed by the framework to their default values.
+ * The application should perform any other necessary reset-related operations
+ * in this callback, including resetting any externally-stored attributes.
+ *
+ * @param endpoint Endpoint that is being initialized  Ver.: always
+ */
+void emberAfPluginBasicResetToFactoryDefaultsCallback(uint8_t endpoint) {}
 
 /** @brief Add To Current App Tasks
  *
@@ -128,15 +195,6 @@ bool emberAfAttributeWriteAccessCallback(uint8_t endpoint, EmberAfClusterId clus
     return true;
 }
 
-/** @brief Groups Cluster Clear Group Table
- *
- * This function is called by the framework when the application should clear
- * the group table.
- *
- * @param endpoint The endpoint.  Ver.: always
- */
-void emberAfGroupsClusterClearGroupTableCallback(uint8_t endpoint) {}
-
 /** @brief Clear Report Table
  *
  * This function is called by the framework when the application should clear
@@ -147,15 +205,6 @@ EmberStatus emberAfClearReportTableCallback(void)
 {
     return EMBER_LIBRARY_NOT_PRESENT;
 }
-
-/** @brief Scenes Cluster ClearSceneTable
- *
- * This function is called by the framework when the application should clear
- * the scene table.
- *
- * @param endpoint The endpoint.  Ver.: always
- */
-void emberAfScenesClusterClearSceneTableCallback(uint8_t endpoint) {}
 
 /** @brief Key Establishment Cluster Client Command Received
  *
@@ -340,20 +389,6 @@ void emberAfEepromNoteInitializedStateCallback(bool state) {}
  *
  */
 void emberAfEepromShutdownCallback(void) {}
-
-/** @brief Groups Cluster Endpoint In Group
- *
- * This function is called by the framework when it needs to determine if an
- * endpoint is a member of a group.  The application should return true if the
- * endpoint is a member of the group and false otherwise.
- *
- * @param endpoint The endpoint.  Ver.: always
- * @param groupId The group identifier.  Ver.: always
- */
-bool emberAfGroupsClusterEndpointInGroupCallback(uint8_t endpoint, uint16_t groupId)
-{
-    return false;
-}
 
 /** @brief External Attribute Read
  *
@@ -896,17 +931,6 @@ bool emberAfKeyEstablishmentCallback(EmberAfKeyEstablishmentNotifyMessage status
     return true;
 }
 
-/** @brief On/off Cluster Level Control Effect
- *
- * This is called by the framework when the on/off cluster initiates a command
- * that must effect a level control change. The implementation assumes that the
- * client will handle any effect on the On/Off Cluster.
- *
- * @param endpoint   Ver.: always
- * @param newValue   Ver.: always
- */
-void emberAfOnOffClusterLevelControlEffectCallback(uint8_t endpoint, bool newValue) {}
-
 /** @brief Main Init
  *
  * This function is called from the application's main function. It gives the
@@ -960,18 +984,6 @@ bool emberAfMainStartCallback(int * returnCode, int argc, char ** argv)
  *
  */
 void emberAfMainTickCallback(void) {}
-
-/** @brief Scenes Cluster Make Invalid
- *
- * This function is called to invalidate the valid attribute in the Scenes
- * cluster.
- *
- * @param endpoint   Ver.: always
- */
-EmberAfStatus emberAfScenesClusterMakeInvalidCallback(uint8_t endpoint)
-{
-    return EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND;
-}
 
 /** @brief Mark Buffers
  *
@@ -1099,7 +1111,8 @@ EmberAfImageVerifyStatus emberAfOtaClientCustomVerifyCallback(bool newVerificati
     // 2) EMBER_AF_IMAGE_BAD  - the image is not valid
     // 3) EMBER_AF_IMAGE_VERIFY_IN_PROGRESS - the image is valid so far, but more
     //      checks are needed.  This callback shall be re-executed later to
-    //      continue verification.  This allows other code in the framework to run.
+    //      continue verification.  This allows other code in the framework to
+    //      run.
     return EMBER_AF_IMAGE_GOOD;
 }
 
@@ -1290,10 +1303,11 @@ bool emberAfOtaServerIncomingMessageRawCallback(EmberAfClusterCommand * message)
 uint8_t emberAfOtaServerQueryCallback(const EmberAfOtaImageId * currentImageId, uint16_t * hardwareVersion,
                                       EmberAfOtaImageId * nextUpgradeImageId)
 {
-    // If a new software image is available, this function should return EMBER_ZCL_STATUS_SUCCESS
-    // and populate the 'nextUpgradeImageId' structure with the appropriate values.
-    // If no new software image is available (i.e. the client should not download a firmware image)
-    // then the server should return EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE.
+    // If a new software image is available, this function should return
+    // EMBER_ZCL_STATUS_SUCCESS and populate the 'nextUpgradeImageId' structure
+    // with the appropriate values. If no new software image is available (i.e.
+    // the client should not download a firmware image) then the server should
+    // return EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE.
     return EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE;
 }
 
@@ -1382,7 +1396,8 @@ bool emberAfOtaServerUpgradeEndRequestCallback(EmberNodeId source, uint8_t statu
 EmberAfOtaStorageStatus emberAfOtaStorageCheckTempDataCallback(uint32_t * currentOffset, uint32_t * totalImageSize,
                                                                EmberAfOtaImageId * newFileInfo)
 {
-    // If the image data cannot be successfully verified, an error should be returned.
+    // If the image data cannot be successfully verified, an error should be
+    // returned.
     return EMBER_AF_OTA_STORAGE_ERROR;
 }
 
@@ -1419,8 +1434,8 @@ void emberAfOtaStorageCloseCallback(void)
  */
 void emberAfOtaStorageDriverDownloadFinishCallback(uint32_t offset)
 {
-    // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
-    // Please implement me.
+    // The storage driver and the rest of the OTA bootload code will not function
+    // correctly unless it is implemnted. Please implement me.
     assert(false);
 }
 
@@ -1431,8 +1446,8 @@ void emberAfOtaStorageDriverDownloadFinishCallback(uint32_t offset)
  */
 bool emberAfOtaStorageDriverInitCallback(void)
 {
-    // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
-    // Please implement me.
+    // The storage driver and the rest of the OTA bootload code will not function
+    // correctly unless it is implemnted. Please implement me.
     assert(false);
     return false;
 }
@@ -1446,8 +1461,8 @@ bool emberAfOtaStorageDriverInitCallback(void)
  */
 EmberAfOtaStorageStatus emberAfOtaStorageDriverInvalidateImageCallback(void)
 {
-    // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
-    // Please implement me.
+    // The storage driver and the rest of the OTA bootload code will not function
+    // correctly unless it is implemnted. Please implement me.
     assert(false);
     return EMBER_AF_OTA_STORAGE_ERROR;
 }
@@ -1479,8 +1494,8 @@ EmberAfOtaStorageStatus emberAfOtaStorageDriverPrepareToResumeDownloadCallback(v
  */
 bool emberAfOtaStorageDriverReadCallback(uint32_t offset, uint32_t length, uint8_t * returnData)
 {
-    // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
-    // Please implement me.
+    // The storage driver and the rest of the OTA bootload code will not function
+    // correctly unless it is implemnted. Please implement me.
     assert(false);
     return false;
 }
@@ -1494,8 +1509,8 @@ bool emberAfOtaStorageDriverReadCallback(uint32_t offset, uint32_t length, uint8
  */
 uint32_t emberAfOtaStorageDriverRetrieveLastStoredOffsetCallback(void)
 {
-    // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
-    // Please implement me.
+    // The storage driver and the rest of the OTA bootload code will not function
+    // correctly unless it is implemnted. Please implement me.
     assert(false);
     return 0;
 }
@@ -1514,8 +1529,8 @@ uint32_t emberAfOtaStorageDriverRetrieveLastStoredOffsetCallback(void)
  */
 bool emberAfOtaStorageDriverWriteCallback(const uint8_t * dataToWrite, uint32_t offset, uint32_t length)
 {
-    // The storage driver and the rest of the OTA bootload code will not function correctly unless it is implemnted.
-    // Please implement me.
+    // The storage driver and the rest of the OTA bootload code will not function
+    // correctly unless it is implemnted. Please implement me.
     assert(false);
     return false;
 }
@@ -1592,10 +1607,11 @@ EmberAfOtaStorageStatus emberAfOtaStorageInitCallback(void)
  */
 EmberAfOtaImageId emberAfOtaStorageIteratorFirstCallback(void)
 {
-    // It is expected that the storage module maintain its own internal iterator that the 'first' and 'next' functions will
-    // manipulate.
+    // It is expected that the storage module maintain its own internal iterator
+    // that the 'first' and 'next' functions will manipulate.
 
-    // If there are no images at all, this function should return the invalid image id.
+    // If there are no images at all, this function should return the invalid
+    // image id.
     return emberAfInvalidImageId;
 }
 
@@ -1608,10 +1624,11 @@ EmberAfOtaImageId emberAfOtaStorageIteratorFirstCallback(void)
  */
 EmberAfOtaImageId emberAfOtaStorageIteratorNextCallback(void)
 {
-    // It is expected that the storage module maintain its own internal iterator that the 'first' and 'next' functions will
-    // manipulate.
+    // It is expected that the storage module maintain its own internal iterator
+    // that the 'first' and 'next' functions will manipulate.
 
-    // If there are no more images, this function should return the invalid image id.
+    // If there are no more images, this function should return the invalid image
+    // id.
     return emberAfInvalidImageId;
 }
 
@@ -1658,7 +1675,8 @@ EmberAfOtaStorageStatus emberAfOtaStorageReadImageDataCallback(const EmberAfOtaI
  */
 EmberAfOtaImageId emberAfOtaStorageSearchCallback(uint16_t manufacturerId, uint16_t imageTypeId, const uint16_t * hardwareVersion)
 {
-    // If no image is found that matches the search criteria, this function should return the invalid image id.
+    // If no image is found that matches the search criteria, this function should
+    // return the invalid image id.
     return emberAfInvalidImageId;
 }
 
@@ -1752,9 +1770,9 @@ bool emberAfPerformingKeyEstablishmentCallback(void)
 
 /** @brief Get Distributed Key
  *
- * This callback is fired when the Network Steering plugin needs to set the distributed
- * key. The application set the distributed key from Zigbee Alliance thru this callback
- * or the network steering will use the default test key.
+ * This callback is fired when the Network Steering plugin needs to set the
+ * distributed key. The application set the distributed key from Zigbee Alliance
+ * thru this callback or the network steering will use the default test key.
  *
  * @param pointer to the distributed key struct
  * @return true if the key is loaded successfully, otherwise false.
@@ -2014,20 +2032,6 @@ bool emberAfReadReportingConfigurationResponseCallback(EmberAfClusterId clusterI
     return false;
 }
 
-/** @brief Scenes Cluster Recall Saved Scene
- *
- * This function is called by the framework when the application should recall a
- * saved scene.
- *
- * @param endpoint The endpoint.  Ver.: always
- * @param groupId The group identifier.  Ver.: always
- * @param sceneId The scene identifier.  Ver.: always
- */
-EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(uint8_t endpoint, uint16_t groupId, uint8_t sceneId)
-{
-    return EMBER_ZCL_STATUS_FAILURE;
-}
-
 /** @brief Registration Abort
  *
  * This callback is called when the device should abort the registration
@@ -2100,15 +2104,6 @@ EmberStatus emberAfRemoteSetBindingPermissionCallback(const EmberBindingTableEnt
  * @param tasks   Ver.: always
  */
 void emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
-
-/** @brief Scenes Cluster Remove Scenes In Group
- *
- * This function removes the scenes from a specified group.
- *
- * @param endpoint Endpoint  Ver.: always
- * @param groupId Group ID  Ver.: always
- */
-void emberAfScenesClusterRemoveScenesInGroupCallback(uint8_t endpoint, uint16_t groupId) {}
 
 /** @brief Report Attributes
  *
@@ -2282,24 +2277,6 @@ void emberAfSetSourceRouteOverheadCallback(EmberNodeId destination, uint8_t over
  */
 void emberAfSetTimeCallback(uint32_t utcTime) {}
 
-// Ifdef out emberAfOnOffClusterSetValueCallback, since it's implemented by
-// on-off.c
-#if 0
-/** @brief On/off Cluster Set Value
- *
- * This function is called when the on/off value needs to be set, either through
- * normal channels or as a result of a level change.
- *
- * @param endpoint   Ver.: always
- * @param command   Ver.: always
- * @param initiatedByLevelChange   Ver.: always
- */
-EmberAfStatus emberAfOnOffClusterSetValueCallback(uint8_t endpoint, uint8_t command, bool initiatedByLevelChange)
-{
-    return EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND;
-}
-#endif
-
 /** @brief Set Wake Timeout Bitmask
  *
  * This function is only useful to sleepy end devices.  This function will set
@@ -2363,23 +2340,6 @@ EmberStatus emberAfStartSearchForJoinableNetworkCallback(void)
  *
  */
 void emberAfStopMoveCallback(void) {}
-
-/** @brief Scenes Cluster Store Current Scene
- *
- * This function is called by the framework when the application should store
- * the current scene.  If an entry already exists in the scene table with the
- * same scene and group ids, the application should update the entry with the
- * current scene.  Otherwise, a new entry should be adde to the scene table, if
- * possible.
- *
- * @param endpoint The endpoint.  Ver.: always
- * @param groupId The group identifier.  Ver.: always
- * @param sceneId The scene identifier.  Ver.: always
- */
-EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(uint8_t endpoint, uint16_t groupId, uint8_t sceneId)
-{
-    return EMBER_ZCL_STATUS_FAILURE;
-}
 
 /** @brief Trust Center Join
  *

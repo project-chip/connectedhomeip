@@ -63,7 +63,10 @@ namespace Internal {
 
 #define CHIP_NVM3_REPACK_HEADROOM 64 // Threshold for User non-forced nvm3 flash repacking.
 
+#define EFR32_SEM_TIMEOUT_ms 5
+
 static nvm3_Handle_t handle;
+static SemaphoreHandle_t nvm3_Sem;
 
 // Declare NVM3 data area and cache.
 
@@ -75,34 +78,39 @@ CHIP_NVM3_DEFINE_SECTION_INIT_DATA(chipNvm3, CHIP_DEVICE_CONFIG_NVM3_MAX_OBJECT_
 CHIP_ERROR EFR32Config::Init()
 {
     CHIP_ERROR err;
-    bool needClose = false;
+
+    nvm3_Sem = xSemaphoreCreateBinary();
+
+    if (nvm3_Sem == NULL)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
 
     err = MapNvm3Error(nvm3_open(&handle, &chipNvm3));
     SuccessOrExit(err);
-    needClose = true;
 
 exit:
-    if (needClose)
-    {
-        nvm3_close(&handle);
-    }
-
+    OnExit();
     return err;
 }
 
 CHIP_ERROR EFR32Config::ReadConfigValue(Key key, bool & val)
 {
     CHIP_ERROR err;
-    bool needClose = false;
     uint32_t objectType;
     size_t dataLen;
     bool tmpVal;
+
+    if (pdFALSE == xSemaphoreTake(nvm3_Sem, pdMS_TO_TICKS(EFR32_SEM_TIMEOUT_ms)))
+    {
+        err = CHIP_ERROR_TIMEOUT;
+        SuccessOrExit(err);
+    }
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
     err = MapNvm3Error(nvm3_open(&handle, &chipNvm3));
     SuccessOrExit(err);
-    needClose = true;
 
     // Get nvm3 object info.
     err = MapNvm3Error(nvm3_getObjectInfo(&handle, key, &objectType, &dataLen));
@@ -114,26 +122,26 @@ CHIP_ERROR EFR32Config::ReadConfigValue(Key key, bool & val)
     val = tmpVal;
 
 exit:
-    if (needClose)
-    {
-        nvm3_close(&handle);
-    }
+    OnExit();
     return err;
 }
 
 CHIP_ERROR EFR32Config::ReadConfigValue(Key key, uint32_t & val)
 {
     CHIP_ERROR err;
-    bool needClose = false;
     uint32_t objectType;
     size_t dataLen;
     uint32_t tmpVal;
 
+    if (pdFALSE == xSemaphoreTake(nvm3_Sem, pdMS_TO_TICKS(EFR32_SEM_TIMEOUT_ms)))
+    {
+        err = CHIP_ERROR_TIMEOUT;
+        SuccessOrExit(err);
+    }
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
     err = MapNvm3Error(nvm3_open(&handle, &chipNvm3));
     SuccessOrExit(err);
-    needClose = true;
 
     // Get nvm3 object info.
     err = MapNvm3Error(nvm3_getObjectInfo(&handle, key, &objectType, &dataLen));
@@ -145,26 +153,27 @@ CHIP_ERROR EFR32Config::ReadConfigValue(Key key, uint32_t & val)
     val = tmpVal;
 
 exit:
-    if (needClose)
-    {
-        nvm3_close(&handle);
-    }
+    OnExit();
     return err;
 }
 
 CHIP_ERROR EFR32Config::ReadConfigValue(Key key, uint64_t & val)
 {
     CHIP_ERROR err;
-    bool needClose = false;
     uint32_t objectType;
     size_t dataLen;
     uint64_t tmpVal;
+
+    if (pdFALSE == xSemaphoreTake(nvm3_Sem, pdMS_TO_TICKS(EFR32_SEM_TIMEOUT_ms)))
+    {
+        err = CHIP_ERROR_TIMEOUT;
+        SuccessOrExit(err);
+    }
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
     err = MapNvm3Error(nvm3_open(&handle, &chipNvm3));
     SuccessOrExit(err);
-    needClose = true;
 
     // Get nvm3 object info.
     err = MapNvm3Error(nvm3_getObjectInfo(&handle, key, &objectType, &dataLen));
@@ -176,27 +185,28 @@ CHIP_ERROR EFR32Config::ReadConfigValue(Key key, uint64_t & val)
     val = tmpVal;
 
 exit:
-    if (needClose)
-    {
-        nvm3_close(&handle);
-    }
+    OnExit();
     return err;
 }
 
 CHIP_ERROR EFR32Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err;
-    bool needClose = false;
     uint32_t objectType;
     size_t dataLen;
 
     outLen = 0;
 
+    if (pdFALSE == xSemaphoreTake(nvm3_Sem, pdMS_TO_TICKS(EFR32_SEM_TIMEOUT_ms)))
+    {
+        err = CHIP_ERROR_TIMEOUT;
+        SuccessOrExit(err);
+    }
+
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
     err = MapNvm3Error(nvm3_open(&handle, &chipNvm3));
     SuccessOrExit(err);
-    needClose = true;
 
     // Get nvm3 object info.
     err = MapNvm3Error(nvm3_getObjectInfo(&handle, key, &objectType, &dataLen));
@@ -234,27 +244,27 @@ CHIP_ERROR EFR32Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
     }
 
 exit:
-    if (needClose)
-    {
-        nvm3_close(&handle);
-    }
+    OnExit();
     return err;
 }
 
 CHIP_ERROR EFR32Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err;
-    bool needClose = false;
     uint32_t objectType;
     size_t dataLen;
 
     outLen = 0;
+    if (pdFALSE == xSemaphoreTake(nvm3_Sem, pdMS_TO_TICKS(EFR32_SEM_TIMEOUT_ms)))
+    {
+        err = CHIP_ERROR_TIMEOUT;
+        SuccessOrExit(err);
+    }
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
     err = MapNvm3Error(nvm3_open(&handle, &chipNvm3));
     SuccessOrExit(err);
-    needClose = true;
 
     // Get nvm3 object info.
     err = MapNvm3Error(nvm3_getObjectInfo(&handle, key, &objectType, &dataLen));
@@ -274,25 +284,26 @@ CHIP_ERROR EFR32Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSiz
     outLen = dataLen;
 
 exit:
-    if (needClose)
-    {
-        nvm3_close(&handle);
-    }
+    OnExit();
     return err;
 }
 
 CHIP_ERROR EFR32Config::ReadConfigValueCounter(uint8_t counterIdx, uint32_t & val)
 {
     CHIP_ERROR err;
-    bool needClose = false;
     uint32_t tmpVal;
-
     Key key = kMinConfigKey_ChipCounter + counterIdx;
+
+    if (pdFALSE == xSemaphoreTake(nvm3_Sem, pdMS_TO_TICKS(EFR32_SEM_TIMEOUT_ms)))
+    {
+        err = CHIP_ERROR_TIMEOUT;
+        SuccessOrExit(err);
+    }
+
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
     err = MapNvm3Error(nvm3_open(&handle, &chipNvm3));
     SuccessOrExit(err);
-    needClose = true;
 
     // Read bytes into tmp.
     err = MapNvm3Error(nvm3_readCounter(&handle, key, &tmpVal));
@@ -300,76 +311,76 @@ CHIP_ERROR EFR32Config::ReadConfigValueCounter(uint8_t counterIdx, uint32_t & va
     val = tmpVal;
 
 exit:
-    if (needClose)
-    {
-        nvm3_close(&handle);
-    }
+    OnExit();
     return err;
 }
 
 CHIP_ERROR EFR32Config::WriteConfigValue(Key key, bool val)
 {
     CHIP_ERROR err;
-    bool needClose = false;
+
+    if (pdFALSE == xSemaphoreTake(nvm3_Sem, pdMS_TO_TICKS(EFR32_SEM_TIMEOUT_ms)))
+    {
+        err = CHIP_ERROR_TIMEOUT;
+        SuccessOrExit(err);
+    }
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_ERROR_INVALID_ARGUMENT); // Verify key id.
 
     err = MapNvm3Error(nvm3_open(&handle, &chipNvm3));
     SuccessOrExit(err);
-    needClose = true;
 
     err = MapNvm3Error(nvm3_writeData(&handle, key, &val, sizeof(val)));
     SuccessOrExit(err);
 
 exit:
-    if (needClose)
-    {
-        nvm3_close(&handle);
-    }
+    OnExit();
     return err;
 }
 
 CHIP_ERROR EFR32Config::WriteConfigValue(Key key, uint32_t val)
 {
     CHIP_ERROR err;
-    bool needClose = false;
+
+    if (pdFALSE == xSemaphoreTake(nvm3_Sem, pdMS_TO_TICKS(EFR32_SEM_TIMEOUT_ms)))
+    {
+        err = CHIP_ERROR_TIMEOUT;
+        SuccessOrExit(err);
+    }
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
     err = MapNvm3Error(nvm3_open(&handle, &chipNvm3));
     SuccessOrExit(err);
-    needClose = true;
 
     err = MapNvm3Error(nvm3_writeData(&handle, key, &val, sizeof(val)));
     SuccessOrExit(err);
 
 exit:
-    if (needClose)
-    {
-        nvm3_close(&handle);
-    }
+    OnExit();
     return err;
 }
 
 CHIP_ERROR EFR32Config::WriteConfigValue(Key key, uint64_t val)
 {
     CHIP_ERROR err;
-    bool needClose = false;
+
+    if (pdFALSE == xSemaphoreTake(nvm3_Sem, pdMS_TO_TICKS(EFR32_SEM_TIMEOUT_ms)))
+    {
+        err = CHIP_ERROR_TIMEOUT;
+        SuccessOrExit(err);
+    }
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
     err = MapNvm3Error(nvm3_open(&handle, &chipNvm3));
     SuccessOrExit(err);
-    needClose = true;
 
     err = MapNvm3Error(nvm3_writeData(&handle, key, &val, sizeof(val)));
     SuccessOrExit(err);
 
 exit:
-    if (needClose)
-    {
-        nvm3_close(&handle);
-    }
+    OnExit();
     return err;
 }
 
@@ -381,13 +392,17 @@ CHIP_ERROR EFR32Config::WriteConfigValueStr(Key key, const char * str)
 CHIP_ERROR EFR32Config::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
     CHIP_ERROR err;
-    bool needClose = false;
+
+    if (pdFALSE == xSemaphoreTake(nvm3_Sem, pdMS_TO_TICKS(EFR32_SEM_TIMEOUT_ms)))
+    {
+        err = CHIP_ERROR_TIMEOUT;
+        SuccessOrExit(err);
+    }
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
     err = MapNvm3Error(nvm3_open(&handle, &chipNvm3));
     SuccessOrExit(err);
-    needClose = true;
 
     if (str != NULL)
     {
@@ -402,24 +417,24 @@ CHIP_ERROR EFR32Config::WriteConfigValueStr(Key key, const char * str, size_t st
     }
 
 exit:
-    if (needClose)
-    {
-        nvm3_close(&handle);
-    }
-
+    OnExit();
     return err;
 }
 
 CHIP_ERROR EFR32Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
     CHIP_ERROR err;
-    bool needClose = false;
+
+    if (pdFALSE == xSemaphoreTake(nvm3_Sem, pdMS_TO_TICKS(EFR32_SEM_TIMEOUT_ms)))
+    {
+        err = CHIP_ERROR_TIMEOUT;
+        SuccessOrExit(err);
+    }
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
     err = MapNvm3Error(nvm3_open(&handle, &chipNvm3));
     SuccessOrExit(err);
-    needClose = true;
 
     if (data != NULL)
     {
@@ -436,76 +451,76 @@ CHIP_ERROR EFR32Config::WriteConfigValueBin(Key key, const uint8_t * data, size_
     }
 
 exit:
-    if (needClose)
-    {
-        nvm3_close(&handle);
-    }
+    OnExit();
     return err;
 }
 
 CHIP_ERROR EFR32Config::WriteConfigValueCounter(uint8_t counterIdx, uint32_t val)
 {
     CHIP_ERROR err;
-    bool needClose = false;
-
     Key key = kMinConfigKey_ChipCounter + counterIdx;
+
+    if (pdFALSE == xSemaphoreTake(nvm3_Sem, pdMS_TO_TICKS(EFR32_SEM_TIMEOUT_ms)))
+    {
+        err = CHIP_ERROR_TIMEOUT;
+        SuccessOrExit(err);
+    }
+
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
     err = MapNvm3Error(nvm3_open(&handle, &chipNvm3));
     SuccessOrExit(err);
-    needClose = true;
 
     err = MapNvm3Error(nvm3_writeCounter(&handle, key, val));
     SuccessOrExit(err);
 
 exit:
-    if (needClose)
-    {
-        nvm3_close(&handle);
-    }
+    OnExit();
     return err;
 }
 
 CHIP_ERROR EFR32Config::ClearConfigValue(Key key)
 {
     CHIP_ERROR err;
-    bool needClose = false;
+
+    if (pdFALSE == xSemaphoreTake(nvm3_Sem, pdMS_TO_TICKS(EFR32_SEM_TIMEOUT_ms)))
+    {
+        err = CHIP_ERROR_TIMEOUT;
+        SuccessOrExit(err);
+    }
 
     err = MapNvm3Error(nvm3_open(&handle, &chipNvm3));
     SuccessOrExit(err);
-    needClose = true;
 
     // Delete the nvm3 object with the given key id.
     err = MapNvm3Error(nvm3_deleteObject(&handle, key));
     SuccessOrExit(err);
 
 exit:
-    if (needClose)
-    {
-        nvm3_close(&handle);
-    }
+    OnExit();
     return err;
 }
 
 bool EFR32Config::ConfigValueExists(Key key)
 {
     CHIP_ERROR err;
-    bool needClose = false;
     uint32_t objectType;
     size_t dataLen;
 
+    if (pdFALSE == xSemaphoreTake(nvm3_Sem, pdMS_TO_TICKS(EFR32_SEM_TIMEOUT_ms)))
+    {
+        err = CHIP_ERROR_TIMEOUT;
+        SuccessOrExit(err);
+    }
+
     err = MapNvm3Error(nvm3_open(&handle, &chipNvm3));
     SuccessOrExit(err);
-    needClose = true;
 
     // Find object with key id.
     err = MapNvm3Error(nvm3_getObjectInfo(&handle, key, &objectType, &dataLen));
 
 exit:
-    if (needClose)
-    {
-        nvm3_close(&handle);
-    }
+    OnExit();
     return (err == CHIP_NO_ERROR);
 }
 
@@ -563,6 +578,11 @@ CHIP_ERROR EFR32Config::ForEachRecord(Key firstNvm3Key, Key lastNvm3Key, bool ad
     // Invokes the callers CB function when appropriate.
 
     CHIP_ERROR err = CHIP_NO_ERROR;
+    if (pdFALSE == xSemaphoreTake(nvm3_Sem, pdMS_TO_TICKS(EFR32_SEM_TIMEOUT_ms)))
+    {
+        err = CHIP_ERROR_TIMEOUT;
+        SuccessOrExit(err);
+    }
 
     for (Key nvm3Key = firstNvm3Key; nvm3Key <= lastNvm3Key; ++nvm3Key)
     {
@@ -603,9 +623,7 @@ CHIP_ERROR EFR32Config::ForEachRecord(Key firstNvm3Key, Key lastNvm3Key, bool ad
     }
 
 exit:
-    // Always close handle.
-    nvm3_close(&handle);
-
+    OnExit();
     return err;
 }
 
@@ -633,6 +651,12 @@ void EFR32Config::RepackNvm3Flash(void)
     // Note- checking periodically during idle periods should prevent
     // forced repack events on any write operation.
     nvm3_repack(&handle);
+}
+
+void EFR32Config::OnExit()
+{
+    xSemaphoreGive(nvm3_Sem);
+    nvm3_close(&handle);
 }
 
 } // namespace Internal

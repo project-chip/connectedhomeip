@@ -1,11 +1,11 @@
-# CHIP nRF52840 Lock Example Application
+# CHIP nRF52840 Lighting Example Application
 
 An example application showing the use
 [CHIP](https://github.com/project-chip/connectedhomeip) on the Nordic nRF52840.
 
 <hr>
 
--   [CHIP nRF52840 Lighting Example Application](#chip-nrf52840-lock-example-application)
+-   [CHIP nRF52840 Lighting Example Application](#chip-nrf52840-lighting-example-application)
     -   [Introduction](#introduction)
     -   [Device UI](#device-ui)
     -   [Building](#building)
@@ -21,7 +21,7 @@ An example application showing the use
 
 ## Introduction
 
-![nrf52840 DK](doc/images/nrf52840-dk.jpg)
+![nrf52840 DK](../../platform/nrf528xx/doc/images/nrf52840-dk.jpg)
 
 The nRF52840 lighting example application provides a working demonstration of a
 connected lighting device, built using CHIP, and the Nordic nRF5 SDK. The
@@ -35,10 +35,10 @@ The lighting example is intended to serve both as a means to explore the
 workings of CHIP, as well as a template for creating real products based on the
 Nordic platform.
 
-The example application builds upon the CHIP. A top-level Makefile orchestrates
-the entire build process, including building CHIP, and select files from the
-nRF5 SDK. The resultant image file can be flashed directly onto the Nordic dev
-kit hardware.
+The example application builds upon the CHIP. A top-level BUILD.gn or Makefile
+orchestrates the entire build process, including building CHIP, and select files
+from the nRF5 SDK. The resultant image file can be flashed directly onto the
+Nordic dev kit hardware.
 
 <a name="device-ui"></a>
 
@@ -74,13 +74,10 @@ pending reset. Holding the button past 6 seconds will cause the device to reset
 its persistent configuration and initiate a reboot. The reset action can be
 cancelled by releasing the button at any point before the 6 second limit.
 
-**LED #2** shows the state of the simulated lock bolt. When the LED is lit the
-bolt is extended (i.e. door locked); when not lit, the bolt is retracted (door
-unlocked). The LED will flash whenever the simulated bolt is in motion from one
-position to another.
+**LED #2** shows the state of the lighting.
 
-**Button #2** can be used to change the state of the simulated bolt. This can be
-used to mimick a user manually operating the lock. The button behaves as a
+**Button #2** can be used to change the state of the lighting. This can be used
+to mimick a user manually switching the lighting. The button behaves as a
 toggle, swapping the state every time it is pressed.
 
 The remaining two LEDs and buttons (#3 and #4) are unused.
@@ -101,20 +98,20 @@ commands in a devcontainer shell.
         # CAUTION: the following step will delete any unstaged files
         $ git clean -Xdf
 
-        $ cd examples/lock-app/nrf5
+        $ cd examples/lighting-app/nrf5
         $ make clean
         $ make
 
 Other alternatives:
 
--   Run `Build nRF5 Lock App` VSCode task.
+-   Run `Build nRF5 Lighting App` VSCode task.
 
 -   Run the `GN build` VSCode task. This does not require a clean tree.
 
 -   Build manually with GN:
 
             $ source scripts/activate.sh
-            $ cd examples/lock-app/nrf5
+            $ cd examples/lighting-app/nrf5
             $ gn gen out/debug
             $ ninja -C out/debug
 
@@ -160,20 +157,20 @@ Other alternatives:
           $ cd ~
           $ git clone https://github.com/project-chip/connectedhomeip.git
 
-*   Run make to build the application
-
-          $ cd ~/connectedhomeip/examples/lock-app/nrf5
-          $ make clean
-          $ make
-
-*   Or, run GN to build the application
+*   Run GN to build the application
 
           $ cd ~/connectedhomeip
           $ git submodule update --init
           $ source scripts/activate.sh
-          $ cd examples/lock-app/nrf5
+          $ cd examples/lighting-app/nrf5
           $ gn gen out/debug
           $ ninja -C out/debug
+
+*   Or, run make to build the application
+
+          $ cd ~/connectedhomeip/examples/lighting-app/nrf5
+          $ make clean
+          $ make
 
 <a name="initializing"></a>
 
@@ -188,9 +185,19 @@ should be erased and the Nordic SoftDevice image installed.
     nRF52840 DK. The Interface MCU connector is the one on the _short_ side of
     the board.
 
-*   Use the Makefile to erase the flash and program the Nordic SoftDevice image.
+*   If you are using the GN build, the flashing script will install the
+    SoftDevice image if it is not already present. If you prefer to do so
+    manually first, to verify your board function, run:
 
-          $ cd ~/connectedhomeip/examples/lock-app/nrf5
+          $ python \
+              ~/connectedhomeip/third_party/nrf5_sdk/nrf5_firmware_utils.py \
+              --eraseall \
+              --application $NRF5_SDK_ROOT/components/softdevice/s140/hex/s140_nrf52_*_softdevice.hex
+
+*   Or, use the Makefile to erase the flash and program the Nordic SoftDevice
+    image.
+
+          $ cd ~/connectedhomeip/examples/lighting-app/nrf5
           $ make erase
           $ make flash-softdevice
 
@@ -205,7 +212,12 @@ and application again.
 
 To flash the example app, run the following commands:
 
-        $ cd ~/connectedhomeip/examples/lock-app/nrf5
+        $ cd ~/connectedhomeip/examples/lighting-app/nrf5
+        $ python out/debug/chip-nrf52840-lighting-example.flash.py
+
+Or, if you are using the Makefile build,
+
+        $ cd ~/connectedhomeip/examples/lighting-app/nrf5
         $ make flash-app
 
 > The [VSCode devcontainer](#using-chips-vscode-devcontainer) cannot communicate

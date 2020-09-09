@@ -56,7 +56,7 @@
 #include <stdint.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include "Linux/gen/DbusBluez.h"
+#include "platform/Linux/dbus/bluez/DbusBluez.h"
 
 namespace chip {
 namespace DeviceLayer {

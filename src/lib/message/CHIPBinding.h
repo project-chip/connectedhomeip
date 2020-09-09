@@ -39,7 +39,7 @@ class ChipExchangeManager;
 class ExchangeContext;
 class ChipSecurityManager;
 
-namespace Profiles {
+namespace Protocols {
 namespace StatusReporting {
 class StatusReport;
 }
@@ -48,7 +48,7 @@ namespace TAKE {
 class ChipTAKEChallengerAuthDelegate;
 }
 } // namespace Security
-} // namespace Profiles
+} // namespace Protocols
 
 /**
  * @class Binding
@@ -189,10 +189,8 @@ public:
     uint8_t GetEncryptionType(void) const;
     uint32_t GetDefaultResponseTimeout() const;
     void SetDefaultResponseTimeout(uint32_t msec);
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     const RMPConfig & GetDefaultRMPConfig(void) const;
     void SetDefaultRMPConfig(const RMPConfig & RMPConfig);
-#endif // #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     EventCallback GetEventCallback() const;
     void SetEventCallback(EventCallback aEventCallback);
     ChipConnection * GetConnection() const;
@@ -294,9 +292,7 @@ private:
     ChipConnection * mCon;
     uint32_t mDefaultResponseTimeoutMsec;
     uint32_t mUDPPathMTU;
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     RMPConfig mDefaultRMPConfig;
-#endif
     uint8_t mHostNameLen;
 
     // Security-specific configuration
@@ -318,7 +314,7 @@ private:
     void PrepareTransport(void);
     void PrepareSecurity(void);
     void HandleBindingReady(void);
-    void HandleBindingFailed(CHIP_ERROR err, Profiles::StatusReporting::StatusReport * statusReport, bool raiseEvent);
+    void HandleBindingFailed(CHIP_ERROR err, Protocols::StatusReporting::StatusReport * statusReport, bool raiseEvent);
     void OnKeyFailed(uint64_t peerNodeId, uint32_t keyId, CHIP_ERROR keyErr);
     void OnSecurityManagerAvailable(void);
     void OnConnectionClosed(ChipConnection * con, CHIP_ERROR conErr);
@@ -328,7 +324,7 @@ private:
     static void OnSecureSessionReady(ChipSecurityManager * sm, ChipConnection * con, void * reqState, uint16_t keyId,
                                      uint64_t peerNodeId, uint8_t encType);
     static void OnSecureSessionFailed(ChipSecurityManager * sm, ChipConnection * con, void * reqState, CHIP_ERROR localErr,
-                                      uint64_t peerNodeId, Profiles::StatusReporting::StatusReport * statusReport);
+                                      uint64_t peerNodeId, Protocols::StatusReporting::StatusReport * statusReport);
     void OnSecureSessionReady(uint64_t peerNodeId, uint8_t encType, ChipAuthMode authMode, uint16_t keyId);
     void OnKeyError(const uint32_t aKeyId, const uint64_t aPeerNodeId, const CHIP_ERROR aKeyErr);
 
@@ -413,7 +409,7 @@ struct Binding::InEventParam
         struct
         {
             CHIP_ERROR Reason;
-            Profiles::StatusReporting::StatusReport * StatusReport;
+            Protocols::StatusReporting::StatusReport * StatusReport;
         } PrepareFailed;
 
         struct
@@ -455,7 +451,7 @@ struct Binding::OutEventParam
             bool EncryptCommPhase;
             bool TimeLimitedIK;
             bool SendChallengerId;
-            chip::Profiles::Security::TAKE::ChipTAKEChallengerAuthDelegate * AuthDelegate;
+            chip::Protocols::Security::TAKE::ChipTAKEChallengerAuthDelegate * AuthDelegate;
         } TAKEParametersRequested;
     };
 
@@ -520,8 +516,6 @@ inline void Binding::SetDefaultResponseTimeout(uint32_t timeout)
     mDefaultResponseTimeoutMsec = timeout;
 }
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-
 inline const RMPConfig & Binding::GetDefaultRMPConfig(void) const
 {
     return mDefaultRMPConfig;
@@ -531,8 +525,6 @@ inline void Binding::SetDefaultRMPConfig(const RMPConfig & aRMPConfig)
 {
     mDefaultRMPConfig = aRMPConfig;
 }
-
-#endif // #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
 inline Binding::EventCallback Binding::GetEventCallback() const
 {

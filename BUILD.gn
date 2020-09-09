@@ -58,7 +58,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
 
     if (chip_build_tests) {
-      deps += [ ":tests" ]
+      deps += [ "//src:tests" ]
     }
 
     if (chip_build_tools) {
@@ -68,29 +68,18 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
         "${chip_root}/src/setup_payload",
       ]
     }
+
+    if (current_os == "android") {
+      deps += [
+        "${chip_root}/src/controller/java",
+        "${chip_root}/src/setup_payload/java",
+      ]
+    }
   }
 
   if (chip_build_tests) {
-    import("${chip_root}/gn/chip/chip_test_group.gni")
-
-    chip_test_group("tests") {
-      deps = [
-        "${chip_root}/src/ble/tests",
-        "${chip_root}/src/crypto/tests",
-        "${chip_root}/src/inet/tests",
-        "${chip_root}/src/lib/core/tests",
-        "${chip_root}/src/lib/shell/tests",
-        "${chip_root}/src/lib/support/tests",
-        "${chip_root}/src/lwip/tests",
-        "${chip_root}/src/platform/tests",
-        "${chip_root}/src/setup_payload/tests",
-        "${chip_root}/src/system/tests",
-        "${chip_root}/src/transport/tests",
-      ]
-    }
-
     group("check") {
-      deps = [ ":tests_run" ]
+      deps = [ "//src:tests_run" ]
     }
   }
 } else {
@@ -99,6 +88,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
   declare_args() {
     # Set this to false to disable all builds by default.
     enable_default_builds = true
+
+    # Enable building for Android.
+    enable_android_builds = false
 
     # Set this to true to enable nRF5 builds by default.
     enable_nrf5_builds = false
@@ -116,9 +108,6 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
     # Enable building chip with gcc & mbedtls.
     enable_host_gcc_mbedtls_build = enable_default_builds
-
-    # Enable building chip for linux embedded.
-    enable_linux_embedded_build = enable_default_builds && host_os == "linux"
 
     # Build the chip-tool example.
     enable_standalone_chip_tool_build = enable_default_builds
@@ -148,10 +137,21 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     toolchain = "${chip_root}/config/mbedtls/toolchain:${host_os}_${host_cpu}_gcc_mbedtls"
   }
 
-  if (host_os == "linux") {
-    chip_build("linux_embedded") {
-      toolchain =
-          "${chip_root}/config/linux/toolchain:linux_${host_cpu}_gcc_embedded"
+  if (enable_android_builds) {
+    chip_build("android_arm") {
+      toolchain = "//build/toolchain/android:android_arm"
+    }
+
+    chip_build("android_arm64") {
+      toolchain = "//build/toolchain/android:android_arm64"
+    }
+
+    chip_build("android_x64") {
+      toolchain = "//build/toolchain/android:android_x64"
+    }
+
+    chip_build("android_x86") {
+      toolchain = "//build/toolchain/android:android_x86"
     }
   }
 
@@ -194,8 +194,13 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     if (enable_host_gcc_mbedtls_build) {
       deps += [ ":all_host_gcc_mbedtls" ]
     }
-    if (enable_linux_embedded_build) {
-      deps += [ ":all_linux_embedded" ]
+    if (enable_android_builds) {
+      deps += [
+        ":all_android_arm",
+        ":all_android_arm64",
+        ":all_android_x64",
+        ":all_android_x86",
+      ]
     }
     if (enable_standalone_chip_tool_build) {
       deps += [ ":standalone_chip_tool" ]
@@ -225,9 +230,6 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       }
       if (enable_host_gcc_mbedtls_build) {
         deps += [ ":check_host_gcc_mbedtls" ]
-      }
-      if (enable_linux_embedded_build) {
-        deps += [ ":check_linux_embedded" ]
       }
     }
   }

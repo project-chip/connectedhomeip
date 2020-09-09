@@ -106,8 +106,10 @@ source_set("system_config_header") {
 
   public_deps = [ ":system_buildconfig" ]
 
-  if (chip_system_config_use_lwip) {
-    public_deps += [ "${chip_root}/src/lwip" ]
+  if (target_cpu != "esp32") {
+    if (chip_system_config_use_lwip) {
+      public_deps += [ "${chip_root}/src/lwip" ]
+    }
   }
 }
 

@@ -1,6 +1,14 @@
 ARG VERSION=latest
 FROM connectedhomeip/chip-build:${VERSION}
 
+# JDK 11 access
+RUN set -x \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
+    openjdk-11-jdk \
+    && rm -rf /var/lib/apt/lists/ \
+    && : # last line
+
 # Download and install android NDK
 RUN set -x \
     && cd /tmp \

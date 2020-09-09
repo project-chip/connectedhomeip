@@ -37,6 +37,7 @@
 
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
+#include <core/CHIPSafeCasts.h>
 #include <support/Base64.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -52,6 +53,13 @@ namespace chip {
 namespace DeviceController {
 
 using namespace chip::Encoding;
+
+BLEDeviceConnectionParameters::BLEDeviceConnectionParameters()
+{
+#if CONFIG_DEVICE_LAYER
+    SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
+#endif
+}
 
 static constexpr uint32_t kSpake2p_Iteration_Count = 50000;
 static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Exchange Salt";
@@ -134,7 +142,6 @@ CHIP_ERROR ChipDeviceController::Shutdown()
     if (mUnsecuredTransport != NULL)
     {
         mUnsecuredTransport->Release();
-        delete mUnsecuredTransport;
         mUnsecuredTransport = NULL;
     }
 
@@ -207,7 +214,7 @@ void ChipDeviceController::BLEConnectionHandler(ChipDeviceController * controlle
     ChipLogProgress(Controller, "Starting pairing session");
     controller->mPairingInProgress = true;
     CHIP_ERROR err                 = controller->mPairingSession.Pair(
-        controller->mSetupPINCode, kSpake2p_Iteration_Count, (const unsigned char *) kSpake2pKeyExchangeSalt,
+        controller->mSetupPINCode, kSpake2p_Iteration_Count, Uint8::from_const_char(kSpake2pKeyExchangeSalt),
         strlen(kSpake2pKeyExchangeSalt), Optional<NodeId>::Value(controller->mLocalDeviceId), controller->mNextKeyId++, controller);
     SuccessOrExit(err);
 
@@ -215,45 +222,45 @@ exit:
     return;
 }
 
-CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const uint16_t discriminator, const uint32_t setupPINCode,
-                                               void * appReqState, NewConnectionHandler onConnected,
-                                               MessageReceiveHandler onMessageReceived, ErrorHandler onError)
+CHIP_ERROR ChipDeviceController::ConnectDevice(const BLEDeviceConnectionParameters & params)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-#if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
+#if CONFIG_NETWORK_LAYER_BLE
     Transport::BLE * transport;
 
     ChipLogProgress(Controller, "Received new pairing request");
     ChipLogProgress(Controller, "mState %d. mConState %d", mState, mConState);
     VerifyOrExit(mState == kState_Initialized && mConState == kConnectionState_NotConnected, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(params.GetBleLayer() != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     if (mPairingInProgress)
     {
         ChipLogError(Controller, "Pairing was already is progress. This will restart pairing.");
     }
 
-    mRemoteDeviceId  = Optional<NodeId>::Value(remoteDeviceId);
-    mAppReqState     = appReqState;
-    mPairingComplete = onConnected;
+    mRemoteDeviceId  = Optional<NodeId>::Value(params.GetRemoteDeviceId());
+    mAppReqState     = params.GetAppReqState();
+    mPairingComplete = params.GetOnConnected();
     mOnNewConnection = BLEConnectionHandler;
-    mAppMsgHandler   = onMessageReceived;
+    mAppMsgHandler   = params.GetOnMessageReceived();
 
-    mSetupPINCode = setupPINCode;
+    mSetupPINCode = params.GetSetupPINCode();
 
     transport = new Transport::BLE();
-    err       = transport->Init(Transport::BleConnectionParameters(this, DeviceLayer::ConnectivityMgr().GetBleLayer())
-                              .SetDiscriminator(discriminator)
-                              .SetSetupPINCode(setupPINCode));
+    err       = transport->Init(Transport::BleConnectionParameters(this, params.GetBleLayer())
+                              .SetDiscriminator(params.GetDiscriminator())
+                              .SetSetupPINCode(params.GetSetupPINCode()));
     SuccessOrExit(err);
 
     mUnsecuredTransport = transport->Retain();
+    transport->Release();
 
     // connected state before 'OnConnect'
     mConState = kConnectionState_Connected;
 
     mOnComplete.Response = PairingMessageHandler;
-    mOnError             = onError;
+    mOnError             = params.GetOnError();
 
     if (err != CHIP_NO_ERROR)
     {
@@ -386,7 +393,6 @@ CHIP_ERROR ChipDeviceController::DisconnectDevice()
     if (mUnsecuredTransport != NULL)
     {
         mUnsecuredTransport->Release();
-        delete mUnsecuredTransport;
         mUnsecuredTransport = NULL;
     }
 

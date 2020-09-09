@@ -34,6 +34,8 @@ int TestErrorStr(void);
 int TestTimeUtils(void);
 int TestMemAlloc(void);
 int TestBufBound(void);
+int TestCHIPCounter(void);
+int TestPersistedCounter(int argc, char * argv[]);
 
 #ifdef __cplusplus
 }

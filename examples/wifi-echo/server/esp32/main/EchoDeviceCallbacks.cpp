@@ -44,7 +44,8 @@ using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 
 // In wifi-echo.cpp
-extern LEDWidget statusLED;
+extern LEDWidget statusLED1;
+extern LEDWidget statusLED2;
 extern WiFiWidget wifiLED;
 extern RendezvousSession * rendezvousSession;
 
@@ -106,8 +107,20 @@ void EchoDeviceCallbacks::PostAttributeChangeCallback(uint8_t endpoint, EmberAfC
         ESP_LOGI(TAG, "Unknown attribute ID: %d", attributeId);
         return;
     }
-    ESP_LOGI(TAG, "Got the post attribute callback");
+    ESP_LOGI(TAG, "Got the post attribute callback with value %d for endpoint %d", *value, endpoint);
     // At this point we can assume that value points to a bool value.
-    statusLED.Set(*value);
+    if (endpoint == 1)
+    {
+        statusLED1.Set(*value);
+    }
+    else if (endpoint == 2)
+    {
+        statusLED2.Set(*value);
+    }
+    else
+    {
+        ESP_LOGE(TAG, "Unexpected endpoint id: %d", endpoint);
+    }
+
     ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }

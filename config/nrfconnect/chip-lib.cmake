@@ -33,18 +33,16 @@ include(ExternalProject)
 # Directory for CHIP build artifacts
 set(CHIP_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/chip")
 
-# Helper macros to conditionally append a list
-macro(append_if VAR CONDITION)
+macro(chip_gn_arg_bool_if CONDITION ARGSTRING GN_VARNAME)
     if (${${CONDITION}})
-        list(APPEND ${VAR} ${ARGN})
+        string(APPEND ${ARGSTRING} "${GN_VARNAME} = true\n")
+    else ()
+        string(APPEND ${ARGSTRING} "${GN_VARNAME} = false\n")
     endif()
 endmacro()
 
-macro(append_if_not VAR CONDITION)
-    if (${${CONDITION}})
-    else()
-        list(APPEND ${VAR} ${ARGN})
-    endif()
+macro(chip_gn_arg_string ARGSTRING GN_STRING)
+    string(APPEND ${ARGSTRING} "${GN_STRING}\n")
 endmacro()
 
 # Function to retrieve Zephyr compilation flags for the given language (C or CXX)
@@ -61,10 +59,10 @@ endfunction()
 # ==================================================
 
 function(chip_configure TARGET_NAME)
-    cmake_parse_arguments(CHIP 
+    cmake_parse_arguments(CHIP
                           "BUILD_TESTS"
-                          "ARCH;PROJECT_CONFIG"
-                          "CFLAGS;CXXFLAGS" 
+                          "PROJECT_CONFIG"
+                          "CFLAGS;CXXFLAGS"
                           ${ARGN})
 
     # Prepare CFLAGS & CXXFLAGS
@@ -75,66 +73,55 @@ function(chip_configure TARGET_NAME)
     list(FILTER CHIP_CXXFLAGS EXCLUDE REGEX -std.*) # CHIP adds gnu++11 anyway...
     convert_list_of_flags_to_string_of_flags(CHIP_CXXFLAGS CHIP_CXXFLAGS)
 
-    # Prepare command line arguments passed to the CHIP's ./configure script
-    set(CHIP_CONFIGURE_ARGS
-        AR=${CMAKE_AR}
-        AS=${CMAKE_AS}
-        CC=${CMAKE_C_COMPILER}
-        CXX=${CMAKE_CXX_COMPILER}
-        LD=${CMAKE_LINKER}
-        OBJCOPY=${CMAKE_OBJCOPY}
-        RANLIB=${CMAKE_RANLIB}
-        CFLAGS=${CHIP_CFLAGS}
-        CXXFLAGS=${CHIP_CXXFLAGS}
-        --prefix=${CHIP_OUTPUT_DIR}
-        --exec-prefix=${CHIP_OUTPUT_DIR}
-        --host=${CHIP_ARCH}
-        --with-device-layer=nrfconnect
-        --with-network-layer=all
-        --with-target-network=sockets
-        --with-inet-endpoint=udp
-        --with-logging-style=external
-        --with-target-style=embedded
-        --with-chip-project-includes=${CHIP_PROJECT_CONFIG}
-        --with-chip-system-project-includes=${CHIP_PROJECT_CONFIG}
-        --with-chip-inet-project-includes=${CHIP_PROJECT_CONFIG}
-        --with-chip-ble-project-includes=${CHIP_PROJECT_CONFIG}
-        --with-chip-warm-project-includes=${CHIP_PROJECT_CONFIG}
-        --with-chip-device-project-includes=${CHIP_PROJECT_CONFIG}
-        --enable-debug
-        --enable-optimization=no
-        --disable-tools
-        --disable-docs
-        --disable-java
-        --disable-device-manager
-        --with-mbedtls=${ZEPHYR_BASE}/../modules/crypto/mbedtls
-        --with-crypto=mbedtls
-    )
-    
-    append_if(CHIP_CONFIGURE_ARGS CONFIG_NET_L2_OPENTHREAD --with-openthread=${ZEPHYR_BASE}/../modules/lib/openthread)
-    append_if_not(CHIP_CONFIGURE_ARGS CHIP_BUILD_TESTS --disable-tests)
-    append_if_not(CHIP_CONFIGURE_ARGS CONFIG_NET_IPV4 --disable-ipv4)
+    set(GN_ARGS "")
+    chip_gn_arg_string(GN_ARGS "target_cflags_c = string_split(\"${CHIP_CFLAGS}\")")
+    chip_gn_arg_string(GN_ARGS "target_cflags_cc = string_split(\"${CHIP_CXXFLAGS}\")")
+    chip_gn_arg_string(GN_ARGS "zephyr_ar = \"${CMAKE_AR}\"")
+    chip_gn_arg_string(GN_ARGS "zephyr_cc = \"${CMAKE_C_COMPILER}\"")
+    chip_gn_arg_string(GN_ARGS "zephyr_cxx = \"${CMAKE_CXX_COMPILER}\"")
 
+    if (CHIP_PROJECT_CONFIG)
+        chip_gn_arg_string(GN_ARGS "chip_project_config_include = \"<${CHIP_PROJECT_CONFIG}>\"")
+        chip_gn_arg_string(GN_ARGS "chip_system_project_config_include = \"<${CHIP_PROJECT_CONFIG}>\"")
+    endif ()
+
+    if ("${BOARD}" STREQUAL "native_posix")
+        chip_gn_arg_string(GN_ARGS "target_cpu = \"x86\"")
+    endif ()
+
+    chip_gn_arg_bool_if(CONFIG_NET_L2_OPENTHREAD GN_ARGS "chip_enable_openthread")
+    chip_gn_arg_bool_if(CONFIG_NET_IPV4          GN_ARGS "chip_inet_config_enable_ipv4")
+    chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_build_tests")
+    chip_gn_arg_bool_if(CONFIG_CHIP_LIB_SHELL    GN_ARGS "chip_build_libshell")
+    chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_inet_config_enable_raw_endpoint")
+    chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_inet_config_enable_tcp_endpoint")
+    chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_inet_config_enable_dns_resolver")
+
+    file(
+        GENERATE OUTPUT ${CHIP_OUTPUT_DIR}/args.gn
+        CONTENT "${GN_ARGS}"
+    )
     # Define target
     ExternalProject_Add(
         ${TARGET_NAME}
         PREFIX              ${CHIP_OUTPUT_DIR}
         SOURCE_DIR          ${CHIP_ROOT}
         BINARY_DIR          ${CHIP_OUTPUT_DIR}
-        CONFIGURE_COMMAND   ${CHIP_ROOT}/configure ${CHIP_CONFIGURE_ARGS}
+        CONFIGURE_COMMAND   gn --root=${CHIP_ROOT}/config/nrfconnect gen ${CHIP_OUTPUT_DIR}
         BUILD_COMMAND       ""
         INSTALL_COMMAND     ""
         BUILD_ALWAYS        TRUE
+        USES_TERMINAL_CONFIGURE TRUE
     )
 endfunction()
 
 # ==================================================
 # Define chip build target
-# ==================================================    
+# ==================================================
 
 function(chip_build TARGET_NAME BASE_TARGET_NAME)
     cmake_parse_arguments(CHIP "" "" "BUILD_COMMAND;BUILD_ARTIFACTS" ${ARGN})
-    
+
     # Define build target
     ExternalProject_Add(
         ${TARGET_NAME}Build
@@ -146,6 +133,7 @@ function(chip_build TARGET_NAME BASE_TARGET_NAME)
         INSTALL_COMMAND     ""
         BUILD_BYPRODUCTS    ${CHIP_BUILD_ARTIFACTS}
         BUILD_ALWAYS        TRUE
+        USES_TERMINAL_BUILD TRUE
     )
 
     # Define interface library containing desired CHIP byproducts
@@ -155,12 +143,24 @@ function(chip_build TARGET_NAME BASE_TARGET_NAME)
         ${CHIP_ROOT}/src/lib
         ${CHIP_ROOT}/src/lib/core
         ${CHIP_ROOT}/src/include
-        ${CHIP_OUTPUT_DIR}/include
-        ${CHIP_OUTPUT_DIR}/src/include
+        ${CHIP_ROOT}/third_party/nlassert/repo/include
+        ${CHIP_OUTPUT_DIR}/gen/include
+        ${CHIP_OUTPUT_DIR}/gen/third_party/connectedhomeip/src/lib/support/include
+        ${CHIP_OUTPUT_DIR}/gen/third_party/connectedhomeip/src/app/include
     )
-    target_link_directories(${TARGET_NAME} INTERFACE ${CHIP_OUTPUT_DIR}/lib)
+    target_link_directories(${TARGET_NAME} INTERFACE
+        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/lib/support/tests/lib
+        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/lib/core/tests/lib
+        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/transport/tests/lib
+        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/setup_payload/tests/lib
+        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/system/tests/lib
+        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/platform/tests/lib
+        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/crypto/tests/lib
+        ${CHIP_OUTPUT_DIR}/lib
+    )
     target_link_libraries(${TARGET_NAME} INTERFACE -Wl,--start-group ${CHIP_BUILD_ARTIFACTS} -Wl,--end-group)
 
     add_dependencies(${TARGET_NAME}Build ${BASE_TARGET_NAME})
     add_dependencies(${TARGET_NAME} ${TARGET_NAME}Build)
+    add_dependencies(${TARGET_NAME}Build kernel)
 endfunction()

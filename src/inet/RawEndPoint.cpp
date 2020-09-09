@@ -42,6 +42,9 @@
 #include <lwip/ip.h>
 #include <lwip/raw.h>
 #include <lwip/tcpip.h>
+#if CHIP_SEPARATE_CONFIG_H
+#include <lwip/lwip_buildconfig.h>
+#endif // CHIP_SEPARATE_CONFIG_H
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS

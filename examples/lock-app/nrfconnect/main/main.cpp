@@ -21,7 +21,6 @@
 
 #include <logging/log.h>
 
-#include <BuildConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 
 LOG_MODULE_REGISTER(app);

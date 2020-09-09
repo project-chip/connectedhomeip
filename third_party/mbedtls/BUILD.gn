@@ -61,6 +61,7 @@ if (mbedtls_target != "") {
       "repo/library/md5.c",
       "repo/library/md_wrap.c",
       "repo/library/oid.c",
+      "repo/library/padlock.c",
       "repo/library/pem.c",
       "repo/library/pk.c",
       "repo/library/pk_wrap.c",

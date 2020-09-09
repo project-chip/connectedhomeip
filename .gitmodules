@@ -45,25 +45,25 @@
 	url = https://pigweed.googlesource.com/pigweed/pigweed
 	branch = master
 	ignore = dirty
-	commit = 22dd0b0b486810b64bf528a38651c8d8c7b8274c
+	commit = 216808f5781ff85a1db7364f132dd39b6e1cb1bb
 [submodule "openthread"]
 	path = third_party/openthread/repo
 	url = https://github.com/openthread/openthread.git
 	branch = master
 	ignore = dirty
-	commit = 6886ff1e4c5dcf1bdc6ac7a067a81debff113938
+	commit = a2d6901404d46be2da4cc2d30b9cbfb4718ac1c7
 [submodule "ot-br-posix"]
 	path = third_party/ot-br-posix/repo
 	url = https://github.com/openthread/ot-br-posix.git
 	branch = master
 	ignore = dirty
-	commit = ecc25701117fc99c6630584dc98294527a145f7d
+	commit = ea9cd69aa2eed3f320f6a80a4d0b966959c19ff0
 [submodule "bluez"]
 	path = third_party/bluez/repo
 	url = git://git.kernel.org/pub/scm/bluetooth/bluez.git
 	branch = master
 	ignore = dirty
-	commit = 8ecfe3221a699f7e1d731a16a4da8e5c349bf754
+	commit = 5a180f2ec9edfacafd95e5fed20d36fe8e077f07
 [submodule "ot-commissioner"]
 	path = third_party/ot-commissioner/repo
 	url = https://github.com/openthread/ot-commissioner
@@ -75,7 +75,7 @@
 	url = https://github.com/openweave/cirque.git
 	branch = master
 	ignore = dirty
-	commit = f0214d37db6e7c91dce393493ca249129c442e6d
+	commit = bc42efe2e0e8f4e0eed7bd08a51e046943a11b98
 [submodule "third_party/happy"]
 	path = third_party/happy/repo
 	url = https://github.com/openweave/happy.git

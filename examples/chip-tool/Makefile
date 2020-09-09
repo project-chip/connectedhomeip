@@ -30,7 +30,7 @@ BUILD_SUPPORT_DIR = $(CHIP_ROOT)/config/standalone
 include $(BUILD_SUPPORT_DIR)/standalone-app.mk
 include $(BUILD_SUPPORT_DIR)/standalone-chip.mk
 
-APP = chip-standalone-demo
+APP = chip-tool
 
 SRCS = \
     $(PROJECT_ROOT)/main.cpp       \
@@ -52,6 +52,11 @@ DEFINES = \
     $(NULL)
 
 CXXFLAGS += -std=c++11
+
+# Until https://github.com/project-chip/connectedhomeip/issues/2284 is
+# fixed, CHIPDeviceController.h pulls in openssl headers, so we need
+# to make sure our include path contains those.
+CFLAGS += $(shell pkg-config --cflags openssl)
 
 ifdef BUILD_RELEASE
     DEFINES += BUILD_RELEASE=1

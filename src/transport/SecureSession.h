@@ -51,9 +51,9 @@ public:
      * @param private_key_length Length of local_private_key
      * @return CHIP_ERROR        The result of key derivation
      */
-    CHIP_ERROR Init(const unsigned char * remote_public_key, const size_t public_key_length,
-                    const unsigned char * local_private_key, const size_t private_key_length, const unsigned char * salt,
-                    const size_t salt_length, const unsigned char * info, const size_t info_length);
+    CHIP_ERROR Init(const uint8_t * remote_public_key, const size_t public_key_length, const uint8_t * local_private_key,
+                    const size_t private_key_length, const uint8_t * salt, const size_t salt_length, const uint8_t * info,
+                    const size_t info_length);
 
     /**
      * @brief
@@ -66,8 +66,8 @@ public:
      * @param private_key_length Length of local_private_key
      * @return CHIP_ERROR        The result of key derivation
      */
-    CHIP_ERROR InitFromSecret(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
-                              const size_t salt_length, const unsigned char * info, const size_t info_length);
+    CHIP_ERROR InitFromSecret(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
+                              const uint8_t * info, const size_t info_length);
 
     /**
      * @brief
@@ -79,7 +79,7 @@ public:
      * @param header message header structure
      * @return CHIP_ERROR The result of encryption
      */
-    CHIP_ERROR Encrypt(const unsigned char * input, size_t input_length, unsigned char * output, MessageHeader & header);
+    CHIP_ERROR Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, MessageHeader & header);
 
     /**
      * @brief
@@ -91,7 +91,7 @@ public:
      * @param header message header structure
      * @return CHIP_ERROR The result of decryption
      */
-    CHIP_ERROR Decrypt(const unsigned char * input, size_t input_length, unsigned char * output, const MessageHeader & header);
+    CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const MessageHeader & header);
 
     /**
      * @brief

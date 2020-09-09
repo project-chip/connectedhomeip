@@ -38,7 +38,7 @@ include ../system/SystemLayer.am
 include ../transport/TransportLayer.am
 include core/CoreLayer.am
 include support/SupportLayer.am
-include profiles/ProfilesLayer.am
+include protocols/ProtocolLayer.am
 include ../crypto/Crypto.am
 include ../app/DataModel.am
 
@@ -50,9 +50,9 @@ dist_CoreLayer__HEADERS=$(CHIP_BUILD_CORE_LAYER_HEADER_FILES)
 Controller_dir=$(includedir)/controller
 dist_Controller__HEADERS=$(CHIP_BUILD_DEVICE_CONTROLLER_HEADER_FILES)
 
-# install headers for profiles layer
-ProfilesLayer_dir=$(includedir)/lib/profiles
-dist_ProfilesLayer__HEADERS=$(CHIP_BUILD_PROFILES_LAYER_HEADER_FILES)
+# install headers for protocol layer
+ProtocolLayer_dir=$(includedir)/lib/protocols
+dist_ProtocolLayer__HEADERS=$(CHIP_BUILD_PROTOCOL_LAYER_HEADER_FILES)
 
 lib_LIBRARIES                       = libCHIP.a
 

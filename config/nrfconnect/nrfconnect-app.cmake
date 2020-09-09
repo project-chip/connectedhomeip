@@ -41,6 +41,13 @@ if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/dts.overlay")
     set(DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/dts.overlay")
 endif()
 
+# Set Kconfig root
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/Kconfig)
+    set(KCONFIG_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/Kconfig)
+else()
+    set(KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/Kconfig)
+endif()
+
 # ==================================================
 # Load NCS/Zephyr build system
 # ==================================================
@@ -54,39 +61,43 @@ include(chip-lib)
 
 set(CHIP_COMMON_FLAGS
     -D_SYS__PTHREADTYPES_H_
+    -DMBEDTLS_CONFIG_FILE=<nrf-config.h>
     -isystem${ZEPHYR_BASE}/include/posix
-    -isystem${ZEPHYR_BASE}/../modules/crypto/mbedtls/configs
+    -isystem${ZEPHYR_BASE}/../mbedtls/include
+    -I${CMAKE_CURRENT_SOURCE_DIR}
+    -I${CMAKE_CURRENT_SOURCE_DIR}/main/include
 )
 
-set(CHIP_OUTPUT_LIBRARIES
-    ${CHIP_OUTPUT_DIR}/lib/libCHIP.a
-    ${CHIP_OUTPUT_DIR}/lib/libInetLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libSystemLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libSupportLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libBleLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libDeviceLayer.a
-    ${CHIP_OUTPUT_DIR}/lib/libCHIPDataModel.a
+set(CHIP_LIBRARIES ${CHIP_OUTPUT_DIR}/lib/libCHIP.a)
+if (CONFIG_CHIP_LIB_SHELL)
+    list(APPEND CHIP_LIBRARIES ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/lib/shell/lib/libCHIPShell.a)
+endif()
+
+find_file(CHIP_PROJECT_CONFIG 
+    CHIPProjectConfig.h
+    PATHS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/main/include
+    NO_DEFAULT_PATH
 )
 
 # ==================================================
 # Setup CHIP build
 # ==================================================
 
-chip_configure(ChipConfig 
+chip_configure(ChipConfig
     ARCH arm-none-eabi
     CFLAGS ${CHIP_COMMON_FLAGS} --specs=nosys.specs
     CXXFLAGS ${CHIP_COMMON_FLAGS}
-    PROJECT_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/main/include/CHIPProjectConfig.h
+    PROJECT_CONFIG ${CHIP_PROJECT_CONFIG}
 )
 
 chip_build(ChipLib ChipConfig
-    BUILD_COMMAND make --no-print-directory install V=${CMAKE_AUTOGEN_VERBOSE}
-    BUILD_ARTIFACTS ${CHIP_OUTPUT_LIBRARIES}
+    BUILD_COMMAND ninja
+    BUILD_ARTIFACTS ${CHIP_LIBRARIES}
 )
 
 # ==================================================
 # Configure application
 # ==================================================
 
-target_compile_definitions(app PRIVATE HAVE_CONFIG_H)
-target_link_libraries(app PUBLIC -Wl,--start-group ChipLib -Wl,--end-group)
+target_link_libraries(app PUBLIC ChipLib)
+target_compile_definitions(app PRIVATE CHIP_SEPARATE_CONFIG_H)

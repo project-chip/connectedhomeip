@@ -49,7 +49,7 @@ using namespace chip;
 using namespace chip::Crypto;
 
 static uint32_t gs_test_entropy_source_called = 0;
-static int test_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
+static int test_entropy_source(void * data, uint8_t * output, size_t len, size_t * olen)
 {
     *olen = len;
     gs_test_entropy_source_called++;
@@ -66,8 +66,8 @@ static void TestAES_CCM_256EncryptTestVectors(nlTestSuite * inSuite, void * inCo
         if (vector->key_len == 32 && vector->pt_len > 0)
         {
             numOfTestsRan++;
-            unsigned char out_ct[vector->ct_len];
-            unsigned char out_tag[vector->tag_len];
+            uint8_t out_ct[vector->ct_len];
+            uint8_t out_tag[vector->tag_len];
 
             CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->key_len,
                                              vector->iv, vector->iv_len, out_ct, out_tag, vector->tag_len);
@@ -100,7 +100,7 @@ static void TestAES_CCM_256DecryptTestVectors(nlTestSuite * inSuite, void * inCo
         if (vector->key_len == 32 && vector->pt_len > 0)
         {
             numOfTestsRan++;
-            unsigned char out_pt[vector->pt_len];
+            uint8_t out_pt[vector->pt_len];
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
                                              vector->key, vector->key_len, vector->iv, vector->iv_len, out_pt);
 
@@ -126,8 +126,8 @@ static void TestAES_CCM_256EncryptInvalidPlainText(nlTestSuite * inSuite, void *
         if (vector->key_len == 32 && vector->pt_len > 0)
         {
             numOfTestsRan++;
-            unsigned char out_ct[vector->ct_len];
-            unsigned char out_tag[vector->tag_len];
+            uint8_t out_ct[vector->ct_len];
+            uint8_t out_tag[vector->tag_len];
 
             CHIP_ERROR err = AES_CCM_encrypt(vector->pt, 0, vector->aad, vector->aad_len, vector->key, vector->key_len, vector->iv,
                                              vector->iv_len, out_ct, out_tag, vector->tag_len);
@@ -148,8 +148,8 @@ static void TestAES_CCM_256EncryptNilKey(nlTestSuite * inSuite, void * inContext
         if (vector->key_len == 32 && vector->pt_len > 0)
         {
             numOfTestsRan++;
-            unsigned char out_ct[vector->ct_len];
-            unsigned char out_tag[vector->tag_len];
+            uint8_t out_ct[vector->ct_len];
+            uint8_t out_tag[vector->tag_len];
 
             CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, NULL, 32, vector->iv,
                                              vector->iv_len, out_ct, out_tag, vector->tag_len);
@@ -170,8 +170,8 @@ static void TestAES_CCM_256EncryptInvalidIVLen(nlTestSuite * inSuite, void * inC
         if (vector->key_len == 32 && vector->pt_len > 0)
         {
             numOfTestsRan++;
-            unsigned char out_ct[vector->ct_len];
-            unsigned char out_tag[vector->tag_len];
+            uint8_t out_ct[vector->ct_len];
+            uint8_t out_tag[vector->tag_len];
 
             CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->key_len,
                                              vector->iv, 0, out_ct, out_tag, vector->tag_len);
@@ -192,8 +192,8 @@ static void TestAES_CCM_256EncryptInvalidTagLen(nlTestSuite * inSuite, void * in
         if (vector->key_len == 32 && vector->pt_len > 0)
         {
             numOfTestsRan++;
-            unsigned char out_ct[vector->ct_len];
-            unsigned char out_tag[vector->tag_len];
+            uint8_t out_ct[vector->ct_len];
+            uint8_t out_tag[vector->tag_len];
 
             CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->key_len,
                                              vector->iv, vector->iv_len, out_ct, out_tag, 13);
@@ -214,7 +214,7 @@ static void TestAES_CCM_256DecryptInvalidCipherText(nlTestSuite * inSuite, void 
         if (vector->key_len == 32 && vector->pt_len > 0)
         {
             numOfTestsRan++;
-            unsigned char out_pt[vector->pt_len];
+            uint8_t out_pt[vector->pt_len];
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, 0, vector->aad, vector->aad_len, vector->tag, vector->tag_len, vector->key,
                                              vector->key_len, vector->iv, vector->iv_len, out_pt);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
@@ -234,7 +234,7 @@ static void TestAES_CCM_256DecryptInvalidKey(nlTestSuite * inSuite, void * inCon
         if (vector->key_len == 32 && vector->pt_len > 0)
         {
             numOfTestsRan++;
-            unsigned char out_pt[vector->pt_len];
+            uint8_t out_pt[vector->pt_len];
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
                                              NULL, 32, vector->iv, vector->iv_len, out_pt);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
@@ -254,7 +254,7 @@ static void TestAES_CCM_256DecryptInvalidIVLen(nlTestSuite * inSuite, void * inC
         if (vector->key_len == 32 && vector->pt_len > 0)
         {
             numOfTestsRan++;
-            unsigned char out_pt[vector->pt_len];
+            uint8_t out_pt[vector->pt_len];
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
                                              vector->key, vector->key_len, vector->iv, 0, out_pt);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
@@ -274,7 +274,7 @@ static void TestAES_CCM_256DecryptInvalidTestVectors(nlTestSuite * inSuite, void
         if (vector->key_len == 32 && vector->pt_len > 0)
         {
             numOfTestsRan++;
-            unsigned char out_pt[vector->pt_len];
+            uint8_t out_pt[vector->pt_len];
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
                                              vector->key, vector->key_len, vector->iv, vector->iv_len, out_pt);
 
@@ -296,8 +296,8 @@ static void TestAES_CCM_128EncryptTestVectors(nlTestSuite * inSuite, void * inCo
         if (vector->pt_len > 0)
         {
             numOfTestsRan++;
-            unsigned char out_ct[vector->ct_len];
-            unsigned char out_tag[vector->tag_len];
+            uint8_t out_ct[vector->ct_len];
+            uint8_t out_tag[vector->tag_len];
 
             CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->key_len,
                                              vector->iv, vector->iv_len, out_ct, out_tag, vector->tag_len);
@@ -333,7 +333,7 @@ static void TestAES_CCM_128DecryptTestVectors(nlTestSuite * inSuite, void * inCo
         if (vector->pt_len > 0)
         {
             numOfTestsRan++;
-            unsigned char out_pt[vector->pt_len];
+            uint8_t out_pt[vector->pt_len];
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
                                              vector->key, vector->key_len, vector->iv, vector->iv_len, out_pt);
 
@@ -362,8 +362,8 @@ static void TestAES_CCM_128EncryptInvalidPlainText(nlTestSuite * inSuite, void *
         if (vector->pt_len > 0)
         {
             numOfTestsRan++;
-            unsigned char out_ct[vector->ct_len];
-            unsigned char out_tag[vector->tag_len];
+            uint8_t out_ct[vector->ct_len];
+            uint8_t out_tag[vector->tag_len];
 
             CHIP_ERROR err = AES_CCM_encrypt(vector->pt, 0, vector->aad, vector->aad_len, vector->key, vector->key_len, vector->iv,
                                              vector->iv_len, out_ct, out_tag, vector->tag_len);
@@ -384,8 +384,8 @@ static void TestAES_CCM_128EncryptNilKey(nlTestSuite * inSuite, void * inContext
         if (vector->pt_len > 0)
         {
             numOfTestsRan++;
-            unsigned char out_ct[vector->ct_len];
-            unsigned char out_tag[vector->tag_len];
+            uint8_t out_ct[vector->ct_len];
+            uint8_t out_tag[vector->tag_len];
 
             CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, NULL, 0, vector->iv,
                                              vector->iv_len, out_ct, out_tag, vector->tag_len);
@@ -406,8 +406,8 @@ static void TestAES_CCM_128EncryptInvalidIVLen(nlTestSuite * inSuite, void * inC
         if (vector->pt_len > 0)
         {
             numOfTestsRan++;
-            unsigned char out_ct[vector->ct_len];
-            unsigned char out_tag[vector->tag_len];
+            uint8_t out_ct[vector->ct_len];
+            uint8_t out_tag[vector->tag_len];
 
             CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->key_len,
                                              vector->iv, 0, out_ct, out_tag, vector->tag_len);
@@ -428,8 +428,8 @@ static void TestAES_CCM_128EncryptInvalidTagLen(nlTestSuite * inSuite, void * in
         if (vector->pt_len > 0)
         {
             numOfTestsRan++;
-            unsigned char out_ct[vector->ct_len];
-            unsigned char out_tag[vector->tag_len];
+            uint8_t out_ct[vector->ct_len];
+            uint8_t out_tag[vector->tag_len];
 
             CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->key_len,
                                              vector->iv, vector->iv_len, out_ct, out_tag, 13);
@@ -450,7 +450,7 @@ static void TestAES_CCM_128DecryptInvalidCipherText(nlTestSuite * inSuite, void 
         if (vector->pt_len > 0)
         {
             numOfTestsRan++;
-            unsigned char out_pt[vector->pt_len];
+            uint8_t out_pt[vector->pt_len];
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, 0, vector->aad, vector->aad_len, vector->tag, vector->tag_len, vector->key,
                                              vector->key_len, vector->iv, vector->iv_len, out_pt);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
@@ -470,7 +470,7 @@ static void TestAES_CCM_128DecryptInvalidKey(nlTestSuite * inSuite, void * inCon
         if (vector->pt_len > 0)
         {
             numOfTestsRan++;
-            unsigned char out_pt[vector->pt_len];
+            uint8_t out_pt[vector->pt_len];
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
                                              NULL, 0, vector->iv, vector->iv_len, out_pt);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
@@ -490,7 +490,7 @@ static void TestAES_CCM_128DecryptInvalidIVLen(nlTestSuite * inSuite, void * inC
         if (vector->pt_len > 0)
         {
             numOfTestsRan++;
-            unsigned char out_pt[vector->pt_len];
+            uint8_t out_pt[vector->pt_len];
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
                                              vector->key, vector->key_len, vector->iv, 0, out_pt);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
@@ -508,7 +508,7 @@ static void TestHash_SHA256(nlTestSuite * inSuite, void * inContext)
     for (numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
     {
         hash_sha256_vector v = hash_sha256_test_vectors[numOfTestsExecuted];
-        unsigned char out_buffer[kSHA256_Hash_Length];
+        uint8_t out_buffer[kSHA256_Hash_Length];
         Hash_SHA256(v.data, v.data_length, out_buffer);
         bool success = memcmp(v.hash, out_buffer, sizeof(out_buffer)) == 0;
         NL_TEST_ASSERT(inSuite, success);
@@ -524,10 +524,10 @@ static void TestHash_SHA256_Stream(nlTestSuite * inSuite, void * inContext)
 
     for (numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
     {
-        hash_sha256_vector v       = hash_sha256_test_vectors[numOfTestsExecuted];
-        const unsigned char * data = v.data;
-        size_t data_length         = v.data_length;
-        unsigned char out_buffer[kSHA256_Hash_Length];
+        hash_sha256_vector v = hash_sha256_test_vectors[numOfTestsExecuted];
+        const uint8_t * data = v.data;
+        size_t data_length   = v.data_length;
+        uint8_t out_buffer[kSHA256_Hash_Length];
 
         Hash_SHA256_stream sha256;
 
@@ -567,7 +567,7 @@ static void TestHKDF_SHA256(nlTestSuite * inSuite, void * inContext)
     {
         hkdf_sha256_vector v = hkdf_sha256_test_vectors[numOfTestsExecuted];
         size_t out_length    = v.output_key_material_length;
-        unsigned char out_buffer[out_length];
+        uint8_t out_buffer[out_length];
         HKDF_SHA256(v.initial_key_material, v.initial_key_material_length, v.salt, v.salt_length, v.info, v.info_length, out_buffer,
                     v.output_key_material_length);
         bool success = memcmp(v.output_key_material, out_buffer, out_length) == 0;
@@ -582,7 +582,7 @@ static void TestDRBG_InvalidInputs(nlTestSuite * inSuite, void * inContext)
     error            = DRBG_get_bytes(NULL, 10);
     NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INVALID_ARGUMENT);
     error = CHIP_NO_ERROR;
-    unsigned char buffer[5];
+    uint8_t buffer[5];
     error = DRBG_get_bytes(buffer, 0);
     NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INVALID_ARGUMENT);
 }
@@ -590,9 +590,9 @@ static void TestDRBG_InvalidInputs(nlTestSuite * inSuite, void * inContext)
 static void TestDRBG_Output(nlTestSuite * inSuite, void * inContext)
 {
     // No good way to unit test a DRBG. Just validate that we get out something
-    CHIP_ERROR error           = CHIP_ERROR_INVALID_ARGUMENT;
-    unsigned char out_buf[10]  = { 0 };
-    unsigned char orig_buf[10] = { 0 };
+    CHIP_ERROR error     = CHIP_ERROR_INVALID_ARGUMENT;
+    uint8_t out_buf[10]  = { 0 };
+    uint8_t orig_buf[10] = { 0 };
 
     error = DRBG_get_bytes(out_buf, sizeof(out_buf));
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
@@ -604,23 +604,22 @@ static void TestECDSA_Signing_SHA256(nlTestSuite * inSuite, void * inContext)
     const char * msg  = "Hello World!";
     size_t msg_length = strlen((const char *) msg);
 
-    unsigned char hex_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f,
-                                        0x11, 0x0e, 0x34, 0x15, 0x81, 0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65,
-                                        0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
+    uint8_t hex_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f, 0x11, 0x0e, 0x34, 0x15, 0x81,
+                                  0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65, 0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
 
-    unsigned char hex_public_key[] = { 0x04, 0xe2, 0x07, 0x64, 0xff, 0x6f, 0x6a, 0x91, 0xd9, 0xc2, 0xc3, 0x0a, 0xc4,
-                                       0x3c, 0x56, 0x4b, 0x42, 0x8a, 0xf3, 0xb4, 0x49, 0x29, 0x39, 0x95, 0xa2, 0xf7,
-                                       0x02, 0x8c, 0xa5, 0xce, 0xf3, 0xc9, 0xca, 0x24, 0xc5, 0xd4, 0x5c, 0x60, 0x79,
-                                       0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
-                                       0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
+    uint8_t hex_public_key[] = { 0x04, 0xe2, 0x07, 0x64, 0xff, 0x6f, 0x6a, 0x91, 0xd9, 0xc2, 0xc3, 0x0a, 0xc4,
+                                 0x3c, 0x56, 0x4b, 0x42, 0x8a, 0xf3, 0xb4, 0x49, 0x29, 0x39, 0x95, 0xa2, 0xf7,
+                                 0x02, 0x8c, 0xa5, 0xce, 0xf3, 0xc9, 0xca, 0x24, 0xc5, 0xd4, 0x5c, 0x60, 0x79,
+                                 0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
+                                 0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
 
-    unsigned char signature[kMax_ECDSA_Signature_Length];
-    size_t signature_length  = sizeof(signature);
-    CHIP_ERROR signing_error = ECDSA_sign_msg((const unsigned char *) msg, msg_length, hex_private_key, sizeof(hex_private_key),
-                                              signature, signature_length);
+    uint8_t signature[kMax_ECDSA_Signature_Length];
+    size_t signature_length = sizeof(signature);
+    CHIP_ERROR signing_error =
+        ECDSA_sign_msg((const uint8_t *) msg, msg_length, hex_private_key, sizeof(hex_private_key), signature, signature_length);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
 
-    CHIP_ERROR validation_error = ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, hex_public_key,
+    CHIP_ERROR validation_error = ECDSA_validate_msg_signature((const uint8_t *) msg, msg_length, hex_public_key,
                                                                sizeof(hex_public_key), signature, signature_length);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_NO_ERROR);
 }
@@ -630,25 +629,24 @@ static void TestECDSA_ValidationFailsDifferentMessage(nlTestSuite * inSuite, voi
     const char * msg  = "Hello World!";
     size_t msg_length = strlen((const char *) msg);
 
-    unsigned char hex_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f,
-                                        0x11, 0x0e, 0x34, 0x15, 0x81, 0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65,
-                                        0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
+    uint8_t hex_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f, 0x11, 0x0e, 0x34, 0x15, 0x81,
+                                  0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65, 0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
 
-    unsigned char hex_public_key[] = { 0x04, 0xe2, 0x07, 0x64, 0xff, 0x6f, 0x6a, 0x91, 0xd9, 0xc2, 0xc3, 0x0a, 0xc4,
-                                       0x3c, 0x56, 0x4b, 0x42, 0x8a, 0xf3, 0xb4, 0x49, 0x29, 0x39, 0x95, 0xa2, 0xf7,
-                                       0x02, 0x8c, 0xa5, 0xce, 0xf3, 0xc9, 0xca, 0x24, 0xc5, 0xd4, 0x5c, 0x60, 0x79,
-                                       0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
-                                       0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
+    uint8_t hex_public_key[] = { 0x04, 0xe2, 0x07, 0x64, 0xff, 0x6f, 0x6a, 0x91, 0xd9, 0xc2, 0xc3, 0x0a, 0xc4,
+                                 0x3c, 0x56, 0x4b, 0x42, 0x8a, 0xf3, 0xb4, 0x49, 0x29, 0x39, 0x95, 0xa2, 0xf7,
+                                 0x02, 0x8c, 0xa5, 0xce, 0xf3, 0xc9, 0xca, 0x24, 0xc5, 0xd4, 0x5c, 0x60, 0x79,
+                                 0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
+                                 0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
 
-    unsigned char signature[kMax_ECDSA_Signature_Length];
-    size_t signature_length  = sizeof(signature);
-    CHIP_ERROR signing_error = ECDSA_sign_msg((const unsigned char *) msg, msg_length, hex_private_key, sizeof(hex_private_key),
-                                              signature, signature_length);
+    uint8_t signature[kMax_ECDSA_Signature_Length];
+    size_t signature_length = sizeof(signature);
+    CHIP_ERROR signing_error =
+        ECDSA_sign_msg((const uint8_t *) msg, msg_length, hex_private_key, sizeof(hex_private_key), signature, signature_length);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
 
     const char * diff_msg       = "NOT Hello World!";
     size_t diff_msg_length      = strlen((const char *) msg);
-    CHIP_ERROR validation_error = ECDSA_validate_msg_signature((const unsigned char *) diff_msg, diff_msg_length, hex_public_key,
+    CHIP_ERROR validation_error = ECDSA_validate_msg_signature((const uint8_t *) diff_msg, diff_msg_length, hex_public_key,
                                                                sizeof(hex_public_key), signature, signature_length);
     NL_TEST_ASSERT(inSuite, validation_error != CHIP_NO_ERROR);
 }
@@ -658,37 +656,35 @@ static void TestECDSA_ValidationFailIncorrectSignature(nlTestSuite * inSuite, vo
     const char * msg  = "Hello World!";
     size_t msg_length = strlen((const char *) msg);
 
-    unsigned char hex_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f,
-                                        0x11, 0x0e, 0x34, 0x15, 0x81, 0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65,
-                                        0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
+    uint8_t hex_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f, 0x11, 0x0e, 0x34, 0x15, 0x81,
+                                  0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65, 0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
 
-    unsigned char hex_public_key[] = { 0x04, 0xe2, 0x07, 0x64, 0xff, 0x6f, 0x6a, 0x91, 0xd9, 0xc2, 0xc3, 0x0a, 0xc4,
-                                       0x3c, 0x56, 0x4b, 0x42, 0x8a, 0xf3, 0xb4, 0x49, 0x29, 0x39, 0x95, 0xa2, 0xf7,
-                                       0x02, 0x8c, 0xa5, 0xce, 0xf3, 0xc9, 0xca, 0x24, 0xc5, 0xd4, 0x5c, 0x60, 0x79,
-                                       0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
-                                       0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
+    uint8_t hex_public_key[] = { 0x04, 0xe2, 0x07, 0x64, 0xff, 0x6f, 0x6a, 0x91, 0xd9, 0xc2, 0xc3, 0x0a, 0xc4,
+                                 0x3c, 0x56, 0x4b, 0x42, 0x8a, 0xf3, 0xb4, 0x49, 0x29, 0x39, 0x95, 0xa2, 0xf7,
+                                 0x02, 0x8c, 0xa5, 0xce, 0xf3, 0xc9, 0xca, 0x24, 0xc5, 0xd4, 0x5c, 0x60, 0x79,
+                                 0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
+                                 0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
 
-    unsigned char signature[kMax_ECDSA_Signature_Length];
-    size_t signature_length  = sizeof(signature);
-    CHIP_ERROR signing_error = ECDSA_sign_msg((const unsigned char *) msg, msg_length, hex_private_key, sizeof(hex_private_key),
-                                              signature, signature_length);
+    uint8_t signature[kMax_ECDSA_Signature_Length];
+    size_t signature_length = sizeof(signature);
+    CHIP_ERROR signing_error =
+        ECDSA_sign_msg((const uint8_t *) msg, msg_length, hex_private_key, sizeof(hex_private_key), signature, signature_length);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
     signature[0] = ~signature[0]; // Flipping bits should invalidate the signature.
 
-    CHIP_ERROR validation_error = ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, hex_public_key,
+    CHIP_ERROR validation_error = ECDSA_validate_msg_signature((const uint8_t *) msg, msg_length, hex_public_key,
                                                                sizeof(hex_public_key), signature, signature_length);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_SIGNATURE);
 }
 
 static void TestECDSA_SigningInvalidParams(nlTestSuite * inSuite, void * inContext)
 {
-    const unsigned char * msg       = (unsigned char *) "Hello World!";
-    size_t msg_length               = strlen((const char *) msg);
-    unsigned char hex_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f,
-                                        0x11, 0x0e, 0x34, 0x15, 0x81, 0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65,
-                                        0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
+    const uint8_t * msg       = (uint8_t *) "Hello World!";
+    size_t msg_length         = strlen((const char *) msg);
+    uint8_t hex_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f, 0x11, 0x0e, 0x34, 0x15, 0x81,
+                                  0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65, 0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
 
-    unsigned char signature[kMax_ECDSA_Signature_Length];
+    uint8_t signature[kMax_ECDSA_Signature_Length];
     size_t signature_length = sizeof(signature);
     CHIP_ERROR signing_error =
         ECDSA_sign_msg(NULL, msg_length, hex_private_key, sizeof(hex_private_key), signature, signature_length);
@@ -717,20 +713,19 @@ static void TestECDSA_ValidationInvalidParam(nlTestSuite * inSuite, void * inCon
     const char * msg  = "Hello World!";
     size_t msg_length = strlen((const char *) msg);
 
-    unsigned char hex_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f,
-                                        0x11, 0x0e, 0x34, 0x15, 0x81, 0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65,
-                                        0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
+    uint8_t hex_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f, 0x11, 0x0e, 0x34, 0x15, 0x81,
+                                  0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65, 0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
 
-    unsigned char hex_public_key[] = { 0x04, 0xe2, 0x07, 0x64, 0xff, 0x6f, 0x6a, 0x91, 0xd9, 0xc2, 0xc3, 0x0a, 0xc4,
-                                       0x3c, 0x56, 0x4b, 0x42, 0x8a, 0xf3, 0xb4, 0x49, 0x29, 0x39, 0x95, 0xa2, 0xf7,
-                                       0x02, 0x8c, 0xa5, 0xce, 0xf3, 0xc9, 0xca, 0x24, 0xc5, 0xd4, 0x5c, 0x60, 0x79,
-                                       0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
-                                       0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
+    uint8_t hex_public_key[] = { 0x04, 0xe2, 0x07, 0x64, 0xff, 0x6f, 0x6a, 0x91, 0xd9, 0xc2, 0xc3, 0x0a, 0xc4,
+                                 0x3c, 0x56, 0x4b, 0x42, 0x8a, 0xf3, 0xb4, 0x49, 0x29, 0x39, 0x95, 0xa2, 0xf7,
+                                 0x02, 0x8c, 0xa5, 0xce, 0xf3, 0xc9, 0xca, 0x24, 0xc5, 0xd4, 0x5c, 0x60, 0x79,
+                                 0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
+                                 0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
 
-    unsigned char signature[kMax_ECDSA_Signature_Length];
-    size_t signature_length  = sizeof(signature);
-    CHIP_ERROR signing_error = ECDSA_sign_msg((const unsigned char *) msg, msg_length, hex_private_key, sizeof(hex_private_key),
-                                              signature, signature_length);
+    uint8_t signature[kMax_ECDSA_Signature_Length];
+    size_t signature_length = sizeof(signature);
+    CHIP_ERROR signing_error =
+        ECDSA_sign_msg((const uint8_t *) msg, msg_length, hex_private_key, sizeof(hex_private_key), signature, signature_length);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
 
     CHIP_ERROR validation_error =
@@ -738,56 +733,54 @@ static void TestECDSA_ValidationInvalidParam(nlTestSuite * inSuite, void * inCon
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
     validation_error = CHIP_NO_ERROR;
 
-    validation_error = ECDSA_validate_msg_signature((const unsigned char *) msg, 0, hex_public_key, sizeof(hex_public_key),
-                                                    signature, signature_length);
+    validation_error =
+        ECDSA_validate_msg_signature((const uint8_t *) msg, 0, hex_public_key, sizeof(hex_public_key), signature, signature_length);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
     validation_error = CHIP_NO_ERROR;
 
     validation_error =
-        ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, hex_public_key, 0, signature, signature_length);
+        ECDSA_validate_msg_signature((const uint8_t *) msg, msg_length, hex_public_key, 0, signature, signature_length);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
     validation_error = CHIP_NO_ERROR;
 
-    validation_error = ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, hex_public_key, sizeof(hex_public_key),
-                                                    NULL, signature_length);
+    validation_error = ECDSA_validate_msg_signature((const uint8_t *) msg, msg_length, hex_public_key, sizeof(hex_public_key), NULL,
+                                                    signature_length);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
     validation_error = CHIP_NO_ERROR;
 
     validation_error =
-        ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, hex_public_key, sizeof(hex_public_key), signature, 0);
+        ECDSA_validate_msg_signature((const uint8_t *) msg, msg_length, hex_public_key, sizeof(hex_public_key), signature, 0);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
     validation_error = CHIP_NO_ERROR;
 }
 
 static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
 {
-    unsigned char private_key1[] = {
-        0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f, 0x11, 0x0e, 0x34, 0x15, 0x81,
-        0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65, 0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1
-    };
+    uint8_t private_key1[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f, 0x11, 0x0e, 0x34, 0x15, 0x81,
+                               0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65, 0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
 
-    const unsigned char public_key1[] = { 0x04, 0xe2, 0x07, 0x64, 0xff, 0x6f, 0x6a, 0x91, 0xd9, 0xc2, 0xc3, 0x0a, 0xc4,
-                                          0x3c, 0x56, 0x4b, 0x42, 0x8a, 0xf3, 0xb4, 0x49, 0x29, 0x39, 0x95, 0xa2, 0xf7,
-                                          0x02, 0x8c, 0xa5, 0xce, 0xf3, 0xc9, 0xca, 0x24, 0xc5, 0xd4, 0x5c, 0x60, 0x79,
-                                          0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
-                                          0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
+    const uint8_t public_key1[] = { 0x04, 0xe2, 0x07, 0x64, 0xff, 0x6f, 0x6a, 0x91, 0xd9, 0xc2, 0xc3, 0x0a, 0xc4,
+                                    0x3c, 0x56, 0x4b, 0x42, 0x8a, 0xf3, 0xb4, 0x49, 0x29, 0x39, 0x95, 0xa2, 0xf7,
+                                    0x02, 0x8c, 0xa5, 0xce, 0xf3, 0xc9, 0xca, 0x24, 0xc5, 0xd4, 0x5c, 0x60, 0x79,
+                                    0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
+                                    0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
 
-    const unsigned char private_key2[] = { 0x00, 0xd1, 0x90, 0xd9, 0xb3, 0x95, 0x1c, 0x5f, 0xa4, 0xe7, 0x47,
-                                           0x92, 0x5b, 0x0a, 0xa9, 0xa7, 0xc1, 0x1c, 0xe7, 0x06, 0x10, 0xe2,
-                                           0xdd, 0x16, 0x41, 0x52, 0x55, 0xb7, 0xb8, 0x80, 0x8d, 0x87, 0xa1 };
+    const uint8_t private_key2[] = { 0x00, 0xd1, 0x90, 0xd9, 0xb3, 0x95, 0x1c, 0x5f, 0xa4, 0xe7, 0x47,
+                                     0x92, 0x5b, 0x0a, 0xa9, 0xa7, 0xc1, 0x1c, 0xe7, 0x06, 0x10, 0xe2,
+                                     0xdd, 0x16, 0x41, 0x52, 0x55, 0xb7, 0xb8, 0x80, 0x8d, 0x87, 0xa1 };
 
-    const unsigned char public_key2[] = { 0x04, 0x30, 0x77, 0x2c, 0xe7, 0xd4, 0x0a, 0xf2, 0xf3, 0x19, 0xbd, 0xfb, 0x1f,
-                                          0xcc, 0x88, 0xd9, 0x83, 0x25, 0x89, 0xf2, 0x09, 0xf3, 0xab, 0xe4, 0x33, 0xb6,
-                                          0x7a, 0xff, 0x73, 0x3b, 0x01, 0x35, 0x34, 0x92, 0x73, 0x14, 0x59, 0x0b, 0xbd,
-                                          0x44, 0x72, 0x1b, 0xcd, 0xb9, 0x02, 0x53, 0xd9, 0xaf, 0xcc, 0x1a, 0xcd, 0xae,
-                                          0xe8, 0x87, 0x2e, 0x52, 0x3b, 0x98, 0xf0, 0xa1, 0x88, 0x4a, 0xe3, 0x03, 0x75 };
+    const uint8_t public_key2[] = { 0x04, 0x30, 0x77, 0x2c, 0xe7, 0xd4, 0x0a, 0xf2, 0xf3, 0x19, 0xbd, 0xfb, 0x1f,
+                                    0xcc, 0x88, 0xd9, 0x83, 0x25, 0x89, 0xf2, 0x09, 0xf3, 0xab, 0xe4, 0x33, 0xb6,
+                                    0x7a, 0xff, 0x73, 0x3b, 0x01, 0x35, 0x34, 0x92, 0x73, 0x14, 0x59, 0x0b, 0xbd,
+                                    0x44, 0x72, 0x1b, 0xcd, 0xb9, 0x02, 0x53, 0xd9, 0xaf, 0xcc, 0x1a, 0xcd, 0xae,
+                                    0xe8, 0x87, 0x2e, 0x52, 0x3b, 0x98, 0xf0, 0xa1, 0x88, 0x4a, 0xe3, 0x03, 0x75 };
 
-    unsigned char out_secret1[kMax_ECDH_Secret_Length] = { 0 };
-    size_t out_size1                                   = sizeof(out_secret1);
+    uint8_t out_secret1[kMax_ECDH_Secret_Length] = { 0 };
+    size_t out_size1                             = sizeof(out_secret1);
 
-    unsigned char out_secret2[kMax_ECDH_Secret_Length] = { 1 };
-    size_t out_size2                                   = sizeof(out_secret2);
-    CHIP_ERROR error                                   = CHIP_NO_ERROR;
+    uint8_t out_secret2[kMax_ECDH_Secret_Length] = { 1 };
+    size_t out_size2                             = sizeof(out_secret2);
+    CHIP_ERROR error                             = CHIP_NO_ERROR;
     NL_TEST_ASSERT(inSuite, memcmp(out_secret1, out_secret2, out_size1) != 0); // Validate that buffers are indeed different.
 
     error = ECDH_derive_secret(public_key1, sizeof(public_key1), private_key2, sizeof(private_key2), out_secret1, out_size1);
@@ -805,19 +798,17 @@ static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
 
 static void TestECDH_InvalidParams(nlTestSuite * inSuite, void * inContext)
 {
-    unsigned char private_key1[] = {
-        0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f, 0x11, 0x0e, 0x34, 0x15, 0x81,
-        0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65, 0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1
-    };
+    uint8_t private_key1[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f, 0x11, 0x0e, 0x34, 0x15, 0x81,
+                               0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65, 0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
 
-    const unsigned char public_key2[] = { 0x04, 0x30, 0x77, 0x2c, 0xe7, 0xd4, 0x0a, 0xf2, 0xf3, 0x19, 0xbd, 0xfb, 0x1f,
-                                          0xcc, 0x88, 0xd9, 0x83, 0x25, 0x89, 0xf2, 0x09, 0xf3, 0xab, 0xe4, 0x33, 0xb6,
-                                          0x7a, 0xff, 0x73, 0x3b, 0x01, 0x35, 0x34, 0x92, 0x73, 0x14, 0x59, 0x0b, 0xbd,
-                                          0x44, 0x72, 0x1b, 0xcd, 0xb9, 0x02, 0x53, 0xd9, 0xaf, 0xcc, 0x1a, 0xcd, 0xae,
-                                          0xe8, 0x87, 0x2e, 0x52, 0x3b, 0x98, 0xf0, 0xa1, 0x88, 0x4a, 0xe3, 0x03, 0x75 };
+    const uint8_t public_key2[] = { 0x04, 0x30, 0x77, 0x2c, 0xe7, 0xd4, 0x0a, 0xf2, 0xf3, 0x19, 0xbd, 0xfb, 0x1f,
+                                    0xcc, 0x88, 0xd9, 0x83, 0x25, 0x89, 0xf2, 0x09, 0xf3, 0xab, 0xe4, 0x33, 0xb6,
+                                    0x7a, 0xff, 0x73, 0x3b, 0x01, 0x35, 0x34, 0x92, 0x73, 0x14, 0x59, 0x0b, 0xbd,
+                                    0x44, 0x72, 0x1b, 0xcd, 0xb9, 0x02, 0x53, 0xd9, 0xaf, 0xcc, 0x1a, 0xcd, 0xae,
+                                    0xe8, 0x87, 0x2e, 0x52, 0x3b, 0x98, 0xf0, 0xa1, 0x88, 0x4a, 0xe3, 0x03, 0x75 };
 
-    unsigned char out_secret[kMax_ECDH_Secret_Length] = { 0 };
-    size_t out_size                                   = sizeof(out_secret);
+    uint8_t out_secret[kMax_ECDH_Secret_Length] = { 0 };
+    size_t out_size                             = sizeof(out_secret);
 
     CHIP_ERROR error = ECDH_derive_secret(NULL, sizeof(public_key2), private_key1, sizeof(private_key1), out_secret, out_size);
     NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INVALID_ARGUMENT);
@@ -845,9 +836,9 @@ static void TestECDH_SampleInputVectors(nlTestSuite * inSuite, void * inContext)
     size_t numOfTestsExecuted = 0;
     for (numOfTestsExecuted = 0; numOfTestsExecuted < ArraySize(ecdh_test_vectors); numOfTestsExecuted++)
     {
-        unsigned char out_secret[kMax_ECDH_Secret_Length] = { 0 };
-        size_t out_secret_length                          = sizeof(out_secret);
-        ECDH_P256_test_vector v                           = ecdh_test_vectors[numOfTestsExecuted];
+        uint8_t out_secret[kMax_ECDH_Secret_Length] = { 0 };
+        size_t out_secret_length                    = sizeof(out_secret);
+        ECDH_P256_test_vector v                     = ecdh_test_vectors[numOfTestsExecuted];
         CHIP_ERROR error = ECDH_derive_secret(v.remote_pub_key, v.remote_pub_key_length, v.local_pvt_key, v.local_pvt_key_length,
                                               out_secret, out_secret_length);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
@@ -865,7 +856,7 @@ static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR error = add_entropy_source(test_entropy_source, NULL, 10);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
-    unsigned char buffer[5];
+    uint8_t buffer[5];
     NL_TEST_ASSERT(inSuite, DRBG_get_bytes(buffer, sizeof(buffer)) == CHIP_NO_ERROR);
 }
 #endif
@@ -875,7 +866,7 @@ static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR error = add_entropy_source(test_entropy_source, NULL, 10);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
-    unsigned char buffer[5];
+    uint8_t buffer[5];
     uint32_t test_entropy_source_call_count = gs_test_entropy_source_called;
     NL_TEST_ASSERT(inSuite, DRBG_get_bytes(buffer, sizeof(buffer)) == CHIP_NO_ERROR);
     for (int i = 0; i < 5000 * 2; i++)
@@ -896,7 +887,7 @@ static void TestPBKDF2_SHA256_TestVectors(nlTestSuite * inSuite, void * inContex
         if (vector->plen > 0)
         {
             numOfTestsRan++;
-            unsigned char out_key[vector->key_len];
+            uint8_t out_key[vector->key_len];
 
             CHIP_ERROR err =
                 pbkdf2_sha256(vector->password, vector->plen, vector->salt, vector->slen, vector->iter, vector->key_len, out_key);
@@ -913,7 +904,7 @@ static void TestPBKDF2_SHA256_TestVectors(nlTestSuite * inSuite, void * inContex
 
 static void TestSPAKE2P_spake2p_FEMul(nlTestSuite * inSuite, void * inContext)
 {
-    unsigned char fe_out[kMAX_FE_Length];
+    uint8_t fe_out[kMAX_FE_Length];
 
     int numOfTestVectors = ArraySize(fe_mul_tvs);
     int numOfTestsRan    = 0;
@@ -946,7 +937,7 @@ static void TestSPAKE2P_spake2p_FEMul(nlTestSuite * inSuite, void * inContext)
 
 static void TestSPAKE2P_spake2p_FELoadWrite(nlTestSuite * inSuite, void * inContext)
 {
-    unsigned char fe_out[kMAX_FE_Length];
+    uint8_t fe_out[kMAX_FE_Length];
 
     int numOfTestVectors = ArraySize(fe_rw_tvs);
     int numOfTestsRan    = 0;
@@ -973,7 +964,7 @@ static void TestSPAKE2P_spake2p_FELoadWrite(nlTestSuite * inSuite, void * inCont
 
 static void TestSPAKE2P_spake2p_Mac(nlTestSuite * inSuite, void * inContext)
 {
-    unsigned char mac[kMAX_Hash_Length];
+    uint8_t mac[kMAX_Hash_Length];
 
     int numOfTestVectors = ArraySize(hmac_tvs);
     int numOfTestsRan    = 0;
@@ -1001,7 +992,7 @@ static void TestSPAKE2P_spake2p_Mac(nlTestSuite * inSuite, void * inContext)
 
 static void TestSPAKE2P_spake2p_PointMul(nlTestSuite * inSuite, void * inContext)
 {
-    unsigned char output[kMAX_Point_Length];
+    uint8_t output[kMAX_Point_Length];
     size_t out_len = sizeof(output);
 
     int numOfTestVectors = ArraySize(point_mul_tvs);
@@ -1037,7 +1028,7 @@ static void TestSPAKE2P_spake2p_PointMul(nlTestSuite * inSuite, void * inContext
 
 static void TestSPAKE2P_spake2p_PointMulAdd(nlTestSuite * inSuite, void * inContext)
 {
-    unsigned char output[kMAX_Point_Length];
+    uint8_t output[kMAX_Point_Length];
     size_t out_len = sizeof(output);
 
     int numOfTestVectors = ArraySize(point_muladd_tvs);
@@ -1079,7 +1070,7 @@ static void TestSPAKE2P_spake2p_PointMulAdd(nlTestSuite * inSuite, void * inCont
 
 static void TestSPAKE2P_spake2p_PointLoadWrite(nlTestSuite * inSuite, void * inContext)
 {
-    unsigned char output[kMAX_Point_Length];
+    uint8_t output[kMAX_Point_Length];
     size_t out_len = sizeof(output);
 
     int numOfTestVectors = ArraySize(point_rw_tvs);
@@ -1137,7 +1128,7 @@ static void TestSPAKE2P_spake2p_PointIsValid(nlTestSuite * inSuite, void * inCon
 class Test_Spake2p_P256_SHA256_HKDF_HMAC : public Spake2p_P256_SHA256_HKDF_HMAC
 {
 public:
-    CHIP_ERROR TestSetFE(const unsigned char * fe_in, size_t fe_in_len)
+    CHIP_ERROR TestSetFE(const uint8_t * fe_in, size_t fe_in_len)
     {
         if (fe_in_len > kMAX_FE_Length)
         {
@@ -1151,32 +1142,36 @@ public:
     CHIP_ERROR FEGenerate(void * feout) { return FELoad(fe, fe_len, feout); }
 
 private:
-    unsigned char fe[kMAX_FE_Length];
+    uint8_t fe[kMAX_FE_Length];
     size_t fe_len;
 };
 
 static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
 {
-    CHIP_ERROR error;
-    unsigned char L[kMAX_Point_Length];
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    uint8_t L[kMAX_Point_Length];
     size_t L_len = sizeof(L);
-    unsigned char Z[kMAX_Point_Length];
-    unsigned char V[kMAX_Point_Length];
-    unsigned char X[kMAX_Point_Length];
+    uint8_t Z[kMAX_Point_Length];
+    uint8_t V[kMAX_Point_Length];
+    uint8_t X[kMAX_Point_Length];
     size_t X_len = sizeof(X);
-    unsigned char Y[kMAX_Point_Length];
+    uint8_t Y[kMAX_Point_Length];
     size_t Y_len = sizeof(Y);
-    unsigned char Pverifier[kMAX_Hash_Length];
+    uint8_t Pverifier[kMAX_Hash_Length];
     size_t Pverifier_len = sizeof(Pverifier);
-    unsigned char Vverifier[kMAX_Hash_Length];
+    uint8_t Vverifier[kMAX_Hash_Length];
     size_t Vverifier_len = sizeof(Vverifier);
-    unsigned char VKe[kMAX_Hash_Length];
+    uint8_t VKe[kMAX_Hash_Length];
     size_t VKe_len = sizeof(VKe);
-    unsigned char PKe[kMAX_Hash_Length];
+    uint8_t PKe[kMAX_Hash_Length];
     size_t PKe_len = sizeof(PKe);
 
     int numOfTestVectors = ArraySize(rfc_tvs);
     int numOfTestsRan    = 0;
+    // static_assert(sizeof(Spake2p_Context) < 1024, "Allocate more bytes for Spake2p Context");
+    // printf("Sizeof spake2pcontext %lu\n", sizeof(Spake2p_Context));
+    // printf("Sizeof mbedtls_sha256_context %lu\n", sizeof(mbedtls_sha256_context));
+    // printf("Sizeof SHA256_CTX %lu\n", sizeof(SHA256_CTX));
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
         const struct spake2p_rfc_tv * vector = rfc_tvs[vectorIndex];

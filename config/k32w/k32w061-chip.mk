@@ -77,7 +77,7 @@ CHIP_CXXFLAGS = $(STD_CXXFLAGS) $(CXXFLAGS)
 CHIP_CONFIGURE_OPTIONS = \
     -C AR="$(AR)" AS="$(AS)" CC="$(CCACHE) $(CC)" CXX="$(CCACHE) $(CXX)" \
     LD="$(LD)" OBJCOPY="$(OBJCOPY)" RANLIB="$(RANLIB)" INSTALL="$(INSTALL) $(INSTALLFLAGS)" \
-    CPPFLAGS="$(CHIP_CPPFLAGS)" \
+    CPPFLAGS="$(CHIP_CPPFLAGS) -imacros $(CHIP_ROOT)/third_party/openthread/repo/examples/platforms/k32w/k32w061/k32w061-sdk-config.h" \
     CXXFLAGS="$(CHIP_CXXFLAGS)" \
     --prefix=$(CHIP_OUTPUT_DIR) \
     --exec-prefix=$(CHIP_OUTPUT_DIR) \
@@ -91,7 +91,7 @@ CHIP_CONFIGURE_OPTIONS = \
     --with-lwip-target=k32w \
     --with-inet-endpoint="tcp udp" \
     --with-openssl=no \
-    --with-openthread=$(K32W061_SDK_ROOT)/middleware/wireless/openthread/openthread \
+    --with-openthread=internal \
     --with-logging-style=external \
     --with-chip-project-includes=$(CHIP_PROJECT_CONFIG) \
     --with-chip-system-project-includes=$(CHIP_PROJECT_CONFIG) \
@@ -140,9 +140,7 @@ STD_INC_DIRS += \
     $(K32W061_SDK_ROOT)/middleware/wireless/framework/Lists \
     $(K32W061_SDK_ROOT)/middleware/wireless/framework/PDM/Include \
     $(K32W061_SDK_ROOT)/middleware/wireless/framework/MemManager/Interface \
-    $(K32W061_SDK_ROOT)/middleware/wireless/openthread/openthread \
-    $(K32W061_SDK_ROOT)/middleware/wireless/openthread/openthread/include \
-    $(K32W061_SDK_ROOT)/middleware/wireless/openthread/openthread/examples/platforms
+    $(CHIP_ROOT)/third_party/openthread/repo/examples/platforms
 
 # Add the location of CHIP libraries to application link action.
 STD_LDFLAGS += -L$(CHIP_OUTPUT_DIR)/lib

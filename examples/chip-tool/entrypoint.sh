@@ -9,7 +9,7 @@ ot-ctl ifconfig up
 ot-ctl thread start
 
 if [ "$1" == "server" ]; then
-    chip-standalone-server
+    chip-tool-server
 elif [ "$1" == "tool" ]; then
     sleep infinity
 fi

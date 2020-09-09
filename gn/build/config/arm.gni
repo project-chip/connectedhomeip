@@ -18,6 +18,12 @@ if (current_cpu == "arm" || current_cpu == "arm64") {
     arm_platform_config = ""
   }
 
+  if (arm_platform_config == "") {
+    if (current_os == "android") {
+      arm_platform_config = "//build/toolchain/android/android_arm.gni"
+    }
+  }
+
   # Allow platforms to override how ARM architecture flags are chosen by
   # providing a file to import.
   if (arm_platform_config != "") {
@@ -33,7 +39,7 @@ if (current_cpu == "arm" || current_cpu == "arm64") {
     arm_fpu = ""
     arm_float_abi = ""
     arm_abi = ""
-    arm_use_thumb = true
+    arm_use_thumb = current_os != "android" || current_cpu != "arm64"
 
     # Update defaults with platform values, if any.
     if (arm_platform_config != "") {

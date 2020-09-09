@@ -81,6 +81,7 @@ public class ChipDeviceController {
     System.loadLibrary("CHIPController");
   }
 
+  @SuppressWarnings("deprecation")
   protected void finalize() throws Throwable {
     super.finalize();
 

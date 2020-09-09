@@ -48,8 +48,7 @@ $(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_rectangle.c            \
 $(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_string.c               \
 
 LCD_SRCS = \
-$(PROJECT_ROOT)/src/display/init_lcd.c                                      \
-$(PROJECT_ROOT)/src/display/sample_qr_code.c                                \
+$(PROJECT_ROOT)/src/display/lcd.c                                      \
 $(EFR32_SDK_ROOT)/hardware/kit/common/drivers/display.c                     \
 $(EFR32_SDK_ROOT)/hardware/kit/common/drivers/displayls013b7dh03.c          \
 $(EFR32_SDK_ROOT)/hardware/kit/common/drivers/displaypalemlib.c             \

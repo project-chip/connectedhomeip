@@ -51,6 +51,78 @@ typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * app
 typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
 };
 
+class BLEDeviceConnectionParameters
+{
+public:
+    BLEDeviceConnectionParameters();
+
+    NodeId GetRemoteDeviceId() const { return remoteDeviceId; }
+    BLEDeviceConnectionParameters & SetRemoteDeviceId(NodeId id)
+    {
+        remoteDeviceId = id;
+        return *this;
+    }
+
+    uint16_t GetDiscriminator() const { return discriminator; }
+    BLEDeviceConnectionParameters & SetDiscriminator(uint16_t value)
+    {
+        discriminator = value;
+        return *this;
+    }
+
+    uint32_t GetSetupPINCode() const { return setupPINCode; }
+    BLEDeviceConnectionParameters & SetSetupPINCode(uint32_t value)
+    {
+        setupPINCode = value;
+        return *this;
+    }
+
+    void * GetAppReqState() const { return appReqState; }
+    BLEDeviceConnectionParameters & SetAppReqState(void * value)
+    {
+        appReqState = value;
+        return *this;
+    }
+
+    NewConnectionHandler GetOnConnected() const { return onConnected; }
+    BLEDeviceConnectionParameters & SetOnConnected(NewConnectionHandler value)
+    {
+        onConnected = value;
+        return *this;
+    }
+
+    MessageReceiveHandler GetOnMessageReceived() const { return onMessageReceived; }
+    BLEDeviceConnectionParameters & SetOnMessageReceived(MessageReceiveHandler value)
+    {
+        onMessageReceived = value;
+        return *this;
+    }
+
+    ErrorHandler GetOnError() const { return onError; }
+    BLEDeviceConnectionParameters & SetOnError(ErrorHandler value)
+    {
+        onError = value;
+        return *this;
+    }
+
+    BleLayer * GetBleLayer() const { return bleLayer; }
+    BLEDeviceConnectionParameters & SetBleLayer(BleLayer * value)
+    {
+        bleLayer = value;
+        return *this;
+    }
+
+private:
+    NodeId remoteDeviceId                   = 0;
+    uint16_t discriminator                  = 0;
+    uint32_t setupPINCode                   = 0;
+    void * appReqState                      = nullptr;
+    NewConnectionHandler onConnected        = nullptr;
+    MessageReceiveHandler onMessageReceived = nullptr;
+    ErrorHandler onError                    = nullptr;
+    BleLayer * bleLayer                     = nullptr;
+};
+
 class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback,
                                         public SecurePairingSessionDelegate,
                                         public Transport::BLECallbackHandler
@@ -88,7 +160,25 @@ public:
      * @return CHIP_ERROR               The connection status
      */
     CHIP_ERROR ConnectDevice(NodeId remoteDeviceId, const uint16_t discriminator, const uint32_t setupPINCode, void * appReqState,
-                             NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived, ErrorHandler onError);
+                             NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived, ErrorHandler onError)
+    {
+        return ConnectDevice(BLEDeviceConnectionParameters()
+                                 .SetRemoteDeviceId(remoteDeviceId)
+                                 .SetDiscriminator(discriminator)
+                                 .SetSetupPINCode(setupPINCode)
+                                 .SetAppReqState(appReqState)
+                                 .SetOnConnected(onConnected)
+                                 .SetOnMessageReceived(onMessageReceived)
+                                 .SetOnError(onError));
+    }
+
+    /**
+     * @brief
+     *   Connect to a CHIP device with the provided BLE connection parameters
+     *
+     * @return CHIP_ERROR               The connection status
+     */
+    CHIP_ERROR ConnectDevice(const BLEDeviceConnectionParameters & params);
 
     /**
      * @brief

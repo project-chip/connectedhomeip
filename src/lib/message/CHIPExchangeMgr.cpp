@@ -33,14 +33,14 @@
 
 #include <stddef.h>
 
-#include <Profiles/common/CommonProfile.h>
-#include <Profiles/security/CHIPSecurity.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <message/CHIPBinding.h>
 #include <message/CHIPExchangeMgr.h>
 #include <message/CHIPSecurityMgr.h>
-#include <profiles/CHIPProfiles.h>
+#include <protocols/CHIPProtocols.h>
+#include <protocols/common/CommonProtocol.h>
+#include <protocols/security/CHIPSecurity.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
@@ -50,8 +50,8 @@
 
 namespace chip {
 
-using namespace nl;
-using namespace chip::Profiles;
+using namespace chip;
+using namespace chip::Protocols;
 using namespace chip::Encoding;
 
 /**
@@ -102,16 +102,13 @@ CHIP_ERROR ChipExchangeManager::Init(ChipMessageLayer * msgLayer)
     msgLayer->ExchangeMgr       = this;
     msgLayer->OnMessageReceived = HandleMessageReceived;
     msgLayer->OnAcceptError     = HandleAcceptError;
-
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    mRMPTimerInterval = CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD; // CRMP Timer tick period
+    mRMPTimerInterval           = CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD; // CRMP Timer tick period
 
     memset(RetransTable, 0, sizeof(RetransTable));
 
     mRMPTimeStampBase = System::Timer::GetCurrentEpoch();
 
     mRMPCurrentTimerExpiry = 0;
-#endif
 
     State = kState_Initialized;
 
@@ -141,7 +138,7 @@ CHIP_ERROR ChipExchangeManager::Shutdown()
             MessageLayer->OnMessageReceived = NULL;
             MessageLayer->OnAcceptError     = NULL;
         }
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
+
         RMPStopTimer();
 
         // Clear the retransmit table
@@ -149,7 +146,7 @@ CHIP_ERROR ChipExchangeManager::Shutdown()
         {
             ClearRetransmitTable(RetransTable[i]);
         }
-#endif
+
         MessageLayer = NULL;
     }
 
@@ -230,7 +227,6 @@ ExchangeContext * ChipExchangeManager::NewContext(const uint64_t & peerNodeId, c
         ec->SetInitiator(true);
         // Initialize RMP variables
         ec->mMsgProtocolVersion = 0;
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         // No need to set RMP timer, this will be done when we add to retrans table
         ec->mRMPNextAckTime = 0;
         ec->SetAckPending(false);
@@ -244,7 +240,6 @@ ExchangeContext * ChipExchangeManager::NewContext(const uint64_t & peerNodeId, c
         ec->OnDDRcvd       = NULL;
         ec->OnAckRcvd      = NULL;
         ec->OnSendError    = NULL;
-#endif
 #if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
         ec->SetUseEphemeralUDPPort(MessageLayer->EphemeralUDPPortEnabled());
 #endif // CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
@@ -581,7 +576,6 @@ ExchangeContext * ChipExchangeManager::AllocContext()
     return NULL;
 }
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 void ChipExchangeManager::RMPProcessDDMessage(uint32_t PauseTimeMillis, uint64_t DelayedNodeId)
 {
     // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
@@ -617,7 +611,6 @@ void ChipExchangeManager::RMPProcessDDMessage(uint32_t PauseTimeMillis, uint64_t
     // Schedule next physical wakeup
     RMPStartTimer();
 }
-#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
 static void DefaultOnMessageReceived(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
                                      uint32_t profileId, uint8_t msgType, PacketBuffer * payload)
@@ -635,14 +628,12 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
     UnsolicitedMessageHandler * matchingUMH = NULL;
     ExchangeContext * ec                    = NULL;
     ChipConnection * msgCon                 = NULL;
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    const uint8_t * p        = NULL;
-    uint32_t PauseTimeMillis = 0;
-    uint64_t DelayedNodeId   = 0;
+    const uint8_t * p                       = NULL;
+    uint32_t PauseTimeMillis                = 0;
+    uint64_t DelayedNodeId                  = 0;
     bool dupMsg;
     bool msgNeedsAck;
     bool sendAckAndCloseExchange;
-#endif
 #if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
     bool isMsgCounterSyncResp;
     bool peerGroupMsgIdNotSynchronized;
@@ -672,8 +663,8 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
                   msgCon->LogId(), exchangeHeader.ExchangeId, (long) err, msgInfo->MessageId);
 
 #if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
-    isMsgCounterSyncResp = exchangeHeader.ProfileId == chip::Profiles::kChipProfile_Security &&
-        exchangeHeader.MessageType == chip::Profiles::Security::kMsgType_MsgCounterSyncResp;
+    isMsgCounterSyncResp = exchangeHeader.ProfileId == chip::Protocols::kChipProtocol_Security &&
+        exchangeHeader.MessageType == chip::Protocols::Security::kMsgType_MsgCounterSyncResp;
     peerGroupMsgIdNotSynchronized = (msgInfo->Flags & kChipMessageFlag_PeerGroupMsgIdNotSynchronized) != 0;
 
     // If received message is a MsgCounterSyncResp process it first.
@@ -688,10 +679,8 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
     {
         MessageLayer->SecurityMgr->SendMsgCounterSyncResp(msgInfo, msgInfo->InPacketInfo);
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         // Retransmit all pending messages that were encrypted with application group key.
         RetransPendingAppGroupMsgs(msgInfo->SourceNodeId);
-#endif
     }
     // Otherwise, if received message is not MsgCounterSyncResp and peer's message counter synchronization is needed.
     else if (!isMsgCounterSyncResp && peerGroupMsgIdNotSynchronized)
@@ -706,10 +695,9 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
     }
 #endif // CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     // Received Delayed Delivery Message: Extend time for pending retrans objects
-    if (exchangeHeader.ProfileId == chip::Profiles::kChipProfile_Common &&
-        exchangeHeader.MessageType == chip::Profiles::Common::kMsgType_RMP_Delayed_Delivery)
+    if (exchangeHeader.ProfileId == chip::Protocols::kChipProtocol_Common &&
+        exchangeHeader.MessageType == chip::Protocols::Common::kMsgType_RMP_Delayed_Delivery)
     {
         // Process Delayed Delivery message if it is not a duplicate.
         if ((msgInfo->Flags & kChipMessageFlag_DuplicateMessage) == 0)
@@ -725,7 +713,6 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
         // Return after processing Delayed Delivery message
         ExitNow(err = CHIP_NO_ERROR);
     } // If delayed delivery Msg
-#endif
 
     // Search for an existing exchange that the message applies to. If a match is found...
     ec = (ExchangeContext *) ContextPool;
@@ -733,14 +720,12 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
     {
         if (ec->ExchangeMgr != NULL && ec->MatchExchange(msgCon, msgInfo, &exchangeHeader))
         {
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
             // Found a matching exchange. Set flag for correct subsequent RMP
             // retransmission timeout selection.
             if (!ec->HasRcvdMsgFromPeer())
             {
                 ec->SetMsgRcvdFromPeer(true);
             }
-#endif
 
             // Matched ExchangeContext; send to message handler.
             ec->HandleMessage(msgInfo, &exchangeHeader, msgBuf);
@@ -751,11 +736,9 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
         }
     }
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     // Is message a duplicate that needs ack.
     msgNeedsAck = exchangeHeader.Flags & kChipExchangeFlag_NeedsAck;
     dupMsg      = (msgInfo->Flags & kChipMessageFlag_DuplicateMessage);
-#endif
 
     // Search for an unsolicited message handler if it marked as being sent by an initiator. Since we didn't
     // find an existing exchange that matches the message, it must be an unsolicited message. However all
@@ -786,9 +769,7 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
     // that needs to send ack to the peer.
     else
     {
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         if (!msgNeedsAck)
-#endif
             ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
     }
 
@@ -803,8 +784,6 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
     //       Y      |     N    |    -    |     N     | Create EC, ec->HandleMessage() sends Dup ack; Close EC.
     //       N      |     Y    |    -    |     -     | Create EC, ec->HandleMessage() sends ack (if needed) and App callback.
     //       N      |     N    |    -    |     -     | Do nothing.
-
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     // Create new exchange to send ack for a duplicate message and then close this exchange.
     sendAckAndCloseExchange = msgNeedsAck && (matchingUMH == NULL || (dupMsg && !matchingUMH->AllowDuplicateMsgs));
 
@@ -813,14 +792,9 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
     if (peerGroupMsgIdNotSynchronized)
         sendAckAndCloseExchange = false;
 #endif
-#endif
 
     // If we found a handler or we need to open a new exchange to send ack for a duplicate message.
-    if (matchingUMH != NULL
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-        || sendAckAndCloseExchange
-#endif
-    )
+    if (matchingUMH != NULL || sendAckAndCloseExchange)
     {
         ExchangeContext::MessageReceiveFunct umhandler = NULL;
 
@@ -850,7 +824,6 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
         }
         ec->EncryptionType = msgInfo->EncryptionType;
         ec->KeyId          = msgInfo->KeyId;
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         // No need to set RMP timer, this will be done when we add to retrans table
         ec->mRMPNextAckTime = 0;
         ec->SetAckPending(false);
@@ -859,15 +832,12 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
         ec->mRMPThrottleTimeout = 0;
         // Internal and for Debug Only; When set, Exchange Layer does not send Ack.
         ec->SetDropAck(false);
-#endif
 
         // Set the ExchangeContext version from the Message header version
         ec->mMsgProtocolVersion = msgInfo->MessageVersion;
 
         // If UMH was found and the exchange is created not just for sending ack.
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         if (!sendAckAndCloseExchange)
-#endif
         {
             umhandler = matchingUMH->Handler;
 
@@ -878,7 +848,6 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
 
             ChipLogProgress(ExchangeManager, "ec id: %d, AppState: 0x%x", EXCHANGE_CONTEXT_ID(ec - ContextPool), ec->AppState);
         }
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         // If the exchange is created only to send ack.
         else
         {
@@ -886,7 +855,6 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
             // If rcvd msg is not from initiator then this exchange is created as Initiator (argument to SetInitiator() is true).
             ec->SetInitiator((exchangeHeader.Flags & kChipExchangeFlag_Initiator) == 0);
         }
-#endif
 
         // If support for ephemeral UDP ports is enabled, arrange to send outbound messages on this exchange from the
         // local ephemeral UDP port IF the inbound message that initiated the exchange was sent TO the local ephemeral port.
@@ -903,11 +871,9 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
         ec->HandleMessage(msgInfo, &exchangeHeader, msgBuf, umhandler);
         msgBuf = NULL;
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         // Close exchange if it was created only to send ack for a duplicate message.
         if (sendAckAndCloseExchange)
             ec->Close();
-#endif
     }
 
 exit:
@@ -998,13 +964,11 @@ CHIP_ERROR ChipExchangeManager::PrependHeader(ChipExchangeHeader * exchangeHeade
     if (exchangeHeader->Version != kChipExchangeVersion_V1)
         ExitNow(err = CHIP_ERROR_UNSUPPORTED_EXCHANGE_VERSION);
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     // Compute the Header Len
     if (exchangeHeader->Flags & kChipExchangeFlag_AckId)
     {
         headLen += 4;
     }
-#endif
 
     p = buf->Start();
 
@@ -1020,12 +984,10 @@ CHIP_ERROR ChipExchangeManager::PrependHeader(ChipExchangeHeader * exchangeHeade
     LittleEndian::Write16(p, exchangeHeader->ExchangeId);
     LittleEndian::Write32(p, exchangeHeader->ProfileId);
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     if (exchangeHeader->Flags & kChipExchangeFlag_AckId)
     {
         LittleEndian::Write32(p, exchangeHeader->AckMsgId);
     }
-#endif
 
     CHIP_FAULT_INJECT_MAX_ARG(
         FaultInjection::kFault_FuzzExchangeHeaderTx,
@@ -1054,10 +1016,8 @@ CHIP_ERROR ChipExchangeManager::DecodeHeader(ChipExchangeHeader * exchangeHeader
 
     uint8_t * p = NULL;
     uint8_t versionFlags;
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     uint16_t msgLen  = buf->DataLength();
     uint8_t * msgEnd = buf->Start() + msgLen;
-#endif
 
     if (buf->DataLength() < 8)
         ExitNow(err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -1077,14 +1037,12 @@ CHIP_ERROR ChipExchangeManager::DecodeHeader(ChipExchangeHeader * exchangeHeader
 
     exchangeHeader->ProfileId = LittleEndian::Read32(p);
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     if ((exchangeHeader->Flags & kChipExchangeFlag_AckId))
     {
         if ((p + 4) > msgEnd)
             ExitNow(err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
         exchangeHeader->AckMsgId = LittleEndian::Read32(p);
     }
-#endif
 
     buf->SetStart(p);
 
@@ -1124,22 +1082,18 @@ void ChipExchangeManager::NotifyKeyFailed(uint64_t peerNodeId, uint16_t keyId, C
     {
         if (ec->ExchangeMgr != NULL && ec->KeyId == keyId && ec->PeerNodeId == peerNodeId)
         {
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
             // Ensure the exchange context stays around until we're done with it.
             ec->AddRef();
 
             // Fail entries matching ec.
             FailRetransmitTableEntries(ec, keyErr);
-#endif
 
             // Application callback function in key error case.
             if (ec->OnKeyError)
                 ec->OnKeyError(ec, keyErr);
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
             // Release reference to the exchange context.
             ec->Release();
-#endif
         }
     }
 
@@ -1164,7 +1118,6 @@ void ChipExchangeManager::NotifySecurityManagerAvailable()
     }
 }
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 /**
  *  Clear MsgCounterSyncReq flag for all pending messages to that peer.
  *
@@ -1803,7 +1756,6 @@ void ChipExchangeManager::RMPStopTimer()
 {
     MessageLayer->SystemLayer->CancelTimer(RMPTimeout, this);
 }
-#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
 /**
  *  Initialize the shared pool of Bindings.

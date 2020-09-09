@@ -23,10 +23,14 @@ executable("chip-shell") {
     "cmd_base64.cpp",
     "cmd_device.cpp",
     "cmd_misc.cpp",
+    "cmd_otcli.cpp",
     "main.cpp",
   ]
 
-  public_deps = [ "${chip_root}/src/lib/shell" ]
+  public_deps = [
+    "${chip_root}/src/lib/shell",
+    "${chip_root}/src/platform",
+  ]
 
   if (is_debug) {
     defines = [ "BUILD_RELEASE=0" ]

@@ -33,6 +33,7 @@ Done
 -   [echo](#echo-string)
 -   [exit](#exit)
 -   [help](#help)
+-   [otcli](README_OTCLI.md)
 -   [rand](#rand)
 -   [version](#version)
 
@@ -49,6 +50,7 @@ Display a list of all top-level commands supported and a brief description.
   rand            Random number utilities
   base64          Base64 encode / decode utilities
   device          Device Layer commands
+  otcli           Dispatch OpenThread CLI command
   exit            Exit the shell application
   help            List out all top level commands
   version         Output the software version

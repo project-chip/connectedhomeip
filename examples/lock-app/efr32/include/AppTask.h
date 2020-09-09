@@ -57,7 +57,6 @@ private:
 
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
-    static void JoinHandler(AppEvent * aEvent);
     static void LockActionEventHandler(AppEvent * aEvent);
     static void TimerEventHandler(TimerHandle_t xTimer);
 
@@ -71,7 +70,8 @@ private:
     {
         kFunction_NoneSelected   = 0,
         kFunction_SoftwareUpdate = 0,
-        kFunction_FactoryReset,
+        kFunction_Joiner         = 1,
+        kFunction_FactoryReset   = 2,
 
         kFunction_Invalid
     } Function;

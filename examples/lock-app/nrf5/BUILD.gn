@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nrf5_sdk.gni")
 import("//build_overrides/openthread.gni")
 
+import("${nrf5_sdk_build_root}/nrf5_executable.gni")
 import("${nrf5_sdk_build_root}/nrf5_sdk.gni")
 
 assert(current_os == "freertos")
@@ -51,7 +52,7 @@ nrf5_sdk("sdk") {
   defines += [ "USE_APP_CONFIG" ]
 }
 
-executable("lock_app") {
+nrf5_executable("lock_app") {
   output_name = "chip-nrf52840-lock-example"
 
   sources = [
@@ -59,6 +60,7 @@ executable("lock_app") {
     "${chip_root}/src/app/util/attribute-size.c",
     "${chip_root}/src/app/util/attribute-storage.c",
     "${chip_root}/src/app/util/attribute-table.c",
+    "${chip_root}/src/app/util/binding-table.cpp",
     "${chip_root}/src/app/util/chip-response.cpp",
     "${chip_root}/src/app/util/client-api.c",
     "${chip_root}/src/app/util/ember-print.cpp",

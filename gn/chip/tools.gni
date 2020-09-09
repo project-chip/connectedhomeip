@@ -14,5 +14,5 @@
 
 declare_args() {
   # Build CHIP tools.
-  chip_build_tools = current_os != "freertos"
+  chip_build_tools = current_os != "freertos" && current_os != "android"
 }

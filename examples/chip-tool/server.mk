@@ -30,7 +30,7 @@ BUILD_SUPPORT_DIR = $(CHIP_ROOT)/config/standalone
 include $(BUILD_SUPPORT_DIR)/standalone-app.mk
 include $(BUILD_SUPPORT_DIR)/standalone-chip.mk
 
-APP = chip-standalone-server
+APP = chip-tool-server
 
 SRCS = \
     $(PROJECT_ROOT)/server.cpp \

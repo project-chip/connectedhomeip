@@ -29,7 +29,7 @@ if (chip_device_platform == "nrf5") {
   import("//build_overrides/nrf5_sdk.gni")
 }
 
-if (chip_device_platform != "none" && chip_device_platform != "external") {
+if (chip_device_platform != "none") {
   declare_args() {
     # Extra header to include in CHIPDeviceConfig.h for project.
     chip_device_project_config_include = ""
@@ -49,7 +49,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     chip_device_config_enable_wpa = chip_enable_wifi
 
     defines = [
-      "CHIP_DEVICE_CONFIG_ENABLE_THREAD=${chip_enable_openthread}",
       "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}",
       "CHIP_ENABLE_OPENTHREAD=${chip_enable_openthread}",
       "CHIP_WITH_GIO=${chip_with_gio}",
@@ -75,6 +74,16 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET_DARWIN=1",
         "CHIP_DEVICE_LAYER_TARGET=Darwin",
       ]
+    } else if (chip_device_platform == "efr32") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_EFR32=1",
+        "CHIP_DEVICE_LAYER_TARGET=EFR32",
+      ]
+    } else if (chip_device_platform == "esp32") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_ESP32=1",
+        "CHIP_DEVICE_LAYER_TARGET=ESP32",
+      ]
     } else if (chip_device_platform == "linux") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_LINUX=1",
@@ -85,15 +94,16 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET_NRF5=1",
         "CHIP_DEVICE_LAYER_TARGET=nRF5",
       ]
-    }
-    if (chip_device_platform == "efr32") {
+    } else if (chip_device_platform == "nrfconnect") {
       defines += [
-        "CHIP_DEVICE_LAYER_TARGET_EFR32=1",
-        "CHIP_DEVICE_LAYER_TARGET=EFR32",
+        "CHIP_DEVICE_LAYER_TARGET_NRFCONNECT=1",
+        "CHIP_DEVICE_LAYER_TARGET=nrfconnect",
       ]
     }
   }
+}
 
+if (chip_device_platform != "none" && chip_device_platform != "external") {
   config("platform_config") {
     if (chip_device_platform == "darwin") {
       frameworks = [
@@ -152,6 +162,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       ":platform_buildconfig",
       "${chip_root}/src/ble",
       "${chip_root}/src/inet",
+      "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/core:chip_config_header",
       "${chip_root}/src/lib/support",
       "${nlio_root}:nlio",
@@ -187,11 +198,70 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Darwin/PosixConfig.h",
         "Darwin/SystemPlatformConfig.h",
       ]
+    } else if (chip_device_platform == "efr32") {
+      sources += [
+        "EFR32/BLEManagerImpl.cpp",
+        "EFR32/BLEManagerImpl.h",
+        "EFR32/BlePlatformConfig.h",
+        "EFR32/CHIPDevicePlatformConfig.h",
+        "EFR32/CHIPDevicePlatformEvent.h",
+        "EFR32/CHIPPlatformConfig.h",
+        "EFR32/ConfigurationManagerImpl.cpp",
+        "EFR32/ConfigurationManagerImpl.h",
+        "EFR32/ConnectivityManagerImpl.cpp",
+        "EFR32/ConnectivityManagerImpl.h",
+        "EFR32/EFR32Config.cpp",
+        "EFR32/EFR32Config.h",
+        "EFR32/InetPlatformConfig.h",
+        "EFR32/Logging.cpp",
+        "EFR32/PlatformManagerImpl.cpp",
+        "EFR32/PlatformManagerImpl.h",
+        "EFR32/SystemPlatformConfig.h",
+        "EFR32/freertos_bluetooth.c",
+        "EFR32/freertos_bluetooth.h",
+        "EFR32/gatt_db.c",
+        "EFR32/gatt_db.h",
+        "FreeRTOS/SystemTimeSupport.cpp",
+      ]
+      if (chip_enable_openthread) {
+        public_deps += [ "${openthread_root}:libopenthread-ftd" ]
+
+        sources += [
+          "EFR32/ThreadStackManagerImpl.cpp",
+          "EFR32/ThreadStackManagerImpl.h",
+          "OpenThread/OpenThreadUtils.cpp",
+        ]
+      }
+    } else if (chip_device_platform == "esp32") {
+      sources += [
+        "ESP32/BLEManagerImpl.cpp",
+        "ESP32/BLEManagerImpl.h",
+        "ESP32/CHIPDevicePlatformConfig.h",
+        "ESP32/CHIPDevicePlatformEvent.h",
+        "ESP32/ConfigurationManagerImpl.cpp",
+        "ESP32/ConfigurationManagerImpl.h",
+        "ESP32/ConnectivityManagerImpl.cpp",
+        "ESP32/ConnectivityManagerImpl.h",
+        "ESP32/ESP32Config.cpp",
+        "ESP32/ESP32Config.h",
+        "ESP32/ESP32Utils.cpp",
+        "ESP32/ESP32Utils.h",
+        "ESP32/Logging.cpp",
+        "ESP32/LwIPCoreLock.cpp",
+        "ESP32/NetworkProvisioningServerImpl.h",
+        "ESP32/PlatformManagerImpl.cpp",
+        "ESP32/PlatformManagerImpl.h",
+        "ESP32/SoftwareUpdateManagerImpl.h",
+        "ESP32/SystemTimeSupport.cpp",
+        "FreeRTOS/SystemTimeSupport.cpp",
+      ]
     } else if (chip_device_platform == "linux") {
       sources += [
         "Linux/BLEManagerImpl.cpp",
         "Linux/BLEManagerImpl.h",
         "Linux/BlePlatformConfig.h",
+        "Linux/CHIPBluezHelper.cpp",
+        "Linux/CHIPBluezHelper.h",
         "Linux/CHIPDevicePlatformConfig.h",
         "Linux/CHIPDevicePlatformEvent.h",
         "Linux/CHIPLinuxStorage.cpp",
@@ -222,7 +292,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       }
 
       if (chip_enable_wifi) {
-        public_deps += [ "Linux/dbus" ]
+        public_deps += [ "Linux/dbus/wpa" ]
+      }
+
+      if (chip_enable_ble) {
+        public_deps += [ "Linux/dbus/bluez" ]
       }
 
       public_deps += [ "${chip_root}/third_party/inipp" ]
@@ -261,38 +335,33 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
           "nRF5/ThreadStackManagerImpl.h",
         ]
       }
-    } else if (chip_device_platform == "efr32") {
+    } else if (chip_device_platform == "nrfconnect") {
       sources += [
-        "EFR32/BLEManagerImpl.cpp",
-        "EFR32/BLEManagerImpl.h",
-        "EFR32/BlePlatformConfig.h",
-        "EFR32/CHIPDevicePlatformConfig.h",
-        "EFR32/CHIPDevicePlatformEvent.h",
-        "EFR32/CHIPPlatformConfig.h",
-        "EFR32/ConfigurationManagerImpl.cpp",
-        "EFR32/ConfigurationManagerImpl.h",
-        "EFR32/ConnectivityManagerImpl.cpp",
-        "EFR32/ConnectivityManagerImpl.h",
-        "EFR32/EFR32Config.cpp",
-        "EFR32/EFR32Config.h",
-        "EFR32/InetPlatformConfig.h",
-        "EFR32/Logging.cpp",
-        "EFR32/PlatformManagerImpl.cpp",
-        "EFR32/PlatformManagerImpl.h",
-        "EFR32/SystemPlatformConfig.h",
-        "EFR32/freertos_bluetooth.c",
-        "EFR32/freertos_bluetooth.h",
-        "EFR32/gatt_db.c",
-        "EFR32/gatt_db.h",
-        "FreeRTOS/SystemTimeSupport.cpp",
+        "Zephyr/SystemTimeSupport.cpp",
+        "nrfconnect/BLEManagerImpl.cpp",
+        "nrfconnect/BLEManagerImpl.h",
+        "nrfconnect/BlePlatformConfig.h",
+        "nrfconnect/CHIPDevicePlatformConfig.h",
+        "nrfconnect/CHIPDevicePlatformEvent.h",
+        "nrfconnect/CHIPPlatformConfig.h",
+        "nrfconnect/ConfigurationManagerImpl.cpp",
+        "nrfconnect/ConfigurationManagerImpl.h",
+        "nrfconnect/ConnectivityManagerImpl.cpp",
+        "nrfconnect/ConnectivityManagerImpl.h",
+        "nrfconnect/InetPlatformConfig.h",
+        "nrfconnect/Logging.cpp",
+        "nrfconnect/PlatformManagerImpl.cpp",
+        "nrfconnect/PlatformManagerImpl.h",
+        "nrfconnect/SystemPlatformConfig.h",
+        "nrfconnect/ZephyrConfig.cpp",
+        "nrfconnect/ZephyrConfig.h",
       ]
-      if (chip_enable_openthread) {
-        public_deps += [ "${openthread_root}:libopenthread-ftd" ]
 
+      if (chip_enable_openthread) {
         sources += [
-          "EFR32/ThreadStackManagerImpl.cpp",
-          "EFR32/ThreadStackManagerImpl.h",
           "OpenThread/OpenThreadUtils.cpp",
+          "nrfconnect/ThreadStackManagerImpl.cpp",
+          "nrfconnect/ThreadStackManagerImpl.h",
         ]
       }
     }

@@ -29,12 +29,12 @@
 #endif // __STDC_FORMAT_MACROS
 
 #include "CHIPSecurityMgr.h"
-#include <Profiles/common/CHIPMessage.h>
-#include <Profiles/common/CommonProfile.h>
-#include <Profiles/security/CHIPSecurity.h>
 #include <core/CHIPCore.h>
 #include <message/CHIPServerBase.h>
-#include <profiles/CHIPProfiles.h>
+#include <protocols/CHIPProtocols.h>
+#include <protocols/common/CHIPMessage.h>
+#include <protocols/common/CommonProtocol.h>
+#include <protocols/security/CHIPSecurity.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
@@ -56,11 +56,11 @@ namespace Security {
 
 #endif // CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_DUMMY
 
-using namespace chip::Profiles;
-using namespace chip::Profiles::Common;
-using namespace chip::Profiles::StatusReporting;
-using namespace chip::Profiles::Security;
-using namespace chip::Profiles::Security::AppKeys;
+using namespace chip::Protocols;
+using namespace chip::Protocols::Common;
+using namespace chip::Protocols::StatusReporting;
+using namespace chip::Protocols::Security;
+using namespace chip::Protocols::Security::AppKeys;
 using namespace chip::Encoding;
 
 ChipSecurityManager::ChipSecurityManager(void)
@@ -98,7 +98,7 @@ CHIP_ERROR ChipSecurityManager::Init(ChipExchangeManager & aExchangeMgr, System:
 
     mFlags = 0;
 
-    err = ExchangeManager->RegisterUnsolicitedMessageHandler(kChipProfile_Security, HandleUnsolicitedMessage, this);
+    err = ExchangeManager->RegisterUnsolicitedMessageHandler(kChipProtocol_Security, HandleUnsolicitedMessage, this);
     SuccessOrExit(err);
 
     aExchangeMgr.MessageLayer->SecurityMgr = this;
@@ -113,7 +113,7 @@ CHIP_ERROR ChipSecurityManager::Shutdown(void)
 {
     if (State != kState_NotInitialized)
     {
-        ExchangeManager->UnregisterUnsolicitedMessageHandler(kChipProfile_Security);
+        ExchangeManager->UnregisterUnsolicitedMessageHandler(kChipProtocol_Security);
         ExchangeManager = NULL;
 
         // TODO: clean-up in-progress session establishment
@@ -134,7 +134,7 @@ void ChipSecurityManager::HandleUnsolicitedMessage(ExchangeContext * ec, const I
     ChipSecurityManager * secMgr = (ChipSecurityManager *) ec->AppState;
 
     // Handle Key Error Messages.
-    if (profileId == kChipProfile_Security && msgType == kMsgType_KeyError)
+    if (profileId == kChipProtocol_Security && msgType == kMsgType_KeyError)
     {
         secMgr->HandleKeyErrorMsg(ec, msgBuf);
         msgBuf = NULL;
@@ -151,9 +151,7 @@ void ChipSecurityManager::HandleUnsolicitedMessage(ExchangeContext * ec, const I
         ExitNow(err = CHIP_ERROR_SECURITY_MANAGER_BUSY);
     });
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     if (!ec->HasPeerRequestedAck())
-#endif
     {
         // Reject the request if it did not arrive over a connection.
         VerifyOrExit(ec->Con != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -285,7 +283,7 @@ CHIP_ERROR ChipSecurityManager::SendKeyErrorMsg(ChipMessageInfo * rcvdMsgInfo, c
     msgBuf->SetDataLength(kChipKeyErrorMessageSize);
 
     // Send key error message.
-    err    = ec->SendMessage(kChipProfile_Security, kMsgType_KeyError, msgBuf, 0);
+    err    = ec->SendMessage(kChipProtocol_Security, kMsgType_KeyError, msgBuf, 0);
     msgBuf = NULL;
 
 exit:
@@ -433,7 +431,6 @@ CHIP_ERROR ChipSecurityManager::NewSessionExchange(uint64_t peerNodeId, IPAddres
     }
     else
     {
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         VerifyOrExit(peerNodeId != kNodeIdNotSpecified && peerNodeId != kAnyNodeId, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         mEC = ExchangeManager->NewContext(peerNodeId, peerAddr, peerPort, INET_NULL_INTERFACEID, this);
@@ -441,10 +438,6 @@ CHIP_ERROR ChipSecurityManager::NewSessionExchange(uint64_t peerNodeId, IPAddres
 
         mEC->OnAckRcvd   = RMPHandleAckRcvd;
         mEC->OnSendError = RMPHandleSendError;
-#else
-        // Reject the request if no connection has been specified.
-        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
-#endif
     }
 
 exit:
@@ -555,7 +548,7 @@ CHIP_ERROR ChipSecurityManager::SendMsgCounterSyncResp(const ChipMessageInfo * r
     msgBuf->SetDataLength(kChipMsgCounterSyncRespMsgSize);
 
     // Send message counter synchronization response message.
-    err    = ec->SendMessage(kChipProfile_Security, kMsgType_MsgCounterSyncResp, msgBuf);
+    err    = ec->SendMessage(kChipProtocol_Security, kMsgType_MsgCounterSyncResp, msgBuf);
     msgBuf = NULL;
 
 exit:
@@ -741,11 +734,7 @@ CHIP_ERROR ChipSecurityManager::SendStatusReport(CHIP_ERROR localErr, ExchangeCo
     }
     else
     {
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         sendFlags = ExchangeContext::kSendFlag_RequestAck;
-#else
-        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
-#endif
     }
 
     // TODO: map CASE errors
@@ -754,36 +743,36 @@ CHIP_ERROR ChipSecurityManager::SendStatusReport(CHIP_ERROR localErr, ExchangeCo
     {
     case CHIP_ERROR_INCORRECT_STATE:
     case CHIP_ERROR_INVALID_MESSAGE_TYPE:
-        profileId  = kChipProfile_Common;
+        profileId  = kChipProtocol_Common;
         statusCode = kStatus_UnexpectedMessage;
         break;
     case CHIP_ERROR_NOT_IMPLEMENTED:
-        profileId  = kChipProfile_Common;
+        profileId  = kChipProtocol_Common;
         statusCode = kStatus_UnsupportedMessage;
         break;
     case CHIP_ERROR_SECURITY_MANAGER_BUSY:
     case CHIP_ERROR_RATE_LIMIT_EXCEEDED:
-        profileId  = kChipProfile_Common;
+        profileId  = kChipProtocol_Common;
         statusCode = kStatus_Busy;
         break;
     case CHIP_ERROR_TIMEOUT:
-        profileId  = kChipProfile_Common;
+        profileId  = kChipProtocol_Common;
         statusCode = kStatus_Timeout;
         break;
     case CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE:
-        profileId  = kChipProfile_Security;
+        profileId  = kChipProtocol_Security;
         statusCode = kStatusCode_UnsupportedEncryptionType;
         break;
     case CHIP_ERROR_WRONG_KEY_TYPE:
-        profileId  = kChipProfile_Security;
+        profileId  = kChipProtocol_Security;
         statusCode = kStatusCode_InvalidKeyId;
         break;
     case CHIP_ERROR_DUPLICATE_KEY_ID:
-        profileId  = kChipProfile_Security;
+        profileId  = kChipProtocol_Security;
         statusCode = kStatusCode_DuplicateKeyId;
         break;
     case CHIP_ERROR_KEY_CONFIRMATION_FAILED:
-        profileId  = kChipProfile_Security;
+        profileId  = kChipProtocol_Security;
         statusCode = kStatusCode_KeyConfirmationFailed;
         break;
     case CHIP_ERROR_INVALID_PASE_PARAMETER:
@@ -797,28 +786,28 @@ CHIP_ERROR ChipSecurityManager::SendStatusReport(CHIP_ERROR localErr, ExchangeCo
     case CHIP_ERROR_CERT_NOT_TRUSTED:
     case CHIP_ERROR_WRONG_CERT_SUBJECT:
     case CHIP_ERROR_WRONG_CERT_TYPE:
-        profileId  = kChipProfile_Security;
+        profileId  = kChipProtocol_Security;
         statusCode = kStatusCode_AuthenticationFailed;
         break;
     case CHIP_ERROR_PASE_SUPPORTS_ONLY_CONFIG1:
-        profileId  = kChipProfile_Security;
+        profileId  = kChipProtocol_Security;
         statusCode = kStatusCode_PASESupportsOnlyConfig1;
         break;
     case CHIP_ERROR_NO_COMMON_PASE_CONFIGURATIONS:
-        profileId  = kChipProfile_Security;
+        profileId  = kChipProtocol_Security;
         statusCode = kStatusCode_NoCommonPASEConfigurations;
         break;
     case CHIP_ERROR_UNSUPPORTED_CASE_CONFIGURATION:
-        profileId  = kChipProfile_Security;
+        profileId  = kChipProtocol_Security;
         statusCode = kStatusCode_UnsupportedCASEConfiguration;
         break;
     case CHIP_ERROR_UNSUPPORTED_CERT_FORMAT:
-        profileId  = kChipProfile_Security;
+        profileId  = kChipProtocol_Security;
         statusCode = kStatusCode_UnsupportedCertificate;
         break;
     default:
         ChipLogError(SecurityManager, "Internal security error %d", localErr);
-        profileId  = kChipProfile_Security;
+        profileId  = kChipProtocol_Security;
         statusCode = kStatusCode_InternalError;
         break;
     }
@@ -925,7 +914,10 @@ void ChipSecurityManager::HandleIdleSessionTimeout(System::Layer * aLayer, void 
     }
 }
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
+void ChipSecurityManager::OnEncryptedMsgRcvd(uint16_t sessionKeyId, uint64_t peerNodeId, uint8_t encType)
+{
+    // TODO(#2248): implement against SCTT defined security protocol
+}
 
 void ChipSecurityManager::RMPHandleAckRcvd(ExchangeContext * ec, void * msgCtxt)
 {
@@ -939,8 +931,6 @@ void ChipSecurityManager::RMPHandleSendError(ExchangeContext * ec, CHIP_ERROR er
 
     secMgr->HandleSessionError(err, NULL);
 }
-
-#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
 void ChipSecurityManager::AsyncNotifySecurityManagerAvailable()
 {
