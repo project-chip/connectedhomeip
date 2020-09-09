@@ -44,7 +44,7 @@
 #include "af.h"
 #include "common.h"
 //#include "../plugin/time-server/time-server.h"
-//#include "app/framework/util/af-event.h"
+#include "af-event.h"
 //#include "app/framework/util/time-util.h"
 #include "gen/znet-bookkeeping.h"
 //#include "hal/micro/crc.h"
@@ -264,7 +264,7 @@ void emberAfInit(void)
     emberAfSetExternalBuffer(appResponseData, EMBER_AF_RESPONSE_BUFFER_LEN, &appResponseLength, &emberAfResponseApsFrame);
 
     // initialize event management system
-    // emAfInitEvents();
+    emAfInitEvents();
 
 #ifdef EMBER_AF_GENERATED_PLUGIN_INIT_FUNCTION_CALLS
     EMBER_AF_GENERATED_PLUGIN_INIT_FUNCTION_CALLS
