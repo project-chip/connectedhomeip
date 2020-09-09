@@ -246,7 +246,7 @@ CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ui
  * @param msg_length Length of message
  * @param public_key Key to use to verify the message signature. Public keys are ASN.1 DER encoded as uncompressed points as
  *described in SEC 1: Elliptic Curve Cryptography [https://www.secg.org/sec1-v2.pdf]
- * @param private_key_length Length of public key
+ * @param public_key_length Length of public key
  * @param signature Signature to use for verification. The signature consists of: 2 EC elements (r and s), represented as ASN.1 DER
  *integers, plus the ASN.1 sequence Header
  * @param signature_length Length of signature
@@ -656,8 +656,8 @@ protected:
      * @param salt_len The size of the salt in bytes.
      * @param info     The info.
      * @param info_len The size of the info in bytes.
-     * @param key      The output key
-     * @param key_len  The output key length
+     * @param out      The output key
+     * @param out_len  The output key length
      *
      * @return Returns a CHIP_ERROR when the MAC doesn't validate, CHIP_NO_ERROR otherwise.
      **/
@@ -731,7 +731,6 @@ private:
 /** @brief Clears the first `len` bytes of memory area `buf`.
  * @param buf Pointer to a memory buffer holding secret data that should be cleared.
  * @param len Specifies secret data size in bytes.
- * @return void
  **/
 void ClearSecretData(uint8_t * buf, uint32_t len);
 
