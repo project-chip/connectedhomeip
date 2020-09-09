@@ -26,6 +26,7 @@ RUN set -x \
     unzip \
     wget \
     libmbedtls-dev \
+    openjdk-11-jdk \
     python3 \
     python3-pip \
     libusb-1.0-0 \
@@ -83,7 +84,7 @@ RUN set -x \
     && mkdir -p bloaty/build \
     && cd bloaty/build \
     && cmake ../ \
-    && make \
+    && make -j8 \
     && make install \
     && cd ../.. \
     && rm -rf bloaty \
