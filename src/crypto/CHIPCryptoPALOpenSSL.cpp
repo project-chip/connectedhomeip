@@ -958,12 +958,14 @@ CHIP_ERROR NewCertificateSigningRequest(ECPKey & pubkey, ECPKey & privkey, uint8
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     BIO_get_mem_ptr(bioMem, &bptr);
-    VerifyOrExit(bptr->length <= csr_length, error = CHIP_ERROR_INTERNAL);
-    memset(out_csr, 0, csr_length);
+    {
+        size_t input_length = csr_length;
+        csr_length = bptr->length;
+        VerifyOrExit(bptr->length <= input_length, error = CHIP_ERROR_BUFFER_TOO_SMALL);
+        memset(out_csr, 0, input_length);
+    }
 
     BIO_read(bioMem, out_csr, bptr->length);
-
-    csr_length = bptr->length;
 
 exit:
     if (ec_key != nullptr)
