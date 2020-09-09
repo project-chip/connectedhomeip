@@ -16,7 +16,12 @@
 # limitations under the License.
 #
 
-set -x
-env
+CHIP_ROOT="$(dirname "$0")/../.."
 
-make V=1 -C build/default check
+PW_ENVSETUP_QUIET=1 source "$CHIP_ROOT/scripts/activate.sh"
+
+set -e
+
+gn gen out/default
+
+ninja -C out/default check

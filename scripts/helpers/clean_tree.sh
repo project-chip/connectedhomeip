@@ -16,7 +16,8 @@
 # limitations under the License.
 #
 
-set -x
-env
+set -e
 
 git clean -Xdf
+
+git submodule foreach git clean -Xdf
