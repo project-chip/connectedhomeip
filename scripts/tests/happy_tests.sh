@@ -25,6 +25,7 @@ env
 
 # Bootstrap Happy
 (cd "$REPO_DIR/third_party/happy/repo" && \
+    apt-get update && \
     apt-get install -y python-setuptools bridge-utils python-lockfile python-psutil && \
     make)
 
