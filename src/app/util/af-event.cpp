@@ -136,7 +136,7 @@ EmberStatus emberAfEventControlSetDelayMS(EmberEventControl * control, uint32_t 
 {
     if (delayMs <= EMBER_MAX_EVENT_CONTROL_DELAY_MS)
     {
-        // TODO: set a CHIP timer here emberEventControlSetDelayMS(*control, delayMs);
+        // TODO: set a CHIP timer here emberEventControlSetDelayMS(*control, delayMs); #658
     }
     else
     {
