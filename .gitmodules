@@ -81,4 +81,4 @@
 	url = https://github.com/openweave/happy.git
 	branch = master
 	ignore = dirty
-	commit = 0f485f7d60565229554f9200a60ab270c030c433
+	commit = 72102da049234815ba2c0184a7a13f1cb5ab4263
