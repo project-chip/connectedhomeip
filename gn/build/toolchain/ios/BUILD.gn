@@ -30,3 +30,11 @@ gcc_toolchain("ios_arm64") {
     is_clang = false
   }
 }
+
+gcc_toolchain("ios_x86_64") {
+  toolchain_args = {
+    current_os = "ios"
+    current_cpu = "x86_64"
+    is_clang = false
+  }
+}
