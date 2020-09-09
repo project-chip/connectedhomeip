@@ -960,7 +960,7 @@ CHIP_ERROR NewCertificateSigningRequest(ECPKey & pubkey, ECPKey & privkey, uint8
     BIO_get_mem_ptr(bioMem, &bptr);
     {
         size_t input_length = csr_length;
-        csr_length = bptr->length;
+        csr_length          = bptr->length;
         VerifyOrExit(bptr->length <= input_length, error = CHIP_ERROR_BUFFER_TOO_SMALL);
         memset(out_csr, 0, input_length);
     }
