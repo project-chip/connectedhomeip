@@ -16,23 +16,20 @@
  *    limitations under the License.
  */
 
-#ifndef APP_CONFIG_H
-#define APP_CONFIG_H
+/**
+ *    @file
+ *          Example project configuration file for CHIP.
+ *
+ *          This is a place to put application or project-specific overrides
+ *          to the default configuration values for general CHIP features.
+ *
+ */
 
-// ---- Lighting Example App Config ----
+#ifndef CHIP_PROJECT_CONFIG_H
+#define CHIP_PROJECT_CONFIG_H
 
-#define LIGHTING_BUTTON DK_BTN2
-#define LIGHTING_BUTTON_MASK DK_BTN2_MSK
-#define FUNCTION_BUTTON DK_BTN1
-#define FUNCTION_BUTTON_MASK DK_BTN1_MSK
-#define JOINER_BUTTON DK_BTN3
-#define JOINER_BUTTON_MASK DK_BTN3_MSK
+// Use a default pairing code if one hasn't been provisioned in flash.
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 12345678
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
-#define SYSTEM_STATE_LED DK_LED1 // led0 in device tree
-#define LIGHTING_GPIO_DEVICE_NAME DT_GPIO_LABEL(DT_ALIAS(led1), gpios)
-#define LIGHTING_GPIO_PIN DT_GPIO_PIN(DT_ALIAS(led1), gpios)
-
-// Time it takes in ms for the simulated actuator to move from one state to another.
-#define ACTUATOR_MOVEMENT_PERIOS_MS 2000
-
-#endif // APP_CONFIG_H
+#endif // CHIP_PROJECT_CONFIG_H

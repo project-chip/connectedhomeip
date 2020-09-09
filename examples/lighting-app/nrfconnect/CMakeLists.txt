@@ -33,6 +33,7 @@ target_sources(app PRIVATE
                main/gen/callback-stub.c
                main/gen/znet-bookkeeping.c
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
+               ${CHIP_ROOT}/src/app/util/af-event.cpp
                ${CHIP_ROOT}/src/app/util/attribute-size.c
                ${CHIP_ROOT}/src/app/util/attribute-storage.c
                ${CHIP_ROOT}/src/app/util/attribute-table.c

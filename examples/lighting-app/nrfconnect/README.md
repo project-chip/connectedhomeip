@@ -80,7 +80,10 @@ cancelled by releasing the button at any point before the 6 second limit.
 to mimick a user manually switching the lighting. The button behaves as a
 toggle, swapping the state every time it is pressed.
 
-The remaining two LEDs and buttons (#3 and #4) are unused.
+**Button #3** can be used to trigger a thread joiner. It should be use to
+commission to the thread network. Credentials will be presented in log messages.
+
+The remaining two LEDs (#3 and #4) and button #4 are unused.
 
 <a name="building"></a>
 
