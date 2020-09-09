@@ -50,6 +50,9 @@ nrf5_sdk("sdk") {
   }
 
   defines += [ "USE_APP_CONFIG" ]
+  defines += [ "MBEDTLS_PK_WRITE_C" ]
+  defines += [ "MBEDTLS_X509_CREATE_C" ]
+  defines += [ "MBEDTLS_X509_CSR_WRITE_C" ]
 }
 
 nrf5_executable("lighting_app") {
