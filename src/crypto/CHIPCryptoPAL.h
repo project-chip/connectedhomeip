@@ -43,6 +43,7 @@ const size_t kMax_ECDSA_Signature_Length = 72;
 const size_t kMAX_FE_Length              = kP256_FE_Length;
 const size_t kMAX_Point_Length           = kP256_Point_Length;
 const size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
+const size_t kMAX_CSR_Length             = 512;
 
 const size_t kP256_PrivateKey_Length = 32;
 const size_t kP256_PublicKey_Length  = 65;

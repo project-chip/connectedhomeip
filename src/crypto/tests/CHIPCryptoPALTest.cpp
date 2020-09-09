@@ -925,7 +925,7 @@ static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
 {
     P256PublicKey pubkey;
     P256PrivateKey privkey;
-    uint8_t csr[1024];
+    uint8_t csr[kMAX_CSR_Length];
     size_t length = sizeof(csr);
 
     NL_TEST_ASSERT(inSuite, NewECPKeypair(pubkey, privkey) == CHIP_NO_ERROR);
