@@ -96,7 +96,8 @@ function(chip_configure TARGET_NAME)
     chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_inet_config_enable_raw_endpoint")
     chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_inet_config_enable_tcp_endpoint")
     chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_inet_config_enable_dns_resolver")
-
+    chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_platform_enable_message_layer")    
+    
     file(
         GENERATE OUTPUT ${CHIP_OUTPUT_DIR}/args.gn
         CONTENT "${GN_ARGS}"

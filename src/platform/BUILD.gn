@@ -49,7 +49,7 @@ if (chip_device_platform != "none") {
     chip_device_config_enable_wpa = chip_enable_wifi
 
     defines = [
-      "CHIP_ENABLE_MESSAGE_LAYER=1",
+      "CHIP_ENABLE_MESSAGE_LAYER=${chip_platform_enable_message_layer}",
       "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}",
       "CHIP_ENABLE_OPENTHREAD=${chip_enable_openthread}",
       "CHIP_WITH_GIO=${chip_with_gio}",
