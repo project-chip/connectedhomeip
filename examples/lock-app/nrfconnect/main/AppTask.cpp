@@ -171,11 +171,11 @@ int AppTask::StartApp()
 
         if (PlatformMgr().TryLockChipStack())
         {
-            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached    = ConnectivityMgr().IsThreadAttached();
-            // sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            // sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
+            sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
+            sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
+            sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
+            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
+            sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
 
