@@ -116,7 +116,7 @@ example, the output binary will be lacking key features (e.g. OpenThread).
 
     -   From CHIP root,
 
-              $ python out/lock_app_debug/BRD4161A/chip-efr32-lock-example.out.flash.py
+              $ python out/lock_app_debug/BRD4161A/chip-efr32-lock-example.flash.py
 
 -   With Make (_deprecated_)
 

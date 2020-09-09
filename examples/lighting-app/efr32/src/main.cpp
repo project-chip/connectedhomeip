@@ -38,6 +38,10 @@
 #include "init_board.h"
 #include "init_mcu.h"
 
+#if DISPLAY_ENABLED
+#include "lcd.h"
+#endif
+
 #if CHIP_ENABLE_OPENTHREAD
 #include <mbedtls/platform.h>
 #include <openthread/cli.h>
@@ -102,6 +106,10 @@ int main(void)
 
     // Initialize mbedtls threading support on EFR32
     THREADING_setup();
+
+#if DISPLAY_ENABLED
+    initLCD();
+#endif
 
 #if EFR32_LOG_ENABLED
     if (efr32LogInit() != 0)
