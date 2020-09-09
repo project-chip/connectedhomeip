@@ -26,16 +26,6 @@
 
 #include <sys/socket.h>
 
-static inline int getsockname(int sock, sockaddr * addr, socklen_t * addrlen)
-{
-    return zsock_getsockname(sock, addr, addrlen);
-}
-
-static inline ssize_t sendmsg(int sock, const struct msghdr * msg, int flags)
-{
-    return zsock_sendmsg(sock, msg, flags);
-}
-
 static inline ssize_t recvmsg(int sock, struct msghdr * msg, int flags)
 {
     // Zephyr doesn't implement recvmsg at all, but if the message vector size is > 0 we can simply

@@ -1,1 +1,41 @@
-* @rwalker-apple @chrisdecenzo @hawk248 @andy31415 @robszewczyk @bzbarsky-apple @BroderickCarlin @saurabhst @jelderton @mspang
+# Each line is a file pattern followed by one or more owners.
+
+# Current reviewers-XXX teams, who review everything for approval.
+#* @reviewers-amazon @reviewers-apple @reviewers-comcast @reviewers-google @reviewers-samsung
+@chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewcyk @mspang @saurabhst @BroderickCarlin
+
+# Owners of any files in these directories at the root of the repository and
+# any of its subdirectories.
+/src/android/  @vidhis88
+/src/app/  @rwalker-apple @bzbarsky-apple @wehale @timotej @selissia @kedars
+/src/ble/  @turon @mspang @vivien-apple
+/src/controller/ @sagar-apple @vivien-apple @andy31415 @pan-apple
+/src/crypto/  @bhaskar-apple @pan-apple
+/src/darwin/ @sagar-apple @vivien-apple @pan-apple @shana-apple @rwalker-apple
+/src/inet/ @gerickson @pan-apple @vivien-apple @mspang
+/src/lib/core/ @pan-apple @sagar-apple @rwalker-apple @gerickson @yufengwangca
+/src/lib/message/ @mspang @andy31415 @yufengwangca @pan-apple
+/src/lib/protocols/ @yufengwangca @pan-apple
+/src/lib/shell/  @mspang @turon
+/src/lib/support/  @rwalker-apple @gerickson @pan-apple
+/src/platform/  @pan-apple  @mspang @vivien-apple @yufengwangca
+/src/qrcodetool/  @shana-apple
+/src/setup_payload/  @bhaskar-apple @vivien-apple
+/src/system/  @sagar-apple @pan-apple @gerickson @turon @rwalker-apple
+/src/test_driver/  @pan-apple @vivien-apple
+/src/transport/  @andy31415 @pan-apple @vivien-apple @mspang
+
+# infra directories
+/.github/ @woody-apple @andy31415
+/.devcontainer/ @woody-apple @rwalker-apple
+/integrations/docker/ @rwalker-apple @woody-apple @andy31415
+/scripts/ @rwalker-apple @woody-apple @andy31415 @mspang
+
+# this catches any directory named docs and its subdirs
+docs/ @gerickson @woody-apple @andy31415 @rwalker-apple
+*.md @gerickson @woody-apple @andy31415 @rwalker-apple
+
+# GN make system
+/.gn/ @mspang
+*.gn @mspang
+*.gni @mspang

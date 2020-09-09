@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 
-#include <shell/shell.h>
+#include <lib/shell/shell.h>
 
-#include <core/CHIPCore.h>
-#include <support/Base64.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CodeUtils.h>
-#include <support/RandUtils.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/Base64.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/RandUtils.h>
 
 #include <inttypes.h>
 #include <stdarg.h>
@@ -56,7 +56,7 @@ int cmd_base64_decode(int argc, char ** argv)
     uint8_t binary[256];
 
     VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    binarySize = Base64Decode(argv[0], sizeof(argv[0]), binary);
+    binarySize = Base64Decode(argv[0], strlen(argv[0]), binary);
     streamer_print_hex(sout, binary, binarySize);
     streamer_printf(sout, "\n\r");
 
@@ -105,7 +105,7 @@ static const shell_command_t cmds_base64[] = {
 void cmd_base64_init(void)
 {
     // Register `base64` subcommands with the local shell dispatcher.
-    theShellBase64.RegisterCommands(cmds_base64, ARRAY_SIZE(cmds_base64));
+    theShellBase64.RegisterCommands(cmds_base64, ArraySize(cmds_base64));
 
     // Register the root `base64` command with the top-level shell.
     shell_register(&cmds_base64_root, 1);

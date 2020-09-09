@@ -201,8 +201,6 @@ uint8_t * emberAfPutDateInResp(EmberAfDate * value);
 
 bool emberAfIsThisMyEui64(EmberEUI64 eui64);
 
-uint32_t emberAfGetBufferCrc(uint8_t * pbuffer, uint16_t length, uint32_t initialValue);
-
 // If the variable has not been set, APS_TEST_SECURITY_DEFAULT will
 // eventually return false.
 enum

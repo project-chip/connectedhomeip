@@ -20,5 +20,4 @@ set -x
 [[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh"
 env
 
-./bootstrap
 west build -b nrf52840dk_nrf52840 -d examples/lock-app/nrfconnect/build examples/lock-app/nrfconnect

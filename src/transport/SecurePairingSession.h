@@ -91,7 +91,7 @@ public:
      * @param salt            Salt to be used for SPAKE2P opertation
      * @param saltLen         Length of salt
      * @param myNodeId        Optional node id of local node
-     * @param mKeyId          Key ID to be assigned to the secure session on the peer node
+     * @param myKeyId         Key ID to be assigned to the secure session on the peer node
      * @param delegate        Callback object
      *
      * @return CHIP_ERROR     The result of initialization
@@ -108,7 +108,7 @@ public:
      * @param salt             Salt to be used for SPAKE2P opertation
      * @param saltLen          Length of salt
      * @param myNodeId         Optional node id of local node
-     * @param mKeyId           Key ID to be assigned to the secure session on the peer node
+     * @param myKeyId          Key ID to be assigned to the secure session on the peer node
      * @param delegate         Callback object
      *
      * @return CHIP_ERROR      The result of initialization

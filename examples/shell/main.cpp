@@ -15,22 +15,16 @@
  *    limitations under the License.
  */
 
-#include <platform/CHIPDeviceConfig.h>
+#include <lib/shell/shell.h>
 
-#include <shell/shell.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/Base64.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/RandUtils.h>
+#include <support/logging/CHIPLogging.h>
 
-#include <core/CHIPCore.h>
-#include <support/Base64.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CodeUtils.h>
-#include <support/RandUtils.h>
-
-#include <inttypes.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+#if CHIP_DEVICE_LAYER_TARGET_NRF5
 #ifdef SOFTDEVICE_PRESENT
 #include "nrf_sdh.h"
 #include "nrf_sdh_ble.h"
@@ -42,6 +36,7 @@ extern "C" {
 #include <openthread/platform/platform-softdevice.h>
 }
 #endif // CHIP_ENABLE_OPENTHREAD
+#endif
 
 using namespace chip;
 using namespace chip::Shell;
@@ -52,7 +47,7 @@ void cmd_btp_init();
 void cmd_device_init();
 void cmd_otcli_init();
 
-#if defined(SOFTDEVICE_PRESENT)
+#if defined(CHIP_DEVICE_LAYER_TARGET_NRF5)
 static void OnSoCEvent(uint32_t sys_evt, void * p_context)
 {
 #if CHIP_ENABLE_OPENTHREAD
@@ -60,13 +55,10 @@ static void OnSoCEvent(uint32_t sys_evt, void * p_context)
 #endif
     UNUSED_PARAMETER(p_context);
 }
-#endif // defined(SOFTDEVICE_PRESENT)
 
 CHIP_ERROR soft_device_init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-#if defined(SOFTDEVICE_PRESENT)
 
     err = nrf_sdh_enable_request();
     SuccessOrExit(err);
@@ -90,15 +82,26 @@ CHIP_ERROR soft_device_init()
         err = nrf_sdh_ble_enable(&appRAMStart);
         SuccessOrExit(err);
     }
-#endif // defined(SOFTDEVICE_PRESENT)
 
 exit:
     return err;
 }
+#endif // defined(CHIP_DEVICE_LAYER_TARGET_NRF5)
 
 int main(void)
 {
+#if defined(CHIP_DEVICE_LAYER_TARGET_NRF5)
     soft_device_init();
+#endif
+
+    // Initialize the default streamer that was linked.
+    const int rc = streamer_init(streamer_get());
+
+    if (rc != 0)
+    {
+        ChipLogError(Shell, "Streamer initialization failed: %d", rc);
+        return rc;
+    }
 
     cmd_misc_init();
     cmd_base64_init();
@@ -107,4 +110,5 @@ int main(void)
     cmd_otcli_init();
 
     shell_task(NULL);
+    return 0;
 }

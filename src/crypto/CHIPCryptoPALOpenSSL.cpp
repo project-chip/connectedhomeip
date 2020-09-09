@@ -52,7 +52,8 @@ enum class DigestType
 
 enum class ECName
 {
-    P256v1
+    None   = 0,
+    P256v1 = 1,
 };
 
 nlSTATIC_ASSERT_PRINT(kMax_ECDH_Secret_Length >= 32, "ECDH shared secret is too short");
@@ -795,6 +796,82 @@ exit:
 void ClearSecretData(uint8_t * buf, uint32_t len)
 {
     memset(buf, 0, len);
+}
+
+ECName MapECName(SupportedECPKeyTypes keyType)
+{
+    switch (keyType)
+    {
+    case SupportedECPKeyTypes::ECP256R1:
+        return ECName::P256v1;
+    default:
+        return ECName::None;
+    }
+}
+
+CHIP_ERROR NewECPKeypair(ECPKey & pubkey, ECPKey & privkey)
+{
+    ERR_clear_error();
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+    int nid          = NID_undef;
+    EC_KEY * ec_key  = nullptr;
+    EC_GROUP * group = nullptr;
+    ECName curve     = MapECName(pubkey.Type());
+
+    VerifyOrExit(curve == MapECName(privkey.Type()), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    nid = _nidForCurve(curve);
+    VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    ec_key = EC_KEY_new_by_curve_name(nid);
+    VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    group = EC_GROUP_new_by_curve_name(nid);
+    VerifyOrExit(group != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    result = EC_KEY_generate_key(ec_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    {
+        size_t pubkey_size          = 0;
+        const EC_POINT * pubkey_ecp = EC_KEY_get0_public_key(ec_key);
+        VerifyOrExit(pubkey_ecp != nullptr, error = CHIP_ERROR_INTERNAL);
+
+        pubkey_size =
+            EC_POINT_point2oct(group, pubkey_ecp, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(pubkey), pubkey.Length(), nullptr);
+        pubkey_ecp = nullptr;
+
+        VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INTERNAL);
+    }
+
+    {
+        int privkey_size          = 0;
+        const BIGNUM * privkey_bn = EC_KEY_get0_private_key(ec_key);
+        VerifyOrExit(privkey_bn != nullptr, error = CHIP_ERROR_INTERNAL);
+
+        privkey_size = BN_bn2binpad(privkey_bn, Uint8::to_uchar(privkey), privkey.Length());
+        privkey_bn   = nullptr;
+
+        VerifyOrExit(privkey_size > 0, error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit((size_t) privkey_size == privkey.Length(), error = CHIP_ERROR_INTERNAL);
+    }
+
+exit:
+    if (ec_key != nullptr)
+    {
+        EC_KEY_free(ec_key);
+        ec_key = nullptr;
+    }
+
+    if (group != nullptr)
+    {
+        EC_GROUP_free(group);
+        group = nullptr;
+    }
+
+    _logSSLError();
+    return error;
 }
 
 #define init_point(_point_)                                                                                                        \

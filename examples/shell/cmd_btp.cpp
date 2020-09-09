@@ -172,7 +172,7 @@ void cmd_btp_init(void)
     // CHIP_ERROR error = CHIP_NO_ERROR;
 
     // Register `device` subcommands with the local shell dispatcher.
-    sShellDeviceSubcommands.RegisterCommands(cmds_btp, ARRAY_SIZE(cmds_btp));
+    sShellDeviceSubcommands.RegisterCommands(cmds_btp, ArraySize(cmds_btp));
 
     // Register the root `btp` command with the top-level shell.
     shell_register(&cmds_btp_root, 1);

@@ -39,9 +39,9 @@
 #include <support/FlagUtils.hpp>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-#include <platform/Linux/dbus/DBusWpa.h>
-#include <platform/Linux/dbus/DBusWpaInterface.h>
-#include <platform/Linux/dbus/DBusWpaNetwork.h>
+#include <platform/Linux/dbus/wpa/DBusWpa.h>
+#include <platform/Linux/dbus/wpa/DBusWpaInterface.h>
+#include <platform/Linux/dbus/wpa/DBusWpaNetwork.h>
 #endif
 
 namespace chip {

@@ -88,7 +88,7 @@ if (chip_device_platform == "nrf5") {
       "${project_dir}/test_identity.cpp",
     ]
 
-    deps = [
+    public_deps = [
       ":sdk",
       "${chip_root}/src/lib",
       "${chip_root}/src/lib/shell",
@@ -136,7 +136,10 @@ if (chip_device_platform == "nrf5") {
       "main.cpp",
     ]
 
-    public_deps = [ "${chip_root}/src/lib/shell" ]
+    public_deps = [
+      "${chip_root}/src/lib/shell",
+      "${chip_root}/src/platform",
+    ]
 
     if (is_debug) {
       defines = [ "BUILD_RELEASE=0" ]

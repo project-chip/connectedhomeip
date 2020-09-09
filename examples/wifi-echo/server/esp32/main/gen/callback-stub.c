@@ -98,6 +98,18 @@ bool emberAfPluginGroupsServerGroupNamesSupportedCallback(uint8_t endpoint)
  */
 void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
 
+/** @brief Basic Cluster Reset To Factory Defaults
+ *
+ * This function is called by the Basic server plugin when a request to
+ * reset to factory defaults is received. The plugin will reset attributes
+ * managed by the framework to their default values.
+ * The application should perform any other necessary reset-related operations
+ * in this callback, including resetting any externally-stored attributes.
+ *
+ * @param endpoint Endpoint that is being initialized  Ver.: always
+ */
+void emberAfPluginBasicResetToFactoryDefaultsCallback(uint8_t endpoint) {}
+
 /** @brief Add To Current App Tasks
  *
  * This function is only useful to sleepy end devices.  This function will note
@@ -193,15 +205,6 @@ EmberStatus emberAfClearReportTableCallback(void)
 {
     return EMBER_LIBRARY_NOT_PRESENT;
 }
-
-/** @brief Scenes Cluster ClearSceneTable
- *
- * This function is called by the framework when the application should clear
- * the scene table.
- *
- * @param endpoint The endpoint.  Ver.: always
- */
-void emberAfScenesClusterClearSceneTableCallback(uint8_t endpoint) {}
 
 /** @brief Key Establishment Cluster Client Command Received
  *
@@ -981,18 +984,6 @@ bool emberAfMainStartCallback(int * returnCode, int argc, char ** argv)
  *
  */
 void emberAfMainTickCallback(void) {}
-
-/** @brief Scenes Cluster Make Invalid
- *
- * This function is called to invalidate the valid attribute in the Scenes
- * cluster.
- *
- * @param endpoint   Ver.: always
- */
-EmberAfStatus emberAfScenesClusterMakeInvalidCallback(uint8_t endpoint)
-{
-    return EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND;
-}
 
 /** @brief Mark Buffers
  *
@@ -2041,20 +2032,6 @@ bool emberAfReadReportingConfigurationResponseCallback(EmberAfClusterId clusterI
     return false;
 }
 
-/** @brief Scenes Cluster Recall Saved Scene
- *
- * This function is called by the framework when the application should recall a
- * saved scene.
- *
- * @param endpoint The endpoint.  Ver.: always
- * @param groupId The group identifier.  Ver.: always
- * @param sceneId The scene identifier.  Ver.: always
- */
-EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(uint8_t endpoint, uint16_t groupId, uint8_t sceneId)
-{
-    return EMBER_ZCL_STATUS_FAILURE;
-}
-
 /** @brief Registration Abort
  *
  * This callback is called when the device should abort the registration
@@ -2127,15 +2104,6 @@ EmberStatus emberAfRemoteSetBindingPermissionCallback(const EmberBindingTableEnt
  * @param tasks   Ver.: always
  */
 void emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
-
-/** @brief Scenes Cluster Remove Scenes In Group
- *
- * This function removes the scenes from a specified group.
- *
- * @param endpoint Endpoint  Ver.: always
- * @param groupId Group ID  Ver.: always
- */
-void emberAfScenesClusterRemoveScenesInGroupCallback(uint8_t endpoint, uint16_t groupId) {}
 
 /** @brief Report Attributes
  *
@@ -2372,23 +2340,6 @@ EmberStatus emberAfStartSearchForJoinableNetworkCallback(void)
  *
  */
 void emberAfStopMoveCallback(void) {}
-
-/** @brief Scenes Cluster Store Current Scene
- *
- * This function is called by the framework when the application should store
- * the current scene.  If an entry already exists in the scene table with the
- * same scene and group ids, the application should update the entry with the
- * current scene.  Otherwise, a new entry should be adde to the scene table, if
- * possible.
- *
- * @param endpoint The endpoint.  Ver.: always
- * @param groupId The group identifier.  Ver.: always
- * @param sceneId The scene identifier.  Ver.: always
- */
-EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(uint8_t endpoint, uint16_t groupId, uint8_t sceneId)
-{
-    return EMBER_ZCL_STATUS_FAILURE;
-}
 
 /** @brief Trust Center Join
  *

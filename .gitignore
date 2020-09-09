@@ -20,7 +20,6 @@ configure
 src/include/BuildConfig.h.in
 src/include/BuildConfig.h.in~
 cmake-build-debug/**
-CMakeLists.txt
 
 # GN build system
 out/

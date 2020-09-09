@@ -21,12 +21,13 @@ import("${efr32_sdk_build_root}/efr32_board.gni")
 config("openthread_efr32_config") {
   include_dirs = [ "${openthread_root}/examples/platforms/${efr32_family}" ]
 
-  defines = [ 
+  defines = [
     "RADIO_CONFIG_DMP_SUPPORT=1",
-    "${efr32_board}=1" 
+    "${efr32_board}=1",
+    "${efr32_mcu}",
   ]
 
-  include_dirs += [ 
+  include_dirs += [
     "${chip_root}/examples/platform/efr32",
     "${chip_root}/examples/platform/efr32/${efr32_family}/${efr32_board}",
   ]

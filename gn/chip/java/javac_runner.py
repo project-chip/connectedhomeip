@@ -99,6 +99,8 @@ def main():
       'rest', metavar='JAVAC_ARGS', nargs='*', help='Argumets to pass to javac')
 
   args = parser.parse_args()
+  if not os.path.isdir(args.classdir):
+    os.makedirs(args.classdir)
   retcode = subprocess.check_call([java_path] + args.rest)
   if retcode != EXIT_SUCCESS:
     return retcode

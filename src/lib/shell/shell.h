@@ -47,9 +47,6 @@
 namespace chip {
 namespace Shell {
 
-/// Counts number of elements inside the array
-#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
-
 /**
  * Callback to execute an individual shell command.
  *

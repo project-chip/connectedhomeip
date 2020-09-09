@@ -260,6 +260,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Linux/BLEManagerImpl.cpp",
         "Linux/BLEManagerImpl.h",
         "Linux/BlePlatformConfig.h",
+        "Linux/CHIPBluezHelper.cpp",
+        "Linux/CHIPBluezHelper.h",
         "Linux/CHIPDevicePlatformConfig.h",
         "Linux/CHIPDevicePlatformEvent.h",
         "Linux/CHIPLinuxStorage.cpp",
@@ -290,7 +292,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       }
 
       if (chip_enable_wifi) {
-        public_deps += [ "Linux/dbus" ]
+        public_deps += [ "Linux/dbus/wpa" ]
+      }
+
+      if (chip_enable_ble) {
+        public_deps += [ "Linux/dbus/bluez" ]
       }
 
       public_deps += [ "${chip_root}/third_party/inipp" ]
@@ -321,7 +327,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       public_deps += [ "${nrf5_sdk_build_root}:nrf5_sdk" ]
 
       if (chip_enable_openthread) {
-        public_deps += [ "${openthread_root}:libopenthread-ftd" ]
+        public_deps += [
+          "${chip_root}/third_party/openthread/platforms/nrf528xx:libnordicsemi_nrf52840_radio_driver_softdevice",
+          "${chip_root}/third_party/openthread/platforms/nrf528xx:libopenthread-nrf52840-softdevice-sdk",
+          "${openthread_root}:libopenthread-ftd",
+        ]
 
         sources += [
           "OpenThread/OpenThreadUtils.cpp",
