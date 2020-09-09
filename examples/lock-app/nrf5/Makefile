@@ -41,6 +41,7 @@ SRCS = \
     $(PROJECT_ROOT)/main/gen/call-command-handler.c \
     $(PROJECT_ROOT)/main/gen/callback-stub.c \
     $(PROJECT_ROOT)/main/gen/znet-bookkeeping.c \
+    $(CHIP_ROOT)/src/app/util/af-event.cpp \
     $(CHIP_ROOT)/src/app/util/attribute-size.c \
     $(CHIP_ROOT)/src/app/util/attribute-storage.c \
     $(CHIP_ROOT)/src/app/util/attribute-table.c \

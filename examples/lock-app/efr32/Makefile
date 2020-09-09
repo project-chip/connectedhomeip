@@ -91,6 +91,7 @@ SRCS = \
     $(PROJECT_ROOT)/src/gen/znet-bookkeeping.c                                               \
     $(EXAMPLES_PLAT_DIR)/$(EFR32FAMILY)/$(BOARD)/init_mcu.c                                  \
     $(EXAMPLES_PLAT_DIR)/$(EFR32FAMILY)/$(BOARD)/init_board.c                                \
+    $(CHIP_ROOT)/src/app/util/af-event.cpp                                                   \
     $(CHIP_ROOT)/src/app/util/attribute-size.c                                               \
     $(CHIP_ROOT)/src/app/util/attribute-storage.c                                            \
     $(CHIP_ROOT)/src/app/util/attribute-table.c                                              \
