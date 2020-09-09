@@ -41,7 +41,7 @@ namespace chip {
 namespace Transport {
 
 class BLECallbackHandler;
-using BLEMacAddress = uint8_t [6];
+using BLEMacAddress = uint8_t[6];
 
 /** Defines connections parameters for setting up a BLE transport */
 class BleConnectionParameters

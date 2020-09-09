@@ -41,7 +41,7 @@ namespace chip {
 namespace DeviceController {
 
 class ChipDeviceController;
-using BLEMacAddress = uint8_t [6];
+using BLEMacAddress = uint8_t[6];
 
 extern "C" {
 typedef void (*NewConnectionHandler)(ChipDeviceController * deviceController, Transport::PeerConnectionState * state,
