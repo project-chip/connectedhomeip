@@ -53,11 +53,11 @@ CHIP_ERROR NetworkCommand::Run(ChipDeviceController * dc, Optional<NodeId> remot
     switch (mNetworkType)
     {
     case NetworkType::BLE:
-      err  = ConnectBLE(dc, remoteId.Value());
-      break;
+        err = ConnectBLE(dc, remoteId.Value());
+        break;
 
     case NetworkType::UDP:
-        err  = ConnectUDP(dc, remoteId.Value());
+        err = ConnectUDP(dc, remoteId.Value());
         break;
 
     case NetworkType::ALL:
