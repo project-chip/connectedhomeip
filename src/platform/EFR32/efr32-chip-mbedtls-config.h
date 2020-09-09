@@ -191,6 +191,7 @@ typedef void mbedtls_ecp_restart_ctx;
 #define MBEDTLS_NO_PLATFORM_ENTROPY
 #define MBEDTLS_PK_C
 #define MBEDTLS_PK_PARSE_C
+#define MBEDTLS_PK_WRITE_C
 #define MBEDTLS_PLATFORM_C
 #define MBEDTLS_PLATFORM_MEMORY
 #define MBEDTLS_PLATFORM_NO_STD_FUNCTIONS
