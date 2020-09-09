@@ -47,6 +47,6 @@ set -e
 set -x
 env
 
-gn gen --root="${EXAMPLE_DIR}" "${OUTPUT_DIR}" --args="${GN_ARGS[*]}"
+gn gen --root="$EXAMPLE_DIR" "$OUTPUT_DIR" --args="${GN_ARGS[*]}"
 
-ninja ${NINJA_VERBOSE} -C "${OUTPUT_DIR}"
+ninja "$NINJA_VERBOSE" -C "$OUTPUT_DIR"
