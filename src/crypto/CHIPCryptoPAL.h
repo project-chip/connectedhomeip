@@ -43,6 +43,7 @@ const size_t kMax_ECDSA_Signature_Length = 72;
 const size_t kMAX_FE_Length              = kP256_FE_Length;
 const size_t kMAX_Point_Length           = kP256_Point_Length;
 const size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
+const size_t kMAX_CSR_Length             = 512;
 
 const size_t kP256_PrivateKey_Length = 32;
 const size_t kP256_PublicKey_Length  = 65;
@@ -307,6 +308,15 @@ CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * 
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 CHIP_ERROR NewECPKeypair(ECPKey & pubkey, ECPKey & privkey);
+
+/** @brief Generate a new Certificate Signing Request (CSR).
+ * @param pubkey public key that'll be inserted in the CSR
+ * @param privkey private key to sign the CSR
+ * @param csr Newly generated CSR
+ * @param csr_length The caller provides the length of input buffer (csr). The function returns the actual length of generated CSR.
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR NewCertificateSigningRequest(ECPKey & pubkey, ECPKey & privkey, uint8_t * csr, size_t & csr_length);
 
 /**
  * The below class implements the draft 01 version of the Spake2+ protocol as
