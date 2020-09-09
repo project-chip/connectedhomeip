@@ -45,6 +45,10 @@
 #define MAX_TIMER_UNITS_HOST 0x7fff
 #define MAX_TIMER_MILLISECONDS_HOST (MAX_TIMER_UNITS_HOST * MILLISECOND_TICKS_PER_MINUTE)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** @brief Complete events with a control and a handler procedure.
  *
  * An application typically creates an array of events
@@ -53,12 +57,6 @@
  * the handlers of any events whose time has arrived.
  */
 typedef struct EmberEventData EmberEventData;
-
-extern uint16_t emAfAppEventContextLength;
-extern EmberAfEventContext emAfAppEventContext[];
-
-extern const char * emAfEventStrings[];
-extern EmberEventData emAfEvents[];
 
 // A function used to retrieve the proper NCP timer duration and unit based on a given
 // passed number of milliseconds.
@@ -69,5 +67,27 @@ void emAfGetTimerDurationAndUnitFromMS(uint32_t durationMs, uint16_t * duration,
 uint32_t emAfGetMSFromTimerDurationAndUnit(uint16_t duration, EmberEventUnits units);
 
 const char * emberAfGetEventString(uint8_t index);
+
+void emAfInitEvents(void);
+
+/** @brief Sets this ::EmberEventControl as inactive (no pending event).
+ */
+#define emberEventControlSetInactive(control)                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        (control).status = EMBER_EVENT_INACTIVE;                                                                                   \
+    } while (0)
+
+/** @brief Sets this ::EmberEventControl as inactive (no pending event).
+ */
+#define emberEventControlSetActive(control)                                                                                        \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        (control).status = EMBER_EVENT_ZERO_DELAY;                                                                                 \
+    } while (0)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SILABS_AF_EVENT_H

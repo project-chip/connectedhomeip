@@ -51,22 +51,6 @@
 #define emberAfPushEndPointNetworkIndex(x) (void) 0
 #define emberAfPopNetworkIndex(x) (void) 0
 
-/** @brief Sets this ::EmberEventControl as inactive (no pending event).
- */
-#define emberEventControlSetInactive(control)                                                                                      \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        (control).status = EMBER_EVENT_INACTIVE;                                                                                   \
-    } while (0)
-
-/** @brief Sets this ::EmberEventControl as inactive (no pending event).
- */
-#define emberEventControlSetActive(control)                                                                                        \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        (control).status = EMBER_EVENT_ZERO_DELAY;                                                                                 \
-    } while (0)
-
 #include "gen/af-gen-event.h"
 
 struct EmberEventData
@@ -112,7 +96,7 @@ const char emAfStackEventString[] = "Stack";
 // Functions
 
 // A function used to initialize events for idling
-void emAfInitEvents(void) {}
+extern "C" void emAfInitEvents(void) {}
 
 const char * emberAfGetEventString(uint8_t index)
 {
