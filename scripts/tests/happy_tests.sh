@@ -35,6 +35,6 @@ env
     make)
 
 # Run Tests
-export TEST_BIN_DIR="$REPO_DIR/out/$BUILD_TYPE"
+export TEST_BIN_DIR="$REPO_DIR/out/$BUILD_TYPE/tests"
 
 python3 src/test_driver/happy/tests/standalone/inet/test_inet_multicast_five_nodes_on_wifi.py
