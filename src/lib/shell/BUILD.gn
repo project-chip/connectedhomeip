@@ -20,10 +20,10 @@ static_library("shell") {
   output_name = "libCHIPShell"
 
   sources = [
-    "Commands.cpp",
-    "Commands.h",
     "CHIPShell.cpp",
     "CHIPShell.h",
+    "Commands.cpp",
+    "Commands.h",
     "Streamer.cpp",
     "Streamer.h",
   ]
