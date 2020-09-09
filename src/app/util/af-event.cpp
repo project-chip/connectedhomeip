@@ -47,7 +47,7 @@
 #define EMBER_MAX_EVENT_CONTROL_DELAY_QS (EMBER_MAX_EVENT_CONTROL_DELAY_MS >> 8)
 #define EMBER_MAX_EVENT_CONTROL_DELAY_MINUTES (EMBER_MAX_EVENT_CONTROL_DELAY_MS >> 16)
 
-// stub these for af-gen-event.h
+// stub these for af-gen-event.h issue #1934
 #define emberAfPushEndPointNetworkIndex(x) (void) 0
 #define emberAfPopNetworkIndex(x) (void) 0
 
@@ -110,6 +110,9 @@ const char emAfStackEventString[] = "Stack";
 
 // *****************************************************************************
 // Functions
+
+// A function used to initialize events for idling
+void emAfInitEvents(void) {}
 
 const char * emberAfGetEventString(uint8_t index)
 {
