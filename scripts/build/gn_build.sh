@@ -22,8 +22,8 @@ CHIP_ROOT="$(dirname "$0")/../.."
 
 source "$CHIP_ROOT/scripts/activate.sh"
 
-set -e
-set -x
+set -ex
+
 env
 
 ninja -v -C "$CHIP_ROOT/out/$BUILD_TYPE"
