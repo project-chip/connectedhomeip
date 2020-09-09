@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 
-#include <shell/shell.h>
+#include <lib/shell/shell.h>
 
-#include <core/CHIPCore.h>
-#include <support/Base64.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CodeUtils.h>
-#include <support/RandUtils.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/Base64.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/RandUtils.h>
 
 #include <inttypes.h>
 #include <stdarg.h>
@@ -66,5 +66,5 @@ static shell_command_t cmds_misc[] = {
 
 void cmd_misc_init(void)
 {
-    shell_register(cmds_misc, ARRAY_SIZE(cmds_misc));
+    shell_register(cmds_misc, ArraySize(cmds_misc));
 }

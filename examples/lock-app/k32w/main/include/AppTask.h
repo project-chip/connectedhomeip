@@ -54,7 +54,7 @@ private:
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void KBD_Callback(uint8_t events);
     static void HandleKeyboard(void);
-    static void OtaHandler(AppEvent * aEvent);
+    static void JoinHandler(AppEvent * aEvent);
     static void LockActionEventHandler(AppEvent * aEvent);
     static void ResetActionEventHandler(AppEvent * aEvent);
     static void InstallEventHandler(AppEvent * aEvent);
@@ -62,6 +62,7 @@ private:
     static void ButtonEventHandler(uint8_t pin_no, uint8_t button_action);
     static void TimerEventHandler(TimerHandle_t xTimer);
 
+    static void ThreadStart();
     void StartTimer(uint32_t aTimeoutInMs);
 
     enum Function_t

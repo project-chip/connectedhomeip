@@ -74,7 +74,7 @@ extra_args=""
 # Android NDK setup
 android_ndk_args=""
 
-if [[ -d "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin" ]]; then
+if [[ -d "${ANDROID_NDK_HOME}/toolchains" ]]; then
     android_ndk_args+="android_ndk_root=\"$ANDROID_NDK_HOME\""
     extra_args+=" $android_ndk_args enable_android_builds=true"
 else

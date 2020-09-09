@@ -383,7 +383,7 @@ exit:
     return error;
 }
 
-static int ECDSA_sign_rng(void * ctxt, uint8_t * out_buffer, size_t out_length)
+static int CryptoRNG(void * ctxt, uint8_t * out_buffer, size_t out_length)
 {
     return (chip::Crypto::DRBG_get_bytes(out_buffer, out_length) == CHIP_NO_ERROR) ? 0 : 1;
 }
@@ -421,7 +421,7 @@ CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ui
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     result = mbedtls_ecdsa_write_signature(&ecdsa_ctxt, MBEDTLS_MD_SHA256, hash, sizeof(hash), Uint8::to_uchar(out_signature),
-                                           &out_signature_length, ECDSA_sign_rng, NULL);
+                                           &out_signature_length, CryptoRNG, NULL);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -512,7 +512,7 @@ CHIP_ERROR ECDH_derive_secret(const uint8_t * remote_public_key, const size_t re
         mbedtls_ecp_point_read_binary(&ecp_grp, &ecp_pubkey, Uint8::to_const_uchar(remote_public_key), remote_public_key_length);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    result = mbedtls_ecdh_compute_shared(&ecp_grp, &mpi_secret, &ecp_pubkey, &mpi_privkey, ECDSA_sign_rng, NULL);
+    result = mbedtls_ecdh_compute_shared(&ecp_grp, &mpi_secret, &ecp_pubkey, &mpi_privkey, CryptoRNG, NULL);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     result = mbedtls_mpi_write_binary(&mpi_secret, Uint8::to_uchar(out_secret), out_secret_length);
@@ -531,6 +531,50 @@ exit:
 void ClearSecretData(uint8_t * buf, uint32_t len)
 {
     memset(buf, 0, len);
+}
+
+mbedtls_ecp_group_id MapECPGroupId(SupportedECPKeyTypes keyType)
+{
+    switch (keyType)
+    {
+    case SupportedECPKeyTypes::ECP256R1:
+        return MBEDTLS_ECP_DP_SECP256R1;
+    default:
+        return MBEDTLS_ECP_DP_NONE;
+    }
+}
+
+CHIP_ERROR NewECPKeypair(ECPKey & pubkey, ECPKey & privkey)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    size_t pubkey_size = 0;
+
+    mbedtls_ecp_group_id group = MapECPGroupId(pubkey.Type());
+
+    mbedtls_ecp_keypair keypair;
+    mbedtls_ecp_keypair_init(&keypair);
+
+    VerifyOrExit(group == MapECPGroupId(privkey.Type()), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_ecp_gen_key(group, &keypair, CryptoRNG, nullptr);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_ecp_point_write_binary(&keypair.grp, &keypair.Q, MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_size,
+                                            Uint8::to_uchar(pubkey), pubkey.Length());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    VerifyOrExit(mbedtls_mpi_size(&keypair.d) == privkey.Length(), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_mpi_write_binary(&keypair.d, Uint8::to_uchar(privkey), privkey.Length());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+exit:
+    mbedtls_ecp_keypair_free(&keypair);
+    _log_mbedTLS_error(result);
+    return error;
 }
 
 typedef struct Spake2p_Context
@@ -730,7 +774,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEGenerate(void * fe)
 
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
-    result = mbedtls_ecp_gen_privkey(&context->curve, (mbedtls_mpi *) fe, ECDSA_sign_rng, nullptr);
+    result = mbedtls_ecp_gen_privkey(&context->curve, (mbedtls_mpi *) fe, CryptoRNG, nullptr);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -787,7 +831,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointMul(void * R, const void * P1, co
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
     if (mbedtls_ecp_mul(&context->curve, (mbedtls_ecp_point *) R, (const mbedtls_mpi *) fe1, (const mbedtls_ecp_point *) P1,
-                        ECDSA_sign_rng, nullptr) != 0)
+                        CryptoRNG, nullptr) != 0)
     {
         return CHIP_ERROR_INTERNAL;
     }
@@ -849,7 +893,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_le
     result = mbedtls_mpi_mod_mpi(&w1_bn, &w1_bn, &curve.N);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_ecp_mul(&curve, &Ltemp, &w1_bn, &curve.G, ECDSA_sign_rng, nullptr);
+    result = mbedtls_ecp_mul(&curve, &Ltemp, &w1_bn, &curve.G, CryptoRNG, nullptr);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     memset(Lout, 0, *L_len);

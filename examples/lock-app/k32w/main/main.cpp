@@ -40,6 +40,8 @@ using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging;
 
+extern "C" void * pvPortCalloc(size_t num, size_t size);
+
 #include <AppTask.h>
 
 void k32wLog(const char * aFormat, ...)
@@ -78,7 +80,7 @@ extern "C" void main_task(void const * argument)
 
     /* Using OT Heap is deprecated so use instead the FreeRTOS
      * allocation system - which is also thread-safe */
-    otHeapSetCAllocFree(calloc, free);
+    otHeapSetCAllocFree(pvPortCalloc, vPortFree);
 
     /* Mbedtls Threading support is needed because both
      * Thread and Weave tasks are using it */

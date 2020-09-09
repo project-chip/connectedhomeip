@@ -15,17 +15,17 @@
  *    limitations under the License.
  */
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 
 #if CONFIG_DEVICE_LAYER
 
 #include <inttypes.h>
 
+#include <lib/shell/shell.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <shell/shell.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/ThreadStackManager.h>
 #endif
@@ -624,7 +624,7 @@ void cmd_device_init(void)
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     // Register `device` subcommands with the local shell dispatcher.
-    sShellDeviceSubcommands.RegisterCommands(cmds_device, ARRAY_SIZE(cmds_device));
+    sShellDeviceSubcommands.RegisterCommands(cmds_device, ArraySize(cmds_device));
 
     // Register the root `base64` command with the top-level shell.
     shell_register(&cmds_base64_root, 1);
