@@ -48,6 +48,7 @@ void cmd_device_init();
 void cmd_otcli_init();
 
 #if defined(CHIP_DEVICE_LAYER_TARGET_NRF5)
+// TODO: Move softdevice initialization behind platform interface.
 static void OnSoCEvent(uint32_t sys_evt, void * p_context)
 {
 #if CHIP_ENABLE_OPENTHREAD

@@ -16,6 +16,8 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/platform/device.gni")
 
 if (chip_device_platform == "nrf5") {
+  # TODO: Unify :shell_nrf5 with :chip-shell
+
   import("//build_overrides/nrf5_sdk.gni")
   import("${nrf5_sdk_build_root}/nrf5_sdk.gni")
 
