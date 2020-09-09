@@ -29,13 +29,13 @@ template("efr32_executable") {
   flashing_runtime_target = target_name + ".flashing_runtime"
   copy(flashing_runtime_target) {
     sources = [
-      "//scripts/flashing/efr32_firmware_utils.py",
-      "//scripts/flashing/firmware_utils.py",
+      "${chip_root}/scripts/flashing/efr32_firmware_utils.py",
+      "${chip_root}/scripts/flashing/firmware_utils.py",
     ]
     outputs = [ "${root_out_dir}/{{source_file_part}}" ]
   }
 
-  flashing_script_generator = "//scripts/flashing/gen_flashing_script.py"
+  flashing_script_generator = "${chip_root}/scripts/flashing/gen_flashing_script.py"
   flashing_script_name = output_base_name + ".flash.py"
   flashing_options = [ "efr32" ]
 

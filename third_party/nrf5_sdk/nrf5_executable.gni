@@ -30,13 +30,13 @@ template("nrf5_executable") {
   copy(flashing_runtime_target) {
     sources = [
       "${softdevice_dir}/${softdevice_file}",
-      "//scripts/flashing/firmware_utils.py",
-      "//scripts/flashing/nrf5_firmware_utils.py",
+      "${chip_root}/scripts/flashing/firmware_utils.py",
+      "${chip_root}/scripts/flashing/nrf5_firmware_utils.py",
     ]
     outputs = [ "${root_out_dir}/{{source_file_part}}" ]
   }
 
-  flashing_script_generator = "//scripts/flashing/gen_flashing_script.py"
+  flashing_script_generator = "${chip_root}/scripts/flashing/gen_flashing_script.py"
   flashing_script_name = invoker.output_name + ".flash.py"
   flashing_options = [
     "nrf5",
