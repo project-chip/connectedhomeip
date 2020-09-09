@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Builds
+name: Happy Test
 
 on:
     push:
@@ -40,6 +40,12 @@ jobs:
                   submodules: true
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
+            - name: Install Dependencies
+              run: |
+                  sudo apt install -y \
+                  bazel socat psmisc tigervnc-standalone-server tigervnc-viewer \
+                  python3-pip python3-venv python3-setuptools libdbus-glib-1-dev \
+                  libgirepository1.0-dev
             - name: Setup Build
               run: |
                   case $BUILD_TYPE in
@@ -52,7 +58,5 @@ jobs:
                   scripts/build/gn_gen.sh --args="$GN_ARGS"
             - name: Run Build
               run: scripts/build/gn_build.sh
-            - name: Run Tests
-              run: scripts/tests/gn_tests.sh
             - name: Run Happy Tests
               run: scripts/tests/happy_tests.sh
