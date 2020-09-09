@@ -584,7 +584,7 @@ CHIP_ERROR NewCertificateSigningRequest(ECPKey & pubkey, ECPKey & privkey, uint8
     int result       = 0;
     size_t length    = csr_length;
 
-    mbedtls_ecp_keypair *keypair = nullptr;
+    mbedtls_ecp_keypair * keypair = nullptr;
 
     mbedtls_x509write_csr csr;
     mbedtls_x509write_csr_init(&csr);
@@ -621,7 +621,7 @@ CHIP_ERROR NewCertificateSigningRequest(ECPKey & pubkey, ECPKey & privkey, uint8
     result = mbedtls_x509write_csr_pem(&csr, out_csr, length, CryptoRNG, nullptr);
     VerifyOrExit(result >= 0, error = CHIP_ERROR_INTERNAL);
     csr_length = result;
-    result = 0;
+    result     = 0;
 
 exit:
     mbedtls_x509write_csr_free(&csr);
