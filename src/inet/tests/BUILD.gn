@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/gn/chip/chip_test_suite.gni")
+import("${chip_root}/gn/chip/chip_test_standalone.gni")
 
 config("tests_config") {
   include_dirs = [ "." ]
@@ -53,5 +54,26 @@ chip_test_suite("tests") {
   tests = [
     "TestInetAddress",
     "TestInetErrorStr",
+  ]
+}
+
+
+chip_test_standalone("standalone_tests") {
+  public_configs = [ ":tests_config" ]
+
+  sources = [
+    "TestInetCommon.cpp",
+    "TestInetCommonOptions.cpp",
+    "TestInetLayerCommon.cpp",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/core",
+    "${nlunit_test_root}:nlunit-test",
+  ]
+
+  tests = [
+    "TestInetLayerMulticast",
   ]
 }
