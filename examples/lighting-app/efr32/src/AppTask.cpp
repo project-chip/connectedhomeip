@@ -24,6 +24,8 @@
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
 #include "Server.h"
+#include "attribute-storage.h"
+#include "gen/cluster-id.h"
 
 #include <assert.h>
 
@@ -118,6 +120,7 @@ int AppTask::Init()
 
     sLightLED.Init(LIGHT_LED);
     sLightLED.Set(LightMgr().IsLightOn());
+    UpdateClusterState();
 
     return err;
 }
@@ -299,7 +302,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
         {
             action = LightingManager::ON_ACTION;
         }
-        actor = 0; // LIGHT_ACTOR_METHOD_PHYSICAL
+        actor = AppEvent::kEventType_Button;
     }
     else
     {
@@ -479,6 +482,11 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
         EFR32_LOG("Turning light OFF")
         sLightLED.Set(false);
     }
+
+    if (aActor == AppEvent::kEventType_Button)
+    {
+        sAppTask.mSyncClusterToButtonAction = true;
+    }
 }
 
 void AppTask::ActionCompleted(LightingManager::Action_t aAction)
@@ -491,6 +499,12 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
     else if (aAction == LightingManager::OFF_ACTION)
     {
         EFR32_LOG("Light OFF")
+    }
+
+    if (sAppTask.mSyncClusterToButtonAction)
+    {
+        UpdateClusterState();
+        sAppTask.mSyncClusterToButtonAction = false;
     }
 }
 
@@ -524,5 +538,18 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     else
     {
         EFR32_LOG("Event received with no handler. Dropping event.");
+    }
+}
+
+void AppTask::UpdateClusterState(void)
+{
+    uint8_t newValue = LightMgr().IsLightOn();
+
+    // write the new on/off value
+    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        EFR32_LOG("ERR: updating on/off %x", status);
     }
 }

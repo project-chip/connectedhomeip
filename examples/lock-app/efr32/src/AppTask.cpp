@@ -24,6 +24,8 @@
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
 #include "Server.h"
+#include "attribute-storage.h"
+#include "gen/cluster-id.h"
 #include "lcd.h"
 #include "qrcodegen.h"
 
@@ -126,6 +128,7 @@ int AppTask::Init()
 
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
+    UpdateClusterState();
 
 // Print setup info on LCD if available
 #ifdef DISPLAY_ENABLED
@@ -345,7 +348,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
         {
             action = BoltLockManager::UNLOCK_ACTION;
         }
-        actor = 0; // BOLT_LOCK_ACTOR_METHOD_PHYSICAL
+        actor = AppEvent::kEventType_Button;
     }
     else
     {
@@ -549,6 +552,11 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
         EFR32_LOG("Unlock Action has been initiated")
     }
 
+    if (aActor == AppEvent::kEventType_Button)
+    {
+        sAppTask.mSyncClusterToButtonAction = true;
+    }
+
     sLockLED.Blink(50, 50);
 }
 
@@ -568,6 +576,12 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
         EFR32_LOG("Unlock Action has been completed")
 
         sLockLED.Set(false);
+    }
+
+    if (sAppTask.mSyncClusterToButtonAction)
+    {
+        UpdateClusterState();
+        sAppTask.mSyncClusterToButtonAction = false;
     }
 }
 
@@ -601,5 +615,18 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     else
     {
         EFR32_LOG("Event received with no handler. Dropping event.");
+    }
+}
+
+void AppTask::UpdateClusterState(void)
+{
+    uint8_t newValue = !BoltLockMgr().IsUnlocked();
+
+    // write the new on/off value
+    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        EFR32_LOG("ERR: updating on/off %x", status);
     }
 }

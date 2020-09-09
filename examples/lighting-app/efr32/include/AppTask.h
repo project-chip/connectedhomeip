@@ -64,6 +64,8 @@ private:
     static void HandleBLEConnectionClosed(chip::Ble::BLEEndPoint * endPoint, BLE_ERROR err);
     static void HandleBLEMessageReceived(chip::Ble::BLEEndPoint * endPoint, chip::System::PacketBuffer * buffer);
 
+    static void UpdateClusterState(void);
+
     void StartTimer(uint32_t aTimeoutMs);
 
     enum Function_t
@@ -77,6 +79,7 @@ private:
 
     Function_t mFunction;
     bool mFunctionTimerActive;
+    bool mSyncClusterToButtonAction;
     chip::Ble::BLEEndPoint * mBLEEndPoint;
 
     static AppTask sAppTask;

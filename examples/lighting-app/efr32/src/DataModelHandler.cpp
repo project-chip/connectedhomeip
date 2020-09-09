@@ -50,10 +50,10 @@ extern "C" void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClus
 
     if (*value)
     {
-        LightMgr().InitiateAction(0, LightingManager::ON_ACTION);
+        LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::ON_ACTION);
     }
     else
     {
-        LightMgr().InitiateAction(0, LightingManager::OFF_ACTION);
+        LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::OFF_ACTION);
     }
 }
