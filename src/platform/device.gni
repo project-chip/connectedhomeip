@@ -18,9 +18,9 @@ declare_args() {
   # Device platform layer: darwin, efr32, esp32, external, freertos, linux, nrf5, nrfconnect, none.
   chip_device_platform = "auto"
   chip_platform_target = ""
- 
+
   # Enable message layer in platform.
-  chip_platform_enable_message_layer = true  
+  chip_platform_enable_message_layer = true
 }
 
 if (chip_device_platform == "auto") {
