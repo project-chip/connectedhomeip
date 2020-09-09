@@ -76,7 +76,7 @@
 	branch = master
 	ignore = dirty
 	commit = bc42efe2e0e8f4e0eed7bd08a51e046943a11b98
-[submodule "third_party/happy"]
+[submodule "happy"]
 	path = third_party/happy/repo
 	url = https://github.com/openweave/happy.git
 	branch = master
