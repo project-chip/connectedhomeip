@@ -56,18 +56,6 @@ nrf5_executable("lighting_app") {
   output_name = "chip-nrf52840-lighting-example"
 
   sources = [
-    "${chip_root}/src/app/clusters/on-off-server/on-off.c",
-    "${chip_root}/src/app/util/attribute-size.c",
-    "${chip_root}/src/app/util/attribute-storage.c",
-    "${chip_root}/src/app/util/attribute-table.c",
-    "${chip_root}/src/app/util/binding-table.cpp",
-    "${chip_root}/src/app/util/chip-response.cpp",
-    "${chip_root}/src/app/util/client-api.c",
-    "${chip_root}/src/app/util/ember-print.cpp",
-    "${chip_root}/src/app/util/message.c",
-    "${chip_root}/src/app/util/process-cluster-message.c",
-    "${chip_root}/src/app/util/process-global-message.c",
-    "${chip_root}/src/app/util/util.c",
     "${nrf5_platform_dir}/app/chipinit.cpp",
     "${nrf5_platform_dir}/app/include/chipinit.h",
     "${nrf5_platform_dir}/app/include/Service.h",
