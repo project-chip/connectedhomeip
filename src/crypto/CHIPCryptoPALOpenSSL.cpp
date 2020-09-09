@@ -883,17 +883,17 @@ CHIP_ERROR NewCertificateSigningRequest(ECPKey & pubkey, ECPKey & privkey, uint8
     int result       = 0;
     int nid          = NID_undef;
 
-    X509_REQ  *x509_req  = X509_REQ_new();
-    EVP_PKEY  *evp_pkey  = nullptr;
+    X509_REQ * x509_req  = X509_REQ_new();
+    EVP_PKEY * evp_pkey  = nullptr;
     BIGNUM * pvt_key     = nullptr;
     EC_GROUP * group     = nullptr;
     EC_POINT * key_point = nullptr;
 
-    EC_KEY * ec_key  = nullptr;
-    ECName curve     = MapECName(pubkey.Type());
+    EC_KEY * ec_key = nullptr;
+    ECName curve    = MapECName(pubkey.Type());
 
-    BIO * bioMem    = nullptr;
-    BUF_MEM *bptr   = nullptr;
+    BIO * bioMem   = nullptr;
+    BUF_MEM * bptr = nullptr;
 
     VerifyOrExit(curve == MapECName(privkey.Type()), error = CHIP_ERROR_INVALID_ARGUMENT);
 
