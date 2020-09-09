@@ -35,7 +35,7 @@ CHIP_ROOT=$(cd "$here/../.." && pwd)
 restyle-paths() {
     url=https://github.com/restyled-io/restyler/raw/master/bin/restyle-path
 
-    sh <(curl --location "$url" -sSf) "$@"
+    sh <(curl --location --proto "=https" --tlsv1.2 "$url" -sSf) "$@"
 }
 
 cd "$CHIP_ROOT"
