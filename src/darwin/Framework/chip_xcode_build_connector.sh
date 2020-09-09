@@ -100,7 +100,6 @@ fi
     args+=(
         'target_os="mac"'
         'chip_project_config_include_dirs=["'"$CHIP_ROOT"'/config/standalone"]'
-        'import("'"$CHIP_ROOT"'/config/standalone/args.gni")'
     )
 }
 
