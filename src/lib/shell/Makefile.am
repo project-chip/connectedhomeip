@@ -38,15 +38,15 @@ libChipShell_a_CPPFLAGS                                           = \
     $(NULL)
 
 dist_libChipShell_a_HEADERS                                       = \
-    @top_builddir@/src/lib/shell/shell.h                            \
-    @top_builddir@/src/lib/shell/streamer.h                         \
-    @top_builddir@/src/lib/shell/commands.h                         \
+    @top_builddir@/src/lib/shell/CHIPShell.h                        \
+    @top_builddir@/src/lib/shell/Streamer.h                         \
+    @top_builddir@/src/lib/shell/Commands.h                         \
     $(NULL)
 
 libChipShell_a_SOURCES                                            = \
-    commands.cpp                                                    \
-    shell.cpp                                                       \
-    streamer.cpp                                                    \
+    Commands.cpp                                                    \
+    CHIPShell.cpp                                                   \
+    Streamer.cpp                                                    \
     $(NULL)
 
 if CHIP_TARGET_STYLE_UNIX
@@ -54,7 +54,7 @@ if CHIP_TARGET_STYLE_UNIX
 SUBDIRS                                                          += tests
 
 libChipShell_a_SOURCES                                           += \
-    streamer_stdio.cpp                                              \
+    StreamerStdio.cpp                                               \
     $(NULL)
 
 endif
@@ -62,7 +62,7 @@ endif
 if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 
 libChipShell_a_SOURCES                                           += \
-    streamer_zephyr.cpp                                             \
+    StreamerZephyr.cpp                                              \
     $(NULL)
 
 endif

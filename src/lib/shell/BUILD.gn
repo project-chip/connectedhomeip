@@ -20,20 +20,20 @@ static_library("shell") {
   output_name = "libCHIPShell"
 
   sources = [
-    "commands.cpp",
-    "commands.h",
-    "shell.cpp",
-    "shell.h",
-    "streamer.cpp",
-    "streamer.h",
+    "Commands.cpp",
+    "Commands.h",
+    "CHIPShell.cpp",
+    "CHIPShell.h",
+    "Streamer.cpp",
+    "Streamer.h",
   ]
 
   if (chip_target_style == "unix") {
-    sources += [ "streamer_stdio.cpp" ]
+    sources += [ "StreamerStdio.cpp" ]
   }
 
   if (current_os == "zephyr") {
-    sources += [ "streamer_zephyr.cpp" ]
+    sources += [ "StreamerZephyr.cpp" ]
   }
 
   public_deps = [

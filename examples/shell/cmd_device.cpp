@@ -15,17 +15,17 @@
  *    limitations under the License.
  */
 
-#include <lib/core/CHIPCore.h>
+#include <core/CHIPCore.h>
 
 #if CONFIG_DEVICE_LAYER
 
 #include <inttypes.h>
 
-#include <lib/shell/shell.h>
-#include <lib/support/CHIPArgParser.hpp>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <shell/CHIPShell.h>
+#include <support/CHIPArgParser.hpp>
+#include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/ThreadStackManager.h>
 #endif

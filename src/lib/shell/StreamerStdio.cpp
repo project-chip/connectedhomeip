@@ -20,7 +20,7 @@
  *      Source implementation of an input / output stream for stdio targets.
  */
 
-#include "shell.h"
+#include "CHIPShell.h"
 
 #include <signal.h>
 #include <stdio.h>

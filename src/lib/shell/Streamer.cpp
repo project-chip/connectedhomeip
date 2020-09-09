@@ -21,7 +21,7 @@
  *      Source implementation for an input / output stream abstraction.
  */
 
-#include "streamer.h"
+#include "Streamer.h"
 
 #include <stdio.h>
 

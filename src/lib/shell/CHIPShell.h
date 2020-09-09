@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "streamer.h"
+#include "Streamer.h"
 
 #include <stdarg.h>
 #include <stddef.h>

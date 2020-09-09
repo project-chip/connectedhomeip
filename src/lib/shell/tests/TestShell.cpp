@@ -17,7 +17,7 @@
 
 #include "TestShell.h"
 
-#include <shell/shell.h>
+#include <shell/CHIPShell.h>
 #include <support/CodeUtils.h>
 
 #include <inttypes.h>
