@@ -62,8 +62,12 @@ chip_test_standalone("standalone_tests") {
   public_configs = [ ":tests_config" ]
 
   sources = [
+    "TapAddrAutoconf.cpp",
+    "TapAddrAutoconf.h",
     "TestInetCommon.cpp",
+    "TestInetCommon.h",
     "TestInetCommonOptions.cpp",
+    "TestInetCommonOptions.h",
     "TestInetLayerCommon.cpp",
   ]
 
