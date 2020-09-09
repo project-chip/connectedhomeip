@@ -31,8 +31,10 @@
 #include <openssl/hmac.h>
 #include <openssl/kdf.h>
 #include <openssl/ossl_typ.h>
+#include <openssl/pem.h>
 #include <openssl/rand.h>
 #include <openssl/sha.h>
+#include <openssl/x509.h>
 
 #include <core/CHIPSafeCasts.h>
 #include <support/CodeUtils.h>
@@ -869,6 +871,138 @@ exit:
         EC_GROUP_free(group);
         group = nullptr;
     }
+
+    _logSSLError();
+    return error;
+}
+
+CHIP_ERROR NewCertificateSigningRequest(ECPKey & pubkey, ECPKey & privkey, uint8_t * out_csr, size_t & csr_length)
+{
+    ERR_clear_error();
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+    int nid          = NID_undef;
+
+    X509_REQ  *x509_req  = X509_REQ_new();
+    EVP_PKEY  *evp_pkey  = nullptr;
+    BIGNUM * pvt_key     = nullptr;
+    EC_GROUP * group     = nullptr;
+    EC_POINT * key_point = nullptr;
+
+    EC_KEY * ec_key  = nullptr;
+    ECName curve     = MapECName(pubkey.Type());
+
+    BIO * bioMem    = nullptr;
+    BUF_MEM *bptr   = nullptr;
+
+    VerifyOrExit(curve == MapECName(privkey.Type()), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    nid = _nidForCurve(curve);
+    VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = X509_REQ_set_version(x509_req, 0);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    group = EC_GROUP_new_by_curve_name(nid);
+    VerifyOrExit(group != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    key_point = EC_POINT_new(group);
+    VerifyOrExit(key_point != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    result = EC_POINT_oct2point(group, key_point, Uint8::to_const_uchar(pubkey), pubkey.Length(), nullptr);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    ec_key = EC_KEY_new_by_curve_name(nid);
+    VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    result = EC_KEY_set_public_key(ec_key, key_point);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    result = EC_KEY_check_key(ec_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    evp_pkey = EVP_PKEY_new();
+    VerifyOrExit(evp_pkey != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    result = EVP_PKEY_set1_EC_KEY(evp_pkey, ec_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    result = X509_REQ_set_pubkey(x509_req, evp_pkey);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    EC_KEY_free(ec_key);
+    EVP_PKEY_free(evp_pkey);
+
+    ec_key = EC_KEY_new_by_curve_name(nid);
+    VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    pvt_key = BN_bin2bn(Uint8::to_const_uchar(privkey), privkey.Length(), nullptr);
+    VerifyOrExit(pvt_key != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    result = EC_KEY_set_private_key(ec_key, pvt_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    evp_pkey = EVP_PKEY_new();
+    VerifyOrExit(evp_pkey != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    result = EVP_PKEY_set1_EC_KEY(evp_pkey, ec_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    result = X509_REQ_sign(x509_req, evp_pkey, EVP_sha256());
+    VerifyOrExit(result > 0, error = CHIP_ERROR_INTERNAL);
+
+    bioMem = BIO_new(BIO_s_mem());
+    VerifyOrExit(bioMem != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    result = PEM_write_bio_X509_REQ(bioMem, x509_req);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    BIO_get_mem_ptr(bioMem, &bptr);
+    VerifyOrExit(bptr->length <= csr_length, error = CHIP_ERROR_INTERNAL);
+    memset(out_csr, 0, csr_length);
+
+    BIO_read(bioMem, out_csr, bptr->length);
+
+    csr_length = bptr->length;
+
+exit:
+    if (ec_key != nullptr)
+    {
+        EC_KEY_free(ec_key);
+        ec_key = nullptr;
+    }
+
+    if (group != nullptr)
+    {
+        EC_GROUP_free(group);
+        group = nullptr;
+    }
+
+    if (evp_pkey != nullptr)
+    {
+        EVP_PKEY_free(evp_pkey);
+        evp_pkey = nullptr;
+    }
+
+    if (bioMem != nullptr)
+    {
+        BIO_free(bioMem);
+        bioMem = nullptr;
+    }
+
+    if (pvt_key != nullptr)
+    {
+        BN_free(pvt_key);
+        pvt_key = nullptr;
+    }
+
+    if (key_point != nullptr)
+    {
+        EC_POINT_free(key_point);
+        key_point = nullptr;
+    }
+
+    X509_REQ_free(x509_req);
 
     _logSSLError();
     return error;

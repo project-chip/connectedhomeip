@@ -921,6 +921,17 @@ static void TestP256_Keygen(nlTestSuite * inSuite, void * inContext)
                    ECDSA_validate_msg_signature(test_msg, msglen, pubkey, pubkey.Length(), test_sig, siglen) == CHIP_NO_ERROR);
 }
 
+static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
+{
+    P256PublicKey pubkey;
+    P256PrivateKey privkey;
+    uint8_t csr[1024];
+    size_t length = sizeof(csr);
+
+    NL_TEST_ASSERT(inSuite, NewECPKeypair(pubkey, privkey) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, NewCertificateSigningRequest(pubkey, privkey, csr, length) == CHIP_NO_ERROR);
+}
+
 static void TestSPAKE2P_spake2p_FEMul(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t fe_out[kMAX_FE_Length];
@@ -1349,6 +1360,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test adding entropy sources", TestAddEntropySources),
     NL_TEST_DEF("Test PBKDF2 SHA256", TestPBKDF2_SHA256_TestVectors),
     NL_TEST_DEF("Test P256 Keygen", TestP256_Keygen),
+    NL_TEST_DEF("Test CSR Generation", TestCSR_Gen),
     NL_TEST_DEF("Test Spake2p_spake2p FEMul", TestSPAKE2P_spake2p_FEMul),
     NL_TEST_DEF("Test Spake2p_spake2p FELoad/FEWrite", TestSPAKE2P_spake2p_FELoadWrite),
     NL_TEST_DEF("Test Spake2p_spake2p Mac", TestSPAKE2P_spake2p_Mac),

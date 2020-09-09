@@ -34,6 +34,7 @@
 #include <mbedtls/md.h>
 #include <mbedtls/pkcs5.h>
 #include <mbedtls/sha256.h>
+#include <mbedtls/x509_csr.h>
 
 #include <core/CHIPSafeCasts.h>
 #include <support/CodeUtils.h>
@@ -573,6 +574,58 @@ CHIP_ERROR NewECPKeypair(ECPKey & pubkey, ECPKey & privkey)
 
 exit:
     mbedtls_ecp_keypair_free(&keypair);
+    _log_mbedTLS_error(result);
+    return error;
+}
+
+CHIP_ERROR NewCertificateSigningRequest(ECPKey & pubkey, ECPKey & privkey, uint8_t * out_csr, size_t & csr_length)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+    size_t length    = csr_length;
+
+    mbedtls_ecp_keypair *keypair = nullptr;
+
+    mbedtls_x509write_csr csr;
+    mbedtls_x509write_csr_init(&csr);
+
+    mbedtls_pk_context pk;
+    mbedtls_pk_init(&pk);
+
+    mbedtls_ecp_group_id group = MapECPGroupId(pubkey.Type());
+
+    const mbedtls_pk_info_t * pk_info = mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY);
+    VerifyOrExit(pk_info != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_pk_setup(&pk, pk_info);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    keypair = mbedtls_pk_ec(pk);
+    mbedtls_ecp_keypair_init(keypair);
+
+    VerifyOrExit(group == MapECPGroupId(privkey.Type()), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_ecp_group_load(&keypair->grp, group);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_ecp_point_read_binary(&keypair->grp, &keypair->Q, Uint8::to_const_uchar(pubkey), pubkey.Length());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_mpi_read_binary(&keypair->d, Uint8::to_const_uchar(privkey), privkey.Length());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    mbedtls_x509write_csr_set_key(&csr, &pk);
+
+    mbedtls_x509write_csr_set_md_alg(&csr, MBEDTLS_MD_SHA256);
+
+    result = mbedtls_x509write_csr_pem(&csr, out_csr, length, CryptoRNG, nullptr);
+    VerifyOrExit(result >= 0, error = CHIP_ERROR_INTERNAL);
+    csr_length = result;
+    result = 0;
+
+exit:
+    mbedtls_x509write_csr_free(&csr);
+    mbedtls_pk_free(&pk);
     _log_mbedTLS_error(result);
     return error;
 }

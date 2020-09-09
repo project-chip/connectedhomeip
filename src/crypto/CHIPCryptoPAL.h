@@ -308,6 +308,15 @@ CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * 
  **/
 CHIP_ERROR NewECPKeypair(ECPKey & pubkey, ECPKey & privkey);
 
+/** @brief Generate a new Certificate Signing Request (CSR).
+ * @param pubkey public key that'll be inserted in the CSR
+ * @param privkey private key to sign the CSR
+ * @param csr Newly generated CSR
+ * @param csr_length The caller provides the length of input buffer (csr). The function returns the actual length of generated CSR.
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR NewCertificateSigningRequest(ECPKey & pubkey, ECPKey & privkey, uint8_t * csr, size_t & csr_length);
+
 /**
  * The below class implements the draft 01 version of the Spake2+ protocol as
  * defined in https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html.
