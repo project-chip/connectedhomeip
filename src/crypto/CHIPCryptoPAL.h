@@ -44,6 +44,9 @@ const size_t kMAX_FE_Length              = kP256_FE_Length;
 const size_t kMAX_Point_Length           = kP256_Point_Length;
 const size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
 
+const size_t kP256_PrivateKey_Length = 32;
+const size_t kP256_PublicKey_Length  = 65;
+
 /* These sizes are hardcoded here to remove header dependency on underlying crypto library
  * in a public interface file. The validity of these sizes is verified by static_assert in
  * the implementation files.
@@ -88,6 +91,41 @@ enum class CHIP_SPAKE2P_ROLE : uint8_t
 {
     VERIFIER = 0, // Accessory
     PROVER   = 1, // Commissioner
+};
+
+enum class SupportedECPKeyTypes : uint8_t
+{
+    ECP256R1 = 0,
+};
+
+class ECPKey
+{
+public:
+    virtual SupportedECPKeyTypes Type() = 0;
+    virtual size_t Length()             = 0;
+    virtual operator uint8_t *()        = 0;
+};
+
+class P256PrivateKey : public ECPKey
+{
+public:
+    SupportedECPKeyTypes Type() override { return SupportedECPKeyTypes::ECP256R1; }
+    size_t Length() override { return kP256_PrivateKey_Length; }
+    operator uint8_t *() override { return bytes; }
+
+private:
+    uint8_t bytes[kP256_PrivateKey_Length];
+};
+
+class P256PublicKey : public ECPKey
+{
+public:
+    SupportedECPKeyTypes Type() override { return SupportedECPKeyTypes::ECP256R1; }
+    size_t Length() override { return kP256_PublicKey_Length; }
+    operator uint8_t *() override { return bytes; }
+
+private:
+    uint8_t bytes[kP256_PublicKey_Length];
 };
 
 /**
@@ -262,6 +300,14 @@ CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t 
  **/
 CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen, unsigned int iteration_count,
                          uint32_t key_length, uint8_t * output);
+
+/** @brief Generate a new ECP keypair.
+ * @param pubkey Generated public key
+ * @param privkey Generated private key
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR NewECPKeypair(ECPKey & pubkey, ECPKey & privkey);
+
 /**
  * The below class implements the draft 01 version of the Spake2+ protocol as
  * defined in https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html.
