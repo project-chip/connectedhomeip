@@ -32,7 +32,7 @@ env
                         python3-pip \
                         python3-psutil \
                         python3-setuptools && \
-    make)
+    make SUDO="")
 
 # Run Tests
 export TEST_BIN_DIR="$REPO_DIR/out/$BUILD_TYPE"
