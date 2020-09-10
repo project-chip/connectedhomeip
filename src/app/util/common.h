@@ -53,6 +53,6 @@
 extern EmberApsFrame emberAfResponseApsFrame;
 extern uint8_t appResponseData[EMBER_AF_RESPONSE_BUFFER_LEN];
 extern uint16_t appResponseLength;
-extern ChipResponseDestination * emberAfResponseDestination;
+extern ChipNodeId emberAfResponseDestination;
 
 #endif // SILABS_COMMON_H
