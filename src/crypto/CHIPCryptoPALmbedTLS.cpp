@@ -389,8 +389,19 @@ static int CryptoRNG(void * ctxt, uint8_t * out_buffer, size_t out_length)
     return (chip::Crypto::DRBG_get_bytes(out_buffer, out_length) == CHIP_NO_ERROR) ? 0 : 1;
 }
 
-CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const uint8_t * private_key,
-                          const size_t private_key_length, uint8_t * out_signature, size_t & out_signature_length)
+mbedtls_ecp_group_id MapECPGroupId(SupportedECPKeyTypes keyType)
+{
+    switch (keyType)
+    {
+    case SupportedECPKeyTypes::ECP256R1:
+        return MBEDTLS_ECP_DP_SECP256R1;
+    default:
+        return MBEDTLS_ECP_DP_NONE;
+    }
+}
+
+CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ECPKey & private_key,
+                          uint8_t * out_signature, size_t & out_signature_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -404,15 +415,13 @@ CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ui
 
     VerifyOrExit(msg != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(private_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(private_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_signature != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_signature_length >= kMax_ECDSA_Signature_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    result = mbedtls_ecp_group_load(&keypair.grp, MBEDTLS_ECP_DP_SECP256R1);
+    result = mbedtls_ecp_group_load(&keypair.grp, MapECPGroupId(private_key.Type()));
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    result = mbedtls_mpi_read_binary(&keypair.d, private_key, private_key_length);
+    result = mbedtls_mpi_read_binary(&keypair.d, Uint8::to_const_uchar(private_key), private_key.Length());
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     result = mbedtls_ecdsa_from_keypair(&ecdsa_ctxt, &keypair);
@@ -432,8 +441,8 @@ exit:
     return error;
 }
 
-CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const uint8_t * public_key,
-                                        const size_t public_key_length, const uint8_t * signature, const size_t signature_length)
+CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const ECPKey & public_key,
+                                        const uint8_t * signature, const size_t signature_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -447,15 +456,13 @@ CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_le
 
     VerifyOrExit(msg != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(public_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(public_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(signature != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(signature_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    result = mbedtls_ecp_group_load(&keypair.grp, MBEDTLS_ECP_DP_SECP256R1);
+    result = mbedtls_ecp_group_load(&keypair.grp, MapECPGroupId(public_key.Type()));
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    result = mbedtls_ecp_point_read_binary(&keypair.grp, &keypair.Q, Uint8::to_const_uchar(public_key), public_key_length);
+    result = mbedtls_ecp_point_read_binary(&keypair.grp, &keypair.Q, Uint8::to_const_uchar(public_key), public_key.Length());
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     result = mbedtls_ecdsa_from_keypair(&ecdsa_ctxt, &keypair);
@@ -474,8 +481,8 @@ exit:
     return error;
 }
 
-CHIP_ERROR ECDH_derive_secret(const uint8_t * remote_public_key, const size_t remote_public_key_length,
-                              const uint8_t * local_private_key, const size_t local_private_key_length, uint8_t * out_secret,
+CHIP_ERROR ECDH_derive_secret(const ECPKey & remote_public_key,
+                              const ECPKey & local_private_key, uint8_t * out_secret,
                               size_t & out_secret_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -496,21 +503,18 @@ CHIP_ERROR ECDH_derive_secret(const uint8_t * remote_public_key, const size_t re
     mbedtls_ecdh_context ecdh_ctxt;
     mbedtls_ecdh_init(&ecdh_ctxt);
 
-    VerifyOrExit(remote_public_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(remote_public_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(local_private_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(local_private_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_secret != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_secret_length >= kMax_ECDH_Secret_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(remote_public_key.Type() == local_private_key.Type(), error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    result = mbedtls_ecp_group_load(&ecp_grp, MBEDTLS_ECP_DP_SECP256R1);
+    result = mbedtls_ecp_group_load(&ecp_grp, MapECPGroupId(local_private_key.Type()));
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_mpi_read_binary(&mpi_privkey, Uint8::to_const_uchar(local_private_key), local_private_key_length);
+    result = mbedtls_mpi_read_binary(&mpi_privkey, Uint8::to_const_uchar(local_private_key), local_private_key.Length());
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     result =
-        mbedtls_ecp_point_read_binary(&ecp_grp, &ecp_pubkey, Uint8::to_const_uchar(remote_public_key), remote_public_key_length);
+        mbedtls_ecp_point_read_binary(&ecp_grp, &ecp_pubkey, Uint8::to_const_uchar(remote_public_key), remote_public_key.Length());
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     result = mbedtls_ecdh_compute_shared(&ecp_grp, &mpi_secret, &ecp_pubkey, &mpi_privkey, CryptoRNG, NULL);
@@ -532,17 +536,6 @@ exit:
 void ClearSecretData(uint8_t * buf, uint32_t len)
 {
     memset(buf, 0, len);
-}
-
-mbedtls_ecp_group_id MapECPGroupId(SupportedECPKeyTypes keyType)
-{
-    switch (keyType)
-    {
-    case SupportedECPKeyTypes::ECP256R1:
-        return MBEDTLS_ECP_DP_SECP256R1;
-    default:
-        return MBEDTLS_ECP_DP_NONE;
-    }
 }
 
 CHIP_ERROR NewECPKeypair(ECPKey & pubkey, ECPKey & privkey)
