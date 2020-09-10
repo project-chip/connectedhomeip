@@ -80,16 +80,22 @@ class TestOnOffCluster(CHIPVirtualHome):
         for ip in server_ip_address:
             output = self.execute_device_cmd(
                 tool_device_id, "chip-tool on {} {} 1".format(ip, CHIP_PORT))
+            self.logger.info(
+                'checking output does not contain "No response from device"')
             self.assertFalse(self.sequenceMatch(
                 output['output'], ["No response from device."]))
         time.sleep(1)
         for ip in server_ip_address:
             output = self.execute_device_cmd(
                 tool_device_id, "chip-tool off {} {} 1".format(ip, CHIP_PORT))
+            self.logger.info(
+                'checking output does not contain "No response from device"')
             self.assertFalse(self.sequenceMatch(
                 output['output'], ["No response from device."]))
 
         for device_id in server_ids:
+            self.logger.info("checking device log for {}".format(
+                self.get_device_pretty_id(device_id)))
             self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), ["OnOff: 1", "OnOff: 0"]),
                             "Datamodel test failed: cannot find matching string from device {}".format(device_id))
 

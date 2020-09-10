@@ -16,6 +16,7 @@ limitations under the License.
 """
 
 import ipaddress
+import json
 import logging
 import os
 import re
@@ -87,6 +88,8 @@ class CHIPVirtualHome:
         return ret.json()
 
     def execute_device_cmd(self, device_id, cmd, stream=False):
+        self.logger.info(
+            "device: {} exec: {}".format(self.get_device_pretty_id(device_id), cmd))
         ret = requests.get(self._build_request_url('device_cmd', [self.home_id, device_id, cmd]),
                            params={'stream': stream},
                            stream=stream)
@@ -128,8 +131,8 @@ class CHIPVirtualHome:
 
         for device in self.non_ap_devices:
             self.logger.info(
-                "device id: {} connecting to desired ssid: {}".format(
-                    device['id'], ssid))
+                "device: {} connecting to desired ssid: {}".format(
+                    self.get_device_pretty_id(device['id']), ssid))
             self.write_psk_to_wpa_supplicant_config(device['id'], ssid, psk)
             self.kill_existing_wpa_supplicant(device['id'])
             self.start_wpa_supplicant(device['id'])
@@ -141,21 +144,15 @@ class CHIPVirtualHome:
         for ipstr in ipaddr_list:
             try:
                 self.logger.info(
-                    "device id: {} thread ip: {}".format(device_id, ipstr))
+                    "device: {} thread ip: {}".format(self.get_device_pretty_id(device_id), ipstr))
                 ipaddr = ipaddress.ip_address(ipstr)
                 if ipaddr.is_link_local:
-                    self.logger.info(
-                        "ignore ip: {} : link local".format(ipstr))
                     continue
                 if not ipaddr.is_private:
-                    self.logger.info(
-                        "ignore ip: {} : global ip addr".format(ipstr))
                     continue
                 if re.match("fd[0-9a-f]{2}:[0-9a-f]{4}:[0-9a-f]{4}:[0-9a-f]{4}:0000:00ff:fe00:[0-9a-f]{4}", ipaddr.exploded) != None:
-                    self.logger.info(
-                        "ignore ip: {} : not for app".format(ipstr))
                     continue
-                self.logger.info("return ip: {}".format(ipstr))
+                self.logger.info("Get Mesh-Local EID: {}".format(ipstr))
                 return str(ipaddr)
             except ValueError:
                 # Since we are using ot-ctl, which is a command line interface and it will append 'Done' to end of output
@@ -217,6 +214,10 @@ class CHIPVirtualHome:
 
         device_types = set()
         created_devices = self.query_api('home_devices', [home_id])
+
+        self.logger.info("home id: {} devices: {}".format(
+            home_id, json.dumps(created_devices, indent=4, sort_keys=True)))
+
         for device in created_devices.values():
             device_types.add(device['type'])
 
@@ -250,8 +251,8 @@ class CHIPVirtualHome:
                 fp.write(ret_log)
 
     def start_wpa_supplicant(self, device_id):
-        self.logger.info("device id: {}: starting wpa_supplicant on device"
-                         .format(device_id))
+        self.logger.info("device: {}: starting wpa_supplicant on device"
+                         .format(self.get_device_pretty_id(device_id)))
 
         start_wpa_supplicant_command = "".join(
             ["wpa_supplicant -B -i wlan0 ",
@@ -261,8 +262,8 @@ class CHIPVirtualHome:
         return self.execute_device_cmd(device_id, start_wpa_supplicant_command)
 
     def write_psk_to_wpa_supplicant_config(self, device_id, ssid, psk):
-        self.logger.info("device id: {}: writing ssid, psk to wpa_supplicant config"
-                         .format(device_id))
+        self.logger.info("device: {}: writing ssid, psk to wpa_supplicant config"
+                         .format(self.get_device_pretty_id(device_id)))
 
         write_psk_command = "".join(
             ["sh -c 'wpa_passphrase {} {} >> ".format(ssid, psk),
@@ -271,9 +272,18 @@ class CHIPVirtualHome:
         return self.execute_device_cmd(device_id, write_psk_command)
 
     def kill_existing_wpa_supplicant(self, device_id):
-        self.logger.info("device id: {}: kill existing wpa_supplicant"
-                         .format(device_id))
+        self.logger.info("device: {}: kill existing wpa_supplicant"
+                         .format(self.get_device_pretty_id(device_id)))
 
         kill_wpa_supplicant_command = 'killall wpa_supplicant'
 
         return self.execute_device_cmd(device_id, kill_wpa_supplicant_command)
+
+    def get_device_pretty_name(self, device_id):
+        device_obj = self.device_config.get(device_id, None)
+        if device_obj != None:
+            return device_obj['type']
+        return "<unknown>"
+
+    def get_device_pretty_id(self, device_id):
+        return "{}({}...)".format(self.get_device_pretty_name(device_id), device_id[:8])
