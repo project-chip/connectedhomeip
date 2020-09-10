@@ -63,7 +63,7 @@ function __cirquetest_start_flask() {
     cd "$REPO_DIR"/third_party/cirque/repo
     sudo FLASK_APP='cirque/restservice/service.py' \
         PATH="$PATH":"$REPO_DIR"/third_party/cirque/repo/openthread/output/x86_64-unknown-linux-gnu/bin/ \
-        python3 -m flask run >/dev/null 2>/dev/null
+        python3 -m flask run >/dev/null 2>&1
 }
 
 function __cirquetest_clean_flask() {
@@ -100,7 +100,7 @@ function cirquetest_run_test() {
     __cirquetest_clean_flask
     # Cleanup containers and possibly networks to run more tests
     echo "Do docker system prune"
-    (yes | docker system prune) >/dev/null 2>/dev/null
+    (yes | docker system prune) >/dev/null 2>&1
     return "$exitcode"
 }
 
