@@ -110,11 +110,12 @@ function cirquetest_run_all_tests() {
     for i in "${!CIRQUE_TESTS[@]}"; do
         test_name="${CIRQUE_TESTS[$i]}"
         echo "[ RUN] $test_name"
-        cirquetest_run_test "$test_name"
+        cirquetest_run_test "$test_name" > "/tmp/test_output_$test_name" 2>&1
         exitcode=$?
         if [ "$exitcode" = 0 ]; then
             echo -e "[$BOLD_GREEN_TEXT""SUCC""$RESET_COLOR] $test_name"
         else
+            cat "/tmp/test_output_$test_name"
             echo -e "[$BOLD_RED_TEXT""FAIL""$RESET_COLOR] $test_name (Exitcode: $exitcode)"
             return 1
         fi
