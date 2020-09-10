@@ -61,10 +61,10 @@ nrf5_executable("lighting_app") {
   output_name = "chip-nrf52840-lighting-example"
 
   sources = [
-    "${nrf5_platform_dir}/app/chipinit.cpp",
-    "${nrf5_platform_dir}/app/include/chipinit.h",
-    "${nrf5_platform_dir}/app/include/Service.h",
     "${nrf5_platform_dir}/app/Service.cpp",
+    "${nrf5_platform_dir}/app/chipinit.cpp",
+    "${nrf5_platform_dir}/app/include/Service.h",
+    "${nrf5_platform_dir}/app/include/chipinit.h",
     "${nrf5_platform_dir}/app/support/CXXExceptionStubs.cpp",
     "${nrf5_platform_dir}/app/support/nRF5Sbrk.c",
     "${nrf5_platform_dir}/util/LEDWidget.cpp",
