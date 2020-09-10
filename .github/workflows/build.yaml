@@ -37,8 +37,7 @@ jobs:
             image: connectedhomeip/chip-build:0.4.1
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
-            options:
-                - "privileged"
+            options: "--privileged"
 
         steps:
             - name: Checkout
