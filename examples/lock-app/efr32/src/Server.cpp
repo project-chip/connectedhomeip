@@ -127,13 +127,12 @@ private:
             System::PacketBuffer::Free(buffer);
             return;
         }
-        ChipResponseDestination responseDest(header.GetSourceNodeId().Value(), mgr);
         uint8_t * message;
         uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
         ret                 = emberAfProcessMessage(&frame,
                                     0, // type
                                     message, messageLen,
-                                    &responseDest, // source identifier
+                                    header.GetSourceNodeId().Value(), // source identifier
                                     NULL);
 
         System::PacketBuffer::Free(buffer);

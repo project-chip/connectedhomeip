@@ -162,10 +162,10 @@ void emberAfDecodeAndPrintCluster(uint16_t cluster);
 void emberAfDecodeAndPrintClusterWithMfgCode(uint16_t cluster, uint16_t mfgCode);
 
 bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message, uint16_t msgLen,
-                           ChipResponseDestination * source, InterPanHeader * interPanHeader);
+                           ChipNodeId source, InterPanHeader * interPanHeader);
 
 bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message,
-                                     uint16_t messageLength, ChipResponseDestination * source, InterPanHeader * interPanHeader,
+                                     uint16_t messageLength, ChipNodeId source, InterPanHeader * interPanHeader,
                                      EmberAfClusterCommand * returnCmd);
 
 /**
@@ -232,7 +232,7 @@ void emberAfSetNoReplyForNextMessage(bool set);
 // the message. It is based on the clusterId and specified in the SE
 // app profile.  If the message is outgoing then the
 bool emberAfDetermineIfLinkSecurityIsRequired(uint8_t commandId, bool incoming, bool broadcast, EmberAfProfileId profileId,
-                                              EmberAfClusterId clusterId, ChipResponseDestination * remoteNodeId);
+                                              EmberAfClusterId clusterId, ChipNodeId remoteNodeId);
 
 #define isThisDataTypeSentLittleEndianOTA(dataType) (!(emberAfIsThisDataTypeAStringType(dataType)))
 

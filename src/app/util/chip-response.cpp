@@ -25,13 +25,22 @@
 #include <assert.h>
 #include <inet/InetLayer.h> // PacketBuffer and the like
 #include <support/logging/CHIPLogging.h>
+#include <transport/SecureSessionMgr.h> // For SecureSessionMgrBase
 
 using namespace chip;
 
+// TODO: This is not ideal, but we're still sorting out how secure session
+// managers end up working and whether they're singletons.  In the long term,
+// there will be some sane API that lets us send a message to a given node id.
+//
+// https://github.com/project-chip/connectedhomeip/issues/2566 tracks that API.
+namespace chip {
+extern SecureSessionMgrBase & SessionManager();
+}
+
 extern "C" {
 
-EmberStatus chipSendResponse(ChipResponseDestination * destination, EmberApsFrame * apsFrame, uint16_t messageLength,
-                             uint8_t * message)
+EmberStatus chipSendResponse(NodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
 {
     uint16_t frameSize  = encodeApsFrame(nullptr, 0, apsFrame);
     uint32_t dataLength = uint32_t(frameSize) + uint32_t(messageLength);
@@ -66,7 +75,7 @@ EmberStatus chipSendResponse(ChipResponseDestination * destination, EmberApsFram
     memcpy(buffer->Start() + frameSize, message, messageLength);
     buffer->SetDataLength(dataLength);
 
-    CHIP_ERROR err = destination->mSecureSessionManager->SendMessage(destination->mSourceNodeId, buffer);
+    CHIP_ERROR err = SessionManager().SendMessage(destination, buffer);
     if (err != CHIP_NO_ERROR)
     {
         // FIXME: Figure out better translations between our error types?
