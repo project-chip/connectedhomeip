@@ -696,7 +696,14 @@ ssize_t GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXWrite(struct bt_conn * 
     ChipDeviceEvent event;
     PacketBuffer * packetBuf = PacketBuffer::NewWithAvailableSize(len);
 
+    // Unfortunately the Zephyr logging macros end up assigning uint16_t
+    // variables to uint16_t:10 fields, which triggers integer conversion
+    // warnings.  And treating the Zephyr headers as system headers does not
+    // help, apparently.  Just turn off that warning around this log call.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
     LOG_HEXDUMP_DBG(buf, len, "Rx char write");
+#pragma GCC diagnostic pop
 
     // If successful...
     if (packetBuf != NULL)

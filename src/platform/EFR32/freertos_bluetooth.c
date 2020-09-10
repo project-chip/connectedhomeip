@@ -357,8 +357,8 @@ void vRaiseEventFlagBasedOnContext(EventGroupHandle_t xEventGroup, EventBits_t u
     }
 }
 
-EventBits_t vSendToQueueBasedOnContext(QueueHandle_t xQueue, void * xItemToQueue, TickType_t xTicksToWait,
-                                       BaseType_t * pxHigherPriorityTaskWoken)
+BaseType_t vSendToQueueBasedOnContext(QueueHandle_t xQueue, void * xItemToQueue, TickType_t xTicksToWait,
+                                      BaseType_t * pxHigherPriorityTaskWoken)
 {
     BaseType_t status;
     BaseType_t higherPrioTaskWoken = pdFALSE;

@@ -41,21 +41,27 @@ uint64_t GetClock_Monotonic(void)
 {
     std::chrono::microseconds epoch =
         std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch());
-    return epoch.count();
+    // count() is nominally signed, but for a monotonic clock it cannot be
+    // negative.
+    return static_cast<uint64_t>(epoch.count());
 }
 
 uint64_t GetClock_MonotonicMS(void)
 {
     std::chrono::milliseconds epoch =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch());
-    return epoch.count();
+    // count() is nominally signed, but for a monotonic clock it cannot be
+    // negative.
+    return static_cast<uint64_t>(epoch.count());
 }
 
 uint64_t GetClock_MonotonicHiRes(void)
 {
     std::chrono::microseconds epoch =
         std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch());
-    return epoch.count();
+    // count() is nominally signed, but for a monotonic clock it cannot be
+    // negative.
+    return static_cast<uint64_t>(epoch.count());
 }
 
 System::Error GetClock_RealTime(uint64_t & curTime)
@@ -70,7 +76,12 @@ System::Error GetClock_RealTime(uint64_t & curTime)
     {
         return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
     }
-    curTime = (tv.tv_sec * UINT64_C(1000000)) + tv.tv_usec;
+    if (tv.tv_usec < 0)
+    {
+        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+    }
+    static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
+    curTime = (static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000000)) + static_cast<uint64_t>(tv.tv_usec);
     return CHIP_SYSTEM_NO_ERROR;
 }
 
@@ -86,7 +97,12 @@ System::Error GetClock_RealTimeMS(uint64_t & curTime)
     {
         return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
     }
-    curTime = (tv.tv_sec * UINT64_C(1000)) + (tv.tv_usec / 1000);
+    if (tv.tv_usec < 0)
+    {
+        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+    }
+    static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
+    curTime = (static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000)) + (static_cast<uint64_t>(tv.tv_usec) / 1000);
     return CHIP_SYSTEM_NO_ERROR;
 }
 

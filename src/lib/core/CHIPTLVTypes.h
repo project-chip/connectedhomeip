@@ -158,7 +158,9 @@ inline TLVFieldSize GetTLVFieldSize(uint8_t type)
 // TODO: move to private namespace
 inline uint8_t TLVFieldSizeToBytes(TLVFieldSize fieldSize)
 {
-    return (fieldSize != kTLVFieldSize_0Byte) ? (1 << fieldSize) : 0;
+    // We would like to assert fieldSize < 7, but that gives us fatal
+    // -Wtautological-constant-out-of-range-compare warnings...
+    return (fieldSize != kTLVFieldSize_0Byte) ? static_cast<uint8_t>(1 << fieldSize) : 0;
 }
 
 } // namespace TLV

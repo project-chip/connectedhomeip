@@ -196,7 +196,9 @@ inline constexpr uint16_t NRF5Config::GetRecordKey(Key key)
  */
 inline constexpr uint16_t NRF5Config::FDSWords(size_t s)
 {
-    return (s + (kFDSWordSize - 1)) / kFDSWordSize;
+    // TODO: This cast does not seem safe from overflow.
+    // https://github.com/project-chip/connectedhomeip/issues/2570
+    return static_cast<uint16_t>((s + (kFDSWordSize - 1)) / kFDSWordSize);
 }
 
 } // namespace Internal

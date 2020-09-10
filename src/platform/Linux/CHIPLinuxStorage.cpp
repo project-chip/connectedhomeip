@@ -223,7 +223,9 @@ CHIP_ERROR ChipLinuxStorage::WriteValueBin(const char * key, const uint8_t * dat
     // Encode it
     if (retval == CHIP_NO_ERROR)
     {
-        encodedDataLen              = Base64Encode(data, dataLen, encodedData);
+        // We tested above that dataLen is no more than kMaxBlobSize.
+        static_assert(kMaxBlobSize < UINT16_MAX, "dataLen won't fit");
+        encodedDataLen              = Base64Encode(data, static_cast<uint16_t>(dataLen), encodedData);
         encodedData[encodedDataLen] = 0;
     }
 

@@ -92,6 +92,13 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
         vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, msg, v);
 
         // Invoke the Zephyr logging library to log the message.
+        //
+        // Unfortunately the Zephyr logging macros end up assigning uint16_t
+        // variables to uint16_t:10 fields, which triggers integer conversion
+        // warnings.  And treating the Zephyr headers as system headers does not
+        // help, apparently.  Just turn off that warning around this switch.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
         switch (category)
         {
         case kLogCategory_Error:
@@ -106,6 +113,7 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
             LOG_DBG("%s", log_strdup(formattedMsg));
             break;
         }
+#pragma GCC diagnostic pop
     }
 
     // Let the application know that a log message has been emitted.
