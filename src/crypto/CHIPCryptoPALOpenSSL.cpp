@@ -459,8 +459,8 @@ ECName MapECName(SupportedECPKeyTypes keyType)
     }
 }
 
-CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ECPKey & private_key,
-                          uint8_t * out_signature, size_t & out_signature_length)
+CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ECPKey & private_key, uint8_t * out_signature,
+                          size_t & out_signature_length)
 {
     ERR_clear_error();
 
@@ -649,8 +649,7 @@ exit:
 }
 
 // helper function to populate octet key into EVP_PKEY out_evp_pkey. Caller must free out_evp_pkey
-static CHIP_ERROR _create_evp_key_from_binary_p256_key(const ECPKey & key, EVP_PKEY ** out_evp_pkey,
-                                                       bool isPrivateKey)
+static CHIP_ERROR _create_evp_key_from_binary_p256_key(const ECPKey & key, EVP_PKEY ** out_evp_pkey, bool isPrivateKey)
 {
 
     CHIP_ERROR error     = CHIP_NO_ERROR;
@@ -732,8 +731,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR ECDH_derive_secret(const ECPKey & remote_public_key,
-                              const ECPKey & local_private_key, uint8_t * out_secret,
+CHIP_ERROR ECDH_derive_secret(const ECPKey & remote_public_key, const ECPKey & local_private_key, uint8_t * out_secret,
                               size_t & out_secret_length)
 {
     ERR_clear_error();
