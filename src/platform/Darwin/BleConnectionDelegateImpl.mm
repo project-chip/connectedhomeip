@@ -124,11 +124,11 @@ namespace DeviceLayer {
             if ([serviceUUID.data isEqualToData:_shortServiceUUID.data]) {
                 NSData * serviceData = [servicesData objectForKey:serviceUUID];
 
-                int length = [serviceData length];
+                NSUInteger length = [serviceData length];
                 if (length == 3) {
                     const uint8_t * bytes = (const uint8_t *) [serviceData bytes];
                     uint8_t opCode = bytes[0];
-                    uint16_t discriminator = ((bytes[1] & 0x0F) << 8) | bytes[2];
+                    uint16_t discriminator = static_cast<uint16_t>(((bytes[1] & 0x0F) << 8) | bytes[2]);
                     if (opCode == 0 && discriminator == _deviceDiscriminator) {
                         ChipLogProgress(Ble, "Connecting to device: %@", peripheral);
                         [self connect:peripheral];
@@ -240,14 +240,21 @@ namespace DeviceLayer {
         chip::System::PacketBuffer * msgBuf = chip::System::PacketBuffer::New();
 
         if (NULL != msgBuf) {
+          if (msgBuf->MaxDataLength() < characteristic.value.length) {
+            ChipLogError(Ble, "Can't fit characteristic value into our packet buffer");
+            chip::System::PacketBuffer::Free(msgBuf);
+            _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_INCORRECT_STATE);
+          } else {
             memcpy(msgBuf->Start(), characteristic.value.bytes, characteristic.value.length);
-            msgBuf->SetDataLength(characteristic.value.length);
+            static_assert(std::is_same<decltype(msgBuf->MaxDataLength()), uint16_t>::value, "Unexpected type for max data length");
+            msgBuf->SetDataLength(static_cast<uint16_t>(characteristic.value.length));
 
             if (!_mBleLayer->HandleIndicationReceived((__bridge void *) peripheral, &svcId, &charId, msgBuf)) {
                 // since this error comes from device manager core
                 // we assume it would do the right thing, like closing the connection
                 ChipLogError(Ble, "Failed at handling incoming BLE data");
             }
+          }
         } else {
             ChipLogError(Ble, "Failed at allocating buffer for incoming BLE data");
             _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_NO_MEMORY);

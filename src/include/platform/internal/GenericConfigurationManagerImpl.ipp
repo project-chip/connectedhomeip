@@ -281,13 +281,19 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturingDate(uin
 
     VerifyOrExit(dateLen == kDateStringLength, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    year = strtoul(dateStr, &parseEnd, 10);
+    // Cast does not lose information, because we then check that we only parsed
+    // 4 digits, so our number can't be bigger than 9999.
+    year = static_cast<uint16_t>(strtoul(dateStr, &parseEnd, 10));
     VerifyOrExit(parseEnd == dateStr + 4, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    month = strtoul(dateStr + 5, &parseEnd, 10);
+    // Cast does not lose information, because we then check that we only parsed
+    // 2 digits, so our number can't be bigger than 99.
+    month = static_cast<uint8_t>(strtoul(dateStr + 5, &parseEnd, 10));
     VerifyOrExit(parseEnd == dateStr + 7, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    dayOfMonth = strtoul(dateStr + 8, &parseEnd, 10);
+    // Cast does not lose information, because we then check that we only parsed
+    // 2 digits, so our number can't be bigger than 99.
+    dayOfMonth = static_cast<uint8_t>(strtoul(dateStr + 8, &parseEnd, 10));
     VerifyOrExit(parseEnd == dateStr + 10, err = CHIP_ERROR_INVALID_ARGUMENT);
 
 exit:
@@ -798,7 +804,8 @@ GenericConfigurationManagerImpl<ImplClass>::_GetBLEDeviceIdentificationInfo(Ble:
 
     err = Impl()->_GetSetupDiscriminator(discriminator);
     SuccessOrExit(err);
-    deviceIdInfo.SetDeviceDiscriminator(discriminator);
+    // TODO: https://github.com/project-chip/connectedhomeip/issues/2562
+    deviceIdInfo.SetDeviceDiscriminator(static_cast<uint16_t>(discriminator));
 
     // TODO: Update when CHIP service/fabric provision is implemented
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
