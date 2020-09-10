@@ -44,13 +44,13 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clust
 {
     if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
     {
-        ChipLogProgress(App, "Unknown cluster ID: %d", clusterId);
+        ChipLogProgress(Zcl, "Unknown cluster ID: %d", clusterId);
         return;
     }
 
     if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
     {
-        ChipLogProgress(App, "Unknown attribute ID: %d", attributeId);
+        ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
         return;
     }
 
@@ -77,11 +77,11 @@ void HandleDataModelMessage(const MessageHeader & header, System::PacketBuffer *
     bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) > 0;
     if (ok)
     {
-        ChipLogProgress(App, "APS frame processing success!");
+        ChipLogProgress(Zcl, "APS frame processing success!");
     }
     else
     {
-        ChipLogProgress(App, "APS frame processing failure!");
+        ChipLogProgress(Zcl, "APS frame processing failure!");
         System::PacketBuffer::Free(buffer);
         return;
     }
@@ -99,11 +99,11 @@ void HandleDataModelMessage(const MessageHeader & header, System::PacketBuffer *
 
     if (ok)
     {
-        ChipLogProgress(App, "Data model processing success!");
+        ChipLogProgress(Zcl, "Data model processing success!");
     }
     else
     {
-        ChipLogProgress(App, "Data model processing failure!");
+        ChipLogProgress(Zcl, "Data model processing failure!");
     }
 }
 

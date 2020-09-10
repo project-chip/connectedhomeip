@@ -55,14 +55,14 @@ public:
         char src_addr[PeerAddress::kMaxToStringSize];
 
         // as soon as a client connects, assume it is connected
-        VerifyOrExit(buffer != NULL, ChipLogProgress(App, "Received data but couldn't process it..."));
-        VerifyOrExit(header.GetSourceNodeId().HasValue(), ChipLogProgress(App, "Unknown source for received message"));
+        VerifyOrExit(buffer != NULL, ChipLogProgress(AppServer, "Received data but couldn't process it..."));
+        VerifyOrExit(header.GetSourceNodeId().HasValue(), ChipLogProgress(AppServer, "Unknown source for received message"));
 
-        VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ChipLogProgress(App, "Unknown source for received message"));
+        VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ChipLogProgress(AppServer, "Unknown source for received message"));
 
         state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
 
-        ChipLogProgress(App, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
+        ChipLogProgress(AppServer, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
 
         HandleDataModelMessage(header, buffer, mgr);
         buffer = NULL;
@@ -78,7 +78,7 @@ public:
 
     virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
     {
-        ChipLogProgress(App, "Received a new connection.");
+        ChipLogProgress(AppServer, "Received a new connection.");
     }
 };
 
@@ -109,10 +109,10 @@ void InitServer(DemoSessionManager * sessions)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(App, "ERROR setting up transport: %s", ErrorStr(err));
+        ChipLogError(AppServer, "ERROR setting up transport: %s", ErrorStr(err));
     }
     else
     {
-        ChipLogProgress(App, "Server Listening...");
+        ChipLogProgress(AppServer, "Server Listening...");
     }
 }
