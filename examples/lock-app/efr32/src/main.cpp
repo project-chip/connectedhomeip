@@ -67,11 +67,11 @@ DemoSessionManager * sessions;
 } // namespace
 
 namespace chip {
-SecureSessionMgrBase& SessionManager() {
+SecureSessionMgrBase & SessionManager()
+{
     return *sessions;
 }
 } // namespace chip
-
 
 volatile int apperror_cnt;
 // ================================================================================
@@ -101,7 +101,7 @@ extern "C" void vApplicationIdleHook(void)
 // ================================================================================
 int main(void)
 {
-    int ret                       = CHIP_ERROR_MAX;
+    int ret  = CHIP_ERROR_MAX;
     sessions = new DemoSessionManager;
 
 #if CHIP_ENABLE_OPENTHREAD

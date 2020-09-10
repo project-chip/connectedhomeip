@@ -42,8 +42,7 @@
 extern "C" {
 #endif // __cplusplus
 
-EmberStatus chipSendResponse(ChipNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength,
-                             uint8_t * message);
+EmberStatus chipSendResponse(ChipNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message);
 
 #ifdef __cplusplus
 } // extern "C"

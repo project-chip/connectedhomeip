@@ -239,7 +239,8 @@ SecureSessionMgr<Transport::UDP, // IPV6
 } // namespace
 
 namespace chip {
-SecureSessionMgrBase& SessionManager() {
+SecureSessionMgrBase & SessionManager()
+{
     return sessions;
 }
 } // namespace chip

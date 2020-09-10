@@ -23,11 +23,11 @@ chip::SecureSessionMgr<chip::Transport::UDP> sessions;
 }
 
 namespace chip {
-SecureSessionMgrBase& SessionManager() {
+SecureSessionMgrBase & SessionManager()
+{
     return sessions;
 }
 } // namespace chip
-
 
 extern "C" {
 void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,

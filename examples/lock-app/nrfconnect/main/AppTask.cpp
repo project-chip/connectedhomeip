@@ -60,7 +60,8 @@ AppTask AppTask::sAppTask;
 DemoSessionManager sSessions;
 
 namespace chip {
-SecureSessionMgrBase& SessionManager() {
+SecureSessionMgrBase & SessionManager()
+{
     return sSessions;
 }
 } // namespace chip

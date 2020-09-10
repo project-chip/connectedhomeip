@@ -24,8 +24,8 @@
 
 #include <assert.h>
 #include <inet/InetLayer.h> // PacketBuffer and the like
-#include <transport/SecureSessionMgr.h> // For SecureSessionMgrBase
 #include <support/logging/CHIPLogging.h>
+#include <transport/SecureSessionMgr.h> // For SecureSessionMgrBase
 
 using namespace chip;
 
@@ -33,13 +33,12 @@ using namespace chip;
 // end up working and whether they're singletons.  In the long term, there will
 // be some sane API that lets us send a message to a given node id.
 namespace chip {
-extern SecureSessionMgrBase& SessionManager();
+extern SecureSessionMgrBase & SessionManager();
 }
 
 extern "C" {
 
-EmberStatus chipSendResponse(NodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength,
-                             uint8_t * message)
+EmberStatus chipSendResponse(NodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
 {
     uint16_t frameSize  = encodeApsFrame(nullptr, 0, apsFrame);
     uint32_t dataLength = uint32_t(frameSize) + uint32_t(messageLength);

@@ -1947,8 +1947,7 @@ typedef struct
  */
 #ifdef __cplusplus
 #include <transport/MessageHeader.h>
-static_assert(sizeof(chip::NodeId) == sizeof(uint64_t),
-              "Unexpected node if size");
+static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
 // Make it easier to have unified function declarations across C and C++ source
 // files.
 typedef chip::NodeId ChipNodeId;

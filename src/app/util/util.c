@@ -42,8 +42,8 @@
 
 #include "af-main.h"
 #include "af.h"
-#include "common.h"
 #include "chip-response.h"
+#include "common.h"
 //#include "../plugin/time-server/time-server.h"
 #include "af-event.h"
 //#include "app/framework/util/time-util.h"

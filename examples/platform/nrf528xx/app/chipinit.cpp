@@ -59,7 +59,10 @@ using namespace ::chip::DeviceLayer;
 DemoSessionManager sessions;
 
 namespace chip {
-SecureSessionMgrBase& SessionManager() { return sessions; }
+SecureSessionMgrBase & SessionManager()
+{
+    return sessions;
+}
 } // namespace chip
 
 #if CHIP_ENABLE_OPENTHREAD
