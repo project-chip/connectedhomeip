@@ -38,7 +38,7 @@ jobs:
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
-                - "--privileged"
+                - "privileged"
 
         steps:
             - name: Checkout
