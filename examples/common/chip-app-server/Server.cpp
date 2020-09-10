@@ -39,7 +39,6 @@ using namespace ::chip::Transport;
 using namespace ::chip::DeviceLayer;
 
 #ifndef EXAMPLE_SERVER_NODEID
-// "nRF5"
 #define EXAMPLE_SERVER_NODEID 12344321
 #endif // EXAMPLE_SERVER_NODEID
 
