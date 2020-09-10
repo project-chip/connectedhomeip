@@ -400,8 +400,8 @@ mbedtls_ecp_group_id MapECPGroupId(SupportedECPKeyTypes keyType)
     }
 }
 
-CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ECPKey & private_key,
-                          uint8_t * out_signature, size_t & out_signature_length)
+CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ECPKey & private_key, uint8_t * out_signature,
+                          size_t & out_signature_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -481,8 +481,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR ECDH_derive_secret(const ECPKey & remote_public_key,
-                              const ECPKey & local_private_key, uint8_t * out_secret,
+CHIP_ERROR ECDH_derive_secret(const ECPKey & remote_public_key, const ECPKey & local_private_key, uint8_t * out_secret,
                               size_t & out_secret_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;

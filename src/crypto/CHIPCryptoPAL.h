@@ -112,7 +112,7 @@ class P256PrivateKey : public ECPKey
 public:
     SupportedECPKeyTypes Type() const override { return SupportedECPKeyTypes::ECP256R1; }
     size_t Length() const override { return kP256_PrivateKey_Length; }
-    operator uint8_t *() const override { return (uint8_t*)bytes; }
+    operator uint8_t *() const override { return (uint8_t *) bytes; }
 
 private:
     uint8_t bytes[kP256_PrivateKey_Length];
@@ -123,7 +123,7 @@ class P256PublicKey : public ECPKey
 public:
     SupportedECPKeyTypes Type() const override { return SupportedECPKeyTypes::ECP256R1; }
     size_t Length() const override { return kP256_PublicKey_Length; }
-    operator uint8_t *() const override { return (uint8_t*)bytes; }
+    operator uint8_t *() const override { return (uint8_t *) bytes; }
 
 private:
     uint8_t bytes[kP256_PublicKey_Length];
@@ -237,8 +237,8 @@ CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length);
  * @param out_signature_length Length of out buffer
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ECPKey & private_key,
-                          uint8_t * out_signature, size_t & out_signature_length);
+CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ECPKey & private_key, uint8_t * out_signature,
+                          size_t & out_signature_length);
 
 /**
  * @brief A function to sign a msg using ECDSA
@@ -264,8 +264,7 @@ CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_le
  * @param out_secret_length Length of out_secret
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR ECDH_derive_secret(const ECPKey & remote_public_key,
-                              const ECPKey & local_private_key, uint8_t * out_secret,
+CHIP_ERROR ECDH_derive_secret(const ECPKey & remote_public_key, const ECPKey & local_private_key, uint8_t * out_secret,
                               size_t & out_secret_length);
 
 /** @brief Entropy callback function

@@ -70,8 +70,7 @@ exit:
 }
 
 CHIP_ERROR SecureSession::Init(const Crypto::ECPKey & remote_public_key, const Crypto::ECPKey & local_private_key,
-                               const uint8_t * salt, const size_t salt_length,
-                               const uint8_t * info, const size_t info_length)
+                               const uint8_t * salt, const size_t salt_length, const uint8_t * info, const size_t info_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     uint8_t secret[kMax_ECDH_Secret_Length];
