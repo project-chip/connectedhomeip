@@ -187,7 +187,8 @@ exit:
 CHIP_ERROR ChipDeviceController::ConnectDeviceUsingPairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
                                                            NewConnectionHandler onConnected,
                                                            MessageReceiveHandler onMessageReceived, ErrorHandler onError,
-                                                           uint16_t devicePort, SecurePairingSession * pairing)
+                                                           uint16_t devicePort, Inet::InterfaceId interfaceId,
+                                                           SecurePairingSession * pairing)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -215,8 +216,8 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceUsingPairing(NodeId remoteDeviceId
     mOnComplete.Response = onMessageReceived;
     mOnError             = onError;
 
-    err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(deviceAddr, devicePort)),
-                                      pairing);
+    err = mSessionManager->NewPairing(
+        Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(deviceAddr, devicePort, interfaceId)), pairing);
     SuccessOrExit(err);
 
     mMessageNumber = 1;
@@ -242,20 +243,20 @@ exit:
 
 CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
                                                NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
-                                               ErrorHandler onError, uint16_t devicePort)
+                                               ErrorHandler onError, uint16_t devicePort, Inet::InterfaceId interfaceId)
 {
     return ConnectDeviceUsingPairing(remoteDeviceId, deviceAddr, appReqState, onConnected, onMessageReceived, onError, devicePort,
-                                     &mPairingSession);
+                                     interfaceId, &mPairingSession);
 }
 
 CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
                                                                    NewConnectionHandler onConnected,
                                                                    MessageReceiveHandler onMessageReceived, ErrorHandler onError,
-                                                                   uint16_t devicePort)
+                                                                   uint16_t devicePort, Inet::InterfaceId interfaceId)
 {
     SecurePairingUsingTestSecret pairing(Optional<NodeId>::Value(remoteDeviceId), 0, 0);
     return ConnectDeviceUsingPairing(remoteDeviceId, deviceAddr, appReqState, onConnected, onMessageReceived, onError, devicePort,
-                                     &pairing);
+                                     interfaceId, &pairing);
 }
 
 CHIP_ERROR ChipDeviceController::PopulatePeerAddress(Transport::PeerAddress & peerAddress)
