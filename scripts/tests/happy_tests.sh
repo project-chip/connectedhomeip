@@ -25,14 +25,14 @@ env
 
 # Bootstrap Happy
 (cd "$REPO_DIR/third_party/happy/repo" && \
-    sudo apt-get update && \
-    sudo apt-get install -y bridge-utils \
+    apt-get update && \
+    apt-get install -y bridge-utils \
                         net-tools \
                         python3-lockfile \
                         python3-pip \
                         python3-psutil \
                         python3-setuptools && \
-    make)
+    make SUDO="")
 
 # Run Tests
 export TEST_BIN_DIR="$REPO_DIR/out/$BUILD_TYPE/tests"
