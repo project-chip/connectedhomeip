@@ -31,34 +31,37 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief It implements and manages the ESI table. The ESI table is shared among
- *   other plugins.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief It implements and manages the ESI table. The
+                                                                               *ESI table is shared among other plugins.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
+
+#include "af.h"
 
 #ifndef EMBER_AF_PLUGIN_ESI_MANAGEMENT_ESI_TABLE_SIZE
 #define EMBER_AF_PLUGIN_ESI_MANAGEMENT_ESI_TABLE_SIZE 3
-#endif //EMBER_AF_PLUGIN_ESI_MANAGEMENT_ESI_TABLE_SIZE
+#endif // EMBER_AF_PLUGIN_ESI_MANAGEMENT_ESI_TABLE_SIZE
 
 #ifndef EMBER_AF_PLUGIN_ESI_MANAGEMENT_MIN_ERASING_AGE
 #define EMBER_AF_PLUGIN_ESI_MANAGEMENT_MIN_ERASING_AGE 3
-#endif //EMBER_AF_PLUGIN_ESI_MANAGEMENT_MIN_ERASING_AGE
+#endif // EMBER_AF_PLUGIN_ESI_MANAGEMENT_MIN_ERASING_AGE
 
 #ifndef EMBER_AF_PLUGIN_ESI_MANAGEMENT_PLUGIN_CALLBACK_TABLE_SIZE
 #define EMBER_AF_PLUGIN_ESI_MANAGEMENT_PLUGIN_CALLBACK_TABLE_SIZE 5
 #endif // EMBER_AF_PLUGIN_ESI_MANAGEMENT_PLUGIN_CALLBACK_TABLE_SIZE
 
-typedef struct {
-  EmberEUI64 eui64;
-  EmberNodeId nodeId;
-  uint8_t networkIndex;
-  uint8_t endpoint;
-  uint8_t age; // The number of discovery cycles the ESI has not been discovered.
+typedef struct
+{
+    EmberEUI64 eui64;
+    EmberNodeId nodeId;
+    uint8_t networkIndex;
+    uint8_t endpoint;
+    uint8_t age; // The number of discovery cycles the ESI has not been discovered.
 } EmberAfPluginEsiManagementEsiEntry;
 
-typedef void(*EmberAfEsiManagementDeletionCallback)(uint8_t);
+typedef void (*EmberAfEsiManagementDeletionCallback)(uint8_t);
 
 /**
  * Searches in the ESI table by the pair node (short ID, endopoint).
@@ -66,8 +69,7 @@ typedef void(*EmberAfEsiManagementDeletionCallback)(uint8_t);
  * Returns a pointer to the entry if a matching entry was found, otherwise it
  * returns NULL.
  */
-EmberAfPluginEsiManagementEsiEntry* emberAfPluginEsiManagementEsiLookUpByShortIdAndEndpoint(EmberNodeId shortId,
-                                                                                            uint8_t endpoint);
+EmberAfPluginEsiManagementEsiEntry * emberAfPluginEsiManagementEsiLookUpByShortIdAndEndpoint(EmberNodeId shortId, uint8_t endpoint);
 
 /**
  * Searches in the ESI table by the pair node (long ID, endopoint).
@@ -75,8 +77,7 @@ EmberAfPluginEsiManagementEsiEntry* emberAfPluginEsiManagementEsiLookUpByShortId
  * Returns a pointer to the entry if a matching entry was found, otherwise it
  * returns NULL.
  */
-EmberAfPluginEsiManagementEsiEntry* emberAfPluginEsiManagementEsiLookUpByLongIdAndEndpoint(EmberEUI64 longId,
-                                                                                           uint8_t endpoint);
+EmberAfPluginEsiManagementEsiEntry * emberAfPluginEsiManagementEsiLookUpByLongIdAndEndpoint(EmberEUI64 longId, uint8_t endpoint);
 
 /**
  * Allows retrieving the index of an entry that matches the passed short ID
@@ -85,8 +86,7 @@ EmberAfPluginEsiManagementEsiEntry* emberAfPluginEsiManagementEsiLookUpByLongIdA
  * It returns the index of the matching entry if a matching entry was found,
  * otherwise it returns 0xFF.
  */
-uint8_t emberAfPluginEsiManagementIndexLookUpByShortIdAndEndpoint(EmberNodeId shortId,
-                                                                  uint8_t endpoint);
+uint8_t emberAfPluginEsiManagementIndexLookUpByShortIdAndEndpoint(EmberNodeId shortId, uint8_t endpoint);
 
 /**
  * Allows retrieving the index of an entry that matches the passed long ID
@@ -95,8 +95,7 @@ uint8_t emberAfPluginEsiManagementIndexLookUpByShortIdAndEndpoint(EmberNodeId sh
  * It returns the index of the matching entry if a matching entry was found,
  * otherwise it returns 0xFF.
  */
-uint8_t emberAfPluginEsiManagementIndexLookUpByLongIdAndEndpoint(EmberEUI64 longId,
-                                                                 uint8_t endpoint);
+uint8_t emberAfPluginEsiManagementIndexLookUpByLongIdAndEndpoint(EmberEUI64 longId, uint8_t endpoint);
 
 /**
  * Searches in the ESI table by the table index.
@@ -104,7 +103,7 @@ uint8_t emberAfPluginEsiManagementIndexLookUpByLongIdAndEndpoint(EmberEUI64 long
  * Returns a pointer to the ESI entry stored at the index passed as
  * parameter.
  */
-EmberAfPluginEsiManagementEsiEntry* emberAfPluginEsiManagementEsiLookUpByIndex(uint8_t index);
+EmberAfPluginEsiManagementEsiEntry * emberAfPluginEsiManagementEsiLookUpByIndex(uint8_t index);
 
 /**
  * Iterates through the entries in the
@@ -115,8 +114,8 @@ EmberAfPluginEsiManagementEsiEntry* emberAfPluginEsiManagementEsiLookUpByIndex(u
  * the next active entry that satisfy the age requirement. If the are no entries
  * after the passed entry that satisfy the age requirement, it returns NULL.
  */
-EmberAfPluginEsiManagementEsiEntry* emberAfPluginEsiManagementGetNextEntry(EmberAfPluginEsiManagementEsiEntry* entry,
-                                                                           uint8_t age);
+EmberAfPluginEsiManagementEsiEntry * emberAfPluginEsiManagementGetNextEntry(EmberAfPluginEsiManagementEsiEntry * entry,
+                                                                            uint8_t age);
 
 /**
  * Allows obtaining a free entry in the ESI table. It is the
@@ -128,7 +127,7 @@ EmberAfPluginEsiManagementEsiEntry* emberAfPluginEsiManagementGetNextEntry(Ember
  * is at least EMBER_AF_PLUGIN_ESI_MANAGEMENT_MIN_ERASING_AGE (if any) and
  * returns it, otherwise it returns NULL.
  */
-EmberAfPluginEsiManagementEsiEntry* emberAfPluginEsiManagementGetFreeEntry(void);
+EmberAfPluginEsiManagementEsiEntry * emberAfPluginEsiManagementGetFreeEntry(void);
 
 /**
  * Deletes the entry indicated by the parameter 'index' from the
@@ -168,4 +167,4 @@ bool emberAfPluginEsiManagementSubscribeToDeletionAnnouncements(EmberAfEsiManage
  *  table, or it returns 0xFF if the ESI was not present in the table and a new
  *  entry could not be added since the table was full.
  **/
-uint8_t emberAfPluginEsiManagementUpdateEsiAndGetIndex(const EmberAfClusterCommand *cmd);
+uint8_t emberAfPluginEsiManagementUpdateEsiAndGetIndex(const EmberAfClusterCommand * cmd);
