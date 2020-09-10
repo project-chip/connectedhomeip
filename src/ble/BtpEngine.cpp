@@ -183,10 +183,8 @@ bool BtpEngine::IsValidAck(SequenceNumber_t ack_num) const
     {
         return (ack_num <= mTxNewestUnackedSeqNum && ack_num >= mTxOldestUnackedSeqNum);
     }
-    else // Else, if current unacked interval DOES wrap...
-    {
-        return (ack_num <= mTxNewestUnackedSeqNum || ack_num >= mTxOldestUnackedSeqNum);
-    }
+    // Else, if current unacked interval DOES wrap...
+    return (ack_num <= mTxNewestUnackedSeqNum || ack_num >= mTxOldestUnackedSeqNum);
 }
 
 BLE_ERROR BtpEngine::HandleAckReceived(SequenceNumber_t ack_num)

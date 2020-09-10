@@ -112,10 +112,8 @@ public:
         {
             return (BLEEndPoint *) (sEndPointPool.Pool + (sizeof(BLEEndPoint) * i));
         }
-        else
-        {
-            return NULL;
-        }
+
+        return NULL;
     }
 
     BLEEndPoint * Find(BLE_CONNECTION_OBJECT c)

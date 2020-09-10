@@ -71,10 +71,8 @@ static int execute_command(int argc, char ** argv)
         ChipLogDetail(chipTool, "Executing cmd %s\n", command_to_execute->c_name);
         return command_to_execute->c_func(argc, argv);
     }
-    else
-    {
-        return help(0, NULL);
-    }
+
+    return help(0, NULL);
 }
 
 int main(int argc, char ** argv)

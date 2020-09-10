@@ -134,12 +134,10 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareRevision(char
         memcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION, outLen);
         return CHIP_NO_ERROR;
     }
-    else
 #endif // CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
-    {
-        outLen = 0;
-        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    }
+
+    outLen = 0;
+    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 }
 
 template <class ImplClass>

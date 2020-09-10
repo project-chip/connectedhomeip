@@ -968,10 +968,8 @@ BLE_ERROR BLEEndPoint::HandleGattSendConfirmationReceived()
 
         return HandleHandshakeConfirmationReceived();
     }
-    else
-    {
-        return HandleFragmentConfirmationReceived();
-    }
+
+    return HandleFragmentConfirmationReceived();
 }
 
 BLE_ERROR BLEEndPoint::DriveStandAloneAck()
@@ -1302,12 +1300,10 @@ SequenceNumber_t BLEEndPoint::AdjustRemoteReceiveWindow(SequenceNumber_t lastRec
         // New window boundary WOULD wrap, and latest unacked seq num already HAS wrapped, so add offset to difference.
         return (newRemoteWindowBoundary - (newestUnackedSentSeqNum + UINT8_MAX));
     }
-    else
-    {
-        // Neither values would or have wrapped, OR new boundary WOULD wrap but latest unacked seq num does not, so no
-        // offset required.
-        return (newRemoteWindowBoundary - newestUnackedSentSeqNum);
-    }
+
+    // Neither values would or have wrapped, OR new boundary WOULD wrap but latest unacked seq num does not, so no
+    // offset required.
+    return (newRemoteWindowBoundary - newestUnackedSentSeqNum);
 }
 
 BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)

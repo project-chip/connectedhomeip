@@ -974,10 +974,8 @@ CHIP_ERROR ChipSecurityManager::CancelSessionEstablishment(void * reqState)
     }
 
     // Otherwise, tell the caller there was no match.
-    else
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+
+    return CHIP_ERROR_INCORRECT_STATE;
 }
 
 /**

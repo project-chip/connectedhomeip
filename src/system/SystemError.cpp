@@ -246,10 +246,8 @@ bool FormatPOSIXError(char * buf, uint16_t bufSize, int32_t err)
         FormatError(buf, bufSize, "OS", err, desc);
         return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 /**

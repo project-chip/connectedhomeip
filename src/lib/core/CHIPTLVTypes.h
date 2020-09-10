@@ -152,8 +152,7 @@ inline TLVFieldSize GetTLVFieldSize(uint8_t type)
 {
     if (TLVTypeHasValue(type))
         return (TLVFieldSize)(type & kTLVTypeSizeMask);
-    else
-        return kTLVFieldSize_0Byte;
+    return kTLVFieldSize_0Byte;
 }
 
 // TODO: move to private namespace

@@ -613,7 +613,7 @@ INET_ERROR RawEndPoint::SendMsg(const IPPacketInfo * pktInfo, chip::System::Pack
         return INET_ERROR_WRONG_ADDRESS_TYPE;
     }
 #if INET_CONFIG_ENABLE_IPV4
-    else if (IPVer == kIPVersion_4 && addr.Type() != kIPAddressType_IPv4)
+    if (IPVer == kIPVersion_4 && addr.Type() != kIPAddressType_IPv4)
     {
         return INET_ERROR_WRONG_ADDRESS_TYPE;
     }

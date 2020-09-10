@@ -71,10 +71,8 @@ extern int setup_payload_operation_generate_qr_code(int argc, char * const * arg
         ChipLogDetail(chipTool, "QR Code: %s", code.c_str());
         return 0;
     }
-    else
-    {
-        return 2;
-    }
+
+    return 2;
 }
 
 extern int setup_payload_operation_generate_manual_code(int argc, char * const * argv)
@@ -92,8 +90,6 @@ extern int setup_payload_operation_generate_manual_code(int argc, char * const *
         ChipLogDetail(chipTool, "Manual Code: %s", code.c_str());
         return 0;
     }
-    else
-    {
-        return 2;
-    }
+
+    return 2;
 }
