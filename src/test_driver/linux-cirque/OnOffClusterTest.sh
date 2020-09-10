@@ -10,9 +10,8 @@ chip_tool_dir=$REPO_DIR/examples/chip-tool
 chip_light_dir=$REPO_DIR/examples/lighting-app/linux
 
 function build_docker_image() {
+    source "$REPO_DIR/scripts/activate.sh"
     set -x
-    cd "$REPO_DIR"
-    source scripts/activate.sh
     cd "$chip_tool_dir"
     gn gen out/debug
     ninja -C out/debug

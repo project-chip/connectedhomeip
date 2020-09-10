@@ -98,7 +98,7 @@ class CHIPVirtualHome:
             self.logger.info('Finding string: "{}"'.format(s))
             this_find = string.find(s, last_find)
             if this_find < 0:
-                self.logger.info('String not found')
+                self.logger.info('Not found')
                 return False
             self.logger.info("Found at index={}".format(this_find))
             last_find = this_find + len(s)

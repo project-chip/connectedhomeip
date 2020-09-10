@@ -76,6 +76,9 @@ function cirquetest_bootstrap() {
     make NO_GRPC=1 install -j
     ./dependency_modules.sh
     pip3 install -r requirements_nogrpc.txt
+
+    # Call activate here so the later tests can be faster
+    source "$REPO_DIR/scripts/activate.sh"
 }
 
 function cirquetest_run_test() {
