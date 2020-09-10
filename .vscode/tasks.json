@@ -132,6 +132,7 @@
             "type": "shell",
             "command": "scripts/examples/esp_echo_app.sh CHIP_BUILD_WITH_GN=y",
             "group": "build",
+            "dependsOn": "Clean Tree",
             "problemMatcher": ["$gcc"]
         }
     ]
