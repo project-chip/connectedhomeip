@@ -16,11 +16,15 @@
 # limitations under the License.
 #
 
-set -x
-
 SOURCE="${BASH_SOURCE[0]}"
 SOURCE_DIR="$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
 REPO_DIR="$SOURCE_DIR/../../"
+TEST_DIR=$(readlink -f "$REPO_DIR"/src/test_driver/linux-cirque)
+
+# Append test name here to add more tests for run_all_tests
+CIRQUE_TESTS=(
+    "OnOffClusterTest"
+)
 
 function __flask_clean() {
     flask_pid=$(ps aux | grep "[f]lask run" | grep -v "sudo" | awk '{print $2}' | sort -k2 -rn)
@@ -35,7 +39,7 @@ function __socat_clean() {
     socat_pid=$(ps aux | grep "[s]ocat" | awk '{print $2}')
     if [ ! -z "$socat_pid" ]; then
         for pid in "$socat_pid"; do
-            kill -2 "$pid"
+            sudo kill -2 "$pid"
         done
     fi
 }
@@ -44,25 +48,27 @@ function __virtual_thread_clean() {
     vthread_pid=$(ps aux | grep "[o]t-ncp-ftd" | awk '{print $2}')
     if [ ! -z "$vthread_pid" ]; then
         for pid in "$vthread_pid"; do
-            kill -2 "$pid"
+            sudo kill -2 "$pid"
         done
     fi
 }
 
-__cirquetest_start_flask() {
+function __cirquetest_start_flask() {
+    echo "Start Flask"
     cd "$REPO_DIR"/third_party/cirque/repo
     sudo FLASK_APP='cirque/restservice/service.py' \
         PATH="$PATH":"$REPO_DIR"/third_party/cirque/repo/openthread/output/x86_64-unknown-linux-gnu/bin/ \
-        python3 -m flask run
+        python3 -m flask run >/dev/null 2>/dev/null
 }
 
-__cirquetest_clean_flask() {
+function __cirquetest_clean_flask() {
+    echo "Cleanup Flask"
     __flask_clean
     __socat_clean
     __virtual_thread_clean
 }
 
-cirquetest_bootstrap() {
+function cirquetest_bootstrap() {
     set -e
     cd "$REPO_DIR"/third_party/cirque/repo
     sudo apt-get install -y bazel socat psmisc tigervnc-standalone-server tigervnc-viewer python3-pip python3-venv python3-setuptools libdbus-glib-1-dev libgirepository1.0-dev
@@ -72,17 +78,35 @@ cirquetest_bootstrap() {
     pip3 install -r requirements_nogrpc.txt
 }
 
-cirquetest_run_test() {
+function cirquetest_run_test() {
     # Start Cirque flash server
     __cirquetest_start_flask &
     sleep 5
-    cd "$REPO_DIR"/src/test_driver/linux-cirque
-    ./do_on-off-cluster-test.sh
-    exit_code=$?
+    cd "$TEST_DIR"
+    ./"$1.sh"
+    exitcode=$?
     __cirquetest_clean_flask
     # Cleanup containers and possibly networks to run more tests
-    yes | docker system prune
-    return "$exit_code"
+    echo "Do docker system prune"
+    (yes | docker system prune) >/dev/null 2>/dev/null
+    return "$exitcode"
+}
+
+function cirquetest_run_all_tests() {
+    # shellharden requires quotes around variables, which will break for-each loops
+    # This is the workaround
+    for i in "${!CIRQUE_TESTS[@]}"; do
+        test_name="${CIRQUE_TESTS[$i]}"
+        echo "Run $test_name"
+        cirquetest_run_test "$test_name"
+        exitcode=$?
+        if [ "$exitcode" = 0 ]; then
+            echo "[SUCC] $test_name"
+        else
+            echo "[FAIL] $test_name"
+            return "$exitcode"
+        fi
+    done
 }
 
 subcommand="$1"
@@ -92,7 +116,7 @@ case $subcommand in
     *)
         cirquetest_"$subcommand" "$@"
         exitcode=$?
-        if [ $? = 127 ]; then
+        if [ "$exitcode" = 127 ]; then
             echo "Unknown command: $subcommand" >&2
         fi
         exit "$exitcode"
