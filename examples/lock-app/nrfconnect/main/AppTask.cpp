@@ -59,6 +59,12 @@ using namespace ::chip::DeviceLayer;
 AppTask AppTask::sAppTask;
 DemoSessionManager sSessions;
 
+namespace chip {
+SecureSessionMgrBase& SessionManager() {
+    return sSessions;
+}
+} // namespace chip
+
 int AppTask::Init()
 {
     // Initialize LEDs

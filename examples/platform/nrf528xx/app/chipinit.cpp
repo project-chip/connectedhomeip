@@ -58,6 +58,10 @@ using namespace ::chip::DeviceLayer;
 
 DemoSessionManager sessions;
 
+namespace chip {
+SecureSessionMgrBase& SessionManager() { return sessions; }
+} // namespace chip
+
 #if CHIP_ENABLE_OPENTHREAD
 static void * ot_calloc(size_t n, size_t size)
 {

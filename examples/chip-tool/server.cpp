@@ -22,6 +22,13 @@ namespace {
 chip::SecureSessionMgr<chip::Transport::UDP> sessions;
 }
 
+namespace chip {
+SecureSessionMgrBase& SessionManager() {
+    return sessions;
+}
+} // namespace chip
+
+
 extern "C" {
 void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
@@ -107,13 +114,12 @@ private:
             return;
         }
 
-        ChipResponseDestination responseDest(header.GetSourceNodeId().Value(), mgr);
         uint8_t * message;
         uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
         ok                  = emberAfProcessMessage(&frame,
                                    0, // type
                                    message, messageLen,
-                                   &responseDest, // source identifier
+                                   header.GetSourceNodeId().Value(), // source identifier
                                    NULL);
 
         System::PacketBuffer::Free(buffer);

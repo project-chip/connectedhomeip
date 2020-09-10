@@ -62,6 +62,17 @@ using namespace ::chip::DeviceLayer;
 
 #define UNUSED_PARAMETER(a) (a = a)
 
+namespace {
+DemoSessionManager * sessions;
+} // namespace
+
+namespace chip {
+SecureSessionMgrBase& SessionManager() {
+    return *sessions;
+}
+} // namespace chip
+
+
 volatile int apperror_cnt;
 // ================================================================================
 // App Error
@@ -91,7 +102,7 @@ extern "C" void vApplicationIdleHook(void)
 int main(void)
 {
     int ret                       = CHIP_ERROR_MAX;
-    DemoSessionManager * sessions = new DemoSessionManager;
+    sessions = new DemoSessionManager;
 
 #if CHIP_ENABLE_OPENTHREAD
     otSysInit(0, NULL);

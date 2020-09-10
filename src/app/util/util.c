@@ -43,6 +43,7 @@
 #include "af-main.h"
 #include "af.h"
 #include "common.h"
+#include "chip-response.h"
 //#include "../plugin/time-server/time-server.h"
 #include "af-event.h"
 //#include "app/framework/util/time-util.h"
@@ -447,7 +448,7 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
 }
 
 bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message,
-                                     uint16_t messageLength, ChipResponseDestination * source, InterPanHeader * interPanHeader,
+                                     uint16_t messageLength, ChipNodeId source, InterPanHeader * interPanHeader,
                                      EmberAfClusterCommand * returnCmd)
 {
     uint8_t minLength =
@@ -493,7 +494,7 @@ bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMess
 
 // a single call to process global and cluster-specific messages and callbacks.
 bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message, uint16_t msgLen,
-                           ChipResponseDestination * source, InterPanHeader * interPanHeader)
+                           ChipNodeId source, InterPanHeader * interPanHeader)
 {
     EmberStatus sendStatus;
     bool msgHandled = false;
@@ -690,7 +691,7 @@ void emAfApplyDisableDefaultResponse(uint8_t * frame_control)
     }
 }
 
-static bool isBroadcastDestination(ChipResponseDestination * responseDestination)
+static bool isBroadcastDestination(ChipNodeId responseDestination)
 {
     // FIXME: Will need to actually figure out how to test for this!
     return false;
@@ -849,7 +850,7 @@ EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberA
 }
 
 bool emberAfDetermineIfLinkSecurityIsRequired(uint8_t commandId, bool incoming, bool broadcast, EmberAfProfileId profileId,
-                                              EmberAfClusterId clusterId, ChipResponseDestination * remoteNodeId)
+                                              EmberAfClusterId clusterId, ChipNodeId remoteNodeId)
 {
     (void) afNoSecurityForDefaultResponse; // remove warning if not used
 

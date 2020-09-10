@@ -238,6 +238,12 @@ SecureSessionMgr<Transport::UDP, // IPV6
 
 } // namespace
 
+namespace chip {
+SecureSessionMgrBase& SessionManager() {
+    return sessions;
+}
+} // namespace chip
+
 void PairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId, SecurePairingSession * pairing)
 {
     Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);

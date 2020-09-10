@@ -24,13 +24,21 @@
 
 #include <assert.h>
 #include <inet/InetLayer.h> // PacketBuffer and the like
+#include <transport/SecureSessionMgr.h> // For SecureSessionMgrBase
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip;
 
+// This is not ideal, but we're still sorting out how secure session managers
+// end up working and whether they're singletons.  In the long term, there will
+// be some sane API that lets us send a message to a given node id.
+namespace chip {
+extern SecureSessionMgrBase& SessionManager();
+}
+
 extern "C" {
 
-EmberStatus chipSendResponse(ChipResponseDestination * destination, EmberApsFrame * apsFrame, uint16_t messageLength,
+EmberStatus chipSendResponse(NodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength,
                              uint8_t * message)
 {
     uint16_t frameSize  = encodeApsFrame(nullptr, 0, apsFrame);
@@ -66,7 +74,7 @@ EmberStatus chipSendResponse(ChipResponseDestination * destination, EmberApsFram
     memcpy(buffer->Start() + frameSize, message, messageLength);
     buffer->SetDataLength(dataLength);
 
-    CHIP_ERROR err = destination->mSecureSessionManager->SendMessage(destination->mSourceNodeId, buffer);
+    CHIP_ERROR err = SessionManager().SendMessage(destination, buffer);
     if (err != CHIP_NO_ERROR)
     {
         // FIXME: Figure out better translations between our error types?

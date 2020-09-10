@@ -56,12 +56,11 @@
 extern "C" {
 #endif // __cplusplus
 #include "gen/enums.h"
-#include "types_stub.h" // For various types.
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus
 
-#include "chip-response.h" // For ChipResponseDestination
+#include "types_stub.h" // For various types.
 
 #ifdef __cplusplus
 extern "C" {
@@ -465,7 +464,7 @@ typedef struct
      */
     EmberApsFrame * apsFrame;
     EmberIncomingMessageType type;
-    ChipResponseDestination * source;
+    ChipNodeId source;
     uint8_t * buffer;
     uint16_t bufLen;
     bool clusterSpecific;
