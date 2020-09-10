@@ -219,10 +219,10 @@ CHIP_ERROR TCPBase::SendMessage(const MessageHeader & header, const Transport::P
     SuccessOrExit(err);
 
 exit:
-    if (msgBuf != NULL)
+    if (msgBuf != nullptr)
     {
         System::PacketBuffer::Free(msgBuf);
-        msgBuf = NULL;
+        msgBuf = nullptr;
     }
 
     return err;

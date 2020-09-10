@@ -56,7 +56,7 @@ namespace Platform {
  *                                         initialization function.
  *
  */
-extern CHIP_ERROR MemoryInit(void * buf = NULL, size_t bufSize = 0);
+extern CHIP_ERROR MemoryInit(void * buf = nullptr, size_t bufSize = 0);
 
 /**
  * This function is called by the CHIP layer to releases all resources that were allocated

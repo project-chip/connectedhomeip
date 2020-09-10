@@ -199,7 +199,7 @@ CHIP_ERROR ChipLinuxStorage::WriteValueBin(const char * key, const uint8_t * dat
     static const size_t kMaxBlobSize = 5 * 1024;
 
     CHIP_ERROR retval         = CHIP_NO_ERROR;
-    char * encodedData        = NULL;
+    char * encodedData        = nullptr;
     size_t encodedDataLen     = 0;
     size_t expectedEncodedLen = ((dataLen + 3) * 4) / 3;
 
@@ -214,7 +214,7 @@ CHIP_ERROR ChipLinuxStorage::WriteValueBin(const char * key, const uint8_t * dat
     if (retval == CHIP_NO_ERROR)
     {
         encodedData = (char *) chip::Platform::MemoryAlloc(expectedEncodedLen + 1);
-        if (encodedData == NULL)
+        if (encodedData == nullptr)
         {
             retval = CHIP_ERROR_NO_MEMORY;
         }

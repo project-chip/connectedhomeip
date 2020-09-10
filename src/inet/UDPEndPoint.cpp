@@ -979,7 +979,7 @@ SocketEvents UDPEndPoint::PrepareIO(void)
 
 void UDPEndPoint::HandlePendingIO(void)
 {
-    if (mState == kState_Listening && OnMessageReceived != NULL && mPendingIO.IsReadable())
+    if (mState == kState_Listening && OnMessageReceived != nullptr && mPendingIO.IsReadable())
     {
         const uint16_t lPort = mBoundPort;
 

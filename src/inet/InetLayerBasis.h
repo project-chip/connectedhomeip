@@ -57,7 +57,7 @@ public:
     bool IsCreatedByInetLayer(const InetLayer & aInetLayer) const;
 
 protected:
-    void InitInetLayerBasis(InetLayer & aInetLayer, void * aAppState = NULL);
+    void InitInetLayerBasis(InetLayer & aInetLayer, void * aAppState = nullptr);
 
 private:
     InetLayer * mInetLayer; /**< Pointer to the InetLayer object that owns this object. */

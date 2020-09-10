@@ -96,7 +96,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
     SecureSessionMgr<LoopbackTransport> conn;
     CHIP_ERROR err;
 
-    ctx.GetInetLayer().SystemLayer()->Init(NULL);
+    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
     err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), "LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -108,7 +108,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     size_t payload_len = sizeof(PAYLOAD);
 
-    ctx.GetInetLayer().SystemLayer()->Init(NULL);
+    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
     chip::System::PacketBuffer * buffer = chip::System::PacketBuffer::NewWithAvailableSize(payload_len);
     memmove(buffer->Start(), PAYLOAD, payload_len);

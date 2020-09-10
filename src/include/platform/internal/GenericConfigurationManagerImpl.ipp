@@ -662,7 +662,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePairedAccountId(con
     err = Impl()->WriteConfigValueStr(ImplClass::kConfigKey_PairedAccountId, accountId, accountIdLen);
     SuccessOrExit(err);
 
-    SetFlag(mFlags, kFlag_IsPairedToAccount, (accountId != NULL && accountIdLen != 0));
+    SetFlag(mFlags, kFlag_IsPairedToAccount, (accountId != nullptr && accountIdLen != 0));
 
 exit:
     return err;
@@ -686,7 +686,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreServiceProvisioning
     SuccessOrExit(err);
 
     SetFlag(mFlags, kFlag_IsServiceProvisioned);
-    SetFlag(mFlags, kFlag_IsPairedToAccount, (accountId != NULL && accountIdLen != 0));
+    SetFlag(mFlags, kFlag_IsPairedToAccount, (accountId != nullptr && accountIdLen != 0));
 
 exit:
     if (err != CHIP_NO_ERROR)

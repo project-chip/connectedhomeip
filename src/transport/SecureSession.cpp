@@ -49,16 +49,16 @@ CHIP_ERROR SecureSession::InitFromSecret(const uint8_t * secret, const size_t se
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     VerifyOrExit(mKeyAvailable == false, error = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(secret != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(secret != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(secret_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     if (salt_length > 0)
     {
-        VerifyOrExit(salt != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(salt != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     VerifyOrExit(info_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(info != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(info != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     error = HKDF_SHA256(secret, secret_length, salt, salt_length, info, info_length, mKey, sizeof(mKey));
     SuccessOrExit(error);
@@ -78,11 +78,11 @@ CHIP_ERROR SecureSession::Init(const Crypto::P256Keypair & local_keypair, const 
     VerifyOrExit(mKeyAvailable == false, error = CHIP_ERROR_INCORRECT_STATE);
     if (salt_length > 0)
     {
-        VerifyOrExit(salt != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(salt != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     VerifyOrExit(info_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(info != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(info != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     error = local_keypair.ECDH_derive_secret(remote_public_key, secret);
     SuccessOrExit(error);
@@ -153,9 +153,9 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
     uint8_t tag[taglen];
 
     VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
-    VerifyOrExit(input != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(input != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(input_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(output != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(output != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     error = GetIV(header, IV, sizeof(IV));
     SuccessOrExit(error);
@@ -182,9 +182,9 @@ CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, ui
     size_t aadLen = sizeof(AAD);
 
     VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
-    VerifyOrExit(input != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(input != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(input_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(output != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(output != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     error = GetIV(header, IV, sizeof(IV));
     SuccessOrExit(error);

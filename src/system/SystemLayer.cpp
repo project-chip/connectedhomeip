@@ -86,7 +86,7 @@ void LwIPEventHandlerDelegate::Prepend(const LwIPEventHandlerDelegate *& aDelega
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-Layer::Layer() : mLayerState(kLayerState_NotInitialized), mContext(NULL), mPlatformData(NULL)
+Layer::Layer() : mLayerState(kLayerState_NotInitialized), mContext(nullptr), mPlatformData(nullptr)
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (!sSystemEventHandlerDelegate.IsInitialized())
@@ -161,13 +161,13 @@ Error Layer::Shutdown()
     {
         Timer * lTimer = Timer::sPool.Get(*this, i);
 
-        if (lTimer != NULL)
+        if (lTimer != nullptr)
         {
             lTimer->Cancel();
         }
     }
 
-    this->mContext    = NULL;
+    this->mContext    = nullptr;
     this->mLayerState = kLayerState_NotInitialized;
 
 exit:
@@ -199,7 +199,7 @@ void Layer::SetPlatformData(void * aPlatformData)
 
 Error Layer::NewTimer(Timer *& aTimerPtr)
 {
-    Timer * lTimer = NULL;
+    Timer * lTimer = nullptr;
 
     if (this->State() != kLayerState_Initialized)
         return CHIP_SYSTEM_ERROR_UNEXPECTED_STATE;
@@ -207,7 +207,7 @@ Error Layer::NewTimer(Timer *& aTimerPtr)
     lTimer    = Timer::sPool.TryCreate(*this);
     aTimerPtr = lTimer;
 
-    if (lTimer == NULL)
+    if (lTimer == nullptr)
     {
         ChipLogError(chipSystemLayer, "Timer pool EMPTY");
         return CHIP_SYSTEM_ERROR_NO_MEMORY;
@@ -325,7 +325,7 @@ void Layer::CancelTimer(Layer::TimerCompleteFunct aOnComplete, void * aAppState)
     {
         Timer * lTimer = Timer::sPool.Get(*this, i);
 
-        if (lTimer != NULL && lTimer->OnComplete == aOnComplete && lTimer->AppState == aAppState)
+        if (lTimer != nullptr && lTimer->OnComplete == aOnComplete && lTimer->AppState == aAppState)
         {
             lTimer->Cancel();
             break;
@@ -605,7 +605,7 @@ void Layer::PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet,
     {
         Timer * lTimer = Timer::sPool.Get(*this, i);
 
-        if (lTimer != NULL)
+        if (lTimer != nullptr)
         {
             if (!Timer::IsEarlierEpoch(kCurrentEpoch, lTimer->mAwakenEpoch))
             {
@@ -689,7 +689,7 @@ void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteS
     {
         Timer * lTimer = Timer::sPool.Get(*this, i);
 
-        if (lTimer != NULL && !Timer::IsEarlierEpoch(kCurrentEpoch, lTimer->mAwakenEpoch))
+        if (lTimer != nullptr && !Timer::IsEarlierEpoch(kCurrentEpoch, lTimer->mAwakenEpoch))
         {
             lTimer->HandleComplete();
         }

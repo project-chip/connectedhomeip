@@ -150,8 +150,8 @@ void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
     {
         TestObject * lCreated = sPool.TryCreate(lLayer);
 
-        NL_TEST_ASSERT(lContext.mTestSuite, lCreated != NULL);
-        if (lCreated == NULL)
+        NL_TEST_ASSERT(lContext.mTestSuite, lCreated != nullptr);
+        if (lCreated == nullptr)
             continue;
         NL_TEST_ASSERT(lContext.mTestSuite, lCreated->IsRetained(lLayer));
         NL_TEST_ASSERT(lContext.mTestSuite, &(lCreated->SystemLayer()) == &lLayer);
@@ -164,11 +164,11 @@ void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
 
             if (j > i)
             {
-                NL_TEST_ASSERT(lContext.mTestSuite, lGotten == NULL);
+                NL_TEST_ASSERT(lContext.mTestSuite, lGotten == nullptr);
             }
             else
             {
-                NL_TEST_ASSERT(lContext.mTestSuite, lGotten != NULL);
+                NL_TEST_ASSERT(lContext.mTestSuite, lGotten != nullptr);
                 lGotten->Retain();
             }
         }
@@ -178,7 +178,7 @@ void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
     {
         TestObject * lGotten = sPool.Get(lLayer, i);
 
-        NL_TEST_ASSERT(lContext.mTestSuite, lGotten != NULL);
+        NL_TEST_ASSERT(lContext.mTestSuite, lGotten != nullptr);
 
         for (j = kPoolSize; j > i; --j)
         {
@@ -195,7 +195,7 @@ void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
     {
         TestObject * lGotten = sPool.Get(lLayer, i);
 
-        NL_TEST_ASSERT(lContext.mTestSuite, lGotten == NULL);
+        NL_TEST_ASSERT(lContext.mTestSuite, lGotten == nullptr);
     }
 
     lLayer.Shutdown();
@@ -224,7 +224,7 @@ void TestObject::Delay(volatile unsigned int & aAccumulator)
 void * TestObject::CheckConcurrencyThread(void * aContext)
 {
     const unsigned int kNumObjects = kPoolSize / kNumThreads;
-    TestObject * lObject           = NULL;
+    TestObject * lObject           = nullptr;
     TestContext & lContext         = *static_cast<TestContext *>(aContext);
     Layer lLayer;
     unsigned int i;
@@ -235,7 +235,7 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
 
     for (i = 0; i < kNumObjects; ++i)
     {
-        while (lObject == NULL)
+        while (lObject == nullptr)
         {
             lObject = sPool.TryCreate(lLayer);
         }
@@ -252,7 +252,7 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
 
     lObject = sPool.Get(lLayer, kPoolSize - 1);
 
-    if (lObject != NULL)
+    if (lObject != nullptr)
     {
         lObject->Release();
         NL_TEST_ASSERT(lContext.mTestSuite, !lObject->IsRetained(lLayer));
@@ -265,8 +265,8 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
     {
         unsigned int j;
 
-        lObject = NULL;
-        while (lObject == NULL)
+        lObject = nullptr;
+        while (lObject == nullptr)
         {
             lObject = sPool.TryCreate(lLayer);
         }
@@ -278,12 +278,12 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
         lObject->Delay(lContext.mAccumulator);
 
         j       = kPoolSize;
-        lObject = NULL;
+        lObject = nullptr;
         while (j-- > 0)
         {
             lObject = sPool.Get(lLayer, j);
 
-            if (lObject == NULL)
+            if (lObject == nullptr)
                 continue;
 
             lObject->Release();
@@ -291,7 +291,7 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
             break;
         }
 
-        NL_TEST_ASSERT(lContext.mTestSuite, lObject != NULL);
+        NL_TEST_ASSERT(lContext.mTestSuite, lObject != nullptr);
     }
 
     // Cleanup
@@ -300,7 +300,7 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
     {
         lObject = sPool.Get(lLayer, i);
 
-        if (lObject == NULL)
+        if (lObject == nullptr)
             continue;
 
         lObject->Release();
@@ -343,14 +343,14 @@ void TestObject::MultithreadedTest(nlTestSuite * inSuite, void * aContext, void 
 
     for (unsigned int i = 0; i < kNumThreads; ++i)
     {
-        int lError = pthread_create(&lThread[i], NULL, aStartRoutine, &lContext);
+        int lError = pthread_create(&lThread[i], nullptr, aStartRoutine, &lContext);
 
         NL_TEST_ASSERT(lContext.mTestSuite, lError == 0);
     }
 
     for (unsigned int i = 0; i < kNumThreads; ++i)
     {
-        int lError = pthread_join(lThread[i], NULL);
+        int lError = pthread_join(lThread[i], nullptr);
 
         NL_TEST_ASSERT(lContext.mTestSuite, lError == 0);
     }
@@ -379,7 +379,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
     memset(&sPool, 0, sizeof(sPool));
 
     const int kNumObjects  = kPoolSize;
-    TestObject * lObject   = NULL;
+    TestObject * lObject   = nullptr;
     TestContext & lContext = *static_cast<TestContext *>(aContext);
     Layer lLayer;
     chip::System::Stats::count_t lNumInUse;
@@ -407,7 +407,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
     // Fail an allocation and check that both stats don't change
 
     lObject = sPool.TryCreate(lLayer);
-    NL_TEST_ASSERT(lContext.mTestSuite, lObject == NULL);
+    NL_TEST_ASSERT(lContext.mTestSuite, lObject == nullptr);
 
     sPool.GetStatistics(lNumInUse, lHighWatermark);
     NL_TEST_ASSERT(lContext.mTestSuite, lNumInUse == kNumObjects);
@@ -420,7 +420,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
     {
         lObject = sPool.Get(lLayer, i);
 
-        NL_TEST_ASSERT(lContext.mTestSuite, lObject != NULL);
+        NL_TEST_ASSERT(lContext.mTestSuite, lObject != nullptr);
 
         lObject->Release();
         NL_TEST_ASSERT(lContext.mTestSuite, !lObject->IsRetained(lLayer));
@@ -453,7 +453,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
     {
         lObject = sPool.Get(lLayer, i);
 
-        if (lObject == NULL)
+        if (lObject == nullptr)
             continue;
 
         lObject->Release();
@@ -493,7 +493,7 @@ static nlTestSuite sTestSuite =
 static int Initialize(void * aContext)
 {
     TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
-    void * lLayerContext   = NULL;
+    void * lLayerContext   = nullptr;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR <= 2 && LWIP_VERSION_MINOR < 1
     static sys_mbox_t * sLwIPEventQueue = NULL;
@@ -520,7 +520,7 @@ static int Finalize(void * aContext)
 {
     TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
 
-    lContext.mTestSuite = NULL;
+    lContext.mTestSuite = nullptr;
 
     return SUCCESS;
 }

@@ -301,14 +301,14 @@ CHIP_ERROR Binding::Init(void * apAppState, EventCallback aEventCallback)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(aEventCallback != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(aEventCallback != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     mState    = kState_NotConfigured;
     mRefCount = 1;
     AppState  = apAppState;
     SetEventCallback(aEventCallback);
-    mProtocolLayerCallback = NULL;
-    mProtocolLayerState    = NULL;
+    mProtocolLayerCallback = nullptr;
+    mProtocolLayerState    = nullptr;
 
     ResetConfig();
 
@@ -380,11 +380,11 @@ void Binding::DoReset(State newState)
     // connection complete handler that may result from releasing the connection.
     if (GetFlag(kFlag_ConnectionReferenced))
     {
-        mCon->OnConnectionComplete = NULL;
+        mCon->OnConnectionComplete = nullptr;
         mCon->Release();
         ClearFlag(kFlag_ConnectionReferenced);
     }
-    mCon = NULL;
+    mCon = nullptr;
 
     // If a session establishment was in progress, cancel it.
     if (origState == kState_PreparingSecurity_EstablishSession)
@@ -416,9 +416,9 @@ void Binding::DoClose(void)
     if (mState != kState_Closed)
     {
         // Clear pointers to application state/code to prevent any further use.
-        AppState = NULL;
-        SetEventCallback(NULL);
-        SetProtocolLayerCallback(NULL, NULL);
+        AppState = nullptr;
+        SetEventCallback(nullptr);
+        SetProtocolLayerCallback(nullptr, nullptr);
 
         // Reset the binding and enter the Closed state.
         DoReset(kState_Closed);
@@ -438,9 +438,9 @@ void Binding::ResetConfig()
     mPeerAddress      = Inet::IPAddress::Any;
     mPeerPort         = CHIP_PORT;
     mInterfaceId      = INET_NULL_INTERFACEID;
-    mHostName         = NULL;
+    mHostName         = nullptr;
 
-    mCon = NULL;
+    mCon = nullptr;
 
     mTransportOption            = kTransport_NotSpecified;
     mDefaultResponseTimeoutMsec = 0;
@@ -571,7 +571,7 @@ CHIP_ERROR Binding::DoPrepare(CHIP_ERROR configErr)
 exit:
     if (CHIP_NO_ERROR != err)
     {
-        HandleBindingFailed(err, NULL, false);
+        HandleBindingFailed(err, nullptr, false);
     }
     ChipLogFunctError(err);
     return err;
@@ -589,7 +589,7 @@ void Binding::PrepareAddress()
     // If configured to use an existing connection, extract the peer IP addressing information from the
     // connection if available.  Although this won't be used in contacting the peer (since the connection
     // already exists) this makes the information available via the Binding API.
-    if ((mTransportOption == kTransport_TCP || mTransportOption == kTransport_ExistingConnection) && mCon != NULL)
+    if ((mTransportOption == kTransport_TCP || mTransportOption == kTransport_ExistingConnection) && mCon != nullptr)
     {
         if (mCon->NetworkType == ChipConnection::kNetworkType_IP)
         {
@@ -642,7 +642,7 @@ void Binding::PrepareAddress()
 exit:
     if (CHIP_NO_ERROR != err)
     {
-        HandleBindingFailed(err, NULL, false);
+        HandleBindingFailed(err, nullptr, false);
     }
 }
 
@@ -656,12 +656,12 @@ void Binding::PrepareTransport()
     mState = kState_PreparingTransport;
 
     // If the application has requested TCP, and no existing connection has been supplied...
-    if (mTransportOption == kTransport_TCP && mCon == NULL)
+    if (mTransportOption == kTransport_TCP && mCon == nullptr)
     {
         // Construct a new ChipConnection object.  This method implicitly establishes a reference
         // to the connection object, which will be owned by the Binding until it is closed or fails.
         mCon = mExchangeManager->MessageLayer->NewConnection();
-        VerifyOrExit(mCon != NULL, err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrExit(mCon != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
         // Remember that we have to release the connection later when the binding closes.
         SetFlag(kFlag_ConnectionReferenced);
@@ -677,7 +677,7 @@ void Binding::PrepareTransport()
         // reference to the connection without using a callback function.  Because of this, leaving
         // in place the default connection closed handler, with its automatic close feature, the
         // would result in a double release.  Thus we suppress that here.
-        mCon->OnConnectionClosed = NULL;
+        mCon->OnConnectionClosed = nullptr;
 
         mState = kState_PreparingTransport_TCPConnect;
 
@@ -702,7 +702,7 @@ void Binding::PrepareTransport()
 exit:
     if (CHIP_NO_ERROR != err)
     {
-        HandleBindingFailed(err, NULL, true);
+        HandleBindingFailed(err, nullptr, true);
     }
 }
 
@@ -758,7 +758,7 @@ exit:
 
     if (CHIP_NO_ERROR != err)
     {
-        HandleBindingFailed(err, NULL, true);
+        HandleBindingFailed(err, nullptr, true);
     }
 }
 
@@ -825,7 +825,7 @@ void Binding::HandleBindingReady()
 
     // If the Binding is still in the Ready state, and a protocol layer callback has been registered,
     // tell the protocol layer that the Binding is ready for use.
-    if (mState == kState_Ready && mProtocolLayerCallback != NULL)
+    if (mState == kState_Ready && mProtocolLayerCallback != nullptr)
     {
         mProtocolLayerCallback(mProtocolLayerState, kEvent_BindingReady, inParam, outParam);
     }
@@ -875,7 +875,7 @@ void Binding::HandleBindingFailed(CHIP_ERROR err, Protocols::StatusReporting::St
     if (raiseEvents)
     {
         mAppEventCallback(AppState, eventType, inParam, outParam);
-        if (mProtocolLayerCallback != NULL)
+        if (mProtocolLayerCallback != nullptr)
         {
             mProtocolLayerCallback(mProtocolLayerState, eventType, inParam, outParam);
         }
@@ -908,7 +908,7 @@ void Binding::OnResolveComplete(void * appState, INET_ERROR err, uint8_t addrCou
     }
     else
     {
-        _this->HandleBindingFailed(err, NULL, true);
+        _this->HandleBindingFailed(err, nullptr, true);
     }
 }
 
@@ -953,7 +953,7 @@ void Binding::OnConnectionComplete(ChipConnection * con, CHIP_ERROR conErr)
     {
         ChipLogDetail(ExchangeManager, "Binding[%" PRIu8 "] (%" PRIu16 "): TCP con failed (%04" PRIX16 "): %s", _this->GetLogId(),
                       _this->mRefCount, con->LogId(), ErrorStr(conErr));
-        _this->HandleBindingFailed(conErr, NULL, true);
+        _this->HandleBindingFailed(conErr, nullptr, true);
     }
 }
 
@@ -979,7 +979,7 @@ void Binding::OnConnectionClosed(ChipConnection * con, CHIP_ERROR err)
     }
 
     // Transition the binding to a failed state.
-    HandleBindingFailed(err, NULL, true);
+    HandleBindingFailed(err, nullptr, true);
 
 exit:
     return;
@@ -1046,7 +1046,7 @@ void Binding::OnKeyFailed(uint64_t peerNodeId, uint32_t keyId, CHIP_ERROR keyErr
     VerifyOrExit(mState != kState_Ready || keyId == mKeyId, /* no-op */);
 
     // Fail the binding.
-    HandleBindingFailed(keyErr, NULL, true);
+    HandleBindingFailed(keyErr, nullptr, true);
 
 exit:
     return;
@@ -1128,7 +1128,7 @@ bool Binding::IsAuthenticMessageFromPeer(const chip::ChipMessageHeader * msgInfo
     if (msgInfo->SourceNodeId != mPeerNodeId)
         return false;
 
-    if (msgInfo->InCon != NULL)
+    if (msgInfo->InCon != nullptr)
     {
         if ((mTransportOption != kTransport_TCP && mTransportOption != kTransport_ExistingConnection) || msgInfo->InCon != mCon)
             return false;
@@ -1182,8 +1182,8 @@ uint32_t Binding::GetMaxChipPayloadSize(const System::PacketBuffer * msgBuf)
  */
 void Binding::GetPeerDescription(char * buf, uint32_t bufSize) const
 {
-    ChipMessageLayer::GetPeerDescription(buf, bufSize, mPeerNodeId, (mPeerAddress != Inet::IPAddress::Any) ? &mPeerAddress : NULL,
-                                         mPeerPort, mInterfaceId, mCon);
+    ChipMessageLayer::GetPeerDescription(
+        buf, bufSize, mPeerNodeId, (mPeerAddress != Inet::IPAddress::Any) ? &mPeerAddress : nullptr, mPeerPort, mInterfaceId, mCon);
 }
 
 /**
@@ -1206,14 +1206,14 @@ CHIP_ERROR Binding::NewExchangeContext(chip::ExchangeContext *& appExchangeConte
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    appExchangeContext = NULL;
+    appExchangeContext = nullptr;
 
     // Fail if the binding is not in the Ready state.
     VerifyOrExit(kState_Ready == mState, err = CHIP_ERROR_INCORRECT_STATE);
 
     // Attempt to allocate a new exchange context.
-    appExchangeContext = mExchangeManager->NewContext(mPeerNodeId, mPeerAddress, mPeerPort, mInterfaceId, NULL);
-    VerifyOrExit(NULL != appExchangeContext, err = CHIP_ERROR_NO_MEMORY);
+    appExchangeContext = mExchangeManager->NewContext(mPeerNodeId, mPeerAddress, mPeerPort, mInterfaceId, nullptr);
+    VerifyOrExit(nullptr != appExchangeContext, err = CHIP_ERROR_NO_MEMORY);
 
     // Set the default RMP configuration in the new exchange.
     appExchangeContext->mRMPConfig = mDefaultRMPConfig;
@@ -1262,10 +1262,10 @@ CHIP_ERROR Binding::NewExchangeContext(chip::ExchangeContext *& appExchangeConte
     SuccessOrExit(err);
 
 exit:
-    if (err != CHIP_NO_ERROR && appExchangeContext != NULL)
+    if (err != CHIP_NO_ERROR && appExchangeContext != nullptr)
     {
         appExchangeContext->Close();
-        appExchangeContext = NULL;
+        appExchangeContext = nullptr;
     }
     ChipLogFunctError(err);
     return err;
@@ -1300,7 +1300,7 @@ CHIP_ERROR Binding::AllocateRightSizedBuffer(PacketBuffer *& buf, const uint32_t
     bufferAllocSize += weaveTrailerSize;
 
     buf = PacketBuffer::NewWithAvailableSize(weaveHeaderSize, bufferAllocSize);
-    VerifyOrExit(buf != NULL, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(buf != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     maxChipPayloadSize = GetMaxChipPayloadSize(buf);
 
@@ -1311,7 +1311,7 @@ CHIP_ERROR Binding::AllocateRightSizedBuffer(PacketBuffer *& buf, const uint32_t
         err = CHIP_ERROR_BUFFER_TOO_SMALL;
 
         PacketBuffer::Free(buf);
-        buf = NULL;
+        buf = nullptr;
     }
 
 exit:
@@ -1817,7 +1817,7 @@ Binding::Configuration & Binding::Configuration::ConfigureFromMessage(const chip
 {
     mBinding.mPeerNodeId = aMsgInfo->SourceNodeId;
 
-    if (aMsgInfo->InCon != NULL)
+    if (aMsgInfo->InCon != nullptr)
     {
         Transport_ExistingConnection(aMsgInfo->InCon);
     }

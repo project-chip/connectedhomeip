@@ -235,12 +235,12 @@ int TestCHIPCallback(void)
 	{
         "CHIPCallback",
         &sTests[0],
-        NULL,
-        NULL
+        nullptr,
+        nullptr
     };
     // clang-format on
 
-    nlTestRunner(&theSuite, NULL);
+    nlTestRunner(&theSuite, nullptr);
 
     return (nlTestRunnerStats(&theSuite));
 }

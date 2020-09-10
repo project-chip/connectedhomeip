@@ -292,8 +292,8 @@ int TestQRCodeTLV(void)
     {
         "chip-qrcode-optional-info-tests",
         &sTests[0],
-        NULL,
-        NULL
+        nullptr,
+        nullptr
     };
     // clang-format on
     TestContext context;

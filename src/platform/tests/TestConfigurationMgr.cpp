@@ -424,10 +424,10 @@ static const nlTest sTests[] = {
 
 int TestConfigurationMgr(void)
 {
-    nlTestSuite theSuite = { "CHIP DeviceLayer time tests", &sTests[0], NULL, NULL };
+    nlTestSuite theSuite = { "CHIP DeviceLayer time tests", &sTests[0], nullptr, nullptr };
 
     // Run test suit againt one context.
-    nlTestRunner(&theSuite, NULL);
+    nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
 

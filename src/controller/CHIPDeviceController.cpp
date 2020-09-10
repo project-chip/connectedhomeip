@@ -57,13 +57,13 @@ using namespace chip::Encoding;
 ChipDeviceController::ChipDeviceController()
 {
     mState             = kState_NotInitialized;
-    AppState           = NULL;
+    AppState           = nullptr;
     mConState          = kConnectionState_NotConnected;
-    mRendezvousSession = NULL;
-    mSessionManager    = NULL;
-    mCurReqMsg         = NULL;
-    mOnError           = NULL;
-    mOnNewConnection   = NULL;
+    mRendezvousSession = nullptr;
+    mSessionManager    = nullptr;
+    mCurReqMsg         = nullptr;
+    mOnError           = nullptr;
+    mOnNewConnection   = nullptr;
     mDeviceAddr        = IPAddress::Any;
     mDevicePort        = CHIP_PORT;
     mLocalDeviceId     = 0;
@@ -121,25 +121,25 @@ CHIP_ERROR ChipDeviceController::Shutdown()
     delete mInetLayer;
 #endif // CONFIG_DEVICE_LAYER
 
-    mSystemLayer = NULL;
-    mInetLayer   = NULL;
+    mSystemLayer = nullptr;
+    mInetLayer   = nullptr;
 
-    if (mSessionManager != NULL)
+    if (mSessionManager != nullptr)
     {
         delete mSessionManager;
-        mSessionManager = NULL;
+        mSessionManager = nullptr;
     }
 
-    if (mRendezvousSession != NULL)
+    if (mRendezvousSession != nullptr)
     {
         delete mRendezvousSession;
-        mRendezvousSession = NULL;
+        mRendezvousSession = nullptr;
     }
 
     mConState = kConnectionState_NotConnected;
     memset(&mOnComplete, 0, sizeof(mOnComplete));
-    mOnError         = NULL;
-    mOnNewConnection = NULL;
+    mOnError         = nullptr;
+    mOnNewConnection = nullptr;
     mMessageNumber   = 0;
     mRemoteDeviceId.ClearValue();
 
@@ -192,7 +192,7 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceUsingPairing(NodeId remoteDeviceId
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (mState != kState_Initialized || mSessionManager != NULL || mConState != kConnectionState_NotConnected)
+    if (mState != kState_Initialized || mSessionManager != nullptr || mConState != kConnectionState_NotConnected)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -224,17 +224,17 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceUsingPairing(NodeId remoteDeviceId
 
     if (mOnNewConnection)
     {
-        mOnNewConnection(this, NULL, mAppReqState);
+        mOnNewConnection(this, nullptr, mAppReqState);
     }
 
 exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        if (mSessionManager != NULL)
+        if (mSessionManager != nullptr)
         {
             delete mSessionManager;
-            mSessionManager = NULL;
+            mSessionManager = nullptr;
         }
         mConState = kConnectionState_NotConnected;
     }
@@ -292,16 +292,16 @@ CHIP_ERROR ChipDeviceController::DisconnectDevice()
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    if (mSessionManager != NULL)
+    if (mSessionManager != nullptr)
     {
         delete mSessionManager;
-        mSessionManager = NULL;
+        mSessionManager = nullptr;
     }
 
-    if (mRendezvousSession != NULL)
+    if (mRendezvousSession != nullptr)
     {
         delete mRendezvousSession;
-        mRendezvousSession = NULL;
+        mRendezvousSession = nullptr;
     }
 
     mConState = kConnectionState_NotConnected;
@@ -317,7 +317,7 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
 
     mAppReqState = appReqState;
 
-    if (mRendezvousSession != NULL)
+    if (mRendezvousSession != nullptr)
     {
         err = mRendezvousSession->SendMessage(buffer);
     }
@@ -363,10 +363,10 @@ exit:
 
 void ChipDeviceController::ClearRequestState()
 {
-    if (mCurReqMsg != NULL)
+    if (mCurReqMsg != nullptr)
     {
         PacketBuffer::Free(mCurReqMsg);
-        mCurReqMsg = NULL;
+        mCurReqMsg = nullptr;
     }
 }
 
@@ -387,7 +387,7 @@ void ChipDeviceController::OnMessageReceived(const MessageHeader & header, Trans
             ChipLogError(Controller, "Received message from an unexpected source node id.");
         }
     }
-    if (IsSecurelyConnected() && mOnComplete.Response != NULL)
+    if (IsSecurelyConnected() && mOnComplete.Response != nullptr)
     {
         mOnComplete.Response(this, mAppReqState, msgBuf);
     }
@@ -397,7 +397,7 @@ void ChipDeviceController::OnRendezvousError(CHIP_ERROR err)
 {
     if (mOnError)
     {
-        mOnError(this, mAppReqState, err, NULL);
+        mOnError(this, mAppReqState, err, nullptr);
     }
 }
 
@@ -408,7 +408,7 @@ void ChipDeviceController::OnRendezvousConnectionOpened()
 
     if (mOnNewConnection)
     {
-        mOnNewConnection(this, NULL, mAppReqState);
+        mOnNewConnection(this, nullptr, mAppReqState);
     }
 }
 

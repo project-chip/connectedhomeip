@@ -810,7 +810,7 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     VerifyOrExit(mAddrType == aPktInfo->DestAddress.Type(), res = INET_ERROR_BAD_ARGS);
 
     // For now the entire message must fit within a single buffer.
-    VerifyOrExit(aBuffer->Next() == NULL, res = INET_ERROR_MESSAGE_TOO_LONG);
+    VerifyOrExit(aBuffer->Next() == nullptr, res = INET_ERROR_MESSAGE_TOO_LONG);
 
     memset(&msgHeader, 0, sizeof(msgHeader));
 
@@ -1045,7 +1045,7 @@ SocketEvents IPEndPointBasis::PrepareIO(void)
 {
     SocketEvents res;
 
-    if (mState == kState_Listening && OnMessageReceived != NULL)
+    if (mState == kState_Listening && OnMessageReceived != nullptr)
         res.SetRead();
 
     return res;
@@ -1062,7 +1062,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 
     lBuffer = PacketBuffer::New(0);
 
-    if (lBuffer != NULL)
+    if (lBuffer != nullptr)
     {
         struct iovec msgIOV;
         PeerSockAddr lPeerSockAddr;
@@ -1117,7 +1117,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 
         if (lStatus == INET_NO_ERROR)
         {
-            for (struct cmsghdr * controlHdr = CMSG_FIRSTHDR(&msgHeader); controlHdr != NULL;
+            for (struct cmsghdr * controlHdr = CMSG_FIRSTHDR(&msgHeader); controlHdr != nullptr;
                  controlHdr                  = CMSG_NXTHDR(&msgHeader, controlHdr))
             {
 #if INET_CONFIG_ENABLE_IPV4
@@ -1164,8 +1164,8 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
     else
     {
         PacketBuffer::Free(lBuffer);
-        if (OnReceiveError != NULL && lStatus != chip::System::MapErrorPOSIX(EAGAIN))
-            OnReceiveError(this, lStatus, NULL);
+        if (OnReceiveError != nullptr && lStatus != chip::System::MapErrorPOSIX(EAGAIN))
+            OnReceiveError(this, lStatus, nullptr);
     }
 
     return;

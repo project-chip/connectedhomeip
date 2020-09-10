@@ -189,10 +189,10 @@ static const nlTest sTests[] = { NL_TEST_DEF_FN(TestBufBound_Str), NL_TEST_DEF_F
 
 int TestBufBound(void)
 {
-    nlTestSuite theSuite = { "CHIP BufBound tests", &sTests[0], NULL, NULL };
+    nlTestSuite theSuite = { "CHIP BufBound tests", &sTests[0], nullptr, nullptr };
 
     // Run test suit againt one context.
-    nlTestRunner(&theSuite, NULL);
+    nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
 
