@@ -101,7 +101,8 @@ public:
      * @return CHIP_ERROR           The connection status
      */
     CHIP_ERROR ConnectDevice(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState, NewConnectionHandler onConnected,
-                             MessageReceiveHandler onMessageReceived, ErrorHandler onError, uint16_t devicePort = CHIP_PORT);
+                             MessageReceiveHandler onMessageReceived, ErrorHandler onError, uint16_t devicePort = CHIP_PORT,
+                             Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
 
     /**
      * @brief
@@ -120,7 +121,8 @@ public:
     [[deprecated("Available until Rendezvous is implemented")]] CHIP_ERROR
     ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
                                       NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
-                                      ErrorHandler onError, uint16_t devicePort = CHIP_PORT);
+                                      ErrorHandler onError, uint16_t devicePort = CHIP_PORT,
+                                      Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
 
     /**
      * @brief
@@ -239,7 +241,8 @@ private:
 
     CHIP_ERROR ConnectDeviceUsingPairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
                                          NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
-                                         ErrorHandler onError, uint16_t devicePort, SecurePairingSession * pairing);
+                                         ErrorHandler onError, uint16_t devicePort, Inet::InterfaceId interfaceId,
+                                         SecurePairingSession * pairing);
 };
 
 } // namespace DeviceController

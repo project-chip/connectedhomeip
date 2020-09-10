@@ -60,7 +60,7 @@ private:
     CHIP_ERROR ConnectUDP(ChipDeviceController * dc, NodeId remoteId);
 
     char mName[46];
-    IPAddress mRemoteAddr;
+    Command::AddressWithInterface mRemoteAddr;
     uint32_t mRemotePort;
     uint32_t mDiscriminator;
     uint32_t mSetupPINCode;

@@ -27,6 +27,7 @@
 #include <stdio.h>
 
 #include <inet/IPAddress.h>
+#include <inet/InetInterface.h>
 
 namespace chip {
 namespace Transport {
@@ -56,7 +57,8 @@ enum class Type
 class PeerAddress
 {
 public:
-    PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type) {}
+    PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type), mInterface(INET_NULL_INTERFACEID)
+    {}
     PeerAddress(Type type) : mTransportType(type) {}
 
     PeerAddress(PeerAddress &&)      = default;
@@ -82,6 +84,13 @@ public:
     PeerAddress & SetPort(uint16_t port)
     {
         mPort = port;
+        return *this;
+    }
+
+    Inet::InterfaceId GetInterface() const { return mInterface; }
+    PeerAddress & SetInterface(Inet::InterfaceId interface)
+    {
+        mInterface = interface;
         return *this;
     }
 
@@ -133,11 +142,16 @@ public:
     static PeerAddress BLE() { return PeerAddress(Type::kBle); }
     static PeerAddress UDP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kUdp); }
     static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port) { return UDP(addr).SetPort(port); }
+    static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port, Inet::InterfaceId interface)
+    {
+        return UDP(addr).SetPort(port).SetInterface(interface);
+    }
 
 private:
     Inet::IPAddress mIPAddress;
     Type mTransportType;
     uint16_t mPort = CHIP_PORT; ///< Relevant for UDP data sending.
+    Inet::InterfaceId mInterface;
 };
 
 } // namespace Transport
