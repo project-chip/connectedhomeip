@@ -16,7 +16,7 @@
 #    limitations under the License.
 #
 
-cd "$(dirname $0)/../../examples"
+cd "$(dirname "$0")/../../examples"
 
 APP="$1"
 
