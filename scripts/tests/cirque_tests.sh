@@ -26,6 +26,11 @@ CIRQUE_TESTS=(
     "OnOffClusterTest"
 )
 
+BOLD_GREEN_TEXT="\033[1;32m"
+BOLD_YELLOW_TEXT="\033[1;33m"
+BOLD_RED_TEXT="\033[1;31m"
+RESET_COLOR="\033[0m"
+
 function __flask_clean() {
     flask_pid=$(ps aux | grep "[f]lask run" | grep -v "sudo" | awk '{print $2}' | sort -k2 -rn)
     if [ ! -z "$flask_pid" ]; then
@@ -104,13 +109,13 @@ function cirquetest_run_all_tests() {
     # This is the workaround
     for i in "${!CIRQUE_TESTS[@]}"; do
         test_name="${CIRQUE_TESTS[$i]}"
-        echo "Run $test_name"
+        echo "[ RUN] $test_name"
         cirquetest_run_test "$test_name"
         exitcode=$?
         if [ "$exitcode" = 0 ]; then
-            echo "[SUCC] $test_name"
+            echo "[$BOLD_GREEN_TEXT""SUCC""$RESET_COLOR] $test_name"
         else
-            echo "[FAIL] $test_name"
+            echo "[$BOLD_RED_TEXT""FAIL""$RESET_COLOR] $test_name"
             return "$exitcode"
         fi
     done
