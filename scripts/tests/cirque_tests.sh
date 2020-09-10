@@ -113,10 +113,10 @@ function cirquetest_run_all_tests() {
         cirquetest_run_test "$test_name"
         exitcode=$?
         if [ "$exitcode" = 0 ]; then
-            echo "[$BOLD_GREEN_TEXT""SUCC""$RESET_COLOR] $test_name"
+            echo -e "[$BOLD_GREEN_TEXT""SUCC""$RESET_COLOR] $test_name"
         else
-            echo "[$BOLD_RED_TEXT""FAIL""$RESET_COLOR] $test_name"
-            return "$exitcode"
+            echo -e "[$BOLD_RED_TEXT""FAIL""$RESET_COLOR] $test_name (Exitcode: $exitcode)"
+            return 1
         fi
     done
 }
