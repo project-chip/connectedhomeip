@@ -34,6 +34,7 @@ APP = chip-tool-server
 
 SRCS = \
     $(PROJECT_ROOT)/server.cpp \
+    $(CHIP_ROOT)/src/app/util/af-event.cpp \
     $(CHIP_ROOT)/src/app/util/attribute-size.c \
     $(CHIP_ROOT)/src/app/util/attribute-storage.c \
     $(CHIP_ROOT)/src/app/util/attribute-table.c \

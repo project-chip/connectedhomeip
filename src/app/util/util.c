@@ -44,7 +44,7 @@
 #include "af.h"
 #include "common.h"
 //#include "../plugin/time-server/time-server.h"
-//#include "app/framework/util/af-event.h"
+#include "af-event.h"
 //#include "app/framework/util/time-util.h"
 #include "gen/znet-bookkeeping.h"
 //#include "hal/micro/crc.h"
@@ -264,7 +264,7 @@ void emberAfInit(void)
     emberAfSetExternalBuffer(appResponseData, EMBER_AF_RESPONSE_BUFFER_LEN, &appResponseLength, &emberAfResponseApsFrame);
 
     // initialize event management system
-    // emAfInitEvents();
+    emAfInitEvents();
 
 #ifdef EMBER_AF_GENERATED_PLUGIN_INIT_FUNCTION_CALLS
     EMBER_AF_GENERATED_PLUGIN_INIT_FUNCTION_CALLS
@@ -1212,43 +1212,6 @@ EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl * controls, u
     return EMBER_SUCCESS;
 }
 
-// EmberStatus emberAfEndpointEventControlSetDelayMS(EmberEventControl * controls, uint8_t endpoint, uint32_t delayMs)
-// {
-//     uint8_t index = emberAfIndexFromEndpoint(endpoint);
-//     if (index == 0xFF)
-//     {
-//         return EMBER_INVALID_ENDPOINT;
-//     }
-//     return emberAfEventControlSetDelayMS(&controls[index], delayMs);
-// }
-
-// EmberStatus emberAfEndpointEventControlSetDelayQS(EmberEventControl * controls, uint8_t endpoint, uint32_t delayQs)
-// {
-//     uint8_t index = emberAfIndexFromEndpoint(endpoint);
-//     if (index == 0xFF)
-//     {
-//         return EMBER_INVALID_ENDPOINT;
-//     }
-//     return emberAfEventControlSetDelayQS(&controls[index], delayQs);
-// }
-
-// EmberStatus emberAfEndpointEventControlSetDelayMinutes(EmberEventControl * controls, uint8_t endpoint, uint16_t delayM)
-// {
-//     uint8_t index = emberAfIndexFromEndpoint(endpoint);
-//     if (index == 0xFF)
-//     {
-//         return EMBER_INVALID_ENDPOINT;
-//     }
-//     return emberAfEventControlSetDelayMinutes(&controls[index], delayM);
-// }
-
-// bool emberAfIsThisMyEui64(EmberEUI64 eui64)
-// {
-//     EmberEUI64 myEui64;
-//     emberAfGetEui64(myEui64);
-//     return (0 == MEMCOMPARE(eui64, myEui64, EUI64_SIZE) ? true : false);
-// }
-
 uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, const uint8_t * appendingChars,
                                 uint8_t appendingCharsLen)
 {
@@ -1386,20 +1349,4 @@ uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel)
         // as case 0 to make MISRA happy.
         return channel | ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_0;
     }
-}
-
-EmberStatus emberAfScheduleServerTick(uint8_t endpoint, EmberAfClusterId clusterId, uint32_t delayMs)
-{
-    return EMBER_SUCCESS; // Stub for now.
-}
-
-EmberStatus emberAfScheduleServerTickExtended(uint8_t endpoint, EmberAfClusterId clusterId, uint32_t delayMs,
-                                              EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl)
-{
-    return EMBER_SUCCESS; // Stub for now.
-}
-
-EmberStatus emberAfDeactivateServerTick(uint8_t endpoint, EmberAfClusterId clusterId)
-{
-    return EMBER_SUCCESS; // Stub for now.
 }
