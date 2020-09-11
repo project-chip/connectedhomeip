@@ -16,30 +16,17 @@ Building the example application is quite straightforward.
 
 ### gn
 
--   From the top-level of the chip repo, run `./gn_build.sh`
-
-            $ ./gn_build.sh
-
--   Or from the `examples/chip-tool` directory:
-
 ```
+cd examples/chip-tool
+git submodule update --init
 source third_party/connectedhomeip/scripts/activate.sh
 gn gen out/debug
 ninja -C out/debug
 ```
 
 -   After the application is built, it can be found in the build directory as
-    `out/debug/standalone/chip-tool`
+    `out/debug/chip-tool`
 
-### autotools
-
--   In the root of the example directory, run `make`.
-
-          $ make
-          $ make -f server.mk
-
--   After the application is built, it can be found in the build directory as
-    `chip-tool`.
 
 ## Using the Client to Request an Echo
 
