@@ -27,7 +27,6 @@ ninja -C out/debug
 -   After the application is built, it can be found in the build directory as
     `out/debug/chip-tool`
 
-
 ## Using the Client to Request an Echo
 
 ### Ping a device over BLE
