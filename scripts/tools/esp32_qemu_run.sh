@@ -38,6 +38,31 @@ die() {
     exit 1
 }
 
+realpath() {
+    path=$1 # input
+
+    [[ -z $path ]] && return 0
+
+    # trim trailing slashes
+    while [[ ${#path} -gt 1 && $path = */ ]]; do
+        path=${path%/}
+    done
+
+    # if we're at root we're done
+    if [[ $path = / ]]; then
+        echo "$path"
+        return 0
+    fi
+
+    [[ $path != /* ]] && path=$PWD/$path
+
+    if [[ -d $path ]]; then
+        (cd "$path" && pwd)
+    else
+        echo "$(realpath ${path%/*})/${path##*/}"
+    fi
+}
+
 [[ $# -eq 1 ]] || usage "Incorrect number of arguments"
 
 [[ -n $QEMU_ESP32 ]] || die "Environment variable QEMU_ESP32 is undefined."
