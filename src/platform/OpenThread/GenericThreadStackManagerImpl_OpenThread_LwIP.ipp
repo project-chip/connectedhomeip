@@ -120,7 +120,7 @@ template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInterface(bool addrChange)
 {
     err_t lwipErr = ERR_OK;
-    bool isAttached;
+    bool isInterfaceUp;
     bool addrAssigned[LWIP_IPV6_NUM_ADDRESSES];
 
     memset(addrAssigned, 0, sizeof(addrAssigned));
@@ -130,15 +130,15 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
     Impl()->LockThreadStack();
 
     // Determine whether the device is attached to a Thread network.
-    isAttached = GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadAttachedNoLock();
+    isInterfaceUp = GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadInterfaceUpNoLock();
 
     // If needed, adjust the link state of the LwIP netif to reflect the state of the OpenThread stack.
     // Set ifConnectivity to indicate the change in the link state.
-    if (isAttached != (bool) netif_is_link_up(mNetIf))
+    if (isInterfaceUp != (bool) netif_is_link_up(mNetIf))
     {
-        ChipLogDetail(DeviceLayer, "LwIP Thread interface %s", isAttached ? "UP" : "DOWN");
+        ChipLogDetail(DeviceLayer, "LwIP Thread interface %s", isInterfaceUp ? "UP" : "DOWN");
 
-        if (isAttached)
+        if (isInterfaceUp)
         {
             netif_set_link_up(mNetIf);
         }
@@ -152,7 +152,7 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
             ChipDeviceEvent event;
             event.Clear();
             event.Type                            = DeviceEventType::kThreadConnectivityChange;
-            event.ThreadConnectivityChange.Result = (isAttached) ? kConnectivity_Established : kConnectivity_Lost;
+            event.ThreadConnectivityChange.Result = (isInterfaceUp) ? kConnectivity_Established : kConnectivity_Lost;
             PlatformMgr().PostEvent(&event);
         }
 
@@ -166,7 +166,7 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
     {
         // If attached to a Thread network, add addresses to the LwIP netif to match those
         // configured in the Thread stack...
-        if (isAttached)
+        if (isInterfaceUp)
         {
             // Enumerate the list of unicast IPv6 addresses known to OpenThread...
             const otNetifAddress * otAddrs = otIp6GetUnicastAddresses(Impl()->OTInstance());
@@ -230,7 +230,7 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
             }
         }
 
-        ChipLogDetail(DeviceLayer, "LwIP Thread interface addresses %s", isAttached ? "updated" : "cleared");
+        ChipLogDetail(DeviceLayer, "LwIP Thread interface addresses %s", isInterfaceUp ? "updated" : "cleared");
 
         // For each address associated with the netif that was *not* assigned above, remove the address
         // from the netif if the address is one that was previously assigned by this method.
@@ -238,7 +238,7 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
         // from the netif.
         for (u8_t addrIdx = 0; addrIdx < LWIP_IPV6_NUM_ADDRESSES; addrIdx++)
         {
-            if (!isAttached || (mAddrAssigned[addrIdx] && !addrAssigned[addrIdx]))
+            if (!isInterfaceUp || (mAddrAssigned[addrIdx] && !addrAssigned[addrIdx]))
             {
                 // Remove the address from the netif by setting its state to INVALID
                 netif_ip6_addr_set_state(mNetIf, addrIdx, IP6_ADDR_INVALID);
