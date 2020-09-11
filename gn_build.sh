@@ -71,15 +71,15 @@ echo ninja -C "$CHIP_ROOT/out/custom"
 
 extra_args=""
 
-# Android NDK setup
-android_ndk_args=""
+# Android SDK setup
+android_sdk_args=""
 
-if [[ -d "${ANDROID_NDK_HOME}/toolchains" ]]; then
-    android_ndk_args+="android_ndk_root=\"$ANDROID_NDK_HOME\""
-    extra_args+=" $android_ndk_args enable_android_builds=true"
+if [[ -d "${ANDROID_NDK_HOME}/toolchains" && -d "${ANDROID_HOME}/platforms" ]]; then
+    android_sdk_args+="android_sdk_root=\"$ANDROID_HOME\" android_ndk_root=\"$ANDROID_NDK_HOME\""
+    extra_args+=" $android_sdk_args enable_android_builds=true"
 else
     echo
-    echo "Hint: Set \$ANDROID_NDK_HOME to enable building for Android"
+    echo "Hint: Set \$ANDROID_HOME and \$ANDROID_NDK_HOME to enable building for Android"
 fi
 
 # nRF5 SDK setup

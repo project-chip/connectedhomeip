@@ -45,7 +45,7 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Setup Build
               run: |
-                  GN_ARGS="is_clang=true target_os=\"android\" target_cpu=\"${{ matrix.type }}\" android_ndk_root=\"/usr/local/share/android-ndk-r21b\""
+                  GN_ARGS="is_clang=true target_os=\"android\" target_cpu=\"${{ matrix.type }}\" android_ndk_root=\"/opt/android/android-ndk-r21b\" android_sdk_root=\"/opt/android/sdk\""
                   scripts/build/gn_gen.sh --args="$GN_ARGS"
             - name: Run Build
               run: |

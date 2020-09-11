@@ -26,7 +26,7 @@ shared_library("jni") {
   output_dir = "${root_out_dir}/lib/jni/${android_abi}"
 }
 
-java_library("java") {
+android_library("java") {
   output_name = "CHIPController.jar"
 
   data_deps = [ ":jni" ]
