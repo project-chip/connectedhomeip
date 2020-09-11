@@ -117,8 +117,8 @@ container:
 
 If you use the container for the first time and you don't have nRF Connect SDK
 and CHIP sources downloaded yet, run `setup` command in the container to pull
-the sources into directories mounted as `/var/ncs` and
-`/var/chip`, respectively:
+the sources into directories mounted as `/var/ncs` and `/var/chip`,
+respectively:
 
         $ setup
         /var/ncs repository is empty. Do you wish to check out nRF Connect SDK sources [master]? [Y/N] y
