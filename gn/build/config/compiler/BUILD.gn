@@ -142,6 +142,10 @@ config("disabled_warnings") {
     "-Wno-non-virtual-dtor",
     "-Wno-deprecated-copy",
   ]
+  if (!is_debug) {
+    # assert() causes unused variable warnings in release.
+    cflags += [ "-Wno-unused" ]
+  }
   if (!is_clang) {
     cflags += [
       "-Wno-psabi",
