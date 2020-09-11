@@ -13,8 +13,8 @@ RUN set -x \
 RUN set -x \
     && cd /tmp \
     && wget https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip \
-    && mkdir -p /usr/local/share \
-    && cd /usr/local/share \
+    && mkdir -p /opt/android \
+    && cd /opt/android \
     && unzip /tmp/android-ndk-r21b-linux-x86_64.zip \
     && : # last line
 
@@ -27,7 +27,7 @@ RUN set -x \
 RUN set -x \
     && export OPENSSL_ARMV7=/usr/local/src/armeabi-v7a \
     && export OPENSSL_X86=/usr/local/src/x86 \
-    && export ANDROID_NDK_HOME=/usr/local/share/android-ndk-r21b \
+    && export ANDROID_NDK_HOME=/opt/android/android-ndk-r21b \
     && export PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH \
     && cd /tmp && wget https://www.openssl.org/source/openssl-1.1.1g.tar.gz \
     && mkdir -p $OPENSSL_ARMV7 && cd $OPENSSL_ARMV7 && tar xfz /tmp/openssl-1.1.1g.tar.gz \
