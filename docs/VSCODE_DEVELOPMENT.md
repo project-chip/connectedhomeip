@@ -67,16 +67,14 @@ same base configuration and build.
 
 ### Current base tasks are listed here
 
--   Main Build - Full build and test of the tree
--   Auto-enforce coding style
--   Verify coding style conformance
--   Run Unit and Functional Tests
--   Run Distribution Generation - Build and check distribution, running all
-    functional and unit tests
--   Run Code Coverage (via 'make coverage')
--   Clean build - Full clean build and test of the tree
--   Bootstrap the source tree - On a clean tree, pull in the third party
-    dependencies required
+-   Main Build - Build the default configuration (i.e., Linux OpenSSL)
+-   Run Unit and Functional Tests - Test the default configuration
+-   Build & Test (all) - Build & Test various configurations (Linux variants,
+    Android, nRF5, EFR32)
+-   Update compilation database - Update the database used by IntelliSense
+    (needed for cross references, completion)
+-   Bootstrap - On a clean tree, pull in the third party dependencies required
+-   Clean Output - Remove build artifacts
 -   Clean Tree - Full (and destructive) git clean of the tree
 
 ## Launch Tasks
@@ -93,8 +91,7 @@ the same base debuging setup.
 
 ### Before submitting a PR, make sure these commands run and succeed
 
--   Run task: "Verify coding style conformance"
--   Run task: "Run Distribution Generation"
+-   Run task: "Build & Test (all)"
 
 ## Common Issues
 

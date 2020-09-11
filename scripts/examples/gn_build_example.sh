@@ -22,10 +22,33 @@ CHIP_ROOT="$(dirname "$0")/../.."
 
 source "$CHIP_ROOT/scripts/activate.sh"
 
+GN_ARGS=()
+
+EXAMPLE_DIR=$1
+shift
+OUTPUT_DIR=$1
+shift
+
+NINJA_ARGS=()
+for arg; do
+    case $arg in
+        -v)
+            NINJA_ARGS+=(-v)
+            ;;
+        *=*)
+            GN_ARGS+=("$arg")
+            ;;
+        *)
+            echo >&2 "invalid argument: $arg"
+            exit 2
+            ;;
+    esac
+done
+
 set -e
 set -x
 env
 
-gn gen --root="$1" "$2"
+gn gen --root="$EXAMPLE_DIR" "$OUTPUT_DIR" --args="${GN_ARGS[*]}"
 
-ninja -v -C "$2"
+ninja -C "$OUTPUT_DIR" "${NINJA_ARGS[@]}"

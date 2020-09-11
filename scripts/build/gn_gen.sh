@@ -22,8 +22,8 @@ CHIP_ROOT="$(dirname "$0")/../.."
 
 source "$CHIP_ROOT/scripts/activate.sh"
 
-set -e
-set -x
+set -ex
+
 env
 
 gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/$BUILD_TYPE" "$@"
