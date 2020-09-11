@@ -76,7 +76,6 @@ bool sHaveServiceConnectivity = false;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
-DemoSessionManager sessions;
 
 int AppTask::StartAppTask()
 {
@@ -104,7 +103,7 @@ int AppTask::Init()
     ret_code_t ret;
 
     // Init ZCL Data Model and start server
-    InitServer(&sessions);
+    InitServer();
 
     // Initialize LEDs
     sStatusLED.Init(SYSTEM_STATE_LED);

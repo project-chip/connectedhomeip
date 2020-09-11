@@ -52,6 +52,7 @@ SecureSessionMgrBase & SessionManager()
     return sessions;
 }
 } // namespace chip
+
 namespace {
 class ServerCallback : public SecureSessionMgrCallback
 {
@@ -97,22 +98,22 @@ SecurePairingUsingTestSecret gTestPairing;
 
 // The function will initialize datamodel handler and then start the server
 // The server assumes the platform's networking has been setup already
-void InitServer(DemoSessionManager * sessions)
+void InitServer()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
 
     InitDataModelHandler();
 
-    err = sessions->Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::SystemLayer,
-                         UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
+    err = sessions.Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::SystemLayer,
+                        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
     SuccessOrExit(err);
 
     // TODO: ESP32 echo server supports actual pairing, needs to investigate how to share this with ESP32
-    err = sessions->NewPairing(Optional<NodeId>::Value(kUndefinedNodeId), peer, 0, 0, &gTestPairing);
+    err = sessions.NewPairing(Optional<NodeId>::Value(kUndefinedNodeId), peer, 0, 0, &gTestPairing);
     SuccessOrExit(err);
 
-    sessions->SetDelegate(&gCallbacks);
+    sessions.SetDelegate(&gCallbacks);
 
 exit:
     if (err != CHIP_NO_ERROR)

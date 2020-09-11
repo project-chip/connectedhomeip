@@ -56,8 +56,6 @@
 
 APP_TIMER_DEF(sFunctionTimer);
 
-DemoSessionManager sessions;
-
 static SemaphoreHandle_t sCHIPEventLock;
 
 static TaskHandle_t sAppTaskHandle;
@@ -108,7 +106,7 @@ int AppTask::Init()
     ret_code_t ret;
 
     // Init ZCL Data Model and start server
-    InitServer(&sessions);
+    InitServer();
 
     // Initialize LEDs
     sStatusLED.Init(SYSTEM_STATE_LED);

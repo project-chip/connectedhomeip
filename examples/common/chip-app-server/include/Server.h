@@ -32,6 +32,6 @@ using DemoSessionManager = chip::SecureSessionMgr<chip::Transport::UDP>;
  *
  * @param [in] sessions The demo's session manager.
  */
-void InitServer(DemoSessionManager * sessions);
+void InitServer();
 
 #endif // CHIP_APP_SERVER_SERVER_H
