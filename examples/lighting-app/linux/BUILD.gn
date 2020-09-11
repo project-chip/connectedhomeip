@@ -28,8 +28,8 @@ config("includes") {
 
 executable("chip-tool-server") {
   sources = [
-    "include/LightingManager.h",
     "LightingManager.cpp",
+    "include/LightingManager.h",
     "main.cpp",
   ]
 
