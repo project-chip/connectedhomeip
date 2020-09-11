@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +20,9 @@
 #define APP_TASK_H
 
 #include "AppEvent.h"
-#include "BoltLockManager.h"
+#include "LightingManager.h"
+
+#include <cstdint>
 
 struct k_timer;
 
@@ -30,7 +31,7 @@ class AppTask
 public:
     int StartApp();
 
-    void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);
+    void PostLightingActionRequest(LightingManager::Action_t aAction);
     void PostEvent(AppEvent * event);
 
 private:
@@ -39,8 +40,8 @@ private:
     int Init();
     void PrintQRCode() const;
 
-    static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(BoltLockManager::Action_t aAction);
+    static void ActionInitiated(LightingManager::Action_t aAction);
+    static void ActionCompleted(LightingManager::Action_t aAction);
 
     void CancelTimer(void);
 
@@ -49,9 +50,9 @@ private:
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
     static void JoinerHandler(AppEvent * aEvent);
-    static void LockActionEventHandler(AppEvent * aEvent);
+    static void LightingActionEventHandler(AppEvent * aEvent);
 
-    static void ButtonEventHandler(uint32_t buttons_state, uint32_t has_changed);
+    static void ButtonEventHandler(uint32_t button_state, uint32_t has_changed);
     static void TimerEventHandler(k_timer * timer);
 
     void StartTimer(uint32_t aTimeoutInMs);

@@ -1,11 +1,11 @@
-# CHIP nRF Connect nRF52840 Lock Example Application
+# CHIP nRF52840 Lighting Example Application
 
 An example application showing the use
 [CHIP](https://github.com/project-chip/connectedhomeip) on the Nordic nRF52840.
 
 <hr>
 
--   [CHIP nRF52840 Lock Example Application](#chip-nrf52840-lock-example-application)
+-   [CHIP nRF52840 Lighting Example Application](#chip-nrf52840-lighting-example-application)
     -   [Introduction](#introduction)
     -   [Device UI](#device-ui)
     -   [Building](#building)
@@ -24,18 +24,17 @@ An example application showing the use
 
 ![nrf52840 DK](../../platform/nrf528xx/doc/images/nrf52840-dk.jpg)
 
-The nRF52840 lock example application provides a working demonstration of a
-connected door lock device, built using CHIP, and the Nordic nRF Connect. The
-example supports remote access and control of a simulated door lock over a
-low-power, 802.15.4 Thread network. It is capable of being paired into an
-existing CHIP network along with other CHIP-enabled devices. The example targets
-the
+The nRF52840 lighting example application provides a working demonstration of a
+connected lighting device, built using CHIP, and the Nordic nRF Connect SDK. The
+example supports remote access and control of a lighting over a low-power,
+802.15.4 Thread network. It is capable of being paired into an existing CHIP
+network along with other CHIP-enabled devices. The example targets the
 [Nordic nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)
 development kit, but is readily adaptable to other nRF52840-based hardware.
 
-The lock example is intended to serve both as a means to explore the workings of
-CHIP, as well as a template for creating real products based on the Nordic
-platform.
+The lighting example is intended to serve both as a means to explore the
+workings of CHIP, as well as a template for creating real products based on the
+Nordic platform.
 
 The example makes use of the CMake build system to generate the ninja build
 script. The build system takes care of invoking the CHIP library build with all
@@ -75,13 +74,10 @@ pending reset. Holding the button past 6 seconds will cause the device to reset
 its persistent configuration and initiate a reboot. The reset action can be
 cancelled by releasing the button at any point before the 6 second limit.
 
-**LED #2** shows the state of the simulated lock bolt. When the LED is lit the
-bolt is extended (i.e. door locked); when not lit, the bolt is retracted (door
-unlocked). The LED will flash whenever the simulated bolt is in motion from one
-position to another.
+**LED #2** shows the state of the lighting.
 
-**Button #2** can be used to change the state of the simulated bolt. This can be
-used to mimick a user manually operating the lock. The button behaves as a
+**Button #2** can be used to change the state of the lighting. This can be used
+to mimick a user manually switching the lighting. The button behaves as a
 toggle, swapping the state every time it is pressed.
 
 **Button #3** can be used to trigger a thread joiner. It should be use to
@@ -129,11 +125,11 @@ respectively:
 Now you may build the example by running the commands below in the Docker
 container:
 
-        $ cd /var/chip/examples/lock-app/nrfconnect
+        $ cd /var/chip/examples/lighting-app/nrfconnect
         $ west build -b nrf52840dk_nrf52840
 
 If the build succeeds, the binary will be available under
-`/var/chip/examples/lock-app/nrfconnect/build/zephyr/zephyr.hex`. Note that
+`/var/chip/examples/lighting-app/nrfconnect/build/zephyr/zephyr.hex`. Note that
 other operations described in this document like flashing or debugging can also
 be done in the container.
 
@@ -165,9 +161,9 @@ After your environment is set up, you are ready to build the example. The
 recommended tool for building and flashing the device is
 [west](https://docs.zephyrproject.org/latest/guides/west/).
 
-The following commands will build the `lock-app` example:
+The following commands will build the `lighting-app` example:
 
-        $ cd ~/connectedhomeip/examples/lock-app/nrfconnect
+        $ cd ~/connectedhomeip/examples/lighting-app/nrfconnect
 
         # If this is a first time build or if `build` directory was deleted
         $ west build -b nrf52840dk_nrf52840
@@ -289,3 +285,6 @@ combination with JLinkRTTClient as follows:
           $ JLinkRTTClient
 
 Logging output will appear in the second terminal.
+
+An alternate method for viewing log output is to use the J-Link GDB server
+described in the following section.

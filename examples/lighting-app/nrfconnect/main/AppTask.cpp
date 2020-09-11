@@ -17,42 +17,50 @@
  */
 
 #include "AppTask.h"
+
 #include "AppConfig.h"
-#include "BoltLockManager.h"
+#include "AppEvent.h"
 #include "LEDWidget.h"
+#include "LightingManager.h"
 #include "Server.h"
 
 #include <platform/CHIPDeviceLayer.h>
 
-#include <dk_buttons_and_leds.h>
-#include <logging/log.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+#include <support/ErrorStr.h>
+#include <system/SystemClock.h>
+
+#include <dk_buttons_and_leds.h>
+#include <logging/log.h>
 #include <zephyr.h>
 
-#define FACTORY_RESET_TRIGGER_TIMEOUT 3000
-#define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_EVENT_QUEUE_SIZE 10
-#define BUTTON_PUSH_EVENT 1
-#define BUTTON_RELEASE_EVENT 0
-#define EXAMPLE_VENDOR_ID 0xabcd
-
 LOG_MODULE_DECLARE(app);
-K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
 
-static LEDWidget sStatusLED;
-static LEDWidget sLockLED;
-static LEDWidget sUnusedLED;
-static LEDWidget sUnusedLED_1;
+namespace {
 
-static bool sIsThreadProvisioned     = false;
-static bool sIsThreadEnabled         = false;
-static bool sIsThreadAttached        = false;
-static bool sIsPairedToAccount       = false;
-static bool sHaveBLEConnections      = false;
-static bool sHaveServiceConnectivity = false;
+constexpr int kFactoryResetTriggerTimeout      = 3000;
+constexpr int kFactoryResetCancelWindowTimeout = 3000;
+constexpr int kAppEventQueueSize               = 10;
+constexpr int kExampleVendorID                 = 0xabcd;
+constexpr uint8_t kButtonPushEvent             = 1;
+constexpr uint8_t kButtonReleaseEvent          = 0;
 
-static k_timer sFunctionTimer;
+K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
+k_timer sFunctionTimer;
+
+LEDWidget sStatusLED;
+LEDWidget sUnusedLED;
+LEDWidget sUnusedLED_1;
+
+bool sIsThreadProvisioned     = false;
+bool sIsThreadEnabled         = false;
+bool sIsThreadAttached        = false;
+bool sIsPairedToAccount       = false;
+bool sHaveBLEConnections      = false;
+bool sHaveServiceConnectivity = false;
+
+} // namespace
 
 using namespace ::chip::DeviceLayer;
 
@@ -72,9 +80,6 @@ int AppTask::Init()
     LEDWidget::InitGpio();
 
     sStatusLED.Init(SYSTEM_STATE_LED);
-    sLockLED.Init(LOCK_STATE_LED);
-    sLockLED.Set(!BoltLockMgr().IsUnlocked());
-
     sUnusedLED.Init(DK_LED3);
     sUnusedLED_1.Init(DK_LED4);
 
@@ -90,8 +95,11 @@ int AppTask::Init()
     k_timer_init(&sFunctionTimer, &AppTask::TimerEventHandler, nullptr);
     k_timer_user_data_set(&sFunctionTimer, this);
 
-    BoltLockMgr().Init();
-    BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+    ret = LightingMgr().Init(LIGHTING_GPIO_DEVICE_NAME, LIGHTING_GPIO_PIN);
+    if (ret != 0)
+        return ret;
+
+    LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Init ZCL Data Model
     InitDataModelHandler();
@@ -105,7 +113,7 @@ void AppTask::PrintQRCode() const
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     uint32_t setUpPINCode       = 0;
-    uint16_t setUpDiscriminator = 0;
+    uint32_t setUpDiscriminator = 0;
 
     err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
     if (err != CHIP_NO_ERROR)
@@ -121,7 +129,7 @@ void AppTask::PrintQRCode() const
 
     chip::SetupPayload payload;
     payload.version       = 1;
-    payload.vendorID      = EXAMPLE_VENDOR_ID;
+    payload.vendorID      = kExampleVendorID;
     payload.productID     = 1;
     payload.setUpPINCode  = setUpPINCode;
     payload.discriminator = setUpDiscriminator;
@@ -216,28 +224,25 @@ int AppTask::StartApp()
         }
 
         sStatusLED.Animate();
-        sLockLED.Animate();
         sUnusedLED.Animate();
         sUnusedLED_1.Animate();
     }
 }
 
-void AppTask::LockActionEventHandler(AppEvent * aEvent)
+void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 {
-    BoltLockManager::Action_t action = BoltLockManager::INVALID_ACTION;
-    int32_t actor                    = 0;
+    LightingManager::Action_t action = LightingManager::INVALID_ACTION;
 
-    if (aEvent->Type == AppEvent::kEventType_Lock)
+    if (aEvent->Type == AppEvent::kEventType_Lighting)
     {
-        action = static_cast<BoltLockManager::Action_t>(aEvent->LockEvent.Action);
-        actor  = aEvent->LockEvent.Actor;
+        action = static_cast<LightingManager::Action_t>(aEvent->LightingEvent.Action);
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        action = BoltLockMgr().IsUnlocked() ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION;
+        action = LightingMgr().IsTurnedOn() ? LightingManager::OFF_ACTION : LightingManager::ON_ACTION;
     }
 
-    if (action != BoltLockManager::INVALID_ACTION && !BoltLockMgr().InitiateAction(actor, action))
+    if (action != LightingManager::INVALID_ACTION && !LightingMgr().InitiateAction(action))
         LOG_INF("Action is already in progress or active.");
 }
 
@@ -246,18 +251,18 @@ void AppTask::ButtonEventHandler(uint32_t button_state, uint32_t has_changed)
     AppEvent button_event;
     button_event.Type = AppEvent::kEventType_Button;
 
-    if (LOCK_BUTTON_MASK & button_state & has_changed)
+    if (LIGHTING_BUTTON_MASK & button_state & has_changed)
     {
-        button_event.ButtonEvent.PinNo  = LOCK_BUTTON;
-        button_event.ButtonEvent.Action = BUTTON_PUSH_EVENT;
-        button_event.Handler            = LockActionEventHandler;
+        button_event.ButtonEvent.PinNo  = LIGHTING_BUTTON;
+        button_event.ButtonEvent.Action = kButtonPushEvent;
+        button_event.Handler            = LightingActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
 
     if (FUNCTION_BUTTON_MASK & has_changed)
     {
         button_event.ButtonEvent.PinNo  = FUNCTION_BUTTON;
-        button_event.ButtonEvent.Action = (FUNCTION_BUTTON_MASK & button_state) ? BUTTON_PUSH_EVENT : BUTTON_RELEASE_EVENT;
+        button_event.ButtonEvent.Action = (FUNCTION_BUTTON_MASK & button_state) ? kButtonPushEvent : kButtonReleaseEvent;
         button_event.Handler            = FunctionHandler;
         sAppTask.PostEvent(&button_event);
     }
@@ -265,7 +270,7 @@ void AppTask::ButtonEventHandler(uint32_t button_state, uint32_t has_changed)
     if (JOINER_BUTTON_MASK & button_state & has_changed)
     {
         button_event.ButtonEvent.PinNo  = JOINER_BUTTON;
-        button_event.ButtonEvent.Action = BUTTON_PUSH_EVENT;
+        button_event.ButtonEvent.Action = kButtonPushEvent;
         button_event.Handler            = JoinerHandler;
         sAppTask.PostEvent(&button_event);
     }
@@ -285,23 +290,21 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     if (aEvent->Type != AppEvent::kEventType_Timer)
         return;
 
-    // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT, initiate factory reset
+    // If we reached here, the button was held past kFactoryResetTriggerTimeout, initiate factory reset
     if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
     {
-        LOG_INF("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_TRIGGER_TIMEOUT);
+        LOG_INF("Factory Reset Triggered. Release button within %ums to cancel.", kFactoryResetTriggerTimeout);
 
-        // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to cancel, if required.
-        sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+        // Start timer for kFactoryResetCancelWindowTimeout to allow user to cancel, if required.
+        sAppTask.StartTimer(kFactoryResetCancelWindowTimeout);
         sAppTask.mFunction = kFunction_FactoryReset;
 
         // Turn off all LEDs before starting blink to make sure blink is co-ordinated.
         sStatusLED.Set(false);
-        sLockLED.Set(false);
         sUnusedLED_1.Set(false);
         sUnusedLED.Set(false);
 
         sStatusLED.Blink(500);
-        sLockLED.Blink(500);
         sUnusedLED.Blink(500);
         sUnusedLED_1.Blink(500);
     }
@@ -318,16 +321,16 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != FUNCTION_BUTTON)
         return;
 
-    // To trigger software update: press the FUNCTION_BUTTON button briefly (< FACTORY_RESET_TRIGGER_TIMEOUT)
-    // To initiate factory reset: press the FUNCTION_BUTTON for FACTORY_RESET_TRIGGER_TIMEOUT + FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
-    // All LEDs start blinking after FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
+    // To trigger software update: press the FUNCTION_BUTTON button briefly (< kFactoryResetTriggerTimeout)
+    // To initiate factory reset: press the FUNCTION_BUTTON for kFactoryResetTriggerTimeout + kFactoryResetCancelWindowTimeout
+    // All LEDs start blinking after kFactoryResetTriggerTimeout to signal factory reset has been initiated.
     // To cancel factory reset: release the FUNCTION_BUTTON once all LEDs start blinking within the
-    // FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
-    if (aEvent->ButtonEvent.Action == BUTTON_PUSH_EVENT)
+    // kFactoryResetCancelWindowTimeout
+    if (aEvent->ButtonEvent.Action == kButtonPushEvent)
     {
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
         {
-            sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
+            sAppTask.StartTimer(kFactoryResetTriggerTimeout);
 
             sAppTask.mFunction = kFunction_SoftwareUpdate;
         }
@@ -345,15 +348,8 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         {
             sUnusedLED.Set(false);
             sUnusedLED_1.Set(false);
-
-            // Set lock status LED back to show state of lock.
-            sLockLED.Set(!BoltLockMgr().IsUnlocked());
-
             sAppTask.CancelTimer();
-
-            // Change the function to none selected since factory reset has been canceled.
             sAppTask.mFunction = kFunction_NoneSelected;
-
             LOG_INF("Factory Reset has been Canceled");
         }
     }
@@ -385,52 +381,42 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     mFunctionTimerActive = true;
 }
 
-void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
+void AppTask::ActionInitiated(LightingManager::Action_t aAction)
 {
-    // If the action has been initiated by the lock, update the bolt lock trait
-    // and start flashing the LEDs rapidly to indicate action initiation.
-    if (aAction == BoltLockManager::LOCK_ACTION)
+    if (aAction == LightingManager::ON_ACTION)
     {
-        LOG_INF("Lock Action has been initiated");
+        LOG_INF("Turn On Action has been initiated");
     }
-    else if (aAction == BoltLockManager::UNLOCK_ACTION)
+    else if (aAction == LightingManager::OFF_ACTION)
     {
-        LOG_INF("Unlock Action has been initiated");
-    }
-
-    sLockLED.Blink(50, 50);
-}
-
-void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
-{
-    // if the action has been completed by the lock, update the bolt lock trait.
-    // Turn on the lock LED if in a LOCKED state OR
-    // Turn off the lock LED if in an UNLOCKED state.
-    if (aAction == BoltLockManager::LOCK_ACTION)
-    {
-        LOG_INF("Lock Action has been completed");
-        sLockLED.Set(true);
-    }
-    else if (aAction == BoltLockManager::UNLOCK_ACTION)
-    {
-        LOG_INF("Unlock Action has been completed");
-        sLockLED.Set(false);
+        LOG_INF("Turn Off Action has been initiated");
     }
 }
 
-void AppTask::PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction)
+void AppTask::ActionCompleted(LightingManager::Action_t aAction)
+{
+    if (aAction == LightingManager::ON_ACTION)
+    {
+        LOG_INF("Turn On Action has been completed");
+    }
+    else if (aAction == LightingManager::OFF_ACTION)
+    {
+        LOG_INF("Turn Off Action has been completed");
+    }
+}
+
+void AppTask::PostLightingActionRequest(LightingManager::Action_t aAction)
 {
     AppEvent event;
-    event.Type             = AppEvent::kEventType_Lock;
-    event.LockEvent.Actor  = aActor;
-    event.LockEvent.Action = aAction;
-    event.Handler          = LockActionEventHandler;
+    event.Type                 = AppEvent::kEventType_Lighting;
+    event.LightingEvent.Action = aAction;
+    event.Handler              = LightingActionEventHandler;
     PostEvent(&event);
 }
 
 void AppTask::PostEvent(AppEvent * aEvent)
 {
-    if (k_msgq_put(&sAppEventQueue, aEvent, K_TICKS(1)))
+    if (k_msgq_put(&sAppEventQueue, aEvent, K_TICKS(1)) != 0)
     {
         LOG_INF("Failed to post event to app task event queue");
     }

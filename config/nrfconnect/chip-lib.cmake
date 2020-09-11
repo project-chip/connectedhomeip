@@ -151,6 +151,7 @@ function(chip_build TARGET_NAME BASE_TARGET_NAME)
     add_library(${TARGET_NAME} INTERFACE)
     target_include_directories(${TARGET_NAME} INTERFACE
         ${CHIP_ROOT}/src
+        ${CHIP_ROOT}/src/app/util
         ${CHIP_ROOT}/src/lib
         ${CHIP_ROOT}/src/lib/core
         ${CHIP_ROOT}/src/include

@@ -21,12 +21,12 @@ get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconne
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHIP_ROOT}/config/nrfconnect/)
 include(nrfconnect-app)
 
-project(chip-nrf52840-lock-example)
+project(chip-nrf52840-lighting-example)
 target_include_directories(app PRIVATE main main/include ${NRFCONNECT_COMMON}/util/include)
 target_sources(app PRIVATE
                main/AppTask.cpp
-               main/BoltLockManager.cpp
                main/DataModelHandler.cpp
+               main/LightingManager.cpp
                main/main.cpp
                main/Server.cpp
                main/gen/call-command-handler.c
