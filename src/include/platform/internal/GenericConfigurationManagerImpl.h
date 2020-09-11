@@ -85,8 +85,8 @@ public:
     CHIP_ERROR _StoreManufacturerDevicePrivateKey(const uint8_t * key, size_t keyLen);
     CHIP_ERROR _GetSetupPinCode(uint32_t & setupPinCode);
     CHIP_ERROR _StoreSetupPinCode(uint32_t setupPinCode);
-    CHIP_ERROR _GetSetupDiscriminator(uint32_t & setupDiscriminator);
-    CHIP_ERROR _StoreSetupDiscriminator(uint32_t setupDiscriminator);
+    CHIP_ERROR _GetSetupDiscriminator(uint16_t & setupDiscriminator);
+    CHIP_ERROR _StoreSetupDiscriminator(uint16_t setupDiscriminator);
     CHIP_ERROR _GetFabricId(uint64_t & fabricId);
     CHIP_ERROR _StoreFabricId(uint64_t fabricId);
     CHIP_ERROR _GetServiceId(uint64_t & serviceId);

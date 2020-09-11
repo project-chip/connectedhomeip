@@ -570,15 +570,16 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreSetupPinCode(uint32
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSetupDiscriminator(uint32_t & setupDiscriminator)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSetupDiscriminator(uint16_t & setupDiscriminator)
 {
     CHIP_ERROR err;
+    uint32_t val;
 
-    err = Impl()->ReadConfigValue(ImplClass::kConfigKey_SetupDiscriminator, setupDiscriminator);
+    err = Impl()->ReadConfigValue(ImplClass::kConfigKey_SetupDiscriminator, val);
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        setupDiscriminator = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
+        val = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
         ChipLogProgress(DeviceLayer, "Setup PIN discriminator not found; using default: %03x",
                         CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR);
         err = CHIP_NO_ERROR;
@@ -586,14 +587,16 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSetupDiscriminator(ui
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
     SuccessOrExit(err);
 
+    setupDiscriminator = (uint16_t) val;
+
 exit:
     return err;
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreSetupDiscriminator(uint32_t setupDiscriminator)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreSetupDiscriminator(uint16_t setupDiscriminator)
 {
-    return Impl()->WriteConfigValue(ImplClass::kConfigKey_SetupDiscriminator, setupDiscriminator);
+    return Impl()->WriteConfigValue(ImplClass::kConfigKey_SetupDiscriminator, (uint32_t) setupDiscriminator);
 }
 
 template <class ImplClass>
@@ -784,7 +787,7 @@ GenericConfigurationManagerImpl<ImplClass>::_GetBLEDeviceIdentificationInfo(Ble:
 {
     CHIP_ERROR err;
     uint16_t id;
-    uint32_t discriminator;
+    uint16_t discriminator;
 
     deviceIdInfo.Init();
 

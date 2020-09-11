@@ -105,7 +105,7 @@ void AppTask::PrintQRCode() const
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     uint32_t setUpPINCode       = 0;
-    uint32_t setUpDiscriminator = 0;
+    uint16_t setUpDiscriminator = 0;
 
     err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
     if (err != CHIP_NO_ERROR)

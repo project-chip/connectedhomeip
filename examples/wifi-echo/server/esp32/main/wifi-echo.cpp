@@ -369,7 +369,7 @@ std::string createSetupPayload()
     CHIP_ERROR err = CHIP_NO_ERROR;
     std::string result;
 
-    uint32_t discriminator;
+    uint16_t discriminator;
     err = ConfigurationMgr().GetSetupDiscriminator(discriminator);
     if (err != CHIP_NO_ERROR)
     {

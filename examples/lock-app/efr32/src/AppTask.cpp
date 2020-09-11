@@ -131,7 +131,7 @@ int AppTask::Init()
 #ifdef DISPLAY_ENABLED
     chip::SetupPayload payload;
     uint32_t setUpPINCode       = 0;
-    uint32_t setUpDiscriminator = 0;
+    uint16_t setUpDiscriminator = 0;
 
     err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
     if (err != CHIP_NO_ERROR)
