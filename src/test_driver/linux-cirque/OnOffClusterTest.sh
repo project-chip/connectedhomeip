@@ -38,7 +38,7 @@ function build_docker_image() {
 
 function build_chip_lighting() {
     set +e
-    source "$REPO_DIR/scripts/activate.sh" > /dev/null
+    source "$REPO_DIR/scripts/activate.sh" >/dev/null
     set -x -e
     cd "$chip_light_dir"
     gn gen out/debug >/dev/null
