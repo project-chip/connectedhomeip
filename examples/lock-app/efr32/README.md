@@ -42,6 +42,7 @@ example, the output binary will be lacking key features (e.g. OpenThread).
     GitHub and export the path with :
 
             $ export EFR32_SDK_ROOT=<Path to cloned git repo>
+            $ export EFR32_BOARD=BRD4161A
 
 -   Download the
     [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
@@ -55,20 +56,7 @@ example, the output binary will be lacking key features (e.g. OpenThread).
 -   Install some additional tools(likely already present for CHIP developers):
 
            # Linux
-           $ sudo apt-get install git make automake libtool ccache libwebkitgtk-1.0-0 ninja
-
-           # Mac OS X
-           $ brew install automake libtool ccache ninja
-
--   To build for an MG21 part make the following changes to the
-    platform/CMSIS/Include/core_cm33.h file within the Silicon Labs SDK. Copy
-    the following lines to the top of the core_cm33.h file.
-
-```cpp
-#if defined(__GNUC__)
-#pragma GCC diagnostic ignored "-Wpedantic"
-#endif
-```
+           $ sudo apt-get install git libwebkitgtk-1.0-0
 
 -   Supported hardware:
 
@@ -86,27 +74,11 @@ example, the output binary will be lacking key features (e.g. OpenThread).
 
 *   Build the example application:
 
-    -   With Ninja
-
-              $ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
-              $ export EFR32_BOARD=BRD4161A
-              <From CHIP root>
-              $ ./scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/ out/lock_app_debug
-
-    -   With Make _deprecated_
-
-             $ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
-             $ make BOARD=BRD4161A
-
--   To delete generated executable, libraries and object files use:
-
-    -   With Ninja
-
-            $ rm -rf ./out/lock_app_debug
-
-    -   With Make _deprecated_
-
-             $ make BOARD=BRD4161A clean
+          $ cd ~/connectedhomeip/examples/lock-app/efr32
+          $ git submodule update --init
+          $ source third_party/connectedhomeip/scripts/activate.sh
+          $ gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" efr32_board=\"${EFR32_BOARD}\""
+          $ ninja -C out/debug
 
 <a name="flashing"></a>
 
@@ -114,24 +86,7 @@ example, the output binary will be lacking key features (e.g. OpenThread).
 
 -   With Ninja
 
-    -   From CHIP root,
-
-              $ python out/lock_app_debug/BRD4161A/chip-efr32-lock-example.out.flash.py
-
--   With Make (_deprecated_)
-
-    -   To rebuild the image and flash the example app:
-
-            $ make BOARD=BRD4161A flash
-
-    -   To rebuild the image and flash a specific device using its serial
-        number:
-
-            $ make BOARD=BRD4161A SERIALNO=440113717 flash
-
-    -   To flash an existing image without rebuilding:
-
-            $ make BOARD=BRD4161A flash-app
+          $ python3 out/debug/chip-efr32-lock-example.out.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
 
