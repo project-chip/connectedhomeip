@@ -294,8 +294,8 @@ static void TestConfigurationMgr_SetupDiscriminator(nlTestSuite * inSuite, void 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    const uint32_t setSetupDiscriminator = 0xBA0;
-    uint32_t getSetupDiscriminator       = 0;
+    const uint16_t setSetupDiscriminator = 0xBA0;
+    uint16_t getSetupDiscriminator       = 0;
 
     err = ConfigurationMgr().StoreSetupDiscriminator(setSetupDiscriminator);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);

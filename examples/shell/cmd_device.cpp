@@ -345,7 +345,7 @@ static CHIP_ERROR ConfigGetSetupDiscriminator(bool printHeader)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
-    uint32_t setupDiscriminator;
+    uint16_t setupDiscriminator;
 
     if (printHeader)
     {

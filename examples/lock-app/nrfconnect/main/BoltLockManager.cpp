@@ -19,8 +19,8 @@
 
 #include "BoltLockManager.h"
 
+#include "AppConfig.h"
 #include "AppTask.h"
-#include "app_config.h"
 
 #include <logging/log.h>
 #include <zephyr.h>

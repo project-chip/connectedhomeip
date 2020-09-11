@@ -918,13 +918,13 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_JoinerStart(voi
 
     {
         otJoinerDiscerner discerner;
-        uint32_t discriminator;
+        uint16_t discriminator;
 
         SuccessOrExit(error = ConfigurationMgr().GetSetupDiscriminator(discriminator));
         discerner.mLength = 12;
         discerner.mValue  = discriminator;
 
-        ChipLogProgress(DeviceLayer, "Joiner Discerner: %u", discriminator);
+        ChipLogProgress(DeviceLayer, "Joiner Discerner: %hu", discriminator);
         otJoinerSetDiscerner(mOTInst, &discerner);
     }
 

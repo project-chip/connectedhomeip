@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
 set -e
 
 CHIP_ROOT="$(dirname "$0")"
@@ -36,9 +37,7 @@ _chip_banner "Environment bringup"
 
 git -C "$CHIP_ROOT" submodule update --init
 
-set +e
 source "$CHIP_ROOT/scripts/activate.sh"
-set -e
 
 _chip_banner "Instructions"
 

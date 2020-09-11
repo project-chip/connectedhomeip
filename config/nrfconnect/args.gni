@@ -23,8 +23,8 @@ chip_config_network_layer_ble = true
 
 chip_build_tests = false
 
-chip_project_config_include = "<CHIPProjectConfig.h>"
-chip_system_project_config_include = "<CHIPProjectConfig.h>"
+chip_project_config_include = ""
+chip_system_project_config_include = ""
 
 custom_toolchain = "//toolchain:zephyr"
 mbedtls_target = "//:dummy"

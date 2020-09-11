@@ -105,11 +105,10 @@ fi
 }
 
 (
-    # activate.sh isn't 'set -e' safe
     cd "$CHIP_ROOT" # pushd and popd because we need the env vars from activate
-    set +ex
+    set +x
     PW_ENVSETUP_QUIET=1 . scripts/activate.sh
-    set -ex
+    set -x
 
     cd "$TEMP_DIR"
     # [[ -f out/build.ninja ]] ?

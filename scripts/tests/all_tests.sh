@@ -16,11 +16,13 @@
 # limitations under the License.
 #
 
+set -e
+
 CHIP_ROOT="$(dirname "$0")/../.."
 
 PW_ENVSETUP_QUIET=1 source "$CHIP_ROOT/scripts/activate.sh"
 
-set -ex
+set -x
 
 gn gen out/default
 

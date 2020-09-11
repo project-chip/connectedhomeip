@@ -17,10 +17,10 @@
  */
 
 #include "AppTask.h"
+#include "AppConfig.h"
 #include "BoltLockManager.h"
 #include "LEDWidget.h"
 #include "Server.h"
-#include "app_config.h"
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -105,7 +105,7 @@ void AppTask::PrintQRCode() const
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     uint32_t setUpPINCode       = 0;
-    uint32_t setUpDiscriminator = 0;
+    uint16_t setUpDiscriminator = 0;
 
     err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
     if (err != CHIP_NO_ERROR)
@@ -171,11 +171,11 @@ int AppTask::StartApp()
 
         if (PlatformMgr().TryLockChipStack())
         {
-            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached    = ConnectivityMgr().IsThreadAttached();
-            // sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            // sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
+            sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
+            sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
+            sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
+            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
+            sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
 
