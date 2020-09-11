@@ -59,7 +59,7 @@ realpath() {
     if [[ -d $path ]]; then
         (cd "$path" && pwd)
     else
-        echo "$(realpath ${path%/*})/${path##*/}"
+        echo "$(realpath "${path%/*}")/${path##*/}"
     fi
 }
 
