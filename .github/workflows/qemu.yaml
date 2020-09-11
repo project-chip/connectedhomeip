@@ -47,4 +47,4 @@ jobs:
               uses: actions/upload-artifact@v1
               with:
                   name: qemu-esp32-logs
-                  path: /tmp/log_output
+                  path: /tmp/test_logs
