@@ -1,41 +1,40 @@
 # Each line is a file pattern followed by one or more owners.
 
 # Current reviewers-XXX teams, who review everything for approval.
-#* @reviewers-amazon @reviewers-apple @reviewers-comcast @reviewers-google @reviewers-samsung
-* @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewcyk @mspang @saurabhst @BroderickCarlin
+* @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung
 
 # Owners of any files in these directories at the root of the repository and
 # any of its subdirectories.
-/src/android/  @vidhis88
-/src/app/  @rwalker-apple @bzbarsky-apple @wehale @timotej @selissia @kedars
-/src/ble/  @turon @mspang @vivien-apple
-/src/controller/ @sagar-apple @vivien-apple @andy31415 @pan-apple
-/src/crypto/  @bhaskar-apple @pan-apple
-/src/darwin/ @sagar-apple @vivien-apple @pan-apple @shana-apple @rwalker-apple
-/src/inet/ @gerickson @pan-apple @vivien-apple @mspang
-/src/lib/core/ @pan-apple @sagar-apple @rwalker-apple @gerickson @yufengwangca
-/src/lib/message/ @mspang @andy31415 @yufengwangca @pan-apple
-/src/lib/protocols/ @yufengwangca @pan-apple
-/src/lib/shell/  @mspang @turon
-/src/lib/support/  @rwalker-apple @gerickson @pan-apple
-/src/platform/  @pan-apple  @mspang @vivien-apple @yufengwangca
-/src/qrcodetool/  @shana-apple
-/src/setup_payload/  @bhaskar-apple @vivien-apple
-/src/system/  @sagar-apple @pan-apple @gerickson @turon @rwalker-apple
-/src/test_driver/  @pan-apple @vivien-apple
-/src/transport/  @andy31415 @pan-apple @vivien-apple @mspang
+/src/android/  @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @vidhis88
+/src/app/  @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @rwalker-apple @bzbarsky-apple @wehale @timotej @selissia @kedars
+/src/ble/  @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @turon @mspang @vivien-apple
+/src/controller/ @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @sagar-apple @vivien-apple @andy31415 @pan-apple
+/src/crypto/  @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @bhaskar-apple @pan-apple
+/src/darwin/ @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @sagar-apple @vivien-apple @pan-apple @shana-apple @rwalker-apple
+/src/inet/ @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @gerickson @pan-apple @vivien-apple @mspang
+/src/lib/core/ @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @pan-apple @sagar-apple @rwalker-apple @gerickson @yufengwangca
+/src/lib/message/ @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @mspang @andy31415 @yufengwangca @pan-apple
+/src/lib/protocols/ @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @yufengwangca @pan-apple
+/src/lib/shell/  @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @mspang @turon
+/src/lib/support/  @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @rwalker-apple @gerickson @pan-apple
+/src/platform/  @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @pan-apple  @mspang @vivien-apple @yufengwangca
+/src/qrcodetool/  @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @shana-apple
+/src/setup_payload/  @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @bhaskar-apple @vivien-apple
+/src/system/  @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @sagar-apple @pan-apple @gerickson @turon @rwalker-apple
+/src/test_driver/  @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @pan-apple @vivien-apple
+/src/transport/  @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @andy31415 @pan-apple @vivien-apple @mspang
 
 # infra directories
-/.github/ @woody-apple @andy31415
-/.devcontainer/ @woody-apple @rwalker-apple
-/integrations/docker/ @rwalker-apple @woody-apple @andy31415
-/scripts/ @rwalker-apple @woody-apple @andy31415 @mspang
+/.github/ @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @woody-apple @andy31415
+/.devcontainer/ @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @woody-apple @rwalker-apple
+/integrations/docker/ @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @rwalker-apple @woody-apple @andy31415
+/scripts/ @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @rwalker-apple @woody-apple @andy31415 @mspang
 
 # this catches any directory named docs and its subdirs
-docs/ @gerickson @woody-apple @andy31415 @rwalker-apple
-*.md @gerickson @woody-apple @andy31415 @rwalker-apple
+docs/ @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @gerickson @woody-apple @andy31415 @rwalker-apple
+*.md @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @gerickson @woody-apple @andy31415 @rwalker-apple
 
 # GN make system
-/.gn/ @mspang
-*.gn @mspang
-*.gni @mspang
+/.gn/ @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @mspang
+*.gn @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @mspang
+*.gni @project-chip/reviewers-amazon @project-chip/reviewers-apple @project-chip/reviewers-comcast @project-chip/reviewers-google @project-chip/reviewers-samsung @mspang
