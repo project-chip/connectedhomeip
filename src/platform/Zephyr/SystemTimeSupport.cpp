@@ -28,6 +28,8 @@
 
 #include <zephyr.h>
 
+#if !CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
+
 namespace chip {
 namespace System {
 namespace Platform {
@@ -89,3 +91,5 @@ Error SetClock_RealTime(uint64_t newCurTime)
 } // namespace Platform
 } // namespace System
 } // namespace chip
+
+#endif // !CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
