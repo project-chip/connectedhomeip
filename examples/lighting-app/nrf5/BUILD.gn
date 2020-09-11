@@ -71,6 +71,7 @@ nrf5_executable("lighting_app") {
     "${nrf5_platform_dir}/util/include/LEDWidget.h",
     "main/AppTask.cpp",
     "main/LightingManager.cpp",
+    "main/ZclCallbacks.cpp",
     "main/include/AppEvent.h",
     "main/include/AppTask.h",
     "main/include/LightingManager.h",

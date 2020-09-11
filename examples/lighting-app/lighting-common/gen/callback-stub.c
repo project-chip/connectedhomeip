@@ -1191,7 +1191,7 @@ void emberAfOtaClientVersionInfoCallback(EmberAfOtaImageId * currentImageInfo, u
     /* This is commented out since the #defines below are not defined.
 
       if (currentImageInfo != NULL) {
-        MEMSET(currentImageInfo, 0, sizeof(EmberAfOtaImageId));
+        memset(currentImageInfo, 0, sizeof(EmberAfOtaImageId));
         currentImageInfo->manufacturerId  = EMBER_AF_MANUFACTURER_CODE;
         currentImageInfo->imageTypeId     = EMBER_AF_IMAGE_TYPE_ID;
         currentImageInfo->firmwareVersion = EMBER_AF_CUSTOM_FIRMWARE_VERSION;
@@ -2475,3 +2475,20 @@ void halRadioPowerUpHandler(void) {}
  * @param sleepMode    Idle/sleep mode
  */
 void halSleepCallback(bool enter, SleepModes sleepMode) {}
+
+// These functions / constants are added to avoid ld failure when building with GN
+// They should be removed if we have zcl updates and nolonger need this or causing other errors
+void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint) {}
+
+bool emberAfIsCurrentSecurityProfileSmartEnergy(void)
+{
+    return false;
+}
+
+const EmberAfOtaImageId emberAfInvalidImageId;
+
+const EmAfZigbeeProNetwork * emAfCurrentZigbeeProNetwork = NULL;
+
+void emberAfPluginUpdateTcLinkKeyZigbeeKeyEstablishmentCallback(EmberEUI64 partner, EmberKeyStatus status) {}
+
+void emberAfPluginNetworkSteeringMarker(void) {}

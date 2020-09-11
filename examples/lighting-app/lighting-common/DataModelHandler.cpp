@@ -24,8 +24,6 @@
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
-#include "LightingManager.h"
-
 #include "DataModelHandler.h"
 
 #include "gen/attribute-id.h"
@@ -39,31 +37,6 @@
 using namespace ::chip;
 
 extern "C" {
-void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
-{
-    if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
-    {
-        ChipLogProgress(Zcl, "Unknown cluster ID: %d", clusterId);
-        return;
-    }
-
-    if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
-    {
-        ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
-        return;
-    }
-
-    if (*value)
-    {
-        LightingMgr().InitiateAction(LightingManager::ON_ACTION);
-    }
-    else
-    {
-        LightingMgr().InitiateAction(LightingManager::OFF_ACTION);
-    }
-}
-
 /**
  * Handle a message that should be processed via our data model processing
  * codepath.

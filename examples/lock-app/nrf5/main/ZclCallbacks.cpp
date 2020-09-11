@@ -16,8 +16,9 @@
  *    limitations under the License.
  */
 
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/PlatformManager.h>
+#include <support/logging/CHIPLogging.h>
+
+#include "BoltLockManager.h"
 
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
@@ -27,14 +28,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 
-#include "LightingManager.h"
-#include "Server.h"
-
-#include <cassert>
-
-using namespace chip;
-using namespace chip::Inet;
-using namespace chip::Transport;
+using namespace ::chip;
 
 extern "C" {
 void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
@@ -54,25 +48,11 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clust
 
     if (*value)
     {
-        LightingMgr().InitiateAction(LightingManager::ON_ACTION);
+        BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
     }
     else
     {
-        LightingMgr().InitiateAction(LightingManager::OFF_ACTION);
+        BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
     }
 }
-}
-
-int main()
-{
-    chip::DeviceLayer::PlatformMgr().InitChipStack();
-
-    LightingMgr().Init();
-
-    // Init ZCL Data Model and CHIP App Server
-    InitServer();
-
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
-
-    return 0;
 }
