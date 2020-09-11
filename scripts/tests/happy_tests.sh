@@ -29,6 +29,7 @@ env
     apt-get install -y bridge-utils \
                         net-tools \
                         iproute2 \
+                        strace \
                         python3-lockfile \
                         python3-pip \
                         python3-psutil \
