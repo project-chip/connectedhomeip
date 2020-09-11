@@ -23,21 +23,38 @@ REPO_DIR="$SOURCE_DIR/../../"
 set -x
 env
 
-# Bootstrap Happy
-(cd "$REPO_DIR/third_party/happy/repo" && \
-    apt-get update && \
+function happytest_bootstrap() {
+    echo "Bootstrapping Happy Test"
+    set -e
+    # Bootstrap Happy
+    cd "$REPO_DIR/third_party/happy/repo"
+
+    apt-get update
     apt-get install -y bridge-utils \
-                        net-tools \
-                        iproute2 \
-                        strace \
-                        sudo \
-                        python3-lockfile \
-                        python3-pip \
-                        python3-psutil \
-                        python3-setuptools && \
-    make SUDO="")
+                            iproute2 \
+                            net-tools \
+                            python3-lockfile \
+                            python3-pip \
+                            python3-psutil \
+                            python3-setuptools \
+                            strace \
+                            sudo
+    make
+}
 
-# Run Tests
-export TEST_BIN_DIR="$REPO_DIR/out/$BUILD_TYPE/tests"
+function happytest_run() {
+    # Run Tests
+    export TEST_BIN_DIR="$REPO_DIR/out/$BUILD_TYPE/tests"
 
-python3 src/test_driver/happy/tests/standalone/inet/test_inet_multicast_five_nodes_on_wifi.py
+    # TODO: Write a testing driver for tests
+    python3 src/test_driver/happy/tests/standalone/inet/test_inet_multicast_five_nodes_on_wifi.py
+}
+
+subcommand="$1"
+shift
+
+case $subcommand in
+    *)
+        happytest_"$subcommand" "$@"
+        ;;
+esac
