@@ -16,13 +16,14 @@
 #    limitations under the License.
 #
 
+set -e
+
 # Build script for GN nRF5 examples GitHub workflow.
 
 CHIP_ROOT="$(dirname "$0")/../.."
 
 source "$CHIP_ROOT/scripts/activate.sh"
 
-set -e
 set -x
 env
 

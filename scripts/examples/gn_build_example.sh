@@ -16,6 +16,8 @@
 #    limitations under the License.
 #
 
+set -e
+
 # Build script for GN examples GitHub workflow.
 
 CHIP_ROOT="$(dirname "$0")/../.."
@@ -45,7 +47,6 @@ for arg; do
     esac
 done
 
-set -e
 set -x
 env
 
