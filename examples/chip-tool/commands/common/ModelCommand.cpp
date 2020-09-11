@@ -18,6 +18,8 @@
 
 #include "ModelCommand.h"
 
+#include <core/CHIPEncoding.h>
+
 #include <atomic>
 #include <chrono>
 #include <sstream>
@@ -26,7 +28,10 @@
 using namespace ::chip;
 using namespace ::chip::DeviceController;
 
-constexpr std::chrono::seconds kWaitingForResponseTimeout(5);
+#define CHECK_MESSAGE_LENGTH(rv)                                                                                                   \
+    VerifyOrExit(rv, ChipLogError(chipTool, "%s: Unexpected response length: %d", __FUNCTION__, messageLen));
+
+constexpr std::chrono::seconds kWaitingForResponseTimeout(10);
 
 void ModelCommand::OnConnect(ChipDeviceController * dc)
 {
@@ -70,90 +75,131 @@ void ModelCommand::SendCommand(ChipDeviceController * dc)
     ChipLogProgress(chipTool, "Encoded data of length %d", dataLength);
 
 #ifdef DEBUG
-    const size_t data_len = buffer->DataLength();
-
-    fprintf(stderr, "SENDING: %zu ", data_len);
-    for (size_t i = 0; i < data_len; ++i)
-    {
-        fprintf(stderr, "%d ", buffer->Start()[i]);
-    }
-    fprintf(stderr, "\n");
+    PrintBuffer(buffer);
 #endif
 
     dc->SendMessage(NULL, buffer);
 }
 
-void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffer * buffer)
+void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffer * buffer) const
 {
-    // A data model message has a first byte whose value is always one of  0x00,
-    // 0x01, 0x02, 0x03.
-    if (buffer->DataLength() == 0 || buffer->Start()[0] >= 0x04)
-    {
-        return;
-    }
-
     EmberApsFrame frame;
+    uint8_t * message;
+    uint16_t messageLen;
+    uint8_t frameControl;
+    uint8_t sequenceNumber;
+    uint8_t commandId;
+
+    // Bit 3 of the frame control byte set means direction is server to client.
     if (extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) == 0)
     {
-        printf("APS frame processing failure!\n");
+        ChipLogError(chipTool, "APS frame processing failure!");
         PacketBuffer::Free(buffer);
-        return;
+        ExitNow();
     }
+    ChipLogProgress(chipTool, "APS frame processing success!");
 
-    printf("APS frame processing success!\n");
-    uint8_t * message;
-    uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
-
-    VerifyOrExit(messageLen >= 3, printf("Unexpected response length: %d\n", messageLen));
     // Bit 3 of the frame control byte set means direction is server to client.
     // We expect no other bits to be set.
-    VerifyOrExit(message[0] == 8, printf("Unexpected frame control byte: 0x%02x\n", message[0]));
-    VerifyOrExit(message[1] == 1, printf("Unexpected sequence number: %d\n", message[1]));
+    messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
+    CHECK_MESSAGE_LENGTH(messageLen >= 3);
 
-    // message[2] is the command id.
-    switch (message[2])
+    frameControl   = chip::Encoding::Read8(message);
+    sequenceNumber = chip::Encoding::Read8(message);
+    commandId      = chip::Encoding::Read8(message);
+    messageLen -= 3;
+
+    VerifyOrExit(frameControl == 8, ChipLogError(chipTool, "Unexpected frame control byte: 0x%02x", frameControl));
+    VerifyOrExit(sequenceNumber == 1, ChipLogError(chipTool, "Unexpected sequence number: %d", sequenceNumber));
+
+    switch (commandId)
     {
-    case 0x0b: {
-        // Default Response command.  Remaining bytes are the command id of the
-        // command that's being responded to and a status code.
-        VerifyOrExit(messageLen == 5, printf("Unexpected response length: %d\n", messageLen));
-        printf("Got default response to command '0x%02x' for cluster '0x%02x'.  Status is '0x%02x'.\n", message[3], frame.clusterId,
-               message[4]);
+    case 0x0b:
+        ParseDefaultResponseCommand(frame.clusterId, message, messageLen);
+        break;
+    case 0x01:
+        ParseReadAttributeResponseCommand(frame.clusterId, message, messageLen);
+        break;
+    default:
+        ChipLogError(chipTool, "Unexpected command '0x%02x'", commandId);
         break;
     }
-    case 0x01: {
-        // Read Attributes Response command.  Remaining bytes are a list of
-        // (attr id, 0, attr type, attr value) or (attr id, failure status)
-        // tuples.
-        //
-        // But for now we only support one attribute value, and that value is a
-        // boolean.
-        VerifyOrExit(messageLen >= 6, printf("Unexpected response length for Read Attributes command: %d\n", messageLen));
-        uint16_t attr_id;
-        memcpy(&attr_id, message + 3, sizeof(attr_id));
-        if (message[5] == 0)
-        {
-            // FIXME: Should we have a mapping of type ids to types, based on
-            // table 2.6.2.2 in Rev 8 of the ZCL spec?  0x10 is "Boolean".
-            VerifyOrExit(messageLen == 8,
-                         printf("Unexpected response length for successful Read Attributes command: %d\n", messageLen));
-            printf("Read attribute '0x%04x' for cluster '0x%02x'.  Type is '0x%02x', value is '0x%02x'.\n", attr_id,
-                   frame.clusterId, message[6], message[7]);
-        }
-        else
-        {
-            VerifyOrExit(messageLen == 6,
-                         printf("Unexpected response length for failed Read Attributes command: %d\n", messageLen));
-            printf("Reading attribute '0x%04x' for cluster '0x%02x' failed with status '0x%02x'.\n", attr_id, frame.clusterId,
-                   message[5]);
-        }
-        break;
+
+exit:
+    return;
+}
+
+void ModelCommand::ParseDefaultResponseCommand(uint16_t clusterId, uint8_t * message, uint16_t messageLen) const
+{
+    uint8_t commandId;
+    uint8_t status;
+
+    CHECK_MESSAGE_LENGTH(messageLen == 2);
+
+    commandId = chip::Encoding::Read8(message);
+    status    = chip::Encoding::Read8(message);
+
+    ChipLogProgress(chipTool, "Got default response to command '0x%02x' for cluster '0x%02x'.  Status is '0x%02x'", commandId,
+                    clusterId, status);
+
+exit:
+    return;
+}
+
+void ModelCommand::ParseReadAttributeResponseCommand(uint16_t clusterId, uint8_t * message, uint16_t messageLen) const
+{
+    uint16_t attrId;
+    uint8_t status;
+
+    // Remaining bytes are a list of (attr id, 0, attr type, attr value) or (attr id, failure status)
+    // tuples.
+    //
+    // But for now we only support one attribute value, and that value is a boolean.
+    CHECK_MESSAGE_LENGTH(messageLen >= 3);
+
+    attrId = chip::Encoding::LittleEndian::Read16(message);
+    status = chip::Encoding::Read8(message);
+    messageLen -= 3;
+
+    if (status == 0)
+    {
+        ParseReadAttributeResponseCommandSuccess(clusterId, attrId, message, messageLen);
     }
-    default: {
-        printf("Unexpected command '0x%02x'.\n", message[2]);
-        break;
+    else
+    {
+        ParseReadAttributeResponseCommandFailure(clusterId, attrId, status, messageLen);
     }
-    }
+
+exit:
+    return;
+}
+
+void ModelCommand::ParseReadAttributeResponseCommandSuccess(uint16_t clusterId, uint16_t attrId, uint8_t * message,
+                                                            uint16_t messageLen) const
+{
+    uint8_t type;
+    uint8_t value;
+
+    // FIXME: Should we have a mapping of type ids to types, based on
+    // table 2.6.2.2 in Rev 8 of the ZCL spec?  0x10 is "Boolean".
+    CHECK_MESSAGE_LENGTH(messageLen == 2);
+
+    type  = chip::Encoding::Read8(message);
+    value = chip::Encoding::Read8(message);
+
+    ChipLogProgress(chipTool, "Read attribute '0x%04x' for cluster '0x%02x'.  Type is '0x%02x', value is '0x%02x'", attrId,
+                    clusterId, type, value);
+
+exit:
+    return;
+}
+
+void ModelCommand::ParseReadAttributeResponseCommandFailure(uint16_t clusterId, uint16_t attrId, uint8_t status,
+                                                            uint16_t messageLen) const
+{
+    CHECK_MESSAGE_LENGTH(messageLen == 0);
+    ChipLogProgress(chipTool, "Reading attribute '0x%04x' for cluster '0x%02x' failed with status '0x%02x'", attrId, clusterId,
+                    status);
 
 exit:
     return;
@@ -176,4 +222,16 @@ void ModelCommand::WaitForResponse()
     {
         ChipLogError(chipTool, "No response from device");
     }
+}
+
+void ModelCommand::PrintBuffer(PacketBuffer * buffer) const
+{
+    const size_t data_len = buffer->DataLength();
+
+    fprintf(stderr, "SENDING: %zu ", data_len);
+    for (size_t i = 0; i < data_len; ++i)
+    {
+        fprintf(stderr, "%d ", buffer->Start()[i]);
+    }
+    fprintf(stderr, "\n");
 }

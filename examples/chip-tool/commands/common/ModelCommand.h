@@ -51,10 +51,17 @@ public:
 
 private:
     void SendCommand(ChipDeviceController * dc);
-    void ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffer * buffer);
+    void ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffer * buffer) const;
+
+    void ParseDefaultResponseCommand(uint16_t clusterId, uint8_t * message, uint16_t messageLen) const;
+    void ParseReadAttributeResponseCommand(uint16_t clusterId, uint8_t * message, uint16_t messageLen) const;
+    void ParseReadAttributeResponseCommandSuccess(uint16_t clusterId, uint16_t attrId, uint8_t * message,
+                                                  uint16_t messageLen) const;
+    void ParseReadAttributeResponseCommandFailure(uint16_t clusterId, uint16_t attrId, uint8_t status, uint16_t messageLen) const;
 
     void UpdateWaitForResponse(bool value);
     void WaitForResponse(void);
+    void PrintBuffer(PacketBuffer * buffer) const;
 
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;
