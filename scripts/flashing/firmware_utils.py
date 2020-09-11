@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,35 +12,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Flash an EFR32 device.
-
-This is layered so that a caller can perform individual operations
-through a `Flasher` instance, or operations according to a command line.
-For `Flasher`, see the class documentation. For the parse_command()
-interface or standalone execution:
-
-usage: efr32_firmware_utils.py [-h] [--verbose] [--erase] [--application FILE]
-                               [--verify-application] [--reset] [--skip-reset]
-                               [--commander FILE]
-
-Flash device
-
-optional arguments:
-  -h, --help            show this help message and exit
-
-configuration:
-  --verbose             Report more verbosely
-  --commander FILE      File name of the commander executable
-
-operations:
-  --erase               Erase device
-  --application FILE    Flash an image
-  --verify-application  Verify the image after flashing
-  --reset               Reset device after flashing
-  --skip-reset          Do not reset device after flashing
-"""
+"""Utitilies to flash or erase a device."""
 
 import argparse
+import errno
 import os
 import stat
 import subprocess
@@ -57,8 +32,9 @@ OPTIONS = {
         'verbose': {
             'help': 'Report more verbosely',
             'default': 0,
+            'short-option': 'v',
             'argument': {
-                'action': 'count'
+                'action': 'count',
             },
             # Levels:
             #   0   - error message
@@ -114,32 +90,21 @@ OPTIONS = {
     },
 }
 
-# Additional options that can be use to configure an `EFR32Flasher`
-# object (as dictionary keys) and/or passed as command line options.
-EFR32_OPTIONS = {
-    # Configuration options define properties used in flashing operations.
-    'configuration': {
-        # Tool configuration options.
-        'commander': {
-            'help': 'File name of the commander executable',
-            'default': 'commander',
-            'argument': {
-                'metavar': 'FILE'
-            },
-        },
-    },
-}
-
 
 class Flasher:
     """Manage flashing."""
 
-    def __init__(self, options=None):
+    def __init__(self, options=None, platform=None):
         self.options = options or {}
-        self.parser = argparse.ArgumentParser(description='Flash device')
+        self.platform = platform
+        self.parser = argparse.ArgumentParser(
+            description='Flash {} device'.format(platform or 'a'))
         self.group = {}
         self.err = 0
         self.define_options(OPTIONS)
+        self.module = __name__
+        self.argv0 = None
+        self.tool = {}
 
     def define_options(self, options):
         """Define options, including setting defaults and argument parsing."""
@@ -147,33 +112,117 @@ class Flasher:
             if group not in self.group:
                 self.group[group] = self.parser.add_argument_group(group)
             for key, info in group_options.items():
-                if 'argument' in info and 'dest' in info['argument']:
-                    option = info['argument']['dest']
-                else:
-                    option = key
+                argument = info.get('argument', {})
+                option = argument.get('dest', key)
+                # Set default value.
                 if option not in self.options:
                     self.options[option] = info['default']
+                # Add command line argument.
+                names = ['--' + key]
+                if 'short-option' in info:
+                    names += ['-' + info['short-option']]
                 self.group[group].add_argument(
-                    '--' + key,
+                    *names,
                     help=info['help'],
                     default=self.options[option],
-                    **info['argument'])
+                    **argument)
+                # Record tool options.
+                if 'tool' in info:
+                    self.tool[option] = info['tool']
 
     def status(self):
         """Return the current error code."""
         return self.err
+
+    def actions(self):
+        """Perform actions on the device according to self.options."""
+        raise NotImplementedError()
 
     def log(self, level, *args):
         """Optionally log a message to stderr."""
         if self.options['verbose'] >= level:
             print(*args, file=sys.stderr)
 
+    def run_tool_logging(self,
+                         tool,
+                         arguments,
+                         name,
+                         pass_message=None,
+                         fail_message=None,
+                         fail_level=0):
+        """Run a tool with log messages."""
+        self.log(1, name)
+        if self.run_tool(tool, arguments).err:
+            self.log(fail_level, fail_message or ('FAILED: ' + name))
+        else:
+            self.log(2, pass_message or (name + ' complete'))
+        return self
+
+    def run_tool(self, tool, arguments):
+        """Run an external tool."""
+        command = [self.options[tool]] + arguments
+        self.log(3, 'Execute:', *command)
+        try:
+            self.err = subprocess.call(command)
+        except FileNotFoundError as exception:
+            self.err = exception.errno
+            if self.err == errno.ENOENT:
+                # This likely means that the program was not found.
+                # But if it seems OK, rethrow the exception.
+                if self.verify_tool(tool):
+                    raise exception
+        return self
+
+    def verify_tool(self, tool):
+        """Run a command to verify that an external tool is available.
+
+        Prints a configurable error and returns False if not.
+        """
+        command = [i.format(**self.options) for i in self.tool[tool]['verify']]
+        try:
+            err = subprocess.call(command)
+        except OSError as ex:
+            err = ex.errno
+        if err:
+            note = self.tool[tool].get('error', 'Unable to execute {tool}.')
+            note = textwrap.dedent(note).format(tool=tool, **self.options)
+            # textwrap.fill only handles single paragraphs:
+            note = '\n\n'.join((textwrap.fill(p) for p in note.split('\n\n')))
+            print(note, file=sys.stderr)
+            return False
+        return True
+
+    def find_file(self, filename, dirs=None):
+        """Resolve a file name; also checks the script directory."""
+        if os.path.isabs(filename) or os.path.exists(filename):
+            return filename
+        dirs = dirs or []
+        if self.argv0:
+            dirs.append(os.path.dirname(self.argv0))
+        for d in dirs:
+            name = os.path.join(d, filename)
+            if os.path.exists(name):
+                return name
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT),
+                                filename)
+
+    def optional_file(self, filename, dirs=None):
+        """Resolve a file name, if present."""
+        if filename is None:
+            return None
+        return self.find_file(filename, dirs)
+
     def parse_argv(self, argv):
         """Handle command line options."""
-        args = self.parser.parse_args(argv)
+        self.argv0 = argv[0]
+        args = self.parser.parse_args(argv[1:])
         for key, value in vars(args).items():
             self.options[key.replace('_', '-')] = value
         return self
+
+    def flash_command(self, argv):
+        """Perform device actions according to the command line."""
+        return self.parse_argv(argv).actions().status()
 
     def make_wrapper(self, argv):
         """Generate script to flash a device.
@@ -190,12 +239,8 @@ class Flasher:
             metavar='FILENAME',
             required=True,
             help='flashing script name')
-        self.parser.add_argument(
-            '--scripts-dir',
-            metavar='DIR',
-            required=True,
-            help='script utilities directory')
-        args = self.parser.parse_args(argv)
+        self.argv0 = argv[0]
+        args = self.parser.parse_args(argv[1:])
 
         # Find any option values that differ from the class defaults.
         # These will be inserted into the wrapper script.
@@ -208,22 +253,18 @@ class Flasher:
         script = """
             import sys
 
-            SCRIPTS_DIR = '{scripts_dir}'
             DEFAULTS = {{
             {defaults}
             }}
 
-            sys.path.append(SCRIPTS_DIR)
             import {module}
 
             if __name__ == '__main__':
-                sys.exit({module}.flash_command(sys.argv[1:], DEFAULTS))
+                sys.exit({module}.Flasher(DEFAULTS).flash_command(sys.argv))
         """
 
         script = ('#!/usr/bin/env python' + textwrap.dedent(script).format(
-            scripts_dir=args.scripts_dir,
-            module=__name__,
-            defaults='\n'.join(defaults)))
+            module=self.module, defaults='\n'.join(defaults)))
 
         try:
             with open(args.output, 'w') as script_file:
@@ -235,83 +276,3 @@ class Flasher:
             print(exception, sys.stderr)
             return 1
         return 0
-
-
-class EFR32Flasher(Flasher):
-    """Manage efr32 flashing."""
-
-    def __init__(self, options=None):
-        super().__init__(options)
-        self.define_options(EFR32_OPTIONS)
-
-    def commander(self, arguments):
-        """Run commander."""
-        command = [self.options['commander']]
-        command += arguments
-        self.log(3, 'Execute:', *command)
-        self.err = subprocess.call(command)
-        return self
-
-    def commander_logging(self,
-                          arguments,
-                          name,
-                          pass_message=None,
-                          fail_message=None,
-                          fail_level=0):
-        """Run commander with log messages."""
-        self.log(1, name)
-        if self.commander(arguments).err:
-            self.log(fail_level, fail_message or ('FAILED: ' + name))
-        else:
-            self.log(2, pass_message or (name + ' complete'))
-        return self
-
-    def erase(self):
-        """Perform `commander device masserase`."""
-        return self.commander_logging(['device', 'masserase'], 'Erase device')
-
-    def verify(self, image):
-        """Verify image."""
-        return self.commander_logging(['verify', image], 'Verify', 'Verified',
-                                      'Not verified', 2)
-
-    def flash(self, image):
-        """Flash image."""
-        return self.commander_logging(['flash', image], 'Flash', 'Flashed')
-
-    def reset(self):
-        """Reset the device."""
-        return self.commander_logging(['device', 'reset'], 'Reset')
-
-    def actions(self):
-        """Perform actions on the device according to self.options."""
-        self.log(3, 'OPTIONS:', self.options)
-
-        if self.options['erase']:
-            if self.erase().err:
-                return self
-
-        application = self.options['application']
-        if application:
-            if self.flash(application).err:
-                return self
-            if self.options['verify-application']:
-                if self.verify(application).err:
-                    return self
-            if self.options['reset'] is None:
-                self.options['reset'] = True
-
-        if self.options['reset']:
-            if self.reset().err:
-                return self
-
-        return self
-
-
-def flash_command(argv, defaults=None):
-    """Perform device actions according to the command line and defaults."""
-    return EFR32Flasher(defaults).parse_argv(argv).actions().status()
-
-
-if __name__ == '__main__':
-    sys.exit(flash_command(sys.argv[1:]))
