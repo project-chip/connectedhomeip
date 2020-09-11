@@ -30,6 +30,7 @@ env
                         net-tools \
                         iproute2 \
                         strace \
+                        sudo \
                         python3-lockfile \
                         python3-pip \
                         python3-psutil \
