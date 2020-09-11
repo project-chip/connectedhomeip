@@ -56,3 +56,9 @@ RUN chown -R $USERNAME:$USERNAME /opt/espressif/esp-idf
 RUN chown -R $USERNAME:$USERNAME /opt/espressif/tools
 # $USERNAME needs to own west configuration to build nRF Connect examples
 RUN chown -R $USERNAME:$USERNAME /opt/NordicSemiconductor/nrfconnect/.west
+# $USERNAME needs to be part of the dialout group to access tty devices.
+RUN adduser $USERNAME dialout
+
+RUN apt-get install python3-pip
+RUN pip install pyserial
+RUN pip install future
