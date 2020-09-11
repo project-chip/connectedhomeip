@@ -8,4 +8,4 @@ ot-ctl panid 0x1234
 ot-ctl ifconfig up
 ot-ctl thread start
 
-sleep infinity
+chip-tool-server
