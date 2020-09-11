@@ -167,9 +167,17 @@
             }
         },
         {
+            "label": "Config/Build ESP32 all-clusters-app Example",
+            "type": "shell",
+            "command": "scripts/examples/build-all-clusters-app.py --clear-config m5stack",
+            "group": "build",
+            "problemMatcher": ["$gcc"]
+        },
+        {
             "label": "Build ESP32 all-clusters-app Example",
             "type": "shell",
             "command": "scripts/examples/build-all-clusters-app.py",
+
             "group": "build",
             "problemMatcher": ["$gcc"]
         },
@@ -268,6 +276,32 @@
                 "fileLocation": [
                     "relative",
                     "${workspaceFolder}/examples/shell/nrfconnect/build/nrf5340dk_nrf5340_cpuapp"
+                ]
+            }
+        },
+        {
+            "label": "Flash all-clusters esp32",
+            "type": "shell",
+            "command": "examples/all-clusters-app/esp32/build/chip-all-clusters-app.flash.py",
+            "group": "none",
+            "problemMatcher": []
+        },
+        {
+            "label": "Monitor esp32",
+            "type": "shell",
+            "command": "scripts/examples/monitor_esp32.sh",
+            "group": "none",
+            "problemMatcher": []
+        }
+        {
+            "label": "Build python",
+            "type": "shell",
+            "command": "scripts/build_python.sh",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
                 ]
             }
         }
