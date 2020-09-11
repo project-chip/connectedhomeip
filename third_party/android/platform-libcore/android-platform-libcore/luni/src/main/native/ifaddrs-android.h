@@ -69,7 +69,7 @@ struct ifaddrs {
     // Sadly, we can't keep the interface index for portability with BSD.
     // We'll have to keep the name instead, and re-query the index when
     // we need it later.
-    bool setNameAndFlagsByIndex(int interfaceIndex) {
+    bool setNameAndFlagsByIndex(unsigned int interfaceIndex) {
         // Get the name.
         char buf[IFNAMSIZ];
         char* name = if_indextoname(interfaceIndex, buf);
@@ -91,7 +91,10 @@ struct ifaddrs {
         if (rc == -1) {
             return false;
         }
-        ifa_flags = ifr.ifr_flags;
+        // ifr_flags is a bitmask, so really should be unsigned short.  But it's
+        // a short, and we're assigning into an unsigned member here, so make
+        // the casting explicit.
+        ifa_flags = (unsigned int)ifr.ifr_flags;
         return true;
     }
 
@@ -99,7 +102,7 @@ struct ifaddrs {
     // sockaddr_in or sockaddr_in6 bytes as the payload. We need to
     // stitch the two bits together into the sockaddr that's part of
     // our portable interface.
-    void setAddress(int family, void* data, size_t byteCount) {
+    void setAddress(unsigned char family, void* data, size_t byteCount) {
         // Set the address proper...
         sockaddr_storage* ss = new sockaddr_storage;
         memset(ss, 0, sizeof(*ss));
@@ -111,7 +114,7 @@ struct ifaddrs {
 
     // Netlink gives us the prefix length as a bit count. We need to turn
     // that into a BSD-compatible netmask represented by a sockaddr*.
-    void setNetmask(int family, size_t prefixLength) {
+    void setNetmask(unsigned char family, size_t prefixLength) {
         // ...and work out the netmask from the prefix length.
         sockaddr_storage* ss = new sockaddr_storage;
         memset(ss, 0, sizeof(*ss));
@@ -120,7 +123,9 @@ struct ifaddrs {
         uint8_t* dst = sockaddrBytes(family, ss);
         memset(dst, 0xff, prefixLength / 8);
         if ((prefixLength % 8) != 0) {
-            dst[prefixLength/8] = (0xff << (8 - (prefixLength % 8)));
+            // We're explicitly dropping any bits left after we bitshift that
+            // don't fit into a uint8_t.
+            dst[prefixLength/8] = (uint8_t)(0xffu << (8 - (prefixLength % 8)));
         }
     }
 
@@ -199,7 +204,7 @@ inline int getifaddrs(ifaddrs** result) {
                     size_t ifaPayloadLength = IFA_PAYLOAD(hdr);
                     while (RTA_OK(rta, ifaPayloadLength)) {
                         if (rta->rta_type == IFA_LOCAL) {
-                            int family = address->ifa_family;
+                            unsigned char family = address->ifa_family;
                             if (family == AF_INET || family == AF_INET6) {
                                 *result = new ifaddrs(*result);
                                 if (!(*result)->setNameAndFlagsByIndex(address->ifa_index)) {

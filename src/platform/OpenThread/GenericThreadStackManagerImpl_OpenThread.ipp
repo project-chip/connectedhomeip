@@ -837,6 +837,12 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadAttachedNoLock
 }
 
 template <class ImplClass>
+bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadInterfaceUpNoLock(void)
+{
+    return otIp6IsEnabled(mOTInst);
+}
+
+template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::AdjustPollingInterval(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

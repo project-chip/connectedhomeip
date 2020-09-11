@@ -416,7 +416,8 @@ INET_ERROR DNSResolver::ProcessGetAddrInfoResult(int returnCode, struct addrinfo
         // to be returned in the results.
         uint8_t numPrimaryAddrs   = CountAddresses(primaryFamily, results);
         uint8_t numSecondaryAddrs = (secondaryFamily != AF_UNSPEC) ? CountAddresses(secondaryFamily, results) : 0;
-        uint8_t numAddrs          = numPrimaryAddrs + numSecondaryAddrs;
+        // Make sure numAddrs can actually fit the sum.
+        uint16_t numAddrs = static_cast<uint16_t>(numPrimaryAddrs + numSecondaryAddrs);
 
         // If the total number of addresses to be returned exceeds the application
         // specified max, ensure that at least 1 address from the secondary family

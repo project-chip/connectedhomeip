@@ -15,8 +15,10 @@
  *    limitations under the License.
  */
 
-#include "AppConfig.h"
+#include "Server.h"
+
 #include "FreeRTOS.h"
+#include "nrf_log.h"
 #include "task.h"
 #include <string.h>
 #include <sys/param.h>
@@ -26,7 +28,6 @@
 #include "lwip/sys.h"
 #include <lwip/netdb.h>
 
-#include <app/chip-zcl-zpro-codec.h>
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
@@ -40,13 +41,11 @@
 #if CHIP_ENABLE_OPENTHREAD
 #include <openthread/message.h>
 #include <openthread/udp.h>
-#include <platform/EFR32/ThreadStackManagerImpl.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+#include <platform/nRF5/ThreadStackManagerImpl.h>
 #endif
-
-#include "Server.h"
 
 #include "attribute-storage.h"
 #include "gen/znet-bookkeeping.h"
@@ -62,12 +61,11 @@ using namespace ::chip::DeviceLayer;
 namespace {
 
 #ifndef EXAMPLE_SERVER_NODEID
-// Use this hardcoded NODEID for the lock app example if none was provided
+// "nRF5"
 #define EXAMPLE_SERVER_NODEID 0x3546526e
 #endif // EXAMPLE_SERVER_NODEID
 
-static char sDeviceName[128] = { 0 };
-// Hardcode UDP BroadcastPort. Temporary use for demo with OTBR
+char deviceName[128];
 constexpr uint16_t kUDPBroadcastPort = 23367;
 
 class ServerCallback : public SecureSessionMgrCallback
@@ -80,14 +78,14 @@ public:
         char src_addr[PeerAddress::kMaxToStringSize];
 
         // as soon as a client connects, assume it is connected
-        VerifyOrExit(buffer != NULL, EFR32_LOG("Received data but couldn't process it..."));
-        VerifyOrExit(header.GetSourceNodeId().HasValue(), EFR32_LOG("Unknown source for received message"));
+        VerifyOrExit(buffer != NULL, NRF_LOG_INFO("Received data but couldn't process it..."));
+        VerifyOrExit(header.GetSourceNodeId().HasValue(), NRF_LOG_INFO("Unknown source for received message"));
 
-        VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, EFR32_LOG("Unknown source for received message"));
+        VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, NRF_LOG_INFO("Unknown source for received message"));
 
         state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
 
-        EFR32_LOG("Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
+        NRF_LOG_INFO("Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
 
         HandleDataModelMessage(header, buffer, mgr);
         buffer = NULL;
@@ -102,7 +100,7 @@ public:
 
     virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
     {
-        EFR32_LOG("Received a new connection.");
+        NRF_LOG_INFO("Received a new connection.");
     }
 
 private:
@@ -116,34 +114,35 @@ private:
     void HandleDataModelMessage(const MessageHeader & header, System::PacketBuffer * buffer, SecureSessionMgrBase * mgr)
     {
         EmberApsFrame frame;
-        bool ret = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame);
-        if (ret)
+        bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) > 0;
+        if (ok)
         {
-            EFR32_LOG("APS framprocessing success!");
+            NRF_LOG_INFO("APS frame processing success!");
         }
         else
         {
-            EFR32_LOG("APS processing failure!");
+            NRF_LOG_INFO("APS frame processing failure!");
             System::PacketBuffer::Free(buffer);
             return;
         }
+
         uint8_t * message;
         uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
-        ret                 = emberAfProcessMessage(&frame,
-                                    0, // type
-                                    message, messageLen,
-                                    header.GetSourceNodeId().Value(), // source identifier
-                                    NULL);
+        ok                  = emberAfProcessMessage(&frame,
+                                   0, // type
+                                   message, messageLen,
+                                   header.GetSourceNodeId().Value(), // source identifier
+                                   NULL);
 
         System::PacketBuffer::Free(buffer);
 
-        if (ret)
+        if (ok)
         {
-            EFR32_LOG("Data model processing success!");
+            NRF_LOG_INFO("Data model processing success!");
         }
         else
         {
-            EFR32_LOG("Data model processing failure!");
+            NRF_LOG_INFO("Data model processing failure!");
         }
     }
 };
@@ -155,7 +154,7 @@ static SecurePairingUsingTestSecret gTestPairing;
 
 void SetDeviceName(const char * newDeviceName)
 {
-    strncpy(sDeviceName, newDeviceName, sizeof(sDeviceName) - 1);
+    strncpy(deviceName, newDeviceName, sizeof(deviceName) - 1);
 }
 
 void PublishService()
@@ -192,19 +191,18 @@ void PublishService()
     message = otUdpNewMessage(ThreadStackMgrImpl().OTInstance(), nullptr);
     otIp6AddressFromString("ff03::1", &messageInfo.mPeerAddr);
     messageInfo.mPeerPort = kUDPBroadcastPort;
-    otMessageAppend(message, sDeviceName, static_cast<uint16_t>(strlen(sDeviceName)));
+    otMessageAppend(message, deviceName, static_cast<uint16_t>(strlen(deviceName)));
 
     error = otUdpSend(ThreadStackMgrImpl().OTInstance(), &mSocket, message, &messageInfo);
 
     if (error != OT_ERROR_NONE && message != nullptr)
     {
         otMessageFree(message);
-        EFR32_LOG("Failed to otUdpSend: %d", error);
+        NRF_LOG_INFO("Failed to otUdpSend: %d", error);
     }
     ThreadStackMgrImpl().UnlockThreadStack();
 }
 
-;
 void InitDataModelHandler()
 {
     emberAfEndpointConfigure();
@@ -229,10 +227,10 @@ void StartServer(DemoSessionManager * sessions)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("ERROR setting up transport: %s", ErrorStr(err));
+        NRF_LOG_ERROR("ERROR setting up transport: %s", ErrorStr(err));
     }
     else
     {
-        EFR32_LOG("Lock Server Listening...");
+        NRF_LOG_INFO("Lock Server Listening...");
     }
 }

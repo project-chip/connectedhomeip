@@ -17,6 +17,7 @@
 #
 
 set -x
-env
 
 git clean -Xdf
+
+git submodule foreach git clean -Xdf

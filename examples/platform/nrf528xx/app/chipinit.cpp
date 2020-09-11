@@ -54,8 +54,7 @@ extern "C" {
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-#if CHIP_ENABLE_OPENTHREAD
-static void * ot_calloc(size_t n, size_t size)
+#if CHIP_ENABLE_OPENTHREAD static void * ot_calloc(size_t n, size_t size)
 {
     void * p_ptr = NULL;
 

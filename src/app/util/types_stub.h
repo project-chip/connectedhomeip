@@ -46,6 +46,10 @@
 
 #include <app/chip-zcl-zpro-codec.h> // For EmberApsFrame
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 #include "gen/gen_config.h"
 
 /**
@@ -1933,5 +1937,22 @@ typedef struct
 #define emberAfPluginColorControlServerComputePwmFromXyCallback(endpoint) (void) 0
 #define emberAfPluginColorControlServerComputePwmFromHsvCallback(endpoint) (void) 0
 #define emberAfPluginColorControlServerComputePwmFromTempCallback(endpoint) (void) 0
+
+#ifdef __cplusplus
+} // extern "C"
+#endif // __cplusplus
+/**
+ * Try to use our chip::NodeId definition if we are C++; otherwise define a
+ * ChipNodeId that's compatible.
+ */
+#ifdef __cplusplus
+#include <transport/MessageHeader.h>
+static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
+// Make it easier to have unified function declarations across C and C++ source
+// files.
+typedef chip::NodeId ChipNodeId;
+#else
+typedef uint64_t ChipNodeId;
+#endif // __cplusplus
 
 #endif // TYPES_STUB_H

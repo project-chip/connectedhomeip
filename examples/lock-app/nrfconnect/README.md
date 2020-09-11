@@ -101,7 +101,7 @@ container:
 
         $ mkdir ~/nrfconnect
         $ mkdir ~/connectedhomeip
-        $ docker run --rm -it --privileged -v /dev:/dev -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip nordicsemi/nrfconnect-chip
+        $ docker run --rm -it --privileged -v /dev:/dev -v ~/nrfconnect:/opt/nrfconnect/sdk-nrf -v ~/connectedhomeip:/var/chip nordicsemi/nrfconnect-chip
 
 > **Note**:
 >
@@ -117,11 +117,11 @@ container:
 
 If you use the container for the first time and you don't have nRF Connect SDK
 and CHIP sources downloaded yet, run `setup` command in the container to pull
-the sources into directories mounted as `/var/ncs` and `/var/chip`,
-respectively:
+the sources into directories mounted as `/opt/nrfconnect/sdk-nrf` and
+`/var/chip`, respectively:
 
         $ setup
-        /var/ncs repository is empty. Do you wish to check out nRF Connect SDK sources [master]? [Y/N] y
+        /opt/nrfconnect/sdk-nrf repository is empty. Do you wish to check out nRF Connect SDK sources [master]? [Y/N] y
         ...
         /var/chip repository is empty. Do you wish to check out Project CHIP sources [master]? [Y/N] y
         ...

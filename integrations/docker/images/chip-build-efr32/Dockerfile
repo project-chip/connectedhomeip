@@ -13,6 +13,6 @@ RUN set -x \
     ccache
 
 #Clone Gecko SDK
-RUN git clone https://github.com/SiliconLabs/sdk_support.git
+RUN mkdir -p /opt/SiliconLabs && git clone https://github.com/SiliconLabs/sdk_support.git /opt/SiliconLabs/sdk_support
 
-ENV EFR32_SDK_ROOT=/sdk_support/
+ENV EFR32_SDK_ROOT=/opt/SiliconLabs/sdk_support

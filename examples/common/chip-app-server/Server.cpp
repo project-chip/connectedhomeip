@@ -43,6 +43,15 @@ using namespace ::chip::DeviceLayer;
 #endif // EXAMPLE_SERVER_NODEID
 
 // Transport Callbacks
+
+DemoSessionManager sessions;
+
+namespace chip {
+SecureSessionMgrBase & SessionManager()
+{
+    return sessions;
+}
+} // namespace chip
 namespace {
 class ServerCallback : public SecureSessionMgrCallback
 {

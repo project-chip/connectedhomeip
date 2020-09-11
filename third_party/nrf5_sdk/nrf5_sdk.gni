@@ -43,7 +43,11 @@ template("nrf5_sdk") {
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
     }
-    include_dirs += [
+
+    # We want to treat SDK headers as system headers, so that warnings in those
+    # headers are not fatal.  Therefore don't add them directly to include_dirs;
+    # we will add them to cflags below instead.
+    _sdk_include_dirs = [
       "${nrf5_sdk_root}/components",
       "${nrf5_sdk_root}/components/boards",
       "${nrf5_sdk_root}/components/ble/ble_advertising",
@@ -141,6 +145,11 @@ template("nrf5_sdk") {
       "-Wno-array-bounds",
       "-Wno-unused-function",
     ]
+
+    # Now add our "system-header" include dirs
+    foreach(include_dir, _sdk_include_dirs) {
+      cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
+    }
   }
 
   # TODO - Break up this monolith and make it configurable.

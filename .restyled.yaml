@@ -43,6 +43,9 @@ exclude:
     - ".github/workflows/*" # https://github.com/restyled-io/restyler/issues/73
     - ".github/**/*" # https://github.com/restyled-io/restyler/issues/73
     - ".github/*" # https://github.com/restyled-io/restyler/issues/73
+    - "**/third_party/*" # https://github.com/restyled-io/restyled.io/issues/213
+    - "**/third_party/**" # https://github.com/restyled-io/restyled.io/issues/213
+    - "**/third_party/**/*" # https://github.com/restyled-io/restyled.io/issues/213
     - "third_party/android/**/*"
     - "third_party/inipp/repo/**/*"
     - "third_party/jlink/**/*"

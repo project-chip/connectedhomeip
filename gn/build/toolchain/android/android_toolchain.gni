@@ -62,7 +62,7 @@ template("android_clang_toolchain") {
 
   gcc_toolchain(target_name) {
     toolchain_args = _android_toolchain_args
-    ar = "llvm-ar"
+    ar = _ndk_prefix + "llvm-ar"
     cc = _ndk_prefix + _tool_name_root + "clang"
     cxx = _ndk_prefix + _tool_name_root + "clang++"
   }
