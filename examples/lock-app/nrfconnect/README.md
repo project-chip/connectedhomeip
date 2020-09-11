@@ -101,7 +101,7 @@ container:
 
         $ mkdir ~/nrfconnect
         $ mkdir ~/connectedhomeip
-        $ docker run --rm -it --privileged -v /dev:/dev -v ~/nrfconnect:/opt/nrfconnect/sdk-nrf -v ~/connectedhomeip:/var/chip nordicsemi/nrfconnect-chip
+        $ docker run --rm -it --privileged -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip nordicsemi/nrfconnect-chip
 
 > **Note**:
 >
@@ -109,19 +109,19 @@ container:
 >     source directory in case you have it already installed.
 > -   Likewise, `~/connectedhomeip` can be replaced with an absolute path to
 >     CHIP source directory.
-> -   `-privileged -v /dev:/dev` parameters can be omitted if you're not
->     planning to flash the example onto hardware. The parameter gives the
->     container full access to devices on your system.
+> -   `--privileged` flag can be omitted if you're not planning to flash the
+>     example onto hardware. The parameter gives the container access to devices
+>     connected to your computer when the container is started.
 > -   `--rm` flag can be omitted if you don't want the container to be
 >     auto-removed when you exit the container shell session.
 
 If you use the container for the first time and you don't have nRF Connect SDK
 and CHIP sources downloaded yet, run `setup` command in the container to pull
-the sources into directories mounted as `/opt/nrfconnect/sdk-nrf` and
+the sources into directories mounted as `/var/ncs` and
 `/var/chip`, respectively:
 
         $ setup
-        /opt/nrfconnect/sdk-nrf repository is empty. Do you wish to check out nRF Connect SDK sources [master]? [Y/N] y
+        /var/ncs repository is empty. Do you wish to check out nRF Connect SDK sources [master]? [Y/N] y
         ...
         /var/chip repository is empty. Do you wish to check out Project CHIP sources [master]? [Y/N] y
         ...
