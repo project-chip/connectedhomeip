@@ -441,8 +441,8 @@ exit:
     return error;
 }
 
-CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length,
-                                                       const uint8_t * signature, const size_t signature_length) const
+CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const uint8_t * signature,
+                                                       const size_t signature_length) const
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -481,8 +481,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR P256Keypair::ECDH_derive_secret(const ECPKey & remote_public_key, uint8_t * out_secret,
-                                           size_t & out_secret_length) const
+CHIP_ERROR P256Keypair::ECDH_derive_secret(const ECPKey & remote_public_key, uint8_t * out_secret, size_t & out_secret_length) const
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;

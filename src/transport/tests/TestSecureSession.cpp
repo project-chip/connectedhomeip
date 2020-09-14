@@ -52,17 +52,20 @@ void SecureChannelInitTest(nlTestSuite * inSuite, void * inContext)
 
     // Test the channel is successfully created with valid parameters
     const char * info = "Test Info";
-    NL_TEST_ASSERT(inSuite, channel.Init(keypair, keypair2.Pubkey(), NULL, 0, (const uint8_t *) info, sizeof(info)) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   channel.Init(keypair, keypair2.Pubkey(), NULL, 0, (const uint8_t *) info, sizeof(info)) == CHIP_NO_ERROR);
 
     // Test the channel cannot be reinitialized
-    NL_TEST_ASSERT(inSuite, channel.Init(keypair, keypair2.Pubkey(), NULL, 0, (const uint8_t *) info, sizeof(info)) == CHIP_ERROR_INCORRECT_STATE);
+    NL_TEST_ASSERT(inSuite,
+                   channel.Init(keypair, keypair2.Pubkey(), NULL, 0, (const uint8_t *) info, sizeof(info)) ==
+                       CHIP_ERROR_INCORRECT_STATE);
 
     // Test the channel can be initialized with valid salt
     const char * salt = "Test Salt";
     SecureSession channel2;
     NL_TEST_ASSERT(inSuite,
-                   channel2.Init(keypair, keypair2.Pubkey(), (const uint8_t *) salt, sizeof(salt), (const uint8_t *) info, sizeof(info)) ==
-                       CHIP_NO_ERROR);
+                   channel2.Init(keypair, keypair2.Pubkey(), (const uint8_t *) salt, sizeof(salt), (const uint8_t *) info,
+                                 sizeof(info)) == CHIP_NO_ERROR);
 }
 
 void SecureChannelEncryptTest(nlTestSuite * inSuite, void * inContext)
@@ -85,8 +88,8 @@ void SecureChannelEncryptTest(nlTestSuite * inSuite, void * inContext)
     const char * info = "Test Info";
     const char * salt = "Test Salt";
     NL_TEST_ASSERT(inSuite,
-                   channel.Init(keypair, keypair2.Pubkey(), (const uint8_t *) salt, sizeof(salt), (const uint8_t *) info, sizeof(info)) ==
-                       CHIP_NO_ERROR);
+                   channel.Init(keypair, keypair2.Pubkey(), (const uint8_t *) salt, sizeof(salt), (const uint8_t *) info,
+                                sizeof(info)) == CHIP_NO_ERROR);
 
     // Test initialized channel, but invalid arguments
     NL_TEST_ASSERT(inSuite, channel.Encrypt(NULL, 0, NULL, header) == CHIP_ERROR_INVALID_ARGUMENT);
@@ -114,8 +117,8 @@ void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   channel.Init(keypair, keypair2.Pubkey(), (const uint8_t *) salt, sizeof(salt), (const uint8_t *) info, sizeof(info)) ==
-                       CHIP_NO_ERROR);
+                   channel.Init(keypair, keypair2.Pubkey(), (const uint8_t *) salt, sizeof(salt), (const uint8_t *) info,
+                                sizeof(info)) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, sizeof(plain_text), encrypted, header) == CHIP_NO_ERROR);
 
     SecureSession channel2;
@@ -124,8 +127,8 @@ void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite,
                    channel2.Decrypt(encrypted, sizeof(plain_text), output, header) == CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     NL_TEST_ASSERT(inSuite,
-                   channel2.Init(keypair2, keypair.Pubkey(), (const uint8_t *) salt, sizeof(salt), (const uint8_t *) info, sizeof(info)) ==
-                       CHIP_NO_ERROR);
+                   channel2.Init(keypair2, keypair.Pubkey(), (const uint8_t *) salt, sizeof(salt), (const uint8_t *) info,
+                                 sizeof(info)) == CHIP_NO_ERROR);
 
     // Channel initialized, but invalid arguments to decrypt
     NL_TEST_ASSERT(inSuite, channel2.Decrypt(NULL, 0, NULL, header) == CHIP_ERROR_INVALID_ARGUMENT);

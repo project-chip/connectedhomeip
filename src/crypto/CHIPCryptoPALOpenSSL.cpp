@@ -460,7 +460,7 @@ ECName MapECName(SupportedECPKeyTypes keyType)
 }
 
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, uint8_t * out_signature,
-                          size_t & out_signature_length)
+                                       size_t & out_signature_length)
 {
     ERR_clear_error();
 
@@ -556,8 +556,8 @@ exit:
     return error;
 }
 
-CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length,
-                                        const uint8_t * signature, const size_t signature_length) const
+CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const uint8_t * signature,
+                                                       const size_t signature_length) const
 {
     ERR_clear_error();
     CHIP_ERROR error            = CHIP_ERROR_INTERNAL;
@@ -731,8 +731,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR P256Keypair::ECDH_derive_secret(const ECPKey & remote_public_key, uint8_t * out_secret,
-                              size_t & out_secret_length) const
+CHIP_ERROR P256Keypair::ECDH_derive_secret(const ECPKey & remote_public_key, uint8_t * out_secret, size_t & out_secret_length) const
 {
     ERR_clear_error();
     CHIP_ERROR error      = CHIP_NO_ERROR;
@@ -825,9 +824,9 @@ CHIP_ERROR P256Keypair::Initialize()
         const EC_POINT * pubkey_ecp = EC_KEY_get0_public_key(ec_key);
         VerifyOrExit(pubkey_ecp != nullptr, error = CHIP_ERROR_INTERNAL);
 
-        pubkey_size =
-            EC_POINT_point2oct(group, pubkey_ecp, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(mPublicKey), mPublicKey.Length(), nullptr);
-        pubkey_ecp = nullptr;
+        pubkey_size = EC_POINT_point2oct(group, pubkey_ecp, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(mPublicKey),
+                                         mPublicKey.Length(), nullptr);
+        pubkey_ecp  = nullptr;
 
         VerifyOrExit(pubkey_size == mPublicKey.Length(), error = CHIP_ERROR_INTERNAL);
     }
