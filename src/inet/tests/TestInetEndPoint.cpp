@@ -28,6 +28,8 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include "TestInetLayer.h"
+
 #include <errno.h>
 #include <inttypes.h>
 #include <stdint.h>
@@ -55,10 +57,10 @@ using namespace chip::System;
 
 #define TOOL_NAME "TestInetEndPoint"
 
-static ArgParser::HelpOptions gHelpOptions(TOOL_NAME, "Usage: " TOOL_NAME " [<options...>]\n",
+ArgParser::HelpOptions gHelpOptions(TOOL_NAME, "Usage: " TOOL_NAME " [<options...>]\n",
                                            CHIP_VERSION_STRING "\n" CHIP_TOOL_COPYRIGHT);
 
-static ArgParser::OptionSet * gToolOptionSets[] = { &gNetworkOptions, &gFaultInjectionOptions, &gHelpOptions, NULL };
+ArgParser::OptionSet * gToolOptionSets[] = { &gNetworkOptions, &gFaultInjectionOptions, &gHelpOptions, NULL };
 
 bool callbackHandlerCalled = false;
 
@@ -82,7 +84,7 @@ void HandleTimer(Layer * aLayer, void * aAppState, Error aError)
 }
 
 // Test before init network, Inet is not initialized
-static void TestInetPre(nlTestSuite * inSuite, void * inContext)
+void TestInetPre(nlTestSuite * inSuite, void * inContext)
 {
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
     RawEndPoint * testRawEP = NULL;
@@ -127,9 +129,9 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
 
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
 // Test Inet ResolveHostAddress functionality
-static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
+void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
 {
-    char testHostName1[20] = "www.nest.com";
+    char testHostName1[20] = "www.google.com";
     char testHostName2[20] = "127.0.0.1";
     char testHostName3[20] = "";
     char testHostName4[260];
@@ -188,10 +190,10 @@ static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
 // Test Inet ParseHostPortAndInterface
-static void TestParseHost(nlTestSuite * inSuite, void * inContext)
+void TestParseHost(nlTestSuite * inSuite, void * inContext)
 {
     char correctHostName[7][30] = {
-        "10.0.0.1", "10.0.0.1:3000", "www.nest.com", "www.nest.com:3000", "[fd00:0:1:1::1]:3000", "[fd00:0:1:1::1]:300%wpan0",
+        "10.0.0.1", "10.0.0.1:3000", "www.google.com", "www.google.com:3000", "[fd00:0:1:1::1]:3000", "[fd00:0:1:1::1]:300%wpan0",
         "%wpan0"
     };
     char invalidHostName[4][30] = { "[fd00::1]5", "[fd00:0:1:1::1:3000", "10.0.0.1:1234567", "10.0.0.1:er31" };
@@ -214,7 +216,7 @@ static void TestParseHost(nlTestSuite * inSuite, void * inContext)
     }
 }
 
-static void TestInetError(nlTestSuite * inSuite, void * inContext)
+void TestInetError(nlTestSuite * inSuite, void * inContext)
 {
     INET_ERROR err = INET_NO_ERROR;
 
@@ -223,7 +225,7 @@ static void TestInetError(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, IsErrorPOSIX(err));
 }
 
-static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
+void TestInetInterface(nlTestSuite * inSuite, void * inContext)
 {
     InterfaceIterator intIterator;
     InterfaceAddressIterator addrIterator;
@@ -296,7 +298,7 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !addrIterator.HasBroadcastAddress());
 }
 
-static void TestInetEndPoint(nlTestSuite * inSuite, void * inContext)
+void TestInetEndPointFunct(nlTestSuite * inSuite, void * inContext)
 {
     INET_ERROR err;
     IPAddress addr_any = IPAddress::Any;
@@ -478,7 +480,7 @@ static void TestInetEndPoint(nlTestSuite * inSuite, void * inContext)
 }
 
 // Test the InetLayer resource limitation
-static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
+void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 {
     RawEndPoint * testRawEP = NULL;
     UDPEndPoint * testUDPEP = NULL;
@@ -525,7 +527,7 @@ static const nlTest sTests[] = { NL_TEST_DEF("InetEndPoint::PreTest", TestInetPr
                                  NL_TEST_DEF("InetEndPoint::TestParseHost", TestParseHost),
                                  NL_TEST_DEF("InetEndPoint::TestInetError", TestInetError),
                                  NL_TEST_DEF("InetEndPoint::TestInetInterface", TestInetInterface),
-                                 NL_TEST_DEF("InetEndPoint::TestInetEndPoint", TestInetEndPoint),
+                                 NL_TEST_DEF("InetEndPoint::TestInetEndPoint", TestInetEndPointFunct),
                                  NL_TEST_DEF("InetEndPoint::TestEndPointLimit", TestInetEndPointLimit),
                                  NL_TEST_SENTINEL() };
 
@@ -535,7 +537,7 @@ static const nlTest sTests[] = { NL_TEST_DEF("InetEndPoint::PreTest", TestInetPr
  *  This is a work-around to initiate PacketBuffer protected class instance's
  *  data and set it to a known state, before an instance is created.
  */
-static int TestSetup(void * inContext)
+int TestSetup(void * inContext)
 {
     return (SUCCESS);
 }
@@ -544,13 +546,13 @@ static int TestSetup(void * inContext)
  *  Tear down the test suite.
  *  Free memory reserved at TestSetup.
  */
-static int TestTeardown(void * inContext)
+int TestTeardown(void * inContext)
 {
     return (SUCCESS);
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-int TestInetEndPoint(void)
+int TestInetEndPointFunct(void)
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // clang-format off
@@ -574,10 +576,10 @@ int TestInetEndPoint(void)
 
 static void __attribute__((constructor)) TestCHIPInetEndpointCtor(void)
 {
-    VerifyOrDie(RegisterUnitTests(&TestInetEndPoint) == CHIP_NO_ERROR);
+    VerifyOrDie(RegisterUnitTests(&TestInetEndPointFunct) == CHIP_NO_ERROR);
 }
 
-int main(int argc, char * argv[])
+int TestInetEndPoint(int argc, char * argv[])
 {
     SetSIGUSR1Handler();
 
@@ -589,5 +591,5 @@ int main(int argc, char * argv[])
     // Generate machine-readable, comma-separated value (CSV) output.
     nlTestSetOutputStyle(OUTPUT_CSV);
 
-    return (TestInetEndPoint());
+    return (TestInetEndPointFunct());
 }

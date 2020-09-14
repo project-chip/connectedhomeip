@@ -27,6 +27,8 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include "TestInetLayer.h"
+
 #include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
@@ -76,18 +78,18 @@ struct DNSResolutionTestContext
     IPAddress resultsBuf[kMaxResults];
 };
 
-static void RunTestCase(nlTestSuite * testSuite, const DNSResolutionTestCase & testCase);
-static void StartTestCase(DNSResolutionTestContext & testContext);
-static void HandleResolutionComplete(void * appState, INET_ERROR err, uint8_t addrCount, IPAddress * addrArray);
-static void ServiceNetworkUntilDone(uint32_t timeoutMS);
-static void HandleSIGUSR1(int sig);
+void RunTestCase(nlTestSuite * testSuite, const DNSResolutionTestCase & testCase);
+void StartTestCase(DNSResolutionTestContext & testContext);
+void HandleResolutionComplete(void * appState, INET_ERROR err, uint8_t addrCount, IPAddress * addrArray);
+void ServiceNetworkUntilDone(uint32_t timeoutMS);
+void HandleSIGUSR1(int sig);
 
 // clang-format off
-static ArgParser::HelpOptions gHelpOptions(TOOL_NAME,
+ArgParser::HelpOptions gHelpOptions(TOOL_NAME,
                                            "Usage: " TOOL_NAME " [<options...>]\n",
                                            CHIP_VERSION_STRING "\n" CHIP_TOOL_COPYRIGHT);
 
-static ArgParser::OptionSet * gToolOptionSets[] =
+ArgParser::OptionSet * gToolOptionSets[] =
 {
     &gNetworkOptions,
     &gFaultInjectionOptions,
@@ -99,7 +101,7 @@ static ArgParser::OptionSet * gToolOptionSets[] =
 /**
  * Test basic name resolution functionality.
  */
-static void TestDNSResolution_Basic(nlTestSuite * testSuite, void * testContext)
+void TestDNSResolution_Basic(nlTestSuite * testSuite, void * testContext)
 {
     // clang-format off
 
@@ -147,7 +149,7 @@ static void TestDNSResolution_Basic(nlTestSuite * testSuite, void * testContext)
 /**
  * Test resolving a name using various address type options.
  */
-static void TestDNSResolution_AddressTypeOption(nlTestSuite * testSuite, void * testContext)
+void TestDNSResolution_AddressTypeOption(nlTestSuite * testSuite, void * testContext)
 {
     // clang-format off
 
@@ -212,7 +214,7 @@ static void TestDNSResolution_AddressTypeOption(nlTestSuite * testSuite, void * 
 /**
  * Test resolving a name with a limited number of results.
  */
-static void TestDNSResolution_RestrictedResults(nlTestSuite * testSuite, void * testContext)
+void TestDNSResolution_RestrictedResults(nlTestSuite * testSuite, void * testContext)
 {
     // clang-format off
 
@@ -279,7 +281,7 @@ static void TestDNSResolution_RestrictedResults(nlTestSuite * testSuite, void * 
 /**
  * Test resolving a non-existant name.
  */
-static void TestDNSResolution_NoRecord(nlTestSuite * testSuite, void * testContext)
+void TestDNSResolution_NoRecord(nlTestSuite * testSuite, void * testContext)
 {
     // clang-format off
     RunTestCase(testSuite,
@@ -299,7 +301,7 @@ static void TestDNSResolution_NoRecord(nlTestSuite * testSuite, void * testConte
 /**
  * Test resolving a name where the resultant DNS entry lacks an A or AAAA record.
  */
-static void TestDNSResolution_NoHostRecord(nlTestSuite * testSuite, void * testContext)
+void TestDNSResolution_NoHostRecord(nlTestSuite * testSuite, void * testContext)
 {
     // clang-format off
 
@@ -349,7 +351,7 @@ static void TestDNSResolution_NoHostRecord(nlTestSuite * testSuite, void * testC
 /**
  * Test resolving text form IP addresses.
  */
-static void TestDNSResolution_TextForm(nlTestSuite * testSuite, void * testContext)
+void TestDNSResolution_TextForm(nlTestSuite * testSuite, void * testContext)
 {
     // clang-format off
     RunTestCase(testSuite,
@@ -405,7 +407,7 @@ static void TestDNSResolution_TextForm(nlTestSuite * testSuite, void * testConte
     // clang-format on
 }
 
-static void TestDNSResolution_Cancel(nlTestSuite * testSuite, void * inContext)
+void TestDNSResolution_Cancel(nlTestSuite * testSuite, void * inContext)
 {
     DNSResolutionTestContext testContext{
         testSuite, DNSResolutionTestCase{ "www.google.com", kDNSOption_Default, kMaxResults, INET_NO_ERROR, true, false }
@@ -433,7 +435,7 @@ static void TestDNSResolution_Cancel(nlTestSuite * testSuite, void * inContext)
     sNumResInProgress = 0;
 }
 
-static void TestDNSResolution_Simultaneous(nlTestSuite * testSuite, void * inContext)
+void TestDNSResolution_Simultaneous(nlTestSuite * testSuite, void * inContext)
 {
     // clang-format off
     DNSResolutionTestContext tests[] =
@@ -505,7 +507,7 @@ static void TestDNSResolution_Simultaneous(nlTestSuite * testSuite, void * inCon
     NL_TEST_ASSERT(testSuite, sNumResInProgress == 0);
 }
 
-static void RunTestCase(nlTestSuite * testSuite, const DNSResolutionTestCase & testCase)
+void RunTestCase(nlTestSuite * testSuite, const DNSResolutionTestCase & testCase)
 {
     DNSResolutionTestContext testContext{ testSuite, testCase };
 
@@ -522,7 +524,7 @@ static void RunTestCase(nlTestSuite * testSuite, const DNSResolutionTestCase & t
     NL_TEST_ASSERT(testSuite, sNumResInProgress == 0);
 }
 
-static void StartTestCase(DNSResolutionTestContext & testContext)
+void StartTestCase(DNSResolutionTestContext & testContext)
 {
     INET_ERROR err                   = INET_NO_ERROR;
     DNSResolutionTestCase & testCase = testContext.testCase;
@@ -553,7 +555,7 @@ static void StartTestCase(DNSResolutionTestContext & testContext)
     }
 }
 
-static void HandleResolutionComplete(void * appState, INET_ERROR err, uint8_t addrCount, IPAddress * addrArray)
+void HandleResolutionComplete(void * appState, INET_ERROR err, uint8_t addrCount, IPAddress * addrArray)
 {
     DNSResolutionTestContext & testContext = *static_cast<DNSResolutionTestContext *>(appState);
     DNSResolutionTestCase & testCase       = testContext.testCase;
@@ -653,7 +655,7 @@ static void HandleResolutionComplete(void * appState, INET_ERROR err, uint8_t ad
     }
 }
 
-static void ServiceNetworkUntilDone(uint32_t timeoutMS)
+void ServiceNetworkUntilDone(uint32_t timeoutMS)
 {
     uint64_t timeoutTimeMS = System::Layer::GetClock_MonotonicMS() + timeoutMS;
     struct timeval sleepTime;
@@ -671,14 +673,14 @@ static void ServiceNetworkUntilDone(uint32_t timeoutMS)
     }
 }
 
-static void HandleSIGUSR1(int sig)
+void HandleSIGUSR1(int sig)
 {
     gInet.Shutdown();
 
     exit(0);
 }
 
-int TestInetLayerDNS(void)
+int TestInetLayerDNSFunct(void)
 {
     // clang-format off
     const nlTest DNSTests[] =
@@ -719,12 +721,11 @@ int TestInetLayerDNS(void)
 
 static void __attribute__((constructor)) TestCHIPInetLayerDNSCtor(void)
 {
-    VerifyOrDie(RegisterUnitTests(&TestInetLayerDNS) == CHIP_NO_ERROR);
+    VerifyOrDie(RegisterUnitTests(&TestInetLayerDNSFunct) == CHIP_NO_ERROR);
 }
-
 #else // !INET_CONFIG_ENABLE_DNS_RESOLVER
 
-int TestInetLayerDNS(void)
+int TestInetLayerDNSFunct(void)
 {
     fprintf(stderr, "Please assert INET_CONFIG_ENABLE_DNS_RESOLVER to use this test.\n");
 
@@ -733,7 +734,7 @@ int TestInetLayerDNS(void)
 
 #endif // !INET_CONFIG_ENABLE_DNS_RESOLVER
 
-int main(int argc, char * argv[])
+int TestInetLayerDNS(int argc, char * argv[])
 {
     SetupFaultInjectionContext(argc, argv);
 
@@ -747,5 +748,5 @@ int main(int argc, char * argv[])
 
     nlTestSetOutputStyle(OUTPUT_CSV);
 
-    return (TestInetLayerDNS());
+    return (TestInetLayerDNSFunct());
 }

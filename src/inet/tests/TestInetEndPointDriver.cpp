@@ -17,26 +17,20 @@
 
 /**
  *    @file
- *      This file declares test entry points for CHIP Internet (inet)
- *      layer library unit tests.
+ *      This file implements a standalone/native program executable
+ *      test driver for the CHIP Internet (inet) library address unit
+ *      tests.
  *
  */
 
-#ifndef TESTINETLAYER_H
-#define TESTINETLAYER_H
+#include "TestInetLayer.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <nlunit-test.h>
 
-int TestInetAddress(void);
-int TestInetBuffer(void);
-int TestInetErrorStr(void);
-int TestInetTimer(void);
-int TestInetEndPoint(int argc, char * argv[]);
-int TestInetLayerDNS(int argc, char * argv[]);
-#ifdef __cplusplus
+int main(int argc, char * argv[])
+{
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nlTestSetOutputStyle(OUTPUT_CSV);
+
+    return (TestInetEndPoint(argc, argv));
 }
-#endif
-
-#endif // TESTINETLAYER_H
