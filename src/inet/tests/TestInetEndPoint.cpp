@@ -28,6 +28,8 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include "TestInetLayer.h"
+
 #include <errno.h>
 #include <inttypes.h>
 #include <stdint.h>
@@ -54,11 +56,6 @@ using namespace chip::Inet;
 using namespace chip::System;
 
 #define TOOL_NAME "TestInetEndPoint"
-
-static ArgParser::HelpOptions gHelpOptions(TOOL_NAME, "Usage: " TOOL_NAME " [<options...>]\n",
-                                           CHIP_VERSION_STRING "\n" CHIP_TOOL_COPYRIGHT);
-
-static ArgParser::OptionSet * gToolOptionSets[] = { &gNetworkOptions, &gFaultInjectionOptions, &gHelpOptions, NULL };
 
 bool callbackHandlerCalled = false;
 
@@ -129,7 +126,7 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
 // Test Inet ResolveHostAddress functionality
 static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
 {
-    char testHostName1[20] = "www.nest.com";
+    char testHostName1[20] = "www.google.com";
     char testHostName2[20] = "127.0.0.1";
     char testHostName3[20] = "";
     char testHostName4[260];
@@ -191,7 +188,7 @@ static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
 static void TestParseHost(nlTestSuite * inSuite, void * inContext)
 {
     char correctHostName[7][30] = {
-        "10.0.0.1", "10.0.0.1:3000", "www.nest.com", "www.nest.com:3000", "[fd00:0:1:1::1]:3000", "[fd00:0:1:1::1]:300%wpan0",
+        "10.0.0.1", "10.0.0.1:3000", "www.google.com", "www.google.com:3000", "[fd00:0:1:1::1]:3000", "[fd00:0:1:1::1]:300%wpan0",
         "%wpan0"
     };
     char invalidHostName[4][30] = { "[fd00::1]5", "[fd00:0:1:1::1:3000", "10.0.0.1:1234567", "10.0.0.1:er31" };
@@ -296,7 +293,7 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !addrIterator.HasBroadcastAddress());
 }
 
-static void TestInetEndPoint(nlTestSuite * inSuite, void * inContext)
+static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
 {
     INET_ERROR err;
     IPAddress addr_any = IPAddress::Any;
@@ -525,7 +522,7 @@ static const nlTest sTests[] = { NL_TEST_DEF("InetEndPoint::PreTest", TestInetPr
                                  NL_TEST_DEF("InetEndPoint::TestParseHost", TestParseHost),
                                  NL_TEST_DEF("InetEndPoint::TestInetError", TestInetError),
                                  NL_TEST_DEF("InetEndPoint::TestInetInterface", TestInetInterface),
-                                 NL_TEST_DEF("InetEndPoint::TestInetEndPoint", TestInetEndPoint),
+                                 NL_TEST_DEF("InetEndPoint::TestInetEndPoint", TestInetEndPointInternal),
                                  NL_TEST_DEF("InetEndPoint::TestEndPointLimit", TestInetEndPointLimit),
                                  NL_TEST_SENTINEL() };
 
@@ -550,7 +547,7 @@ static int TestTeardown(void * inContext)
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-int TestInetEndPoint(void)
+int TestInetEndPointInternal(void)
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // clang-format off
@@ -574,20 +571,15 @@ int TestInetEndPoint(void)
 
 static void __attribute__((constructor)) TestCHIPInetEndpointCtor(void)
 {
-    VerifyOrDie(RegisterUnitTests(&TestInetEndPoint) == CHIP_NO_ERROR);
+    VerifyOrDie(RegisterUnitTests(&TestInetEndPointInternal) == CHIP_NO_ERROR);
 }
 
-int main(int argc, char * argv[])
+int TestInetEndPoint()
 {
     SetSIGUSR1Handler();
-
-    if (!ParseArgs(TOOL_NAME, argc, argv, gToolOptionSets, NULL))
-    {
-        exit(EXIT_FAILURE);
-    }
 
     // Generate machine-readable, comma-separated value (CSV) output.
     nlTestSetOutputStyle(OUTPUT_CSV);
 
-    return (TestInetEndPoint());
+    return (TestInetEndPointInternal());
 }
