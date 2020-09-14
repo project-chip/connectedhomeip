@@ -37,4 +37,3 @@ fi
 
 #get size of the .s37 binary file generated
 arm-none-eabi-size $(find ./"$2"/"$3" -type f -name "*.s37")
-
