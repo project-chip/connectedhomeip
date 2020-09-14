@@ -189,10 +189,10 @@ struct ConnectionDataBundle
     GVariant * mpVal;
 };
 
-CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & aBleAdvConfig, BluezEndpoint *& apEndpoint);
+CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & aBleAdvConfig, void *& apEndpoint);
 bool BluezRunOnBluezThread(int (*aCallback)(void *), void * apClosure);
-bool SendBluezIndication(BluezConnection * apConn, chip::System::PacketBuffer * apBuf);
-bool CloseBluezConnection(BluezConnection * apConn);
+bool SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBuffer * apBuf);
+bool CloseBluezConnection(BLE_CONNECTION_OBJECT apConn);
 CHIP_ERROR StartBluezAdv(BluezEndpoint * apEndpoint);
 CHIP_ERROR StopBluezAdv(BluezEndpoint * apEndpoint);
 CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint);

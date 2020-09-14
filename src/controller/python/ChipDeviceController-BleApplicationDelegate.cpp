@@ -1,6 +1,8 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2014-2017 Nest Labs, Inc.
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,29 +16,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "ChipDeviceController-BleApplicationDelegate.h"
+#include <ble/BleApplicationDelegate.h>
 
-/**
- *    @file
- *          Platform-specific configuration overrides for the CHIP BLE
- *          Layer on Linux platforms.
- *
- */
+void DeviceController_BleApplicationDelegate::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj)
+{
+    // NO-OP
 
-#ifndef BLE_PLATFORM_CONFIG_H
-#define BLE_PLATFORM_CONFIG_H
-
-namespace chip {
-namespace DeviceLayer {
-namespace Internal {
-struct BluezConnection;
-} // namespace Internal
-} // namespace DeviceLayer
-} // namespace chip
-
-// ==================== Platform Adaptations ====================
-#define BLE_CONNECTION_UNINITIALIZED nullptr
-// ========== Platform-specific Configuration Overrides =========
-
-/* none so far */
-
-#endif // BLE_PLATFORM_CONFIG_H
+    // TODO Python queue-based implementation
+}
