@@ -66,6 +66,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
         "${chip_root}/examples/shell",
         "${chip_root}/src/qrcodetool",
         "${chip_root}/src/setup_payload",
+        "${chip_root}/src/controller/python",
       ]
     }
 
