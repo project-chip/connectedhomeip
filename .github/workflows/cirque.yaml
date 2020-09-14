@@ -34,4 +34,4 @@ jobs:
                   scripts/tests/cirque_tests.sh bootstrap
             - name: Run Tests
               run: |
-                  scripts/tests/cirque_tests.sh run_all_tests
+                  sudo scripts/tests/cirque_tests.sh run_all_tests

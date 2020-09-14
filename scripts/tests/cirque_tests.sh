@@ -35,7 +35,7 @@ function __flask_clean() {
     flask_pid=$(ps aux | grep "[f]lask run" | grep -v "sudo" | awk '{print $2}' | sort -k2 -rn)
     if [ ! -z "$flask_pid" ]; then
         for pid in "$flask_pid"; do
-            sudo kill -2 "$pid"
+            kill -2 "$pid"
         done
     fi
 }
@@ -44,7 +44,7 @@ function __socat_clean() {
     socat_pid=$(ps aux | grep "[s]ocat" | awk '{print $2}')
     if [ ! -z "$socat_pid" ]; then
         for pid in "$socat_pid"; do
-            sudo kill -2 "$pid"
+            kill -2 "$pid"
         done
     fi
 }
@@ -53,7 +53,7 @@ function __virtual_thread_clean() {
     vthread_pid=$(ps aux | grep "[o]t-ncp-ftd" | awk '{print $2}')
     if [ ! -z "$vthread_pid" ]; then
         for pid in "$vthread_pid"; do
-            sudo kill -2 "$pid"
+            kill -2 "$pid"
         done
     fi
 }
@@ -87,7 +87,6 @@ function cirquetest_bootstrap() {
     # this is an expected behavior caused by pigweed/activate.sh
     set +e
     source "$REPO_DIR/scripts/bootstrap.sh"
-    source "$REPO_DIR/scripts/activate.sh"
 }
 
 function cirquetest_run_test() {
@@ -98,8 +97,11 @@ function cirquetest_run_test() {
     ./"$1.sh"
     exitcode=$?
     __cirquetest_clean_flask
-    # Cleanup containers and possibly networks to run more tests
+    # Flask will create many virtual networks for running tests,
+    # After test finished, the container is perserved and networks will not delete
+    # This is useful when running tests on local workstation, but not for CI.
     echo "Do docker system prune"
+    docker ps -aq | xargs docker stop > /dev/null 2>&1
     (yes | docker system prune) >/dev/null 2>&1
     return "$exitcode"
 }
