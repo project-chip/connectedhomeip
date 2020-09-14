@@ -54,6 +54,6 @@ chip_test_suite("tests") {
     "TestInetAddress",
     "TestInetErrorStr",
     "TestInetEndPoint",
-    "TestInetLayerDNS"
+    "TestInetLayerDNS",
   ]
 }
