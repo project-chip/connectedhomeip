@@ -102,12 +102,12 @@ void FillPrefix(char * buf, uint8_t bufLen, uint8_t chipCategory, uint8_t otLogL
     size_t prefixLen;
 
     /* add the error string */
-    assert(bufLen > ChipLoggingChipPrefixLen);
+    VerifyOrDie(bufLen > ChipLoggingChipPrefixLen);
     ::GetMessageString(buf, chipCategory, otLogLevel);
 
     /* add the module name string */
     prefixLen = strlen(buf);
-    assert(bufLen > (prefixLen + ChipLoggingModuleNameLen + 3));
+    VerifyOrDie(bufLen > (prefixLen + ChipLoggingModuleNameLen + 3));
     buf[prefixLen++] = '[';
     GetModuleName(buf + prefixLen, module);
     prefixLen        = strlen(buf);
@@ -156,7 +156,7 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
 
             // Append the log message.
             writtenLen = vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen - EOL_CHARS_LEN, msg, v);
-            assert(writtenLen > 0);
+            VerifyOrDie(writtenLen > 0);
             memcpy(formattedMsg + prefixLen + writtenLen, EOL_CHARS, EOL_CHARS_LEN);
 
             K32WWriteBlocking((const uint8_t *) formattedMsg, strlen(formattedMsg));
@@ -233,7 +233,7 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
 
     // Append the log message.
     writtenLen = vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen - EOL_CHARS_LEN, aFormat, v);
-    assert(writtenLen > 0);
+    VerifyOrDie(writtenLen > 0);
     memcpy(formattedMsg + prefixLen + writtenLen, EOL_CHARS, EOL_CHARS_LEN);
 
     K32WWriteBlocking((const uint8_t *) formattedMsg, strlen(formattedMsg));
