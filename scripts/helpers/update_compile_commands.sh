@@ -15,15 +15,13 @@
 # limitations under the License.
 #
 
-# Update compilation database in VS Code devcontainer.
-
 set -e
+
+# Update compilation database in VS Code devcontainer.
 
 CHIP_ROOT="$(dirname "$0")/../.."
 
-set +e
 source "$CHIP_ROOT/scripts/activate.sh"
-set -e
 
 gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=all_host_gcc
 mv "$CHIP_ROOT/out/debug/compile_commands.json" "$CHIP_ROOT/out/debug/compile_commands.gcc.json"
@@ -34,5 +32,14 @@ mv "$CHIP_ROOT/out/debug/compile_commands.json" "$CHIP_ROOT/out/debug/compile_co
 gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=all_host_gcc_mbedtls
 mv "$CHIP_ROOT/out/debug/compile_commands.json" "$CHIP_ROOT/out/debug/compile_commands.mbedtls.json"
 
+gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=all_android_x64
+mv "$CHIP_ROOT/out/debug/compile_commands.json" "$CHIP_ROOT/out/debug/compile_commands.android_x64.json"
+
+gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=all_android_arm64
+mv "$CHIP_ROOT/out/debug/compile_commands.json" "$CHIP_ROOT/out/debug/compile_commands.android_arm64.json"
+
 gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=nrf5_lock_app,nrf5_lighting_app
 mv "$CHIP_ROOT/out/debug/compile_commands.json" "$CHIP_ROOT/out/debug/compile_commands.nrf5.json"
+
+gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=efr32_lock_app
+mv "$CHIP_ROOT/out/debug/compile_commands.json" "$CHIP_ROOT/out/debug/compile_commands.efr32.json"

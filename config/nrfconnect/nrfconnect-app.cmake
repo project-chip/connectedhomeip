@@ -62,6 +62,9 @@ include(chip-lib)
 set(CHIP_COMMON_FLAGS
     -D_SYS__PTHREADTYPES_H_
     -DMBEDTLS_CONFIG_FILE=<nrf-config.h>
+    -DMBEDTLS_PK_WRITE_C
+    -DMBEDTLS_X509_CREATE_C
+    -DMBEDTLS_X509_CSR_WRITE_C
     -isystem${ZEPHYR_BASE}/include/posix
     -isystem${ZEPHYR_BASE}/../mbedtls/include
     -I${CMAKE_CURRENT_SOURCE_DIR}

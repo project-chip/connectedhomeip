@@ -9,13 +9,26 @@ RUN set -x \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
+# Download and install android SDK
+RUN set -x \
+    && wget -O /tmp/android-21.zip https://dl.google.com/android/repository/android-21_r02.zip \
+    && mkdir -p /opt/android/sdk/platforms \
+    && cd /opt/android/sdk/platforms \
+    && unzip /tmp/android-21.zip \
+    && mv android-5.0.1 android-21 \
+    && rm -f /tmp/android-21.zip \
+    && chmod -R a+rX /opt/android/sdk \
+    && test -d /opt/android/sdk/platforms/android-21 \
+    && : # last line
+
 # Download and install android NDK
 RUN set -x \
     && cd /tmp \
     && wget https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip \
-    && mkdir -p /usr/local/share \
-    && cd /usr/local/share \
+    && mkdir -p /opt/android \
+    && cd /opt/android \
     && unzip /tmp/android-ndk-r21b-linux-x86_64.zip \
+    && rm -f /tmp/android-ndk-r21b-linux-x86_64.zip \
     && : # last line
 
 # Install specific release of openssl and compile for x86/armv7-a
@@ -27,7 +40,7 @@ RUN set -x \
 RUN set -x \
     && export OPENSSL_ARMV7=/usr/local/src/armeabi-v7a \
     && export OPENSSL_X86=/usr/local/src/x86 \
-    && export ANDROID_NDK_HOME=/usr/local/share/android-ndk-r21b \
+    && export ANDROID_NDK_HOME=/opt/android/android-ndk-r21b \
     && export PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH \
     && cd /tmp && wget https://www.openssl.org/source/openssl-1.1.1g.tar.gz \
     && mkdir -p $OPENSSL_ARMV7 && cd $OPENSSL_ARMV7 && tar xfz /tmp/openssl-1.1.1g.tar.gz \
@@ -36,3 +49,6 @@ RUN set -x \
     && cd $OPENSSL_X86/openssl-1.1.1g && CC=clang ANDROID_API=21 ./Configure android-x86 -D__ANDROID_API__=21 && make SHLIB_VERSION_NUMBER= SHLIB_EXT=.so \
     && rm -rf /tmp/OpenSSL_1_1_1g.zip \
     && : # last line
+
+ENV ANDROID_HOME=/opt/android/sdk
+ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r21b

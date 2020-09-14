@@ -88,6 +88,7 @@ protected:
 
     CHIP_ERROR DoInit(otInstance * otInst);
     bool IsThreadAttachedNoLock(void);
+    bool IsThreadInterfaceUpNoLock(void);
     CHIP_ERROR AdjustPollingInterval(void);
 
     CHIP_ERROR _JoinerStart(void);

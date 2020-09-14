@@ -16,14 +16,16 @@
 # limitations under the License.
 #
 
+set -e
+
 # GN gen script for GN build GitHub workflow.
 
 CHIP_ROOT="$(dirname "$0")/../.."
 
 source "$CHIP_ROOT/scripts/activate.sh"
 
-set -e
 set -x
+
 env
 
 gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/$BUILD_TYPE" "$@"

@@ -383,13 +383,16 @@ IPAddress IPAddress::MakeLLA(uint64_t interfaceId)
 IPAddress IPAddress::MakeIPv6Multicast(uint8_t aFlags, uint8_t aScope,
                                        const uint8_t aGroupId[NL_INET_IPV6_MCAST_GROUP_LEN_IN_BYTES])
 {
-    const uint32_t lFlagsAndScope = (((aFlags & 0xF) << 20) | ((aScope & 0xF) << 16));
+    const uint32_t lFlagsAndScope = (((uint32_t(aFlags) & 0xF) << 20) | ((uint32_t(aScope) & 0xF) << 16));
     IPAddress addr;
 
-    addr.Addr[0] = htonl((0xFF000000U | lFlagsAndScope) | (aGroupId[0] << 8) | (aGroupId[1] << 0));
-    addr.Addr[1] = htonl((aGroupId[2] << 24) | (aGroupId[3] << 16) | (aGroupId[4] << 8) | (aGroupId[5] << 0));
-    addr.Addr[2] = htonl((aGroupId[6] << 24) | (aGroupId[7] << 16) | (aGroupId[8] << 8) | (aGroupId[9] << 0));
-    addr.Addr[3] = htonl((aGroupId[10] << 24) | (aGroupId[11] << 16) | (aGroupId[12] << 8) | (aGroupId[13] << 0));
+    addr.Addr[0] = htonl((0xFF000000U | lFlagsAndScope) | (uint32_t(aGroupId[0]) << 8) | (uint32_t(aGroupId[1]) << 0));
+    addr.Addr[1] = htonl((uint32_t(aGroupId[2]) << 24) | (uint32_t(aGroupId[3]) << 16) | (uint32_t(aGroupId[4]) << 8) |
+                         (uint32_t(aGroupId[5]) << 0));
+    addr.Addr[2] = htonl((uint32_t(aGroupId[6]) << 24) | (uint32_t(aGroupId[7]) << 16) | (uint32_t(aGroupId[8]) << 8) |
+                         (uint32_t(aGroupId[9]) << 0));
+    addr.Addr[3] = htonl((uint32_t(aGroupId[10]) << 24) | (uint32_t(aGroupId[11]) << 16) | (uint32_t(aGroupId[12]) << 8) |
+                         (uint32_t(aGroupId[13]) << 0));
 
     return addr;
 }

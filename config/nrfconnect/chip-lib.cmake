@@ -47,7 +47,18 @@ endmacro()
 
 # Function to retrieve Zephyr compilation flags for the given language (C or CXX)
 function(zephyr_get_compile_flags VAR LANG)
-    zephyr_get_include_directories_for_lang(${LANG} INCLUDES)
+    # We want to treat all zephyr-provided headers as system headers, so
+    # warnings in them don't trigger -Werror.  That means that for the headers
+    # zephyr returns as "non-system" headers (the ones from
+    # zephyr_get_include_directories_for_lang) we need to manually replace "-I"
+    # with "-isystem" before adding them to INCLUDES.
+    set(temp_includes "")
+    zephyr_get_include_directories_for_lang(${LANG} temp_includes)
+    foreach(include ${temp_includes})
+      string(REPLACE "-I" "-isystem" include ${include})
+      list(APPEND INCLUDES ${include})
+    endforeach()
+
     zephyr_get_system_include_directories_for_lang(${LANG} SYSTEM_INCLUDES)
     zephyr_get_compile_definitions_for_lang(${LANG} DEFINES)
     zephyr_get_compile_options_for_lang(${LANG} FLAGS)
@@ -140,6 +151,7 @@ function(chip_build TARGET_NAME BASE_TARGET_NAME)
     add_library(${TARGET_NAME} INTERFACE)
     target_include_directories(${TARGET_NAME} INTERFACE
         ${CHIP_ROOT}/src
+        ${CHIP_ROOT}/src/app/util
         ${CHIP_ROOT}/src/lib
         ${CHIP_ROOT}/src/lib/core
         ${CHIP_ROOT}/src/include

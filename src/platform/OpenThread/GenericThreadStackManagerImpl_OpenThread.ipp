@@ -837,6 +837,12 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadAttachedNoLock
 }
 
 template <class ImplClass>
+bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadInterfaceUpNoLock(void)
+{
+    return otIp6IsEnabled(mOTInst);
+}
+
+template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::AdjustPollingInterval(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -912,13 +918,13 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_JoinerStart(voi
 
     {
         otJoinerDiscerner discerner;
-        uint32_t discriminator;
+        uint16_t discriminator;
 
         SuccessOrExit(error = ConfigurationMgr().GetSetupDiscriminator(discriminator));
         discerner.mLength = 12;
         discerner.mValue  = discriminator;
 
-        ChipLogProgress(DeviceLayer, "Joiner Discerner: %u", discriminator);
+        ChipLogProgress(DeviceLayer, "Joiner Discerner: %hu", discriminator);
         otJoinerSetDiscerner(mOTInst, &discerner);
     }
 

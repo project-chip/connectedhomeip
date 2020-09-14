@@ -23,7 +23,6 @@
  */
 
 #include <core/CHIPEncoding.h>
-#include <crypto/CHIPCryptoPAL.h>
 #include <support/BufBound.h>
 #include <support/CodeUtils.h>
 #include <transport/MessageHeader.h>
@@ -70,19 +69,14 @@ exit:
     return error;
 }
 
-CHIP_ERROR SecureSession::Init(const uint8_t * remote_public_key, const size_t public_key_length, const uint8_t * local_private_key,
-                               const size_t private_key_length, const uint8_t * salt, const size_t salt_length,
-                               const uint8_t * info, const size_t info_length)
+CHIP_ERROR SecureSession::Init(const Crypto::ECPKey & remote_public_key, const Crypto::ECPKey & local_private_key,
+                               const uint8_t * salt, const size_t salt_length, const uint8_t * info, const size_t info_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     uint8_t secret[kMax_ECDH_Secret_Length];
     size_t secret_size = sizeof(secret);
 
     VerifyOrExit(mKeyAvailable == false, error = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(remote_public_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(public_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(local_private_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(private_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     if (salt_length > 0)
     {
         VerifyOrExit(salt != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -91,7 +85,7 @@ CHIP_ERROR SecureSession::Init(const uint8_t * remote_public_key, const size_t p
     VerifyOrExit(info_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(info != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = ECDH_derive_secret(remote_public_key, public_key_length, local_private_key, private_key_length, secret, secret_size);
+    error = ECDH_derive_secret(remote_public_key, local_private_key, secret, secret_size);
     SuccessOrExit(error);
 
     error = InitFromSecret(secret, secret_size, salt, salt_length, info, info_length);

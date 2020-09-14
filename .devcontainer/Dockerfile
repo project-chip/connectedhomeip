@@ -52,5 +52,5 @@ RUN chmod +x /home/$USERNAME/bin/restyle-path
 RUN chown -R $USERNAME:$USERNAME /home/$USERNAME
 RUN echo "PATH=/home/$USERNAME/bin:${PATH}" >> /home/$USERNAME/.bashrc
 # $USERNAME needs to own the esp-idf and tools for the examples to build
-RUN chown -R $USERNAME:$USERNAME /var/esp-idf
-RUN chown -R $USERNAME:$USERNAME /var/.espressif
+RUN chown -R $USERNAME:$USERNAME /opt/expressif/esp-idf
+RUN chown -R $USERNAME:$USERNAME /opt/expressif/tools

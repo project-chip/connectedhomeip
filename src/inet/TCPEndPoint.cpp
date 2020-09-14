@@ -38,6 +38,7 @@
 #include <inet/InetLayer.h>
 
 #include <support/CodeUtils.h>
+#include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemFaultInjection.h>
 
@@ -59,6 +60,7 @@
 
 #include "arpa-inet-compatibility.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -441,7 +443,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
     int flags = fcntl(mSocket, F_GETFL, 0);
     fcntl(mSocket, F_SETFL, flags | O_NONBLOCK);
 
-    int sockaddrsize             = 0;
+    socklen_t sockaddrsize       = 0;
     const sockaddr * sockaddrptr = NULL;
 
     union
@@ -1150,7 +1152,7 @@ void TCPEndPoint::SetIdleTimeout(uint32_t timeoutMS)
 
     if (newIdleTimeout > UINT16_MAX)
         newIdleTimeout = UINT16_MAX;
-    mIdleTimeout = mRemainingIdleTime = newIdleTimeout;
+    mIdleTimeout = mRemainingIdleTime = static_cast<uint16_t>(newIdleTimeout);
 
     if (!isIdleTimerRunning && mIdleTimeout)
     {
@@ -1229,13 +1231,17 @@ INET_ERROR TCPEndPoint::DriveSending()
                 uint8_t * sendData = mUnsentQueue->Start() + mUnsentOffset;
 
                 // Determine the amount of data to send from the current buffer.
-                uint16_t sendLen = bufDataLen - mUnsentOffset;
+                assert(bufDataLen >= mUnsentOffset);
+                uint16_t sendLen = static_cast<uint16_t>(bufDataLen - mUnsentOffset);
                 if (sendLen > sendWindowSize)
                     sendLen = sendWindowSize;
 
                 // Adjust the unsent data offset by the length of data to be written. If the entire buffer
                 // has been sent advance to the next one.
-                mUnsentOffset += sendLen;
+                //
+                // This cast is safe, because mUnsentOffset + sendLen <=
+                // bufDataLen, which fits in uint16_t.
+                mUnsentOffset = static_cast<uint16_t>(mUnsentOffset + sendLen);
                 if (mUnsentOffset == bufDataLen)
                 {
                     mUnsentQueue  = mUnsentQueue->Next();
@@ -1243,7 +1249,9 @@ INET_ERROR TCPEndPoint::DriveSending()
                 }
 
                 // Adjust the remaining window size.
-                sendWindowSize -= sendLen;
+                //
+                // This cast is safe because sendLen <= sendWindowSize here.
+                sendWindowSize = static_cast<uint16_t>(sendWindowSize - sendLen);
 
                 // Determine if there's more data to be sent after this buffer.
                 canSend = (mUnsentQueue != NULL && sendWindowSize > 0);
@@ -1308,14 +1316,23 @@ INET_ERROR TCPEndPoint::DriveSending()
     {
         uint16_t bufLen = mSendQueue->DataLength();
 
-        ssize_t lenSent = send(mSocket, mSendQueue->Start(), (size_t) bufLen, sendFlags);
+        ssize_t lenSentRaw = send(mSocket, mSendQueue->Start(), bufLen, sendFlags);
 
-        if (lenSent == -1)
+        if (lenSentRaw == -1)
         {
             if (errno != EAGAIN && errno != EWOULDBLOCK)
                 err = (errno == EPIPE) ? INET_ERROR_PEER_DISCONNECTED : chip::System::MapErrorPOSIX(errno);
             break;
         }
+
+        if (lenSentRaw < 0 || lenSentRaw > bufLen)
+        {
+            err = INET_ERROR_INCORRECT_STATE;
+            break;
+        }
+
+        // Cast is safe because bufLen is uint16_t.
+        uint16_t lenSent = static_cast<uint16_t>(lenSentRaw);
 
         // Mark the connection as being active.
         MarkActive();
@@ -1326,7 +1343,7 @@ INET_ERROR TCPEndPoint::DriveSending()
             mSendQueue = PacketBuffer::FreeHead(mSendQueue);
 
         if (OnDataSent != NULL)
-            OnDataSent(this, (uint16_t) lenSent);
+            OnDataSent(this, lenSent);
 
 #if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
         // TCP Send is not Idle; Set state and notify if needed
@@ -2446,7 +2463,10 @@ void TCPEndPoint::ReceiveData()
         // Otherwise, add the new data onto the receive queue.
         else if (isNewBuf)
         {
-            rcvBuf->SetDataLength(rcvBuf->DataLength() + (uint16_t) rcvLen);
+            assert(rcvLen > 0);
+            size_t newDataLength = rcvBuf->DataLength() + static_cast<size_t>(rcvLen);
+            assert(CanCastTo<uint16_t>(newDataLength));
+            rcvBuf->SetDataLength(static_cast<uint16_t>(newDataLength));
             if (mRcvQueue == NULL)
                 mRcvQueue = rcvBuf;
             else
@@ -2454,7 +2474,12 @@ void TCPEndPoint::ReceiveData()
         }
 
         else
-            rcvBuf->SetDataLength(rcvBuf->DataLength() + (uint16_t) rcvLen, mRcvQueue);
+        {
+            assert(rcvLen > 0);
+            size_t newDataLength = rcvBuf->DataLength() + static_cast<size_t>(rcvLen);
+            assert(CanCastTo<uint16_t>(newDataLength));
+            rcvBuf->SetDataLength(static_cast<uint16_t>(newDataLength), mRcvQueue);
+        }
     }
 
     // Drive any received data into the app.
@@ -2553,18 +2578,25 @@ void TCPEndPoint::HandleIncomingConnection()
  */
 INET_ERROR TCPEndPoint::CheckConnectionProgress(bool & isProgressing)
 {
-    INET_ERROR err       = INET_NO_ERROR;
-    int currPendingBytes = 0;
+    INET_ERROR err          = INET_NO_ERROR;
+    int currPendingBytesRaw = 0;
+    uint32_t currPendingBytes; // Will be initialized once we know it's safe.
 
     // Fetch the bytes pending successful transmission in the TCP out queue.
 
-    if (ioctl(mSocket, TIOCOUTQ, &currPendingBytes) < 0)
+    if (ioctl(mSocket, TIOCOUTQ, &currPendingBytesRaw) < 0)
     {
         ExitNow(err = chip::System::MapErrorPOSIX(errno));
     }
 
-    if ((currPendingBytes != 0) &&
-        (mBytesWrittenSinceLastProbe + mLastTCPKernelSendQueueLen == static_cast<uint32_t>(currPendingBytes)))
+    if (!CanCastTo<uint32_t>(currPendingBytesRaw))
+    {
+        ExitNow(err = INET_ERROR_INCORRECT_STATE);
+    }
+
+    currPendingBytes = static_cast<uint32_t>(currPendingBytesRaw);
+
+    if ((currPendingBytes != 0) && (mBytesWrittenSinceLastProbe + mLastTCPKernelSendQueueLen == currPendingBytes))
     {
         // No progress has been made
 

@@ -36,6 +36,7 @@
 #include <inet/InetLayer.h>
 
 #include <support/CodeUtils.h>
+#include <support/SafeInt.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if INET_CONFIG_ENABLE_IPV4
@@ -299,12 +300,19 @@ exit:
 static INET_ERROR SocketsIPv6JoinLeaveMulticastGroup(int aSocket, InterfaceId aInterfaceId, const IPAddress & aAddress,
                                                      int aCommand)
 {
-    INET_ERROR lRetval = INET_NO_ERROR;
-    const int lIfIndex = static_cast<int>(aInterfaceId);
+    INET_ERROR lRetval          = INET_NO_ERROR;
+    const unsigned int lIfIndex = static_cast<unsigned int>(aInterfaceId);
     struct ipv6_mreq lMulticastRequest;
 
+    // Check whether that cast we did was actually safe.  We can't VerifyOrExit
+    // before declaring variables, and can't reassign lIfIndex without making it
+    // non-const, so have to do things in this order.
+    VerifyOrExit(CanCastTo<unsigned int>(aInterfaceId), lRetval = INET_ERROR_UNEXPECTED_EVENT);
+
     memset(&lMulticastRequest, 0, sizeof(lMulticastRequest));
-    lMulticastRequest.ipv6mr_interface = lIfIndex;
+    VerifyOrExit(CanCastTo<decltype(lMulticastRequest.ipv6mr_interface)>(lIfIndex), lRetval = INET_ERROR_UNEXPECTED_EVENT);
+
+    lMulticastRequest.ipv6mr_interface = static_cast<decltype(lMulticastRequest.ipv6mr_interface)>(lIfIndex);
     lMulticastRequest.ipv6mr_multiaddr = aAddress.ToIPv6();
 
     lRetval = setsockopt(aSocket, IPPROTO_IPV6, aCommand, &lMulticastRequest, sizeof(lMulticastRequest));
@@ -683,10 +691,14 @@ INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress,
 
         memset(&sa, 0, sizeof(sa));
 
-        sa.sin6_family   = AF_INET6;
-        sa.sin6_port     = htons(aPort);
-        sa.sin6_addr     = aAddress.ToIPv6();
-        sa.sin6_scope_id = aInterfaceId;
+        sa.sin6_family = AF_INET6;
+        sa.sin6_port   = htons(aPort);
+        sa.sin6_addr   = aAddress.ToIPv6();
+        if (!CanCastTo<decltype(sa.sin6_scope_id)>(aInterfaceId))
+        {
+            return INET_ERROR_INCORRECT_STATE;
+        }
+        sa.sin6_scope_id = static_cast<decltype(sa.sin6_scope_id)>(aInterfaceId);
 
         if (bind(mSocket, (const sockaddr *) &sa, (unsigned) sizeof(sa)) != 0)
             lRetval = chip::System::MapErrorPOSIX(errno);
@@ -812,10 +824,11 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     msgHeader.msg_name = &peerSockAddr;
     if (mAddrType == kIPAddressType_IPv6)
     {
-        peerSockAddr.in6.sin6_family   = AF_INET6;
-        peerSockAddr.in6.sin6_port     = htons(aPktInfo->DestPort);
-        peerSockAddr.in6.sin6_addr     = aPktInfo->DestAddress.ToIPv6();
-        peerSockAddr.in6.sin6_scope_id = aPktInfo->Interface;
+        peerSockAddr.in6.sin6_family = AF_INET6;
+        peerSockAddr.in6.sin6_port   = htons(aPktInfo->DestPort);
+        peerSockAddr.in6.sin6_addr   = aPktInfo->DestAddress.ToIPv6();
+        VerifyOrExit(CanCastTo<decltype(peerSockAddr.in6.sin6_scope_id)>(aPktInfo->Interface), res = INET_ERROR_INCORRECT_STATE);
+        peerSockAddr.in6.sin6_scope_id = static_cast<decltype(peerSockAddr.in6.sin6_scope_id)>(aPktInfo->Interface);
         msgHeader.msg_namelen          = sizeof(sockaddr_in6);
     }
 #if INET_CONFIG_ENABLE_IPV4
@@ -860,8 +873,13 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
             controlHdr->cmsg_len   = CMSG_LEN(sizeof(in_pktinfo));
 
             struct in_pktinfo * pktInfo = (struct in_pktinfo *) CMSG_DATA(controlHdr);
-            pktInfo->ipi_ifindex        = intfId;
-            pktInfo->ipi_spec_dst       = aPktInfo->SrcAddress.ToIPv4();
+            if (!CanCastTo<decltype(pktInfo->ipi_ifindex)>(intfId))
+            {
+                ExitNow(res = INET_ERROR_NOT_SUPPORTED);
+            }
+
+            pktInfo->ipi_ifindex  = static_cast<decltype(pktInfo->ipi_ifindex)>(intfId);
+            pktInfo->ipi_spec_dst = aPktInfo->SrcAddress.ToIPv4();
 
             msgHeader.msg_controllen = CMSG_SPACE(sizeof(in_pktinfo));
 #else  // !defined(IP_PKTINFO)
@@ -879,8 +897,12 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
             controlHdr->cmsg_len   = CMSG_LEN(sizeof(in6_pktinfo));
 
             struct in6_pktinfo * pktInfo = (struct in6_pktinfo *) CMSG_DATA(controlHdr);
-            pktInfo->ipi6_ifindex        = intfId;
-            pktInfo->ipi6_addr           = aPktInfo->SrcAddress.ToIPv6();
+            if (!CanCastTo<decltype(pktInfo->ipi6_ifindex)>(intfId))
+            {
+                ExitNow(res = INET_ERROR_UNEXPECTED_EVENT);
+            }
+            pktInfo->ipi6_ifindex = static_cast<decltype(pktInfo->ipi6_ifindex)>(intfId);
+            pktInfo->ipi6_addr    = aPktInfo->SrcAddress.ToIPv6();
 
             msgHeader.msg_controllen = CMSG_SPACE(sizeof(in6_pktinfo));
 #else  // !defined(IPV6_PKTINFO)
@@ -1103,8 +1125,13 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
                 if (controlHdr->cmsg_level == IPPROTO_IP && controlHdr->cmsg_type == IP_PKTINFO)
                 {
                     struct in_pktinfo * inPktInfo = (struct in_pktinfo *) CMSG_DATA(controlHdr);
-                    lPacketInfo.Interface         = inPktInfo->ipi_ifindex;
-                    lPacketInfo.DestAddress       = IPAddress::FromIPv4(inPktInfo->ipi_addr);
+                    if (!CanCastTo<InterfaceId>(inPktInfo->ipi_ifindex))
+                    {
+                        lStatus = INET_ERROR_INCORRECT_STATE;
+                        break;
+                    }
+                    lPacketInfo.Interface   = static_cast<InterfaceId>(inPktInfo->ipi_ifindex);
+                    lPacketInfo.DestAddress = IPAddress::FromIPv4(inPktInfo->ipi_addr);
                     continue;
                 }
 #endif // defined(IP_PKTINFO)
@@ -1114,8 +1141,13 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
                 if (controlHdr->cmsg_level == IPPROTO_IPV6 && controlHdr->cmsg_type == IPV6_PKTINFO)
                 {
                     struct in6_pktinfo * in6PktInfo = (struct in6_pktinfo *) CMSG_DATA(controlHdr);
-                    lPacketInfo.Interface           = in6PktInfo->ipi6_ifindex;
-                    lPacketInfo.DestAddress         = IPAddress::FromIPv6(in6PktInfo->ipi6_addr);
+                    if (!CanCastTo<InterfaceId>(in6PktInfo->ipi6_ifindex))
+                    {
+                        lStatus = INET_ERROR_INCORRECT_STATE;
+                        break;
+                    }
+                    lPacketInfo.Interface   = static_cast<InterfaceId>(in6PktInfo->ipi6_ifindex);
+                    lPacketInfo.DestAddress = IPAddress::FromIPv6(in6PktInfo->ipi6_addr);
                     continue;
                 }
 #endif // defined(IPV6_PKTINFO)

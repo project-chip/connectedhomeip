@@ -844,7 +844,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
 
     memset(&wifiConfig, 0, sizeof(wifiConfig));
 
-    uint32_t discriminator;
+    uint16_t discriminator;
     SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
 
     snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s%04u", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX,

@@ -31,8 +31,10 @@
 #include <openssl/hmac.h>
 #include <openssl/kdf.h>
 #include <openssl/ossl_typ.h>
+#include <openssl/pem.h>
 #include <openssl/rand.h>
 #include <openssl/sha.h>
+#include <openssl/x509.h>
 
 #include <core/CHIPSafeCasts.h>
 #include <support/CodeUtils.h>
@@ -446,8 +448,19 @@ exit:
     return error;
 }
 
-CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const uint8_t * private_key,
-                          const size_t private_key_length, uint8_t * out_signature, size_t & out_signature_length)
+ECName MapECName(SupportedECPKeyTypes keyType)
+{
+    switch (keyType)
+    {
+    case SupportedECPKeyTypes::ECP256R1:
+        return ECName::P256v1;
+    default:
+        return ECName::None;
+    }
+}
+
+CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ECPKey & private_key, uint8_t * out_signature,
+                          size_t & out_signature_length)
 {
     ERR_clear_error();
 
@@ -460,16 +473,13 @@ CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ui
     char * _hexKey         = NULL;
     BIGNUM * pvt_key       = NULL;
     const EVP_MD * md      = NULL;
-    ECName curve_name      = ECName::P256v1;
     DigestType digest      = DigestType::SHA256;
     size_t out_length      = 0;
 
     VerifyOrExit(msg != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    nid = _nidForCurve(curve_name);
+    nid = _nidForCurve(MapECName(private_key.Type()));
     VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(private_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(private_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_signature != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     md = _digestForType(digest);
     VerifyOrExit(md != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -477,7 +487,7 @@ CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ui
     ec_key = EC_KEY_new_by_curve_name(nid);
     VerifyOrExit(ec_key != NULL, error = CHIP_ERROR_INTERNAL);
 
-    pvt_key = BN_bin2bn(Uint8::to_const_uchar(private_key), private_key_length, pvt_key);
+    pvt_key = BN_bin2bn(Uint8::to_const_uchar(private_key), private_key.Length(), pvt_key);
     VerifyOrExit(pvt_key != NULL, error = CHIP_ERROR_INTERNAL);
 
     result = EC_KEY_set_private_key(ec_key, pvt_key);
@@ -546,8 +556,8 @@ exit:
     return error;
 }
 
-CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const uint8_t * public_key,
-                                        const size_t public_key_length, const uint8_t * signature, const size_t signature_length)
+CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const ECPKey & public_key,
+                                        const uint8_t * signature, const size_t signature_length)
 {
     ERR_clear_error();
     CHIP_ERROR error            = CHIP_ERROR_INTERNAL;
@@ -559,15 +569,12 @@ CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_le
     EC_GROUP * ec_group         = NULL;
     int result                  = 0;
     EVP_MD_CTX * md_context     = NULL;
-    ECName curve_name           = ECName::P256v1;
     DigestType digest           = DigestType::SHA256;
 
     VerifyOrExit(msg != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    nid = _nidForCurve(curve_name);
+    nid = _nidForCurve(MapECName(public_key.Type()));
     VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(public_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(public_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(signature != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(signature_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -580,7 +587,7 @@ CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_le
     key_point = EC_POINT_new(ec_group);
     VerifyOrExit(key_point != NULL, error = CHIP_ERROR_INTERNAL);
 
-    result = EC_POINT_oct2point(ec_group, key_point, Uint8::to_const_uchar(public_key), public_key_length, NULL);
+    result = EC_POINT_oct2point(ec_group, key_point, Uint8::to_const_uchar(public_key), public_key.Length(), NULL);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     ec_key = EC_KEY_new_by_curve_name(nid);
@@ -642,8 +649,7 @@ exit:
 }
 
 // helper function to populate octet key into EVP_PKEY out_evp_pkey. Caller must free out_evp_pkey
-static CHIP_ERROR _create_evp_key_from_binary_p256_key(const uint8_t * key, const size_t key_length, EVP_PKEY ** out_evp_pkey,
-                                                       bool isPrivateKey)
+static CHIP_ERROR _create_evp_key_from_binary_p256_key(const ECPKey & key, EVP_PKEY ** out_evp_pkey, bool isPrivateKey)
 {
 
     CHIP_ERROR error     = CHIP_NO_ERROR;
@@ -654,17 +660,15 @@ static CHIP_ERROR _create_evp_key_from_binary_p256_key(const uint8_t * key, cons
     EC_GROUP * group     = NULL;
     int nid              = NID_undef;
 
-    VerifyOrExit(key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(*out_evp_pkey == NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    nid = _nidForCurve(ECName::P256v1);
+    nid = _nidForCurve(MapECName(key.Type()));
     VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INTERNAL);
 
     ec_key = EC_KEY_new_by_curve_name(nid);
     VerifyOrExit(ec_key != NULL, error = CHIP_ERROR_INTERNAL);
 
-    big_num_key = BN_bin2bn(Uint8::to_const_uchar(key), key_length, NULL);
+    big_num_key = BN_bin2bn(Uint8::to_const_uchar(key), key.Length(), NULL);
     VerifyOrExit(big_num_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     if (isPrivateKey)
@@ -679,7 +683,7 @@ static CHIP_ERROR _create_evp_key_from_binary_p256_key(const uint8_t * key, cons
         point = EC_POINT_new(group);
         VerifyOrExit(point != NULL, error = CHIP_ERROR_INTERNAL);
 
-        result = EC_POINT_oct2point(group, point, key, key_length, NULL);
+        result = EC_POINT_oct2point(group, point, Uint8::to_const_uchar(key), key.Length(), NULL);
         VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
         result = EC_KEY_set_public_key(ec_key, point);
@@ -727,8 +731,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR ECDH_derive_secret(const uint8_t * remote_public_key, const size_t remote_public_key_length,
-                              const uint8_t * local_private_key, const size_t local_private_key_length, uint8_t * out_secret,
+CHIP_ERROR ECDH_derive_secret(const ECPKey & remote_public_key, const ECPKey & local_private_key, uint8_t * out_secret,
                               size_t & out_secret_length)
 {
     ERR_clear_error();
@@ -740,19 +743,14 @@ CHIP_ERROR ECDH_derive_secret(const uint8_t * remote_public_key, const size_t re
     EVP_PKEY_CTX * context = NULL;
     size_t out_buf_length  = 0;
 
-    VerifyOrExit(remote_public_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(remote_public_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(local_private_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(local_private_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_secret != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_secret_length >= kMax_ECDH_Secret_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(remote_public_key.Type() == local_private_key.Type(), error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    error =
-        _create_evp_key_from_binary_p256_key(Uint8::to_const_uchar(local_private_key), local_private_key_length, &local_key, true);
+    error = _create_evp_key_from_binary_p256_key(local_private_key, &local_key, true);
     SuccessOrExit(error);
 
-    error = _create_evp_key_from_binary_p256_key(Uint8::to_const_uchar(remote_public_key), remote_public_key_length, &remote_key,
-                                                 false);
+    error = _create_evp_key_from_binary_p256_key(remote_public_key, &remote_key, false);
     SuccessOrExit(error);
 
     context = EVP_PKEY_CTX_new(local_key, NULL);
@@ -796,17 +794,6 @@ exit:
 void ClearSecretData(uint8_t * buf, uint32_t len)
 {
     memset(buf, 0, len);
-}
-
-ECName MapECName(SupportedECPKeyTypes keyType)
-{
-    switch (keyType)
-    {
-    case SupportedECPKeyTypes::ECP256R1:
-        return ECName::P256v1;
-    default:
-        return ECName::None;
-    }
 }
 
 CHIP_ERROR NewECPKeypair(ECPKey & pubkey, ECPKey & privkey)
@@ -869,6 +856,140 @@ exit:
         EC_GROUP_free(group);
         group = nullptr;
     }
+
+    _logSSLError();
+    return error;
+}
+
+CHIP_ERROR NewCertificateSigningRequest(ECPKey & pubkey, ECPKey & privkey, uint8_t * out_csr, size_t & csr_length)
+{
+    ERR_clear_error();
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+    int nid          = NID_undef;
+
+    X509_REQ * x509_req  = X509_REQ_new();
+    EVP_PKEY * evp_pkey  = nullptr;
+    BIGNUM * pvt_key     = nullptr;
+    EC_GROUP * group     = nullptr;
+    EC_POINT * key_point = nullptr;
+
+    EC_KEY * ec_key = nullptr;
+    ECName curve    = MapECName(pubkey.Type());
+
+    BIO * bioMem   = nullptr;
+    BUF_MEM * bptr = nullptr;
+
+    VerifyOrExit(curve == MapECName(privkey.Type()), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    nid = _nidForCurve(curve);
+    VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = X509_REQ_set_version(x509_req, 0);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    group = EC_GROUP_new_by_curve_name(nid);
+    VerifyOrExit(group != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    key_point = EC_POINT_new(group);
+    VerifyOrExit(key_point != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    result = EC_POINT_oct2point(group, key_point, Uint8::to_const_uchar(pubkey), pubkey.Length(), nullptr);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    ec_key = EC_KEY_new_by_curve_name(nid);
+    VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    result = EC_KEY_set_public_key(ec_key, key_point);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    result = EC_KEY_check_key(ec_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    evp_pkey = EVP_PKEY_new();
+    VerifyOrExit(evp_pkey != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    result = EVP_PKEY_set1_EC_KEY(evp_pkey, ec_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    result = X509_REQ_set_pubkey(x509_req, evp_pkey);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    EC_KEY_free(ec_key);
+    EVP_PKEY_free(evp_pkey);
+
+    ec_key = EC_KEY_new_by_curve_name(nid);
+    VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    pvt_key = BN_bin2bn(Uint8::to_const_uchar(privkey), privkey.Length(), nullptr);
+    VerifyOrExit(pvt_key != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    result = EC_KEY_set_private_key(ec_key, pvt_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    evp_pkey = EVP_PKEY_new();
+    VerifyOrExit(evp_pkey != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    result = EVP_PKEY_set1_EC_KEY(evp_pkey, ec_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    result = X509_REQ_sign(x509_req, evp_pkey, EVP_sha256());
+    VerifyOrExit(result > 0, error = CHIP_ERROR_INTERNAL);
+
+    bioMem = BIO_new(BIO_s_mem());
+    VerifyOrExit(bioMem != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    result = PEM_write_bio_X509_REQ(bioMem, x509_req);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    BIO_get_mem_ptr(bioMem, &bptr);
+    {
+        size_t input_length = csr_length;
+        csr_length          = bptr->length;
+        VerifyOrExit(bptr->length <= input_length, error = CHIP_ERROR_BUFFER_TOO_SMALL);
+        memset(out_csr, 0, input_length);
+    }
+
+    BIO_read(bioMem, out_csr, bptr->length);
+
+exit:
+    if (ec_key != nullptr)
+    {
+        EC_KEY_free(ec_key);
+        ec_key = nullptr;
+    }
+
+    if (group != nullptr)
+    {
+        EC_GROUP_free(group);
+        group = nullptr;
+    }
+
+    if (evp_pkey != nullptr)
+    {
+        EVP_PKEY_free(evp_pkey);
+        evp_pkey = nullptr;
+    }
+
+    if (bioMem != nullptr)
+    {
+        BIO_free(bioMem);
+        bioMem = nullptr;
+    }
+
+    if (pvt_key != nullptr)
+    {
+        BN_free(pvt_key);
+        pvt_key = nullptr;
+    }
+
+    if (key_point != nullptr)
+    {
+        EC_POINT_free(key_point);
+        key_point = nullptr;
+    }
+
+    X509_REQ_free(x509_req);
 
     _logSSLError();
     return error;
