@@ -27,6 +27,6 @@ source "$CHIP_ROOT/scripts/activate.sh"
 set -x
 env
 
-gn gen --root="$1" --args="nrf5_sdk_root=\"$NRF5_SDK_ROOT\"" "$2"
+gn gen --check --root="$1" --args="nrf5_sdk_root=\"$NRF5_SDK_ROOT\"" "$2"
 
 ninja -v -C "$2"
