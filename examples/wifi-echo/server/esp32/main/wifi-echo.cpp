@@ -24,7 +24,7 @@
 #include "LEDWidget.h"
 #include "ListScreen.h"
 #include "QRCodeScreen.h"
-#include "RendezvousSession.h"
+#include "RendezvousDeviceDelegate.h"
 #include "ScreenManager.h"
 #include "WiFiWidget.h"
 #include "esp_heap_caps_init.h"
@@ -101,13 +101,12 @@ LEDWidget statusLED2;
 BluetoothWidget bluetoothLED;
 WiFiWidget wifiLED;
 
-extern NodeId kLocalNodeId;
-extern void PairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId, SecurePairingSession * pairing);
+extern void PairingComplete(SecurePairingSession * pairing);
 
 const char * TAG = "wifi-echo-demo";
 
 static EchoDeviceCallbacks EchoCallbacks;
-RendezvousSession * rendezvousSession = nullptr;
+RendezvousDeviceDelegate * rendezvousDelegate = nullptr;
 
 namespace {
 
@@ -475,19 +474,12 @@ extern "C" void app_main()
 
     if (isRendezvousBLE())
     {
-        uint32_t setupPINCode;
-        err = ConfigurationMgr().GetSetupPinCode(setupPINCode);
-        if (err != CHIP_NO_ERROR)
-        {
-            ESP_LOGE(TAG, "GetSetupPinCode() failed: %s", ErrorStr(err));
-            return;
-        }
-        rendezvousSession = new RendezvousSession(&bluetoothLED, setupPINCode, kLocalNodeId);
+        rendezvousDelegate = new RendezvousDeviceDelegate();
     }
     else if (isRendezvousBypassed())
     {
         ChipLogProgress(Ble, "Rendezvous and Secure Pairing skipped. Using test secret.");
-        PairingComplete(Optional<NodeId>::Value(kUndefinedNodeId), 0, 0, &gTestPairing);
+        PairingComplete(&gTestPairing);
     }
 
 #if CONFIG_USE_ECHO_CLIENT
