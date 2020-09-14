@@ -1,6 +1,5 @@
 #
 #    Copyright (c) 2020 Project CHIP Authors
-#    Copyright (c) 2018 Nest Labs, Inc.
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,24 +18,8 @@
 #      Some useful defaults for the demo app configuration.
 #
 
-
-# Default to 921600 baud when flashing and monitoring device
-CONFIG_ESPTOOLPY_BAUD_921600B=y
-CONFIG_ESPTOOLPY_BAUD=921600
-CONFIG_ESPTOOLPY_COMPRESSED=y
-CONFIG_ESPTOOLPY_MONITOR_BAUD_115200B=y
-CONFIG_ESPTOOLPY_MONITOR_BAUD=115200
-CONFIG_MBEDTLS_HARDWARE_AES=n
-CONFIG_MBEDTLS_HARDWARE_MPI=n
-CONFIG_MBEDTLS_HARDWARE_SHA=n
-CONFIG_CHIP_TASK_STACK_SIZE=32768
-CONFIG_ESP_MAIN_TASK_STACK_SIZE=32768
-CONFIG_ESP32_PANIC_PRINT_REBOOT=y
-CONFIG_ESP32_PANIC_PRINT_HALT=n
-
-# enable BT
-CONFIG_BT_ENABLED=y
-
-# Use a custom partition table
-CONFIG_PARTITION_TABLE_CUSTOM=y
-CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
+# ESP-IDF Partition Table
+# Name,   Type, SubType, Offset,  Size, Flags
+nvs,      data, nvs,     0x9000,  0x6000,
+phy_init, data, phy,     0xf000,  0x1000,
+factory,  app,  factory, 0x10000, 1984K,

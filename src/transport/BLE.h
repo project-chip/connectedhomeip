@@ -36,61 +36,11 @@
 #include <core/CHIPCore.h>
 #include <support/DLLUtil.h>
 #include <transport/Base.h>
+#include <transport/RendezvousParameters.h>
+#include <transport/RendezvousSessionDelegate.h>
 
 namespace chip {
 namespace Transport {
-
-class BLECallbackHandler;
-
-/** Defines connections parameters for setting up a BLE transport */
-class BleConnectionParameters
-{
-public:
-    explicit BleConnectionParameters(BLECallbackHandler * callbacks, Ble::BleLayer * layer) :
-        mCallbackHandler(callbacks), mLayer(layer)
-    {}
-
-    BleConnectionParameters(const BleConnectionParameters &) = default;
-    BleConnectionParameters(BleConnectionParameters &&)      = default;
-
-    BLECallbackHandler * GetCallbackHandler() { return mCallbackHandler; }
-
-    Ble::BleLayer * GetBleLayer() { return mLayer; }
-
-    bool HasConnectionObject() const { return mConnectionObj; };
-    BLE_CONNECTION_OBJECT GetConnectionObject() const { return mConnectionObj; };
-    BleConnectionParameters & SetConnectionObject(BLE_CONNECTION_OBJECT connObj)
-    {
-        mConnectionObj = connObj;
-
-        return *this;
-    }
-
-    bool HasDiscriminator() const { return mDiscriminator != 0; };
-    uint16_t GetDiscriminator() const { return mDiscriminator; };
-    BleConnectionParameters & SetDiscriminator(const uint16_t discriminator)
-    {
-        mDiscriminator = discriminator;
-
-        return *this;
-    }
-
-    bool HasSetupPINCode() const { return mSetupPINCode != 0; };
-    uint32_t GetSetupPINCode() const { return mSetupPINCode; };
-    BleConnectionParameters & SetSetupPINCode(const uint32_t setupPINCode)
-    {
-        mSetupPINCode = setupPINCode;
-
-        return *this;
-    }
-
-private:
-    BLECallbackHandler * mCallbackHandler = nullptr;
-    Ble::BleLayer * mLayer                = nullptr; ///< Associated ble layer
-    BLE_CONNECTION_OBJECT mConnectionObj  = 0;       ///< the target peripheral BLE_CONNECTION_OBJECT
-    uint16_t mDiscriminator               = 0;       ///< the target peripheral discriminator
-    uint32_t mSetupPINCode                = 0;       ///< the target peripheral setup PIN Code
-};
 
 /** Implements a transport using BLE.
  *
@@ -116,9 +66,10 @@ public:
     /**
      * Initialize a BLE transport to a given peripheral or a given device name.
      *
+     * @param delegate      the delegate that will receive BLE events
      * @param params        BLE configuration parameters for this transport
      */
-    CHIP_ERROR Init(BleConnectionParameters & params);
+    CHIP_ERROR Init(RendezvousSessionDelegate * delegate, const RendezvousParameters & params);
 
     CHIP_ERROR SendMessage(const MessageHeader & header, const Transport::PeerAddress & address,
                            System::PacketBuffer * msgBuf) override;
@@ -128,9 +79,21 @@ public:
         return (mState == State::kInitialized) && (address.GetTransportType() == Type::kBle);
     }
 
+    CHIP_ERROR SetEndPoint(Ble::BLEEndPoint * endPoint);
+
 private:
-    CHIP_ERROR InitInternal(Ble::BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj);
+    CHIP_ERROR InitInternal(BLE_CONNECTION_OBJECT connObj);
     CHIP_ERROR DelegateConnection(Ble::BleLayer * bleLayer, const uint16_t connDiscriminator);
+    void SetupEvents(Ble::BLEEndPoint * endPoint);
+
+    /**
+     * @brief
+     *  Called when the underlying BleLayer receive a new
+     *  remote connection.
+     *
+     * @param endPoint The newly opened BLEEndPoint
+     */
+    static void OnNewConnection(Ble::BLEEndPoint * endPoint);
 
     // Those functions are BLEConnectionDelegate callbacks used when the connection
     // parameters used a name instead of a BLE_CONNECTION_OBJECT.
@@ -142,24 +105,10 @@ private:
     static void OnBleEndPointConnectionComplete(BLEEndPoint * endPoint, BLE_ERROR err);
     static void OnBleEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err);
 
-    Ble::BleLayer * mBleLayer          = nullptr;          ///< Associated ble layer
-    BLEEndPoint * mBleEndPoint         = nullptr;          ///< BLE endpoint used by the transport
-    State mState                       = State::kNotReady; ///< State of the BLE transport
-    BLECallbackHandler * mBleCallbacks = nullptr;          ///< BLE events
-};
-
-/** Defines callbacks that are BLE specific, beyond standard
- *  'transport' layer base callbacks for message receive
- */
-class BLECallbackHandler
-{
-public:
-    virtual ~BLECallbackHandler() {}
-
-    virtual void OnBLEConnectionError(BLE_ERROR err)        = 0;
-    virtual void OnBLEConnectionComplete(BLE_ERROR err)     = 0;
-    virtual void OnBLEConnectionClosed(BLE_ERROR err)       = 0;
-    virtual void OnBLEPacketReceived(PacketBuffer * buffer) = 0;
+    Ble::BleLayer * mBleLayer             = nullptr;          ///< Associated ble layer
+    State mState                          = State::kNotReady; ///< State of the BLE transport
+    BLEEndPoint * mBleEndPoint            = nullptr;          ///< BLE endpoint used by transport
+    RendezvousSessionDelegate * mDelegate = nullptr;          ///< BLE events from transport
 };
 
 } // namespace Transport

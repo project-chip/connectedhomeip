@@ -38,11 +38,10 @@ public:
     static CHIP_ERROR SetAPMode(bool enabled);
     static int OrderScanResultsByRSSI(const void * _res1, const void * _res2);
     static const char * WiFiModeToStr(wifi_mode_t wifiMode);
-    static struct netif * GetNetif(tcpip_adapter_if_t intfId);
+    static struct netif * GetNetif(const char * ifKey);
     static struct netif * GetStationNetif(void);
-    static bool IsInterfaceUp(tcpip_adapter_if_t intfId);
-    static const char * InterfaceIdToName(tcpip_adapter_if_t intfId);
-    static bool HasIPv6LinkLocalAddress(tcpip_adapter_if_t intfId);
+    static bool IsInterfaceUp(const char * ifKey);
+    static bool HasIPv6LinkLocalAddress(const char * ifKey);
 
     static CHIP_ERROR GetWiFiStationProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials);
     static CHIP_ERROR SetWiFiStationProvision(const Internal::DeviceNetworkInfo & netInfo);

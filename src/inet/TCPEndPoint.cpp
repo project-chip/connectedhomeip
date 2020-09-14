@@ -60,7 +60,6 @@
 
 #include "arpa-inet-compatibility.h"
 
-#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -1231,7 +1230,7 @@ INET_ERROR TCPEndPoint::DriveSending()
                 uint8_t * sendData = mUnsentQueue->Start() + mUnsentOffset;
 
                 // Determine the amount of data to send from the current buffer.
-                assert(bufDataLen >= mUnsentOffset);
+                VerifyOrDie(bufDataLen >= mUnsentOffset);
                 uint16_t sendLen = static_cast<uint16_t>(bufDataLen - mUnsentOffset);
                 if (sendLen > sendWindowSize)
                     sendLen = sendWindowSize;
@@ -2463,9 +2462,9 @@ void TCPEndPoint::ReceiveData()
         // Otherwise, add the new data onto the receive queue.
         else if (isNewBuf)
         {
-            assert(rcvLen > 0);
+            VerifyOrDie(rcvLen > 0);
             size_t newDataLength = rcvBuf->DataLength() + static_cast<size_t>(rcvLen);
-            assert(CanCastTo<uint16_t>(newDataLength));
+            VerifyOrDie(CanCastTo<uint16_t>(newDataLength));
             rcvBuf->SetDataLength(static_cast<uint16_t>(newDataLength));
             if (mRcvQueue == NULL)
                 mRcvQueue = rcvBuf;
@@ -2475,9 +2474,9 @@ void TCPEndPoint::ReceiveData()
 
         else
         {
-            assert(rcvLen > 0);
+            VerifyOrDie(rcvLen > 0);
             size_t newDataLength = rcvBuf->DataLength() + static_cast<size_t>(rcvLen);
-            assert(CanCastTo<uint16_t>(newDataLength));
+            VerifyOrDie(CanCastTo<uint16_t>(newDataLength));
             rcvBuf->SetDataLength(static_cast<uint16_t>(newDataLength), mRcvQueue);
         }
     }

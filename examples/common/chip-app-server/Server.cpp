@@ -110,7 +110,7 @@ void InitServer()
     SuccessOrExit(err);
 
     // TODO: ESP32 echo server supports actual pairing, needs to investigate how to share this with ESP32
-    err = sessions.NewPairing(Optional<NodeId>::Value(kUndefinedNodeId), peer, 0, 0, &gTestPairing);
+    err = sessions.NewPairing(peer, &gTestPairing);
     SuccessOrExit(err);
 
     sessions.SetDelegate(&gCallbacks);
