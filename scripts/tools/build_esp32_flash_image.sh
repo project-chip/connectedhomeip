@@ -28,7 +28,7 @@
 
 here=$(cd "$(dirname "$0")" && pwd)
 build_dir="$(dirname "$1")"
-bootload_file="$build_dir"/bootloader/bootloader.bin
-partitions_file="$build_dir"/partitions_singleapp.bin
+bootload_file="$build_dir"/bootloader.bin
+partitions_file="$build_dir"/partitions.bin
 
 "$here"/flash_image_builder.sh 0x400000 "$2" 0x1000="$bootload_file" 0x8000="$partitions_file" 0x10000="$1"

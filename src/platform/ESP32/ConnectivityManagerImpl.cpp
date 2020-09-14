@@ -30,6 +30,7 @@
 #include <support/logging/CHIPLogging.h>
 
 #include "esp_event.h"
+#include "esp_netif.h"
 #include "esp_wifi.h"
 
 #include <lwip/dns.h>
@@ -454,60 +455,72 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     // Handle ESP system events...
     if (event->Type == DeviceEventType::kESPSystemEvent)
     {
-        switch (event->Platform.ESPSystemEvent.event_id)
+        if (event->Platform.ESPSystemEvent.Base == WIFI_EVENT)
         {
-        case SYSTEM_EVENT_STA_START:
-            ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_STA_START");
-            DriveStationState();
-            break;
-        case SYSTEM_EVENT_STA_CONNECTED:
-            ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_STA_CONNECTED");
-            if (mWiFiStationState == kWiFiStationState_Connecting)
+            switch (event->Platform.ESPSystemEvent.Id)
             {
-                ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
+            case WIFI_EVENT_STA_START:
+                ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_START");
+                DriveStationState();
+                break;
+            case WIFI_EVENT_STA_CONNECTED:
+                ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_CONNECTED");
+                if (mWiFiStationState == kWiFiStationState_Connecting)
+                {
+                    ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
+                }
+                DriveStationState();
+                break;
+            case WIFI_EVENT_STA_DISCONNECTED:
+                ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_DISCONNECTED");
+                if (mWiFiStationState == kWiFiStationState_Connecting)
+                {
+                    ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
+                }
+                DriveStationState();
+                break;
+            case WIFI_EVENT_STA_STOP:
+                ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_STOP");
+                DriveStationState();
+                break;
+            case WIFI_EVENT_AP_START:
+                ChipLogProgress(DeviceLayer, "WIFI_EVENT_AP_START");
+                ChangeWiFiAPState(kWiFiAPState_Active);
+                DriveAPState();
+                break;
+            case WIFI_EVENT_AP_STOP:
+                ChipLogProgress(DeviceLayer, "WIFI_EVENT_AP_STOP");
+                ChangeWiFiAPState(kWiFiAPState_NotActive);
+                DriveAPState();
+                break;
+            case WIFI_EVENT_AP_STACONNECTED:
+                ChipLogProgress(DeviceLayer, "WIFI_EVENT_AP_STACONNECTED");
+                MaintainOnDemandWiFiAP();
+                break;
+            default:
+                break;
             }
-            DriveStationState();
-            break;
-        case SYSTEM_EVENT_STA_DISCONNECTED:
-            ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_STA_DISCONNECTED");
-            if (mWiFiStationState == kWiFiStationState_Connecting)
+        }
+
+        if (event->Platform.ESPSystemEvent.Base == IP_EVENT)
+        {
+            switch (event->Platform.ESPSystemEvent.Id)
             {
-                ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
+            case IP_EVENT_STA_GOT_IP:
+                ChipLogProgress(DeviceLayer, "IP_EVENT_STA_GOT_IP");
+                OnStationIPv4AddressAvailable(event->Platform.ESPSystemEvent.Data.IpGotIp);
+                break;
+            case IP_EVENT_STA_LOST_IP:
+                ChipLogProgress(DeviceLayer, "IP_EVENT_STA_LOST_IP");
+                OnStationIPv4AddressLost();
+                break;
+            case IP_EVENT_GOT_IP6:
+                ChipLogProgress(DeviceLayer, "IP_EVENT_GOT_IP6");
+                OnIPv6AddressAvailable(event->Platform.ESPSystemEvent.Data.IpGotIp6);
+                break;
+            default:
+                break;
             }
-            DriveStationState();
-            break;
-        case SYSTEM_EVENT_STA_STOP:
-            ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_STA_STOP");
-            DriveStationState();
-            break;
-        case SYSTEM_EVENT_STA_GOT_IP:
-            ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_STA_GOT_IP");
-            OnStationIPv4AddressAvailable(event->Platform.ESPSystemEvent.event_info.got_ip);
-            break;
-        case SYSTEM_EVENT_STA_LOST_IP:
-            ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_STA_LOST_IP");
-            OnStationIPv4AddressLost();
-            break;
-        case SYSTEM_EVENT_GOT_IP6:
-            ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_GOT_IP6");
-            OnIPv6AddressAvailable(event->Platform.ESPSystemEvent.event_info.got_ip6);
-            break;
-        case SYSTEM_EVENT_AP_START:
-            ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_AP_START");
-            ChangeWiFiAPState(kWiFiAPState_Active);
-            DriveAPState();
-            break;
-        case SYSTEM_EVENT_AP_STOP:
-            ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_AP_STOP");
-            ChangeWiFiAPState(kWiFiAPState_NotActive);
-            DriveAPState();
-            break;
-        case SYSTEM_EVENT_AP_STACONNECTED:
-            ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_AP_STACONNECTED");
-            MaintainOnDemandWiFiAP();
-            break;
-        default:
-            break;
         }
     }
 }
@@ -653,10 +666,10 @@ void ConnectivityManagerImpl::OnStationConnected()
     CHIP_ERROR err;
 
     // Assign an IPv6 link local address to the station interface.
-    err = tcpip_adapter_create_ip6_linklocal(TCPIP_ADAPTER_IF_STA);
+    err = esp_netif_create_ip6_linklocal(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"));
     if (err != ESP_OK)
     {
-        ChipLogError(DeviceLayer, "tcpip_adapter_create_ip6_linklocal(TCPIP_ADAPTER_IF_STA) failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_netif_create_ip6_linklocal() failed for WIFI_STA_DEF interface: %s", chip::ErrorStr(err));
     }
 
     // TODO Invoke WARM to perform actions that occur when the WiFi station interface comes up.
@@ -818,13 +831,13 @@ void ConnectivityManagerImpl::DriveAPState()
 
     // If AP is active, but the interface doesn't have an IPv6 link-local
     // address, assign one now.
-    if (mWiFiAPState == kWiFiAPState_Active && Internal::ESP32Utils::IsInterfaceUp(TCPIP_ADAPTER_IF_AP) &&
-        !Internal::ESP32Utils::HasIPv6LinkLocalAddress(TCPIP_ADAPTER_IF_AP))
+    if (mWiFiAPState == kWiFiAPState_Active && Internal::ESP32Utils::IsInterfaceUp("WIFI_AP_DEF") &&
+        !Internal::ESP32Utils::HasIPv6LinkLocalAddress("WIFI_AP_DEF"))
     {
-        err = tcpip_adapter_create_ip6_linklocal(TCPIP_ADAPTER_IF_AP);
+        err = esp_netif_create_ip6_linklocal(esp_netif_get_handle_from_ifkey("WIFI_AP_DEF"));
         if (err != ESP_OK)
         {
-            ChipLogError(DeviceLayer, "tcpip_adapter_create_ip6_linklocal(TCPIP_ADAPTER_IF_AP) failed: %s", chip::ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_netif_create_ip6_linklocal() failed for WIFI_AP_DEF interface: %s", chip::ErrorStr(err));
         }
         SuccessOrExit(err);
     }
@@ -953,16 +966,13 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
     }
 }
 
-void ConnectivityManagerImpl::OnStationIPv4AddressAvailable(const system_event_sta_got_ip_t & got_ip)
+void ConnectivityManagerImpl::OnStationIPv4AddressAvailable(const ip_event_got_ip_t & got_ip)
 {
 #if CHIP_PROGRESS_LOGGING
     {
-        char ipAddrStr[INET_ADDRSTRLEN], netMaskStr[INET_ADDRSTRLEN], gatewayStr[INET_ADDRSTRLEN];
-        IPAddress::FromIPv4(got_ip.ip_info.ip).ToString(ipAddrStr, sizeof(ipAddrStr));
-        IPAddress::FromIPv4(got_ip.ip_info.netmask).ToString(netMaskStr, sizeof(netMaskStr));
-        IPAddress::FromIPv4(got_ip.ip_info.gw).ToString(gatewayStr, sizeof(gatewayStr));
-        ChipLogProgress(DeviceLayer, "IPv4 address %s on WiFi station interface: %s/%s gateway %s",
-                        (got_ip.ip_changed) ? "changed" : "ready", ipAddrStr, netMaskStr, gatewayStr);
+        ChipLogProgress(DeviceLayer, "IPv4 address %s on WiFi station interface: " IPSTR "/" IPSTR " gateway " IPSTR,
+                        (got_ip.ip_changed) ? "changed" : "ready", IP2STR(&got_ip.ip_info.ip), IP2STR(&got_ip.ip_info.netmask),
+                        IP2STR(&got_ip.ip_info.gw));
     }
 #endif // CHIP_PROGRESS_LOGGING
 
@@ -980,15 +990,12 @@ void ConnectivityManagerImpl::OnStationIPv4AddressLost(void)
     UpdateInternetConnectivityState();
 }
 
-void ConnectivityManagerImpl::OnIPv6AddressAvailable(const system_event_got_ip6_t & got_ip)
+void ConnectivityManagerImpl::OnIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip)
 {
 #if CHIP_PROGRESS_LOGGING
     {
-        IPAddress ipAddr = IPAddress::FromIPv6(got_ip.ip6_info.ip);
-        char ipAddrStr[INET6_ADDRSTRLEN];
-        ipAddr.ToString(ipAddrStr, sizeof(ipAddrStr));
-        ChipLogProgress(DeviceLayer, "IPv6 addr available. Ready on %s interface: %s",
-                        Internal::ESP32Utils::InterfaceIdToName(got_ip.if_index), ipAddrStr);
+        ChipLogProgress(DeviceLayer, "IPv6 addr available. Ready on %s interface: " IPV6STR, esp_netif_get_ifkey(got_ip.esp_netif),
+                        IPV62STR(got_ip.ip6_info.ip));
     }
 #endif // CHIP_PROGRESS_LOGGING
 

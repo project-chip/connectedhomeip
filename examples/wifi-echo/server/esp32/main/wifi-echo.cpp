@@ -27,17 +27,15 @@
 #include "RendezvousSession.h"
 #include "ScreenManager.h"
 #include "WiFiWidget.h"
-#include "esp_event_loop.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
+#include "esp_netif.h"
 #include "esp_spi_flash.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
-
-#include "tcpip_adapter.h"
 
 #include <cmath>
 #include <cstdio>
@@ -348,10 +346,10 @@ void SetupPretendDevices()
 
 void GetGatewayIP(char * ip_buf, size_t ip_len)
 {
-    tcpip_adapter_ip_info_t ip;
-    tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_AP, &ip);
-    IPAddress::FromIPv4(ip.ip).ToString(ip_buf, ip_len);
-    ESP_LOGE(TAG, "Got gateway ip %s", ip_buf);
+    esp_netif_ip_info_t ipInfo;
+    esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_AP_DEF"), &ipInfo);
+    esp_ip4addr_ntoa(&ipInfo.ip, ip_buf, ip_len);
+    ESP_LOGI(TAG, "Got gateway ip %s", ip_buf);
 }
 
 bool isRendezvousBLE()
