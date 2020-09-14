@@ -64,9 +64,15 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     if (chip_build_tools) {
       deps += [
         "${chip_root}/examples/shell",
+        "${chip_root}/src/controller/python",
         "${chip_root}/src/qrcodetool",
         "${chip_root}/src/setup_payload",
       ]
+      if (current_os == "linux") {
+        deps += [
+          "${chip_root}/src/controller/python",
+        ]
+      }
     }
 
     if (current_os == "android") {
