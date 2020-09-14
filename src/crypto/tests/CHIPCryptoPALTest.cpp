@@ -608,7 +608,7 @@ static void TestECDSA_Signing_SHA256(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     uint8_t signature[kMax_ECDSA_Signature_Length];
-    size_t signature_length = sizeof(signature);
+    size_t signature_length  = sizeof(signature);
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg((const uint8_t *) msg, msg_length, signature, signature_length);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
 
@@ -626,7 +626,7 @@ static void TestECDSA_ValidationFailsDifferentMessage(nlTestSuite * inSuite, voi
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     uint8_t signature[kMax_ECDSA_Signature_Length];
-    size_t signature_length = sizeof(signature);
+    size_t signature_length  = sizeof(signature);
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg((const uint8_t *) msg, msg_length, signature, signature_length);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
 
@@ -646,7 +646,7 @@ static void TestECDSA_ValidationFailIncorrectSignature(nlTestSuite * inSuite, vo
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     uint8_t signature[kMax_ECDSA_Signature_Length];
-    size_t signature_length = sizeof(signature);
+    size_t signature_length  = sizeof(signature);
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg((const uint8_t *) msg, msg_length, signature, signature_length);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
     signature[0] = ~signature[0]; // Flipping bits should invalidate the signature.
@@ -658,14 +658,14 @@ static void TestECDSA_ValidationFailIncorrectSignature(nlTestSuite * inSuite, vo
 
 static void TestECDSA_SigningInvalidParams(nlTestSuite * inSuite, void * inContext)
 {
-    const uint8_t * msg       = (uint8_t *) "Hello World!";
-    size_t msg_length         = strlen((const char *) msg);
+    const uint8_t * msg = (uint8_t *) "Hello World!";
+    size_t msg_length   = strlen((const char *) msg);
 
     P256Keypair keypair;
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     uint8_t signature[kMax_ECDSA_Signature_Length];
-    size_t signature_length = sizeof(signature);
+    size_t signature_length  = sizeof(signature);
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(NULL, msg_length, signature, signature_length);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_ERROR_INVALID_ARGUMENT);
     signing_error = CHIP_NO_ERROR;
