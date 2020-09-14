@@ -162,7 +162,7 @@ int AppTask::Init()
         EFR32_LOG("Failed to get Base41 payload for QR code with %s", chip::ErrorStr(err));
     }
 
-    EFR32_LOG("SetupPINCode: [%" PRIu32 "]", setUpPINCode);
+    EFR32_LOG("SetupPINCode: [%09u]", setUpPINCode);
     LCDWriteQRCode((uint8_t *) result.c_str());
 
 #endif

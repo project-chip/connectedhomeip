@@ -58,7 +58,7 @@ efr32_sdk("sdk") {
 efr32_executable("lock_app") {
   include_dirs = []
   defines = []
-  output_name = "chip-efr32-lock-example"
+  output_name = "chip-efr32-lock-example.out"
 
   public_deps = [
     ":sdk",
@@ -71,9 +71,9 @@ efr32_executable("lock_app") {
   ]
 
   include_dirs += [
-    "${efr32_project_dir}/include/",
+    "${efr32_project_dir}/include",
     "${chip_root}/src/app/util",
-    "${examples_plat_dir}/",
+    "${examples_plat_dir}",
     "${chip_root}/examples/common/QRCode/repo/c",
   ]
 
@@ -92,6 +92,7 @@ efr32_executable("lock_app") {
     "${chip_root}/src/app/util/process-cluster-message.c",
     "${chip_root}/src/app/util/process-global-message.c",
     "${chip_root}/src/app/util/util.c",
+    "${examples_plat_dir}/init_otSystem.c",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/hal-config.h",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
@@ -108,7 +109,7 @@ efr32_executable("lock_app") {
   ]
 
   if (show_qr_code) {
-    sources += [ "src/display/lcd.c" ]
+    sources += [ "${examples_plat_dir}/display/lcd.c" ]
 
     defines += [ "DISPLAY_ENABLED" ]
   }

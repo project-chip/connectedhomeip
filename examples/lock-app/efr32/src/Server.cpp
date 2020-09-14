@@ -204,7 +204,6 @@ void PublishService()
     ThreadStackMgrImpl().UnlockThreadStack();
 }
 
-;
 void InitDataModelHandler()
 {
     emberAfEndpointConfigure();

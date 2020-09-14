@@ -57,7 +57,7 @@
 extern "C" {
 #endif
 
-int efr32LogInit(void);
+void efr32LogInit(void);
 void efr32RandomInit(void);
 
 void efr32Log(const char * aFormat, ...);

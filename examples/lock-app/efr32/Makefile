@@ -74,7 +74,7 @@ BUILD_SUPPORT_DIR := $(CHIP_ROOT)/config/efr32
 include $(BUILD_SUPPORT_DIR)/efr32-app.mk
 include $(BUILD_SUPPORT_DIR)/efr32-chip.mk
 include $(BUILD_SUPPORT_DIR)/efr32-freertos.mk
-include $(PROJECT_ROOT)/src/display/efr32-lcd.mk
+include $(EXAMPLES_PLAT_DIR)/display/efr32-lcd.mk
 
 APP = efr32-lock-example
 

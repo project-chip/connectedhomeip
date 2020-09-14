@@ -91,15 +91,13 @@ static void PrintLog(const char * msg)
 /**
  * Initialize Segger RTT for logging
  */
-extern "C" int efr32LogInit(void)
+extern "C" void efr32LogInit(void)
 {
 #if EFR32_LOG_ENABLED
     SEGGER_RTT_ConfigUpBuffer(LOG_RTT_BUFFER_INDEX, LOG_RTT_BUFFER_NAME, sLogBuffer, LOG_RTT_BUFFER_SIZE,
                               SEGGER_RTT_MODE_NO_BLOCK_TRIM);
     sLogInitialized = true;
 #endif // EFR32_LOG_ENABLED
-
-    return 0;
 }
 
 /**
