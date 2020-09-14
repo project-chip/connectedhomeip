@@ -391,7 +391,6 @@ EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(uint8_t end
 }
 
 void emberAfPluginDoorLockServerInitCallback(void) {}
-void emberAfPluginReportingInitCallback(void) {}
 void emberAfPollControlClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId) {}
 void emberAfPollControlClusterServerInitCallback(uint8_t endpoint) {}
 void emberAfPluginPollControlServerStackStatusCallback(EmberStatus status) {}
