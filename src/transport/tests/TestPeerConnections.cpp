@@ -287,7 +287,4 @@ int TestPeerConnectionsFn(void)
     return nlTestRunnerStats(&theSuite);
 }
 
-static void __attribute__((constructor)) TestPeerConnectionsCtor(void)
-{
-    VerifyOrDie(RegisterUnitTests(&TestPeerConnectionsFn) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestPeerConnectionsFn)

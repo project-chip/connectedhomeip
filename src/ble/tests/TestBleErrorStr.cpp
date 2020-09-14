@@ -40,6 +40,7 @@
 
 #include <ble/BleError.h>
 #include <support/ErrorStr.h>
+#include <support/TestUtils.h>
 
 #include <nlunit-test.h>
 
@@ -142,3 +143,5 @@ int TestBleErrorStr(void)
 
     return nlTestRunnerStats(&theSuite);
 }
+
+CHIP_REGISTER_TEST_SUITE(TestBleErrorStr)

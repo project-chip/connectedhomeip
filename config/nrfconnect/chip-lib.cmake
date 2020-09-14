@@ -161,6 +161,7 @@ function(chip_build TARGET_NAME BASE_TARGET_NAME)
         ${CHIP_OUTPUT_DIR}/gen/third_party/connectedhomeip/src/app/include
     )
     target_link_directories(${TARGET_NAME} INTERFACE
+        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/inet/tests/lib
         ${CHIP_OUTPUT_DIR}/lib
     )
     target_link_libraries(${TARGET_NAME} INTERFACE -Wl,--start-group ${CHIP_BUILD_ARTIFACTS} -Wl,--end-group)

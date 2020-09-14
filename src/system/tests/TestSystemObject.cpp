@@ -536,7 +536,4 @@ int TestSystemObject(void)
     return nlTestRunnerStats(&sTestSuite);
 }
 
-static void __attribute__((constructor)) TestSystemObjectCtor(void)
-{
-    VerifyOrDie(chip::RegisterUnitTests(&TestSystemObject) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestSystemObject)

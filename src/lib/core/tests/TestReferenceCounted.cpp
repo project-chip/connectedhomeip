@@ -30,6 +30,7 @@
 #include <string.h>
 
 #include <lib/core/ReferenceCounted.h>
+#include <support/TestUtils.h>
 
 #include <nlunit-test.h>
 
@@ -74,3 +75,5 @@ int TestReferenceCounted(void)
 
     return (nlTestRunnerStats(&theSuite));
 }
+
+CHIP_REGISTER_TEST_SUITE(TestReferenceCounted)

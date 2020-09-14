@@ -1253,7 +1253,4 @@ int TestCHIPCryptoPAL(void)
     return (nlTestRunnerStats(&theSuite));
 }
 
-static void __attribute__((constructor)) TestCHIPCryptoCtor(void)
-{
-    VerifyOrDie(RegisterUnitTests(&TestCHIPCryptoPAL) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestCHIPCryptoPAL)
