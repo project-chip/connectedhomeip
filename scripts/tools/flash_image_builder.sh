@@ -57,7 +57,7 @@ for item in "${@:3}"; do
     [[ $written -le $offset ]] || usage "Writing $file at $offset will overwrite previous segment"
 
     read -r _perms _ _user _group filesize _rest < <(ls -l "$file")
-    ((written+=filesize))
+    ((written += filesize))
     [[ $written -lt $image_size ]] || usage "Writing $file at $offset will overflow image"
 
     dd if="$file" of="$2" conv=notrunc bs="$offset" seek=1
