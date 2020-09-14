@@ -23,6 +23,7 @@ config("includes") {
 
 source_set("lighting-common") {
   sources = [
+    "${chip_root}/examples/common/chip-app-server/DataModelHandler.cpp",
     "${chip_root}/src/app/clusters/on-off-server/on-off.c",
     "${chip_root}/src/app/util/af-event.cpp",
     "${chip_root}/src/app/util/attribute-size.c",
@@ -36,7 +37,6 @@ source_set("lighting-common") {
     "${chip_root}/src/app/util/process-cluster-message.c",
     "${chip_root}/src/app/util/process-global-message.c",
     "${chip_root}/src/app/util/util.c",
-    "DataModelHandler.cpp",
     "gen/call-command-handler.c",
     "gen/callback-stub.c",
     "gen/znet-bookkeeping.c",
