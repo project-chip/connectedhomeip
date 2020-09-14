@@ -14,38 +14,21 @@
 
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/gn/chip/tools.gni")
-
-assert(chip_build_tools)
-
 config("includes") {
   include_dirs = [
     ".",
     "include",
-    "${chip_root}/src/app/util",
   ]
 }
 
-executable("chip-tool-server") {
-  sources = [
-    "LightingManager.cpp",
-    "include/LightingManager.h",
-    "main.cpp",
-  ]
+static_library("chip-app-server") {
+  output_name = "chip-app-server"
 
-  if (is_debug) {
-    defines = [ "BUILD_RELEASE=0" ]
-  } else {
-    defines = [ "BUILD_RELEASE=1" ]
-  }
+  sources = [ "Server.cpp" ]
+
+  deps = [ "${chip_root}/src/lib" ]
 
   public_configs = [ ":includes" ]
-
-  deps = [
-    "${chip_root}/examples/common/chip-app-server:chip-app-server",
-    "${chip_root}/examples/lighting-app/lighting-common",
-    "${chip_root}/src/lib",
-  ]
 
   output_dir = root_out_dir
 }

@@ -15,18 +15,23 @@
  *    limitations under the License.
  */
 
+#ifndef CHIP_APP_SERVER_SERVER_H
+#define CHIP_APP_SERVER_SERVER_H
+
+#include <inet/IPAddress.h>
+#include <inet/InetLayer.h>
+#include <system/SystemPacketBuffer.h>
+#include <transport/SecureSessionMgr.h>
+#include <transport/UDP.h>
+
+using DemoSessionManager = chip::SecureSessionMgr<chip::Transport::UDP>;
+
 /**
- * @file
- *   This file defines the API for the handler for data model messages.
+ * Initialize DataModelHandler and start CHIP datamodel server, the server
+ * assumes the platform's networking has been setup already.
+ *
+ * @param [in] sessions The demo's session manager.
  */
+void InitServer();
 
-#ifndef DATA_MODEL_HANDLER_H
-#define DATA_MODEL_HANDLER_H
-
-namespace chip {
-namespace System {
-class PacketBuffer;
-} // namespace System
-} // namespace chip
-
-#endif // DATA_MODEL_HANDLER_H
+#endif // CHIP_APP_SERVER_SERVER_H

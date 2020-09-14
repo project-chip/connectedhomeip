@@ -15,20 +15,29 @@
  *    limitations under the License.
  */
 
-#ifndef NRF5_COMMON_SERVER_H
-#define NRF5_COMMON_SERVER_H
+/**
+ * @file
+ *   This file defines the API for the handler for data model messages.
+ */
 
-#include <inet/IPAddress.h>
-#include <inet/InetLayer.h>
+#ifndef DATA_MODEL_HANDLER_H
+#define DATA_MODEL_HANDLER_H
+
 #include <system/SystemPacketBuffer.h>
+#include <transport/MessageHeader.h>
 #include <transport/SecureSessionMgr.h>
-#include <transport/UDP.h>
 
-using DemoSessionManager = chip::SecureSessionMgr<chip::Transport::UDP>;
-
-void StartServer(DemoSessionManager * sessions);
+extern "C" {
+/**
+ * Handle a message that should be processed via our data model processing
+ * codepath.
+ *
+ * @param [in] buffer The buffer holding the message.  This function guarantees
+ *                    that it will free the buffer before returning.
+ */
+void HandleDataModelMessage(const chip::MessageHeader & header, chip::System::PacketBuffer * buffer,
+                            chip::SecureSessionMgrBase * mgr);
 void InitDataModelHandler();
-void SetDeviceName(const char * newDeviceName);
-void PublishService();
+}
 
-#endif // NRF5_COMMON_SERVER_H
+#endif // DATA_MODEL_HANDLER_H

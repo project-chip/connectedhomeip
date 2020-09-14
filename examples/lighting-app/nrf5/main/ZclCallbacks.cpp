@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,36 +16,31 @@
  *    limitations under the License.
  */
 
-/**
- * @file
- *   This file implements the handler for data model messages.
- */
+#include <support/logging/CHIPLogging.h>
 
-#include <system/SystemPacketBuffer.h>
-
-#include "DataModelHandler.h"
-#include "LightingManager.h"
-#include "nrf_log.h"
-
-#include "af-types.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
+#include "gen/znet-bookkeeping.h"
+#include <app/chip-zcl-zpro-codec.h>
+#include <app/util/af-types.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/util.h>
 
-using namespace ::chip;
+#include "LightingManager.h"
 
-extern "C" void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
-                                                   uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
-                                                   uint8_t * value)
+extern "C" {
+void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
+                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
     if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
     {
-        NRF_LOG_INFO("Unknown cluster ID: %d", clusterId);
+        ChipLogProgress(Zcl, "Unknown cluster ID: %d", clusterId);
         return;
     }
 
     if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
     {
-        NRF_LOG_INFO("Unknown attribute ID: %d", attributeId);
+        ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
         return;
     }
 
@@ -56,4 +52,5 @@ extern "C" void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClus
     {
         LightingMgr().InitiateAction(LightingManager::OFF_ACTION);
     }
+}
 }

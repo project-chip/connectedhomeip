@@ -1,0 +1,89 @@
+/*
+ *
+ *    Copyright (c) 2020 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/**
+ * @file
+ *   This file implements the handler for data model messages.
+ */
+
+#include <lib/support/logging/CHIPLogging.h>
+#include <support/logging/CHIPLogging.h>
+#include <system/SystemPacketBuffer.h>
+
+#include "BoltLockManager.h"
+
+#include "DataModelHandler.h"
+
+#include "gen/attribute-id.h"
+#include "gen/cluster-id.h"
+#include "gen/znet-bookkeeping.h"
+#include <app/chip-zcl-zpro-codec.h>
+#include <app/util/af-types.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/util.h>
+
+using namespace ::chip;
+
+extern "C" {
+/**
+ * Handle a message that should be processed via our data model processing
+ * codepath. This function will free the packet buffer.
+ *
+ * @param [in] buffer The buffer holding the message.  This function guarantees
+ *                    that it will free the buffer before returning.
+ */
+void HandleDataModelMessage(const MessageHeader & header, System::PacketBuffer * buffer, SecureSessionMgrBase * mgr)
+{
+    EmberApsFrame frame;
+    bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) > 0;
+    if (ok)
+    {
+        ChipLogProgress(Zcl, "APS frame processing success!");
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "APS frame processing failure!");
+        System::PacketBuffer::Free(buffer);
+        return;
+    }
+
+    uint8_t * message;
+    uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
+    ok                  = emberAfProcessMessage(&frame,
+                               0, // type
+                               message, messageLen,
+                               header.GetSourceNodeId().Value(), // source identifier
+                               NULL);
+
+    System::PacketBuffer::Free(buffer);
+
+    if (ok)
+    {
+        ChipLogProgress(Zcl, "Data model processing success!");
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "Data model processing failure!");
+    }
+}
+
+void InitDataModelHandler()
+{
+    emberAfEndpointConfigure();
+    emAfInit();
+}
+}
