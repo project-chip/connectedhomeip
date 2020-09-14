@@ -58,7 +58,7 @@ using namespace chip::System;
 #define TOOL_NAME "TestInetEndPoint"
 
 ArgParser::HelpOptions gHelpOptions(TOOL_NAME, "Usage: " TOOL_NAME " [<options...>]\n",
-                                           CHIP_VERSION_STRING "\n" CHIP_TOOL_COPYRIGHT);
+                                    CHIP_VERSION_STRING "\n" CHIP_TOOL_COPYRIGHT);
 
 ArgParser::OptionSet * gToolOptionSets[] = { &gNetworkOptions, &gFaultInjectionOptions, &gHelpOptions, NULL };
 
