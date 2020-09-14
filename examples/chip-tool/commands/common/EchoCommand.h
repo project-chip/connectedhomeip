@@ -26,14 +26,19 @@ class EchoCommand : public NetworkCommand
 public:
     EchoCommand(const char * name, NetworkType type) : NetworkCommand(name, type) {}
 
+    /////////// Command Interface /////////
+    CHIP_ERROR Run(ChipDeviceController * dc, NodeId remoteId) override;
+
     /////////// IPCommand Interface /////////
-    void OnConnect(ChipDeviceController * dc) override { SendEcho(dc); }
-    void OnMessage(ChipDeviceController * dc, PacketBuffer * buffer) override { ReceiveEcho(dc, buffer); }
-    void OnError(ChipDeviceController * dc, CHIP_ERROR err) override {}
+    void OnConnect(ChipDeviceController * dc) override { mController = dc; }
+    void OnMessage(ChipDeviceController * dc, PacketBuffer * buffer) override { ReceiveEcho(buffer); }
+    void OnError(ChipDeviceController * dc, CHIP_ERROR err) override { mController = nullptr; }
 
 private:
-    void SendEcho(ChipDeviceController * dc);
-    void ReceiveEcho(ChipDeviceController * dc, PacketBuffer * buffer);
+    void SendEcho(void) const;
+    void ReceiveEcho(PacketBuffer * buffer) const;
+
+    ChipDeviceController * mController = nullptr;
 };
 
 #endif // __CHIPTOOL_COMMAND_ECHO_H__
