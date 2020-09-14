@@ -24,12 +24,8 @@
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
-#include "BoltLockManager.h"
-
 #include "DataModelHandler.h"
 
-#include "gen/attribute-id.h"
-#include "gen/cluster-id.h"
 #include "gen/znet-bookkeeping.h"
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/util/af-types.h>
