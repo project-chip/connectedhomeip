@@ -60,6 +60,9 @@ if (chip_device_platform == "nrf5") {
     defines += [
       "USE_APP_CONFIG",
       "OPENTHREAD_CONFIG_CLI_TRANSPORT=2",
+      "MBEDTLS_PK_WRITE_C",
+      "MBEDTLS_X509_CREATE_C",
+      "MBEDTLS_X509_CSR_WRITE_C",
     ]
   }
 
