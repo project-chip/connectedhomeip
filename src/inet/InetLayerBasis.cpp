@@ -29,6 +29,16 @@ namespace chip {
 namespace Inet {
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+SocketEvents & SocketEvents::operator=(const SocketEvents & other)
+{
+    if (this != &other)
+    {
+        Value = other.Value;
+    }
+
+    return *this;
+}
+
 /**
  *  Sets the bit for the specified file descriptor in the given sets of file descriptors.
  *

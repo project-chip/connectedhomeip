@@ -45,6 +45,14 @@ namespace Inet {
 
 IPAddress IPAddress::Any;
 
+IPAddress::IPAddress(const IPAddress & other)
+{
+    Addr[0] = other.Addr[0];
+    Addr[1] = other.Addr[1];
+    Addr[2] = other.Addr[2];
+    Addr[3] = other.Addr[3];
+}
+
 bool IPAddress::operator==(const IPAddress & other) const
 {
     return Addr[0] == other.Addr[0] && Addr[1] == other.Addr[1] && Addr[2] == other.Addr[2] && Addr[3] == other.Addr[3];

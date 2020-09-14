@@ -157,7 +157,7 @@ INET_ERROR InetLayer::InitQueueLimiter(void)
     const unsigned portBASE_TYPE initial = INET_CONFIG_MAX_DROPPABLE_EVENTS;
 
 #if (configSUPPORT_STATIC_ALLOCATION == 1)
-    mDroppableEvents                     = xSemaphoreCreateCountingStatic(maximum, initial, &mDroppableEventsObj);
+    mDroppableEvents = xSemaphoreCreateCountingStatic(maximum, initial, &mDroppableEventsObj);
 #else
     mDroppableEvents = xSemaphoreCreateCounting(maximum, initial);
 #endif
@@ -264,7 +264,7 @@ INET_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
 
     mPlatformData = NULL;
 
-    Platform::InetLayer::WillInit(this, aContext);
+    err = Platform::InetLayer::WillInit(this, aContext);
     SuccessOrExit(err);
 
     mSystemLayer = &aSystemLayer;

@@ -133,6 +133,14 @@ typedef enum
 class DLL_EXPORT IPAddress
 {
 public:
+    IPAddress() {}
+
+    /**
+     *  Copy constructor for the IPAddress class.
+     *
+     */
+    IPAddress(const IPAddress & other);
+
     /**
      * @brief   Opaque word array to contain IP addresses (independent of protocol version)
      *

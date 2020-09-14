@@ -39,6 +39,12 @@ bool IPPrefix::IsZero() const
     return IPAddr.Addr[0] == 0 && IPAddr.Addr[1] == 0 && IPAddr.Addr[2] == 0 && IPAddr.Addr[3] == 0 && Length == 0;
 }
 
+IPPrefix::IPPrefix(const IPPrefix & other)
+{
+    IPAddr = other.IPAddr;
+    Length = other.Length;
+}
+
 bool IPPrefix::operator==(const IPPrefix & other) const
 {
     return IPAddr == other.IPAddr && Length == other.Length;

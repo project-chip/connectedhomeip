@@ -46,6 +46,14 @@ namespace Inet {
 class IPPrefix
 {
 public:
+    IPPrefix() {}
+
+    /**
+     *  Copy constructor for the IPPrefix class.
+     *
+     */
+    IPPrefix(const IPPrefix & other);
+
     /** An IPv6 or IPv4 address. */
     IPAddress IPAddr;
 
