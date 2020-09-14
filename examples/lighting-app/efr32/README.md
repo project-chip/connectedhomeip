@@ -19,13 +19,13 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
 
 ## Introduction
 
-The EFR32 lighting example provides a baseline demonstration of a Light control device,
-built using CHIP and the Silicon Labs gecko SDK. The example currently support
-OpenThread. The BLE feature is still a work in progress.
+The EFR32 lighting example provides a baseline demonstration of a Light control
+device, built using CHIP and the Silicon Labs gecko SDK. The example currently
+support OpenThread. The BLE feature is still a work in progress.
 
-The lighting example is intended to serve both as a means to explore the workings of
-CHIP as well as a template for creating real products based on the Silicon Labs
-platform.
+The lighting example is intended to serve both as a means to explore the
+workings of CHIP as well as a template for creating real products based on the
+Silicon Labs platform.
 
 <a name="building"></a>
 
@@ -34,8 +34,8 @@ platform.
 ### Note
 
 A consensus within the CHIP organization was reached to move from Make/Automake
-to the GN/Ninja build system. As a result, the Make file structure as not been implemented
-inside the lighting-app example.
+to the GN/Ninja build system. As a result, the Make file structure as not been
+implemented inside the lighting-app example.
 
 -   Download the [sdk_support](https://github.com/SiliconLabs/sdk_support) from
     GitHub and export the path with :
