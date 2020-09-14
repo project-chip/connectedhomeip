@@ -90,7 +90,7 @@ if (chip_device_platform == "nrf5") {
       "${project_dir}/test_identity.cpp",
     ]
 
-    public_deps = [
+    public_deps += [
       ":sdk",
       "${chip_root}/src/lib",
       "${chip_root}/src/lib/shell",
