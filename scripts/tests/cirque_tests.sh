@@ -101,7 +101,7 @@ function cirquetest_run_test() {
     # After test finished, the container is perserved and networks will not delete
     # This is useful when running tests on local workstation, but not for CI.
     echo "Do docker system prune"
-    docker ps -aq | xargs docker stop > /dev/null 2>&1
+    docker ps -aq | xargs docker stop >/dev/null 2>&1
     (yes | docker system prune) >/dev/null 2>&1
     return "$exitcode"
 }
