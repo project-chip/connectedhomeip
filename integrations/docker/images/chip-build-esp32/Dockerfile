@@ -5,13 +5,13 @@ FROM connectedhomeip/chip-build:${VERSION}
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y python \
-    && mkdir -p /opt/expressif \
-    && cd /opt/expressif \
+    && mkdir -p /opt/espressif \
+    && cd /opt/espressif \
     && git clone --progress -b release/v4.0 https://github.com/espressif/esp-idf.git \
     && cd esp-idf \
     && git submodule update --init --progress \
-    && IDF_TOOLS_PATH=/opt/expressif/tools ./install.sh \
+    && IDF_TOOLS_PATH=/opt/espressif/tools ./install.sh \
     && : # last line
 
-ENV IDF_PATH=/opt/expressif/esp-idf/
-ENV IDF_TOOLS_PATH=/opt/expressif/tools
+ENV IDF_PATH=/opt/espressif/esp-idf/
+ENV IDF_TOOLS_PATH=/opt/espressif/tools
