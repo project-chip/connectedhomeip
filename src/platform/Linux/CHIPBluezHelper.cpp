@@ -1516,7 +1516,7 @@ exit:
     return G_SOURCE_REMOVE;
 }
 
-bool SendBluezIndication(BluezConnection * apConn, chip::System::PacketBuffer * apBuf)
+bool SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBuffer * apBuf)
 {
     ConnectionDataBundle * closure;
     const char * msg = nullptr;
@@ -1529,7 +1529,7 @@ bool SendBluezIndication(BluezConnection * apConn, chip::System::PacketBuffer * 
     len    = apBuf->DataLength();
 
     closure         = g_new(ConnectionDataBundle, 1);
-    closure->mpConn = apConn;
+    closure->mpConn = static_cast<BluezConnection *>(apConn);
 
     closure->mpVal = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, buffer, len * sizeof(uint8_t), sizeof(uint8_t));
 
@@ -1575,7 +1575,7 @@ static int CloseBleconnectionCB(void * apAppState)
     return G_SOURCE_REMOVE;
 }
 
-bool CloseBluezConnection(BluezConnection * apConn)
+bool CloseBluezConnection(BLE_CONNECTION_OBJECT apConn)
 {
     return BluezRunOnBluezThread(CloseBleconnectionCB, apConn);
 }
@@ -1661,7 +1661,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & aBleAdvConfig, BluezEndpoint *& apEndpoint)
+CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & aBleAdvConfig, void *& apEndpoint)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     bool retval    = false;
