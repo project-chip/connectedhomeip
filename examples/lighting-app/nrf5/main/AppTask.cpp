@@ -19,10 +19,10 @@
 
 #include "AppTask.h"
 #include "AppEvent.h"
-#include "DataModelHandler.h"
 #include "LEDWidget.h"
 #include "LightingManager.h"
 #include "Server.h"
+#include "Service.h"
 
 #include "app_button.h"
 #include "app_config.h"
@@ -101,6 +101,9 @@ int AppTask::StartAppTask()
 int AppTask::Init()
 {
     ret_code_t ret;
+
+    // Init ZCL Data Model and start server
+    InitServer();
 
     // Initialize LEDs
     sStatusLED.Init(SYSTEM_STATE_LED);

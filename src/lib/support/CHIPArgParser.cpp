@@ -1007,10 +1007,10 @@ bool ParseSubnetId(const char * str, uint16_t & subnetId)
  */
 bool ParseHexString(const char * hexStr, uint32_t strLen, uint8_t * outBuf, uint32_t outBufSize, uint32_t & outDataLen)
 {
-    bool isFirstNibble = true;
-    uint8_t firstNibbleVal;
-    const char * p   = hexStr;
-    uint32_t dataLen = 0;
+    bool isFirstNibble     = true;
+    uint8_t firstNibbleVal = 0;
+    const char * p         = hexStr;
+    uint32_t dataLen       = 0;
 
     outDataLen = 0;
 

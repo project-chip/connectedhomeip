@@ -30,6 +30,8 @@
 #include <support/logging/CHIPLogging.h>
 
 #include "esp_event.h"
+#include "esp_netif.h"
+#include "esp_netif_net_stack.h"
 #include "esp_wifi.h"
 
 using namespace ::chip::DeviceLayer::Internal;
@@ -203,40 +205,28 @@ const char * ESP32Utils::WiFiModeToStr(wifi_mode_t wifiMode)
 
 struct netif * ESP32Utils::GetStationNetif(void)
 {
-    return GetNetif(TCPIP_ADAPTER_IF_STA);
+    return GetNetif("WIFI_STA_DEF");
 }
 
-struct netif * ESP32Utils::GetNetif(tcpip_adapter_if_t intfId)
+struct netif * ESP32Utils::GetNetif(const char * ifKey)
 {
-    struct netif * netif;
-    return (tcpip_adapter_get_netif(intfId, (void **) &netif) == ESP_OK) ? netif : NULL;
+    struct netif * netif       = NULL;
+    esp_netif_t * netif_handle = NULL;
+    netif_handle               = esp_netif_get_handle_from_ifkey(ifKey);
+    netif                      = (struct netif *) esp_netif_get_netif_impl(netif_handle);
+    return netif;
 }
 
-bool ESP32Utils::IsInterfaceUp(tcpip_adapter_if_t intfId)
+bool ESP32Utils::IsInterfaceUp(const char * ifKey)
 {
-    struct netif * netif = GetNetif(intfId);
+    struct netif * netif = GetNetif(ifKey);
     return netif != NULL && netif_is_up(netif);
 }
 
-const char * ESP32Utils::InterfaceIdToName(tcpip_adapter_if_t intfId)
+bool ESP32Utils::HasIPv6LinkLocalAddress(const char * ifKey)
 {
-    switch (intfId)
-    {
-    case TCPIP_ADAPTER_IF_STA:
-        return "WiFi station";
-    case TCPIP_ADAPTER_IF_AP:
-        return "WiFi AP";
-    case TCPIP_ADAPTER_IF_ETH:
-        return "Ethernet";
-    default:
-        return "(unknown)";
-    }
-}
-
-bool ESP32Utils::HasIPv6LinkLocalAddress(tcpip_adapter_if_t intfId)
-{
-    ip6_addr_t unused;
-    return tcpip_adapter_get_ip6_linklocal(intfId, &unused) == ESP_OK;
+    struct esp_ip6_addr if_ip6_unused;
+    return esp_netif_get_ip6_linklocal(esp_netif_get_handle_from_ifkey(ifKey), &if_ip6_unused) == ESP_OK;
 }
 
 CHIP_ERROR ESP32Utils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials)

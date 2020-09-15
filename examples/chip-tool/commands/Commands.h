@@ -91,8 +91,15 @@ CHIP_ERROR RunCommand(chip::DeviceController::ChipDeviceController * dc, chip::N
 
             err = cmd->Run(dc, remoteId);
             SuccessOrExit(err);
+
+            return err;
         }
     }
+
+    // No command found.
+    ChipLogError(chipTool, "Unknown command: %s", argv[1]);
+    ShowUsage(commands, ArraySize(commands), argv[0]);
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 
 exit:
     if (err != CHIP_NO_ERROR)

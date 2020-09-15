@@ -22,6 +22,8 @@
 #      source binaries at specific offset in the image
 #
 
+set -e
+
 usage() {
     exitcode=0
     if [[ -n "$1" ]]; then
@@ -54,8 +56,8 @@ for item in "${@:3}"; do
     [[ -r $file ]] || usage "Cannot read file $file"
     [[ $written -le $offset ]] || usage "Writing $file at $offset will overwrite previous segment"
 
-    filesize=$(stat -c%s "$file")
-    written=$((written + filesize))
+    read -r _perms _ _user _group filesize _rest < <(ls -l "$file")
+    ((written += filesize))
     [[ $written -lt $image_size ]] || usage "Writing $file at $offset will overflow image"
 
     dd if="$file" of="$2" conv=notrunc bs="$offset" seek=1

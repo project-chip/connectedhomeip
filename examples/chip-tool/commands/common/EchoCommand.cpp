@@ -22,36 +22,30 @@ using namespace ::chip;
 using namespace ::chip::DeviceController;
 
 #define SEND_DELAY 5
-static const char * PAYLOAD = "(IP) Message from Standalone CHIP echo client!";
+static const char * PAYLOAD = "Message from Standalone CHIP echo client!";
 
-void EchoCommand::SendEcho(ChipDeviceController * dc)
+void EchoCommand::SendEcho() const
 {
     size_t payload_len = strlen(PAYLOAD);
 
-    // Run the client
-    while (1)
+    // Reallocate buffer on each run, as the secure transport encrypts and
+    // overwrites the buffer from previous iteration.
+    auto * buffer = PacketBuffer::NewWithAvailableSize(payload_len);
+    memcpy(buffer->Start(), PAYLOAD, payload_len);
+    buffer->SetDataLength(payload_len);
+
+    CHIP_ERROR err = mController->SendMessage(NULL, buffer);
+    if (err == CHIP_NO_ERROR)
     {
-        // Reallocate buffer on each run, as the secure transport encrypts and
-        // overwrites the buffer from previous iteration.
-        auto * buffer = PacketBuffer::NewWithAvailableSize(payload_len);
-        memcpy(buffer->Start(), PAYLOAD, payload_len);
-        buffer->SetDataLength(payload_len);
-
-        CHIP_ERROR err = dc->SendMessage(NULL, buffer);
-        if (err == CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "Echo (%s): Message sent to server", GetName());
-        }
-        else
-        {
-            ChipLogError(chipTool, "Echo (%s): %s", GetName(), ErrorStr(err));
-        }
-
-        sleep(SEND_DELAY);
+        ChipLogProgress(chipTool, "Echo (%s): Message sent to server", GetName());
+    }
+    else
+    {
+        ChipLogError(chipTool, "Echo (%s): %s", GetName(), ErrorStr(err));
     }
 }
 
-void EchoCommand::ReceiveEcho(ChipDeviceController * dc, PacketBuffer * buffer)
+void EchoCommand::ReceiveEcho(PacketBuffer * buffer) const
 {
     // attempt to print the incoming message
     size_t data_len = buffer->DataLength();
@@ -68,4 +62,25 @@ void EchoCommand::ReceiveEcho(ChipDeviceController * dc, PacketBuffer * buffer)
     {
         ChipLogProgress(chipTool, "Echo: (%s): Error \nSend: %s \nRecv: %s", GetName(), PAYLOAD, msg_buffer);
     }
+}
+
+CHIP_ERROR EchoCommand::Run(ChipDeviceController * dc, NodeId remoteId)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = NetworkCommand::Run(dc, remoteId);
+    SuccessOrExit(err);
+
+    // Run command until the user exits the process
+    while (1)
+    {
+        if (mController != nullptr)
+        {
+            SendEcho();
+        }
+        sleep(SEND_DELAY);
+    }
+
+exit:
+    return err;
 }

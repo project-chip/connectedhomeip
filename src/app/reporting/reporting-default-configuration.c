@@ -38,10 +38,13 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "app/framework/include/af.h"
-#include "app/framework/util/attribute-storage.h"
-#include "app/framework/util/common.h"
 #include "reporting.h"
+#include <app/util/af-types.h>
+#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/common.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #define REPORT_FAILED 0xFF
 
@@ -60,6 +63,28 @@ void emberAfPluginReportingLoadReportingConfigDefaults(void)
         emAfPluginReportingConditionallyAddReportingEntry((EmberAfPluginReportingEntry *) &generatedReportingConfigDefaults[i]);
     }
 #endif
+}
+
+/** @brief Configured
+ *
+ * This callback is called by the Reporting plugin to get the default reporting
+ * configuration values from user if there is no default value available within
+ * af generated default reporting configuration tabel. The application need to
+ * write to the minInterval, maxInterval and reportable change in the passed
+ * IO pointer in the arguement while handleing this callback, then application
+ * shall return true if it has provided the default values or else false for
+ * reporting plugin to further handleing.
+ *
+ * @param entry   Ver.: always
+ */
+bool emberAfPluginReportingGetDefaultReportingConfigCallback(EmberAfPluginReportingEntry * entry)
+{
+    // Change the values as appropriate for the application.
+    entry->data.reported.minInterval      = 1;
+    entry->data.reported.maxInterval      = 0xFFFE;
+    entry->data.reported.reportableChange = 1;
+    entry->direction                      = EMBER_ZCL_REPORTING_DIRECTION_REPORTED;
+    return true;
 }
 
 // Get default reporting values - returns true if there is default value
