@@ -41,6 +41,8 @@ static int Finalize(void * aContext);
 
 namespace {
 
+constexpr size_t kMaxTcpActiveConnectionCount = 4;
+
 constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
 constexpr uint32_t kMessageId       = 18;
@@ -73,7 +75,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    Transport::TCP tcp;
+    Transport::TCP<kMaxTcpActiveConnectionCount> tcp;
 
     CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(&ctx.GetInetLayer()).SetAddressType(type));
 
@@ -106,7 +108,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Transport::TCP tcp;
+    Transport::TCP<kMaxTcpActiveConnectionCount> tcp;
 
     err = tcp.Init(Transport::TcpListenParameters(&ctx.GetInetLayer()).SetAddressType(addr.Type()));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);

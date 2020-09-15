@@ -25,6 +25,7 @@
 #ifndef __TCPTRANSPORT_H__
 #define __TCPTRANSPORT_H__
 
+#include <algorithm>
 #include <utility>
 
 #include <core/CHIPCore.h>
@@ -78,7 +79,7 @@ private:
 };
 
 /** Implements a transport using TCP. */
-class DLL_EXPORT TCP : public Base
+class DLL_EXPORT TCPBase : public Base
 {
     /**
      *  The State of the TCP connection
@@ -91,7 +92,12 @@ class DLL_EXPORT TCP : public Base
     };
 
 public:
-    virtual ~TCP();
+    TCPBase(Inet::TCPEndPoint ** activeConnectionsBuffer, size_t bufferSize) :
+        mActiveConnections(activeConnectionsBuffer), mActiveConnectionsSize(bufferSize)
+    {
+        std::fill(mActiveConnections, mActiveConnections + mActiveConnectionsSize, nullptr);
+    }
+    virtual ~TCPBase();
 
     /**
      * Initialize a TCP transport on a given port.
@@ -117,14 +123,44 @@ public:
     }
 
 private:
+    /**
+     * Find an active connection to the given peer or return nullptr if
+     * no active connection exists.
+     */
+    Inet::TCPEndPoint * FindActiveConnection(const PeerAddress & addr);
+
     // TCP message receive handler.
     static void OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer);
 
-    // FIXME: implement accept, error, ...
+    // Called when a connection has been completed
+    static void OnConnectionComplete(Inet::TCPEndPoint * endPoint, INET_ERROR err);
+
+    // Called when a connection has been closed
+    static void OnConnectionClosed(Inet::TCPEndPoint * endPoint, INET_ERROR err);
+
+    // Called when a connection is received on the listening port
+    static void OnConnectionRecevied(Inet::TCPEndPoint * listenEndPoint, Inet::TCPEndPoint * endPoint,
+                                     const IPAddress & peerAddress, uint16_t peerPort);
+
+    // Called on accept error
+    static void OnAcceptError(Inet::TCPEndPoint * endPoint, INET_ERROR err);
 
     Inet::TCPEndPoint * mListenSocket = nullptr;                                     ///< TCP socket used by the transport
     Inet::IPAddressType mEndpointType = Inet::IPAddressType::kIPAddressType_Unknown; ///< Socket listening type
     State mState                      = State::kNotReady;                            ///< State of the TCP transport
+
+    Inet::TCPEndPoint ** mActiveConnections;
+    const size_t mActiveConnectionsSize;
+};
+
+template <size_t kActiveConnectionsSize>
+class TCP : public TCPBase
+{
+public:
+    TCP() : TCPBase(mConnectionsBuffer, kActiveConnectionsSize) {}
+
+private:
+    Inet::TCPEndPoint * mConnectionsBuffer[kActiveConnectionsSize];
 };
 
 } // namespace Transport

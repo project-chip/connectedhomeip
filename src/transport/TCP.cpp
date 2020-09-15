@@ -23,6 +23,7 @@
  */
 #include <transport/TCP.h>
 
+#include <core/CHIPEncoding.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/MessageHeader.h>
@@ -32,20 +33,32 @@
 namespace chip {
 namespace Transport {
 
+using namespace chip::Encoding;
+
 constexpr int kListenBacklogSize = 2;
 
-TCP::~TCP()
+TCPBase::~TCPBase()
 {
     if (mListenSocket != nullptr)
     {
-        // Udp endpoint is only non null if udp endpoint is initialized and listening
+        // endpoint is only non null if it is initialized and listening
         mListenSocket->Close();
         mListenSocket->Free();
         mListenSocket = nullptr;
     }
+
+    for (size_t i = 0; i < mActiveConnectionsSize; i++)
+    {
+        if (mActiveConnections[i] != nullptr)
+        {
+            mActiveConnections[i]->Close();
+            mActiveConnections[i]->Free();
+            mActiveConnections[i] = nullptr;
+        }
+    }
 }
 
-CHIP_ERROR TCP::Init(TcpListenParameters & params)
+CHIP_ERROR TCPBase::Init(TcpListenParameters & params)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -60,9 +73,13 @@ CHIP_ERROR TCP::Init(TcpListenParameters & params)
     err = mListenSocket->Listen(kListenBacklogSize);
     SuccessOrExit(err);
 
-    mListenSocket->AppState       = reinterpret_cast<void *>(this);
-    mListenSocket->OnDataReceived = OnTcpReceive;
-    mEndpointType                 = params.GetAddressType();
+    mListenSocket->AppState             = reinterpret_cast<void *>(this);
+    mListenSocket->OnDataReceived       = OnTcpReceive;
+    mListenSocket->OnConnectComplete    = OnConnectionComplete;
+    mListenSocket->OnConnectionClosed   = OnConnectionClosed;
+    mListenSocket->OnConnectionReceived = OnConnectionRecevied;
+    mListenSocket->OnAcceptError        = OnAcceptError;
+    mEndpointType                       = params.GetAddressType();
 
     mState = State::kInitialized;
 
@@ -80,39 +97,79 @@ exit:
     return err;
 }
 
-CHIP_ERROR TCP::SendMessage(const MessageHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgBuf)
+Inet::TCPEndPoint * TCPBase::FindActiveConnection(const PeerAddress & address)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    Inet::TCPEndPoint * endPoint = nullptr;
 
-    // FIXME: implement
-    err = CHIP_ERROR_NOT_IMPLEMENTED;
+    VerifyOrExit(address.GetTransportType() == Type::kTcp, endPoint = nullptr);
 
-    /*
-    const size_t headerSize = header.EncodeSizeBytes();
+    for (size_t i = 0; i < mActiveConnectionsSize; i++)
+    {
+        if (mActiveConnections[i] == nullptr)
+        {
+            continue;
+        }
+        IPAddress addr;
+        uint16_t port;
+        mActiveConnections[i]->GetPeerInfo(&addr, &port);
+
+        if ((addr == address.GetIPAddress()) && (port == address.GetPort()))
+        {
+            ExitNow(endPoint = mActiveConnections[i]);
+        }
+    }
+
+exit:
+    return endPoint;
+}
+
+CHIP_ERROR TCPBase::SendMessage(const MessageHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgBuf)
+{
+    // Sent buffer data format is:
+    //    - packet size as a uint16_t
+    //    - header
+    //    - actual data
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    const size_t prefixSize      = header.EncodeSizeBytes() + sizeof(uint16_t);
+    Inet::TCPEndPoint * endPoint = nullptr;
     size_t actualEncodedHeaderSize;
 
-    VerifyOrExit(address.GetTransportType() == Type::kUdp, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(address.GetTransportType() == Type::kTcp, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mUDPEndPoint != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(prefixSize + msgBuf->DataLength() <= std::numeric_limits<uint16_t>::max(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    IPPacketInfo addrInfo;
-    addrInfo.Clear();
+    VerifyOrExit(msgBuf->EnsureReservedSize(prefixSize), err = CHIP_ERROR_NO_MEMORY);
 
-    addrInfo.DestAddress = address.GetIPAddress();
-    addrInfo.DestPort    = address.GetPort();
+    {
+        msgBuf->SetStart(msgBuf->Start() - prefixSize);
 
-    VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
+        uint8_t * output = msgBuf->Start();
+        LittleEndian::Write16(output, msgBuf->DataLength());
 
-    msgBuf->SetStart(msgBuf->Start() - headerSize);
-    err = header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize);
-    SuccessOrExit(err);
+        err = header.Encode(output, msgBuf->DataLength(), &actualEncodedHeaderSize);
+        SuccessOrExit(err);
 
-    // This is unexpected and means header changed while encoding
-    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
+        // header encoding has to match space that we allocated
+        VerifyOrExit(prefixSize == actualEncodedHeaderSize + sizeof(uint16_t), err = CHIP_ERROR_INTERNAL);
+    }
 
-    err    = mUDPEndPoint->SendMsg(&addrInfo, msgBuf);
-    msgBuf = nullptr;
-    SuccessOrExit(err);
+    // Reuse existing connection if one exists, otherwise a new one
+    // will be established
+
+    endPoint = FindActiveConnection(address);
+    if (endPoint != nullptr)
+    {
+        err    = endPoint->Send(msgBuf);
+        msgBuf = nullptr;
+        SuccessOrExit(err);
+    }
+    else
+    {
+        // FIXME: connect
+        // FIXME: implement
+        err = CHIP_ERROR_NOT_IMPLEMENTED;
+        ChipLogError(Inet, "%s not yet implemented", __PRETTY_FUNCTION__);
+    }
 
 exit:
     if (msgBuf != NULL)
@@ -120,12 +177,11 @@ exit:
         System::PacketBuffer::Free(msgBuf);
         msgBuf = NULL;
     }
-    */
 
     return err;
 }
 
-void TCP::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer)
+void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     /*
@@ -141,6 +197,8 @@ void TCP::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buff
     udp->HandleMessageReceived(header, peerAddress, buffer);
     */
 
+    ChipLogError(Inet, "%s not yet implemented", __PRETTY_FUNCTION__);
+
     err = CHIP_ERROR_NOT_IMPLEMENTED;
 
     // exit:
@@ -150,9 +208,35 @@ void TCP::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buff
     }
 }
 
-void TCP::Disconnect(const PeerAddress & address)
+void TCPBase::OnConnectionComplete(Inet::TCPEndPoint * endPoint, INET_ERROR err)
 {
     // FIXME: implement
+    ChipLogError(Inet, "%s not yet implemented", __PRETTY_FUNCTION__);
+}
+
+void TCPBase::OnConnectionClosed(Inet::TCPEndPoint * endPoint, INET_ERROR err)
+{
+    // FIXME: implement
+    ChipLogError(Inet, "%s not yet implemented", __PRETTY_FUNCTION__);
+}
+
+void TCPBase::OnConnectionRecevied(Inet::TCPEndPoint * listenEndPoint, Inet::TCPEndPoint * endPoint, const IPAddress & peerAddress,
+                                   uint16_t peerPort)
+{
+    // FIXME: implement
+    ChipLogError(Inet, "%s not yet implemented", __PRETTY_FUNCTION__);
+}
+
+void TCPBase::OnAcceptError(Inet::TCPEndPoint * endPoint, INET_ERROR err)
+{
+    // FIXME: implement
+    ChipLogError(Inet, "%s not yet implemented", __PRETTY_FUNCTION__);
+}
+
+void TCPBase::Disconnect(const PeerAddress & address)
+{
+    // FIXME: implement
+    ChipLogError(Inet, "%s not yet implemented", __PRETTY_FUNCTION__);
 }
 
 } // namespace Transport
