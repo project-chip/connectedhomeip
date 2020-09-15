@@ -78,8 +78,8 @@ For more information on Qorvo and the platforms, please visit
           $ cd ~/connectedhomeip/examples/lock-app/qpg6100
           $ make -j
 
-*           GN/ninja based
-                 Not yet supported
+*             GN/ninja based
+                   Not yet supported
 
 <a name="flashing-the-application"></a>
 
