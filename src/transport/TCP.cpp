@@ -272,11 +272,21 @@ exit:
 
 void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer)
 {
+
     CHIP_ERROR err = CHIP_NO_ERROR;
+    TCPBase * tcp  = reinterpret_cast<TCPBase *>(endPoint->AppState);
+    IPAddress ipAddress;
+    uint16_t port;
+
+    endPoint->GetPeerInfo(&ipAddress, &port);
+    PeerAddress peerAddress = PeerAddress::TCP(ipAddress, port);
+
+    // FIXME: read header uint16_t size
+    //        decode the buffer
+    //        report peer address receiving
+
     /*
-    TCP * tc               = reinterpret_cast<TCP *>(endPoint->AppState);
     size_t headerSize       = 0;
-    PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort);
 
     MessageHeader header;
     err = header.Decode(buffer->Start(), buffer->DataLength(), &headerSize);
