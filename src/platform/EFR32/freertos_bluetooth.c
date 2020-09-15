@@ -339,12 +339,12 @@ void vRaiseEventFlagBasedOnContext(EventGroupHandle_t xEventGroup, EventBits_t u
     if (xPortIsInsideInterrupt())
     {
         eventBitsFromISRStatus = xEventGroupSetBitsFromISR(xEventGroup, uxBitsToWaitFor, &higherPrioTaskWoken);
-        (void)eventBitsFromISRStatus;
+        (void) eventBitsFromISRStatus;
     }
     else
     {
         eventBits = xEventGroupSetBits(xEventGroup, uxBitsToWaitFor);
-        (void)eventBits;
+        (void) eventBits;
     }
 }
 
