@@ -93,6 +93,8 @@ public:
         return (mTransportType == other.mTransportType) && (mIPAddress == other.mIPAddress) && (mPort == other.mPort);
     }
 
+    bool operator!=(const PeerAddress & other) { return !(*this == other); }
+
     /// Maximum size of an Inet address ToString format, that can hold both IPV6 and IPV4 addresses.
 #ifdef INET6_ADDRSTRLEN
     static constexpr size_t kInetMaxAddrLen = INET6_ADDRSTRLEN;

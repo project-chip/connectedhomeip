@@ -144,6 +144,14 @@ private:
      */
     Inet::TCPEndPoint * FindActiveConnection(const PeerAddress & addr);
 
+    /**
+     * Sends the specified message once a connection has been established.
+     *
+     * @param addr - what peer to connect to
+     * @param msg - what buffer to send once a connection has been established.
+     */
+    CHIP_ERROR SendAfterConnect(const PeerAddress & addr, System::PacketBuffer * msg);
+
     // TCP message receive handler.
     static void OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer);
 
@@ -160,9 +168,13 @@ private:
     // Called on accept error
     static void OnAcceptError(Inet::TCPEndPoint * endPoint, INET_ERROR err);
 
+    InterfaceId mInterfaceId          = INET_NULL_INTERFACEID;
     Inet::TCPEndPoint * mListenSocket = nullptr;                                     ///< TCP socket used by the transport
     Inet::IPAddressType mEndpointType = Inet::IPAddressType::kIPAddressType_Unknown; ///< Socket listening type
     State mState                      = State::kNotReady;                            ///< State of the TCP transport
+
+    // Number of active and 'pending connection' endpoints
+    size_t mUsedEndPointCount = 0;
 
     // Currently active connections
     Inet::TCPEndPoint ** mActiveConnections;
