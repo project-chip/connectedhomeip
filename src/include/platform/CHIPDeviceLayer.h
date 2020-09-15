@@ -41,11 +41,6 @@ namespace chip {
 namespace DeviceLayer {
 
 struct ChipDeviceEvent;
-
-using chip::ExchangeMgr;
-using chip::FabricState;
-using chip::MessageLayer;
-
 extern chip::System::Layer SystemLayer;
 extern Inet::InetLayer InetLayer;
 
