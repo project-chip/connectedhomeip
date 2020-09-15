@@ -27,6 +27,9 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 if CHIP_WITH_JAVA
 
 EXTRA_DIST                                   = \
+    AndroidBleApplicationDelegate.h            \
+		AndroidBleConnectionDelegate.h             \
+		AndroidBlePlatformDelegate.h               \
     $(srcdir)/src                              \
     $(NULL)
 
@@ -59,6 +62,16 @@ libCHIPController_la_LDFLAGS                 = \
 libCHIPController_la_SOURCES                 = \
     CHIPDeviceController-JNI.cpp               \
     $(NULL)
+
+if CONFIG_NETWORK_LAYER_BLE
+
+libCHIPController_la_SOURCES                 += \
+    AndroidBleApplicationDelegate.cpp           \
+		AndroidBleConnectionDelegate.cpp            \
+    AndroidBlePlatformDelegate.cpp              \
+    $(NULL)
+
+endif # CONFIG_NETWORK_LAYER_BLE
 
 libCHIPController_la_LIBADD                  = \
     -L$(top_builddir)/src/lib -lCHIP           \

@@ -16,17 +16,13 @@
  *
  */
 
-package com.google.chip.chiptool.setuppayloadscanner
+#include <ble/BleLayer.h>
+#include <controller/java/AndroidBleConnectionDelegate.h>
 
-import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
-
-/** Class to hold the CHIP device information. */
-@Parcelize data class CHIPDeviceInfo(
-    val version: Int,
-    val vendorId: Int,
-    val productId: Int,
-    val discriminator: Int,
-    val setupPinCode: Long,
-    val optionalQrCodeInfoMap: Map<Int, QrCodeInfo>
-) : Parcelable
+void AndroidBleConnectionDelegate::NewConnection(chip::Ble::BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator)
+{
+    if (newConnectionCb)
+    {
+        newConnectionCb(bleLayer->mAppState, connDiscriminator);
+    }
+}
