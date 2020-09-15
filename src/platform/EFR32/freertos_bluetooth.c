@@ -101,26 +101,19 @@ errorcode_t bluetooth_start(UBaseType_t ll_priority, UBaseType_t stack_priority,
 // sets flag to trigger Link Layer Task
 void BluetoothLLCallback()
 {
-    EventBits_t eventBits;
-    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
-    eventBits = vRaiseEventFlagBasedOnContext(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_LL, &pxHigherPriorityTaskWoken);
-    (void) eventBits;
+    vRaiseEventFlagBasedOnContext(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_LL);
 }
 // This callback is called from Bluetooth stack
 // Called from kernel aware interrupt context (RTCC interrupt) and from Bluetooth task
 // sets flag to trigger running Bluetooth stack
 void BluetoothUpdate()
 {
-    EventBits_t eventBits;
-    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
-    eventBits = vRaiseEventFlagBasedOnContext(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_STACK, &pxHigherPriorityTaskWoken);
-    (void) eventBits;
+    vRaiseEventFlagBasedOnContext(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_STACK);
 }
 // Bluetooth task, it waits for events from bluetooth and handles them
 void BluetoothTask(void * p)
 {
     EventBits_t flags = BLUETOOTH_EVENT_FLAG_EVT_HANDLED | BLUETOOTH_EVENT_FLAG_STACK;
-    EventBits_t eventBits;
     TickType_t xTicksToWait;
 
     while (1)
@@ -133,8 +126,7 @@ void BluetoothTask(void * p)
             sli_bt_cmd_handler_delegate(header, cmd_handler, (void *) command_data);
             command_handler_func = NULL;
             flags &= ~BLUETOOTH_EVENT_FLAG_CMD_WAITING;
-            eventBits = vRaiseEventFlagBasedOnContext(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_RSP_WAITING, NULL);
-            (void) eventBits;
+            vRaiseEventFlagBasedOnContext(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_RSP_WAITING);
         }
 
         // Bluetooth stack needs updating, and evt can be used
@@ -143,8 +135,7 @@ void BluetoothTask(void * p)
             bluetooth_evt = gecko_wait_event();
             if (bluetooth_evt != NULL)
             { // we got event, notify event handler. evt state is now waiting handling
-                eventBits = vRaiseEventFlagBasedOnContext(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_EVT_WAITING, NULL);
-                (void) eventBits;
+                vRaiseEventFlagBasedOnContext(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_EVT_WAITING);
                 flags &= ~(BLUETOOTH_EVENT_FLAG_EVT_HANDLED);
                 if (wakeupCB != NULL)
                 {
@@ -237,7 +228,7 @@ void sli_bt_cmd_handler_rtos_delegate(uint32_t header, gecko_cmd_handler handler
     command_handler_func = handler;
     command_data         = (void *) payload;
     // Command structure is filled, notify the stack
-    uxBits = vRaiseEventFlagBasedOnContext(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_CMD_WAITING, NULL);
+    vRaiseEventFlagBasedOnContext(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_CMD_WAITING);
 
     // wait for response
     uxBits = xEventGroupWaitBits(bluetooth_event_flags,            /* The event group being tested. */
@@ -339,26 +330,31 @@ void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBuffer, Stack
     *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
 }
 
-EventBits_t vRaiseEventFlagBasedOnContext(EventGroupHandle_t xEventGroup, EventBits_t uxBitsToWaitFor,
-                                          BaseType_t * pxHigherPriorityTaskWoken)
+void vRaiseEventFlagBasedOnContext(EventGroupHandle_t xEventGroup, EventBits_t uxBitsToWaitFor)
 {
     EventBits_t eventBits;
+    BaseType_t eventBitsFromISRStatus;
     BaseType_t higherPrioTaskWoken = pdFALSE;
 
     if (xPortIsInsideInterrupt())
     {
-        eventBits = xEventGroupSetBitsFromISR(xEventGroup, uxBitsToWaitFor, &higherPrioTaskWoken);
+        eventBitsFromISRStatus = xEventGroupSetBitsFromISR(xEventGroup, uxBitsToWaitFor, &higherPrioTaskWoken);
+        if (eventBitsFromISRStatus != pdFAIL)
+        {
+#ifdef portYIELD_FROM_ISR
+            portYIELD_FROM_ISR(higherPrioTaskWoken);
+#elif portEND_SWITCHING_ISR // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+            portEND_SWITCHING_ISR(higherPrioTaskWoken);
+#else                       // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+#error "Must have portYIELD_FROM_ISR or portEND_SWITCHING_ISR"
+#endif // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+        }
     }
     else
     {
         eventBits = xEventGroupSetBits(xEventGroup, uxBitsToWaitFor);
+        (void) eventBits;
     }
-
-    if (pxHigherPriorityTaskWoken != NULL)
-    {
-        *pxHigherPriorityTaskWoken = higherPrioTaskWoken;
-    }
-    return eventBits;
 }
 
 EventBits_t vSendToQueueBasedOnContext(QueueHandle_t xQueue, void * xItemToQueue, TickType_t xTicksToWait,
