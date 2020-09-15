@@ -61,6 +61,8 @@ public:
     /**
      * @brief Send a message to the specified target.
      *
+     * On connection-oriented transports, sending a message implies connecting to it first.
+     *
      * @details
      *   This method calls <tt>chip::System::PacketBuffer::Free</tt> on
      *   behalf of the caller regardless of the return status.
@@ -72,7 +74,12 @@ public:
      *
      * Generally it is expected that a transport can send to any peer from which it receives a message.
      */
-    virtual bool CanSendToPeer(const Transport::PeerAddress & address) = 0;
+    virtual bool CanSendToPeer(const PeerAddress & address) = 0;
+
+    /**
+     * Handle disconnection from the specified peer if currently connected to it.
+     */
+    virtual void Disconnect(const PeerAddress & address) {}
 
 protected:
     /**
