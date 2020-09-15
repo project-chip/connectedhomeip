@@ -108,6 +108,8 @@ public:
     CHIP_ERROR SendMessage(const MessageHeader & header, const Transport::PeerAddress & address,
                            System::PacketBuffer * msgBuf) override;
 
+    void Disconnect(const PeerAddress & address) override;
+
     bool CanSendToPeer(const Transport::PeerAddress & address) override
     {
         return (mState == State::kInitialized) && (address.GetTransportType() == Type::kTcp) &&
@@ -117,7 +119,8 @@ public:
 private:
     // TCP message receive handler.
     static void OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer);
-    // FIXME: accept, error, ...
+
+    // FIXME: implement accept, error, ...
 
     Inet::TCPEndPoint * mListenSocket = nullptr;                                     ///< TCP socket used by the transport
     Inet::IPAddressType mEndpointType = Inet::IPAddressType::kIPAddressType_Unknown; ///< Socket listening type

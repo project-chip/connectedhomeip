@@ -73,9 +73,9 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    Transport::TCP udp;
+    Transport::TCP tcp;
 
-    CHIP_ERROR err = udp.Init(Transport::TcpListenParameters(&ctx.GetInetLayer()).SetAddressType(type));
+    CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(&ctx.GetInetLayer()).SetAddressType(type));
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
@@ -106,19 +106,19 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Transport::TCP udp;
+    Transport::TCP tcp;
 
-    err = udp.Init(Transport::TcpListenParameters(&ctx.GetInetLayer()).SetAddressType(addr.Type()));
+    err = tcp.Init(Transport::TcpListenParameters(&ctx.GetInetLayer()).SetAddressType(addr.Type()));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    udp.SetMessageReceiveHandler(MessageReceiveHandler, inSuite);
+    tcp.SetMessageReceiveHandler(MessageReceiveHandler, inSuite);
     ReceiveHandlerCallCount = 0;
 
     MessageHeader header;
     header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
 
     // Should be able to send a message to itself by just calling send.
-    err = udp.SendMessage(header, Transport::PeerAddress::TCP(addr), buffer);
+    err = tcp.SendMessage(header, Transport::PeerAddress::TCP(addr), buffer);
     if (err == System::MapErrorPOSIX(EADDRNOTAVAIL))
     {
         // TODO: the underlying system does not support IPV6. This early return should

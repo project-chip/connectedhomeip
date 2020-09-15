@@ -150,5 +150,10 @@ void TCP::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buff
     }
 }
 
+void TCP::Disconnect(const PeerAddress & address)
+{
+    // FIXME: implement
+}
+
 } // namespace Transport
 } // namespace chip
