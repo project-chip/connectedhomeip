@@ -403,7 +403,7 @@ void ChipDeviceController::OnRendezvousError(CHIP_ERROR err)
 void ChipDeviceController::OnRendezvousConnectionOpened()
 {
     mPairingSession = mRendezvousSession->GetPairingSession();
-    mConState = kConnectionState_SecureConnected;
+    mConState       = kConnectionState_SecureConnected;
 
     if (mOnNewConnection)
     {
