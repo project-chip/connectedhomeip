@@ -16,7 +16,8 @@
  *
  */
 
-#include <BuildConfig.h>
+#include <ble/BleConfig.h>
+
 #if CONFIG_NETWORK_LAYER_BLE
 
 #include "AndroidBlePlatformDelegate.h"

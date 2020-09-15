@@ -19,7 +19,15 @@ import("//gn/chip/java/rules.gni")
 shared_library("jni") {
   output_name = "libCHIPController"
 
-  sources = [ "CHIPDeviceController-JNI.cpp" ]
+  sources = [
+    "AndroidBleApplicationDelegate.cpp",
+    "AndroidBleApplicationDelegate.h",
+    "AndroidBleConnectionDelegate.cpp",
+    "AndroidBleConnectionDelegate.h",
+    "AndroidBlePlatformDelegate.cpp",
+    "AndroidBlePlatformDelegate.h",
+    "CHIPDeviceController-JNI.cpp",
+  ]
 
   deps = [ "//src/lib" ]
 
@@ -32,6 +40,7 @@ android_library("java") {
   data_deps = [ ":jni" ]
 
   sources = [
+    "src/chip/devicecontroller/AndroidChipStack.java",
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",

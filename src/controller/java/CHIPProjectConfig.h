@@ -20,7 +20,7 @@
 
 /**
  *    @file
- *      Project-specific configuration file for iOS builds.
+ *      Project-specific configuration file for Android builds.
  *
  */
 #ifndef CHIPPROJECTCONFIG_H

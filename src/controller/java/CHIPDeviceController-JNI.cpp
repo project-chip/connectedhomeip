@@ -25,11 +25,11 @@
 #include "AndroidBleApplicationDelegate.h"
 #include "AndroidBleConnectionDelegate.h"
 #include "AndroidBlePlatformDelegate.h"
-#include "CHIPDeviceController.h"
 
 #include <jni.h>
 #include <pthread.h>
 #include <support/CodeUtils.h>
+#include <controller/CHIPDeviceController.h>
 #include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
 
