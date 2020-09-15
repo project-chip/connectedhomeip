@@ -16,7 +16,8 @@
  *
  */
 
-#include <BuildConfig.h>
+#include <core/CHIPConfig.h>
+
 #if CONFIG_NETWORK_LAYER_BLE
 
 #include "AndroidBleApplicationDelegate.h"
