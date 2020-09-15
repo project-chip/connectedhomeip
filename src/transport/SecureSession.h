@@ -52,8 +52,8 @@ public:
      * @param salt_length        Length of the initial salt
      * @return CHIP_ERROR        The result of key derivation
      */
-    CHIP_ERROR Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key, const uint8_t * salt,
-                    const size_t salt_length, const uint8_t * info, const size_t info_length);
+    CHIP_ERROR Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
+                    const uint8_t * salt, const size_t salt_length, const uint8_t * info, const size_t info_length);
 
     /**
      * @brief

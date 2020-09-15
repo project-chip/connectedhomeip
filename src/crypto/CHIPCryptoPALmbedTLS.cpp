@@ -440,7 +440,8 @@ exit:
     return error;
 }
 
-CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const P256ECDSASignature & signature) const
+CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length,
+                                                       const P256ECDSASignature & signature) const
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
