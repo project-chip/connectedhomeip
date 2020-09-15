@@ -459,8 +459,7 @@ ECName MapECName(SupportedECPKeyTypes keyType)
     }
 }
 
-CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, uint8_t * out_signature,
-                                       size_t & out_signature_length)
+CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature)
 {
     ERR_clear_error();
 
@@ -480,7 +479,6 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
     VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     nid = _nidForCurve(MapECName(mPrivateKey.Type()));
     VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(out_signature != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     md = _digestForType(digest);
     VerifyOrExit(md != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -512,13 +510,13 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
 
     result = EVP_DigestSignFinal(context, NULL, &out_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(out_signature_length >= out_length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(out_signature.Length() >= out_length, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     result = EVP_DigestSignFinal(context, Uint8::to_uchar(out_signature), &out_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
     // This should not happen due to the check above. But check this nonetheless
-    VerifyOrExit(out_signature_length >= out_length, error = CHIP_ERROR_INTERNAL);
-    out_signature_length = out_length;
+    VerifyOrExit(out_signature.Length() >= out_length, error = CHIP_ERROR_INTERNAL);
+    out_signature.Length() = out_length;
 
 exit:
     if (ec_key != NULL)
@@ -556,8 +554,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const uint8_t * signature,
-                                                       const size_t signature_length) const
+CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const P256ECDSASignature & signature) const
 {
     ERR_clear_error();
     CHIP_ERROR error            = CHIP_ERROR_INTERNAL;
@@ -575,8 +572,6 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, cons
     VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     nid = _nidForCurve(MapECName(Type()));
     VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(signature != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(signature_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     md = _digestForType(digest);
     VerifyOrExit(md != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -614,7 +609,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, cons
     result = EVP_DigestVerifyUpdate(md_context, Uint8::to_const_uchar(msg), msg_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
-    result = EVP_DigestVerifyFinal(md_context, Uint8::to_const_uchar(signature), signature_length);
+    result = EVP_DigestVerifyFinal(md_context, Uint8::to_const_uchar(signature), signature.Length());
     VerifyOrExit(result == 1, error = CHIP_ERROR_INVALID_SIGNATURE);
     error = CHIP_NO_ERROR;
 
@@ -649,7 +644,7 @@ exit:
 }
 
 // helper function to populate octet key into EVP_PKEY out_evp_pkey. Caller must free out_evp_pkey
-static CHIP_ERROR _create_evp_key_from_binary_p256_key(const ECPKey & key, EVP_PKEY ** out_evp_pkey, bool isPrivateKey)
+static CHIP_ERROR _create_evp_key_from_binary_p256_key(const ECPKey<P256ECDSASignature> & key, EVP_PKEY ** out_evp_pkey, bool isPrivateKey)
 {
 
     CHIP_ERROR error     = CHIP_NO_ERROR;
@@ -731,7 +726,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR P256Keypair::ECDH_derive_secret(const ECPKey & remote_public_key, uint8_t * out_secret, size_t & out_secret_length) const
+CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
     ERR_clear_error();
     CHIP_ERROR error      = CHIP_NO_ERROR;
@@ -742,8 +737,6 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const ECPKey & remote_public_key, uin
     EVP_PKEY_CTX * context = NULL;
     size_t out_buf_length  = 0;
 
-    VerifyOrExit(out_secret != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(out_secret_length >= kMax_ECDH_Secret_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(remote_public_key.Type() == mPrivateKey.Type(), error = CHIP_ERROR_INVALID_ARGUMENT);
 
     error = _create_evp_key_from_binary_p256_key(mPrivateKey, &local_key, true);
@@ -761,11 +754,11 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const ECPKey & remote_public_key, uin
     result = EVP_PKEY_derive_set_peer(context, remote_key);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
-    out_buf_length = out_secret_length;
+    out_buf_length = out_secret.Length();
     result         = EVP_PKEY_derive(context, Uint8::to_uchar(out_secret), &out_buf_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(out_secret_length >= out_buf_length, error = CHIP_ERROR_INTERNAL);
-    out_secret_length = out_buf_length;
+    VerifyOrExit(out_secret.Length() >= out_buf_length, error = CHIP_ERROR_INTERNAL);
+    out_secret.Length() = out_buf_length;
 
 exit:
     if (local_key != NULL)

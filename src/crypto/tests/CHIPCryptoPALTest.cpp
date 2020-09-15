@@ -607,13 +607,12 @@ static void TestECDSA_Signing_SHA256(nlTestSuite * inSuite, void * inContext)
     P256Keypair keypair;
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
-    uint8_t signature[kMax_ECDSA_Signature_Length];
-    size_t signature_length  = sizeof(signature);
-    CHIP_ERROR signing_error = keypair.ECDSA_sign_msg((const uint8_t *) msg, msg_length, signature, signature_length);
+    P256ECDSASignature signature;
+    CHIP_ERROR signing_error = keypair.ECDSA_sign_msg((const uint8_t *) msg, msg_length, signature);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
 
     CHIP_ERROR validation_error =
-        keypair.Pubkey().ECDSA_validate_msg_signature((const uint8_t *) msg, msg_length, signature, signature_length);
+        keypair.Pubkey().ECDSA_validate_msg_signature((const uint8_t *) msg, msg_length, signature);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_NO_ERROR);
 }
 
@@ -625,15 +624,14 @@ static void TestECDSA_ValidationFailsDifferentMessage(nlTestSuite * inSuite, voi
     P256Keypair keypair;
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
-    uint8_t signature[kMax_ECDSA_Signature_Length];
-    size_t signature_length  = sizeof(signature);
-    CHIP_ERROR signing_error = keypair.ECDSA_sign_msg((const uint8_t *) msg, msg_length, signature, signature_length);
+    P256ECDSASignature signature;
+    CHIP_ERROR signing_error = keypair.ECDSA_sign_msg((const uint8_t *) msg, msg_length, signature);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
 
     const char * diff_msg  = "NOT Hello World!";
     size_t diff_msg_length = strlen((const char *) msg);
     CHIP_ERROR validation_error =
-        keypair.Pubkey().ECDSA_validate_msg_signature((const uint8_t *) diff_msg, diff_msg_length, signature, signature_length);
+        keypair.Pubkey().ECDSA_validate_msg_signature((const uint8_t *) diff_msg, diff_msg_length, signature);
     NL_TEST_ASSERT(inSuite, validation_error != CHIP_NO_ERROR);
 }
 
@@ -645,14 +643,13 @@ static void TestECDSA_ValidationFailIncorrectSignature(nlTestSuite * inSuite, vo
     P256Keypair keypair;
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
-    uint8_t signature[kMax_ECDSA_Signature_Length];
-    size_t signature_length  = sizeof(signature);
-    CHIP_ERROR signing_error = keypair.ECDSA_sign_msg((const uint8_t *) msg, msg_length, signature, signature_length);
+    P256ECDSASignature signature;
+    CHIP_ERROR signing_error = keypair.ECDSA_sign_msg((const uint8_t *) msg, msg_length, signature);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
     signature[0] = ~signature[0]; // Flipping bits should invalidate the signature.
 
     CHIP_ERROR validation_error =
-        keypair.Pubkey().ECDSA_validate_msg_signature((const uint8_t *) msg, msg_length, signature, signature_length);
+        keypair.Pubkey().ECDSA_validate_msg_signature((const uint8_t *) msg, msg_length, signature);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_SIGNATURE);
 }
 
@@ -664,17 +661,12 @@ static void TestECDSA_SigningInvalidParams(nlTestSuite * inSuite, void * inConte
     P256Keypair keypair;
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
-    uint8_t signature[kMax_ECDSA_Signature_Length];
-    size_t signature_length  = sizeof(signature);
-    CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(NULL, msg_length, signature, signature_length);
+    P256ECDSASignature signature;
+    CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(NULL, msg_length, signature);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_ERROR_INVALID_ARGUMENT);
     signing_error = CHIP_NO_ERROR;
 
-    signing_error = keypair.ECDSA_sign_msg(msg, 0, signature, signature_length);
-    NL_TEST_ASSERT(inSuite, signing_error == CHIP_ERROR_INVALID_ARGUMENT);
-    signing_error = CHIP_NO_ERROR;
-
-    signing_error = keypair.ECDSA_sign_msg(msg, msg_length, NULL, signature_length);
+    signing_error = keypair.ECDSA_sign_msg(msg, 0, signature);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_ERROR_INVALID_ARGUMENT);
     signing_error = CHIP_NO_ERROR;
 }
@@ -687,24 +679,15 @@ static void TestECDSA_ValidationInvalidParam(nlTestSuite * inSuite, void * inCon
     P256Keypair keypair;
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
-    uint8_t signature[kMax_ECDSA_Signature_Length];
-    size_t signature_length  = sizeof(signature);
-    CHIP_ERROR signing_error = keypair.ECDSA_sign_msg((const uint8_t *) msg, msg_length, signature, signature_length);
+    P256ECDSASignature signature;
+    CHIP_ERROR signing_error = keypair.ECDSA_sign_msg((const uint8_t *) msg, msg_length, signature);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
 
-    CHIP_ERROR validation_error = keypair.Pubkey().ECDSA_validate_msg_signature(NULL, msg_length, signature, signature_length);
+    CHIP_ERROR validation_error = keypair.Pubkey().ECDSA_validate_msg_signature(NULL, msg_length, signature);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
     validation_error = CHIP_NO_ERROR;
 
-    validation_error = keypair.Pubkey().ECDSA_validate_msg_signature((const uint8_t *) msg, 0, signature, signature_length);
-    NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
-    validation_error = CHIP_NO_ERROR;
-
-    validation_error = keypair.Pubkey().ECDSA_validate_msg_signature((const uint8_t *) msg, msg_length, NULL, signature_length);
-    NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
-    validation_error = CHIP_NO_ERROR;
-
-    validation_error = keypair.Pubkey().ECDSA_validate_msg_signature((const uint8_t *) msg, msg_length, signature, 0);
+    validation_error = keypair.Pubkey().ECDSA_validate_msg_signature((const uint8_t *) msg, 0, signature);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
     validation_error = CHIP_NO_ERROR;
 }
@@ -717,44 +700,26 @@ static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
     P256Keypair keypair2;
     NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
 
-    uint8_t out_secret1[kMax_ECDH_Secret_Length] = { 0 };
-    size_t out_size1                             = sizeof(out_secret1);
+    P256ECDHDerivedSecret out_secret1;
+    out_secret1[0] = 0;
 
-    uint8_t out_secret2[kMax_ECDH_Secret_Length] = { 1 };
-    size_t out_size2                             = sizeof(out_secret2);
-    CHIP_ERROR error                             = CHIP_NO_ERROR;
-    NL_TEST_ASSERT(inSuite, memcmp(out_secret1, out_secret2, out_size1) != 0); // Validate that buffers are indeed different.
+    P256ECDHDerivedSecret out_secret2;
+    out_secret2[0] = 1;
 
-    error = keypair2.ECDH_derive_secret(keypair1.Pubkey(), out_secret1, out_size1);
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    NL_TEST_ASSERT(inSuite, memcmp(Uint8::to_uchar(out_secret1), Uint8::to_uchar(out_secret2), out_secret1.Length()) != 0); // Validate that buffers are indeed different.
+
+    error = keypair2.ECDH_derive_secret(keypair1.Pubkey(), out_secret1);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
-    error = keypair1.ECDH_derive_secret(keypair2.Pubkey(), out_secret2, out_size2);
+    error = keypair1.ECDH_derive_secret(keypair2.Pubkey(), out_secret2);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
-    bool signature_lengths_match = out_size1 == out_size2;
+    bool signature_lengths_match = out_secret1.Length() == out_secret2.Length();
     NL_TEST_ASSERT(inSuite, signature_lengths_match);
 
-    bool signatures_match = (memcmp(out_secret1, out_secret2, out_size1) == 0);
+    bool signatures_match = (memcmp(Uint8::to_uchar(out_secret1), Uint8::to_uchar(out_secret2), out_secret1.Length()) == 0);
     NL_TEST_ASSERT(inSuite, signatures_match);
-}
-
-static void TestECDH_InvalidParams(nlTestSuite * inSuite, void * inContext)
-{
-    P256Keypair keypair1;
-    NL_TEST_ASSERT(inSuite, keypair1.Initialize() == CHIP_NO_ERROR);
-
-    P256Keypair keypair2;
-    NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
-
-    uint8_t out_secret[kMax_ECDH_Secret_Length] = { 0 };
-    size_t out_size                             = sizeof(out_secret);
-
-    CHIP_ERROR error = keypair1.ECDH_derive_secret(keypair2.Pubkey(), NULL, out_size);
-    NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INVALID_ARGUMENT);
-
-    size_t bad_size = 0;
-    error           = keypair1.ECDH_derive_secret(keypair2.Pubkey(), out_secret, bad_size);
-    NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 #if CHIP_CRYPTO_OPENSSL
@@ -816,12 +781,10 @@ static void TestP256_Keygen(nlTestSuite * inSuite, void * inContext)
     const char * msg         = "Test Message for Keygen";
     const uint8_t * test_msg = Uint8::from_const_char(msg);
     size_t msglen            = strlen(msg);
-    uint8_t test_sig[kMax_ECDSA_Signature_Length];
-    size_t siglen = sizeof(test_sig);
 
-    NL_TEST_ASSERT(inSuite, keypair.ECDSA_sign_msg(test_msg, msglen, test_sig, siglen) == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, keypair.Pubkey().ECDSA_validate_msg_signature(test_msg, msglen, test_sig, siglen) == CHIP_NO_ERROR);
+    P256ECDSASignature test_sig;
+    NL_TEST_ASSERT(inSuite, keypair.ECDSA_sign_msg(test_msg, msglen, test_sig) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Pubkey().ECDSA_validate_msg_signature(test_msg, msglen, test_sig) == CHIP_NO_ERROR);
 }
 
 static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
@@ -831,7 +794,6 @@ static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
 
     P256Keypair keypair;
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
-
     NL_TEST_ASSERT(inSuite, keypair.NewCertificateSigningRequest(csr, length) == CHIP_NO_ERROR);
 }
 
@@ -1258,7 +1220,6 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
     NL_TEST_DEF("Test DRBG output", TestDRBG_Output),
     NL_TEST_DEF("Test ECDH derive shared secret", TestECDH_EstablishSecret),
-    NL_TEST_DEF("Test ECDH invalid params", TestECDH_InvalidParams),
     NL_TEST_DEF("Test adding entropy sources", TestAddEntropySources),
     NL_TEST_DEF("Test PBKDF2 SHA256", TestPBKDF2_SHA256_TestVectors),
     NL_TEST_DEF("Test P256 Keygen", TestP256_Keygen),

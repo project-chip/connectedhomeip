@@ -99,6 +99,7 @@ enum class SupportedECPKeyTypes : uint8_t
     ECP256R1 = 0,
 };
 
+template <typename Sig>
 class ECPKey
 {
 public:
@@ -106,14 +107,37 @@ public:
     virtual size_t Length() const             = 0;
     virtual operator uint8_t *() const        = 0;
 
-    virtual CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const uint8_t * signature,
-                                                    const size_t signature_length) const
+    virtual CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const Sig & signature) const
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 };
 
-class P256PrivateKey : public ECPKey
+class P256ECDSASignature
+{
+public:
+    size_t & Length() { return length; }
+    size_t Length() const { return length; }
+    operator uint8_t *() const { return (uint8_t *) bytes; }
+
+private:
+    uint8_t bytes[kMax_ECDSA_Signature_Length];
+    size_t length = sizeof(bytes); //kMax_ECDSA_Signature_Length;
+};
+
+class P256ECDHDerivedSecret
+{
+public:
+    size_t & Length() { return length; }
+    size_t Length() const { return length; }
+    operator uint8_t *() const { return (uint8_t *) bytes; }
+
+private:
+    uint8_t bytes[kMax_ECDH_Secret_Length];
+    size_t length = sizeof(bytes);
+};
+
+class P256PrivateKey : public ECPKey<P256ECDSASignature>
 {
 public:
     SupportedECPKeyTypes Type() const override { return SupportedECPKeyTypes::ECP256R1; }
@@ -124,22 +148,20 @@ private:
     uint8_t bytes[kP256_PrivateKey_Length];
 };
 
-class P256PublicKey : public ECPKey
+class P256PublicKey : public ECPKey<P256ECDSASignature>
 {
 public:
     SupportedECPKeyTypes Type() const override { return SupportedECPKeyTypes::ECP256R1; }
     size_t Length() const override { return kP256_PublicKey_Length; }
     operator uint8_t *() const override { return (uint8_t *) bytes; }
 
-    CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const uint8_t * signature,
-                                            const size_t signature_length) const override;
+    CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const P256ECDSASignature & signature) const override;
 
 private:
     uint8_t bytes[kP256_PublicKey_Length];
 };
 
-class ECPKeypairFactory;
-
+template <typename PK, typename Secret, typename Sig>
 class ECPKeypair
 {
 public:
@@ -157,27 +179,23 @@ public:
      * @param msg_length Length of message
      * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
      *represented as ASN.1 DER integers, plus the ASN.1 sequence Header
-     * @param out_signature_length Length of out buffer
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, uint8_t * out_signature,
-                                      size_t & out_signature_length) = 0;
+    virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, Sig & out_signature) = 0;
 
     /** @brief A function to derive a shared secret using ECDH
      * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
      * ASN.1 DER encoded as padded big-endian field elements as described in SEC 1: Elliptic Curve Cryptography
      * [https://www.secg.org/sec1-v2.pdf]
      * @param out_secret Buffer to write out secret into. This is a byte array representing the x coordinate of the shared secret.
-     * @param out_secret_length Length of out_secret
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR ECDH_derive_secret(const ECPKey & remote_public_key, uint8_t * out_secret,
-                                          size_t & out_secret_length) const = 0;
+    virtual CHIP_ERROR ECDH_derive_secret(const PK & remote_public_key, Secret & out_secret) const = 0;
 
-    virtual const ECPKey & Pubkey() = 0;
+    virtual const PK & Pubkey() = 0;
 };
 
-class P256Keypair : public ECPKeypair
+class P256Keypair : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
 {
 public:
     /** @brief Initialize the keypair.
@@ -199,26 +217,22 @@ public:
      * @param msg_length Length of message
      * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
      *represented as ASN.1 DER integers, plus the ASN.1 sequence Header
-     * @param out_signature_length Length of out buffer
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, uint8_t * out_signature,
-                                      size_t & out_signature_length) override;
+    virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) override;
 
     /** @brief A function to derive a shared secret using ECDH
      * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
      * ASN.1 DER encoded as padded big-endian field elements as described in SEC 1: Elliptic Curve Cryptography
      * [https://www.secg.org/sec1-v2.pdf]
      * @param out_secret Buffer to write out secret into. This is a byte array representing the x coordinate of the shared secret.
-     * @param out_secret_length Length of out_secret
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR ECDH_derive_secret(const ECPKey & remote_public_key, uint8_t * out_secret,
-                                          size_t & out_secret_length) const override;
+    virtual CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const override;
 
     /** @brief Return public key for the keypair.
      **/
-    virtual const ECPKey & Pubkey() override { return mPublicKey; }
+    virtual const P256PublicKey & Pubkey() override { return mPublicKey; }
 
 private:
     P256PrivateKey mPrivateKey;
