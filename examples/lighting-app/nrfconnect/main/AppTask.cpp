@@ -65,14 +65,6 @@ bool sHaveServiceConnectivity = false;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
-DemoSessionManager sSessions;
-
-namespace chip {
-SecureSessionMgrBase & SessionManager()
-{
-    return sSessions;
-}
-} // namespace chip
 
 int AppTask::Init()
 {
@@ -101,9 +93,8 @@ int AppTask::Init()
 
     LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-    // Init ZCL Data Model
-    InitDataModelHandler();
-    StartServer(&sSessions);
+    // Init ZCL Data Model and start server
+    InitServer();
     PrintQRCode();
 
     return 0;

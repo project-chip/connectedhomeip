@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,36 +16,31 @@
  *    limitations under the License.
  */
 
-/**
- * @file
- *   This file implements the handler for data model messages.
- */
+#include <support/logging/CHIPLogging.h>
+
+#include "gen/attribute-id.h"
+#include "gen/cluster-id.h"
+#include "gen/znet-bookkeeping.h"
+#include <app/util/af-types.h>
 
 #include "LightingManager.h"
 
-#include "af-types.h"
-#include "gen/attribute-id.h"
-#include "gen/cluster-id.h"
-
-#include <logging/log.h>
-
-LOG_MODULE_DECLARE(app);
-
-extern "C" void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
-                                                   uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
-                                                   uint8_t * value)
+extern "C" {
+void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
+                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
     if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
     {
-        LOG_INF("Unknown cluster ID: %" PRIu16, clusterId);
+        ChipLogProgress(Zcl, "Unknown cluster ID: %d", clusterId);
         return;
     }
 
     if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
     {
-        LOG_INF("Unknown attribute ID: %" PRIu16, attributeId);
+        ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
         return;
     }
 
     LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
+}
 }
