@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#
+
 #
 #    Copyright (c) 2020 Project CHIP Authors
 #
@@ -15,26 +15,17 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-#
-#    Description:
-#      This is a utility script that compiles ESP32 QEMU and sets it up
-#      for testing.
-#
 
-here=$(cd "$(dirname "$0")" && pwd)
+# Build script for GN nRF5 examples GitHub workflow.
+
+CHIP_ROOT="$(dirname "$0")/../.."
+
+source "$CHIP_ROOT/scripts/activate.sh"
 
 set -e
+set -x
+env
 
-die() {
-    echo "${me:?}: *** ERROR: " "${*}"
-    exit 1
-}
+gn gen --root="$CHIP_ROOT"/examples/shell --args='target_os="freertos" target_cpu="arm" import("//nrf5_args.gni")' out/nrf5
 
-# move to the example folder, I don't work anywhere else
-cd "$here" || die 'ack!, where am I?!?'
-
-# shellcheck source=/dev/null
-source idf.sh
-rm -f ./build/sdkconfig
-SDKCONFIG=./build/sdkconfig SDKCONFIG_DEFAULTS=sdkconfig_qemu.defaults CHIP_BUILD_WITH_GN=n idf make defconfig
-SDKCONFIG=./build/sdkconfig CHIP_BUILD_WITH_GN=n idf make -j8 esp32_elf_builder
+ninja -v -C out/nrf5
