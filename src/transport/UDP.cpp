@@ -51,8 +51,6 @@ CHIP_ERROR UDP::Init(UdpListenParameters & params)
 
     VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
 
-    mSendPort = params.GetMessageSendPort();
-
     err = params.GetInetLayer()->NewUDPEndPoint(&mUDPEndPoint);
     SuccessOrExit(err);
 
