@@ -129,7 +129,7 @@ function cirquetest_run_all_tests() {
         echo -e "[$BOLD_GREEN_TEXT""PASS""$RESET_COLOR] Test finished, test log can be found at artifacts"
         return 0
     else
-        echo -e "[$BOLD_GREEN_TEXT""FAIL""$RESET_COLOR] Test failed, test log can be found at artifacts"
+        echo -e "[$BOLD_RED_TEXT""FAIL""$RESET_COLOR] Test failed, test log can be found at artifacts"
         return 1
     fi
 }
