@@ -274,12 +274,16 @@ void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * 
 {
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    TCPBase * tcp  = reinterpret_cast<TCPBase *>(endPoint->AppState);
+    // TCPBase * tcp  = reinterpret_cast<TCPBase *>(endPoint->AppState);
     IPAddress ipAddress;
     uint16_t port;
 
     endPoint->GetPeerInfo(&ipAddress, &port);
     PeerAddress peerAddress = PeerAddress::TCP(ipAddress, port);
+
+    char src[PeerAddress::kMaxToStringSize];
+    peerAddress.ToString(src, sizeof(src));
+    ChipLogProgress(Inet, "TCP Data received from %s", src);
 
     // FIXME: read header uint16_t size
     //        decode the buffer
