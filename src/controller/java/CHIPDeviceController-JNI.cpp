@@ -248,21 +248,16 @@ exit:
 JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong deviceControllerPtr, jint discriminator, jlong pinCode)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
+    void * appReqState                      = (void *) "ConnectDevice";
     ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
 
     ChipLogProgress(Controller, "beginConnectDevice() called with discriminator and pincode on 0x%08lX", (long) self);
 
     pthread_mutex_lock(&sStackLock);
-    sBleLayer.mAppState = (void *) self;
-    err                 = deviceController->ConnectDevice(BLEDeviceConnectionParameters()
-                                              .SetRemoteDeviceId(kRemoteDeviceId)
-                                              .SetDiscriminator(discriminator)
-                                              .SetSetupPINCode(pinCode)
-                                              .SetAppReqState((void *) self)
-                                              .SetOnConnected(HandleKeyExchange)
-                                              .SetOnMessageReceived(HandleEchoResponse)
-                                              .SetOnError(HandleError)
-                                              .SetBleLayer(&sBleLayer));
+    sBleLayer.mAppState = appReqState;
+    RendezvousParameters params = RendezvousParameters(pinCode).SetDiscriminator(discriminator).SetBleLayer(&sBleLayer);
+    err                         = deviceController->ConnectDevice(kRemoteDeviceId, params, appReqState,
+                                                                  HandleKeyExchange, HandleEchoResponse, HandleError);
 
     pthread_mutex_unlock(&sStackLock);
 
