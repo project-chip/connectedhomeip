@@ -126,4 +126,3 @@
 
 
 #endif /* STACK_MACROS_H */
-
