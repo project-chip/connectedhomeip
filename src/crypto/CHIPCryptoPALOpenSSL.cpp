@@ -554,7 +554,8 @@ exit:
     return error;
 }
 
-CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const P256ECDSASignature & signature) const
+CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length,
+                                                       const P256ECDSASignature & signature) const
 {
     ERR_clear_error();
     CHIP_ERROR error            = CHIP_ERROR_INTERNAL;
@@ -644,7 +645,8 @@ exit:
 }
 
 // helper function to populate octet key into EVP_PKEY out_evp_pkey. Caller must free out_evp_pkey
-static CHIP_ERROR _create_evp_key_from_binary_p256_key(const ECPKey<P256ECDSASignature> & key, EVP_PKEY ** out_evp_pkey, bool isPrivateKey)
+static CHIP_ERROR _create_evp_key_from_binary_p256_key(const ECPKey<P256ECDSASignature> & key, EVP_PKEY ** out_evp_pkey,
+                                                       bool isPrivateKey)
 {
 
     CHIP_ERROR error     = CHIP_NO_ERROR;

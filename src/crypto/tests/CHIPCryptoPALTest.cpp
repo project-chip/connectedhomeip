@@ -611,8 +611,7 @@ static void TestECDSA_Signing_SHA256(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg((const uint8_t *) msg, msg_length, signature);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
 
-    CHIP_ERROR validation_error =
-        keypair.Pubkey().ECDSA_validate_msg_signature((const uint8_t *) msg, msg_length, signature);
+    CHIP_ERROR validation_error = keypair.Pubkey().ECDSA_validate_msg_signature((const uint8_t *) msg, msg_length, signature);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_NO_ERROR);
 }
 
@@ -648,8 +647,7 @@ static void TestECDSA_ValidationFailIncorrectSignature(nlTestSuite * inSuite, vo
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
     signature[0] = ~signature[0]; // Flipping bits should invalidate the signature.
 
-    CHIP_ERROR validation_error =
-        keypair.Pubkey().ECDSA_validate_msg_signature((const uint8_t *) msg, msg_length, signature);
+    CHIP_ERROR validation_error = keypair.Pubkey().ECDSA_validate_msg_signature((const uint8_t *) msg, msg_length, signature);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_SIGNATURE);
 }
 
@@ -707,7 +705,9 @@ static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
     out_secret2[0] = 1;
 
     CHIP_ERROR error = CHIP_NO_ERROR;
-    NL_TEST_ASSERT(inSuite, memcmp(Uint8::to_uchar(out_secret1), Uint8::to_uchar(out_secret2), out_secret1.Length()) != 0); // Validate that buffers are indeed different.
+    NL_TEST_ASSERT(inSuite,
+                   memcmp(Uint8::to_uchar(out_secret1), Uint8::to_uchar(out_secret2), out_secret1.Length()) !=
+                       0); // Validate that buffers are indeed different.
 
     error = keypair2.ECDH_derive_secret(keypair1.Pubkey(), out_secret1);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);

@@ -122,7 +122,7 @@ public:
 
 private:
     uint8_t bytes[kMax_ECDSA_Signature_Length];
-    size_t length = sizeof(bytes); //kMax_ECDSA_Signature_Length;
+    size_t length = sizeof(bytes); // kMax_ECDSA_Signature_Length;
 };
 
 class P256ECDHDerivedSecret
@@ -155,7 +155,8 @@ public:
     size_t Length() const override { return kP256_PublicKey_Length; }
     operator uint8_t *() const override { return (uint8_t *) bytes; }
 
-    CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const P256ECDSASignature & signature) const override;
+    CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length,
+                                            const P256ECDSASignature & signature) const override;
 
 private:
     uint8_t bytes[kP256_PublicKey_Length];
@@ -228,7 +229,8 @@ public:
      * @param out_secret Buffer to write out secret into. This is a byte array representing the x coordinate of the shared secret.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const override;
+    virtual CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key,
+                                          P256ECDHDerivedSecret & out_secret) const override;
 
     /** @brief Return public key for the keypair.
      **/
