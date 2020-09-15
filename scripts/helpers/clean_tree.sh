@@ -25,5 +25,5 @@ git submodule foreach git clean -Xdf
 # TODO - Remove after fixing
 # https://bugs.chromium.org/p/pigweed/issues/detail?id=265
 if test -n "$PW_ENVIRONMENT_ROOT" -a -w "$PW_ENVIRONMENT_ROOT"; then
-  rm -rf "$PW_ENVIRONMENT_ROOT"
+    rm -rf "$PW_ENVIRONMENT_ROOT"
 fi
