@@ -41,16 +41,20 @@ private:
 public:
     AndroidBlePlatformDelegate();
 
-    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID * svcId, const chip::Ble::ChipBleUUID * charId);
-    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID * svcId, const chip::Ble::ChipBleUUID * charId);
+    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID * svcId,
+                                 const chip::Ble::ChipBleUUID * charId);
+    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID * svcId,
+                                   const chip::Ble::ChipBleUUID * charId);
     bool CloseConnection(BLE_CONNECTION_OBJECT connObj);
     uint16_t GetMTU(BLE_CONNECTION_OBJECT connObj) const;
-    bool SendIndication(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID * svcId, const chip::Ble::ChipBleUUID * charId, chip::System::PacketBuffer * pBuf);
-    bool SendWriteRequest(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID * svcId, const chip::Ble::ChipBleUUID * charId,
-                          chip::System::PacketBuffer * pBuf);
-    bool SendReadRequest(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID * svcId, const chip::Ble::ChipBleUUID * charId, chip::System::PacketBuffer * pBuf);
-    bool SendReadResponse(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext, const chip::Ble::ChipBleUUID * svcId,
-                          const chip::Ble::ChipBleUUID * charId);
+    bool SendIndication(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID * svcId, const chip::Ble::ChipBleUUID * charId,
+                        chip::System::PacketBuffer * pBuf);
+    bool SendWriteRequest(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID * svcId,
+                          const chip::Ble::ChipBleUUID * charId, chip::System::PacketBuffer * pBuf);
+    bool SendReadRequest(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID * svcId, const chip::Ble::ChipBleUUID * charId,
+                         chip::System::PacketBuffer * pBuf);
+    bool SendReadResponse(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext,
+                          const chip::Ble::ChipBleUUID * svcId, const chip::Ble::ChipBleUUID * charId);
 
     void SetSendWriteRequestCallback(SendWriteRequestCallback cb);
     void SetSubscribeCharacteristicCallback(SubscribeCharacteristicCallback cb);
