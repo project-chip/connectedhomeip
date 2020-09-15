@@ -386,6 +386,26 @@ endif
 
 endif # CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 
+if CHIP_DEVICE_LAYER_TARGET_QPG6100
+
+libDeviceLayer_a_SOURCES               +=       \
+    qpg6100/BLEManagerImpl.cpp                  \
+    qpg6100/PlatformManagerImpl.cpp             \
+    qpg6100/ConfigurationManagerImpl.cpp        \
+    qpg6100/ConnectivityManagerImpl.cpp         \
+    qpg6100/qpg6100Config.cpp                   \
+    qpg6100/Logging.cpp                         \
+    FreeRTOS/SystemTimeSupport.cpp              \
+    $(NULL)
+
+if CHIP_ENABLE_OPENTHREAD
+libDeviceLayer_a_SOURCES               +=       \
+    qpg6100/ThreadStackManagerImpl.cpp          \
+    $(NULL)
+endif
+
+endif # CHIP_DEVICE_LAYER_TARGET_QPG6100
+
 if CHIP_DEVICE_LAYER_TARGET_K32W
 
 libDeviceLayer_a_SOURCES               +=       \
