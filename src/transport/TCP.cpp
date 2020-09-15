@@ -19,9 +19,9 @@
 
 /**
  *    @file
- *      This file implements the CHIP Connection object that maintains a UDP connection.
+ *      This file implements the CHIP Connection object that maintains a TCP connection.
  */
-#include <transport/UDP.h>
+#include <transport/TCP.h>
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -32,57 +32,64 @@
 namespace chip {
 namespace Transport {
 
-UDP::~UDP()
+constexpr int kListenBacklogSize = 2;
+
+TCP::~TCP()
 {
-    if (mUDPEndPoint)
+    if (mListenSocket != nullptr)
     {
         // Udp endpoint is only non null if udp endpoint is initialized and listening
-        mUDPEndPoint->Close();
-        mUDPEndPoint->Free();
-        mUDPEndPoint = nullptr;
+        mListenSocket->Close();
+        mListenSocket->Free();
+        mListenSocket = nullptr;
     }
 }
 
-CHIP_ERROR UDP::Init(UdpListenParameters & params)
+CHIP_ERROR TCP::Init(TcpListenParameters & params)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = params.GetInetLayer()->NewUDPEndPoint(&mUDPEndPoint);
+    err = params.GetInetLayer()->NewTCPEndPoint(&mListenSocket);
     SuccessOrExit(err);
 
-    err = mUDPEndPoint->Bind(params.GetAddressType(), IPAddress::Any, params.GetListenPort(), params.GetInterfaceId());
+    err = mListenSocket->Bind(params.GetAddressType(), IPAddress::Any, params.GetListenPort(), params.GetInterfaceId());
     SuccessOrExit(err);
 
-    err = mUDPEndPoint->Listen();
+    err = mListenSocket->Listen(kListenBacklogSize);
     SuccessOrExit(err);
 
-    mUDPEndPoint->AppState          = reinterpret_cast<void *>(this);
-    mUDPEndPoint->OnMessageReceived = OnUdpReceive;
-    mUDPEndpointType                = params.GetAddressType();
+    mListenSocket->AppState       = reinterpret_cast<void *>(this);
+    mListenSocket->OnDataReceived = OnTcpReceive;
+    mEndpointType                 = params.GetAddressType();
 
     mState = State::kInitialized;
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(Inet, "Failed to initialize Udp transport: %s", ErrorStr(err));
-        if (mUDPEndPoint)
+        ChipLogProgress(Inet, "Failed to initialize TCP transport: %s", ErrorStr(err));
+        if (mListenSocket)
         {
-            mUDPEndPoint->Free();
-            mUDPEndPoint = nullptr;
+            mListenSocket->Free();
+            mListenSocket = nullptr;
         }
     }
 
     return err;
 }
 
-CHIP_ERROR UDP::SendMessage(const MessageHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgBuf)
+CHIP_ERROR TCP::SendMessage(const MessageHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgBuf)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // FIXME: implement
+    err = CHIP_ERROR_NOT_IMPLEMENTED;
+
+    /*
     const size_t headerSize = header.EncodeSizeBytes();
     size_t actualEncodedHeaderSize;
-    CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(address.GetTransportType() == Type::kUdp, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
@@ -113,14 +120,16 @@ exit:
         System::PacketBuffer::Free(msgBuf);
         msgBuf = NULL;
     }
+    */
 
     return err;
 }
 
-void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * buffer, const IPPacketInfo * pktInfo)
+void TCP::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer)
 {
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    UDP * udp               = reinterpret_cast<UDP *>(endPoint->AppState);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    /*
+    TCP * tc               = reinterpret_cast<TCP *>(endPoint->AppState);
     size_t headerSize       = 0;
     PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort);
 
@@ -130,11 +139,14 @@ void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * 
 
     buffer->ConsumeHead(headerSize);
     udp->HandleMessageReceived(header, peerAddress, buffer);
+    */
 
-exit:
+    err = CHIP_ERROR_NOT_IMPLEMENTED;
+
+    // exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Inet, "Failed to receive UDP message: %s", ErrorStr(err));
+        ChipLogError(Inet, "Failed to receive TCP message: %s", ErrorStr(err));
     }
 }
 

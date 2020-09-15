@@ -37,6 +37,8 @@ static_library("transport") {
     "SecureSessionMgr.cpp",
     "SecureSessionMgr.h",
     "Tuple.h",
+    "TCP.cpp",
+    "TCP.h",
     "UDP.cpp",
     "UDP.h",
   ]

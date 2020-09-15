@@ -18,13 +18,12 @@
 
 /**
  *    @file
- *      This file defines the CHIP Connection object that maintains a UDP connection.
+ *      This file defines the CHIP Connection object that maintains TCP connections.
  *      It binds to any avaiable local addr and port and begins listening.
- *
  */
 
-#ifndef __UDPTRANSPORT_H__
-#define __UDPTRANSPORT_H__
+#ifndef __TCPTRANSPORT_H__
+#define __TCPTRANSPORT_H__
 
 #include <utility>
 
@@ -37,18 +36,18 @@
 namespace chip {
 namespace Transport {
 
-/** Defines listening parameters for setting up a UDP transport */
-class UdpListenParameters
+/** Defines listening parameters for setting up a TCP transport */
+class TcpListenParameters
 {
 public:
-    explicit UdpListenParameters(Inet::InetLayer * layer) : mLayer(layer) {}
-    UdpListenParameters(const UdpListenParameters &) = default;
-    UdpListenParameters(UdpListenParameters &&)      = default;
+    explicit TcpListenParameters(Inet::InetLayer * layer) : mLayer(layer) {}
+    TcpListenParameters(const TcpListenParameters &) = default;
+    TcpListenParameters(TcpListenParameters &&)      = default;
 
     Inet::InetLayer * GetInetLayer() { return mLayer; }
 
     Inet::IPAddressType GetAddressType() const { return mAddressType; }
-    UdpListenParameters & SetAddressType(Inet::IPAddressType type)
+    TcpListenParameters & SetAddressType(Inet::IPAddressType type)
     {
         mAddressType = type;
 
@@ -56,7 +55,7 @@ public:
     }
 
     uint16_t GetListenPort() const { return mListenPort; }
-    UdpListenParameters & SetListenPort(uint16_t port)
+    TcpListenParameters & SetListenPort(uint16_t port)
     {
         mListenPort = port;
 
@@ -64,7 +63,7 @@ public:
     }
 
     InterfaceId GetInterfaceId() const { return mInterfaceId; }
-    UdpListenParameters & SetInterfaceId(InterfaceId id)
+    TcpListenParameters & SetInterfaceId(InterfaceId id)
     {
         mInterfaceId = id;
 
@@ -74,15 +73,15 @@ public:
 private:
     Inet::InetLayer * mLayer         = nullptr;               ///< Associated inet layer
     Inet::IPAddressType mAddressType = kIPAddressType_IPv6;   ///< type of listening socket
-    uint16_t mListenPort             = CHIP_PORT;             ///< UDP listen port
+    uint16_t mListenPort             = CHIP_PORT;             ///< TCP listen port
     InterfaceId mInterfaceId         = INET_NULL_INTERFACEID; ///< Interface to listen on
 };
 
-/** Implements a transport using UDP. */
-class DLL_EXPORT UDP : public Base
+/** Implements a transport using TCP. */
+class DLL_EXPORT TCP : public Base
 {
     /**
-     *  The State of the UDP connection
+     *  The State of the TCP connection
      *
      */
     enum class State
@@ -92,39 +91,40 @@ class DLL_EXPORT UDP : public Base
     };
 
 public:
-    virtual ~UDP();
+    virtual ~TCP();
 
     /**
-     * Initialize a UDP transport on a given port.
+     * Initialize a TCP transport on a given port.
      *
-     * @param params        UDP configuration parameters for this transport
+     * @param params        TCP configuration parameters for this transport
      *
      * @details
      *   Generally send and receive ports should be the same and equal to CHIP_PORT.
      *   The class allows separate definitions to allow local execution of several
      *   Nodes.
      */
-    CHIP_ERROR Init(UdpListenParameters & params);
+    CHIP_ERROR Init(TcpListenParameters & params);
 
     CHIP_ERROR SendMessage(const MessageHeader & header, const Transport::PeerAddress & address,
                            System::PacketBuffer * msgBuf) override;
 
     bool CanSendToPeer(const Transport::PeerAddress & address) override
     {
-        return (mState == State::kInitialized) && (address.GetTransportType() == Type::kUdp) &&
-            (address.GetIPAddress().Type() == mUDPEndpointType);
+        return (mState == State::kInitialized) && (address.GetTransportType() == Type::kTcp) &&
+            (address.GetIPAddress().Type() == mEndpointType);
     }
 
 private:
-    // UDP message receive handler.
-    static void OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * buffer, const IPPacketInfo * pktInfo);
+    // TCP message receive handler.
+    static void OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer);
+    // FIXME: accept, error, ...
 
-    Inet::UDPEndPoint * mUDPEndPoint     = nullptr;                                     ///< UDP socket used by the transport
-    Inet::IPAddressType mUDPEndpointType = Inet::IPAddressType::kIPAddressType_Unknown; ///< Socket listening type
-    State mState                         = State::kNotReady;                            ///< State of the UDP transport
+    Inet::TCPEndPoint * mListenSocket = nullptr;                                     ///< TCP socket used by the transport
+    Inet::IPAddressType mEndpointType = Inet::IPAddressType::kIPAddressType_Unknown; ///< Socket listening type
+    State mState                      = State::kNotReady;                            ///< State of the TCP transport
 };
 
 } // namespace Transport
 } // namespace chip
 
-#endif // __UDPTRANSPORT_H__
+#endif // __TCPTRANSPORT_H__
