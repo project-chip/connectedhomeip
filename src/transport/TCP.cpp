@@ -165,8 +165,11 @@ CHIP_ERROR TCPBase::SendMessage(const MessageHeader & header, const Transport::P
     }
     else
     {
-        // FIXME: connect
-        // FIXME: implement
+        // FIXME:
+        //    - set buffer as pending after connection
+        //    - initiate the connection
+        //    - NOTE: multiple pending buffers may exist. Need to order them.
+        //      Need a queue? Based on address?
         err = CHIP_ERROR_NOT_IMPLEMENTED;
         ChipLogError(Inet, "%s not yet implemented", __PRETTY_FUNCTION__);
     }

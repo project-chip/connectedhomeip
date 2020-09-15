@@ -56,6 +56,7 @@ enum class Type
 class PeerAddress
 {
 public:
+    PeerAddress() : mIPAddress(Inet::IPAddress::Any), mTransportType(Type::kUndefined) {}
     PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type) {}
     PeerAddress(Type type) : mTransportType(type) {}
 

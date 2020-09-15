@@ -78,12 +78,20 @@ private:
     InterfaceId mInterfaceId         = INET_NULL_INTERFACEID; ///< Interface to listen on
 };
 
+/**
+ * Packets scheduled for sending once a connection has been established.
+ */
+struct PendingPacket
+{
+    PeerAddress peerAddress;             // where the packet is being sent to
+    System::PacketBuffer * packetBuffer; // what data needs to be sent
+};
+
 /** Implements a transport using TCP. */
 class DLL_EXPORT TCPBase : public Base
 {
     /**
      *  The State of the TCP connection
-     *
      */
     enum class State
     {
@@ -92,10 +100,18 @@ class DLL_EXPORT TCPBase : public Base
     };
 
 public:
-    TCPBase(Inet::TCPEndPoint ** activeConnectionsBuffer, size_t bufferSize) :
-        mActiveConnections(activeConnectionsBuffer), mActiveConnectionsSize(bufferSize)
+    TCPBase(Inet::TCPEndPoint ** activeConnectionsBuffer, size_t bufferSize, PendingPacket * packetBuffers,
+            size_t packetsBuffersSize) :
+        mActiveConnections(activeConnectionsBuffer),
+        mActiveConnectionsSize(bufferSize), mPendingPackets(packetBuffers), mPendingPacketsSize(packetsBuffersSize)
     {
+        PendingPacket emptyPending{
+            .peerAddress  = PeerAddress::Uninitialized(),
+            .packetBuffer = nullptr,
+        };
+
         std::fill(mActiveConnections, mActiveConnections + mActiveConnectionsSize, nullptr);
+        std::fill(mPendingPackets, mPendingPackets + mPendingPacketsSize, emptyPending);
     }
     virtual ~TCPBase();
 
@@ -111,12 +127,11 @@ public:
      */
     CHIP_ERROR Init(TcpListenParameters & params);
 
-    CHIP_ERROR SendMessage(const MessageHeader & header, const Transport::PeerAddress & address,
-                           System::PacketBuffer * msgBuf) override;
+    CHIP_ERROR SendMessage(const MessageHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) override;
 
     void Disconnect(const PeerAddress & address) override;
 
-    bool CanSendToPeer(const Transport::PeerAddress & address) override
+    bool CanSendToPeer(const PeerAddress & address) override
     {
         return (mState == State::kInitialized) && (address.GetTransportType() == Type::kTcp) &&
             (address.GetIPAddress().Type() == mEndpointType);
@@ -149,18 +164,24 @@ private:
     Inet::IPAddressType mEndpointType = Inet::IPAddressType::kIPAddressType_Unknown; ///< Socket listening type
     State mState                      = State::kNotReady;                            ///< State of the TCP transport
 
+    // Currently active connections
     Inet::TCPEndPoint ** mActiveConnections;
     const size_t mActiveConnectionsSize;
+
+    // Data to be sent when connections succeed
+    PendingPacket * mPendingPackets;
+    const size_t mPendingPacketsSize;
 };
 
-template <size_t kActiveConnectionsSize>
+template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
 class TCP : public TCPBase
 {
 public:
-    TCP() : TCPBase(mConnectionsBuffer, kActiveConnectionsSize) {}
+    TCP() : TCPBase(mConnectionsBuffer, kActiveConnectionsSize, mPendingPackets, kPendingPacketSize) {}
 
 private:
     Inet::TCPEndPoint * mConnectionsBuffer[kActiveConnectionsSize];
+    PendingPacket mPendingPackets[kPendingPacketSize];
 };
 
 } // namespace Transport
