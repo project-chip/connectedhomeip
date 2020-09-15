@@ -47,7 +47,7 @@ enum class Type
     kUndefined,
     kUdp,
     kBle,
-    // More constants to be added later, such as TCP
+    kTcp,
 };
 
 /**
@@ -120,6 +120,14 @@ public:
             mIPAddress.ToString(ip_addr, sizeof(ip_addr));
             snprintf(buf, bufSize, "UDP:%s:%d", ip_addr, mPort);
             break;
+        case Type::kTcp:
+            mIPAddress.ToString(ip_addr, sizeof(ip_addr));
+            snprintf(buf, bufSize, "TCP:%s:%d", ip_addr, mPort);
+            break;
+        case Type::kBle:
+            // Note that BLE does not currently use any specific address.
+            snprintf(buf, bufSize, "BLE");
+            break;
         default:
             snprintf(buf, bufSize, "ERROR");
             break;
@@ -133,6 +141,8 @@ public:
     static PeerAddress BLE() { return PeerAddress(Type::kBle); }
     static PeerAddress UDP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kUdp); }
     static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port) { return UDP(addr).SetPort(port); }
+    static PeerAddress TCP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kTcp); }
+    static PeerAddress TCP(const Inet::IPAddress & addr, uint16_t port) { return TCP(addr).SetPort(port); }
 
 private:
     Inet::IPAddress mIPAddress;
