@@ -160,13 +160,6 @@ static int OnOtCliOutput(const char * aBuf, uint16_t aBufLength, void * aContext
 }
 #endif
 
-#if CHIP_TARGET_STYLE_EMBEDDED
-static otInstance * GetOtInstance()
-{
-    return ThreadStackMgrImpl().OTInstance();
-}
-#endif // CHIP_TARGET_STYLE_EMBEDDED
-
 #endif // CHIP_ENABLE_OPENTHREAD
 
 void cmd_otcli_init(void)

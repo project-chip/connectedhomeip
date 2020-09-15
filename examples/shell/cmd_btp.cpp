@@ -23,7 +23,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #endif
 
-#include <shell/shell.h>
+#include <lib/shell/shell.h>
 #include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
