@@ -29,9 +29,10 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
-#include "esp_event_loop.h"
+#include "esp_event.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
+#include "esp_netif.h"
 #include "esp_spi_flash.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
@@ -61,11 +62,19 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = Internal::InitLwIPCoreLock();
     SuccessOrExit(err);
 
-    // Initialize the ESP tcpip adapter.
-    tcpip_adapter_init();
+    err = esp_netif_init();
+    SuccessOrExit(err);
 
     // Arrange for the ESP event loop to deliver events into the CHIP Device layer.
-    err = esp_event_loop_init(PlatformManagerImpl::HandleESPSystemEvent, NULL);
+    err = esp_event_loop_create_default();
+    SuccessOrExit(err);
+
+    esp_netif_create_default_wifi_ap();
+    esp_netif_create_default_wifi_sta();
+
+    esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
+    SuccessOrExit(err);
+    esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
     SuccessOrExit(err);
 
     // Initialize the ESP WiFi layer.
@@ -90,15 +99,77 @@ CHIP_ERROR PlatformManagerImpl::InitLwIPCoreLock(void)
     return Internal::InitLwIPCoreLock();
 }
 
-esp_err_t PlatformManagerImpl::HandleESPSystemEvent(void * ctx, system_event_t * espEvent)
+void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t eventBase, int32_t eventId, void * eventData)
 {
     ChipDeviceEvent event;
-    event.Type                    = DeviceEventType::kESPSystemEvent;
-    event.Platform.ESPSystemEvent = *espEvent;
+    memset(&event, 0, sizeof(event));
+    event.Type                         = DeviceEventType::kESPSystemEvent;
+    event.Platform.ESPSystemEvent.Base = eventBase;
+    event.Platform.ESPSystemEvent.Id   = eventId;
+    if (eventBase == IP_EVENT)
+    {
+        switch (eventId)
+        {
+        case IP_EVENT_STA_GOT_IP:
+            memcpy(&event.Platform.ESPSystemEvent.Data.IpGotIp, eventData, sizeof(event.Platform.ESPSystemEvent.Data.IpGotIp));
+            break;
+        case IP_EVENT_GOT_IP6:
+            memcpy(&event.Platform.ESPSystemEvent.Data.IpGotIp6, eventData, sizeof(event.Platform.ESPSystemEvent.Data.IpGotIp6));
+            break;
+        case IP_EVENT_AP_STAIPASSIGNED:
+            memcpy(&event.Platform.ESPSystemEvent.Data.IpApStaIpAssigned, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.IpApStaIpAssigned));
+            break;
+        default:
+            break;
+        }
+    }
+    else if (eventBase == WIFI_EVENT)
+    {
+        switch (eventId)
+        {
+        case WIFI_EVENT_SCAN_DONE:
+            memcpy(&event.Platform.ESPSystemEvent.Data.WifiStaScanDone, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WifiStaScanDone));
+            break;
+        case WIFI_EVENT_STA_CONNECTED:
+            memcpy(&event.Platform.ESPSystemEvent.Data.WifiStaConnected, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WifiStaConnected));
+            break;
+        case WIFI_EVENT_STA_DISCONNECTED:
+            memcpy(&event.Platform.ESPSystemEvent.Data.WifiStaDisconnected, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WifiStaDisconnected));
+            break;
+        case WIFI_EVENT_STA_AUTHMODE_CHANGE:
+            memcpy(&event.Platform.ESPSystemEvent.Data.WifiStaAuthModeChange, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WifiStaAuthModeChange));
+            break;
+        case WIFI_EVENT_STA_WPS_ER_PIN:
+            memcpy(&event.Platform.ESPSystemEvent.Data.WifiStaWpsErPin, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WifiStaWpsErPin));
+            break;
+        case WIFI_EVENT_STA_WPS_ER_FAILED:
+            memcpy(&event.Platform.ESPSystemEvent.Data.WifiStaWpsErFailed, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WifiStaWpsErFailed));
+            break;
+        case WIFI_EVENT_AP_STACONNECTED:
+            memcpy(&event.Platform.ESPSystemEvent.Data.WifiApStaConnected, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WifiApStaConnected));
+            break;
+        case WIFI_EVENT_AP_STADISCONNECTED:
+            memcpy(&event.Platform.ESPSystemEvent.Data.WifiApStaDisconnected, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WifiApStaDisconnected));
+            break;
+        case WIFI_EVENT_AP_PROBEREQRECVED:
+            memcpy(&event.Platform.ESPSystemEvent.Data.WifiApProbeReqRecved, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WifiApProbeReqRecved));
+            break;
+        default:
+            break;
+        }
+    }
 
     sInstance.PostEvent(&event);
-
-    return ESP_OK;
 }
 
 } // namespace DeviceLayer

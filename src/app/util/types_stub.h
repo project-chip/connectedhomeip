@@ -1954,5 +1954,39 @@ typedef chip::NodeId ChipNodeId;
 #else
 typedef uint64_t ChipNodeId;
 #endif // __cplusplus
+/**
+ * @brief Macro that copies the token value from non-volatile storage into a RAM
+ * location.  This macro can only be used with tokens that are defined using
+ * DEFINE_INDEXED_TOKEN.
+ *
+ * @note To better understand the parameters of this macro, refer to the
+ *           example of token usage above.
+ *
+ * @param data   A pointer to where the token data should be placed.
+ *
+ * @param token  The token name used in <code>DEFINE_*_TOKEN</code>,
+ *               prepended with <code>TOKEN_</code>.
+ * @param index  The index to access in the indexed token.
+ */
+#define halCommonGetIndexedToken(data, token, index)
+
+/**
+ * @brief Macro that sets the value of a token in non-volatile storage.  This
+ * macro can only be used with tokens that are defined using
+ * DEFINE_INDEXED_TOKEN.
+ *
+ * @note  To better understand the parameters of this macro, refer to the
+ *           example of token usage above.
+ *
+ * @param token  The token name used in <code>DEFINE_*_TOKEN</code>,
+ * prepended with <code>TOKEN_</code>.
+ *
+ * @param index  The index to access in the indexed token.
+ *
+ * @param data   A pointer to where the token data should be placed.
+ */
+#define halCommonSetIndexedToken(token, index, data)
+
+uint32_t halCommonGetInt32uMillisecondTick(void);
 
 #endif // TYPES_STUB_H

@@ -22,7 +22,6 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
-#include "tcpip_adapter.h"
 
 #include <algorithm>
 #include <stdint.h>
@@ -245,21 +244,18 @@ SecureSessionMgrBase & SessionManager()
 }
 } // namespace chip
 
-void PairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId, SecurePairingSession * pairing)
+void PairingComplete(SecurePairingSession * pairing)
 {
     Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
-    sessions.NewPairing(peerNodeId, peer, peerKeyId, localKeyId, pairing);
+    sessions.NewPairing(peer, pairing);
 }
 
 // The echo server assumes the platform's networking has been setup already
 void startServer()
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    struct netif * ipV6NetIf = NULL;
-    tcpip_adapter_get_netif(TCPIP_ADAPTER_IF_AP, (void **) &ipV6NetIf);
-
-    err = sessions.Init(kLocalNodeId, &DeviceLayer::SystemLayer,
-                        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6).SetInterfaceId(ipV6NetIf),
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    err            = sessions.Init(kLocalNodeId, &DeviceLayer::SystemLayer,
+                        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6).SetInterfaceId(NULL),
                         UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv4));
     SuccessOrExit(err);
 

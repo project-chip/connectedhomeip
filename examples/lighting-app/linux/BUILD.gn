@@ -18,30 +18,19 @@ import("${chip_root}/gn/chip/tools.gni")
 
 assert(chip_build_tools)
 
-executable("chip-tool-server") {
-  sources = [
-    "${chip_root}/src/app/clusters/on-off-server/on-off.c",
-    "${chip_root}/src/app/util/af-event.cpp",
-    "${chip_root}/src/app/util/attribute-size.c",
-    "${chip_root}/src/app/util/attribute-storage.c",
-    "${chip_root}/src/app/util/attribute-table.c",
-    "${chip_root}/src/app/util/binding-table.cpp",
-    "${chip_root}/src/app/util/chip-response.cpp",
-    "${chip_root}/src/app/util/client-api.c",
-    "${chip_root}/src/app/util/ember-print.cpp",
-    "${chip_root}/src/app/util/message.c",
-    "${chip_root}/src/app/util/process-cluster-message.c",
-    "${chip_root}/src/app/util/process-global-message.c",
-    "${chip_root}/src/app/util/util.c",
-    "gen/call-command-handler.c",
-    "gen/callback-stub.c",
-    "gen/znet-bookkeeping.c",
-    "main.cpp",
-  ]
-
+config("includes") {
   include_dirs = [
     ".",
+    "include",
     "${chip_root}/src/app/util",
+  ]
+}
+
+executable("chip-tool-server") {
+  sources = [
+    "LightingManager.cpp",
+    "include/LightingManager.h",
+    "main.cpp",
   ]
 
   if (is_debug) {
@@ -50,7 +39,13 @@ executable("chip-tool-server") {
     defines = [ "BUILD_RELEASE=1" ]
   }
 
-  public_deps = [ "${chip_root}/src/lib" ]
+  public_configs = [ ":includes" ]
+
+  deps = [
+    "${chip_root}/examples/common/chip-app-server:chip-app-server",
+    "${chip_root}/examples/lighting-app/lighting-common",
+    "${chip_root}/src/lib",
+  ]
 
   output_dir = root_out_dir
 }

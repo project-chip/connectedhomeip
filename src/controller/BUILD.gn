@@ -14,11 +14,6 @@
 
 import("//build_overrides/chip.gni")
 
-# FIXME: remove after actual key exchange is implemented
-config("controller_wno_deprecate") {
-  cflags = [ "-Wno-deprecated-declarations" ]
-}
-
 static_library("controller") {
   output_name = "libChipController"
 
@@ -33,6 +28,4 @@ static_library("controller") {
     "${chip_root}/src/platform",
     "${chip_root}/src/transport",
   ]
-
-  configs += [ ":controller_wno_deprecate" ]
 }
