@@ -102,12 +102,16 @@ function cirquetest_run_test() {
     ./"$1.sh"
     exitcode=$?
     __cirquetest_clean_flask
-    # Flask will create many virtual networks for running tests,
+    # TODO: Do docker system prune, we cannot filter which container
+    # is created by cirque now. This will be implemented later. Currently, only do this on CI
+
     # After test finished, the container is perserved and networks will not delete
     # This is useful when running tests on local workstation, but not for CI.
-    echo "Do docker system prune"
-    docker ps -aq | xargs docker stop >/dev/null 2>&1
-    (yes | docker system prune) >/dev/null 2>&1
+    if [ "x$CLEANUP_DOCKER_FOR_CI" = "x1" ]; then
+        echo "Do docker system prune"
+        docker ps -aq | xargs docker stop >/dev/null 2>&1
+        (yes | docker system prune) >/dev/null 2>&1
+    fi
     return "$exitcode"
 }
 
