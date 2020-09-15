@@ -110,11 +110,6 @@ void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
 InetLayer::InetLayer(void)
 {
     State = kState_NotInitialized;
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    if (!sInetEventHandlerDelegate.IsInitialized())
-        sInetEventHandlerDelegate.Init(HandleInetLayerEvent);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -257,6 +252,11 @@ INET_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
 
     if (State != kState_NotInitialized)
         return INET_ERROR_INCORRECT_STATE;
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    if (!sInetEventHandlerDelegate.IsInitialized())
+        sInetEventHandlerDelegate.Init(HandleInetLayerEvent);
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // Platform-specific initialization may elect to set this data
     // member. Ensure it is set to a sane default value before

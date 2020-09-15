@@ -89,9 +89,6 @@ void LwIPEventHandlerDelegate::Prepend(const LwIPEventHandlerDelegate *& aDelega
 Layer::Layer() : mLayerState(kLayerState_NotInitialized), mContext(NULL), mPlatformData(NULL)
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    if (!sSystemEventHandlerDelegate.IsInitialized())
-        sSystemEventHandlerDelegate.Init(HandleSystemLayerEvent);
-
     this->mEventDelegateList = NULL;
     this->mTimerList         = NULL;
     this->mTimerComplete     = false;
@@ -109,10 +106,15 @@ Error Layer::Init(void * aContext)
     Error lReturn;
 
     RegisterLayerErrorFormatter();
+
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     RegisterPOSIXErrorFormatter();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+    if (!sSystemEventHandlerDelegate.IsInitialized())
+        sSystemEventHandlerDelegate.Init(HandleSystemLayerEvent);
+
     RegisterLwIPErrorFormatter();
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 

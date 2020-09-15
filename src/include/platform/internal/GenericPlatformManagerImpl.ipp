@@ -62,7 +62,6 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
     SuccessOrExit(err);
 
     // Initialize the CHIP System Layer.
-    new (&SystemLayer) System::Layer();
     err = SystemLayer.Init(NULL);
     if (err != CHIP_SYSTEM_NO_ERROR)
     {
@@ -71,7 +70,6 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
     SuccessOrExit(err);
 
     // Initialize the CHIP Inet Layer.
-    new (&InetLayer) Inet::InetLayer();
     err = InetLayer.Init(SystemLayer, NULL);
     if (err != INET_NO_ERROR)
     {
@@ -81,7 +79,6 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
 
 #if CHIP_ENABLE_MESSAGE_LAYER
     // Initialize the CHIP Fabric State object.
-    new (&FabricState) ChipFabricState();
     err = FabricState.Init();
     if (err != CHIP_NO_ERROR)
     {
@@ -100,7 +97,6 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
         initContext.fabricState = &FabricState;
 
         // Initialize the CHIP Message Layer.
-        new (&MessageLayer) ChipMessageLayer();
         err = MessageLayer.Init(&initContext);
         if (err != CHIP_NO_ERROR) {
             ChipLogError(DeviceLayer, "MessageLayer initialization failed: %s", ErrorStr(err));
