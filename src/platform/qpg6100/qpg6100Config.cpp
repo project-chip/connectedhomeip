@@ -129,16 +129,15 @@ CHIP_ERROR QPG6100Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-
     outLen = bufSize;
-    res = qvCHIP_Nvm_Restore(key, (uint8_t *)buf, &length);
+    res    = qvCHIP_Nvm_Restore(key, (uint8_t *) buf, &length);
     if (length > bufSize)
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
     if (res == true)
     {
-        outLen = length;
+        outLen      = length;
         buf[outLen] = 0;
     }
     else

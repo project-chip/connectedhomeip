@@ -53,13 +53,13 @@
 
 /* Kernel includes. */
 #include "FreeRTOS.h"
-#include "task.h"
 #include "semphr.h"
+#include "task.h"
 
 #if (configUSE_MALLOC_FAILED_HOOK == 1)
 /*-----------------------------------------------------------*/
 
-void vApplicationMallocFailedHook( void )
+void vApplicationMallocFailedHook(void)
 {
     /* vApplicationMallocFailedHook() will only be called if
     configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h.  It is a hook
@@ -72,7 +72,8 @@ void vApplicationMallocFailedHook( void )
     to query the size of free heap space that remains (although it does not
     provide information on how the remaining heap might be fragmented). */
     taskDISABLE_INTERRUPTS();
-    for( ;; );
+    for (;;)
+        ;
 }
 #endif
 
@@ -80,9 +81,8 @@ void vApplicationMallocFailedHook( void )
 #if (configSUPPORT_STATIC_ALLOCATION == 1)
 static StaticTask_t xIdleTaskTCB;
 static StackType_t uxIdleTaskStack[256];
-void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer,
-                                   StackType_t **ppxIdleTaskStackBuffer,
-                                   uint32_t *pulIdleTaskStackSize )
+void vApplicationGetIdleTaskMemory(StaticTask_t ** ppxIdleTaskTCBBuffer, StackType_t ** ppxIdleTaskStackBuffer,
+                                   uint32_t * pulIdleTaskStackSize)
 {
     /* Pass out a pointer to the StaticTask_t structure in which the Idle tasks
     state will be stored. */
@@ -103,13 +103,12 @@ void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer,
 static StaticTask_t xTimerTaskTCB;
 static StackType_t uxTimerTaskStack[configTIMER_TASK_STACK_DEPTH];
 
-void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer,
-                                    StackType_t **ppxTimerTaskStackBuffer,
-                                    uint32_t *pxTimerTaskStackSize)
+void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBuffer, StackType_t ** ppxTimerTaskStackBuffer,
+                                    uint32_t * pxTimerTaskStackSize)
 {
-    *ppxTimerTaskTCBBuffer = &xTimerTaskTCB;
+    *ppxTimerTaskTCBBuffer   = &xTimerTaskTCB;
     *ppxTimerTaskStackBuffer = uxTimerTaskStack;
-    *pxTimerTaskStackSize = sizeof(uxTimerTaskStack);
+    *pxTimerTaskStackSize    = sizeof(uxTimerTaskStack);
 }
 #endif
 
@@ -137,16 +136,17 @@ __weak void vApplicationIdleHook(void)
 
 /*-----------------------------------------------------------*/
 #if (configCHECK_FOR_STACK_OVERFLOW == 1)
-void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName )
+void vApplicationStackOverflowHook(TaskHandle_t pxTask, char * pcTaskName)
 {
-    ( void ) pcTaskName;
-    ( void ) pxTask;
+    (void) pcTaskName;
+    (void) pxTask;
 
     /* Run time stack overflow checking is performed if
     configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.  This hook
     function is called if a stack overflow is detected. */
     taskDISABLE_INTERRUPTS();
-    for( ;; );
+    for (;;)
+        ;
 }
 #endif
 
