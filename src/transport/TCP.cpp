@@ -380,6 +380,13 @@ void TCPBase::OnConnectionRecevied(Inet::TCPEndPoint * listenEndPoint, Inet::TCP
                 break;
             }
         }
+
+        endPoint->AppState             = listenEndPoint->AppState;
+        endPoint->OnDataReceived       = OnTcpReceive;
+        endPoint->OnConnectComplete    = OnConnectionComplete;
+        endPoint->OnConnectionClosed   = OnConnectionClosed;
+        endPoint->OnConnectionReceived = OnConnectionRecevied;
+        endPoint->OnAcceptError        = OnAcceptError;
     }
     else
     {
