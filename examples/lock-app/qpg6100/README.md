@@ -18,22 +18,27 @@ An example application showing the use
 
 ## Introduction
 
-The QPG6100 Lock shows an implementation of a Door Lock device, based on CHIP and the Qorvo QPG6100 SDK.
-Intention of this example is to demonstrate a CHIP device, with Thread connectivity, using BLE to perform CHIP provisioning.
+The QPG6100 Lock shows an implementation of a Door Lock device, based on CHIP
+and the Qorvo QPG6100 SDK. Intention of this example is to demonstrate a CHIP
+device, with Thread connectivity, using BLE to perform CHIP provisioning.
 
-The example will be implemented in a phased approach, enabling more features with separate updates.
+The example will be implemented in a phased approach, enabling more features
+with separate updates.
 
 Current status of implementation:
+
 -   Initialization of the CHIP stack.
 -   CHIP Logging, PlatformManager and ConfigurationManager enabled.
 
 Pending:
+
 -   Button and LED control
 -   BLE: Addition of CHIPoBLE to enable provisioning
 -   Thread: Linking QPG6100 OpenThread implementation to CHIP build
 -   Intake CHIP ZCL cluster control for the Lock mechanism through CHIP tool.
 
-For more information on Qorvo and the platforms, please visit [the Qorvo website](www.qorvo.com)
+For more information on Qorvo and the platforms, please visit
+[the Qorvo website](www.qorvo.com)
 
 <a name="building"></a>
 
@@ -61,7 +66,6 @@ For more information on Qorvo and the platforms, please visit [the Qorvo website
           $ cd ~
           $ git clone https://github.com/project-chip/connectedhomeip.git
 
-
 ### Compilation
 
 -   Set the following environment variables before compilation:
@@ -74,18 +78,23 @@ For more information on Qorvo and the platforms, please visit [the Qorvo website
           $ cd ~/connectedhomeip/examples/lock-app/qpg6100
           $ make -j
 
-* 	GN/ninja based
-           Not yet supported
+*       GN/ninja based
+             Not yet supported
 
 <a name="flashing-the-application"></a>
 
 ## Flashing the application
 
 The QPG6100 DK boards can be programmed using:
-### CMSIS-DAP Drag and Drop 
+
+### CMSIS-DAP Drag and Drop
+
 Drag the hex-file to the mBED drive that appears when plugging in the DK board.
+
 ### Segger JLink debugger
-Connect the Segger J-Link to the programming header and use the Segger SW to flash the .hex.
+
+Connect the Segger J-Link to the programming header and use the Segger SW to
+flash the .hex.
 
 More detailed information to be included in SDK Documentation.
 
@@ -105,5 +114,6 @@ More detailed information to be included in SDK Documentation.
           [P][-] ============================
           [D][DL] CHIP task running
 
--   Note! Logging is currently encapsulated by the Qorvo logging module. 
-Output will have additional header and footer bytes. This will be updated later into a raw stream for any serial terminal to parse.
+-   Note! Logging is currently encapsulated by the Qorvo logging module. Output
+    will have additional header and footer bytes. This will be updated later
+    into a raw stream for any serial terminal to parse.
