@@ -56,6 +56,15 @@ TCPBase::~TCPBase()
             mActiveConnections[i] = nullptr;
         }
     }
+
+    for (size_t i = 0; i < mPendingPacketsSize; i++)
+    {
+        if (mPendingPackets[i].packetBuffer != nullptr)
+        {
+            System::PacketBuffer::Free(mPendingPackets[i].packetBuffer);
+            mPendingPackets[i].packetBuffer = nullptr;
+        }
+    }
 }
 
 CHIP_ERROR TCPBase::Init(TcpListenParameters & params)
