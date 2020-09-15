@@ -50,6 +50,6 @@ done
 set -x
 env
 
-gn gen --root="$EXAMPLE_DIR" "$OUTPUT_DIR" --args="${GN_ARGS[*]}"
+gn gen --check --root="$EXAMPLE_DIR" "$OUTPUT_DIR" --args="${GN_ARGS[*]}"
 
 ninja -C "$OUTPUT_DIR" "${NINJA_ARGS[@]}"
