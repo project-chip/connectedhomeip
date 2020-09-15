@@ -70,16 +70,17 @@ For more information on Qorvo and the platforms, please visit
 
 -   Set the following environment variables before compilation:
 
-          export CHIP_ROOT=${HOME}/connectedhomeip
-          export ARM_GCC_INSTALL_ROOT=${HOME}/tools/gcc-arm-none-eabi-9-2019-q4-major/bin
+        export CHIP_ROOT=${HOME}/connectedhomeip
+        export ARM_GCC_INSTALL_ROOT=${HOME}/tools/gcc-arm-none-eabi-9-2019-q4-major/bin
 
-*   make based
+-   make based
 
-          $ cd ~/connectedhomeip/examples/lock-app/qpg6100
-          $ make -j
+        $ cd ~/connectedhomeip/examples/lock-app/qpg6100
+        $ make -j
 
-*           GN/ninja based
-                 Not yet supported
+-   GN/ninja based
+
+        Not yet supported
 
 <a name="flashing-the-application"></a>
 
