@@ -342,6 +342,7 @@ void TCPBase::OnConnectionComplete(Inet::TCPEndPoint * endPoint, INET_ERROR inet
     // cleanup packets or mark as free
     if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(Inet, "Connection complete encountered an error: %s", ErrorStr(err));
         endPoint->Free();
     }
     else
@@ -366,8 +367,25 @@ void TCPBase::OnConnectionClosed(Inet::TCPEndPoint * endPoint, INET_ERROR err)
 void TCPBase::OnConnectionRecevied(Inet::TCPEndPoint * listenEndPoint, Inet::TCPEndPoint * endPoint, const IPAddress & peerAddress,
                                    uint16_t peerPort)
 {
-    // FIXME: implement
-    ChipLogError(Inet, "%s not yet implemented", __PRETTY_FUNCTION__);
+    TCPBase * tcp = reinterpret_cast<TCPBase *>(listenEndPoint->AppState);
+
+    if (tcp->mUsedEndPointCount < tcp->mActiveConnectionsSize)
+    {
+        // have space to use one more (even if considering pending connections)
+        for (size_t i = 0; i < tcp->mActiveConnectionsSize; i++)
+        {
+            if (tcp->mActiveConnections[i] == nullptr)
+            {
+                tcp->mActiveConnections[i] = endPoint;
+                break;
+            }
+        }
+    }
+    else
+    {
+        ChipLogError(Inet, "Insufficient connection space to accept new connections");
+        endPoint->Free();
+    }
 }
 
 void TCPBase::OnAcceptError(Inet::TCPEndPoint * endPoint, INET_ERROR err)
