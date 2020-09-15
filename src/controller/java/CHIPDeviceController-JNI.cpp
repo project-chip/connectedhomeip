@@ -254,10 +254,9 @@ JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong deviceCon
     ChipLogProgress(Controller, "beginConnectDevice() called with discriminator and pincode on 0x%08lX", (long) self);
 
     pthread_mutex_lock(&sStackLock);
-    sBleLayer.mAppState = appReqState;
+    sBleLayer.mAppState         = appReqState;
     RendezvousParameters params = RendezvousParameters(pinCode).SetDiscriminator(discriminator).SetBleLayer(&sBleLayer);
-    err                         = deviceController->ConnectDevice(kRemoteDeviceId, params, appReqState,
-                                                                  HandleKeyExchange, HandleEchoResponse, HandleError);
+    err = deviceController->ConnectDevice(kRemoteDeviceId, params, appReqState, HandleKeyExchange, HandleEchoResponse, HandleError);
 
     pthread_mutex_unlock(&sStackLock);
 
