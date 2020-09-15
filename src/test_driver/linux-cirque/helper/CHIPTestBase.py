@@ -238,7 +238,8 @@ class CHIPVirtualHome:
 
     def save_device_logs(self):
         timestamp = int(time.time())
-        if not os.path.exists("logs"):
+        log_dir = os.environ.get("DEVICE_LOG_DIR", None)
+        if log_dir != None and not os.path.exists(log_dir):
             os.makedirs("logs")
 
         for device in self.non_ap_devices:
@@ -247,7 +248,7 @@ class CHIPVirtualHome:
             f_name = '{}-{}-{}.log'.format(device['type'],
                                            timestamp, device['id'][-8:])
             self.logger.debug("device log name: \n{}".format(f_name))
-            with open(os.path.join('logs', f_name), 'wb') as fp:
+            with open(os.path.join(log_dir, f_name), 'wb') as fp:
                 fp.write(ret_log)
 
     def start_wpa_supplicant(self, device_id):

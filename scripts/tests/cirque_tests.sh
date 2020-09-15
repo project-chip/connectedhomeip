@@ -21,6 +21,8 @@ SOURCE_DIR="$(cd "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
 REPO_DIR="$SOURCE_DIR/../../"
 TEST_DIR="$REPO_DIR"/src/test_driver/linux-cirque
 
+LOG_DIR=${LOG_DIR:-$(mktemp -d)}
+
 # Append test name here to add more tests for run_all_tests
 CIRQUE_TESTS=(
     "OnOffClusterTest"
@@ -63,7 +65,7 @@ function __cirquetest_start_flask() {
     cd "$REPO_DIR"/third_party/cirque/repo
     sudo FLASK_APP='cirque/restservice/service.py' \
         PATH="$PATH":"$REPO_DIR"/third_party/cirque/repo/openthread/output/x86_64-unknown-linux-gnu/bin/ \
-        python3 -m flask run >/dev/null 2>&1
+        python3 -m flask run >"$LOG_DIR/$CURRENT_TEST/flask.log" 2>&1
 }
 
 function __cirquetest_clean_flask() {
@@ -91,6 +93,9 @@ function cirquetest_bootstrap() {
 
 function cirquetest_run_test() {
     # Start Cirque flash server
+    export CURRENT_TEST="$1"
+    export DEVICE_LOG_DIR="$LOG_DIR/$CURRENT_TEST/device_logs"
+    mkdir -p "$DEVICE_LOG_DIR"
     __cirquetest_start_flask &
     sleep 5
     cd "$TEST_DIR"
@@ -109,7 +114,6 @@ function cirquetest_run_test() {
 function cirquetest_run_all_tests() {
     # shellharden requires quotes around variables, which will break for-each loops
     # This is the workaround
-    LOG_DIR=${LOG_DIR:-$(mktemp -d)}
     echo "Logs will be stored at $LOG_DIR"
     test_pass="1"
     for i in "${!CIRQUE_TESTS[@]}"; do
