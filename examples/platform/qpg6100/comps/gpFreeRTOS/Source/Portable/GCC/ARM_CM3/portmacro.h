@@ -242,4 +242,3 @@ portFORCE_INLINE static void vPortSetBASEPRI( uint32_t ulNewMaskValue )
 #endif
 
 #endif /* PORTMACRO_H */
-
