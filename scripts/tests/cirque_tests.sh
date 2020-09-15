@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # Copyright (c) 2020 Project CHIP Authors
@@ -17,9 +17,9 @@
 #
 
 SOURCE="${BASH_SOURCE[0]}"
-SOURCE_DIR="$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
+SOURCE_DIR="$(cd "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
 REPO_DIR="$SOURCE_DIR/../../"
-TEST_DIR=$(readlink -f "$REPO_DIR"/src/test_driver/linux-cirque)
+TEST_DIR="$REPO_DIR"/src/test_driver/linux-cirque
 
 # Append test name here to add more tests for run_all_tests
 CIRQUE_TESTS=(
@@ -109,19 +109,29 @@ function cirquetest_run_test() {
 function cirquetest_run_all_tests() {
     # shellharden requires quotes around variables, which will break for-each loops
     # This is the workaround
+    LOG_DIR=${LOG_DIR:-$(mktemp -d)}
+    echo "Logs will be stored at $LOG_DIR"
+    test_pass="1"
     for i in "${!CIRQUE_TESTS[@]}"; do
         test_name="${CIRQUE_TESTS[$i]}"
         echo "[ RUN] $test_name"
-        cirquetest_run_test "$test_name" >"/tmp/test_output_$test_name" 2>&1
+        cirquetest_run_test "$test_name" >"$LOG_DIR/$test_name.log" 2>&1
         exitcode=$?
         if [ "$exitcode" = 0 ]; then
-            echo -e "[$BOLD_GREEN_TEXT""SUCC""$RESET_COLOR] $test_name"
+            echo -e "[$BOLD_GREEN_TEXT""PASS""$RESET_COLOR] $test_name"
         else
-            cat "/tmp/test_output_$test_name"
             echo -e "[$BOLD_RED_TEXT""FAIL""$RESET_COLOR] $test_name (Exitcode: $exitcode)"
-            return 1
+            test_pass="0"
         fi
     done
+
+    if [ "$test_pass" -eq "1" ]; then
+        echo -e "[$BOLD_GREEN_TEXT""PASS""$RESET_COLOR] Test finished, test log can be found at artifacts"
+        return 0
+    else
+        echo -e "[$BOLD_GREEN_TEXT""FAIL""$RESET_COLOR] Test failed, test log can be found at artifacts"
+        return 1
+    fi
 }
 
 subcommand="$1"

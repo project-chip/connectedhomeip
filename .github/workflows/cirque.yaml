@@ -34,4 +34,19 @@ jobs:
                   scripts/tests/cirque_tests.sh bootstrap
             - name: Run Tests
               run: |
-                  sudo scripts/tests/cirque_tests.sh run_all_tests
+                  mkdir -p /tmp/cirque_test_output
+                  sudo LOG_DIR=/tmp/cirque_test_output/ scripts/tests/cirque_tests.sh run_all_tests
+            - name: Binary artifact suffix
+              id: outsuffix
+              uses: haya14busa/action-cond@v1.0.0
+              with:
+                  cond: ${{ github.event.pull_request.number == '' }}
+                  if_true: "${{ github.sha }}"
+                  if_false: "pull-${{ github.event.pull_request.number }}"
+            - name: Uploading Binaries
+              uses: actions/upload-artifact@v1
+              with:
+                  name:
+                      cirque_log-${{
+                        steps.outsuffix.outputs.value }}
+                  path: /tmp/cirque_test_output/
