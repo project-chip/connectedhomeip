@@ -70,8 +70,6 @@ void MessageReceiveHandler(MessageHeader & header, const Transport::PeerAddress 
     ReceiveHandlerCallCount++;
 }
 
-} // namespace
-
 /////////////////////////// Init test
 
 void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddressType type)
@@ -155,6 +153,8 @@ void CheckMessageTest6(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("::1", addr);
     CheckMessageTest(inSuite, inContext, addr);
 }
+
+} // namespace
 
 // Test Suite
 
