@@ -16,23 +16,26 @@
 cmake_minimum_required(VERSION 3.13.1)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
+get_filename_component(CHIP_APP_SERVER ${CHIP_ROOT}/examples/common/chip-app-server REALPATH)
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
+get_filename_component(LIGHTING_COMMON ${CHIP_ROOT}/examples/lighting-app/lighting-common REALPATH)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHIP_ROOT}/config/nrfconnect/)
 include(nrfconnect-app)
 
 project(chip-nrf52840-lighting-example)
-target_include_directories(app PRIVATE main main/include ${NRFCONNECT_COMMON}/util/include)
+target_include_directories(app PRIVATE main/include ${LIGHTING_COMMON} ${NRFCONNECT_COMMON}/util/include ${CHIP_APP_SERVER}/include)
 target_sources(app PRIVATE
                main/AppTask.cpp
-               main/DataModelHandler.cpp
                main/LightingManager.cpp
                main/main.cpp
-               main/Server.cpp
-               main/gen/call-command-handler.c
-               main/gen/callback-stub.c
-               main/gen/znet-bookkeeping.c
+               main/ZclCallbacks.cpp
+               ${LIGHTING_COMMON}/gen/call-command-handler.c
+               ${LIGHTING_COMMON}/gen/callback-stub.c
+               ${LIGHTING_COMMON}/gen/znet-bookkeeping.c
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
+               ${CHIP_APP_SERVER}/DataModelHandler.cpp
+               ${CHIP_APP_SERVER}/Server.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp
                ${CHIP_ROOT}/src/app/util/attribute-size.c
                ${CHIP_ROOT}/src/app/util/attribute-storage.c
