@@ -32,10 +32,38 @@
 
 namespace chip {
 namespace Transport {
+namespace {
 
 using namespace chip::Encoding;
 
+// Packets start with a 16-bit size
+constexpr size_t kPacketSizeBytes = 2;
+
 constexpr int kListenBacklogSize = 2;
+
+/**
+ *  Determine if the given buffer contains a complete message
+ */
+bool ContainsCompleteMessage(System::PacketBuffer * buffer, uint8_t ** start, uint16_t * size)
+{
+    bool completeMessage = false;
+
+    if (buffer->DataLength() >= kPacketSizeBytes)
+    {
+        *size           = LittleEndian::Get16(buffer->Start());
+        *start          = buffer->Start() + kPacketSizeBytes;
+        completeMessage = (buffer->DataLength() >= *size + kPacketSizeBytes);
+    }
+
+    if (!completeMessage)
+    {
+        *start = nullptr;
+    }
+
+    return completeMessage;
+}
+
+} // namespace
 
 TCPBase::~TCPBase()
 {
@@ -140,7 +168,7 @@ CHIP_ERROR TCPBase::SendMessage(const MessageHeader & header, const Transport::P
     //    - header
     //    - actual data
     CHIP_ERROR err               = CHIP_NO_ERROR;
-    const size_t prefixSize      = header.EncodeSizeBytes() + sizeof(uint16_t);
+    const size_t prefixSize      = header.EncodeSizeBytes() + kPacketSizeBytes;
     Inet::TCPEndPoint * endPoint = nullptr;
     size_t actualEncodedHeaderSize;
 
@@ -160,7 +188,7 @@ CHIP_ERROR TCPBase::SendMessage(const MessageHeader & header, const Transport::P
         SuccessOrExit(err);
 
         // header encoding has to match space that we allocated
-        VerifyOrExit(prefixSize == actualEncodedHeaderSize + sizeof(uint16_t), err = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(prefixSize == actualEncodedHeaderSize + kPacketSizeBytes, err = CHIP_ERROR_INTERNAL);
     }
 
     // Reuse existing connection if one exists, otherwise a new one
@@ -270,36 +298,99 @@ exit:
     return err;
 }
 
-CHIP_ERROR TCPBase::ProcessReceivedBuffer(PeerAddress peerAddress, System::PacketBuffer * buffer)
+CHIP_ERROR TCPBase::ProcessSingleMessageFromBufferHead(const PeerAddress & peerAddress, System::PacketBuffer * buffer,
+                                                       uint16_t messageSize)
 {
-    char src[PeerAddress::kMaxToStringSize];
-    peerAddress.ToString(src, sizeof(src));
-    ChipLogProgress(Inet, "TCP Data received from %s", src);
+    CHIP_ERROR err     = CHIP_NO_ERROR;
+    uint8_t * oldStart = buffer->Start();
+    size_t oldLength   = buffer->DataLength();
 
-    // FIXME: read header uint16_t size
-    //        decode the buffer
-    //        report peer address receiving
-    //
-    // TODO:
-    //   - ensure exactly one message can be read
-    //   - ensure payloads are compacted
-    //   - PutBackReceivedData if incomplete
-    //   - Free packet data if complete
-    // Logic:
-    //   - compacthead/resize
+    buffer->SetDataLength(messageSize);
 
-    /*
-    size_t headerSize       = 0;
+    size_t headerSize = 0;
 
     MessageHeader header;
     err = header.Decode(buffer->Start(), buffer->DataLength(), &headerSize);
     SuccessOrExit(err);
 
     buffer->ConsumeHead(headerSize);
-    udp->HandleMessageReceived(header, peerAddress, buffer);
-    */
+    HandleMessageReceived(header, peerAddress, buffer);
 
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+exit:
+    buffer->SetStart(oldStart);
+    buffer->SetDataLength(oldLength);
+
+    return err;
+}
+
+CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress,
+                                          System::PacketBuffer * buffer)
+{
+    char src[PeerAddress::kMaxToStringSize];
+    peerAddress.ToString(src, sizeof(src));
+    ChipLogProgress(Inet, "TCP Data received from %s", src);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    while (buffer != nullptr)
+    {
+        // when a buffer is empty, it can be released back to the app
+        if (buffer->DataLength() == 0)
+        {
+            System::PacketBuffer * old = buffer;
+            buffer                     = old->DetachTail();
+            System::PacketBuffer::Free(old);
+            continue;
+        }
+
+        // TODO: figure out frame sizes and ACK sizes.
+        uint8_t * messageData = nullptr;
+        uint16_t messageSize  = 0;
+        if (ContainsCompleteMessage(buffer, &messageData, &messageSize))
+        {
+            // length was read and is not needed anymore
+            buffer->ConsumeHead(kPacketSizeBytes);
+
+            VerifyOrExit(messageData == buffer->Start(), err = CHIP_ERROR_INTERNAL);
+
+            err = ProcessSingleMessageFromBufferHead(peerAddress, buffer, messageSize);
+            buffer->ConsumeHead(messageSize);
+            SuccessOrExit(err);
+
+            err = endPoint->AckReceive(messageSize);
+            SuccessOrExit(err);
+            continue;
+        }
+
+        // Buffer is incomplete if we reach this point
+        if (buffer->Next() != nullptr)
+        {
+            buffer->CompactHead();
+            continue;
+        }
+
+        if (messageSize > 0)
+        {
+            // Open the receive window just enough to allow the remainder of the message to be received.
+            // This is necessary in the case where the message size exceeds the TCP window size to ensure
+            // the peer has enough window to send us the entire message.
+            uint16_t neededLen = messageSize - buffer->DataLength();
+            err                = endPoint->AckReceive(neededLen);
+            SuccessOrExit(err);
+        }
+
+        // Buffer is incomplete and we cannot get more data
+        break;
+    }
+
+exit:
+    if (buffer != nullptr)
+    {
+        // Incomplete processing will be retried
+        endPoint->PutBackReceivedData(buffer);
+    }
+
+    return err;
 }
 
 void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer)
@@ -311,7 +402,7 @@ void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * 
     PeerAddress peerAddress = PeerAddress::TCP(ipAddress, port);
 
     TCPBase * tcp  = reinterpret_cast<TCPBase *>(endPoint->AppState);
-    CHIP_ERROR err = tcp->ProcessReceivedBuffer(peerAddress, buffer);
+    CHIP_ERROR err = tcp->ProcessReceivedBuffer(endPoint, peerAddress, buffer);
 
     if (err != CHIP_NO_ERROR)
     {

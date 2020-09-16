@@ -154,8 +154,22 @@ private:
 
     /**
      * Process a single received buffer from the specified peer address.
+     *
+     * @param endPoint the source end point from which the data comes from
+     * @param peerAddress the peer the data is coming from
+     * @param buffer the actual data
      */
-    CHIP_ERROR ProcessReceivedBuffer(PeerAddress PeerAddress, System::PacketBuffer * buffer);
+    CHIP_ERROR ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress, System::PacketBuffer * buffer);
+
+    /**
+     * Process a single message of the specified size from a buffer.
+     *
+     * @param peerAddress the peer the data is coming from
+     * @param buffer the buffer containing the message
+     * @param messageSize how much of the head contains the actual message
+     */
+    CHIP_ERROR ProcessSingleMessageFromBufferHead(const PeerAddress & peerAddress, System::PacketBuffer * buffer,
+                                                  uint16_t messageSize);
 
     // TCP message receive handler.
     static void OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer);
