@@ -13,14 +13,35 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/happy_tests.gni")
 
-happy_tests("inet_tests") {
-    deps = [
-        "${chip_root}/src/inet/tests"
-    ]
+import("${chip_root}/gn/chip/tests.gni")
 
-    tests = [
-        "test_inet_multicast_five_nodes_on_wifi.py"
-    ]
+assert(chip_build_tests)
+
+template("happy_test") {
+  _suite_name = target_name
+  _deps = invoker.deps
+
+  tests = []
+  if (defined(invoker.tests)) {
+    foreach(_test, invoker.tests) {
+      action(_test) {
+        script = "${chip_root}/srcipts/tests/happy_test_warpper.py"
+        deps = _deps
+        deps += [ _test ]
+        output = []
+        args = [
+          "--test-bin-dir",
+          rebase_path(_test_output_dir),
+          rebase_dir(test_name),
+        ]
+      }
+
+      tests += [ _test ]
+    }
+  }
+
+  group("${_suite_name}_test") {
+    deps = tests
+  }
 }
