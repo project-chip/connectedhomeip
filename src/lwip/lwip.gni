@@ -13,6 +13,6 @@
 # limitations under the License.
 
 declare_args() {
-  # Have the the lwIP library available.
+  # Have the lwIP library available.
   chip_with_lwip = current_os != "zephyr"
 }
