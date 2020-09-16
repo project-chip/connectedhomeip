@@ -396,7 +396,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = kFunction_NoneSelected;
-        NRF_LOG_INFO("Factory reset is not implemented");
+        ConfigurationMgr().InitiateFactoryReset();
     }
 }
 
