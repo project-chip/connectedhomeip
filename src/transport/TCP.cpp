@@ -348,7 +348,9 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
             // length was read and is not needed anymore
             buffer->ConsumeHead(kPacketSizeBytes);
 
+            // Sanity checks. These are more like an assert for invariants
             VerifyOrExit(messageData == buffer->Start(), err = CHIP_ERROR_INTERNAL);
+            VerifyOrExit(buffer->DataLength() >= messageSize, err = CHIP_ERROR_INTERNAL);
 
             err = ProcessSingleMessageFromBufferHead(peerAddress, buffer, messageSize);
             buffer->ConsumeHead(messageSize);
