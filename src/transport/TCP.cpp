@@ -542,6 +542,9 @@ void TCPBase::Disconnect(const PeerAddress & address)
             mActiveConnections[i]->GetPeerInfo(&ipAddress, &port);
             if (address == PeerAddress::TCP(ipAddress, port))
             {
+                // NOTE: this leaves the socket in TIME_WAIT.
+                // Calling Abort() would clean it since SO_LINGER would be set to 0,
+                // however this seems not to be useful.
                 mActiveConnections[i]->Free();
                 mActiveConnections[i] = nullptr;
                 mUsedEndPointCount--;
