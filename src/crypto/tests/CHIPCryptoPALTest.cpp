@@ -706,7 +706,7 @@ static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
 
     CHIP_ERROR error = CHIP_NO_ERROR;
     NL_TEST_ASSERT(inSuite,
-                   memcmp(Uint8::to_uchar(out_secret1), Uint8::to_uchar(out_secret2), out_secret1.Length()) !=
+                   memcmp(Uint8::to_uchar(out_secret1), Uint8::to_uchar(out_secret2), out_secret1.Capacity()) !=
                        0); // Validate that buffers are indeed different.
 
     error = keypair2.ECDH_derive_secret(keypair1.Pubkey(), out_secret1);

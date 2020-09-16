@@ -405,7 +405,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
     uint8_t hash[NUM_BYTES_IN_SHA256_HASH];
-    size_t siglen = out_signature.Length();
+    size_t siglen = out_signature.Capacity();
 
     mbedtls_ecp_keypair keypair;
     mbedtls_ecp_keypair_init(&keypair);
@@ -430,7 +430,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
 
     result = mbedtls_ecdsa_write_signature(&ecdsa_ctxt, MBEDTLS_MD_SHA256, hash, sizeof(hash), Uint8::to_uchar(out_signature),
                                            &siglen, CryptoRNG, NULL);
-    out_signature.Length() = siglen;
+    SuccessOrExit(out_signature.SetLength(siglen));
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -480,8 +480,9 @@ exit:
 
 CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
+    CHIP_ERROR error     = CHIP_NO_ERROR;
+    int result           = 0;
+    size_t secret_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
 
     mbedtls_ecp_group ecp_grp;
     mbedtls_ecp_group_init(&ecp_grp);
@@ -513,8 +514,9 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     result = mbedtls_ecdh_compute_shared(&ecp_grp, &mpi_secret, &ecp_pubkey, &mpi_privkey, CryptoRNG, NULL);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_mpi_write_binary(&mpi_secret, Uint8::to_uchar(out_secret), out_secret.Length());
+    result = mbedtls_mpi_write_binary(&mpi_secret, Uint8::to_uchar(out_secret), secret_length);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    SuccessOrExit(out_secret.SetLength(secret_length));
 
 exit:
     mbedtls_ecdh_free(&ecdh_ctxt);

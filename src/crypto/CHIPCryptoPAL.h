@@ -28,6 +28,7 @@
 #endif
 
 #include <core/CHIPError.h>
+#include <support/CodeUtils.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -113,29 +114,43 @@ public:
     }
 };
 
-class P256ECDSASignature
+template <size_t Cap>
+class CapacityBoundBuffer
 {
 public:
-    size_t & Length() { return length; }
+    /** @brief Set current length of the buffer that's being used
+     * @return Returns error if new length is > capacity
+     **/
+    CHIP_ERROR SetLength(size_t len)
+    {
+        CHIP_ERROR error = CHIP_NO_ERROR;
+        VerifyOrExit(len <= sizeof(bytes), error = CHIP_ERROR_INVALID_ARGUMENT);
+        length = len;
+exit:
+        return error;
+    }
+
+    /** @brief Returns current length of the buffer that's being used
+     * @return Returns 0 if SetLength() was never called
+     **/
     size_t Length() const { return length; }
+
+    /** @brief Returns max capacity of the buffer
+     **/
+    size_t Capacity() const { return sizeof(bytes); }
+
+    /** @brief Returns buffer pointer
+     **/
     operator uint8_t *() const { return (uint8_t *) bytes; }
 
 private:
-    uint8_t bytes[kMax_ECDSA_Signature_Length];
-    size_t length = sizeof(bytes); // kMax_ECDSA_Signature_Length;
+    uint8_t bytes[Cap];
+    size_t length = 0;
 };
 
-class P256ECDHDerivedSecret
-{
-public:
-    size_t & Length() { return length; }
-    size_t Length() const { return length; }
-    operator uint8_t *() const { return (uint8_t *) bytes; }
+typedef CapacityBoundBuffer<kMax_ECDSA_Signature_Length> P256ECDSASignature;
 
-private:
-    uint8_t bytes[kMax_ECDH_Secret_Length];
-    size_t length = sizeof(bytes);
-};
+typedef CapacityBoundBuffer<kMax_ECDH_Secret_Length> P256ECDHDerivedSecret;
 
 class P256PrivateKey : public ECPKey<P256ECDSASignature>
 {
@@ -210,7 +225,7 @@ public:
      *CSR.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) override;
+    CHIP_ERROR NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) override;
 
     /**
      * @brief A function to sign a msg using ECDSA
@@ -220,7 +235,7 @@ public:
      *represented as ASN.1 DER integers, plus the ASN.1 sequence Header
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) override;
+    CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) override;
 
     /** @brief A function to derive a shared secret using ECDH
      * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
@@ -229,12 +244,12 @@ public:
      * @param out_secret Buffer to write out secret into. This is a byte array representing the x coordinate of the shared secret.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key,
+    CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key,
                                           P256ECDHDerivedSecret & out_secret) const override;
 
     /** @brief Return public key for the keypair.
      **/
-    virtual const P256PublicKey & Pubkey() override { return mPublicKey; }
+    const P256PublicKey & Pubkey() override { return mPublicKey; }
 
 private:
     P256PrivateKey mPrivateKey;

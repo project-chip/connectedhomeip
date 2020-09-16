@@ -510,13 +510,12 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
 
     result = EVP_DigestSignFinal(context, NULL, &out_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(out_signature.Length() >= out_length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(out_signature.Capacity() >= out_length, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     result = EVP_DigestSignFinal(context, Uint8::to_uchar(out_signature), &out_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
     // This should not happen due to the check above. But check this nonetheless
-    VerifyOrExit(out_signature.Length() >= out_length, error = CHIP_ERROR_INTERNAL);
-    out_signature.Length() = out_length;
+    SuccessOrExit(out_signature.SetLength(out_length));
 
 exit:
     if (ec_key != NULL)
@@ -756,11 +755,10 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     result = EVP_PKEY_derive_set_peer(context, remote_key);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
-    out_buf_length = out_secret.Length();
+    out_buf_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
     result         = EVP_PKEY_derive(context, Uint8::to_uchar(out_secret), &out_buf_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(out_secret.Length() >= out_buf_length, error = CHIP_ERROR_INTERNAL);
-    out_secret.Length() = out_buf_length;
+    SuccessOrExit(out_secret.SetLength(out_buf_length));
 
 exit:
     if (local_key != NULL)
