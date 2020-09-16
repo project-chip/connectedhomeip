@@ -96,8 +96,10 @@ function(chip_configure TARGET_NAME)
         chip_gn_arg_string(GN_ARGS "chip_system_project_config_include = \"<${CHIP_PROJECT_CONFIG}>\"")
     endif ()
 
-    if ("${BOARD}" STREQUAL "native_posix")
+    if (BOARD STREQUAL "native_posix")
         chip_gn_arg_string(GN_ARGS "target_cpu = \"x86\"")
+    elseif (BOARD STREQUAL "native_posix_64")
+        chip_gn_arg_string(GN_ARGS "target_cpu = \"x64\"")
     endif ()
 
     chip_gn_arg_bool_if(CONFIG_NET_L2_OPENTHREAD GN_ARGS "chip_enable_openthread")
