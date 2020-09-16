@@ -21,27 +21,28 @@ assert(chip_build_tests)
 template("happy_test") {
   _suite_name = target_name
   _deps = invoker.deps
+  _test_output_dir = "${root_out_dir}/tests"
 
-  tests = []
+  _tests = []
   if (defined(invoker.tests)) {
     foreach(_test, invoker.tests) {
-      action(_test) {
-        script = "${chip_root}/srcipts/tests/happy_test_warpper.py"
+      action("${_test}_test") {
+        script = rebase_path("${chip_root}/scripts/tests/happy_test_warpper.py")
         deps = _deps
-        deps += [ _test ]
-        output = []
+        inputs = [ "${_test}.py" ]
+        outputs = ["${_test_output_dir}/${_test}.testout"]
         args = [
           "--test-bin-dir",
-          rebase_path(_test_output_dir),
-          rebase_dir(test_name),
+          rebase_path("${_test_output_dir}"),
+          rebase_path("${_test}.py"),
         ]
       }
 
-      tests += [ _test ]
+      _tests += [ ":${_test}_test" ]
     }
   }
 
-  group("${_suite_name}_test") {
-    deps = tests
+  group("${_suite_name}") {
+    deps = _tests
   }
 }

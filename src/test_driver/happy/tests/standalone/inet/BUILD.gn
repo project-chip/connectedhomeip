@@ -13,14 +13,15 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/happy_tests.gni")
 
-happy_tests("inet_tests") {
+import("${chip_root}/gn/chip/happy_test.gni")
+
+happy_test("inet_tests") {
     deps = [
         "${chip_root}/src/inet/tests"
     ]
 
     tests = [
-        "test_inet_multicast_five_nodes_on_wifi.py"
+        "test_inet_multicast_five_nodes_on_wifi"
     ]
 }
