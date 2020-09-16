@@ -32,6 +32,7 @@
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
 #include <inet/InetInterface.h>
+#include <inet/TCPEndPoint.h>
 #include <transport/Base.h>
 
 namespace chip {
