@@ -12,19 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-
-import("${chip_root}/gn/chip/chip_test.gni")
-import("${chip_root}/gn/chip/chip_test_group.gni")
-import("${chip_root}/src/lwip/lwip.gni")
-
-assert(chip_with_lwip)
-
-chip_test("TestLwIP") {
-  sources = [ "tests.c" ]
-  deps = [ "${chip_root}/src/lwip" ]
-}
-
-chip_test_group("tests") {
-  deps = [ ":TestLwIP" ]
+declare_args() {
+  # Have the the lwIP library available.
+  chip_with_lwip = current_os != "zephyr"
 }

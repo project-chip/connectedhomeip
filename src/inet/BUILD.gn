@@ -19,6 +19,7 @@ import("//build_overrides/nlio.gni")
 
 import("${chip_root}/gn/chip/buildconfig_header.gni")
 import("${chip_root}/gn/chip/tests.gni")
+import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
 import("inet.gni")
 
@@ -97,10 +98,13 @@ static_library("inet") {
   public_deps = [
     ":inet_config_header",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/lwip",
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
   ]
+
+  if (chip_with_lwip) {
+    public_deps += [ "${chip_root}/src/lwip" ]
+  }
 
   if (chip_inet_config_enable_raw_endpoint) {
     sources += [
