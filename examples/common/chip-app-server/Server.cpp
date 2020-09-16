@@ -65,6 +65,10 @@ namespace {
 
 void HandleBLEConnectionClosed(chip::Ble::BLEEndPoint * endPoint, BLE_ERROR err)
 {
+    if (err != BLE_NO_ERROR)
+    {
+        ChipLogError(AppServer, "BLE Error: %d", err);
+    }
     ChipLogProgress(AppServer, "BLE Connection closed");
 }
 
