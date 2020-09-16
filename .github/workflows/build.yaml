@@ -37,6 +37,7 @@ jobs:
             image: connectedhomeip/chip-build:0.4.7
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
+                - “/tmp/happy_test_logs:/tmp/happy_test_logs”
             options: "--privileged"
 
         steps:
