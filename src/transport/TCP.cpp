@@ -86,6 +86,29 @@ TCPBase::~TCPBase()
     }
 }
 
+bool TCPBase::HasActiveConnections() const
+{
+    for (size_t i = 0; i < mActiveConnectionsSize; i++)
+    {
+        if (mActiveConnections[i] != nullptr)
+        {
+            // An active connection exists
+            return true;
+        }
+    }
+
+    for (size_t i = 0; i < mPendingPacketsSize; i++)
+    {
+        if (mPendingPackets[i].packetBuffer != nullptr)
+        {
+            // 'Connect' is pending
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void TCPBase::CloseActiveConnections()
 {
     for (size_t i = 0; i < mActiveConnectionsSize; i++)

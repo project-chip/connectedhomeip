@@ -142,7 +142,7 @@ public:
      * before everything is cleaned up (socket closing is async, so after calling 'Close' on
      * the transport, some time may be needed to actually be able to close.)
      */
-    bool HasActiveConnections() const { return (mActiveConnections > 0) || (mPendingPackets > 0); }
+    bool HasActiveConnections() const;
 
     /**
      * Close all active connetions
