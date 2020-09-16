@@ -28,9 +28,9 @@
 #endif
 
 #include <core/CHIPError.h>
-#include <support/CodeUtils.h>
 #include <stddef.h>
 #include <string.h>
+#include <support/CodeUtils.h>
 
 namespace chip {
 namespace Crypto {
@@ -126,7 +126,7 @@ public:
         CHIP_ERROR error = CHIP_NO_ERROR;
         VerifyOrExit(len <= sizeof(bytes), error = CHIP_ERROR_INVALID_ARGUMENT);
         length = len;
-exit:
+    exit:
         return error;
     }
 
@@ -244,8 +244,7 @@ public:
      * @param out_secret Buffer to write out secret into. This is a byte array representing the x coordinate of the shared secret.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key,
-                                          P256ECDHDerivedSecret & out_secret) const override;
+    CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const override;
 
     /** @brief Return public key for the keypair.
      **/
