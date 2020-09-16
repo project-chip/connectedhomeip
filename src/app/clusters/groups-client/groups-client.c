@@ -45,7 +45,7 @@
 // * Copyright 2010 by Ember Corporation. All rights reserved.              *80*
 // *******************************************************************
 
-#include "../../include/af.h"
+#include <app/util/af.h>
 
 bool emberAfGroupsClusterAddGroupResponseCallback(uint8_t status, uint16_t groupId)
 {

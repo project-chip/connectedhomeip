@@ -47,8 +47,9 @@ public:
      *   Called when pairing session generates a new message that should be sent to peer.
      *
      * @param msgBuf the new message that should be sent to the peer
+     * @return CHIP_ERROR Error thrown when sending the message
      */
-    virtual CHIP_ERROR OnNewMessageForPeer(System::PacketBuffer * msgBuf) { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR SendMessage(System::PacketBuffer * msgBuf) { return CHIP_NO_ERROR; }
 
     /**
      * @brief
@@ -61,12 +62,8 @@ public:
     /**
      * @brief
      *   Called when the pairing is complete and the new secure session has been established
-     *
-     * @param peerNodeId  Node ID of peer
-     * @param peerKeyId   Encrytion key ID assigned by the peer node for this connection
-     * @param localKeyId  Encrytion key ID assigned by the local node for this connection
      */
-    virtual void OnPairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId) {}
+    virtual void OnPairingComplete() {}
 
     virtual ~SecurePairingSessionDelegate() {}
 };
@@ -77,7 +74,7 @@ public:
     SecurePairingSession(void);
     SecurePairingSession(SecurePairingSession &&)      = default;
     SecurePairingSession(const SecurePairingSession &) = delete;
-    SecurePairingSession & operator=(const SecurePairingSession &) = delete;
+    SecurePairingSession & operator=(const SecurePairingSession &) = default;
     SecurePairingSession & operator=(SecurePairingSession &&) = default;
 
     virtual ~SecurePairingSession(void);
@@ -91,7 +88,7 @@ public:
      * @param salt            Salt to be used for SPAKE2P opertation
      * @param saltLen         Length of salt
      * @param myNodeId        Optional node id of local node
-     * @param mKeyId          Key ID to be assigned to the secure session on the peer node
+     * @param myKeyId         Key ID to be assigned to the secure session on the peer node
      * @param delegate        Callback object
      *
      * @return CHIP_ERROR     The result of initialization
@@ -108,7 +105,7 @@ public:
      * @param salt             Salt to be used for SPAKE2P opertation
      * @param saltLen          Length of salt
      * @param myNodeId         Optional node id of local node
-     * @param mKeyId           Key ID to be assigned to the secure session on the peer node
+     * @param myKeyId          Key ID to be assigned to the secure session on the peer node
      * @param delegate         Callback object
      *
      * @return CHIP_ERROR      The result of initialization
@@ -138,6 +135,30 @@ public:
      * @return CHIP_ERROR The result of message processing
      */
     CHIP_ERROR HandlePeerMessage(MessageHeader & header, System::PacketBuffer * msg);
+
+    /**
+     * @brief
+     *  Return the associated secure session peer NodeId
+     *
+     * @return Optional<NodeId> The associated peer NodeId
+     */
+    NodeId GetPeerNodeId() const { return mPeerNodeId.Value(); };
+
+    /**
+     * @brief
+     *  Return the associated peer key id
+     *
+     * @return uint16_t The associated peer key id
+     */
+    uint16_t GetPeerKeyId() { return mPeerKeyId; };
+
+    /**
+     * @brief
+     *  Return the associated local key id
+     *
+     * @return uint16_t The assocated local key id
+     */
+    uint16_t GetLocalKeyId() { return mLocalKeyId; };
 
 private:
     CHIP_ERROR Init(uint32_t setupCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen, Optional<NodeId> myNodeId,
@@ -177,11 +198,12 @@ private:
 
     bool mPairingComplete = false;
 
-    Optional<NodeId> mLocalNodeId;
+protected:
+    Optional<NodeId> mLocalNodeId = Optional<NodeId>::Value(kUndefinedNodeId);
 
-    Optional<NodeId> mPeerNodeId;
+    Optional<NodeId> mPeerNodeId = Optional<NodeId>::Value(kUndefinedNodeId);
 
-    uint16_t mKeyId;
+    uint16_t mLocalKeyId;
 
     uint16_t mPeerKeyId;
 };
@@ -196,6 +218,12 @@ class SecurePairingUsingTestSecret : public SecurePairingSession
 {
 public:
     SecurePairingUsingTestSecret() : SecurePairingSession() {}
+    SecurePairingUsingTestSecret(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId) : SecurePairingSession()
+    {
+        mPeerNodeId = peerNodeId;
+        mPeerKeyId  = peerKeyId;
+        mLocalKeyId = localKeyId;
+    }
 
     ~SecurePairingUsingTestSecret(void) {}
 

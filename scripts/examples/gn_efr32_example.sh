@@ -16,21 +16,22 @@
 #    limitations under the License.
 #
 
+set -e
+
 # Build script for GN EFT32 examples GitHub workflow.
 
 CHIP_ROOT="$(dirname "$0")/../.."
 
 source "$CHIP_ROOT/scripts/activate.sh"
 
-set -e
 set -x
 env
 
 if [ -z "$3" ]; then
-    gn gen --root="$1" --args="efr32_sdk_root=\"$EFR32_SDK_ROOT\"" "$2"/"$EFR32_BOARD"/
+    gn gen --check --root="$1" --args="efr32_sdk_root=\"$EFR32_SDK_ROOT\"" "$2"/"$EFR32_BOARD"/
     ninja -v -C "$2"/"$EFR32_BOARD"/
 else
-    gn gen --root="$1" --args="efr32_sdk_root=\"$EFR32_SDK_ROOT\" efr32_board=\"$3\"" "$2/$3"
+    gn gen --check --root="$1" --args="efr32_sdk_root=\"$EFR32_SDK_ROOT\" efr32_board=\"$3\"" "$2/$3"
     ninja -v -C "$2/$3"
 fi
 

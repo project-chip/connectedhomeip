@@ -8,8 +8,4 @@ ot-ctl panid 0x1234
 ot-ctl ifconfig up
 ot-ctl thread start
 
-if [ "$1" == "server" ]; then
-    chip-tool-server
-elif [ "$1" == "tool" ]; then
-    sleep infinity
-fi
+sleep infinity

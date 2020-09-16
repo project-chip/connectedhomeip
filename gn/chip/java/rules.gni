@@ -12,8 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/android/config.gni")
+
 javac_runner = "//gn/chip/java/javac_runner.py"
 jar_runner = "//gn/chip/java/jar_runner.py"
+
+assert(android_sdk_root != "", "android_sdk_root must be specified")
 
 # Declare a java library target
 #
@@ -102,6 +106,21 @@ template("java_library") {
       "-C",
       _class_dir,
       ".",
+    ]
+  }
+}
+
+template("android_library") {
+  java_library(target_name) {
+    forward_variables_from(invoker, "*")
+
+    if (!defined(javac_flags)) {
+      javac_flags = []
+    }
+
+    javac_flags += [
+      "-classpath",
+      "${android_sdk_root}/platforms/android-${android_sdk_version}/android.jar",
     ]
   }
 }

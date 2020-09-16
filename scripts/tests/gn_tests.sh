@@ -16,14 +16,16 @@
 # limitations under the License.
 #
 
+set -e
+
 # Test script for GN GitHub workflow.
 
 CHIP_ROOT="$(dirname "$0")/../.."
 
 source "$CHIP_ROOT/scripts/activate.sh"
 
-set -e
-set -x
 env
+
+set -x
 
 ninja -v -C "$CHIP_ROOT/out/$BUILD_TYPE" check

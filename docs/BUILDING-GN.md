@@ -42,7 +42,7 @@ On Debian-based Linux distributions such as Ubuntu, these dependencies can be
 satisfied with the following:
 
 ```
-sudo apt-get install git-core gcc g++ python pkg-config libssl-dev
+sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev
 ```
 
 #### How to install prerequisites on macOS

@@ -35,7 +35,7 @@ public:
         UNLOCK_ACTION,
 
         INVALID_ACTION
-    } Action;
+    };
 
     enum State_t
     {
@@ -43,7 +43,7 @@ public:
         kState_LockingCompleted,
         kState_UnlockingInitiated,
         kState_UnlockingCompleted,
-    } State;
+    };
 
     void Init();
     bool IsUnlocked();

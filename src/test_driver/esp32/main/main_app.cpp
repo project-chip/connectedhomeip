@@ -15,16 +15,17 @@
  *    limitations under the License.
  */
 
-#include "esp_event_loop.h"
+#include "esp_event.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
+#include "esp_netif.h"
 #include "esp_spi_flash.h"
 #include "esp_system.h"
+#include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
 
-#include "tcpip_adapter.h"
 #include <stdio.h>
 
 #include <crypto/CHIPCryptoPAL.h>
@@ -89,14 +90,33 @@ extern "C" void app_main()
         exit(err);
     }
 
-    // Initialize the ESP tcpip adapter.
-    tcpip_adapter_init();
-
-    // Arrange for the ESP event loop to deliver events into the CHIP Device layer.
-    err = esp_event_loop_init(PlatformManagerImpl::HandleESPSystemEvent, NULL);
+    err = esp_netif_init();
     if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "esp_event_loop_init() failed: %s", ErrorStr(err));
+        ESP_LOGE(TAG, "esp_netif_init() failed: %s", ErrorStr(err));
+        exit(err);
+    }
+
+    // Arrange for the ESP event loop to deliver events into the CHIP Device layer.
+    err = esp_event_loop_create_default();
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "esp_event_loop_create_default() failed: %s", ErrorStr(err));
+        exit(err);
+    }
+    esp_netif_create_default_wifi_ap();
+    esp_netif_create_default_wifi_sta();
+
+    err = esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "esp_event_handler_register() failed for WIFI_EVENT: %s", ErrorStr(err));
+        exit(err);
+    }
+    err = esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "esp_event_handler_register() failed for IP_EVENT: %s", ErrorStr(err));
         exit(err);
     }
 

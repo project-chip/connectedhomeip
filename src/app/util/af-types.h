@@ -56,12 +56,11 @@
 extern "C" {
 #endif // __cplusplus
 #include "gen/enums.h"
-#include "types_stub.h" // For various types.
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus
 
-#include "chip-response.h" // For ChipResponseDestination
+#include "types_stub.h" // For various types.
 
 #ifdef __cplusplus
 extern "C" {
@@ -465,7 +464,7 @@ typedef struct
      */
     EmberApsFrame * apsFrame;
     EmberIncomingMessageType type;
-    ChipResponseDestination * source;
+    ChipNodeId source;
     uint8_t * buffer;
     uint16_t bufLen;
     bool clusterSpecific;
@@ -1977,7 +1976,15 @@ typedef struct
 #define EMBER_AF_PERMIT_JOIN_FOREVER 0xFF
 #define EMBER_AF_PERMIT_JOIN_MAX_TIMEOUT 0xFE
 
+#define MAX_INT32U_VALUE (0xFFFFFFFFUL)
 #define MAX_INT16U_VALUE (0xFFFF)
+#define MAX_INT8U_VALUE (0xFF)
+
+/**
+ * @brief Returns the elapsed time between two 32 bit values.
+ *   Result may not be valid if the time samples differ by more than 2147483647
+ */
+#define elapsedTimeInt32u(oldTime, newTime) ((uint32_t)((uint32_t)(newTime) - (uint32_t)(oldTime)))
 
 /**
  * @brief The overhead of the ZDO response.

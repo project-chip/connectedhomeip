@@ -65,11 +65,11 @@ template("gen_flashing_script") {
   action(target_name) {
     outputs = [ flashing_script_name ]
 
-    args = [
+    args = flashing_options
+    args += [
       "--output",
       rebase_path(flashing_script_name, root_build_dir),
     ]
-    args += flashing_options
 
     script = flashing_script_generator
   }
@@ -133,7 +133,7 @@ template("flashable_executable") {
       }
       flashing_options += [
         "--application",
-        rebase_path(image_name, "", root_out_dir),
+        rebase_path(image_name, root_out_dir, root_out_dir),
       ]
       data_deps = [ ":$image_target" ]
     }

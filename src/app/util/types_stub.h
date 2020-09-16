@@ -46,6 +46,10 @@
 
 #include <app/chip-zcl-zpro-codec.h> // For EmberApsFrame
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 #include "gen/gen_config.h"
 
 /**
@@ -1929,9 +1933,60 @@ typedef struct
 #define MILLISECOND_TICKS_PER_DECISECOND (MILLISECOND_TICKS_PER_SECOND / 10)
 
 #define emberEventControlSetDelayMS(control, delay) (void) 0
-#define emberEventControlSetInactive(control) (void) 0
+
 #define emberAfPluginColorControlServerComputePwmFromXyCallback(endpoint) (void) 0
 #define emberAfPluginColorControlServerComputePwmFromHsvCallback(endpoint) (void) 0
 #define emberAfPluginColorControlServerComputePwmFromTempCallback(endpoint) (void) 0
+
+#ifdef __cplusplus
+} // extern "C"
+#endif // __cplusplus
+/**
+ * Try to use our chip::NodeId definition if we are C++; otherwise define a
+ * ChipNodeId that's compatible.
+ */
+#ifdef __cplusplus
+#include <transport/MessageHeader.h>
+static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
+// Make it easier to have unified function declarations across C and C++ source
+// files.
+typedef chip::NodeId ChipNodeId;
+#else
+typedef uint64_t ChipNodeId;
+#endif // __cplusplus
+/**
+ * @brief Macro that copies the token value from non-volatile storage into a RAM
+ * location.  This macro can only be used with tokens that are defined using
+ * DEFINE_INDEXED_TOKEN.
+ *
+ * @note To better understand the parameters of this macro, refer to the
+ *           example of token usage above.
+ *
+ * @param data   A pointer to where the token data should be placed.
+ *
+ * @param token  The token name used in <code>DEFINE_*_TOKEN</code>,
+ *               prepended with <code>TOKEN_</code>.
+ * @param index  The index to access in the indexed token.
+ */
+#define halCommonGetIndexedToken(data, token, index)
+
+/**
+ * @brief Macro that sets the value of a token in non-volatile storage.  This
+ * macro can only be used with tokens that are defined using
+ * DEFINE_INDEXED_TOKEN.
+ *
+ * @note  To better understand the parameters of this macro, refer to the
+ *           example of token usage above.
+ *
+ * @param token  The token name used in <code>DEFINE_*_TOKEN</code>,
+ * prepended with <code>TOKEN_</code>.
+ *
+ * @param index  The index to access in the indexed token.
+ *
+ * @param data   A pointer to where the token data should be placed.
+ */
+#define halCommonSetIndexedToken(token, index, data)
+
+uint32_t halCommonGetInt32uMillisecondTick(void);
 
 #endif // TYPES_STUB_H

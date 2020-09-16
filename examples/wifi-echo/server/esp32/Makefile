@@ -26,13 +26,13 @@ EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/third_party/connectedhomeip/config/esp32
                         $(PROJECT_PATH)/../../../common/QRCode \
                         $(PROJECT_PATH)/../../../common/screen-framework \
 
-CXXFLAGS += -std=c++11 -Os
-CPPFLAGS += -Os
-CFLAGS += -Os
+CXXFLAGS += -std=c++11 -Os -DLWIP_IPV6_SCOPES=0
+CPPFLAGS += -Os -DLWIP_IPV6_SCOPES=0
+CFLAGS += -Os -DLWIP_IPV6_SCOPES=0
 
 CHIP_BUILD_WITH_GN ?= ""
 
-ifeq ($(CHIP_BUILD_WITH_GN),y)
+ifneq ($(CHIP_BUILD_WITH_GN),n)
 CPPFLAGS += -DCHIP_SEPARATE_CONFIG_H
 endif
 export CHIP_BUILD_WITH_GN

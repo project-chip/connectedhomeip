@@ -38,7 +38,7 @@ using namespace chip;
 class TestSecurePairingDelegate : public SecurePairingSessionDelegate
 {
 public:
-    virtual CHIP_ERROR OnNewMessageForPeer(System::PacketBuffer * msgBuf)
+    virtual CHIP_ERROR SendMessage(System::PacketBuffer * msgBuf)
     {
         mNumMessageSend++;
         if (peer != nullptr)
@@ -56,7 +56,7 @@ public:
 
     virtual void OnPairingError(CHIP_ERROR error) { mNumPairingErrors++; }
 
-    virtual void OnPairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId) { mNumPairingComplete++; }
+    virtual void OnPairingComplete() { mNumPairingComplete++; }
 
     uint32_t mNumMessageSend     = 0;
     uint32_t mNumPairingErrors   = 0;

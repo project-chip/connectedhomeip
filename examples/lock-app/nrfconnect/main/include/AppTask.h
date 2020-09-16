@@ -63,7 +63,7 @@ private:
         kFunction_FactoryReset,
 
         kFunction_Invalid
-    } Function;
+    };
 
     Function_t mFunction;
     bool mFunctionTimerActive;

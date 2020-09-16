@@ -19,9 +19,9 @@
 
 #include "AppTask.h"
 #include "AppEvent.h"
-#include "DataModelHandler.h"
 #include "LEDWidget.h"
 #include "Server.h"
+#include "Service.h"
 
 #include "app_button.h"
 #include "app_config.h"
@@ -44,6 +44,8 @@
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+
+#include <lib/support/logging/CHIPLogging.h>
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -102,6 +104,9 @@ int AppTask::StartAppTask()
 int AppTask::Init()
 {
     ret_code_t ret;
+
+    // Init ZCL Data Model and start server
+    InitServer();
 
     // Initialize LEDs
     sStatusLED.Init(SYSTEM_STATE_LED);
@@ -173,7 +178,7 @@ int AppTask::Init()
         CHIP_ERROR err = CHIP_NO_ERROR;
         chip::SetupPayload payload;
         uint32_t setUpPINCode       = 0;
-        uint32_t setUpDiscriminator = 0;
+        uint16_t setUpDiscriminator = 0;
 
         err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
         if (err != CHIP_NO_ERROR)
@@ -200,7 +205,7 @@ int AppTask::Init()
         err = generator.payloadBase41Representation(result);
         if (err != CHIP_NO_ERROR)
         {
-            NRF_LOG_ERROR("Failed to generate QR Code");
+            NRF_LOG_INFO("Failed to generate QR Code");
         }
 
         NRF_LOG_INFO("SetupPINCode: [%" PRIu32 "]", setUpPINCode);
@@ -213,7 +218,7 @@ int AppTask::Init()
 
 void AppTask::HandleBLEConnectionOpened(chip::Ble::BLEEndPoint * endPoint)
 {
-    ChipLogProgress(DeviceLayer, "AppTask: Connection opened");
+    NRF_LOG_INFO("AppTask: Connection opened");
 
     GetAppTask().mBLEEndPoint    = endPoint;
     endPoint->OnMessageReceived  = AppTask::HandleBLEMessageReceived;
@@ -222,7 +227,7 @@ void AppTask::HandleBLEConnectionOpened(chip::Ble::BLEEndPoint * endPoint)
 
 void AppTask::HandleBLEConnectionClosed(chip::Ble::BLEEndPoint * endPoint, BLE_ERROR err)
 {
-    ChipLogProgress(DeviceLayer, "AppTask: Connection closed");
+    NRF_LOG_INFO("AppTask: Connection closed");
 
     GetAppTask().mBLEEndPoint = nullptr;
 }
@@ -233,7 +238,7 @@ void AppTask::HandleBLEMessageReceived(chip::Ble::BLEEndPoint * endPoint, chip::
     uint16_t bufferLen = buffer->DataLength();
     uint8_t * data     = buffer->Start();
     chip::DeviceLayer::Internal::DeviceNetworkInfo networkInfo;
-    ChipLogProgress(DeviceLayer, "AppTask: Receive message size %u", bufferLen);
+    NRF_LOG_INFO("AppTask: Receive message size %u", bufferLen);
 
     memcpy(networkInfo.ThreadNetworkName, data, sizeof(networkInfo.ThreadNetworkName));
     data += sizeof(networkInfo.ThreadNetworkName);
@@ -578,11 +583,11 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
     // and start flashing the LEDs rapidly to indicate action initiation.
     if (aAction == BoltLockManager::LOCK_ACTION)
     {
-        NRF_LOG_INFO("Lock Action has been initiated")
+        NRF_LOG_INFO("Lock Action has been initiated");
     }
     else if (aAction == BoltLockManager::UNLOCK_ACTION)
     {
-        NRF_LOG_INFO("Unlock Action has been initiated")
+        NRF_LOG_INFO("Unlock Action has been initiated");
     }
 
     sLockLED.Blink(50, 50);
@@ -595,13 +600,13 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
     // Turn off the lock LED if in an UNLOCKED state.
     if (aAction == BoltLockManager::LOCK_ACTION)
     {
-        NRF_LOG_INFO("Lock Action has been completed")
+        NRF_LOG_INFO("Lock Action has been completed");
 
         sLockLED.Set(true);
     }
     else if (aAction == BoltLockManager::UNLOCK_ACTION)
     {
-        NRF_LOG_INFO("Unlock Action has been completed")
+        NRF_LOG_INFO("Unlock Action has been completed");
 
         sLockLED.Set(false);
     }

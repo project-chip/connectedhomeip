@@ -109,13 +109,12 @@ private:
             return;
         }
 
-        ChipResponseDestination responseDest(header.GetSourceNodeId().Value(), mgr);
         uint8_t * message;
         uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
         ok                  = emberAfProcessMessage(&frame,
                                    0, // type
                                    message, messageLen,
-                                   &responseDest, // source identifier
+                                   header.GetSourceNodeId().Value(), // source identifier
                                    NULL);
 
         System::PacketBuffer::Free(buffer);
@@ -142,7 +141,7 @@ void StartServer(DemoSessionManager * sessions)
                          UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
     SuccessOrExit(err);
 
-    err = sessions->NewPairing(Optional<NodeId>::Value(kUndefinedNodeId), peer, 0, 0, &gTestPairing);
+    err = sessions->NewPairing(peer, &gTestPairing);
     SuccessOrExit(err);
 
     sessions->SetDelegate(&gCallbacks);

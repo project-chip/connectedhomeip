@@ -101,7 +101,7 @@ container:
 
         $ mkdir ~/nrfconnect
         $ mkdir ~/connectedhomeip
-        $ docker run --rm -it --privileged -v /dev:/dev -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip nordicsemi/nrfconnect-chip
+        $ docker run --rm -it --privileged -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip nordicsemi/nrfconnect-chip
 
 > **Note**:
 >
@@ -109,9 +109,9 @@ container:
 >     source directory in case you have it already installed.
 > -   Likewise, `~/connectedhomeip` can be replaced with an absolute path to
 >     CHIP source directory.
-> -   `-privileged -v /dev:/dev` parameters can be omitted if you're not
->     planning to flash the example onto hardware. The parameter gives the
->     container full access to devices on your system.
+> -   `--privileged` flag can be omitted if you're not planning to flash the
+>     example onto hardware. The parameter gives the container access to devices
+>     connected to your computer when the container is started.
 > -   `--rm` flag can be omitted if you don't want the container to be
 >     auto-removed when you exit the container shell session.
 
@@ -178,14 +178,14 @@ The following commands will build the `lock-app` example:
 After a successful build, the binary will be available under
 `<example-dir>/build/zephyr/zephyr.hex`
 
-<a name="configuring"></a>
-
 ### Troubleshooting
 
 If the example fails to build on your system make sure that you use a recent
 version of nRF Connect SDK. Please refer to
 [this section](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html#updating-the-repositories)
 in the user guide to learn how to update nRF Connect SDK repository.
+
+<a name="configuring"></a>
 
 ## Configuring the example
 
@@ -231,7 +231,7 @@ To debug the application on target:
         $ cd <example-dir>
         $ west debug
 
-<a name="view-logging"></a>
+<a name="accessing-the-command-line"></a>
 
 ## Accessing the command line
 
@@ -245,6 +245,8 @@ The UART interface is configured for `115200` baud rate.
 
 All OpenThread commands must be prefixed with `ot`, for example
 `ot thread start`.
+
+<a name="view-logging"></a>
 
 ## Viewing Logging Output
 

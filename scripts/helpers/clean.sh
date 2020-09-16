@@ -16,7 +16,6 @@
 # limitations under the License.
 #
 
-set -x
-env
+set -ex
 
-make -C build/default distclean
+rm -rf out/

@@ -54,7 +54,6 @@
 import optparse
 import os
 import shlex
-import sys
 
 
 class Options:

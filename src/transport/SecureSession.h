@@ -27,6 +27,7 @@
 #define __SECURESESSION_H__
 
 #include <core/CHIPCore.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <transport/MessageHeader.h>
 
 namespace chip {
@@ -46,24 +47,23 @@ public:
      *   data exchanged on the secure channel.
      *
      * @param remote_public_key  A pointer to peer's public key
-     * @param public_key_length  Length of remote_public_key
      * @param local_private_key  A pointer to local private key
-     * @param private_key_length Length of local_private_key
+     * @param salt               A pointer to the initial salt used for deriving the keys
+     * @param salt_length        Length of the initial salt
      * @return CHIP_ERROR        The result of key derivation
      */
-    CHIP_ERROR Init(const uint8_t * remote_public_key, const size_t public_key_length, const uint8_t * local_private_key,
-                    const size_t private_key_length, const uint8_t * salt, const size_t salt_length, const uint8_t * info,
-                    const size_t info_length);
+    CHIP_ERROR Init(const Crypto::ECPKey & remote_public_key, const Crypto::ECPKey & local_private_key, const uint8_t * salt,
+                    const size_t salt_length, const uint8_t * info, const size_t info_length);
 
     /**
      * @brief
      *   Derive a shared key. The derived key will be used for encryting/decrypting
      *   data exchanged on the secure channel.
      *
-     * @param remote_public_key  A pointer to peer's public key
-     * @param public_key_length  Length of remote_public_key
-     * @param local_private_key  A pointer to local private key
-     * @param private_key_length Length of local_private_key
+     * @param secret             A pointer to the shared secret
+     * @param secret_length      Length of the shared secret
+     * @param salt               A pointer to the initial salt used for deriving the keys
+     * @param salt_length        Length of the initial salt
      * @return CHIP_ERROR        The result of key derivation
      */
     CHIP_ERROR InitFromSecret(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,

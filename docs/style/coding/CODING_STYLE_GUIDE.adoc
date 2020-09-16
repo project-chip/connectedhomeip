@@ -13,8 +13,8 @@
 == Best Practices, Coding Conventions, and Style
 
 [.text-center]
-_Revision 3_ +
-_2020-09-01_
+_Revision 4_ +
+_2020-09-15_
 
 [.text-center]
 *Status:* [red]*Approved* / [red]*Active*
@@ -284,6 +284,17 @@ architectures and and ABIs for those architectures. For example, a char is signe
 on some architectures and unsigned on others and a long is 32-bits on some
 architectures and 64-bits on others.
 
+==== Language-dependent
+
+=====	C{plusplus}
+
+======	Avoid `using namespace` Statements in Headers
+
+By doing this, you are effectively forcing every other module that
+includes the header to also be using the namespace. This causes
+namespace pollution and generally defeats the purposes of namespaces.
+Fully-qualified symbols should be used instead.
+
 :sectnums!:
 
 == Recommended Reading
@@ -316,6 +327,7 @@ Use of the C{plusplus} Language in Critical Systems. June 2008.
 [cols="^1,^1,<2,<3",options="header"]
 |===
 |Revision |Date |Modified By |Description
+|4 |2020-09-15 |Grant Erickson |Added Common > Language-dependent > Avoid `using namespace` Statements in Headers
 |3 |2020-09-01 |Grant Erickson |Added Common > Language-independent > Use C _stdint.h_ or C{plusplus} _cstdint_ for Plain Old Data Types
 |2 |2020-07-09 |Grant Erickson |Added Common > Language-independent > Commenting Out or Disabling Code
 |1 |2020-07-08 |Grant Erickson |Initial revision.

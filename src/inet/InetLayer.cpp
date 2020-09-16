@@ -264,7 +264,7 @@ INET_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
 
     mPlatformData = NULL;
 
-    Platform::InetLayer::WillInit(this, aContext);
+    err = Platform::InetLayer::WillInit(this, aContext);
     SuccessOrExit(err);
 
     mSystemLayer = &aSystemLayer;
@@ -704,7 +704,12 @@ exit:
 INET_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint8_t maxAddrs, IPAddress * addrArray,
                                          DNSResolveCompleteFunct onComplete, void * appState)
 {
-    return ResolveHostAddress(hostName, strlen(hostName), maxAddrs, addrArray, onComplete, appState);
+    size_t hostNameLength = strlen(hostName);
+    if (hostNameLength > UINT16_MAX)
+    {
+        return INET_ERROR_HOST_NAME_TOO_LONG;
+    }
+    return ResolveHostAddress(hostName, static_cast<uint16_t>(hostNameLength), maxAddrs, addrArray, onComplete, appState);
 }
 
 /**

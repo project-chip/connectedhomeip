@@ -88,6 +88,7 @@ static const char ModuleNames[] = "-\0\0" // None
                                   "SH\0"  // Shell
                                   "DL\0"  // DeviceLayer
                                   "SPL"   // SetupPayload
+                                  "SVR"   // AppServer
     ;
 
 #define ModuleNamesCount ((sizeof(ModuleNames) - 1) / ChipLoggingModuleNameLen)

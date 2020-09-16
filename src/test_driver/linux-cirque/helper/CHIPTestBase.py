@@ -116,7 +116,7 @@ class CHIPVirtualHome:
         roles = set()
         for device in self.non_ap_devices:
             reply = self.execute_device_cmd(device['id'], 'ot-ctl state')
-            roles.add(reply['output'].split()[0])
+            roles.add(reply['output'].split()[1])
         self.assertTrue('leader' in roles)
         self.assertTrue('router' in roles or 'child' in roles)
         self.logger.info("Thread network formed")

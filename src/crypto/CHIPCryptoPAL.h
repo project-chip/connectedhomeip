@@ -43,6 +43,10 @@ const size_t kMax_ECDSA_Signature_Length = 72;
 const size_t kMAX_FE_Length              = kP256_FE_Length;
 const size_t kMAX_Point_Length           = kP256_Point_Length;
 const size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
+const size_t kMAX_CSR_Length             = 512;
+
+const size_t kP256_PrivateKey_Length = 32;
+const size_t kP256_PublicKey_Length  = 65;
 
 /* These sizes are hardcoded here to remove header dependency on underlying crypto library
  * in a public interface file. The validity of these sizes is verified by static_assert in
@@ -88,6 +92,41 @@ enum class CHIP_SPAKE2P_ROLE : uint8_t
 {
     VERIFIER = 0, // Accessory
     PROVER   = 1, // Commissioner
+};
+
+enum class SupportedECPKeyTypes : uint8_t
+{
+    ECP256R1 = 0,
+};
+
+class ECPKey
+{
+public:
+    virtual SupportedECPKeyTypes Type() const = 0;
+    virtual size_t Length() const             = 0;
+    virtual operator uint8_t *() const        = 0;
+};
+
+class P256PrivateKey : public ECPKey
+{
+public:
+    SupportedECPKeyTypes Type() const override { return SupportedECPKeyTypes::ECP256R1; }
+    size_t Length() const override { return kP256_PrivateKey_Length; }
+    operator uint8_t *() const override { return (uint8_t *) bytes; }
+
+private:
+    uint8_t bytes[kP256_PrivateKey_Length];
+};
+
+class P256PublicKey : public ECPKey
+{
+public:
+    SupportedECPKeyTypes Type() const override { return SupportedECPKeyTypes::ECP256R1; }
+    size_t Length() const override { return kP256_PublicKey_Length; }
+    operator uint8_t *() const override { return (uint8_t *) bytes; }
+
+private:
+    uint8_t bytes[kP256_PublicKey_Length];
 };
 
 /**
@@ -193,14 +232,13 @@ CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length);
  * @param msg_length Length of message
  * @param private_key Key to use to sign the message. Private keys are ASN.1 DER encoded as padded big-endian field elements as
  *described in SEC 1: Elliptic Curve Cryptography [https://www.secg.org/sec1-v2.pdf]
- * @param private_key_length Length of private key
  * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s), represented
  *as ASN.1 DER integers, plus the ASN.1 sequence Header
  * @param out_signature_length Length of out buffer
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const uint8_t * private_key,
-                          const size_t private_key_length, uint8_t * out_signature, size_t & out_signature_length);
+CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ECPKey & private_key, uint8_t * out_signature,
+                          size_t & out_signature_length);
 
 /**
  * @brief A function to sign a msg using ECDSA
@@ -208,29 +246,25 @@ CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ui
  * @param msg_length Length of message
  * @param public_key Key to use to verify the message signature. Public keys are ASN.1 DER encoded as uncompressed points as
  *described in SEC 1: Elliptic Curve Cryptography [https://www.secg.org/sec1-v2.pdf]
- * @param private_key_length Length of public key
  * @param signature Signature to use for verification. The signature consists of: 2 EC elements (r and s), represented as ASN.1 DER
  *integers, plus the ASN.1 sequence Header
  * @param signature_length Length of signature
  * @return Returns a CHIP_NO_ERROR on successful verification, a CHIP_ERROR otherwise
  **/
-CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const uint8_t * public_key,
-                                        const size_t public_key_length, const uint8_t * signature, const size_t signature_length);
+CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const ECPKey & public_key,
+                                        const uint8_t * signature, const size_t signature_length);
 
 /** @brief A function to derive a shared secret using ECDH
  * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
  *ASN.1 DER encoded as padded big-endian field elements as described in SEC 1: Elliptic Curve Cryptography
  *[https://www.secg.org/sec1-v2.pdf]
- * @param remote_public_key_length Length of remote_public_key
  * @param local_private_key Local private key. local_private_key is ASN.1 DER encoded as padded big-endian field elements as
  *described in SEC 1: Elliptic Curve Cryptography [https://www.secg.org/sec1-v2.pdf]
- * @param local_private_key_length Length of private_key_length
  * @param out_secret Buffer to write out secret into. This is a byte array representing the x coordinate of the shared secret.
  * @param out_secret_length Length of out_secret
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR ECDH_derive_secret(const uint8_t * remote_public_key, const size_t remote_public_key_length,
-                              const uint8_t * local_private_key, const size_t local_private_key_length, uint8_t * out_secret,
+CHIP_ERROR ECDH_derive_secret(const ECPKey & remote_public_key, const ECPKey & local_private_key, uint8_t * out_secret,
                               size_t & out_secret_length);
 
 /** @brief Entropy callback function
@@ -262,6 +296,23 @@ CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t 
  **/
 CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen, unsigned int iteration_count,
                          uint32_t key_length, uint8_t * output);
+
+/** @brief Generate a new ECP keypair.
+ * @param pubkey Generated public key
+ * @param privkey Generated private key
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR NewECPKeypair(ECPKey & pubkey, ECPKey & privkey);
+
+/** @brief Generate a new Certificate Signing Request (CSR).
+ * @param pubkey public key that'll be inserted in the CSR
+ * @param privkey private key to sign the CSR
+ * @param csr Newly generated CSR
+ * @param csr_length The caller provides the length of input buffer (csr). The function returns the actual length of generated CSR.
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR NewCertificateSigningRequest(ECPKey & pubkey, ECPKey & privkey, uint8_t * csr, size_t & csr_length);
+
 /**
  * The below class implements the draft 01 version of the Spake2+ protocol as
  * defined in https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html.
@@ -610,8 +661,8 @@ protected:
      * @param salt_len The size of the salt in bytes.
      * @param info     The info.
      * @param info_len The size of the info in bytes.
-     * @param key      The output key
-     * @param key_len  The output key length
+     * @param out      The output key
+     * @param out_len  The output key length
      *
      * @return Returns a CHIP_ERROR when the MAC doesn't validate, CHIP_NO_ERROR otherwise.
      **/
@@ -685,7 +736,6 @@ private:
 /** @brief Clears the first `len` bytes of memory area `buf`.
  * @param buf Pointer to a memory buffer holding secret data that should be cleared.
  * @param len Specifies secret data size in bytes.
- * @return void
  **/
 void ClearSecretData(uint8_t * buf, uint32_t len);
 

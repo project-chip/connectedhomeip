@@ -13,6 +13,12 @@
 # limitations under the License.
 
 declare_args() {
+  # Location of the Android SDK.
+  android_sdk_root = ""
+
   # Location of the Android NDK.
   android_ndk_root = ""
+
+  # Version of the Android SDK.
+  android_sdk_version = 21
 }

@@ -16,6 +16,8 @@
 # limitations under the License.
 #
 
+set -e
+
 # Bootstrap script for GN build GitHub workflow.
 
 # This is used to account bootstrap time in a dedicated workflow step; there's

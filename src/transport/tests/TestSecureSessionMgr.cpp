@@ -127,13 +127,14 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     conn.SetDelegate(&callback);
 
-    SecurePairingUsingTestSecret pairing1, pairing2;
+    SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
-    err = conn.NewPairing(Optional<NodeId>::Value(kSourceNodeId), peer, 1, 2, &pairing1);
+    err = conn.NewPairing(peer, &pairing1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = conn.NewPairing(Optional<NodeId>::Value(kDestinationNodeId), peer, 2, 1, &pairing2);
+    SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
+    err = conn.NewPairing(peer, &pairing2);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Should be able to send a message to itself by just calling send.
