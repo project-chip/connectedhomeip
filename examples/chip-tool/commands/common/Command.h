@@ -22,8 +22,8 @@
 #include <vector>
 
 #include <controller/CHIPDeviceController.h>
-#include <inet/InetInterface.h>
 #include <core/CHIPError.h>
+#include <inet/InetInterface.h>
 #include <support/CHIPLogging.h>
 
 enum ArgumentType
@@ -50,9 +50,10 @@ public:
     using PacketBuffer         = ::chip::System::PacketBuffer;
     using NodeId               = ::chip::NodeId;
 
-    struct AddressWithInterface {
-      ::chip::Inet::IPAddress address;
-      ::chip::Inet::InterfaceId interfaceId;
+    struct AddressWithInterface
+    {
+        ::chip::Inet::IPAddress address;
+        ::chip::Inet::InterfaceId interfaceId;
     };
 
     Command(const char * commandName) : mName(commandName) {}
