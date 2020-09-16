@@ -134,14 +134,12 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ctx.DriveIOUntil(1000 /* ms */, []() { return ReceiveHandlerCallCount != 0; });
-
-    tcp.Disconnect(Transport::PeerAddress::TCP(addr));
-
-    // wait for seeing peer close
-    ctx.DriveIOUntil(1000 /* ms */, [&tcp]() { return !tcp.HasActiveConnections(); });
-
+    ctx.DriveIOUntil(5000 /* ms */, []() { return ReceiveHandlerCallCount != 0; });
     NL_TEST_ASSERT(inSuite, ReceiveHandlerCallCount == 1);
+
+    // Disconnect and wait for seeing peer close
+    tcp.Disconnect(Transport::PeerAddress::TCP(addr));
+    ctx.DriveIOUntil(5000 /* ms */, [&tcp]() { return !tcp.HasActiveConnections(); });
 }
 
 void CheckMessageTest4(nlTestSuite * inSuite, void * inContext)
