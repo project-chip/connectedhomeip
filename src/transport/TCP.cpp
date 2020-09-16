@@ -74,7 +74,16 @@ TCPBase::~TCPBase()
         mListenSocket->Free();
         mListenSocket = nullptr;
     }
-    CloseActiveConnections();
+
+    for (size_t i = 0; i < mActiveConnectionsSize; i++)
+    {
+        if (mActiveConnections[i] != nullptr)
+        {
+            mActiveConnections[i]->Close();
+            mActiveConnections[i]->Free();
+            mActiveConnections[i] = nullptr;
+        }
+    }
 
     for (size_t i = 0; i < mPendingPacketsSize; i++)
     {
@@ -115,9 +124,8 @@ void TCPBase::CloseActiveConnections()
     {
         if (mActiveConnections[i] != nullptr)
         {
+            ChipLogProgress(Inet, "Closing an active connection.");
             mActiveConnections[i]->Close();
-            mActiveConnections[i]->Free();
-            mActiveConnections[i] = nullptr;
         }
     }
 }
@@ -301,6 +309,7 @@ CHIP_ERROR TCPBase::SendAfterConnect(const PeerAddress & addr, System::PacketBuf
     endPoint->OnConnectionClosed   = OnConnectionClosed;
     endPoint->OnConnectionReceived = OnConnectionRecevied;
     endPoint->OnAcceptError        = OnAcceptError;
+    endPoint->OnPeerClose          = OnPeerClosed;
 
     err = endPoint->Connect(addr.GetIPAddress(), addr.GetPort(), mInterfaceId);
     SuccessOrExit(err);
@@ -500,8 +509,18 @@ void TCPBase::OnConnectionComplete(Inet::TCPEndPoint * endPoint, INET_ERROR inet
 
 void TCPBase::OnConnectionClosed(Inet::TCPEndPoint * endPoint, INET_ERROR err)
 {
-    // FIXME: implement
-    ChipLogError(Inet, "%s not yet implemented", __PRETTY_FUNCTION__);
+    TCPBase * tcp = reinterpret_cast<TCPBase *>(endPoint->AppState);
+    ChipLogProgress(Inet, "Connection was closed.");
+
+    for (size_t i = 0; i < tcp->mActiveConnectionsSize; i++)
+    {
+        if (tcp->mActiveConnections[i] == endPoint)
+        {
+            ChipLogProgress(Inet, "Freeing closed connection.");
+            tcp->mActiveConnections[i]->Free();
+            tcp->mActiveConnections[i] = nullptr;
+        }
+    }
 }
 
 void TCPBase::OnConnectionRecevied(Inet::TCPEndPoint * listenEndPoint, Inet::TCPEndPoint * endPoint, const IPAddress & peerAddress,
@@ -527,6 +546,7 @@ void TCPBase::OnConnectionRecevied(Inet::TCPEndPoint * listenEndPoint, Inet::TCP
         endPoint->OnConnectionClosed   = OnConnectionClosed;
         endPoint->OnConnectionReceived = OnConnectionRecevied;
         endPoint->OnAcceptError        = OnAcceptError;
+        endPoint->OnPeerClose          = OnPeerClosed;
     }
     else
     {
@@ -542,6 +562,12 @@ void TCPBase::OnAcceptError(Inet::TCPEndPoint * endPoint, INET_ERROR err)
 }
 
 void TCPBase::Disconnect(const PeerAddress & address)
+{
+    // FIXME: implement
+    ChipLogError(Inet, "%s not yet implemented", __PRETTY_FUNCTION__);
+}
+
+void TCPBase::OnPeerClosed(Inet::TCPEndPoint * endPoint)
 {
     // FIXME: implement
     ChipLogError(Inet, "%s not yet implemented", __PRETTY_FUNCTION__);

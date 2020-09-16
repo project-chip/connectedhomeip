@@ -192,6 +192,9 @@ private:
     // Called when a connection has been closed
     static void OnConnectionClosed(Inet::TCPEndPoint * endPoint, INET_ERROR err);
 
+    // Callend when a peer closes the connection
+    static void OnPeerClosed(Inet::TCPEndPoint * endPoint);
+
     // Called when a connection is received on the listening port
     static void OnConnectionRecevied(Inet::TCPEndPoint * listenEndPoint, Inet::TCPEndPoint * endPoint,
                                      const IPAddress & peerAddress, uint16_t peerPort);
