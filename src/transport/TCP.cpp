@@ -74,16 +74,7 @@ TCPBase::~TCPBase()
         mListenSocket->Free();
         mListenSocket = nullptr;
     }
-
-    for (size_t i = 0; i < mActiveConnectionsSize; i++)
-    {
-        if (mActiveConnections[i] != nullptr)
-        {
-            mActiveConnections[i]->Close();
-            mActiveConnections[i]->Free();
-            mActiveConnections[i] = nullptr;
-        }
-    }
+    CloseActiveConnections();
 
     for (size_t i = 0; i < mPendingPacketsSize; i++)
     {
@@ -91,6 +82,19 @@ TCPBase::~TCPBase()
         {
             System::PacketBuffer::Free(mPendingPackets[i].packetBuffer);
             mPendingPackets[i].packetBuffer = nullptr;
+        }
+    }
+}
+
+void TCPBase::CloseActiveConnections()
+{
+    for (size_t i = 0; i < mActiveConnectionsSize; i++)
+    {
+        if (mActiveConnections[i] != nullptr)
+        {
+            mActiveConnections[i]->Close();
+            mActiveConnections[i]->Free();
+            mActiveConnections[i] = nullptr;
         }
     }
 }

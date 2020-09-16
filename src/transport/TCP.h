@@ -137,6 +137,18 @@ public:
             (address.GetIPAddress().Type() == mEndpointType);
     }
 
+    /**
+     * Helper method to determine if IO processing is still required for a TCP transport
+     * before everything is cleaned up (socket closing is async, so after calling 'Close' on
+     * the transport, some time may be needed to actually be able to close.)
+     */
+    bool HasActiveConnections() const { return (mActiveConnections > 0) || (mPendingPackets > 0); }
+
+    /**
+     * Close all active connetions
+     */
+    void CloseActiveConnections();
+
 private:
     /**
      * Find an active connection to the given peer or return nullptr if
