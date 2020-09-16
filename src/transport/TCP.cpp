@@ -124,7 +124,7 @@ CHIP_ERROR TCPBase::Init(TcpListenParameters & params)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(Inet, "Failed to initialize TCP transport: %s", ErrorStr(err));
+        ChipLogError(Inet, "Failed to initialize TCP transport: %s", ErrorStr(err));
         if (mListenSocket)
         {
             mListenSocket->Free();
@@ -182,7 +182,9 @@ CHIP_ERROR TCPBase::SendMessage(const MessageHeader & header, const Transport::P
         msgBuf->SetStart(msgBuf->Start() - prefixSize);
 
         uint8_t * output = msgBuf->Start();
-        LittleEndian::Write16(output, msgBuf->DataLength());
+
+        // Length is actual data, without considering the length bytes themselves
+        LittleEndian::Write16(output, msgBuf->DataLength() - kPacketSizeBytes);
 
         err = header.Encode(output, msgBuf->DataLength(), &actualEncodedHeaderSize);
         SuccessOrExit(err);
@@ -326,10 +328,6 @@ exit:
 CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress,
                                           System::PacketBuffer * buffer)
 {
-    char src[PeerAddress::kMaxToStringSize];
-    peerAddress.ToString(src, sizeof(src));
-    ChipLogProgress(Inet, "TCP Data received from %s", src);
-
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     while (buffer != nullptr)
@@ -343,7 +341,6 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
             continue;
         }
 
-        // TODO: figure out frame sizes and ACK sizes.
         uint8_t * messageData = nullptr;
         uint16_t messageSize  = 0;
         if (ContainsCompleteMessage(buffer, &messageData, &messageSize))
