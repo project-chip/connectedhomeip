@@ -120,7 +120,6 @@ CHIP_ERROR TCPBase::Init(TcpListenParameters & params)
     mListenSocket->OnConnectionReceived = OnConnectionRecevied;
     mListenSocket->OnAcceptError        = OnAcceptError;
     mEndpointType                       = params.GetAddressType();
-    mInterfaceId                        = params.GetInterfaceId();
 
     mState = State::kInitialized;
 
@@ -279,7 +278,7 @@ CHIP_ERROR TCPBase::SendAfterConnect(const PeerAddress & addr, System::PacketBuf
     endPoint->OnAcceptError        = OnAcceptError;
     endPoint->OnPeerClose          = OnPeerClosed;
 
-    err = endPoint->Connect(addr.GetIPAddress(), addr.GetPort(), mInterfaceId);
+    err = endPoint->Connect(addr.GetIPAddress(), addr.GetPort(), addr.GetInterface());
     SuccessOrExit(err);
 
     // enqueue the packet once the connection succeeds

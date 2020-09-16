@@ -202,7 +202,6 @@ private:
     // Called on accept error
     static void OnAcceptError(Inet::TCPEndPoint * endPoint, INET_ERROR err);
 
-    InterfaceId mInterfaceId          = INET_NULL_INTERFACEID;
     Inet::TCPEndPoint * mListenSocket = nullptr;                                     ///< TCP socket used by the transport
     Inet::IPAddressType mEndpointType = Inet::IPAddressType::kIPAddressType_Unknown; ///< Socket listening type
     State mState                      = State::kNotReady;                            ///< State of the TCP transport
