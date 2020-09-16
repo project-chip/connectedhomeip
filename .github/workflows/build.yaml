@@ -46,8 +46,8 @@ jobs:
                   submodules: true
             - name: Bootstrap
               run: |
+                  scripts/tests/happy_tests.sh bootstrap ;
                   scripts/build/gn_bootstrap.sh ;
-                  scripts/tests/happy_tests.sh bootstrap
             - name: Setup Build
               run: |
                   case $BUILD_TYPE in
