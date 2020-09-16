@@ -37,7 +37,7 @@ import ChipUtilities
 import ChipInetMulticast
 
 
-class test_chip_inet_multicast_01(unittest.TestCase):
+class test_chip_inet_multicast_five_nodes_on_wifi(unittest.TestCase):
     def setUp(self):
         self.using_lwip = False
 
@@ -56,7 +56,7 @@ class test_chip_inet_multicast_01(unittest.TestCase):
         ret = setup_network.run()
 
     def tearDown(self):
-        # cleaning up
+        """cleaning up"""
         options = ChipStateUnload.option()
         options["quiet"] = True
         options["json_file"] = self.topology_file
@@ -215,10 +215,12 @@ class test_chip_inet_multicast_01(unittest.TestCase):
             raise ValueError("Chip Inet Multicast Test Failed")
 
     def __run_inet_multicast_test(self, configuration, interface, network, transport):
-        # The default interval is 1 s (1000 ms). This is a good
-        # default for interactive test operation; however, for
-        # automated continuous integration, we prefer it to run much
-        # faster. Consequently, use 250 ms as the interval.
+        """ Run Inet Multicast test on configured topology
+        The default interval is 1 s (1000 ms). This is a good
+        default for interactive test operation; however, for
+        automated continuous integration, we prefer it to run much
+        faster. Consequently, use 250 ms as the interval.
+        """
 
         options = ChipInetMulticast.option()
         options["quiet"] = False

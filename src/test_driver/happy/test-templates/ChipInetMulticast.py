@@ -94,9 +94,8 @@ class ChipInetMulticast(HappyNode, HappyNetwork, ChipTest):
                 description, node)
             self.__log_error_and_exit(emsg)
 
-    # Sanity check the instantiated options and configuration
-
     def __pre_check(self):
+        """Sanity check the instantiated options and configuration"""
         # Sanity check the transport
         if self.transport != "udp" and self.transport != "raw":
             emsg = "Transport type must be one of 'raw' or 'udp'."
@@ -135,9 +134,10 @@ class ChipInetMulticast(HappyNode, HappyNetwork, ChipTest):
             emsg = "Please specify a valid send interval in milliseconds."
             self.__log_error_and_exit(emsg)
 
-    # Gather and return the exit status and output as a tuple for the
-    # specified process node and tag.
     def __gather_process_results(self, process, quiet):
+        """Gather and return the exit status and output as a tuple for the
+        specified process node and tag.
+        """
         node = process['node']
         tag = process['tag']
 
@@ -145,26 +145,26 @@ class ChipInetMulticast(HappyNode, HappyNetwork, ChipTest):
 
         return (status, output)
 
-    # Gather and return the exit status and output as a tuple for the
-    # sender process.
-
     def __gather_sender_results(self, quiet):
+        """Gather and return the exit status and output as a tuple for the
+        sender process.
+        """
         status, output = self.__gather_process_results(self.sender, quiet)
 
         return (status, output)
 
-    # Gather and return the exit status and output as a tuple for the
-    # specified receiver process.
-
     def __gather_receiver_results(self, receiver, quiet):
+        """Gather and return the exit status and output as a tuple for the
+        specified receiver process.
+        """
         status, output = self.__gather_process_results(receiver, quiet)
 
         return (status, output)
 
-    # Gather and return the exit status and output as a tuple for all
-    # receiver processes.
-
     def __gather_receivers_results(self, quiet):
+        """Gather and return the exit status and output as a tuple for all
+        receiver processes.
+        """
         receiver_results = {}
         receivers_results = []
 
@@ -175,9 +175,10 @@ class ChipInetMulticast(HappyNode, HappyNetwork, ChipTest):
 
         return (receivers_results)
 
-    # Gather and return the exit status and output as a dictionary for all
-    # sender and receiver processes.
     def __gather_results(self):
+        """Gather and return the exit status and output as a dictionary for all
+        sender and receiver processes.
+        """
         quiet = True
         results = {}
         sender_results = {}
@@ -220,11 +221,11 @@ class ChipInetMulticast(HappyNode, HappyNetwork, ChipTest):
 
         return (status, output)
 
-    # Start the test process on the specified node with the provided
-    # tag using the provided attributes and extra command line
-    # options.
-
     def __start_node(self, node, attributes, extra, tag):
+        """Start the test process on the specified node with the provided
+        tag using the provided attributes and extra command line
+        options.
+        """
         cmd = "sudo "
         cmd += self.getChipInetLayerMulticastPath()
 
@@ -271,10 +272,10 @@ class ChipInetMulticast(HappyNode, HappyNetwork, ChipTest):
         self.start_chip_process(
             node, cmd, tag, sync_on_output=self.ready_to_service_events_str)
 
-    # Start a receiver test process on the specified node with the
-    # provided attributes and tag identifier.
-
     def __start_receiver(self, node, attributes, identifier):
+        """Start a receiver test process on the specified node with the
+        provided attributes and tag identifier.
+        """
         receiver = {}
         tag = "INET-MCAST-RX-%u" % (identifier)
 
@@ -287,9 +288,8 @@ class ChipInetMulticast(HappyNode, HappyNetwork, ChipTest):
 
         self.receivers.append(receiver)
 
-    # Start all receiver test processes.
-
     def __start_receivers(self):
+        """Start all receiver test processes."""
         receiver = {}
         identifier = 0
         for receiver in self.configuration['receivers']:
@@ -297,9 +297,8 @@ class ChipInetMulticast(HappyNode, HappyNetwork, ChipTest):
                 receiver, self.configuration['receivers'][receiver], identifier)
             identifier += 1
 
-    # Start the sender test process.
-
     def __start_sender(self):
+        """Start the sender test process."""
         node = list(self.configuration['sender'])[0]
         attributes = self.configuration['sender'][node]
         tag = "INET-MCAST-TX-0"
@@ -316,9 +315,8 @@ class ChipInetMulticast(HappyNode, HappyNetwork, ChipTest):
         self.sender['node'] = node
         self.sender['tag'] = tag
 
-    # Block and wait for the sender test process.
-
     def __wait_for_sender(self):
+        """Block and wait for the sender test process."""
         node = self.sender['node']
         tag = self.sender['tag']
 
@@ -326,8 +324,6 @@ class ChipInetMulticast(HappyNode, HappyNetwork, ChipTest):
             "[localhost] ChipInetMulticast: Will wait for sender on node %s with tag %s..." % (node, tag))
 
         self.wait_for_test_to_end(node, tag)
-
-    # Stop the specified receiver test process.
 
     def __stop_receiver(self, receiver):
         node = receiver['node']
@@ -338,12 +334,10 @@ class ChipInetMulticast(HappyNode, HappyNetwork, ChipTest):
 
         self.stop_chip_process(node, tag)
 
-    # Stop all receiver test processes.
     def __stop_receivers(self):
+        """Stop all receiver test processes."""
         for receiver in self.receivers:
             self.__stop_receiver(receiver)
-
-    # Run the test.
 
     def run(self):
         results = {}
