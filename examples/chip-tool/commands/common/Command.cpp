@@ -17,7 +17,12 @@
  */
 
 #include "Command.h"
+
+#include <netdb.h>
 #include <sstream>
+#include <sys/socket.h>
+#include <sys/types.h>
+
 #include <support/CHIPLogging.h>
 
 bool Command::InitArguments(int argc, char * argv[])
@@ -40,6 +45,36 @@ bool Command::InitArguments(int argc, char * argv[])
 
 exit:
     return isValidCommand;
+}
+
+static bool ParseAddressWithInterface(const char * addressString, Command::AddressWithInterface * address)
+{
+    struct addrinfo hints;
+    struct addrinfo * result;
+    int ret;
+
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family   = AF_UNSPEC;
+    hints.ai_socktype = SOCK_DGRAM;
+    ret               = getaddrinfo(addressString, nullptr, &hints, &result);
+    if (ret < 0)
+    {
+        ChipLogError(chipTool, "Invalid address: %s", addressString);
+        return false;
+    }
+
+    address->address = ::chip::Inet::IPAddress::FromSockAddr(*result->ai_addr);
+    if (result->ai_family == AF_INET6)
+    {
+        struct sockaddr_in6 * addr = reinterpret_cast<struct sockaddr_in6 *>(result->ai_addr);
+        address->interfaceId       = addr->sin6_scope_id;
+    }
+    else
+    {
+        address->interfaceId = INET_NULL_INTERFACEID;
+    }
+
+    return true;
 }
 
 bool Command::InitArgument(size_t argIndex, const char * argValue)
@@ -65,8 +100,8 @@ bool Command::InitArgument(size_t argIndex, const char * argValue)
     }
 
     case ArgumentType::Address: {
-        IPAddress * value = reinterpret_cast<IPAddress *>(arg.value);
-        isValidArgument   = IPAddress::FromString(argValue, *value);
+        AddressWithInterface * value = reinterpret_cast<AddressWithInterface *>(arg.value);
+        isValidArgument              = ParseAddressWithInterface(argValue, value);
         break;
     }
     }
@@ -90,7 +125,7 @@ size_t Command::AddArgument(const char * name, const char * value)
     return mArgs.size();
 }
 
-size_t Command::AddArgument(const char * name, IPAddress * out)
+size_t Command::AddArgument(const char * name, AddressWithInterface * out)
 {
     Argument arg;
     arg.type  = ArgumentType::Address;

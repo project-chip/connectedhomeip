@@ -127,6 +127,12 @@ public:
     SocketEvents(const SocketEvents & other) { Value = other.Value; }
 
     /**
+     *  Copy assignment operator for the SocketEvents class.
+     *
+     */
+    SocketEvents & operator=(const SocketEvents & other) = default;
+
+    /**
      *  Check if any of the bit flags for the socket events are set.
      *
      *  @return true if set, otherwise false.

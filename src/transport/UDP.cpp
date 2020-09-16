@@ -93,6 +93,7 @@ CHIP_ERROR UDP::SendMessage(const MessageHeader & header, const Transport::PeerA
 
     addrInfo.DestAddress = address.GetIPAddress();
     addrInfo.DestPort    = address.GetPort();
+    addrInfo.Interface   = address.GetInterface();
 
     VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 

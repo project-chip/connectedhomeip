@@ -327,7 +327,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       public_deps += [ "${nrf5_sdk_build_root}:nrf5_sdk" ]
 
       if (chip_enable_openthread) {
-        public_deps += [ "${openthread_root}:libopenthread-ftd" ]
+        public_deps += [
+          "${chip_root}/third_party/openthread/platforms/nrf528xx:libnordicsemi_nrf52840_radio_driver_softdevice",
+          "${chip_root}/third_party/openthread/platforms/nrf528xx:libopenthread-nrf52840-softdevice-sdk",
+          "${openthread_root}:libopenthread-ftd",
+        ]
 
         sources += [
           "OpenThread/OpenThreadUtils.cpp",

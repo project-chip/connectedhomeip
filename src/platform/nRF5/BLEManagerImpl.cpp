@@ -40,8 +40,26 @@
 #include "nrf_ble_gatt.h"
 #include "nrf_error.h"
 
+#ifdef SOFTDEVICE_PRESENT
+#include "nrf_sdh.h"
+#include "nrf_sdh_ble.h"
+#include "nrf_sdh_soc.h"
+#endif
+
+#if CHIP_ENABLE_OPENTHREAD
+extern "C" {
+#include <openthread/platform/platform-softdevice.h>
+}
+#endif // CHIP_ENABLE_OPENTHREAD
+
 #define NRF_LOG_MODULE_NAME chip
 #include "nrf_log.h"
+
+#if NRF_LOG_ENABLED
+#include "nrf_log_backend_uart.h"
+#include "nrf_log_ctrl.h"
+#include "nrf_log_default_backends.h"
+#endif // NRF_LOG_ENABLED
 
 using namespace chip::Ble;
 
@@ -88,6 +106,23 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 #define CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY 3
 #endif // CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
 
+static uint32_t LogTimestamp(void)
+{
+    return 0;
+}
+
+CHIP_ERROR BLEManagerImpl::_PlatformInit()
+{
+    if (!nrf_sdh_is_enabled())
+    {
+        return CHIP_ERROR_WELL_UNINITIALIZED;
+    }
+    else
+    {
+        return CHIP_NO_ERROR;
+    }
+}
+
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
@@ -103,8 +138,15 @@ CHIP_ERROR BLEManagerImpl::_Init()
         mSubscribedConIds[i] = BLE_CONNECTION_UNINITIALIZED;
     }
 
+    NRF_LOG_INFO("Starting BLE initialization");
+    NRF_LOG_FLUSH();
+
     // Initialize the CHIP BleLayer.
     err = BleLayer::Init(this, this, &SystemLayer);
+    SuccessOrExit(err);
+
+    // Initialize the Softdevice
+    err = _PlatformInit();
     SuccessOrExit(err);
 
     // Register vendor-specific UUIDs with the soft device.
@@ -519,8 +561,9 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     // Advertise in fast mode if not fully provisioned and there are no CHIPoBLE connections, or
     // if the application has expressly requested fast advertising.
+    // TODO: Return back the !ConfigurationMgr().IsFullyProvisioned() checking when the ConfigurationMgr() will be available
     gapAdvParams.interval =
-        ((numCHIPoBLECons == 0 && !ConfigurationMgr().IsFullyProvisioned()) || GetFlag(mFlags, kFlag_FastAdvertisingEnabled))
+        ((numCHIPoBLECons == 0 /* && !ConfigurationMgr().IsFullyProvisioned()*/) || GetFlag(mFlags, kFlag_FastAdvertisingEnabled))
         ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
         : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL;
 
@@ -636,7 +679,11 @@ CHIP_ERROR BLEManagerImpl::EncodeAdvertisingData(ble_gap_adv_data_t & gapAdvData
 
     // Initialize the CHIP BLE Device Identification Information block that will be sent as payload
     // within the BLE service advertisement data.
-    err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
+    // TODO: retrive device configuration from the ConfigurationMgr()
+    // err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
+    deviceIdInfo.Init();
+    deviceIdInfo.SetVendorId(0xDEAD);
+    deviceIdInfo.SetProductId(0xBEEF);
     SuccessOrExit(err);
 
     // Form the contents of the scan response packet.
