@@ -70,20 +70,11 @@ TCPBase::~TCPBase()
     if (mListenSocket != nullptr)
     {
         // endpoint is only non null if it is initialized and listening
-        mListenSocket->Close();
         mListenSocket->Free();
         mListenSocket = nullptr;
     }
 
-    for (size_t i = 0; i < mActiveConnectionsSize; i++)
-    {
-        if (mActiveConnections[i] != nullptr)
-        {
-            mActiveConnections[i]->Close();
-            mActiveConnections[i]->Free();
-            mActiveConnections[i] = nullptr;
-        }
-    }
+    CloseActiveConnections();
 
     for (size_t i = 0; i < mPendingPacketsSize; i++)
     {
@@ -95,37 +86,14 @@ TCPBase::~TCPBase()
     }
 }
 
-bool TCPBase::HasActiveConnections() const
-{
-    for (size_t i = 0; i < mActiveConnectionsSize; i++)
-    {
-        if (mActiveConnections[i] != nullptr)
-        {
-            // An active connection exists
-            return true;
-        }
-    }
-
-    for (size_t i = 0; i < mPendingPacketsSize; i++)
-    {
-        if (mPendingPackets[i].packetBuffer != nullptr)
-        {
-            // 'Connect' is pending
-            return true;
-        }
-    }
-
-    return false;
-}
-
 void TCPBase::CloseActiveConnections()
 {
     for (size_t i = 0; i < mActiveConnectionsSize; i++)
     {
         if (mActiveConnections[i] != nullptr)
         {
-            ChipLogProgress(Inet, "Closing an active connection.");
-            mActiveConnections[i]->Close();
+            mActiveConnections[i]->Free();
+            mActiveConnections[i] = nullptr;
         }
     }
 }
@@ -510,7 +478,8 @@ void TCPBase::OnConnectionComplete(Inet::TCPEndPoint * endPoint, INET_ERROR inet
 void TCPBase::OnConnectionClosed(Inet::TCPEndPoint * endPoint, INET_ERROR err)
 {
     TCPBase * tcp = reinterpret_cast<TCPBase *>(endPoint->AppState);
-    ChipLogProgress(Inet, "Connection was closed.");
+
+    ChipLogProgress(Inet, "Connection closed.");
 
     for (size_t i = 0; i < tcp->mActiveConnectionsSize; i++)
     {
@@ -563,14 +532,52 @@ void TCPBase::OnAcceptError(Inet::TCPEndPoint * endPoint, INET_ERROR err)
 
 void TCPBase::Disconnect(const PeerAddress & address)
 {
-    // FIXME: implement
-    ChipLogError(Inet, "%s not yet implemented", __PRETTY_FUNCTION__);
+    // Closes an existing connection
+    for (size_t i = 0; i < mActiveConnectionsSize; i++)
+    {
+        if (mActiveConnections[i] != nullptr)
+        {
+            IPAddress ipAddress;
+            uint16_t port;
+
+            mActiveConnections[i]->GetPeerInfo(&ipAddress, &port);
+            if (address == PeerAddress::TCP(ipAddress, port))
+            {
+                mActiveConnections[i]->Free();
+                mActiveConnections[i] = nullptr;
+                mUsedEndPointCount--;
+            }
+        }
+    }
 }
 
 void TCPBase::OnPeerClosed(Inet::TCPEndPoint * endPoint)
 {
-    // FIXME: implement
-    ChipLogError(Inet, "%s not yet implemented", __PRETTY_FUNCTION__);
+    TCPBase * tcp = reinterpret_cast<TCPBase *>(endPoint->AppState);
+
+    for (size_t i = 0; i < tcp->mActiveConnectionsSize; i++)
+    {
+        if (tcp->mActiveConnections[i] == endPoint)
+        {
+            ChipLogProgress(Inet, "Freeing connection: connection closed by peer");
+            tcp->mActiveConnections[i]->Free();
+            tcp->mActiveConnections[i] = nullptr;
+            tcp->mUsedEndPointCount--;
+        }
+    }
+}
+
+bool TCPBase::HasActiveConnections() const
+{
+    for (size_t i = 0; i < mActiveConnectionsSize; i++)
+    {
+        if (mActiveConnections[i] != nullptr)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 } // namespace Transport

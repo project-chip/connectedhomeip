@@ -136,11 +136,10 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return ReceiveHandlerCallCount != 0; });
 
-    // Close connections and drive IO to ensure clean things up
-    tcp.CloseActiveConnections();
-    ctx.DriveIOUntil(1000 /* ms */, [&tcp]() { return !tcp.HasActiveConnections(); });
+    tcp.Disconnect(Transport::PeerAddress::TCP(addr));
 
-    NL_TEST_ASSERT(inSuite, !tcp.HasActiveConnections());
+    // wait for seeing peer close
+    ctx.DriveIOUntil(1000 /* ms */, [&tcp]() { return !tcp.HasActiveConnections(); });
 
     NL_TEST_ASSERT(inSuite, ReceiveHandlerCallCount == 1);
 }

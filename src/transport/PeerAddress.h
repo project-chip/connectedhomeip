@@ -88,12 +88,12 @@ public:
 
     bool IsInitialized() const { return mTransportType != Type::kUndefined; }
 
-    bool operator==(const PeerAddress & other)
+    bool operator==(const PeerAddress & other) const
     {
         return (mTransportType == other.mTransportType) && (mIPAddress == other.mIPAddress) && (mPort == other.mPort);
     }
 
-    bool operator!=(const PeerAddress & other) { return !(*this == other); }
+    bool operator!=(const PeerAddress & other) const { return !(*this == other); }
 
     /// Maximum size of an Inet address ToString format, that can hold both IPV6 and IPV4 addresses.
 #ifdef INET6_ADDRSTRLEN
