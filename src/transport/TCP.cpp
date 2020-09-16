@@ -526,8 +526,7 @@ void TCPBase::OnConnectionRecevied(Inet::TCPEndPoint * listenEndPoint, Inet::TCP
 
 void TCPBase::OnAcceptError(Inet::TCPEndPoint * endPoint, INET_ERROR err)
 {
-    // FIXME: implement
-    ChipLogError(Inet, "%s not yet implemented", __PRETTY_FUNCTION__);
+    ChipLogError(Inet, "Accept error: %s", ErrorStr(err));
 }
 
 void TCPBase::Disconnect(const PeerAddress & address)
