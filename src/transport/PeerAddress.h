@@ -100,7 +100,7 @@ public:
     bool operator==(const PeerAddress & other) const
     {
         return (mTransportType == other.mTransportType) && (mIPAddress == other.mIPAddress) && (mPort == other.mPort) &&
-            ((mInterface == INET_NULL_INTERFACE_ID) || (other.mInterface == INET_NULL_INTERFACE_ID) ||
+            ((mInterface == INET_NULL_INTERFACEID) || (other.mInterface == INET_NULL_INTERFACEID) ||
              (mInterface == other.mInterface));
     }
 
@@ -166,7 +166,7 @@ private:
     Inet::IPAddress mIPAddress;
     Type mTransportType;
     uint16_t mPort               = CHIP_PORT; ///< Relevant for UDP data sending.
-    Inet::InterfaceId mInterface = INET_NULL_INTERFACE_ID;
+    Inet::InterfaceId mInterface = INET_NULL_INTERFACEID;
 };
 
 } // namespace Transport
