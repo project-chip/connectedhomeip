@@ -167,7 +167,7 @@ exit:
 CHIP_ERROR TCPBase::SendMessage(const MessageHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgBuf)
 {
     // Sent buffer data format is:
-    //    - packet size as a uint16_t
+    //    - packet size as a uint16_t (inludes size of header and actual data)
     //    - header
     //    - actual data
     CHIP_ERROR err               = CHIP_NO_ERROR;
