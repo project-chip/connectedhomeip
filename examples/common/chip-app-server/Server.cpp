@@ -19,6 +19,7 @@
 
 #include <string.h>
 
+#include <ble/BLEEndPoint.h>
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
@@ -32,6 +33,11 @@
 #include <transport/UDP.h>
 
 #include <DataModelHandler.h>
+
+#if CHIP_ENABLE_OPENTHREAD
+#include <platform/ThreadStackManager.h>
+#include <platform/internal/DeviceNetworkInfo.h>
+#endif
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -47,13 +53,75 @@ using namespace ::chip::DeviceLayer;
 DemoSessionManager sessions;
 
 namespace chip {
+
 SecureSessionMgrBase & SessionManager()
 {
     return sessions;
 }
+
 } // namespace chip
 
 namespace {
+
+void HandleBLEConnectionClosed(chip::Ble::BLEEndPoint * endPoint, BLE_ERROR err)
+{
+    ChipLogProgress(AppServer, "BLE Connection closed");
+}
+
+void HandleBLEMessageReceived(chip::Ble::BLEEndPoint * endPoint, chip::System::PacketBuffer * buffer)
+{
+#if CHIP_ENABLE_OPENTHREAD
+    uint16_t bufferLen = buffer->DataLength();
+    uint8_t * data     = buffer->Start();
+    chip::DeviceLayer::Internal::DeviceNetworkInfo networkInfo;
+    ChipLogProgress(AppServer, "Receive BLE message size=%u", bufferLen);
+
+    memcpy(networkInfo.ThreadNetworkName, data, sizeof(networkInfo.ThreadNetworkName));
+    data += sizeof(networkInfo.ThreadNetworkName);
+
+    memcpy(networkInfo.ThreadExtendedPANId, data, sizeof(networkInfo.ThreadExtendedPANId));
+    data += sizeof(networkInfo.ThreadExtendedPANId);
+
+    memcpy(networkInfo.ThreadMeshPrefix, data, sizeof(networkInfo.ThreadMeshPrefix));
+    data += sizeof(networkInfo.ThreadMeshPrefix);
+
+    memcpy(networkInfo.ThreadNetworkKey, data, sizeof(networkInfo.ThreadNetworkKey));
+    data += sizeof(networkInfo.ThreadNetworkKey);
+
+    memcpy(networkInfo.ThreadPSKc, data, sizeof(networkInfo.ThreadPSKc));
+    data += sizeof(networkInfo.ThreadPSKc);
+
+    networkInfo.ThreadPANId = data[0] | (data[1] << 8);
+    data += sizeof(networkInfo.ThreadPANId);
+    networkInfo.ThreadChannel = data[0];
+    data += sizeof(networkInfo.ThreadChannel);
+
+    networkInfo.FieldPresent.ThreadExtendedPANId = *data;
+    data++;
+    networkInfo.FieldPresent.ThreadMeshPrefix = *data;
+    data++;
+    networkInfo.FieldPresent.ThreadPSKc = *data;
+    data++;
+    networkInfo.NetworkId              = 0;
+    networkInfo.FieldPresent.NetworkId = true;
+
+    ThreadStackMgr().SetThreadEnabled(false);
+    ThreadStackMgr().SetThreadProvision(networkInfo);
+    ThreadStackMgr().SetThreadEnabled(true);
+
+#endif
+    endPoint->Close();
+    chip::System::PacketBuffer::Free(buffer);
+}
+
+void HandleBLEConnectionOpened(chip::Ble::BLEEndPoint * endPoint)
+{
+    ChipLogProgress(AppServer, "BLE Connection opened");
+
+    endPoint->OnMessageReceived  = HandleBLEMessageReceived;
+    endPoint->OnConnectionClosed = HandleBLEConnectionClosed;
+}
+
 class ServerCallback : public SecureSessionMgrCallback
 {
 public:
@@ -114,6 +182,8 @@ void InitServer()
     SuccessOrExit(err);
 
     sessions.SetDelegate(&gCallbacks);
+
+    chip::DeviceLayer::ConnectivityMgr().AddCHIPoBLEConnectionHandler(HandleBLEConnectionOpened);
 
 exit:
     if (err != CHIP_NO_ERROR)
