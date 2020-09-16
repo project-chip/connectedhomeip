@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is a warpper for running happy tests
+# This is a wrapper for running happy tests.
 
 import os
 import sys

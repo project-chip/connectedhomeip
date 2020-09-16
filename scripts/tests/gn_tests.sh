@@ -28,4 +28,4 @@ env
 
 set -x
 
-ninja -v -C "$CHIP_ROOT/out/$BUILD_TYPE" check
+ninja -v -C "$CHIP_ROOT/out/$BUILD_TYPE" -k 0 check

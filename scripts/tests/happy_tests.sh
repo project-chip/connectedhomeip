@@ -16,9 +16,14 @@
 # limitations under the License.
 #
 
+# This file is used to test a single happy test using (almost) the same
+# method as ninja does. Suggest passing $HAPPY_LOG_DIR to set path for logs.
+
 SOURCE="${BASH_SOURCE[0]}"
-SOURCE_DIR="$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
+SOURCE_DIR="$(cd "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
 REPO_DIR="$SOURCE_DIR/../../"
+
+export HAPPY_LOG_DIR="${HAPPY_LOG_DIR:-$(mktemp -d)}"
 
 set -x
 env
@@ -28,6 +33,9 @@ function happytest_bootstrap() {
     set -e
     # Bootstrap Happy
     cd "$REPO_DIR/third_party/happy/repo"
+
+    # Override happy log dir config.
+    python3 -c 'import json, os; file = open("happy/conf/main_config.json"); data = json.load(file); data["log_directory"] = os.environ["HAPPY_LOG_DIR"]; out = open("happy/conf/main_config.json", "w"); json.dump(data, out);'
 
     apt-get update
     apt-get install -y bridge-utils \
@@ -40,14 +48,12 @@ function happytest_bootstrap() {
                             strace \
                             sudo
     make
+
+    echo "Happy Log dir set to $HAPPY_LOG_DIR"
 }
 
 function happytest_run() {
-    # Run Tests
-    export TEST_BIN_DIR="$REPO_DIR/out/$BUILD_TYPE/tests"
-
-    # TODO: Write a testing driver for tests
-    python3 src/test_driver/happy/tests/standalone/inet/test_inet_multicast_five_nodes_on_wifi.py
+    "$REPO_DIR/scripts/tests/happy_test_wrapper.py" --test-bin-dir "$REPO_DIR/out/$BUILD_TYPE/tests" "$1"
 }
 
 subcommand="$1"

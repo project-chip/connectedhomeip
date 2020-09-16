@@ -27,7 +27,7 @@ template("happy_test") {
   if (defined(invoker.tests)) {
     foreach(_test, invoker.tests) {
       action("${_test}_test") {
-        script = rebase_path("${chip_root}/scripts/tests/happy_test_warpper.py")
+        script = rebase_path("${chip_root}/scripts/tests/happy_test_wrapper.py")
         deps = _deps
         inputs = [ "${_test}.py" ]
         outputs = ["${_test_output_dir}/${_test}.testout"]
