@@ -104,7 +104,11 @@ CHIP_ERROR TCPBase::Init(TcpListenParameters & params)
 
     VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     err = params.GetInetLayer()->NewTCPEndPoint(&mListenSocket);
+#else
+    err = CHIP_SYSTEM_ERROR_NOT_SUPPORTED;
+#endif
     SuccessOrExit(err);
 
     err = mListenSocket->Bind(params.GetAddressType(), IPAddress::Any, params.GetListenPort(), params.GetInterfaceId());
@@ -267,7 +271,11 @@ CHIP_ERROR TCPBase::SendAfterConnect(const PeerAddress & addr, System::PacketBuf
     // Ensures sufficient active connections size exist
     VerifyOrExit(mUsedEndPointCount < mActiveConnectionsSize, err = CHIP_ERROR_NO_MEMORY);
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     err = mListenSocket->Layer().NewTCPEndPoint(&endPoint);
+#else
+    err = CHIP_SYSTEM_ERROR_NOT_SUPPORTED;
+#endif
     SuccessOrExit(err);
 
     endPoint->AppState             = reinterpret_cast<void *>(this);
