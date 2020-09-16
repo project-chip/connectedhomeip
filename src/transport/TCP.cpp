@@ -270,17 +270,8 @@ exit:
     return err;
 }
 
-void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer)
+CHIP_ERROR TCPBase::ProcessReceivedBuffer(PeerAddress peerAddress, System::PacketBuffer * buffer)
 {
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    // TCPBase * tcp  = reinterpret_cast<TCPBase *>(endPoint->AppState);
-    IPAddress ipAddress;
-    uint16_t port;
-
-    endPoint->GetPeerInfo(&ipAddress, &port);
-    PeerAddress peerAddress = PeerAddress::TCP(ipAddress, port);
-
     char src[PeerAddress::kMaxToStringSize];
     peerAddress.ToString(src, sizeof(src));
     ChipLogProgress(Inet, "TCP Data received from %s", src);
@@ -288,6 +279,14 @@ void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * 
     // FIXME: read header uint16_t size
     //        decode the buffer
     //        report peer address receiving
+    //
+    // TODO:
+    //   - ensure exactly one message can be read
+    //   - ensure payloads are compacted
+    //   - PutBackReceivedData if incomplete
+    //   - Free packet data if complete
+    // Logic:
+    //   - compacthead/resize
 
     /*
     size_t headerSize       = 0;
@@ -300,13 +299,23 @@ void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * 
     udp->HandleMessageReceived(header, peerAddress, buffer);
     */
 
-    ChipLogError(Inet, "%s not yet implemented", __PRETTY_FUNCTION__);
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
 
-    err = CHIP_ERROR_NOT_IMPLEMENTED;
+void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer)
+{
+    IPAddress ipAddress;
+    uint16_t port;
 
-    // exit:
+    endPoint->GetPeerInfo(&ipAddress, &port);
+    PeerAddress peerAddress = PeerAddress::TCP(ipAddress, port);
+
+    TCPBase * tcp  = reinterpret_cast<TCPBase *>(endPoint->AppState);
+    CHIP_ERROR err = tcp->ProcessReceivedBuffer(peerAddress, buffer);
+
     if (err != CHIP_NO_ERROR)
     {
+        // Connection could need to be closed at this point
         ChipLogError(Inet, "Failed to receive TCP message: %s", ErrorStr(err));
     }
 }

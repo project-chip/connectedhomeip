@@ -152,6 +152,11 @@ private:
      */
     CHIP_ERROR SendAfterConnect(const PeerAddress & addr, System::PacketBuffer * msg);
 
+    /**
+     * Process a single received buffer from the specified peer address.
+     */
+    CHIP_ERROR ProcessReceivedBuffer(PeerAddress PeerAddress, System::PacketBuffer * buffer);
+
     // TCP message receive handler.
     static void OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer);
 
