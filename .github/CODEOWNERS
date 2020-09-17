@@ -2,40 +2,40 @@
 
 # Current reviewers-XXX teams, who review everything for approval.
 #* @reviewers-amazon @reviewers-apple @reviewers-comcast @reviewers-google @reviewers-samsung
-* @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin
+* @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin
 
 # Owners of any files in these directories at the root of the repository and
 # any of its subdirectories.
-/src/android/  @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @vidhis88
-/src/app/  @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @rwalker-apple @bzbarsky-apple @wehale @timotej @selissia @kedars
-/src/ble/  @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @turon @mspang @vivien-apple
-/src/controller/ @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @sagar-apple @vivien-apple @andy31415 @pan-apple
-/src/crypto/  @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @bhaskar-apple @pan-apple
-/src/darwin/ @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @sagar-apple @vivien-apple @pan-apple @shana-apple @rwalker-apple
-/src/inet/ @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @gerickson @pan-apple @vivien-apple @mspang
-/src/lib/core/ @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @pan-apple @sagar-apple @rwalker-apple @gerickson @yufengwangca
-/src/lib/message/ @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @mspang @andy31415 @yufengwangca @pan-apple
-/src/lib/protocols/ @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @yufengwangca @pan-apple
-/src/lib/shell/  @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @mspang @turon
-/src/lib/support/  @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @rwalker-apple @gerickson @pan-apple
-/src/platform/  @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @pan-apple  @mspang @vivien-apple @yufengwangca
-/src/qrcodetool/  @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @shana-apple
-/src/setup_payload/  @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @bhaskar-apple @vivien-apple
-/src/system/  @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @sagar-apple @pan-apple @gerickson @turon @rwalker-apple
-/src/test_driver/  @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @pan-apple @vivien-apple
-/src/transport/  @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @andy31415 @pan-apple @vivien-apple @mspang
+/src/android/  @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @vidhis88
+/src/app/  @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @rwalker-apple @bzbarsky-apple @wehale @timotej @selissia @kedars
+/src/ble/  @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @turon @mspang @vivien-apple
+/src/controller/ @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @sagar-apple @vivien-apple @andy31415 @pan-apple
+/src/crypto/  @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @bhaskar-apple @pan-apple
+/src/darwin/ @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @sagar-apple @vivien-apple @pan-apple @shana-apple @rwalker-apple
+/src/inet/ @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @gerickson @pan-apple @vivien-apple @mspang
+/src/lib/core/ @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @pan-apple @sagar-apple @rwalker-apple @gerickson @yufengwangca
+/src/lib/message/ @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @mspang @andy31415 @yufengwangca @pan-apple
+/src/lib/protocols/ @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @yufengwangca @pan-apple
+/src/lib/shell/  @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @mspang @turon
+/src/lib/support/  @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @rwalker-apple @gerickson @pan-apple
+/src/platform/  @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @pan-apple  @mspang @vivien-apple @yufengwangca
+/src/qrcodetool/  @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @shana-apple
+/src/setup_payload/  @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @bhaskar-apple @vivien-apple
+/src/system/  @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @sagar-apple @pan-apple @gerickson @turon @rwalker-apple
+/src/test_driver/  @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @pan-apple @vivien-apple
+/src/transport/  @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @andy31415 @pan-apple @vivien-apple @mspang
 
 # infra directories
-/.github/ @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @woody-apple @andy31415
-/.devcontainer/ @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @woody-apple @rwalker-apple
-/integrations/docker/ @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @rwalker-apple @woody-apple @andy31415
-/scripts/ @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @rwalker-apple @woody-apple @andy31415 @mspang
+/.github/ @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @woody-apple @andy31415
+/.devcontainer/ @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @woody-apple @rwalker-apple
+/integrations/docker/ @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @rwalker-apple @woody-apple @andy31415
+/scripts/ @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @rwalker-apple @woody-apple @andy31415 @mspang
 
 # this catches any directory named docs and its subdirs
-docs/ @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @gerickson @woody-apple @andy31415 @rwalker-apple
-*.md @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @gerickson @woody-apple @andy31415 @rwalker-apple
+docs/ @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @gerickson @woody-apple @andy31415 @rwalker-apple
+*.md @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @gerickson @woody-apple @andy31415 @rwalker-apple
 
 # GN make system
-/.gn/ @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @mspang
-*.gn @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @mspang
-*.gni @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @robszewczyk @mspang @saurabhst @BroderickCarlin @mspang
+/.gn/ @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @mspang
+*.gn @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @mspang
+*.gni @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin @mspang
