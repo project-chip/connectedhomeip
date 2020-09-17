@@ -26,7 +26,7 @@ die() {
 }
 
 install_doxygen() {
-    if ! doxygen --version > /dev/null 2>&1; then
+    if ! doxygen --version >/dev/null 2>&1; then
         echo "doxygen not installed. Installing..."
         case "$(uname)" in
             "Darwin")
@@ -44,7 +44,7 @@ install_doxygen() {
 }
 
 install_graphviz() {
-    if ! dot -V > /dev/null 2>&1; then
+    if ! dot -V >/dev/null 2>&1; then
         echo "graphviz not installed. Installing..."
         case "$(uname)" in
             "Darwin")
