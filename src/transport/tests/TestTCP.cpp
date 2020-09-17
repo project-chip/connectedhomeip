@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file implements unit tests for the UdpTransport implementation.
+ *      This file implements unit tests for the TcpTransport implementation.
  */
 
 #include "TestTransportLayer.h"
@@ -27,7 +27,7 @@
 
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
-#include <transport/UDP.h>
+#include <transport/TCP.h>
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
@@ -40,6 +40,11 @@ static int Initialize(void * aContext);
 static int Finalize(void * aContext);
 
 namespace {
+
+constexpr size_t kMaxTcpActiveConnectionCount = 4;
+constexpr size_t kMaxTcpPendingPackets        = 4;
+
+using TCPImpl = Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
 
 constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
@@ -67,17 +72,15 @@ void MessageReceiveHandler(MessageHeader & header, const Transport::PeerAddress 
     ReceiveHandlerCallCount++;
 }
 
-} // namespace
-
 /////////////////////////// Init test
 
 void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddressType type)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    Transport::UDP udp;
+    TCPImpl tcp;
 
-    CHIP_ERROR err = udp.Init(Transport::UdpListenParameters(&ctx.GetInetLayer()).SetAddressType(type));
+    CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(&ctx.GetInetLayer()).SetAddressType(type));
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
@@ -108,19 +111,19 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Transport::UDP udp;
+    TCPImpl tcp;
 
-    err = udp.Init(Transport::UdpListenParameters(&ctx.GetInetLayer()).SetAddressType(addr.Type()));
+    err = tcp.Init(Transport::TcpListenParameters(&ctx.GetInetLayer()).SetAddressType(addr.Type()));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    udp.SetMessageReceiveHandler(MessageReceiveHandler, inSuite);
+    tcp.SetMessageReceiveHandler(MessageReceiveHandler, inSuite);
     ReceiveHandlerCallCount = 0;
 
     MessageHeader header;
     header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
 
     // Should be able to send a message to itself by just calling send.
-    err = udp.SendMessage(header, Transport::PeerAddress::UDP(addr), buffer);
+    err = tcp.SendMessage(header, Transport::PeerAddress::TCP(addr), buffer);
     if (err == System::MapErrorPOSIX(EADDRNOTAVAIL))
     {
         // TODO(#2698): the underlying system does not support IPV6. This early return
@@ -131,9 +134,12 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ctx.DriveIOUntil(1000 /* ms */, []() { return ReceiveHandlerCallCount != 0; });
-
+    ctx.DriveIOUntil(5000 /* ms */, []() { return ReceiveHandlerCallCount != 0; });
     NL_TEST_ASSERT(inSuite, ReceiveHandlerCallCount == 1);
+
+    // Disconnect and wait for seeing peer close
+    tcp.Disconnect(Transport::PeerAddress::TCP(addr));
+    ctx.DriveIOUntil(5000 /* ms */, [&tcp]() { return !tcp.HasActiveConnections(); });
 }
 
 void CheckMessageTest4(nlTestSuite * inSuite, void * inContext)
@@ -149,6 +155,8 @@ void CheckMessageTest6(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("::1", addr);
     CheckMessageTest(inSuite, inContext, addr);
 }
+
+} // namespace
 
 // Test Suite
 
@@ -173,7 +181,7 @@ static const nlTest sTests[] =
 // clang-format off
 static nlTestSuite sSuite =
 {
-    "Test-CHIP-Udp",
+    "Test-CHIP-Tcp",
     &sTests[0],
     Initialize,
     Finalize
@@ -201,7 +209,7 @@ static int Finalize(void * aContext)
 /**
  *  Main
  */
-int TestUDP()
+int TestTCP()
 {
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);

@@ -32,6 +32,7 @@ CHIP_BUILD_TRANSPORT_LAYER_SOURCE_FILES                  = \
     @top_builddir@/src/transport/SecureSession.cpp         \
     @top_builddir@/src/transport/SecureSessionMgr.cpp      \
     @top_builddir@/src/transport/UDP.cpp                   \
+    @top_builddir@/src/transport/TCP.cpp                   \
     $(NULL)
 
 CHIP_BUILD_TRANSPORT_LAYER_HEADER_FILES               =         \
@@ -49,4 +50,5 @@ CHIP_BUILD_TRANSPORT_LAYER_HEADER_FILES               =         \
     @top_builddir@/src/transport/SecureSessionMgr.h             \
     @top_builddir@/src/transport/Tuple.h                        \
     @top_builddir@/src/transport/UDP.h                          \
+    @top_builddir@/src/transport/TCP.h                          \
     $(NULL)

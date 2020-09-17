@@ -17,28 +17,19 @@
 
 /**
  *    @file
- *      This file declares test entry points for CHIP Transport layer
- *      layer library unit tests.
+ *      This file implements a standalone/native program executable
+ *      test driver for the CHIP core library CHIP Connection tests.
  *
  */
 
-#ifndef TESTTRANSPORTLAYER_H
-#define TESTTRANSPORTLAYER_H
+#include "TestTransportLayer.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <nlunit-test.h>
 
-int TestMessageHeader(void);
-int TestPeerConnectionsFn(void);
-int TestSecurePairingSession(void);
-int TestSecureSession(void);
-int TestSecureSessionMgr(void);
-int TestTCP(void);
-int TestUDP(void);
+int main(void)
+{
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nlTestSetOutputStyle(OUTPUT_CSV);
 
-#ifdef __cplusplus
+    return (TestTCP());
 }
-#endif
-
-#endif // TESTTRANSPORTLAYER_H
