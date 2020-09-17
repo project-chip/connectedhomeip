@@ -174,6 +174,9 @@ private:
      * @param endPoint the source end point from which the data comes from
      * @param peerAddress the peer the data is coming from
      * @param buffer the actual data
+     *
+     * Ownership of buffer is taken over and will be freed (or re-enqueued to the endPoint receive queue)
+     * as needed during processing.
      */
     CHIP_ERROR ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress, System::PacketBuffer * buffer);
 
@@ -183,6 +186,8 @@ private:
      * @param peerAddress the peer the data is coming from
      * @param buffer the buffer containing the message
      * @param messageSize how much of the head contains the actual message
+     *
+     * Does *not* free buffer.
      */
     CHIP_ERROR ProcessSingleMessageFromBufferHead(const PeerAddress & peerAddress, System::PacketBuffer * buffer,
                                                   uint16_t messageSize);
