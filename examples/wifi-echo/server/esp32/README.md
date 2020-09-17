@@ -44,6 +44,12 @@ step. To install these components manually, follow these steps:
           $ export IDF_PATH=${HOME}/tools/esp-idf
           $ ./install.sh
 
+### Bootstrap CHIP project
+
+If you haven't already, bootstrap CHIP as shown below:
+         $ cd connectedhomeip/
+         $ source scripts/bootstrap.sh
+
 ### To build the application, follow these steps:
 
 Currently building in VSCode _and_ deploying from native is not supported, so

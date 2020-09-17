@@ -149,14 +149,14 @@ COMPONENT_ADD_INCLUDEDIRS 	 = project-config \
 COMPONENT_ADD_LDFLAGS        = -L$(OUTPUT_DIR)/lib/ \
                                -lCHIP
 
-CHIP_BUILD_WITH_GN ?= ""
+CHIP_BUILD_WITH_CMAKE ?= ""
 
-ifeq ($(CHIP_BUILD_WITH_GN),y)
+ifneq ($(CHIP_BUILD_WITH_CMAKE),y)
 COMPONENT_ADD_INCLUDEDIRS +=   $(REL_OUTPUT_DIR)/src/include \
                                $(REL_CHIP_ROOT)/third_party/nlassert/repo/include \
                                $(REL_OUTPUT_DIR)/gen/third_party/connectedhomeip/src/app/include \
                                $(REL_OUTPUT_DIR)/gen/include
-else # CHIP_BUILD_WITH_GN == y
+else # CHIP_BUILD_WITH_CMAKE == y
 COMPONENT_ADD_LDFLAGS +=       -lInetLayer \
                                -lSystemLayer \
                                -lDeviceLayer \
@@ -165,7 +165,7 @@ COMPONENT_ADD_LDFLAGS +=       -lInetLayer \
 ifneq (,$(findstring CHIP_SUPPORT_FOREIGN_TEST_DRIVERS,$(CXXFLAGS)))
 COMPONENT_ADD_LDFLAGS       += -lnlfaultinjection
 endif
-endif # CHIP_BUILD_WITH_GN == y
+endif # CHIP_BUILD_WITH_CMAKE == y
 
 # Tell the ESP-IDF build system that the CHIP component defines its own build
 # and clean targets.
@@ -228,7 +228,7 @@ install-chip-with-automake: configure-chip
 	echo "INSTALL CHIP..."
 	MAKEFLAGS= make -C $(OUTPUT_DIR) --no-print-directory install
 
-ifeq ($(CHIP_BUILD_WITH_GN),y)
+ifneq ($(CHIP_BUILD_WITH_CMAKE),y)
 install-chip: install-chip-with-gn
 SHELL=/bin/bash
 else
