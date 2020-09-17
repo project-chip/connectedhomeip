@@ -312,6 +312,8 @@ void SecureSessionMgrBase::ExpiryTimerCallback(System::Layer * layer, void * par
 {
     SecureSessionMgrBase * mgr = reinterpret_cast<SecureSessionMgrBase *>(param);
 #if CHIP_CONFIG_SESSION_REKEYING
+    // TODO(#2279): session expiration is currently disabled until rekeying is supported
+    // the #ifdef should be removed after that.
     mgr->mPeerConnections.ExpireInactiveConnections(CHIP_PEER_CONNECTION_TIMEOUT_MS);
 #endif
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
