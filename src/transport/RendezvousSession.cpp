@@ -183,6 +183,7 @@ void RendezvousSession::OnRendezvousConnectionClosed()
 
     if (!mParams.HasDiscriminator())
     {
+        mSecureSession.Reset();
         CHIP_ERROR err = WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
         VerifyOrExit(err == CHIP_NO_ERROR, OnPairingError(err));
     }
