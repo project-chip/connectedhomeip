@@ -21,7 +21,7 @@ Make sure that JAVA_HOME is set to the correct path.
 ABIs that can be used as target_cpu
 
 | ABI         | target_cpu |
-| ----------- | -----------|
+| ----------- | ---------- |
 | armeabi-v7a | arm        |
 | arm64-v8a   | arm64      |
 | x86         | x86        |
@@ -31,24 +31,24 @@ ABIs that can be used as target_cpu
 
 2. In commandline / Terminal, 'cd' into the top CHIP directory and run
 
-   ```shell
-   source scripts/activate.sh
-   gn gen out/android_arm64 --args="is_clang=true target_os=\"android\" target_cpu=\"arm64\" android_ndk_root=\"${ANDROID_NDK_HOME}\" android_sdk_root=\"${ANDROID_HOME}\""
-   ninja -C out/android_arm64 src/setup_payload/java src/controller/java
-   ```
+    ```shell
+    source scripts/activate.sh
+    gn gen out/android_arm64 --args="is_clang=true target_os=\"android\" target_cpu=\"arm64\" android_ndk_root=\"${ANDROID_NDK_HOME}\" android_sdk_root=\"${ANDROID_HOME}\""
+    ninja -C out/android_arm64 src/setup_payload/java src/controller/java
+    ```
 
-   See table above for other values of `target_cpu`.
+    See table above for other values of `target_cpu`.
 
-9. You should see the generated SetupPayloadParser.jar under
+3. You should see the generated SetupPayloadParser.jar under
    `out/android_arm64/lib` and libSetupPayloadParser.so under
    `out/android_arm64/lib/jni/arm64-v8a` in the output directory.
 
-10. Copy the .jar and .so files into the Android project:
+4. Copy the .jar and .so files into the Android project:
 
-   ```shell
-   rsync -a out/android_arm64/lib/*.jar src/android/CHIPTool/app/libs
-   rsync -a out/android_arm64/lib/jni/* src/android/CHIPTool/app/src/main/jniLibs
-   ```
+```shell
+rsync -a out/android_arm64/lib/*.jar src/android/CHIPTool/app/libs
+rsync -a out/android_arm64/lib/jni/* src/android/CHIPTool/app/src/main/jniLibs
+```
 
 'Gradle sync' the Android project and run.
 
