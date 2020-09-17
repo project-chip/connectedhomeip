@@ -35,7 +35,10 @@ function happytest_bootstrap() {
     cd "$REPO_DIR/third_party/happy/repo"
 
     # Override happy log dir config.
-    python3 -c 'import json, os; file = open("happy/conf/main_config.json"); data = json.load(file); data["log_directory"] = os.environ["HAPPY_LOG_DIR"]; out = open("happy/conf/main_config.json", "w"); json.dump(data, out);'
+    python3 -c 'import json, os; file = open("happy/conf/main_config.json"); data = json.load(file); data["log_directory"] = os.environ["HAPPY_LOG_DIR"]; data["default_happy_log_dir"] = os.environ["HAPPY_LOG_DIR"]; out = open("happy/conf/main_config.json", "w"); json.dump(data, out);'
+
+    echo "Happy Main Config"
+    cat happy/conf/main_config.json
 
     apt-get update
     apt-get install -y bridge-utils \
