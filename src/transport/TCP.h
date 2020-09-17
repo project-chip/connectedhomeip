@@ -146,7 +146,7 @@ public:
     bool HasActiveConnections() const;
 
     /**
-     * Close all active connetions
+     * Close all active connections.
      */
     void CloseActiveConnections();
 
@@ -162,6 +162,9 @@ private:
      *
      * @param addr - what peer to connect to
      * @param msg - what buffer to send once a connection has been established.
+     *
+     * Ownership of msg is taken over and will be freed at some unspecified time
+     * in the future (once connection succeeds/fails).
      */
     CHIP_ERROR SendAfterConnect(const PeerAddress & addr, System::PacketBuffer * msg);
 
