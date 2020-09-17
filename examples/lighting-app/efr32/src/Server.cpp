@@ -62,7 +62,7 @@ using namespace ::chip::DeviceLayer;
 namespace {
 
 #ifndef EXAMPLE_SERVER_NODEID
-// Use this hardcoded NODEID for the lock app example if none was provided
+// Use this hardcoded NODEID for the lighting app example if none was provided
 #define EXAMPLE_SERVER_NODEID 0x3546526e
 #endif // EXAMPLE_SERVER_NODEID
 
@@ -127,6 +127,7 @@ private:
             System::PacketBuffer::Free(buffer);
             return;
         }
+
         uint8_t * message;
         uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
         ret                 = emberAfProcessMessage(&frame,
@@ -220,7 +221,7 @@ void StartServer(DemoSessionManager * sessions)
                          UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
     SuccessOrExit(err);
 
-    err = sessions->NewPairing(peer, &gTestPairing);
+    err = sessions->NewPairing(Optional<NodeId>::Value(kUndefinedNodeId), peer, 0, 0, &gTestPairing);
     SuccessOrExit(err);
 
     sessions->SetDelegate(&gCallbacks);
@@ -232,6 +233,6 @@ exit:
     }
     else
     {
-        EFR32_LOG("Lock Server Listening...");
+        EFR32_LOG("Lighting Server Listening...");
     }
 }

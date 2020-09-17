@@ -124,7 +124,7 @@ int main(void)
     THREADING_setup();
 
     EFR32_LOG("==================================================");
-    EFR32_LOG("chip-efr32-lock-example starting");
+    EFR32_LOG("chip-efr32-lighting-example starting");
     EFR32_LOG("==================================================");
 
     EFR32_LOG("Init CHIP Stack");

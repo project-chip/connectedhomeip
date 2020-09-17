@@ -23,8 +23,8 @@
 #include <system/SystemPacketBuffer.h>
 
 #include "AppConfig.h"
-#include "BoltLockManager.h"
 #include "DataModelHandler.h"
+#include "LightingManager.h"
 
 #include "af-types.h"
 #include "gen/attribute-id.h"
@@ -50,10 +50,10 @@ extern "C" void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClus
 
     if (*value)
     {
-        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::LOCK_ACTION);
+        LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::ON_ACTION);
     }
     else
     {
-        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::UNLOCK_ACTION);
+        LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::OFF_ACTION);
     }
 }

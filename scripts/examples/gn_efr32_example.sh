@@ -35,11 +35,5 @@ else
     ninja -v -C "$2/$3"
 fi
 
-# Post build step since Pigweed doesn't seems to support objcopy yet.
-if [ -z "$3" ]; then
-    arm-none-eabi-objcopy -O srec ./"$2"/"$EFR32_BOARD"/chip-efr32-lock-example.out ./"$2"/"$EFR32_BOARD"/chip-efr32-lock-example.s37
-    arm-none-eabi-size ./"$2"/"$EFR32_BOARD"/chip-efr32-lock-example.s37
-else
-    arm-none-eabi-objcopy -O srec ./"$2"/"$3"/chip-efr32-lock-example.out ./"$2"/"$3"/chip-efr32-lock-example.s37
-    arm-none-eabi-size ./"$2"/"$3"/chip-efr32-lock-example.s37
-fi
+#get size of the .s37 binary file generated
+arm-none-eabi-size "$(find ./"$2"/"$3" -type f -name "*.s37")"

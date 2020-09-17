@@ -4,7 +4,7 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
 
 <hr>
 
--   [CHIP EFR32 Lock Example](#chip-efr32-lock-example)
+-   [CHIP EFR32 Lighting Example](#chip-efr32-lighting-example)
     -   [Introduction](#introduction)
     -   [Building](#building)
         -   [Note](#note)
@@ -19,13 +19,13 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
 
 ## Introduction
 
-The EFR32 lock example provides a baseline demonstration of a door lock device,
-built using CHIP and the Silicon Labs gecko SDK. The example currently support
-OpenThread. The BLE feature is still a work in progress.
+The EFR32 lighting example provides a baseline demonstration of a Light control
+device, built using CHIP and the Silicon Labs gecko SDK. The example currently
+support OpenThread. The BLE feature is still a work in progress.
 
-The lock example is intended to serve both as a means to explore the workings of
-CHIP as well as a template for creating real products based on the Silicon Labs
-platform.
+The lighting example is intended to serve both as a means to explore the
+workings of CHIP as well as a template for creating real products based on the
+Silicon Labs platform.
 
 <a name="building"></a>
 
@@ -34,9 +34,8 @@ platform.
 ### Note
 
 A consensus within the CHIP organization was reached to move from Make/Automake
-to the GN/Ninja build system. As a result we are no longer supporting Make
-inside the lock-app example. While the Makefile can stil be used to compile the
-example, the output binary will be lacking key features (e.g. OpenThread).
+to the GN/Ninja build system. As a result, the Make file structure as not been
+implemented inside the lighting-app example.
 
 -   Download the [sdk_support](https://github.com/SiliconLabs/sdk_support) from
     GitHub and export the path with :
@@ -91,22 +90,13 @@ example, the output binary will be lacking key features (e.g. OpenThread).
               $ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
               $ export EFR32_BOARD=BRD4161A
               <From CHIP root>
-              $ ./scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/ out/lock_app_debug
-
-    -   With Make _deprecated_
-
-             $ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
-             $ make BOARD=BRD4161A
+              $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/lighting_app_debug
 
 -   To delete generated executable, libraries and object files use:
 
     -   With Ninja
 
-            $ rm -rf ./out/lock_app_debug
-
-    -   With Make _deprecated_
-
-             $ make BOARD=BRD4161A clean
+            $ rm -rf ./out/lighting_app_debug
 
 <a name="flashing"></a>
 
@@ -116,22 +106,7 @@ example, the output binary will be lacking key features (e.g. OpenThread).
 
     -   From CHIP root,
 
-              $ python out/lock_app_debug/BRD4161A/chip-efr32-lock-example.flash.py
-
--   With Make (_deprecated_)
-
-    -   To rebuild the image and flash the example app:
-
-            $ make BOARD=BRD4161A flash
-
-    -   To rebuild the image and flash a specific device using its serial
-        number:
-
-            $ make BOARD=BRD4161A SERIALNO=440113717 flash
-
-    -   To flash an existing image without rebuilding:
-
-            $ make BOARD=BRD4161A flash-app
+              $ python out/lock_app_debug/BRD4161A/chip-efr32-lighting-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
 
@@ -196,7 +171,7 @@ combination with JLinkRTTClient as follows:
     under File->New->Project Wizard->Examples->Thread : ot-rcp
 -   Once said connectection is established (you can verify that with the command
     `router table` using a serial terminal (screen / minicom etc.) on the board
-    running the lock-app example)
+    running the lighting-app example)
 -   Using chip-tool you can now control the lock status with on/off command such
     as `chip-tool on <ipv6 address of the node> 11095 1`
 

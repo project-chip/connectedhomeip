@@ -39,15 +39,7 @@ static void LCDFillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h);
 
 void initLCD(void)
 {
-
     EMSTATUS status;
-
-    /* Initialize the display module. */
-    status = DISPLAY_Init();
-    if (DISPLAY_EMSTATUS_OK != status)
-    {
-        EFR32_LOG("Display init failed %d", status);
-    }
 
     /* Initialize the DMD module for the DISPLAY device driver. */
     status = DMD_init(0);

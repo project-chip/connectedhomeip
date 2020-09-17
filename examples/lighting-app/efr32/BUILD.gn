@@ -20,7 +20,7 @@ import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 assert(current_os == "freertos")
 
-efr32_project_dir = "${chip_root}/examples/lock-app/efr32"
+efr32_project_dir = "${chip_root}/examples/lighting-app/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/efr32"
 
 show_qr_code = true
@@ -34,8 +34,8 @@ if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
 efr32_sdk("sdk") {
   include_dirs = [
     "${chip_root}/src/platform/EFR32",
-    "${efr32_project_dir}/include/",
-    "${efr32_project_dir}/src/",
+    "${efr32_project_dir}/include",
+    "${efr32_project_dir}/src",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}",
   ]
 
@@ -55,10 +55,10 @@ efr32_sdk("sdk") {
   defines += [ "BOARD_ID=${efr32_board}" ]
 }
 
-efr32_executable("lock_app") {
+efr32_executable("lighting_app") {
   include_dirs = []
   defines = []
-  output_name = "chip-efr32-lock-example.out"
+  output_name = "chip-efr32-lighting-example.out"
 
   public_deps = [
     ":sdk",
@@ -97,10 +97,10 @@ efr32_executable("lock_app") {
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
     "${examples_plat_dir}/init_otSystem.c",
     "src/AppTask.cpp",
-    "src/BoltLockManager.cpp",
     "src/ButtonHandler.cpp",
     "src/DataModelHandler.cpp",
     "src/LEDWidget.cpp",
+    "src/LightingManager.cpp",
     "src/Server.cpp",
     "src/gen/call-command-handler.c",
     "src/gen/callback-stub.c",
@@ -116,16 +116,16 @@ efr32_executable("lock_app") {
   output_dir = root_out_dir
 
   if (efr32_family == "efr32mg12") {
-    ldscript = "${efr32_project_dir}/ldscripts/efr32-lock-example-MG12P.ld"
+    ldscript = "${efr32_project_dir}/ldscripts/efr32-light-example-MG12P.ld"
   } else if (efr32_family == "efr32mg21") {
-    ldscript = "${efr32_project_dir}/ldscripts/efr32-lock-example-MG21.ld"
+    ldscript = "${efr32_project_dir}/ldscripts/efr32-light-example-MG21.ld"
   }
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
 }
 
 group("efr32") {
-  deps = [ ":lock_app" ]
+  deps = [ ":lighting_app" ]
 }
 
 group("default") {

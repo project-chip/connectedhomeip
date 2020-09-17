@@ -20,7 +20,7 @@
 #ifndef APP_CONFIG_H
 #define APP_CONFIG_H
 
-// ---- Lock Example App Config ----
+// ---- Lighting Example App Config ----
 
 // EFR32 WSTK Buttons
 #define PB0 0
@@ -30,7 +30,7 @@
 #define BSP_LED_0 0
 #define BSP_LED_1 1
 
-#define APP_LOCK_BUTTON PB1
+#define APP_LIGHT_SWITCH PB1
 #define APP_FUNCTION_BUTTON PB0
 #define APP_BUTTON_DEBOUNCE_PERIOD_MS 50
 
@@ -38,13 +38,13 @@
 #define APP_BUTTON_RELEASED 1
 
 #define SYSTEM_STATE_LED BSP_LED_0
-#define LOCK_STATE_LED BSP_LED_1
+#define LIGHT_LED BSP_LED_1
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.
-#define ACTUATOR_MOVEMENT_PERIOS_MS 2000
+#define ACTUATOR_MOVEMENT_PERIOS_MS 10
 
-// ---- Lock Example SWU Config ----
+// ---- Light Example SWU Config ----
 #define SWU_INTERVAl_WINDOW_MIN_MS (23 * 60 * 60 * 1000) // 23 hours
 #define SWU_INTERVAl_WINDOW_MAX_MS (24 * 60 * 60 * 1000) // 24 hours
 
