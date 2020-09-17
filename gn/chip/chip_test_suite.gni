@@ -30,6 +30,8 @@ template("chip_test_suite") {
                              "tests",
                              "c_tests",
                            ])
+
+    output_dir = "${root_out_dir}/lib"
   }
 
   tests = []
