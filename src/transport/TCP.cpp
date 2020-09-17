@@ -518,6 +518,7 @@ void TCPBase::OnConnectionClosed(Inet::TCPEndPoint * endPoint, INET_ERROR err)
             ChipLogProgress(Inet, "Freeing closed connection.");
             tcp->mActiveConnections[i]->Free();
             tcp->mActiveConnections[i] = nullptr;
+            tcp->mUsedEndPointCount--;
         }
     }
 }
