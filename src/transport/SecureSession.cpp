@@ -69,12 +69,11 @@ exit:
     return error;
 }
 
-CHIP_ERROR SecureSession::Init(const Crypto::ECPKey & remote_public_key, const Crypto::ECPKey & local_private_key,
+CHIP_ERROR SecureSession::Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
                                const uint8_t * salt, const size_t salt_length, const uint8_t * info, const size_t info_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    uint8_t secret[kMax_ECDH_Secret_Length];
-    size_t secret_size = sizeof(secret);
+    P256ECDHDerivedSecret secret;
 
     VerifyOrExit(mKeyAvailable == false, error = CHIP_ERROR_INCORRECT_STATE);
     if (salt_length > 0)
@@ -85,10 +84,10 @@ CHIP_ERROR SecureSession::Init(const Crypto::ECPKey & remote_public_key, const C
     VerifyOrExit(info_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(info != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = ECDH_derive_secret(remote_public_key, local_private_key, secret, secret_size);
+    error = local_keypair.ECDH_derive_secret(remote_public_key, secret);
     SuccessOrExit(error);
 
-    error = InitFromSecret(secret, secret_size, salt, salt_length, info, info_length);
+    error = InitFromSecret(secret, secret.Length(), salt, salt_length, info, info_length);
 
 exit:
     return error;
