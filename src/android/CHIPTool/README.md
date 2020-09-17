@@ -31,7 +31,7 @@ ABIs and corresponding values for `target_cpu`
 
     ```shell
     source scripts/activate.sh
-    gn gen out/android_arm64 --args="is_clang=true target_os=\"android\" target_cpu=\"arm64\" android_ndk_root=\"${ANDROID_NDK_HOME}\" android_sdk_root=\"${ANDROID_HOME}\""
+    gn gen out/android_arm64 --args="target_os=\"android\" target_cpu=\"arm64\" android_ndk_root=\"${ANDROID_NDK_HOME}\" android_sdk_root=\"${ANDROID_HOME}\""
     ninja -C out/android_arm64 src/setup_payload/java src/controller/java
     ```
 
