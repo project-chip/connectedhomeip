@@ -100,8 +100,7 @@ public:
     bool operator==(const PeerAddress & other) const
     {
         return (mTransportType == other.mTransportType) && (mIPAddress == other.mIPAddress) && (mPort == other.mPort) &&
-            ((mInterface == INET_NULL_INTERFACEID) || (other.mInterface == INET_NULL_INTERFACEID) ||
-             (mInterface == other.mInterface));
+            (mInterface == other.mInterface);
     }
 
     bool operator!=(const PeerAddress & other) const { return !(*this == other); }
