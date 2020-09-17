@@ -10,20 +10,20 @@ cd "$CUR_DIR"
 [ ! -d build/ ] && ./repo/script/bootstrap.sh
 
 mkdir -p build && cd build
-cmake -GNinja                                                                               \
+cmake -GNinja \
     -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_HOME"/build/cmake/android.toolchain.cmake \
-    -DANDROID_ABI="$ABI"                                                                  \
-    -DANDROID_ARM_NEON=ON                                                                   \
-    -DANDROID_NATIVE_API_LEVEL="$API"                                                     \
-    -DBUILD_SHARED_LIBS=ON                                                                  \
-    -DCMAKE_CXX_STANDARD=11                                                                 \
-    -DCMAKE_CXX_STANDARD_REQUIRED=ON                                                        \
-    -DCMAKE_BUILD_TYPE=Release                                                              \
-    -DOT_COMM_ANDROID=ON                                                                    \
-    -DOT_COMM_JAVA_BINDING=ON                                                               \
-    -DOT_COMM_APP=OFF                                                                       \
-    -DOT_COMM_TEST=OFF                                                                      \
-    -DOT_COMM_CCM=OFF                                                                \
+    -DANDROID_ABI="$ABI" \
+    -DANDROID_ARM_NEON=ON \
+    -DANDROID_NATIVE_API_LEVEL="$API" \
+    -DBUILD_SHARED_LIBS=ON \
+    -DCMAKE_CXX_STANDARD=11 \
+    -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DOT_COMM_ANDROID=ON \
+    -DOT_COMM_JAVA_BINDING=ON \
+    -DOT_COMM_APP=OFF \
+    -DOT_COMM_TEST=OFF \
+    -DOT_COMM_CCM=OFF \
     ../repo
 
 ninja
