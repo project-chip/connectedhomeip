@@ -64,8 +64,8 @@ install_graphviz() {
 install_doxygen
 install_graphviz
 
-cd "${CHIP_ROOT}" || exit 1
+cd "$CHIP_ROOT" || exit 1
 
-CHIP_NAME=${CHIP_NAME} CHIP_VERSION=${CHIP_VERSION} doxygen docs/Doxyfile || die "doxygen failed"
+CHIP_NAME=$CHIP_NAME CHIP_VERSION=$CHIP_VERSION doxygen docs/Doxyfile || die "doxygen failed"
 
 exit 0
