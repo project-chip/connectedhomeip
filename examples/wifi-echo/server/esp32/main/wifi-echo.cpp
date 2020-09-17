@@ -79,11 +79,6 @@ extern void startClient(void);
 
 #endif // !CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
-// A temporary value assigned for this example's QRCode
-// Spells CHIP on a dialer
-#define EXAMPLE_VENDOR_ID 2447
-// Spells ESP32 on a dialer
-#define EXAMPLE_PRODUCT_ID 37732
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
@@ -370,7 +365,7 @@ std::string createSetupPayload()
     err = ConfigurationMgr().GetSetupDiscriminator(discriminator);
     if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "Couldn't get discriminator: %d", err);
+        ESP_LOGE(TAG, "Couldn't get discriminator: %s", ErrorStr(err));
         return result;
     }
 
@@ -378,7 +373,23 @@ std::string createSetupPayload()
     err = ConfigurationMgr().GetSetupPinCode(setupPINCode);
     if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "Couldn't get setupPINCode: %d", err);
+        ESP_LOGE(TAG, "Couldn't get setupPINCode: %s", ErrorStr(err));
+        return result;
+    }
+
+    uint16_t vendorId;
+    err = ConfigurationMgr().GetVendorId(vendorId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Couldn't get vendorId: %s", ErrorStr(err));
+        return result;
+    }
+
+    uint16_t productId;
+    err = ConfigurationMgr().GetProductId(productId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Couldn't get productId: %s", ErrorStr(err));
         return result;
     }
 
@@ -387,8 +398,8 @@ std::string createSetupPayload()
     payload.discriminator         = discriminator;
     payload.setUpPINCode          = setupPINCode;
     payload.rendezvousInformation = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
-    payload.vendorID              = EXAMPLE_VENDOR_ID;
-    payload.productID             = EXAMPLE_PRODUCT_ID;
+    payload.vendorID              = vendorId;
+    payload.productID             = productId;
 
     if (!isRendezvousBLE())
     {
