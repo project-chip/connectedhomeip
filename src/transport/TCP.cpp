@@ -479,16 +479,27 @@ void TCPBase::OnConnectionComplete(Inet::TCPEndPoint * endPoint, INET_ERROR inet
     {
         ChipLogError(Inet, "Connection complete encountered an error: %s", ErrorStr(err));
         endPoint->Free();
+        tcp->mUsedEndPointCount--;
     }
     else
     {
+        bool connectionStored = false;
         for (size_t i = 0; i < tcp->mActiveConnectionsSize; i++)
         {
             if (tcp->mActiveConnections[i] == nullptr)
             {
                 tcp->mActiveConnections[i] = endPoint;
+                connectionStored           = true;
                 break;
             }
+        }
+
+        // since we track end points counts, we always expect to store the
+        // connection.
+        if (!connectionStored)
+        {
+            endPoint->Free();
+            ChipLogError(Inet, "Internal logic error: insufficient space to store active connection");
         }
     }
 }
