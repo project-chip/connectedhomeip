@@ -19,7 +19,9 @@
 
 /**
  *    @file
- *      This file implements the CHIP Connection object that maintains a TCP connection.
+ *      This file implements the CHIP Transport object that maintains TCP connections
+ *      to peers. Handles both establishing new connections and accepting peer connection
+ *      requests.
  */
 #include <transport/TCP.h>
 
@@ -449,6 +451,10 @@ void TCPBase::OnConnectionComplete(Inet::TCPEndPoint * endPoint, INET_ERROR inet
         if ((inetErr == CHIP_NO_ERROR) && (err == CHIP_NO_ERROR))
         {
             err = endPoint->Send(tcp->mPendingPackets[i].packetBuffer);
+        }
+        else
+        {
+            System::PacketBuffer::Free(tcp->mPendingPackets[i].packetBuffer);
         }
 
         tcp->mPendingPackets[i].packetBuffer = nullptr;
