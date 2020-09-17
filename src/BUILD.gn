@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/gn/chip/tests.gni")
+import("${chip_root}/src/lwip/lwip.gni")
 
 config("includes") {
   include_dirs = [
@@ -46,11 +47,12 @@ if (chip_build_tests) {
       "${chip_root}/src/transport/tests",
     ]
 
+    if (chip_with_lwip) {
+      deps += [ "${chip_root}/src/lwip/tests" ]
+    }
+
     if (current_os != "zephyr") {
-      deps += [
-        "${chip_root}/src/lib/shell/tests",
-        "${chip_root}/src/lwip/tests",
-      ]
+      deps += [ "${chip_root}/src/lib/shell/tests" ]
     }
   }
 }
