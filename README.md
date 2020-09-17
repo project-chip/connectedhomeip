@@ -1,4 +1,4 @@
-# Connected Home over IP
+# Connected Home over IP {#mainpage}
 
 ![Main](https://github.com/project-chip/connectedhomeip/workflows/Builds/badge.svg)
 ![Examples](https://github.com/project-chip/connectedhomeip/workflows/Examples/badge.svg)
@@ -138,12 +138,12 @@ scalability.
 
 We welcome your contributions to Project Connected Home over IP. Read our
 contribution guidelines
-[here](https://github.com/project-chip/connectedhomeip/blob/master/CONTRIBUTING.md).
+[here](./CONTRIBUTING.md).
 
 # Building and Developing in Project
 
 Instructions about how to build Project Connected Home over IP can be found
-[here](./docs/README.md#building-and-developing).
+[here](./docs/README.md).
 
 # Directory Structure
 
@@ -155,9 +155,9 @@ The Connected Home over IP repository is structured as follows:
 | `bootstrap`            | GNU autotools bootstrap script for the Project CHIP build system                                                     |
 | `bootstrap-configure`  | Convenience script that will bootstrap the Project CHIP build system, via `bootstrap`, and invoke `configure`        |
 | `build/`               | Build system support content and build output directories                                                            |
-| `BUILDING.md`          | More detailed information on configuring and building Project CHIP for different targets                             |
+| [BUILDING.md](./docs/BUILDING.md)          | More detailed information on configuring and building Project CHIP for different targets                             |
 | `CODE_OF_CONDUCT.md`   | Code of Conduct for Project CHIP, and contributions to it                                                            |
-| `CONTRIBUTING.md`      | Guidelines for contributing to Project CHIP                                                                          |
+| [CONTRIBUTING.md](./CONTRIBUTING.md)      | Guidelines for contributing to Project CHIP                                                                          |
 | `CONTRIBUTORS.md`      | Contributors to Project CHIP                                                                                         |
 | `docs/`                | Documentation                                                                                                        |
 | `examples/`            | Example firmware applications that demonstrate use of Project CHIP technology                                        |
