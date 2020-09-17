@@ -121,7 +121,7 @@ CHIP_ERROR TCPBase::Init(TcpListenParameters & params)
     mListenSocket->OnDataReceived       = OnTcpReceive;
     mListenSocket->OnConnectComplete    = OnConnectionComplete;
     mListenSocket->OnConnectionClosed   = OnConnectionClosed;
-    mListenSocket->OnConnectionReceived = OnConnectionRecevied;
+    mListenSocket->OnConnectionReceived = OnConnectionReceived;
     mListenSocket->OnAcceptError        = OnAcceptError;
     mEndpointType                       = params.GetAddressType();
 
@@ -282,7 +282,7 @@ CHIP_ERROR TCPBase::SendAfterConnect(const PeerAddress & addr, System::PacketBuf
     endPoint->OnDataReceived       = OnTcpReceive;
     endPoint->OnConnectComplete    = OnConnectionComplete;
     endPoint->OnConnectionClosed   = OnConnectionClosed;
-    endPoint->OnConnectionReceived = OnConnectionRecevied;
+    endPoint->OnConnectionReceived = OnConnectionReceived;
     endPoint->OnAcceptError        = OnAcceptError;
     endPoint->OnPeerClose          = OnPeerClosed;
 
@@ -504,7 +504,7 @@ void TCPBase::OnConnectionClosed(Inet::TCPEndPoint * endPoint, INET_ERROR err)
     }
 }
 
-void TCPBase::OnConnectionRecevied(Inet::TCPEndPoint * listenEndPoint, Inet::TCPEndPoint * endPoint, const IPAddress & peerAddress,
+void TCPBase::OnConnectionReceived(Inet::TCPEndPoint * listenEndPoint, Inet::TCPEndPoint * endPoint, const IPAddress & peerAddress,
                                    uint16_t peerPort)
 {
     TCPBase * tcp = reinterpret_cast<TCPBase *>(listenEndPoint->AppState);
@@ -525,7 +525,7 @@ void TCPBase::OnConnectionRecevied(Inet::TCPEndPoint * listenEndPoint, Inet::TCP
         endPoint->OnDataReceived       = OnTcpReceive;
         endPoint->OnConnectComplete    = OnConnectionComplete;
         endPoint->OnConnectionClosed   = OnConnectionClosed;
-        endPoint->OnConnectionReceived = OnConnectionRecevied;
+        endPoint->OnConnectionReceived = OnConnectionReceived;
         endPoint->OnAcceptError        = OnAcceptError;
         endPoint->OnPeerClose          = OnPeerClosed;
     }

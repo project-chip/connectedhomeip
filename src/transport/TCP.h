@@ -197,7 +197,7 @@ private:
     static void OnPeerClosed(Inet::TCPEndPoint * endPoint);
 
     // Callback handler for TCPEndPoint. Called when a connection is received on the listening port.
-    static void OnConnectionRecevied(Inet::TCPEndPoint * listenEndPoint, Inet::TCPEndPoint * endPoint,
+    static void OnConnectionReceived(Inet::TCPEndPoint * listenEndPoint, Inet::TCPEndPoint * endPoint,
                                      const IPAddress & peerAddress, uint16_t peerPort);
 
     // Called on accept error
