@@ -59,7 +59,6 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
     if (chip_build_tests) {
       deps += [ "//src:tests" ]
-      deps += [ "//src:standalone_tests" ]
     }
 
     if (chip_build_tools) {
