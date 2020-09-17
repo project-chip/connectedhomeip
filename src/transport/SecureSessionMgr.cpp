@@ -304,6 +304,8 @@ void SecureSessionMgrBase::HandleConnectionExpired(const Transport::PeerConnecti
     state.GetPeerAddress().ToString(addr, sizeof(addr));
 
     ChipLogProgress(Inet, "Connection from '%s' expired", addr);
+
+    mgr->mTransport->Disconnect(state.GetPeerAddress());
 }
 
 void SecureSessionMgrBase::ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error)
