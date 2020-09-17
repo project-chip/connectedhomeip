@@ -19,7 +19,7 @@
 /**
  *    @file
  *      This file defines the CHIP Connection object that maintains TCP connections.
- *      It binds to any avaiable local addr and port and begins listening.
+ *      It binds to any available local addr and port and begins listening.
  */
 
 #ifndef __TCPTRANSPORT_H__
