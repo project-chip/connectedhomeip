@@ -28,9 +28,10 @@
 #endif
 
 #include <core/CHIPError.h>
+#include <support/CodeUtils.h>
+
 #include <stddef.h>
 #include <string.h>
-#include <support/CodeUtils.h>
 
 namespace chip {
 namespace Crypto {
