@@ -96,6 +96,7 @@ void TCPBase::CloseActiveConnections()
         {
             mActiveConnections[i]->Free();
             mActiveConnections[i] = nullptr;
+            mUsedEndPointCount--;
         }
     }
 }
