@@ -127,18 +127,28 @@ exit:
 
 CHIP_ERROR BLE::SendMessage(const MessageHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgBuf)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    const size_t headerSize = header.EncodeSizeBytes();
+    size_t actualEncodedHeaderSize;
 
     VerifyOrExit(address.GetTransportType() == Type::kBle, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mBleEndPoint != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
+
+    msgBuf->SetStart(msgBuf->Start() - headerSize);
+
+    err = header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize);
+    SuccessOrExit(err);
+
+    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
     err    = mBleEndPoint->Send(msgBuf);
     msgBuf = nullptr;
     SuccessOrExit(err);
 
 exit:
-    if (msgBuf != NULL)
+    if (msgBuf != nullptr)
     {
         System::PacketBuffer::Free(msgBuf);
         msgBuf = nullptr;
