@@ -7,9 +7,7 @@ a CHIP device
 -   Connection to the chip device's soft AP will be a manual step until pairing
     is implemented.
 
-===========================================
-
-Steps to build CHIP for Android apps
+# Steps to build CHIP for Android apps
 
 Pre-conditions: Have Android SDK & NDK downloaded to your machine. Set the
 \$ANDROID_HOME environment variable to where the SDK is downloaded and the
@@ -18,7 +16,7 @@ downloaded.
 
 Make sure that JAVA_HOME is set to the correct path.
 
-ABIs that can be used as target_cpu
+ABIs and corresponding values for `target_cpu`
 
 | ABI         | target_cpu |
 | ----------- | ---------- |
