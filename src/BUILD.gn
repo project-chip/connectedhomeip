@@ -55,12 +55,6 @@ if (chip_build_tests) {
   }
 
   if (current_os != "zephyr") {
-    group("standalone_tests") {
-      deps = [
-        "${chip_root}/src/inet/tests:standalone_tests",
-      ]
-    }
-
     group("happy_tests") {
       deps = [
         "${chip_root}/src/test_driver/happy/tests/standalone/inet:inet_tests"
