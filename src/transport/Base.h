@@ -61,7 +61,7 @@ public:
     /**
      * @brief Send a message to the specified target.
      *
-     * On connection-oriented transports, sending a message implies connecting to it first.
+     * On connection-oriented transports, sending a message implies connecting to the target first.
      *
      * @details
      *   This method calls <tt>chip::System::PacketBuffer::Free</tt> on
@@ -92,6 +92,10 @@ protected:
         {
             OnMessageReceived(header, source, buffer, mMessageReceivedArgument);
         }
+        else
+        {
+            System::PacketBuffer::Free(buffer);
+        }
     }
 
     /**
@@ -99,6 +103,8 @@ protected:
      * Chip connection.
      *
      * @param[in]    msgBuf        A pointer to the PacketBuffer object holding the message.
+     *
+     * Callback *MUST* free msgBuf as a result of handling.
      */
     typedef void (*MessageReceiveHandler)(const MessageHeader & header, const PeerAddress & source, System::PacketBuffer * msgBuf,
                                           void * param);

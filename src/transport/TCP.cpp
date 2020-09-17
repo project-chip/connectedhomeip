@@ -327,6 +327,11 @@ CHIP_ERROR TCPBase::ProcessSingleMessageFromBufferHead(const PeerAddress & peerA
     SuccessOrExit(err);
 
     buffer->ConsumeHead(headerSize);
+
+    // message receive handler will attempt to free the buffer, however as the buffer may
+    // contain additional data, we retain it to prevent actual free
+    buffer->AddRef();
+
     HandleMessageReceived(header, peerAddress, buffer);
 
 exit:

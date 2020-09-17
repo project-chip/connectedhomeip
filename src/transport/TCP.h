@@ -184,19 +184,19 @@ private:
     CHIP_ERROR ProcessSingleMessageFromBufferHead(const PeerAddress & peerAddress, System::PacketBuffer * buffer,
                                                   uint16_t messageSize);
 
-    // TCP message receive handler.
+    // Callback handler for TCPEndPoint. TCP message receive handler.
     static void OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer);
 
-    // Called when a connection has been completed
+    // Callback handler for TCPEndPoint. Called when a connection has been completed.
     static void OnConnectionComplete(Inet::TCPEndPoint * endPoint, INET_ERROR err);
 
-    // Called when a connection has been closed
+    // Callback handler for TCPEndPoint. Called when a connection has been closed.
     static void OnConnectionClosed(Inet::TCPEndPoint * endPoint, INET_ERROR err);
 
-    // Callend when a peer closes the connection
+    // Callback handler for TCPEndPoint. Callend when a peer closes the connection.
     static void OnPeerClosed(Inet::TCPEndPoint * endPoint);
 
-    // Called when a connection is received on the listening port
+    // Callback handler for TCPEndPoint. Called when a connection is received on the listening port.
     static void OnConnectionRecevied(Inet::TCPEndPoint * listenEndPoint, Inet::TCPEndPoint * endPoint,
                                      const IPAddress & peerAddress, uint16_t peerPort);
 

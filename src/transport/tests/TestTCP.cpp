@@ -67,6 +67,8 @@ void MessageReceiveHandler(MessageHeader & header, const Transport::PeerAddress 
     int compare     = memcmp(msgBuf->Start(), PAYLOAD, data_len);
     NL_TEST_ASSERT(inSuite, compare == 0);
 
+    System::PacketBuffer::Free(msgBuf);
+
     ReceiveHandlerCallCount++;
 }
 
@@ -124,8 +126,8 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     err = tcp.SendMessage(header, Transport::PeerAddress::TCP(addr), buffer);
     if (err == System::MapErrorPOSIX(EADDRNOTAVAIL))
     {
-        // TODO: the underlying system does not support IPV6. This early return should
-        // be removed and error should be made fatal.
+        // TODO(#2698): the underlying system does not support IPV6. This early return
+        // should be removed and error should be made fatal.
         printf("%s:%u: System does NOT support IPV6.\n", __FILE__, __LINE__);
         return;
     }
