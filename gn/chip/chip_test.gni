@@ -35,7 +35,6 @@ if (chip_link_tests) {
       output_dir = _test_output_dir
     }
 
-    # Only execute tests when current_os == host_os
     pw_python_script(_test_name + "_run") {
       deps = [ ":${_test_name}" ]
       inputs = [ pw_unit_test_AUTOMATIC_RUNNER ]
