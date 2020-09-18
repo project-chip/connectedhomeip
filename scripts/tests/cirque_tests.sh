@@ -87,7 +87,6 @@ function cirquetest_bootstrap() {
     # Call activate here so the later tests can be faster
     # set -e will cause error if activate.sh is sourced twice
     # this is an expected behavior caused by pigweed/activate.sh
-    set +e
     source "$REPO_DIR/scripts/bootstrap.sh"
 }
 

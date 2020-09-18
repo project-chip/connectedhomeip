@@ -27,9 +27,8 @@ chip_light_dir=$REPO_DIR/examples/lighting-app/linux
 
 function build_chip_tool() {
     # These files should be successfully compiled elsewhere.
-    set +e
     source "$REPO_DIR/scripts/activate.sh" >/dev/null
-    set -x -e
+    set -x
     cd "$chip_tool_dir"
     gn gen out/debug >/dev/null
     ninja -C out/debug >/dev/null
@@ -37,9 +36,8 @@ function build_chip_tool() {
 }
 
 function build_chip_lighting() {
-    set +e
     source "$REPO_DIR/scripts/activate.sh" >/dev/null
-    set -x -e
+    set -x
     cd "$chip_light_dir"
     gn gen out/debug >/dev/null
     ninja -C out/debug >/dev/null
