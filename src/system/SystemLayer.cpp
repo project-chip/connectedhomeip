@@ -244,9 +244,9 @@ static int TimerCompare(void * p, const Cancelable * a, const Cancelable * b)
  *   @return Other Value indicating timer failed to start.
  *
  */
-void Layer::StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * cb)
+void Layer::StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCallback)
 {
-    Cancelable * ca = cb->Cancel();
+    Cancelable * ca = aCallback->Cancel();
 
     ca->mInfoScalar = Timer::GetCurrentEpoch() + aMilliseconds;
 
@@ -507,7 +507,7 @@ Error Layer::GetClock_RealTime(uint64_t & curTime)
  *
  * This function is guaranteed to be thread-safe on any platform that employs threading.
  *
- * @param[out] curTime                  The current time, expressed as Unix time scaled to milliseconds.
+ * @param[out] curTimeMS               The current time, expressed as Unix time scaled to milliseconds.
  *
  * @retval #CHIP_SYSTEM_NO_ERROR       If the method succeeded.
  * @retval #CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED
