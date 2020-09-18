@@ -171,7 +171,7 @@ bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err)
  * underlying POSIX network and OS stack errors into a platform- or system-specific range. Error codes beyond those currently
  * defined by POSIX or the ISO C/C++ standards are mapped similar to the standard ones.
  *
- *  @param[in] e  The POSIX network or OS error to map.
+ *  @param[in] aError  The POSIX network or OS error to map.
  *
  *  @return The mapped POSIX network or OS error.
  */
@@ -184,7 +184,7 @@ DLL_EXPORT Error MapErrorPOSIX(int aError)
  * This implements a function to return an NULL-terminated OS-specific descriptive C string, associated with the specified, mapped
  * OS error.
  *
- *  @param[in] err  The mapped OS-specific error to describe.
+ *  @param[in] aError  The mapped OS-specific error to describe.
  *
  *  @return A NULL-terminated, OS-specific descriptive C string describing the error.
  */
@@ -198,7 +198,7 @@ DLL_EXPORT const char * DescribeErrorPOSIX(Error aError)
  * This implements an introspection function for CHIP System Layer errors that allows the caller to determine whether the
  * specified error is an internal, underlying OS error.
  *
- *  @param[in] err  The mapped error to determine whether it is an OS error.
+ *  @param[in] aError  The mapped error to determine whether it is an OS error.
  *
  *  @return True if the specified error is an OS error; otherwise, false.
  */
@@ -272,7 +272,7 @@ DLL_EXPORT Error MapErrorZephyr(int aError)
  * This implements a mapping function for CHIP System Layer errors that allows mapping underlying LwIP network stack errors into a
  * platform- or system-specific range.
  *
- *  @param[in] e  The LwIP error to map.
+ *  @param[in] aError  The LwIP error to map.
  *
  *  @return The mapped LwIP network or OS error.
  *
@@ -286,7 +286,7 @@ DLL_EXPORT Error MapErrorLwIP(err_t aError)
  * This implements a function to return an NULL-terminated LwIP-specific descriptive C string, associated with the specified,
  * mapped LwIP error.
  *
- *  @param[in] err  The mapped LwIP-specific error to describe.
+ *  @param[in] aError  The mapped LwIP-specific error to describe.
  *
  *  @return A NULL-terminated, LwIP-specific descriptive C string describing the error.
  *
@@ -308,7 +308,7 @@ DLL_EXPORT const char * DescribeErrorLwIP(Error aError)
  * allows the caller to determine whether the specified error is an
  * internal, underlying LwIP error.
  *
- *  @param[in] err  The mapped error to determine whether it is a LwIP error.
+ *  @param[in] aError  The mapped error to determine whether it is a LwIP error.
  *
  *  @return True if the specified error is a LwIP error; otherwise, false.
  *
