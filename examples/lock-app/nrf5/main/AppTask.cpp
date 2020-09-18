@@ -229,67 +229,6 @@ int AppTask::Init()
     return ret;
 }
 
-void AppTask::HandleBLEConnectionOpened(chip::Ble::BLEEndPoint * endPoint)
-{
-    NRF_LOG_INFO("AppTask: Connection opened");
-
-    GetAppTask().mBLEEndPoint    = endPoint;
-    endPoint->OnMessageReceived  = AppTask::HandleBLEMessageReceived;
-    endPoint->OnConnectionClosed = AppTask::HandleBLEConnectionClosed;
-}
-
-void AppTask::HandleBLEConnectionClosed(chip::Ble::BLEEndPoint * endPoint, BLE_ERROR err)
-{
-    NRF_LOG_INFO("AppTask: Connection closed");
-
-    GetAppTask().mBLEEndPoint = nullptr;
-}
-
-void AppTask::HandleBLEMessageReceived(chip::Ble::BLEEndPoint * endPoint, chip::System::PacketBuffer * buffer)
-{
-#if CHIP_ENABLE_OPENTHREAD
-    uint16_t bufferLen = buffer->DataLength();
-    uint8_t * data     = buffer->Start();
-    chip::DeviceLayer::Internal::DeviceNetworkInfo networkInfo;
-    NRF_LOG_INFO("AppTask: Receive message size %u", bufferLen);
-
-    memcpy(networkInfo.ThreadNetworkName, data, sizeof(networkInfo.ThreadNetworkName));
-    data += sizeof(networkInfo.ThreadNetworkName);
-
-    memcpy(networkInfo.ThreadExtendedPANId, data, sizeof(networkInfo.ThreadExtendedPANId));
-    data += sizeof(networkInfo.ThreadExtendedPANId);
-
-    memcpy(networkInfo.ThreadMeshPrefix, data, sizeof(networkInfo.ThreadMeshPrefix));
-    data += sizeof(networkInfo.ThreadMeshPrefix);
-
-    memcpy(networkInfo.ThreadNetworkKey, data, sizeof(networkInfo.ThreadNetworkKey));
-    data += sizeof(networkInfo.ThreadNetworkKey);
-
-    memcpy(networkInfo.ThreadPSKc, data, sizeof(networkInfo.ThreadPSKc));
-    data += sizeof(networkInfo.ThreadPSKc);
-
-    networkInfo.ThreadPANId = data[0] | (data[1] << 8);
-    data += sizeof(networkInfo.ThreadPANId);
-    networkInfo.ThreadChannel = data[0];
-    data += sizeof(networkInfo.ThreadChannel);
-
-    networkInfo.FieldPresent.ThreadExtendedPANId = *data;
-    data++;
-    networkInfo.FieldPresent.ThreadMeshPrefix = *data;
-    data++;
-    networkInfo.FieldPresent.ThreadPSKc = *data;
-    data++;
-    networkInfo.NetworkId              = 0;
-    networkInfo.FieldPresent.NetworkId = true;
-
-    ThreadStackMgr().SetThreadEnabled(false);
-    ThreadStackMgr().SetThreadProvision(networkInfo);
-    ThreadStackMgr().SetThreadEnabled(true);
-#endif
-    endPoint->Close();
-    chip::System::PacketBuffer::Free(buffer);
-}
-
 void AppTask::AppTaskMain(void * pvParameter)
 {
     ret_code_t ret;
@@ -303,7 +242,6 @@ void AppTask::AppTaskMain(void * pvParameter)
         APP_ERROR_HANDLER(ret);
     }
 
-    chip::DeviceLayer::ConnectivityMgr().AddCHIPoBLEConnectionHandler(&AppTask::HandleBLEConnectionOpened);
     SetDeviceName("LockDemo._chip._udp.local.");
 
     while (true)
