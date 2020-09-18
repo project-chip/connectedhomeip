@@ -24,7 +24,7 @@
 #define _CHIP_DEVICE_ERROR(e) (CHIP_DEVICE_ERROR_MIN + (e))
 
 /**
- *  @def CHIP_DEVICE_ERROR_CONFIG_VALUE_NOT_FOUND
+ *  @def CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND
  *
  *  @brief
  *    The requested configuration value was not found.
