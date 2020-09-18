@@ -240,19 +240,8 @@ exit:
  * interface index.  Also sets various IPv6 socket options appropriate for
  * transmitting packets to and from on-link destinations.
  *
- * @param[in]   intf    An InterfaceId to identify the scope of the address.
- *
+ * @param[in]   intfId  An InterfaceId to identify the scope of the address.
  * @param[in]   addr    An IPv6 link-local scope IPAddress object.
- *
- * @return INET_NO_ERROR on success, or a mapped OS error on failure. An invalid
- * parameter list can result in INET_ERROR_WRONG_ADDRESS_TYPE. If the raw endpoint
- * is already bound or is listening, then returns INET_ERROR_INCORRECT_STATE.
- */
-/**
- * @brief   Bind the endpoint to an interface IPv6 link-local address.
- *
- * @param[in]   intf    the indicator of the network interface
- * @param[in]   addr    the IP address (must be an interface address)
  *
  * @retval  INET_NO_ERROR               success: endpoint bound to address
  * @retval  INET_ERROR_INCORRECT_STATE  endpoint has been bound previously
@@ -262,24 +251,24 @@ exit:
  *      \c addrType does not match \c IPVer.
  *
  * @retval  INET_ERROR_WRONG_ADDRESS_TYPE
- *      \c addr is not an IPv6 link-local address or \c intf is
+ *      \c addr is not an IPv6 link-local address or \c intfId is
  *      \c INET_NULL_INTERFACEID.
  *
  * @retval  other                   another system or platform error
  *
  * @details
  *  Binds the endpoint to the IPv6 link-local address \c addr on the
- *  network interface indicated by \c intf.
+ *  network interface indicated by \c intfId.
  *
  *  On LwIP, this method must not be called with the LwIP stack lock
  *  already acquired.
  */
-INET_ERROR RawEndPoint::BindIPv6LinkLocal(InterfaceId intf, IPAddress addr)
+INET_ERROR RawEndPoint::BindIPv6LinkLocal(InterfaceId intfId, IPAddress addr)
 {
     INET_ERROR res = INET_NO_ERROR;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    const int lIfIndex = static_cast<int>(intf);
+    const int lIfIndex = static_cast<int>(intfId);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (mState != kState_Ready && mState != kState_Bound)
@@ -800,7 +789,7 @@ exit:
  *
  * @param[in]   addrType    the protocol version of the IP address.
  *
- * @param[in]   intf        indicator of the network interface.
+ * @param[in]   intfId      indicator of the network interface.
  *
  * @retval  INET_NO_ERROR               success: endpoint bound to address
  * @retval  INET_NO_MEMORY              insufficient memory for endpoint

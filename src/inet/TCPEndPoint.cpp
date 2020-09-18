@@ -295,7 +295,7 @@ INET_ERROR TCPEndPoint::Listen(uint16_t backlog)
     return res;
 }
 
-INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
+INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intfId)
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -314,7 +314,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
     // As a work-around, if the destination is an IPv6 link-local address, we bind the PCB
     // to the link local address associated with the source interface; however this is only
     // viable if the endpoint hasn't already been bound.
-    if (intf != INET_NULL_INTERFACEID)
+    if (intfId != INET_NULL_INTERFACEID)
     {
         IPAddress intfLLAddr;
         InetLayer & lInetLayer = Layer();
@@ -322,7 +322,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
         if (!addr.IsIPv6LinkLocal() || State == kState_Bound)
             return INET_ERROR_NOT_IMPLEMENTED;
 
-        res = lInetLayer.GetLinkLocalAddr(intf, &intfLLAddr);
+        res = lInetLayer.GetLinkLocalAddr(intfId, &intfLLAddr);
         if (res != INET_NO_ERROR)
             return res;
 
@@ -385,7 +385,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
     if (res != INET_NO_ERROR)
         return res;
 
-    if (intf == INET_NULL_INTERFACEID)
+    if (intfId == INET_NULL_INTERFACEID)
     {
         // The behavior when connecting to an IPv6 link-local address without specifying an outbound
         // interface is ambiguous. So prevent it in all cases.
@@ -405,7 +405,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
             struct ::ifreq ifr;
             memset(&ifr, 0, sizeof(ifr));
 
-            res = GetInterfaceName(intf, ifr.ifr_name, sizeof(ifr.ifr_name));
+            res = GetInterfaceName(intfId, ifr.ifr_name, sizeof(ifr.ifr_name));
             if (res != INET_NO_ERROR)
                 return res;
 
@@ -425,7 +425,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
                 // Attempting to initiate a connection via a specific interface is not allowed.
                 // The only way to do this is to bind the local to an address on the desired
                 // interface.
-                res = BindSrcAddrFromIntf(addrType, intf);
+                res = BindSrcAddrFromIntf(addrType, intfId);
                 if (res != INET_NO_ERROR)
                     return res;
             }
@@ -461,7 +461,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
         sa.in6.sin6_port     = htons(port);
         sa.in6.sin6_flowinfo = 0;
         sa.in6.sin6_addr     = addr.ToIPv6();
-        sa.in6.sin6_scope_id = intf;
+        sa.in6.sin6_scope_id = intfId;
         sockaddrsize         = sizeof(sockaddr_in6);
         sockaddrptr          = (const sockaddr *) &sa.in6;
     }
@@ -801,28 +801,6 @@ INET_ERROR TCPEndPoint::EnableNoDelay(void)
 
     return res;
 }
-
-/**
- *  TCPEndPoint::EnableKeepAlive
- *
- *  @brief
- *    Enable TCP keepalive probes on the associated TCP connection.
- *
- *  @param interval
- *    The interval (in seconds) between keepalive probes.  This value also controls
- *    the time between last data packet sent and the transmission of the first keepalive
- *    probe.
- *
- *  @param timeoutCount
- *    The maximum number of unacknowledged probes before the connection will be deemed
- *    to have failed.
- *
- *  @note
- *    This method can only be called when the endpoint is in one of the connected states.
- *
- *    This method can be called multiple times to adjust the keepalive interval or timeout
- *    count.
- */
 
 INET_ERROR TCPEndPoint::EnableKeepAlive(uint16_t interval, uint16_t timeoutCount)
 {
@@ -2165,7 +2143,7 @@ void TCPEndPoint::LwIPHandleError(void * arg, err_t lwipErr)
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-INET_ERROR TCPEndPoint::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intf)
+INET_ERROR TCPEndPoint::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intfId)
 {
     INET_ERROR err = INET_NO_ERROR;
 
@@ -2185,7 +2163,7 @@ INET_ERROR TCPEndPoint::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId 
         curAddr   = addrIter.GetAddress();
         curIntfId = addrIter.GetInterface();
 
-        if (curIntfId == intf)
+        if (curIntfId == intfId)
         {
             // Search for an IPv4 address on the TargetInterface
 
