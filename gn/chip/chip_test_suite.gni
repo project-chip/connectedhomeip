@@ -52,9 +52,7 @@ template("chip_test_suite") {
     if (defined(invoker.c_tests)) {
       foreach(_test, invoker.c_tests) {
         chip_test(_test) {
-          if (current_os != "zephyr" && chip_device_platform != "esp32") {
-            sources = [ "${_test}Driver.c" ]
-          }
+          sources = [ "${_test}Driver.c" ]
 
           public_deps = [ ":${_suite_name}_common" ]
         }
