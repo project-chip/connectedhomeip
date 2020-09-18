@@ -104,12 +104,14 @@ function cirquetest_run_test() {
     # TODO: Do docker system prune, we cannot filter which container
     # is created by cirque now. This will be implemented later. Currently, only do this on CI
 
-    # After test finished, the container is perserved and networks will not delete
+    # After test finished, the container is perserved and networks will not be deleted
     # This is useful when running tests on local workstation, but not for CI.
     if [ "x$CLEANUP_DOCKER_FOR_CI" = "x1" ]; then
-        echo "Do docker system prune"
+        echo "Do docker container and network prune"
+        # TODO: Filter cirque containers
         docker ps -aq | xargs docker stop >/dev/null 2>&1
-        (yes | docker system prune) >/dev/null 2>&1
+        docker container prune -f >/dev/null 2>&1
+        docker network prune -f >/dev/null 2>&1
     fi
     return "$exitcode"
 }
