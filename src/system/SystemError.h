@@ -70,8 +70,6 @@
 #define CHIP_SYSTEM_ERROR_MAX CHIP_SYSTEM_CONFIG_ERROR_MAX
 #endif // CHIP_SYSTEM_CONFIG_ERROR_MAX
 
-#ifdef _CHIP_SYSTEM_CONFIG_ERROR
-
 /**
  *  @def _CHIP_SYSTEM_ERROR(e)
  *
@@ -163,8 +161,6 @@
 /**
  *  @}
  */
-
-#endif // _CHIP_SYSTEM_CONFIG_ERROR
 
 #ifdef __cplusplus
 
