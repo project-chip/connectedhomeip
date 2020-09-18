@@ -12,9 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/src/platform/device.gni")
+
 declare_args() {
   # Enable building tests.
   chip_build_tests = current_os != "freertos"
+}
+
+declare_args() {
+  # Build executables for running individual tests.
+  chip_link_tests =
+      chip_build_tests && (current_os == "linux" || current_os == "mac")
 }
 
 declare_args() {

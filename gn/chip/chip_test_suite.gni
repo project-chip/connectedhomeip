@@ -30,48 +30,53 @@ template("chip_test_suite") {
                              "tests",
                              "c_tests",
                            ])
+
+    output_dir = "${root_out_dir}/lib"
   }
 
-  tests = []
-  if (defined(invoker.tests)) {
-    foreach(_test, invoker.tests) {
-      chip_test(_test) {
-        if (current_os != "zephyr") {
+  if (chip_link_tests) {
+    tests = []
+
+    if (defined(invoker.tests)) {
+      foreach(_test, invoker.tests) {
+        chip_test(_test) {
           sources = [ "${_test}Driver.cpp" ]
+
+          public_deps = [ ":${_suite_name}_common" ]
         }
 
-        public_deps = [ ":${_suite_name}_common" ]
+        tests += [ _test ]
       }
-
-      tests += [ _test ]
     }
-  }
 
-  if (defined(invoker.c_tests)) {
-    foreach(_test, invoker.c_tests) {
-      chip_test(_test) {
-        if (current_os != "zephyr") {
+    if (defined(invoker.c_tests)) {
+      foreach(_test, invoker.c_tests) {
+        chip_test(_test) {
           sources = [ "${_test}Driver.c" ]
+
+          public_deps = [ ":${_suite_name}_common" ]
         }
 
-        public_deps = [ ":${_suite_name}_common" ]
+        tests += [ _test ]
       }
-
-      tests += [ _test ]
     }
-  }
 
-  group(_suite_name) {
-    deps = []
-    foreach(_test, tests) {
-      deps += [ ":${_test}" ]
+    group(_suite_name) {
+      deps = []
+      foreach(_test, tests) {
+        deps += [ ":${_test}" ]
+      }
     }
-  }
 
-  group("${_suite_name}_run") {
-    deps = []
-    foreach(_test, tests) {
-      deps += [ ":${_test}_run" ]
+    group("${_suite_name}_run") {
+      deps = []
+      foreach(_test, tests) {
+        deps += [ ":${_test}_run" ]
+      }
+    }
+  } else {
+    group(_suite_name) {
+      deps = [ ":${_suite_name}_common" ]
     }
   }
 }

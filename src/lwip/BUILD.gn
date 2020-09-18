@@ -21,11 +21,6 @@ import("${lwip_root}/lwip.gni")
 
 assert(chip_with_lwip)
 
-declare_args() {
-  # lwIP platform: standalone, freertos.
-  lwip_platform = ""
-}
-
 if (lwip_platform == "") {
   if (current_os != "freertos") {
     lwip_platform = "standalone"
