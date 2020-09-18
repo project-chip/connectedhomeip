@@ -118,7 +118,7 @@ This will build all sources, libraries, and tests for the given platform:
 make -f Makefile-Standalone
 ```
 
-The helper Makefile-<platform> will automatically run configure the using a
+The helper Makefile-&lt;platform> will automatically run configure the using a
 default set of parameters, and allow custom override parameters to be passed via
 environment variables. An example of this follows:
 
