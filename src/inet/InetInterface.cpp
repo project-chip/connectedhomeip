@@ -664,14 +664,13 @@ bool InterfaceIterator::HasBroadcastAddress(void)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+
 /**
  * @fn      short InterfaceIterator::GetFlags(void)
  *
  * @brief   Returns the ifr_flags value for the current interface.
  */
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
-
 short InterfaceIterator::GetFlags(void)
 {
     struct ifreq intfData;
@@ -694,6 +693,7 @@ short InterfaceIterator::GetFlags(void)
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
+#if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 /**
  * @fn      InterfaceAddressIterator::InterfaceAddressIterator(void)
  *
@@ -703,8 +703,6 @@ short InterfaceIterator::GetFlags(void)
  *     Starts the iterator at the first network address. On some platforms,
  *     this constructor may allocate resources recycled by the destructor.
  */
-
-#if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 InterfaceAddressIterator::InterfaceAddressIterator(void)
 {
     mAddrsList = NULL;
