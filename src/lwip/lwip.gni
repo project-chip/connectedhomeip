@@ -15,4 +15,7 @@
 declare_args() {
   # Have the lwIP library available.
   chip_with_lwip = current_os != "zephyr"
+
+  # lwIP platform: standalone, freertos.
+  lwip_platform = ""
 }

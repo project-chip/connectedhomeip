@@ -51,7 +51,8 @@ if (chip_link_tests) {
   }
 } else {
   template("chip_test") {
-    group(target_name) {}
+    group(target_name) {
+    }
     not_needed(invoker, "*")
   }
 }
