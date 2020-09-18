@@ -105,29 +105,23 @@ int main(void)
     sessions = new DemoSessionManager;
 
 #if CHIP_ENABLE_OPENTHREAD
-    otSysInit(0, NULL);
-    otHeapSetCAllocFree(calloc, free);
+    initOtSysEFR();
 #else
     initMcu();
     initBoard();
     efr32RandomInit();
+#if DISPLAY_ENABLED
+    initLCD();
+#endif
+#if EFR32_LOG_ENABLED
+    efr32LogInit();
+#endif
 #endif
 
     mbedtls_platform_set_calloc_free(calloc, free);
 
     // Initialize mbedtls threading support on EFR32
     THREADING_setup();
-
-#if DISPLAY_ENABLED
-    initLCD();
-#endif
-
-#if EFR32_LOG_ENABLED
-    if (efr32LogInit() != 0)
-    {
-        appError(ret);
-    }
-#endif
 
     EFR32_LOG("==================================================");
     EFR32_LOG("chip-efr32-lock-example starting");

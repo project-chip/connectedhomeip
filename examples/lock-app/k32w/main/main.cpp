@@ -59,7 +59,7 @@ extern InitFunc __init_array_end;
 
 extern "C" void main_task(void const * argument)
 {
-    CHIP_ERROR ret;
+    CHIP_ERROR ret = CHIP_ERROR_MAX;
 
     /* Call C++ constructors */
     InitFunc * pFunc = &__init_array_start;

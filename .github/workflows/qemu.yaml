@@ -28,7 +28,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-esp32-qemu:0.4.1
+            image: connectedhomeip/chip-build-esp32-qemu:0.4.7
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -40,9 +40,7 @@ jobs:
             - name: Build example Echo App
               run: scripts/examples/esp_echo_app.sh
             - name: Build ESP32 QEMU and Run Tests
-              run: scripts/tests/esp32_qemu_tests.sh
-            - name: Save test log files
-              run: scripts/tests/save_logs.sh /tmp/test_logs
+              run: scripts/tests/esp32_qemu_tests.sh /tmp/test_logs
             - name: Uploading Logs
               uses: actions/upload-artifact@v1
               with:

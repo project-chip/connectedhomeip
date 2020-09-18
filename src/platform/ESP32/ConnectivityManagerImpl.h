@@ -155,9 +155,9 @@ private:
     static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState, ::chip::System::Error aError);
 
     void UpdateInternetConnectivityState(void);
-    void OnStationIPv4AddressAvailable(const system_event_sta_got_ip_t & got_ip);
+    void OnStationIPv4AddressAvailable(const ip_event_got_ip_t & got_ip);
     void OnStationIPv4AddressLost(void);
-    void OnIPv6AddressAvailable(const system_event_got_ip6_t & got_ip);
+    void OnIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip);
 
     static const char * WiFiStationStateToStr(WiFiStationState state);
     static const char * WiFiAPStateToStr(WiFiAPState state);

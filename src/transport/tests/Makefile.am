@@ -47,6 +47,7 @@ libTransportLayerTests_a_SOURCES                      = \
     TestSecurePairingSession.cpp                        \
     TestSecureSession.cpp                               \
     TestSecureSessionMgr.cpp                            \
+    TestTCP.cpp                                         \
     TestUDP.cpp                                         \
     $(NULL)
 
@@ -124,6 +125,7 @@ check_PROGRAMS                                       += \
     TestSecurePairingSession                            \
     TestSecureSessionMgr                                \
     TestSecureSession                                   \
+    TestTCP                                             \
     TestUDP                                             \
     $(NULL)
 
@@ -150,6 +152,9 @@ TestSecureSessionMgr_LDADD       = $(COMMON_LDADD)
 
 TestSecureSession_SOURCES        = TestSecureSessionDriver.cpp
 TestSecureSession_LDADD          = $(COMMON_LDADD)
+
+TestTCP_SOURCES                  = TestTCPDriver.cpp
+TestTCP_LDADD                    = $(COMMON_LDADD)
 
 TestUDP_SOURCES                  = TestUDPDriver.cpp
 TestUDP_LDADD                    = $(COMMON_LDADD)

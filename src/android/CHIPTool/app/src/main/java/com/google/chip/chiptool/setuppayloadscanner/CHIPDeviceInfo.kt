@@ -26,6 +26,7 @@ import kotlinx.android.parcel.Parcelize
     val version: Int,
     val vendorId: Int,
     val productId: Int,
+    val discriminator: Int,
     val setupPinCode: Long,
     val optionalQrCodeInfoMap: Map<Int, QrCodeInfo>
 ) : Parcelable

@@ -50,10 +50,10 @@ extern "C" void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClus
 
     if (*value)
     {
-        BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
+        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::LOCK_ACTION);
     }
     else
     {
-        BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
+        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::UNLOCK_ACTION);
     }
 }

@@ -15,26 +15,28 @@
 #
 cmake_minimum_required(VERSION 3.13.1)
 
-set(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip)
-get_filename_component(CHIP_ROOT ${CHIP_ROOT} REALPATH)
+get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
+get_filename_component(CHIP_APP_SERVER ${CHIP_ROOT}/examples/common/chip-app-server REALPATH)
+get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
+get_filename_component(LOCK_COMMON ${CHIP_ROOT}/examples/lock-app/lock-common REALPATH)
+
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHIP_ROOT}/config/nrfconnect/)
-
-# Make sure all components can see our mbedtls config
-include_directories(AFTER main/include ${CHIP_ROOT}/src/app/util main)
-
 include(nrfconnect-app)
 
 project(chip-nrf52840-lock-example)
+target_include_directories(app PRIVATE main/include ${LOCK_COMMON} ${NRFCONNECT_COMMON}/util/include ${CHIP_APP_SERVER}/include)
 target_sources(app PRIVATE
                main/AppTask.cpp
                main/BoltLockManager.cpp
-               main/DataModelHandler.cpp
                main/main.cpp
-               main/LEDWidget.cpp
-               main/Server.cpp
-               main/gen/call-command-handler.c
-               main/gen/callback-stub.c
-               main/gen/znet-bookkeeping.c
+               main/ZclCallbacks.cpp
+               ${LOCK_COMMON}/gen/call-command-handler.c
+               ${LOCK_COMMON}/gen/callback-stub.c
+               ${LOCK_COMMON}/gen/znet-bookkeeping.c
+               ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
+               ${CHIP_APP_SERVER}/DataModelHandler.cpp
+               ${CHIP_APP_SERVER}/Server.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp
                ${CHIP_ROOT}/src/app/util/attribute-size.c
                ${CHIP_ROOT}/src/app/util/attribute-storage.c

@@ -15,15 +15,13 @@
 # limitations under the License.
 #
 
-# Update compilation database in VS Code devcontainer.
-
 set -e
+
+# Update compilation database in VS Code devcontainer.
 
 CHIP_ROOT="$(dirname "$0")/../.."
 
-set +e
 source "$CHIP_ROOT/scripts/activate.sh"
-set -e
 
 gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=all_host_gcc
 mv "$CHIP_ROOT/out/debug/compile_commands.json" "$CHIP_ROOT/out/debug/compile_commands.gcc.json"

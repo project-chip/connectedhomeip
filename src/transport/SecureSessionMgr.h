@@ -130,8 +130,7 @@ public:
      *   establishes the security keys for secure communication with the
      *   peer node.
      */
-    CHIP_ERROR NewPairing(Optional<NodeId> peerNodeId, const Optional<Transport::PeerAddress> & peerAddr, uint16_t peerKeyId,
-                          uint16_t localKeyId, SecurePairingSession * pairing);
+    CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, SecurePairingSession * pairing);
 
 protected:
     /**

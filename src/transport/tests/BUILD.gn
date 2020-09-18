@@ -29,6 +29,7 @@ chip_test_suite("tests") {
     "TestSecurePairingSession.cpp",
     "TestSecureSession.cpp",
     "TestSecureSessionMgr.cpp",
+    "TestTCP.cpp",
     "TestTransportLayer.h",
     "TestUDP.cpp",
   ]
@@ -48,6 +49,7 @@ chip_test_suite("tests") {
     "TestSecurePairingSession",
     "TestSecureSession",
     "TestSecureSessionMgr",
+    "TestTCP",
     "TestUDP",
   ]
 }

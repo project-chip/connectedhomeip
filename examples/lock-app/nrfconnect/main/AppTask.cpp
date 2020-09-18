@@ -17,10 +17,10 @@
  */
 
 #include "AppTask.h"
+#include "AppConfig.h"
 #include "BoltLockManager.h"
 #include "LEDWidget.h"
 #include "Server.h"
-#include "app_config.h"
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -35,7 +35,6 @@
 #define APP_EVENT_QUEUE_SIZE 10
 #define BUTTON_PUSH_EVENT 1
 #define BUTTON_RELEASE_EVENT 0
-#define EXAMPLE_VENDOR_ID 0xabcd
 
 LOG_MODULE_DECLARE(app);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
@@ -57,14 +56,6 @@ static k_timer sFunctionTimer;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
-DemoSessionManager sSessions;
-
-namespace chip {
-SecureSessionMgrBase & SessionManager()
-{
-    return sSessions;
-}
-} // namespace chip
 
 int AppTask::Init()
 {
@@ -93,9 +84,8 @@ int AppTask::Init()
     BoltLockMgr().Init();
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-    // Init ZCL Data Model
-    InitDataModelHandler();
-    StartServer(&sSessions);
+    // Init ZCL Data Model and start server
+    InitServer();
     PrintQRCode();
 
     return 0;
@@ -105,7 +95,9 @@ void AppTask::PrintQRCode() const
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     uint32_t setUpPINCode       = 0;
-    uint32_t setUpDiscriminator = 0;
+    uint16_t setUpDiscriminator = 0;
+    uint16_t vendorId           = 0;
+    uint16_t productId          = 0;
 
     err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
     if (err != CHIP_NO_ERROR)
@@ -119,10 +111,22 @@ void AppTask::PrintQRCode() const
         LOG_INF("ConfigurationMgr().GetSetupDiscriminator() failed: %s", log_strdup(chip::ErrorStr(err)));
     }
 
+    err = ConfigurationMgr().GetVendorId(vendorId);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_INF("ConfigurationMgr().GetVendorId() failed: %s", log_strdup(chip::ErrorStr(err)));
+    }
+
+    err = ConfigurationMgr().GetProductId(productId);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_INF("ConfigurationMgr().GetProductId() failed: %s", log_strdup(chip::ErrorStr(err)));
+    }
+
     chip::SetupPayload payload;
     payload.version       = 1;
-    payload.vendorID      = EXAMPLE_VENDOR_ID;
-    payload.productID     = 1;
+    payload.vendorID      = vendorId;
+    payload.productID     = productId;
     payload.setUpPINCode  = setUpPINCode;
     payload.discriminator = setUpDiscriminator;
     chip::QRCodeSetupPayloadGenerator generator(payload);
@@ -171,11 +175,11 @@ int AppTask::StartApp()
 
         if (PlatformMgr().TryLockChipStack())
         {
-            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached    = ConnectivityMgr().IsThreadAttached();
-            // sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            // sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
+            sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
+            sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
+            sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
+            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
+            sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
 

@@ -33,7 +33,7 @@ assert(efr32_board != "", "efr32_board must be specified")
 # - BRD4180A / SLWSTK6006A / MG21 Module / 2.4GHz@20dBm
 
 if (efr32_board == "BRD4304A") {
-  efr32_family_path = "efr32mg12"
+  efr32_family = "efr32mg12"
   efr32_mcu = "EFR32MG12P432F1024GM48"
 } else if (efr32_board == "BRD4161A") {
   efr32_family = "efr32mg12"

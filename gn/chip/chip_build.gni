@@ -24,9 +24,7 @@ template("chip_build") {
     deps = [ ":all(${_toolchain})" ]
   }
 
-  if (chip_build_tests) {
-    group("check_${_build_name}") {
-      deps = [ ":check(${_toolchain})" ]
-    }
+  group("check_${_build_name}") {
+    deps = [ ":check(${_toolchain})" ]
   }
 }

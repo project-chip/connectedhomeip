@@ -33,29 +33,6 @@ bool emberAfIdentifyClusterIdentifyQueryResponseCallback(uint16_t timeout)
     return false;
 }
 
-/** @brief Identify Cluster Start Feedback Callback
- *
- *
- *
- * @param endpoint Endpoint id
- * @param identifyTime Identify time
- */
-bool emberAfPluginIdentifyStartFeedbackCallback(uint8_t endpoint, uint16_t identifyTime)
-{
-    return false;
-}
-
-/** @brief Identify Cluster Stop Feedback Callback
- *
- *
- *
- * @param endpoint Endpoint id
- */
-bool emberAfPluginIdentifyStopFeedbackCallback(uint8_t endpoint)
-{
-    return false;
-}
-
 /** @brief Door Lock Cluster Clear All Pins
  *
  *
@@ -391,7 +368,6 @@ EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(uint8_t end
 }
 
 void emberAfPluginDoorLockServerInitCallback(void) {}
-void emberAfPluginReportingInitCallback(void) {}
 void emberAfPollControlClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId) {}
 void emberAfPollControlClusterServerInitCallback(uint8_t endpoint) {}
 void emberAfPluginPollControlServerStackStatusCallback(EmberStatus status) {}

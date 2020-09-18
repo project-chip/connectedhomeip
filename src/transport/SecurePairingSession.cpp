@@ -76,7 +76,7 @@ CHIP_ERROR SecurePairingSession::Init(uint32_t setupCode, uint32_t pbkdf2IterCou
     }
     mDelegate    = delegate->Retain();
     mLocalNodeId = myNodeId;
-    mKeyId       = myKeyId;
+    mLocalKeyId  = myKeyId;
 
 exit:
     return err;
@@ -95,6 +95,7 @@ CHIP_ERROR SecurePairingSession::WaitForPairing(uint32_t mySetUpPINCode, uint32_
     SuccessOrExit(err);
 
     mNextExpectedMsg = Spake2pMsgType::kSpake2pCompute_pA;
+    mPairingComplete = false;
 
 exit:
     return err;
@@ -108,7 +109,7 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
     header.SetMessageType(msgType);
     header.SetProtocolID(kSecurePairingProtocol);
     header.SetSourceNodeId(mLocalNodeId);
-    header.SetEncryptionKeyID(mKeyId);
+    header.SetEncryptionKeyID(mLocalKeyId);
 
     size_t headerSize              = header.EncryptedHeaderSizeBytes();
     size_t actualEncodedHeaderSize = 0;
@@ -131,7 +132,7 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
     // This is unexpected and means header changed while encoding
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
-    err = mDelegate->OnNewMessageForPeer(msgBuf);
+    err = mDelegate->SendMessage(msgBuf);
     SuccessOrExit(err);
 
 exit:
@@ -313,7 +314,7 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const MessageHeader & heade
     mPairingComplete = true;
 
     // Call delegate to indicate pairing completion
-    mDelegate->OnPairingComplete(mPeerNodeId, mPeerKeyId, mKeyId);
+    mDelegate->OnPairingComplete();
 
 exit:
 
@@ -347,7 +348,7 @@ CHIP_ERROR SecurePairingSession::HandleCompute_cA(const MessageHeader & header, 
     mPairingComplete = true;
 
     // Call delegate to indicate pairing completion
-    mDelegate->OnPairingComplete(mPeerNodeId, mPeerKeyId, mKeyId);
+    mDelegate->OnPairingComplete();
 
 exit:
 

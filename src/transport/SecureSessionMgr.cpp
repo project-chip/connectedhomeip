@@ -162,12 +162,14 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureSessionMgrBase::NewPairing(Optional<NodeId> peerNodeId, const Optional<Transport::PeerAddress> & peerAddr,
-                                            uint16_t peerKeyId, uint16_t localKeyId, SecurePairingSession * pairing)
+CHIP_ERROR SecureSessionMgrBase::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, SecurePairingSession * pairing)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     PeerConnectionState * state = nullptr;
+    Optional<NodeId> peerNodeId = Optional<NodeId>::Value(pairing->GetPeerNodeId());
+    uint16_t peerKeyId          = pairing->GetPeerKeyId();
+    uint16_t localKeyId         = pairing->GetLocalKeyId();
 
     // Find any existing connection with the same node and key ID
     if (mPeerConnections.FindPeerConnectionState(peerNodeId, peerKeyId, &state))
@@ -302,12 +304,16 @@ void SecureSessionMgrBase::HandleConnectionExpired(const Transport::PeerConnecti
     state.GetPeerAddress().ToString(addr, sizeof(addr));
 
     ChipLogProgress(Inet, "Connection from '%s' expired", addr);
+
+    mgr->mTransport->Disconnect(state.GetPeerAddress());
 }
 
 void SecureSessionMgrBase::ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error)
 {
     SecureSessionMgrBase * mgr = reinterpret_cast<SecureSessionMgrBase *>(param);
 #if CHIP_CONFIG_SESSION_REKEYING
+    // TODO(#2279): session expiration is currently disabled until rekeying is supported
+    // the #ifdef should be removed after that.
     mgr->mPeerConnections.ExpireInactiveConnections(CHIP_PEER_CONNECTION_TIMEOUT_MS);
 #endif
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer

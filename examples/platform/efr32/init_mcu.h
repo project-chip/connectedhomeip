@@ -64,6 +64,8 @@ extern "C" {
 
 void initMcu(void);
 
+void initOtSysEFR(void);
+
 #ifdef __cplusplus
 }
 #endif

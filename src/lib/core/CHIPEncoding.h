@@ -128,7 +128,7 @@ inline void Put8(uint8_t * p, uint8_t v)
 }
 
 /**
- * Perform a, potentially unaligned, memory read of the 16-bit value
+ * Perform a, potentially unaligned, memory read of the 8-bit value
  * from the specified pointer address and increment the pointer by
  * 8-bits (1 byte).
  *
@@ -144,7 +144,7 @@ inline uint8_t Read8(uint8_t *& p)
 }
 
 /**
- * Perform a, potentially unaligned, memory read of the 16-bit value
+ * Perform a, potentially unaligned, memory read of the 8-bit value
  * from the specified pointer address and increment the pointer by
  * 8-bits (1 byte).
  *

@@ -31,7 +31,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.4.1
+            image: connectedhomeip/chip-build-nrf-platform:0.4.7
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -82,7 +82,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.4.1
+            image: connectedhomeip/chip-build:0.4.7
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -130,7 +130,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-efr32:0.4.1
+            image: connectedhomeip/chip-build-efr32:0.4.7
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -167,7 +167,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.4.3
+            image: connectedhomeip/chip-build-nrf-platform:0.4.7
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -180,14 +180,18 @@ jobs:
                   fetch-depth: 0
                   submodules: true
             - name: Build example nRF Connect SDK Lock App
-              run: scripts/examples/nrfconnect_lock_app.sh
+              run: scripts/examples/nrfconnect_example.sh lock-app
+            - name: Build example nRF Connect SDK Lighting App
+              run: scripts/examples/nrfconnect_example.sh lighting-app
             - name: Build example nRF Connect SDK Shell
-              run: scripts/examples/nrfconnect_shell.sh
+              run: scripts/examples/nrfconnect_example.sh shell
             - name: Copy aside build products
               run: |
                   mkdir -p /tmp/output_binaries/$BUILD_TYPE-build
                   cp examples/lock-app/nrfconnect/build/zephyr/zephyr.elf \
                       /tmp/output_binaries/$BUILD_TYPE-build/chip-lock.elf
+                  cp examples/lighting-app/nrfconnect/build/zephyr/zephyr.elf \
+                      /tmp/output_binaries/$BUILD_TYPE-build/chip-lighting.elf
                   cp examples/shell/nrfconnect/build/zephyr/zephyr.elf \
                       /tmp/output_binaries/$BUILD_TYPE-build/chip-shell.elf
             - name: Binary artifact suffix

@@ -16,6 +16,8 @@
 #    limitations under the License.
 #
 
+set -e
+
 # Build script for GN examples GitHub workflow.
 
 CHIP_ROOT="$(dirname "$0")/../.."
@@ -45,10 +47,9 @@ for arg; do
     esac
 done
 
-set -e
 set -x
 env
 
-gn gen --root="$EXAMPLE_DIR" "$OUTPUT_DIR" --args="${GN_ARGS[*]}"
+gn gen --check --root="$EXAMPLE_DIR" "$OUTPUT_DIR" --args="${GN_ARGS[*]}"
 
 ninja -C "$OUTPUT_DIR" "${NINJA_ARGS[@]}"

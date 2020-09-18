@@ -81,7 +81,7 @@ public:
     CHIP_ERROR GetManufacturerDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen);
     CHIP_ERROR GetManufacturerDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen);
     CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode);
-    CHIP_ERROR GetSetupDiscriminator(uint32_t & setupDiscriminator);
+    CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator);
     CHIP_ERROR GetServiceId(uint64_t & serviceId);
     CHIP_ERROR GetFabricId(uint64_t & fabricId);
     CHIP_ERROR GetServiceConfig(uint8_t * buf, size_t bufSize, size_t & serviceConfigLen);
@@ -104,7 +104,7 @@ public:
     CHIP_ERROR StoreManufacturerDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen);
     CHIP_ERROR StoreManufacturerDevicePrivateKey(const uint8_t * key, size_t keyLen);
     CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode);
-    CHIP_ERROR StoreSetupDiscriminator(uint32_t setupDiscriminator);
+    CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator);
     CHIP_ERROR StoreServiceProvisioningData(uint64_t serviceId, const uint8_t * serviceConfig, size_t serviceConfigLen,
                                             const char * accountId, size_t accountIdLen);
     CHIP_ERROR ClearServiceProvisioningData();
@@ -301,7 +301,7 @@ inline CHIP_ERROR ConfigurationManager::GetSetupPinCode(uint32_t & setupPinCode)
     return static_cast<ImplClass *>(this)->_GetSetupPinCode(setupPinCode);
 }
 
-inline CHIP_ERROR ConfigurationManager::GetSetupDiscriminator(uint32_t & setupDiscriminator)
+inline CHIP_ERROR ConfigurationManager::GetSetupDiscriminator(uint16_t & setupDiscriminator)
 {
     return static_cast<ImplClass *>(this)->_GetSetupDiscriminator(setupDiscriminator);
 }
@@ -405,7 +405,7 @@ inline CHIP_ERROR ConfigurationManager::StoreSetupPinCode(uint32_t setupPinCode)
     return static_cast<ImplClass *>(this)->_StoreSetupPinCode(setupPinCode);
 }
 
-inline CHIP_ERROR ConfigurationManager::StoreSetupDiscriminator(uint32_t setupDiscriminator)
+inline CHIP_ERROR ConfigurationManager::StoreSetupDiscriminator(uint16_t setupDiscriminator)
 {
     return static_cast<ImplClass *>(this)->_StoreSetupDiscriminator(setupDiscriminator);
 }

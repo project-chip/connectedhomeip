@@ -195,17 +195,6 @@ bool emberAfAttributeWriteAccessCallback(uint8_t endpoint, EmberAfClusterId clus
     return true;
 }
 
-/** @brief Clear Report Table
- *
- * This function is called by the framework when the application should clear
- * the report table.
- *
- */
-EmberStatus emberAfClearReportTableCallback(void)
-{
-    return EMBER_LIBRARY_NOT_PRESENT;
-}
-
 /** @brief Key Establishment Cluster Client Command Received
  *
  * This function is called by the application framework when a server-to-client
@@ -248,21 +237,6 @@ void emberAfClusterInitCallback(uint8_t endpoint, EmberAfClusterId clusterId) {}
 bool emberAfClusterSecurityCustomCallback(EmberAfProfileId profileId, EmberAfClusterId clusterId, bool incoming, uint8_t commandId)
 {
     // By default, assume APS encryption is not required.
-    return false;
-}
-
-/** @brief Configure Reporting Command
- *
- * This function is called by the application framework when a Configure
- * Reporting command is received from an external device.  The Configure
- * Reporting command contains a series of attribute reporting configuration
- * records.  The application should return true if the message was processed or
- * false if it was not.
- *
- * @param cmd   Ver.: always
- */
-bool emberAfConfigureReportingCommandCallback(const EmberAfClusterCommand * cmd)
-{
     return false;
 }
 
@@ -2002,19 +1976,6 @@ bool emberAfReadAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t *
     return false;
 }
 
-/** @brief Read Reporting Configuration Command
- *
- * This function is called by the application framework when a Read Reporting
- * Configuration command is received from an external device.  The application
- * should return true if the message was processed or false if it was not.
- *
- * @param cmd   Ver.: always
- */
-bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterCommand * cmd)
-{
-    return false;
-}
-
 /** @brief Read Reporting Configuration Response
  *
  * This function is called by the application framework when a Read Reporting
@@ -2120,25 +2081,6 @@ bool emberAfReportAttributesCallback(EmberAfClusterId clusterId, uint8_t * buffe
 {
     return false;
 }
-
-/** @brief Reporting Attribute Change
- *
- * This function is called by the framework when an attribute managed by the
- * framework changes.  The application should call this function when an
- * externally-managed attribute changes.  The application should use the change
- * notification to inform its reporting decisions.
- *
- * @param endpoint   Ver.: always
- * @param clusterId   Ver.: always
- * @param attributeId   Ver.: always
- * @param mask   Ver.: always
- * @param manufacturerCode   Ver.: always
- * @param type   Ver.: always
- * @param data   Ver.: always
- */
-void emberAfReportingAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
-                                             uint8_t mask, uint16_t manufacturerCode, EmberAfAttributeType type, uint8_t * data)
-{}
 
 /** @brief Scan Error
  *
@@ -2435,3 +2377,26 @@ void halRadioPowerUpHandler(void) {}
  * @param sleepMode    Idle/sleep mode
  */
 void halSleepCallback(bool enter, SleepModes sleepMode) {}
+
+/** @brief Identify Cluster Start Feedback Callback
+ *
+ *
+ *
+ * @param endpoint Endpoint id
+ * @param identifyTime Identify time
+ */
+bool emberAfPluginIdentifyStartFeedbackCallback(uint8_t endpoint, uint16_t identifyTime)
+{
+    return false;
+}
+
+/** @brief Identify Cluster Stop Feedback Callback
+ *
+ *
+ *
+ * @param endpoint Endpoint id
+ */
+bool emberAfPluginIdentifyStopFeedbackCallback(uint8_t endpoint)
+{
+    return false;
+}

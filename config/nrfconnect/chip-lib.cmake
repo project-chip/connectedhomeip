@@ -151,6 +151,7 @@ function(chip_build TARGET_NAME BASE_TARGET_NAME)
     add_library(${TARGET_NAME} INTERFACE)
     target_include_directories(${TARGET_NAME} INTERFACE
         ${CHIP_ROOT}/src
+        ${CHIP_ROOT}/src/app/util
         ${CHIP_ROOT}/src/lib
         ${CHIP_ROOT}/src/lib/core
         ${CHIP_ROOT}/src/include
@@ -160,13 +161,6 @@ function(chip_build TARGET_NAME BASE_TARGET_NAME)
         ${CHIP_OUTPUT_DIR}/gen/third_party/connectedhomeip/src/app/include
     )
     target_link_directories(${TARGET_NAME} INTERFACE
-        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/lib/support/tests/lib
-        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/lib/core/tests/lib
-        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/transport/tests/lib
-        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/setup_payload/tests/lib
-        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/system/tests/lib
-        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/platform/tests/lib
-        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/crypto/tests/lib
         ${CHIP_OUTPUT_DIR}/lib
     )
     target_link_libraries(${TARGET_NAME} INTERFACE -Wl,--start-group ${CHIP_BUILD_ARTIFACTS} -Wl,--end-group)

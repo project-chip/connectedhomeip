@@ -19,10 +19,10 @@
 
 #include "AppTask.h"
 #include "AppEvent.h"
-#include "DataModelHandler.h"
 #include "LEDWidget.h"
 #include "LightingManager.h"
 #include "Server.h"
+#include "Service.h"
 
 #include "app_button.h"
 #include "app_config.h"
@@ -102,6 +102,9 @@ int AppTask::Init()
 {
     ret_code_t ret;
 
+    // Init ZCL Data Model and start server
+    InitServer();
+
     // Initialize LEDs
     sStatusLED.Init(SYSTEM_STATE_LED);
 
@@ -163,7 +166,7 @@ int AppTask::Init()
         CHIP_ERROR err = CHIP_NO_ERROR;
         chip::SetupPayload payload;
         uint32_t setUpPINCode       = 0;
-        uint32_t setUpDiscriminator = 0;
+        uint16_t setUpDiscriminator = 0;
 
         err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
         if (err != CHIP_NO_ERROR)
@@ -393,7 +396,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = kFunction_NoneSelected;
-        NRF_LOG_INFO("Factory reset is not implemented");
+        ConfigurationMgr().InitiateFactoryReset();
     }
 }
 

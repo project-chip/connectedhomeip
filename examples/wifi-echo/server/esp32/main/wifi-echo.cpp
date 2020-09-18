@@ -24,20 +24,18 @@
 #include "LEDWidget.h"
 #include "ListScreen.h"
 #include "QRCodeScreen.h"
-#include "RendezvousSession.h"
+#include "RendezvousDeviceDelegate.h"
 #include "ScreenManager.h"
 #include "WiFiWidget.h"
-#include "esp_event_loop.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
+#include "esp_netif.h"
 #include "esp_spi_flash.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
-
-#include "tcpip_adapter.h"
 
 #include <cmath>
 #include <cstdio>
@@ -81,11 +79,6 @@ extern void startClient(void);
 
 #endif // !CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
-// A temporary value assigned for this example's QRCode
-// Spells CHIP on a dialer
-#define EXAMPLE_VENDOR_ID 2447
-// Spells ESP32 on a dialer
-#define EXAMPLE_PRODUCT_ID 37732
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
@@ -103,13 +96,12 @@ LEDWidget statusLED2;
 BluetoothWidget bluetoothLED;
 WiFiWidget wifiLED;
 
-extern NodeId kLocalNodeId;
-extern void PairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId, SecurePairingSession * pairing);
+extern void PairingComplete(SecurePairingSession * pairing);
 
 const char * TAG = "wifi-echo-demo";
 
 static EchoDeviceCallbacks EchoCallbacks;
-RendezvousSession * rendezvousSession = nullptr;
+RendezvousDeviceDelegate * rendezvousDelegate = nullptr;
 
 namespace {
 
@@ -348,10 +340,10 @@ void SetupPretendDevices()
 
 void GetGatewayIP(char * ip_buf, size_t ip_len)
 {
-    tcpip_adapter_ip_info_t ip;
-    tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_AP, &ip);
-    IPAddress::FromIPv4(ip.ip).ToString(ip_buf, ip_len);
-    ESP_LOGE(TAG, "Got gateway ip %s", ip_buf);
+    esp_netif_ip_info_t ipInfo;
+    esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_AP_DEF"), &ipInfo);
+    esp_ip4addr_ntoa(&ipInfo.ip, ip_buf, ip_len);
+    ESP_LOGI(TAG, "Got gateway ip %s", ip_buf);
 }
 
 bool isRendezvousBLE()
@@ -369,11 +361,11 @@ std::string createSetupPayload()
     CHIP_ERROR err = CHIP_NO_ERROR;
     std::string result;
 
-    uint32_t discriminator;
+    uint16_t discriminator;
     err = ConfigurationMgr().GetSetupDiscriminator(discriminator);
     if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "Couldn't get discriminator: %d", err);
+        ESP_LOGE(TAG, "Couldn't get discriminator: %s", ErrorStr(err));
         return result;
     }
 
@@ -381,7 +373,23 @@ std::string createSetupPayload()
     err = ConfigurationMgr().GetSetupPinCode(setupPINCode);
     if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "Couldn't get setupPINCode: %d", err);
+        ESP_LOGE(TAG, "Couldn't get setupPINCode: %s", ErrorStr(err));
+        return result;
+    }
+
+    uint16_t vendorId;
+    err = ConfigurationMgr().GetVendorId(vendorId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Couldn't get vendorId: %s", ErrorStr(err));
+        return result;
+    }
+
+    uint16_t productId;
+    err = ConfigurationMgr().GetProductId(productId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Couldn't get productId: %s", ErrorStr(err));
         return result;
     }
 
@@ -390,8 +398,8 @@ std::string createSetupPayload()
     payload.discriminator         = discriminator;
     payload.setUpPINCode          = setupPINCode;
     payload.rendezvousInformation = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
-    payload.vendorID              = EXAMPLE_VENDOR_ID;
-    payload.productID             = EXAMPLE_PRODUCT_ID;
+    payload.vendorID              = vendorId;
+    payload.productID             = productId;
 
     if (!isRendezvousBLE())
     {
@@ -477,19 +485,12 @@ extern "C" void app_main()
 
     if (isRendezvousBLE())
     {
-        uint32_t setupPINCode;
-        err = ConfigurationMgr().GetSetupPinCode(setupPINCode);
-        if (err != CHIP_NO_ERROR)
-        {
-            ESP_LOGE(TAG, "GetSetupPinCode() failed: %s", ErrorStr(err));
-            return;
-        }
-        rendezvousSession = new RendezvousSession(&bluetoothLED, setupPINCode, kLocalNodeId);
+        rendezvousDelegate = new RendezvousDeviceDelegate();
     }
     else if (isRendezvousBypassed())
     {
         ChipLogProgress(Ble, "Rendezvous and Secure Pairing skipped. Using test secret.");
-        PairingComplete(Optional<NodeId>::Value(kUndefinedNodeId), 0, 0, &gTestPairing);
+        PairingComplete(&gTestPairing);
     }
 
 #if CONFIG_USE_ECHO_CLIENT

@@ -28,7 +28,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.4.1
+            image: connectedhomeip/chip-build-esp32:0.4.7
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -41,7 +41,7 @@ jobs:
                   fetch-depth: 0
                   submodules: true
             - name: Build example Echo App
-              run: scripts/examples/esp_echo_app.sh
+              run: scripts/examples/esp_echo_app.sh CHIP_BUILD_WITH_GN=n
             - name: Copy aside build products
               run: |
                   mkdir -p example_binaries/$BUILD_TYPE-build

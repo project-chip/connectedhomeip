@@ -28,6 +28,7 @@ target_sources(app PRIVATE
     ${APP_ROOT}/cmd_device.cpp
     ${APP_ROOT}/cmd_misc.cpp
     ${APP_ROOT}/cmd_otcli.cpp
+    ${APP_ROOT}/cmd_btp.cpp
     ${APP_ROOT}/main.cpp
 )
 

@@ -62,3 +62,6 @@ TAGS
 # Python bytecodes
 __pycache__
 *.pyc
+
+# Doxygen outputs
+docs/html

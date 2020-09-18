@@ -19,17 +19,36 @@ template("nrf5_executable") {
   objcopy_image_format = "ihex"
   objcopy = "arm-none-eabi-objcopy"
 
+  # Copy flashing dependencies, including the softdevice image, to the output
+  # directory, so that the output is collectively self-contained; this allows
+  # flashing to work reliably even if the build and flashing steps take place
+  # on different machines or in different containers.
+
+  flashing_runtime_target = target_name + ".flashing_runtime"
+  softdevice_dir = "${invoker.nrf5_sdk_root}/components/softdevice/s140/hex"
+  softdevice_file = "s140_nrf52_${invoker.nrf5_sdk_version}_softdevice.hex"
+  copy(flashing_runtime_target) {
+    sources = [
+      "${chip_root}/scripts/flashing/firmware_utils.py",
+      "${chip_root}/scripts/flashing/nrf5_firmware_utils.py",
+      "${softdevice_dir}/${softdevice_file}",
+    ]
+    outputs = [ "${root_out_dir}/{{source_file_part}}" ]
+  }
+
   flashing_script_generator =
-      "${invoker.nrf5_sdk_build_root}/gen_flashing_script.py"
+      "${chip_root}/scripts/flashing/gen_flashing_script.py"
   flashing_script_name = invoker.output_name + ".flash.py"
   flashing_options = [
-    "--scripts-dir",
-    rebase_path(invoker.nrf5_sdk_build_root),
+    "nrf5",
     "--softdevice",
-    "${invoker.nrf5_sdk_root}/components/softdevice/s140/hex/s140_nrf52_${invoker.nrf5_sdk_version}_softdevice.hex",
+    rebase_path("${root_out_dir}/${softdevice_file}",
+                root_out_dir,
+                root_build_dir),
   ]
 
   flashable_executable(target_name) {
     forward_variables_from(invoker, "*")
+    data_deps = [ ":${flashing_runtime_target}" ]
   }
 }

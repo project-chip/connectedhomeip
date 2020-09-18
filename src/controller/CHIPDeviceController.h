@@ -32,8 +32,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/DLLUtil.h>
-#include <transport/BLE.h>
-#include <transport/SecurePairingSession.h>
+#include <transport/RendezvousSession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/UDP.h>
 
@@ -51,81 +50,7 @@ typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * app
 typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
 };
 
-class BLEDeviceConnectionParameters
-{
-public:
-    BLEDeviceConnectionParameters();
-
-    NodeId GetRemoteDeviceId() const { return remoteDeviceId; }
-    BLEDeviceConnectionParameters & SetRemoteDeviceId(NodeId id)
-    {
-        remoteDeviceId = id;
-        return *this;
-    }
-
-    uint16_t GetDiscriminator() const { return discriminator; }
-    BLEDeviceConnectionParameters & SetDiscriminator(uint16_t value)
-    {
-        discriminator = value;
-        return *this;
-    }
-
-    uint32_t GetSetupPINCode() const { return setupPINCode; }
-    BLEDeviceConnectionParameters & SetSetupPINCode(uint32_t value)
-    {
-        setupPINCode = value;
-        return *this;
-    }
-
-    void * GetAppReqState() const { return appReqState; }
-    BLEDeviceConnectionParameters & SetAppReqState(void * value)
-    {
-        appReqState = value;
-        return *this;
-    }
-
-    NewConnectionHandler GetOnConnected() const { return onConnected; }
-    BLEDeviceConnectionParameters & SetOnConnected(NewConnectionHandler value)
-    {
-        onConnected = value;
-        return *this;
-    }
-
-    MessageReceiveHandler GetOnMessageReceived() const { return onMessageReceived; }
-    BLEDeviceConnectionParameters & SetOnMessageReceived(MessageReceiveHandler value)
-    {
-        onMessageReceived = value;
-        return *this;
-    }
-
-    ErrorHandler GetOnError() const { return onError; }
-    BLEDeviceConnectionParameters & SetOnError(ErrorHandler value)
-    {
-        onError = value;
-        return *this;
-    }
-
-    BleLayer * GetBleLayer() const { return bleLayer; }
-    BLEDeviceConnectionParameters & SetBleLayer(BleLayer * value)
-    {
-        bleLayer = value;
-        return *this;
-    }
-
-private:
-    NodeId remoteDeviceId                   = 0;
-    uint16_t discriminator                  = 0;
-    uint32_t setupPINCode                   = 0;
-    void * appReqState                      = nullptr;
-    NewConnectionHandler onConnected        = nullptr;
-    MessageReceiveHandler onMessageReceived = nullptr;
-    ErrorHandler onError                    = nullptr;
-    BleLayer * bleLayer                     = nullptr;
-};
-
-class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback,
-                                        public SecurePairingSessionDelegate,
-                                        public Transport::BLECallbackHandler
+class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback, public RendezvousSessionDelegate
 {
     friend class ChipDeviceControllerCallback;
 
@@ -148,37 +73,19 @@ public:
     // ----- Connection Management -----
     /**
      * @brief
-     *   Connect to a CHIP device with a given name for Rendezvous
+     *   Connect to a CHIP device with the provided Rendezvous connection parameters
      *
      * @param[in] remoteDeviceId        The remote device Id.
-     * @param[in] discriminator         The discriminator of the requested Device
-     * @param[in] setupPINCode          The setup PIN code of the requested Device
+     * @param[in] params                The Rendezvous connection parameters
      * @param[in] appReqState           Application specific context to be passed back when a message is received or on error
      * @param[in] onConnected           Callback for when the connection is established
      * @param[in] onMessageReceived     Callback for when a message is received
      * @param[in] onError               Callback for when an error occurs
-     * @return CHIP_ERROR               The connection status
-     */
-    CHIP_ERROR ConnectDevice(NodeId remoteDeviceId, const uint16_t discriminator, const uint32_t setupPINCode, void * appReqState,
-                             NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived, ErrorHandler onError)
-    {
-        return ConnectDevice(BLEDeviceConnectionParameters()
-                                 .SetRemoteDeviceId(remoteDeviceId)
-                                 .SetDiscriminator(discriminator)
-                                 .SetSetupPINCode(setupPINCode)
-                                 .SetAppReqState(appReqState)
-                                 .SetOnConnected(onConnected)
-                                 .SetOnMessageReceived(onMessageReceived)
-                                 .SetOnError(onError));
-    }
-
-    /**
-     * @brief
-     *   Connect to a CHIP device with the provided BLE connection parameters
      *
      * @return CHIP_ERROR               The connection status
      */
-    CHIP_ERROR ConnectDevice(const BLEDeviceConnectionParameters & params);
+    CHIP_ERROR ConnectDevice(NodeId remoteDeviceId, RendezvousParameters & params, void * appReqState,
+                             NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived, ErrorHandler onError);
 
     /**
      * @brief
@@ -194,7 +101,8 @@ public:
      * @return CHIP_ERROR           The connection status
      */
     CHIP_ERROR ConnectDevice(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState, NewConnectionHandler onConnected,
-                             MessageReceiveHandler onMessageReceived, ErrorHandler onError, uint16_t devicePort = CHIP_PORT);
+                             MessageReceiveHandler onMessageReceived, ErrorHandler onError, uint16_t devicePort = CHIP_PORT,
+                             Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
 
     /**
      * @brief
@@ -213,30 +121,8 @@ public:
     [[deprecated("Available until Rendezvous is implemented")]] CHIP_ERROR
     ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
                                       NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
-                                      ErrorHandler onError, uint16_t devicePort = CHIP_PORT);
-
-    /**
-     * @brief
-     *   Called when pairing session generates a new message that should be sent to peer.
-     *
-     * @param msgBuf the new message that should be sent to the peer
-     */
-    virtual CHIP_ERROR OnNewMessageForPeer(System::PacketBuffer * msgBuf) override;
-
-    /**
-     * @brief
-     *   Called when pairing fails with an error
-     *
-     * @param error error code
-     */
-    virtual void OnPairingError(CHIP_ERROR error) override;
-
-    /**
-     * @brief
-     *   Called when the pairing is complete and the new secure session has been established
-     *
-     */
-    virtual void OnPairingComplete(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId) override;
+                                      ErrorHandler onError, uint16_t devicePort = CHIP_PORT,
+                                      Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
 
     /**
      * @brief
@@ -303,17 +189,13 @@ public:
 
     void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
 
-    //////////// BLECallbackHandler Implementation ///////////////
-    void OnBLEConnectionError(BLE_ERROR err) override;
-    void OnBLEConnectionComplete(BLE_ERROR err) override;
-    void OnBLEConnectionClosed(BLE_ERROR err) override;
-    void OnBLEPacketReceived(PacketBuffer * buffer) override;
+    //////////// RendezvousSessionDelegate Implementation ///////////////
+    void OnRendezvousConnectionOpened() override;
+    void OnRendezvousConnectionClosed() override;
+    void OnRendezvousError(CHIP_ERROR err) override;
+    void OnRendezvousMessageReceived(PacketBuffer * buffer) override;
 
 private:
-#if CONFIG_NETWORK_LAYER_BLE
-    friend class Transport::BLE;
-#endif
-
     enum
     {
         kState_NotInitialized = 0,
@@ -331,7 +213,7 @@ private:
     Inet::InetLayer * mInetLayer;
 
     SecureSessionMgr<Transport::UDP> * mSessionManager;
-    Transport::Base * mUnsecuredTransport = NULL;
+    RendezvousSession * mRendezvousSession;
 
     ConnectionState mConState;
     void * mAppReqState;
@@ -344,8 +226,6 @@ private:
 
     ErrorHandler mOnError;
     NewConnectionHandler mOnNewConnection;
-    NewConnectionHandler mPairingComplete = nullptr;
-    MessageReceiveHandler mAppMsgHandler  = nullptr;
     System::PacketBuffer * mCurReqMsg;
 
     NodeId mLocalDeviceId;
@@ -355,24 +235,13 @@ private:
     uint32_t mMessageNumber = 0;
 
     SecurePairingSession mPairingSession;
-    uint16_t mNextKeyId     = 0;
-    bool mPairingInProgress = false;
-
-    uint32_t mSetupPINCode     = 0;
-    uint16_t mPeerKeyId        = 0;
-    uint16_t mLocalPairedKeyId = 0;
 
     void ClearRequestState();
     void ClearOpState();
 
-    static void PairingMessageHandler(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
-
-    static void BLEConnectionHandler(ChipDeviceController * deviceController, Transport::PeerConnectionState * state,
-                                     void * appReqState);
-
     CHIP_ERROR ConnectDeviceUsingPairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
                                          NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
-                                         ErrorHandler onError, uint16_t devicePort, uint16_t localKeyId,
+                                         ErrorHandler onError, uint16_t devicePort, Inet::InterfaceId interfaceId,
                                          SecurePairingSession * pairing);
 };
 

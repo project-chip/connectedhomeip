@@ -29,8 +29,8 @@
 #define QR_CODE_FREEZE 1.0 * NSEC_PER_SEC
 
 // The expected Vendor ID for CHIP demos
-// Spells CHIP on a dialer
-#define EXAMPLE_VENDOR_ID 2447
+// 0x235A: Chip's Vendor Id
+#define EXAMPLE_VENDOR_ID 0x235A
 
 #define EXAMPLE_VENDOR_TAG_IP 1
 #define MAX_IP_LEN 46
