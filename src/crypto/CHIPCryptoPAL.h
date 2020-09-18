@@ -529,7 +529,7 @@ public:
      *
      *  @param fe  A pointer to an initialized implementation dependant field element.
      *
-     *  @requirements The implementation must generate a random element from [0, q) where q is the curve order.
+     *  @note The implementation must generate a random element from [0, q) where q is the curve order.
      *
      *  @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
@@ -542,7 +542,7 @@ public:
      *  @param fe1  A pointer to an initialized implementation dependant field element.
      *  @param fe2  A pointer to an initialized implementation dependant field element.
      *
-     *  @requirements The result must be a field element (i.e. reduced by the curve order).
+     *  @note The result must be a field element (i.e. reduced by the curve order).
      *
      *  @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
