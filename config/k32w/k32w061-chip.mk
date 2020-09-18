@@ -64,7 +64,21 @@ CHIP_BUILD_ARCH = $(shell $(CHIP_ROOT)/third_party/nlbuild-autotools/repo/third_
 # Compilation flags specific to building CHIP
 # ==================================================
 
-CHIP_DEFINES += \
+CHIP_DEFINES +=                                                                                                                    \
+    MBEDTLS_CONFIG_FILE=\<$(CHIP_ROOT)/third_party/openthread/repo/third_party/mbedtls/mbedtls-config.h\>                          \
+    MBEDTLS_USER_CONFIG_FILE=\<$(CHIP_ROOT)/third_party/openthread/repo/examples/platforms/k32w/k32w061/k32w061-mbedtls-config.h\> \
+    MBEDTLS_THREADING_C=1                                                                                                          \
+    MBEDTLS_THREADING_ALT=1                                                                                                        \
+    MBEDTLS_X509_CSR_WRITE_C                                                                                                       \
+    MBEDTLS_X509_CREATE_C                                                                                                          \
+    MBEDTLS_PK_WRITE_C                                                                                                             \
+    MBEDTLS_OID_C                                                                                                                  \
+    MBEDTLS_PEM_WRITE_C                                                                                                            \
+    MBEDTLS_BASE64_C                                                                                                               \
+    MBEDTLS_SSL_COOKIE_C                                                                                                           \
+    MBEDTLS_HKDF_C                                                                                                                 \
+    MBEDTLS_SSL_SRV_C                                                                                                              \
+    MBEDTLS_ERROR_C
 
 CHIP_DEFINE_FLAGS = $(foreach def,$(CHIP_DEFINES),-D$(def))
 CHIP_CPPFLAGS = $(STD_CFLAGS) $(CFLAGS) $(DEBUG_FLAGS) $(OPT_FLAGS) $(DEFINE_FLAGS) $(CHIP_DEFINE_FLAGS) $(INC_FLAGS)
@@ -75,36 +89,36 @@ CHIP_CXXFLAGS = $(STD_CXXFLAGS) $(CXXFLAGS)
 # ==================================================
 
 CHIP_CONFIGURE_OPTIONS = \
-    -C AR="$(AR)" AS="$(AS)" CC="$(CCACHE) $(CC)" CXX="$(CCACHE) $(CXX)" \
-    LD="$(LD)" OBJCOPY="$(OBJCOPY)" RANLIB="$(RANLIB)" INSTALL="$(INSTALL) $(INSTALLFLAGS)" \
+    -C AR="$(AR)" AS="$(AS)" CC="$(CCACHE) $(CC)" CXX="$(CCACHE) $(CXX)"                                                               \
+    LD="$(LD)" OBJCOPY="$(OBJCOPY)" RANLIB="$(RANLIB)" INSTALL="$(INSTALL) $(INSTALLFLAGS)"                                            \
     CPPFLAGS="$(CHIP_CPPFLAGS) -imacros $(CHIP_ROOT)/third_party/openthread/repo/examples/platforms/k32w/k32w061/k32w061-sdk-config.h" \
-    CXXFLAGS="$(CHIP_CXXFLAGS)" \
-    --prefix=$(CHIP_OUTPUT_DIR) \
-    --exec-prefix=$(CHIP_OUTPUT_DIR) \
-    --host=$(CHIP_HOST_ARCH) \
-    --build=$(CHIP_BUILD_ARCH) \
-    --with-target-style=embedded \
-    --with-device-layer=k32w \
-    --with-network-layer=all \
-    --with-target-network=lwip \
-    --with-lwip=internal \
-    --with-lwip-target=k32w \
-    --with-inet-endpoint="tcp udp" \
-    --with-openssl=no \
-    --with-openthread=internal \
-    --with-logging-style=external \
-    --with-chip-project-includes=$(CHIP_PROJECT_CONFIG) \
-    --with-chip-system-project-includes=$(CHIP_PROJECT_CONFIG) \
-    --with-chip-inet-project-includes=$(CHIP_PROJECT_CONFIG) \
-    --with-chip-ble-project-includes=$(CHIP_PROJECT_CONFIG) \
-    --with-chip-warm-project-includes=$(CHIP_PROJECT_CONFIG) \
-    --with-chip-device-project-includes=$(CHIP_PROJECT_CONFIG) \
-    --disable-ipv4 \
-    --disable-tests \
-    --disable-tools \
-    --disable-docs \
-    --disable-java \
-    --disable-device-manager \
+    CXXFLAGS="$(CHIP_CXXFLAGS)"                                                                                                        \
+    --prefix=$(CHIP_OUTPUT_DIR)                                                                                                        \
+    --exec-prefix=$(CHIP_OUTPUT_DIR)                                                                                                   \
+    --host=$(CHIP_HOST_ARCH)                                                                                                           \
+    --build=$(CHIP_BUILD_ARCH)                                                                                                         \
+    --with-target-style=embedded                                                                                                       \
+    --with-device-layer=k32w                                                                                                           \
+    --with-network-layer=all                                                                                                           \
+    --with-target-network=lwip                                                                                                         \
+    --with-lwip=internal                                                                                                               \
+    --with-lwip-target=k32w                                                                                                            \
+    --with-inet-endpoint="tcp udp"                                                                                                     \
+    --with-openssl=no                                                                                                                  \
+    --with-openthread=internal                                                                                                         \
+    --with-logging-style=external                                                                                                      \
+    --with-chip-project-includes=$(CHIP_PROJECT_CONFIG)                                                                                \
+    --with-chip-system-project-includes=$(CHIP_PROJECT_CONFIG)                                                                         \
+    --with-chip-inet-project-includes=$(CHIP_PROJECT_CONFIG)                                                                           \
+    --with-chip-ble-project-includes=$(CHIP_PROJECT_CONFIG)                                                                            \
+    --with-chip-warm-project-includes=$(CHIP_PROJECT_CONFIG)                                                                           \
+    --with-chip-device-project-includes=$(CHIP_PROJECT_CONFIG)                                                                         \
+    --disable-ipv4                                                                                                                     \
+    --disable-tests                                                                                                                    \
+    --disable-tools                                                                                                                    \
+    --disable-docs                                                                                                                     \
+    --disable-java                                                                                                                     \
+    --disable-device-manager                                                                                                           \
     --with-crypto=mbedtls
 
 # Enable / disable optimization.
@@ -123,35 +137,37 @@ endif
 # ==================================================
 
 # Add CHIP-specific paths to the standard include directories.
-STD_INC_DIRS += \
-    $(CHIP_OUTPUT_DIR)/include \
-    $(CHIP_OUTPUT_DIR)/src/include \
-    $(CHIP_ROOT)/third_party/lwip/repo/lwip/src/include \
-    $(CHIP_ROOT)/src/lwip \
-    $(CHIP_ROOT)/src/lwip/k32w \
-    $(CHIP_ROOT)/src/lwip/freertos \
-    $(K32W061_SDK_ROOT)/CMSIS/Include \
-    $(K32W061_SDK_ROOT)/devices/K32W061 \
-    $(K32W061_SDK_ROOT)/devices/K32W061/drivers \
-    $(K32W061_SDK_ROOT)/devices/K32W061/utilities \
-    $(K32W061_SDK_ROOT)/devices/K32W061/utilities/debug_console \
-    $(K32W061_SDK_ROOT)/devices/K32W061/utilities/str \
-    $(K32W061_SDK_ROOT)/middleware/wireless/framework/Common \
-    $(K32W061_SDK_ROOT)/middleware/wireless/framework/Lists \
-    $(K32W061_SDK_ROOT)/middleware/wireless/framework/PDM/Include \
-    $(K32W061_SDK_ROOT)/middleware/wireless/framework/MemManager/Interface \
+STD_INC_DIRS +=                                                                                      \
+    $(CHIP_OUTPUT_DIR)/include                                                                       \
+    $(CHIP_OUTPUT_DIR)/src/include                                                                   \
+    $(CHIP_OUTPUT_DIR)/third_party/openthread/include                                                \
+    $(CHIP_ROOT)/third_party/lwip/repo/lwip/src/include                                              \
+    $(CHIP_ROOT)/third_party/openthread/repo/third_party/nxp/K32W061DK6/middleware/mbedtls/port/ksdk \
+    $(CHIP_ROOT)/src/lwip                                                                            \
+    $(CHIP_ROOT)/src/lwip/k32w                                                                       \
+    $(CHIP_ROOT)/src/lwip/freertos                                                                   \
+    $(K32W061_SDK_ROOT)/CMSIS/Include                                                                \
+    $(K32W061_SDK_ROOT)/devices/K32W061                                                              \
+    $(K32W061_SDK_ROOT)/devices/K32W061/drivers                                                      \
+    $(K32W061_SDK_ROOT)/devices/K32W061/utilities                                                    \
+    $(K32W061_SDK_ROOT)/devices/K32W061/utilities/debug_console                                      \
+    $(K32W061_SDK_ROOT)/devices/K32W061/utilities/str                                                \
+    $(K32W061_SDK_ROOT)/middleware/wireless/framework/Common                                         \
+    $(K32W061_SDK_ROOT)/middleware/wireless/framework/Lists                                          \
+    $(K32W061_SDK_ROOT)/middleware/wireless/framework/PDM/Include                                    \
+    $(K32W061_SDK_ROOT)/middleware/wireless/framework/MemManager/Interface                           \
     $(CHIP_ROOT)/third_party/openthread/repo/examples/platforms
 
 # Add the location of CHIP libraries to application link action.
 STD_LDFLAGS += -L$(CHIP_OUTPUT_DIR)/lib
 
 # Add CHIP libraries to standard libraries list.
-STD_LIBS += \
+STD_LIBS +=       \
     -lDeviceLayer \
-    -lCHIP \
-    -lInetLayer \
+    -lCHIP        \
+    -lInetLayer   \
     -lSystemLayer \
-    -llwip \
+    -llwip        \
     -lmbedtls
 
 # Add the appropriate CHIP target as a prerequisite to all application
@@ -160,13 +176,13 @@ STD_LIBS += \
 STD_COMPILE_PREREQUISITES += install-chip
 
 # Add the CHIP libraries as prerequisites for linking the application.
-STD_LINK_PREREQUISITES += \
+STD_LINK_PREREQUISITES +=                   \
     $(CHIP_OUTPUT_DIR)/lib/libDeviceLayer.a \
-    $(CHIP_OUTPUT_DIR)/lib/libCHIP.a \
-    $(CHIP_OUTPUT_DIR)/lib/libInetLayer.a \
+    $(CHIP_OUTPUT_DIR)/lib/libCHIP.a        \
+    $(CHIP_OUTPUT_DIR)/lib/libInetLayer.a   \
     $(CHIP_OUTPUT_DIR)/lib/libSystemLayer.a \
-    $(CHIP_OUTPUT_DIR)/lib/liblwip.a \
-    $(CHIP_OUTPUT_DIR)/lib/libmbedtls.a \
+    $(CHIP_OUTPUT_DIR)/lib/liblwip.a        \
+    $(CHIP_OUTPUT_DIR)/lib/libmbedtls.a
 
 # ==================================================
 # Late-bound build rules for CHIP

@@ -20,6 +20,7 @@
 #include "AppTask.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
+#include "Server.h"
 #include "support/ErrorStr.h"
 
 #include <platform/CHIPDeviceLayer.h>
@@ -75,6 +76,9 @@ int AppTask::StartAppTask()
 int AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // Init ZCL Data Model and start server
+    InitServer();
 
     TMR_Init();
 

@@ -1817,6 +1817,7 @@ NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
                 -I${chip_srcdir}/third_party/openthread/repo/src/core \
                 -I${chip_srcdir}/third_party/mbedtls/repo/include \
                 -I${chip_srcdir}/third_party/mbedtls/repo/ \
+                -I${chip_srcdir}/examples/lock-app/k32w/main/include \
                 -I${K32W061_SDK_ROOT}/middleware/mbedtls/port/ksdk \
                 -I${K32W061_SDK_ROOT}/middleware/mbedtls/repo/include/mbedtls \
                 -I${K32W061_SDK_ROOT}/middleware/wireless/ieee-802.15.4/uMac/Include \
