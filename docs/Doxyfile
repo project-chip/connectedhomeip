@@ -824,9 +824,11 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = README.md \
+                         CODE_OF_CONDUCT.md \
                          CONTRIBUTING.md \
                          docs/README.md \
                          docs/BUILDING.md \
+                         docs/BUILDING-GN.md \
                          docs/VSCODE_DEVELOPMENT.md \
                          docs/PROJECT_FLOW.md \
                          docs/STYLE_GUIDE.md \
