@@ -34,7 +34,6 @@ SUBDIRS                                  = \
     examples                               \
     third_party                            \
     src                                    \
-    docs                                   \
     $(NULL)
 
 PRETTY_SUBDIRS                           = \
@@ -214,24 +213,6 @@ dist-hook: $(distdir)/.dist-version
 #
 distclean-local:
 	$(MAKE) -C $(srcdir) -f Makefile-bootstrap clean-repos
-
-#
-# Top-level convenience target for making documentation.
-#
-
-.PHONY: doc
-doc: $(BUILT_SOURCES)
-	$(MAKE) -C docs $(@)
-
-#
-# Top-level convenience target for making a documentation-only
-# distribution whose results appear at the top level of the build tree
-# in the same fashion that the distribution would be for 'make dist'.
-#
-
-.PHONY: docdist
-docdist: $(BUILT_SOURCES)
-	$(MAKE) -C docs docdistdir=$(abs_builddir) $(@)
 
 #
 # Top-level convenience target for making a tools-only distribution

@@ -896,14 +896,6 @@ AC_DEFINE_UNQUOTED([CHIP_ENABLE_CHIPOBLE_TEST],[${CHIP_ENABLE_CHIPOBLE_TEST}],[D
 # Documentation
 #
 
-# Determine whether or not documentation (via Doxygen) should be built
-# or not, with 'auto' as the default and establish a default support
-# value for GraphViz 'dot' support.
-
-NL_ENABLE_DOCS([auto],[NO])
-
-AM_CONDITIONAL(CHIP_BUILD_DOCS, [test "${nl_cv_build_docs}" = "yes"])
-
 #
 # Network Technology Layer
 #
@@ -2552,7 +2544,6 @@ fi
 #
 AC_CONFIG_FILES([
 Makefile
-docs/Makefile
 examples/Makefile
 third_party/Makefile
 third_party/lwip/Makefile
@@ -2650,7 +2641,6 @@ AC_MSG_NOTICE([
   Python extension directory                       : ${pyexecdir:--}
   Verhoeff support                                 : ${enable_verhoeff}
   Pairing code decoding support                    : ${enable_pairing_code_decoding}
-  Documentation support                            : ${nl_cv_build_docs}
   Clang-format                                     : ${CLANG_FORMAT:--}
   Doxygen                                          : ${DOXYGEN:--}
   GraphViz dot                                     : ${DOT:--}
