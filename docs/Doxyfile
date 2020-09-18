@@ -839,6 +839,7 @@ INPUT                  = README.md \
                          src/lib/core \
                          src/lib/support \
                          src/lib/shell \
+                         src/lib/message/support/crypto \
                          src/platform \
                          src/setup_payload \
                          src/system \
