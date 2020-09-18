@@ -28,12 +28,14 @@ die() {
 }
 
 SRC_DIR="$(dirname "$0")/../.."
-BUILD_DIR="$1"; shift
-QEMU_TEST_TARGET="$1"; shift
+BUILD_DIR="$1"
+shift
+QEMU_TEST_TARGET="$1"
+shift
 
 # shellcheck source=/dev/null
 source "$BUILD_DIR"/env.sh
-bash "$BUILD_DIR"/esp32_elf_builder.sh "${BUILD_DIR}/lib/$QEMU_TEST_TARGET"
+bash "$BUILD_DIR"/esp32_elf_builder.sh "$BUILD_DIR/lib/$QEMU_TEST_TARGET"
 
 flash_image_file=$(mktemp)
 log_file=$(mktemp)
