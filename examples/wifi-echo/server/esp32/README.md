@@ -6,13 +6,13 @@ CHIP.
 
 ---
 
--   [CHIP WiFi Echo Server Example](#chip-wifi-echo-server-example)
-    -   [Supported Devices](#supported-devices)
-    -   [Building the Example Application](#building-the-example-application)
-        -   [To build the application, follow these steps:](#to-build-the-application-follow-these-steps)
-    -   [Using the Echo Server](#using-the-echo-server)
-        -   [Connect the ESP32 to a 2.4GHz Network of your choice](#connect-the-esp32-to-a-24ghz-network-of-your-choice)
-        -   [Use the ESP32's Network](#use-the-esp32s-network)
+- [CHIP WiFi Echo Server Example](#chip-wifi-echo-server-example)
+  - [Supported Devices](#supported-devices)
+  - [Building the Example Application](#building-the-example-application)
+    - [To build the application, follow these steps:](#to-build-the-application-follow-these-steps)
+  - [Using the Echo Server](#using-the-echo-server)
+    - [Connect the ESP32 to a 2.4GHz Network of your choice](#connect-the-esp32-to-a-24ghz-network-of-your-choice)
+    - [Use the ESP32's Network](#use-the-esp32s-network)
 
 ---
 
@@ -43,6 +43,10 @@ step. To install these components manually, follow these steps:
           $ git submodule update --init
           $ export IDF_PATH=${HOME}/tools/esp-idf
           $ ./install.sh
+
+-   Install ninja-build
+
+          $ sudo apt-get install ninja-build
 
 ### To build the application, follow these steps:
 
