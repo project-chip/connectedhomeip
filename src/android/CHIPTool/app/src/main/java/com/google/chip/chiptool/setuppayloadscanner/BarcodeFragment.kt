@@ -128,6 +128,7 @@ class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListene
                 payload.version,
                 payload.vendorId,
                 payload.productId,
+                payload.discriminator,
                 payload.setupPinCode,
                 qrCodeInfoMap
             )

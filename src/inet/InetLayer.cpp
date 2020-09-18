@@ -264,7 +264,7 @@ INET_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
 
     mPlatformData = NULL;
 
-    Platform::InetLayer::WillInit(this, aContext);
+    err = Platform::InetLayer::WillInit(this, aContext);
     SuccessOrExit(err);
 
     mSystemLayer = &aSystemLayer;

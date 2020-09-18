@@ -89,6 +89,8 @@ public:
 
     bool CanSendToPeer(const PeerAddress & address) override { return CanSendToPeerImpl<0>(address); }
 
+    void Disconnect(const PeerAddress & address) override { return DisconnectImpl<0>(address); }
+
     /**
      * Initialization method that forwards arguments for initialization to each of the underlying
      * transports.
@@ -128,6 +130,27 @@ private:
     {
         return false;
     }
+
+    /**
+     * Recursive disconnect implementation iterating through transport members.
+     *
+     * @tparam N the index of the underlying transport to send disconnect to
+     *
+     * @param address what address to check.
+     */
+    template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
+    void DisconnectImpl(const PeerAddress & address)
+    {
+        std::get<N>(mTransports).Disconnect(address);
+        DisconnectImpl<N + 1>(address);
+    }
+
+    /**
+     * DisconnectImpl template for out of range N.
+     */
+    template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
+    void DisconnectImpl(const PeerAddress & address)
+    {}
 
     /**
      * Recursive sendmessage implementation iterating through transport members.

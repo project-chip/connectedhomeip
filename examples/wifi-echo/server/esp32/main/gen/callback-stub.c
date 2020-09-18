@@ -2377,3 +2377,26 @@ void halRadioPowerUpHandler(void) {}
  * @param sleepMode    Idle/sleep mode
  */
 void halSleepCallback(bool enter, SleepModes sleepMode) {}
+
+/** @brief Identify Cluster Start Feedback Callback
+ *
+ *
+ *
+ * @param endpoint Endpoint id
+ * @param identifyTime Identify time
+ */
+bool emberAfPluginIdentifyStartFeedbackCallback(uint8_t endpoint, uint16_t identifyTime)
+{
+    return false;
+}
+
+/** @brief Identify Cluster Stop Feedback Callback
+ *
+ *
+ *
+ * @param endpoint Endpoint id
+ */
+bool emberAfPluginIdentifyStopFeedbackCallback(uint8_t endpoint)
+{
+    return false;
+}

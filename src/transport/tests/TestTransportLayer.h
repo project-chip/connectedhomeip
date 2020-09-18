@@ -34,6 +34,7 @@ int TestPeerConnectionsFn(void);
 int TestSecurePairingSession(void);
 int TestSecureSession(void);
 int TestSecureSessionMgr(void);
+int TestTCP(void);
 int TestUDP(void);
 
 #ifdef __cplusplus

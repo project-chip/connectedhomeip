@@ -95,6 +95,7 @@ CHIP_ERROR SecurePairingSession::WaitForPairing(uint32_t mySetUpPINCode, uint32_
     SuccessOrExit(err);
 
     mNextExpectedMsg = Spake2pMsgType::kSpake2pCompute_pA;
+    mPairingComplete = false;
 
 exit:
     return err;

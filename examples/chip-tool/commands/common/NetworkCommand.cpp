@@ -86,8 +86,9 @@ CHIP_ERROR NetworkCommand::ConnectBLE(ChipDeviceController * dc, NodeId remoteId
 CHIP_ERROR NetworkCommand::ConnectUDP(ChipDeviceController * dc, NodeId remoteId)
 {
     char hostIpStr[40];
-    mRemoteAddr.ToString(hostIpStr, sizeof(hostIpStr));
+    mRemoteAddr.address.ToString(hostIpStr, sizeof(hostIpStr));
     snprintf(mName, sizeof(mName), "%s:%d", hostIpStr, mRemotePort);
 
-    return dc->ConnectDeviceWithoutSecurePairing(remoteId, mRemoteAddr, nullptr, onConnect, onMessage, onError, mRemotePort);
+    return dc->ConnectDeviceWithoutSecurePairing(remoteId, mRemoteAddr.address, nullptr, onConnect, onMessage, onError, mRemotePort,
+                                                 mRemoteAddr.interfaceId);
 }

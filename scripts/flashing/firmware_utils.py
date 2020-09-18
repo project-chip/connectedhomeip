@@ -263,7 +263,7 @@ class Flasher:
                 sys.exit({module}.Flasher(DEFAULTS).flash_command(sys.argv))
         """
 
-        script = ('#!/usr/bin/env python' + textwrap.dedent(script).format(
+        script = ('#!/usr/bin/env python3' + textwrap.dedent(script).format(
             module=self.module, defaults='\n'.join(defaults)))
 
         try:

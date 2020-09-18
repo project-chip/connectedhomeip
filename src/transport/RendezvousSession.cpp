@@ -20,6 +20,7 @@
 #include <transport/BLE.h>
 #include <transport/RendezvousSession.h>
 
+static const size_t kMax_SecureSDU_Length          = 1024;
 static constexpr uint32_t kSpake2p_Iteration_Count = 50000;
 static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Exchange Salt";
 
@@ -64,13 +65,83 @@ RendezvousSession::~RendezvousSession()
     mDelegate = nullptr;
 }
 
-CHIP_ERROR RendezvousSession::SendMessage(System::PacketBuffer * buffer)
+CHIP_ERROR RendezvousSession::SendMessage(System::PacketBuffer * msgBuf)
 {
-    // Rendezvous does not use a MessageHeader yet, but the Transport::Base API expects one, so
-    // let build an empty one for now.
-    MessageHeader header;
-    CHIP_ERROR err = mTransport->SendMessage(header, Transport::PeerAddress::BLE(), buffer);
+    CHIP_ERROR err = mPairingInProgress ? SendPairingMessage(msgBuf) : SendSecureMessage(msgBuf);
+    SuccessOrExit(err);
 
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        mPairingInProgress ? OnPairingError(err) : OnRendezvousError(err);
+    }
+    return err;
+}
+
+CHIP_ERROR RendezvousSession::SendPairingMessage(System::PacketBuffer * msgBuf)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    MessageHeader header;
+    size_t headerSize = 0;
+
+    VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(msgBuf->Next() == nullptr, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+    err = header.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
+    SuccessOrExit(err);
+
+    msgBuf->ConsumeHead(headerSize);
+    err = mTransport->SendMessage(header, Transport::PeerAddress::BLE(), msgBuf);
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
+
+CHIP_ERROR RendezvousSession::SendSecureMessage(System::PacketBuffer * msgBuf)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    MessageHeader header;
+    const size_t headerSize = header.EncryptedHeaderSizeBytes();
+    size_t actualEncodedHeaderSize;
+    uint8_t * data  = nullptr;
+    size_t totalLen = 0;
+    size_t taglen   = 0;
+
+    VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(msgBuf->Next() == nullptr, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrExit(msgBuf->TotalLength() < kMax_SecureSDU_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+    header
+        .SetSourceNodeId(mParams.GetLocalNodeId())           //
+        .SetMessageId(mSecureMessageIndex)                   //
+        .SetEncryptionKeyID(mPairingSession.GetLocalKeyId()) //
+        .SetPayloadLength(headerSize + msgBuf->TotalLength());
+
+    VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
+
+    msgBuf->SetStart(msgBuf->Start() - headerSize);
+    data     = msgBuf->Start();
+    totalLen = msgBuf->TotalLength();
+
+    err = header.EncodeEncryptedHeader(data, totalLen, &actualEncodedHeaderSize);
+    SuccessOrExit(err);
+
+    err = mSecureSession.Encrypt(data, totalLen, data, header);
+    SuccessOrExit(err);
+
+    err = header.EncodeMACTag(&data[totalLen], kMaxTagLen, &taglen);
+    SuccessOrExit(err);
+
+    msgBuf->SetDataLength(totalLen + taglen);
+
+    err = mTransport->SendMessage(header, Transport::PeerAddress::BLE(), msgBuf);
+    SuccessOrExit(err);
+
+    mSecureMessageIndex++;
+    msgBuf = nullptr;
+
+exit:
     return err;
 }
 
@@ -83,7 +154,15 @@ void RendezvousSession::OnPairingError(CHIP_ERROR err)
 void RendezvousSession::OnPairingComplete()
 {
     mPairingInProgress = false;
+
+    CHIP_ERROR err = mPairingSession.DeriveSecureSession((const unsigned char *) kSpake2pI2RSessionInfo,
+                                                         strlen(kSpake2pI2RSessionInfo), mSecureSession);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Ble, "Failed to initialize a secure session: %s", ErrorStr(err)));
+
     mDelegate->OnRendezvousConnectionOpened();
+
+exit:
+    return;
 }
 
 void RendezvousSession::OnRendezvousConnectionOpened()
@@ -91,11 +170,11 @@ void RendezvousSession::OnRendezvousConnectionOpened()
     if (mParams.HasDiscriminator())
     {
         CHIP_ERROR err = Pair(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
-        if (err != CHIP_NO_ERROR)
-        {
-            OnPairingError(err);
-        }
+        VerifyOrExit(err == CHIP_NO_ERROR, OnPairingError(err));
     }
+
+exit:
+    return;
 }
 
 void RendezvousSession::OnRendezvousConnectionClosed()
@@ -104,12 +183,13 @@ void RendezvousSession::OnRendezvousConnectionClosed()
 
     if (!mParams.HasDiscriminator())
     {
+        mSecureSession.Reset();
         CHIP_ERROR err = WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
-        if (err != CHIP_NO_ERROR)
-        {
-            OnPairingError(err);
-        }
+        VerifyOrExit(err == CHIP_NO_ERROR, OnPairingError(err));
     }
+
+exit:
+    return;
 }
 
 void RendezvousSession::OnRendezvousError(CHIP_ERROR err)
@@ -117,21 +197,92 @@ void RendezvousSession::OnRendezvousError(CHIP_ERROR err)
     mDelegate->OnRendezvousError(err);
 }
 
-void RendezvousSession::OnRendezvousMessageReceived(PacketBuffer * buffer)
+void RendezvousSession::OnRendezvousMessageReceived(PacketBuffer * msgBuf)
 {
-    if (mPairingInProgress)
-    {
-        MessageHeader header;
-        size_t headerSize = 0;
-        header.Decode(buffer->Start(), buffer->DataLength(), &headerSize);
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-        buffer->ConsumeHead(headerSize);
-        mPairingSession.HandlePeerMessage(header, buffer);
-    }
-    else
+    err = mPairingInProgress ? HandlePairingMessage(msgBuf) : HandleSecureMessage(msgBuf);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
     {
-        mDelegate->OnRendezvousMessageReceived(buffer);
+        mPairingInProgress ? OnPairingError(err) : OnRendezvousError(err);
     }
+}
+
+CHIP_ERROR RendezvousSession::HandlePairingMessage(PacketBuffer * msgBuf)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    MessageHeader header;
+    size_t headerSize = 0;
+
+    err = header.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
+    SuccessOrExit(err);
+
+    msgBuf->ConsumeHead(headerSize);
+
+    err = mPairingSession.HandlePeerMessage(header, msgBuf);
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
+
+CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    MessageHeader header;
+    size_t headerSize              = 0;
+    uint8_t * data                 = nullptr;
+    uint8_t * plainText            = nullptr;
+    uint16_t len                   = 0;
+    size_t decodedSize             = 0;
+    size_t taglen                  = 0;
+    System::PacketBuffer * origMsg = nullptr;
+
+    err = header.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
+    SuccessOrExit(err);
+    msgBuf->ConsumeHead(headerSize);
+
+    headerSize = header.EncryptedHeaderSizeBytes();
+    data       = msgBuf->Start();
+    len        = msgBuf->TotalLength();
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    /* This is a workaround for the case where PacketBuffer payload is not
+       allocated as an inline buffer to PacketBuffer structure */
+    origMsg = msgBuf;
+    msgBuf  = PacketBuffer::NewWithAvailableSize(len);
+    msgBuf->SetDataLength(len, msgBuf);
+#endif
+    plainText = msgBuf->Start();
+
+    err = header.DecodeMACTag(&data[header.GetPayloadLength()], kMaxTagLen, &taglen);
+    SuccessOrExit(err);
+
+    len -= taglen;
+    msgBuf->SetDataLength(len);
+
+    err = mSecureSession.Decrypt(data, len, plainText, header);
+    SuccessOrExit(err);
+
+    err = header.DecodeEncryptedHeader(plainText, headerSize, &decodedSize);
+    SuccessOrExit(err);
+    VerifyOrExit(headerSize == decodedSize, err = CHIP_ERROR_INCORRECT_STATE);
+
+    msgBuf->ConsumeHead(headerSize);
+
+    mDelegate->OnRendezvousMessageReceived(msgBuf);
+    msgBuf = nullptr;
+
+exit:
+    if (origMsg != nullptr)
+    {
+        PacketBuffer::Free(origMsg);
+    }
+
+    return err;
 }
 
 CHIP_ERROR RendezvousSession::WaitForPairing(Optional<NodeId> nodeId, uint32_t setupPINCode)

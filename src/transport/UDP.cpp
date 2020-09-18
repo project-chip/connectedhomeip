@@ -20,8 +20,6 @@
 /**
  *    @file
  *      This file implements the CHIP Connection object that maintains a UDP connection.
- *      TODO This class should be extended to support TCP as well...
- *
  */
 #include <transport/UDP.h>
 
@@ -50,8 +48,6 @@ CHIP_ERROR UDP::Init(UdpListenParameters & params)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
-
-    mSendPort = params.GetMessageSendPort();
 
     err = params.GetInetLayer()->NewUDPEndPoint(&mUDPEndPoint);
     SuccessOrExit(err);
@@ -97,6 +93,7 @@ CHIP_ERROR UDP::SendMessage(const MessageHeader & header, const Transport::PeerA
 
     addrInfo.DestAddress = address.GetIPAddress();
     addrInfo.DestPort    = address.GetPort();
+    addrInfo.Interface   = address.GetInterface();
 
     VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 

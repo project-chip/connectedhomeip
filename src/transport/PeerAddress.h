@@ -27,6 +27,7 @@
 #include <stdio.h>
 
 #include <inet/IPAddress.h>
+#include <inet/InetInterface.h>
 
 namespace chip {
 namespace Transport {
@@ -47,7 +48,7 @@ enum class Type
     kUndefined,
     kUdp,
     kBle,
-    // More constants to be added later, such as TCP
+    kTcp,
 };
 
 /**
@@ -56,7 +57,9 @@ enum class Type
 class PeerAddress
 {
 public:
-    PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type) {}
+    PeerAddress() : mIPAddress(Inet::IPAddress::Any), mTransportType(Type::kUndefined), mInterface(INET_NULL_INTERFACEID) {}
+    PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type), mInterface(INET_NULL_INTERFACEID)
+    {}
     PeerAddress(Type type) : mTransportType(type) {}
 
     PeerAddress(PeerAddress &&)      = default;
@@ -85,12 +88,22 @@ public:
         return *this;
     }
 
+    Inet::InterfaceId GetInterface() const { return mInterface; }
+    PeerAddress & SetInterface(Inet::InterfaceId interface)
+    {
+        mInterface = interface;
+        return *this;
+    }
+
     bool IsInitialized() const { return mTransportType != Type::kUndefined; }
 
-    bool operator==(const PeerAddress & other)
+    bool operator==(const PeerAddress & other) const
     {
-        return (mTransportType == other.mTransportType) && (mIPAddress == other.mIPAddress) && (mPort == other.mPort);
+        return (mTransportType == other.mTransportType) && (mIPAddress == other.mIPAddress) && (mPort == other.mPort) &&
+            (mInterface == other.mInterface);
     }
+
+    bool operator!=(const PeerAddress & other) const { return !(*this == other); }
 
     /// Maximum size of an Inet address ToString format, that can hold both IPV6 and IPV4 addresses.
 #ifdef INET6_ADDRSTRLEN
@@ -120,6 +133,14 @@ public:
             mIPAddress.ToString(ip_addr, sizeof(ip_addr));
             snprintf(buf, bufSize, "UDP:%s:%d", ip_addr, mPort);
             break;
+        case Type::kTcp:
+            mIPAddress.ToString(ip_addr, sizeof(ip_addr));
+            snprintf(buf, bufSize, "TCP:%s:%d", ip_addr, mPort);
+            break;
+        case Type::kBle:
+            // Note that BLE does not currently use any specific address.
+            snprintf(buf, bufSize, "BLE");
+            break;
         default:
             snprintf(buf, bufSize, "ERROR");
             break;
@@ -133,11 +154,18 @@ public:
     static PeerAddress BLE() { return PeerAddress(Type::kBle); }
     static PeerAddress UDP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kUdp); }
     static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port) { return UDP(addr).SetPort(port); }
+    static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port, Inet::InterfaceId interface)
+    {
+        return UDP(addr).SetPort(port).SetInterface(interface);
+    }
+    static PeerAddress TCP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kTcp); }
+    static PeerAddress TCP(const Inet::IPAddress & addr, uint16_t port) { return TCP(addr).SetPort(port); }
 
 private:
     Inet::IPAddress mIPAddress;
     Type mTransportType;
-    uint16_t mPort = CHIP_PORT; ///< Relevant for UDP data sending.
+    uint16_t mPort               = CHIP_PORT; ///< Relevant for UDP data sending.
+    Inet::InterfaceId mInterface = INET_NULL_INTERFACEID;
 };
 
 } // namespace Transport

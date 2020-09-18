@@ -36,5 +36,5 @@ cd "$here" || die 'ack!, where am I?!?'
 # shellcheck source=/dev/null
 source idf.sh
 rm -f ./build/sdkconfig
-SDKCONFIG=./build/sdkconfig SDKCONFIG_DEFAULTS=sdkconfig_qemu.defaults idf make defconfig
-SDKCONFIG=./build/sdkconfig idf make -j8 esp32_elf_builder
+SDKCONFIG=./build/sdkconfig SDKCONFIG_DEFAULTS=sdkconfig_qemu.defaults CHIP_BUILD_WITH_GN=n idf make defconfig
+SDKCONFIG=./build/sdkconfig CHIP_BUILD_WITH_GN=n idf make -j8 esp32_elf_builder
