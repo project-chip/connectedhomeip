@@ -1026,7 +1026,7 @@ DLL_EXPORT Error WillShutdown(Layer & aLayer, void * aContext)
  *
  *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, ::Init.
  *
- *  @param[in]     anError   The overall status being returned via the CHIP System Layer ::Init method.
+ *  @param[in]     aStatus   The overall status being returned via the CHIP System Layer ::Init method.
  */
 DLL_EXPORT void DidInit(Layer & aLayer, void * aContext, Error aStatus)
 {
@@ -1043,7 +1043,7 @@ DLL_EXPORT void DidInit(Layer & aLayer, void * aContext, Error aStatus)
  *
  *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, ::Shutdown.
  *
- *  @param[in]     anError   The overall status being returned via the CHIP System Layer ::Shutdown method.
+ *  @param[in]     aStatus   The overall status being returned via the CHIP System Layer ::Shutdown method.
  *
  *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for shutdown failure. Returning
  *      non-successful status will abort shutdown.
@@ -1080,7 +1080,7 @@ using chip::System::LwIPEvent;
  *
  *  @param[in]     aType     The type of event to post.
  *
- *  @param[in,out] anArg     The argument associated with the event to post.
+ *  @param[in,out] aArgument The argument associated with the event to post.
  *
  *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
  */
@@ -1169,9 +1169,9 @@ exit:
  *
  *  @param[in,out] aLayer    A reference to the layer instance for which events / messages are being dispatched.
  *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, ::Init.
- *  @param[in]     anEvent   The platform-specific event object to dispatch for handling.
+ *  @param[in]     aEvent    The platform-specific event object to dispatch for handling.
  *
- *  @retval   #CHIP_SYSTEM_ERROR_BAD_ARGS          If #aLayer or the event target is NULL.
+ *  @retval   #CHIP_SYSTEM_ERROR_BAD_ARGS          If aLayer or the event target is NULL.
  *  @retval   #CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT  If the event type is unrecognized.
  *  @retval   #CHIP_SYSTEM_ERROR_UNEXPECTED_STATE  If the state of the CHIP System Layer object is unexpected.
  *  @retval   #CHIP_SYSTEM_NO_ERROR                On success.

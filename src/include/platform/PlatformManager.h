@@ -31,10 +31,11 @@ namespace System {
 namespace Platform {
 namespace Layer {
 
-System::Error PostEvent(System::Layer &, void *, System::Object &, System::EventType, uintptr_t);
-System::Error DispatchEvents(System::Layer &, void *);
-System::Error DispatchEvent(System::Layer &, void *, System::Event);
-System::Error StartTimer(System::Layer &, void *, uint32_t);
+System::Error PostEvent(System::Layer & aLayer, void * aContext, System::Object & aTarget, System::EventType aType,
+                        uintptr_t aArgument);
+System::Error DispatchEvents(System::Layer & aLayer, void * aContext);
+System::Error DispatchEvent(System::Layer & aLayer, void * aContext, System::Event aEvent);
+System::Error StartTimer(System::Layer & aLayer, void * aContext, uint32_t aMilliseconds);
 
 } // namespace Layer
 } // namespace Platform
