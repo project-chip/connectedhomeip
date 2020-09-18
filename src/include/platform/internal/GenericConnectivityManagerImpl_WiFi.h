@@ -40,7 +40,7 @@ namespace Internal {
  * class, which also appears as the template's ImplClass parameter.
  *
  * The members of this class are all inlined methods that do nothing, and return static return
- * values.  This allows the compiler to optimize away dead code without the use of #ifdef's.
+ * values.  This allows the compiler to optimize away dead code without the use of \#ifdef's.
  * For example:
  *
  * ```

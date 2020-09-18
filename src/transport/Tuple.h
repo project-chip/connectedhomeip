@@ -56,7 +56,7 @@ namespace Transport {
  * ~~~~~~~~~
  *
  * The intent of this is to allow applications to use any transport types without CHIP pre-defining
- * popular mappings (like UDP only, UDP and BLE, BLE only etc.) and without using #ifdefs to create
+ * popular mappings (like UDP only, UDP and BLE, BLE only etc.) and without using \#ifdefs to create
  * a single 'standard transport'.
  *
  * Transport logic:
