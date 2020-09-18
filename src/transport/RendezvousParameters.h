@@ -57,6 +57,14 @@ public:
         mBleLayer = value;
         return *this;
     }
+
+    bool HasConnectionObject() const { return mConnectionObject != 0; };
+    BLE_CONNECTION_OBJECT GetConnectionObject() const { return mConnectionObject; };
+    RendezvousParameters & SetConnectionObject(BLE_CONNECTION_OBJECT connObj)
+    {
+        mConnectionObject = connObj;
+        return *this;
+    }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 private:
@@ -65,7 +73,8 @@ private:
     uint16_t mDiscriminator = 0;   ///< the target peripheral discriminator
 
 #if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * mBleLayer = nullptr;
+    Ble::BleLayer * mBleLayer               = nullptr;
+    BLE_CONNECTION_OBJECT mConnectionObject = 0;
 #endif // CONFIG_NETWORK_LAYER_BLE
 };
 } // namespace chip
