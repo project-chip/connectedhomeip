@@ -160,11 +160,11 @@
 // If you add new CHIP System Layer errors, please update the translation of error
 // codes to strings in SystemError.cpp, and add them to unittest in test-apps/TestErrorStr.cpp
 
-#endif // _CHIP_SYSTEM_CONFIG_ERROR
-
 /**
  *  @}
  */
+
+#endif // _CHIP_SYSTEM_CONFIG_ERROR
 
 #ifdef __cplusplus
 
