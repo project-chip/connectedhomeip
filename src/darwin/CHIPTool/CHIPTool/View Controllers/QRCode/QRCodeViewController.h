@@ -15,17 +15,10 @@
  *    limitations under the License.
  */
 
-#import "CHIPViewControllerBase.h"
+#import <AVFoundation/AVFoundation.h>
 #import <UIKit/UIKit.h>
+#import <CHIP/CHIP.h>
 
-NS_ASSUME_NONNULL_BEGIN
+@interface QRCodeViewController : UIViewController <AVCaptureMetadataOutputObjectsDelegate,  CHIPDeviceControllerDelegate>
 
-@interface WifiViewController : CHIPViewControllerBase
-
-@property (weak, nonatomic) IBOutlet UITextField * networkSSID;
-@property (weak, nonatomic) IBOutlet UITextField * networkPassword;
-@property (weak, nonatomic) IBOutlet UIButton * saveButton;
-@property (weak, nonatomic) IBOutlet UIButton * clearButton;
 @end
-
-NS_ASSUME_NONNULL_END

@@ -15,11 +15,12 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
-extern NSString * const kCHIPToolDefaultsDomain;
-extern NSString * const kNetworkSSIDDefaultsKey;
-extern NSString * const kNetworkPasswordDefaultsKey;
+NS_ASSUME_NONNULL_BEGIN
 
-id CHIPGetDomainValueForKey(NSString * domain, NSString * key);
-void CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value);
+@interface WifiViewController : UIViewController
+
+@end
+
+NS_ASSUME_NONNULL_END

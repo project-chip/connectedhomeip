@@ -20,6 +20,7 @@
 NSString * const kCHIPToolDefaultsDomain = @"com.apple.chiptool";
 NSString * const kNetworkSSIDDefaultsKey = @"networkSSID";
 NSString * const kNetworkPasswordDefaultsKey = @"networkPassword";
+NSString * const kIPKey = @"ipk";
 
 id CHIPGetDomainValueForKey(NSString * domain, NSString * key)
 {
@@ -35,3 +36,10 @@ void CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value)
     CFPreferencesSetAppValue((CFStringRef) key, (__bridge CFPropertyListRef _Nullable)(value), (CFStringRef) domain);
     CFPreferencesAppSynchronize((CFStringRef) domain);
 }
+
+void CHIPRemoveDomainValueForKey(NSString * domain, NSString * key)
+{
+    CFPreferencesSetAppValue((CFStringRef) key, NULL, (CFStringRef) domain);
+    CFPreferencesAppSynchronize((CFStringRef) domain);
+}
+
