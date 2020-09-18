@@ -16,7 +16,8 @@
  */
 
 /**
- * @file  This file defines the chip::MessageHeader class.
+ * @file
+ *    This file defines the chip::MessageHeader class.
  */
 
 #ifndef MESSAGEHEADER_H_
