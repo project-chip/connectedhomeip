@@ -22,9 +22,9 @@ board.
 
 The K32W lock example application provides a working demonstration of a
 connected door lock device, built using CHIP, and the NXP K32W061 SDK. The
-example supports remote access (e.g.: using CHIP Tool from a mobile phone)
-and control of a simulated door lock over a low-power, 802.15.4 Thread network.
-It is capable of being paired into an existing CHIP network along with other
+example supports remote access (e.g.: using CHIP Tool from a mobile phone) and
+control of a simulated door lock over a low-power, 802.15.4 Thread network. It
+is capable of being paired into an existing CHIP network along with other
 CHIP-enabled devices.
 
 The example targets the
