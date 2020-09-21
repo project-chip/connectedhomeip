@@ -20,6 +20,7 @@
 #include "AppTask.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
+#include "LightingCLI.h"
 #include "LightingManager.h"
 #include "Server.h"
 #include "Service.h"
@@ -95,12 +96,16 @@ int AppTask::StartAppTask()
         ret = NRF_ERROR_NULL;
     }
 
+    NRF_LOG_INFO("App Task Started");
+
     return ret;
 }
 
 int AppTask::Init()
 {
     ret_code_t ret;
+
+    StartShellTask();
 
     // Init ZCL Data Model and start server
     InitServer();

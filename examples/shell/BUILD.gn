@@ -15,117 +15,40 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/platform/device.gni")
 
-if (chip_device_platform == "nrf5") {
-  # TODO: Unify :shell_nrf5 with :chip-shell
-
-  import("//build_overrides/nrf5_sdk.gni")
-  import("${nrf5_sdk_build_root}/nrf5_sdk.gni")
-
-  import("//build_overrides/openthread.gni")
-
-  assert(current_os == "freertos")
-  public_deps = [
-    "${chip_root}/src/lib/shell",
-    "${chip_root}/src/platform",
+config("chip_shell_collection_config") {
+  include_dirs = [
+    ".",
+    "./include",
+      "${chip_root}/src/lib/shell",
   ]
 
-  nrf5_platform_dir = "${chip_root}/examples/platform/nrf528xx"
-  project_dir = "."
+  defines = [
+    "ENABLE_CHIP_SHELL",
+  ]
+}
 
-  nrf5_sdk("sdk") {
-    include_dirs = [
-      "nrf52/include",
-      "${nrf5_platform_dir}/app/project_include",
-      "${nrf5_platform_dir}/util/include",
-      "${nrf5_platform_dir}/app/include",
-      "${chip_root}/src/app/util",
-    ]
+static_library("chip_shell_collection") {
+  sources = [
+    "cmd_base64.cpp",
+    "cmd_btp.cpp",
+    "cmd_device.cpp",
+    "cmd_misc.cpp",
+    "cmd_otcli.cpp",
+  ]
 
-    sources = [
-      "${nrf5_platform_dir}/app/project_include/CHIPProjectConfig.h",
-      "${nrf5_platform_dir}/app/project_include/FreeRTOSConfig.h",
-      "${nrf5_platform_dir}/app/project_include/OpenThreadConfig.h",
-      "${nrf5_platform_dir}/app/project_include/freertos_tasks_c_additions.h",
-      "${nrf5_platform_dir}/app/project_include/nrf_log_ctrl_internal.h",
-      "${project_dir}/nrf52/include/app_config.h",
-    ]
+  public_deps = [
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/shell",
+    "${chip_root}/src/setup_payload",
+    # "${openthread_root}:libopenthread-cli-ftd",
+    # "${openthread_root}:libopenthread-ftd",
+  ]
 
-    defines = []
-    if (is_debug) {
-      defines += [ "BUILD_RELEASE=0" ]
-    } else {
-      defines += [ "BUILD_RELEASE=1" ]
-    }
+  public_configs = [ ":chip_shell_collection_config" ]
+}
 
-    defines += [
-      "USE_APP_CONFIG",
-      "OPENTHREAD_CONFIG_CLI_TRANSPORT=2",
-      "MBEDTLS_PK_WRITE_C",
-      "MBEDTLS_X509_CREATE_C",
-      "MBEDTLS_X509_CSR_WRITE_C",
-    ]
-  }
+if (chip_device_platform == "nrf5") {
 
-  executable("shell_nrf5") {
-    output_name = "shell-nrf52840"
-
-    include_dirs = [
-      "${chip_root}/src/lib/shell",
-      "${nrf5_sdk_root}/components/libraries/uart",
-    ]
-
-    sources = [
-      "${nrf5_platform_dir}/app/chipinit.cpp",
-      "${nrf5_platform_dir}/app/include/Server.h",
-      "${nrf5_platform_dir}/app/include/chipinit.h",
-      "${nrf5_platform_dir}/app/support/CXXExceptionStubs.cpp",
-      "${nrf5_platform_dir}/app/support/nRF5Sbrk.c",
-      "${nrf5_platform_dir}/util/LEDWidget.cpp",
-      "${nrf5_platform_dir}/util/include/LEDWidget.h",
-      "${nrf5_platform_dir}/util/streamer/streamer_nrf5.cpp",
-      "${project_dir}/cmd_base64.cpp",
-      "${project_dir}/cmd_btp.cpp",
-      "${project_dir}/cmd_device.cpp",
-      "${project_dir}/cmd_misc.cpp",
-      "${project_dir}/cmd_otcli.cpp",
-      "${project_dir}/main.cpp",
-      "${project_dir}/nrf52/include/CHIPProjectConfig.h",
-      "${project_dir}/test_identity.cpp",
-    ]
-
-    public_deps += [
-      ":sdk",
-      "${chip_root}/src/lib",
-      "${chip_root}/src/lib/shell",
-      "${chip_root}/src/setup_payload",
-      "${chip_root}/third_party/openthread/platforms/nrf528xx:libnordicsemi_nrf52840_radio_driver_softdevice",
-      "${chip_root}/third_party/openthread/platforms/nrf528xx:libopenthread-nrf52840-softdevice-sdk",
-      "${nrf5_platform_dir}/app/support:freertos_debugging_hooks",
-      "${nrf5_platform_dir}/app/support:freertos_newlib_lock_support",
-      "${nrf5_platform_dir}/app/support:freertos_newlib_lock_support_test",
-      "${openthread_root}:libopenthread-cli-ftd",
-      "${openthread_root}:libopenthread-ftd",
-    ]
-
-    output_dir = root_out_dir
-
-    ldscript = "${nrf5_platform_dir}/app/ldscripts/chip-nrf52840-example.ld"
-
-    ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
-
-    defines = [
-      "NRF_SHELL_STREAMER",
-      "SHELL_STREAMER_APP_SPECIFIC",
-    ]
-  }
-
-  group("nrf5") {
-    deps = [ ":shell_nrf5" ]
-  }
-
-  group("default") {
-    deps = [ ":nrf5" ]
-  }
 } else {
   import("${chip_root}/gn/chip/tools.gni")
 
@@ -133,15 +56,11 @@ if (chip_device_platform == "nrf5") {
 
   executable("chip-shell") {
     sources = [
-      "cmd_base64.cpp",
-      "cmd_btp.cpp",
-      "cmd_device.cpp",
-      "cmd_misc.cpp",
-      "cmd_otcli.cpp",
       "main.cpp",
     ]
 
     public_deps = [
+      ":chip_shell_collection",
       "${chip_root}/src/lib/shell",
       "${chip_root}/src/platform",
     ]

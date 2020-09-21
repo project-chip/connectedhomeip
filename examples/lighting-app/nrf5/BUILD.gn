@@ -51,6 +51,7 @@ nrf5_sdk("sdk") {
 
   defines += [
     "USE_APP_CONFIG",
+    "NRF_SHELL_STREAMER",
     "MBEDTLS_PK_WRITE_C",
     "MBEDTLS_X509_CREATE_C",
     "MBEDTLS_X509_CSR_WRITE_C",
@@ -59,6 +60,10 @@ nrf5_sdk("sdk") {
 
 nrf5_executable("lighting_app") {
   output_name = "chip-nrf52840-lighting-example"
+
+  include_dirs = [
+    "${nrf5_sdk_root}/components/libraries/uart",
+  ]
 
   sources = [
     "${nrf5_platform_dir}/app/Service.cpp",
@@ -69,8 +74,10 @@ nrf5_executable("lighting_app") {
     "${nrf5_platform_dir}/app/support/nRF5Sbrk.c",
     "${nrf5_platform_dir}/util/LEDWidget.cpp",
     "${nrf5_platform_dir}/util/include/LEDWidget.h",
+    "${nrf5_platform_dir}/util/streamer/streamer_nrf5.cpp",
     "main/AppTask.cpp",
     "main/LightingManager.cpp",
+    "main/LightingCLI.cpp",
     "main/ZclCallbacks.cpp",
     "main/include/AppEvent.h",
     "main/include/AppTask.h",
@@ -82,6 +89,7 @@ nrf5_executable("lighting_app") {
     ":sdk",
     "${chip_root}/examples/common/chip-app-server:chip-app-server",
     "${chip_root}/examples/lighting-app/lighting-common",
+    "${chip_root}/examples/shell:chip_shell_collection",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms/nrf528xx:libnordicsemi_nrf52840_radio_driver_softdevice",

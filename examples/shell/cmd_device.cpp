@@ -30,6 +30,8 @@
 #include <platform/ThreadStackManager.h>
 #endif
 
+#include <ChipShellCollection.h>
+
 using namespace chip;
 using namespace chip::Shell;
 using namespace chip::Platform;
