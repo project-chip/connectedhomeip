@@ -293,14 +293,14 @@ class BLEManagerImpl final : public BLEManager,
 
     enum
     {
-        kFlag_AsyncInitCompleted       = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
-        kFlag_ESPBLELayerInitialized   = 0x0002, /**< The ESP BLE layer has been initialized. */
-        kFlag_AppRegistered            = 0x0004, /**< The CHIPoBLE application has been registered with the ESP BLE layer. */
-        kFlag_AttrsRegistered          = 0x0008, /**< The CHIPoBLE GATT attributes have been registered with the ESP BLE layer. */
-        kFlag_GATTServiceStarted       = 0x0010, /**< The CHIPoBLE GATT service has been started. */
-        kFlag_AdvertisingConfigured    = 0x0020, /**< CHIPoBLE advertising has been configured in the ESP BLE layer. */
-        kFlag_Advertising              = 0x0040, /**< The system is currently CHIPoBLE advertising. */
-        //kFlag_ControlOpInProgress      = 0x0080, /**< An async control operation has been issued to the ESP BLE layer. */
+        kFlag_AsyncInitCompleted     = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
+        kFlag_ESPBLELayerInitialized = 0x0002, /**< The ESP BLE layer has been initialized. */
+        kFlag_AppRegistered          = 0x0004, /**< The CHIPoBLE application has been registered with the ESP BLE layer. */
+        kFlag_AttrsRegistered        = 0x0008, /**< The CHIPoBLE GATT attributes have been registered with the ESP BLE layer. */
+        kFlag_GATTServiceStarted     = 0x0010, /**< The CHIPoBLE GATT service has been started. */
+        kFlag_AdvertisingConfigured  = 0x0020, /**< CHIPoBLE advertising has been configured in the ESP BLE layer. */
+        kFlag_Advertising            = 0x0040, /**< The system is currently CHIPoBLE advertising. */
+        // kFlag_ControlOpInProgress      = 0x0080, /**< An async control operation has been issued to the ESP BLE layer. */
         kFlag_AdvertisingEnabled       = 0x0100, /**< The application has enabled CHIPoBLE advertising. */
         kFlag_FastAdvertisingEnabled   = 0x0200, /**< The application has enabled fast advertising. */
         kFlag_UseCustomDeviceName      = 0x0400, /**< The application has configured a custom BLE device name. */

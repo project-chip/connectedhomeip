@@ -70,7 +70,7 @@ struct ESP32ChipServiceData
     ChipBLEDeviceIdentificationInfo DeviceIdInfo;
 };
 
-const ble_uuid128_t UUID_CHIPoBLEService   = {
+const ble_uuid128_t UUID_CHIPoBLEService = {
     BLE_UUID_TYPE_128, { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xAF, 0xFE, 0x00, 0x00 }
 };
 const uint8_t ShortUUID_CHIPoBLEService[] = { 0xAF, 0xFE };
@@ -103,15 +103,15 @@ const struct ble_gatt_svc_def BLEManagerImpl::CHIPoBLEGATTAttrs[] = {
       .characteristics =
           (struct ble_gatt_chr_def[]){
               {
-                  .uuid      = (ble_uuid_t *) (&UUID128_CHIPoBLEChar_RX),
-                  .access_cb = gatt_svr_chr_access,
-                  .flags     = BLE_GATT_CHR_F_WRITE,
+                  .uuid       = (ble_uuid_t *) (&UUID128_CHIPoBLEChar_RX),
+                  .access_cb  = gatt_svr_chr_access,
+                  .flags      = BLE_GATT_CHR_F_WRITE,
                   .val_handle = &sInstance.mRXCharAttrHandle,
               },
               {
-                  .uuid      = (ble_uuid_t *) (&UUID_CHIPoBLEChar_TX),
-                  .access_cb = gatt_svr_chr_access,
-                  .flags     = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
+                  .uuid       = (ble_uuid_t *) (&UUID_CHIPoBLEChar_TX),
+                  .access_cb  = gatt_svr_chr_access,
+                  .flags      = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
                   .val_handle = &sInstance.mTXCharCCCDAttrHandle,
               },
               {
@@ -479,7 +479,7 @@ void BLEManagerImpl::DriveBLEState(void)
                 ExitNow();
             }
 
-            //ClearFlag(mFlags, kFlag_AdvertisingRefreshNeeded);
+            // ClearFlag(mFlags, kFlag_AdvertisingRefreshNeeded);
 
             // Transition to the not Advertising state...
             if (GetFlag(mFlags, kFlag_Advertising))
@@ -488,7 +488,7 @@ void BLEManagerImpl::DriveBLEState(void)
 
                 ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
 
-            // Directly inform the ThreadStackManager that CHIPoBLE advertising has stopped.
+                // Directly inform the ThreadStackManager that CHIPoBLE advertising has stopped.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
                 ThreadStackMgr().OnCHIPoBLEAdvertisingStop();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -643,8 +643,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     err = ble_gap_adv_set_data(advData, sizeof(advData));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "ble_gap_adv_set_data failed: %s %d",
-        ErrorStr(err), advDataVersionDiscriminator);
+        ChipLogError(DeviceLayer, "ble_gap_adv_set_data failed: %s %d", ErrorStr(err), advDataVersionDiscriminator);
         ExitNow();
     }
 
@@ -707,7 +706,9 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(struct ble_gap_event * gapEvent)
     bool indicationsEnabled;
     bool notificationsEnabled;
 
-    ChipLogProgress(DeviceLayer, "Write request/command received for CHIPoBLE TX CCCD characteristic (con %" PRIu16 " ) indicate = %d notify = %d",
+    ChipLogProgress(DeviceLayer,
+                    "Write request/command received for CHIPoBLE TX CCCD characteristic (con %" PRIu16
+                    " ) indicate = %d notify = %d",
                     gapEvent->subscribe.conn_handle, gapEvent->subscribe.cur_indicate, gapEvent->subscribe.cur_notify);
 
     // Determine if the client is enabling or disabling indications/notification.
@@ -733,7 +734,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(struct ble_gap_event * gapEvent)
         // enabled and inform the BLE layer that the client has "unsubscribed" the connection.
         if (UnsetSubscribed(gapEvent->subscribe.conn_handle))
         {
-           // HandleUnsubscribeReceived(gapEvent->subscribe.conn_handle, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
+            // HandleUnsubscribeReceived(gapEvent->subscribe.conn_handle, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
         }
     }
 
@@ -773,7 +774,6 @@ CHIP_ERROR BLEManagerImpl::HandleTXComplete(struct ble_gap_event * gapEvent)
         event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
         event.CHIPoBLEIndicateConfirm.ConId = gapEvent->notify_tx.conn_handle;
         PlatformMgr().PostEvent(&event);
-
     }
 
     else
@@ -973,7 +973,7 @@ exit:
 int BLEManagerImpl::gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt * ctxt, void * arg)
 {
     struct ble_gatt_char_context param;
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     memset(&param, 0, sizeof(struct ble_gatt_char_context));
 
@@ -1020,7 +1020,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     CHIP_ERROR err;
     ble_gap_adv_params adv_params;
     memset(&adv_params, 0, sizeof(adv_params));
-    uint8_t own_addr_type                = BLE_OWN_ADDR_PUBLIC;
+    uint8_t own_addr_type = BLE_OWN_ADDR_PUBLIC;
 
     adv_params.disc_mode = BLE_GAP_DISC_MODE_GEN;
 
