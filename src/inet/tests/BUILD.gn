@@ -60,7 +60,7 @@ chip_test_suite("tests") {
     "TestInetEndPoint",
   ]
 
-  if (chip_device_platform != "esp32") {
+  if (current_os != "mac" && chip_device_platform != "esp32") {
     sources += [
       "TestInetLayerDNS.cpp",
       "TestInetLayerMulticast.cpp",

@@ -49,7 +49,10 @@ chip_test_suite("tests") {
     "TestSecurePairingSession",
     "TestSecureSession",
     "TestSecureSessionMgr",
-    "TestTCP",
     "TestUDP",
   ]
+
+  if (current_os != "mac") {
+    tests += [ "TestTCP" ]
+  }
 }
