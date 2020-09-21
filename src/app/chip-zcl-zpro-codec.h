@@ -114,6 +114,27 @@ void printApsFrame(EmberApsFrame * frame);
  */
 uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame);
 
+/**
+ * Idenfity cluster commands
+ * */
+
+/**
+ * @brief Encode an identify query command for the identify cluster
+ * @param buffer Buffer to encode into
+ * @param buf_length Length of buffer
+ * @param destination_endpoint destination endpoint
+ * */
+uint16_t encodeIdentifyQueryCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/**
+ * @brief Encode an identify command for the identify cluster
+ * @param buffer Buffer to encode into
+ * @param buf_length Length of buffer
+ * @param destination_endpoint destination endpoint
+ * @param duration The duration for which the device will identify itself
+ * */
+uint16_t encodeIdentifyCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t duration);
+
 #ifdef __cplusplus
 }
 #endif

@@ -99,7 +99,7 @@ void EchoDeviceCallbacks::PostAttributeChangeCallback(uint8_t endpoint, EmberAfC
 {
     if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
     {
-        ESP_LOGI(TAG, "Unknown cluster ID: %d", clusterId);
+        ESP_LOGI(TAG, "PostAttributeChangeCallback for unhandled cluster ID: %d", clusterId);
         return;
     }
 

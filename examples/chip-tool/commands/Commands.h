@@ -23,6 +23,7 @@
 
 #include "Echo.h"
 #include "EchoBle.h"
+#include "Identify-Cluster-Commands.h"
 #include "Off.h"
 #include "On.h"
 #include "ReadOnOff.h"
@@ -74,10 +75,10 @@ CHIP_ERROR RunCommand(chip::DeviceController::ChipDeviceController * dc, chip::N
     Off off;
     Toggle toggle;
     ReadOnOff readOnOff;
+    IdentifyQuery identifyQuery;
+    Identify identify;
 
-    Command * commands[] = {
-        &echoBle, &echo, &on, &off, &toggle, &readOnOff,
-    };
+    Command * commands[] = { &echoBle, &echo, &on, &off, &toggle, &readOnOff, &identify, &identifyQuery };
     // End list of available commands
 
     VerifyOrExit(argc > 1, err = CHIP_ERROR_INVALID_ARGUMENT);

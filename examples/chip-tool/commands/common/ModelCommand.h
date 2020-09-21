@@ -31,6 +31,9 @@
 #define CHIP_ZCL_ENDPOINT_MIN 0x01
 #define CHIP_ZCL_ENDPOINT_MAX 0xF0
 
+#define CHECK_MESSAGE_LENGTH(rv)                                                                                                   \
+    VerifyOrExit(rv, ChipLogError(chipTool, "%s: Unexpected response length: %d", __FUNCTION__, messageLen));
+
 class ModelCommand : public NetworkCommand
 {
 public:
@@ -48,6 +51,8 @@ public:
     void OnMessage(ChipDeviceController * dc, PacketBuffer * buffer) override;
 
     virtual size_t EncodeCommand(PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) = 0;
+    virtual void HandleClusterResponse(uint16_t clusterId, uint16_t endPointId, uint16_t commandId, uint8_t * message,
+                                       uint16_t messageLen) const;
 
 private:
     void SendCommand(ChipDeviceController * dc);
@@ -58,6 +63,7 @@ private:
     void ParseReadAttributeResponseCommandSuccess(uint16_t clusterId, uint16_t attrId, uint8_t * message,
                                                   uint16_t messageLen) const;
     void ParseReadAttributeResponseCommandFailure(uint16_t clusterId, uint16_t attrId, uint8_t status, uint16_t messageLen) const;
+    void ParseIdentifyClusterCommand(uint16_t endpointID, uint8_t * message, uint16_t messageLen) const;
 
     void UpdateWaitForResponse(bool value);
     void WaitForResponse(void);

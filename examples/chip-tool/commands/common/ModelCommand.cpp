@@ -28,9 +28,6 @@
 using namespace ::chip;
 using namespace ::chip::DeviceController;
 
-#define CHECK_MESSAGE_LENGTH(rv)                                                                                                   \
-    VerifyOrExit(rv, ChipLogError(chipTool, "%s: Unexpected response length: %d", __FUNCTION__, messageLen));
-
 constexpr std::chrono::seconds kWaitingForResponseTimeout(10);
 
 void ModelCommand::OnConnect(ChipDeviceController * dc)
@@ -89,6 +86,7 @@ void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffe
     uint8_t frameControl;
     uint8_t sequenceNumber;
     uint8_t commandId;
+    bool isGlobalCommand = false;
 
     // Bit 3 of the frame control byte set means direction is server to client.
     if (extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) == 0)
@@ -109,20 +107,30 @@ void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffe
     commandId      = chip::Encoding::Read8(message);
     messageLen -= 3;
 
-    VerifyOrExit(frameControl == 8, ChipLogError(chipTool, "Unexpected frame control byte: 0x%02x", frameControl));
+    // frameControl 8 is for global cmds and frameControl 9 is for specific cluster
+    VerifyOrExit((frameControl == 8 || frameControl == 9),
+                 ChipLogError(chipTool, "Unexpected frame control byte: 0x%02x", frameControl));
     VerifyOrExit(sequenceNumber == 1, ChipLogError(chipTool, "Unexpected sequence number: %d", sequenceNumber));
 
-    switch (commandId)
+    isGlobalCommand = (frameControl == 8);
+    if (isGlobalCommand)
     {
-    case 0x0b:
-        ParseDefaultResponseCommand(frame.clusterId, message, messageLen);
-        break;
-    case 0x01:
-        ParseReadAttributeResponseCommand(frame.clusterId, message, messageLen);
-        break;
-    default:
-        ChipLogError(chipTool, "Unexpected command '0x%02x'", commandId);
-        break;
+        switch (commandId)
+        {
+        case 0x0b:
+            ParseDefaultResponseCommand(frame.clusterId, message, messageLen);
+            break;
+        case 0x01:
+            ParseReadAttributeResponseCommand(frame.clusterId, message, messageLen);
+            break;
+        default:
+            ChipLogError(chipTool, "Unexpected command '0x%02x'", commandId);
+            break;
+        }
+    }
+    else
+    {
+        HandleClusterResponse(frame.clusterId, frame.sourceEndpoint, commandId, message, messageLen);
     }
 
 exit:
@@ -203,6 +211,12 @@ void ModelCommand::ParseReadAttributeResponseCommandFailure(uint16_t clusterId, 
 
 exit:
     return;
+}
+
+void ModelCommand::HandleClusterResponse(uint16_t clusterId, uint16_t endPointId, uint16_t commandId, uint8_t * message,
+                                         uint16_t messageLen) const
+{
+    ChipLogProgress(chipTool, "Received cmd %d for cluster %d", commandId, clusterId);
 }
 
 void ModelCommand::UpdateWaitForResponse(bool value)
