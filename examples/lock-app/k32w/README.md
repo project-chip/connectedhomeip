@@ -22,10 +22,10 @@ board.
 
 The K32W lock example application provides a working demonstration of a
 connected door lock device, built using CHIP, and the NXP K32W061 SDK. The
-functionality at this moment is limited and the demo app can be used for
-changing the state of a door lock and also for factoryreset the board. Soon,
-functionality for BLE pairing and ZCL control will be added. This will allow a
-user to control the door lock using a mobile application (CHIP Tool).
+example supports remote access (e.g.: using CHIP Tool from a mobile phone)
+and control of a simulated door lock over a low-power, 802.15.4 Thread network.
+It is capable of being paired into an existing CHIP network along with other
+CHIP-enabled devices.
 
 The example targets the
 [NXP K32W061 DK6](https://www.nxp.com/products/wireless/thread/k32w061-41-high-performance-secure-and-ultra-low-power-mcu-for-zigbeethread-and-bluetooth-le-5-0-with-built-in-nfc-option:K32W061_41)
@@ -81,7 +81,11 @@ position to another.
 be used to mimick a user manually operating the lock. The button behaves as a
 toggle, swapping the state every time it is pressed.
 
-The remaining two LEDs and buttons (D1/D4 and SW1/SW4) are unused.
+**Button SW4** can be used for joining a Thread network advertised by a Border
+Router. At this moment, Thread commissioning parameters are hard-coded but a
+future PR will add support for transmiting them over BLE.
+
+The remaining two LEDs(D1/D2) and button (SW1) are unused.
 
 <a name="building"></a>
 
