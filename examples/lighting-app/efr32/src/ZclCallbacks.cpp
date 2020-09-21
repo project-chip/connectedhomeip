@@ -20,17 +20,16 @@
  *   This file implements the handler for data model messages.
  */
 
-#include <system/SystemPacketBuffer.h>
-
 #include "AppConfig.h"
-#include "BoltLockManager.h"
 #include "DataModelHandler.h"
+#include "LightingManager.h"
 
-#include "af-types.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
 
-using namespace ::chip;
+#include <app/util/af-types.h>
+
+// using namespace ::chip;
 
 extern "C" void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
                                                    uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
@@ -50,10 +49,10 @@ extern "C" void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClus
 
     if (*value)
     {
-        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::LOCK_ACTION);
+        LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::ON_ACTION);
     }
     else
     {
-        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::UNLOCK_ACTION);
+        LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::OFF_ACTION);
     }
 }
