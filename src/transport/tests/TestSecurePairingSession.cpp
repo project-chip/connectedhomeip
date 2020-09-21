@@ -46,7 +46,7 @@ public:
             MessageHeader hdr;
             size_t headerSize = 0;
 
-            hdr.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
+            hdr.packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
             msgBuf->ConsumeHead(headerSize);
 
             return peer->HandlePeerMessage(hdr, msgBuf);

@@ -82,9 +82,10 @@ template <typename... TransportTypes>
 class Tuple : public Base
 {
 public:
-    CHIP_ERROR SendMessage(const MessageHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) override
+    CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const PeerAddress & address,
+                           System::PacketBuffer * msgBuf) override
     {
-        return SendMessageImpl<0>(header, address, msgBuf);
+        return SendMessageImpl<0>(header, payloadFlags, address, msgBuf);
     }
 
     bool CanSendToPeer(const PeerAddress & address) override { return CanSendToPeerImpl<0>(address); }
@@ -164,21 +165,23 @@ private:
      * @param msgBuf the data to send.
      */
     template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
-    CHIP_ERROR SendMessageImpl(const MessageHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf)
+    CHIP_ERROR SendMessageImpl(const PacketHeader & header, Header::Flags payloadFlags, const PeerAddress & address,
+                               System::PacketBuffer * msgBuf)
     {
         Base * base = &std::get<N>(mTransports);
         if (base->CanSendToPeer(address))
         {
-            return base->SendMessage(header, address, msgBuf);
+            return base->SendMessage(header, payloadFlags, address, msgBuf);
         }
-        return SendMessageImpl<N + 1>(header, address, msgBuf);
+        return SendMessageImpl<N + 1>(header, payloadFlags, address, msgBuf);
     }
 
     /**
      * SendMessageImpl when N is out of range. Always returns an error code.
      */
     template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
-    CHIP_ERROR SendMessageImpl(const MessageHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf)
+    CHIP_ERROR SendMessageImpl(const PacketHeader & header, Header::Flags payloadFlags, const PeerAddress & address,
+                               System::PacketBuffer * msgBuf)
     {
         System::PacketBuffer::Free(msgBuf);
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
@@ -225,7 +228,7 @@ private:
      * Calls the underlying Base message receive handler whenever any of the underlying transports
      * receives a message.
      */
-    static void OnMessageReceive(MessageHeader & header, const PeerAddress & source, System::PacketBuffer * msg, Tuple * t)
+    static void OnMessageReceive(const PacketHeader & header, const PeerAddress & source, System::PacketBuffer * msg, Tuple * t)
     {
         t->HandleMessageReceived(header, source, msg);
     }

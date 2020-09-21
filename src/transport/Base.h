@@ -52,7 +52,8 @@ public:
      *
      */
     template <class T>
-    void SetMessageReceiveHandler(void (*handler)(MessageHeader &, const PeerAddress &, System::PacketBuffer *, T *), T * param)
+    void SetMessageReceiveHandler(void (*handler)(const PacketHeader &, const PeerAddress &, System::PacketBuffer *, T *),
+                                  T * param)
     {
         mMessageReceivedArgument = param;
         OnMessageReceived        = reinterpret_cast<MessageReceiveHandler>(handler);
@@ -67,7 +68,8 @@ public:
      *   This method calls <tt>chip::System::PacketBuffer::Free</tt> on
      *   behalf of the caller regardless of the return status.
      */
-    virtual CHIP_ERROR SendMessage(const MessageHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) = 0;
+    virtual CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const PeerAddress & address,
+                                   System::PacketBuffer * msgBuf) = 0;
 
     /**
      * Determine if this transport can SendMessage to the specified peer address.
@@ -86,7 +88,7 @@ protected:
      * Method used by subclasses to notify that a packet has been received after
      * any associated headers have been decoded.
      */
-    void HandleMessageReceived(const MessageHeader & header, const PeerAddress & source, System::PacketBuffer * buffer)
+    void HandleMessageReceived(const PacketHeader & header, const PeerAddress & source, System::PacketBuffer * buffer)
     {
         if (OnMessageReceived)
         {
@@ -106,7 +108,7 @@ protected:
      *
      * Callback *MUST* free msgBuf as a result of handling.
      */
-    typedef void (*MessageReceiveHandler)(const MessageHeader & header, const PeerAddress & source, System::PacketBuffer * msgBuf,
+    typedef void (*MessageReceiveHandler)(const PacketHeader & header, const PeerAddress & source, System::PacketBuffer * msgBuf,
                                           void * param);
 
     MessageReceiveHandler OnMessageReceived = nullptr; ///< Callback on message receiving
