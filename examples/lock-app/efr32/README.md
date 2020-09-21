@@ -31,18 +31,10 @@ platform.
 
 ## Building
 
-### Note
-
-A consensus within the CHIP organization was reached to move from Make/Automake
-to the GN/Ninja build system. As a result we are no longer supporting Make
-inside the lock-app example. While the Makefile can stil be used to compile the
-example, the output binary will be lacking key features (e.g. OpenThread).
-
 -   Download the [sdk_support](https://github.com/SiliconLabs/sdk_support) from
     GitHub and export the path with :
 
             $ export EFR32_SDK_ROOT=<Path to cloned git repo>
-            $ export EFR32_BOARD=BRD4161A
 
 -   Download the
     [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
@@ -80,15 +72,23 @@ example, the output binary will be lacking key features (e.g. OpenThread).
           $ cd ~/connectedhomeip/examples/lock-app/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
+          $ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
+          $ export EFR32_BOARD=BRD4161A
           $ gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" efr32_board=\"${EFR32_BOARD}\""
           $ ninja -C out/debug
+
+-   To delete generated executable, libraries and object files use:
+
+          $ cd ~/connectedhomeip/examples/lighting-app/efr32
+          $ rm -rf out/
 
 <a name="flashing"></a>
 
 ## Flashing the Application
 
--   With Ninja
+-   On the command line:
 
+          $ cd ~/connectedhomeip/examples/lock-app/efr32
           $ python3 out/debug/chip-efr32-lock-example.out.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
