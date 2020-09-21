@@ -28,6 +28,8 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 
+#include <ChipShellCollection.h>
+
 using namespace chip;
 using namespace chip::Shell;
 using namespace chip::Platform;
