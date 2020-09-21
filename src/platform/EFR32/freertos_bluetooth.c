@@ -339,7 +339,16 @@ void vRaiseEventFlagBasedOnContext(EventGroupHandle_t xEventGroup, EventBits_t u
     if (xPortIsInsideInterrupt())
     {
         eventBitsFromISRStatus = xEventGroupSetBitsFromISR(xEventGroup, uxBitsToWaitFor, &higherPrioTaskWoken);
-        (void) eventBitsFromISRStatus;
+        if (eventBitsFromISRStatus != pdFAIL)
+        {
+#ifdef portYIELD_FROM_ISR
+            portYIELD_FROM_ISR(higherPrioTaskWoken);
+#elif portEND_SWITCHING_ISR // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+            portEND_SWITCHING_ISR(higherPrioTaskWoken);
+#else // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+#error "Must have portYIELD_FROM_ISR or portEND_SWITCHING_ISR"
+#endif // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+        }
     }
     else
     {
