@@ -50,17 +50,25 @@ CHIP_ERROR BLE::Init(RendezvousSessionDelegate * delegate, const RendezvousParam
     VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(bleLayer, err = CHIP_ERROR_INCORRECT_STATE);
 
-    if (params.HasDiscriminator())
-    {
-        err = DelegateConnection(bleLayer, params.GetDiscriminator());
-        SuccessOrExit(err);
-    }
-
     mDelegate = delegate;
 
     mBleLayer                           = bleLayer;
     mBleLayer->mAppState                = reinterpret_cast<void *>(this);
     mBleLayer->OnChipBleConnectReceived = OnNewConnection;
+
+    if (params.HasDiscriminator())
+    {
+        err = DelegateConnection(params.GetDiscriminator());
+    }
+    else if (params.HasConnectionObject())
+    {
+        err = InitInternal(params.GetConnectionObject());
+    }
+    else
+    {
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SuccessOrExit(err);
 
 exit:
     return err;
@@ -113,12 +121,12 @@ void BLE::SetupEvents(Ble::BLEEndPoint * endPoint)
     endPoint->OnConnectionClosed = OnBleEndPointConnectionClosed;
 }
 
-CHIP_ERROR BLE::DelegateConnection(Ble::BleLayer * bleLayer, const uint16_t connDiscriminator)
+CHIP_ERROR BLE::DelegateConnection(const uint16_t connDiscriminator)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = bleLayer->NewBleConnection(reinterpret_cast<void *>(this), connDiscriminator, OnBleConnectionComplete,
-                                     OnBleConnectionError);
+    err = mBleLayer->NewBleConnection(reinterpret_cast<void *>(this), connDiscriminator, OnBleConnectionComplete,
+                                      OnBleConnectionError);
     SuccessOrExit(err);
 
 exit:

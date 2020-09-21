@@ -83,7 +83,7 @@ public:
 
 private:
     CHIP_ERROR InitInternal(BLE_CONNECTION_OBJECT connObj);
-    CHIP_ERROR DelegateConnection(Ble::BleLayer * bleLayer, const uint16_t connDiscriminator);
+    CHIP_ERROR DelegateConnection(const uint16_t connDiscriminator);
     void SetupEvents(Ble::BLEEndPoint * endPoint);
 
     /**
