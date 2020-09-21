@@ -130,7 +130,7 @@ void __attribute__((weak)) OnLogOutput(void) {}
 } // namespace DeviceLayer
 } // namespace chip
 
-void GenericLog(const char *format, va_list arg)
+void GenericLog(const char * format, va_list arg)
 {
 
 #if K32W_LOG_ENABLED
@@ -154,7 +154,6 @@ void GenericLog(const char *format, va_list arg)
     DeviceLayer::OnLogOutput();
 
 #endif // K32W_LOG_ENABLED
-
 }
 
 namespace chip {
