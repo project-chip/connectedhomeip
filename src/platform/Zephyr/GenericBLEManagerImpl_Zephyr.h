@@ -94,6 +94,8 @@ private:
             0x0010, /**< The advertising state/configuration has changed, but the SoftDevice has yet to be updated. */
     };
 
+    struct ServiceData;
+
     uint16_t mFlags;
     uint16_t mGAPConns;
     CHIPoBLEServiceMode mServiceMode;
@@ -113,6 +115,7 @@ private:
     bool IsSubscribed(bt_conn * conn);
     bool SetSubscribed(bt_conn * conn);
     bool UnsetSubscribed(bt_conn * conn);
+    uint32_t GetAdvertisingInterval();
 
     static void DriveBLEState(intptr_t arg);
 

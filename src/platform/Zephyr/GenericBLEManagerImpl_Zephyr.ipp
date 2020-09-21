@@ -180,29 +180,33 @@ exit:
 }
 
 template <class ImplClass>
+struct GenericBLEManagerImpl_Zephyr<ImplClass>::ServiceData
+{
+    uint8_t uuid[2];
+    ChipBLEDeviceIdentificationInfo deviceIdInfo;
+} __attribute__((packed));
+
+template <class ImplClass>
 CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::StartAdvertising(void)
 {
-    ChipBLEDeviceIdentificationInfo deviceIdInfo;
-    const char * deviceName = bt_get_name();
-    uint8_t advFlags        = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
-    uint16_t advUUID        = sys_cpu_to_le16(UUID16_CHIPoBLEService.val);
-    CHIP_ERROR err          = CHIP_NO_ERROR;
+    CHIP_ERROR err;
 
-    // Advertising data Initialize with previously set name, flags and service UUIDs.
-    bt_data ad[] = { BT_DATA(BT_DATA_NAME_COMPLETE, deviceName, static_cast<uint8_t>(strlen(deviceName))),
-                     BT_DATA(BT_DATA_FLAGS, &advFlags, sizeof(advFlags)), BT_DATA(BT_DATA_UUID16_ALL, &advUUID, sizeof(advUUID)) };
+    const char * deviceName   = bt_get_name();
+    const uint8_t advFlags    = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
+    bt_le_adv_param advParams = BT_LE_ADV_PARAM_INIT(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME, GetAdvertisingInterval(),
+                                                     CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL, nullptr);
 
-    // Scan response data
-    bt_data sd[] = { BT_DATA(BT_DATA_UUID16_ALL, &advUUID, sizeof(advUUID)),
-                     BT_DATA(BT_DATA_SVC_DATA16, &deviceIdInfo, sizeof(deviceIdInfo)) };
+    // Define advertising data
+    ServiceData serviceData;
+    bt_data ad[] = { BT_DATA(BT_DATA_FLAGS, &advFlags, sizeof(advFlags)),
+                     BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData)),
+                     BT_DATA(BT_DATA_NAME_COMPLETE, deviceName, static_cast<uint8_t>(strlen(deviceName))) };
 
-    uint32_t minAdvInterval =
-        (NumConnections() == 0 && !ConfigurationMgr().IsFullyProvisioned()) || GetFlag(mFlags, kFlag_FastAdvertisingEnabled)
-        ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
-        : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL;
-
-    bt_le_adv_param param = BT_LE_ADV_PARAM_INIT(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME, minAdvInterval,
-                                                 CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL, nullptr);
+    // Initialize service data
+    static_assert(sizeof(serviceData) == 9, "Size of BLE advertisement data changed! Was that intentional?");
+    chip::Encoding::LittleEndian::Put16(serviceData.uuid, UUID16_CHIPoBLEService.val);
+    err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(serviceData.deviceIdInfo);
+    SuccessOrExit(err);
 
     // If necessary, inform the ThreadStackManager that CHIPoBLE advertising is about to start.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -212,18 +216,16 @@ CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::StartAdvertising(void)
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-    err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
-    SuccessOrExit(err);
-
+    // Restart advertising
     err = bt_le_adv_stop();
     VerifyOrExit(err == CHIP_NO_ERROR, err = MapErrorZephyr(err));
 
-    err = bt_le_adv_start(&param, ad, ARRAY_SIZE(ad), sd, ARRAY_SIZE(sd));
+    err = bt_le_adv_start(&advParams, ad, ARRAY_SIZE(ad), nullptr, 0u);
     if (err == -ENOMEM)
     {
         // No free connection objects for connectable advertiser. Advertise as non-connectable instead.
-        param.options &= ~BT_LE_ADV_OPT_CONNECTABLE;
-        err = bt_le_adv_start(&param, ad, ARRAY_SIZE(ad), sd, ARRAY_SIZE(sd));
+        advParams.options &= ~BT_LE_ADV_OPT_CONNECTABLE;
+        err = bt_le_adv_start(&advParams, ad, ARRAY_SIZE(ad), nullptr, 0u);
     }
 
     VerifyOrExit(err == CHIP_NO_ERROR, err = MapErrorZephyr(err));
@@ -687,6 +689,14 @@ bool GenericBLEManagerImpl_Zephyr<ImplClass>::UnsetSubscribed(bt_conn * conn)
     }
 
     return isSubscribed;
+}
+
+template <class ImplClass>
+uint32_t GenericBLEManagerImpl_Zephyr<ImplClass>::GetAdvertisingInterval()
+{
+    return (NumConnections() == 0 && !ConfigurationMgr().IsFullyProvisioned()) || GetFlag(mFlags, kFlag_FastAdvertisingEnabled)
+        ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
+        : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL;
 }
 
 template <class ImplClass>
