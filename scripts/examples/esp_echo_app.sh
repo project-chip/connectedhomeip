@@ -33,7 +33,7 @@ idf make -j V=1 -C "$root" "$@" || {
 
 rm -f "$root"/sdkconfig
 SDKCONFIG_DEFAULTS=sdkconfig_m5stack.defaults idf make -j V=1 -C "$root" defconfig "$@"
-idf make -j V=1 -C "$root" "$@" || {
+idf make -j 8 V=1 -C "$root" "$@" || {
     echo 'build M5Stack failed'
     exit 1
 }
