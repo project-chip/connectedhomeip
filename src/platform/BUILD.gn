@@ -99,6 +99,11 @@ if (chip_device_platform != "none") {
         "CHIP_DEVICE_LAYER_TARGET_NRFCONNECT=1",
         "CHIP_DEVICE_LAYER_TARGET=nrfconnect",
       ]
+    } else if (chip_device_platform == "qpg6100") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_QPG6100=1",
+        "CHIP_DEVICE_LAYER_TARGET=qpg6100",
+      ]
     }
   }
 }
@@ -366,6 +371,35 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
           "OpenThread/OpenThreadUtils.cpp",
           "nrfconnect/ThreadStackManagerImpl.cpp",
           "nrfconnect/ThreadStackManagerImpl.h",
+        ]
+      }
+    } else if (chip_device_platform == "qpg6100") {
+      sources += [
+        "FreeRTOS/SystemTimeSupport.cpp",
+        "qpg6100/BLEManagerImpl.cpp",
+        "qpg6100/BLEManagerImpl.h",
+        "qpg6100/BlePlatformConfig.h",
+        "qpg6100/CHIPDevicePlatformConfig.h",
+        "qpg6100/CHIPDevicePlatformEvent.h",
+        "qpg6100/CHIPPlatformConfig.h",
+        "qpg6100/ConfigurationManagerImpl.cpp",
+        "qpg6100/ConfigurationManagerImpl.h",
+        "qpg6100/ConnectivityManagerImpl.cpp",
+        "qpg6100/ConnectivityManagerImpl.h",
+        "qpg6100/InetPlatformConfig.h",
+        "qpg6100/Logging.cpp",
+        "qpg6100/PlatformManagerImpl.cpp",
+        "qpg6100/PlatformManagerImpl.h",
+        "qpg6100/SystemPlatformConfig.h",
+        "qpg6100/qpg6100Config.cpp",
+        "qpg6100/qpg6100Config.h",
+      ]
+
+      if (chip_enable_openthread) {
+        sources += [
+          "OpenThread/OpenThreadUtils.cpp",
+          "qpg6100/ThreadStackManagerImpl.cpp",
+          "qpg6100/ThreadStackManagerImpl.h",
         ]
       }
     }

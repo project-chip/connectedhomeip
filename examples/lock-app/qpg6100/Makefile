@@ -26,12 +26,10 @@ PROJECT_ROOT := $(realpath .)
 
 CHIP_ROOT ?= $(realpath $(PROJECT_ROOT)/third_party/connectedhomeip)
 BUILD_SUPPORT_DIR = $(CHIP_ROOT)/config/qpg6100
-QORVO_PLATFORM_DIR = $(CHIP_ROOT)/examples/platform/qpg6100
+QORVO_SDK_DIR = $(CHIP_ROOT)/third_party/qpg_sdk/qpg6100
 
 include $(BUILD_SUPPORT_DIR)/qpg6100-app.mk
 include $(BUILD_SUPPORT_DIR)/qpg6100-chip.mk
-
-PREINCLUDE_HEADER:=$(QORVO_PLATFORM_DIR)/inc/qorvo_config.h
 
 APP = chip-qpg6100-lock-example
 
@@ -40,22 +38,20 @@ SRC_APP:=
 SRC_APP+=$(PROJECT_ROOT)/src/main.cpp
 SRC+=$(SRC_APP)
 
-#Compilation flags are defined in $(QORVO_PLATFORM_DIR)/Work/P236_CHIP/lock-app_QPG6100_dk/gen/qorvo_config.h
-
 SRC_gpFreeRTOS:=
-SRC_gpFreeRTOS+=$(QORVO_PLATFORM_DIR)/comps/gpFreeRTOS/config/hooks.c
+SRC_gpFreeRTOS+=$(QORVO_SDK_DIR)/comps/gpFreeRTOS/config/hooks.c
 SRC+=$(SRC_gpFreeRTOS)
 INC_gpFreeRTOS:=
-INC_gpFreeRTOS+=$(QORVO_PLATFORM_DIR)/comps/gpFreeRTOS/config
-INC_gpFreeRTOS+=$(QORVO_PLATFORM_DIR)/comps/gpFreeRTOS/Source/include
-INC_gpFreeRTOS+=$(QORVO_PLATFORM_DIR)/comps/gpFreeRTOS/Source/Portable/GCC/ARM_CM3
+INC_gpFreeRTOS+=$(QORVO_SDK_DIR)/comps/gpFreeRTOS/config
+INC_gpFreeRTOS+=$(QORVO_SDK_DIR)/comps/gpFreeRTOS/Source/include
+INC_gpFreeRTOS+=$(QORVO_SDK_DIR)/comps/gpFreeRTOS/Source/Portable/GCC/ARM_CM3
 INC+=$(INC_gpFreeRTOS)
 
 INC_qvCHIP:=
-INC_qvCHIP+=$(QORVO_PLATFORM_DIR)/comps/qvCHIP/inc
+INC_qvCHIP+=$(QORVO_SDK_DIR)/comps/qvCHIP/inc
 INC+=$(INC_qvCHIP)
 LIB_qvCHIP:=
-LIB_qvCHIP+=$(QORVO_PLATFORM_DIR)/lib/libCHIP_qpg6100.a
+LIB_qvCHIP+=$(QORVO_SDK_DIR)/lib/libCHIP_qpg6100.a
 LIBS+=$(LIB_qvCHIP)
 
 # TODO - Add OpenThread library
@@ -109,6 +105,6 @@ endif
 
 CHIP_PROJECT_CONFIG = $(PROJECT_ROOT)/include/CHIPProjectConfig.h
 
-LINKER_SCRIPT = $(QORVO_PLATFORM_DIR)/ldscripts/chip-qpg6100-example.ld
+LINKER_SCRIPT = $(QORVO_SDK_DIR)/ldscripts/chip-qpg6100-example.ld
 
 $(call GenerateBuildRules)

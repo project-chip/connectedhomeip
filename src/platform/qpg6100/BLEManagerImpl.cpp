@@ -124,6 +124,7 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 
     // TODO
     // err = qvCHIP_BleGetDeviceName(buf, bufSize);
+    goto exit;
 
 exit:
     return err;
@@ -135,6 +136,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * devName)
 
     // TODO
     // err = qvCHIP_BleSetDeviceName(devName);
+    goto exit;
 
 exit:
     return err;
@@ -346,6 +348,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     // TODO
     // err = qvCHIP_BleStartAdvertising();
+    goto exit;
 
 exit:
     return err;
@@ -442,6 +445,8 @@ CHIP_ERROR BLEManagerImpl::HandleRXCharWrite(const ChipDeviceEvent * event)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // TODO -
+    goto exit;
+
 exit:
     return err;
 }
@@ -450,7 +455,8 @@ CHIP_ERROR BLEManagerImpl::HandleTXCharCCCDWrite(const ChipDeviceEvent * event)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // TODO -
-
+    goto exit;
+    
 exit:
     return err;
 }

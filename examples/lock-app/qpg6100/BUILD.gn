@@ -1,0 +1,96 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/defaults.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/qpg6100_sdk.gni")
+import("${qpg6100_sdk_build_root}/qpg6100_executable.gni")
+import("${qpg6100_sdk_build_root}/qpg6100_sdk.gni")
+
+assert(current_os == "freertos")
+
+qpg6100_project_dir = "${chip_root}/examples/lock-app/qpg6100"
+examples_plat_dir = "${chip_root}/examples/platform/qpg6100"
+
+qpg6100_sdk("sdk") {
+  include_dirs = [
+    "${chip_root}/src/platform/qpg6100",
+    "${qpg6100_project_dir}/include/",
+    "${qpg6100_project_dir}/src/",
+  ]
+
+  sources = [
+    "${qpg6100_project_dir}/include/CHIPProjectConfig.h",
+  ]
+
+  defines = []
+  if (is_debug) {
+    defines += [ "BUILD_RELEASE=0" ]
+  } else {
+    defines += [ "BUILD_RELEASE=1" ]
+  }
+}
+
+qpg6100_executable("lock_app") {
+  include_dirs = []
+  defines = []
+  output_name = "chip-qpg6100-lock-example.out"
+
+  public_deps = [
+    ":sdk",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+#    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
+#    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+#    "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
+#    "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+  ]
+
+  include_dirs += [
+    "${qpg6100_project_dir}/include/",
+    "${chip_root}/src/app/util",
+    "${examples_plat_dir}/",
+  ]
+
+  sources = [
+#    "${chip_root}/src/app/clusters/on-off-server/on-off.c",
+#    "${chip_root}/src/app/util/af-event.cpp",
+#    "${chip_root}/src/app/util/attribute-size.c",
+#    "${chip_root}/src/app/util/attribute-storage.c",
+#    "${chip_root}/src/app/util/attribute-table.c",
+#    "${chip_root}/src/app/util/binding-table.cpp",
+#    "${chip_root}/src/app/util/chip-response.cpp",
+#    "${chip_root}/src/app/util/client-api.c",
+#    "${chip_root}/src/app/util/ember-print.cpp",
+#    "${chip_root}/src/app/util/message.c",
+#    "${chip_root}/src/app/util/process-cluster-message.c",
+#    "${chip_root}/src/app/util/process-global-message.c",
+#    "${chip_root}/src/app/util/util.c",
+    "src/main.cpp",
+  ]
+
+  output_dir = root_out_dir
+
+  ldscript = "${qpg6100_sdk_build_root}/qpg6100/ldscripts/chip-qpg6100-example.ld"
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+}
+
+group("qpg6100") {
+  deps = [ ":lock_app" ]
+}
+
+group("default") {
+  deps = [ ":qpg6100" ]
+}

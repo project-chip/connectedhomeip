@@ -18,6 +18,8 @@ An example application showing the use
 
 ## Introduction
 
+![QPG6100 DK board](../../platform/qpg6100/doc/images/QPG6100_DK_Board.jpg)
+
 The QPG6100 Lock shows an implementation of a Door Lock device, based on CHIP
 and the Qorvo QPG6100 SDK. Intention of this example is to demonstrate a CHIP
 device, with Thread connectivity, using BLE to perform CHIP provisioning.
@@ -38,7 +40,7 @@ Pending:
 -   Intake CHIP ZCL cluster control for the Lock mechanism through CHIP tool.
 
 For more information on Qorvo and the platforms, please visit
-[the Qorvo website](www.qorvo.com)
+[the Qorvo website](www.qorvo.com) or contact us on LPW.support@qorvo.com.
 
 <a name="building"></a>
 
@@ -72,6 +74,7 @@ For more information on Qorvo and the platforms, please visit
 
         export CHIP_ROOT=${HOME}/connectedhomeip
         export ARM_GCC_INSTALL_ROOT=${HOME}/tools/gcc-arm-none-eabi-9-2019-q4-major/bin
+        export QPG6100_SDK_ROOT=${HOME}/connectedhomeip/third_party/qpg_sdk
 
 -   make based
 
@@ -80,7 +83,9 @@ For more information on Qorvo and the platforms, please visit
 
 -   GN/ninja based
 
-        Not yet supported
+        $ cd ~/connectedhomeip/examples/lock-app/qpg6100
+        $ gn gen out/debug
+        $ ninja -C out/debug
 
 <a name="flashing-the-application"></a>
 
@@ -90,7 +95,7 @@ The QPG6100 DK boards can be programmed using:
 
 ### CMSIS-DAP Drag and Drop
 
-Drag the hex-file to the mBED drive that appears when plugging in the DK board.
+Drag/copy the hex-file generated to the mBED drive that appears when plugging in the DK board.
 
 ### Segger JLink debugger
 
