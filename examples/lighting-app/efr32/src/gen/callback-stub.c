@@ -1997,6 +1997,19 @@ bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterComman
     return false;
 }
 
+/** @brief Activate Door Lock Callback
+ * This function is provided by the door lock server plugin.
+ *
+ * @param activate True if the lock should move to the locked position,
+ *  false if it should move to the unlocked position Ver.: always
+ *
+ * @returns true if the callback was able to activate/deactivate the Lock.
+ */
+bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate)
+{
+    return false;
+};
+
 /** @brief Read Reporting Configuration Response
  *
  * This function is called by the application framework when a Read Reporting
