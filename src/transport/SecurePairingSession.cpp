@@ -106,14 +106,16 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     MessageHeader header;
+
+    header.packetHeader
+        .SetSourceNodeId(mLocalNodeId) //
+        .SetEncryptionKeyID(mLocalKeyId);
+
     header.payloadHeader
         .SetMessageType(msgType) //
         .SetProtocolID(kSecurePairingProtocol);
-    header.packetHeader
-        .SetEncryptionKeyID(mLocalKeyId) //
-        .SetSourceNodeId(mLocalNodeId);
 
-    size_t headerSize              = header.packetHeader.EncodeSizeBytes();
+    size_t headerSize              = header.payloadHeader.EncodeSizeBytes();
     size_t actualEncodedHeaderSize = 0;
 
     VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
@@ -122,8 +124,17 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
     err = header.packetHeader.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize,
                                      header.payloadHeader.GetEncodePacketFlags());
     SuccessOrExit(err);
+    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
-    // This is unexpected and means header changed while encoding
+    headerSize              = header.packetHeader.EncodeSizeBytes();
+    actualEncodedHeaderSize = 0;
+
+    VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
+
+    msgBuf->SetStart(msgBuf->Start() - headerSize);
+    err = header.packetHeader.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize,
+                                     header.payloadHeader.GetEncodePacketFlags());
+    SuccessOrExit(err);
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
     err = mDelegate->SendMessage(msgBuf);
