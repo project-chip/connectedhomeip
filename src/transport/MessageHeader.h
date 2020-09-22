@@ -114,7 +114,7 @@ public:
     const Header::Flags & GetFlags() const { return mFlags; }
 
     /** Check if it's a secure session control message. */
-    bool IsSecureSessionControlMsg(void) const { return mFlags.value & Header::Flags::kSecureSessionControlMessage; }
+    bool IsSecureSessionControlMsg(void) const { return (mFlags.value & Header::Flags::kSecureSessionControlMessage) != 0; }
 
     Header::EncryptionType GetEncryptionType(void) const { return mEncryptionType; }
 
@@ -134,17 +134,27 @@ public:
     PacketHeader & SetSourceNodeId(NodeId id)
     {
         mSourceNodeId.SetValue(id);
+        mFlags.value |= Header::Flags::kSourceNodeIdPresent;
         return *this;
     }
 
     PacketHeader & SetSourceNodeId(Optional<NodeId> id)
     {
         mSourceNodeId = id;
+        if (id.HasValue())
+        {
+            mFlags.value |= Header::Flags::kSourceNodeIdPresent;
+        }
+        else
+        {
+            mFlags.value &= ~Header::Flags::kSourceNodeIdPresent;
+        }
         return *this;
     }
 
     PacketHeader & ClearSourceNodeId()
     {
+        mFlags.value &= ~Header::Flags::kSourceNodeIdPresent;
         mSourceNodeId.ClearValue();
         return *this;
     }
@@ -158,6 +168,7 @@ public:
 
     PacketHeader & SetDestinationNodeId(NodeId id)
     {
+        mFlags.value |= Header::Flags::kDestinationNodeIdPresent;
         mDestinationNodeId.SetValue(id);
         return *this;
     }
@@ -165,11 +176,20 @@ public:
     PacketHeader & SetDestinationNodeId(Optional<NodeId> id)
     {
         mDestinationNodeId = id;
+        if (id.HasValue())
+        {
+            mFlags.value |= Header::Flags::kDestinationNodeIdPresent;
+        }
+        else
+        {
+            mFlags.value &= ~Header::Flags::kDestinationNodeIdPresent;
+        }
         return *this;
     }
 
     PacketHeader & ClearDestinationNodeId()
     {
+        mFlags.value &= ~Header::Flags::kDestinationNodeIdPresent;
         mDestinationNodeId.ClearValue();
         return *this;
     }

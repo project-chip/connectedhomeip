@@ -119,7 +119,7 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(77));
     NL_TEST_ASSERT(inSuite, header.IsSecureSessionControlMsg());
 
-    header.SetMessageId(234).SetSourceNodeId(77).SetDestinationNodeId(88);
+    header.SetMessageId(234).SetSourceNodeId(77).SetDestinationNodeId(88).SetEncryptionKeyID(2);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, sizeof(buffer), &encodeLen, Header::Flags::None()) == CHIP_NO_ERROR);
 
     // change it to verify decoding
@@ -153,11 +153,10 @@ void TestPayloadHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
 
     header.SetMessageType(112).SetExchangeID(2233).SetProtocolID(1221);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, sizeof(buffer), &encodeLen) == CHIP_NO_ERROR);
-    header.SetMessageType(221).SetExchangeID(3322);
-    NL_TEST_ASSERT(inSuite, header.Encode(buffer, sizeof(buffer), &encodeLen) == CHIP_NO_ERROR);
 
     header.SetMessageType(221).SetExchangeID(3322).SetProtocolID(4567);
     NL_TEST_ASSERT(inSuite, header.Decode(Header::Flags::None(), buffer, sizeof(buffer), &decodeLen) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, encodeLen == decodeLen);
     NL_TEST_ASSERT(inSuite, header.GetMessageType() == 112);
     NL_TEST_ASSERT(inSuite, header.GetExchangeID() == 2233);
     NL_TEST_ASSERT(inSuite, header.GetProtocolID() == 1221);
@@ -165,21 +164,25 @@ void TestPayloadHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
 
     header.SetMessageType(112).SetExchangeID(2233).SetProtocolID(1221);
     header.SetVendorId(6789);
+
+    Header::Flags encodeFlags = header.GetEncodePacketFlags();
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, sizeof(buffer), &encodeLen) == CHIP_NO_ERROR);
 
     header.SetMessageType(111).SetExchangeID(222);
 
-    NL_TEST_ASSERT(inSuite, header.Decode(Header::Flags::None(), buffer, sizeof(buffer), &decodeLen) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, header.Decode(encodeFlags, buffer, sizeof(buffer), &decodeLen) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, encodeLen == decodeLen);
     NL_TEST_ASSERT(inSuite, header.GetExchangeID() == 2233);
-    NL_TEST_ASSERT(inSuite, header.GetVendorId() == Optional<uint16_t>::Value(3222));
+    NL_TEST_ASSERT(inSuite, header.GetVendorId() == Optional<uint16_t>::Value(6789));
 
     header.SetMessageType(221).SetExchangeID(3322).SetProtocolID(4567);
     header.SetVendorId(8976);
 
-    NL_TEST_ASSERT(inSuite, header.Decode(Header::Flags::None(), buffer, sizeof(buffer), &decodeLen) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, header.Decode(encodeFlags, buffer, sizeof(buffer), &decodeLen) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, encodeLen == decodeLen);
     NL_TEST_ASSERT(inSuite, header.GetExchangeID() == 2233);
-    NL_TEST_ASSERT(inSuite, header.GetProtocolID() == 4567);
-    NL_TEST_ASSERT(inSuite, header.GetVendorId() == Optional<uint16_t>::Value(8976));
+    NL_TEST_ASSERT(inSuite, header.GetProtocolID() == 1221);
+    NL_TEST_ASSERT(inSuite, header.GetVendorId() == Optional<uint16_t>::Value(6789));
 }
 
 void TestPacketHeaderEncodeDecodeBounds(nlTestSuite * inSuite, void * inContext)
