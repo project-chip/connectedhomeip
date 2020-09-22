@@ -26,7 +26,7 @@ source "$root"/idf.sh
 
 rm -f "$root"/sdkconfig
 SDKCONFIG_DEFAULTS=sdkconfig_devkit.defaults idf make -j 8 V=1 -C "$root" defconfig "$@"
-idf make -j V=1 -C "$root" "$@" || {
+idf make -j 8 V=1 -C "$root" "$@" || {
     echo 'build DevKit-C failed'
     exit 1
 }
