@@ -276,7 +276,7 @@ JNI_METHOD(void, beginConnectDeviceIp)(JNIEnv * env, jobject self, jlong deviceC
     ChipLogProgress(Controller, "beginConnectDevice() called with IP Address");
 
     const char * deviceAddrStr = env->GetStringUTFChars(deviceAddr, 0);
-    chip::Inet::IPAddress::FromString(deviceAddrStr, deviceIPAddr);
+    deviceIPAddr.FromString(deviceAddrStr, deviceIPAddr);
     env->ReleaseStringUTFChars(deviceAddr, deviceAddrStr);
 
     pthread_mutex_lock(&sStackLock);
@@ -374,7 +374,11 @@ JNI_METHOD(jboolean, isConnected)(JNIEnv * env, jobject self, jlong deviceContro
 {
     ChipLogProgress(Controller, "isConnected() called");
     ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
-    return deviceController->IsConnected() ? JNI_TRUE : JNI_FALSE;
+    if (deviceController->IsConnected())
+    {
+        return JNI_TRUE;
+    }
+    return JNI_FALSE;
 }
 
 JNI_METHOD(jboolean, disconnectDevice)(JNIEnv * env, jobject self, jlong deviceControllerPtr)

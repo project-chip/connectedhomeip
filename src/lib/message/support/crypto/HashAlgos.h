@@ -31,7 +31,7 @@
  *
  *      The default name for the platform-specific hash implementation header
  *      file is "ChipProjectHashAlgos.h".  This can be overridden by defining
- *      #CHIP_HASH_ALGOS_PLATFORM_INCLUDE.
+ *      CHIP_HASH_ALGOS_PLATFORM_INCLUDE.
  *
  *      The platform-specific header file should include declarations of the
  *      SHA_CTX_PLATFORM and SHA256_CTX_PLATFORM context structures.

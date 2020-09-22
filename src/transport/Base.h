@@ -16,8 +16,9 @@
  */
 
 /**
- * @file  Defines base properties and constants valid across all transport
- *        classes (UDP, TCP, BLE, ....)
+ * @file
+ *    Defines base properties and constants valid across all transport
+ *    classes (UDP, TCP, BLE, ....)
  */
 
 #ifndef TRANSPORT_BASE_H_

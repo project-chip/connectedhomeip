@@ -15,18 +15,10 @@
  *    limitations under the License.
  */
 
-/**
- * @file
- *   This file defines the API for the handler for data model messages.
- */
+#ifndef EFR32_SERVICE_H
+#define EFR32_SERVICE_H
 
-#ifndef DATA_MODEL_HANDLER_H
-#define DATA_MODEL_HANDLER_H
+void SetDeviceName(const char * newDeviceName);
+void PublishService();
 
-namespace chip {
-namespace System {
-class PacketBuffer;
-} // namespace System
-} // namespace chip
-
-#endif // DATA_MODEL_HANDLER_H
+#endif // EFR32_SERVICE_H

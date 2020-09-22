@@ -136,7 +136,7 @@ public:
      *
      * @param[in]   addr        the destination IP address
      * @param[in]   port        the destination TCP port
-     * @param[in]   intf        an optional network interface indicator
+     * @param[in]   intfId      an optional network interface indicator
      *
      * @retval  INET_NO_ERROR       success: \c msg is queued for transmit.
      * @retval  INET_ERROR_NOT_IMPLEMENTED  system implementation not complete.
@@ -144,16 +144,16 @@ public:
      * @retval  INET_ERROR_WRONG_ADDRESS_TYPE
      *      the destination address and the bound interface address do not
      *      have matching protocol versions or address type, or the destination
-     *      address is an IPv6 link-local address and \c intf is not specified.
+     *      address is an IPv6 link-local address and \c intfId is not specified.
      *
      * @retval  other                   another system or platform error
      *
      * @details
      *      If possible, then this method initiates a TCP connection to the
-     *      destination \c addr (with \c intf used as the scope
+     *      destination \c addr (with \c intfId used as the scope
      *      identifier for IPv6 link-local destinations) and \c port.
      */
-    INET_ERROR Connect(IPAddress addr, uint16_t port, InterfaceId intf = INET_NULL_INTERFACEID);
+    INET_ERROR Connect(IPAddress addr, uint16_t port, InterfaceId intfId = INET_NULL_INTERFACEID);
 
     /**
      * @brief   Extract IP address and TCP port of remote endpoint.
@@ -224,10 +224,17 @@ public:
     INET_ERROR EnableNoDelay(void);
 
     /**
-     * @brief   Enable the TCP "keep-alive" option.
+     * @brief
+     *    Enable TCP keepalive probes on the associated TCP connection.
      *
-     * @param[in]   interval        time in seconds between probe requests.
-     * @param[in]   timeoutCount    number of probes to send before timeout.
+     *  @param[in] interval
+     *    The interval (in seconds) between keepalive probes.  This value also controls
+     *    the time between last data packet sent and the transmission of the first keepalive
+     *    probe.
+     *
+     *  @param[in] timeoutCount
+     *    The maximum number of unacknowledged probes before the connection will be deemed
+     *    to have failed.
      *
      * @retval  INET_NO_ERROR           success: address and port extracted.
      * @retval  INET_ERROR_INCORRECT_STATE  TCP connection not established.
@@ -235,6 +242,12 @@ public:
      * @retval  INET_ERROR_NOT_IMPLEMENTED  system implementation not complete.
      *
      * @retval  other                   another system or platform error
+     *
+     *  @note
+     *    This method can only be called when the endpoint is in one of the connected states.
+     *
+     *    This method can be called multiple times to adjust the keepalive interval or timeout
+     *    count.
      *
      * @details
      *  Start automatically  transmitting TCP "keep-alive" probe segments every
@@ -645,7 +658,7 @@ private:
     void HandlePendingIO(void);
     void ReceiveData(void);
     void HandleIncomingConnection(void);
-    INET_ERROR BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intf);
+    INET_ERROR BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intfId);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
 

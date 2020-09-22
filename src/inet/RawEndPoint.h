@@ -72,8 +72,8 @@ public:
     IPProtocol IPProto; // This data member is read-only
 
     INET_ERROR Bind(IPAddressType addrType, IPAddress addr, InterfaceId intfId = INET_NULL_INTERFACEID);
-    INET_ERROR BindIPv6LinkLocal(InterfaceId intf, IPAddress addr);
-    INET_ERROR BindInterface(IPAddressType addrType, InterfaceId intf);
+    INET_ERROR BindIPv6LinkLocal(InterfaceId intfId, IPAddress addr);
+    INET_ERROR BindInterface(IPAddressType addrType, InterfaceId intfId);
     InterfaceId GetBoundInterface(void);
     INET_ERROR Listen(void);
     INET_ERROR SendTo(IPAddress addr, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
