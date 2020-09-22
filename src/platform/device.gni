@@ -94,5 +94,6 @@ assert(
         chip_device_platform == "darwin" || chip_device_platform == "efr32" ||
         chip_device_platform == "esp32" || chip_device_platform == "external" ||
         chip_device_platform == "linux" || chip_device_platform == "nrf5" ||
-        chip_device_platform == "nrfconnect" || chip_device_platform == "qpg6100",
+        chip_device_platform == "nrfconnect" ||
+        chip_device_platform == "qpg6100",
     "Please select a valid value for chip_device_platform")

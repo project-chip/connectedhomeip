@@ -29,7 +29,7 @@ template("qpg6100_executable") {
   flashing_runtime_target = target_name + ".flashing_runtime"
   copy(flashing_runtime_target) {
     sources = [
-#      "${chip_root}/scripts/flashing/qpg6100_firmware_utils.py",
+      #      "${chip_root}/scripts/flashing/qpg6100_firmware_utils.py",
       "${chip_root}/scripts/flashing/firmware_utils.py",
     ]
     outputs = [ "${root_out_dir}/{{source_file_part}}" ]

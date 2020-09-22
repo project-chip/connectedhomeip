@@ -28,7 +28,7 @@ if (lwip_platform == "") {
 }
 
 assert(lwip_platform == "external" || lwip_platform == "standalone" ||
-           lwip_platform == "nrf5" || lwip_platform == "efr32" || 
+           lwip_platform == "nrf5" || lwip_platform == "efr32" ||
            lwip_platform == "qpg6100",
        "Unsupported lwIP platform: ${lwip_platform}")
 

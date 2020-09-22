@@ -13,9 +13,10 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/qpg6100_sdk.gni")
 import("//build_overrides/jlink.gni")
 import("//build_overrides/mbedtls.gni")
+import("//build_overrides/qpg6100_sdk.gni")
+
 #import("//build_overrides/openthread.gni")
 
 declare_args() {
@@ -46,7 +47,7 @@ template("qpg6100_sdk") {
   config("${sdk_target_name}_config") {
     include_dirs = []
     libs = []
-    
+
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
     }
@@ -60,14 +61,10 @@ template("qpg6100_sdk") {
     ]
 
     lib_dirs = []
-    
-    libs += [
-      "${qpg6100_sdk_root}/qpg6100/lib/libCHIP_qpg6100.a"
-    ]
 
-    defines = [
+    libs += [ "${qpg6100_sdk_root}/qpg6100/lib/libCHIP_qpg6100.a" ]
 
-    ]
+    defines = []
 
     if (defined(invoker.defines)) {
       defines += invoker.defines
@@ -77,7 +74,7 @@ template("qpg6100_sdk") {
   source_set(sdk_target_name) {
     sources = [
       "${chip_root}/third_party/mbedtls/repo/include/mbedtls/platform.h",
-      "${qpg6100_sdk_root}/qpg6100/comps/qvCHIP/inc/qvCHIP.h",
+      "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/Source/Portable/GCC/ARM_CM3/portmacro.h",
       "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/Source/include/FreeRTOS.h",
       "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/Source/include/deprecated_definitions.h",
       "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/Source/include/list.h",
@@ -89,15 +86,15 @@ template("qpg6100_sdk") {
       "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/Source/include/stack_macros.h",
       "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/Source/include/task.h",
       "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/Source/include/timers.h",
-      "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/Source/Portable/GCC/ARM_CM3/portmacro.h",
       "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/config/FreeRTOSConfig.h",
       "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/config/hooks.c",
+      "${qpg6100_sdk_root}/qpg6100/comps/qvCHIP/inc/qvCHIP.h",
     ]
-    
+
     public_deps = [
-#      "${segger_rtt_root}:segger_rtt",
-#      "${segger_rtt_root}:segger_rtt_printf",
-#      "${segger_rtt_root}:segger_rtt_syscalls",
+      #      "${segger_rtt_root}:segger_rtt",
+      #      "${segger_rtt_root}:segger_rtt_printf",
+      #      "${segger_rtt_root}:segger_rtt_syscalls",
     ]
 
     if (defined(invoker.sources)) {
