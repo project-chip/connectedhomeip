@@ -62,17 +62,6 @@ using namespace ::chip::DeviceLayer;
 
 #define UNUSED_PARAMETER(a) (a = a)
 
-namespace {
-DemoSessionManager * sessions;
-} // namespace
-
-namespace chip {
-SecureSessionMgrBase & SessionManager()
-{
-    return *sessions;
-}
-} // namespace chip
-
 volatile int apperror_cnt;
 // ================================================================================
 // App Error
@@ -101,8 +90,7 @@ extern "C" void vApplicationIdleHook(void)
 // ================================================================================
 int main(void)
 {
-    int ret  = CHIP_ERROR_MAX;
-    sessions = new DemoSessionManager;
+    int ret = CHIP_ERROR_MAX;
 
 #if CHIP_ENABLE_OPENTHREAD
     initOtSysEFR();
@@ -160,10 +148,6 @@ int main(void)
         EFR32_LOG("PlatformMgr().StartEventLoopTask() failed");
         appError(ret);
     }
-
-    // Init ZCL Data Model
-    InitDataModelHandler();
-    StartServer(sessions);
 
 #if CHIP_ENABLE_OPENTHREAD
     EFR32_LOG("Starting OpenThread task");
