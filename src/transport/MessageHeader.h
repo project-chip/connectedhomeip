@@ -471,7 +471,7 @@ private:
  *
  * Used as a temporary stop-gap while specific classes are used directly
  */
-struct [[deprecated]] MessageHeader
+struct MessageHeader
 {
     PacketHeader packetHeader;
     PayloadHeader payloadHeader;
