@@ -44,6 +44,10 @@ step. To install these components manually, follow these steps:
           $ export IDF_PATH=${HOME}/tools/esp-idf
           $ ./install.sh
 
+-   Install ninja-build
+
+          $ sudo apt-get install ninja-build
+
 ### To build the application, follow these steps:
 
 Currently building in VSCode _and_ deploying from native is not supported, so
