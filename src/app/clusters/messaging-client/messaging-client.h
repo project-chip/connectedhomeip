@@ -31,22 +31,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * @file
- * @brief APIs and defines for the Messaging Client plugin.
- *******************************************************************************
-   ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief APIs and defines for the Messaging Client
+                                                                               *plugin.
+                                                                               *******************************************************************************
+                                                                               ******************************************************************************/
 
 // ----------------------------------------------------------------------------
 // Message Control byte
 // ----------------------------------------------------------------------------
 
 #define ZCL_MESSAGING_CLUSTER_TRANSMISSION_MASK (BIT(1) | BIT(0))
-#define ZCL_MESSAGING_CLUSTER_IMPORTANCE_MASK   (BIT(3) | BIT(2))
+#define ZCL_MESSAGING_CLUSTER_IMPORTANCE_MASK (BIT(3) | BIT(2))
 #define ZCL_MESSAGING_CLUSTER_CONFIRMATION_MASK BIT(7)
 
-#define ZCL_MESSAGING_CLUSTER_START_TIME_NOW         0x00000000UL
-#define ZCL_MESSAGING_CLUSTER_END_TIME_NEVER         0xFFFFFFFFUL
+#define ZCL_MESSAGING_CLUSTER_START_TIME_NOW 0x00000000UL
+#define ZCL_MESSAGING_CLUSTER_END_TIME_NEVER 0xFFFFFFFFUL
 #define ZCL_MESSAGING_CLUSTER_DURATION_UNTIL_CHANGED 0xFFFF
 
 /**
