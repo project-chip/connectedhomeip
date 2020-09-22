@@ -317,7 +317,7 @@ void PacketBuffer::CompactHead()
  *  Advance the data start position in the current buffer by the specified amount, in bytes, up to the length of data in the
  *  buffer. Decrease the length and total length by the amount consumed.
  *
- *  @param[in] aConsumeLen - number of bytes to consume from the current buffer.
+ *  @param[in] aConsumeLength - number of bytes to consume from the current buffer.
  */
 void PacketBuffer::ConsumeHead(uint16_t aConsumeLength)
 {

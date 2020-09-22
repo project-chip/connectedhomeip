@@ -27,8 +27,6 @@
 
 #include <ble/BleConfig.h>
 
-#if CONFIG_NETWORK_LAYER_BLE
-
 #include <utility>
 
 #include <ble/BleError.h>
@@ -113,7 +111,5 @@ private:
 
 } // namespace Transport
 } // namespace chip
-
-#endif // CONFIG_NETWORK_LAYER_BLE
 
 #endif // __TRANSPORT_BLE_H__

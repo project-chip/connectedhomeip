@@ -121,7 +121,6 @@ public:
      *
      * @param on_command            An iterator callback to be called for each command.
      * @param arg                   A context variable to be passed to each command iterated.
-     * @param streamer              The streamer to write shell output to.
      */
     void ForEachCommand(shell_command_iterator_t * on_command, void * arg);
 

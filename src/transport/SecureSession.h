@@ -50,6 +50,8 @@ public:
      * @param remote_public_key  A pointer to peer's public key
      * @param salt               A pointer to the initial salt used for deriving the keys
      * @param salt_length        Length of the initial salt
+     * @param info               A pointer to the initial info
+     * @param info_length        Length of the initial info
      * @return CHIP_ERROR        The result of key derivation
      */
     CHIP_ERROR Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
@@ -64,6 +66,8 @@ public:
      * @param secret_length      Length of the shared secret
      * @param salt               A pointer to the initial salt used for deriving the keys
      * @param salt_length        Length of the initial salt
+     * @param info               A pointer to the initial info
+     * @param info_length        Length of the initial info
      * @return CHIP_ERROR        The result of key derivation
      */
     CHIP_ERROR InitFromSecret(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,

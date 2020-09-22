@@ -40,11 +40,11 @@ namespace Inet {
  *  following formats:
  *
  *    * <host-name>
- *    * <host-name>:<port>
+ *    * <host-name>:\<port\>
  *    * <ip-4-addr>
- *    * <ip-4-addr>:<port>
+ *    * <ip-4-addr>:\<port\>
  *    * <ip-6-addr>
- *    * [<ip-6-addr>]:<port>
+ *    * [<ip-6-addr>]:\<port\>
  *
  *  @param[in]  aString     The human-reable string to parse.
  *
@@ -159,17 +159,17 @@ DLL_EXPORT INET_ERROR ParseHostAndPort(const char * aString, uint16_t aStringLen
  *  formats:
  *
  *    * <host-name>
- *    * <host-name>%<interface>
- *    * <host-name>:<port>
- *    * <host-name>:<port>%<interface>
+ *    * <host-name>%\<interface\>
+ *    * <host-name>:\<port\>
+ *    * <host-name>:\<port\>%\<interface\>
  *    * <ip-4-addr>
- *    * <ip-4-addr>%<interface>
- *    * <ip-4-addr>:<port>
- *    * <ip-4-addr>:<port>%<interface>
+ *    * <ip-4-addr>%\<interface\>
+ *    * <ip-4-addr>:\<port\>
+ *    * <ip-4-addr>:\<port\>%\<interface\>
  *    * <ip-6-addr>
- *    * <ip-6-addr>%<interface>
- *    * [<ip-6-addr>]:<port>
- *    * [<ip-6-addr>]:<port>%<interface>
+ *    * <ip-6-addr>%\<interface\>
+ *    * [<ip-6-addr>]:\<port\>
+ *    * [<ip-6-addr>]:\<port\>%\<interface\>
  *
  *  @param[in]  aString        The human-reable string to parse.
  *

@@ -36,6 +36,11 @@
 #include <stdarg.h>
 #include <stdint.h>
 
+// Doxygen is confused by the __attribute__ annotation
+#ifndef DOXYGEN
+#define NO_INLINE __attribute__((noinline))
+#endif // DOXYGEN
+
 namespace chip {
 namespace TLV {
 
@@ -162,7 +167,7 @@ using namespace chip::Encoding;
  * @param[in]   maxLen  The maximum number of bytes that should be written to the output buffer.
  *
  */
-__attribute__((noinline)) void TLVWriter::Init(uint8_t * buf, uint32_t maxLen)
+NO_INLINE void TLVWriter::Init(uint8_t * buf, uint32_t maxLen)
 {
     mBufHandle = 0;
     mBufStart = mWritePoint = buf;

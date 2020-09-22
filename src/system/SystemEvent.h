@@ -74,9 +74,9 @@ enum
  *
  *  @return true if it falls within the enumerated range; otherwise, false.
  */
-static inline bool IsEventOfType(EventType aType)
+static inline bool IsEventOfType(EventType aEventType)
 {
-    return (aType >= kEvent_ReleaseObj && aType <= kEvent_ScheduleWork);
+    return (aEventType >= kEvent_ReleaseObj && aEventType <= kEvent_ScheduleWork);
 }
 
 #else
