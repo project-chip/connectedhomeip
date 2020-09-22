@@ -160,7 +160,7 @@ public:
             ESP_LOGI(TAG, "Client sent: %s", logmsg);
 
             // Attempt to echo back
-            err    = mgr->SendMessage(header.packetHeader.GetSourceNodeId().Value(), buffer);
+            err    = mgr->SendMessage(header.GetSourceNodeId().Value(), buffer);
             buffer = NULL;
             if (err != CHIP_NO_ERROR)
             {

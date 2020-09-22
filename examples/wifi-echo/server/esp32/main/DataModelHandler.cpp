@@ -64,7 +64,7 @@ void HandleDataModelMessage(const PacketHeader & header, System::PacketBuffer * 
     ok                  = emberAfProcessMessage(&frame,
                                0, // type
                                message, messageLen,
-                               header.packetHeader.GetSourceNodeId().Value(), // source identifier
+                               header.GetSourceNodeId().Value(), // source identifier
                                NULL);
 
     System::PacketBuffer::Free(buffer);
