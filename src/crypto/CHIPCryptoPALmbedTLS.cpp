@@ -98,17 +98,17 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     mbedtls_ccm_context context;
     mbedtls_ccm_init(&context);
 
-    VerifyOrExit(plaintext != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(plaintext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(plaintext_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(key != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE);
-    VerifyOrExit(iv != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(iv != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(tag != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(tag != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     if (aad_length > 0)
     {
-        VerifyOrExit(aad != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(aad != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // Size of key = key_length * number of bits in a byte (8)
@@ -137,17 +137,17 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, co
     mbedtls_ccm_context context;
     mbedtls_ccm_init(&context);
 
-    VerifyOrExit(ciphertext != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(ciphertext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(ciphertext_len > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(tag != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(tag != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(key != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE);
-    VerifyOrExit(iv != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(iv != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     if (aad_len > 0)
     {
-        VerifyOrExit(aad != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(aad != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // Size of key = key_length * number of bits in a byte (8)
@@ -173,7 +173,7 @@ CHIP_ERROR Hash_SHA256(const uint8_t * data, const size_t data_length, uint8_t *
 
     // zero data length hash is supported.
 
-    VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(out_buffer != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     result = mbedtls_sha256_ret(Uint8::to_const_uchar(data), data_length, Uint8::to_uchar(out_buffer), 0);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
@@ -246,22 +246,22 @@ CHIP_ERROR HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const
     int result       = 1;
     const mbedtls_md_info_t * md;
 
-    VerifyOrExit(secret != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(secret != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(secret_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Salt is optional
     if (salt_length > 0)
     {
-        VerifyOrExit(salt != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(salt != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     VerifyOrExit(info_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(info != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(info != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(out_buffer != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     md = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
-    VerifyOrExit(md != NULL, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(md != nullptr, error = CHIP_ERROR_INTERNAL);
 
     result = mbedtls_hkdf(md, Uint8::to_const_uchar(salt), salt_length, Uint8::to_const_uchar(secret), secret_length,
                           Uint8::to_const_uchar(info), info_length, Uint8::to_uchar(out_buffer), out_length);
@@ -283,15 +283,15 @@ CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * 
 
     bool free_md_ctxt = false;
 
-    VerifyOrExit(password != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(password != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(plen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(salt != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(salt != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(slen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(output != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(output != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     md_info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
-    VerifyOrExit(md_info != NULL, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(md_info != nullptr, error = CHIP_ERROR_INTERNAL);
 
     mbedtls_md_init(&md_ctxt);
     free_md_ctxt = true;
@@ -336,7 +336,7 @@ static mbedtls_ctr_drbg_context * get_drbg_context()
 
     if (!context->mDRBGSeeded)
     {
-        int status = mbedtls_ctr_drbg_seed(drbgCtxt, mbedtls_entropy_func, &context->mEntropy, NULL, 0);
+        int status = mbedtls_ctr_drbg_seed(drbgCtxt, mbedtls_entropy_func, &context->mEntropy, nullptr, 0);
         VerifyOrExit(status == 0, _log_mbedTLS_error(status));
 
         context->mDRBGSeeded = true;
@@ -460,7 +460,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, cons
     mbedtls_ecdsa_context ecdsa_ctxt;
     mbedtls_ecdsa_init(&ecdsa_ctxt);
 
-    VerifyOrExit(msg != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(msg != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     result = mbedtls_ecp_group_load(&keypair.grp, MapECPGroupId(Type()));
@@ -511,7 +511,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
         mbedtls_ecp_point_read_binary(&ecp_grp, &ecp_pubkey, Uint8::to_const_uchar(remote_public_key), remote_public_key.Length());
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    result = mbedtls_ecdh_compute_shared(&ecp_grp, &mpi_secret, &ecp_pubkey, &keypair->d, CryptoRNG, NULL);
+    result = mbedtls_ecdh_compute_shared(&ecp_grp, &mpi_secret, &ecp_pubkey, &keypair->d, CryptoRNG, nullptr);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     result = mbedtls_mpi_write_binary(&mpi_secret, Uint8::to_uchar(out_secret), secret_length);
@@ -714,7 +714,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     context->md_info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
-    VerifyOrExit(context->md_info != NULL, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(context->md_info != nullptr, error = CHIP_ERROR_INTERNAL);
 
     mbedtls_ecp_point_init(&context->M);
     mbedtls_ecp_point_init(&context->N);
