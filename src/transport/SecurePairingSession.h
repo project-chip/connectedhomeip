@@ -142,7 +142,7 @@ public:
      *
      * @return Optional<NodeId> The associated peer NodeId
      */
-    NodeId GetPeerNodeId() const { return mPeerNodeId.Value(); };
+    NodeId GetPeerNodeId() const { return mPeerNodeId.Value(); }
 
     /**
      * @brief
@@ -150,7 +150,7 @@ public:
      *
      * @return uint16_t The associated peer key id
      */
-    uint16_t GetPeerKeyId() { return mPeerKeyId; };
+    uint16_t GetPeerKeyId() { return mPeerKeyId; }
 
     /**
      * @brief
@@ -158,7 +158,7 @@ public:
      *
      * @return uint16_t The assocated local key id
      */
-    uint16_t GetLocalKeyId() { return mLocalKeyId; };
+    uint16_t GetLocalKeyId() { return mLocalKeyId; }
 
 private:
     CHIP_ERROR Init(uint32_t setupCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen, Optional<NodeId> myNodeId,

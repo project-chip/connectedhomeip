@@ -220,11 +220,11 @@ private:
 
     // Mutex lock on Tx queue. Used only in BtpEngine test build for now.
 #if CHIP_ENABLE_CHIPOBLE_TEST
-    inline void QueueTxLock() { mTxQueueMutex.Lock(); };
-    inline void QueueTxUnlock() { mTxQueueMutex.Unlock(); };
+    inline void QueueTxLock() { mTxQueueMutex.Lock(); }
+    inline void QueueTxUnlock() { mTxQueueMutex.Unlock(); }
 #else
-    inline void QueueTxLock(){};
-    inline void QueueTxUnlock(){};
+    inline void QueueTxLock() {}
+    inline void QueueTxUnlock() {}
 #endif
     void QueueTx(PacketBuffer * data, PacketType_t type);
 };

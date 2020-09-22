@@ -42,7 +42,7 @@ private:
     SetupPayload mPayload;
 
 public:
-    QRCodeSetupPayloadGenerator(const SetupPayload & setupPayload) : mPayload(setupPayload){};
+    QRCodeSetupPayloadGenerator(const SetupPayload & setupPayload) : mPayload(setupPayload) {}
 
     /**
      * This function is called to encode the binary data of a payload to a
@@ -88,6 +88,6 @@ private:
                                            uint32_t & tlvDataLengthInBytes);
 };
 
-}; // namespace chip
+} // namespace chip
 
 #endif /* _QR_CODE_SETUP_PAYLOAD_GENERATOR_ */
