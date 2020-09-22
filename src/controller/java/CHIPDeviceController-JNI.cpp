@@ -108,7 +108,6 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env;
     int pthreadErr = 0;
-    pthread_mutexattr_t stackLockAttrs;
 
     ChipLogProgress(Controller, "JNI_OnLoad() called");
 
@@ -128,13 +127,6 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     err = GetClassRef(env, "chip/devicecontroller/ChipDeviceControllerException", sChipDeviceControllerExceptionCls);
     SuccessOrExit(err);
     ChipLogProgress(Controller, "Java class references loaded.");
-
-    // Initialize the lock that will be used to protect the stack.
-    // Note that this needs to allow recursive acquisition.
-    pthread_mutexattr_init(&stackLockAttrs);
-    pthread_mutexattr_settype(&stackLockAttrs, PTHREAD_MUTEX_RECURSIVE);
-    pthreadErr = pthread_mutex_init(&sStackLock, &stackLockAttrs);
-    VerifyOrExit(pthreadErr == 0, err = System::MapErrorPOSIX(pthreadErr));
 
     // Initialize the CHIP System Layer.
     err = sSystemLayer.Init(NULL);
@@ -200,8 +192,6 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
 
     sSystemLayer.Shutdown();
     sInetLayer.Shutdown();
-
-    pthread_mutex_destroy(&sStackLock);
     sJVM = NULL;
 }
 
