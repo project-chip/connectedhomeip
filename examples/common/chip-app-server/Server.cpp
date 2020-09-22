@@ -158,7 +158,8 @@ public:
 
         // as soon as a client connects, assume it is connected
         VerifyOrExit(buffer != NULL, ChipLogProgress(AppServer, "Received data but couldn't process it..."));
-        VerifyOrExit(header.GetSourceNodeId().HasValue(), ChipLogProgress(AppServer, "Unknown source for received message"));
+        VerifyOrExit(header.packetHeader.GetSourceNodeId().HasValue(),
+                     ChipLogProgress(AppServer, "Unknown source for received message"));
 
         VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ChipLogProgress(AppServer, "Unknown source for received message"));
 
