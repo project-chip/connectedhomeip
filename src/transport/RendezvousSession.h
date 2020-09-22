@@ -15,6 +15,12 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *      This file defines the CHIP RendezvousSession object that maintains a Rendezvous session.
+ *
+ */
+
 #ifndef __TRANSPORT_RENDEZVOUSSESSION_H__
 #define __TRANSPORT_RENDEZVOUSSESSION_H__
 
@@ -25,6 +31,28 @@
 
 namespace chip {
 
+/**
+ * RendezvousSession establishes and maintains the first connection between
+ * a commissioner and a device. This connection is used in order to
+ * provide the necessary infos for a device to participate to the CHIP
+ * ecosystem.
+ *
+ * All the information transmitted over the underlying transport are
+ * encrypted upon establishment of an initial secure pairing session.
+ *
+ * In order to securely transmit the informations, RendezvousSession
+ * requires a setupPINCode to be shared between both ends. The
+ * setupPINCode can be configured using RendezvousParameters
+ *
+ * @dotfile dots/Rendezvous/RendezvousSessionGeneral.dot
+ *
+ * The state of the secure pairing session setup can be observed by passing a
+ * RendezvousSessionDelegate object to RendezvousSession.
+ * Both the commissioner and the device needs to bootstrap RendezvousSession
+ * using RendezvousParameters.
+ *
+ * @dotfile dots/Rendezvous/RendezvousSessionInit.dot
+ */
 class RendezvousSession : public SecurePairingSessionDelegate, public RendezvousSessionDelegate
 {
 public:
