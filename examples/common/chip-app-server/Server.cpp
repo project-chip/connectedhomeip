@@ -167,7 +167,7 @@ public:
 
         ChipLogProgress(AppServer, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
 
-        HandleDataModelMessage(header, buffer, mgr);
+        HandleDataModelMessage(header.packetHeader, buffer, mgr);
         buffer = NULL;
 
     exit:
