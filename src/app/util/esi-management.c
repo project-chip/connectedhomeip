@@ -31,12 +31,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************/ /**
-                                                                               * @file
-                                                                               * @brief It implements and manages the ESI table. The
-                                                                               *ESI table is shared among other plugins.
-                                                                               *******************************************************************************
-                                                                               ******************************************************************************/
+/***************************************************************************/
+/**
+ * @file
+ * @brief It implements and manages the ESI table. The
+ *ESI table is shared among other plugins.
+ *******************************************************************************
+ ******************************************************************************/
 
 #include "esi-management.h"
 #include "af.h"

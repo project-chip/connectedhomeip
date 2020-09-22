@@ -31,19 +31,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************/ /**
-                                                                               * @file
-                                                                               * @brief Routines for the Messaging Client plugin,
-                                                                               *which implements the client side of the Messaging
-                                                                               *cluster.
-                                                                               *******************************************************************************
-                                                                               ******************************************************************************/
+/***************************************************************************/
+/**
+ * @file
+ * @brief Routines for the Messaging Client plugin,
+ *which implements the client side of the Messaging
+ *cluster.
+ *******************************************************************************
+ ******************************************************************************/
 
 #include "messaging-client.h"
 #include "../../include/af.h"
 #include "../../util/common.h"
 
-// #include "app/framework/plugin/esi-management/esi-management.h"
+#include "app/framework/plugin/esi-management/esi-management.h"
 
 static EmberAfPluginMessagingClientMessage messageTable[EMBER_AF_MESSAGING_CLUSTER_CLIENT_ENDPOINT_COUNT];
 
