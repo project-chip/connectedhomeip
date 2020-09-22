@@ -456,7 +456,7 @@ CHIP_ERROR BLEManagerImpl::HandleTXCharCCCDWrite(const ChipDeviceEvent * event)
 
     // TODO -
     goto exit;
-    
+
 exit:
     return err;
 }
