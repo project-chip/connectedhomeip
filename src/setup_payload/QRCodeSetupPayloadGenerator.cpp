@@ -34,7 +34,6 @@
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 
-#include <iostream>
 #include <stdlib.h>
 #include <string.h>
 
