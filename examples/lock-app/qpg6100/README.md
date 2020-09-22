@@ -95,7 +95,8 @@ The QPG6100 DK boards can be programmed using:
 
 ### CMSIS-DAP Drag and Drop
 
-Drag/copy the hex-file generated to the mBED drive that appears when plugging in the DK board.
+Drag/copy the hex-file generated to the mBED drive that appears when plugging in
+the DK board.
 
 ### Segger JLink debugger
 
