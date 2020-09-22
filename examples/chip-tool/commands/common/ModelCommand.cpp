@@ -28,6 +28,9 @@
 using namespace ::chip;
 using namespace ::chip::DeviceController;
 
+#define ZCL_DEFAULT_RESPONSE_COMMAND_ID 0x0b
+#define ZCL_READ_ATTRIBUTES_RESPONSE_COMMAND_ID 0x01
+
 constexpr std::chrono::seconds kWaitingForResponseTimeout(10);
 
 void ModelCommand::OnConnect(ChipDeviceController * dc)
@@ -78,6 +81,13 @@ void ModelCommand::SendCommand(ChipDeviceController * dc)
     dc->SendMessage(NULL, buffer);
 }
 
+bool _isValidFrame(uint8_t frameControl)
+{
+#define kZCLGlobalCmdFrameControlHeader 8
+#define kZCLClusterCmdFrameControlHeader 9
+
+    return (frameControl == kZCLGlobalCmdFrameControlHeader || frameControl == kZCLClusterCmdFrameControlHeader);
+}
 void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffer * buffer) const
 {
     EmberApsFrame frame;
@@ -107,9 +117,7 @@ void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffe
     commandId      = chip::Encoding::Read8(message);
     messageLen -= 3;
 
-    // frameControl 8 is for global cmds and frameControl 9 is for specific cluster
-    VerifyOrExit((frameControl == 8 || frameControl == 9),
-                 ChipLogError(chipTool, "Unexpected frame control byte: 0x%02x", frameControl));
+    VerifyOrExit(_isValidFrame(frameControl), ChipLogError(chipTool, "Unexpected frame control byte: 0x%02x", frameControl));
     VerifyOrExit(sequenceNumber == 1, ChipLogError(chipTool, "Unexpected sequence number: %d", sequenceNumber));
 
     isGlobalCommand = (frameControl == 8);
@@ -117,10 +125,10 @@ void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffe
     {
         switch (commandId)
         {
-        case 0x0b:
+        case ZCL_DEFAULT_RESPONSE_COMMAND_ID:
             ParseDefaultResponseCommand(frame.clusterId, message, messageLen);
             break;
-        case 0x01:
+        case ZCL_READ_ATTRIBUTES_RESPONSE_COMMAND_ID:
             ParseReadAttributeResponseCommand(frame.clusterId, message, messageLen);
             break;
         default:
