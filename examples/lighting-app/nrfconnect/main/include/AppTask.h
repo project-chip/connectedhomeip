@@ -38,7 +38,6 @@ private:
     friend AppTask & GetAppTask(void);
 
     int Init();
-    void PrintQRCode() const;
 
     static void ActionInitiated(LightingManager::Action_t aAction);
     static void ActionCompleted(LightingManager::Action_t aAction);
