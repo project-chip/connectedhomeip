@@ -797,6 +797,29 @@ static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, keypair.NewCertificateSigningRequest(csr, length) == CHIP_NO_ERROR);
 }
 
+static void TestKeypair_Serialize(nlTestSuite * inSuite, void * inContext)
+{
+    P256Keypair keypair;
+    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+
+    P256SerializedKeypair serialized;
+    NL_TEST_ASSERT(inSuite, keypair.Serialize(serialized) == CHIP_NO_ERROR);
+
+    P256Keypair keypair_dup;
+    NL_TEST_ASSERT(inSuite, keypair_dup.Deserialize(serialized) == CHIP_NO_ERROR);
+
+    const char * msg         = "Test Message for Keygen";
+    const uint8_t * test_msg = Uint8::from_const_char(msg);
+    size_t msglen            = strlen(msg);
+
+    P256ECDSASignature test_sig;
+    NL_TEST_ASSERT(inSuite, keypair.ECDSA_sign_msg(test_msg, msglen, test_sig) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair_dup.Pubkey().ECDSA_validate_msg_signature(test_msg, msglen, test_sig) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, keypair_dup.ECDSA_sign_msg(test_msg, msglen, test_sig) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Pubkey().ECDSA_validate_msg_signature(test_msg, msglen, test_sig) == CHIP_NO_ERROR);
+}
+
 static void TestSPAKE2P_spake2p_FEMul(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t fe_out[kMAX_FE_Length];
@@ -1224,6 +1247,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test PBKDF2 SHA256", TestPBKDF2_SHA256_TestVectors),
     NL_TEST_DEF("Test P256 Keygen", TestP256_Keygen),
     NL_TEST_DEF("Test CSR Generation", TestCSR_Gen),
+    NL_TEST_DEF("Test Keypair Serialize", TestKeypair_Serialize),
     NL_TEST_DEF("Test Spake2p_spake2p FEMul", TestSPAKE2P_spake2p_FEMul),
     NL_TEST_DEF("Test Spake2p_spake2p FELoad/FEWrite", TestSPAKE2P_spake2p_FELoadWrite),
     NL_TEST_DEF("Test Spake2p_spake2p Mac", TestSPAKE2P_spake2p_Mac),
