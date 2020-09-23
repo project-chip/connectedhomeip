@@ -78,7 +78,7 @@ static CHIP_ERROR extractBits(uint32_t number, uint64_t & dest, int index, int n
 static CHIP_ERROR toNumber(string decimalString, uint64_t & dest)
 {
     uint64_t number = 0;
-    for (uint i = 0; i < decimalString.length(); i++)
+    for (size_t i = 0; i < decimalString.length(); i++)
     {
         if (!isdigit(decimalString[i]))
         {
