@@ -35,6 +35,9 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "FreeRTOS.h"
+#include "task.h"
+
 using namespace chip::Logging;
 
 namespace chip {
@@ -94,6 +97,7 @@ int shell_line_read(char * buffer, size_t max)
             inptr++;
             read--;
         }
+        taskYIELD();
     }
 
     return (inptr - buffer);

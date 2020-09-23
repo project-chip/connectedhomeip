@@ -14,6 +14,7 @@
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/platform/device.gni")
+import("//build_overrides/openthread.gni")
 
 config("chip_shell_collection_config") {
   include_dirs = [
@@ -24,6 +25,7 @@ config("chip_shell_collection_config") {
 
   defines = [
     "ENABLE_CHIP_SHELL",
+    "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE",
   ]
 }
 
@@ -40,8 +42,8 @@ static_library("chip_shell_collection") {
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/shell",
     "${chip_root}/src/setup_payload",
-    # "${openthread_root}:libopenthread-cli-ftd",
-    # "${openthread_root}:libopenthread-ftd",
+    "${openthread_root}:libopenthread-cli-ftd",
+    "${openthread_root}:libopenthread-ftd",
   ]
 
   public_configs = [ ":chip_shell_collection_config" ]

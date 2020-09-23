@@ -51,7 +51,7 @@ namespace {
 
 constexpr int kFactoryResetTriggerTimeout      = 3000;
 constexpr int kFactoryResetCancelWindowTimeout = 3000;
-constexpr size_t kAppTaskStackSize             = 4096;
+constexpr size_t kAppTaskStackSize             = 1536;
 constexpr int kAppTaskPriority                 = 2;
 constexpr int kAppEventQueueSize               = 10;
 constexpr int kExampleVenderID                 = 0xabcd;
