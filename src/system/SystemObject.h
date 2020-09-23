@@ -99,8 +99,8 @@ protected:
 private:
     Object(void);
     ~Object(void);
-    Object(const Object &) /* = delete */;
-    Object & operator=(const Object &) /* = delete */;
+    Object(const Object &) = delete;
+    Object & operator=(const Object &) = delete;
 
     Layer * volatile mSystemLayer; /**< Pointer to the layer object that owns this object. */
     unsigned int mRefCount;        /**< Count of remaining calls to Release before object is dead. */

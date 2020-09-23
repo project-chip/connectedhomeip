@@ -209,8 +209,8 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // Copy and assignment NOT DEFINED
-    Layer(const Layer &);
-    Layer & operator=(const Layer &);
+    Layer(const Layer &) = delete;
+    Layer & operator=(const Layer &) = delete;
 
     friend class Timer;
 };

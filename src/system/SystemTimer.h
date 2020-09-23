@@ -90,8 +90,8 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // Not defined
-    Timer(const Timer &);
-    Timer & operator=(const Timer &);
+    Timer(const Timer &) = delete;
+    Timer & operator=(const Timer &) = delete;
 };
 
 inline void Timer::GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark)
