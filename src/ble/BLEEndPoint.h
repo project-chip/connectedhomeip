@@ -159,8 +159,8 @@ private:
 
 private:
     // Private functions:
-    BLEEndPoint(void);  // not defined
-    ~BLEEndPoint(void); // not defined
+    BLEEndPoint(void)  = delete
+    ~BLEEndPoint(void) = delete;
 
     BLE_ERROR Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
     bool IsConnected(uint8_t state) const;

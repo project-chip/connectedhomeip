@@ -64,8 +64,8 @@ public:
     static char ValToChar(int val);
 
 private:
-    Verhoeff10(void);  // not defined
-    ~Verhoeff10(void); // not defined
+    Verhoeff10(void)  = delete;
+    ~Verhoeff10(void) = delete;
 
     static uint8_t sMultiplyTable[];
     static uint8_t sPermTable[];
@@ -101,8 +101,8 @@ public:
     static char ValToChar(int val);
 
 private:
-    Verhoeff16(void);  // not defined
-    ~Verhoeff16(void); // not defined
+    Verhoeff16(void)  = delete;
+    ~Verhoeff16(void) = delete;
 
     static uint8_t sMultiplyTable[];
     static uint8_t sPermTable[];
@@ -140,8 +140,8 @@ public:
     static char ValToChar(int val);
 
 private:
-    Verhoeff32(void);  // not defined
-    ~Verhoeff32(void); // not defined
+    Verhoeff32(void)  = delete;
+    ~Verhoeff32(void) = delete;
 
     static uint8_t sMultiplyTable[];
     static uint8_t sPermTable[];
@@ -175,8 +175,8 @@ public:
     static char ValToChar(int val);
 
 private:
-    Verhoeff36(void);  // not defined
-    ~Verhoeff36(void); // not defined
+    Verhoeff36(void)  = delete;
+    ~Verhoeff36(void) = delete;
 
     static uint8_t sMultiplyTable[];
     static uint8_t sPermTable[];
