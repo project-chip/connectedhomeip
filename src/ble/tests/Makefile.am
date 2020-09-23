@@ -56,6 +56,7 @@ dist_libBleLayerTests_a_HEADERS                       = \
 AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
     -I$(top_srcdir)/src/lib                             \
+    $(NLASSERT_CPPFLAGS)                                \
     $(NLIO_CPPFLAGS)                                    \
     $(NLUNIT_TEST_CPPFLAGS)                             \
     $(LWIP_CPPFLAGS)                                    \

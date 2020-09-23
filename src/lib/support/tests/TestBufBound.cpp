@@ -25,6 +25,7 @@
 #include "TestSupport.h"
 
 #include <support/BufBound.h>
+#include <support/TestUtils.h>
 
 #include <nlunit-test.h>
 
@@ -194,3 +195,5 @@ int TestBufBound(void)
     nlTestRunner(&theSuite, NULL);
     return nlTestRunnerStats(&theSuite);
 }
+
+CHIP_REGISTER_TEST_SUITE(TestBufBound)

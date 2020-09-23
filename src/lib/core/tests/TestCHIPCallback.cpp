@@ -24,7 +24,8 @@
 
 #include "TestCore.h"
 
-#include "core/CHIPCallback.h"
+#include <core/CHIPCallback.h>
+#include <support/TestUtils.h>
 
 #include <nlunit-test.h>
 
@@ -243,3 +244,5 @@ int TestCHIPCallback(void)
 
     return (nlTestRunnerStats(&theSuite));
 }
+
+CHIP_REGISTER_TEST_SUITE(TestCHIPCallback)

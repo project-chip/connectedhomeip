@@ -178,10 +178,7 @@ int TestSecureSession()
     return (nlTestRunnerStats(&sSuite));
 }
 
-static void __attribute__((constructor)) TestSecureSessionCtor(void)
-{
-    VerifyOrDie(RegisterUnitTests(&TestSecureSession) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestSecureSession)
 
 namespace chip {
 namespace Logging {

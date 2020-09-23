@@ -22,6 +22,11 @@
 #define MBEDTLS_HKDF_C
 #define MBEDTLS_BIGNUM_C
 #define MBEDTLS_PKCS5_C
+#define MBEDTLS_PK_WRITE_C
+#define MBEDTLS_X509_CREATE_C
+#define MBEDTLS_X509_CSR_WRITE_C
+#define MBEDTLS_BASE64_C
+#define MBEDTLS_PEM_WRITE_C
 
 // Define mbedtls_error()
 #define MBEDTLS_ERROR_C

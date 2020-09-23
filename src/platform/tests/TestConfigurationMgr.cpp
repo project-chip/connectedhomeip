@@ -431,7 +431,4 @@ int TestConfigurationMgr(void)
     return nlTestRunnerStats(&theSuite);
 }
 
-static void __attribute__((constructor)) TestConfigurationMgrCtor(void)
-{
-    VerifyOrDie(RegisterUnitTests(&TestConfigurationMgr) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestConfigurationMgr)

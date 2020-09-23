@@ -168,10 +168,7 @@ int TestSecurePairingSession()
     return (nlTestRunnerStats(&sSuite));
 }
 
-static void __attribute__((constructor)) TestSecurePairingSessionCtor(void)
-{
-    VerifyOrDie(RegisterUnitTests(&TestSecurePairingSession) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestSecurePairingSession)
 
 namespace chip {
 namespace Logging {

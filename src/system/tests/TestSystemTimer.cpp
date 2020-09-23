@@ -293,7 +293,4 @@ int TestSystemTimer(void)
     return nlTestRunnerStats(&kTheSuite);
 }
 
-static void __attribute__((constructor)) TestSystemTimerCtor(void)
-{
-    VerifyOrDie(chip::RegisterUnitTests(&TestSystemTimer) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestSystemTimer)

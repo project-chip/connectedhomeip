@@ -1214,7 +1214,4 @@ int TestSystemPacketBuffer(void)
     return (nlTestRunnerStats(&theSuite));
 }
 
-static void __attribute__((constructor)) TestSystemPacketBufferCtor(void)
-{
-    VerifyOrDie(chip::RegisterUnitTests(&TestSystemPacketBuffer) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestSystemPacketBuffer)
