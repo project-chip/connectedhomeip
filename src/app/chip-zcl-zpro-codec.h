@@ -51,17 +51,17 @@ extern "C" {
 
 /** @brief Encode an on command for on-off server into buffer including the APS frame
  */
-uint32_t encodeOnCommand(uint8_t * buffer, uint32_t buf_length, uint8_t destination_endpoint);
+uint16_t encodeOnCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
 /** @brief Encode an off command for on-off server into buffer including the APS frame
  */
 
-uint32_t encodeOffCommand(uint8_t * buffer, uint32_t buf_length, uint8_t destination_endpoint);
+uint16_t encodeOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
 /** @brief Encode a toggle command for on-off server into buffer including the APS frame
  */
 
-uint32_t encodeToggleCommand(uint8_t * buffer, uint32_t buf_length, uint8_t destination_endpoint);
+uint16_t encodeToggleCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
 /**
  * @brief Encode a Read Attributes command for the given cluster and the given
@@ -82,7 +82,7 @@ uint16_t encodeReadOnOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t d
  * @param outApsFrame Pointer to EmberApsFrame struct to read into
  * @return returns the number of bytes that were consumed to read out the EmberApsFrame. 0 means an error was encountered
  */
-uint16_t extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * outApsFrame);
+uint16_t extractApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * outApsFrame);
 
 /** @brief Populates msg with address of the zcl message within buffer.
  * @return Returns the length of msg buffer. Returns 0 on error e.g. if buffer is too short.
