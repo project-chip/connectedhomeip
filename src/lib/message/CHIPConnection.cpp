@@ -73,8 +73,8 @@ void ChipConnection::Release()
     if (mRefCount == 2 && State != kState_ReadyToConnect && State != kState_Closed)
     {
         // Suppress callbacks.
-        OnConnectionComplete = NULL;
-        OnConnectionClosed   = NULL;
+        OnConnectionComplete = nullptr;
+        OnConnectionClosed   = nullptr;
 
         // Perform a graceful close.
         DoClose(CHIP_NO_ERROR, kDoCloseFlag_SuppressCallback);
@@ -194,7 +194,7 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, c
                  err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Can't request authentication if the security manager is not initialized.
-    VerifyOrExit(authMode == kChipAuthMode_Unauthenticated || MessageLayer->SecurityMgr != NULL,
+    VerifyOrExit(authMode == kChipAuthMode_Unauthenticated || MessageLayer->SecurityMgr != nullptr,
                  err = CHIP_ERROR_UNSUPPORTED_AUTH_MODE);
 
     // Application has made this an IP-based ChipConnection.
@@ -259,7 +259,7 @@ exit:
  */
 CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, const char * peerAddr, uint16_t defaultPort)
 {
-    return Connect(peerNodeId, authMode, peerAddr, (peerAddr != NULL) ? strlen(peerAddr) : 0, defaultPort);
+    return Connect(peerNodeId, authMode, peerAddr, (peerAddr != nullptr) ? strlen(peerAddr) : 0, defaultPort);
 }
 
 /**
@@ -372,11 +372,11 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, c
                  err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Can't request authentication if the security manager is not initialized.
-    VerifyOrExit(authMode == kChipAuthMode_Unauthenticated || MessageLayer->SecurityMgr != NULL,
+    VerifyOrExit(authMode == kChipAuthMode_Unauthenticated || MessageLayer->SecurityMgr != nullptr,
                  err = CHIP_ERROR_UNSUPPORTED_AUTH_MODE);
 
     // If no peer address given, connect using the node id.
-    if (peerAddr == NULL || peerAddrLen == 0)
+    if (peerAddr == nullptr || peerAddrLen == 0)
     {
         err = Connect(peerNodeId, authMode, IPAddress::Any, defaultPort);
         ExitNow();
@@ -392,7 +392,7 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, c
         PeerPort = (defaultPort != 0) ? defaultPort : CHIP_PORT;
 
     // If an interface name has been specified, attempt to convert it to a network interface id.
-    if (intfName != NULL)
+    if (intfName != nullptr)
     {
         err = InterfaceNameToId(intfName, mTargetInterface);
         SuccessOrExit(err);
@@ -450,7 +450,7 @@ void ChipConnection::SetConnectTimeout(const uint32_t connTimeoutMsecs)
 CHIP_ERROR ChipConnection::GetPeerAddressInfo(IPPacketInfo & addrInfo)
 {
 #if CONFIG_NETWORK_LAYER_BLE
-    if (mBleEndPoint != NULL)
+    if (mBleEndPoint != nullptr)
         return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 
@@ -472,7 +472,7 @@ CHIP_ERROR ChipConnection::GetPeerAddressInfo(IPPacketInfo & addrInfo)
  */
 void ChipConnection::GetPeerDescription(char * buf, size_t bufSize) const
 {
-    ChipMessageLayer::GetPeerDescription(buf, bufSize, PeerNodeId, (NetworkType == kNetworkType_IP) ? &PeerAddr : NULL,
+    ChipMessageLayer::GetPeerDescription(buf, bufSize, PeerNodeId, (NetworkType == kNetworkType_IP) ? &PeerAddr : nullptr,
                                          (NetworkType == kNetworkType_IP) ? PeerPort : 0, INET_NULL_INTERFACEID, this);
 }
 
@@ -545,7 +545,7 @@ CHIP_ERROR ChipConnection::SendMessage(ChipMessageInfo * msgInfo, PacketBuffer *
     msgBuf = PacketBuffer::RightSize(msgBuf);
 
 #if CONFIG_NETWORK_LAYER_BLE
-    if (mBleEndPoint != NULL)
+    if (mBleEndPoint != nullptr)
     {
         res = mBleEndPoint->Send(msgBuf);
     }
@@ -554,13 +554,13 @@ CHIP_ERROR ChipConnection::SendMessage(ChipMessageInfo * msgInfo, PacketBuffer *
     {
         res = mTcpEndPoint->Send(msgBuf, true);
     }
-    msgBuf = NULL;
+    msgBuf = nullptr;
 
 exit:
-    if (msgBuf != NULL)
+    if (msgBuf != nullptr)
     {
         PacketBuffer::Free(msgBuf);
-        msgBuf = NULL;
+        msgBuf = nullptr;
     }
 
     return res;
@@ -592,7 +592,7 @@ exit:
 CHIP_ERROR ChipConnection::Shutdown()
 {
 #if CONFIG_NETWORK_LAYER_BLE
-    if (mBleEndPoint != NULL)
+    if (mBleEndPoint != nullptr)
         return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 
@@ -672,8 +672,8 @@ CHIP_ERROR ChipConnection::Close()
 CHIP_ERROR ChipConnection::Close(bool suppressCloseLog)
 {
     // Suppress callbacks.
-    OnConnectionComplete = NULL;
-    OnConnectionClosed   = NULL;
+    OnConnectionComplete = nullptr;
+    OnConnectionClosed   = nullptr;
 
     // Perform a graceful close.
     DoClose(CHIP_NO_ERROR, kDoCloseFlag_SuppressCallback | (suppressCloseLog ? kDoCloseFlag_SuppressLogging : 0));
@@ -704,8 +704,8 @@ CHIP_ERROR ChipConnection::Close(bool suppressCloseLog)
 void ChipConnection::Abort()
 {
     // Suppress callbacks.
-    OnConnectionComplete = NULL;
-    OnConnectionClosed   = NULL;
+    OnConnectionComplete = nullptr;
+    OnConnectionClosed   = nullptr;
 
     // Perform an abortive close of the connection.
     DoClose(CHIP_ERROR_CONNECTION_ABORTED, kDoCloseFlag_SuppressCallback);
@@ -787,7 +787,7 @@ void ChipConnection::DisableReceive()
 CHIP_ERROR ChipConnection::EnableKeepAlive(uint16_t interval, uint16_t timeoutCount)
 {
 #if CONFIG_NETWORK_LAYER_BLE
-    if (mBleEndPoint != NULL)
+    if (mBleEndPoint != nullptr)
         return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 
@@ -823,7 +823,7 @@ CHIP_ERROR ChipConnection::EnableKeepAlive(uint16_t interval, uint16_t timeoutCo
 CHIP_ERROR ChipConnection::DisableKeepAlive()
 {
 #if CONFIG_NETWORK_LAYER_BLE
-    if (mBleEndPoint != NULL)
+    if (mBleEndPoint != nullptr)
         return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 
@@ -869,7 +869,7 @@ CHIP_ERROR ChipConnection::DisableKeepAlive()
 CHIP_ERROR ChipConnection::SetUserTimeout(uint32_t userTimeoutMillis)
 {
 #if CONFIG_NETWORK_LAYER_BLE
-    if (mBleEndPoint != NULL)
+    if (mBleEndPoint != nullptr)
         return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 
@@ -941,7 +941,7 @@ void ChipConnection::DoClose(CHIP_ERROR err, uint8_t flags)
     if (State != kState_Closed)
     {
 #if CONFIG_NETWORK_LAYER_BLE
-        if (mBleEndPoint != NULL)
+        if (mBleEndPoint != nullptr)
         {
             if (err == CHIP_NO_ERROR)
             {
@@ -955,19 +955,19 @@ void ChipConnection::DoClose(CHIP_ERROR err, uint8_t flags)
 
             // BleEndPoint frees itself once it finishes the close operation. It must stick around to negotiate the
             // close, potentially after it's emptied the remainder of its WoBle transmit buffer.
-            mBleEndPoint = NULL;
+            mBleEndPoint = nullptr;
         }
         else
 #endif
         {
-            if (mTcpEndPoint != NULL)
+            if (mTcpEndPoint != nullptr)
             {
                 if (err == CHIP_NO_ERROR)
                     err = mTcpEndPoint->Close();
                 if (err != CHIP_NO_ERROR)
                     mTcpEndPoint->Abort();
                 mTcpEndPoint->Free();
-                mTcpEndPoint = NULL;
+                mTcpEndPoint = nullptr;
             }
 
 #if CHIP_CONFIG_ENABLE_DNS_RESOLVER
@@ -985,7 +985,7 @@ void ChipConnection::DoClose(CHIP_ERROR err, uint8_t flags)
             ChipLogProgress(MessageLayer, "Con closed %04X %ld", LogId(), (long) err);
 
         // If the exchange manager has been initialized, call its callback.
-        if (MessageLayer->ExchangeMgr != NULL)
+        if (MessageLayer->ExchangeMgr != nullptr)
             MessageLayer->ExchangeMgr->HandleConnectionClosed(this, err);
 
         // Call the Fabric state object to alert it of the connection close.
@@ -996,10 +996,10 @@ void ChipConnection::DoClose(CHIP_ERROR err, uint8_t flags)
         {
             if (oldState == kState_Resolving || oldState == kState_Connecting || oldState == kState_EstablishingSession)
             {
-                if (OnConnectionComplete != NULL)
+                if (OnConnectionComplete != nullptr)
                     OnConnectionComplete(this, err);
             }
-            else if (OnConnectionClosed != NULL)
+            else if (OnConnectionClosed != nullptr)
                 OnConnectionClosed(this, err);
         }
 
@@ -1078,7 +1078,7 @@ void ChipConnection::StartSession()
         ChipLogProgress(MessageLayer, "Con complete %04X", LogId());
 
         // Call the app's completion function.
-        if (OnConnectionComplete != NULL)
+        if (OnConnectionComplete != nullptr)
             OnConnectionComplete(this, CHIP_NO_ERROR);
     }
 }
@@ -1185,7 +1185,7 @@ void ChipConnection::HandleConnectComplete(TCPEndPoint * endPoint, INET_ERROR co
 
         // Setup various callbacks on the end point.
         endPoint->OnDataReceived     = HandleDataReceived;
-        endPoint->OnDataSent         = NULL; // TODO: should handle flow control
+        endPoint->OnDataSent         = nullptr; // TODO: should handle flow control
         endPoint->OnConnectionClosed = HandleTcpConnectionClosed;
 
         // Disable TCP Nagle buffering by setting TCP_NODELAY socket option to true
@@ -1206,7 +1206,7 @@ void ChipConnection::HandleConnectComplete(TCPEndPoint * endPoint, INET_ERROR co
     {
         // Release the end point object.
         endPoint->Free();
-        con->mTcpEndPoint = NULL;
+        con->mTcpEndPoint = nullptr;
 
         // Attempt to connect to another address if available.
         con->TryNextPeerAddress(conRes);
@@ -1220,13 +1220,13 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
     ChipMessageLayer * msgLayer = con->MessageLayer;
 
     // While in a state that allows receiving, process the received data...
-    while (data != NULL && con->StateAllowsReceive() && con->ReceiveEnabled && (con->OnMessageReceived != NULL))
+    while (data != nullptr && con->StateAllowsReceive() && con->ReceiveEnabled && (con->OnMessageReceived != nullptr))
     {
         IPPacketInfo packetInfo;
         ChipMessageInfo msgInfo;
         uint8_t * payload;
         uint16_t payloadLen;
-        PacketBuffer * payloadBuf = NULL;
+        PacketBuffer * payloadBuf = nullptr;
         uint32_t frameLen;
 
         packetInfo.Clear();
@@ -1264,7 +1264,7 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
             // Attempt to allocate a buffer big enough to hold the entire message.  Fail with
             // CHIP_ERROR_MESSAGE_TOO_LONG if no such buffer is available.
             PacketBuffer * newBuf = PacketBuffer::NewWithAvailableSize(0, frameLen);
-            if (newBuf == NULL)
+            if (newBuf == nullptr)
             {
                 break;
             }
@@ -1284,7 +1284,7 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
         {
             // If there are more buffers in the queue, move as much data as possible into the head buffer
             // and try again.
-            if (data->Next() != NULL)
+            if (data->Next() != nullptr)
             {
                 data->CompactHead();
                 continue;
@@ -1332,7 +1332,7 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
             else
             {
                 payloadBuf = PacketBuffer::New(0);
-                if (payloadBuf != NULL)
+                if (payloadBuf != nullptr)
                 {
                     memcpy(payloadBuf->Start(), payload, payloadLen);
                     payloadBuf->SetDataLength(payloadLen);
@@ -1350,13 +1350,13 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
             // Send key error response to the peer if required.
             if (msgLayer->SecurityMgr->IsKeyError(err))
             {
-                if (data != NULL)
+                if (data != nullptr)
                 {
                     PacketBuffer::Free(data);
-                    data = NULL;
+                    data = nullptr;
                 }
 
-                msgLayer->SecurityMgr->SendKeyErrorMsg(&msgInfo, NULL, con, err);
+                msgLayer->SecurityMgr->SendKeyErrorMsg(&msgInfo, nullptr, con, err);
             }
 
             con->DisconnectOnError(err);
@@ -1381,19 +1381,19 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
     // TCP connection is closed (which means we're never going to receive any more data), fail with
     // a MESSAGE_INCOMPLETE error.  If the ChipConnection is closed (e.g. the app called close)
     // then simply discard the received data.
-    if (data != NULL)
+    if (data != nullptr)
     {
         if (con->StateAllowsReceive())
         {
             if (endPoint->State == TCPEndPoint::kState_Connected || endPoint->State == TCPEndPoint::kState_SendShutdown)
             {
                 endPoint->PutBackReceivedData(data);
-                data = NULL;
+                data = nullptr;
             }
             else
                 con->DoClose(CHIP_ERROR_MESSAGE_INCOMPLETE, 0);
         }
-        if (data != NULL)
+        if (data != nullptr)
             PacketBuffer::Free(data);
     }
 }
@@ -1420,7 +1420,7 @@ void ChipConnection::HandleSecureSessionEstablished(ChipSecurityManager * sm, Ch
     ChipLogProgress(MessageLayer, "Con complete %04X", con->LogId());
 
     // Invoke the app's completion function.
-    if (con->OnConnectionComplete != NULL)
+    if (con->OnConnectionComplete != nullptr)
         con->OnConnectionComplete(con, CHIP_NO_ERROR);
 }
 
@@ -1437,7 +1437,7 @@ void ChipConnection::Init(ChipMessageLayer * msgLayer)
     PeerNodeId            = 0;
     PeerAddr              = IPAddress::Any;
     MessageLayer          = msgLayer;
-    AppState              = NULL;
+    AppState              = nullptr;
     PeerPort              = 0;
     DefaultKeyId          = ChipKeyId::kNone;
     AuthMode              = kChipAuthMode_NotSpecified;
@@ -1445,14 +1445,14 @@ void ChipConnection::Init(ChipMessageLayer * msgLayer)
     State                 = ChipConnection::kState_ReadyToConnect;
     NetworkType           = kNetworkType_Unassigned;
     ReceiveEnabled        = true;
-    OnConnectionComplete  = NULL;
-    OnMessageReceived     = NULL;
+    OnConnectionComplete  = nullptr;
+    OnMessageReceived     = nullptr;
     OnConnectionClosed    = DefaultConnectionClosedHandler;
-    OnReceiveError        = NULL;
+    OnReceiveError        = nullptr;
     memset(&mPeerAddrs, 0, sizeof(mPeerAddrs));
-    mTcpEndPoint = NULL;
+    mTcpEndPoint = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
-    mBleEndPoint = NULL;
+    mBleEndPoint = nullptr;
 #endif
     mTargetInterface = INET_NULL_INTERFACEID;
     mRefCount        = 1;
@@ -1488,7 +1488,7 @@ void ChipConnection::MakeConnectedTcp(TCPEndPoint * endPoint, const IPAddress & 
     NetworkType                  = kNetworkType_IP;
     endPoint->AppState           = this;
     endPoint->OnDataReceived     = HandleDataReceived;
-    endPoint->OnDataSent         = NULL; // TODO: should handle flow control
+    endPoint->OnDataSent         = nullptr; // TODO: should handle flow control
     endPoint->OnConnectionClosed = HandleTcpConnectionClosed;
 
     PeerNodeId = (peerAddr.IsIPv6ULA()) ? IPv6InterfaceIdToChipNodeId(peerAddr.InterfaceId()) : kNodeIdNotSpecified;
@@ -1508,7 +1508,7 @@ void ChipConnection::MakeConnectedTcp(TCPEndPoint * endPoint, const IPAddress & 
         SendDestNodeId = true;
     }
 
-    AppState = NULL;
+    AppState = nullptr;
     mRefCount++;
 
     ReceiveEnabled = true;
@@ -1561,13 +1561,13 @@ CHIP_ERROR ChipConnection::ConnectBle(BLE_CONNECTION_OBJECT connObj, ChipAuthMod
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(State == kState_ReadyToConnect && MessageLayer->mBle != NULL, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(State == kState_ReadyToConnect && MessageLayer->mBle != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     VerifyOrExit(authMode == kChipAuthMode_Unauthenticated || IsCASEAuthMode(authMode) || IsPASEAuthMode(authMode),
                  err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Can't request authentication if the security manager is not initialized.
-    VerifyOrExit(authMode == kChipAuthMode_Unauthenticated || MessageLayer->SecurityMgr != NULL,
+    VerifyOrExit(authMode == kChipAuthMode_Unauthenticated || MessageLayer->SecurityMgr != nullptr,
                  err = CHIP_ERROR_UNSUPPORTED_AUTH_MODE);
 
     // Application has made us a BLE-based ChipConnection.
@@ -1646,7 +1646,7 @@ void ChipConnection::HandleBleMessageReceived(BLEEndPoint * endPoint, PacketBuff
     msgInfo.InCon = con;
 
     // Verify received buffer is not part of a multi-buffer chain.
-    VerifyOrExit(data->Next() == NULL, err = BLE_ERROR_BAD_ARGS);
+    VerifyOrExit(data->Next() == nullptr, err = BLE_ERROR_BAD_ARGS);
 
     // Attempt to parse the message.
     err = msgLayer->DecodeMessageWithLength(data, con->PeerNodeId, con, &msgInfo, &payload, &payloadLen, &frameLen);
@@ -1661,7 +1661,7 @@ void ChipConnection::HandleBleMessageReceived(BLEEndPoint * endPoint, PacketBuff
 
     // Assign received data to payload buffer.
     payloadBuf = data;
-    data       = NULL;
+    data       = nullptr;
 
     // Adjust the buffer to point at the payload of the message.
     payloadBuf->SetStart(payload);
@@ -1676,12 +1676,12 @@ exit:
     {
         ChipLogError(MessageLayer, "HandleBleMessageReceived failed, err = %d", err);
 
-        if (data != NULL)
+        if (data != nullptr)
             PacketBuffer::Free(data);
 
         // Send key error response to the peer if required.
         if (msgLayer->SecurityMgr->IsKeyError(err))
-            msgLayer->SecurityMgr->SendKeyErrorMsg(&msgInfo, NULL, con, err);
+            msgLayer->SecurityMgr->SendKeyErrorMsg(&msgInfo, nullptr, con, err);
     }
 }
 
@@ -1713,11 +1713,11 @@ void ChipConnection::MakeConnectedBle(BLEEndPoint * endPoint)
 
 void ChipConnection::DisconnectOnError(CHIP_ERROR err)
 {
-    if (OnReceiveError != NULL)
+    if (OnReceiveError != nullptr)
     {
         OnReceiveError(this, err);
     }
-    else if (MessageLayer->OnReceiveError != NULL)
+    else if (MessageLayer->OnReceiveError != nullptr)
     {
         IPPacketInfo addrInfo;
         GetPeerAddressInfo(addrInfo);

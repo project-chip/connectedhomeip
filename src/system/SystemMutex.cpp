@@ -49,7 +49,7 @@ namespace System {
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 DLL_EXPORT Error Mutex::Init(Mutex & aThis)
 {
-    int lSysError = pthread_mutex_init(&aThis.mPOSIXMutex, NULL);
+    int lSysError = pthread_mutex_init(&aThis.mPOSIXMutex, nullptr);
     Error lError;
 
     switch (lSysError)

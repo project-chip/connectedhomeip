@@ -685,8 +685,8 @@ int TestInetLayerDNSInternal(void)
     {
         "DNS",
         &DNSTests[0],
-        NULL,
-        NULL
+        nullptr,
+        nullptr
     };
     // clang-format on
 
@@ -697,7 +697,7 @@ int TestInetLayerDNSInternal(void)
 
     // Run all tests in Suite
 
-    nlTestRunner(&DNSTestSuite, NULL);
+    nlTestRunner(&DNSTestSuite, nullptr);
 
     ShutdownNetwork();
     ShutdownSystemLayer();
@@ -705,10 +705,7 @@ int TestInetLayerDNSInternal(void)
     return nlTestRunnerStats(&DNSTestSuite);
 }
 
-static void __attribute__((constructor)) TestCHIPInetLayerDNSCtor(void)
-{
-    VerifyOrDie(RegisterUnitTests(&TestInetLayerDNSInternal) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestInetLayerDNSInternal)
 #else // !INET_CONFIG_ENABLE_DNS_RESOLVER
 
 int TestInetLayerDNSInternal(void)

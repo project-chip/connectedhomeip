@@ -120,7 +120,7 @@ CHIP_ERROR ChipMessageLayer::Init(InitContext * context)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(State == kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(context != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(context != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     State = kState_Initializing;
 
@@ -132,17 +132,17 @@ CHIP_ERROR ChipMessageLayer::Init(InitContext * context)
 
     FabricState                           = context->fabricState;
     FabricState->MessageLayer             = this;
-    OnMessageReceived                     = NULL;
-    OnReceiveError                        = NULL;
-    OnConnectionReceived                  = NULL;
-    OnUnsecuredConnectionReceived         = NULL;
-    OnUnsecuredConnectionCallbacksRemoved = NULL;
-    OnAcceptError                         = NULL;
-    OnMessageLayerActivityChange          = NULL;
+    OnMessageReceived                     = nullptr;
+    OnReceiveError                        = nullptr;
+    OnConnectionReceived                  = nullptr;
+    OnUnsecuredConnectionReceived         = nullptr;
+    OnUnsecuredConnectionCallbacksRemoved = nullptr;
+    OnAcceptError                         = nullptr;
+    OnMessageLayerActivityChange          = nullptr;
     memset(mConPool, 0, sizeof(mConPool));
-    AppState               = NULL;
-    ExchangeMgr            = NULL;
-    SecurityMgr            = NULL;
+    AppState               = nullptr;
+    ExchangeMgr            = nullptr;
+    SecurityMgr            = nullptr;
     IsListening            = context->listenTCP || context->listenUDP;
     IncomingConIdleTimeout = CHIP_CONFIG_DEFAULT_INCOMING_CONNECTION_IDLE_TIMEOUT;
 
@@ -155,25 +155,25 @@ CHIP_ERROR ChipMessageLayer::Init(InitContext * context)
     SetEphemeralUDPPortEnabled(context->enableEphemeralUDPPort);
 #endif
 
-    mIPv6TCPListen = NULL;
-    mIPv6UDP       = NULL;
+    mIPv6TCPListen = nullptr;
+    mIPv6UDP       = nullptr;
 
 #if INET_CONFIG_ENABLE_IPV4
-    mIPv4TCPListen = NULL;
-    mIPv4UDP       = NULL;
+    mIPv4TCPListen = nullptr;
+    mIPv4UDP       = nullptr;
 #endif // INET_CONFIG_ENABLE_IPV4
 
 #if CHIP_CONFIG_ENABLE_TARGETED_LISTEN
-    mIPv6UDPMulticastRcv = NULL;
+    mIPv6UDPMulticastRcv = nullptr;
 #if INET_CONFIG_ENABLE_IPV4
-    mIPv4UDPBroadcastRcv = NULL;
+    mIPv4UDPBroadcastRcv = nullptr;
 #endif // INET_CONFIG_ENABLE_IPV4
 #endif // CHIP_CONFIG_ENABLE_TARGETED_LISTEN
 
 #if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
-    mIPv6EphemeralUDP = NULL;
+    mIPv6EphemeralUDP = nullptr;
 #if INET_CONFIG_ENABLE_IPV4
-    mIPv4EphemeralUDP = NULL;
+    mIPv4EphemeralUDP = nullptr;
 #endif // INET_CONFIG_ENABLE_IPV4
 #endif // CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
 
@@ -185,7 +185,7 @@ CHIP_ERROR ChipMessageLayer::Init(InitContext * context)
     SuccessOrExit(err);
 
 #if CONFIG_NETWORK_LAYER_BLE
-    if (context->listenBLE && mBle != NULL)
+    if (context->listenBLE && mBle != nullptr)
     {
         mBle->mAppState                = this;
         mBle->OnChipBleConnectReceived = HandleIncomingBleConnection;
@@ -221,25 +221,25 @@ CHIP_ERROR ChipMessageLayer::Shutdown()
     CloseEndpoints();
 
 #if CONFIG_NETWORK_LAYER_BLE
-    if (mBle != NULL && mBle->mAppState == this)
+    if (mBle != nullptr && mBle->mAppState == this)
     {
-        mBle->mAppState                = NULL;
-        mBle->OnChipBleConnectReceived = NULL;
+        mBle->mAppState                = nullptr;
+        mBle->OnChipBleConnectReceived = nullptr;
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
     State                         = kState_NotInitialized;
     IsListening                   = false;
-    FabricState                   = NULL;
-    OnMessageReceived             = NULL;
-    OnReceiveError                = NULL;
-    OnUnsecuredConnectionReceived = NULL;
-    OnConnectionReceived          = NULL;
-    OnAcceptError                 = NULL;
-    OnMessageLayerActivityChange  = NULL;
+    FabricState                   = nullptr;
+    OnMessageReceived             = nullptr;
+    OnReceiveError                = nullptr;
+    OnUnsecuredConnectionReceived = nullptr;
+    OnConnectionReceived          = nullptr;
+    OnAcceptError                 = nullptr;
+    OnMessageLayerActivityChange  = nullptr;
     memset(mConPool, 0, sizeof(mConPool));
-    ExchangeMgr = NULL;
-    AppState    = NULL;
+    ExchangeMgr = nullptr;
+    AppState    = nullptr;
     mFlags      = 0;
 
     return CHIP_NO_ERROR;
@@ -293,7 +293,7 @@ CHIP_ERROR ChipMessageLayer::EncodeMessage(const IPAddress & destAddr, uint16_t 
         msgInfo->Flags |= kChipMessageFlag_DestNodeId;
 
     // Encode the CHIP message. NOTE that this results in the payload buffer containing the entire encoded message.
-    res = EncodeMessage(msgInfo, payload, NULL, UINT16_MAX, 0);
+    res = EncodeMessage(msgInfo, payload, nullptr, UINT16_MAX, 0);
 
     return res;
 }
@@ -403,7 +403,7 @@ CHIP_ERROR ChipMessageLayer::SendMessage(const IPAddress & aDestAddr, uint16_t d
     return SendMessage(destAddr, destPort, sendIntfId, payload, msgInfo->Flags);
 
 exit:
-    if ((res != CHIP_NO_ERROR) && (payload != NULL) && ((msgInfo->Flags & kChipMessageFlag_RetainBuffer) == 0))
+    if ((res != CHIP_NO_ERROR) && (payload != nullptr) && ((msgInfo->Flags & kChipMessageFlag_RetainBuffer) == 0))
     {
         PacketBuffer::Free(payload);
     }
@@ -585,7 +585,7 @@ CHIP_ERROR ChipMessageLayer::SendMessage(const IPAddress & destAddr, uint16_t de
         // message buffer. If a send interface was specified, the message is sent over that interface.
         udpSendFlags = GetFlag(msgFlags, kChipMessageFlag_RetainBuffer) ? UDPEndPoint::kSendFlag_RetainBuffer : 0;
         err          = ep->SendMsg(&pktInfo, payload, udpSendFlags);
-        payload      = NULL; // Prevent call to Free() in exit code
+        payload      = nullptr; // Prevent call to Free() in exit code
         CheckForceRefreshUDPEndPointsNeeded(err);
         err = FilterUDPSendError(err, sendAction == kMulticast_OneInterface);
         break;
@@ -634,7 +634,7 @@ CHIP_ERROR ChipMessageLayer::SendMessage(const IPAddress & destAddr, uint16_t de
     }
 
 exit:
-    if (payload != NULL && !GetFlag(msgFlags, kChipMessageFlag_RetainBuffer))
+    if (payload != nullptr && !GetFlag(msgFlags, kChipMessageFlag_RetainBuffer))
         PacketBuffer::Free(payload);
     return err;
 }
@@ -693,7 +693,7 @@ CHIP_ERROR ChipMessageLayer::SelectOutboundUDPEndPoint(const IPAddress & destAdd
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    VerifyOrExit(ep != NULL, err = CHIP_ERROR_NO_ENDPOINT);
+    VerifyOrExit(ep != nullptr, err = CHIP_ERROR_NO_ENDPOINT);
 
 exit:
     return err;
@@ -793,7 +793,7 @@ CHIP_ERROR ChipMessageLayer::ResendMessage(const IPAddress & aDestAddr, uint16_t
 
     return SendMessage(destAddr, destPort, interfaceId, payload, msgInfo->Flags);
 exit:
-    if ((res != CHIP_NO_ERROR) && (payload != NULL) && ((msgInfo->Flags & kChipMessageFlag_RetainBuffer) == 0))
+    if ((res != CHIP_NO_ERROR) && (payload != nullptr) && ((msgInfo->Flags & kChipMessageFlag_RetainBuffer) == 0))
     {
         PacketBuffer::Free(payload);
     }
@@ -841,7 +841,7 @@ ChipConnection * ChipMessageLayer::NewConnection()
     }
 
     ChipLogError(ExchangeManager, "New con FAILED");
-    return NULL;
+    return nullptr;
 }
 
 void ChipMessageLayer::GetIncomingTCPConCount(const IPAddress & peerAddr, uint16_t & count, uint16_t & countFromIP)
@@ -879,16 +879,16 @@ CHIP_ERROR ChipMessageLayer::SetUnsecuredConnectionListener(ConnectionReceiveFun
     }
 
     // New OnUnsecuredConnectionReceived cannot be null. To clear, use ClearOnUnsecuredConnectionReceived().
-    VerifyOrExit(newOnUnsecuredConnectionReceived != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(newOnUnsecuredConnectionReceived != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (OnUnsecuredConnectionReceived != NULL)
+    if (OnUnsecuredConnectionReceived != nullptr)
     {
         if (force == false)
         {
             err = CHIP_ERROR_INCORRECT_STATE;
             ExitNow();
         }
-        else if (OnUnsecuredConnectionCallbacksRemoved != NULL)
+        else if (OnUnsecuredConnectionCallbacksRemoved != nullptr)
         {
             // Notify application that its previous OnUnsecuredConnectionReceived callback has been removed.
             OnUnsecuredConnectionCallbacksRemoved(UnsecuredConnectionReceivedAppState);
@@ -930,9 +930,9 @@ CHIP_ERROR ChipMessageLayer::ClearUnsecuredConnectionListener(ConnectionReceiveF
         SuccessOrExit(err);
     }
 
-    OnUnsecuredConnectionReceived         = NULL;
-    OnUnsecuredConnectionCallbacksRemoved = NULL;
-    UnsecuredConnectionReceivedAppState   = NULL;
+    OnUnsecuredConnectionReceived         = nullptr;
+    OnUnsecuredConnectionCallbacksRemoved = nullptr;
+    UnsecuredConnectionReceivedAppState   = nullptr;
 
 exit:
     return err;
@@ -1065,7 +1065,7 @@ CHIP_ERROR ChipMessageLayer::DecodeHeader(PacketBuffer * msgBuf, ChipMessageInfo
         msgInfo->KeyId = ChipKeyId::kNone;
     }
 
-    if (payloadStart != NULL)
+    if (payloadStart != nullptr)
     {
         *payloadStart = p;
     }
@@ -1093,7 +1093,7 @@ CHIP_ERROR ChipMessageLayer::ReEncodeMessage(PacketBuffer * msgBuf)
 
     encryptionLen = msgLen - (p - msgStart);
 
-    err = FabricState->GetSessionState(msgInfo.SourceNodeId, msgInfo.KeyId, msgInfo.EncryptionType, NULL, sessionState);
+    err = FabricState->GetSessionState(msgInfo.SourceNodeId, msgInfo.KeyId, msgInfo.EncryptionType, nullptr, sessionState);
     if (err != CHIP_NO_ERROR)
         return err;
 
@@ -1501,7 +1501,7 @@ void ChipMessageLayer::HandleUDPMessage(UDPEndPoint * endPoint, PacketBuffer * m
                                                          : kNodeIdNotSpecified;
 
         // Attempt to decode the message.
-        err = msgLayer->DecodeMessage(msg, sourceNodeId, NULL, &msgInfo, &payload, &payloadLen);
+        err = msgLayer->DecodeMessage(msg, sourceNodeId, nullptr, &msgInfo, &payload, &payloadLen);
 
         if (err == CHIP_NO_ERROR)
         {
@@ -1532,7 +1532,7 @@ void ChipMessageLayer::HandleUDPMessage(UDPEndPoint * endPoint, PacketBuffer * m
 #endif // CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
 
     // Call the supplied OnMessageReceived callback.
-    if (msgLayer->OnMessageReceived != NULL)
+    if (msgLayer->OnMessageReceived != nullptr)
     {
         msgLayer->OnMessageReceived(msgLayer, &msgInfo, msg);
     }
@@ -1551,9 +1551,9 @@ exit:
         // Send key error response to the peer if required.
         // Key error response is sent only if the received message is not a multicast.
         if (!pktInfo->DestAddress.IsMulticast() && msgLayer->SecurityMgr->IsKeyError(err))
-            msgLayer->SecurityMgr->SendKeyErrorMsg(&msgInfo, pktInfo, NULL, err);
+            msgLayer->SecurityMgr->SendKeyErrorMsg(&msgInfo, pktInfo, nullptr, err);
 
-        if (msgLayer->OnReceiveError != NULL)
+        if (msgLayer->OnReceiveError != nullptr)
             msgLayer->OnReceiveError(msgLayer, err, pktInfo);
     }
 
@@ -1565,7 +1565,7 @@ void ChipMessageLayer::HandleUDPReceiveError(UDPEndPoint * endPoint, INET_ERROR 
     ChipLogError(MessageLayer, "HandleUDPReceiveError Error %s", ErrorStr(err));
 
     ChipMessageLayer * msgLayer = (ChipMessageLayer *) endPoint->AppState;
-    if (msgLayer->OnReceiveError != NULL)
+    if (msgLayer->OnReceiveError != nullptr)
         msgLayer->OnReceiveError(msgLayer, err, pktInfo);
 }
 
@@ -1575,20 +1575,20 @@ void ChipMessageLayer::HandleIncomingBleConnection(BLEEndPoint * bleEP)
     ChipMessageLayer * msgLayer = (ChipMessageLayer *) bleEP->mAppState;
 
     // Immediately close the connection if there's no callback registered.
-    if (msgLayer->OnConnectionReceived == NULL && msgLayer->ExchangeMgr == NULL)
+    if (msgLayer->OnConnectionReceived == nullptr && msgLayer->ExchangeMgr == nullptr)
     {
         bleEP->Close();
-        if (msgLayer->OnAcceptError != NULL)
+        if (msgLayer->OnAcceptError != nullptr)
             msgLayer->OnAcceptError(msgLayer, CHIP_ERROR_NO_CONNECTION_HANDLER);
         return;
     }
 
     // Attempt to allocate a connection object. Fail if too many connections.
     ChipConnection * con = msgLayer->NewConnection();
-    if (con == NULL)
+    if (con == nullptr)
     {
         bleEP->Close();
-        if (msgLayer->OnAcceptError != NULL)
+        if (msgLayer->OnAcceptError != nullptr)
             msgLayer->OnAcceptError(msgLayer, CHIP_ERROR_TOO_MANY_CONNECTIONS);
         return;
     }
@@ -1609,11 +1609,11 @@ void ChipMessageLayer::HandleIncomingBleConnection(BLEEndPoint * bleEP)
     con->SetIncoming(true);
 
     // If the exchange manager has been initialized, call its callback.
-    if (msgLayer->ExchangeMgr != NULL)
+    if (msgLayer->ExchangeMgr != nullptr)
         msgLayer->ExchangeMgr->HandleConnectionReceived(con);
 
     // Call the app's OnConnectionReceived callback.
-    if (msgLayer->OnConnectionReceived != NULL)
+    if (msgLayer->OnConnectionReceived != nullptr)
         msgLayer->OnConnectionReceived(msgLayer, con);
 }
 #endif /* CONFIG_NETWORK_LAYER_BLE */
@@ -1629,10 +1629,10 @@ void ChipMessageLayer::HandleIncomingTcpConnection(TCPEndPoint * listeningEP, TC
     ChipMessageLayer * msgLayer = (ChipMessageLayer *) listeningEP->AppState;
 
     // Immediately close the connection if there's no callback registered.
-    if (msgLayer->OnConnectionReceived == NULL && msgLayer->ExchangeMgr == NULL)
+    if (msgLayer->OnConnectionReceived == nullptr && msgLayer->ExchangeMgr == nullptr)
     {
         conEP->Free();
-        if (msgLayer->OnAcceptError != NULL)
+        if (msgLayer->OnAcceptError != nullptr)
             msgLayer->OnAcceptError(msgLayer, CHIP_ERROR_NO_CONNECTION_HANDLER);
         return;
     }
@@ -1643,17 +1643,17 @@ void ChipMessageLayer::HandleIncomingTcpConnection(TCPEndPoint * listeningEP, TC
         incomingTCPConCountFromIP == CHIP_CONFIG_MAX_INCOMING_TCP_CON_FROM_SINGLE_IP)
     {
         conEP->Free();
-        if (msgLayer->OnAcceptError != NULL)
+        if (msgLayer->OnAcceptError != nullptr)
             msgLayer->OnAcceptError(msgLayer, CHIP_ERROR_TOO_MANY_CONNECTIONS);
         return;
     }
 
     // Attempt to allocate a connection object. Fail if too many connections.
     ChipConnection * con = msgLayer->NewConnection();
-    if (con == NULL)
+    if (con == nullptr)
     {
         conEP->Free();
-        if (msgLayer->OnAcceptError != NULL)
+        if (msgLayer->OnAcceptError != nullptr)
             msgLayer->OnAcceptError(msgLayer, CHIP_ERROR_TOO_MANY_CONNECTIONS);
         return;
     }
@@ -1663,7 +1663,7 @@ void ChipMessageLayer::HandleIncomingTcpConnection(TCPEndPoint * listeningEP, TC
     if (err != INET_NO_ERROR)
     {
         conEP->Free();
-        if (msgLayer->OnAcceptError != NULL)
+        if (msgLayer->OnAcceptError != nullptr)
             msgLayer->OnAcceptError(msgLayer, err);
         return;
     }
@@ -1686,15 +1686,15 @@ void ChipMessageLayer::HandleIncomingTcpConnection(TCPEndPoint * listeningEP, TC
     con->SetIncoming(true);
 
     // If the exchange manager has been initialized, call its callback.
-    if (msgLayer->ExchangeMgr != NULL)
+    if (msgLayer->ExchangeMgr != nullptr)
         msgLayer->ExchangeMgr->HandleConnectionReceived(con);
 
     // Call the app's OnConnectionReceived callback.
-    if (msgLayer->OnConnectionReceived != NULL)
+    if (msgLayer->OnConnectionReceived != nullptr)
         msgLayer->OnConnectionReceived(msgLayer, con);
 
     // If connection was received on unsecured port, call the app's OnUnsecuredConnectionReceived callback.
-    if (msgLayer->OnUnsecuredConnectionReceived != NULL && conEP->GetLocalInfo(&localAddr, &localPort) == CHIP_NO_ERROR &&
+    if (msgLayer->OnUnsecuredConnectionReceived != nullptr && conEP->GetLocalInfo(&localAddr, &localPort) == CHIP_NO_ERROR &&
         localPort == CHIP_UNSECURED_PORT)
         msgLayer->OnUnsecuredConnectionReceived(msgLayer, con);
 }
@@ -1702,7 +1702,7 @@ void ChipMessageLayer::HandleIncomingTcpConnection(TCPEndPoint * listeningEP, TC
 void ChipMessageLayer::HandleAcceptError(TCPEndPoint * ep, INET_ERROR err)
 {
     ChipMessageLayer * msgLayer = (ChipMessageLayer *) ep->AppState;
-    if (msgLayer->OnAcceptError != NULL)
+    if (msgLayer->OnAcceptError != nullptr)
         msgLayer->OnAcceptError(msgLayer, err);
 }
 
@@ -1913,14 +1913,14 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoint(TCPEndPoint *& endPoint, bool enabl
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Release any existing endpoint as needed.
-    if (endPoint != NULL && !enable)
+    if (endPoint != nullptr && !enable)
     {
         endPoint->Free();
-        endPoint = NULL;
+        endPoint = nullptr;
     }
 
     // If needed, create and bind a new endpoint...
-    if (endPoint == NULL && enable)
+    if (endPoint == nullptr && enable)
     {
         // Create a new TCP endpoint object.
         err = Inet->NewTCPEndPoint(&endPoint);
@@ -1949,10 +1949,10 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoint(TCPEndPoint *& endPoint, bool enabl
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        if (endPoint != NULL)
+        if (endPoint != nullptr)
         {
             endPoint->Free();
-            endPoint = NULL;
+            endPoint = nullptr;
         }
         ChipLogError(MessageLayer, "Error initializing %s endpoint: %s", name, ErrorStr(err));
     }
@@ -1965,14 +1965,14 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoint(UDPEndPoint *& endPoint, bool enabl
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Release any existing endpoint as needed.
-    if (endPoint != NULL && (!enable || GetFlag(mFlags, kFlag_ForceRefreshUDPEndPoints)))
+    if (endPoint != nullptr && (!enable || GetFlag(mFlags, kFlag_ForceRefreshUDPEndPoints)))
     {
         endPoint->Free();
-        endPoint = NULL;
+        endPoint = nullptr;
     }
 
     // If needed, create and bind a new endpoint...
-    if (endPoint == NULL && enable)
+    if (endPoint == nullptr && enable)
     {
         // Create a new UDP endpoint object.
         err = Inet->NewUDPEndPoint(&endPoint);
@@ -2011,10 +2011,10 @@ CHIP_ERROR ChipMessageLayer::RefreshEndpoint(UDPEndPoint *& endPoint, bool enabl
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        if (endPoint != NULL)
+        if (endPoint != nullptr)
         {
             endPoint->Free();
-            endPoint = NULL;
+            endPoint = nullptr;
         }
         ChipLogError(MessageLayer, "Error initializing %s endpoint: %s", name, ErrorStr(err));
     }
@@ -2097,34 +2097,34 @@ void ChipMessageLayer::CloseListeningEndpoints(void)
 {
     ChipBindLog("Closing endpoints");
 
-    if (mIPv6TCPListen != NULL)
+    if (mIPv6TCPListen != nullptr)
     {
         mIPv6TCPListen->Free();
-        mIPv6TCPListen = NULL;
+        mIPv6TCPListen = nullptr;
     }
 
-    if (mIPv6UDP != NULL)
+    if (mIPv6UDP != nullptr)
     {
         mIPv6UDP->Free();
-        mIPv6UDP = NULL;
+        mIPv6UDP = nullptr;
     }
 
 #if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
 
-    if (mIPv6EphemeralUDP != NULL)
+    if (mIPv6EphemeralUDP != nullptr)
     {
         mIPv6EphemeralUDP->Free();
-        mIPv6EphemeralUDP = NULL;
+        mIPv6EphemeralUDP = nullptr;
     }
 
 #endif // CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
 
 #if CHIP_CONFIG_ENABLE_TARGETED_LISTEN
 
-    if (mIPv6UDPMulticastRcv != NULL)
+    if (mIPv6UDPMulticastRcv != nullptr)
     {
         mIPv6UDPMulticastRcv->Free();
-        mIPv6UDPMulticastRcv = NULL;
+        mIPv6UDPMulticastRcv = nullptr;
     }
 
 #endif // CHIP_CONFIG_ENABLE_TARGETED_LISTEN
@@ -2141,34 +2141,34 @@ void ChipMessageLayer::CloseListeningEndpoints(void)
 
 #if INET_CONFIG_ENABLE_IPV4
 
-    if (mIPv4TCPListen != NULL)
+    if (mIPv4TCPListen != nullptr)
     {
         mIPv4TCPListen->Free();
-        mIPv4TCPListen = NULL;
+        mIPv4TCPListen = nullptr;
     }
 
-    if (mIPv4UDP != NULL)
+    if (mIPv4UDP != nullptr)
     {
         mIPv4UDP->Free();
-        mIPv4UDP = NULL;
+        mIPv4UDP = nullptr;
     }
 
 #if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
 
-    if (mIPv4EphemeralUDP != NULL)
+    if (mIPv4EphemeralUDP != nullptr)
     {
         mIPv4EphemeralUDP->Free();
-        mIPv4EphemeralUDP = NULL;
+        mIPv4EphemeralUDP = nullptr;
     }
 
 #endif // CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
 
 #if CHIP_CONFIG_ENABLE_TARGETED_LISTEN
 
-    if (mIPv4UDPBroadcastRcv != NULL)
+    if (mIPv4UDPBroadcastRcv != nullptr)
     {
         mIPv4UDPBroadcastRcv->Free();
-        mIPv4UDPBroadcastRcv = NULL;
+        mIPv4UDPBroadcastRcv = nullptr;
     }
 
 #endif // CHIP_CONFIG_ENABLE_TARGETED_LISTEN
@@ -2318,7 +2318,7 @@ void ChipMessageLayer::GetPeerDescription(char * buf, size_t bufSize, uint64_t n
     }
     VerifyOrExit(len < bufSize, /* no-op */);
 
-    if (addr != NULL)
+    if (addr != nullptr)
     {
         buf[len++] = '[';
         VerifyOrExit(len < bufSize, /* no-op */);
@@ -2348,7 +2348,7 @@ void ChipMessageLayer::GetPeerDescription(char * buf, size_t bufSize, uint64_t n
         sep = ", ";
     }
 
-    if (con != NULL)
+    if (con != nullptr)
     {
         const char * conType;
         switch (con->NetworkType)
@@ -2389,10 +2389,10 @@ exit:
  */
 void ChipMessageLayer::GetPeerDescription(char * buf, size_t bufSize, const ChipMessageInfo * msgInfo)
 {
-    GetPeerDescription(buf, bufSize, msgInfo->SourceNodeId,
-                       (msgInfo->InPacketInfo != NULL) ? &msgInfo->InPacketInfo->SrcAddress : NULL,
-                       (msgInfo->InPacketInfo != NULL) ? msgInfo->InPacketInfo->SrcPort : 0,
-                       (msgInfo->InPacketInfo != NULL) ? msgInfo->InPacketInfo->Interface : INET_NULL_INTERFACEID, msgInfo->InCon);
+    GetPeerDescription(
+        buf, bufSize, msgInfo->SourceNodeId, (msgInfo->InPacketInfo != nullptr) ? &msgInfo->InPacketInfo->SrcAddress : nullptr,
+        (msgInfo->InPacketInfo != nullptr) ? msgInfo->InPacketInfo->SrcPort : 0,
+        (msgInfo->InPacketInfo != nullptr) ? msgInfo->InPacketInfo->Interface : INET_NULL_INTERFACEID, msgInfo->InCon);
 }
 
 /**

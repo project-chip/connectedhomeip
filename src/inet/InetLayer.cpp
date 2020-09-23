@@ -262,7 +262,7 @@ INET_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
     // member. Ensure it is set to a sane default value before
     // invoking platform-specific initialization.
 
-    mPlatformData = NULL;
+    mPlatformData = nullptr;
 
     err = Platform::InetLayer::WillInit(this, aContext);
     SuccessOrExit(err);
@@ -322,7 +322,7 @@ INET_ERROR InetLayer::Shutdown(void)
         for (size_t i = 0; i < DNSResolver::sPool.Size(); i++)
         {
             DNSResolver * lResolver = DNSResolver::sPool.Get(*mSystemLayer, i);
-            if ((lResolver != NULL) && lResolver->IsCreatedByInetLayer(*this))
+            if ((lResolver != nullptr) && lResolver->IsCreatedByInetLayer(*this))
             {
                 lResolver->Cancel();
             }
@@ -340,7 +340,7 @@ INET_ERROR InetLayer::Shutdown(void)
         for (size_t i = 0; i < RawEndPoint::sPool.Size(); i++)
         {
             RawEndPoint * lEndPoint = RawEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != NULL) && lEndPoint->IsCreatedByInetLayer(*this))
+            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
                 lEndPoint->Close();
             }
@@ -352,7 +352,7 @@ INET_ERROR InetLayer::Shutdown(void)
         for (size_t i = 0; i < TCPEndPoint::sPool.Size(); i++)
         {
             TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != NULL) && lEndPoint->IsCreatedByInetLayer(*this))
+            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
                 lEndPoint->Abort();
             }
@@ -364,7 +364,7 @@ INET_ERROR InetLayer::Shutdown(void)
         for (size_t i = 0; i < UDPEndPoint::sPool.Size(); i++)
         {
             UDPEndPoint * lEndPoint = UDPEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != NULL) && lEndPoint->IsCreatedByInetLayer(*this))
+            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
                 lEndPoint->Close();
             }
@@ -415,7 +415,7 @@ bool InetLayer::IsIdleTimerRunning(void)
     {
         TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
 
-        if ((lEndPoint != NULL) && (lEndPoint->mIdleTimeout != 0))
+        if ((lEndPoint != nullptr) && (lEndPoint->mIdleTimeout != 0))
         {
             timerRunning = true;
             break;
@@ -452,7 +452,7 @@ INET_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
 #endif //! LWIP_IPV6
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    if (llAddr == NULL)
+    if (llAddr == nullptr)
     {
         err = INET_ERROR_BAD_ARGS;
         goto exit;
@@ -487,10 +487,10 @@ INET_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
     if (rv != -1)
     {
         struct ifaddrs * ifaddr_iter = ifaddr;
-        while (ifaddr_iter != NULL)
+        while (ifaddr_iter != nullptr)
         {
 
-            if (ifaddr_iter->ifa_addr != NULL)
+            if (ifaddr_iter->ifa_addr != nullptr)
             {
                 if ((ifaddr_iter->ifa_addr->sa_family == AF_INET6) &&
                     ((link == INET_NULL_INTERFACEID) || (if_nametoindex(ifaddr_iter->ifa_name) == link)))
@@ -555,12 +555,12 @@ exit:
 INET_ERROR InetLayer::NewRawEndPoint(IPVersion ipVer, IPProtocol ipProto, RawEndPoint ** retEndPoint)
 {
     INET_ERROR err = INET_NO_ERROR;
-    *retEndPoint   = NULL;
+    *retEndPoint   = nullptr;
 
     VerifyOrExit(State == kState_Initialized, err = INET_ERROR_INCORRECT_STATE);
 
     *retEndPoint = RawEndPoint::sPool.TryCreate(*mSystemLayer);
-    if (*retEndPoint != NULL)
+    if (*retEndPoint != nullptr)
     {
         (*retEndPoint)->Inet::RawEndPoint::Init(this, ipVer, ipProto);
         SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumRawEps);
@@ -597,12 +597,12 @@ exit:
 INET_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
 {
     INET_ERROR err = INET_NO_ERROR;
-    *retEndPoint   = NULL;
+    *retEndPoint   = nullptr;
 
     VerifyOrExit(State == kState_Initialized, err = INET_ERROR_INCORRECT_STATE);
 
     *retEndPoint = TCPEndPoint::sPool.TryCreate(*mSystemLayer);
-    if (*retEndPoint != NULL)
+    if (*retEndPoint != nullptr)
     {
         (*retEndPoint)->Init(this);
         SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumTCPEps);
@@ -639,12 +639,12 @@ exit:
 INET_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
 {
     INET_ERROR err = INET_NO_ERROR;
-    *retEndPoint   = NULL;
+    *retEndPoint   = nullptr;
 
     VerifyOrExit(State == kState_Initialized, err = INET_ERROR_INCORRECT_STATE);
 
     *retEndPoint = UDPEndPoint::sPool.TryCreate(*mSystemLayer);
-    if (*retEndPoint != NULL)
+    if (*retEndPoint != nullptr)
     {
         (*retEndPoint)->Init(this);
         SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumUDPEps);
@@ -809,7 +809,7 @@ INET_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint16_t hostNam
                                          IPAddress * addrArray, DNSResolveCompleteFunct onComplete, void * appState)
 {
     INET_ERROR err         = INET_NO_ERROR;
-    DNSResolver * resolver = NULL;
+    DNSResolver * resolver = nullptr;
 
     VerifyOrExit(State == kState_Initialized, err = INET_ERROR_INCORRECT_STATE);
 
@@ -820,7 +820,7 @@ INET_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint16_t hostNam
     VerifyOrExit(maxAddrs > 0, err = INET_ERROR_NO_MEMORY);
 
     resolver = DNSResolver::sPool.TryCreate(*mSystemLayer);
-    if (resolver != NULL)
+    if (resolver != nullptr)
     {
         resolver->InitInetLayerBasis(*this);
     }
@@ -852,7 +852,7 @@ INET_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint16_t hostNam
         }
 
         resolver->Release();
-        resolver = NULL;
+        resolver = nullptr;
 
         ExitNow(err = INET_NO_ERROR);
     }
@@ -905,7 +905,7 @@ void InetLayer::CancelResolveHostAddress(DNSResolveCompleteFunct onComplete, voi
     {
         DNSResolver * lResolver = DNSResolver::sPool.Get(*mSystemLayer, i);
 
-        if (lResolver == NULL)
+        if (lResolver == nullptr)
         {
             continue;
         }
@@ -1017,7 +1017,7 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
     {
         TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*aSystemLayer, i);
 
-        if (lEndPoint == NULL)
+        if (lEndPoint == nullptr)
             continue;
         if (!lEndPoint->IsCreatedByInetLayer(lInetLayer))
             continue;
@@ -1139,7 +1139,7 @@ void InetLayer::PrepareSelect(int & nfds, fd_set * readfds, fd_set * writefds, f
     for (size_t i = 0; i < RawEndPoint::sPool.Size(); i++)
     {
         RawEndPoint * lEndPoint = RawEndPoint::sPool.Get(*mSystemLayer, i);
-        if ((lEndPoint != NULL) && lEndPoint->IsCreatedByInetLayer(*this))
+        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             lEndPoint->PrepareIO().SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
     }
 #endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
@@ -1148,7 +1148,7 @@ void InetLayer::PrepareSelect(int & nfds, fd_set * readfds, fd_set * writefds, f
     for (size_t i = 0; i < TCPEndPoint::sPool.Size(); i++)
     {
         TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
-        if ((lEndPoint != NULL) && lEndPoint->IsCreatedByInetLayer(*this))
+        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             lEndPoint->PrepareIO().SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
     }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -1157,7 +1157,7 @@ void InetLayer::PrepareSelect(int & nfds, fd_set * readfds, fd_set * writefds, f
     for (size_t i = 0; i < UDPEndPoint::sPool.Size(); i++)
     {
         UDPEndPoint * lEndPoint = UDPEndPoint::sPool.Get(*mSystemLayer, i);
-        if ((lEndPoint != NULL) && lEndPoint->IsCreatedByInetLayer(*this))
+        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             lEndPoint->PrepareIO().SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
     }
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
@@ -1205,7 +1205,7 @@ void InetLayer::HandleSelectResult(int selectRes, fd_set * readfds, fd_set * wri
         for (size_t i = 0; i < RawEndPoint::sPool.Size(); i++)
         {
             RawEndPoint * lEndPoint = RawEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != NULL) && lEndPoint->IsCreatedByInetLayer(*this))
+            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
                 lEndPoint->mPendingIO = SocketEvents::FromFDs(lEndPoint->mSocket, readfds, writefds, exceptfds);
             }
@@ -1216,7 +1216,7 @@ void InetLayer::HandleSelectResult(int selectRes, fd_set * readfds, fd_set * wri
         for (size_t i = 0; i < TCPEndPoint::sPool.Size(); i++)
         {
             TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != NULL) && lEndPoint->IsCreatedByInetLayer(*this))
+            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
                 lEndPoint->mPendingIO = SocketEvents::FromFDs(lEndPoint->mSocket, readfds, writefds, exceptfds);
             }
@@ -1227,7 +1227,7 @@ void InetLayer::HandleSelectResult(int selectRes, fd_set * readfds, fd_set * wri
         for (size_t i = 0; i < UDPEndPoint::sPool.Size(); i++)
         {
             UDPEndPoint * lEndPoint = UDPEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != NULL) && lEndPoint->IsCreatedByInetLayer(*this))
+            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
                 lEndPoint->mPendingIO = SocketEvents::FromFDs(lEndPoint->mSocket, readfds, writefds, exceptfds);
             }
@@ -1239,7 +1239,7 @@ void InetLayer::HandleSelectResult(int selectRes, fd_set * readfds, fd_set * wri
         for (size_t i = 0; i < RawEndPoint::sPool.Size(); i++)
         {
             RawEndPoint * lEndPoint = RawEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != NULL) && lEndPoint->IsCreatedByInetLayer(*this))
+            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
                 lEndPoint->HandlePendingIO();
             }
@@ -1250,7 +1250,7 @@ void InetLayer::HandleSelectResult(int selectRes, fd_set * readfds, fd_set * wri
         for (size_t i = 0; i < TCPEndPoint::sPool.Size(); i++)
         {
             TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != NULL) && lEndPoint->IsCreatedByInetLayer(*this))
+            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
                 lEndPoint->HandlePendingIO();
             }
@@ -1261,7 +1261,7 @@ void InetLayer::HandleSelectResult(int selectRes, fd_set * readfds, fd_set * wri
         for (size_t i = 0; i < UDPEndPoint::sPool.Size(); i++)
         {
             UDPEndPoint * lEndPoint = UDPEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != NULL) && lEndPoint->IsCreatedByInetLayer(*this))
+            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
                 lEndPoint->HandlePendingIO();
             }

@@ -128,6 +128,19 @@
             }
         },
         {
+            "label": "Build nRF5 Lighting Example",
+            "type": "shell",
+            "command": "scripts/examples/gn_build_example.sh examples/lighting-app/nrf5 out/nrf5_lighting_app",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/out/nrf5_lighting_app/"
+                ]
+            }
+        },
+        {
             "label": "Build EFR32 Lock Example",
             "type": "shell",
             "command": "scripts/examples/gn_build_example.sh examples/lock-app/efr32 out/efr32_lock_app",

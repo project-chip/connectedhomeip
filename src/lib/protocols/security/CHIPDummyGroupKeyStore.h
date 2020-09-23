@@ -47,20 +47,20 @@ public:
     DummyGroupKeyStore(void);
 
     // Manage application group key material storage.
-    virtual CHIP_ERROR RetrieveGroupKey(uint32_t keyId, ChipGroupKey & key);
-    virtual CHIP_ERROR StoreGroupKey(const ChipGroupKey & key);
-    virtual CHIP_ERROR DeleteGroupKey(uint32_t keyId);
-    virtual CHIP_ERROR DeleteGroupKeysOfAType(uint32_t keyType);
-    virtual CHIP_ERROR EnumerateGroupKeys(uint32_t keyType, uint32_t * keyIds, uint8_t keyIdsArraySize, uint8_t & keyCount);
-    virtual CHIP_ERROR Clear(void);
+    CHIP_ERROR RetrieveGroupKey(uint32_t keyId, ChipGroupKey & key) override;
+    CHIP_ERROR StoreGroupKey(const ChipGroupKey & key) override;
+    CHIP_ERROR DeleteGroupKey(uint32_t keyId) override;
+    CHIP_ERROR DeleteGroupKeysOfAType(uint32_t keyType) override;
+    CHIP_ERROR EnumerateGroupKeys(uint32_t keyType, uint32_t * keyIds, uint8_t keyIdsArraySize, uint8_t & keyCount) override;
+    CHIP_ERROR Clear(void) override;
 
 private:
     // Retrieve and Store LastUsedEpochKeyId value.
-    virtual CHIP_ERROR RetrieveLastUsedEpochKeyId(void);
-    virtual CHIP_ERROR StoreLastUsedEpochKeyId(void);
+    CHIP_ERROR RetrieveLastUsedEpochKeyId(void) override;
+    CHIP_ERROR StoreLastUsedEpochKeyId(void) override;
 
     // Get current platform UTC time in seconds.
-    virtual CHIP_ERROR GetCurrentUTCTime(uint32_t & utcTime);
+    CHIP_ERROR GetCurrentUTCTime(uint32_t & utcTime) override;
 };
 
 } // namespace AppKeys

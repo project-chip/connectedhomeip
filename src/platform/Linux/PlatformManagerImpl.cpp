@@ -49,9 +49,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     CHIP_ERROR err;
 
 #if CHIP_WITH_GIO
-    GError * error = NULL;
+    GError * error = nullptr;
 
-    this->mpGDBusConnection = UniqueGDBusConnection(g_bus_get_sync(G_BUS_TYPE_SYSTEM, NULL, &error));
+    this->mpGDBusConnection = UniqueGDBusConnection(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error));
 
     std::thread gdbusThread(GDBus_Thread);
     gdbusThread.detach();

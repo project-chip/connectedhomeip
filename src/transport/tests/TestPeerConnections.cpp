@@ -282,12 +282,9 @@ static const nlTest sTests[] =
 
 int TestPeerConnectionsFn(void)
 {
-    nlTestSuite theSuite = { "Transport-PeerConnections", &sTests[0], NULL, NULL };
-    nlTestRunner(&theSuite, NULL);
+    nlTestSuite theSuite = { "Transport-PeerConnections", &sTests[0], nullptr, nullptr };
+    nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
 
-static void __attribute__((constructor)) TestPeerConnectionsCtor(void)
-{
-    VerifyOrDie(RegisterUnitTests(&TestPeerConnectionsFn) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestPeerConnectionsFn)

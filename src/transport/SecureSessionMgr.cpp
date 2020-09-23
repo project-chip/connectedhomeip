@@ -93,8 +93,8 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBu
 
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(msgBuf->Next() == NULL, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(msgBuf->Next() == nullptr, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrExit(msgBuf->TotalLength() < kMax_SecureSDU_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     // Find an active connection to the specified peer node
@@ -133,19 +133,19 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBu
         err = header.mac.Encode(header.packetHeader, &data[totalLen], kMaxTagLen, &taglen);
         SuccessOrExit(err);
 
-        msgBuf->SetDataLength(totalLen + taglen, NULL);
+        msgBuf->SetDataLength(totalLen + taglen, nullptr);
 
         ChipLogProgress(Inet, "Secure transport transmitting msg %u after encryption", state->GetSendMessageIndex());
 
         err    = mTransport->SendMessage(header.packetHeader, header.payloadHeader.GetEncodePacketFlags(), state->GetPeerAddress(),
                                       msgBuf);
-        msgBuf = NULL;
+        msgBuf = nullptr;
     }
     SuccessOrExit(err);
     state->IncrementSendMessageIndex();
 
 exit:
-    if (msgBuf != NULL)
+    if (msgBuf != nullptr)
     {
         const char * errStr = ErrorStr(err);
         if (state == nullptr)
@@ -157,7 +157,7 @@ exit:
             ChipLogProgress(Inet, "Secure transport failed to encrypt msg %u: %s", state->GetSendMessageIndex(), errStr);
         }
         PacketBuffer::Free(msgBuf);
-        msgBuf = NULL;
+        msgBuf = nullptr;
     }
 
     return err;
@@ -262,7 +262,7 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
         err = header.mac.Decode(header.packetHeader, &data[header.packetHeader.GetPayloadLength()], kMaxTagLen, &taglen);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Inet, "Secure transport failed to decode MAC Tag: err %d", err));
         len -= taglen;
-        msg->SetDataLength(len, NULL);
+        msg->SetDataLength(len, nullptr);
 
         err = state->GetSecureSession().Decrypt(data, len, plainText, header);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Inet, "Secure transport failed to decrypt msg: err %d", err));

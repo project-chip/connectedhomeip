@@ -43,9 +43,8 @@ ninja -j8 && sudo ninja install
 sudo /usr/local/sbin/otbr-agent -d6 -v -I wpan0 spinel+hdlc+forkpty:///usr/local/bin/ot-rcp\?forkpty-arg=5
 
 # In a new shell, at top-level of CHIP repo, test Thread device layer is operational
-./bootstrap
-mkdir build && cd build
-../configure  --with-device-layer=linux
-make -C src/platform/tests TestThreadStackMgr
-sudo ./src/platform/tests/TestThreadStackMgr
+git submodule update --init
+source scripts/activate.sh
+gn gen out/default
+ninja -C out/default src/platform/tests:TestThreadStackMgr_run
 ```

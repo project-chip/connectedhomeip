@@ -173,7 +173,7 @@ void PacketBuffer::SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead)
     this->len     = aNewLen;
     this->tot_len = (uint16_t)(this->tot_len + lDelta);
 
-    while (aChainHead != NULL && aChainHead != this)
+    while (aChainHead != nullptr && aChainHead != this)
     {
         aChainHead->tot_len = static_cast<uint16_t>(aChainHead->tot_len + lDelta);
         aChainHead          = static_cast<PacketBuffer *>(aChainHead->next);
@@ -242,7 +242,7 @@ void PacketBuffer::AddToEnd(PacketBuffer * aPacket)
     while (true)
     {
         lCursor->tot_len += aPacket->tot_len;
-        if (lCursor->next == NULL)
+        if (lCursor->next == nullptr)
         {
             lCursor->next = aPacket;
             break;
@@ -263,7 +263,7 @@ PacketBuffer * PacketBuffer::DetachTail()
 {
     PacketBuffer & lReturn = *static_cast<PacketBuffer *>(this->next);
 
-    this->next    = NULL;
+    this->next    = nullptr;
     this->tot_len = this->len;
 
     return &lReturn;
@@ -289,7 +289,7 @@ void PacketBuffer::CompactHead()
 
     uint16_t lAvailLength = this->AvailableDataLength();
 
-    while (lAvailLength > 0 && this->next != NULL)
+    while (lAvailLength > 0 && this->next != nullptr)
     {
         PacketBuffer & lNextPacket = *static_cast<PacketBuffer *>(this->next);
         VerifyOrDieWithMsg(lNextPacket.ref == 1, chipSystemLayer, "next buffer %p is not exclusive to this chain", &lNextPacket);
@@ -343,7 +343,7 @@ PacketBuffer * PacketBuffer::Consume(uint16_t aConsumeLength)
 {
     PacketBuffer * lPacket = this;
 
-    while (lPacket != NULL && aConsumeLength > 0)
+    while (lPacket != nullptr && aConsumeLength > 0)
     {
         const uint16_t kLength = lPacket->DataLength();
 
@@ -452,12 +452,12 @@ PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t
     const size_t lBlockSize    = CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + lAllocSize;
     PacketBuffer * lPacket;
 
-    CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_PacketBufferNew, return NULL);
+    CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_PacketBufferNew, return nullptr);
 
     if (lAllocSize > CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX)
     {
         ChipLogError(chipSystemLayer, "PacketBuffer: allocation too large.");
-        return NULL;
+        return nullptr;
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -474,7 +474,7 @@ PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t
     LOCK_BUF_POOL();
 
     lPacket = sFreeList;
-    if (lPacket != NULL)
+    if (lPacket != nullptr)
     {
         sFreeList = static_cast<PacketBuffer *>(lPacket->next);
         SYSTEM_STATS_INCREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
@@ -490,15 +490,15 @@ PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t
 #endif // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    if (lPacket == NULL)
+    if (lPacket == nullptr)
     {
         ChipLogError(chipSystemLayer, "PacketBuffer: pool EMPTY.");
-        return NULL;
+        return nullptr;
     }
 
     lPacket->payload = reinterpret_cast<uint8_t *>(lPacket) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + lReservedSize;
     lPacket->len = lPacket->tot_len = 0;
-    lPacket->next                   = NULL;
+    lPacket->next                   = nullptr;
     lPacket->ref                    = 1;
 #if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
     lPacket->alloc_size = lAllocSize;
@@ -585,7 +585,7 @@ void PacketBuffer::Free(PacketBuffer * aPacket)
 
     LOCK_BUF_POOL();
 
-    while (aPacket != NULL)
+    while (aPacket != nullptr)
     {
         PacketBuffer * lNextPacket = static_cast<PacketBuffer *>(aPacket->next);
 
@@ -606,7 +606,7 @@ void PacketBuffer::Free(PacketBuffer * aPacket)
         }
         else
         {
-            aPacket = NULL;
+            aPacket = nullptr;
         }
     }
 
@@ -642,7 +642,7 @@ void PacketBuffer::Clear(void)
 PacketBuffer * PacketBuffer::FreeHead(PacketBuffer * aPacket)
 {
     PacketBuffer * lNextPacket = static_cast<PacketBuffer *>(aPacket->next);
-    aPacket->next              = NULL;
+    aPacket->next              = nullptr;
     PacketBuffer::Free(aPacket);
     return lNextPacket;
 }
@@ -674,7 +674,7 @@ PacketBuffer * PacketBuffer::RightSize(PacketBuffer * aPacket)
 
 PacketBuffer * PacketBuffer::BuildFreeList()
 {
-    PacketBuffer * lHead = NULL;
+    PacketBuffer * lHead = nullptr;
 
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC; i++)
     {

@@ -201,7 +201,7 @@ void * GenericPlatformManagerImpl_POSIX<ImplClass>::EventLoopTaskMain(void * arg
     ChipLogDetail(DeviceLayer, "CHIP task running");
 
     static_cast<GenericPlatformManagerImpl_POSIX<ImplClass> *>(arg)->Impl()->RunEventLoop();
-    return NULL;
+    return nullptr;
 }
 
 template <class ImplClass>
@@ -227,7 +227,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown(void)
     mShouldRunEventLoop.store(false, std::memory_order_relaxed);
     if (mChipTask)
     {
-        SuccessOrExit(err = pthread_join(mChipTask, NULL));
+        SuccessOrExit(err = pthread_join(mChipTask, nullptr));
     }
 
 exit:

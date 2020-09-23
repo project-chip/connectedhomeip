@@ -110,6 +110,6 @@ int main(void)
     cmd_btp_init();
     cmd_otcli_init();
 
-    shell_task(NULL);
+    shell_task(nullptr);
     return 0;
 }

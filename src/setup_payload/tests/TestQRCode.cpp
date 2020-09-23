@@ -339,8 +339,8 @@ int TestQuickResponseCode(void)
     {
         "chip-qrcode-general-tests",
         &sTests[0],
-        NULL,
-        NULL
+        nullptr,
+        nullptr
     };
     // clang-format on
     TestContext context;

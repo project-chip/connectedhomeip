@@ -82,13 +82,13 @@ void HandleTimer(Layer * aLayer, void * aAppState, Error aError)
 static void TestInetPre(nlTestSuite * inSuite, void * inContext)
 {
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    RawEndPoint * testRawEP = NULL;
+    RawEndPoint * testRawEP = nullptr;
 #endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    UDPEndPoint * testUDPEP = NULL;
+    UDPEndPoint * testUDPEP = nullptr;
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    TCPEndPoint * testTCPEP = NULL;
+    TCPEndPoint * testTCPEP = nullptr;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     INET_ERROR err         = INET_NO_ERROR;
     IPAddress testDestAddr = IPAddress::Any;
@@ -109,11 +109,11 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
-    err = gSystemLayer.StartTimer(10, HandleTimer, NULL);
+    err = gSystemLayer.StartTimer(10, HandleTimer, nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_SYSTEM_ERROR_UNEXPECTED_STATE);
 
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
-    err = gInet.ResolveHostAddress(testHostName, 1, &testDestAddr, HandleDNSResolveComplete, NULL);
+    err = gInet.ResolveHostAddress(testHostName, 1, &testDestAddr, HandleDNSResolveComplete, nullptr);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
@@ -242,7 +242,7 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
     err = gInet.GetInterfaceFromAddr(addr, intId);
     NL_TEST_ASSERT(inSuite, intId == INET_NULL_INTERFACEID);
 
-    err = gInet.GetLinkLocalAddr(intId, NULL);
+    err = gInet.GetLinkLocalAddr(intId, nullptr);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_BAD_ARGS);
 
     printf("    Interfaces:\n");
@@ -278,7 +278,7 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
         memset(intName, 42, sizeof(intName));
         err = addrIterator.GetInterfaceName(intName, sizeof(intName));
         NL_TEST_ASSERT(inSuite, err == INET_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, intName[0] != '\0' && memchr(intName, '\0', sizeof(intName)) != NULL);
+        NL_TEST_ASSERT(inSuite, intName[0] != '\0' && memchr(intName, '\0', sizeof(intName)) != nullptr);
         printf("     %s/%d, interface id: 0x%" PRIxPTR
                ", interface name: %s, interface state: %s, %s multicast, %s broadcast addr\n",
                addrStr, addrWithPrefix.Length, (uintptr_t)(intId), intName, addrIterator.IsUp() ? "UP" : "DOWN",
@@ -304,12 +304,12 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     InterfaceId intId;
 
     // EndPoint
-    RawEndPoint * testRaw6EP = NULL;
+    RawEndPoint * testRaw6EP = nullptr;
 #if INET_CONFIG_ENABLE_IPV4
-    RawEndPoint * testRaw4EP = NULL;
+    RawEndPoint * testRaw4EP = nullptr;
 #endif // INET_CONFIG_ENABLE_IPV4
-    UDPEndPoint * testUDPEP  = NULL;
-    TCPEndPoint * testTCPEP1 = NULL;
+    UDPEndPoint * testUDPEP  = nullptr;
+    TCPEndPoint * testTCPEP1 = nullptr;
     PacketBuffer * buf       = PacketBuffer::New();
     bool didBind             = false;
     bool didListen           = false;
@@ -436,7 +436,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
 #endif // INET_CONFIG_ENABLE_IPV4
 
     // TcpEndPoint special cases to cover the error branch
-    err = testTCPEP1->GetPeerInfo(NULL, NULL);
+    err = testTCPEP1->GetPeerInfo(nullptr, nullptr);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
     buf = PacketBuffer::New();
     err = testTCPEP1->Send(buf, false);
@@ -450,7 +450,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !testTCPEP1->PendingReceiveLength());
     err = testTCPEP1->Listen(4);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
-    err = testTCPEP1->GetLocalInfo(NULL, NULL);
+    err = testTCPEP1->GetLocalInfo(nullptr, nullptr);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
 
     err = testTCPEP1->Bind(kIPAddressType_Unknown, addr_any, 3000, true);
@@ -477,9 +477,9 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
 // Test the InetLayer resource limitation
 static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 {
-    RawEndPoint * testRawEP = NULL;
-    UDPEndPoint * testUDPEP = NULL;
-    TCPEndPoint * testTCPEP = NULL;
+    RawEndPoint * testRawEP = nullptr;
+    UDPEndPoint * testUDPEP = nullptr;
+    TCPEndPoint * testTCPEP = nullptr;
     INET_ERROR err;
     char numTimersTest[CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1];
 
@@ -498,7 +498,7 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
     // Verify same aComplete and aAppState args do not exhaust timer pool
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
     {
-        err = gSystemLayer.StartTimer(10, HandleTimer, NULL);
+        err = gSystemLayer.StartTimer(10, HandleTimer, nullptr);
         NL_TEST_ASSERT(inSuite, err == CHIP_SYSTEM_NO_ERROR);
     }
 
@@ -561,7 +561,7 @@ int TestInetEndPointInternal(void)
     // clang-format on
 
     // Run test suite against one context.
-    nlTestRunner(&theSuite, NULL);
+    nlTestRunner(&theSuite, nullptr);
 
     return nlTestRunnerStats(&theSuite);
 #else  // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -569,10 +569,7 @@ int TestInetEndPointInternal(void)
 #endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
 }
 
-static void __attribute__((constructor)) TestCHIPInetEndpointCtor(void)
-{
-    VerifyOrDie(RegisterUnitTests(&TestInetEndPointInternal) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestInetEndPointInternal)
 
 int TestInetEndPoint()
 {

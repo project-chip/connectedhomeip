@@ -59,7 +59,7 @@ class DLL_EXPORT BLE : public Base
     };
 
 public:
-    virtual ~BLE();
+    ~BLE() override;
 
     /**
      * Initialize a BLE transport to a given peripheral or a given device name.

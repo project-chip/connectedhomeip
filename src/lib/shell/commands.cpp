@@ -50,7 +50,7 @@ int cmd_help_iterator(shell_command_t * command, void * arg)
 
 int cmd_help(int argc, char ** argv)
 {
-    shell_command_foreach(cmd_help_iterator, NULL);
+    shell_command_foreach(cmd_help_iterator, nullptr);
     return 0;
 }
 

@@ -97,7 +97,7 @@ DLL_EXPORT INET_ERROR GetInterfaceName(InterfaceId intfId, char * nameBuf, size_
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
         char intfName[IF_NAMESIZE];
-        if (if_indextoname(intfId, intfName) == NULL)
+        if (if_indextoname(intfId, intfName) == nullptr)
             return chip::System::MapErrorPOSIX(errno);
         if (strlen(intfName) >= nameBufSize)
             return INET_ERROR_NO_MEMORY;
@@ -394,7 +394,7 @@ exit:
 
 InterfaceIterator::InterfaceIterator(void)
 {
-    mIntfArray       = NULL;
+    mIntfArray       = nullptr;
     mCurIntf         = 0;
     mIntfFlags       = 0;
     mIntfFlagsCached = 0;
@@ -419,14 +419,14 @@ InterfaceIterator::InterfaceIterator() : mCurrentInterface(net_if_get_by_index(m
 
 InterfaceIterator::~InterfaceIterator(void)
 {
-    if (mIntfArray != NULL)
+    if (mIntfArray != nullptr)
     {
 #if __ANDROID__ && __ANDROID_API__ < 24
         backport_if_freenameindex(mIntfArray);
 #else
         if_freenameindex(mIntfArray);
 #endif
-        mIntfArray = NULL;
+        mIntfArray = nullptr;
     }
 }
 
@@ -444,7 +444,7 @@ InterfaceIterator::~InterfaceIterator(void)
 #if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 bool InterfaceIterator::HasCurrent(void)
 {
-    return (mIntfArray != NULL) ? mIntfArray[mCurIntf].if_index != 0 : Next();
+    return (mIntfArray != nullptr) ? mIntfArray[mCurIntf].if_index != 0 : Next();
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
@@ -479,7 +479,7 @@ bool InterfaceIterator::Next(void)
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
-    if (mIntfArray == NULL)
+    if (mIntfArray == nullptr)
     {
 #if __ANDROID__ && __ANDROID_API__ < 24
         mIntfArray = backport_if_nameindex();
@@ -493,7 +493,7 @@ bool InterfaceIterator::Next(void)
         mIntfFlags       = 0;
         mIntfFlagsCached = false;
     }
-    return (mIntfArray != NULL && mIntfArray[mCurIntf].if_index != 0);
+    return (mIntfArray != nullptr && mIntfArray[mCurIntf].if_index != 0);
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
@@ -705,8 +705,8 @@ short InterfaceIterator::GetFlags(void)
  */
 InterfaceAddressIterator::InterfaceAddressIterator(void)
 {
-    mAddrsList = NULL;
-    mCurAddr   = NULL;
+    mAddrsList = nullptr;
+    mCurAddr   = nullptr;
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
@@ -726,10 +726,10 @@ InterfaceAddressIterator::InterfaceAddressIterator() = default;
 #if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 InterfaceAddressIterator::~InterfaceAddressIterator(void)
 {
-    if (mAddrsList != NULL)
+    if (mAddrsList != nullptr)
     {
         freeifaddrs(mAddrsList);
-        mAddrsList = mCurAddr = NULL;
+        mAddrsList = mCurAddr = nullptr;
     }
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
@@ -745,7 +745,7 @@ InterfaceAddressIterator::~InterfaceAddressIterator(void)
 bool InterfaceAddressIterator::HasCurrent(void)
 {
 #if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
-    return (mAddrsList != NULL) ? (mCurAddr != NULL) : Next();
+    return (mAddrsList != nullptr) ? (mCurAddr != nullptr) : Next();
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
@@ -778,7 +778,7 @@ bool InterfaceAddressIterator::Next(void)
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
     while (true)
     {
-        if (mAddrsList == NULL)
+        if (mAddrsList == nullptr)
         {
             int res = getifaddrs(&mAddrsList);
             if (res < 0)
@@ -787,17 +787,17 @@ bool InterfaceAddressIterator::Next(void)
             }
             mCurAddr = mAddrsList;
         }
-        else if (mCurAddr != NULL)
+        else if (mCurAddr != nullptr)
         {
             mCurAddr = mCurAddr->ifa_next;
         }
 
-        if (mCurAddr == NULL)
+        if (mCurAddr == nullptr)
         {
             return false;
         }
 
-        if (mCurAddr->ifa_addr != NULL &&
+        if (mCurAddr->ifa_addr != nullptr &&
             (mCurAddr->ifa_addr->sa_family == AF_INET6
 #if INET_CONFIG_ENABLE_IPV4
              || mCurAddr->ifa_addr->sa_family == AF_INET

@@ -188,6 +188,8 @@ jobs:
               run: scripts/examples/nrfconnect_example.sh lighting-app
             - name: Build example nRF Connect SDK Shell
               run: scripts/examples/nrfconnect_example.sh shell
+            - name: Run unit tests for Zephyr native_posix_64 platform
+              run: scripts/tests/nrfconnect_native_posix_tests.sh native_posix_64
             - name: Copy aside build products
               run: |
                   mkdir -p /tmp/output_binaries/$BUILD_TYPE-build

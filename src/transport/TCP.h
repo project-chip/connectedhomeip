@@ -114,7 +114,7 @@ public:
         std::fill(mActiveConnections, mActiveConnections + mActiveConnectionsSize, nullptr);
         std::fill(mPendingPackets, mPendingPackets + mPendingPacketsSize, emptyPending);
     }
-    virtual ~TCPBase();
+    ~TCPBase() override;
 
     /**
      * Initialize a TCP transport on a given port.
