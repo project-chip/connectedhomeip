@@ -292,8 +292,7 @@ uint64_t IPAddress::InterfaceId() const
 {
     if (IsIPv6ULA())
         return (((uint64_t) ntohl(Addr[2])) << 32) | ((uint64_t) ntohl(Addr[3]));
-    else
-        return 0;
+    return 0;
 }
 
 // Extract the subnet id from a IPv6 ULA address.  Returns 0 if the address
@@ -302,8 +301,7 @@ uint16_t IPAddress::Subnet() const
 {
     if (IsIPv6ULA())
         return (uint16_t) ntohl(Addr[1]);
-    else
-        return 0;
+    return 0;
 }
 
 // Extract the global id from a IPv6 ULA address.  Returns 0 if the address
@@ -312,8 +310,7 @@ uint64_t IPAddress::GlobalId() const
 {
     if (IsIPv6ULA())
         return (((uint64_t)(ntohl(Addr[0]) & 0xFFFFFF)) << 16) | ((uint64_t)(ntohl(Addr[1])) & 0xFFFF0000) >> 16;
-    else
-        return 0;
+    return 0;
 }
 
 IPAddressType IPAddress::Type() const

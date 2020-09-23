@@ -318,10 +318,8 @@ bool ChipLinuxStorageIni::HasValue(const char * key)
     {
         return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 CHIP_ERROR ChipLinuxStorageIni::AddEntry(const char * key, const char * value)

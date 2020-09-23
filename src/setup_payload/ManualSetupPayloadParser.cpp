@@ -100,7 +100,8 @@ static CHIP_ERROR readDigitsFromDecimalString(string decimalString, int & index,
         ChipLogError(SetupPayload, "Failed decoding base10. Input was too short. %zu", decimalString.length());
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
-    else if (index < 0)
+
+    if (index < 0)
     {
         ChipLogError(SetupPayload, "Failed decoding base10. Index was negative. %d", index);
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -170,7 +171,7 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     {
         return result;
     }
-    else if (setUpPINCode == 0)
+    if (setUpPINCode == 0)
     {
         ChipLogError(SetupPayload, "Failed decoding base10. SetUpPINCode was 0.");
         return CHIP_ERROR_INVALID_ARGUMENT;

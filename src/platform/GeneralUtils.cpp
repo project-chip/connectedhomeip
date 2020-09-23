@@ -131,14 +131,17 @@ const char * CharacterizeIPv6Address(const IPAddress & ipAddr)
     {
         return "IPv6 link-local address";
     }
-    else if (ipAddr.IsIPv6ULA())
+
+    if (ipAddr.IsIPv6ULA())
     {
         return "IPv6 unique local address";
     }
-    else if (ipAddr.IsIPv6GlobalUnicast())
+
+    if (ipAddr.IsIPv6GlobalUnicast())
     {
         return "IPv6 global unicast address";
     }
+
     return "IPv6 address";
 }
 

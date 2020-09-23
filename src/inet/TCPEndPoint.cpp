@@ -1038,16 +1038,14 @@ uint32_t TCPEndPoint::PendingSendLength()
 {
     if (mSendQueue != nullptr)
         return mSendQueue->TotalLength();
-    else
-        return 0;
+    return 0;
 }
 
 uint32_t TCPEndPoint::PendingReceiveLength()
 {
     if (mRcvQueue != nullptr)
         return mRcvQueue->TotalLength();
-    else
-        return 0;
+    return 0;
 }
 
 INET_ERROR TCPEndPoint::Shutdown()

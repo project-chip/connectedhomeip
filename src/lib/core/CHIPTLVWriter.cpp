@@ -380,8 +380,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, uint8_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_UInt8, tag, v);
-    else
-        return Put(tag, v);
+    return Put(tag, v);
 }
 
 /**
@@ -399,8 +398,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, uint16_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_UInt16, tag, v);
-    else
-        return Put(tag, v);
+    return Put(tag, v);
 }
 
 /**
@@ -418,8 +416,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, uint32_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_UInt32, tag, v);
-    else
-        return Put(tag, v);
+    return Put(tag, v);
 }
 
 /**
@@ -446,8 +443,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, uint64_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_UInt64, tag, v);
-    else
-        return Put(tag, v);
+    return Put(tag, v);
 }
 
 /**
@@ -515,8 +511,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_Int8, tag, v);
-    else
-        return Put(tag, v);
+    return Put(tag, v);
 }
 
 /**
@@ -534,8 +529,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int16_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_Int16, tag, v);
-    else
-        return Put(tag, v);
+    return Put(tag, v);
 }
 
 /**
@@ -553,8 +547,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int32_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_Int32, tag, v);
-    else
-        return Put(tag, v);
+    return Put(tag, v);
 }
 
 /**
@@ -581,8 +574,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int64_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_Int64, tag, v);
-    else
-        return Put(tag, v);
+    return Put(tag, v);
 }
 
 /**
@@ -1772,8 +1764,7 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
         mLenWritten += len;
         return CHIP_NO_ERROR;
     }
-    else
-        return WriteData(stagingBuf, p - stagingBuf);
+    return WriteData(stagingBuf, p - stagingBuf);
 }
 
 CHIP_ERROR TLVWriter::WriteElementWithData(TLVType type, uint64_t tag, const uint8_t * data, uint32_t dataLen)

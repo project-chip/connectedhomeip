@@ -85,24 +85,22 @@ bool ChipServerBase::EnforceAccessControl(ExchangeContext * ec, uint32_t msgProf
     }
 
     // Otherwise the message should not be accepted...
-    else
+    // Clear the 'Final' bit so that the following checks ignore it.
+    res &= ~ChipServerDelegateBase::kAccessControlResult_IsFinal;
+
+    // Send a standard response to the requester unless the delegate has already sent a response, or determined
+    // that no response should be sent.
+    if (res != ChipServerDelegateBase::kAccessControlResult_Rejected_RespSent &&
+        res != ChipServerDelegateBase::kAccessControlResult_Rejected_Silent)
     {
-        // Clear the 'Final' bit so that the following checks ignore it.
-        res &= ~ChipServerDelegateBase::kAccessControlResult_IsFinal;
+        uint16_t statusCode =
+            (msgInfo->PeerAuthMode == kChipAuthMode_None) ? Common::kStatus_AuthenticationRequired : Common::kStatus_AccessDenied;
 
-        // Send a standard response to the requester unless the delegate has already sent a response, or determined
-        // that no response should be sent.
-        if (res != ChipServerDelegateBase::kAccessControlResult_Rejected_RespSent &&
-            res != ChipServerDelegateBase::kAccessControlResult_Rejected_Silent)
-        {
-            uint16_t statusCode = (msgInfo->PeerAuthMode == kChipAuthMode_None) ? Common::kStatus_AuthenticationRequired
-                                                                                : Common::kStatus_AccessDenied;
-            ChipServerBase::SendStatusReport(ec, kChipProtocol_Common, statusCode, CHIP_NO_ERROR);
-        }
-
-        // Tell the caller the message should NOT be accepted.
-        return false;
+        ChipServerBase::SendStatusReport(ec, kChipProtocol_Common, statusCode, CHIP_NO_ERROR);
     }
+
+    // Tell the caller the message should NOT be accepted.
+    return false;
 }
 
 /**

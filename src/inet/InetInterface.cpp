@@ -117,13 +117,12 @@ DLL_EXPORT INET_ERROR GetInterfaceName(InterfaceId intfId, char * nameBuf, size_
 
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
     }
-    else
-    {
-        if (nameBufSize < 1)
-            return INET_ERROR_NO_MEMORY;
-        nameBuf[0] = 0;
-        return INET_NO_ERROR;
-    }
+
+    if (nameBufSize < 1)
+        return INET_ERROR_NO_MEMORY;
+
+    nameBuf[0] = 0;
+    return INET_NO_ERROR;
 }
 
 /**

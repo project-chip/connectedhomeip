@@ -1002,10 +1002,8 @@ IPAddress ChipFabricState::SelectNodeAddress(uint64_t nodeId, uint16_t subnetId)
     {
         return IPAddress::MakeIPv6WellKnownMulticast(kIPv6MulticastScope_Link, kIPV6MulticastGroup_AllNodes);
     }
-    else
-    {
-        return IPAddress::MakeULA(FabricId, subnetId, ChipNodeIdToIPv6InterfaceId(nodeId));
-    }
+
+    return IPAddress::MakeULA(FabricId, subnetId, ChipNodeIdToIPv6InterfaceId(nodeId));
 }
 
 /**
@@ -2091,7 +2089,8 @@ ChipMsgEncryptionKey * ChipMsgEncryptionKeyCache::FindOrAllocateKeyEntry(uint16_
             retKeyEntryIndex = i;
             break;
         }
-        else if (retKeyEntryIndex == CHIP_CONFIG_MAX_CACHED_MSG_ENC_APP_KEYS && keyEntry->KeyId == ChipKeyId::kNone)
+
+        if (retKeyEntryIndex == CHIP_CONFIG_MAX_CACHED_MSG_ENC_APP_KEYS && keyEntry->KeyId == ChipKeyId::kNone)
         {
             retKeyEntryIndex = i;
         }

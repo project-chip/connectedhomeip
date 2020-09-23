@@ -328,8 +328,7 @@ uint32_t TLVReader::GetLength() const
 {
     if (TLVTypeHasLength(ElementType()))
         return (uint32_t) mElemLenOrVal;
-    else
-        return 0;
+    return 0;
 }
 
 /**
@@ -1553,8 +1552,7 @@ TLVElementType TLVReader::ElementType() const
 {
     if (mControlByte == (uint16_t) kTLVControlByte_NotSpecified)
         return kTLVElementType_NotSpecified;
-    else
-        return (TLVElementType)(mControlByte & kTLVTypeMask);
+    return (TLVElementType)(mControlByte & kTLVTypeMask);
 }
 
 CHIP_ERROR TLVReader::GetNextPacketBuffer(TLVReader & reader, uintptr_t & bufHandle, const uint8_t *& bufStart, uint32_t & bufLen)

@@ -35,24 +35,21 @@ int Verhoeff::DihedralMultiply(int x, int y, int n)
     {
         if (y < n)
             return (x + y) % n;
-        else
-            return ((x + (y - n)) % n) + n;
+
+        return ((x + (y - n)) % n) + n;
     }
-    else
-    {
-        if (y < n)
-            return ((n + (x - n) - y) % n) + n;
-        else
-            return (n + (x - n) - (y - n)) % n;
-    }
+
+    if (y < n)
+        return ((n + (x - n) - y) % n) + n;
+
+    return (n + (x - n) - (y - n)) % n;
 }
 
 int Verhoeff::DihedralInvert(int val, int n)
 {
     if (val > 0 && val < n)
         return n - val;
-    else
-        return val;
+    return val;
 }
 
 int Verhoeff::Permute(int val, uint8_t * permTable, int permTableLen, int iterCount)
@@ -60,6 +57,5 @@ int Verhoeff::Permute(int val, uint8_t * permTable, int permTableLen, int iterCo
     val = val % permTableLen;
     if (iterCount <= 0)
         return val;
-    else
-        return Permute(permTable[val], permTable, permTableLen, iterCount - 1);
+    return Permute(permTable[val], permTable, permTableLen, iterCount - 1);
 }
