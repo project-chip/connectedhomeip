@@ -177,33 +177,9 @@ uint16_t encodeReadOnOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t d
 uint16_t _encodeIdentifyClusterCommand(uint8_t * buffer, uint16_t buf_length, uint8_t command_id, uint8_t destination_endpoint,
                                        uint16_t * identify_duration)
 {
-    uint32_t result = 0;
-    // pick cluster id as 3 for now.
-    // pick source and destination end points as 1 for now.
-    // Profile is 65535 because that matches our simple generated code, but we
-    // should sort out the profile situation.
-    if (!buffer)
-    {
-        return 0;
-    }
-    BufBound buf        = BufBound(buffer, buf_length);
-    uint16_t cluster_id = 3;
-    result              = doEncodeApsFrame(buf, 65535, cluster_id, 1, destination_endpoint, 0, 0, 0, 0, false);
-    if (result == 0)
-    {
-        ChipLogError(Zcl, "Error encoding aps frame result %" PRIu32 "\n", result);
-        return result;
-    }
 
-    // This is a cluster-specific command so low two bits are 0b01.  The command
-    // is standard, so does not need a manufacturer code, and we're sending
-    // client to server, so all the remaining bits are 0.
-    buf.Put(uint8_t(1));
-
-    // Transaction sequence number.  Just pick something.
-    buf.Put(uint8_t(1));
-
-    buf.Put(uint8_t(command_id));
+    BufBound buf    = BufBound(buffer, buf_length);
+    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0003, command_id);
 
     if (identify_duration)
     {
@@ -218,20 +194,14 @@ uint16_t _encodeIdentifyClusterCommand(uint8_t * buffer, uint16_t buf_length, ui
 uint16_t encodeIdentifyQueryCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
 {
     uint16_t result = _encodeIdentifyClusterCommand(buffer, buf_length, 1, destination_endpoint, nullptr);
-    if (result == 0)
-    {
-        ChipLogError(Zcl, "Error encoding identify query cmd");
-    }
+    CHECK_COMMAND_LENGTH(result, "Identify Query");
     return result;
 }
 
 uint16_t encodeIdentifyCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t duration)
 {
     uint16_t result = _encodeIdentifyClusterCommand(buffer, buf_length, 0, destination_endpoint, &duration);
-    if (result == 0)
-    {
-        ChipLogError(Zcl, "Error encoding identify query cmd");
-    }
+    CHECK_COMMAND_LENGTH(result, "Identify");
     return result;
 }
 
