@@ -24,7 +24,7 @@
 class ReadOnOff : public ModelCommand
 {
 public:
-    ReadOnOff() : ModelCommand("read") { AddArgument("attr-name", "onoff"); }
+    ReadOnOff() : ModelCommand("read", 0x06) { AddArgument("attr-name", "onoff"); }
 
     size_t EncodeCommand(PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) override
     {

@@ -24,7 +24,7 @@
 class IdentifyQuery : public ModelCommand
 {
 public:
-    IdentifyQuery() : ModelCommand("identify-query"){};
+    IdentifyQuery() : ModelCommand("identify-query", 0x03){};
     size_t EncodeCommand(PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) override
     {
         return encodeIdentifyQueryCommand(buffer->Start(), bufferSize, endPointId);
@@ -33,8 +33,13 @@ public:
     void HandleClusterResponse(uint16_t clusterId, uint16_t endPointId, uint16_t commandId, uint8_t * message,
                                uint16_t messageLen) const override
     {
+        if (clusterId != getClusterId())
+        {
+            ChipLogError(Zcl, "Got invalid clusterID %d for Identify cluster. Expected cluster id %d", clusterId, getClusterId());
+            return;
+        }
         uint16_t identify_time = 0;
-        ChipLogProgress(chipTool, "Parsing identify cluster response id %d", commandId);
+        ChipLogProgress(chipTool, "Parsing identify cluster response command id %d", commandId);
         CHECK_MESSAGE_LENGTH(messageLen == 2);
         identify_time = chip::Encoding::LittleEndian::Read16(message);
         ChipLogProgress(chipTool, "Identify query response %d", identify_time);
@@ -47,7 +52,7 @@ public:
 class Identify : public ModelCommand
 {
 public:
-    Identify() : ModelCommand("identify") {}
+    Identify() : ModelCommand("identify", 0x03) {}
     size_t EncodeCommand(PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) override
     {
         return encodeIdentifyCommand(buffer->Start(), bufferSize, endPointId, 10);
