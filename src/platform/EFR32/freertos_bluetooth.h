@@ -72,8 +72,7 @@ extern void BluetoothLLCallback(void);
 void BluetoothPend(void);
 void BluetoothPost(void);
 
-EventBits_t vRaiseEventFlagBasedOnContext(EventGroupHandle_t xEventGroup, EventBits_t uxBitsToWaitFor,
-                                          BaseType_t * pxHigherPriorityTaskWoken);
+void vRaiseEventFlagBasedOnContext(EventGroupHandle_t xEventGroup, EventBits_t uxBitsToWaitFor);
 EventBits_t vSendToQueueBasedOnContext(QueueHandle_t xQueue, void * xItemToQueue, TickType_t xTicksToWait,
                                        BaseType_t * pxHigherPriorityTaskWoken);
 
