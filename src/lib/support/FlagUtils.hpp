@@ -39,13 +39,13 @@ inline bool GetFlag(const FlagsT & inFlags, const FlagT inFlag)
 template <typename FlagsT, typename FlagT>
 inline void ClearFlag(FlagsT & inFlags, const FlagT inFlag)
 {
-    inFlags &= ~static_cast<FlagsT>(inFlag);
+    inFlags &= static_cast<FlagsT>(~static_cast<FlagsT>(inFlag));
 }
 
 template <typename FlagsT, typename FlagT>
 inline void SetFlag(FlagsT & inFlags, const FlagT inFlag)
 {
-    inFlags |= static_cast<FlagsT>(inFlag);
+    inFlags = static_cast<FlagsT>(inFlags | static_cast<FlagsT>(inFlag));
 }
 
 template <typename FlagsT, typename FlagT>

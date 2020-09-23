@@ -100,11 +100,12 @@ CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform
                                                                 uint32_t & value)
 {
     CHIP_ERROR err;
-    uint16_t recordKey = persistedStorageKey + kPersistedCounterRecordKeyBase;
+    uintmax_t recordKey = persistedStorageKey + kPersistedCounterRecordKeyBase;
 
     VerifyOrExit(recordKey <= kPersistedCounterRecordKeyMax, err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    static_assert(kPersistedCounterRecordKeyMax <= UINT16_MAX, "Key won't fit in uint16_t");
 
-    err = ReadConfigValue(NRF5ConfigKey(NRF5Config::kFileId_ChipCounter, recordKey), value);
+    err = ReadConfigValue(NRF5ConfigKey(NRF5Config::kFileId_ChipCounter, static_cast<uint16_t>(recordKey)), value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -119,11 +120,12 @@ CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platfor
                                                                  uint32_t value)
 {
     CHIP_ERROR err;
-    uint16_t recordKey = persistedStorageKey + kPersistedCounterRecordKeyBase;
+    uintmax_t recordKey = persistedStorageKey + kPersistedCounterRecordKeyBase;
 
     VerifyOrExit(recordKey <= kPersistedCounterRecordKeyMax, err = CHIP_ERROR_INVALID_ARGUMENT);
+    static_assert(kPersistedCounterRecordKeyMax <= UINT16_MAX, "Key won't fit in uint16_t");
 
-    err = WriteConfigValue(NRF5ConfigKey(NRF5Config::kFileId_ChipCounter, recordKey), value);
+    err = WriteConfigValue(NRF5ConfigKey(NRF5Config::kFileId_ChipCounter, static_cast<uint16_t>(recordKey)), value);
     SuccessOrExit(err);
 
 exit:

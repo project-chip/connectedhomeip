@@ -92,7 +92,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_UnlockChipStack(void)
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartChipTimer(uint32_t aMilliseconds)
+CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartChipTimer(int64_t aMilliseconds)
 {
     // Let SystemLayer.PrepareSelect() handle timers.
     return CHIP_NO_ERROR;
@@ -150,10 +150,10 @@ template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::SysProcess()
 {
     int selectRes;
-    uint32_t nextTimeoutMs;
+    int64_t nextTimeoutMs;
 
     nextTimeoutMs = mNextTimeout.tv_sec * 1000 + mNextTimeout.tv_usec / 1000;
-    ChipLogDetail(DeviceLayer, "Timer: %ld", nextTimeoutMs);
+    ChipLogDetail(DeviceLayer, "Timer: " PRId64, nextTimeoutMs);
     _StartChipTimer(nextTimeoutMs);
 
     Impl()->UnlockChipStack();
