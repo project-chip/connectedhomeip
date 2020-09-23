@@ -1302,7 +1302,7 @@ namespace InetLayer {
  *                          initialized.
  *
  * @param[in,out] aContext  Platform-specific context data passed to
- *                          the layer initialization method, ::Init.
+ *                          the layer initialization method, \::Init.
  *
  * @return #INET_NO_ERROR on success; otherwise, a specific error indicating
  *         the reason for initialization failure. Returning non-successful
@@ -1326,10 +1326,10 @@ DLL_EXPORT INET_ERROR WillInit(Inet::InetLayer * aLayer, void * aContext)
  *                          initialized.
  *
  * @param[in,out] aContext  Platform-specific context data passed to
- *                          the layer initialization method, ::Init.
+ *                          the layer initialization method, \::Init.
  *
  * @param[in]     anError   The overall status being returned via the
- *                          InetLayer ::Init method.
+ *                          InetLayer \::Init method.
  *
  */
 DLL_EXPORT void DidInit(Inet::InetLayer * aLayer, void * aContext, INET_ERROR anError)
@@ -1350,7 +1350,7 @@ DLL_EXPORT void DidInit(Inet::InetLayer * aLayer, void * aContext, INET_ERROR an
  *                          shutdown.
  *
  * @param[in,out] aContext  Platform-specific context data passed to
- *                          the layer initialization method, ::Init.
+ *                          the layer initialization method, \::Init.
  *
  * @return #INET_NO_ERROR on success; otherwise, a specific error indicating
  *         the reason for shutdown failure. Returning non-successful
@@ -1374,10 +1374,10 @@ DLL_EXPORT INET_ERROR WillShutdown(Inet::InetLayer * aLayer, void * aContext)
  *                          shutdown.
  *
  * @param[in,out] aContext  Platform-specific context data passed to
- *                          the layer initialization method, ::Init.
+ *                          the layer initialization method, \::Init.
  *
  * @param[in]     anError   The overall status being returned via the
- *                          InetLayer ::Shutdown method.
+ *                          InetLayer \::Shutdown method.
  *
  */
 DLL_EXPORT void DidShutdown(Inet::InetLayer * aLayer, void * aContext, INET_ERROR anError)

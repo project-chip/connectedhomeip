@@ -122,9 +122,9 @@ public:
     {
         TestContext * lContext = static_cast<TestContext *>(p);
         lContext->GreedyTimer();
-    };
+    }
 
-    TestContext() : mGreedyTimer(GreedyTimer, this), mNumTimersHandled(0){};
+    TestContext() : mGreedyTimer(GreedyTimer, this), mNumTimersHandled(0) {}
 };
 
 // Test input data.
@@ -293,7 +293,4 @@ int TestSystemTimer(void)
     return nlTestRunnerStats(&kTheSuite);
 }
 
-static void __attribute__((constructor)) TestSystemTimerCtor(void)
-{
-    VerifyOrDie(chip::RegisterUnitTests(&TestSystemTimer) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestSystemTimer)

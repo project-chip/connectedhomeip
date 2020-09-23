@@ -27,10 +27,10 @@
  *      functions should assert #CHIP_CONFIG_AES_IMPLEMENTATION_PLATFORM
  *      and create a platform-specific header file containing the necessary
  *      declarations.  The name of the platform-specific header file must be
- *      specified via the #CHIP_AES_BLOCK_CIPHER_PLATFORM_INCLUDE macro.
+ *      specified via the CHIP_AES_BLOCK_CIPHER_PLATFORM_INCLUDE macro.
  *
  *      Platforms that that require specific AES context data should define
- *      the #CHIP_AES_128_CTX_PLATFORM and #CHIP_AES_256_CTX_PLATFORM macros
+ *      the CHIP_AES_128_CTX_PLATFORM and CHIP_AES_256_CTX_PLATFORM macros
  *      accordingly.
  *
  */

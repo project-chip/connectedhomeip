@@ -348,7 +348,7 @@ static INET_ERROR SocketsIPv6LeaveMulticastGroup(int aSocket, InterfaceId aInter
  *
  *  @param[in]   aIPVersion
  *
- *  @param[in]   aLoop
+ *  @param[in]   aLoopback
  *
  *  @retval  INET_NO_ERROR
  *       success: multicast loopback behavior set

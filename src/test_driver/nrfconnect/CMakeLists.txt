@@ -51,7 +51,7 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 include(chip-lib)
 
 set(CHIP_COMMON_FLAGS
-    -D_SYS__PTHREADTYPES_H_
+    -DCHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS=1
     -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS=0
     -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF=0
     -DCHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS=1
@@ -60,18 +60,19 @@ set(CHIP_COMMON_FLAGS
     -isystem${ZEPHYR_BASE}/../mbedtls/include
 )
 
-set(CHIP_OUTPUT_LIBRARIES
-    ${CHIP_OUTPUT_DIR}/lib/libCHIP.a
+set(CHIP_LIBRARIES
+    -lCHIP
+    -lInetLayerTests
+    -lnlunit-test
 )
 
-set(CHIP_OUTPUT_TESTS
+set(CHIP_TESTS
     -lSupportTests
     -lCoreTests
     -lSystemLayerTests
     -lTransportLayerTests
     -lChipCryptoTests
     -lPlatformTests
-    -lnlunit-test
 )
 
 # ==================================================
@@ -89,14 +90,14 @@ chip_configure(ChipConfig
 
 chip_build(ChipLib ChipConfig
     BUILD_COMMAND ninja
-    BUILD_ARTIFACTS ${CHIP_OUTPUT_LIBRARIES}
+    BUILD_ARTIFACTS ${CHIP_LIBRARIES} ${CHIP_TESTS}
 )
 
 # ==================================================
 # Build 'all tests' runner
 # ==================================================
 target_sources(app PRIVATE main/runner.cpp)
-target_link_options(app PUBLIC -Wl,--whole-archive ${CHIP_OUTPUT_TESTS} -Wl,--no-whole-archive)
+target_link_options(app PUBLIC -Wl,--whole-archive ${CHIP_TESTS} -Wl,--no-whole-archive)
 target_link_libraries(app PUBLIC ChipLib $<TARGET_FILE:kernel>)
 target_compile_definitions(app PUBLIC CHIP_SEPARATE_CONFIG_H)
 

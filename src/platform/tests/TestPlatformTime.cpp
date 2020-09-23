@@ -32,6 +32,7 @@
 
 #include <nlunit-test.h>
 #include <support/CodeUtils.h>
+#include <support/TestUtils.h>
 #include <system/SystemClock.h>
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -209,3 +210,5 @@ int TestPlatformTime(void)
     nlTestRunner(&theSuite, NULL);
     return nlTestRunnerStats(&theSuite);
 }
+
+CHIP_REGISTER_TEST_SUITE(TestPlatformTime)

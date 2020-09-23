@@ -203,7 +203,4 @@ int TestMessageHeader(void)
     return nlTestRunnerStats(&theSuite);
 }
 
-static void __attribute__((constructor)) TestMessageHeaderCtor(void)
-{
-    VerifyOrDie(RegisterUnitTests(&TestMessageHeader) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestMessageHeader)

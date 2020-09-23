@@ -16,15 +16,15 @@
 #    limitations under the License.
 #
 
+CHIP_ROOT="$(dirname "$0")/../.."
+BOARD=native_posix
+[[ -n $1 ]] && BOARD="$1"
+
 set -x
 [[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh"
 env
 
-CHIP_ROOT="$(dirname "$0")/../.."
-
-cd "$CHIP_ROOT" &&
-    ./bootstrap &&
-    cd src/test_driver/nrfconnect &&
-    west build -b native_posix &&
+cd "$CHIP_ROOT/src/test_driver/nrfconnect" &&
+    west build -b "$BOARD" &&
     cd build &&
     timeout 5m ctest -V

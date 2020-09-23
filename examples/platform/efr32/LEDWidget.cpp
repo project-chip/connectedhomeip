@@ -18,7 +18,6 @@
  */
 
 #include "LEDWidget.h"
-#include "AppTask.h"
 
 #include "bsp.h"
 

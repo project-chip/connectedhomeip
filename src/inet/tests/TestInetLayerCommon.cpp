@@ -444,4 +444,4 @@ void HandleUDPReceiveError(const IPEndPointBasis * aEndPoint, const INET_ERROR &
     printf("UDP receive error from %s:%u: %s\n", lAddressBuffer, lSourcePort, ErrorStr(aError));
 }
 
-}; // namespace Common
+} // namespace Common

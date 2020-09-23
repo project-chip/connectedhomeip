@@ -37,6 +37,7 @@
 
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
+#include <support/TestUtils.h>
 
 #include <string.h>
 
@@ -3833,3 +3834,5 @@ int TestCHIPTLV(void)
 
     return (nlTestRunnerStats(&theSuite));
 }
+
+CHIP_REGISTER_TEST_SUITE(TestCHIPTLV)

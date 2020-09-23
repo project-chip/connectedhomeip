@@ -70,8 +70,6 @@
 #define CHIP_SYSTEM_ERROR_MAX CHIP_SYSTEM_CONFIG_ERROR_MAX
 #endif // CHIP_SYSTEM_CONFIG_ERROR_MAX
 
-#ifdef _CHIP_SYSTEM_CONFIG_ERROR
-
 /**
  *  @def _CHIP_SYSTEM_ERROR(e)
  *
@@ -159,8 +157,6 @@
 //
 // If you add new CHIP System Layer errors, please update the translation of error
 // codes to strings in SystemError.cpp, and add them to unittest in test-apps/TestErrorStr.cpp
-
-#endif // _CHIP_SYSTEM_CONFIG_ERROR
 
 /**
  *  @}

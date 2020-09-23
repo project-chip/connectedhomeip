@@ -16,7 +16,8 @@
  */
 
 /**
- * @file  This file contains the implementation the chip::MessageHeader class.
+ * @file
+ *    This file contains the implementation the chip::MessageHeader class.
  */
 
 #include "MessageHeader.h"

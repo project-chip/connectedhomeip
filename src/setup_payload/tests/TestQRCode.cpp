@@ -25,7 +25,6 @@
 #include "TestQRCode.h"
 #include "TestHelpers.h"
 
-#include <iostream>
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 

@@ -38,8 +38,8 @@ private:
     std::string mDecimalStringRepresentation;
 
 public:
-    ManualSetupPayloadParser(std::string decimalRepresentation) : mDecimalStringRepresentation(decimalRepresentation){};
+    ManualSetupPayloadParser(std::string decimalRepresentation) : mDecimalStringRepresentation(decimalRepresentation) {}
     CHIP_ERROR populatePayload(SetupPayload & outPayload);
 };
 
-}; // namespace chip
+} // namespace chip

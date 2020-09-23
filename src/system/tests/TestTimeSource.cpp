@@ -92,7 +92,4 @@ int TestTimeSource(void)
     return (nlTestRunnerStats(&theSuite));
 }
 
-static void __attribute__((constructor)) TestTimeSourceCtor(void)
-{
-    VerifyOrDie(chip::RegisterUnitTests(&TestTimeSource) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestTimeSource)

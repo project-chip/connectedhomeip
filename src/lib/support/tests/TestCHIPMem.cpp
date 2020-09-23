@@ -34,6 +34,7 @@
 #include <nlunit-test.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+#include <support/TestUtils.h>
 
 using namespace chip;
 using namespace chip::Logging;
@@ -111,3 +112,5 @@ int TestMemAlloc(void)
     nlTestRunner(&theSuite, NULL);
     return nlTestRunnerStats(&theSuite);
 }
+
+CHIP_REGISTER_TEST_SUITE(TestMemAlloc)

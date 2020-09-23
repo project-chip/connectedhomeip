@@ -141,7 +141,4 @@ int TestInetErrorStr(void)
     return (nlTestRunnerStats(&theSuite));
 }
 
-static void __attribute__((constructor)) TestCHIPInetErrorStrCtor(void)
-{
-    VerifyOrDie(RegisterUnitTests(&TestInetErrorStr) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestInetErrorStr)

@@ -111,7 +111,7 @@ uint32_t _encodeOnOffCommand(uint8_t * buffer, uint32_t buf_length, uint8_t comm
 uint32_t encodeOffCommand(uint8_t * buffer, uint32_t buf_length, uint8_t destination_endpoint)
 {
     return _encodeOnOffCommand(buffer, buf_length, 0, destination_endpoint);
-};
+}
 
 uint32_t encodeOnCommand(uint8_t * buffer, uint32_t buf_length, uint8_t destination_endpoint)
 {

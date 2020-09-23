@@ -40,6 +40,7 @@
 
 #include <core/CHIPError.h>
 #include <support/ErrorStr.h>
+#include <support/TestUtils.h>
 
 #include <nlunit-test.h>
 
@@ -279,3 +280,5 @@ int TestCHIPErrorStr(void)
 
     return nlTestRunnerStats(&theSuite);
 }
+
+CHIP_REGISTER_TEST_SUITE(TestCHIPErrorStr)

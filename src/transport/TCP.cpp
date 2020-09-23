@@ -206,18 +206,17 @@ CHIP_ERROR TCPBase::SendMessage(const MessageHeader & header, const Transport::P
     // will be established
 
     endPoint = FindActiveConnection(address);
+
     if (endPoint != nullptr)
     {
-        err    = endPoint->Send(msgBuf);
-        msgBuf = nullptr;
-        SuccessOrExit(err);
+        err = endPoint->Send(msgBuf);
     }
     else
     {
-        err    = SendAfterConnect(address, msgBuf);
-        msgBuf = nullptr;
-        SuccessOrExit(err);
+        err = SendAfterConnect(address, msgBuf);
     }
+    msgBuf = nullptr;
+    SuccessOrExit(err);
 
 exit:
     if (msgBuf != NULL)
@@ -371,6 +370,12 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
             VerifyOrExit(messageData == buffer->Start(), err = CHIP_ERROR_INTERNAL);
             VerifyOrExit(buffer->DataLength() >= messageSize, err = CHIP_ERROR_INTERNAL);
 
+            // messagesize is always consumed once processed, even on error. This is done
+            // on purpose:
+            //   - we already consumed the packet size above
+            //   - there is no reason to believe that an error would not occur again on the
+            //     same parameters (errors are likely not transient)
+            //   - this guarantees data is received and progress is made.
             err = ProcessSingleMessageFromBufferHead(peerAddress, buffer, messageSize);
             buffer->ConsumeHead(messageSize);
             SuccessOrExit(err);

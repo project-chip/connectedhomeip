@@ -19,6 +19,7 @@
 
 #include <shell/shell.h>
 #include <support/CodeUtils.h>
+#include <support/TestUtils.h>
 
 #include <inttypes.h>
 #include <stdarg.h>
@@ -105,3 +106,5 @@ int TestShell(void)
     nlTestRunner(&theSuite, NULL);
     return nlTestRunnerStats(&theSuite);
 }
+
+CHIP_REGISTER_TEST_SUITE(TestShell)

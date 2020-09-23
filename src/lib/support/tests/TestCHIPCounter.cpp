@@ -19,6 +19,7 @@
 #include <nlunit-test.h>
 
 #include <support/CHIPCounter.h>
+#include <support/TestUtils.h>
 
 static void CheckStartWithZero(nlTestSuite * inSuite, void * inContext)
 {
@@ -92,3 +93,5 @@ extern "C" int TestCHIPCounter(void)
 
     return nlTestRunnerStats(&theSuite);
 }
+
+CHIP_REGISTER_TEST_SUITE(TestCHIPCounter)

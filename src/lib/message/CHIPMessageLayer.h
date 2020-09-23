@@ -479,7 +479,7 @@ public:
 #if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
             enableEphemeralUDPPort = false;
 #endif
-        };
+        }
     };
 
     ChipMessageLayer(void);

@@ -26,7 +26,6 @@
 #include <support/logging/CHIPLogging.h>
 #include <support/verhoeff/Verhoeff.h>
 
-#include <iostream>
 #include <math.h>
 #include <string>
 #include <vector>

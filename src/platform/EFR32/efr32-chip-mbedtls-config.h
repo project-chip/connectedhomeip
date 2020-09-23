@@ -102,6 +102,7 @@
  */
 #define MBEDTLS_ENTROPY_HARDWARE_ALT
 
+#if defined(CRYPTO_COUNT) && (CRYPTO_COUNT > 0)
 /**
  * \def MBEDTLS_ECP_INTERNAL_ALT
  * \def ECP_SHORTWEIERSTRASS
@@ -118,7 +119,6 @@
  * Requires: MBEDTLS_BIGNUM_C, MBEDTLS_ECP_C and at least one
  * MBEDTLS_ECP_DP_XXX_ENABLED and (CRYPTO_COUNT > 0)
  */
-#if defined(CRYPTO_COUNT) && (CRYPTO_COUNT > 0)
 #define MBEDTLS_ECP_INTERNAL_ALT
 #define ECP_SHORTWEIERSTRASS
 #define MBEDTLS_ECP_ADD_MIXED_ALT
@@ -128,6 +128,7 @@
 #define MBEDTLS_ECP_RANDOMIZE_JAC_ALT
 #endif
 
+#if defined(CRYPTO_COUNT) && (CRYPTO_COUNT > 0)
 /**
  * \def MBEDTLS_SHA1_ALT
  *
@@ -143,10 +144,10 @@
  * Requires: MBEDTLS_SHA1_C and (CRYPTO_COUNT > 0)
  * See MBEDTLS_SHA1_C for more information.
  */
-#if defined(CRYPTO_COUNT) && (CRYPTO_COUNT > 0)
 #define MBEDTLS_SHA1_ALT
 #endif
 
+#if defined(CRYPTO_COUNT) && (CRYPTO_COUNT > 0)
 /**
  * \def MBEDTLS_SHA256_ALT
  *
@@ -163,7 +164,6 @@
  * Requires: MBEDTLS_SHA256_C and (CRYPTO_COUNT > 0)
  * See MBEDTLS_SHA256_C for more information.
  */
-#if defined(CRYPTO_COUNT) && (CRYPTO_COUNT > 0)
 #define MBEDTLS_SHA256_ALT
 #endif
 
