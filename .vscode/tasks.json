@@ -110,7 +110,7 @@
                 "base": "$gcc",
                 "fileLocation": [
                     "relative",
-                    "${workspaceFolder}/out/chip_tool/"
+                    "${workspaceFolder}/out/lighting-app/"
                 ]
             }
         },
