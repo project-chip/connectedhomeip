@@ -24,6 +24,7 @@
 #include "streamer.h"
 
 #include <stdio.h>
+#include <support/logging/CHIPLogging.h>
 
 #ifndef CONSOLE_DEFAULT_MAX_LINE
 #define CONSOLE_DEFAULT_MAX_LINE 256

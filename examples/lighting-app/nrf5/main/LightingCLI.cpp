@@ -39,7 +39,7 @@ using namespace ::chip::Shell;
 
 namespace {
 
-const size_t kShellTaskStackSize = 2048;
+const size_t kShellTaskStackSize = 1536;
 const int kShellTaskPriority     = 2;
 TaskHandle_t sShellTaskHandle;
 
@@ -55,6 +55,12 @@ void LightingCLIMain(void * pvParameter)
     }
 
     ChipLogDetail(Shell, "Initializing CHIP shell", rc);
+
+    cmd_misc_init();
+    cmd_base64_init();
+    cmd_btp_init();
+    cmd_otcli_init();
+
     shell_task(NULL);
 }
 
