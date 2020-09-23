@@ -735,7 +735,7 @@ static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
 #if CHIP_CRYPTO_MBEDTLS
 static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
 {
-    CHIP_ERROR error = add_entropy_source(test_entropy_source, NULL, 10);
+    CHIP_ERROR error = add_entropy_source(test_entropy_source, nullptr, 10);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
     uint8_t buffer[5];
     uint32_t test_entropy_source_call_count = gs_test_entropy_source_called;
