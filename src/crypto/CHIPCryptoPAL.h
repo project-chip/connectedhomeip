@@ -408,7 +408,7 @@ class Spake2p
 {
 public:
     Spake2p(size_t fe_size, size_t point_size, size_t hash_size);
-    virtual ~Spake2p(void){};
+    virtual ~Spake2p(void) {}
 
     /**
      * @brief Initialize Spake2+ with some context specific information.

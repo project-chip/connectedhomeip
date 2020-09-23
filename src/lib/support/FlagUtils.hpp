@@ -61,6 +61,6 @@ inline void SetFlag(FlagsT & inFlags, const FlagT inFlag, const bool inValue)
     }
 }
 
-}; // namespace chip
+} // namespace chip
 
 #endif // CHIP_CHIP_SUPPORT_FLAGUTILS_HPP

@@ -47,7 +47,7 @@ public:
         // always first thing: cancel to take ownership of
         //  cb members
         Enqueue(cb->Cancel());
-    };
+    }
 
     void Dispatch()
     {

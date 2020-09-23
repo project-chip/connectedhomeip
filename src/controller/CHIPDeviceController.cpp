@@ -306,7 +306,7 @@ CHIP_ERROR ChipDeviceController::DisconnectDevice()
 
     mConState = kConnectionState_NotConnected;
     return err;
-};
+}
 
 CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * buffer)
 {

@@ -97,7 +97,7 @@ enum optionalQRCodeInfoType
  */
 struct OptionalQRCodeInfo
 {
-    OptionalQRCodeInfo() { int32 = 0; };
+    OptionalQRCodeInfo() { int32 = 0; }
 
     /*@{*/
     uint8_t tag;                      /**< the tag number of the optional info */
@@ -115,7 +115,7 @@ struct OptionalQRCodeInfoExtension : OptionalQRCodeInfo
         int64  = 0;
         uint32 = 0;
         uint64 = 0;
-    };
+    }
 
     int64_t int64;
     uint64_t uint32;
@@ -191,7 +191,8 @@ public:
     // Test that the Setup Payload is within expected value ranges
     SetupPayload() :
         version(0), vendorID(0), productID(0), requiresCustomFlow(0), rendezvousInformation(RendezvousInformationFlags::kNone),
-        discriminator(0), setUpPINCode(0){};
+        discriminator(0), setUpPINCode(0)
+    {}
 
     bool isValidQRCodePayload();
     bool isValidManualCode();
@@ -240,6 +241,6 @@ private:
     optionalQRCodeInfoType getNumericTypeFor(uint8_t tag);
 };
 
-}; // namespace chip
+} // namespace chip
 
 #endif /* _SETUP_PAYLOAD_H_ */
