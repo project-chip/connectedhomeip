@@ -58,10 +58,10 @@ public:
 
     Command(const char * commandName) : mName(commandName) {}
 
-    const char * GetName(void) const { return mName; };
+    const char * GetName(void) const { return mName; }
     const char * GetAttribute(void) const;
     const char * GetArgumentName(size_t index) const;
-    size_t GetArgumentsCount(void) const { return mArgs.size(); };
+    size_t GetArgumentsCount(void) const { return mArgs.size(); }
 
     bool InitArguments(int argc, char * argv[]);
     size_t AddArgument(const char * name, const char * value);

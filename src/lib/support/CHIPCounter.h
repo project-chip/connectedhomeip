@@ -41,8 +41,8 @@ namespace chip {
 class Counter
 {
 public:
-    Counter(void){};
-    virtual ~Counter(void){};
+    Counter(void) {}
+    virtual ~Counter(void) {}
 
     /**
      *  @brief

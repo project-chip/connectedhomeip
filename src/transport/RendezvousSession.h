@@ -29,7 +29,8 @@ class RendezvousSession : public SecurePairingSessionDelegate, public Rendezvous
 {
 public:
     RendezvousSession(RendezvousSessionDelegate * delegate, const RendezvousParameters & params) :
-        mDelegate(delegate), mParams(params){};
+        mDelegate(delegate), mParams(params)
+    {}
     virtual ~RendezvousSession();
 
     /**
@@ -46,7 +47,7 @@ public:
      *
      * @return SecurePairingSession The associated pairing session
      */
-    SecurePairingSession & GetPairingSession() { return mPairingSession; };
+    SecurePairingSession & GetPairingSession() { return mPairingSession; }
 
     //////////// SecurePairingSessionDelegate Implementation ///////////////
     virtual CHIP_ERROR SendMessage(System::PacketBuffer * msgBuf) override;

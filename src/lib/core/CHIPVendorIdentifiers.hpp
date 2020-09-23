@@ -40,6 +40,6 @@ enum ChipVendorId
     kChipVendor_NotSpecified = 0xFFFF
 };
 
-}; // namespace chip
+} // namespace chip
 
 #endif // CHIP_VENDOR_IDENTIFIERS_HPP

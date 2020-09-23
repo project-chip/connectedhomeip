@@ -65,7 +65,7 @@ public:
     {
         mNext = mPrev = this;
         mCancel       = nullptr;
-    };
+    }
 
     /**
      * @brief run whatever function the callee/registrar has specified in order
@@ -82,7 +82,7 @@ public:
         }
         return this;
     }
-    ~Cancelable() { Cancel(); };
+    ~Cancelable() { Cancel(); }
 };
 
 typedef void (*CallFn)(void *);
@@ -149,12 +149,12 @@ public:
      *    the socket from the interest set
      *
      */
-    Cancelable * Cancel() { return Cancelable::Cancel(); };
+    Cancelable * Cancel() { return Cancelable::Cancel(); }
 
     /**
      * public constructor
      */
-    Callback(T call, void * context) : mContext(context), mCall(call) { Cancelable(); };
+    Callback(T call, void * context) : mContext(context), mCall(call) { Cancelable(); }
 
     /**
      * TODO: type-safety? It'd be nice if Cancelables that aren't Callbacks returned null
@@ -178,11 +178,11 @@ public:
     {
         // add to a doubly-linked list, set cancel function
         InsertBefore(ca, this, cancel);
-    };
+    }
     /**
      * @brief appends
      */
-    void Enqueue(Cancelable * ca) { Enqueue(ca, Dequeue); };
+    void Enqueue(Cancelable * ca) { Enqueue(ca, Dequeue); }
 
     /**
      * @brief dequeue, but don't cancel, all cas that match the by()
@@ -220,12 +220,12 @@ public:
             }
         }
         InsertBefore(ca, where, cancel);
-    };
+    }
 
     void InsertBy(Cancelable * ca, int (*sortby)(void *, const Cancelable *, const Cancelable *), void * p)
     {
         InsertBy(ca, sortby, p, Dequeue);
-    };
+    }
 
     /**
      * @brief insert the node in a the list at a specific point
@@ -235,8 +235,8 @@ public:
         ca->Cancel(); // make doubly-sure we're not corrupting another list somewhere
         ca->mCancel = cancel;
         _InsertBefore(ca, where);
-    };
-    void InsertBefore(Cancelable * ca, Cancelable * where) { InsertBefore(ca, where, Dequeue); };
+    }
+    void InsertBefore(Cancelable * ca, Cancelable * where) { InsertBefore(ca, where, Dequeue); }
 
     /**
      * @brief returns first item unless list is empty, otherwise returns NULL

@@ -40,7 +40,7 @@ private:
     std::string mBase41Representation;
 
 public:
-    QRCodeSetupPayloadParser(std::string base41Representation) : mBase41Representation(base41Representation){};
+    QRCodeSetupPayloadParser(std::string base41Representation) : mBase41Representation(base41Representation) {}
     CHIP_ERROR populatePayload(SetupPayload & outPayload);
 
 private:
@@ -49,4 +49,4 @@ private:
     CHIP_ERROR parseTLVFields(chip::SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t tlvDataLengthInBytes);
 };
 
-}; // namespace chip
+} // namespace chip

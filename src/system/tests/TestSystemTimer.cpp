@@ -122,9 +122,9 @@ public:
     {
         TestContext * lContext = static_cast<TestContext *>(p);
         lContext->GreedyTimer();
-    };
+    }
 
-    TestContext() : mGreedyTimer(GreedyTimer, this), mNumTimersHandled(0){};
+    TestContext() : mGreedyTimer(GreedyTimer, this), mNumTimersHandled(0) {}
 };
 
 // Test input data.
