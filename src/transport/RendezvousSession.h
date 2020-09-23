@@ -59,7 +59,7 @@ public:
     RendezvousSession(RendezvousSessionDelegate * delegate, const RendezvousParameters & params) :
         mDelegate(delegate), mParams(params)
     {}
-    virtual ~RendezvousSession();
+    ~RendezvousSession() override;
 
     /**
      * @brief
@@ -78,9 +78,9 @@ public:
     SecurePairingSession & GetPairingSession() { return mPairingSession; }
 
     //////////// SecurePairingSessionDelegate Implementation ///////////////
-    virtual CHIP_ERROR SendMessage(System::PacketBuffer * msgBuf) override;
-    virtual void OnPairingError(CHIP_ERROR err) override;
-    virtual void OnPairingComplete() override;
+    CHIP_ERROR SendMessage(System::PacketBuffer * msgBuf) override;
+    void OnPairingError(CHIP_ERROR err) override;
+    void OnPairingComplete() override;
 
     //////////// RendezvousSessionDelegate Implementation ///////////////
     void OnRendezvousConnectionOpened() override;

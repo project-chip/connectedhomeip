@@ -65,8 +65,8 @@ public:
 class TestSessMgrCallback : public SecureSessionMgrCallback
 {
 public:
-    virtual void OnMessageReceived(const MessageHeader & header, PeerConnectionState * state, System::PacketBuffer * msgBuf,
-                                   SecureSessionMgrBase * mgr)
+    void OnMessageReceived(const MessageHeader & header, PeerConnectionState * state, System::PacketBuffer * msgBuf,
+                           SecureSessionMgrBase * mgr) override
     {
         NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
         NL_TEST_ASSERT(mSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
@@ -80,7 +80,7 @@ public:
         ReceiveHandlerCallCount++;
     }
 
-    virtual void OnNewConnection(PeerConnectionState * state, SecureSessionMgrBase * mgr) { NewConnectionHandlerCallCount++; }
+    void OnNewConnection(PeerConnectionState * state, SecureSessionMgrBase * mgr) override { NewConnectionHandlerCallCount++; }
 
     nlTestSuite * mSuite              = nullptr;
     int ReceiveHandlerCallCount       = 0;

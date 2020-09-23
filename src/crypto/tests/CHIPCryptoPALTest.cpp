@@ -1057,7 +1057,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR FEGenerate(void * feout) { return FELoad(fe, fe_len, feout); }
+    CHIP_ERROR FEGenerate(void * feout) override { return FELoad(fe, fe_len, feout); }
 
 private:
     uint8_t fe[kMAX_FE_Length];

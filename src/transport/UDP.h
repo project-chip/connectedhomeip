@@ -92,7 +92,7 @@ class DLL_EXPORT UDP : public Base
     };
 
 public:
-    virtual ~UDP();
+    ~UDP() override;
 
     /**
      * Initialize a UDP transport on a given port.
