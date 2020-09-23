@@ -220,7 +220,7 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, size_t size, size_t * encode_siz
     VerifyOrExit(size >= EncodeSizeBytes(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Payload flags are restricted.
-    VerifyOrExit((payloadFlags.value & Header::Flags::kVendorIdPresent) == payloadFlags.value, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit((payloadFlags.value & Header::Flags::kValidPayloadFlags) == payloadFlags.value, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     header |= mFlags.value;
     header |= payloadFlags.value;

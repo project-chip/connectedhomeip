@@ -69,8 +69,11 @@ struct Flags
     // Header is a 16-bit value of the form
     //  |  4 bit  | 4 bit |  4 bit  |  4 bit   |
     //  +---------+-------+---------+----------|
-    //  | version | Flags | encType | rezerved |
+    //  | version | Flags | encType | reserved |
     static constexpr uint16_t kMask = 0x0F00;
+
+    // Flags of what is in a payload are restricted.
+    static constexpr uint16_t kValidPayloadFlags = kVendorIdPresent;
 };
 
 } // namespace Header
