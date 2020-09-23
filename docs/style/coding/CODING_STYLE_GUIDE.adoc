@@ -361,15 +361,33 @@ example is shown in the listing below.
 
 ...
 
+// Preprocessor Definitions
+
+// Allocate the structure using "raw" storage.
+
+#if defined(__cplusplus) && (__cplusplus >= 201103L)
+#include <type_traits>
+
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+	typename std::aligned_storage<size, alignof(align_type)>::type name;
+
+#else
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+    align_type name[(((size) + (sizeof (align_type) - 1)) / sizeof (align_type))]
+
+#endif // defined(__cplusplus) && (__cplusplus >= 201103L)
+
+// Forward Declarations
+
+extern void * foobar_entry(void *aArgument);
+
+// Global Variables
+
 #if USE_STRUCT_STORAGE
 // Allocate the structure directly.
 static pthread_attr_t sThreadAttributes;
 
 #elif USE_RAW_STORAGE
-// Allocate the structure using "raw" storage.
-#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
-    align_type name[(((size) + (sizeof(align_type) - 1)) / sizeof(align_type))]
-
 static chipDEFINE_ALIGNED_VAR(sThreadAttributes, sizeof (pthread_attr_t), uint64_t);
 
 #endif // USE_STRUCT_STORAGE
@@ -386,7 +404,7 @@ int foobar(void)
 
     if (retval == 0)
     {
-        retval = pthread_create(&thread, attrs, NULL, NULL);
+        retval = pthread_create(&thread, attrs, foobar_entry, NULL);
 
         if (retval == 0)
         {
@@ -426,6 +444,24 @@ destructed after deinitialization.
 
 ...
 
+// Preprocessor Definitions
+
+// Allocate the structure using "raw" storage.
+
+#if defined(__cplusplus) && (__cplusplus >= 201103L)
+#include <type_traits>
+
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+	typename std::aligned_storage<size, alignof(align_type)>::type name;
+
+#else
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+    align_type name[(((size) + (sizeof (align_type) - 1)) / sizeof (align_type))]
+
+#endif // defined(__cplusplus) && (__cplusplus >= 201103L)
+
+// Type Declarations
+
 class ThreadAttributes
 {
 public:
@@ -438,9 +474,11 @@ private:
     pthread_attr_t mAttributes;
 };
 
-// Allocate the structure using "raw" storage.
-#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
-    align_type name[(((size) + (sizeof (align_type) - 1)) / sizeof (align_type))]
+// Forward Declarations
+
+extern void * foobar_entry(void *aArgument);
+
+// Global Variables
 
 static chipDEFINE_ALIGNED_VAR(sThreadAttributes, sizeof (ThreadAttributes), uint64_t);
 
@@ -463,7 +501,7 @@ int foobar(void)
 
         if (retval == 0)
         {
-            retval = pthread_create(&thread, attrs, NULL, NULL);
+            retval = pthread_create(&thread, attrs, foobar_entry, NULL);
 
             if (retval == 0)
             {
@@ -509,6 +547,24 @@ storage of objects from a static array of storage.
 
 #include <stdint.h>
 
+// Preprocessor Definitions
+
+// Allocate the structure using "raw" storage.
+
+#if defined(__cplusplus) && (__cplusplus >= 201103L)
+#include <type_traits>
+
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+	typename std::aligned_storage<size, alignof(align_type)>::type name;
+
+#else
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+    align_type name[(((size) + (sizeof (align_type) - 1)) / sizeof (align_type))]
+
+#endif // defined(__cplusplus) && (__cplusplus >= 201103L)
+
+// Type Definitions
+
 class Foo
 {
 public:
@@ -517,7 +573,9 @@ public:
     ~Foo(void);
 };
 
-static DEFINE_ALIGNED_VAR(sFooAllocatorBuffer, sizeof (StaticAllocatorBitmap), uint32_t);
+// Global Variables
+
+static chipDEFINE_ALIGNED_VAR(sFooAllocatorBuffer, sizeof (StaticAllocatorBitmap), uint32_t);
 static StaticAllocatorBitmap *sFooAllocator;
 
 static void CreateFooAllocator(void *inStorage,
