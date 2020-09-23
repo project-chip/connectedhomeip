@@ -63,7 +63,6 @@ private:
     void ParseReadAttributeResponseCommandSuccess(uint16_t clusterId, uint16_t attrId, uint8_t * message,
                                                   uint16_t messageLen) const;
     void ParseReadAttributeResponseCommandFailure(uint16_t clusterId, uint16_t attrId, uint8_t status, uint16_t messageLen) const;
-    void ParseIdentifyClusterCommand(uint16_t endpointID, uint8_t * message, uint16_t messageLen) const;
 
     void UpdateWaitForResponse(bool value);
     void WaitForResponse(void);

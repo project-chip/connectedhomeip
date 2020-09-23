@@ -115,7 +115,7 @@ void printApsFrame(EmberApsFrame * frame);
 uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame);
 
 /**
- * Idenfity cluster commands
+ * Identify cluster commands
  * */
 
 /**

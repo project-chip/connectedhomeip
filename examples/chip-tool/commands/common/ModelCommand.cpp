@@ -28,10 +28,25 @@
 using namespace ::chip;
 using namespace ::chip::DeviceController;
 
-#define ZCL_DEFAULT_RESPONSE_COMMAND_ID 0x0b
-#define ZCL_READ_ATTRIBUTES_RESPONSE_COMMAND_ID 0x01
+namespace {
+constexpr uint8_t kDefaultResponseCommandId        = 0x0b;
+constexpr uint8_t kReadAttributesResponseCommandId = 0x01;
+} // namespace
+
+namespace {
+constexpr uint8_t kZCLGlobalCmdFrameControlHeader  = 8;
+constexpr uint8_t kZCLClusterCmdFrameControlHeader = 9;
+} // namespace
 
 constexpr std::chrono::seconds kWaitingForResponseTimeout(10);
+
+namespace {
+bool isValidFrame(uint8_t frameControl)
+{
+    // Bit 3 of the frame control byte set means direction is server to client.
+    return (frameControl == kZCLGlobalCmdFrameControlHeader || frameControl == kZCLClusterCmdFrameControlHeader);
+}
+} // namespace
 
 void ModelCommand::OnConnect(ChipDeviceController * dc)
 {
@@ -81,13 +96,6 @@ void ModelCommand::SendCommand(ChipDeviceController * dc)
     dc->SendMessage(NULL, buffer);
 }
 
-bool _isValidFrame(uint8_t frameControl)
-{
-#define kZCLGlobalCmdFrameControlHeader 8
-#define kZCLClusterCmdFrameControlHeader 9
-
-    return (frameControl == kZCLGlobalCmdFrameControlHeader || frameControl == kZCLClusterCmdFrameControlHeader);
-}
 void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffer * buffer) const
 {
     EmberApsFrame frame;
@@ -98,7 +106,6 @@ void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffe
     uint8_t commandId;
     bool isGlobalCommand = false;
 
-    // Bit 3 of the frame control byte set means direction is server to client.
     if (extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) == 0)
     {
         ChipLogError(chipTool, "APS frame processing failure!");
@@ -107,8 +114,6 @@ void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffe
     }
     ChipLogProgress(chipTool, "APS frame processing success!");
 
-    // Bit 3 of the frame control byte set means direction is server to client.
-    // We expect no other bits to be set.
     messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
     CHECK_MESSAGE_LENGTH(messageLen >= 3);
 
@@ -117,18 +122,18 @@ void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffe
     commandId      = chip::Encoding::Read8(message);
     messageLen -= 3;
 
-    VerifyOrExit(_isValidFrame(frameControl), ChipLogError(chipTool, "Unexpected frame control byte: 0x%02x", frameControl));
+    VerifyOrExit(isValidFrame(frameControl), ChipLogError(chipTool, "Unexpected frame control byte: 0x%02x", frameControl));
     VerifyOrExit(sequenceNumber == 1, ChipLogError(chipTool, "Unexpected sequence number: %d", sequenceNumber));
 
-    isGlobalCommand = (frameControl == 8);
+    isGlobalCommand = (frameControl == kZCLGlobalCmdFrameControlHeader);
     if (isGlobalCommand)
     {
         switch (commandId)
         {
-        case ZCL_DEFAULT_RESPONSE_COMMAND_ID:
+        case kDefaultResponseCommandId:
             ParseDefaultResponseCommand(frame.clusterId, message, messageLen);
             break;
-        case ZCL_READ_ATTRIBUTES_RESPONSE_COMMAND_ID:
+        case kReadAttributesResponseCommandId:
             ParseReadAttributeResponseCommand(frame.clusterId, message, messageLen);
             break;
         default:
@@ -224,7 +229,7 @@ exit:
 void ModelCommand::HandleClusterResponse(uint16_t clusterId, uint16_t endPointId, uint16_t commandId, uint8_t * message,
                                          uint16_t messageLen) const
 {
-    ChipLogProgress(chipTool, "Received cmd %d for cluster %d", commandId, clusterId);
+    ChipLogProgress(chipTool, "Not handling command %d for cluster %d endPointId %d", commandId, clusterId, endPointId);
 }
 
 void ModelCommand::UpdateWaitForResponse(bool value)

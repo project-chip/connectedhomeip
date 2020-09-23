@@ -47,7 +47,7 @@ public:
 class Identify : public ModelCommand
 {
 public:
-    Identify() : ModelCommand("identify"){};
+    Identify() : ModelCommand("identify") {}
     size_t EncodeCommand(PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) override
     {
         return encodeIdentifyCommand(buffer->Start(), bufferSize, endPointId, 10);
