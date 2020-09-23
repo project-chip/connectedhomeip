@@ -543,8 +543,8 @@ int TestManualSetupCode(void)
     {
         "chip-manual-code-general-Tests",
         &sTests[0],
-        NULL,
-        NULL
+        nullptr,
+        nullptr
     };
     // clang-format on
     TestContext context;

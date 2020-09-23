@@ -81,7 +81,7 @@ void test_os_sleep_ms(uint64_t millisecs)
     sleep_time.tv_sec  = s;
     sleep_time.tv_nsec = millisecs * 1000000;
 
-    nanosleep(&sleep_time, NULL);
+    nanosleep(&sleep_time, nullptr);
 }
 
 void test_os_sleep_us(uint64_t microsecs)
@@ -93,7 +93,7 @@ void test_os_sleep_us(uint64_t microsecs)
     sleep_time.tv_sec  = s;
     sleep_time.tv_nsec = microsecs * 1000;
 
-    nanosleep(&sleep_time, NULL);
+    nanosleep(&sleep_time, nullptr);
 }
 
 // =================================
@@ -204,10 +204,10 @@ static const nlTest sTests[] = {
 
 int TestPlatformTime(void)
 {
-    nlTestSuite theSuite = { "CHIP DeviceLayer tests", &sTests[0], NULL, NULL };
+    nlTestSuite theSuite = { "CHIP DeviceLayer tests", &sTests[0], nullptr, nullptr };
 
     // Run test suit againt one context.
-    nlTestRunner(&theSuite, NULL);
+    nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
 

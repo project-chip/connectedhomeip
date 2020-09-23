@@ -89,7 +89,7 @@ extern "C" int TestCHIPCounter(void)
     // clang-format on
 
     // Run test suit againt one context.
-    nlTestRunner(&theSuite, NULL);
+    nlTestRunner(&theSuite, nullptr);
 
     return nlTestRunnerStats(&theSuite);
 }

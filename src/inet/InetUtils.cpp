@@ -82,7 +82,7 @@ DLL_EXPORT INET_ERROR ParseHostAndPort(const char * aString, uint16_t aStringLen
     {
         // Search for the end bracket.
         p = (const char *) memchr(aString, ']', aStringLen);
-        if (p == NULL)
+        if (p == nullptr)
             return INET_ERROR_INVALID_HOST_NAME;
 
         // Return the IPv6 address.
@@ -110,7 +110,7 @@ DLL_EXPORT INET_ERROR ParseHostAndPort(const char * aString, uint16_t aStringLen
         //
         // Note: The cast is safe because p points into the string of p is not
         // null, so end - p - 1 can't be negative.
-        if (p == NULL || memchr(p + 1, ':', static_cast<size_t>(end - p - 1)) != NULL)
+        if (p == nullptr || memchr(p + 1, ':', static_cast<size_t>(end - p - 1)) != nullptr)
             p = end;
 
         // Return the host/address portion.
@@ -201,7 +201,7 @@ DLL_EXPORT INET_ERROR ParseHostPortAndInterface(const char * aString, uint16_t a
 {
     const char * end = aString + aStringLen;
 
-    aInterface    = NULL;
+    aInterface    = nullptr;
     aInterfaceLen = 0;
 
     for (uint16_t i = 1; i < aStringLen; i++)

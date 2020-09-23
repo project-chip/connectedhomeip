@@ -46,29 +46,29 @@ using namespace chip::Platform;
 
 static void TestMemAlloc_Malloc(nlTestSuite * inSuite, void * inContext)
 {
-    char * p1 = NULL;
-    char * p2 = NULL;
-    char * p3 = NULL;
+    char * p1 = nullptr;
+    char * p2 = nullptr;
+    char * p3 = nullptr;
 
     // Verify long-term allocation
     p1 = (char *) MemoryAlloc(64, true);
-    NL_TEST_ASSERT(inSuite, p1 != NULL);
+    NL_TEST_ASSERT(inSuite, p1 != nullptr);
 
     p2 = (char *) MemoryAlloc(256, true);
-    NL_TEST_ASSERT(inSuite, p2 != NULL);
+    NL_TEST_ASSERT(inSuite, p2 != nullptr);
 
     chip::Platform::MemoryFree(p1);
     chip::Platform::MemoryFree(p2);
 
     // Verify short-term allocation
     p1 = (char *) MemoryAlloc(256);
-    NL_TEST_ASSERT(inSuite, p1 != NULL);
+    NL_TEST_ASSERT(inSuite, p1 != nullptr);
 
     p2 = (char *) MemoryAlloc(256);
-    NL_TEST_ASSERT(inSuite, p2 != NULL);
+    NL_TEST_ASSERT(inSuite, p2 != nullptr);
 
     p3 = (char *) MemoryAlloc(256);
-    NL_TEST_ASSERT(inSuite, p3 != NULL);
+    NL_TEST_ASSERT(inSuite, p3 != nullptr);
 
     chip::Platform::MemoryFree(p1);
     chip::Platform::MemoryFree(p2);
@@ -78,7 +78,7 @@ static void TestMemAlloc_Malloc(nlTestSuite * inSuite, void * inContext)
 static void TestMemAlloc_Calloc(nlTestSuite * inSuite, void * inContext)
 {
     char * p = (char *) MemoryCalloc(128, true);
-    NL_TEST_ASSERT(inSuite, p != NULL);
+    NL_TEST_ASSERT(inSuite, p != nullptr);
 
     for (int i = 0; i < 128; i++)
         NL_TEST_ASSERT(inSuite, p[i] == 0);
@@ -89,10 +89,10 @@ static void TestMemAlloc_Calloc(nlTestSuite * inSuite, void * inContext)
 static void TestMemAlloc_Realloc(nlTestSuite * inSuite, void * inContext)
 {
     char * pa = (char *) MemoryAlloc(128, true);
-    NL_TEST_ASSERT(inSuite, pa != NULL);
+    NL_TEST_ASSERT(inSuite, pa != nullptr);
 
     char * pb = (char *) MemoryRealloc(pa, 256);
-    NL_TEST_ASSERT(inSuite, pb != NULL);
+    NL_TEST_ASSERT(inSuite, pb != nullptr);
 
     chip::Platform::MemoryFree(pb);
 }
@@ -106,10 +106,10 @@ static const nlTest sTests[] = { NL_TEST_DEF("Test MemAlloc::Malloc", TestMemAll
 
 int TestMemAlloc(void)
 {
-    nlTestSuite theSuite = { "CHIP Memory Allocation tests", &sTests[0], NULL, NULL };
+    nlTestSuite theSuite = { "CHIP Memory Allocation tests", &sTests[0], nullptr, nullptr };
 
     // Run test suit againt one context.
-    nlTestRunner(&theSuite, NULL);
+    nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
 

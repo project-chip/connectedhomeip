@@ -56,9 +56,9 @@ static bool trueFormat(char * buf, uint16_t bufSize, int32_t err)
 
 static bool testRegisterDeregisterErrorFormatter(void)
 {
-    static ErrorFormatter falseFormatter  = { falseFormat, NULL };
-    static ErrorFormatter falseFormatter2 = { falseFormat2, NULL };
-    static ErrorFormatter trueFormatter   = { trueFormat, NULL };
+    static ErrorFormatter falseFormatter  = { falseFormat, nullptr };
+    static ErrorFormatter falseFormatter2 = { falseFormat2, nullptr };
+    static ErrorFormatter trueFormatter   = { trueFormat, nullptr };
 
     // assume success
     bool ret = true;
@@ -144,19 +144,19 @@ static bool testFormatErr()
     ret &= CHECK_EQ_STR(buf, "subsys Error 1 (0x00000001): desc");
 
     // skip desc
-    FormatError(buf, kBufSize, subsys, 1, NULL);
+    FormatError(buf, kBufSize, subsys, 1, nullptr);
     ret &= CHECK_EQ_STR(buf, "subsys Error 1 (0x00000001)");
 
     // skip subsys
-    FormatError(buf, kBufSize, NULL, 1, desc);
+    FormatError(buf, kBufSize, nullptr, 1, desc);
     ret &= CHECK_EQ_STR(buf, "Error 1 (0x00000001): desc");
 
     // skip both
-    FormatError(buf, kBufSize, NULL, 1, NULL);
+    FormatError(buf, kBufSize, nullptr, 1, nullptr);
     ret &= CHECK_EQ_STR(buf, "Error 1 (0x00000001)");
 
     // negative
-    FormatError(buf, kBufSize, NULL, -1, NULL);
+    FormatError(buf, kBufSize, nullptr, -1, nullptr);
     ret &= CHECK_EQ_STR(buf, "Error -1 (0xFFFFFFFF)");
 #endif
 

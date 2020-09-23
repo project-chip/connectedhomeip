@@ -63,7 +63,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
 
     // Initialize the CHIP system layer.
     new (&SystemLayer) System::Layer();
-    err = SystemLayer.Init(NULL);
+    err = SystemLayer.Init(nullptr);
     if (err != CHIP_SYSTEM_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "SystemLayer initialization failed: %s", ErrorStr(err));
@@ -72,7 +72,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
 
     // Initialize the CHIP Inet layer.
     new (&InetLayer) Inet::InetLayer();
-    err = InetLayer.Init(SystemLayer, NULL);
+    err = InetLayer.Init(SystemLayer, nullptr);
     if (err != INET_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "InetLayer initialization failed: %s", ErrorStr(err));
@@ -118,7 +118,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_AddEventHandler(PlatformManag
     AppEventHandler * eventHandler;
 
     // Do nothing if the event handler is already registered.
-    for (eventHandler = mAppEventHandlerList; eventHandler != NULL; eventHandler = eventHandler->Next)
+    for (eventHandler = mAppEventHandlerList; eventHandler != nullptr; eventHandler = eventHandler->Next)
     {
         if (eventHandler->Handler == handler && eventHandler->Arg == arg)
         {
@@ -127,7 +127,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_AddEventHandler(PlatformManag
     }
 
     eventHandler = (AppEventHandler *) chip::Platform::MemoryAlloc(sizeof(AppEventHandler));
-    VerifyOrExit(eventHandler != NULL, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(eventHandler != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     eventHandler->Next    = mAppEventHandlerList;
     eventHandler->Handler = handler;
@@ -144,7 +144,7 @@ void GenericPlatformManagerImpl<ImplClass>::_RemoveEventHandler(PlatformManager:
 {
     AppEventHandler ** eventHandlerIndirectPtr;
 
-    for (eventHandlerIndirectPtr = &mAppEventHandlerList; *eventHandlerIndirectPtr != NULL;)
+    for (eventHandlerIndirectPtr = &mAppEventHandlerList; *eventHandlerIndirectPtr != nullptr;)
     {
         AppEventHandler * eventHandler = (*eventHandlerIndirectPtr);
 
@@ -252,7 +252,7 @@ template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::DispatchEventToApplication(const ChipDeviceEvent * event)
 {
     // Dispatch the event to each of the registered application event handlers.
-    for (AppEventHandler * eventHandler = mAppEventHandlerList; eventHandler != NULL; eventHandler = eventHandler->Next)
+    for (AppEventHandler * eventHandler = mAppEventHandlerList; eventHandler != nullptr; eventHandler = eventHandler->Next)
     {
         eventHandler->Handler(event, eventHandler->Arg);
     }

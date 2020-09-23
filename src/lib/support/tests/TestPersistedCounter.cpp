@@ -183,13 +183,13 @@ static const nlTest sTests[] = { NL_TEST_DEF("Out of box Test", CheckOOB), NL_TE
 static HelpOptions gHelpOptions(TOOL_NAME, "Usage: " TOOL_NAME " [<options...>]\n", CHIP_VERSION_STRING "\n" CHIP_TOOL_COPYRIGHT,
                                 "Test persisted counter API.  Without any options, the program invokes a suite of local tests.\n");
 
-static OptionSet * gOptionSets[] = { &gHelpOptions, NULL };
+static OptionSet * gOptionSets[] = { &gHelpOptions, nullptr };
 
 extern "C" int TestPersistedCounter(int argc, char * argv[])
 {
     TestPersistedCounterContext context;
 
-    if (!ParseArgsFromEnvVar(TOOL_NAME, TOOL_OPTIONS_ENV_VAR_NAME, gOptionSets, NULL, true) ||
+    if (!ParseArgsFromEnvVar(TOOL_NAME, TOOL_OPTIONS_ENV_VAR_NAME, gOptionSets, nullptr, true) ||
         !ParseArgs(TOOL_NAME, argc, argv, gOptionSets))
     {
         return EXIT_FAILURE;

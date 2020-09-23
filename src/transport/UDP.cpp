@@ -109,10 +109,10 @@ CHIP_ERROR UDP::SendMessage(const MessageHeader & header, const Transport::PeerA
     SuccessOrExit(err);
 
 exit:
-    if (msgBuf != NULL)
+    if (msgBuf != nullptr)
     {
         System::PacketBuffer::Free(msgBuf);
-        msgBuf = NULL;
+        msgBuf = nullptr;
     }
 
     return err;

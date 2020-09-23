@@ -63,8 +63,8 @@ CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, size_t inBuffer
     mQueueLength = 0;
     mQueueHead   = inHead;
 
-    mProcessEvictedElement = NULL;
-    mAppData               = NULL;
+    mProcessEvictedElement = nullptr;
+    mAppData               = nullptr;
 
     // use common as opposed to unspecified, s.t. the reader that
     // skips over the elements does not complain about implicit
@@ -87,8 +87,8 @@ CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, size_t inBuffer
     mQueueLength = 0;
     mQueueHead   = mQueue;
 
-    mProcessEvictedElement = NULL;
-    mAppData               = NULL;
+    mProcessEvictedElement = nullptr;
+    mAppData               = nullptr;
 
     // use common as opposed to unspecified, s.t. the reader that
     // skips over the elements does not complain about implicit
@@ -139,7 +139,7 @@ CHIP_ERROR CHIPCircularTLVBuffer::EvictHead(void)
 
     // if a custom handler is installed, give it a chance to
     // process the element before we evict it from the buffer.
-    if (mProcessEvictedElement != NULL)
+    if (mProcessEvictedElement != nullptr)
     {
         // Reinitialize the reader
         reader.Init(this);
@@ -265,7 +265,7 @@ CHIP_ERROR CHIPCircularTLVBuffer::GetNextBuffer(TLVReader & ioReader, const uint
     uint8_t * tail              = QueueTail();
     const uint8_t * readerStart = outBufStart;
 
-    if (readerStart == NULL)
+    if (readerStart == nullptr)
     {
         outBufStart = mQueueHead;
 
@@ -292,7 +292,7 @@ CHIP_ERROR CHIPCircularTLVBuffer::GetNextBuffer(TLVReader & ioReader, const uint
         // (i.e. mQueue+mQueueSize).  This case tail == outBufStart
         // indicates that the buffer is completely full
         outBufLen = (mQueue + mQueueSize) - outBufStart;
-        if ((tail == outBufStart) && (readerStart != NULL))
+        if ((tail == outBufStart) && (readerStart != nullptr))
             outBufLen = 0;
     }
     else
@@ -453,7 +453,7 @@ void CircularTLVReader::Init(CHIPCircularTLVBuffer * buf)
     mBufHandle    = (uintptr_t) buf;
     GetNextBuffer = CHIPCircularTLVBuffer::GetNextBufferFunct;
     mLenRead      = 0;
-    mReadPoint    = NULL;
+    mReadPoint    = nullptr;
     GetNextBuffer(*this, mBufHandle, mReadPoint, bufLen);
     mBufEnd        = mReadPoint + bufLen;
     mMaxLen        = buf->DataLength();
@@ -463,7 +463,7 @@ void CircularTLVReader::Init(CHIPCircularTLVBuffer * buf)
     mContainerType = kTLVType_NotSpecified;
     SetContainerOpen(false);
     ImplicitProfileId = kProfileIdNotSpecified;
-    AppData           = NULL;
+    AppData           = nullptr;
 }
 
 } // namespace TLV

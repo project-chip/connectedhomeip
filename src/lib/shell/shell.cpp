@@ -196,7 +196,7 @@ int Shell::TokenizeLine(char * buffer, char ** tokens, int max_tokens)
         }
     }
 
-    tokens[cursor] = 0;
+    tokens[cursor] = nullptr;
 
 exit:
     return cursor;

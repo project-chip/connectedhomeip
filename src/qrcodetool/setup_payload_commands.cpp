@@ -38,7 +38,7 @@ static std::string _extractFilePath(int argc, char * const * argv)
         return path;
     }
     int ch;
-    const char * filePath = NULL;
+    const char * filePath = nullptr;
 
     while ((ch = getopt(argc, argv, "f:")) != -1)
     {

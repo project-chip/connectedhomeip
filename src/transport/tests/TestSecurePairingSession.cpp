@@ -152,8 +152,8 @@ static nlTestSuite sSuite =
 {
     "Test-CHIP-SecurePairing",
     &sTests[0],
-    NULL,
-    NULL
+    nullptr,
+    nullptr
 };
 // clang-format on
 
@@ -163,7 +163,7 @@ static nlTestSuite sSuite =
 int TestSecurePairingSession()
 {
     // Run test suit against one context
-    nlTestRunner(&sSuite, NULL);
+    nlTestRunner(&sSuite, nullptr);
 
     return (nlTestRunnerStats(&sSuite));
 }

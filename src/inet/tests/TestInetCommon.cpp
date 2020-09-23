@@ -153,7 +153,7 @@ static void UseStdoutLineBuffering()
 {
     // Set stdout to be line buffered with a buffer of 512 (will flush on new line
     // or when the buffer of 512 is exceeded).
-    setvbuf(stdout, NULL, _IOLBF, 512);
+    setvbuf(stdout, nullptr, _IOLBF, 512);
 }
 
 void InitTestInetCommon()
@@ -184,7 +184,7 @@ void SetSignalHandler(SignalHandler handler)
 
     for (i = 0; i < sizeof(signals) / sizeof(signals[0]); i++)
     {
-        if (sigaction(signals[i], &sa, NULL) == -1)
+        if (sigaction(signals[i], &sa, nullptr) == -1)
         {
             perror("Can't catch signal");
             exit(1);
@@ -199,7 +199,7 @@ void InitSystemLayer()
 
     gSystemLayer.Init(sLwIPEventQueue);
 #else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
-    gSystemLayer.Init(NULL);
+    gSystemLayer.Init(nullptr);
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
@@ -265,7 +265,7 @@ static void PrintNetworkState()
 
 void InitNetwork()
 {
-    void * lContext = NULL;
+    void * lContext = nullptr;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -624,7 +624,7 @@ void ShutdownNetwork()
 
 void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix, uint32_t rowWidth)
 {
-    int indexWidth = snprintf(NULL, 0, "%X", len);
+    int indexWidth = snprintf(nullptr, 0, "%X", len);
 
     if (indexWidth < 4)
         indexWidth = 4;
@@ -670,7 +670,7 @@ static void RebootCallbackFn(void)
         ExitNow();
     }
 
-    for (i = 0; sRestartCallbackCtx.mArgv[i] != NULL; i++)
+    for (i = 0; sRestartCallbackCtx.mArgv[i] != nullptr; i++)
     {
         if (strcmp(sRestartCallbackCtx.mArgv[i], "--faults") == 0)
         {
@@ -681,9 +681,9 @@ static void RebootCallbackFn(void)
         lArgv[j++] = sRestartCallbackCtx.mArgv[i];
     }
 
-    lArgv[j] = NULL;
+    lArgv[j] = nullptr;
 
-    for (i = 0; lArgv[i] != NULL; i++)
+    for (i = 0; lArgv[i] != nullptr; i++)
     {
         printf("argv[%d]: %s\n", i, lArgv[i]);
     }
@@ -759,7 +759,7 @@ static bool PrintSystemFaultInjectionMaxArgCbFn(nl::FaultInjection::Identifier a
 
 void SetupFaultInjectionContext(int argc, char * argv[])
 {
-    SetupFaultInjectionContext(argc, argv, NULL, NULL);
+    SetupFaultInjectionContext(argc, argv, nullptr, nullptr);
 }
 
 void SetupFaultInjectionContext(int argc, char * argv[], int32_t (*aNumEventsAvailable)(void),

@@ -67,7 +67,7 @@ bool ChipServerBase::EnforceAccessControl(ExchangeContext * ec, uint32_t msgProf
                                           const ChipMessageInfo * msgInfo, ChipServerDelegateBase * delegate)
 {
     // Reject all messages if the application hasn't specified a delegate object.
-    if (delegate == NULL)
+    if (delegate == nullptr)
     {
         ChipServerBase::SendStatusReport(ec, kChipProtocol_Common, Common::kStatus_InternalError, CHIP_NO_ERROR);
         return false;
@@ -158,8 +158,8 @@ CHIP_ERROR ChipServerBase::SendStatusReport(ExchangeContext * ec, uint32_t statu
                           // EndContainer (1)
 
     respBuf = PacketBuffer::NewWithAvailableSize(respLen);
-    VerifyOrExit(respBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
-    VerifyOrDie(ec != NULL);
+    VerifyOrExit(respBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrDie(ec != nullptr);
 
     p = respBuf->Start();
     LittleEndian::Write32(p, statusProfileId);
@@ -187,10 +187,10 @@ CHIP_ERROR ChipServerBase::SendStatusReport(ExchangeContext * ec, uint32_t statu
     }
 
     err     = ec->SendMessage(kChipProtocol_Common, Common::kMsgType_StatusReport, respBuf, sendFlags);
-    respBuf = NULL;
+    respBuf = nullptr;
 
 exit:
-    if (respBuf != NULL)
+    if (respBuf != nullptr)
         PacketBuffer::Free(respBuf);
     return err;
 }

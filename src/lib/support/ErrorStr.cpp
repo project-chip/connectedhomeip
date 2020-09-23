@@ -43,7 +43,7 @@ static char sErrorStr[CHIP_CONFIG_ERROR_STR_SIZE];
 /**
  * Linked-list of error formatter functions.
  */
-static ErrorFormatter * sErrorFormatterList = NULL;
+static ErrorFormatter * sErrorFormatterList = nullptr;
 
 /**
  * This routine returns a human-readable NULL-terminated C string
@@ -63,7 +63,7 @@ DLL_EXPORT const char * ErrorStr(int32_t err)
 
     // Search the registered error formatter for one that will format the given
     // error code.
-    for (const ErrorFormatter * errFormatter = sErrorFormatterList; errFormatter != NULL; errFormatter = errFormatter->Next)
+    for (const ErrorFormatter * errFormatter = sErrorFormatterList; errFormatter != nullptr; errFormatter = errFormatter->Next)
     {
         if (errFormatter->FormatError(sErrorStr, sizeof(sErrorStr), err))
         {
@@ -72,7 +72,7 @@ DLL_EXPORT const char * ErrorStr(int32_t err)
     }
 
     // Use a default formatting if no formatter found.
-    FormatError(sErrorStr, sizeof(sErrorStr), NULL, err, NULL);
+    FormatError(sErrorStr, sizeof(sErrorStr), nullptr, err, nullptr);
     return sErrorStr;
 }
 
@@ -89,7 +89,7 @@ DLL_EXPORT const char * ErrorStr(int32_t err)
 DLL_EXPORT void RegisterErrorFormatter(ErrorFormatter * errFormatter)
 {
     // Do nothing if a formatter with the same format function is already in the list.
-    for (ErrorFormatter * existingFormatter = sErrorFormatterList; existingFormatter != NULL;
+    for (ErrorFormatter * existingFormatter = sErrorFormatterList; existingFormatter != nullptr;
          existingFormatter                  = existingFormatter->Next)
     {
         if (existingFormatter->FormatError == errFormatter->FormatError)
@@ -112,7 +112,7 @@ DLL_EXPORT void RegisterErrorFormatter(ErrorFormatter * errFormatter)
 DLL_EXPORT void DeregisterErrorFormatter(ErrorFormatter * errFormatter)
 {
     // Remove the formatter if present
-    for (ErrorFormatter ** lfp = &sErrorFormatterList; *lfp != NULL; lfp = &(*lfp)->Next)
+    for (ErrorFormatter ** lfp = &sErrorFormatterList; *lfp != nullptr; lfp = &(*lfp)->Next)
     {
         // Remove the formatter from the global list, if found.
         if (*lfp == errFormatter)
@@ -155,12 +155,12 @@ DLL_EXPORT void FormatError(char * buf, uint16_t bufSize, const char * subsys, i
     const char * subsysSep = " ";
     const char * descSep   = ": ";
 
-    if (subsys == NULL)
+    if (subsys == nullptr)
     {
         subsys    = "";
         subsysSep = "";
     }
-    if (desc == NULL)
+    if (desc == nullptr)
     {
         desc    = "";
         descSep = "";

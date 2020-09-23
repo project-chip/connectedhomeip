@@ -685,8 +685,8 @@ int TestInetLayerDNSInternal(void)
     {
         "DNS",
         &DNSTests[0],
-        NULL,
-        NULL
+        nullptr,
+        nullptr
     };
     // clang-format on
 
@@ -697,7 +697,7 @@ int TestInetLayerDNSInternal(void)
 
     // Run all tests in Suite
 
-    nlTestRunner(&DNSTestSuite, NULL);
+    nlTestRunner(&DNSTestSuite, nullptr);
 
     ShutdownNetwork();
     ShutdownSystemLayer();

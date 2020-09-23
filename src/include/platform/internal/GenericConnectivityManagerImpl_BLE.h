@@ -92,7 +92,7 @@ template <class ImplClass>
 inline void GenericConnectivityManagerImpl_BLE<ImplClass>::_RemoveCHIPoBLEConnectionHandler(void)
 {
     BleLayer * bleLayer                = BLEMgr().GetBleLayer();
-    bleLayer->OnChipBleConnectReceived = NULL;
+    bleLayer->OnChipBleConnectReceived = nullptr;
 }
 
 template <class ImplClass>
