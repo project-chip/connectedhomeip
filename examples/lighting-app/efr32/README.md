@@ -155,8 +155,8 @@ combination with JLinkRTTClient as follows:
 -   Once said connectection is established (you can verify that with the command
     `router table` using a serial terminal (screen / minicom etc.) on the board
     running the lighting-app example)
--   Using chip-tool you can now control the light status with on/off command such
-    as `chip-tool on <ipv6 address of the node> 11095 1`
+-   Using chip-tool you can now control the light status with on/off command
+    such as `chip-tool on <ipv6 address of the node> 11095 1`
 
 ### Notes
 
