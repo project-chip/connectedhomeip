@@ -56,8 +56,8 @@ static uint8_t sNumIpAddrs = DNS_MAX_ADDRS_PER_NAME;
 static ip_addr_t sIpAddrs[DNS_MAX_ADDRS_PER_NAME];
 #endif // INET_LWIP
 
-static const char * sHostname      = NULL;
-static const char * sDNSServerAddr = NULL;
+static const char * sHostname      = nullptr;
+static const char * sDNSServerAddr = nullptr;
 
 // clang-format off
 static ArgParser::HelpOptions gHelpOptions(TOOL_NAME,
@@ -69,7 +69,7 @@ static ArgParser::OptionSet * gToolOptionSets[] =
     &gNetworkOptions,
     &gFaultInjectionOptions,
     &gHelpOptions,
-    NULL
+    nullptr
 };
 // clang-format on
 

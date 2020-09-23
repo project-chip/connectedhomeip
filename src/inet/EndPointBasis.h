@@ -130,7 +130,7 @@ protected:
     void DeferredFree(chip::System::Object::ReleaseDeferralErrorTactic aTactic);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    void InitEndPointBasis(InetLayer & aInetLayer, void * aAppState = NULL);
+    void InitEndPointBasis(InetLayer & aInetLayer, void * aAppState = nullptr);
 };
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK

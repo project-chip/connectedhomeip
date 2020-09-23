@@ -271,7 +271,7 @@ public:
      * callback in hand, false otherwise.
      */
 
-    inline bool isEmpty(void) { return (theLength == 0 && theWriteCallback == NULL); }
+    inline bool isEmpty(void) { return (theLength == 0 && theWriteCallback == nullptr); }
 
     // packing and parsing
 

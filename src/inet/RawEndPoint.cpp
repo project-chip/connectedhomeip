@@ -747,7 +747,8 @@ INET_ERROR RawEndPoint::SetICMPFilter(uint8_t numICMPTypes, const uint8_t * aICM
 
     VerifyOrExit(IPVer == kIPVersion_6, err = INET_ERROR_WRONG_ADDRESS_TYPE);
     VerifyOrExit(IPProto == kIPProtocol_ICMPv6, err = INET_ERROR_WRONG_PROTOCOL_TYPE);
-    VerifyOrExit((numICMPTypes == 0 && aICMPTypes == NULL) || (numICMPTypes != 0 && aICMPTypes != NULL), err = INET_ERROR_BAD_ARGS);
+    VerifyOrExit((numICMPTypes == 0 && aICMPTypes == nullptr) || (numICMPTypes != 0 && aICMPTypes != nullptr),
+                 err = INET_ERROR_BAD_ARGS);
 
     err = INET_NO_ERROR;
 
@@ -1108,7 +1109,7 @@ SocketEvents RawEndPoint::PrepareIO(void)
 
 void RawEndPoint::HandlePendingIO(void)
 {
-    if (mState == kState_Listening && OnMessageReceived != NULL && mPendingIO.IsReadable())
+    if (mState == kState_Listening && OnMessageReceived != nullptr && mPendingIO.IsReadable())
     {
         const uint16_t lPort = 0;
 

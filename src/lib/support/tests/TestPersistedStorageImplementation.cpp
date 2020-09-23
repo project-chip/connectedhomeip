@@ -46,7 +46,7 @@ using namespace chip::ArgParser;
 
 std::map<std::string, std::string> sPersistentStore;
 
-FILE * sPersistentStoreFile = NULL;
+FILE * sPersistentStoreFile = nullptr;
 
 namespace chip {
 namespace Platform {
@@ -67,13 +67,13 @@ static CHIP_ERROR GetCounterValueFromFile(const char * aKey, uint32_t & aValue)
 
     rewind(sPersistentStoreFile);
 
-    while (fgets(key, sizeof(key), sPersistentStoreFile) != NULL)
+    while (fgets(key, sizeof(key), sPersistentStoreFile) != nullptr)
     {
         RemoveEndOfLineSymbol(key);
 
         if (strcmp(key, aKey) == 0)
         {
-            if (fgets(value, sizeof(value), sPersistentStoreFile) == NULL)
+            if (fgets(value, sizeof(value), sPersistentStoreFile) == nullptr)
             {
                 err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
             }
@@ -107,7 +107,7 @@ static CHIP_ERROR SaveCounterValueToFile(const char * aKey, uint32_t aValue)
     rewind(sPersistentStoreFile);
 
     // Find the stored counter value location in the file.
-    while (fgets(key, sizeof(key), sPersistentStoreFile) != NULL)
+    while (fgets(key, sizeof(key), sPersistentStoreFile) != nullptr)
     {
         RemoveEndOfLineSymbol(key);
 
@@ -142,7 +142,7 @@ CHIP_ERROR Read(const char * aKey, uint32_t & aValue)
     CHIP_ERROR err = CHIP_NO_ERROR;
     std::map<std::string, std::string>::iterator it;
 
-    VerifyOrExit(aKey != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(aKey != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(strlen(aKey) <= CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH, err = CHIP_ERROR_INVALID_STRING_LENGTH);
 
     if (sPersistentStoreFile)
@@ -166,7 +166,7 @@ CHIP_ERROR Write(const char * aKey, uint32_t aValue)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(aKey != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(aKey != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(strlen(aKey) <= CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH, err = CHIP_ERROR_INVALID_STRING_LENGTH);
 
     if (sPersistentStoreFile)

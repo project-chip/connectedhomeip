@@ -84,7 +84,7 @@ char * IPAddress::ToString(char * buf, uint32_t bufSize) const
 bool IPAddress::FromString(const char * str, IPAddress & output)
 {
 #if INET_CONFIG_ENABLE_IPV4
-    if (strchr(str, ':') == NULL)
+    if (strchr(str, ':') == nullptr)
     {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5

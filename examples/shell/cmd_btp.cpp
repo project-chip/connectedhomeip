@@ -45,7 +45,7 @@ int cmd_btp_help_iterator(shell_command_t * command, void * arg)
 
 int cmd_btp_help(int argc, char ** argv)
 {
-    sShellDeviceSubcommands.ForEachCommand(cmd_btp_help_iterator, NULL);
+    sShellDeviceSubcommands.ForEachCommand(cmd_btp_help_iterator, nullptr);
     return 0;
 }
 

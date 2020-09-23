@@ -156,8 +156,8 @@ void TLVReader::Init(const uint8_t * data, uint32_t dataLen)
     SetContainerOpen(false);
 
     ImplicitProfileId = kProfileIdNotSpecified;
-    AppData           = NULL;
-    GetNextBuffer     = NULL;
+    AppData           = nullptr;
+    GetNextBuffer     = nullptr;
 }
 
 /**
@@ -182,8 +182,8 @@ void TLVReader::Init(PacketBuffer * buf, uint32_t maxLen)
     SetContainerOpen(false);
 
     ImplicitProfileId = kProfileIdNotSpecified;
-    AppData           = NULL;
-    GetNextBuffer     = NULL;
+    AppData           = nullptr;
+    GetNextBuffer     = nullptr;
 }
 
 /**
@@ -214,7 +214,7 @@ void TLVReader::Init(PacketBuffer * buf, uint32_t maxLen, bool allowDiscontiguou
     SetContainerOpen(false);
 
     ImplicitProfileId = kProfileIdNotSpecified;
-    AppData           = NULL;
+    AppData           = nullptr;
 
     if (allowDiscontiguousBuffers)
     {
@@ -222,7 +222,7 @@ void TLVReader::Init(PacketBuffer * buf, uint32_t maxLen, bool allowDiscontiguou
     }
     else
     {
-        GetNextBuffer = NULL;
+        GetNextBuffer = nullptr;
     }
 }
 
@@ -688,7 +688,7 @@ CHIP_ERROR TLVReader::DupBytes(uint8_t *& buf, uint32_t & dataLen)
         return CHIP_ERROR_WRONG_TLV_TYPE;
 
     buf = (uint8_t *) malloc(mElemLenOrVal);
-    if (buf == NULL)
+    if (buf == nullptr)
         return CHIP_ERROR_NO_MEMORY;
 
     CHIP_ERROR err = ReadData(buf, (uint32_t) mElemLenOrVal);
@@ -737,7 +737,7 @@ CHIP_ERROR TLVReader::DupString(char *& buf)
         return CHIP_ERROR_WRONG_TLV_TYPE;
 
     buf = (char *) malloc(mElemLenOrVal + 1);
-    if (buf == NULL)
+    if (buf == nullptr)
         return CHIP_ERROR_NO_MEMORY;
 
     CHIP_ERROR err = ReadData((uint8_t *) buf, (uint32_t) mElemLenOrVal);
@@ -1230,7 +1230,7 @@ CHIP_ERROR TLVReader::SkipData(void)
 
     if (TLVTypeHasLength(elemType))
     {
-        err = ReadData(NULL, mElemLenOrVal);
+        err = ReadData(nullptr, mElemLenOrVal);
         if (err != CHIP_NO_ERROR)
             return err;
     }
@@ -1464,7 +1464,7 @@ CHIP_ERROR TLVReader::ReadData(uint8_t * buf, uint32_t len)
         if (readLen > remainingLen)
             readLen = remainingLen;
 
-        if (buf != NULL)
+        if (buf != nullptr)
         {
             memcpy(buf, mReadPoint, readLen);
             buf += readLen;
@@ -1486,7 +1486,7 @@ CHIP_ERROR TLVReader::EnsureData(CHIP_ERROR noDataErr)
         if (mLenRead == mMaxLen)
             return noDataErr;
 
-        if (GetNextBuffer == NULL)
+        if (GetNextBuffer == nullptr)
             return noDataErr;
 
         uint32_t bufLen;
@@ -1559,16 +1559,16 @@ CHIP_ERROR TLVReader::GetNextPacketBuffer(TLVReader & reader, uintptr_t & bufHan
 {
     PacketBuffer *& buf = (PacketBuffer *&) bufHandle;
 
-    if (buf != NULL)
+    if (buf != nullptr)
         buf = buf->Next();
-    if (buf != NULL)
+    if (buf != nullptr)
     {
         bufStart = buf->Start();
         bufLen   = buf->DataLength();
     }
     else
     {
-        bufStart = NULL;
+        bufStart = nullptr;
         bufLen   = 0;
     }
 

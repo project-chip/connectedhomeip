@@ -153,7 +153,7 @@ CHIP_ERROR Iterate(const TLVReader & aReader, IterateHandler aHandler, void * aC
     TLVReader temp;
     CHIP_ERROR retval = CHIP_ERROR_NOT_IMPLEMENTED;
 
-    VerifyOrExit(aHandler != NULL, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(aHandler != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     temp.Init(aReader);
 
@@ -181,7 +181,7 @@ static CHIP_ERROR CountHandler(const TLVReader & aReader, size_t aDepth, void * 
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
-    VerifyOrExit(aContext != NULL, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(aContext != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     *static_cast<size_t *>(aContext) += 1;
 
@@ -264,7 +264,7 @@ static CHIP_ERROR FindHandler(const TLVReader & aReader, size_t aDepth, void * a
     const FindContext * theContext = static_cast<const FindContext *>(aContext);
     CHIP_ERROR retval              = CHIP_NO_ERROR;
 
-    VerifyOrExit(aContext != NULL, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(aContext != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     if (theContext->mTag == aReader.GetTag())
     {

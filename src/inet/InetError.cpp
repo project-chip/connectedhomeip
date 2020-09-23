@@ -38,7 +38,7 @@ namespace Inet {
  */
 void RegisterLayerErrorFormatter(void)
 {
-    static chip::ErrorFormatter sInetLayerErrorFormatter = { FormatLayerError, NULL };
+    static chip::ErrorFormatter sInetLayerErrorFormatter = { FormatLayerError, nullptr };
 
     RegisterErrorFormatter(&sInetLayerErrorFormatter);
 }
@@ -57,7 +57,7 @@ void RegisterLayerErrorFormatter(void)
  */
 bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err)
 {
-    const char * desc = NULL;
+    const char * desc = nullptr;
 
     if (err < INET_ERROR_MIN || err > INET_ERROR_MAX)
     {

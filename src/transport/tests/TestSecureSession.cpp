@@ -47,17 +47,17 @@ void SecureChannelInitTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
 
     // Test all combinations of invalid parameters
-    NL_TEST_ASSERT(inSuite, channel.Init(keypair, keypair2.Pubkey(), NULL, 0, NULL, 0) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, channel.Init(keypair, keypair2.Pubkey(), NULL, 10, NULL, 0) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, channel.Init(keypair, keypair2.Pubkey(), nullptr, 0, nullptr, 0) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, channel.Init(keypair, keypair2.Pubkey(), nullptr, 10, nullptr, 0) == CHIP_ERROR_INVALID_ARGUMENT);
 
     // Test the channel is successfully created with valid parameters
     const char * info = "Test Info";
     NL_TEST_ASSERT(inSuite,
-                   channel.Init(keypair, keypair2.Pubkey(), NULL, 0, (const uint8_t *) info, sizeof(info)) == CHIP_NO_ERROR);
+                   channel.Init(keypair, keypair2.Pubkey(), nullptr, 0, (const uint8_t *) info, sizeof(info)) == CHIP_NO_ERROR);
 
     // Test the channel cannot be reinitialized
     NL_TEST_ASSERT(inSuite,
-                   channel.Init(keypair, keypair2.Pubkey(), NULL, 0, (const uint8_t *) info, sizeof(info)) ==
+                   channel.Init(keypair, keypair2.Pubkey(), nullptr, 0, (const uint8_t *) info, sizeof(info)) ==
                        CHIP_ERROR_INCORRECT_STATE);
 
     // Test the channel can be initialized with valid salt
@@ -92,9 +92,9 @@ void SecureChannelEncryptTest(nlTestSuite * inSuite, void * inContext)
                                 sizeof(info)) == CHIP_NO_ERROR);
 
     // Test initialized channel, but invalid arguments
-    NL_TEST_ASSERT(inSuite, channel.Encrypt(NULL, 0, NULL, header) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, 0, NULL, header) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, sizeof(plain_text), NULL, header) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, channel.Encrypt(nullptr, 0, nullptr, header) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, 0, nullptr, header) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, sizeof(plain_text), nullptr, header) == CHIP_ERROR_INVALID_ARGUMENT);
 
     // Valid arguments
     NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, sizeof(plain_text), output, header) == CHIP_NO_ERROR);
@@ -131,9 +131,9 @@ void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
                                  sizeof(info)) == CHIP_NO_ERROR);
 
     // Channel initialized, but invalid arguments to decrypt
-    NL_TEST_ASSERT(inSuite, channel2.Decrypt(NULL, 0, NULL, header) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, channel2.Decrypt(encrypted, 0, NULL, header) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, channel2.Decrypt(encrypted, sizeof(encrypted), NULL, header) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, channel2.Decrypt(nullptr, 0, nullptr, header) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, channel2.Decrypt(encrypted, 0, nullptr, header) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, channel2.Decrypt(encrypted, sizeof(encrypted), nullptr, header) == CHIP_ERROR_INVALID_ARGUMENT);
 
     // Valid arguments
     NL_TEST_ASSERT(inSuite, channel2.Decrypt(encrypted, sizeof(plain_text), output, header) == CHIP_NO_ERROR);
@@ -162,8 +162,8 @@ static nlTestSuite sSuite =
 {
     "Test-CHIP-SecureChannel",
     &sTests[0],
-    NULL,
-    NULL
+    nullptr,
+    nullptr
 };
 // clang-format on
 
@@ -173,7 +173,7 @@ static nlTestSuite sSuite =
 int TestSecureSession()
 {
     // Run test suit against one context
-    nlTestRunner(&sSuite, NULL);
+    nlTestRunner(&sSuite, nullptr);
 
     return (nlTestRunnerStats(&sSuite));
 }

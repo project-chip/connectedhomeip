@@ -43,7 +43,7 @@ CHIP_ERROR ParseCompilerDateStr(const char * dateStr, uint16_t & year, uint8_t &
     monthStr[3] = 0;
 
     p = strstr(months, monthStr);
-    VerifyOrExit(p != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(p != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     month = ((p - months) / 3) + 1;
 
@@ -82,7 +82,7 @@ exit:
  */
 void RegisterDeviceLayerErrorFormatter(void)
 {
-    static ErrorFormatter sDeviceLayerErrorFormatter = { FormatDeviceLayerError, NULL };
+    static ErrorFormatter sDeviceLayerErrorFormatter = { FormatDeviceLayerError, nullptr };
 
     RegisterErrorFormatter(&sDeviceLayerErrorFormatter);
 }
@@ -101,7 +101,7 @@ void RegisterDeviceLayerErrorFormatter(void)
  */
 bool FormatDeviceLayerError(char * buf, uint16_t bufSize, int32_t err)
 {
-    const char * desc = NULL;
+    const char * desc = nullptr;
 
     if (err < CHIP_DEVICE_ERROR_MIN || err > CHIP_DEVICE_ERROR_MAX)
     {

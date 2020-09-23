@@ -33,7 +33,7 @@ namespace chip {
  */
 void RegisterCHIPLayerErrorFormatter(void)
 {
-    static ErrorFormatter sCHIPErrorFormatter = { FormatCHIPError, NULL };
+    static ErrorFormatter sCHIPErrorFormatter = { FormatCHIPError, nullptr };
 
     RegisterErrorFormatter(&sCHIPErrorFormatter);
 }
@@ -52,7 +52,7 @@ void RegisterCHIPLayerErrorFormatter(void)
  */
 bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
 {
-    const char * desc = NULL;
+    const char * desc = nullptr;
 
     if (err < CHIP_ERROR_MIN || err > CHIP_ERROR_MAX)
     {

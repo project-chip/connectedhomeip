@@ -100,12 +100,12 @@ static void CheckInetErrorStr(nlTestSuite * inSuite, void * inContext)
 
         // Assert that the error string contains the error number in hex.
         snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, err);
-        NL_TEST_ASSERT(inSuite, (strstr(errStr, expectedText) != NULL));
+        NL_TEST_ASSERT(inSuite, (strstr(errStr, expectedText) != nullptr));
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
         // Assert that the error string contains a description, which is signaled
         // by a presence of a colon proceeding the description.
-        NL_TEST_ASSERT(inSuite, (strchr(errStr, ':') != NULL));
+        NL_TEST_ASSERT(inSuite, (strchr(errStr, ':') != nullptr));
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
     }
 }
@@ -130,8 +130,8 @@ int TestInetErrorStr(void)
 	{
         "Inet-Error-Strings",
         &sTests[0],
-        NULL,
-        NULL
+        nullptr,
+        nullptr
     };
     // clang-format on
 

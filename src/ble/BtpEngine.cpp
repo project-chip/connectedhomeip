@@ -96,12 +96,12 @@ BLE_ERROR BtpEngine::Init(void * an_app_state, bool expect_first_ack)
 {
     mAppState              = an_app_state;
     mRxState               = kState_Idle;
-    mRxBuf                 = NULL;
+    mRxBuf                 = nullptr;
     mRxNewestUnackedSeqNum = 0;
     mRxOldestUnackedSeqNum = 0;
     mRxFragmentSize        = sDefaultFragmentSize;
     mTxState               = kState_Idle;
-    mTxBuf                 = NULL;
+    mTxBuf                 = nullptr;
     mTxFragmentSize        = sDefaultFragmentSize;
     mRxCharCount           = 0;
     mRxPacketCount         = 0;
@@ -265,7 +265,7 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(PacketBuffer * data, SequenceN
     uint8_t cursor           = 0;
     uint8_t * characteristic = data->Start();
 
-    VerifyOrExit(data != NULL, err = BLE_ERROR_BAD_ARGS);
+    VerifyOrExit(data != nullptr, err = BLE_ERROR_BAD_ARGS);
 
     mRxCharCount++;
 
@@ -303,7 +303,7 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(PacketBuffer * data, SequenceN
     {
         // Free stand-alone ack buffer.
         PacketBuffer::Free(data);
-        data = NULL;
+        data = nullptr;
 
         ExitNow();
     }
@@ -330,11 +330,11 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(PacketBuffer * data, SequenceN
         // Create a new buffer for use as the Rx re-assembly area.
         mRxBuf = PacketBuffer::New();
 
-        VerifyOrExit(mRxBuf != NULL, err = BLE_ERROR_NO_MEMORY);
+        VerifyOrExit(mRxBuf != nullptr, err = BLE_ERROR_NO_MEMORY);
 
         mRxBuf->AddToEnd(data);
         mRxBuf->CompactHead(); // will free 'data' and adjust rx buf's end/length
-        data = NULL;
+        data = nullptr;
     }
     else if (mRxState == kState_InProgress)
     {
@@ -349,11 +349,11 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(PacketBuffer * data, SequenceN
         data->SetStart(&(characteristic[cursor]));
         mRxBuf->AddToEnd(data);
         mRxBuf->CompactHead(); // will free 'data' and adjust rx buf's end/length
-        data = NULL;
+        data = nullptr;
 
         // For now, limit BtpEngine message size to max length of 1 pbuf, as we do for chip messages sent via IP.
         // TODO add support for BtpEngine messages longer than 1 pbuf
-        VerifyOrExit(mRxBuf->Next() == NULL, err = BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG);
+        VerifyOrExit(mRxBuf->Next() == nullptr, err = BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG);
     }
     else
     {
@@ -390,16 +390,16 @@ exit:
         {
             ChipLogError(Ble, "With rx'd ack = %u", receivedAck);
         }
-        if (mRxBuf != NULL)
+        if (mRxBuf != nullptr)
         {
             ChipLogError(Ble, "With rx buf data length = %u", mRxBuf->DataLength());
         }
         LogState();
 
-        if (data != NULL)
+        if (data != nullptr)
         {
             // Tack received data onto rx buffer, to be freed when end point resets protocol engine on close.
-            if (mRxBuf != NULL)
+            if (mRxBuf != nullptr)
             {
                 mRxBuf->AddToEnd(data);
             }
@@ -423,7 +423,7 @@ bool BtpEngine::ClearRxPacket()
     if (mRxState == kState_Complete)
     {
         mRxState = kState_Idle;
-        mRxBuf   = NULL;
+        mRxBuf   = nullptr;
         // do not reset mRxNextSeqNum
         return true;
     }
@@ -447,7 +447,7 @@ bool BtpEngine::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
 
     if (mTxState == kState_Idle)
     {
-        if (data == NULL)
+        if (data == nullptr)
         {
             return false;
         }
@@ -469,7 +469,7 @@ bool BtpEngine::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
             // handle error
             ChipLogError(Ble, "HandleCharacteristicSend: not enough headroom");
             mTxState = kState_Error;
-            mTxBuf   = NULL; // Avoid double-free after assignment above, as caller frees data on error.
+            mTxBuf   = nullptr; // Avoid double-free after assignment above, as caller frees data on error.
 
             return false;
         }
@@ -517,7 +517,7 @@ bool BtpEngine::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
     }
     else if (mTxState == kState_InProgress)
     {
-        if (data != NULL)
+        if (data != nullptr)
         {
             return false;
         }
@@ -585,7 +585,7 @@ bool BtpEngine::ClearTxPacket()
     if (mTxState == kState_Complete)
     {
         mTxState = kState_Idle;
-        mTxBuf   = NULL;
+        mTxBuf   = nullptr;
         // do not reset mTxNextSeqNum
         return true;
     }

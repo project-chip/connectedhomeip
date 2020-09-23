@@ -776,31 +776,31 @@ public:
         memset(&mSpake2pContext, 0, sizeof(mSpake2pContext));
     }
 
-    virtual ~Spake2p_P256_SHA256_HKDF_HMAC(void) { FreeImpl(); }
+    ~Spake2p_P256_SHA256_HKDF_HMAC(void) override { FreeImpl(); }
 
-    CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out);
+    CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out) override;
     CHIP_ERROR MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len, const uint8_t * in,
-                         size_t in_len);
-    CHIP_ERROR FELoad(const uint8_t * in, size_t in_len, void * fe);
-    CHIP_ERROR FEWrite(const void * fe, uint8_t * out, size_t out_len);
-    CHIP_ERROR FEGenerate(void * fe);
-    CHIP_ERROR FEMul(void * fer, const void * fe1, const void * fe2);
+                         size_t in_len) override;
+    CHIP_ERROR FELoad(const uint8_t * in, size_t in_len, void * fe) override;
+    CHIP_ERROR FEWrite(const void * fe, uint8_t * out, size_t out_len) override;
+    CHIP_ERROR FEGenerate(void * fe) override;
+    CHIP_ERROR FEMul(void * fer, const void * fe1, const void * fe2) override;
 
-    CHIP_ERROR PointLoad(const uint8_t * in, size_t in_len, void * R);
-    CHIP_ERROR PointWrite(const void * R, uint8_t * out, size_t out_len);
-    CHIP_ERROR PointMul(void * R, const void * P1, const void * fe1);
-    CHIP_ERROR PointAddMul(void * R, const void * P1, const void * fe1, const void * P2, const void * fe2);
-    CHIP_ERROR PointInvert(void * R);
-    CHIP_ERROR PointCofactorMul(void * R);
-    CHIP_ERROR PointIsValid(void * R);
-    CHIP_ERROR ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len);
+    CHIP_ERROR PointLoad(const uint8_t * in, size_t in_len, void * R) override;
+    CHIP_ERROR PointWrite(const void * R, uint8_t * out, size_t out_len) override;
+    CHIP_ERROR PointMul(void * R, const void * P1, const void * fe1) override;
+    CHIP_ERROR PointAddMul(void * R, const void * P1, const void * fe1, const void * P2, const void * fe2) override;
+    CHIP_ERROR PointInvert(void * R) override;
+    CHIP_ERROR PointCofactorMul(void * R) override;
+    CHIP_ERROR PointIsValid(void * R) override;
+    CHIP_ERROR ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len) override;
 
 protected:
-    CHIP_ERROR InitImpl();
-    CHIP_ERROR Hash(const uint8_t * in, size_t in_len);
-    CHIP_ERROR HashFinalize(uint8_t * out);
+    CHIP_ERROR InitImpl() override;
+    CHIP_ERROR Hash(const uint8_t * in, size_t in_len) override;
+    CHIP_ERROR HashFinalize(uint8_t * out) override;
     CHIP_ERROR KDF(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
-                   const uint8_t * info, const size_t info_length, uint8_t * out, size_t out_length);
+                   const uint8_t * info, const size_t info_length, uint8_t * out, size_t out_length) override;
 
 private:
     /**

@@ -443,7 +443,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intfI
     fcntl(mSocket, F_SETFL, flags | O_NONBLOCK);
 
     socklen_t sockaddrsize       = 0;
-    const sockaddr * sockaddrptr = NULL;
+    const sockaddr * sockaddrptr = nullptr;
 
     union
     {
@@ -494,7 +494,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intfI
     if (conRes == 0)
     {
         State = kState_Connected;
-        if (OnConnectComplete != NULL)
+        if (OnConnectComplete != nullptr)
             OnConnectComplete(this, INET_NO_ERROR);
     }
     else
@@ -544,7 +544,7 @@ void TCPEndPoint::TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, v
 {
     TCPEndPoint * tcpEndPoint = reinterpret_cast<TCPEndPoint *>(aAppState);
 
-    VerifyOrDie((aSystemLayer != NULL) && (tcpEndPoint != NULL));
+    VerifyOrDie((aSystemLayer != nullptr) && (tcpEndPoint != nullptr));
 
     // Close Connection as we have timed out and Connect has not returned to
     // stop this timer.
@@ -700,7 +700,7 @@ INET_ERROR TCPEndPoint::Send(PacketBuffer * data, bool push)
         return INET_ERROR_INCORRECT_STATE;
     }
 
-    if (mSendQueue == NULL)
+    if (mSendQueue == nullptr)
         mSendQueue = data;
     else
         mSendQueue->AddToEnd(data);
@@ -1036,14 +1036,14 @@ INET_ERROR TCPEndPoint::PutBackReceivedData(PacketBuffer * data)
 
 uint32_t TCPEndPoint::PendingSendLength()
 {
-    if (mSendQueue != NULL)
+    if (mSendQueue != nullptr)
         return mSendQueue->TotalLength();
     return 0;
 }
 
 uint32_t TCPEndPoint::PendingReceiveLength()
 {
-    if (mRcvQueue != NULL)
+    if (mRcvQueue != nullptr)
         return mRcvQueue->TotalLength();
     return 0;
 }
@@ -1073,12 +1073,12 @@ INET_ERROR TCPEndPoint::Close()
 {
     // Clear the receive queue.
     PacketBuffer::Free(mRcvQueue);
-    mRcvQueue = NULL;
+    mRcvQueue = nullptr;
 
     // Suppress closing callbacks, since the application explicitly called Close().
-    OnConnectionClosed = NULL;
-    OnPeerClose        = NULL;
-    OnConnectComplete  = NULL;
+    OnConnectionClosed = nullptr;
+    OnPeerClose        = nullptr;
+    OnConnectComplete  = nullptr;
 
     // Perform a graceful close.
     return DoClose(INET_NO_ERROR, true);
@@ -1087,9 +1087,9 @@ INET_ERROR TCPEndPoint::Close()
 void TCPEndPoint::Abort()
 {
     // Suppress closing callbacks, since the application explicitly called Abort().
-    OnConnectionClosed = NULL;
-    OnPeerClose        = NULL;
-    OnConnectComplete  = NULL;
+    OnConnectionClosed = nullptr;
+    OnPeerClose        = nullptr;
+    OnConnectComplete  = nullptr;
 
     DoClose(INET_ERROR_CONNECTION_ABORTED, true);
 }
@@ -1099,13 +1099,13 @@ void TCPEndPoint::Free()
     INET_ERROR err;
 
     // Ensure no callbacks to the app after this point.
-    OnAcceptError        = NULL;
-    OnConnectComplete    = NULL;
-    OnConnectionReceived = NULL;
-    OnConnectionClosed   = NULL;
-    OnPeerClose          = NULL;
-    OnDataReceived       = NULL;
-    OnDataSent           = NULL;
+    OnAcceptError        = nullptr;
+    OnConnectComplete    = nullptr;
+    OnConnectionReceived = nullptr;
+    OnConnectionClosed   = nullptr;
+    OnPeerClose          = nullptr;
+    OnDataReceived       = nullptr;
+    OnDataSent           = nullptr;
 
     // Ensure the end point is Closed or Closing.
     err = Close();
@@ -1287,7 +1287,7 @@ INET_ERROR TCPEndPoint::DriveSending()
         return err;
     });
 
-    while (mSendQueue != NULL)
+    while (mSendQueue != nullptr)
     {
         uint16_t bufLen = mSendQueue->DataLength();
 
@@ -1317,7 +1317,7 @@ INET_ERROR TCPEndPoint::DriveSending()
         else
             mSendQueue = PacketBuffer::FreeHead(mSendQueue);
 
-        if (OnDataSent != NULL)
+        if (OnDataSent != nullptr)
             OnDataSent(this, lenSent);
 
 #if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
@@ -1360,7 +1360,7 @@ INET_ERROR TCPEndPoint::DriveSending()
     if (err == INET_NO_ERROR)
     {
         // If we're in the SendShutdown state and the send queue is now empty, shutdown writing on the socket.
-        if (State == kState_SendShutdown && mSendQueue == NULL)
+        if (State == kState_SendShutdown && mSendQueue == nullptr)
         {
             if (shutdown(mSocket, SHUT_WR) != 0)
                 err = chip::System::MapErrorPOSIX(errno);
@@ -1381,16 +1381,16 @@ void TCPEndPoint::DriveReceiving()
 {
     // If there's data in the receive queue and the app is ready to receive it then call the app's callback
     // with the entire receive queue.
-    if (mRcvQueue != NULL && ReceiveEnabled && OnDataReceived != NULL)
+    if (mRcvQueue != nullptr && ReceiveEnabled && OnDataReceived != nullptr)
     {
         PacketBuffer * rcvQueue = mRcvQueue;
-        mRcvQueue               = NULL;
+        mRcvQueue               = nullptr;
         OnDataReceived(this, rcvQueue);
     }
 
     // If the connection is closing, and the receive queue is now empty, call DoClose() to complete
     // the process of closing the connection.
-    if (State == kState_Closing && mRcvQueue == NULL)
+    if (State == kState_Closing && mRcvQueue == nullptr)
         DoClose(INET_NO_ERROR, false);
 }
 
@@ -1406,7 +1406,7 @@ void TCPEndPoint::HandleConnectComplete(INET_ERROR err)
         MarkActive();
 
         State = kState_Connected;
-        if (OnConnectComplete != NULL)
+        if (OnConnectComplete != nullptr)
             OnConnectComplete(this, INET_NO_ERROR);
     }
 
@@ -1428,7 +1428,7 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
     // AND there is data waiting to be processed on either the send or receive queues
     // ... THEN enter the Closing state, allowing the queued data to drain,
     // ... OTHERWISE go straight to the Closed state.
-    if (IsConnected() && err == INET_NO_ERROR && (mSendQueue != NULL || mRcvQueue != NULL))
+    if (IsConnected() && err == INET_NO_ERROR && (mSendQueue != nullptr || mRcvQueue != nullptr))
         State = kState_Closing;
     else
         State = kState_Closed;
@@ -1518,7 +1518,7 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
         // If entering the Closed state
         // OR if entering the Closing state, and there's no unsent data in the send queue
         // THEN close the socket.
-        if (State == kState_Closed || (State == kState_Closing && mSendQueue == NULL))
+        if (State == kState_Closed || (State == kState_Closing && mSendQueue == nullptr))
         {
             chip::System::Layer & lSystemLayer = SystemLayer();
 
@@ -1556,21 +1556,21 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
     {
         // Clear clear the send and receive queues.
         PacketBuffer::Free(mSendQueue);
-        mSendQueue = NULL;
+        mSendQueue = nullptr;
         PacketBuffer::Free(mRcvQueue);
-        mRcvQueue = NULL;
+        mRcvQueue = nullptr;
 
         // Call the appropriate app callback if allowed.
         if (!suppressCallback)
         {
             if (oldState == kState_Connecting)
             {
-                if (OnConnectComplete != NULL)
+                if (OnConnectComplete != nullptr)
                     OnConnectComplete(this, err);
             }
             else if ((oldState == kState_Connected || oldState == kState_SendShutdown || oldState == kState_ReceiveShutdown ||
                       oldState == kState_Closing) &&
-                     OnConnectionClosed != NULL)
+                     OnConnectionClosed != nullptr)
                 OnConnectionClosed(this, err);
         }
 
@@ -1600,7 +1600,7 @@ void TCPEndPoint::TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void
 {
     TCPEndPoint * tcpEndPoint = reinterpret_cast<TCPEndPoint *>(aAppState);
 
-    VerifyOrDie((aSystemLayer != NULL) && (tcpEndPoint != NULL));
+    VerifyOrDie((aSystemLayer != nullptr) && (tcpEndPoint != nullptr));
 
     // Set the timer running flag to false
     tcpEndPoint->mUserTimeoutTimerRunning = false;
@@ -2257,14 +2257,14 @@ SocketEvents TCPEndPoint::PrepareIO()
     // If initiating a new connection...
     // OR if connected and there is data to be sent...
     // THEN arrange for the kernel to alert us when the socket is ready to be written.
-    if (State == kState_Connecting || (IsConnected() && mSendQueue != NULL))
+    if (State == kState_Connecting || (IsConnected() && mSendQueue != nullptr))
         ioType.SetWrite();
 
     // If listening for incoming connections and the app is ready to receive a connection...
     // OR if in a state where receiving is allowed, and the app is ready to receive data...
     // THEN arrange for the kernel to alert us when the socket is ready to be read.
-    if ((State == kState_Listening && OnConnectionReceived != NULL) ||
-        ((State == kState_Connected || State == kState_SendShutdown) && ReceiveEnabled && OnDataReceived != NULL))
+    if ((State == kState_Listening && OnConnectionReceived != nullptr) ||
+        ((State == kState_Connected || State == kState_SendShutdown) && ReceiveEnabled && OnDataReceived != nullptr))
         ioType.SetRead();
 
     return ioType;
@@ -2279,7 +2279,7 @@ void TCPEndPoint::HandlePendingIO()
     // ready to be received on the socket, process the incoming connection.
     if (State == kState_Listening)
     {
-        if (OnConnectionReceived != NULL && mPendingIO.IsReadable())
+        if (OnConnectionReceived != nullptr && mPendingIO.IsReadable())
             HandleIncomingConnection();
     }
 
@@ -2305,12 +2305,12 @@ void TCPEndPoint::HandlePendingIO()
     {
         // If in a state where sending is allowed, and there is data to be sent, and the socket is ready for
         // writing, drive outbound data into the connection.
-        if (IsConnected() && mSendQueue != NULL && mPendingIO.IsWriteable())
+        if (IsConnected() && mSendQueue != nullptr && mPendingIO.IsWriteable())
             DriveSending();
 
         // If in a state were receiving is allowed, and the app is ready to receive data, and data is ready
         // on the socket, receive inbound data from the connection.
-        if ((State == kState_Connected || State == kState_SendShutdown) && ReceiveEnabled && OnDataReceived != NULL &&
+        if ((State == kState_Connected || State == kState_SendShutdown) && ReceiveEnabled && OnDataReceived != nullptr &&
             mPendingIO.IsReadable())
             ReceiveData();
     }
@@ -2325,12 +2325,12 @@ void TCPEndPoint::ReceiveData()
     PacketBuffer * rcvBuf;
     bool isNewBuf = true;
 
-    if (mRcvQueue == NULL)
+    if (mRcvQueue == nullptr)
         rcvBuf = PacketBuffer::New(0);
     else
     {
         rcvBuf = mRcvQueue;
-        for (PacketBuffer * nextBuf = rcvBuf->Next(); nextBuf != NULL; rcvBuf = nextBuf, nextBuf = nextBuf->Next())
+        for (PacketBuffer * nextBuf = rcvBuf->Next(); nextBuf != nullptr; rcvBuf = nextBuf, nextBuf = nextBuf->Next())
             ;
 
         if (rcvBuf->AvailableDataLength() == 0)
@@ -2342,7 +2342,7 @@ void TCPEndPoint::ReceiveData()
         }
     }
 
-    if (rcvBuf == NULL)
+    if (rcvBuf == nullptr)
     {
         DoClose(INET_ERROR_NO_MEMORY, false);
         return;
@@ -2425,13 +2425,13 @@ void TCPEndPoint::ReceiveData()
             // the app to decide whether to keep the send side of the connection open after
             // the peer has closed. If no OnPeerClose is provided, we assume that the app
             // wants to close both directions and automatically enter the Closing state.
-            if (State == kState_Connected && OnPeerClose != NULL)
+            if (State == kState_Connected && OnPeerClose != nullptr)
                 State = kState_ReceiveShutdown;
             else
                 State = kState_Closing;
 
             // Call the app's OnPeerClose.
-            if (OnPeerClose != NULL)
+            if (OnPeerClose != nullptr)
                 OnPeerClose(this);
         }
 
@@ -2442,7 +2442,7 @@ void TCPEndPoint::ReceiveData()
             size_t newDataLength = rcvBuf->DataLength() + static_cast<size_t>(rcvLen);
             VerifyOrDie(CanCastTo<uint16_t>(newDataLength));
             rcvBuf->SetDataLength(static_cast<uint16_t>(newDataLength));
-            if (mRcvQueue == NULL)
+            if (mRcvQueue == nullptr)
                 mRcvQueue = rcvBuf;
             else
                 mRcvQueue->AddToEnd(rcvBuf);
@@ -2464,7 +2464,7 @@ void TCPEndPoint::ReceiveData()
 void TCPEndPoint::HandleIncomingConnection()
 {
     INET_ERROR err      = INET_NO_ERROR;
-    TCPEndPoint * conEP = NULL;
+    TCPEndPoint * conEP = nullptr;
     IPAddress peerAddr;
     uint16_t peerPort;
 
@@ -2483,7 +2483,7 @@ void TCPEndPoint::HandleIncomingConnection()
         err = chip::System::MapErrorPOSIX(errno);
 
     // If there's no callback available, fail with an error.
-    if (err == INET_NO_ERROR && OnConnectionReceived == NULL)
+    if (err == INET_NO_ERROR && OnConnectionReceived == nullptr)
         err = INET_ERROR_NO_CONNECTION_HANDLER;
 
     // Extract the peer's address information.
@@ -2535,13 +2535,13 @@ void TCPEndPoint::HandleIncomingConnection()
     {
         if (conSocket != -1)
             close(conSocket);
-        if (conEP != NULL)
+        if (conEP != nullptr)
         {
             if (conEP->State == kState_Connected)
                 conEP->Release();
             conEP->Release();
         }
-        if (OnAcceptError != NULL)
+        if (OnAcceptError != nullptr)
             OnAcceptError(this, err);
     }
 }

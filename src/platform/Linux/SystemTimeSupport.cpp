@@ -61,7 +61,7 @@ uint64_t GetClock_MonotonicHiRes(void)
 System::Error GetClock_RealTime(uint64_t & curTime)
 {
     struct timeval tv;
-    int res = gettimeofday(&tv, NULL);
+    int res = gettimeofday(&tv, nullptr);
     if (res != 0)
     {
         return MapErrorPOSIX(errno);
@@ -77,7 +77,7 @@ System::Error GetClock_RealTime(uint64_t & curTime)
 System::Error GetClock_RealTimeMS(uint64_t & curTime)
 {
     struct timeval tv;
-    int res = gettimeofday(&tv, NULL);
+    int res = gettimeofday(&tv, nullptr);
     if (res != 0)
     {
         return MapErrorPOSIX(errno);
@@ -95,7 +95,7 @@ System::Error SetClock_RealTime(uint64_t newCurTime)
     struct timeval tv;
     tv.tv_sec  = static_cast<time_t>(newCurTime / UINT64_C(1000000));
     tv.tv_usec = static_cast<long>(newCurTime % UINT64_C(1000000));
-    int res    = settimeofday(&tv, NULL);
+    int res    = settimeofday(&tv, nullptr);
     if (res != 0)
     {
         return (errno == EPERM) ? CHIP_SYSTEM_ERROR_ACCESS_DENIED : MapErrorPOSIX(errno);

@@ -72,7 +72,7 @@ class MonotonicallyIncreasingCounter : public Counter
 {
 public:
     MonotonicallyIncreasingCounter(void);
-    virtual ~MonotonicallyIncreasingCounter(void);
+    ~MonotonicallyIncreasingCounter(void) override;
 
     /**
      *  @brief

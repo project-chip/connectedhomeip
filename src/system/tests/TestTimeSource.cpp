@@ -83,11 +83,11 @@ static const nlTest sTests[] =
 int TestTimeSource(void)
 {
     nlTestSuite theSuite = {
-        "chip-timesource", &sTests[0], NULL /* setup */, NULL /* teardown */
+        "chip-timesource", &sTests[0], nullptr /* setup */, nullptr /* teardown */
     };
 
     // Run test suit againt one context.
-    nlTestRunner(&theSuite, NULL /* context */);
+    nlTestRunner(&theSuite, nullptr /* context */);
 
     return (nlTestRunnerStats(&theSuite));
 }

@@ -151,7 +151,7 @@ static void TestAES_CCM_256EncryptNilKey(nlTestSuite * inSuite, void * inContext
             uint8_t out_ct[vector->ct_len];
             uint8_t out_tag[vector->tag_len];
 
-            CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, NULL, 32, vector->iv,
+            CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, nullptr, 32, vector->iv,
                                              vector->iv_len, out_ct, out_tag, vector->tag_len);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
@@ -236,7 +236,7 @@ static void TestAES_CCM_256DecryptInvalidKey(nlTestSuite * inSuite, void * inCon
             numOfTestsRan++;
             uint8_t out_pt[vector->pt_len];
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
-                                             NULL, 32, vector->iv, vector->iv_len, out_pt);
+                                             nullptr, 32, vector->iv, vector->iv_len, out_pt);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -387,7 +387,7 @@ static void TestAES_CCM_128EncryptNilKey(nlTestSuite * inSuite, void * inContext
             uint8_t out_ct[vector->ct_len];
             uint8_t out_tag[vector->tag_len];
 
-            CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, NULL, 0, vector->iv,
+            CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, nullptr, 0, vector->iv,
                                              vector->iv_len, out_ct, out_tag, vector->tag_len);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
@@ -472,7 +472,7 @@ static void TestAES_CCM_128DecryptInvalidKey(nlTestSuite * inSuite, void * inCon
             numOfTestsRan++;
             uint8_t out_pt[vector->pt_len];
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
-                                             NULL, 0, vector->iv, vector->iv_len, out_pt);
+                                             nullptr, 0, vector->iv, vector->iv_len, out_pt);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -579,7 +579,7 @@ static void TestHKDF_SHA256(nlTestSuite * inSuite, void * inContext)
 static void TestDRBG_InvalidInputs(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    error            = DRBG_get_bytes(NULL, 10);
+    error            = DRBG_get_bytes(nullptr, 10);
     NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INVALID_ARGUMENT);
     error = CHIP_NO_ERROR;
     uint8_t buffer[5];
@@ -660,7 +660,7 @@ static void TestECDSA_SigningInvalidParams(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
-    CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(NULL, msg_length, signature);
+    CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(nullptr, msg_length, signature);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_ERROR_INVALID_ARGUMENT);
     signing_error = CHIP_NO_ERROR;
 
@@ -681,7 +681,7 @@ static void TestECDSA_ValidationInvalidParam(nlTestSuite * inSuite, void * inCon
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg((const uint8_t *) msg, msg_length, signature);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
 
-    CHIP_ERROR validation_error = keypair.Pubkey().ECDSA_validate_msg_signature(NULL, msg_length, signature);
+    CHIP_ERROR validation_error = keypair.Pubkey().ECDSA_validate_msg_signature(nullptr, msg_length, signature);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
     validation_error = CHIP_NO_ERROR;
 
@@ -725,7 +725,7 @@ static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
 #if CHIP_CRYPTO_OPENSSL
 static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
 {
-    CHIP_ERROR error = add_entropy_source(test_entropy_source, NULL, 10);
+    CHIP_ERROR error = add_entropy_source(test_entropy_source, nullptr, 10);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
     uint8_t buffer[5];
     NL_TEST_ASSERT(inSuite, DRBG_get_bytes(buffer, sizeof(buffer)) == CHIP_NO_ERROR);
@@ -735,7 +735,7 @@ static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
 #if CHIP_CRYPTO_MBEDTLS
 static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
 {
-    CHIP_ERROR error = add_entropy_source(test_entropy_source, NULL, 10);
+    CHIP_ERROR error = add_entropy_source(test_entropy_source, nullptr, 10);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
     uint8_t buffer[5];
     uint32_t test_entropy_source_call_count = gs_test_entropy_source_called;
@@ -831,7 +831,7 @@ static void TestSPAKE2P_spake2p_FEMul(nlTestSuite * inSuite, void * inContext)
         const struct spake2p_fe_mul_tv * vector = fe_mul_tvs[vectorIndex];
 
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
-        CHIP_ERROR err = spake2p.Init(NULL, 0);
+        CHIP_ERROR err = spake2p.Init(nullptr, 0);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = spake2p.FELoad(vector->fe1, vector->fe1_len, spake2p.w0);
@@ -864,7 +864,7 @@ static void TestSPAKE2P_spake2p_FELoadWrite(nlTestSuite * inSuite, void * inCont
         const struct spake2p_fe_rw_tv * vector = fe_rw_tvs[vectorIndex];
 
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
-        CHIP_ERROR err = spake2p.Init(NULL, 0);
+        CHIP_ERROR err = spake2p.Init(nullptr, 0);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = spake2p.FELoad(vector->fe_in, vector->fe_in_len, spake2p.w0);
@@ -891,7 +891,7 @@ static void TestSPAKE2P_spake2p_Mac(nlTestSuite * inSuite, void * inContext)
         const struct spake2p_hmac_tv * vector = hmac_tvs[vectorIndex];
 
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
-        CHIP_ERROR err = spake2p.Init(NULL, 0);
+        CHIP_ERROR err = spake2p.Init(nullptr, 0);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = spake2p.Mac(vector->key, vector->key_len, vector->input, vector->input_len, mac);
@@ -921,7 +921,7 @@ static void TestSPAKE2P_spake2p_PointMul(nlTestSuite * inSuite, void * inContext
         const struct spake2p_point_mul_tv * vector = point_mul_tvs[vectorIndex];
 
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
-        CHIP_ERROR err = spake2p.Init(NULL, 0);
+        CHIP_ERROR err = spake2p.Init(nullptr, 0);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = spake2p.PointLoad(vector->point, vector->point_len, spake2p.L);
@@ -957,7 +957,7 @@ static void TestSPAKE2P_spake2p_PointMulAdd(nlTestSuite * inSuite, void * inCont
         const struct spake2p_point_muladd_tv * vector = point_muladd_tvs[vectorIndex];
 
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
-        CHIP_ERROR err = spake2p.Init(NULL, 0);
+        CHIP_ERROR err = spake2p.Init(nullptr, 0);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = spake2p.PointLoad(vector->point1, vector->point1_len, spake2p.X);
@@ -999,7 +999,7 @@ static void TestSPAKE2P_spake2p_PointLoadWrite(nlTestSuite * inSuite, void * inC
         const struct spake2p_point_rw_tv * vector = point_rw_tvs[vectorIndex];
 
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
-        CHIP_ERROR err = spake2p.Init(NULL, 0);
+        CHIP_ERROR err = spake2p.Init(nullptr, 0);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = spake2p.PointLoad(vector->point, vector->point_len, spake2p.L);
@@ -1025,7 +1025,7 @@ static void TestSPAKE2P_spake2p_PointIsValid(nlTestSuite * inSuite, void * inCon
         const struct spake2p_point_valid_tv * vector = point_valid_tvs[vectorIndex];
 
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
-        CHIP_ERROR err = spake2p.Init(NULL, 0);
+        CHIP_ERROR err = spake2p.Init(nullptr, 0);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = spake2p.PointLoad(vector->point, vector->point_len, spake2p.L);
@@ -1057,7 +1057,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR FEGenerate(void * feout) { return FELoad(fe, fe_len, feout); }
+    CHIP_ERROR FEGenerate(void * feout) override { return FELoad(fe, fe_len, feout); }
 
 private:
     uint8_t fe[kMAX_FE_Length];
@@ -1266,14 +1266,14 @@ int TestCHIPCryptoPAL(void)
     {
         "CHIP Crypto PAL tests",
         &sTests[0],
-        NULL,
-        NULL
+        nullptr,
+        nullptr
     };
     // clang-format on
     // Run test suit againt one context.
-    nlTestRunner(&theSuite, NULL);
+    nlTestRunner(&theSuite, nullptr);
 
-    add_entropy_source(test_entropy_source, NULL, 16);
+    add_entropy_source(test_entropy_source, nullptr, 16);
     return (nlTestRunnerStats(&theSuite));
 }
 

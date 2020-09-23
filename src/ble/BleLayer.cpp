@@ -113,26 +113,26 @@ public:
             return (BLEEndPoint *) (sEndPointPool.Pool + (sizeof(BLEEndPoint) * i));
         }
 
-        return NULL;
+        return nullptr;
     }
 
     BLEEndPoint * Find(BLE_CONNECTION_OBJECT c)
     {
         if (c == BLE_CONNECTION_UNINITIALIZED)
         {
-            return NULL;
+            return nullptr;
         }
 
         for (int i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
         {
             BLEEndPoint * elem = Get(i);
-            if (elem->mBle != NULL && elem->mConnObj == c)
+            if (elem->mBle != nullptr && elem->mConnObj == c)
             {
                 return elem;
             }
         }
 
-        return NULL;
+        return nullptr;
     }
 
     BLEEndPoint * GetFree() const
@@ -140,12 +140,12 @@ public:
         for (int i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
         {
             BLEEndPoint * elem = Get(i);
-            if (elem->mBle == NULL)
+            if (elem->mBle == nullptr)
             {
                 return elem;
             }
         }
-        return NULL;
+        return nullptr;
     }
 };
 
@@ -170,7 +170,7 @@ void BleLayerObject::Release()
     mRefCount--;
     if (mRefCount == 0)
     {
-        mBle = NULL;
+        mBle = nullptr;
     }
 }
 
@@ -304,9 +304,9 @@ BLE_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleConnectionDe
 
     // It is totally valid to not have a connDelegate. In this case the client application
     // will take care of the connection steps.
-    VerifyOrExit(platformDelegate != NULL, err = BLE_ERROR_BAD_ARGS);
-    VerifyOrExit(appDelegate != NULL, err = BLE_ERROR_BAD_ARGS);
-    VerifyOrExit(systemLayer != NULL, err = BLE_ERROR_BAD_ARGS);
+    VerifyOrExit(platformDelegate != nullptr, err = BLE_ERROR_BAD_ARGS);
+    VerifyOrExit(appDelegate != nullptr, err = BLE_ERROR_BAD_ARGS);
+    VerifyOrExit(systemLayer != nullptr, err = BLE_ERROR_BAD_ARGS);
 
     if (mState != kState_NotInitialized)
     {
@@ -333,7 +333,7 @@ exit:
 BLE_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleApplicationDelegate * appDelegate,
                          chip::System::Layer * systemLayer)
 {
-    return Init(platformDelegate, NULL, appDelegate, systemLayer);
+    return Init(platformDelegate, nullptr, appDelegate, systemLayer);
 }
 
 BLE_ERROR BleLayer::Shutdown()
@@ -346,7 +346,7 @@ BLE_ERROR BleLayer::Shutdown()
         BLEEndPoint * elem = sBLEEndPointPool.Get(i);
 
         // If end point was initialized, and has not since been freed...
-        if (elem->mBle != NULL)
+        if (elem->mBle != nullptr)
         {
             // If end point hasn't already been closed...
             if (elem->mState != BLEEndPoint::kState_Closed)
@@ -387,7 +387,7 @@ exit:
 
 BLE_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose)
 {
-    *retEndPoint = NULL;
+    *retEndPoint = nullptr;
 
     if (mState != kState_Initialized)
     {
@@ -400,7 +400,7 @@ BLE_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OB
     }
 
     *retEndPoint = sBLEEndPointPool.GetFree();
-    if (*retEndPoint == NULL)
+    if (*retEndPoint == nullptr)
     {
         ChipLogError(Ble, "%s endpoint pool FULL", "Ble");
         return BLE_ERROR_NO_ENDPOINTS;
@@ -419,7 +419,7 @@ BLE_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OB
 BLE_ERROR BleLayer::HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT connObj, PacketBuffer * pBuf)
 {
     BLE_ERROR err             = BLE_NO_ERROR;
-    BLEEndPoint * newEndPoint = NULL;
+    BLEEndPoint * newEndPoint = nullptr;
 
     // Only BLE peripherals can receive GATT writes, so specify this role in our creation of the BLEEndPoint.
     // Set autoClose = false. Peripherals only notify the application when an end point releases a BLE connection.
@@ -429,18 +429,18 @@ BLE_ERROR BleLayer::HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT 
     newEndPoint->mAppState = mAppState;
 
     err  = newEndPoint->Receive(pBuf);
-    pBuf = NULL;
+    pBuf = nullptr;
     SuccessOrExit(err); // If we fail here, end point will have already released connection and freed itself.
 
 exit:
-    if (pBuf != NULL)
+    if (pBuf != nullptr)
     {
         PacketBuffer::Free(pBuf);
     }
 
     // If we failed to allocate a new end point, release underlying BLE connection. Central's handshake will time out
     // if the application decides to keep the BLE connection open.
-    if (newEndPoint == NULL)
+    if (newEndPoint == nullptr)
     {
         mApplicationDelegate->NotifyChipConnectionClosed(connObj);
     }
@@ -464,7 +464,7 @@ bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleU
 
     if (UUIDsMatch(&CHIP_BLE_CHAR_1_ID, charId))
     {
-        if (pBuf == NULL)
+        if (pBuf == nullptr)
         {
             ChipLogError(Ble, "rcvd null ble write");
             ExitNow();
@@ -473,10 +473,10 @@ bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleU
         // Find matching connection end point.
         BLEEndPoint * endPoint = sBLEEndPointPool.Find(connObj);
 
-        if (endPoint != NULL)
+        if (endPoint != nullptr)
         {
             BLE_ERROR status = endPoint->Receive(pBuf);
-            pBuf             = NULL;
+            pBuf             = nullptr;
             if (status != BLE_NO_ERROR)
             {
                 ChipLogError(Ble, "BLEEndPoint rcv failed, err = %d", status);
@@ -485,7 +485,7 @@ bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleU
         else
         {
             BLE_ERROR status = HandleBleTransportConnectionInitiated(connObj, pBuf);
-            pBuf             = NULL;
+            pBuf             = nullptr;
             if (status != BLE_NO_ERROR)
             {
                 ChipLogError(Ble, "failed handle new chip BLE connection, status = %d", status);
@@ -498,7 +498,7 @@ bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleU
     }
 
 exit:
-    if (pBuf != NULL)
+    if (pBuf != nullptr)
     {
         PacketBuffer::Free(pBuf);
     }
@@ -516,7 +516,7 @@ bool BleLayer::HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const Chi
 
     if (UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId))
     {
-        if (pBuf == NULL)
+        if (pBuf == nullptr)
         {
             ChipLogError(Ble, "rcvd null ble indication");
             ExitNow();
@@ -525,10 +525,10 @@ bool BleLayer::HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const Chi
         // find matching connection end point.
         BLEEndPoint * endPoint = sBLEEndPointPool.Find(connObj);
 
-        if (endPoint != NULL)
+        if (endPoint != nullptr)
         {
             BLE_ERROR status = endPoint->Receive(pBuf);
-            pBuf             = NULL;
+            pBuf             = nullptr;
             if (status != BLE_NO_ERROR)
             {
                 ChipLogError(Ble, "BLEEndPoint rcv failed, err = %d", status);
@@ -545,7 +545,7 @@ bool BleLayer::HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const Chi
     }
 
 exit:
-    if (pBuf != NULL)
+    if (pBuf != nullptr)
     {
         PacketBuffer::Free(pBuf);
     }
@@ -596,7 +596,7 @@ void BleLayer::HandleAckReceived(BLE_CONNECTION_OBJECT connObj)
     // find matching connection end point.
     BLEEndPoint * endPoint = sBLEEndPointPool.Find(connObj);
 
-    if (endPoint != NULL)
+    if (endPoint != nullptr)
     {
         BLE_ERROR status = endPoint->HandleGattSendConfirmationReceived();
 
@@ -623,7 +623,7 @@ bool BleLayer::HandleSubscribeReceived(BLE_CONNECTION_OBJECT connObj, const Chip
         // Find end point already associated with BLE connection, if any.
         BLEEndPoint * endPoint = sBLEEndPointPool.Find(connObj);
 
-        if (endPoint != NULL)
+        if (endPoint != nullptr)
         {
             endPoint->HandleSubscribeReceived();
         }
@@ -647,7 +647,7 @@ bool BleLayer::HandleSubscribeComplete(BLE_CONNECTION_OBJECT connObj, const Chip
     {
         BLEEndPoint * endPoint = sBLEEndPointPool.Find(connObj);
 
-        if (endPoint != NULL)
+        if (endPoint != nullptr)
         {
             endPoint->HandleSubscribeComplete();
         }
@@ -672,7 +672,7 @@ bool BleLayer::HandleUnsubscribeReceived(BLE_CONNECTION_OBJECT connObj, const Ch
         // Find end point already associated with BLE connection, if any.
         BLEEndPoint * endPoint = sBLEEndPointPool.Find(connObj);
 
-        if (endPoint != NULL)
+        if (endPoint != nullptr)
         {
             endPoint->DoClose(kBleCloseFlag_AbortTransmission, BLE_ERROR_CENTRAL_UNSUBSCRIBED);
         }
@@ -697,7 +697,7 @@ bool BleLayer::HandleUnsubscribeComplete(BLE_CONNECTION_OBJECT connObj, const Ch
         // Find end point already associated with BLE connection, if any.
         BLEEndPoint * endPoint = sBLEEndPointPool.Find(connObj);
 
-        if (endPoint != NULL)
+        if (endPoint != nullptr)
         {
             endPoint->HandleUnsubscribeComplete();
         }
@@ -715,7 +715,7 @@ void BleLayer::HandleConnectionError(BLE_CONNECTION_OBJECT connObj, BLE_ERROR er
     // BLE connection has failed somehow, we must find and abort matching connection end point.
     BLEEndPoint * endPoint = sBLEEndPointPool.Find(connObj);
 
-    if (endPoint != NULL)
+    if (endPoint != nullptr)
     {
         if (err == BLE_ERROR_GATT_UNSUBSCRIBE_FAILED && endPoint->IsUnsubscribePending())
         {

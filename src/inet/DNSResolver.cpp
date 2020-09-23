@@ -210,14 +210,14 @@ INET_ERROR DNSResolver::Resolve(const char * hostName, uint16_t hostNameLen, uin
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     struct addrinfo gaiHints;
-    struct addrinfo * gaiResults = NULL;
+    struct addrinfo * gaiResults = nullptr;
     int gaiReturnCode;
 
     // Configure the hints argument for getaddrinfo()
     InitAddrInfoHints(gaiHints);
 
     // Call getaddrinfo() to perform the name resolution.
-    gaiReturnCode = getaddrinfo(hostNameBuf, NULL, &gaiHints, &gaiResults);
+    gaiReturnCode = getaddrinfo(hostNameBuf, nullptr, &gaiHints, &gaiResults);
 
     // Process the return code and results list returned by getaddrinfo(). If the call
     // was successful this will copy the resultant addresses into the caller's array.
@@ -276,8 +276,8 @@ INET_ERROR DNSResolver::Cancel()
 
     InetLayer & inet = Layer();
 
-    OnComplete = NULL;
-    AppState   = NULL;
+    OnComplete = nullptr;
+    AppState   = nullptr;
     inet.mAsyncDNSResolver.Cancel(*this);
 
 #endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
@@ -486,7 +486,7 @@ INET_ERROR DNSResolver::ProcessGetAddrInfoResult(int returnCode, struct addrinfo
     }
 
     // Free the results structure.
-    if (results != NULL)
+    if (results != nullptr)
         freeaddrinfo(results);
 
     return err;
@@ -494,7 +494,7 @@ INET_ERROR DNSResolver::ProcessGetAddrInfoResult(int returnCode, struct addrinfo
 
 void DNSResolver::CopyAddresses(int family, uint8_t count, const struct addrinfo * addrs)
 {
-    for (const struct addrinfo * addr = addrs; addr != NULL && NumAddrs < MaxAddrs && count > 0; addr = addr->ai_next)
+    for (const struct addrinfo * addr = addrs; addr != nullptr && NumAddrs < MaxAddrs && count > 0; addr = addr->ai_next)
     {
         if (family == AF_UNSPEC || addr->ai_addr->sa_family == family)
         {
@@ -508,7 +508,7 @@ uint8_t DNSResolver::CountAddresses(int family, const struct addrinfo * addrs)
 {
     uint8_t count = 0;
 
-    for (const struct addrinfo * addr = addrs; addr != NULL && count < UINT8_MAX; addr = addr->ai_next)
+    for (const struct addrinfo * addr = addrs; addr != nullptr && count < UINT8_MAX; addr = addr->ai_next)
     {
         if (family == AF_UNSPEC || addr->ai_addr->sa_family == family)
         {

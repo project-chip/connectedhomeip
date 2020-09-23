@@ -204,7 +204,7 @@ inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_OnWiFiStationProvis
 template <class ImplClass>
 inline const char * GenericConnectivityManagerImpl_WiFi<ImplClass>::_WiFiAPModeToStr(ConnectivityManager::WiFiAPMode mode)
 {
-    return NULL;
+    return nullptr;
 }
 
 } // namespace Internal

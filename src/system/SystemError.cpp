@@ -104,7 +104,7 @@ namespace System {
  */
 void RegisterLayerErrorFormatter(void)
 {
-    static ErrorFormatter sSystemLayerErrorFormatter = { FormatLayerError, NULL };
+    static ErrorFormatter sSystemLayerErrorFormatter = { FormatLayerError, nullptr };
 
     RegisterErrorFormatter(&sSystemLayerErrorFormatter);
 }
@@ -123,7 +123,7 @@ void RegisterLayerErrorFormatter(void)
  */
 bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err)
 {
-    const char * desc = NULL;
+    const char * desc = nullptr;
 
     if (err < CHIP_SYSTEM_ERROR_MIN || err > CHIP_SYSTEM_ERROR_MAX)
     {
@@ -214,7 +214,7 @@ DLL_EXPORT bool IsErrorPOSIX(Error aError)
  */
 void RegisterPOSIXErrorFormatter(void)
 {
-    static ErrorFormatter sPOSIXErrorFormatter = { FormatPOSIXError, NULL };
+    static ErrorFormatter sPOSIXErrorFormatter = { FormatPOSIXError, nullptr };
 
     RegisterErrorFormatter(&sPOSIXErrorFormatter);
 }
