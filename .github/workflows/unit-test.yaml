@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Builds
+name: Unit Test
 
 on:
     push:
@@ -20,7 +20,7 @@ on:
 
 jobs:
     build:
-        name: Build
+        name: Unit Test
 
         strategy:
             matrix:
