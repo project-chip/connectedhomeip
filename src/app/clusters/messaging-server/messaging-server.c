@@ -31,8 +31,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************/
-/**
+/***************************************************************************
  * @file
  * @brief Routines for the Messaging Server plugin,
  *which implements the server side of the Messaging
