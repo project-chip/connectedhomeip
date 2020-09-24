@@ -877,6 +877,12 @@ typedef struct
  */
 #define EMBER_UNKNOWN_NODE_ID 0xFFFD
 
+/**
+ * @brief A distinguished network ID that will never be assigned
+ * to any node. Used to indicate the absence of a node ID.
+ */
+#define EMBER_NULL_NODE_ID 0xFFFF
+
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 enum EmberStatus
 #else
