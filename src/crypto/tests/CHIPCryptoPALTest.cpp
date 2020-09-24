@@ -537,7 +537,7 @@ static void TestHash_SHA256_Stream(nlTestSuite * inSuite, void * inContext)
         // Split data into 3 random streams.
         for (int i = 0; i < 2; ++i)
         {
-            size_t rand_data_length = rand() % (data_length + 1);
+            size_t rand_data_length = static_cast<unsigned int>(rand()) % (data_length + 1);
 
             error = sha256.AddData(data, rand_data_length);
             NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
@@ -645,7 +645,7 @@ static void TestECDSA_ValidationFailIncorrectSignature(nlTestSuite * inSuite, vo
     P256ECDSASignature signature;
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg((const uint8_t *) msg, msg_length, signature);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
-    signature[0] = ~signature[0]; // Flipping bits should invalidate the signature.
+    signature[0] = static_cast<uint8_t>(~signature[0]); // Flipping bits should invalidate the signature.
 
     CHIP_ERROR validation_error = keypair.Pubkey().ECDSA_validate_msg_signature((const uint8_t *) msg, msg_length, signature);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_SIGNATURE);
