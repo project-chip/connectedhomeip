@@ -88,7 +88,9 @@ ret_code_t ChipInit()
     NRF_LOG_INFO("Initializing OpenThread stack");
 
     // mbedtls_platform_set_calloc_free(ot_calloc, ot_free);
-
+    nrf_cc310_platform_abort_init();
+    nrf_cc310_platform_mutex_init();
+    mbedtls_platform_setup(NULL);
     // otHeapSetCAllocFree(ot_calloc, ot_free);
 
     otSysInit(0, NULL);
