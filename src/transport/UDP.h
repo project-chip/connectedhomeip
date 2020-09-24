@@ -20,7 +20,6 @@
  *    @file
  *      This file defines the CHIP Connection object that maintains a UDP connection.
  *      It binds to any avaiable local addr and port and begins listening.
- *      TODO This class should be extended to support TCP as well...
  *
  */
 
@@ -56,14 +55,6 @@ public:
         return *this;
     }
 
-    uint16_t GetMessageSendPort() const { return mMessageSendPort; }
-    UdpListenParameters & SetMessageSendPort(uint16_t port)
-    {
-        mMessageSendPort = port;
-
-        return *this;
-    }
-
     uint16_t GetListenPort() const { return mListenPort; }
     UdpListenParameters & SetListenPort(uint16_t port)
     {
@@ -83,7 +74,6 @@ public:
 private:
     Inet::InetLayer * mLayer         = nullptr;               ///< Associated inet layer
     Inet::IPAddressType mAddressType = kIPAddressType_IPv6;   ///< type of listening socket
-    uint16_t mMessageSendPort        = CHIP_PORT;             ///< over what port to send requests
     uint16_t mListenPort             = CHIP_PORT;             ///< UDP listen port
     InterfaceId mInterfaceId         = INET_NULL_INTERFACEID; ///< Interface to listen on
 };
@@ -102,7 +92,7 @@ class DLL_EXPORT UDP : public Base
     };
 
 public:
-    virtual ~UDP();
+    ~UDP() override;
 
     /**
      * Initialize a UDP transport on a given port.
@@ -132,7 +122,6 @@ private:
     Inet::UDPEndPoint * mUDPEndPoint     = nullptr;                                     ///< UDP socket used by the transport
     Inet::IPAddressType mUDPEndpointType = Inet::IPAddressType::kIPAddressType_Unknown; ///< Socket listening type
     State mState                         = State::kNotReady;                            ///< State of the UDP transport
-    uint16_t mSendPort                   = 0;                                           ///< Port where packets are sent by default
 };
 
 } // namespace Transport

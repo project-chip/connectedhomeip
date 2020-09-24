@@ -99,7 +99,7 @@ public:
     void SetStart(uint8_t * aNewStart);
 
     uint16_t DataLength(void) const;
-    void SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead = NULL);
+    void SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead = nullptr);
 
     uint16_t TotalLength(void) const;
 

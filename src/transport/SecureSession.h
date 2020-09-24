@@ -46,14 +46,16 @@ public:
      *   Derive a shared key. The derived key will be used for encryting/decrypting
      *   data exchanged on the secure channel.
      *
+     * @param local_keypair      A pointer to local ECP keypair
      * @param remote_public_key  A pointer to peer's public key
-     * @param local_private_key  A pointer to local private key
      * @param salt               A pointer to the initial salt used for deriving the keys
      * @param salt_length        Length of the initial salt
+     * @param info               A pointer to the initial info
+     * @param info_length        Length of the initial info
      * @return CHIP_ERROR        The result of key derivation
      */
-    CHIP_ERROR Init(const Crypto::ECPKey & remote_public_key, const Crypto::ECPKey & local_private_key, const uint8_t * salt,
-                    const size_t salt_length, const uint8_t * info, const size_t info_length);
+    CHIP_ERROR Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
+                    const uint8_t * salt, const size_t salt_length, const uint8_t * info, const size_t info_length);
 
     /**
      * @brief
@@ -64,6 +66,8 @@ public:
      * @param secret_length      Length of the shared secret
      * @param salt               A pointer to the initial salt used for deriving the keys
      * @param salt_length        Length of the initial salt
+     * @param info               A pointer to the initial info
+     * @param info_length        Length of the initial info
      * @return CHIP_ERROR        The result of key derivation
      */
     CHIP_ERROR InitFromSecret(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,

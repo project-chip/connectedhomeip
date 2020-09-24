@@ -16,17 +16,17 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/gn/chip/chip_test_suite.gni")
+import("${chip_root}/src/lwip/lwip.gni")
+import("${chip_root}/src/platform/device.gni")
 
 config("tests_config") {
   include_dirs = [ "." ]
 }
 
 chip_test_suite("tests") {
-  output_name = "libTestInetCommon"
+  output_name = "libInetLayerTests"
 
   sources = [
-    "TapAddrAutoconf.cpp",
-    "TapAddrAutoconf.h",
     "TestInetAddress.cpp",
     "TestInetCommon.cpp",
     "TestInetCommon.h",
@@ -37,9 +37,14 @@ chip_test_suite("tests") {
     "TestInetLayer.cpp",
     "TestInetLayer.h",
     "TestInetLayerCommon.cpp",
-    "TestInetLayerDNS.cpp",
-    "TestLwIPDNS.cpp",
   ]
+
+  if (lwip_platform == "standalone") {
+    sources += [
+      "TapAddrAutoconf.cpp",
+      "TapAddrAutoconf.h",
+    ]
+  }
 
   public_configs = [ ":tests_config" ]
 
@@ -52,7 +57,17 @@ chip_test_suite("tests") {
   tests = [
     "TestInetAddress",
     "TestInetErrorStr",
+    "TestInetEndPoint",
   ]
+
+  if (current_os != "mac" && chip_device_platform != "esp32") {
+    sources += [
+      "TestInetLayerDNS.cpp",
+      "TestInetLayerMulticast.cpp",
+      "TestLwIPDNS.cpp",
+    ]
+    tests += [ "TestInetLayerDNS" ]
+  }
 }
 
 # The following binaries should be executed by happy.

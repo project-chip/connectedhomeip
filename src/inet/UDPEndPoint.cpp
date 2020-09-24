@@ -718,7 +718,7 @@ exit:
  *
  * @param[in]   addrType    the protocol version of the IP address.
  *
- * @param[in]   intf        indicator of the network interface.
+ * @param[in]   intfId      indicator of the network interface.
  *
  * @retval  INET_NO_ERROR               success: endpoint bound to address
  * @retval  INET_NO_MEMORY              insufficient memory for endpoint
@@ -979,7 +979,7 @@ SocketEvents UDPEndPoint::PrepareIO(void)
 
 void UDPEndPoint::HandlePendingIO(void)
 {
-    if (mState == kState_Listening && OnMessageReceived != NULL && mPendingIO.IsReadable())
+    if (mState == kState_Listening && OnMessageReceived != nullptr && mPendingIO.IsReadable())
     {
         const uint16_t lPort = mBoundPort;
 

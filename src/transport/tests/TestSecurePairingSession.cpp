@@ -38,7 +38,7 @@ using namespace chip;
 class TestSecurePairingDelegate : public SecurePairingSessionDelegate
 {
 public:
-    virtual CHIP_ERROR SendMessage(System::PacketBuffer * msgBuf)
+    CHIP_ERROR SendMessage(System::PacketBuffer * msgBuf) override
     {
         mNumMessageSend++;
         if (peer != nullptr)
@@ -54,9 +54,9 @@ public:
         return mMessageSendError;
     }
 
-    virtual void OnPairingError(CHIP_ERROR error) { mNumPairingErrors++; }
+    void OnPairingError(CHIP_ERROR error) override { mNumPairingErrors++; }
 
-    virtual void OnPairingComplete() { mNumPairingComplete++; }
+    void OnPairingComplete() override { mNumPairingComplete++; }
 
     uint32_t mNumMessageSend     = 0;
     uint32_t mNumPairingErrors   = 0;
@@ -152,8 +152,8 @@ static nlTestSuite sSuite =
 {
     "Test-CHIP-SecurePairing",
     &sTests[0],
-    NULL,
-    NULL
+    nullptr,
+    nullptr
 };
 // clang-format on
 
@@ -163,15 +163,12 @@ static nlTestSuite sSuite =
 int TestSecurePairingSession()
 {
     // Run test suit against one context
-    nlTestRunner(&sSuite, NULL);
+    nlTestRunner(&sSuite, nullptr);
 
     return (nlTestRunnerStats(&sSuite));
 }
 
-static void __attribute__((constructor)) TestSecurePairingSessionCtor(void)
-{
-    VerifyOrDie(RegisterUnitTests(&TestSecurePairingSession) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestSecurePairingSession)
 
 namespace chip {
 namespace Logging {

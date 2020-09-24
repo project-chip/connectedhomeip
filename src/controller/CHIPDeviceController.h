@@ -48,7 +48,7 @@ typedef void (*CompleteHandler)(ChipDeviceController * deviceController, void * 
 typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err,
                              const IPPacketInfo * pktInfo);
 typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
-};
+}
 
 class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback, public RendezvousSessionDelegate
 {
@@ -98,10 +98,12 @@ public:
      * @param[in] onMessageReceived     Callback for when a message is received
      * @param[in] onError               Callback for when an error occurs
      * @param[in] devicePort            [Optional] The CHIP Device's port, defaults to CHIP_PORT
+     * @param[in] interfaceId           [Optional] The interface indicator to use
      * @return CHIP_ERROR           The connection status
      */
     CHIP_ERROR ConnectDevice(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState, NewConnectionHandler onConnected,
-                             MessageReceiveHandler onMessageReceived, ErrorHandler onError, uint16_t devicePort = CHIP_PORT);
+                             MessageReceiveHandler onMessageReceived, ErrorHandler onError, uint16_t devicePort = CHIP_PORT,
+                             Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
 
     /**
      * @brief
@@ -115,12 +117,14 @@ public:
      * @param[in] onMessageReceived     Callback for when a message is received
      * @param[in] onError               Callback for when an error occurs
      * @param[in] devicePort            [Optional] The CHIP Device's port, defaults to CHIP_PORT
+     * @param[in] interfaceId           [Optional] The interface indicator to use
      * @return CHIP_ERROR           The connection status
      */
     [[deprecated("Available until Rendezvous is implemented")]] CHIP_ERROR
     ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
                                       NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
-                                      ErrorHandler onError, uint16_t devicePort = CHIP_PORT);
+                                      ErrorHandler onError, uint16_t devicePort = CHIP_PORT,
+                                      Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
 
     /**
      * @brief
@@ -239,7 +243,8 @@ private:
 
     CHIP_ERROR ConnectDeviceUsingPairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
                                          NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
-                                         ErrorHandler onError, uint16_t devicePort, SecurePairingSession * pairing);
+                                         ErrorHandler onError, uint16_t devicePort, Inet::InterfaceId interfaceId,
+                                         SecurePairingSession * pairing);
 };
 
 } // namespace DeviceController

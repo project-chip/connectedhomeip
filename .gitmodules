@@ -33,7 +33,7 @@
 	url = https://github.com/nayuki/QR-Code-generator.git
 	branch = master
 	ignore = dirty
-	commit = 08ac806145aa6ab5d3e9df61d023092bb6cfe761
+	commit = 455e0b24272f164cfc1b2a1b47fe3903b821dc39
 [submodule "m5stack-tft"]
 	path = examples/common/m5stack-tft/repo
 	url = https://github.com/jeremyjh/ESP32_TFT_library.git
@@ -45,7 +45,7 @@
 	url = https://pigweed.googlesource.com/pigweed/pigweed
 	branch = master
 	ignore = dirty
-	commit = 133eb7dc55505fde3212a61a333cd2e83acfbac6
+	commit = fbd4a11583798365618375fd705fe1fd5c70ff9e
 [submodule "openthread"]
 	path = third_party/openthread/repo
 	url = https://github.com/openthread/openthread.git
@@ -57,13 +57,13 @@
 	url = https://github.com/openthread/ot-br-posix.git
 	branch = master
 	ignore = dirty
-	commit = ea9cd69aa2eed3f320f6a80a4d0b966959c19ff0
+	commit = 47ba8653be21ed4d1cc75b7eebd0047b1945a820
 [submodule "bluez"]
 	path = third_party/bluez/repo
 	url = git://git.kernel.org/pub/scm/bluetooth/bluez.git
 	branch = master
 	ignore = dirty
-	commit = 179ccb9362b7eb2d56412acdf9a281ba495f75b6
+	commit = 81bcf6a61b67c933c84011ce998e4dc10f267024
 [submodule "ot-commissioner"]
 	path = third_party/ot-commissioner/repo
 	url = https://github.com/openthread/ot-commissioner
@@ -82,3 +82,6 @@
 	branch = master
 	ignore = dirty
 	commit = 72102da049234815ba2c0184a7a13f1cb5ab4263
+[submodule "nanopb"]
+	path = third_party/nanopb/repo
+	url = https://github.com/nanopb/nanopb.git

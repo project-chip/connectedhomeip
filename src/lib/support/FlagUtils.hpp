@@ -39,13 +39,13 @@ inline bool GetFlag(const FlagsT & inFlags, const FlagT inFlag)
 template <typename FlagsT, typename FlagT>
 inline void ClearFlag(FlagsT & inFlags, const FlagT inFlag)
 {
-    inFlags &= ~static_cast<FlagsT>(inFlag);
+    inFlags &= static_cast<FlagsT>(~static_cast<FlagsT>(inFlag));
 }
 
 template <typename FlagsT, typename FlagT>
 inline void SetFlag(FlagsT & inFlags, const FlagT inFlag)
 {
-    inFlags |= static_cast<FlagsT>(inFlag);
+    inFlags = static_cast<FlagsT>(inFlags | static_cast<FlagsT>(inFlag));
 }
 
 template <typename FlagsT, typename FlagT>
@@ -61,6 +61,6 @@ inline void SetFlag(FlagsT & inFlags, const FlagT inFlag, const bool inValue)
     }
 }
 
-}; // namespace chip
+} // namespace chip
 
 #endif // CHIP_CHIP_SUPPORT_FLAGUTILS_HPP

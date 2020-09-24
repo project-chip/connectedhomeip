@@ -56,7 +56,7 @@ namespace Transport {
  * ~~~~~~~~~
  *
  * The intent of this is to allow applications to use any transport types without CHIP pre-defining
- * popular mappings (like UDP only, UDP and BLE, BLE only etc.) and without using #ifdefs to create
+ * popular mappings (like UDP only, UDP and BLE, BLE only etc.) and without using \#ifdefs to create
  * a single 'standard transport'.
  *
  * Transport logic:
@@ -88,6 +88,8 @@ public:
     }
 
     bool CanSendToPeer(const PeerAddress & address) override { return CanSendToPeerImpl<0>(address); }
+
+    void Disconnect(const PeerAddress & address) override { return DisconnectImpl<0>(address); }
 
     /**
      * Initialization method that forwards arguments for initialization to each of the underlying
@@ -128,6 +130,27 @@ private:
     {
         return false;
     }
+
+    /**
+     * Recursive disconnect implementation iterating through transport members.
+     *
+     * @tparam N the index of the underlying transport to send disconnect to
+     *
+     * @param address what address to check.
+     */
+    template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
+    void DisconnectImpl(const PeerAddress & address)
+    {
+        std::get<N>(mTransports).Disconnect(address);
+        DisconnectImpl<N + 1>(address);
+    }
+
+    /**
+     * DisconnectImpl template for out of range N.
+     */
+    template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
+    void DisconnectImpl(const PeerAddress & address)
+    {}
 
     /**
      * Recursive sendmessage implementation iterating through transport members.

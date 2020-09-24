@@ -23,6 +23,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <core/CHIPError.h>
+#include <inet/InetInterface.h>
 #include <support/CHIPLogging.h>
 
 enum ArgumentType
@@ -49,17 +50,23 @@ public:
     using PacketBuffer         = ::chip::System::PacketBuffer;
     using NodeId               = ::chip::NodeId;
 
+    struct AddressWithInterface
+    {
+        ::chip::Inet::IPAddress address;
+        ::chip::Inet::InterfaceId interfaceId;
+    };
+
     Command(const char * commandName) : mName(commandName) {}
 
-    const char * GetName(void) const { return mName; };
+    const char * GetName(void) const { return mName; }
     const char * GetAttribute(void) const;
     const char * GetArgumentName(size_t index) const;
-    size_t GetArgumentsCount(void) const { return mArgs.size(); };
+    size_t GetArgumentsCount(void) const { return mArgs.size(); }
 
     bool InitArguments(int argc, char * argv[]);
     size_t AddArgument(const char * name, const char * value);
     size_t AddArgument(const char * name, uint32_t min, uint32_t max, uint32_t * out);
-    size_t AddArgument(const char * name, IPAddress * out);
+    size_t AddArgument(const char * name, AddressWithInterface * out);
 
     virtual CHIP_ERROR Run(ChipDeviceController * dc, NodeId remoteId) = 0;
 

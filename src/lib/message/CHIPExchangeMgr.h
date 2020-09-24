@@ -163,9 +163,9 @@ public:
 #endif
 
     CHIP_ERROR SendMessage(uint32_t profileId, uint8_t msgType, PacketBuffer * msgPayload, uint16_t sendFlags = 0,
-                           void * msgCtxt = 0);
+                           void * msgCtxt = nullptr);
     CHIP_ERROR SendMessage(uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf, uint16_t sendFlags,
-                           ChipMessageInfo * msgInfo, void * msgCtxt = 0);
+                           ChipMessageInfo * msgInfo, void * msgCtxt = nullptr);
     CHIP_ERROR SendCommonNullMessage(void);
     CHIP_ERROR EncodeExchHeader(ChipExchangeHeader * exchangeHeader, uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf,
                                 uint16_t sendFlags);
@@ -388,15 +388,15 @@ public:
     size_t ExpireExchangeTimers(void);
 #endif
 
-    ExchangeContext * NewContext(const uint64_t & peerNodeId, void * appState = NULL);
-    ExchangeContext * NewContext(const uint64_t & peerNodeId, const IPAddress & peerAddr, void * appState = NULL);
+    ExchangeContext * NewContext(const uint64_t & peerNodeId, void * appState = nullptr);
+    ExchangeContext * NewContext(const uint64_t & peerNodeId, const IPAddress & peerAddr, void * appState = nullptr);
     ExchangeContext * NewContext(const uint64_t & peerNodeId, const IPAddress & peerAddr, uint16_t peerPort, InterfaceId sendIntfId,
-                                 void * appState = NULL);
-    ExchangeContext * NewContext(ChipConnection * con, void * appState = NULL);
+                                 void * appState = nullptr);
+    ExchangeContext * NewContext(ChipConnection * con, void * appState = nullptr);
 
     ExchangeContext * FindContext(uint64_t peerNodeId, ChipConnection * con, void * appState, bool isInitiator);
 
-    Binding * NewBinding(Binding::EventCallback eventCallback = Binding::DefaultEventHandler, void * appState = NULL);
+    Binding * NewBinding(Binding::EventCallback eventCallback = Binding::DefaultEventHandler, void * appState = nullptr);
 
     CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t profileId, ExchangeContext::MessageReceiveFunct handler, void * appState);
     CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t profileId, ExchangeContext::MessageReceiveFunct handler, bool allowDups,

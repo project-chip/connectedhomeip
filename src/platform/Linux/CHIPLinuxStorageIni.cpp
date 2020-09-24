@@ -271,7 +271,7 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobDataAndLengths(const char * key, ch
 CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobValue(const char * key, uint8_t * decodedData, size_t bufSize, size_t & decodedDataLen)
 {
     CHIP_ERROR retval  = CHIP_NO_ERROR;
-    char * encodedData = NULL;
+    char * encodedData = nullptr;
     size_t encodedDataLen;
     size_t expectedDecodedLen = 0;
 
@@ -287,10 +287,17 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobValue(const char * key, uint8_t * d
         }
     }
 
+    if (retval == CHIP_NO_ERROR && encodedDataLen > UINT16_MAX)
+    {
+        // We can't even pass this length into Base64Decode.
+        retval = CHIP_ERROR_DECODE_FAILED;
+    }
+
     // Decode it
     if (retval == CHIP_NO_ERROR)
     {
-        decodedDataLen = Base64Decode(encodedData, encodedDataLen, (uint8_t *) decodedData);
+        // Cast is safe because we checked encodedDataLen above.
+        decodedDataLen = Base64Decode(encodedData, static_cast<uint16_t>(encodedDataLen), (uint8_t *) decodedData);
         if (decodedDataLen == UINT16_MAX || decodedDataLen > expectedDecodedLen)
         {
             retval = CHIP_ERROR_DECODE_FAILED;
@@ -318,17 +325,15 @@ bool ChipLinuxStorageIni::HasValue(const char * key)
     {
         return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 CHIP_ERROR ChipLinuxStorageIni::AddEntry(const char * key, const char * value)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
-    if ((key != NULL) && (value != NULL))
+    if ((key != nullptr) && (value != nullptr))
     {
         std::map<std::string, std::string> & section = mConfigStore.sections["DEFAULT"];
         section[key]                                 = std::string(value);

@@ -65,7 +65,7 @@ public:
      */
     virtual void OnPairingComplete() {}
 
-    virtual ~SecurePairingSessionDelegate() {}
+    ~SecurePairingSessionDelegate() override {}
 };
 
 class DLL_EXPORT SecurePairingSession
@@ -142,7 +142,7 @@ public:
      *
      * @return Optional<NodeId> The associated peer NodeId
      */
-    NodeId GetPeerNodeId() const { return mPeerNodeId.Value(); };
+    NodeId GetPeerNodeId() const { return mPeerNodeId.Value(); }
 
     /**
      * @brief
@@ -150,7 +150,7 @@ public:
      *
      * @return uint16_t The associated peer key id
      */
-    uint16_t GetPeerKeyId() { return mPeerKeyId; };
+    uint16_t GetPeerKeyId() { return mPeerKeyId; }
 
     /**
      * @brief
@@ -158,7 +158,7 @@ public:
      *
      * @return uint16_t The assocated local key id
      */
-    uint16_t GetLocalKeyId() { return mLocalKeyId; };
+    uint16_t GetLocalKeyId() { return mLocalKeyId; }
 
 private:
     CHIP_ERROR Init(uint32_t setupCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen, Optional<NodeId> myNodeId,
@@ -225,7 +225,7 @@ public:
         mLocalKeyId = localKeyId;
     }
 
-    ~SecurePairingUsingTestSecret(void) {}
+    ~SecurePairingUsingTestSecret(void) override {}
 
     CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                               Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate)
@@ -239,7 +239,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session)
+    CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session) override
     {
         const char * secret = "Test secret for key derivation";
         size_t secretLen    = strlen(secret);

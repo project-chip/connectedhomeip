@@ -67,13 +67,13 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mConnectivityFlag            = 0;
     mWpaSupplicant.state         = GDBusWpaSupplicant::INIT;
     mWpaSupplicant.scanState     = GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
-    mWpaSupplicant.proxy         = NULL;
-    mWpaSupplicant.iface         = NULL;
-    mWpaSupplicant.interfacePath = NULL;
-    mWpaSupplicant.networkPath   = NULL;
+    mWpaSupplicant.proxy         = nullptr;
+    mWpaSupplicant.iface         = nullptr;
+    mWpaSupplicant.interfacePath = nullptr;
+    mWpaSupplicant.networkPath   = nullptr;
 
     wpa_fi_w1_wpa_supplicant1_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
-                                                kWpaSupplicantObjectPath, NULL, _OnWpaProxyReady, NULL);
+                                                kWpaSupplicantObjectPath, nullptr, _OnWpaProxyReady, nullptr);
 #endif
 
     SuccessOrExit(err);
@@ -108,7 +108,7 @@ bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
 bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
 {
     bool ret            = false;
-    const gchar * state = NULL;
+    const gchar * state = nullptr;
 
     if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
     {
@@ -138,16 +138,16 @@ bool ConnectivityManagerImpl::_CanStartWiFiScan()
 
 void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
-    GError * err                            = NULL;
+    GError * err                            = nullptr;
     WpaFiW1Wpa_supplicant1Interface * iface = wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus_finish(res, &err);
 
     if (mWpaSupplicant.iface)
     {
         g_object_unref(mWpaSupplicant.iface);
-        mWpaSupplicant.iface = NULL;
+        mWpaSupplicant.iface = nullptr;
     }
 
-    if (iface != NULL && err == NULL)
+    if (iface != nullptr && err == nullptr)
     {
         mWpaSupplicant.iface = iface;
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED;
@@ -161,13 +161,13 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object,
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_NOT_CONNECTED;
     }
 
-    if (err != NULL)
+    if (err != nullptr)
         g_error_free(err);
 }
 
 void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
-    GError * err = NULL;
+    GError * err = nullptr;
 
     gboolean result =
         wpa_fi_w1_wpa_supplicant1_call_get_interface_finish(mWpaSupplicant.proxy, &mWpaSupplicant.interfacePath, res, &err);
@@ -177,7 +177,8 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
         ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi interface: %s", mWpaSupplicant.interfacePath);
 
         wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
-                                                              mWpaSupplicant.interfacePath, NULL, _OnWpaInterfaceProxyReady, NULL);
+                                                              mWpaSupplicant.interfacePath, nullptr, _OnWpaInterfaceProxyReady,
+                                                              nullptr);
     }
     else
     {
@@ -189,11 +190,11 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
         if (mWpaSupplicant.interfacePath)
         {
             g_free(mWpaSupplicant.interfacePath);
-            mWpaSupplicant.interfacePath = NULL;
+            mWpaSupplicant.interfacePath = nullptr;
         }
     }
 
-    if (err != NULL)
+    if (err != nullptr)
         g_error_free(err);
 }
 
@@ -210,14 +211,15 @@ void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * prox
         ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi interface added: %s", mWpaSupplicant.interfacePath);
 
         wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
-                                                              mWpaSupplicant.interfacePath, NULL, _OnWpaInterfaceProxyReady, NULL);
+                                                              mWpaSupplicant.interfacePath, nullptr, _OnWpaInterfaceProxyReady,
+                                                              nullptr);
     }
 }
 
 void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
                                                      gpointer user_data)
 {
-    if (mWpaSupplicant.interfacePath == NULL)
+    if (mWpaSupplicant.interfacePath == nullptr)
         return;
 
     if (g_strcmp0(mWpaSupplicant.interfacePath, path) == 0)
@@ -229,13 +231,13 @@ void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * pr
         if (mWpaSupplicant.interfacePath)
         {
             g_free(mWpaSupplicant.interfacePath);
-            mWpaSupplicant.interfacePath = NULL;
+            mWpaSupplicant.interfacePath = nullptr;
         }
 
         if (mWpaSupplicant.iface)
         {
             g_object_unref(mWpaSupplicant.iface);
-            mWpaSupplicant.iface = NULL;
+            mWpaSupplicant.iface = nullptr;
         }
 
         mWpaSupplicant.scanState = GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
@@ -244,10 +246,10 @@ void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * pr
 
 void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
-    GError * err = NULL;
+    GError * err = nullptr;
 
     mWpaSupplicant.proxy = wpa_fi_w1_wpa_supplicant1_proxy_new_for_bus_finish(res, &err);
-    if (mWpaSupplicant.proxy != NULL && err == NULL)
+    if (mWpaSupplicant.proxy != nullptr && err == nullptr)
     {
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_CONNECTED;
         ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant proxy");
@@ -256,8 +258,8 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
 
         g_signal_connect(mWpaSupplicant.proxy, "interface-removed", G_CALLBACK(_OnWpaInterfaceRemoved), NULL);
 
-        wpa_fi_w1_wpa_supplicant1_call_get_interface(mWpaSupplicant.proxy, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME, NULL,
-                                                     _OnWpaInterfaceReady, NULL);
+        wpa_fi_w1_wpa_supplicant1_call_get_interface(mWpaSupplicant.proxy, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME, nullptr,
+                                                     _OnWpaInterfaceReady, nullptr);
     }
     else
     {
@@ -266,7 +268,7 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_NOT_CONNECTED;
     }
 
-    if (err != NULL)
+    if (err != nullptr)
         g_error_free(err);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA

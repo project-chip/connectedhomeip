@@ -198,12 +198,9 @@ static const nlTest sTests[] =
 
 int TestMessageHeader(void)
 {
-    nlTestSuite theSuite = { "Transport-MessageHeader", &sTests[0], NULL, NULL };
-    nlTestRunner(&theSuite, NULL);
+    nlTestSuite theSuite = { "Transport-MessageHeader", &sTests[0], nullptr, nullptr };
+    nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
 
-static void __attribute__((constructor)) TestMessageHeaderCtor(void)
-{
-    VerifyOrDie(RegisterUnitTests(&TestMessageHeader) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestMessageHeader)

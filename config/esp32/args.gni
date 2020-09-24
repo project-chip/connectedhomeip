@@ -26,8 +26,7 @@ chip_ble_project_config_include = ""
 mbedtls_target = "//mbedtls:mbedtls"
 lwip_platform = "external"
 
-chip_build_tests = false
-chip_inet_config_enable_raw_endpoint = false
+chip_build_tests = true
 chip_inet_config_enable_dns_resolver = false
 
 #Enabling this causes some error

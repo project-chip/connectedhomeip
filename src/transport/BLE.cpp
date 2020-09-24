@@ -50,17 +50,25 @@ CHIP_ERROR BLE::Init(RendezvousSessionDelegate * delegate, const RendezvousParam
     VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(bleLayer, err = CHIP_ERROR_INCORRECT_STATE);
 
-    if (params.HasDiscriminator())
-    {
-        err = DelegateConnection(bleLayer, params.GetDiscriminator());
-        SuccessOrExit(err);
-    }
-
     mDelegate = delegate;
 
     mBleLayer                           = bleLayer;
     mBleLayer->mAppState                = reinterpret_cast<void *>(this);
     mBleLayer->OnChipBleConnectReceived = OnNewConnection;
+
+    if (params.HasDiscriminator())
+    {
+        err = DelegateConnection(params.GetDiscriminator());
+    }
+    else if (params.HasConnectionObject())
+    {
+        err = InitInternal(params.GetConnectionObject());
+    }
+    else
+    {
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SuccessOrExit(err);
 
 exit:
     return err;
@@ -113,12 +121,12 @@ void BLE::SetupEvents(Ble::BLEEndPoint * endPoint)
     endPoint->OnConnectionClosed = OnBleEndPointConnectionClosed;
 }
 
-CHIP_ERROR BLE::DelegateConnection(Ble::BleLayer * bleLayer, const uint16_t connDiscriminator)
+CHIP_ERROR BLE::DelegateConnection(const uint16_t connDiscriminator)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = bleLayer->NewBleConnection(reinterpret_cast<void *>(this), connDiscriminator, OnBleConnectionComplete,
-                                     OnBleConnectionError);
+    err = mBleLayer->NewBleConnection(reinterpret_cast<void *>(this), connDiscriminator, OnBleConnectionComplete,
+                                      OnBleConnectionError);
     SuccessOrExit(err);
 
 exit:
@@ -127,18 +135,28 @@ exit:
 
 CHIP_ERROR BLE::SendMessage(const MessageHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgBuf)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    const size_t headerSize = header.EncodeSizeBytes();
+    size_t actualEncodedHeaderSize;
 
     VerifyOrExit(address.GetTransportType() == Type::kBle, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mBleEndPoint != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
+
+    msgBuf->SetStart(msgBuf->Start() - headerSize);
+
+    err = header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize);
+    SuccessOrExit(err);
+
+    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
     err    = mBleEndPoint->Send(msgBuf);
     msgBuf = nullptr;
     SuccessOrExit(err);
 
 exit:
-    if (msgBuf != NULL)
+    if (msgBuf != nullptr)
     {
         System::PacketBuffer::Free(msgBuf);
         msgBuf = nullptr;

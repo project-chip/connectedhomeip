@@ -36,6 +36,11 @@
 #include <stdarg.h>
 #include <stdint.h>
 
+// Doxygen is confused by the __attribute__ annotation
+#ifndef DOXYGEN
+#define NO_INLINE __attribute__((noinline))
+#endif // DOXYGEN
+
 namespace chip {
 namespace TLV {
 
@@ -162,7 +167,7 @@ using namespace chip::Encoding;
  * @param[in]   maxLen  The maximum number of bytes that should be written to the output buffer.
  *
  */
-__attribute__((noinline)) void TLVWriter::Init(uint8_t * buf, uint32_t maxLen)
+NO_INLINE void TLVWriter::Init(uint8_t * buf, uint32_t maxLen)
 {
     mBufHandle = 0;
     mBufStart = mWritePoint = buf;
@@ -174,8 +179,8 @@ __attribute__((noinline)) void TLVWriter::Init(uint8_t * buf, uint32_t maxLen)
     SetCloseContainerReserved(true);
 
     ImplicitProfileId = kProfileIdNotSpecified;
-    GetNewBuffer      = NULL;
-    FinalizeBuffer    = NULL;
+    GetNewBuffer      = nullptr;
+    FinalizeBuffer    = nullptr;
 }
 
 /**
@@ -205,7 +210,7 @@ void TLVWriter::Init(PacketBuffer * buf, uint32_t maxLen)
     SetCloseContainerReserved(true);
 
     ImplicitProfileId = kProfileIdNotSpecified;
-    GetNewBuffer      = NULL;
+    GetNewBuffer      = nullptr;
     FinalizeBuffer    = FinalizePacketBuffer;
 }
 
@@ -240,7 +245,7 @@ void TLVWriter::Init(PacketBuffer * buf, uint32_t maxLen, bool allowDiscontiguou
     }
     else
     {
-        GetNewBuffer = NULL;
+        GetNewBuffer = nullptr;
     }
 }
 
@@ -274,7 +279,7 @@ CHIP_ERROR TLVWriter::Finalize()
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (IsContainerOpen())
         return CHIP_ERROR_TLV_CONTAINER_OPEN;
-    if (FinalizeBuffer != NULL)
+    if (FinalizeBuffer != nullptr)
         err = FinalizeBuffer(*this, mBufHandle, mBufStart, mWritePoint - mBufStart);
     return err;
 }
@@ -375,8 +380,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, uint8_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_UInt8, tag, v);
-    else
-        return Put(tag, v);
+    return Put(tag, v);
 }
 
 /**
@@ -394,8 +398,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, uint16_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_UInt16, tag, v);
-    else
-        return Put(tag, v);
+    return Put(tag, v);
 }
 
 /**
@@ -413,8 +416,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, uint32_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_UInt32, tag, v);
-    else
-        return Put(tag, v);
+    return Put(tag, v);
 }
 
 /**
@@ -441,8 +443,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, uint64_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_UInt64, tag, v);
-    else
-        return Put(tag, v);
+    return Put(tag, v);
 }
 
 /**
@@ -510,8 +511,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_Int8, tag, v);
-    else
-        return Put(tag, v);
+    return Put(tag, v);
 }
 
 /**
@@ -529,8 +529,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int16_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_Int16, tag, v);
-    else
-        return Put(tag, v);
+    return Put(tag, v);
 }
 
 /**
@@ -548,8 +547,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int32_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_Int32, tag, v);
-    else
-        return Put(tag, v);
+    return Put(tag, v);
 }
 
 /**
@@ -576,8 +574,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int64_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_Int64, tag, v);
-    else
-        return Put(tag, v);
+    return Put(tag, v);
 }
 
 /**
@@ -863,7 +860,7 @@ CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char * fmt, va_list ap)
 #endif
     va_copy(aq, ap);
 
-    dataLen = vsnprintf(NULL, 0, fmt, aq);
+    dataLen = vsnprintf(nullptr, 0, fmt, aq);
 
     va_end(aq);
 
@@ -938,7 +935,7 @@ CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char * fmt, va_list ap)
 #elif HAVE_MALLOC
 
     tmpBuf = static_cast<char *>(malloc(dataLen + 1));
-    VerifyOrExit(tmpBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(tmpBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     va_copy(aq, ap);
 
@@ -1282,7 +1279,7 @@ CHIP_ERROR TLVWriter::CloseContainer(TLVWriter & containerWriter)
     SetContainerOpen(false);
 
     // Reset the container writer so that it can't accidentally be used again.
-    containerWriter.Init((uint8_t *) NULL, 0);
+    containerWriter.Init((uint8_t *) nullptr, 0);
 
     return WriteElementHead(kTLVElementType_EndOfContainer, AnonymousTag, 0);
 }
@@ -1767,8 +1764,7 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
         mLenWritten += len;
         return CHIP_NO_ERROR;
     }
-    else
-        return WriteData(stagingBuf, p - stagingBuf);
+    return WriteData(stagingBuf, p - stagingBuf);
 }
 
 CHIP_ERROR TLVWriter::WriteElementWithData(TLVType type, uint64_t tag, const uint8_t * data, uint32_t dataLen)
@@ -1799,9 +1795,9 @@ CHIP_ERROR TLVWriter::WriteData(const uint8_t * p, uint32_t len)
     {
         if (mRemainingLen == 0)
         {
-            VerifyOrExit(GetNewBuffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+            VerifyOrExit(GetNewBuffer != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-            if (FinalizeBuffer != NULL)
+            if (FinalizeBuffer != nullptr)
             {
                 err = FinalizeBuffer(*this, mBufHandle, mBufStart, mWritePoint - mBufStart);
                 SuccessOrExit(err);
@@ -1850,14 +1846,14 @@ CHIP_ERROR TLVWriter::GetNewPacketBuffer(TLVWriter & writer, uintptr_t & bufHand
     PacketBuffer * buf = (PacketBuffer *) bufHandle;
 
     PacketBuffer * newBuf = buf->Next();
-    if (newBuf == NULL)
+    if (newBuf == nullptr)
     {
         newBuf = PacketBuffer::New(0);
-        if (newBuf != NULL)
+        if (newBuf != nullptr)
             buf->AddToEnd(newBuf);
     }
 
-    if (newBuf != NULL)
+    if (newBuf != nullptr)
     {
         bufHandle = (uintptr_t) newBuf;
         bufStart  = newBuf->Start();
@@ -1865,7 +1861,7 @@ CHIP_ERROR TLVWriter::GetNewPacketBuffer(TLVWriter & writer, uintptr_t & bufHand
     }
     else
     {
-        bufStart = NULL;
+        bufStart = nullptr;
         bufLen   = 0;
     }
 

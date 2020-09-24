@@ -27,8 +27,6 @@
 
 #include <ble/BleConfig.h>
 
-#if CONFIG_NETWORK_LAYER_BLE
-
 #include <utility>
 
 #include <ble/BleError.h>
@@ -61,7 +59,7 @@ class DLL_EXPORT BLE : public Base
     };
 
 public:
-    virtual ~BLE();
+    ~BLE() override;
 
     /**
      * Initialize a BLE transport to a given peripheral or a given device name.
@@ -83,7 +81,7 @@ public:
 
 private:
     CHIP_ERROR InitInternal(BLE_CONNECTION_OBJECT connObj);
-    CHIP_ERROR DelegateConnection(Ble::BleLayer * bleLayer, const uint16_t connDiscriminator);
+    CHIP_ERROR DelegateConnection(const uint16_t connDiscriminator);
     void SetupEvents(Ble::BLEEndPoint * endPoint);
 
     /**
@@ -113,7 +111,5 @@ private:
 
 } // namespace Transport
 } // namespace chip
-
-#endif // CONFIG_NETWORK_LAYER_BLE
 
 #endif // __TRANSPORT_BLE_H__

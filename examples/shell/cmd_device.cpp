@@ -47,7 +47,7 @@ int cmd_device_help_iterator(shell_command_t * command, void * arg)
 
 int cmd_device_help(int argc, char ** argv)
 {
-    sShellDeviceSubcommands.ForEachCommand(cmd_device_help_iterator, NULL);
+    sShellDeviceSubcommands.ForEachCommand(cmd_device_help_iterator, nullptr);
     return 0;
 }
 
@@ -167,7 +167,7 @@ static CHIP_ERROR ConfigGetDeviceCert(bool printHeader)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
-    uint8_t * certBuf = NULL;
+    uint8_t * certBuf = nullptr;
     size_t certLen;
 
     if (printHeader)
@@ -175,7 +175,7 @@ static CHIP_ERROR ConfigGetDeviceCert(bool printHeader)
         streamer_printf(sout, "DeviceCert:      ");
     }
     // Determine the length of the device certificate.
-    error = ConfigurationMgr().GetDeviceCertificate((uint8_t *) NULL, 0, certLen);
+    error = ConfigurationMgr().GetDeviceCertificate((uint8_t *) nullptr, 0, certLen);
     SuccessOrExit(error);
 
     // Fail if no certificate has been configured.
@@ -183,7 +183,7 @@ static CHIP_ERROR ConfigGetDeviceCert(bool printHeader)
 
     // Create a temporary buffer to hold the certificate.
     certBuf = (uint8_t *) MemoryAlloc(certLen);
-    VerifyOrExit(certBuf != NULL, error = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(certBuf != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
     // Read the certificate
     error = ConfigurationMgr().GetDeviceCertificate(certBuf, certLen, certLen);
@@ -192,7 +192,7 @@ static CHIP_ERROR ConfigGetDeviceCert(bool printHeader)
     streamer_print_hex(sout, const_cast<const uint8_t *>(certBuf), certLen);
 
 exit:
-    if (certBuf != NULL)
+    if (certBuf != nullptr)
     {
         MemoryFree(certBuf);
     }
@@ -203,7 +203,7 @@ static CHIP_ERROR ConfigGetDeviceCaCerts(bool printHeader)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
-    uint8_t * certBuf = NULL;
+    uint8_t * certBuf = nullptr;
     size_t certLen;
 
     if (printHeader)
@@ -211,7 +211,7 @@ static CHIP_ERROR ConfigGetDeviceCaCerts(bool printHeader)
         streamer_printf(sout, "DeviceCaCerts:   ");
     }
     // Determine the length of the device certificate.
-    error = ConfigurationMgr().GetDeviceIntermediateCACerts((uint8_t *) NULL, 0, certLen);
+    error = ConfigurationMgr().GetDeviceIntermediateCACerts((uint8_t *) nullptr, 0, certLen);
     SuccessOrExit(error);
 
     // Fail if no certificate has been configured.
@@ -219,7 +219,7 @@ static CHIP_ERROR ConfigGetDeviceCaCerts(bool printHeader)
 
     // Create a temporary buffer to hold the certificate.
     certBuf = (uint8_t *) MemoryAlloc(certLen);
-    VerifyOrExit(certBuf != NULL, error = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(certBuf != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
     // Read the certificate
     error = ConfigurationMgr().GetDeviceIntermediateCACerts(certBuf, certLen, certLen);
@@ -228,7 +228,7 @@ static CHIP_ERROR ConfigGetDeviceCaCerts(bool printHeader)
     streamer_print_hex(sout, const_cast<const uint8_t *>(certBuf), certLen);
 
 exit:
-    if (certBuf != NULL)
+    if (certBuf != nullptr)
     {
         MemoryFree(certBuf);
     }
@@ -256,7 +256,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCert(bool printHeader)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
-    uint8_t * certBuf = NULL;
+    uint8_t * certBuf = nullptr;
     size_t certLen;
 
     if (printHeader)
@@ -264,7 +264,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCert(bool printHeader)
         streamer_printf(sout, "MfrDeviceCert:   ");
     }
     // Determine the length of the device certificate.
-    error = ConfigurationMgr().GetManufacturerDeviceCertificate((uint8_t *) NULL, 0, certLen);
+    error = ConfigurationMgr().GetManufacturerDeviceCertificate((uint8_t *) nullptr, 0, certLen);
     SuccessOrExit(error);
 
     // Fail if no certificate has been configured.
@@ -272,7 +272,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCert(bool printHeader)
 
     // Create a temporary buffer to hold the certificate.
     certBuf = (uint8_t *) MemoryAlloc(certLen);
-    VerifyOrExit(certBuf != NULL, error = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(certBuf != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
     // Read the certificate
     error = ConfigurationMgr().GetManufacturerDeviceCertificate(certBuf, certLen, certLen);
@@ -281,7 +281,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCert(bool printHeader)
     streamer_print_hex(sout, const_cast<const uint8_t *>(certBuf), certLen);
 
 exit:
-    if (certBuf != NULL)
+    if (certBuf != nullptr)
     {
         MemoryFree(certBuf);
     }
@@ -292,7 +292,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCaCerts(bool printHeader)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
-    uint8_t * certBuf = NULL;
+    uint8_t * certBuf = nullptr;
     size_t certLen;
 
     if (printHeader)
@@ -300,7 +300,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCaCerts(bool printHeader)
         streamer_printf(sout, "MfgDeviceCaCerts:");
     }
     // Determine the length of the device certificate.
-    error = ConfigurationMgr().GetManufacturerDeviceIntermediateCACerts((uint8_t *) NULL, 0, certLen);
+    error = ConfigurationMgr().GetManufacturerDeviceIntermediateCACerts((uint8_t *) nullptr, 0, certLen);
     SuccessOrExit(error);
 
     // Fail if no certificate has been configured.
@@ -308,7 +308,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCaCerts(bool printHeader)
 
     // Create a temporary buffer to hold the certificate.
     certBuf = (uint8_t *) MemoryAlloc(certLen);
-    VerifyOrExit(certBuf != NULL, error = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(certBuf != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
     // Read the certificate
     error = ConfigurationMgr().GetManufacturerDeviceIntermediateCACerts(certBuf, certLen, certLen);
@@ -317,7 +317,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCaCerts(bool printHeader)
     streamer_print_hex(sout, const_cast<const uint8_t *>(certBuf), certLen);
 
 exit:
-    if (certBuf != NULL)
+    if (certBuf != nullptr)
     {
         MemoryFree(certBuf);
     }

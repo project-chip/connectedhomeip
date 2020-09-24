@@ -28,6 +28,8 @@
 #endif
 
 #include <core/CHIPError.h>
+#include <support/CodeUtils.h>
+
 #include <stddef.h>
 #include <string.h>
 
@@ -54,6 +56,7 @@ const size_t kP256_PublicKey_Length  = 65;
  */
 const size_t kMAX_Spake2p_Context_Size     = 1024;
 const size_t kMAX_Hash_SHA256_Context_Size = 256;
+const size_t kMAX_P256Keypair_Context_Size = 512;
 
 /**
  * Spake2+ parameters for P256
@@ -99,34 +102,169 @@ enum class SupportedECPKeyTypes : uint8_t
     ECP256R1 = 0,
 };
 
+template <typename Sig>
 class ECPKey
 {
 public:
     virtual SupportedECPKeyTypes Type() const = 0;
     virtual size_t Length() const             = 0;
     virtual operator uint8_t *() const        = 0;
+
+    virtual CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const Sig & signature) const
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 };
 
-class P256PrivateKey : public ECPKey
+template <size_t Cap>
+class CapacityBoundBuffer
 {
 public:
-    SupportedECPKeyTypes Type() const override { return SupportedECPKeyTypes::ECP256R1; }
-    size_t Length() const override { return kP256_PrivateKey_Length; }
-    operator uint8_t *() const override { return (uint8_t *) bytes; }
+    /** @brief Set current length of the buffer that's being used
+     * @return Returns error if new length is > capacity
+     **/
+    CHIP_ERROR SetLength(size_t len)
+    {
+        CHIP_ERROR error = CHIP_NO_ERROR;
+        VerifyOrExit(len <= sizeof(bytes), error = CHIP_ERROR_INVALID_ARGUMENT);
+        length = len;
+    exit:
+        return error;
+    }
+
+    /** @brief Returns current length of the buffer that's being used
+     * @return Returns 0 if SetLength() was never called
+     **/
+    size_t Length() const { return length; }
+
+    /** @brief Returns max capacity of the buffer
+     **/
+    size_t Capacity() const { return sizeof(bytes); }
+
+    /** @brief Returns buffer pointer
+     **/
+    operator uint8_t *() const { return (uint8_t *) bytes; }
 
 private:
-    uint8_t bytes[kP256_PrivateKey_Length];
+    uint8_t bytes[Cap];
+    size_t length = 0;
 };
 
-class P256PublicKey : public ECPKey
+typedef CapacityBoundBuffer<kMax_ECDSA_Signature_Length> P256ECDSASignature;
+
+typedef CapacityBoundBuffer<kMax_ECDH_Secret_Length> P256ECDHDerivedSecret;
+
+class P256PublicKey : public ECPKey<P256ECDSASignature>
 {
 public:
     SupportedECPKeyTypes Type() const override { return SupportedECPKeyTypes::ECP256R1; }
     size_t Length() const override { return kP256_PublicKey_Length; }
     operator uint8_t *() const override { return (uint8_t *) bytes; }
 
+    CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length,
+                                            const P256ECDSASignature & signature) const override;
+
 private:
     uint8_t bytes[kP256_PublicKey_Length];
+};
+
+template <typename PK, typename Secret, typename Sig>
+class ECPKeypair
+{
+public:
+    /** @brief Generate a new Certificate Signing Request (CSR).
+     * @param csr Newly generated CSR
+     * @param csr_length The caller provides the length of input buffer (csr). The function returns the actual length of generated
+     *CSR.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) = 0;
+
+    /**
+     * @brief A function to sign a msg using ECDSA
+     * @param msg Message that needs to be signed
+     * @param msg_length Length of message
+     * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
+     *represented as ASN.1 DER integers, plus the ASN.1 sequence Header
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, Sig & out_signature) = 0;
+
+    /** @brief A function to derive a shared secret using ECDH
+     * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
+     * ASN.1 DER encoded as padded big-endian field elements as described in SEC 1: Elliptic Curve Cryptography
+     * [https://www.secg.org/sec1-v2.pdf]
+     * @param out_secret Buffer to write out secret into. This is a byte array representing the x coordinate of the shared secret.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR ECDH_derive_secret(const PK & remote_public_key, Secret & out_secret) const = 0;
+
+    virtual const PK & Pubkey() = 0;
+};
+
+struct P256KeypairContext
+{
+    uint8_t mBytes[kMAX_P256Keypair_Context_Size];
+};
+
+typedef CapacityBoundBuffer<kP256_PublicKey_Length + kP256_PrivateKey_Length> P256SerializedKeypair;
+
+class P256Keypair : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
+{
+public:
+    P256Keypair() {}
+    ~P256Keypair();
+
+    /** @brief Initialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR Initialize();
+
+    /** @brief Serialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR Serialize(P256SerializedKeypair & output);
+
+    /** @brief Deserialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR Deserialize(P256SerializedKeypair & input);
+
+    /** @brief Generate a new Certificate Signing Request (CSR).
+     * @param csr Newly generated CSR
+     * @param csr_length The caller provides the length of input buffer (csr). The function returns the actual length of generated
+     *CSR.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) override;
+
+    /**
+     * @brief A function to sign a msg using ECDSA
+     * @param msg Message that needs to be signed
+     * @param msg_length Length of message
+     * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
+     *represented as ASN.1 DER integers, plus the ASN.1 sequence Header
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) override;
+
+    /** @brief A function to derive a shared secret using ECDH
+     * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
+     * ASN.1 DER encoded as padded big-endian field elements as described in SEC 1: Elliptic Curve Cryptography
+     * [https://www.secg.org/sec1-v2.pdf]
+     * @param out_secret Buffer to write out secret into. This is a byte array representing the x coordinate of the shared secret.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const override;
+
+    /** @brief Return public key for the keypair.
+     **/
+    const P256PublicKey & Pubkey() override { return mPublicKey; }
+
+private:
+    P256PublicKey mPublicKey;
+    P256KeypairContext mKeypair;
+    bool mInitialized = false;
 };
 
 /**
@@ -226,47 +364,6 @@ CHIP_ERROR HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const
  **/
 CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length);
 
-/**
- * @brief A function to sign a msg using ECDSA
- * @param msg Message that needs to be signed
- * @param msg_length Length of message
- * @param private_key Key to use to sign the message. Private keys are ASN.1 DER encoded as padded big-endian field elements as
- *described in SEC 1: Elliptic Curve Cryptography [https://www.secg.org/sec1-v2.pdf]
- * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s), represented
- *as ASN.1 DER integers, plus the ASN.1 sequence Header
- * @param out_signature_length Length of out buffer
- * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
- **/
-CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, const ECPKey & private_key, uint8_t * out_signature,
-                          size_t & out_signature_length);
-
-/**
- * @brief A function to sign a msg using ECDSA
- * @param msg Message that needs to be signed
- * @param msg_length Length of message
- * @param public_key Key to use to verify the message signature. Public keys are ASN.1 DER encoded as uncompressed points as
- *described in SEC 1: Elliptic Curve Cryptography [https://www.secg.org/sec1-v2.pdf]
- * @param signature Signature to use for verification. The signature consists of: 2 EC elements (r and s), represented as ASN.1 DER
- *integers, plus the ASN.1 sequence Header
- * @param signature_length Length of signature
- * @return Returns a CHIP_NO_ERROR on successful verification, a CHIP_ERROR otherwise
- **/
-CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const ECPKey & public_key,
-                                        const uint8_t * signature, const size_t signature_length);
-
-/** @brief A function to derive a shared secret using ECDH
- * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
- *ASN.1 DER encoded as padded big-endian field elements as described in SEC 1: Elliptic Curve Cryptography
- *[https://www.secg.org/sec1-v2.pdf]
- * @param local_private_key Local private key. local_private_key is ASN.1 DER encoded as padded big-endian field elements as
- *described in SEC 1: Elliptic Curve Cryptography [https://www.secg.org/sec1-v2.pdf]
- * @param out_secret Buffer to write out secret into. This is a byte array representing the x coordinate of the shared secret.
- * @param out_secret_length Length of out_secret
- * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
- **/
-CHIP_ERROR ECDH_derive_secret(const ECPKey & remote_public_key, const ECPKey & local_private_key, uint8_t * out_secret,
-                              size_t & out_secret_length);
-
 /** @brief Entropy callback function
  * @param data Callback-specific data pointer
  * @param output Output data to fill
@@ -297,22 +394,6 @@ CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t 
 CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen, unsigned int iteration_count,
                          uint32_t key_length, uint8_t * output);
 
-/** @brief Generate a new ECP keypair.
- * @param pubkey Generated public key
- * @param privkey Generated private key
- * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
- **/
-CHIP_ERROR NewECPKeypair(ECPKey & pubkey, ECPKey & privkey);
-
-/** @brief Generate a new Certificate Signing Request (CSR).
- * @param pubkey public key that'll be inserted in the CSR
- * @param privkey private key to sign the CSR
- * @param csr Newly generated CSR
- * @param csr_length The caller provides the length of input buffer (csr). The function returns the actual length of generated CSR.
- * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
- **/
-CHIP_ERROR NewCertificateSigningRequest(ECPKey & pubkey, ECPKey & privkey, uint8_t * csr, size_t & csr_length);
-
 /**
  * The below class implements the draft 01 version of the Spake2+ protocol as
  * defined in https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html.
@@ -338,7 +419,7 @@ class Spake2p
 {
 public:
     Spake2p(size_t fe_size, size_t point_size, size_t hash_size);
-    virtual ~Spake2p(void){};
+    virtual ~Spake2p(void) {}
 
     /**
      * @brief Initialize Spake2+ with some context specific information.
@@ -459,7 +540,7 @@ public:
      *
      *  @param fe  A pointer to an initialized implementation dependant field element.
      *
-     *  @requirements The implementation must generate a random element from [0, q) where q is the curve order.
+     *  @note The implementation must generate a random element from [0, q) where q is the curve order.
      *
      *  @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
@@ -472,7 +553,7 @@ public:
      *  @param fe1  A pointer to an initialized implementation dependant field element.
      *  @param fe2  A pointer to an initialized implementation dependant field element.
      *
-     *  @requirements The result must be a field element (i.e. reduced by the curve order).
+     *  @note The result must be a field element (i.e. reduced by the curve order).
      *
      *  @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
@@ -695,31 +776,31 @@ public:
         memset(&mSpake2pContext, 0, sizeof(mSpake2pContext));
     }
 
-    virtual ~Spake2p_P256_SHA256_HKDF_HMAC(void) { FreeImpl(); }
+    ~Spake2p_P256_SHA256_HKDF_HMAC(void) override { FreeImpl(); }
 
-    CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out);
+    CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out) override;
     CHIP_ERROR MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len, const uint8_t * in,
-                         size_t in_len);
-    CHIP_ERROR FELoad(const uint8_t * in, size_t in_len, void * fe);
-    CHIP_ERROR FEWrite(const void * fe, uint8_t * out, size_t out_len);
-    CHIP_ERROR FEGenerate(void * fe);
-    CHIP_ERROR FEMul(void * fer, const void * fe1, const void * fe2);
+                         size_t in_len) override;
+    CHIP_ERROR FELoad(const uint8_t * in, size_t in_len, void * fe) override;
+    CHIP_ERROR FEWrite(const void * fe, uint8_t * out, size_t out_len) override;
+    CHIP_ERROR FEGenerate(void * fe) override;
+    CHIP_ERROR FEMul(void * fer, const void * fe1, const void * fe2) override;
 
-    CHIP_ERROR PointLoad(const uint8_t * in, size_t in_len, void * R);
-    CHIP_ERROR PointWrite(const void * R, uint8_t * out, size_t out_len);
-    CHIP_ERROR PointMul(void * R, const void * P1, const void * fe1);
-    CHIP_ERROR PointAddMul(void * R, const void * P1, const void * fe1, const void * P2, const void * fe2);
-    CHIP_ERROR PointInvert(void * R);
-    CHIP_ERROR PointCofactorMul(void * R);
-    CHIP_ERROR PointIsValid(void * R);
-    CHIP_ERROR ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len);
+    CHIP_ERROR PointLoad(const uint8_t * in, size_t in_len, void * R) override;
+    CHIP_ERROR PointWrite(const void * R, uint8_t * out, size_t out_len) override;
+    CHIP_ERROR PointMul(void * R, const void * P1, const void * fe1) override;
+    CHIP_ERROR PointAddMul(void * R, const void * P1, const void * fe1, const void * P2, const void * fe2) override;
+    CHIP_ERROR PointInvert(void * R) override;
+    CHIP_ERROR PointCofactorMul(void * R) override;
+    CHIP_ERROR PointIsValid(void * R) override;
+    CHIP_ERROR ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len) override;
 
 protected:
-    CHIP_ERROR InitImpl();
-    CHIP_ERROR Hash(const uint8_t * in, size_t in_len);
-    CHIP_ERROR HashFinalize(uint8_t * out);
+    CHIP_ERROR InitImpl() override;
+    CHIP_ERROR Hash(const uint8_t * in, size_t in_len) override;
+    CHIP_ERROR HashFinalize(uint8_t * out) override;
     CHIP_ERROR KDF(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
-                   const uint8_t * info, const size_t info_length, uint8_t * out, size_t out_length);
+                   const uint8_t * info, const size_t info_length, uint8_t * out, size_t out_length) override;
 
 private:
     /**

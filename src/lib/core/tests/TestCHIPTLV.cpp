@@ -37,6 +37,7 @@
 
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
+#include <support/TestUtils.h>
 
 #include <string.h>
 
@@ -164,7 +165,7 @@ void ForEachElement(nlTestSuite * inSuite, TLVReader & reader, void * context,
         }
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        if (cb != NULL)
+        if (cb != nullptr)
         {
             cb(inSuite, reader, context);
         }
@@ -256,7 +257,7 @@ void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const
 
 void TestBufferContents(nlTestSuite * inSuite, PacketBuffer * buf, const uint8_t * expectedVal, uint32_t expectedLen)
 {
-    while (buf != NULL)
+    while (buf != nullptr)
     {
         uint16_t len = buf->DataLength();
         NL_TEST_ASSERT(inSuite, len <= expectedLen);
@@ -1562,7 +1563,7 @@ void CheckCHIPTLVUtilities(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, count == expectedCount);
 
     // Iterate
-    err = chip::TLV::Utilities::Iterate(reader, NullIterateHandler, NULL);
+    err = chip::TLV::Utilities::Iterate(reader, NullIterateHandler, nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_END_OF_TLV);
 }
 
@@ -2781,8 +2782,8 @@ void CheckCHIPTLVWriter(nlTestSuite * inSuite, void * inContext)
 void SkipNonContainer(nlTestSuite * inSuite)
 {
     TLVReader reader;
-    const uint8_t * readpoint1 = NULL;
-    const uint8_t * readpoint2 = NULL;
+    const uint8_t * readpoint1 = nullptr;
+    const uint8_t * readpoint2 = nullptr;
 
     reader.Init(Encoding1, sizeof(Encoding1));
     reader.ImplicitProfileId = TestProfile_2;
@@ -2802,8 +2803,8 @@ void SkipNonContainer(nlTestSuite * inSuite)
 void SkipContainer(nlTestSuite * inSuite)
 {
     TLVReader reader;
-    const uint8_t * readpoint1 = NULL;
-    const uint8_t * readpoint2 = NULL;
+    const uint8_t * readpoint1 = nullptr;
+    const uint8_t * readpoint2 = nullptr;
 
     reader.Init(Encoding1, sizeof(Encoding1));
     reader.ImplicitProfileId = TestProfile_2;
@@ -3081,7 +3082,7 @@ void TestCHIPTLVReader_NextOverContainer_ProcessElement(nlTestSuite * inSuite, T
         // Manually advance one of the readers to the element immediately after the container (if any).
         err = readerClone1.EnterContainer(outerContainerType);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        ForEachElement(inSuite, readerClone1, NULL, NULL);
+        ForEachElement(inSuite, readerClone1, nullptr, nullptr);
         err = readerClone1.ExitContainer(outerContainerType);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         nextRes1 = readerClone1.Next();
@@ -3108,7 +3109,7 @@ void TestCHIPTLVReader_NextOverContainer(nlTestSuite * inSuite)
     reader.Init(Encoding1, sizeof(Encoding1));
     reader.ImplicitProfileId = TestProfile_2;
 
-    ForEachElement(inSuite, reader, NULL, TestCHIPTLVReader_NextOverContainer_ProcessElement);
+    ForEachElement(inSuite, reader, nullptr, TestCHIPTLVReader_NextOverContainer_ProcessElement);
 }
 
 void TestCHIPTLVReader_SkipOverContainer_ProcessElement(nlTestSuite * inSuite, TLVReader & reader, void * context)
@@ -3126,7 +3127,7 @@ void TestCHIPTLVReader_SkipOverContainer_ProcessElement(nlTestSuite * inSuite, T
         // Manually advance one of the readers to immediately after the container.
         err = readerClone1.EnterContainer(outerContainerType);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        ForEachElement(inSuite, readerClone1, NULL, NULL);
+        ForEachElement(inSuite, readerClone1, nullptr, nullptr);
         err = readerClone1.ExitContainer(outerContainerType);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -3150,7 +3151,7 @@ void TestCHIPTLVReader_SkipOverContainer(nlTestSuite * inSuite)
     reader.Init(Encoding1, sizeof(Encoding1));
     reader.ImplicitProfileId = TestProfile_2;
 
-    ForEachElement(inSuite, reader, NULL, TestCHIPTLVReader_SkipOverContainer_ProcessElement);
+    ForEachElement(inSuite, reader, nullptr, TestCHIPTLVReader_SkipOverContainer_ProcessElement);
 }
 
 /**
@@ -3820,8 +3821,8 @@ int TestCHIPTLV(void)
     {
         "chip-tlv",
         &sTests[0],
-        NULL,
-        NULL
+        nullptr,
+        nullptr
     };
     // clang-format on
     TestTLVContext context;
@@ -3833,3 +3834,5 @@ int TestCHIPTLV(void)
 
     return (nlTestRunnerStats(&theSuite));
 }
+
+CHIP_REGISTER_TEST_SUITE(TestCHIPTLV)

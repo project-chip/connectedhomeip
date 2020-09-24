@@ -77,11 +77,11 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
   }
 
-  if (chip_build_tests) {
-    group("check") {
+  group("check") {
+    if (chip_link_tests) {
       deps = [
         "//src:tests_run",
-        "//src:happy_tests"
+        "//src:happy_tests",
       ]
     }
   }
@@ -222,18 +222,16 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
   }
 
-  if (chip_build_tests) {
-    group("check") {
-      deps = []
-      if (enable_host_clang_build) {
-        deps += [ ":check_host_clang" ]
-      }
-      if (enable_host_gcc_build) {
-        deps += [ ":check_host_gcc" ]
-      }
-      if (enable_host_gcc_mbedtls_build) {
-        deps += [ ":check_host_gcc_mbedtls" ]
-      }
+  group("check") {
+    deps = []
+    if (enable_host_clang_build) {
+      deps += [ ":check_host_clang" ]
+    }
+    if (enable_host_gcc_build) {
+      deps += [ ":check_host_gcc" ]
+    }
+    if (enable_host_gcc_mbedtls_build) {
+      deps += [ ":check_host_gcc_mbedtls" ]
     }
   }
 }

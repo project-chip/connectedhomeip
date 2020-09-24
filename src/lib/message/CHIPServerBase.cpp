@@ -67,7 +67,7 @@ bool ChipServerBase::EnforceAccessControl(ExchangeContext * ec, uint32_t msgProf
                                           const ChipMessageInfo * msgInfo, ChipServerDelegateBase * delegate)
 {
     // Reject all messages if the application hasn't specified a delegate object.
-    if (delegate == NULL)
+    if (delegate == nullptr)
     {
         ChipServerBase::SendStatusReport(ec, kChipProtocol_Common, Common::kStatus_InternalError, CHIP_NO_ERROR);
         return false;
@@ -85,24 +85,22 @@ bool ChipServerBase::EnforceAccessControl(ExchangeContext * ec, uint32_t msgProf
     }
 
     // Otherwise the message should not be accepted...
-    else
+    // Clear the 'Final' bit so that the following checks ignore it.
+    res &= ~ChipServerDelegateBase::kAccessControlResult_IsFinal;
+
+    // Send a standard response to the requester unless the delegate has already sent a response, or determined
+    // that no response should be sent.
+    if (res != ChipServerDelegateBase::kAccessControlResult_Rejected_RespSent &&
+        res != ChipServerDelegateBase::kAccessControlResult_Rejected_Silent)
     {
-        // Clear the 'Final' bit so that the following checks ignore it.
-        res &= ~ChipServerDelegateBase::kAccessControlResult_IsFinal;
+        uint16_t statusCode =
+            (msgInfo->PeerAuthMode == kChipAuthMode_None) ? Common::kStatus_AuthenticationRequired : Common::kStatus_AccessDenied;
 
-        // Send a standard response to the requester unless the delegate has already sent a response, or determined
-        // that no response should be sent.
-        if (res != ChipServerDelegateBase::kAccessControlResult_Rejected_RespSent &&
-            res != ChipServerDelegateBase::kAccessControlResult_Rejected_Silent)
-        {
-            uint16_t statusCode = (msgInfo->PeerAuthMode == kChipAuthMode_None) ? Common::kStatus_AuthenticationRequired
-                                                                                : Common::kStatus_AccessDenied;
-            ChipServerBase::SendStatusReport(ec, kChipProtocol_Common, statusCode, CHIP_NO_ERROR);
-        }
-
-        // Tell the caller the message should NOT be accepted.
-        return false;
+        ChipServerBase::SendStatusReport(ec, kChipProtocol_Common, statusCode, CHIP_NO_ERROR);
     }
+
+    // Tell the caller the message should NOT be accepted.
+    return false;
 }
 
 /**
@@ -158,8 +156,8 @@ CHIP_ERROR ChipServerBase::SendStatusReport(ExchangeContext * ec, uint32_t statu
                           // EndContainer (1)
 
     respBuf = PacketBuffer::NewWithAvailableSize(respLen);
-    VerifyOrExit(respBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
-    VerifyOrDie(ec != NULL);
+    VerifyOrExit(respBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrDie(ec != nullptr);
 
     p = respBuf->Start();
     LittleEndian::Write32(p, statusProfileId);
@@ -187,10 +185,10 @@ CHIP_ERROR ChipServerBase::SendStatusReport(ExchangeContext * ec, uint32_t statu
     }
 
     err     = ec->SendMessage(kChipProtocol_Common, Common::kMsgType_StatusReport, respBuf, sendFlags);
-    respBuf = NULL;
+    respBuf = nullptr;
 
 exit:
-    if (respBuf != NULL)
+    if (respBuf != nullptr)
         PacketBuffer::Free(respBuf);
     return err;
 }

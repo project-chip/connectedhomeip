@@ -96,8 +96,10 @@ function(chip_configure TARGET_NAME)
         chip_gn_arg_string(GN_ARGS "chip_system_project_config_include = \"<${CHIP_PROJECT_CONFIG}>\"")
     endif ()
 
-    if ("${BOARD}" STREQUAL "native_posix")
+    if (BOARD STREQUAL "native_posix")
         chip_gn_arg_string(GN_ARGS "target_cpu = \"x86\"")
+    elseif (BOARD STREQUAL "native_posix_64")
+        chip_gn_arg_string(GN_ARGS "target_cpu = \"x64\"")
     endif ()
 
     chip_gn_arg_bool_if(CONFIG_NET_L2_OPENTHREAD GN_ARGS "chip_enable_openthread")
@@ -160,16 +162,7 @@ function(chip_build TARGET_NAME BASE_TARGET_NAME)
         ${CHIP_OUTPUT_DIR}/gen/third_party/connectedhomeip/src/lib/support/include
         ${CHIP_OUTPUT_DIR}/gen/third_party/connectedhomeip/src/app/include
     )
-    target_link_directories(${TARGET_NAME} INTERFACE
-        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/lib/support/tests/lib
-        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/lib/core/tests/lib
-        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/transport/tests/lib
-        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/setup_payload/tests/lib
-        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/system/tests/lib
-        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/platform/tests/lib
-        ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/crypto/tests/lib
-        ${CHIP_OUTPUT_DIR}/lib
-    )
+    target_link_directories(${TARGET_NAME} INTERFACE ${CHIP_OUTPUT_DIR}/lib)
     target_link_libraries(${TARGET_NAME} INTERFACE -Wl,--start-group ${CHIP_BUILD_ARTIFACTS} -Wl,--end-group)
 
     add_dependencies(${TARGET_NAME}Build ${BASE_TARGET_NAME})

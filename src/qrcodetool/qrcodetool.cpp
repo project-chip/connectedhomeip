@@ -30,8 +30,8 @@ static int match_command(const char * command_name, const char * name)
 
 static int help(int argc, char ** argv)
 {
-    qrcodetool_command_t * cmd = NULL;
-    for (cmd = commands; cmd->c_name != NULL; cmd++)
+    qrcodetool_command_t * cmd = nullptr;
+    for (cmd = commands; cmd->c_name != nullptr; cmd++)
     {
         ChipLogDetail(chipTool, "%s\t%s\n", cmd->c_name, cmd->c_help);
     }
@@ -44,7 +44,7 @@ static int usage(const char * prog_name)
                   "Usage: %s [-h] [command] [opt ...]\n"
                   "%s commands are:\n",
                   prog_name, prog_name);
-    help(0, NULL);
+    help(0, nullptr);
     return 2;
 }
 
@@ -54,7 +54,7 @@ static int execute_command(int argc, char ** argv)
     {
         return -1;
     }
-    const qrcodetool_command_t * command_to_execute = NULL;
+    const qrcodetool_command_t * command_to_execute = nullptr;
     bool found                                      = false;
 
     for (command_to_execute = commands; command_to_execute->c_name; command_to_execute++)
@@ -71,10 +71,8 @@ static int execute_command(int argc, char ** argv)
         ChipLogDetail(chipTool, "Executing cmd %s\n", command_to_execute->c_name);
         return command_to_execute->c_func(argc, argv);
     }
-    else
-    {
-        return help(0, NULL);
-    }
+
+    return help(0, nullptr);
 }
 
 int main(int argc, char ** argv)
@@ -109,7 +107,7 @@ int main(int argc, char ** argv)
     if (do_help)
     {
         /* Munge argc/argv so that argv[0] is something. */
-        result = help(0, NULL);
+        result = help(0, nullptr);
     }
     else if (argc > 0)
     {

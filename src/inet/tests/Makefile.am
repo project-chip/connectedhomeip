@@ -181,15 +181,20 @@ TestLwIPDNS_LDADD                                     = libTestInetCommon.a $(CO
 TestInetAddress_SOURCES                               = TestInetAddressDriver.cpp
 TestInetAddress_LDADD                                 = $(COMMON_LDADD)
 
-TestInetEndPoint_SOURCES                              = TestInetEndPoint.cpp    \
+TestInetEndPoint_SOURCES                              = TestInetEndPointDriver.cpp    \
+                                                        TestInetEndPoint.cpp          \
                                                         $(NULL)
+
 TestInetEndPoint_LDADD                                = libTestInetCommon.a $(COMMON_LDADD)
 
 TestInetErrorStr_SOURCES                              = TestInetErrorStrDriver.cpp    \
                                                         $(NULL)
 TestInetErrorStr_LDADD                                = $(COMMON_LDADD)
 
-TestInetLayerDNS_SOURCES                              = TestInetLayerDNS.cpp
+TestInetLayerDNS_SOURCES                              = TestInetLayerDNSDriver.cpp    \
+                                                        TestInetLayerDNS.cpp          \
+                                                        $(NULL)
+
 TestInetLayerDNS_LDADD                                = libTestInetCommon.a $(COMMON_LDADD)
 
 TestInetLayer_SOURCES                                 = TestInetLayer.cpp    \

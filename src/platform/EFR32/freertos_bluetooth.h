@@ -34,12 +34,12 @@ extern "C" {
 // Bluetooth event flag group
 extern EventGroupHandle_t bluetooth_event_flags;
 // Bluetooth event flag definitions
-#define BLUETOOTH_EVENT_FLAG_STACK (0x01)       // Bluetooth task needs an update
-#define BLUETOOTH_EVENT_FLAG_LL (0x02)          // Linklayer task needs an update
-#define BLUETOOTH_EVENT_FLAG_CMD_WAITING (0x04) // BGAPI command is waiting to be processed
-#define BLUETOOTH_EVENT_FLAG_RSP_WAITING (0x08) // BGAPI response is waiting to be processed
-#define BLUETOOTH_EVENT_FLAG_EVT_WAITING (0x10) // BGAPI event is waiting to be processed
-#define BLUETOOTH_EVENT_FLAG_EVT_HANDLED (0x20) // BGAPI event is handled
+#define BLUETOOTH_EVENT_FLAG_STACK (0x01u)       // Bluetooth task needs an update
+#define BLUETOOTH_EVENT_FLAG_LL (0x02u)          // Linklayer task needs an update
+#define BLUETOOTH_EVENT_FLAG_CMD_WAITING (0x04u) // BGAPI command is waiting to be processed
+#define BLUETOOTH_EVENT_FLAG_RSP_WAITING (0x08u) // BGAPI response is waiting to be processed
+#define BLUETOOTH_EVENT_FLAG_EVT_WAITING (0x10u) // BGAPI event is waiting to be processed
+#define BLUETOOTH_EVENT_FLAG_EVT_HANDLED (0x20u) // BGAPI event is handled
 
 // Bluetooth event data pointer
 extern volatile struct gecko_cmd_packet * bluetooth_evt;
@@ -72,10 +72,9 @@ extern void BluetoothLLCallback(void);
 void BluetoothPend(void);
 void BluetoothPost(void);
 
-EventBits_t vRaiseEventFlagBasedOnContext(EventGroupHandle_t xEventGroup, EventBits_t uxBitsToWaitFor,
-                                          BaseType_t * pxHigherPriorityTaskWoken);
-EventBits_t vSendToQueueBasedOnContext(QueueHandle_t xQueue, void * xItemToQueue, TickType_t xTicksToWait,
-                                       BaseType_t * pxHigherPriorityTaskWoken);
+void vRaiseEventFlagBasedOnContext(EventGroupHandle_t xEventGroup, EventBits_t uxBitsToWaitFor);
+BaseType_t vSendToQueueBasedOnContext(QueueHandle_t xQueue, void * xItemToQueue, TickType_t xTicksToWait,
+                                      BaseType_t * pxHigherPriorityTaskWoken);
 
 #if __cplusplus
 }

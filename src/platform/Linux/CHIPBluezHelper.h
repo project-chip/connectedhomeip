@@ -93,7 +93,7 @@ namespace Internal {
 #define BLUEZ_ADV_FLAGS_LE_EDR_CONTROLLER (1 << 3)
 #define BLUEZ_ADV_FLAGS_LE_EDR_HOST (1 << 4)
 
-#define CHAR_TO_BLUEZ(c) (((c) <= '9') ? (c) - '0' : tolower((c)) - 'a' + 10)
+#define CHAR_TO_BLUEZ(c) (static_cast<uint8_t>(((c) <= '9') ? (c) - '0' : tolower((c)) - 'a' + 10))
 
 enum BluezAddressType
 {

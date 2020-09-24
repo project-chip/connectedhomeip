@@ -46,7 +46,7 @@ public:
         }
     }
 
-    const char * GetName(void) const { return mName; };
+    const char * GetName(void) const { return mName; }
 
     virtual void OnConnect(ChipDeviceController * dc)                        = 0;
     virtual void OnError(ChipDeviceController * dc, CHIP_ERROR err)          = 0;
@@ -60,7 +60,7 @@ private:
     CHIP_ERROR ConnectUDP(ChipDeviceController * dc, NodeId remoteId);
 
     char mName[46];
-    IPAddress mRemoteAddr;
+    Command::AddressWithInterface mRemoteAddr;
     uint32_t mRemotePort;
     uint32_t mDiscriminator;
     uint32_t mSetupPINCode;

@@ -137,6 +137,9 @@ config("disabled_warnings") {
   cflags = [
     "-Wno-deprecated-declarations",
     "-Wno-unknown-warning-option",
+    "-Wno-missing-field-initializers",
+    "-Wno-unused-but-set-variable",
+    "-Wno-unused-variable",
   ]
   cflags_cc = [
     "-Wno-non-virtual-dtor",

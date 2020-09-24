@@ -60,7 +60,7 @@ int cmd_otcli_help_iterator(shell_command_t * command, void * arg)
 
 int cmd_otcli_help(int argc, char ** argv)
 {
-    sShellOtcliSubcommands.ForEachCommand(cmd_otcli_help_iterator, NULL);
+    sShellOtcliSubcommands.ForEachCommand(cmd_otcli_help_iterator, nullptr);
     return 0;
 }
 

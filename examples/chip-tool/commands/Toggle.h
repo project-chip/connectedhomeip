@@ -24,7 +24,7 @@
 class Toggle : public ModelCommand
 {
 public:
-    Toggle() : ModelCommand("toggle") {}
+    Toggle() : ModelCommand("toggle", 0x06) {}
 
     size_t EncodeCommand(PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) override
     {

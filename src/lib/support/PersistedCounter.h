@@ -58,7 +58,7 @@ class PersistedCounter : public MonotonicallyIncreasingCounter
 {
 public:
     PersistedCounter(void);
-    virtual ~PersistedCounter(void);
+    ~PersistedCounter(void) override;
 
     /**
      *  @brief

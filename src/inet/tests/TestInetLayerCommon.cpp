@@ -82,7 +82,7 @@ bool gSendIntervalExpired = true;
 
 uint32_t gSendIntervalMs = 1000;
 
-const char * gInterfaceName = NULL;
+const char * gInterfaceName = nullptr;
 
 InterfaceId gInterfaceId = INET_NULL_INTERFACEID;
 
@@ -164,12 +164,12 @@ exit:
 
 static PacketBuffer * MakeDataBuffer(uint16_t aDesiredLength, uint16_t aPatternStartOffset, uint8_t aFirstValue)
 {
-    PacketBuffer * lBuffer = NULL;
+    PacketBuffer * lBuffer = nullptr;
 
     VerifyOrExit(aPatternStartOffset <= aDesiredLength, );
 
     lBuffer = PacketBuffer::New();
-    VerifyOrExit(lBuffer != NULL, );
+    VerifyOrExit(lBuffer != nullptr, );
 
     aDesiredLength = min(lBuffer->MaxDataLength(), aDesiredLength);
 
@@ -184,10 +184,10 @@ exit:
 static PacketBuffer * MakeDataBuffer(uint16_t aDesiredLength, uint16_t aPatternStartOffset)
 {
     const uint8_t lFirstValue = 0;
-    PacketBuffer * lBuffer    = NULL;
+    PacketBuffer * lBuffer    = nullptr;
 
     lBuffer = MakeDataBuffer(aDesiredLength, aPatternStartOffset, lFirstValue);
-    VerifyOrExit(lBuffer != NULL, );
+    VerifyOrExit(lBuffer != nullptr, );
 
 exit:
     return (lBuffer);
@@ -198,14 +198,14 @@ static PacketBuffer * MakeICMPDataBuffer(uint16_t aDesiredUserLength, uint16_t a
                                          uint8_t aType)
 {
     static uint16_t lSequenceNumber = 0;
-    PacketBuffer * lBuffer          = NULL;
+    PacketBuffer * lBuffer          = nullptr;
 
     // To ensure there is enough room for the user data and the ICMP
     // header, include both the user data size and the ICMP header length.
 
     lBuffer = MakeDataBuffer(aDesiredUserLength + aHeaderLength, aPatternStartOffset);
 
-    if (lBuffer != NULL)
+    if (lBuffer != nullptr)
     {
         tType * lHeader = reinterpret_cast<tType *>(lBuffer->Start());
 
@@ -224,7 +224,7 @@ PacketBuffer * MakeICMPv4DataBuffer(uint16_t aDesiredUserLength)
     const uint16_t lICMPHeaderLength   = sizeof(ICMPv4EchoHeader);
     const uint16_t lPatternStartOffset = lICMPHeaderLength;
     const uint8_t lType                = gICMPv4Types[kICMP_EchoRequestIndex];
-    PacketBuffer * lBuffer             = NULL;
+    PacketBuffer * lBuffer             = nullptr;
 
     lBuffer = MakeICMPDataBuffer<ICMPv4EchoHeader>(aDesiredUserLength, lICMPHeaderLength, lPatternStartOffset, lType);
 
@@ -236,7 +236,7 @@ PacketBuffer * MakeICMPv6DataBuffer(uint16_t aDesiredUserLength)
     const uint16_t lICMPHeaderLength   = sizeof(ICMPv6EchoHeader);
     const uint16_t lPatternStartOffset = lICMPHeaderLength;
     const uint8_t lType                = gICMPv6Types[kICMP_EchoRequestIndex];
-    PacketBuffer * lBuffer             = NULL;
+    PacketBuffer * lBuffer             = nullptr;
 
     lBuffer = MakeICMPDataBuffer<ICMPv6EchoHeader>(aDesiredUserLength, lICMPHeaderLength, lPatternStartOffset, lType);
 
@@ -246,7 +246,7 @@ PacketBuffer * MakeICMPv6DataBuffer(uint16_t aDesiredUserLength)
 PacketBuffer * MakeDataBuffer(uint16_t aDesiredLength, uint8_t aFirstValue)
 {
     const uint16_t lPatternStartOffset = 0;
-    PacketBuffer * lBuffer             = NULL;
+    PacketBuffer * lBuffer             = nullptr;
 
     lBuffer = MakeDataBuffer(aDesiredLength, lPatternStartOffset, aFirstValue);
 
@@ -256,7 +256,7 @@ PacketBuffer * MakeDataBuffer(uint16_t aDesiredLength, uint8_t aFirstValue)
 PacketBuffer * MakeDataBuffer(uint16_t aDesiredLength)
 {
     const uint16_t lPatternStartOffset = 0;
-    PacketBuffer * lBuffer             = NULL;
+    PacketBuffer * lBuffer             = nullptr;
 
     lBuffer = MakeDataBuffer(aDesiredLength, lPatternStartOffset);
 
@@ -272,7 +272,7 @@ static bool HandleDataReceived(const PacketBuffer * aBuffer, TransferStats & aSt
     // Walk through each buffer in the packet chain, checking the
     // buffer for the expected pattern, if requested.
 
-    for (const PacketBuffer * lBuffer = aBuffer; lBuffer != NULL; lBuffer = lBuffer->Next())
+    for (const PacketBuffer * lBuffer = aBuffer; lBuffer != nullptr; lBuffer = lBuffer->Next())
     {
         const uint16_t lDataLength = lBuffer->DataLength();
 
@@ -399,7 +399,7 @@ void HandleRawReceiveError(const IPEndPointBasis * aEndPoint, const INET_ERROR &
 {
     char lAddressBuffer[INET6_ADDRSTRLEN];
 
-    if (aPacketInfo != NULL)
+    if (aPacketInfo != nullptr)
     {
         aPacketInfo->SrcAddress.ToString(lAddressBuffer, sizeof(lAddressBuffer));
     }
@@ -430,7 +430,7 @@ void HandleUDPReceiveError(const IPEndPointBasis * aEndPoint, const INET_ERROR &
     char lAddressBuffer[INET6_ADDRSTRLEN];
     uint16_t lSourcePort;
 
-    if (aPacketInfo != NULL)
+    if (aPacketInfo != nullptr)
     {
         aPacketInfo->SrcAddress.ToString(lAddressBuffer, sizeof(lAddressBuffer));
         lSourcePort = aPacketInfo->SrcPort;
@@ -444,4 +444,4 @@ void HandleUDPReceiveError(const IPEndPointBasis * aEndPoint, const INET_ERROR &
     printf("UDP receive error from %s:%u: %s\n", lAddressBuffer, lSourcePort, ErrorStr(aError));
 }
 
-}; // namespace Common
+} // namespace Common

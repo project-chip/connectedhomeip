@@ -24,6 +24,20 @@
 #include <support/BufBound.h>
 #include <support/logging/CHIPLogging.h>
 
+#define CHECK_FRAME_LENGTH(value, name)                                                                                            \
+    if (value == 0)                                                                                                                \
+    {                                                                                                                              \
+        ChipLogError(Zcl, "Error encoding APS Frame: %s", name);                                                                   \
+        return value;                                                                                                              \
+    }
+
+#define CHECK_COMMAND_LENGTH(value, name)                                                                                          \
+    if (value == 0)                                                                                                                \
+    {                                                                                                                              \
+        ChipLogError(Zcl, "Error encoding %s command", name);                                                                      \
+        return value;                                                                                                              \
+    }
+
 using namespace chip;
 extern "C" {
 
@@ -52,14 +66,8 @@ static uint16_t doEncodeApsFrame(BufBound & buf, uint16_t profileID, uint16_t cl
     else
     {
         result = buf.Fit() ? buf.Written() : 0;
-        if (result > 0)
-        {
-            ChipLogProgress(Zcl, "Successfully encoded %d bytes", result);
-        }
-        else
-        {
-            ChipLogError(Zcl, "Error encoding APS frame");
-        }
+        CHECK_FRAME_LENGTH(result, "Buffer too small");
+        ChipLogProgress(Zcl, "Successfully encoded %d bytes", result);
     }
     return result;
 }
@@ -71,106 +79,130 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
                             apsFrame->options, apsFrame->groupId, apsFrame->sequence, apsFrame->radius, !buffer);
 }
 
-uint32_t _encodeOnOffCommand(uint8_t * buffer, uint32_t buf_length, uint8_t command, uint8_t destination_endpoint)
+uint16_t _encodeCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t cluster_id, uint8_t command, uint8_t frame_control)
 {
-    uint32_t result = 0;
-    // pick cluster id as 6 for now.
-    // pick source and destination end points as 1 for now.
-    // Profile is 65535 because that matches our simple generated code, but we
-    // should sort out the profile situation.
-    if (!buffer)
+    CHECK_FRAME_LENGTH(buf.Size(), "Buffer is empty");
+
+    uint8_t seq_num         = 1;     // Transaction sequence number.  Just pick something.
+    uint8_t source_endpoint = 1;     // Pick source endpoint as 1 for now.
+    uint16_t profile_id     = 65535; // Profile is 65535 because that matches our simple generated code, but we
+                                     // should sort out the profile situation.
+
+    if (doEncodeApsFrame(buf, profile_id, cluster_id, source_endpoint, destination_endpoint, 0, 0, 0, 0, false))
     {
-        return 0;
-    }
-    BufBound buf = BufBound(buffer, buf_length);
-    result       = doEncodeApsFrame(buf, 65535, 6, 1, destination_endpoint, 0, 0, 0, 0, false);
-    if (result == 0)
-    {
-        ChipLogError(Zcl, "Error encoding aps frame result %" PRIu32 "\n", result);
-        return result;
+        buf.Put(frame_control);
+        buf.Put(seq_num);
+        buf.Put(command);
     }
 
+    return buf.Fit() ? buf.Written() : 0;
+}
+
+uint16_t _encodeClusterSpecificCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t cluster_id, uint8_t command)
+{
     // This is a cluster-specific command so low two bits are 0b01.  The command
     // is standard, so does not need a manufacturer code, and we're sending
     // client to server, so all the remaining bits are 0.
-    buf.Put(uint8_t(1));
+    uint8_t frame_control = 0x01;
 
-    // Transaction sequence number.  Just pick something.
-    buf.Put(uint8_t(1));
-
-    buf.Put(command);
-
-    result = buf.Fit() ? buf.Written() : 0;
-    if (result == 0)
-    {
-        ChipLogError(Zcl, "Error encoding on / off cmd");
-    }
-    return result;
+    return _encodeCommand(buf, destination_endpoint, cluster_id, command, frame_control);
 }
 
-uint32_t encodeOffCommand(uint8_t * buffer, uint32_t buf_length, uint8_t destination_endpoint)
+uint16_t _encodeGlobalCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t cluster_id, uint8_t command)
 {
-    return _encodeOnOffCommand(buffer, buf_length, 0, destination_endpoint);
-};
+    // This is a global command, so the low bits are 0b00.  The command is
+    // standard, so does not need a manufacturer code, and we're sending client
+    // to server, so all the remaining bits are 0.
+    uint8_t frame_control = 0x00;
 
-uint32_t encodeOnCommand(uint8_t * buffer, uint32_t buf_length, uint8_t destination_endpoint)
-{
-    return _encodeOnOffCommand(buffer, buf_length, 1, destination_endpoint);
-}
-
-uint32_t encodeToggleCommand(uint8_t * buffer, uint32_t buf_length, uint8_t destination_endpoint)
-{
-    return _encodeOnOffCommand(buffer, buf_length, 2, destination_endpoint);
+    return _encodeCommand(buf, destination_endpoint, cluster_id, command, frame_control);
 }
 
 uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t cluster_id,
                                      uint16_t * attr_ids, uint16_t attr_id_count)
 {
-    if (!buffer)
+    BufBound buf = BufBound(buffer, buf_length);
+    if (_encodeGlobalCommand(buf, destination_endpoint, cluster_id, 0x00))
     {
-        return 0;
+        for (uint16_t i = 0; i < attr_id_count; ++i)
+        {
+            uint16_t attr_id = attr_ids[i];
+            buf.PutLE16(attr_id);
+        }
     }
 
+    return buf.Fit() ? buf.Written() : 0;
+}
+
+/*
+ * On/Off Cluster commands
+ *
+ * Pick cluster id as 0x0006 for now
+ */
+
+uint16_t encodeOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
     BufBound buf    = BufBound(buffer, buf_length);
-    uint16_t result = doEncodeApsFrame(buf, 65535, 6, 1, destination_endpoint, 0, 0, 0, 0, false);
-    if (result == 0)
-    {
-        ChipLogError(Zcl, "Error encoding read attributes aps frame\n");
-        return 0;
-    }
+    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0006, 0x00);
+    CHECK_COMMAND_LENGTH(result, "Off");
+    return result;
+};
 
-    // This is a global command, so the low bits are 0b00.  The command is
-    // standard, so does not need a manufacturer code, and we're sending client
-    // to server, so all the remaining bits are 0.
-    uint8_t frameControl = 0x00;
-    buf.Put(frameControl);
+uint16_t encodeOnCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    BufBound buf    = BufBound(buffer, buf_length);
+    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0006, 0x01);
+    CHECK_COMMAND_LENGTH(result, "On");
+    return result;
+}
 
-    // Transaction sequence number.  Just pick something.
-    uint8_t seqNum = 0x1;
-    buf.Put(seqNum);
-
-    uint8_t readAttributesCommandId = 0x00;
-    buf.Put(readAttributesCommandId);
-
-    for (uint16_t i = 0; i < attr_id_count; ++i)
-    {
-        uint16_t attr_id = attr_ids[i];
-        buf.PutLE16(attr_id);
-    }
-
-    result = buf.Fit() ? buf.Written() : 0;
-    if (result == 0)
-    {
-        ChipLogError(Zcl, "Error encoding read attributes cmd");
-    }
+uint16_t encodeToggleCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    BufBound buf    = BufBound(buffer, buf_length);
+    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0006, 0x02);
+    CHECK_COMMAND_LENGTH(result, "Toggle");
     return result;
 }
 
 uint16_t encodeReadOnOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
 {
-    uint16_t attr_id = 0x0000; /* OnOff attribute */
-    return encodeReadAttributesCommand(buffer, buf_length, destination_endpoint, 0x6 /* cluster_id */, &attr_id,
-                                       1 /* attr_id_count */);
+    uint16_t attr_id       = 0x0000; /* OnOff attribute */
+    uint16_t attr_id_count = 1;
+
+    uint16_t result = encodeReadAttributesCommand(buffer, buf_length, destination_endpoint, 0x0006, &attr_id, attr_id_count);
+    CHECK_COMMAND_LENGTH(result, "ReadOnOff");
+    return result;
+}
+
+uint16_t _encodeIdentifyClusterCommand(uint8_t * buffer, uint16_t buf_length, uint8_t command_id, uint8_t destination_endpoint,
+                                       uint16_t * identify_duration)
+{
+
+    BufBound buf    = BufBound(buffer, buf_length);
+    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0003, command_id);
+
+    if (identify_duration)
+    {
+        buf.PutLE16(*identify_duration);
+    }
+
+    result = buf.Fit() ? buf.Written() : 0;
+
+    return result;
+}
+
+uint16_t encodeIdentifyQueryCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    uint16_t result = _encodeIdentifyClusterCommand(buffer, buf_length, 1, destination_endpoint, nullptr);
+    CHECK_COMMAND_LENGTH(result, "Identify Query");
+    return result;
+}
+
+uint16_t encodeIdentifyCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t duration)
+{
+    uint16_t result = _encodeIdentifyClusterCommand(buffer, buf_length, 0, destination_endpoint, &duration);
+    CHECK_COMMAND_LENGTH(result, "Identify");
+    return result;
 }
 
 } // extern "C"

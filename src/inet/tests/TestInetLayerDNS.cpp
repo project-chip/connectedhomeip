@@ -27,6 +27,8 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include "TestInetLayer.h"
+
 #include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
@@ -81,20 +83,6 @@ static void StartTestCase(DNSResolutionTestContext & testContext);
 static void HandleResolutionComplete(void * appState, INET_ERROR err, uint8_t addrCount, IPAddress * addrArray);
 static void ServiceNetworkUntilDone(uint32_t timeoutMS);
 static void HandleSIGUSR1(int sig);
-
-// clang-format off
-static ArgParser::HelpOptions gHelpOptions(TOOL_NAME,
-                                           "Usage: " TOOL_NAME " [<options...>]\n",
-                                           CHIP_VERSION_STRING "\n" CHIP_TOOL_COPYRIGHT);
-
-static ArgParser::OptionSet * gToolOptionSets[] =
-{
-    &gNetworkOptions,
-    &gFaultInjectionOptions,
-    &gHelpOptions,
-    NULL
-};
-// clang-format on
 
 /**
  * Test basic name resolution functionality.
@@ -678,7 +666,7 @@ static void HandleSIGUSR1(int sig)
     exit(0);
 }
 
-int TestInetLayerDNS(void)
+int TestInetLayerDNSInternal(void)
 {
     // clang-format off
     const nlTest DNSTests[] =
@@ -697,8 +685,8 @@ int TestInetLayerDNS(void)
     {
         "DNS",
         &DNSTests[0],
-        NULL,
-        NULL
+        nullptr,
+        nullptr
     };
     // clang-format on
 
@@ -709,7 +697,7 @@ int TestInetLayerDNS(void)
 
     // Run all tests in Suite
 
-    nlTestRunner(&DNSTestSuite, NULL);
+    nlTestRunner(&DNSTestSuite, nullptr);
 
     ShutdownNetwork();
     ShutdownSystemLayer();
@@ -717,14 +705,10 @@ int TestInetLayerDNS(void)
     return nlTestRunnerStats(&DNSTestSuite);
 }
 
-static void __attribute__((constructor)) TestCHIPInetLayerDNSCtor(void)
-{
-    VerifyOrDie(RegisterUnitTests(&TestInetLayerDNS) == CHIP_NO_ERROR);
-}
-
+CHIP_REGISTER_TEST_SUITE(TestInetLayerDNSInternal)
 #else // !INET_CONFIG_ENABLE_DNS_RESOLVER
 
-int TestInetLayerDNS(void)
+int TestInetLayerDNSInternal(void)
 {
     fprintf(stderr, "Please assert INET_CONFIG_ENABLE_DNS_RESOLVER to use this test.\n");
 
@@ -733,19 +717,11 @@ int TestInetLayerDNS(void)
 
 #endif // !INET_CONFIG_ENABLE_DNS_RESOLVER
 
-int main(int argc, char * argv[])
+int TestInetLayerDNS()
 {
-    SetupFaultInjectionContext(argc, argv);
-
     SetSignalHandler(HandleSIGUSR1);
-
-    if (!ParseArgsFromEnvVar(TOOL_NAME, TOOL_OPTIONS_ENV_VAR_NAME, gToolOptionSets, NULL, true) ||
-        !ParseArgs(TOOL_NAME, argc, argv, gToolOptionSets, NULL))
-    {
-        exit(EXIT_FAILURE);
-    }
 
     nlTestSetOutputStyle(OUTPUT_CSV);
 
-    return (TestInetLayerDNS());
+    return (TestInetLayerDNSInternal());
 }

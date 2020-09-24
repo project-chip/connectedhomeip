@@ -33,7 +33,8 @@ int TestInetAddress(void);
 int TestInetBuffer(void);
 int TestInetErrorStr(void);
 int TestInetTimer(void);
-
+int TestInetEndPoint(void);
+int TestInetLayerDNS(void);
 #ifdef __cplusplus
 }
 #endif

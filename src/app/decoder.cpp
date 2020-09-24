@@ -47,9 +47,9 @@ struct Reader<2>
 
 extern "C" {
 
-uint16_t extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * outApsFrame)
+uint16_t extractApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * outApsFrame)
 {
-    if (buffer == NULL || buf_length == 0 || outApsFrame == NULL)
+    if (buffer == nullptr || buf_length == 0 || outApsFrame == nullptr)
     {
         ChipLogError(Zcl, "Error extracting APS frame. invalid inputs");
         return 0;
@@ -111,7 +111,7 @@ uint16_t extractMessage(uint8_t * buffer, uint16_t buffer_length, uint8_t ** msg
     }
     else if (msg)
     {
-        *msg = NULL;
+        *msg = nullptr;
     }
     return result;
 }

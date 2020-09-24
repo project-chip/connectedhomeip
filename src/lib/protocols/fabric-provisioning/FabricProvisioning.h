@@ -161,8 +161,8 @@ public:
      *                          is expected to represent the final assessment of access control policy for the
      *                          message.
      */
-    virtual void EnforceAccessControl(ExchangeContext * ec, uint32_t msgProfileId, uint8_t msgType, const ChipMessageInfo * msgInfo,
-                                      AccessControlResult & result);
+    void EnforceAccessControl(ExchangeContext * ec, uint32_t msgProfileId, uint8_t msgType, const ChipMessageInfo * msgInfo,
+                              AccessControlResult & result) override;
 
     /**
      * Called to determine if the device is currently paired to an account.

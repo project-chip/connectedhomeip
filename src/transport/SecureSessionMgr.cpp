@@ -93,8 +93,8 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBu
 
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(msgBuf->Next() == NULL, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(msgBuf->Next() == nullptr, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrExit(msgBuf->TotalLength() < kMax_SecureSDU_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     // Find an active connection to the specified peer node
@@ -133,18 +133,18 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBu
         err = header.EncodeMACTag(&data[totalLen], kMaxTagLen, &taglen);
         SuccessOrExit(err);
 
-        msgBuf->SetDataLength(totalLen + taglen, NULL);
+        msgBuf->SetDataLength(totalLen + taglen, nullptr);
 
         ChipLogProgress(Inet, "Secure transport transmitting msg %u after encryption", state->GetSendMessageIndex());
 
         err    = mTransport->SendMessage(header, state->GetPeerAddress(), msgBuf);
-        msgBuf = NULL;
+        msgBuf = nullptr;
     }
     SuccessOrExit(err);
     state->IncrementSendMessageIndex();
 
 exit:
-    if (msgBuf != NULL)
+    if (msgBuf != nullptr)
     {
         const char * errStr = ErrorStr(err);
         if (state == nullptr)
@@ -156,7 +156,7 @@ exit:
             ChipLogProgress(Inet, "Secure transport failed to encrypt msg %u: %s", state->GetSendMessageIndex(), errStr);
         }
         PacketBuffer::Free(msgBuf);
-        msgBuf = NULL;
+        msgBuf = nullptr;
     }
 
     return err;
@@ -256,7 +256,7 @@ void SecureSessionMgrBase::HandleDataReceived(MessageHeader & header, const Peer
         err = header.DecodeMACTag(&data[header.GetPayloadLength()], kMaxTagLen, &taglen);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Inet, "Secure transport failed to decode MAC Tag: err %d", err));
         len -= taglen;
-        msg->SetDataLength(len, NULL);
+        msg->SetDataLength(len, nullptr);
 
         err = state->GetSecureSession().Decrypt(data, len, plainText, header);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Inet, "Secure transport failed to decrypt msg: err %d", err));
@@ -304,12 +304,16 @@ void SecureSessionMgrBase::HandleConnectionExpired(const Transport::PeerConnecti
     state.GetPeerAddress().ToString(addr, sizeof(addr));
 
     ChipLogProgress(Inet, "Connection from '%s' expired", addr);
+
+    mgr->mTransport->Disconnect(state.GetPeerAddress());
 }
 
 void SecureSessionMgrBase::ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error)
 {
     SecureSessionMgrBase * mgr = reinterpret_cast<SecureSessionMgrBase *>(param);
 #if CHIP_CONFIG_SESSION_REKEYING
+    // TODO(#2279): session expiration is currently disabled until rekeying is supported
+    // the #ifdef should be removed after that.
     mgr->mPeerConnections.ExpireInactiveConnections(CHIP_PEER_CONNECTION_TIMEOUT_MS);
 #endif
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer

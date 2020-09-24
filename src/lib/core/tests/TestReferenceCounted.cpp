@@ -30,6 +30,7 @@
 #include <string.h>
 
 #include <lib/core/ReferenceCounted.h>
+#include <support/TestUtils.h>
 
 #include <nlunit-test.h>
 
@@ -65,12 +66,14 @@ int TestReferenceCounted(void)
 	{
         "Reference-Counted",
         &sTests[0],
-        NULL,
-        NULL
+        nullptr,
+        nullptr
     };
     // clang-format on
 
-    nlTestRunner(&theSuite, NULL);
+    nlTestRunner(&theSuite, nullptr);
 
     return (nlTestRunnerStats(&theSuite));
 }
+
+CHIP_REGISTER_TEST_SUITE(TestReferenceCounted)

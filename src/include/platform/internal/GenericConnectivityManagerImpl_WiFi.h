@@ -40,7 +40,7 @@ namespace Internal {
  * class, which also appears as the template's ImplClass parameter.
  *
  * The members of this class are all inlined methods that do nothing, and return static return
- * values.  This allows the compiler to optimize away dead code without the use of #ifdef's.
+ * values.  This allows the compiler to optimize away dead code without the use of \#ifdef's.
  * For example:
  *
  * ```
@@ -204,7 +204,7 @@ inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_OnWiFiStationProvis
 template <class ImplClass>
 inline const char * GenericConnectivityManagerImpl_WiFi<ImplClass>::_WiFiAPModeToStr(ConnectivityManager::WiFiAPMode mode)
 {
-    return NULL;
+    return nullptr;
 }
 
 } // namespace Internal

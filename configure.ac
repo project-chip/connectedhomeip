@@ -896,14 +896,6 @@ AC_DEFINE_UNQUOTED([CHIP_ENABLE_CHIPOBLE_TEST],[${CHIP_ENABLE_CHIPOBLE_TEST}],[D
 # Documentation
 #
 
-# Determine whether or not documentation (via Doxygen) should be built
-# or not, with 'auto' as the default and establish a default support
-# value for GraphViz 'dot' support.
-
-NL_ENABLE_DOCS([auto],[NO])
-
-AM_CONDITIONAL(CHIP_BUILD_DOCS, [test "${nl_cv_build_docs}" = "yes"])
-
 #
 # Network Technology Layer
 #
@@ -1817,6 +1809,7 @@ NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
                 -I${chip_srcdir}/third_party/openthread/repo/src/core \
                 -I${chip_srcdir}/third_party/mbedtls/repo/include \
                 -I${chip_srcdir}/third_party/mbedtls/repo/ \
+                -I${chip_srcdir}/examples/lock-app/k32w/main/include \
                 -I${K32W061_SDK_ROOT}/middleware/mbedtls/port/ksdk \
                 -I${K32W061_SDK_ROOT}/middleware/mbedtls/repo/include/mbedtls \
                 -I${K32W061_SDK_ROOT}/middleware/wireless/ieee-802.15.4/uMac/Include \
@@ -2551,7 +2544,6 @@ fi
 #
 AC_CONFIG_FILES([
 Makefile
-docs/Makefile
 examples/Makefile
 third_party/Makefile
 third_party/lwip/Makefile
@@ -2564,7 +2556,6 @@ src/app/clusters/Makefile
 src/app/util/Makefile
 src/ble/Makefile
 src/ble/tests/Makefile
-src/controller/java/Makefile
 src/crypto/Makefile
 src/crypto/tests/Makefile
 src/lwip/Makefile
@@ -2572,7 +2563,6 @@ src/lwip/tests/Makefile
 src/system/Makefile
 src/system/tests/Makefile
 src/setup_payload/Makefile
-src/setup_payload/java/Makefile
 src/setup_payload/tests/Makefile
 src/inet/Makefile
 src/inet/tests/Makefile
@@ -2651,7 +2641,6 @@ AC_MSG_NOTICE([
   Python extension directory                       : ${pyexecdir:--}
   Verhoeff support                                 : ${enable_verhoeff}
   Pairing code decoding support                    : ${enable_pairing_code_decoding}
-  Documentation support                            : ${nl_cv_build_docs}
   Clang-format                                     : ${CLANG_FORMAT:--}
   Doxygen                                          : ${DOXYGEN:--}
   GraphViz dot                                     : ${DOT:--}

@@ -16,8 +16,9 @@
  */
 
 /**
- * @file  Defines base properties and constants valid across all transport
- *        classes (UDP, TCP, BLE, ....)
+ * @file
+ *    Defines base properties and constants valid across all transport
+ *    classes (UDP, TCP, BLE, ....)
  */
 
 #ifndef TRANSPORT_BASE_H_
@@ -42,7 +43,7 @@ namespace Transport {
 class Base : public ReferenceCounted<Base>
 {
 public:
-    virtual ~Base() {}
+    ~Base() override {}
 
     /**
      * Sets the message receive handler and associated argument
@@ -61,6 +62,8 @@ public:
     /**
      * @brief Send a message to the specified target.
      *
+     * On connection-oriented transports, sending a message implies connecting to the target first.
+     *
      * @details
      *   This method calls <tt>chip::System::PacketBuffer::Free</tt> on
      *   behalf of the caller regardless of the return status.
@@ -72,7 +75,12 @@ public:
      *
      * Generally it is expected that a transport can send to any peer from which it receives a message.
      */
-    virtual bool CanSendToPeer(const Transport::PeerAddress & address) = 0;
+    virtual bool CanSendToPeer(const PeerAddress & address) = 0;
+
+    /**
+     * Handle disconnection from the specified peer if currently connected to it.
+     */
+    virtual void Disconnect(const PeerAddress & address) {}
 
 protected:
     /**
@@ -85,6 +93,10 @@ protected:
         {
             OnMessageReceived(header, source, buffer, mMessageReceivedArgument);
         }
+        else
+        {
+            System::PacketBuffer::Free(buffer);
+        }
     }
 
     /**
@@ -92,6 +104,8 @@ protected:
      * Chip connection.
      *
      * @param[in]    msgBuf        A pointer to the PacketBuffer object holding the message.
+     *
+     * Callback *MUST* free msgBuf as a result of handling.
      */
     typedef void (*MessageReceiveHandler)(const MessageHeader & header, const PeerAddress & source, System::PacketBuffer * msgBuf,
                                           void * param);

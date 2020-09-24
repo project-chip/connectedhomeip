@@ -1,5 +1,6 @@
 [.text-center]
 = Project Connected Home over IP Software
+:listing-caption: *Listing*
 :toc: macro
 :toclevels: 7
 :sectnumlevels: 7
@@ -13,8 +14,8 @@
 == Best Practices, Coding Conventions, and Style
 
 [.text-center]
-_Revision 4_ +
-_2020-09-15_
+_Revision 5_ +
+_2020-09-22_
 
 [.text-center]
 *Status:* [red]*Approved* / [red]*Active*
@@ -295,6 +296,426 @@ includes the header to also be using the namespace. This causes
 namespace pollution and generally defeats the purposes of namespaces.
 Fully-qualified symbols should be used instead.
 
+=== Tightly-constrained Systems and Shared Infrastructure
+
+Applicability to tightly-constrained systems also generally applies to
+shared infrastructure software that is used on both tightly- and
+loosely-constrained systems.
+
+==== Avoid Heap-based Resource Allocation
+
+Heap-based resource allocation should be avoided.
+
+===== Motivation and Rationale
+
+As emphasized throughout this document, the software produced by Project
+CHIP is consumed both inside and outside Project CHIP, across a variety
+of platforms. The capabilities of these platforms are broad, spanning
+soft real-time, deeply-embedded systems based on based on RTOSes that
+may cover life safety and/or physical security applications to richer,
+softly-embedded systems based on non-RTOS platforms such as Darwin or
+Linux. While the latter are apt to have fully-functional heaps, the
+former explicitly may not.
+
+Consequently, when planning new or extending existing Project CHIP code,
+consider the platforms to which the code is targeted. If the platforms
+include those deeply-embedded platforms absent functioning heaps, then
+heap-based resource allocation is absolutely forbidden. If not,
+consideration should be made to the cost / benefit trade-offs of
+heap-based allocation and, if possible, it should be avoided using one
+of the recommended techniques below.
+
+===== Alternatives
+
+In either case, recommended resource allocation alternatives are:
+
+* In Place Allocation and Initialization
+* Pool-based Allocators
+* Platform-defined and -assigned Allocators
+
+The interfaces in https://github.com/project-chip/connectedhomeip/blob/master/src/lib/support/CHIPMem.h[_src/lib/support/CHIPMem.h_] provide support for
+the latter two alternatives.
+
+====== Use In Place Allocation and Initialization
+
+Regardless of whether the source code and runtime are C or C{plusplus}, the
+first step is creating storage for the object being allocated and
+initialized. For simple
+https://en.wikipedia.org/wiki/Passive_data_structure[plain-old-data
+(POD)] data structures, this can be done by just allocating the
+structure at an appropriate scope. Alternatively, _raw_ storage can be
+allocated and then cast. However, great care must be taken with the
+latter approach to ensure that natural machine alignments and language
+strict-aliasing rules are observed. With the simple data structure
+declaration, the compiler does this on your behalf. With the raw
+approach, you must do this.
+
+Once the storage has been allocated, then use symmetric initializers and
+deinitializers such as those, for example, for `pthread_attr_t`. An
+example is shown in the listing below.
+
+[source,C,caption='',title='{listing-caption} *{counter:refnum}*. Using in place allocation and initialization in C or C{plusplus}.']
+----
+#include <pthread.h>
+#include <stdint.h>
+
+...
+
+// Preprocessor Definitions
+
+// Allocate the structure using "raw" storage.
+
+#if defined(__cplusplus) && (__cplusplus >= 201103L)
+#include <type_traits>
+
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+	typename std::aligned_storage<size, alignof(align_type)>::type name;
+
+#else
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+    align_type name[(((size) + (sizeof (align_type) - 1)) / sizeof (align_type))]
+
+#endif // defined(__cplusplus) && (__cplusplus >= 201103L)
+
+// Forward Declarations
+
+extern void * foobar_entry(void *aArgument);
+
+// Global Variables
+
+#if USE_STRUCT_STORAGE
+// Allocate the structure directly.
+static pthread_attr_t sThreadAttributes;
+
+#elif USE_RAW_STORAGE
+static chipDEFINE_ALIGNED_VAR(sThreadAttributes, sizeof (pthread_attr_t), uint64_t);
+
+#endif // USE_STRUCT_STORAGE
+
+int foobar(void)
+{
+    int              retval;
+    int              status;
+    pthread_t        thread;
+    pthread_attr_t * attrs = (pthread_attr_t *)&sThreadAttributes;
+
+    // Now "construct" or initialize the storage.
+    retval = pthread_attr_init(attrs);
+
+    if (retval == 0)
+    {
+        retval = pthread_create(&thread, attrs, foobar_entry, NULL);
+
+        if (retval == 0)
+        {
+            status = pthread_join(thread, NULL);
+
+            if (status != 0)
+            {
+                retval = status;
+            }
+
+            status = pthread_attr_destroy(attrs);
+
+            if (status != 0)
+            {
+                retval = status;
+            }
+        }
+    }
+
+    return (retval);
+}
+----
+
+For non-scalar types and objects such as C{plusplus} classes, this gets slightly
+trickier since C{plusplus} constructors and destructors must be accounted for
+and invoked. Fortunately, C{plusplus} has placement new which handles this.
+The listing below modifies the listing above using C{plusplus} placement new
+to ensure the class is properly constructed before initialization and
+destructed after deinitialization.
+
+[source,C++,caption='',title='{listing-caption} *{counter:refnum}*. Using C{plusplus} placement new for in place allocation and initialization.']
+----
+#include <new>
+
+#include <pthread.h>
+#include <stdint.h>
+
+...
+
+// Preprocessor Definitions
+
+// Allocate the structure using "raw" storage.
+
+#if defined(__cplusplus) && (__cplusplus >= 201103L)
+#include <type_traits>
+
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+	typename std::aligned_storage<size, alignof(align_type)>::type name;
+
+#else
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+    align_type name[(((size) + (sizeof (align_type) - 1)) / sizeof (align_type))]
+
+#endif // defined(__cplusplus) && (__cplusplus >= 201103L)
+
+// Type Declarations
+
+class ThreadAttributes
+{
+public:
+    ThreadAttributes(void) {};
+    ~ThreadAttributes(void) {};
+
+    operator pthread_attr_t *(void) { return &mAttributes; }
+
+private:
+    pthread_attr_t mAttributes;
+};
+
+// Forward Declarations
+
+extern void * foobar_entry(void *aArgument);
+
+// Global Variables
+
+static chipDEFINE_ALIGNED_VAR(sThreadAttributes, sizeof (ThreadAttributes), uint64_t);
+
+int foobar(void)
+{
+    int                retval = -1;
+    int                status;
+    pthread_t          thread;
+    ThreadAttributes * ta;
+    pthread_attr_t *   attrs;
+
+    ta = new (&sThreadAttributes) ThreadAttributes;
+
+    if (ta != NULL)
+    {
+        attrs = static_cast<pthread_attr_t *>(*ta);
+
+        // Now "construct" or initialize the storage.
+        retval = pthread_attr_init(attrs);
+
+        if (retval == 0)
+        {
+            retval = pthread_create(&thread, attrs, foobar_entry, NULL);
+
+            if (retval == 0)
+            {
+                status = pthread_join(thread, NULL);
+
+                if (status != 0)
+                {
+                    retval = status;
+                }
+
+                status = pthread_attr_destroy(attrs);
+
+                if (status != 0)
+                {
+                    retval = status;
+                }
+            }
+        }
+
+        ta->~ThreadAttributes();
+    }
+
+    return retval;
+}
+----
+
+====== Use Pool-based Allocators
+
+In place allocation allows the successful allocation, initialization,
+deinitialization, and deallocation of a single object allocated from
+preallocated storage. However, if the desire exists for a fixed,
+configurable pool of objects where 0 to `n` of such objects can be
+allocated at any one time, a pool allocator for that specific object
+type must be created.
+
+As shown in the listing below, a pool allocator for a `Foo` class of
+`CHIP_FOO_COUNT` objects is effected, assuming the existence of another
+helper class, StaticAllocatorBitmap, which uses a bitmap to track the
+storage of objects from a static array of storage.
+
+[source,C++,caption='',title='{listing-caption} *{counter:refnum}*. Using pool-based allocators.']
+----
+
+#include <stdint.h>
+
+// Preprocessor Definitions
+
+// Allocate the structure using "raw" storage.
+
+#if defined(__cplusplus) && (__cplusplus >= 201103L)
+#include <type_traits>
+
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+	typename std::aligned_storage<size, alignof(align_type)>::type name;
+
+#else
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+    align_type name[(((size) + (sizeof (align_type) - 1)) / sizeof (align_type))]
+
+#endif // defined(__cplusplus) && (__cplusplus >= 201103L)
+
+// Type Definitions
+
+class Foo
+{
+public:
+    Foo(void);
+    Foo(const Foo &inFoo);
+    ~Foo(void);
+};
+
+// Global Variables
+
+static chipDEFINE_ALIGNED_VAR(sFooAllocatorBuffer, sizeof (StaticAllocatorBitmap), uint32_t);
+static StaticAllocatorBitmap *sFooAllocator;
+
+static void CreateFooAllocator(void *inStorage,
+                               const StaticAllocatorBitmap::size_type &inStorageSize,
+                               const StaticAllocatorBitmap::size_type &inElementCount,
+                               StaticAllocatorBitmap::InitializeFunction inInitialize,
+                               StaticAllocatorBitmap::DestroyFunction inDestroy)
+{
+    sFooAllocator = new (sFooAllocatorBuffer)
+        StaticAllocatorBitmap(inStorage,
+                              inStorageSize,
+                              inElementCount,
+                              inInitialize,
+                              inDestroy);
+}
+
+static StaticAllocatorBitmap &GetFooAllocator(void)
+{
+    return *sFooAllocator;
+}
+
+static void *FooInitialize(AllocatorBase &inAllocator, void *inObject)
+{
+    memset(inObject, 0, sizeof(Foo));
+
+    return inObject;
+}
+
+static void FooDestroy(AllocatorBase &inAllocator, void *inObject)
+{
+    return;
+}
+
+int Init(void)
+{
+    static const size_t sFooCount = CHIP_FOO_COUNT;
+    static chipAllocatorStaticBitmapStorageDefine(sFooStorage, Foo, sFooCount, uint32_t, sizeof (void *));
+    int retval = 0;
+
+    CreateFooAllocator(sFooStorage,
+                       sizeof (sFooStorage),
+                       sFooCount,
+                       FooInitialize,
+                       FooDestroy);
+
+    return retval;
+}
+
+Foo * FooAllocate(void)
+{
+    Foo *foo;
+
+    foo = static_cast<Foo *>(GetFooAllocator().allocate());
+
+    return foo;
+}
+
+void FooDeallocate(Foo *inFoo)
+{
+    GetFooAllocator().deallocate(inFoo);
+}
+----
+
+====== Use Platform-defined and -assigned Allocators
+
+This is a variation on both in place allocation and pool-based
+allocation in that it completely delegates resource allocation to the
+system integrator and the platform on which the particular software
+subsystem is running.
+
+The advantage of this approach is that it allows the platform to decide
+how resource allocation will be handled and allows the package to scale
+independently of platform resource allocation.
+
+The package may define default implementations for a few types of
+platform allocation strategies, such as heap-based allocators and
+pool-based allocators.
+
+There are a range of granularities for achieving this type of
+delegation, depending on the desired size of the API surface, as shown
+in the listings below.
+
+[source,C++,caption='',title='{listing-caption} *{counter:refnum}*. Using a common allocator method pattern with unique allocators per object, accessed from a unique singleton access per allocator.']
+----
+
+chipPlatformInitFooAllocator();
+chipPlatformInitBarAllocator();
+…
+foo = chipPlatformGetFooAllocator().allocate();
+…
+chipPlatformGetFooAllocator().deallocate(foo);
+…
+bar = chipPlatformGetBarAllocator().allocate();
+…
+chipPlatformGetBarAllocator().deallocate(bar);
+----
+
+[source,C++,caption='',title='{listing-caption} *{counter:refnum}*. Using a common allocator method pattern with unique allocators per object, accessed from a common singleton access with type per allocator.']
+----
+chipPlatformInitAllocator(CHIP_FOO_T);
+chipPlatformInitAllocator(CHIP_BAR_T);
+…
+foo = chipPlatformGetAllocator(CHIP_FOO_T).allocate();
+…
+chipPlatformGetAllocator(CHIP_FOO_T).deallocate(foo);
+…
+bar = chipPlatformGetAllocator(CHIP_BAR_T).allocate();
+…
+chipPlatformGetAllocator(CHIP_BAR_T).deallocate(bar);
+----
+
+[source,C,caption='',title='{listing-caption} *{counter:refnum}*. Using unique allocators per object.']
+----
+chipPlatformInitFooAllocator();
+chipPlatformInitBarAllocator();
+…
+foo = chipPlatformFooAllocate();
+…
+chipPlatformFooDeallocate(foo);
+…
+bar = chipPlatformBarAllocate();
+…
+chipPlatformBarDeallocate(bar);
+----
+
+[source,C,caption='',title='{listing-caption} *{counter:refnum}*. Using a common allocator pattern with unique allocators per object, accessed from a common interface with type per allocator.']
+----
+
+chipPlatformInitAllocator(CHIP_FOO_T);
+chipPlatformInitAllocator(CHIP_BAR_T);
+…
+foo = chipPlatformAllocate(CHIP_FOO_T);
+…
+chipPlatformDeallocate(CHIP_FOO_T, foo);
+…
+bar = chipPlatformAllocate(CHIP_BAR_T);
+…
+chipPlatformBarDeallocate(CHIP_BAR_T, bar);
+----
+
 :sectnums!:
 
 == Recommended Reading
@@ -327,6 +748,7 @@ Use of the C{plusplus} Language in Critical Systems. June 2008.
 [cols="^1,^1,<2,<3",options="header"]
 |===
 |Revision |Date |Modified By |Description
+|5 |2020-09-22 |Grant Erickson |Added Tightly-constrained Systems and Shared Infrastructure > Avoid Heap-based Resource Allocation
 |4 |2020-09-15 |Grant Erickson |Added Common > Language-dependent > Avoid `using namespace` Statements in Headers
 |3 |2020-09-01 |Grant Erickson |Added Common > Language-independent > Use C _stdint.h_ or C{plusplus} _cstdint_ for Plain Old Data Types
 |2 |2020-07-09 |Grant Erickson |Added Common > Language-independent > Commenting Out or Disabling Code

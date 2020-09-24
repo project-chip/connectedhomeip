@@ -54,7 +54,7 @@ class DLL_EXPORT UDPEndPoint : public IPEndPointBasis
 
 public:
     INET_ERROR Bind(IPAddressType addrType, IPAddress addr, uint16_t port, InterfaceId intfId = INET_NULL_INTERFACEID);
-    INET_ERROR BindInterface(IPAddressType addrType, InterfaceId intf);
+    INET_ERROR BindInterface(IPAddressType addrType, InterfaceId intfId);
     InterfaceId GetBoundInterface(void);
     uint16_t GetBoundPort(void);
     INET_ERROR Listen(void);

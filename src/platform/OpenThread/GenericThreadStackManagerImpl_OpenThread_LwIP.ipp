@@ -327,7 +327,7 @@ err_t GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::SendPacket(struc
         otErr = otMessageAppend(pktMsg, partialPkt->payload, partialPkt->len);
         VerifyOrExit(otErr == OT_ERROR_NONE, lwipErr = ERR_MEM);
 
-        remainingLen -= partialPkt->len;
+        remainingLen = static_cast<uint16_t>(remainingLen - partialPkt->len);
     }
     VerifyOrExit(remainingLen == 0, lwipErr = ERR_VAL);
 

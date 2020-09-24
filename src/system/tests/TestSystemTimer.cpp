@@ -122,9 +122,9 @@ public:
     {
         TestContext * lContext = static_cast<TestContext *>(p);
         lContext->GreedyTimer();
-    };
+    }
 
-    TestContext() : mGreedyTimer(GreedyTimer, this), mNumTimersHandled(0){};
+    TestContext() : mGreedyTimer(GreedyTimer, this), mNumTimersHandled(0) {}
 };
 
 // Test input data.
@@ -244,7 +244,7 @@ static Layer sLayer;
 static int TestSetup(void * aContext)
 {
     TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
-    void * lLayerContext   = NULL;
+    void * lLayerContext   = nullptr;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_VERSION_MAJOR <= 2 && LWIP_VERSION_MINOR < 1
@@ -293,7 +293,4 @@ int TestSystemTimer(void)
     return nlTestRunnerStats(&kTheSuite);
 }
 
-static void __attribute__((constructor)) TestSystemTimerCtor(void)
-{
-    VerifyOrDie(chip::RegisterUnitTests(&TestSystemTimer) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestSystemTimer)

@@ -24,6 +24,9 @@
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
 #include "Server.h"
+#include "Service.h"
+#include "attribute-storage.h"
+#include "gen/cluster-id.h"
 #include "lcd.h"
 #include "qrcodegen.h"
 
@@ -49,7 +52,6 @@ using namespace chip::DeviceLayer;
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
-#define EXAMPLE_VENDOR_ID 0xcafe
 
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
@@ -94,6 +96,9 @@ int AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    // Init ZCL Data Model
+    InitServer();
+
     // Initialise WSTK buttons PB0 and PB1 (including debounce).
     ButtonHandler::Init();
 
@@ -126,12 +131,15 @@ int AppTask::Init()
 
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
+    UpdateClusterState();
 
 // Print setup info on LCD if available
 #ifdef DISPLAY_ENABLED
     chip::SetupPayload payload;
     uint32_t setUpPINCode       = 0;
     uint16_t setUpDiscriminator = 0;
+    uint16_t vendorId           = 0;
+    uint16_t productId          = 0;
 
     err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
     if (err != CHIP_NO_ERROR)
@@ -145,9 +153,21 @@ int AppTask::Init()
         EFR32_LOG("ConfigurationMgr().GetSetupDiscriminator() failed: %s", chip::ErrorStr(err));
     }
 
+    err = ConfigurationMgr().GetVendorId(vendorId);
+    if (err != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("ConfigurationMgr().GetVendorId() failed: %s", chip::ErrorStr(err));
+    }
+
+    err = ConfigurationMgr().GetProductId(productId);
+    if (err != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("ConfigurationMgr().GetProductId() failed: %s", chip::ErrorStr(err));
+    }
+
     payload.version       = 1;
-    payload.vendorID      = EXAMPLE_VENDOR_ID;
-    payload.productID     = 1;
+    payload.vendorID      = vendorId;
+    payload.productID     = productId;
     payload.setUpPINCode  = setUpPINCode;
     payload.discriminator = setUpDiscriminator;
     chip::QRCodeSetupPayloadGenerator generator(payload);
@@ -159,78 +179,12 @@ int AppTask::Init()
         EFR32_LOG("Failed to get Base41 payload for QR code with %s", chip::ErrorStr(err));
     }
 
-    EFR32_LOG("SetupPINCode: [%" PRIu32 "]", setUpPINCode);
+    EFR32_LOG("SetupPINCode: [%09u]", setUpPINCode);
     LCDWriteQRCode((uint8_t *) result.c_str());
 
 #endif
 
     return err;
-}
-
-void AppTask::HandleBLEConnectionOpened(chip::Ble::BLEEndPoint * endPoint)
-{
-    assert(endPoint != NULL);
-
-    ChipLogProgress(DeviceLayer, "AppTask: Connection opened");
-
-    GetAppTask().mBLEEndPoint    = endPoint;
-    endPoint->OnMessageReceived  = AppTask::HandleBLEMessageReceived;
-    endPoint->OnConnectionClosed = AppTask::HandleBLEConnectionClosed;
-}
-
-void AppTask::HandleBLEConnectionClosed(chip::Ble::BLEEndPoint * endPoint, BLE_ERROR err)
-{
-    ChipLogProgress(DeviceLayer, "AppTask: Connection closed");
-
-    GetAppTask().mBLEEndPoint = nullptr;
-}
-
-void AppTask::HandleBLEMessageReceived(chip::Ble::BLEEndPoint * endPoint, chip::System::PacketBuffer * buffer)
-{
-    assert(endPoint != NULL);
-#if CHIP_ENABLE_OPENTHREAD
-    assert(buffer != NULL);
-
-    uint16_t bufferLen = buffer->DataLength();
-    uint8_t * data     = buffer->Start();
-    chip::DeviceLayer::Internal::DeviceNetworkInfo networkInfo;
-    ChipLogProgress(DeviceLayer, "AppTask: Receive message size %u", bufferLen);
-
-    memcpy(networkInfo.ThreadNetworkName, data, sizeof(networkInfo.ThreadNetworkName));
-    data += sizeof(networkInfo.ThreadNetworkName);
-
-    memcpy(networkInfo.ThreadExtendedPANId, data, sizeof(networkInfo.ThreadExtendedPANId));
-    data += sizeof(networkInfo.ThreadExtendedPANId);
-
-    memcpy(networkInfo.ThreadMeshPrefix, data, sizeof(networkInfo.ThreadMeshPrefix));
-    data += sizeof(networkInfo.ThreadMeshPrefix);
-
-    memcpy(networkInfo.ThreadNetworkKey, data, sizeof(networkInfo.ThreadNetworkKey));
-    data += sizeof(networkInfo.ThreadNetworkKey);
-
-    memcpy(networkInfo.ThreadPSKc, data, sizeof(networkInfo.ThreadPSKc));
-    data += sizeof(networkInfo.ThreadPSKc);
-
-    networkInfo.ThreadPANId = data[0] | (data[1] << 8);
-    data += sizeof(networkInfo.ThreadPANId);
-    networkInfo.ThreadChannel = data[0];
-    data += sizeof(networkInfo.ThreadChannel);
-
-    networkInfo.FieldPresent.ThreadExtendedPANId = *data;
-    data++;
-    networkInfo.FieldPresent.ThreadMeshPrefix = *data;
-    data++;
-    networkInfo.FieldPresent.ThreadPSKc = *data;
-    data++;
-    networkInfo.NetworkId              = 0;
-    networkInfo.FieldPresent.NetworkId = true;
-
-    ThreadStackMgr().SetThreadEnabled(false);
-    ThreadStackMgr().SetThreadProvision(networkInfo);
-    ThreadStackMgr().SetThreadEnabled(true);
-#endif
-    endPoint->Close();
-    chip::System::PacketBuffer::Free(buffer);
 }
 
 void AppTask::AppTaskMain(void * pvParameter)
@@ -247,7 +201,6 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
     EFR32_LOG("App Task started");
-    chip::DeviceLayer::ConnectivityMgr().AddCHIPoBLEConnectionHandler(&AppTask::HandleBLEConnectionOpened);
     SetDeviceName("EFR32LockDemo._chip._udp.local.");
 
     while (true)
@@ -345,7 +298,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
         {
             action = BoltLockManager::UNLOCK_ACTION;
         }
-        actor = 0; // BOLT_LOCK_ACTOR_METHOD_PHYSICAL
+        actor = AppEvent::kEventType_Button;
     }
     else
     {
@@ -549,6 +502,11 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
         EFR32_LOG("Unlock Action has been initiated")
     }
 
+    if (aActor == AppEvent::kEventType_Button)
+    {
+        sAppTask.mSyncClusterToButtonAction = true;
+    }
+
     sLockLED.Blink(50, 50);
 }
 
@@ -568,6 +526,12 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
         EFR32_LOG("Unlock Action has been completed")
 
         sLockLED.Set(false);
+    }
+
+    if (sAppTask.mSyncClusterToButtonAction)
+    {
+        UpdateClusterState();
+        sAppTask.mSyncClusterToButtonAction = false;
     }
 }
 
@@ -601,5 +565,18 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     else
     {
         EFR32_LOG("Event received with no handler. Dropping event.");
+    }
+}
+
+void AppTask::UpdateClusterState(void)
+{
+    uint8_t newValue = !BoltLockMgr().IsUnlocked();
+
+    // write the new on/off value
+    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        EFR32_LOG("ERR: updating on/off %x", status);
     }
 }

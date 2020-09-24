@@ -62,8 +62,9 @@ public:
      *   msgBuf after processing it.
      *
      * @param header  messageheader
-     * @param state connection state
-     * @param msgBuf received message
+     * @param state   connection state
+     * @param msgBuf  received message
+     * @param mgr     A pointer to the SecureSessionMgr
      */
     virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
                                    System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr)
@@ -73,8 +74,9 @@ public:
      * @brief
      *   Called when received message processing resulted in error
      *
-     * @param error error code
-     * @param source network entity that sent the message
+     * @param error   error code
+     * @param source  network entity that sent the message
+     * @param mgr     A pointer to the SecureSessionMgr
      */
     virtual void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgrBase * mgr) {}
 
@@ -82,11 +84,12 @@ public:
      * @brief
      *   Called when a new connection is being established
      *
-     * @param state connection state
+     * @param state   connection state
+     * @param mgr     A pointer to the SecureSessionMgr
      */
     virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
 
-    virtual ~SecureSessionMgrCallback() {}
+    ~SecureSessionMgrCallback() override {}
 };
 
 class DLL_EXPORT SecureSessionMgrBase : public ReferenceCounted<SecureSessionMgrBase>
@@ -103,7 +106,7 @@ public:
     CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf);
 
     SecureSessionMgrBase();
-    virtual ~SecureSessionMgrBase();
+    ~SecureSessionMgrBase() override;
 
     /**
      * @brief

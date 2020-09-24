@@ -51,7 +51,7 @@ DLL_EXPORT void Object::Release(void)
 
     if (oldCount == 1)
     {
-        this->mSystemLayer = NULL;
+        this->mSystemLayer = nullptr;
         __sync_synchronize();
     }
     else if (oldCount == 0)
@@ -64,10 +64,10 @@ DLL_EXPORT bool Object::TryCreate(Layer & aLayer, size_t aOctets)
 {
     bool lReturn = false;
 
-    if (__sync_bool_compare_and_swap(&this->mSystemLayer, NULL, &aLayer))
+    if (__sync_bool_compare_and_swap(&this->mSystemLayer, nullptr, &aLayer))
     {
         this->mRefCount = 0;
-        this->AppState  = NULL;
+        this->AppState  = nullptr;
         memset(reinterpret_cast<char *>(this) + sizeof(*this), 0, aOctets - sizeof(*this));
 
         this->Retain();

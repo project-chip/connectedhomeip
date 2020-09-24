@@ -24,7 +24,6 @@
 #include "QRCodeSetupPayloadParser.h"
 #include "Base41.h"
 
-#include <iostream>
 #include <math.h>
 #include <memory>
 #include <string.h>
@@ -347,10 +346,8 @@ static string extractPayload(string inString)
     {
         return chipSegment.substr(strlen(kQRCodePrefix)); // strip out prefix before returning
     }
-    else
-    {
-        return chipSegment;
-    }
+
+    return chipSegment;
 }
 
 CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)

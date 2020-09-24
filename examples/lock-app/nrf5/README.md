@@ -9,7 +9,7 @@ An example application showing the use
     -   [Introduction](#introduction)
     -   [Device UI](#device-ui)
     -   [Building](#building)
-        -   [Using CHIP's nRF Platform Docker container](#using-chips-nrf-platform-docker-container)
+        -   [Using CHIP's VSCode `devcontainer`](#using-chips-vscode-devcontainer)
         -   [Using Native Shell](#using-native-shell)
     -   [Initializing the nRF52840 DK](#initializing-the-nrf52840-dk)
     -   [Flashing the Application](#flashing-the-application)
@@ -36,10 +36,10 @@ The lock example is intended to serve both as a means to explore the workings of
 CHIP, as well as a template for creating real products based on the Nordic
 platform.
 
-The example application builds upon the CHIP. A top-level BUILD.gn or Makefile
-orchestrates the entire build process, including building CHIP, and select files
-from the nRF5 SDK. The resultant image file can be flashed directly onto the
-Nordic dev kit hardware.
+The example application builds upon the CHIP. The build system orchestrates the
+entire build process, including building CHIP, and select files from the nRF5
+SDK. The resultant image file can be flashed directly onto the Nordic dev kit
+hardware.
 
 <a name="device-ui"></a>
 
@@ -90,38 +90,25 @@ The remaining two LEDs and buttons (#3 and #4) are unused.
 
 ## Building
 
-### Using CHIP's nRF Platform Docker container
+### Using CHIP's VSCode `devcontainer`
 
-Tools and SDK are preinstalled in CHIP's nRF Platform Docker container. You can
-build this example on a clean tree by running `make`.
+Tools and SDK are preinstalled in
+[CHIP's VSCode devcontainer](https://github.com/project-chip/connectedhomeip/blob/master/docs/VSCODE_DEVELOPMENT.md).
 
-Run the following commands to start a shell using Docker container.
+Run one of the following tasks in VSCode to build:
 
-        $ cd <connectedhomeip source directory>
+-   Run `Build nRF5 Lighting Example` VSCode task.
+
+-   Run the `Build & Test (all)` VSCode task.
+
+-   Run the following commands in the Docker container shell.
+
+        $ cd /workspaces/connectedhomeip-vscode/examples/lock-app/nrf5
+
         $ git submodule update --init
-        $ docker run -v $(pwd):/workspaces/connectedhomeip -it connectedhomeip/chip-build-nrf-platform:latest /bin/bash
-
-Run the following commands in the Docker container shell.
-
-        $ cd /workspaces/connectedhomeip
-
-        # CAUTION: the following step will delete any unstaged files
-        $ git clean -Xdf
-
-        $ scripts/examples/nrf_lock_app.sh
-
-Other alternatives in the container:
-
--   Run `Build nRF5 Lock App` VSCode task.
-
--   Run the `GN build` VSCode task. This does not require a clean tree.
-
--   Build manually with GN.
-
-            $ source scripts/activate.sh
-            $ cd examples/lock-app/nrf5
-            $ gn gen out/debug
-            $ ninja -C out/debug
+        $ source third_party/connectedhomeip/scripts/activate.sh
+        $ gn gen out/debug --args="nrf5_sdk_root=\"${NRF5_SDK_ROOT}\""
+        $ ninja -C out/debug
 
 ### Using Native Shell
 
@@ -144,10 +131,7 @@ Other alternatives in the container:
 -   Install some additional tools:
 
            # Linux
-           $ sudo apt-get install git make automake libtool ccache
-
-           # Mac OS X
-           $ brew install automake libtool ccache
+           $ sudo apt-get install git
 
 -   Set the following environment variables based on the locations/versions of
     the packages installed above:
@@ -167,18 +151,11 @@ Other alternatives in the container:
 
 *   Run GN to build the application
 
-          $ cd ~/connectedhomeip
+          $ cd ~/connectedhomeip/examples/lock-app/nrf5
           $ git submodule update --init
-          $ source scripts/activate.sh
-          $ cd examples/lock-app/nrf5
-          $ gn gen out/debug
+          $ source third_party/connectedhomeip/scripts/activate.sh
+          $ gn gen out/debug --args="nrf5_sdk_root=\"${NRF5_SDK_ROOT}\""
           $ ninja -C out/debug
-
-*   Or, run make to build the application
-
-          $ cd ~/connectedhomeip
-          $ git submodule update --init
-          $ scripts/examples/nrf_lock_app.sh
 
 <a name="initializing"></a>
 
@@ -197,17 +174,10 @@ should be erased and the Nordic SoftDevice image installed.
     SoftDevice image if it is not already present. If you prefer to do so
     manually first, to verify your board function, run:
 
-          $ python \
+          $ python3 \
               ~/connectedhomeip/third_party/nrf5_sdk/nrf5_firmware_utils.py \
               --eraseall \
               --application $NRF5_SDK_ROOT/components/softdevice/s140/hex/s140_nrf52_*_softdevice.hex
-
-*   Or, use the Makefile to erase the flash and program the Nordic SoftDevice
-    image.
-
-          $ cd ~/connectedhomeip/examples/lock-app/nrf5
-          $ make erase
-          $ make flash-softdevice
 
 Once the above is complete, it shouldn't need be done again _unless_ the
 SoftDevice image or the Nordic configuration storage (fds) area becomes corrupt.
@@ -221,12 +191,7 @@ and application again.
 To flash the example app, run the following commands:
 
         $ cd ~/connectedhomeip/examples/lock-app/nrf5
-        $ python out/debug/chip-nrf52840-lock-example.flash.py
-
-Or, if you are using the Makefile build,
-
-        $ cd ~/connectedhomeip/examples/lock-app/nrf5
-        $ make flash-app
+        $ python3 out/debug/chip-nrf52840-lock-example.flash.py
 
 > The [VSCode devcontainer](#using-chips-vscode-devcontainer) cannot communicate
 > with the nRF device. So, the above command must be run from a native shell.
