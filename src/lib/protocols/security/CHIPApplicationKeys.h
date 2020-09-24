@@ -129,7 +129,7 @@ public:
     virtual CHIP_ERROR DeleteGroupKey(uint32_t keyId)                                                                       = 0;
     virtual CHIP_ERROR DeleteGroupKeysOfAType(uint32_t keyType)                                                             = 0;
     virtual CHIP_ERROR EnumerateGroupKeys(uint32_t keyType, uint32_t * keyIds, uint8_t keyIdsArraySize, uint8_t & keyCount) = 0;
-    virtual CHIP_ERROR Clear()                                                                                          = 0;
+    virtual CHIP_ERROR Clear()                                                                                              = 0;
 
     // Get the current time.
     virtual CHIP_ERROR GetCurrentUTCTime(uint32_t & utcTime);

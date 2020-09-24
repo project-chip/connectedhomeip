@@ -65,9 +65,9 @@ public:
     void Free();
 
 private:
-    UDPEndPoint();                // not defined
+    UDPEndPoint();                    // not defined
     UDPEndPoint(const UDPEndPoint &); // not defined
-    ~UDPEndPoint();               // not defined
+    ~UDPEndPoint();                   // not defined
 
     static chip::System::ObjectPool<UDPEndPoint, INET_CONFIG_NUM_UDP_ENDPOINTS> sPool;
 

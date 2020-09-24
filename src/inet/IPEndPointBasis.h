@@ -176,9 +176,9 @@ protected:
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 private:
-    IPEndPointBasis();                    // not defined
+    IPEndPointBasis();                        // not defined
     IPEndPointBasis(const IPEndPointBasis &); // not defined
-    ~IPEndPointBasis();                   // not defined
+    ~IPEndPointBasis();                       // not defined
 };
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

@@ -84,9 +84,9 @@ public:
     void Free();
 
 private:
-    RawEndPoint();                // not defined
+    RawEndPoint();                    // not defined
     RawEndPoint(const RawEndPoint &); // not defined
-    ~RawEndPoint();               // not defined
+    ~RawEndPoint();                   // not defined
 
     static chip::System::ObjectPool<RawEndPoint, INET_CONFIG_NUM_RAW_ENDPOINTS> sPool;
 

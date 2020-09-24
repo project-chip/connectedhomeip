@@ -617,9 +617,9 @@ private:
 
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
-    TCPEndPoint();                // not defined
+    TCPEndPoint();                    // not defined
     TCPEndPoint(const TCPEndPoint &); // not defined
-    ~TCPEndPoint();               // not defined
+    ~TCPEndPoint();                   // not defined
 
     void Init(InetLayer * inetLayer);
     INET_ERROR DriveSending();
