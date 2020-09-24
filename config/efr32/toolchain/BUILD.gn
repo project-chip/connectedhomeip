@@ -22,3 +22,10 @@ arm_toolchain("efr32_lock_app") {
     import("${chip_root}/examples/lock-app/efr32/args.gni")
   }
 }
+
+arm_toolchain("efr32_lighting_app") {
+  toolchain_args = {
+    current_os = "freertos"
+    import("${chip_root}/examples/lighting-app/efr32/args.gni")
+  }
+}
