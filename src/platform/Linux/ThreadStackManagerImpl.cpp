@@ -32,9 +32,7 @@
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
 using otbr::DBus::ClientError;
 using otbr::DBus::DeviceRole;
-using otbr::DBus::IpCounters;
 using otbr::DBus::LinkModeConfig;
-using otbr::DBus::MacCounters;
 using otbr::DBus::NeighborInfo;
 
 #ifndef CHIP_CONFIG_OTBR_CLIENT_ERROR_MIN
