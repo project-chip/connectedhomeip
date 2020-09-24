@@ -24,6 +24,7 @@
 #ifndef BLE_MANAGER_IMPL_H
 #define BLE_MANAGER_IMPL_H
 
+#include <ble/BleLayer.h>
 #include <platform/internal/BLEManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -71,10 +72,23 @@ struct BLEAdvConfig
     const char * mpAdvertisingUUID;
 };
 
+struct BLEScanConfig
+{
+    // Discriminator of seeked device (encoded in its BLE advertising payload)
+    uint16_t mDiscriminator = 0;
+
+    // Optional argument to be passed to callback functions provided by the BLE scan/connect requestor
+    void * mAppState = nullptr;
+};
+
 /**
  * Concrete implementation of the BLEManagerImpl singleton object for the Linux platforms.
  */
-class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
+class BLEManagerImpl final : public BLEManager,
+                             private BleLayer,
+                             private BlePlatformDelegate,
+                             private BleApplicationDelegate,
+                             private BleConnectionDelegate
 {
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -133,6 +147,10 @@ private:
 
     void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
 
+    // ===== Members that implement virtual methods on BleConnectionDelegate.
+
+    void NewConnection(BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator) override;
+
     // ===== Members for internal use by the following friends.
 
     friend BLEManager & BLEMgr();
@@ -152,7 +170,8 @@ private:
         kFlag_AdvertisingEnabled       = 0x0040, /**< The application has enabled CHIPoBLE advertising. */
         kFlag_FastAdvertisingEnabled   = 0x0080, /**< The application has enabled fast advertising. */
         kFlag_UseCustomDeviceName      = 0x0100, /**< The application has configured a custom BLE device name. */
-        kFlag_AdvertisingRefreshNeeded = 0x0200, /**< The advertising configuration/state in ESP BLE layer needs to be updated. */
+        kFlag_AdvertisingRefreshNeeded = 0x0200, /**< The advertising configuration/state in BLE layer needs to be updated. */
+        kFlag_Scanning                 = 0x0400, /**< The system is currently scanning for CHIPoBLE devices */
     };
 
     enum
@@ -170,9 +189,10 @@ private:
 
     CHIPoBLEServiceMode mServiceMode;
     BLEAdvConfig mBLEAdvConfig;
+    BLEScanConfig mBLEScanConfig;
     uint16_t mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
-    bool mIsCentral;
+    bool mIsCentral = false;
     BluezEndpoint * mpAppState;
 };
 
