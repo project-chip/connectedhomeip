@@ -53,7 +53,8 @@ public:
     /// Transports are required to have a constructor that takes exactly one argument
     CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR SendMessage(const MessageHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) override
+    CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const PeerAddress & address,
+                           System::PacketBuffer * msgBuf) override
     {
         HandleMessageReceived(header, address, msgBuf);
         return CHIP_NO_ERROR;
@@ -65,7 +66,7 @@ public:
 class TestSessMgrCallback : public SecureSessionMgrCallback
 {
 public:
-    void OnMessageReceived(const MessageHeader & header, PeerConnectionState * state, System::PacketBuffer * msgBuf,
+    void OnMessageReceived(const PacketHeader & header, PeerConnectionState * state, System::PacketBuffer * msgBuf,
                            SecureSessionMgrBase * mgr) override
     {
         NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));

@@ -48,7 +48,7 @@ void InitDataModelHandler();
  * @param[in] mgr The session manager to use for sending a response to the
  *                message.
  */
-void HandleDataModelMessage(const chip::MessageHeader & header, chip::System::PacketBuffer * buffer,
+void HandleDataModelMessage(const chip::PacketHeader & header, chip::System::PacketBuffer * buffer,
                             chip::SecureSessionMgrBase * mgr);
 
 #endif // DATA_MODEL_HANDLER_H

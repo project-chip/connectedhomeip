@@ -150,7 +150,7 @@ void HandleBLEConnectionOpened(chip::Ble::BLEEndPoint * endPoint)
 class ServerCallback : public SecureSessionMgrCallback
 {
 public:
-    void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
+    void OnMessageReceived(const PacketHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
                            SecureSessionMgrBase * mgr) override
     {
         const size_t data_len = buffer->DataLength();

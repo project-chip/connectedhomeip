@@ -66,7 +66,7 @@ public:
      * @param msgBuf  received message
      * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
+    virtual void OnMessageReceived(const PacketHeader & packetHeader, Transport::PeerConnectionState * state,
                                    System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr)
     {}
 
@@ -180,8 +180,8 @@ private:
     CHIP_ERROR AllocateNewConnection(const MessageHeader & header, const Transport::PeerAddress & address,
                                      Transport::PeerConnectionState ** state);
 
-    static void HandleDataReceived(MessageHeader & header, const Transport::PeerAddress & source, System::PacketBuffer * msgBuf,
-                                   SecureSessionMgrBase * transport);
+    static void HandleDataReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                                   System::PacketBuffer * msgBuf, SecureSessionMgrBase * transport);
 
     /**
      * Called when a specific connection expires.

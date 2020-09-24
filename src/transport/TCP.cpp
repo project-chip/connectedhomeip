@@ -170,7 +170,8 @@ exit:
     return endPoint;
 }
 
-CHIP_ERROR TCPBase::SendMessage(const MessageHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgBuf)
+CHIP_ERROR TCPBase::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
+                                System::PacketBuffer * msgBuf)
 {
     // Sent buffer data format is:
     //    - packet size as a uint16_t (inludes size of header and actual data)
@@ -195,7 +196,7 @@ CHIP_ERROR TCPBase::SendMessage(const MessageHeader & header, const Transport::P
         // Length is actual data, without considering the length bytes themselves
         LittleEndian::Write16(output, msgBuf->DataLength() - kPacketSizeBytes);
 
-        err = header.Encode(output, msgBuf->DataLength(), &actualEncodedHeaderSize);
+        err = header.Encode(output, msgBuf->DataLength(), &actualEncodedHeaderSize, payloadFlags);
         SuccessOrExit(err);
 
         // header encoding has to match space that we allocated
@@ -324,7 +325,7 @@ CHIP_ERROR TCPBase::ProcessSingleMessageFromBufferHead(const PeerAddress & peerA
 
     size_t headerSize = 0;
 
-    MessageHeader header;
+    PacketHeader header;
     err = header.Decode(buffer->Start(), buffer->DataLength(), &headerSize);
     SuccessOrExit(err);
 

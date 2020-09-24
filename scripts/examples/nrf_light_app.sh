@@ -19,4 +19,4 @@
 set -x
 env
 
-make -j VERBOSE=1 -C examples/lighting-app/nrf5
+make -j 8 VERBOSE=1 -C examples/lighting-app/nrf5
