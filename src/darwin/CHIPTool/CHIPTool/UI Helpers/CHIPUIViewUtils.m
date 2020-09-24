@@ -39,8 +39,8 @@
 {
     UIStackView *stackView = [UIStackView new];
     stackView.axis = UILayoutConstraintAxisVertical;
-    stackView.distribution = UIStackViewDistributionEqualSpacing
-;
+    stackView.distribution = UIStackViewDistributionEqualSpacing;
+    
     stackView.alignment = UIStackViewAlignmentLeading;
     stackView.spacing = 3;
     
