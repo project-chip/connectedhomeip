@@ -60,11 +60,12 @@ CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
 
-    err = BleLayer::Init(this, this, &SystemLayer);
+    err = BleLayer::Init(this, this, this, &SystemLayer);
     SuccessOrExit(err);
 
+    // TODO: for chip-tool set mIsCentral   = true;
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
-    mFlags       = kFlag_AdvertisingEnabled;
+    mFlags       = !mIsCentral ? kFlag_AdvertisingEnabled : 0;
     mAppState    = nullptr;
 
     memset(mDeviceName, 0, sizeof(mDeviceName));
@@ -485,7 +486,7 @@ void BLEManagerImpl::DriveBLEState()
     // Initializes the Bluez BLE layer if needed.
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !GetFlag(mFlags, kFlag_BluezBLELayerInitialized))
     {
-        err = InitBluezBleLayer(false, nullptr, mBLEAdvConfig, mpAppState);
+        err = InitBluezBleLayer(mIsCentral, nullptr, mBLEAdvConfig, mpAppState);
         SuccessOrExit(err);
         SetFlag(mFlags, kFlag_BluezBLELayerInitialized);
     }
@@ -536,6 +537,20 @@ void BLEManagerImpl::DriveBLEState()
         }
     }
 
+    // Configure BLE scanning
+    if (mBLEScanConfig.mDiscriminator && !GetFlag(mFlags, kFlag_Scanning))
+    {
+        err = StartDiscovery(static_cast<BluezEndpoint *>(mpAppState), { mBLEScanConfig.mDiscriminator, /* mAutoConnect= */ true });
+        SuccessOrExit(err);
+        SetFlag(mFlags, kFlag_Scanning);
+    }
+    else if (!mBLEScanConfig.mDiscriminator && GetFlag(mFlags, kFlag_Scanning))
+    {
+        err = StopDiscovery(static_cast<BluezEndpoint *>(mpAppState));
+        SuccessOrExit(err);
+        ClearFlag(mFlags, kFlag_Scanning);
+    }
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -552,6 +567,13 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogRetain(Ble, "Got notification regarding chip connection closure");
+}
+
+void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator)
+{
+    mBLEScanConfig.mDiscriminator = connDiscriminator;
+    mBLEScanConfig.mAppState      = appState;
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, void * apAppstate)
