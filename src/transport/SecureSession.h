@@ -80,10 +80,13 @@ public:
      * @param input Unencrypted input data
      * @param input_length Length of the input data
      * @param output Output buffer for encrypted data
-     * @param header message header structure
+     * @param header message header structure. Encryption type will be set on the header.
+     * @param mac - output the resulting mac
+     *
      * @return CHIP_ERROR The result of encryption
      */
-    CHIP_ERROR Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, MessageHeader & header);
+    CHIP_ERROR Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, MessageHeader & header,
+                       MessageAuthenticationCode & mac);
 
     /**
      * @brief
@@ -95,7 +98,8 @@ public:
      * @param header message header structure
      * @return CHIP_ERROR The result of decryption
      */
-    CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const MessageHeader & header);
+    CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const MessageHeader & header,
+                       const MessageAuthenticationCode & mac);
 
     /**
      * @brief
@@ -117,12 +121,13 @@ private:
     bool mKeyAvailable;
     uint8_t mKey[kAES_CCM128_Key_Length];
 
-    static CHIP_ERROR GetIV(const MessageHeader & header, uint8_t * iv, size_t len);
+    static CHIP_ERROR GetIV(const PacketHeader & header, uint8_t * iv, size_t len);
 
     // Use unencrypted header as additional authenticated data (AAD) during encryption and decryption.
     // The encryption operations includes AAD when message authentication tag is generated. This tag
     // is used at the time of decryption to integrity check the received data.
-    static CHIP_ERROR GetAdditionalAuthData(const MessageHeader & header, uint8_t * aad, size_t & len);
+    static CHIP_ERROR GetAdditionalAuthData(const PacketHeader & header, const Header::Flags payloadEncodeFlags, uint8_t * aad,
+                                            size_t & len);
 };
 
 } // namespace chip

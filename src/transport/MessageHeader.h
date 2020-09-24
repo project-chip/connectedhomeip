@@ -478,7 +478,6 @@ struct MessageHeader
 {
     PacketHeader packetHeader;
     PayloadHeader payloadHeader;
-    MessageAuthenticationCode mac;
 };
 
 } // namespace chip

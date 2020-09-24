@@ -106,6 +106,8 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBu
     {
         uint8_t * data = nullptr;
         MessageHeader header;
+        MessageAuthenticationCode mac;
+
         const size_t headerSize = header.payloadHeader.EncodeSizeBytes();
         size_t actualEncodedHeaderSize;
         size_t totalLen = 0;
@@ -127,10 +129,10 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBu
         err = header.payloadHeader.Encode(data, totalLen, &actualEncodedHeaderSize);
         SuccessOrExit(err);
 
-        err = state->GetSecureSession().Encrypt(data, totalLen, data, header);
+        err = state->GetSecureSession().Encrypt(data, totalLen, data, header, mac);
         SuccessOrExit(err);
 
-        err = header.mac.Encode(header.packetHeader, &data[totalLen], kMaxTagLen, &taglen);
+        err = mac.Encode(header.packetHeader, &data[totalLen], kMaxTagLen, &taglen);
         SuccessOrExit(err);
 
         msgBuf->SetDataLength(totalLen + taglen, nullptr);
@@ -241,6 +243,7 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
     // TODO this is where messages should be decoded
     {
         MessageHeader header;
+        MessageAuthenticationCode mac;
         header.packetHeader = packetHeader;
 
         uint8_t * data          = msg->Start();
@@ -259,12 +262,12 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
 #endif
         plainText = msg->Start();
 
-        err = header.mac.Decode(header.packetHeader, &data[header.packetHeader.GetPayloadLength()], kMaxTagLen, &taglen);
+        err = mac.Decode(header.packetHeader, &data[header.packetHeader.GetPayloadLength()], kMaxTagLen, &taglen);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Inet, "Secure transport failed to decode MAC Tag: err %d", err));
         len -= taglen;
         msg->SetDataLength(len, nullptr);
 
-        err = state->GetSecureSession().Decrypt(data, len, plainText, header);
+        err = state->GetSecureSession().Decrypt(data, len, plainText, header, mac);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Inet, "Secure transport failed to decrypt msg: err %d", err));
 
         err = header.payloadHeader.Decode(header.packetHeader.GetFlags(), plainText, headerSize, &decodedSize);
