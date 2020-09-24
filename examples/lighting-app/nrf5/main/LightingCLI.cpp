@@ -30,17 +30,135 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/RandUtils.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <support/logging/CHIPLogging.h>
 
 #include <ChipShellCollection.h>
 
+#include <AppEvent.h>
+#include <AppTask.h>
+#include <LightingManager.h>
+
 using namespace ::chip;
+using namespace ::chip::DeviceLayer;
 using namespace ::chip::Shell;
 
 namespace {
 
-const size_t kShellTaskStackSize = 1536;
-const int kShellTaskPriority     = 2;
+enum CLIEvents
+{
+    kCLIEvent_LightOn = 0,
+    kCLIEvent_LightOff,
+    kCLIEvent_LightToggle,
+
+    kCLIEvent_FactoryReset,
+};
+
+void CLIAppEventHandler(AppEvent * event)
+{
+    switch (event->CLIEvent.Event)
+    {
+    case kCLIEvent_LightOn:
+        LightingMgr().InitiateAction(LightingManager::ON_ACTION);
+        break;
+    case kCLIEvent_LightOff:
+        LightingMgr().InitiateAction(LightingManager::OFF_ACTION);
+        break;
+    case kCLIEvent_LightToggle: {
+        LightingManager::Action_t action;
+        if (LightingMgr().IsTurnedOn())
+        {
+            action = LightingManager::OFF_ACTION;
+        }
+        else
+        {
+            action = LightingManager::ON_ACTION;
+        }
+        LightingMgr().InitiateAction(action);
+        break;
+    }
+    case kCLIEvent_FactoryReset:
+        ConfigurationMgr().InitiateFactoryReset();
+        return;
+    default:
+        ChipLogError(Shell, "Unknown event received: %d", event->CLIEvent.Event);
+        return;
+    }
+}
+
+int cmd_light(int argc, char ** argv)
+{
+    int end_point = 1;
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_CLI;
+    event.Handler = CLIAppEventHandler;
+
+    VerifyOrExit(argc > 0 && argc <= 2, streamer_printf(streamer_get(), "light on/off/toggle [endpoint=1]\n\r"));
+
+    if (strcmp(argv[0], "on") == 0)
+    {
+        event.CLIEvent.Event = kCLIEvent_LightOn;
+    }
+    else if (strcmp(argv[0], "off") == 0)
+    {
+        event.CLIEvent.Event = kCLIEvent_LightOff;
+    }
+    else if (strcmp(argv[0], "toggle") == 0)
+    {
+        event.CLIEvent.Event = kCLIEvent_LightToggle;
+    }
+
+    if (argc == 2)
+    {
+        sscanf(argv[1], "%d", &end_point);
+    }
+
+    GetAppTask().PostEvent(&event);
+exit:
+    streamer_printf(streamer_get(), "\n\r");
+    return 0;
+}
+
+int cmd_app(int argc, char ** argv)
+{
+    int end_point = 1;
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_CLI;
+    event.Handler = CLIAppEventHandler;
+
+    VerifyOrExit(argc > 0, streamer_printf(streamer_get(), "app subcommand|help\n\r"));
+
+    if (strcmp(argv[0], "factoryrst") == 0)
+    {
+        event.CLIEvent.Event = kCLIEvent_FactoryReset;
+    }
+    else
+    {
+        streamer_printf(streamer_get(), "app factoryrst      : Do factory reset\n\r");
+    }
+
+    GetAppTask().PostEvent(&event);
+exit:
+    streamer_printf(streamer_get(), "\n\r");
+    return 0;
+}
+
+shell_command_t cmd_lightingcli[] = {
+    { &cmd_light, "light", "Lighting control" },
+    { &cmd_app, "app", "App utilities" },
+};
+
+void cmd_app_init(void)
+{
+    shell_register(cmd_lightingcli, ArraySize(cmd_lightingcli));
+}
+
+} // namespace
+
+namespace {
+
+const size_t kShellTaskStackSize = 2048;
+const int kShellTaskPriority     = 1;
 TaskHandle_t sShellTaskHandle;
 
 void LightingCLIMain(void * pvParameter)
@@ -57,9 +175,11 @@ void LightingCLIMain(void * pvParameter)
     ChipLogDetail(Shell, "Initializing CHIP shell", rc);
 
     cmd_misc_init();
-    cmd_base64_init();
+    cmd_app_init();
     cmd_btp_init();
     cmd_otcli_init();
+
+    ChipLogDetail(Shell, "Run CHIP shell Task", rc);
 
     shell_task(NULL);
 }

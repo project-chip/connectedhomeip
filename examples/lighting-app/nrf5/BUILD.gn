@@ -57,6 +57,7 @@ nrf5_sdk("sdk") {
     "MBEDTLS_X509_CREATE_C",
     "MBEDTLS_X509_CSR_WRITE_C",
     "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE",
+    "OPENTHREAD_CONFIG_ENABLE_BUILTIN_MBEDTLS_MANAGEMENT=1",
   ]
 }
 
@@ -88,7 +89,7 @@ nrf5_executable("lighting_app") {
   ]
 
   public_deps = [
-    "${chip_root}/examples/shell:chip_shell_collection",
+    "${chip_root}/examples/shell/shell_common:chip_shell_collection",
   ]
 
   deps = [
