@@ -33,13 +33,6 @@ jobs:
 
         runs-on: ubuntu-latest
 
-        container:
-            image: connectedhomeip/chip-build:0.4.8
-            volumes:
-                - "/tmp/log_output:/tmp/test_logs"
-                - "/tmp/happy_test_logs:/tmp/happy_test_logs"
-            options: --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
-
         steps:
             - name: Checkout
               uses: actions/checkout@v2
@@ -47,6 +40,8 @@ jobs:
                   submodules: true
             - name: Bootstrap
               run: |
+                  mkdir -p /tmp/happy_test_logs ;
+                  HAPPY_LOG_DIR=/tmp/happy_test_logs scripts/tests/happy_tests.sh bootstrap ;
                   scripts/build/gn_bootstrap.sh ;
             - name: Artifact suffix
               id: outsuffix
@@ -64,9 +59,25 @@ jobs:
                      *) ;;
                   esac
 
-                  scripts/build/gn_gen.sh --args="$GN_ARGS"
+                  scripts/build/gn_gen.sh --args="chip_with_happytests=true $GN_ARGS"
             - name: Run Build
               run: scripts/build/gn_build.sh
+            - name: Run Tests
+              run: scripts/tests/gn_tests.sh
+            - name: Uploading Logs
+              uses: actions/upload-artifact@v1
+              if: ${{ always() }}
+              with:
+                  name: ${{ env.BUILD_TYPE }}-logs
+                  path: /tmp/log_output
+            - name: Uploading Happy Test Log
+              uses: actions/upload-artifact@v1
+              if: ${{ always() }}
+              with:
+                  name:
+                      happy_log-${{
+                        steps.outsuffix.outputs.value }}-${{ matrix.type }}
+                  path: /tmp/happy_test_logs/
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
             # - name: Run Code Coverage

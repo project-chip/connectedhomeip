@@ -78,11 +78,12 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
   }
 
   group("check") {
+    deps = []
     if (chip_link_tests) {
-      deps = [
-        "//src:tests_run",
-        "//src:happy_tests",
-      ]
+      deps += [ "//src:tests_run" ]
+    }
+    if (chip_happy_tests) {
+      deps += [ "//src:happy_tests" ]
     }
   }
 } else {
