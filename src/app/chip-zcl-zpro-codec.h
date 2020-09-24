@@ -106,7 +106,8 @@ void printApsFrame(EmberApsFrame * frame);
  * @param[in] apsFrame The frame to encode.
  *
  * @return
- *   - If buffer is null, the number of bytes needed to encode.
+ *   - If buffer is null, the number of bytes needed to encode.  If this number
+ *     does not fit in a uint16_t, 0 will be returned.
  *   - If buffer is non-null but buf_length is not enough to hold the
  *     EmberApsFrame, 0.
  *   - If buffer is non-null and buf_length is large enough, the number of bytes
