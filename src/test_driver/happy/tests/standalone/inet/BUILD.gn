@@ -17,11 +17,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/gn/chip/happy_test.gni")
 
 happy_test("inet_tests") {
-    deps = [
-        "${chip_root}/src/inet/tests:happy_tests"
-    ]
+  deps = [ "${chip_root}/src/inet/tests:happy_tests" ]
 
-    tests = [
-        "test_inet_multicast_five_nodes_on_wifi"
-    ]
+  tests = [ "test_inet_multicast_five_nodes_on_wifi" ]
 }

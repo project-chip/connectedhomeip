@@ -30,7 +30,7 @@ template("happy_test") {
         script = rebase_path("${chip_root}/scripts/tests/happy_test_wrapper.py")
         data_deps = _deps
         inputs = [ "${_test}.py" ]
-        outputs = ["${_test_output_dir}/${_test}.testout"]
+        outputs = [ "${_test_output_dir}/${_test}.testout" ]
 
         # GN will run python under virtual env, which will cause test failed to run
         args = [

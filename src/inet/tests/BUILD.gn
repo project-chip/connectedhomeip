@@ -92,7 +92,5 @@ chip_test_suite("happy_tests") {
     "${nlunit_test_root}:nlunit-test",
   ]
 
-  tests = [
-    "TestInetLayerMulticast",
-  ]
+  tests = [ "TestInetLayerMulticast" ]
 }
