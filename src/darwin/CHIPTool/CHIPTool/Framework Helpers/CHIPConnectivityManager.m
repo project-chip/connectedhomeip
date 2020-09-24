@@ -57,7 +57,7 @@
 {
     if (self = [super init]) {
         self.chipController = [CHIPDeviceController sharedController];
-        
+
         // need to restart connections on background/foreground transitions otherwise the socket can be closed without CHIP knowing
         // about it.
         [[NSNotificationCenter defaultCenter] addObserver:self

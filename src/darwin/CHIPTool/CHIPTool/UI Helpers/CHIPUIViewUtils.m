@@ -27,11 +27,11 @@
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.font = [UIFont systemFontOfSize:25 weight:UIFontWeightBold];
     [view addSubview:titleLabel];
-    
+
     titleLabel.translatesAutoresizingMaskIntoConstraints = false;
     [titleLabel.centerXAnchor constraintEqualToAnchor:view.centerXAnchor].active = YES;
     [titleLabel.topAnchor constraintEqualToAnchor:view.topAnchor constant:100].active = YES;
-    
+
     return titleLabel;
 }
 
@@ -40,42 +40,42 @@
     UIStackView *stackView = [UIStackView new];
     stackView.axis = UILayoutConstraintAxisVertical;
     stackView.distribution = UIStackViewDistributionEqualSpacing;
-    
+
     stackView.alignment = UIStackViewAlignmentLeading;
     stackView.spacing = 3;
-    
+
     label.textColor = UIColor.systemBlueColor;
     result.textColor = UIColor.systemBlueColor;
     label.font = [UIFont systemFontOfSize:17];
     result.font = [UIFont italicSystemFontOfSize:17];
-    
+
     [stackView addArrangedSubview:label];
     [stackView addArrangedSubview:result];
-    
+
     label.translatesAutoresizingMaskIntoConstraints = false;
     result.translatesAutoresizingMaskIntoConstraints = false;
-    
+
     return stackView;
 }
 
 + (UIView *)viewWithLabel:(UILabel *)label textField:(UITextField *)textField
 {
     UIView *containingView = [UIView new];
-    
+
     label.font = [UIFont systemFontOfSize:17];
     [containingView addSubview:label];
-    
+
     label.translatesAutoresizingMaskIntoConstraints = false;
     [label.leadingAnchor constraintEqualToAnchor:containingView.leadingAnchor].active = true;
     [label.topAnchor constraintEqualToAnchor:containingView.topAnchor].active = true;
     [label.bottomAnchor constraintEqualToAnchor:containingView.bottomAnchor].active = YES;
-    
+
     textField.font = [UIFont systemFontOfSize:17];
     textField.borderStyle = UITextBorderStyleRoundedRect;
     textField.textColor = UIColor.blackColor;
     [textField.layer setCornerRadius:14.0f];
     [containingView addSubview:textField];
-    
+
     textField.translatesAutoresizingMaskIntoConstraints = false;
     [textField.trailingAnchor constraintEqualToAnchor:containingView.trailingAnchor].active = true;
     [textField.topAnchor constraintEqualToAnchor:containingView.topAnchor].active = true;
@@ -87,56 +87,56 @@
 + (UIView *)viewWithLabel:(UILabel *)label toggle:(UISwitch *)toggle
 {
     UIView *containingView = [UIView new];
-    
+
     label.font = [UIFont systemFontOfSize:17];
     [containingView addSubview:label];
-    
+
     label.translatesAutoresizingMaskIntoConstraints = false;
     [label.leadingAnchor constraintEqualToAnchor:containingView.leadingAnchor].active = true;
     [label.topAnchor constraintEqualToAnchor:containingView.topAnchor].active = true;
     [label.bottomAnchor constraintEqualToAnchor:containingView.bottomAnchor].active = YES;
-    
+
     [containingView addSubview:toggle];
-    
+
     toggle.translatesAutoresizingMaskIntoConstraints = false;
     [toggle.trailingAnchor constraintEqualToAnchor:containingView.trailingAnchor].active = true;
     [toggle.topAnchor constraintEqualToAnchor:containingView.topAnchor].active = true;
     [toggle.bottomAnchor constraintEqualToAnchor:containingView.bottomAnchor].active = YES;
     [toggle.leadingAnchor constraintGreaterThanOrEqualToAnchor:label.trailingAnchor constant:20].active = YES;
-    
+
     return containingView;
 }
 
 + (UIView *)viewWithUITextField:(UITextField *)textField button:(UIButton *)button
 {
     UIView *containingView = [UIView new];
-    
+
     textField.font = [UIFont systemFontOfSize:17];
     textField.backgroundColor = UIColor.whiteColor;
     textField.borderStyle = UITextBorderStyleRoundedRect;
     textField.textColor = UIColor.blackColor;
     [textField.layer setCornerRadius:14.0f];
     [containingView addSubview:textField];
-    
+
     textField.translatesAutoresizingMaskIntoConstraints = false;
     [textField.leadingAnchor constraintEqualToAnchor:containingView.leadingAnchor].active = true;
     [textField.topAnchor constraintEqualToAnchor:containingView.topAnchor].active = true;
     [textField.bottomAnchor constraintEqualToAnchor:containingView.bottomAnchor].active = YES;
-    
+
     button.titleLabel.font = [UIFont systemFontOfSize:17];
     button.titleLabel.textColor = [UIColor blackColor];
     button.layer.cornerRadius = 5;
     button.clipsToBounds = YES;
     button.backgroundColor = UIColor.systemBlueColor;
     [containingView addSubview:button];
-    
+
     button.translatesAutoresizingMaskIntoConstraints = false;
     [button.trailingAnchor constraintEqualToAnchor:containingView.trailingAnchor].active = true;
     [button.topAnchor constraintEqualToAnchor:containingView.topAnchor].active = true;
     [button.bottomAnchor constraintEqualToAnchor:containingView.bottomAnchor].active = YES;
     [button.widthAnchor constraintEqualToConstant:60].active = YES;
     [button.leadingAnchor constraintEqualToAnchor:textField.trailingAnchor constant:15].active = YES;
-    
+
     return containingView;
 }
 @end

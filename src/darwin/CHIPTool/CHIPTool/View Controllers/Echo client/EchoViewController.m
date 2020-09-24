@@ -71,10 +71,10 @@
 - (void)setupUIElements
 {
     self.view.backgroundColor = UIColor.whiteColor;
-    
+
     // Title
     UILabel *titleLabel = [CHIPUIViewUtils addTitle:@"Echo client" toView:self.view];
-   
+
     // stack view
     _stackView = [UIStackView new];
     _stackView.axis = UILayoutConstraintAxisVertical;
@@ -82,12 +82,12 @@
     _stackView.alignment = UIStackViewAlignmentLeading;
     _stackView.spacing = 30;
     [self.view addSubview:_stackView];
-    
+
     _stackView.translatesAutoresizingMaskIntoConstraints = false;
     [_stackView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:30].active = YES;
     [_stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [_stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
-    
+
     // IP
     UILabel *serverIPLabel = [UILabel new];
     serverIPLabel.text = @"Server IP";
@@ -104,7 +104,7 @@
     [_stackView addArrangedSubview:serverIPView];
     serverIPView.translatesAutoresizingMaskIntoConstraints = false;
     [serverIPView.trailingAnchor constraintEqualToAnchor:_stackView.trailingAnchor].active = YES;
-  
+
     // Send message
     _messageTextField = [UITextField new];
     _messageTextField.placeholder = @"Hello from iOS!";
@@ -115,7 +115,7 @@
     [_stackView addArrangedSubview:sendMessageView];
     sendMessageView.translatesAutoresizingMaskIntoConstraints = false;
     [sendMessageView.trailingAnchor constraintEqualToAnchor:_stackView.trailingAnchor].active = YES;
-    
+
     // Result message
     _resultLabel = [UILabel new];
     _resultLabel.hidden = YES;
@@ -124,7 +124,7 @@
     _resultLabel.lineBreakMode = NSLineBreakByWordWrapping;
     _resultLabel.numberOfLines = 0;
     [_stackView addArrangedSubview:_resultLabel];
-    
+
     _resultLabel.translatesAutoresizingMaskIntoConstraints = false;
     [_resultLabel.trailingAnchor constraintEqualToAnchor:_stackView.trailingAnchor].active = YES;
     _resultLabel.adjustsFontSizeToFitWidth = YES;
@@ -183,7 +183,7 @@
            [self updateResult:stringError];
        });
     }
-    
+
 }
 
 - (void)deviceControllerOnMessage:(nonnull NSData *)message {
@@ -222,4 +222,3 @@
 }
 
 @end
-

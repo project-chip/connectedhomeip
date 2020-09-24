@@ -44,18 +44,18 @@
 {
     [super viewDidLoad];
     [self setupUIElements];
-    
+
     // listen for taps to dismiss the keyboard
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
-    
+
     // initialize the device controller
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.onoffvc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = [CHIPDeviceController sharedController];
     [self.chipController setDelegate:self queue:callbackQueue];
     self.connectivityManager = [CHIPConnectivityManager sharedManager];
     [self.connectivityManager setDelegate:self queue:callbackQueue];
-    
+
     self.onOff = [[CHIPOnOff alloc] initWithDeviceController:self.chipController];
 }
 
@@ -69,10 +69,10 @@
 - (void)setupUIElements
 {
      self.view.backgroundColor = UIColor.whiteColor;
-    
+
     // Title
     UILabel *titleLabel = [CHIPUIViewUtils addTitle:@"On Off Cluster" toView:self.view];
-    
+
     // stack view
     UIStackView *stackView = [UIStackView new];
     stackView.axis = UILayoutConstraintAxisVertical;
@@ -80,12 +80,12 @@
     stackView.alignment = UIStackViewAlignmentLeading;
     stackView.spacing = 30;
     [self.view addSubview:stackView];
-    
+
     stackView.translatesAutoresizingMaskIntoConstraints = false;
     [stackView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:30].active = YES;
     [stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
-    
+
     // IP
     UILabel *serverIPLabel = [UILabel new];
     serverIPLabel.text = @"Server IP";
@@ -102,7 +102,7 @@
     [stackView addArrangedSubview:serverIPView];
     serverIPView.translatesAutoresizingMaskIntoConstraints = false;
     [serverIPView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
- 
+
     // Button stack view
     UIStackView *stackViewButtons = [UIStackView new];
     stackViewButtons.axis = UILayoutConstraintAxisHorizontal;
@@ -110,7 +110,7 @@
     stackViewButtons.alignment = UIStackViewAlignmentLeading;
     stackViewButtons.spacing = 10;
     [stackView addArrangedSubview:stackViewButtons];
-    
+
     // Create buttons
     UIButton *onButton = [UIButton new];
     [onButton setTitle:@"On" forState:UIControlStateNormal];
@@ -121,7 +121,7 @@
     UIButton *toggleButton = [UIButton new];
     [toggleButton setTitle:@"Toggle" forState:UIControlStateNormal];
     [toggleButton addTarget:self action:@selector(toggleButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    
+
     stackView.translatesAutoresizingMaskIntoConstraints = false;
     NSArray <UIButton *> *buttons = @[onButton, offButton, toggleButton];
     for (int i = 0; i < buttons.count; i ++) {
@@ -135,7 +135,7 @@
         [buttonForStack.widthAnchor constraintGreaterThanOrEqualToConstant:60].active = YES;
         [stackViewButtons addArrangedSubview:buttonForStack];
     }
-    
+
     // Result message
     _resultLabel = [UILabel new];
     _resultLabel.hidden = YES;
@@ -144,7 +144,7 @@
     _resultLabel.lineBreakMode = NSLineBreakByWordWrapping;
     _resultLabel.numberOfLines = 0;
     [stackView addArrangedSubview:_resultLabel];
-    
+
     _resultLabel.translatesAutoresizingMaskIntoConstraints = false;
     [_resultLabel.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
     _resultLabel.adjustsFontSizeToFitWidth = YES;
@@ -201,7 +201,7 @@
            [self updateResult:stringError];
        });
     }
-    
+
 }
 
 - (void)deviceControllerOnMessage:(nonnull NSData *)message {

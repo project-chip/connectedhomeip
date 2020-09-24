@@ -55,10 +55,10 @@
 - (void)setupUI
 {
     self.view.backgroundColor = UIColor.whiteColor;
-    
+
     // Title
     UILabel *titleLabel = [CHIPUIViewUtils addTitle:@"Network Configuration" toView:self.view];
-    
+
     // stack view
     UIStackView *stackView = [UIStackView new];
     stackView.axis = UILayoutConstraintAxisVertical;
@@ -66,12 +66,12 @@
     stackView.alignment = UIStackViewAlignmentLeading;
     stackView.spacing = 30;
     [self.view addSubview:stackView];
-    
+
     stackView.translatesAutoresizingMaskIntoConstraints = false;
     [stackView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:30].active = YES;
     [stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
-    
+
     // info label
     UILabel *informationLabel = [UILabel new];
     informationLabel.font = [UIFont systemFontOfSize:17 weight:UIFontWeightThin];
@@ -79,7 +79,7 @@
     informationLabel.numberOfLines = 0;
     [stackView addArrangedSubview:informationLabel];
     informationLabel.translatesAutoresizingMaskIntoConstraints = false;
-    
+
     // wifi entry
     UILabel *ssidLabel = [UILabel new];
     ssidLabel.text = @"SSID";
@@ -88,7 +88,7 @@
     [stackView addArrangedSubview:ssidView];
     ssidView.translatesAutoresizingMaskIntoConstraints = false;
     [ssidView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
-    
+
     // password entry
     UILabel *passwordLabel = [UILabel new];
     passwordLabel.text = @"Password";
@@ -97,7 +97,7 @@
     UIView *passwordView = [CHIPUIViewUtils viewWithLabel:passwordLabel textField:_networkPassword];
     [stackView addArrangedSubview:passwordView];
     [passwordView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
-    
+
     // Button stack view
     UIStackView *stackViewButtons = [UIStackView new];
     stackViewButtons.axis = UILayoutConstraintAxisHorizontal;
@@ -105,7 +105,7 @@
     stackViewButtons.alignment = UIStackViewAlignmentTrailing;
     stackViewButtons.spacing = 10;
     [self.view addSubview:stackViewButtons];
-    
+
     stackViewButtons.translatesAutoresizingMaskIntoConstraints = false;
     [stackViewButtons.topAnchor constraintEqualToAnchor:stackView.bottomAnchor constant:30].active = YES;
     [stackViewButtons.bottomAnchor constraintLessThanOrEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active = YES;
@@ -129,7 +129,7 @@
         [buttonForStack.widthAnchor constraintEqualToConstant:70].active = YES;
         [stackViewButtons addArrangedSubview:buttonForStack];
     }
-    
+
 }
 
 - (void)fillNetworkConfigWithDefaults
