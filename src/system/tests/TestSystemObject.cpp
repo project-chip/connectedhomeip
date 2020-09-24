@@ -66,8 +66,6 @@ using namespace chip::System;
 namespace chip {
 namespace System {
 
-using chip::ErrorStr;
-
 static int Initialize(void * aContext);
 static int Finalize(void * aContext);
 
