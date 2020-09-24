@@ -136,15 +136,19 @@ config("optimize_default") {
 config("disabled_warnings") {
   cflags = [
     "-Wno-deprecated-declarations",
-    "-Wno-unknown-warning-option",
     "-Wno-missing-field-initializers",
-    "-Wno-unused-but-set-variable",
     "-Wno-unused-variable",
   ]
-  cflags_cc = [
-    "-Wno-non-virtual-dtor",
-    "-Wno-deprecated-copy",
-  ]
+  if (!_is_embedded_arm) {
+    cflags += [
+      "-Wno-unknown-warning-option",
+      "-Wno-unused-but-set-variable",
+    ]
+  }
+  cflags_cc = [ "-Wno-non-virtual-dtor" ]
+  if (!_is_embedded_arm) {
+    cflags_cc += [ "-Wno-deprecated-copy" ]
+  }
   if (!is_debug) {
     # assert() causes unused variable warnings in release.
     cflags += [ "-Wno-unused" ]
