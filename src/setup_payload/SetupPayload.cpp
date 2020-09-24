@@ -132,9 +132,9 @@ exit:
 vector<OptionalQRCodeInfo> SetupPayload::getAllOptionalVendorData()
 {
     vector<OptionalQRCodeInfo> returnedOptionalInfo;
-    for (map<uint8_t, OptionalQRCodeInfo>::iterator it = optionalVendorData.begin(); it != optionalVendorData.end(); ++it)
+    for (auto & entry : optionalVendorData)
     {
-        returnedOptionalInfo.push_back(it->second);
+        returnedOptionalInfo.push_back(entry.second);
     }
     return returnedOptionalInfo;
 }
@@ -272,10 +272,9 @@ optionalQRCodeInfoType SetupPayload::getNumericTypeFor(uint8_t tag)
 vector<OptionalQRCodeInfoExtension> SetupPayload::getAllOptionalExtensionData()
 {
     vector<OptionalQRCodeInfoExtension> returnedOptionalInfo;
-    for (map<uint8_t, OptionalQRCodeInfoExtension>::iterator it = optionalExtensionData.begin(); it != optionalExtensionData.end();
-         ++it)
+    for (auto & entry : optionalExtensionData)
     {
-        returnedOptionalInfo.push_back(it->second);
+        returnedOptionalInfo.push_back(entry.second);
     }
     return returnedOptionalInfo;
 }

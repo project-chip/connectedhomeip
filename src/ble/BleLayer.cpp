@@ -208,9 +208,9 @@ BLE_ERROR BleTransportCapabilitiesRequestMessage::Encode(PacketBuffer * msgBuf) 
     chip::Encoding::Write8(p, CAPABILITIES_MSG_CHECK_BYTE_1);
     chip::Encoding::Write8(p, CAPABILITIES_MSG_CHECK_BYTE_2);
 
-    for (int i = 0; i < CAPABILITIES_REQUEST_SUPPORTED_VERSIONS_LEN; i++)
+    for (uint8_t version : mSupportedProtocolVersions)
     {
-        chip::Encoding::Write8(p, mSupportedProtocolVersions[i]);
+        chip::Encoding::Write8(p, version);
     }
 
     chip::Encoding::LittleEndian::Write16(p, mMtu);
