@@ -42,14 +42,14 @@ function happytest_bootstrap() {
 
     apt-get update
     apt-get install -y bridge-utils \
-                            iproute2 \
-                            net-tools \
-                            python3-lockfile \
-                            python3-pip \
-                            python3-psutil \
-                            python3-setuptools \
-                            strace \
-                            sudo
+        iproute2 \
+        net-tools \
+        python3-lockfile \
+        python3-pip \
+        python3-psutil \
+        python3-setuptools \
+        strace \
+        sudo
     make
 
     echo "Happy Log dir set to $HAPPY_LOG_DIR"
