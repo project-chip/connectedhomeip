@@ -39,7 +39,7 @@ find ./io/openthread/commissioner -name "*.class" | xargs jar cvf ../../../libs/
 cd ../../../
 
 ## Copy shared native libraries
-for lib in "$(find ./build -name "*.so")"; do
+for lib in $(find ./build -name "*.so"); do
     ## Avoid copying symblink files.
     [ ! -L "$lib" ] && cp "$lib" libs
 done
