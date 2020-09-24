@@ -15,17 +15,22 @@
  *    limitations under the License.
  */
 
-#import "CHIPViewControllerBase.h"
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface WifiViewController : CHIPViewControllerBase
+@protocol CHIPConnectivityManagerDelegate;
 
-@property (weak, nonatomic) IBOutlet UITextField * networkSSID;
-@property (weak, nonatomic) IBOutlet UITextField * networkPassword;
-@property (weak, nonatomic) IBOutlet UIButton * saveButton;
-@property (weak, nonatomic) IBOutlet UIButton * clearButton;
+@interface CHIPConnectivityManager : NSObject
++ (CHIPConnectivityManager *)sharedManager;
+- (void)reconnectIfNeeded;
+- (void)setDelegate:(id<CHIPConnectivityManagerDelegate>)delegate queue:(dispatch_queue_t)queue;
+@end
+
+@protocol CHIPConnectivityManagerDelegate <NSObject>
+
+- (void)didReceiveConnectionError:(NSError *)error;
+- (void)didReceiveDisconnectionError:(NSError *)error;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -15,14 +15,13 @@
  *    limitations under the License.
  */
 
-#import "CHIPViewControllerBase.h"
+#import "CHIPConnectivityManager.h"
+#import <CHIP/CHIP.h>
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface EchoViewController : CHIPViewControllerBase
-
-- (IBAction)sendAction:(id)sender;
+@interface OnOffViewController : UIViewController <CHIPDeviceControllerDelegate, CHIPConnectivityManagerDelegate>
 
 @end
 

@@ -14,8 +14,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#import <UIKit/UIKit.h>
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+#import <Foundation/Foundation.h>
 
-@end
+extern NSString * const kCHIPToolDefaultsDomain;
+extern NSString * const kNetworkSSIDDefaultsKey;
+extern NSString * const kNetworkPasswordDefaultsKey;
+extern NSString * const kIPKey;
+
+id CHIPGetDomainValueForKey(NSString * domain, NSString * key);
+void CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value);
+void CHIPRemoveDomainValueForKey(NSString * domain, NSString * key);
