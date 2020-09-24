@@ -71,7 +71,7 @@ uint16_t extractApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * 
             return 0;                                                                                                              \
         }                                                                                                                          \
         outApsFrame->fieldName = Reader<fieldSize>::read(read_ptr);                                                                \
-        buf_length -= fieldSize;                                                                                                   \
+        buf_length             = static_cast<uint16_t>(buf_length - fieldSize);                                                    \
     } while (0)
 
     TRY_READ(profileId, 2);
@@ -85,7 +85,9 @@ uint16_t extractApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * 
 
 #undef TRY_READ
 
-    return read_ptr - buffer;
+    // Cast is safe because buf_length is uint16_t, so we can't have moved too
+    // far along.
+    return static_cast<uint16_t>(read_ptr - buffer);
 }
 
 void printApsFrame(EmberApsFrame * frame)
@@ -107,7 +109,7 @@ uint16_t extractMessage(uint8_t * buffer, uint16_t buffer_length, uint8_t ** msg
     if (msg && apsFrameSize > 0)
     {
         *msg   = buffer + apsFrameSize;
-        result = buffer_length - apsFrameSize;
+        result = static_cast<uint16_t>(buffer_length - apsFrameSize);
     }
     else if (msg)
     {
