@@ -239,7 +239,6 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
     CHIP_ERROR err = CHIP_NO_ERROR;
     PacketHeader packetHeader;
     PayloadHeader payloadHeader;
-    MessageHeader header;
     MessageAuthenticationCode mac;
     size_t headerSize              = 0;
     uint8_t * data                 = nullptr;
