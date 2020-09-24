@@ -47,7 +47,7 @@ struct Reader<2>
 
 extern "C" {
 
-uint16_t extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * outApsFrame)
+uint16_t extractApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * outApsFrame)
 {
     if (buffer == nullptr || buf_length == 0 || outApsFrame == nullptr)
     {

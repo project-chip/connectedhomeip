@@ -134,12 +134,10 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareRevision(char
         memcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION, outLen);
         return CHIP_NO_ERROR;
     }
-    else
 #endif // CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
-    {
-        outLen = 0;
-        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    }
+
+    outLen = 0;
+    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 }
 
 template <class ImplClass>
@@ -281,13 +279,19 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturingDate(uin
 
     VerifyOrExit(dateLen == kDateStringLength, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    year = strtoul(dateStr, &parseEnd, 10);
+    // Cast does not lose information, because we then check that we only parsed
+    // 4 digits, so our number can't be bigger than 9999.
+    year = static_cast<uint16_t>(strtoul(dateStr, &parseEnd, 10));
     VerifyOrExit(parseEnd == dateStr + 4, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    month = strtoul(dateStr + 5, &parseEnd, 10);
+    // Cast does not lose information, because we then check that we only parsed
+    // 2 digits, so our number can't be bigger than 99.
+    month = static_cast<uint8_t>(strtoul(dateStr + 5, &parseEnd, 10));
     VerifyOrExit(parseEnd == dateStr + 7, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    dayOfMonth = strtoul(dateStr + 8, &parseEnd, 10);
+    // Cast does not lose information, because we then check that we only parsed
+    // 2 digits, so our number can't be bigger than 99.
+    dayOfMonth = static_cast<uint8_t>(strtoul(dateStr + 8, &parseEnd, 10));
     VerifyOrExit(parseEnd == dateStr + 10, err = CHIP_ERROR_INVALID_ARGUMENT);
 
 exit:

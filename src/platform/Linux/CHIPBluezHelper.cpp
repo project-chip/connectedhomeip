@@ -55,6 +55,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <errno.h>
 #include <gio/gunixfdlist.h>
+#include <limits>
 #include <stdarg.h>
 #include <strings.h>
 #include <unistd.h>
@@ -363,10 +364,11 @@ static gboolean BluezCharacteristicWriteFD(GIOChannel * aChannel, GIOCondition a
 
     VerifyOrExit(len > 0, ChipLogProgress(DeviceLayer, "FAIL: short read in %s (%d)", __func__, len));
 
-    newVal = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, buf, len, sizeof(uint8_t));
+    // Casting len to size_t is safe, since we ensured that it's not negative.
+    newVal = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, buf, static_cast<size_t>(len), sizeof(uint8_t));
 
     bluez_gatt_characteristic1_set_value(conn->mpC1, newVal);
-    BLEManagerImpl::HandleRXCharWrite(conn, (uint8_t *) (buf), len);
+    BLEManagerImpl::HandleRXCharWrite(conn, (uint8_t *) (buf), static_cast<size_t>(len));
     isSuccess = true;
 
 exit:
@@ -621,7 +623,8 @@ static void BluezStringAddressToCHIPAddress(const char * aAddressString, BluezAd
     size_t i, j = 0;
     for (i = 0; i < BLUEZ_ADDRESS_SIZE; i++)
     {
-        apAddress->mAddress[i] = (CHAR_TO_BLUEZ(aAddressString[j]) << 4) + CHAR_TO_BLUEZ(aAddressString[j + 1]);
+        apAddress->mAddress[i] =
+            static_cast<uint8_t>((CHAR_TO_BLUEZ(aAddressString[j]) << 4) + CHAR_TO_BLUEZ(aAddressString[j + 1]));
         j += 2;
         if (aAddressString[j] == ':')
             j++;
@@ -658,7 +661,8 @@ static uint16_t BluezUUIDStringToShortServiceID(const char * aService)
     {
         for (i = 0; i < 4; i++)
         {
-            shortService = (shortService << 8) | (CHAR_TO_BLUEZ(aService[2 * i]) << 4) | CHAR_TO_BLUEZ(aService[2 * i + 1]);
+            shortService = (shortService << 8) | static_cast<uint32_t>(CHAR_TO_BLUEZ(aService[2 * i]) << 4) |
+                CHAR_TO_BLUEZ(aService[2 * i + 1]);
         }
 
         ChipLogProgress(DeviceLayer, "TRACE: full service UUID: %s, short service %08x", aService, shortService);
@@ -923,10 +927,12 @@ static void BluezHandleAdvertisementFromDevice(BluezDevice1 * aDevice)
 
             if (serviceId != 0)
             {
-                buf[i++] = g_variant_n_children(rawVal) + 2 + 1;
+                // TODO: Sort out whether this cast is safe:
+                // https://github.com/project-chip/connectedhomeip/issues/2576
+                buf[i++] = static_cast<uint8_t>(g_variant_n_children(rawVal) + 2 + 1);
                 buf[i++] = BLUEZ_ADV_TYPE_SERVICE_DATA;
-                buf[i++] = serviceId & 0xff;
-                buf[i++] = (serviceId >> 8) & 0xff;
+                buf[i++] = static_cast<uint8_t>(serviceId & 0xff);
+                buf[i++] = static_cast<uint8_t>((serviceId >> 8) & 0xff);
                 tmpBuf   = (const uint8_t *) g_variant_get_fixed_array(rawVal, &dataLen, sizeof(uint8_t));
                 for (j = 0; j < dataLen; j++)
                 {
@@ -1480,8 +1486,10 @@ static gboolean BluezC2Indicate(void * apClosure)
 
     if (bluez_gatt_characteristic1_get_notify_acquired(conn->mpC2) == TRUE)
     {
-        buf    = (char *) g_variant_get_fixed_array(closure->mpVal, &len, sizeof(uint8_t));
-        status = g_io_channel_write_chars(conn->mC2Channel.mpChannel, buf, len, &written, &error);
+        buf = (char *) g_variant_get_fixed_array(closure->mpVal, &len, sizeof(uint8_t));
+        VerifyOrExit(len <= static_cast<size_t>(std::numeric_limits<gssize>::max()),
+                     ChipLogProgress(DeviceLayer, "FAIL: buffer too large in %s", __func__));
+        status = g_io_channel_write_chars(conn->mC2Channel.mpChannel, buf, static_cast<gssize>(len), &written, &error);
         g_variant_unref(closure->mpVal);
         closure->mpVal = nullptr;
 

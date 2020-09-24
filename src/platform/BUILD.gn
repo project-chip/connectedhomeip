@@ -158,6 +158,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "SystemTimerSupport.cpp",
     ]
 
+    cflags = [ "-Wconversion" ]
+
     public_deps = [
       ":platform_buildconfig",
       "${chip_root}/src/ble",

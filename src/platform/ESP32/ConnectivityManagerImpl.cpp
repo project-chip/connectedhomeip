@@ -38,6 +38,8 @@
 #include <lwip/nd6.h>
 #include <lwip/netif.h>
 
+#include <type_traits>
+
 #if !CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #error "WiFi Station support must be enabled when building for ESP32"
 #endif
@@ -181,7 +183,8 @@ static uint16_t Map2400MHz(const uint8_t inChannel)
 
     if (inChannel >= 1 && inChannel <= 13)
     {
-        frequency = 2412 + ((inChannel - 1) * 5);
+        // Cast is OK because we definitely fit in 16 bits.
+        frequency = static_cast<uint16_t>(2412 + ((inChannel - 1) * 5));
     }
     else if (inChannel == 14)
     {
@@ -368,8 +371,10 @@ CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
     }
     SuccessOrExit(err);
 
-    freq  = MapFrequency(WIFI_BAND_2_4GHZ, primaryChannel);
-    bssid = (wifiConfig.sta.bssid[4] << 8) | wifiConfig.sta.bssid[5];
+    freq = MapFrequency(WIFI_BAND_2_4GHZ, primaryChannel);
+    static_assert(std::is_same<std::remove_reference<decltype(wifiConfig.sta.bssid[5])>::type, uint8_t>::value,
+                  "Our bits are going to start overlapping");
+    bssid = static_cast<uint16_t>((wifiConfig.sta.bssid[4] << 8) | wifiConfig.sta.bssid[5]);
     ChipLogProgress(DeviceLayer,
                     "Wifi-Telemetry\n"
                     "BSSID: %x\n"

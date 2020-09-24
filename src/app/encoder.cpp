@@ -79,7 +79,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
                             apsFrame->options, apsFrame->groupId, apsFrame->sequence, apsFrame->radius, !buffer);
 }
 
-uint32_t _encodeCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t cluster_id, uint8_t command, uint8_t frame_control)
+uint16_t _encodeCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t cluster_id, uint8_t command, uint8_t frame_control)
 {
     CHECK_FRAME_LENGTH(buf.Size(), "Buffer is empty");
 
@@ -98,7 +98,7 @@ uint32_t _encodeCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t c
     return buf.Fit() ? buf.Written() : 0;
 }
 
-uint32_t _encodeClusterSpecificCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t cluster_id, uint8_t command)
+uint16_t _encodeClusterSpecificCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t cluster_id, uint8_t command)
 {
     // This is a cluster-specific command so low two bits are 0b01.  The command
     // is standard, so does not need a manufacturer code, and we're sending
@@ -108,7 +108,7 @@ uint32_t _encodeClusterSpecificCommand(BufBound & buf, uint8_t destination_endpo
     return _encodeCommand(buf, destination_endpoint, cluster_id, command, frame_control);
 }
 
-uint32_t _encodeGlobalCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t cluster_id, uint8_t command)
+uint16_t _encodeGlobalCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t cluster_id, uint8_t command)
 {
     // This is a global command, so the low bits are 0b00.  The command is
     // standard, so does not need a manufacturer code, and we're sending client
@@ -140,26 +140,26 @@ uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint
  * Pick cluster id as 0x0006 for now
  */
 
-uint32_t encodeOffCommand(uint8_t * buffer, uint32_t buf_length, uint8_t destination_endpoint)
+uint16_t encodeOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
 {
     BufBound buf    = BufBound(buffer, buf_length);
-    uint32_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0006, 0x00);
+    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0006, 0x00);
     CHECK_COMMAND_LENGTH(result, "Off");
     return result;
 };
 
-uint32_t encodeOnCommand(uint8_t * buffer, uint32_t buf_length, uint8_t destination_endpoint)
+uint16_t encodeOnCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
 {
     BufBound buf    = BufBound(buffer, buf_length);
-    uint32_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0006, 0x01);
+    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0006, 0x01);
     CHECK_COMMAND_LENGTH(result, "On");
     return result;
 }
 
-uint32_t encodeToggleCommand(uint8_t * buffer, uint32_t buf_length, uint8_t destination_endpoint)
+uint16_t encodeToggleCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
 {
     BufBound buf    = BufBound(buffer, buf_length);
-    uint32_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0006, 0x02);
+    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0006, 0x02);
     CHECK_COMMAND_LENGTH(result, "Toggle");
     return result;
 }
@@ -171,6 +171,37 @@ uint16_t encodeReadOnOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t d
 
     uint16_t result = encodeReadAttributesCommand(buffer, buf_length, destination_endpoint, 0x0006, &attr_id, attr_id_count);
     CHECK_COMMAND_LENGTH(result, "ReadOnOff");
+    return result;
+}
+
+uint16_t _encodeIdentifyClusterCommand(uint8_t * buffer, uint16_t buf_length, uint8_t command_id, uint8_t destination_endpoint,
+                                       uint16_t * identify_duration)
+{
+
+    BufBound buf    = BufBound(buffer, buf_length);
+    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0003, command_id);
+
+    if (identify_duration)
+    {
+        buf.PutLE16(*identify_duration);
+    }
+
+    result = buf.Fit() ? buf.Written() : 0;
+
+    return result;
+}
+
+uint16_t encodeIdentifyQueryCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    uint16_t result = _encodeIdentifyClusterCommand(buffer, buf_length, 1, destination_endpoint, nullptr);
+    CHECK_COMMAND_LENGTH(result, "Identify Query");
+    return result;
+}
+
+uint16_t encodeIdentifyCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t duration)
+{
+    uint16_t result = _encodeIdentifyClusterCommand(buffer, buf_length, 0, destination_endpoint, &duration);
+    CHECK_COMMAND_LENGTH(result, "Identify");
     return result;
 }
 

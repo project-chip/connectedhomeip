@@ -650,16 +650,16 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     advDataVersionDiscriminator = (discriminator | (CHIP_ADV_VERSION << 12));
 
     memset(advData, 0, sizeof(advData));
-    advData[index++] = 0x02;                             // length
-    advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;         // AD type : flags
-    advData[index++] = CHIP_ADV_DATA_FLAGS;              // AD value
-    advData[index++] = 0x06;                             // length
-    advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;  // AD type: (Service Data - 16-bit UUID)
-    advData[index++] = ShortUUID_CHIPoBLEService[0];     // AD value
-    advData[index++] = ShortUUID_CHIPoBLEService[1];     // AD value
-    advData[index++] = CHIP_BLE_OPCODE;                  // Used to differentiate from operational CHIP Ble adv
-    advData[index++] = advDataVersionDiscriminator >> 8; // Bits[15:12] == version - Bits[11:0] Discriminator
-    advData[index++] = advDataVersionDiscriminator & 0x00FF;
+    advData[index++] = 0x02;                            // length
+    advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;        // AD type : flags
+    advData[index++] = CHIP_ADV_DATA_FLAGS;             // AD value
+    advData[index++] = 0x06;                            // length
+    advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA; // AD type: (Service Data - 16-bit UUID)
+    advData[index++] = ShortUUID_CHIPoBLEService[0];    // AD value
+    advData[index++] = ShortUUID_CHIPoBLEService[1];    // AD value
+    advData[index++] = CHIP_BLE_OPCODE;                 // Used to differentiate from operational CHIP Ble adv
+    advData[index++] = static_cast<uint8_t>(advDataVersionDiscriminator >> 8); // Bits[15:12] == version - Bits[11:0] Discriminator
+    advData[index++] = static_cast<uint8_t>(advDataVersionDiscriminator & 0x00FF);
 
     // Construct the Chip BLE Service Data to be sent in the scan response packet.
     err = esp_ble_gap_config_adv_data_raw(advData, sizeof(advData));
@@ -890,7 +890,19 @@ void BLEManagerImpl::HandleGATTCommEvent(esp_gatts_cb_event_t event, esp_gatt_if
         CHIPoBLEConState * conState = GetConnectionState(param->mtu.conn_id);
         if (conState != NULL)
         {
+            // conState->MTU is a 10-bit field inside a uint16_t.  We're
+            // assigning to it from a uint16_t, and compilers warn about
+            // possibly not fitting.  There's no way to suppress that warning
+            // via explicit cast; we have to disable the warning around the
+            // assignment.
+            //
+            // TODO: https://github.com/project-chip/connectedhomeip/issues/2569
+            // tracks making this safe with a check or explaining why no check
+            // is needed.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
             conState->MTU = param->mtu.mtu;
+#pragma GCC diagnostic pop
         }
     }
     break;

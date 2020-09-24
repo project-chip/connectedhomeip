@@ -24,7 +24,7 @@
 class On : public ModelCommand
 {
 public:
-    On() : ModelCommand("on") {}
+    On() : ModelCommand("on", 0x06) {}
 
     size_t EncodeCommand(PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) override
     {

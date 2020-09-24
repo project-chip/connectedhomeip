@@ -2,7 +2,7 @@
 
 # Current reviewers-XXX teams, who review everything for approval.
 #* @reviewers-amazon @reviewers-apple @reviewers-comcast @reviewers-google @reviewers-samsung
-* @chrisdecenzo @woody-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin
+* @chrisdecenzo @rwalker-apple @bzbarsky-apple @hawk248 @jelderton @andy31415 @mspang @saurabhst @BroderickCarlin
 
 # Owners of any files in these directories at the root of the repository and
 # any of its subdirectories.

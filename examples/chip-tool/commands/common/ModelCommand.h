@@ -31,12 +31,16 @@
 #define CHIP_ZCL_ENDPOINT_MIN 0x01
 #define CHIP_ZCL_ENDPOINT_MAX 0xF0
 
+#define CHECK_MESSAGE_LENGTH(rv)                                                                                                   \
+    VerifyOrExit(rv, ChipLogError(chipTool, "%s: Unexpected response length: %d", __FUNCTION__, messageLen));
+
 class ModelCommand : public NetworkCommand
 {
 public:
-    ModelCommand(const char * commandName) : NetworkCommand(commandName, NetworkType::UDP)
+    ModelCommand(const char * commandName, const uint16_t clusterId) : NetworkCommand(commandName, NetworkType::UDP)
     {
         AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndPointId);
+        mClusterId = clusterId;
     }
 
     /////////// Command Interface /////////
@@ -48,6 +52,9 @@ public:
     void OnMessage(ChipDeviceController * dc, PacketBuffer * buffer) override;
 
     virtual size_t EncodeCommand(PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) = 0;
+    virtual void HandleClusterResponse(uint16_t clusterId, uint16_t endPointId, uint16_t commandId, uint8_t * message,
+                                       uint16_t messageLen) const;
+    uint16_t getClusterId() const { return mClusterId; };
 
 private:
     void SendCommand(ChipDeviceController * dc);
@@ -67,6 +74,7 @@ private:
     std::mutex cvWaitingForResponseMutex;
     bool mWaitingForResponse{ false };
     uint32_t mEndPointId;
+    uint16_t mClusterId;
 };
 
 #endif // __CHIPTOOL_MODELCOMMAND_H__

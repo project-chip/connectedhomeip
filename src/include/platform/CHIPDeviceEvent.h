@@ -245,10 +245,9 @@ inline ConnectivityChange GetConnectivityChange(bool prevState, bool newState)
 {
     if (prevState == newState)
         return kConnectivity_NoChange;
-    else if (newState)
+    if (newState)
         return kConnectivity_Established;
-    else
-        return kConnectivity_Lost;
+    return kConnectivity_Lost;
 }
 
 /**

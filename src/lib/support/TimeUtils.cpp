@@ -56,8 +56,7 @@ static inline uint8_t DaysToMarch1(uint16_t year)
 {
     if (IsLeapYear(year))
         return 60;
-    else
-        return 59;
+    return 59;
 }
 
 /* Converts a March-based month number (0=March, 1=April, etc.) to a March-1st based day of year (0=March 1st, 1=March 2nd, etc.).
@@ -112,10 +111,9 @@ uint8_t DaysInMonth(uint16_t year, uint8_t month)
 
     if (month == kFebruary && IsLeapYear(year))
         return 29;
-    else if (month >= kJanuary && month <= kDecember)
+    if (month >= kJanuary && month <= kDecember)
         return daysInMonth[month - 1];
-    else
-        return 0;
+    return 0;
 }
 
 /**

@@ -518,7 +518,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
     result = EVP_DigestSignUpdate(context, Uint8::to_const_uchar(msg), msg_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
-    // Call the EVP_DigestSignFinal with a NULL param to get length of the signature.
+    // Call the EVP_DigestSignFinal with a nullptr param to get length of the signature.
 
     result = EVP_DigestSignFinal(context, nullptr, &out_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
@@ -1032,14 +1032,14 @@ exit:
     do                                                                                                                             \
     {                                                                                                                              \
         _point_ = EC_POINT_new(context->curve);                                                                                    \
-        VerifyOrExit(_point_ != NULL, error = CHIP_ERROR_INTERNAL);                                                                \
+        VerifyOrExit(_point_ != nullptr, error = CHIP_ERROR_INTERNAL);                                                             \
     } while (0)
 
 #define init_bn(_bn_)                                                                                                              \
     do                                                                                                                             \
     {                                                                                                                              \
         _bn_ = BN_new();                                                                                                           \
-        VerifyOrExit(_bn_ != NULL, error = CHIP_ERROR_INTERNAL);                                                                   \
+        VerifyOrExit(_bn_ != nullptr, error = CHIP_ERROR_INTERNAL);                                                                \
     } while (0)
 
 #define free_point(_point_)                                                                                                        \

@@ -78,7 +78,7 @@ protected:
     void _PostEvent(const ChipDeviceEvent * event);
     void _RunEventLoop(void);
     CHIP_ERROR _StartEventLoopTask(void);
-    CHIP_ERROR _StartChipTimer(uint32_t durationMS);
+    CHIP_ERROR _StartChipTimer(int64_t durationMS);
     CHIP_ERROR _Shutdown(void);
 
     // ===== Methods available to the implementation subclass.

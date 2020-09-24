@@ -28,6 +28,8 @@
 #include <platform/internal/BLEManager.h>
 #include <support/CodeUtils.h>
 
+#include <type_traits>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include "CHIPBluezHelper.h"
@@ -379,7 +381,10 @@ void BLEManagerImpl::HandleRXCharWrite(void * data, const uint8_t * value, size_
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(buf->AvailableDataLength() >= len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf->Start(), value, len);
-    buf->SetDataLength(len);
+    static_assert(std::is_same<decltype(buf->AvailableDataLength()), uint16_t>::value,
+                  "Unexpected available data length type; fix the casting below");
+    // Cast is safe, since we just verified that "len" fits in uint16_t.
+    buf->SetDataLength(static_cast<uint16_t>(len));
 
     // Post an event to the Chip queue to deliver the data into the Chip stack.
     {

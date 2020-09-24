@@ -45,12 +45,18 @@ CHIP_ERROR ParseCompilerDateStr(const char * dateStr, uint16_t & year, uint8_t &
     p = strstr(months, monthStr);
     VerifyOrExit(p != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    month = ((p - months) / 3) + 1;
+    // Safe to cast because "months" is not too long.
+    static_assert(sizeof(months) < UINT8_MAX, "Too many months");
+    month = static_cast<uint8_t>(((p - months) / 3) + 1);
 
-    dayOfMonth = strtoul(dateStr + 4, &endptr, 10);
+    // Cast does not lose information, because we then check that we only parsed
+    // 2 digits, so our number can't be bigger than 99.
+    dayOfMonth = static_cast<uint8_t>(strtoul(dateStr + 4, &endptr, 10));
     VerifyOrExit(endptr == dateStr + 6, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    year = strtoul(dateStr + 7, &endptr, 10);
+    // Cast does not lose information, because we then check that we only parsed
+    // 4 digits, so our number can't be bigger than 9999.
+    year = static_cast<uint16_t>(strtoul(dateStr + 7, &endptr, 10));
     VerifyOrExit(endptr == dateStr + 11, err = CHIP_ERROR_INVALID_ARGUMENT);
 
 exit:
@@ -64,13 +70,19 @@ CHIP_ERROR Parse24HourTimeStr(const char * timeStr, uint8_t & hour, uint8_t & mi
 
     VerifyOrExit(strlen(timeStr) == 8, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    hour = strtoul(timeStr, &p, 10);
+    // Cast does not lose information, because we then check that we only parsed
+    // 2 digits, so our number can't be bigger than 99.
+    hour = static_cast<uint8_t>(strtoul(timeStr, &p, 10));
     VerifyOrExit(p == timeStr + 2, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    minute = strtoul(timeStr + 3, &p, 10);
+    // Cast does not lose information, because we then check that we only parsed
+    // 2 digits, so our number can't be bigger than 99.
+    minute = static_cast<uint8_t>(strtoul(timeStr + 3, &p, 10));
     VerifyOrExit(p == timeStr + 5, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    second = strtoul(timeStr + 6, &p, 10);
+    // Cast does not lose information, because we then check that we only parsed
+    // 2 digits, so our number can't be bigger than 99.
+    second = static_cast<uint8_t>(strtoul(timeStr + 6, &p, 10));
     VerifyOrExit(p == timeStr + 8, err = CHIP_ERROR_INVALID_ARGUMENT);
 
 exit:
@@ -131,14 +143,17 @@ const char * CharacterizeIPv6Address(const IPAddress & ipAddr)
     {
         return "IPv6 link-local address";
     }
-    else if (ipAddr.IsIPv6ULA())
+
+    if (ipAddr.IsIPv6ULA())
     {
         return "IPv6 unique local address";
     }
-    else if (ipAddr.IsIPv6GlobalUnicast())
+
+    if (ipAddr.IsIPv6GlobalUnicast())
     {
         return "IPv6 global unicast address";
     }
+
     return "IPv6 address";
 }
 
