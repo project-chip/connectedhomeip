@@ -174,4 +174,35 @@ uint16_t encodeReadOnOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t d
     return result;
 }
 
+uint16_t _encodeIdentifyClusterCommand(uint8_t * buffer, uint16_t buf_length, uint8_t command_id, uint8_t destination_endpoint,
+                                       uint16_t * identify_duration)
+{
+
+    BufBound buf    = BufBound(buffer, buf_length);
+    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0003, command_id);
+
+    if (identify_duration)
+    {
+        buf.PutLE16(*identify_duration);
+    }
+
+    result = buf.Fit() ? buf.Written() : 0;
+
+    return result;
+}
+
+uint16_t encodeIdentifyQueryCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    uint16_t result = _encodeIdentifyClusterCommand(buffer, buf_length, 1, destination_endpoint, nullptr);
+    CHECK_COMMAND_LENGTH(result, "Identify Query");
+    return result;
+}
+
+uint16_t encodeIdentifyCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t duration)
+{
+    uint16_t result = _encodeIdentifyClusterCommand(buffer, buf_length, 0, destination_endpoint, &duration);
+    CHECK_COMMAND_LENGTH(result, "Identify");
+    return result;
+}
+
 } // extern "C"
