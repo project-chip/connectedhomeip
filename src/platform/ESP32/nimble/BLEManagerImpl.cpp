@@ -628,14 +628,14 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     advDataVersionDiscriminator = (discriminator | (CHIP_ADV_VERSION << 12));
 
     memset(advData, 0, sizeof(advData));
-    advData[index++] = 0x02;                             // length
-    advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;         // AD type : flags
-    advData[index++] = CHIP_ADV_DATA_FLAGS;              // AD value
-    advData[index++] = 0x06;                             // length
-    advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;  // AD type: (Service Data - 16-bit UUID)
-    advData[index++] = ShortUUID_CHIPoBLEService[0];     // AD value
-    advData[index++] = ShortUUID_CHIPoBLEService[1];     // AD value
-    advData[index++] = CHIP_BLE_OPCODE;                  // Used to differentiate from operational CHIP Ble adv
+    advData[index++] = 0x02;                            // length
+    advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;        // AD type : flags
+    advData[index++] = CHIP_ADV_DATA_FLAGS;             // AD value
+    advData[index++] = 0x06;                            // length
+    advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA; // AD type: (Service Data - 16-bit UUID)
+    advData[index++] = ShortUUID_CHIPoBLEService[0];    // AD value
+    advData[index++] = ShortUUID_CHIPoBLEService[1];    // AD value
+    advData[index++] = CHIP_BLE_OPCODE;                 // Used to differentiate from operational CHIP Ble adv
     advData[index++] = static_cast<uint8_t>(advDataVersionDiscriminator >> 8); // Bits[15:12] == version - Bits[11:0] Discriminator
     advData[index++] = static_cast<uint8_t>(advDataVersionDiscriminator & 0x00FF);
 
