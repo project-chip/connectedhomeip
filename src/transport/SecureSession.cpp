@@ -141,8 +141,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, MessageHeader & header,
-                                  MessageAuthenticationCode & mac)
+CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
+                                  Header::Flags payloadFlags, MessageAuthenticationCode & mac)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     uint8_t IV[kAESCCMIVLen];
@@ -159,26 +159,26 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
     VerifyOrExit(input_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = GetIV(header.packetHeader, IV, sizeof(IV));
+    error = GetIV(header, IV, sizeof(IV));
     SuccessOrExit(error);
 
-    error = GetAdditionalAuthData(header.packetHeader, header.payloadHeader.GetEncodePacketFlags(), AAD, aadLen);
+    error = GetAdditionalAuthData(header, payloadFlags, AAD, aadLen);
     SuccessOrExit(error);
 
     error = AES_CCM_encrypt(input, input_length, AAD, aadLen, mKey, sizeof(mKey), IV, sizeof(IV), output, tag, taglen);
     SuccessOrExit(error);
 
-    mac.SetTag(&header.packetHeader, encType, tag, taglen);
+    mac.SetTag(&header, encType, tag, taglen);
 
 exit:
     return error;
 }
 
-CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const MessageHeader & header,
-                                  const MessageAuthenticationCode & mac)
+CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
+                                  Header::Flags payloadFlags, const MessageAuthenticationCode & mac)
 {
     CHIP_ERROR error    = CHIP_NO_ERROR;
-    size_t taglen       = MessageAuthenticationCode::TagLenForEncryptionType(header.packetHeader.GetEncryptionType());
+    size_t taglen       = MessageAuthenticationCode::TagLenForEncryptionType(header.GetEncryptionType());
     const uint8_t * tag = mac.GetTag();
     uint8_t IV[kAESCCMIVLen];
     uint8_t AAD[kMaxAADLen];
@@ -189,10 +189,10 @@ CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, ui
     VerifyOrExit(input_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = GetIV(header.packetHeader, IV, sizeof(IV));
+    error = GetIV(header, IV, sizeof(IV));
     SuccessOrExit(error);
 
-    error = GetAdditionalAuthData(header.packetHeader, header.payloadHeader.GetEncodePacketFlags(), AAD, aadLen);
+    error = GetAdditionalAuthData(header, payloadFlags, AAD, aadLen);
     SuccessOrExit(error);
 
     error = AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKey, sizeof(mKey), IV, sizeof(IV), output);

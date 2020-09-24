@@ -81,12 +81,13 @@ public:
      * @param input_length Length of the input data
      * @param output Output buffer for encrypted data
      * @param header message header structure. Encryption type will be set on the header.
+     * @param payloadFlags extra flags for packet header encryption
      * @param mac - output the resulting mac
      *
      * @return CHIP_ERROR The result of encryption
      */
-    CHIP_ERROR Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, MessageHeader & header,
-                       MessageAuthenticationCode & mac);
+    CHIP_ERROR Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
+                       Header::Flags payloadFlags, MessageAuthenticationCode & mac);
 
     /**
      * @brief
@@ -98,8 +99,8 @@ public:
      * @param header message header structure
      * @return CHIP_ERROR The result of decryption
      */
-    CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const MessageHeader & header,
-                       const MessageAuthenticationCode & mac);
+    CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
+                       Header::Flags payloadFlags, const MessageAuthenticationCode & mac);
 
     /**
      * @brief
