@@ -121,6 +121,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     # Build the nRF5 lighting app example.
     enable_nrf5_lighting_app_build = enable_nrf5_builds
 
+    # Build the nRF5 pigweed app example.
+    enable_nrf5_pigweed_app_build = enable_nrf5_builds
+
     # Build the efr32 lock app example.
     enable_efr32_lock_app_build = enable_efr32_builds
   }
@@ -177,6 +180,12 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
   }
 
+  if (enable_nrf5_pigweed_app_build) {
+    group("nrf5_pigweed_app") {
+      deps = [ "${chip_root}/examples/pigweed-app/nrf5(${chip_root}/config/nrf5/toolchain:nrf5_pigweed_app)" ]
+    }
+  }
+
   if (enable_efr32_lock_app_build) {
     group("efr32_lock_app") {
       deps = [ "${chip_root}/examples/lock-app/efr32(${chip_root}/config/efr32/toolchain:efr32_lock_app)" ]
@@ -213,6 +222,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
     if (enable_nrf5_lighting_app_build) {
       deps += [ ":nrf5_lighting_app" ]
+    }
+    if (enable_nrf5_pigweed_app_build) {
+      deps += [ ":nrf5_pigweed_app" ]
     }
     if (enable_efr32_lock_app_build) {
       deps += [ ":efr32_lock_app" ]
