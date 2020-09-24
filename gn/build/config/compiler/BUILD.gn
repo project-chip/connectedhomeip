@@ -168,9 +168,10 @@ config("strict_warnings") {
     ldflags += [ "-Werror" ]
   }
 
-  if (is_clang) {
-    cflags += [ "-Wimplicit-fallthrough" ]
-  }
+  # Implicit fallthrough will break openthread builds
+  # if (is_clang) {
+  #  cflags += [ "-Wimplicit-fallthrough" ]
+  # }
 }
 
 config("warnings_default") {
