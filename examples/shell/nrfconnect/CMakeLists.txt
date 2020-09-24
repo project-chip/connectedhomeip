@@ -24,11 +24,11 @@ include(nrfconnect-app)
 project(chip-nrf52840-shell-example)
 target_include_directories(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_sources(app PRIVATE
-    ${APP_ROOT}/cmd_base64.cpp
-    ${APP_ROOT}/cmd_device.cpp
-    ${APP_ROOT}/cmd_misc.cpp
-    ${APP_ROOT}/cmd_otcli.cpp
-    ${APP_ROOT}/cmd_btp.cpp
+    ${APP_ROOT}/shell_common/cmd_base64.cpp
+    ${APP_ROOT}/shell_common/cmd_device.cpp
+    ${APP_ROOT}/shell_common/cmd_misc.cpp
+    ${APP_ROOT}/shell_common/cmd_otcli.cpp
+    ${APP_ROOT}/shell_common/cmd_btp.cpp
     ${APP_ROOT}/main.cpp
 )
 
