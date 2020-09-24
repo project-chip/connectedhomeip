@@ -45,13 +45,16 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include "attribute-storage.h"
+#include "gen/cluster-id.h"
+
 APP_TIMER_DEF(sFunctionTimer);
 
 namespace {
 
 constexpr int kFactoryResetTriggerTimeout      = 3000;
 constexpr int kFactoryResetCancelWindowTimeout = 3000;
-constexpr size_t kAppTaskStackSize             = 1536;
+constexpr size_t kAppTaskStackSize             = 4096;
 constexpr int kAppTaskPriority                 = 2;
 constexpr int kAppEventQueueSize               = 10;
 constexpr int kExampleVenderID                 = 0xabcd;
@@ -224,6 +227,8 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     SetDeviceName("LightingDemo._chip._udp.local.");
 
+    GetAppTask().UpdateClusterState();
+
     while (true)
     {
         BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
@@ -287,6 +292,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         sStatusLED.Animate();
         sUnusedLED.Animate();
         sUnusedLED_1.Animate();
+        GetAppTask().UpdateClusterState();
 
         uint64_t nowUS            = chip::System::Platform::Layer::GetClock_Monotonic();
         uint64_t nextChangeTimeUS = mLastChangeTimeUS + 5 * 1000 * 1000UL;
@@ -527,6 +533,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
 
 void AppTask::DispatchEvent(AppEvent * aEvent)
 {
+
     if (aEvent->Handler)
     {
         aEvent->Handler(aEvent);
@@ -534,5 +541,18 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     else
     {
         NRF_LOG_INFO("Event received with no handler. Dropping event.");
+    }
+}
+
+void AppTask::UpdateClusterState(void)
+{
+    uint8_t newValue = LightingMgr().IsTurnedOn();
+
+    // write the new on/off value
+    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        NRF_LOG_INFO("ERR: updating on/off %x", status);
     }
 }

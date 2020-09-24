@@ -30,6 +30,7 @@ struct AppEvent
         kEventType_Timer,
         kEventType_Lighting,
         kEventType_Install,
+        kEventType_CLI,
     };
 
     uint16_t Type;
@@ -49,6 +50,10 @@ struct AppEvent
         {
             uint8_t Action;
         } LightingEvent;
+        struct
+        {
+            uint8_t Event;
+        } CLIEvent;
     };
 
     EventHandler Handler;
