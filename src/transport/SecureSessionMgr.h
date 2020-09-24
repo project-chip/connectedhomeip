@@ -165,10 +165,10 @@ private:
     SecureSessionMgrCallback * mCB = nullptr;
 
     /** Schedules a new oneshot timer for checking connection expiry. */
-    void ScheduleExpiryTimer(void);
+    void ScheduleExpiryTimer();
 
     /** Cancels any active timers for connection expiry checks. */
-    void CancelExpiryTimer(void);
+    void CancelExpiryTimer();
 
     /**
      * Allocates a new connection for the given source.

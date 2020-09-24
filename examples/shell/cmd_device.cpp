@@ -618,7 +618,7 @@ static const shell_command_t cmds_device[] = {
 
 #endif // CONFIG_DEVICE_LAYER
 
-void cmd_device_init(void)
+void cmd_device_init()
 {
 #if CONFIG_DEVICE_LAYER
     CHIP_ERROR error = CHIP_NO_ERROR;

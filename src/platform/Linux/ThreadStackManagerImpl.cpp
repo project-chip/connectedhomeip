@@ -413,17 +413,17 @@ exit:
     return OTBR_TO_CHIP_ERROR(error);
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_JoinerStart(void)
+CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-ThreadStackManager & ThreadStackMgr(void)
+ThreadStackManager & ThreadStackMgr()
 {
     return chip::DeviceLayer::ThreadStackManagerImpl::sInstance;
 }
 
-ThreadStackManagerImpl & ThreadStackMgrImpl(void)
+ThreadStackManagerImpl & ThreadStackMgrImpl()
 {
     return chip::DeviceLayer::ThreadStackManagerImpl::sInstance;
 }

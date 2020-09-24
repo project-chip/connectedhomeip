@@ -24,6 +24,6 @@
 #ifndef TESTQRCODE_H
 #define TESTQRCODE_H
 
-int TestQuickResponseCode(void);
+int TestQuickResponseCode();
 
 #endif // TESTQRCODE_H

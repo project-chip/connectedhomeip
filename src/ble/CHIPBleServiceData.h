@@ -59,15 +59,15 @@ struct ChipBLEDeviceIdentificationInfo
 
     void Init() { memset(this, 0, sizeof(*this)); }
 
-    uint16_t GetVendorId(void) { return chip::Encoding::LittleEndian::Get16(DeviceVendorId); }
+    uint16_t GetVendorId() { return chip::Encoding::LittleEndian::Get16(DeviceVendorId); }
 
     void SetVendorId(uint16_t vendorId) { chip::Encoding::LittleEndian::Put16(DeviceVendorId, vendorId); }
 
-    uint16_t GetProductId(void) { return chip::Encoding::LittleEndian::Get16(DeviceProductId); }
+    uint16_t GetProductId() { return chip::Encoding::LittleEndian::Get16(DeviceProductId); }
 
     void SetProductId(uint16_t productId) { chip::Encoding::LittleEndian::Put16(DeviceProductId, productId); }
 
-    uint16_t GetDeviceDiscriminator(void)
+    uint16_t GetDeviceDiscriminator()
     {
         uint16_t discriminator                = chip::Encoding::LittleEndian::Get16(DeviceDiscriminator);
         constexpr uint16_t kDiscriminatorMask = 0x7f;

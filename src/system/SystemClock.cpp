@@ -84,7 +84,7 @@ namespace Layer {
 #endif
 #endif // HAVE_CLOCK_GETTIME
 
-uint64_t GetClock_Monotonic(void)
+uint64_t GetClock_Monotonic()
 {
 #if HAVE_CLOCK_GETTIME
     struct timespec ts;
@@ -99,12 +99,12 @@ uint64_t GetClock_Monotonic(void)
 #endif // HAVE_CLOCK_GETTIME
 }
 
-uint64_t GetClock_MonotonicMS(void)
+uint64_t GetClock_MonotonicMS()
 {
     return GetClock_Monotonic() / 1000;
 }
 
-uint64_t GetClock_MonotonicHiRes(void)
+uint64_t GetClock_MonotonicHiRes()
 {
 #if HAVE_CLOCK_GETTIME && defined(MONOTONIC_RAW_CLOCK_ID)
     struct timespec ts;

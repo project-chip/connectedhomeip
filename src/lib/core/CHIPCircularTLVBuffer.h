@@ -65,14 +65,14 @@ public:
     CHIP_ERROR FinalizeBuffer(TLVWriter & ioWriter, uint8_t * inBufStart, uint32_t inBufLen);
     CHIP_ERROR GetNextBuffer(TLVReader & ioReader, const uint8_t *& outBufStart, uint32_t & outBufLen);
 
-    inline uint8_t * QueueHead(void) const { return mQueueHead; }
-    inline uint8_t * QueueTail(void) const { return mQueue + (((mQueueHead - mQueue) + mQueueLength) % mQueueSize); }
-    inline size_t DataLength(void) const { return mQueueLength; }
-    inline size_t AvailableDataLength(void) const { return mQueueSize - mQueueLength; }
-    inline size_t GetQueueSize(void) const { return mQueueSize; }
-    inline uint8_t * GetQueue(void) const { return mQueue; }
+    inline uint8_t * QueueHead() const { return mQueueHead; }
+    inline uint8_t * QueueTail() const { return mQueue + (((mQueueHead - mQueue) + mQueueLength) % mQueueSize); }
+    inline size_t DataLength() const { return mQueueLength; }
+    inline size_t AvailableDataLength() const { return mQueueSize - mQueueLength; }
+    inline size_t GetQueueSize() const { return mQueueSize; }
+    inline uint8_t * GetQueue() const { return mQueue; }
 
-    CHIP_ERROR EvictHead(void);
+    CHIP_ERROR EvictHead();
 
     static CHIP_ERROR GetNewBufferFunct(TLVWriter & ioWriter, uintptr_t & inBufHandle, uint8_t *& outBufStart,
                                         uint32_t & outBufLen);

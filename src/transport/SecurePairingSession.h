@@ -71,13 +71,13 @@ public:
 class DLL_EXPORT SecurePairingSession
 {
 public:
-    SecurePairingSession(void);
+    SecurePairingSession();
     SecurePairingSession(SecurePairingSession &&)      = default;
     SecurePairingSession(const SecurePairingSession &) = delete;
     SecurePairingSession & operator=(const SecurePairingSession &) = default;
     SecurePairingSession & operator=(SecurePairingSession &&) = default;
 
-    virtual ~SecurePairingSession(void);
+    virtual ~SecurePairingSession();
 
     /**
      * @brief
@@ -225,7 +225,7 @@ public:
         mLocalKeyId = localKeyId;
     }
 
-    ~SecurePairingUsingTestSecret(void) override {}
+    ~SecurePairingUsingTestSecret() override {}
 
     CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                               Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate)

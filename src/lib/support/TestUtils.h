@@ -51,7 +51,7 @@
 
 namespace chip {
 
-typedef int (*UnitTestTriggerFunction)(void);
+typedef int (*UnitTestTriggerFunction)();
 
 CHIP_ERROR RegisterUnitTests(UnitTestTriggerFunction tests);
 

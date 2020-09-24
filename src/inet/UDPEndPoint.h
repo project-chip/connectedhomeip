@@ -55,19 +55,19 @@ class DLL_EXPORT UDPEndPoint : public IPEndPointBasis
 public:
     INET_ERROR Bind(IPAddressType addrType, IPAddress addr, uint16_t port, InterfaceId intfId = INET_NULL_INTERFACEID);
     INET_ERROR BindInterface(IPAddressType addrType, InterfaceId intfId);
-    InterfaceId GetBoundInterface(void);
-    uint16_t GetBoundPort(void);
-    INET_ERROR Listen(void);
+    InterfaceId GetBoundInterface();
+    uint16_t GetBoundPort();
+    INET_ERROR Listen();
     INET_ERROR SendTo(IPAddress addr, uint16_t port, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
     INET_ERROR SendTo(IPAddress addr, uint16_t port, InterfaceId intfId, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
     INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
-    void Close(void);
-    void Free(void);
+    void Close();
+    void Free();
 
 private:
-    UDPEndPoint(void);                // not defined
+    UDPEndPoint();                // not defined
     UDPEndPoint(const UDPEndPoint &); // not defined
-    ~UDPEndPoint(void);               // not defined
+    ~UDPEndPoint();               // not defined
 
     static chip::System::ObjectPool<UDPEndPoint, INET_CONFIG_NUM_UDP_ENDPOINTS> sPool;
 
@@ -87,8 +87,8 @@ private:
     uint16_t mBoundPort;
 
     INET_ERROR GetSocket(IPAddressType addrType);
-    SocketEvents PrepareIO(void);
-    void HandlePendingIO(void);
+    SocketEvents PrepareIO();
+    void HandlePendingIO();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
 

@@ -43,9 +43,9 @@ class GenericConnectivityManagerImpl
 public:
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
-    bool _IsUserSelectedModeActive(void);
+    bool _IsUserSelectedModeActive();
     void _SetUserSelectedMode(bool val);
-    uint16_t _GetUserSelectedModeTimeout(void);
+    uint16_t _GetUserSelectedModeTimeout();
     void _SetUserSelectedModeTimeout(uint16_t val);
 
 private:
@@ -53,7 +53,7 @@ private:
 };
 
 template <class ImplClass>
-inline bool GenericConnectivityManagerImpl<ImplClass>::_IsUserSelectedModeActive(void)
+inline bool GenericConnectivityManagerImpl<ImplClass>::_IsUserSelectedModeActive()
 {
     return false;
 }
@@ -63,7 +63,7 @@ inline void GenericConnectivityManagerImpl<ImplClass>::_SetUserSelectedMode(bool
 {}
 
 template <class ImplClass>
-inline uint16_t GenericConnectivityManagerImpl<ImplClass>::_GetUserSelectedModeTimeout(void)
+inline uint16_t GenericConnectivityManagerImpl<ImplClass>::_GetUserSelectedModeTimeout()
 {
     return 0;
 }

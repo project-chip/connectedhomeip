@@ -45,7 +45,7 @@ namespace System {
  *      Decrements the reference count for the CHIP System Layer object. Recycles the object back into the pool if the reference
  *      count is decremented to zero. No destructor is invoked.
  */
-DLL_EXPORT void Object::Release(void)
+DLL_EXPORT void Object::Release()
 {
     unsigned int oldCount = __sync_fetch_and_sub(&this->mRefCount, 1);
 

@@ -95,17 +95,17 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 uint16_t ConnectivityManagerImpl::mConnectivityFlag;
 struct GDBusWpaSupplicant ConnectivityManagerImpl::mWpaSupplicant;
 
-bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
+bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity()
 {
     return ((mConnectivityFlag & kFlag_HaveIPv4InternetConnectivity) != 0);
 }
 
-bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
+bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity()
 {
     return ((mConnectivityFlag & kFlag_HaveIPv6InternetConnectivity) != 0);
 }
 
-bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
+bool ConnectivityManagerImpl::_IsWiFiStationConnected()
 {
     bool ret            = false;
     const gchar * state = nullptr;

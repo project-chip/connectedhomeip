@@ -64,7 +64,7 @@ static shell_command_t cmds_misc[] = {
     { &cmd_rand, "rand", "Random number utilities" },
 };
 
-void cmd_misc_init(void)
+void cmd_misc_init()
 {
     shell_register(cmds_misc, ArraySize(cmds_misc));
 }

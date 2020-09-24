@@ -38,7 +38,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-CHIP_ERROR ChipLinuxStorageIni::Init(void)
+CHIP_ERROR ChipLinuxStorageIni::Init()
 {
     return RemoveAll();
 }

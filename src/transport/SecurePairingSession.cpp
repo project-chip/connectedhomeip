@@ -41,9 +41,9 @@ const char * kSpake2pContext        = "CHIP 1.0 Provisioning";
 const char * kSpake2pI2RSessionInfo = "Commissioning I2R Key";
 const char * kSpake2pR2ISessionInfo = "Commissioning R2I Key";
 
-SecurePairingSession::SecurePairingSession(void) {}
+SecurePairingSession::SecurePairingSession() {}
 
-SecurePairingSession::~SecurePairingSession(void)
+SecurePairingSession::~SecurePairingSession()
 {
     if (mDelegate != nullptr)
     {

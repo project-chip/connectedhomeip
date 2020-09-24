@@ -84,7 +84,7 @@ ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> Timer::sPool;
  *
  *  @return A timestamp in milliseconds.
  */
-Timer::Epoch Timer::GetCurrentEpoch(void)
+Timer::Epoch Timer::GetCurrentEpoch()
 {
     return Platform::Layer::GetClock_MonotonicMS();
 }

@@ -105,7 +105,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR Spake2p::WriteMN(void)
+CHIP_ERROR Spake2p::WriteMN()
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
 
@@ -323,7 +323,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR Spake2p::GenerateKeys(void)
+CHIP_ERROR Spake2p::GenerateKeys()
 {
     CHIP_ERROR error                         = CHIP_ERROR_INTERNAL;
     static const uint8_t info_keyconfirm[16] = { 'C', 'o', 'n', 'f', 'i', 'r', 'm', 'a', 't', 'i', 'o', 'n', 'K', 'e', 'y', 's' };
@@ -387,7 +387,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitImpl(void)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitImpl()
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
 

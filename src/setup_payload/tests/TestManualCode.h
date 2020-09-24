@@ -24,6 +24,6 @@
 #ifndef TESTMANUALCODE_H
 #define TESTMANUALCODE_H
 
-int TestManualSetupCode(void);
+int TestManualSetupCode();
 
 #endif // TESTMANUALCODE_H

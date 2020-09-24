@@ -55,7 +55,7 @@ GenericConnectivityManagerImpl_WiFi<ImplClass>::_WiFiStationModeToStr(Connectivi
 }
 
 template <class ImplClass>
-bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiStationEnabled(void)
+bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiStationEnabled()
 {
     return Impl()->GetWiFiStationMode() == ConnectivityManager::kWiFiStationMode_Enabled;
 }

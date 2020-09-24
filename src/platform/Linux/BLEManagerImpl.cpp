@@ -159,7 +159,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
     return CHIP_NO_ERROR;
 }
 
-uint16_t BLEManagerImpl::_NumConnections(void)
+uint16_t BLEManagerImpl::_NumConnections()
 {
     uint16_t numCons = 0;
     return numCons;
@@ -186,12 +186,12 @@ CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aNodeId, bool aIsCentral)
     return err;
 }
 
-CHIP_ERROR BLEManagerImpl::StartBLEAdvertising(void)
+CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
 {
     return StartBluezAdv(mpAppState);
 }
 
-CHIP_ERROR BLEManagerImpl::StopBLEAdvertising(void)
+CHIP_ERROR BLEManagerImpl::StopBLEAdvertising()
 {
     return StopBluezAdv(mpAppState);
 }

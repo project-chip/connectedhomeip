@@ -79,7 +79,7 @@ enum
  *  @return Returns 'true' if it is the initiator, else 'false'.
  *
  */
-bool ExchangeContext::IsInitiator(void) const
+bool ExchangeContext::IsInitiator() const
 {
     return GetFlag(mFlags, static_cast<uint16_t>(kFlagInitiator));
 }
@@ -89,7 +89,7 @@ bool ExchangeContext::IsInitiator(void) const
  *
  *  @return Returns 'true' if connection is closed, else 'false'.
  */
-bool ExchangeContext::IsConnectionClosed(void) const
+bool ExchangeContext::IsConnectionClosed() const
 {
     return GetFlag(mFlags, static_cast<uint16_t>(kFlagConnectionClosed));
 }
@@ -100,7 +100,7 @@ bool ExchangeContext::IsConnectionClosed(void) const
  *
  *  @return Returns 'true' if response expected, else 'false'.
  */
-bool ExchangeContext::IsResponseExpected(void) const
+bool ExchangeContext::IsResponseExpected() const
 {
     return GetFlag(mFlags, static_cast<uint16_t>(kFlagResponseExpected));
 }
@@ -139,7 +139,7 @@ void ExchangeContext::SetConnectionClosed(bool inConnectionClosed)
  *  to the peer on this exchange.
  *
  */
-bool ExchangeContext::IsAckPending(void) const
+bool ExchangeContext::IsAckPending() const
 {
     return GetFlag(mFlags, static_cast<uint16_t>(kFlagAckPending));
 }
@@ -150,7 +150,7 @@ bool ExchangeContext::IsAckPending(void) const
  *
  *  @return Returns 'true' if acknowledgment requested, else 'false'.
  */
-bool ExchangeContext::HasPeerRequestedAck(void) const
+bool ExchangeContext::HasPeerRequestedAck() const
 {
     return GetFlag(mFlags, static_cast<uint16_t>(kFlagPeerRequestedAck));
 }
@@ -161,7 +161,7 @@ bool ExchangeContext::HasPeerRequestedAck(void) const
  *
  *  @return Returns 'true' if message received, else 'false'.
  */
-bool ExchangeContext::HasRcvdMsgFromPeer(void) const
+bool ExchangeContext::HasRcvdMsgFromPeer() const
 {
     return GetFlag(mFlags, static_cast<uint16_t>(kFlagMsgRcvdFromPeer));
 }
@@ -230,7 +230,7 @@ void ExchangeContext::SetDropAck(bool inDropAck)
  *  For internal, debug use only.
  *
  */
-bool ExchangeContext::ShouldDropAck(void) const
+bool ExchangeContext::ShouldDropAck() const
 {
     return GetFlag(mFlags, static_cast<uint16_t>(kFlagDropAck));
 }
@@ -326,7 +326,7 @@ void ExchangeContext::SetShouldAutoReleaseConnection(bool autoReleaseCon)
 
 #if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
 
-bool ExchangeContext::UseEphemeralUDPPort(void) const
+bool ExchangeContext::UseEphemeralUDPPort() const
 {
     return GetFlag(mFlags, static_cast<uint16_t>(kFlagUseEphemeralUDPPort));
 }
@@ -594,7 +594,7 @@ exit:
  *  @retval  other                    Another critical error returned by SendMessage().
  *
  */
-CHIP_ERROR ExchangeContext::SendCommonNullMessage(void)
+CHIP_ERROR ExchangeContext::SendCommonNullMessage()
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
     PacketBuffer * msgBuf = nullptr;
@@ -790,7 +790,7 @@ void ExchangeContext::Abort()
  *  and stop all timers.
  *
  */
-void ExchangeContext::Release(void)
+void ExchangeContext::Release()
 {
     VerifyOrDie(ExchangeMgr != nullptr && mRefCount != 0);
 
@@ -1042,7 +1042,7 @@ bool ExchangeContext::RMPCheckAndRemRetransTable(uint32_t ackMsgId, void ** rCtx
 }
 
 // Flush the pending Ack
-CHIP_ERROR ExchangeContext::RMPFlushAcks(void)
+CHIP_ERROR ExchangeContext::RMPFlushAcks()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -1070,7 +1070,7 @@ CHIP_ERROR ExchangeContext::RMPFlushAcks(void)
  *
  *  @return the current retransmit time.
  */
-uint32_t ExchangeContext::GetCurrentRetransmitTimeout(void)
+uint32_t ExchangeContext::GetCurrentRetransmitTimeout()
 {
     return (HasRcvdMsgFromPeer() ? mRMPConfig.mActiveRetransTimeout : mRMPConfig.mInitialRetransTimeout);
 }

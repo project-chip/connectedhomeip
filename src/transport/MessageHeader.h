@@ -82,24 +82,24 @@ public:
     uint16_t GetPayloadLength() const { return mPayloadLength; }
 
     /** Get the secure msg type from this header. */
-    uint8_t GetMessageType(void) const { return mMessageType; }
+    uint8_t GetMessageType() const { return mMessageType; }
 
     /** Check if it's a secure session control message. */
-    bool IsSecureSessionControlMsg(void) const { return mSecureSessionControlMsg; }
+    bool IsSecureSessionControlMsg() const { return mSecureSessionControlMsg; }
 
     /** Get the Session ID from this header. */
-    uint16_t GetExchangeID(void) const { return mExchangeID; }
+    uint16_t GetExchangeID() const { return mExchangeID; }
 
     /** Get the Protocol ID from this header. */
-    uint16_t GetProtocolID(void) const { return mProtocolID; }
+    uint16_t GetProtocolID() const { return mProtocolID; }
 
     /** Get the Encryption Key ID from this header. */
-    uint16_t GetEncryptionKeyID(void) const { return mEncryptionKeyID; }
+    uint16_t GetEncryptionKeyID() const { return mEncryptionKeyID; }
 
     /** Get the MAC tag length. */
-    size_t GetTagLength(void) const { return TagLenForEncryptionType(mEncryptionType); }
+    size_t GetTagLength() const { return TagLenForEncryptionType(mEncryptionType); }
 
-    const uint8_t * GetTag(void) const { return &mTag[0]; }
+    const uint8_t * GetTag() const { return &mTag[0]; }
 
     /** Set the message id for this header. */
     MessageHeader & SetMessageId(uint32_t id)

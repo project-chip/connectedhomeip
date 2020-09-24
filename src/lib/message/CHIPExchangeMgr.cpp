@@ -529,7 +529,7 @@ void ChipExchangeManager::HandleConnectionClosed(ChipConnection * con, CHIP_ERRO
  * @return Number of timers found running.
  */
 #if CHIP_CONFIG_TEST
-size_t ChipExchangeManager::ExpireExchangeTimers(void)
+size_t ChipExchangeManager::ExpireExchangeTimers()
 {
     size_t retval        = 0;
     ExchangeContext * ec = (ExchangeContext *) ContextPool;
@@ -1227,7 +1227,7 @@ void ChipExchangeManager::TicklessDebugDumpRetransTable(const char * log)
  * that action.
  *
  */
-void ChipExchangeManager::RMPExecuteActions(void)
+void ChipExchangeManager::RMPExecuteActions()
 {
     ExchangeContext * ec = nullptr;
 
@@ -1321,7 +1321,7 @@ void ChipExchangeManager::RMPExecuteActions(void)
  * RMP timer tick expiry.
  *
  */
-void ChipExchangeManager::RMPExpireTicks(void)
+void ChipExchangeManager::RMPExpireTicks()
 {
     uint64_t now         = 0;
     ExchangeContext * ec = nullptr;
@@ -1762,7 +1762,7 @@ void ChipExchangeManager::RMPStopTimer()
  *  Initialize the shared pool of Bindings.
  *
  */
-void ChipExchangeManager::InitBindingPool(void)
+void ChipExchangeManager::InitBindingPool()
 {
     memset(BindingPool, 0, sizeof(BindingPool));
     for (size_t i = 0; i < CHIP_CONFIG_MAX_BINDINGS; ++i)
@@ -1779,7 +1779,7 @@ void ChipExchangeManager::InitBindingPool(void)
  *  @return  A pointer to the newly allocated Binding, or NULL if the pool has been exhausted
  *
  */
-Binding * ChipExchangeManager::AllocBinding(void)
+Binding * ChipExchangeManager::AllocBinding()
 {
     Binding * pResult = nullptr;
 

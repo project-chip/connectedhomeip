@@ -162,7 +162,7 @@ static int OnOtCliOutput(const char * aBuf, uint16_t aBufLength, void * aContext
 
 #endif // CHIP_ENABLE_OPENTHREAD
 
-void cmd_otcli_init(void)
+void cmd_otcli_init()
 {
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_TARGET_STYLE_EMBEDDED

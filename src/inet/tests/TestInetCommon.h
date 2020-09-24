@@ -74,18 +74,18 @@ extern chip::Inet::InetLayer gInet;
 extern bool gDone;
 extern bool gSigusr1Received;
 
-extern void InitTestInetCommon(void);
-extern void SetSIGUSR1Handler(void);
-extern void InitSystemLayer(void);
-extern void ShutdownSystemLayer(void);
+extern void InitTestInetCommon();
+extern void SetSIGUSR1Handler();
+extern void InitSystemLayer();
+extern void ShutdownSystemLayer();
 
 typedef void (*SignalHandler)(int signum);
 
 extern void SetSignalHandler(SignalHandler handler);
 
-extern void InitNetwork(void);
+extern void InitNetwork();
 extern void ServiceEvents(struct ::timeval & aSleepTime);
-extern void ShutdownNetwork(void);
+extern void ShutdownNetwork();
 extern void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix, uint32_t rowWidth);
 extern void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix);
 
@@ -95,6 +95,6 @@ inline static void ServiceNetwork(struct ::timeval & aSleepTime)
 }
 
 extern void SetupFaultInjectionContext(int argc, char * argv[]);
-extern void SetupFaultInjectionContext(int argc, char * argv[], int32_t (*aNumEventsAvailable)(void),
+extern void SetupFaultInjectionContext(int argc, char * argv[], int32_t (*aNumEventsAvailable)(),
                                        void (*aInjectAsyncEvents)(int32_t index));
 #endif /* CHIP_TEST_INET_COMMON_H_ */

@@ -203,7 +203,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SetupPayload::removeSerialNumber(void)
+CHIP_ERROR SetupPayload::removeSerialNumber()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(optionalExtensionData.find(kSerialNumberTag) != optionalExtensionData.end(), err = CHIP_ERROR_KEY_NOT_FOUND);

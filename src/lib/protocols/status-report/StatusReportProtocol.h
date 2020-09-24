@@ -61,8 +61,8 @@ namespace StatusReporting {
 class DLL_EXPORT StatusReport
 {
 public:
-    StatusReport(void);
-    ~StatusReport(void);
+    StatusReport();
+    ~StatusReport();
 
     CHIP_ERROR init(uint32_t aProtocolId, uint16_t aCode, ReferencedTLVData * aInfo = nullptr);
 
@@ -75,12 +75,12 @@ public:
     CHIP_ERROR init(CHIP_ERROR aError);
 
     CHIP_ERROR pack(PacketBuffer * aBuffer, uint32_t maxLen = 0xFFFFFFFFUL);
-    uint16_t packedLength(void);
+    uint16_t packedLength();
     static CHIP_ERROR parse(PacketBuffer * aBuffer, StatusReport & aDestination);
 
     bool operator==(const StatusReport & another) const;
 
-    bool success(void);
+    bool success();
 
     /*
      * here are some static convenience methods for adding metadata
