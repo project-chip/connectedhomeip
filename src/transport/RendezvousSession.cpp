@@ -220,15 +220,15 @@ exit:
 CHIP_ERROR RendezvousSession::HandlePairingMessage(PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    MessageHeader header;
+    PacketHeader packetHeader;
     size_t headerSize = 0;
 
-    err = header.packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
+    err = packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
     SuccessOrExit(err);
 
     msgBuf->ConsumeHead(headerSize);
 
-    err = mPairingSession.HandlePeerMessage(header, msgBuf);
+    err = mPairingSession.HandlePeerMessage(packetHeader, msgBuf);
     SuccessOrExit(err);
 
 exit:
