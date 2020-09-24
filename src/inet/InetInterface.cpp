@@ -396,7 +396,7 @@ InterfaceIterator::InterfaceIterator(void)
     mIntfArray       = nullptr;
     mCurIntf         = 0;
     mIntfFlags       = 0;
-    mIntfFlagsCached = 0;
+    mIntfFlagsCached = false;
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
