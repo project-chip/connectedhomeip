@@ -16,9 +16,9 @@
  */
 
 #import <AVFoundation/AVFoundation.h>
-#import <UIKit/UIKit.h>
 #import <CHIP/CHIP.h>
+#import <UIKit/UIKit.h>
 
-@interface QRCodeViewController : UIViewController <AVCaptureMetadataOutputObjectsDelegate,  CHIPDeviceControllerDelegate>
+@interface QRCodeViewController : UIViewController <AVCaptureMetadataOutputObjectsDelegate, CHIPDeviceControllerDelegate>
 
 @end

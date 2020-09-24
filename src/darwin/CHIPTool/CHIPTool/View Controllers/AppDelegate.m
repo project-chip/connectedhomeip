@@ -26,9 +26,11 @@ static NSString * const ipKey = @"ipk";
 
 @implementation AppDelegate
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:[[RootViewController alloc] init]];
+    UINavigationController * navController =
+        [[UINavigationController alloc] initWithRootViewController:[[RootViewController alloc] init]];
     [self.window setRootViewController:navController];
     [self.window makeKeyAndVisible];
     return YES;

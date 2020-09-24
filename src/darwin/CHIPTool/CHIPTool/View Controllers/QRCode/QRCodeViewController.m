@@ -18,9 +18,9 @@
 #import "QRCodeViewController.h"
 
 // local imports
+#import "CHIPUIViewUtils.h"
 #import "DefaultsUtils.h"
 #import <CHIP/CHIP.h>
-#import "CHIPUIViewUtils.h"
 
 // system imports
 #import <AVFoundation/AVFoundation.h>
@@ -64,7 +64,7 @@
 @property (strong, nonatomic) UIActivityIndicatorView * activityIndicator;
 @property (strong, nonatomic) UILabel * errorLabel;
 
-@property (readwrite) CHIPDeviceController *chipController;
+@property (readwrite) CHIPDeviceController * chipController;
 @end
 
 @implementation QRCodeViewController {
@@ -75,25 +75,29 @@
 
 - (void)changeNavBarButtonToCamera
 {
-    UIBarButtonItem *camera = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(startScanningQRCode:)];
+    UIBarButtonItem * camera = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
+                                                                             target:self
+                                                                             action:@selector(startScanningQRCode:)];
     self.navigationItem.rightBarButtonItem = camera;
 }
 
 - (void)changeNavBarButtonToCancel
 {
-    UIBarButtonItem *cancel = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(stopScanningQRCode:)];
+    UIBarButtonItem * cancel = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                                                             target:self
+                                                                             action:@selector(stopScanningQRCode:)];
     self.navigationItem.rightBarButtonItem = cancel;
 }
 
 - (void)setupUI
 {
     self.view.backgroundColor = UIColor.whiteColor;
-    
+
     // Setup nav bar button
     [self changeNavBarButtonToCamera];
-    
+
     // Title
-    UILabel *titleLabel = [CHIPUIViewUtils addTitle:@"QR Code Parser" toView:self.view];
+    UILabel * titleLabel = [CHIPUIViewUtils addTitle:@"QR Code Parser" toView:self.view];
 
     // Manual entry view
     _manualCodeTextField = [UITextField new];
@@ -102,57 +106,57 @@
     _manualCodeTextField.placeholder = @"Manual Code";
     _manualCodeTextField.keyboardType = UIKeyboardTypeNumberPad;
     [_doneManualCodeButton setTitle:@"Go" forState:UIControlStateNormal];
-    UIView *manualEntryView = [CHIPUIViewUtils viewWithUITextField:_manualCodeTextField button:_doneManualCodeButton];
+    UIView * manualEntryView = [CHIPUIViewUtils viewWithUITextField:_manualCodeTextField button:_doneManualCodeButton];
     [self.view addSubview:manualEntryView];
-    
+
     manualEntryView.translatesAutoresizingMaskIntoConstraints = false;
     [manualEntryView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [manualEntryView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
     [manualEntryView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:30].active = YES;
-    
+
     // Results view
     _setupPayloadView = [UIView new];
     [self.view addSubview:_setupPayloadView];
-    
+
     _setupPayloadView.translatesAutoresizingMaskIntoConstraints = false;
     [_setupPayloadView.topAnchor constraintEqualToAnchor:manualEntryView.bottomAnchor constant:10].active = YES;
     [_setupPayloadView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [_setupPayloadView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
     [_setupPayloadView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active = YES;
-    
+
     [self addViewsToSetupPayloadView];
-    
+
     // activity indicator
     _activityIndicator = [UIActivityIndicatorView new];
     [self.view addSubview:_activityIndicator];
-    
+
     _activityIndicator.translatesAutoresizingMaskIntoConstraints = false;
     [_activityIndicator.centerXAnchor constraintEqualToAnchor:_setupPayloadView.centerXAnchor].active = YES;
     [_activityIndicator.centerYAnchor constraintEqualToAnchor:_setupPayloadView.centerYAnchor].active = YES;
     _activityIndicator.color = UIColor.blackColor;
-    
+
     // QRCode preview
     _qrCodeViewPreview = [UIView new];
     [self.view addSubview:_qrCodeViewPreview];
-    
+
     _qrCodeViewPreview.translatesAutoresizingMaskIntoConstraints = false;
     [_qrCodeViewPreview.topAnchor constraintEqualToAnchor:manualEntryView.bottomAnchor constant:30].active = YES;
     [_qrCodeViewPreview.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [_qrCodeViewPreview.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
     [_qrCodeViewPreview.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-50].active = YES;
-    
+
     // Error label
     _errorLabel = [UILabel new];
     _errorLabel.text = @"Error Text";
     _errorLabel.textColor = UIColor.blackColor;
     _errorLabel.font = [UIFont systemFontOfSize:17];
     [self.view addSubview:_errorLabel];
-    
+
     _errorLabel.translatesAutoresizingMaskIntoConstraints = false;
     [_errorLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [_errorLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
     [_errorLabel.topAnchor constraintEqualToAnchor:manualEntryView.bottomAnchor constant:40].active = YES;
-    
+
     // Reset button
     _resetButton = [UIButton new];
     [_resetButton setTitle:@"Reset" forState:UIControlStateNormal];
@@ -163,13 +167,11 @@
     _resetButton.layer.cornerRadius = 5;
     _resetButton.clipsToBounds = YES;
     [self.view addSubview:_resetButton];
-    
+
     _resetButton.translatesAutoresizingMaskIntoConstraints = false;
     [_resetButton.widthAnchor constraintEqualToConstant:60].active = YES;
     [_resetButton.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active = YES;
     [_resetButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
-    
-    
 }
 
 - (void)addViewsToSetupPayloadView
@@ -181,22 +183,22 @@
     _manualCodeLabel.font = [UIFont systemFontOfSize:17];
     _manualCodeLabel.textAlignment = NSTextAlignmentRight;
     [_setupPayloadView addSubview:_manualCodeLabel];
-    
+
     _manualCodeLabel.translatesAutoresizingMaskIntoConstraints = false;
     [_manualCodeLabel.topAnchor constraintEqualToAnchor:_setupPayloadView.topAnchor].active = YES;
     [_manualCodeLabel.trailingAnchor constraintEqualToAnchor:_setupPayloadView.trailingAnchor].active = YES;
-    
+
     // Results scroll view
-    UIScrollView *resultsScrollView = [UIScrollView new];
+    UIScrollView * resultsScrollView = [UIScrollView new];
     [_setupPayloadView addSubview:resultsScrollView];
-    
+
     resultsScrollView.translatesAutoresizingMaskIntoConstraints = false;
     [resultsScrollView.topAnchor constraintEqualToAnchor:_manualCodeLabel.bottomAnchor constant:10].active = YES;
     [resultsScrollView.leadingAnchor constraintEqualToAnchor:_setupPayloadView.leadingAnchor].active = YES;
     [resultsScrollView.trailingAnchor constraintEqualToAnchor:_setupPayloadView.trailingAnchor].active = YES;
     [resultsScrollView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-20].active = YES;
-    
-    UIStackView *parserResultsView = [UIStackView new];
+
+    UIStackView * parserResultsView = [UIStackView new];
     parserResultsView.axis = UILayoutConstraintAxisVertical;
     parserResultsView.distribution = UIStackViewDistributionEqualSpacing;
     parserResultsView.alignment = UIStackViewAlignmentLeading;
@@ -213,13 +215,8 @@
 
 - (void)addResultsUIToStackView:(UIStackView *)stackView
 {
-    NSArray<NSString *> *resultLabelTexts = @[@"version",
-                                               @"discriminator",
-                                               @"setup pin code",
-                                               @"rendez vous information",
-                                               @"vendor ID",
-                                               @"product ID",
-                                               @"serial #"];
+    NSArray<NSString *> * resultLabelTexts =
+        @[ @"version", @"discriminator", @"setup pin code", @"rendez vous information", @"vendor ID", @"product ID", @"serial #" ];
     _versionLabel = [UILabel new];
     _discriminatorLabel = [UILabel new];
     _setupPinCodeLabel = [UILabel new];
@@ -227,23 +224,17 @@
     _vendorID = [UILabel new];
     _productID = [UILabel new];
     _serialNumber = [UILabel new];
-    NSArray<UILabel *> *resultLabels = @[_versionLabel,
-                                      _discriminatorLabel,
-                                      _setupPinCodeLabel,
-                                      _rendezVousInformation,
-                                      _vendorID,
-                                      _productID,
-                                      _serialNumber];
+    NSArray<UILabel *> * resultLabels =
+        @[ _versionLabel, _discriminatorLabel, _setupPinCodeLabel, _rendezVousInformation, _vendorID, _productID, _serialNumber ];
     for (int i = 0; i < resultLabels.count && i < resultLabels.count; i++) {
-        UILabel *label = [UILabel new];
+        UILabel * label = [UILabel new];
         label.text = [resultLabelTexts objectAtIndex:i];
-        UILabel *result = [resultLabels objectAtIndex:i];
+        UILabel * result = [resultLabels objectAtIndex:i];
         result.text = @"N/A";
-        UIStackView *labelStackView = [CHIPUIViewUtils stackViewWithLabel:label result:result];
+        UIStackView * labelStackView = [CHIPUIViewUtils stackViewWithLabel:label result:result];
         labelStackView.translatesAutoresizingMaskIntoConstraints = false;
         [stackView addArrangedSubview:labelStackView];
     }
-    
 }
 
 // MARK: UIViewController methods
@@ -262,7 +253,7 @@
 {
     [super viewDidLoad];
     [self setupUI];
-    
+
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = [CHIPDeviceController sharedController];
     [self.chipController setDelegate:self queue:callbackQueue];
@@ -275,20 +266,23 @@
 }
 
 // MARK: CHIPDeviceControllerDelegate
-- (void)deviceControllerOnConnected {
+- (void)deviceControllerOnConnected
+{
     NSLog(@"Status: Device connected");
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
         [self retrieveAndSendWifiCredentials];
     });
 }
 
-- (void)deviceControllerOnError:(nonnull NSError *)error {
+- (void)deviceControllerOnError:(nonnull NSError *)error
+{
     NSLog(@"Status: Device Controller error %@", [error description]);
 }
 
-- (void)deviceControllerOnMessage:(nonnull NSData *)message {
+- (void)deviceControllerOnMessage:(nonnull NSData *)message
+{
     // WRONG
-    NSString *stringMessage;
+    NSString * stringMessage;
     if ([CHIPDeviceController isDataModelCommand:message] == YES) {
         stringMessage = [CHIPDeviceController commandToString:message];
     } else {
@@ -374,7 +368,7 @@
     self->_errorLabel.hidden = YES;
     // reset the view and remove any preferences that were stored from a previous scan
     if ([self hasScannedConnectionInfo]) {
-         CHIPRemoveDomainValueForKey(kCHIPToolDefaultsDomain, kIPKey);
+        CHIPRemoveDomainValueForKey(kCHIPToolDefaultsDomain, kIPKey);
     }
     self->_setupPayloadView.hidden = NO;
     self->_resetButton.hidden = NO;

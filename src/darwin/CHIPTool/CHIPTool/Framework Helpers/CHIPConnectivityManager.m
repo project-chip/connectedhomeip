@@ -1,35 +1,34 @@
 /**
-*
-*    Copyright (c) 2020 Project CHIP Authors
-*
-*    Licensed under the Apache License, Version 2.0 (the "License");
-*    you may not use this file except in compliance with the License.
-*    You may obtain a copy of the License at
-*
-*        http://www.apache.org/licenses/LICENSE-2.0
-*
-*    Unless required by applicable law or agreed to in writing, software
-*    distributed under the License is distributed on an "AS IS" BASIS,
-*    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*    See the License for the specific language governing permissions and
-*    limitations under the License.
-*/
+ *
+ *    Copyright (c) 2020 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 
 #import "CHIPConnectivityManager.h"
-#import <UIKit/UIKit.h>
-#import <CHIP/CHIP.h>
 #import "DefaultsUtils.h"
+#import <CHIP/CHIP.h>
+#import <UIKit/UIKit.h>
 
-@interface CHIPConnectivityManager()
+@interface CHIPConnectivityManager ()
 @property (readwrite) CHIPDeviceController * chipController;
-@property (nonatomic, weak) id <CHIPConnectivityManagerDelegate> delegate;
+@property (nonatomic, weak) id<CHIPConnectivityManagerDelegate> delegate;
 @property (readonly, nonatomic) dispatch_queue_t delegateQueue;
 @end
 
 @implementation CHIPConnectivityManager {
     BOOL reconnectOnForeground;
 }
-
 
 + (CHIPConnectivityManager *)sharedManager
 {
@@ -57,7 +56,7 @@
 {
     if (self = [super init]) {
         self.chipController = [CHIPDeviceController sharedController];
-        
+
         // need to restart connections on background/foreground transitions otherwise the socket can be closed without CHIP knowing
         // about it.
         [[NSNotificationCenter defaultCenter] addObserver:self

@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-#import <UIKit/UIKit.h>
-#import <CHIP/CHIP.h>
 #import "CHIPConnectivityManager.h"
+#import <CHIP/CHIP.h>
+#import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
