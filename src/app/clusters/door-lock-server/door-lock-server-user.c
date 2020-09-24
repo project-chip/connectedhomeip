@@ -269,7 +269,7 @@ bool emberAfDoorLockClusterSetPinCallback(uint16_t userId, uint8_t userStatus, u
     {
         emberAfFillCommandDoorLockClusterProgrammingEventNotification(
             EMBER_ZCL_DOOR_LOCK_EVENT_SOURCE_RF, EMBER_ZCL_DOOR_LOCK_PROGRAMMING_EVENT_CODE_PIN_ADDED, userId, pin, userType,
-            userStatus, 0, pin); /*emberAfGetCurrentTime() #2507*/
+            userStatus, 0 /*emberAfGetCurrentTime() #2507*/, pin);
         // SEND_COMMAND_UNICAST_TO_BINDINGS();
     }
 
@@ -568,8 +568,8 @@ bool emberAfDoorLockClusterUnlockDoorCallback(uint8_t * pin)
     if (doorUnlocked && (rfOperationEventMask & BIT(2)) && (pin != NULL))
     {
         emberAfFillCommandDoorLockClusterOperationEventNotification(EMBER_ZCL_DOOR_LOCK_EVENT_SOURCE_RF,
-                                                                    EMBER_ZCL_DOOR_LOCK_OPERATION_EVENT_CODE_UNLOCK, userId, pin, 0,
-                                                                    pin); /*emberAfGetCurrentTime() #2507 */
+                                                                    EMBER_ZCL_DOOR_LOCK_OPERATION_EVENT_CODE_UNLOCK, userId, pin,
+                                                                    0 /*emberAfGetCurrentTime() #2507 */, pin);
         // SEND_COMMAND_UNICAST_TO_BINDINGS();
     }
 
