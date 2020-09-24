@@ -19,6 +19,8 @@ import("${chip_root}/gn/chip/chip_test_suite.gni")
 import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
 
+# TODO: Factor common parts
+
 config("tests_config") {
   include_dirs = [ "." ]
 }
@@ -63,7 +65,6 @@ chip_test_suite("tests") {
   if (current_os != "mac" && chip_device_platform != "esp32") {
     sources += [
       "TestInetLayerDNS.cpp",
-      "TestInetLayerMulticast.cpp",
       "TestLwIPDNS.cpp",
     ]
     tests += [ "TestInetLayerDNS" ]
@@ -75,14 +76,20 @@ chip_test_suite("happy_tests") {
   output_name = "libHappyTestInetCommon"
 
   sources = [
-    "TapAddrAutoconf.cpp",
-    "TapAddrAutoconf.h",
     "TestInetCommon.cpp",
     "TestInetCommon.h",
     "TestInetCommonOptions.cpp",
     "TestInetCommonOptions.h",
     "TestInetLayerCommon.cpp",
+    "TestInetLayerMulticast.cpp",
   ]
+
+  if (lwip_platform == "standalone") {
+    sources += [
+      "TapAddrAutoconf.cpp",
+      "TapAddrAutoconf.h",
+    ]
+  }
 
   public_configs = [ ":tests_config" ]
 

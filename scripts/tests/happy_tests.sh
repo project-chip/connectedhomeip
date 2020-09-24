@@ -40,15 +40,16 @@ function happytest_bootstrap() {
     echo "Happy Main Config"
     cat happy/conf/main_config.json
 
-    sudo apt-get update
-    sudo apt-get install -y bridge-utils \
+    apt-get update
+    apt-get install -y bridge-utils \
         iproute2 \
         net-tools \
         python3-lockfile \
         python3-pip \
         python3-psutil \
         python3-setuptools \
-        strace
+        strace \
+        sudo
     make
 
     echo "Happy Log dir set to $HAPPY_LOG_DIR"
