@@ -25,7 +25,7 @@ pw_sys_io_BACKEND = "${chip_root}/examples/platform/nrf528xx/pw_sys_io:pw_sys_io
 dir_pw_third_party_nanopb = "${chip_root}/third_party/nanopb/repo"
 pw_protobuf_GENERATORS = [
   "pwpb",
-  "nanopb_rpc"
+  "nanopb_rpc",
 ]
 
 # SDK target. This is overriden to add our SDK app_config.h & defines.
