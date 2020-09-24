@@ -156,7 +156,7 @@ bool emberAfDoorLockClusterSetWeekdayScheduleCallback(uint8_t scheduleId, uint16
     if (rfProgrammingEventMask & BIT(0))
     {
         emberAfFillCommandDoorLockClusterProgrammingEventNotification(0x01, 0x00, userId, &userPin, 0x00, 0x00, 0x00, &userPin);
-        SEND_COMMAND_UNICAST_TO_BINDINGS();
+        // SEND_COMMAND_UNICAST_TO_BINDINGS();
     }
 
     return true;
