@@ -88,12 +88,14 @@ void CLIAppEventHandler(AppEvent * event)
 
 int cmd_light(int argc, char ** argv)
 {
-    int end_point = 1;
+    // TODO: Add or remove multiple endpoints support.
+    bool read_state = false;
+    int end_point   = 1;
     AppEvent event;
     event.Type    = AppEvent::kEventType_CLI;
     event.Handler = CLIAppEventHandler;
 
-    VerifyOrExit(argc > 0 && argc <= 2, streamer_printf(streamer_get(), "light on/off/toggle [endpoint=1]\n\r"));
+    VerifyOrExit(argc > 0 && argc <= 2, streamer_printf(streamer_get(), "light on/off/toggle/state [endpoint=1]\n\r"));
 
     if (strcmp(argv[0], "on") == 0)
     {
@@ -107,13 +109,24 @@ int cmd_light(int argc, char ** argv)
     {
         event.CLIEvent.Event = kCLIEvent_LightToggle;
     }
+    else if (strcmp(argv[0], "state") == 0)
+    {
+        read_state = true;
+    }
 
     if (argc == 2)
     {
         sscanf(argv[1], "%d", &end_point);
     }
 
-    GetAppTask().PostEvent(&event);
+    if (read_state)
+    {
+        streamer_printf(streamer_get(), "%d\n\r", LightingMgr().IsTurnedOn());
+    }
+    else
+    {
+        GetAppTask().PostEvent(&event);
+    }
 exit:
     streamer_printf(streamer_get(), "\n\r");
     return 0;
