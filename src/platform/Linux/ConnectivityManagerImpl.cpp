@@ -58,6 +58,8 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    mWiFiStationMode                = kWiFiStationMode_Disabled;
+
     // Initialize the generic base classes that require it.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
@@ -95,6 +97,16 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 uint16_t ConnectivityManagerImpl::mConnectivityFlag;
 struct GDBusWpaSupplicant ConnectivityManagerImpl::mWpaSupplicant;
 
+ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode(void)
+{
+    if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
+    {
+        mWiFiStationMode = (mWpaSupplicant.iface != nullptr) ? kWiFiStationMode_Enabled : kWiFiStationMode_Disabled;
+    }
+
+    return mWiFiStationMode;
+}
+
 bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
 {
     return ((mConnectivityFlag & kFlag_HaveIPv4InternetConnectivity) != 0);
@@ -103,6 +115,11 @@ bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
 bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
 {
     return ((mConnectivityFlag & kFlag_HaveIPv6InternetConnectivity) != 0);
+}
+
+bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
+{
+    return GetWiFiStationMode() == kWiFiStationMode_Enabled;
 }
 
 bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)

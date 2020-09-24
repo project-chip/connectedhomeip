@@ -115,6 +115,8 @@ private:
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    WiFiStationMode _GetWiFiStationMode(void);    
+    bool _IsWiFiStationEnabled(void);
     bool _IsWiFiStationConnected(void);
     bool _CanStartWiFiScan();
     static void _OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
