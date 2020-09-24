@@ -151,8 +151,8 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, Rendezvous
                                                NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
                                                ErrorHandler onError)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    RendezvousSession * rendezvousSession;
+    CHIP_ERROR err                        = CHIP_NO_ERROR;
+    RendezvousSession * rendezvousSession = nullptr;
 
     VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mConState == kConnectionState_NotConnected, err = CHIP_ERROR_INCORRECT_STATE);
@@ -181,6 +181,11 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, Rendezvous
     mOnError             = onError;
 
 exit:
+    if (err != CHIP_NO_ERROR && rendezvousSession != nullptr)
+    {
+        delete rendezvousSession;
+    }
+
     return err;
 }
 
