@@ -50,32 +50,32 @@ static CHIP_ERROR resolveSetupPayloadParameter(SetupPayloadParameter & parameter
 {
     bool isUnsignedInt   = true;
     bool shouldHaveValue = true;
-    if (key.compare("version") == 0)
+    if (key == "version")
     {
         parameter.key = SetupPayloadKey_Version;
     }
-    else if (key.compare("vendorID") == 0)
+    else if (key == "vendorID")
     {
         parameter.key = SetupPayloadKey_VendorID;
     }
-    else if (key.compare("productID") == 0)
+    else if (key == "productID")
     {
         parameter.key = SetupPayloadKey_ProductID;
     }
-    else if (key.compare("requiresCustomFlowTrue") == 0)
+    else if (key == "requiresCustomFlowTrue")
     {
         parameter.key   = SetupPayloadKey_RequiresCustomFlowTrue;
         shouldHaveValue = false;
     }
-    else if (key.compare("rendezVousInformation") == 0)
+    else if (key == "rendezVousInformation")
     {
         parameter.key = SetupPayloadKey_RendezVousInformation;
     }
-    else if (key.compare("discriminator") == 0)
+    else if (key == "discriminator")
     {
         parameter.key = SetupPayloadKey_Discriminator;
     }
-    else if (key.compare("setUpPINCode") == 0)
+    else if (key == "setUpPINCode")
     {
         parameter.key = SetupPayloadKey_SetupPINCode;
     }

@@ -301,7 +301,7 @@ bool SetupPayload::operator==(SetupPayload & input)
         CHIP_ERROR err = getOptionalVendorData(inputInfo.tag, info);
         VerifyOrExit(err == CHIP_NO_ERROR, isIdentical = false);
         VerifyOrExit(inputInfo.type == info.type, isIdentical = false);
-        VerifyOrExit(inputInfo.data.compare(info.data) == 0, isIdentical = false);
+        VerifyOrExit(inputInfo.data == info.data, isIdentical = false);
         VerifyOrExit(inputInfo.int32 == info.int32, isIdentical = false);
     }
 
@@ -314,7 +314,7 @@ bool SetupPayload::operator==(SetupPayload & input)
         CHIP_ERROR err = getOptionalExtensionData(inputInfo.tag, info);
         VerifyOrExit(err == CHIP_NO_ERROR, isIdentical = false);
         VerifyOrExit(inputInfo.type == info.type, isIdentical = false);
-        VerifyOrExit(inputInfo.data.compare(info.data) == 0, isIdentical = false);
+        VerifyOrExit(inputInfo.data == info.data, isIdentical = false);
         VerifyOrExit(inputInfo.int32 == info.int32, isIdentical = false);
         VerifyOrExit(inputInfo.int64 == info.int64, isIdentical = false);
         VerifyOrExit(inputInfo.uint32 == info.uint32, isIdentical = false);
