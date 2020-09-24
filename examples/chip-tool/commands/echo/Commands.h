@@ -16,20 +16,27 @@
  *
  */
 
-#ifndef __CHIPTOOL_ON_H__
-#define __CHIPTOOL_ON_H__
+#ifndef __CHIPTOOL_ECHO_COMMANDS_H__
+#define __CHIPTOOL_ECHO_COMMANDS_H__
 
-#include "common/ModelCommand.h"
+#include "../common/EchoCommand.h"
 
-class On : public ModelCommand
+class Echo : public EchoCommand
 {
 public:
-    On() : ModelCommand("on", 0x06) {}
-
-    size_t EncodeCommand(PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) override
-    {
-        return encodeOnCommand(buffer->Start(), bufferSize, endPointId);
-    }
+    Echo() : EchoCommand("echo", NetworkType::UDP) {}
 };
 
-#endif // __CHIPTOOL_ON_H__
+class EchoBle : public EchoCommand
+{
+public:
+    EchoBle() : EchoCommand("echo-ble", NetworkType::BLE) {}
+};
+
+void registerCommandsEcho(Commands & commands)
+{
+    commands.Register(make_unique<Echo>());
+    commands.Register(make_unique<EchoBle>());
+}
+
+#endif // __CHIPTOOL_ECHO_COMMANDS_H__

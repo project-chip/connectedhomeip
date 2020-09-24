@@ -16,46 +16,52 @@
  *
  */
 
-#ifndef __CHIPTOOL_IDENTIFY_H__
-#define __CHIPTOOL_IDENTIFY_H__
-#include "common/ModelCommand.h"
-#include <core/CHIPEncoding.h>
+#ifndef __CHIPTOOL_IDENTIFY_COMMANDS_H__
+#define __CHIPTOOL_IDENTIFY_COMMANDS_H__
+
+#include "../../common/ModelCommand.h"
+
+class Identify : public ModelCommand
+{
+public:
+    Identify(const uint16_t clusterId) : ModelCommand("identify", clusterId) {}
+    size_t EncodeCommand(PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) override
+    {
+        uint16_t duration = 10;
+        return encodeIdentifyCommand(buffer->Start(), bufferSize, endPointId, duration);
+    }
+};
 
 class IdentifyQuery : public ModelCommand
 {
 public:
-    IdentifyQuery() : ModelCommand("identify-query", 0x03){};
+    IdentifyQuery(const uint16_t clusterId) : ModelCommand("identify-query", clusterId) {}
     size_t EncodeCommand(PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) override
     {
         return encodeIdentifyQueryCommand(buffer->Start(), bufferSize, endPointId);
     }
 
-    void HandleClusterResponse(uint16_t clusterId, uint16_t endPointId, uint16_t commandId, uint8_t * message,
-                               uint16_t messageLen) const override
+    bool HandleClusterResponse(uint8_t * message, uint16_t messageLen) const override
     {
-        if (clusterId != getClusterId())
-        {
-            ChipLogError(Zcl, "Got invalid clusterID %d for Identify cluster. Expected cluster id %d", clusterId, getClusterId());
-            return;
-        }
         uint16_t identify_time = 0;
-        ChipLogProgress(chipTool, "Parsing identify cluster response command id %d", commandId);
+
         CHECK_MESSAGE_LENGTH(messageLen == 2);
+
         identify_time = chip::Encoding::LittleEndian::Read16(message);
+
         ChipLogProgress(chipTool, "Identify query response %d", identify_time);
 
     exit:
-        return;
+        return true;
     }
 };
 
-class Identify : public ModelCommand
+void registerClusterIdentify(Commands & commands)
 {
-public:
-    Identify() : ModelCommand("identify", 0x03) {}
-    size_t EncodeCommand(PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) override
-    {
-        return encodeIdentifyCommand(buffer->Start(), bufferSize, endPointId, 10);
-    }
-};
-#endif
+    const uint16_t clusterId = 0x0003;
+
+    commands.Register(make_unique<Identify>(clusterId));
+    commands.Register(make_unique<IdentifyQuery>(clusterId));
+}
+
+#endif // __CHIPTOOL_IDENTIFY_COMMANDS_H__
