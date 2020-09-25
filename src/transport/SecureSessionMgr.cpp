@@ -107,9 +107,9 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBu
         uint8_t * data = nullptr;
         MessageHeader header;
         const size_t headerSize = header.payloadHeader.EncodeSizeBytes();
-        size_t actualEncodedHeaderSize;
+        uint16_t actualEncodedHeaderSize;
         size_t totalLen = 0;
-        size_t taglen   = 0;
+        uint16_t taglen = 0;
 
         header.packetHeader
             .SetSourceNodeId(mLocalNodeId)              //
@@ -247,8 +247,8 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
         uint8_t * plainText     = nullptr;
         uint16_t len            = msg->TotalLength();
         const size_t headerSize = header.payloadHeader.EncodeSizeBytes();
-        size_t decodedSize      = 0;
-        size_t taglen           = 0;
+        uint16_t decodedSize    = 0;
+        uint16_t taglen         = 0;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         /* This is a workaround for the case where PacketBuffer payload is not

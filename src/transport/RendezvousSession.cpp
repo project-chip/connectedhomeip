@@ -85,7 +85,7 @@ CHIP_ERROR RendezvousSession::SendPairingMessage(System::PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     MessageHeader header;
-    size_t headerSize = 0;
+    uint16_t headerSize = 0;
 
     VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msgBuf->Next() == nullptr, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -107,10 +107,10 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(System::PacketBuffer * msgBuf)
     CHIP_ERROR err = CHIP_NO_ERROR;
     MessageHeader header;
     const size_t headerSize = header.payloadHeader.EncodeSizeBytes();
-    size_t actualEncodedHeaderSize;
+    uint16_t actualEncodedHeaderSize;
     uint8_t * data  = nullptr;
     size_t totalLen = 0;
-    size_t taglen   = 0;
+    uint16_t taglen = 0;
 
     VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msgBuf->Next() == nullptr, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -220,7 +220,7 @@ CHIP_ERROR RendezvousSession::HandlePairingMessage(PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     MessageHeader header;
-    size_t headerSize = 0;
+    uint16_t headerSize = 0;
 
     err = header.packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
     SuccessOrExit(err);
@@ -238,12 +238,12 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     MessageHeader header;
-    size_t headerSize              = 0;
+    uint16_t headerSize            = 0;
     uint8_t * data                 = nullptr;
     uint8_t * plainText            = nullptr;
     uint16_t len                   = 0;
-    size_t decodedSize             = 0;
-    size_t taglen                  = 0;
+    uint16_t decodedSize           = 0;
+    uint16_t taglen                = 0;
     System::PacketBuffer * origMsg = nullptr;
 
     err = header.packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);

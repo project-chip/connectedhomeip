@@ -34,7 +34,7 @@ struct pbkdf2_test_vector
     const uint8_t * salt;
     size_t slen;
     unsigned int iter;
-    size_t key_len;
+    uint32_t key_len;
     const uint8_t * key;
     unsigned tcId;
     int result;
