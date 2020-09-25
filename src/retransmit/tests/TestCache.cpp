@@ -49,12 +49,29 @@ public:
 
     size_t Count() const { return mAquired.count(); }
 
+    bool IsAquired(int value) const { return mAquired.test(value); }
+
 private:
     nlTestSuite * mSuite;
     std::bitset<kMaxPayloadValue> mAquired;
 };
 
 static IntPayloadTracker gPayloadTracker;
+
+/**
+ * Helper class defining a matches method for things divisible by a
+ * specific value.
+ */
+class DivisibleBy
+{
+public:
+    DivisibleBy(int value) : mValue(value) {}
+
+    bool Matches(int x) const { return (x % mValue) == 0; }
+
+private:
+    const int mValue;
+};
 
 } // namespace
 
@@ -163,6 +180,30 @@ void AddRemove(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
 }
 
+void RemoveMatching(nlTestSuite * inSuite, void * inContext)
+{
+    chip::Retransmit::Cache<int, int, 4> test;
+
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
+
+    NL_TEST_ASSERT(inSuite, test.Add(1, 1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.Add(2, 2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.Add(3, 4) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.Add(4, 8) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 4);
+
+    test.RemoveMatching(DivisibleBy(2));
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 2);
+
+    // keys 1 and 3 remain
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.IsAquired(1));
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.IsAquired(4));
+
+    NL_TEST_ASSERT(inSuite, test.Remove(3) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.IsAquired(1));
+    NL_TEST_ASSERT(inSuite, !gPayloadTracker.IsAquired(4));
+}
+
 } // namespace
 
 // clang-format off
@@ -172,6 +213,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("DestructorFree", TestDestructorFree),
     NL_TEST_DEF("OutOfSpace", OutOfSpace),
     NL_TEST_DEF("AddRemove", AddRemove),
+    NL_TEST_DEF("RemoveMatching", RemoveMatching),
     NL_TEST_SENTINEL()
 };
 // clang-format on

@@ -116,6 +116,25 @@ public:
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
 
+    /**
+     * Remove any matching payloads. Used for mass removal, e.g. when a connection
+     * is closed, relevant payloads need/can be cleared for the entire connection.
+     *
+     * @tparam Matcher is a generic macher object defining a bool Maches method.
+     */
+    template <typename Matcher>
+    void RemoveMatching(const Matcher & matcher)
+    {
+        for (unsigned i = 0; i < N; i++)
+        {
+            if (mInUse.test(i) && matcher.Matches(mEntries[i].key))
+            {
+                mInUse.reset(i);
+                Lifetime<PayloadType>::Release(mEntries[i].payload);
+            }
+        }
+    }
+
 #ifdef UNIT_TESTS
     /**
      * Convenience add when types are trivially copyable, so no actual
