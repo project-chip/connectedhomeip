@@ -507,21 +507,21 @@ int cmd_device_sta(int argc, char ** argv)
 
     if (strcmp(argv[0], "mode") == 0)
     {
-        const char * typeStr                      = u8"Unknown";
+        const char * typeStr                      = "Unknown";
         ConnectivityManager::WiFiStationMode mode = ConnectivityMgr().GetWiFiStationMode();
         switch (mode)
         {
         case ConnectivityManager::WiFiStationMode::kWiFiStationMode_NotSupported:
-            typeStr = u8"NotSupported";
+            typeStr = "NotSupported";
             break;
         case ConnectivityManager::WiFiStationMode::kWiFiStationMode_ApplicationControlled:
-            typeStr = u8"ApplicationControlled";
+            typeStr = "ApplicationControlled";
             break;
         case ConnectivityManager::WiFiStationMode::kWiFiStationMode_Disabled:
-            typeStr = u8"Disabled";
+            typeStr = "Disabled";
             break;
         case ConnectivityManager::WiFiStationMode::kWiFiStationMode_Enabled:
-            typeStr = u8"Enabled";
+            typeStr = "Enabled";
             break;
         }
         streamer_printf(sout, "%s\r\n", typeStr);
@@ -595,25 +595,25 @@ int cmd_device_thread(int argc, char ** argv)
     }
     else if (strcmp(argv[0], "role") == 0)
     {
-        const char * typeStr = u8"Unknown";
+        const char * typeStr = "Unknown";
         ConnectivityManager::ThreadDeviceType type;
         type = ConnectivityMgr().GetThreadDeviceType();
         switch (type)
         {
         case ConnectivityManager::kThreadDeviceType_NotSupported:
-            typeStr = u8"NotSupported";
+            typeStr = "NotSupported";
             break;
         case ConnectivityManager::kThreadDeviceType_Router:
-            typeStr = u8"Router";
+            typeStr = "Router";
             break;
         case ConnectivityManager::kThreadDeviceType_FullEndDevice:
-            typeStr = u8"FullEndDevice";
+            typeStr = "FullEndDevice";
             break;
         case ConnectivityManager::kThreadDeviceType_MinimalEndDevice:
-            typeStr = u8"MinimalEndDevice";
+            typeStr = "MinimalEndDevice";
             break;
         case ConnectivityManager::kThreadDeviceType_SleepyEndDevice:
-            typeStr = u8"SleepyEndDevice";
+            typeStr = "SleepyEndDevice";
             break;
         }
         streamer_printf(sout, "%d: %s\r\n", static_cast<int>(type), typeStr);
