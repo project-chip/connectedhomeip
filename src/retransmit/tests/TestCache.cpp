@@ -17,7 +17,9 @@
 
 #include "TestRetransmit.h"
 
-#include <retransmit/MessageCache.h>
+#define UNIT_TESTS
+
+#include <retransmit/Cache.h>
 #include <support/TestUtils.h>
 
 #include <bitset>
@@ -77,7 +79,7 @@ void TestNoOp(nlTestSuite * inSuite, void * inContext)
     // unused address cache should not do any aquire/release at any time
     NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
     {
-        chip::Retransmit::PeerAddressedCache<int, 20> test;
+        chip::Retransmit::Cache<int, int, 20> test;
         NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
     }
     NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
@@ -85,10 +87,41 @@ void TestNoOp(nlTestSuite * inSuite, void * inContext)
 
 void TestDestructorFree(nlTestSuite * inSuite, void * inContext)
 {
-    chip::Retransmit::PeerAddressedCache<int, 20> test;
+    {
+        chip::Retransmit::Cache<int, int, 20> test;
 
-    // FIXME: set some values, then reset
-    // FIXME: implement
+        NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
+
+        NL_TEST_ASSERT(inSuite, test.Add(1, 1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, test.Add(2, 2) == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 2);
+    }
+
+    // destructor should release the items
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
+}
+
+void OutOfSpace(nlTestSuite * inSuite, void * inContext)
+{
+    {
+        chip::Retransmit::Cache<int, int, 4> test;
+
+        NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
+
+        NL_TEST_ASSERT(inSuite, test.Add(1, 1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, test.Add(2, 2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, test.Add(3, 4) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, test.Add(3, 6) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 4);
+
+        NL_TEST_ASSERT(inSuite, test.Add(3, 8) == CHIP_ERROR_NO_MEMORY);
+        NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 4);
+
+        NL_TEST_ASSERT(inSuite, test.Add(3, 10) == CHIP_ERROR_NO_MEMORY);
+        NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 4);
+    }
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
 }
 
 } // namespace
@@ -98,16 +131,17 @@ static const nlTest sTests[] =
 {
     NL_TEST_DEF("NoOp", TestNoOp),
     NL_TEST_DEF("DestructorFree", TestDestructorFree),
+    NL_TEST_DEF("OutOfSpace", OutOfSpace),
     NL_TEST_SENTINEL()
 };
 // clang-format on
 
-int TestMessageCache(void)
+int TestCache(void)
 {
-    nlTestSuite theSuite = { "Retransmit-MessageCache", &sTests[0], nullptr, nullptr };
+    nlTestSuite theSuite = { "Retransmit-Cache", &sTests[0], nullptr, nullptr };
     gPayloadTracker.Init(&theSuite);
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestMessageCache)
+CHIP_REGISTER_TEST_SUITE(TestCache)

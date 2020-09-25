@@ -21,5 +21,5 @@
 int main(void)
 {
     nlTestSetOutputStyle(OUTPUT_CSV);
-    return (TestMessageCache());
+    return (TestCache());
 }

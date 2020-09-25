@@ -22,7 +22,7 @@ chip_test_suite("tests") {
   output_name = "libRetransmigTests"
 
   sources = [
-    "TestMessageCache.cpp",
+    "TestCache.cpp",
     "TestRetransmit.h",
   ]
 
@@ -33,6 +33,6 @@ chip_test_suite("tests") {
   ]
 
   tests = [
-    "TestMessageCache",
+    "TestCache",
   ]
 }

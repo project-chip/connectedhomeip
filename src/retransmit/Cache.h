@@ -19,7 +19,9 @@
 
 #include <bitset>
 #include <cstddef>
+#include <type_traits>
 
+#include <core/CHIPError.h>
 #include <transport/PeerAddress.h>
 
 namespace chip {
@@ -43,6 +45,7 @@ struct Lifetime
  * Typical use is to keep track of unacknowledged packets and resend them
  * as needed.
  *
+ * @tparam KeyType the key to identify a single message
  * @tparam PayloadType the type of payload to cache for the given peer address
  * @tparam N size of the available cache
  *
@@ -52,35 +55,69 @@ struct Lifetime
  *    PayloadType chip::Retransmit::Aquire(PayloadType&);
  *    chip::Retransmit::Release(PayloadType&);
  */
-template <typename PayloadType, size_t N>
-class PeerAddressedCache
+template <typename KeyType, typename PayloadType, size_t N>
+class Cache
 {
 public:
-    PeerAddressedCache() {}
-    PeerAddressedCache(const PeerAddressedCache &) = delete;
-    PeerAddressedCache & operator=(const PeerAddressedCache &) = delete;
+    Cache() {}
+    Cache(const Cache &) = delete;
+    Cache & operator=(const Cache &) = delete;
 
-    ~PeerAddressedCache()
+    ~Cache()
     {
         for (unsigned i = 0; i < N; i++)
         {
             if (mPayloadInUse.test(i))
             {
-                Lifetime<PayloadType>::Release(mPayloads[i].payload);
+                Lifetime<PayloadType>::Release(mEntries[i].payload);
             }
         }
     }
 
+    CHIP_ERROR Add(const KeyType & key, PayloadType & payload)
+    {
+        if (mPayloadInUse.count() >= N)
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        for (unsigned i = 0; i < N; i++)
+        {
+            if (!mPayloadInUse.test(i))
+            {
+                mPayloadInUse.set(i);
+                mEntries[i].key     = key;
+                mEntries[i].payload = Lifetime<PayloadType>::Acquire(payload);
+                break;
+            }
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+#ifdef UNIT_TESTS
+    /**
+     * Convenience add when types are trivially copyable, so no actual
+     * reference needs to be created. Only to be used by tests to avoid
+     * confusion/
+     */
+    template <typename = std::enable_if<std::is_trivially_copyable<PayloadType>::value, int>>
+    CHIP_ERROR Add(const KeyType & key, PayloadType payload)
+    {
+        return Add(key, payload); // add as reference
+    }
+#endif // UNIT_TESTS
+
 private:
     struct Entry
     {
-        Transport::PeerAddress peerAddress;
+        KeyType key;
         PayloadType payload;
     };
 
-    Entry mPayloads[N];           // payload entries
+    Entry mEntries[N];            // payload entries
     std::bitset<N> mPayloadInUse; // compact 'in use' marker for payloads
-};
+};                                // namespace Retransmit
 
 } // namespace Retransmit
 } // namespace chip

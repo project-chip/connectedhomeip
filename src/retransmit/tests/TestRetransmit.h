@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-int TestMessageCache(void);
+int TestCache(void);
 
 #ifdef __cplusplus
 }

@@ -19,7 +19,7 @@ static_library("retransmit") {
   output_name = "libRetransmit"
 
   sources = [
-      "MessageCache.h",
+      "Cache.h",
   ]
 
   public_deps = [
