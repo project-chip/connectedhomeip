@@ -73,30 +73,40 @@ groups:
             - files.include('*')
         reviewers:
             teams: [reviewers-amazon]
+        reviews:
+            request: 1
     shared-reviewers-apple:
         type: optional
         conditions:
             - files.include('*')
         reviewers:
             teams: [reviewers-apple]
+        reviews:
+            request: 2
     shared-reviewers-comcast:
         type: optional
         conditions:
             - files.include('*')
         reviewers:
             teams: [reviewers-comcast]
+        reviews:
+            request: 2
     shared-reviewers-google:
         type: optional
         conditions:
             - files.include('*')
         reviewers:
             teams: [reviewers-google]
+        reviews:
+            request: 2
     shared-reviewers-samsung:
         type: optional
         conditions:
             - files.include('*')
         reviewers:
             teams: [reviewers-samsung]
+        reviews:
+            request: 2
 
     ############################################################
     #  Base Required Reviewers
