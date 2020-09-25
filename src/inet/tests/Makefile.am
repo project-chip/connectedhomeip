@@ -202,6 +202,7 @@ TestInetLayer_SOURCES                                 = TestInetLayer.cpp    \
 TestInetLayer_LDADD                                   = libTestInetCommon.a $(COMMON_LDADD)
 
 TestInetLayerMulticast_SOURCES                        = TestInetLayerMulticast.cpp    \
+                                                        TestInetLayerMulticastDriver.cpp    \
                                                         $(NULL)
 TestInetLayerMulticast_LDADD                          = libTestInetCommon.a $(COMMON_LDADD)
 
