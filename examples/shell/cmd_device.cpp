@@ -560,7 +560,7 @@ int cmd_device_sta(int argc, char ** argv)
     {
         SuccessOrExit(error = ConnectivityMgr().GetAndLogWifiStatsCounters());
         streamer_printf(sout, "WiFi statistics written to log\r\n");
-    }    
+    }
     else
     {
         ExitNow(error = CHIP_ERROR_INVALID_ARGUMENT);
