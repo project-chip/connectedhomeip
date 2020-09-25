@@ -64,10 +64,6 @@ CHIP_ERROR BLE::Init(RendezvousSessionDelegate * delegate, const RendezvousParam
     {
         err = InitInternal(params.GetConnectionObject());
     }
-    else
-    {
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-    }
     SuccessOrExit(err);
 
 exit:

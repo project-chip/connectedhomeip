@@ -38,6 +38,7 @@ target_sources(app PRIVATE
                ${CHIP_APP_SERVER}/DataModelHandler.cpp
                ${CHIP_APP_SERVER}/Server.cpp
                ${CHIP_APP_SERVER}/QRCodeUtil.cpp
+               ${CHIP_APP_SERVER}/RendezvousServer.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp
                ${CHIP_ROOT}/src/app/util/attribute-size.c
                ${CHIP_ROOT}/src/app/util/attribute-storage.c
