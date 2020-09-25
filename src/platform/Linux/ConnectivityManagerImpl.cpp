@@ -97,6 +97,16 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 uint16_t ConnectivityManagerImpl::mConnectivityFlag;
 struct GDBusWpaSupplicant ConnectivityManagerImpl::mWpaSupplicant;
 
+bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
+{
+    return ((mConnectivityFlag & kFlag_HaveIPv4InternetConnectivity) != 0);
+}
+
+bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
+{
+    return ((mConnectivityFlag & kFlag_HaveIPv6InternetConnectivity) != 0);
+}
+
 ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode(void)
 {
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
@@ -107,14 +117,21 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMod
     return mWiFiStationMode;
 }
 
-bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
+CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(ConnectivityManager::WiFiStationMode val)
 {
-    return ((mConnectivityFlag & kFlag_HaveIPv4InternetConnectivity) != 0);
-}
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
-{
-    return ((mConnectivityFlag & kFlag_HaveIPv6InternetConnectivity) != 0);
+    VerifyOrExit(val != ConnectivityManager::kWiFiStationMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (mWiFiStationMode != val)
+    {
+        ChipLogProgress(DeviceLayer, "WiFi station mode change: %s -> %s", WiFiStationModeToStr(mWiFiStationMode),
+                        WiFiStationModeToStr(val));
+    }
+
+    mWiFiStationMode = val;
+exit:
+    return err;
 }
 
 bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
@@ -145,6 +162,11 @@ bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
     }
 
     return ret;
+}
+
+bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled(void)
+{
+    return mWiFiStationMode == ConnectivityManager::kWiFiStationMode_ApplicationControlled;
 }
 
 bool ConnectivityManagerImpl::_CanStartWiFiScan()

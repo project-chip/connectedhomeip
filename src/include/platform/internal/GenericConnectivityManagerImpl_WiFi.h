@@ -89,25 +89,12 @@ protected:
     };
 
     DeviceNetworkInfo mWiFiNetworkInfo;
-    ConnectivityManager::WiFiStationMode mWiFiStationMode;
     bool mWiFiProvisioned;
     bool mWiFiScanPending;
 
 private:
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
-
-template <class ImplClass>
-inline ConnectivityManager::WiFiStationMode GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetWiFiStationMode(void)
-{
-    return mWiFiStationMode;
-}
-
-template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiStationApplicationControlled(void)
-{
-    return mWiFiStationMode == ConnectivityManager::kWiFiStationMode_ApplicationControlled;
-}
 
 template <class ImplClass>
 inline uint32_t GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetWiFiStationReconnectIntervalMS(void)
