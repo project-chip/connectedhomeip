@@ -76,7 +76,8 @@ exit:
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::_LockChipStack(void)
 {
-    assert(pthread_mutex_lock(&mChipStackLock) == 0);
+    int err = pthread_mutex_lock(&mChipStackLock);
+    assert(err == 0);
 }
 
 template <class ImplClass>
@@ -88,7 +89,8 @@ bool GenericPlatformManagerImpl_POSIX<ImplClass>::_TryLockChipStack(void)
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::_UnlockChipStack(void)
 {
-    assert(pthread_mutex_unlock(&mChipStackLock) == 0);
+    int err = pthread_mutex_unlock(&mChipStackLock);
+    assert(err == 0);
 }
 
 template <class ImplClass>
