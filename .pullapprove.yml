@@ -72,31 +72,31 @@ groups:
         conditions:
             - files.include('*')
         reviewers:
-            teams: [reviewers-amazon]
+            teams: [project-chip/reviewers-amazon]
     shared-reviewers-apple:
         type: optional
         conditions:
             - files.include('*')
         reviewers:
-            teams: [reviewers-apple]
+            teams: [project-chip/reviewers-apple]
     shared-reviewers-comcast:
         type: optional
         conditions:
             - files.include('*')
         reviewers:
-            teams: [reviewers-comcast]
+            teams: [project-chip/reviewers-comcast]
     shared-reviewers-google:
         type: optional
         conditions:
             - files.include('*')
         reviewers:
-            teams: [reviewers-google]
+            teams: [project-chip/reviewers-google]
     shared-reviewers-samsung:
         type: optional
         conditions:
             - files.include('*')
         reviewers:
-            teams: [reviewers-samsung]
+            teams: [project-chip/reviewers-samsung]
 
     ############################################################
     #  Base Required Reviewers
@@ -121,7 +121,7 @@ groups:
             - "'android' in labels"
         reviewers:
             teams:
-                - codeowners-android
+                - project-chip/codeowners-android
         reviews:
             request: 100
 
@@ -130,7 +130,7 @@ groups:
             - "'app' in labels"
         reviewers:
             teams:
-                - codeowners-app
+                - project-chip/codeowners-app
         reviews:
             request: 100
 
@@ -139,7 +139,7 @@ groups:
             - "'ble' in labels"
         reviewers:
             teams:
-                - codeowners-ble
+                - project-chip/codeowners-ble
         reviews:
             request: 100
 
@@ -148,7 +148,7 @@ groups:
             - "'controller' in labels"
         reviewers:
             teams:
-                - codeowners-controller
+                - project-chip/codeowners-controller
         reviews:
             request: 100
 
@@ -157,7 +157,7 @@ groups:
             - "'darwin' in labels"
         reviewers:
             teams:
-                - codeowners-darwin
+                - project-chip/codeowners-darwin
         reviews:
             request: 100
 
@@ -166,7 +166,7 @@ groups:
             - "'crypto' in labels"
         reviewers:
             teams:
-                - codeowners-crypto
+                - project-chip/codeowners-crypto
         reviews:
             request: 100
 
@@ -175,7 +175,7 @@ groups:
             - "'inet' in labels"
         reviewers:
             teams:
-                - codeowners-inet
+                - project-chip/codeowners-inet
         reviews:
             request: 100
 
@@ -184,7 +184,7 @@ groups:
             - "'core' in labels"
         reviewers:
             teams:
-                - codeowners-core
+                - project-chip/codeowners-core
         reviews:
             request: 100
 
@@ -193,7 +193,7 @@ groups:
             - "'protocols' in labels"
         reviewers:
             teams:
-                - codeowners-protocols
+                - project-chip/codeowners-protocols
         reviews:
             request: 100
 
@@ -202,7 +202,7 @@ groups:
             - "'shell' in labels"
         reviewers:
             teams:
-                - codeowners-shell
+                - project-chip/codeowners-shell
         reviews:
             request: 100
 
@@ -211,7 +211,7 @@ groups:
             - "'support' in labels"
         reviewers:
             teams:
-                - codeowners-support
+                - project-chip/codeowners-support
         reviews:
             request: 100
 
@@ -220,7 +220,7 @@ groups:
             - "'platform' in labels"
         reviewers:
             teams:
-                - codeowners-platform
+                - project-chip/codeowners-platform
         reviews:
             request: 100
 
@@ -229,7 +229,7 @@ groups:
             - "'qrcode' in labels"
         reviewers:
             teams:
-                - codeowners-qrcode
+                - project-chip/codeowners-qrcode
         reviews:
             request: 100
 
@@ -238,7 +238,7 @@ groups:
             - "'setup payload' in labels"
         reviewers:
             teams:
-                - codeowners-setup-payload
+                - project-chip/codeowners-setup-payload
         reviews:
             request: 100
 
@@ -247,7 +247,7 @@ groups:
             - "'system' in labels"
         reviewers:
             teams:
-                - codeowners-system
+                - project-chip/codeowners-system
         reviews:
             request: 100
 
@@ -256,7 +256,7 @@ groups:
             - "'test driver' in labels"
         reviewers:
             teams:
-                - codeowners-test-driver
+                - project-chip/codeowners-test-driver
         reviews:
             request: 100
 
@@ -265,7 +265,7 @@ groups:
             - "'github' in labels"
         reviewers:
             teams:
-                - codeowners-github
+                - project-chip/codeowners-github
         reviews:
             request: 100
 
@@ -274,7 +274,7 @@ groups:
             - "'vscode' in labels"
         reviewers:
             teams:
-                - codeowners-vscode
+                - project-chip/codeowners-vscode
         reviews:
             request: 100
 
@@ -283,7 +283,7 @@ groups:
             - "'integrations' in labels"
         reviewers:
             teams:
-                - codeowners-integrations
+                - project-chip/codeowners-integrations
         reviews:
             request: 100
 
@@ -292,7 +292,7 @@ groups:
             - "'transport' in labels"
         reviewers:
             teams:
-                - codeowners-transport
+                - project-chip/codeowners-transport
         reviews:
             request: 100
 
@@ -301,7 +301,7 @@ groups:
             - "'scripts' in labels"
         reviewers:
             teams:
-                - codeowners-scripts
+                - project-chip/codeowners-scripts
         reviews:
             request: 100
 
@@ -310,7 +310,7 @@ groups:
             - "'documentation' in labels"
         reviewers:
             teams:
-                - codeowners-documentation
+                - project-chip/codeowners-documentation
         reviews:
             request: 100
 
@@ -319,6 +319,6 @@ groups:
             - "'gn' in labels"
         reviewers:
             teams:
-                - codeowners-gn
+                - project-chip/codeowners-gn
         reviews:
             request: 100
