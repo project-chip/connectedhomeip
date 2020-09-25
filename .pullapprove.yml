@@ -112,3 +112,213 @@ groups:
             - len(groups.approved.include('shared-reviewers-*')) >= 3
         reviews:
             required: 0
+
+    ############################################################
+    #  Label Based Reviewers
+    ############################################################
+    codeowners-android:
+        conditions:
+            - "'android' in labels"
+        reviewers:
+            teams:
+                - codeowners-android
+        reviews:
+            request: 100
+
+    codeowners-app:
+        conditions:
+            - "'app' in labels"
+        reviewers:
+            teams:
+                - codeowners-app
+        reviews:
+            request: 100
+
+    codeowners-ble:
+        conditions:
+            - "'ble' in labels"
+        reviewers:
+            teams:
+                - codeowners-ble
+        reviews:
+            request: 100
+
+    codeowners-controller:
+        conditions:
+            - "'controller' in labels"
+        reviewers:
+            teams:
+                - codeowners-controller
+        reviews:
+            request: 100
+
+    codeowners-darwin:
+        conditions:
+            - "'darwin' in labels"
+        reviewers:
+            teams:
+                - codeowners-darwin
+        reviews:
+            request: 100
+
+    codeowners-crypto:
+        conditions:
+            - "'crypto' in labels"
+        reviewers:
+            teams:
+                - codeowners-crypto
+        reviews:
+            request: 100
+
+    codeowners-inet:
+        conditions:
+            - "'inet' in labels"
+        reviewers:
+            teams:
+                - codeowners-inet
+        reviews:
+            request: 100
+
+    codeowners-core:
+        conditions:
+            - "'core' in labels"
+        reviewers:
+            teams:
+                - codeowners-core
+        reviews:
+            request: 100
+
+    codeowners-protocols:
+        conditions:
+            - "'protocols' in labels"
+        reviewers:
+            teams:
+                - codeowners-protocols
+        reviews:
+            request: 100
+
+    codeowners-shell:
+        conditions:
+            - "'shell' in labels"
+        reviewers:
+            teams:
+                - codeowners-shell
+        reviews:
+            request: 100
+
+    codeowners-support:
+        conditions:
+            - "'support' in labels"
+        reviewers:
+            teams:
+                - codeowners-support
+        reviews:
+            request: 100
+
+    codeowners-platform:
+        conditions:
+            - "'platform' in labels"
+        reviewers:
+            teams:
+                - codeowners-platform
+        reviews:
+            request: 100
+
+    codeowners-qrcode:
+        conditions:
+            - "'qrcode' in labels"
+        reviewers:
+            teams:
+                - codeowners-qrcode
+        reviews:
+            request: 100
+
+    codeowners-setup-payload:
+        conditions:
+            - "'setup payload' in labels"
+        reviewers:
+            teams:
+                - codeowners-setup-payload
+        reviews:
+            request: 100
+
+    codeowners-system:
+        conditions:
+            - "'system' in labels"
+        reviewers:
+            teams:
+                - codeowners-system
+        reviews:
+            request: 100
+
+    codeowners-test-driver:
+        conditions:
+            - "'test driver' in labels"
+        reviewers:
+            teams:
+                - codeowners-test-driver
+        reviews:
+            request: 100
+
+    codeowners-github:
+        conditions:
+            - "'github' in labels"
+        reviewers:
+            teams:
+                - codeowners-github
+        reviews:
+            request: 100
+
+    codeowners-vscode:
+        conditions:
+            - "'vscode' in labels"
+        reviewers:
+            teams:
+                - codeowners-vscode
+        reviews:
+            request: 100
+
+    codeowners-integrations:
+        conditions:
+            - "'integrations' in labels"
+        reviewers:
+            teams:
+                - codeowners-integrations
+        reviews:
+            request: 100
+
+    codeowners-transport:
+        conditions:
+            - "'transport' in labels"
+        reviewers:
+            teams:
+                - codeowners-transport
+        reviews:
+            request: 100
+
+    codeowners-scripts:
+        conditions:
+            - "'scripts' in labels"
+        reviewers:
+            teams:
+                - codeowners-scripts
+        reviews:
+            request: 100
+
+    codeowners-documentation:
+        conditions:
+            - "'documentation' in labels"
+        reviewers:
+            teams:
+                - codeowners-documentation
+        reviews:
+            request: 100
+
+    codeowners-gn:
+        conditions:
+            - "'gn' in labels"
+        reviewers:
+            teams:
+                - codeowners-gn
+        reviews:
+            request: 100
