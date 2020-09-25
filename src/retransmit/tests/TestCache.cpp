@@ -112,15 +112,54 @@ void OutOfSpace(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, test.Add(1, 1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, test.Add(2, 2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, test.Add(3, 4) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, test.Add(3, 6) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, test.Add(4, 6) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 4);
 
-        NL_TEST_ASSERT(inSuite, test.Add(3, 8) == CHIP_ERROR_NO_MEMORY);
+        NL_TEST_ASSERT(inSuite, test.Add(5, 8) == CHIP_ERROR_NO_MEMORY);
         NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 4);
 
-        NL_TEST_ASSERT(inSuite, test.Add(3, 10) == CHIP_ERROR_NO_MEMORY);
+        NL_TEST_ASSERT(inSuite, test.Add(6, 10) == CHIP_ERROR_NO_MEMORY);
         NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 4);
     }
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
+}
+
+void AddRemove(nlTestSuite * inSuite, void * inContext)
+{
+    chip::Retransmit::Cache<int, int, 3> test;
+
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
+
+    NL_TEST_ASSERT(inSuite, test.Add(1, 1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.Add(2, 2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.Add(3, 4) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 3);
+
+    NL_TEST_ASSERT(inSuite, test.Add(10, 8) == CHIP_ERROR_NO_MEMORY);
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 3);
+
+    NL_TEST_ASSERT(inSuite, test.Remove(2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 2);
+
+    NL_TEST_ASSERT(inSuite, test.Add(10, 8) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 3);
+
+    NL_TEST_ASSERT(inSuite, test.Remove(14) == CHIP_ERROR_KEY_NOT_FOUND);
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 3);
+
+    NL_TEST_ASSERT(inSuite, test.Remove(1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 2);
+
+    NL_TEST_ASSERT(inSuite, test.Remove(3) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 1);
+
+    NL_TEST_ASSERT(inSuite, test.Remove(3) == CHIP_ERROR_KEY_NOT_FOUND);
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 1);
+
+    NL_TEST_ASSERT(inSuite, test.Remove(10) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
+
+    NL_TEST_ASSERT(inSuite, test.Remove(10) == CHIP_ERROR_KEY_NOT_FOUND);
     NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
 }
 
@@ -132,6 +171,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("NoOp", TestNoOp),
     NL_TEST_DEF("DestructorFree", TestDestructorFree),
     NL_TEST_DEF("OutOfSpace", OutOfSpace),
+    NL_TEST_DEF("AddRemove", AddRemove),
     NL_TEST_SENTINEL()
 };
 // clang-format on

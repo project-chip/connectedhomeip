@@ -67,25 +67,28 @@ public:
     {
         for (unsigned i = 0; i < N; i++)
         {
-            if (mPayloadInUse.test(i))
+            if (mInUse.test(i))
             {
                 Lifetime<PayloadType>::Release(mEntries[i].payload);
             }
         }
     }
 
+    /**
+     * Add a payload to the cache.
+     */
     CHIP_ERROR Add(const KeyType & key, PayloadType & payload)
     {
-        if (mPayloadInUse.count() >= N)
+        if (mInUse.count() >= N)
         {
             return CHIP_ERROR_NO_MEMORY;
         }
 
         for (unsigned i = 0; i < N; i++)
         {
-            if (!mPayloadInUse.test(i))
+            if (!mInUse.test(i))
             {
-                mPayloadInUse.set(i);
+                mInUse.set(i);
                 mEntries[i].key     = key;
                 mEntries[i].payload = Lifetime<PayloadType>::Acquire(payload);
                 break;
@@ -93,6 +96,24 @@ public:
         }
 
         return CHIP_NO_ERROR;
+    }
+
+    /**
+     * Remove a payload from the cache given the key.
+     */
+    CHIP_ERROR Remove(const KeyType & key)
+    {
+        for (unsigned i = 0; i < N; i++)
+        {
+            if (mInUse.test(i) && (mEntries[i].key == key))
+            {
+                mInUse.reset(i);
+                Lifetime<PayloadType>::Release(mEntries[i].payload);
+                return CHIP_NO_ERROR;
+            }
+        }
+
+        return CHIP_ERROR_KEY_NOT_FOUND;
     }
 
 #ifdef UNIT_TESTS
@@ -115,9 +136,9 @@ private:
         PayloadType payload;
     };
 
-    Entry mEntries[N];            // payload entries
-    std::bitset<N> mPayloadInUse; // compact 'in use' marker for payloads
-};                                // namespace Retransmit
+    Entry mEntries[N];     // payload entries
+    std::bitset<N> mInUse; // compact 'in use' marker for payloads
+};                         // namespace Retransmit
 
 } // namespace Retransmit
 } // namespace chip
