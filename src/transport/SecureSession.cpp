@@ -124,7 +124,7 @@ exit:
 CHIP_ERROR SecureSession::GetAdditionalAuthData(const MessageHeader & header, uint8_t * aad, size_t & len)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint16_t actualEncodedHeaderSize;
+    size_t actualEncodedHeaderSize;
 
     VerifyOrExit(len >= header.packetHeader.EncodeSizeBytes(), err = CHIP_ERROR_INVALID_ARGUMENT);
 

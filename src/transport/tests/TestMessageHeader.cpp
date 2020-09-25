@@ -60,8 +60,8 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
 {
     PacketHeader header;
     uint8_t buffer[64];
-    uint16_t encodeLen;
-    uint16_t decodeLen;
+    size_t encodeLen;
+    size_t decodeLen;
 
     header.SetMessageId(123).SetPayloadLength(16);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, sizeof(buffer), &encodeLen, Header::Flags::None()) == CHIP_NO_ERROR);
@@ -145,8 +145,8 @@ void TestPayloadHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
 {
     PayloadHeader header;
     uint8_t buffer[64];
-    uint16_t encodeLen;
-    uint16_t decodeLen;
+    size_t encodeLen;
+    size_t decodeLen;
 
     header.SetMessageType(112).SetExchangeID(2233);
     NL_TEST_ASSERT(inSuite, !header.GetVendorId().HasValue());
@@ -189,7 +189,7 @@ void TestPacketHeaderEncodeDecodeBounds(nlTestSuite * inSuite, void * inContext)
 {
     PacketHeader header;
     uint8_t buffer[64];
-    uint16_t unusedLen;
+    size_t unusedLen;
 
     for (size_t shortLen = 0; shortLen < 6; shortLen++)
     {
@@ -202,7 +202,7 @@ void TestPayloadHeaderEncodeDecodeBounds(nlTestSuite * inSuite, void * inContext
 {
     PayloadHeader header;
     uint8_t buffer[64];
-    uint16_t unusedLen;
+    size_t unusedLen;
 
     for (size_t shortLen = 0; shortLen < 6; shortLen++)
     {

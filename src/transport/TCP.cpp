@@ -180,7 +180,7 @@ CHIP_ERROR TCPBase::SendMessage(const PacketHeader & header, Header::Flags paylo
     CHIP_ERROR err               = CHIP_NO_ERROR;
     const size_t prefixSize      = header.EncodeSizeBytes() + kPacketSizeBytes;
     Inet::TCPEndPoint * endPoint = nullptr;
-    uint16_t actualEncodedHeaderSize;
+    size_t actualEncodedHeaderSize;
 
     VerifyOrExit(address.GetTransportType() == Type::kTcp, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
@@ -323,7 +323,7 @@ CHIP_ERROR TCPBase::ProcessSingleMessageFromBufferHead(const PeerAddress & peerA
 
     buffer->SetDataLength(messageSize);
 
-    uint16_t headerSize = 0;
+    size_t headerSize = 0;
 
     PacketHeader header;
     err = header.Decode(buffer->Start(), buffer->DataLength(), &headerSize);
