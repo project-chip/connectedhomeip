@@ -193,7 +193,7 @@ CHIP_ERROR ChipMessageLayer::Init(InitContext * context)
     }
     else
     {
-        ChipLogProgress(MessageLayer, "WoBLE disabled%s", (mBle != NULL) ? " by application" : " (BLE layer not initialized)");
+        ChipLogProgress(MessageLayer, "CHIPoBLE disabled%s", (mBle != NULL) ? " by application" : " (BLE layer not initialized)");
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
 

@@ -211,7 +211,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 
     [self.lock lock];
 
-    chip::RendezvousParameters params = chip::RendezvousParameters(setupPINCode).SetDiscriminator(discriminator);
+    chip::RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetDiscriminator(discriminator);
     err = self.cppController->ConnectDevice(
         kRemoteDeviceId, params, (__bridge void *) self, onConnected, onMessageReceived, onInternalError);
     [self.lock unlock];
