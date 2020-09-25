@@ -136,8 +136,8 @@ exit:
 CHIP_ERROR BLE::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
                             System::PacketBuffer * msgBuf)
 {
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    const size_t headerSize = header.EncodeSizeBytes();
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    const uint16_t headerSize = header.EncodeSizeBytes();
     uint16_t actualEncodedHeaderSize;
 
     VerifyOrExit(address.GetTransportType() == Type::kBle, err = CHIP_ERROR_INVALID_ARGUMENT);
