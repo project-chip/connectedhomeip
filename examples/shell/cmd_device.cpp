@@ -507,7 +507,7 @@ int cmd_device_sta(int argc, char ** argv)
 
     if (strcmp(argv[0], "mode") == 0)
     {
-        const char * typeStr = u8"Unknown";
+        const char * typeStr                      = u8"Unknown";
         ConnectivityManager::WiFiStationMode mode = ConnectivityMgr().GetWiFiStationMode();
         switch (mode)
         {
