@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Unit Test
+name: Unit / Interation Tests
 
 on:
     push:
@@ -20,7 +20,7 @@ on:
 
 jobs:
     build:
-        name: Unit Test
+        name: Unit / Interation Tests
 
         strategy:
             matrix:
