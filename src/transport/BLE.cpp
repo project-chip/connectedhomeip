@@ -138,7 +138,7 @@ CHIP_ERROR BLE::SendMessage(const PacketHeader & header, Header::Flags payloadFl
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     const size_t headerSize = header.EncodeSizeBytes();
-    size_t actualEncodedHeaderSize;
+    uint16_t actualEncodedHeaderSize;
 
     VerifyOrExit(address.GetTransportType() == Type::kBle, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);

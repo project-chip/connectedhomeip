@@ -44,7 +44,7 @@ public:
         if (peer != nullptr)
         {
             PacketHeader hdr;
-            size_t headerSize = 0;
+            uint16_t headerSize = 0;
 
             hdr.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
             msgBuf->ConsumeHead(headerSize);
