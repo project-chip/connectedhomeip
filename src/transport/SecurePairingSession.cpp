@@ -115,8 +115,8 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
         .SetMessageType(msgType) //
         .SetProtocolID(kSecurePairingProtocol);
 
-    size_t headerSize                = header.payloadHeader.EncodeSizeBytes();
-    uint16_t actualEncodedHeaderSize = 0;
+    size_t headerSize              = header.payloadHeader.EncodeSizeBytes();
+    size_t actualEncodedHeaderSize = 0;
 
     VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
@@ -362,8 +362,8 @@ exit:
 
 CHIP_ERROR SecurePairingSession::HandlePeerMessage(MessageHeader & header, System::PacketBuffer * msg)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    uint16_t headerSize = 0;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    size_t headerSize = 0;
 
     VerifyOrExit(msg != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
