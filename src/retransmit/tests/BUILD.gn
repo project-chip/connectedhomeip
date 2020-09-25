@@ -32,7 +32,5 @@ chip_test_suite("tests") {
     "${nlunit_test_root}:nlunit-test",
   ]
 
-  tests = [
-    "TestCache",
-  ]
+  tests = [ "TestCache" ]
 }
