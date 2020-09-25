@@ -15,13 +15,10 @@
  *    limitations under the License.
  */
 
-#import "CHIPViewControllerBase.h"
+#import <AVFoundation/AVFoundation.h>
+#import <CHIP/CHIP.h>
 #import <UIKit/UIKit.h>
 
-NS_ASSUME_NONNULL_BEGIN
-
-@interface OnOffViewController : CHIPViewControllerBase
+@interface QRCodeViewController : UIViewController <AVCaptureMetadataOutputObjectsDelegate, CHIPDeviceControllerDelegate>
 
 @end
-
-NS_ASSUME_NONNULL_END

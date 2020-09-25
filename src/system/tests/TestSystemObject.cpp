@@ -105,8 +105,8 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
     // Not defined
-    TestObject(const TestObject &);
-    TestObject & operator=(const TestObject &);
+    TestObject(const TestObject &) = delete;
+    TestObject & operator=(const TestObject &) = delete;
 };
 
 ObjectPool<TestObject, TestObject::kPoolSize> TestObject::sPool;

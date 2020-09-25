@@ -15,7 +15,7 @@ cmake -GNinja \
     -DANDROID_ABI="$ABI" \
     -DANDROID_ARM_NEON=ON \
     -DANDROID_NATIVE_API_LEVEL="$API" \
-    -DBUILD_SHARED_LIBS=ON \
+    -DBUILD_SHARED_LIBS=OFF \
     -DCMAKE_CXX_STANDARD=11 \
     -DCMAKE_CXX_STANDARD_REQUIRED=ON \
     -DCMAKE_BUILD_TYPE=Release \
@@ -39,10 +39,7 @@ find ./io/openthread/commissioner -name "*.class" | xargs jar cvf ../../../libs/
 cd ../../../
 
 ## Copy shared native libraries
-for lib in "$(find ./build -name "*.so")"; do
-    ## Avoid copying symblink files.
-    [ ! -L "$lib" ] && cp "$lib" libs
-done
+cp ./build/src/java/libcommissioner-java.so libs
 
 cp libs/libotcommissioner.jar ../../src/android/CHIPTool/app/libs
 cp libs/*.so ../../src/android/CHIPTool/app/src/main/jniLibs/"$ABI"

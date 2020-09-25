@@ -15,11 +15,13 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
-extern NSString * const kCHIPToolDefaultsDomain;
-extern NSString * const kNetworkSSIDDefaultsKey;
-extern NSString * const kNetworkPasswordDefaultsKey;
+NS_ASSUME_NONNULL_BEGIN
 
-id CHIPGetDomainValueForKey(NSString * domain, NSString * key);
-void CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value);
+@interface RootViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
+@property (strong, nonatomic) UITableView * tableView;
+@property (strong, nonatomic) NSArray * options;
+@end
+
+NS_ASSUME_NONNULL_END

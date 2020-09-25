@@ -41,6 +41,8 @@
 // ------------------------------------------------------------------------------
 // Core
 
+#include <app/util/af.h>
+
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 typedef struct
 {
@@ -228,6 +230,7 @@ bool emAfPluginDoorLockServerCheckForSufficientSpace(uint8_t spaceReq, uint8_t s
 
 // Critical Message Queue
 // If the Critical Message Queue Plugin is available, use it for event notifications
+/* Replace SEND_COMMAND_UNICAST_TO_BINDINGS #2504
 #ifdef EMBER_AF_PLUGIN_CRITICAL_MESSAGE_QUEUE
 #include "../critical-message-queue/critical-message-queue.h"
 #define SEND_COMMAND_UNICAST_TO_BINDINGS()                                                                                         \
@@ -235,6 +238,7 @@ bool emAfPluginDoorLockServerCheckForSufficientSpace(uint8_t spaceReq, uint8_t s
 #else
 #define SEND_COMMAND_UNICAST_TO_BINDINGS() emberAfSendCommandUnicastToBindings()
 #endif
+*/
 // ------------------------------------------------------------------------------
 // Legacy
 

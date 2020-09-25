@@ -18,6 +18,7 @@
 #import "QRCodeViewController.h"
 
 // local imports
+#import "CHIPUIViewUtils.h"
 #import "DefaultsUtils.h"
 #import <CHIP/CHIP.h>
 
@@ -39,68 +40,204 @@
 
 #define NOT_APPLICABLE_STRING @"N/A"
 
-static NSString * const ipKey = @"ipk";
-
 @interface QRCodeViewController ()
 
 @property (nonatomic, strong) AVCaptureSession * captureSession;
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer * videoPreviewLayer;
+
+@property (strong, nonatomic) UIView * qrCodeViewPreview;
+
+@property (strong, nonatomic) UITextField * manualCodeTextField;
+@property (strong, nonatomic) UIButton * doneManualCodeButton;
+
+@property (strong, nonatomic) UIView * setupPayloadView;
+@property (strong, nonatomic) UILabel * manualCodeLabel;
+@property (strong, nonatomic) UIButton * resetButton;
+@property (strong, nonatomic) UILabel * versionLabel;
+@property (strong, nonatomic) UILabel * discriminatorLabel;
+@property (strong, nonatomic) UILabel * setupPinCodeLabel;
+@property (strong, nonatomic) UILabel * rendezVousInformation;
+@property (strong, nonatomic) UILabel * vendorID;
+@property (strong, nonatomic) UILabel * productID;
+@property (strong, nonatomic) UILabel * serialNumber;
+
+@property (strong, nonatomic) UIActivityIndicatorView * activityIndicator;
+@property (strong, nonatomic) UILabel * errorLabel;
+
+@property (readwrite) CHIPDeviceController * chipController;
 @end
 
 @implementation QRCodeViewController {
     dispatch_queue_t _captureSessionQueue;
 }
 
-// MARK: UIViewController methods
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
+// MARK: UI Setup
 
-    _doneManualCodeButton.layer.cornerRadius = 5;
-    _doneManualCodeButton.clipsToBounds = YES;
+- (void)changeNavBarButtonToCamera
+{
+    UIBarButtonItem * camera = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
+                                                                             target:self
+                                                                             action:@selector(startScanningQRCode:)];
+    self.navigationItem.rightBarButtonItem = camera;
+}
+
+- (void)changeNavBarButtonToCancel
+{
+    UIBarButtonItem * cancel = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                                                             target:self
+                                                                             action:@selector(stopScanningQRCode:)];
+    self.navigationItem.rightBarButtonItem = cancel;
+}
+
+- (void)setupUI
+{
+    self.view.backgroundColor = UIColor.whiteColor;
+
+    // Setup nav bar button
+    [self changeNavBarButtonToCamera];
+
+    // Title
+    UILabel * titleLabel = [CHIPUIViewUtils addTitle:@"QR Code Parser" toView:self.view];
+
+    // Manual entry view
+    _manualCodeTextField = [UITextField new];
+    _doneManualCodeButton = [UIButton new];
+    [_doneManualCodeButton addTarget:self action:@selector(enteredManualCode:) forControlEvents:UIControlEventTouchUpInside];
+    _manualCodeTextField.placeholder = @"Manual Code";
+    _manualCodeTextField.keyboardType = UIKeyboardTypeNumberPad;
+    [_doneManualCodeButton setTitle:@"Go" forState:UIControlStateNormal];
+    UIView * manualEntryView = [CHIPUIViewUtils viewWithUITextField:_manualCodeTextField button:_doneManualCodeButton];
+    [self.view addSubview:manualEntryView];
+
+    manualEntryView.translatesAutoresizingMaskIntoConstraints = false;
+    [manualEntryView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
+    [manualEntryView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
+    [manualEntryView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:30].active = YES;
+
+    // Results view
+    _setupPayloadView = [UIView new];
+    [self.view addSubview:_setupPayloadView];
+
+    _setupPayloadView.translatesAutoresizingMaskIntoConstraints = false;
+    [_setupPayloadView.topAnchor constraintEqualToAnchor:manualEntryView.bottomAnchor constant:10].active = YES;
+    [_setupPayloadView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
+    [_setupPayloadView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
+    [_setupPayloadView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active = YES;
+
+    [self addViewsToSetupPayloadView];
+
+    // activity indicator
+    _activityIndicator = [UIActivityIndicatorView new];
+    [self.view addSubview:_activityIndicator];
+
+    _activityIndicator.translatesAutoresizingMaskIntoConstraints = false;
+    [_activityIndicator.centerXAnchor constraintEqualToAnchor:_setupPayloadView.centerXAnchor].active = YES;
+    [_activityIndicator.centerYAnchor constraintEqualToAnchor:_setupPayloadView.centerYAnchor].active = YES;
+    _activityIndicator.color = UIColor.blackColor;
+
+    // QRCode preview
+    _qrCodeViewPreview = [UIView new];
+    [self.view addSubview:_qrCodeViewPreview];
+
+    _qrCodeViewPreview.translatesAutoresizingMaskIntoConstraints = false;
+    [_qrCodeViewPreview.topAnchor constraintEqualToAnchor:manualEntryView.bottomAnchor constant:30].active = YES;
+    [_qrCodeViewPreview.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
+    [_qrCodeViewPreview.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
+    [_qrCodeViewPreview.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-50].active = YES;
+
+    // Error label
+    _errorLabel = [UILabel new];
+    _errorLabel.text = @"Error Text";
+    _errorLabel.textColor = UIColor.blackColor;
+    _errorLabel.font = [UIFont systemFontOfSize:17];
+    [self.view addSubview:_errorLabel];
+
+    _errorLabel.translatesAutoresizingMaskIntoConstraints = false;
+    [_errorLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
+    [_errorLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
+    [_errorLabel.topAnchor constraintEqualToAnchor:manualEntryView.bottomAnchor constant:40].active = YES;
+
+    // Reset button
+    _resetButton = [UIButton new];
+    [_resetButton setTitle:@"Reset" forState:UIControlStateNormal];
+    [_resetButton addTarget:self action:@selector(resetView:) forControlEvents:UIControlEventTouchUpInside];
+    _resetButton.backgroundColor = UIColor.systemBlueColor;
+    _resetButton.titleLabel.font = [UIFont systemFontOfSize:17];
+    _resetButton.titleLabel.textColor = [UIColor whiteColor];
     _resetButton.layer.cornerRadius = 5;
     _resetButton.clipsToBounds = YES;
-    _manualCodeTextField.keyboardType = UIKeyboardTypeNumberPad;
+    [self.view addSubview:_resetButton];
 
-    __weak typeof(self) weakSelf = self;
-    self.onConnectedBlock = ^() {
-        typeof(self) strongSelf = weakSelf;
-        [strongSelf onConnected];
-    };
-
-    self.onMessageBlock = ^(NSString * message) {
-        typeof(self) strongSelf = weakSelf;
-        [strongSelf onMessage:message];
-    };
-
-    self.onErrorBlock = ^(NSString * error) {
-        typeof(self) strongSelf = weakSelf;
-        [strongSelf onError:error];
-    };
-
-    UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
-    [self.view addGestureRecognizer:tap];
-
-    [self manualCodeInitialState];
-    [self qrCodeInitialState];
+    _resetButton.translatesAutoresizingMaskIntoConstraints = false;
+    [_resetButton.widthAnchor constraintEqualToConstant:60].active = YES;
+    [_resetButton.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active = YES;
+    [_resetButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
 }
 
-- (void)onConnected
+- (void)addViewsToSetupPayloadView
 {
-    [self retrieveAndSendWifiCredentials];
+    // manual entry field
+    _manualCodeLabel = [UILabel new];
+    _manualCodeLabel.text = @"00000000000000000000";
+    _manualCodeLabel.textColor = UIColor.systemBlueColor;
+    _manualCodeLabel.font = [UIFont systemFontOfSize:17];
+    _manualCodeLabel.textAlignment = NSTextAlignmentRight;
+    [_setupPayloadView addSubview:_manualCodeLabel];
+
+    _manualCodeLabel.translatesAutoresizingMaskIntoConstraints = false;
+    [_manualCodeLabel.topAnchor constraintEqualToAnchor:_setupPayloadView.topAnchor].active = YES;
+    [_manualCodeLabel.trailingAnchor constraintEqualToAnchor:_setupPayloadView.trailingAnchor].active = YES;
+
+    // Results scroll view
+    UIScrollView * resultsScrollView = [UIScrollView new];
+    [_setupPayloadView addSubview:resultsScrollView];
+
+    resultsScrollView.translatesAutoresizingMaskIntoConstraints = false;
+    [resultsScrollView.topAnchor constraintEqualToAnchor:_manualCodeLabel.bottomAnchor constant:10].active = YES;
+    [resultsScrollView.leadingAnchor constraintEqualToAnchor:_setupPayloadView.leadingAnchor].active = YES;
+    [resultsScrollView.trailingAnchor constraintEqualToAnchor:_setupPayloadView.trailingAnchor].active = YES;
+    [resultsScrollView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-20].active = YES;
+
+    UIStackView * parserResultsView = [UIStackView new];
+    parserResultsView.axis = UILayoutConstraintAxisVertical;
+    parserResultsView.distribution = UIStackViewDistributionEqualSpacing;
+    parserResultsView.alignment = UIStackViewAlignmentLeading;
+    parserResultsView.spacing = 15;
+    [resultsScrollView addSubview:parserResultsView];
+
+    parserResultsView.translatesAutoresizingMaskIntoConstraints = false;
+    [parserResultsView.topAnchor constraintEqualToAnchor:resultsScrollView.topAnchor].active = YES;
+    [parserResultsView.leadingAnchor constraintEqualToAnchor:resultsScrollView.leadingAnchor].active = YES;
+    [parserResultsView.trailingAnchor constraintEqualToAnchor:resultsScrollView.trailingAnchor].active = YES;
+    [parserResultsView.bottomAnchor constraintEqualToAnchor:resultsScrollView.bottomAnchor].active = YES;
+    [self addResultsUIToStackView:parserResultsView];
 }
 
-- (void)onMessage:(NSString *)message
+- (void)addResultsUIToStackView:(UIStackView *)stackView
 {
-    [[NSUserDefaults standardUserDefaults] setObject:message forKey:ipKey];
-    NSError * error;
-    [self.chipController disconnect:&error];
+    NSArray<NSString *> * resultLabelTexts =
+        @[ @"version", @"discriminator", @"setup pin code", @"rendez vous information", @"vendor ID", @"product ID", @"serial #" ];
+    _versionLabel = [UILabel new];
+    _discriminatorLabel = [UILabel new];
+    _setupPinCodeLabel = [UILabel new];
+    _rendezVousInformation = [UILabel new];
+    _vendorID = [UILabel new];
+    _productID = [UILabel new];
+    _serialNumber = [UILabel new];
+    NSArray<UILabel *> * resultLabels =
+        @[ _versionLabel, _discriminatorLabel, _setupPinCodeLabel, _rendezVousInformation, _vendorID, _productID, _serialNumber ];
+    for (int i = 0; i < resultLabels.count && i < resultLabels.count; i++) {
+        UILabel * label = [UILabel new];
+        label.text = [resultLabelTexts objectAtIndex:i];
+        UILabel * result = [resultLabels objectAtIndex:i];
+        result.text = @"N/A";
+        UIStackView * labelStackView = [CHIPUIViewUtils stackViewWithLabel:label result:result];
+        labelStackView.translatesAutoresizingMaskIntoConstraints = false;
+        [stackView addArrangedSubview:labelStackView];
+    }
 }
 
-- (void)onError:(NSString *)error
-{
-    NSLog(@"Receive an error: %@", error);
-}
+// MARK: UIViewController methods
 
 - (void)viewDidDisappear:(BOOL)animated
 {
@@ -112,11 +249,56 @@ static NSString * const ipKey = @"ipk";
     [_manualCodeTextField resignFirstResponder];
 }
 
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    [self setupUI];
+
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
+    self.chipController = [CHIPDeviceController sharedController];
+    [self.chipController setDelegate:self queue:callbackQueue];
+
+    UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
+    [self.view addGestureRecognizer:tap];
+
+    [self manualCodeInitialState];
+    [self qrCodeInitialState];
+}
+
+// MARK: CHIPDeviceControllerDelegate
+- (void)deviceControllerOnConnected
+{
+    NSLog(@"Status: Device connected");
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
+        [self retrieveAndSendWifiCredentials];
+    });
+}
+
+- (void)deviceControllerOnError:(nonnull NSError *)error
+{
+    NSLog(@"Status: Device Controller error %@", [error description]);
+}
+
+- (void)deviceControllerOnMessage:(nonnull NSData *)message
+{
+    // WRONG
+    NSString * stringMessage;
+    if ([CHIPDeviceController isDataModelCommand:message] == YES) {
+        stringMessage = [CHIPDeviceController commandToString:message];
+    } else {
+        stringMessage = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
+    }
+    CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kIPKey, stringMessage);
+    NSError * error;
+    [self.chipController disconnect:&error];
+}
+
 // MARK: UI Helper methods
 
 - (void)manualCodeInitialState
 {
     _setupPayloadView.hidden = YES;
+    _resetButton.hidden = YES;
     _activityIndicator.hidden = YES;
     _errorLabel.hidden = YES;
 }
@@ -129,10 +311,8 @@ static NSString * const ipKey = @"ipk";
     if ([_activityIndicator isAnimating]) {
         [_activityIndicator stopAnimating];
     }
-    // show the reset button if there's scanned data saved
-    _resetButton.hidden = ![self hasScannedConnectionInfo];
-    _qrCodeButton.hidden = NO;
-    _doneQrCodeButton.hidden = YES;
+    _resetButton.hidden = YES;
+    [self changeNavBarButtonToCamera];
     _activityIndicator.hidden = YES;
     _captureSession = nil;
     [_videoPreviewLayer removeFromSuperlayer];
@@ -140,9 +320,9 @@ static NSString * const ipKey = @"ipk";
 
 - (void)scanningStartState
 {
-    _qrCodeButton.hidden = YES;
-    _doneQrCodeButton.hidden = NO;
+    [self changeNavBarButtonToCancel];
     _setupPayloadView.hidden = YES;
+    _resetButton.hidden = YES;
     _errorLabel.hidden = YES;
 }
 
@@ -151,6 +331,7 @@ static NSString * const ipKey = @"ipk";
     self->_activityIndicator.hidden = NO;
     [self->_activityIndicator startAnimating];
     _setupPayloadView.hidden = YES;
+    _resetButton.hidden = YES;
     _errorLabel.hidden = YES;
     _manualCodeTextField.text = @"";
 }
@@ -158,8 +339,7 @@ static NSString * const ipKey = @"ipk";
 - (void)postScanningQRCodeState
 {
     _captureSession = nil;
-    _qrCodeButton.hidden = NO;
-    _doneQrCodeButton.hidden = YES;
+    [self changeNavBarButtonToCamera];
 
     [_videoPreviewLayer removeFromSuperlayer];
 
@@ -172,6 +352,7 @@ static NSString * const ipKey = @"ipk";
     [self->_activityIndicator stopAnimating];
     self->_activityIndicator.hidden = YES;
     self->_manualCodeLabel.hidden = YES;
+    _resetButton.hidden = YES;
 
     self->_errorLabel.text = error.localizedDescription;
     self->_errorLabel.hidden = NO;
@@ -187,7 +368,7 @@ static NSString * const ipKey = @"ipk";
     self->_errorLabel.hidden = YES;
     // reset the view and remove any preferences that were stored from a previous scan
     if ([self hasScannedConnectionInfo]) {
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:ipKey];
+        CHIPRemoveDomainValueForKey(kCHIPToolDefaultsDomain, kIPKey);
     }
     self->_setupPayloadView.hidden = NO;
     self->_resetButton.hidden = NO;
@@ -323,12 +504,14 @@ static NSString * const ipKey = @"ipk";
                 NSLog(@"Unexpected IP String... %@", infoValue);
             } else {
                 NSLog(@"Got IP String... %@", infoValue);
-                [[NSUserDefaults standardUserDefaults] setObject:infoValue forKey:ipKey];
+                CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kIPKey, infoValue);
             }
             break;
         }
     }
 }
+
+// MARK: Rendez Vous
 
 - (void)handleRendezVous:(CHIPSetupPayload *)payload
 {
@@ -376,7 +559,7 @@ static NSString * const ipKey = @"ipk";
 
 - (BOOL)hasScannedConnectionInfo
 {
-    NSString * ipAddress = [[NSUserDefaults standardUserDefaults] stringForKey:ipKey];
+    NSString * ipAddress = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kIPKey);
     return (ipAddress.length > 0);
 }
 
@@ -484,7 +667,7 @@ static NSString * const ipKey = @"ipk";
 - (IBAction)resetView:(id)sender
 {
     // reset the view and remove any preferences that were stored from scanning the QRCode
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:ipKey];
+    CHIPRemoveDomainValueForKey(kCHIPToolDefaultsDomain, kIPKey);
     [self manualCodeInitialState];
     [self qrCodeInitialState];
 }
@@ -503,5 +686,7 @@ static NSString * const ipKey = @"ipk";
     });
     [_manualCodeTextField resignFirstResponder];
 }
+
+@synthesize description;
 
 @end

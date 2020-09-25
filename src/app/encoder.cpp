@@ -22,20 +22,21 @@
 #include <string.h>
 
 #include <support/BufBound.h>
+#include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 
 #define CHECK_FRAME_LENGTH(value, name)                                                                                            \
     if (value == 0)                                                                                                                \
     {                                                                                                                              \
         ChipLogError(Zcl, "Error encoding APS Frame: %s", name);                                                                   \
-        return value;                                                                                                              \
+        return 0;                                                                                                                  \
     }
 
 #define CHECK_COMMAND_LENGTH(value, name)                                                                                          \
     if (value == 0)                                                                                                                \
     {                                                                                                                              \
         ChipLogError(Zcl, "Error encoding %s command", name);                                                                      \
-        return value;                                                                                                              \
+        return 0;                                                                                                                  \
     }
 
 using namespace chip;
@@ -57,7 +58,7 @@ static uint16_t doEncodeApsFrame(BufBound & buf, uint16_t profileID, uint16_t cl
     buf.Put(sequence);
     buf.Put(radius);
 
-    uint16_t result = 0;
+    size_t result = 0;
     if (isMeasuring)
     {
         result = buf.Written();
@@ -69,7 +70,13 @@ static uint16_t doEncodeApsFrame(BufBound & buf, uint16_t profileID, uint16_t cl
         CHECK_FRAME_LENGTH(result, "Buffer too small");
         ChipLogProgress(Zcl, "Successfully encoded %d bytes", result);
     }
-    return result;
+    if (!CanCastTo<uint16_t>(result))
+    {
+        ChipLogProgress(Zcl, "Can't fit our measured size in uint16_t");
+        result = 0;
+    }
+
+    return static_cast<uint16_t>(result);
 }
 
 uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame)
@@ -95,7 +102,7 @@ uint16_t _encodeCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t c
         buf.Put(command);
     }
 
-    return buf.Fit() ? buf.Written() : 0;
+    return buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;
 }
 
 uint16_t _encodeClusterSpecificCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t cluster_id, uint8_t command)
@@ -131,7 +138,7 @@ uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint
         }
     }
 
-    return buf.Fit() ? buf.Written() : 0;
+    return buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;
 }
 
 /*
@@ -186,7 +193,7 @@ uint16_t _encodeIdentifyClusterCommand(uint8_t * buffer, uint16_t buf_length, ui
         buf.PutLE16(*identify_duration);
     }
 
-    result = buf.Fit() ? buf.Written() : 0;
+    result = buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;
 
     return result;
 }
