@@ -134,11 +134,41 @@ public:
         }
     }
 
+    /**
+     * Search for a specific entry within the cache.
+     *
+     * @tparam Matcher is a generic macher object defining a bool Maches method.
+     *
+     * @param matcher the entry to find
+     * @param key - out set the key if found
+     * @param payload - the payload if found
+     *
+     * Key and payload are only valid as long as no remove methods
+     * are called on the class.
+     */
+    template <typename Matcher>
+    bool Find(const Matcher & matcher, const KeyType ** key, const PayloadType ** payload)
+    {
+        *key     = nullptr;
+        *payload = nullptr;
+
+        for (unsigned i = 0; i < N; i++)
+        {
+            if (mInUse.test(i) && matcher.Matches(mEntries[i].key))
+            {
+                *key     = &mEntries[i].key;
+                *payload = &mEntries[i].payload;
+                return true;
+            }
+        }
+        return false;
+    }
+
 #ifdef UNIT_TESTS
     /**
      * Convenience add when types are trivially copyable, so no actual
      * reference needs to be created. Only to be used by tests to avoid
-     * confusion/
+     * confusion.
      */
     template <typename = std::enable_if<std::is_trivially_copyable<PayloadType>::value, int>>
     CHIP_ERROR Add(const KeyType & key, PayloadType payload)

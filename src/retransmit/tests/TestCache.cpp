@@ -204,6 +204,42 @@ void RemoveMatching(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !gPayloadTracker.IsAquired(4));
 }
 
+void FindMatching(nlTestSuite * inSuite, void * inContext)
+{
+    chip::Retransmit::Cache<int, int, 4> test;
+
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
+
+    NL_TEST_ASSERT(inSuite, test.Add(1, 1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.Add(2, 2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.Add(3, 4) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.Add(4, 8) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 4);
+
+    const int * key;
+    const int * value;
+
+    NL_TEST_ASSERT(inSuite, test.Find(DivisibleBy(20), &key, &value) == false);
+    NL_TEST_ASSERT(inSuite, key == nullptr);
+    NL_TEST_ASSERT(inSuite, value == nullptr);
+
+    // This relies on linear add. May need changing if implementation changes
+    NL_TEST_ASSERT(inSuite, test.Find(DivisibleBy(2), &key, &value) == true);
+    NL_TEST_ASSERT(inSuite, *key == 2);
+    NL_TEST_ASSERT(inSuite, *value == 2);
+
+    NL_TEST_ASSERT(inSuite, test.Remove(*key) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, test.Find(DivisibleBy(2), &key, &value) == true);
+    NL_TEST_ASSERT(inSuite, *key == 4);
+    NL_TEST_ASSERT(inSuite, *value == 8);
+
+    NL_TEST_ASSERT(inSuite, test.Remove(*key) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.Find(DivisibleBy(2), &key, &value) == false);
+    NL_TEST_ASSERT(inSuite, key == nullptr);
+    NL_TEST_ASSERT(inSuite, value == nullptr);
+}
+
 } // namespace
 
 // clang-format off
@@ -214,6 +250,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("OutOfSpace", OutOfSpace),
     NL_TEST_DEF("AddRemove", AddRemove),
     NL_TEST_DEF("RemoveMatching", RemoveMatching),
+    NL_TEST_DEF("FindMatching", FindMatching),
     NL_TEST_SENTINEL()
 };
 // clang-format on
