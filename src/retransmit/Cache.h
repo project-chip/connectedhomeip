@@ -22,7 +22,6 @@
 #include <type_traits>
 
 #include <core/CHIPError.h>
-#include <transport/PeerAddress.h>
 
 namespace chip {
 namespace Retransmit {
