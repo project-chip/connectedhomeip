@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#ifndef RETRANSMIT_MESSAGE_CACHE_H_
-#define RETRANSMIT_MESSAGE_CACHE_H_
+#ifndef RETRANSIMIT_CACHE_H_
+#define RETRANSIMIT_CACHE_H_
 
 #include <bitset>
 #include <cstddef>
@@ -191,4 +191,4 @@ private:
 } // namespace Retransmit
 } // namespace chip
 
-#endif // RETRANSMIT_MESSAGE_CACHE_H_
+#endif // RETRANSIMIT_CACHE_H_
