@@ -15,7 +15,7 @@
 	url = https://github.com/nestlabs/nlio.git
 	branch = master
 	ignore = dirty
-	commit = 8a4048faf7c84c6c9e3c9b3e79f7dc48d5d69f71
+	commit = 5bc9ff07974c503d283ea8edf5b301f65e167e74
 [submodule "nlunit-test"]
 	path = third_party/nlunit-test/repo
 	url = https://github.com/nestlabs/nlunit-test.git
@@ -45,7 +45,7 @@
 	url = https://pigweed.googlesource.com/pigweed/pigweed
 	branch = master
 	ignore = dirty
-	commit = fbd4a11583798365618375fd705fe1fd5c70ff9e
+	commit = bb2bc72fcb4936e9a7ca016870d784aa7937d43c
 [submodule "openthread"]
 	path = third_party/openthread/repo
 	url = https://github.com/openthread/openthread.git
@@ -57,19 +57,19 @@
 	url = https://github.com/openthread/ot-br-posix.git
 	branch = master
 	ignore = dirty
-	commit = 47ba8653be21ed4d1cc75b7eebd0047b1945a820
+	commit = d1671cfa4777d3a1bb565b88856f1ef446fe760f
 [submodule "bluez"]
 	path = third_party/bluez/repo
 	url = git://git.kernel.org/pub/scm/bluetooth/bluez.git
 	branch = master
 	ignore = dirty
-	commit = 81bcf6a61b67c933c84011ce998e4dc10f267024
+	commit = b8c156ffa3ab524813cdf4e0fd9afce59ff675bf
 [submodule "ot-commissioner"]
 	path = third_party/ot-commissioner/repo
 	url = https://github.com/openthread/ot-commissioner
 	branch = master
 	ignore = dirty
-	commit = ad96e6f6f5b1915844ba4481bf8d0b66af91175e
+	commit = 99372e440c65cc41cd04a809cb6de2c24d54a99e
 [submodule "cirque"]
 	path = third_party/cirque/repo
 	url = https://github.com/openweave/cirque.git
@@ -85,3 +85,6 @@
 [submodule "nanopb"]
 	path = third_party/nanopb/repo
 	url = https://github.com/nanopb/nanopb.git
+	branch = master
+	ignore = dirty
+	commit = 7e4472420897c96b41a4928b4a1b2271d8af23e8
