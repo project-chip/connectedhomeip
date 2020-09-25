@@ -255,6 +255,8 @@ typedef void mbedtls_ecp_restart_ctx;
 
 #define MBEDTLS_SSL_CIPHERSUITES MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8
 
+#define MBEDTLS_PKCS5_C
+
 #if defined(MBEDTLS_USER_CONFIG_FILE)
 #include MBEDTLS_USER_CONFIG_FILE
 #endif

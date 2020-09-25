@@ -245,9 +245,11 @@ JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong deviceCon
     ChipLogProgress(Controller, "beginConnectDevice() called with connection object and pincode");
 
     pthread_mutex_lock(&sStackLock);
-    sBleLayer.mAppState = appReqState;
-    RendezvousParameters params =
-        RendezvousParameters(pinCode).SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj)).SetBleLayer(&sBleLayer);
+    sBleLayer.mAppState         = appReqState;
+    RendezvousParameters params = RendezvousParameters()
+                                      .SetSetupPINCode(pinCode)
+                                      .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
+                                      .SetBleLayer(&sBleLayer);
     err = deviceController->ConnectDevice(kRemoteDeviceId, params, appReqState, HandleKeyExchange, HandleEchoResponse, HandleError);
 
     pthread_mutex_unlock(&sStackLock);

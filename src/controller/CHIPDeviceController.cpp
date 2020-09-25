@@ -164,8 +164,8 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, Rendezvous
     }
 #endif // CONFIG_DEVICE_LAYER
 
-    rendezvousSession = new RendezvousSession(this, params.SetLocalNodeId(mLocalDeviceId));
-    err               = rendezvousSession->Init();
+    rendezvousSession = new RendezvousSession(this);
+    err               = rendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId));
     SuccessOrExit(err);
 
     mRendezvousSession = rendezvousSession;
