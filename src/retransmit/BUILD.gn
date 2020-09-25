@@ -23,6 +23,5 @@ static_library("retransmit") {
   ]
 
   public_deps = [
-    "${chip_root}/src/transport",
   ]
 }
