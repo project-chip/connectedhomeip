@@ -33,14 +33,14 @@ CHIP_ERROR Spake2p::InternalHash(const uint8_t * in, size_t in_len)
     uint64_t u64_len = in_len;
 
     uint8_t lb[8];
-    lb[0] = (u64_len >> 0) & 0xff;
-    lb[1] = (u64_len >> 8) & 0xff;
-    lb[2] = (u64_len >> 16) & 0xff;
-    lb[3] = (u64_len >> 24) & 0xff;
-    lb[4] = (u64_len >> 32) & 0xff;
-    lb[5] = (u64_len >> 40) & 0xff;
-    lb[6] = (u64_len >> 48) & 0xff;
-    lb[7] = (u64_len >> 56) & 0xff;
+    lb[0] = static_cast<uint8_t>((u64_len >> 0) & 0xff);
+    lb[1] = static_cast<uint8_t>((u64_len >> 8) & 0xff);
+    lb[2] = static_cast<uint8_t>((u64_len >> 16) & 0xff);
+    lb[3] = static_cast<uint8_t>((u64_len >> 24) & 0xff);
+    lb[4] = static_cast<uint8_t>((u64_len >> 32) & 0xff);
+    lb[5] = static_cast<uint8_t>((u64_len >> 40) & 0xff);
+    lb[6] = static_cast<uint8_t>((u64_len >> 48) & 0xff);
+    lb[7] = static_cast<uint8_t>((u64_len >> 56) & 0xff);
 
     error = Hash(lb, sizeof(lb));
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);

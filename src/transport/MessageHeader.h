@@ -129,7 +129,7 @@ public:
         }
         else
         {
-            mFlags.value &= ~Header::Flags::kSecureSessionControlMessage;
+            mFlags.value = static_cast<uint16_t>(mFlags.value & ~Header::Flags::kSecureSessionControlMessage);
         }
         return *this;
     }
@@ -150,14 +150,14 @@ public:
         }
         else
         {
-            mFlags.value &= ~Header::Flags::kSourceNodeIdPresent;
+            mFlags.value = static_cast<uint16_t>(mFlags.value & ~Header::Flags::kSourceNodeIdPresent);
         }
         return *this;
     }
 
     PacketHeader & ClearSourceNodeId()
     {
-        mFlags.value &= ~Header::Flags::kSourceNodeIdPresent;
+        mFlags.value = static_cast<uint16_t>(mFlags.value & ~Header::Flags::kSourceNodeIdPresent);
         mSourceNodeId.ClearValue();
         return *this;
     }
@@ -185,14 +185,14 @@ public:
         }
         else
         {
-            mFlags.value &= ~Header::Flags::kDestinationNodeIdPresent;
+            mFlags.value = static_cast<uint16_t>(mFlags.value & ~Header::Flags::kDestinationNodeIdPresent);
         }
         return *this;
     }
 
     PacketHeader & ClearDestinationNodeId()
     {
-        mFlags.value &= ~Header::Flags::kDestinationNodeIdPresent;
+        mFlags.value = static_cast<uint16_t>(mFlags.value & ~Header::Flags::kDestinationNodeIdPresent);
         mDestinationNodeId.ClearValue();
         return *this;
     }

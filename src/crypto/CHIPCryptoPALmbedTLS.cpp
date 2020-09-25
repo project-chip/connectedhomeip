@@ -112,7 +112,9 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     }
 
     // Size of key = key_length * number of bits in a byte (8)
-    result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, Uint8::to_const_uchar(key), key_length * 8);
+    // Cast is safe because we called _isValidKeyLength above.
+    result =
+        mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, Uint8::to_const_uchar(key), static_cast<unsigned int>(key_length * 8));
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     // Encrypt
@@ -151,7 +153,9 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, co
     }
 
     // Size of key = key_length * number of bits in a byte (8)
-    result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, Uint8::to_const_uchar(key), key_length * 8);
+    // Cast is safe because we called _isValidKeyLength above.
+    result =
+        mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, Uint8::to_const_uchar(key), static_cast<unsigned int>(key_length * 8));
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     // Decrypt
@@ -665,7 +669,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
 
     result = mbedtls_x509write_csr_pem(&csr, out_csr, length, CryptoRNG, nullptr);
     VerifyOrExit(result >= 0, error = CHIP_ERROR_INTERNAL);
-    csr_length = result;
+    csr_length = static_cast<unsigned int>(result);
     result     = 0;
 
 exit:

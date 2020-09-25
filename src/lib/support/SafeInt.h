@@ -47,8 +47,8 @@ bool CanCastTo(U arg)
     // We want to check that "arg" can fit inside T but without doing any tests
     // that are always true or always false due to the types involved, which
     // would trigger compiler warnings themselves.  So for example, we can't
-    // can't compare arg to max values for T if all U values are representable
-    // in T, etc, because those trigger warnings on some compilers.
+    // compare arg to max values for T if all U values are representable in T,
+    // etc, because those trigger warnings on some compilers.
 
     // We also can't directly compare signed to unsigned values in general,
     // because that will trigger sign conversion warnings. In fact, it will
