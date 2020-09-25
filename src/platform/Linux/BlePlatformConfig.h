@@ -25,7 +25,18 @@
 #ifndef BLE_PLATFORM_CONFIG_H
 #define BLE_PLATFORM_CONFIG_H
 
+namespace chip {
+namespace DeviceLayer {
+namespace Internal {
+struct BluezConnection;
+} // namespace Internal
+} // namespace DeviceLayer
+} // namespace chip
+
 // ==================== Platform Adaptations ====================
+
+#define BLE_CONNECTION_OBJECT chip::DeviceLayer::Internal::BluezConnection *
+#define BLE_CONNECTION_UNINITIALIZED nullptr
 
 // ========== Platform-specific Configuration Overrides =========
 
