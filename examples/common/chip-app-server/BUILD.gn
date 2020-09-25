@@ -28,7 +28,10 @@ static_library("chip-app-server") {
   # so we can't compile it into this static library.  It needs to be compiled
   # directly by someone who knows where the generated files for the app we're
   # compiling live.
-  sources = [ "Server.cpp" ]
+  sources = [
+    "RendezvousServer.cpp",
+    "Server.cpp" ,
+  ]
 
   deps = [ "${chip_root}/src/lib" ]
 

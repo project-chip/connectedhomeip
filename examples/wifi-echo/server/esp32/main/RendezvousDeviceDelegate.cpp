@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include "RendezvousDeviceDelegate.h"
 #include "BluetoothWidget.h"
+#include "RendezvousDeviceDelegate.h"
 #include "RendezvousMessageHandler.h"
 #include "esp_log.h"
 #include <platform/ConfigurationManager.h>
@@ -35,18 +35,16 @@ using namespace ::chip;
 RendezvousDeviceDelegate::RendezvousDeviceDelegate()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    RendezvousParameters * params;
+    RendezvousParameters params;
 
     uint32_t setupPINCode;
     err = DeviceLayer::ConfigurationMgr().GetSetupPinCode(setupPINCode);
     SuccessOrExit(err);
 
-    params = new RendezvousParameters(setupPINCode);
-    params->SetLocalNodeId(kLocalNodeId);
-    params->SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
+    params.SetSetupPINCode(setupPINCode).SetLocalNodeId(kLocalNodeId).SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
 
-    mRendezvousSession = new RendezvousSession(this, *params);
-    err                = mRendezvousSession->Init();
+    mRendezvousSession = new RendezvousSession(this);
+    err                = mRendezvousSession->Init(params);
 
 exit:
     if (err != CHIP_NO_ERROR)
