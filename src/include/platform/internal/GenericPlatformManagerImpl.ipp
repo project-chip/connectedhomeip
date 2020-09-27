@@ -164,7 +164,6 @@ template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::_ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg)
 {
     ChipDeviceEvent event;
-
     event.Type                    = DeviceEventType::kCallWorkFunct;
     event.CallWorkFunct.WorkFunct = workFunct;
     event.CallWorkFunct.Arg       = arg;
@@ -192,7 +191,6 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
 
     case DeviceEventType::kCallWorkFunct:
         // If the event is a "call work function" event, call the specified function.
-
         event->CallWorkFunct.WorkFunct(event->CallWorkFunct.Arg);
         break;
 
@@ -240,7 +238,6 @@ void GenericPlatformManagerImpl<ImplClass>::DispatchEventToSystemLayer(const Chi
 template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::DispatchEventToDeviceLayer(const ChipDeviceEvent * event)
 {
-
     // Dispatch the event to all the components in the Device Layer.
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     BLEMgr().OnPlatformEvent(event);
