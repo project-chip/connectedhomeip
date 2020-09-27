@@ -15,7 +15,7 @@ public class CommissionerUtils {
   public static ByteArray getByteArray(byte[] byteArray) {
     ByteArray ret = new ByteArray();
     for (byte b : byteArray) {
-      ret.add((short)(((short)b) & 0xff));
+      ret.add((short) (((short) b) & 0xff));
     }
     return ret;
   }

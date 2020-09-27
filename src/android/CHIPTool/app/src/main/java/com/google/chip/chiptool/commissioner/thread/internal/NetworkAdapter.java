@@ -28,9 +28,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 import com.google.chip.chiptool.R;
 import com.google.chip.chiptool.commissioner.thread.BorderAgentInfo;
-import com.google.chip.chiptool.commissioner.thread.ThreadNetworkInfo;
 import com.google.chip.chiptool.commissioner.thread.internal.BorderAgentDiscoverer.BorderAgentListener;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Vector;
 
@@ -48,7 +46,8 @@ class NetworkAdapter extends BaseAdapter implements BorderAgentListener {
     boolean hasExistingNetwork = false;
     for (ThreadNetworkInfoHolder networkInfoHolder : networks) {
       if (networkInfoHolder.networkInfo.networkName.equals(borderAgent.networkName)
-          && Arrays.equals(networkInfoHolder.networkInfo.extendedPanId, borderAgent.extendedPanId)) {
+          && Arrays.equals(
+              networkInfoHolder.networkInfo.extendedPanId, borderAgent.extendedPanId)) {
         networkInfoHolder.borderAgents.add(borderAgent);
         hasExistingNetwork = true;
       }

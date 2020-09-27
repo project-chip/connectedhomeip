@@ -74,15 +74,17 @@ public class CommissioningFragment extends Fragment {
     progressBar.setMin(0);
     progressBar.setMax(100);
 
-    view.findViewById(R.id.cancel_button).setOnClickListener(
-        v -> {
-          commissionerActivity.finishCommissioning(Activity.RESULT_CANCELED);
-        });
+    view.findViewById(R.id.cancel_button)
+        .setOnClickListener(
+            v -> {
+              commissionerActivity.finishCommissioning(Activity.RESULT_CANCELED);
+            });
 
-    view.findViewById(R.id.done_button).setOnClickListener(
-        v -> {
-          commissionerActivity.finishCommissioning(Activity.RESULT_OK);
-        });
+    view.findViewById(R.id.done_button)
+        .setOnClickListener(
+            v -> {
+              commissionerActivity.finishCommissioning(Activity.RESULT_OK);
+            });
 
     // TODO: commissioning over BLE.
     showCommissionDone(false, "Commissioning over BLE not implemented yet!");

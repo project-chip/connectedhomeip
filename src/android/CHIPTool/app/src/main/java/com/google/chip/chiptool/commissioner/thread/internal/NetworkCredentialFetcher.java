@@ -6,7 +6,6 @@ import com.google.chip.chiptool.commissioner.thread.BorderAgentInfo;
 import com.google.chip.chiptool.commissioner.thread.CommissionerUtils;
 import com.google.chip.chiptool.commissioner.thread.ThreadCommissionerException;
 import com.google.chip.chiptool.commissioner.thread.ThreadNetworkCredential;
-import io.openthread.commissioner.ActiveOperationalDataset;
 import io.openthread.commissioner.ByteArray;
 import io.openthread.commissioner.ChannelMask;
 import io.openthread.commissioner.Commissioner;
@@ -25,8 +24,11 @@ class NetworkCredentialFetcher {
   NativeCommissionerHandler nativeCommissionerHandler = new NativeCommissionerHandler();
   Commissioner nativeCommissioner;
 
-  public ThreadNetworkCredential fetchNetworkCredential(@NonNull BorderAgentInfo borderAgentInfo, @NonNull byte[] pskc) throws ThreadCommissionerException {
-    byte[] rawActiveDataset = fetchNetworkCredential(borderAgentInfo.host, borderAgentInfo.port, pskc);
+  public ThreadNetworkCredential fetchNetworkCredential(
+      @NonNull BorderAgentInfo borderAgentInfo, @NonNull byte[] pskc)
+      throws ThreadCommissionerException {
+    byte[] rawActiveDataset =
+        fetchNetworkCredential(borderAgentInfo.host, borderAgentInfo.port, pskc);
     return new ThreadNetworkCredential(rawActiveDataset);
   }
 
@@ -37,7 +39,9 @@ class NetworkCredentialFetcher {
     }
   }
 
-  private byte[] fetchNetworkCredential(@NonNull InetAddress address, int port, @NonNull byte[] pskc) throws ThreadCommissionerException {
+  private byte[] fetchNetworkCredential(
+      @NonNull InetAddress address, int port, @NonNull byte[] pskc)
+      throws ThreadCommissionerException {
     nativeCommissioner = Commissioner.create(nativeCommissionerHandler);
 
     Config config = new Config();

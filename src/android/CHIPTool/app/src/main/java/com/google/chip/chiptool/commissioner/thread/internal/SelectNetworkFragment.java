@@ -29,13 +29,11 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import com.google.chip.chiptool.R;
 import com.google.chip.chiptool.commissioner.CommissionerActivity;
 import com.google.chip.chiptool.commissioner.thread.BorderAgentInfo;
 import com.google.chip.chiptool.commissioner.thread.CommissionerUtils;
-import com.google.chip.chiptool.commissioner.thread.ThreadCommissionerService;
 import com.google.chip.chiptool.commissioner.thread.ThreadNetworkCredential;
 import com.google.chip.chiptool.commissioner.thread.ThreadNetworkInfo;
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo;
@@ -45,7 +43,10 @@ import io.openthread.commissioner.Error;
 import io.openthread.commissioner.ErrorCode;
 import java.util.concurrent.ExecutionException;
 
-public class SelectNetworkFragment extends Fragment implements InputNetworkPasswordDialogFragment.PasswordDialogListener, FetchCredentialDialogFragment.CredentialListener, View.OnClickListener {
+public class SelectNetworkFragment extends Fragment
+    implements InputNetworkPasswordDialogFragment.PasswordDialogListener,
+        FetchCredentialDialogFragment.CredentialListener,
+        View.OnClickListener {
 
   private static final String TAG = SelectNetworkFragment.class.getSimpleName();
 
@@ -59,9 +60,7 @@ public class SelectNetworkFragment extends Fragment implements InputNetworkPassw
 
   private BorderAgentDiscoverer borderAgentDiscoverer;
 
-  public SelectNetworkFragment() {
-
-  }
+  public SelectNetworkFragment() {}
 
   public SelectNetworkFragment(CHIPDeviceInfo deviceInfo) {
     this.deviceInfo = deviceInfo;
@@ -134,10 +133,10 @@ public class SelectNetworkFragment extends Fragment implements InputNetworkPassw
     networkListView.setAdapter(networksAdapter);
 
     networkListView.setOnItemClickListener(
-      (AdapterView<?> adapterView, View v, int position, long id) -> {
-        selectedNetwork = (ThreadNetworkInfoHolder) adapterView.getItemAtPosition(position);
-        addDeviceButton.setVisibility(View.VISIBLE);
-      });
+        (AdapterView<?> adapterView, View v, int position, long id) -> {
+          selectedNetwork = (ThreadNetworkInfoHolder) adapterView.getItemAtPosition(position);
+          addDeviceButton.setVisibility(View.VISIBLE);
+        });
 
     view.findViewById(R.id.add_device_button).setOnClickListener(this);
   }
@@ -165,21 +164,29 @@ public class SelectNetworkFragment extends Fragment implements InputNetworkPassw
   private byte[] computePskc(ThreadNetworkInfo threadNetworkInfo, String password) {
     short[] extendedPanId = new short[threadNetworkInfo.extendedPanId.length];
     for (int i = 0; i < extendedPanId.length; ++i) {
-      extendedPanId[i] = (short)(((short) threadNetworkInfo.extendedPanId[i]) & 0xff);
+      extendedPanId[i] = (short) (((short) threadNetworkInfo.extendedPanId[i]) & 0xff);
     }
 
     ByteArray pskc = new ByteArray();
-    Error error = Commissioner.generatePSKc(pskc, password, threadNetworkInfo.networkName, new ByteArray(extendedPanId));
+    Error error =
+        Commissioner.generatePSKc(
+            pskc, password, threadNetworkInfo.networkName, new ByteArray(extendedPanId));
     if (error.getCode() != ErrorCode.kNone) {
-      Log.e(TAG, String.format("failed to generate PSKc: %s; network-name=%s, extended-pan-id=%s",
-                               error.toString(),
-                               threadNetworkInfo.networkName,
-                               CommissionerUtils.getHexString(threadNetworkInfo.extendedPanId)));
+      Log.e(
+          TAG,
+          String.format(
+              "failed to generate PSKc: %s; network-name=%s, extended-pan-id=%s",
+              error.toString(),
+              threadNetworkInfo.networkName,
+              CommissionerUtils.getHexString(threadNetworkInfo.extendedPanId)));
     } else {
-      Log.d(TAG, String.format("generated pskc=%s, network-name=%s, extended-pan-id=%s",
-                               CommissionerUtils.getHexString(pskc),
-                               threadNetworkInfo.networkName,
-                               CommissionerUtils.getHexString(threadNetworkInfo.extendedPanId)));
+      Log.d(
+          TAG,
+          String.format(
+              "generated pskc=%s, network-name=%s, extended-pan-id=%s",
+              CommissionerUtils.getHexString(pskc),
+              threadNetworkInfo.networkName,
+              CommissionerUtils.getHexString(threadNetworkInfo.extendedPanId)));
     }
 
     return CommissionerUtils.getByteArray(pskc);
@@ -194,16 +201,21 @@ public class SelectNetworkFragment extends Fragment implements InputNetworkPassw
   public void onClick(View view) {
     try {
       BorderAgentInfo selectedBorderAgent = selectedNetwork.borderAgents.get(0);
-      ThreadCommissionerServiceImpl commissionerService = new ThreadCommissionerServiceImpl(getContext());
-      BorderAgentRecord borderAgentRecord = commissionerService.getBorderAgentRecord(selectedBorderAgent).get();
+      ThreadCommissionerServiceImpl commissionerService =
+          new ThreadCommissionerServiceImpl(getContext());
+      BorderAgentRecord borderAgentRecord =
+          commissionerService.getBorderAgentRecord(selectedBorderAgent).get();
 
       if (borderAgentRecord != null && borderAgentRecord.getActiveOperationalDataset() != null) {
-        gotoCommissioning(new ThreadNetworkCredential(borderAgentRecord.getActiveOperationalDataset()));
+        gotoCommissioning(
+            new ThreadNetworkCredential(borderAgentRecord.getActiveOperationalDataset()));
       } else if (borderAgentRecord != null && borderAgentRecord.getPskc() != null) {
         gotoFetchingCredential(selectedBorderAgent, borderAgentRecord.getPskc());
       } else {
-        new InputNetworkPasswordDialogFragment(SelectNetworkFragment.this).show(
-            getParentFragmentManager(), InputNetworkPasswordDialogFragment.class.getSimpleName());
+        new InputNetworkPasswordDialogFragment(SelectNetworkFragment.this)
+            .show(
+                getParentFragmentManager(),
+                InputNetworkPasswordDialogFragment.class.getSimpleName());
       }
     } catch (ExecutionException e) {
       e.printStackTrace();
@@ -218,12 +230,16 @@ public class SelectNetworkFragment extends Fragment implements InputNetworkPassw
   }
 
   @Override
-  public void onConfirmClick(FetchCredentialDialogFragment fragment,
-      ThreadNetworkCredential credential) {
+  public void onConfirmClick(
+      FetchCredentialDialogFragment fragment, ThreadNetworkCredential credential) {
     if (credential != null) {
-      ThreadCommissionerServiceImpl commissionerService = new ThreadCommissionerServiceImpl(getContext());
+      ThreadCommissionerServiceImpl commissionerService =
+          new ThreadCommissionerServiceImpl(getContext());
       try {
-        commissionerService.addThreadNetworkCredential(selectedNetwork.borderAgents.get(0), userInputPskc, credential).get();
+        commissionerService
+            .addThreadNetworkCredential(
+                selectedNetwork.borderAgents.get(0), userInputPskc, credential)
+            .get();
       } catch (ExecutionException e) {
         e.printStackTrace();
       } catch (InterruptedException e) {

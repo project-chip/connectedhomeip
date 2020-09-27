@@ -28,13 +28,15 @@ import android.widget.EditText;
 import androidx.fragment.app.DialogFragment;
 import com.google.chip.chiptool.R;
 
-public class InputNetworkPasswordDialogFragment extends DialogFragment implements DialogInterface.OnClickListener {
+public class InputNetworkPasswordDialogFragment extends DialogFragment
+    implements DialogInterface.OnClickListener {
 
   private PasswordDialogListener passwordListener;
   private EditText passwordText;
 
   public interface PasswordDialogListener {
     public void onPositiveClick(InputNetworkPasswordDialogFragment fragment, String password);
+
     public void onNegativeClick(InputNetworkPasswordDialogFragment fragment);
   }
 

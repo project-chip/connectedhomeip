@@ -2,7 +2,6 @@ package com.google.chip.chiptool.commissioner.thread.internal;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.net.ConnectivityManagerCompat.RestrictBackgroundStatus;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -31,7 +30,12 @@ public class BorderAgentRecord {
   @ColumnInfo(name = "active_operational_dataset", typeAffinity = ColumnInfo.BLOB)
   private byte[] activeOperationalDataset;
 
-  public BorderAgentRecord(@NonNull String discriminator, @NonNull String networkName, @NonNull byte[] extendedPanId, @NonNull byte[] pskc, @Nullable byte[] activeOperationalDataset) {
+  public BorderAgentRecord(
+      @NonNull String discriminator,
+      @NonNull String networkName,
+      @NonNull byte[] extendedPanId,
+      @NonNull byte[] pskc,
+      @Nullable byte[] activeOperationalDataset) {
     this.discriminator = discriminator;
     this.networkName = networkName;
     this.extendedPanId = extendedPanId;

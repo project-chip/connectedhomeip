@@ -3,13 +3,11 @@ package com.google.chip.chiptool.commissioner.thread.internal;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.net.Network;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
@@ -18,7 +16,8 @@ import com.google.chip.chiptool.commissioner.thread.BorderAgentInfo;
 import com.google.chip.chiptool.commissioner.thread.ThreadCommissionerException;
 import com.google.chip.chiptool.commissioner.thread.ThreadNetworkCredential;
 
-public class FetchCredentialDialogFragment extends DialogFragment implements DialogInterface.OnClickListener {
+public class FetchCredentialDialogFragment extends DialogFragment
+    implements DialogInterface.OnClickListener {
 
   private CredentialListener credentialListener;
   private TextView statusText;
@@ -32,10 +31,14 @@ public class FetchCredentialDialogFragment extends DialogFragment implements Dia
 
   public interface CredentialListener {
     void onCancelClick(FetchCredentialDialogFragment fragment);
+
     void onConfirmClick(FetchCredentialDialogFragment fragment, ThreadNetworkCredential credential);
   }
 
-  public FetchCredentialDialogFragment(@NonNull BorderAgentInfo borderAgentInfo, @NonNull byte[] pskc, @NonNull CredentialListener credentialListener) {
+  public FetchCredentialDialogFragment(
+      @NonNull BorderAgentInfo borderAgentInfo,
+      @NonNull byte[] pskc,
+      @NonNull CredentialListener credentialListener) {
     this.borderAgentInfo = borderAgentInfo;
     this.pskc = pskc;
     this.credentialListener = credentialListener;
@@ -84,26 +87,32 @@ public class FetchCredentialDialogFragment extends DialogFragment implements Dia
   }
 
   private void startFetching() {
-    Thread thread = new Thread(() -> {
-      new Handler(Looper.getMainLooper()).post(() -> {
-        statusText.setText("petitioning...");
-      });
+    Thread thread =
+        new Thread(
+            () -> {
+              new Handler(Looper.getMainLooper())
+                  .post(
+                      () -> {
+                        statusText.setText("petitioning...");
+                      });
 
-      String status;
-      try {
-        credential = fetcher.fetchNetworkCredential(borderAgentInfo, pskc);
-        status = "success";
-      } catch (ThreadCommissionerException e) {
-        status = e.getMessage();
-      }
+              String status;
+              try {
+                credential = fetcher.fetchNetworkCredential(borderAgentInfo, pskc);
+                status = "success";
+              } catch (ThreadCommissionerException e) {
+                status = e.getMessage();
+              }
 
-      final String statusCopy = status;
+              final String statusCopy = status;
 
-      new Handler(Looper.getMainLooper()).post(() -> {
-        statusText.setText(statusCopy);
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-      });
-    });
+              new Handler(Looper.getMainLooper())
+                  .post(
+                      () -> {
+                        statusText.setText(statusCopy);
+                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                      });
+            });
     thread.start();
   }
 

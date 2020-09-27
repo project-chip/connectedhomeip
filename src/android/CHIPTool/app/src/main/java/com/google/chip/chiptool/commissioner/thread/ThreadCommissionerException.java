@@ -1,16 +1,12 @@
 package com.google.chip.chiptool.commissioner.thread;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
 public class ThreadCommissionerException extends Exception {
 
-  @NonNull
-  private int code;
+  @NonNull private int code;
 
-  @NonNull
-  private String message;
+  @NonNull private String message;
 
   public ThreadCommissionerException(int code, String message) {
     this.code = code;

@@ -18,23 +18,17 @@
 
 package com.google.chip.chiptool.commissioner.thread.internal;
 
-import android.Manifest;
 import android.Manifest.permission;
 import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.net.wifi.WifiManager;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import androidx.annotation.RequiresPermission;
 import com.google.chip.chiptool.commissioner.thread.BorderAgentInfo;
-import com.google.chip.chiptool.commissioner.thread.ThreadNetworkInfo;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -60,6 +54,7 @@ class BorderAgentDiscoverer implements NsdManager.DiscoveryListener {
 
   public interface BorderAgentListener {
     void onBorderAgentFound(BorderAgentInfo borderAgentInfo);
+
     void onBorderAgentLost(String discriminator);
   }
 
@@ -90,26 +85,28 @@ class BorderAgentDiscoverer implements NsdManager.DiscoveryListener {
   }
 
   private void startResolver() {
-    NsdManager.ResolveListener listener = new NsdManager.ResolveListener() {
-      @Override
-      public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
-        Log.e(
-            TAG,
-            String.format(
-                "failed to resolve service %s, error: %d, this=%s", serviceInfo.toString(), errorCode, this));
-        isResolvingService.set(false);
-      }
+    NsdManager.ResolveListener listener =
+        new NsdManager.ResolveListener() {
+          @Override
+          public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
+            Log.e(
+                TAG,
+                String.format(
+                    "failed to resolve service %s, error: %d, this=%s",
+                    serviceInfo.toString(), errorCode, this));
+            isResolvingService.set(false);
+          }
 
-      @Override
-      public void onServiceResolved(NsdServiceInfo serviceInfo) {
-        BorderAgentInfo borderAgent = getBorderAgentInfo(serviceInfo);
-        if (borderAgent != null) {
-          Log.d(TAG, "successfully resolved service: " + serviceInfo.toString());
-          borderAgentListener.onBorderAgentFound(borderAgent);
-        }
-        isResolvingService.set(false);
-      }
-    };
+          @Override
+          public void onServiceResolved(NsdServiceInfo serviceInfo) {
+            BorderAgentInfo borderAgent = getBorderAgentInfo(serviceInfo);
+            if (borderAgent != null) {
+              Log.d(TAG, "successfully resolved service: " + serviceInfo.toString());
+              borderAgentListener.onBorderAgentFound(borderAgent);
+            }
+            isResolvingService.set(false);
+          }
+        };
 
     Log.d(TAG, "mDNS resolve listener is " + listener);
 
@@ -117,16 +114,17 @@ class BorderAgentDiscoverer implements NsdManager.DiscoveryListener {
       executor = Executors.newSingleThreadExecutor();
     }
 
-    executor.submit(() -> {
-      while (true) {
-        if (!isResolvingService.get()) {
-          NsdServiceInfo serviceInfo = unresolvedServices.take();
+    executor.submit(
+        () -> {
+          while (true) {
+            if (!isResolvingService.get()) {
+              NsdServiceInfo serviceInfo = unresolvedServices.take();
 
-          isResolvingService.set(true);
-          nsdManager.resolveService(serviceInfo, listener);
-        }
-      }
-    });
+              isResolvingService.set(true);
+              nsdManager.resolveService(serviceInfo, listener);
+            }
+          }
+        });
   }
 
   private void stopResolver() {

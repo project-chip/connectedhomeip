@@ -24,6 +24,6 @@ class ThreadNetworkInfoHolder implements Parcelable {
   @Override
   public void writeToParcel(Parcel dest, int flags) {
     dest.writeParcelable(networkInfo, flags);
-    dest.writeParcelableArray( (BorderAgentInfo[]) borderAgents.toArray(), flags);
+    dest.writeParcelableArray((BorderAgentInfo[]) borderAgents.toArray(), flags);
   }
 }
