@@ -4,7 +4,7 @@ readonly CUR_DIR="$(dirname "$(realpath -s "$0")")"
 
 set -e
 
-case "${TARGET}" in
+case "$TARGET" in
     armv7a-linux-androideabi)
         ABI="armeabi-v7a"
         ;;
@@ -18,9 +18,9 @@ case "${TARGET}" in
         ABI="x86-64"
         ;;
     *)
-        echo "invalid TARGET value: ${TARGET}"
+        echo "invalid TARGET value: $TARGET"
         exit 1
-esac
+;; esac
 
 cd "$CUR_DIR"
 
