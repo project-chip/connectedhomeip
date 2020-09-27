@@ -88,14 +88,11 @@ nrf5_executable("lighting_app") {
     "main/main.cpp",
   ]
 
-  public_deps = [
-    "${chip_root}/examples/shell/shell_common:chip_shell_collection",
-  ]
-
   deps = [
     ":sdk",
     "${chip_root}/examples/common/chip-app-server:chip-app-server",
     "${chip_root}/examples/lighting-app/lighting-common",
+    "${chip_root}/examples/shell/shell_common:chip_shell_collection",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms/nrf528xx:libnordicsemi_nrf52840_radio_driver_softdevice",
