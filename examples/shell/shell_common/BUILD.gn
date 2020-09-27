@@ -13,14 +13,14 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/platform/device.gni")
 import("//build_overrides/openthread.gni")
+import("${chip_root}/src/platform/device.gni")
 
 config("chip_shell_collection_config") {
   include_dirs = [
     ".",
     "./include",
-      "${chip_root}/src/lib/shell",
+    "${chip_root}/src/lib/shell",
   ]
 
   defines = [
