@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/platform/device.gni")
 import("//build_overrides/openthread.gni")
+import("${chip_root}/src/platform/device.gni")
 
 if (chip_device_platform == "nrf5") {
   # TODO: Unify :shell_nrf5 with :chip-shell
@@ -91,7 +91,6 @@ if (chip_device_platform == "nrf5") {
 
     public_deps += [
       ":sdk",
-      "shell_common:chip_shell_collection",
       "${chip_root}/src/lib",
       "${chip_root}/src/lib/shell",
       "${chip_root}/src/setup_payload",
@@ -102,6 +101,7 @@ if (chip_device_platform == "nrf5") {
       "${nrf5_platform_dir}/app/support:freertos_newlib_lock_support_test",
       "${openthread_root}:libopenthread-cli-ftd",
       "${openthread_root}:libopenthread-ftd",
+      "shell_common:chip_shell_collection",
     ]
 
     output_dir = root_out_dir
@@ -129,14 +129,12 @@ if (chip_device_platform == "nrf5") {
   assert(chip_build_tools)
 
   executable("chip-shell") {
-    sources = [
-      "main.cpp",
-    ]
+    sources = [ "main.cpp" ]
 
     public_deps = [
-      "shell_common:chip_shell_collection",
       "${chip_root}/src/lib/shell",
       "${chip_root}/src/platform",
+      "shell_common:chip_shell_collection",
     ]
 
     if (is_debug) {
