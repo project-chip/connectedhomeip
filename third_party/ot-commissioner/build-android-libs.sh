@@ -20,7 +20,8 @@ case "$TARGET" in
     *)
         echo "invalid TARGET value: $TARGET"
         exit 1
-;; esac
+        ;;
+esac
 
 cd "$CUR_DIR"
 
