@@ -47,7 +47,6 @@ int shell_line_read(char * buffer, size_t max)
     int read     = 0;
     bool done    = false;
     char * inptr = buffer;
-    ChipLogError(Shell, "%s %d\n", __FUNCTION__, __LINE__);
 
     // Read in characters until we get a new line or we hit our max size.
     while (((inptr - buffer) < (int) max) && !done)

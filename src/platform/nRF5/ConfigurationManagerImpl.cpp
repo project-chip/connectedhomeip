@@ -93,7 +93,6 @@ bool ConfigurationManagerImpl::_CanFactoryReset()
 
 void ConfigurationManagerImpl::_InitiateFactoryReset()
 {
-    ChipLogError(DeviceLayer, "_InitiateFactoryReset");
     PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 

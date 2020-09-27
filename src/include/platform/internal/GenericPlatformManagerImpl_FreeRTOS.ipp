@@ -93,10 +93,8 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_UnlockChipStack(void)
 template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
-
     if (mChipEventQueue != NULL)
     {
-
         if (!xQueueSend(mChipEventQueue, event, 1))
         {
             ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
@@ -174,7 +172,6 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
         // dispatching them until the queue is empty.
         while (eventReceived == pdTRUE)
         {
-
             Impl()->DispatchEvent(&event);
 
             eventReceived = xQueueReceive(mChipEventQueue, &event, 0);
