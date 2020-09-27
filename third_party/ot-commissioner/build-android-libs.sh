@@ -4,6 +4,24 @@ readonly CUR_DIR="$(dirname "$(realpath -s "$0")")"
 
 set -e
 
+case "${TARGET}" in
+    armv7a-linux-androideabi)
+        ABI="armeabi-v7a"
+        ;;
+    aarch64-linux-android)
+        ABI="arm64-v8a"
+        ;;
+    i686-linux-android)
+        ABI="x86"
+        ;;
+    x86_64-linux-android)
+        ABI="x86-64"
+        ;;
+    *)
+        echo "invalid TARGET value: ${TARGET}"
+        exit 1
+esac
+
 cd "$CUR_DIR"
 
 ## Install dependencies.

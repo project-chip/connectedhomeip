@@ -65,3 +65,7 @@ __pycache__
 
 # Doxygen outputs
 docs/html
+
+# Shared libs & JAR libs
+*.so
+*.jar

@@ -16,7 +16,7 @@
  *
  */
 
-package com.google.chip.chiptool.commissioner;
+package com.google.chip.chiptool.commissioner.thread.internal;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -28,26 +28,18 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.work.Data;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkInfo;
-import androidx.work.WorkManager;
-import androidx.work.WorkRequest;
 import com.google.chip.chiptool.R;
-import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo;
-import com.google.gson.Gson;
+import com.google.chip.chiptool.commissioner.CommissionerActivity;
+import com.google.chip.chiptool.commissioner.thread.ThreadNetworkCredential;
 
-public class CommissioningFragment extends Fragment implements Observer<WorkInfo> {
+public class CommissioningFragment extends Fragment {
 
   private static final String TAG = CommissioningFragment.class.getSimpleName();
 
-  private CHIPDeviceInfo deviceInfo;
-  private NetworkInfo networkInfo;
+  ThreadNetworkCredential networkCredential;
 
-  WorkRequest commssionerWorkRequest;
+  CommissionerActivity commissionerActivity;
 
   TextView statusText;
   ProgressBar progressBar;
@@ -56,6 +48,10 @@ public class CommissioningFragment extends Fragment implements Observer<WorkInfo
   ImageView doneImage;
   ImageView errorImage;
 
+  public CommissioningFragment(@NonNull ThreadNetworkCredential networkCredential) {
+    this.networkCredential = networkCredential;
+  }
+
   @Override
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -63,8 +59,11 @@ public class CommissioningFragment extends Fragment implements Observer<WorkInfo
     return inflater.inflate(R.layout.commissioner_commissioning_fragment, container, false);
   }
 
+  @Override
   public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
+
+    commissionerActivity = (CommissionerActivity) getActivity();
 
     cancelButton = view.findViewById(R.id.cancel_button);
     doneButton = view.findViewById(R.id.done_button);
@@ -75,59 +74,18 @@ public class CommissioningFragment extends Fragment implements Observer<WorkInfo
     progressBar.setMin(0);
     progressBar.setMax(100);
 
-    deviceInfo = getArguments().getParcelable(Constants.KEY_DEVICE_INFO);
-    networkInfo = getArguments().getParcelable(Constants.KEY_NETWORK_INFO);
+    view.findViewById(R.id.cancel_button).setOnClickListener(
+        v -> {
+          commissionerActivity.finishCommissioning(Activity.RESULT_CANCELED);
+        });
 
-    Data arguments =
-        new Data.Builder()
-            .putString(Constants.KEY_DEVICE_INFO, new Gson().toJson(deviceInfo))
-            .putString(Constants.KEY_NETWORK_INFO, new Gson().toJson(networkInfo))
-            .build();
-    commssionerWorkRequest =
-        new OneTimeWorkRequest.Builder(CommissionerWorker.class).setInputData(arguments).build();
+    view.findViewById(R.id.done_button).setOnClickListener(
+        v -> {
+          commissionerActivity.finishCommissioning(Activity.RESULT_OK);
+        });
 
-    WorkManager.getInstance(getActivity()).enqueue(commssionerWorkRequest);
-
-    WorkManager.getInstance(getActivity())
-        .getWorkInfoByIdLiveData(commssionerWorkRequest.getId())
-        .observe(getViewLifecycleOwner(), this);
-
-    view.findViewById(R.id.cancel_button)
-        .setOnClickListener(
-            new View.OnClickListener() {
-              @Override
-              public void onClick(View view) {
-                WorkManager.getInstance(getActivity())
-                    .cancelWorkById(commssionerWorkRequest.getId());
-
-                CommissionerActivity commissionerActivity = (CommissionerActivity) getActivity();
-                commissionerActivity.finishCommissioning(Activity.RESULT_CANCELED);
-              }
-            });
-
-    view.findViewById(R.id.done_button)
-        .setOnClickListener(
-            new View.OnClickListener() {
-              @Override
-              public void onClick(View view) {
-                CommissionerActivity commissionerActivity = (CommissionerActivity) getActivity();
-                commissionerActivity.finishCommissioning(Activity.RESULT_OK);
-              }
-            });
-  }
-
-  @Override
-  public void onChanged(@Nullable WorkInfo workInfo) {
-    if (workInfo != null) {
-      if (workInfo.getState().isFinished()) {
-
-        showCommissionDone(
-            workInfo.getOutputData().getBoolean(Constants.KEY_SUCCESS, false),
-            workInfo.getOutputData().getString(Constants.KEY_COMMISSIONING_STATUS));
-      } else {
-        showInProgress(workInfo.getProgress().getString(Constants.KEY_COMMISSIONING_STATUS));
-      }
-    }
+    // TODO: commissioning over BLE.
+    showCommissionDone(false, "Commissioning over BLE not implemented yet!");
   }
 
   private void showInProgress(String status) {
@@ -161,3 +119,4 @@ public class CommissioningFragment extends Fragment implements Observer<WorkInfo
     }
   }
 }
+

@@ -8,9 +8,10 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/network_icon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:layout_marginStart="5dp"
+        android:visibility="invisible"
         app:layout_constraintEnd_toStartOf="@+id/network_name"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -21,7 +22,6 @@
         style="@style/info_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
         app:layout_constraintBottom_toBottomOf="@+id/network_icon"
         app:layout_constraintStart_toEndOf="@+id/network_icon"
         app:layout_constraintTop_toTopOf="@+id/network_icon"></TextView>
