@@ -21,7 +21,7 @@ import("${chip_root}/gn/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libRetransmitTests"
 
-  cflags = ["-Wconversion"]
+  cflags = [ "-Wconversion" ]
 
   sources = [
     "TestCache.cpp",
