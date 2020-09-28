@@ -17,7 +17,6 @@
 #include "TestQRCodeTLV.h"
 #include "TestHelpers.h"
 
-#include <iostream>
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 
@@ -130,11 +129,11 @@ void TestSerialNumberAddRemove(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, inPayload.addSerialNumber(kSerialNumberDefaultStringValue) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, inPayload.getSerialNumber(sn) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, sn.compare(kSerialNumberDefaultStringValue) == 0);
+    NL_TEST_ASSERT(inSuite, sn == kSerialNumberDefaultStringValue);
 
     NL_TEST_ASSERT(inSuite, inPayload.addSerialNumber(kSerialNumberDefaultUInt32Value) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, inPayload.getSerialNumber(sn) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, sn.compare(to_string(kSerialNumberDefaultUInt32Value)) == 0);
+    NL_TEST_ASSERT(inSuite, sn == to_string(kSerialNumberDefaultUInt32Value));
 
     NL_TEST_ASSERT(inSuite, inPayload.removeSerialNumber() == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, inPayload.getSerialNumber(sn) == CHIP_ERROR_KEY_NOT_FOUND);
@@ -293,8 +292,8 @@ int TestQRCodeTLV(void)
     {
         "chip-qrcode-optional-info-tests",
         &sTests[0],
-        NULL,
-        NULL
+        nullptr,
+        nullptr
     };
     // clang-format on
     TestContext context;

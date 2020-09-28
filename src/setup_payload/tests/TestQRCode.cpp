@@ -25,7 +25,6 @@
 #include "TestQRCode.h"
 #include "TestHelpers.h"
 
-#include <iostream>
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 
@@ -84,52 +83,51 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
     uint8_t input[] = { 10, 10, 10 };
 
     // basic stuff
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 0).compare("") == 0);
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 1).compare("A") == 0);
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("SL1") == 0);
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 3).compare("SL1A") == 0);
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 0) == "");
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 1) == "A");
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 2) == "SL1");
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 3) == "SL1A");
 
     // test single odd byte corner conditions
     input[2] = 0;
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 3).compare("SL10") == 0);
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 3) == "SL10");
     input[2] = 40;
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 3).compare("SL1.") == 0);
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 3) == "SL1.");
     input[2] = 41;
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 3).compare("SL101") == 0);
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 3) == "SL101");
     input[2] = 255;
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 3).compare("SL196") == 0);
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 3) == "SL196");
 
     // testing optimized encoding
     // verify that we can't optimize a low value, need 3 chars
     input[0] = 255;
     input[1] = 0;
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("960") == 0);
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 2) == "960");
     // smallest optimized encoding, 256
     input[0] = 256 % 256;
     input[1] = 256 / 256;
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("A6") == 0);
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 2) == "A6");
     // largest optimizated encoding value
     input[0] = ((kRadix * kRadix) - 1) % 256;
     input[1] = ((kRadix * kRadix) - 1) / 256;
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("..") == 0);
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 2) == "..");
     // can't optimize
     input[0] = ((kRadix * kRadix)) % 256;
     input[1] = ((kRadix * kRadix)) / 256;
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("001") == 0);
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 2) == "001");
 
     // fun with strings
-    NL_TEST_ASSERT(inSuite,
-                   base41Encode((uint8_t *) "Hello World!", sizeof("Hello World!") - 1).compare("GHF.KGL+48-G5LGK35") == 0);
+    NL_TEST_ASSERT(inSuite, base41Encode((uint8_t *) "Hello World!", sizeof("Hello World!") - 1) == "GHF.KGL+48-G5LGK35");
 
     vector<uint8_t> decoded = vector<uint8_t>();
     NL_TEST_ASSERT(inSuite, base41Decode("GHF.KGL+48-G5LGK35", decoded) == CHIP_NO_ERROR);
 
     string hello_world;
-    for (size_t _ = 0; _ < decoded.size(); _++)
+    for (uint8_t b : decoded)
     {
-        hello_world += (char) decoded[_];
+        hello_world += (char) b;
     }
-    NL_TEST_ASSERT(inSuite, hello_world.compare("Hello World!") == 0);
+    NL_TEST_ASSERT(inSuite, hello_world == "Hello World!");
 
     // short input
     NL_TEST_ASSERT(inSuite, base41Decode("A0", decoded) == CHIP_NO_ERROR);
@@ -279,23 +277,23 @@ void TestQRCodeToPayloadGeneration(nlTestSuite * inSuite, void * inContext)
 
 void TestExtractPayload(nlTestSuite * inSuite, void * inContext)
 {
-    NL_TEST_ASSERT(inSuite, extractPayload(string("CH:ABC")).compare(string("ABC")) == 0);
-    NL_TEST_ASSERT(inSuite, extractPayload(string("CH:")).compare(string("")) == 0);
-    NL_TEST_ASSERT(inSuite, extractPayload(string("H:")).compare(string("")) == 0);
-    NL_TEST_ASSERT(inSuite, extractPayload(string("ASCH:")).compare(string("")) == 0);
-    NL_TEST_ASSERT(inSuite, extractPayload(string("Z%CH:ABC%")).compare(string("ABC")) == 0);
-    NL_TEST_ASSERT(inSuite, extractPayload(string("Z%CH:ABC")).compare(string("ABC")) == 0);
-    NL_TEST_ASSERT(inSuite, extractPayload(string("%Z%CH:ABC")).compare(string("ABC")) == 0);
-    NL_TEST_ASSERT(inSuite, extractPayload(string("%Z%CH:ABC%")).compare(string("ABC")) == 0);
-    NL_TEST_ASSERT(inSuite, extractPayload(string("%Z%CH:ABC%DDD")).compare(string("ABC")) == 0);
-    NL_TEST_ASSERT(inSuite, extractPayload(string("CH:ABC%DDD")).compare(string("ABC")) == 0);
-    NL_TEST_ASSERT(inSuite, extractPayload(string("CH:ABC%")).compare(string("ABC")) == 0);
-    NL_TEST_ASSERT(inSuite, extractPayload(string("%CH:")).compare(string("")) == 0);
-    NL_TEST_ASSERT(inSuite, extractPayload(string("%CH:%")).compare(string("")) == 0);
-    NL_TEST_ASSERT(inSuite, extractPayload(string("A%")).compare(string("")) == 0);
-    NL_TEST_ASSERT(inSuite, extractPayload(string("CH:%")).compare(string("")) == 0);
-    NL_TEST_ASSERT(inSuite, extractPayload(string("%CH:ABC")).compare(string("ABC")) == 0);
-    NL_TEST_ASSERT(inSuite, extractPayload(string("ABC")).compare(string("")) == 0);
+    NL_TEST_ASSERT(inSuite, extractPayload(string("CH:ABC")) == string("ABC"));
+    NL_TEST_ASSERT(inSuite, extractPayload(string("CH:")) == string(""));
+    NL_TEST_ASSERT(inSuite, extractPayload(string("H:")) == string(""));
+    NL_TEST_ASSERT(inSuite, extractPayload(string("ASCH:")) == string(""));
+    NL_TEST_ASSERT(inSuite, extractPayload(string("Z%CH:ABC%")) == string("ABC"));
+    NL_TEST_ASSERT(inSuite, extractPayload(string("Z%CH:ABC")) == string("ABC"));
+    NL_TEST_ASSERT(inSuite, extractPayload(string("%Z%CH:ABC")) == string("ABC"));
+    NL_TEST_ASSERT(inSuite, extractPayload(string("%Z%CH:ABC%")) == string("ABC"));
+    NL_TEST_ASSERT(inSuite, extractPayload(string("%Z%CH:ABC%DDD")) == string("ABC"));
+    NL_TEST_ASSERT(inSuite, extractPayload(string("CH:ABC%DDD")) == string("ABC"));
+    NL_TEST_ASSERT(inSuite, extractPayload(string("CH:ABC%")) == string("ABC"));
+    NL_TEST_ASSERT(inSuite, extractPayload(string("%CH:")) == string(""));
+    NL_TEST_ASSERT(inSuite, extractPayload(string("%CH:%")) == string(""));
+    NL_TEST_ASSERT(inSuite, extractPayload(string("A%")) == string(""));
+    NL_TEST_ASSERT(inSuite, extractPayload(string("CH:%")) == string(""));
+    NL_TEST_ASSERT(inSuite, extractPayload(string("%CH:ABC")) == string("ABC"));
+    NL_TEST_ASSERT(inSuite, extractPayload(string("ABC")) == string(""));
 }
 
 // Test Suite
@@ -340,8 +338,8 @@ int TestQuickResponseCode(void)
     {
         "chip-qrcode-general-tests",
         &sTests[0],
-        NULL,
-        NULL
+        nullptr,
+        nullptr
     };
     // clang-format on
     TestContext context;

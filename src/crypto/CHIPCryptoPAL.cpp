@@ -33,18 +33,18 @@ CHIP_ERROR Spake2p::InternalHash(const uint8_t * in, size_t in_len)
     uint64_t u64_len = in_len;
 
     uint8_t lb[8];
-    lb[0] = (u64_len >> 0) & 0xff;
-    lb[1] = (u64_len >> 8) & 0xff;
-    lb[2] = (u64_len >> 16) & 0xff;
-    lb[3] = (u64_len >> 24) & 0xff;
-    lb[4] = (u64_len >> 32) & 0xff;
-    lb[5] = (u64_len >> 40) & 0xff;
-    lb[6] = (u64_len >> 48) & 0xff;
-    lb[7] = (u64_len >> 56) & 0xff;
+    lb[0] = static_cast<uint8_t>((u64_len >> 0) & 0xff);
+    lb[1] = static_cast<uint8_t>((u64_len >> 8) & 0xff);
+    lb[2] = static_cast<uint8_t>((u64_len >> 16) & 0xff);
+    lb[3] = static_cast<uint8_t>((u64_len >> 24) & 0xff);
+    lb[4] = static_cast<uint8_t>((u64_len >> 32) & 0xff);
+    lb[5] = static_cast<uint8_t>((u64_len >> 40) & 0xff);
+    lb[6] = static_cast<uint8_t>((u64_len >> 48) & 0xff);
+    lb[7] = static_cast<uint8_t>((u64_len >> 56) & 0xff);
 
     error = Hash(lb, sizeof(lb));
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-    if (in != NULL)
+    if (in != nullptr)
     {
         error = Hash(in, in_len);
         VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
@@ -182,8 +182,8 @@ exit:
 CHIP_ERROR Spake2p::ComputeRoundOne(uint8_t * out, size_t * out_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-    void * MN        = NULL; // Choose M if a prover, N if a verifier
-    void * XY        = NULL; // Choose X if a prover, Y if a verifier
+    void * MN        = nullptr; // Choose M if a prover, N if a verifier
+    void * XY        = nullptr; // Choose X if a prover, Y if a verifier
 
     VerifyOrExit(state == CHIP_SPAKE2P_STATE::STARTED, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(*out_len >= point_size, error = CHIP_ERROR_INTERNAL);
@@ -201,8 +201,8 @@ CHIP_ERROR Spake2p::ComputeRoundOne(uint8_t * out, size_t * out_len)
         MN = N;
         XY = Y;
     }
-    VerifyOrExit(MN != NULL, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(XY != NULL, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(MN != nullptr, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(XY != nullptr, error = CHIP_ERROR_INTERNAL);
 
     error = PointAddMul(XY, G, xy, MN, w0);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
@@ -221,9 +221,9 @@ CHIP_ERROR Spake2p::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t *
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     uint8_t point_buffer[kMAX_Point_Length];
-    void * MN        = NULL; // Choose N if a prover, M if a verifier
-    void * XY        = NULL; // Choose Y if a prover, X if a verifier
-    uint8_t * Kcaorb = NULL; // Choose Kca if a prover, Kcb if a verifier
+    void * MN        = nullptr; // Choose N if a prover, M if a verifier
+    void * XY        = nullptr; // Choose Y if a prover, X if a verifier
+    uint8_t * Kcaorb = nullptr; // Choose Kca if a prover, Kcb if a verifier
 
     VerifyOrExit(*out_len >= hash_size, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(state == CHIP_SPAKE2P_STATE::R1, error = CHIP_ERROR_INTERNAL);
@@ -259,9 +259,8 @@ CHIP_ERROR Spake2p::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t *
         XY     = X;
         Kcaorb = Kcb;
     }
-    VerifyOrExit(MN != NULL, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(XY != NULL, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(Kcab != NULL, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(MN != nullptr, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(XY != nullptr, error = CHIP_ERROR_INTERNAL);
 
     error = PointLoad(in, in_len, XY);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
@@ -332,7 +331,7 @@ CHIP_ERROR Spake2p::GenerateKeys(void)
     error = HashFinalize(Kae);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
-    error = KDF(Ka, hash_size / 2, NULL, 0, info_keyconfirm, sizeof(info_keyconfirm), Kcab, hash_size);
+    error = KDF(Ka, hash_size / 2, nullptr, 0, info_keyconfirm, sizeof(info_keyconfirm), Kcab, hash_size);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -344,8 +343,8 @@ CHIP_ERROR Spake2p::KeyConfirm(const uint8_t * in, size_t in_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     uint8_t point_buffer[kP256_Point_Length];
-    void * XY        = NULL; // Choose X if a prover, Y if a verifier
-    uint8_t * Kcaorb = NULL; // Choose Kcb if a prover, Kca if a verifier
+    void * XY        = nullptr; // Choose X if a prover, Y if a verifier
+    uint8_t * Kcaorb = nullptr; // Choose Kcb if a prover, Kca if a verifier
 
     VerifyOrExit(state == CHIP_SPAKE2P_STATE::R2, error = CHIP_ERROR_INTERNAL);
 
@@ -359,8 +358,8 @@ CHIP_ERROR Spake2p::KeyConfirm(const uint8_t * in, size_t in_len)
         XY     = Y;
         Kcaorb = Kca;
     }
-    VerifyOrExit(XY != NULL, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(Kcaorb != NULL, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(XY != nullptr, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(Kcaorb != nullptr, error = CHIP_ERROR_INTERNAL);
 
     error = PointWrite(XY, point_buffer, point_size);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);

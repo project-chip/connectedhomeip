@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0C47BE4424885B97005E97F6 /* CHIPViewControllerBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 0C47BE4324885B97005E97F6 /* CHIPViewControllerBase.m */; };
 		0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0CA0E0CE248599BB009087B9 /* OnOffViewController.m */; };
 		991DC091247747F500C13860 /* EchoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 991DC090247747F500C13860 /* EchoViewController.m */; };
 		B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A620244E1D0600C7C0E1 /* AppDelegate.m */; };
@@ -15,10 +14,12 @@
 		B204A627244E1D0600C7C0E1 /* QRCodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A626244E1D0600C7C0E1 /* QRCodeViewController.m */; };
 		B204A62C244E1D0700C7C0E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B204A62B244E1D0700C7C0E1 /* Assets.xcassets */; };
 		B204A632244E1D0700C7C0E1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A631244E1D0700C7C0E1 /* main.m */; };
+		B232D8BA2514BD0800792CB4 /* CHIPUIViewUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = B232D8B92514BD0800792CB4 /* CHIPUIViewUtils.m */; };
+		B232D8BD2518E4AD00792CB4 /* CHIPConnectivityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B232D8BC2518E4AD00792CB4 /* CHIPConnectivityManager.m */; };
+		B243A6692513A73600E56FEA /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B243A6682513A73600E56FEA /* RootViewController.m */; };
 		B2946A4224C99D53005C87D0 /* WifiViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2946A4124C99D53005C87D0 /* WifiViewController.m */; };
 		B2946A9B24C9A7BF005C87D0 /* DefaultsUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */; };
 		B2F53AEB245B0D140010745E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B2F53AE9245B0D140010745E /* LaunchScreen.storyboard */; };
-		B2F53AEE245B0D1A0010745E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B2F53AEC245B0D190010745E /* Main.storyboard */; };
 		B2F53AEF245B0D910010745E /* CHIP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2E0D7BE245B0C59003C5B48 /* CHIP.framework */; };
 		B2F53AF0245B0D910010745E /* CHIP.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B2E0D7BE245B0C59003C5B48 /* CHIP.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -48,17 +49,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0C47BE4324885B97005E97F6 /* CHIPViewControllerBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHIPViewControllerBase.m; sourceTree = "<group>"; };
 		0CA0E0CD248599BB009087B9 /* OnOffViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OnOffViewController.h; sourceTree = "<group>"; };
 		0CA0E0CE248599BB009087B9 /* OnOffViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OnOffViewController.m; sourceTree = "<group>"; };
-		515C401824868BF0004C4DB3 /* CHIPViewControllerBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPViewControllerBase.h; sourceTree = "<group>"; };
 		991DC08F247747F500C13860 /* EchoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EchoViewController.h; sourceTree = "<group>"; };
 		991DC090247747F500C13860 /* EchoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EchoViewController.m; sourceTree = "<group>"; };
 		B204A61C244E1D0600C7C0E1 /* CHIPTool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CHIPTool.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		B204A61F244E1D0600C7C0E1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = UI/AppDelegate.h; sourceTree = "<group>"; };
-		B204A620244E1D0600C7C0E1 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = UI/AppDelegate.m; sourceTree = "<group>"; };
-		B204A622244E1D0600C7C0E1 /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SceneDelegate.h; path = UI/SceneDelegate.h; sourceTree = "<group>"; };
-		B204A623244E1D0600C7C0E1 /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SceneDelegate.m; path = UI/SceneDelegate.m; sourceTree = "<group>"; };
+		B204A61F244E1D0600C7C0E1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		B204A620244E1D0600C7C0E1 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		B204A622244E1D0600C7C0E1 /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
+		B204A623244E1D0600C7C0E1 /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
 		B204A625244E1D0600C7C0E1 /* QRCodeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QRCodeViewController.h; sourceTree = "<group>"; };
 		B204A626244E1D0600C7C0E1 /* QRCodeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QRCodeViewController.m; sourceTree = "<group>"; };
 		B204A62B244E1D0700C7C0E1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -66,13 +65,18 @@
 		B204A631244E1D0700C7C0E1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		B204A637244E1D0700C7C0E1 /* CHIPToolTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CHIPToolTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B204A63D244E1D0700C7C0E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B232D8B82514BD0800792CB4 /* CHIPUIViewUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPUIViewUtils.h; sourceTree = "<group>"; };
+		B232D8B92514BD0800792CB4 /* CHIPUIViewUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CHIPUIViewUtils.m; sourceTree = "<group>"; };
+		B232D8BB2518E4AD00792CB4 /* CHIPConnectivityManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPConnectivityManager.h; sourceTree = "<group>"; };
+		B232D8BC2518E4AD00792CB4 /* CHIPConnectivityManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CHIPConnectivityManager.m; sourceTree = "<group>"; };
+		B243A6672513A73600E56FEA /* RootViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
+		B243A6682513A73600E56FEA /* RootViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
 		B2946A4024C99D53005C87D0 /* WifiViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WifiViewController.h; sourceTree = "<group>"; };
 		B2946A4124C99D53005C87D0 /* WifiViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WifiViewController.m; sourceTree = "<group>"; };
 		B2946A9924C9A7BF005C87D0 /* DefaultsUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DefaultsUtils.h; sourceTree = "<group>"; };
 		B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DefaultsUtils.m; sourceTree = "<group>"; };
 		B2E0D7BE245B0C59003C5B48 /* CHIP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CHIP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2F53AEA245B0D140010745E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = UI/Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		B2F53AED245B0D190010745E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = UI/Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -152,22 +156,12 @@
 			isa = PBXGroup;
 			children = (
 				B204A62B244E1D0700C7C0E1 /* Assets.xcassets */,
-				B2F53AEC245B0D190010745E /* Main.storyboard */,
 				B2F53AE9245B0D140010745E /* LaunchScreen.storyboard */,
 				B204A630244E1D0700C7C0E1 /* Info.plist */,
-				515C401824868BF0004C4DB3 /* CHIPViewControllerBase.h */,
-				0C47BE4324885B97005E97F6 /* CHIPViewControllerBase.m */,
-				B204A620244E1D0600C7C0E1 /* AppDelegate.m */,
 				B204A631244E1D0700C7C0E1 /* main.m */,
-				B204A622244E1D0600C7C0E1 /* SceneDelegate.h */,
-				B204A623244E1D0600C7C0E1 /* SceneDelegate.m */,
-				B204A61F244E1D0600C7C0E1 /* AppDelegate.h */,
-				B2946A3F24C99D21005C87D0 /* Wifi */,
-				0C79937824858B3B0047A373 /* QRCode */,
-				0C79937924858B4F0047A373 /* Echo client */,
-				0CA0E0D0248599C4009087B9 /* OnOffCluster */,
-				B2946A9924C9A7BF005C87D0 /* DefaultsUtils.h */,
-				B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */,
+				B232D8C0251A0EE200792CB4 /* Framework Helpers */,
+				B232D8BF251A0EC500792CB4 /* View Controllers */,
+				B232D8BE251A0EA300792CB4 /* UI Helpers */,
 			);
 			path = CHIPTool;
 			sourceTree = "<group>";
@@ -178,6 +172,43 @@
 				B204A63D244E1D0700C7C0E1 /* Info.plist */,
 			);
 			path = CHIPToolTests;
+			sourceTree = "<group>";
+		};
+		B232D8BE251A0EA300792CB4 /* UI Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				B232D8B82514BD0800792CB4 /* CHIPUIViewUtils.h */,
+				B232D8B92514BD0800792CB4 /* CHIPUIViewUtils.m */,
+			);
+			path = "UI Helpers";
+			sourceTree = "<group>";
+		};
+		B232D8BF251A0EC500792CB4 /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				B204A61F244E1D0600C7C0E1 /* AppDelegate.h */,
+				B204A620244E1D0600C7C0E1 /* AppDelegate.m */,
+				B204A622244E1D0600C7C0E1 /* SceneDelegate.h */,
+				B204A623244E1D0600C7C0E1 /* SceneDelegate.m */,
+				B243A6672513A73600E56FEA /* RootViewController.h */,
+				B243A6682513A73600E56FEA /* RootViewController.m */,
+				B2946A3F24C99D21005C87D0 /* Wifi */,
+				0C79937824858B3B0047A373 /* QRCode */,
+				0C79937924858B4F0047A373 /* Echo client */,
+				0CA0E0D0248599C4009087B9 /* OnOffCluster */,
+			);
+			path = "View Controllers";
+			sourceTree = "<group>";
+		};
+		B232D8C0251A0EE200792CB4 /* Framework Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				B2946A9924C9A7BF005C87D0 /* DefaultsUtils.h */,
+				B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */,
+				B232D8BB2518E4AD00792CB4 /* CHIPConnectivityManager.h */,
+				B232D8BC2518E4AD00792CB4 /* CHIPConnectivityManager.m */,
+			);
+			path = "Framework Helpers";
 			sourceTree = "<group>";
 		};
 		B2946A3F24C99D21005C87D0 /* Wifi */ = {
@@ -270,7 +301,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B2F53AEE245B0D1A0010745E /* Main.storyboard in Resources */,
 				B204A62C244E1D0700C7C0E1 /* Assets.xcassets in Resources */,
 				B2F53AEB245B0D140010745E /* LaunchScreen.storyboard in Resources */,
 			);
@@ -291,13 +321,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				B204A627244E1D0600C7C0E1 /* QRCodeViewController.m in Sources */,
+				B232D8BA2514BD0800792CB4 /* CHIPUIViewUtils.m in Sources */,
 				B2946A9B24C9A7BF005C87D0 /* DefaultsUtils.m in Sources */,
 				991DC091247747F500C13860 /* EchoViewController.m in Sources */,
 				B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */,
+				B243A6692513A73600E56FEA /* RootViewController.m in Sources */,
 				B204A632244E1D0700C7C0E1 /* main.m in Sources */,
 				B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */,
 				B2946A4224C99D53005C87D0 /* WifiViewController.m in Sources */,
-				0C47BE4424885B97005E97F6 /* CHIPViewControllerBase.m in Sources */,
+				B232D8BD2518E4AD00792CB4 /* CHIPConnectivityManager.m in Sources */,
 				0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -326,14 +358,6 @@
 				B2F53AEA245B0D140010745E /* Base */,
 			);
 			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-		B2F53AEC245B0D190010745E /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				B2F53AED245B0D190010745E /* Base */,
-			);
-			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

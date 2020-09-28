@@ -122,7 +122,7 @@ void ChipSessionKey::Init(void)
     NodeId = kNodeIdNotSpecified;
     NextMsgId.Init(0);
     MaxRcvdMsgId = 0;
-    BoundCon     = NULL;
+    BoundCon     = nullptr;
     RcvFlags     = 0;
     AuthMode     = kChipAuthMode_NotSpecified;
     memset(&MsgEncKey, 0, sizeof(MsgEncKey));
@@ -228,7 +228,7 @@ CHIP_ERROR ChipFabricState::Init(GroupKeyStoreBase * groupKeyStore)
     if (State != kState_NotInitialized)
         return CHIP_ERROR_INCORRECT_STATE;
 
-    if (groupKeyStore == NULL)
+    if (groupKeyStore == nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
 #ifdef CHIP_NON_PRODUCTION_MARKER
@@ -242,7 +242,7 @@ CHIP_ERROR ChipFabricState::Init(GroupKeyStoreBase * groupKeyStore)
 
     FabricId      = kFabricIdNotSpecified;
     LocalNodeId   = 1;
-    PairingCode   = NULL;
+    PairingCode   = nullptr;
     DefaultSubnet = kChipSubnetId_PrimaryWiFi;
     PeerCount     = 0;
     NextUnencUDPMsgId.Init(GetRandU32());
@@ -260,7 +260,7 @@ CHIP_ERROR ChipFabricState::Init(GroupKeyStoreBase * groupKeyStore)
     AppKeyCache.Init();
 #endif
     memset(&PeerStates, 0, sizeof(PeerStates));
-    Delegate = NULL;
+    Delegate = nullptr;
     memset(SharedSessionsNodes, 0, sizeof(SharedSessionsNodes));
 
 #if CHIP_CONFIG_SECURITY_TEST_MODE
@@ -288,7 +288,7 @@ CHIP_ERROR ChipFabricState::Init(GroupKeyStoreBase * groupKeyStore)
 
 #endif
 
-    sessionEndCallbackList = NULL;
+    sessionEndCallbackList = nullptr;
 
     State = kState_Initialized;
 
@@ -446,7 +446,7 @@ ChipSessionKey * ChipFabricState::FindSharedSession(uint64_t terminatingNodeId, 
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /**
@@ -532,7 +532,7 @@ CHIP_ERROR ChipFabricState::AddSharedSessionEndNode(ChipSessionKey * sessionKey,
 {
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     SharedSessionEndNode * endNode     = SharedSessionsNodes;
-    SharedSessionEndNode * freeEndNode = NULL;
+    SharedSessionEndNode * freeEndNode = nullptr;
     uint8_t endNodeCount               = 0;
 
     // No need to add new shared entry record if the end node is also the terminating node.
@@ -552,7 +552,7 @@ CHIP_ERROR ChipFabricState::AddSharedSessionEndNode(ChipSessionKey * sessionKey,
                 endNodeCount++;
             }
         }
-        else if (endNode->EndNodeId == kNodeIdNotSpecified && freeEndNode == NULL)
+        else if (endNode->EndNodeId == kNodeIdNotSpecified && freeEndNode == nullptr)
         {
             freeEndNode = endNode;
         }
@@ -560,7 +560,7 @@ CHIP_ERROR ChipFabricState::AddSharedSessionEndNode(ChipSessionKey * sessionKey,
 
     // Verify that there is free entry in the list and that we don't exit maximum
     // allowed number of end nodes per single shared session.
-    VerifyOrExit(freeEndNode != NULL && endNodeCount <= CHIP_CONFIG_MAX_END_NODES_PER_SHARED_SESSION,
+    VerifyOrExit(freeEndNode != nullptr && endNodeCount <= CHIP_CONFIG_MAX_END_NODES_PER_SHARED_SESSION,
                  err = CHIP_ERROR_TOO_MANY_SHARED_SESSION_END_NODES);
 
     // Add new end node.
@@ -647,7 +647,7 @@ CHIP_ERROR ChipFabricState::SuspendSession(uint16_t keyId, uint64_t peerNodeId, 
     // Assert various requirements about the session.
     VerifyOrExit(sessionKey->IsKeySet(), err = CHIP_ERROR_KEY_NOT_FOUND);
     VerifyOrExit(!sessionKey->IsSuspended(), err = CHIP_ERROR_SESSION_KEY_SUSPENDED);
-    VerifyOrExit(sessionKey->BoundCon == NULL, err = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
+    VerifyOrExit(sessionKey->BoundCon == nullptr, err = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     VerifyOrExit(IsCertAuthMode(sessionKey->AuthMode), err = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
 
     {
@@ -760,7 +760,7 @@ CHIP_ERROR ChipFabricState::RestoreSession(uint8_t * serializedSession, uint16_t
     TLVType container;
     uint16_t keyId;
     uint64_t peerNodeId;
-    ChipSessionKey * sessionKey = NULL;
+    ChipSessionKey * sessionKey = nullptr;
     bool removeSessionOnError   = false;
 
     reader.Init(serializedSession, serializedSessionLen);
@@ -788,7 +788,7 @@ CHIP_ERROR ChipFabricState::RestoreSession(uint8_t * serializedSession, uint16_t
     {
         sessionKey->MsgEncKey.KeyId = keyId;
         sessionKey->NodeId          = peerNodeId;
-        sessionKey->BoundCon        = NULL;
+        sessionKey->BoundCon        = nullptr;
         sessionKey->ReserveCount    = 0;
         sessionKey->Flags           = 0;
     }
@@ -931,14 +931,14 @@ CHIP_ERROR ChipFabricState::GetSessionState(uint64_t remoteNodeId, uint16_t keyI
         if (encType != kChipEncryptionType_None)
             return CHIP_ERROR_WRONG_ENCRYPTION_TYPE;
 
-        if (con == NULL)
+        if (con == nullptr)
         {
             FindOrAllocPeerEntry(remoteNodeId, true, peerIndex);
-            outSessionState = ChipSessionState(NULL, kChipAuthMode_Unauthenticated, &NextUnencUDPMsgId,
+            outSessionState = ChipSessionState(nullptr, kChipAuthMode_Unauthenticated, &NextUnencUDPMsgId,
                                                &PeerStates.MaxUnencUDPMsgIdRcvd[peerIndex], &PeerStates.UnencRcvFlags[peerIndex]);
         }
         else
-            outSessionState = ChipSessionState(NULL, kChipAuthMode_Unauthenticated, &NextUnencTCPMsgId, NULL, NULL);
+            outSessionState = ChipSessionState(nullptr, kChipAuthMode_Unauthenticated, &NextUnencTCPMsgId, nullptr, nullptr);
         break;
 
     case ChipKeyId::kType_Session:
@@ -951,7 +951,7 @@ CHIP_ERROR ChipFabricState::GetSessionState(uint64_t remoteNodeId, uint16_t keyI
         if (sessionKey->MsgEncKey.EncType != encType)
             return (sessionKey->MsgEncKey.EncType == kChipEncryptionType_None) ? CHIP_ERROR_KEY_NOT_FOUND
                                                                                : CHIP_ERROR_WRONG_ENCRYPTION_TYPE;
-        if (sessionKey->BoundCon != NULL && sessionKey->BoundCon != con)
+        if (sessionKey->BoundCon != nullptr && sessionKey->BoundCon != con)
             return CHIP_ERROR_INVALID_USE_OF_SESSION_KEY;
         outSessionState = ChipSessionState(&sessionKey->MsgEncKey, sessionKey->AuthMode, &sessionKey->NextMsgId,
                                            &sessionKey->MaxRcvdMsgId, &sessionKey->RcvFlags);
@@ -971,7 +971,7 @@ CHIP_ERROR ChipFabricState::GetSessionState(uint64_t remoteNodeId, uint16_t keyI
                 ChipSessionState(applicationKey, authMode, &NextGroupKeyMsgId, &PeerStates.MaxGroupKeyMsgIdRcvd[peerIndex],
                                  &PeerStates.GroupKeyRcvFlags[peerIndex]);
         else
-            outSessionState = ChipSessionState(applicationKey, authMode, &NextGroupKeyMsgId, NULL, NULL);
+            outSessionState = ChipSessionState(applicationKey, authMode, &NextGroupKeyMsgId, nullptr, nullptr);
         break;
     }
 #endif
@@ -1002,10 +1002,8 @@ IPAddress ChipFabricState::SelectNodeAddress(uint64_t nodeId, uint16_t subnetId)
     {
         return IPAddress::MakeIPv6WellKnownMulticast(kIPv6MulticastScope_Link, kIPV6MulticastGroup_AllNodes);
     }
-    else
-    {
-        return IPAddress::MakeULA(FabricId, subnetId, ChipNodeIdToIPv6InterfaceId(nodeId));
-    }
+
+    return IPAddress::MakeULA(FabricId, subnetId, ChipNodeIdToIPv6InterfaceId(nodeId));
 }
 
 /**
@@ -1121,7 +1119,7 @@ void ChipFabricState::OnMsgCounterSyncRespTimeout(System::Layer * aSystemLayer, 
     ChipFabricState * fabricState = reinterpret_cast<ChipFabricState *>(aAppState);
     uint32_t freshWindoWidth;
 
-    VerifyOrDie(fabricState != NULL && fabricState->MessageLayer->SystemLayer == aSystemLayer);
+    VerifyOrDie(fabricState != nullptr && fabricState->MessageLayer->SystemLayer == aSystemLayer);
 
     // If message counter synchronization request was sent this period.
     if (fabricState->MsgCounterSyncStatus & fabricState->kFlag_ReqSentThisPeriod)
@@ -1345,8 +1343,8 @@ CHIP_ERROR ChipFabricState::RegisterSessionEndCallback(SessionEndCbCtxt * sessio
 
     VerifyOrExit(sessionEndCb, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    sessionEndCb->next = NULL;
-    if (sessionEndCallbackList == NULL)
+    sessionEndCb->next = nullptr;
+    if (sessionEndCallbackList == nullptr)
     {
         sessionEndCallbackList = sessionEndCb;
         ExitNow();
@@ -1386,7 +1384,7 @@ CHIP_ERROR ChipFabricState::GetPassword(uint8_t pwSrc, const char *& ps, uint16_
     switch (pwSrc)
     {
     case kPasswordSource_PairingCode:
-        if (PairingCode == NULL)
+        if (PairingCode == nullptr)
             return CHIP_ERROR_INVALID_ARGUMENT; // TODO: use proper error code
         ps    = PairingCode;
         pwLen = (uint16_t) strlen(PairingCode);
@@ -1446,7 +1444,7 @@ CHIP_ERROR ChipFabricState::CreateFabric()
     err = GroupKeyStore->StoreGroupKey(fabricSecret);
     SuccessOrExit(err);
 
-    if (Delegate != NULL)
+    if (Delegate != nullptr)
         Delegate->DidJoinFabric(this, FabricId);
 
 exit:
@@ -1468,7 +1466,7 @@ void ChipFabricState::ClearFabricState()
 
     if (oldFabricId != kFabricIdNotSpecified)
     {
-        if (Delegate != NULL)
+        if (Delegate != nullptr)
             Delegate->DidLeaveFabric(this, oldFabricId);
     }
 }
@@ -1657,7 +1655,7 @@ CHIP_ERROR ChipFabricState::JoinExistingFabric(const uint8_t * fabricState, uint
         }
     }
 
-    if (Delegate != NULL)
+    if (Delegate != nullptr)
         Delegate->DidJoinFabric(this, FabricId);
 
 exit:
@@ -1686,11 +1684,11 @@ void ChipFabricState::HandleConnectionClosed(ChipConnection * con)
 
 ChipSessionState::ChipSessionState(void)
 {
-    MsgEncKey    = NULL;
+    MsgEncKey    = nullptr;
     AuthMode     = kChipAuthMode_NotSpecified;
-    NextMsgId    = NULL;
-    MaxMsgIdRcvd = NULL;
-    RcvFlags     = NULL;
+    NextMsgId    = nullptr;
+    MaxMsgIdRcvd = nullptr;
+    RcvFlags     = nullptr;
 }
 
 ChipSessionState::ChipSessionState(ChipMsgEncryptionKey * msgEncKey, ChipAuthMode authMode,
@@ -1714,7 +1712,7 @@ uint32_t ChipSessionState::NewMessageId(void)
 
 bool ChipSessionState::MessageIdNotSynchronized(void)
 {
-    return (RcvFlags == NULL) || (((*RcvFlags) & kReceiveFlags_MessageIdSynchronized) == 0);
+    return (RcvFlags == nullptr) || (((*RcvFlags) & kReceiveFlags_MessageIdSynchronized) == 0);
 }
 
 bool ChipSessionState::IsDuplicateMessage(uint32_t msgId)
@@ -1744,7 +1742,7 @@ bool ChipSessionState::IsDuplicateMessage(uint32_t msgId)
         // This happens for unencrypted messages sent over TCP. Such messages provide no security against replay
         // attacks (since they are not encrypted) and are not subject to message reordering in the network layer
         // (since TCP eliminates such reorderings). Thus duplicate message detection is unnecessary in this case.
-        if (MsgEncKey == NULL && RcvFlags == NULL)
+        if (MsgEncKey == nullptr && RcvFlags == nullptr)
         {
             ExitNow();
         }
@@ -1752,7 +1750,7 @@ bool ChipSessionState::IsDuplicateMessage(uint32_t msgId)
         // Mark message as a duplicate and exit if it was encrypted with application group key.
         // In this case, peer's message counter synchronization can only be done by
         // ChipSecurityManager::HandleMsgCounterSyncRespMsg() function.
-        else if (MsgEncKey != NULL && ChipKeyId::IsAppGroupKey(MsgEncKey->KeyId))
+        else if (MsgEncKey != nullptr && ChipKeyId::IsAppGroupKey(MsgEncKey->KeyId))
         {
             ExitNow(isDup = true);
         }
@@ -1826,7 +1824,7 @@ bool ChipSessionState::IsDuplicateMessage(uint32_t msgId)
         else
         {
             // If the message was encrypted then assume the message is a duplicate.
-            if (MsgEncKey != NULL)
+            if (MsgEncKey != nullptr)
             {
                 ExitNow(isDup = true);
             }
@@ -1870,7 +1868,7 @@ exit:
 CHIP_ERROR ChipFabricState::FindSessionKey(uint16_t keyId, uint64_t peerNodeId, bool create, ChipSessionKey *& retRec)
 {
     ChipSessionKey * curRec  = SessionKeys;
-    ChipSessionKey * freeRec = NULL;
+    ChipSessionKey * freeRec = nullptr;
 
     if (!ChipKeyId::IsSessionKey(keyId))
         return CHIP_ERROR_WRONG_KEY_TYPE;
@@ -1882,7 +1880,7 @@ CHIP_ERROR ChipFabricState::FindSessionKey(uint16_t keyId, uint64_t peerNodeId, 
     {
         if (!curRec->IsAllocated())
         {
-            if (freeRec == NULL)
+            if (freeRec == nullptr)
                 freeRec = curRec;
         }
         else if (curRec->MsgEncKey.KeyId == keyId &&
@@ -1896,7 +1894,7 @@ CHIP_ERROR ChipFabricState::FindSessionKey(uint16_t keyId, uint64_t peerNodeId, 
     if (!create)
         return CHIP_ERROR_KEY_NOT_FOUND;
 
-    if (freeRec == NULL)
+    if (freeRec == nullptr)
         return CHIP_ERROR_TOO_MANY_KEYS;
 
     retRec = freeRec;
@@ -1976,7 +1974,7 @@ CHIP_ERROR ChipFabricState::DeriveMsgEncAppKey(uint32_t keyId, uint8_t encType, 
     keyDiversifier[sizeof(kChipMsgEncAppKeyDiversifier)] = encType;
 
     // Derive application key data.
-    err = GroupKeyStore->DeriveApplicationKey(keyId, NULL, 0, keyDiversifier, kChipMsgEncAppKeyDiversifierSize, keyData,
+    err = GroupKeyStore->DeriveApplicationKey(keyId, nullptr, 0, keyDiversifier, kChipMsgEncAppKeyDiversifierSize, keyData,
                                               sizeof(keyData), ChipEncryptionKey_AES128CTRSHA1::KeySize, appGroupGlobalId);
     SuccessOrExit(err);
 
@@ -2021,7 +2019,7 @@ bool ChipFabricState::RemoveIdleSessionKeys()
 
             // Ignore the session if it is bound to a connection. (Connection bound
             // sessions persist until their connections close).
-            if (sessionKey->BoundCon != NULL)
+            if (sessionKey->BoundCon != nullptr)
                 continue;
 
             // If the session is marked for remove-on-idle and is not currently reserved...
@@ -2091,7 +2089,8 @@ ChipMsgEncryptionKey * ChipMsgEncryptionKeyCache::FindOrAllocateKeyEntry(uint16_
             retKeyEntryIndex = i;
             break;
         }
-        else if (retKeyEntryIndex == CHIP_CONFIG_MAX_CACHED_MSG_ENC_APP_KEYS && keyEntry->KeyId == ChipKeyId::kNone)
+
+        if (retKeyEntryIndex == CHIP_CONFIG_MAX_CACHED_MSG_ENC_APP_KEYS && keyEntry->KeyId == ChipKeyId::kNone)
         {
             retKeyEntryIndex = i;
         }

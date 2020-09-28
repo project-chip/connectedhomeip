@@ -159,8 +159,8 @@ private:
 
 private:
     // Private functions:
-    BLEEndPoint(void);  // not defined
-    ~BLEEndPoint(void); // not defined
+    BLEEndPoint(void)  = delete;
+    ~BLEEndPoint(void) = delete;
 
     BLE_ERROR Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
     bool IsConnected(uint8_t state) const;
@@ -220,11 +220,11 @@ private:
 
     // Mutex lock on Tx queue. Used only in BtpEngine test build for now.
 #if CHIP_ENABLE_CHIPOBLE_TEST
-    inline void QueueTxLock() { mTxQueueMutex.Lock(); };
-    inline void QueueTxUnlock() { mTxQueueMutex.Unlock(); };
+    inline void QueueTxLock() { mTxQueueMutex.Lock(); }
+    inline void QueueTxUnlock() { mTxQueueMutex.Unlock(); }
 #else
-    inline void QueueTxLock(){};
-    inline void QueueTxUnlock(){};
+    inline void QueueTxLock() {}
+    inline void QueueTxUnlock() {}
 #endif
     void QueueTx(PacketBuffer * data, PacketType_t type);
 };

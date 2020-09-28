@@ -31,35 +31,35 @@ class RendezvousParameters
 public:
     explicit RendezvousParameters(uint32_t setupPINCode) : mSetupPINCode(setupPINCode) {}
 
-    uint32_t GetSetupPINCode() const { return mSetupPINCode; };
+    uint32_t GetSetupPINCode() const { return mSetupPINCode; }
 
-    bool HasDiscriminator() const { return mDiscriminator != 0; };
-    uint16_t GetDiscriminator() const { return mDiscriminator; };
+    bool HasDiscriminator() const { return mDiscriminator != 0; }
+    uint16_t GetDiscriminator() const { return mDiscriminator; }
     RendezvousParameters & SetDiscriminator(uint16_t discriminator)
     {
         mDiscriminator = discriminator;
         return *this;
-    };
+    }
 
-    bool HasLocalNodeId() const { return mLocalNodeId.HasValue(); };
-    const Optional<NodeId> GetLocalNodeId() const { return mLocalNodeId; };
+    bool HasLocalNodeId() const { return mLocalNodeId.HasValue(); }
+    const Optional<NodeId> GetLocalNodeId() const { return mLocalNodeId; }
     RendezvousParameters & SetLocalNodeId(NodeId nodeId)
     {
         mLocalNodeId = Optional<NodeId>::Value(nodeId);
         return *this;
-    };
+    }
 
 #if CONFIG_NETWORK_LAYER_BLE
-    bool HasBleLayer() const { return mBleLayer != nullptr; };
-    Ble::BleLayer * GetBleLayer() const { return mBleLayer; };
+    bool HasBleLayer() const { return mBleLayer != nullptr; }
+    Ble::BleLayer * GetBleLayer() const { return mBleLayer; }
     RendezvousParameters & SetBleLayer(Ble::BleLayer * value)
     {
         mBleLayer = value;
         return *this;
     }
 
-    bool HasConnectionObject() const { return mConnectionObject != 0; };
-    BLE_CONNECTION_OBJECT GetConnectionObject() const { return mConnectionObject; };
+    bool HasConnectionObject() const { return mConnectionObject != 0; }
+    BLE_CONNECTION_OBJECT GetConnectionObject() const { return mConnectionObject; }
     RendezvousParameters & SetConnectionObject(BLE_CONNECTION_OBJECT connObj)
     {
         mConnectionObject = connObj;
@@ -77,6 +77,7 @@ private:
     BLE_CONNECTION_OBJECT mConnectionObject = 0;
 #endif // CONFIG_NETWORK_LAYER_BLE
 };
+
 } // namespace chip
 
 #endif // __TRANSPORT_RENDEZVOUSPARAMETERS_H__

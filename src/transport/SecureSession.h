@@ -50,6 +50,8 @@ public:
      * @param remote_public_key  A pointer to peer's public key
      * @param salt               A pointer to the initial salt used for deriving the keys
      * @param salt_length        Length of the initial salt
+     * @param info               A pointer to the initial info
+     * @param info_length        Length of the initial info
      * @return CHIP_ERROR        The result of key derivation
      */
     CHIP_ERROR Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
@@ -64,6 +66,8 @@ public:
      * @param secret_length      Length of the shared secret
      * @param salt               A pointer to the initial salt used for deriving the keys
      * @param salt_length        Length of the initial salt
+     * @param info               A pointer to the initial info
+     * @param info_length        Length of the initial info
      * @return CHIP_ERROR        The result of key derivation
      */
     CHIP_ERROR InitFromSecret(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
@@ -76,10 +80,14 @@ public:
      * @param input Unencrypted input data
      * @param input_length Length of the input data
      * @param output Output buffer for encrypted data
-     * @param header message header structure
+     * @param header message header structure. Encryption type will be set on the header.
+     * @param payloadFlags extra flags for packet header encryption
+     * @param mac - output the resulting mac
+     *
      * @return CHIP_ERROR The result of encryption
      */
-    CHIP_ERROR Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, MessageHeader & header);
+    CHIP_ERROR Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
+                       Header::Flags payloadFlags, MessageAuthenticationCode & mac);
 
     /**
      * @brief
@@ -91,7 +99,8 @@ public:
      * @param header message header structure
      * @return CHIP_ERROR The result of decryption
      */
-    CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const MessageHeader & header);
+    CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
+                       Header::Flags payloadFlags, const MessageAuthenticationCode & mac);
 
     /**
      * @brief
@@ -113,12 +122,13 @@ private:
     bool mKeyAvailable;
     uint8_t mKey[kAES_CCM128_Key_Length];
 
-    static CHIP_ERROR GetIV(const MessageHeader & header, uint8_t * iv, size_t len);
+    static CHIP_ERROR GetIV(const PacketHeader & header, uint8_t * iv, size_t len);
 
     // Use unencrypted header as additional authenticated data (AAD) during encryption and decryption.
     // The encryption operations includes AAD when message authentication tag is generated. This tag
     // is used at the time of decryption to integrity check the received data.
-    static CHIP_ERROR GetAdditionalAuthData(const MessageHeader & header, uint8_t * aad, size_t & len);
+    static CHIP_ERROR GetAdditionalAuthData(const PacketHeader & header, const Header::Flags payloadEncodeFlags, uint8_t * aad,
+                                            size_t & len);
 };
 
 } // namespace chip

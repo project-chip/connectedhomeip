@@ -29,8 +29,6 @@
 
 #include "Base41.h"
 
-#include <iostream>
-
 using namespace std;
 
 namespace chip {

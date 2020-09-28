@@ -190,7 +190,9 @@ config("symbols_default") {
 
 config("gnu11") {
   cflags_c = [ "-std=gnu11" ]
+  cflags_objc = [ "-std=gnu11" ]
   cflags_cc = [ "-std=gnu++11" ]
+  cflags_objcc = [ "-std=gnu++11" ]
 }
 
 config("std_default") {

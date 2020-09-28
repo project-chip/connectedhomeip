@@ -49,7 +49,7 @@ bool CheckGenerator(SetupPayload payload, string expectedResult)
         expectedResult += Verhoeff10::ComputeCheckChar(expectedResult.c_str());
     }
 
-    bool same = result.compare(expectedResult) == 0;
+    bool same = result == expectedResult;
     if (!same)
     {
         printf("Actual result: %s\n", result.c_str());
@@ -374,13 +374,13 @@ void TestCheckDecimalStringValidity(nlTestSuite * inSuite, void * inContext)
     checkDigit                      = Verhoeff10::ComputeCheckChar(representationWithoutCheckDigit.c_str());
     decimalString                   = representationWithoutCheckDigit + checkDigit;
     NL_TEST_ASSERT(inSuite, checkDecimalStringValidity(decimalString, outReprensation) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, outReprensation.compare(representationWithoutCheckDigit) == 0);
+    NL_TEST_ASSERT(inSuite, outReprensation == representationWithoutCheckDigit);
 
     representationWithoutCheckDigit = "0000";
     checkDigit                      = Verhoeff10::ComputeCheckChar(representationWithoutCheckDigit.c_str());
     decimalString                   = representationWithoutCheckDigit + checkDigit;
     NL_TEST_ASSERT(inSuite, checkDecimalStringValidity(decimalString, outReprensation) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, outReprensation.compare(representationWithoutCheckDigit) == 0);
+    NL_TEST_ASSERT(inSuite, outReprensation == representationWithoutCheckDigit);
 }
 
 void TestCheckCodeLengthValidity(nlTestSuite * inSuite, void * inContext)
@@ -543,8 +543,8 @@ int TestManualSetupCode(void)
     {
         "chip-manual-code-general-Tests",
         &sTests[0],
-        NULL,
-        NULL
+        nullptr,
+        nullptr
     };
     // clang-format on
     TestContext context;

@@ -56,6 +56,7 @@ const size_t kP256_PublicKey_Length  = 65;
  */
 const size_t kMAX_Spake2p_Context_Size     = 1024;
 const size_t kMAX_Hash_SHA256_Context_Size = 256;
+const size_t kMAX_P256Keypair_Context_Size = 512;
 
 /**
  * Spake2+ parameters for P256
@@ -153,17 +154,6 @@ typedef CapacityBoundBuffer<kMax_ECDSA_Signature_Length> P256ECDSASignature;
 
 typedef CapacityBoundBuffer<kMax_ECDH_Secret_Length> P256ECDHDerivedSecret;
 
-class P256PrivateKey : public ECPKey<P256ECDSASignature>
-{
-public:
-    SupportedECPKeyTypes Type() const override { return SupportedECPKeyTypes::ECP256R1; }
-    size_t Length() const override { return kP256_PrivateKey_Length; }
-    operator uint8_t *() const override { return (uint8_t *) bytes; }
-
-private:
-    uint8_t bytes[kP256_PrivateKey_Length];
-};
-
 class P256PublicKey : public ECPKey<P256ECDSASignature>
 {
 public:
@@ -212,13 +202,33 @@ public:
     virtual const PK & Pubkey() = 0;
 };
 
+struct P256KeypairContext
+{
+    uint8_t mBytes[kMAX_P256Keypair_Context_Size];
+};
+
+typedef CapacityBoundBuffer<kP256_PublicKey_Length + kP256_PrivateKey_Length> P256SerializedKeypair;
+
 class P256Keypair : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
 {
 public:
+    P256Keypair() {}
+    ~P256Keypair();
+
     /** @brief Initialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR Initialize();
+
+    /** @brief Serialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR Serialize(P256SerializedKeypair & output);
+
+    /** @brief Deserialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR Deserialize(P256SerializedKeypair & input);
 
     /** @brief Generate a new Certificate Signing Request (CSR).
      * @param csr Newly generated CSR
@@ -252,8 +262,9 @@ public:
     const P256PublicKey & Pubkey() override { return mPublicKey; }
 
 private:
-    P256PrivateKey mPrivateKey;
     P256PublicKey mPublicKey;
+    P256KeypairContext mKeypair;
+    bool mInitialized = false;
 };
 
 /**
@@ -408,7 +419,7 @@ class Spake2p
 {
 public:
     Spake2p(size_t fe_size, size_t point_size, size_t hash_size);
-    virtual ~Spake2p(void){};
+    virtual ~Spake2p(void) {}
 
     /**
      * @brief Initialize Spake2+ with some context specific information.
@@ -529,7 +540,7 @@ public:
      *
      *  @param fe  A pointer to an initialized implementation dependant field element.
      *
-     *  @requirements The implementation must generate a random element from [0, q) where q is the curve order.
+     *  @note The implementation must generate a random element from [0, q) where q is the curve order.
      *
      *  @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
@@ -542,7 +553,7 @@ public:
      *  @param fe1  A pointer to an initialized implementation dependant field element.
      *  @param fe2  A pointer to an initialized implementation dependant field element.
      *
-     *  @requirements The result must be a field element (i.e. reduced by the curve order).
+     *  @note The result must be a field element (i.e. reduced by the curve order).
      *
      *  @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
@@ -765,31 +776,31 @@ public:
         memset(&mSpake2pContext, 0, sizeof(mSpake2pContext));
     }
 
-    virtual ~Spake2p_P256_SHA256_HKDF_HMAC(void) { FreeImpl(); }
+    ~Spake2p_P256_SHA256_HKDF_HMAC(void) override { FreeImpl(); }
 
-    CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out);
+    CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out) override;
     CHIP_ERROR MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len, const uint8_t * in,
-                         size_t in_len);
-    CHIP_ERROR FELoad(const uint8_t * in, size_t in_len, void * fe);
-    CHIP_ERROR FEWrite(const void * fe, uint8_t * out, size_t out_len);
-    CHIP_ERROR FEGenerate(void * fe);
-    CHIP_ERROR FEMul(void * fer, const void * fe1, const void * fe2);
+                         size_t in_len) override;
+    CHIP_ERROR FELoad(const uint8_t * in, size_t in_len, void * fe) override;
+    CHIP_ERROR FEWrite(const void * fe, uint8_t * out, size_t out_len) override;
+    CHIP_ERROR FEGenerate(void * fe) override;
+    CHIP_ERROR FEMul(void * fer, const void * fe1, const void * fe2) override;
 
-    CHIP_ERROR PointLoad(const uint8_t * in, size_t in_len, void * R);
-    CHIP_ERROR PointWrite(const void * R, uint8_t * out, size_t out_len);
-    CHIP_ERROR PointMul(void * R, const void * P1, const void * fe1);
-    CHIP_ERROR PointAddMul(void * R, const void * P1, const void * fe1, const void * P2, const void * fe2);
-    CHIP_ERROR PointInvert(void * R);
-    CHIP_ERROR PointCofactorMul(void * R);
-    CHIP_ERROR PointIsValid(void * R);
-    CHIP_ERROR ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len);
+    CHIP_ERROR PointLoad(const uint8_t * in, size_t in_len, void * R) override;
+    CHIP_ERROR PointWrite(const void * R, uint8_t * out, size_t out_len) override;
+    CHIP_ERROR PointMul(void * R, const void * P1, const void * fe1) override;
+    CHIP_ERROR PointAddMul(void * R, const void * P1, const void * fe1, const void * P2, const void * fe2) override;
+    CHIP_ERROR PointInvert(void * R) override;
+    CHIP_ERROR PointCofactorMul(void * R) override;
+    CHIP_ERROR PointIsValid(void * R) override;
+    CHIP_ERROR ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len) override;
 
 protected:
-    CHIP_ERROR InitImpl();
-    CHIP_ERROR Hash(const uint8_t * in, size_t in_len);
-    CHIP_ERROR HashFinalize(uint8_t * out);
+    CHIP_ERROR InitImpl() override;
+    CHIP_ERROR Hash(const uint8_t * in, size_t in_len) override;
+    CHIP_ERROR HashFinalize(uint8_t * out) override;
     CHIP_ERROR KDF(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
-                   const uint8_t * info, const size_t info_length, uint8_t * out, size_t out_length);
+                   const uint8_t * info, const size_t info_length, uint8_t * out, size_t out_length) override;
 
 private:
     /**

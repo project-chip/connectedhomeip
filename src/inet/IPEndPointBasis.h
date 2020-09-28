@@ -136,7 +136,7 @@ public:
 protected:
     void HandleDataReceived(chip::System::PacketBuffer * aBuffer);
 
-    static IPPacketInfo * GetPacketInfo(chip::System::PacketBuffer * buf);
+    static IPPacketInfo * GetPacketInfo(chip::System::PacketBuffer * aBuffer);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -176,9 +176,9 @@ protected:
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 private:
-    IPEndPointBasis(void);                    // not defined
-    IPEndPointBasis(const IPEndPointBasis &); // not defined
-    ~IPEndPointBasis(void);                   // not defined
+    IPEndPointBasis(void)                    = delete;
+    IPEndPointBasis(const IPEndPointBasis &) = delete;
+    ~IPEndPointBasis(void)                   = delete;
 };
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

@@ -114,7 +114,6 @@ void FillPrefix(char * buf, uint8_t bufLen, uint8_t chipCategory, uint8_t otLogL
     buf[prefixLen++] = ']';
     buf[prefixLen++] = ' ';
 }
-
 } // unnamed namespace
 
 namespace chip {
@@ -130,6 +129,32 @@ void __attribute__((weak)) OnLogOutput(void) {}
 
 } // namespace DeviceLayer
 } // namespace chip
+
+void GenericLog(const char * format, va_list arg)
+{
+
+#if K32W_LOG_ENABLED
+
+    char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1] = { 0 };
+    size_t prefixLen, writtenLen;
+
+    /* Prefix is composed of [Debug String][MOdule Name String] */
+    FillPrefix(formattedMsg, CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, kLogCategory_None, kLogCategory_Detail,
+               (uint8_t) kLogModule_NotSpecified);
+    prefixLen = strlen(formattedMsg);
+
+    // Append the log message.
+    writtenLen = vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen - EOL_CHARS_LEN, format, arg);
+    VerifyOrDie(writtenLen > 0);
+    memcpy(formattedMsg + prefixLen + writtenLen, EOL_CHARS, EOL_CHARS_LEN);
+
+    K32WWriteBlocking((const uint8_t *) formattedMsg, strlen(formattedMsg));
+
+    // Let the application know that a log message has been emitted.
+    DeviceLayer::OnLogOutput();
+
+#endif // K32W_LOG_ENABLED
+}
 
 namespace chip {
 namespace Logging {
@@ -147,19 +172,7 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
     if (IsCategoryEnabled(category))
     {
         {
-            char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1] = { 0 };
-            size_t prefixLen, writtenLen;
-
-            /* Prefix is composed of [Debug String][MOdule Name String] */
-            FillPrefix(formattedMsg, CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, category, OT_LOG_LEVEL_NONE, module);
-            prefixLen = strlen(formattedMsg);
-
-            // Append the log message.
-            writtenLen = vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen - EOL_CHARS_LEN, msg, v);
-            VerifyOrDie(writtenLen > 0);
-            memcpy(formattedMsg + prefixLen + writtenLen, EOL_CHARS, EOL_CHARS_LEN);
-
-            K32WWriteBlocking((const uint8_t *) formattedMsg, strlen(formattedMsg));
+            GenericLog(msg, v);
         }
     }
 
@@ -183,28 +196,7 @@ extern "C" void LwIPLog(const char * msg, ...)
     va_list v;
 
     va_start(v, msg);
-
-#if K32W_LOG_ENABLED
-    {
-        char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1];
-
-        // Append the log message.
-        size_t len = vsnprintf(formattedMsg, sizeof(formattedMsg), msg, v);
-
-        while (len > 0 && isspace(formattedMsg[len - 1]))
-        {
-            len--;
-            formattedMsg[len] = 0;
-        }
-
-        K32WWriteBlocking((const uint8_t *) formattedMsg, strlen(formattedMsg));
-    }
-
-    // Let the application know that a log message has been emitted.
-    DeviceLayer::OnLogOutput();
-
-#endif // K32W_LOG_ENABLED
-
+    GenericLog(msg, v);
     va_end(v);
 }
 
@@ -221,27 +213,7 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
     (void) aLogRegion;
 
     va_start(v, aFormat);
-
-#if K32W_LOG_ENABLED
-    char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1] = { 0 };
-    size_t prefixLen, writtenLen;
-
-    /* Prefix is composed of [Debug String][MOdule Name String] */
-    FillPrefix(formattedMsg, CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, kLogCategory_None, aLogLevel,
-               (uint8_t) kLogModule_NotSpecified);
-    prefixLen = strlen(formattedMsg);
-
-    // Append the log message.
-    writtenLen = vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen - EOL_CHARS_LEN, aFormat, v);
-    VerifyOrDie(writtenLen > 0);
-    memcpy(formattedMsg + prefixLen + writtenLen, EOL_CHARS, EOL_CHARS_LEN);
-
-    K32WWriteBlocking((const uint8_t *) formattedMsg, strlen(formattedMsg));
-
-    // Let the application know that a log message has been emitted.
-    DeviceLayer::OnLogOutput();
-#endif // K32W_LOG_ENABLED
-
+    GenericLog(aFormat, v);
     va_end(v);
 }
 

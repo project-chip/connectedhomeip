@@ -139,7 +139,7 @@ public:
 
     Error NewTimer(Timer *& aTimerPtr);
 
-    void StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * cb);
+    void StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCallback);
     void DispatchTimerCallbacks(const uint64_t kCurrentEpoch);
 
     typedef void (*TimerCompleteFunct)(Layer * aLayer, void * aAppState, Error aError);
@@ -209,8 +209,8 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // Copy and assignment NOT DEFINED
-    Layer(const Layer &);
-    Layer & operator=(const Layer &);
+    Layer(const Layer &) = delete;
+    Layer & operator=(const Layer &) = delete;
 
     friend class Timer;
 };

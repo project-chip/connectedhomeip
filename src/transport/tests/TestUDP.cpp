@@ -51,7 +51,7 @@ TestContext sContext;
 const char PAYLOAD[]        = "Hello!";
 int ReceiveHandlerCallCount = 0;
 
-void MessageReceiveHandler(MessageHeader & header, const Transport::PeerAddress & source, System::PacketBuffer * msgBuf,
+void MessageReceiveHandler(const PacketHeader & header, const Transport::PeerAddress & source, System::PacketBuffer * msgBuf,
                            nlTestSuite * inSuite)
 {
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
@@ -116,11 +116,11 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     udp.SetMessageReceiveHandler(MessageReceiveHandler, inSuite);
     ReceiveHandlerCallCount = 0;
 
-    MessageHeader header;
+    PacketHeader header;
     header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
 
     // Should be able to send a message to itself by just calling send.
-    err = udp.SendMessage(header, Transport::PeerAddress::UDP(addr), buffer);
+    err = udp.SendMessage(header, Header::Flags::None(), Transport::PeerAddress::UDP(addr), buffer);
     if (err == System::MapErrorPOSIX(EADDRNOTAVAIL))
     {
         // TODO(#2698): the underlying system does not support IPV6. This early return

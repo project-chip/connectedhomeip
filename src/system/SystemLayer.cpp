@@ -86,7 +86,7 @@ void LwIPEventHandlerDelegate::Prepend(const LwIPEventHandlerDelegate *& aDelega
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-Layer::Layer() : mLayerState(kLayerState_NotInitialized), mContext(NULL), mPlatformData(NULL)
+Layer::Layer() : mLayerState(kLayerState_NotInitialized), mContext(nullptr), mPlatformData(nullptr)
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (!sSystemEventHandlerDelegate.IsInitialized())
@@ -161,13 +161,13 @@ Error Layer::Shutdown()
     {
         Timer * lTimer = Timer::sPool.Get(*this, i);
 
-        if (lTimer != NULL)
+        if (lTimer != nullptr)
         {
             lTimer->Cancel();
         }
     }
 
-    this->mContext    = NULL;
+    this->mContext    = nullptr;
     this->mLayerState = kLayerState_NotInitialized;
 
 exit:
@@ -199,7 +199,7 @@ void Layer::SetPlatformData(void * aPlatformData)
 
 Error Layer::NewTimer(Timer *& aTimerPtr)
 {
-    Timer * lTimer = NULL;
+    Timer * lTimer = nullptr;
 
     if (this->State() != kLayerState_Initialized)
         return CHIP_SYSTEM_ERROR_UNEXPECTED_STATE;
@@ -207,7 +207,7 @@ Error Layer::NewTimer(Timer *& aTimerPtr)
     lTimer    = Timer::sPool.TryCreate(*this);
     aTimerPtr = lTimer;
 
-    if (lTimer == NULL)
+    if (lTimer == nullptr)
     {
         ChipLogError(chipSystemLayer, "Timer pool EMPTY");
         return CHIP_SYSTEM_ERROR_NO_MEMORY;
@@ -244,9 +244,9 @@ static int TimerCompare(void * p, const Cancelable * a, const Cancelable * b)
  *   @return Other Value indicating timer failed to start.
  *
  */
-void Layer::StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * cb)
+void Layer::StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCallback)
 {
-    Cancelable * ca = cb->Cancel();
+    Cancelable * ca = aCallback->Cancel();
 
     ca->mInfoScalar = Timer::GetCurrentEpoch() + aMilliseconds;
 
@@ -325,7 +325,7 @@ void Layer::CancelTimer(Layer::TimerCompleteFunct aOnComplete, void * aAppState)
     {
         Timer * lTimer = Timer::sPool.Get(*this, i);
 
-        if (lTimer != NULL && lTimer->OnComplete == aOnComplete && lTimer->AppState == aAppState)
+        if (lTimer != nullptr && lTimer->OnComplete == aOnComplete && lTimer->AppState == aAppState)
         {
             lTimer->Cancel();
             break;
@@ -507,7 +507,7 @@ Error Layer::GetClock_RealTime(uint64_t & curTime)
  *
  * This function is guaranteed to be thread-safe on any platform that employs threading.
  *
- * @param[out] curTime                  The current time, expressed as Unix time scaled to milliseconds.
+ * @param[out] curTimeMS               The current time, expressed as Unix time scaled to milliseconds.
  *
  * @retval #CHIP_SYSTEM_NO_ERROR       If the method succeeded.
  * @retval #CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED
@@ -605,7 +605,7 @@ void Layer::PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet,
     {
         Timer * lTimer = Timer::sPool.Get(*this, i);
 
-        if (lTimer != NULL)
+        if (lTimer != nullptr)
         {
             if (!Timer::IsEarlierEpoch(kCurrentEpoch, lTimer->mAwakenEpoch))
             {
@@ -689,7 +689,7 @@ void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteS
     {
         Timer * lTimer = Timer::sPool.Get(*this, i);
 
-        if (lTimer != NULL && !Timer::IsEarlierEpoch(kCurrentEpoch, lTimer->mAwakenEpoch))
+        if (lTimer != nullptr && !Timer::IsEarlierEpoch(kCurrentEpoch, lTimer->mAwakenEpoch))
         {
             lTimer->HandleComplete();
         }
@@ -986,7 +986,7 @@ namespace Layer {
  *
  *  @param[in,out] aLayer    A reference to the CHIP System Layer instance being initialized.
  *
- *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, ::Init.
+ *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, \::Init.
  *
  *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
  *      Returning non-successful status will abort initialization.
@@ -1005,7 +1005,7 @@ DLL_EXPORT Error WillInit(Layer & aLayer, void * aContext)
  *
  *  @param[in,out] aLayer    A pointer to the CHIP System Layer instance being shutdown.
  *
- *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, ::Shutdown.
+ *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, \::Shutdown.
  *
  *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for shutdown failure. Returning
  *      non-successful status will abort shutdown.
@@ -1024,9 +1024,9 @@ DLL_EXPORT Error WillShutdown(Layer & aLayer, void * aContext)
  *
  *  @param[in,out] aLayer    A reference to the CHIP System Layer instance being initialized.
  *
- *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, ::Init.
+ *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, \::Init.
  *
- *  @param[in]     anError   The overall status being returned via the CHIP System Layer ::Init method.
+ *  @param[in]     aStatus   The overall status being returned via the CHIP System Layer \::Init method.
  */
 DLL_EXPORT void DidInit(Layer & aLayer, void * aContext, Error aStatus)
 {
@@ -1041,9 +1041,9 @@ DLL_EXPORT void DidInit(Layer & aLayer, void * aContext, Error aStatus)
  *
  *  @param[in,out] aLayer    A reference to the CHIP System Layer instance being shutdown.
  *
- *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, ::Shutdown.
+ *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, \::Shutdown.
  *
- *  @param[in]     anError   The overall status being returned via the CHIP System Layer ::Shutdown method.
+ *  @param[in]     aStatus   The overall status being returned via the CHIP System Layer \::Shutdown method.
  *
  *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for shutdown failure. Returning
  *      non-successful status will abort shutdown.
@@ -1074,13 +1074,13 @@ using chip::System::LwIPEvent;
  *
  *  @param[in,out] aLayer    A pointer to the layer instance to which the event / message is being posted.
  *
- *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, ::Init.
+ *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, \::Init.
  *
  *  @param[in,out] aTarget   A pointer to the CHIP System Layer object making the post request.
  *
  *  @param[in]     aType     The type of event to post.
  *
- *  @param[in,out] anArg     The argument associated with the event to post.
+ *  @param[in,out] aArgument The argument associated with the event to post.
  *
  *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
  */
@@ -1120,9 +1120,9 @@ exit:
  *
  *  @param[in,out] aLayer    A reference to the layer instance for which events / messages are being dispatched.
  *
- *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, ::Init.
+ *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, \::Init.
  *
- *  @retval   #CHIP_SYSTEM_ERROR_BAD_ARGS          If #aLayer or #aContext is NULL.
+ *  @retval   #CHIP_SYSTEM_ERROR_BAD_ARGS          If aLayer or aContext is NULL.
  *  @retval   #CHIP_SYSTEM_ERROR_UNEXPECTED_STATE  If the state of the CHIP System Layer object is unexpected.
  *  @retval   #CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT  If an event type is unrecognized.
  *  @retval   #CHIP_SYSTEM_NO_ERROR                On success.
@@ -1168,10 +1168,10 @@ exit:
  *    This is an implementation for LwIP.
  *
  *  @param[in,out] aLayer    A reference to the layer instance for which events / messages are being dispatched.
- *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, ::Init.
- *  @param[in]     anEvent   The platform-specific event object to dispatch for handling.
+ *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, \::Init.
+ *  @param[in]     aEvent    The platform-specific event object to dispatch for handling.
  *
- *  @retval   #CHIP_SYSTEM_ERROR_BAD_ARGS          If #aLayer or the event target is NULL.
+ *  @retval   #CHIP_SYSTEM_ERROR_BAD_ARGS          If aLayer or the event target is NULL.
  *  @retval   #CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT  If the event type is unrecognized.
  *  @retval   #CHIP_SYSTEM_ERROR_UNEXPECTED_STATE  If the state of the CHIP System Layer object is unexpected.
  *  @retval   #CHIP_SYSTEM_NO_ERROR                On success.
@@ -1202,7 +1202,7 @@ exit:
  *    This is an implementation for LwIP.
  *
  *  @param[in,out] aLayer               A reference to the layer instance for which events / messages are being dispatched.
- *  @param[in,out] aContext             Platform-specific context data passed to the layer initialization method, ::Init.
+ *  @param[in,out] aContext             Platform-specific context data passed to the layer initialization method, \::Init.
  *  @param[in]     aMilliseconds        The number of milliseconds to set for the timer.
  *
  *  @retval   #CHIP_SYSTEM_NO_ERROR    Always succeeds unless overridden.

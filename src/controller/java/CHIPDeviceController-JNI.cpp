@@ -62,6 +62,7 @@ using namespace chip::DeviceController;
 
 static void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState);
 static void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
+static void HandleSimpleOperationComplete(ChipDeviceController * deviceController, void * appReqState);
 static void HandleNotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj);
 static bool HandleSendCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId,
                                      const uint8_t * characteristicData, uint32_t characteristicDataLen);
@@ -108,7 +109,6 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env;
     int pthreadErr = 0;
-    pthread_mutexattr_t stackLockAttrs;
 
     ChipLogProgress(Controller, "JNI_OnLoad() called");
 
@@ -128,13 +128,6 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     err = GetClassRef(env, "chip/devicecontroller/ChipDeviceControllerException", sChipDeviceControllerExceptionCls);
     SuccessOrExit(err);
     ChipLogProgress(Controller, "Java class references loaded.");
-
-    // Initialize the lock that will be used to protect the stack.
-    // Note that this needs to allow recursive acquisition.
-    pthread_mutexattr_init(&stackLockAttrs);
-    pthread_mutexattr_settype(&stackLockAttrs, PTHREAD_MUTEX_RECURSIVE);
-    pthreadErr = pthread_mutex_init(&sStackLock, &stackLockAttrs);
-    VerifyOrExit(pthreadErr == 0, err = System::MapErrorPOSIX(pthreadErr));
 
     // Initialize the CHIP System Layer.
     err = sSystemLayer.Init(NULL);
@@ -200,8 +193,6 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
 
     sSystemLayer.Shutdown();
     sInetLayer.Shutdown();
-
-    pthread_mutex_destroy(&sStackLock);
     sJVM = NULL;
 }
 
@@ -245,17 +236,18 @@ exit:
     return result;
 }
 
-JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong deviceControllerPtr, jint discriminator, jlong pinCode)
+JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong deviceControllerPtr, jint connObj, jlong pinCode)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
-    void * appReqState                      = (void *) "ConnectDevice";
+    void * appReqState                      = (void *) self;
     ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
 
-    ChipLogProgress(Controller, "beginConnectDevice() called with discriminator and pincode on 0x%08lX", (long) self);
+    ChipLogProgress(Controller, "beginConnectDevice() called with connection object and pincode");
 
     pthread_mutex_lock(&sStackLock);
-    sBleLayer.mAppState         = appReqState;
-    RendezvousParameters params = RendezvousParameters(pinCode).SetDiscriminator(discriminator).SetBleLayer(&sBleLayer);
+    sBleLayer.mAppState = appReqState;
+    RendezvousParameters params =
+        RendezvousParameters(pinCode).SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj)).SetBleLayer(&sBleLayer);
     err = deviceController->ConnectDevice(kRemoteDeviceId, params, appReqState, HandleKeyExchange, HandleEchoResponse, HandleError);
 
     pthread_mutex_unlock(&sStackLock);
@@ -276,7 +268,7 @@ JNI_METHOD(void, beginConnectDeviceIp)(JNIEnv * env, jobject self, jlong deviceC
     ChipLogProgress(Controller, "beginConnectDevice() called with IP Address");
 
     const char * deviceAddrStr = env->GetStringUTFChars(deviceAddr, 0);
-    chip::Inet::IPAddress::FromString(deviceAddrStr, deviceIPAddr);
+    deviceIPAddr.FromString(deviceAddrStr, deviceIPAddr);
     env->ReleaseStringUTFChars(deviceAddr, deviceAddrStr);
 
     pthread_mutex_lock(&sStackLock);
@@ -374,7 +366,11 @@ JNI_METHOD(jboolean, isConnected)(JNIEnv * env, jobject self, jlong deviceContro
 {
     ChipLogProgress(Controller, "isConnected() called");
     ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
-    return deviceController->IsConnected() ? JNI_TRUE : JNI_FALSE;
+    if (deviceController->IsConnected())
+    {
+        return JNI_TRUE;
+    }
+    return JNI_FALSE;
 }
 
 JNI_METHOD(jboolean, disconnectDevice)(JNIEnv * env, jobject self, jlong deviceControllerPtr)
@@ -415,7 +411,75 @@ JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong devic
     }
 }
 
-void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState) {}
+void HandleSimpleOperationComplete(ChipDeviceController * deviceController, void * appReqState)
+{
+    JNIEnv * env;
+    jclass deviceControllerCls;
+    jmethodID methodID;
+    char methodName[128];
+    jobject self   = (jobject) deviceController->AppState;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ChipLogProgress(Controller, "Received response to %s request", (const char *) appReqState);
+
+    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+
+    deviceControllerCls = env->GetObjectClass(self);
+    VerifyOrExit(deviceControllerCls != NULL, err = CDC_JNI_ERROR_TYPE_NOT_FOUND);
+
+    snprintf(methodName, sizeof(methodName) - 1, "on%sComplete", (const char *) appReqState);
+    methodName[sizeof(methodName) - 1] = 0;
+    methodID                           = env->GetMethodID(deviceControllerCls, methodName, "()V");
+    VerifyOrExit(methodID != NULL, err = CDC_JNI_ERROR_METHOD_NOT_FOUND);
+
+    ChipLogProgress(Controller, "Calling Java %s method", methodName);
+
+    env->ExceptionClear();
+    env->CallVoidMethod(self, methodID);
+    VerifyOrExit(!env->ExceptionCheck(), err = CDC_JNI_ERROR_EXCEPTION_THROWN);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        const char * functName = __FUNCTION__;
+
+        if (err == CDC_JNI_ERROR_EXCEPTION_THROWN)
+        {
+            ChipLogError(Controller, "Java Exception thrown in %s", functName);
+            env->ExceptionDescribe();
+        }
+        else
+        {
+            const char * errStr;
+            switch (err)
+            {
+            case CDC_JNI_ERROR_TYPE_NOT_FOUND:
+                errStr = "JNI type not found";
+                break;
+            case CDC_JNI_ERROR_METHOD_NOT_FOUND:
+                errStr = "JNI method not found";
+                break;
+            case CDC_JNI_ERROR_FIELD_NOT_FOUND:
+                errStr = "JNI field not found";
+                break;
+            default:
+                errStr = ErrorStr(err);
+                break;
+            }
+            ChipLogError(Controller, "Error in %s : %s", functName, errStr);
+        }
+    }
+    env->ExceptionClear();
+}
+
+void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState)
+{
+    JNIEnv * env;
+
+    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+
+    HandleSimpleOperationComplete(deviceController, appReqState);
+}
 
 void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload)
 {

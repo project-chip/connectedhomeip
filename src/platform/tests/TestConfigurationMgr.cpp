@@ -424,14 +424,11 @@ static const nlTest sTests[] = {
 
 int TestConfigurationMgr(void)
 {
-    nlTestSuite theSuite = { "CHIP DeviceLayer time tests", &sTests[0], NULL, NULL };
+    nlTestSuite theSuite = { "CHIP DeviceLayer time tests", &sTests[0], nullptr, nullptr };
 
     // Run test suit againt one context.
-    nlTestRunner(&theSuite, NULL);
+    nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
 
-static void __attribute__((constructor)) TestConfigurationMgrCtor(void)
-{
-    VerifyOrDie(RegisterUnitTests(&TestConfigurationMgr) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestConfigurationMgr)

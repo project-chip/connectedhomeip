@@ -24,7 +24,8 @@
 
 #include "TestCore.h"
 
-#include "core/CHIPCallback.h"
+#include <core/CHIPCallback.h>
+#include <support/TestUtils.h>
 
 #include <nlunit-test.h>
 
@@ -47,7 +48,7 @@ public:
         // always first thing: cancel to take ownership of
         //  cb members
         Enqueue(cb->Cancel());
-    };
+    }
 
     void Dispatch()
     {
@@ -234,12 +235,14 @@ int TestCHIPCallback(void)
 	{
         "CHIPCallback",
         &sTests[0],
-        NULL,
-        NULL
+        nullptr,
+        nullptr
     };
     // clang-format on
 
-    nlTestRunner(&theSuite, NULL);
+    nlTestRunner(&theSuite, nullptr);
 
     return (nlTestRunnerStats(&theSuite));
 }
+
+CHIP_REGISTER_TEST_SUITE(TestCHIPCallback)

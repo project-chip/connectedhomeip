@@ -271,7 +271,7 @@ public:
      * callback in hand, false otherwise.
      */
 
-    inline bool isEmpty(void) { return (theLength == 0 && theWriteCallback == NULL); };
+    inline bool isEmpty(void) { return (theLength == 0 && theWriteCallback == nullptr); }
 
     // packing and parsing
 
@@ -291,7 +291,7 @@ public:
         MessageIterator i(buff);
 
         return pack(i);
-    };
+    }
 
     CHIP_ERROR pack(MessageIterator & i, uint32_t maxLen = 0xFFFFFFFFUL);
 
@@ -302,7 +302,7 @@ public:
      * @return the integer length of the packed data.
      */
 
-    inline uint16_t packedLength(void) { return theLength; };
+    inline uint16_t packedLength(void) { return theLength; }
 
     /**
      * @fn CHIP_ERROR parse(System::PacketBuffer *buff, ReferencedTLVData &aTarget)
@@ -325,7 +325,7 @@ public:
         MessageIterator i(buff);
 
         return parse(i, aTarget);
-    };
+    }
 
     static CHIP_ERROR parse(MessageIterator & i, ReferencedTLVData & aTarget);
 

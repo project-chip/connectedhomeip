@@ -170,7 +170,8 @@ exit:
     return endPoint;
 }
 
-CHIP_ERROR TCPBase::SendMessage(const MessageHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgBuf)
+CHIP_ERROR TCPBase::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
+                                System::PacketBuffer * msgBuf)
 {
     // Sent buffer data format is:
     //    - packet size as a uint16_t (inludes size of header and actual data)
@@ -195,7 +196,7 @@ CHIP_ERROR TCPBase::SendMessage(const MessageHeader & header, const Transport::P
         // Length is actual data, without considering the length bytes themselves
         LittleEndian::Write16(output, msgBuf->DataLength() - kPacketSizeBytes);
 
-        err = header.Encode(output, msgBuf->DataLength(), &actualEncodedHeaderSize);
+        err = header.Encode(output, msgBuf->DataLength(), &actualEncodedHeaderSize, payloadFlags);
         SuccessOrExit(err);
 
         // header encoding has to match space that we allocated
@@ -206,24 +207,23 @@ CHIP_ERROR TCPBase::SendMessage(const MessageHeader & header, const Transport::P
     // will be established
 
     endPoint = FindActiveConnection(address);
+
     if (endPoint != nullptr)
     {
-        err    = endPoint->Send(msgBuf);
-        msgBuf = nullptr;
-        SuccessOrExit(err);
+        err = endPoint->Send(msgBuf);
     }
     else
     {
-        err    = SendAfterConnect(address, msgBuf);
-        msgBuf = nullptr;
-        SuccessOrExit(err);
+        err = SendAfterConnect(address, msgBuf);
     }
+    msgBuf = nullptr;
+    SuccessOrExit(err);
 
 exit:
-    if (msgBuf != NULL)
+    if (msgBuf != nullptr)
     {
         System::PacketBuffer::Free(msgBuf);
-        msgBuf = NULL;
+        msgBuf = nullptr;
     }
 
     return err;
@@ -325,7 +325,7 @@ CHIP_ERROR TCPBase::ProcessSingleMessageFromBufferHead(const PeerAddress & peerA
 
     size_t headerSize = 0;
 
-    MessageHeader header;
+    PacketHeader header;
     err = header.Decode(buffer->Start(), buffer->DataLength(), &headerSize);
     SuccessOrExit(err);
 
@@ -371,6 +371,12 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
             VerifyOrExit(messageData == buffer->Start(), err = CHIP_ERROR_INTERNAL);
             VerifyOrExit(buffer->DataLength() >= messageSize, err = CHIP_ERROR_INTERNAL);
 
+            // messagesize is always consumed once processed, even on error. This is done
+            // on purpose:
+            //   - we already consumed the packet size above
+            //   - there is no reason to believe that an error would not occur again on the
+            //     same parameters (errors are likely not transient)
+            //   - this guarantees data is received and progress is made.
             err = ProcessSingleMessageFromBufferHead(peerAddress, buffer, messageSize);
             buffer->ConsumeHead(messageSize);
             SuccessOrExit(err);

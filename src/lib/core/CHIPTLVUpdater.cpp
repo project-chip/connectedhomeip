@@ -57,7 +57,7 @@ CHIP_ERROR TLVUpdater::Init(uint8_t * buf, uint32_t dataLen, uint32_t maxLen)
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint32_t freeLen;
 
-    VerifyOrExit(buf != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(buf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     VerifyOrExit(maxLen >= dataLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
@@ -118,7 +118,7 @@ CHIP_ERROR TLVUpdater::Init(TLVReader & aReader, uint32_t freeLen)
     VerifyOrExit(aReader.mBufHandle == 0, err = CHIP_ERROR_NOT_IMPLEMENTED);
 
     // TLVReader should point to a non-NULL buffer
-    VerifyOrExit(buf != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(buf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // If reader is already on an element, reset it to start of element
     if (aReader.ElementType() != kTLVElementType_NotSpecified)
@@ -150,7 +150,7 @@ CHIP_ERROR TLVUpdater::Init(TLVReader & aReader, uint32_t freeLen)
 
     mUpdaterReader.ImplicitProfileId = aReader.ImplicitProfileId;
     mUpdaterReader.AppData           = aReader.AppData;
-    mUpdaterReader.GetNextBuffer     = NULL;
+    mUpdaterReader.GetNextBuffer     = nullptr;
 
     // Initialize the internal writer object
     mUpdaterWriter.mBufHandle     = 0;
@@ -164,15 +164,15 @@ CHIP_ERROR TLVUpdater::Init(TLVReader & aReader, uint32_t freeLen)
     mUpdaterWriter.SetCloseContainerReserved(false);
 
     mUpdaterWriter.ImplicitProfileId = aReader.ImplicitProfileId;
-    mUpdaterWriter.GetNewBuffer      = NULL;
-    mUpdaterWriter.FinalizeBuffer    = NULL;
+    mUpdaterWriter.GetNewBuffer      = nullptr;
+    mUpdaterWriter.FinalizeBuffer    = nullptr;
 
     // Cache element start address for internal use
     mElementStartAddr = buf + freeLen;
 
     // Clear the input reader object before returning. The user can no longer
     // use the original TLVReader object anymore.
-    aReader.Init((const uint8_t *) NULL, 0);
+    aReader.Init((const uint8_t *) nullptr, 0);
 
 exit:
     return err;

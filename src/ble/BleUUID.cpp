@@ -33,7 +33,7 @@ const ChipBleUUID CHIP_BLE_SVC_ID = { { // 0000FEAF-0000-1000-8000-00805F9B34FB
 
 bool UUIDsMatch(const ChipBleUUID * idOne, const ChipBleUUID * idTwo)
 {
-    if ((idOne == NULL) || (idTwo == NULL))
+    if ((idOne == nullptr) || (idTwo == nullptr))
     {
         return false;
     }

@@ -124,29 +124,75 @@
             {                                                                                                                      \
                 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_CLIENT), { (uint8_t *) 0x0001 }                              \
             },                                                                        /* 38 / Color Control / cluster revision*/   \
-            { 0x0003, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x616B } }, /* 39 / Color Control / current x*/          \
-            { 0x0004, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x607D } }, /* 40 / Color Control / current y*/          \
+            { 0x0000, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },    /* 39 / Color Control / current hue*/        \
+            { 0x0001, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },    /* 40 / Color Control / current saturation*/ \
+            { 0x0002, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000 } }, /* 41 / Color Control / remaining time*/     \
+            { 0x0003, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x616B } }, /* 42 / Color Control / current x*/          \
+            { 0x0004, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x607D } }, /* 43 / Color Control / current y*/          \
+            { 0x0007, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x00FA } }, /* 44 / Color Control / color temperature*/  \
+            { 0x0008, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x01 } },    /* 45 / Color Control / color mode*/         \
             {                                                                                                                      \
                 0x000F, ZCL_BITMAP8_ATTRIBUTE_TYPE, 1, (ATTRIBUTE_MASK_WRITABLE), { (uint8_t *) 0x00 }                             \
-            }, /* 41 / Color Control / color control options*/                                                                     \
+            }, /* 46 / Color Control / color control options*/                                                                     \
+            { 0x0010, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00UL } }, /* 47 / Color Control / number of primaries*/ \
+            { 0x0011, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000UL } }, /* 48 / Color Control / primary 1 x*/      \
+            { 0x0012, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000UL } }, /* 49 / Color Control / primary 1 y*/      \
+            { 0x0013, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00UL } }, /* 50 / Color Control / primary 1 intensity*/ \
+            { 0x0015, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000UL } }, /* 51 / Color Control / primary 2 x*/      \
+            { 0x0016, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000UL } }, /* 52 / Color Control / primary 2 y*/      \
+            { 0x0017, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00UL } }, /* 53 / Color Control / primary 2 intensity*/ \
+            { 0x0019, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000UL } }, /* 54 / Color Control / primary 3 x*/      \
+            { 0x001A, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000UL } }, /* 55 / Color Control / primary 3 y*/      \
+            { 0x001B, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00UL } }, /* 56 / Color Control / primary 3 intensity*/ \
+            { 0x0020, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000UL } }, /* 57 / Color Control / primary 4 x*/      \
+            { 0x0021, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000UL } }, /* 58 / Color Control / primary 4 y*/      \
+            { 0x0022, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00UL } }, /* 59 / Color Control / primary 4 intensity*/ \
+            { 0x0024, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000UL } }, /* 60 / Color Control / primary 5 x*/      \
+            { 0x0025, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000UL } }, /* 61 / Color Control / primary 5 y*/      \
+            { 0x0026, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00UL } }, /* 62 / Color Control / primary 5 intensity*/ \
+            { 0x0028, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000UL } }, /* 63 / Color Control / primary 6 x*/      \
+            { 0x0029, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000UL } }, /* 64 / Color Control / primary 6 y*/      \
+            { 0x002A, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00UL } }, /* 65 / Color Control / primary 6 intensity*/ \
+            {                                                                                                                      \
+                0x4000, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000 }                                               \
+            },                                                                     /* 66 / Color Control / enhanced current hue*/  \
+            { 0x4001, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x01 } }, /* 67 / Color Control / enhanced color mode*/   \
+            { 0x4002, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } }, /* 68 / Color Control / color loop active*/     \
+            { 0x4003, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } }, /* 69 / Color Control / color loop direction*/  \
+            { 0x4004, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0019 } }, /* 70 / Color Control / color loop time*/    \
+            {                                                                                                                      \
+                0x4005, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x2300 }                                               \
+            }, /* 71 / Color Control / color loop start enhanced hue*/                                                             \
+            {                                                                                                                      \
+                0x4006, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000 }                                               \
+            }, /* 72 / Color Control / color loop stored enhanced hue*/                                                            \
+            {                                                                                                                      \
+                0x400A, ZCL_BITMAP16_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000 }                                             \
+            }, /* 73 / Color Control / color capabilities*/                                                                        \
+            {                                                                                                                      \
+                0x400B, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000 }                                               \
+            }, /* 74 / Color Control / color temp physical min*/                                                                   \
+            {                                                                                                                      \
+                0x400C, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0xFEFF }                                               \
+            }, /* 75 / Color Control / color temp physical max*/                                                                   \
             {                                                                                                                      \
                 0x400D, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000UL }                                             \
-            }, /* 42 / Color Control / couple color temp to level min-mireds*/                                                     \
+            }, /* 76 / Color Control / couple color temp to level min-mireds*/                                                     \
             {                                                                                                                      \
                 0x4010, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_WRITABLE), { (uint8_t *) 0x0000UL }                          \
-            }, /* 43 / Color Control / start up color temperature mireds*/                                                         \
-            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 44 / Color Control / cluster revision*/   \
+            }, /* 77 / Color Control / start up color temperature mireds*/                                                         \
+            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 78 / Color Control / cluster revision*/   \
             {                                                                                                                      \
                 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (ATTRIBUTE_MASK_CLIENT), { (uint8_t *) 0x0001 }                              \
-            },                                                                          /* 45 / IAS Zone / cluster revision*/      \
-            { 0x0000, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },      /* 46 / IAS Zone / zone state*/            \
-            { 0x0001, ZCL_ENUM16_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000 } },   /* 47 / IAS Zone / zone type*/             \
-            { 0x0002, ZCL_BITMAP16_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000 } }, /* 48 / IAS Zone / zone status*/           \
+            },                                                                          /* 79 / IAS Zone / cluster revision*/      \
+            { 0x0000, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },      /* 80 / IAS Zone / zone state*/            \
+            { 0x0001, ZCL_ENUM16_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000 } },   /* 81 / IAS Zone / zone type*/             \
+            { 0x0002, ZCL_BITMAP16_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0000 } }, /* 82 / IAS Zone / zone status*/           \
             {                                                                                                                      \
                 0x0010, ZCL_IEEE_ADDRESS_ATTRIBUTE_TYPE, 8, (ATTRIBUTE_MASK_WRITABLE), { NULL }                                    \
-            },                                                                        /* 49 / IAS Zone / IAS CIE address*/         \
-            { 0x0011, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0xFF } },    /* 50 / IAS Zone / Zone ID*/                 \
-            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 51 / IAS Zone / cluster revision*/        \
+            },                                                                        /* 83 / IAS Zone / IAS CIE address*/         \
+            { 0x0011, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0xFF } },    /* 84 / IAS Zone / Zone ID*/                 \
+            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 85 / IAS Zone / cluster revision*/        \
     }
 
 // Cluster function static arrays
@@ -246,16 +292,16 @@
                 0x0300, (EmberAfAttributeMetadata *) &(generatedAttributes[38]), 1, 2, (CLUSTER_MASK_CLIENT), NULL,                \
             },                                                                                                                     \
             {                                                                                                                      \
-                0x0300, (EmberAfAttributeMetadata *) &(generatedAttributes[39]), 6,                                                \
-                11,     (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayColorControlClusterServer,        \
+                0x0300, (EmberAfAttributeMetadata *) &(generatedAttributes[39]), 40,                                               \
+                66,     (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayColorControlClusterServer,        \
             },                                                                                                                     \
             {                                                                                                                      \
-                0x0500, (EmberAfAttributeMetadata *) &(generatedAttributes[45]), 1,                                                \
+                0x0500, (EmberAfAttributeMetadata *) &(generatedAttributes[79]), 1,                                                \
                 2,      (CLUSTER_MASK_CLIENT | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayIasZoneClusterClient,             \
             },                                                                                                                     \
             {                                                                                                                      \
                 0x0500,                                                                                                            \
-                (EmberAfAttributeMetadata *) &(generatedAttributes[46]),                                                           \
+                (EmberAfAttributeMetadata *) &(generatedAttributes[80]),                                                           \
                 6,                                                                                                                 \
                 16,                                                                                                                \
                 (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION | CLUSTER_MASK_MESSAGE_SENT_FUNCTION |                           \
@@ -263,15 +309,15 @@
                 emberAfFuncArrayIasZoneClusterServer,                                                                              \
             },                                                                                                                     \
             {                                                                                                                      \
-                0x0006, (EmberAfAttributeMetadata *) &(generatedAttributes[18]), 1,                                                \
-                1,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayOnOffClusterServer,               \
+                0x0006, (EmberAfAttributeMetadata *) &(generatedAttributes[18]), 2,                                                \
+                3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayOnOffClusterServer,               \
             },                                                                                                                     \
     }
 
 // Endpoint types
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { (EmberAfCluster *) &(generatedClusters[0]), 22, 84 }, { (EmberAfCluster *) &(generatedClusters[22]), 1, 1 },             \
+        { (EmberAfCluster *) &(generatedClusters[0]), 22, 139 }, { (EmberAfCluster *) &(generatedClusters[22]), 1, 3 },            \
     }
 
 // Cluster manufacturer codes
@@ -298,7 +344,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (6)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE 85
+#define ATTRIBUTE_MAX_SIZE 142
 
 // Array of endpoints that are supported
 #define FIXED_ENDPOINT_ARRAY                                                                                                       \
@@ -557,8 +603,12 @@
         { EMBER_ZCL_REPORTING_DIRECTION_REPORTED, 1, 0x0006, 0x0000, CLUSTER_MASK_SERVER, 0x0000, { { 1, 65534, 0 } } },           \
             { EMBER_ZCL_REPORTING_DIRECTION_REPORTED, 1, 0x0008, 0x0000, CLUSTER_MASK_SERVER, 0x0000, { { 1, 65534, 0 } } },       \
             { EMBER_ZCL_REPORTING_DIRECTION_REPORTED, 1, 0x0101, 0x0000, CLUSTER_MASK_SERVER, 0x0000, { { 1, 65534, 0 } } },       \
+            { EMBER_ZCL_REPORTING_DIRECTION_REPORTED, 1, 0x0300, 0x0000, CLUSTER_MASK_SERVER, 0x0000, { { 1, 65534, 0 } } },       \
+            { EMBER_ZCL_REPORTING_DIRECTION_REPORTED, 1, 0x0300, 0x0001, CLUSTER_MASK_SERVER, 0x0000, { { 1, 65534, 0 } } },       \
             { EMBER_ZCL_REPORTING_DIRECTION_REPORTED, 1, 0x0300, 0x0003, CLUSTER_MASK_SERVER, 0x0000, { { 1, 65534, 0 } } },       \
             { EMBER_ZCL_REPORTING_DIRECTION_REPORTED, 1, 0x0300, 0x0004, CLUSTER_MASK_SERVER, 0x0000, { { 1, 65534, 0 } } },       \
+            { EMBER_ZCL_REPORTING_DIRECTION_REPORTED, 1, 0x0300, 0x0007, CLUSTER_MASK_SERVER, 0x0000, { { 1, 65534, 0 } } },       \
+            { EMBER_ZCL_REPORTING_DIRECTION_REPORTED, 2, 0x0006, 0x0000, CLUSTER_MASK_SERVER, 0x0000, { { 1, 65534, 0 } } },       \
     }
-#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (5)
+#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (9)
 #endif // SILABS_AF_ENDPOINT_CONFIG

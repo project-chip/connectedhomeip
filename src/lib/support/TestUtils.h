@@ -19,10 +19,35 @@
 #define TEST_UTILS_H_
 
 #include <core/CHIPError.h>
+#include <support/CodeUtils.h>
 
-#if __cplusplus
-extern "C" {
-#endif
+/**
+ * @def CHIP_REGISTER_TEST_SUITE(FUNCTION)
+ *
+ * @brief
+ *   Registers a unit test suite runner
+ *
+ * Adds a function of the signature int(*)() to the list of test runners which
+ * should be invoked when chip::RunRegisteredUnitTests() is called.
+ *
+ * Example:
+ *
+ * @code
+ * int MyTestSuiteRunner()
+ * {
+ *     if (!RunSomeTests())
+ *         return -1; // test failure
+ *     return 0; // test success
+ * }
+ *
+ * CHIP_REGISTER_TEST_SUITE(MyTestSuiteRunner)
+ * @endcode
+ */
+#define CHIP_REGISTER_TEST_SUITE(FUNCTION)                                                                                         \
+    static void __attribute__((constructor)) Register##FUNCTION(void)                                                              \
+    {                                                                                                                              \
+        VerifyOrDie(chip::RegisterUnitTests(&FUNCTION) == CHIP_NO_ERROR);                                                          \
+    }
 
 namespace chip {
 
@@ -33,9 +58,5 @@ CHIP_ERROR RegisterUnitTests(UnitTestTriggerFunction tests);
 int RunRegisteredUnitTests();
 
 } // namespace chip
-
-#if __cplusplus
-}
-#endif
 
 #endif /* TEST_UTILS_H_ */

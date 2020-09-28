@@ -66,7 +66,7 @@ using namespace chip::Encoding;
 ChipSecurityManager::ChipSecurityManager(void)
 {
     State        = kState_NotInitialized;
-    mSystemLayer = NULL;
+    mSystemLayer = nullptr;
 }
 
 CHIP_ERROR ChipSecurityManager::Init(ChipExchangeManager & aExchangeMgr, System::Layer & aSystemLayer)
@@ -81,17 +81,17 @@ CHIP_ERROR ChipSecurityManager::Init(ChipExchangeManager & aExchangeMgr, System:
     SessionEstablishTimeout = CHIP_CONFIG_DEFAULT_SECURITY_SESSION_ESTABLISHMENT_TIMEOUT;
     IdleSessionTimeout      = CHIP_CONFIG_DEFAULT_SECURITY_SESSION_IDLE_TIMEOUT;
     FabricState             = aExchangeMgr.FabricState;
-    OnSessionEstablished    = NULL;
-    OnSessionError          = NULL;
-    OnKeyErrorMsgRcvd       = NULL;
-    mEC                     = NULL;
-    mCon                    = NULL;
+    OnSessionEstablished    = nullptr;
+    OnSessionError          = nullptr;
+    OnKeyErrorMsgRcvd       = nullptr;
+    mEC                     = nullptr;
+    mCon                    = nullptr;
 #if CHIP_CONFIG_SECURITY_TEST_MODE
     CASEUseKnownECDHKey = false;
 #endif
-    mStartSecureSession_OnComplete = NULL;
-    mStartSecureSession_OnError    = NULL;
-    mStartSecureSession_ReqState   = NULL;
+    mStartSecureSession_OnComplete = nullptr;
+    mStartSecureSession_OnError    = nullptr;
+    mStartSecureSession_ReqState   = nullptr;
     mRequestedAuthMode             = kChipAuthMode_NotSpecified;
     mSessionKeyId                  = ChipKeyId::kNone;
     mEncType                       = kChipEncryptionType_None;
@@ -114,7 +114,7 @@ CHIP_ERROR ChipSecurityManager::Shutdown(void)
     if (State != kState_NotInitialized)
     {
         ExchangeManager->UnregisterUnsolicitedMessageHandler(kChipProtocol_Security);
-        ExchangeManager = NULL;
+        ExchangeManager = nullptr;
 
         // TODO: clean-up in-progress session establishment
 
@@ -137,8 +137,8 @@ void ChipSecurityManager::HandleUnsolicitedMessage(ExchangeContext * ec, const I
     if (profileId == kChipProtocol_Security && msgType == kMsgType_KeyError)
     {
         secMgr->HandleKeyErrorMsg(ec, msgBuf);
-        msgBuf = NULL;
-        ec     = NULL;
+        msgBuf = nullptr;
+        ec     = nullptr;
 
         ExitNow();
     }
@@ -154,16 +154,16 @@ void ChipSecurityManager::HandleUnsolicitedMessage(ExchangeContext * ec, const I
     if (!ec->HasPeerRequestedAck())
     {
         // Reject the request if it did not arrive over a connection.
-        VerifyOrExit(ec->Con != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(ec->Con != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     }
     // Reject all other message types.
     else
         ExitNow(err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
 exit:
-    if (msgBuf != NULL)
+    if (msgBuf != nullptr)
         PacketBuffer::Free(msgBuf);
-    if (ec != NULL)
+    if (ec != nullptr)
     {
         if (err != CHIP_NO_ERROR)
             SendStatusReport(err, ec);
@@ -216,15 +216,15 @@ CHIP_ERROR ChipSecurityManager::SendKeyErrorMsg(ChipMessageInfo * rcvdMsgInfo, c
                                                 ChipConnection * con, CHIP_ERROR keyErr)
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
-    ExchangeContext * ec  = NULL;
-    PacketBuffer * msgBuf = NULL;
+    ExchangeContext * ec  = nullptr;
+    PacketBuffer * msgBuf = nullptr;
     uint8_t * p;
     uint16_t keyErrCode;
 
     // Create new exchange context.
-    if (con == NULL)
+    if (con == nullptr)
     {
-        VerifyOrExit(rcvdMsgPacketInfo != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(rcvdMsgPacketInfo != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
         ec = ExchangeManager->NewContext(rcvdMsgInfo->SourceNodeId, rcvdMsgPacketInfo->SrcAddress, rcvdMsgPacketInfo->SrcPort,
                                          rcvdMsgPacketInfo->Interface, this);
     }
@@ -232,7 +232,7 @@ CHIP_ERROR ChipSecurityManager::SendKeyErrorMsg(ChipMessageInfo * rcvdMsgInfo, c
     {
         ec = ExchangeManager->NewContext(con, this);
     }
-    VerifyOrExit(ec != NULL, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     // Encode key error status code.
     switch (keyErr)
@@ -259,7 +259,7 @@ CHIP_ERROR ChipSecurityManager::SendKeyErrorMsg(ChipMessageInfo * rcvdMsgInfo, c
 
     // Allocate new buffer.
     msgBuf = PacketBuffer::New();
-    VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     // Verify that the buffer is big enough for this message.
     VerifyOrExit(msgBuf->AvailableDataLength() >= kChipKeyErrorMessageSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -284,13 +284,13 @@ CHIP_ERROR ChipSecurityManager::SendKeyErrorMsg(ChipMessageInfo * rcvdMsgInfo, c
 
     // Send key error message.
     err    = ec->SendMessage(kChipProtocol_Security, kMsgType_KeyError, msgBuf, 0);
-    msgBuf = NULL;
+    msgBuf = nullptr;
 
 exit:
-    if (msgBuf != NULL)
+    if (msgBuf != nullptr)
         PacketBuffer::Free(msgBuf);
 
-    if (ec != NULL)
+    if (ec != nullptr)
         ec->Close();
 
     return err;
@@ -323,11 +323,11 @@ void ChipSecurityManager::HandleKeyErrorMsg(ExchangeContext * ec, PacketBuffer *
 
     // Free the received message buffer so that it can be reused to initiate additional communication.
     PacketBuffer::Free(msgBuf);
-    msgBuf = NULL;
+    msgBuf = nullptr;
 
     // Close exchange context that delivered key error message.
     ec->Close();
-    ec = NULL;
+    ec = nullptr;
 
     // Decode error status code.
     switch (keyErrCode)
@@ -400,14 +400,14 @@ void ChipSecurityManager::HandleKeyErrorMsg(ExchangeContext * ec, PacketBuffer *
     // TODO: fail the current in-progress session if the key error identifies the proposed key.
 
     // Call the general key error message handler.
-    if (OnKeyErrorMsgRcvd != NULL)
+    if (OnKeyErrorMsgRcvd != nullptr)
         OnKeyErrorMsgRcvd(keyId, encType, messageId, srcNodeId, keyErr);
 
 exit:
-    if (msgBuf != NULL)
+    if (msgBuf != nullptr)
         PacketBuffer::Free(msgBuf);
 
-    if (ec != NULL)
+    if (ec != nullptr)
         ec->Close();
 
     return;
@@ -417,24 +417,24 @@ CHIP_ERROR ChipSecurityManager::NewSessionExchange(uint64_t peerNodeId, IPAddres
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (mEC != NULL)
+    if (mEC != nullptr)
     {
         mEC->Close();
-        mEC = NULL;
+        mEC = nullptr;
     }
 
     // Create a new exchange context.
     if (mCon)
     {
         mEC = ExchangeManager->NewContext(mCon, this);
-        VerifyOrExit(mEC != NULL, err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrExit(mEC != nullptr, err = CHIP_ERROR_NO_MEMORY);
     }
     else
     {
         VerifyOrExit(peerNodeId != kNodeIdNotSpecified && peerNodeId != kAnyNodeId, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         mEC = ExchangeManager->NewContext(peerNodeId, peerAddr, peerPort, INET_NULL_INTERFACEID, this);
-        VerifyOrExit(mEC != NULL, err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrExit(mEC != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
         mEC->OnAckRcvd   = RMPHandleAckRcvd;
         mEC->OnSendError = RMPHandleSendError;
@@ -453,7 +453,7 @@ CHIP_ERROR ChipSecurityManager::NewMsgCounterSyncExchange(const ChipMessageInfo 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Verify input arguments.
-    VerifyOrExit(rcvdMsgInfo != NULL && rcvdMsgPacketInfo != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(rcvdMsgInfo != nullptr && rcvdMsgPacketInfo != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Message counter synchronization protocol is only applicable for application group keys.
     VerifyOrExit(ChipKeyId::IsAppGroupKey(rcvdMsgInfo->KeyId), err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -461,7 +461,7 @@ CHIP_ERROR ChipSecurityManager::NewMsgCounterSyncExchange(const ChipMessageInfo 
     // Create new exchange context.
     ec = ExchangeManager->NewContext(rcvdMsgInfo->SourceNodeId, rcvdMsgPacketInfo->SrcAddress, rcvdMsgPacketInfo->SrcPort,
                                      rcvdMsgPacketInfo->Interface, this);
-    VerifyOrExit(ec != NULL, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     // Set encryption type and key Id.
     ec->EncryptionType = rcvdMsgInfo->EncryptionType;
@@ -490,7 +490,7 @@ CHIP_ERROR ChipSecurityManager::SendSolitaryMsgCounterSyncReq(const ChipMessageI
                                                               const IPPacketInfo * rcvdMsgPacketInfo)
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
-    ExchangeContext * ec = NULL;
+    ExchangeContext * ec = nullptr;
 
     // Create and initialize new exchange.
     err = NewMsgCounterSyncExchange(rcvdMsgInfo, rcvdMsgPacketInfo, ec);
@@ -501,7 +501,7 @@ CHIP_ERROR ChipSecurityManager::SendSolitaryMsgCounterSyncReq(const ChipMessageI
     SuccessOrExit(err);
 
 exit:
-    if (ec != NULL)
+    if (ec != nullptr)
         ec->Close();
 
     return err;
@@ -527,8 +527,8 @@ exit:
 CHIP_ERROR ChipSecurityManager::SendMsgCounterSyncResp(const ChipMessageInfo * rcvdMsgInfo, const IPPacketInfo * rcvdMsgPacketInfo)
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
-    ExchangeContext * ec  = NULL;
-    PacketBuffer * msgBuf = NULL;
+    ExchangeContext * ec  = nullptr;
+    PacketBuffer * msgBuf = nullptr;
 
     // Create and initialize new exchange.
     err = NewMsgCounterSyncExchange(rcvdMsgInfo, rcvdMsgPacketInfo, ec);
@@ -536,7 +536,7 @@ CHIP_ERROR ChipSecurityManager::SendMsgCounterSyncResp(const ChipMessageInfo * r
 
     // Allocate new buffer.
     msgBuf = PacketBuffer::New();
-    VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     // Verify that the buffer is big enough for this message.
     VerifyOrExit(msgBuf->AvailableDataLength() >= kChipMsgCounterSyncRespMsgSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -549,13 +549,13 @@ CHIP_ERROR ChipSecurityManager::SendMsgCounterSyncResp(const ChipMessageInfo * r
 
     // Send message counter synchronization response message.
     err    = ec->SendMessage(kChipProtocol_Security, kMsgType_MsgCounterSyncResp, msgBuf);
-    msgBuf = NULL;
+    msgBuf = nullptr;
 
 exit:
-    if (msgBuf != NULL)
+    if (msgBuf != nullptr)
         PacketBuffer::Free(msgBuf);
 
-    if (ec != NULL)
+    if (ec != nullptr)
         ec->Close();
 
     return err;
@@ -623,11 +623,11 @@ void ChipSecurityManager::HandleSessionComplete(void)
     Reset();
 
     // Call the general session established handler.
-    if (OnSessionEstablished != NULL)
-        OnSessionEstablished(this, con, NULL, sessionKeyId, peerNodeId, encType);
+    if (OnSessionEstablished != nullptr)
+        OnSessionEstablished(this, con, nullptr, sessionKeyId, peerNodeId, encType);
 
     // Call the user's completion function.
-    if (userOnComplete != NULL)
+    if (userOnComplete != nullptr)
         userOnComplete(this, con, reqState, sessionKeyId, peerNodeId, encType);
 
     // If the session was initiated the remote party, release the reservation that was
@@ -668,7 +668,7 @@ void ChipSecurityManager::HandleSessionError(CHIP_ERROR err, PacketBuffer * stat
         SessionErrorFunct userOnError = mStartSecureSession_OnError;
         void * reqState               = mStartSecureSession_ReqState;
         StatusReport rcvdStatusReport;
-        StatusReport * statusReportPtr = NULL;
+        StatusReport * statusReportPtr = nullptr;
 
         // If a status report was received from the peer, parse it and arrange to pass it
         // to the callbacks.
@@ -692,11 +692,11 @@ void ChipSecurityManager::HandleSessionError(CHIP_ERROR err, PacketBuffer * stat
         Reset();
 
         // Call the general session error handler.
-        if (OnSessionError != NULL)
-            OnSessionError(this, con, NULL, err, peerNodeId, statusReportPtr);
+        if (OnSessionError != nullptr)
+            OnSessionError(this, con, nullptr, err, peerNodeId, statusReportPtr);
 
         // Call the user's error handler.
-        if (userOnError != NULL)
+        if (userOnError != nullptr)
             userOnError(this, con, reqState, err, peerNodeId, statusReportPtr);
 
         // Asynchronously notify other subsystems that the security manager is now available
@@ -713,7 +713,7 @@ void ChipSecurityManager::HandleConnectionClosed(ExchangeContext * ec, ChipConne
         conErr = CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY;
 
     // Clean-up the local state and invoke the appropriate callbacks.
-    secMgr->HandleSessionError(conErr, NULL);
+    secMgr->HandleSessionError(conErr, nullptr);
 }
 
 CHIP_ERROR ChipSecurityManager::SendStatusReport(CHIP_ERROR localErr, ExchangeContext * ec)
@@ -724,9 +724,9 @@ CHIP_ERROR ChipSecurityManager::SendStatusReport(CHIP_ERROR localErr, ExchangeCo
     uint16_t sendFlags;
 
     // Verify that specified exchange isn't closed.
-    VerifyOrExit(ec != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(ec != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (ec->Con != NULL)
+    if (ec->Con != nullptr)
     {
         // Verify that underlying connection isn't closed.
         VerifyOrExit(!ec->IsConnectionClosed(), err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -824,10 +824,10 @@ exit:
 
 void ChipSecurityManager::Reset(void)
 {
-    if (mEC != NULL)
+    if (mEC != nullptr)
     {
         mEC->Abort();
-        mEC = NULL;
+        mEC = nullptr;
     }
 
     switch (State)
@@ -841,13 +841,13 @@ void ChipSecurityManager::Reset(void)
     CancelSessionTimer();
 
     State                          = kState_Idle;
-    mCon                           = NULL;
+    mCon                           = nullptr;
     mRequestedAuthMode             = kChipAuthMode_NotSpecified;
     mSessionKeyId                  = ChipKeyId::kNone;
     mEncType                       = kChipEncryptionType_None;
-    mStartSecureSession_OnComplete = NULL;
-    mStartSecureSession_OnError    = NULL;
-    mStartSecureSession_ReqState   = NULL;
+    mStartSecureSession_OnComplete = nullptr;
+    mStartSecureSession_OnError    = nullptr;
+    mStartSecureSession_ReqState   = nullptr;
 }
 
 void ChipSecurityManager::StartSessionTimer(void)
@@ -873,7 +873,7 @@ void ChipSecurityManager::HandleSessionTimeout(System::Layer * aSystemLayer, voi
     ChipSecurityManager * securityMgr = reinterpret_cast<ChipSecurityManager *>(aAppState);
     if (securityMgr)
     {
-        securityMgr->HandleSessionError(CHIP_ERROR_TIMEOUT, NULL);
+        securityMgr->HandleSessionError(CHIP_ERROR_TIMEOUT, nullptr);
     }
 }
 
@@ -929,7 +929,7 @@ void ChipSecurityManager::RMPHandleSendError(ExchangeContext * ec, CHIP_ERROR er
     ChipLogProgress(SecurityManager, "%s", __FUNCTION__);
     ChipSecurityManager * secMgr = (ChipSecurityManager *) ec->AppState;
 
-    secMgr->HandleSessionError(err, NULL);
+    secMgr->HandleSessionError(err, nullptr);
 }
 
 void ChipSecurityManager::AsyncNotifySecurityManagerAvailable()
@@ -965,19 +965,17 @@ CHIP_ERROR ChipSecurityManager::CancelSessionEstablishment(void * reqState)
         reqState == mStartSecureSession_ReqState)
     {
         // Clear the application's OnError handler to prevent a callback.
-        mStartSecureSession_OnError = NULL;
+        mStartSecureSession_OnError = nullptr;
 
         // Fail the session with a canceled error.
-        HandleSessionError(CHIP_ERROR_TRANSACTION_CANCELED, NULL);
+        HandleSessionError(CHIP_ERROR_TRANSACTION_CANCELED, nullptr);
 
         return CHIP_NO_ERROR;
     }
 
     // Otherwise, tell the caller there was no match.
-    else
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+
+    return CHIP_ERROR_INCORRECT_STATE;
 }
 
 /**
@@ -1069,7 +1067,7 @@ void ChipSecurityManager::ReleaseSessionKey(ChipSessionKey * sessionKey)
                   sessionKey->MsgEncKey.KeyId, sessionKey->NodeId, sessionKey->ReserveCount);
 
     // If the session key is subject to automatic removal and its reserve count is now zero...
-    if (sessionKey->BoundCon == NULL && sessionKey->IsKeySet() && sessionKey->ReserveCount == 0)
+    if (sessionKey->BoundCon == nullptr && sessionKey->IsKeySet() && sessionKey->ReserveCount == 0)
     {
         // If the session key is marked remove-on-idle, enable the idle session timer and mark the key as
         // recently active.  This will give it the maximum lifetime before it gets removed for inactivity.

@@ -51,18 +51,25 @@ COMPONENT_LIBRARIES         :=
 # Compilation flags specific to building CHIP
 # ==================================================
 
-# Include directories to be searched when building CHIP.
+# Include directories to be searched when building CHIP.  Make sure
+# that anything starting with $(IDF_PATH) ends up being included with
+# -isystem, not -I, so warnings in those headers don't cause the build
+# to fail.
 INCLUDES                    := $(OUTPUT_DIR)/src/include \
                                $(OUTPUT_DIR)/src/include/platform/ESP32 \
-                               $(IDF_PATH)/components/lwip/lwip/src/include \
+                               $(filter-out $(IDF_PATH)/%, $(COMPONENT_INCLUDES))
+
+SYSTEM_INCLUDES             := $(IDF_PATH)/components/lwip/lwip/src/include \
                                $(IDF_PATH)/components/freertos/include/freertos/ \
                                $(IDF_PATH)/components/mbedtls/mbedtls/include \
-                               $(COMPONENT_INCLUDES)
+                               $(filter $(IDF_PATH)/%, $(COMPONENT_INCLUDES))
+
 
 # Compiler flags for building CHIP
-CFLAGS                      += $(addprefix -I,$(INCLUDES))
-CPPFLAGS                    += $(addprefix -I,$(INCLUDES))
-CXXFLAGS                    += $(addprefix -I,$(INCLUDES))
+ALL_INCLUDES                := $(addprefix -I,$(INCLUDES)) $(addprefix -isystem,$(SYSTEM_INCLUDES))
+CFLAGS                      += $(ALL_INCLUDES)
+CPPFLAGS                    += $(ALL_INCLUDES)
+CXXFLAGS                    += $(ALL_INCLUDES)
 
 INSTALL                     := /usr/bin/install
 INSTALLFLAGS                := -C -v

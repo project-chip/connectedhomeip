@@ -150,8 +150,8 @@ void HandleBLEConnectionOpened(chip::Ble::BLEEndPoint * endPoint)
 class ServerCallback : public SecureSessionMgrCallback
 {
 public:
-    virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
-                                   System::PacketBuffer * buffer, SecureSessionMgrBase * mgr)
+    void OnMessageReceived(const PacketHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
+                           SecureSessionMgrBase * mgr) override
     {
         const size_t data_len = buffer->DataLength();
         char src_addr[PeerAddress::kMaxToStringSize];
@@ -178,7 +178,7 @@ public:
         }
     }
 
-    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
+    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override
     {
         ChipLogProgress(AppServer, "Received a new connection.");
     }

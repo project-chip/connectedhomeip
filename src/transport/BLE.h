@@ -27,8 +27,6 @@
 
 #include <ble/BleConfig.h>
 
-#if CONFIG_NETWORK_LAYER_BLE
-
 #include <utility>
 
 #include <ble/BleError.h>
@@ -61,7 +59,7 @@ class DLL_EXPORT BLE : public Base
     };
 
 public:
-    virtual ~BLE();
+    ~BLE() override;
 
     /**
      * Initialize a BLE transport to a given peripheral or a given device name.
@@ -71,7 +69,7 @@ public:
      */
     CHIP_ERROR Init(RendezvousSessionDelegate * delegate, const RendezvousParameters & params);
 
-    CHIP_ERROR SendMessage(const MessageHeader & header, const Transport::PeerAddress & address,
+    CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
                            System::PacketBuffer * msgBuf) override;
 
     bool CanSendToPeer(const Transport::PeerAddress & address) override
@@ -113,7 +111,5 @@ private:
 
 } // namespace Transport
 } // namespace chip
-
-#endif // CONFIG_NETWORK_LAYER_BLE
 
 #endif // __TRANSPORT_BLE_H__

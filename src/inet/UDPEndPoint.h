@@ -54,7 +54,7 @@ class DLL_EXPORT UDPEndPoint : public IPEndPointBasis
 
 public:
     INET_ERROR Bind(IPAddressType addrType, IPAddress addr, uint16_t port, InterfaceId intfId = INET_NULL_INTERFACEID);
-    INET_ERROR BindInterface(IPAddressType addrType, InterfaceId intf);
+    INET_ERROR BindInterface(IPAddressType addrType, InterfaceId intfId);
     InterfaceId GetBoundInterface(void);
     uint16_t GetBoundPort(void);
     INET_ERROR Listen(void);
@@ -65,9 +65,9 @@ public:
     void Free(void);
 
 private:
-    UDPEndPoint(void);                // not defined
-    UDPEndPoint(const UDPEndPoint &); // not defined
-    ~UDPEndPoint(void);               // not defined
+    UDPEndPoint(void)                = delete;
+    UDPEndPoint(const UDPEndPoint &) = delete;
+    ~UDPEndPoint(void)               = delete;
 
     static chip::System::ObjectPool<UDPEndPoint, INET_CONFIG_NUM_UDP_ENDPOINTS> sPool;
 

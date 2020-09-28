@@ -83,8 +83,8 @@ private:
     volatile int mInitialized;
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
-    Mutex(const Mutex &) /* = delete */;
-    Mutex & operator=(const Mutex &) /* = delete */;
+    Mutex(const Mutex &) = delete;
+    Mutex & operator=(const Mutex &) = delete;
 };
 
 inline Mutex::Mutex(void) {}

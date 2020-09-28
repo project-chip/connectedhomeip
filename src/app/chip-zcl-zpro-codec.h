@@ -51,17 +51,17 @@ extern "C" {
 
 /** @brief Encode an on command for on-off server into buffer including the APS frame
  */
-uint32_t encodeOnCommand(uint8_t * buffer, uint32_t buf_length, uint8_t destination_endpoint);
+uint16_t encodeOnCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
 /** @brief Encode an off command for on-off server into buffer including the APS frame
  */
 
-uint32_t encodeOffCommand(uint8_t * buffer, uint32_t buf_length, uint8_t destination_endpoint);
+uint16_t encodeOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
 /** @brief Encode a toggle command for on-off server into buffer including the APS frame
  */
 
-uint32_t encodeToggleCommand(uint8_t * buffer, uint32_t buf_length, uint8_t destination_endpoint);
+uint16_t encodeToggleCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
 /**
  * @brief Encode a Read Attributes command for the given cluster and the given
@@ -82,7 +82,7 @@ uint16_t encodeReadOnOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t d
  * @param outApsFrame Pointer to EmberApsFrame struct to read into
  * @return returns the number of bytes that were consumed to read out the EmberApsFrame. 0 means an error was encountered
  */
-uint16_t extractApsFrame(uint8_t * buffer, uint32_t buf_length, EmberApsFrame * outApsFrame);
+uint16_t extractApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * outApsFrame);
 
 /** @brief Populates msg with address of the zcl message within buffer.
  * @return Returns the length of msg buffer. Returns 0 on error e.g. if buffer is too short.
@@ -106,13 +106,35 @@ void printApsFrame(EmberApsFrame * frame);
  * @param[in] apsFrame The frame to encode.
  *
  * @return
- *   - If buffer is null, the number of bytes needed to encode.
+ *   - If buffer is null, the number of bytes needed to encode.  If this number
+ *     does not fit in a uint16_t, 0 will be returned.
  *   - If buffer is non-null but buf_length is not enough to hold the
  *     EmberApsFrame, 0.
  *   - If buffer is non-null and buf_length is large enough, the number of bytes
  *     placed in buffer.
  */
 uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame);
+
+/**
+ * Identify cluster commands
+ * */
+
+/**
+ * @brief Encode an identify query command for the identify cluster
+ * @param buffer Buffer to encode into
+ * @param buf_length Length of buffer
+ * @param destination_endpoint destination endpoint
+ * */
+uint16_t encodeIdentifyQueryCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/**
+ * @brief Encode an identify command for the identify cluster
+ * @param buffer Buffer to encode into
+ * @param buf_length Length of buffer
+ * @param destination_endpoint destination endpoint
+ * @param duration The duration for which the device will identify itself
+ * */
+uint16_t encodeIdentifyCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t duration);
 
 #ifdef __cplusplus
 }

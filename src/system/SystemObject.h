@@ -99,8 +99,8 @@ protected:
 private:
     Object(void);
     ~Object(void);
-    Object(const Object &) /* = delete */;
-    Object & operator=(const Object &) /* = delete */;
+    Object(const Object &) = delete;
+    Object & operator=(const Object &) = delete;
 
     Layer * volatile mSystemLayer; /**< Pointer to the layer object that owns this object. */
     unsigned int mRefCount;        /**< Count of remaining calls to Release before object is dead. */
@@ -211,14 +211,14 @@ inline size_t ObjectPool<T, N>::Size(void)
 template <class T, unsigned int N>
 inline T * ObjectPool<T, N>::Get(const Layer & aLayer, size_t aIndex)
 {
-    T * lReturn = NULL;
+    T * lReturn = nullptr;
 
     if (aIndex < N)
         lReturn = &reinterpret_cast<T *>(mArena.uMemory)[aIndex];
 
     (void) static_cast<Object *>(lReturn); /* In C++-11, this would be a static_assert that T inherits Object. */
 
-    return (lReturn != NULL) && lReturn->IsRetained(aLayer) ? lReturn : NULL;
+    return (lReturn != nullptr) && lReturn->IsRetained(aLayer) ? lReturn : nullptr;
 }
 
 /**
@@ -228,7 +228,7 @@ inline T * ObjectPool<T, N>::Get(const Layer & aLayer, size_t aIndex)
 template <class T, unsigned int N>
 inline T * ObjectPool<T, N>::TryCreate(Layer & aLayer)
 {
-    T * lReturn = NULL;
+    T * lReturn = nullptr;
     unsigned int lIndex;
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
     unsigned int lNumInUse = 0;
@@ -246,7 +246,7 @@ inline T * ObjectPool<T, N>::TryCreate(Layer & aLayer)
     }
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-    if (lReturn != NULL)
+    if (lReturn != nullptr)
     {
         lIndex++;
         lNumInUse = lIndex;
@@ -293,7 +293,7 @@ inline void ObjectPool<T, N>::GetNumObjectsInUse(unsigned int aStartIndex, unsig
     {
         T & lObject = reinterpret_cast<T *>(mArena.uMemory)[lIndex];
 
-        if (lObject.mSystemLayer != NULL)
+        if (lObject.mSystemLayer != nullptr)
         {
             count++;
         }

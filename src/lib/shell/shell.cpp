@@ -196,7 +196,7 @@ int Shell::TokenizeLine(char * buffer, char ** tokens, int max_tokens)
         }
     }
 
-    tokens[cursor] = 0;
+    tokens[cursor] = nullptr;
 
 exit:
     return cursor;
@@ -211,7 +211,7 @@ void Shell::TaskLoop(void * arg)
 
     theShellRoot.RegisterDefaultCommands();
 
-    while (1)
+    while (true)
     {
         streamer_printf(streamer_get(), CHIP_SHELL_PROMPT);
 

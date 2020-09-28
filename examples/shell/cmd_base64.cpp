@@ -44,7 +44,7 @@ int cmd_base64_help_iterator(shell_command_t * command, void * arg)
 
 int cmd_base64_help(int argc, char ** argv)
 {
-    theShellBase64.ForEachCommand(cmd_base64_help_iterator, NULL);
+    theShellBase64.ForEachCommand(cmd_base64_help_iterator, nullptr);
     return 0;
 }
 

@@ -97,14 +97,12 @@ int Verhoeff10::CharToVal(char ch)
 {
     if (ch >= '0' && ch <= '9')
         return ch - '0';
-    else
-        return -1;
+    return -1;
 }
 
 char Verhoeff10::ValToChar(int val)
 {
     if (val >= 0 && val <= Base)
         return '0' + val;
-    else
-        return 0;
+    return 0;
 }

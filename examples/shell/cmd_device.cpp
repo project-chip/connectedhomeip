@@ -47,7 +47,7 @@ int cmd_device_help_iterator(shell_command_t * command, void * arg)
 
 int cmd_device_help(int argc, char ** argv)
 {
-    sShellDeviceSubcommands.ForEachCommand(cmd_device_help_iterator, NULL);
+    sShellDeviceSubcommands.ForEachCommand(cmd_device_help_iterator, nullptr);
     return 0;
 }
 
@@ -167,7 +167,7 @@ static CHIP_ERROR ConfigGetDeviceCert(bool printHeader)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
-    uint8_t * certBuf = NULL;
+    uint8_t * certBuf = nullptr;
     size_t certLen;
 
     if (printHeader)
@@ -175,7 +175,7 @@ static CHIP_ERROR ConfigGetDeviceCert(bool printHeader)
         streamer_printf(sout, "DeviceCert:      ");
     }
     // Determine the length of the device certificate.
-    error = ConfigurationMgr().GetDeviceCertificate((uint8_t *) NULL, 0, certLen);
+    error = ConfigurationMgr().GetDeviceCertificate((uint8_t *) nullptr, 0, certLen);
     SuccessOrExit(error);
 
     // Fail if no certificate has been configured.
@@ -183,7 +183,7 @@ static CHIP_ERROR ConfigGetDeviceCert(bool printHeader)
 
     // Create a temporary buffer to hold the certificate.
     certBuf = (uint8_t *) MemoryAlloc(certLen);
-    VerifyOrExit(certBuf != NULL, error = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(certBuf != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
     // Read the certificate
     error = ConfigurationMgr().GetDeviceCertificate(certBuf, certLen, certLen);
@@ -192,7 +192,7 @@ static CHIP_ERROR ConfigGetDeviceCert(bool printHeader)
     streamer_print_hex(sout, const_cast<const uint8_t *>(certBuf), certLen);
 
 exit:
-    if (certBuf != NULL)
+    if (certBuf != nullptr)
     {
         MemoryFree(certBuf);
     }
@@ -203,7 +203,7 @@ static CHIP_ERROR ConfigGetDeviceCaCerts(bool printHeader)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
-    uint8_t * certBuf = NULL;
+    uint8_t * certBuf = nullptr;
     size_t certLen;
 
     if (printHeader)
@@ -211,7 +211,7 @@ static CHIP_ERROR ConfigGetDeviceCaCerts(bool printHeader)
         streamer_printf(sout, "DeviceCaCerts:   ");
     }
     // Determine the length of the device certificate.
-    error = ConfigurationMgr().GetDeviceIntermediateCACerts((uint8_t *) NULL, 0, certLen);
+    error = ConfigurationMgr().GetDeviceIntermediateCACerts((uint8_t *) nullptr, 0, certLen);
     SuccessOrExit(error);
 
     // Fail if no certificate has been configured.
@@ -219,7 +219,7 @@ static CHIP_ERROR ConfigGetDeviceCaCerts(bool printHeader)
 
     // Create a temporary buffer to hold the certificate.
     certBuf = (uint8_t *) MemoryAlloc(certLen);
-    VerifyOrExit(certBuf != NULL, error = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(certBuf != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
     // Read the certificate
     error = ConfigurationMgr().GetDeviceIntermediateCACerts(certBuf, certLen, certLen);
@@ -228,7 +228,7 @@ static CHIP_ERROR ConfigGetDeviceCaCerts(bool printHeader)
     streamer_print_hex(sout, const_cast<const uint8_t *>(certBuf), certLen);
 
 exit:
-    if (certBuf != NULL)
+    if (certBuf != nullptr)
     {
         MemoryFree(certBuf);
     }
@@ -256,7 +256,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCert(bool printHeader)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
-    uint8_t * certBuf = NULL;
+    uint8_t * certBuf = nullptr;
     size_t certLen;
 
     if (printHeader)
@@ -264,7 +264,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCert(bool printHeader)
         streamer_printf(sout, "MfrDeviceCert:   ");
     }
     // Determine the length of the device certificate.
-    error = ConfigurationMgr().GetManufacturerDeviceCertificate((uint8_t *) NULL, 0, certLen);
+    error = ConfigurationMgr().GetManufacturerDeviceCertificate((uint8_t *) nullptr, 0, certLen);
     SuccessOrExit(error);
 
     // Fail if no certificate has been configured.
@@ -272,7 +272,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCert(bool printHeader)
 
     // Create a temporary buffer to hold the certificate.
     certBuf = (uint8_t *) MemoryAlloc(certLen);
-    VerifyOrExit(certBuf != NULL, error = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(certBuf != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
     // Read the certificate
     error = ConfigurationMgr().GetManufacturerDeviceCertificate(certBuf, certLen, certLen);
@@ -281,7 +281,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCert(bool printHeader)
     streamer_print_hex(sout, const_cast<const uint8_t *>(certBuf), certLen);
 
 exit:
-    if (certBuf != NULL)
+    if (certBuf != nullptr)
     {
         MemoryFree(certBuf);
     }
@@ -292,7 +292,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCaCerts(bool printHeader)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
-    uint8_t * certBuf = NULL;
+    uint8_t * certBuf = nullptr;
     size_t certLen;
 
     if (printHeader)
@@ -300,7 +300,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCaCerts(bool printHeader)
         streamer_printf(sout, "MfgDeviceCaCerts:");
     }
     // Determine the length of the device certificate.
-    error = ConfigurationMgr().GetManufacturerDeviceIntermediateCACerts((uint8_t *) NULL, 0, certLen);
+    error = ConfigurationMgr().GetManufacturerDeviceIntermediateCACerts((uint8_t *) nullptr, 0, certLen);
     SuccessOrExit(error);
 
     // Fail if no certificate has been configured.
@@ -308,7 +308,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCaCerts(bool printHeader)
 
     // Create a temporary buffer to hold the certificate.
     certBuf = (uint8_t *) MemoryAlloc(certLen);
-    VerifyOrExit(certBuf != NULL, error = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(certBuf != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
     // Read the certificate
     error = ConfigurationMgr().GetManufacturerDeviceIntermediateCACerts(certBuf, certLen, certLen);
@@ -317,7 +317,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCaCerts(bool printHeader)
     streamer_print_hex(sout, const_cast<const uint8_t *>(certBuf), certLen);
 
 exit:
-    if (certBuf != NULL)
+    if (certBuf != nullptr)
     {
         MemoryFree(certBuf);
     }
@@ -494,6 +494,84 @@ exit:
     return error;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+int cmd_device_sta(int argc, char ** argv)
+{
+    streamer_t * sout = streamer_get();
+
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    VerifyOrExit(PlatformMgr().TryLockChipStack(), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (strcmp(argv[0], "mode") == 0)
+    {
+        const char * typeStr                      = "Unknown";
+        ConnectivityManager::WiFiStationMode mode = ConnectivityMgr().GetWiFiStationMode();
+        switch (mode)
+        {
+        case ConnectivityManager::WiFiStationMode::kWiFiStationMode_NotSupported:
+            typeStr = "NotSupported";
+            break;
+        case ConnectivityManager::WiFiStationMode::kWiFiStationMode_ApplicationControlled:
+            typeStr = "ApplicationControlled";
+            break;
+        case ConnectivityManager::WiFiStationMode::kWiFiStationMode_Disabled:
+            typeStr = "Disabled";
+            break;
+        case ConnectivityManager::WiFiStationMode::kWiFiStationMode_Enabled:
+            typeStr = "Enabled";
+            break;
+        }
+        streamer_printf(sout, "%s\r\n", typeStr);
+    }
+    else if (strcmp(argv[0], "enabled") == 0)
+    {
+        bool isState = ConnectivityMgr().IsWiFiStationEnabled();
+        streamer_printf(sout, "%s\r\n", (isState) ? "true" : "false");
+    }
+    else if (strcmp(argv[0], "provisioned") == 0)
+    {
+        bool isState = ConnectivityMgr().IsWiFiStationProvisioned();
+        streamer_printf(sout, "%s\r\n", (isState) ? "true" : "false");
+    }
+    else if (strcmp(argv[0], "clear_provision") == 0)
+    {
+        ConnectivityMgr().ClearWiFiStationProvision();
+        streamer_printf(sout, "Clear WiFi Station provision\r\n");
+    }
+    else if (strcmp(argv[0], "controlled") == 0)
+    {
+        bool isState = ConnectivityMgr().IsWiFiStationApplicationControlled();
+        streamer_printf(sout, "%s\r\n", (isState) ? "true" : "false");
+    }
+    else if (strcmp(argv[0], "connected") == 0)
+    {
+        bool isState = ConnectivityMgr().IsWiFiStationConnected();
+        streamer_printf(sout, "%s\r\n", (isState) ? "true" : "false");
+    }
+    else if (strcmp(argv[0], "reconnect_interval") == 0)
+    {
+        uint32_t interval = ConnectivityMgr().GetWiFiStationReconnectIntervalMS();
+        streamer_printf(sout, "WiFi Station Reconnect Interval (in seconds): %d\r\n", interval / 1000);
+    }
+    else if (strcmp(argv[0], "stats") == 0)
+    {
+        SuccessOrExit(error = ConnectivityMgr().GetAndLogWifiStatsCounters());
+        streamer_printf(sout, "WiFi statistics written to log\r\n");
+    }
+    else
+    {
+        ExitNow(error = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+exit:
+    PlatformMgr().UnlockChipStack();
+    return error;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 int cmd_device_thread(int argc, char ** argv)
 {
@@ -517,25 +595,25 @@ int cmd_device_thread(int argc, char ** argv)
     }
     else if (strcmp(argv[0], "role") == 0)
     {
-        const char * typeStr = u8"Unknown";
+        const char * typeStr = "Unknown";
         ConnectivityManager::ThreadDeviceType type;
         type = ConnectivityMgr().GetThreadDeviceType();
         switch (type)
         {
         case ConnectivityManager::kThreadDeviceType_NotSupported:
-            typeStr = u8"NotSupported";
+            typeStr = "NotSupported";
             break;
         case ConnectivityManager::kThreadDeviceType_Router:
-            typeStr = u8"Router";
+            typeStr = "Router";
             break;
         case ConnectivityManager::kThreadDeviceType_FullEndDevice:
-            typeStr = u8"FullEndDevice";
+            typeStr = "FullEndDevice";
             break;
         case ConnectivityManager::kThreadDeviceType_MinimalEndDevice:
-            typeStr = u8"MinimalEndDevice";
+            typeStr = "MinimalEndDevice";
             break;
         case ConnectivityManager::kThreadDeviceType_SleepyEndDevice:
-            typeStr = u8"SleepyEndDevice";
+            typeStr = "SleepyEndDevice";
             break;
         }
         streamer_printf(sout, "%d: %s\r\n", static_cast<int>(type), typeStr);
@@ -613,6 +691,9 @@ static const shell_command_t cmds_device[] = {
     { &cmd_device_config, "config", "Dump entire configuration of device. Usage: device config" },
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     { &cmd_device_thread, "thread", "Control the Thread interface. Usage: device thread <param_name>" },
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    { &cmd_device_sta, "sta", "Control the WiFi sta interface. Usage: device sta <param_name>" },
 #endif
 };
 

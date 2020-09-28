@@ -64,7 +64,7 @@ public:
     StatusReport(void);
     ~StatusReport(void);
 
-    CHIP_ERROR init(uint32_t aProtocolId, uint16_t aCode, ReferencedTLVData * aInfo = NULL);
+    CHIP_ERROR init(uint32_t aProtocolId, uint16_t aCode, ReferencedTLVData * aInfo = nullptr);
 
     /*
      * this version of the intializer is provided as a convenience in

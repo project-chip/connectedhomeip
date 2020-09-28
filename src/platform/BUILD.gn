@@ -148,6 +148,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "../include/platform/internal/GenericConnectivityManagerImpl_NoThread.h",
       "../include/platform/internal/GenericConnectivityManagerImpl_NoWiFi.h",
       "../include/platform/internal/GenericConnectivityManagerImpl_Thread.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_WiFi.h",
       "../include/platform/internal/GenericNetworkProvisioningServerImpl.h",
       "../include/platform/internal/GenericPlatformManagerImpl.h",
       "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h",
@@ -162,6 +163,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "SystemEventSupport.cpp",
       "SystemTimerSupport.cpp",
     ]
+
+    cflags = [ "-Wconversion" ]
 
     public_deps = [
       ":platform_buildconfig",

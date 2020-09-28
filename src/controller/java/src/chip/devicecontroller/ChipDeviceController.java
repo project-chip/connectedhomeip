@@ -26,7 +26,7 @@ public class ChipDeviceController {
   private static final String TAG = ChipDeviceController.class.getSimpleName();
 
   private long deviceControllerPtr;
-  private long connectionId;
+  private int connectionId;
   private BluetoothGatt bleGatt;
   private CompletionListener completionListener;
 
@@ -46,7 +46,7 @@ public class ChipDeviceController {
     return AndroidChipStack.getInstance().getCallback();
   }
 
-  public void beginConnectDeviceBle(BluetoothGatt bleServer, int discriminator, int setupPincode) {
+  public void beginConnectDeviceBle(BluetoothGatt bleServer, long setupPincode) {
     if (connectionId == 0) {
       bleGatt = bleServer;
 
@@ -58,7 +58,7 @@ public class ChipDeviceController {
       }
 
       Log.d(TAG, "Bluetooth connection added with ID: " + connectionId);
-      beginConnectDevice(deviceControllerPtr, discriminator, setupPincode);
+      beginConnectDevice(deviceControllerPtr, connectionId, setupPincode);
     } else {
       Log.e(TAG, "Bluetooth connection already in use.");
       completionListener.onError(new Exception("Bluetooth connection already in use."));
@@ -135,7 +135,7 @@ public class ChipDeviceController {
 
   private native long newDeviceController();
 
-  private native void beginConnectDevice(long deviceControllerPtr, int discrimnator, long pinCode);
+  private native void beginConnectDevice(long deviceControllerPtr, int connectionId, long pinCode);
 
   private native void beginConnectDeviceIp(long deviceControllerPtr, String ipAddress);
 

@@ -102,6 +102,19 @@
             }
         },
         {
+            "label": "Build Lighting App (Linux)",
+            "type": "shell",
+            "command": "scripts/examples/gn_build_example.sh examples/lighting-app/linux out/lighting-app",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/out/lighting-app/"
+                ]
+            }
+        },
+        {
             "label": "Build nRF5 Lock Example",
             "type": "shell",
             "command": "scripts/examples/gn_build_example.sh examples/lock-app/nrf5 out/nrf5_lock_app",
@@ -111,6 +124,19 @@
                 "fileLocation": [
                     "relative",
                     "${workspaceFolder}/out/nrf5_lock_app/"
+                ]
+            }
+        },
+        {
+            "label": "Build nRF5 Lighting Example",
+            "type": "shell",
+            "command": "scripts/examples/gn_build_example.sh examples/lighting-app/nrf5 out/nrf5_lighting_app",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/out/nrf5_lighting_app/"
                 ]
             }
         },

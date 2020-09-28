@@ -2387,6 +2387,7 @@ void halSleepCallback(bool enter, SleepModes sleepMode) {}
  */
 bool emberAfPluginIdentifyStartFeedbackCallback(uint8_t endpoint, uint16_t identifyTime)
 {
+    emberAfPrintln(EMBER_AF_PRINT_IDENTIFY_CLUSTER, "Start identify callback on endpoint %d time %d", endpoint, identifyTime);
     return false;
 }
 
@@ -2398,5 +2399,18 @@ bool emberAfPluginIdentifyStartFeedbackCallback(uint8_t endpoint, uint16_t ident
  */
 bool emberAfPluginIdentifyStopFeedbackCallback(uint8_t endpoint)
 {
+    emberAfPrintln(EMBER_AF_PRINT_IDENTIFY_CLUSTER, "Stop identify callback on endpoint %d", endpoint);
     return false;
 }
+/** @brief Activate Door Lock Callback
+ * This function is provided by the door lock server plugin.
+ *
+ * @param activate True if the lock should move to the locked position,
+ *  false if it should move to the unlocked position Ver.: always
+ *
+ * @returns true if the callback was able to activate/deactivate the Lock.
+ */
+bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate)
+{
+    return false;
+};

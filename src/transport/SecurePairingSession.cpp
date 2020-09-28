@@ -105,31 +105,36 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    MessageHeader header;
-    header.SetMessageType(msgType);
-    header.SetProtocolID(kSecurePairingProtocol);
-    header.SetSourceNodeId(mLocalNodeId);
-    header.SetEncryptionKeyID(mLocalKeyId);
+    PacketHeader packetHeader;
+    PayloadHeader payloadHeader;
 
-    size_t headerSize              = header.EncryptedHeaderSizeBytes();
+    packetHeader
+        .SetSourceNodeId(mLocalNodeId) //
+        .SetEncryptionKeyID(mLocalKeyId);
+
+    payloadHeader
+        .SetMessageType(msgType) //
+        .SetProtocolID(kSecurePairingProtocol);
+
+    size_t headerSize              = payloadHeader.EncodeSizeBytes();
     size_t actualEncodedHeaderSize = 0;
 
     VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
     msgBuf->SetStart(msgBuf->Start() - headerSize);
-    err = header.EncodeEncryptedHeader(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize);
+    err = payloadHeader.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize);
     SuccessOrExit(err);
+    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
-    headerSize              = header.EncodeSizeBytes();
+    headerSize              = packetHeader.EncodeSizeBytes();
     actualEncodedHeaderSize = 0;
 
     VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
     msgBuf->SetStart(msgBuf->Start() - headerSize);
-    err = header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize);
+    err =
+        packetHeader.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize, payloadHeader.GetEncodePacketFlags());
     SuccessOrExit(err);
-
-    // This is unexpected and means header changed while encoding
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
     err = mDelegate->SendMessage(msgBuf);
@@ -202,7 +207,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandleCompute_pA(const MessageHeader & header, System::PacketBuffer * msg)
+CHIP_ERROR SecurePairingSession::HandleCompute_pA(const PacketHeader & header, System::PacketBuffer * msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -264,7 +269,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const MessageHeader & header, System::PacketBuffer * msg)
+CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const PacketHeader & header, System::PacketBuffer * msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -328,7 +333,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandleCompute_cA(const MessageHeader & header, System::PacketBuffer * msg)
+CHIP_ERROR SecurePairingSession::HandleCompute_cA(const PacketHeader & header, System::PacketBuffer * msg)
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
     const uint8_t * hash = msg->Start();
@@ -356,33 +361,34 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandlePeerMessage(MessageHeader & header, System::PacketBuffer * msg)
+CHIP_ERROR SecurePairingSession::HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBuffer * msg)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     size_t headerSize = 0;
+    PayloadHeader payloadHeader;
 
     VerifyOrExit(msg != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = header.DecodeEncryptedHeader(msg->Start(), msg->DataLength(), &headerSize);
+    err = payloadHeader.Decode(packetHeader.GetFlags(), msg->Start(), msg->DataLength(), &headerSize);
     SuccessOrExit(err);
 
     msg->ConsumeHead(headerSize);
 
-    VerifyOrExit(header.GetProtocolID() == kSecurePairingProtocol, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
-    VerifyOrExit(header.GetMessageType() == (uint8_t) mNextExpectedMsg, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    VerifyOrExit(payloadHeader.GetProtocolID() == kSecurePairingProtocol, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    VerifyOrExit(payloadHeader.GetMessageType() == (uint8_t) mNextExpectedMsg, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    switch ((Spake2pMsgType) header.GetMessageType())
+    switch ((Spake2pMsgType) payloadHeader.GetMessageType())
     {
     case Spake2pMsgType::kSpake2pCompute_pA:
-        err = HandleCompute_pA(header, msg);
+        err = HandleCompute_pA(packetHeader, msg);
         break;
 
     case Spake2pMsgType::kSpake2pCompute_pB_cB:
-        err = HandleCompute_pB_cB(header, msg);
+        err = HandleCompute_pB_cB(packetHeader, msg);
         break;
 
     case Spake2pMsgType::kSpake2pCompute_cA:
-        err = HandleCompute_cA(header, msg);
+        err = HandleCompute_cA(packetHeader, msg);
         break;
 
     default:

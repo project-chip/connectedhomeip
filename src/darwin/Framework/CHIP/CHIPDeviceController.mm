@@ -327,7 +327,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 
 - (BOOL)sendOnCommand
 {
-    return [self sendCHIPCommand:^(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
+    return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
         // Hardcode endpoint to 1 for now
         return encodeOnCommand(buffer->Start(), bufferSize, 1);
     }];
@@ -335,7 +335,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 
 - (BOOL)sendOffCommand
 {
-    return [self sendCHIPCommand:^(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
+    return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
         // Hardcode endpoint to 1 for now
         return encodeOffCommand(buffer->Start(), bufferSize, 1);
     }];
@@ -343,7 +343,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 
 - (BOOL)sendToggleCommand
 {
-    return [self sendCHIPCommand:^(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
+    return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
         // Hardcode endpoint to 1 for now
         return encodeToggleCommand(buffer->Start(), bufferSize, 1);
     }];

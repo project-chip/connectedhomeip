@@ -217,10 +217,8 @@ err_t sys_thread_finish(sys_thread_t t)
         finish_thread(t);
         return ERR_OK;
     }
-    else
-    {
-        return ERR_VAL;
-    }
+
+    return ERR_VAL;
 }
 /*-----------------------------------------------------------------------------------*/
 err_t sys_mbox_new_extra(void * pool, struct sys_mbox ** mb, int size)
@@ -490,24 +488,22 @@ static u32_t cond_wait(pthread_cond_t * cond, pthread_mutex_t * mutex, u32_t tim
         {
             return SYS_ARCH_TIMEOUT;
         }
-        else
-        {
-            /* Calculate for how long we waited for the cond. */
-            gettimeofday(&rtime2, NULL);
-            tdiff = (rtime2.tv_sec - rtime1.tv_sec) * 1000 + (rtime2.tv_usec - rtime1.tv_usec) / 1000;
 
-            if (tdiff <= 0)
-            {
-                return 0;
-            }
-            return (u32_t) tdiff;
+        /* Calculate for how long we waited for the cond. */
+        gettimeofday(&rtime2, NULL);
+        tdiff = (rtime2.tv_sec - rtime1.tv_sec) * 1000 + (rtime2.tv_usec - rtime1.tv_usec) / 1000;
+
+        if (tdiff <= 0)
+        {
+            return 0;
         }
+
+        return (u32_t) tdiff;
     }
-    else
-    {
-        pthread_cond_wait(cond, mutex);
-        return 0;
-    }
+
+    pthread_cond_wait(cond, mutex);
+
+    return 0;
 }
 /*-----------------------------------------------------------------------------------*/
 u32_t sys_arch_sem_wait(struct sys_sem ** s, u32_t timeout)

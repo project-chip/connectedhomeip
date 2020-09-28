@@ -152,7 +152,7 @@ public:
     void PrintLongUsage(OptionSet * optSets[], FILE * s);
     void PrintVersion(FILE * s);
 
-    virtual bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg);
+    bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg) override;
 };
 
 } // namespace ArgParser

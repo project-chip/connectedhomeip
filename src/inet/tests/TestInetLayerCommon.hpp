@@ -163,7 +163,7 @@ extern void HandleUDPMessageReceived(const Inet::IPEndPointBasis * aEndPoint, co
 extern void HandleUDPReceiveError(const Inet::IPEndPointBasis * aEndPoint, const INET_ERROR & aError,
                                   const Inet::IPPacketInfo * aPacketInfo);
 
-}; // namespace Common
+} // namespace Common
 
 // Period send function to be implemented by individual tests but
 // referenced by common code.

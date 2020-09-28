@@ -92,49 +92,49 @@ public:
 
 public:
     // Public functions:
-    BtpEngine(void){};
-    ~BtpEngine(void){};
+    BtpEngine(void) {}
+    ~BtpEngine(void) {}
 
     BLE_ERROR Init(void * an_app_state, bool expect_first_ack);
 
-    inline void SetTxFragmentSize(uint8_t size) { mTxFragmentSize = size; };
-    inline void SetRxFragmentSize(uint8_t size) { mRxFragmentSize = size; };
+    inline void SetTxFragmentSize(uint8_t size) { mTxFragmentSize = size; }
+    inline void SetRxFragmentSize(uint8_t size) { mRxFragmentSize = size; }
 
-    uint16_t GetRxFragmentSize(void) { return mRxFragmentSize; };
-    uint16_t GetTxFragmentSize(void) { return mTxFragmentSize; };
+    uint16_t GetRxFragmentSize(void) { return mRxFragmentSize; }
+    uint16_t GetTxFragmentSize(void) { return mTxFragmentSize; }
 
     SequenceNumber_t GetAndIncrementNextTxSeqNum(void);
     SequenceNumber_t GetAndRecordRxAckSeqNum(void);
 
-    inline SequenceNumber_t GetLastReceivedSequenceNumber(void) { return mRxNewestUnackedSeqNum; };
-    inline SequenceNumber_t GetNewestUnackedSentSequenceNumber(void) { return mTxNewestUnackedSeqNum; };
+    inline SequenceNumber_t GetLastReceivedSequenceNumber(void) { return mRxNewestUnackedSeqNum; }
+    inline SequenceNumber_t GetNewestUnackedSentSequenceNumber(void) { return mTxNewestUnackedSeqNum; }
 
-    inline bool ExpectingAck(void) const { return mExpectingAck; };
+    inline bool ExpectingAck(void) const { return mExpectingAck; }
 
     inline State_t RxState(void) { return mRxState; }
     inline State_t TxState(void) { return mTxState; }
 #if CHIP_ENABLE_CHIPOBLE_TEST
-    inline PacketType_t SetTxPacketType(PacketType_t type) { return (mTxPacketType = type); };
-    inline PacketType_t SetRxPacketType(PacketType_t type) { return (mRxPacketType = type); };
-    inline PacketType_t TxPacketType() { return mTxPacketType; };
-    inline PacketType_t RxPacketType() { return mRxPacketType; };
-    inline SequenceNumber_t SetTxPacketSeq(SequenceNumber_t seq) { return (mTxPacketSeq = seq); };
-    inline SequenceNumber_t SetRxPacketSeq(SequenceNumber_t seq) { return (mRxPacketSeq = seq); };
-    inline SequenceNumber_t TxPacketSeq() { return mTxPacketSeq; };
-    inline SequenceNumber_t RxPacketSeq() { return mRxPacketSeq; };
+    inline PacketType_t SetTxPacketType(PacketType_t type) { return (mTxPacketType = type); }
+    inline PacketType_t SetRxPacketType(PacketType_t type) { return (mRxPacketType = type); }
+    inline PacketType_t TxPacketType() { return mTxPacketType; }
+    inline PacketType_t RxPacketType() { return mRxPacketType; }
+    inline SequenceNumber_t SetTxPacketSeq(SequenceNumber_t seq) { return (mTxPacketSeq = seq); }
+    inline SequenceNumber_t SetRxPacketSeq(SequenceNumber_t seq) { return (mRxPacketSeq = seq); }
+    inline SequenceNumber_t TxPacketSeq() { return mTxPacketSeq; }
+    inline SequenceNumber_t RxPacketSeq() { return mRxPacketSeq; }
     inline bool IsCommandPacket(PacketBuffer * p) { return GetFlag(*(p->Start()), kHeaderFlag_CommandMessage); }
     inline void PushPacketTag(PacketBuffer * p, PacketType_t type)
     {
         p->SetStart(p->Start() - sizeof(type));
         memcpy(p->Start(), &type, sizeof(type));
-    };
+    }
     inline PacketType_t PopPacketTag(PacketBuffer * p)
     {
         PacketType_t type;
         memcpy(&type, p->Start(), sizeof(type));
         p->SetStart(p->Start() + sizeof(type));
         return type;
-    };
+    }
 #endif // CHIP_ENABLE_CHIPOBLE_TEST
 
     bool HasUnackedData(void) const;

@@ -28,6 +28,8 @@
 #include <platform/internal/BLEManager.h>
 #include <support/CodeUtils.h>
 
+#include <type_traits>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include "CHIPBluezHelper.h"
@@ -63,7 +65,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags       = kFlag_AdvertisingEnabled;
-    mAppState    = NULL;
+    mAppState    = nullptr;
 
     memset(mDeviceName, 0, sizeof(mDeviceName));
 
@@ -139,7 +141,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
     {
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
-    if (deviceName != NULL && deviceName[0] != 0)
+    if (deviceName != nullptr && deviceName[0] != 0)
     {
         if (strlen(deviceName) >= kMaxDeviceNameLength)
         {
@@ -178,7 +180,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aNodeId, bool aIsCentral)
     mBLEAdvConfig.mType             = ChipAdvType::BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE;
     mBLEAdvConfig.mpAdvertisingUUID = "0xFEAF";
 
-    mpBleAddr  = NULL;
+    mpBleAddr  = nullptr;
     mIsCentral = aIsCentral;
 
     return err;
@@ -315,7 +317,7 @@ exit:
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
     BluezConnection * con = static_cast<BluezConnection *>(conId);
-    return (con != NULL) ? con->mMtu : 0;
+    return (con != nullptr) ? con->mMtu : 0;
 }
 
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
@@ -372,14 +374,17 @@ void BLEManagerImpl::CHIPoBluez_NewConnection(void * data)
 void BLEManagerImpl::HandleRXCharWrite(void * data, const uint8_t * value, size_t len)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
-    PacketBuffer * buf = NULL;
+    PacketBuffer * buf = nullptr;
 
     // Copy the data to a PacketBuffer.
     buf = PacketBuffer::New();
-    VerifyOrExit(buf != NULL, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(buf != nullptr, err = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(buf->AvailableDataLength() >= len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf->Start(), value, len);
-    buf->SetDataLength(len);
+    static_assert(std::is_same<decltype(buf->AvailableDataLength()), uint16_t>::value,
+                  "Unexpected available data length type; fix the casting below");
+    // Cast is safe, since we just verified that "len" fits in uint16_t.
+    buf->SetDataLength(static_cast<uint16_t>(len));
 
     // Post an event to the Chip queue to deliver the data into the Chip stack.
     {
@@ -389,7 +394,7 @@ void BLEManagerImpl::HandleRXCharWrite(void * data, const uint8_t * value, size_
         event.CHIPoBLEWriteReceived.ConId = data;
         event.CHIPoBLEWriteReceived.Data  = buf;
         PlatformMgr().PostEvent(&event);
-        buf = NULL;
+        buf = nullptr;
     }
 
 exit:
@@ -398,7 +403,7 @@ exit:
         ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
     }
 
-    if (NULL != buf)
+    if (nullptr != buf)
     {
         chip::System::PacketBuffer::Free(buf);
     }
@@ -423,8 +428,8 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(void * data)
     CHIP_ERROR err               = CHIP_NO_ERROR;
     BluezConnection * connection = static_cast<BluezConnection *>(data);
 
-    VerifyOrExit(connection != NULL, ChipLogProgress(DeviceLayer, "Connection is NULL in HandleTXCharCCCDWrite"));
-    VerifyOrExit(connection->mpC2 != NULL, ChipLogProgress(DeviceLayer, "C2 is NULL in HandleTXCharCCCDWrite"));
+    VerifyOrExit(connection != nullptr, ChipLogProgress(DeviceLayer, "Connection is NULL in HandleTXCharCCCDWrite"));
+    VerifyOrExit(connection->mpC2 != nullptr, ChipLogProgress(DeviceLayer, "C2 is NULL in HandleTXCharCCCDWrite"));
 
     // Post an event to the Chip queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
     // whether the client is enabling or disabling indications.
@@ -481,7 +486,7 @@ void BLEManagerImpl::DriveBLEState()
     // Initializes the Bluez BLE layer if needed.
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !GetFlag(mFlags, kFlag_BluezBLELayerInitialized))
     {
-        err = InitBluezBleLayer(false, NULL, mBLEAdvConfig, mpAppState);
+        err = InitBluezBleLayer(false, nullptr, mBLEAdvConfig, mpAppState);
         SuccessOrExit(err);
         SetFlag(mFlags, kFlag_BluezBLELayerInitialized);
     }

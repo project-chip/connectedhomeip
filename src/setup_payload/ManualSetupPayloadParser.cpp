@@ -26,7 +26,6 @@
 #include <support/logging/CHIPLogging.h>
 #include <support/verhoeff/Verhoeff.h>
 
-#include <iostream>
 #include <math.h>
 #include <string>
 #include <vector>
@@ -79,15 +78,15 @@ static CHIP_ERROR extractBits(uint32_t number, uint64_t & dest, int index, int n
 static CHIP_ERROR toNumber(string decimalString, uint64_t & dest)
 {
     uint64_t number = 0;
-    for (uint i = 0; i < decimalString.length(); i++)
+    for (char c : decimalString)
     {
-        if (!isdigit(decimalString[i]))
+        if (!isdigit(c))
         {
-            ChipLogError(SetupPayload, "Failed decoding base10. Character was invalid %c", decimalString[i]);
+            ChipLogError(SetupPayload, "Failed decoding base10. Character was invalid %c", c);
             return CHIP_ERROR_INVALID_INTEGER_VALUE;
         }
         number *= 10;
-        number += decimalString[i] - '0';
+        number += c - '0';
     }
     dest = number;
     return CHIP_NO_ERROR;
@@ -101,7 +100,8 @@ static CHIP_ERROR readDigitsFromDecimalString(string decimalString, int & index,
         ChipLogError(SetupPayload, "Failed decoding base10. Input was too short. %zu", decimalString.length());
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
-    else if (index < 0)
+
+    if (index < 0)
     {
         ChipLogError(SetupPayload, "Failed decoding base10. Index was negative. %d", index);
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -171,7 +171,7 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     {
         return result;
     }
-    else if (setUpPINCode == 0)
+    if (setUpPINCode == 0)
     {
         ChipLogError(SetupPayload, "Failed decoding base10. SetUpPINCode was 0.");
         return CHIP_ERROR_INVALID_ARGUMENT;

@@ -114,7 +114,7 @@ public:
         std::fill(mActiveConnections, mActiveConnections + mActiveConnectionsSize, nullptr);
         std::fill(mPendingPackets, mPendingPackets + mPendingPacketsSize, emptyPending);
     }
-    virtual ~TCPBase();
+    ~TCPBase() override;
 
     /**
      * Initialize a TCP transport on a given port.
@@ -128,7 +128,8 @@ public:
      */
     CHIP_ERROR Init(TcpListenParameters & params);
 
-    CHIP_ERROR SendMessage(const MessageHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) override;
+    CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const PeerAddress & address,
+                           System::PacketBuffer * msgBuf) override;
 
     void Disconnect(const PeerAddress & address) override;
 
@@ -193,22 +194,28 @@ private:
                                                   uint16_t messageSize);
 
     // Callback handler for TCPEndPoint. TCP message receive handler.
+    // @see TCPEndpoint::OnDataReceivedFunct
     static void OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer);
 
     // Callback handler for TCPEndPoint. Called when a connection has been completed.
+    // @see TCPEndpoint::OnConnectCompleteFunct
     static void OnConnectionComplete(Inet::TCPEndPoint * endPoint, INET_ERROR err);
 
     // Callback handler for TCPEndPoint. Called when a connection has been closed.
+    // @see TCPEndpoint::OnConnectionClosedFunct
     static void OnConnectionClosed(Inet::TCPEndPoint * endPoint, INET_ERROR err);
 
     // Callback handler for TCPEndPoint. Callend when a peer closes the connection.
+    // @see TCPEndpoint::OnPeerCloseFunct
     static void OnPeerClosed(Inet::TCPEndPoint * endPoint);
 
     // Callback handler for TCPEndPoint. Called when a connection is received on the listening port.
+    // @see TCPEndpoint::OnConnectionReceivedFunct
     static void OnConnectionReceived(Inet::TCPEndPoint * listenEndPoint, Inet::TCPEndPoint * endPoint,
                                      const IPAddress & peerAddress, uint16_t peerPort);
 
     // Called on accept error
+    // @see TCPEndpoint::OnAcceptErrorFunct
     static void OnAcceptError(Inet::TCPEndPoint * endPoint, INET_ERROR err);
 
     Inet::TCPEndPoint * mListenSocket = nullptr;                                     ///< TCP socket used by the transport

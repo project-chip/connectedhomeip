@@ -78,7 +78,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR UDP::SendMessage(const MessageHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgBuf)
+CHIP_ERROR UDP::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
+                            System::PacketBuffer * msgBuf)
 {
     const size_t headerSize = header.EncodeSizeBytes();
     size_t actualEncodedHeaderSize;
@@ -98,7 +99,7 @@ CHIP_ERROR UDP::SendMessage(const MessageHeader & header, const Transport::PeerA
     VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
     msgBuf->SetStart(msgBuf->Start() - headerSize);
-    err = header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize);
+    err = header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize, payloadFlags);
     SuccessOrExit(err);
 
     // This is unexpected and means header changed while encoding
@@ -109,10 +110,10 @@ CHIP_ERROR UDP::SendMessage(const MessageHeader & header, const Transport::PeerA
     SuccessOrExit(err);
 
 exit:
-    if (msgBuf != NULL)
+    if (msgBuf != nullptr)
     {
         System::PacketBuffer::Free(msgBuf);
-        msgBuf = NULL;
+        msgBuf = nullptr;
     }
 
     return err;
@@ -125,7 +126,7 @@ void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * 
     size_t headerSize       = 0;
     PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort);
 
-    MessageHeader header;
+    PacketHeader header;
     err = header.Decode(buffer->Start(), buffer->DataLength(), &headerSize);
     SuccessOrExit(err);
 

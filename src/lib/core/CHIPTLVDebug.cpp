@@ -60,7 +60,7 @@ static void DumpHandler(DumpWriter aWriter, const char * aIndent, const TLVReade
     const TLVType type     = aReader.GetType();
     const uint64_t tag     = aReader.GetTag();
     const uint32_t len     = aReader.GetLength();
-    const uint8_t * strbuf = NULL;
+    const uint8_t * strbuf = nullptr;
     CHIP_ERROR err         = CHIP_NO_ERROR;
     TLVReader temp;
     TLVTagControl tagControl;
@@ -218,7 +218,7 @@ const char * DecodeTagControl(const TLVTagControl aTagControl)
         break;
 
     default:
-        retval = NULL;
+        retval = nullptr;
         break;
     }
 
@@ -287,7 +287,7 @@ const char * DecodeType(const TLVType aType)
         break;
 
     default:
-        retval = NULL;
+        retval = nullptr;
         break;
     }
 
@@ -336,11 +336,11 @@ CHIP_ERROR DumpHandler(const TLVReader & aReader, size_t aDepth, void * aContext
     CHIP_ERROR retval          = CHIP_NO_ERROR;
     DumpContext * context;
 
-    VerifyOrExit(aContext != NULL, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(aContext != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     context = static_cast<DumpContext *>(aContext);
 
-    VerifyOrExit(context->mWriter != NULL, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(context->mWriter != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     DumpHandler(context->mWriter, indent, aReader, aDepth);
 
@@ -362,7 +362,7 @@ exit:
  */
 CHIP_ERROR Dump(const TLVReader & aReader, DumpWriter aWriter)
 {
-    void * context          = NULL;
+    void * context          = nullptr;
     DumpContext dumpContext = { aWriter, context };
     CHIP_ERROR retval;
 

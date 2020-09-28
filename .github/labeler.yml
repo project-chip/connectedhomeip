@@ -29,6 +29,7 @@ examples:
 ############################################################
 documentation:
     - docs/*
+    - "*.md"
 
 ############################################################
 #  Tools + Development Items
@@ -45,6 +46,9 @@ vscode:
 
 gn:
     - gn/*
+    - .gn/*
+    - "*.gn"
+    - "*.gni"
 
 github:
     - .github
@@ -56,10 +60,17 @@ tools:
     - tools/*
 
 ############################################################
+#  Tests
+############################################################
+test driver:
+    - src/test_driver/*
+
+############################################################
 #  Source Code
 ############################################################
 qr code:
     - src/qrcode/*
+    - src/qrcodetool/*
 
 lwip:
     - src/lwip/*
@@ -72,6 +83,18 @@ config:
 
 lib:
     - src/lib/*
+
+core:
+    - src/lib/core/*
+
+protocols:
+    - src/lib/protocols/*
+
+shell:
+    - src/lib/shell/*
+
+support:
+    - src/lib/support/*
 
 crypto:
     - src/crypto/*

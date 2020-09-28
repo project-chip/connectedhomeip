@@ -16,10 +16,16 @@ import("//build/config/linux/pkg_config.gni")
 import("//build_overrides/chip.gni")
 
 config("ot_br_client_config") {
-  include_dirs = [
+  # Treat these includes as system includes, so warnings in them are not fatal.
+  _include_dirs = [
     "repo/src",
     "repo/include",
   ]
+
+  cflags = []
+  foreach(include_dir, _include_dirs) {
+    cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
+  }
 }
 
 pkg_config("dbus_config") {

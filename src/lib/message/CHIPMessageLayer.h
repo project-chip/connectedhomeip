@@ -467,19 +467,19 @@ public:
          */
         InitContext(void)
         {
-            systemLayer = NULL;
-            inet        = NULL;
-            fabricState = NULL;
+            systemLayer = nullptr;
+            inet        = nullptr;
+            fabricState = nullptr;
             listenTCP   = true;
             listenUDP   = true;
 #if CONFIG_NETWORK_LAYER_BLE
-            ble       = NULL;
+            ble       = nullptr;
             listenBLE = true;
 #endif
 #if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
             enableEphemeralUDPPort = false;
 #endif
-        };
+        }
     };
 
     ChipMessageLayer(void);

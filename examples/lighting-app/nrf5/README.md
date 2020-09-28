@@ -35,10 +35,10 @@ The lighting example is intended to serve both as a means to explore the
 workings of CHIP, as well as a template for creating real products based on the
 Nordic platform.
 
-The example application builds upon the CHIP. A top-level BUILD.gn or Makefile
-orchestrates the entire build process, including building CHIP, and select files
-from the nRF5 SDK. The resultant image file can be flashed directly onto the
-Nordic dev kit hardware.
+The example application builds upon the CHIP. The build system orchestrates the
+entire build process, including building CHIP, and select files from the nRF5
+SDK. The resultant image file can be flashed directly onto the Nordic dev kit
+hardware.
 
 <a name="device-ui"></a>
 
@@ -90,30 +90,21 @@ The remaining two LEDs and buttons (#3 and #4) are unused.
 
 Tools and SDK are preinstalled in
 [CHIP's VSCode devcontainer](https://github.com/project-chip/connectedhomeip/blob/master/docs/VSCODE_DEVELOPMENT.md).
-You can build this example on a clean tree by running `make`. Run the following
-commands in a devcontainer shell.
-
-        $ cd /workspaces/connectedhomeip
-
-        # CAUTION: the following step will delete any unstaged files
-        $ git clean -Xdf
-
-        $ cd examples/lighting-app/nrf5
-        $ make clean
-        $ make
 
 Other alternatives:
 
--   Run `Build nRF5 Lighting App` VSCode task.
+-   Run `Build nRF5 Lock Example` VSCode task.
 
--   Run the `GN build` VSCode task. This does not require a clean tree.
+-   Run the `Build & Test (all)` VSCode task.
 
--   Build manually with GN:
+-   Run the following commands in the Docker container shell.
 
-            $ source scripts/activate.sh
-            $ cd examples/lighting-app/nrf5
-            $ gn gen out/debug
-            $ ninja -C out/debug
+        $ cd /workspaces/connectedhomeip/examples/lighting-app/nrf5
+
+        $ git submodule update --init
+        $ source third_party/connectedhomeip/scripts/activate.sh
+        $ gn gen out/debug --args="nrf5_sdk_root=\"${NRF5_SDK_ROOT}\""
+        $ ninja -C out/debug
 
 ### Using Native Shell
 
@@ -129,17 +120,13 @@ Other alternatives:
 
 *   Download and install a suitable ARM gcc tool chain:
     [GNU Arm Embedded Toolchain 7-2018-q2-update](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
-    (Direct download link:
     [Linux](https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2)
     [Mac OS X](https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-mac.tar.bz2))
 
 -   Install some additional tools:
 
            # Linux
-           $ sudo apt-get install git make automake libtool ccache
-
-           # Mac OS X
-           $ brew install automake libtool ccache
+           $ sudo apt-get install git
 
 -   Set the following environment variables based on the locations/versions of
     the packages installed above:
@@ -159,18 +146,11 @@ Other alternatives:
 
 *   Run GN to build the application
 
-          $ cd ~/connectedhomeip
-          $ git submodule update --init
-          $ source scripts/activate.sh
-          $ cd examples/lighting-app/nrf5
-          $ gn gen out/debug
-          $ ninja -C out/debug
-
-*   Or, run make to build the application
-
           $ cd ~/connectedhomeip/examples/lighting-app/nrf5
-          $ make clean
-          $ make
+          $ git submodule update --init
+          $ source third_party/connectedhomeip/scripts/activate.sh
+          $ gn gen out/debug --args="nrf5_sdk_root=\"${NRF5_SDK_ROOT}\""
+          $ ninja -C out/debug
 
 <a name="initializing"></a>
 
@@ -189,17 +169,10 @@ should be erased and the Nordic SoftDevice image installed.
     SoftDevice image if it is not already present. If you prefer to do so
     manually first, to verify your board function, run:
 
-          $ python \
+          $ python3 \
               ~/connectedhomeip/third_party/nrf5_sdk/nrf5_firmware_utils.py \
               --eraseall \
               --application $NRF5_SDK_ROOT/components/softdevice/s140/hex/s140_nrf52_*_softdevice.hex
-
-*   Or, use the Makefile to erase the flash and program the Nordic SoftDevice
-    image.
-
-          $ cd ~/connectedhomeip/examples/lighting-app/nrf5
-          $ make erase
-          $ make flash-softdevice
 
 Once the above is complete, it shouldn't need be done again _unless_ the
 SoftDevice image or the Nordic configuration storage (fds) area becomes corrupt.
@@ -213,12 +186,7 @@ and application again.
 To flash the example app, run the following commands:
 
         $ cd ~/connectedhomeip/examples/lighting-app/nrf5
-        $ python out/debug/chip-nrf52840-lighting-example.flash.py
-
-Or, if you are using the Makefile build,
-
-        $ cd ~/connectedhomeip/examples/lighting-app/nrf5
-        $ make flash-app
+        $ python3 out/debug/chip-nrf52840-lighting-example.flash.py
 
 > The [VSCode devcontainer](#using-chips-vscode-devcontainer) cannot communicate
 > with the nRF device. So, the above command must be run from a native shell.

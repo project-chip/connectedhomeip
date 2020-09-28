@@ -34,7 +34,7 @@ struct pbkdf2_test_vector
     const uint8_t * salt;
     size_t slen;
     unsigned int iter;
-    size_t key_len;
+    uint32_t key_len;
     const uint8_t * key;
     unsigned tcId;
     int result;
@@ -148,7 +148,7 @@ static const struct pbkdf2_test_vector chiptest_test_vector_10 = { .password = c
                                                                    .slen     = 4,
                                                                    .iter     = 16777216,
                                                                    .key_len  = 20,
-                                                                   .key      = NULL,
+                                                                   .key      = nullptr,
                                                                    .tcId     = 10,
                                                                    .result   = CHIP_ERROR_INVALID_ARGUMENT };
 

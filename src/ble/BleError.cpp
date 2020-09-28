@@ -40,14 +40,14 @@ namespace Ble {
  */
 void RegisterLayerErrorFormatter(void)
 {
-    static ErrorFormatter sBleLayerErrorFormatter = { FormatLayerError, NULL };
+    static ErrorFormatter sBleLayerErrorFormatter = { FormatLayerError, nullptr };
 
     RegisterErrorFormatter(&sBleLayerErrorFormatter);
 }
 
 bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err)
 {
-    const char * desc = NULL;
+    const char * desc = nullptr;
 
     if (err < BLE_ERROR_MIN || err > BLE_ERROR_MAX)
     {

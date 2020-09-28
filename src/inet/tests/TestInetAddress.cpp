@@ -1791,7 +1791,4 @@ int TestInetAddress(void)
     return (nlTestRunnerStats(&theSuite));
 }
 
-static void __attribute__((constructor)) TestCHIPInetAddressCtor(void)
-{
-    VerifyOrDie(RegisterUnitTests(&TestInetAddress) == CHIP_NO_ERROR);
-}
+CHIP_REGISTER_TEST_SUITE(TestInetAddress)

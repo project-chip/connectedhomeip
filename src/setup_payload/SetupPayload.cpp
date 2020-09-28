@@ -132,9 +132,9 @@ exit:
 vector<OptionalQRCodeInfo> SetupPayload::getAllOptionalVendorData()
 {
     vector<OptionalQRCodeInfo> returnedOptionalInfo;
-    for (map<uint8_t, OptionalQRCodeInfo>::iterator it = optionalVendorData.begin(); it != optionalVendorData.end(); ++it)
+    for (auto & entry : optionalVendorData)
     {
-        returnedOptionalInfo.push_back(it->second);
+        returnedOptionalInfo.push_back(entry.second);
     }
     return returnedOptionalInfo;
 }
@@ -272,10 +272,9 @@ optionalQRCodeInfoType SetupPayload::getNumericTypeFor(uint8_t tag)
 vector<OptionalQRCodeInfoExtension> SetupPayload::getAllOptionalExtensionData()
 {
     vector<OptionalQRCodeInfoExtension> returnedOptionalInfo;
-    for (map<uint8_t, OptionalQRCodeInfoExtension>::iterator it = optionalExtensionData.begin(); it != optionalExtensionData.end();
-         ++it)
+    for (auto & entry : optionalExtensionData)
     {
-        returnedOptionalInfo.push_back(it->second);
+        returnedOptionalInfo.push_back(entry.second);
     }
     return returnedOptionalInfo;
 }
@@ -301,7 +300,7 @@ bool SetupPayload::operator==(SetupPayload & input)
         CHIP_ERROR err = getOptionalVendorData(inputInfo.tag, info);
         VerifyOrExit(err == CHIP_NO_ERROR, isIdentical = false);
         VerifyOrExit(inputInfo.type == info.type, isIdentical = false);
-        VerifyOrExit(inputInfo.data.compare(info.data) == 0, isIdentical = false);
+        VerifyOrExit(inputInfo.data == info.data, isIdentical = false);
         VerifyOrExit(inputInfo.int32 == info.int32, isIdentical = false);
     }
 
@@ -314,7 +313,7 @@ bool SetupPayload::operator==(SetupPayload & input)
         CHIP_ERROR err = getOptionalExtensionData(inputInfo.tag, info);
         VerifyOrExit(err == CHIP_NO_ERROR, isIdentical = false);
         VerifyOrExit(inputInfo.type == info.type, isIdentical = false);
-        VerifyOrExit(inputInfo.data.compare(info.data) == 0, isIdentical = false);
+        VerifyOrExit(inputInfo.data == info.data, isIdentical = false);
         VerifyOrExit(inputInfo.int32 == info.int32, isIdentical = false);
         VerifyOrExit(inputInfo.int64 == info.int64, isIdentical = false);
         VerifyOrExit(inputInfo.uint32 == info.uint32, isIdentical = false);

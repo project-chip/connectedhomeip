@@ -1,4 +1,4 @@
-# CHIP EFR32 Lock Example
+# CHIP EFR32 Lighting Example
 
 An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
 
@@ -31,12 +31,6 @@ Silicon Labs platform.
 
 ## Building
 
-### Note
-
-A consensus within the CHIP organization was reached to move from Make/Automake
-to the GN/Ninja build system. As a result, the Make file structure as not been
-implemented inside the lighting-app example.
-
 -   Download the [sdk_support](https://github.com/SiliconLabs/sdk_support) from
     GitHub and export the path with :
 
@@ -54,20 +48,10 @@ implemented inside the lighting-app example.
 -   Install some additional tools(likely already present for CHIP developers):
 
            # Linux
-           $ sudo apt-get install git make automake libtool ccache libwebkitgtk-1.0-0 ninja
+           $ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
 
            # Mac OS X
-           $ brew install automake libtool ccache ninja
-
--   To build for an MG21 part make the following changes to the
-    platform/CMSIS/Include/core_cm33.h file within the Silicon Labs SDK. Copy
-    the following lines to the top of the core_cm33.h file.
-
-```cpp
-#if defined(__GNUC__)
-#pragma GCC diagnostic ignored "-Wpedantic"
-#endif
-```
+           $ brew install ninja
 
 -   Supported hardware:
 
@@ -85,28 +69,27 @@ implemented inside the lighting-app example.
 
 *   Build the example application:
 
-    -   With Ninja
-
-              $ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
-              $ export EFR32_BOARD=BRD4161A
-              <From CHIP root>
-              $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/lighting_app_debug
+          $ cd ~/connectedhomeip/examples/lighting-app/efr32
+          $ git submodule update --init
+          $ source third_party/connectedhomeip/scripts/activate.sh
+          $ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
+          $ export EFR32_BOARD=BRD4161A
+          $ gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" efr32_board=\"${EFR32_BOARD}\""
+          $ ninja -C out/debug
 
 -   To delete generated executable, libraries and object files use:
 
-    -   With Ninja
-
-            $ rm -rf ./out/lighting_app_debug
+          $ cd ~/connectedhomeip/examples/lighting-app/efr32
+          $ rm -rf out/
 
 <a name="flashing"></a>
 
 ## Flashing the Application
 
--   With Ninja
+-   On the command line:
 
-    -   From CHIP root,
-
-              $ python out/lock_app_debug/BRD4161A/chip-efr32-lighting-example.flash.py
+          $ cd ~/connectedhomeip/examples/lock-app/efr32
+          $ python3 out/debug/chip-efr32-lighting-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
 
@@ -172,8 +155,8 @@ combination with JLinkRTTClient as follows:
 -   Once said connectection is established (you can verify that with the command
     `router table` using a serial terminal (screen / minicom etc.) on the board
     running the lighting-app example)
--   Using chip-tool you can now control the lock status with on/off command such
-    as `chip-tool on <ipv6 address of the node> 11095 1`
+-   Using chip-tool you can now control the light status with on/off command
+    such as `chip-tool on <ipv6 address of the node> 11095 1`
 
 ### Notes
 

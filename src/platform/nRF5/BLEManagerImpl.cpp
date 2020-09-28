@@ -32,6 +32,8 @@
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
+#include <type_traits>
+
 #include "ble.h"
 #include "ble_advdata.h"
 #include "ble_gap.h"
@@ -92,8 +94,10 @@ CHIP_ERROR RegisterVendorUUID(ble_uuid_t & uuid, const ble_uuid128_t & vendorUUI
 
     err = sd_ble_uuid_vs_add(&vendorUUID, &uuid.type);
     SuccessOrExit(err);
-
-    uuid.uuid = (((uint16_t) vendorUUID.uuid128[13]) << 8) | vendorUUID.uuid128[12];
+    static_assert(CHAR_BIT == 8, "We're about to assume chars are at most 8 bits wide");
+    static_assert(std::is_same<std::remove_reference<decltype(vendorUUID.uuid128[12])>::type, const unsigned char>::value,
+                  "Our bits will overlap");
+    uuid.uuid = static_cast<uint16_t>((((uint16_t) vendorUUID.uuid128[13]) << 8) | vendorUUID.uuid128[12]);
 
 exit:
     return err;
@@ -304,7 +308,9 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * devName)
     BLE_GAP_CONN_SEC_MODE_SET_NO_ACCESS(&secMode);
 
     // Configure the device name within the BLE soft device.
-    err = sd_ble_gap_device_name_set(&secMode, (const uint8_t *) devNameBuf, strlen(devNameBuf));
+    static_assert(CHAR_BIT == 8, "We're casting char to uint8_t");
+    static_assert(sizeof(devNameBuf) < UINT16_MAX, "Our length might not fit in a uint16_t");
+    err = sd_ble_gap_device_name_set(&secMode, (const uint8_t *) devNameBuf, static_cast<uint16_t>(strlen(devNameBuf)));
     SuccessOrExit(err);
 
 exit:
@@ -679,11 +685,7 @@ CHIP_ERROR BLEManagerImpl::EncodeAdvertisingData(ble_gap_adv_data_t & gapAdvData
 
     // Initialize the CHIP BLE Device Identification Information block that will be sent as payload
     // within the BLE service advertisement data.
-    // TODO: retrive device configuration from the ConfigurationMgr()
-    // err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
-    deviceIdInfo.Init();
-    deviceIdInfo.SetVendorId(0xDEAD);
-    deviceIdInfo.SetProductId(0xBEEF);
+    err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
     SuccessOrExit(err);
 
     // Form the contents of the scan response packet.
@@ -807,8 +809,10 @@ void BLEManagerImpl::SoftDeviceBLEEventCallback(const ble_evt_t * bleEvent, void
         bleEvent->evt.gatts_evt.params.write.handle == sInstance.mCHIPoBLECharHandle_RX.value_handle)
     {
         PacketBuffer * buf;
-        const uint16_t valLen     = bleEvent->evt.gatts_evt.params.write.len;
-        const uint16_t minBufSize = CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + valLen;
+        const uint16_t valLen = bleEvent->evt.gatts_evt.params.write.len;
+        // TODO: This cast does not obviously looks safe.
+        // https://github.com/project-chip/connectedhomeip/issues/2571
+        const uint16_t minBufSize = static_cast<uint16_t>(CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + valLen);
 
         // Attempt to allocate a packet buffer with enough space to hold the characteristic value.
         // Note that we must use pbuf_alloc() directly, as PacketBuffer::New() is not interrupt-safe.

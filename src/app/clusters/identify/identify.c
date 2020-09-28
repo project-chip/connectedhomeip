@@ -126,6 +126,15 @@ bool emberAfIdentifyClusterIdentifyQueryCallback(void)
     status = readIdentifyTime(emberAfCurrentEndpoint(), &identifyTime);
     if (status != EMBER_ZCL_STATUS_SUCCESS || identifyTime == 0)
     {
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            emberAfIdentifyClusterPrintln("Error reading identify time");
+        }
+        else
+        {
+            emberAfIdentifyClusterPrintln("identifyTime is at 0");
+        }
+        emberAfIdentifyClusterPrintln("Sending back default response");
         sendStatus = emberAfSendImmediateDefaultResponse(status);
         if (EMBER_SUCCESS != sendStatus)
         {
@@ -136,6 +145,7 @@ bool emberAfIdentifyClusterIdentifyQueryCallback(void)
         return true;
     }
 
+    emberAfIdentifyClusterPrintln("Identifying for %d more seconds", identifyTime);
     emberAfFillCommandIdentifyClusterIdentifyQueryResponse(identifyTime);
     sendStatus = emberAfSendResponse();
     if (EMBER_SUCCESS != sendStatus)

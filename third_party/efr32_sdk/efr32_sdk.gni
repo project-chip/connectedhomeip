@@ -50,7 +50,9 @@ template("efr32_sdk") {
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
     }
-    include_dirs += [
+
+    # Treat these includes as system includes, so warnings in them are not fatal.
+    _include_dirs = [
       "${efr32_sdk_root}",
       "${efr32_sdk_root}/util/third_party/freertos/Source/include",
       "${efr32_sdk_root}/platform/radio/rail_lib/hal",
@@ -124,7 +126,7 @@ template("efr32_sdk") {
     ]
 
     if (efr32_family == "efr32mg12") {
-      include_dirs += [
+      _include_dirs += [
         "${efr32_sdk_root}/hardware/kit/EFR32MG12_${efr32_board}/config",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG12P/Include",
         "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/efr32xg1x",
@@ -138,7 +140,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG12P/GCC/libmbedtls.a",
       ]
     } else if (efr32_family == "efr32mg21") {
-      include_dirs += [
+      _include_dirs += [
         "${efr32_sdk_root}/hardware/kit/EFR32MG21_${efr32_board}/config",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/efr32mg21/Include",
         "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/efr32xg2x",
@@ -153,6 +155,11 @@ template("efr32_sdk") {
       ]
 
       defines += [ "EFR32_SERIES2_CONFIG1_MICRO" ]
+    }
+
+    cflags = []
+    foreach(include_dir, _include_dirs) {
+      cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
     }
 
     if (defined(invoker.defines)) {

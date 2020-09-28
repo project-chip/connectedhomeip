@@ -92,7 +92,7 @@ class DLL_EXPORT UDP : public Base
     };
 
 public:
-    virtual ~UDP();
+    ~UDP() override;
 
     /**
      * Initialize a UDP transport on a given port.
@@ -106,7 +106,7 @@ public:
      */
     CHIP_ERROR Init(UdpListenParameters & params);
 
-    CHIP_ERROR SendMessage(const MessageHeader & header, const Transport::PeerAddress & address,
+    CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
                            System::PacketBuffer * msgBuf) override;
 
     bool CanSendToPeer(const Transport::PeerAddress & address) override

@@ -19,6 +19,7 @@
 
 #include <shell/shell.h>
 #include <support/CodeUtils.h>
+#include <support/TestUtils.h>
 
 #include <inttypes.h>
 #include <stdarg.h>
@@ -99,9 +100,11 @@ static const nlTest sTests[] = {
 
 int TestShell(void)
 {
-    nlTestSuite theSuite = { "CHIP Shell tests", &sTests[0], NULL, NULL };
+    nlTestSuite theSuite = { "CHIP Shell tests", &sTests[0], nullptr, nullptr };
 
     // Run test suit againt one context.
-    nlTestRunner(&theSuite, NULL);
+    nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
+
+CHIP_REGISTER_TEST_SUITE(TestShell)
