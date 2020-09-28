@@ -17,7 +17,7 @@ import("//build_overrides/chip.gni")
 static_library("retransmit") {
   output_name = "libRetransmit"
 
-  cflags = ["-Wconversion"]
+  cflags = [ "-Wconversion" ]
 
   sources = [ "Cache.h" ]
 
