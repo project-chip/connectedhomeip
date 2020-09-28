@@ -29,6 +29,22 @@
 namespace {
 constexpr int kMaxPayloadValue = 100;
 
+template <typename KeyType, typename PayloadType, size_t N>
+class TestableCache : public chip::Retransmit::Cache<KeyType, PayloadType, N>
+{
+public:
+    /**
+     * Convenience add when types are trivially copyable, so no actual
+     * reference needs to be created. Only to be used by tests to avoid
+     * confusion.
+     */
+    template <typename = std::enable_if<std::is_trivially_copyable<PayloadType>::value, int>>
+    CHIP_ERROR AddValue(const KeyType & key, PayloadType payload)
+    {
+        return chip::Retransmit::Cache<KeyType, PayloadType, N>::Add(key, payload);
+    }
+};
+
 class IntPayloadTracker
 {
 public:
@@ -96,7 +112,7 @@ void TestNoOp(nlTestSuite * inSuite, void * inContext)
     // unused address cache should not do any aquire/release at any time
     NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
     {
-        chip::Retransmit::Cache<int, int, 20> test;
+        TestableCache<int, int, 20> test;
         NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
     }
     NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
@@ -105,12 +121,12 @@ void TestNoOp(nlTestSuite * inSuite, void * inContext)
 void TestDestructorFree(nlTestSuite * inSuite, void * inContext)
 {
     {
-        chip::Retransmit::Cache<int, int, 20> test;
+        TestableCache<int, int, 20> test;
 
         NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
 
-        NL_TEST_ASSERT(inSuite, test.Add(1, 1) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, test.Add(2, 2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, test.AddValue(1, 1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, test.AddValue(2, 2) == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 2);
     }
@@ -122,20 +138,20 @@ void TestDestructorFree(nlTestSuite * inSuite, void * inContext)
 void OutOfSpace(nlTestSuite * inSuite, void * inContext)
 {
     {
-        chip::Retransmit::Cache<int, int, 4> test;
+        TestableCache<int, int, 4> test;
 
         NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
 
-        NL_TEST_ASSERT(inSuite, test.Add(1, 1) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, test.Add(2, 2) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, test.Add(3, 4) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, test.Add(4, 6) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, test.AddValue(1, 1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, test.AddValue(2, 2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, test.AddValue(3, 4) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, test.AddValue(4, 6) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 4);
 
-        NL_TEST_ASSERT(inSuite, test.Add(5, 8) == CHIP_ERROR_NO_MEMORY);
+        NL_TEST_ASSERT(inSuite, test.AddValue(5, 8) == CHIP_ERROR_NO_MEMORY);
         NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 4);
 
-        NL_TEST_ASSERT(inSuite, test.Add(6, 10) == CHIP_ERROR_NO_MEMORY);
+        NL_TEST_ASSERT(inSuite, test.AddValue(6, 10) == CHIP_ERROR_NO_MEMORY);
         NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 4);
     }
     NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
@@ -143,22 +159,22 @@ void OutOfSpace(nlTestSuite * inSuite, void * inContext)
 
 void AddRemove(nlTestSuite * inSuite, void * inContext)
 {
-    chip::Retransmit::Cache<int, int, 3> test;
+    TestableCache<int, int, 3> test;
 
     NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
 
-    NL_TEST_ASSERT(inSuite, test.Add(1, 1) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, test.Add(2, 2) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, test.Add(3, 4) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.AddValue(1, 1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.AddValue(2, 2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.AddValue(3, 4) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 3);
 
-    NL_TEST_ASSERT(inSuite, test.Add(10, 8) == CHIP_ERROR_NO_MEMORY);
+    NL_TEST_ASSERT(inSuite, test.AddValue(10, 8) == CHIP_ERROR_NO_MEMORY);
     NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 3);
 
     NL_TEST_ASSERT(inSuite, test.Remove(2) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 2);
 
-    NL_TEST_ASSERT(inSuite, test.Add(10, 8) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.AddValue(10, 8) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 3);
 
     NL_TEST_ASSERT(inSuite, test.Remove(14) == CHIP_ERROR_KEY_NOT_FOUND);
@@ -182,14 +198,14 @@ void AddRemove(nlTestSuite * inSuite, void * inContext)
 
 void RemoveMatching(nlTestSuite * inSuite, void * inContext)
 {
-    chip::Retransmit::Cache<int, int, 4> test;
+    TestableCache<int, int, 4> test;
 
     NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
 
-    NL_TEST_ASSERT(inSuite, test.Add(1, 1) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, test.Add(2, 2) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, test.Add(3, 4) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, test.Add(4, 8) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.AddValue(1, 1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.AddValue(2, 2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.AddValue(3, 4) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.AddValue(4, 8) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 4);
 
     test.RemoveMatching(DivisibleBy(2));
@@ -206,14 +222,14 @@ void RemoveMatching(nlTestSuite * inSuite, void * inContext)
 
 void FindMatching(nlTestSuite * inSuite, void * inContext)
 {
-    chip::Retransmit::Cache<int, int, 4> test;
+    TestableCache<int, int, 4> test;
 
     NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
 
-    NL_TEST_ASSERT(inSuite, test.Add(1, 1) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, test.Add(2, 2) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, test.Add(3, 4) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, test.Add(4, 8) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.AddValue(1, 1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.AddValue(2, 2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.AddValue(3, 4) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test.AddValue(4, 8) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 4);
 
     const int * key;

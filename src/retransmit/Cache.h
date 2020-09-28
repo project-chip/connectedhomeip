@@ -64,7 +64,7 @@ public:
 
     ~Cache()
     {
-        for (unsigned i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
         {
             if (mInUse.test(i))
             {
@@ -83,7 +83,7 @@ public:
             return CHIP_ERROR_NO_MEMORY;
         }
 
-        for (unsigned i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
         {
             if (!mInUse.test(i))
             {
@@ -102,7 +102,7 @@ public:
      */
     CHIP_ERROR Remove(const KeyType & key)
     {
-        for (unsigned i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
         {
             if (mInUse.test(i) && (mEntries[i].key == key))
             {
@@ -119,12 +119,12 @@ public:
      * Remove any matching payloads. Used for mass removal, e.g. when a connection
      * is closed, relevant payloads need/can be cleared for the entire connection.
      *
-     * @tparam Matcher is a generic macher object defining a bool Maches method.
+     * @tparam Matcher is a generic matcher object defining a bool Matches method.
      */
     template <typename Matcher>
     void RemoveMatching(const Matcher & matcher)
     {
-        for (unsigned i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
         {
             if (mInUse.test(i) && matcher.Matches(mEntries[i].key))
             {
@@ -152,7 +152,7 @@ public:
         *key     = nullptr;
         *payload = nullptr;
 
-        for (unsigned i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
         {
             if (mInUse.test(i) && matcher.Matches(mEntries[i].key))
             {
@@ -163,19 +163,6 @@ public:
         }
         return false;
     }
-
-#ifdef UNIT_TESTS
-    /**
-     * Convenience add when types are trivially copyable, so no actual
-     * reference needs to be created. Only to be used by tests to avoid
-     * confusion.
-     */
-    template <typename = std::enable_if<std::is_trivially_copyable<PayloadType>::value, int>>
-    CHIP_ERROR Add(const KeyType & key, PayloadType payload)
-    {
-        return Add(key, payload); // add as reference
-    }
-#endif // UNIT_TESTS
 
 private:
     struct Entry
