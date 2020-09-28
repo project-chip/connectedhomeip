@@ -105,13 +105,16 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBu
 
     {
         uint8_t * data = nullptr;
-        MessageHeader header;
-        const size_t headerSize = header.payloadHeader.EncodeSizeBytes();
+        PacketHeader packetHeader;
+        PayloadHeader payloadHeader;
+        MessageAuthenticationCode mac;
+
+        const size_t headerSize = payloadHeader.EncodeSizeBytes();
         size_t actualEncodedHeaderSize;
         size_t totalLen = 0;
         size_t taglen   = 0;
 
-        header.packetHeader
+        packetHeader
             .SetSourceNodeId(mLocalNodeId)              //
             .SetDestinationNodeId(peerNodeId)           //
             .SetMessageId(state->GetSendMessageIndex()) //
@@ -124,21 +127,20 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBu
         data     = msgBuf->Start();
         totalLen = msgBuf->TotalLength();
 
-        err = header.payloadHeader.Encode(data, totalLen, &actualEncodedHeaderSize);
+        err = payloadHeader.Encode(data, totalLen, &actualEncodedHeaderSize);
         SuccessOrExit(err);
 
-        err = state->GetSecureSession().Encrypt(data, totalLen, data, header);
+        err = state->GetSecureSession().Encrypt(data, totalLen, data, packetHeader, payloadHeader.GetEncodePacketFlags(), mac);
         SuccessOrExit(err);
 
-        err = header.mac.Encode(header.packetHeader, &data[totalLen], kMaxTagLen, &taglen);
+        err = mac.Encode(packetHeader, &data[totalLen], kMaxTagLen, &taglen);
         SuccessOrExit(err);
 
         msgBuf->SetDataLength(totalLen + taglen, nullptr);
 
         ChipLogProgress(Inet, "Secure transport transmitting msg %u after encryption", state->GetSendMessageIndex());
 
-        err    = mTransport->SendMessage(header.packetHeader, header.payloadHeader.GetEncodePacketFlags(), state->GetPeerAddress(),
-                                      msgBuf);
+        err    = mTransport->SendMessage(packetHeader, payloadHeader.GetEncodePacketFlags(), state->GetPeerAddress(), msgBuf);
         msgBuf = nullptr;
     }
     SuccessOrExit(err);
@@ -240,13 +242,13 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
 
     // TODO this is where messages should be decoded
     {
-        MessageHeader header;
-        header.packetHeader = packetHeader;
+        PayloadHeader payloadHeader;
+        MessageAuthenticationCode mac;
 
         uint8_t * data          = msg->Start();
         uint8_t * plainText     = nullptr;
         uint16_t len            = msg->TotalLength();
-        const size_t headerSize = header.payloadHeader.EncodeSizeBytes();
+        const size_t headerSize = payloadHeader.EncodeSizeBytes();
         size_t decodedSize      = 0;
         size_t taglen           = 0;
 
@@ -259,15 +261,15 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
 #endif
         plainText = msg->Start();
 
-        err = header.mac.Decode(header.packetHeader, &data[header.packetHeader.GetPayloadLength()], kMaxTagLen, &taglen);
+        err = mac.Decode(packetHeader, &data[packetHeader.GetPayloadLength()], kMaxTagLen, &taglen);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Inet, "Secure transport failed to decode MAC Tag: err %d", err));
         len -= taglen;
         msg->SetDataLength(len, nullptr);
 
-        err = state->GetSecureSession().Decrypt(data, len, plainText, header);
+        err = state->GetSecureSession().Decrypt(data, len, plainText, packetHeader, payloadHeader.GetEncodePacketFlags(), mac);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Inet, "Secure transport failed to decrypt msg: err %d", err));
 
-        err = header.payloadHeader.Decode(header.packetHeader.GetFlags(), plainText, headerSize, &decodedSize);
+        err = payloadHeader.Decode(packetHeader.GetFlags(), plainText, headerSize, &decodedSize);
         VerifyOrExit(err == CHIP_NO_ERROR,
                      ChipLogProgress(Inet, "Secure transport failed to decode encrypted header: err %d", err));
         VerifyOrExit(headerSize == decodedSize,
@@ -282,7 +284,7 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
 
         if (connection->mCB != nullptr)
         {
-            connection->mCB->OnMessageReceived(header.packetHeader, state, msg, connection);
+            connection->mCB->OnMessageReceived(packetHeader, state, msg, connection);
             msg = nullptr;
         }
     }

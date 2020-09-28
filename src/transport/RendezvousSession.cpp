@@ -84,18 +84,17 @@ exit:
 CHIP_ERROR RendezvousSession::SendPairingMessage(System::PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    MessageHeader header;
+    PacketHeader header;
     size_t headerSize = 0;
 
     VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msgBuf->Next() == nullptr, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    err = header.packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
+    err = header.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
     SuccessOrExit(err);
 
     msgBuf->ConsumeHead(headerSize);
-    err = mTransport->SendMessage(header.packetHeader, header.payloadHeader.GetEncodePacketFlags(), Transport::PeerAddress::BLE(),
-                                  msgBuf);
+    err = mTransport->SendMessage(header, Header::Flags::None(), Transport::PeerAddress::BLE(), msgBuf);
     SuccessOrExit(err);
 
 exit:
@@ -105,8 +104,10 @@ exit:
 CHIP_ERROR RendezvousSession::SendSecureMessage(System::PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    MessageHeader header;
-    const size_t headerSize = header.payloadHeader.EncodeSizeBytes();
+    PacketHeader packetHeader;
+    PayloadHeader payloadHeader;
+    MessageAuthenticationCode mac;
+    const size_t headerSize = payloadHeader.EncodeSizeBytes();
     size_t actualEncodedHeaderSize;
     uint8_t * data  = nullptr;
     size_t totalLen = 0;
@@ -116,7 +117,7 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(System::PacketBuffer * msgBuf)
     VerifyOrExit(msgBuf->Next() == nullptr, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrExit(msgBuf->TotalLength() < kMax_SecureSDU_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    header.packetHeader
+    packetHeader
         .SetSourceNodeId(mParams.GetLocalNodeId())           //
         .SetMessageId(mSecureMessageIndex)                   //
         .SetEncryptionKeyID(mPairingSession.GetLocalKeyId()) //
@@ -128,19 +129,18 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(System::PacketBuffer * msgBuf)
     data     = msgBuf->Start();
     totalLen = msgBuf->TotalLength();
 
-    err = header.payloadHeader.Encode(data, totalLen, &actualEncodedHeaderSize);
+    err = payloadHeader.Encode(data, totalLen, &actualEncodedHeaderSize);
     SuccessOrExit(err);
 
-    err = mSecureSession.Encrypt(data, totalLen, data, header);
+    err = mSecureSession.Encrypt(data, totalLen, data, packetHeader, payloadHeader.GetEncodePacketFlags(), mac);
     SuccessOrExit(err);
 
-    err = header.mac.Encode(header.packetHeader, &data[totalLen], kMaxTagLen, &taglen);
+    err = mac.Encode(packetHeader, &data[totalLen], kMaxTagLen, &taglen);
     SuccessOrExit(err);
 
     msgBuf->SetDataLength(totalLen + taglen);
 
-    err = mTransport->SendMessage(header.packetHeader, header.payloadHeader.GetEncodePacketFlags(), Transport::PeerAddress::BLE(),
-                                  msgBuf);
+    err = mTransport->SendMessage(packetHeader, payloadHeader.GetEncodePacketFlags(), Transport::PeerAddress::BLE(), msgBuf);
     SuccessOrExit(err);
 
     mSecureMessageIndex++;
@@ -219,15 +219,15 @@ exit:
 CHIP_ERROR RendezvousSession::HandlePairingMessage(PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    MessageHeader header;
+    PacketHeader packetHeader;
     size_t headerSize = 0;
 
-    err = header.packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
+    err = packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
     SuccessOrExit(err);
 
     msgBuf->ConsumeHead(headerSize);
 
-    err = mPairingSession.HandlePeerMessage(header, msgBuf);
+    err = mPairingSession.HandlePeerMessage(packetHeader, msgBuf);
     SuccessOrExit(err);
 
 exit:
@@ -237,7 +237,9 @@ exit:
 CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    MessageHeader header;
+    PacketHeader packetHeader;
+    PayloadHeader payloadHeader;
+    MessageAuthenticationCode mac;
     size_t headerSize              = 0;
     uint8_t * data                 = nullptr;
     uint8_t * plainText            = nullptr;
@@ -246,11 +248,11 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
     size_t taglen                  = 0;
     System::PacketBuffer * origMsg = nullptr;
 
-    err = header.packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
+    err = packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
     SuccessOrExit(err);
     msgBuf->ConsumeHead(headerSize);
 
-    headerSize = header.payloadHeader.EncodeSizeBytes();
+    headerSize = payloadHeader.EncodeSizeBytes();
     data       = msgBuf->Start();
     len        = msgBuf->TotalLength();
 
@@ -263,16 +265,16 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
 #endif
     plainText = msgBuf->Start();
 
-    err = header.mac.Decode(header.packetHeader, &data[header.packetHeader.GetPayloadLength()], kMaxTagLen, &taglen);
+    err = mac.Decode(packetHeader, &data[packetHeader.GetPayloadLength()], kMaxTagLen, &taglen);
     SuccessOrExit(err);
 
     len -= taglen;
     msgBuf->SetDataLength(len);
 
-    err = mSecureSession.Decrypt(data, len, plainText, header);
+    err = mSecureSession.Decrypt(data, len, plainText, packetHeader, payloadHeader.GetEncodePacketFlags(), mac);
     SuccessOrExit(err);
 
-    err = header.payloadHeader.Decode(header.packetHeader.GetFlags(), plainText, headerSize, &decodedSize);
+    err = payloadHeader.Decode(packetHeader.GetFlags(), plainText, headerSize, &decodedSize);
     SuccessOrExit(err);
     VerifyOrExit(headerSize == decodedSize, err = CHIP_ERROR_INCORRECT_STATE);
 
