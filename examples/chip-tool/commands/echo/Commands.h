@@ -35,8 +35,14 @@ public:
 
 void registerCommandsEcho(Commands & commands)
 {
-    commands.Register(make_unique<Echo>());
-    commands.Register(make_unique<EchoBle>());
+    const char * clusterName = "";
+
+    commands_list clusterCommands = {
+        make_unique<Echo>(),
+        make_unique<EchoBle>(),
+    };
+
+    commands.Register(clusterName, clusterCommands);
 }
 
 #endif // __CHIPTOOL_ECHO_COMMANDS_H__

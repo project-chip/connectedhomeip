@@ -58,10 +58,15 @@ public:
 
 void registerClusterIdentify(Commands & commands)
 {
+    const char * clusterName = "Identify";
     const uint16_t clusterId = 0x0003;
 
-    commands.Register(make_unique<Identify>(clusterId));
-    commands.Register(make_unique<IdentifyQuery>(clusterId));
+    commands_list clusterCommands = {
+        make_unique<Identify>(clusterId),
+        make_unique<IdentifyQuery>(clusterId),
+    };
+
+    commands.Register(clusterName, clusterCommands);
 }
 
 #endif // __CHIPTOOL_IDENTIFY_COMMANDS_H__
