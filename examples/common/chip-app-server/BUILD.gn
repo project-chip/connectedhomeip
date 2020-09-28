@@ -30,7 +30,7 @@ static_library("chip-app-server") {
   # compiling live.
   sources = [
     "RendezvousServer.cpp",
-    "Server.cpp" ,
+    "Server.cpp",
   ]
 
   deps = [ "${chip_root}/src/lib" ]
