@@ -17,8 +17,6 @@
 
 #include "TestRetransmit.h"
 
-#define UNIT_TESTS
-
 #include <retransmit/Cache.h>
 #include <support/TestUtils.h>
 
@@ -29,14 +27,16 @@
 namespace {
 constexpr int kMaxPayloadValue = 100;
 
+/**
+ * Derived cache class containing some test helper methods.
+ */
 template <typename KeyType, typename PayloadType, size_t N>
 class TestableCache : public chip::Retransmit::Cache<KeyType, PayloadType, N>
 {
 public:
     /**
      * Convenience add when types are trivially copyable, so no actual
-     * reference needs to be created. Only to be used by tests to avoid
-     * confusion.
+     * reference needs to be created.
      */
     template <typename = std::enable_if<std::is_trivially_copyable<PayloadType>::value, int>>
     CHIP_ERROR AddValue(const KeyType & key, PayloadType payload)
