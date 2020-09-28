@@ -98,9 +98,9 @@ INET_ERROR AsyncDNSResolverSockets::Shutdown(void)
     AsyncMutexUnlock();
 
     // Have the CHIP thread join the thread pool for asynchronous DNS resolution.
-    for (int i = 0; i < INET_CONFIG_DNS_ASYNC_MAX_THREAD_COUNT; i++)
+    for (pthread_t thread : mAsyncDNSThreadHandle)
     {
-        pthreadErr = pthread_join(mAsyncDNSThreadHandle[i], nullptr);
+        pthreadErr = pthread_join(thread, nullptr);
         VerifyOrDie(pthreadErr == 0);
     }
 

@@ -187,26 +187,24 @@ static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
 // Test Inet ParseHostPortAndInterface
 static void TestParseHost(nlTestSuite * inSuite, void * inContext)
 {
-    char correctHostName[7][30] = {
+    char correctHostNames[7][30] = {
         "10.0.0.1", "10.0.0.1:3000", "www.google.com", "www.google.com:3000", "[fd00:0:1:1::1]:3000", "[fd00:0:1:1::1]:300%wpan0",
         "%wpan0"
     };
-    char invalidHostName[4][30] = { "[fd00::1]5", "[fd00:0:1:1::1:3000", "10.0.0.1:1234567", "10.0.0.1:er31" };
+    char invalidHostNames[4][30] = { "[fd00::1]5", "[fd00:0:1:1::1:3000", "10.0.0.1:1234567", "10.0.0.1:er31" };
     const char * host;
     const char * intf;
     uint16_t port, hostlen, intflen;
     INET_ERROR err;
 
-    for (int i = 0; i < 7; i++)
+    for (char * correctHostName : correctHostNames)
     {
-        err =
-            ParseHostPortAndInterface(correctHostName[i], uint16_t(strlen(correctHostName[i])), host, hostlen, port, intf, intflen);
+        err = ParseHostPortAndInterface(correctHostName, uint16_t(strlen(correctHostName)), host, hostlen, port, intf, intflen);
         NL_TEST_ASSERT(inSuite, err == INET_NO_ERROR);
     }
-    for (int i = 0; i < 4; i++)
+    for (char * invalidHostName : invalidHostNames)
     {
-        err =
-            ParseHostPortAndInterface(invalidHostName[i], uint16_t(strlen(invalidHostName[i])), host, hostlen, port, intf, intflen);
+        err = ParseHostPortAndInterface(invalidHostName, uint16_t(strlen(invalidHostName)), host, hostlen, port, intf, intflen);
         NL_TEST_ASSERT(inSuite, err == INET_ERROR_INVALID_HOST_NAME);
     }
 }

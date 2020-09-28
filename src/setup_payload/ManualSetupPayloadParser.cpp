@@ -78,15 +78,15 @@ static CHIP_ERROR extractBits(uint32_t number, uint64_t & dest, int index, int n
 static CHIP_ERROR toNumber(string decimalString, uint64_t & dest)
 {
     uint64_t number = 0;
-    for (size_t i = 0; i < decimalString.length(); i++)
+    for (char c : decimalString)
     {
-        if (!isdigit(decimalString[i]))
+        if (!isdigit(c))
         {
-            ChipLogError(SetupPayload, "Failed decoding base10. Character was invalid %c", decimalString[i]);
+            ChipLogError(SetupPayload, "Failed decoding base10. Character was invalid %c", c);
             return CHIP_ERROR_INVALID_INTEGER_VALUE;
         }
         number *= 10;
-        number += decimalString[i] - '0';
+        number += c - '0';
     }
     dest = number;
     return CHIP_NO_ERROR;

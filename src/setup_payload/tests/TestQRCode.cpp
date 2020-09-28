@@ -123,9 +123,9 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, base41Decode("GHF.KGL+48-G5LGK35", decoded) == CHIP_NO_ERROR);
 
     string hello_world;
-    for (size_t _ = 0; _ < decoded.size(); _++)
+    for (uint8_t b : decoded)
     {
-        hello_world += (char) decoded[_];
+        hello_world += (char) b;
     }
     NL_TEST_ASSERT(inSuite, hello_world == "Hello World!");
 
