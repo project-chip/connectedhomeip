@@ -18,7 +18,7 @@ board.
 
 ## Introduction
 
-![K32W061 DK6](doc/images/k32w-dk6.jpg)
+![K32W061 DK6](../../platform/k32w/doc/images/k32w-dk6.jpg)
 
 The K32W lock example application provides a working demonstration of a
 connected door lock device, built using CHIP, and the NXP K32W061 SDK. The
@@ -99,7 +99,7 @@ demo-application was compiled on Ubuntu 20.04).
     account is created, login and follow the steps for downloading
     SDK_2.6.1_K32W061DK6. The UI is very intuitive and the correct selection
     should be similiar with the one from the image below.
-    ![MCUXpresso SDK Download](doc/images/mcux-sdk-download.JPG)
+    ![MCUXpresso SDK Download](../../platform/k32w/doc/images/mcux-sdk-download.JPG)
 
 -   Download the suitable
     [ARM GCC toolchain](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads/7-2018-q2-update)
@@ -146,7 +146,7 @@ In order to flash the application we recommend using
 
 -   Import the previously downloaded NXP SDK into MCUXpresso IDE. This can be
     done by drag-and-dropping the SDK archive into MCUXpresso IDE's "Installed
-    SDKs" tab; ![Select SDK](doc/images/select-sdk.JPG)
+    SDKs" tab; ![Select SDK](../../platform/k32w/doc/images/select-sdk.JPG)
 -   Import Project CHIP in MCUXpresso IDE as Makefile Project:
     <i>File->Import->C/C++->Existing Code as Makefile Project-> Next </i>.
     Select Project CHIP folder as the <i>Existing Code Location</i>. In the
@@ -175,4 +175,4 @@ In order to flash the application we recommend using
     select "bin" as the <i>Format to use for programming</i>. Make sure the
     <i>Base address</i> is 0x0. Click <i>Debug</i>. A pop-up window entitled
     <i>Errors in Workspace</i> will appear. Click <i>Proceed</i>.
-    ![Debug_configuration](doc/images/debg-conf.JPG)
+    ![Debug_configuration](../../platform/k32w/doc/images/debg-conf.JPG)

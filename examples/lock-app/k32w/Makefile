@@ -36,9 +36,9 @@ SRCS = \
     $(PROJECT_ROOT)/main/main.cpp                                                                         \
     $(PROJECT_ROOT)/main/AppTask.cpp                                                                      \
     $(PROJECT_ROOT)/main/BoltLockManager.cpp                                                              \
-    $(PROJECT_ROOT)/main/LEDWidget.cpp                                                                    \
     $(PROJECT_ROOT)/main/ZclCallbacks.cpp                                                                 \
-    $(PROJECT_ROOT)/main/support/FreeRtosMbedtlsMutex.c                                                   \
+    $(CHIP_ROOT)/examples/platform/k32w/util/LEDWidget.cpp                                                \
+    $(CHIP_ROOT)/examples/platform/k32w/app/support/FreeRtosMbedtlsMutex.c                                \
     ${CHIP_ROOT}/src/app/util/af-event.cpp                                                                \
     $(CHIP_ROOT)/src/app/util/attribute-size.c                                                            \
     $(CHIP_ROOT)/src/app/util/attribute-storage.c                                                         \
@@ -105,6 +105,9 @@ INC_DIRS = \
     $(PROJECT_ROOT)/src                                                                                   \
     $(PROJECT_ROOT)/main                                                                                  \
     $(PROJECT_ROOT)/main/include                                                                          \
+    $(CHIP_ROOT)/examples/platform/k32w/util/include                                                      \
+    $(CHIP_ROOT)/examples/platform/k32w/app/support                                                       \
+    $(CHIP_ROOT)/examples/platform/k32w/app/project_include                                               \
     $(CHIP_ROOT)/examples/lock-app/lock-common/                                                           \
     $(CHIP_ROOT)/examples/common/chip-app-server/include/                                                 \
     $(CHIP_ROOT)/src/include/                                                                             \
@@ -189,12 +192,12 @@ else
     CHIP_DEFINES += CHIP_CONFIG_LOG_LEVEL=OT_LOG_LEVEL_DEBG
 endif
 
-CHIP_PROJECT_CONFIG = $(PROJECT_ROOT)/main/include/CHIPProjectConfig.h
+CHIP_PROJECT_CONFIG = ${CHIP_ROOT}/examples/platform/k32w/app/project_include/CHIPProjectConfig.h
 
 OPENTHREAD_CONFIGURE_OPTIONS += \
     --enable-child-supervision \
     --enable-jam-detection
 
-LINKER_SCRIPT = $(PROJECT_ROOT)/main/ldscripts/chip-k32w061-lock-example.ld
+LINKER_SCRIPT = ${CHIP_ROOT}/examples/platform/k32w/app/ldscripts/chip-k32w061-lock-example.ld
 
 $(call GenerateBuildRules)
