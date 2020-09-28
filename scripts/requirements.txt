@@ -4,16 +4,21 @@
 #
 #    pip-compile requirements.in
 #
+certifi==2020.6.20        # via requests
 cffi==1.14.3              # via cryptography
+chardet==3.0.4            # via requests
 click==7.1.2              # via -r requirements.in, pip-tools
 cryptography==3.1.1       # via -r requirements.in
 future==0.18.2            # via -r requirements.in
+idna==2.10                # via requests
 pip-tools==5.3.1          # via -r requirements.in
 pycparser==2.20           # via cffi
 pyelftools==0.26          # via -r requirements.in
 pyparsing==2.3.1          # via -r requirements.in
 pyserial==3.4             # via -r requirements.in
+requests==2.24.0          # via -r requirements.in
 six==1.15.0               # via cryptography, pip-tools
+urllib3==1.25.10          # via requests
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
