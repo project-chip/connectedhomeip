@@ -189,14 +189,14 @@ struct ConnectionDataBundle
     GVariant * mpVal;
 };
 
-CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & aBleAdvConfig, void *& apEndpoint);
+CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & aBleAdvConfig, BluezEndpoint *& apEndpoint);
 bool BluezRunOnBluezThread(int (*aCallback)(void *), void * apClosure);
-bool SendBluezIndication(void * apConn, chip::System::PacketBuffer * apBuf);
-bool CloseBluezConnection(void * apAppState);
-CHIP_ERROR StartBluezAdv(void * apAppState);
-CHIP_ERROR StopBluezAdv(void * apAppState);
-CHIP_ERROR BluezGattsAppRegister(void * apAppState);
-CHIP_ERROR BluezAdvertisementSetup(void * apAppState);
+bool SendBluezIndication(BluezConnection * apConn, chip::System::PacketBuffer * apBuf);
+bool CloseBluezConnection(BluezConnection * apConn);
+CHIP_ERROR StartBluezAdv(BluezEndpoint * apEndpoint);
+CHIP_ERROR StopBluezAdv(BluezEndpoint * apEndpoint);
+CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint);
+CHIP_ERROR BluezAdvertisementSetup(BluezEndpoint * apEndpoint);
 
 } // namespace Internal
 } // namespace DeviceLayer
