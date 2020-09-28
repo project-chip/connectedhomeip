@@ -177,6 +177,7 @@ uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint
     COMMAND_HEADER(name, cluster_id, command_id);                                                                                  \
     COMMAND_FOOTER(name);
 
+#define BARRIERCONTROL_CLUSTER_ID 0x0103
 #define BASIC_CLUSTER_ID 0x0000
 #define ONOFF_CLUSTER_ID 0x0006
 #define IDENTIFY_CLUSTER_ID 0x0003
@@ -428,6 +429,22 @@ uint16_t encodeUnlockDoorCommand(uint8_t * buffer, uint16_t buf_length, uint8_t 
     COMMAND_HEADER("UnlockDoor", DOORLOCK_CLUSTER_ID, 0x01);
     COMMAND_INSERT_STRING("UnlockDoor", pin);
     COMMAND_FOOTER("UnlockDoor");
+}
+
+/*
+ * Barrier Control Cluster commands
+ */
+
+uint16_t encodeMoveToPercentCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t percent)
+{
+    COMMAND_HEADER("MoveToPercent", BARRIERCONTROL_CLUSTER_ID, 0x00);
+    buf.Put(percent);
+    COMMAND_FOOTER("MoveToPercent");
+}
+
+uint16_t encodeStopMoveToPercentCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    COMMAND("StopMoveToPercent", BARRIERCONTROL_CLUSTER_ID, 0x01);
 }
 
 } // extern "C"
