@@ -79,10 +79,10 @@ void CLIAppEventHandler(AppEvent * event)
     }
     case kCLIEvent_FactoryReset:
         ConfigurationMgr().InitiateFactoryReset();
-        return;
+        break;
     default:
         ChipLogError(Shell, "Unknown event received: %d", event->CLIEvent.Event);
-        return;
+        break;
     }
 }
 
