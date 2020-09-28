@@ -51,6 +51,8 @@ static_library("crypto") {
     "CHIPCryptoPAL.h",
   ]
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [
     ":crypto_buildconfig",
     "${chip_root}/src/lib/core",

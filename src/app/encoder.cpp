@@ -32,13 +32,6 @@
         return 0;                                                                                                                  \
     }
 
-#define CHECK_COMMAND_LENGTH(value, name)                                                                                          \
-    if (value == 0)                                                                                                                \
-    {                                                                                                                              \
-        ChipLogError(Zcl, "Error encoding %s command", name);                                                                      \
-        return 0;                                                                                                                  \
-    }
-
 using namespace chip;
 extern "C" {
 
@@ -141,75 +134,76 @@ uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint
     return buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;
 }
 
+#define READ_ATTRIBUTES(name, cluster_id)                                                                                            \
+    uint16_t attr_id_count = sizeof(attr_ids) / sizeof(attr_ids[0]);                                                                 \
+    uint16_t result        = encodeReadAttributesCommand(buffer, buf_length, destination_endpoint, 0x0006, attr_ids, attr_id_count); \
+    if (result == 0)                                                                                                                 \
+    {                                                                                                                                \
+        ChipLogError(Zcl, "Error encoding %s command", name);                                                                        \
+        return 0;                                                                                                                    \
+    }                                                                                                                                \
+    return result;
+
+#define COMMAND_HEADER(name, cluster_id, command_id)                                                                               \
+    BufBound buf    = BufBound(buffer, buf_length);                                                                                \
+    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, cluster_id, command_id);                            \
+    if (result == 0)                                                                                                               \
+    {                                                                                                                              \
+        ChipLogError(Zcl, "Error encoding %s command", name);                                                                      \
+        return 0;                                                                                                                  \
+    }
+
+#define COMMAND_FOOTER(name)                                                                                                       \
+    result = buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;                           \
+    if (result == 0)                                                                                                               \
+    {                                                                                                                              \
+        ChipLogError(Zcl, "Error encoding %s command", name);                                                                      \
+        return 0;                                                                                                                  \
+    }                                                                                                                              \
+    return result;
+
+#define COMMAND(name, cluster_id, command_id)                                                                                      \
+    COMMAND_HEADER(name, cluster_id, command_id);                                                                                  \
+    COMMAND_FOOTER(name);
+
+#define ONOFF_CLUSTER_ID 0x0006
+#define IDENTIFY_CLUSTER_ID 0x0003
+
 /*
  * On/Off Cluster commands
- *
- * Pick cluster id as 0x0006 for now
  */
 
 uint16_t encodeOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
 {
-    BufBound buf    = BufBound(buffer, buf_length);
-    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0006, 0x00);
-    CHECK_COMMAND_LENGTH(result, "Off");
-    return result;
+    COMMAND("Off", ONOFF_CLUSTER_ID, 0x00);
 };
 
 uint16_t encodeOnCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
 {
-    BufBound buf    = BufBound(buffer, buf_length);
-    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0006, 0x01);
-    CHECK_COMMAND_LENGTH(result, "On");
-    return result;
+    COMMAND("On", ONOFF_CLUSTER_ID, 0x01);
 }
 
 uint16_t encodeToggleCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
 {
-    BufBound buf    = BufBound(buffer, buf_length);
-    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0006, 0x02);
-    CHECK_COMMAND_LENGTH(result, "Toggle");
-    return result;
+    COMMAND("Toggle", ONOFF_CLUSTER_ID, 0x02);
 }
 
 uint16_t encodeReadOnOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
 {
-    uint16_t attr_id       = 0x0000; /* OnOff attribute */
-    uint16_t attr_id_count = 1;
-
-    uint16_t result = encodeReadAttributesCommand(buffer, buf_length, destination_endpoint, 0x0006, &attr_id, attr_id_count);
-    CHECK_COMMAND_LENGTH(result, "ReadOnOff");
-    return result;
-}
-
-uint16_t _encodeIdentifyClusterCommand(uint8_t * buffer, uint16_t buf_length, uint8_t command_id, uint8_t destination_endpoint,
-                                       uint16_t * identify_duration)
-{
-
-    BufBound buf    = BufBound(buffer, buf_length);
-    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0003, command_id);
-
-    if (identify_duration)
-    {
-        buf.PutLE16(*identify_duration);
-    }
-
-    result = buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;
-
-    return result;
-}
-
-uint16_t encodeIdentifyQueryCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
-{
-    uint16_t result = _encodeIdentifyClusterCommand(buffer, buf_length, 1, destination_endpoint, nullptr);
-    CHECK_COMMAND_LENGTH(result, "Identify Query");
-    return result;
+    uint16_t attr_ids[] = { 0x0000 }; /* OnOff attribute */
+    READ_ATTRIBUTES("ReadOnOff", ONOFF_CLUSTER_ID);
 }
 
 uint16_t encodeIdentifyCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t duration)
 {
-    uint16_t result = _encodeIdentifyClusterCommand(buffer, buf_length, 0, destination_endpoint, &duration);
-    CHECK_COMMAND_LENGTH(result, "Identify");
-    return result;
+    COMMAND_HEADER("Identify", IDENTIFY_CLUSTER_ID, 0x00);
+    buf.PutLE16(duration);
+    COMMAND_FOOTER("Identify");
+}
+
+uint16_t encodeIdentifyQueryCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    COMMAND("IdentifyQuery", IDENTIFY_CLUSTER_ID, 0x01);
 }
 
 } // extern "C"

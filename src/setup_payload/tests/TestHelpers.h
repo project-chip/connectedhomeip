@@ -34,7 +34,7 @@ const uint32_t kOptionalDefaultIntValue = 12;
 const char * kSerialNumberDefaultStringValue   = "123456789";
 const uint32_t kSerialNumberDefaultUInt32Value = 123456789;
 
-SetupPayload GetDefaultPayload()
+inline SetupPayload GetDefaultPayload()
 {
     SetupPayload payload;
 
@@ -49,7 +49,7 @@ SetupPayload GetDefaultPayload()
     return payload;
 }
 
-SetupPayload GetDefaultPayloadWithSerialNumber()
+inline SetupPayload GetDefaultPayloadWithSerialNumber()
 {
     SetupPayload payload = GetDefaultPayload();
     payload.addSerialNumber(kSerialNumberDefaultStringValue);
@@ -57,7 +57,7 @@ SetupPayload GetDefaultPayloadWithSerialNumber()
     return payload;
 }
 
-SetupPayload GetDefaultPayloadWithOptionalDefaults()
+inline SetupPayload GetDefaultPayloadWithOptionalDefaults()
 {
     SetupPayload payload = GetDefaultPayloadWithSerialNumber();
 
@@ -67,7 +67,7 @@ SetupPayload GetDefaultPayloadWithOptionalDefaults()
     return payload;
 }
 
-string toBinaryRepresentation(string base41Result)
+inline string toBinaryRepresentation(string base41Result)
 {
     // Remove the kQRCodePrefix
     base41Result.erase(0, strlen(kQRCodePrefix));
@@ -113,7 +113,7 @@ string toBinaryRepresentation(string base41Result)
     return binaryResult;
 }
 
-bool CompareBinary(SetupPayload & payload, string & expectedBinary)
+inline bool CompareBinary(SetupPayload & payload, string & expectedBinary)
 {
     QRCodeSetupPayloadGenerator generator(payload);
 
@@ -125,7 +125,7 @@ bool CompareBinary(SetupPayload & payload, string & expectedBinary)
     return (expectedBinary == resultBinary);
 }
 
-bool CompareBinaryLength(SetupPayload & payload, size_t expectedTLVLengthInBytes)
+inline bool CompareBinaryLength(SetupPayload & payload, size_t expectedTLVLengthInBytes)
 {
     string result;
     uint8_t optionalInfo[kDefaultBufferSizeInBytes];
@@ -143,7 +143,7 @@ bool CompareBinaryLength(SetupPayload & payload, size_t expectedTLVLengthInBytes
     return (expectedTLVLengthInBytes == resultTLVLengthInBytes);
 }
 
-bool CheckWriteRead(SetupPayload & inPayload)
+inline bool CheckWriteRead(SetupPayload & inPayload)
 {
     SetupPayload outPayload;
     string result;

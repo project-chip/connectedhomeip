@@ -129,7 +129,7 @@ public:
         }
         else
         {
-            mFlags.value &= ~Header::Flags::kSecureSessionControlMessage;
+            mFlags.value = static_cast<uint16_t>(mFlags.value & ~Header::Flags::kSecureSessionControlMessage);
         }
         return *this;
     }
@@ -150,14 +150,14 @@ public:
         }
         else
         {
-            mFlags.value &= ~Header::Flags::kSourceNodeIdPresent;
+            mFlags.value = static_cast<uint16_t>(mFlags.value & ~Header::Flags::kSourceNodeIdPresent);
         }
         return *this;
     }
 
     PacketHeader & ClearSourceNodeId()
     {
-        mFlags.value &= ~Header::Flags::kSourceNodeIdPresent;
+        mFlags.value = static_cast<uint16_t>(mFlags.value & ~Header::Flags::kSourceNodeIdPresent);
         mSourceNodeId.ClearValue();
         return *this;
     }
@@ -185,14 +185,14 @@ public:
         }
         else
         {
-            mFlags.value &= ~Header::Flags::kDestinationNodeIdPresent;
+            mFlags.value = static_cast<uint16_t>(mFlags.value & ~Header::Flags::kDestinationNodeIdPresent);
         }
         return *this;
     }
 
     PacketHeader & ClearDestinationNodeId()
     {
-        mFlags.value &= ~Header::Flags::kDestinationNodeIdPresent;
+        mFlags.value = static_cast<uint16_t>(mFlags.value & ~Header::Flags::kDestinationNodeIdPresent);
         mDestinationNodeId.ClearValue();
         return *this;
     }
@@ -465,20 +465,6 @@ public:
 private:
     /// Message authentication tag generated at encryption of the message.
     uint8_t mTag[kMaxTagLen];
-};
-
-/**
- * @deprecated
- *
- * Class that contains ALL headers (encrypted/decrypted) as one.
- *
- * Used as a temporary stop-gap while specific classes are used directly
- */
-struct MessageHeader
-{
-    PacketHeader packetHeader;
-    PayloadHeader payloadHeader;
-    MessageAuthenticationCode mac;
 };
 
 } // namespace chip

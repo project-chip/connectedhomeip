@@ -66,8 +66,6 @@ using namespace chip::System;
 namespace chip {
 namespace System {
 
-using chip::ErrorStr;
-
 static int Initialize(void * aContext);
 static int Finalize(void * aContext);
 
@@ -348,9 +346,9 @@ void TestObject::MultithreadedTest(nlTestSuite * inSuite, void * aContext, void 
         NL_TEST_ASSERT(lContext.mTestSuite, lError == 0);
     }
 
-    for (unsigned int i = 0; i < kNumThreads; ++i)
+    for (pthread_t thread : lThread)
     {
-        int lError = pthread_join(lThread[i], nullptr);
+        int lError = pthread_join(thread, nullptr);
 
         NL_TEST_ASSERT(lContext.mTestSuite, lError == 0);
     }

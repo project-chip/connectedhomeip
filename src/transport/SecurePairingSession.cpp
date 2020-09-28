@@ -105,34 +105,35 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    MessageHeader header;
+    PacketHeader packetHeader;
+    PayloadHeader payloadHeader;
 
-    header.packetHeader
+    packetHeader
         .SetSourceNodeId(mLocalNodeId) //
         .SetEncryptionKeyID(mLocalKeyId);
 
-    header.payloadHeader
+    payloadHeader
         .SetMessageType(msgType) //
         .SetProtocolID(kSecurePairingProtocol);
 
-    size_t headerSize              = header.payloadHeader.EncodeSizeBytes();
+    size_t headerSize              = payloadHeader.EncodeSizeBytes();
     size_t actualEncodedHeaderSize = 0;
 
     VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
     msgBuf->SetStart(msgBuf->Start() - headerSize);
-    err = header.payloadHeader.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize);
+    err = payloadHeader.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize);
     SuccessOrExit(err);
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
-    headerSize              = header.packetHeader.EncodeSizeBytes();
+    headerSize              = packetHeader.EncodeSizeBytes();
     actualEncodedHeaderSize = 0;
 
     VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
     msgBuf->SetStart(msgBuf->Start() - headerSize);
-    err = header.packetHeader.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize,
-                                     header.payloadHeader.GetEncodePacketFlags());
+    err =
+        packetHeader.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize, payloadHeader.GetEncodePacketFlags());
     SuccessOrExit(err);
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
@@ -206,7 +207,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandleCompute_pA(const MessageHeader & header, System::PacketBuffer * msg)
+CHIP_ERROR SecurePairingSession::HandleCompute_pA(const PacketHeader & header, System::PacketBuffer * msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -234,8 +235,8 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pA(const MessageHeader & header, 
     err = mSpake2p.ComputeRoundTwo(buf, buf_len, verifier, &verifier_len);
     SuccessOrExit(err);
 
-    mPeerKeyId  = header.packetHeader.GetEncryptionKeyID();
-    mPeerNodeId = header.packetHeader.GetSourceNodeId();
+    mPeerKeyId  = header.GetEncryptionKeyID();
+    mPeerNodeId = header.GetSourceNodeId();
 
     resp = System::PacketBuffer::NewWithAvailableSize(Y_len + verifier_len);
     VerifyOrExit(resp != nullptr, err = CHIP_SYSTEM_ERROR_NO_MEMORY);
@@ -268,7 +269,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const MessageHeader & header, System::PacketBuffer * msg)
+CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const PacketHeader & header, System::PacketBuffer * msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -286,8 +287,8 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const MessageHeader & heade
     err = mSpake2p.ComputeRoundTwo(buf, kMAX_Point_Length, verifier, &verifier_len);
     SuccessOrExit(err);
 
-    mPeerKeyId  = header.packetHeader.GetEncryptionKeyID();
-    mPeerNodeId = header.packetHeader.GetSourceNodeId();
+    mPeerKeyId  = header.GetEncryptionKeyID();
+    mPeerNodeId = header.GetSourceNodeId();
 
     resp = System::PacketBuffer::NewWithAvailableSize(verifier_len);
     VerifyOrExit(resp != nullptr, err = CHIP_SYSTEM_ERROR_NO_MEMORY);
@@ -332,7 +333,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandleCompute_cA(const MessageHeader & header, System::PacketBuffer * msg)
+CHIP_ERROR SecurePairingSession::HandleCompute_cA(const PacketHeader & header, System::PacketBuffer * msg)
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
     const uint8_t * hash = msg->Start();
@@ -340,8 +341,8 @@ CHIP_ERROR SecurePairingSession::HandleCompute_cA(const MessageHeader & header, 
     VerifyOrExit(hash != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(msg->TotalLength() == kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    VerifyOrExit(header.packetHeader.GetSourceNodeId() == mPeerNodeId, err = CHIP_ERROR_WRONG_NODE_ID);
-    VerifyOrExit(header.packetHeader.GetEncryptionKeyID() == mPeerKeyId, err = CHIP_ERROR_INVALID_KEY_ID);
+    VerifyOrExit(header.GetSourceNodeId() == mPeerNodeId, err = CHIP_ERROR_WRONG_NODE_ID);
+    VerifyOrExit(header.GetEncryptionKeyID() == mPeerKeyId, err = CHIP_ERROR_INVALID_KEY_ID);
 
     err = mSpake2p.KeyConfirm(hash, kMAX_Hash_Length);
     SuccessOrExit(err);
@@ -360,33 +361,34 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandlePeerMessage(MessageHeader & header, System::PacketBuffer * msg)
+CHIP_ERROR SecurePairingSession::HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBuffer * msg)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     size_t headerSize = 0;
+    PayloadHeader payloadHeader;
 
     VerifyOrExit(msg != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = header.payloadHeader.Decode(header.packetHeader.GetFlags(), msg->Start(), msg->DataLength(), &headerSize);
+    err = payloadHeader.Decode(packetHeader.GetFlags(), msg->Start(), msg->DataLength(), &headerSize);
     SuccessOrExit(err);
 
     msg->ConsumeHead(headerSize);
 
-    VerifyOrExit(header.payloadHeader.GetProtocolID() == kSecurePairingProtocol, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
-    VerifyOrExit(header.payloadHeader.GetMessageType() == (uint8_t) mNextExpectedMsg, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    VerifyOrExit(payloadHeader.GetProtocolID() == kSecurePairingProtocol, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    VerifyOrExit(payloadHeader.GetMessageType() == (uint8_t) mNextExpectedMsg, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    switch ((Spake2pMsgType) header.payloadHeader.GetMessageType())
+    switch ((Spake2pMsgType) payloadHeader.GetMessageType())
     {
     case Spake2pMsgType::kSpake2pCompute_pA:
-        err = HandleCompute_pA(header, msg);
+        err = HandleCompute_pA(packetHeader, msg);
         break;
 
     case Spake2pMsgType::kSpake2pCompute_pB_cB:
-        err = HandleCompute_pB_cB(header, msg);
+        err = HandleCompute_pB_cB(packetHeader, msg);
         break;
 
     case Spake2pMsgType::kSpake2pCompute_cA:
-        err = HandleCompute_cA(header, msg);
+        err = HandleCompute_cA(packetHeader, msg);
         break;
 
     default:

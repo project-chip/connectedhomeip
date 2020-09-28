@@ -17,7 +17,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/gn/chip/linux/gdbus_library.gni")
 
 gdbus_library("bluez") {
-  sources = [ "org.bluez.xml" ]
+  sources = [ "DbusBluez.xml" ]
 
   c_namespace = "Bluez"
   interface_prefix = "org.bluez"

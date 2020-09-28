@@ -42,7 +42,6 @@
 #include <pthread.h>
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-using chip::ErrorStr;
 using namespace chip::System;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS

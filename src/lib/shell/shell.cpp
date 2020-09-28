@@ -211,7 +211,7 @@ void Shell::TaskLoop(void * arg)
 
     theShellRoot.RegisterDefaultCommands();
 
-    while (1)
+    while (true)
     {
         streamer_printf(streamer_get(), CHIP_SHELL_PROMPT);
 

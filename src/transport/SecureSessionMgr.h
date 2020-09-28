@@ -170,16 +170,6 @@ private:
     /** Cancels any active timers for connection expiry checks. */
     void CancelExpiryTimer(void);
 
-    /**
-     * Allocates a new connection for the given source.
-     *
-     * @param header The header that was received when the connection was established
-     * @param address Where the connection originated from
-     * @param state [out] the newly allocated connection state for the connection
-     */
-    CHIP_ERROR AllocateNewConnection(const MessageHeader & header, const Transport::PeerAddress & address,
-                                     Transport::PeerConnectionState ** state);
-
     static void HandleDataReceived(const PacketHeader & header, const Transport::PeerAddress & source,
                                    System::PacketBuffer * msgBuf, SecureSessionMgrBase * transport);
 
