@@ -23,6 +23,7 @@ fi
 
 export PW_BRANDING_BANNER="$CHIP_ROOT/.chip-banner.txt"
 export PW_BRANDING_BANNER_COLOR="bold_white"
+export PW_VIRTUALENV_REQUIREMENTS="$CHIP_ROOT/scripts/requirements.txt"
 
 # shellcheck source=/dev/null
 source "$CHIP_ROOT/third_party/pigweed/repo/activate.sh"
