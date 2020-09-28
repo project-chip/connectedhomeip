@@ -58,6 +58,8 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    mWiFiStationMode = kWiFiStationMode_Disabled;
+
     // Initialize the generic base classes that require it.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
@@ -105,6 +107,38 @@ bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
     return ((mConnectivityFlag & kFlag_HaveIPv6InternetConnectivity) != 0);
 }
 
+ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode(void)
+{
+    if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
+    {
+        mWiFiStationMode = (mWpaSupplicant.iface != nullptr) ? kWiFiStationMode_Enabled : kWiFiStationMode_Disabled;
+    }
+
+    return mWiFiStationMode;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(ConnectivityManager::WiFiStationMode val)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(val != ConnectivityManager::kWiFiStationMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (mWiFiStationMode != val)
+    {
+        ChipLogProgress(DeviceLayer, "WiFi station mode change: %s -> %s", WiFiStationModeToStr(mWiFiStationMode),
+                        WiFiStationModeToStr(val));
+    }
+
+    mWiFiStationMode = val;
+exit:
+    return err;
+}
+
+bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
+{
+    return GetWiFiStationMode() == kWiFiStationMode_Enabled;
+}
+
 bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
 {
     bool ret            = false;
@@ -128,6 +162,11 @@ bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
     }
 
     return ret;
+}
+
+bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled(void)
+{
+    return mWiFiStationMode == ConnectivityManager::kWiFiStationMode_ApplicationControlled;
 }
 
 bool ConnectivityManagerImpl::_CanStartWiFiScan()

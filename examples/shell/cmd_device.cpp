@@ -494,6 +494,84 @@ exit:
     return error;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+int cmd_device_sta(int argc, char ** argv)
+{
+    streamer_t * sout = streamer_get();
+
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    VerifyOrExit(PlatformMgr().TryLockChipStack(), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (strcmp(argv[0], "mode") == 0)
+    {
+        const char * typeStr                      = "Unknown";
+        ConnectivityManager::WiFiStationMode mode = ConnectivityMgr().GetWiFiStationMode();
+        switch (mode)
+        {
+        case ConnectivityManager::WiFiStationMode::kWiFiStationMode_NotSupported:
+            typeStr = "NotSupported";
+            break;
+        case ConnectivityManager::WiFiStationMode::kWiFiStationMode_ApplicationControlled:
+            typeStr = "ApplicationControlled";
+            break;
+        case ConnectivityManager::WiFiStationMode::kWiFiStationMode_Disabled:
+            typeStr = "Disabled";
+            break;
+        case ConnectivityManager::WiFiStationMode::kWiFiStationMode_Enabled:
+            typeStr = "Enabled";
+            break;
+        }
+        streamer_printf(sout, "%s\r\n", typeStr);
+    }
+    else if (strcmp(argv[0], "enabled") == 0)
+    {
+        bool isState = ConnectivityMgr().IsWiFiStationEnabled();
+        streamer_printf(sout, "%s\r\n", (isState) ? "true" : "false");
+    }
+    else if (strcmp(argv[0], "provisioned") == 0)
+    {
+        bool isState = ConnectivityMgr().IsWiFiStationProvisioned();
+        streamer_printf(sout, "%s\r\n", (isState) ? "true" : "false");
+    }
+    else if (strcmp(argv[0], "clear_provision") == 0)
+    {
+        ConnectivityMgr().ClearWiFiStationProvision();
+        streamer_printf(sout, "Clear WiFi Station provision\r\n");
+    }
+    else if (strcmp(argv[0], "controlled") == 0)
+    {
+        bool isState = ConnectivityMgr().IsWiFiStationApplicationControlled();
+        streamer_printf(sout, "%s\r\n", (isState) ? "true" : "false");
+    }
+    else if (strcmp(argv[0], "connected") == 0)
+    {
+        bool isState = ConnectivityMgr().IsWiFiStationConnected();
+        streamer_printf(sout, "%s\r\n", (isState) ? "true" : "false");
+    }
+    else if (strcmp(argv[0], "reconnect_interval") == 0)
+    {
+        uint32_t interval = ConnectivityMgr().GetWiFiStationReconnectIntervalMS();
+        streamer_printf(sout, "WiFi Station Reconnect Interval (in seconds): %d\r\n", interval / 1000);
+    }
+    else if (strcmp(argv[0], "stats") == 0)
+    {
+        SuccessOrExit(error = ConnectivityMgr().GetAndLogWifiStatsCounters());
+        streamer_printf(sout, "WiFi statistics written to log\r\n");
+    }
+    else
+    {
+        ExitNow(error = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+exit:
+    PlatformMgr().UnlockChipStack();
+    return error;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 int cmd_device_thread(int argc, char ** argv)
 {
@@ -517,25 +595,25 @@ int cmd_device_thread(int argc, char ** argv)
     }
     else if (strcmp(argv[0], "role") == 0)
     {
-        const char * typeStr = u8"Unknown";
+        const char * typeStr = "Unknown";
         ConnectivityManager::ThreadDeviceType type;
         type = ConnectivityMgr().GetThreadDeviceType();
         switch (type)
         {
         case ConnectivityManager::kThreadDeviceType_NotSupported:
-            typeStr = u8"NotSupported";
+            typeStr = "NotSupported";
             break;
         case ConnectivityManager::kThreadDeviceType_Router:
-            typeStr = u8"Router";
+            typeStr = "Router";
             break;
         case ConnectivityManager::kThreadDeviceType_FullEndDevice:
-            typeStr = u8"FullEndDevice";
+            typeStr = "FullEndDevice";
             break;
         case ConnectivityManager::kThreadDeviceType_MinimalEndDevice:
-            typeStr = u8"MinimalEndDevice";
+            typeStr = "MinimalEndDevice";
             break;
         case ConnectivityManager::kThreadDeviceType_SleepyEndDevice:
-            typeStr = u8"SleepyEndDevice";
+            typeStr = "SleepyEndDevice";
             break;
         }
         streamer_printf(sout, "%d: %s\r\n", static_cast<int>(type), typeStr);
@@ -613,6 +691,9 @@ static const shell_command_t cmds_device[] = {
     { &cmd_device_config, "config", "Dump entire configuration of device. Usage: device config" },
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     { &cmd_device_thread, "thread", "Control the Thread interface. Usage: device thread <param_name>" },
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    { &cmd_device_sta, "sta", "Control the WiFi sta interface. Usage: device sta <param_name>" },
 #endif
 };
 
