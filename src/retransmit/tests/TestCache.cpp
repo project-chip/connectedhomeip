@@ -53,19 +53,19 @@ public:
     void Acquire(int value)
     {
         NL_TEST_ASSERT(mSuite, (value > 0) && value < kMaxPayloadValue);
-        mAquired.set(value);
+        mAquired.set(static_cast<size_t>(value));
     }
 
     void Release(int value)
     {
         NL_TEST_ASSERT(mSuite, (value > 0) && value < kMaxPayloadValue);
-        NL_TEST_ASSERT(mSuite, mAquired.test(value));
-        mAquired.reset(value);
+        NL_TEST_ASSERT(mSuite, mAquired.test(static_cast<size_t>(value)));
+        mAquired.reset(static_cast<size_t>(value));
     }
 
     size_t Count() const { return mAquired.count(); }
 
-    bool IsAquired(int value) const { return mAquired.test(value); }
+    bool IsAquired(int value) const { return mAquired.test(static_cast<size_t>(value)); }
 
 private:
     nlTestSuite * mSuite;
