@@ -340,6 +340,18 @@ uint16_t encodeStepColorTemperatureCommand(uint8_t * buffer, uint16_t buf_length
 uint16_t encodeStopMoveStepCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t optionMask,
                                    uint8_t optionOverride);
 
+/**
+ * Basic cluster commands
+ */
+
+/**
+ * @brief Encode a reset-to-factory command for the Basic cluster
+ * @param buffer                Buffer to encode into
+ * @param buf_length            Length of buffer
+ * @param destination_endpoint  Destination endpoint
+ * */
+uint16_t encodeResetToFactoryCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
 #ifdef __cplusplus
 }
 #endif
