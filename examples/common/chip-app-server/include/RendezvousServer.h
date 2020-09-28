@@ -28,7 +28,7 @@ class RendezvousServer : public RendezvousSessionDelegate
 public:
     RendezvousServer();
 
-    CHIP_ERROR Init(const RendezvousParameters &params);
+    CHIP_ERROR Init(const RendezvousParameters & params);
 
     void OnRendezvousConnectionOpened() override;
     void OnRendezvousConnectionClosed() override;

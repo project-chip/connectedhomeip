@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include "BluetoothWidget.h"
 #include "RendezvousDeviceDelegate.h"
+#include "BluetoothWidget.h"
 #include "RendezvousMessageHandler.h"
 #include "esp_log.h"
 #include <platform/ConfigurationManager.h>

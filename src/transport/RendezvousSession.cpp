@@ -29,7 +29,7 @@ static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Exchange Salt"
 
 namespace chip {
 
-CHIP_ERROR RendezvousSession::Init(const RendezvousParameters &params)
+CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
