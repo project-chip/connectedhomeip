@@ -19,25 +19,16 @@ import("${chip_root}/gn/chip/chip_test_suite.gni")
 import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
 
-# TODO: Factor common parts
-
 config("tests_config") {
   include_dirs = [ "." ]
 }
 
-chip_test_suite("tests") {
-  output_name = "libInetLayerTests"
-
+static_library("chip_inet_test_common_source") {
   sources = [
-    "TestInetAddress.cpp",
     "TestInetCommon.cpp",
     "TestInetCommon.h",
     "TestInetCommonOptions.cpp",
     "TestInetCommonOptions.h",
-    "TestInetEndPoint.cpp",
-    "TestInetErrorStr.cpp",
-    "TestInetLayer.cpp",
-    "TestInetLayer.h",
     "TestInetLayerCommon.cpp",
   ]
 
@@ -48,9 +39,30 @@ chip_test_suite("tests") {
     ]
   }
 
+  public_deps = [
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/core",
+    "${nlunit_test_root}:nlunit-test",
+  ]
+
+  public_configs = [ ":tests_config" ]
+}
+
+chip_test_suite("tests") {
+  output_name = "libInetLayerTests"
+
+  sources = [
+    "TestInetAddress.cpp",
+    "TestInetEndPoint.cpp",
+    "TestInetErrorStr.cpp",
+    "TestInetLayer.cpp",
+    "TestInetLayer.h",
+  ]
+
   public_configs = [ ":tests_config" ]
 
   public_deps = [
+    ":chip_inet_test_common_source",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${nlunit_test_root}:nlunit-test",
@@ -75,25 +87,12 @@ chip_test_suite("tests") {
 chip_test_suite("happy_tests") {
   output_name = "libHappyTestInetCommon"
 
-  sources = [
-    "TestInetCommon.cpp",
-    "TestInetCommon.h",
-    "TestInetCommonOptions.cpp",
-    "TestInetCommonOptions.h",
-    "TestInetLayerCommon.cpp",
-    "TestInetLayerMulticast.cpp",
-  ]
-
-  if (lwip_platform == "standalone") {
-    sources += [
-      "TapAddrAutoconf.cpp",
-      "TapAddrAutoconf.h",
-    ]
-  }
+  sources = [ "TestInetLayerMulticast.cpp" ]
 
   public_configs = [ ":tests_config" ]
 
   public_deps = [
+    ":chip_inet_test_common_source",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${nlunit_test_root}:nlunit-test",
