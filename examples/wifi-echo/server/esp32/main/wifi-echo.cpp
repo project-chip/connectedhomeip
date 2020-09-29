@@ -19,8 +19,8 @@
 #include "Button.h"
 #include "CHIPDeviceManager.h"
 #include "DataModelHandler.h"
+#include "DeviceCallbacks.h"
 #include "Display.h"
-#include "EchoDeviceCallbacks.h"
 #include "LEDWidget.h"
 #include "ListScreen.h"
 #include "QRCodeScreen.h"
@@ -49,6 +49,7 @@
 #include <transport/SecureSessionMgr.h>
 
 using namespace ::chip;
+using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
 extern void startServer();
@@ -59,16 +60,16 @@ extern void startClient(void);
 
 #if CONFIG_DEVICE_TYPE_M5STACK
 
-#define BUTTON_1_GPIO_NUM GPIO_NUM_39    // Left button on M5Stack
-#define BUTTON_2_GPIO_NUM GPIO_NUM_38    // Middle button on M5Stack
-#define BUTTON_3_GPIO_NUM GPIO_NUM_37    // Right button on M5Stack
+#define BUTTON_1_GPIO_NUM GPIO_NUM_39 // Left button on M5Stack
+#define BUTTON_2_GPIO_NUM GPIO_NUM_38 // Middle button on M5Stack
+#define BUTTON_3_GPIO_NUM GPIO_NUM_37 // Right button on M5Stack
 #define STATUS_LED_GPIO_NUM GPIO_NUM_MAX // No status LED on M5Stack
 
 #elif CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
-#define BUTTON_1_GPIO_NUM GPIO_NUM_34  // Button 1 on DevKitC
-#define BUTTON_2_GPIO_NUM GPIO_NUM_35  // Button 2 on DevKitC
-#define BUTTON_3_GPIO_NUM GPIO_NUM_0   // Button 3 on DevKitC
+#define BUTTON_1_GPIO_NUM GPIO_NUM_34 // Button 1 on DevKitC
+#define BUTTON_2_GPIO_NUM GPIO_NUM_35 // Button 2 on DevKitC
+#define BUTTON_3_GPIO_NUM GPIO_NUM_0 // Button 3 on DevKitC
 #define STATUS_LED_GPIO_NUM GPIO_NUM_2 // Use LED1 (blue LED) as status LED on DevKitC
 
 #else // !CONFIG_DEVICE_TYPE_ESP32_DEVKITC
@@ -98,7 +99,7 @@ extern void PairingComplete(SecurePairingSession * pairing);
 
 const char * TAG = "wifi-echo-demo";
 
-static EchoDeviceCallbacks EchoCallbacks;
+static DeviceCallbacks EchoCallbacks;
 RendezvousDeviceDelegate * rendezvousDelegate = nullptr;
 
 namespace {
