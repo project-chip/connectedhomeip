@@ -88,9 +88,6 @@ protected:
         kFlag_AwaitingConnectivity         = 0x0010,
     };
 
-    DeviceNetworkInfo mWiFiNetworkInfo;
-    bool mWiFiScanPending;
-
 private:
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
@@ -177,9 +174,7 @@ inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_CanStartWiFiScan()
 
 template <class ImplClass>
 inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_OnWiFiScanDone()
-{
-    mWiFiScanPending = false;
-}
+{}
 
 template <class ImplClass>
 inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_OnWiFiStationProvisionChange()
