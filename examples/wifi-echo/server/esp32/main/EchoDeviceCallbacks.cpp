@@ -68,7 +68,9 @@ void EchoDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, int
                 // of the peripheral, the following code send it over the current Rendezvous session.
                 if (rendezvousDelegate != NULL)
                 {
-                    rendezvousDelegate->Send(ipAddrStr);
+                    IPAddress addr;
+                    IPAddress::FromString(ipAddrStr, addr);
+                    rendezvousDelegate->AssignedIPAddress(addr);
                 }
             }
             wifiLED.Set(true);

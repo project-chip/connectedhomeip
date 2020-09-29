@@ -170,8 +170,7 @@ private:
 
     CHIP_ERROR AttachHeaderAndSend(uint8_t msgType, System::PacketBuffer * msgBuf);
 
-    static constexpr uint16_t kSecurePairingProtocol = 1;
-    static constexpr size_t kSpake2p_WS_Length       = kP256_FE_Length + 8;
+    static constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;
 
     enum Spake2pMsgType : uint8_t
     {

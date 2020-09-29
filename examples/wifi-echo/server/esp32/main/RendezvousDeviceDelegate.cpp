@@ -55,22 +55,9 @@ exit:
     }
 }
 
-CHIP_ERROR RendezvousDeviceDelegate::Send(const char * msg)
+CHIP_ERROR RendezvousDeviceDelegate::AssignedIPAddress(IPAddress & deviceAddr)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    System::PacketBuffer * buffer;
-    const size_t msgLen = strlen(msg);
-
-    VerifyOrExit(mRendezvousSession, err = CHIP_ERROR_INCORRECT_STATE);
-
-    buffer = System::PacketBuffer::NewWithAvailableSize(msgLen);
-    memcpy(buffer->Start(), msg, msgLen);
-    buffer->SetDataLength(msgLen);
-
-    err = mRendezvousSession->SendMessage(buffer);
-
-exit:
-    return err;
+    return mRendezvousSession->AssignedIPAddress(deviceAddr);
 }
 
 void RendezvousDeviceDelegate::OnRendezvousError(CHIP_ERROR err)

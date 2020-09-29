@@ -29,6 +29,7 @@
  */
 
 #include <core/CHIPSafeCasts.h>
+#include <protocols/CHIPProtocols.h>
 #include <support/BufBound.h>
 #include <support/CodeUtils.h>
 #include <transport/SecurePairingSession.h>
@@ -114,7 +115,7 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
 
     payloadHeader
         .SetMessageType(msgType) //
-        .SetProtocolID(kSecurePairingProtocol);
+        .SetProtocolID(Protocols::kChipProtocol_SecurePairing);
 
     size_t headerSize              = payloadHeader.EncodeSizeBytes();
     size_t actualEncodedHeaderSize = 0;
@@ -374,7 +375,7 @@ CHIP_ERROR SecurePairingSession::HandlePeerMessage(const PacketHeader & packetHe
 
     msg->ConsumeHead(headerSize);
 
-    VerifyOrExit(payloadHeader.GetProtocolID() == kSecurePairingProtocol, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    VerifyOrExit(payloadHeader.GetProtocolID() == Protocols::kChipProtocol_SecurePairing, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
     VerifyOrExit(payloadHeader.GetMessageType() == (uint8_t) mNextExpectedMsg, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     switch ((Spake2pMsgType) payloadHeader.GetMessageType())
