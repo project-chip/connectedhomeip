@@ -50,6 +50,7 @@ enum CHIPProtocolId
 
     kChipProtocol_Common              = (kChipVendor_Common << 16) | 0x0000, // Common Protocol
     kChipProtocol_Echo                = (kChipVendor_Common << 16) | 0x0001, // Echo Protocol
+    kChipProtocol_SecurePairing       = (kChipVendor_Common << 16) | 0x0002, // SPAKE2+ handshake Protocol
     kChipProtocol_NetworkProvisioning = (kChipVendor_Common << 16) | 0x0003, // Network Provisioning Protocol
     kChipProtocol_Security            = (kChipVendor_Common << 16) | 0x0004, // Network Security Protocol
     kChipProtocol_FabricProvisioning  = (kChipVendor_Common << 16) | 0x0005, // Fabric Provisioning Protocol
