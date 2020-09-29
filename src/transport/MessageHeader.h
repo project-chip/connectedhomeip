@@ -221,7 +221,7 @@ public:
      *
      * @return the number of bytes needed in a buffer to be able to Encode.
      */
-    size_t EncodeSizeBytes() const;
+    uint16_t EncodeSizeBytes() const;
 
     /**
      * Decodes a header from the given buffer.
@@ -237,7 +237,7 @@ public:
      *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
      *    CHIP_ERROR_VERSION_MISMATCH if header version is not supported.
      */
-    CHIP_ERROR Decode(const uint8_t * data, size_t size, size_t * decode_size);
+    CHIP_ERROR Decode(const uint8_t * const data, size_t size, uint16_t * decode_size);
 
     /**
      * Encodes a header into the given buffer.
@@ -251,7 +251,7 @@ public:
      * Possible failures:
      *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
      */
-    CHIP_ERROR Encode(uint8_t * data, size_t size, size_t * encode_size, Header::Flags payloadFlags) const;
+    CHIP_ERROR Encode(uint8_t * data, size_t size, uint16_t * encode_size, Header::Flags payloadFlags) const;
 
 private:
     /// Represents the current encode/decode header version
@@ -355,7 +355,7 @@ public:
      *
      * @return the number of bytes needed in a buffer to be able to Encode.
      */
-    size_t EncodeSizeBytes() const;
+    uint16_t EncodeSizeBytes() const;
 
     /**
      * Decodes the encrypted header fields from the given buffer.
@@ -372,7 +372,7 @@ public:
      *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
      *    CHIP_ERROR_VERSION_MISMATCH if header version is not supported.
      */
-    CHIP_ERROR Decode(Header::Flags flags, const uint8_t * data, size_t size, size_t * decode_size);
+    CHIP_ERROR Decode(Header::Flags flags, const uint8_t * const data, size_t size, uint16_t * decode_size);
 
     /**
      * Encodes the encrypted part of the header into the given buffer.
@@ -386,7 +386,7 @@ public:
      * Possible failures:
      *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
      */
-    CHIP_ERROR Encode(uint8_t * data, size_t size, size_t * encode_size) const;
+    CHIP_ERROR Encode(uint8_t * data, size_t size, uint16_t * encode_size) const;
 
     /** Flags required for encoding this payload. */
     Header::Flags GetEncodePacketFlags() const;
@@ -443,7 +443,7 @@ public:
      *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
      *    CHIP_ERROR_VERSION_MISMATCH if header version is not supported.
      */
-    CHIP_ERROR Decode(const PacketHeader & packetHeader, const uint8_t * data, size_t size, size_t * decode_size);
+    CHIP_ERROR Decode(const PacketHeader & packetHeader, const uint8_t * const data, size_t size, uint16_t * decode_size);
 
     /**
      * Encodes the Messae Authentication Tag into the given buffer.
@@ -458,9 +458,9 @@ public:
      * Possible failures:
      *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
      */
-    CHIP_ERROR Encode(const PacketHeader & packetHeader, uint8_t * data, size_t size, size_t * encode_size) const;
+    CHIP_ERROR Encode(const PacketHeader & packetHeader, uint8_t * data, size_t size, uint16_t * encode_size) const;
 
-    static size_t TagLenForEncryptionType(Header::EncryptionType encType);
+    static uint16_t TagLenForEncryptionType(Header::EncryptionType encType);
 
 private:
     /// Message authentication tag generated at encryption of the message.
