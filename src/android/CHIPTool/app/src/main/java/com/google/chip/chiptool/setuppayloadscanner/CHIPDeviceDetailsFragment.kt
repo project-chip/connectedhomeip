@@ -18,6 +18,7 @@
 
 package com.google.chip.chiptool.setuppayloadscanner
 
+import android.bluetooth.BluetoothGatt
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -27,12 +28,20 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.R
+import com.google.chip.chiptool.bluetooth.BluetoothManager
 import kotlinx.android.synthetic.main.chip_device_info_fragment.view.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 /** Show the [CHIPDeviceInfo]. */
 class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionListener {
 
     private lateinit var deviceInfo: CHIPDeviceInfo
+    private var gatt: BluetoothGatt? = null
+    private val scope = CoroutineScope(Dispatchers.Main + Job())
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,7 +79,26 @@ class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionLis
         }
     }
 
-    private fun onRendezvousBleClicked() { }
+    override fun onStop() {
+        super.onStop()
+        gatt?.disconnect()
+        gatt = null
+        scope.cancel()
+    }
+
+    private fun onRendezvousBleClicked() {
+        if (gatt == null) {
+            scope.launch {
+                val bluetoothManager = BluetoothManager()
+                val device = bluetoothManager.getBluetoothDevice(deviceInfo.discriminator) ?: run {
+                    Log.i(TAG, "No device found")
+                    return@launch
+                }
+
+                gatt = bluetoothManager.connect(requireContext(), device)
+            }
+        }
+    }
 
     override fun onConnectDeviceComplete() {
         Log.d(TAG, "TODO: Retrieve Wi-Fi credentials and send to device.")
