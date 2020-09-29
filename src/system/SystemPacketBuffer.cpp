@@ -556,7 +556,7 @@ PacketBuffer * PacketBuffer::New(uint16_t aReservedSize)
  * The reserved size (#CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) is large enough to hold transport layer headers as well as headers
  * required by \c chipMessageLayer and \c chipExchangeLayer.
  */
-PacketBuffer * PacketBuffer::New(void)
+PacketBuffer * PacketBuffer::New()
 {
     return PacketBuffer::New(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
 }
@@ -620,7 +620,7 @@ void PacketBuffer::Free(PacketBuffer * aPacket)
  *
  * This method is called by Free(), before the buffer is released to the free buffer pool.
  */
-void PacketBuffer::Clear(void)
+void PacketBuffer::Clear()
 {
     tot_len = 0;
     len     = 0;

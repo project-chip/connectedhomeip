@@ -80,8 +80,8 @@ static void HandleSignal(int aSignal);
 static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
 static bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[]);
 
-static void StartTest(void);
-static void CleanupTest(void);
+static void StartTest();
+static void CleanupTest();
 
 /* Global Variables */
 
@@ -761,7 +761,7 @@ static void HandleUDPReceiveError(IPEndPointBasis * aEndPoint, INET_ERROR aError
     SetStatusFailed(sTestState.mStatus);
 }
 
-static bool IsTransportReadyForSend(void)
+static bool IsTransportReadyForSend()
 {
     bool lStatus = false;
 
@@ -796,7 +796,7 @@ static bool IsTransportReadyForSend(void)
     return (lStatus);
 }
 
-static INET_ERROR PrepareTransportForSend(void)
+static INET_ERROR PrepareTransportForSend()
 {
     INET_ERROR lStatus = INET_NO_ERROR;
 
@@ -885,7 +885,7 @@ exit:
     return (lStatus);
 }
 
-void DriveSend(void)
+void DriveSend()
 {
     INET_ERROR lStatus = INET_NO_ERROR;
 
@@ -932,7 +932,7 @@ exit:
     return;
 }
 
-static void StartTest(void)
+static void StartTest()
 {
     IPAddressType lIPAddressType = kIPAddressType_IPv6;
     IPProtocol lIPProtocol       = kIPProtocol_ICMPv6;
@@ -1044,7 +1044,7 @@ static void StartTest(void)
         DriveSend();
 }
 
-static void CleanupTest(void)
+static void CleanupTest()
 {
     INET_ERROR lStatus;
 

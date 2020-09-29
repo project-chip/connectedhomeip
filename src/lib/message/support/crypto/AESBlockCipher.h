@@ -73,11 +73,11 @@ public:
         kRoundCount    = 10
     };
 
-    void Reset(void);
+    void Reset();
 
 protected:
-    AES128BlockCipher(void);
-    ~AES128BlockCipher(void);
+    AES128BlockCipher();
+    ~AES128BlockCipher();
 
 #if CHIP_CRYPTO_OPENSSL
     AES_KEY mKey;
@@ -119,11 +119,11 @@ public:
         kRoundCount    = 14
     };
 
-    void Reset(void);
+    void Reset();
 
 protected:
-    AES256BlockCipher(void);
-    ~AES256BlockCipher(void);
+    AES256BlockCipher();
+    ~AES256BlockCipher();
 
 #if CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL
     AES_KEY mKey;

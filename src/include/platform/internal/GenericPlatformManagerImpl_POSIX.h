@@ -72,14 +72,14 @@ protected:
 
     CHIP_ERROR
     _InitChipStack();
-    void _LockChipStack(void);
-    bool _TryLockChipStack(void);
-    void _UnlockChipStack(void);
+    void _LockChipStack();
+    bool _TryLockChipStack();
+    void _UnlockChipStack();
     void _PostEvent(const ChipDeviceEvent * event);
-    void _RunEventLoop(void);
-    CHIP_ERROR _StartEventLoopTask(void);
+    void _RunEventLoop();
+    CHIP_ERROR _StartEventLoopTask();
     CHIP_ERROR _StartChipTimer(int64_t durationMS);
-    CHIP_ERROR _Shutdown(void);
+    CHIP_ERROR _Shutdown();
 
     // ===== Methods available to the implementation subclass.
 

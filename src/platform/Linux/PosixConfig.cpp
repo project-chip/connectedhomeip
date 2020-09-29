@@ -459,7 +459,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR PosixConfig::FactoryResetConfig(void)
+CHIP_ERROR PosixConfig::FactoryResetConfig()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLinuxStorage * storage;

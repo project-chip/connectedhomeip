@@ -43,7 +43,7 @@ namespace Internal {
 extern CHIP_ERROR InitEntropy();
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
 {
     CHIP_ERROR err;
 

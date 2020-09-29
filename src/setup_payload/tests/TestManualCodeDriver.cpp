@@ -24,7 +24,7 @@
 
 #include "TestManualCode.h"
 
-int main(void)
+int main()
 {
     return (TestManualSetupCode());
 }

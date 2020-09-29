@@ -106,7 +106,7 @@ struct RestartCallbackContext
     char ** mArgv;
 };
 
-static void RebootCallbackFn(void);
+static void RebootCallbackFn();
 static void PostInjectionCallbackFn(nl::FaultInjection::Manager * aManager, nl::FaultInjection::Identifier aId,
                                     nl::FaultInjection::Record * aFaultRecord);
 
@@ -168,7 +168,7 @@ static void ExitOnSIGUSR1Handler(int signum)
 }
 
 // We set a hook to exit when we receive SIGUSR1, SIGTERM or SIGHUP
-void SetSIGUSR1Handler(void)
+void SetSIGUSR1Handler()
 {
     SetSignalHandler(ExitOnSIGUSR1Handler);
 }
@@ -658,7 +658,7 @@ void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix)
 
     DumpMemory(mem, len, prefix, kRowWidth);
 }
-static void RebootCallbackFn(void)
+static void RebootCallbackFn()
 {
     char * lArgv[sRestartCallbackCtx.mArgc + 2];
     int i;
@@ -762,7 +762,7 @@ void SetupFaultInjectionContext(int argc, char * argv[])
     SetupFaultInjectionContext(argc, argv, nullptr, nullptr);
 }
 
-void SetupFaultInjectionContext(int argc, char * argv[], int32_t (*aNumEventsAvailable)(void),
+void SetupFaultInjectionContext(int argc, char * argv[], int32_t (*aNumEventsAvailable)(),
                                 void (*aInjectAsyncEvents)(int32_t index))
 {
     nl::FaultInjection::Manager & weavemgr  = chip::FaultInjection::GetManager();

@@ -92,7 +92,7 @@ exit:
 /**
  * Register a text error formatter for Device Layer errors.
  */
-void RegisterDeviceLayerErrorFormatter(void)
+void RegisterDeviceLayerErrorFormatter()
 {
     static ErrorFormatter sDeviceLayerErrorFormatter = { FormatDeviceLayerError, nullptr };
 

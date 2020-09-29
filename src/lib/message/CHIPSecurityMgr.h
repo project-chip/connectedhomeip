@@ -101,10 +101,10 @@ public:
     uint32_t SessionEstablishTimeout; // The amount of time after which an in-progress session establishment will timeout.
     uint32_t IdleSessionTimeout;      // The amount of time after which an idle session will be removed.
 
-    ChipSecurityManager(void);
+    ChipSecurityManager();
 
     CHIP_ERROR Init(ChipExchangeManager & aExchangeMgr, System::Layer & aSystemLayer);
-    CHIP_ERROR Shutdown(void);
+    CHIP_ERROR Shutdown();
 
     typedef void (*SessionEstablishedFunct)(ChipSecurityManager * sm, ChipConnection * con, void * reqState, uint16_t sessionKeyId,
                                             uint64_t peerNodeId, uint8_t encType);
@@ -186,12 +186,12 @@ private:
     System::Layer * mSystemLayer;
     uint8_t mFlags;
 
-    void StartSessionTimer(void);
-    void CancelSessionTimer(void);
+    void StartSessionTimer();
+    void CancelSessionTimer();
     static void HandleSessionTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 
-    void StartIdleSessionTimer(void);
-    void StopIdleSessionTimer(void);
+    void StartIdleSessionTimer();
+    void StopIdleSessionTimer();
     static void HandleIdleSessionTimeout(System::Layer * aLayer, void * aAppState, System::Error aError);
 
     static void HandleUnsolicitedMessage(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
@@ -204,15 +204,15 @@ private:
                                          ExchangeContext *& ec);
 #endif
     CHIP_ERROR NewSessionExchange(uint64_t peerNodeId, IPAddress peerAddr, uint16_t peerPort);
-    CHIP_ERROR HandleSessionEstablished(void);
-    void HandleSessionComplete(void);
+    CHIP_ERROR HandleSessionEstablished();
+    void HandleSessionComplete();
     void HandleSessionError(CHIP_ERROR err, PacketBuffer * statusReportMsgBuf);
     static void HandleConnectionClosed(ExchangeContext * ec, ChipConnection * con, CHIP_ERROR conErr);
     static CHIP_ERROR SendStatusReport(CHIP_ERROR localError, ExchangeContext * ec);
     static void RMPHandleAckRcvd(ExchangeContext * ec, void * msgCtxt);
     static void RMPHandleSendError(ExchangeContext * ec, CHIP_ERROR err, void * msgCtxt);
 
-    void Reset(void);
+    void Reset();
 
     void AsyncNotifySecurityManagerAvailable();
     static void DoNotifySecurityManagerAvailable(System::Layer * systemLayer, void * appState, System::Error err);

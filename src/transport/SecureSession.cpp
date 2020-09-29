@@ -93,7 +93,7 @@ exit:
     return error;
 }
 
-void SecureSession::Reset(void)
+void SecureSession::Reset()
 {
     mKeyAvailable = false;
     memset(mKey, 0, sizeof(mKey));

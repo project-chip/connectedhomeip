@@ -84,7 +84,7 @@ public:
 
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
 
-    CHIP_ERROR _JoinerStart(void);
+    CHIP_ERROR _JoinerStart();
 
     ~ThreadStackManagerImpl() = default;
 

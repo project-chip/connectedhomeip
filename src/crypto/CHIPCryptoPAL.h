@@ -328,13 +328,13 @@ struct HashSHA256OpaqueContext
 class Hash_SHA256_stream
 {
 public:
-    Hash_SHA256_stream(void);
-    ~Hash_SHA256_stream(void);
+    Hash_SHA256_stream();
+    ~Hash_SHA256_stream();
 
-    CHIP_ERROR Begin(void);
+    CHIP_ERROR Begin();
     CHIP_ERROR AddData(const uint8_t * data, const size_t data_length);
     CHIP_ERROR Finish(uint8_t * out_buffer);
-    void Clear(void);
+    void Clear();
 
 private:
     HashSHA256OpaqueContext mContext;
@@ -419,7 +419,7 @@ class Spake2p
 {
 public:
     Spake2p(size_t fe_size, size_t point_size, size_t hash_size);
-    virtual ~Spake2p(void) {}
+    virtual ~Spake2p() {}
 
     /**
      * @brief Initialize Spake2+ with some context specific information.
@@ -510,8 +510,8 @@ public:
     CHIP_ERROR GetKeys(uint8_t * out, size_t * out_len);
 
     CHIP_ERROR InternalHash(const uint8_t * in, size_t in_len);
-    CHIP_ERROR WriteMN(void);
-    CHIP_ERROR GenerateKeys(void);
+    CHIP_ERROR WriteMN();
+    CHIP_ERROR GenerateKeys();
 
     /**
      * @brief Load a field element.
@@ -771,12 +771,12 @@ struct Spake2pOpaqueContext
 class Spake2p_P256_SHA256_HKDF_HMAC : public Spake2p
 {
 public:
-    Spake2p_P256_SHA256_HKDF_HMAC(void) : Spake2p(kP256_FE_Length, kP256_Point_Length, kSHA256_Hash_Length)
+    Spake2p_P256_SHA256_HKDF_HMAC() : Spake2p(kP256_FE_Length, kP256_Point_Length, kSHA256_Hash_Length)
     {
         memset(&mSpake2pContext, 0, sizeof(mSpake2pContext));
     }
 
-    ~Spake2p_P256_SHA256_HKDF_HMAC(void) override { FreeImpl(); }
+    ~Spake2p_P256_SHA256_HKDF_HMAC() override { FreeImpl(); }
 
     CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out) override;
     CHIP_ERROR MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len, const uint8_t * in,

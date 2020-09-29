@@ -33,7 +33,7 @@
 
 #include <nlunit-test.h>
 
-int main(void)
+int main()
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     tcpip_init(NULL, NULL);

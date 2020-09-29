@@ -240,8 +240,8 @@ public:
                                           an explicitly encoded destination node identifier, false
                                           otherwise. */
 
-    void AddRef(void);
-    void Release(void);
+    void AddRef();
+    void Release();
 
     // Note: a downcall to Connect() may call OnConnectionComplete before it returns.
     CHIP_ERROR Connect(uint64_t peerNodeId);
@@ -267,28 +267,28 @@ public:
     CHIP_ERROR SendMessage(ChipMessageInfo * msgInfo, PacketBuffer * msgBuf);
 
     // TODO COM-311: implement EnableReceived/DisableReceive for BLE ChipConnections.
-    void EnableReceive(void);
-    void DisableReceive(void);
+    void EnableReceive();
+    void DisableReceive();
 
-    CHIP_ERROR Shutdown(void);
+    CHIP_ERROR Shutdown();
 
-    CHIP_ERROR Close(void);
+    CHIP_ERROR Close();
     CHIP_ERROR Close(bool suppressCloseLog);
 
-    void Abort(void);
+    void Abort();
 
     void SetConnectTimeout(const uint32_t connTimeoutMsecs);
 
     CHIP_ERROR SetIdleTimeout(uint32_t timeoutMS);
 
     CHIP_ERROR EnableKeepAlive(uint16_t interval, uint16_t timeoutCount);
-    CHIP_ERROR DisableKeepAlive(void);
+    CHIP_ERROR DisableKeepAlive();
 
     CHIP_ERROR SetUserTimeout(uint32_t userTimeoutMillis);
-    CHIP_ERROR ResetUserTimeout(void);
-    uint16_t LogId(void) const { return static_cast<uint16_t>(reinterpret_cast<intptr_t>(this)); }
+    CHIP_ERROR ResetUserTimeout();
+    uint16_t LogId() const { return static_cast<uint16_t>(reinterpret_cast<intptr_t>(this)); }
 
-    TCPEndPoint * GetTCPEndPoint(void) const { return mTcpEndPoint; }
+    TCPEndPoint * GetTCPEndPoint() const { return mTcpEndPoint; }
 
     /**
      *  This function is the application callback that is invoked when a connection setup is complete.
@@ -338,7 +338,7 @@ public:
     typedef void (*ReceiveErrorFunct)(ChipConnection * con, CHIP_ERROR err);
     ReceiveErrorFunct OnReceiveError;
 
-    bool IsIncoming(void) const { return GetFlag(mFlags, kFlag_IsIncoming); }
+    bool IsIncoming() const { return GetFlag(mFlags, kFlag_IsIncoming); }
     void SetIncoming(bool val) { SetFlag(mFlags, kFlag_IsIncoming, val); }
 
 private:
@@ -366,12 +366,12 @@ private:
 
     void Init(ChipMessageLayer * msgLayer);
     void MakeConnectedTcp(TCPEndPoint * endPoint, const IPAddress & localAddr, const IPAddress & peerAddr);
-    CHIP_ERROR StartConnect(void);
+    CHIP_ERROR StartConnect();
     void DoClose(CHIP_ERROR err, uint8_t flags);
     CHIP_ERROR TryNextPeerAddress(CHIP_ERROR lastErr);
-    void StartSession(void);
-    bool StateAllowsSend(void) const { return State == kState_EstablishingSession || State == kState_Connected; }
-    bool StateAllowsReceive(void) const
+    void StartSession();
+    bool StateAllowsSend() const { return State == kState_EstablishingSession || State == kState_Connected; }
+    bool StateAllowsReceive() const
     {
         return State == kState_EstablishingSession || State == kState_Connected || State == kState_SendShutdown;
     }
@@ -465,7 +465,7 @@ public:
          *  The InitContext constructor.
          *
          */
-        InitContext(void)
+        InitContext()
         {
             systemLayer = nullptr;
             inet        = nullptr;
@@ -482,7 +482,7 @@ public:
         }
     };
 
-    ChipMessageLayer(void);
+    ChipMessageLayer();
     ChipMessageLayer(const ChipMessageLayer &) = delete;
     ChipMessageLayer & operator=(const ChipMessageLayer &) = delete;
 
@@ -500,7 +500,7 @@ public:
                                             drops the message and returns. */
 
     CHIP_ERROR Init(InitContext * context);
-    CHIP_ERROR Shutdown(void);
+    CHIP_ERROR Shutdown();
 
     CHIP_ERROR SendMessage(ChipMessageInfo * msgInfo, PacketBuffer * msgBuf);
     CHIP_ERROR SendMessage(const IPAddress & destAddr, ChipMessageInfo * msgInfo, PacketBuffer * msgBuf);
@@ -512,7 +512,7 @@ public:
     CHIP_ERROR ResendMessage(const IPAddress & destAddr, uint16_t destPort, InterfaceId interfaceId, ChipMessageInfo * msgInfo,
                              PacketBuffer * msgBuf);
 
-    ChipConnection * NewConnection(void);
+    ChipConnection * NewConnection();
 
     void GetConnectionPoolStats(chip::System::Stats::count_t & aOutInUse) const;
 
@@ -592,23 +592,23 @@ public:
     CHIP_ERROR EncodeMessage(const IPAddress & destAddr, uint16_t destPort, InterfaceId sendIntId, ChipMessageInfo * msgInfo,
                              PacketBuffer * payload);
 
-    CHIP_ERROR RefreshEndpoints(void);
-    CHIP_ERROR CloseEndpoints(void);
+    CHIP_ERROR RefreshEndpoints();
+    CHIP_ERROR CloseEndpoints();
 
-    bool IPv4ListenEnabled(void) const;
-    bool IPv6ListenEnabled(void) const;
-    bool TCPListenEnabled(void) const;
+    bool IPv4ListenEnabled() const;
+    bool IPv6ListenEnabled() const;
+    bool TCPListenEnabled() const;
     void SetTCPListenEnabled(bool val);
-    bool UDPListenEnabled(void) const;
+    bool UDPListenEnabled() const;
     void SetUDPListenEnabled(bool val);
-    bool UnsecuredListenEnabled(void) const;
-    bool EphemeralUDPPortEnabled(void) const;
+    bool UnsecuredListenEnabled() const;
+    bool EphemeralUDPPortEnabled() const;
 #if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
     void SetEphemeralUDPPortEnabled(bool val);
 #endif
 
-    bool IsBoundToLocalIPv4Address(void) const;
-    bool IsBoundToLocalIPv6Address(void) const;
+    bool IsBoundToLocalIPv4Address() const;
+    bool IsBoundToLocalIPv6Address() const;
 
     /**
      *  This function is the application callback for reporting message layer activity change.
@@ -620,7 +620,7 @@ public:
      */
     typedef void (*MessageLayerActivityChangeHandlerFunct)(bool messageLayerIsActive);
     void SetSignalMessageLayerActivityChanged(MessageLayerActivityChangeHandlerFunct messageLayerActivityChangeHandler);
-    bool IsMessageLayerActive(void);
+    bool IsMessageLayerActive();
 
     static uint32_t GetMaxChipPayloadSize(const PacketBuffer * msgBuf, bool isUDP, uint32_t udpMTU);
 
@@ -672,12 +672,12 @@ private:
     void * UnsecuredConnectionReceivedAppState;
     MessageLayerActivityChangeHandlerFunct OnMessageLayerActivityChange;
 
-    CHIP_ERROR EnableUnsecuredListen(void);
-    CHIP_ERROR DisableUnsecuredListen(void);
+    CHIP_ERROR EnableUnsecuredListen();
+    CHIP_ERROR DisableUnsecuredListen();
 
-    void SignalMessageLayerActivityChanged(void);
+    void SignalMessageLayerActivityChanged();
 
-    void CloseListeningEndpoints(void);
+    void CloseListeningEndpoints();
 
     CHIP_ERROR RefreshEndpoint(TCPEndPoint *& endPoint, bool enable, const char * name, IPAddressType addrType, IPAddress addr,
                                uint16_t port);
@@ -724,7 +724,7 @@ private:
  *  Check if the ChipMessageLayer is configured to listen for inbound communications
  *  over IPv4.
  */
-inline bool ChipMessageLayer::IPv4ListenEnabled(void) const
+inline bool ChipMessageLayer::IPv4ListenEnabled() const
 {
     // When IPv4 is supported, and the targeted listen feature is enabled, enable IPv4 listening
     // when the message layer has been bound to a specific IPv4 listening address OR the message
@@ -744,7 +744,7 @@ inline bool ChipMessageLayer::IPv4ListenEnabled(void) const
  *  Check if the ChipMessageLayer is configured to listen for inbound communications
  *  over IPv4.
  */
-inline bool ChipMessageLayer::IPv6ListenEnabled(void) const
+inline bool ChipMessageLayer::IPv6ListenEnabled() const
 {
     // When the targeted listen feature is enabled, enable IPv6 listening when the message layer has
     // been bound to a specific IPv6 listening address OR the message
@@ -758,7 +758,7 @@ inline bool ChipMessageLayer::IPv6ListenEnabled(void) const
 /**
  *  Check if the ChipMessageLayer is configured to listen for inbound TCP connections.
  */
-inline bool ChipMessageLayer::TCPListenEnabled(void) const
+inline bool ChipMessageLayer::TCPListenEnabled() const
 {
     return GetFlag(mFlags, kFlag_ListenTCP);
 }
@@ -776,7 +776,7 @@ inline void ChipMessageLayer::SetTCPListenEnabled(bool val)
 /**
  *  Check if the ChipMessageLayer is configured to listen for inbound UDP messages.
  */
-inline bool ChipMessageLayer::UDPListenEnabled(void) const
+inline bool ChipMessageLayer::UDPListenEnabled() const
 {
     return GetFlag(mFlags, kFlag_ListenUDP);
 }
@@ -795,7 +795,7 @@ inline void ChipMessageLayer::SetUDPListenEnabled(bool val)
  *  Check if locally initiated CHIP UDP exchanges should be sent from an ephemeral
  *  UDP source port.
  */
-inline bool ChipMessageLayer::EphemeralUDPPortEnabled(void) const
+inline bool ChipMessageLayer::EphemeralUDPPortEnabled() const
 {
 #if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
     return GetFlag(mFlags, kFlag_EphemeralUDPPortEnabled);
@@ -829,7 +829,7 @@ inline bool ChipMessageLayer::UnsecuredListenEnabled() const
 /**
  *  Check if the ChipMessageLayer is bound to a local IPv4 address.
  */
-inline bool ChipMessageLayer::IsBoundToLocalIPv4Address(void) const
+inline bool ChipMessageLayer::IsBoundToLocalIPv4Address() const
 {
 #if INET_CONFIG_ENABLE_IPV4 && CHIP_CONFIG_ENABLE_TARGETED_LISTEN
     return FabricState->ListenIPv4Addr != IPAddress::Any;
@@ -841,7 +841,7 @@ inline bool ChipMessageLayer::IsBoundToLocalIPv4Address(void) const
 /**
  *  Check if the ChipMessageLayer is bound to a local IPv6 address.
  */
-inline bool ChipMessageLayer::IsBoundToLocalIPv6Address(void) const
+inline bool ChipMessageLayer::IsBoundToLocalIPv6Address() const
 {
 #if CHIP_CONFIG_ENABLE_TARGETED_LISTEN
     return FabricState->ListenIPv6Addr != IPAddress::Any;

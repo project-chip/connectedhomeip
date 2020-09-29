@@ -102,7 +102,7 @@ namespace System {
 /**
  * Register a text error formatter for System Layer errors.
  */
-void RegisterLayerErrorFormatter(void)
+void RegisterLayerErrorFormatter()
 {
     static ErrorFormatter sSystemLayerErrorFormatter = { FormatLayerError, nullptr };
 
@@ -212,7 +212,7 @@ DLL_EXPORT bool IsErrorPOSIX(Error aError)
 /**
  * Register a text error formatter for POSIX errors.
  */
-void RegisterPOSIXErrorFormatter(void)
+void RegisterPOSIXErrorFormatter()
 {
     static ErrorFormatter sPOSIXErrorFormatter = { FormatPOSIXError, nullptr };
 

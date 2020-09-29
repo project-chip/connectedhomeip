@@ -98,21 +98,21 @@ public:
 private:
     // ===== Members that implement the BLEManager internal interface.
 
-    CHIP_ERROR _Init(void);
-    CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
+    CHIP_ERROR _Init();
+    CHIPoBLEServiceMode _GetCHIPoBLEServiceMode();
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
-    bool _IsAdvertisingEnabled(void);
+    bool _IsAdvertisingEnabled();
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
-    bool _IsFastAdvertisingEnabled(void);
+    bool _IsFastAdvertisingEnabled();
     CHIP_ERROR _SetFastAdvertisingEnabled(bool val);
-    bool _IsAdvertising(void);
+    bool _IsAdvertising();
     CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetDeviceName(const char * deviceName);
-    uint16_t _NumConnections(void);
+    uint16_t _NumConnections();
 
     void _OnPlatformEvent(const ChipDeviceEvent * event);
     void HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * event);
-    BleLayer * _GetBleLayer(void) const;
+    BleLayer * _GetBleLayer() const;
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
@@ -135,8 +135,8 @@ private:
 
     // ===== Members for internal use by the following friends.
 
-    friend BLEManager & BLEMgr(void);
-    friend BLEManagerImpl & BLEMgrImpl(void);
+    friend BLEManager & BLEMgr();
+    friend BLEManagerImpl & BLEMgrImpl();
 
     static BLEManagerImpl sInstance;
 
@@ -162,8 +162,8 @@ private:
         kMaxAdvertismentDataSetSize = 31  // TODO: verify this
     };
 
-    CHIP_ERROR StartBLEAdvertising(void);
-    CHIP_ERROR StopBLEAdvertising(void);
+    CHIP_ERROR StartBLEAdvertising();
+    CHIP_ERROR StopBLEAdvertising();
 
     void DriveBLEState();
     static void DriveBLEState(intptr_t arg);
@@ -182,7 +182,7 @@ private:
  * Internal components should use this to access features of the BLEManager object
  * that are common to all platforms.
  */
-inline BLEManager & BLEMgr(void)
+inline BLEManager & BLEMgr()
 {
     return BLEManagerImpl::sInstance;
 }
@@ -193,7 +193,7 @@ inline BLEManager & BLEMgr(void)
  * Internal components can use this to gain access to features of the BLEManager
  * that are specific to the Linux platforms.
  */
-inline BLEManagerImpl & BLEMgrImpl(void)
+inline BLEManagerImpl & BLEMgrImpl()
 {
     return BLEManagerImpl::sInstance;
 }
@@ -203,22 +203,22 @@ inline BleLayer * BLEManagerImpl::_GetBleLayer() const
     return (BleLayer *) (this);
 }
 
-inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
+inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode()
 {
     return mServiceMode;
 }
 
-inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)
+inline bool BLEManagerImpl::_IsAdvertisingEnabled()
 {
     return GetFlag(mFlags, kFlag_AdvertisingEnabled);
 }
 
-inline bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
+inline bool BLEManagerImpl::_IsFastAdvertisingEnabled()
 {
     return GetFlag(mFlags, kFlag_FastAdvertisingEnabled);
 }
 
-inline bool BLEManagerImpl::_IsAdvertising(void)
+inline bool BLEManagerImpl::_IsAdvertising()
 {
     return GetFlag(mFlags, kFlag_Advertising);
 }

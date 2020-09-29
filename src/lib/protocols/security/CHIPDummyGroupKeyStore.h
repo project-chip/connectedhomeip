@@ -44,7 +44,7 @@ namespace AppKeys {
 class DummyGroupKeyStore : public GroupKeyStoreBase
 {
 public:
-    DummyGroupKeyStore(void);
+    DummyGroupKeyStore();
 
     // Manage application group key material storage.
     CHIP_ERROR RetrieveGroupKey(uint32_t keyId, ChipGroupKey & key) override;
@@ -52,12 +52,12 @@ public:
     CHIP_ERROR DeleteGroupKey(uint32_t keyId) override;
     CHIP_ERROR DeleteGroupKeysOfAType(uint32_t keyType) override;
     CHIP_ERROR EnumerateGroupKeys(uint32_t keyType, uint32_t * keyIds, uint8_t keyIdsArraySize, uint8_t & keyCount) override;
-    CHIP_ERROR Clear(void) override;
+    CHIP_ERROR Clear() override;
 
 private:
     // Retrieve and Store LastUsedEpochKeyId value.
-    CHIP_ERROR RetrieveLastUsedEpochKeyId(void) override;
-    CHIP_ERROR StoreLastUsedEpochKeyId(void) override;
+    CHIP_ERROR RetrieveLastUsedEpochKeyId() override;
+    CHIP_ERROR StoreLastUsedEpochKeyId() override;
 
     // Get current platform UTC time in seconds.
     CHIP_ERROR GetCurrentUTCTime(uint32_t & utcTime) override;

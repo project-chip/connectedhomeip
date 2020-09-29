@@ -42,7 +42,7 @@ public:
     typedef uint32_t count_type;
 
     /** Adds one to the usage count of this class */
-    SUBCLASS * Retain(void)
+    SUBCLASS * Retain()
     {
         if (mRefCount == std::numeric_limits<count_type>::max())
         {
@@ -54,7 +54,7 @@ public:
     }
 
     /** Release usage of this class */
-    void Release(void)
+    void Release()
     {
         if (mRefCount == 0)
         {

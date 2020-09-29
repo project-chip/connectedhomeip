@@ -523,7 +523,7 @@ void TCPEndPoint::SetConnectTimeout(const uint32_t connTimeoutMsecs)
     mConnectTimeoutMsecs = connTimeoutMsecs;
 }
 
-void TCPEndPoint::StartConnectTimerIfSet(void)
+void TCPEndPoint::StartConnectTimerIfSet()
 {
     if (mConnectTimeoutMsecs > 0)
     {
@@ -533,7 +533,7 @@ void TCPEndPoint::StartConnectTimerIfSet(void)
     }
 }
 
-void TCPEndPoint::StopConnectTimer(void)
+void TCPEndPoint::StopConnectTimer()
 {
     chip::System::Layer & lSystemLayer = SystemLayer();
 
@@ -764,7 +764,7 @@ void TCPEndPoint::EnableReceive()
  *
  */
 
-INET_ERROR TCPEndPoint::EnableNoDelay(void)
+INET_ERROR TCPEndPoint::EnableNoDelay()
 {
     INET_ERROR res = INET_NO_ERROR;
 

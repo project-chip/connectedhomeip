@@ -53,7 +53,7 @@ class InetLayer;
 class InetLayerBasis : public chip::System::Object
 {
 public:
-    InetLayer & Layer(void) const;
+    InetLayer & Layer() const;
     bool IsCreatedByInetLayer(const InetLayer & aInetLayer) const;
 
 protected:
@@ -66,7 +66,7 @@ private:
 /**
  *  Returns a reference to the Inet layer object that owns this basis object.
  */
-inline InetLayer & InetLayerBasis::Layer(void) const
+inline InetLayer & InetLayerBasis::Layer() const
 {
     return *mInetLayer;
 }

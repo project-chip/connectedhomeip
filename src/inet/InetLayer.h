@@ -173,12 +173,12 @@ public:
         kState_ShutdownInProgress = 2, /**< State where Shutdown has been triggered. */
     } State;                           /**< [READ-ONLY] Current state. */
 
-    InetLayer(void);
+    InetLayer();
 
     INET_ERROR Init(chip::System::Layer & aSystemLayer, void * aContext);
-    INET_ERROR Shutdown(void);
+    INET_ERROR Shutdown();
 
-    chip::System::Layer * SystemLayer(void) const;
+    chip::System::Layer * SystemLayer() const;
 
     // End Points
 
@@ -222,7 +222,7 @@ public:
 
     static void UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot);
 
-    void * GetPlatformData(void);
+    void * GetPlatformData();
     void SetPlatformData(void * aPlatformData);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -305,10 +305,10 @@ private:
     friend INET_ERROR Platform::InetLayer::WillShutdown(Inet::InetLayer * aLayer, void * aContext);
     friend void Platform::InetLayer::DidShutdown(Inet::InetLayer * aLayer, void * aContext, INET_ERROR anError);
 
-    bool IsIdleTimerRunning(void);
+    bool IsIdleTimerRunning();
 };
 
-inline chip::System::Layer * InetLayer::SystemLayer(void) const
+inline chip::System::Layer * InetLayer::SystemLayer() const
 {
     return mSystemLayer;
 }
@@ -332,7 +332,7 @@ public:
     uint16_t SrcPort;      /**< The source port in the packet. */
     uint16_t DestPort;     /**< The destination port in the packet. */
 
-    void Clear(void);
+    void Clear();
 };
 
 extern INET_ERROR ParseHostAndPort(const char * aString, uint16_t aStringLen, const char *& aHost, uint16_t & aHostLen,

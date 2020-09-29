@@ -114,7 +114,7 @@ CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, size_t inBuffer
  *                         or by the TLVReader.
  *
  */
-CHIP_ERROR CHIPCircularTLVBuffer::EvictHead(void)
+CHIP_ERROR CHIPCircularTLVBuffer::EvictHead()
 {
     CircularTLVReader reader;
     uint8_t * newHead;

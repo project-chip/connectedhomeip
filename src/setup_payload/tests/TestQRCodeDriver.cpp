@@ -24,7 +24,7 @@
 
 #include "TestQRCode.h"
 
-int main(void)
+int main()
 {
     return (TestQuickResponseCode());
 }

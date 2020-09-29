@@ -521,7 +521,7 @@ uint8_t DNSResolver::CountAddresses(int family, const struct addrinfo * addrs)
 
 #if INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
-void DNSResolver::HandleAsyncResolveComplete(void)
+void DNSResolver::HandleAsyncResolveComplete()
 {
     // Copy the resolved address to the application supplied buffer, but only if the request hasn't been canceled.
     if (OnComplete && mState != kState_Canceled)
