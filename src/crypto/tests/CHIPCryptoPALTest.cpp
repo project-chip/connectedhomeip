@@ -795,6 +795,7 @@ static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
     P256Keypair keypair;
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, keypair.NewCertificateSigningRequest(csr, length) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, length > 0);
 }
 
 static void TestKeypair_Serialize(nlTestSuite * inSuite, void * inContext)
