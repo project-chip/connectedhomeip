@@ -426,18 +426,18 @@ static const nlTest sTests[] = {
 /**
  *  Set up the test suite.
  */
-int TestSetup(void * inContext)
+int TestConfigurationMgr_Setup(void * inContext)
 {
     CHIP_ERROR error = chip::Platform::MemoryInit();
     if (error != CHIP_NO_ERROR)
-      return FAILURE;
+        return FAILURE;
     return SUCCESS;
 }
 
 /**
  *  Tear down the test suite.
  */
-int TestTeardown(void * inContext)
+int TestConfigurationMgr_Teardown(void * inContext)
 {
     chip::Platform::MemoryShutdown();
     return SUCCESS;
@@ -445,7 +445,7 @@ int TestTeardown(void * inContext)
 
 int TestConfigurationMgr(void)
 {
-    nlTestSuite theSuite = { "CHIP DeviceLayer time tests", &sTests[0], TestSetup, TestTeardown };
+    nlTestSuite theSuite = { "CHIP DeviceLayer time tests", &sTests[0], TestConfigurationMgr_Setup, TestConfigurationMgr_Teardown };
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, nullptr);
