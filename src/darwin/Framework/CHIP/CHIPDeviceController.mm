@@ -349,6 +349,18 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     }];
 }
 
+- (BOOL)sendIdentifyCommandWithDuration:(NSTimeInterval)duration
+{
+    if (duration > UINT16_MAX) {
+        duration = UINT16_MAX;
+    }
+
+    return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
+        // Hardcode endpoint to 1 for now
+        return encodeIdentifyCommand(buffer->Start(), bufferSize, 1, duration);
+    }];
+}
+
 - (BOOL)disconnect:(NSError * __autoreleasing *)error
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
