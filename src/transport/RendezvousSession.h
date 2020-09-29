@@ -25,6 +25,7 @@
 #define __TRANSPORT_RENDEZVOUSSESSION_H__
 
 #include <core/CHIPCore.h>
+#include <protocols/CHIPProtocols.h>
 #include <transport/RendezvousParameters.h>
 #include <transport/RendezvousSessionDelegate.h>
 #include <transport/SecurePairingSession.h>
@@ -86,14 +87,20 @@ public:
     void OnRendezvousError(CHIP_ERROR err) override;
     void OnRendezvousMessageReceived(PacketBuffer * buffer) override;
 
+    CHIP_ERROR AssignedIPAddress(IPAddress & deviceAddr);
+
+    bool HasIPAddress() const { return mDeviceAddress != IPAddress::Any; }
+    const IPAddress & GetIPAddress() const { return mDeviceAddress; }
+
 private:
     CHIP_ERROR SendPairingMessage(System::PacketBuffer * msgBug);
     CHIP_ERROR HandlePairingMessage(System::PacketBuffer * msgBug);
     CHIP_ERROR Pair(Optional<NodeId> nodeId, uint32_t setupPINCode);
     CHIP_ERROR WaitForPairing(Optional<NodeId> nodeId, uint32_t setupPINCode);
 
-    CHIP_ERROR SendSecureMessage(System::PacketBuffer * msgBug);
+    CHIP_ERROR SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBuffer * msgBug);
     CHIP_ERROR HandleSecureMessage(System::PacketBuffer * msgBuf);
+    CHIP_ERROR HandleIPAddressAssignment(System::PacketBuffer * buffer);
 
     Transport::Base * mTransport          = nullptr; ///< Underlying transport
     RendezvousSessionDelegate * mDelegate = nullptr; ///< Underlying transport events
@@ -104,6 +111,7 @@ private:
     bool mPairingInProgress      = false;
     uint32_t mSecureMessageIndex = 0;
     uint16_t mNextKeyId          = 0;
+    IPAddress mDeviceAddress     = IPAddress::Any;
 };
 
 } // namespace chip
