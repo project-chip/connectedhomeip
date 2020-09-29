@@ -3,15 +3,15 @@
 An example application showing the use
 [CHIP](https://github.com/project-chip/connectedhomeip) on the Qorvo QPG6100.
 
-___
+---
 
-- [CHIP QPG6100 Lock Example Application](#chip-qpg6100-lock-example-application)
-  - [Introduction](#introduction)
-  - [Building](#building)
-  - [Flashing the application](#flashing-the-application)
-  - [Viewing Logging Output](#viewing-logging-output)
+-   [CHIP QPG6100 Lock Example Application](#chip-qpg6100-lock-example-application)
+    -   [Introduction](#introduction)
+    -   [Building](#building)
+    -   [Flashing the application](#flashing-the-application)
+    -   [Viewing Logging Output](#viewing-logging-output)
 
-___
+---
 
 ## Introduction
 
@@ -26,15 +26,15 @@ with separate updates.
 
 Current status of implementation:
 
-- Initialization of the CHIP stack.
-- CHIP Logging, PlatformManager and ConfigurationManager enabled.
+-   Initialization of the CHIP stack.
+-   CHIP Logging, PlatformManager and ConfigurationManager enabled.
 
 Pending:
 
-- Button and LED control
-- BLE: Addition of CHIPoBLE to enable provisioning
-- Thread: Linking QPG6100 OpenThread implementation to CHIP build
-- Intake CHIP ZCL cluster control for the Lock mechanism through CHIP tool.
+-   Button and LED control
+-   BLE: Addition of CHIPoBLE to enable provisioning
+-   Thread: Linking QPG6100 OpenThread implementation to CHIP build
+-   Intake CHIP ZCL cluster control for the Lock mechanism through CHIP tool.
 
 For more information on Qorvo and the platforms, please visit
 [the Qorvo website](www.qorvo.com) or contact us on LPW.support@qorvo.com.
@@ -43,13 +43,13 @@ For more information on Qorvo and the platforms, please visit
 
 ### Preparation
 
-- Download and install a suitable ARM gcc tool chain:
-  [GNU Arm Embedded Toolchain 9-2019-q4-update](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
-  (Direct download link:
-  [Linux](https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2)
-  [Mac OS X](https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-mac.tar.bz2))
+-   Download and install a suitable ARM gcc tool chain:
+    [GNU Arm Embedded Toolchain 9-2019-q4-update](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
+    (Direct download link:
+    [Linux](https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2)
+    [Mac OS X](https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-mac.tar.bz2))
 
-- Install additional tools used by the CHIP build:
+-   Install additional tools used by the CHIP build:
 
 ```
 # Linux
@@ -61,16 +61,16 @@ sudo apt-get install git make automake libtool ccache
 brew install automake libtool ccache
 ```
 
-- Clone the [CHIP](https://github.com/project-chip/connectedhomeip) repo into
-  a local directory
+-   Clone the [CHIP](https://github.com/project-chip/connectedhomeip) repo into
+    a local directory
 
 ```
 cd ~
 git clone https://github.com/project-chip/connectedhomeip.git
 ```
 
-- Clone the Qorvo [CHIP SDK](https://github.com/Qorvo/qpg-connectedhomeip) repo
-  into a local directory to obtain the Qorvo specific platform libraries
+-   Clone the Qorvo [CHIP SDK](https://github.com/Qorvo/qpg-connectedhomeip)
+    repo into a local directory to obtain the Qorvo specific platform libraries
 
 ```
 cd ~
@@ -79,7 +79,7 @@ git clone https://github.com/Qorvo/qpg-connectedhomeip
 
 ### Compilation
 
-- Set the following environment variables before compilation:
+-   Set the following environment variables before compilation:
 
 ```
 export CHIP_ROOT=${HOME}/connectedhomeip
@@ -87,14 +87,14 @@ export ARM_GCC_INSTALL_ROOT=${HOME}/tools/gcc-arm-none-eabi-9-2019-q4-major/bin
 export QPG6100_SDK_ROOT=${HOME}/qpg-connectedhomeip
 ```
 
-- make based
+-   make based
 
 ```
 cd ~/connectedhomeip/examples/lock-app/qpg6100
 make -j
 ```
 
-- GN/ninja based
+-   GN/ninja based
 
 ```
 cd ~/connectedhomeip/examples/lock-app/qpg6100
@@ -120,8 +120,8 @@ More detailed information to be included in SDK Documentation.
 
 ## Viewing Logging Output
 
-- Launch a serial terminal with baudrate 115200.
-- At startup you will see:
+-   Launch a serial terminal with baudrate 115200.
+-   At startup you will see:
 
 ```
 qvCHIP v0.0.0.0 (CL:155586) running
@@ -134,6 +134,6 @@ qvCHIP v0.0.0.0 (CL:155586) running
 [D][DL] CHIP task running
 ```
 
-- Note! Logging is currently encapsulated by the Qorvo logging module. Output
-  will have additional header and footer bytes. This will be updated later
-  into a raw stream for any serial terminal to parse.
+-   Note! Logging is currently encapsulated by the Qorvo logging module. Output
+    will have additional header and footer bytes. This will be updated later
+    into a raw stream for any serial terminal to parse.
