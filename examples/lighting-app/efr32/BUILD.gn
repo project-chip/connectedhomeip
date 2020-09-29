@@ -61,7 +61,6 @@ efr32_executable("lighting_app") {
   output_name = "chip-efr32-lighting-example.out"
 
   public_deps = [
-    ":sdk",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
     "${chip_root}/examples/common/chip-app-server:chip-app-server",
