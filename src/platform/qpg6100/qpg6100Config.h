@@ -37,7 +37,7 @@ namespace Internal {
 /* Base for the category calculation when determining the key IDs */
 #define CATEGORY_BASE 0x01
 
-constexpr inline uint32_t QorvoConfigKey(uint8_t categoryId, uint8_t id)
+constexpr inline uint16_t QorvoConfigKey(uint8_t categoryId, uint8_t id)
 {
     return static_cast<uint16_t>(((categoryId) << 6) | (id & 0x3F));
 }

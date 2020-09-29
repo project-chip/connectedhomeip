@@ -82,7 +82,7 @@ qpg6100_executable("lock_app") {
   output_dir = root_out_dir
 
   ldscript =
-      "${qpg6100_sdk_build_root}/qpg6100/ldscripts/chip-qpg6100-example.ld"
+      "${qpg6100_sdk_root}/qpg6100/ldscripts/chip-qpg6100-example.ld"
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
 }
