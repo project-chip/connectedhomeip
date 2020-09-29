@@ -88,10 +88,6 @@ protected:
         kFlag_AwaitingConnectivity         = 0x0010,
     };
 
-    DeviceNetworkInfo mWiFiNetworkInfo;
-    bool mWiFiProvisioned;
-    bool mWiFiScanPending;
-
 private:
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
@@ -111,14 +107,12 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_SetWiFiStatio
 template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiStationProvisioned(void)
 {
-    return mWiFiProvisioned;
+    return false;
 }
 
 template <class ImplClass>
 inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_ClearWiFiStationProvision(void)
-{
-    mWiFiProvisioned = false;
-}
+{}
 
 template <class ImplClass>
 inline ConnectivityManager::WiFiAPMode GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetWiFiAPMode(void)
@@ -180,9 +174,7 @@ inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_CanStartWiFiScan()
 
 template <class ImplClass>
 inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_OnWiFiScanDone()
-{
-    mWiFiScanPending = false;
-}
+{}
 
 template <class ImplClass>
 inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_OnWiFiStationProvisionChange()
