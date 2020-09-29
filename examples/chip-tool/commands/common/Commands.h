@@ -16,15 +16,28 @@
  *
  */
 
-#ifndef __CHIPTOOL_ECHO_H__
-#define __CHIPTOOL_ECHO_H__
+#ifndef __CHIPTOOL_COMMANDS_H__
+#define __CHIPTOOL_COMMANDS_H__
 
-#include "common/EchoCommand.h"
+#include <controller/CHIPDeviceController.h>
+#include <memory>
+#include <vector>
 
-class Echo : public EchoCommand
+class Command;
+
+class Commands
 {
 public:
-    Echo() : EchoCommand("echo", NetworkType::UDP) {}
+    using ChipDeviceController = ::chip::DeviceController::ChipDeviceController;
+    using NodeId               = ::chip::NodeId;
+
+    void Register(std::unique_ptr<Command> command);
+    int Run(NodeId localId, NodeId remoteId, int argc, char * argv[]);
+
+private:
+    CHIP_ERROR RunCommand(ChipDeviceController & dc, NodeId remoteId, int argc, char * argv[]);
+    void ShowUsage(const char * executable);
+    std::vector<std::unique_ptr<Command>> commands;
 };
 
-#endif // __CHIPTOOL_ECHO_H__
+#endif // __CHIPTOOL_COMMANDS_H__
