@@ -61,9 +61,9 @@ efr32_executable("lock_app") {
   output_name = "chip-efr32-lock-example.out"
 
   public_deps = [
+    "${chip_root}/examples/common/chip-app-server:chip-app-server",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
-    "${chip_root}/examples/common/chip-app-server:chip-app-server",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
     "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
@@ -96,9 +96,9 @@ efr32_executable("lock_app") {
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/hal-config.h",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
-    "${examples_plat_dir}/init_otSystem.c",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/Service.cpp",
+    "${examples_plat_dir}/init_otSystem.c",
     "src/AppTask.cpp",
     "src/BoltLockManager.cpp",
     "src/ButtonHandler.cpp",
