@@ -1,8 +1,8 @@
 #########################################################################
 # Thank you for your PR.  If you're editing this as a result of an
-#   invocation GitHub command line tools, note that lines that begin
-#   with '#' are stripped. To preserve the markdown that begins with
-#   '#' below, be sure to preserve the leading whitespace on thos lines.
+#  invocation GitHub command line tools, note that lines that begin
+#  with '#' are stripped. To preserve the markdown that begins with
+#  '#' below, be sure to preserve the leading whitespace on thos lines.
 #
 
  #### Problem
@@ -12,10 +12,10 @@
 # In the Problem section please describe what motivates the proposed changes.
 #
 # Please do your best to couch the motivation as a problem you're
-#   trying to address.  This makes reviewers' jobs easier: they
-#   can verify that the code actually targets the problem and
-#   pick out code that maybe should be in another PR because it
-#   targets another problem.
+#  trying to address.  This makes reviewers' jobs easier: they
+#  can verify that the code actually targets the problem and
+#  pick out code that maybe should be in another PR because it
+#  targets another problem.
 #
 # "Do" examples:
 #     "CHIP does not support IP-rendezvous"
@@ -33,12 +33,12 @@
 
 #########################################################################
 # In the Summary of Changes section please describe, as completely as possible,
-#   what changes you've made.  A bulleted list of items is great here, and if
-#   your PR is a draft, you can use checkboxes as you make progress through your
-#   planned steps.  The goal of this section is again to aid reviewer's work.  A
-#   reviewer can tick down the list looking at how your changes affect the code,
-#   that your list covers what's changed, and that your changes address the
-#   problem (and not another problem).
+#  what changes you've made.  A bulleted list of items is great here, and if
+#  your PR is a draft, you can use checkboxes as you make progress through your
+#  planned steps.  The goal of this section is again to aid reviewer's work.  A
+#  reviewer can tick down the list looking at how your changes affect the code,
+#  that your list covers what's changed, and that your changes address the
+#  problem (and not another problem).
 #
 
  fixes #<issue number, or numbers. if no issue, please create one>
