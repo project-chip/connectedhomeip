@@ -31,6 +31,7 @@
 #include <string.h>
 
 #include <nlunit-test.h>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/TestUtils.h>
 
@@ -422,9 +423,29 @@ static const nlTest sTests[] = {
     NL_TEST_SENTINEL()
 };
 
+/**
+ *  Set up the test suite.
+ */
+int TestSetup(void * inContext)
+{
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+      return FAILURE;
+    return SUCCESS;
+}
+
+/**
+ *  Tear down the test suite.
+ */
+int TestTeardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 int TestConfigurationMgr(void)
 {
-    nlTestSuite theSuite = { "CHIP DeviceLayer time tests", &sTests[0], nullptr, nullptr };
+    nlTestSuite theSuite = { "CHIP DeviceLayer time tests", &sTests[0], TestSetup, TestTeardown };
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, nullptr);
