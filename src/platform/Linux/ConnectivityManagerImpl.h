@@ -123,7 +123,7 @@ private:
     bool _IsWiFiStationConnected(void);
     bool _IsWiFiStationApplicationControlled(void);
     bool _IsWiFiStationProvisioned(void);
-    void _ClearWiFiStationProvision(void);    
+    void _ClearWiFiStationProvision(void);
     bool _CanStartWiFiScan();
     static void _OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
     static void _OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
