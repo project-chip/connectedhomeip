@@ -58,7 +58,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    mWiFiStationMode = kWiFiStationMode_Disabled;
+    mWiFiStationMode                = kWiFiStationMode_Disabled;
     mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
 
     // Initialize the generic base classes that require it.
@@ -135,6 +135,11 @@ exit:
     return err;
 }
 
+uint32_t ConnectivityManagerImpl::_GetWiFiStationReconnectIntervalMS(void)
+{
+    return mWiFiStationReconnectIntervalMS;
+}
+
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationReconnectIntervalMS(uint32_t val)
 {
     mWiFiStationReconnectIntervalMS = val;
@@ -176,7 +181,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled()
 
 bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
 {
-    bool ret            = false;
+    bool ret          = false;
     const gchar * bss = nullptr;
 
     if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
@@ -186,7 +191,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
     }
 
     bss = wpa_fi_w1_wpa_supplicant1_interface_get_current_bss(mWpaSupplicant.iface);
-    if (g_str_match_string ("BSSs", bss, true))
+    if (g_str_match_string("BSSs", bss, true))
     {
         ret = true;
     }
@@ -204,16 +209,13 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
-        GError * err                            = nullptr;
-        gboolean ret = wpa_fi_w1_wpa_supplicant1_interface_call_remove_all_networks_sync(
-            mWpaSupplicant.iface,
-            nullptr,
-            &err);
+        GError * err = nullptr;
+        gboolean ret = wpa_fi_w1_wpa_supplicant1_interface_call_remove_all_networks_sync(mWpaSupplicant.iface, nullptr, &err);
 
         if (err != nullptr)
         {
             ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to remove all networks with error: %s",
-                err ? err->message : "unknown error");
+                            err ? err->message : "unknown error");
             g_error_free(err);
         }
     }

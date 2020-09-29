@@ -154,11 +154,6 @@ inline bool ConnectivityManagerImpl::_HaveServiceConnectivity()
     return _HaveServiceConnectivityViaThread();
 }
 
-inline uint32_t ConnectivityManagerImpl::_GetWiFiStationReconnectIntervalMS(void)
-{
-    return mWiFiStationReconnectIntervalMS;
-}
-
 /**
  * Returns the public interface of the ConnectivityManager singleton object.
  *
