@@ -35,7 +35,8 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params)
 
     mParams = params;
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mParams.HasLocalNodeId(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mParams.HasLocalNodeId(), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(mParams.HasSetupPINCode(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #if CONFIG_NETWORK_LAYER_BLE

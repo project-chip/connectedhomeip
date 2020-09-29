@@ -33,6 +33,7 @@ class RendezvousParameters
 public:
     RendezvousParameters() = default;
 
+    bool HasSetupPINCode() const { return mSetupPINCode != 0; }
     uint32_t GetSetupPINCode() const { return mSetupPINCode; }
     RendezvousParameters & SetSetupPINCode(uint32_t setupPINCode)
     {

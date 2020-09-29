@@ -108,10 +108,6 @@ void InitServer()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
-#ifndef BYPASS_RENDEZVOUS
-    RendezvousParameters params;
-#endif
-    uint32_t pinCode;
 
     InitDataModelHandler();
 
@@ -119,10 +115,19 @@ void InitServer()
                         UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
     SuccessOrExit(err);
 
+    // This flag is used to bypass BLE in the cirque test
+    // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'
 #ifndef BYPASS_RENDEZVOUS
-    SuccessOrExit(err = DeviceLayer::ConfigurationMgr().GetSetupPinCode(pinCode));
-    params.SetSetupPINCode(pinCode).SetLocalNodeId(EXAMPLE_SERVER_NODEID).SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
-    SuccessOrExit(err = gRendezvousServer.Init(params));
+    {
+        RendezvousParameters params;
+        uint32_t pinCode;
+
+        SuccessOrExit(err = DeviceLayer::ConfigurationMgr().GetSetupPinCode(pinCode));
+        params.SetSetupPINCode(pinCode)
+            .SetLocalNodeId(EXAMPLE_SERVER_NODEID)
+            .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
+        SuccessOrExit(err = gRendezvousServer.Init(params));
+    }
 #endif
 
     err = sessions.NewPairing(peer, &gTestPairing);
