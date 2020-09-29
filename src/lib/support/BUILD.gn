@@ -115,6 +115,11 @@ static_library("support") {
     public += [ "CHIPFaultInjection.h" ]
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
   }
+
+  libs = []
+  if (chip_logging_style == "android") {
+    libs += [ "log" ]
+  }
 }
 
 copy("support_headers") {
