@@ -108,7 +108,7 @@ int TestPlatformMgr_Setup(void * inContext)
 {
     CHIP_ERROR error = chip::Platform::MemoryInit();
     if (error != CHIP_NO_ERROR)
-      return FAILURE;
+        return FAILURE;
     return SUCCESS;
 }
 
