@@ -30,8 +30,8 @@ function build_chip_tool() {
     source "$REPO_DIR/scripts/activate.sh" >/dev/null
     set -x
     cd "$chip_tool_dir"
-    gn gen out/debug >/dev/null
-    ninja -C out/debug >/dev/null
+    gn gen out/debug
+    ninja -C out/debug
     docker build -t chip_tool -f Dockerfile . >/dev/null 2>&1
 }
 
@@ -39,8 +39,8 @@ function build_chip_lighting() {
     source "$REPO_DIR/scripts/activate.sh" >/dev/null
     set -x
     cd "$chip_light_dir"
-    gn gen out/debug >/dev/null
-    ninja -C out/debug >/dev/null
+    gn gen out/debug --args='bypass_rendezvous=true'
+    ninja -C out/debug
     docker build -t chip_server -f Dockerfile . >/dev/null 2>&1
     set +x
 }
