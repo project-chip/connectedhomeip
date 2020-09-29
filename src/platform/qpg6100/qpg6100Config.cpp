@@ -160,7 +160,7 @@ CHIP_ERROR QPG6100Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufS
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    length = (uint16_t)outLen;
+    length = (uint16_t) outLen;
 
     res = qvCHIP_Nvm_Restore(key, buffer, &length);
     if (res == true)
@@ -247,7 +247,7 @@ CHIP_ERROR QPG6100Config::WriteConfigValueStr(Key key, const char * str, size_t 
         memcpy(buffer, str, strLen);
         buffer[strLen] = 0;
 
-        qvCHIP_Nvm_Backup(key, buffer, (uint16_t)strLen);
+        qvCHIP_Nvm_Backup(key, buffer, (uint16_t) strLen);
     }
 
     return CHIP_NO_ERROR;
@@ -261,7 +261,7 @@ CHIP_ERROR QPG6100Config::WriteConfigValueBin(Key key, const uint8_t * data, siz
     }
     else
     {
-        qvCHIP_Nvm_Backup(key, (uint8_t *) data, (uint16_t)dataLen);
+        qvCHIP_Nvm_Backup(key, (uint8_t *) data, (uint16_t) dataLen);
     }
 
     return CHIP_NO_ERROR;

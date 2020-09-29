@@ -103,7 +103,7 @@ CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platfor
 {
     CHIP_ERROR err;
 
-    uintmax_t recordKey = persistedStorageKey +  kConfigKey_GroupKeyBase;
+    uintmax_t recordKey = persistedStorageKey + kConfigKey_GroupKeyBase;
 
     VerifyOrExit(recordKey <= kConfigKey_GroupKeyMax, err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
