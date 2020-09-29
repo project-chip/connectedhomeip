@@ -29,6 +29,10 @@ jobs:
             volumes:
                 - "/tmp/cirque_test_output:/tmp/cirque_test_output"
 
+        env:
+            LOG_DIR: /tmp/cirque_test_output/
+            CLEANUP_DOCKER_FOR_CI: 1
+
         steps:
             - name: Checkout
               uses: actions/checkout@v2
@@ -47,7 +51,7 @@ jobs:
             - name: Run Tests
               run: |
                   mkdir -p /tmp/cirque_test_output
-                  LOG_DIR=/tmp/cirque_test_output/ CLEANUP_DOCKER_FOR_CI=1 scripts/tests/cirque_tests.sh run_all_tests
+                  scripts/tests/cirque_tests.sh run_all_tests
             - name: Uploading Binaries
               uses: actions/upload-artifact@v1
               if: ${{ always() }}
