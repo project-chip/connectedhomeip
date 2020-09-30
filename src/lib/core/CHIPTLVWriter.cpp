@@ -30,6 +30,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -745,11 +746,8 @@ CHIP_ERROR TLVWriter::PutString(uint64_t tag, const char * buf, uint32_t len)
  * use the least amount of code, the `vsprintf_ex` variety of
  * functions will consume less stack.
  *
- * If neither of the above is available, but platform provides
- * `malloc` the function will allocate a temporary buffer to hold the
- * output.  When the platform supplies neither enhancement to the
- * printf family nor malloc, the output is truncated such that it fits
- * in the continuous state in the current TLV storage
+ * If neither of the above is available, the function will allocate a
+ * temporary buffer to hold the output, using Platform::MemoryAlloc().
  *
  * @param[in] tag The TLV tag to be encoded with the value, or @p
  *                AnonymousTag if the value should be encoded without
@@ -818,11 +816,8 @@ void TLVWriter::CHIPTLVWriterPutcharCB(uint8_t c, void * appState)
  * use the least amount of code, the `vsprintf_ex` variety of
  * functions will consume less stack.
  *
- * If neither of the above is available, but platform provides
- * `malloc` the function will allocate a temporary buffer to hold the
- * output.  When the platform supplies neither enhancement to the
- * printf family nor malloc, the output is truncated such that it fits
- * in the continuous state in the current TLV storage
+ * If neither of the above is available, the function will allocate a
+ * temporary buffer to hold the output, using Platform::MemoryAlloc().
  *
  * @param[in] tag The TLV tag to be encoded with the value, or @p
  *                AnonymousTag if the value should be encoded without
@@ -853,10 +848,10 @@ CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char * fmt, va_list ap)
     size_t skipLen;
     size_t writtenBytes;
 #elif CONFIG_HAVE_VCBPRINTF
-#elif HAVE_MALLOC
-    char * tmpBuf;
-#else
+#elif CONFIG_TLV_TRUNCATE
     size_t maxLen;
+#else
+    char * tmpBuf;
 #endif
     va_copy(aq, ap);
 
@@ -871,7 +866,7 @@ CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char * fmt, va_list ap)
     else
         lenFieldSize = kTLVFieldSize_4Byte;
 
-#if !(CONFIG_HAVE_VCBPRINTF) && !(CONFIG_HAVE_VSNPRINTF_EX) && !(HAVE_MALLOC)
+#if !(CONFIG_HAVE_VCBPRINTF) && !(CONFIG_HAVE_VSNPRINTF_EX) && CONFIG_TLV_TRUNCATE
     // no facilities for splitting the stream across multiple buffers,
     // just write however much fits in the current buffer.
     // assume conservative tag length at this time (8 bytes)
@@ -932,9 +927,9 @@ CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char * fmt, va_list ap)
 
     va_end(aq);
 
-#elif HAVE_MALLOC
+#else // CONFIG_HAVE_VSNPRINTF_EX
 
-    tmpBuf = static_cast<char *>(malloc(dataLen + 1));
+    tmpBuf = static_cast<char *>(chip::Platform::MemoryAlloc(dataLen + 1));
     VerifyOrExit(tmpBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     va_copy(aq, ap);
@@ -944,19 +939,7 @@ CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char * fmt, va_list ap)
     va_end(aq);
 
     err = WriteData(reinterpret_cast<uint8_t *>(tmpBuf), dataLen);
-    free(tmpBuf);
-
-#else // CONFIG_HAVE_VSNPRINTF_EX
-
-    va_copy(aq, ap);
-
-    vsnprintf(reinterpret_cast<char *>(mWritePoint), dataLen + 1, fmt, aq);
-
-    va_end(aq);
-
-    mWritePoint += dataLen;
-    mRemainingLen -= dataLen;
-    mLenWritten += dataLen;
+    chip::Platform::MemoryFree(tmpBuf);
 
 #endif // CONFIG_HAVE_VSNPRINTF_EX
 

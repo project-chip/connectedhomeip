@@ -35,6 +35,7 @@
 
 int CollectTapAddresses(std::vector<char *> & addresses, const char * ifName)
 {
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
     struct ifaddrs *addrsList, *curAddr;
     const int err = getifaddrs(&addrsList);
 
@@ -71,4 +72,7 @@ int CollectTapAddresses(std::vector<char *> & addresses, const char * ifName)
     }
 
     return 0;
+#else
+#error "Unsupported configuration: requires CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS"
+#endif
 }
