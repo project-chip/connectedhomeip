@@ -63,7 +63,6 @@ extern void startClient(void);
 #define BUTTON_2_GPIO_NUM GPIO_NUM_38               // Middle button on M5Stack
 #define BUTTON_3_GPIO_NUM GPIO_NUM_37               // Right button on M5Stack
 #define STATUS_LED_GPIO_NUM GPIO_NUM_MAX            // No status LED on M5Stack
-#define LIGHT_CONTROLLER_OUTPUT_GPIO_NUM GPIO_NUM_2 // Use GPIO2 as the light controller output on M5Stack
 
 #elif CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
@@ -71,7 +70,6 @@ extern void startClient(void);
 #define BUTTON_2_GPIO_NUM GPIO_NUM_35                // Button 2 on DevKitC
 #define BUTTON_3_GPIO_NUM GPIO_NUM_0                 // Button 3 on DevKitC
 #define STATUS_LED_GPIO_NUM GPIO_NUM_2               // Use LED1 (blue LED) as status LED on DevKitC
-#define LIGHT_CONTROLLER_OUTPUT_GPIO_NUM GPIO_NUM_33 // Use GPIO33 as the light controller output on DevKitC
 
 #else // !CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
