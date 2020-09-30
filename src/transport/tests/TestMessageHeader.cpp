@@ -202,7 +202,7 @@ void TestPacketHeaderEncodeDecodeBounds(nlTestSuite * inSuite, void * inContext)
     static const size_t minLen = 10;
     uint16_t encoded_len;
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, minLen, &encoded_len, Header::Flags::None()) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, encoded_len = minLen);
+    NL_TEST_ASSERT(inSuite, encoded_len == minLen);
     // Verify that decoding at any smaller length fails.
     for (size_t shortLen = 0; shortLen < encoded_len; shortLen++)
     {
@@ -219,7 +219,7 @@ void TestPacketHeaderEncodeDecodeBounds(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, header.Encode(buffer, shortLen, &unusedLen, Header::Flags::None()) != CHIP_NO_ERROR);
     }
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, minLen + 8, &encoded_len, Header::Flags::None()) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, encoded_len = minLen + 8);
+    NL_TEST_ASSERT(inSuite, encoded_len == minLen + 8);
     for (size_t shortLen = 0; shortLen < encoded_len; shortLen++)
     {
         NL_TEST_ASSERT(inSuite, header.Decode(buffer, shortLen, &unusedLen) != CHIP_NO_ERROR);
@@ -234,7 +234,7 @@ void TestPacketHeaderEncodeDecodeBounds(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, header.Encode(buffer, shortLen, &unusedLen, Header::Flags::None()) != CHIP_NO_ERROR);
     }
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, minLen + 16, &encoded_len, Header::Flags::None()) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, encoded_len = minLen + 16);
+    NL_TEST_ASSERT(inSuite, encoded_len == minLen + 16);
     for (size_t shortLen = 0; shortLen < encoded_len; shortLen++)
     {
         NL_TEST_ASSERT(inSuite, header.Decode(buffer, shortLen, &unusedLen) != CHIP_NO_ERROR);
