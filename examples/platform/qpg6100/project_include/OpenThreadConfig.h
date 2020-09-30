@@ -24,6 +24,7 @@
  */
 
 // TODO - enable full OpenThread integration
+// https://github.com/project-chip/connectedhomeip/issues/293
 
 #ifndef OPENTHREAD_PLATFORM_CONFIG_H
 #define OPENTHREAD_PLATFORM_CONFIG_H

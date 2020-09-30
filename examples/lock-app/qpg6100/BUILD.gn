@@ -49,7 +49,8 @@ qpg6100_executable("lock_app") {
     ":sdk",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
-
+    #    OpenThread to be enabled 
+    #    https://github.com/project-chip/connectedhomeip/issues/293
     #    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     #    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
     #    "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
@@ -63,19 +64,6 @@ qpg6100_executable("lock_app") {
   ]
 
   sources = [
-    #    "${chip_root}/src/app/clusters/on-off-server/on-off.c",
-    #    "${chip_root}/src/app/util/af-event.cpp",
-    #    "${chip_root}/src/app/util/attribute-size.c",
-    #    "${chip_root}/src/app/util/attribute-storage.c",
-    #    "${chip_root}/src/app/util/attribute-table.c",
-    #    "${chip_root}/src/app/util/binding-table.cpp",
-    #    "${chip_root}/src/app/util/chip-response.cpp",
-    #    "${chip_root}/src/app/util/client-api.c",
-    #    "${chip_root}/src/app/util/ember-print.cpp",
-    #    "${chip_root}/src/app/util/message.c",
-    #    "${chip_root}/src/app/util/process-cluster-message.c",
-    #    "${chip_root}/src/app/util/process-global-message.c",
-    #    "${chip_root}/src/app/util/util.c",
     "src/main.cpp",
   ]
 

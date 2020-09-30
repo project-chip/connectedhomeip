@@ -19,6 +19,8 @@ config("chip_examples_project_config") {
 }
 
 # TODO - create OpenThread portion of build flow
+# https://github.com/project-chip/connectedhomeip/issues/2939
+
 source_set("openthread_core_config_qpg6100_chip_examples") {
   sources = [ "project_include/OpenThreadConfig.h" ]
 

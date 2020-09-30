@@ -187,8 +187,6 @@ CHIP_ERROR QPG6100Config::WriteConfigValue(Key key, bool val)
     uint8_t buffer[255];
     uint16_t length;
 
-    // GP_ASSERT_DEV_INT(sizeof(bool) <= GetSettingsMaxValueLength(key));
-
     buffer[0] = (val) ? 1 : 0;
     length    = sizeof(bool);
 
@@ -203,8 +201,6 @@ CHIP_ERROR QPG6100Config::WriteConfigValue(Key key, uint32_t val)
     uint8_t buffer[255];
     uint16_t length;
 
-    // GP_ASSERT_DEV_INT(sizeof(uint32_t) <= GetSettingsMaxValueLength(key));
-
     memcpy(&buffer, (uint8_t *) &val, sizeof(uint32_t));
     length = sizeof(uint32_t);
 
@@ -218,8 +214,6 @@ CHIP_ERROR QPG6100Config::WriteConfigValue(Key key, uint64_t val)
 {
     uint8_t buffer[255];
     uint16_t length;
-
-    // GP_ASSERT_DEV_INT(sizeof(uint64_t) <= GetSettingsMaxValueLength(key));
 
     memcpy(&buffer, (uint8_t *) &val, sizeof(uint64_t));
     length = sizeof(uint64_t);
