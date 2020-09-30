@@ -1041,7 +1041,7 @@ INET_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
     return INET_NO_ERROR;
 }
 
-SocketEvents IPEndPointBasis::PrepareIO(void)
+SocketEvents IPEndPointBasis::PrepareIO()
 {
     SocketEvents res;
 

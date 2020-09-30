@@ -48,7 +48,7 @@ static const nl::FaultInjection::Name sFaultNames[] = {
 /**
  * Get the singleton FaultInjection::Manager for Inet faults
  */
-nl::FaultInjection::Manager & GetManager(void)
+nl::FaultInjection::Manager & GetManager()
 {
     if (0 == sChipFaultInMgr.GetNumFaults())
     {

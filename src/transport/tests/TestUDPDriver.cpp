@@ -26,7 +26,7 @@
 
 #include <nlunit-test.h>
 
-int main(void)
+int main()
 {
     // Generate machine-readable, comma-separated value (CSV) output.
     nlTestSetOutputStyle(OUTPUT_CSV);

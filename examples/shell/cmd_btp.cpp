@@ -166,7 +166,7 @@ static const shell_command_t cmds_btp[] = {
 
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-void cmd_btp_init(void)
+void cmd_btp_init()
 {
 #if CONFIG_NETWORK_LAYER_BLE
     // CHIP_ERROR error = CHIP_NO_ERROR;

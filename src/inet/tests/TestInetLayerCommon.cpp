@@ -92,12 +92,12 @@ uint32_t gOptFlags = 0;
 
 namespace Common {
 
-bool IsReceiver(void)
+bool IsReceiver()
 {
     return ((gOptFlags & kOptFlagListen) == kOptFlagListen);
 }
 
-bool IsSender(void)
+bool IsSender()
 {
     return (!IsReceiver());
 }

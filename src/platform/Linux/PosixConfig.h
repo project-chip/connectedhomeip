@@ -80,7 +80,7 @@ public:
 
     static const char kGroupKeyNamePrefix[];
 
-    static CHIP_ERROR Init(void);
+    static CHIP_ERROR Init();
 
     // Config value accessors.
     static CHIP_ERROR ReadConfigValue(Key key, bool & val);
@@ -96,9 +96,9 @@ public:
     static CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen);
     static CHIP_ERROR ClearConfigValue(Key key);
     static bool ConfigValueExists(Key key);
-    static CHIP_ERROR FactoryResetConfig(void);
+    static CHIP_ERROR FactoryResetConfig();
 
-    static void RunConfigUnitTest(void);
+    static void RunConfigUnitTest();
 
 protected:
     // NVS Namespace helper functions.

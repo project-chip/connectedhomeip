@@ -331,7 +331,7 @@ struct TestContext
 /**
  *  Main
  */
-int TestQuickResponseCode(void)
+int TestQuickResponseCode()
 {
     // clang-format off
     nlTestSuite theSuite =

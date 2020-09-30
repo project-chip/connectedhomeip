@@ -66,7 +66,7 @@ typedef enum
     kFault_NumItems,
 } Id;
 
-DLL_EXPORT nl::FaultInjection::Manager & GetManager(void);
+DLL_EXPORT nl::FaultInjection::Manager & GetManager();
 
 /**
  * The number of ways in which chip Fault Injection fuzzers can

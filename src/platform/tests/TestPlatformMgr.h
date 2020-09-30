@@ -24,6 +24,6 @@
 #ifndef TESTPLATFORMMGR_H
 #define TESTPLATFORMMGR_H
 
-int TestPlatformMgr(void);
+int TestPlatformMgr();
 
 #endif // TESTPLATFORMMGR_H

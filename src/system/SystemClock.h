@@ -69,7 +69,7 @@ namespace Layer {
  *
  * @returns             Elapsed time in microseconds since an arbitrary, platform-defined epoch.
  */
-extern uint64_t GetClock_Monotonic(void);
+extern uint64_t GetClock_Monotonic();
 
 /**
  * @brief
@@ -91,7 +91,7 @@ extern uint64_t GetClock_Monotonic(void);
  *
  * @returns             Elapsed time in milliseconds since an arbitrary, platform-defined epoch.
  */
-extern uint64_t GetClock_MonotonicMS(void);
+extern uint64_t GetClock_MonotonicMS();
 
 /**
  * @brief
@@ -117,7 +117,7 @@ extern uint64_t GetClock_MonotonicMS(void);
  *
  * @returns             Elapsed time in microseconds since an arbitrary, platform-defined epoch.
  */
-extern uint64_t GetClock_MonotonicHiRes(void);
+extern uint64_t GetClock_MonotonicHiRes();
 
 /**
  * @brief

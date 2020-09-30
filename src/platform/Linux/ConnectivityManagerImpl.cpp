@@ -97,17 +97,17 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 uint16_t ConnectivityManagerImpl::mConnectivityFlag;
 struct GDBusWpaSupplicant ConnectivityManagerImpl::mWpaSupplicant;
 
-bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
+bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity()
 {
     return ((mConnectivityFlag & kFlag_HaveIPv4InternetConnectivity) != 0);
 }
 
-bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
+bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity()
 {
     return ((mConnectivityFlag & kFlag_HaveIPv6InternetConnectivity) != 0);
 }
 
-ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode(void)
+ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode()
 {
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
@@ -134,12 +134,12 @@ exit:
     return err;
 }
 
-bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
+bool ConnectivityManagerImpl::_IsWiFiStationEnabled()
 {
     return GetWiFiStationMode() == kWiFiStationMode_Enabled;
 }
 
-bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
+bool ConnectivityManagerImpl::_IsWiFiStationConnected()
 {
     bool ret            = false;
     const gchar * state = nullptr;
@@ -164,7 +164,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
     return ret;
 }
 
-bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled(void)
+bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled()
 {
     return mWiFiStationMode == ConnectivityManager::kWiFiStationMode_ApplicationControlled;
 }

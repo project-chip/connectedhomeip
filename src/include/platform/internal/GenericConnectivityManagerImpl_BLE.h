@@ -52,19 +52,19 @@ class GenericConnectivityManagerImpl_BLE
 public:
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
-    Ble::BleLayer * _GetBleLayer(void);
+    Ble::BleLayer * _GetBleLayer();
     void _AddCHIPoBLEConnectionHandler(ConnectivityManager::BleConnectionReceivedFunct handler);
-    void _RemoveCHIPoBLEConnectionHandler(void);
-    ConnectivityManager::CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
+    void _RemoveCHIPoBLEConnectionHandler();
+    ConnectivityManager::CHIPoBLEServiceMode _GetCHIPoBLEServiceMode();
     CHIP_ERROR _SetCHIPoBLEServiceMode(ConnectivityManager::CHIPoBLEServiceMode val);
-    bool _IsBLEAdvertisingEnabled(void);
+    bool _IsBLEAdvertisingEnabled();
     CHIP_ERROR _SetBLEAdvertisingEnabled(bool val);
-    bool _IsBLEFastAdvertisingEnabled(void);
+    bool _IsBLEFastAdvertisingEnabled();
     CHIP_ERROR _SetBLEFastAdvertisingEnabled(bool val);
-    bool _IsBLEAdvertising(void);
+    bool _IsBLEAdvertising();
     CHIP_ERROR _GetBLEDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetBLEDeviceName(const char * deviceName);
-    uint16_t _NumBLEConnections(void);
+    uint16_t _NumBLEConnections();
     static const char * _CHIPoBLEServiceModeToStr(ConnectivityManager::CHIPoBLEServiceMode mode);
 
 private:
@@ -75,7 +75,7 @@ private:
 extern template class GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>;
 
 template <class ImplClass>
-inline Ble::BleLayer * GenericConnectivityManagerImpl_BLE<ImplClass>::_GetBleLayer(void)
+inline Ble::BleLayer * GenericConnectivityManagerImpl_BLE<ImplClass>::_GetBleLayer()
 {
     return BLEMgr().GetBleLayer();
 }
@@ -89,14 +89,14 @@ inline void GenericConnectivityManagerImpl_BLE<ImplClass>::_AddCHIPoBLEConnectio
 }
 
 template <class ImplClass>
-inline void GenericConnectivityManagerImpl_BLE<ImplClass>::_RemoveCHIPoBLEConnectionHandler(void)
+inline void GenericConnectivityManagerImpl_BLE<ImplClass>::_RemoveCHIPoBLEConnectionHandler()
 {
     BleLayer * bleLayer                = BLEMgr().GetBleLayer();
     bleLayer->OnChipBleConnectReceived = nullptr;
 }
 
 template <class ImplClass>
-inline ConnectivityManager::CHIPoBLEServiceMode GenericConnectivityManagerImpl_BLE<ImplClass>::_GetCHIPoBLEServiceMode(void)
+inline ConnectivityManager::CHIPoBLEServiceMode GenericConnectivityManagerImpl_BLE<ImplClass>::_GetCHIPoBLEServiceMode()
 {
     return BLEMgr().GetCHIPoBLEServiceMode();
 }
@@ -109,7 +109,7 @@ GenericConnectivityManagerImpl_BLE<ImplClass>::_SetCHIPoBLEServiceMode(Connectiv
 }
 
 template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_BLE<ImplClass>::_IsBLEAdvertisingEnabled(void)
+inline bool GenericConnectivityManagerImpl_BLE<ImplClass>::_IsBLEAdvertisingEnabled()
 {
     return BLEMgr().IsAdvertisingEnabled();
 }
@@ -121,7 +121,7 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_SetBLEAdvertis
 }
 
 template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_BLE<ImplClass>::_IsBLEFastAdvertisingEnabled(void)
+inline bool GenericConnectivityManagerImpl_BLE<ImplClass>::_IsBLEFastAdvertisingEnabled()
 {
     return BLEMgr().IsFastAdvertisingEnabled();
 }
@@ -133,7 +133,7 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_SetBLEFastAdve
 }
 
 template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_BLE<ImplClass>::_IsBLEAdvertising(void)
+inline bool GenericConnectivityManagerImpl_BLE<ImplClass>::_IsBLEAdvertising()
 {
     return BLEMgr().IsAdvertising();
 }
@@ -151,7 +151,7 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_SetBLEDeviceNa
 }
 
 template <class ImplClass>
-inline uint16_t GenericConnectivityManagerImpl_BLE<ImplClass>::_NumBLEConnections(void)
+inline uint16_t GenericConnectivityManagerImpl_BLE<ImplClass>::_NumBLEConnections()
 {
     return BLEMgr().NumConnections();
 }

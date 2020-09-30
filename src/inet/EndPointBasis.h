@@ -76,7 +76,7 @@ public:
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     /** Test whether endpoint is a POSIX socket */
-    bool IsSocketsEndPoint(void) const;
+    bool IsSocketsEndPoint() const;
 #endif
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -85,7 +85,7 @@ public:
 #endif
 
     /** Test whether endpoint has a valid descriptor. */
-    bool IsOpenEndPoint(void) const;
+    bool IsOpenEndPoint() const;
 
 protected:
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
@@ -141,7 +141,7 @@ inline bool EndPointBasis::IsNetworkFrameworkEndPoint(void) const
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-inline bool EndPointBasis::IsSocketsEndPoint(void) const
+inline bool EndPointBasis::IsSocketsEndPoint() const
 {
     return mSocket >= 0;
 }
@@ -154,7 +154,7 @@ inline bool EndPointBasis::IsLWIPEndPoint(void) const
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-inline bool EndPointBasis::IsOpenEndPoint(void) const
+inline bool EndPointBasis::IsOpenEndPoint() const
 {
     bool lResult = false;
 

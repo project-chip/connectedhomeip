@@ -235,7 +235,7 @@ void Binding::Release()
  * Calling Close() decrements the reference count associated with the binding, freeing the object if the
  * reference count becomes zero.
  */
-void Binding::Close(void)
+void Binding::Close()
 {
     VerifyOrDie(mState != kState_NotAllocated);
     VerifyOrDie(mRefCount > 0);
@@ -266,7 +266,7 @@ void Binding::Reset()
 /**
  * Get a unique id for the binding.
  */
-uint16_t Binding::GetLogId(void) const
+uint16_t Binding::GetLogId() const
 {
     return mExchangeManager->GetBindingLogId(this);
 }
@@ -410,7 +410,7 @@ void Binding::DoReset(State newState)
 /**
  * Transition the binding to the Closed state if not already closed.
  */
-void Binding::DoClose(void)
+void Binding::DoClose()
 {
     // If not already closed...
     if (mState != kState_Closed)
@@ -1318,12 +1318,12 @@ exit:
     return err;
 }
 
-uint32_t Binding::GetChipHeaderSize(void)
+uint32_t Binding::GetChipHeaderSize()
 {
     return CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE;
 }
 
-uint32_t Binding::GetChipTrailerSize(void)
+uint32_t Binding::GetChipTrailerSize()
 {
     return CHIP_TRAILER_RESERVE_SIZE;
 }
@@ -1609,7 +1609,7 @@ Binding::Configuration & Binding::Configuration::Security_None()
  *
  * @return                              A reference to the binding object.
  */
-Binding::Configuration & Binding::Configuration::Security_CASESession(void)
+Binding::Configuration & Binding::Configuration::Security_CASESession()
 {
 #if CHIP_CONFIG_ENABLE_CASE_INITIATOR
     mBinding.mSecurityOption = kSecurityOption_CASESession;
@@ -1630,7 +1630,7 @@ Binding::Configuration & Binding::Configuration::Security_CASESession(void)
  *
  * @return                              A reference to the binding object.
  */
-Binding::Configuration & Binding::Configuration::Security_SharedCASESession(void)
+Binding::Configuration & Binding::Configuration::Security_SharedCASESession()
 {
 #if CHIP_CONFIG_ENABLE_CASE_INITIATOR
     mBinding.mSecurityOption = kSecurityOption_SharedCASESession;

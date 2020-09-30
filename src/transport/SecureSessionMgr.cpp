@@ -200,7 +200,7 @@ exit:
     return err;
 }
 
-void SecureSessionMgrBase::ScheduleExpiryTimer(void)
+void SecureSessionMgrBase::ScheduleExpiryTimer()
 {
     CHIP_ERROR err =
         mSystemLayer->StartTimer(CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS, SecureSessionMgrBase::ExpiryTimerCallback, this);
@@ -208,7 +208,7 @@ void SecureSessionMgrBase::ScheduleExpiryTimer(void)
     VerifyOrDie(err == CHIP_NO_ERROR);
 }
 
-void SecureSessionMgrBase::CancelExpiryTimer(void)
+void SecureSessionMgrBase::CancelExpiryTimer()
 {
     if (mSystemLayer != nullptr)
     {

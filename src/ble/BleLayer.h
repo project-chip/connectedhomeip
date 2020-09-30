@@ -113,8 +113,8 @@ public:
 protected:
     uint32_t mRefCount;
 
-    void AddRef(void) { mRefCount++; }
-    void Release(void);
+    void AddRef() { mRefCount++; }
+    void Release();
 };
 
 class BleTransportCapabilitiesRequestMessage
@@ -246,12 +246,12 @@ public:
 
 public:
     // Public functions:
-    BleLayer(void);
+    BleLayer();
 
     BLE_ERROR Init(BlePlatformDelegate * platformDelegate, BleApplicationDelegate * appDelegate, chip::System::Layer * systemLayer);
     BLE_ERROR Init(BlePlatformDelegate * platformDelegate, BleConnectionDelegate * connDelegate,
                    BleApplicationDelegate * appDelegate, chip::System::Layer * systemLayer);
-    BLE_ERROR Shutdown(void);
+    BLE_ERROR Shutdown();
 
     BLE_ERROR NewBleConnection(void * appState, const uint16_t connDiscriminator,
                                BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
@@ -348,7 +348,7 @@ private:
     // Private functions:
     void HandleDataReceived(BLE_CONNECTION_OBJECT connObj, PacketBuffer * pBuf);
     void HandleAckReceived(BLE_CONNECTION_OBJECT connObj);
-    void DriveSending(void);
+    void DriveSending();
     BLE_ERROR HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT connObj, PacketBuffer * pBuf);
 
     static BleTransportProtocolVersion GetHighestSupportedProtocolVersion(const BleTransportCapabilitiesRequestMessage & reqMsg);

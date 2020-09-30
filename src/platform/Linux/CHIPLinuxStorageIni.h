@@ -36,7 +36,7 @@ namespace Internal {
 class ChipLinuxStorageIni
 {
 public:
-    CHIP_ERROR Init(void);
+    CHIP_ERROR Init();
     CHIP_ERROR AddConfig(const std::string & configFile);
     CHIP_ERROR CommitConfig(const std::string & configFile);
     CHIP_ERROR GetUIntValue(const char * key, uint32_t & val);
@@ -48,7 +48,7 @@ public:
 protected:
     CHIP_ERROR AddEntry(const char * key, const char * value);
     CHIP_ERROR RemoveEntry(const char * key);
-    CHIP_ERROR RemoveAll(void);
+    CHIP_ERROR RemoveAll();
 
 private:
     CHIP_ERROR GetDefaultSection(std::map<std::string, std::string> & section);
