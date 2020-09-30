@@ -24,14 +24,22 @@
 #include <ble/Ble.h>
 #endif // CONFIG_NETWORK_LAYER_BLE
 
+#include <support/logging/CHIPLogging.h>
+
 namespace chip {
 
 class RendezvousParameters
 {
 public:
-    explicit RendezvousParameters(uint32_t setupPINCode) : mSetupPINCode(setupPINCode) {}
+    RendezvousParameters() = default;
 
+    bool HasSetupPINCode() const { return mSetupPINCode != 0; }
     uint32_t GetSetupPINCode() const { return mSetupPINCode; }
+    RendezvousParameters & SetSetupPINCode(uint32_t setupPINCode)
+    {
+        mSetupPINCode = setupPINCode;
+        return *this;
+    }
 
     bool HasDiscriminator() const { return mDiscriminator != 0; }
     uint16_t GetDiscriminator() const { return mDiscriminator; }
@@ -45,7 +53,7 @@ public:
     const Optional<NodeId> GetLocalNodeId() const { return mLocalNodeId; }
     RendezvousParameters & SetLocalNodeId(NodeId nodeId)
     {
-        mLocalNodeId = Optional<NodeId>::Value(nodeId);
+        mLocalNodeId.SetValue(nodeId);
         return *this;
     }
 

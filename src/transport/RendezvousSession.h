@@ -56,9 +56,7 @@ namespace chip {
 class RendezvousSession : public SecurePairingSessionDelegate, public RendezvousSessionDelegate
 {
 public:
-    RendezvousSession(RendezvousSessionDelegate * delegate, const RendezvousParameters & params) :
-        mDelegate(delegate), mParams(params)
-    {}
+    RendezvousSession(RendezvousSessionDelegate * delegate) : mDelegate(delegate) {}
     ~RendezvousSession() override;
 
     /**
@@ -67,7 +65,7 @@ public:
      *
      * @ return CHIP_ERROR  The result of the initialization
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(const RendezvousParameters & params);
 
     /**
      * @brief
@@ -99,7 +97,7 @@ private:
 
     Transport::Base * mTransport          = nullptr; ///< Underlying transport
     RendezvousSessionDelegate * mDelegate = nullptr; ///< Underlying transport events
-    const RendezvousParameters mParams;              ///< Rendezvous configuration
+    RendezvousParameters mParams;                    ///< Rendezvous configuration
 
     SecurePairingSession mPairingSession;
     SecureSession mSecureSession;

@@ -29,12 +29,14 @@ static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Exchange Salt"
 
 namespace chip {
 
-CHIP_ERROR RendezvousSession::Init()
+CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    mParams = params;
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mParams.HasLocalNodeId(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mParams.HasLocalNodeId(), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(mParams.HasSetupPINCode(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #if CONFIG_NETWORK_LAYER_BLE
