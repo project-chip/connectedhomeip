@@ -18,31 +18,45 @@ import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/gn/chip/chip_test_suite.gni")
 
-chip_test_suite("tests") {
-  output_name = "libTransportLayerTests"
+static_library("helpers") {
+  output_name = "libNetworkTestHelpers"
 
   sources = [
-    "TestPeerConnections.cpp",
-    "TestSecurePairingSession.cpp",
-    "TestSecureSession.cpp",
-    "TestSecureSessionMgr.cpp",
-    "TestTransportLayer.h",
+    "NetworkTestHelpers.cpp",
+    "NetworkTestHelpers.h",
   ]
 
   public_deps = [
     "${chip_root}/src/inet/tests:tests_common",
+  ]
+}
+
+chip_test_suite("tests") {
+  output_name = "libRawTransportTests"
+
+  sources = [
+    "TestMessageHeader.cpp",
+    "TestTCP.cpp",
+    "TestRawTransportLayer.h",
+    "TestUDP.cpp",
+  ]
+
+  public_deps = [
+    ":helpers",
+    "${chip_root}/src/inet/tests:tests_common",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/transport",
-    "${chip_root}/src/transport/raw/tests:helpers",
+    "${chip_root}/src/transport/raw",
     "${nlio_root}:nlio",
     "${nlunit_test_root}:nlunit-test",
   ]
 
   tests = [
-    "TestPeerConnections",
-    "TestSecurePairingSession",
-    "TestSecureSession",
-    "TestSecureSessionMgr",
+    "TestMessageHeader",
+    "TestUDP",
   ]
+
+  if (current_os != "mac") {
+    tests += [ "TestTCP" ]
+  }
 }

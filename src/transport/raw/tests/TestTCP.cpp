@@ -21,7 +21,7 @@
  *      This file implements unit tests for the TcpTransport implementation.
  */
 
-#include "TestTransportLayer.h"
+#include "TestRawTransportLayer.h"
 
 #include "NetworkTestHelpers.h"
 

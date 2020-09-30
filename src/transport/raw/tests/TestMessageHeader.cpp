@@ -22,7 +22,7 @@
  *      the Message Header class within the transport layer
  *
  */
-#include "TestTransportLayer.h"
+#include "TestRawTransportLayer.h"
 
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
