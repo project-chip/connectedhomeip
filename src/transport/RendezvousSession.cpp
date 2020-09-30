@@ -41,7 +41,7 @@ enum NetworkProvisioningMsgTypes : uint8_t
     kIPAddressAssigned      = 1,
 };
 
-CHIP_ERROR RendezvousSession::Init()
+CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
