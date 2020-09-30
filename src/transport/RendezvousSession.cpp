@@ -20,7 +20,7 @@
 #include <transport/RendezvousSession.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
-#include <transport/raw/BLE.h>
+#include <transport/BLE.h>
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 static const size_t kMax_SecureSDU_Length          = 1024;
