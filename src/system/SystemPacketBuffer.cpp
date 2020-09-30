@@ -461,8 +461,7 @@ PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, uint16
 
     CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_PacketBufferNew, return nullptr);
 
-    if (lAllocSize > CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX ||
-        lBlockSize > UINT16_MAX)
+    if (lAllocSize > CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX || lBlockSize > UINT16_MAX)
     {
         ChipLogError(chipSystemLayer, "PacketBuffer: allocation too large.");
         return nullptr;
