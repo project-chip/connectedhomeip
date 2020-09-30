@@ -21,6 +21,10 @@
 #include <support/SafeInt.h>
 #include <transport/RendezvousSession.h>
 
+#if CONFIG_DEVICE_LAYER
+#include <platform/CHIPDeviceLayer.h>
+#endif
+
 #if CONFIG_NETWORK_LAYER_BLE
 #include <transport/BLE.h>
 #endif // CONFIG_NETWORK_LAYER_BLE
@@ -61,6 +65,9 @@ CHIP_ERROR RendezvousSession::Init()
     if (mParams.HasDiscriminator() == false)
     {
         err = WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
+#if CONFIG_DEVICE_LAYER
+        DeviceLayer::PlatformMgr().AddEventHandler(ConnectivityHandler, reinterpret_cast<intptr_t>(this));
+#endif
     }
 
 exit:
@@ -92,28 +99,6 @@ exit:
     }
     return err;
 }
-
-CHIP_ERROR RendezvousSession::AssignedIPAddress(IPAddress & deviceAddr)
-{
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    System::PacketBuffer * buffer = System::PacketBuffer::New();
-
-    char * addrStr = deviceAddr.ToString(Uint8::to_char(buffer->Start()), buffer->AvailableDataLength());
-    VerifyOrExit(addrStr != nullptr, err = CHIP_ERROR_INVALID_ADDRESS);
-
-    buffer->SetDataLength(strlen(addrStr) + 1);
-
-    err = SendSecureMessage(Protocols::kChipProtocol_NetworkProvisioning, NetworkProvisioningMsgTypes::kIPAddressAssigned, buffer);
-    SuccessOrExit(err);
-
-    mDeviceAddress = deviceAddr;
-    return err;
-
-exit:
-    OnRendezvousError(err);
-    return err;
-}
-
 CHIP_ERROR RendezvousSession::SendPairingMessage(System::PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -273,17 +258,6 @@ exit:
     return err;
 }
 
-CHIP_ERROR RendezvousSession::HandleIPAddressAssignment(System::PacketBuffer * buffer)
-{
-    if (IPAddress::FromString(Uint8::to_const_char(buffer->Start()), buffer->DataLength(), mDeviceAddress))
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningFailed);
-    return CHIP_ERROR_INVALID_ADDRESS;
-}
-
 CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -334,9 +308,11 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
     if (payloadHeader.GetProtocolID() == Protocols::kChipProtocol_NetworkProvisioning &&
         payloadHeader.GetMessageType() == NetworkProvisioningMsgTypes::kIPAddressAssigned)
     {
-        err = HandleIPAddressAssignment(msgBuf);
-        SuccessOrExit(err);
-
+        if (!IPAddress::FromString(Uint8::to_const_char(msgBuf->Start()), msgBuf->DataLength(), mDeviceAddress))
+        {
+            mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningFailed);
+            ExitNow(err = CHIP_ERROR_INVALID_ADDRESS);
+        }
         mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningSuccess);
     }
     // else .. TBD once application dependency on this message has been removed, enable the else condition
@@ -368,5 +344,45 @@ CHIP_ERROR RendezvousSession::Pair(Optional<NodeId> nodeId, uint32_t setupPINCod
     return mPairingSession.Pair(setupPINCode, kSpake2p_Iteration_Count, (const unsigned char *) kSpake2pKeyExchangeSalt,
                                 strlen(kSpake2pKeyExchangeSalt), nodeId, mNextKeyId++, this);
 }
+
+void RendezvousSession::SendIPAddress(IPAddress & addr)
+{
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    System::PacketBuffer * buffer = System::PacketBuffer::New();
+    char * addrStr                = addr.ToString(Uint8::to_char(buffer->Start()), buffer->AvailableDataLength());
+
+    VerifyOrExit(addrStr != nullptr, err = CHIP_ERROR_INVALID_ADDRESS);
+    VerifyOrExit(mPairingInProgress == false, err = CHIP_ERROR_INCORRECT_STATE);
+
+    buffer->SetDataLength(strlen(addrStr) + 1);
+
+    err = SendSecureMessage(Protocols::kChipProtocol_NetworkProvisioning, NetworkProvisioningMsgTypes::kIPAddressAssigned, buffer);
+    SuccessOrExit(err);
+
+exit:
+    if (CHIP_NO_ERROR != err)
+    {
+        OnRendezvousError(err);
+        PacketBuffer::Free(buffer);
+    }
+}
+
+#if CONFIG_DEVICE_LAYER
+void RendezvousSession::ConnectivityHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    RendezvousSession * session = reinterpret_cast<RendezvousSession *>(arg);
+
+    VerifyOrExit(session != nullptr, /**/);
+    VerifyOrExit(event->Type == DeviceLayer::DeviceEventType::kInternetConnectivityChange, /**/);
+    VerifyOrExit(event->InternetConnectivityChange.IPv4 == DeviceLayer::kConnectivity_Established, /**/);
+
+    IPAddress addr;
+    IPAddress::FromString(event->InternetConnectivityChange.address, addr);
+    session->SendIPAddress(addr);
+
+exit:
+    return;
+}
+#endif
 
 } // namespace chip

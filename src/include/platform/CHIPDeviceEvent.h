@@ -305,6 +305,7 @@ struct ChipDeviceEvent final
         {
             ConnectivityChange IPv4;
             ConnectivityChange IPv6;
+            char address[INET6_ADDRSTRLEN];
         } InternetConnectivityChange;
         struct
         {

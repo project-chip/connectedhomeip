@@ -24,7 +24,6 @@
  **/
 
 #include "EchoDeviceCallbacks.h"
-#include "RendezvousDeviceDelegate.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
 #include "esp_netif.h"
@@ -48,7 +47,6 @@ using namespace ::chip::DeviceLayer;
 extern LEDWidget statusLED1;
 extern LEDWidget statusLED2;
 extern WiFiWidget wifiLED;
-extern RendezvousDeviceDelegate * rendezvousDelegate;
 
 void EchoDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
@@ -57,22 +55,7 @@ void EchoDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, int
         ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
         if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
         {
-            esp_netif_ip_info_t ipInfo;
-            if (esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"), &ipInfo) == ESP_OK)
-            {
-                char ipAddrStr[INET_ADDRSTRLEN];
-                esp_ip4addr_ntoa(&ipInfo.ip, ipAddrStr, sizeof(ipAddrStr));
-                ESP_LOGI(TAG, "Server ready at: %s:%d", ipAddrStr, CHIP_PORT);
-
-                // Since the commissioner device does not yet have a mechanism to discover the IP address
-                // of the peripheral, the following code send it over the current Rendezvous session.
-                if (rendezvousDelegate != NULL)
-                {
-                    IPAddress addr;
-                    IPAddress::FromString(ipAddrStr, addr);
-                    rendezvousDelegate->AssignedIPAddress(addr);
-                }
-            }
+            ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
             wifiLED.Set(true);
         }
         else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)

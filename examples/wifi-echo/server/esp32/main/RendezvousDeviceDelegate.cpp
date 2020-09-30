@@ -54,11 +54,6 @@ exit:
     }
 }
 
-CHIP_ERROR RendezvousDeviceDelegate::AssignedIPAddress(IPAddress & deviceAddr)
-{
-    return mRendezvousSession->AssignedIPAddress(deviceAddr);
-}
-
 void RendezvousDeviceDelegate::OnRendezvousError(CHIP_ERROR err)
 {
     ESP_LOGI(TAG, "OnRendezvousError: %s", ErrorStr(err));
