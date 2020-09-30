@@ -422,7 +422,7 @@ static const nlTest sTests[] = {
     NL_TEST_SENTINEL()
 };
 
-int TestConfigurationMgr(void)
+int TestConfigurationMgr()
 {
     nlTestSuite theSuite = { "CHIP DeviceLayer time tests", &sTests[0], nullptr, nullptr };
 

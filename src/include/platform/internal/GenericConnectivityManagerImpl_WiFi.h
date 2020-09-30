@@ -56,24 +56,24 @@ class GenericConnectivityManagerImpl_WiFi
 public:
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
-    ConnectivityManager::WiFiStationMode _GetWiFiStationMode(void);
+    ConnectivityManager::WiFiStationMode _GetWiFiStationMode();
     CHIP_ERROR _SetWiFiStationMode(ConnectivityManager::WiFiStationMode val);
-    bool _IsWiFiStationEnabled(void);
-    bool _IsWiFiStationApplicationControlled(void);
-    uint32_t _GetWiFiStationReconnectIntervalMS(void);
+    bool _IsWiFiStationEnabled();
+    bool _IsWiFiStationApplicationControlled();
+    uint32_t _GetWiFiStationReconnectIntervalMS();
     CHIP_ERROR _SetWiFiStationReconnectIntervalMS(uint32_t val);
-    bool _IsWiFiStationProvisioned(void);
-    void _ClearWiFiStationProvision(void);
-    ConnectivityManager::WiFiAPMode _GetWiFiAPMode(void);
+    bool _IsWiFiStationProvisioned();
+    void _ClearWiFiStationProvision();
+    ConnectivityManager::WiFiAPMode _GetWiFiAPMode();
     CHIP_ERROR _SetWiFiAPMode(ConnectivityManager::WiFiAPMode val);
-    bool _IsWiFiAPActive(void);
-    bool _IsWiFiAPApplicationControlled(void);
-    void _DemandStartWiFiAP(void);
-    void _StopOnDemandWiFiAP(void);
-    void _MaintainOnDemandWiFiAP(void);
-    uint32_t _GetWiFiAPIdleTimeoutMS(void);
+    bool _IsWiFiAPActive();
+    bool _IsWiFiAPApplicationControlled();
+    void _DemandStartWiFiAP();
+    void _StopOnDemandWiFiAP();
+    void _MaintainOnDemandWiFiAP();
+    uint32_t _GetWiFiAPIdleTimeoutMS();
     void _SetWiFiAPIdleTimeoutMS(uint32_t val);
-    CHIP_ERROR _GetAndLogWifiStatsCounters(void);
+    CHIP_ERROR _GetAndLogWifiStatsCounters();
     bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
@@ -93,7 +93,7 @@ private:
 };
 
 template <class ImplClass>
-inline uint32_t GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetWiFiStationReconnectIntervalMS(void)
+inline uint32_t GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetWiFiStationReconnectIntervalMS()
 {
     return 0;
 }
@@ -105,17 +105,17 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_SetWiFiStatio
 }
 
 template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiStationProvisioned(void)
+inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiStationProvisioned()
 {
     return false;
 }
 
 template <class ImplClass>
-inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_ClearWiFiStationProvision(void)
+inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_ClearWiFiStationProvision()
 {}
 
 template <class ImplClass>
-inline ConnectivityManager::WiFiAPMode GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetWiFiAPMode(void)
+inline ConnectivityManager::WiFiAPMode GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetWiFiAPMode()
 {
     return ConnectivityManager::kWiFiAPMode_NotSupported;
 }
@@ -127,31 +127,31 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_SetWiFiAPMode
 }
 
 template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiAPActive(void)
+inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiAPActive()
 {
     return false;
 }
 
 template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiAPApplicationControlled(void)
+inline bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiAPApplicationControlled()
 {
     return false;
 }
 
 template <class ImplClass>
-inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_DemandStartWiFiAP(void)
+inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_DemandStartWiFiAP()
 {}
 
 template <class ImplClass>
-inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_StopOnDemandWiFiAP(void)
+inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_StopOnDemandWiFiAP()
 {}
 
 template <class ImplClass>
-inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_MaintainOnDemandWiFiAP(void)
+inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_MaintainOnDemandWiFiAP()
 {}
 
 template <class ImplClass>
-inline uint32_t GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetWiFiAPIdleTimeoutMS(void)
+inline uint32_t GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetWiFiAPIdleTimeoutMS()
 {
     return 0;
 }
@@ -161,7 +161,7 @@ inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_SetWiFiAPIdleTimeou
 {}
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetAndLogWifiStatsCounters(void)
+inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetAndLogWifiStatsCounters()
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

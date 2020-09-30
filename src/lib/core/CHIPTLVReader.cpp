@@ -1206,7 +1206,7 @@ CHIP_ERROR TLVReader::Skip()
  * This method is used to position the reader before the first TLV,
  * between TLVs or after the last TLV.
  */
-void TLVReader::ClearElementState(void)
+void TLVReader::ClearElementState()
 {
     mElemTag      = AnonymousTag;
     mControlByte  = kTLVControlByte_NotSpecified;
@@ -1223,7 +1223,7 @@ void TLVReader::ClearElementState(void)
  *                                      GetNextBuffer() function. Only possible when GetNextBuffer is
  *                                      non-NULL.
  */
-CHIP_ERROR TLVReader::SkipData(void)
+CHIP_ERROR TLVReader::SkipData()
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLVElementType elemType = ElementType();

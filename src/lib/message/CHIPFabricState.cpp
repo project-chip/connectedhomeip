@@ -117,7 +117,7 @@ const uint8_t kChipMsgEncAppKeyDiversifier[] = { 0xB1, 0x1D, 0xAE, 0x5B };
 /**
  * Initialize a ChipSessionKey object.
  */
-void ChipSessionKey::Init(void)
+void ChipSessionKey::Init()
 {
     NodeId = kNodeIdNotSpecified;
     NextMsgId.Init(0);
@@ -133,7 +133,7 @@ void ChipSessionKey::Init(void)
 /**
  * Reset a ChipSessionKey object.
  */
-void ChipSessionKey::Clear(void)
+void ChipSessionKey::Clear()
 {
     Init();
     ClearSecretData((uint8_t *) &MsgEncKey.EncKey, sizeof(MsgEncKey.EncKey));
@@ -1074,7 +1074,7 @@ void ChipFabricState::OnMsgCounterSyncRespRcvd(uint64_t peerNodeId, uint32_t pee
 }
 
 // Start message counter synchronization timer.
-void ChipFabricState::StartMsgCounterSyncTimer(void)
+void ChipFabricState::StartMsgCounterSyncTimer()
 {
     // Arm timer to call MsgCounterSyncRespTimeout after CHIP_CONFIG_MSG_COUNTER_SYNC_RESP_TIMEOUT.
     CHIP_ERROR res = MessageLayer->SystemLayer->StartTimer((uint32_t) CHIP_CONFIG_MSG_COUNTER_SYNC_RESP_TIMEOUT,
@@ -1682,7 +1682,7 @@ void ChipFabricState::HandleConnectionClosed(ChipConnection * con)
 
 // ChipSessionState Members
 
-ChipSessionState::ChipSessionState(void)
+ChipSessionState::ChipSessionState()
 {
     MsgEncKey    = nullptr;
     AuthMode     = kChipAuthMode_NotSpecified;
@@ -1701,7 +1701,7 @@ ChipSessionState::ChipSessionState(ChipMsgEncryptionKey * msgEncKey, ChipAuthMod
     RcvFlags     = rcvFlags;
 }
 
-uint32_t ChipSessionState::NewMessageId(void)
+uint32_t ChipSessionState::NewMessageId()
 {
     uint32_t newMsgId = NextMsgId->GetValue();
 
@@ -1710,7 +1710,7 @@ uint32_t ChipSessionState::NewMessageId(void)
     return newMsgId;
 }
 
-bool ChipSessionState::MessageIdNotSynchronized(void)
+bool ChipSessionState::MessageIdNotSynchronized()
 {
     return (RcvFlags == nullptr) || (((*RcvFlags) & kReceiveFlags_MessageIdSynchronized) == 0);
 }

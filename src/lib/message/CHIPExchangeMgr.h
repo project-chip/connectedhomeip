@@ -135,21 +135,21 @@ public:
         /**< Deprecated alias for \c kSendFlag_DefaultMulticastSourceAddress */
     };
 
-    bool IsInitiator(void) const;
-    bool IsConnectionClosed(void) const;
-    bool IsResponseExpected(void) const;
+    bool IsInitiator() const;
+    bool IsConnectionClosed() const;
+    bool IsResponseExpected() const;
     void SetInitiator(bool inInitiator);
     void SetConnectionClosed(bool inConnectionClosed);
-    bool ShouldDropAck(void) const;
-    bool IsAckPending(void) const;
+    bool ShouldDropAck() const;
+    bool IsAckPending() const;
     void SetDropAck(bool inDropAck);
     void SetAckPending(bool inAckPending);
-    bool HasPeerRequestedAck(void) const;
+    bool HasPeerRequestedAck() const;
     void SetPeerRequestedAck(bool inPeerRequestedAck);
-    bool HasRcvdMsgFromPeer(void) const;
+    bool HasRcvdMsgFromPeer() const;
     void SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer);
-    CHIP_ERROR RMPFlushAcks(void);
-    uint32_t GetCurrentRetransmitTimeout(void);
+    CHIP_ERROR RMPFlushAcks();
+    uint32_t GetCurrentRetransmitTimeout();
     void SetResponseExpected(bool inResponseExpected);
     bool AutoRequestAck() const;
     void SetAutoRequestAck(bool autoReqAck);
@@ -157,7 +157,7 @@ public:
     void SetAutoReleaseKey(bool autoReleaseKey);
     bool ShouldAutoReleaseConnection() const;
     void SetShouldAutoReleaseConnection(bool autoReleaseCon);
-    bool UseEphemeralUDPPort(void) const;
+    bool UseEphemeralUDPPort() const;
 #if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
     void SetUseEphemeralUDPPort(bool val);
 #endif
@@ -166,10 +166,10 @@ public:
                            void * msgCtxt = nullptr);
     CHIP_ERROR SendMessage(uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf, uint16_t sendFlags,
                            ChipMessageInfo * msgInfo, void * msgCtxt = nullptr);
-    CHIP_ERROR SendCommonNullMessage(void);
+    CHIP_ERROR SendCommonNullMessage();
     CHIP_ERROR EncodeExchHeader(ChipExchangeHeader * exchangeHeader, uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf,
                                 uint16_t sendFlags);
-    void TeardownTrickleRetransmit(void);
+    void TeardownTrickleRetransmit();
 
     /**
      * This function is the application callback for handling a received CHIP message.
@@ -241,7 +241,7 @@ public:
      */
     KeyErrorFunct OnKeyError;
 
-    void CancelRetrans(void);
+    void CancelRetrans();
 
     CHIP_ERROR RMPSendThrottleFlow(uint32_t PauseTimeMillis);
     CHIP_ERROR RMPSendDelayedDelivery(uint32_t PauseTimeMillis, uint64_t DelayedNodeId);
@@ -297,11 +297,11 @@ public:
      * can hold onto it while it's out of their direct control
      * to make sure it isn't closed before everyone's ready.
      */
-    void AddRef(void);
-    void Close(void);
-    void Abort(void);
-    void Release(void);
-    CHIP_ERROR StartTimerT(void);
+    void AddRef();
+    void Close();
+    void Abort();
+    void Release();
+    CHIP_ERROR StartTimerT();
 
     enum
     {
@@ -321,14 +321,14 @@ private:
     uint8_t rebroadcastThreshold; // re-broadcast threshold
     uint16_t mFlags;              // Internal state flags
 
-    CHIP_ERROR ResendMessage(void);
+    CHIP_ERROR ResendMessage();
     bool MatchExchange(ChipConnection * msgCon, const ChipMessageInfo * msgInfo, const ChipExchangeHeader * exchangeHeader);
     static void CancelRetransmissionTimer(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
     static void TimerTau(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
     static void TimerT(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 
-    CHIP_ERROR StartResponseTimer(void);
-    void CancelResponseTimer(void);
+    CHIP_ERROR StartResponseTimer();
+    void CancelResponseTimer();
     static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 
     uint32_t mPendingPeerAckId;
@@ -373,7 +373,7 @@ public:
         kState_Initialized    = 1  /**< Used to indicate that the ChipExchangeManager is initialized */
     };
 
-    ChipExchangeManager(void);
+    ChipExchangeManager();
     ChipExchangeManager(const ChipExchangeManager &) = delete;
     ChipExchangeManager operator=(const ChipExchangeManager &) = delete;
 
@@ -382,10 +382,10 @@ public:
     uint8_t State;                   /**< [READ ONLY] The state of the ChipExchangeManager object. */
 
     CHIP_ERROR Init(ChipMessageLayer * msgLayer);
-    CHIP_ERROR Shutdown(void);
+    CHIP_ERROR Shutdown();
 
 #if CHIP_CONFIG_TEST
-    size_t ExpireExchangeTimers(void);
+    size_t ExpireExchangeTimers();
 #endif
 
     ExchangeContext * NewContext(const uint64_t & peerNodeId, void * appState = nullptr);
@@ -441,10 +441,10 @@ private:
         uint16_t nextRetransTime;      /**< A counter representing the next retransmission time for the message. */
         uint8_t sendCount;             /**< A counter representing the number of times the message has been sent. */
     };
-    void RMPExecuteActions(void);
-    void RMPExpireTicks(void);
-    void RMPStartTimer(void);
-    void RMPStopTimer(void);
+    void RMPExecuteActions();
+    void RMPExpireTicks();
+    void RMPStartTimer();
+    void RMPStopTimer();
     void RMPProcessDDMessage(uint32_t PauseTimeMillis, uint64_t DelayedNodeId);
     uint32_t GetTickCounterFromTimeDelta(uint64_t newTime, uint64_t oldTime);
     static void RMPTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
@@ -483,7 +483,7 @@ private:
     UnsolicitedMessageHandler UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
     void (*OnExchangeContextChanged)(size_t numContextsInUse);
 
-    ExchangeContext * AllocContext(void);
+    ExchangeContext * AllocContext();
 
     void HandleConnectionReceived(ChipConnection * con);
     void HandleConnectionClosed(ChipConnection * con, CHIP_ERROR conErr);
@@ -498,8 +498,8 @@ private:
     static CHIP_ERROR PrependHeader(ChipExchangeHeader * exchangeHeader, PacketBuffer * buf);
     static CHIP_ERROR DecodeHeader(ChipExchangeHeader * exchangeHeader, ChipMessageInfo * msgInfo, PacketBuffer * buf);
 
-    void InitBindingPool(void);
-    Binding * AllocBinding(void);
+    void InitBindingPool();
+    Binding * AllocBinding();
     void FreeBinding(Binding * binding);
     uint16_t GetBindingLogId(const Binding * const binding) const;
 

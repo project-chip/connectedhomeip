@@ -89,7 +89,7 @@ exit:
 }
 #endif // defined(CHIP_DEVICE_LAYER_TARGET_NRF5)
 
-int main(void)
+int main()
 {
 #if defined(CHIP_DEVICE_LAYER_TARGET_NRF5)
     soft_device_init();

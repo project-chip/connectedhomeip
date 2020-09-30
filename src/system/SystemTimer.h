@@ -63,14 +63,14 @@ public:
      */
     typedef uint64_t Epoch;
 
-    static Epoch GetCurrentEpoch(void);
+    static Epoch GetCurrentEpoch();
     static bool IsEarlierEpoch(const Epoch & first, const Epoch & second);
 
     typedef void (*OnCompleteFunct)(Layer * aLayer, void * aAppState, Error aError);
     OnCompleteFunct OnComplete;
 
     Error Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, void * aAppState);
-    Error Cancel(void);
+    Error Cancel();
 
     static void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark);
 
@@ -79,7 +79,7 @@ private:
 
     Epoch mAwakenEpoch;
 
-    void HandleComplete(void);
+    void HandleComplete();
 
     Error ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState);
 

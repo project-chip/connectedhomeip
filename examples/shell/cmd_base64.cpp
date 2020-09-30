@@ -102,7 +102,7 @@ static const shell_command_t cmds_base64[] = {
     { &cmd_base64_decode, "decode", "Decode a base64 sting as hex. Usage: base64 decode <base64_string>" },
 };
 
-void cmd_base64_init(void)
+void cmd_base64_init()
 {
     // Register `base64` subcommands with the local shell dispatcher.
     theShellBase64.RegisterCommands(cmds_base64, ArraySize(cmds_base64));

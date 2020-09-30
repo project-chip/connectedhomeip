@@ -63,7 +63,7 @@ using namespace chip::Protocols::Security;
 using namespace chip::Protocols::Security::AppKeys;
 using namespace chip::Encoding;
 
-ChipSecurityManager::ChipSecurityManager(void)
+ChipSecurityManager::ChipSecurityManager()
 {
     State        = kState_NotInitialized;
     mSystemLayer = nullptr;
@@ -109,7 +109,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipSecurityManager::Shutdown(void)
+CHIP_ERROR ChipSecurityManager::Shutdown()
 {
     if (State != kState_NotInitialized)
     {
@@ -587,7 +587,7 @@ exit:
 
 #endif // CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
 
-CHIP_ERROR ChipSecurityManager::HandleSessionEstablished(void)
+CHIP_ERROR ChipSecurityManager::HandleSessionEstablished()
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
     uint64_t peerNodeId   = mEC->PeerNodeId;
@@ -610,7 +610,7 @@ exit:
     return err;
 }
 
-void ChipSecurityManager::HandleSessionComplete(void)
+void ChipSecurityManager::HandleSessionComplete()
 {
     ChipConnection * con                   = mCon;
     uint64_t peerNodeId                    = mEC->PeerNodeId;
@@ -822,7 +822,7 @@ exit:
     return err;
 }
 
-void ChipSecurityManager::Reset(void)
+void ChipSecurityManager::Reset()
 {
     if (mEC != nullptr)
     {
@@ -850,7 +850,7 @@ void ChipSecurityManager::Reset(void)
     mStartSecureSession_ReqState   = nullptr;
 }
 
-void ChipSecurityManager::StartSessionTimer(void)
+void ChipSecurityManager::StartSessionTimer()
 {
     ChipLogProgress(SecurityManager, "%s", __FUNCTION__);
 
@@ -860,7 +860,7 @@ void ChipSecurityManager::StartSessionTimer(void)
     }
 }
 
-void ChipSecurityManager::CancelSessionTimer(void)
+void ChipSecurityManager::CancelSessionTimer()
 {
     ChipLogProgress(SecurityManager, "%s", __FUNCTION__);
     mSystemLayer->CancelTimer(HandleSessionTimeout, this);
@@ -877,7 +877,7 @@ void ChipSecurityManager::HandleSessionTimeout(System::Layer * aSystemLayer, voi
     }
 }
 
-void ChipSecurityManager::StartIdleSessionTimer(void)
+void ChipSecurityManager::StartIdleSessionTimer()
 {
     if (IdleSessionTimeout != 0 && !GetFlag(mFlags, kFlag_IdleSessionTimerRunning))
     {
@@ -891,7 +891,7 @@ void ChipSecurityManager::StartIdleSessionTimer(void)
     }
 }
 
-void ChipSecurityManager::StopIdleSessionTimer(void)
+void ChipSecurityManager::StopIdleSessionTimer()
 {
     System::Layer * systemLayer = FabricState->MessageLayer->SystemLayer;
     systemLayer->CancelTimer(HandleIdleSessionTimeout, this);

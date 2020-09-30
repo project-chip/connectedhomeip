@@ -285,7 +285,7 @@ struct TestContext
 /**
  *  Main
  */
-int TestQRCodeTLV(void)
+int TestQRCodeTLV()
 {
     // clang-format off
     nlTestSuite theSuite =

@@ -666,7 +666,7 @@ static void HandleSIGUSR1(int sig)
     exit(0);
 }
 
-int TestInetLayerDNSInternal(void)
+int TestInetLayerDNSInternal()
 {
     // clang-format off
     const nlTest DNSTests[] =

@@ -55,7 +55,7 @@ typedef enum
     kFault_NumberOfFaultIdentifiers,
 } Id;
 
-DLL_EXPORT nl::FaultInjection::Manager & GetManager(void);
+DLL_EXPORT nl::FaultInjection::Manager & GetManager();
 
 /**
  * Callback to the application that returns how many asynchronous events the application could
@@ -63,7 +63,7 @@ DLL_EXPORT nl::FaultInjection::Manager & GetManager(void);
  *
  * @return The number of events
  */
-typedef int32_t (*GetNumEventsAvailableCb)(void);
+typedef int32_t (*GetNumEventsAvailableCb)();
 
 /**
  * Callback to the application to inject the asynchronous event specified by argument.
@@ -86,7 +86,7 @@ DLL_EXPORT void SetAsyncEventCallbacks(GetNumEventsAvailableCb aGetNumEventsAvai
 /**
  * @see CHIP_SYSTEM_FAULT_INJECT_ASYNC_EVENT
  */
-DLL_EXPORT void InjectAsyncEvent(void);
+DLL_EXPORT void InjectAsyncEvent();
 
 } // namespace FaultInjection
 } // namespace System

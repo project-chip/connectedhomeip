@@ -32,7 +32,7 @@ namespace Internal {
 /**
  * Defines the event logging resources and initializes event logging management subsystem.
  */
-extern CHIP_ERROR InitChipEventLogging(void);
+extern CHIP_ERROR InitChipEventLogging();
 
 } // namespace Internal
 } // namespace DeviceLayer

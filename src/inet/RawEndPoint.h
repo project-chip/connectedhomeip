@@ -74,19 +74,19 @@ public:
     INET_ERROR Bind(IPAddressType addrType, IPAddress addr, InterfaceId intfId = INET_NULL_INTERFACEID);
     INET_ERROR BindIPv6LinkLocal(InterfaceId intfId, IPAddress addr);
     INET_ERROR BindInterface(IPAddressType addrType, InterfaceId intfId);
-    InterfaceId GetBoundInterface(void);
-    INET_ERROR Listen(void);
+    InterfaceId GetBoundInterface();
+    INET_ERROR Listen();
     INET_ERROR SendTo(IPAddress addr, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
     INET_ERROR SendTo(IPAddress addr, InterfaceId intfId, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
     INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
     INET_ERROR SetICMPFilter(uint8_t numICMPTypes, const uint8_t * aICMPTypes);
-    void Close(void);
-    void Free(void);
+    void Close();
+    void Free();
 
 private:
-    RawEndPoint(void)                = delete;
+    RawEndPoint()                    = delete;
     RawEndPoint(const RawEndPoint &) = delete;
-    ~RawEndPoint(void)               = delete;
+    ~RawEndPoint()                   = delete;
 
     static chip::System::ObjectPool<RawEndPoint, INET_CONFIG_NUM_RAW_ENDPOINTS> sPool;
 
@@ -108,8 +108,8 @@ private:
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     INET_ERROR GetSocket(IPAddressType addrType);
-    SocketEvents PrepareIO(void);
-    void HandlePendingIO(void);
+    SocketEvents PrepareIO();
+    void HandlePendingIO();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
 

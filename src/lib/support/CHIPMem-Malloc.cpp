@@ -38,7 +38,7 @@ CHIP_ERROR MemoryInit(void * buf, size_t bufSize)
     return CHIP_NO_ERROR;
 }
 
-void MemoryShutdown(void) {}
+void MemoryShutdown() {}
 
 void * MemoryAlloc(size_t size)
 {

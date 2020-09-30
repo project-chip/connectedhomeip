@@ -82,16 +82,16 @@ public:
         kBlockLength = 64
     };
 
-    SHA1(void);
-    ~SHA1(void);
+    SHA1();
+    ~SHA1();
 
-    void Begin(void);
+    void Begin();
     void AddData(const uint8_t * data, uint16_t dataLen);
 #if CHIP_WITH_OPENSSL
     void AddData(const BIGNUM & num);
 #endif
     void Finish(uint8_t * hashBuf);
-    void Reset(void);
+    void Reset();
 
 private:
 #if CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL
@@ -112,16 +112,16 @@ public:
         kBlockLength = 64
     };
 
-    SHA256(void);
-    ~SHA256(void);
+    SHA256();
+    ~SHA256();
 
-    void Begin(void);
+    void Begin();
     void AddData(const uint8_t * data, uint16_t dataLen);
 #if CHIP_WITH_OPENSSL
     void AddData(const BIGNUM & num);
 #endif
     void Finish(uint8_t * hashBuf);
-    void Reset(void);
+    void Reset();
 
 private:
 #if CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL

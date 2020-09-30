@@ -109,7 +109,7 @@ public:
      */
     const Optional<NodeId> & GetDestinationNodeId() const { return mDestinationNodeId; }
 
-    uint16_t GetEncryptionKeyID(void) const { return mEncryptionKeyID; }
+    uint16_t GetEncryptionKeyID() const { return mEncryptionKeyID; }
 
     /** Get the length of encrypted payload. */
     uint16_t GetPayloadLength() const { return mPayloadLength; }
@@ -117,9 +117,9 @@ public:
     const Header::Flags & GetFlags() const { return mFlags; }
 
     /** Check if it's a secure session control message. */
-    bool IsSecureSessionControlMsg(void) const { return (mFlags.value & Header::Flags::kSecureSessionControlMessage) != 0; }
+    bool IsSecureSessionControlMsg() const { return (mFlags.value & Header::Flags::kSecureSessionControlMessage) != 0; }
 
-    Header::EncryptionType GetEncryptionType(void) const { return mEncryptionType; }
+    Header::EncryptionType GetEncryptionType() const { return mEncryptionType; }
 
     PacketHeader & SetSecureSessionControlMsg(bool value)
     {
@@ -296,13 +296,13 @@ public:
     const Optional<uint16_t> & GetVendorId() const { return mVendorId; }
 
     /** Get the Session ID from this header. */
-    uint16_t GetExchangeID(void) const { return mExchangeID; }
+    uint16_t GetExchangeID() const { return mExchangeID; }
 
     /** Get the Protocol ID from this header. */
-    uint16_t GetProtocolID(void) const { return mProtocolID; }
+    uint16_t GetProtocolID() const { return mProtocolID; }
 
     /** Get the secure msg type from this header. */
-    uint8_t GetMessageType(void) const { return mMessageType; }
+    uint8_t GetMessageType() const { return mMessageType; }
 
     /** Set the vendor id for this header. */
     PayloadHeader & SetVendorId(uint16_t id)
@@ -413,7 +413,7 @@ private:
 class MessageAuthenticationCode
 {
 public:
-    const uint8_t * GetTag(void) const { return &mTag[0]; }
+    const uint8_t * GetTag() const { return &mTag[0]; }
 
     /** Set the message auth tag for this header. */
     MessageAuthenticationCode & SetTag(PacketHeader * header, Header::EncryptionType encType, uint8_t * tag, size_t len)

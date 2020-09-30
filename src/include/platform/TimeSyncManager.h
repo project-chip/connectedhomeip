@@ -77,7 +77,7 @@ private:
     friend class Internal::GenericPlatformManagerImpl;
     template <class>
     friend class Internal::GenericPlatformManagerImpl_FreeRTOS;
-    friend TimeSyncManager & TimeSyncMgr(void);
+    friend TimeSyncManager & TimeSyncMgr();
 
     static TimeSyncManager sInstance;
 
@@ -131,7 +131,7 @@ inline uint32_t TimeSyncManager::GetSyncInterval()
 /**
  * Returns a reference to the TimeSyncManager singleton object.
  */
-inline TimeSyncManager & TimeSyncMgr(void)
+inline TimeSyncManager & TimeSyncMgr()
 {
     return TimeSyncManager::sInstance;
 }

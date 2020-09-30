@@ -401,7 +401,7 @@ exit:
  *
  * @returns             Elapsed time in microseconds since an arbitrary, platform-defined epoch.
  */
-uint64_t Layer::GetClock_Monotonic(void)
+uint64_t Layer::GetClock_Monotonic()
 {
     // Current implementation is a simple pass-through to the platform.
     return Platform::Layer::GetClock_Monotonic();
@@ -425,7 +425,7 @@ uint64_t Layer::GetClock_Monotonic(void)
  *
  * @returns             Elapsed time in milliseconds since an arbitrary, platform-defined epoch.
  */
-uint64_t Layer::GetClock_MonotonicMS(void)
+uint64_t Layer::GetClock_MonotonicMS()
 {
     // Current implementation is a simple pass-through to the platform.
     return Platform::Layer::GetClock_MonotonicMS();
@@ -452,7 +452,7 @@ uint64_t Layer::GetClock_MonotonicMS(void)
  *
  * @returns             Elapsed time in microseconds since an arbitrary, platform-defined epoch.
  */
-uint64_t Layer::GetClock_MonotonicHiRes(void)
+uint64_t Layer::GetClock_MonotonicHiRes()
 {
     // Current implementation is a simple pass-through to the platform.
     return Platform::Layer::GetClock_MonotonicHiRes();

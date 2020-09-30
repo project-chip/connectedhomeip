@@ -49,10 +49,10 @@ class ConfigurationManagerImpl final : public ConfigurationManager,
 private:
     // ===== Members that implement the ConfigurationManager public interface.
 
-    CHIP_ERROR _Init(void);
+    CHIP_ERROR _Init();
     CHIP_ERROR _GetPrimaryWiFiMACAddress(uint8_t * buf);
-    bool _CanFactoryReset(void);
-    void _InitiateFactoryReset(void);
+    bool _CanFactoryReset();
+    void _InitiateFactoryReset();
     CHIP_ERROR _ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
     CHIP_ERROR _WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value);
 
@@ -60,8 +60,8 @@ private:
 
     // ===== Members for internal use by the following friends.
 
-    friend ConfigurationManager & ConfigurationMgr(void);
-    friend ConfigurationManagerImpl & ConfigurationMgrImpl(void);
+    friend ConfigurationManager & ConfigurationMgr();
+    friend ConfigurationManagerImpl & ConfigurationMgrImpl();
 
     static ConfigurationManagerImpl sInstance;
 
@@ -76,7 +76,7 @@ private:
  * chip applications should use this to access features of the ConfigurationManager object
  * that are common to all platforms.
  */
-inline ConfigurationManager & ConfigurationMgr(void)
+inline ConfigurationManager & ConfigurationMgr()
 {
     return ConfigurationManagerImpl::sInstance;
 }
@@ -87,7 +87,7 @@ inline ConfigurationManager & ConfigurationMgr(void)
  * chip applications can use this to gain access to features of the ConfigurationManager
  * that are specific to the ESP32 platform.
  */
-inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
+inline ConfigurationManagerImpl & ConfigurationMgrImpl()
 {
     return ConfigurationManagerImpl::sInstance;
 }

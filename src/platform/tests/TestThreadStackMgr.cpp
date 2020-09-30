@@ -47,7 +47,7 @@ void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg
     }
 }
 
-int TestThreadStackManager(void)
+int TestThreadStackManager()
 {
     chip::DeviceLayer::ThreadStackManagerImpl impl;
     chip::DeviceLayer::Internal::DeviceNetworkInfo info;

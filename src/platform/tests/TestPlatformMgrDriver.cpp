@@ -24,7 +24,7 @@
 
 #include "TestPlatformMgr.h"
 
-int main(void)
+int main()
 {
     return (TestPlatformMgr());
 }

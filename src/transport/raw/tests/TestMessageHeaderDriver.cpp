@@ -27,7 +27,7 @@
 
 #include <nlunit-test.h>
 
-int main(void)
+int main()
 {
     nlTestSetOutputStyle(OUTPUT_CSV);
     return TestMessageHeader();
