@@ -51,8 +51,8 @@ rsync -a out/android_arm64/lib/jni/* src/android/CHIPTool/app/src/main/jniLibs
 5. 'Gradle sync' the Android project and run.
 
 6. You will also need the "libc++\_shared.so" file in the jniLibs folder. This
-    file comes packaged with Android NDK and can be found under
-    `$ANDROID_NDK_HOME/sources/cxx-stl/llvm-libc++/libs/$TARGET`, e.g.
+   file comes packaged with Android NDK and can be found under
+   `$ANDROID_NDK_HOME/sources/cxx-stl/llvm-libc++/libs/$TARGET`, e.g.
 
     `rsync -a "${ANDROID_NDK_HOME}/sources/cxx-stl/llvm-libc++/libs/arm64-v8a/libc++_shared.so" src/android/CHIPTool/app/src/main/jniLibs/arm64-v8a/`
 
