@@ -156,9 +156,10 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/protocol/bluetooth/lib/efr32mg21/GCC/libmbedtls.a",
       ]
 
-      defines += [  "EFR32MG21",
-                    "EFR32_SERIES2_CONFIG1_MICRO"
-                 ]
+      defines += [
+        "EFR32MG21",
+        "EFR32_SERIES2_CONFIG1_MICRO",
+      ]
     }
 
     cflags = []
