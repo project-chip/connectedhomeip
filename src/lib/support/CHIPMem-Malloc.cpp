@@ -29,7 +29,8 @@
 #include <stdlib.h>
 
 #ifndef NDEBUG
-#include <stdio.h>
+#include <atomic>
+#include <cstdio>
 #endif
 
 #if CHIP_CONFIG_MEMORY_MGMT_MALLOC
@@ -43,7 +44,9 @@ namespace Platform {
 
 #else
 
-static int memoryInitialized = 0;
+#define VERIFY_INITIALIZED() VerifyInitialized(__func__)
+
+static std::atomic_int memoryInitialized { 0 };
 
 static void VerifyInitialized(const char * func)
 {
@@ -54,14 +57,15 @@ static void VerifyInitialized(const char * func)
     }
 }
 
-#define VERIFY_INITIALIZED() VerifyInitialized(__func__)
-
 #endif
 
 CHIP_ERROR MemoryInit(void * buf, size_t bufSize)
 {
 #ifndef NDEBUG
-    memoryInitialized = 1;
+    if (memoryInitialized++ > 0) {
+        fprintf(stderr, "ABORT: chip::Platform::MemoryInit() called twice.\n");
+        abort();
+    }
 #endif
     return CHIP_NO_ERROR;
 }
@@ -69,47 +73,40 @@ CHIP_ERROR MemoryInit(void * buf, size_t bufSize)
 void MemoryShutdown(void)
 {
 #ifndef NDEBUG
-    memoryInitialized = 0;
+    if (--memoryInitialized < 0) {
+        fprintf(stderr, "ABORT: chip::Platform::MemoryShutdown() called twice.\n");
+        abort();
+    }
 #endif
 }
 
 void * MemoryAlloc(size_t size)
 {
-#ifndef NDEBUG
     VERIFY_INITIALIZED();
-#endif
     return MemoryAlloc(size, false);
 }
 
 void * MemoryAlloc(size_t size, bool isLongTermAlloc)
 {
-#ifndef NDEBUG
     VERIFY_INITIALIZED();
-#endif
     return malloc(size);
 }
 
 void * MemoryCalloc(size_t num, size_t size)
 {
-#ifndef NDEBUG
     VERIFY_INITIALIZED();
-#endif
     return calloc(num, size);
 }
 
 void * MemoryRealloc(void * p, size_t size)
 {
-#ifndef NDEBUG
     VERIFY_INITIALIZED();
-#endif
     return realloc(p, size);
 }
 
 void MemoryFree(void * p)
 {
-#ifndef NDEBUG
     VERIFY_INITIALIZED();
-#endif
     free(p);
 }
 
