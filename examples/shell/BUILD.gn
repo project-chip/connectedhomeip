@@ -101,7 +101,7 @@ if (chip_device_platform == "nrf5") {
       "${nrf5_platform_dir}/app/support:freertos_newlib_lock_support_test",
       "${openthread_root}:libopenthread-cli-ftd",
       "${openthread_root}:libopenthread-ftd",
-      "shell_common:chip_shell_collection",
+      "shell_common:shell_common",
     ]
 
     output_dir = root_out_dir
@@ -134,7 +134,7 @@ if (chip_device_platform == "nrf5") {
     public_deps = [
       "${chip_root}/src/lib/shell",
       "${chip_root}/src/platform",
-      "shell_common:chip_shell_collection",
+      "shell_common:shell_common",
     ]
 
     if (is_debug) {

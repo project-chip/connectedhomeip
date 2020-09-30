@@ -16,7 +16,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/openthread.gni")
 import("${chip_root}/src/platform/device.gni")
 
-config("chip_shell_collection_config") {
+config("shell_common_config") {
   include_dirs = [
     ".",
     "./include",
@@ -29,7 +29,7 @@ config("chip_shell_collection_config") {
   ]
 }
 
-static_library("chip_shell_collection") {
+static_library("shell_common") {
   sources = [
     "cmd_base64.cpp",
     "cmd_btp.cpp",
@@ -51,5 +51,5 @@ static_library("chip_shell_collection") {
     ]
   }
 
-  public_configs = [ ":chip_shell_collection_config" ]
+  public_configs = [ ":shell_common_config" ]
 }

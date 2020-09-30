@@ -30,6 +30,7 @@ nrf5_sdk("sdk") {
     "${nrf5_platform_dir}/app/project_include",
     "${nrf5_platform_dir}/util/include",
     "${nrf5_platform_dir}/app/include",
+    "${nrf5_sdk_root}/components/libraries/uart"
     "${chip_root}/src/app/util",
   ]
 
@@ -64,8 +65,6 @@ nrf5_sdk("sdk") {
 nrf5_executable("lighting_app") {
   output_name = "chip-nrf52840-lighting-example"
 
-  include_dirs = [ "${nrf5_sdk_root}/components/libraries/uart" ]
-
   sources = [
     "${nrf5_platform_dir}/app/Service.cpp",
     "${nrf5_platform_dir}/app/chipinit.cpp",
@@ -90,7 +89,7 @@ nrf5_executable("lighting_app") {
     ":sdk",
     "${chip_root}/examples/common/chip-app-server:chip-app-server",
     "${chip_root}/examples/lighting-app/lighting-common",
-    "${chip_root}/examples/shell/shell_common:chip_shell_collection",
+    "${chip_root}/examples/shell/shell_common:shell_common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms/nrf528xx:libnordicsemi_nrf52840_radio_driver_softdevice",
