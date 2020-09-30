@@ -69,8 +69,9 @@ cd ~
 git clone https://github.com/project-chip/connectedhomeip.git
 ```
 
--   Clone the Qorvo [CHIP SDK](https://github.com/Qorvo/qpg-connectedhomeip)
-    repo into a local directory to obtain the Qorvo specific platform libraries
+-   The Qorvo CHIP SDK is added as a submodule in /third_party/qpg_sdk/repo.
+    To manually clone this repo you can clone it from
+    [CHIP SDK](https://github.com/Qorvo/qpg-connectedhomeip)
 
 ```
 cd ~

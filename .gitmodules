@@ -85,3 +85,12 @@
 [submodule "nanopb"]
 	path = third_party/nanopb/repo
 	url = https://github.com/nanopb/nanopb.git
+	branch = master
+	ignore = dirty
+	commit = 7e4472420897c96b41a4928b4a1b2271d8af23e8
+[submodule "third_party/qpg_sdk/repo"]
+	path = third_party/qpg_sdk/repo
+	url = https://github.com/Qorvo/qpg-connectedhomeip
+	branch = master
+	ignore = dirty
+	commit = e1214fffae4a0d22e331326b19458061a97a9bb2
