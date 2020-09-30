@@ -124,7 +124,7 @@ int TestMemAlloc_Teardown(void * inContext)
     return (SUCCESS);
 }
 
-int TestMemAlloc(void)
+int TestMemAlloc()
 {
     nlTestSuite theSuite = { "CHIP Memory Allocation tests", &sTests[0], TestMemAlloc_Setup, TestMemAlloc_Teardown };
 

@@ -121,7 +121,7 @@ int TestPlatformMgr_Teardown(void * inContext)
     return SUCCESS;
 }
 
-int TestPlatformMgr(void)
+int TestPlatformMgr()
 {
     nlTestSuite theSuite = { "CHIP DeviceLayer time tests", &sTests[0], TestPlatformMgr_Setup, TestPlatformMgr_Teardown };
 

@@ -443,7 +443,7 @@ int TestConfigurationMgr_Teardown(void * inContext)
     return SUCCESS;
 }
 
-int TestConfigurationMgr(void)
+int TestConfigurationMgr()
 {
     nlTestSuite theSuite = { "CHIP DeviceLayer time tests", &sTests[0], TestConfigurationMgr_Setup, TestConfigurationMgr_Teardown };
 
