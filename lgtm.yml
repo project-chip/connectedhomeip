@@ -1,0 +1,11 @@
+extraction:
+  cpp:
+    prepare: # Customizable step used by all languages.
+      packages:
+        - g++-6
+    configure: # Customizable step used only by C/C++ extraction.
+      command:
+        - source scripts/bootstrap.sh && gn gen out/custom --args='target_os="linux_x64"'
+    index: # Customizable step used by all languages.
+      build_command:
+        - cd out/custom && ninja
