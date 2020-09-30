@@ -36,9 +36,7 @@
     extern EmberEventControl emberAfPluginDoorLockServerRelockEventControl;                                                        \
     extern EmberEventControl emberAfPluginIasZoneClientStateMachineEventControl;                                                   \
     extern EmberEventControl emberAfPluginIasZoneServerManageQueueEventControl;                                                    \
-    extern EmberEventControl emberAfPluginNetworkSteeringFinishSteeringEventControl;                                               \
     extern EmberEventControl emberAfPluginReportingTickEventControl;                                                               \
-    extern EmberEventControl emberAfPluginUpdateTcLinkKeyBeginTcLinkKeyUpdateEventControl;                                         \
     extern void emberAfPluginColorControlServerHueSatTransitionEventHandler(void);                                                 \
     extern void emberAfPluginColorControlServerTempTransitionEventHandler(void);                                                   \
     extern void emberAfPluginColorControlServerXyTransitionEventHandler(void);                                                     \
@@ -46,23 +44,7 @@
     extern void emberAfPluginDoorLockServerRelockEventHandler(void);                                                               \
     extern void emberAfPluginIasZoneClientStateMachineEventHandler(void);                                                          \
     extern void emberAfPluginIasZoneServerManageQueueEventHandler(void);                                                           \
-    extern void emberAfPluginNetworkSteeringFinishSteeringEventHandler(void);                                                      \
     extern void emberAfPluginReportingTickEventHandler(void);                                                                      \
-    extern void emberAfPluginUpdateTcLinkKeyBeginTcLinkKeyUpdateEventHandler(void);                                                \
-    static void networkEventWrapper(EmberEventControl * control, EmberAfNetworkEventHandler handler, uint8_t networkIndex)         \
-    {                                                                                                                              \
-        emberAfPushNetworkIndex(networkIndex);                                                                                     \
-        emberEventControlSetInactive(*control);                                                                                    \
-        (*handler)();                                                                                                              \
-        emberAfPopNetworkIndex();                                                                                                  \
-    }                                                                                                                              \
-    EmberEventControl emberAfPluginScanDispatchScanNetworkEventControls[1];                                                        \
-    extern void emberAfPluginScanDispatchScanNetworkEventHandler(void);                                                            \
-    void emberAfPluginScanDispatchScanNetworkEventWrapper0(void)                                                                   \
-    {                                                                                                                              \
-        networkEventWrapper(&emberAfPluginScanDispatchScanNetworkEventControls[0],                                                 \
-                            emberAfPluginScanDispatchScanNetworkEventHandler, 0);                                                  \
-    }                                                                                                                              \
     static void clusterTickWrapper(EmberEventControl * control, EmberAfTickFunction callback, uint8_t endpoint)                    \
     {                                                                                                                              \
         emberAfPushEndpointNetworkIndex(endpoint);                                                                                 \
@@ -104,19 +86,14 @@
         { &emberAfPluginDoorLockServerRelockEventControl, emberAfPluginDoorLockServerRelockEventHandler },                         \
         { &emberAfPluginIasZoneClientStateMachineEventControl, emberAfPluginIasZoneClientStateMachineEventHandler },               \
         { &emberAfPluginIasZoneServerManageQueueEventControl, emberAfPluginIasZoneServerManageQueueEventHandler },                 \
-        { &emberAfPluginNetworkSteeringFinishSteeringEventControl, emberAfPluginNetworkSteeringFinishSteeringEventHandler },       \
-        { &emberAfPluginReportingTickEventControl, emberAfPluginReportingTickEventHandler },                                       \
-        { &emberAfPluginUpdateTcLinkKeyBeginTcLinkKeyUpdateEventControl,                                                           \
-          emberAfPluginUpdateTcLinkKeyBeginTcLinkKeyUpdateEventHandler },                                                          \
-        { &emberAfPluginScanDispatchScanNetworkEventControls[0], emberAfPluginScanDispatchScanNetworkEventWrapper0 },
+        { &emberAfPluginReportingTickEventControl, emberAfPluginReportingTickEventHandler },
 
 #define EMBER_AF_GENERATED_EVENT_STRINGS                                                                                           \
     "Identify Cluster Server EP 1", "Level Control Cluster Server EP 1", "Barrier Control Cluster Server EP 1",                    \
         "IAS Zone Cluster Server EP 1", "Color Control Cluster Server Plugin HueSatTransition",                                    \
         "Color Control Cluster Server Plugin TempTransition", "Color Control Cluster Server Plugin XyTransition",                  \
         "Door Lock Server Cluster Plugin Lockout", "Door Lock Server Cluster Plugin Relock",                                       \
-        "IAS Zone Client Plugin StateMachine", "IAS Zone Server Plugin ManageQueue", "Network Steering Plugin FinishSteering",     \
-        "Reporting Plugin Tick", "Update TC Link Key Plugin BeginTcLinkKeyUpdate", "Scan Dispatch Plugin Scan NWK 0",
+        "IAS Zone Client Plugin StateMachine", "IAS Zone Server Plugin ManageQueue", "Reporting Plugin Tick",
 
 // The length of the event context table used to track and retrieve cluster events
 #define EMBER_AF_EVENT_CONTEXT_LENGTH 4

@@ -394,12 +394,10 @@
 
 #define EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_DECLARATIONS                                                               \
     void emberAfPluginReportingStackStatusCallback(EmberStatus status);                                                            \
-    void emberAfPluginNetworkSteeringStackStatusCallback(EmberStatus status);                                                      \
     void emberAfPluginIasZoneServerStackStatusCallback(EmberStatus status);
 
 #define EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_CALLS                                                                      \
     emberAfPluginReportingStackStatusCallback(status);                                                                             \
-    emberAfPluginNetworkSteeringStackStatusCallback(status);                                                                       \
     emberAfPluginIasZoneServerStackStatusCallback(status);
 
 #define EMBER_AF_GENERATED_PLUGIN_ZDO_MESSAGE_RECEIVED_FUNCTION_DECLARATIONS                                                       \
