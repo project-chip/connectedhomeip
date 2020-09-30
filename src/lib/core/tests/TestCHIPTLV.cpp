@@ -35,6 +35,7 @@
 #include <core/CHIPTLVDebug.hpp>
 #include <core/CHIPTLVUtilities.hpp>
 
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 #include <support/TestUtils.h>
@@ -211,14 +212,14 @@ void TestString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const c
     uint32_t expectedLen = strlen(expectedVal);
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    char * val = static_cast<char *>(malloc(expectedLen + 1));
+    char * val = static_cast<char *>(chip::Platform::MemoryAlloc(expectedLen + 1));
 
     CHIP_ERROR err = reader.GetString(val, expectedLen + 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen + 1) == 0);
 
-    free(val);
+    chip::Platform::MemoryFree(val);
 }
 
 void TestDupString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const char * expectedVal)
@@ -229,14 +230,14 @@ void TestDupString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, cons
     uint32_t expectedLen = strlen(expectedVal);
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    char * val = static_cast<char *>(malloc(expectedLen + 1));
+    char * val = static_cast<char *>(chip::Platform::MemoryAlloc(expectedLen + 1));
 
     CHIP_ERROR err = reader.DupString(val);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen + 1) == 0);
 
-    free(val);
+    chip::Platform::MemoryFree(val);
 }
 
 void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const uint8_t * expectedVal, uint32_t expectedLen)
@@ -246,13 +247,13 @@ void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const
 
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    uint8_t * val  = static_cast<uint8_t *>(malloc(expectedLen));
+    uint8_t * val  = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(expectedLen));
     CHIP_ERROR err = reader.DupBytes(val, expectedLen);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen) == 0);
 
-    free(val);
+    chip::Platform::MemoryFree(val);
 }
 
 void TestBufferContents(nlTestSuite * inSuite, PacketBuffer * buf, const uint8_t * expectedVal, uint32_t expectedLen)
@@ -3027,16 +3028,16 @@ void TestCHIPTLVReaderErrorHandling(nlTestSuite * inSuite)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     // DupString()
-    char * str = static_cast<char *>(malloc(16));
+    char * str = static_cast<char *>(chip::Platform::MemoryAlloc(16));
     err        = reader.DupString(str);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
-    free(str);
+    chip::Platform::MemoryFree(str);
 
     // GetDataPtr()
-    const uint8_t * data = static_cast<uint8_t *>(malloc(16));
+    const uint8_t * data = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(16));
     err                  = reader.GetDataPtr(data);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
-    free(const_cast<uint8_t *>(data));
+    chip::Platform::MemoryFree(const_cast<uint8_t *>(data));
 }
 /**
  *  Test CHIP TLV Reader in a use case
@@ -3817,6 +3818,26 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
+/**
+ *  Set up the test suite.
+ */
+int TestCHIPTLV_Setup(void * inContext)
+{
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
+    return SUCCESS;
+}
+
+/**
+ *  Tear down the test suite.
+ */
+int TestCHIPTLV_Teardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 int TestCHIPTLV(void)
 {
     // clang-format off
@@ -3824,8 +3845,8 @@ int TestCHIPTLV(void)
     {
         "chip-tlv",
         &sTests[0],
-        nullptr,
-        nullptr
+        TestCHIPTLV_Setup,
+        TestCHIPTLV_Teardown
     };
     // clang-format on
     TestTLVContext context;

@@ -25,6 +25,8 @@
 #include <string.h>
 
 #include <core/CHIPCore.h>
+#include <support/CHIPMem.h>
+#include <support/CHIPMemString.h>
 
 #include <support/CHIPArgParser.hpp>
 #include <support/ScopedBuffer.h>
@@ -669,13 +671,13 @@ static void ClearCallbackRecords()
     for (size_t i = 0; i < sCallbackRecordCount; i++)
     {
         if (sCallbackRecords[i].ProgName != nullptr)
-            free(sCallbackRecords[i].ProgName);
+            chip::Platform::MemoryFree(sCallbackRecords[i].ProgName);
         if (sCallbackRecords[i].Name != nullptr)
-            free(sCallbackRecords[i].Name);
+            chip::Platform::MemoryFree(sCallbackRecords[i].Name);
         if (sCallbackRecords[i].Arg != nullptr)
-            free(sCallbackRecords[i].Arg);
+            chip::Platform::MemoryFree(sCallbackRecords[i].Arg);
         if (sCallbackRecords[i].Error != nullptr)
-            free(sCallbackRecords[i].Error);
+            chip::Platform::MemoryFree(sCallbackRecords[i].Error);
     }
     memset(sCallbackRecords, 0, sizeof(sCallbackRecords));
     sCallbackRecordCount = 0;
@@ -689,11 +691,11 @@ static bool HandleOption(const char * progName, OptionSet * optSet, int id, cons
 
     VerifyOrQuit(sCallbackRecordCount < kMaxCallbackRecords, "Out of callback records");
     sCallbackRecords[sCallbackRecordCount].Type     = CallbackRecord::kHandleOption;
-    sCallbackRecords[sCallbackRecordCount].ProgName = strdup(progName);
+    sCallbackRecords[sCallbackRecordCount].ProgName = chip::Platform::MemoryAllocString(progName);
     sCallbackRecords[sCallbackRecordCount].OptSet   = optSet;
     sCallbackRecords[sCallbackRecordCount].Id       = id;
-    sCallbackRecords[sCallbackRecordCount].Name     = strdup(name);
-    sCallbackRecords[sCallbackRecordCount].Arg      = (arg != nullptr) ? strdup(arg) : nullptr;
+    sCallbackRecords[sCallbackRecordCount].Name     = chip::Platform::MemoryAllocString(name);
+    sCallbackRecords[sCallbackRecordCount].Arg      = (arg != nullptr) ? chip::Platform::MemoryAllocString(arg) : nullptr;
     sCallbackRecordCount++;
     return true;
 }
@@ -714,7 +716,7 @@ static bool HandleNonOptionArgs(const char * progName, int argc, char * argv[])
 
     VerifyOrQuit(sCallbackRecordCount < kMaxCallbackRecords, "Out of callback records");
     sCallbackRecords[sCallbackRecordCount].Type     = CallbackRecord::kHandleNonOptionArgs;
-    sCallbackRecords[sCallbackRecordCount].ProgName = strdup(progName);
+    sCallbackRecords[sCallbackRecordCount].ProgName = chip::Platform::MemoryAllocString(progName);
     sCallbackRecords[sCallbackRecordCount].Argc     = argc;
     sCallbackRecordCount++;
 
@@ -722,7 +724,7 @@ static bool HandleNonOptionArgs(const char * progName, int argc, char * argv[])
     {
         VerifyOrQuit(sCallbackRecordCount < kMaxCallbackRecords, "Out of callback records");
         sCallbackRecords[sCallbackRecordCount].Type = CallbackRecord::kNonOptionArg;
-        sCallbackRecords[sCallbackRecordCount].Arg  = strdup(argv[i]);
+        sCallbackRecords[sCallbackRecordCount].Arg  = chip::Platform::MemoryAllocString(argv[i]);
         sCallbackRecordCount++;
     }
 
@@ -744,7 +746,7 @@ static void HandleArgError(const char * msg, ...)
     va_end(ap);
 
     va_start(ap, msg);
-    sCallbackRecords[sCallbackRecordCount].Error = static_cast<char *>(malloc(msgLen + 1));
+    sCallbackRecords[sCallbackRecordCount].Error = static_cast<char *>(chip::Platform::MemoryAlloc(msgLen + 1));
     status                                       = vsnprintf(sCallbackRecords[sCallbackRecordCount].Error, msgLen + 1, msg, ap);
     (void) status;
     va_end(ap);
@@ -782,7 +784,7 @@ int TestCHIPArgParser(void)
 
     return (EXIT_SUCCESS);
 }
-#else  // CHIP_CONFIG_ENABLE_ARG_PARSER
+#else // CHIP_CONFIG_ENABLE_ARG_PARSER
 int TestCHIPArgParser(void)
 {
     printf("No tests were run\n");

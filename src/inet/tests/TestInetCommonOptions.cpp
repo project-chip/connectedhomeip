@@ -37,6 +37,8 @@
 
 #include <inet/InetFaultInjection.h>
 #include <support/CHIPFaultInjection.h>
+#include <support/CHIPMem.h>
+#include <support/CHIPMemString.h>
 #include <system/SystemFaultInjection.h>
 
 using namespace chip;
@@ -133,7 +135,7 @@ bool NetworkOptions::HandleOption(const char * progName, OptionSet * optSet, int
         {
             LocalIPv6Addr.push_back(localAddr);
         }
-#else  // INET_CONFIG_ENABLE_IPV4
+#else // INET_CONFIG_ENABLE_IPV4
         LocalIPv6Addr.push_back(localAddr);
 #endif // INET_CONFIG_ENABLE_IPV4
         break;
@@ -256,9 +258,9 @@ bool FaultInjectionOptions::HandleOption(const char * progName, OptionSet * optS
     {
 #if CHIP_CONFIG_TEST || CHIP_SYSTEM_CONFIG_TEST || INET_CONFIG_TEST
     case kToolCommonOpt_FaultInjection: {
-        char * mutableArg = strdup(arg);
+        char * mutableArg = chip::Platform::MemoryAllocString(arg);
         bool parseRes     = ParseFaultInjectionStr(mutableArg, faultMgrFnTable, faultMgrFnTableLen);
-        free(mutableArg);
+        chip::Platform::MemoryFree(mutableArg);
         if (!parseRes)
         {
             PrintArgError("%s: Invalid string specified for fault injection option: %s\n", progName, arg);

@@ -44,6 +44,9 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <support/CHIPMem.h>
+#include <support/CHIPMemString.h>
+
 /*
  * TODO: Revisit these if and when fabric ID and node ID support has
  *       been integrated into the stack.
@@ -423,9 +426,9 @@ bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSe
 done:
 
     if (shortOpts != nullptr)
-        free(shortOpts);
+        chip::Platform::MemoryFree(shortOpts);
     if (longOpts != nullptr)
-        free(longOpts);
+        chip::Platform::MemoryFree(longOpts);
 
     gActiveOptionSets = nullptr;
 
@@ -493,7 +496,7 @@ bool ParseArgsFromString(const char * progName, const char * argStr, OptionSet *
     int argc;
     bool res;
 
-    argStrCopy = strdup(argStr);
+    argStrCopy = chip::Platform::MemoryAllocString(argStr);
     if (argStrCopy == nullptr)
     {
         PrintArgError("%s: Memory allocation failure\n", progName);
@@ -504,14 +507,14 @@ bool ParseArgsFromString(const char * progName, const char * argStr, OptionSet *
     if (argc < 0)
     {
         PrintArgError("%s: Memory allocation failure\n", progName);
-        free(argStrCopy);
+        chip::Platform::MemoryFree(argStrCopy);
         return false;
     }
 
     res = ParseArgs(progName, argc, argv, optSets, nonOptArgHandler, ignoreUnknown);
 
-    free(argStrCopy);
-    free(argv);
+    chip::Platform::MemoryFree(argStrCopy);
+    chip::Platform::MemoryFree(argv);
 
     return res;
 }
@@ -608,7 +611,7 @@ void PrintOptionHelp(OptionSet * optSets[], FILE * s)
             }
     }
 
-    free(helpGroupNames);
+    chip::Platform::MemoryFree(helpGroupNames);
 }
 
 /**
@@ -1177,7 +1180,7 @@ static char * MakeShortOptions(OptionSet ** optSets)
     // The buffer needs to be big enough to hold up to 3 characters per short option plus an initial
     // ":" and a terminating null.
     size_t arraySize = 2 + (totalOptions * 3);
-    char * shortOpts = static_cast<char *>(malloc(arraySize));
+    char * shortOpts = static_cast<char *>(chip::Platform::MemoryAlloc(arraySize));
     if (shortOpts == nullptr)
         return nullptr;
 
@@ -1217,7 +1220,7 @@ static struct option * MakeLongOptions(OptionSet ** optSets)
 
     // Allocate an array to hold the list of long options.
     size_t arraySize         = (sizeof(struct option) * (totalOptions + 1));
-    struct option * longOpts = static_cast<struct option *>(malloc(arraySize));
+    struct option * longOpts = static_cast<struct option *>(chip::Platform::MemoryAlloc(arraySize));
     if (longOpts == nullptr)
         return nullptr;
 
@@ -1252,7 +1255,7 @@ static int32_t SplitArgs(char * argStr, char **& argList, char * initialArg)
     int32_t argCount    = 0;
 
     // Allocate an array to hold pointers to the arguments.
-    argList = static_cast<char **>(malloc(sizeof(char *) * InitialArgListSize));
+    argList = static_cast<char **>(chip::Platform::MemoryAlloc(sizeof(char *) * InitialArgListSize));
     if (argList == nullptr)
         return -1;
     argListSize = InitialArgListSize;
@@ -1278,7 +1281,7 @@ static int32_t SplitArgs(char * argStr, char **& argList, char * initialArg)
         if (argListSize == argCount + 1)
         {
             argListSize *= 2;
-            argList = static_cast<char **>(realloc(argList, argListSize));
+            argList = static_cast<char **>(chip::Platform::MemoryRealloc(argList, argListSize));
             if (argList == nullptr)
                 return -1;
         }
@@ -1403,7 +1406,7 @@ static const char ** MakeUniqueHelpGroupNamesList(OptionSet * optSets[])
     size_t numOptSets = CountOptionSets(optSets);
     size_t numGroups  = 0;
 
-    const char ** groupNames = static_cast<const char **>(malloc(sizeof(const char *) * (numOptSets + 1)));
+    const char ** groupNames = static_cast<const char **>(chip::Platform::MemoryAlloc(sizeof(const char *) * (numOptSets + 1)));
     if (groupNames == nullptr)
         return nullptr;
 

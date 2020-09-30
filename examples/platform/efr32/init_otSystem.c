@@ -17,6 +17,8 @@
  *    limitations under the License.
  */
 
+#include <support/c/CHIPPlatformMemory.h>
+
 #include <mbedtls/platform.h>
 #include <openthread/cli.h>
 #include <openthread/dataset.h>
@@ -119,5 +121,5 @@ void initOtSysEFR(void)
 #ifndef EFR32MG21
     efr32RandomInit();
 #endif /* EFR32 PLATFORM */
-    otHeapSetCAllocFree(calloc, free);
+    otHeapSetCAllocFree(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 }

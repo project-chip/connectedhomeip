@@ -27,6 +27,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPTLV.h>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 #include <system/SystemPacketBuffer.h>
@@ -661,7 +662,8 @@ CHIP_ERROR TLVReader::GetString(char * buf, uint32_t bufSize)
  *
  * This method creates a buffer for and returns a copy of the data associated with the byte
  * or UTF-8 string element at the current position. Memory for the buffer is obtained with
- * malloc() and should be freed with free() by the caller when it is no longer needed.
+ * Platform::MemoryAlloc() and should be freed with Platform::MemoryFree() by the caller when
+ * it is no longer needed.
  *
  * @note The data returned by this method is NOT null-terminated.
  *
@@ -675,8 +677,6 @@ CHIP_ERROR TLVReader::GetString(char * buf, uint32_t bufSize)
  *                                      the reader is not positioned on an element.
  * @retval #CHIP_ERROR_NO_MEMORY       If memory could not be allocated for the output buffer.
  * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
- * @retval #CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
- *                                      If the target platform does not support malloc() and free().
  * @retval other                        Other CHIP or platform error codes returned by the configured
  *                                      GetNextBuffer() function. Only possible when GetNextBuffer
  *                                      is non-NULL.
@@ -684,18 +684,17 @@ CHIP_ERROR TLVReader::GetString(char * buf, uint32_t bufSize)
  */
 CHIP_ERROR TLVReader::DupBytes(uint8_t *& buf, uint32_t & dataLen)
 {
-#if HAVE_MALLOC && HAVE_FREE
     if (!TLVTypeIsString(ElementType()))
         return CHIP_ERROR_WRONG_TLV_TYPE;
 
-    buf = static_cast<uint8_t *>(malloc(mElemLenOrVal));
+    buf = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(mElemLenOrVal));
     if (buf == nullptr)
         return CHIP_ERROR_NO_MEMORY;
 
     CHIP_ERROR err = ReadData(buf, static_cast<uint32_t>(mElemLenOrVal));
     if (err != CHIP_NO_ERROR)
     {
-        free(buf);
+        chip::Platform::MemoryFree(buf);
         return err;
     }
 
@@ -703,9 +702,6 @@ CHIP_ERROR TLVReader::DupBytes(uint8_t *& buf, uint32_t & dataLen)
     mElemLenOrVal = 0;
 
     return CHIP_NO_ERROR;
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // HAVE_MALLOC && HAVE_FREE
 }
 
 /**
@@ -714,7 +710,8 @@ CHIP_ERROR TLVReader::DupBytes(uint8_t *& buf, uint32_t & dataLen)
  *
  * This method creates a buffer for and returns a null-terminated copy of the data associated with
  * the byte or UTF-8 string element at the current position. Memory for the buffer is obtained with
- * malloc() and should be freed with free() by the caller when it is no longer needed.
+ * Platform::MemoryAlloc() and should be freed with chip::Platform::MemoryFree() by the caller when
+ * it is no longer needed.
  *
  * @param[out] buf                      A reference to a pointer to which a heap-allocated buffer of
  *                                      will be assigned on success.
@@ -724,8 +721,6 @@ CHIP_ERROR TLVReader::DupBytes(uint8_t *& buf, uint32_t & dataLen)
  *                                      the reader is not positioned on an element.
  * @retval #CHIP_ERROR_NO_MEMORY       If memory could not be allocated for the output buffer.
  * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
- * @retval #CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
- *                                      If the target platform does not support malloc() and free().
  * @retval other                        Other CHIP or platform error codes returned by the configured
  *                                      GetNextBuffer() function. Only possible when GetNextBuffer
  *                                      is non-NULL.
@@ -733,18 +728,17 @@ CHIP_ERROR TLVReader::DupBytes(uint8_t *& buf, uint32_t & dataLen)
  */
 CHIP_ERROR TLVReader::DupString(char *& buf)
 {
-#if HAVE_MALLOC && HAVE_FREE
     if (!TLVTypeIsString(ElementType()))
         return CHIP_ERROR_WRONG_TLV_TYPE;
 
-    buf = static_cast<char *>(malloc(mElemLenOrVal + 1));
+    buf = static_cast<char *>(chip::Platform::MemoryAlloc(mElemLenOrVal + 1));
     if (buf == nullptr)
         return CHIP_ERROR_NO_MEMORY;
 
     CHIP_ERROR err = ReadData(reinterpret_cast<uint8_t *>(buf), static_cast<uint32_t>(mElemLenOrVal));
     if (err != CHIP_NO_ERROR)
     {
-        free(buf);
+        chip::Platform::MemoryFree(buf);
         return err;
     }
 
@@ -752,9 +746,6 @@ CHIP_ERROR TLVReader::DupString(char *& buf)
     mElemLenOrVal      = 0;
 
     return err;
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // HAVE_MALLOC && HAVE_FREE
 }
 
 /**

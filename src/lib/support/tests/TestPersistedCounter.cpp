@@ -37,6 +37,7 @@
 #include <CHIPVersion.h>
 #include <platform/PersistedStorage.h>
 #include <support/CHIPArgParser.hpp>
+#include <support/CHIPMem.h>
 #include <support/PersistedCounter.h>
 
 #include "TestPersistedStorageImplementation.h"
@@ -189,6 +190,12 @@ extern "C" int TestPersistedCounter(int argc, char * argv[])
 {
     TestPersistedCounterContext context;
 
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+    {
+        return EXIT_FAILURE;
+    }
+
     if (!ParseArgsFromEnvVar(TOOL_NAME, TOOL_OPTIONS_ENV_VAR_NAME, gOptionSets, nullptr, true) ||
         !ParseArgs(TOOL_NAME, argc, argv, gOptionSets))
     {
@@ -200,5 +207,9 @@ extern "C" int TestPersistedCounter(int argc, char * argv[])
     // Run test suite against one context
     nlTestRunner(&theSuite, &context);
 
-    return nlTestRunnerStats(&theSuite);
+    int r = nlTestRunnerStats(&theSuite);
+
+    chip::Platform::MemoryShutdown();
+
+    return r;
 }
