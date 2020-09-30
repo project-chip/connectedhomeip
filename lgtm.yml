@@ -2,7 +2,7 @@ extraction:
     cpp:
         prepare: # Customizable step used by all languages.
             packages:
-                - g++-6
+                - g++-9
         configure: # Customizable step used only by C/C++ extraction.
             command:
                 - source scripts/bootstrap.sh && gn gen out/custom
