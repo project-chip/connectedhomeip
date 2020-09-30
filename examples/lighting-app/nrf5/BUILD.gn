@@ -30,7 +30,7 @@ nrf5_sdk("sdk") {
     "${nrf5_platform_dir}/app/project_include",
     "${nrf5_platform_dir}/util/include",
     "${nrf5_platform_dir}/app/include",
-    "${nrf5_sdk_root}/components/libraries/uart"
+    "${nrf5_sdk_root}/components/libraries/uart",
     "${chip_root}/src/app/util",
   ]
 
