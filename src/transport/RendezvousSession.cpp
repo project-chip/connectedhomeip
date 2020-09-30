@@ -339,7 +339,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
 
         mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningSuccess);
     }
-    // else .. TBD once application dependency on this message has been removed, enable the else condition 
+    // else .. TBD once application dependency on this message has been removed, enable the else condition
     {
         mDelegate->OnRendezvousMessageReceived(msgBuf);
     }
