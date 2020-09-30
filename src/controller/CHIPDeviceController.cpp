@@ -429,9 +429,9 @@ void ChipDeviceController::OnRendezvousMessageReceived(PacketBuffer * buffer)
 
 void ChipDeviceController::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status)
 {
-    if (status == RendezvousSessionDelegate::NetworkProvisioningSuccess && mRendezvousSession->HasIPAddress())
+    if (status == RendezvousSessionDelegate::NetworkProvisioningSuccess)
     {
-        ChipLogProgress(Controller, "Device was assigned an ip address\n");
+        ChipLogProgress(Controller, "Remote device was assigned an ip address\n");
         mDeviceAddr = mRendezvousSession->GetIPAddress();
     }
 }

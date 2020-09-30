@@ -32,6 +32,10 @@
 
 namespace chip {
 
+namespace DeviceLayer {
+class CHIPDeviceEvent;
+}
+
 /**
  * RendezvousSession establishes and maintains the first connection between
  * a commissioner and a device. This connection is used in order to
@@ -87,10 +91,8 @@ public:
     void OnRendezvousError(CHIP_ERROR err) override;
     void OnRendezvousMessageReceived(PacketBuffer * buffer) override;
 
-    CHIP_ERROR AssignedIPAddress(IPAddress & deviceAddr);
-
-    bool HasIPAddress() const { return mDeviceAddress != IPAddress::Any; }
     const IPAddress & GetIPAddress() const { return mDeviceAddress; }
+    void SendIPAddress(IPAddress & addr);
 
 private:
     CHIP_ERROR SendPairingMessage(System::PacketBuffer * msgBug);
@@ -100,7 +102,6 @@ private:
 
     CHIP_ERROR SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBuffer * msgBug);
     CHIP_ERROR HandleSecureMessage(System::PacketBuffer * msgBuf);
-    CHIP_ERROR HandleIPAddressAssignment(System::PacketBuffer * buffer);
 
     Transport::Base * mTransport          = nullptr; ///< Underlying transport
     RendezvousSessionDelegate * mDelegate = nullptr; ///< Underlying transport events
@@ -112,6 +113,10 @@ private:
     uint32_t mSecureMessageIndex = 0;
     uint16_t mNextKeyId          = 0;
     IPAddress mDeviceAddress     = IPAddress::Any;
+
+#if CONFIG_DEVICE_LAYER
+    static void ConnectivityHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+#endif // CONFIG_DEVICE_LAYER
 };
 
 } // namespace chip

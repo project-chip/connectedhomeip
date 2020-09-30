@@ -27,7 +27,6 @@ class RendezvousDeviceDelegate : public RendezvousSessionDelegate
 {
 public:
     RendezvousDeviceDelegate();
-    CHIP_ERROR AssignedIPAddress(IPAddress & deviceAddr);
 
     //////////// RendezvousSession callback Implementation ///////////////
     void OnRendezvousConnectionOpened() override;
