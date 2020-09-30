@@ -36,11 +36,11 @@ shared_library("ChipDeviceCtrl") {
   ]
 
   sources = [
-    "ChipDeviceController-ScriptBinding.cpp",
-    "ChipDeviceController-BlePlatformDelegate.cpp",
-    "ChipDeviceController-BlePlatformDelegate.h",
     "ChipDeviceController-BleApplicationDelegate.cpp",
     "ChipDeviceController-BleApplicationDelegate.h",
+    "ChipDeviceController-BlePlatformDelegate.cpp",
+    "ChipDeviceController-BlePlatformDelegate.h",
+    "ChipDeviceController-ScriptBinding.cpp",
   ]
 
   public_deps = [
@@ -51,40 +51,37 @@ shared_library("ChipDeviceCtrl") {
     "${chip_root}/src/platform",
     "${chip_root}/src/transport",
   ]
-  allow_circular_includes_from = [
-    "${chip_root}/src/controller",
+  allow_circular_includes_from = [ "${chip_root}/src/controller" ]
+  configs += [
+    ":controller_wno_deprecate",
+    ":controller_wno_warning_error",
   ]
-  configs += [ ":controller_wno_deprecate", ":controller_wno_warning_error" ]
 }
 
 copy("deviceControllerPyCopy1") {
   sources = [
-      "chip/__init__.py",
-      "chip/ChipDeviceCtrl.py",
-      "chip/ChipStack.py",
-      "chip/ChipUtility.py",
-      "chip/ChipTLV.py",
-      "chip/ChipBleBase.py",
-      "chip/ChipBluezMgr.py",
-      "chip/ChipBleUtility.py",
+    "chip/ChipBleBase.py",
+    "chip/ChipBleUtility.py",
+    "chip/ChipBluezMgr.py",
+    "chip/ChipDeviceCtrl.py",
+    "chip/ChipStack.py",
+    "chip/ChipTLV.py",
+    "chip/ChipUtility.py",
+    "chip/__init__.py",
   ]
 
-  public_deps = [
-      ":ChipDeviceCtrl",
-  ]
+  public_deps = [ ":ChipDeviceCtrl" ]
 
   outputs = [ "$root_out_dir/controller/python/chip/{{source_file_part}}" ]
 }
 
 copy("deviceControllerPyCopy2") {
   sources = [
-      "build-chip-wheel.py",
-      "chip-device-ctrl.py"
+    "build-chip-wheel.py",
+    "chip-device-ctrl.py",
   ]
 
-  public_deps = [
-      ":ChipDeviceCtrl",
-  ]
+  public_deps = [ ":ChipDeviceCtrl" ]
 
   outputs = [ "$root_out_dir/controller/python/{{source_name_part}}" ]
 }
@@ -92,8 +89,8 @@ copy("deviceControllerPyCopy2") {
 action("python") {
   script = "$root_out_dir/controller/python/build-chip-wheel"
   public_deps = [
-      ":deviceControllerPyCopy1",
-      ":deviceControllerPyCopy2",
+    ":deviceControllerPyCopy1",
+    ":deviceControllerPyCopy2",
   ]
 
   outputs = [ "$root_out_dir/controller/python/chip/" ]
