@@ -34,6 +34,8 @@ chip_test_suite("tests") {
     "TestUDP.cpp",
   ]
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [
     "${chip_root}/src/inet/tests:tests_common",
     "${chip_root}/src/lib/core",
