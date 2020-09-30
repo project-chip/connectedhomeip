@@ -49,7 +49,8 @@ qpg6100_executable("lock_app") {
     ":sdk",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
-    #    OpenThread to be enabled 
+
+    #    OpenThread to be enabled
     #    https://github.com/project-chip/connectedhomeip/issues/293
     #    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     #    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
@@ -63,9 +64,7 @@ qpg6100_executable("lock_app") {
     "${examples_plat_dir}/",
   ]
 
-  sources = [
-    "src/main.cpp",
-  ]
+  sources = [ "src/main.cpp" ]
 
   output_dir = root_out_dir
 
