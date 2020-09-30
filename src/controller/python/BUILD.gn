@@ -48,9 +48,7 @@ shared_library("ChipDeviceCtrl") {
     "${chip_root}/src/transport",
   ]
   allow_circular_includes_from = [ "${chip_root}/src/controller" ]
-  configs += [
-    ":controller_wno_deprecate",
-  ]
+  configs += [ ":controller_wno_deprecate" ]
 }
 
 copy("deviceControllerPyCopy1") {
