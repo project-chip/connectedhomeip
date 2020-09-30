@@ -35,8 +35,6 @@ namespace Internal {
 using namespace chip::Ble;
 using namespace chip::Ble;
 
-struct BluezEndpoint;
-
 void HandleIncomingBleConnection(BLEEndPoint * bleEP);
 
 enum ChipAdvType
@@ -84,11 +82,12 @@ public:
     CHIP_ERROR ConfigureBle(uint32_t aNodeId, bool aIsCentral);
 
     // Driven by BlueZ IO
-    static void CHIPoBluez_NewConnection(BLE_CONNECTION_OBJECT conId);
-    static void HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
-    static void CHIPoBluez_ConnectionClosed(BLE_CONNECTION_OBJECT conId);
-    static void HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId);
-    static void HandleTXComplete(BLE_CONNECTION_OBJECT conId);
+    static void CHIPoBluez_NewConnection(void * user_data);
+    static void HandleRXCharWrite(void * user_data, const uint8_t * value, size_t len);
+    static void CHIPoBluez_ConnectionClosed(void * user_data);
+    static void HandleTXCharCCCDWrite(void * user_data);
+    static void HandleTXComplete(void * user_data);
+    static bool WoBLEz_TimerCb(void * user_data);
 
     static void NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, void * apAppstate);
     static void NotifyBLEPeripheralAdvConfiguredComplete(bool aIsSuccess, void * apAppstate);
@@ -173,7 +172,8 @@ private:
     uint16_t mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
     bool mIsCentral;
-    BluezEndpoint * mpAppState;
+    char * mpBleAddr;
+    void * mpAppState;
 };
 
 /**

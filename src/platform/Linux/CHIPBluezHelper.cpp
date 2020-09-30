@@ -235,13 +235,13 @@ exit:
     return G_SOURCE_REMOVE;
 }
 
-static gboolean BluezAdvStart(void * apEndpoint)
+static gboolean BluezAdvStart(void * apClosure)
 {
     GDBusObject * adapter;
     BluezLEAdvertisingManager1 * advMgr = nullptr;
     GVariantBuilder optionsBuilder;
     GVariant * options;
-    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apEndpoint);
+    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apClosure);
 
     VerifyOrExit(endpoint != nullptr, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
     VerifyOrExit(!endpoint->mIsAdvertising,
@@ -258,16 +258,16 @@ static gboolean BluezAdvStart(void * apEndpoint)
     options = g_variant_builder_end(&optionsBuilder);
 
     bluez_leadvertising_manager1_call_register_advertisement(advMgr, endpoint->mpAdvPath, options, nullptr, BluezAdvStartDone,
-                                                             apEndpoint);
+                                                             apClosure);
 
 exit:
     return G_SOURCE_REMOVE;
 }
 
-static gboolean BluezAdvStop(void * apEndpoint)
+static gboolean BluezAdvStop(void * apClosure)
 {
     GDBusObject * adapter;
-    BluezEndpoint * endpoint            = static_cast<BluezEndpoint *>(apEndpoint);
+    BluezEndpoint * endpoint            = static_cast<BluezEndpoint *>(apClosure);
     BluezLEAdvertisingManager1 * advMgr = nullptr;
 
     VerifyOrExit(endpoint != nullptr, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
@@ -281,7 +281,7 @@ static gboolean BluezAdvStop(void * apEndpoint)
     advMgr = bluez_object_get_leadvertising_manager1(BLUEZ_OBJECT(adapter));
     VerifyOrExit(advMgr != nullptr, ChipLogProgress(DeviceLayer, "FAIL: NULL advMgr in %s", __func__));
 
-    bluez_leadvertising_manager1_call_unregister_advertisement(advMgr, endpoint->mpAdvPath, nullptr, BluezAdvStopDone, apEndpoint);
+    bluez_leadvertising_manager1_call_unregister_advertisement(advMgr, endpoint->mpAdvPath, nullptr, BluezAdvStopDone, apClosure);
 
 exit:
     return G_SOURCE_REMOVE;
@@ -299,7 +299,7 @@ static gboolean BluezCharacteristicReadValue(BluezGattCharacteristic1 * aChar, G
 
 #if CHIP_BLUEZ_CHAR_WRITE_VALUE
 static gboolean BluezCharacteristicWriteValue(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
-                                              GVariant * aValue, GVariant * aOptions, gpointer apEndpoint)
+                                              GVariant * aValue, GVariant * aOptions, gpointer apClosure)
 {
     const uint8_t * tmpBuf;
     uint8_t * buf;
@@ -307,7 +307,7 @@ static gboolean BluezCharacteristicWriteValue(BluezGattCharacteristic1 * aChar, 
     bool isSuccess         = false;
     BluezConnection * conn = NULL;
 
-    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apEndpoint);
+    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apClosure);
     VerifyOrExit(endpoint != NULL, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
 
     VerifyOrExit(aValue != NULL, ChipLogProgress(DeviceLayer, "aValue is NULL in %s", __func__));
@@ -339,7 +339,7 @@ static gboolean BluezCharacteristicWriteValueError(BluezGattCharacteristic1 * aC
     return TRUE;
 }
 
-static gboolean BluezCharacteristicWriteFD(GIOChannel * aChannel, GIOCondition aCond, gpointer apEndpoint)
+static gboolean BluezCharacteristicWriteFD(GIOChannel * aChannel, GIOCondition aCond, gpointer apClosure)
 {
     GVariant * newVal;
     gchar * buf;
@@ -347,7 +347,7 @@ static gboolean BluezCharacteristicWriteFD(GIOChannel * aChannel, GIOCondition a
     int fd;
     bool isSuccess = false;
 
-    BluezConnection * conn = static_cast<BluezConnection *>(apEndpoint);
+    BluezConnection * conn = static_cast<BluezConnection *>(apClosure);
 
     VerifyOrExit(conn != nullptr, ChipLogProgress(DeviceLayer, "No CHIP Bluez connection in %s", __func__));
 
@@ -392,7 +392,7 @@ static gboolean bluezCharacteristicDestroyFD(GIOChannel * aChannel, GIOCondition
 }
 
 static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
-                                                GVariant * aOptions, gpointer apEndpoint)
+                                                GVariant * aOptions, gpointer apClosure)
 {
     int fds[2] = { -1, -1 };
     GIOChannel * channel;
@@ -401,7 +401,7 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
     bool isSuccess         = false;
     BluezConnection * conn = nullptr;
 
-    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apEndpoint);
+    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apClosure);
     VerifyOrExit(endpoint != nullptr, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
 
     conn = GetBluezConnectionViaDevice(endpoint);
@@ -460,7 +460,7 @@ static gboolean BluezCharacteristicAcquireWriteError(BluezGattCharacteristic1 * 
 }
 
 static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
-                                                 GVariant * aOptions, gpointer apEndpoint)
+                                                 GVariant * aOptions, gpointer apClosure)
 {
     int fds[2] = { -1, -1 };
     GIOChannel * channel;
@@ -469,7 +469,7 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
     BluezConnection * conn = nullptr;
     bool isSuccess         = false;
 
-    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apEndpoint);
+    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apClosure);
     VerifyOrExit(endpoint != nullptr, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
 
     conn = GetBluezConnectionViaDevice(endpoint);
@@ -509,7 +509,7 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
     close(fds[1]);
 
     conn->mIsNotify = true;
-    BLEManagerImpl::HandleTXCharCCCDWrite(conn);
+    BLEManagerImpl::HandleTXCharCCCDWrite((void *) conn);
     isSuccess = true;
 
 exit:
@@ -526,12 +526,12 @@ static gboolean BluezCharacteristicAcquireNotifyError(BluezGattCharacteristic1 *
 }
 
 static gboolean BluezCharacteristicStartNotify(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
-                                               gpointer apEndpoint)
+                                               gpointer apClosure)
 {
     bool isSuccess         = false;
     BluezConnection * conn = nullptr;
 
-    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apEndpoint);
+    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apClosure);
     VerifyOrExit(endpoint != nullptr, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
 
     conn = GetBluezConnectionViaDevice(endpoint);
@@ -563,12 +563,12 @@ static gboolean BluezCharacteristicStartNotifyError(BluezGattCharacteristic1 * a
 }
 
 static gboolean BluezCharacteristicStopNotify(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
-                                              gpointer apEndpoint)
+                                              gpointer apClosure)
 {
     bool isSuccess         = false;
     BluezConnection * conn = nullptr;
 
-    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apEndpoint);
+    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apClosure);
     VerifyOrExit(endpoint != nullptr, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
 
     conn = GetBluezConnectionViaDevice(endpoint);
@@ -999,12 +999,12 @@ static void BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClient * aMa
                         }
                         // for central, we do not call BluezConnectionInit until the services have been resolved
 
-                        BLEManagerImpl::CHIPoBluez_NewConnection(conn);
+                        BLEManagerImpl::CHIPoBluez_NewConnection(endpoint);
                     }
                     else
                     {
                         ChipLogProgress(DeviceLayer, "Bluez disconnected");
-                        BLEManagerImpl::CHIPoBluez_ConnectionClosed(conn);
+                        BLEManagerImpl::CHIPoBluez_ConnectionClosed(endpoint);
                         BluezOTConnectionDestroy(conn);
                         g_hash_table_remove(endpoint->mpConnMap, g_dbus_proxy_get_object_path(aInterface));
                     }
@@ -1516,7 +1516,7 @@ exit:
     return G_SOURCE_REMOVE;
 }
 
-bool SendBluezIndication(BluezConnection * apConn, chip::System::PacketBuffer * apBuf)
+bool SendBluezIndication(void * apConn, chip::System::PacketBuffer * apBuf)
 {
     ConnectionDataBundle * closure;
     const char * msg = nullptr;
@@ -1529,7 +1529,7 @@ bool SendBluezIndication(BluezConnection * apConn, chip::System::PacketBuffer * 
     len    = apBuf->DataLength();
 
     closure         = g_new(ConnectionDataBundle, 1);
-    closure->mpConn = apConn;
+    closure->mpConn = static_cast<BluezConnection *>(apConn);
 
     closure->mpVal = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, buffer, len * sizeof(uint8_t), sizeof(uint8_t));
 
@@ -1575,15 +1575,15 @@ static int CloseBleconnectionCB(void * apAppState)
     return G_SOURCE_REMOVE;
 }
 
-bool CloseBluezConnection(BluezConnection * apConn)
+bool CloseBluezConnection(void * apAppState)
 {
-    return BluezRunOnBluezThread(CloseBleconnectionCB, apConn);
+    return BluezRunOnBluezThread(CloseBleconnectionCB, apAppState);
 }
 
-CHIP_ERROR StartBluezAdv(BluezEndpoint * apEndpoint)
+CHIP_ERROR StartBluezAdv(void * apAppState)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    if (!BluezRunOnBluezThread(BluezAdvStart, apEndpoint))
+    if (!BluezRunOnBluezThread(BluezAdvStart, apAppState))
     {
         err = CHIP_ERROR_INCORRECT_STATE;
         ChipLogError(Ble, "Failed to schedule BluezAdvStart() on CHIPoBluez thread");
@@ -1591,10 +1591,10 @@ CHIP_ERROR StartBluezAdv(BluezEndpoint * apEndpoint)
     return err;
 }
 
-CHIP_ERROR StopBluezAdv(BluezEndpoint * apEndpoint)
+CHIP_ERROR StopBluezAdv(void * apAppState)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    if (!BluezRunOnBluezThread(BluezAdvStop, apEndpoint))
+    if (!BluezRunOnBluezThread(BluezAdvStop, apAppState))
     {
         err = CHIP_ERROR_INCORRECT_STATE;
         ChipLogError(Ble, "Failed to schedule BluezAdvStop() on CHIPoBluez thread");
@@ -1602,10 +1602,10 @@ CHIP_ERROR StopBluezAdv(BluezEndpoint * apEndpoint)
     return err;
 }
 
-CHIP_ERROR BluezAdvertisementSetup(BluezEndpoint * apEndpoint)
+CHIP_ERROR BluezAdvertisementSetup(void * apAppState)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    if (!BluezRunOnBluezThread(BluezAdvSetup, apEndpoint))
+    if (!BluezRunOnBluezThread(BluezAdvSetup, apAppState))
     {
         err = CHIP_ERROR_INCORRECT_STATE;
         ChipLogError(Ble, "Failed to schedule BluezAdvertisementSetup() on CHIPoBluez thread");
@@ -1613,10 +1613,10 @@ CHIP_ERROR BluezAdvertisementSetup(BluezEndpoint * apEndpoint)
     return err;
 }
 
-CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint)
+CHIP_ERROR BluezGattsAppRegister(void * apAppState)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    if (!BluezRunOnBluezThread(BluezPeripheralRegisterApp, apEndpoint))
+    if (!BluezRunOnBluezThread(BluezPeripheralRegisterApp, apAppState))
     {
         err = CHIP_ERROR_INCORRECT_STATE;
         ChipLogError(Ble, "Failed to schedule BluezPeripheralRegisterApp() on CHIPoBluez thread");
@@ -1661,7 +1661,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & aBleAdvConfig, BluezEndpoint *& apEndpoint)
+CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & aBleAdvConfig, void *& apEndpoint)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     bool retval    = false;
