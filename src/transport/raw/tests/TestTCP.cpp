@@ -103,7 +103,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    size_t payload_len = sizeof(PAYLOAD);
+    uint16_t payload_len = sizeof(PAYLOAD);
 
     chip::System::PacketBuffer * buffer = chip::System::PacketBuffer::NewWithAvailableSize(payload_len);
     memmove(buffer->Start(), PAYLOAD, payload_len);
