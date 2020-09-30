@@ -36,4 +36,31 @@ ifneq ($(CHIP_BUILD_WITH_GN),n)
 CPPFLAGS += -DCHIP_SEPARATE_CONFIG_H
 endif
 export CHIP_BUILD_WITH_GN
+
+top: all flashing_script
+
 include $(IDF_PATH)/make/project.mk
+
+FLASHING_SCRIPT=$(BUILD_DIR_BASE)/$(PROJECT_NAME).flash.py
+
+$(FLASHING_SCRIPT): $(APP_BIN) $(BOOTLOADER_BIN) $(PARTITION_TABLE_BIN) $(PROJECT_PATH)/sdkconfig
+	@third_party/connectedhomeip/scripts/flashing/gen_flashing_script.py esp32 \
+	  --output $(BUILD_DIR_BASE)/$(PROJECT_NAME).flash.py \
+	  --port $(ESPPORT) --baud $(ESPBAUD) --before $(CONFIG_ESPTOOLPY_BEFORE) --after $(CONFIG_ESPTOOLPY_AFTER) \
+	  --application $(subst $(BUILD_DIR_BASE)/,,$(APP_BIN)) \
+	  --bootloader $(subst $(BUILD_DIR_BASE)/,,$(BOOTLOADER_BIN)) \
+	  --partition $(subst $(BUILD_DIR_BASE)/,,$(PARTITION_TABLE_BIN)) \
+	  --use-partition-file $(PARTITION_TABLE_BIN) \
+	  --use-parttool $(IDF_PATH)/components/partition_table/parttool.py \
+	  --use-sdkconfig $(PROJECT_PATH)/sdkconfig
+
+flashing_script: $(FLASHING_SCRIPT) $(BUILD_DIR_BASE)/esp32_firmware_utils.py $(BUILD_DIR_BASE)/firmware_utils.py 
+	@echo To flash $(subst $(CURDIR)/,,$(APP_BIN)), run $(subst $(CURDIR)/,,$(FLASHING_SCRIPT))
+
+$(BUILD_DIR_BASE)/esp32_firmware_utils.py: third_party/connectedhomeip/scripts/flashing/esp32_firmware_utils.py
+	@cp $< $@
+
+$(BUILD_DIR_BASE)/firmware_utils.py: third_party/connectedhomeip/scripts/flashing/firmware_utils.py
+	@cp $< $@
+
+.PHONY: flashing_script

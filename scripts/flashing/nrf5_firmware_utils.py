@@ -20,9 +20,10 @@ For `Flasher`, see the class documentation. For the parse_command()
 interface or standalone execution:
 
 usage: nrf5_firmware_utils.py [-h] [--verbose] [--erase] [--application FILE]
-                              [--verify-application] [--reset] [--skip-reset]
-                              [--nrfjprog FILE] [--family FAMILY]
-                              [--softdevice FILE] [--skip-softdevice]
+                              [--verify_application] [--reset] [--skip_reset]
+                              [--nrfjprog FILE] [--snr SERIAL]
+                              [--family FAMILY] [--softdevice FILE]
+                              [--skip_softdevice]
 
 Flash NRF5 device
 
@@ -32,18 +33,24 @@ optional arguments:
 configuration:
   --verbose, -v         Report more verbosely
   --nrfjprog FILE       File name of the nrfjprog executable
+  --snr SERIAL, --serial SERIAL, -s SERIAL
+                        Serial number of device to flash
   --family FAMILY       NRF5 device family
 
 operations:
   --erase               Erase device
   --application FILE    Flash an image
-  --verify-application  Verify the image after flashing
+  --verify_application, --verify-application
+                        Verify the image after flashing
   --reset               Reset device after flashing
-  --skip-reset          Do not reset device after flashing
+  --skip_reset, --skip-reset
+                        Do not reset device after flashing
   --softdevice FILE     Softdevice image file name
-  --skip-softdevice     Do not flash softdevice even if softdevice is set
+  --skip_softdevice, --skip-softdevice
+                        Do not flash softdevice even if softdevice is set
 """
 
+import errno
 import sys
 
 import firmware_utils
@@ -57,28 +64,40 @@ NRF5_OPTIONS = {
         'nrfjprog': {
             'help': 'File name of the nrfjprog executable',
             'default': 'nrfjprog',
-            'argument': {
+            'argparse': {
                 'metavar': 'FILE'
             },
-            'tool': {
-                'verify': ['{nrfjprog}', '--version'],
-                'error':
-                    """\
-                    Unable to execute {nrfjprog}.
+            'command': [
+                '{nrfjprog}',
+                {'optional': 'family'},
+                {'optional': 'snr'},
+                ()
+            ],
+            'verify': ['{nrfjprog}', '--version'],
+            'error':
+                """\
+                Unable to execute {nrfjprog}.
 
-                    Please ensure that this tool is installed and
-                    available. See the NRF5 example README for
-                    installation instructions.
+                Please ensure that this tool is installed and
+                available. See the NRF5 example README for
+                installation instructions.
 
-                    """,
-            }
+                """,
+        },
+        'snr': {
+            'help': 'Serial number of device to flash',
+            'default': None,
+            'alias': ['--serial', '-s'],
+            'argparse': {
+                'metavar': 'SERIAL'
+            },
         },
 
         # Device configuration options.
         'family': {
             'help': 'NRF5 device family',
             'default': None,
-            'argument': {
+            'argparse': {
                 'metavar': 'FAMILY'
             },
         },
@@ -90,14 +109,14 @@ NRF5_OPTIONS = {
         'softdevice': {
             'help': 'Softdevice image file name',
             'default': None,
-            'argument': {
+            'argparse': {
                 'metavar': 'FILE'
             },
         },
-        'skip-softdevice': {
+        'skip_softdevice': {
             'help': 'Do not flash softdevice even if softdevice is set',
             'default': False,
-            'argument': {
+            'argparse': {
                 'action': 'store_true'
             },
         },
@@ -108,58 +127,63 @@ NRF5_OPTIONS = {
 class Flasher(firmware_utils.Flasher):
     """Manage nrf5 flashing."""
 
-    def __init__(self, options=None):
-        super().__init__(options, 'NRF5')
+    def __init__(self, **options):
+        super().__init__(platform='NRF5', module=__name__, **options)
         self.define_options(NRF5_OPTIONS)
-        self.module = __name__
 
     def erase(self):
         """Perform nrfjprog --eraseall"""
-        return self.run_tool_logging('nrfjprog', ['--eraseall'], 'Erase all')
+        return self.run_tool('nrfjprog', ['--eraseall'], name='Erase all')
 
     def verify(self, image):
         """Verify image."""
-        return self.run_tool_logging('nrfjprog', ['--quiet', '--verify', image],
-                                     'Verify', 'Verified', 'Not verified', 2)
+        return self.run_tool('nrfjprog',
+                             ['--quiet', '--verify', image],
+                             name='Verify',
+                             pass_message='Verified',
+                             fail_message='Not verified',
+                             fail_level=2)
 
     def flash(self, image):
         """Flash image."""
-        return self.run_tool_logging('nrfjprog',
-                                     ['--program', image, '--sectorerase'],
-                                     'Flash', 'Flashed')
+        return self.run_tool('nrfjprog',
+                             ['--program', image, '--sectorerase'],
+                             name='Flash')
 
     def reset(self):
         """Reset the device."""
-        return self.run_tool_logging('nrfjprog', ['--reset'], 'Reset')
+        return self.run_tool('nrfjprog', ['--reset'], name='Reset')
 
     def actions(self):
-        """Perform actions on the device according to self.options."""
-        self.log(3, 'OPTIONS:', self.options)
+        """Perform actions on the device according to self.option."""
+        self.log(3, 'Options:', self.option)
 
-        if self.options['erase']:
+        if self.option.erase:
             if self.erase().err:
                 return self
 
-        softdevice = self.optional_file(self.options['softdevice'])
-        if softdevice and not self.options['skip-softdevice']:
+        softdevice = self.optional_file(self.option.softdevice)
+        if softdevice and not self.option.skip_softdevice:
             if self.verify(softdevice).err:
+                if self.err == errno.ENOENT:
+                    return self
                 if self.flash(softdevice).err:
                     return self
-                if self.options['verify-application']:
+                if self.option.verify_application:
                     if self.verify(softdevice).err:
                         return self
 
-        application = self.optional_file(self.options['application'])
+        application = self.optional_file(self.option.application)
         if application:
             if self.flash(application).err:
                 return self
-            if self.options['verify-application']:
+            if self.option.verify_application:
                 if self.verify(application).err:
                     return self
-            if self.options['reset'] is None:
-                self.options['reset'] = True
+            if self.option.reset is None:
+                self.option.reset = True
 
-        if self.options['reset']:
+        if self.option.reset:
             if self.reset().err:
                 return self
 
