@@ -27,7 +27,7 @@
 
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
-#include <transport/UDP.h>
+#include <transport/raw/UDP.h>
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>

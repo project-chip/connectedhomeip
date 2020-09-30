@@ -25,21 +25,17 @@
 #
 
 CHIP_BUILD_TRANSPORT_LAYER_SOURCE_FILES                  = \
-    @top_builddir@/src/transport/BLE.cpp                   \
-    @top_builddir@/src/transport/MessageHeader.cpp         \
     @top_builddir@/src/transport/RendezvousSession.cpp     \
     @top_builddir@/src/transport/SecurePairingSession.cpp  \
     @top_builddir@/src/transport/SecureSession.cpp         \
     @top_builddir@/src/transport/SecureSessionMgr.cpp      \
-    @top_builddir@/src/transport/UDP.cpp                   \
-    @top_builddir@/src/transport/TCP.cpp                   \
+    @top_builddir@/src/transport/raw/BLE.cpp               \
+    @top_builddir@/src/transport/raw/MessageHeader.cpp     \
+    @top_builddir@/src/transport/raw/UDP.cpp               \
+    @top_builddir@/src/transport/raw/TCP.cpp               \
     $(NULL)
 
 CHIP_BUILD_TRANSPORT_LAYER_HEADER_FILES               =         \
-    @top_builddir@/src/transport/Base.h                         \
-    @top_builddir@/src/transport/BLE.h                          \
-    @top_builddir@/src/transport/MessageHeader.h                \
-    @top_builddir@/src/transport/PeerAddress.h                  \
     @top_builddir@/src/transport/PeerConnectionState.h          \
     @top_builddir@/src/transport/PeerConnections.h              \
     @top_builddir@/src/transport/RendezvousParameters.h         \
@@ -48,7 +44,11 @@ CHIP_BUILD_TRANSPORT_LAYER_HEADER_FILES               =         \
     @top_builddir@/src/transport/SecurePairingSession.h         \
     @top_builddir@/src/transport/SecureSession.h                \
     @top_builddir@/src/transport/SecureSessionMgr.h             \
-    @top_builddir@/src/transport/Tuple.h                        \
-    @top_builddir@/src/transport/UDP.h                          \
-    @top_builddir@/src/transport/TCP.h                          \
+    @top_builddir@/src/transport/raw/PeerAddress.h              \
+    @top_builddir@/src/transport/raw/Base.h                     \
+    @top_builddir@/src/transport/raw/BLE.h                      \
+    @top_builddir@/src/transport/raw/MessageHeader.h            \
+    @top_builddir@/src/transport/raw/Tuple.h                    \
+    @top_builddir@/src/transport/raw/UDP.h                      \
+    @top_builddir@/src/transport/raw/TCP.h                      \
     $(NULL)

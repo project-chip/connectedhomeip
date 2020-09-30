@@ -33,7 +33,7 @@
 #include <ble/BleLayer.h>
 #include <core/CHIPCore.h>
 #include <support/DLLUtil.h>
-#include <transport/Base.h>
+#include <transport/raw/Base.h>
 #include <transport/RendezvousParameters.h>
 #include <transport/RendezvousSessionDelegate.h>
 

@@ -25,7 +25,7 @@
 #include <core/CHIPEncoding.h>
 #include <support/BufBound.h>
 #include <support/CodeUtils.h>
-#include <transport/MessageHeader.h>
+#include <transport/raw/MessageHeader.h>
 #include <transport/SecureSession.h>
 
 #include <string.h>

@@ -21,11 +21,11 @@
  *    @file
  *      This file implements the CHIP Connection object that maintains a UDP connection.
  */
-#include <transport/UDP.h>
+#include <transport/raw/UDP.h>
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <transport/MessageHeader.h>
+#include <transport/raw/MessageHeader.h>
 
 #include <inttypes.h>
 

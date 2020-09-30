@@ -34,11 +34,11 @@
 #include <inet/IPEndPointBasis.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
-#include <transport/Base.h>
+#include <transport/raw/Base.h>
 #include <transport/PeerConnections.h>
 #include <transport/SecurePairingSession.h>
 #include <transport/SecureSession.h>
-#include <transport/Tuple.h>
+#include <transport/raw/Tuple.h>
 
 namespace chip {
 

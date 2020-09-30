@@ -17,8 +17,8 @@
 
 #include "TestRetransmit.h"
 
-#include <retransmit/Cache.h>
 #include <support/TestUtils.h>
+#include <transport/retransmit/Cache.h>
 
 #include <bitset>
 #include <nlunit-test.h>

@@ -34,7 +34,7 @@
 #include <support/DLLUtil.h>
 #include <transport/RendezvousSession.h>
 #include <transport/SecureSessionMgr.h>
-#include <transport/UDP.h>
+#include <transport/raw/UDP.h>
 
 namespace chip {
 namespace DeviceController {

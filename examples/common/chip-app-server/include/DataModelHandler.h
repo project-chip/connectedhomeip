@@ -24,7 +24,7 @@
 #define DATA_MODEL_HANDLER_H
 
 #include <system/SystemPacketBuffer.h>
-#include <transport/MessageHeader.h>
+#include <transport/raw/MessageHeader.h>
 #include <transport/SecureSessionMgr.h>
 
 extern "C" {

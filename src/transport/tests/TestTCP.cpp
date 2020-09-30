@@ -27,7 +27,7 @@
 
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
-#include <transport/TCP.h>
+#include <transport/raw/TCP.h>
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
