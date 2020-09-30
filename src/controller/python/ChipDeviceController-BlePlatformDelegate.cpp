@@ -17,36 +17,40 @@
  *    limitations under the License.
  */
 
-#include <ble/BlePlatformDelegate.h>
 #include "ChipDeviceController-BlePlatformDelegate.h"
+#include <ble/BlePlatformDelegate.h>
 
-DeviceController_BlePlatformDelegate::DeviceController_BlePlatformDelegate(BleLayer *ble)
+DeviceController_BlePlatformDelegate::DeviceController_BlePlatformDelegate(BleLayer * ble)
 {
-    Ble = ble;
-    writeCB = NULL;
+    Ble         = ble;
+    writeCB     = NULL;
     subscribeCB = NULL;
-    closeCB = NULL;
+    closeCB     = NULL;
 }
 
-bool DeviceController_BlePlatformDelegate::SubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID *svcId, const chip::Ble::ChipBleUUID *charId)
+bool DeviceController_BlePlatformDelegate::SubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj,
+                                                                   const chip::Ble::ChipBleUUID * svcId,
+                                                                   const chip::Ble::ChipBleUUID * charId)
 {
     const bool subscribe = true;
 
     if (subscribeCB && svcId && charId)
     {
-        return subscribeCB(connObj, (void *)svcId->bytes, (void *)charId->bytes, subscribe);
+        return subscribeCB(connObj, (void *) svcId->bytes, (void *) charId->bytes, subscribe);
     }
 
     return false;
 }
 
-bool DeviceController_BlePlatformDelegate::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID *svcId, const chip::Ble::ChipBleUUID *charId)
+bool DeviceController_BlePlatformDelegate::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj,
+                                                                     const chip::Ble::ChipBleUUID * svcId,
+                                                                     const chip::Ble::ChipBleUUID * charId)
 {
     const bool subscribe = true;
 
     if (subscribeCB && svcId && charId)
     {
-        return subscribeCB(connObj, (void *)svcId->bytes, (void *)charId->bytes, !subscribe);
+        return subscribeCB(connObj, (void *) svcId->bytes, (void *) charId->bytes, !subscribe);
     }
 
     return false;
@@ -68,40 +72,47 @@ uint16_t DeviceController_BlePlatformDelegate::GetMTU(BLE_CONNECTION_OBJECT conn
     return 0;
 }
 
-bool DeviceController_BlePlatformDelegate::SendIndication(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID *svcId, const chip::Ble::ChipBleUUID *charId, chip::System::PacketBuffer *pBuf)
+bool DeviceController_BlePlatformDelegate::SendIndication(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID * svcId,
+                                                          const chip::Ble::ChipBleUUID * charId, chip::System::PacketBuffer * pBuf)
 {
     // TODO Python queue-based implementation
 
-    // Release delegate's reference to pBuf. pBuf will be freed when both platform delegate and Chip stack free their references to it.
+    // Release delegate's reference to pBuf. pBuf will be freed when both platform delegate and Chip stack free their references to
+    // it.
     chip::System::PacketBuffer::Free(pBuf);
 
     return false;
 }
 
-bool DeviceController_BlePlatformDelegate::SendWriteRequest(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID *svcId, const chip::Ble::ChipBleUUID *charId, chip::System::PacketBuffer *pBuf)
+bool DeviceController_BlePlatformDelegate::SendWriteRequest(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID * svcId,
+                                                            const chip::Ble::ChipBleUUID * charId,
+                                                            chip::System::PacketBuffer * pBuf)
 {
     bool ret = false;
 
     if (writeCB && svcId && charId && pBuf)
     {
-        ret = writeCB(connObj, (void *)svcId->bytes, (void *)charId->bytes, (void *)pBuf->Start(), pBuf->DataLength());
+        ret = writeCB(connObj, (void *) svcId->bytes, (void *) charId->bytes, (void *) pBuf->Start(), pBuf->DataLength());
     }
 
-    // Release delegate's reference to pBuf. pBuf will be freed when both platform delegate and Chip stack free their references to it.
-    // We release pBuf's reference here since its payload bytes were copied into a new NSData object by ChipBleMgr.py's writeCB, and
-    // in both the error and succees cases this code has no further use for the pBuf PacketBuffer.
+    // Release delegate's reference to pBuf. pBuf will be freed when both platform delegate and Chip stack free their references to
+    // it. We release pBuf's reference here since its payload bytes were copied into a new NSData object by ChipBleMgr.py's writeCB,
+    // and in both the error and succees cases this code has no further use for the pBuf PacketBuffer.
     chip::System::PacketBuffer::Free(pBuf);
 
     return ret;
 }
 
-bool DeviceController_BlePlatformDelegate::SendReadRequest(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID *svcId, const chip::Ble::ChipBleUUID *charId, chip::System::PacketBuffer *pBuf)
+bool DeviceController_BlePlatformDelegate::SendReadRequest(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID * svcId,
+                                                           const chip::Ble::ChipBleUUID * charId, chip::System::PacketBuffer * pBuf)
 {
     // TODO Python queue-based implementation
     return false;
 }
 
-bool DeviceController_BlePlatformDelegate::SendReadResponse(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext, const chip::Ble::ChipBleUUID *svcId, const chip::Ble::ChipBleUUID *charId)
+bool DeviceController_BlePlatformDelegate::SendReadResponse(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext,
+                                                            const chip::Ble::ChipBleUUID * svcId,
+                                                            const chip::Ble::ChipBleUUID * charId)
 {
     // TODO Python queue-based implementation
     return false;

@@ -21,8 +21,7 @@
 
 #include <ble/BleApplicationDelegate.h>
 
-class DeviceController_BleApplicationDelegate :
-public chip::Ble::BleApplicationDelegate
+class DeviceController_BleApplicationDelegate : public chip::Ble::BleApplicationDelegate
 {
     void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj);
 };

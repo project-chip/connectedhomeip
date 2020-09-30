@@ -16,8 +16,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <ble/BleApplicationDelegate.h>
 #include "ChipDeviceController-BleApplicationDelegate.h"
+#include <ble/BleApplicationDelegate.h>
 
 void DeviceController_BleApplicationDelegate::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj)
 {

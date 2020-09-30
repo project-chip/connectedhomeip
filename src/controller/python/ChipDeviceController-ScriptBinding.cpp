@@ -25,23 +25,22 @@
  *
  */
 
-
+#include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include <sys/time.h>
+#include <unistd.h>
 
-#include <system/SystemLayer.h>
 #include <system/SystemError.h>
+#include <system/SystemLayer.h>
 
 #include <inttypes.h>
 #include <net/if.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
-#include "ChipDeviceController-BlePlatformDelegate.h"
 #include "ChipDeviceController-BleApplicationDelegate.h"
+#include "ChipDeviceController-BlePlatformDelegate.h"
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
 #include "CHIPDeviceController.h"
@@ -54,21 +53,21 @@ using namespace chip::DeviceController;
 
 extern "C" {
 typedef void * (*GetBleEventCBFunct)(void);
-typedef void (*ConstructBytesArrayFunct)(const uint8_t *dataBuf, uint32_t dataLen);
-typedef void (*LogMessageFunct)(uint64_t time, uint64_t timeUS, const char *moduleName, uint8_t category, const char *msg);
+typedef void (*ConstructBytesArrayFunct)(const uint8_t * dataBuf, uint32_t dataLen);
+typedef void (*LogMessageFunct)(uint64_t time, uint64_t timeUS, const char * moduleName, uint8_t category, const char * msg);
 }
 
 enum BleEventType
 {
-    kBleEventType_Rx        = 1,
-    kBleEventType_Tx        = 2,
-    kBleEventType_Subscribe = 3,
+    kBleEventType_Rx         = 1,
+    kBleEventType_Tx         = 2,
+    kBleEventType_Subscribe  = 3,
     kBleEventType_Disconnect = 4
 };
 
 enum BleSubscribeOperation
 {
-    kBleSubOp_Subscribe = 1,
+    kBleSubOp_Subscribe   = 1,
     kBleSubOp_Unsubscribe = 2
 };
 
@@ -78,46 +77,41 @@ public:
     int32_t eventType;
 };
 
-class  BleRxEvent :
-    public BleEventBase
-{
-public:
-    void *   connObj;
-    void *   svcId;
-    void *   charId;
-    void *   buffer;
-    uint16_t length;
-};
-
-class BleTxEvent :
-    public BleEventBase
+class BleRxEvent : public BleEventBase
 {
 public:
     void * connObj;
     void * svcId;
     void * charId;
-    bool   status;
+    void * buffer;
+    uint16_t length;
 };
 
-class BleSubscribeEvent :
-    public BleEventBase
+class BleTxEvent : public BleEventBase
 {
 public:
-    void *    connObj;
-    void *    svcId;
-    void *    charId;
-    int32_t   operation;
-    bool      status;
+    void * connObj;
+    void * svcId;
+    void * charId;
+    bool status;
 };
 
-class BleDisconnectEvent :
-    public BleEventBase
+class BleSubscribeEvent : public BleEventBase
 {
 public:
-    void *    connObj;
-    int32_t   error;
+    void * connObj;
+    void * svcId;
+    void * charId;
+    int32_t operation;
+    bool status;
 };
 
+class BleDisconnectEvent : public BleEventBase
+{
+public:
+    void * connObj;
+    int32_t error;
+};
 
 static chip::System::Layer sSystemLayer;
 static chip::InetLayer sInetLayer;
@@ -148,38 +142,38 @@ ErrorHandler sOnError;
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
 extern "C" {
-    // Trampolined callback types
-    CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS);
+// Trampolined callback types
+CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS);
 
 #if CONFIG_NETWORK_LAYER_BLE
-    CHIP_ERROR nl_Chip_DeviceController_WakeForBleIO();
-    CHIP_ERROR nl_Chip_DeviceController_SetBleEventCB(GetBleEventCBFunct getBleEventCB);
-    CHIP_ERROR nl_Chip_DeviceController_SetBleWriteCharacteristic(WriteBleCharacteristicCBFunct writeBleCharacteristicCB);
-    CHIP_ERROR nl_Chip_DeviceController_SetBleSubscribeCharacteristic(SubscribeBleCharacteristicCBFunct subscribeBleCharacteristicCB);
-    CHIP_ERROR nl_Chip_DeviceController_SetBleClose(CloseBleCBFunct closeBleCB);
+CHIP_ERROR nl_Chip_DeviceController_WakeForBleIO();
+CHIP_ERROR nl_Chip_DeviceController_SetBleEventCB(GetBleEventCBFunct getBleEventCB);
+CHIP_ERROR nl_Chip_DeviceController_SetBleWriteCharacteristic(WriteBleCharacteristicCBFunct writeBleCharacteristicCB);
+CHIP_ERROR nl_Chip_DeviceController_SetBleSubscribeCharacteristic(SubscribeBleCharacteristicCBFunct subscribeBleCharacteristicCB);
+CHIP_ERROR nl_Chip_DeviceController_SetBleClose(CloseBleCBFunct closeBleCB);
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
-    CHIP_ERROR nl_Chip_DeviceController_NewDeviceController(chip::DeviceController::ChipDeviceController **outDevCtrl);
-    CHIP_ERROR nl_Chip_DeviceController_DeleteDeviceController(chip::DeviceController::ChipDeviceController *devCtrl);
+CHIP_ERROR nl_Chip_DeviceController_NewDeviceController(chip::DeviceController::ChipDeviceController ** outDevCtrl);
+CHIP_ERROR nl_Chip_DeviceController_DeleteDeviceController(chip::DeviceController::ChipDeviceController * devCtrl);
 
 #if CONFIG_NETWORK_LAYER_BLE
-    CHIP_ERROR nl_Chip_DeviceController_ValidateBTP(chip::DeviceController::ChipDeviceController *devCtrl, BLE_CONNECTION_OBJECT connObj,
-            CompleteHandler onComplete, ErrorHandler onError);
+CHIP_ERROR nl_Chip_DeviceController_ValidateBTP(chip::DeviceController::ChipDeviceController * devCtrl,
+                                                BLE_CONNECTION_OBJECT connObj, CompleteHandler onComplete, ErrorHandler onError);
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
-    bool nl_Chip_DeviceController_IsConnected(chip::DeviceController::ChipDeviceController *devCtrl);
-    void nl_Chip_DeviceController_Close(chip::DeviceController::ChipDeviceController *devCtrl);
-    uint8_t nl_Chip_DeviceController_GetLogFilter();
-    void nl_Chip_DeviceController_SetLogFilter(uint8_t category);
+bool nl_Chip_DeviceController_IsConnected(chip::DeviceController::ChipDeviceController * devCtrl);
+void nl_Chip_DeviceController_Close(chip::DeviceController::ChipDeviceController * devCtrl);
+uint8_t nl_Chip_DeviceController_GetLogFilter();
+void nl_Chip_DeviceController_SetLogFilter(uint8_t category);
 
-    CHIP_ERROR nl_Chip_Stack_Init();
-    CHIP_ERROR nl_Chip_Stack_Shutdown();
-    const char *nl_Chip_Stack_ErrorToString(CHIP_ERROR err);
-    const char *nl_Chip_Stack_StatusReportToString(uint32_t profileId, uint16_t statusCode);
-    void nl_Chip_Stack_SetLogFunct(LogMessageFunct logFunct);
+CHIP_ERROR nl_Chip_Stack_Init();
+CHIP_ERROR nl_Chip_Stack_Shutdown();
+const char * nl_Chip_Stack_ErrorToString(CHIP_ERROR err);
+const char * nl_Chip_Stack_StatusReportToString(uint32_t profileId, uint16_t statusCode);
+void nl_Chip_Stack_SetLogFunct(LogMessageFunct logFunct);
 }
 
-CHIP_ERROR nl_Chip_DeviceController_NewDeviceController(chip::DeviceController::ChipDeviceController **outDevCtrl)
+CHIP_ERROR nl_Chip_DeviceController_NewDeviceController(chip::DeviceController::ChipDeviceController ** outDevCtrl)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -198,7 +192,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR nl_Chip_DeviceController_DeleteDeviceController(chip::DeviceController::ChipDeviceController *devCtrl)
+CHIP_ERROR nl_Chip_DeviceController_DeleteDeviceController(chip::DeviceController::ChipDeviceController * devCtrl)
 {
     if (devCtrl != NULL)
     {
@@ -223,15 +217,15 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
 #if CONFIG_NETWORK_LAYER_BLE
     uint8_t bleWakeByte;
     bool result = false;
-   chip::System::PacketBuffer* msgBuf;
+    chip::System::PacketBuffer * msgBuf;
     ChipBleUUID svcId, charId;
     union
     {
-        const BleEventBase      *ev;
-        const BleTxEvent        *txEv;
-        const BleRxEvent        *rxEv;
-        const BleSubscribeEvent *subscribeEv;
-        const BleDisconnectEvent *dcEv;
+        const BleEventBase * ev;
+        const BleTxEvent * txEv;
+        const BleRxEvent * rxEv;
+        const BleSubscribeEvent * subscribeEv;
+        const BleDisconnectEvent * dcEv;
     } evu;
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
@@ -239,10 +233,10 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
     FD_ZERO(&writeFDs);
     FD_ZERO(&exceptFDs);
 
-    sleepTime.tv_sec = sleepTimeMS / 1000;
+    sleepTime.tv_sec  = sleepTimeMS / 1000;
     sleepTime.tv_usec = (sleepTimeMS % 1000) * 1000;
 
-    if (sSystemLayer.State() ==chip::System::kLayerState_Initialized)
+    if (sSystemLayer.State() == chip::System::kLayerState_Initialized)
         sSystemLayer.PrepareSelect(maxFDs, &readFDs, &writeFDs, &exceptFDs, sleepTime);
 
     if (sInetLayer.State == chip::InetLayer::kState_Initialized)
@@ -257,7 +251,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
     int selectRes = select(maxFDs, &readFDs, &writeFDs, &exceptFDs, &sleepTime);
-    VerifyOrExit(selectRes >= 0, err =chip::System::MapErrorPOSIX(errno));
+    VerifyOrExit(selectRes >= 0, err = chip::System::MapErrorPOSIX(errno));
 
 #if CONFIG_NETWORK_LAYER_BLE
     // Drive IO to InetLayer and/or BleLayer.
@@ -279,85 +273,85 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
 
             if (GetBleEventCB)
             {
-                evu.ev = (const BleEventBase *)GetBleEventCB();
+                evu.ev = (const BleEventBase *) GetBleEventCB();
 
                 if (evu.ev)
                 {
                     switch (evu.ev->eventType)
                     {
-                        case kBleEventType_Rx:
-                            // build a packet buffer from the rxEv and send to blelayer.
-                            msgBuf =chip::System::PacketBuffer::New();
-                            VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
+                    case kBleEventType_Rx:
+                        // build a packet buffer from the rxEv and send to blelayer.
+                        msgBuf = chip::System::PacketBuffer::New();
+                        VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-                            memcpy(msgBuf->Start(), evu.rxEv->buffer, evu.rxEv->length);
-                            msgBuf->SetDataLength(evu.rxEv->length);
+                        memcpy(msgBuf->Start(), evu.rxEv->buffer, evu.rxEv->length);
+                        msgBuf->SetDataLength(evu.rxEv->length);
 
-                            // copy the svcId and charId from the event.
-                            memcpy(svcId.bytes, evu.rxEv->svcId, sizeof(svcId.bytes));
-                            memcpy(charId.bytes, evu.rxEv->charId, sizeof(charId.bytes));
+                        // copy the svcId and charId from the event.
+                        memcpy(svcId.bytes, evu.rxEv->svcId, sizeof(svcId.bytes));
+                        memcpy(charId.bytes, evu.rxEv->charId, sizeof(charId.bytes));
 
-                            result = sBle.HandleIndicationReceived(evu.txEv->connObj, &svcId, &charId, msgBuf);
+                        result = sBle.HandleIndicationReceived(evu.txEv->connObj, &svcId, &charId, msgBuf);
 
-                            if (!result)
+                        if (!result)
+                        {
+                            chip::System::PacketBuffer::Free(msgBuf);
+                        }
+
+                        msgBuf = NULL;
+                        break;
+
+                    case kBleEventType_Tx:
+                        // copy the svcId and charId from the event.
+                        memcpy(svcId.bytes, evu.txEv->svcId, sizeof(svcId.bytes));
+                        memcpy(charId.bytes, evu.txEv->charId, sizeof(charId.bytes));
+
+                        result = sBle.HandleWriteConfirmation(evu.txEv->connObj, &svcId, &charId);
+                        break;
+
+                    case kBleEventType_Subscribe:
+                        memcpy(svcId.bytes, evu.subscribeEv->svcId, sizeof(svcId.bytes));
+                        memcpy(charId.bytes, evu.subscribeEv->charId, sizeof(charId.bytes));
+
+                        switch (evu.subscribeEv->operation)
+                        {
+                        case kBleSubOp_Subscribe:
+                            if (evu.subscribeEv->status)
                             {
-                               chip::System::PacketBuffer::Free(msgBuf);
+                                result = sBle.HandleSubscribeComplete(evu.subscribeEv->connObj, &svcId, &charId);
                             }
-
-                            msgBuf = NULL;
-                            break;
-
-                        case kBleEventType_Tx:
-                            // copy the svcId and charId from the event.
-                            memcpy(svcId.bytes, evu.txEv->svcId, sizeof(svcId.bytes));
-                            memcpy(charId.bytes, evu.txEv->charId, sizeof(charId.bytes));
-
-                            result = sBle.HandleWriteConfirmation(evu.txEv->connObj, &svcId, &charId);
-                            break;
-
-                        case kBleEventType_Subscribe:
-                            memcpy(svcId.bytes, evu.subscribeEv->svcId, sizeof(svcId.bytes));
-                            memcpy(charId.bytes, evu.subscribeEv->charId, sizeof(charId.bytes));
-
-                            switch (evu.subscribeEv->operation)
+                            else
                             {
-                                case kBleSubOp_Subscribe:
-                                    if (evu.subscribeEv->status)
-                                    {
-                                        result = sBle.HandleSubscribeComplete(evu.subscribeEv->connObj, &svcId, &charId);
-                                    }
-                                    else
-                                    {
-                                        sBle.HandleConnectionError(evu.subscribeEv->connObj, BLE_ERROR_GATT_SUBSCRIBE_FAILED);
-                                    }
-                                    break;
-
-                                case kBleSubOp_Unsubscribe:
-                                    if (evu.subscribeEv->status)
-                                    {
-                                        result = sBle.HandleUnsubscribeComplete(evu.subscribeEv->connObj, &svcId, &charId);
-                                    }
-                                    else
-                                    {
-                                        sBle.HandleConnectionError(evu.subscribeEv->connObj, BLE_ERROR_GATT_UNSUBSCRIBE_FAILED);
-                                    }
-                                    break;
-
-                                default:
-                                    printf("Error: unhandled subscribe operation. Calling ExitNow()\n");
-                                    ExitNow();
-                                    break;
+                                sBle.HandleConnectionError(evu.subscribeEv->connObj, BLE_ERROR_GATT_SUBSCRIBE_FAILED);
                             }
                             break;
 
-                        case kBleEventType_Disconnect:
-                            sBle.HandleConnectionError(evu.dcEv->connObj, evu.dcEv->error);
+                        case kBleSubOp_Unsubscribe:
+                            if (evu.subscribeEv->status)
+                            {
+                                result = sBle.HandleUnsubscribeComplete(evu.subscribeEv->connObj, &svcId, &charId);
+                            }
+                            else
+                            {
+                                sBle.HandleConnectionError(evu.subscribeEv->connObj, BLE_ERROR_GATT_UNSUBSCRIBE_FAILED);
+                            }
                             break;
 
                         default:
-                            printf("Error: unhandled sBle EventType. Calling ExitNow()\n");
+                            printf("Error: unhandled subscribe operation. Calling ExitNow()\n");
                             ExitNow();
                             break;
+                        }
+                        break;
+
+                    case kBleEventType_Disconnect:
+                        sBle.HandleConnectionError(evu.dcEv->connObj, evu.dcEv->error);
+                        break;
+
+                    default:
+                        printf("Error: unhandled sBle EventType. Calling ExitNow()\n");
+                        ExitNow();
+                        break;
                     }
                 }
                 else
@@ -372,7 +366,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
     }
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
-    if (sSystemLayer.State() ==chip::System::kLayerState_Initialized)
+    if (sSystemLayer.State() == chip::System::kLayerState_Initialized)
         sSystemLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
 
     if (sInetLayer.State == chip::InetLayer::kState_Initialized)
@@ -427,7 +421,7 @@ CHIP_ERROR nl_Chip_DeviceController_SetBleClose(CloseBleCBFunct closeBleCB)
 
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
-void nl_Chip_DeviceController_Close(chip::DeviceController::ChipDeviceController *devCtrl)
+void nl_Chip_DeviceController_Close(chip::DeviceController::ChipDeviceController * devCtrl)
 {
 #if CONFIG_NETWORK_LAYER_BLE
     if (spBleEndPoint != NULL)
@@ -437,7 +431,6 @@ void nl_Chip_DeviceController_Close(chip::DeviceController::ChipDeviceController
     }
 #endif
 }
-
 
 #if CONFIG_NETWORK_LAYER_BLE
 static void HandleBleConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err)
@@ -462,10 +455,10 @@ static void HandleBleConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)
     ChipLogProgress(Controller, "ChipoBle con close\n");
 }
 
-CHIP_ERROR nl_Chip_DeviceController_ValidateBTP(chip::DeviceController::ChipDeviceController *devCtrl, BLE_CONNECTION_OBJECT connObj,
-            CompleteHandler onComplete, ErrorHandler onError)
+CHIP_ERROR nl_Chip_DeviceController_ValidateBTP(chip::DeviceController::ChipDeviceController * devCtrl,
+                                                BLE_CONNECTION_OBJECT connObj, CompleteHandler onComplete, ErrorHandler onError)
 {
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(Controller, "begin BTPConnect validation");
 
@@ -478,7 +471,7 @@ CHIP_ERROR nl_Chip_DeviceController_ValidateBTP(chip::DeviceController::ChipDevi
 
     sOnComplete.General = onComplete;
     sOnError            = onError;
-    err = spBleEndPoint->StartConnect();
+    err                 = spBleEndPoint->StartConnect();
     SuccessOrExit(err);
 
 exit:
@@ -486,19 +479,19 @@ exit:
 }
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
-bool nl_Chip_DeviceController_IsConnected(chip::DeviceController::ChipDeviceController *devCtrl)
+bool nl_Chip_DeviceController_IsConnected(chip::DeviceController::ChipDeviceController * devCtrl)
 {
     return devCtrl->IsConnected();
 }
 
-const char *nl_Chip_DeviceController_ErrorToString(CHIP_ERROR err)
+const char * nl_Chip_DeviceController_ErrorToString(CHIP_ERROR err)
 {
     return chip::ErrorStr(err);
 }
 
-const char *nl_Chip_DeviceController_StatusReportToString(uint32_t profileId, uint16_t statusCode)
+const char * nl_Chip_DeviceController_StatusReportToString(uint32_t profileId, uint16_t statusCode)
 {
-    //return chip::StatusReportStr(profileId, statusCode);
+    // return chip::StatusReportStr(profileId, statusCode);
     return NULL;
 }
 
@@ -532,7 +525,7 @@ CHIP_ERROR nl_Chip_Stack_Init()
 
 #else /* CHIP_SYSTEM_CONFIG_USE_SOCKETS */
 
-    if (sSystemLayer.State() ==chip::System::kLayerState_Initialized)
+    if (sSystemLayer.State() == chip::System::kLayerState_Initialized)
         ExitNow();
 
     err = sSystemLayer.Init(NULL);
@@ -553,7 +546,7 @@ CHIP_ERROR nl_Chip_Stack_Init()
     // Create BLE wake pipe and make it non-blocking.
     if (pipe(BleWakePipe) == -1)
     {
-        err =chip::System::MapErrorPOSIX(errno);
+        err = chip::System::MapErrorPOSIX(errno);
         ExitNow();
     }
 
@@ -561,14 +554,14 @@ CHIP_ERROR nl_Chip_Stack_Init()
     flags = fcntl(BleWakePipe[0], F_GETFL);
     if (flags == -1)
     {
-        err =chip::System::MapErrorPOSIX(errno);
+        err = chip::System::MapErrorPOSIX(errno);
         ExitNow();
     }
 
     flags |= O_NONBLOCK;
     if (fcntl(BleWakePipe[0], F_SETFL, flags) == -1)
     {
-        err =chip::System::MapErrorPOSIX(errno);
+        err = chip::System::MapErrorPOSIX(errno);
         ExitNow();
     }
 
@@ -576,14 +569,14 @@ CHIP_ERROR nl_Chip_Stack_Init()
     flags = fcntl(BleWakePipe[1], F_GETFL);
     if (flags == -1)
     {
-        err =chip::System::MapErrorPOSIX(errno);
+        err = chip::System::MapErrorPOSIX(errno);
         ExitNow();
     }
 
     flags |= O_NONBLOCK;
     if (fcntl(BleWakePipe[1], F_SETFL, flags) == -1)
     {
-        err =chip::System::MapErrorPOSIX(errno);
+        err = chip::System::MapErrorPOSIX(errno);
         ExitNow();
     }
 #endif /* CONFIG_NETWORK_LAYER_BLE */
@@ -603,21 +596,21 @@ CHIP_ERROR nl_Chip_Stack_Shutdown()
     if (sInetLayer.State == chip::InetLayer::kState_NotInitialized)
         ExitNow();
 
-    if (sSystemLayer.State() ==chip::System::kLayerState_NotInitialized)
+    if (sSystemLayer.State() == chip::System::kLayerState_NotInitialized)
         ExitNow();
 
 exit:
     return err;
 }
 
-const char *nl_Chip_Stack_ErrorToString(CHIP_ERROR err)
+const char * nl_Chip_Stack_ErrorToString(CHIP_ERROR err)
 {
     return chip::ErrorStr(err);
 }
 
-const char *nl_Chip_Stack_StatusReportToString(uint32_t profileId, uint16_t statusCode)
+const char * nl_Chip_Stack_StatusReportToString(uint32_t profileId, uint16_t statusCode)
 {
-    //return chip::StatusReportStr(profileId, statusCode);
+    // return chip::StatusReportStr(profileId, statusCode);
     return NULL;
 }
 
@@ -630,7 +623,7 @@ static LogMessageFunct sLogMessageFunct = NULL;
 // is logged.  It serves as glue to adapt the logging arguments to what is expected
 // by the python code.
 // NOTE that this function MUST be thread-safe.
-static void LogMessageToPython(uint8_t module, uint8_t category, const char *msg, va_list ap)
+static void LogMessageToPython(uint8_t module, uint8_t category, const char * msg, va_list ap)
 {
     if (IsCategoryEnabled(category))
     {
@@ -640,21 +633,21 @@ static void LogMessageToPython(uint8_t module, uint8_t category, const char *msg
 
         // Get the module name
         char moduleName[nlChipLoggingModuleNameLen + 1];
-        ::chip::::Logging::GetModuleName(moduleName, module);
+        ::chip:: ::Logging::GetModuleName(moduleName, module);
 
         // Format the log message into a dynamic memory buffer, growing the
         // buffer as needed to fit the message.
-        char * msgBuf = NULL;
-        size_t msgBufSize = 0;
-        size_t msgSize = 0;
+        char * msgBuf                    = NULL;
+        size_t msgBufSize                = 0;
+        size_t msgSize                   = 0;
         constexpr size_t kInitialBufSize = 120;
         do
         {
             va_list apCopy;
             va_copy(apCopy, ap);
 
-            msgBufSize = max(msgSize+1, kInitialBufSize);
-            msgBuf = (char *)realloc(msgBuf, msgBufSize);
+            msgBufSize = max(msgSize + 1, kInitialBufSize);
+            msgBuf     = (char *) realloc(msgBuf, msgBufSize);
             if (msgBuf == NULL)
             {
                 return;
@@ -665,13 +658,13 @@ static void LogMessageToPython(uint8_t module, uint8_t category, const char *msg
             {
                 return;
             }
-            msgSize = (size_t)res;
+            msgSize = (size_t) res;
 
             va_end(apCopy);
         } while (msgSize >= msgBufSize);
 
         // Call the configured python logging function.
-        sLogMessageFunct((int64_t)tv.tv_sec, (int64_t)tv.tv_usec, moduleName, category, msgBuf);
+        sLogMessageFunct((int64_t) tv.tv_sec, (int64_t) tv.tv_usec, moduleName, category, msgBuf);
 
         // Release the message buffer.
         free(msgBuf);
@@ -694,8 +687,6 @@ void nl_Chip_Stack_SetLogFunct(LogMessageFunct logFunct)
 
 #else // CHIP_LOG_ENABLE_DYNAMIC_LOGING_FUNCTION
 
-void nl_Chip_Stack_SetLogFunct(LogMessageFunct logFunct)
-{
-}
+void nl_Chip_Stack_SetLogFunct(LogMessageFunct logFunct) {}
 
 #endif // CHIP_LOG_ENABLE_DYNAMIC_LOGING_FUNCTION
