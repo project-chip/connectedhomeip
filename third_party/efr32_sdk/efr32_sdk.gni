@@ -139,6 +139,8 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a",
         "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG12P/GCC/libmbedtls.a",
       ]
+
+      defines += [ "EFR32MG12" ]
     } else if (efr32_family == "efr32mg21") {
       _include_dirs += [
         "${efr32_sdk_root}/hardware/kit/EFR32MG21_${efr32_board}/config",
@@ -154,7 +156,9 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/protocol/bluetooth/lib/efr32mg21/GCC/libmbedtls.a",
       ]
 
-      defines += [ "EFR32_SERIES2_CONFIG1_MICRO" ]
+      defines += [  "EFR32MG21",
+                    "EFR32_SERIES2_CONFIG1_MICRO"
+                 ]
     }
 
     cflags = []
