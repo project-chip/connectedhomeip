@@ -867,9 +867,9 @@ static void BluezHandleAdvertisementFromDevice(BluezDevice1 * aDevice, BluezEndp
         memcpy(&deviceInfo, rawData, dataLen);
         ChipLogProgress(DeviceLayer, "TRACE: Found CHIP BLE Device: %" PRIu16, deviceInfo.GetDeviceDiscriminator());
 
-        // TODO: Connect device
-        // if (endpoint->mDiscoveryRequest.mDiscriminator == deviceInfo.GetDeviceDiscriminator() &&
-        // endpoint->mDiscoveryRequest.mAutoConnect) ...
+        if (endpoint->mDiscoveryRequest.mDiscriminator == deviceInfo.GetDeviceDiscriminator() &&
+            endpoint->mDiscoveryRequest.mAutoConnect)
+            ConnectDevice(aDevice);
     }
 
 exit:
@@ -1737,6 +1737,47 @@ CHIP_ERROR StopDiscovery(BluezEndpoint * apEndpoint)
     if (!BluezRunOnBluezThread(StopDiscoveryImpl, apEndpoint))
     {
         ChipLogError(Ble, "Failed to schedule StopDiscoveryImpl() on CHIPoBluez thread");
+        error = CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    return error;
+}
+
+// ConnectDevice callbacks
+
+static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer)
+{
+    BluezDevice1 * device = BLUEZ_DEVICE1(aObject);
+    GError * error        = nullptr;
+    gboolean success      = bluez_device1_call_connect_finish(device, aResult, &error);
+
+    VerifyOrExit(success == TRUE, ChipLogProgress(DeviceLayer, "FAIL: ConnectDevice : %s", error->message));
+    ChipLogProgress(DeviceLayer, "ConnectDevice complete");
+
+exit:
+    if (error != nullptr)
+        g_error_free(error);
+}
+
+static gboolean ConnectDeviceImpl(void * apDevice)
+{
+    BluezDevice1 * device = static_cast<BluezDevice1 *>(apDevice);
+
+    VerifyOrExit(device != nullptr, ChipLogProgress(DeviceLayer, "device is NULL in %s", __func__));
+
+    bluez_device1_call_connect(device, nullptr, ConnectDeviceDone, nullptr);
+
+exit:
+    return G_SOURCE_REMOVE;
+}
+
+CHIP_ERROR ConnectDevice(BluezDevice1 * apDevice)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    if (!BluezRunOnBluezThread(ConnectDeviceImpl, apDevice))
+    {
+        ChipLogError(Ble, "Failed to schedule ConnectDeviceImpl() on CHIPoBluez thread");
         error = CHIP_ERROR_INCORRECT_STATE;
     }
 

@@ -210,6 +210,8 @@ CHIP_ERROR BluezAdvertisementSetup(BluezEndpoint * apEndpoint);
 CHIP_ERROR StartDiscovery(BluezEndpoint * apEndpoint, BluezDiscoveryRequest aRequest = {});
 CHIP_ERROR StopDiscovery(BluezEndpoint * apEndpoint);
 
+CHIP_ERROR ConnectDevice(BluezDevice1 * apDevice);
+
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
