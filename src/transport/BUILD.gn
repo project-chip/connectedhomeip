@@ -40,7 +40,6 @@ static_library("transport") {
     ]
   }
 
-
   public_deps = [
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",
