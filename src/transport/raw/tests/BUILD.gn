@@ -26,9 +26,7 @@ static_library("helpers") {
     "NetworkTestHelpers.h",
   ]
 
-  public_deps = [
-    "${chip_root}/src/inet/tests:tests_common",
-  ]
+  public_deps = [ "${chip_root}/src/inet/tests:tests_common" ]
 }
 
 chip_test_suite("tests") {
@@ -36,8 +34,8 @@ chip_test_suite("tests") {
 
   sources = [
     "TestMessageHeader.cpp",
-    "TestTCP.cpp",
     "TestRawTransportLayer.h",
+    "TestTCP.cpp",
     "TestUDP.cpp",
   ]
 
