@@ -43,6 +43,7 @@
 
 #include <stdint.h>
 
+#include <limits.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -445,16 +446,23 @@ void PacketBuffer::AddRef()
  *
  *  @return     On success, a pointer to the PacketBuffer in the allocated block. On fail, \c NULL.
  */
-PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t aAvailableSize)
+PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, uint16_t aAvailableSize)
 {
-    const size_t lReservedSize = static_cast<size_t>(aReservedSize);
-    const size_t lAllocSize    = lReservedSize + aAvailableSize;
-    const size_t lBlockSize    = CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + lAllocSize;
+    // Adding three 16-bit-int sized numbers together will never overflow
+    // assuming int is at least 32 bits.
+    static_assert(INT_MAX >= INT32_MAX, "int is not big enough");
+    static_assert(CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE < UINT16_MAX, "Check for overflow more carefully");
+    static_assert(SIZE_MAX >= INT_MAX, "Our additions might not fit in size_t");
+    static_assert(CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX <= UINT16_MAX, "PacketBuffer may have size not fitting uint16_t");
+
+    const size_t lAllocSize = aReservedSize + aAvailableSize;
+    const size_t lBlockSize = CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + lAllocSize;
     PacketBuffer * lPacket;
 
     CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_PacketBufferNew, return nullptr);
 
-    if (lAllocSize > CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX)
+    if (lAllocSize > CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX ||
+        lBlockSize > UINT16_MAX)
     {
         ChipLogError(chipSystemLayer, "PacketBuffer: allocation too large.");
         return nullptr;
@@ -462,7 +470,7 @@ PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    lPacket = static_cast<PacketBuffer *>(pbuf_alloc(PBUF_RAW, lBlockSize, PBUF_POOL));
+    lPacket = static_cast<PacketBuffer *>(pbuf_alloc(PBUF_RAW, static_cast<uint16_t>(lBlockSize), PBUF_POOL));
 
     SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
 
@@ -496,12 +504,12 @@ PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t
         return nullptr;
     }
 
-    lPacket->payload = reinterpret_cast<uint8_t *>(lPacket) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + lReservedSize;
+    lPacket->payload = reinterpret_cast<uint8_t *>(lPacket) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + aReservedSize;
     lPacket->len = lPacket->tot_len = 0;
     lPacket->next                   = nullptr;
     lPacket->ref                    = 1;
 #if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
-    lPacket->alloc_size = lAllocSize;
+    lPacket->alloc_size = static_cast<uint16_t>(lAllocSize);
 #endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
 
     return lPacket;
@@ -517,7 +525,7 @@ PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t
  *
  *  @return     On success, a pointer to the PacketBuffer in the allocated block. On fail, \c NULL. *
  */
-PacketBuffer * PacketBuffer::NewWithAvailableSize(size_t aAvailableSize)
+PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aAvailableSize)
 {
     return PacketBuffer::NewWithAvailableSize(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE, aAvailableSize);
 }
@@ -540,10 +548,9 @@ PacketBuffer * PacketBuffer::NewWithAvailableSize(size_t aAvailableSize)
  */
 PacketBuffer * PacketBuffer::New(uint16_t aReservedSize)
 {
-    const size_t lReservedSize = static_cast<size_t>(aReservedSize);
-
-    const size_t lAvailableSize = lReservedSize < CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
-        ? CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX - lReservedSize
+    static_assert(CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX <= UINT16_MAX, "Our available size won't fit in uint16_t");
+    const uint16_t lAvailableSize = aReservedSize < CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
+        ? static_cast<uint16_t>(CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX - aReservedSize)
         : 0;
 
     return PacketBuffer::NewWithAvailableSize(aReservedSize, lAvailableSize);
