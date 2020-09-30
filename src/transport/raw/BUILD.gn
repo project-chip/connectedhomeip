@@ -30,6 +30,8 @@ static_library("raw") {
     "UDP.h",
   ]
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",

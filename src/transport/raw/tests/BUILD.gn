@@ -26,6 +26,8 @@ static_library("helpers") {
     "NetworkTestHelpers.h",
   ]
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [ "${chip_root}/src/inet/tests:tests_common" ]
 }
 
@@ -48,6 +50,8 @@ chip_test_suite("tests") {
     "${nlio_root}:nlio",
     "${nlunit_test_root}:nlunit-test",
   ]
+
+  cflags = [ "-Wconversion" ]
 
   tests = [
     "TestMessageHeader",
