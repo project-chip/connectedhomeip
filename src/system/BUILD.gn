@@ -143,6 +143,8 @@ static_library("system") {
     "TimeSource.h",
   ]
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [
     "${chip_root}/src/lib/support",
     "${nlassert_root}:nlassert",

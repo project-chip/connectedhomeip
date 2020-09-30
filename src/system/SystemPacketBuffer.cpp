@@ -36,6 +36,7 @@
 
 // Include local headers
 #include <support/CodeUtils.h>
+#include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemMutex.h>
@@ -210,7 +211,7 @@ uint16_t PacketBuffer::MaxDataLength() const
  */
 uint16_t PacketBuffer::AvailableDataLength() const
 {
-    return this->MaxDataLength() - this->len;
+    return static_cast<uint16_t>(this->MaxDataLength() - this->DataLength());
 }
 
 /**
@@ -220,7 +221,9 @@ uint16_t PacketBuffer::AvailableDataLength() const
  */
 uint16_t PacketBuffer::ReservedSize() const
 {
-    const ptrdiff_t kDelta = static_cast<uint8_t *>(this->payload) - reinterpret_cast<const uint8_t *>(this);
+    // Cast to size_t is safe because this->payload always points to "after"
+    // this.
+    const size_t kDelta = static_cast<size_t>(static_cast<uint8_t *>(this->payload) - reinterpret_cast<const uint8_t *>(this));
     return static_cast<uint16_t>(kDelta - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE);
 }
 
@@ -242,7 +245,7 @@ void PacketBuffer::AddToEnd(PacketBuffer * aPacket)
 
     while (true)
     {
-        lCursor->tot_len += aPacket->tot_len;
+        lCursor->tot_len = static_cast<uint16_t>(lCursor->tot_len + aPacket->tot_len);
         if (lCursor->next == nullptr)
         {
             lCursor->next = aPacket;
@@ -302,10 +305,10 @@ void PacketBuffer::CompactHead()
         memcpy(static_cast<uint8_t *>(this->payload) + this->len, lNextPacket.payload, lMoveLength);
 
         lNextPacket.payload = (uint8_t *) lNextPacket.payload + lMoveLength;
-        this->len += lMoveLength;
-        lAvailLength -= lMoveLength;
-        lNextPacket.len -= lMoveLength;
-        lNextPacket.tot_len -= lMoveLength;
+        this->len           = static_cast<uint16_t>(this->len + lMoveLength);
+        lAvailLength        = static_cast<uint16_t>(lAvailLength - lMoveLength);
+        lNextPacket.len     = static_cast<uint16_t>(lNextPacket.len - lMoveLength);
+        lNextPacket.tot_len = static_cast<uint16_t>(lNextPacket.tot_len - lMoveLength);
 
         if (lNextPacket.len == 0)
             this->next = this->FreeHead(&lNextPacket);
@@ -325,8 +328,8 @@ void PacketBuffer::ConsumeHead(uint16_t aConsumeLength)
     if (aConsumeLength > this->len)
         aConsumeLength = this->len;
     this->payload = static_cast<uint8_t *>(this->payload) + aConsumeLength;
-    this->len -= aConsumeLength;
-    this->tot_len -= aConsumeLength;
+    this->len     = static_cast<uint16_t>(this->len - aConsumeLength);
+    this->tot_len = static_cast<uint16_t>(this->tot_len - aConsumeLength);
 }
 
 /**
@@ -350,8 +353,8 @@ PacketBuffer * PacketBuffer::Consume(uint16_t aConsumeLength)
 
         if (aConsumeLength >= kLength)
         {
-            lPacket = PacketBuffer::FreeHead(lPacket);
-            aConsumeLength -= kLength;
+            lPacket        = PacketBuffer::FreeHead(lPacket);
+            aConsumeLength = static_cast<uint16_t>(aConsumeLength - kLength);
         }
         else
         {
@@ -382,7 +385,8 @@ bool PacketBuffer::EnsureReservedSize(uint16_t aReservedSize)
     if ((aReservedSize + this->len) > this->AllocSize())
         return false;
 
-    const uint16_t kMoveLength = aReservedSize - kCurrentReservedSize;
+    // Cast is safe because aReservedSize > kCurrentReservedSize.
+    const uint16_t kMoveLength = static_cast<uint16_t>(aReservedSize - kCurrentReservedSize);
     memmove(static_cast<uint8_t *>(this->payload) + kMoveLength, this->payload, this->len);
     payload = static_cast<uint8_t *>(this->payload) + kMoveLength;
 
@@ -403,14 +407,20 @@ bool PacketBuffer::AlignPayload(uint16_t aAlignBytes)
     if (aAlignBytes == 0)
         return false;
 
-    const uint16_t kPayloadOffset = reinterpret_cast<uintptr_t>(this->payload) % aAlignBytes;
+    const uint16_t kPayloadOffset = static_cast<uint16_t>(reinterpret_cast<uintptr_t>(this->payload) % aAlignBytes);
 
     if (kPayloadOffset == 0)
         return true;
 
-    const uint16_t kPayloadShift = aAlignBytes - kPayloadOffset;
+    // Cast is safe because by construction kPayloadOffset < aAlignBytes.
+    const uint16_t kPayloadShift = static_cast<uint16_t>(aAlignBytes - kPayloadOffset);
 
-    return (this->EnsureReservedSize(this->ReservedSize() + kPayloadShift));
+    if (!CanCastTo<uint16_t>(this->ReservedSize() + kPayloadShift))
+    {
+        return false;
+    }
+
+    return (this->EnsureReservedSize(static_cast<uint16_t>(this->ReservedSize() + kPayloadShift)));
 }
 
 /**
