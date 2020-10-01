@@ -85,7 +85,7 @@ git clone https://github.com/Qorvo/qpg-connectedhomeip
 ```
 export ARM_GCC_INSTALL_ROOT=${HOME}/tools/gcc-arm-none-eabi-9-2019-q4-major/bin
 export PATH=$PATH:$ARM_GCC_INSTALL_ROOT
-export QPG6100_SDK_ROOT=${HOME}/qpg-connectedhomeip 
+export QPG6100_SDK_ROOT=${HOME}/qpg-connectedhomeip
 ```
 
 -   All builds are GN/ninja based
