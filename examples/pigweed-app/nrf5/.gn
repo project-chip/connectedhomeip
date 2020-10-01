@@ -12,27 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
+# The location of the build configuration file.
+buildconfig = "//build/config/BUILDCONFIG.gn"
 
-import("//build/toolchain/arm_gcc/arm_toolchain.gni")
+# CHIP uses angle bracket includes.
+check_system_includes = true
 
-arm_toolchain("nrf5_lock_app") {
-  toolchain_args = {
-    current_os = "freertos"
-    import("${chip_root}/examples/lock-app/nrf5/args.gni")
-  }
-}
+# Allow loading paths relative to //gn.
+secondary_source = "//third_party/connectedhomeip/gn/"
 
-arm_toolchain("nrf5_lighting_app") {
-  toolchain_args = {
-    current_os = "freertos"
-    import("${chip_root}/examples/lighting-app/nrf5/args.gni")
-  }
-}
+default_args = {
+  target_cpu = "arm"
+  target_os = "freertos"
 
-arm_toolchain("nrf5_pigweed_app") {
-  toolchain_args = {
-    current_os = "freertos"
-    import("${chip_root}/examples/pigweed-app/nrf5/args.gni")
-  }
+  import("//args.gni")
 }
