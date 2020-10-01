@@ -1,11 +1,11 @@
 extraction:
     cpp:
-        prepare: # Customizable step used by all languages.
-            packages:
-                - g++-9
         configure: # Customizable step used only by C/C++ extraction.
             command:
-                - source scripts/bootstrap.sh && gn gen out/custom
+                - wget -O /tmp/gn.zip
+                  https://chrome-infra-packages.appspot.com/dl/gn/gn/linux-amd64/+/Z6cz3BKAP2GgVlujo5D6CFdrLE3B1hXFwVwraB6QBnUC
+                  && unzip /tmp/gn.zip -d /tmp/gn-bin gn && /tmp/gn-bin/gn gen
+                  out/default
         index: # Customizable step used by all languages.
             build_command:
-                - cd out/custom && ninja
+                - ninja -C out/default
