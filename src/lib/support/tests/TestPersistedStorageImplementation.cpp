@@ -154,7 +154,8 @@ CHIP_ERROR Read(const char * aKey, uint32_t & aValue)
         it = sPersistentStore.find(aKey);
         VerifyOrExit(it != sPersistentStore.end(), err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
-        size_t aValueLength = Base64Decode(it->second.c_str(), strlen(it->second.c_str()), reinterpret_cast<uint8_t *>(&aValue));
+        size_t aValueLength =
+            Base64Decode(it->second.c_str(), static_cast<uint16_t>(it->second.length()), reinterpret_cast<uint8_t *>(&aValue));
         VerifyOrExit(aValueLength == sizeof(uint32_t), err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
     }
 

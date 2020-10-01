@@ -300,7 +300,7 @@ CHIP_ERROR TLVUpdater::Move()
 
     elementEnd = mUpdaterReader.mReadPoint;
 
-    copyLen = elementEnd - mElementStartAddr;
+    copyLen = static_cast<uint32_t>(elementEnd - mElementStartAddr);
 
     // Move the element to output TLV
     memmove(mUpdaterWriter.mWritePoint, mElementStartAddr, copyLen);
@@ -335,7 +335,7 @@ void TLVUpdater::MoveUntilEnd()
 {
     const uint8_t * buffEnd = mUpdaterReader.GetReadPoint() + mUpdaterReader.GetRemainingLength();
 
-    uint32_t copyLen = buffEnd - mElementStartAddr;
+    uint32_t copyLen = static_cast<uint32_t>(buffEnd - mElementStartAddr);
 
     // Move all elements till end to output TLV
     memmove(mUpdaterWriter.mWritePoint, mElementStartAddr, copyLen);
@@ -487,8 +487,9 @@ void TLVUpdater::AdjustInternalWriterFreeSpace()
     if (nextElementStart != mElementStartAddr)
     {
         // Increase the internal writer's free space state variables
-        mUpdaterWriter.mRemainingLen += nextElementStart - mElementStartAddr;
-        mUpdaterWriter.mMaxLen += nextElementStart - mElementStartAddr;
+        uint32_t spaceIncrease = static_cast<uint32_t>(nextElementStart - mElementStartAddr);
+        mUpdaterWriter.mRemainingLen += spaceIncrease;
+        mUpdaterWriter.mMaxLen += spaceIncrease;
 
         // Cache the start address of the next element
         mElementStartAddr = nextElementStart;

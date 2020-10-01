@@ -87,6 +87,8 @@ static_library("support") {
 
   public = support_headers
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [
     ":chip_version_header",
     ":support_headers",

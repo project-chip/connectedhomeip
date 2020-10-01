@@ -195,7 +195,7 @@ struct TestTLVContext
 {
     nlTestSuite * mSuite;
     int mEvictionCount;
-    int mEvictedBytes;
+    uint32_t mEvictedBytes;
 };
 
 void TestNull(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag)
@@ -210,13 +210,13 @@ void TestString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const c
     NL_TEST_ASSERT(inSuite, reader.GetType() == kTLVType_UTF8String);
     NL_TEST_ASSERT(inSuite, reader.GetTag() == tag);
 
-    uint32_t expectedLen = strlen(expectedVal);
+    size_t expectedLen = strlen(expectedVal);
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
     chip::Platform::ScopedMemoryBuffer<char> valBuffer;
     char * val = static_cast<char *>(valBuffer.Alloc(expectedLen + 1).Get());
 
-    CHIP_ERROR err = reader.GetString(val, expectedLen + 1);
+    CHIP_ERROR err = reader.GetString(val, static_cast<uint32_t>(expectedLen) + 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen + 1) == 0);
@@ -227,7 +227,7 @@ void TestDupString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, cons
     NL_TEST_ASSERT(inSuite, reader.GetType() == kTLVType_UTF8String);
     NL_TEST_ASSERT(inSuite, reader.GetTag() == tag);
 
-    uint32_t expectedLen = strlen(expectedVal);
+    size_t expectedLen = strlen(expectedVal);
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
     chip::Platform::ScopedMemoryBuffer<char> valBuffer;
@@ -2449,7 +2449,7 @@ void CheckBufferOverflow(nlTestSuite * inSuite, void * inContext)
 
     PacketBuffer * buf  = PacketBuffer::New(0);
     uint16_t maxDataLen = buf->MaxDataLength();
-    uint16_t reserve    = (sizeof(Encoding1) < maxDataLen) ? (maxDataLen - sizeof(Encoding1)) + 2 : 0;
+    uint16_t reserve    = static_cast<uint16_t>((sizeof(Encoding1) < maxDataLen) ? (maxDataLen - sizeof(Encoding1)) + 2 : 0);
 
     // Repeatedly write and read a TLV encoding to a chain of PacketBuffers. Use progressively larger
     // and larger amounts of space in the first buffer to force the encoding/decoding to overlap the
@@ -3478,7 +3478,7 @@ static void CheckCloseContainerReserve(nlTestSuite * inSuite, void * inContext)
 
     // Test again all cases from 0 to the length of buf1
 
-    for (size_t maxLen = 0; maxLen <= sizeof(buf); maxLen++)
+    for (uint32_t maxLen = 0; maxLen <= sizeof(buf); maxLen++)
     {
         // Open/CloseContainer
 
@@ -3690,8 +3690,8 @@ exit:
     return err;
 }
 
-static uint32_t sFuzzTestDurationSecs = 5;
-static uint8_t sFixedFuzzMask         = 0;
+static time_t sFuzzTestDurationSecs = 5;
+static uint8_t sFixedFuzzMask       = 0;
 
 static void TLVReaderFuzzTest(nlTestSuite * inSuite, void * inContext)
 {
@@ -3727,7 +3727,7 @@ static void TLVReaderFuzzTest(nlTestSuite * inSuite, void * inContext)
     time(&now);
     endTime = now + sFuzzTestDurationSecs + 1;
 
-    srand(now);
+    srand(static_cast<unsigned int>(now));
 
     size_t m = 0;
     while (true)
