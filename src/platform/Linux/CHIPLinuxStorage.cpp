@@ -35,6 +35,7 @@
 #include <support/Base64.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+#include <support/ScopedBuffer.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -198,8 +199,8 @@ CHIP_ERROR ChipLinuxStorage::WriteValueBin(const char * key, const uint8_t * dat
 {
     static const size_t kMaxBlobSize = 5 * 1024;
 
-    CHIP_ERROR retval         = CHIP_NO_ERROR;
-    char * encodedData        = nullptr;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
+    chip::Platform::ScopedMemoryBuffer encodedData;
     size_t encodedDataLen     = 0;
     size_t expectedEncodedLen = ((dataLen + 3) * 4) / 3;
 
@@ -213,8 +214,7 @@ CHIP_ERROR ChipLinuxStorage::WriteValueBin(const char * key, const uint8_t * dat
     // Allocate just enough space for the encoded data, and the NULL terminator
     if (retval == CHIP_NO_ERROR)
     {
-        encodedData = (char *) chip::Platform::MemoryAlloc(expectedEncodedLen + 1);
-        if (encodedData == nullptr)
+        if (!encodedData.Alloc(expectedEncodedLen + 1))
         {
             retval = CHIP_ERROR_NO_MEMORY;
         }
@@ -225,20 +225,14 @@ CHIP_ERROR ChipLinuxStorage::WriteValueBin(const char * key, const uint8_t * dat
     {
         // We tested above that dataLen is no more than kMaxBlobSize.
         static_assert(kMaxBlobSize < UINT16_MAX, "dataLen won't fit");
-        encodedDataLen              = Base64Encode(data, static_cast<uint16_t>(dataLen), encodedData);
-        encodedData[encodedDataLen] = 0;
+        encodedDataLen                          = Base64Encode(data, static_cast<uint16_t>(dataLen), encodedData.Ptr<char>());
+        encodedData.Ptr<char>()[encodedDataLen] = 0;
     }
 
     // Store it
     if (retval == CHIP_NO_ERROR)
     {
-        WriteValueStr(key, (const char *) encodedData);
-    }
-
-    // Free memory
-    if (encodedData)
-    {
-        chip::Platform::MemoryFree(encodedData);
+        WriteValueStr(key, encodedData.Ptr<char>());
     }
 
     return retval;

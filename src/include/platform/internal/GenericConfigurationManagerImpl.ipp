@@ -32,6 +32,7 @@
 #include <support/Base64.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+#include <support/ScopedBuffer.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
@@ -867,7 +868,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
     using HashAlgo = chip::Crypto::Hash_SHA256_stream;
 
     HashAlgo hash;
-    uint8_t * dataBuf = NULL;
+    chip::Platform::ScopedMemoryBuffer dataBuf;
     size_t dataBufSize;
     constexpr uint16_t kLenFieldLen = 4; // 4 hex characters
 
@@ -920,11 +921,10 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
         // Create a temporary buffer to hold the certificate.  (This will also be used for
         // the private key).
         dataBufSize = certLen;
-        dataBuf     = (uint8_t *) chip::Platform::MemoryAlloc(dataBufSize);
-        VerifyOrExit(dataBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrExit(dataBuf.Alloc(dataBufSize), err = CHIP_ERROR_NO_MEMORY);
 
         // Read the certificate.
-        err = Impl()->_GetManufacturerDeviceCertificate(dataBuf, certLen, certLen);
+        err = Impl()->_GetManufacturerDeviceCertificate(dataBuf.Ptr<uint8_t>(), certLen, certLen);
         SuccessOrExit(err);
     }
 
@@ -941,15 +941,12 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
         // (This will also be used for the private key).
         if (certsLen > dataBufSize)
         {
-            chip::Platform::MemoryFree(dataBuf);
-
             dataBufSize = certsLen;
-            dataBuf     = (uint8_t *) chip::Platform::MemoryAlloc(dataBufSize);
-            VerifyOrExit(dataBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
+            VerifyOrExit(dataBuf.Alloc(dataBufSize), err = CHIP_ERROR_NO_MEMORY);
         }
 
         // Read the device intermediate CA certificates.
-        err = Impl()->_GetManufacturerDeviceIntermediateCACerts(dataBuf, certsLen, certsLen);
+        err = Impl()->_GetManufacturerDeviceIntermediateCACerts(dataBuf.Ptr<uint8_t>(), certsLen, certsLen);
         SuccessOrExit(err);
     }
 
@@ -964,7 +961,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
         // Read the private key.  (Note that we presume the buffer allocated to hold the certificate
         // is big enough to hold the private key.  _GetDevicePrivateKey() will return an error in the
         // unlikely event that this is not the case.)
-        err = Impl()->_GetManufacturerDevicePrivateKey(dataBuf, dataBufSize, keyLen);
+        err = Impl()->_GetManufacturerDevicePrivateKey(dataBuf.Ptr<uint8_t>(), dataBufSize, keyLen);
         SuccessOrExit(err);
     }
 
@@ -991,10 +988,9 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
     hash.Finish(hashBuf);
 
 exit:
-    if (dataBuf != NULL)
+    if (dataBuf)
     {
-        chip::Crypto::ClearSecretData(dataBuf, dataBufSize);
-        chip::Platform::MemoryFree(dataBuf);
+        chip::Crypto::ClearSecretData(dataBuf.Ptr(), dataBufSize);
     }
 #endif // CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
 
