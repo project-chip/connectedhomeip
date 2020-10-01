@@ -15,7 +15,7 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/qpg6100_sdk.gni")
 
-# ARM architecture flags will be set based on efr32_family.
+# ARM architecture flags will be set for QPG6100.
 arm_platform_config = "${qpg6100_sdk_build_root}/qpg6100_arm.gni"
 
 mbedtls_target = "${qpg6100_sdk_build_root}:qpg6100_sdk"
