@@ -175,7 +175,9 @@
   <interface name="org.bluez.LEAdvertisement1">
     <method name="Release"/>
     <property name="Type" type="s" access="read"/>
-    <property name="ServiceUUIDs" type="as" access="read"/>
+    <property name="ServiceUUIDs" type="as" access="read">
+      <annotation name="org.gtk.GDBus.C.ForceGVariant" value="true"/>
+    </property>
     <property name="ManufacturerData" type="a{qv}" access="read"/>
     <property name="SolicitUUIDs" type="as" access="read"/>
     <property name="ServiceData" type="a{sv}" access="read"/>
