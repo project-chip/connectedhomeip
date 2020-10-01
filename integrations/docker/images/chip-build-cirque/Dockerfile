@@ -34,5 +34,5 @@ RUN set -x \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
        sudo socat psmisc tigervnc-standalone-server tigervnc-viewer \
        python3-pip python3-venv python3-setuptools libdbus-glib-1-dev \
-       libgirepository1.0-dev \
+       uuid-runtime libgirepository1.0-dev \
     && : # aids diffs
