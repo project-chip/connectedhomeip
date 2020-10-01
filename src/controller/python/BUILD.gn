@@ -79,16 +79,11 @@ action("python") {
   script = "$root_out_dir/controller/python/build-chip-wheel"
 
   inputs = [
-    "chip/ChipBleBase.py",
-    "chip/ChipBleUtility.py",
-    "chip/ChipBluezMgr.py",
-    "chip/ChipDeviceCtrl.py",
-    "chip/ChipStack.py",
-    "chip/ChipTLV.py",
-    "chip/ChipUtility.py",
-    "chip/__init__.py",
     "${root_out_dir}/controller/python/chip/_ChipDeviceCtrl.so",
   ]
+
+  inputs += get_target_outputs(":deviceControllerPyCopy1")
+  inputs += get_target_outputs(":deviceControllerPyCopy2")
 
   args = [
     "--package_name",
