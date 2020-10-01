@@ -18,6 +18,7 @@ pyparsing==2.3.1          # via -r requirements.in
 pyserial==3.4             # via -r requirements.in
 requests==2.24.0          # via -r requirements.in
 six==1.15.0               # via cryptography, pip-tools
+wheel==0.34.2             # via -r requirements.in
 urllib3==1.25.10          # via requests
 
 # The following packages are considered to be unsafe in a requirements file:

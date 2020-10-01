@@ -1,0 +1,54 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# gn-format disable
+import("//build_overrides/nrf5_sdk.gni")
+
+import("${nrf5_sdk_build_root}/nrf5_executable.gni")
+import("${nrf5_sdk_build_root}/nrf5_sdk.gni")
+assert(current_os == "freertos")
+
+nrf5_platform_dir = "${chip_root}/examples/platform/nrf528xx"
+
+declare_args() {
+  nrf5_app_config_dir = "//"
+}
+
+nrf5_sdk("sdk") {
+  include_dirs = [
+    nrf5_app_config_dir,
+    "${nrf5_platform_dir}/app/project_include",
+    "${nrf5_platform_dir}/util/include",
+    "${nrf5_platform_dir}/app/include",
+    "${chip_root}/src/app/util",
+  ]
+
+  sources = [
+    "$nrf5_app_config_dir/app_config.h",
+    "${nrf5_platform_dir}/app/project_include/CHIPProjectConfig.h",
+    "${nrf5_platform_dir}/app/project_include/FreeRTOSConfig.h",
+    "${nrf5_platform_dir}/app/project_include/OpenThreadConfig.h",
+    "${nrf5_platform_dir}/app/project_include/freertos_tasks_c_additions.h",
+    "${nrf5_platform_dir}/app/project_include/nrf_log_ctrl_internal.h",
+  ]
+
+  defines = []
+  if (is_debug) {
+    defines += [ "BUILD_RELEASE=0" ]
+  } else {
+    defines += [ "BUILD_RELEASE=1" ]
+  }
+
+  defines += [ "USE_APP_CONFIG" ]
+}

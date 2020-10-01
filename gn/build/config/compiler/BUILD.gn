@@ -171,6 +171,10 @@ config("strict_warnings") {
   if (is_clang) {
     cflags += [ "-Wimplicit-fallthrough" ]
   }
+
+  if (current_os == "linux" || current_os == "android") {
+    ldflags += [ "-Wl,-z,defs" ]
+  }
 }
 
 config("warnings_default") {

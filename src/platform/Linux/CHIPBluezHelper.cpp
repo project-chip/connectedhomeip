@@ -95,17 +95,15 @@ static BluezLEAdvertisement1 * BluezAdvertisingCreate(BluezEndpoint * apEndpoint
     BluezLEAdvertisement1 * adv = nullptr;
     BluezObjectSkeleton * object;
     GVariant * serviceData;
+    GVariant * serviceUUID;
     gchar * localName;
     GVariantBuilder serviceDataBuilder;
     GVariantBuilder serviceUUIDsBuilder;
     char * debugStr;
-    const gchar * array[1];
 
     VerifyOrExit(apEndpoint != nullptr, ChipLogProgress(DeviceLayer, "endpoint is NULL in %s", __func__));
     if (apEndpoint->mpAdvPath == nullptr)
         apEndpoint->mpAdvPath = g_strdup_printf("%s/advertising", apEndpoint->mpRootPath);
-
-    array[0] = g_strdup_printf("%s", apEndpoint->mpAdvertisingUUID);
 
     ChipLogProgress(DeviceLayer, "Create adv object at %s", apEndpoint->mpAdvPath);
     object = bluez_object_skeleton_new(apEndpoint->mpAdvPath);
@@ -126,7 +124,9 @@ static BluezLEAdvertisement1 * BluezAdvertisingCreate(BluezEndpoint * apEndpoint
         localName = g_strdup_printf("%s%04x", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, getpid() & 0xffff);
 
     serviceData = g_variant_builder_end(&serviceDataBuilder);
-    debugStr    = g_variant_print(serviceData, TRUE);
+    serviceUUID = g_variant_builder_end(&serviceUUIDsBuilder);
+
+    debugStr = g_variant_print(serviceData, TRUE);
     ChipLogProgress(DeviceLayer, "SET service data to %s", debugStr);
     g_free(debugStr);
 
@@ -140,7 +140,7 @@ static BluezLEAdvertisement1 * BluezAdvertisingCreate(BluezEndpoint * apEndpoint
 
     // advertising name corresponding to the PID and object path, for debug purposes
     bluez_leadvertisement1_set_local_name(adv, localName);
-    bluez_leadvertisement1_set_service_uuids(adv, array);
+    bluez_leadvertisement1_set_service_uuids(adv, serviceUUID);
 
     // 0xffff means no appearance
     bluez_leadvertisement1_set_appearance(adv, 0xffff);
@@ -183,7 +183,7 @@ static void BluezAdvStartDone(GObject * aObject, GAsyncResult * aResult, gpointe
     ChipLogProgress(DeviceLayer, "RegisterAdvertisement complete");
 
 exit:
-    BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(success == TRUE ? true : false, nullptr);
+    BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(success == TRUE ? true : false, nullptr);
     if (error != nullptr)
         g_error_free(error);
 }
@@ -1516,7 +1516,7 @@ exit:
     return G_SOURCE_REMOVE;
 }
 
-bool SendBluezIndication(BluezConnection * apConn, chip::System::PacketBuffer * apBuf)
+bool SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBuffer * apBuf)
 {
     ConnectionDataBundle * closure;
     const char * msg = nullptr;
@@ -1529,7 +1529,7 @@ bool SendBluezIndication(BluezConnection * apConn, chip::System::PacketBuffer * 
     len    = apBuf->DataLength();
 
     closure         = g_new(ConnectionDataBundle, 1);
-    closure->mpConn = apConn;
+    closure->mpConn = static_cast<BluezConnection *>(apConn);
 
     closure->mpVal = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, buffer, len * sizeof(uint8_t), sizeof(uint8_t));
 
@@ -1575,7 +1575,7 @@ static int CloseBleconnectionCB(void * apAppState)
     return G_SOURCE_REMOVE;
 }
 
-bool CloseBluezConnection(BluezConnection * apConn)
+bool CloseBluezConnection(BLE_CONNECTION_OBJECT apConn)
 {
     return BluezRunOnBluezThread(CloseBleconnectionCB, apConn);
 }
@@ -1661,7 +1661,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & aBleAdvConfig, BluezEndpoint *& apEndpoint)
+CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & aBleAdvConfig, void *& apEndpoint)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     bool retval    = false;
