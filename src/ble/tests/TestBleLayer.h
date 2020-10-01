@@ -25,14 +25,7 @@
 #ifndef TESTBLELAYER_H
 #define TESTBLELAYER_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-int TestBleErrorStr(void);
-
-#ifdef __cplusplus
-}
-#endif
+int TestBleErrorStr();
+int TestBleUUID();
 
 #endif // TESTBLELAYER_H
