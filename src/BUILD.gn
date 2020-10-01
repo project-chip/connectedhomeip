@@ -46,6 +46,7 @@ if (chip_build_tests) {
 
     if (chip_device_platform != "esp32") {
       deps += [
+        "${chip_root}/src/ble/tests",
         "${chip_root}/src/lib/core/tests",
         "${chip_root}/src/lib/support/tests",
         "${chip_root}/src/platform/tests",
