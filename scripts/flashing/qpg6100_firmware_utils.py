@@ -64,10 +64,9 @@ QPG6100_OPTIONS = {
 class Flasher(firmware_utils.Flasher):
     """Manage flashing."""
 
-    def __init__(self, options=None):
-        super().__init__(options, 'QPG6100')
+    def __init__(self, **options):
+        super().__init__(platform='QPG6100', module=__name__, **options)
         self.define_options(QPG6100_OPTIONS)
-        self.module = __name__
 
     def erase(self):
         """Not supported"""
@@ -82,10 +81,10 @@ class Flasher(firmware_utils.Flasher):
     def flash(self, image):
         """Flash image."""
         self.log(1, "Copying to drive")
-        if not self.options['drive']:
+        if not self.option['drive']:
             self.log(fail_level, "--drive required for copy action")
         else:
-            shutil.copyfile(image, self.options['drive'])
+            shutil.copyfile(image, self.option['drive'])
         return self
 
     def reset(self):
@@ -94,31 +93,14 @@ class Flasher(firmware_utils.Flasher):
         return self
 
     def actions(self):
-        """Perform actions on the device according to self.options."""
-        self.log(3, 'OPTIONS:', self.options)
+        """Perform actions on the device according to self.option."""
+        self.log(3, 'OPTIONS:', self.option)
 
-        if self.options['erase']:
+        if self.option['erase']:
             if self.erase().err:
                 return self
 
-        softdevice = self.optional_file(self.options['softdevice'])
-        if softdevice and not self.options['skip-softdevice']:
-            if self.verify(softdevice).err:
-                if self.flash(softdevice).err:
-                    return self
-                if self.options['verify-application']:
-                    if self.verify(softdevice).err:
-                        return self
 
-        application = self.optional_file(self.options['application'])
-        if application:
-            if self.flash(application).err:
-                return self
-            if self.options['verify-application']:
-                if self.verify(application).err:
-                    return self
-            if self.options['reset'] is None:
-                self.options['reset'] = True
 
         if self.options['reset']:
             if self.reset().err:
