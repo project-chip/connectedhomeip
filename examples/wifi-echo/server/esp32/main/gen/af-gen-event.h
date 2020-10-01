@@ -47,7 +47,7 @@
     extern void emberAfPluginReportingTickEventHandler(void);                                                                      \
     static void clusterTickWrapper(EmberEventControl * control, EmberAfTickFunction callback, uint8_t endpoint)                    \
     {                                                                                                                              \
-        emberEventControlSetInactive(control);                                                                                    \
+        emberEventControlSetInactive(control);                                                                                     \
         (*callback)(endpoint);                                                                                                     \
     }                                                                                                                              \
     void emberAfIdentifyClusterServerTickCallbackWrapperFunction1(void)                                                            \
