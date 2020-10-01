@@ -35,6 +35,7 @@ target_sources(app PRIVATE
                ${LOCK_COMMON}/gen/callback-stub.c
                ${LOCK_COMMON}/gen/znet-bookkeeping.c
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
+               ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
                ${CHIP_APP_SERVER}/DataModelHandler.cpp
                ${CHIP_APP_SERVER}/Server.cpp
                ${CHIP_APP_SERVER}/QRCodeUtil.cpp

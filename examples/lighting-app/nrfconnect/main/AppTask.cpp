@@ -21,6 +21,7 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
+#include "ThreadUtil.h"
 #include "LightingManager.h"
 #include "QRCodeUtil.h"
 #include "Server.h"
@@ -219,11 +220,11 @@ void AppTask::ButtonEventHandler(uint32_t button_state, uint32_t has_changed)
         sAppTask.PostEvent(&button_event);
     }
 
-    if (JOINER_BUTTON_MASK & button_state & has_changed)
+    if (THREAD_START_BUTTON_MASK & button_state & has_changed)
     {
-        button_event.ButtonEvent.PinNo  = JOINER_BUTTON;
+        button_event.ButtonEvent.PinNo  = THREAD_START_BUTTON;
         button_event.ButtonEvent.Action = kButtonPushEvent;
-        button_event.Handler            = JoinerHandler;
+        button_event.Handler            = StartThreadHandler;
         sAppTask.PostEvent(&button_event);
     }
 }
@@ -307,18 +308,19 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::JoinerHandler(AppEvent * aEvent)
+void AppTask::StartThreadHandler(AppEvent * aEvent)
 {
-    if (aEvent->ButtonEvent.PinNo != JOINER_BUTTON)
+    if (aEvent->ButtonEvent.PinNo != THREAD_START_BUTTON)
         return;
 
-    CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
-
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    error = ThreadStackMgr().JoinerStart();
+    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned()) {
+        StartDefaultThreadNetwork();
+        LOG_INF("Device is not commissioned to a Thread network. Starting with the default configuration.");
+    } else {
+        LOG_INF("Device is commissioned to a Thread network.");
+    }
 #endif
-
-    LOG_INF("Thread joiner triggering result: %s", log_strdup(chip::ErrorStr(error)));
 }
 
 void AppTask::CancelTimer()
