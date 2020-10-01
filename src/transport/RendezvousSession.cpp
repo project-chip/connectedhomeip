@@ -345,7 +345,7 @@ CHIP_ERROR RendezvousSession::Pair(Optional<NodeId> nodeId, uint32_t setupPINCod
                                 strlen(kSpake2pKeyExchangeSalt), nodeId, mNextKeyId++, this);
 }
 
-void RendezvousSession::SendIPAddress(IPAddress & addr)
+void RendezvousSession::SendIPAddress(const IPAddress & addr)
 {
     CHIP_ERROR err                = CHIP_NO_ERROR;
     System::PacketBuffer * buffer = System::PacketBuffer::New();

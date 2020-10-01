@@ -929,6 +929,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                     if (esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"), &ipInfo) == ESP_OK)
                     {
                         char addrStr[INET_ADDRSTRLEN];
+                        // ToDo: change the code to using IPv6 address
                         esp_ip4addr_ntoa(&ipInfo.ip, addrStr, sizeof(addrStr));
                         IPAddress::FromString(addrStr, addr);
                     }

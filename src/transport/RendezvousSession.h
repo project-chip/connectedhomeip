@@ -92,7 +92,16 @@ public:
     void OnRendezvousMessageReceived(PacketBuffer * buffer) override;
 
     const IPAddress & GetIPAddress() const { return mDeviceAddress; }
-    void SendIPAddress(IPAddress & addr);
+
+    /**
+     * @brief
+     *  The device can use this function to send its IP address to
+     *  commissioner. This would generally be called during network
+     *  provisioning of the device, after the IP address assignment.
+     *
+     * @param addr The IP address of the device
+     */
+    void SendIPAddress(const IPAddress & addr);
 
 private:
     CHIP_ERROR SendPairingMessage(System::PacketBuffer * msgBug);
