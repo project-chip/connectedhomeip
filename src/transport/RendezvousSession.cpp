@@ -15,7 +15,9 @@
  *    limitations under the License.
  */
 
+#include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
+#include <platform/internal/DeviceNetworkInfo.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
@@ -261,6 +263,50 @@ exit:
     return err;
 }
 
+CHIP_ERROR RendezvousSession::HandleNetworkProvisioningMessage(uint8_t msgType, PacketBuffer * msgBuf)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    switch (msgType)
+    {
+    case NetworkProvisioningMsgTypes::kWiFiAssociationRequest: {
+        char SSID[chip::DeviceLayer::Internal::kMaxWiFiSSIDLength];
+        char passwd[chip::DeviceLayer::Internal::kMaxWiFiKeyLength];
+        BufBound bbufSSID(Uint8::from_char(SSID), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
+        BufBound bbufPW(Uint8::from_char(passwd), chip::DeviceLayer::Internal::kMaxWiFiKeyLength);
+
+        const uint8_t * buffer = msgBuf->Start();
+        size_t len             = msgBuf->DataLength();
+        size_t offset          = 0;
+
+        err = DecodeString(&buffer[offset], len - offset, bbufSSID, offset);
+        SuccessOrExit(err);
+
+        err = DecodeString(&buffer[offset], len - offset, bbufPW, offset);
+        SuccessOrExit(err);
+
+        mDelegate->OnRendezvousProvisionNetwork(SSID, passwd);
+    }
+    break;
+
+    case NetworkProvisioningMsgTypes::kIPAddressAssigned: {
+        if (!IPAddress::FromString(Uint8::to_const_char(msgBuf->Start()), msgBuf->DataLength(), mDeviceAddress))
+        {
+            mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningFailed);
+            ExitNow(err = CHIP_ERROR_INVALID_ADDRESS);
+        }
+        mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningSuccess);
+    }
+    break;
+
+    default:
+        err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
+        break;
+    };
+
+exit:
+    return err;
+}
+
 CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -308,15 +354,10 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
 
     msgBuf->ConsumeHead(headerSize);
 
-    if (payloadHeader.GetProtocolID() == Protocols::kChipProtocol_NetworkProvisioning &&
-        payloadHeader.GetMessageType() == NetworkProvisioningMsgTypes::kIPAddressAssigned)
+    if (payloadHeader.GetProtocolID() == Protocols::kChipProtocol_NetworkProvisioning)
     {
-        if (!IPAddress::FromString(Uint8::to_const_char(msgBuf->Start()), msgBuf->DataLength(), mDeviceAddress))
-        {
-            mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningFailed);
-            ExitNow(err = CHIP_ERROR_INVALID_ADDRESS);
-        }
-        mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningSuccess);
+        err = HandleNetworkProvisioningMessage(payloadHeader.GetMessageType(), msgBuf);
+        // Ignoring error for time being, as the message is getting routed via OnRendezvousMessageReceived()
     }
     // else .. TBD once application dependency on this message has been removed, enable the else condition
     {
@@ -373,6 +414,68 @@ exit:
         PacketBuffer::Free(buffer);
     }
 }
+
+CHIP_ERROR RendezvousSession::EncodeString(const char * str, BufBound & bbuf)
+{
+    CHIP_ERROR err  = CHIP_NO_ERROR;
+    size_t length   = strlen(str);
+    uint16_t u16len = static_cast<uint16_t>(length);
+    VerifyOrExit(CanCastTo<uint16_t>(length), err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    bbuf.PutLE16(u16len);
+    bbuf.Put(str);
+
+exit:
+    return err;
+}
+
+CHIP_ERROR RendezvousSession::DecodeString(const uint8_t * input, size_t input_len, BufBound & bbuf, size_t & consumed)
+{
+    CHIP_ERROR err  = CHIP_NO_ERROR;
+    uint16_t length = 0;
+
+    VerifyOrExit(input_len >= sizeof(uint16_t), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    length   = chip::Encoding::LittleEndian::Get16(input);
+    consumed = sizeof(uint16_t);
+
+    VerifyOrExit(input_len - consumed >= length, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    bbuf.Put(&input[consumed], length);
+
+    consumed += bbuf.Written();
+    bbuf.Put('\0');
+
+    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+
+exit:
+    return err;
+}
+
+void RendezvousSession::SendNetworkCredentials(const char * ssid, const char * passwd)
+{
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    System::PacketBuffer * buffer = System::PacketBuffer::New();
+    BufBound bbuf(buffer->Start(), buffer->TotalLength());
+
+    VerifyOrExit(mPairingInProgress == false, err = CHIP_ERROR_INCORRECT_STATE);
+    SuccessOrExit(EncodeString(ssid, bbuf));
+    SuccessOrExit(EncodeString(passwd, bbuf));
+    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    buffer->SetDataLength(bbuf.Written());
+
+    err = SendSecureMessage(Protocols::kChipProtocol_NetworkProvisioning, NetworkProvisioningMsgTypes::kWiFiAssociationRequest,
+                            buffer);
+    SuccessOrExit(err);
+
+exit:
+    if (CHIP_NO_ERROR != err)
+    {
+        OnRendezvousError(err);
+        PacketBuffer::Free(buffer);
+    }
+}
+
+void RendezvousSession::SendOperationalCredentials() {}
 
 #if CONFIG_DEVICE_LAYER
 void RendezvousSession::ConnectivityHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)

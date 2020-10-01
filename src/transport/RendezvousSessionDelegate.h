@@ -39,7 +39,16 @@ public:
     virtual void OnRendezvousConnectionClosed()                             = 0;
     virtual void OnRendezvousError(CHIP_ERROR err)                          = 0;
     virtual void OnRendezvousMessageReceived(System::PacketBuffer * buffer) = 0;
+
     virtual void OnRendezvousStatusUpdate(Status status) {}
+    virtual void OnRendezvousProvisionNetwork(const char * ssid, const char * passwd) {}
+};
+
+class DLL_EXPORT RendezvousDeviceCredentialsDelegate
+{
+public:
+    virtual void SendNetworkCredentials(const char * ssid, const char * passwd) = 0;
+    virtual void SendOperationalCredentials()                                   = 0;
 };
 
 } // namespace chip

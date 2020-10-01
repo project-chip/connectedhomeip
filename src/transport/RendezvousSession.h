@@ -26,6 +26,7 @@
 
 #include <core/CHIPCore.h>
 #include <protocols/CHIPProtocols.h>
+#include <support/BufBound.h>
 #include <transport/RendezvousParameters.h>
 #include <transport/RendezvousSessionDelegate.h>
 #include <transport/SecurePairingSession.h>
@@ -58,7 +59,9 @@ class CHIPDeviceEvent;
  *
  * @dotfile dots/Rendezvous/RendezvousSessionInit.dot
  */
-class RendezvousSession : public SecurePairingSessionDelegate, public RendezvousSessionDelegate
+class RendezvousSession : public SecurePairingSessionDelegate,
+                          public RendezvousSessionDelegate,
+                          public RendezvousDeviceCredentialsDelegate
 {
 public:
     RendezvousSession(RendezvousSessionDelegate * delegate) : mDelegate(delegate) {}
@@ -91,8 +94,12 @@ public:
     void OnRendezvousError(CHIP_ERROR err) override;
     void OnRendezvousMessageReceived(System::/*  */ PacketBuffer * buffer) override;
 
-    const Inet::IPAddress & GetIPAddress() const { return mDeviceAddress; }
+    //////////// RendezvousDeviceCredentialsDelegate Implementation ///////////////
+    void SendNetworkCredentials(const char * ssid, const char * passwd) override;
+    void SendOperationalCredentials() override;
 
+    const Inet::IPAddress & GetIPAddress() const { return mDeviceAddress; }
+ 
     /**
      * @brief
      *  The device can use this function to send its IP address to
@@ -111,7 +118,9 @@ private:
 
     CHIP_ERROR SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBuffer * msgBug);
     CHIP_ERROR HandleSecureMessage(System::PacketBuffer * msgBuf);
-
+    CHIP_ERROR HandleNetworkProvisioningMessage(uint8_t msgType, PacketBuffer * msgBuf);
+    CHIP_ERROR EncodeString(const char * str, BufBound & bbuf);
+    CHIP_ERROR DecodeString(const uint8_t * input, size_t input_len, BufBound & bbuf, size_t & consumed);
     Transport::Base * mTransport          = nullptr; ///< Underlying transport
     RendezvousSessionDelegate * mDelegate = nullptr; ///< Underlying transport events
     RendezvousParameters mParams;                    ///< Rendezvous configuration

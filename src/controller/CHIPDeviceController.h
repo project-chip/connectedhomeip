@@ -33,6 +33,7 @@
 #include <core/CHIPTLV.h>
 #include <support/DLLUtil.h>
 #include <transport/RendezvousSession.h>
+#include <transport/RendezvousSessionDelegate.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
 
@@ -47,6 +48,53 @@ typedef void (*CompleteHandler)(ChipDeviceController * deviceController, void * 
 typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err,
                              const Inet::IPPacketInfo * pktInfo);
 typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
+
+class DLL_EXPORT DevicePairingDelegate
+{
+public:
+    /**
+     * @brief
+     *   Called when the pairing reaches a certain stage.
+     *
+     * @param status Current status of pairing
+     */
+    virtual void OnStatusUpdate(RendezvousSessionDelegate::Status status) {}
+
+    /**
+     * @brief
+     *   Called when the network credentials are needed for the remote device
+     *
+     * @param callback Callback delegate that provisions the network credentials
+     */
+    virtual void OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback) = 0;
+
+    /**
+     * @brief
+     *   Called when the operational credentials are needed for the remote device
+     *
+     * @param csr Certificate signing request from the device
+     * @param csr_length The length of CSR
+     * @param callback Callback delegate that provisions the operational credentials
+     */
+    virtual void OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
+                                                   RendezvousDeviceCredentialsDelegate * callback) = 0;
+
+    /**
+     * @brief
+     *   Called when the pairing is complete (with success or error)
+     *
+     * @param error Error cause, if any
+     */
+    virtual void OnPairingComplete(CHIP_ERROR error) {}
+
+    /**
+     * @brief
+     *   Called when the pairing is deleted (with success or error)
+     *
+     * @param error Error cause, if any
+     */
+    virtual void OnPairingDeleted(CHIP_ERROR error) {}
+};
 
 class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback, public RendezvousSessionDelegate
 {
@@ -66,6 +114,7 @@ public:
      * Init function to be used when already-initialized System::Layer and InetLayer are available.
      */
     CHIP_ERROR Init(NodeId localDeviceId, System::Layer * systemLayer, Inet::InetLayer * inetLayer);
+    CHIP_ERROR Init(NodeId localDeviceId, DevicePairingDelegate * pairingDelegate);
     CHIP_ERROR Shutdown();
 
     // ----- Connection Management -----
@@ -236,6 +285,8 @@ private:
     uint32_t mMessageNumber = 0;
 
     SecurePairingSession mPairingSession;
+
+    DevicePairingDelegate * mPairingDelegate;
 
     void ClearRequestState();
     void ClearOpState();

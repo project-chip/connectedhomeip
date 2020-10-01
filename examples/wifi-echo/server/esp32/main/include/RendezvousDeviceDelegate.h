@@ -32,6 +32,8 @@ public:
     void OnRendezvousError(CHIP_ERROR err) override;
     void OnRendezvousMessageReceived(chip::System::PacketBuffer * buffer) override;
 
+    void OnRendezvousProvisionNetwork(const char * ssid, const char * passwd) override;
+
 private:
     chip::RendezvousSession * mRendezvousSession;
 };

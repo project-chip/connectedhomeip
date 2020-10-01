@@ -87,3 +87,9 @@ void RendezvousDeviceDelegate::OnRendezvousMessageReceived(PacketBuffer * buffer
         mRendezvousSession->SendMessage(buffer);
     }
 }
+
+void RendezvousDeviceDelegate::OnRendezvousProvisionNetwork(const char * ssid, const char * passwd)
+{
+    ESP_LOGI(TAG, "OnRendezvousProvisionNetwork");
+    // Call device network configuration method here.
+}

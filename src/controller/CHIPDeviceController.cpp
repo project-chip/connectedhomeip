@@ -67,6 +67,7 @@ ChipDeviceController::ChipDeviceController()
     mCurReqMsg         = nullptr;
     mOnError           = nullptr;
     mOnNewConnection   = nullptr;
+    mPairingDelegate   = nullptr;
     mDeviceAddr        = IPAddress::Any;
     mDevicePort        = CHIP_PORT;
     mLocalDeviceId     = 0;
@@ -101,6 +102,17 @@ CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, System::Layer * system
 
     mState         = kState_Initialized;
     mLocalDeviceId = localNodeId;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, DevicePairingDelegate * pairingDelegate)
+{
+    CHIP_ERROR err = Init(localNodeId);
+    SuccessOrExit(err);
+
+    mPairingDelegate = pairingDelegate;
 
 exit:
     return err;
@@ -432,11 +444,25 @@ void ChipDeviceController::OnRendezvousMessageReceived(PacketBuffer * buffer)
 
 void ChipDeviceController::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status)
 {
-    if (status == RendezvousSessionDelegate::NetworkProvisioningSuccess)
+    switch (status)
     {
+    case RendezvousSessionDelegate::SecurePairingSuccess:
+        ChipLogProgress(Controller, "Remote device completed SPAKE2+ handshake\n");
+        if (mPairingDelegate != nullptr)
+        {
+            mPairingDelegate->OnNetworkCredentialsRequested(mRendezvousSession);
+        }
+        break;
+
+    case RendezvousSessionDelegate::NetworkProvisioningSuccess:
+
         ChipLogProgress(Controller, "Remote device was assigned an ip address\n");
         mDeviceAddr = mRendezvousSession->GetIPAddress();
-    }
+        break;
+
+    default:
+        break;
+    };
 }
 
 } // namespace DeviceController
