@@ -53,17 +53,25 @@ enum TLVTagFields
 };
 
 // TODO: Move to private namespace
-enum TLVTagControl
+enum class TLVTagControl : uint8_t
 {
-    kTLVTagControl_Anonymous              = 0x00,
-    kTLVTagControl_ContextSpecific        = 0x20,
-    kTLVTagControl_CommonProfile_2Bytes   = 0x40,
-    kTLVTagControl_CommonProfile_4Bytes   = 0x60,
-    kTLVTagControl_ImplicitProfile_2Bytes = 0x80,
-    kTLVTagControl_ImplicitProfile_4Bytes = 0xA0,
-    kTLVTagControl_FullyQualified_6Bytes  = 0xC0,
-    kTLVTagControl_FullyQualified_8Bytes  = 0xE0
+    // IMPORTANT: All values here must have no bits in common with specified
+    // values of TLVElementType.
+    Anonymous              = 0x00,
+    ContextSpecific        = 0x20,
+    CommonProfile_2Bytes   = 0x40,
+    CommonProfile_4Bytes   = 0x60,
+    ImplicitProfile_2Bytes = 0x80,
+    ImplicitProfile_4Bytes = 0xA0,
+    FullyQualified_6Bytes  = 0xC0,
+    FullyQualified_8Bytes  = 0xE0
 };
+
+template <typename T>
+inline uint8_t operator>>(TLVTagControl lhs, const T & rhs)
+{
+    return static_cast<uint8_t>(lhs) >> rhs;
+}
 
 // TODO: Move to private namespace
 enum

@@ -2636,7 +2636,7 @@ void PreserveSizeWrite(nlTestSuite * inSuite, TLVWriter & writer, bool preserveS
     CHIP_ERROR err;
     TLVWriter writer2;
 
-    // kTLVTagControl_FullyQualified_8Bytes
+    // TLVTagControl::FullyQualified_8Bytes
     err = writer.Put(ProfileTag(TestProfile_1, 4000000000ULL), static_cast<int64_t>(40000000000ULL), true);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 

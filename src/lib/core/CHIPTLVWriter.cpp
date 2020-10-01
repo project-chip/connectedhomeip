@@ -312,7 +312,7 @@ CHIP_ERROR TLVWriter::Finalize()
  */
 CHIP_ERROR TLVWriter::PutBoolean(uint64_t tag, bool v)
 {
-    return WriteElementHead((v) ? kTLVElementType_BooleanTrue : kTLVElementType_BooleanFalse, tag, 0);
+    return WriteElementHead((v) ? TLVElementType::BooleanTrue : TLVElementType::BooleanFalse, tag, 0);
 }
 
 /**
@@ -379,7 +379,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, uint8_t v)
 CHIP_ERROR TLVWriter::Put(uint64_t tag, uint8_t v, bool preserveSize)
 {
     if (preserveSize)
-        return WriteElementHead(kTLVElementType_UInt8, tag, v);
+        return WriteElementHead(TLVElementType::UInt8, tag, v);
     return Put(tag, v);
 }
 
@@ -397,7 +397,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, uint16_t v)
 CHIP_ERROR TLVWriter::Put(uint64_t tag, uint16_t v, bool preserveSize)
 {
     if (preserveSize)
-        return WriteElementHead(kTLVElementType_UInt16, tag, v);
+        return WriteElementHead(TLVElementType::UInt16, tag, v);
     return Put(tag, v);
 }
 
@@ -415,7 +415,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, uint32_t v)
 CHIP_ERROR TLVWriter::Put(uint64_t tag, uint32_t v, bool preserveSize)
 {
     if (preserveSize)
-        return WriteElementHead(kTLVElementType_UInt32, tag, v);
+        return WriteElementHead(TLVElementType::UInt32, tag, v);
     return Put(tag, v);
 }
 
@@ -426,13 +426,13 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, uint64_t v)
 {
     TLVElementType elemType;
     if (v <= UINT8_MAX)
-        elemType = kTLVElementType_UInt8;
+        elemType = TLVElementType::UInt8;
     else if (v <= UINT16_MAX)
-        elemType = kTLVElementType_UInt16;
+        elemType = TLVElementType::UInt16;
     else if (v <= UINT32_MAX)
-        elemType = kTLVElementType_UInt32;
+        elemType = TLVElementType::UInt32;
     else
-        elemType = kTLVElementType_UInt64;
+        elemType = TLVElementType::UInt64;
     return WriteElementHead(elemType, tag, v);
 }
 
@@ -442,7 +442,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, uint64_t v)
 CHIP_ERROR TLVWriter::Put(uint64_t tag, uint64_t v, bool preserveSize)
 {
     if (preserveSize)
-        return WriteElementHead(kTLVElementType_UInt64, tag, v);
+        return WriteElementHead(TLVElementType::UInt64, tag, v);
     return Put(tag, v);
 }
 
@@ -510,7 +510,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v)
 CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v, bool preserveSize)
 {
     if (preserveSize)
-        return WriteElementHead(kTLVElementType_Int8, tag, v);
+        return WriteElementHead(TLVElementType::Int8, tag, v);
     return Put(tag, v);
 }
 
@@ -528,7 +528,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int16_t v)
 CHIP_ERROR TLVWriter::Put(uint64_t tag, int16_t v, bool preserveSize)
 {
     if (preserveSize)
-        return WriteElementHead(kTLVElementType_Int16, tag, v);
+        return WriteElementHead(TLVElementType::Int16, tag, v);
     return Put(tag, v);
 }
 
@@ -546,7 +546,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int32_t v)
 CHIP_ERROR TLVWriter::Put(uint64_t tag, int32_t v, bool preserveSize)
 {
     if (preserveSize)
-        return WriteElementHead(kTLVElementType_Int32, tag, v);
+        return WriteElementHead(TLVElementType::Int32, tag, v);
     return Put(tag, v);
 }
 
@@ -557,13 +557,13 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int64_t v)
 {
     TLVElementType elemType;
     if (v >= INT8_MIN && v <= INT8_MAX)
-        elemType = kTLVElementType_Int8;
+        elemType = TLVElementType::Int8;
     else if (v >= INT16_MIN && v <= INT16_MAX)
-        elemType = kTLVElementType_Int16;
+        elemType = TLVElementType::Int16;
     else if (v >= INT32_MIN && v <= INT32_MAX)
-        elemType = kTLVElementType_Int32;
+        elemType = TLVElementType::Int32;
     else
-        elemType = kTLVElementType_Int64;
+        elemType = TLVElementType::Int64;
     return WriteElementHead(elemType, tag, v);
 }
 
@@ -573,7 +573,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int64_t v)
 CHIP_ERROR TLVWriter::Put(uint64_t tag, int64_t v, bool preserveSize)
 {
     if (preserveSize)
-        return WriteElementHead(kTLVElementType_Int64, tag, v);
+        return WriteElementHead(TLVElementType::Int64, tag, v);
     return Put(tag, v);
 }
 
@@ -588,7 +588,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, float v)
         uint32_t u32;
     } cvt;
     cvt.f = v;
-    return WriteElementHead(kTLVElementType_FloatingPointNumber32, tag, cvt.u32);
+    return WriteElementHead(TLVElementType::FloatingPointNumber32, tag, cvt.u32);
 }
 
 /**
@@ -625,7 +625,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, double v)
         uint64_t u64;
     } cvt;
     cvt.d = v;
-    return WriteElementHead(kTLVElementType_FloatingPointNumber64, tag, cvt.u64);
+    return WriteElementHead(TLVElementType::FloatingPointNumber64, tag, cvt.u64);
 }
 
 /**
@@ -992,7 +992,7 @@ exit:
  */
 CHIP_ERROR TLVWriter::PutNull(uint64_t tag)
 {
-    return WriteElementHead(kTLVElementType_Null, tag, 0);
+    return WriteElementHead(TLVElementType::Null, tag, 0);
 }
 
 /**
@@ -1102,7 +1102,7 @@ CHIP_ERROR TLVWriter::CopyElement(uint64_t tag, TLVReader & reader)
     uint32_t copyDataLen;
     uint8_t chunk[kCHIPTLVCopyChunkSize];
 
-    VerifyOrExit(elemType != kTLVElementType_NotSpecified && elemType != kTLVElementType_EndOfContainer,
+    VerifyOrExit(elemType != TLVElementType::NotSpecified && elemType != TLVElementType::EndOfContainer,
                  err = CHIP_ERROR_INCORRECT_STATE);
 
     // Initialize the helper
@@ -1281,7 +1281,7 @@ CHIP_ERROR TLVWriter::CloseContainer(TLVWriter & containerWriter)
     // Reset the container writer so that it can't accidentally be used again.
     containerWriter.Init(static_cast<uint8_t *>(nullptr), 0);
 
-    return WriteElementHead(kTLVElementType_EndOfContainer, AnonymousTag, 0);
+    return WriteElementHead(TLVElementType::EndOfContainer, AnonymousTag, 0);
 }
 
 /**
@@ -1399,7 +1399,7 @@ CHIP_ERROR TLVWriter::EndContainer(TLVType outerContainerType)
     if (IsCloseContainerReserved())
         mMaxLen += kEndOfContainerMarkerSize;
 
-    return WriteElementHead(kTLVElementType_EndOfContainer, AnonymousTag, 0);
+    return WriteElementHead(TLVElementType::EndOfContainer, AnonymousTag, 0);
 }
 
 /**
@@ -1671,16 +1671,16 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
             if (mContainerType != kTLVType_Structure && mContainerType != kTLVType_Path)
                 return CHIP_ERROR_INVALID_TLV_TAG;
 
-            Write8(p, kTLVTagControl_ContextSpecific | elemType);
+            Write8(p, TLVTagControl::ContextSpecific | elemType);
             Write8(p, static_cast<uint8_t>(tagNum));
         }
         else
         {
-            if (elemType != kTLVElementType_EndOfContainer && mContainerType != kTLVType_NotSpecified &&
+            if (elemType != TLVElementType::EndOfContainer && mContainerType != kTLVType_NotSpecified &&
                 mContainerType != kTLVType_Array && mContainerType != kTLVType_Path)
                 return CHIP_ERROR_INVALID_TLV_TAG;
 
-            Write8(p, kTLVTagControl_Anonymous | elemType);
+            Write8(p, TLVTagControl::Anonymous | elemType);
         }
     }
     else
@@ -1694,12 +1694,12 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
         {
             if (tagNum < 65536)
             {
-                Write8(p, kTLVTagControl_CommonProfile_2Bytes | elemType);
+                Write8(p, TLVTagControl::CommonProfile_2Bytes | elemType);
                 LittleEndian::Write16(p, static_cast<uint16_t>(tagNum));
             }
             else
             {
-                Write8(p, kTLVTagControl_CommonProfile_4Bytes | elemType);
+                Write8(p, TLVTagControl::CommonProfile_4Bytes | elemType);
                 LittleEndian::Write32(p, tagNum);
             }
         }
@@ -1707,12 +1707,12 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
         {
             if (tagNum < 65536)
             {
-                Write8(p, kTLVTagControl_ImplicitProfile_2Bytes | elemType);
+                Write8(p, TLVTagControl::ImplicitProfile_2Bytes | elemType);
                 LittleEndian::Write16(p, static_cast<uint16_t>(tagNum));
             }
             else
             {
-                Write8(p, kTLVTagControl_ImplicitProfile_4Bytes | elemType);
+                Write8(p, TLVTagControl::ImplicitProfile_4Bytes | elemType);
                 LittleEndian::Write32(p, tagNum);
             }
         }
@@ -1723,14 +1723,14 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
 
             if (tagNum < 65536)
             {
-                Write8(p, kTLVTagControl_FullyQualified_6Bytes | elemType);
+                Write8(p, TLVTagControl::FullyQualified_6Bytes | elemType);
                 LittleEndian::Write16(p, vendorId);
                 LittleEndian::Write16(p, profileNum);
                 LittleEndian::Write16(p, static_cast<uint16_t>(tagNum));
             }
             else
             {
-                Write8(p, kTLVTagControl_FullyQualified_8Bytes | elemType);
+                Write8(p, TLVTagControl::FullyQualified_8Bytes | elemType);
                 LittleEndian::Write16(p, vendorId);
                 LittleEndian::Write16(p, profileNum);
                 LittleEndian::Write32(p, tagNum);
