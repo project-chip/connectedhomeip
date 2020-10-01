@@ -130,7 +130,7 @@ public:
      * @brief
      *   Handler for peer's messages, exchanged during pairing handshake.
      *
-     * @param header      Message header for the received message
+     * @param packetHeader      Message header for the received message
      * @param msg         Message sent by the peer
      * @return CHIP_ERROR The result of message processing
      */
