@@ -126,7 +126,7 @@ groups:
     ############################################################
     #  Label Based Reviewers
     ############################################################
-     codeowners-android:
+    codeowners-android:
          type: optional
          conditions:
              - "'android' in labels"
