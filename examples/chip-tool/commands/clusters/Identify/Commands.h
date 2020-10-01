@@ -25,10 +25,10 @@ class Identify : public ModelCommand
 {
 public:
     Identify(const uint16_t clusterId) : ModelCommand("identify", clusterId) {}
-    size_t EncodeCommand(PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) override
+    size_t EncodeCommand(PacketBuffer * buffer, size_t bufferSize, uint8_t endpointId, uint16_t clusterId) override
     {
         uint16_t duration = 10;
-        return encodeIdentifyCommand(buffer->Start(), bufferSize, endPointId, duration);
+        return encodeCommand(buffer->Start(), bufferSize, endpointId, clusterId, 0x00, duration);
     }
 };
 
@@ -36,9 +36,9 @@ class IdentifyQuery : public ModelCommand
 {
 public:
     IdentifyQuery(const uint16_t clusterId) : ModelCommand("identify-query", clusterId) {}
-    size_t EncodeCommand(PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) override
+    size_t EncodeCommand(PacketBuffer * buffer, size_t bufferSize, uint8_t endpointId, uint16_t clusterId) override
     {
-        return encodeIdentifyQueryCommand(buffer->Start(), bufferSize, endPointId);
+        return encodeCommand(buffer->Start(), bufferSize, endpointId, clusterId, 0x01);
     }
 
     bool HandleClusterResponse(uint8_t * message, uint16_t messageLen) const override

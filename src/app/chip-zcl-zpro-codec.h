@@ -20,6 +20,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <support/BufBound.h>
 
 typedef uint16_t EmberApsOption;
 
@@ -48,33 +49,6 @@ typedef struct
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/** @brief Encode an on command for on-off server into buffer including the APS frame
- */
-uint16_t encodeOnCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
-
-/** @brief Encode an off command for on-off server into buffer including the APS frame
- */
-
-uint16_t encodeOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
-
-/** @brief Encode a toggle command for on-off server into buffer including the APS frame
- */
-
-uint16_t encodeToggleCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
-
-/**
- * @brief Encode a Read Attributes command for the given cluster and the given
- * list of attributes.
- */
-uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t cluster_id,
-                                     uint16_t * attr_ids, uint16_t attr_id_count);
-
-/**
- * @brief Encode a command to read the OnOff attribute from the on/off
- * cluster.
- */
-uint16_t encodeReadOnOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
 /** @brief Extracts an aps frame from buffer into outApsFrame
  * @param buffer Buffer to read from
@@ -115,29 +89,62 @@ void printApsFrame(EmberApsFrame * frame);
  */
 uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame);
 
-/**
- * Identify cluster commands
- * */
-
-/**
- * @brief Encode an identify query command for the identify cluster
- * @param buffer Buffer to encode into
- * @param buf_length Length of buffer
- * @param destination_endpoint destination endpoint
- * */
-uint16_t encodeIdentifyQueryCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
-
-/**
- * @brief Encode an identify command for the identify cluster
- * @param buffer Buffer to encode into
- * @param buf_length Length of buffer
- * @param destination_endpoint destination endpoint
- * @param duration The duration for which the device will identify itself
- * */
-uint16_t encodeIdentifyCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t duration);
-
 #ifdef __cplusplus
 }
 #endif
+
+uint16_t encodeClusterSpecificCommandHeader(chip::BufBound & buf, uint8_t endpointId, uint16_t clusterId, uint8_t commandId);
+
+uint16_t encodeGlobalCommandHeader(chip::BufBound & buf, uint8_t endpointId, uint16_t clusterId, uint8_t commandIdId);
+
+template <typename... Args>
+void encodeCommand(chip::BufBound & buf, Args... args)
+{}
+
+template <typename... Args>
+void encodeCommand(chip::BufBound & buf, uint8_t value, Args... args)
+{
+    buf.Put(value);
+    encodeCommand(buf, args...);
+}
+
+template <typename... Args>
+void encodeCommand(chip::BufBound & buf, uint16_t value, Args... args)
+{
+    buf.PutLE16(value);
+    encodeCommand(buf, args...);
+}
+
+/**
+ * @brief Encode a Cluster Specific command for the given cluster and the given values.
+ */
+template <typename... Args>
+uint16_t encodeCommand(uint8_t * buffer, uint16_t bufferLen, uint8_t endpointId, uint16_t clusterId, uint8_t commandId,
+                       Args... args)
+{
+    chip::BufBound buf = chip::BufBound(buffer, bufferLen);
+    if (encodeClusterSpecificCommandHeader(buf, endpointId, clusterId, commandId))
+    {
+        encodeCommand(buf, args...);
+    }
+
+    return buf.Fit() && chip::CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;
+}
+
+/**
+ * @brief Encode a Global command for the given cluster and the given values.
+ */
+template <typename... Args>
+uint16_t encodeGlobalCommand(uint8_t * buffer, uint16_t bufferLen, uint8_t endpointId, uint16_t clusterId, uint8_t commandId,
+                             Args... args)
+{
+    chip::BufBound buf = chip::BufBound(buffer, bufferLen);
+    if (encodeGlobalCommandHeader(buf, endpointId, clusterId, commandId))
+    {
+        encodeCommand(buf, args...);
+    }
+
+    return buf.Fit() && chip::CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;
+}
 
 #endif // CHIP_ZCL_ZPRO_CODEC_H
