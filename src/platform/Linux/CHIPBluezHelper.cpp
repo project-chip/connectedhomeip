@@ -126,7 +126,7 @@ static BluezLEAdvertisement1 * BluezAdvertisingCreate(BluezEndpoint * apEndpoint
     serviceData = g_variant_builder_end(&serviceDataBuilder);
     serviceUUID = g_variant_builder_end(&serviceUUIDsBuilder);
 
-    debugStr    = g_variant_print(serviceData, TRUE);
+    debugStr = g_variant_print(serviceData, TRUE);
     ChipLogProgress(DeviceLayer, "SET service data to %s", debugStr);
     g_free(debugStr);
 
