@@ -93,7 +93,12 @@ action("python") {
     "chip/__init__.py",
   ]
 
-  args = [ "--package_name", "chip", "--build_number", "0.0" ]
+  args = [
+    "--package_name",
+    "chip",
+    "--build_number",
+    "0.0",
+  ]
 
   public_deps = [
     ":deviceControllerPyCopy1",
