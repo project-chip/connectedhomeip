@@ -53,12 +53,12 @@ For more information on Qorvo and the platforms, please visit
 
 ```
 # Linux
-sudo apt-get install git make automake libtool ccache
+sudo apt-get install git make libtool ccache ninja-build
 ```
 
 ```
 # Mac OS X
-brew install automake libtool ccache
+brew install libtool ccache ninja
 ```
 
 -   Clone the [CHIP](https://github.com/project-chip/connectedhomeip) repo into
@@ -83,19 +83,12 @@ git clone https://github.com/Qorvo/qpg-connectedhomeip
 -   Set the following environment variables before compilation:
 
 ```
-export CHIP_ROOT=${HOME}/connectedhomeip
 export ARM_GCC_INSTALL_ROOT=${HOME}/tools/gcc-arm-none-eabi-9-2019-q4-major/bin
-export QPG6100_SDK_ROOT=${HOME}/qpg-connectedhomeip
+export PATH=$PATH:$ARM_GCC_INSTALL_ROOT
+export QPG6100_SDK_ROOT=${HOME}/qpg-connectedhomeip 
 ```
 
--   make based
-
-```
-cd ~/connectedhomeip/examples/lock-app/qpg6100
-make -j
-```
-
--   GN/ninja based
+-   All builds are GN/ninja based
 
 ```
 cd ~/connectedhomeip/examples/lock-app/qpg6100
