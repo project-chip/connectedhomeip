@@ -142,7 +142,7 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protoc
         .SetEncryptionKeyID(mPairingSession.GetLocalKeyId()) //
         .SetPayloadLength(static_cast<uint16_t>(headerSize + msgBuf->TotalLength()));
 
-    payloadHeader.SetProtocolID(protocol).SetMessageType(msgType);
+    payloadHeader.SetProtocolID(static_cast<uint16_t>(protocol)).SetMessageType(msgType);
 
     VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
@@ -350,11 +350,15 @@ void RendezvousSession::SendIPAddress(const IPAddress & addr)
     CHIP_ERROR err                = CHIP_NO_ERROR;
     System::PacketBuffer * buffer = System::PacketBuffer::New();
     char * addrStr                = addr.ToString(Uint8::to_char(buffer->Start()), buffer->AvailableDataLength());
+    size_t addrLen                = 0;
 
     VerifyOrExit(addrStr != nullptr, err = CHIP_ERROR_INVALID_ADDRESS);
     VerifyOrExit(mPairingInProgress == false, err = CHIP_ERROR_INCORRECT_STATE);
 
-    buffer->SetDataLength(strlen(addrStr) + 1);
+    addrLen = strlen(addrStr) + 1;
+
+    VerifyOrExit(CanCastTo<uint16_t>(addrLen), err = CHIP_ERROR_INVALID_ARGUMENT);
+    buffer->SetDataLength(static_cast<uint16_t>(addrLen));
 
     err = SendSecureMessage(Protocols::kChipProtocol_NetworkProvisioning, NetworkProvisioningMsgTypes::kIPAddressAssigned, buffer);
     SuccessOrExit(err);
