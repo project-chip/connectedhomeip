@@ -1,0 +1,65 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/k32w_sdk.gni")
+import("//build_overrides/openthread.gni")
+
+config("openthread_k32w_config") {
+  include_dirs = [ 
+    "${openthread_root}/examples/platforms/k32w/",
+    "${openthread_root}/examples/platforms/k32w/k32w061", 
+    ]
+
+  include_dirs += [
+    "${chip_root}/examples/platform/k32w",
+  ]
+}
+
+source_set("openthread_core_config_k32w") {
+  sources = [
+    "${openthread_root}/examples/platforms/k32w/k32w061/openthread-core-k32w061-config-check.h",
+    "${openthread_root}/examples/platforms/k32w/k32w061/openthread-core-k32w061-config.h",
+  ]
+
+  public_deps = [ "${k32w_sdk_build_root}:k32w_sdk" ]
+
+  public_configs = [ ":openthread_k32w_config" ]
+}
+
+source_set("openthread_mbedtls_config_k32w") {
+  sources = [ "${openthread_root}/examples/platforms/k32w/k32w061/k32w061-mbedtls-config.h" ]
+}
+
+source_set("libopenthread-k32w") {
+  sources = [
+    "${openthread_root}/examples/platforms/k32w/src/alarm.c",
+    "${openthread_root}/examples/platforms/k32w/src/diag.c",
+    "${openthread_root}/examples/platforms/k32w/src/entropy.c",
+    "${openthread_root}/examples/platforms/k32w/src/flash.c",
+    "${openthread_root}/examples/platforms/k32w/src/logging.c",
+    "${openthread_root}/examples/platforms/k32w/src/misc.c",
+    "${openthread_root}/examples/platforms/k32w/src/radio.c",
+    "${openthread_root}/examples/platforms/k32w/src/settings_k32w.c",
+    "${openthread_root}/examples/platforms/k32w/src/system.c",
+    "${openthread_root}/examples/platforms/k32w/src/uart.c",
+  ]
+
+  public_deps = [
+    ":openthread_core_config_k32w",
+    "${openthread_root}/src/core:libopenthread_core_headers",
+    "..:libopenthread-platform",
+    "..:libopenthread-platform-utils",
+  ]
+}

@@ -26,8 +26,8 @@
 #define OPENTHREAD_PLATFORM_CONFIG_H
 
 // Disable the Nxp-supplied OpenThread logging facilities and use
-// the facilities provided by the OpenWeave Device Layer (see
-// openweave/src/adaptations/device-layer/K32W/Logging.cpp).
+// the facilities provided by the Device Layer (see
+// src/platform/K32W/Logging.cpp).
 #define OPENTHREAD_CONFIG_LOG_OUTPUT OPENTHREAD_CONFIG_LOG_OUTPUT_APP
 
 // When operating in a less than ideal RF environment, having a more forgiving configuration
