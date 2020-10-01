@@ -174,9 +174,6 @@
 #define EMBER_CALLBACK_SCENES_CLUSTER_REMOVE_ALL_SCENES_RESPONSE
 #define EMBER_CALLBACK_SCENES_CLUSTER_STORE_SCENE_RESPONSE
 #define EMBER_CALLBACK_SCENES_CLUSTER_GET_SCENE_MEMBERSHIP_RESPONSE
-#define EMBER_CALLBACK_ENERGY_SCAN_RESULT
-#define EMBER_CALLBACK_SCAN_COMPLETE
-#define EMBER_CALLBACK_NETWORK_FOUND
 #define EMBER_CALLBACK_GROUPS_CLUSTER_ADD_GROUP_RESPONSE
 #define EMBER_CALLBACK_GROUPS_CLUSTER_VIEW_GROUP_RESPONSE
 #define EMBER_CALLBACK_GROUPS_CLUSTER_GET_GROUP_MEMBERSHIP_RESPONSE
@@ -369,15 +366,6 @@
 #define EMBER_AF_PLUGIN_MBEDTLS_CONF_DEVICE_ACCELERATION
 #define EMBER_AF_PLUGIN_MBEDTLS_CONF_DEVICE_ACCELERATION_APP
 
-// Use this macro to check if Network Steering plugin is included
-#define EMBER_AF_PLUGIN_NETWORK_STEERING
-// User options for plugin Network Steering
-#define EMBER_AF_PLUGIN_NETWORK_STEERING_CHANNEL_MASK 0x0318C800
-#define EMBER_AF_PLUGIN_NETWORK_STEERING_RADIO_TX_POWER 3
-#define EMBER_AF_PLUGIN_NETWORK_STEERING_SCAN_DURATION 4
-#define EMBER_AF_PLUGIN_NETWORK_STEERING_COMMISSIONING_TIME_S 180
-#define EMBER_AF_PLUGIN_NETWORK_STEERING_OPTIMIZE_SCANS
-
 // Use this macro to check if NVM3 Library plugin is included
 #define EMBER_AF_PLUGIN_NVM3
 // User options for plugin NVM3 Library
@@ -403,11 +391,6 @@
 #define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE 5
 #define EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS
 
-// Use this macro to check if Scan Dispatch plugin is included
-#define EMBER_AF_PLUGIN_SCAN_DISPATCH
-// User options for plugin Scan Dispatch
-#define EMBER_AF_PLUGIN_SCAN_DISPATCH_SCAN_QUEUE_SIZE 10
-
 // Use this macro to check if Scenes Server Cluster plugin is included
 #define EMBER_AF_PLUGIN_SCENES
 // User options for plugin Scenes Server Cluster
@@ -430,11 +413,6 @@
 // User options for plugin Strong Random
 #define EMBER_AF_PLUGIN_STRONG_RANDOM_RADIO_PRNG
 #define USE_RADIO_API_FOR_TRNG
-
-// Use this macro to check if Update TC Link Key plugin is included
-#define EMBER_AF_PLUGIN_UPDATE_TC_LINK_KEY
-// User options for plugin Update TC Link Key
-#define EMBER_AF_PLUGIN_UPDATE_TC_LINK_KEY_MAX_ATTEMPTS 3
 
 // Use this macro to check if ZCL Framework Core plugin is included
 #define EMBER_AF_PLUGIN_ZCL_FRAMEWORK_CORE
@@ -468,12 +446,6 @@
     "Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/platform/radio/rail_lib/plugin/coexistence/protocol/"         \
     "ieee802154/coexistence-802154.h"
 
-// API network-steering from Network Steering plugin
-#define EMBER_AF_API_NETWORK_STEERING                                                                                              \
-    "../../../../../Applications/Simplicity "                                                                                      \
-    "Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/protocol/zigbee/app/framework/plugin/network-steering/"       \
-    "network-steering.h"
-
 // API nvm3 from NVM3 Library plugin
 #define EMBER_AF_API_NVM3                                                                                                          \
     "../../../../../Applications/Simplicity "                                                                                      \
@@ -484,22 +456,10 @@
     "../../../../../Applications/Simplicity "                                                                                      \
     "Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/platform/radio/rail_lib/common/rail.h"
 
-// API scan-dispatch from Scan Dispatch plugin
-#define EMBER_AF_API_SCAN_DISPATCH                                                                                                 \
-    "../../../../../Applications/Simplicity "                                                                                      \
-    "Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/protocol/zigbee/app/framework/plugin/scan-dispatch/"          \
-    "scan-dispatch.h"
-
 // API serial from Serial plugin
 #define EMBER_AF_API_SERIAL                                                                                                        \
     "../../../../../Applications/Simplicity "                                                                                      \
     "Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/platform/base/hal/plugin/serial/serial.h"
-
-// API update-tc-link-key from Update TC Link Key plugin
-#define EMBER_AF_API_UPDATE_TC_LINK_KEY                                                                                            \
-    "../../../../../Applications/Simplicity "                                                                                      \
-    "Studio.app/Contents/Eclipse/developer/sdks/gecko_sdk_suite/v3.0/protocol/zigbee/app/framework/plugin/update-tc-link-key/"     \
-    "update-tc-link-key.h"
 
 // API command-interpreter2 from ZCL Framework Core plugin
 #define EMBER_AF_API_COMMAND_INTERPRETER2                                                                                          \

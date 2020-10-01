@@ -162,7 +162,7 @@ void ModelCommand::ParseDefaultResponseCommand(uint8_t * message, uint16_t messa
     commandId = chip::Encoding::Read8(message);
     status    = chip::Encoding::Read8(message);
 
-    ChipLogProgress(chipTool, "Got default response to command '0x%02x' for cluster '0x%02x'.  Status is '0x%02x'", commandId,
+    ChipLogProgress(chipTool, "Got default response to command '0x%02x' for cluster '0x%04x'.  Status is '0x%02x'", commandId,
                     mClusterId, status);
 
 exit:
@@ -209,7 +209,7 @@ void ModelCommand::ParseReadAttributeResponseCommandSuccess(uint16_t attrId, uin
     type  = chip::Encoding::Read8(message);
     value = chip::Encoding::Read8(message);
 
-    ChipLogProgress(chipTool, "Read attribute '0x%04x' for cluster '0x%02x'.  Type is '0x%02x', value is '0x%02x'", attrId,
+    ChipLogProgress(chipTool, "Read attribute '0x%04x' for cluster '0x%04x'.  Type is '0x%02x', value is '0x%02x'", attrId,
                     mClusterId, type, value);
 
 exit:
@@ -219,7 +219,7 @@ exit:
 void ModelCommand::ParseReadAttributeResponseCommandFailure(uint16_t attrId, uint8_t status, uint16_t messageLen) const
 {
     CHECK_MESSAGE_LENGTH(messageLen == 0);
-    ChipLogProgress(chipTool, "Reading attribute '0x%04x' for cluster '0x%02x' failed with status '0x%02x'", attrId, mClusterId,
+    ChipLogProgress(chipTool, "Reading attribute '0x%04x' for cluster '0x%04x' failed with status '0x%02x'", attrId, mClusterId,
                     status);
 
 exit:
