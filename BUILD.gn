@@ -69,9 +69,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
         "${chip_root}/src/setup_payload",
       ]
       if (current_os == "linux") {
-        deps += [
-          "${chip_root}/src/controller/python",
-        ]
+        deps += [ "${chip_root}/src/controller/python" ]
       }
     }
 
