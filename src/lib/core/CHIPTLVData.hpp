@@ -104,41 +104,41 @@
 /*
  *  @brief Specifies an anonymous TLV element, which doesn't have any tag
  */
-#define CHIP_TLV_TAG_ANONYMOUS chip::TLV::kTLVTagControl_Anonymous
+#define CHIP_TLV_TAG_ANONYMOUS chip::TLV::TLVTagControl::Anonymous
 
 /*
  *  @brief Specifies a TLV element with a context-specific tag
  *  @param Tag      The context-specific tag for this TLV element. Would be truncated to 8 bits.
  */
-#define CHIP_TLV_TAG_CONTEXT_SPECIFIC(Tag) chip::TLV::kTLVTagControl_ContextSpecific, CHIP_TLV_Serialize8(Tag)
+#define CHIP_TLV_TAG_CONTEXT_SPECIFIC(Tag) chip::TLV::TLVTagControl::ContextSpecific, CHIP_TLV_Serialize8(Tag)
 
 /*
  *  @brief Specifies a TLV element with a Common Profile tag
  *  @param Tag      The tag for this TLV element, defined under Common Profile.
  *                  Would be truncated to 16 bites.
  */
-#define CHIP_TLV_TAG_COMMON_PROFILE_2Bytes(Tag) chip::TLV::kTLVTagControl_CommonProfile_2Bytes, CHIP_TLV_Serialize16(Tag)
+#define CHIP_TLV_TAG_COMMON_PROFILE_2Bytes(Tag) chip::TLV::TLVTagControl::CommonProfile_2Bytes, CHIP_TLV_Serialize16(Tag)
 
 /*
  *  @brief Specifies a TLV element with a Common Profile tag
  *  @param Tag      The tag for this TLV element, defined under Common Profile.
  *                  Would be truncated to 32 bites.
  */
-#define CHIP_TLV_TAG_COMMON_PROFILE_4Bytes(Tag) chip::TLV::kTLVTagControl_CommonProfile_4Bytes, CHIP_TLV_Serialize32(Tag)
+#define CHIP_TLV_TAG_COMMON_PROFILE_4Bytes(Tag) chip::TLV::TLVTagControl::CommonProfile_4Bytes, CHIP_TLV_Serialize32(Tag)
 
 /*
  *  @brief Specifies a TLV element with an Implicit Profile tag
  *  @param Tag      The tag for this TLV element, defined under the current implicit profile.
  *                  Would be truncated to 16 bits.
  */
-#define CHIP_TLV_TAG_IMPLICIT_PROFILE_2Bytes(Tag) chip::TLV::kTLVTagControl_ImplicitProfile_2Bytes, CHIP_TLV_Serialize16(Tag)
+#define CHIP_TLV_TAG_IMPLICIT_PROFILE_2Bytes(Tag) chip::TLV::TLVTagControl::ImplicitProfile_2Bytes, CHIP_TLV_Serialize16(Tag)
 
 /*
  *  @brief Specifies a TLV element with an Implicit Profile tag
  *  @param Tag      The tag for this TLV element, defined under the current implicit profile.
  *                  Would be truncated to 32 bits.
  */
-#define CHIP_TLV_TAG_IMPLICIT_PROFILE_4Bytes(Tag) chip::TLV::kTLVTagControl_ImplicitProfile_4Bytes, CHIP_TLV_Serialize32(Tag)
+#define CHIP_TLV_TAG_IMPLICIT_PROFILE_4Bytes(Tag) chip::TLV::TLVTagControl::ImplicitProfile_4Bytes, CHIP_TLV_Serialize32(Tag)
 
 /*
  *  @brief Specifies a TLV element with a Fully Qualified tag
@@ -147,7 +147,7 @@
  *                      Would be truncated to 16 bits.
  */
 #define CHIP_TLV_TAG_FULLY_QUALIFIED_6Bytes(ProfileId, Tag)                                                                        \
-    chip::TLV::kTLVTagControl_FullyQualified_6Bytes, CHIP_TLV_Serialize16(ProfileId >> 16), CHIP_TLV_Serialize16(ProfileId),       \
+    chip::TLV::TLVTagControl::FullyQualified_6Bytes, CHIP_TLV_Serialize16(ProfileId >> 16), CHIP_TLV_Serialize16(ProfileId),       \
         CHIP_TLV_Serialize16(Tag)
 
 /*
@@ -157,32 +157,32 @@
  *                      Would be truncated to 32 bits.
  */
 #define CHIP_TLV_TAG_FULLY_QUALIFIED_8Bytes(ProfileId, Tag)                                                                        \
-    chip::TLV::kTLVTagControl_FullyQualified_8Bytes, CHIP_TLV_Serialize16(ProfileId >> 16), CHIP_TLV_Serialize16(ProfileId),       \
+    chip::TLV::TLVTagControl::FullyQualified_8Bytes, CHIP_TLV_Serialize16(ProfileId >> 16), CHIP_TLV_Serialize16(ProfileId),       \
         CHIP_TLV_Serialize32(Tag)
 
 /*
  *  @brief Specifies a NULL TLV element, which has just the tag but no value
  *  @param TagSpec      Should be filled with macros begin with CHIP_TLV_TAG_
  */
-#define CHIP_TLV_NULL(TagSpec) chip::TLV::kTLVElementType_Null | TagSpec
+#define CHIP_TLV_NULL(TagSpec) chip::TLV::TLVElementType::Null | TagSpec
 
 /*
  *  @brief Specifies a Structure TLV element, marking the beginning of a Structure
  *  @param TagSpec      Should be filled with macros begin with CHIP_TLV_TAG_
  */
-#define CHIP_TLV_STRUCTURE(TagSpec) chip::TLV::kTLVElementType_Structure | TagSpec
+#define CHIP_TLV_STRUCTURE(TagSpec) chip::TLV::TLVElementType::Structure | TagSpec
 
 /*
  *  @brief Specifies a Array TLV element, marking the beginning of an Array
  *  @param TagSpec      Should be filled with macros begin with CHIP_TLV_TAG_
  */
-#define CHIP_TLV_ARRAY(TagSpec) chip::TLV::kTLVElementType_Array | TagSpec
+#define CHIP_TLV_ARRAY(TagSpec) chip::TLV::TLVElementType::Array | TagSpec
 
 /*
  *  @brief Specifies a Path TLV element, marking the beginning of a Path
  *  @param TagSpec      Should be filled with macros begin with CHIP_TLV_TAG_
  */
-#define CHIP_TLV_PATH(TagSpec) chip::TLV::kTLVElementType_Path | TagSpec
+#define CHIP_TLV_PATH(TagSpec) chip::TLV::TLVElementType::Path | TagSpec
 
 /*
  *  @brief Specifies a Boolean TLV element, which can be either true or false
@@ -190,7 +190,7 @@
  *  @param Value        Should be either true or false
  */
 #define CHIP_TLV_BOOL(TagSpec, Value)                                                                                              \
-    ((Value) ? chip::TLV::kTLVElementType_BooleanTrue : chip::TLV::kTLVElementType_BooleanFalse) | TagSpec
+    ((Value) ? chip::TLV::TLVElementType::BooleanTrue : chip::TLV::TLVElementType::BooleanFalse) | TagSpec
 
 /**
  *  @brief
@@ -200,7 +200,7 @@
  *
  *  @param ...          Bytes representing the floating point value to serialize
  */
-#define CHIP_TLV_FLOAT32(TagSpec, ...) chip::TLV::kTLVElementType_FloatingPointNumber32 | TagSpec, ##__VA_ARGS__
+#define CHIP_TLV_FLOAT32(TagSpec, ...) chip::TLV::TLVElementType::FloatingPointNumber32 | TagSpec, ##__VA_ARGS__
 
 /**
  *  @brief
@@ -210,12 +210,12 @@
  *
  *  @param ...          Bytes representing the floating point value to serialize
  */
-#define CHIP_TLV_FLOAT64(TagSpec, ...) chip::TLV::kTLVElementType_FloatingPointNumber64 | TagSpec, ##__VA_ARGS__
+#define CHIP_TLV_FLOAT64(TagSpec, ...) chip::TLV::TLVElementType::FloatingPointNumber64 | TagSpec, ##__VA_ARGS__
 
 /*
  *  @brief Specifies a EndOfContainer TLV element, marking the end of a Structure, Array, or Path
  */
-#define CHIP_TLV_END_OF_CONTAINER chip::TLV::kTLVElementType_EndOfContainer | chip::TLV::kTLVTagControl_Anonymous
+#define CHIP_TLV_END_OF_CONTAINER chip::TLV::TLVElementType::EndOfContainer | chip::TLV::TLVTagControl::Anonymous
 
 /*
  *  @brief Specifies a EndOfContainer TLV element, marking the end of a Structure, Array, or Path
@@ -237,56 +237,56 @@
  *  @param TagSpec      Should be filled with macros begin with CHIP_TLV_TAG_
  *  @param Value        Would be first converted to int8_t, and then serialized
  */
-#define CHIP_TLV_INT8(TagSpec, Value) chip::TLV::kTLVElementType_Int8 | TagSpec, CHIP_TLV_Serialize8(int8_t(Value))
+#define CHIP_TLV_INT8(TagSpec, Value) chip::TLV::TLVElementType::Int8 | TagSpec, CHIP_TLV_Serialize8(int8_t(Value))
 
 /*
  *  @brief Specifies a 16-bit Signed Integer TLV element
  *  @param TagSpec      Should be filled with macros begin with CHIP_TLV_TAG_
  *  @param Value        Would be first converted to int16_t, and then serialized
  */
-#define CHIP_TLV_INT16(TagSpec, Value) chip::TLV::kTLVElementType_Int16 | TagSpec, CHIP_TLV_Serialize16(int16_t(Value))
+#define CHIP_TLV_INT16(TagSpec, Value) chip::TLV::TLVElementType::Int16 | TagSpec, CHIP_TLV_Serialize16(int16_t(Value))
 
 /*
  *  @brief Specifies a 32-bit Signed Integer TLV element
  *  @param TagSpec      Should be filled with macros begin with CHIP_TLV_TAG_
  *  @param Value        Would be first converted to int32_t, and then serialized
  */
-#define CHIP_TLV_INT32(TagSpec, Value) chip::TLV::kTLVElementType_Int32 | TagSpec, CHIP_TLV_Serialize32(int32_t(Value))
+#define CHIP_TLV_INT32(TagSpec, Value) chip::TLV::TLVElementType::Int32 | TagSpec, CHIP_TLV_Serialize32(int32_t(Value))
 
 /*
  *  @brief Specifies a 32-bit Signed Integer TLV element
  *  @param TagSpec      Should be filled with macros begin with CHIP_TLV_TAG_
  *  @param Value        Would be first converted to int64_t, and then serialized
  */
-#define CHIP_TLV_INT64(TagSpec, Value) chip::TLV::kTLVElementType_Int64 | TagSpec, CHIP_TLV_Serialize64(int64_t(Value))
+#define CHIP_TLV_INT64(TagSpec, Value) chip::TLV::TLVElementType::Int64 | TagSpec, CHIP_TLV_Serialize64(int64_t(Value))
 
 /*
  *  @brief Specifies an 8-bit Unsigned Integer TLV element
  *  @param TagSpec      Should be filled with macros begin with CHIP_TLV_TAG_
  *  @param Value        Would be first converted to (uint8_t), and then serialized
  */
-#define CHIP_TLV_UINT8(TagSpec, Value) chip::TLV::kTLVElementType_UInt8 | TagSpec, CHIP_TLV_Serialize8((uint8_t)(Value))
+#define CHIP_TLV_UINT8(TagSpec, Value) chip::TLV::TLVElementType::UInt8 | TagSpec, CHIP_TLV_Serialize8((uint8_t)(Value))
 
 /*
  *  @brief Specifies a 16-bit Unsigned Integer TLV element
  *  @param TagSpec      Should be filled with macros begin with CHIP_TLV_TAG_
  *  @param Value        Would be first converted to (uint16_t), and then serialized
  */
-#define CHIP_TLV_UINT16(TagSpec, Value) chip::TLV::kTLVElementType_UInt16 | TagSpec, CHIP_TLV_Serialize16((uint16_t)(Value))
+#define CHIP_TLV_UINT16(TagSpec, Value) chip::TLV::TLVElementType::UInt16 | TagSpec, CHIP_TLV_Serialize16((uint16_t)(Value))
 
 /*
  *  @brief Specifies a 32-bit Unsigned Integer TLV element
  *  @param TagSpec      Should be filled with macros begin with CHIP_TLV_TAG_
  *  @param Value        Would be first converted to (uint32_t), and then serialized
  */
-#define CHIP_TLV_UINT32(TagSpec, Value) chip::TLV::kTLVElementType_UInt32 | TagSpec, CHIP_TLV_Serialize32((uint32_t)(Value))
+#define CHIP_TLV_UINT32(TagSpec, Value) chip::TLV::TLVElementType::UInt32 | TagSpec, CHIP_TLV_Serialize32((uint32_t)(Value))
 
 /*
  *  @brief Specifies a 64-bit Unsigned Integer TLV element
  *  @param TagSpec      Should be filled with macros begin with CHIP_TLV_TAG_
  *  @param Value        Would be first converted to (uint64_t), and then serialized
  */
-#define CHIP_TLV_UINT64(TagSpec, Value) chip::TLV::kTLVElementType_UInt64 | TagSpec, CHIP_TLV_Serialize64((uint64_t)(Value))
+#define CHIP_TLV_UINT64(TagSpec, Value) chip::TLV::TLVElementType::UInt64 | TagSpec, CHIP_TLV_Serialize64((uint64_t)(Value))
 
 /**
  *  @brief
@@ -299,7 +299,7 @@
  *  @param ...                  Bytes representing the string characters to serialize
  */
 #define CHIP_TLV_UTF8_STRING_1ByteLength(TagSpec, StringLength, ...)                                                               \
-    chip::TLV::kTLVElementType_UTF8String_1ByteLength | TagSpec, CHIP_TLV_Serialize8((uint8_t)(StringLength)), ##__VA_ARGS__
+    chip::TLV::TLVElementType::UTF8String_1ByteLength | TagSpec, CHIP_TLV_Serialize8((uint8_t)(StringLength)), ##__VA_ARGS__
 
 /**
  *  @brief
@@ -312,7 +312,7 @@
  *  @param ...                  Bytes representing the string characters to serialize
  */
 #define CHIP_TLV_UTF8_STRING_2ByteLength(TagSpec, StringLength, ...)                                                               \
-    chip::TLV::kTLVElementType_UTF8String_2ByteLength | TagSpec, CHIP_TLV_Serialize16((uint16_t)(StringLength)), ##__VA_ARGS__
+    chip::TLV::TLVElementType::UTF8String_2ByteLength | TagSpec, CHIP_TLV_Serialize16((uint16_t)(StringLength)), ##__VA_ARGS__
 
 /**
  *  @brief
@@ -325,7 +325,7 @@
  *  @param ...                  Bytes representing the string characters to serialize
  */
 #define CHIP_TLV_UTF8_STRING_4ByteLength(TagSpec, StringLength, ...)                                                               \
-    chip::TLV::kTLVElementType_UTF8String_4ByteLength | TagSpec, CHIP_TLV_Serialize32((uint32_t)(StringLength)), ##__VA_ARGS__
+    chip::TLV::TLVElementType::UTF8String_4ByteLength | TagSpec, CHIP_TLV_Serialize32((uint32_t)(StringLength)), ##__VA_ARGS__
 
 /**
  *  @brief
@@ -338,7 +338,7 @@
  *  @param ...                  Bytes representing the string characters to serialize
  */
 #define CHIP_TLV_UTF8_STRING_8ByteLength(TagSpec, StringLength, ...)                                                               \
-    chip::TLV::kTLVElementType_UTF8String_8ByteLength | TagSpec, CHIP_TLV_Serialize64((uint64_t)(StringLength)), ##__VA_ARGS__
+    chip::TLV::TLVElementType::UTF8String_8ByteLength | TagSpec, CHIP_TLV_Serialize64((uint64_t)(StringLength)), ##__VA_ARGS__
 
 /**
  *  @brief
@@ -351,7 +351,7 @@
  *  @param ...                  Bytes to serialize
  */
 #define CHIP_TLV_BYTE_STRING_1ByteLength(TagSpec, StringLength, ...)                                                               \
-    chip::TLV::kTLVElementType_ByteString_1ByteLength | TagSpec, CHIP_TLV_Serialize8((uint8_t)(StringLength)), ##__VA_ARGS__
+    chip::TLV::TLVElementType::ByteString_1ByteLength | TagSpec, CHIP_TLV_Serialize8((uint8_t)(StringLength)), ##__VA_ARGS__
 
 /**
  *  @brief
@@ -364,7 +364,7 @@
  *  @param ...                  Bytes to serialize
  */
 #define CHIP_TLV_BYTE_STRING_2ByteLength(TagSpec, StringLength, ...)                                                               \
-    chip::TLV::kTLVElementType_ByteString_2ByteLength | TagSpec, CHIP_TLV_Serialize16((uint16_t)(StringLength)), ##__VA_ARGS__
+    chip::TLV::TLVElementType::ByteString_2ByteLength | TagSpec, CHIP_TLV_Serialize16((uint16_t)(StringLength)), ##__VA_ARGS__
 
 /**
  *  @brief
@@ -377,7 +377,7 @@
  *  @param ...                  Bytes to serialize
  */
 #define CHIP_TLV_BYTE_STRING_4ByteLength(TagSpec, StringLength, ...)                                                               \
-    chip::TLV::kTLVElementType_ByteString_4ByteLength | TagSpec, CHIP_TLV_Serialize32((uint32_t)(StringLength)), ##__VA_ARGS__
+    chip::TLV::TLVElementType::ByteString_4ByteLength | TagSpec, CHIP_TLV_Serialize32((uint32_t)(StringLength)), ##__VA_ARGS__
 
 /**
  *  @brief
@@ -390,4 +390,4 @@
  *  @param ...                  Bytes to serialize
  */
 #define CHIP_TLV_BYTE_STRING_8ByteLength(TagSpec, StringLength, ...)                                                               \
-    chip::TLV::kTLVElementType_ByteString_8ByteLength | TagSpec, CHIP_TLV_Serialize64((uint64_t)(StringLength)), ##__VA_ARGS__
+    chip::TLV::TLVElementType::ByteString_8ByteLength | TagSpec, CHIP_TLV_Serialize64((uint64_t)(StringLength)), ##__VA_ARGS__

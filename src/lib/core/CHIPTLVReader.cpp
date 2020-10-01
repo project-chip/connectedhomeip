@@ -266,13 +266,13 @@ void TLVReader::Init(const TLVReader & aReader)
 TLVType TLVReader::GetType() const
 {
     TLVElementType elemType = ElementType();
-    if (elemType == kTLVElementType_EndOfContainer)
+    if (elemType == TLVElementType::EndOfContainer)
         return kTLVType_NotSpecified;
-    if (elemType == kTLVElementType_FloatingPointNumber32 || elemType == kTLVElementType_FloatingPointNumber64)
+    if (elemType == TLVElementType::FloatingPointNumber32 || elemType == TLVElementType::FloatingPointNumber64)
         return kTLVType_FloatingPointNumber;
-    if (elemType == kTLVElementType_NotSpecified || elemType >= kTLVElementType_Null)
+    if (elemType == TLVElementType::NotSpecified || elemType >= TLVElementType::Null)
         return static_cast<TLVType>(elemType);
-    return static_cast<TLVType>(elemType & ~kTLVTypeSizeMask);
+    return static_cast<TLVType>(static_cast<uint8_t>(elemType) & ~kTLVTypeSizeMask);
 }
 
 /**
@@ -346,9 +346,9 @@ uint32_t TLVReader::GetLength() const
 CHIP_ERROR TLVReader::Get(bool & v)
 {
     TLVElementType elemType = ElementType();
-    if (elemType == kTLVElementType_BooleanFalse)
+    if (elemType == TLVElementType::BooleanFalse)
         v = false;
-    else if (elemType == kTLVElementType_BooleanTrue)
+    else if (elemType == TLVElementType::BooleanTrue)
         v = true;
     else
         return CHIP_ERROR_WRONG_TLV_TYPE;
@@ -521,20 +521,20 @@ CHIP_ERROR TLVReader::Get(uint64_t & v)
 {
     switch (ElementType())
     {
-    case kTLVElementType_Int8:
+    case TLVElementType::Int8:
         v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint8_t>(mElemLenOrVal))));
         break;
-    case kTLVElementType_Int16:
+    case TLVElementType::Int16:
         v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint16_t>(mElemLenOrVal))));
         break;
-    case kTLVElementType_Int32:
+    case TLVElementType::Int32:
         v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint32_t>(mElemLenOrVal))));
         break;
-    case kTLVElementType_Int64:
-    case kTLVElementType_UInt8:
-    case kTLVElementType_UInt16:
-    case kTLVElementType_UInt32:
-    case kTLVElementType_UInt64:
+    case TLVElementType::Int64:
+    case TLVElementType::UInt8:
+    case TLVElementType::UInt16:
+    case TLVElementType::UInt32:
+    case TLVElementType::UInt64:
         v = mElemLenOrVal;
         break;
     default:
@@ -557,7 +557,7 @@ CHIP_ERROR TLVReader::Get(double & v)
 {
     switch (ElementType())
     {
-    case kTLVElementType_FloatingPointNumber32: {
+    case TLVElementType::FloatingPointNumber32: {
         union
         {
             uint32_t u32;
@@ -567,7 +567,7 @@ CHIP_ERROR TLVReader::Get(double & v)
         v       = cvt.f;
         break;
     }
-    case kTLVElementType_FloatingPointNumber64: {
+    case TLVElementType::FloatingPointNumber64: {
         union
         {
             uint64_t u64;
@@ -1095,7 +1095,7 @@ CHIP_ERROR TLVReader::Next()
         return err;
 
     elemType = ElementType();
-    if (elemType == kTLVElementType_EndOfContainer)
+    if (elemType == TLVElementType::EndOfContainer)
         return CHIP_END_OF_TLV;
 
     return CHIP_NO_ERROR;
@@ -1167,7 +1167,7 @@ CHIP_ERROR TLVReader::Skip()
     CHIP_ERROR err;
     TLVElementType elemType = ElementType();
 
-    if (elemType == kTLVElementType_EndOfContainer)
+    if (elemType == TLVElementType::EndOfContainer)
         return CHIP_END_OF_TLV;
 
     if (TLVTypeIsContainer(elemType))
@@ -1246,7 +1246,7 @@ CHIP_ERROR TLVReader::SkipToEndOfContainer()
     {
         TLVElementType elemType = ElementType();
 
-        if (elemType == kTLVElementType_EndOfContainer)
+        if (elemType == TLVElementType::EndOfContainer)
         {
             if (nestLevel == 0)
                 return CHIP_NO_ERROR;
@@ -1354,7 +1354,7 @@ CHIP_ERROR TLVReader::ReadElement()
 
 CHIP_ERROR TLVReader::VerifyElement()
 {
-    if (ElementType() == kTLVElementType_EndOfContainer)
+    if (ElementType() == TLVElementType::EndOfContainer)
     {
         if (mContainerType == kTLVType_NotSpecified)
             return CHIP_ERROR_INVALID_TLV_ELEMENT;
@@ -1412,29 +1412,29 @@ uint64_t TLVReader::ReadTag(TLVTagControl tagControl, const uint8_t *& p)
 
     switch (tagControl)
     {
-    case kTLVTagControl_ContextSpecific:
+    case TLVTagControl::ContextSpecific:
         return ContextTag(Read8(p));
-    case kTLVTagControl_CommonProfile_2Bytes:
+    case TLVTagControl::CommonProfile_2Bytes:
         return CommonTag(LittleEndian::Read16(p));
-    case kTLVTagControl_CommonProfile_4Bytes:
+    case TLVTagControl::CommonProfile_4Bytes:
         return CommonTag(LittleEndian::Read32(p));
-    case kTLVTagControl_ImplicitProfile_2Bytes:
+    case TLVTagControl::ImplicitProfile_2Bytes:
         if (ImplicitProfileId == kProfileIdNotSpecified)
             return UnknownImplicitTag;
         return ProfileTag(ImplicitProfileId, LittleEndian::Read16(p));
-    case kTLVTagControl_ImplicitProfile_4Bytes:
+    case TLVTagControl::ImplicitProfile_4Bytes:
         if (ImplicitProfileId == kProfileIdNotSpecified)
             return UnknownImplicitTag;
         return ProfileTag(ImplicitProfileId, LittleEndian::Read32(p));
-    case kTLVTagControl_FullyQualified_6Bytes:
+    case TLVTagControl::FullyQualified_6Bytes:
         vendorId   = LittleEndian::Read16(p);
         profileNum = LittleEndian::Read16(p);
         return ProfileTag(vendorId, profileNum, LittleEndian::Read16(p));
-    case kTLVTagControl_FullyQualified_8Bytes:
+    case TLVTagControl::FullyQualified_8Bytes:
         vendorId   = LittleEndian::Read16(p);
         profileNum = LittleEndian::Read16(p);
         return ProfileTag(vendorId, profileNum, LittleEndian::Read32(p));
-    case kTLVTagControl_Anonymous:
+    case TLVTagControl::Anonymous:
     default:
         return AnonymousTag;
     }
@@ -1543,7 +1543,7 @@ exit:
 TLVElementType TLVReader::ElementType() const
 {
     if (mControlByte == static_cast<uint16_t>(kTLVControlByte_NotSpecified))
-        return kTLVElementType_NotSpecified;
+        return TLVElementType::NotSpecified;
     return static_cast<TLVElementType>(mControlByte & kTLVTypeMask);
 }
 
