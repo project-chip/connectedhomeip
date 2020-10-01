@@ -106,8 +106,13 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     # Set this to true to enable efr32 builds by default.
     enable_efr32_builds = false
 
+<<<<<<< HEAD
     # Set this to true to enable qpg6100 builds by default.
     enable_qpg6100_builds = false
+=======
+    # Set this to true to enable k32w builds by default.
+    enable_k32w_builds = false
+>>>>>>> [K32W] Add GN/Ninja build
   }
 
   declare_args() {
@@ -143,6 +148,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
     # Build the efr32 lighting app example.
     enable_efr32_lighting_app_build = enable_efr32_builds
+
+    # Build the k32w lock app example.
+    enable_k32w_lock_app_build = enable_k32w_builds
   }
 
   chip_build("host_clang") {
@@ -221,6 +229,12 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
   }
 
+  if (enable_k32w_lock_app_build) {
+    group("k32w_lock_app") {
+      deps = [ "${chip_root}/examples/lock-app/k32w(${chip_root}/config/k32w/toolchain:k32w_lock_app)" ]
+    }
+  }
+
   group("default") {
     deps = []
     if (enable_host_clang_build) {
@@ -257,6 +271,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
     if (enable_efr32_lock_app_build) {
       deps += [ ":efr32_lock_app" ]
+    }
+    if (enable_k32w_lock_app_build) {
+      deps += [ ":k32w_lock_app" ]
     }
   }
 

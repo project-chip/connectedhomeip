@@ -82,7 +82,7 @@ template("gen_flashing_script") {
 # ultimately be flashable/runnable in a consistent way.
 
 template("flashable_executable") {
-  executable_target = "$target_name.executable"
+  executable_target = "$target_name.executable" #lock-app.executable
 
   if (defined(invoker.flashing_script_name)) {
     # Generating the flashing script is the final target.

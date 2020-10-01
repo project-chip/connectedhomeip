@@ -1,0 +1,91 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/k32w_sdk.gni")
+import("//build_overrides/openthread.gni")
+
+import("${k32w_sdk_build_root}/k32w_executable.gni")
+import("${k32w_sdk_build_root}/k32w_sdk.gni")
+
+assert(current_os == "freertos")
+
+k32w_platform_dir = "${chip_root}/examples/platform/k32w"
+
+k32w_sdk("sdk") {
+  include_dirs = [
+    "main/include",
+    "main",
+    "${k32w_platform_dir}/app/project_include",
+    "${k32w_platform_dir}/app/support",
+    "${chip_root}/examples/lock-app/lock-common",
+    "${chip_root}/src/app/util",
+    "${k32w_platform_dir}/util/include",
+  ]
+
+  sources = [
+    "${k32w_platform_dir}/app/project_include/CHIPProjectConfig.h",
+    "${k32w_platform_dir}/app/project_include/FreeRTOSConfig.h",
+    "${k32w_platform_dir}/app/project_include/OpenThreadConfig.h",
+    "main/include/app_config.h",
+  ]
+
+  defines = []
+  if (is_debug) {
+    defines += [ "BUILD_RELEASE=0" ]
+  } else {
+    defines += [ "BUILD_RELEASE=1" ]
+  }
+}
+
+k32w_executable("lock_app") {
+  output_name = "chip-k32w061-lock-example"
+
+  sources = [
+    "${k32w_platform_dir}/util/LEDWidget.cpp",
+    "${k32w_platform_dir}/util/include/LEDWidget.h",
+    "main/AppTask.cpp",
+    "main/BoltLockManager.cpp",
+    "main/ZclCallbacks.cpp",
+    "main/include/AppEvent.h",
+    "main/include/AppTask.h",
+    "main/include/BoltLockManager.h",
+    "main/main.cpp",
+  ]
+
+  deps = [
+    ":sdk",
+    "${chip_root}/examples/common/chip-app-server:chip-app-server",
+    "${chip_root}/examples/lock-app/lock-common",
+    "${chip_root}/src/lib",
+    "${chip_root}/third_party/mbedtls:mbedtls",
+    "${k32w_platform_dir}/app/support:freertos_mbedtls_lock_support",
+    "${openthread_root}:libopenthread-cli-ftd",
+    "${openthread_root}:libopenthread-ftd",
+  ]
+
+  output_dir = root_out_dir
+
+  ldscript = "${k32w_platform_dir}/app/ldscripts/chip-k32w061-lock-example.ld"
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+}
+
+group("k32w") {
+  deps = [ ":lock_app" ]
+}
+
+group("default") {
+  deps = [ ":k32w" ]
+}

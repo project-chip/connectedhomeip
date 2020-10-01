@@ -1,0 +1,230 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build_overrides/k32w_sdk.gni")
+import("//build_overrides/openthread.gni")
+import("//build_overrides/chip.gni")
+
+declare_args() {
+  # Location of the k32w SDK.
+  k32w_sdk_root = getenv("K32W_SDK_ROOT")
+}
+
+assert(k32w_sdk_root != "", "k32w_sdk_root must be specified")
+
+# Defines an k32w SDK build target.
+#
+# Parameters:
+#   k32w_sdk_root - The location of the k32w SDK.
+#   sources - Extra source files to build.
+template("k32w_sdk") {
+  if (defined(invoker.k32w_sdk_root)) {
+    k32w_sdk_root = invoker.k32w_sdk_root
+  }
+
+  assert(k32w_sdk_root != "", "k32w_sdk_root must be specified")
+
+  sdk_target_name = target_name
+
+  config("${sdk_target_name}_config") {
+    include_dirs = []
+    if (defined(invoker.include_dirs)) {
+      include_dirs += invoker.include_dirs
+    }
+
+    include_dirs += [
+      "${openthread_root}/src/core",
+      "${openthread_root}/examples/platforms/k32w/k32w061",
+      "${openthread_root}/examples/platforms/",
+      "${chip_root}",
+      "${chip_root}/third_party/mbedtls",
+      "${chip_root}/third_party/mbedtls/repo/include",
+      "${chip_root}/third_party/mbedtls/repo/include",
+    ]
+
+    # We want to treat SDK headers as system headers, so that warnings in those
+    # headers are not fatal.  Therefore don't add them directly to include_dirs;
+    # we will add them to cflags below instead.
+    _sdk_include_dirs = [
+      "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm",
+      "${k32w_sdk_root}boards/k32w061dk6/wireless_examples/openthread/enablement",
+      "${k32w_sdk_root}/CMSIS/Include",
+      "${k32w_sdk_root}/components/serial_manager",
+      "${k32w_sdk_root}/components/uart",
+      "${k32w_sdk_root}/devices/K32W061",
+      "${k32w_sdk_root}/devices/K32W061/drivers",
+      "${k32w_sdk_root}/devices/K32W061/utilities",
+      "${k32w_sdk_root}/devices/K32W061/utilities/debug_console",
+      "${k32w_sdk_root}/devices/K32W061/utilities/str",
+      "${k32w_sdk_root}/middleware/mbedtls/port/ksdk",
+      "${k32w_sdk_root}/middleware/wireless/framework/Common",
+      "${k32w_sdk_root}/middleware/wireless/framework/Flash/Internal",
+      "${k32w_sdk_root}/middleware/wireless/framework/FunctionLib",
+      "${k32w_sdk_root}/middleware/wireless/framework/GPIO",
+      "${k32w_sdk_root}/middleware/wireless/framework/Keyboard/Interface",
+      "${k32w_sdk_root}/middleware/wireless/framework/LED/Interface",
+      "${k32w_sdk_root}/middleware/wireless/framework/Lists",
+      "${k32w_sdk_root}/middleware/wireless/framework/MemManager/Interface",
+      "${k32w_sdk_root}/middleware/wireless/framework/OSAbstraction/Interface",
+      "${k32w_sdk_root}/middleware/wireless/framework/Panic/Interface",
+      "${k32w_sdk_root}/middleware/wireless/framework/PDM/Include",
+      "${k32w_sdk_root}/middleware/wireless/framework/RNG/Interface",
+      "${k32w_sdk_root}/middleware/wireless/framework/SerialManager/Source",
+      "${k32w_sdk_root}/middleware/wireless/framework/TimersManager/Interface",
+      "${k32w_sdk_root}/middleware/wireless/framework/TimersManager/Source",
+      "${k32w_sdk_root}/middleware/wireless/framework/XCVR/DK6",
+      "${k32w_sdk_root}/middleware/wireless/framework/XCVR/DK6/Build/Include",
+      "${k32w_sdk_root}/middleware/wireless/ieee-802.15.4/uMac/Include",
+      "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/portable/GCC/ARM_CM3",
+      "${k32w_sdk_root}/rtos/amazon-freertos/lib/include",
+      "${k32w_sdk_root}/rtos/amazon-freertos/lib/include/private",
+      "${k32w_sdk_root}/rtos/amazon-freertos/lib/third_party/unity/src",
+    ]
+
+    libs = [
+      "${k32w_sdk_root}/middleware/wireless/ieee-802.15.4/lib/libMiniMac.a",
+      "${k32w_sdk_root}/middleware/wireless/framework/PDM/Library/libPDM.a",
+      "${k32w_sdk_root}/middleware/wireless/framework/XCVR/lib/libRadio.a",
+    ]
+    
+
+    defines = [
+      "CPU_K32W061HN",
+      "CPU_JN518X",
+      "CPU_JN518X_REV=2",
+      "JENNIC_CHIP_FAMILY_NAME=_JN518x",
+      "gPWR_LDOMEM_0_9V_PD=0",
+      "SDK_DEBUGCONSOLE=0",
+      "NO_SYSCORECLK_UPD=0",
+      "USE_RTOS=1",
+      "FSL_RTOS_FREE_RTOS=1",
+      "MBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT=1",
+      "gUartDebugConsole_d=0",
+      "gUsePdm_d=1",
+      "gLEDSupported_d",
+      "gKeyBoardSupported_d",
+      "gPdmNbSegments=63",
+      "osCustomStartup=1",
+      "OM15082=1",
+      "gKBD_KeysCount_c=3",
+      "gLEDsOnTargetBoardCnt_c=2",
+      "gLED_InvertedMode_d=1",
+      "ENABLE_RAM_VECTOR_TABLE=1",
+      "gTMR_Enabled_d=1",
+      "gTimestamp_Enabled_d=0",
+      "gMainThreadStackSize_c=2048",
+      "K32W_LOG_ENABLED=1",
+      "CHIP_ENABLE_OPENTHREAD=1",
+      "PoolsDetails_c=_block_size_ 512 _number_of_blocks_ 2 _pool_id_(0) _eol_ _block_size_ 768 _number_of_blocks_ 1 _pool_id_(0) _eol_",
+      "MBEDTLS_CONFIG_FILE=<third_party/openthread/repo/third_party/mbedtls/mbedtls-config.h>",
+      "MBEDTLS_USER_CONFIG_FILE=<third_party/openthread/repo/examples/platforms/k32w/k32w061/k32w061-mbedtls-config.h>",
+      "MBEDTLS_THREADING_C=1",
+      "MBEDTLS_THREADING_ALT=1",
+      "MBEDTLS_X509_CSR_WRITE_C",
+      "MBEDTLS_X509_CREATE_C",
+      "MBEDTLS_PK_WRITE_C",
+      "MBEDTLS_OID_C",
+      "MBEDTLS_PEM_WRITE_C",
+      "MBEDTLS_BASE64_C",
+      "MBEDTLS_HKDF_C",
+      "MBEDTLS_ERROR_C",
+      "OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1"
+    ]
+    
+    if (defined(invoker.defines)) {
+      defines += invoker.defines
+    }
+
+    cflags = [
+      "-Wno-unused-function",
+      "-Wno-conversion"
+    ]
+
+    # Now add our "system-header" include dirs
+    foreach(include_dir, _sdk_include_dirs) {
+      cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
+    }
+  }
+
+  # TODO - Break up this monolith and make it configurable.
+  source_set(sdk_target_name) {
+    forward_variables_from(invoker, "*")
+
+    if (!defined(sources)) {
+      sources = []
+    }
+
+    sources += [
+      "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement/clock_config.c",
+      "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement/pin_mux.c",
+      "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/board.c",
+      "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/board_utility.c",
+      "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/hardware_init.c",
+      "${k32w_sdk_root}/components/serial_manager/serial_manager.c",
+      "${k32w_sdk_root}/components/serial_manager/serial_port_uart.c",
+      "${k32w_sdk_root}/components/uart/usart_adapter.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_aes.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_clock.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_common.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_ctimer.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_flash.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_flexcomm.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_gpio.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_inputmux.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_pint.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_power.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_reset.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_rng.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_sha.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_usart.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_wtimer.c",
+      "${k32w_sdk_root}/devices/K32W061/mcuxpresso/startup_k32w061.c",
+      "${k32w_sdk_root}/devices/K32W061/system_K32W061.c",
+      "${k32w_sdk_root}/devices/K32W061/utilities/debug_console/fsl_debug_console.c",
+      "${k32w_sdk_root}/devices/K32W061/utilities/str/fsl_str.c",
+      "${k32w_sdk_root}/middleware/mbedtls/port/ksdk/aes_alt.c",
+      "${k32w_sdk_root}/middleware/mbedtls/port/ksdk/ksdk_mbedtls.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/Common/MicroInt_arm_sdk2.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/Flash/Internal/Flash_Adapter.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/FunctionLib/FunctionLib.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/GPIO/GPIO_Adapter.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/Keyboard/Source/Keyboard.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/MemManager/Source/MemManager.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/LED/Source/LED.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/Lists/GenericList.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/OSAbstraction/Source/fsl_os_abstraction_free_rtos.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/Panic/Source/Panic.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/PDM/pdm_port.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/Reset/Reset.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/TimersManager/Source/TimersManager.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/TimersManager/Source/TMR_Adapter.c",
+      "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/event_groups.c",
+      "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/list.c",
+      "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/portable/GCC/ARM_CM3/port.c",
+      "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/portable/MemMang/heap_3.c",
+      "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/queue.c",
+      "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/tasks.c",
+      "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/timers.c",      
+    ]
+
+    public_deps = [
+      "${openthread_root}/include/openthread:openthread_config",
+    ]
+
+    if (!defined(public_configs)) {
+      public_configs = []
+    }
+
+    public_configs += [ ":${sdk_target_name}_config" ]
+  }
+}
