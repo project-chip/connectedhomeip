@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2020 Project CHIP Authors
  *    All rights reserved.
  *
@@ -16,23 +15,9 @@
  *    limitations under the License.
  */
 
-#ifndef APP_CONFIG_H
-#define APP_CONFIG_H
+#ifndef THREAD_UTIL_H
+#define THREAD_UTIL_H
 
-// ---- Lighting Example App Config ----
+void StartDefaultThreadNetwork(void);
 
-#define LIGHTING_BUTTON DK_BTN2
-#define LIGHTING_BUTTON_MASK DK_BTN2_MSK
-#define FUNCTION_BUTTON DK_BTN1
-#define FUNCTION_BUTTON_MASK DK_BTN1_MSK
-#define THREAD_START_BUTTON DK_BTN3
-#define THREAD_START_BUTTON_MASK DK_BTN3_MSK
-
-#define SYSTEM_STATE_LED DK_LED1 // led0 in device tree
-#define LIGHTING_GPIO_DEVICE_NAME DT_GPIO_LABEL(DT_ALIAS(led1), gpios)
-#define LIGHTING_GPIO_PIN DT_GPIO_PIN(DT_ALIAS(led1), gpios)
-
-// Time it takes in ms for the simulated actuator to move from one state to another.
-#define ACTUATOR_MOVEMENT_PERIOS_MS 2000
-
-#endif // APP_CONFIG_H
+#endif // THREAD_UTIL_H
