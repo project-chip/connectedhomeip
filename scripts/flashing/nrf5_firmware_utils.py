@@ -51,6 +51,7 @@ operations:
 """
 
 import errno
+import os
 import sys
 
 import firmware_utils
@@ -189,6 +190,25 @@ class Flasher(firmware_utils.Flasher):
 
         return self
 
+### Mobly integration
+class Nrf5Platform:
+  def __init__(self, flasher_args):
+      self.flasher = Flasher(**flasher_args)
+
+  def flash(self):
+      self.flasher.flash_command([os.getcwd()])
+
+def verify_platform_args(platform_args):
+    required_args = ['application', 'softdevice']
+    for r in required_args:
+        if not r in platform_args:
+            raise ValueError("Required argument %s missing" % r)
+
+def create_platform(platform_args):
+    verify_platform_args(platform_args[0])
+    return Nrf5Platform(platform_args[0])
+
+### End of Mobly integration
 
 if __name__ == '__main__':
     sys.exit(Flasher().flash_command(sys.argv))

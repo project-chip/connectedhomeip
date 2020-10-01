@@ -20,9 +20,7 @@ set -e
 
 # Build script for GN EFT32 examples GitHub workflow.
 
-CHIP_ROOT="$(dirname "$0")/../.."
-
-source "$CHIP_ROOT/scripts/activate.sh"
+source "$(dirname "$0")/../../scripts/activate.sh"
 
 set -x
 env

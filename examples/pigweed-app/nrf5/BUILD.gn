@@ -57,8 +57,19 @@ nrf5_executable("pigweed_app") {
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
 }
 
+copy("mobly_tests") {
+  sources = [
+    "mobly_tests/pigweed_mobly_config.yml",
+    "mobly_tests/pigweed_mobly_test.py",
+  ]
+  outputs = [ "$root_out_dir/{{source_file_part}}" ]
+}
+
 group("nrf5") {
-  deps = [ ":pigweed_app" ]
+  deps = [
+    ":mobly_tests",
+    ":pigweed_app",
+  ]
 }
 
 group("default") {
