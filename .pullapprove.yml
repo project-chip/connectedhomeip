@@ -126,16 +126,16 @@ groups:
     ############################################################
     #  Label Based Reviewers
     ############################################################
-#     codeowners-android:
-#         type: optional
-#         conditions:
-#             - "'android' in labels"
-#         reviewers:
-#             teams:
-#                 - codeowners-android
-#         reviews:
-#             request: 2
-#
+     codeowners-android:
+         type: optional
+         conditions:
+             - "'android' in labels"
+         reviewers:
+             teams:
+                 - codeowners-android
+         reviews:
+             request: 2
+
 #     codeowners-app:
 #         type: optional
 #         conditions:
