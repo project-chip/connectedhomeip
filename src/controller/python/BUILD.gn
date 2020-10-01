@@ -78,9 +78,7 @@ copy("deviceControllerPyCopy2") {
 action("python") {
   script = "$root_out_dir/controller/python/build-chip-wheel"
 
-  inputs = [
-    "${root_out_dir}/controller/python/chip/_ChipDeviceCtrl.so",
-  ]
+  inputs = [ "${root_out_dir}/controller/python/chip/_ChipDeviceCtrl.so" ]
 
   inputs += get_target_outputs(":deviceControllerPyCopy1")
   inputs += get_target_outputs(":deviceControllerPyCopy2")
