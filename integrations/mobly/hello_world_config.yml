@@ -1,7 +1,7 @@
 TestBeds:
-  # A test bed where pw_rpc will find a CHIP device
-  - Name: SampleTestBed
-    Controllers:
-        ChipDevice:
-            - device_tty: /dev/ttyACM0
-              baud: 115200
+    # A test bed where pw_rpc will find a CHIP device
+    - Name: SampleTestBed
+      Controllers:
+          ChipDevice:
+              - device_tty: /dev/ttyACM0
+                baud: 115200
