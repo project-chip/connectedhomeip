@@ -536,7 +536,7 @@ struct TestContext
 /**
  *  Main
  */
-int TestManualSetupCode(void)
+int TestManualSetupCode()
 {
     // clang-format off
     nlTestSuite theSuite =

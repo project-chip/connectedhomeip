@@ -180,13 +180,15 @@ CHIP_ERROR TCPBase::SendMessage(const PacketHeader & header, Header::Flags paylo
     CHIP_ERROR err               = CHIP_NO_ERROR;
     const size_t prefixSize      = header.EncodeSizeBytes() + kPacketSizeBytes;
     Inet::TCPEndPoint * endPoint = nullptr;
-    size_t actualEncodedHeaderSize;
+    uint16_t actualEncodedHeaderSize;
 
     VerifyOrExit(address.GetTransportType() == Type::kTcp, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(prefixSize + msgBuf->DataLength() <= std::numeric_limits<uint16_t>::max(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(msgBuf->EnsureReservedSize(prefixSize), err = CHIP_ERROR_NO_MEMORY);
+    // The check above about prefixSize + msgBuf->DataLength() means prefixSize
+    // definitely fits in uint16_t.
+    VerifyOrExit(msgBuf->EnsureReservedSize(static_cast<uint16_t>(prefixSize)), err = CHIP_ERROR_NO_MEMORY);
 
     {
         msgBuf->SetStart(msgBuf->Start() - prefixSize);
@@ -194,7 +196,9 @@ CHIP_ERROR TCPBase::SendMessage(const PacketHeader & header, Header::Flags paylo
         uint8_t * output = msgBuf->Start();
 
         // Length is actual data, without considering the length bytes themselves
-        LittleEndian::Write16(output, msgBuf->DataLength() - kPacketSizeBytes);
+        VerifyOrExit(msgBuf->DataLength() >= kPacketSizeBytes, err = CHIP_ERROR_INTERNAL);
+
+        LittleEndian::Write16(output, static_cast<uint16_t>(msgBuf->DataLength() - kPacketSizeBytes));
 
         err = header.Encode(output, msgBuf->DataLength(), &actualEncodedHeaderSize, payloadFlags);
         SuccessOrExit(err);
@@ -319,11 +323,11 @@ CHIP_ERROR TCPBase::ProcessSingleMessageFromBufferHead(const PeerAddress & peerA
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     uint8_t * oldStart = buffer->Start();
-    size_t oldLength   = buffer->DataLength();
+    uint16_t oldLength = buffer->DataLength();
 
     buffer->SetDataLength(messageSize);
 
-    size_t headerSize = 0;
+    uint16_t headerSize = 0;
 
     PacketHeader header;
     err = header.Decode(buffer->Start(), buffer->DataLength(), &headerSize);
@@ -398,7 +402,7 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
             // Open the receive window just enough to allow the remainder of the message to be received.
             // This is necessary in the case where the message size exceeds the TCP window size to ensure
             // the peer has enough window to send us the entire message.
-            uint16_t neededLen = messageSize - buffer->DataLength();
+            uint16_t neededLen = static_cast<uint16_t>(messageSize - buffer->DataLength());
             err                = endPoint->AckReceive(neededLen);
             SuccessOrExit(err);
         }

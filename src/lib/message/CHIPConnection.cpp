@@ -901,7 +901,7 @@ CHIP_ERROR ChipConnection::SetUserTimeout(uint32_t userTimeoutMillis)
  *  @retval  other Inet layer errors related to the TCP endpoint resetting of the TCP user timeout.
  *
  */
-CHIP_ERROR ChipConnection::ResetUserTimeout(void)
+CHIP_ERROR ChipConnection::ResetUserTimeout()
 {
     return SetUserTimeout(0);
 }

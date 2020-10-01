@@ -38,7 +38,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-CHIP_ERROR ChipLinuxStorageIni::Init(void)
+CHIP_ERROR ChipLinuxStorageIni::Init()
 {
     return RemoveAll();
 }
@@ -302,11 +302,11 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobValue(const char * key, uint8_t * d
         {
             retval = CHIP_ERROR_DECODE_FAILED;
         }
+    }
 
-        if (encodedData)
-        {
-            chip::Platform::MemoryFree(encodedData);
-        }
+    if (encodedData)
+    {
+        chip::Platform::MemoryFree(encodedData);
     }
 
     return retval;

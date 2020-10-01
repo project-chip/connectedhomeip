@@ -52,10 +52,10 @@ if (chip_target_style == "") {
 }
 
 if (chip_logging_style == "") {
-  if (current_os != "freertos") {
-    chip_logging_style = "stdio"
-  } else if (current_os == "android") {
+  if (current_os == "android") {
     chip_logging_style = "android"
+  } else if (current_os != "freertos") {
+    chip_logging_style = "stdio"
   } else {
     chip_logging_style = "external"
   }

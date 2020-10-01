@@ -66,7 +66,7 @@ extern CHIP_ERROR MemoryInit(void * buf = nullptr, size_t bufSize = 0);
  * for memory allocation.
  *
  */
-extern void MemoryShutdown(void);
+extern void MemoryShutdown();
 
 /**
  * This function is called by the CHIP layer to allocate a block of memory of "size" bytes.

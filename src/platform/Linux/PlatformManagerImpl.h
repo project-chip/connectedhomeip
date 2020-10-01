@@ -56,12 +56,12 @@ public:
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
-    CHIP_ERROR _InitChipStack(void);
+    CHIP_ERROR _InitChipStack();
 
     // ===== Members for internal use by the following friends.
 
-    friend PlatformManager & PlatformMgr(void);
-    friend PlatformManagerImpl & PlatformMgrImpl(void);
+    friend PlatformManager & PlatformMgr();
+    friend PlatformManagerImpl & PlatformMgrImpl();
     friend class Internal::BLEManagerImpl;
 
     static PlatformManagerImpl sInstance;
@@ -82,7 +82,7 @@ private:
  * chip applications should use this to access features of the PlatformManager object
  * that are common to all platforms.
  */
-inline PlatformManager & PlatformMgr(void)
+inline PlatformManager & PlatformMgr()
 {
     return PlatformManagerImpl::sInstance;
 }
@@ -93,7 +93,7 @@ inline PlatformManager & PlatformMgr(void)
  * chip applications can use this to gain access to features of the PlatformManager
  * that are specific to the ESP32 platform.
  */
-inline PlatformManagerImpl & PlatformMgrImpl(void)
+inline PlatformManagerImpl & PlatformMgrImpl()
 {
     return PlatformManagerImpl::sInstance;
 }

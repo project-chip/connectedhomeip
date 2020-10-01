@@ -159,7 +159,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
     return CHIP_NO_ERROR;
 }
 
-uint16_t BLEManagerImpl::_NumConnections(void)
+uint16_t BLEManagerImpl::_NumConnections()
 {
     uint16_t numCons = 0;
     return numCons;
@@ -180,18 +180,17 @@ CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aNodeId, bool aIsCentral)
     mBLEAdvConfig.mType             = ChipAdvType::BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE;
     mBLEAdvConfig.mpAdvertisingUUID = "0xFEAF";
 
-    mpBleAddr  = nullptr;
     mIsCentral = aIsCentral;
 
     return err;
 }
 
-CHIP_ERROR BLEManagerImpl::StartBLEAdvertising(void)
+CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
 {
     return StartBluezAdv(mpAppState);
 }
 
-CHIP_ERROR BLEManagerImpl::StopBLEAdvertising(void)
+CHIP_ERROR BLEManagerImpl::StopBLEAdvertising()
 {
     return StopBluezAdv(mpAppState);
 }
@@ -316,8 +315,7 @@ exit:
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
-    BluezConnection * con = static_cast<BluezConnection *>(conId);
-    return (con != nullptr) ? con->mMtu : 0;
+    return conId != nullptr ? conId->mMtu : 0;
 }
 
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
@@ -334,15 +332,14 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
 
 bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
-    BluezConnection * con = static_cast<BluezConnection *>(conId);
-    ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (con %u)", conId);
-    return CloseBluezConnection(con);
+    ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (con %p)", conId);
+    return CloseBluezConnection(conId);
 }
 
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
                                     chip::System::PacketBuffer * pBuf)
 {
-    return SendBluezIndication((void *) conId, pBuf);
+    return SendBluezIndication(conId, pBuf);
 }
 
 bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
@@ -366,12 +363,12 @@ bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQU
     return true;
 }
 
-void BLEManagerImpl::CHIPoBluez_NewConnection(void * data)
+void BLEManagerImpl::CHIPoBluez_NewConnection(BLE_CONNECTION_OBJECT conId)
 {
-    ChipLogProgress(Ble, "CHIPoBluez_NewConnection: %p", data);
+    ChipLogProgress(Ble, "CHIPoBluez_NewConnection: %p", conId);
 }
 
-void BLEManagerImpl::HandleRXCharWrite(void * data, const uint8_t * value, size_t len)
+void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     PacketBuffer * buf = nullptr;
@@ -390,8 +387,8 @@ void BLEManagerImpl::HandleRXCharWrite(void * data, const uint8_t * value, size_
     {
         ChipDeviceEvent event;
         event.Type = DeviceEventType::kCHIPoBLEWriteReceived;
-        ChipLogProgress(Ble, "Write request received debug %p", data);
-        event.CHIPoBLEWriteReceived.ConId = data;
+        ChipLogProgress(Ble, "Write request received debug %p", conId);
+        event.CHIPoBLEWriteReceived.ConId = conId;
         event.CHIPoBLEWriteReceived.Data  = buf;
         PlatformMgr().PostEvent(&event);
         buf = nullptr;
@@ -409,7 +406,7 @@ exit:
     }
 }
 
-void BLEManagerImpl::CHIPoBluez_ConnectionClosed(void * data)
+void BLEManagerImpl::CHIPoBluez_ConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogProgress(DeviceLayer, "Bluez notify CHIPoBluez connection disconnected");
 
@@ -417,30 +414,29 @@ void BLEManagerImpl::CHIPoBluez_ConnectionClosed(void * data)
     {
         ChipDeviceEvent event;
         event.Type                           = DeviceEventType::kCHIPoBLEConnectionError;
-        event.CHIPoBLEConnectionError.ConId  = data;
+        event.CHIPoBLEConnectionError.ConId  = conId;
         event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
         PlatformMgr().PostEvent(&event);
     }
 }
 
-void BLEManagerImpl::HandleTXCharCCCDWrite(void * data)
+void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
 {
-    CHIP_ERROR err               = CHIP_NO_ERROR;
-    BluezConnection * connection = static_cast<BluezConnection *>(data);
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(connection != nullptr, ChipLogProgress(DeviceLayer, "Connection is NULL in HandleTXCharCCCDWrite"));
-    VerifyOrExit(connection->mpC2 != nullptr, ChipLogProgress(DeviceLayer, "C2 is NULL in HandleTXCharCCCDWrite"));
+    VerifyOrExit(conId != nullptr, ChipLogProgress(DeviceLayer, "Connection is NULL in HandleTXCharCCCDWrite"));
+    VerifyOrExit(conId->mpC2 != nullptr, ChipLogProgress(DeviceLayer, "C2 is NULL in HandleTXCharCCCDWrite"));
 
     // Post an event to the Chip queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
     // whether the client is enabling or disabling indications.
     {
         ChipDeviceEvent event;
-        event.Type = (connection->mIsNotify) ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
-        event.CHIPoBLESubscribe.ConId = data;
+        event.Type = conId->mIsNotify ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
+        event.CHIPoBLESubscribe.ConId = conId;
         PlatformMgr().PostEvent(&event);
     }
 
-    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", (connection->mIsNotify) ? "subscribe" : "unsubscribe");
+    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", conId->mIsNotify ? "subscribe" : "unsubscribe");
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -450,12 +446,12 @@ exit:
     }
 }
 
-void BLEManagerImpl::HandleTXComplete(void * data)
+void BLEManagerImpl::HandleTXComplete(BLE_CONNECTION_OBJECT conId)
 {
     // Post an event to the Chip queue to process the indicate confirmation.
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
-    event.CHIPoBLEIndicateConfirm.ConId = data;
+    event.CHIPoBLEIndicateConfirm.ConId = conId;
     PlatformMgr().PostEvent(&event);
 }
 

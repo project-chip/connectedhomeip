@@ -141,17 +141,17 @@ extern uint8_t NetmaskToPrefixLength(const uint8_t * netmask, uint16_t netmaskLe
 class InterfaceIterator
 {
 public:
-    InterfaceIterator(void);
-    ~InterfaceIterator(void);
+    InterfaceIterator();
+    ~InterfaceIterator();
 
-    bool HasCurrent(void);
-    bool Next(void);
-    InterfaceId GetInterface(void);
-    InterfaceId GetInterfaceId(void);
+    bool HasCurrent();
+    bool Next();
+    InterfaceId GetInterface();
+    InterfaceId GetInterfaceId();
     INET_ERROR GetInterfaceName(char * nameBuf, size_t nameBufSize);
-    bool IsUp(void);
-    bool SupportsMulticast(void);
-    bool HasBroadcastAddress(void);
+    bool IsUp();
+    bool SupportsMulticast();
+    bool HasBroadcastAddress();
 
 protected:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -164,7 +164,7 @@ protected:
     short mIntfFlags;
     bool mIntfFlagsCached;
 
-    short GetFlags(void);
+    short GetFlags();
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
@@ -198,21 +198,21 @@ protected:
 class DLL_EXPORT InterfaceAddressIterator
 {
 public:
-    InterfaceAddressIterator(void);
-    ~InterfaceAddressIterator(void);
+    InterfaceAddressIterator();
+    ~InterfaceAddressIterator();
 
-    bool HasCurrent(void);
-    bool Next(void);
-    IPAddress GetAddress(void);
-    uint8_t GetPrefixLength(void);
-    uint8_t GetIPv6PrefixLength(void);
+    bool HasCurrent();
+    bool Next();
+    IPAddress GetAddress();
+    uint8_t GetPrefixLength();
+    uint8_t GetIPv6PrefixLength();
     void GetAddressWithPrefix(IPPrefix & addrWithPrefix);
-    InterfaceId GetInterface(void);
-    InterfaceId GetInterfaceId(void);
+    InterfaceId GetInterface();
+    InterfaceId GetInterfaceId();
     INET_ERROR GetInterfaceName(char * nameBuf, size_t nameBufSize);
-    bool IsUp(void);
-    bool SupportsMulticast(void);
-    bool HasBroadcastAddress(void);
+    bool IsUp();
+    bool SupportsMulticast();
+    bool HasBroadcastAddress();
 
 private:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -273,7 +273,7 @@ inline InterfaceAddressIterator::~InterfaceAddressIterator() = default;
 /**
  * @brief    Deprecated alias for \c GetInterfaceId(void)
  */
-inline InterfaceId InterfaceIterator::GetInterface(void)
+inline InterfaceId InterfaceIterator::GetInterface()
 {
     return GetInterfaceId();
 }
@@ -281,7 +281,7 @@ inline InterfaceId InterfaceIterator::GetInterface(void)
 /**
  * @brief    Deprecated alias for \c GetInterfaceId(void)
  */
-inline InterfaceId InterfaceAddressIterator::GetInterface(void)
+inline InterfaceId InterfaceAddressIterator::GetInterface()
 {
     return GetInterfaceId();
 }
@@ -289,7 +289,7 @@ inline InterfaceId InterfaceAddressIterator::GetInterface(void)
 /**
  * @brief    Deprecated alias for \c GetPrefixLength(void)
  */
-inline uint8_t InterfaceAddressIterator::GetIPv6PrefixLength(void)
+inline uint8_t InterfaceAddressIterator::GetIPv6PrefixLength()
 {
     return GetPrefixLength();
 }

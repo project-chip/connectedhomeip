@@ -198,41 +198,11 @@
         <property name="DeviceType" type="s" access="readwrite" />
         <property name="OsVersion" type="s" access="readwrite" />
         <property name="ConfigMethods" type="s" access="readwrite" />
-        <property name="WpsCredProcessing" type="s" access="readwrite" />
-        <property name="WpsCredAddSae" type="s" access="readwrite" />
-        <property name="WpsVendorExtM1" type="s" access="readwrite" />
         <property name="SecDeviceType" type="s" access="readwrite" />
-        <property name="P2pListenRegClass" type="s" access="readwrite" />
-        <property name="P2pListenChannel" type="s" access="readwrite" />
-        <property name="P2pOperRegClass" type="s" access="readwrite" />
-        <property name="P2pOperChannel" type="s" access="readwrite" />
-        <property name="P2pGoIntent" type="s" access="readwrite" />
-        <property name="P2pSsidPostfix" type="s" access="readwrite" />
-        <property name="PersistentReconnect" type="s" access="readwrite" />
-        <property name="P2pIntraBss" type="s" access="readwrite" />
-        <property name="P2pGroupIdle" type="s" access="readwrite" />
-        <property name="P2pGoFreqChangePolicy" type="s" access="readwrite" />
-        <property name="P2pPassphraseLen" type="s" access="readwrite" />
-        <property name="P2pPrefChan" type="s" access="readwrite" />
-        <property name="P2pNoGoFreq" type="s" access="readwrite" />
-        <property name="P2pAddCliChan" type="s" access="readwrite" />
-        <property name="P2pOptimizeListenChan" type="s" access="readwrite" />
-        <property name="P2pGoHt40" type="s" access="readwrite" />
-        <property name="P2pGoVht" type="s" access="readwrite" />
-        <property name="P2pGoHe" type="s" access="readwrite" />
-        <property name="P2pGoEdmg" type="s" access="readwrite" />
-        <property name="P2pDisabled" type="s" access="readwrite" />
-        <property name="P2pGoCtwindow" type="s" access="readwrite" />
-        <property name="P2pNoGroupIface" type="s" access="readwrite" />
-        <property name="P2pIgnoreSharedFreq" type="s" access="readwrite" />
         <property name="IpAddrGo" type="s" access="readwrite" />
         <property name="IpAddrMask" type="s" access="readwrite" />
         <property name="IpAddrStart" type="s" access="readwrite" />
         <property name="IpAddrEnd" type="s" access="readwrite" />
-        <property name="P2pCliProbe" type="s" access="readwrite" />
-        <property name="P2pDeviceRandomMacAddr" type="s" access="readwrite" />
-        <property name="P2pDevicePersistentMacAddr" type="s" access="readwrite" />
-        <property name="P2pInterfaceRandomMacAddr" type="s" access="readwrite" />
         <property name="BssMaxCount" type="s" access="readwrite" />
         <property name="FilterSsids" type="s" access="readwrite" />
         <property name="FilterRssi" type="s" access="readwrite" />
@@ -250,12 +220,7 @@
         <property name="GoVenueType" type="s" access="readwrite" />
         <property name="PbcInM1" type="s" access="readwrite" />
         <property name="Autoscan" type="s" access="readwrite" />
-        <property name="WpsNfcDevPwId" type="s" access="readwrite" />
-        <property name="WpsNfcDhPubkey" type="s" access="readwrite" />
-        <property name="WpsNfcDhPrivkey" type="s" access="readwrite" />
-        <property name="WpsNfcDevPw" type="s" access="readwrite" />
         <property name="ExtPasswordBackend" type="s" access="readwrite" />
-        <property name="P2pGoMaxInactivity" type="s" access="readwrite" />
         <property name="AutoInterworking" type="s" access="readwrite" />
         <property name="Okc" type="s" access="readwrite" />
         <property name="Pmf" type="s" access="readwrite" />
@@ -273,14 +238,12 @@
         <property name="TdlsExternalControl" type="s" access="readwrite" />
         <property name="OsuDir" type="s" access="readwrite" />
         <property name="WowlanTriggers" type="s" access="readwrite" />
-        <property name="P2pSearchDelay" type="s" access="readwrite" />
         <property name="MacAddr" type="s" access="readwrite" />
         <property name="RandAddrLifetime" type="s" access="readwrite" />
         <property name="PreassocMacAddr" type="s" access="readwrite" />
         <property name="KeyMgmtOffload" type="s" access="readwrite" />
         <property name="PassiveScan" type="s" access="readwrite" />
         <property name="ReassocSameBssOptim" type="s" access="readwrite" />
-        <property name="WpsPriority" type="s" access="readwrite" />
         <property name="FstGroupId" type="s" access="readwrite" />
         <property name="FstPriority" type="s" access="readwrite" />
         <property name="FstLlt" type="s" access="readwrite" />
@@ -296,182 +259,6 @@
         <property name="DppName" type="s" access="readwrite" />
         <property name="DppMudUrl" type="s" access="readwrite" />
         <property name="ColocIntfReporting" type="s" access="readwrite" />
-    </interface>
-    <interface name="fi.w1.wpa_supplicant1.Interface.WPS">
-        <method name="Start">
-            <arg name="args" type="a{sv}" direction="in" />
-            <arg name="output" type="a{sv}" direction="out" />
-        </method>
-        <method name="Cancel" />
-        <signal name="Event">
-            <arg name="name" type="s" />
-            <arg name="args" type="a{sv}" />
-        </signal>
-        <signal name="Credentials">
-            <arg name="credentials" type="a{sv}" />
-        </signal>
-        <signal name="PropertiesChanged">
-            <arg name="properties" type="a{sv}" />
-        </signal>
-        <property name="ProcessCredentials" type="b" access="readwrite" />
-        <property name="ConfigMethods" type="s" access="readwrite" />
-        <property name="DeviceName" type="s" access="readwrite" />
-        <property name="Manufacturer" type="s" access="readwrite" />
-        <property name="ModelName" type="s" access="readwrite" />
-        <property name="ModelNumber" type="s" access="readwrite" />
-        <property name="SerialNumber" type="s" access="readwrite" />
-        <property name="DeviceType" type="ay" access="readwrite" />
-    </interface>
-    <interface name="fi.w1.wpa_supplicant1.Interface.P2PDevice">
-        <method name="Find">
-            <arg name="args" type="a{sv}" direction="in" />
-        </method>
-        <method name="StopFind" />
-        <method name="Listen">
-            <arg name="timeout" type="i" direction="in" />
-        </method>
-        <method name="ExtendedListen">
-            <arg name="args" type="a{sv}" direction="in" />
-        </method>
-        <method name="PresenceRequest">
-            <arg name="args" type="a{sv}" direction="in" />
-        </method>
-        <method name="ProvisionDiscoveryRequest">
-            <arg name="peer" type="o" direction="in" />
-            <arg name="config_method" type="s" direction="in" />
-        </method>
-        <method name="Connect">
-            <arg name="args" type="a{sv}" direction="in" />
-            <arg name="generated_pin" type="s" direction="out" />
-        </method>
-        <method name="GroupAdd">
-            <arg name="args" type="a{sv}" direction="in" />
-        </method>
-        <method name="Cancel" />
-        <method name="Invite">
-            <arg name="args" type="a{sv}" direction="in" />
-        </method>
-        <method name="Disconnect" />
-        <method name="RejectPeer">
-            <arg name="peer" type="o" direction="in" />
-        </method>
-        <method name="RemoveClient">
-            <arg name="args" type="a{sv}" direction="in" />
-        </method>
-        <method name="Flush" />
-        <method name="AddService">
-            <arg name="args" type="a{sv}" direction="in" />
-        </method>
-        <method name="DeleteService">
-            <arg name="args" type="a{sv}" direction="in" />
-        </method>
-        <method name="FlushService" />
-        <method name="ServiceDiscoveryRequest">
-            <arg name="args" type="a{sv}" direction="in" />
-            <arg name="ref" type="t" direction="out" />
-        </method>
-        <method name="ServiceDiscoveryResponse">
-            <arg name="args" type="a{sv}" direction="in" />
-        </method>
-        <method name="ServiceDiscoveryCancelRequest">
-            <arg name="args" type="t" direction="in" />
-        </method>
-        <method name="ServiceUpdate" />
-        <method name="ServiceDiscoveryExternal">
-            <arg name="arg" type="i" direction="in" />
-        </method>
-        <method name="AddPersistentGroup">
-            <arg name="args" type="a{sv}" direction="in" />
-            <arg name="path" type="o" direction="out" />
-        </method>
-        <method name="RemovePersistentGroup">
-            <arg name="path" type="o" direction="in" />
-        </method>
-        <method name="RemoveAllPersistentGroups" />
-        <signal name="DeviceFound">
-            <arg name="path" type="o" />
-        </signal>
-        <signal name="DeviceFoundProperties">
-            <arg name="path" type="o" />
-            <arg name="properties" type="a{sv}" />
-        </signal>
-        <signal name="DeviceLost">
-            <arg name="path" type="o" />
-        </signal>
-        <signal name="FindStopped" />
-        <signal name="ProvisionDiscoveryRequestDisplayPin">
-            <arg name="peer_object" type="o" />
-            <arg name="pin" type="s" />
-        </signal>
-        <signal name="ProvisionDiscoveryResponseDisplayPin">
-            <arg name="peer_object" type="o" />
-            <arg name="pin" type="s" />
-        </signal>
-        <signal name="ProvisionDiscoveryRequestEnterPin">
-            <arg name="peer_object" type="o" />
-        </signal>
-        <signal name="ProvisionDiscoveryResponseEnterPin">
-            <arg name="peer_object" type="o" />
-        </signal>
-        <signal name="ProvisionDiscoveryPBCRequest">
-            <arg name="peer_object" type="o" />
-        </signal>
-        <signal name="ProvisionDiscoveryPBCResponse">
-            <arg name="peer_object" type="o" />
-        </signal>
-        <signal name="ProvisionDiscoveryFailure">
-            <arg name="peer_object" type="o" />
-            <arg name="status" type="i" />
-        </signal>
-        <signal name="GroupStarted">
-            <arg name="properties" type="a{sv}" />
-        </signal>
-        <signal name="GroupFormationFailure">
-            <arg name="reason" type="s" />
-        </signal>
-        <signal name="GONegotiationSuccess">
-            <arg name="properties" type="a{sv}" />
-        </signal>
-        <signal name="GONegotiationFailure">
-            <arg name="properties" type="a{sv}" />
-        </signal>
-        <signal name="GONegotiationRequest">
-            <arg name="path" type="o" />
-            <arg name="dev_passwd_id" type="q" />
-            <arg name="device_go_intent" type="y" />
-        </signal>
-        <signal name="InvitationResult">
-            <arg name="invite_result" type="a{sv}" />
-        </signal>
-        <signal name="GroupFinished">
-            <arg name="properties" type="a{sv}" />
-        </signal>
-        <signal name="ServiceDiscoveryRequest">
-            <arg name="sd_request" type="a{sv}" />
-        </signal>
-        <signal name="ServiceDiscoveryResponse">
-            <arg name="sd_response" type="a{sv}" />
-        </signal>
-        <signal name="PersistentGroupAdded">
-            <arg name="path" type="o" />
-            <arg name="properties" type="a{sv}" />
-        </signal>
-        <signal name="PersistentGroupRemoved">
-            <arg name="path" type="o" />
-        </signal>
-        <signal name="WpsFailed">
-            <arg name="name" type="s" />
-            <arg name="args" type="a{sv}" />
-        </signal>
-        <signal name="InvitationReceived">
-            <arg name="properties" type="a{sv}" />
-        </signal>
-        <property name="P2PDeviceConfig" type="a{sv}" access="readwrite" />
-        <property name="Peers" type="ao" access="read" />
-        <property name="Role" type="s" access="read" />
-        <property name="Group" type="o" access="read" />
-        <property name="PeerGO" type="o" access="read" />
-        <property name="PersistentGroups" type="ao" access="read" />
     </interface>
     <node name="BSSs" />
     <node name="Networks" />

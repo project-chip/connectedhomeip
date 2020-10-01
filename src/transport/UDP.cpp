@@ -81,8 +81,8 @@ exit:
 CHIP_ERROR UDP::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
                             System::PacketBuffer * msgBuf)
 {
-    const size_t headerSize = header.EncodeSizeBytes();
-    size_t actualEncodedHeaderSize;
+    const uint16_t headerSize = header.EncodeSizeBytes();
+    uint16_t actualEncodedHeaderSize;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(address.GetTransportType() == Type::kUdp, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -123,7 +123,7 @@ void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * 
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     UDP * udp               = reinterpret_cast<UDP *>(endPoint->AppState);
-    size_t headerSize       = 0;
+    uint16_t headerSize     = 0;
     PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort);
 
     PacketHeader header;

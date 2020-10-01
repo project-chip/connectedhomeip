@@ -45,8 +45,8 @@ public:
         kCounterLength = BlockCipher::kBlockLength
     };
 
-    CTRMode(void);
-    ~CTRMode(void);
+    CTRMode();
+    ~CTRMode();
 
     // The CTR-mode encryption counter. The algorithm assumes the counter is in big-endian
     // form and increments it once for each encrypted block.
@@ -57,7 +57,7 @@ public:
     void SetChipMessageCounter(uint64_t sendingNodeId, uint32_t msgId);
     void EncryptData(const uint8_t * inData, uint16_t dataLen, uint8_t * outData);
 
-    void Reset(void);
+    void Reset();
 
 private:
     BlockCipher mBlockCipher;

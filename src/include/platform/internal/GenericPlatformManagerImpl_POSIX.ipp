@@ -49,7 +49,7 @@ namespace DeviceLayer {
 namespace Internal {
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack(void)
+CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -74,21 +74,23 @@ exit:
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl_POSIX<ImplClass>::_LockChipStack(void)
+void GenericPlatformManagerImpl_POSIX<ImplClass>::_LockChipStack()
 {
-    assert(pthread_mutex_lock(&mChipStackLock) == 0);
+    int err = pthread_mutex_lock(&mChipStackLock);
+    assert(err == 0);
 }
 
 template <class ImplClass>
-bool GenericPlatformManagerImpl_POSIX<ImplClass>::_TryLockChipStack(void)
+bool GenericPlatformManagerImpl_POSIX<ImplClass>::_TryLockChipStack()
 {
     return pthread_mutex_trylock(&mChipStackLock) == 0;
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl_POSIX<ImplClass>::_UnlockChipStack(void)
+void GenericPlatformManagerImpl_POSIX<ImplClass>::_UnlockChipStack()
 {
-    assert(pthread_mutex_unlock(&mChipStackLock) == 0);
+    int err = pthread_mutex_unlock(&mChipStackLock);
+    assert(err == 0);
 }
 
 template <class ImplClass>
@@ -182,7 +184,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::SysProcess()
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop(void)
+void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
 {
     Impl()->LockChipStack();
 
@@ -205,7 +207,7 @@ void * GenericPlatformManagerImpl_POSIX<ImplClass>::EventLoopTaskMain(void * arg
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartEventLoopTask(void)
+CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartEventLoopTask()
 {
     int err;
     err = pthread_attr_init(&mChipTaskAttr);
@@ -221,7 +223,7 @@ exit:
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown(void)
+CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
 {
     int err = 0;
     mShouldRunEventLoop.store(false, std::memory_order_relaxed);

@@ -186,7 +186,7 @@ public:
     /** @brief A function to remove the serial number from the payload
      * @return Returns a CHIP_ERROR_KEY_NOT_FOUND on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR removeSerialNumber(void);
+    CHIP_ERROR removeSerialNumber();
 
     // Test that the Setup Payload is within expected value ranges
     SetupPayload() :

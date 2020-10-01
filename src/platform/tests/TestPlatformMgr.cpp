@@ -100,7 +100,7 @@ static const nlTest sTests[] = {
     NL_TEST_SENTINEL()
 };
 
-int TestPlatformMgr(void)
+int TestPlatformMgr()
 {
     nlTestSuite theSuite = { "CHIP DeviceLayer time tests", &sTests[0], nullptr, nullptr };
 

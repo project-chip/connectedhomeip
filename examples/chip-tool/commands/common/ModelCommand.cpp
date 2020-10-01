@@ -18,8 +18,6 @@
 
 #include "ModelCommand.h"
 
-#include <core/CHIPEncoding.h>
-
 #include <atomic>
 #include <chrono>
 #include <sstream>
@@ -124,33 +122,37 @@ void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffe
 
     VerifyOrExit(isValidFrame(frameControl), ChipLogError(chipTool, "Unexpected frame control byte: 0x%02x", frameControl));
     VerifyOrExit(sequenceNumber == 1, ChipLogError(chipTool, "Unexpected sequence number: %d", sequenceNumber));
+    VerifyOrExit(
+        mEndPointId == frame.sourceEndpoint,
+        ChipLogError(chipTool, "Invalid endpoint '0x%02x'. Expected endpoint '0x%02x'", frame.sourceEndpoint, mEndPointId));
+    VerifyOrExit(mClusterId == frame.clusterId,
+                 ChipLogError(chipTool, "Invalid cluster '0x%02x'. Expected cluster '0x%02x'", frame.clusterId, mClusterId));
 
     isGlobalCommand = (frameControl == kZCLGlobalCmdFrameControlHeader);
-    if (isGlobalCommand)
-    {
-        switch (commandId)
-        {
-        case kDefaultResponseCommandId:
-            ParseDefaultResponseCommand(frame.clusterId, message, messageLen);
-            break;
-        case kReadAttributesResponseCommandId:
-            ParseReadAttributeResponseCommand(frame.clusterId, message, messageLen);
-            break;
-        default:
-            ChipLogError(chipTool, "Unexpected command '0x%02x'", commandId);
-            break;
-        }
-    }
-    else
-    {
-        HandleClusterResponse(frame.clusterId, frame.sourceEndpoint, commandId, message, messageLen);
-    }
+    isGlobalCommand ? ParseGlobalResponseCommand(commandId, message, messageLen)
+                    : ParseSpecificClusterResponseCommand(commandId, message, messageLen);
 
 exit:
     return;
 }
 
-void ModelCommand::ParseDefaultResponseCommand(uint16_t clusterId, uint8_t * message, uint16_t messageLen) const
+void ModelCommand::ParseGlobalResponseCommand(uint8_t commandId, uint8_t * message, uint16_t messageLen) const
+{
+    switch (commandId)
+    {
+    case kDefaultResponseCommandId:
+        ParseDefaultResponseCommand(message, messageLen);
+        break;
+    case kReadAttributesResponseCommandId:
+        ParseReadAttributeResponseCommand(message, messageLen);
+        break;
+    default:
+        ChipLogError(chipTool, "Unexpected command '0x%02x'", commandId);
+        break;
+    }
+}
+
+void ModelCommand::ParseDefaultResponseCommand(uint8_t * message, uint16_t messageLen) const
 {
     uint8_t commandId;
     uint8_t status;
@@ -160,14 +162,14 @@ void ModelCommand::ParseDefaultResponseCommand(uint16_t clusterId, uint8_t * mes
     commandId = chip::Encoding::Read8(message);
     status    = chip::Encoding::Read8(message);
 
-    ChipLogProgress(chipTool, "Got default response to command '0x%02x' for cluster '0x%02x'.  Status is '0x%02x'", commandId,
-                    clusterId, status);
+    ChipLogProgress(chipTool, "Got default response to command '0x%02x' for cluster '0x%04x'.  Status is '0x%02x'", commandId,
+                    mClusterId, status);
 
 exit:
     return;
 }
 
-void ModelCommand::ParseReadAttributeResponseCommand(uint16_t clusterId, uint8_t * message, uint16_t messageLen) const
+void ModelCommand::ParseReadAttributeResponseCommand(uint8_t * message, uint16_t messageLen) const
 {
     uint16_t attrId;
     uint8_t status;
@@ -184,19 +186,18 @@ void ModelCommand::ParseReadAttributeResponseCommand(uint16_t clusterId, uint8_t
 
     if (status == 0)
     {
-        ParseReadAttributeResponseCommandSuccess(clusterId, attrId, message, messageLen);
+        ParseReadAttributeResponseCommandSuccess(attrId, message, messageLen);
     }
     else
     {
-        ParseReadAttributeResponseCommandFailure(clusterId, attrId, status, messageLen);
+        ParseReadAttributeResponseCommandFailure(attrId, status, messageLen);
     }
 
 exit:
     return;
 }
 
-void ModelCommand::ParseReadAttributeResponseCommandSuccess(uint16_t clusterId, uint16_t attrId, uint8_t * message,
-                                                            uint16_t messageLen) const
+void ModelCommand::ParseReadAttributeResponseCommandSuccess(uint16_t attrId, uint8_t * message, uint16_t messageLen) const
 {
     uint8_t type;
     uint8_t value;
@@ -208,28 +209,30 @@ void ModelCommand::ParseReadAttributeResponseCommandSuccess(uint16_t clusterId, 
     type  = chip::Encoding::Read8(message);
     value = chip::Encoding::Read8(message);
 
-    ChipLogProgress(chipTool, "Read attribute '0x%04x' for cluster '0x%02x'.  Type is '0x%02x', value is '0x%02x'", attrId,
-                    clusterId, type, value);
+    ChipLogProgress(chipTool, "Read attribute '0x%04x' for cluster '0x%04x'.  Type is '0x%02x', value is '0x%02x'", attrId,
+                    mClusterId, type, value);
 
 exit:
     return;
 }
 
-void ModelCommand::ParseReadAttributeResponseCommandFailure(uint16_t clusterId, uint16_t attrId, uint8_t status,
-                                                            uint16_t messageLen) const
+void ModelCommand::ParseReadAttributeResponseCommandFailure(uint16_t attrId, uint8_t status, uint16_t messageLen) const
 {
     CHECK_MESSAGE_LENGTH(messageLen == 0);
-    ChipLogProgress(chipTool, "Reading attribute '0x%04x' for cluster '0x%02x' failed with status '0x%02x'", attrId, clusterId,
+    ChipLogProgress(chipTool, "Reading attribute '0x%04x' for cluster '0x%04x' failed with status '0x%02x'", attrId, mClusterId,
                     status);
 
 exit:
     return;
 }
 
-void ModelCommand::HandleClusterResponse(uint16_t clusterId, uint16_t endPointId, uint16_t commandId, uint8_t * message,
-                                         uint16_t messageLen) const
+void ModelCommand::ParseSpecificClusterResponseCommand(uint8_t commandId, uint8_t * message, uint16_t messageLen) const
 {
-    ChipLogProgress(chipTool, "Not handling command %d for cluster %d endPointId %d", commandId, clusterId, endPointId);
+    ChipLogProgress(chipTool, "Parsing cluster id '0x%02x' response command '0x%02x'", mClusterId, commandId);
+    if (!HandleClusterResponse(message, messageLen))
+    {
+        ChipLogProgress(chipTool, "Not handling command '0x%02x'", commandId);
+    }
 }
 
 void ModelCommand::UpdateWaitForResponse(bool value)

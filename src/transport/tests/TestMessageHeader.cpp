@@ -60,8 +60,8 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
 {
     PacketHeader header;
     uint8_t buffer[64];
-    size_t encodeLen;
-    size_t decodeLen;
+    uint16_t encodeLen;
+    uint16_t decodeLen;
 
     header.SetMessageId(123).SetPayloadLength(16);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, sizeof(buffer), &encodeLen, Header::Flags::None()) == CHIP_NO_ERROR);
@@ -145,8 +145,8 @@ void TestPayloadHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
 {
     PayloadHeader header;
     uint8_t buffer[64];
-    size_t encodeLen;
-    size_t decodeLen;
+    uint16_t encodeLen;
+    uint16_t decodeLen;
 
     header.SetMessageType(112).SetExchangeID(2233);
     NL_TEST_ASSERT(inSuite, !header.GetVendorId().HasValue());
@@ -189,20 +189,65 @@ void TestPacketHeaderEncodeDecodeBounds(nlTestSuite * inSuite, void * inContext)
 {
     PacketHeader header;
     uint8_t buffer[64];
-    size_t unusedLen;
+    uint16_t unusedLen;
 
-    for (size_t shortLen = 0; shortLen < 6; shortLen++)
+    for (size_t shortLen = 0; shortLen < 10; shortLen++)
     {
         NL_TEST_ASSERT(inSuite, header.Encode(buffer, shortLen, &unusedLen, Header::Flags::None()) != CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, header.Decode(buffer, shortLen, &unusedLen) != CHIP_NO_ERROR);
     }
+
+    // Now check that with 10 bytes we can successfully encode a
+    // default-constructed PacketHeader.
+    static const size_t minLen = 10;
+    uint16_t encoded_len;
+    NL_TEST_ASSERT(inSuite, header.Encode(buffer, minLen, &encoded_len, Header::Flags::None()) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, encoded_len = minLen);
+    // Verify that decoding at any smaller length fails.
+    for (size_t shortLen = 0; shortLen < encoded_len; shortLen++)
+    {
+        NL_TEST_ASSERT(inSuite, header.Decode(buffer, shortLen, &unusedLen) != CHIP_NO_ERROR);
+    }
+    uint16_t decoded_len;
+    NL_TEST_ASSERT(inSuite, header.Decode(buffer, encoded_len, &decoded_len) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, decoded_len == encoded_len);
+
+    // Now test encoding/decoding with a source node id present.
+    header.SetSourceNodeId(1);
+    for (size_t shortLen = minLen; shortLen < minLen + 8; shortLen++)
+    {
+        NL_TEST_ASSERT(inSuite, header.Encode(buffer, shortLen, &unusedLen, Header::Flags::None()) != CHIP_NO_ERROR);
+    }
+    NL_TEST_ASSERT(inSuite, header.Encode(buffer, minLen + 8, &encoded_len, Header::Flags::None()) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, encoded_len = minLen + 8);
+    for (size_t shortLen = 0; shortLen < encoded_len; shortLen++)
+    {
+        NL_TEST_ASSERT(inSuite, header.Decode(buffer, shortLen, &unusedLen) != CHIP_NO_ERROR);
+    }
+    NL_TEST_ASSERT(inSuite, header.Decode(buffer, encoded_len, &decoded_len) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, decoded_len == encoded_len);
+
+    // Now test encoding/decoding with a source and destination node id present.
+    header.SetDestinationNodeId(1);
+    for (size_t shortLen = minLen; shortLen < minLen + 16; shortLen++)
+    {
+        NL_TEST_ASSERT(inSuite, header.Encode(buffer, shortLen, &unusedLen, Header::Flags::None()) != CHIP_NO_ERROR);
+    }
+    NL_TEST_ASSERT(inSuite, header.Encode(buffer, minLen + 16, &encoded_len, Header::Flags::None()) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, encoded_len = minLen + 16);
+    for (size_t shortLen = 0; shortLen < encoded_len; shortLen++)
+    {
+        NL_TEST_ASSERT(inSuite, header.Decode(buffer, shortLen, &unusedLen) != CHIP_NO_ERROR);
+    }
+    NL_TEST_ASSERT(inSuite, header.Decode(buffer, encoded_len, &decoded_len) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, decoded_len == encoded_len);
 }
 
 void TestPayloadHeaderEncodeDecodeBounds(nlTestSuite * inSuite, void * inContext)
 {
     PayloadHeader header;
     uint8_t buffer[64];
-    size_t unusedLen;
+    uint16_t unusedLen;
 
     for (size_t shortLen = 0; shortLen < 6; shortLen++)
     {

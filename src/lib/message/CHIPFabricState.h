@@ -356,15 +356,15 @@ public:
         kReceiveFlags_MessageIdFlagsMask    = ~kReceiveFlags_MessageIdSynchronized
     };
 
-    ChipSessionState(void);
+    ChipSessionState();
     ChipSessionState(ChipMsgEncryptionKey * msgEncKey, ChipAuthMode authMode, MonotonicallyIncreasingCounter * nextMsgId,
                      uint32_t * maxRcvdMsgId, ReceiveFlagsType * rcvFlags);
 
     ChipMsgEncryptionKey * MsgEncKey;
     ChipAuthMode AuthMode;
 
-    uint32_t NewMessageId(void);
-    bool MessageIdNotSynchronized(void);
+    uint32_t NewMessageId();
+    bool MessageIdNotSynchronized();
     bool IsDuplicateMessage(uint32_t msgId);
 
 private:
@@ -402,8 +402,8 @@ public:
     uint8_t ReserveCount;           /**< Number of times the session key has been reserved. */
     uint8_t Flags;                  /**< Various flags associated with the session. */
 
-    void Init(void);
-    void Clear(void);
+    void Init();
+    void Clear();
 
     bool IsAllocated() const { return MsgEncKey.KeyId != ChipKeyId::kNone; }
     bool IsKeySet() const { return MsgEncKey.EncType != 0; }
@@ -430,9 +430,9 @@ public:
 class ChipMsgEncryptionKeyCache
 {
 public:
-    void Init(void);
-    void Reset(void);
-    void Shutdown(void);
+    void Init();
+    void Reset();
+    void Shutdown();
 
     ChipMsgEncryptionKey * FindOrAllocateKeyEntry(uint16_t keyId, uint8_t encType);
 
@@ -512,7 +512,7 @@ public:
         kState_Initialized    = 1
     };
 
-    ChipFabricState(void);
+    ChipFabricState();
 
     ChipMessageLayer * MessageLayer; // [READ ONLY] The associated ChipMessageLayer object.
     uint64_t FabricId;               // [READ ONLY] Node's Fabric Id (0 means node is not a member of a fabric).
@@ -534,9 +534,9 @@ public:
     IPAddress ListenIPv6Addr;
 #endif
 
-    CHIP_ERROR Init(void);
+    CHIP_ERROR Init();
     CHIP_ERROR Init(chip::Protocols::Security::AppKeys::GroupKeyStoreBase * groupKeyStore);
-    CHIP_ERROR Shutdown(void);
+    CHIP_ERROR Shutdown();
 
     CHIP_ERROR AllocSessionKey(uint64_t peerNodeId, uint16_t keyId, ChipConnection * boundCon, ChipSessionKey *& sessionKey);
     CHIP_ERROR SetSessionKey(uint16_t keyId, uint64_t peerNodeId, uint8_t encType, ChipAuthMode authMode,
@@ -570,8 +570,8 @@ public:
 
     CHIP_ERROR GetPassword(uint8_t pwSrc, const char *& ps, uint16_t & pwLen);
 
-    CHIP_ERROR CreateFabric(void);
-    void ClearFabricState(void);
+    CHIP_ERROR CreateFabric();
+    void ClearFabricState();
     CHIP_ERROR GetFabricState(uint8_t * buf, uint32_t bufSize, uint32_t & fabricStateLen);
     CHIP_ERROR JoinExistingFabric(const uint8_t * fabricState, uint32_t fabricStateLen);
 
@@ -593,7 +593,7 @@ public:
 #if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
     void OnMsgCounterSyncRespRcvd(uint64_t peerNodeId, uint32_t peerMsgId, uint32_t requestorMsgCounter);
     void OnMsgCounterSyncReqSent(uint32_t messageId);
-    bool IsMsgCounterSyncReqInProgress(void);
+    bool IsMsgCounterSyncReqInProgress();
     CHIP_ERROR GetMsgEncKeyIdForAppGroup(uint32_t appGroupGlobalId, uint32_t rootKeyId, bool useRotatingKey, uint32_t & keyId);
     CHIP_ERROR CheckMsgEncForAppGroup(const ChipMessageInfo * msgInfo, uint32_t appGroupGlobalId, uint32_t rootKeyId,
                                       bool requireRotatingKey);
@@ -671,7 +671,7 @@ private:
     bool FindSharedSessionEndNode(uint64_t endNodeId, const ChipSessionKey * sessionKey);
 
 #if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
-    void StartMsgCounterSyncTimer(void);
+    void StartMsgCounterSyncTimer();
     static void OnMsgCounterSyncRespTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 #endif
 
@@ -688,7 +688,7 @@ private:
  * @retval bool                 Whether or not peer's message counter synchronization
  *                              is in progress.
  */
-inline bool ChipFabricState::IsMsgCounterSyncReqInProgress(void)
+inline bool ChipFabricState::IsMsgCounterSyncReqInProgress()
 {
     return (MsgCounterSyncStatus & kFlag_ReqInProgress) != 0;
 }

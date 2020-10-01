@@ -107,7 +107,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    size_t payload_len = sizeof(PAYLOAD);
+    uint16_t payload_len = sizeof(PAYLOAD);
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 

@@ -62,7 +62,7 @@ public:
                                        uint16_t sendFlags);
 
 protected:
-    ChipServerBase(void) {}
+    ChipServerBase() {}
     ChipServerBase(const ChipServerBase &) = delete;
     ChipServerBase & operator=(const ChipServerBase &) = delete;
 
@@ -78,7 +78,7 @@ class ChipServerDelegateBase
     friend class ChipServerBase;
 
 protected:
-    ChipServerDelegateBase(void) {}
+    ChipServerDelegateBase() {}
 
     typedef uint8_t AccessControlResult;
 

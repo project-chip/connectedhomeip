@@ -65,17 +65,17 @@ static const Label sStatsStrings[chip::System::Stats::kNumEntries] = {
 count_t sResourcesInUse[kNumEntries];
 count_t sHighWatermarks[kNumEntries];
 
-const Label * GetStrings(void)
+const Label * GetStrings()
 {
     return sStatsStrings;
 }
 
-count_t * GetResourcesInUse(void)
+count_t * GetResourcesInUse()
 {
     return sResourcesInUse;
 }
 
-count_t * GetHighWatermarks(void)
+count_t * GetHighWatermarks()
 {
     return sHighWatermarks;
 }

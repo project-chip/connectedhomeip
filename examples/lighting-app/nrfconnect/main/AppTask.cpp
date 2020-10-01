@@ -22,6 +22,7 @@
 #include "AppEvent.h"
 #include "LEDWidget.h"
 #include "LightingManager.h"
+#include "QRCodeUtil.h"
 #include "Server.h"
 
 #include <platform/CHIPDeviceLayer.h>
@@ -95,49 +96,9 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     InitServer();
-    PrintQRCode();
+    PrintQRCode(chip::RendezvousInformationFlags::kBLE);
 
     return 0;
-}
-
-void AppTask::PrintQRCode() const
-{
-    CHIP_ERROR err              = CHIP_NO_ERROR;
-    uint32_t setUpPINCode       = 0;
-    uint16_t setUpDiscriminator = 0;
-
-    err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_INF("ConfigurationMgr().GetSetupPinCode() failed: %s", log_strdup(chip::ErrorStr(err)));
-    }
-
-    err = ConfigurationMgr().GetSetupDiscriminator(setUpDiscriminator);
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_INF("ConfigurationMgr().GetSetupDiscriminator() failed: %s", log_strdup(chip::ErrorStr(err)));
-    }
-
-    chip::SetupPayload payload;
-    payload.version       = 1;
-    payload.vendorID      = kExampleVendorID;
-    payload.productID     = 1;
-    payload.setUpPINCode  = setUpPINCode;
-    payload.discriminator = setUpDiscriminator;
-    chip::QRCodeSetupPayloadGenerator generator(payload);
-
-    // TODO: Usage of STL will significantly increase the image size, this should be changed to more efficient method for
-    // generating payload
-    std::string result;
-    err = generator.payloadBase41Representation(result);
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("Failed to generate QR Code");
-    }
-
-    LOG_INF("SetupPINCode: [%" PRIu32 "]", setUpPINCode);
-    // There might be whitespace in setup QRCode, add brackets to make it clearer.
-    LOG_INF("SetupQRCode:  [%s]", log_strdup(result.c_str()));
 }
 
 int AppTask::StartApp()

@@ -42,7 +42,7 @@ namespace DeviceLayer {
  * This function is intended be overridden by the application to, e.g.,
  * schedule output of queued log entries.
  */
-void __attribute__((weak)) OnLogOutput(void) {}
+void __attribute__((weak)) OnLogOutput() {}
 
 } // namespace DeviceLayer
 } // namespace chip

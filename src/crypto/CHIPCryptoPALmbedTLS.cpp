@@ -668,9 +668,8 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
     mbedtls_x509write_csr_set_md_alg(&csr, MBEDTLS_MD_SHA256);
 
     result = mbedtls_x509write_csr_pem(&csr, out_csr, length, CryptoRNG, nullptr);
-    VerifyOrExit(result >= 0, error = CHIP_ERROR_INTERNAL);
-    csr_length = static_cast<unsigned int>(result);
-    result     = 0;
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    csr_length = strlen(Uint8::to_const_char(out_csr));
 
 exit:
     keypair = nullptr;

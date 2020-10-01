@@ -545,7 +545,7 @@ static int TestTeardown(void * inContext)
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-int TestInetEndPointInternal(void)
+int TestInetEndPointInternal()
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // clang-format off
