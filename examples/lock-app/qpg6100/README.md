@@ -69,8 +69,8 @@ cd ~
 git clone https://github.com/project-chip/connectedhomeip.git
 ```
 
--   The Qorvo CHIP SDK is added as a submodule in /third_party/qpg_sdk/repo.
-    To manually clone this repo you can clone it from
+-   The Qorvo CHIP SDK is added as a submodule in /third_party/qpg_sdk/repo. To
+    manually clone this repo you can clone it from
     [CHIP SDK](https://github.com/Qorvo/qpg-connectedhomeip)
 
 ```
