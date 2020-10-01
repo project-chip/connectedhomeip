@@ -61,11 +61,11 @@ for relInstallDir in relChipPackageInstallDirs:
 from chip import ChipDeviceCtrl
 from chip import ChipStack
 
-if platform.system() == "Darwin":
-    print("ChipCoreBluetoothMgr not yet ready")
-    # from chip.ChipCoreBluetoothMgr import CoreBluetoothManager as BleManager
-elif sys.platform.startswith("linux"):
+if platform.system() == 'Darwin':
+    from chip.ChipCoreBluetoothMgr import CoreBluetoothManager as BleManager
+elif sys.platform.startswith('linux'):
     from chip.ChipBluezMgr import BluezManager as BleManager
+
 from chip.ChipBleUtility import FAKE_CONN_OBJ_VALUE
 
 

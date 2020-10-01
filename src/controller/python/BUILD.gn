@@ -63,6 +63,19 @@ copy("deviceControllerPyCopy1") {
     "chip/__init__.py",
   ]
 
+  if (current_os == "linux") {
+    sources += [
+      "chip/ChipBluezMgr.py",
+    ]
+  }
+
+    
+  if (current_os == "mac") {
+    sources += [
+      "chip/ChipCoreBluetoothMgr.py",
+    ]
+  }
+
   public_deps = [ ":ChipDeviceCtrl" ]
 
   outputs = [ "$root_out_dir/controller/python/chip/{{source_file_part}}" ]
@@ -99,6 +112,19 @@ action("python") {
     "--build_number",
     "0.0",
   ]
+
+  if (current_os == "linux") {
+    inputs += [
+      "chip/ChipBluezMgr.py",
+    ]
+  }
+
+    
+  if (current_os == "mac") {
+    inputs += [
+      "chip/ChipCoreBluetoothMgr.py",
+    ]
+  }
 
   public_deps = [
     ":deviceControllerPyCopy1",
