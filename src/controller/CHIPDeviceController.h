@@ -239,12 +239,9 @@ public:
     void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
 
     //////////// RendezvousSessionDelegate Implementation ///////////////
-    void OnRendezvousConnectionOpened() override;
-    void OnRendezvousConnectionClosed() override;
-    void OnRendezvousError(CHIP_ERROR err) override;
     void OnRendezvousMessageReceived(System::PacketBuffer * buffer) override;
-    void OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status) override;
-
+    void OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err) override;
+ 
 private:
     enum
     {

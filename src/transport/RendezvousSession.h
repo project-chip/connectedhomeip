@@ -27,6 +27,7 @@
 #include <core/CHIPCore.h>
 #include <protocols/CHIPProtocols.h>
 #include <support/BufBound.h>
+#include <transport/NetworkProvisioning.h>
 #include <transport/RendezvousParameters.h>
 #include <transport/RendezvousSessionDelegate.h>
 #include <transport/SecurePairingSession.h>
@@ -61,9 +62,18 @@ class CHIPDeviceEvent;
  */
 class RendezvousSession : public SecurePairingSessionDelegate,
                           public RendezvousSessionDelegate,
-                          public RendezvousDeviceCredentialsDelegate
+                          public RendezvousDeviceCredentialsDelegate,
+                          public NetworkProvisioningDelegate
 {
 public:
+    enum State : uint8_t
+    {
+        kUnknown = 0,
+        kSecurePairing,
+        kNetworkProvisioning,
+        kRendezvousComplete,
+    };
+
     RendezvousSession(RendezvousSessionDelegate * delegate) : mDelegate(delegate) {}
     ~RendezvousSession() override;
 
@@ -98,17 +108,19 @@ public:
     void SendNetworkCredentials(const char * ssid, const char * passwd) override;
     void SendOperationalCredentials() override;
 
-    const Inet::IPAddress & GetIPAddress() const { return mDeviceAddress; }
- 
+    //////////// NetworkProvisioningDelegate Implementation ///////////////
+    CHIP_ERROR SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBuffer * msgBug) override;
+    void OnNetworkProvisioningError(CHIP_ERROR error) override;
+    void OnNetworkProvisioningComplete() override;
+
     /**
      * @brief
-     *  The device can use this function to send its IP address to
-     *  commissioner. This would generally be called during network
-     *  provisioning of the device, after the IP address assignment.
+     *  Get the IP address assigned to the device during network provisioning
+     *  process.
      *
-     * @param addr The IP address of the device
+     * @return The IP address of the device
      */
-    void SendIPAddress(const Inet::IPAddress & addr);
+    const Inet::IPAddress & GetIPAddress() const { return mNetworkProvision.GetIPAddress(); }
 
 private:
     CHIP_ERROR SendPairingMessage(System::PacketBuffer * msgBug);
@@ -116,25 +128,19 @@ private:
     CHIP_ERROR Pair(Optional<NodeId> nodeId, uint32_t setupPINCode);
     CHIP_ERROR WaitForPairing(Optional<NodeId> nodeId, uint32_t setupPINCode);
 
-    CHIP_ERROR SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBuffer * msgBug);
     CHIP_ERROR HandleSecureMessage(System::PacketBuffer * msgBuf);
-    CHIP_ERROR HandleNetworkProvisioningMessage(uint8_t msgType, PacketBuffer * msgBuf);
-    CHIP_ERROR EncodeString(const char * str, BufBound & bbuf);
-    CHIP_ERROR DecodeString(const uint8_t * input, size_t input_len, BufBound & bbuf, size_t & consumed);
     Transport::Base * mTransport          = nullptr; ///< Underlying transport
     RendezvousSessionDelegate * mDelegate = nullptr; ///< Underlying transport events
     RendezvousParameters mParams;                    ///< Rendezvous configuration
 
     SecurePairingSession mPairingSession;
+    NetworkProvisioning mNetworkProvision;
     SecureSession mSecureSession;
-    bool mPairingInProgress        = false;
-    uint32_t mSecureMessageIndex   = 0;
-    uint16_t mNextKeyId            = 0;
-    Inet::IPAddress mDeviceAddress = Inet::IPAddress::Any;
-
-#if CONFIG_DEVICE_LAYER
-    static void ConnectivityHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-#endif // CONFIG_DEVICE_LAYER
+    uint32_t mSecureMessageIndex = 0;
+    uint16_t mNextKeyId          = 0;
+ 
+    RendezvousSession::State mCurrentState = State::kUnknown;
+    void UpdateState(RendezvousSession::State newState);
 };
 
 } // namespace chip

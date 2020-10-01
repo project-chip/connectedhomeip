@@ -413,27 +413,6 @@ void ChipDeviceController::OnMessageReceived(const PacketHeader & header, Transp
     }
 }
 
-void ChipDeviceController::OnRendezvousError(CHIP_ERROR err)
-{
-    if (mOnError)
-    {
-        mOnError(this, mAppReqState, err, nullptr);
-    }
-}
-
-void ChipDeviceController::OnRendezvousConnectionOpened()
-{
-    mPairingSession = mRendezvousSession->GetPairingSession();
-    mConState       = kConnectionState_SecureConnected;
-
-    if (mOnNewConnection)
-    {
-        mOnNewConnection(this, nullptr, mAppReqState);
-    }
-}
-
-void ChipDeviceController::OnRendezvousConnectionClosed() {}
-
 void ChipDeviceController::OnRendezvousMessageReceived(PacketBuffer * buffer)
 {
     if (mOnComplete.Response)
@@ -442,12 +421,25 @@ void ChipDeviceController::OnRendezvousMessageReceived(PacketBuffer * buffer)
     }
 }
 
-void ChipDeviceController::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status)
+void ChipDeviceController::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err)
 {
+    if (mOnError != nullptr && err != CHIP_NO_ERROR)
+    {
+        mOnError(this, mAppReqState, err, nullptr);
+    }
+
     switch (status)
     {
     case RendezvousSessionDelegate::SecurePairingSuccess:
         ChipLogProgress(Controller, "Remote device completed SPAKE2+ handshake\n");
+        mPairingSession = mRendezvousSession->GetPairingSession();
+        mConState       = kConnectionState_SecureConnected;
+
+        if (mOnNewConnection)
+        {
+            mOnNewConnection(this, nullptr, mAppReqState);
+        }
+
         if (mPairingDelegate != nullptr)
         {
             mPairingDelegate->OnNetworkCredentialsRequested(mRendezvousSession);

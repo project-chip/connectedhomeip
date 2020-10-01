@@ -56,23 +56,30 @@ exit:
     }
 }
 
-void RendezvousDeviceDelegate::OnRendezvousError(CHIP_ERROR err)
+void RendezvousDeviceDelegate::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err)
 {
-    ESP_LOGI(TAG, "OnRendezvousError: %s", ErrorStr(err));
-}
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGI(TAG, "OnRendezvousStatusUpdate: %s", ErrorStr(err));
+    }
 
-void RendezvousDeviceDelegate::OnRendezvousConnectionOpened()
-{
-    ESP_LOGI(TAG, "OnRendezvousConnectionOpened");
+    switch (status)
+    {
+    case RendezvousSessionDelegate::SecurePairingSuccess:
+        ESP_LOGI(TAG, "Device completed SPAKE2+ handshake\n");
+        PairingComplete(&mRendezvousSession->GetPairingSession());
+        bluetoothLED.Set(true);
+        break;
 
-    PairingComplete(&mRendezvousSession->GetPairingSession());
-    bluetoothLED.Set(true);
-}
+    case RendezvousSessionDelegate::NetworkProvisioningSuccess:
 
-void RendezvousDeviceDelegate::OnRendezvousConnectionClosed()
-{
-    ESP_LOGI(TAG, "OnRendezvousConnectionClosed");
-    bluetoothLED.Set(false);
+        ESP_LOGI(TAG, "Device was assigned an ip address\n");
+        bluetoothLED.Set(false);
+        break;
+
+    default:
+        break;
+    };
 }
 
 void RendezvousDeviceDelegate::OnRendezvousMessageReceived(PacketBuffer * buffer)

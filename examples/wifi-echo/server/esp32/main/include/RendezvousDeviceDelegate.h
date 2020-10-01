@@ -27,11 +27,9 @@ public:
     RendezvousDeviceDelegate();
 
     //////////// RendezvousSession callback Implementation ///////////////
-    void OnRendezvousConnectionOpened() override;
-    void OnRendezvousConnectionClosed() override;
-    void OnRendezvousError(CHIP_ERROR err) override;
     void OnRendezvousMessageReceived(chip::System::PacketBuffer * buffer) override;
-
+    void OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err) override;
+ 
     void OnRendezvousProvisionNetwork(const char * ssid, const char * passwd) override;
 
 private:

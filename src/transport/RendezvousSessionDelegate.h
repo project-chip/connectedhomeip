@@ -35,12 +35,12 @@ public:
         NetworkProvisioningFailed,
     };
 
-    virtual void OnRendezvousConnectionOpened()                             = 0;
-    virtual void OnRendezvousConnectionClosed()                             = 0;
-    virtual void OnRendezvousError(CHIP_ERROR err)                          = 0;
+    virtual void OnRendezvousConnectionOpened() {}
+    virtual void OnRendezvousConnectionClosed() {}
+    virtual void OnRendezvousError(CHIP_ERROR err) {}
     virtual void OnRendezvousMessageReceived(System::PacketBuffer * buffer) = 0;
 
-    virtual void OnRendezvousStatusUpdate(Status status) {}
+    virtual void OnRendezvousStatusUpdate(Status status, CHIP_ERROR err) {}
     virtual void OnRendezvousProvisionNetwork(const char * ssid, const char * passwd) {}
 };
 
