@@ -63,8 +63,6 @@ copy("deviceControllerPyCopy1") {
     "chip/__init__.py",
   ]
 
-  public_deps = [ ":ChipDeviceCtrl" ]
-
   outputs = [ "$root_out_dir/controller/python/chip/{{source_file_part}}" ]
 }
 
@@ -73,8 +71,6 @@ copy("deviceControllerPyCopy2") {
     "build-chip-wheel.py",
     "chip-device-ctrl.py",
   ]
-
-  public_deps = [ ":ChipDeviceCtrl" ]
 
   outputs = [ "$root_out_dir/controller/python/{{source_name_part}}" ]
 }
@@ -91,6 +87,7 @@ action("python") {
     "chip/ChipTLV.py",
     "chip/ChipUtility.py",
     "chip/__init__.py",
+    "${root_out_dir}/controller/python/chip/_ChipDeviceCtrl.so",
   ]
 
   args = [
@@ -101,6 +98,7 @@ action("python") {
   ]
 
   public_deps = [
+    ":ChipDeviceCtrl",
     ":deviceControllerPyCopy1",
     ":deviceControllerPyCopy2",
   ]
