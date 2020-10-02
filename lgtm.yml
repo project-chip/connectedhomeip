@@ -5,7 +5,7 @@ extraction:
                 - wget -O /tmp/gn.zip
                   https://chrome-infra-packages.appspot.com/dl/gn/gn/linux-amd64/+/Z6cz3BKAP2GgVlujo5D6CFdrLE3B1hXFwVwraB6QBnUC
                   && unzip /tmp/gn.zip -d /tmp/gn-bin gn && /tmp/gn-bin/gn gen
-                  out/default --args='enable_python_build_tools=false'
+                  out/default --args='chip_enable_python_modules=false'
         index: # Customizable step used by all languages.
             build_command:
                 - ninja -C out/default

@@ -27,7 +27,7 @@ import("${chip_root}/gn/chip/tools.gni")
 
 if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
   declare_args() {
-    enable_python_build_tools = true
+    chip_enable_python_modules = true
   }
 
   # This is a real toolchain. Build CHIP.
@@ -71,7 +71,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
         "${chip_root}/src/qrcodetool",
         "${chip_root}/src/setup_payload",
       ]
-      if (enable_python_build_tools) {
+      if (chip_enable_python_modules) {
         deps += [ "${chip_root}/src/controller/python" ]
       }
     }
