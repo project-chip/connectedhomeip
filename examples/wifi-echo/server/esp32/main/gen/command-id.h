@@ -88,6 +88,14 @@
 #define ZCL_UPDATE_COMMISSION_STATE_COMMAND_ID 0x03 // Ver.: always
 #define ZCL_TRIGGER_EFFECT_COMMAND_ID 0x40          // Ver.: since zll-1.0-11-0037-10
 
+// Command types for cluster: Echo
+
+// Server to client
+#define ZCL_ECHO_RESPONSE_COMMAND_ID 0x00
+
+// Client to server
+#define ZCL_ECHO_COMMAND_ID 0x00
+
 // Command types for cluster: Groups
 // Cluster specification level: zcl-7.0-07-5123-07
 

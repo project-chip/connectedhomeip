@@ -168,6 +168,7 @@ uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint
 
 #define ONOFF_CLUSTER_ID 0x0006
 #define IDENTIFY_CLUSTER_ID 0x0003
+#define ECHO_CLUSTER_ID 0x1234
 
 /*
  * On/Off Cluster commands
@@ -204,6 +205,22 @@ uint16_t encodeIdentifyCommand(uint8_t * buffer, uint16_t buf_length, uint8_t de
 uint16_t encodeIdentifyQueryCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
 {
     COMMAND("IdentifyQuery", IDENTIFY_CLUSTER_ID, 0x01);
+}
+
+/*
+ * Echo Cluster commands
+ */
+
+uint16_t encodeEchoCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, const char * msg)
+{
+    COMMAND_HEADER("Echo", ECHO_CLUSTER_ID, 0x00);
+    uint8_t len = (uint8_t) strlen(msg);
+    buf.Put(len);
+    for (uint16_t i = 0; i < len; i++)
+    {
+        buf.Put((uint8_t) msg[i]);
+    }
+    COMMAND_FOOTER("Echo");
 }
 
 } // extern "C"

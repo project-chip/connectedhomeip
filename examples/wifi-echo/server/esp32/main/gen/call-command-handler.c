@@ -80,6 +80,51 @@ static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecifi
     }
 }
 
+EmberAfStatus echoClusterServerCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+    if (!cmd->mfgSpecific)
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_ECHO_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t msgLen;
+            uint8_t * msg;
+
+            // Command is not a fixed length
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            msgLen = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1u;
+
+            emberAfIdentifyClusterPrintln("Echo: Receive (%d)", msgLen);
+            if (cmd->bufLen < payloadOffset + msgLen)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+
+            // Send back the same string as a response
+            emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_ECHO_CLUSTER_ID,
+                                      ZCL_ECHO_RESPONSE_COMMAND_ID, "S", cmd->buffer + payloadOffset, msgLen);
+            EmberStatus sendStatus = emberAfSendResponse();
+            if (EMBER_SUCCESS != sendStatus)
+            {
+                emberAfIdentifyClusterPrintln("Echo: failed to send %s response: 0x%x", "echo", sendStatus);
+            }
+            wasHandled = true;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
+
 // Main command parsing controller.
 EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
 {
@@ -87,6 +132,7 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
     if (cmd->direction == (uint8_t) ZCL_DIRECTION_SERVER_TO_CLIENT &&
         emberAfContainsClientWithMfgCode(cmd->apsFrame->destinationEndpoint, cmd->apsFrame->clusterId, cmd->mfgCode))
     {
+        emberAfIdentifyClusterPrintln("Handling client command!");
         switch (cmd->apsFrame->clusterId)
         {
         case ZCL_BASIC_CLUSTER_ID:
@@ -128,8 +174,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         }
     }
     else if (cmd->direction == (uint8_t) ZCL_DIRECTION_CLIENT_TO_SERVER &&
-             emberAfContainsServerWithMfgCode(cmd->apsFrame->destinationEndpoint, cmd->apsFrame->clusterId, cmd->mfgCode))
+             (emberAfContainsServerWithMfgCode(cmd->apsFrame->destinationEndpoint, cmd->apsFrame->clusterId, cmd->mfgCode) ||
+              cmd->apsFrame->clusterId == ZCL_ECHO_CLUSTER_ID))
     {
+        emberAfIdentifyClusterPrintln("Handling server command!");
         switch (cmd->apsFrame->clusterId)
         {
         case ZCL_BASIC_CLUSTER_ID:
@@ -164,6 +212,9 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_IAS_ZONE_CLUSTER_ID:
             result = emberAfIasZoneClusterServerCommandParse(cmd);
+            break;
+        case ZCL_ECHO_CLUSTER_ID:
+            result = echoClusterServerCommandParse(cmd);
             break;
         default:
             // Unrecognized cluster ID, error status will apply.

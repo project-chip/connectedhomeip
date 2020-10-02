@@ -16,9 +16,10 @@
  *
  */
 
+#include "commands/echo/Commands.h"
+#include "commands/clusters/Echo/Commands.h"
 #include "commands/clusters/Identify/Commands.h"
 #include "commands/clusters/OnOff/Commands.h"
-#include "commands/echo/Commands.h"
 
 // NOTE: Remote device ID is in sync with the echo server device id
 //       At some point, we may want to add an option to connect to a device without
@@ -34,6 +35,7 @@ int main(int argc, char * argv[])
     Commands commands;
 
     registerCommandsEcho(commands);
+    registerClusterEcho(commands);
     registerClusterIdentify(commands);
     registerClusterOnOff(commands);
 

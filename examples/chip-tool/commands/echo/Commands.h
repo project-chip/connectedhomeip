@@ -16,16 +16,10 @@
  *
  */
 
-#ifndef __CHIPTOOL_ECHO_COMMANDS_H__
-#define __CHIPTOOL_ECHO_COMMANDS_H__
+#ifndef __CHIPTOOL_ECHO_BLE_COMMANDS_H__
+#define __CHIPTOOL_ECHO_BLE_COMMANDS_H__
 
 #include "../common/EchoCommand.h"
-
-class Echo : public EchoCommand
-{
-public:
-    Echo() : EchoCommand("echo", NetworkType::UDP) {}
-};
 
 class EchoBle : public EchoCommand
 {
@@ -35,8 +29,7 @@ public:
 
 void registerCommandsEcho(Commands & commands)
 {
-    commands.Register(make_unique<Echo>());
     commands.Register(make_unique<EchoBle>());
 }
 
-#endif // __CHIPTOOL_ECHO_COMMANDS_H__
+#endif // __CHIPTOOL_ECHO_BLE_COMMANDS_H__

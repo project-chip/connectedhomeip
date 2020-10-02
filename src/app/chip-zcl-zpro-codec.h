@@ -136,6 +136,19 @@ uint16_t encodeIdentifyQueryCommand(uint8_t * buffer, uint16_t buf_length, uint8
  * */
 uint16_t encodeIdentifyCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t duration);
 
+/**
+ * Echo cluster commands
+ * */
+
+/**
+ * @brief Encode an echo command for the echo cluster
+ * @param buffer Buffer to encode into
+ * @param buf_length Length of buffer
+ * @param destination_endpoint destination endpoint
+ * @param msg The message to echo
+ * */
+uint16_t encodeEchoCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, const char * msg);
+
 #ifdef __cplusplus
 }
 #endif
