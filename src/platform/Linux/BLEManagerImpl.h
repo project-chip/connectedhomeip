@@ -72,9 +72,9 @@ struct BLEAdvConfig
  * Concrete implementation of the BLEManagerImpl singleton object for the Linux platforms.
  */
 class BLEManagerImpl final : public BLEManager,
-                             private BleLayer,
-                             private ::chip::Ble::BlePlatformDelegate,
-                             private BleApplicationDelegate
+                             private Ble::BleLayer,
+                             private Ble::BlePlatformDelegate,
+                             private Ble::BleApplicationDelegate
 {
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -201,9 +201,9 @@ inline BLEManagerImpl & BLEMgrImpl()
     return BLEManagerImpl::sInstance;
 }
 
-inline BleLayer * BLEManagerImpl::_GetBleLayer() const
+inline Ble::BleLayer * BLEManagerImpl::_GetBleLayer() const
 {
-    return (BleLayer *) (this);
+    return (Ble::BleLayer *) (this);
 }
 
 inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode()
