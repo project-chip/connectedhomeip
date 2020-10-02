@@ -19,18 +19,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol CHIPConnectivityManagerDelegate;
-
 @interface CHIPConnectivityManager : NSObject
 + (CHIPConnectivityManager *)sharedManager;
-- (void)reconnectIfNeeded;
-- (void)setDelegate:(id<CHIPConnectivityManagerDelegate>)delegate queue:(dispatch_queue_t)queue;
-@end
-
-@protocol CHIPConnectivityManagerDelegate <NSObject>
-
-- (void)didReceiveConnectionError:(NSError *)error;
-- (void)didReceiveDisconnectionError:(NSError *)error;
 @end
 
 NS_ASSUME_NONNULL_END

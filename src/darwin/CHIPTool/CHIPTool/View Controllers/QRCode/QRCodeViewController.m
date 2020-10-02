@@ -281,16 +281,6 @@
 
 - (void)deviceControllerOnMessage:(nonnull NSData *)message
 {
-    // WRONG
-    NSString * stringMessage;
-    if ([CHIPDeviceController isDataModelCommand:message] == YES) {
-        stringMessage = [CHIPDeviceController commandToString:message];
-    } else {
-        stringMessage = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
-    }
-    CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kIPKey, stringMessage);
-    NSError * error;
-    [self.chipController disconnect:&error];
 }
 
 // MARK: UI Helper methods

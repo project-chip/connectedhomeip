@@ -17,6 +17,7 @@
 
 #import "EchoViewController.h"
 
+#import "CHIPConnectivityManager.h"
 #import "CHIPUIViewUtils.h"
 #import "DefaultsUtils.h"
 
@@ -26,9 +27,6 @@
 
 @property (strong, nonatomic) UITextField * messageTextField;
 @property (strong, nonatomic) UIButton * sendButton;
-
-@property (strong, nonatomic) UITextField * serverIPTextField;
-@property (strong, nonatomic) UIButton * serverIPDoneButton;
 
 @property (nonatomic, strong) UILabel * resultLabel;
 @property (nonatomic, strong) UIStackView * stackView;
@@ -56,13 +54,11 @@
     self.chipController = [CHIPDeviceController sharedController];
     [self.chipController setDelegate:self queue:callbackQueue];
     self.connectivityManager = [CHIPConnectivityManager sharedManager];
-    [self.connectivityManager setDelegate:self queue:callbackQueue];
 }
 
 - (void)dismissKeyboard
 {
     [self.messageTextField resignFirstResponder];
-    [self.serverIPTextField resignFirstResponder];
 }
 
 // MARK: UI Setup
@@ -86,23 +82,6 @@
     [_stackView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:30].active = YES;
     [_stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [_stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
-
-    // IP
-    UILabel * serverIPLabel = [UILabel new];
-    serverIPLabel.text = @"Server IP";
-    _serverIPTextField = [UITextField new];
-    _serverIPTextField.placeholder = @"Server IP";
-    NSString * savedServerIP = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kIPKey);
-    if ([savedServerIP length] > 0) {
-        _serverIPTextField.text = savedServerIP;
-    }
-    _serverIPDoneButton = [UIButton new];
-    [_serverIPDoneButton setTitle:@"Save" forState:UIControlStateNormal];
-    [_serverIPDoneButton addTarget:self action:@selector(saveServerID:) forControlEvents:UIControlEventTouchUpInside];
-    UIView * serverIPView = [CHIPUIViewUtils viewWithUITextField:_serverIPTextField button:_serverIPDoneButton];
-    [_stackView addArrangedSubview:serverIPView];
-    serverIPView.translatesAutoresizingMaskIntoConstraints = false;
-    [serverIPView.trailingAnchor constraintEqualToAnchor:_stackView.trailingAnchor].active = YES;
 
     // Send message
     _messageTextField = [UITextField new];
@@ -137,22 +116,12 @@
 
 // MARK: UIButton actions
 
-- (IBAction)saveServerID:(id)sender
-{
-    NSString * serverIP = [self.serverIPTextField text];
-    if ([serverIP length] > 0) {
-        CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kIPKey, serverIP);
-    }
-}
-
 - (IBAction)sendMessage:(id)sender
 {
     NSString * msg = [self.messageTextField text];
     if (msg.length == 0) {
         msg = [self.messageTextField placeholder];
     }
-
-    [self.connectivityManager reconnectIfNeeded];
 
     // send message
     if ([self.chipController isConnected]) {
@@ -198,30 +167,6 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5.0), dispatch_get_main_queue(), ^{
         [self updateResult:resultMessage];
     });
-}
-
-// MARK: CHIPConnectivityManagerDelegate
-
-- (void)didReceiveConnectionError:(nonnull NSError *)error
-{
-    NSLog(@"Status: Connection error %@", [error description]);
-    if (error) {
-        NSString * stringError = [@"Error: " stringByAppendingString:error.description];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5.0), dispatch_get_main_queue(), ^{
-            [self updateResult:stringError];
-        });
-    }
-}
-
-- (void)didReceiveDisconnectionError:(nonnull NSError *)error
-{
-    NSLog(@"Status: Disconnection error %@", [error description]);
-    if (error) {
-        NSString * stringError = [@"Error: " stringByAppendingString:error.description];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5.0), dispatch_get_main_queue(), ^{
-            [self updateResult:stringError];
-        });
-    }
 }
 
 @end
