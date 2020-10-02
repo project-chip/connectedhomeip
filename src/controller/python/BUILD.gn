@@ -28,11 +28,8 @@ config("includes") {
 
 shared_library("ChipDeviceCtrl") {
   output_name = "_ChipDeviceCtrl"
-  output_dir = "$root_out_dir/controller/python/chip"
-  include_dirs = [
-    ".",
-    "${chip_root}/src/controller",
-  ]
+  output_dir = "${target_out_dir}/chip"
+  include_dirs = [ "." ]
 
   sources = [
     "ChipDeviceController-BleApplicationDelegate.cpp",
@@ -54,68 +51,75 @@ shared_library("ChipDeviceCtrl") {
   configs += [ ":controller_wno_deprecate" ]
 }
 
-copy("deviceControllerPyCopy1") {
-  sources = [
-    "chip/ChipBleBase.py",
-    "chip/ChipBleUtility.py",
-    "chip/ChipDeviceCtrl.py",
-    "chip/ChipStack.py",
-    "chip/ChipTLV.py",
-    "chip/ChipUtility.py",
-    "chip/__init__.py",
-  ]
-
-  if (current_os == "linux") {
-    sources += [ "chip/ChipBluezMgr.py" ]
-  }
-
-  if (current_os == "mac") {
-    sources += [ "chip/ChipCoreBluetoothMgr.py" ]
-  }
-
-  outputs = [ "$root_out_dir/controller/python/chip/{{source_file_part}}" ]
-}
-
-copy("deviceControllerPyCopy2") {
-  sources = [
-    "build-chip-wheel.py",
-    "chip-device-ctrl.py",
-  ]
-
-  outputs = [ "$root_out_dir/controller/python/{{source_name_part}}" ]
-}
-
 pw_python_script("python") {
-  script = "$root_out_dir/controller/python/build-chip-wheel"
+  script = "build-chip-wheel.py"
 
-  inputs = [ "${root_out_dir}/controller/python/chip/_ChipDeviceCtrl.so" ]
+  _py_manifest_files = [
+    {
+      src_dir = "."
+      sources = [
+        "chip-device-ctrl.py",
+        "chip/ChipBleBase.py",
+        "chip/ChipBleUtility.py",
+        "chip/ChipBluezMgr.py",
+        "chip/ChipCoreBluetoothMgr.py",
+        "chip/ChipDeviceCtrl.py",
+        "chip/ChipStack.py",
+        "chip/ChipTLV.py",
+        "chip/ChipUtility.py",
+        "chip/__init__.py",
+      ]
+    },
+    {
+      src_dir = target_out_dir
+      sources = [ "${target_out_dir}/chip/_ChipDeviceCtrl.so" ]
+    },
+    {
+      src_dir = "//"
+      sources = [ "//LICENSE" ]
+    },
+  ]
 
-  inputs += get_target_outputs(":deviceControllerPyCopy1")
-  inputs += get_target_outputs(":deviceControllerPyCopy2")
+  _py_manifest_file = "${target_gen_dir}/${target_name}.py_manifest.json"
+
+  inputs = []
+  _py_manifest_files_rebased = []
+  foreach(_manifest_entry, _py_manifest_files) {
+    inputs += _manifest_entry.sources
+    _py_manifest_files_rebased += [
+      {
+        src_dir = rebase_path(_manifest_entry.src_dir,
+                              get_path_info(_py_manifest_file, "dir"))
+        sources = rebase_path(_manifest_entry.sources, _manifest_entry.src_dir)
+      },
+    ]
+  }
+
+  _py_manifest = {
+    files = _py_manifest_files_rebased
+  }
+
+  write_file(_py_manifest_file, _py_manifest, "json")
+
+  _dist_dir = "${root_out_dir}/controller/python"
 
   args = [
     "--package_name",
     "chip",
     "--build_number",
     "0.0",
+    "--build_dir",
+    rebase_path("${target_gen_dir}/${target_name}.py_build", root_build_dir),
+    "--dist_dir",
+    rebase_path(_dist_dir, root_build_dir),
+    "--manifest",
+    rebase_path(_py_manifest_file, root_build_dir),
   ]
 
-  if (current_os == "linux") {
-    inputs += [ "chip/ChipBluezMgr.py" ]
-  }
-
-  if (current_os == "mac") {
-    inputs += [ "chip/ChipCoreBluetoothMgr.py" ]
-  }
-
-  public_deps = [
-    ":ChipDeviceCtrl",
-    ":deviceControllerPyCopy1",
-    ":deviceControllerPyCopy2",
-  ]
+  public_deps = [ ":ChipDeviceCtrl" ]
 
   pythontags = exec_script("//chip/python_gen_tags.py", [], "list lines", [])
   pythontagsStr = string_join("", pythontags)
   output_name = "chip-0.0-$pythontagsStr.whl"
-  outputs = [ "$root_out_dir/controller/python/$output_name" ]
+  outputs = [ "${_dist_dir}/$output_name" ]
 }
