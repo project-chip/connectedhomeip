@@ -65,7 +65,7 @@ namespace Internal {
  */
 class BLEManagerImpl final : public BLEManager,
                              private ::chip::Ble::BleLayer,
-                             private BlePlatformDelegate,
+                             private ::chip::Ble::BlePlatformDelegate,
                              private BleApplicationDelegate
 {
     // Allow the BLEManager interface class to delegate method calls to

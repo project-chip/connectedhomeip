@@ -32,11 +32,9 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-using namespace chip::Ble;
-
 struct BluezEndpoint;
 
-void HandleIncomingBleConnection(BLEEndPoint * bleEP);
+void HandleIncomingBleConnection(Ble::BLEEndPoint * bleEP);
 
 enum ChipAdvType
 {
@@ -73,7 +71,10 @@ struct BLEAdvConfig
 /**
  * Concrete implementation of the BLEManagerImpl singleton object for the Linux platforms.
  */
-class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
+class BLEManagerImpl final : public BLEManager,
+                             private BleLayer,
+                             private ::chip::Ble::BlePlatformDelegate,
+                             private BleApplicationDelegate
 {
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
