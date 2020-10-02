@@ -114,5 +114,3 @@ void emberAfPluginIasZoneClientZdoCallback(EmberNodeId emberNodeId, EmberApsFram
 void emberAfPluginIasZoneClientWriteAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen) {}
 
 void emberAfPluginIasZoneClientReadAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen) {}
-
-void emberAfPluginTemperatureMeasurementServerInitCallback(void) {}
