@@ -25,13 +25,15 @@
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 
+using namespace ::chip;
+using namespace ::chip::Inet;
+using namespace ::chip::System;
+
 extern BluetoothWidget bluetoothLED;
 extern NodeId kLocalNodeId;
 extern void PairingComplete(SecurePairingSession * pairing);
 
 static const char * TAG = "rendezvous-devicedelegate";
-
-using namespace ::chip;
 
 RendezvousDeviceDelegate::RendezvousDeviceDelegate()
 {

@@ -14,32 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "TestSupport.h"
 
-/**
- *    @file
- *      This file declares test entry points for CHIP support library
- *      unit tests.
- *
- */
-
-#ifndef TESTSUPPORT_H
-#define TESTSUPPORT_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-int TestCHIPArgParser(void);
-int TestErrorStr(void);
-int TestTimeUtils(void);
-int TestMemAlloc(void);
-int TestBufBound(void);
-int TestCHIPCounter(void);
-int TestPersistedCounter(int argc, char * argv[]);
-int TestScopedBuffer(void);
-
-#ifdef __cplusplus
+int main()
+{
+    return (TestScopedBuffer());
 }
-#endif
-
-#endif // TESTSUPPORT_H

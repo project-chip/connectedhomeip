@@ -70,7 +70,8 @@ static bool HandleSubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const u
 static bool HandleUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId);
 static bool HandleCloseConnection(BLE_CONNECTION_OBJECT connObj);
 static uint16_t HandleGetMTU(BLE_CONNECTION_OBJECT connObj);
-static void HandleError(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err, const IPPacketInfo * pktInfo);
+static void HandleError(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err,
+                        const Inet::IPPacketInfo * pktInfo);
 static void HandleNewConnection(void * appState, const uint16_t discriminator);
 static void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow);
 static void ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * cbName);
@@ -83,9 +84,9 @@ static CHIP_ERROR N2J_NewStringUTF(JNIEnv * env, const char * inStr, size_t inSt
 
 static JavaVM * sJVM;
 static System::Layer sSystemLayer;
-static InetLayer sInetLayer;
+static Inet::InetLayer sInetLayer;
 #if CONFIG_NETWORK_LAYER_BLE
-static BleLayer sBleLayer;
+static Ble::BleLayer sBleLayer;
 static AndroidBleApplicationDelegate sBleApplicationDelegate;
 static AndroidBlePlatformDelegate sBlePlatformDelegate;
 static AndroidBleConnectionDelegate sBleConnectionDelegate;
@@ -773,7 +774,7 @@ exit:
     env->ExceptionClear();
 }
 
-void HandleError(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err, const IPPacketInfo * pktInfo)
+void HandleError(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err, const Inet::IPPacketInfo * pktInfo)
 {
     JNIEnv * env;
     jclass cls;

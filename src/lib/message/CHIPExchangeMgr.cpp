@@ -48,11 +48,12 @@
 #include <system/SystemStats.h>
 #include <system/SystemTimer.h>
 
-namespace chip {
-
-using namespace chip;
-using namespace chip::Protocols;
 using namespace chip::Encoding;
+using namespace chip::Inet;
+using namespace chip::Protocols;
+using namespace chip::System;
+
+namespace chip {
 
 /**
  *  Constructor for the ChipExchangeManager class.

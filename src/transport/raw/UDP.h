@@ -63,8 +63,8 @@ public:
         return *this;
     }
 
-    InterfaceId GetInterfaceId() const { return mInterfaceId; }
-    UdpListenParameters & SetInterfaceId(InterfaceId id)
+    Inet::InterfaceId GetInterfaceId() const { return mInterfaceId; }
+    UdpListenParameters & SetInterfaceId(Inet::InterfaceId id)
     {
         mInterfaceId = id;
 
@@ -72,10 +72,10 @@ public:
     }
 
 private:
-    Inet::InetLayer * mLayer         = nullptr;               ///< Associated inet layer
-    Inet::IPAddressType mAddressType = kIPAddressType_IPv6;   ///< type of listening socket
-    uint16_t mListenPort             = CHIP_PORT;             ///< UDP listen port
-    InterfaceId mInterfaceId         = INET_NULL_INTERFACEID; ///< Interface to listen on
+    Inet::InetLayer * mLayer         = nullptr;                   ///< Associated inet layer
+    Inet::IPAddressType mAddressType = Inet::kIPAddressType_IPv6; ///< type of listening socket
+    uint16_t mListenPort             = CHIP_PORT;                 ///< UDP listen port
+    Inet::InterfaceId mInterfaceId   = INET_NULL_INTERFACEID;     ///< Interface to listen on
 };
 
 /** Implements a transport using UDP. */
@@ -117,7 +117,7 @@ public:
 
 private:
     // UDP message receive handler.
-    static void OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * buffer, const IPPacketInfo * pktInfo);
+    static void OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * buffer, const Inet::IPPacketInfo * pktInfo);
 
     Inet::UDPEndPoint * mUDPEndPoint     = nullptr;                                     ///< UDP socket used by the transport
     Inet::IPAddressType mUDPEndpointType = Inet::IPAddressType::kIPAddressType_Unknown; ///< Socket listening type

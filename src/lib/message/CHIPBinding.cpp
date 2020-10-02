@@ -34,6 +34,8 @@
 #include <support/CodeUtils.h>
 #include <system/SystemStats.h>
 
+using namespace chip::Inet;
+
 namespace chip {
 
 /**

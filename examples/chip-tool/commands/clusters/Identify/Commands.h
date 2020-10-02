@@ -25,7 +25,7 @@ class Identify : public ModelCommand
 {
 public:
     Identify(const uint16_t clusterId) : ModelCommand("identify", clusterId) {}
-    size_t EncodeCommand(PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) override
+    size_t EncodeCommand(chip::System::PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) override
     {
         uint16_t duration = 10;
         return encodeIdentifyCommand(buffer->Start(), bufferSize, endPointId, duration);
@@ -58,10 +58,15 @@ public:
 
 void registerClusterIdentify(Commands & commands)
 {
+    const char * clusterName = "Identify";
     const uint16_t clusterId = 0x0003;
 
-    commands.Register(make_unique<Identify>(clusterId));
-    commands.Register(make_unique<IdentifyQuery>(clusterId));
+    commands_list clusterCommands = {
+        make_unique<Identify>(clusterId),
+        make_unique<IdentifyQuery>(clusterId),
+    };
+
+    commands.Register(clusterName, clusterCommands);
 }
 
 #endif // __CHIPTOOL_IDENTIFY_COMMANDS_H__

@@ -20,8 +20,6 @@
 
 #include <ble/BleApplicationDelegate.h>
 
-using namespace ::chip::Ble;
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {

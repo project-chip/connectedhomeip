@@ -219,97 +219,88 @@ CHIP_ERROR ChipLinuxStorageIni::GetStringValue(const char * key, char * buf, siz
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobDataAndLengths(const char * key, char *& encodedData, size_t & encodedDataLen,
-                                                            size_t & decodedDataLen)
+CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobDataAndLengths(const char * key, chip::Platform::ScopedMemoryBuffer & encodedData,
+                                                            size_t & encodedDataLen, size_t & decodedDataLen)
 {
-    CHIP_ERROR retval            = CHIP_NO_ERROR;
     size_t encodedDataPaddingLen = 0;
     std::map<std::string, std::string> section;
-    retval = GetDefaultSection(section);
-
-    if (retval == CHIP_NO_ERROR)
+    CHIP_ERROR err = GetDefaultSection(section);
+    if (err != CHIP_NO_ERROR)
     {
-        auto it = section.find(key);
-
-        if (it != section.end())
-        {
-            std::string value;
-
-            // Compute the expectedDecodedLen
-            if (inipp::extract(section[key], value))
-            {
-                size_t len = value.size();
-
-                encodedData                 = (char *) chip::Platform::MemoryAlloc(len + 1);
-                encodedDataLen              = value.copy(encodedData, len);
-                encodedData[encodedDataLen] = '\0';
-
-                // Check if encoded data was padded. Only "=" or "==" padding combinations are allowed.
-                if ((encodedDataLen > 0) && (encodedData[encodedDataLen - 1] == '='))
-                {
-                    encodedDataPaddingLen++;
-                    if ((encodedDataLen > 1) && (encodedData[encodedDataLen - 2] == '='))
-                        encodedDataPaddingLen++;
-                }
-
-                decodedDataLen = ((encodedDataLen - encodedDataPaddingLen) * 3) / 4;
-            }
-            else
-            {
-                retval = CHIP_ERROR_INVALID_ARGUMENT;
-            }
-        }
-        else
-        {
-            retval = CHIP_ERROR_KEY_NOT_FOUND;
-        }
+        return err;
     }
 
-    return retval;
+    auto it = section.find(key);
+    if (it == section.end())
+    {
+        return CHIP_ERROR_KEY_NOT_FOUND;
+    }
+
+    std::string value;
+
+    // Compute the expectedDecodedLen
+    if (!inipp::extract(section[key], value))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    size_t len = value.size();
+    if (!encodedData.Alloc(len + 1))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    encodedDataLen                          = value.copy(encodedData.Ptr<char>(), len);
+    encodedData.Ptr<char>()[encodedDataLen] = '\0';
+
+    // Check if encoded data was padded. Only "=" or "==" padding combinations are allowed.
+    if ((encodedDataLen > 0) && (encodedData.Ptr<char>()[encodedDataLen - 1] == '='))
+    {
+        encodedDataPaddingLen++;
+        if ((encodedDataLen > 1) && (encodedData.Ptr<char>()[encodedDataLen - 2] == '='))
+            encodedDataPaddingLen++;
+    }
+
+    decodedDataLen = ((encodedDataLen - encodedDataPaddingLen) * 3) / 4;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobValue(const char * key, uint8_t * decodedData, size_t bufSize, size_t & decodedDataLen)
 {
-    CHIP_ERROR retval  = CHIP_NO_ERROR;
-    char * encodedData = nullptr;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
+    chip::Platform::ScopedMemoryBuffer encodedData;
     size_t encodedDataLen;
     size_t expectedDecodedLen = 0;
 
     retval = GetBinaryBlobDataAndLengths(key, encodedData, encodedDataLen, expectedDecodedLen);
 
     // Check the size
-    if (retval == CHIP_NO_ERROR)
+    if (retval != CHIP_NO_ERROR)
     {
-        if (expectedDecodedLen > bufSize)
-        {
-            decodedDataLen = expectedDecodedLen;
-            retval         = CHIP_ERROR_BUFFER_TOO_SMALL;
-        }
+        return retval;
     }
 
-    if (retval == CHIP_NO_ERROR && encodedDataLen > UINT16_MAX)
+    if (expectedDecodedLen > bufSize)
+    {
+        decodedDataLen = expectedDecodedLen;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    if (encodedDataLen > UINT16_MAX)
     {
         // We can't even pass this length into Base64Decode.
-        retval = CHIP_ERROR_DECODE_FAILED;
+        return CHIP_ERROR_DECODE_FAILED;
     }
 
     // Decode it
-    if (retval == CHIP_NO_ERROR)
+    // Cast is safe because we checked encodedDataLen above.
+    decodedDataLen = Base64Decode(encodedData.Ptr<char>(), static_cast<uint16_t>(encodedDataLen), (uint8_t *) decodedData);
+    if (decodedDataLen == UINT16_MAX || decodedDataLen > expectedDecodedLen)
     {
-        // Cast is safe because we checked encodedDataLen above.
-        decodedDataLen = Base64Decode(encodedData, static_cast<uint16_t>(encodedDataLen), (uint8_t *) decodedData);
-        if (decodedDataLen == UINT16_MAX || decodedDataLen > expectedDecodedLen)
-        {
-            retval = CHIP_ERROR_DECODE_FAILED;
-        }
+        return CHIP_ERROR_DECODE_FAILED;
     }
 
-    if (encodedData)
-    {
-        chip::Platform::MemoryFree(encodedData);
-    }
-
-    return retval;
+    return CHIP_NO_ERROR;
 }
 
 bool ChipLinuxStorageIni::HasValue(const char * key)

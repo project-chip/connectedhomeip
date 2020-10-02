@@ -44,6 +44,10 @@
 #include <inet/InetLayer.h>
 #include <system/SystemStats.h>
 
+using namespace chip::Ble;
+using namespace chip::Inet;
+using namespace chip::System;
+
 namespace chip {
 
 /**

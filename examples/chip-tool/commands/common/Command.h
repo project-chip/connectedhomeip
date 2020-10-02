@@ -19,12 +19,29 @@
 #ifndef __CHIPTOOL_COMMAND_H__
 #define __CHIPTOOL_COMMAND_H__
 
-#include "Commands.h"
-#include <vector>
-
 #include <controller/CHIPDeviceController.h>
 #include <inet/InetInterface.h>
 #include <support/CHIPLogging.h>
+
+#include <memory>
+#include <vector>
+
+class Command;
+
+template <typename T, typename... Args>
+std::unique_ptr<Command> make_unique(Args &&... args)
+{
+    return std::unique_ptr<Command>(new T(std::forward<Args>(args)...));
+}
+
+struct movable_initializer_list
+{
+    movable_initializer_list(std::unique_ptr<Command> && in) : item(std::move(in)) {}
+    operator std::unique_ptr<Command>() const && { return std::move(item); }
+    mutable std::unique_ptr<Command> item;
+};
+
+typedef std::initializer_list<movable_initializer_list> commands_list;
 
 enum ArgumentType
 {
@@ -41,12 +58,6 @@ struct Argument
     uint32_t max;
     void * value;
 };
-
-template <typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args &&... args)
-{
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
 
 class Command
 {

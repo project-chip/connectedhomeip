@@ -29,6 +29,7 @@ chip_test_suite("tests") {
     "TestPersistedCounter.cpp",
     "TestPersistedStorageImplementation.cpp",
     "TestPersistedStorageImplementation.h",
+    "TestScopedBuffer.cpp",
     "TestSupport.h",
     "TestTimeUtils.cpp",
   ]
@@ -47,5 +48,6 @@ chip_test_suite("tests") {
     "TestCHIPMem",
     "TestCHIPCounter",
     "TestPersistedCounter",
+    "TestScopedBuffer",
   ]
 }

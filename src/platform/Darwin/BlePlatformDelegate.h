@@ -21,14 +21,14 @@
 #include <ble/BlePlatformDelegate.h>
 #include <system/SystemPacketBuffer.h>
 
-using namespace ::chip::Ble;
+using ::chip::Ble::ChipBleUUID;
 using ::chip::System::PacketBuffer;
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-class BlePlatformDelegateImpl : public BlePlatformDelegate
+class BlePlatformDelegateImpl : public Ble::BlePlatformDelegate
 {
 public:
     virtual bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);

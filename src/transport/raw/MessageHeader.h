@@ -16,7 +16,8 @@
  */
 
 /**
- * @file  This file defines CHIP binary header encode/decode.
+ * @file
+ * This file defines CHIP binary header encode/decode.
  */
 
 #ifndef MESSAGEHEADER_H_
@@ -245,6 +246,7 @@ public:
      * @param data - the buffer to write to
      * @param size - space available in the buffer (in bytes)
      * @param encode_size - number of bytes written to the buffer.
+     * @param payloadFlags extra flags for packet header encoding
      *
      * @return CHIP_NO_ERROR on success.
      *

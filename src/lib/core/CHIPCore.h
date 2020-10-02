@@ -41,24 +41,6 @@
 #define CHIP_CORE_IDENTITY "chip-core"
 #define CHIP_CORE_PREFIX CHIP_CORE_IDENTITY ": "
 
-namespace chip {
-
-#if CONFIG_NETWORK_LAYER_BLE
-using namespace ::chip::Ble;
-#endif // CONFIG_NETWORK_LAYER_BLE
-
-using namespace ::chip::Inet;
-
-} // namespace chip
-
 #include <core/CHIPError.h>
-/*
-#include "core/CHIPBinding.h"
-#include "core/CHIPExchangeMgr.h"
-#include "core/CHIPFabricState.h"
-#include "core/CHIPGlobals.h"
-#include "core/CHIPKeyIds.h"
-#include "core/CHIPMessageLayer.h"
-#include "core/CHIPSecurityMgr.h"
-*/
+
 #endif /* CHIPCORE_H_ */

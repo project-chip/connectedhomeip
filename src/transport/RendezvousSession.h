@@ -89,9 +89,9 @@ public:
     void OnRendezvousConnectionOpened() override;
     void OnRendezvousConnectionClosed() override;
     void OnRendezvousError(CHIP_ERROR err) override;
-    void OnRendezvousMessageReceived(PacketBuffer * buffer) override;
+    void OnRendezvousMessageReceived(System::/*  */ PacketBuffer * buffer) override;
 
-    const IPAddress & GetIPAddress() const { return mDeviceAddress; }
+    const Inet::IPAddress & GetIPAddress() const { return mDeviceAddress; }
 
     /**
      * @brief
@@ -101,7 +101,7 @@ public:
      *
      * @param addr The IP address of the device
      */
-    void SendIPAddress(const IPAddress & addr);
+    void SendIPAddress(const Inet::IPAddress & addr);
 
 private:
     CHIP_ERROR SendPairingMessage(System::PacketBuffer * msgBug);
@@ -118,10 +118,10 @@ private:
 
     SecurePairingSession mPairingSession;
     SecureSession mSecureSession;
-    bool mPairingInProgress      = false;
-    uint32_t mSecureMessageIndex = 0;
-    uint16_t mNextKeyId          = 0;
-    IPAddress mDeviceAddress     = IPAddress::Any;
+    bool mPairingInProgress        = false;
+    uint32_t mSecureMessageIndex   = 0;
+    uint16_t mNextKeyId            = 0;
+    Inet::IPAddress mDeviceAddress = Inet::IPAddress::Any;
 
 #if CONFIG_DEVICE_LAYER
     static void ConnectivityHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);

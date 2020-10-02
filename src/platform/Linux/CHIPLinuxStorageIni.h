@@ -28,6 +28,7 @@
 
 #include <inipp/inipp.h>
 #include <platform/PersistedStorage.h>
+#include <support/ScopedBuffer.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -52,7 +53,8 @@ protected:
 
 private:
     CHIP_ERROR GetDefaultSection(std::map<std::string, std::string> & section);
-    CHIP_ERROR GetBinaryBlobDataAndLengths(const char * key, char *& encodedData, size_t & encodedDataLen, size_t & decodedDataLen);
+    CHIP_ERROR GetBinaryBlobDataAndLengths(const char * key, chip::Platform::ScopedMemoryBuffer & encodedData,
+                                           size_t & encodedDataLen, size_t & decodedDataLen);
     inipp::Ini<char> mConfigStore;
 };
 

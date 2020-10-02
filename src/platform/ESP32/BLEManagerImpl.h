@@ -64,9 +64,9 @@ namespace Internal {
  * Concrete implementation of the NetworkProvisioningServer singleton object for the ESP32 platform.
  */
 class BLEManagerImpl final : public BLEManager,
-                             private ::chip::Ble::BleLayer,
-                             private BlePlatformDelegate,
-                             private BleApplicationDelegate
+                             private Ble::BleLayer,
+                             private Ble::BlePlatformDelegate,
+                             private Ble::BleApplicationDelegate
 {
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -90,18 +90,20 @@ class BLEManagerImpl final : public BLEManager,
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
-    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId) override;
-    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId) override;
+    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                 const Ble::ChipBleUUID * charId) override;
+    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                   const Ble::ChipBleUUID * charId) override;
     bool CloseConnection(BLE_CONNECTION_OBJECT conId) override;
     uint16_t GetMTU(BLE_CONNECTION_OBJECT conId) const override;
-    bool SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                        PacketBuffer * pBuf) override;
-    bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                          PacketBuffer * pBuf) override;
-    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                         PacketBuffer * pBuf) override;
-    bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,
-                          const ChipBleUUID * charId) override;
+    bool SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                        System::PacketBuffer * pBuf) override;
+    bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                          System::PacketBuffer * pBuf) override;
+    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                         System::PacketBuffer * pBuf) override;
+    bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const Ble::ChipBleUUID * svcId,
+                          const Ble::ChipBleUUID * charId) override;
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
@@ -144,7 +146,7 @@ class BLEManagerImpl final : public BLEManager,
 
     struct CHIPoBLEConState
     {
-        PacketBuffer * PendingIndBuf;
+        System::PacketBuffer * PendingIndBuf;
         uint16_t ConId;
         uint16_t MTU : 10;
         uint16_t Allocated : 1;

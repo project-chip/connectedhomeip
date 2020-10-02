@@ -16,8 +16,9 @@
  */
 
 /**
- * @file This file contains the implementation the chip message header
- *       encode/decode classes.
+ * @file
+ *   This file contains the implementation the chip message header
+ *   encode/decode classes.
  */
 
 #include "MessageHeader.h"

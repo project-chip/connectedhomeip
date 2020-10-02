@@ -199,18 +199,32 @@ exit:
 
 void ModelCommand::ParseReadAttributeResponseCommandSuccess(uint16_t attrId, uint8_t * message, uint16_t messageLen) const
 {
-    uint8_t type;
-    uint8_t value;
+    uint8_t type = chip::Encoding::Read8(message);
+    messageLen--;
+
+    VerifyOrExit(type == 0x10 || type == 0x29, ChipLogError(chipTool, "Unexpected attribute type: '0x%02x'", type));
+
+    ChipLogProgress(chipTool, "Read attribute '0x%04x' for cluster '0x%04x'.  Type is '0x%02x'", attrId, mClusterId, type);
 
     // FIXME: Should we have a mapping of type ids to types, based on
-    // table 2.6.2.2 in Rev 8 of the ZCL spec?  0x10 is "Boolean".
-    CHECK_MESSAGE_LENGTH(messageLen == 2);
-
-    type  = chip::Encoding::Read8(message);
-    value = chip::Encoding::Read8(message);
-
-    ChipLogProgress(chipTool, "Read attribute '0x%04x' for cluster '0x%04x'.  Type is '0x%02x', value is '0x%02x'", attrId,
-                    mClusterId, type, value);
+    // table 2.6.2.2 in Rev 8 of the ZCL spec?
+    switch (type)
+    {
+    case 0x10: { // "Boolean"
+        uint8_t value;
+        CHECK_MESSAGE_LENGTH(messageLen == 1);
+        value = chip::Encoding::Read8(message);
+        ChipLogProgress(chipTool, "Attribute value: '0x%02x'", value);
+        break;
+    }
+    case 0x29: { // "Int16"
+        int16_t value;
+        CHECK_MESSAGE_LENGTH(messageLen == 2);
+        value = chip::Encoding::LittleEndian::Read16(message);
+        ChipLogProgress(chipTool, "Attribute value: '0x%04x'", value);
+        break;
+    }
+    }
 
 exit:
     return;

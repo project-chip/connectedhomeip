@@ -24,8 +24,6 @@
 #ifndef THREAD_STACK_MANAGER_H
 #define THREAD_STACK_MANAGER_H
 
-//#include <platform/PlatformManager.h>
-
 namespace chip {
 namespace DeviceLayer {
 
@@ -74,7 +72,7 @@ public:
     void LockThreadStack();
     bool TryLockThreadStack();
     void UnlockThreadStack();
-    bool HaveRouteToAddress(const Inet::IPAddress & destAddr);
+    bool HaveRouteToAddress(const chip::Inet::IPAddress & destAddr);
     CHIP_ERROR GetAndLogThreadStatsCounters();
     CHIP_ERROR GetAndLogThreadTopologyMinimal();
     CHIP_ERROR GetAndLogThreadTopologyFull();
@@ -202,7 +200,7 @@ inline void ThreadStackManager::UnlockThreadStack()
 /**
  * Determines whether a route exists via the Thread interface to the specified destination address.
  */
-inline bool ThreadStackManager::HaveRouteToAddress(const IPAddress & destAddr)
+inline bool ThreadStackManager::HaveRouteToAddress(const chip::Inet::IPAddress & destAddr)
 {
     return static_cast<ImplClass *>(this)->_HaveRouteToAddress(destAddr);
 }

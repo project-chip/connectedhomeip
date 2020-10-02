@@ -64,18 +64,20 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
-    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId) override;
-    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId) override;
+    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                 const Ble::ChipBleUUID * charId) override;
+    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                   const Ble::ChipBleUUID * charId) override;
     bool CloseConnection(BLE_CONNECTION_OBJECT conId) override;
     uint16_t GetMTU(BLE_CONNECTION_OBJECT conId) const override;
-    bool SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                        PacketBuffer * pBuf) override;
-    bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                          PacketBuffer * pBuf) override;
-    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                         PacketBuffer * pBuf) override;
-    bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,
-                          const ChipBleUUID * charId) override;
+    bool SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                        System::PacketBuffer * pBuf) override;
+    bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                          System::PacketBuffer * pBuf) override;
+    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                         System::PacketBuffer * pBuf) override;
+    bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const Ble::ChipBleUUID * svcId,
+                          const Ble::ChipBleUUID * charId) override;
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 

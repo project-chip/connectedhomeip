@@ -50,9 +50,11 @@
 #undef nlLogError
 #define nlLogError(MSG, ...)
 
-namespace chip {
-
 using namespace chip::Encoding;
+using namespace chip::Inet;
+using namespace chip::System;
+
+namespace chip {
 
 enum
 {
