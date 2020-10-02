@@ -31,12 +31,12 @@ public:
 
     /////////// IPCommand Interface /////////
     void OnConnect(ChipDeviceController * dc) override { mController = dc; }
-    void OnMessage(ChipDeviceController * dc, PacketBuffer * buffer) override { ReceiveEcho(buffer); }
+    void OnMessage(ChipDeviceController * dc, chip::System::PacketBuffer * buffer) override { ReceiveEcho(buffer); }
     void OnError(ChipDeviceController * dc, CHIP_ERROR err) override { mController = nullptr; }
 
 private:
     void SendEcho(void) const;
-    void ReceiveEcho(PacketBuffer * buffer) const;
+    void ReceiveEcho(chip::System::PacketBuffer * buffer) const;
 
     ChipDeviceController * mController = nullptr;
 };

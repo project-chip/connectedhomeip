@@ -20,6 +20,7 @@
 
 using namespace ::chip;
 using namespace ::chip::DeviceController;
+using namespace ::chip::System;
 
 static void onConnect(ChipDeviceController * dc, Transport::PeerConnectionState * state, void * appReqState)
 {
@@ -29,7 +30,7 @@ static void onConnect(ChipDeviceController * dc, Transport::PeerConnectionState 
     command->OnConnect(dc);
 }
 
-static void onError(ChipDeviceController * dc, void * appReqState, CHIP_ERROR err, const IPPacketInfo * pi)
+static void onError(ChipDeviceController * dc, void * appReqState, CHIP_ERROR err, const Inet::IPPacketInfo * pi)
 {
     ChipLogError(chipTool, "OnError: %s", ErrorStr(err));
 
