@@ -64,9 +64,9 @@ namespace Internal {
  * Concrete implementation of the NetworkProvisioningServer singleton object for the ESP32 platform.
  */
 class BLEManagerImpl final : public BLEManager,
-                             private ::chip::Ble::BleLayer,
-                             private ::chip::Ble::BlePlatformDelegate,
-                             private BleApplicationDelegate
+                             private Ble::BleLayer,
+                             private Ble::BlePlatformDelegate,
+                             private Ble::BleApplicationDelegate
 {
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
