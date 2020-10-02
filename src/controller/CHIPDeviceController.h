@@ -34,7 +34,7 @@
 #include <support/DLLUtil.h>
 #include <transport/RendezvousSession.h>
 #include <transport/SecureSessionMgr.h>
-#include <transport/UDP.h>
+#include <transport/raw/UDP.h>
 
 namespace chip {
 namespace DeviceController {
@@ -196,6 +196,7 @@ public:
     void OnRendezvousConnectionClosed() override;
     void OnRendezvousError(CHIP_ERROR err) override;
     void OnRendezvousMessageReceived(PacketBuffer * buffer) override;
+    void OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status) override;
 
 private:
     enum
@@ -241,10 +242,9 @@ private:
     void ClearRequestState();
     void ClearOpState();
 
-    CHIP_ERROR ConnectDeviceUsingPairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
-                                         NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
-                                         ErrorHandler onError, uint16_t devicePort, Inet::InterfaceId interfaceId,
-                                         SecurePairingSession * pairing);
+    CHIP_ERROR ConnectDeviceUsingPairing(NodeId remoteDeviceId, void * appReqState, NewConnectionHandler onConnected,
+                                         MessageReceiveHandler onMessageReceived, ErrorHandler onError, uint16_t devicePort,
+                                         Inet::InterfaceId interfaceId, SecurePairingSession * pairing);
 };
 
 } // namespace DeviceController

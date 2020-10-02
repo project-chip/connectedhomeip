@@ -85,7 +85,7 @@ Error SystemWakeEvent::Close()
 Error SystemWakeEvent::Confirm()
 {
     uint8_t buffer[128];
-    int res;
+    ssize_t res;
 
     do
     {

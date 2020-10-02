@@ -28,7 +28,7 @@
 
 #include <core/CHIPCore.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <transport/MessageHeader.h>
+#include <transport/raw/MessageHeader.h>
 
 namespace chip {
 

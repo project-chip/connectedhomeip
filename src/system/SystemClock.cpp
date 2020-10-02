@@ -90,7 +90,7 @@ uint64_t GetClock_Monotonic()
     struct timespec ts;
     int res = clock_gettime(MONOTONIC_CLOCK_ID, &ts);
     VerifyOrDie(res == 0);
-    return (ts.tv_sec * UINT64_C(1000000)) + (ts.tv_nsec / 1000);
+    return (static_cast<uint64_t>(ts.tv_sec) * UINT64_C(1000000)) + (static_cast<uint64_t>(ts.tv_nsec) / 1000);
 #else  // HAVE_CLOCK_GETTIME
     struct timeval tv;
     int res = gettimeofday(&tv, NULL);
@@ -129,7 +129,7 @@ Error GetClock_RealTime(uint64_t & curTime)
     {
         return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
     }
-    curTime = (ts.tv_sec * UINT64_C(1000000)) + (ts.tv_nsec / 1000);
+    curTime = (static_cast<uint64_t>(ts.tv_sec) * UINT64_C(1000000)) + (static_cast<uint64_t>(ts.tv_nsec) / 1000);
     return CHIP_SYSTEM_NO_ERROR;
 #else  // HAVE_CLOCK_GETTIME
     struct timeval tv;

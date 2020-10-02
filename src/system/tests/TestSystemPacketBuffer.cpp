@@ -547,8 +547,8 @@ void CheckDetachTail(nlTestSuite * inSuite, void * inContext)
 
             if (theFirstContext != theSecondContext)
             {
-                theFirstContext->buf->next = theSecondContext->buf;
-                theFirstContext->buf->tot_len += theSecondContext->init_len;
+                theFirstContext->buf->next    = theSecondContext->buf;
+                theFirstContext->buf->tot_len = static_cast<uint16_t>(theFirstContext->buf->tot_len + theSecondContext->init_len);
             }
 
             returned = buffer_1->DetachTail();
@@ -805,13 +805,13 @@ void CheckEnsureReservedSize(nlTestSuite * inSuite, void * inContext)
     {
         for (uint16_t length : sLengths)
         {
-            PacketBuffer & lBuffer  = *PrepareTestBuffer(theContext);
-            const size_t kAllocSize = lBuffer.AllocSize();
-            uint16_t reserved_size  = theContext->reserved_size;
+            PacketBuffer & lBuffer    = *PrepareTestBuffer(theContext);
+            const uint16_t kAllocSize = lBuffer.AllocSize();
+            uint16_t reserved_size    = theContext->reserved_size;
 
             if (CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + theContext->reserved_size > kAllocSize)
             {
-                reserved_size = kAllocSize - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
+                reserved_size = static_cast<uint16_t>(kAllocSize - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE);
             }
 
             if (length <= reserved_size)
@@ -851,8 +851,8 @@ void CheckAlignPayload(nlTestSuite * inSuite, void * inContext)
     {
         for (size_t n = 0; n < kTestLengths - 1; n++)
         {
-            PacketBuffer & lBuffer  = *PrepareTestBuffer(theContext);
-            const size_t kAllocSize = lBuffer.AllocSize();
+            PacketBuffer & lBuffer    = *PrepareTestBuffer(theContext);
+            const uint16_t kAllocSize = lBuffer.AllocSize();
 
             if (sLengths[n] == 0)
             {
@@ -866,10 +866,10 @@ void CheckAlignPayload(nlTestSuite * inSuite, void * inContext)
                 reserved_size = kAllocSize;
             }
 
-            uint16_t payload_offset = (unsigned long) lBuffer.Start() % sLengths[n];
+            uint16_t payload_offset = static_cast<uint16_t>(reinterpret_cast<uintptr_t>(lBuffer.Start()) % sLengths[n]);
             uint16_t payload_shift  = 0;
             if (payload_offset > 0)
-                payload_shift = sLengths[n] - payload_offset;
+                payload_shift = static_cast<uint16_t>(sLengths[n] - payload_offset);
 
             if (payload_shift <= kAllocSize - reserved_size)
             {
@@ -1013,8 +1013,8 @@ void CheckFree(nlTestSuite * inSuite, void * inContext)
 
         for (size_t jth = 0; jth < kTestElements; jth++)
         {
-            const uint16_t init_ref_count[] = { 1, 2, 3 };
-            const int refs                  = sizeof(init_ref_count) / sizeof(uint16_t);
+            const uint8_t init_ref_count[] = { 1, 2, 3 };
+            const int refs                 = sizeof(init_ref_count) / sizeof(uint16_t);
 
             // start with various buffer ref counts
             for (size_t r = 0; r < refs; r++)

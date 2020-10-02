@@ -18,7 +18,7 @@
 #ifndef __TRANSPORT_RENDEZVOUSPARAMETERS_H__
 #define __TRANSPORT_RENDEZVOUSPARAMETERS_H__
 
-#include <transport/Base.h>
+#include <transport/raw/Base.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/Ble.h>

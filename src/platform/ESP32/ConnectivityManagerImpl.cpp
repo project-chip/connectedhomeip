@@ -903,6 +903,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
     bool haveIPv6Conn = false;
     bool hadIPv4Conn  = GetFlag(mFlags, kFlag_HaveIPv4InternetConnectivity);
     bool hadIPv6Conn  = GetFlag(mFlags, kFlag_HaveIPv6InternetConnectivity);
+    IPAddress addr;
 
     // If the WiFi station is currently in the connected state...
     if (mWiFiStationState == kWiFiStationState_Connected)
@@ -923,6 +924,15 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                 if (!ip4_addr_isany_val(*netif_ip4_addr(netif)) && !ip4_addr_isany_val(*netif_ip4_gw(netif)))
                 {
                     haveIPv4Conn = true;
+
+                    esp_netif_ip_info_t ipInfo;
+                    if (esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"), &ipInfo) == ESP_OK)
+                    {
+                        char addrStr[INET_ADDRSTRLEN];
+                        // ToDo: change the code to using IPv6 address
+                        esp_ip4addr_ntoa(&ipInfo.ip, addrStr, sizeof(addrStr));
+                        IPAddress::FromString(addrStr, addr);
+                    }
                 }
 
                 // Search among the IPv6 addresses assigned to the interface for a Global Unicast
@@ -957,6 +967,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
         event.Type                            = DeviceEventType::kInternetConnectivityChange;
         event.InternetConnectivityChange.IPv4 = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
         event.InternetConnectivityChange.IPv6 = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
+        addr.ToString(event.InternetConnectivityChange.address, sizeof(event.InternetConnectivityChange.address));
         PlatformMgr().PostEvent(&event);
 
         if (haveIPv4Conn != hadIPv4Conn)

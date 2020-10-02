@@ -28,9 +28,33 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include "sdkconfig.h"
+
+#if CONFIG_BT_BLUEDROID_ENABLED
+
 #include "esp_bt.h"
 #include "esp_gap_ble_api.h"
 #include "esp_gatts_api.h"
+#elif CONFIG_BT_NIMBLE_ENABLED
+
+/* min max macros in NimBLE can cause build issues with generic min max
+ * functions defined in CHIP.*/
+#define min
+#define max
+#include "host/ble_hs.h"
+#undef min
+#undef max
+
+/* GATT context */
+struct ble_gatt_char_context
+{
+    uint16_t conn_handle;
+    uint16_t attr_handle;
+    struct ble_gatt_access_ctxt * ctxt;
+    void * arg;
+};
+
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -114,6 +138,10 @@ class BLEManagerImpl final : public BLEManager,
         kMaxDeviceNameLength = 16
     };
 
+#if CONFIG_BT_NIMBLE_ENABLED
+    uint16_t mSubscribedConIds[kMaxConnections];
+#endif
+
     struct CHIPoBLEConState
     {
         PacketBuffer * PendingIndBuf;
@@ -126,7 +154,11 @@ class BLEManagerImpl final : public BLEManager,
 
     CHIPoBLEConState mCons[kMaxConnections];
     CHIPoBLEServiceMode mServiceMode;
+#if CONFIG_BT_BLUEDROID_ENABLED
     esp_gatt_if_t mAppIf;
+#elif CONFIG_BT_NIMBLE_ENABLED
+    uint16_t mNumGAPCons;
+#endif
     uint16_t mServiceAttrHandle;
     uint16_t mRXCharAttrHandle;
     uint16_t mTXCharAttrHandle;
@@ -138,6 +170,8 @@ class BLEManagerImpl final : public BLEManager,
     CHIP_ERROR InitESPBleLayer(void);
     CHIP_ERROR ConfigureAdvertisingData(void);
     CHIP_ERROR StartAdvertising(void);
+
+#if CONFIG_BT_BLUEDROID_ENABLED
     void HandleGATTControlEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);
     void HandleGATTCommEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);
     void HandleRXCharWrite(esp_ble_gatts_cb_param_t * param);
@@ -151,6 +185,30 @@ class BLEManagerImpl final : public BLEManager,
 
     static void HandleGATTEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);
     static void HandleGAPEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t * param);
+
+#elif CONFIG_BT_NIMBLE_ENABLED
+    void HandleRXCharRead(struct ble_gatt_char_context * param);
+    void HandleRXCharWrite(struct ble_gatt_char_context * param);
+    void HandleTXCharWrite(struct ble_gatt_char_context * param);
+    void HandleTXCharRead(struct ble_gatt_char_context * param);
+    void HandleTXCharCCCDRead(void * param);
+    void HandleTXCharCCCDWrite(struct ble_gap_event * gapEvent);
+    CHIP_ERROR HandleTXComplete(struct ble_gap_event * gapEvent);
+    CHIP_ERROR HandleGAPConnect(struct ble_gap_event * gapEvent);
+    CHIP_ERROR HandleGAPDisconnect(struct ble_gap_event * gapEvent);
+    CHIP_ERROR SetSubscribed(uint16_t conId);
+    bool UnsetSubscribed(uint16_t conId);
+    bool IsSubscribed(uint16_t conId);
+
+    static void bleprph_host_task(void * param);
+    static void bleprph_on_sync(void);
+    static void bleprph_on_reset(int);
+    static const struct ble_gatt_svc_def CHIPoBLEGATTAttrs[];
+    static int ble_svr_gap_event(struct ble_gap_event * event, void * arg);
+
+    static int gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt * ctxt, void * arg);
+#endif
+
     static void DriveBLEState(intptr_t arg);
 };
 
