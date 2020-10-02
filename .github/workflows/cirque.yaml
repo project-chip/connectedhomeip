@@ -28,9 +28,11 @@ jobs:
             image: connectedhomeip/chip-build-cirque:0.4.9
             volumes:
                 - "/tmp/cirque_test_output:/tmp/cirque_test_output"
+                - "/dev/pts:/dev/pts"
 
         env:
             LOG_DIR: /tmp/cirque_test_output/
+            privileged: true
             CLEANUP_DOCKER_FOR_CI: 1
 
         steps:

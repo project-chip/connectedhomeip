@@ -81,7 +81,6 @@ function cirquetest_bootstrap() {
     pip3 install pycodestyle==2.5.0 wheel
     make NO_GRPC=1 install -j
     ./dependency_modules.sh
-    pip3 install -r requirements_nogrpc.txt
 
     # Call activate here so the later tests can be faster
     # set -e will cause error if activate.sh is sourced twice
@@ -108,7 +107,10 @@ function cirquetest_run_test() {
     if [ "x$CLEANUP_DOCKER_FOR_CI" = "x1" ]; then
         echo "Do docker container and network prune"
         # TODO: Filter cirque containers
-        docker ps -aq | xargs docker stop >/dev/null 2>&1
+        IN_DOCKER=`cat /proc/1/cgroup | grep docker`
+        if [ -z $IN_DOCKER ]; then
+            docker ps -aq | xargs docker stop >/dev/null 2>&1
+        fi
         docker container prune -f >/dev/null 2>&1
         docker network prune -f >/dev/null 2>&1
     fi

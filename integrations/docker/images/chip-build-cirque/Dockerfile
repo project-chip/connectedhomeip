@@ -36,3 +36,9 @@ RUN set -x \
        python3-pip python3-venv python3-setuptools libdbus-glib-1-dev \
        uuid-runtime libgirepository1.0-dev \
     && : # aids diffs
+
+COPY requirements_nogrpc.txt /requirements.txt
+
+RUN set -x \
+    && pip3 install -r requirements.txt \
+    && : # aids diffs
