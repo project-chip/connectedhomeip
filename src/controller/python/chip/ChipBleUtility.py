@@ -41,13 +41,7 @@ BLE_SUBSCRIBE_OPERATION_UNSUBSCRIBE = 2
 # From BleError.h:
 BLE_ERROR_REMOTE_DEVICE_DISCONNECTED = 12
 
-# Internal representation of the BLE peripheral State enum.
-BLE_PERIPHERAL_STATE_DISCONNECTED = 0
-
 FAKE_CONN_OBJ_VALUE = 12121212
-
-CBCharacteristicWriteWithResponse = 0
-CBCharacteristicWriteWithoutResponse = 1
 
 
 def VoidPtrToUUIDString(ptr, len):

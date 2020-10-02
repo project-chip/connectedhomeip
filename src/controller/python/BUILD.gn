@@ -55,13 +55,20 @@ copy("deviceControllerPyCopy1") {
   sources = [
     "chip/ChipBleBase.py",
     "chip/ChipBleUtility.py",
-    "chip/ChipBluezMgr.py",
     "chip/ChipDeviceCtrl.py",
     "chip/ChipStack.py",
     "chip/ChipTLV.py",
     "chip/ChipUtility.py",
     "chip/__init__.py",
   ]
+
+  if (current_os == "linux") {
+    sources += [ "chip/ChipBluezMgr.py" ]
+  }
+
+  if (current_os == "mac") {
+    sources += [ "chip/ChipCoreBluetoothMgr.py" ]
+  }
 
   public_deps = [ ":ChipDeviceCtrl" ]
 
@@ -99,6 +106,14 @@ action("python") {
     "--build_number",
     "0.0",
   ]
+
+  if (current_os == "linux") {
+    inputs += [ "chip/ChipBluezMgr.py" ]
+  }
+
+  if (current_os == "mac") {
+    inputs += [ "chip/ChipCoreBluetoothMgr.py" ]
+  }
 
   public_deps = [
     ":deviceControllerPyCopy1",
