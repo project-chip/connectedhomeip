@@ -84,14 +84,14 @@ template <class ImplClass>
 inline void GenericConnectivityManagerImpl_BLE<ImplClass>::_AddCHIPoBLEConnectionHandler(
     ConnectivityManager::BleConnectionReceivedFunct handler)
 {
-    BleLayer * bleLayer                = BLEMgr().GetBleLayer();
+    Ble::BleLayer * bleLayer           = BLEMgr().GetBleLayer();
     bleLayer->OnChipBleConnectReceived = handler;
 }
 
 template <class ImplClass>
 inline void GenericConnectivityManagerImpl_BLE<ImplClass>::_RemoveCHIPoBLEConnectionHandler()
 {
-    BleLayer * bleLayer                = BLEMgr().GetBleLayer();
+    Ble::BleLayer * bleLayer           = BLEMgr().GetBleLayer();
     bleLayer->OnChipBleConnectReceived = nullptr;
 }
 
