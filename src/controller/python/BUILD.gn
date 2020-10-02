@@ -73,8 +73,6 @@ copy("deviceControllerPyCopy1") {
     sources += [ "chip/ChipCoreBluetoothMgr.py" ]
   }
 
-  public_deps = [ ":ChipDeviceCtrl" ]
-
   outputs = [ "$root_out_dir/controller/python/chip/{{source_file_part}}" ]
 }
 
@@ -84,24 +82,16 @@ copy("deviceControllerPyCopy2") {
     "chip-device-ctrl.py",
   ]
 
-  public_deps = [ ":ChipDeviceCtrl" ]
-
   outputs = [ "$root_out_dir/controller/python/{{source_name_part}}" ]
 }
 
 pw_python_script("python") {
   script = "$root_out_dir/controller/python/build-chip-wheel"
 
-  inputs = [
-    "chip/ChipBleBase.py",
-    "chip/ChipBleUtility.py",
-    "chip/ChipBluezMgr.py",
-    "chip/ChipDeviceCtrl.py",
-    "chip/ChipStack.py",
-    "chip/ChipTLV.py",
-    "chip/ChipUtility.py",
-    "chip/__init__.py",
-  ]
+  inputs = [ "${root_out_dir}/controller/python/chip/_ChipDeviceCtrl.so" ]
+
+  inputs += get_target_outputs(":deviceControllerPyCopy1")
+  inputs += get_target_outputs(":deviceControllerPyCopy2")
 
   args = [
     "--package_name",
@@ -119,6 +109,7 @@ pw_python_script("python") {
   }
 
   public_deps = [
+    ":ChipDeviceCtrl",
     ":deviceControllerPyCopy1",
     ":deviceControllerPyCopy2",
   ]
