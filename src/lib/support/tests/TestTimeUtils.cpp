@@ -800,7 +800,7 @@ OrdinalDateTestValue LeapYearOrdinalDates[] =
 };
 // clang-format on
 
-void TestOrdinalDateConversion(void)
+void TestOrdinalDateConversion()
 {
     for (uint16_t year = 0; year <= 10000; year++)
     {
@@ -823,7 +823,7 @@ void TestOrdinalDateConversion(void)
     }
 }
 
-void TestDaysSinceEpochConversion(void)
+void TestDaysSinceEpochConversion()
 {
     uint32_t daysSinceEpoch = 0;
 
@@ -869,7 +869,7 @@ void TestDaysSinceEpochConversion(void)
     }
 }
 
-void TestSecondsSinceEpochConversion(void)
+void TestSecondsSinceEpochConversion()
 {
     uint32_t daysSinceEpoch = 0;
     uint32_t timeOfDay      = 0;

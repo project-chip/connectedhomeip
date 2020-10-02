@@ -125,8 +125,8 @@ extern uint32_t gOptFlags;
 
 namespace Common {
 
-extern bool IsReceiver(void);
-extern bool IsSender(void);
+extern bool IsReceiver();
+extern bool IsSender();
 
 extern bool IsTesting(const TestStatus & aTestStatus);
 extern bool WasSuccessful(const TestStatus & aTestStatus);
@@ -168,6 +168,6 @@ extern void HandleUDPReceiveError(const Inet::IPEndPointBasis * aEndPoint, const
 // Period send function to be implemented by individual tests but
 // referenced by common code.
 
-extern void DriveSend(void);
+extern void DriveSend();
 
 #endif // CHIP_TEST_INETLAYER_COMMON_HPP

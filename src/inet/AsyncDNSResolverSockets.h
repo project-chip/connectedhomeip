@@ -62,7 +62,7 @@ public:
 
     INET_ERROR Cancel(DNSResolver & resolver);
 
-    INET_ERROR Shutdown(void);
+    INET_ERROR Shutdown();
 
     INET_ERROR PrepareDNSResolver(DNSResolver & resolver, const char * hostName, uint16_t hostNameLen, uint8_t options,
                                   uint8_t maxAddrs, IPAddress * addrArray, DNSResolver::OnResolveCompleteFunct onComplete,
@@ -81,7 +81,7 @@ private:
 
     INET_ERROR DequeueRequest(DNSResolver ** outResolver);
 
-    bool ShouldThreadShutdown(void);
+    bool ShouldThreadShutdown();
 
     void Resolve(DNSResolver & resolver);
 
@@ -91,9 +91,9 @@ private:
 
     static void NotifyChipThread(DNSResolver * resolver);
 
-    void AsyncMutexLock(void);
+    void AsyncMutexLock();
 
-    void AsyncMutexUnlock(void);
+    void AsyncMutexUnlock();
 };
 
 } // namespace Inet

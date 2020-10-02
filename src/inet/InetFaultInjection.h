@@ -53,7 +53,7 @@ typedef enum
     kFault_NumItems,
 } InetFaultInjectionID;
 
-DLL_EXPORT nl::FaultInjection::Manager & GetManager(void);
+DLL_EXPORT nl::FaultInjection::Manager & GetManager();
 
 } // namespace FaultInjection
 } // namespace Inet

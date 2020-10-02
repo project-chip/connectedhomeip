@@ -83,7 +83,7 @@ public:
      *
      * @return  \c true if equivalent to \c Zero, else \c false.
      */
-    bool IsZero(void) const;
+    bool IsZero() const;
 
     /**
      * @brief   Compares the prefix with another for equivalence.

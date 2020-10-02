@@ -266,7 +266,7 @@ CHIP_ERROR ChipLinuxStorage::ClearValue(const char * key)
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorage::ClearAll(void)
+CHIP_ERROR ChipLinuxStorage::ClearAll()
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
@@ -302,7 +302,7 @@ bool ChipLinuxStorage::HasValue(const char * key)
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorage::Commit(void)
+CHIP_ERROR ChipLinuxStorage::Commit()
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 

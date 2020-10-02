@@ -193,7 +193,7 @@ CHIP_ERROR ChipMessageLayer::Init(InitContext * context)
     }
     else
     {
-        ChipLogProgress(MessageLayer, "WoBLE disabled%s", (mBle != NULL) ? " by application" : " (BLE layer not initialized)");
+        ChipLogProgress(MessageLayer, "CHIPoBLE disabled%s", (mBle != NULL) ? " by application" : " (BLE layer not initialized)");
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
@@ -2093,7 +2093,7 @@ CHIP_ERROR ChipMessageLayer::CloseEndpoints()
     return CHIP_NO_ERROR;
 }
 
-void ChipMessageLayer::CloseListeningEndpoints(void)
+void ChipMessageLayer::CloseListeningEndpoints()
 {
     ChipBindLog("Closing endpoints");
 
@@ -2213,7 +2213,7 @@ void ChipMessageLayer::SetSignalMessageLayerActivityChanged(
     OnMessageLayerActivityChange = messageLayerActivityChangeHandler;
 }
 
-bool ChipMessageLayer::IsMessageLayerActive(void)
+bool ChipMessageLayer::IsMessageLayerActive()
 {
     return (ExchangeMgr->mContextsInUse != 0)
 #if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
@@ -2232,7 +2232,7 @@ bool ChipMessageLayer::IsMessageLayerActive(void)
  *
  *  @retval None.
  */
-void ChipMessageLayer::SignalMessageLayerActivityChanged(void)
+void ChipMessageLayer::SignalMessageLayerActivityChanged()
 {
     if (OnMessageLayerActivityChange)
     {

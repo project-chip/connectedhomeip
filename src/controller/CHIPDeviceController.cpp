@@ -164,8 +164,8 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, Rendezvous
     }
 #endif // CONFIG_DEVICE_LAYER
 
-    rendezvousSession = new RendezvousSession(this, params.SetLocalNodeId(mLocalDeviceId));
-    err               = rendezvousSession->Init();
+    rendezvousSession = new RendezvousSession(this);
+    err               = rendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId));
     SuccessOrExit(err);
 
     mRendezvousSession = rendezvousSession;
@@ -189,7 +189,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::ConnectDeviceUsingPairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
+CHIP_ERROR ChipDeviceController::ConnectDeviceUsingPairing(NodeId remoteDeviceId, void * appReqState,
                                                            NewConnectionHandler onConnected,
                                                            MessageReceiveHandler onMessageReceived, ErrorHandler onError,
                                                            uint16_t devicePort, Inet::InterfaceId interfaceId,
@@ -203,7 +203,6 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceUsingPairing(NodeId remoteDeviceId
     }
 
     mRemoteDeviceId  = Optional<NodeId>::Value(remoteDeviceId);
-    mDeviceAddr      = deviceAddr;
     mDevicePort      = devicePort;
     mAppReqState     = appReqState;
     mOnNewConnection = onConnected;
@@ -211,7 +210,7 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceUsingPairing(NodeId remoteDeviceId
     mSessionManager = new SecureSessionMgr<Transport::UDP>();
 
     err = mSessionManager->Init(mLocalDeviceId, mSystemLayer,
-                                Transport::UdpListenParameters(mInetLayer).SetAddressType(deviceAddr.Type()));
+                                Transport::UdpListenParameters(mInetLayer).SetAddressType(mDeviceAddr.Type()));
     SuccessOrExit(err);
 
     mSessionManager->SetDelegate(this);
@@ -222,7 +221,7 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceUsingPairing(NodeId remoteDeviceId
     mOnError             = onError;
 
     err = mSessionManager->NewPairing(
-        Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(deviceAddr, devicePort, interfaceId)), pairing);
+        Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(mDeviceAddr, devicePort, interfaceId)), pairing);
     SuccessOrExit(err);
 
     mMessageNumber = 1;
@@ -250,8 +249,8 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress 
                                                NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
                                                ErrorHandler onError, uint16_t devicePort, Inet::InterfaceId interfaceId)
 {
-    return ConnectDeviceUsingPairing(remoteDeviceId, deviceAddr, appReqState, onConnected, onMessageReceived, onError, devicePort,
-                                     interfaceId, &mPairingSession);
+    return ConnectDeviceUsingPairing(remoteDeviceId, appReqState, onConnected, onMessageReceived, onError, devicePort, interfaceId,
+                                     &mPairingSession);
 }
 
 CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
@@ -260,8 +259,9 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remote
                                                                    uint16_t devicePort, Inet::InterfaceId interfaceId)
 {
     SecurePairingUsingTestSecret pairing(Optional<NodeId>::Value(remoteDeviceId), 0, 0);
-    return ConnectDeviceUsingPairing(remoteDeviceId, deviceAddr, appReqState, onConnected, onMessageReceived, onError, devicePort,
-                                     interfaceId, &pairing);
+    mDeviceAddr = deviceAddr;
+    return ConnectDeviceUsingPairing(remoteDeviceId, appReqState, onConnected, onMessageReceived, onError, devicePort, interfaceId,
+                                     &pairing);
 }
 
 CHIP_ERROR ChipDeviceController::PopulatePeerAddress(Transport::PeerAddress & peerAddress)
@@ -424,6 +424,15 @@ void ChipDeviceController::OnRendezvousMessageReceived(PacketBuffer * buffer)
     if (mOnComplete.Response)
     {
         mOnComplete.Response(this, mAppReqState, buffer);
+    }
+}
+
+void ChipDeviceController::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status)
+{
+    if (status == RendezvousSessionDelegate::NetworkProvisioningSuccess)
+    {
+        ChipLogProgress(Controller, "Remote device was assigned an ip address\n");
+        mDeviceAddr = mRendezvousSession->GetIPAddress();
     }
 }
 

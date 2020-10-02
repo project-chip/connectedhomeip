@@ -23,11 +23,10 @@
 
 #include "TestTransportLayer.h"
 
-#include "NetworkTestHelpers.h"
-
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
@@ -107,7 +106,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    size_t payload_len = sizeof(PAYLOAD);
+    uint16_t payload_len = sizeof(PAYLOAD);
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 

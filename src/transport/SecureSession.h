@@ -28,14 +28,14 @@
 
 #include <core/CHIPCore.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <transport/MessageHeader.h>
+#include <transport/raw/MessageHeader.h>
 
 namespace chip {
 
 class DLL_EXPORT SecureSession
 {
 public:
-    SecureSession(void);
+    SecureSession();
     SecureSession(SecureSession &&)      = default;
     SecureSession(const SecureSession &) = default;
     SecureSession & operator=(const SecureSession &) = default;
@@ -109,12 +109,12 @@ public:
      *
      * @return number of bytes.
      */
-    size_t EncryptionOverhead(void);
+    size_t EncryptionOverhead();
 
     /**
      * Clears the internal state of secure session back to the state of a new object.
      */
-    void Reset(void);
+    void Reset();
 
 private:
     static constexpr size_t kAES_CCM128_Key_Length = 16;

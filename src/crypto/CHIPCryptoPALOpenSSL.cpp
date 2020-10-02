@@ -297,9 +297,9 @@ exit:
     return error;
 }
 
-Hash_SHA256_stream::Hash_SHA256_stream(void) {}
+Hash_SHA256_stream::Hash_SHA256_stream() {}
 
-Hash_SHA256_stream::~Hash_SHA256_stream(void) {}
+Hash_SHA256_stream::~Hash_SHA256_stream() {}
 
 static inline SHA256_CTX * to_inner_hash_sha256_context(HashSHA256OpaqueContext * context)
 {
@@ -307,7 +307,7 @@ static inline SHA256_CTX * to_inner_hash_sha256_context(HashSHA256OpaqueContext 
     return reinterpret_cast<SHA256_CTX *>(context->mOpaque);
 }
 
-CHIP_ERROR Hash_SHA256_stream::Begin(void)
+CHIP_ERROR Hash_SHA256_stream::Begin()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 1;
@@ -349,7 +349,7 @@ exit:
     return error;
 }
 
-void Hash_SHA256_stream::Clear(void)
+void Hash_SHA256_stream::Clear()
 {
     memset(this, 0, sizeof(*this));
 }
@@ -1096,7 +1096,7 @@ static inline Spake2p_Context * to_inner_spake2p_context(Spake2pOpaqueContext * 
     return reinterpret_cast<Spake2p_Context *>(context->mOpaque);
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal()
 {
     CHIP_ERROR error  = CHIP_ERROR_INTERNAL;
     int error_openssl = 0;
@@ -1140,7 +1140,7 @@ exit:
     return error;
 }
 
-void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl(void)
+void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl()
 {
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 

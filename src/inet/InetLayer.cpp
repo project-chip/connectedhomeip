@@ -107,7 +107,7 @@ void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
  *  method must be called successfully prior to using the object.
  *
  */
-InetLayer::InetLayer(void)
+InetLayer::InetLayer()
 {
     State = kState_NotInitialized;
 
@@ -308,7 +308,7 @@ exit:
  *          the reason for shutdown failure.
  *
  */
-INET_ERROR InetLayer::Shutdown(void)
+INET_ERROR InetLayer::Shutdown()
 {
     INET_ERROR err;
 
@@ -388,7 +388,7 @@ exit:
  *         otherwise, NULL.
  *
  */
-void * InetLayer::GetPlatformData(void)
+void * InetLayer::GetPlatformData()
 {
     return mPlatformData;
 }
@@ -406,7 +406,7 @@ void InetLayer::SetPlatformData(void * aPlatformData)
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
-bool InetLayer::IsIdleTimerRunning(void)
+bool InetLayer::IsIdleTimerRunning()
 {
     bool timerRunning = false;
 

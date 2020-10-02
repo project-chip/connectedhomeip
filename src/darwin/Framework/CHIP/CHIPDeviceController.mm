@@ -211,7 +211,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 
     [self.lock lock];
 
-    chip::RendezvousParameters params = chip::RendezvousParameters(setupPINCode).SetDiscriminator(discriminator);
+    chip::RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetDiscriminator(discriminator);
     err = self.cppController->ConnectDevice(
         kRemoteDeviceId, params, (__bridge void *) self, onConnected, onMessageReceived, onInternalError);
     [self.lock unlock];
@@ -346,6 +346,18 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
         // Hardcode endpoint to 1 for now
         return encodeToggleCommand(buffer->Start(), bufferSize, 1);
+    }];
+}
+
+- (BOOL)sendIdentifyCommandWithDuration:(NSTimeInterval)duration
+{
+    if (duration > UINT16_MAX) {
+        duration = UINT16_MAX;
+    }
+
+    return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
+        // Hardcode endpoint to 1 for now
+        return encodeIdentifyCommand(buffer->Start(), bufferSize, 1, duration);
     }];
 }
 

@@ -57,8 +57,8 @@ namespace chip {
 class PersistedCounter : public MonotonicallyIncreasingCounter
 {
 public:
-    PersistedCounter(void);
-    ~PersistedCounter(void) override;
+    PersistedCounter();
+    ~PersistedCounter() override;
 
     /**
      *  @brief
@@ -83,7 +83,7 @@ public:
      *
      *  @return Any error returned by a write to persisted storage.
      */
-    CHIP_ERROR Advance(void) override;
+    CHIP_ERROR Advance() override;
 
 private:
     /**

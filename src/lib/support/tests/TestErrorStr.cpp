@@ -54,7 +54,7 @@ static bool trueFormat(char * buf, uint16_t bufSize, int32_t err)
     return true; // means I handled it
 }
 
-static bool testRegisterDeregisterErrorFormatter(void)
+static bool testRegisterDeregisterErrorFormatter()
 {
     static ErrorFormatter falseFormatter  = { falseFormat, nullptr };
     static ErrorFormatter falseFormatter2 = { falseFormat2, nullptr };

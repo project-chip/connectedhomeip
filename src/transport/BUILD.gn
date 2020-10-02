@@ -19,10 +19,6 @@ static_library("transport") {
   output_name = "libTransportLayer"
 
   sources = [
-    "Base.h",
-    "MessageHeader.cpp",
-    "MessageHeader.h",
-    "PeerAddress.h",
     "PeerConnectionState.h",
     "PeerConnections.h",
     "RendezvousParameters.h",
@@ -35,11 +31,6 @@ static_library("transport") {
     "SecureSession.h",
     "SecureSessionMgr.cpp",
     "SecureSessionMgr.h",
-    "TCP.cpp",
-    "TCP.h",
-    "Tuple.h",
-    "UDP.cpp",
-    "UDP.h",
   ]
 
   if (chip_config_network_layer_ble) {
@@ -49,11 +40,14 @@ static_library("transport") {
     ]
   }
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+    "${chip_root}/src/transport/raw",
   ]
 }

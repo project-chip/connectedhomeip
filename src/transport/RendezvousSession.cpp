@@ -15,9 +15,15 @@
  *    limitations under the License.
  */
 
+#include <core/CHIPSafeCasts.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/SafeInt.h>
 #include <transport/RendezvousSession.h>
+
+#if CONFIG_DEVICE_LAYER
+#include <platform/CHIPDeviceLayer.h>
+#endif
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <transport/BLE.h>
@@ -29,12 +35,20 @@ static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Exchange Salt"
 
 namespace chip {
 
-CHIP_ERROR RendezvousSession::Init()
+enum NetworkProvisioningMsgTypes : uint8_t
+{
+    kWiFiAssociationRequest = 0,
+    kIPAddressAssigned      = 1,
+};
+
+CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    mParams = params;
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mParams.HasLocalNodeId(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mParams.HasLocalNodeId(), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(mParams.HasSetupPINCode(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #if CONFIG_NETWORK_LAYER_BLE
@@ -51,6 +65,9 @@ CHIP_ERROR RendezvousSession::Init()
     if (mParams.HasDiscriminator() == false)
     {
         err = WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
+#if CONFIG_DEVICE_LAYER
+        DeviceLayer::PlatformMgr().AddEventHandler(ConnectivityHandler, reinterpret_cast<intptr_t>(this));
+#endif
     }
 
 exit:
@@ -70,7 +87,9 @@ RendezvousSession::~RendezvousSession()
 
 CHIP_ERROR RendezvousSession::SendMessage(System::PacketBuffer * msgBuf)
 {
-    CHIP_ERROR err = mPairingInProgress ? SendPairingMessage(msgBuf) : SendSecureMessage(msgBuf);
+    CHIP_ERROR err = mPairingInProgress ? SendPairingMessage(msgBuf)
+                                        : SendSecureMessage(Protocols::kChipProtocol_NetworkProvisioning,
+                                                            NetworkProvisioningMsgTypes::kWiFiAssociationRequest, msgBuf);
     SuccessOrExit(err);
 
 exit:
@@ -80,12 +99,11 @@ exit:
     }
     return err;
 }
-
 CHIP_ERROR RendezvousSession::SendPairingMessage(System::PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     PacketHeader header;
-    size_t headerSize = 0;
+    uint16_t headerSize = 0;
 
     VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msgBuf->Next() == nullptr, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -101,27 +119,30 @@ exit:
     return err;
 }
 
-CHIP_ERROR RendezvousSession::SendSecureMessage(System::PacketBuffer * msgBuf)
+CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     PacketHeader packetHeader;
     PayloadHeader payloadHeader;
     MessageAuthenticationCode mac;
-    const size_t headerSize = payloadHeader.EncodeSizeBytes();
-    size_t actualEncodedHeaderSize;
-    uint8_t * data  = nullptr;
-    size_t totalLen = 0;
-    size_t taglen   = 0;
+    const uint16_t headerSize = payloadHeader.EncodeSizeBytes();
+    uint16_t actualEncodedHeaderSize;
+    uint8_t * data    = nullptr;
+    uint16_t totalLen = 0;
+    uint16_t taglen   = 0;
 
     VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msgBuf->Next() == nullptr, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrExit(msgBuf->TotalLength() < kMax_SecureSDU_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrExit(CanCastTo<uint16_t>(headerSize + msgBuf->TotalLength()), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     packetHeader
         .SetSourceNodeId(mParams.GetLocalNodeId())           //
         .SetMessageId(mSecureMessageIndex)                   //
         .SetEncryptionKeyID(mPairingSession.GetLocalKeyId()) //
-        .SetPayloadLength(headerSize + msgBuf->TotalLength());
+        .SetPayloadLength(static_cast<uint16_t>(headerSize + msgBuf->TotalLength()));
+
+    payloadHeader.SetProtocolID(static_cast<uint16_t>(protocol)).SetMessageType(msgType);
 
     VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
@@ -138,7 +159,8 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(System::PacketBuffer * msgBuf)
     err = mac.Encode(packetHeader, &data[totalLen], kMaxTagLen, &taglen);
     SuccessOrExit(err);
 
-    msgBuf->SetDataLength(totalLen + taglen);
+    VerifyOrExit(CanCastTo<uint16_t>(totalLen + taglen), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
 
     err = mTransport->SendMessage(packetHeader, payloadHeader.GetEncodePacketFlags(), Transport::PeerAddress::BLE(), msgBuf);
     SuccessOrExit(err);
@@ -154,6 +176,7 @@ void RendezvousSession::OnPairingError(CHIP_ERROR err)
 {
     mPairingInProgress = false;
     mDelegate->OnRendezvousError(err);
+    mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::SecurePairingFailed);
 }
 
 void RendezvousSession::OnPairingComplete()
@@ -164,6 +187,7 @@ void RendezvousSession::OnPairingComplete()
                                                          strlen(kSpake2pI2RSessionInfo), mSecureSession);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Ble, "Failed to initialize a secure session: %s", ErrorStr(err)));
 
+    mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::SecurePairingSuccess);
     mDelegate->OnRendezvousConnectionOpened();
 
 exit:
@@ -220,7 +244,7 @@ CHIP_ERROR RendezvousSession::HandlePairingMessage(PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     PacketHeader packetHeader;
-    size_t headerSize = 0;
+    uint16_t headerSize = 0;
 
     err = packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
     SuccessOrExit(err);
@@ -240,12 +264,12 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
     PacketHeader packetHeader;
     PayloadHeader payloadHeader;
     MessageAuthenticationCode mac;
-    size_t headerSize              = 0;
+    uint16_t headerSize            = 0;
     uint8_t * data                 = nullptr;
     uint8_t * plainText            = nullptr;
     uint16_t len                   = 0;
-    size_t decodedSize             = 0;
-    size_t taglen                  = 0;
+    uint16_t decodedSize           = 0;
+    uint16_t taglen                = 0;
     System::PacketBuffer * origMsg = nullptr;
 
     err = packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
@@ -265,10 +289,11 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
 #endif
     plainText = msgBuf->Start();
 
+    // TODO: We need length checks here!  https://github.com/project-chip/connectedhomeip/issues/2928
     err = mac.Decode(packetHeader, &data[packetHeader.GetPayloadLength()], kMaxTagLen, &taglen);
     SuccessOrExit(err);
 
-    len -= taglen;
+    len = static_cast<uint16_t>(len - taglen);
     msgBuf->SetDataLength(len);
 
     err = mSecureSession.Decrypt(data, len, plainText, packetHeader, payloadHeader.GetEncodePacketFlags(), mac);
@@ -280,7 +305,21 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
 
     msgBuf->ConsumeHead(headerSize);
 
-    mDelegate->OnRendezvousMessageReceived(msgBuf);
+    if (payloadHeader.GetProtocolID() == Protocols::kChipProtocol_NetworkProvisioning &&
+        payloadHeader.GetMessageType() == NetworkProvisioningMsgTypes::kIPAddressAssigned)
+    {
+        if (!IPAddress::FromString(Uint8::to_const_char(msgBuf->Start()), msgBuf->DataLength(), mDeviceAddress))
+        {
+            mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningFailed);
+            ExitNow(err = CHIP_ERROR_INVALID_ADDRESS);
+        }
+        mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningSuccess);
+    }
+    // else .. TBD once application dependency on this message has been removed, enable the else condition
+    {
+        mDelegate->OnRendezvousMessageReceived(msgBuf);
+    }
+
     msgBuf = nullptr;
 
 exit:
@@ -305,5 +344,49 @@ CHIP_ERROR RendezvousSession::Pair(Optional<NodeId> nodeId, uint32_t setupPINCod
     return mPairingSession.Pair(setupPINCode, kSpake2p_Iteration_Count, (const unsigned char *) kSpake2pKeyExchangeSalt,
                                 strlen(kSpake2pKeyExchangeSalt), nodeId, mNextKeyId++, this);
 }
+
+void RendezvousSession::SendIPAddress(const IPAddress & addr)
+{
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    System::PacketBuffer * buffer = System::PacketBuffer::New();
+    char * addrStr                = addr.ToString(Uint8::to_char(buffer->Start()), buffer->AvailableDataLength());
+    size_t addrLen                = 0;
+
+    VerifyOrExit(addrStr != nullptr, err = CHIP_ERROR_INVALID_ADDRESS);
+    VerifyOrExit(mPairingInProgress == false, err = CHIP_ERROR_INCORRECT_STATE);
+
+    addrLen = strlen(addrStr) + 1;
+
+    VerifyOrExit(CanCastTo<uint16_t>(addrLen), err = CHIP_ERROR_INVALID_ARGUMENT);
+    buffer->SetDataLength(static_cast<uint16_t>(addrLen));
+
+    err = SendSecureMessage(Protocols::kChipProtocol_NetworkProvisioning, NetworkProvisioningMsgTypes::kIPAddressAssigned, buffer);
+    SuccessOrExit(err);
+
+exit:
+    if (CHIP_NO_ERROR != err)
+    {
+        OnRendezvousError(err);
+        PacketBuffer::Free(buffer);
+    }
+}
+
+#if CONFIG_DEVICE_LAYER
+void RendezvousSession::ConnectivityHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    RendezvousSession * session = reinterpret_cast<RendezvousSession *>(arg);
+
+    VerifyOrExit(session != nullptr, /**/);
+    VerifyOrExit(event->Type == DeviceLayer::DeviceEventType::kInternetConnectivityChange, /**/);
+    VerifyOrExit(event->InternetConnectivityChange.IPv4 == DeviceLayer::kConnectivity_Established, /**/);
+
+    IPAddress addr;
+    IPAddress::FromString(event->InternetConnectivityChange.address, addr);
+    session->SendIPAddress(addr);
+
+exit:
+    return;
+}
+#endif
 
 } // namespace chip

@@ -240,36 +240,36 @@ bool IPAddress::IsIPv4() const
 }
 
 // Is address a IPv4 multicast address?
-bool IPAddress::IsIPv4Multicast(void) const
+bool IPAddress::IsIPv4Multicast() const
 {
     return (IsIPv4() && ((ntohl(Addr[3]) & 0xF0000000U) == 0xE0000000U));
 }
 
 // Is address the IPv4 broadcast address?
-bool IPAddress::IsIPv4Broadcast(void) const
+bool IPAddress::IsIPv4Broadcast() const
 {
     return (IsIPv4() && (Addr[3] == 0xFFFFFFFFU));
 }
 
 // Is address an IPv4 or IPv6 multicast address?
-bool IPAddress::IsMulticast(void) const
+bool IPAddress::IsMulticast() const
 {
     return (IsIPv6Multicast() || IsIPv4Multicast());
 }
 
-bool IPAddress::IsIPv6(void) const
+bool IPAddress::IsIPv6() const
 {
     return *this != Any && !IsIPv4();
 }
 
 // Is address an IPv6 multicast address?
-bool IPAddress::IsIPv6Multicast(void) const
+bool IPAddress::IsIPv6Multicast() const
 {
     return (ntohl(Addr[0]) & 0xFF000000U) == 0xFF000000U;
 }
 
 // Is address an IPv6 Global Unicast Address?
-bool IPAddress::IsIPv6GlobalUnicast(void) const
+bool IPAddress::IsIPv6GlobalUnicast() const
 {
     return (ntohl(Addr[0]) & 0xE0000000U) == 0x20000000U;
 }
@@ -451,7 +451,7 @@ IPAddress IPAddress::MakeIPv6PrefixMulticast(uint8_t aScope, uint8_t aPrefixLeng
     return (MakeIPv6TransientMulticast(lFlags, aScope, lGroupId));
 }
 
-IPAddress IPAddress::MakeIPv4Broadcast(void)
+IPAddress IPAddress::MakeIPv4Broadcast()
 {
     IPAddress ipAddr;
     ipAddr.Addr[0] = 0;

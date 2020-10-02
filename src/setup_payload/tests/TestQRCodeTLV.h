@@ -24,6 +24,6 @@
 #ifndef TESTQRCODETLV_H
 #define TESTQRCODETLV_H
 
-int TestQRCodeTLV(void);
+int TestQRCodeTLV();
 
 #endif // TESTQRCODETLV_H

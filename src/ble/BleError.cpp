@@ -38,7 +38,7 @@ namespace Ble {
 /**
  * Register a text error formatter for BLE Layer errors.
  */
-void RegisterLayerErrorFormatter(void)
+void RegisterLayerErrorFormatter()
 {
     static ErrorFormatter sBleLayerErrorFormatter = { FormatLayerError, nullptr };
 

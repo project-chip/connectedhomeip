@@ -46,6 +46,8 @@ enum chipBLEServiceDataType
  */
 struct ChipBLEDeviceIdentificationInfo
 {
+    constexpr static uint16_t kDiscriminatorMask = 0xfff;
+
     enum
     {
         kPairingStatus_Unpaired = 0,
@@ -59,26 +61,25 @@ struct ChipBLEDeviceIdentificationInfo
 
     void Init() { memset(this, 0, sizeof(*this)); }
 
-    uint16_t GetVendorId(void) { return chip::Encoding::LittleEndian::Get16(DeviceVendorId); }
+    uint16_t GetVendorId() const { return chip::Encoding::LittleEndian::Get16(DeviceVendorId); }
 
     void SetVendorId(uint16_t vendorId) { chip::Encoding::LittleEndian::Put16(DeviceVendorId, vendorId); }
 
-    uint16_t GetProductId(void) { return chip::Encoding::LittleEndian::Get16(DeviceProductId); }
+    uint16_t GetProductId() const { return chip::Encoding::LittleEndian::Get16(DeviceProductId); }
 
     void SetProductId(uint16_t productId) { chip::Encoding::LittleEndian::Put16(DeviceProductId, productId); }
 
-    uint16_t GetDeviceDiscriminator(void)
+    uint16_t GetDeviceDiscriminator() const
     {
-        uint16_t discriminator                = chip::Encoding::LittleEndian::Get16(DeviceDiscriminator);
-        constexpr uint16_t kDiscriminatorMask = 0x7f;
-
-        return discriminator & kDiscriminatorMask;
+        return chip::Encoding::LittleEndian::Get16(DeviceDiscriminator) & kDiscriminatorMask;
     }
 
     void SetDeviceDiscriminator(uint16_t deviceDiscriminator)
     {
+        // Discriminator is 12-bit long, so don't overwrite bits 12th through 15th
+        deviceDiscriminator &= kDiscriminatorMask;
+        deviceDiscriminator |= static_cast<uint16_t>(DeviceDiscriminator[1] << 8u & ~kDiscriminatorMask);
         chip::Encoding::LittleEndian::Put16(DeviceDiscriminator, deviceDiscriminator);
-        DeviceDiscriminator[1] &= 0x0f;
     }
 } __attribute__((packed));
 

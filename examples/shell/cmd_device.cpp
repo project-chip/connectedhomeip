@@ -681,9 +681,9 @@ exit:
     return error;
 }
 
-static const shell_command_t cmds_base64_root = { &cmd_device_dispatch, "device", "Device Layer commands" };
+static const shell_command_t cmds_device_root = { &cmd_device_dispatch, "device", "Device Layer commands" };
 
-/// Subcommands for root command: `base64 <subcommand>`
+/// Subcommands for root command: `device <subcommand>`
 static const shell_command_t cmds_device[] = {
     { &cmd_device_help, "help", "Usage: device <subcommand>" },
     { &cmd_device_start, "start", "Start the device layer. Usage: device start" },
@@ -699,7 +699,7 @@ static const shell_command_t cmds_device[] = {
 
 #endif // CONFIG_DEVICE_LAYER
 
-void cmd_device_init(void)
+void cmd_device_init()
 {
 #if CONFIG_DEVICE_LAYER
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -707,8 +707,8 @@ void cmd_device_init(void)
     // Register `device` subcommands with the local shell dispatcher.
     sShellDeviceSubcommands.RegisterCommands(cmds_device, ArraySize(cmds_device));
 
-    // Register the root `base64` command with the top-level shell.
-    shell_register(&cmds_base64_root, 1);
+    // Register the root `device` command with the top-level shell.
+    shell_register(&cmds_device_root, 1);
 
     streamer_t * sout = streamer_get();
 

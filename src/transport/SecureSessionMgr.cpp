@@ -26,6 +26,7 @@
 
 #include <string.h>
 #include <support/CodeUtils.h>
+#include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/SecurePairingSession.h>
 #include <transport/SecureSessionMgr.h>
@@ -109,17 +110,23 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBu
         PayloadHeader payloadHeader;
         MessageAuthenticationCode mac;
 
-        const size_t headerSize = payloadHeader.EncodeSizeBytes();
-        size_t actualEncodedHeaderSize;
-        size_t totalLen = 0;
-        size_t taglen   = 0;
+        const uint16_t headerSize = payloadHeader.EncodeSizeBytes();
+        uint16_t actualEncodedHeaderSize;
+        uint16_t totalLen = 0;
+        uint16_t taglen   = 0;
+        uint32_t payloadLength; // Make sure it's big enough to add two 16-bit
+                                // ints without overflowing.
+        static_assert(std::is_same<decltype(msgBuf->TotalLength()), uint16_t>::value,
+                      "Addition to generate payloadLength might overflow");
+        payloadLength = static_cast<uint32_t>(headerSize + msgBuf->TotalLength());
+        VerifyOrExit(CanCastTo<uint16_t>(payloadLength), err = CHIP_ERROR_NO_MEMORY);
 
         packetHeader
             .SetSourceNodeId(mLocalNodeId)              //
             .SetDestinationNodeId(peerNodeId)           //
             .SetMessageId(state->GetSendMessageIndex()) //
             .SetEncryptionKeyID(state->GetLocalKeyID()) //
-            .SetPayloadLength(headerSize + msgBuf->TotalLength());
+            .SetPayloadLength(static_cast<uint16_t>(payloadLength));
 
         VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
@@ -136,7 +143,8 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBu
         err = mac.Encode(packetHeader, &data[totalLen], kMaxTagLen, &taglen);
         SuccessOrExit(err);
 
-        msgBuf->SetDataLength(totalLen + taglen, nullptr);
+        VerifyOrExit(CanCastTo<uint16_t>(totalLen + taglen), err = CHIP_ERROR_INTERNAL);
+        msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen), nullptr);
 
         ChipLogProgress(Inet, "Secure transport transmitting msg %u after encryption", state->GetSendMessageIndex());
 
@@ -200,7 +208,7 @@ exit:
     return err;
 }
 
-void SecureSessionMgrBase::ScheduleExpiryTimer(void)
+void SecureSessionMgrBase::ScheduleExpiryTimer()
 {
     CHIP_ERROR err =
         mSystemLayer->StartTimer(CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS, SecureSessionMgrBase::ExpiryTimerCallback, this);
@@ -208,7 +216,7 @@ void SecureSessionMgrBase::ScheduleExpiryTimer(void)
     VerifyOrDie(err == CHIP_NO_ERROR);
 }
 
-void SecureSessionMgrBase::CancelExpiryTimer(void)
+void SecureSessionMgrBase::CancelExpiryTimer()
 {
     if (mSystemLayer != nullptr)
     {
@@ -245,12 +253,12 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
         PayloadHeader payloadHeader;
         MessageAuthenticationCode mac;
 
-        uint8_t * data          = msg->Start();
-        uint8_t * plainText     = nullptr;
-        uint16_t len            = msg->TotalLength();
-        const size_t headerSize = payloadHeader.EncodeSizeBytes();
-        size_t decodedSize      = 0;
-        size_t taglen           = 0;
+        uint8_t * data            = msg->Start();
+        uint8_t * plainText       = nullptr;
+        uint16_t len              = msg->TotalLength();
+        const uint16_t headerSize = payloadHeader.EncodeSizeBytes();
+        uint16_t decodedSize      = 0;
+        uint16_t taglen           = 0;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         /* This is a workaround for the case where PacketBuffer payload is not
@@ -261,9 +269,10 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
 #endif
         plainText = msg->Start();
 
+        // TODO: We need length checks here!  https://github.com/project-chip/connectedhomeip/issues/2928
         err = mac.Decode(packetHeader, &data[packetHeader.GetPayloadLength()], kMaxTagLen, &taglen);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Inet, "Secure transport failed to decode MAC Tag: err %d", err));
-        len -= taglen;
+        len = static_cast<uint16_t>(len - taglen);
         msg->SetDataLength(len, nullptr);
 
         err = state->GetSecureSession().Decrypt(data, len, plainText, packetHeader, payloadHeader.GetEncodePacketFlags(), mac);

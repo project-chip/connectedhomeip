@@ -19,10 +19,10 @@
 #ifndef __CHIPTOOL_COMMAND_H__
 #define __CHIPTOOL_COMMAND_H__
 
+#include "Commands.h"
 #include <vector>
 
 #include <controller/CHIPDeviceController.h>
-#include <core/CHIPError.h>
 #include <inet/InetInterface.h>
 #include <support/CHIPLogging.h>
 
@@ -42,6 +42,12 @@ struct Argument
     void * value;
 };
 
+template <typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args &&... args)
+{
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
 class Command
 {
 public:
@@ -57,6 +63,7 @@ public:
     };
 
     Command(const char * commandName) : mName(commandName) {}
+    virtual ~Command() {}
 
     const char * GetName(void) const { return mName; }
     const char * GetAttribute(void) const;

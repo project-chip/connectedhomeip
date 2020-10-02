@@ -401,7 +401,7 @@ exit:
  *
  * @returns             Elapsed time in microseconds since an arbitrary, platform-defined epoch.
  */
-uint64_t Layer::GetClock_Monotonic(void)
+uint64_t Layer::GetClock_Monotonic()
 {
     // Current implementation is a simple pass-through to the platform.
     return Platform::Layer::GetClock_Monotonic();
@@ -425,7 +425,7 @@ uint64_t Layer::GetClock_Monotonic(void)
  *
  * @returns             Elapsed time in milliseconds since an arbitrary, platform-defined epoch.
  */
-uint64_t Layer::GetClock_MonotonicMS(void)
+uint64_t Layer::GetClock_MonotonicMS()
 {
     // Current implementation is a simple pass-through to the platform.
     return Platform::Layer::GetClock_MonotonicMS();
@@ -452,7 +452,7 @@ uint64_t Layer::GetClock_MonotonicMS(void)
  *
  * @returns             Elapsed time in microseconds since an arbitrary, platform-defined epoch.
  */
-uint64_t Layer::GetClock_MonotonicHiRes(void)
+uint64_t Layer::GetClock_MonotonicHiRes()
 {
     // Current implementation is a simple pass-through to the platform.
     return Platform::Layer::GetClock_MonotonicHiRes();
@@ -599,7 +599,8 @@ void Layer::PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet,
         aSetSize = wakeEventFd + 1;
 
     const Timer::Epoch kCurrentEpoch = Timer::GetCurrentEpoch();
-    Timer::Epoch lAwakenEpoch = kCurrentEpoch + static_cast<Timer::Epoch>(aSleepTime.tv_sec) * 1000 + aSleepTime.tv_usec / 1000;
+    Timer::Epoch lAwakenEpoch =
+        kCurrentEpoch + static_cast<Timer::Epoch>(aSleepTime.tv_sec) * 1000 + static_cast<uint32_t>(aSleepTime.tv_usec) / 1000;
 
     for (size_t i = 0; i < Timer::sPool.Size(); i++)
     {
@@ -629,8 +630,8 @@ void Layer::PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet,
     }
 
     const Timer::Epoch kSleepTime = lAwakenEpoch - kCurrentEpoch;
-    aSleepTime.tv_sec             = kSleepTime / 1000;
-    aSleepTime.tv_usec            = (kSleepTime % 1000) * 1000;
+    aSleepTime.tv_sec             = static_cast<time_t>(kSleepTime / 1000);
+    aSleepTime.tv_usec            = static_cast<suseconds_t>((kSleepTime % 1000) * 1000);
 }
 
 /**

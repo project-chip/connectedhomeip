@@ -22,7 +22,7 @@
 #include <inet/InetLayer.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
-#include <transport/UDP.h>
+#include <transport/raw/UDP.h>
 
 using DemoSessionManager = chip::SecureSessionMgr<chip::Transport::UDP>;
 

@@ -16,6 +16,7 @@
  */
 
 #include "RendezvousDeviceDelegate.h"
+
 #include "BluetoothWidget.h"
 #include "RendezvousMessageHandler.h"
 #include "esp_log.h"
@@ -35,42 +36,22 @@ using namespace ::chip;
 RendezvousDeviceDelegate::RendezvousDeviceDelegate()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    RendezvousParameters * params;
+    RendezvousParameters params;
 
     uint32_t setupPINCode;
     err = DeviceLayer::ConfigurationMgr().GetSetupPinCode(setupPINCode);
     SuccessOrExit(err);
 
-    params = new RendezvousParameters(setupPINCode);
-    params->SetLocalNodeId(kLocalNodeId);
-    params->SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
+    params.SetSetupPINCode(setupPINCode).SetLocalNodeId(kLocalNodeId).SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
 
-    mRendezvousSession = new RendezvousSession(this, *params);
-    err                = mRendezvousSession->Init();
+    mRendezvousSession = new RendezvousSession(this);
+    err                = mRendezvousSession->Init(params);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "RendezvousDeviceDelegate Init failure: %s", ErrorStr(err));
     }
-}
-
-CHIP_ERROR RendezvousDeviceDelegate::Send(const char * msg)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    System::PacketBuffer * buffer;
-    const size_t msgLen = strlen(msg);
-
-    VerifyOrExit(mRendezvousSession, err = CHIP_ERROR_INCORRECT_STATE);
-
-    buffer = System::PacketBuffer::NewWithAvailableSize(msgLen);
-    memcpy(buffer->Start(), msg, msgLen);
-    buffer->SetDataLength(msgLen);
-
-    err = mRendezvousSession->SendMessage(buffer);
-
-exit:
-    return err;
 }
 
 void RendezvousDeviceDelegate::OnRendezvousError(CHIP_ERROR err)

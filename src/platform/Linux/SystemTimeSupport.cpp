@@ -37,7 +37,7 @@ namespace System {
 namespace Platform {
 namespace Layer {
 
-uint64_t GetClock_Monotonic(void)
+uint64_t GetClock_Monotonic()
 {
     std::chrono::microseconds epoch =
         std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch());
@@ -46,7 +46,7 @@ uint64_t GetClock_Monotonic(void)
     return static_cast<uint64_t>(epoch.count());
 }
 
-uint64_t GetClock_MonotonicMS(void)
+uint64_t GetClock_MonotonicMS()
 {
     std::chrono::milliseconds epoch =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch());
@@ -55,7 +55,7 @@ uint64_t GetClock_MonotonicMS(void)
     return static_cast<uint64_t>(epoch.count());
 }
 
-uint64_t GetClock_MonotonicHiRes(void)
+uint64_t GetClock_MonotonicHiRes()
 {
     std::chrono::microseconds epoch =
         std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch());
