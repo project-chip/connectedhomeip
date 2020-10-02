@@ -59,10 +59,10 @@ public:
      *   Called when a new message is received. The function must internally release the
      *   msgBuf after processing it.
      *
-     * @param header  messageheader
-     * @param state   connection state
-     * @param msgBuf  received message
-     * @param mgr     A pointer to the SecureSessionMgr
+     * @param packetHeader  The message header
+     * @param state         The connection state
+     * @param msgBuf        The received message
+     * @param mgr           A pointer to the SecureSessionMgr
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, Transport::PeerConnectionState * state,
                                    System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr)

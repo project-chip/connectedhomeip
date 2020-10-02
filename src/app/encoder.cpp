@@ -118,7 +118,7 @@ uint16_t _encodeGlobalCommand(BufBound & buf, uint8_t destination_endpoint, uint
     return _encodeCommand(buf, destination_endpoint, cluster_id, command, frame_control);
 }
 
-uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t cluster_id,
+uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t cluster_id,
                                      uint16_t * attr_ids, uint16_t attr_id_count)
 {
     BufBound buf = BufBound(buffer, buf_length);
@@ -134,14 +134,14 @@ uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint
     return buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;
 }
 
-#define READ_ATTRIBUTES(name, cluster_id)                                                                                            \
-    uint16_t attr_id_count = sizeof(attr_ids) / sizeof(attr_ids[0]);                                                                 \
-    uint16_t result        = encodeReadAttributesCommand(buffer, buf_length, destination_endpoint, 0x0006, attr_ids, attr_id_count); \
-    if (result == 0)                                                                                                                 \
-    {                                                                                                                                \
-        ChipLogError(Zcl, "Error encoding %s command", name);                                                                        \
-        return 0;                                                                                                                    \
-    }                                                                                                                                \
+#define READ_ATTRIBUTES(name, cluster_id)                                                                                          \
+    uint16_t attr_id_count = sizeof(attr_ids) / sizeof(attr_ids[0]);                                                               \
+    uint16_t result = encodeReadAttributesCommand(buffer, buf_length, destination_endpoint, cluster_id, attr_ids, attr_id_count);  \
+    if (result == 0)                                                                                                               \
+    {                                                                                                                              \
+        ChipLogError(Zcl, "Error encoding %s command", name);                                                                      \
+        return 0;                                                                                                                  \
+    }                                                                                                                              \
     return result;
 
 #define COMMAND_HEADER(name, cluster_id, command_id)                                                                               \
@@ -168,6 +168,7 @@ uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint
 
 #define ONOFF_CLUSTER_ID 0x0006
 #define IDENTIFY_CLUSTER_ID 0x0003
+#define TEMP_MEASUREMENT_CLUSTER_ID 0x0402
 
 /*
  * On/Off Cluster commands
@@ -204,6 +205,15 @@ uint16_t encodeIdentifyCommand(uint8_t * buffer, uint16_t buf_length, uint8_t de
 uint16_t encodeIdentifyQueryCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
 {
     COMMAND("IdentifyQuery", IDENTIFY_CLUSTER_ID, 0x01);
+}
+
+/*
+ * Temperature Measurement Cluster commands
+ */
+uint16_t encodeReadCurrentTemperatureCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    uint16_t attr_ids[] = { 0x0000 }; /* Current Temperature attribute */
+    READ_ATTRIBUTES("ReadCurrentTemperature", TEMP_MEASUREMENT_CLUSTER_ID);
 }
 
 } // extern "C"

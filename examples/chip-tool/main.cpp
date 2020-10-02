@@ -18,6 +18,7 @@
 
 #include "commands/clusters/Identify/Commands.h"
 #include "commands/clusters/OnOff/Commands.h"
+#include "commands/clusters/TemperatureMeasurement/Commands.h"
 #include "commands/echo/Commands.h"
 
 // NOTE: Remote device ID is in sync with the echo server device id
@@ -36,6 +37,7 @@ int main(int argc, char * argv[])
     registerCommandsEcho(commands);
     registerClusterIdentify(commands);
     registerClusterOnOff(commands);
+    registerClusterTemperatureMeasurement(commands);
 
     return commands.Run(kLocalDeviceId, kRemoteDeviceId, argc, argv);
 }
