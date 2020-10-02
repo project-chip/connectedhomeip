@@ -67,7 +67,7 @@ uint16_t encodeToggleCommand(uint8_t * buffer, uint16_t buf_length, uint8_t dest
  * @brief Encode a Read Attributes command for the given cluster and the given
  * list of attributes.
  */
-uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t cluster_id,
+uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t cluster_id,
                                      uint16_t * attr_ids, uint16_t attr_id_count);
 
 /**
@@ -135,6 +135,12 @@ uint16_t encodeIdentifyQueryCommand(uint8_t * buffer, uint16_t buf_length, uint8
  * @param duration The duration for which the device will identify itself
  * */
 uint16_t encodeIdentifyCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t duration);
+
+/**
+ * @brief Encode a command to read the current temperature attribute from the Temperature Measurement
+ * cluster.
+ */
+uint16_t encodeReadCurrentTemperatureCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
 #ifdef __cplusplus
 }
