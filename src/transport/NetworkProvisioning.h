@@ -99,7 +99,7 @@ public:
 
     CHIP_ERROR SendNetworkCredentials(const char * ssid, const char * passwd);
 
-    CHIP_ERROR HandleNetworkProvisioningMessage(uint8_t msgType, PacketBuffer * msgBuf);
+    CHIP_ERROR HandleNetworkProvisioningMessage(uint8_t msgType, System::PacketBuffer * msgBuf);
 
     /**
      * @brief
@@ -114,7 +114,7 @@ private:
     NetworkProvisioningDelegate * mDelegate             = nullptr;
     DeviceNetworkProvisioningDelegate * mDeviceDelegate = nullptr;
 
-    Inet::IPAddress mDeviceAddress = IPAddress::Any;
+    Inet::IPAddress mDeviceAddress = Inet::IPAddress::Any;
 
     /**
      * @brief

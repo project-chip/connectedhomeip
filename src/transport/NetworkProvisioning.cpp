@@ -73,7 +73,7 @@ NetworkProvisioning::~NetworkProvisioning()
     }
 }
 
-CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType, PacketBuffer * msgBuf)
+CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType, System::PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -106,7 +106,7 @@ CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType
 
     case NetworkProvisioning::MsgTypes::kIPAddressAssigned: {
         ChipLogProgress(NetworkProvisioning, "Received kIPAddressAssigned\n");
-        if (!IPAddress::FromString(Uint8::to_const_char(msgBuf->Start()), msgBuf->DataLength(), mDeviceAddress))
+        if (!Inet::IPAddress::FromString(Uint8::to_const_char(msgBuf->Start()), msgBuf->DataLength(), mDeviceAddress))
         {
             ExitNow(err = CHIP_ERROR_INVALID_ADDRESS);
         }
@@ -172,7 +172,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR NetworkProvisioning::SendIPAddress(const IPAddress & addr)
+CHIP_ERROR NetworkProvisioning::SendIPAddress(const Inet::IPAddress & addr)
 {
     CHIP_ERROR err                = CHIP_NO_ERROR;
     System::PacketBuffer * buffer = System::PacketBuffer::New();
@@ -196,7 +196,7 @@ exit:
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(NetworkProvisioning, "Failed in sending IP address. error %s\n", ErrorStr(err));
-        PacketBuffer::Free(buffer);
+        System::PacketBuffer::Free(buffer);
     }
     return err;
 }
@@ -224,7 +224,7 @@ exit:
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(NetworkProvisioning, "Failed in sending Network Creds. error %s\n", ErrorStr(err));
-        PacketBuffer::Free(buffer);
+        System::PacketBuffer::Free(buffer);
     }
     return err;
 }
@@ -238,8 +238,8 @@ void NetworkProvisioning::ConnectivityHandler(const DeviceLayer::ChipDeviceEvent
     VerifyOrExit(event->Type == DeviceLayer::DeviceEventType::kInternetConnectivityChange, /**/);
     VerifyOrExit(event->InternetConnectivityChange.IPv4 == DeviceLayer::kConnectivity_Established, /**/);
 
-    IPAddress addr;
-    IPAddress::FromString(event->InternetConnectivityChange.address, addr);
+    Inet::IPAddress addr;
+    Inet::IPAddress::FromString(event->InternetConnectivityChange.address, addr);
     (void) session->SendIPAddress(addr);
 
 exit:
