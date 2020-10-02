@@ -48,6 +48,7 @@ jobs:
               uses: github/codeql-action/init@v1
               with:
                   languages: "cpp"
+                  queries: +security-and-quality
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
             - name: Build example nRF5 Lock App
@@ -107,6 +108,7 @@ jobs:
               uses: github/codeql-action/init@v1
               with:
                   languages: "cpp"
+                  queries: +security-and-quality
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
             - name: Build example Standalone Echo Client
@@ -162,6 +164,7 @@ jobs:
               uses: github/codeql-action/init@v1
               with:
                   languages: "cpp"
+                  queries: +security-and-quality
             - name: Build example EFR32 Lock App for BRD4161A
               run:
                   scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/
@@ -215,6 +218,7 @@ jobs:
               uses: github/codeql-action/init@v1
               with:
                   languages: "cpp"
+                  queries: +security-and-quality
             - name: Build example nRF Connect SDK Lock App
               run: scripts/examples/nrfconnect_example.sh lock-app
             - name: Build example nRF Connect SDK Lighting App
