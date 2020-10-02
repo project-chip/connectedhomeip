@@ -50,65 +50,9 @@ public:
 
     ~ScopedMemoryBufferBase() { Free(); }
 
-    void * Ptr() { return mBuffer; }
-    const void * Ptr() const { return mBuffer; }
-
-    template <typename T>
-    inline T * Ptr()
-    {
-        return static_cast<T *>(mBuffer);
-    }
-
-    template <typename T>
-    inline const T * Ptr() const
-    {
-        return static_cast<T *>(mBuffer);
-    }
-
-    ScopedMemoryBufferBase & Alloc(size_t size)
-    {
-        Free();
-        mBuffer = Impl::MemoryAlloc(size);
-        return *this;
-    }
-
-    ScopedMemoryBufferBase & LongTermAlloc(size_t size)
-    {
-        Free();
-        mBuffer = Impl::MemoryAlloc(size, true /* isLongTermAlloc */);
-        return *this;
-    }
-
-    template <typename T>
-    ScopedMemoryBufferBase & Calloc(size_t elementCount)
-    {
-        Free();
-        mBuffer = Impl::MemoryCalloc(elementCount, sizeof(T));
-        return *this;
-    }
-
     /** Check if a buffer is valid */
     explicit operator bool() const { return mBuffer != nullptr; }
     bool operator!() const { return mBuffer == nullptr; }
-
-    /**
-     * Releases the undelying buffer. Buffer stops being managed and will not be
-     * auto-freed.
-     */
-    void * Release()
-    {
-        void * buffer = mBuffer;
-        mBuffer       = nullptr;
-        return buffer;
-    }
-
-    template <typename T>
-    inline T * Release()
-    {
-        void * buffer = mBuffer;
-        mBuffer       = nullptr;
-        return static_cast<T *>(buffer);
-    }
 
     /** Release memory used */
     void Free()
@@ -121,8 +65,53 @@ public:
         mBuffer = nullptr;
     }
 
+protected:
+    void * Ptr() { return mBuffer; }
+    const void * Ptr() const { return mBuffer; }
+
+    /**
+     * Releases the undelying buffer. Buffer stops being managed and will not be
+     * auto-freed.
+     */
+    void * Release()
+    {
+        void * buffer = mBuffer;
+        mBuffer       = nullptr;
+        return buffer;
+    }
+
+    void Alloc(size_t size)
+    {
+        Free();
+        mBuffer = Impl::MemoryAlloc(size);
+    }
+
+    void LongTermAlloc(size_t size)
+    {
+        Free();
+        mBuffer = Impl::MemoryAlloc(size, true /* isLongTermAlloc */);
+    }
+
+    void Calloc(size_t elementCount, size_t elementSize)
+    {
+        Free();
+        mBuffer = Impl::MemoryCalloc(elementCount, elementSize);
+    }
+
 private:
     void * mBuffer = nullptr;
+};
+
+/**
+ * Helper class that forwards memory management tasks to Platform::Memory* calls.
+ */
+class PlatformMemoryManagement
+{
+public:
+    static void MemoryFree(void * p) { chip::Platform::MemoryFree(p); }
+    static void * MemoryAlloc(size_t size) { return chip::Platform::MemoryAlloc(size); }
+    static void * MemoryAlloc(size_t size, bool longTerm) { return chip::Platform::MemoryAlloc(size, longTerm); }
+    static void * MemoryCalloc(size_t num, size_t size) { return chip::Platform::MemoryCalloc(num, size); }
 };
 
 } // namespace Impl
@@ -133,15 +122,37 @@ private:
  *
  * Use for RAII to auto-free after use.
  */
-class ScopedMemoryBuffer : public Impl::ScopedMemoryBufferBase<ScopedMemoryBuffer>
+template <typename T, class MemoryManagement = Impl::PlatformMemoryManagement>
+class ScopedMemoryBuffer : public Impl::ScopedMemoryBufferBase<MemoryManagement>
 {
-    friend class Impl::ScopedMemoryBufferBase<ScopedMemoryBuffer>;
+    friend class Impl::ScopedMemoryBufferBase<MemoryManagement>;
 
-protected:
-    static void MemoryFree(void * p) { chip::Platform::MemoryFree(p); }
-    static void * MemoryAlloc(size_t size) { return chip::Platform::MemoryAlloc(size); }
-    static void * MemoryAlloc(size_t size, bool longTerm) { return chip::Platform::MemoryAlloc(size, longTerm); }
-    static void * MemoryCalloc(size_t num, size_t size) { return chip::Platform::MemoryCalloc(num, size); }
+public:
+    using Base = Impl::ScopedMemoryBufferBase<MemoryManagement>;
+
+    inline T * Ptr() { return static_cast<T *>(Base::Ptr()); }
+
+    inline const T * Ptr() const { return static_cast<T *>(Base::Ptr()); }
+
+    inline T * Release() { return static_cast<T *>(Base::Release()); }
+
+    ScopedMemoryBuffer & Calloc(size_t elementCount)
+    {
+        Base::Calloc(elementCount, sizeof(T));
+        return *this;
+    }
+
+    ScopedMemoryBuffer & Alloc(size_t size)
+    {
+        Base::Alloc(size * sizeof(T));
+        return *this;
+    }
+
+    ScopedMemoryBuffer & LongTermAlloc(size_t size)
+    {
+        Base::LongTermAlloc(size * sizeof(T));
+        return *this;
+    }
 };
 
 } // namespace Platform

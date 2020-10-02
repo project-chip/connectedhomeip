@@ -53,7 +53,7 @@ protected:
 
 private:
     CHIP_ERROR GetDefaultSection(std::map<std::string, std::string> & section);
-    CHIP_ERROR GetBinaryBlobDataAndLengths(const char * key, chip::Platform::ScopedMemoryBuffer & encodedData,
+    CHIP_ERROR GetBinaryBlobDataAndLengths(const char * key, chip::Platform::ScopedMemoryBuffer<char> & encodedData,
                                            size_t & encodedDataLen, size_t & decodedDataLen);
     inipp::Ini<char> mConfigStore;
 };

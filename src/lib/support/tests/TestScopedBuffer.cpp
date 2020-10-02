@@ -25,7 +25,7 @@
 
 namespace {
 
-class TestCounterScopedBuffer : public chip::Platform::Impl::ScopedMemoryBufferBase<TestCounterScopedBuffer>
+class TestCounterMemoryManagement
 {
 public:
     static int Counter() { return mAllocCount; }
@@ -56,51 +56,53 @@ public:
 private:
     static int mAllocCount;
 };
-int TestCounterScopedBuffer::mAllocCount = 0;
+int TestCounterMemoryManagement::mAllocCount = 0;
+
+using TestCounterScopedBuffer = chip::Platform::ScopedMemoryBuffer<char, TestCounterMemoryManagement>;
 
 void TestAutoFree(nlTestSuite * inSuite, void * inContext)
 {
-    NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 0);
+    NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 0);
 
     {
         TestCounterScopedBuffer buffer;
 
-        NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 0);
+        NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 0);
         NL_TEST_ASSERT(inSuite, buffer.Alloc(128));
-        NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 1);
+        NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 1);
     }
-    NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 0);
+    NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 0);
 }
 
 void TestFreeDuringAllocs(nlTestSuite * inSuite, void * inContext)
 {
-    NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 0);
+    NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 0);
 
     {
         TestCounterScopedBuffer buffer;
 
-        NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 0);
+        NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 0);
         NL_TEST_ASSERT(inSuite, buffer.Alloc(128));
-        NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 1);
+        NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 1);
         NL_TEST_ASSERT(inSuite, buffer.Alloc(64));
-        NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 1);
+        NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 1);
         NL_TEST_ASSERT(inSuite, buffer.LongTermAlloc(256));
-        NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 1);
-        NL_TEST_ASSERT(inSuite, buffer.Calloc<uint64_t>(10));
-        NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 1);
+        NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 1);
+        NL_TEST_ASSERT(inSuite, buffer.Calloc(10));
+        NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 1);
     }
-    NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 0);
+    NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 0);
 }
 
 void TestRelease(nlTestSuite * inSuite, void * inContext)
 {
-    NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 0);
+    NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 0);
     void * ptr = nullptr;
 
     {
         TestCounterScopedBuffer buffer;
 
-        NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 0);
+        NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 0);
         NL_TEST_ASSERT(inSuite, buffer.Alloc(128));
         NL_TEST_ASSERT(inSuite, buffer.Ptr() != nullptr);
 
@@ -109,17 +111,17 @@ void TestRelease(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, buffer.Ptr() == nullptr);
     }
 
-    NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 1);
+    NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 1);
 
     {
         TestCounterScopedBuffer buffer;
         NL_TEST_ASSERT(inSuite, buffer.Alloc(128));
-        NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 2);
-        TestCounterScopedBuffer::MemoryFree(ptr);
-        NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 1);
+        NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 2);
+        TestCounterMemoryManagement::MemoryFree(ptr);
+        NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 1);
     }
 
-    NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 0);
+    NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 0);
 }
 
 } // namespace
