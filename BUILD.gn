@@ -26,6 +26,10 @@ import("${chip_root}/gn/chip/tests.gni")
 import("${chip_root}/gn/chip/tools.gni")
 
 if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
+  declare_args() {
+    enable_python_build_tools = true
+  }
+
   # This is a real toolchain. Build CHIP.
   group("default") {
     deps = [ ":all" ]
@@ -64,11 +68,10 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     if (chip_build_tools) {
       deps += [
         "${chip_root}/examples/shell",
-        "${chip_root}/src/controller/python",
         "${chip_root}/src/qrcodetool",
         "${chip_root}/src/setup_payload",
       ]
-      if (current_os == "linux") {
+      if (enable_python_build_tools) {
         deps += [ "${chip_root}/src/controller/python" ]
       }
     }
