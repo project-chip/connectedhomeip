@@ -1468,7 +1468,7 @@ Binding::Configuration & Binding::Configuration::DNS_Options(uint8_t dnsOptions)
 {
 #if CHIP_CONFIG_ENABLE_DNS_RESOLVER
     mBinding.mDNSOptions = dnsOptions;
-#else  // CHIP_CONFIG_ENABLE_DNS_RESOLVER
+#else // CHIP_CONFIG_ENABLE_DNS_RESOLVER
     mError = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CHIP_CONFIG_ENABLE_DNS_RESOLVER
     return *this;

@@ -136,9 +136,9 @@ Inet::InetLayer gInet;
 // CollectTapAddresses() is only available on such targets.
 
 static std::vector<TapInterface> sTapIFs;
-#endif                                    // CHIP_TARGET_STYLE_UNIX
+#endif // CHIP_TARGET_STYLE_UNIX
 static std::vector<struct netif> sNetIFs; // interface to filter
-#endif                                    // CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -199,7 +199,7 @@ void InitSystemLayer()
     AcquireLwIP();
 
     gSystemLayer.Init(sLwIPEventQueue);
-#else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
+#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
     gSystemLayer.Init(nullptr);
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
@@ -379,7 +379,7 @@ void InitNetwork()
         {
 #if LWIP_VERSION_MAJOR > 1
             ip4_addr_t ip4AddrLwIP, ip4NetmaskLwIP, ip4GatewayLwIP;
-#else  // LWIP_VERSION_MAJOR <= 1
+#else // LWIP_VERSION_MAJOR <= 1
             ip_addr_t ip4AddrLwIP, ip4NetmaskLwIP, ip4GatewayLwIP;
 #endif // LWIP_VERSION_MAJOR <= 1
 

@@ -270,7 +270,7 @@ CHIP_ERROR ChipFabricState::Init(GroupKeyStoreBase * groupKeyStore)
     LogKeys        = false;
     UseTestKey     = false; // DEPRECATED -- Temporarily retained for API compatibility
     AutoCreateKeys = false; // DEPRECATED -- Temporarily retained for API compatibility
-#endif                      // CHIP_CONFIG_SECURITY_TEST_MODE
+#endif // CHIP_CONFIG_SECURITY_TEST_MODE
 
 #if CHIP_CONFIG_ENABLE_TARGETED_LISTEN
 
