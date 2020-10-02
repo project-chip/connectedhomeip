@@ -34,6 +34,11 @@ namespace Impl {
 
 /**
  * Represents a memory buffer that is auto-freed in the destructor.
+ *
+ * This class uses void* underneath on purpose (rather than a unique_ptr like
+ * 'Type') and uses  templated type on Ptr(). This is to avoid template explosion
+ * when the buffers are used for different types - only one implementation of
+ * the class will be stored in flash.
  */
 template <class Impl>
 class ScopedMemoryBufferBase
