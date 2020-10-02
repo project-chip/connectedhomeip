@@ -17,24 +17,31 @@
  */
 
 /**
- * @file EchoDeviceCallbacks.h
+ * @file DeviceCallbacks.h
  *
  * Implementations for the DeviceManager callbacks for this application
  *
  **/
 
-#ifndef ECHO_DEVICE_CALLBACKS_H
-#define ECHO_DEVICE_CALLBACKS_H
+#ifndef DEVICE_CALLBACKS_H
+#define DEVICE_CALLBACKS_H
 
 #include "CHIPDeviceManager.h"
+#include <app/util/af-types.h>
 #include <platform/CHIPDeviceLayer.h>
 
-class EchoDeviceCallbacks : public CHIPDeviceManagerCallbacks
+class DeviceCallbacks : public chip::DeviceManager::CHIPDeviceManagerCallbacks
 {
 public:
     virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-    virtual void PostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
+    virtual void PostAttributeChangeCallback(uint8_t endpointId, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
                                              uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value);
+
+private:
+    void OnInternetConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent * event);
+    void OnSessionEstablished(const chip::DeviceLayer::ChipDeviceEvent * event);
+    void OnOnOffPostAttributeChangeCallback(uint8_t endpointId, uint16_t attributeId, uint8_t * value);
+    void OnIdentifyPostAttributeChangeCallback(uint8_t endpointId, uint16_t attributeId, uint8_t * value);
 };
 
-#endif // ECHO_DEVICE_CALLBACKS_H
+#endif // DEVICE_CALLBACKS_H
