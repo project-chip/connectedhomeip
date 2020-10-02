@@ -873,8 +873,7 @@ static void BluezHandleAdvertisementFromDevice(BluezDevice1 * aDevice, BluezEndp
     }
 
 exit:
-    if (debugStr)
-        g_free(debugStr);
+    g_free(debugStr);
 }
 
 static void BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClient * aManager, GDBusObjectProxy * aObject,
