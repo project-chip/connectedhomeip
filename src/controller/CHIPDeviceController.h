@@ -241,7 +241,7 @@ public:
     //////////// RendezvousSessionDelegate Implementation ///////////////
     void OnRendezvousMessageReceived(System::PacketBuffer * buffer) override;
     void OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err) override;
- 
+
 private:
     enum
     {
