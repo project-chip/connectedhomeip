@@ -104,7 +104,8 @@
         { &emberAfPluginDoorLockServerRelockEventControl, emberAfPluginDoorLockServerRelockEventHandler },                         \
         { &emberAfPluginIasZoneClientStateMachineEventControl, emberAfPluginIasZoneClientStateMachineEventHandler },               \
         { &emberAfPluginIasZoneServerManageQueueEventControl, emberAfPluginIasZoneServerManageQueueEventHandler },                 \
-        { &emberAfPluginReportingTickEventControl, emberAfPluginReportingTickEventHandler },
+        { &emberAfPluginReportingTickEventControl, emberAfPluginReportingTickEventHandler },                                       \
+        { &emberAfPluginTemperatureMeasurementServerReadEventControl, emberAfPluginTemperatureMeasurementServerReadEventHandler },
 
 #define EMBER_AF_GENERATED_EVENT_STRINGS                                                                                           \
     "Identify Cluster Server EP 1", "Level Control Cluster Server EP 1", "Barrier Control Cluster Server EP 1",                    \

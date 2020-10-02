@@ -62,3 +62,5 @@ void emberAfPluginTemperatureMeasurementServerInitCallback(void)
         return;
     }
 }
+
+void emberAfPluginTemperatureMeasurementServerReadEventHandler() {}
