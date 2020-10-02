@@ -13,7 +13,10 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
 import("${chip_root}/gn/chip/tools.gni")
+import("${dir_pw_unit_test}/test.gni")
 
 config("controller_wno_deprecate") {
   cflags = [ "-Wno-deprecated-declarations" ]
@@ -86,7 +89,7 @@ copy("deviceControllerPyCopy2") {
   outputs = [ "$root_out_dir/controller/python/{{source_name_part}}" ]
 }
 
-action("python") {
+pw_python_script("python") {
   script = "$root_out_dir/controller/python/build-chip-wheel"
 
   inputs = [
