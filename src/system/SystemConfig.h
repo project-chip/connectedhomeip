@@ -163,7 +163,7 @@
  *  @def CHIP_SYSTEM_CONFIG_NO_LOCKING
  *
  *  @brief
- *      Disable the use of locking within the system layer..
+ *      Disable the use of locking within the system layer.
  *
  *      Unless you are simulating an LwIP-based system on a Unix-style host, this value should be left at its default.
  */
