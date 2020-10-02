@@ -219,7 +219,8 @@ CHIP_ERROR ChipLinuxStorageIni::GetStringValue(const char * key, char * buf, siz
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobDataAndLengths(const char * key, chip::Platform::ScopedMemoryBuffer & encodedData,
+CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobDataAndLengths(const char * key,
+                                                            chip::Platform::ScopedMemoryBuffer<char> & encodedData,
                                                             size_t & encodedDataLen, size_t & decodedDataLen)
 {
     size_t encodedDataPaddingLen = 0;
@@ -249,14 +250,14 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobDataAndLengths(const char * key, ch
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    encodedDataLen                          = value.copy(encodedData.Ptr<char>(), len);
-    encodedData.Ptr<char>()[encodedDataLen] = '\0';
+    encodedDataLen                    = value.copy(encodedData.Ptr(), len);
+    encodedData.Ptr()[encodedDataLen] = '\0';
 
     // Check if encoded data was padded. Only "=" or "==" padding combinations are allowed.
-    if ((encodedDataLen > 0) && (encodedData.Ptr<char>()[encodedDataLen - 1] == '='))
+    if ((encodedDataLen > 0) && (encodedData.Ptr()[encodedDataLen - 1] == '='))
     {
         encodedDataPaddingLen++;
-        if ((encodedDataLen > 1) && (encodedData.Ptr<char>()[encodedDataLen - 2] == '='))
+        if ((encodedDataLen > 1) && (encodedData.Ptr()[encodedDataLen - 2] == '='))
             encodedDataPaddingLen++;
     }
 
@@ -268,7 +269,7 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobDataAndLengths(const char * key, ch
 CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobValue(const char * key, uint8_t * decodedData, size_t bufSize, size_t & decodedDataLen)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
-    chip::Platform::ScopedMemoryBuffer encodedData;
+    chip::Platform::ScopedMemoryBuffer<char> encodedData;
     size_t encodedDataLen;
     size_t expectedDecodedLen = 0;
 
@@ -294,7 +295,7 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobValue(const char * key, uint8_t * d
 
     // Decode it
     // Cast is safe because we checked encodedDataLen above.
-    decodedDataLen = Base64Decode(encodedData.Ptr<char>(), static_cast<uint16_t>(encodedDataLen), (uint8_t *) decodedData);
+    decodedDataLen = Base64Decode(encodedData.Ptr(), static_cast<uint16_t>(encodedDataLen), (uint8_t *) decodedData);
     if (decodedDataLen == UINT16_MAX || decodedDataLen > expectedDecodedLen)
     {
         return CHIP_ERROR_DECODE_FAILED;

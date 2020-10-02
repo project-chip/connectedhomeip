@@ -200,7 +200,7 @@ CHIP_ERROR ChipLinuxStorage::WriteValueBin(const char * key, const uint8_t * dat
     static const size_t kMaxBlobSize = 5 * 1024;
 
     CHIP_ERROR retval = CHIP_NO_ERROR;
-    chip::Platform::ScopedMemoryBuffer encodedData;
+    chip::Platform::ScopedMemoryBuffer<char> encodedData;
     size_t encodedDataLen     = 0;
     size_t expectedEncodedLen = ((dataLen + 3) * 4) / 3;
 
@@ -225,14 +225,14 @@ CHIP_ERROR ChipLinuxStorage::WriteValueBin(const char * key, const uint8_t * dat
     {
         // We tested above that dataLen is no more than kMaxBlobSize.
         static_assert(kMaxBlobSize < UINT16_MAX, "dataLen won't fit");
-        encodedDataLen                          = Base64Encode(data, static_cast<uint16_t>(dataLen), encodedData.Ptr<char>());
-        encodedData.Ptr<char>()[encodedDataLen] = 0;
+        encodedDataLen                    = Base64Encode(data, static_cast<uint16_t>(dataLen), encodedData.Ptr());
+        encodedData.Ptr()[encodedDataLen] = 0;
     }
 
     // Store it
     if (retval == CHIP_NO_ERROR)
     {
-        WriteValueStr(key, encodedData.Ptr<char>());
+        WriteValueStr(key, encodedData.Ptr());
     }
 
     return retval;
