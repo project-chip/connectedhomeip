@@ -22,9 +22,9 @@
 #ifndef PEER_CONNCTION_STATE_H_
 #define PEER_CONNCTION_STATE_H_
 
-#include <transport/MessageHeader.h>
-#include <transport/PeerAddress.h>
 #include <transport/SecureSession.h>
+#include <transport/raw/MessageHeader.h>
+#include <transport/raw/PeerAddress.h>
 
 namespace chip {
 namespace Transport {

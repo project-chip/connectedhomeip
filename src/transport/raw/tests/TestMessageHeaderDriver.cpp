@@ -18,18 +18,17 @@
 /**
  *    @file
  *      This file implements a standalone/native program executable
- *      test driver for the CHIP core library CHIP Connection tests.
+ *      test driver for the CHIP Transport Layer Message header unit
+ *      tests.
  *
  */
 
-#include "TestTransportLayer.h"
+#include "TestRawTransportLayer.h"
 
 #include <nlunit-test.h>
 
 int main()
 {
-    // Generate machine-readable, comma-separated value (CSV) output.
     nlTestSetOutputStyle(OUTPUT_CSV);
-
-    return (TestUDP());
+    return TestMessageHeader();
 }

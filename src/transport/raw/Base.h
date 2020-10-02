@@ -29,8 +29,8 @@
 #include <inet/IPAddress.h>
 #include <inet/UDPEndPoint.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/MessageHeader.h>
-#include <transport/PeerAddress.h>
+#include <transport/raw/MessageHeader.h>
+#include <transport/raw/PeerAddress.h>
 
 namespace chip {
 namespace Transport {

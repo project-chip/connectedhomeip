@@ -30,7 +30,6 @@ typedef bool (*CloseBleCBFunct)(void * connObj);
 class DeviceController_BlePlatformDelegate : public chip::Ble::BlePlatformDelegate
 {
 public:
-    // ctor
     DeviceController_BlePlatformDelegate(chip::Ble::BleLayer * ble);
 
     // Set callback used to send GATT write request

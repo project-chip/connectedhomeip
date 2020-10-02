@@ -15,23 +15,21 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_APP_SERVER_SERVER_H
-#define CHIP_APP_SERVER_SERVER_H
-
-#include <inet/IPAddress.h>
-#include <inet/InetLayer.h>
-#include <system/SystemPacketBuffer.h>
-#include <transport/SecureSessionMgr.h>
-#include <transport/raw/UDP.h>
-
-using DemoSessionManager = chip::SecureSessionMgr<chip::Transport::UDP>;
-
 /**
- * Initialize DataModelHandler and start CHIP datamodel server, the server
- * assumes the platform's networking has been setup already.
+ *    @file
+ *      This file implements a standalone/native program executable
+ *      test driver for the CHIP core library CHIP Connection tests.
  *
- * @param [in] sessions The demo's session manager.
  */
-void InitServer();
 
-#endif // CHIP_APP_SERVER_SERVER_H
+#include "TestRawTransportLayer.h"
+
+#include <nlunit-test.h>
+
+int main()
+{
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nlTestSetOutputStyle(OUTPUT_CSV);
+
+    return (TestUDP());
+}

@@ -30,7 +30,7 @@
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
-#include <transport/UDP.h>
+#include <transport/raw/UDP.h>
 
 #include "DataModelHandler.h"
 #include "RendezvousServer.h"

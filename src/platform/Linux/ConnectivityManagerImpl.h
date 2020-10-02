@@ -117,9 +117,13 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     WiFiStationMode _GetWiFiStationMode();
     CHIP_ERROR _SetWiFiStationMode(ConnectivityManager::WiFiStationMode val);
+    uint32_t _GetWiFiStationReconnectIntervalMS();
+    CHIP_ERROR _SetWiFiStationReconnectIntervalMS(uint32_t val);
     bool _IsWiFiStationEnabled();
     bool _IsWiFiStationConnected();
     bool _IsWiFiStationApplicationControlled();
+    bool _IsWiFiStationProvisioned();
+    void _ClearWiFiStationProvision();
     bool _CanStartWiFiScan();
     static void _OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
     static void _OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
@@ -142,6 +146,7 @@ private:
     // ===== Private members reserved for use by this class only.
 
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
+    uint32_t mWiFiStationReconnectIntervalMS;
 };
 
 inline bool ConnectivityManagerImpl::_HaveServiceConnectivity()

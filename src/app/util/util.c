@@ -1192,7 +1192,7 @@ EmberStatus emberAfEndpointEventControlSetInactive(EmberEventControl * controls,
     {
         return EMBER_INVALID_ENDPOINT;
     }
-    // emberEventControlSetInactive(controls[index]);
+    emberEventControlSetInactive(&controls[index]);
     return EMBER_SUCCESS;
 }
 
@@ -1209,7 +1209,7 @@ EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl * controls, u
     {
         return EMBER_INVALID_ENDPOINT;
     }
-    // emberEventControlSetActive(controls[index]);
+    emberEventControlSetActive(&controls[index]);
     return EMBER_SUCCESS;
 }
 

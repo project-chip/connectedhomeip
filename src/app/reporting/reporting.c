@@ -660,7 +660,7 @@ EmberStatus emberAfClearReportTableCallback(void)
     {
         removeConfiguration(i);
     }
-    emberEventControlSetInactive(emberAfPluginReportingTickEventControl);
+    emberEventControlSetInactive(&emberAfPluginReportingTickEventControl);
     return EMBER_SUCCESS;
 }
 
@@ -824,7 +824,7 @@ static void scheduleTick(void)
     else
     {
         emberAfDebugPrintln("deactivate report event");
-        emberEventControlSetInactive(emberAfPluginReportingTickEventControl);
+        emberEventControlSetInactive(&emberAfPluginReportingTickEventControl);
     }
 }
 

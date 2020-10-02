@@ -22,12 +22,12 @@
  *      the Message Header class within the transport layer
  *
  */
-#include "TestTransportLayer.h"
+#include "TestRawTransportLayer.h"
 
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/TestUtils.h>
-#include <transport/MessageHeader.h>
+#include <transport/raw/MessageHeader.h>
 
 #include <nlunit-test.h>
 

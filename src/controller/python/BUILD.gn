@@ -13,7 +13,10 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
 import("${chip_root}/gn/chip/tools.gni")
+import("${dir_pw_unit_test}/test.gni")
 
 config("controller_wno_deprecate") {
   cflags = [ "-Wno-deprecated-declarations" ]
@@ -55,13 +58,20 @@ copy("deviceControllerPyCopy1") {
   sources = [
     "chip/ChipBleBase.py",
     "chip/ChipBleUtility.py",
-    "chip/ChipBluezMgr.py",
     "chip/ChipDeviceCtrl.py",
     "chip/ChipStack.py",
     "chip/ChipTLV.py",
     "chip/ChipUtility.py",
     "chip/__init__.py",
   ]
+
+  if (current_os == "linux") {
+    sources += [ "chip/ChipBluezMgr.py" ]
+  }
+
+  if (current_os == "mac") {
+    sources += [ "chip/ChipCoreBluetoothMgr.py" ]
+  }
 
   outputs = [ "$root_out_dir/controller/python/chip/{{source_file_part}}" ]
 }
@@ -75,7 +85,7 @@ copy("deviceControllerPyCopy2") {
   outputs = [ "$root_out_dir/controller/python/{{source_name_part}}" ]
 }
 
-action("python") {
+pw_python_script("python") {
   script = "$root_out_dir/controller/python/build-chip-wheel"
 
   inputs = [ "${root_out_dir}/controller/python/chip/_ChipDeviceCtrl.so" ]
@@ -90,6 +100,14 @@ action("python") {
     "0.0",
   ]
 
+  if (current_os == "linux") {
+    inputs += [ "chip/ChipBluezMgr.py" ]
+  }
+
+  if (current_os == "mac") {
+    inputs += [ "chip/ChipCoreBluetoothMgr.py" ]
+  }
+
   public_deps = [
     ":ChipDeviceCtrl",
     ":deviceControllerPyCopy1",
@@ -99,5 +117,5 @@ action("python") {
   pythontags = exec_script("//chip/python_gen_tags.py", [], "list lines", [])
   pythontagsStr = string_join("", pythontags)
   output_name = "chip-0.0-$pythontagsStr.whl"
-  outputs = [ "$root_out_dir/controller/python/chip/$output_name" ]
+  outputs = [ "$root_out_dir/controller/python/$output_name" ]
 }

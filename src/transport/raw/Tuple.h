@@ -27,7 +27,7 @@
 #include <tuple>
 #include <type_traits>
 
-#include <transport/Base.h>
+#include <transport/raw/Base.h>
 
 namespace chip {
 namespace Transport {
