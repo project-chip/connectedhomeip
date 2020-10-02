@@ -23,18 +23,13 @@
 
 #include <nlunit-test.h>
 
-using namespace chip;
-
 namespace {
 
 class TestCounterScopedBuffer : public chip::Platform::Impl::ScopedMemoryBufferBase<TestCounterScopedBuffer>
 {
-    friend class chip::Platform::Impl::ScopedMemoryBufferBase<TestCounterScopedBuffer>;
-
 public:
     static int Counter() { return mAllocCount; }
 
-protected:
     static void MemoryFree(void * p)
     {
         mAllocCount--;
@@ -97,7 +92,7 @@ void TestFreeDuringAllocs(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 0);
 }
 
-void TestReleaseAndAquire(nlTestSuite * inSuite, void * inContext)
+void TestRelease(nlTestSuite * inSuite, void * inContext)
 {
     NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 0);
     void * ptr = nullptr;
@@ -120,19 +115,11 @@ void TestReleaseAndAquire(nlTestSuite * inSuite, void * inContext)
         TestCounterScopedBuffer buffer;
         NL_TEST_ASSERT(inSuite, buffer.Alloc(128));
         NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 2);
-        NL_TEST_ASSERT(inSuite, buffer.Aquire(ptr));
+        TestCounterScopedBuffer::MemoryFree(ptr);
         NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 1);
     }
 
     NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 0);
-
-    {
-        TestCounterScopedBuffer buffer;
-        NL_TEST_ASSERT(inSuite, buffer.Alloc(128));
-        NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 1);
-        NL_TEST_ASSERT(inSuite, !buffer.Aquire(nullptr));
-        NL_TEST_ASSERT(inSuite, TestCounterScopedBuffer::Counter() == 0);
-    }
 }
 
 } // namespace
@@ -144,7 +131,7 @@ void TestReleaseAndAquire(nlTestSuite * inSuite, void * inContext)
 static const nlTest sTests[] = {
     NL_TEST_DEF_FN(TestAutoFree),         //
     NL_TEST_DEF_FN(TestFreeDuringAllocs), //
-    NL_TEST_DEF_FN(TestReleaseAndAquire), //
+    NL_TEST_DEF_FN(TestRelease),          //
     NL_TEST_SENTINEL()                    //
 };
 

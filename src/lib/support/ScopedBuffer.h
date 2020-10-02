@@ -83,15 +83,8 @@ public:
     }
 
     /** Check if a buffer is valid */
-    operator bool() const { return mBuffer != nullptr; }
-
-    /** Take over managing memory from the specified buffer */
-    ScopedMemoryBufferBase & Aquire(void * buffer)
-    {
-        Free();
-        mBuffer = buffer;
-        return *this;
-    }
+    explicit operator bool() const { return mBuffer != nullptr; }
+    bool operator!() const { return mBuffer == nullptr; }
 
     /**
      * Releases the undelying buffer. Buffer stops being managed and will not be
