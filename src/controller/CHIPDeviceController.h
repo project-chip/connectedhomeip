@@ -41,14 +41,12 @@ namespace DeviceController {
 
 class ChipDeviceController;
 
-extern "C" {
 typedef void (*NewConnectionHandler)(ChipDeviceController * deviceController, Transport::PeerConnectionState * state,
                                      void * appReqState);
 typedef void (*CompleteHandler)(ChipDeviceController * deviceController, void * appReqState);
 typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err,
-                             const IPPacketInfo * pktInfo);
+                             const Inet::IPPacketInfo * pktInfo);
 typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
-}
 
 class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback, public RendezvousSessionDelegate
 {
@@ -67,7 +65,7 @@ public:
     /**
      * Init function to be used when already-initialized System::Layer and InetLayer are available.
      */
-    CHIP_ERROR Init(NodeId localDeviceId, System::Layer * systemLayer, InetLayer * inetLayer);
+    CHIP_ERROR Init(NodeId localDeviceId, System::Layer * systemLayer, Inet::InetLayer * inetLayer);
     CHIP_ERROR Shutdown();
 
     // ----- Connection Management -----
@@ -101,9 +99,9 @@ public:
      * @param[in] interfaceId           [Optional] The interface indicator to use
      * @return CHIP_ERROR           The connection status
      */
-    CHIP_ERROR ConnectDevice(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState, NewConnectionHandler onConnected,
-                             MessageReceiveHandler onMessageReceived, ErrorHandler onError, uint16_t devicePort = CHIP_PORT,
-                             Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
+    CHIP_ERROR ConnectDevice(NodeId remoteDeviceId, Inet::IPAddress deviceAddr, void * appReqState,
+                             NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived, ErrorHandler onError,
+                             uint16_t devicePort = CHIP_PORT, Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
 
     /**
      * @brief
@@ -121,7 +119,7 @@ public:
      * @return CHIP_ERROR           The connection status
      */
     [[deprecated("Available until Rendezvous is implemented")]] CHIP_ERROR
-    ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
+    ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, Inet::IPAddress deviceAddr, void * appReqState,
                                       NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
                                       ErrorHandler onError, uint16_t devicePort = CHIP_PORT,
                                       Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
@@ -195,7 +193,7 @@ public:
     void OnRendezvousConnectionOpened() override;
     void OnRendezvousConnectionClosed() override;
     void OnRendezvousError(CHIP_ERROR err) override;
-    void OnRendezvousMessageReceived(PacketBuffer * buffer) override;
+    void OnRendezvousMessageReceived(System::PacketBuffer * buffer) override;
     void OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status) override;
 
 private:
@@ -232,7 +230,7 @@ private:
     System::PacketBuffer * mCurReqMsg;
 
     NodeId mLocalDeviceId;
-    IPAddress mDeviceAddr;
+    Inet::IPAddress mDeviceAddr;
     uint16_t mDevicePort;
     Optional<NodeId> mRemoteDeviceId;
     uint32_t mMessageNumber = 0;

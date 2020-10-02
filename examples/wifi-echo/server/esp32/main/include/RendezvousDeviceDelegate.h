@@ -21,9 +21,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <transport/RendezvousSession.h>
 
-using namespace ::chip;
-
-class RendezvousDeviceDelegate : public RendezvousSessionDelegate
+class RendezvousDeviceDelegate : public chip::RendezvousSessionDelegate
 {
 public:
     RendezvousDeviceDelegate();
@@ -32,10 +30,10 @@ public:
     void OnRendezvousConnectionOpened() override;
     void OnRendezvousConnectionClosed() override;
     void OnRendezvousError(CHIP_ERROR err) override;
-    void OnRendezvousMessageReceived(PacketBuffer * buffer) override;
+    void OnRendezvousMessageReceived(chip::System::PacketBuffer * buffer) override;
 
 private:
-    RendezvousSession * mRendezvousSession;
+    chip::RendezvousSession * mRendezvousSession;
 };
 
 #endif // __RENDEZVOUSDEVICEDELEGATE_H__

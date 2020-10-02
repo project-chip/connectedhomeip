@@ -36,6 +36,7 @@
 namespace {
 
 using namespace chip;
+using namespace chip::Inet;
 using namespace chip::Transport;
 
 using TestContext = chip::Test::IOContext;

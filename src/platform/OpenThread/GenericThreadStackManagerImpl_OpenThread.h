@@ -62,7 +62,7 @@ protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.
 
     void _ProcessThreadActivity(void);
-    bool _HaveRouteToAddress(const IPAddress & destAddr);
+    bool _HaveRouteToAddress(const Inet::IPAddress & destAddr);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
     bool _IsThreadEnabled(void);
     CHIP_ERROR _SetThreadEnabled(bool val);

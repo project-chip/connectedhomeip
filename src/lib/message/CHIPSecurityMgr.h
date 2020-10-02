@@ -138,20 +138,20 @@ public:
     bool IsKeyError(CHIP_ERROR err);
 
     // Send key error message when correct key has not been found and the message cannot be decrypted.
-    CHIP_ERROR SendKeyErrorMsg(ChipMessageInfo * rcvdMsgInfo, const IPPacketInfo * rcvdMsgPacketInfo, ChipConnection * con,
+    CHIP_ERROR SendKeyErrorMsg(ChipMessageInfo * rcvdMsgInfo, const Inet::IPPacketInfo * rcvdMsgPacketInfo, ChipConnection * con,
                                CHIP_ERROR keyErr);
 
     void OnEncryptedMsgRcvd(uint16_t sessionKeyId, uint64_t peerNodeId, uint8_t encType);
 
 #if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
     // Send message counter synchronization message.
-    CHIP_ERROR SendMsgCounterSyncResp(const ChipMessageInfo * rcvdMsgInfo, const IPPacketInfo * rcvdMsgPacketInfo);
+    CHIP_ERROR SendMsgCounterSyncResp(const ChipMessageInfo * rcvdMsgInfo, const Inet::IPPacketInfo * rcvdMsgPacketInfo);
 
     // Send peer message counter synchronization request.
-    CHIP_ERROR SendSolitaryMsgCounterSyncReq(const ChipMessageInfo * rcvdMsgInfo, const IPPacketInfo * rcvdMsgPacketInfo);
+    CHIP_ERROR SendSolitaryMsgCounterSyncReq(const ChipMessageInfo * rcvdMsgInfo, const Inet::IPPacketInfo * rcvdMsgPacketInfo);
 
     // Handle message counter synchronization response message.
-    void HandleMsgCounterSyncRespMsg(ChipMessageInfo * msgInfo, PacketBuffer * msgBuf);
+    void HandleMsgCounterSyncRespMsg(ChipMessageInfo * msgInfo, System::PacketBuffer * msgBuf);
 #endif
 
     CHIP_ERROR CancelSessionEstablishment(void * reqState);
@@ -194,19 +194,19 @@ private:
     void StopIdleSessionTimer();
     static void HandleIdleSessionTimeout(System::Layer * aLayer, void * aAppState, System::Error aError);
 
-    static void HandleUnsolicitedMessage(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
-                                         uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf);
+    static void HandleUnsolicitedMessage(ExchangeContext * ec, const Inet::IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
+                                         uint32_t profileId, uint8_t msgType, System::PacketBuffer * msgBuf);
 
-    void HandleKeyErrorMsg(ExchangeContext * ec, PacketBuffer * msgBuf);
+    void HandleKeyErrorMsg(ExchangeContext * ec, System::PacketBuffer * msgBuf);
 
 #if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
-    CHIP_ERROR NewMsgCounterSyncExchange(const ChipMessageInfo * rcvdMsgInfo, const IPPacketInfo * rcvdMsgPacketInfo,
+    CHIP_ERROR NewMsgCounterSyncExchange(const ChipMessageInfo * rcvdMsgInfo, const Inet::IPPacketInfo * rcvdMsgPacketInfo,
                                          ExchangeContext *& ec);
 #endif
-    CHIP_ERROR NewSessionExchange(uint64_t peerNodeId, IPAddress peerAddr, uint16_t peerPort);
+    CHIP_ERROR NewSessionExchange(uint64_t peerNodeId, Inet::IPAddress peerAddr, uint16_t peerPort);
     CHIP_ERROR HandleSessionEstablished();
     void HandleSessionComplete();
-    void HandleSessionError(CHIP_ERROR err, PacketBuffer * statusReportMsgBuf);
+    void HandleSessionError(CHIP_ERROR err, System::PacketBuffer * statusReportMsgBuf);
     static void HandleConnectionClosed(ExchangeContext * ec, ChipConnection * con, CHIP_ERROR conErr);
     static CHIP_ERROR SendStatusReport(CHIP_ERROR localError, ExchangeContext * ec);
     static void RMPHandleAckRcvd(ExchangeContext * ec, void * msgCtxt);

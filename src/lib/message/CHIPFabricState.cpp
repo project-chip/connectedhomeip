@@ -64,15 +64,17 @@ inline void * operator new[](size_t, void * p) throw()
 }
 #endif
 
-namespace chip {
-
-using namespace chip::TLV;
-using namespace chip::Encoding;
 using namespace chip::Crypto;
+using namespace chip::Encoding;
+using namespace chip::Inet;
 using namespace chip::Protocols;
 using namespace chip::Protocols::FabricProvisioning;
 using namespace chip::Protocols::Security;
 using namespace chip::Protocols::Security::AppKeys;
+using namespace chip::System;
+using namespace chip::TLV;
+
+namespace chip {
 
 #if CHIP_CONFIG_SECURITY_TEST_MODE
 #pragma message "\n \

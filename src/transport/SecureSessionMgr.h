@@ -42,8 +42,6 @@
 
 namespace chip {
 
-using namespace System;
-
 class SecureSessionMgrBase;
 
 /**

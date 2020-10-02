@@ -52,7 +52,7 @@ CHIP_ERROR UDP::Init(UdpListenParameters & params)
     err = params.GetInetLayer()->NewUDPEndPoint(&mUDPEndPoint);
     SuccessOrExit(err);
 
-    err = mUDPEndPoint->Bind(params.GetAddressType(), IPAddress::Any, params.GetListenPort(), params.GetInterfaceId());
+    err = mUDPEndPoint->Bind(params.GetAddressType(), Inet::IPAddress::Any, params.GetListenPort(), params.GetInterfaceId());
     SuccessOrExit(err);
 
     err = mUDPEndPoint->Listen();
@@ -89,7 +89,7 @@ CHIP_ERROR UDP::SendMessage(const PacketHeader & header, Header::Flags payloadFl
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mUDPEndPoint != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    IPPacketInfo addrInfo;
+    Inet::IPPacketInfo addrInfo;
     addrInfo.Clear();
 
     addrInfo.DestAddress = address.GetIPAddress();
@@ -119,7 +119,7 @@ exit:
     return err;
 }
 
-void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * buffer, const IPPacketInfo * pktInfo)
+void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * buffer, const Inet::IPPacketInfo * pktInfo)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     UDP * udp               = reinterpret_cast<UDP *>(endPoint->AppState);
