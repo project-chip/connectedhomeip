@@ -46,7 +46,7 @@ namespace Platform {
 
 #define VERIFY_INITIALIZED() VerifyInitialized(__func__)
 
-static std::atomic_int memoryInitialized { 0 };
+static std::atomic_int memoryInitialized{ 0 };
 
 static void VerifyInitialized(const char * func)
 {
@@ -62,7 +62,8 @@ static void VerifyInitialized(const char * func)
 CHIP_ERROR MemoryInit(void * buf, size_t bufSize)
 {
 #ifndef NDEBUG
-    if (memoryInitialized++ > 0) {
+    if (memoryInitialized++ > 0)
+    {
         fprintf(stderr, "ABORT: chip::Platform::MemoryInit() called twice.\n");
         abort();
     }
@@ -73,7 +74,8 @@ CHIP_ERROR MemoryInit(void * buf, size_t bufSize)
 void MemoryShutdown()
 {
 #ifndef NDEBUG
-    if (--memoryInitialized < 0) {
+    if (--memoryInitialized < 0)
+    {
         fprintf(stderr, "ABORT: chip::Platform::MemoryShutdown() called twice.\n");
         abort();
     }
