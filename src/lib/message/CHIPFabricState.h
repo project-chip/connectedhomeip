@@ -530,8 +530,8 @@ public:
 #endif
 
 #if CHIP_CONFIG_ENABLE_TARGETED_LISTEN
-    IPAddress ListenIPv4Addr;
-    IPAddress ListenIPv6Addr;
+    Inet::IPAddress ListenIPv4Addr;
+    Inet::IPAddress ListenIPv6Addr;
 #endif
 
     CHIP_ERROR Init();
@@ -563,10 +563,10 @@ public:
     CHIP_ERROR GetSessionState(uint64_t remoteNodeId, uint16_t keyId, uint8_t encType, ChipConnection * con,
                                ChipSessionState & outSessionState);
 
-    IPAddress SelectNodeAddress(uint64_t nodeId, uint16_t subnet) const;
-    IPAddress SelectNodeAddress(uint64_t nodeId) const;
-    bool IsFabricAddress(const IPAddress & addr) const;
-    bool IsLocalFabricAddress(const IPAddress & addr) const;
+    Inet::IPAddress SelectNodeAddress(uint64_t nodeId, uint16_t subnet) const;
+    Inet::IPAddress SelectNodeAddress(uint64_t nodeId) const;
+    bool IsFabricAddress(const Inet::IPAddress & addr) const;
+    bool IsLocalFabricAddress(const Inet::IPAddress & addr) const;
 
     CHIP_ERROR GetPassword(uint8_t pwSrc, const char *& ps, uint16_t & pwLen);
 

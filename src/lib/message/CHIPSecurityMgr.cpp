@@ -56,12 +56,14 @@ namespace Security {
 
 #endif // CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_DUMMY
 
+using namespace chip::Encoding;
+using namespace chip::Inet;
 using namespace chip::Protocols;
 using namespace chip::Protocols::Common;
-using namespace chip::Protocols::StatusReporting;
 using namespace chip::Protocols::Security;
 using namespace chip::Protocols::Security::AppKeys;
-using namespace chip::Encoding;
+using namespace chip::Protocols::StatusReporting;
+using namespace chip::System;
 
 ChipSecurityManager::ChipSecurityManager()
 {

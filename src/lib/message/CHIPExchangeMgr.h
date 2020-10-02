@@ -105,8 +105,8 @@ public:
     uint16_t mMsgProtocolVersion;      /**< Message Protocol version for the ExchangeContext. */
     ChipConnection * Con;              /**< [READ ONLY] Associated CHIP connection. */
     uint64_t PeerNodeId;               /**< [READ ONLY] Node ID of peer node. */
-    IPAddress PeerAddr;                /**< [READ ONLY] IP address of peer node. */
-    InterfaceId
+    Inet::IPAddress PeerAddr;          /**< [READ ONLY] IP address of peer node. */
+    Inet::InterfaceId
         PeerIntf; /**< [READ ONLY] Outbound interface to be used when sending messages to the peer. (Only meaningful for UDP.) */
     uint16_t PeerPort;        /**< [READ ONLY] Port of peer node. */
     uint16_t ExchangeId;      /**< [READ ONLY] Assigned exchange ID. */
@@ -162,13 +162,13 @@ public:
     void SetUseEphemeralUDPPort(bool val);
 #endif
 
-    CHIP_ERROR SendMessage(uint32_t profileId, uint8_t msgType, PacketBuffer * msgPayload, uint16_t sendFlags = 0,
+    CHIP_ERROR SendMessage(uint32_t profileId, uint8_t msgType, System::PacketBuffer * msgPayload, uint16_t sendFlags = 0,
                            void * msgCtxt = nullptr);
-    CHIP_ERROR SendMessage(uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf, uint16_t sendFlags,
+    CHIP_ERROR SendMessage(uint32_t profileId, uint8_t msgType, System::PacketBuffer * msgBuf, uint16_t sendFlags,
                            ChipMessageInfo * msgInfo, void * msgCtxt = nullptr);
     CHIP_ERROR SendCommonNullMessage();
-    CHIP_ERROR EncodeExchHeader(ChipExchangeHeader * exchangeHeader, uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf,
-                                uint16_t sendFlags);
+    CHIP_ERROR EncodeExchHeader(ChipExchangeHeader * exchangeHeader, uint32_t profileId, uint8_t msgType,
+                                System::PacketBuffer * msgBuf, uint16_t sendFlags);
     void TeardownTrickleRetransmit();
 
     /**
@@ -186,8 +186,8 @@ public:
      *
      *  @param[in]    payload       A pointer to the PacketBuffer object holding the message payload.
      */
-    typedef void (*MessageReceiveFunct)(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
-                                        uint32_t profileId, uint8_t msgType, PacketBuffer * payload);
+    typedef void (*MessageReceiveFunct)(ExchangeContext * ec, const Inet::IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
+                                        uint32_t profileId, uint8_t msgType, System::PacketBuffer * payload);
     MessageReceiveFunct OnMessageReceived;
 
     /**
@@ -313,7 +313,7 @@ public:
     void GetPeerDescription(char * buf, uint32_t bufSize) const;
 
 private:
-    PacketBuffer * msg; // If we are re-transmitting, then this is the pointer to the message being retransmitted
+    System::PacketBuffer * msg; // If we are re-transmitting, then this is the pointer to the message being retransmitted
 
     // Trickle-controlled retransmissions:
     uint32_t backoff;             // backoff for sampling the numner of messages
@@ -335,8 +335,8 @@ private:
     uint16_t mRMPNextAckTime;     // Next time for triggering Solo Ack
     uint16_t mRMPThrottleTimeout; // Timeout until when Throttle is On when RMPThrottleEnabled is set
     void DoClose(bool clearRetransTable);
-    CHIP_ERROR HandleMessage(ChipMessageInfo * msgInfo, const ChipExchangeHeader * exchHeader, PacketBuffer * msgBuf);
-    CHIP_ERROR HandleMessage(ChipMessageInfo * msgInfo, const ChipExchangeHeader * exchHeader, PacketBuffer * msgBuf,
+    CHIP_ERROR HandleMessage(ChipMessageInfo * msgInfo, const ChipExchangeHeader * exchHeader, System::PacketBuffer * msgBuf);
+    CHIP_ERROR HandleMessage(ChipMessageInfo * msgInfo, const ChipExchangeHeader * exchHeader, System::PacketBuffer * msgBuf,
                              ExchangeContext::MessageReceiveFunct umhandler);
     void HandleConnectionClosed(CHIP_ERROR conErr);
 
@@ -389,9 +389,9 @@ public:
 #endif
 
     ExchangeContext * NewContext(const uint64_t & peerNodeId, void * appState = nullptr);
-    ExchangeContext * NewContext(const uint64_t & peerNodeId, const IPAddress & peerAddr, void * appState = nullptr);
-    ExchangeContext * NewContext(const uint64_t & peerNodeId, const IPAddress & peerAddr, uint16_t peerPort, InterfaceId sendIntfId,
-                                 void * appState = nullptr);
+    ExchangeContext * NewContext(const uint64_t & peerNodeId, const Inet::IPAddress & peerAddr, void * appState = nullptr);
+    ExchangeContext * NewContext(const uint64_t & peerNodeId, const Inet::IPAddress & peerAddr, uint16_t peerPort,
+                                 Inet::InterfaceId sendIntfId, void * appState = nullptr);
     ExchangeContext * NewContext(ChipConnection * con, void * appState = nullptr);
 
     ExchangeContext * FindContext(uint64_t peerNodeId, ChipConnection * con, void * appState, bool isInitiator);
@@ -436,7 +436,7 @@ private:
     public:
         uint32_t msgId;                /**< The message identifier of the CHIP message awaiting acknowledgment. */
         ExchangeContext * exchContext; /**< The ExchangeContext for the stored CHIP message. */
-        PacketBuffer * msgBuf;         /**< A pointer to the PacketBuffer object holding the CHIP message. */
+        System::PacketBuffer * msgBuf; /**< A pointer to the PacketBuffer object holding the CHIP message. */
         void * msgCtxt;                /**< A pointer to an application level context object associated with the message. */
         uint16_t nextRetransTime;      /**< A counter representing the next retransmission time for the message. */
         uint8_t sendCount;             /**< A counter representing the number of times the message has been sent. */
@@ -450,7 +450,7 @@ private:
     static void RMPTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
     static bool isLaterInRMP(uint64_t t2, uint64_t t1);
     bool IsSendErrorCritical(CHIP_ERROR err) const;
-    CHIP_ERROR AddToRetransTable(ExchangeContext * ec, PacketBuffer * inetBuff, uint32_t msgId, void * msgCtxt,
+    CHIP_ERROR AddToRetransTable(ExchangeContext * ec, System::PacketBuffer * inetBuff, uint32_t msgId, void * msgCtxt,
                                  RetransTableEntry ** rEntry);
     CHIP_ERROR SendFromRetransTable(RetransTableEntry * entry);
     void ClearRetransmitTable(ExchangeContext * ec);
@@ -487,16 +487,16 @@ private:
 
     void HandleConnectionReceived(ChipConnection * con);
     void HandleConnectionClosed(ChipConnection * con, CHIP_ERROR conErr);
-    void DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffer * msgBuf);
+    void DispatchMessage(ChipMessageInfo * msgInfo, System::PacketBuffer * msgBuf);
     CHIP_ERROR RegisterUMH(uint32_t profileId, int16_t msgType, ChipConnection * con, bool allowDups,
                            ExchangeContext::MessageReceiveFunct handler, void * appState);
     CHIP_ERROR UnregisterUMH(uint32_t profileId, int16_t msgType, ChipConnection * con);
 
     static void HandleAcceptError(ChipMessageLayer * msgLayer, CHIP_ERROR err);
-    static void HandleMessageReceived(ChipMessageLayer * msgLayer, ChipMessageInfo * msgInfo, PacketBuffer * msgBuf);
-    static void HandleMessageReceived(ChipConnection * con, ChipMessageInfo * msgInfo, PacketBuffer * msgBuf);
-    static CHIP_ERROR PrependHeader(ChipExchangeHeader * exchangeHeader, PacketBuffer * buf);
-    static CHIP_ERROR DecodeHeader(ChipExchangeHeader * exchangeHeader, ChipMessageInfo * msgInfo, PacketBuffer * buf);
+    static void HandleMessageReceived(ChipMessageLayer * msgLayer, ChipMessageInfo * msgInfo, System::PacketBuffer * msgBuf);
+    static void HandleMessageReceived(ChipConnection * con, ChipMessageInfo * msgInfo, System::PacketBuffer * msgBuf);
+    static CHIP_ERROR PrependHeader(ChipExchangeHeader * exchangeHeader, System::PacketBuffer * buf);
+    static CHIP_ERROR DecodeHeader(ChipExchangeHeader * exchangeHeader, ChipMessageInfo * msgInfo, System::PacketBuffer * buf);
 
     void InitBindingPool();
     Binding * AllocBinding();

@@ -54,10 +54,13 @@
 #include <support/crypto/HashAlgos.h>
 #include <support/logging/CHIPLogging.h>
 
-namespace chip {
-
+using namespace chip::Ble;
 using namespace chip::Crypto;
 using namespace chip::Encoding;
+using namespace chip::Inet;
+using namespace chip::System;
+
+namespace chip {
 
 /**
  *  @def CHIP_BIND_DETAIL_LOGGING

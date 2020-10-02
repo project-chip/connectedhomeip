@@ -184,7 +184,7 @@ public:
     uint16_t GetLogId() const;
 
     uint64_t GetPeerNodeId() const;
-    void GetPeerIPAddress(Inet::IPAddress & address, uint16_t & port, InterfaceId & interfaceId) const;
+    void GetPeerIPAddress(Inet::IPAddress & address, uint16_t & port, Inet::InterfaceId & interfaceId) const;
     uint32_t GetKeyId() const;
     uint8_t GetEncryptionType() const;
     uint32_t GetDefaultResponseTimeout() const;
@@ -283,7 +283,7 @@ private:
     uint64_t mPeerNodeId;
 
     // Addressing-specific configuration
-    InterfaceId mInterfaceId;
+    Inet::InterfaceId mInterfaceId;
     uint16_t mPeerPort;
 
     // Transport-specific configuration
@@ -328,7 +328,7 @@ private:
     void OnSecureSessionReady(uint64_t peerNodeId, uint8_t encType, ChipAuthMode authMode, uint16_t keyId);
     void OnKeyError(const uint32_t aKeyId, const uint64_t aPeerNodeId, const CHIP_ERROR aKeyErr);
 
-    static void OnResolveComplete(void * appState, INET_ERROR err, uint8_t addrCount, IPAddress * addrArray);
+    static void OnResolveComplete(void * appState, INET_ERROR err, uint8_t addrCount, Inet::IPAddress * addrArray);
     static void OnConnectionComplete(ChipConnection * con, CHIP_ERROR conErr);
 };
 
@@ -355,11 +355,11 @@ public:
     Configuration & TargetAddress_ChipService();
     Configuration & TargetAddress_ChipFabric(uint16_t aSubnetId);
     Configuration & TargetAddress_IP(Inet::IPAddress aPeerAddress, uint16_t aPeerPort = CHIP_PORT,
-                                     InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
+                                     Inet::InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
     Configuration & TargetAddress_IP(const char * aHostName, uint16_t aPeerPort = CHIP_PORT,
-                                     InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
+                                     Inet::InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
     Configuration & TargetAddress_IP(const char * aHostName, size_t aHostNameLen, uint16_t aPeerPort = CHIP_PORT,
-                                     InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
+                                     Inet::InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
 
     Configuration & DNS_Options(uint8_t dnsOptions);
 
@@ -489,7 +489,7 @@ inline uint64_t Binding::GetPeerNodeId() const
     return mPeerNodeId;
 }
 
-inline void Binding::GetPeerIPAddress(Inet::IPAddress & address, uint16_t & port, InterfaceId & interfaceId) const
+inline void Binding::GetPeerIPAddress(Inet::IPAddress & address, uint16_t & port, Inet::InterfaceId & interfaceId) const
 {
     address     = mPeerAddress;
     port        = mPeerPort;

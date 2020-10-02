@@ -115,7 +115,7 @@ public:
 };
 
 static chip::System::Layer sSystemLayer;
-static chip::InetLayer sInetLayer;
+static chip::Inet::InetLayer sInetLayer;
 
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
@@ -240,7 +240,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
     if (sSystemLayer.State() == chip::System::kLayerState_Initialized)
         sSystemLayer.PrepareSelect(maxFDs, &readFDs, &writeFDs, &exceptFDs, sleepTime);
 
-    if (sInetLayer.State == chip::InetLayer::kState_Initialized)
+    if (sInetLayer.State == chip::Inet::InetLayer::kState_Initialized)
         sInetLayer.PrepareSelect(maxFDs, &readFDs, &writeFDs, &exceptFDs, sleepTime);
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -370,7 +370,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
     if (sSystemLayer.State() == chip::System::kLayerState_Initialized)
         sSystemLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
 
-    if (sInetLayer.State == chip::InetLayer::kState_Initialized)
+    if (sInetLayer.State == chip::Inet::InetLayer::kState_Initialized)
         sInetLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
 
 #endif /* CHIP_SYSTEM_CONFIG_USE_SOCKETS */
@@ -532,7 +532,7 @@ CHIP_ERROR nl_Chip_Stack_Init()
     err = sSystemLayer.Init(NULL);
     SuccessOrExit(err);
 
-    if (sInetLayer.State == chip::InetLayer::kState_Initialized)
+    if (sInetLayer.State == chip::Inet::InetLayer::kState_Initialized)
         ExitNow();
 
     // Initialize the InetLayer object.
@@ -594,7 +594,7 @@ CHIP_ERROR nl_Chip_Stack_Shutdown()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (sInetLayer.State == chip::InetLayer::kState_NotInitialized)
+    if (sInetLayer.State == chip::Inet::InetLayer::kState_NotInitialized)
         ExitNow();
 
     if (sSystemLayer.State() == chip::System::kLayerState_NotInitialized)

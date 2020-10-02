@@ -199,7 +199,7 @@ protected:
     ExchangeContext * mCurClientOp;
 
 private:
-    static void HandleClientRequest(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
+    static void HandleClientRequest(ExchangeContext * ec, const Inet::IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
                                     uint32_t profileId, uint8_t msgType, PacketBuffer * payload);
 
     // Utility functions for managing registration with/notification from ChipFabricState

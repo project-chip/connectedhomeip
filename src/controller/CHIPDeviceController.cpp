@@ -49,6 +49,9 @@
 #include <stdlib.h>
 #include <time.h>
 
+using namespace chip::Inet;
+using namespace chip::System;
+
 namespace chip {
 namespace DeviceController {
 
