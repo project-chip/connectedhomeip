@@ -68,13 +68,15 @@ class RendezvousSession : public SecurePairingSessionDelegate,
 public:
     enum State : uint8_t
     {
-        kUnknown = 0,
+        kInit = 0,
         kSecurePairing,
         kNetworkProvisioning,
         kRendezvousComplete,
     };
 
-    RendezvousSession(RendezvousSessionDelegate * delegate) : mDelegate(delegate) {}
+    RendezvousSession(RendezvousSessionDelegate * delegate, DeviceNetworkProvisioningDelegate * networkDelegate = nullptr) :
+        mDelegate(delegate), mDeviceNetworkProvisionDelegate(networkDelegate)
+    {}
     ~RendezvousSession() override;
 
     /**
@@ -135,11 +137,12 @@ private:
 
     SecurePairingSession mPairingSession;
     NetworkProvisioning mNetworkProvision;
+    DeviceNetworkProvisioningDelegate * mDeviceNetworkProvisionDelegate = nullptr;
     SecureSession mSecureSession;
     uint32_t mSecureMessageIndex = 0;
     uint16_t mNextKeyId          = 0;
- 
-    RendezvousSession::State mCurrentState = State::kUnknown;
+
+    RendezvousSession::State mCurrentState = State::kInit;
     void UpdateState(RendezvousSession::State newState);
 };
 

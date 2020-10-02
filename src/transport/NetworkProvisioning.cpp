@@ -30,11 +30,52 @@
 
 namespace chip {
 
-CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType, PacketBuffer * msgBuf,
-                                                                 RendezvousSessionDelegate * delegate)
+void NetworkProvisioning::Init(NetworkProvisioningDelegate * delegate, DeviceNetworkProvisioningDelegate * deviceDelegate)
+{
+    if (mDelegate != nullptr)
+    {
+        mDelegate->Release();
+    }
+
+    if (delegate != nullptr)
+    {
+        mDelegate = delegate->Retain();
+    }
+
+    if (mDeviceDelegate != nullptr)
+    {
+        mDeviceDelegate->Release();
+    }
+
+    if (deviceDelegate != nullptr)
+    {
+        mDeviceDelegate = deviceDelegate->Retain();
+#if CONFIG_DEVICE_LAYER
+        DeviceLayer::PlatformMgr().AddEventHandler(ConnectivityHandler, reinterpret_cast<intptr_t>(this));
+#endif
+    }
+}
+
+NetworkProvisioning::~NetworkProvisioning()
+{
+    if (mDeviceDelegate != nullptr)
+    {
+        mDeviceDelegate->Release();
+
+#if CONFIG_DEVICE_LAYER
+        DeviceLayer::PlatformMgr().RemoveEventHandler(ConnectivityHandler, reinterpret_cast<intptr_t>(this));
+#endif
+    }
+
+    if (mDelegate != nullptr)
+    {
+        mDelegate->Release();
+    }
+}
+
+CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType, PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(delegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     switch (msgType)
     {
@@ -48,17 +89,23 @@ CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType
         size_t len             = msgBuf->DataLength();
         size_t offset          = 0;
 
+        ChipLogProgress(NetworkProvisioning, "Received kWiFiAssociationRequest. DeviceDelegate %p\n", mDeviceDelegate);
+
+        VerifyOrExit(mDeviceDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
         err = DecodeString(&buffer[offset], len - offset, bbufSSID, offset);
-        SuccessOrExit(err);
+        // TODO: Check for the error once network provisioning is moved to delegate calls
 
         err = DecodeString(&buffer[offset], len - offset, bbufPW, offset);
-        SuccessOrExit(err);
+        // TODO: Check for the error once network provisioning is moved to delegate calls
 
-        delegate->OnRendezvousProvisionNetwork(SSID, passwd);
+        mDeviceDelegate->ProvisionNetwork(SSID, passwd);
+        err = CHIP_NO_ERROR;
     }
     break;
 
     case NetworkProvisioning::MsgTypes::kIPAddressAssigned: {
+        ChipLogProgress(NetworkProvisioning, "Received kIPAddressAssigned\n");
         if (!IPAddress::FromString(Uint8::to_const_char(msgBuf->Start()), msgBuf->DataLength(), mDeviceAddress))
         {
             ExitNow(err = CHIP_ERROR_INVALID_ADDRESS);
@@ -72,16 +119,20 @@ CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType
     };
 
 exit:
-    if (err != CHIP_NO_ERROR)
+    if (mDelegate != nullptr)
     {
-        mDelegate->OnNetworkProvisioningError(err);
-    }
-    else
-    {
-        // Network provisioning handshake requires only one message exchange in either direction.
-        // If the current message handling did not result in an error, network provisioning is
-        // complete.
-        mDelegate->OnNetworkProvisioningComplete();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(NetworkProvisioning, "Failed in HandleNetworkProvisioningMessage. error %s\n", ErrorStr(err));
+            mDelegate->OnNetworkProvisioningError(err);
+        }
+        else
+        {
+            // Network provisioning handshake requires only one message exchange in either direction.
+            // If the current message handling did not result in an error, network provisioning is
+            // complete.
+            mDelegate->OnNetworkProvisioningComplete();
+        }
     }
     return err;
 }
@@ -128,6 +179,7 @@ CHIP_ERROR NetworkProvisioning::SendIPAddress(const IPAddress & addr)
     char * addrStr                = addr.ToString(Uint8::to_char(buffer->Start()), buffer->AvailableDataLength());
     size_t addrLen                = 0;
 
+    ChipLogProgress(NetworkProvisioning, "Sending IP Address. Delegate %p\n", mDelegate);
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(addrStr != nullptr, err = CHIP_ERROR_INVALID_ADDRESS);
 
@@ -143,6 +195,7 @@ CHIP_ERROR NetworkProvisioning::SendIPAddress(const IPAddress & addr)
 exit:
     if (CHIP_NO_ERROR != err)
     {
+        ChipLogError(NetworkProvisioning, "Failed in sending IP address. error %s\n", ErrorStr(err));
         PacketBuffer::Free(buffer);
     }
     return err;
@@ -154,6 +207,7 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
     System::PacketBuffer * buffer = System::PacketBuffer::New();
     BufBound bbuf(buffer->Start(), buffer->TotalLength());
 
+    ChipLogProgress(NetworkProvisioning, "Sending Network Creds. Delegate %p\n", mDelegate);
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     SuccessOrExit(EncodeString(ssid, bbuf));
     SuccessOrExit(EncodeString(passwd, bbuf));
@@ -169,6 +223,7 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
 exit:
     if (CHIP_NO_ERROR != err)
     {
+        ChipLogError(NetworkProvisioning, "Failed in sending Network Creds. error %s\n", ErrorStr(err));
         PacketBuffer::Free(buffer);
     }
     return err;

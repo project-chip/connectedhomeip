@@ -26,6 +26,7 @@
 
 #include <core/CHIPCore.h>
 #include <core/ReferenceCounted.h>
+#include <protocols/CHIPProtocols.h>
 #include <support/BufBound.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/RendezvousSessionDelegate.h>
@@ -35,6 +36,21 @@
 #endif
 
 namespace chip {
+
+class DLL_EXPORT DeviceNetworkProvisioningDelegate : public ReferenceCounted<DeviceNetworkProvisioningDelegate>
+{
+public:
+    /**
+     * @brief
+     *   Called to provision WiFi credentials in a device
+     *
+     * @param ssid WiFi SSID
+     * @param passwd WiFi password
+     */
+    virtual void ProvisionNetwork(const char * ssid, const char * passwd) {}
+
+    ~DeviceNetworkProvisioningDelegate() override {}
+};
 
 class DLL_EXPORT NetworkProvisioningDelegate : public ReferenceCounted<NetworkProvisioningDelegate>
 {
@@ -77,37 +93,13 @@ public:
         kIPAddressAssigned      = 1,
     };
 
-    void Init(NetworkProvisioningDelegate * delegate, bool monitorNetIf)
-    {
-        if (mDelegate != nullptr)
-        {
-            mDelegate->Release();
-        }
+    void Init(NetworkProvisioningDelegate * delegate, DeviceNetworkProvisioningDelegate * deviceDelegate);
 
-        if (delegate != nullptr)
-        {
-            mDelegate = delegate->Retain();
-        }
-
-#if CONFIG_DEVICE_LAYER
-        DeviceLayer::PlatformMgr().AddEventHandler(ConnectivityHandler, reinterpret_cast<intptr_t>(this));
-#endif
-    }
-
-    ~NetworkProvisioning()
-    {
-#if CONFIG_DEVICE_LAYER
-        DeviceLayer::PlatformMgr().RemoveEventHandler(ConnectivityHandler, reinterpret_cast<intptr_t>(this));
-#endif
-        if (mDelegate != nullptr)
-        {
-            mDelegate->Release();
-        }
-    }
+    ~NetworkProvisioning();
 
     CHIP_ERROR SendNetworkCredentials(const char * ssid, const char * passwd);
 
-    CHIP_ERROR HandleNetworkProvisioningMessage(uint8_t msgType, PacketBuffer * msgBuf, RendezvousSessionDelegate * delegate);
+    CHIP_ERROR HandleNetworkProvisioningMessage(uint8_t msgType, PacketBuffer * msgBuf);
 
     /**
      * @brief
@@ -116,12 +108,13 @@ public:
      *
      * @return The IP address of the device
      */
-    const IPAddress & GetIPAddress() const { return mDeviceAddress; }
+    const Inet::IPAddress & GetIPAddress() const { return mDeviceAddress; }
 
 private:
-    NetworkProvisioningDelegate * mDelegate = nullptr;
+    NetworkProvisioningDelegate * mDelegate             = nullptr;
+    DeviceNetworkProvisioningDelegate * mDeviceDelegate = nullptr;
 
-    IPAddress mDeviceAddress = IPAddress::Any;
+    Inet::IPAddress mDeviceAddress = IPAddress::Any;
 
     /**
      * @brief
@@ -131,7 +124,7 @@ private:
      *
      * @param addr The IP address of the device
      */
-    CHIP_ERROR SendIPAddress(const IPAddress & addr);
+    CHIP_ERROR SendIPAddress(const Inet::IPAddress & addr);
 
     CHIP_ERROR EncodeString(const char * str, BufBound & bbuf);
     CHIP_ERROR DecodeString(const uint8_t * input, size_t input_len, BufBound & bbuf, size_t & consumed);

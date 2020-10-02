@@ -61,13 +61,9 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params)
     {
         err = WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
         SuccessOrExit(err);
+    }
 
-        mNetworkProvision.Init(this, true);
-    }
-    else
-    {
-        mNetworkProvision.Init(this, false);
-    }
+    mNetworkProvision.Init(this, mDeviceNetworkProvisionDelegate);
 
 exit:
     return err;
@@ -254,6 +250,7 @@ void RendezvousSession::OnRendezvousError(CHIP_ERROR err)
         break;
     };
     mDelegate->OnRendezvousError(err);
+    UpdateState(State::kInit);
 }
 
 void RendezvousSession::UpdateState(RendezvousSession::State newState)
@@ -370,10 +367,10 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
 
     if (payloadHeader.GetProtocolID() == Protocols::kChipProtocol_NetworkProvisioning)
     {
-        err = mNetworkProvision.HandleNetworkProvisioningMessage(payloadHeader.GetMessageType(), msgBuf, mDelegate);
-        // Ignoring error for time being, as the message is getting routed via OnRendezvousMessageReceived()
+        err = mNetworkProvision.HandleNetworkProvisioningMessage(payloadHeader.GetMessageType(), msgBuf);
+        SuccessOrExit(err);
     }
-    // else .. TBD once application dependency on this message has been removed, enable the else condition
+    // else .. TODO once application dependency on this message has been removed, enable the else condition
     {
         mDelegate->OnRendezvousMessageReceived(msgBuf);
     }

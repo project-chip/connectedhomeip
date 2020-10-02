@@ -46,7 +46,7 @@ RendezvousDeviceDelegate::RendezvousDeviceDelegate()
 
     params.SetSetupPINCode(setupPINCode).SetLocalNodeId(kLocalNodeId).SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
 
-    mRendezvousSession = new RendezvousSession(this);
+    mRendezvousSession = new RendezvousSession(this, &mDeviceNetworkProvisioningDelegate);
     err                = mRendezvousSession->Init(params);
 
 exit:
@@ -60,7 +60,7 @@ void RendezvousDeviceDelegate::OnRendezvousStatusUpdate(RendezvousSessionDelegat
 {
     if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGI(TAG, "OnRendezvousStatusUpdate: %s", ErrorStr(err));
+        ESP_LOGE(TAG, "OnRendezvousStatusUpdate: %s, status %d", ErrorStr(err), status);
     }
 
     switch (status)
@@ -93,10 +93,4 @@ void RendezvousDeviceDelegate::OnRendezvousMessageReceived(PacketBuffer * buffer
         // If the handler did not recognize the message, treat it as an echo request.
         mRendezvousSession->SendMessage(buffer);
     }
-}
-
-void RendezvousDeviceDelegate::OnRendezvousProvisionNetwork(const char * ssid, const char * passwd)
-{
-    ESP_LOGI(TAG, "OnRendezvousProvisionNetwork");
-    // Call device network configuration method here.
 }

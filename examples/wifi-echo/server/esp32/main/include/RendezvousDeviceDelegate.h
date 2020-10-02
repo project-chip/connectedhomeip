@@ -18,6 +18,8 @@
 #ifndef __RENDEZVOUSDEVICEDELEGATE_H__
 #define __RENDEZVOUSDEVICEDELEGATE_H__
 
+#include "DeviceNetworkProvisioningDelegate.h"
+
 #include <platform/CHIPDeviceLayer.h>
 #include <transport/RendezvousSession.h>
 
@@ -29,11 +31,10 @@ public:
     //////////// RendezvousSession callback Implementation ///////////////
     void OnRendezvousMessageReceived(chip::System::PacketBuffer * buffer) override;
     void OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err) override;
- 
-    void OnRendezvousProvisionNetwork(const char * ssid, const char * passwd) override;
 
 private:
     chip::RendezvousSession * mRendezvousSession;
-};
+    ESP32NetworkProvisioningDelegate mDeviceNetworkProvisioningDelegate;
+ };
 
 #endif // __RENDEZVOUSDEVICEDELEGATE_H__

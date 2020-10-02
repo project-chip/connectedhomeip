@@ -41,7 +41,6 @@ public:
     virtual void OnRendezvousMessageReceived(System::PacketBuffer * buffer) = 0;
 
     virtual void OnRendezvousStatusUpdate(Status status, CHIP_ERROR err) {}
-    virtual void OnRendezvousProvisionNetwork(const char * ssid, const char * passwd) {}
 };
 
 class DLL_EXPORT RendezvousDeviceCredentialsDelegate
