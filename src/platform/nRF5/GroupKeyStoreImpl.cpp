@@ -141,7 +141,7 @@ CHIP_ERROR GroupKeyStoreImpl::StoreGroupKey(const ChipGroupKey & key)
 exit:
     if (storedVal != NULL)
     {
-        ClearSecretData(storedVal, storedValLen);
+        ClearSecretData(storedVal.Ptr<uint8_t>(), storedValLen);
         vPortFree(storedVal);
     }
     return err;

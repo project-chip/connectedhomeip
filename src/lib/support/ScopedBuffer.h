@@ -1,0 +1,150 @@
+/*
+ *
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/**
+ *    @file
+ *      Defines scoped auto-free buffers for CHIP.
+ *
+ */
+
+#ifndef CHIP_SCOPED_BUFFER_H_
+#define CHIP_SCOPED_BUFFER_H_
+
+#include <lib/support/CHIPMem.h>
+
+namespace chip {
+namespace Platform {
+
+namespace Impl {
+
+/**
+ * Represents a memory buffer that is auto-freed in the destructor.
+ *
+ * This class uses void* underneath on purpose (rather than a unique_ptr like
+ * 'Type') and uses  templated type on Ptr(). This is to avoid template explosion
+ * when the buffers are used for different types - only one implementation of
+ * the class will be stored in flash.
+ */
+template <class Impl>
+class ScopedMemoryBufferBase
+{
+public:
+    ScopedMemoryBufferBase() {}
+    ScopedMemoryBufferBase(const ScopedMemoryBufferBase &) = delete;
+    ScopedMemoryBufferBase & operator=(const ScopedMemoryBufferBase & other) = delete;
+
+    ~ScopedMemoryBufferBase() { Free(); }
+
+    void * Ptr() { return mBuffer; }
+    const void * Ptr() const { return mBuffer; }
+
+    template <typename T>
+    inline T * Ptr()
+    {
+        return static_cast<T *>(mBuffer);
+    }
+
+    template <typename T>
+    inline const T * Ptr() const
+    {
+        return static_cast<T *>(mBuffer);
+    }
+
+    ScopedMemoryBufferBase & Alloc(size_t size)
+    {
+        Free();
+        mBuffer = Impl::MemoryAlloc(size);
+        return *this;
+    }
+
+    ScopedMemoryBufferBase & LongTermAlloc(size_t size)
+    {
+        Free();
+        mBuffer = Impl::MemoryAlloc(size, true /* isLongTermAlloc */);
+        return *this;
+    }
+
+    template <typename T>
+    ScopedMemoryBufferBase & Calloc(size_t elementCount)
+    {
+        Free();
+        mBuffer = Impl::MemoryCalloc(elementCount, sizeof(T));
+        return *this;
+    }
+
+    /** Check if a buffer is valid */
+    explicit operator bool() const { return mBuffer != nullptr; }
+    bool operator!() const { return mBuffer == nullptr; }
+
+    /**
+     * Releases the undelying buffer. Buffer stops being managed and will not be
+     * auto-freed.
+     */
+    void * Release()
+    {
+        void * buffer = mBuffer;
+        mBuffer       = nullptr;
+        return buffer;
+    }
+
+    template <typename T>
+    inline T * Release()
+    {
+        void * buffer = mBuffer;
+        mBuffer       = nullptr;
+        return static_cast<T *>(buffer);
+    }
+
+    /** Release memory used */
+    void Free()
+    {
+        if (mBuffer == nullptr)
+        {
+            return;
+        }
+        Impl::MemoryFree(mBuffer);
+        mBuffer = nullptr;
+    }
+
+private:
+    void * mBuffer = nullptr;
+};
+
+} // namespace Impl
+
+/**
+ * Represents a memory buffer allocated using chip::Platform::Memory*Alloc
+ * methods.
+ *
+ * Use for RAII to auto-free after use.
+ */
+class ScopedMemoryBuffer : public Impl::ScopedMemoryBufferBase<ScopedMemoryBuffer>
+{
+    friend class Impl::ScopedMemoryBufferBase<ScopedMemoryBuffer>;
+
+protected:
+    static void MemoryFree(void * p) { chip::Platform::MemoryFree(p); }
+    static void * MemoryAlloc(size_t size) { return chip::Platform::MemoryAlloc(size); }
+    static void * MemoryAlloc(size_t size, bool longTerm) { return chip::Platform::MemoryAlloc(size, longTerm); }
+    static void * MemoryCalloc(size_t num, size_t size) { return chip::Platform::MemoryCalloc(num, size); }
+};
+
+} // namespace Platform
+} // namespace chip
+
+#endif // CHIP_SCOPED_BUFFER_H_
