@@ -19,8 +19,8 @@
 #include "Button.h"
 #include "CHIPDeviceManager.h"
 #include "DataModelHandler.h"
+#include "DeviceCallbacks.h"
 #include "Display.h"
-#include "EchoDeviceCallbacks.h"
 #include "LEDWidget.h"
 #include "ListScreen.h"
 #include "QRCodeScreen.h"
@@ -49,6 +49,7 @@
 #include <transport/SecureSessionMgr.h>
 
 using namespace ::chip;
+using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
 extern void startServer();
@@ -98,7 +99,7 @@ extern void PairingComplete(SecurePairingSession * pairing);
 
 const char * TAG = "wifi-echo-demo";
 
-static EchoDeviceCallbacks EchoCallbacks;
+static DeviceCallbacks EchoCallbacks;
 RendezvousDeviceDelegate * rendezvousDelegate = nullptr;
 
 namespace {
