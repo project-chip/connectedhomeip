@@ -16,6 +16,8 @@
  *
  */
 
+#include "commands/common/Commands.h"
+
 #include "commands/clusters/Identify/Commands.h"
 #include "commands/clusters/OnOff/Commands.h"
 #include "commands/clusters/TemperatureMeasurement/Commands.h"

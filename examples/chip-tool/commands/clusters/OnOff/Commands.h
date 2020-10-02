@@ -67,12 +67,17 @@ public:
 
 void registerClusterOnOff(Commands & commands)
 {
+    const char * clusterName = "OnOff";
     const uint16_t clusterId = 0x0006;
 
-    commands.Register(make_unique<Off>(clusterId));
-    commands.Register(make_unique<On>(clusterId));
-    commands.Register(make_unique<ReadOnOff>(clusterId));
-    commands.Register(make_unique<Toggle>(clusterId));
+    commands_list clusterCommands = {
+        make_unique<Off>(clusterId),
+        make_unique<On>(clusterId),
+        make_unique<ReadOnOff>(clusterId),
+        make_unique<Toggle>(clusterId),
+    };
+
+    commands.Register(clusterName, clusterCommands);
 }
 
 #endif // __CHIPTOOL_ONOFF_COMMANDS_H__

@@ -37,9 +37,14 @@ public:
 
 void registerClusterTemperatureMeasurement(Commands & commands)
 {
+    const char * clusterName = "Temperature Measurement";
     const uint16_t clusterId = 0x0402;
 
-    commands.Register(make_unique<ReadCurrentTemperature>(clusterId));
+    commands_list clusterCommands = {
+        make_unique<ReadCurrentTemperature>(clusterId),
+    };
+
+    commands.Register(clusterName, clusterCommands);
 }
 
 #endif // __CHIPTOOL_TEMPERATURE_MEASUREMENT_COMMANDS_H__
