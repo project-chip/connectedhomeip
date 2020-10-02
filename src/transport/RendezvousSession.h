@@ -89,7 +89,7 @@ public:
     void OnRendezvousConnectionOpened() override;
     void OnRendezvousConnectionClosed() override;
     void OnRendezvousError(CHIP_ERROR err) override;
-    void OnRendezvousMessageReceived(System::/*  */PacketBuffer * buffer) override;
+    void OnRendezvousMessageReceived(System::/*  */ PacketBuffer * buffer) override;
 
     const IPAddress & GetIPAddress() const { return mDeviceAddress; }
 
