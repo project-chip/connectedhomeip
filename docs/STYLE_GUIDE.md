@@ -5,14 +5,15 @@ CHIP documentation lives here:
 -   **GitHub** — All guides and tutorials across the complete
     [Project-CHIP organization](https://github.com/project-chip).
 
-See [CONTRIBUTING.md](../CONTRIBUTING.md) for general information on
-contributing to this project.
+See
+[CONTRIBUTING.md](https://github.com/project-chip/connectedhomeip/blob/master/CONTRIBUTING.md)
+for general information on contributing to this project.
 
 ## Location
 
 Place all documentation contributions in the appropriate location in the
-[`/docs`](./) directory. Most contributions should go into the `/docs/guides`
-subdirectory, which covers conceptual and usage content.
+[`/docs`](../docs) directory. Most contributions should go into the
+`/docs/guides` subdirectory, which covers conceptual and usage content.
 
 Current documentation structure:
 
