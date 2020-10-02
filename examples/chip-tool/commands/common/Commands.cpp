@@ -57,6 +57,12 @@ CHIP_ERROR Commands::RunCommand(ChipDeviceController & dc, NodeId remoteId, int 
         Command * cmd = commands.at(i).get();
         if (strcmp(cmd->GetName(), argv[1]) == 0)
         {
+            // If the command is a read command, ensure the target attribute value matches with the last argument
+            if (strcmp(cmd->GetName(), "read") == 0 && strcmp(cmd->GetAttribute(), argv[argc - 1]) != 0)
+            {
+                continue;
+            }
+
             VerifyOrExit(cmd->InitArguments(argc - 2, &argv[2]), err = CHIP_ERROR_INVALID_ARGUMENT);
 
             err = cmd->Run(&dc, remoteId);
