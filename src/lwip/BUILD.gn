@@ -50,8 +50,10 @@ buildconfig_header("lwip_buildconfig") {
 
   defines = [ "HAVE_LWIP_UDP_BIND_NETIF=1" ]
   if (lwip_platform != "external") {
-    # Automatically enable LWIP_DEBUG for internal is_debug builds.
-    defines += [ "LWIP_DEBUG=${is_debug}" ]
+    if (is_debug) {
+      # Automatically enable LWIP_DEBUG for internal is_debug builds.
+      defines += [ "LWIP_DEBUG=1" ]
+    }
 
     if (current_os == "android") {
       defines += [ "LWIP_NO_STDINT_H=1" ]

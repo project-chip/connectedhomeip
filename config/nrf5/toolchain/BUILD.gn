@@ -29,3 +29,10 @@ arm_toolchain("nrf5_lighting_app") {
     import("${chip_root}/examples/lighting-app/nrf5/args.gni")
   }
 }
+
+arm_toolchain("nrf5_pigweed_app") {
+  toolchain_args = {
+    current_os = "freertos"
+    import("${chip_root}/examples/pigweed-app/nrf5/args.gni")
+  }
+}

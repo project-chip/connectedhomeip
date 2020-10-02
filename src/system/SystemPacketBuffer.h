@@ -93,7 +93,7 @@ struct pbuf
 class DLL_EXPORT PacketBuffer : private pbuf
 {
 public:
-    size_t AllocSize() const;
+    uint16_t AllocSize() const;
 
     uint8_t * Start() const;
     void SetStart(uint8_t * aNewStart);
@@ -120,8 +120,8 @@ public:
 
     void AddRef();
 
-    static PacketBuffer * NewWithAvailableSize(size_t aAvailableSize);
-    static PacketBuffer * NewWithAvailableSize(uint16_t aReservedSize, size_t aAvailableSize);
+    static PacketBuffer * NewWithAvailableSize(uint16_t aAvailableSize);
+    static PacketBuffer * NewWithAvailableSize(uint16_t aReservedSize, uint16_t aAvailableSize);
 
     static PacketBuffer * New();
     static PacketBuffer * New(uint16_t aReservedSize);
@@ -207,7 +207,7 @@ typedef union
  *
  *  @return     size of the allocation
  */
-inline size_t PacketBuffer::AllocSize() const
+inline uint16_t PacketBuffer::AllocSize() const
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_PBUF_FROM_CUSTOM_POOLS
@@ -221,7 +221,7 @@ inline size_t PacketBuffer::AllocSize() const
 #endif // !LWIP_PBUF_FROM_CUSTOM_POOLS
 #else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
 #if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
-    return static_cast<size_t>(this->alloc_size);
+    return this->alloc_size;
 #else  // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC != 0
     extern BufferPoolElement gDummyBufferPoolElement;
     return sizeof(gDummyBufferPoolElement.Block) - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;

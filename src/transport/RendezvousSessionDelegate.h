@@ -27,10 +27,19 @@ class RendezvousSessionDelegate
 public:
     virtual ~RendezvousSessionDelegate() {}
 
+    enum Status : uint8_t
+    {
+        SecurePairingSuccess = 0,
+        SecurePairingFailed,
+        NetworkProvisioningSuccess,
+        NetworkProvisioningFailed,
+    };
+
     virtual void OnRendezvousConnectionOpened()                             = 0;
     virtual void OnRendezvousConnectionClosed()                             = 0;
     virtual void OnRendezvousError(CHIP_ERROR err)                          = 0;
     virtual void OnRendezvousMessageReceived(System::PacketBuffer * buffer) = 0;
+    virtual void OnRendezvousStatusUpdate(Status status) {}
 };
 
 } // namespace chip

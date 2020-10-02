@@ -46,6 +46,8 @@
 
 #include <stddef.h>
 
+#include <limits>
+
 #if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
 
 /**
@@ -90,7 +92,7 @@
  *      layer.
  */
 #ifndef CHIP_SYSTEM_LWIP_ERROR_MAX
-#define CHIP_SYSTEM_LWIP_ERROR_MAX 3999
+#define CHIP_SYSTEM_LWIP_ERROR_MAX 3128
 #endif // CHIP_SYSTEM_LWIP_ERROR_MAX
 
 #endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_LWIP_ERROR_FUNCTIONS
@@ -277,6 +279,8 @@ DLL_EXPORT Error MapErrorZephyr(int aError)
  */
 DLL_EXPORT Error MapErrorLwIP(err_t aError)
 {
+    static_assert(std::numeric_limits<err_t>::min() == CHIP_SYSTEM_LWIP_ERROR_MIN - CHIP_SYSTEM_LWIP_ERROR_MAX,
+                  "Can't represent all LWIP errors");
     return (aError == ERR_OK ? CHIP_SYSTEM_NO_ERROR : CHIP_SYSTEM_LWIP_ERROR_MIN - aError);
 }
 
@@ -291,7 +295,20 @@ DLL_EXPORT Error MapErrorLwIP(err_t aError)
  */
 DLL_EXPORT const char * DescribeErrorLwIP(Error aError)
 {
-    const err_t lError = -((aError) -CHIP_SYSTEM_LWIP_ERROR_MIN);
+    if (!IsErrorLwIP(aError))
+    {
+        return nullptr;
+    }
+
+    // Error might be a signed or unsigned type.  But we know the value is no
+    // larger than CHIP_SYSTEM_LWIP_ERROR_MAX and that this means it's safe to
+    // store in int.
+    static_assert(INT_MAX > CHIP_SYSTEM_LWIP_ERROR_MAX, "Our subtraction will fail");
+    const int lErrorWithoutOffset = aError - CHIP_SYSTEM_LWIP_ERROR_MIN;
+    // Cast is safe because the range from CHIP_SYSTEM_LWIP_ERROR_MIN to
+    // CHIP_SYSTEM_LWIP_ERROR_MAX all fits inside err_t.  See static_assert in
+    // MapErrorLwIP.
+    const err_t lError = static_cast<err_t>(-lErrorWithoutOffset);
 
     // If we are not compiling with LWIP_DEBUG asserted, the unmapped
     // local value may go unused.
