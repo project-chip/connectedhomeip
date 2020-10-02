@@ -30,6 +30,7 @@ operations:
 """
 
 import sys
+import os
 import shutil
 
 import firmware_utils
@@ -43,19 +44,10 @@ QPG6100_OPTIONS = {
         'drive': {
             'help': 'Location of the mBed mount',
             'default': '/mnt/e',
-            'argument': {
+            'alias': ['-d'],
+            'argparse': {
                 'metavar': 'FILE'
             },
-            'tool': {
-                'verify': ['ls', '{drive}/MBED.HTM'],
-                'error':
-                    """\
-                    Unable to find an mBed drive at this location: {drive}.
-
-                    Please check the mBed USB device is properly mounted at the location given.
-
-                    """,
-            }
         },
     },
 }
@@ -70,39 +62,62 @@ class Flasher(firmware_utils.Flasher):
 
     def erase(self):
         """Not supported"""
-        self.log(fail_level, "Not supported")
+        self.log(0, "Erase not supported")
         return self
 
     def verify(self, image):
         """Not supported"""
-        self.log(fail_level, "Not supported")
+        self.log(0, "Verify not supported")
         return self
 
     def flash(self, image):
         """Flash image."""
-        self.log(1, "Copying to drive")
-        if not self.option['drive']:
-            self.log(fail_level, "--drive required for copy action")
-        else:
-            shutil.copyfile(image, self.option['drive'])
+        self.log(1, "Copying to {} drive {}".format(image, self.option.drive or "None"))
+        if not self.option.drive:
+            self.log(0, "--drive or -d required for copy action")
+            self.err = 1
+            return self
+
+        # Check for drive mount
+        if not os.path.exists(self.option.drive):
+            self.log(0, "Drive '{}' does not exist. Is the USB device mounted correctly ?".format(self.option.drive))
+            self.err = 2
+            return self
+
+        # Check for valid mBed device
+        mbed_marker = os.path.join(self.option.drive, 'MBED.HTM')
+        if not os.path.exists(mbed_marker):
+            self.log(0, "Drive '{}' not a path to an MBED device".format(self.option.drive))
+            self.err = 3
+            return self
+
+        shutil.copyfile(image, os.path.join(self.option.drive, image))
         return self
 
     def reset(self):
         """Not supported"""
-        self.log(fail_level, "Not supported")
+        self.log(0, "Reset is triggered automatically after completion of mBed copy.")
         return self
 
     def actions(self):
         """Perform actions on the device according to self.option."""
-        self.log(3, 'OPTIONS:', self.option)
+        self.log(3, 'Options:', self.option)
 
-        if self.option['erase']:
+        if self.option.erase:
             if self.erase().err:
                 return self
 
+        application = self.optional_file(self.option.application)
+        if application:
+            if self.flash(application).err:
+                return self
+            if self.option.verify_application:
+                if self.verify(application).err:
+                    return self
+            if self.option.reset is None:
+                self.option.reset = True
 
-
-        if self.options['reset']:
+        if self.option.reset:
             if self.reset().err:
                 return self
 
