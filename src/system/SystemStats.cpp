@@ -31,6 +31,8 @@
 // Include module header
 #include <system/SystemStats.h>
 
+#include <support/SafeInt.h>
+
 #include <string.h>
 
 namespace chip {
@@ -98,8 +100,9 @@ bool Difference(Snapshot & result, Snapshot & after, Snapshot & before)
 
     for (i = 0; i < kNumEntries; i++)
     {
-        result.mResourcesInUse[i] = after.mResourcesInUse[i] - before.mResourcesInUse[i];
-        result.mHighWatermarks[i] = after.mHighWatermarks[i] - before.mHighWatermarks[i];
+        // TODO: These casts can be bogus.  https://github.com/project-chip/connectedhomeip/issues/2949
+        result.mResourcesInUse[i] = static_cast<count_t>(after.mResourcesInUse[i] - before.mResourcesInUse[i]);
+        result.mHighWatermarks[i] = static_cast<count_t>(after.mHighWatermarks[i] - before.mHighWatermarks[i]);
 
         if (result.mResourcesInUse[i] > 0)
         {

@@ -25,7 +25,6 @@ class RendezvousDeviceDelegate : public RendezvousSessionDelegate
 {
 public:
     RendezvousDeviceDelegate();
-    CHIP_ERROR Send(const char * msg);
 
     //////////// RendezvousSession callback Implementation ///////////////
     void OnRendezvousConnectionOpened() override;

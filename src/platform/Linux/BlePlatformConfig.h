@@ -34,10 +34,7 @@ struct BluezConnection;
 } // namespace chip
 
 // ==================== Platform Adaptations ====================
-
-#define BLE_CONNECTION_OBJECT chip::DeviceLayer::Internal::BluezConnection *
 #define BLE_CONNECTION_UNINITIALIZED nullptr
-
 // ========== Platform-specific Configuration Overrides =========
 
 /* none so far */

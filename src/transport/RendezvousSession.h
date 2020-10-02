@@ -25,11 +25,16 @@
 #define __TRANSPORT_RENDEZVOUSSESSION_H__
 
 #include <core/CHIPCore.h>
+#include <protocols/CHIPProtocols.h>
 #include <transport/RendezvousParameters.h>
 #include <transport/RendezvousSessionDelegate.h>
 #include <transport/SecurePairingSession.h>
 
 namespace chip {
+
+namespace DeviceLayer {
+class CHIPDeviceEvent;
+}
 
 /**
  * RendezvousSession establishes and maintains the first connection between
@@ -86,13 +91,25 @@ public:
     void OnRendezvousError(CHIP_ERROR err) override;
     void OnRendezvousMessageReceived(System::/*  */PacketBuffer * buffer) override;
 
+    const IPAddress & GetIPAddress() const { return mDeviceAddress; }
+
+    /**
+     * @brief
+     *  The device can use this function to send its IP address to
+     *  commissioner. This would generally be called during network
+     *  provisioning of the device, after the IP address assignment.
+     *
+     * @param addr The IP address of the device
+     */
+    void SendIPAddress(const IPAddress & addr);
+
 private:
     CHIP_ERROR SendPairingMessage(System::PacketBuffer * msgBug);
     CHIP_ERROR HandlePairingMessage(System::PacketBuffer * msgBug);
     CHIP_ERROR Pair(Optional<NodeId> nodeId, uint32_t setupPINCode);
     CHIP_ERROR WaitForPairing(Optional<NodeId> nodeId, uint32_t setupPINCode);
 
-    CHIP_ERROR SendSecureMessage(System::PacketBuffer * msgBug);
+    CHIP_ERROR SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBuffer * msgBug);
     CHIP_ERROR HandleSecureMessage(System::PacketBuffer * msgBuf);
 
     Transport::Base * mTransport          = nullptr; ///< Underlying transport
@@ -104,6 +121,11 @@ private:
     bool mPairingInProgress      = false;
     uint32_t mSecureMessageIndex = 0;
     uint16_t mNextKeyId          = 0;
+    IPAddress mDeviceAddress     = IPAddress::Any;
+
+#if CONFIG_DEVICE_LAYER
+    static void ConnectivityHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+#endif // CONFIG_DEVICE_LAYER
 };
 
 } // namespace chip

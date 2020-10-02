@@ -25,7 +25,7 @@
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/BLE.h>
-#include <transport/MessageHeader.h>
+#include <transport/raw/MessageHeader.h>
 
 #include <inttypes.h>
 
