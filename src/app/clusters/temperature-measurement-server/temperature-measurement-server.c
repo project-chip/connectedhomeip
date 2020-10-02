@@ -43,6 +43,10 @@
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 
+EmberEventControl emberAfPluginTemperatureMeasurementServerReadEventControl;
+
+void emberAfPluginTemperatureMeasurementServerReadEventHandler() {}
+
 // -------------------------------------------------------------------------
 // ****** callback section *******
 
@@ -62,5 +66,3 @@ void emberAfPluginTemperatureMeasurementServerInitCallback(void)
         return;
     }
 }
-
-void emberAfPluginTemperatureMeasurementServerReadEventHandler() {}
