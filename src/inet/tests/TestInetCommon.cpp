@@ -76,6 +76,7 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 using namespace chip;
+using namespace chip::Inet;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 static sys_mbox_t * sLwIPEventQueue   = NULL;

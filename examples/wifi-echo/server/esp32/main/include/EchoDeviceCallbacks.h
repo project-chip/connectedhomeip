@@ -29,7 +29,6 @@
 #include "CHIPDeviceManager.h"
 #include <platform/CHIPDeviceLayer.h>
 
-using namespace chip::DeviceManager;
 class EchoDeviceCallbacks : public CHIPDeviceManagerCallbacks
 {
 public:

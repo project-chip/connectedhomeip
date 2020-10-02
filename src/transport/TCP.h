@@ -64,8 +64,8 @@ public:
         return *this;
     }
 
-    InterfaceId GetInterfaceId() const { return mInterfaceId; }
-    TcpListenParameters & SetInterfaceId(InterfaceId id)
+    Inet::InterfaceId GetInterfaceId() const { return mInterfaceId; }
+    TcpListenParameters & SetInterfaceId(Inet::InterfaceId id)
     {
         mInterfaceId = id;
 
@@ -73,10 +73,10 @@ public:
     }
 
 private:
-    Inet::InetLayer * mLayer         = nullptr;               ///< Associated inet layer
-    Inet::IPAddressType mAddressType = kIPAddressType_IPv6;   ///< type of listening socket
-    uint16_t mListenPort             = CHIP_PORT;             ///< TCP listen port
-    InterfaceId mInterfaceId         = INET_NULL_INTERFACEID; ///< Interface to listen on
+    Inet::InetLayer * mLayer         = nullptr;                   ///< Associated inet layer
+    Inet::IPAddressType mAddressType = Inet::kIPAddressType_IPv6; ///< type of listening socket
+    uint16_t mListenPort             = CHIP_PORT;                 ///< TCP listen port
+    Inet::InterfaceId mInterfaceId   = INET_NULL_INTERFACEID;     ///< Interface to listen on
 };
 
 /**
@@ -212,7 +212,7 @@ private:
     // Callback handler for TCPEndPoint. Called when a connection is received on the listening port.
     // @see TCPEndpoint::OnConnectionReceivedFunct
     static void OnConnectionReceived(Inet::TCPEndPoint * listenEndPoint, Inet::TCPEndPoint * endPoint,
-                                     const IPAddress & peerAddress, uint16_t peerPort);
+                                     const Inet::IPAddress & peerAddress, uint16_t peerPort);
 
     // Called on accept error
     // @see TCPEndpoint::OnAcceptErrorFunct

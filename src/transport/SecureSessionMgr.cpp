@@ -35,6 +35,7 @@
 
 namespace chip {
 
+using System::PacketBuffer;
 using Transport::PeerAddress;
 using Transport::PeerConnectionState;
 

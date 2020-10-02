@@ -35,6 +35,7 @@
 #include <errno.h>
 
 using namespace chip;
+using namespace chip::Inet;
 
 static int Initialize(void * aContext);
 static int Finalize(void * aContext);

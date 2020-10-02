@@ -114,7 +114,7 @@ CHIP_ERROR TCPBase::Init(TcpListenParameters & params)
 #endif
     SuccessOrExit(err);
 
-    err = mListenSocket->Bind(params.GetAddressType(), IPAddress::Any, params.GetListenPort(), params.GetInterfaceId());
+    err = mListenSocket->Bind(params.GetAddressType(), Inet::IPAddress::Any, params.GetListenPort(), params.GetInterfaceId());
     SuccessOrExit(err);
 
     err = mListenSocket->Listen(kListenBacklogSize);
@@ -156,7 +156,7 @@ Inet::TCPEndPoint * TCPBase::FindActiveConnection(const PeerAddress & address)
         {
             continue;
         }
-        IPAddress addr;
+        Inet::IPAddress addr;
         uint16_t port;
         mActiveConnections[i]->GetPeerInfo(&addr, &port);
 
@@ -236,10 +236,10 @@ exit:
 CHIP_ERROR TCPBase::SendAfterConnect(const PeerAddress & addr, System::PacketBuffer * msg)
 {
     // This will initiate a connection to the specified peer
-    CHIP_ERROR err         = CHIP_NO_ERROR;
-    PendingPacket * packet = nullptr;
-    bool alreadyConnecting = false;
-    TCPEndPoint * endPoint = nullptr;
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    PendingPacket * packet       = nullptr;
+    bool alreadyConnecting       = false;
+    Inet::TCPEndPoint * endPoint = nullptr;
 
     // Iterate through the ENTIRE array. If a pending packet for
     // the address already exists, this means a connection is pending and
@@ -423,7 +423,7 @@ exit:
 
 void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer)
 {
-    IPAddress ipAddress;
+    Inet::IPAddress ipAddress;
     uint16_t port;
 
     endPoint->GetPeerInfo(&ipAddress, &port);
@@ -444,7 +444,7 @@ void TCPBase::OnConnectionComplete(Inet::TCPEndPoint * endPoint, INET_ERROR inet
     CHIP_ERROR err          = CHIP_NO_ERROR;
     bool foundPendingPacket = false;
     TCPBase * tcp           = reinterpret_cast<TCPBase *>(endPoint->AppState);
-    IPAddress ipAddress;
+    Inet::IPAddress ipAddress;
     uint16_t port;
 
     endPoint->GetPeerInfo(&ipAddress, &port);
@@ -533,8 +533,8 @@ void TCPBase::OnConnectionClosed(Inet::TCPEndPoint * endPoint, INET_ERROR err)
     }
 }
 
-void TCPBase::OnConnectionReceived(Inet::TCPEndPoint * listenEndPoint, Inet::TCPEndPoint * endPoint, const IPAddress & peerAddress,
-                                   uint16_t peerPort)
+void TCPBase::OnConnectionReceived(Inet::TCPEndPoint * listenEndPoint, Inet::TCPEndPoint * endPoint,
+                                   const Inet::IPAddress & peerAddress, uint16_t peerPort)
 {
     TCPBase * tcp = reinterpret_cast<TCPBase *>(listenEndPoint->AppState);
 
@@ -577,7 +577,7 @@ void TCPBase::Disconnect(const PeerAddress & address)
     {
         if (mActiveConnections[i] != nullptr)
         {
-            IPAddress ipAddress;
+            Inet::IPAddress ipAddress;
             uint16_t port;
 
             mActiveConnections[i]->GetPeerInfo(&ipAddress, &port);

@@ -21,8 +21,6 @@
 #include <core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
-using namespace ::chip;
-
 class RendezvousMessageHandler
 {
 public:
@@ -30,7 +28,7 @@ public:
     // - CHIP_NO_ERROR if the message was handled successfully.
     // - CHIP_ERROR_INVALID_MESSAGE_TYPE if the message was not recognized.
     // - Some other error encountered processing a specific message type.
-    static CHIP_ERROR HandleMessageReceived(System::PacketBuffer * buffer);
+    static CHIP_ERROR HandleMessageReceived(chip::System::PacketBuffer * buffer);
 };
 
 #endif // _RENDEZVOUS_MESSAGE_HANDLER_H

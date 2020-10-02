@@ -29,6 +29,9 @@
 
 #include <inttypes.h>
 
+using namespace chip::Ble;
+using namespace chip::System;
+
 namespace chip {
 namespace Transport {
 

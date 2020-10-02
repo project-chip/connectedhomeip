@@ -21,8 +21,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <transport/RendezvousSession.h>
 
-using namespace ::chip;
-
 class RendezvousDeviceDelegate : public RendezvousSessionDelegate
 {
 public:
