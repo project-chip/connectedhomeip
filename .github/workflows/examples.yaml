@@ -44,7 +44,6 @@ jobs:
                   fetch-depth: 0
                   submodules: true
             - name: Initialize CodeQL
-              if: ${{ github.event_name == 'push' }}
               uses: github/codeql-action/init@v1
               with:
                   languages: "cpp"
@@ -104,7 +103,6 @@ jobs:
                   fetch-depth: 0
                   submodules: true
             - name: Initialize CodeQL
-              if: ${{ github.event_name == 'push' }}
               uses: github/codeql-action/init@v1
               with:
                   languages: "cpp"
@@ -160,7 +158,6 @@ jobs:
                   fetch-depth: 0
                   submodules: true
             - name: Initialize CodeQL
-              if: ${{ github.event_name == 'push' }}
               uses: github/codeql-action/init@v1
               with:
                   languages: "cpp"
@@ -214,7 +211,6 @@ jobs:
                   fetch-depth: 0
                   submodules: true
             - name: Initialize CodeQL
-              if: ${{ github.event_name == 'push' }}
               uses: github/codeql-action/init@v1
               with:
                   languages: "cpp"

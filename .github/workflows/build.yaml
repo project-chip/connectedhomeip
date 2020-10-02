@@ -47,7 +47,6 @@ jobs:
               with:
                   submodules: true
             - name: Initialize CodeQL
-              if: ${{ github.event_name == 'push' }}
               uses: github/codeql-action/init@v1
               with:
                   languages: "cpp"
