@@ -20,9 +20,9 @@
 #include "AppConfig.h"
 #include "BoltLockManager.h"
 #include "LEDWidget.h"
-#include "ThreadUtil.h"
 #include "QRCodeUtil.h"
 #include "Server.h"
+#include "ThreadUtil.h"
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -317,10 +317,13 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
         return;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned()) {
+    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    {
         StartDefaultThreadNetwork();
         LOG_INF("Device is not commissioned to a Thread network. Starting with the default configuration.");
-    } else {
+    }
+    else
+    {
         LOG_INF("Device is commissioned to a Thread network.");
     }
 #endif
