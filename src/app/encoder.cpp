@@ -169,6 +169,7 @@ uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint
 #define ONOFF_CLUSTER_ID 0x0006
 #define IDENTIFY_CLUSTER_ID 0x0003
 #define TEMP_MEASUREMENT_CLUSTER_ID 0x0402
+#define COLORCONTROL_CLUSTER_ID 0x0300
 
 /*
  * On/Off Cluster commands
@@ -195,6 +196,10 @@ uint16_t encodeReadOnOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t d
     READ_ATTRIBUTES("ReadOnOff", ONOFF_CLUSTER_ID);
 }
 
+/*
+ * Identify Cluster commands
+ */
+
 uint16_t encodeIdentifyCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t duration)
 {
     COMMAND_HEADER("Identify", IDENTIFY_CLUSTER_ID, 0x00);
@@ -214,6 +219,176 @@ uint16_t encodeReadCurrentTemperatureCommand(uint8_t * buffer, uint16_t buf_leng
 {
     uint16_t attr_ids[] = { 0x0000 }; /* Current Temperature attribute */
     READ_ATTRIBUTES("ReadCurrentTemperature", TEMP_MEASUREMENT_CLUSTER_ID);
+}
+
+/*
+ * Color Control Cluster commands
+ */
+
+uint16_t encodeMoveToHueCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t hue, uint8_t direction,
+                                uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("MoveToHue", COLORCONTROL_CLUSTER_ID, 0x00);
+    buf.Put(hue);
+    buf.Put(direction);
+    buf.PutLE16(transitionTime);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("MoveToHue");
+}
+
+uint16_t encodeMoveHueCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t moveMode, uint8_t rate,
+                              uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("MoveHue", COLORCONTROL_CLUSTER_ID, 0x01);
+    buf.Put(moveMode);
+    buf.Put(rate);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("MoveHue");
+}
+
+uint16_t encodeStepHueCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t stepMode,
+                              uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("StepHue", COLORCONTROL_CLUSTER_ID, 0x02);
+    buf.Put(stepMode);
+    buf.Put(stepSize);
+    buf.PutLE16(transitionTime);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("StepHue");
+}
+
+uint16_t encodeMoveToSaturationCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t saturation,
+                                       uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("MoveToSaturation", COLORCONTROL_CLUSTER_ID, 0x03);
+    buf.Put(saturation);
+    buf.PutLE16(transitionTime);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("MoveToSaturation");
+}
+
+uint16_t encodeMoveSaturationCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t moveMode,
+                                     uint8_t rate, uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("MoveSaturation", COLORCONTROL_CLUSTER_ID, 0x04);
+    buf.Put(moveMode);
+    buf.Put(rate);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("MoveSaturation");
+}
+
+uint16_t encodeStepSaturationCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t stepMode,
+                                     uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("StepSaturation", COLORCONTROL_CLUSTER_ID, 0x05);
+    buf.Put(stepMode);
+    buf.Put(stepSize);
+    buf.PutLE16(transitionTime);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("StepSaturation");
+}
+
+uint16_t encodeMoveToHueSaturationCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t hue,
+                                          uint8_t saturation, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("MoveToHueSaturation", COLORCONTROL_CLUSTER_ID, 0x06);
+    buf.Put(hue);
+    buf.Put(saturation);
+    buf.PutLE16(transitionTime);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("MoveToHueSaturation");
+}
+
+uint16_t encodeMoveToColorCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t colorX,
+                                  uint16_t colorY, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("MoveToColor", COLORCONTROL_CLUSTER_ID, 0x07);
+    buf.PutLE16(colorX);
+    buf.PutLE16(colorY);
+    buf.PutLE16(transitionTime);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("MoveToColor");
+}
+
+uint16_t encodeMoveColorCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t rateX, uint16_t rateY,
+                                uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("MoveColor", COLORCONTROL_CLUSTER_ID, 0x08);
+    buf.PutLE16(rateX);
+    buf.PutLE16(rateY);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("MoveColor");
+}
+
+uint16_t encodeStepColorCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t stepX, uint16_t stepY,
+                                uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("StepColor", COLORCONTROL_CLUSTER_ID, 0x09);
+    buf.PutLE16(stepX);
+    buf.PutLE16(stepY);
+    buf.PutLE16(transitionTime);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("StepColor");
+}
+
+uint16_t encodeMoveToColorTemperatureCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                             uint16_t colorTemperature, uint16_t transitionTime, uint8_t optionMask,
+                                             uint8_t optionOverride)
+{
+    COMMAND_HEADER("MoveToColorTemperature", COLORCONTROL_CLUSTER_ID, 0x0A);
+    buf.PutLE16(colorTemperature);
+    buf.PutLE16(transitionTime);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("MoveToColorTemperature");
+}
+
+uint16_t encodeMoveColorTemperatureCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t moveMode,
+                                           uint16_t rate, uint16_t colorTemperatureMin, uint16_t colorTemperatureMax,
+                                           uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("MoveColorTemperature", COLORCONTROL_CLUSTER_ID, 0x4B);
+    buf.Put(moveMode);
+    buf.PutLE16(rate);
+    buf.PutLE16(colorTemperatureMin);
+    buf.PutLE16(colorTemperatureMax);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("MoveColorTemperature");
+}
+
+uint16_t encodeStepColorTemperatureCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t stepMode,
+                                           uint16_t stepSize, uint16_t transitionTime, uint16_t colorTemperatureMin,
+                                           uint16_t colorTemperatureMax, uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("StepColorTemperature", COLORCONTROL_CLUSTER_ID, 0x4C);
+    buf.Put(stepMode);
+    buf.PutLE16(stepSize);
+    buf.PutLE16(transitionTime);
+    buf.PutLE16(colorTemperatureMin);
+    buf.PutLE16(colorTemperatureMax);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("StepColorTemperature");
+}
+
+uint16_t encodeStopMoveStepCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t optionMask,
+                                   uint8_t optionOverride)
+{
+    COMMAND_HEADER("StopMoveStep", COLORCONTROL_CLUSTER_ID, 0x47);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("StopMoveStep");
 }
 
 } // extern "C"

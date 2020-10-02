@@ -142,6 +142,204 @@ uint16_t encodeIdentifyCommand(uint8_t * buffer, uint16_t buf_length, uint8_t de
  */
 uint16_t encodeReadCurrentTemperatureCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
+/*
+ * Color control cluster commands
+ */
+
+/**
+ * @brief Encode a move-to-hue command for the Color Control cluster
+ * @param buffer                Buffer to encode into
+ * @param buf_length            Length of buffer
+ * @param destination_endpoint  Destination endpoint
+ * @param hue                   The hue value of the color
+ * @param direction             A direction to change the hue to
+ * @param transitionTime        The number of steps for the color transition
+ * @param optionMask            An option mask
+ * @param optionOverride        An option override
+ * */
+uint16_t encodeMoveToHueCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t hue, uint8_t direction,
+                                uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride);
+
+/**
+ * @brief Encode a move-hue command for the Color Control cluster
+ * @param buffer                Buffer to encode into
+ * @param buf_length            Length of buffer
+ * @param destination_endpoint  Destination endpoint
+ * @param moveMode              The move mode to apply
+ * @param rate                  The rate of the move
+ * @param optionMask            An option mask
+ * @param optionOverride        An option override
+ * */
+uint16_t encodeMoveHueCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t moveMode, uint8_t rate,
+                              uint8_t optionMask, uint8_t optionOverride);
+
+/**
+ * @brief Encode a step-hue command for the Color Control cluster
+ * @param buffer                Buffer to encode into
+ * @param buf_length            Length of buffer
+ * @param destination_endpoint  Destination endpoint
+ * @param stepMode              The step mode to apply
+ * @param stepSize              The step size
+ * @param transitionTime        The number of steps for the color transition
+ * @param optionMask            An option mask
+ * @param optionOverride        An option override
+ * */
+uint16_t encodeStepHueCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t stepMode,
+                              uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride);
+
+/**
+ * @brief Encode a move-to-saturation command for the Color Control cluster
+ * @param buffer                Buffer to encode into
+ * @param buf_length            Length of buffer
+ * @param destination_endpoint  Destination endpoint
+ * @param saturation            The saturation value of the color
+ * @param transitionTime        The number of steps for the color transition
+ * @param optionMask            An option mask
+ * @param optionOverride        An option override
+ * */
+uint16_t encodeMoveToSaturationCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t saturation,
+                                       uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride);
+
+/**
+ * @brief Encode a move-saturation command for the Color Control cluster
+ * @param buffer                Buffer to encode into
+ * @param buf_length            Length of buffer
+ * @param destination_endpoint  Destination endpoint
+ * @param moveMode              The move mode to apply
+ * @param rate                  The rate of the move
+ * @param optionMask            An option mask
+ * @param optionOverride        An option override
+ * */
+uint16_t encodeMoveSaturationCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t moveMode,
+                                     uint8_t rate, uint8_t optionMask, uint8_t optionOverride);
+
+/**
+ * @brief Encode a step-saturation command for the Color Control cluster
+ * @param buffer                Buffer to encode into
+ * @param buf_length            Length of buffer
+ * @param destination_endpoint  Destination endpoint
+ * @param stepMode              The step mode to apply
+ * @param stepSize              The step size
+ * @param transitionTime        The number of steps for the color transition
+ * @param optionMask            An option mask
+ * @param optionOverride        An option override
+ * */
+uint16_t encodeStepSaturationCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t stepMode,
+                                     uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride);
+
+/**
+ * @brief Encode a move-to-hue-saturation command for the Color Control cluster
+ * @param buffer                Buffer to encode into
+ * @param buf_length            Length of buffer
+ * @param destination_endpoint  Destination endpoint
+ * @param hue                   The hue value of the color
+ * @param saturation            The saturation value of the color
+ * @param transitionTime        The number of steps for the color transition
+ * @param optionMask            An option mask
+ * @param optionOverride        An option override
+ * */
+uint16_t encodeMoveToHueSaturationCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t hue,
+                                          uint8_t saturation, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride);
+
+/**
+ * @brief Encode a move-to-color command for the Color Control cluster
+ * @param buffer                Buffer to encode into
+ * @param buf_length            Length of buffer
+ * @param destination_endpoint  Destination endpoint
+ * @param colorX                The x color value
+ * @param colorY                The y color value
+ * @param transitionTime        The number of steps for the color transition
+ * @param optionMask            An option mask
+ * @param optionOverride        An option override
+ * */
+uint16_t encodeMoveToColorCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t colorX,
+                                  uint16_t colorY, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride);
+
+/**
+ * @brief Encode a move-color command for the Color Control cluster
+ * @param buffer                Buffer to encode into
+ * @param buf_length            Length of buffer
+ * @param destination_endpoint  Destination endpoint
+ * @param rateX                 The x rate value
+ * @param rateY                 The y rate value
+ * @param optionMask            An option mask
+ * @param optionOverride        An option override
+ * */
+uint16_t encodeMoveColorCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t rateX, uint16_t rateY,
+                                uint8_t optionMask, uint8_t optionOverride);
+
+/**
+ * @brief Encode a step-color command for the Color Control cluster
+ * @param buffer                Buffer to encode into
+ * @param buf_length            Length of buffer
+ * @param destination_endpoint  Destination endpoint
+ * @param stepX                 The x step value
+ * @param stepY                 The y step value
+ * @param transitionTime        The number of steps for the color transition
+ * @param optionMask            An option mask
+ * @param optionOverride        An option override
+ * */
+uint16_t encodeStepColorCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t stepX, uint16_t stepY,
+                                uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride);
+
+/**
+ * @brief Encode a move-to-color-temperature command for the Color Control cluster
+ * @param buffer                Buffer to encode into
+ * @param buf_length            Length of buffer
+ * @param destination_endpoint  Destination endpoint
+ * @param colorTemperature      The temperature of the color
+ * @param transitionTime        The number of steps for the color transition
+ * @param optionMask            An option mask
+ * @param optionOverride        An option override
+ * */
+uint16_t encodeMoveToColorTemperatureCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                             uint16_t colorTemperature, uint16_t transitionTime, uint8_t optionMask,
+                                             uint8_t optionOverride);
+
+/**
+ * @brief Encode a move-color-temperature command for the Color Control cluster
+ * @param buffer                Buffer to encode into
+ * @param buf_length            Length of buffer
+ * @param destination_endpoint  Destination endpoint
+ * @param moveMode              The move mode to apply
+ * @param rate                  The rate of the move
+ * @param colorTemperatureMin   The min temperature of the color
+ * @param colorTemperatureMax   The max temperature of the color
+ * @param optionMask            An option mask
+ * @param optionOverride        An option override
+ * */
+uint16_t encodeMoveColorTemperatureCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t moveMode,
+                                           uint16_t rate, uint16_t colorTemperatureMin, uint16_t colorTemperatureMax,
+                                           uint8_t optionMask, uint8_t optionOverride);
+
+/**
+ * @brief Encode a step-color-temperature command for the Color Control cluster
+ * @param buffer                Buffer to encode into
+ * @param buf_length            Length of buffer
+ * @param destination_endpoint  Destination endpoint
+ * @param stepMode              The step mode to apply
+ * @param stepSize              The step size
+ * @param transitionTime        The number of steps for the color transition
+ * @param colorTemperatureMin   The min temperature of the color
+ * @param colorTemperatureMax   The max temperature of the color
+ * @param optionMask            An option mask
+ * @param optionOverride        An option override
+ * */
+uint16_t encodeStepColorTemperatureCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t stepMode,
+                                           uint16_t stepSize, uint16_t transitionTime, uint16_t colorTemperatureMin,
+                                           uint16_t colorTemperatureMax, uint8_t optionMask, uint8_t optionOverride);
+
+/**
+ * @brief Encode a stop-move-step command for the Color Control cluster
+ * @param buffer                Buffer to encode into
+ * @param buf_length            Length of buffer
+ * @param destination_endpoint  Destination endpoint
+ * @param optionMask            An option mask
+ * @param optionOverride        An option override
+ * */
+uint16_t encodeStopMoveStepCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t optionMask,
+                                   uint8_t optionOverride);
+
 #ifdef __cplusplus
 }
 #endif
