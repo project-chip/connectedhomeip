@@ -47,10 +47,10 @@
     extern void emberAfPluginReportingTickEventHandler(void);                                                                      \
     static void clusterTickWrapper(EmberEventControl * control, EmberAfTickFunction callback, uint8_t endpoint)                    \
     {                                                                                                                              \
-        emberAfPushEndpointNetworkIndex(endpoint);                                                                                 \
-        emberEventControlSetInactive(*control);                                                                                    \
+        /* emberAfPushEndpointNetworkIndex(endpoint); */                                                                           \
+        emberEventControlSetInactive(control);                                                                                     \
         (*callback)(endpoint);                                                                                                     \
-        emberAfPopNetworkIndex();                                                                                                  \
+        /* emberAfPopNetworkIndex(); */                                                                                            \
     }                                                                                                                              \
     void emberAfIdentifyClusterServerTickCallbackWrapperFunction1(void)                                                            \
     {                                                                                                                              \

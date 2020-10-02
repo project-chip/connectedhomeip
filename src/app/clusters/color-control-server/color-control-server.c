@@ -1365,9 +1365,9 @@ bool emberAfColorControlClusterStopMoveStepCallback(uint8_t optionsMask, uint8_t
 
 static void stopAllColorTransitions(void)
 {
-    emberEventControlSetInactive(COLOR_TEMP_CONTROL);
-    emberEventControlSetInactive(COLOR_XY_CONTROL);
-    emberEventControlSetInactive(COLOR_HSV_CONTROL);
+    emberEventControlSetInactive(&COLOR_TEMP_CONTROL);
+    emberEventControlSetInactive(&COLOR_XY_CONTROL);
+    emberEventControlSetInactive(&COLOR_HSV_CONTROL);
 }
 
 void emberAfPluginColorControlServerStopTransition(void)

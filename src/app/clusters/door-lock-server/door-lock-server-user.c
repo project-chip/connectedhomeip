@@ -640,7 +640,7 @@ static EmberAfStatus applyCode(uint8_t * code, uint8_t codeLength, EmberAfPlugin
 
 void emberAfPluginDoorLockServerLockoutEventHandler(void)
 {
-    emberEventControlSetInactive(emberAfPluginDoorLockServerLockoutEventControl);
+    emberEventControlSetInactive(&emberAfPluginDoorLockServerLockoutEventControl);
 
     emberAfDoorLockClusterPrintln("Door lock entering normal mode");
 }
@@ -677,7 +677,7 @@ static void scheduleAutoRelock(uint32_t autoRelockTimeS)
 
     if (autoRelockTimeS == 0)
     {
-        emberEventControlSetInactive(emberAfPluginDoorLockServerRelockEventControl);
+        emberEventControlSetInactive(&emberAfPluginDoorLockServerRelockEventControl);
     }
     else
     {
@@ -688,7 +688,7 @@ static void scheduleAutoRelock(uint32_t autoRelockTimeS)
 
 void emberAfPluginDoorLockServerRelockEventHandler(void)
 {
-    emberEventControlSetInactive(emberAfPluginDoorLockServerRelockEventControl);
+    emberEventControlSetInactive(&emberAfPluginDoorLockServerRelockEventControl);
 
     EmberAfStatus status = applyCode(NULL, 0, pinUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE);
     emberAfDoorLockClusterPrintln("Door automatically relocked: 0x%X", status);
