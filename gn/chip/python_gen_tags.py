@@ -15,9 +15,5 @@
 
 # Utility script to genertae the python tag + the abi tag + platform tag for a Python
 
-import distutils.util
-import sys
-import sysconfig
-
 from setuptools.pep425tags import get_abbr_impl, get_impl_ver, get_abi_tag, get_platform
 print(get_abbr_impl() + get_impl_ver() + "-" + get_abi_tag() + "-" + get_platform())
