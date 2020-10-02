@@ -23,12 +23,12 @@
  *      to peers. Handles both establishing new connections and accepting peer connection
  *      requests.
  */
-#include <transport/TCP.h>
+#include <transport/raw/TCP.h>
 
 #include <core/CHIPEncoding.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <transport/MessageHeader.h>
+#include <transport/raw/MessageHeader.h>
 
 #include <inttypes.h>
 

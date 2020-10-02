@@ -42,8 +42,8 @@
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
-#include <transport/Tuple.h>
-#include <transport/UDP.h>
+#include <transport/raw/Tuple.h>
+#include <transport/raw/UDP.h>
 
 #include "DataModelHandler.h"
 #include "LEDWidget.h"

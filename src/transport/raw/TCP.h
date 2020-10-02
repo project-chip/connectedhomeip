@@ -33,7 +33,7 @@
 #include <inet/IPEndPointBasis.h>
 #include <inet/InetInterface.h>
 #include <inet/TCPEndPoint.h>
-#include <transport/Base.h>
+#include <transport/raw/Base.h>
 
 namespace chip {
 namespace Transport {

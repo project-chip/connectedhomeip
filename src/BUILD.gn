@@ -39,8 +39,9 @@ if (chip_build_tests) {
     deps = [
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
-      "${chip_root}/src/retransmit/tests",
       "${chip_root}/src/system/tests",
+      "${chip_root}/src/transport/raw/tests",
+      "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/transport/tests",
     ]
 

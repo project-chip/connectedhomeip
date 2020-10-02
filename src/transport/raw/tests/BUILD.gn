@@ -13,41 +13,52 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/ble/ble.gni")
+import("//build_overrides/nlio.gni")
+import("//build_overrides/nlunit_test.gni")
 
-static_library("transport") {
-  output_name = "libTransportLayer"
+import("${chip_root}/gn/chip/chip_test_suite.gni")
+
+static_library("helpers") {
+  output_name = "libNetworkTestHelpers"
 
   sources = [
-    "PeerConnectionState.h",
-    "PeerConnections.h",
-    "RendezvousParameters.h",
-    "RendezvousSession.cpp",
-    "RendezvousSession.h",
-    "RendezvousSessionDelegate.h",
-    "SecurePairingSession.cpp",
-    "SecurePairingSession.h",
-    "SecureSession.cpp",
-    "SecureSession.h",
-    "SecureSessionMgr.cpp",
-    "SecureSessionMgr.h",
+    "NetworkTestHelpers.cpp",
+    "NetworkTestHelpers.h",
   ]
-
-  if (chip_config_network_layer_ble) {
-    sources += [
-      "BLE.cpp",
-      "BLE.h",
-    ]
-  }
 
   cflags = [ "-Wconversion" ]
 
+  public_deps = [ "${chip_root}/src/inet/tests:tests_common" ]
+}
+
+chip_test_suite("tests") {
+  output_name = "libRawTransportTests"
+
+  sources = [
+    "TestMessageHeader.cpp",
+    "TestRawTransportLayer.h",
+    "TestTCP.cpp",
+    "TestUDP.cpp",
+  ]
+
   public_deps = [
-    "${chip_root}/src/crypto",
-    "${chip_root}/src/inet",
+    ":helpers",
+    "${chip_root}/src/inet/tests:tests_common",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/platform",
     "${chip_root}/src/transport/raw",
+    "${nlio_root}:nlio",
+    "${nlunit_test_root}:nlunit-test",
   ]
+
+  cflags = [ "-Wconversion" ]
+
+  tests = [
+    "TestMessageHeader",
+    "TestUDP",
+  ]
+
+  if (current_os != "mac") {
+    tests += [ "TestTCP" ]
+  }
 }
