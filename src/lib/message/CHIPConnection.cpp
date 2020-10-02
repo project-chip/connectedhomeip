@@ -420,8 +420,8 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, c
     State = kState_Resolving;
     err   = MessageLayer->Inet->ResolveHostAddress(hostName, hostNameLen, dnsOptions, CHIP_CONFIG_CONNECT_IP_ADDRS, mPeerAddrs,
                                                  HandleResolveComplete, this);
-#else // !CHIP_CONFIG_ENABLE_DNS_RESOLVER
-    err = StartConnectToAddressLiteral(hostName, hostNameLen);
+#else  // !CHIP_CONFIG_ENABLE_DNS_RESOLVER
+    err                      = StartConnectToAddressLiteral(hostName, hostNameLen);
 #endif // !CHIP_CONFIG_ENABLE_DNS_RESOLVER
 
 exit:
@@ -1118,7 +1118,7 @@ CHIP_ERROR ChipConnection::StartConnect()
     // correct source address.
 #if INET_CONFIG_ENABLE_IPV4
     if (!PeerAddr.IsIPv4() && MessageLayer->FabricState->ListenIPv6Addr != IPAddress::Any)
-#else // !INET_CONFIG_ENABLE_IPV4
+#else  // !INET_CONFIG_ENABLE_IPV4
     if (MessageLayer->FabricState->ListenIPv6Addr != IPAddress::Any)
 #endif // !INET_CONFIG_ENABLE_IPV4
     {
