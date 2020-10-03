@@ -228,7 +228,7 @@ CHIP_ERROR PosixConfig::WriteConfigValue(Key key, bool val)
     storage = GetStorageForNamespace(key);
     VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
-    err = storage->WriteValue(key.Name, val ? true : false);
+    err = storage->WriteValue(key.Name, val);
     SuccessOrExit(err);
 
     // Commit the value to the persistent store.

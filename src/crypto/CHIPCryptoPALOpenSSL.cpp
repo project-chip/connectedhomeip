@@ -79,21 +79,13 @@ static int _nidForCurve(ECName name)
 
 static bool _isValidTagLength(size_t tag_length)
 {
-    if (tag_length == 8 || tag_length == 12 || tag_length == 16)
-    {
-        return true;
-    }
-    return false;
+    return tag_length == 8 || tag_length == 12 || tag_length == 16;
 }
 
 static bool _isValidKeyLength(size_t length)
 {
     // 16 bytes key for AES-CCM-128, 32 for AES-CCM-256
-    if (length == 16 || length == 32)
-    {
-        return true;
-    }
-    return false;
+    return length == 16 || length == 32;
 }
 
 static void _logSSLError()

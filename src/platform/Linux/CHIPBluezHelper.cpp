@@ -183,7 +183,7 @@ static void BluezAdvStartDone(GObject * aObject, GAsyncResult * aResult, gpointe
     ChipLogProgress(DeviceLayer, "RegisterAdvertisement complete");
 
 exit:
-    BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(success == TRUE ? true : false, nullptr);
+    BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(success == TRUE, nullptr);
     if (error != nullptr)
         g_error_free(error);
 }
@@ -213,7 +213,7 @@ static void BluezAdvStopDone(GObject * aObject, GAsyncResult * aResult, gpointer
     ChipLogProgress(DeviceLayer, "UnregisterAdvertisement complete");
 
 exit:
-    BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(success == TRUE ? true : false, nullptr);
+    BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(success == TRUE, nullptr);
     if (error != nullptr)
         g_error_free(error);
 }

@@ -87,7 +87,7 @@ CHIP_ERROR ChipLinuxStorage::ReadValue(const char * key, bool & val)
     mLock.lock();
 
     retval = ChipLinuxStorageIni::GetUIntValue(key, result);
-    val    = (result == 0 ? false : true);
+    val    = (result != 0);
 
     mLock.unlock();
 

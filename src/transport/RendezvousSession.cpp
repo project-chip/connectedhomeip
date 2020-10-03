@@ -65,7 +65,7 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params)
 #endif // CONFIG_NETWORK_LAYER_BLE
     SuccessOrExit(err);
 
-    if (mParams.HasDiscriminator() == false)
+    if (!mParams.HasDiscriminator())
     {
         err = WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
 #if CONFIG_DEVICE_LAYER
