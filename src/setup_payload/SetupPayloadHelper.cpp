@@ -47,7 +47,8 @@ struct SetupPayloadParameter
     uint64_t uintValue;
 };
 
-static CHIP_ERROR resolveSetupPayloadParameter(SetupPayloadParameter & parameter, const std::string& key, const std::string& value)
+static CHIP_ERROR resolveSetupPayloadParameter(SetupPayloadParameter & parameter, const std::string & key,
+                                               const std::string & value)
 {
     bool isUnsignedInt   = true;
     bool shouldHaveValue = true;
@@ -102,7 +103,7 @@ static CHIP_ERROR resolveSetupPayloadParameter(SetupPayloadParameter & parameter
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR addParameter(SetupPayload & setupPayload, const SetupPayloadParameter& parameter)
+static CHIP_ERROR addParameter(SetupPayload & setupPayload, const SetupPayloadParameter & parameter)
 {
     switch (parameter.key)
     {
@@ -140,7 +141,7 @@ static CHIP_ERROR addParameter(SetupPayload & setupPayload, const SetupPayloadPa
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR loadPayloadFromFile(SetupPayload & setupPayload, const std::string& filePath)
+CHIP_ERROR loadPayloadFromFile(SetupPayload & setupPayload, const std::string & filePath)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     std::ifstream fileStream(filePath);
