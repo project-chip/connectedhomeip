@@ -294,8 +294,6 @@ void AsyncDNSResolverSockets::Resolve(DNSResolver & resolver)
 
     // Release lock.
     AsyncMutexUnlock();
-
-    return;
 }
 
 /* Event handler function for asynchronous DNS notification */

@@ -1559,8 +1559,6 @@ exit:
         if (msgLayer->OnReceiveError != nullptr)
             msgLayer->OnReceiveError(msgLayer, err, pktInfo);
     }
-
-    return;
 }
 
 void ChipMessageLayer::HandleUDPReceiveError(UDPEndPoint * endPoint, INET_ERROR err, const IPPacketInfo * pktInfo)
@@ -2376,7 +2374,6 @@ exit:
     {
         buf[bufSize - 1] = 0;
     }
-    return;
 }
 
 /**

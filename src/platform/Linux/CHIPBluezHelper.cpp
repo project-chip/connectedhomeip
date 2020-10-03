@@ -831,7 +831,6 @@ exit:
         BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(false, nullptr);
         g_error_free(error);
     }
-    return;
 }
 
 gboolean BluezPeripheralRegisterApp(void * apClosure)

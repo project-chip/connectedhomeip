@@ -1167,8 +1167,6 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
         if (OnReceiveError != nullptr && lStatus != chip::System::MapErrorPOSIX(EAGAIN))
             OnReceiveError(this, lStatus, nullptr);
     }
-
-    return;
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 

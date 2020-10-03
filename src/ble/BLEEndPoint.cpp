@@ -269,8 +269,6 @@ exit:
     {
         DoClose(kBleCloseFlag_SuppressCallback | kBleCloseFlag_AbortTransmission, err);
     }
-
-    return;
 }
 
 void BLEEndPoint::HandleSubscribeComplete()

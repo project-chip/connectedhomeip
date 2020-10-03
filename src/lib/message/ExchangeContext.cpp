@@ -1036,8 +1036,6 @@ bool ExchangeContext::RMPCheckAndRemRetransTable(uint32_t ackMsgId, void ** rCtx
             res = true;
             break;
         }
-
-        continue;
     }
 
     return res;

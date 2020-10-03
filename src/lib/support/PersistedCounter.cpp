@@ -31,10 +31,7 @@ PersistedCounter::PersistedCounter() :
     MonotonicallyIncreasingCounter(), mId(chip::Platform::PersistedStorage::kEmptyKey), mEpoch(0), mNextEpoch(0)
 {}
 
-PersistedCounter::~PersistedCounter()
-{
-    return;
-}
+PersistedCounter::~PersistedCounter() {}
 
 CHIP_ERROR
 PersistedCounter::Init(const chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch)
