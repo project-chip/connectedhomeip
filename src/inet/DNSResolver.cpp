@@ -427,7 +427,7 @@ INET_ERROR DNSResolver::ProcessGetAddrInfoResult(int returnCode, struct addrinfo
         // when attempting to communicate with the host.
         if (numAddrs > MaxAddrs && MaxAddrs > 1 && numPrimaryAddrs > 0 && numSecondaryAddrs > 0)
         {
-            numPrimaryAddrs = ::chip::min(numPrimaryAddrs, (uint8_t)(MaxAddrs - 1));
+            numPrimaryAddrs = ::chip::min(numPrimaryAddrs, static_cast<uint8_t>(MaxAddrs - 1));
         }
 
         // Copy the primary addresses into the beginning of the application's output array,

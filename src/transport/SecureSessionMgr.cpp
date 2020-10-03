@@ -201,7 +201,7 @@ CHIP_ERROR SecureSessionMgrBase::NewPairing(const Optional<Transport::PeerAddres
 
     if (state != nullptr)
     {
-        err = pairing->DeriveSecureSession((const uint8_t *) kSpake2pI2RSessionInfo, strlen(kSpake2pI2RSessionInfo),
+        err = pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(kSpake2pI2RSessionInfo), strlen(kSpake2pI2RSessionInfo),
                                            state->GetSecureSession());
     }
 

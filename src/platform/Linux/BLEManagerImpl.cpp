@@ -187,12 +187,12 @@ CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aNodeId, bool aIsCentral)
 
 CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
 {
-    return StartBluezAdv((BluezEndpoint *) mpAppState);
+    return StartBluezAdv(static_cast<BluezEndpoint *>(mpAppState));
 }
 
 CHIP_ERROR BLEManagerImpl::StopBLEAdvertising()
 {
-    return StopBluezAdv((BluezEndpoint *) mpAppState);
+    return StopBluezAdv(static_cast<BluezEndpoint *>(mpAppState));
 }
 
 void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
@@ -493,7 +493,7 @@ void BLEManagerImpl::DriveBLEState()
     // Register the CHIPoBLE application with the Bluez BLE layer if needed.
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !GetFlag(mFlags, kFlag_AppRegistered))
     {
-        err = BluezGattsAppRegister((BluezEndpoint *) mpAppState);
+        err = BluezGattsAppRegister(static_cast<BluezEndpoint *>(mpAppState));
         SetFlag(mFlags, kFlag_ControlOpInProgress);
         ExitNow();
     }
@@ -510,7 +510,7 @@ void BLEManagerImpl::DriveBLEState()
             // be called again, and execution will proceed to the code below.
             if (!GetFlag(mFlags, kFlag_AdvertisingConfigured))
             {
-                err = BluezAdvertisementSetup((BluezEndpoint *) mpAppState);
+                err = BluezAdvertisementSetup(static_cast<BluezEndpoint *>(mpAppState));
                 ExitNow();
             }
 

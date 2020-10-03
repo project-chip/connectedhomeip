@@ -1132,7 +1132,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal()
     init_bn(tempbn);
     init_bn(order);
 
-    error_openssl = EC_GROUP_get_order(context->curve, (BIGNUM *) order, context->bn_ctx);
+    error_openssl = EC_GROUP_get_order(context->curve, static_cast<BIGNUM *>(order), context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -1218,7 +1218,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FELoad(const uint8_t * in, size_t in_l
 {
     CHIP_ERROR error  = CHIP_ERROR_INTERNAL;
     int error_openssl = 0;
-    BIGNUM * bn_fe    = (BIGNUM *) fe;
+    BIGNUM * bn_fe    = static_cast<BIGNUM *>(fe);
 
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
@@ -1251,7 +1251,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEGenerate(void * fe)
     CHIP_ERROR error  = CHIP_ERROR_INTERNAL;
     int error_openssl = 0;
 
-    error_openssl = BN_rand_range((BIGNUM *) fe, (BIGNUM *) order);
+    error_openssl = BN_rand_range(static_cast<BIGNUM *>(fe), static_cast<BIGNUM *>(order));
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -1266,7 +1266,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEMul(void * fer, const void * fe1, co
 
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
-    error_openssl = BN_mod_mul((BIGNUM *) fer, (BIGNUM *) fe1, (BIGNUM *) fe2, (BIGNUM *) order, context->bn_ctx);
+    error_openssl = BN_mod_mul(static_cast<BIGNUM *>(fer), (BIGNUM *) fe1, (BIGNUM *) fe2, static_cast<BIGNUM *>(order), context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -1281,7 +1281,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointLoad(const uint8_t * in, size_t i
 
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
-    error_openssl = EC_POINT_oct2point(context->curve, (EC_POINT *) R, Uint8::to_const_uchar(in), in_len, context->bn_ctx);
+    error_openssl = EC_POINT_oct2point(context->curve, static_cast<EC_POINT *>(R), Uint8::to_const_uchar(in), in_len, context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -1310,7 +1310,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointMul(void * R, const void * P1, co
 
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
-    error_openssl = EC_POINT_mul(context->curve, (EC_POINT *) R, nullptr, (EC_POINT *) P1, (BIGNUM *) fe1, context->bn_ctx);
+    error_openssl = EC_POINT_mul(context->curve, static_cast<EC_POINT *>(R), nullptr, (EC_POINT *) P1, (BIGNUM *) fe1, context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -1336,7 +1336,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointAddMul(void * R, const void * P1,
     error = PointMul(R, P2, fe2);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
-    error_openssl = EC_POINT_add(context->curve, (EC_POINT *) R, (EC_POINT *) R, (const EC_POINT *) scratch, context->bn_ctx);
+    error_openssl = EC_POINT_add(context->curve, static_cast<EC_POINT *>(R), static_cast<EC_POINT *>(R), (const EC_POINT *) scratch, context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -1352,7 +1352,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointInvert(void * R)
 
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
-    error_openssl = EC_POINT_invert(context->curve, (EC_POINT *) R, context->bn_ctx);
+    error_openssl = EC_POINT_invert(context->curve, static_cast<EC_POINT *>(R), context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -1408,7 +1408,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
 
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
-    error_openssl = EC_POINT_is_on_curve(context->curve, (EC_POINT *) R, context->bn_ctx);
+    error_openssl = EC_POINT_is_on_curve(context->curve, static_cast<EC_POINT *>(R), context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;

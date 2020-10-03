@@ -315,7 +315,7 @@ ExchangeContext * ChipExchangeManager::FindContext(uint64_t peerNodeId, ChipConn
 CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, ExchangeContext::MessageReceiveFunct handler,
                                                                   void * appState)
 {
-    return RegisterUMH(profileId, (int16_t) -1, nullptr, false, handler, appState);
+    return RegisterUMH(profileId, static_cast<int16_t>(-1), nullptr, false, handler, appState);
 }
 
 /**
@@ -337,7 +337,7 @@ CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profi
 CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, ExchangeContext::MessageReceiveFunct handler,
                                                                   bool allowDups, void * appState)
 {
-    return RegisterUMH(profileId, (int16_t) -1, nullptr, allowDups, handler, appState);
+    return RegisterUMH(profileId, static_cast<int16_t>(-1), nullptr, allowDups, handler, appState);
 }
 
 /**
@@ -358,7 +358,7 @@ CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profi
 CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType,
                                                                   ExchangeContext::MessageReceiveFunct handler, void * appState)
 {
-    return RegisterUMH(profileId, (int16_t) msgType, nullptr, false, handler, appState);
+    return RegisterUMH(profileId, static_cast<int16_t>(msgType), nullptr, false, handler, appState);
 }
 
 /**
@@ -383,7 +383,7 @@ CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profi
                                                                   ExchangeContext::MessageReceiveFunct handler, bool allowDups,
                                                                   void * appState)
 {
-    return RegisterUMH(profileId, (int16_t) msgType, nullptr, allowDups, handler, appState);
+    return RegisterUMH(profileId, static_cast<int16_t>(msgType), nullptr, allowDups, handler, appState);
 }
 
 /**
@@ -408,7 +408,7 @@ CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profi
 CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection * con,
                                                                   ExchangeContext::MessageReceiveFunct handler, void * appState)
 {
-    return RegisterUMH(profileId, (int16_t) msgType, con, false, handler, appState);
+    return RegisterUMH(profileId, static_cast<int16_t>(msgType), con, false, handler, appState);
 }
 
 /**
@@ -437,7 +437,7 @@ CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profi
                                                                   ExchangeContext::MessageReceiveFunct handler, bool allowDups,
                                                                   void * appState)
 {
-    return RegisterUMH(profileId, (int16_t) msgType, con, allowDups, handler, appState);
+    return RegisterUMH(profileId, static_cast<int16_t>(msgType), con, allowDups, handler, appState);
 }
 
 /**
@@ -451,7 +451,7 @@ CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profi
  */
 CHIP_ERROR ChipExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t profileId)
 {
-    return UnregisterUMH(profileId, (int16_t) -1, nullptr);
+    return UnregisterUMH(profileId, static_cast<int16_t>(-1), nullptr);
 }
 
 /**
@@ -467,7 +467,7 @@ CHIP_ERROR ChipExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t pro
  */
 CHIP_ERROR ChipExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType)
 {
-    return UnregisterUMH(profileId, (int16_t) msgType, nullptr);
+    return UnregisterUMH(profileId, static_cast<int16_t>(msgType), nullptr);
 }
 
 /**
@@ -486,7 +486,7 @@ CHIP_ERROR ChipExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t pro
  */
 CHIP_ERROR ChipExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection * con)
 {
-    return UnregisterUMH(profileId, (int16_t) msgType, con);
+    return UnregisterUMH(profileId, static_cast<int16_t>(msgType), con);
 }
 
 void ChipExchangeManager::HandleAcceptError(ChipMessageLayer * msgLayer, CHIP_ERROR err)
@@ -1731,7 +1731,7 @@ void ChipExchangeManager::RMPStartTimer()
             ChipLogProgress(ExchangeManager, "RMPStartTimer set timer for %d %" PRIu64, timerArmValue, timerExpiryEpoch);
 #endif
             RMPStopTimer();
-            res = MessageLayer->SystemLayer->StartTimer((uint32_t) timerArmValue, RMPTimeout, this);
+            res = MessageLayer->SystemLayer->StartTimer(static_cast<uint32_t>(timerArmValue), RMPTimeout, this);
 
             VerifyOrDieWithMsg(res == CHIP_NO_ERROR, ExchangeManager, "Cannot start RMPTimeout\n");
             mRMPCurrentTimerExpiry = timerExpiryEpoch;

@@ -209,14 +209,14 @@ struct in6_addr IPAddress::ToIPv6() const
 IPAddress IPAddress::FromIPv6(const struct in6_addr & ipv6Addr)
 {
     IPAddress ipAddr;
-    ipAddr.Addr[0] = htonl(((uint32_t) ipv6Addr.s6_addr[0]) << 24 | ((uint32_t) ipv6Addr.s6_addr[1]) << 16 |
-                           ((uint32_t) ipv6Addr.s6_addr[2]) << 8 | ((uint32_t) ipv6Addr.s6_addr[3]));
-    ipAddr.Addr[1] = htonl(((uint32_t) ipv6Addr.s6_addr[4]) << 24 | ((uint32_t) ipv6Addr.s6_addr[5]) << 16 |
-                           ((uint32_t) ipv6Addr.s6_addr[6]) << 8 | ((uint32_t) ipv6Addr.s6_addr[7]));
-    ipAddr.Addr[2] = htonl(((uint32_t) ipv6Addr.s6_addr[8]) << 24 | ((uint32_t) ipv6Addr.s6_addr[9]) << 16 |
-                           ((uint32_t) ipv6Addr.s6_addr[10]) << 8 | ((uint32_t) ipv6Addr.s6_addr[11]));
-    ipAddr.Addr[3] = htonl(((uint32_t) ipv6Addr.s6_addr[12]) << 24 | ((uint32_t) ipv6Addr.s6_addr[13]) << 16 |
-                           ((uint32_t) ipv6Addr.s6_addr[14]) << 8 | ((uint32_t) ipv6Addr.s6_addr[15]));
+    ipAddr.Addr[0] = htonl((static_cast<uint32_t>(ipv6Addr.s6_addr[0])) << 24 | (static_cast<uint32_t>(ipv6Addr.s6_addr[1])) << 16 |
+                           (static_cast<uint32_t>(ipv6Addr.s6_addr[2])) << 8 | (static_cast<uint32_t>(ipv6Addr.s6_addr[3])));
+    ipAddr.Addr[1] = htonl((static_cast<uint32_t>(ipv6Addr.s6_addr[4])) << 24 | (static_cast<uint32_t>(ipv6Addr.s6_addr[5])) << 16 |
+                           (static_cast<uint32_t>(ipv6Addr.s6_addr[6])) << 8 | (static_cast<uint32_t>(ipv6Addr.s6_addr[7])));
+    ipAddr.Addr[2] = htonl((static_cast<uint32_t>(ipv6Addr.s6_addr[8])) << 24 | (static_cast<uint32_t>(ipv6Addr.s6_addr[9])) << 16 |
+                           (static_cast<uint32_t>(ipv6Addr.s6_addr[10])) << 8 | (static_cast<uint32_t>(ipv6Addr.s6_addr[11])));
+    ipAddr.Addr[3] = htonl((static_cast<uint32_t>(ipv6Addr.s6_addr[12])) << 24 | (static_cast<uint32_t>(ipv6Addr.s6_addr[13])) << 16 |
+                           (static_cast<uint32_t>(ipv6Addr.s6_addr[14])) << 8 | (static_cast<uint32_t>(ipv6Addr.s6_addr[15])));
     return ipAddr;
 }
 
@@ -291,7 +291,7 @@ bool IPAddress::IsIPv6LinkLocal() const
 uint64_t IPAddress::InterfaceId() const
 {
     if (IsIPv6ULA())
-        return (((uint64_t) ntohl(Addr[2])) << 32) | ((uint64_t) ntohl(Addr[3]));
+        return ((static_cast<uint64_t>(ntohl(Addr[2]))) << 32) | (static_cast<uint64_t>(ntohl(Addr[3])));
     return 0;
 }
 
@@ -300,7 +300,7 @@ uint64_t IPAddress::InterfaceId() const
 uint16_t IPAddress::Subnet() const
 {
     if (IsIPv6ULA())
-        return (uint16_t) ntohl(Addr[1]);
+        return static_cast<uint16_t>(ntohl(Addr[1]));
     return 0;
 }
 
@@ -309,7 +309,7 @@ uint16_t IPAddress::Subnet() const
 uint64_t IPAddress::GlobalId() const
 {
     if (IsIPv6ULA())
-        return (((uint64_t)(ntohl(Addr[0]) & 0xFFFFFF)) << 16) | ((uint64_t)(ntohl(Addr[1])) & 0xFFFF0000) >> 16;
+        return ((static_cast<uint64_t>(ntohl(Addr[0]) & 0xFFFFFF)) << 16) | (static_cast<uint64_t>(ntohl(Addr[1])) & 0xFFFF0000) >> 16;
     return 0;
 }
 
@@ -352,14 +352,14 @@ IPAddress IPAddress::MakeULA(uint64_t globalId, uint16_t subnet, uint64_t interf
 {
     IPAddress addr;
 
-    addr.Addr[0] = 0xFD000000 | (uint32_t)((globalId & 0xFFFFFF0000ULL) >> 16);
+    addr.Addr[0] = 0xFD000000 | static_cast<uint32_t>((globalId & 0xFFFFFF0000ULL) >> 16);
     addr.Addr[0] = htonl(addr.Addr[0]);
 
-    addr.Addr[1] = (uint32_t)((globalId & 0x000000FFFFULL) << 16) | subnet;
+    addr.Addr[1] = static_cast<uint32_t>((globalId & 0x000000FFFFULL) << 16) | subnet;
     addr.Addr[1] = htonl(addr.Addr[1]);
 
-    addr.Addr[2] = htonl((uint32_t)(interfaceId >> 32));
-    addr.Addr[3] = htonl((uint32_t)(interfaceId));
+    addr.Addr[2] = htonl(static_cast<uint32_t>(interfaceId >> 32));
+    addr.Addr[3] = htonl(static_cast<uint32_t>(interfaceId));
 
     return addr;
 }
@@ -371,8 +371,8 @@ IPAddress IPAddress::MakeLLA(uint64_t interfaceId)
     addr.Addr[0] = htonl(0xFE800000);
     addr.Addr[1] = 0;
 
-    addr.Addr[2] = htonl((uint32_t)(interfaceId >> 32));
-    addr.Addr[3] = htonl((uint32_t)(interfaceId));
+    addr.Addr[2] = htonl(static_cast<uint32_t>(interfaceId >> 32));
+    addr.Addr[3] = htonl(static_cast<uint32_t>(interfaceId));
 
     return addr;
 }
@@ -406,10 +406,10 @@ IPAddress IPAddress::MakeIPv6Multicast(uint8_t aFlags, uint8_t aScope, uint32_t 
                                                                       0,
                                                                       0,
                                                                       0,
-                                                                      (uint8_t)((aGroupId & 0xFF000000U) >> 24),
-                                                                      (uint8_t)((aGroupId & 0x00FF0000U) >> 16),
-                                                                      (uint8_t)((aGroupId & 0x0000FF00U) >> 8),
-                                                                      (uint8_t)((aGroupId & 0x000000FFU) >> 0) };
+                                                                      static_cast<uint8_t>((aGroupId & 0xFF000000U) >> 24),
+                                                                      static_cast<uint8_t>((aGroupId & 0x00FF0000U) >> 16),
+                                                                      static_cast<uint8_t>((aGroupId & 0x0000FF00U) >> 8),
+                                                                      static_cast<uint8_t>((aGroupId & 0x000000FFU) >> 0) };
 
     return (MakeIPv6Multicast(aFlags, aScope, lGroupId));
 }
@@ -435,18 +435,18 @@ IPAddress IPAddress::MakeIPv6PrefixMulticast(uint8_t aScope, uint8_t aPrefixLeng
     const uint8_t lFlags                                          = kIPv6MulticastFlag_Prefix;
     const uint8_t lGroupId[NL_INET_IPV6_MCAST_GROUP_LEN_IN_BYTES] = { lReserved,
                                                                       aPrefixLength,
-                                                                      (uint8_t)((aPrefix & 0xFF00000000000000ULL) >> 56),
-                                                                      (uint8_t)((aPrefix & 0x00FF000000000000ULL) >> 48),
-                                                                      (uint8_t)((aPrefix & 0x0000FF0000000000ULL) >> 40),
-                                                                      (uint8_t)((aPrefix & 0x000000FF00000000ULL) >> 32),
-                                                                      (uint8_t)((aPrefix & 0x00000000FF000000ULL) >> 24),
-                                                                      (uint8_t)((aPrefix & 0x0000000000FF0000ULL) >> 16),
-                                                                      (uint8_t)((aPrefix & 0x000000000000FF00ULL) >> 8),
-                                                                      (uint8_t)((aPrefix & 0x00000000000000FFULL) >> 0),
-                                                                      (uint8_t)((aGroupId & 0xFF000000U) >> 24),
-                                                                      (uint8_t)((aGroupId & 0x00FF0000U) >> 16),
-                                                                      (uint8_t)((aGroupId & 0x0000FF00U) >> 8),
-                                                                      (uint8_t)((aGroupId & 0x000000FFU) >> 0) };
+                                                                      static_cast<uint8_t>((aPrefix & 0xFF00000000000000ULL) >> 56),
+                                                                      static_cast<uint8_t>((aPrefix & 0x00FF000000000000ULL) >> 48),
+                                                                      static_cast<uint8_t>((aPrefix & 0x0000FF0000000000ULL) >> 40),
+                                                                      static_cast<uint8_t>((aPrefix & 0x000000FF00000000ULL) >> 32),
+                                                                      static_cast<uint8_t>((aPrefix & 0x00000000FF000000ULL) >> 24),
+                                                                      static_cast<uint8_t>((aPrefix & 0x0000000000FF0000ULL) >> 16),
+                                                                      static_cast<uint8_t>((aPrefix & 0x000000000000FF00ULL) >> 8),
+                                                                      static_cast<uint8_t>((aPrefix & 0x00000000000000FFULL) >> 0),
+                                                                      static_cast<uint8_t>((aGroupId & 0xFF000000U) >> 24),
+                                                                      static_cast<uint8_t>((aGroupId & 0x00FF0000U) >> 16),
+                                                                      static_cast<uint8_t>((aGroupId & 0x0000FF00U) >> 8),
+                                                                      static_cast<uint8_t>((aGroupId & 0x000000FFU) >> 0) };
 
     return (MakeIPv6TransientMulticast(lFlags, aScope, lGroupId));
 }

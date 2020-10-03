@@ -210,7 +210,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::retrieveOptionalInfos(SetupPayload & outPay
             continue;
         }
 
-        tag = (uint8_t) TagNumFromTag(reader.GetTag());
+        tag = static_cast<uint8_t>(TagNumFromTag(reader.GetTag()));
         VerifyOrExit(IsContextTag(tag) == true || IsProfileTag(tag) == true, err = CHIP_ERROR_INVALID_TLV_TAG);
 
         optionalQRCodeInfoType elemType = optionalQRCodeInfoTypeUnknown;

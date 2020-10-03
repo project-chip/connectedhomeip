@@ -295,7 +295,7 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobValue(const char * key, uint8_t * d
 
     // Decode it
     // Cast is safe because we checked encodedDataLen above.
-    decodedDataLen = Base64Decode(encodedData.Ptr(), static_cast<uint16_t>(encodedDataLen), (uint8_t *) decodedData);
+    decodedDataLen = Base64Decode(encodedData.Ptr(), static_cast<uint16_t>(encodedDataLen), decodedData);
     if (decodedDataLen == UINT16_MAX || decodedDataLen > expectedDecodedLen)
     {
         return CHIP_ERROR_DECODE_FAILED;

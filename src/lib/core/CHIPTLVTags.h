@@ -81,7 +81,7 @@ enum
  */
 inline uint64_t ProfileTag(uint32_t profileId, uint32_t tagNum)
 {
-    return (((uint64_t) profileId) << kProfileIdShift) | tagNum;
+    return ((static_cast<uint64_t>(profileId)) << kProfileIdShift) | tagNum;
 }
 
 /**
@@ -94,7 +94,7 @@ inline uint64_t ProfileTag(uint32_t profileId, uint32_t tagNum)
  */
 inline uint64_t ProfileTag(uint16_t vendorId, uint16_t profileNum, uint32_t tagNum)
 {
-    return (((uint64_t) vendorId) << kVendorIdShift) | (((uint64_t) profileNum) << kProfileNumShift) | tagNum;
+    return ((static_cast<uint64_t>(vendorId)) << kVendorIdShift) | ((static_cast<uint64_t>(profileNum)) << kProfileNumShift) | tagNum;
 }
 
 /**
@@ -140,7 +140,7 @@ enum
  */
 inline uint32_t ProfileIdFromTag(uint64_t tag)
 {
-    return (uint32_t)((tag & kProfileIdMask) >> kProfileIdShift);
+    return static_cast<uint32_t>((tag & kProfileIdMask) >> kProfileIdShift);
 }
 
 /**
@@ -153,7 +153,7 @@ inline uint32_t ProfileIdFromTag(uint64_t tag)
  */
 inline uint16_t ProfileNumFromTag(uint64_t tag)
 {
-    return (uint16_t)((tag & kProfileIdMask) >> kProfileIdShift);
+    return static_cast<uint16_t>((tag & kProfileIdMask) >> kProfileIdShift);
 }
 
 /**
@@ -169,7 +169,7 @@ inline uint16_t ProfileNumFromTag(uint64_t tag)
  */
 inline uint32_t TagNumFromTag(uint64_t tag)
 {
-    return (uint32_t)(tag & kTagNumMask);
+    return static_cast<uint32_t>(tag & kTagNumMask);
 }
 
 /**
@@ -182,7 +182,7 @@ inline uint32_t TagNumFromTag(uint64_t tag)
  */
 inline uint16_t VendorIdFromTag(uint64_t tag)
 {
-    return (uint16_t)((tag & kProfileIdMask) >> kVendorIdShift);
+    return static_cast<uint16_t>((tag & kProfileIdMask) >> kVendorIdShift);
 }
 
 /**

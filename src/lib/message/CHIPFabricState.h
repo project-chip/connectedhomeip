@@ -234,7 +234,7 @@ inline bool IsGroupKeyAuthMode(ChipAuthMode authMode)
  */
 inline uint8_t PasswordSourceFromAuthMode(ChipAuthMode authMode)
 {
-    return (uint8_t)(authMode & kChipAuthMode_PASE_PasswordSourceMask);
+    return static_cast<uint8_t>(authMode & kChipAuthMode_PASE_PasswordSourceMask);
 }
 
 /** Returns the password source for the given authentication mode.
@@ -243,7 +243,7 @@ inline uint8_t PasswordSourceFromAuthMode(ChipAuthMode authMode)
  */
 inline uint8_t CertTypeFromAuthMode(ChipAuthMode authMode)
 {
-    return (uint8_t)(authMode & kChipAuthMode_CASE_CertTypeMask);
+    return static_cast<uint8_t>(authMode & kChipAuthMode_CASE_CertTypeMask);
 }
 
 /** Returns the application group master key ID associated with the authentication mode.

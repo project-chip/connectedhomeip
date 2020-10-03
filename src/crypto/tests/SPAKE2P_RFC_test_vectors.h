@@ -117,11 +117,11 @@ static const uint8_t chiptest_e4836c3b50dd_MAC_KcB_15[] = { 0x06, 0x60, 0xa6, 0x
                                                             0xb2, 0x2d, 0xff, 0x29, 0x8b, 0x1d, 0x07, 0xa5, 0x26, 0xcf, 0x3c,
                                                             0xc5, 0x91, 0xad, 0xfe, 0xcd, 0x1f, 0x6e, 0xf6, 0xe0, 0x2e };
 static const struct spake2p_rfc_tv chiptest_e4836c3b50dd_test_vector_16 = {
-    .context               = (const uint8_t *) "SPAKE2+-P256-SHA256-HKDF draft-01",
+    .context               = reinterpret_cast<const uint8_t *>("SPAKE2+-P256-SHA256-HKDF draft-01"),
     .context_len           = 33,
-    .prover_identity       = (const uint8_t *) "client",
+    .prover_identity       = reinterpret_cast<const uint8_t *>("client"),
     .prover_identity_len   = 6,
-    .verifier_identity     = (const uint8_t *) "server",
+    .verifier_identity     = reinterpret_cast<const uint8_t *>("server"),
     .verifier_identity_len = 6,
     .w0                    = chiptest_e4836c3b50dd_w0_1,
     .w0_len                = 32,
@@ -211,11 +211,11 @@ static const uint8_t chiptest_e4836c3b50dd_MAC_KcB_31[] = { 0xb9, 0xc3, 0x9d, 0x
                                                             0x9b, 0xed, 0xea, 0xca, 0x24, 0x48, 0xb9, 0x05, 0xbe, 0x19, 0xa4,
                                                             0x3b, 0x94, 0xee, 0x24, 0xb7, 0x70, 0x20, 0x81, 0x35, 0xe3 };
 static const struct spake2p_rfc_tv chiptest_e4836c3b50dd_test_vector_32 = {
-    .context               = (const uint8_t *) "SPAKE2+-P256-SHA256-HKDF draft-01",
+    .context               = reinterpret_cast<const uint8_t *>("SPAKE2+-P256-SHA256-HKDF draft-01"),
     .context_len           = 33,
-    .prover_identity       = (const uint8_t *) "client",
+    .prover_identity       = reinterpret_cast<const uint8_t *>("client"),
     .prover_identity_len   = 6,
-    .verifier_identity     = (const uint8_t *) "",
+    .verifier_identity     = reinterpret_cast<const uint8_t *>(""),
     .verifier_identity_len = 0,
     .w0                    = chiptest_e4836c3b50dd_w0_17,
     .w0_len                = 32,
@@ -305,11 +305,11 @@ static const uint8_t chiptest_e4836c3b50dd_MAC_KcB_47[] = { 0x07, 0x2a, 0x94, 0x
                                                             0x53, 0x4c, 0x23, 0x17, 0xca, 0xdf, 0x3e, 0xa3, 0x79, 0x28, 0x27,
                                                             0xf4, 0x79, 0xe8, 0x73, 0xf9, 0x3e, 0x90, 0xf2, 0x15, 0x52 };
 static const struct spake2p_rfc_tv chiptest_e4836c3b50dd_test_vector_48 = {
-    .context               = (const uint8_t *) "SPAKE2+-P256-SHA256-HKDF draft-01",
+    .context               = reinterpret_cast<const uint8_t *>("SPAKE2+-P256-SHA256-HKDF draft-01"),
     .context_len           = 33,
-    .prover_identity       = (const uint8_t *) "",
+    .prover_identity       = reinterpret_cast<const uint8_t *>(""),
     .prover_identity_len   = 0,
-    .verifier_identity     = (const uint8_t *) "server",
+    .verifier_identity     = reinterpret_cast<const uint8_t *>("server"),
     .verifier_identity_len = 6,
     .w0                    = chiptest_e4836c3b50dd_w0_33,
     .w0_len                = 32,
@@ -399,11 +399,11 @@ static const uint8_t chiptest_e4836c3b50dd_MAC_KcB_63[] = { 0x09, 0x5d, 0xc0, 0x
                                                             0x37, 0x81, 0x18, 0x15, 0xb3, 0xc1, 0x52, 0x4a, 0xae, 0x80, 0xfd,
                                                             0x4e, 0x68, 0x10, 0xcf, 0x53, 0x1c, 0xf1, 0x1d, 0x20, 0xe3 };
 static const struct spake2p_rfc_tv chiptest_e4836c3b50dd_test_vector_64 = {
-    .context               = (const uint8_t *) "SPAKE2+-P256-SHA256-HKDF draft-01",
+    .context               = reinterpret_cast<const uint8_t *>("SPAKE2+-P256-SHA256-HKDF draft-01"),
     .context_len           = 33,
-    .prover_identity       = (const uint8_t *) "",
+    .prover_identity       = reinterpret_cast<const uint8_t *>(""),
     .prover_identity_len   = 0,
-    .verifier_identity     = (const uint8_t *) "",
+    .verifier_identity     = reinterpret_cast<const uint8_t *>(""),
     .verifier_identity_len = 0,
     .w0                    = chiptest_e4836c3b50dd_w0_49,
     .w0_len                = 32,

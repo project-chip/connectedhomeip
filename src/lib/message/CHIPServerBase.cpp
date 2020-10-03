@@ -174,7 +174,7 @@ CHIP_ERROR ChipServerBase::SendStatusReport(ExchangeContext * ec, uint32_t statu
         err = statusWriter.StartContainer(AnonymousTag, kTLVType_Structure, outerContainerType);
         SuccessOrExit(err);
 
-        err = statusWriter.Put(ProfileTag(kChipProtocol_Common, Common::kTag_SystemErrorCode), (uint32_t) sysError);
+        err = statusWriter.Put(ProfileTag(kChipProtocol_Common, Common::kTag_SystemErrorCode), static_cast<uint32_t>(sysError));
         SuccessOrExit(err);
 
         err = statusWriter.EndContainer(outerContainerType);

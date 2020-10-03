@@ -252,7 +252,7 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
         err = intIterator.GetInterfaceName(intName, sizeof(intName));
         NL_TEST_ASSERT(inSuite, err == INET_NO_ERROR);
         printf("     interface id: 0x%" PRIxPTR ", interface name: %s, interface state: %s, %s multicast, %s broadcast addr\n",
-               (uintptr_t)(intId), intName, intIterator.IsUp() ? "UP" : "DOWN", intIterator.SupportsMulticast() ? "supports" : "no",
+               static_cast<uintptr_t>(intId), intName, intIterator.IsUp() ? "UP" : "DOWN", intIterator.SupportsMulticast() ? "supports" : "no",
                intIterator.HasBroadcastAddress() ? "has" : "no");
 
         gInet.GetLinkLocalAddr(intId, &addr);
@@ -279,7 +279,7 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, intName[0] != '\0' && memchr(intName, '\0', sizeof(intName)) != nullptr);
         printf("     %s/%d, interface id: 0x%" PRIxPTR
                ", interface name: %s, interface state: %s, %s multicast, %s broadcast addr\n",
-               addrStr, addrWithPrefix.Length, (uintptr_t)(intId), intName, addrIterator.IsUp() ? "UP" : "DOWN",
+               addrStr, addrWithPrefix.Length, static_cast<uintptr_t>(intId), intName, addrIterator.IsUp() ? "UP" : "DOWN",
                addrIterator.SupportsMulticast() ? "supports" : "no", addrIterator.HasBroadcastAddress() ? "has" : "no");
     }
     NL_TEST_ASSERT(inSuite, !addrIterator.Next());

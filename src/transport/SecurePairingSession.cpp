@@ -157,7 +157,7 @@ CHIP_ERROR SecurePairingSession::Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2
     CHIP_ERROR err = Init(peerSetUpPINCode, pbkdf2IterCount, salt, saltLen, myNodeId, myKeyId, delegate);
     SuccessOrExit(err);
 
-    err = mSpake2p.BeginProver((const uint8_t *) "", 0, (const uint8_t *) "", 0, &mWS[0][0], kSpake2p_WS_Length, &mWS[1][0],
+    err = mSpake2p.BeginProver(reinterpret_cast<const uint8_t *>(""), 0, reinterpret_cast<const uint8_t *>(""), 0, &mWS[0][0], kSpake2p_WS_Length, &mWS[1][0],
                                kSpake2p_WS_Length);
     SuccessOrExit(err);
 
@@ -231,7 +231,7 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pA(const PacketHeader & header, S
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(buf_len == kMAX_Point_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    err = mSpake2p.BeginVerifier((const uint8_t *) "", 0, (const uint8_t *) "", 0, &mWS[0][0], kSpake2p_WS_Length, mPoint,
+    err = mSpake2p.BeginVerifier(reinterpret_cast<const uint8_t *>(""), 0, reinterpret_cast<const uint8_t *>(""), 0, &mWS[0][0], kSpake2p_WS_Length, mPoint,
                                  sizeof(mPoint));
     SuccessOrExit(err);
 
@@ -391,7 +391,7 @@ CHIP_ERROR SecurePairingSession::HandlePeerMessage(const PacketHeader & packetHe
     VerifyOrExit(payloadHeader.GetProtocolID() == Protocols::kChipProtocol_SecurePairing, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
     VerifyOrExit(payloadHeader.GetMessageType() == (uint8_t) mNextExpectedMsg, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    switch ((Spake2pMsgType) payloadHeader.GetMessageType())
+    switch (static_cast<Spake2pMsgType>(payloadHeader.GetMessageType()))
     {
     case Spake2pMsgType::kSpake2pCompute_pA:
         err = HandleCompute_pA(packetHeader, msg);
