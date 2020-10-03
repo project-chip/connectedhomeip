@@ -690,7 +690,7 @@ static void HandleArgError(const char * msg, ...)
     va_end(ap);
 
     va_start(ap, msg);
-    sCallbackRecords[sCallbackRecordCount].Error = (char *) malloc(msgLen + 1);
+    sCallbackRecords[sCallbackRecordCount].Error = static_cast<char *>(malloc(msgLen + 1));
     status                                       = vsnprintf(sCallbackRecords[sCallbackRecordCount].Error, msgLen + 1, msg, ap);
     (void) status;
     va_end(ap);

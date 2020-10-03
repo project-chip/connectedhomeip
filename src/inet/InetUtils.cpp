@@ -81,7 +81,7 @@ DLL_EXPORT INET_ERROR ParseHostAndPort(const char * aString, uint16_t aStringLen
     if (*aString == '[')
     {
         // Search for the end bracket.
-        p = (const char *) memchr(aString, ']', aStringLen);
+        p = static_cast<const char *>(memchr(aString, ']', aStringLen));
         if (p == nullptr)
             return INET_ERROR_INVALID_HOST_NAME;
 
@@ -100,7 +100,7 @@ DLL_EXPORT INET_ERROR ParseHostAndPort(const char * aString, uint16_t aStringLen
     else
     {
         // Search for a colon.
-        p = (const char *) memchr(aString, ':', aStringLen);
+        p = static_cast<const char *>(memchr(aString, ':', aStringLen));
 
         // If the string contains no colons, then it is a host name or
         // IPv4 address without a port.

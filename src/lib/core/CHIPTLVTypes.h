@@ -151,7 +151,7 @@ inline bool TLVTypeIsString(uint8_t type)
 inline TLVFieldSize GetTLVFieldSize(uint8_t type)
 {
     if (TLVTypeHasValue(type))
-        return (TLVFieldSize)(type & kTLVTypeSizeMask);
+        return static_cast<TLVFieldSize>(type & kTLVTypeSizeMask);
     return kTLVFieldSize_0Byte;
 }
 

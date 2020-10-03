@@ -184,7 +184,7 @@ static CHIP_ERROR ConfigGetDeviceCert(bool printHeader)
     VerifyOrExit(certLen != 0, error = CHIP_ERROR_CERT_NOT_FOUND);
 
     // Create a temporary buffer to hold the certificate.
-    certBuf = (uint8_t *) MemoryAlloc(certLen);
+    certBuf = static_cast<uint8_t *>(MemoryAlloc(certLen));
     VerifyOrExit(certBuf != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
     // Read the certificate
@@ -220,7 +220,7 @@ static CHIP_ERROR ConfigGetDeviceCaCerts(bool printHeader)
     VerifyOrExit(certLen != 0, error = CHIP_ERROR_CERT_NOT_FOUND);
 
     // Create a temporary buffer to hold the certificate.
-    certBuf = (uint8_t *) MemoryAlloc(certLen);
+    certBuf = static_cast<uint8_t *>(MemoryAlloc(certLen));
     VerifyOrExit(certBuf != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
     // Read the certificate
@@ -273,7 +273,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCert(bool printHeader)
     VerifyOrExit(certLen != 0, error = CHIP_ERROR_CERT_NOT_FOUND);
 
     // Create a temporary buffer to hold the certificate.
-    certBuf = (uint8_t *) MemoryAlloc(certLen);
+    certBuf = static_cast<uint8_t *>(MemoryAlloc(certLen));
     VerifyOrExit(certBuf != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
     // Read the certificate
@@ -309,7 +309,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCaCerts(bool printHeader)
     VerifyOrExit(certLen != 0, error = CHIP_ERROR_CERT_NOT_FOUND);
 
     // Create a temporary buffer to hold the certificate.
-    certBuf = (uint8_t *) MemoryAlloc(certLen);
+    certBuf = static_cast<uint8_t *>(MemoryAlloc(certLen));
     VerifyOrExit(certBuf != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
     // Read the certificate

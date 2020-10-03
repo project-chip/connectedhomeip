@@ -242,8 +242,8 @@ public:
     {
         const char * secret = "Test secret for key derivation";
         size_t secretLen    = strlen(secret);
-        return session.InitFromSecret((const uint8_t *) secret, secretLen, (const uint8_t *) "", 0, (const uint8_t *) secret,
-                                      secretLen);
+        return session.InitFromSecret(reinterpret_cast<const uint8_t *>(secret), secretLen, reinterpret_cast<const uint8_t *>(""),
+                                      0, reinterpret_cast<const uint8_t *>(secret), secretLen);
     }
 
     CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBuffer * msg) override { return CHIP_NO_ERROR; }
