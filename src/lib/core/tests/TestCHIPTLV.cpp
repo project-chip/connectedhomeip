@@ -581,7 +581,8 @@ void ReadEncoding1(nlTestSuite * inSuite, TLVReader & reader)
 
         TestNext<TLVReader>(inSuite, reader2);
 
-        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535), static_cast<float>(17.9));
+        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535),
+                                   static_cast<float>(17.9));
 
         TestNext<TLVReader>(inSuite, reader2);
 
@@ -2962,7 +2963,8 @@ void TestCHIPTLVReaderDup(nlTestSuite * inSuite)
 
         TestNext<TLVReader>(inSuite, reader2);
 
-        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535), static_cast<float>(17.9));
+        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535),
+                                   static_cast<float>(17.9));
 
         TestNext<TLVReader>(inSuite, reader2);
 
@@ -3059,7 +3061,8 @@ void TestCHIPTLVReaderInPractice(nlTestSuite * inSuite)
 
     TestNext<TLVReader>(inSuite, reader);
 
-    TestGet<TLVReader, int64_t>(inSuite, reader, kTLVType_SignedInteger, ProfileTag(TestProfile_1, 4000000000ULL), static_cast<int16_t>(12345));
+    TestGet<TLVReader, int64_t>(inSuite, reader, kTLVType_SignedInteger, ProfileTag(TestProfile_1, 4000000000ULL),
+                                static_cast<int16_t>(12345));
 
     TestNext<TLVReader>(inSuite, reader);
 
@@ -3760,8 +3763,8 @@ static void TLVReaderFuzzTest(nlTestSuite * inSuite, void * inContext)
 
             if (readRes == CHIP_NO_ERROR)
             {
-                printf("Unexpected success of fuzz test: offset %u, original value 0x%02X, mutated value 0x%02X\n", static_cast<unsigned>(i),
-                       static_cast<unsigned>(origVal), static_cast<unsigned>(fuzzedData[i]));
+                printf("Unexpected success of fuzz test: offset %u, original value 0x%02X, mutated value 0x%02X\n",
+                       static_cast<unsigned>(i), static_cast<unsigned>(origVal), static_cast<unsigned>(fuzzedData[i]));
                 ExitNow();
             }
 

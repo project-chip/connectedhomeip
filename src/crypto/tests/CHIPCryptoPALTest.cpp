@@ -611,7 +611,8 @@ static void TestECDSA_Signing_SHA256(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(reinterpret_cast<const uint8_t *>(msg), msg_length, signature);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
 
-    CHIP_ERROR validation_error = keypair.Pubkey().ECDSA_validate_msg_signature(reinterpret_cast<const uint8_t *>(msg), msg_length, signature);
+    CHIP_ERROR validation_error =
+        keypair.Pubkey().ECDSA_validate_msg_signature(reinterpret_cast<const uint8_t *>(msg), msg_length, signature);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_NO_ERROR);
 }
 
@@ -647,7 +648,8 @@ static void TestECDSA_ValidationFailIncorrectSignature(nlTestSuite * inSuite, vo
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
     signature[0] = static_cast<uint8_t>(~signature[0]); // Flipping bits should invalidate the signature.
 
-    CHIP_ERROR validation_error = keypair.Pubkey().ECDSA_validate_msg_signature(reinterpret_cast<const uint8_t *>(msg), msg_length, signature);
+    CHIP_ERROR validation_error =
+        keypair.Pubkey().ECDSA_validate_msg_signature(reinterpret_cast<const uint8_t *>(msg), msg_length, signature);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_SIGNATURE);
 }
 

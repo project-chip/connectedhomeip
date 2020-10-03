@@ -337,15 +337,17 @@ exit:
 CHIP_ERROR RendezvousSession::WaitForPairing(Optional<NodeId> nodeId, uint32_t setupPINCode)
 {
     mPairingInProgress = true;
-    return mPairingSession.WaitForPairing(setupPINCode, kSpake2p_Iteration_Count, reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt),
+    return mPairingSession.WaitForPairing(setupPINCode, kSpake2p_Iteration_Count,
+                                          reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt),
                                           strlen(kSpake2pKeyExchangeSalt), nodeId, 0, this);
 }
 
 CHIP_ERROR RendezvousSession::Pair(Optional<NodeId> nodeId, uint32_t setupPINCode)
 {
     mPairingInProgress = true;
-    return mPairingSession.Pair(setupPINCode, kSpake2p_Iteration_Count, reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt),
-                                strlen(kSpake2pKeyExchangeSalt), nodeId, mNextKeyId++, this);
+    return mPairingSession.Pair(setupPINCode, kSpake2p_Iteration_Count,
+                                reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt),
+                                nodeId, mNextKeyId++, this);
 }
 
 void RendezvousSession::SendIPAddress(const IPAddress & addr)

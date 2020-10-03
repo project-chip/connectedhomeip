@@ -215,8 +215,9 @@ IPAddress IPAddress::FromIPv6(const struct in6_addr & ipv6Addr)
                            (static_cast<uint32_t>(ipv6Addr.s6_addr[6])) << 8 | (static_cast<uint32_t>(ipv6Addr.s6_addr[7])));
     ipAddr.Addr[2] = htonl((static_cast<uint32_t>(ipv6Addr.s6_addr[8])) << 24 | (static_cast<uint32_t>(ipv6Addr.s6_addr[9])) << 16 |
                            (static_cast<uint32_t>(ipv6Addr.s6_addr[10])) << 8 | (static_cast<uint32_t>(ipv6Addr.s6_addr[11])));
-    ipAddr.Addr[3] = htonl((static_cast<uint32_t>(ipv6Addr.s6_addr[12])) << 24 | (static_cast<uint32_t>(ipv6Addr.s6_addr[13])) << 16 |
-                           (static_cast<uint32_t>(ipv6Addr.s6_addr[14])) << 8 | (static_cast<uint32_t>(ipv6Addr.s6_addr[15])));
+    ipAddr.Addr[3] =
+        htonl((static_cast<uint32_t>(ipv6Addr.s6_addr[12])) << 24 | (static_cast<uint32_t>(ipv6Addr.s6_addr[13])) << 16 |
+              (static_cast<uint32_t>(ipv6Addr.s6_addr[14])) << 8 | (static_cast<uint32_t>(ipv6Addr.s6_addr[15])));
     return ipAddr;
 }
 
@@ -309,7 +310,8 @@ uint16_t IPAddress::Subnet() const
 uint64_t IPAddress::GlobalId() const
 {
     if (IsIPv6ULA())
-        return ((static_cast<uint64_t>(ntohl(Addr[0]) & 0xFFFFFF)) << 16) | (static_cast<uint64_t>(ntohl(Addr[1])) & 0xFFFF0000) >> 16;
+        return ((static_cast<uint64_t>(ntohl(Addr[0]) & 0xFFFFFF)) << 16) |
+            (static_cast<uint64_t>(ntohl(Addr[1])) & 0xFFFF0000) >> 16;
     return 0;
 }
 

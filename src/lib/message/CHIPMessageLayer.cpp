@@ -964,16 +964,20 @@ CHIP_ERROR ChipMessageLayer::SelectDestNodeIdAndAddress(uint64_t & destNodeId, I
 static uint16_t EncodeHeaderField(const ChipMessageInfo * msgInfo)
 {
     return (((static_cast<uint16_t>(msgInfo->Flags)) << kMsgHeaderField_FlagsShift) & kMsgHeaderField_FlagsMask) |
-        (((static_cast<uint16_t>(msgInfo->EncryptionType)) << kMsgHeaderField_EncryptionTypeShift) & kMsgHeaderField_EncryptionTypeMask) |
-        (((static_cast<uint16_t>(msgInfo->MessageVersion)) << kMsgHeaderField_MessageVersionShift) & kMsgHeaderField_MessageVersionMask);
+        (((static_cast<uint16_t>(msgInfo->EncryptionType)) << kMsgHeaderField_EncryptionTypeShift) &
+         kMsgHeaderField_EncryptionTypeMask) |
+        (((static_cast<uint16_t>(msgInfo->MessageVersion)) << kMsgHeaderField_MessageVersionShift) &
+         kMsgHeaderField_MessageVersionMask);
 }
 
 // Decode message header field value.
 static void DecodeHeaderField(const uint16_t headerField, ChipMessageInfo * msgInfo)
 {
-    msgInfo->Flags          = static_cast<uint16_t>((headerField & kMsgHeaderField_FlagsMask) >> kMsgHeaderField_FlagsShift);
-    msgInfo->EncryptionType = static_cast<uint8_t>((headerField & kMsgHeaderField_EncryptionTypeMask) >> kMsgHeaderField_EncryptionTypeShift);
-    msgInfo->MessageVersion = static_cast<uint8_t>((headerField & kMsgHeaderField_MessageVersionMask) >> kMsgHeaderField_MessageVersionShift);
+    msgInfo->Flags = static_cast<uint16_t>((headerField & kMsgHeaderField_FlagsMask) >> kMsgHeaderField_FlagsShift);
+    msgInfo->EncryptionType =
+        static_cast<uint8_t>((headerField & kMsgHeaderField_EncryptionTypeMask) >> kMsgHeaderField_EncryptionTypeShift);
+    msgInfo->MessageVersion =
+        static_cast<uint8_t>((headerField & kMsgHeaderField_MessageVersionMask) >> kMsgHeaderField_MessageVersionShift);
 }
 
 /**

@@ -252,8 +252,8 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
         err = intIterator.GetInterfaceName(intName, sizeof(intName));
         NL_TEST_ASSERT(inSuite, err == INET_NO_ERROR);
         printf("     interface id: 0x%" PRIxPTR ", interface name: %s, interface state: %s, %s multicast, %s broadcast addr\n",
-               static_cast<uintptr_t>(intId), intName, intIterator.IsUp() ? "UP" : "DOWN", intIterator.SupportsMulticast() ? "supports" : "no",
-               intIterator.HasBroadcastAddress() ? "has" : "no");
+               static_cast<uintptr_t>(intId), intName, intIterator.IsUp() ? "UP" : "DOWN",
+               intIterator.SupportsMulticast() ? "supports" : "no", intIterator.HasBroadcastAddress() ? "has" : "no");
 
         gInet.GetLinkLocalAddr(intId, &addr);
         gInet.MatchLocalIPv6Subnet(addr);

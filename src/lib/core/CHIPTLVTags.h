@@ -94,7 +94,8 @@ inline uint64_t ProfileTag(uint32_t profileId, uint32_t tagNum)
  */
 inline uint64_t ProfileTag(uint16_t vendorId, uint16_t profileNum, uint32_t tagNum)
 {
-    return ((static_cast<uint64_t>(vendorId)) << kVendorIdShift) | ((static_cast<uint64_t>(profileNum)) << kProfileNumShift) | tagNum;
+    return ((static_cast<uint64_t>(vendorId)) << kVendorIdShift) | ((static_cast<uint64_t>(profileNum)) << kProfileNumShift) |
+        tagNum;
 }
 
 /**

@@ -437,8 +437,8 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
     g_io_channel_set_buffered(channel, FALSE);
 
     conn->mC1Channel.mpChannel = channel;
-    conn->mC1Channel.mWatch =
-        g_io_add_watch(channel, static_cast<GIOCondition>(G_IO_HUP | G_IO_IN | G_IO_ERR | G_IO_NVAL), BluezCharacteristicWriteFD, conn);
+    conn->mC1Channel.mWatch    = g_io_add_watch(channel, static_cast<GIOCondition>(G_IO_HUP | G_IO_IN | G_IO_ERR | G_IO_NVAL),
+                                             BluezCharacteristicWriteFD, conn);
 
     bluez_gatt_characteristic1_set_write_acquired(aChar, TRUE);
 
@@ -499,8 +499,9 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
     g_io_channel_set_close_on_unref(channel, TRUE);
     g_io_channel_set_buffered(channel, FALSE);
     conn->mC2Channel.mpChannel = channel;
-    conn->mC2Channel.mWatch = g_io_add_watch_full(channel, G_PRIORITY_DEFAULT_IDLE, static_cast<GIOCondition>(G_IO_HUP | G_IO_ERR | G_IO_NVAL),
-                                                  bluezCharacteristicDestroyFD, conn, nullptr);
+    conn->mC2Channel.mWatch =
+        g_io_add_watch_full(channel, G_PRIORITY_DEFAULT_IDLE, static_cast<GIOCondition>(G_IO_HUP | G_IO_ERR | G_IO_NVAL),
+                            bluezCharacteristicDestroyFD, conn, nullptr);
 
     bluez_gatt_characteristic1_set_notify_acquired(aChar, TRUE);
 
@@ -1058,7 +1059,8 @@ static void BluezHandleNewDevice(BluezDevice1 * device, BluezEndpoint * apEndpoi
         BluezConnection * conn;
         SuccessOrExit(bluez_device1_get_connected(device));
 
-        conn = static_cast<BluezConnection *>(g_hash_table_lookup(apEndpoint->mpConnMap, g_dbus_proxy_get_object_path(G_DBUS_PROXY(device))));
+        conn = static_cast<BluezConnection *>(
+            g_hash_table_lookup(apEndpoint->mpConnMap, g_dbus_proxy_get_object_path(G_DBUS_PROXY(device))));
         VerifyOrExit(conn == nullptr,
                      ChipLogProgress(DeviceLayer, "FAIL: connection already tracked: conn: %x new device: %s", conn,
                                      g_dbus_proxy_get_object_path(G_DBUS_PROXY(device))));
@@ -1183,7 +1185,8 @@ exit:
 
 static BluezConnection * GetBluezConnectionViaDevice(BluezEndpoint * apEndpoint)
 {
-    BluezConnection * retval = static_cast<BluezConnection *>(g_hash_table_lookup(apEndpoint->mpConnMap, apEndpoint->mpPeerDevicePath));
+    BluezConnection * retval =
+        static_cast<BluezConnection *>(g_hash_table_lookup(apEndpoint->mpConnMap, apEndpoint->mpPeerDevicePath));
     // ChipLogProgress(DeviceLayer, "acquire connection object %p in (%s)", retval, __func__);
     return retval;
 }

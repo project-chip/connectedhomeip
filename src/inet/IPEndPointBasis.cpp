@@ -872,7 +872,7 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
             controlHdr->cmsg_type  = IP_PKTINFO;
             controlHdr->cmsg_len   = CMSG_LEN(sizeof(in_pktinfo));
 
-            struct in_pktinfo * pktInfo = reinterpret_cast<struct in_pktinfo *>CMSG_DATA(controlHdr);
+            struct in_pktinfo * pktInfo = reinterpret_cast<struct in_pktinfo *> CMSG_DATA(controlHdr);
             if (!CanCastTo<decltype(pktInfo->ipi_ifindex)>(intfId))
             {
                 ExitNow(res = INET_ERROR_NOT_SUPPORTED);
@@ -896,7 +896,7 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
             controlHdr->cmsg_type  = IPV6_PKTINFO;
             controlHdr->cmsg_len   = CMSG_LEN(sizeof(in6_pktinfo));
 
-            struct in6_pktinfo * pktInfo = reinterpret_cast<struct in6_pktinfo *>CMSG_DATA(controlHdr);
+            struct in6_pktinfo * pktInfo = reinterpret_cast<struct in6_pktinfo *> CMSG_DATA(controlHdr);
             if (!CanCastTo<decltype(pktInfo->ipi6_ifindex)>(intfId))
             {
                 ExitNow(res = INET_ERROR_UNEXPECTED_EVENT);
@@ -1124,7 +1124,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 #ifdef IP_PKTINFO
                 if (controlHdr->cmsg_level == IPPROTO_IP && controlHdr->cmsg_type == IP_PKTINFO)
                 {
-                    struct in_pktinfo * inPktInfo = reinterpret_cast<struct in_pktinfo *>CMSG_DATA(controlHdr);
+                    struct in_pktinfo * inPktInfo = reinterpret_cast<struct in_pktinfo *> CMSG_DATA(controlHdr);
                     if (!CanCastTo<InterfaceId>(inPktInfo->ipi_ifindex))
                     {
                         lStatus = INET_ERROR_INCORRECT_STATE;
@@ -1140,7 +1140,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 #ifdef IPV6_PKTINFO
                 if (controlHdr->cmsg_level == IPPROTO_IPV6 && controlHdr->cmsg_type == IPV6_PKTINFO)
                 {
-                    struct in6_pktinfo * in6PktInfo = reinterpret_cast<struct in6_pktinfo *>CMSG_DATA(controlHdr);
+                    struct in6_pktinfo * in6PktInfo = reinterpret_cast<struct in6_pktinfo *> CMSG_DATA(controlHdr);
                     if (!CanCastTo<InterfaceId>(in6PktInfo->ipi6_ifindex))
                     {
                         lStatus = INET_ERROR_INCORRECT_STATE;
