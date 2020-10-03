@@ -137,7 +137,7 @@ static void onMessageReceived(
 }
 
 static void onInternalError(chip::DeviceController::ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR error,
-    const chip::IPPacketInfo * pi)
+    const chip::Inet::IPPacketInfo * pi)
 {
     CHIPDeviceController * controller = (__bridge CHIPDeviceController *) appReqState;
     [controller _dispatchAsyncErrorBlock:[CHIPError errorForCHIPErrorCode:error]];
@@ -264,7 +264,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     [self.lock lock];
     err = self.cppController->PopulatePeerAddress(peerAddr);
     [self.lock unlock];
-    chip::IPAddress ipAddr = peerAddr.GetIPAddress();
+    chip::Inet::IPAddress ipAddr = peerAddr.GetIPAddress();
     uint16_t port = peerAddr.GetPort();
 
     if (err != CHIP_NO_ERROR) {

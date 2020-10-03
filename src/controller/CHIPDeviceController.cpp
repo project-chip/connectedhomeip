@@ -67,6 +67,7 @@ ChipDeviceController::ChipDeviceController()
     mCurReqMsg         = nullptr;
     mOnError           = nullptr;
     mOnNewConnection   = nullptr;
+    mPairingDelegate   = nullptr;
     mDeviceAddr        = IPAddress::Any;
     mDevicePort        = CHIP_PORT;
     mLocalDeviceId     = 0;
@@ -101,6 +102,17 @@ CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, System::Layer * system
 
     mState         = kState_Initialized;
     mLocalDeviceId = localNodeId;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, DevicePairingDelegate * pairingDelegate)
+{
+    CHIP_ERROR err = Init(localNodeId);
+    SuccessOrExit(err);
+
+    mPairingDelegate = pairingDelegate;
 
 exit:
     return err;
@@ -401,27 +413,6 @@ void ChipDeviceController::OnMessageReceived(const PacketHeader & header, Transp
     }
 }
 
-void ChipDeviceController::OnRendezvousError(CHIP_ERROR err)
-{
-    if (mOnError)
-    {
-        mOnError(this, mAppReqState, err, nullptr);
-    }
-}
-
-void ChipDeviceController::OnRendezvousConnectionOpened()
-{
-    mPairingSession = mRendezvousSession->GetPairingSession();
-    mConState       = kConnectionState_SecureConnected;
-
-    if (mOnNewConnection)
-    {
-        mOnNewConnection(this, nullptr, mAppReqState);
-    }
-}
-
-void ChipDeviceController::OnRendezvousConnectionClosed() {}
-
 void ChipDeviceController::OnRendezvousMessageReceived(PacketBuffer * buffer)
 {
     if (mOnComplete.Response)
@@ -430,13 +421,40 @@ void ChipDeviceController::OnRendezvousMessageReceived(PacketBuffer * buffer)
     }
 }
 
-void ChipDeviceController::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status)
+void ChipDeviceController::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err)
 {
-    if (status == RendezvousSessionDelegate::NetworkProvisioningSuccess)
+    if (mOnError != nullptr && err != CHIP_NO_ERROR)
     {
+        mOnError(this, mAppReqState, err, nullptr);
+    }
+
+    switch (status)
+    {
+    case RendezvousSessionDelegate::SecurePairingSuccess:
+        ChipLogProgress(Controller, "Remote device completed SPAKE2+ handshake\n");
+        mPairingSession = mRendezvousSession->GetPairingSession();
+        mConState       = kConnectionState_SecureConnected;
+
+        if (mOnNewConnection)
+        {
+            mOnNewConnection(this, nullptr, mAppReqState);
+        }
+
+        if (mPairingDelegate != nullptr)
+        {
+            mPairingDelegate->OnNetworkCredentialsRequested(mRendezvousSession);
+        }
+        break;
+
+    case RendezvousSessionDelegate::NetworkProvisioningSuccess:
+
         ChipLogProgress(Controller, "Remote device was assigned an ip address\n");
         mDeviceAddr = mRendezvousSession->GetIPAddress();
-    }
+        break;
+
+    default:
+        break;
+    };
 }
 
 } // namespace DeviceController
