@@ -59,6 +59,8 @@ public:
      * @brief
      *   Called when network provisioning generates a new message that should be sent to peer.
      *
+     * @param protocol Protocol ID for the message
+     * @param msgType Message type
      * @param msgBuf the new message that should be sent to the peer
      * @return CHIP_ERROR Error thrown when sending the message
      */
