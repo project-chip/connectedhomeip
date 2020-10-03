@@ -250,7 +250,7 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobDataAndLengths(const char * key,
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    encodedDataLen                    = value.copy(encodedData, len);
+    encodedDataLen              = value.copy(encodedData, len);
     encodedData[encodedDataLen] = '\0';
 
     // Check if encoded data was padded. Only "=" or "==" padding combinations are allowed.

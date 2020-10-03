@@ -135,12 +135,12 @@ public:
     static_assert(std::is_trivial<T>::value, "Constructors won't get run");
 
     inline T * Ptr() { return static_cast<T *>(Base::Ptr()); }
-    inline operator T*() { return Ptr(); }
-    inline T& operator[](size_t index) { return Ptr()[index]; }
+    inline operator T *() { return Ptr(); }
+    inline T & operator[](size_t index) { return Ptr()[index]; }
 
     inline const T * Ptr() const { return static_cast<T *>(Base::Ptr()); }
-    inline operator const T*() const { return Ptr(); }
-    inline const T& operator[](size_t index) const { return Ptr()[index]; }
+    inline operator const T *() const { return Ptr(); }
+    inline const T & operator[](size_t index) const { return Ptr()[index]; }
 
     inline T * Release() { return static_cast<T *>(Base::Release()); }
 
