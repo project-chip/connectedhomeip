@@ -140,7 +140,7 @@ inline void Put8(uint8_t * p, uint8_t v)
  */
 inline uint8_t Read8(uint8_t *& p)
 {
-    return nl::IO::Read8((const void *&) p);
+    return nl::IO::Read8(const_cast<const void *&>(reinterpret_cast<void *&>(p)));
 }
 
 /**
@@ -156,7 +156,7 @@ inline uint8_t Read8(uint8_t *& p)
  */
 inline uint8_t Read8(const uint8_t *& p)
 {
-    return nl::IO::Read8((const void *&) p);
+    return nl::IO::Read8(reinterpret_cast<const void *&>(p));
 }
 
 /**
@@ -375,7 +375,7 @@ inline void Put64(uint8_t * p, uint64_t v)
  */
 inline uint16_t Read16(uint8_t *& p)
 {
-    return nl::IO::LittleEndian::ReadUnaligned16((const void *&) p);
+    return nl::IO::LittleEndian::ReadUnaligned16(const_cast<const void *&>(reinterpret_cast<void *&>(p)));
 }
 
 /**
@@ -395,7 +395,7 @@ inline uint16_t Read16(uint8_t *& p)
  */
 inline uint32_t Read32(uint8_t *& p)
 {
-    return nl::IO::LittleEndian::ReadUnaligned32((const void *&) p);
+    return nl::IO::LittleEndian::ReadUnaligned32(const_cast<const void *&>(reinterpret_cast<void *&>(p)));
 }
 
 /**
@@ -415,7 +415,7 @@ inline uint32_t Read32(uint8_t *& p)
  */
 inline uint64_t Read64(uint8_t *& p)
 {
-    return nl::IO::LittleEndian::ReadUnaligned64((const void *&) p);
+    return nl::IO::LittleEndian::ReadUnaligned64(const_cast<const void *&>(reinterpret_cast<void *&>(p)));
 }
 
 /**
@@ -435,7 +435,7 @@ inline uint64_t Read64(uint8_t *& p)
  */
 inline uint16_t Read16(const uint8_t *& p)
 {
-    return nl::IO::LittleEndian::ReadUnaligned16((const void *&) p);
+    return nl::IO::LittleEndian::ReadUnaligned16(reinterpret_cast<const void *&>(p));
 }
 
 /**
@@ -455,7 +455,7 @@ inline uint16_t Read16(const uint8_t *& p)
  */
 inline uint32_t Read32(const uint8_t *& p)
 {
-    return nl::IO::LittleEndian::ReadUnaligned32((const void *&) p);
+    return nl::IO::LittleEndian::ReadUnaligned32(reinterpret_cast<const void *&>(p));
 }
 
 /**
@@ -475,7 +475,7 @@ inline uint32_t Read32(const uint8_t *& p)
  */
 inline uint64_t Read64(const uint8_t *& p)
 {
-    return nl::IO::LittleEndian::ReadUnaligned64((const void *&) p);
+    return nl::IO::LittleEndian::ReadUnaligned64(reinterpret_cast<const void *&>(p));
 }
 
 /**
@@ -748,7 +748,7 @@ inline void Put64(uint8_t * p, uint64_t v)
  */
 inline uint16_t Read16(uint8_t *& p)
 {
-    return nl::IO::BigEndian::ReadUnaligned16((const void *&) p);
+    return nl::IO::BigEndian::ReadUnaligned16(const_cast<const void *&>(reinterpret_cast<void *&>(p)));
 }
 
 /**
@@ -768,7 +768,7 @@ inline uint16_t Read16(uint8_t *& p)
  */
 inline uint32_t Read32(uint8_t *& p)
 {
-    return nl::IO::BigEndian::ReadUnaligned32((const void *&) p);
+    return nl::IO::BigEndian::ReadUnaligned32(const_cast<const void *&>(reinterpret_cast<void *&>(p)));
 }
 
 /**
@@ -788,7 +788,7 @@ inline uint32_t Read32(uint8_t *& p)
  */
 inline uint64_t Read64(uint8_t *& p)
 {
-    return nl::IO::BigEndian::ReadUnaligned64((const void *&) p);
+    return nl::IO::BigEndian::ReadUnaligned64(const_cast<const void *&>(reinterpret_cast<void *&>(p)));
 }
 
 /**
@@ -808,7 +808,7 @@ inline uint64_t Read64(uint8_t *& p)
  */
 inline uint16_t Read16(const uint8_t *& p)
 {
-    return nl::IO::BigEndian::ReadUnaligned16((const void *&) p);
+    return nl::IO::BigEndian::ReadUnaligned16(reinterpret_cast<const void *&>(p));
 }
 
 /**
@@ -828,7 +828,7 @@ inline uint16_t Read16(const uint8_t *& p)
  */
 inline uint32_t Read32(const uint8_t *& p)
 {
-    return nl::IO::BigEndian::ReadUnaligned32((const void *&) p);
+    return nl::IO::BigEndian::ReadUnaligned32(reinterpret_cast<const void *&>(p));
 }
 
 /**
@@ -848,7 +848,7 @@ inline uint32_t Read32(const uint8_t *& p)
  */
 inline uint64_t Read64(const uint8_t *& p)
 {
-    return nl::IO::BigEndian::ReadUnaligned64((const void *&) p);
+    return nl::IO::BigEndian::ReadUnaligned64(reinterpret_cast<const void *&>(p));
 }
 
 /**

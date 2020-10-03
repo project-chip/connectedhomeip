@@ -177,7 +177,7 @@ static CHIP_ERROR ConfigGetDeviceCert(bool printHeader)
         streamer_printf(sout, "DeviceCert:      ");
     }
     // Determine the length of the device certificate.
-    error = ConfigurationMgr().GetDeviceCertificate((uint8_t *) nullptr, 0, certLen);
+    error = ConfigurationMgr().GetDeviceCertificate(nullptr, 0, certLen);
     SuccessOrExit(error);
 
     // Fail if no certificate has been configured.
@@ -213,7 +213,7 @@ static CHIP_ERROR ConfigGetDeviceCaCerts(bool printHeader)
         streamer_printf(sout, "DeviceCaCerts:   ");
     }
     // Determine the length of the device certificate.
-    error = ConfigurationMgr().GetDeviceIntermediateCACerts((uint8_t *) nullptr, 0, certLen);
+    error = ConfigurationMgr().GetDeviceIntermediateCACerts(nullptr, 0, certLen);
     SuccessOrExit(error);
 
     // Fail if no certificate has been configured.
@@ -266,7 +266,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCert(bool printHeader)
         streamer_printf(sout, "MfrDeviceCert:   ");
     }
     // Determine the length of the device certificate.
-    error = ConfigurationMgr().GetManufacturerDeviceCertificate((uint8_t *) nullptr, 0, certLen);
+    error = ConfigurationMgr().GetManufacturerDeviceCertificate(nullptr, 0, certLen);
     SuccessOrExit(error);
 
     // Fail if no certificate has been configured.
@@ -302,7 +302,7 @@ static CHIP_ERROR ConfigGetManufacturerDeviceCaCerts(bool printHeader)
         streamer_printf(sout, "MfgDeviceCaCerts:");
     }
     // Determine the length of the device certificate.
-    error = ConfigurationMgr().GetManufacturerDeviceIntermediateCACerts((uint8_t *) nullptr, 0, certLen);
+    error = ConfigurationMgr().GetManufacturerDeviceIntermediateCACerts(nullptr, 0, certLen);
     SuccessOrExit(error);
 
     // Fail if no certificate has been configured.

@@ -149,7 +149,7 @@ lwip_ip_addr_type IPAddress::ToLwIPAddrType(IPAddressType typ)
 #if INET_CONFIG_ENABLE_IPV4
 ip4_addr_t IPAddress::ToIPv4() const
 {
-    return *(ip4_addr_t *) &Addr[3];
+    return *reinterpret_cast<const ip4_addr_t *>(&Addr[3]);
 }
 
 IPAddress IPAddress::FromIPv4(const ip4_addr_t & ipv4Addr)
@@ -203,7 +203,10 @@ IPAddress IPAddress::FromIPv4(const struct in_addr & ipv4Addr)
 
 struct in6_addr IPAddress::ToIPv6() const
 {
-    return *(struct in6_addr *) &Addr;
+    in6_addr addr;
+    static_assert(sizeof(addr) == sizeof(Addr), "in6_addr size mismatch");
+    memcpy(&addr, Addr, sizeof(addr));
+    return addr;
 }
 
 IPAddress IPAddress::FromIPv6(const struct in6_addr & ipv6Addr)
@@ -225,10 +228,10 @@ IPAddress IPAddress::FromSockAddr(const struct sockaddr & sockaddr)
 {
 #if INET_CONFIG_ENABLE_IPV4
     if (sockaddr.sa_family == AF_INET)
-        return FromIPv4(((sockaddr_in *) &sockaddr)->sin_addr);
+        return FromIPv4(reinterpret_cast<const sockaddr_in *>(&sockaddr)->sin_addr);
 #endif // INET_CONFIG_ENABLE_IPV4
     if (sockaddr.sa_family == AF_INET6)
-        return FromIPv6(((sockaddr_in6 *) &sockaddr)->sin6_addr);
+        return FromIPv6(reinterpret_cast<const sockaddr_in6 *>(&sockaddr)->sin6_addr);
     return Any;
 }
 

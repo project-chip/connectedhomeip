@@ -969,11 +969,11 @@ INET_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
         // logic up to check for implementations of these options and
         // to provide appropriate HAVE_xxxxx definitions accordingly.
 
-        res = setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, (void *) &one, sizeof(one));
+        res = setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const void *>(&one), sizeof(one));
         static_cast<void>(res);
 
 #ifdef SO_REUSEPORT
-        res = setsockopt(mSocket, SOL_SOCKET, SO_REUSEPORT, (void *) &one, sizeof(one));
+        res = setsockopt(mSocket, SOL_SOCKET, SO_REUSEPORT, reinterpret_cast<const void *>(&one), sizeof(one));
         if (res != 0)
         {
             ChipLogError(Inet, "SO_REUSEPORT failed: %d", errno);
@@ -987,7 +987,7 @@ INET_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
 #ifdef IPV6_V6ONLY
         if (aAddressType == kIPAddressType_IPv6)
         {
-            res = setsockopt(mSocket, IPPROTO_IPV6, IPV6_V6ONLY, (void *) &one, sizeof(one));
+            res = setsockopt(mSocket, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const void *>(&one), sizeof(one));
             if (res != 0)
             {
                 ChipLogError(Inet, "IPV6_V6ONLY failed: %d", errno);
@@ -999,7 +999,7 @@ INET_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
 #ifdef IP_PKTINFO
         if (aAddressType == kIPAddressType_IPv4)
         {
-            res = setsockopt(mSocket, IPPROTO_IP, IP_PKTINFO, (void *) &one, sizeof(one));
+            res = setsockopt(mSocket, IPPROTO_IP, IP_PKTINFO, reinterpret_cast<const void *>(&one), sizeof(one));
             if (res != 0)
             {
                 ChipLogError(Inet, "IP_PKTINFO failed: %d", errno);
@@ -1011,7 +1011,7 @@ INET_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
 #ifdef IPV6_RECVPKTINFO
         if (aAddressType == kIPAddressType_IPv6)
         {
-            res = setsockopt(mSocket, IPPROTO_IPV6, IPV6_RECVPKTINFO, (void *) &one, sizeof(one));
+            res = setsockopt(mSocket, IPPROTO_IPV6, IPV6_RECVPKTINFO, reinterpret_cast<const void *>(&one), sizeof(one));
             if (res != 0)
             {
                 ChipLogError(Inet, "IPV6_PKTINFO failed: %d", errno);

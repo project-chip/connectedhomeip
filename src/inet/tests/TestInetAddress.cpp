@@ -1234,7 +1234,7 @@ void CheckFromSocket(nlTestSuite * inSuite, void * inContext)
             memset(&sock_v4, 0, sizeof(struct sockaddr_in));
             sock_v4.sin_family = AF_INET;
             memcpy(&sock_v4.sin_addr.s_addr, &addr[3], sizeof(struct in_addr));
-            test_addr_2 = IPAddress::FromSockAddr((struct sockaddr &) sock_v4);
+            test_addr_2 = IPAddress::FromSockAddr(reinterpret_cast<struct sockaddr &>(sock_v4));
             break;
 #endif // INET_CONFIG_ENABLE_IPV4
 
@@ -1242,14 +1242,14 @@ void CheckFromSocket(nlTestSuite * inSuite, void * inContext)
             memset(&sock_v6, 0, sizeof(struct sockaddr_in6));
             sock_v6.sin6_family = AF_INET6;
             memcpy(&sock_v6.sin6_addr.s6_addr, addr, sizeof(struct in6_addr));
-            test_addr_2 = IPAddress::FromSockAddr((struct sockaddr &) sock_v6);
+            test_addr_2 = IPAddress::FromSockAddr(reinterpret_cast<struct sockaddr &>(sock_v6));
             break;
 
         case kIPAddressType_Any:
             memset(&sock_v6, 0, sizeof(struct sockaddr_in6));
             sock_v6.sin6_family = 0;
             memcpy(&sock_v6.sin6_addr.s6_addr, addr, sizeof(struct in6_addr));
-            test_addr_2 = IPAddress::FromSockAddr((struct sockaddr &) sock_v6);
+            test_addr_2 = IPAddress::FromSockAddr(reinterpret_cast<struct sockaddr &>(sock_v6));
             break;
 
         default:

@@ -92,9 +92,6 @@ public:
 
 public:
     // Public functions:
-    BtpEngine() {}
-    ~BtpEngine() {}
-
     BLE_ERROR Init(void * an_app_state, bool expect_first_ack);
 
     inline void SetTxFragmentSize(uint8_t size) { mTxFragmentSize = size; }

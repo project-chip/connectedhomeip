@@ -56,7 +56,7 @@ private:
     CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
-    BleLayer * _GetBleLayer(void) const;
+    BleLayer * _GetBleLayer(void);
 
     // ===== Members for internal use by the following friends.
 

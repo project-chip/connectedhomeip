@@ -65,7 +65,7 @@ public:
     CHIP_ERROR SetDeviceName(const char * deviceName);
     uint16_t NumConnections();
     void OnPlatformEvent(const ChipDeviceEvent * event);
-    chip::Ble::BleLayer * GetBleLayer() const;
+    chip::Ble::BleLayer * GetBleLayer();
 
 protected:
     // Construction/destruction limited to subclasses.
@@ -171,9 +171,9 @@ inline void BLEManager::OnPlatformEvent(const ChipDeviceEvent * event)
     return static_cast<ImplClass *>(this)->_OnPlatformEvent(event);
 }
 
-inline chip::Ble::BleLayer * BLEManager::GetBleLayer() const
+inline chip::Ble::BleLayer * BLEManager::GetBleLayer()
 {
-    return static_cast<const ImplClass *>(this)->_GetBleLayer();
+    return static_cast<ImplClass *>(this)->_GetBleLayer();
 }
 
 } // namespace Internal

@@ -290,7 +290,7 @@ ExchangeContext * ChipExchangeManager::NewContext(ChipConnection * con, void * a
  */
 ExchangeContext * ChipExchangeManager::FindContext(uint64_t peerNodeId, ChipConnection * con, void * appState, bool isInitiator)
 {
-    ExchangeContext * ec = (ExchangeContext *) ContextPool;
+    ExchangeContext * ec = ContextPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
         if (ec->ExchangeMgr != nullptr && ec->PeerNodeId == peerNodeId && ec->Con == con && ec->AppState == appState &&
             ec->IsInitiator() == isInitiator)
@@ -507,14 +507,14 @@ void ChipExchangeManager::HandleConnectionClosed(ChipConnection * con, CHIP_ERRO
         BindingPool[i].OnConnectionClosed(con, conErr);
     }
 
-    ExchangeContext * ec = (ExchangeContext *) ContextPool;
+    ExchangeContext * ec = ContextPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
         if (ec->ExchangeMgr != nullptr && ec->Con == con)
         {
             ec->HandleConnectionClosed(conErr);
         }
 
-    UnsolicitedMessageHandler * umh = (UnsolicitedMessageHandler *) UMHandlerPool;
+    UnsolicitedMessageHandler * umh = UMHandlerPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
         if (umh->Handler != nullptr && umh->Con == con)
         {
@@ -533,7 +533,7 @@ void ChipExchangeManager::HandleConnectionClosed(ChipConnection * con, CHIP_ERRO
 size_t ChipExchangeManager::ExpireExchangeTimers()
 {
     size_t retval        = 0;
-    ExchangeContext * ec = (ExchangeContext *) ContextPool;
+    ExchangeContext * ec = ContextPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
         if (ec->ExchangeMgr != nullptr)
@@ -553,7 +553,7 @@ size_t ChipExchangeManager::ExpireExchangeTimers()
 
 ExchangeContext * ChipExchangeManager::AllocContext()
 {
-    ExchangeContext * ec = (ExchangeContext *) ContextPool;
+    ExchangeContext * ec = ContextPool;
 
     CHIP_FAULT_INJECT(FaultInjection::kFault_AllocExchangeContext, return nullptr);
 
@@ -716,7 +716,7 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
     } // If delayed delivery Msg
 
     // Search for an existing exchange that the message applies to. If a match is found...
-    ec = (ExchangeContext *) ContextPool;
+    ec = ContextPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
         if (ec->ExchangeMgr != nullptr && ec->MatchExchange(msgCon, msgInfo, &exchangeHeader))
@@ -748,7 +748,7 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
     {
         // Search for an unsolicited message handler that can handle the message. Prefer handlers that can explicitly
         // handle the message type over handlers that handle all messages for a profile.
-        umh = (UnsolicitedMessageHandler *) UMHandlerPool;
+        umh = UMHandlerPool;
 
         matchingUMH = nullptr;
 
@@ -895,7 +895,7 @@ exit:
 CHIP_ERROR ChipExchangeManager::RegisterUMH(uint32_t profileId, int16_t msgType, ChipConnection * con, bool allowDups,
                                             ExchangeContext::MessageReceiveFunct handler, void * appState)
 {
-    UnsolicitedMessageHandler * umh      = (UnsolicitedMessageHandler *) UMHandlerPool;
+    UnsolicitedMessageHandler * umh      = UMHandlerPool;
     UnsolicitedMessageHandler * selected = nullptr;
     for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
     {
@@ -929,7 +929,7 @@ CHIP_ERROR ChipExchangeManager::RegisterUMH(uint32_t profileId, int16_t msgType,
 
 CHIP_ERROR ChipExchangeManager::UnregisterUMH(uint32_t profileId, int16_t msgType, ChipConnection * con)
 {
-    UnsolicitedMessageHandler * umh = (UnsolicitedMessageHandler *) UMHandlerPool;
+    UnsolicitedMessageHandler * umh = UMHandlerPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
     {
         if (umh->Handler != nullptr && umh->ProfileId == profileId && umh->MessageType == msgType && umh->Con == con)
@@ -1078,7 +1078,7 @@ void ChipExchangeManager::AllowUnsolicitedMessages(ChipConnection * con)
  */
 void ChipExchangeManager::NotifyKeyFailed(uint64_t peerNodeId, uint16_t keyId, CHIP_ERROR keyErr)
 {
-    ExchangeContext * ec = (ExchangeContext *) ContextPool;
+    ExchangeContext * ec = ContextPool;
 
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
@@ -1128,7 +1128,7 @@ void ChipExchangeManager::NotifySecurityManagerAvailable()
  */
 void ChipExchangeManager::ClearMsgCounterSyncReq(uint64_t peerNodeId)
 {
-    RetransTableEntry * re = (RetransTableEntry *) RetransTable;
+    RetransTableEntry * re = RetransTable;
 
     // Find all retransmit entries (re) matching peerNodeId and using application group key.
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++, re++)
@@ -1153,7 +1153,7 @@ void ChipExchangeManager::ClearMsgCounterSyncReq(uint64_t peerNodeId)
  */
 void ChipExchangeManager::RetransPendingAppGroupMsgs(uint64_t peerNodeId)
 {
-    RetransTableEntry * re = (RetransTableEntry *) RetransTable;
+    RetransTableEntry * re = RetransTable;
 
     // Find all retransmit entries (re) matching peerNodeId and using application group key.
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++, re++)
@@ -1233,7 +1233,7 @@ void ChipExchangeManager::RMPExecuteActions()
     ExchangeContext * ec = nullptr;
 
     // Process Ack Tables for all ExchangeContexts
-    ec = (ExchangeContext *) ContextPool;
+    ec = ContextPool;
 
 #if defined(RMP_TICKLESS_DEBUG)
     ChipLogProgress(ExchangeManager, "RMPExecuteActions");
@@ -1329,7 +1329,7 @@ void ChipExchangeManager::RMPExpireTicks()
     uint32_t deltaTicks;
 
     // Process Ack Tables for all ExchangeContexts
-    ec = (ExchangeContext *) ContextPool;
+    ec = ContextPool;
 
     now = System::Timer::GetCurrentEpoch();
 
@@ -1666,7 +1666,7 @@ void ChipExchangeManager::RMPStartTimer()
     ExchangeContext * ec  = nullptr;
 
     // When do we need to next wake up to send an ACK?
-    ec = (ExchangeContext *) ContextPool;
+    ec = ContextPool;
 
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {

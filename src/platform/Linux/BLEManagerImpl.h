@@ -124,7 +124,7 @@ private:
 
     void _OnPlatformEvent(const ChipDeviceEvent * event);
     void HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * event);
-    BleLayer * _GetBleLayer() const;
+    BleLayer * _GetBleLayer();
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
@@ -218,9 +218,9 @@ inline BLEManagerImpl & BLEMgrImpl()
     return BLEManagerImpl::sInstance;
 }
 
-inline Ble::BleLayer * BLEManagerImpl::_GetBleLayer() const
+inline Ble::BleLayer * BLEManagerImpl::_GetBleLayer()
 {
-    return (Ble::BleLayer *) (this);
+    return this;
 }
 
 inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode()

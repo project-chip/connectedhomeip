@@ -172,7 +172,7 @@ CHIP_ERROR TLVUpdater::Init(TLVReader & aReader, uint32_t freeLen)
 
     // Clear the input reader object before returning. The user can no longer
     // use the original TLVReader object anymore.
-    aReader.Init((const uint8_t *) nullptr, 0);
+    aReader.Init(static_cast<const uint8_t *>(nullptr), 0);
 
 exit:
     return err;

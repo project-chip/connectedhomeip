@@ -239,7 +239,8 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
 
     // Pass in expected tag
     VerifyOrExit(CanCastTo<int>(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
-    result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_SET_TAG, static_cast<int>(tag_length), (void *) tag);
+    result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_SET_TAG, static_cast<int>(tag_length),
+                                 const_cast<void *>(reinterpret_cast<const void *>(tag)));
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in key + iv
@@ -902,7 +903,7 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     const uint8_t * privkey = Uint8::to_const_uchar(input) + mPublicKey.Length();
 
     VerifyOrExit(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
-    bbuf.Put((const uint8_t *) input, mPublicKey.Length());
+    bbuf.Put(input, mPublicKey.Length());
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
 
     nid = _nidForCurve(curve);
@@ -1062,7 +1063,7 @@ exit:
     {                                                                                                                              \
         if (_point_ != nullptr)                                                                                                    \
         {                                                                                                                          \
-            EC_POINT_clear_free((EC_POINT *) _point_);                                                                             \
+            EC_POINT_clear_free(static_cast<EC_POINT *>(_point_));                                                                 \
         }                                                                                                                          \
     } while (0)
 
@@ -1071,7 +1072,7 @@ exit:
     {                                                                                                                              \
         if (_bn_ != nullptr)                                                                                                       \
         {                                                                                                                          \
-            BN_clear_free((BIGNUM *) _bn_);                                                                                        \
+            BN_clear_free(static_cast<BIGNUM *>(_bn_));                                                                            \
         }                                                                                                                          \
     } while (0)
 
@@ -1102,7 +1103,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal()
     context->curve = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
     VerifyOrExit(context->curve != nullptr, error = CHIP_ERROR_INTERNAL);
 
-    G = (void *) EC_GROUP_get0_generator(context->curve);
+    G = const_cast<void *>(reinterpret_cast<const void *>(EC_GROUP_get0_generator(context->curve)));
     VerifyOrExit(G != nullptr, error = CHIP_ERROR_INTERNAL);
 
     context->bn_ctx = BN_CTX_secure_new();
@@ -1229,7 +1230,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEWrite(const void * fe, uint8_t * out
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     int bn_out_len;
     VerifyOrExit(CanCastTo<int>(out_len), error = CHIP_ERROR_INTERNAL);
-    bn_out_len = BN_bn2binpad((BIGNUM *) fe, Uint8::to_uchar(out), static_cast<int>(out_len));
+    bn_out_len = BN_bn2binpad(static_cast<const BIGNUM *>(fe), Uint8::to_uchar(out), static_cast<int>(out_len));
 
     VerifyOrExit(bn_out_len == static_cast<int>(out_len), error = CHIP_ERROR_INTERNAL);
 
@@ -1258,8 +1259,8 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEMul(void * fer, const void * fe1, co
 
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
-    error_openssl =
-        BN_mod_mul(static_cast<BIGNUM *>(fer), (BIGNUM *) fe1, (BIGNUM *) fe2, static_cast<BIGNUM *>(order), context->bn_ctx);
+    error_openssl = BN_mod_mul(static_cast<BIGNUM *>(fer), static_cast<const BIGNUM *>(fe1), static_cast<const BIGNUM *>(fe2),
+                               static_cast<BIGNUM *>(order), context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -1288,8 +1289,8 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointWrite(const void * R, uint8_t * o
     CHIP_ERROR error          = CHIP_ERROR_INTERNAL;
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
-    size_t ec_out_len = EC_POINT_point2oct(context->curve, (EC_POINT *) R, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(out),
-                                           out_len, context->bn_ctx);
+    size_t ec_out_len = EC_POINT_point2oct(context->curve, static_cast<const EC_POINT *>(R), POINT_CONVERSION_UNCOMPRESSED,
+                                           Uint8::to_uchar(out), out_len, context->bn_ctx);
     VerifyOrExit(ec_out_len == out_len, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -1304,8 +1305,8 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointMul(void * R, const void * P1, co
 
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
-    error_openssl =
-        EC_POINT_mul(context->curve, static_cast<EC_POINT *>(R), nullptr, (EC_POINT *) P1, (BIGNUM *) fe1, context->bn_ctx);
+    error_openssl = EC_POINT_mul(context->curve, static_cast<EC_POINT *>(R), nullptr, static_cast<const EC_POINT *>(P1),
+                                 static_cast<const BIGNUM *>(fe1), context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;
@@ -1331,8 +1332,8 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointAddMul(void * R, const void * P1,
     error = PointMul(R, P2, fe2);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
-    error_openssl = EC_POINT_add(context->curve, static_cast<EC_POINT *>(R), static_cast<EC_POINT *>(R), (const EC_POINT *) scratch,
-                                 context->bn_ctx);
+    error_openssl = EC_POINT_add(context->curve, static_cast<EC_POINT *>(R), static_cast<EC_POINT *>(R),
+                                 static_cast<const EC_POINT *>(scratch), context->bn_ctx);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;

@@ -108,7 +108,8 @@ class ECPKey
 public:
     virtual SupportedECPKeyTypes Type() const = 0;
     virtual size_t Length() const             = 0;
-    virtual operator uint8_t *() const        = 0;
+    virtual operator const uint8_t *() const  = 0;
+    virtual operator uint8_t *()              = 0;
 
     virtual CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const Sig & signature) const
     {
@@ -143,7 +144,8 @@ public:
 
     /** @brief Returns buffer pointer
      **/
-    operator uint8_t *() const { return (uint8_t *) bytes; }
+    operator uint8_t *() { return bytes; }
+    operator const uint8_t *() const { return bytes; }
 
 private:
     uint8_t bytes[Cap];
@@ -159,7 +161,8 @@ class P256PublicKey : public ECPKey<P256ECDSASignature>
 public:
     SupportedECPKeyTypes Type() const override { return SupportedECPKeyTypes::ECP256R1; }
     size_t Length() const override { return kP256_PublicKey_Length; }
-    operator uint8_t *() const override { return (uint8_t *) bytes; }
+    operator uint8_t *() override { return bytes; }
+    operator const uint8_t *() const override { return bytes; }
 
     CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length,
                                             const P256ECDSASignature & signature) const override;
