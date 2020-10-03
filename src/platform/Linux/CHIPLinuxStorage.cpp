@@ -225,14 +225,14 @@ CHIP_ERROR ChipLinuxStorage::WriteValueBin(const char * key, const uint8_t * dat
     {
         // We tested above that dataLen is no more than kMaxBlobSize.
         static_assert(kMaxBlobSize < UINT16_MAX, "dataLen won't fit");
-        encodedDataLen                    = Base64Encode(data, static_cast<uint16_t>(dataLen), encodedData.Ptr());
-        encodedData.Ptr()[encodedDataLen] = 0;
+        encodedDataLen              = Base64Encode(data, static_cast<uint16_t>(dataLen), encodedData.Get());
+        encodedData[encodedDataLen] = 0;
     }
 
     // Store it
     if (retval == CHIP_NO_ERROR)
     {
-        WriteValueStr(key, encodedData.Ptr());
+        WriteValueStr(key, encodedData.Get());
     }
 
     return retval;
