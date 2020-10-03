@@ -250,14 +250,14 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobDataAndLengths(const char * key,
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    encodedDataLen                    = value.copy(encodedData.Ptr(), len);
-    encodedData.Ptr()[encodedDataLen] = '\0';
+    encodedDataLen                    = value.copy(encodedData, len);
+    encodedData[encodedDataLen] = '\0';
 
     // Check if encoded data was padded. Only "=" or "==" padding combinations are allowed.
-    if ((encodedDataLen > 0) && (encodedData.Ptr()[encodedDataLen - 1] == '='))
+    if ((encodedDataLen > 0) && (encodedData[encodedDataLen - 1] == '='))
     {
         encodedDataPaddingLen++;
-        if ((encodedDataLen > 1) && (encodedData.Ptr()[encodedDataLen - 2] == '='))
+        if ((encodedDataLen > 1) && (encodedData[encodedDataLen - 2] == '='))
             encodedDataPaddingLen++;
     }
 
@@ -295,7 +295,7 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobValue(const char * key, uint8_t * d
 
     // Decode it
     // Cast is safe because we checked encodedDataLen above.
-    decodedDataLen = Base64Decode(encodedData.Ptr(), static_cast<uint16_t>(encodedDataLen), (uint8_t *) decodedData);
+    decodedDataLen = Base64Decode(encodedData, static_cast<uint16_t>(encodedDataLen), (uint8_t *) decodedData);
     if (decodedDataLen == UINT16_MAX || decodedDataLen > expectedDecodedLen)
     {
         return CHIP_ERROR_DECODE_FAILED;
