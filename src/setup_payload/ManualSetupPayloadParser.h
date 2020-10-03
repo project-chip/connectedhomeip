@@ -25,6 +25,7 @@
 
 #include <core/CHIPError.h>
 #include <string>
+#include <utility>
 
 namespace chip {
 
@@ -38,7 +39,7 @@ private:
     std::string mDecimalStringRepresentation;
 
 public:
-    ManualSetupPayloadParser(std::string decimalRepresentation) : mDecimalStringRepresentation(decimalRepresentation) {}
+    ManualSetupPayloadParser(std::string decimalRepresentation) : mDecimalStringRepresentation(std::move(decimalRepresentation)) {}
     CHIP_ERROR populatePayload(SetupPayload & outPayload);
 };
 

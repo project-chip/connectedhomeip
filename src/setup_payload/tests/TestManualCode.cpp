@@ -38,7 +38,7 @@ using namespace chip;
 
 namespace {
 
-bool CheckGenerator(SetupPayload payload, string expectedResult)
+bool CheckGenerator(const SetupPayload& payload, string expectedResult)
 {
     string result;
     ManualSetupPayloadGenerator generator(payload);
@@ -143,7 +143,7 @@ void TestDecimalRepresentation_InvalidPayload(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, generator.payloadDecimalStringRepresentation(result) == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
-void assertPayloadValues(nlTestSuite * inSuite, CHIP_ERROR actualError, CHIP_ERROR expectedError, SetupPayload payload,
+void assertPayloadValues(nlTestSuite * inSuite, CHIP_ERROR actualError, CHIP_ERROR expectedError, const SetupPayload& payload,
                          uint32_t pinCode, uint8_t discriminator, uint16_t vendorID, uint16_t productID)
 {
     NL_TEST_ASSERT(inSuite, actualError == expectedError);
@@ -153,7 +153,7 @@ void assertPayloadValues(nlTestSuite * inSuite, CHIP_ERROR actualError, CHIP_ERR
     NL_TEST_ASSERT(inSuite, payload.productID == productID);
 }
 
-void assertEmptyPayloadWithError(nlTestSuite * inSuite, CHIP_ERROR actualError, CHIP_ERROR expectedError, SetupPayload payload)
+void assertEmptyPayloadWithError(nlTestSuite * inSuite, CHIP_ERROR actualError, CHIP_ERROR expectedError, const SetupPayload& payload)
 {
     NL_TEST_ASSERT(inSuite, actualError == expectedError);
     NL_TEST_ASSERT(inSuite,
