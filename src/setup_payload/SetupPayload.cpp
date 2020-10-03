@@ -29,6 +29,7 @@
 #include <core/CHIPTLVUtilities.hpp>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
+#include <utility>
 
 using namespace chip;
 using namespace std;
@@ -105,7 +106,7 @@ CHIP_ERROR SetupPayload::addOptionalVendorData(uint8_t tag, string data)
     OptionalQRCodeInfo info;
     info.tag  = tag;
     info.type = optionalQRCodeInfoTypeString;
-    info.data = data;
+    info.data = std::move(data);
 
     err = addOptionalVendorData(info);
     SuccessOrExit(err);
@@ -156,7 +157,7 @@ CHIP_ERROR SetupPayload::addSerialNumber(string serialNumber)
     OptionalQRCodeInfoExtension info;
     info.tag  = kSerialNumberTag;
     info.type = optionalQRCodeInfoTypeString;
-    info.data = serialNumber;
+    info.data = std::move(serialNumber);
 
     err = addOptionalExtensionData(info);
     SuccessOrExit(err);
