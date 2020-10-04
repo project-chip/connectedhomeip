@@ -858,7 +858,7 @@ static void BluezHandleAdvertisementFromDevice(BluezDevice1 * aDevice, BluezEndp
 
         VerifyOrExit(chip::Ble::StringToUUID(uuidStr, uuid), ChipLogProgress(DeviceLayer, "TRACE: Invalid BLE UUID format"));
 
-        if (!UUIDsMatch(&uuid, &CHIP_BLE_SVC_ID))
+        if (!UUIDsMatch(&uuid, &Ble::CHIP_BLE_SVC_ID))
             continue;
 
         rawData = g_variant_get_fixed_array(g_variant_get_variant(val), &dataLen, sizeof(uint8_t));

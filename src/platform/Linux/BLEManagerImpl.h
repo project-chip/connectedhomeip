@@ -84,7 +84,7 @@ struct BLEScanConfig
 class BLEManagerImpl final : public BLEManager,
                              private Ble::BleLayer,
                              private Ble::BlePlatformDelegate,
-                             private Ble::BleApplicationDelegate
+                             private Ble::BleApplicationDelegate,
                              private Ble::BleConnectionDelegate
 {
     // Allow the BLEManager interface class to delegate method calls to
