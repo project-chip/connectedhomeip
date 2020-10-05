@@ -104,9 +104,29 @@ static const nlTest sTests[] = { NL_TEST_DEF("Test MemAlloc::Malloc", TestMemAll
                                  NL_TEST_DEF("Test MemAlloc::Calloc", TestMemAlloc_Calloc),
                                  NL_TEST_DEF("Test MemAlloc::Realloc", TestMemAlloc_Realloc), NL_TEST_SENTINEL() };
 
-int TestMemAlloc(void)
+/**
+ *  Set up the test suite.
+ */
+int TestMemAlloc_Setup(void * inContext)
 {
-    nlTestSuite theSuite = { "CHIP Memory Allocation tests", &sTests[0], nullptr, nullptr };
+    CHIP_ERROR error = MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return (FAILURE);
+    return (SUCCESS);
+}
+
+/**
+ *  Tear down the test suite.
+ */
+int TestMemAlloc_Teardown(void * inContext)
+{
+    MemoryShutdown();
+    return (SUCCESS);
+}
+
+int TestMemAlloc()
+{
+    nlTestSuite theSuite = { "CHIP Memory Allocation tests", &sTests[0], TestMemAlloc_Setup, TestMemAlloc_Teardown };
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, nullptr);
