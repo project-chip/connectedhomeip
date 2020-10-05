@@ -44,7 +44,7 @@ bool CheckGenerator(const SetupPayload & payload, string expectedResult)
     ManualSetupPayloadGenerator generator(payload);
     generator.payloadDecimalStringRepresentation(result);
 
-    if (expectedResult.size() != 0)
+    if (!expectedResult.empty())
     {
         expectedResult += Verhoeff10::ComputeCheckChar(expectedResult.c_str());
     }

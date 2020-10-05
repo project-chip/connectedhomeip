@@ -135,7 +135,7 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::generateTLVFromOptionalData(SetupPayload
     CHIP_ERROR err                                            = CHIP_NO_ERROR;
     vector<OptionalQRCodeInfo> optionalData                   = outPayload.getAllOptionalVendorData();
     vector<OptionalQRCodeInfoExtension> optionalExtensionData = outPayload.getAllOptionalExtensionData();
-    VerifyOrExit(optionalData.size() != 0 || optionalExtensionData.size() != 0, err = CHIP_NO_ERROR);
+    VerifyOrExit(!optionalData.empty() || !optionalExtensionData.empty(), err = CHIP_NO_ERROR);
 
     TLVWriter rootWriter;
     rootWriter.Init(tlvDataStart, maxLen);

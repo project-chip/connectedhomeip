@@ -32,7 +32,7 @@ void TestOptionalDataAddRemove(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err;
 
     optionalData = payload.getAllOptionalVendorData();
-    NL_TEST_ASSERT(inSuite, optionalData.size() == 0);
+    NL_TEST_ASSERT(inSuite, optionalData.empty());
 
     err = payload.addOptionalVendorData(kOptionalDefaultStringTag, kOptionalDefaultStringValue);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -56,19 +56,19 @@ void TestOptionalDataAddRemove(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     optionalData = payload.getAllOptionalVendorData();
-    NL_TEST_ASSERT(inSuite, optionalData.size() == 0);
+    NL_TEST_ASSERT(inSuite, optionalData.empty());
 
     err = payload.removeOptionalVendorData(kOptionalDefaultStringTag);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_KEY_NOT_FOUND);
 
     optionalData = payload.getAllOptionalVendorData();
-    NL_TEST_ASSERT(inSuite, optionalData.size() == 0);
+    NL_TEST_ASSERT(inSuite, optionalData.empty());
 
     err = payload.removeOptionalVendorData(kOptionalDefaultIntTag);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_KEY_NOT_FOUND);
 
     optionalData = payload.getAllOptionalVendorData();
-    NL_TEST_ASSERT(inSuite, optionalData.size() == 0);
+    NL_TEST_ASSERT(inSuite, optionalData.empty());
 }
 
 void TestSimpleWrite(nlTestSuite * inSuite, void * inContext)
