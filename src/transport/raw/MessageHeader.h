@@ -117,6 +117,18 @@ public:
 
     const Header::Flags & GetFlags() const { return mFlags; }
 
+    inline PacketHeader & SetFlag(uint16_t flag)
+    {
+        mFlags.value |= flag;
+        return *this;
+    }
+
+    inline PacketHeader & ClearFlag(uint16_t flag)
+    {
+        mFlags.value = static_cast<uint16_t>(mFlags.value & ~flag);
+        return *this;
+    }
+
     /** Check if it's a secure session control message. */
     bool IsSecureSessionControlMsg() const { return (mFlags.value & Header::Flags::kSecureSessionControlMessage) != 0; }
 
@@ -124,15 +136,8 @@ public:
 
     PacketHeader & SetSecureSessionControlMsg(bool value)
     {
-        if (value)
-        {
-            mFlags.value |= Header::Flags::kSecureSessionControlMessage;
-        }
-        else
-        {
-            mFlags.value = static_cast<uint16_t>(mFlags.value & ~Header::Flags::kSecureSessionControlMessage);
-        }
-        return *this;
+        return value ? SetFlag(Header::Flags::kSecureSessionControlMessage)
+                     : ClearFlag(Header::Flags::kSecureSessionControlMessage);
     }
 
     PacketHeader & SetSourceNodeId(NodeId id)
@@ -147,11 +152,11 @@ public:
         mSourceNodeId = id;
         if (id.HasValue())
         {
-            mFlags.value |= Header::Flags::kSourceNodeIdPresent;
+            SetFlag(Header::Flags::kSourceNodeIdPresent);
         }
         else
         {
-            mFlags.value = static_cast<uint16_t>(mFlags.value & ~Header::Flags::kSourceNodeIdPresent);
+            ClearFlag(Header::Flags::kSourceNodeIdPresent);
         }
         return *this;
     }
