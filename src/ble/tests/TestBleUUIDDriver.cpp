@@ -17,15 +17,19 @@
 
 /**
  *    @file
- *      This file declares test entry points for CHIP Bluetooth Low
- *      Energy (BLE) layer library unit tests.
+ *      This file implements a standalone/native program executable
+ *      test driver for the CHIP Bluetooth Low Energy (BLE) library
+ *      error string library unit tests.
  *
  */
 
-#ifndef TESTBLELAYER_H
-#define TESTBLELAYER_H
+#include "TestBleLayer.h"
 
-int TestBleErrorStr();
-int TestBleUUID();
+#include <nlunit-test.h>
 
-#endif // TESTBLELAYER_H
+int main()
+{
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nlTestSetOutputStyle(OUTPUT_CSV);
+    return TestBleUUID();
+}

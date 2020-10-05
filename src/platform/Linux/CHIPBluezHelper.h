@@ -132,6 +132,12 @@ struct CHIPServiceData
     CHIPIdInfo mIdInfo;
 } __attribute__((packed));
 
+struct BluezDiscoveryRequest
+{
+    uint16_t mDiscriminator;
+    bool mAutoConnect;
+};
+
 struct BluezEndpoint
 {
     char * mpOwningName; // Bus owning name
@@ -167,6 +173,9 @@ struct BluezEndpoint
     uint16_t mDuration; ///< Advertisement interval (in ms).
     bool mIsAdvertising;
     char * mpPeerDevicePath;
+
+    // Discovery settings
+    BluezDiscoveryRequest mDiscoveryRequest = {};
 };
 
 struct BluezConnection
@@ -197,6 +206,11 @@ CHIP_ERROR StartBluezAdv(BluezEndpoint * apEndpoint);
 CHIP_ERROR StopBluezAdv(BluezEndpoint * apEndpoint);
 CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint);
 CHIP_ERROR BluezAdvertisementSetup(BluezEndpoint * apEndpoint);
+
+CHIP_ERROR StartDiscovery(BluezEndpoint * apEndpoint, BluezDiscoveryRequest aRequest = {});
+CHIP_ERROR StopDiscovery(BluezEndpoint * apEndpoint);
+
+CHIP_ERROR ConnectDevice(BluezDevice1 * apDevice);
 
 } // namespace Internal
 } // namespace DeviceLayer
