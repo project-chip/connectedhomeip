@@ -104,6 +104,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
     # Set this to true to enable efr32 builds by default.
     enable_efr32_builds = false
+
+    # Set this to true to enable qpg6100 builds by default.
+    enable_qpg6100_builds = false
   }
 
   declare_args() {
@@ -133,6 +136,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
     # Build the efr32 lock app example.
     enable_efr32_lock_app_build = enable_efr32_builds
+
+    # Build the qpg6100 lock app example.
+    enable_qpg6100_lock_app_build = enable_qpg6100_builds
 
     # Build the efr32 lighting app example.
     enable_efr32_lighting_app_build = enable_efr32_builds
@@ -199,6 +205,12 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
   if (enable_efr32_lock_app_build) {
     group("efr32_lock_app") {
       deps = [ "${chip_root}/examples/lock-app/efr32(${chip_root}/config/efr32/toolchain:efr32_lock_app)" ]
+    }
+  }
+
+  if (enable_qpg6100_lock_app_build) {
+    group("qpg6100_lock_app") {
+      deps = [ "${chip_root}/examples/lock-app/qpg6100(${chip_root}/config/qpg6100/toolchain:qpg6100_lock_app)" ]
     }
   }
 

@@ -124,6 +124,20 @@ void TestRelease(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 0);
 }
 
+int Setup(void * inContext)
+{
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
+    return SUCCESS;
+}
+
+int Teardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 } // namespace
 
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
@@ -139,7 +153,7 @@ static const nlTest sTests[] = {
 
 int TestScopedBuffer(void)
 {
-    nlTestSuite theSuite = { "CHIP ScopedBuffer tests", &sTests[0], nullptr, nullptr };
+    nlTestSuite theSuite = { "CHIP ScopedBuffer tests", &sTests[0], Setup, Teardown };
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, nullptr);

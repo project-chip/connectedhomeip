@@ -20,13 +20,18 @@
  *      Source implementation of an input / output stream for stdio targets.
  */
 
-#include "shell.h"
+#include <lib/shell/shell.h>
 
 #ifdef NRF_SHELL_STREAMER
 
 #include "app_uart.h"
 #include "bsp.h"
 #include "nrf_uarte.h"
+
+#ifdef FREERTOS
+#include "FreeRTOS.h"
+#include "task.h"
+#endif
 
 namespace chip {
 namespace Shell {
@@ -60,7 +65,12 @@ int streamer_nrf5_read(streamer_t * streamer, char * buf, size_t len)
 {
     size_t count = 0;
     while (count < len && app_uart_get(reinterpret_cast<uint8_t *>(buf + count)) == NRF_SUCCESS)
+    {
         count++;
+#ifdef FREERTOS
+        taskYIELD();
+#endif // FREERTOS
+    }
 
     return count;
 }

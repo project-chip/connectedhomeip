@@ -785,7 +785,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
         VerifyOrExit(otInst != NULL, err = MapOpenThreadError(OT_ERROR_FAILED));
     }
 
-#ifndef __ZEPHYR__
+#if !defined(__ZEPHYR__) && !defined(ENABLE_CHIP_SHELL)
     otCliUartInit(otInst);
 #endif
 

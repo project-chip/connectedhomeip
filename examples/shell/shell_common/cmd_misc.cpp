@@ -29,6 +29,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <ChipShellCollection.h>
+
 using namespace chip;
 using namespace chip::Shell;
 using namespace chip::Logging;
