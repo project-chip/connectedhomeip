@@ -357,9 +357,6 @@
     self->_activityIndicator.hidden = YES;
     self->_errorLabel.hidden = YES;
     // reset the view and remove any preferences that were stored from a previous scan
-    if ([self hasScannedConnectionInfo]) {
-        CHIPRemoveDomainValueForKey(kCHIPToolDefaultsDomain, kIPKey);
-    }
     self->_setupPayloadView.hidden = NO;
     self->_resetButton.hidden = NO;
 
@@ -492,9 +489,6 @@
         case EXAMPLE_VENDOR_TAG_IP:
             if ([infoValue length] > MAX_IP_LEN) {
                 NSLog(@"Unexpected IP String... %@", infoValue);
-            } else {
-                NSLog(@"Got IP String... %@", infoValue);
-                CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kIPKey, infoValue);
             }
             break;
         }
@@ -545,12 +539,6 @@
     UIAlertAction * cancelAction = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleCancel handler:nil];
     [alert addAction:cancelAction];
     [self presentViewController:alert animated:YES completion:nil];
-}
-
-- (BOOL)hasScannedConnectionInfo
-{
-    NSString * ipAddress = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kIPKey);
-    return (ipAddress.length > 0);
 }
 
 // MARK: QR Code
@@ -657,7 +645,6 @@
 - (IBAction)resetView:(id)sender
 {
     // reset the view and remove any preferences that were stored from scanning the QRCode
-    CHIPRemoveDomainValueForKey(kCHIPToolDefaultsDomain, kIPKey);
     [self manualCodeInitialState];
     [self qrCodeInitialState];
 }

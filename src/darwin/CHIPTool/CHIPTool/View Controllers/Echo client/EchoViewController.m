@@ -17,7 +17,6 @@
 
 #import "EchoViewController.h"
 
-#import "CHIPConnectivityManager.h"
 #import "CHIPUIViewUtils.h"
 #import "DefaultsUtils.h"
 
@@ -32,7 +31,6 @@
 @property (nonatomic, strong) UIStackView * stackView;
 
 @property (readwrite) CHIPDeviceController * chipController;
-@property (readwrite) CHIPConnectivityManager * connectivityManager;
 
 @end
 
@@ -53,7 +51,6 @@
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.echovc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = [CHIPDeviceController sharedController];
     [self.chipController setDelegate:self queue:callbackQueue];
-    self.connectivityManager = [CHIPConnectivityManager sharedManager];
 }
 
 - (void)dismissKeyboard

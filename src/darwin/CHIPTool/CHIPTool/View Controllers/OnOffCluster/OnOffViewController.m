@@ -16,7 +16,6 @@
  */
 
 #import "OnOffViewController.h"
-#import "CHIPConnectivityManager.h"
 #import "CHIPUIViewUtils.h"
 #import "DefaultsUtils.h"
 #import <CHIP/CHIP.h>
@@ -30,7 +29,6 @@
 @property (nonatomic, strong) UILabel * resultLabel;
 
 @property (readwrite) CHIPDeviceController * chipController;
-@property (readwrite) CHIPConnectivityManager * connectivityManager;
 
 @end
 
@@ -47,7 +45,6 @@
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.onoffvc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = [CHIPDeviceController sharedController];
     [self.chipController setDelegate:self queue:callbackQueue];
-    self.connectivityManager = [CHIPConnectivityManager sharedManager];
     self.onOff = [[CHIPOnOff alloc] initWithDeviceController:self.chipController];
 }
 
