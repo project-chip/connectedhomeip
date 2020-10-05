@@ -104,11 +104,11 @@ void TestRelease(nlTestSuite * inSuite, void * inContext)
 
         NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 0);
         NL_TEST_ASSERT(inSuite, buffer.Alloc(128));
-        NL_TEST_ASSERT(inSuite, buffer.Ptr() != nullptr);
+        NL_TEST_ASSERT(inSuite, buffer.Get() != nullptr);
 
         ptr = buffer.Release();
         NL_TEST_ASSERT(inSuite, ptr != nullptr);
-        NL_TEST_ASSERT(inSuite, buffer.Ptr() == nullptr);
+        NL_TEST_ASSERT(inSuite, buffer.Get() == nullptr);
     }
 
     NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 1);

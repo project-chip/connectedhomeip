@@ -27,6 +27,8 @@
 
 #include <lib/support/CHIPMem.h>
 
+#include <type_traits>
+
 namespace chip {
 namespace Platform {
 
@@ -130,9 +132,13 @@ class ScopedMemoryBuffer : public Impl::ScopedMemoryBufferBase<MemoryManagement>
 public:
     using Base = Impl::ScopedMemoryBufferBase<MemoryManagement>;
 
-    inline T * Ptr() { return static_cast<T *>(Base::Ptr()); }
+    static_assert(std::is_trivial<T>::value, "Constructors won't get run");
 
-    inline const T * Ptr() const { return static_cast<T *>(Base::Ptr()); }
+    inline T * Get() { return static_cast<T *>(Base::Ptr()); }
+    inline T & operator[](size_t index) { return Get()[index]; }
+
+    inline const T * Get() const { return static_cast<T *>(Base::Ptr()); }
+    inline const T & operator[](size_t index) const { return Get()[index]; }
 
     inline T * Release() { return static_cast<T *>(Base::Release()); }
 
