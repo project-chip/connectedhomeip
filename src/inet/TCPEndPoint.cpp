@@ -112,7 +112,7 @@ using chip::System::PacketBuffer;
 
 chip::System::ObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> TCPEndPoint::sPool;
 
-INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, const IPAddress &addr, uint16_t port, bool reuseAddr)
+INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr)
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -295,7 +295,7 @@ INET_ERROR TCPEndPoint::Listen(uint16_t backlog)
     return res;
 }
 
-INET_ERROR TCPEndPoint::Connect(const IPAddress &addr, uint16_t port, InterfaceId intfId)
+INET_ERROR TCPEndPoint::Connect(const IPAddress & addr, uint16_t port, InterfaceId intfId)
 {
     INET_ERROR res = INET_NO_ERROR;
 

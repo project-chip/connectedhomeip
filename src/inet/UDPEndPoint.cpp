@@ -154,7 +154,7 @@ static INET_ERROR LwIPBindInterface(struct udp_pcb * aUDP, InterfaceId intfId)
  *  On LwIP, this method must not be called with the LwIP stack lock
  *  already acquired.
  */
-INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, const IPAddress &addr, uint16_t port, InterfaceId intfId)
+INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uint16_t port, InterfaceId intfId)
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -451,7 +451,7 @@ void UDPEndPoint::Free()
 /**
  *  A synonym for <tt>SendTo(addr, port, INET_NULL_INTERFACEID, msg, sendFlags)</tt>.
  */
-INET_ERROR UDPEndPoint::SendTo(const IPAddress &addr, uint16_t port, chip::System::PacketBuffer * msg, uint16_t sendFlags)
+INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBuffer * msg, uint16_t sendFlags)
 {
     return SendTo(addr, port, INET_NULL_INTERFACEID, msg, sendFlags);
 }
@@ -495,7 +495,7 @@ INET_ERROR UDPEndPoint::SendTo(const IPAddress &addr, uint16_t port, chip::Syste
  *      method deep-copies \c msg into a fresh object, and queues that for
  *      transmission, leaving the original \c msg available after return.
  */
-INET_ERROR UDPEndPoint::SendTo(const IPAddress &addr, uint16_t port, InterfaceId intfId, chip::System::PacketBuffer * msg,
+INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBuffer * msg,
                                uint16_t sendFlags)
 {
     IPPacketInfo pktInfo;

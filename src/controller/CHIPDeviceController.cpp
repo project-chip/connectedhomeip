@@ -260,7 +260,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const IPAddress &deviceAddr, void * appReqState,
+CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const IPAddress & deviceAddr, void * appReqState,
                                                NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
                                                ErrorHandler onError, uint16_t devicePort, Inet::InterfaceId interfaceId)
 {
@@ -268,8 +268,8 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const IPAd
                                      &mPairingSession);
 }
 
-CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, const IPAddress &deviceAddr, void * appReqState,
-                                                                   NewConnectionHandler onConnected,
+CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, const IPAddress & deviceAddr,
+                                                                   void * appReqState, NewConnectionHandler onConnected,
                                                                    MessageReceiveHandler onMessageReceived, ErrorHandler onError,
                                                                    uint16_t devicePort, Inet::InterfaceId interfaceId)
 {

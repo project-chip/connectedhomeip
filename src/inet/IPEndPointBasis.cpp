@@ -681,7 +681,7 @@ done:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, const IPAddress &aAddress, uint16_t aPort, InterfaceId aInterfaceId)
+INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort, InterfaceId aInterfaceId)
 {
     INET_ERROR lRetval = INET_NO_ERROR;
 
