@@ -15,21 +15,5 @@
 
 # Utility script to genertae the python tag + the abi tag + platform tag for a Python
 
-import distutils.util
-import sys
-import sysconfig
-
-# TODO: pigweed virtualenv don't have pep425tags, will revisit it after figuring out with pigwee
-# The below is temporary solution.
-#from wheel.pep425tags import get_abbr_impl, get_impl_ver, get_abi_tag, get_platform
-#print(get_abbr_impl() + get_impl_ver() + "-" + get_abi_tag() + "-" + get_platform())
-
-abbr_ver = "cp"
-impl_ver = str(sys.version_info[0]) + str(sys.version_info[1])
-if sysconfig.get_config_var('SOABI') is None:
-    abi_tag = abbr_ver + impl_ver
-else:
-    abi_tag = 'cp' + sysconfig.get_config_var('SOABI').split('-')[1]
-platform_tag = distutils.util.get_platform().replace('.', '_').replace('-', '_')
-
-print(abbr_ver + impl_ver + "-" + abi_tag + "-" + platform_tag)
+from setuptools.pep425tags import get_abbr_impl, get_impl_ver, get_abi_tag, get_platform
+print(get_abbr_impl() + get_impl_ver() + "-" + get_abi_tag() + "-" + get_platform())
