@@ -117,28 +117,29 @@ public:
 
     const Header::Flags & GetFlags() const { return mFlags; }
 
-    inline PacketHeader & SetFlag(uint16_t flag)
+    /** Sets the given flag bit(s). */
+    inline PacketHeader & AddFlag(uint16_t flag)
     {
         mFlags.value |= flag;
         return *this;
     }
 
-    inline PacketHeader & ClearFlag(uint16_t flag)
+    /** Clears the given flag bit(s). */
+    inline PacketHeader & RemoveFlag(uint16_t flag)
     {
         mFlags.value = static_cast<uint16_t>(mFlags.value & ~flag);
         return *this;
     }
+
+    /** Sets or clears the specified flag bit(s) depending in the 'value' argument. */
+    inline PacketHeader & SetFlag(uint16_t flag, bool value) { return value ? AddFlag(flag) : RemoveFlag(flag); }
 
     /** Check if it's a secure session control message. */
     bool IsSecureSessionControlMsg() const { return (mFlags.value & Header::Flags::kSecureSessionControlMessage) != 0; }
 
     Header::EncryptionType GetEncryptionType() const { return mEncryptionType; }
 
-    PacketHeader & SetSecureSessionControlMsg(bool value)
-    {
-        return value ? SetFlag(Header::Flags::kSecureSessionControlMessage)
-                     : ClearFlag(Header::Flags::kSecureSessionControlMessage);
-    }
+    PacketHeader & SetSecureSessionControlMsg(bool value) { return SetFlag(Header::Flags::kSecureSessionControlMessage, value); }
 
     PacketHeader & SetSourceNodeId(NodeId id)
     {
@@ -150,20 +151,13 @@ public:
     PacketHeader & SetSourceNodeId(Optional<NodeId> id)
     {
         mSourceNodeId = id;
-        if (id.HasValue())
-        {
-            SetFlag(Header::Flags::kSourceNodeIdPresent);
-        }
-        else
-        {
-            ClearFlag(Header::Flags::kSourceNodeIdPresent);
-        }
+        SetFlag(Header::Flags::kSourceNodeIdPresent, id.HasValue());
         return *this;
     }
 
     PacketHeader & ClearSourceNodeId()
     {
-        mFlags.value = static_cast<uint16_t>(mFlags.value & ~Header::Flags::kSourceNodeIdPresent);
+        RemoveFlag(Header::Flags::kSourceNodeIdPresent);
         mSourceNodeId.ClearValue();
         return *this;
     }
@@ -185,20 +179,13 @@ public:
     PacketHeader & SetDestinationNodeId(Optional<NodeId> id)
     {
         mDestinationNodeId = id;
-        if (id.HasValue())
-        {
-            mFlags.value |= Header::Flags::kDestinationNodeIdPresent;
-        }
-        else
-        {
-            mFlags.value = static_cast<uint16_t>(mFlags.value & ~Header::Flags::kDestinationNodeIdPresent);
-        }
+        SetFlag(Header::Flags::kDestinationNodeIdPresent, id.HasValue());
         return *this;
     }
 
     PacketHeader & ClearDestinationNodeId()
     {
-        mFlags.value = static_cast<uint16_t>(mFlags.value & ~Header::Flags::kDestinationNodeIdPresent);
+        RemoveFlag(Header::Flags::kDestinationNodeIdPresent);
         mDestinationNodeId.ClearValue();
         return *this;
     }
