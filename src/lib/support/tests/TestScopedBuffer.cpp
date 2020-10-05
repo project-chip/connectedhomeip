@@ -137,9 +137,29 @@ static const nlTest sTests[] = {
     NL_TEST_SENTINEL()                    //
 };
 
+/**
+ *  Set up the test suite.
+ */
+int TestScopedBuffer_Setup(void * inContext)
+{
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
+    return SUCCESS;
+}
+
+/**
+ *  Tear down the test suite.
+ */
+int TestScopedBuffer_Teardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 int TestScopedBuffer(void)
 {
-    nlTestSuite theSuite = { "CHIP ScopedBuffer tests", &sTests[0], nullptr, nullptr };
+    nlTestSuite theSuite = { "CHIP ScopedBuffer tests", &sTests[0], TestScopedBuffer_Setup, TestScopedBuffer_Teardown };
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, nullptr);
