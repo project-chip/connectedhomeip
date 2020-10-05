@@ -143,7 +143,7 @@ protected:
 protected:
     InterfaceId mBoundIntfId;
 
-    INET_ERROR Bind(IPAddressType aAddressType, IPAddress aAddress, uint16_t aPort, InterfaceId aInterfaceId);
+    INET_ERROR Bind(IPAddressType aAddressType, const IPAddress &aAddress, uint16_t aPort, InterfaceId aInterfaceId);
     INET_ERROR BindInterface(IPAddressType aAddressType, InterfaceId aInterfaceId);
     INET_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBuffer * aBuffer, uint16_t aSendFlags);
     INET_ERROR GetSocket(IPAddressType aAddressType, int aType, int aProtocol);
