@@ -166,6 +166,7 @@ uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint
     COMMAND_HEADER(name, cluster_id, command_id);                                                                                  \
     COMMAND_FOOTER(name);
 
+#define BASIC_CLUSTER_ID 0x0000
 #define ONOFF_CLUSTER_ID 0x0006
 #define IDENTIFY_CLUSTER_ID 0x0003
 #define TEMP_MEASUREMENT_CLUSTER_ID 0x0402
@@ -389,6 +390,15 @@ uint16_t encodeStopMoveStepCommand(uint8_t * buffer, uint16_t buf_length, uint8_
     buf.Put(optionMask);
     buf.Put(optionOverride);
     COMMAND_FOOTER("StopMoveStep");
+}
+
+/*
+ * Basic Cluster commands
+ */
+
+uint16_t encodeResetToFactoryCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    COMMAND("ResetToFactory", BASIC_CLUSTER_ID, 0x00);
 }
 
 } // extern "C"
