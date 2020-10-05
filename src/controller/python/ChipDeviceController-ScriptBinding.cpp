@@ -43,8 +43,7 @@
 #include "ChipDeviceController-BlePlatformDelegate.h"
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
-#include "CHIPDeviceController.h"
-
+#include <controller/CHIPDeviceController.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <support/logging/CHIPLogging.h>
