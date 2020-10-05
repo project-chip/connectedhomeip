@@ -119,7 +119,7 @@ uint16_t _encodeGlobalCommand(BufBound & buf, uint8_t destination_endpoint, uint
 }
 
 uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t cluster_id,
-                                     uint16_t * attr_ids, uint16_t attr_id_count)
+                                     const uint16_t * attr_ids, uint16_t attr_id_count)
 {
     BufBound buf = BufBound(buffer, buf_length);
     if (_encodeGlobalCommand(buf, destination_endpoint, cluster_id, 0x00))

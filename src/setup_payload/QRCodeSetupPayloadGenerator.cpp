@@ -65,7 +65,7 @@ exit:
     return err;
 }
 
-static CHIP_ERROR populateTLVBits(uint8_t * bits, int & offset, uint8_t * tlvBuf, size_t tlvBufSizeInBytes,
+static CHIP_ERROR populateTLVBits(uint8_t * bits, int & offset, const uint8_t * tlvBuf, size_t tlvBufSizeInBytes,
                                   int totalPayloadDataSizeInBits)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

@@ -68,7 +68,7 @@ uint16_t encodeToggleCommand(uint8_t * buffer, uint16_t buf_length, uint8_t dest
  * list of attributes.
  */
 uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t cluster_id,
-                                     uint16_t * attr_ids, uint16_t attr_id_count);
+                                     const uint16_t * attr_ids, uint16_t attr_id_count);
 
 /**
  * @brief Encode a command to read the OnOff attribute from the on/off
