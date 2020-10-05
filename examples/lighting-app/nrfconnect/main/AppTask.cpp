@@ -373,7 +373,7 @@ void AppTask::PostLightingActionRequest(LightingManager::Action_t aAction)
 
 void AppTask::PostEvent(AppEvent * aEvent)
 {
-    if (k_msgq_put(&sAppEventQueue, aEvent, K_TICKS(1)) != 0)
+    if (k_msgq_put(&sAppEventQueue, aEvent, K_NO_WAIT) != 0)
     {
         LOG_INF("Failed to post event to app task event queue");
     }

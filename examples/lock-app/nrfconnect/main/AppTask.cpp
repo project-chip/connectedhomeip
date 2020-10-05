@@ -386,7 +386,7 @@ void AppTask::PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aA
 
 void AppTask::PostEvent(AppEvent * aEvent)
 {
-    if (k_msgq_put(&sAppEventQueue, aEvent, K_TICKS(1)))
+    if (k_msgq_put(&sAppEventQueue, aEvent, K_NO_WAIT))
     {
         LOG_INF("Failed to post event to app task event queue");
     }
