@@ -30,6 +30,7 @@ nrf5_sdk("sdk") {
     "${nrf5_platform_dir}/app/project_include",
     "${nrf5_platform_dir}/util/include",
     "${nrf5_platform_dir}/app/include",
+    "${nrf5_sdk_root}/components/libraries/uart",
     "${chip_root}/src/app/util",
   ]
 
@@ -51,9 +52,13 @@ nrf5_sdk("sdk") {
 
   defines += [
     "USE_APP_CONFIG",
+    "ENABLE_CHIP_SHELL",
+    "NRF_SHELL_STREAMER",
     "MBEDTLS_PK_WRITE_C",
     "MBEDTLS_X509_CREATE_C",
     "MBEDTLS_X509_CSR_WRITE_C",
+    "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE",
+    "OPENTHREAD_CONFIG_ENABLE_BUILTIN_MBEDTLS_MANAGEMENT=1",
   ]
 }
 
@@ -69,7 +74,9 @@ nrf5_executable("lighting_app") {
     "${nrf5_platform_dir}/app/support/nRF5Sbrk.c",
     "${nrf5_platform_dir}/util/LEDWidget.cpp",
     "${nrf5_platform_dir}/util/include/LEDWidget.h",
+    "${nrf5_platform_dir}/util/streamer/streamer_nrf5.cpp",
     "main/AppTask.cpp",
+    "main/LightingCLI.cpp",
     "main/LightingManager.cpp",
     "main/ZclCallbacks.cpp",
     "main/include/AppEvent.h",
@@ -82,6 +89,7 @@ nrf5_executable("lighting_app") {
     ":sdk",
     "${chip_root}/examples/common/chip-app-server:chip-app-server",
     "${chip_root}/examples/lighting-app/lighting-common",
+    "${chip_root}/examples/shell/shell_common:shell_common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms/nrf528xx:libnordicsemi_nrf52840_radio_driver_softdevice",

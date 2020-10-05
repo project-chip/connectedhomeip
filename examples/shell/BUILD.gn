@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/openthread.gni")
 import("${chip_root}/src/platform/device.gni")
 
 if (chip_device_platform == "nrf5") {
@@ -83,11 +84,6 @@ if (chip_device_platform == "nrf5") {
       "${nrf5_platform_dir}/util/LEDWidget.cpp",
       "${nrf5_platform_dir}/util/include/LEDWidget.h",
       "${nrf5_platform_dir}/util/streamer/streamer_nrf5.cpp",
-      "${project_dir}/cmd_base64.cpp",
-      "${project_dir}/cmd_btp.cpp",
-      "${project_dir}/cmd_device.cpp",
-      "${project_dir}/cmd_misc.cpp",
-      "${project_dir}/cmd_otcli.cpp",
       "${project_dir}/main.cpp",
       "${project_dir}/nrf52/include/CHIPProjectConfig.h",
       "${project_dir}/test_identity.cpp",
@@ -105,6 +101,7 @@ if (chip_device_platform == "nrf5") {
       "${nrf5_platform_dir}/app/support:freertos_newlib_lock_support_test",
       "${openthread_root}:libopenthread-cli-ftd",
       "${openthread_root}:libopenthread-ftd",
+      "shell_common:shell_common",
     ]
 
     output_dir = root_out_dir
@@ -132,18 +129,12 @@ if (chip_device_platform == "nrf5") {
   assert(chip_build_tools)
 
   executable("chip-shell") {
-    sources = [
-      "cmd_base64.cpp",
-      "cmd_btp.cpp",
-      "cmd_device.cpp",
-      "cmd_misc.cpp",
-      "cmd_otcli.cpp",
-      "main.cpp",
-    ]
+    sources = [ "main.cpp" ]
 
     public_deps = [
       "${chip_root}/src/lib/shell",
       "${chip_root}/src/platform",
+      "shell_common:shell_common",
     ]
 
     if (is_debug) {
