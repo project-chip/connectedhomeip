@@ -142,7 +142,7 @@ def generateBloatReport(outputFileName,
 
 def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
                         compare_results):
-  """Generates a PR comment conaining the specified file content."""
+  """Generates a PR comment containing the specified file content."""
 
   logging.info('Uploading report to "%s", PR %d', gh_repo, gh_pr_number)
 
@@ -162,7 +162,7 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
 
     comment.delete()
 
-  if len(compare_results) == 0:
+  if all(len(file.sectionChanges) == 0 for file in compare_results):
     logging.info('No results to report')
     return
 
