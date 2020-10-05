@@ -875,7 +875,7 @@ CHIP_ERROR ChipMessageLayer::SetUnsecuredConnectionListener(ConnectionReceiveFun
     ChipLogProgress(ExchangeManager, "Entered SetUnsecuredConnectionReceived, cb = %p, %p", newOnUnsecuredConnectionReceived,
                     newOnUnsecuredConnectionCallbacksRemoved);
 
-    if (UnsecuredListenEnabled() == false)
+    if (!UnsecuredListenEnabled())
     {
         err = EnableUnsecuredListen();
         SuccessOrExit(err);
@@ -886,7 +886,7 @@ CHIP_ERROR ChipMessageLayer::SetUnsecuredConnectionListener(ConnectionReceiveFun
 
     if (OnUnsecuredConnectionReceived != nullptr)
     {
-        if (force == false)
+        if (!force)
         {
             err = CHIP_ERROR_INCORRECT_STATE;
             ExitNow();
@@ -927,7 +927,7 @@ CHIP_ERROR ChipMessageLayer::ClearUnsecuredConnectionListener(ConnectionReceiveF
         ExitNow();
     }
 
-    if (UnsecuredListenEnabled() == true)
+    if (UnsecuredListenEnabled())
     {
         err = DisableUnsecuredListen();
         SuccessOrExit(err);

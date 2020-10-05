@@ -313,12 +313,7 @@ bool ChipLinuxStorageIni::HasValue(const char * key)
 
     auto it = section.find(key);
 
-    if (it != section.end())
-    {
-        return true;
-    }
-
-    return false;
+    return it != section.end();
 }
 
 CHIP_ERROR ChipLinuxStorageIni::AddEntry(const char * key, const char * value)

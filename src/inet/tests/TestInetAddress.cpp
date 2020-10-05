@@ -669,7 +669,7 @@ void CheckAddressQuartet(nlTestSuite * inSuite, const uint32_t & inFirstAddressQ
 
     NL_TEST_ASSERT(inSuite, lResult == true);
 
-    if (lResult != true)
+    if (!lResult)
     {
         fprintf(stdout, "Address quartet %zu mismatch: actual 0x%08x, expected: 0x%08x\n", inWhich, inFirstAddressQuartet,
                 inSecondAddressQuartet);
@@ -733,7 +733,7 @@ void CheckAddress(nlTestSuite * inSuite, const IPAddressContext & inContext, con
 
     lResult = (inAddress == lParsedAddress);
 
-    if (lResult != true)
+    if (!static_cast<bool>(lResult))
     {
         fprintf(stdout, "Address parse mismatch for %s\n", inContext.mAddrString);
     }
