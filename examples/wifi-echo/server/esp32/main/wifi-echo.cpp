@@ -54,10 +54,6 @@ using namespace ::chip::DeviceLayer;
 
 extern void startServer();
 
-#if CONFIG_USE_ECHO_CLIENT
-extern void startClient(void);
-#endif // CONFIG_USE_ECHO_CLIENT
-
 #if CONFIG_DEVICE_TYPE_M5STACK
 
 #define BUTTON_1_GPIO_NUM GPIO_NUM_39    // Left button on M5Stack
@@ -491,10 +487,6 @@ extern "C" void app_main()
         ChipLogProgress(Ble, "Rendezvous and Secure Pairing skipped. Using test secret.");
         PairingComplete(&gTestPairing);
     }
-
-#if CONFIG_USE_ECHO_CLIENT
-    startClient();
-#endif
 
     std::string qrCodeText = createSetupPayload();
     ESP_LOGI(TAG, "QR CODE: '%s'", qrCodeText.c_str());
