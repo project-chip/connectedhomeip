@@ -162,7 +162,7 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
 
     comment.delete()
 
-  if compare_results.len() == 0:
+  if len(compare_results) == 0:
     logging.info('No results to report')
     return
 
