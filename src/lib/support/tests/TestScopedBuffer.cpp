@@ -132,6 +132,12 @@ int Setup(void * inContext)
     return SUCCESS;
 }
 
+int Teardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 } // namespace
 
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
@@ -147,7 +153,7 @@ static const nlTest sTests[] = {
 
 int TestScopedBuffer(void)
 {
-    nlTestSuite theSuite = { "CHIP ScopedBuffer tests", &sTests[0], Setup, nullptr };
+    nlTestSuite theSuite = { "CHIP ScopedBuffer tests", &sTests[0], Setup, Teardown };
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, nullptr);
