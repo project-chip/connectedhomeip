@@ -15,6 +15,10 @@
 declare_args() {
   # Use a different target, such as a prebuilt MbedTLS.
   mbedtls_target = ""
+
+  # this is just a temporary hack until we discover how to transfer
+  # the includes/defines from k32w_sdk.gni
+  k32w_sdk_root1="/home/doru/Desktop/SDK_K32_2.6.1/"
 }
 
 if (mbedtls_target != "") {
@@ -42,6 +46,7 @@ if (mbedtls_target != "") {
       "repo/library/chacha20.c",
       "repo/library/chachapoly.c",
       "repo/library/cipher.c",
+      "repo/library/cmac.c",
       "repo/library/cipher_wrap.c",
       "repo/library/ctr_drbg.c",
       "repo/library/debug.c",
@@ -51,6 +56,7 @@ if (mbedtls_target != "") {
       "repo/library/ecdsa.c",
       "repo/library/ecp.c",
       "repo/library/ecp_curves.c",
+      "repo/library/ecjpake.c",
       "repo/library/entropy.c",
       "repo/library/entropy_poll.c",
       "repo/library/error.c",
@@ -94,6 +100,93 @@ if (mbedtls_target != "") {
       "repo/library/x509write_crt.c",
       "repo/library/x509write_csr.c",
       "repo/library/xtea.c",
+      "repo/library/threading.c",
+    ]
+
+    defines = [
+      "MBEDTLS_CONFIG_FILE=<third_party/openthread/repo/third_party/mbedtls/mbedtls-config.h>",
+      "MBEDTLS_USER_CONFIG_FILE=<third_party/openthread/repo/examples/platforms/k32w/k32w061/k32w061-mbedtls-config.h>",
+      "MBEDTLS_THREADING_C=1",
+      "MBEDTLS_THREADING_ALT=1",
+      "MBEDTLS_X509_CSR_WRITE_C",
+      "MBEDTLS_X509_CREATE_C",
+      "MBEDTLS_PK_WRITE_C",
+      "MBEDTLS_OID_C",
+      "MBEDTLS_PEM_WRITE_C",
+      "MBEDTLS_BASE64_C",
+      "MBEDTLS_HKDF_C",
+      "MBEDTLS_ERROR_C",
+      "OPENTHREAD_CONFIG_FILE=<openthread-core-k32w061-config.h>",
+      "CPU_K32W061HN",
+      "CPU_JN518X",
+      "CPU_JN518X_REV=2",
+      "JENNIC_CHIP_FAMILY_NAME=_JN518x",
+      "gPWR_LDOMEM_0_9V_PD=0",
+      "SDK_DEBUGCONSOLE=0",
+      "NO_SYSCORECLK_UPD=0",
+      "USE_RTOS=1",
+      "FSL_RTOS_FREE_RTOS=1",
+      "gUartDebugConsole_d=0",
+      "gUsePdm_d=1",
+      "gLEDSupported_d",
+      "gKeyBoardSupported_d",
+      "gPdmNbSegments=63",
+      "osCustomStartup=1",
+      "OM15082=1",
+      "gKBD_KeysCount_c=3",
+      "gLEDsOnTargetBoardCnt_c=2",
+      "gLED_InvertedMode_d=1",
+      "ENABLE_RAM_VECTOR_TABLE=1",
+      "gTMR_Enabled_d=1",
+      "gTimestamp_Enabled_d=0",
+      "gMainThreadStackSize_c=2048",
+      "K32W_LOG_ENABLED=1",
+      "CHIP_ENABLE_OPENTHREAD=1",
+      "PoolsDetails_c=_block_size_ 512 _number_of_blocks_ 2 _pool_id_(0) _eol_ _block_size_ 768 _number_of_blocks_ 1 _pool_id_(0) _eol_",
+    ]
+
+    include_dirs = 
+    [
+     "/home/doru/Desktop/demo/connectedhomeip",
+      "../openthread/repo/src/core",
+      "../openthread/repo/examples/platforms/k32w/k32w061",
+      "../openthread/repo/examples/platforms/",
+      "./repo/include",
+      "../openthread/repo/include",
+      "${k32w_sdk_root1}/boards/k32w061dk6/wireless_examples/openthread/reed/bm",
+      "${k32w_sdk_root1}/boards/k32w061dk6/wireless_examples/openthread/enablement",
+      "${k32w_sdk_root1}/CMSIS/Include",
+      "${k32w_sdk_root1}/components/serial_manager",
+      "${k32w_sdk_root1}/components/uart",
+      "${k32w_sdk_root1}/devices/K32W061",
+      "${k32w_sdk_root1}/devices/K32W061/drivers",
+      "${k32w_sdk_root1}/devices/K32W061/utilities",
+      "${k32w_sdk_root1}/devices/K32W061/utilities/debug_console",
+      "${k32w_sdk_root1}/devices/K32W061/utilities/str",
+      "${k32w_sdk_root1}/middleware/mbedtls/port/ksdk",
+      "${k32w_sdk_root1}/middleware/wireless/framework/Common",
+      "${k32w_sdk_root1}/middleware/wireless/framework/Flash/Internal",
+      "${k32w_sdk_root1}/middleware/wireless/framework/FunctionLib",
+      "${k32w_sdk_root1}/middleware/wireless/framework/GPIO",
+      "${k32w_sdk_root1}/middleware/wireless/framework/Keyboard/Interface",
+      "${k32w_sdk_root1}/middleware/wireless/framework/LED/Interface",
+      "${k32w_sdk_root1}/middleware/wireless/framework/Lists",
+      "${k32w_sdk_root1}/middleware/wireless/framework/MemManager/Interface",
+      "${k32w_sdk_root1}/middleware/wireless/framework/OSAbstraction/Interface",
+      "${k32w_sdk_root1}/middleware/wireless/framework/Panic/Interface",
+      "${k32w_sdk_root1}/middleware/wireless/framework/PDM/Include",
+      "${k32w_sdk_root1}/middleware/wireless/framework/RNG/Interface",
+      "${k32w_sdk_root1}/middleware/wireless/framework/SerialManager/Source",
+      "${k32w_sdk_root1}/middleware/wireless/framework/TimersManager/Interface",
+      "${k32w_sdk_root1}/middleware/wireless/framework/TimersManager/Source",
+      "${k32w_sdk_root1}/middleware/wireless/framework/XCVR/DK6",
+      "${k32w_sdk_root1}/middleware/wireless/framework/XCVR/DK6/Build/Include",
+      "${k32w_sdk_root1}/middleware/wireless/ieee-802.15.4/uMac/Include",
+      "${k32w_sdk_root1}/rtos/amazon-freertos/lib/FreeRTOS/portable/GCC/ARM_CM3",
+      "${k32w_sdk_root1}/rtos/amazon-freertos/lib/include",
+      "${k32w_sdk_root1}/rtos/amazon-freertos/lib/include/private",
+      "${k32w_sdk_root1}/rtos/amazon-freertos/lib/third_party/unity/src",
+      "../../examples/platform/k32w/app/project_include/",
     ]
 
     if (current_os != "freertos") {
