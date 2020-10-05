@@ -295,7 +295,7 @@ bool SetupPayload::operator==(SetupPayload & input)
     inputOptionalVendorData = input.getAllOptionalVendorData();
     VerifyOrExit(optionalVendorData.size() == inputOptionalVendorData.size(), isIdentical = false);
 
-    for (OptionalQRCodeInfo inputInfo : inputOptionalVendorData)
+    for (const OptionalQRCodeInfo & inputInfo : inputOptionalVendorData)
     {
         OptionalQRCodeInfo info;
         CHIP_ERROR err = getOptionalVendorData(inputInfo.tag, info);
@@ -308,7 +308,7 @@ bool SetupPayload::operator==(SetupPayload & input)
     inputOptionalExtensionData = input.getAllOptionalExtensionData();
     VerifyOrExit(optionalExtensionData.size() == inputOptionalExtensionData.size(), isIdentical = false);
 
-    for (OptionalQRCodeInfoExtension inputInfo : inputOptionalExtensionData)
+    for (const OptionalQRCodeInfoExtension & inputInfo : inputOptionalExtensionData)
     {
         OptionalQRCodeInfoExtension info;
         CHIP_ERROR err = getOptionalExtensionData(inputInfo.tag, info);
