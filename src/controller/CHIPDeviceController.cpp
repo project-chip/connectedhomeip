@@ -77,9 +77,9 @@ ChipDeviceController::ChipDeviceController()
 
 ChipDeviceController::~ChipDeviceController()
 {
-    if (mTestPairingSession != nullptr)
+    if (mTestSecurePairingSecret != nullptr)
     {
-        delete mTestPairingSession;
+        delete mTestSecurePairingSecret;
     }
 }
 
@@ -222,14 +222,14 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remote
                                                                    MessageReceiveHandler onMessageReceived, ErrorHandler onError,
                                                                    uint16_t devicePort, Inet::InterfaceId interfaceId)
 {
-    if (mTestPairingSession != nullptr)
+    if (mTestSecurePairingSecret != nullptr)
     {
-        delete mTestPairingSession;
+        delete mTestSecurePairingSecret;
     }
 
-    mTestPairingSession = new SecurePairingUsingTestSecret(Optional<NodeId>::Value(remoteDeviceId), 0, 0);
+    mTestSecurePairingSecret = new SecurePairingUsingTestSecret(Optional<NodeId>::Value(remoteDeviceId), 0, 0);
 
-    mCurrentPairingSession = mTestPairingSession;
+    mSecurePairingSession = mTestSecurePairingSecret;
 
     mDeviceAddr      = deviceAddr;
     mRemoteDeviceId  = Optional<NodeId>::Value(remoteDeviceId);
@@ -272,7 +272,7 @@ CHIP_ERROR ChipDeviceController::EstablishSecureSession()
 
     err = mSessionManager->NewPairing(
         Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(mDeviceAddr, mDevicePort, mInterface)),
-        mCurrentPairingSession);
+        mSecurePairingSession);
     SuccessOrExit(err);
 
     mMessageNumber = 1;
@@ -523,8 +523,8 @@ void ChipDeviceController::OnRendezvousStatusUpdate(RendezvousSessionDelegate::S
     {
     case RendezvousSessionDelegate::SecurePairingSuccess:
         ChipLogProgress(Controller, "Remote device completed SPAKE2+ handshake\n");
-        mPairingSession        = mRendezvousSession->GetPairingSession();
-        mCurrentPairingSession = &mPairingSession;
+        mPairingSession       = mRendezvousSession->GetPairingSession();
+        mSecurePairingSession = &mPairingSession;
 
         if (mOnNewConnection)
         {

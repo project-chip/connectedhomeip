@@ -270,9 +270,9 @@ private:
     uint32_t mMessageNumber = 0;
 
     SecurePairingSession mPairingSession;
-    SecurePairingUsingTestSecret * mTestPairingSession = nullptr;
+    SecurePairingUsingTestSecret * mTestSecurePairingSecret = nullptr;
 
-    SecurePairingSession * mCurrentPairingSession = nullptr;
+    SecurePairingSession * mSecurePairingSession = nullptr;
 
     DevicePairingDelegate * mPairingDelegate;
 
