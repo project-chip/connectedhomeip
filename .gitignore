@@ -8,31 +8,7 @@
 .DS_Store
 
 # Build System
-Makefile.in
-aclocal.m4
-autom4te.cache
-output/
-/build/
-examples/**/build
-config.log
-config.status
-configure
-src/include/BuildConfig.h.in
-src/include/BuildConfig.h.in~
-cmake-build-debug/**
-
-# GN build system
 out/
-
-# Repos stuff
-.repos-warning-stamp
-
-# Example specific rules
-examples/**/sdkconfig
-examples/**/sdkconfig.old
-
-# ESP32 QEMU build
-src/test_driver/esp32/build
 
 # Temporary Directories
 .tmp/
