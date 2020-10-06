@@ -70,9 +70,9 @@ jobs:
                       steps.outsuffix.outputs.value }}
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
             - name: Remove third_party binaries for CodeQL Analysis
-              run: find out -type d -name "third_party" -exec rm -rf {} +
+              run: find . -type d -name "third_party" -exec rm -rf {} +
             - name: Remove m5stack-tft binaries for CodeQL Analysis
-              run: find out -type d -name "m5stack-tft" -exec rm -rf {} +
+              run: find . -type d -name "m5stack-tft" -exec rm -rf {} +
             - name: Perform CodeQL Analysis
               if: ${{ github.event_name == 'push' }}
               uses: github/codeql-action/analyze@v1
