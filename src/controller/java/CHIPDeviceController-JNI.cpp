@@ -62,7 +62,7 @@ using namespace chip::DeviceController;
 
 static void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState);
 static void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
-static void HandleSimpleOperationComplete(ChipDeviceController * deviceController, void * appReqState);
+static void HandleSimpleOperationComplete(ChipDeviceController * deviceController, const char * operation);
 static void HandleNotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj);
 static bool HandleSendCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId,
                                      const uint8_t * characteristicData, uint32_t characteristicDataLen);
@@ -275,8 +275,8 @@ JNI_METHOD(void, beginConnectDeviceIp)(JNIEnv * env, jobject self, jlong deviceC
     env->ReleaseStringUTFChars(deviceAddr, deviceAddrStr);
 
     pthread_mutex_lock(&sStackLock);
-    err = deviceController->ConnectDeviceWithoutSecurePairing(kRemoteDeviceId, deviceIPAddr, (void *) "ConnectDevice",
-                                                              HandleKeyExchange, HandleEchoResponse, HandleError, CHIP_PORT);
+    err = deviceController->ConnectDeviceWithoutSecurePairing(kRemoteDeviceId, deviceIPAddr, nullptr, HandleKeyExchange,
+                                                              HandleEchoResponse, HandleError, CHIP_PORT);
     pthread_mutex_unlock(&sStackLock);
 
     if (err != CHIP_NO_ERROR)
@@ -414,7 +414,7 @@ JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong devic
     }
 }
 
-void HandleSimpleOperationComplete(ChipDeviceController * deviceController, void * appReqState)
+void HandleSimpleOperationComplete(ChipDeviceController * deviceController, const char * operation)
 {
     JNIEnv * env;
     jclass deviceControllerCls;
@@ -423,14 +423,14 @@ void HandleSimpleOperationComplete(ChipDeviceController * deviceController, void
     jobject self   = (jobject) deviceController->AppState;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(Controller, "Received response to %s request", (const char *) appReqState);
+    ChipLogProgress(Controller, "Received response to %s request", operation);
 
     sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
 
     deviceControllerCls = env->GetObjectClass(self);
     VerifyOrExit(deviceControllerCls != NULL, err = CDC_JNI_ERROR_TYPE_NOT_FOUND);
 
-    snprintf(methodName, sizeof(methodName) - 1, "on%sComplete", (const char *) appReqState);
+    snprintf(methodName, sizeof(methodName) - 1, "on%sComplete", operation);
     methodName[sizeof(methodName) - 1] = 0;
     methodID                           = env->GetMethodID(deviceControllerCls, methodName, "()V");
     VerifyOrExit(methodID != NULL, err = CDC_JNI_ERROR_METHOD_NOT_FOUND);
@@ -477,12 +477,9 @@ exit:
 
 void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState)
 {
-    JNIEnv * env;
-
-    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
-
-    HandleSimpleOperationComplete(deviceController, appReqState);
+    HandleSimpleOperationComplete(deviceController, "ConnectDevice");
 }
+
 
 void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload)
 {
