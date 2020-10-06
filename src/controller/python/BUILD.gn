@@ -118,7 +118,10 @@ pw_python_script("python") {
 
   public_deps = [ ":ChipDeviceCtrl" ]
 
-  pythontags = exec_script("${chip_root}/build/chip/python_gen_tags.py", [], "list lines", [])
+  pythontags = exec_script("${chip_root}/build/chip/python_gen_tags.py",
+                           [],
+                           "list lines",
+                           [])
   pythontagsStr = string_join("", pythontags)
   output_name = "chip-0.0-$pythontagsStr.whl"
   outputs = [ "${_dist_dir}/$output_name" ]
