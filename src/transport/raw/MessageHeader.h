@@ -74,9 +74,6 @@ using Flags = BitFlags<uint16_t, FlagValues>;
 //  | version | Flags | encType | reserved |
 static constexpr uint16_t kFlagsMask = 0x0F00;
 
-// Flags of what is in a payload are restricted.
-static constexpr uint16_t kValidPayloadFlags = static_cast<uint16_t>(FlagValues::kVendorIdPresent);
-
 } // namespace Header
 
 /**
@@ -119,7 +116,7 @@ public:
     const Header::Flags & GetFlags() const { return mFlags; }
 
     /** Check if it's a secure session control message. */
-    bool IsSecureSessionControlMsg() const { return mFlags.Get(Header::FlagValues::kSecureSessionControlMessage); }
+    bool IsSecureSessionControlMsg() const { return mFlags.Has(Header::FlagValues::kSecureSessionControlMessage); }
 
     Header::EncryptionType GetEncryptionType() const { return mEncryptionType; }
 

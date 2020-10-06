@@ -228,7 +228,7 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, size_t size, uint16_t * encode_s
 
     {
         // Payload flags are restricted.
-        VerifyOrExit((payloadFlags.Raw() & Header::kValidPayloadFlags) == payloadFlags.Raw(), err = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(payloadFlags.HasOnly(Header::FlagValues::kVendorIdPresent), err = CHIP_ERROR_INVALID_ARGUMENT);
 
         Header::Flags encodeFlags = mFlags;
         encodeFlags.Set(payloadFlags)

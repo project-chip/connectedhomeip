@@ -28,6 +28,8 @@
 
 #include <stdint.h>
 
+#include <utility>
+
 namespace chip {
 
 /**
@@ -75,8 +77,24 @@ public:
         return *this;
     }
 
+    /** Check that no flags outside the arguments are set.*/
+    template <typename... Args>
+    bool HasOnly(Args &&... args) const
+    {
+        return IsZeroAfterClearing(mValue, std::forward<Args>(args)...);
+    }
+
 private:
     StorageType mValue = 0;
+
+    template <typename... Args>
+    static bool IsZeroAfterClearing(StorageType value, FlagsEnum flagToClear, Args &&... args)
+    {
+        value &= static_cast<StorageType>(~static_cast<StorageType>(flagToClear));
+        return IsZeroAfterClearing(value, std::forward<Args>(args)...);
+    }
+
+    static bool IsZeroAfterClearing(StorageType value) { return value == 0; }
 };
 
 /**
