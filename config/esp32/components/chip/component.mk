@@ -38,9 +38,6 @@ REL_CHIP_ROOT               := $(shell perl -e 'use File::Spec; use Cwd; print F
 # Directory containing esp32-specific CHIP project configuration files.
 PROJECT_CONFIG_DIR          := $(CHIP_ROOT)/build/config/esp32
 
-# Architcture on which CHIP is being built.
-BUILD_ARCH                  := $(shell $(CHIP_ROOT)/third_party/nlbuild-autotools/repo/third_party/autoconf/config.guess | sed -e 's/[[:digit:].]*$$//g')
-
 # Directory containing the esp32-specific LwIP component sources.
 LWIP_COMPONENT_DIR      	?= $(IDF_PATH)/components/lwip
 
