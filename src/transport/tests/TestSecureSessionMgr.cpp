@@ -43,7 +43,7 @@ using TestContext = chip::Test::IOContext;
 
 TestContext sContext;
 
-static const char PAYLOAD[]         = "Hello!";
+const char PAYLOAD[]         = "Hello!";
 constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
 
