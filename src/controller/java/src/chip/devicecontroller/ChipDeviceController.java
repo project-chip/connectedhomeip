@@ -19,6 +19,10 @@ package chip.devicecontroller;
 
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
+import android.bluetooth.BluetoothGattDescriptor;
+import java.util.UUID;
 import android.util.Log;
 
 /** Controller to interact with the CHIP device. */
@@ -93,6 +97,47 @@ public class ChipDeviceController {
     completionListener.onSendMessageComplete(message);
   }
 
+  public void onCharacteristicWrite(BluetoothGatt gatt, String charId, int status) {
+    int connId = AndroidChipStack.getInstance().getConnId(gatt);
+
+    if (connId <= 0) {
+      Log.e(TAG, "onCharacteristicWrite for non-active connection");
+      return;
+    }
+
+    if (status != BluetoothGatt.GATT_SUCCESS) {
+      return;
+    }
+
+    handleWriteConfirmation(connId, charId);
+  }
+
+  public void onDescriptorWrite(BluetoothGatt gatt, String charId, byte[] value, int status) {
+    int connId = AndroidChipStack.getInstance().getConnId(gatt);
+
+    if (connId <= 0) {
+      Log.e(TAG, "onCharacteristicWrite for non-active connection");
+      return;
+    }
+
+    if (status != BluetoothGatt.GATT_SUCCESS)
+      return;
+
+    if (value.equals(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE))
+      handleSubscribeComplete(connId, charId);
+  }
+
+  public void onCharacteristicChanged(BluetoothGatt gatt, String charId, byte[] value) {
+    int connId = AndroidChipStack.getInstance().getConnId(gatt);
+
+    if (connId <= 0) {
+      Log.e(TAG, "onCharacteristicChanged for non-active connection");
+      return;
+    }
+
+    handleIndicationReceived(connId, charId, value);
+  }
+
   public void onNotifyChipConnectionClosed(int connId) {
     // Clear connection state.
     AndroidChipStack.getInstance().removeConnection(connId);
@@ -144,6 +189,12 @@ public class ChipDeviceController {
   private native void beginSendMessage(long deviceControllerPtr, String message);
 
   private native void beginSendCommand(long deviceControllerPtr, ChipCommandType command);
+
+  private native void handleIndicationReceived(int conn, String charId, byte[] value);
+
+  private native void handleWriteConfirmation(int conn, String charId);
+
+  private native void handleSubscribeComplete(int conn, String charId);
 
   private native boolean disconnectDevice(long deviceControllerPtr);
 
