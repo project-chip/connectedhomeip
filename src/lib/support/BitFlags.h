@@ -42,7 +42,7 @@ template <typename StorageType, typename FlagsEnum>
 class BitFlags
 {
 public:
-    static_assert(sizeof(StorageType) >= sizeof(FlagsEnum));
+    static_assert(sizeof(StorageType) >= sizeof(FlagsEnum), "All flags should fit in the storage type");
 
     BitFlags() {}
     BitFlags(const BitFlags &) = default;
