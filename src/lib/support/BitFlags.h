@@ -40,6 +40,8 @@ template <typename StorageType, typename FlagsEnum>
 class BitFlags
 {
 public:
+    static_assert(sizeof(StorageType) >= sizeof(FlagsEnum));
+
     BitFlags() {}
     BitFlags(const BitFlags &) = default;
     BitFlags & operator=(const BitFlags &) = default;
@@ -58,7 +60,7 @@ public:
 
     BitFlags & Set(FlagsEnum v, bool isSet) { return isSet ? Set(v) : Clear(v); }
 
-    bool Get(FlagsEnum v) const { return (mValue & static_cast<StorageType>(v)) != 0; }
+    bool Has(FlagsEnum v) const { return (mValue & static_cast<StorageType>(v)) != 0; }
 
     BitFlags & Set(const BitFlags & other)
     {

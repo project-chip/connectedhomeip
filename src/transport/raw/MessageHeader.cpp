@@ -153,7 +153,7 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, size_t size, uint16_
 
     mMessageId = LittleEndian::Read32(p);
 
-    if (mFlags.Get(Header::FlagValues::kSourceNodeIdPresent))
+    if (mFlags.Has(Header::FlagValues::kSourceNodeIdPresent))
     {
         static_assert(kNodeIdSizeBytes == 8, "Read64 might read more bytes than we have in the buffer");
         VerifyOrExit(size >= static_cast<size_t>(p - data) + kNodeIdSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -164,7 +164,7 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, size_t size, uint16_
         mSourceNodeId.ClearValue();
     }
 
-    if (mFlags.Get(Header::FlagValues::kDestinationNodeIdPresent))
+    if (mFlags.Has(Header::FlagValues::kDestinationNodeIdPresent))
     {
         VerifyOrExit(size >= static_cast<size_t>(p - data) + kNodeIdSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
         mDestinationNodeId.SetValue(LittleEndian::Read64(p));
@@ -197,7 +197,7 @@ CHIP_ERROR PayloadHeader::Decode(Header::Flags flags, const uint8_t * const data
     mMessageType    = Read8(p);
     mExchangeID     = LittleEndian::Read16(p);
 
-    if (flags.Get(Header::FlagValues::kVendorIdPresent))
+    if (flags.Has(Header::FlagValues::kVendorIdPresent))
     {
         VerifyOrExit(size >= static_cast<size_t>(p - data) + kVendorIdSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
         mVendorId.SetValue(LittleEndian::Read16(p));
