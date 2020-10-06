@@ -145,14 +145,14 @@ extern template class Internal::GenericConfigurationManagerImpl<ConfigurationMan
 template <class ImplClass>
 inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetVendorId(uint16_t & vendorId)
 {
-    vendorId = (uint16_t) CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
+    vendorId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
     return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
 inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductId(uint16_t & productId)
 {
-    productId = (uint16_t) CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID;
+    productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
     return CHIP_NO_ERROR;
 }
 

@@ -174,7 +174,7 @@ uint32_t Base64Encode32(const uint8_t * in, uint32_t inLen, char * out, Base64Va
 
     while (true)
     {
-        uint16_t inChunkLen = (inLen > kMaxConvert) ? (uint16_t) kMaxConvert : (uint16_t) inLen;
+        uint16_t inChunkLen = (inLen > kMaxConvert) ? static_cast<uint16_t>(kMaxConvert) : static_cast<uint16_t>(inLen);
 
         uint16_t outChunkLen = Base64Encode(in, inChunkLen, out, valToCharFunct);
 
@@ -267,7 +267,7 @@ uint32_t Base64Decode32(const char * in, uint32_t inLen, uint8_t * out, Base64Ch
 
     while (true)
     {
-        uint16_t inChunkLen = (inLen > kMaxConvert) ? (uint16_t) kMaxConvert : (uint16_t) inLen;
+        uint16_t inChunkLen = (inLen > kMaxConvert) ? static_cast<uint16_t>(kMaxConvert) : static_cast<uint16_t>(inLen);
 
         uint16_t outChunkLen = Base64Decode(in, inChunkLen, out, charToValFunct);
         if (outChunkLen == UINT16_MAX)

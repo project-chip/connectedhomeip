@@ -1018,7 +1018,7 @@ void ChipConnection::DoClose(CHIP_ERROR err, uint8_t flags)
 
 void ChipConnection::HandleResolveComplete(void * appState, INET_ERROR dnsRes, uint8_t addrCount, IPAddress * addrArray)
 {
-    ChipConnection * con = (ChipConnection *) appState;
+    ChipConnection * con = static_cast<ChipConnection *>(appState);
 
     // It is legal for a DNS entry to exist but contain no A/AAAA records. If this happens, return a reasonable error
     // to the user.
@@ -1147,7 +1147,7 @@ CHIP_ERROR ChipConnection::StartConnect()
 
 void ChipConnection::HandleConnectComplete(TCPEndPoint * endPoint, INET_ERROR conRes)
 {
-    ChipConnection * con = (ChipConnection *) endPoint->AppState;
+    ChipConnection * con = static_cast<ChipConnection *>(endPoint->AppState);
 
     ChipLogProgress(MessageLayer, "TCP con complete %04X %ld", con->LogId(), (long) conRes);
 
@@ -1220,7 +1220,7 @@ void ChipConnection::HandleConnectComplete(TCPEndPoint * endPoint, INET_ERROR co
 void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * data)
 {
     CHIP_ERROR err;
-    ChipConnection * con        = (ChipConnection *) endPoint->AppState;
+    ChipConnection * con        = static_cast<ChipConnection *>(endPoint->AppState);
     ChipMessageLayer * msgLayer = con->MessageLayer;
 
     // While in a state that allows receiving, process the received data...
@@ -1404,7 +1404,7 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
 
 void ChipConnection::HandleTcpConnectionClosed(TCPEndPoint * endPoint, INET_ERROR err)
 {
-    ChipConnection * con = (ChipConnection *) endPoint->AppState;
+    ChipConnection * con = static_cast<ChipConnection *>(endPoint->AppState);
     if (err == INET_NO_ERROR && con->State == kState_EstablishingSession)
         err = CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY;
     con->DoClose(err, 0);
@@ -1632,7 +1632,7 @@ exit:
 
 void ChipConnection::HandleBleMessageReceived(BLEEndPoint * endPoint, PacketBuffer * data)
 {
-    ChipConnection * con        = (ChipConnection *) endPoint->mAppState;
+    ChipConnection * con        = static_cast<ChipConnection *>(endPoint->mAppState);
     ChipMessageLayer * msgLayer = con->MessageLayer;
 
     // CHIP's BLE layer reassembles received messages in their entirety before it passes them up the stack,
@@ -1691,7 +1691,7 @@ exit:
 
 void ChipConnection::HandleBleConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)
 {
-    ChipConnection * con = (ChipConnection *) endPoint->mAppState;
+    ChipConnection * con = static_cast<ChipConnection *>(endPoint->mAppState);
     con->DoClose(err, 0);
 }
 

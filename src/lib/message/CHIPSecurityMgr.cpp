@@ -133,7 +133,7 @@ void ChipSecurityManager::HandleUnsolicitedMessage(ExchangeContext * ec, const I
                                                    PacketBuffer * msgBuf)
 {
     CHIP_ERROR err               = CHIP_NO_ERROR;
-    ChipSecurityManager * secMgr = (ChipSecurityManager *) ec->AppState;
+    ChipSecurityManager * secMgr = static_cast<ChipSecurityManager *>(ec->AppState);
 
     // Handle Key Error Messages.
     if (profileId == kChipProtocol_Security && msgType == kMsgType_KeyError)
@@ -709,7 +709,7 @@ void ChipSecurityManager::HandleSessionError(CHIP_ERROR err, PacketBuffer * stat
 
 void ChipSecurityManager::HandleConnectionClosed(ExchangeContext * ec, ChipConnection * con, CHIP_ERROR conErr)
 {
-    ChipSecurityManager * secMgr = (ChipSecurityManager *) ec->AppState;
+    ChipSecurityManager * secMgr = static_cast<ChipSecurityManager *>(ec->AppState);
 
     if (conErr == CHIP_NO_ERROR)
         conErr = CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY;
@@ -903,7 +903,7 @@ void ChipSecurityManager::StopIdleSessionTimer()
 
 void ChipSecurityManager::HandleIdleSessionTimeout(System::Layer * aLayer, void * aAppState, System::Error aError)
 {
-    ChipSecurityManager * _this = (ChipSecurityManager *) aAppState;
+    ChipSecurityManager * _this = static_cast<ChipSecurityManager *>(aAppState);
     bool unreservedSessionsExist;
 
     ClearFlag(_this->mFlags, kFlag_IdleSessionTimerRunning);
@@ -929,7 +929,7 @@ void ChipSecurityManager::RMPHandleAckRcvd(ExchangeContext * ec, void * msgCtxt)
 void ChipSecurityManager::RMPHandleSendError(ExchangeContext * ec, CHIP_ERROR err, void * msgCtxt)
 {
     ChipLogProgress(SecurityManager, "%s", __FUNCTION__);
-    ChipSecurityManager * secMgr = (ChipSecurityManager *) ec->AppState;
+    ChipSecurityManager * secMgr = static_cast<ChipSecurityManager *>(ec->AppState);
 
     secMgr->HandleSessionError(err, nullptr);
 }
@@ -941,7 +941,7 @@ void ChipSecurityManager::AsyncNotifySecurityManagerAvailable()
 
 void ChipSecurityManager::DoNotifySecurityManagerAvailable(System::Layer * systemLayer, void * appState, System::Error err)
 {
-    ChipSecurityManager * _this = (ChipSecurityManager *) appState;
+    ChipSecurityManager * _this = static_cast<ChipSecurityManager *>(appState);
     if (_this->State == kState_Idle)
     {
         _this->ExchangeManager->NotifySecurityManagerAvailable();
