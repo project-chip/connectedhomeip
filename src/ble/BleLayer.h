@@ -244,7 +244,6 @@ public:
     typedef void (*BleConnectionReceivedFunct)(BLEEndPoint * newEndPoint);
     BleConnectionReceivedFunct OnChipBleConnectReceived;
 
-public:
     // Public functions:
     BleLayer();
 
@@ -344,7 +343,6 @@ private:
     BleApplicationDelegate * mApplicationDelegate;
     chip::System::Layer * mSystemLayer;
 
-private:
     // Private functions:
     void HandleDataReceived(BLE_CONNECTION_OBJECT connObj, PacketBuffer * pBuf);
     void HandleAckReceived(BLE_CONNECTION_OBJECT connObj);

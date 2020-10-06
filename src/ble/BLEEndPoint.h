@@ -96,7 +96,6 @@ public:
     inline void SetRxWindowSize(uint8_t size) { mReceiveWindowMaxSize = size; };
 #endif
 
-public:
     // Public functions:
     BLE_ERROR Send(PacketBuffer * data);
     BLE_ERROR Receive(PacketBuffer * data);
@@ -157,7 +156,6 @@ private:
     chip::System::Mutex mTxQueueMutex; // For MT-safe Tx queuing
 #endif
 
-private:
     // Private functions:
     BLEEndPoint()  = delete;
     ~BLEEndPoint() = delete;

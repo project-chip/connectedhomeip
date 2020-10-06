@@ -99,7 +99,6 @@ private:
     static void DefaultRetryPolicyCallback(void * const aAppState, SoftwareUpdateManager::RetryParam & aRetryParam,
                                            uint32_t & aOutIntervalMsec);
 
-private:
     SoftwareUpdateManager::State mState;
 
     void * mAppState;
