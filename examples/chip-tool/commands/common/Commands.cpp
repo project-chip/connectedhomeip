@@ -109,11 +109,12 @@ void Commands::ShowUsage(const char * executable)
     fprintf(stderr, "  | Clusters:                                                                           |\n");
     fprintf(stderr, "  |                                                                                     |\n");
     fprintf(stderr, "  |   Usage:                                                                            |\n");
-    fprintf(stderr, "  |    command_name remote-ip remote-port endpoint-id                                   |\n");
+    fprintf(stderr, "  |    command_name remote-ip remote-port endpoint-id [param1 param2 ...]               |\n");
     fprintf(stderr, "  |                                                                                     |\n");
-    fprintf(stderr, "  | Available command names:                                                            |\n");
+    fprintf(stderr, "  | Available command names and command specific parameters:                            |\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     PrintClustersCommands();
+    fprintf(stderr, "\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | Read Attributes:                                                                    |\n");
@@ -180,7 +181,27 @@ void Commands::PrintClustersCommands()
                         hasCommands = true;
                     }
 
-                    fprintf(stderr, "  | %-84s|\n", command->GetName());
+                    std::string arguments = "";
+                    arguments += command->GetName();
+
+                    size_t argumentsCount = command->GetArgumentsCount();
+
+                    // Skip the first 3 arguments since those are the common arguments for ModelCommands.
+                    if (argumentsCount > 3)
+                    {
+                        arguments += " [";
+                        for (size_t i = 3; i < argumentsCount; i++)
+                        {
+                            if (i != 3)
+                            {
+                                arguments += " ";
+                            }
+                            arguments += command->GetArgumentName(i);
+                        }
+                        arguments += "]";
+                    }
+
+                    fprintf(stderr, "  | %-84s|\n", arguments.c_str());
                 }
             }
         }
