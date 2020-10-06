@@ -14,7 +14,7 @@
 
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/gn/chip/linux/gdbus_library.gni")
+import("${chip_root}/build/chip/linux/gdbus_library.gni")
 
 gdbus_library("bluez") {
   sources = [ "DbusBluez.xml" ]
