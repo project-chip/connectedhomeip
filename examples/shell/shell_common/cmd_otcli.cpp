@@ -17,6 +17,8 @@
 
 #include <core/CHIPCore.h>
 
+#include <ChipShellCollection.h>
+
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
 #endif
@@ -42,8 +44,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #endif
-
-#include <ChipShellCollection.h>
 
 using namespace chip;
 using namespace chip::Shell;
@@ -164,10 +164,6 @@ static int OnOtCliOutput(const char * aBuf, uint16_t aBufLength, void * aContext
 
 #endif // CHIP_ENABLE_OPENTHREAD
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void cmd_otcli_init()
 {
 #if CHIP_ENABLE_OPENTHREAD
@@ -179,7 +175,3 @@ void cmd_otcli_init()
     shell_register(&cmds_otcli_root, 1);
 #endif // CHIP_ENABLE_OPENTHREAD
 }
-
-#ifdef __cplusplus
-}
-#endif
