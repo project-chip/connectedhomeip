@@ -17,6 +17,8 @@
 
 #include <core/CHIPCore.h>
 
+#include <ChipShellCollection.h>
+
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
 #endif
@@ -42,8 +44,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #endif
-
-#include <ChipShellCollection.h>
 
 using namespace chip;
 using namespace chip::Shell;
