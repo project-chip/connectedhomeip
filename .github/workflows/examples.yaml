@@ -76,9 +76,9 @@ jobs:
                       out/lighting_app_debug/chip-nrf52840-lighting-example
             # TODO: NRF Connect https://github.com/project-chip/connectedhomeip/issues/2225
             - name: Remove third_party binaries for CodeQL Analysis
-              run: find out -type d -name "third_party" -exec rm -rf {} +
+              run: find . -type d -name "third_party" -exec rm -rf {} +
             - name: Remove nrfxlib binaries for CodeQL Analysis
-              run: find out -type d -name "nrfxlib" -exec rm -rf {} +
+              run: find . -type d -name "nrfxlib" -exec rm -rf {} +
             - name: Perform CodeQL Analysis
               if: ${{ github.event_name == 'push' }}
               uses: github/codeql-action/analyze@v1
@@ -138,9 +138,9 @@ jobs:
                       out/chip_tool_debug/chip-tool
                       out/shell_debug/chip-shell
             - name: Remove third_party binaries for CodeQL Analysis
-              run: find out -type d -name "third_party" -exec rm -rf {} +
+              run: find . -type d -name "third_party" -exec rm -rf {} +
             - name: Remove dbus binaries for CodeQL Analysis
-              run: find out -type d -name "dbus" -exec rm -rf {} +
+              run: find . -type d -name "dbus" -exec rm -rf {} +
             - name: Perform CodeQL Analysis
               if: ${{ github.event_name == 'push' }}
               uses: github/codeql-action/analyze@v1
@@ -195,7 +195,7 @@ jobs:
                       out/lock_app_debug/BRD4161A/chip-efr32-lock-example.out
                       out/lighting_app_debug/BRD4161A/chip-efr32-lighting-example.out
             - name: Remove third_party binaries for CodeQL Analysis
-              run: find out -type d -name "third_party" -exec rm -rf {} +
+              run: find . -type d -name "third_party" -exec rm -rf {} +
             - name: Remove dbus binaries for CodeQL Analysis
             - name: Perform CodeQL Analysis
               if: ${{ github.event_name == 'push' }}
@@ -259,9 +259,9 @@ jobs:
                       steps.outsuffix.outputs.value }}
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
             - name: Remove third_party binaries for CodeQL Analysis
-              run: find out -type d -name "third_party" -exec rm -rf {} +
+              run: find . -type d -name "third_party" -exec rm -rf {} +
             - name: Remove nrfxlib binaries for CodeQL Analysis
-              run: find out -type d -name "nrfxlib" -exec rm -rf {} +
+              run: find . -type d -name "nrfxlib" -exec rm -rf {} +
             - name: Perform CodeQL Analysis
               if: ${{ github.event_name == 'push' }}
               uses: github/codeql-action/analyze@v1
