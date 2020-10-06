@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
 import("//build/config/android/config.gni")
 
-javac_runner = "//gn/chip/java/javac_runner.py"
-jar_runner = "//gn/chip/java/jar_runner.py"
+javac_runner = "${chip_root}/build/chip/java/javac_runner.py"
+jar_runner = "${chip_root}/build/chip/java/jar_runner.py"
 
 assert(android_sdk_root != "", "android_sdk_root must be specified")
 

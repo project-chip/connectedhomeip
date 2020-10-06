@@ -124,7 +124,7 @@ if (chip_device_platform == "nrf5") {
     deps = [ ":nrf5" ]
   }
 } else {
-  import("${chip_root}/gn/chip/tools.gni")
+  import("${chip_root}/build/chip/tools.gni")
 
   assert(chip_build_tools)
 
