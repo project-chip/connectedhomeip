@@ -2,8 +2,8 @@
 
 ### :warning: nRF5 platform deprecated
 
-> This platform based on the nRF5 SDK for Thread and Zigbee is in
-> maintenance mode and support for it will be removed from the CHIP project
+> This platform based on the nRF5 SDK for Thread and Zigbee is in maintenance
+> mode and support for it will be removed from the CHIP project
 > repository.<br /><br /> To develop CHIP applications on Nordic Semiconductor
 > devices such as nRF52840, use the platform based on the
 > [nRF Connect SDK](https://www.nordicsemi.com/Software-and-tools/Software/nRF-Connect-SDK),
