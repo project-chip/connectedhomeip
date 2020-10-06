@@ -40,6 +40,11 @@ jobs:
               with:
                   fetch-depth: 0
                   submodules: true
+            - name: Initialize CodeQL
+              uses: github/codeql-action/init@v1
+              with:
+                  languages: "cpp"
+                  queries: +security-and-quality
             - name: Build example Echo App
               run: scripts/examples/esp_echo_app.sh CHIP_BUILD_WITH_GN=y
             - name: Copy aside build products
@@ -64,3 +69,6 @@ jobs:
                       ${{ env.BUILD_TYPE }}-example-build-${{
                       steps.outsuffix.outputs.value }}
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
+            - name: Perform CodeQL Analysis
+              if: ${{ github.event_name == 'push' }}
+              uses: github/codeql-action/analyze@v1
