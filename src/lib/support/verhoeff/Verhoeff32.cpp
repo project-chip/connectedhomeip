@@ -139,7 +139,7 @@ bool Verhoeff32::ValidateCheckChar(const char * str, size_t strLen)
 int Verhoeff32::CharToVal(char ch)
 {
     if (ch >= '0' && ch <= 'y')
-        return sCharToValTable[(int) ch - '0'];
+        return sCharToValTable[static_cast<int>(ch) - '0'];
     return -1;
 }
 

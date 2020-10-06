@@ -246,12 +246,12 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductRevisio
     err = Impl()->ReadConfigValue(ImplClass::kConfigKey_ProductRevision, val);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        productRev = (uint16_t) CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION;
+        productRev = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION);
         err        = CHIP_NO_ERROR;
     }
     else
     {
-        productRev = (uint16_t) val;
+        productRev = static_cast<uint16_t>(val);
     }
 
     return err;
@@ -260,7 +260,7 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductRevisio
 template <class ImplClass>
 inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreProductRevision(uint16_t productRev)
 {
-    return Impl()->WriteConfigValue(ImplClass::kConfigKey_ProductRevision, (uint32_t) productRev);
+    return Impl()->WriteConfigValue(ImplClass::kConfigKey_ProductRevision, static_cast<uint32_t>(productRev));
 }
 
 template <class ImplClass>
@@ -592,7 +592,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSetupDiscriminator(ui
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
     SuccessOrExit(err);
 
-    setupDiscriminator = (uint16_t) val;
+    setupDiscriminator = static_cast<uint16_t>(val);
 
 exit:
     return err;
@@ -601,7 +601,7 @@ exit:
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreSetupDiscriminator(uint16_t setupDiscriminator)
 {
-    return Impl()->WriteConfigValue(ImplClass::kConfigKey_SetupDiscriminator, (uint32_t) setupDiscriminator);
+    return Impl()->WriteConfigValue(ImplClass::kConfigKey_SetupDiscriminator, static_cast<uint32_t>(setupDiscriminator));
 }
 
 template <class ImplClass>

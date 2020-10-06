@@ -87,7 +87,7 @@ CHIP_ERROR ChipLinuxStorage::ReadValue(const char * key, bool & val)
     mLock.lock();
 
     retval = ChipLinuxStorageIni::GetUIntValue(key, result);
-    val    = (result == 0 ? false : true);
+    val    = (result != 0);
 
     mLock.unlock();
 
@@ -152,11 +152,11 @@ CHIP_ERROR ChipLinuxStorage::WriteValue(const char * key, bool val)
 
     if (val)
     {
-        retval = WriteValue(key, (uint32_t) 1);
+        retval = WriteValue(key, static_cast<uint32_t>(1));
     }
     else
     {
-        retval = WriteValue(key, (uint32_t) 0);
+        retval = WriteValue(key, static_cast<uint32_t>(0));
     }
 
     return retval;
@@ -225,14 +225,14 @@ CHIP_ERROR ChipLinuxStorage::WriteValueBin(const char * key, const uint8_t * dat
     {
         // We tested above that dataLen is no more than kMaxBlobSize.
         static_assert(kMaxBlobSize < UINT16_MAX, "dataLen won't fit");
-        encodedDataLen                    = Base64Encode(data, static_cast<uint16_t>(dataLen), encodedData.Ptr());
-        encodedData.Ptr()[encodedDataLen] = 0;
+        encodedDataLen              = Base64Encode(data, static_cast<uint16_t>(dataLen), encodedData.Get());
+        encodedData[encodedDataLen] = 0;
     }
 
     // Store it
     if (retval == CHIP_NO_ERROR)
     {
-        WriteValueStr(key, encodedData.Ptr());
+        WriteValueStr(key, encodedData.Get());
     }
 
     return retval;

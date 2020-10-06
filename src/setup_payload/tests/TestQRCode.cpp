@@ -83,7 +83,7 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
     uint8_t input[] = { 10, 10, 10 };
 
     // basic stuff
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 0) == "");
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 0).empty());
     NL_TEST_ASSERT(inSuite, base41Encode(input, 1) == "A");
     NL_TEST_ASSERT(inSuite, base41Encode(input, 2) == "SL1");
     NL_TEST_ASSERT(inSuite, base41Encode(input, 3) == "SL1A");
@@ -125,7 +125,7 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
     string hello_world;
     for (uint8_t b : decoded)
     {
-        hello_world += (char) b;
+        hello_world += static_cast<char>(b);
     }
     NL_TEST_ASSERT(inSuite, hello_world == "Hello World!");
 
@@ -135,7 +135,7 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
 
     // empty == empty
     NL_TEST_ASSERT(inSuite, base41Decode("", decoded) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, decoded.size() == 0);
+    NL_TEST_ASSERT(inSuite, decoded.empty());
 
     // single base41 means one byte of output
     NL_TEST_ASSERT(inSuite, base41Decode("A", decoded) == CHIP_NO_ERROR);

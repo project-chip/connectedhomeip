@@ -657,7 +657,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, double v)
  */
 CHIP_ERROR TLVWriter::PutBytes(uint64_t tag, const uint8_t * buf, uint32_t len)
 {
-    return WriteElementWithData(kTLVType_ByteString, tag, (const uint8_t *) buf, len);
+    return WriteElementWithData(kTLVType_ByteString, tag, buf, len);
 }
 
 /**
@@ -720,7 +720,7 @@ CHIP_ERROR TLVWriter::PutString(uint64_t tag, const char * buf)
  */
 CHIP_ERROR TLVWriter::PutString(uint64_t tag, const char * buf, uint32_t len)
 {
-    return WriteElementWithData(kTLVType_UTF8String, tag, (const uint8_t *) buf, len);
+    return WriteElementWithData(kTLVType_UTF8String, tag, reinterpret_cast<const uint8_t *>(buf), len);
 }
 
 /**
@@ -883,7 +883,7 @@ CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char * fmt, va_list ap)
 #endif
 
     // write length.
-    err = WriteElementHead((TLVElementType)(kTLVType_UTF8String | lenFieldSize), tag, dataLen);
+    err = WriteElementHead(static_cast<TLVElementType>(kTLVType_UTF8String | lenFieldSize), tag, dataLen);
     SuccessOrExit(err);
 
     VerifyOrExit((mLenWritten + dataLen) <= mMaxLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -1197,7 +1197,7 @@ CHIP_ERROR TLVWriter::OpenContainer(uint64_t tag, TLVType containerType, TLVWrit
         VerifyOrExit(mMaxLen >= kEndOfContainerMarkerSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
         mMaxLen -= kEndOfContainerMarkerSize;
     }
-    err = WriteElementHead((TLVElementType) containerType, tag, 0);
+    err = WriteElementHead(static_cast<TLVElementType>(containerType), tag, 0);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1337,7 +1337,7 @@ CHIP_ERROR TLVWriter::StartContainer(uint64_t tag, TLVType containerType, TLVTyp
         mMaxLen -= kEndOfContainerMarkerSize;
     }
 
-    err = WriteElementHead((TLVElementType) containerType, tag, 0);
+    err = WriteElementHead(static_cast<TLVElementType>(containerType), tag, 0);
     if (err != CHIP_NO_ERROR)
     {
         // undo the space reservation, as the container is not actually open
@@ -1447,7 +1447,7 @@ CHIP_ERROR TLVWriter::PutPreEncodedContainer(uint64_t tag, TLVType containerType
     if (!TLVTypeIsContainer(containerType))
         return CHIP_ERROR_INVALID_ARGUMENT;
 
-    CHIP_ERROR err = WriteElementHead((TLVElementType) containerType, tag, 0);
+    CHIP_ERROR err = WriteElementHead(static_cast<TLVElementType>(containerType), tag, 0);
     if (err != CHIP_NO_ERROR)
         return err;
 
@@ -1672,7 +1672,7 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
                 return CHIP_ERROR_INVALID_TLV_TAG;
 
             Write8(p, kTLVTagControl_ContextSpecific | elemType);
-            Write8(p, (uint8_t) tagNum);
+            Write8(p, static_cast<uint8_t>(tagNum));
         }
         else
         {
@@ -1695,7 +1695,7 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
             if (tagNum < 65536)
             {
                 Write8(p, kTLVTagControl_CommonProfile_2Bytes | elemType);
-                LittleEndian::Write16(p, (uint16_t) tagNum);
+                LittleEndian::Write16(p, static_cast<uint16_t>(tagNum));
             }
             else
             {
@@ -1708,7 +1708,7 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
             if (tagNum < 65536)
             {
                 Write8(p, kTLVTagControl_ImplicitProfile_2Bytes | elemType);
-                LittleEndian::Write16(p, (uint16_t) tagNum);
+                LittleEndian::Write16(p, static_cast<uint16_t>(tagNum));
             }
             else
             {
@@ -1718,15 +1718,15 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
         }
         else
         {
-            uint16_t vendorId   = (uint16_t)(profileId >> 16);
-            uint16_t profileNum = (uint16_t) profileId;
+            uint16_t vendorId   = static_cast<uint16_t>(profileId >> 16);
+            uint16_t profileNum = static_cast<uint16_t>(profileId);
 
             if (tagNum < 65536)
             {
                 Write8(p, kTLVTagControl_FullyQualified_6Bytes | elemType);
                 LittleEndian::Write16(p, vendorId);
                 LittleEndian::Write16(p, profileNum);
-                LittleEndian::Write16(p, (uint16_t) tagNum);
+                LittleEndian::Write16(p, static_cast<uint16_t>(tagNum));
             }
             else
             {
@@ -1743,13 +1743,13 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
     case kTLVFieldSize_0Byte:
         break;
     case kTLVFieldSize_1Byte:
-        Write8(p, (uint8_t) lenOrVal);
+        Write8(p, static_cast<uint8_t>(lenOrVal));
         break;
     case kTLVFieldSize_2Byte:
-        LittleEndian::Write16(p, (uint16_t) lenOrVal);
+        LittleEndian::Write16(p, static_cast<uint16_t>(lenOrVal));
         break;
     case kTLVFieldSize_4Byte:
-        LittleEndian::Write32(p, (uint32_t) lenOrVal);
+        LittleEndian::Write32(p, static_cast<uint32_t>(lenOrVal));
         break;
     case kTLVFieldSize_8Byte:
         LittleEndian::Write64(p, lenOrVal);
@@ -1778,7 +1778,7 @@ CHIP_ERROR TLVWriter::WriteElementWithData(TLVType type, uint64_t tag, const uin
     else
         lenFieldSize = kTLVFieldSize_4Byte;
 
-    CHIP_ERROR err = WriteElementHead((TLVElementType)(type | lenFieldSize), tag, dataLen);
+    CHIP_ERROR err = WriteElementHead(static_cast<TLVElementType>(type | lenFieldSize), tag, dataLen);
     if (err != CHIP_NO_ERROR)
         return err;
 

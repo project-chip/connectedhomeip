@@ -976,7 +976,7 @@ typedef enum ChipSubnetId
 inline void ChipNodeAddrToStr(char * buf, uint32_t bufSize, uint64_t nodeId, const Inet::IPAddress * addr, uint16_t port,
                               ChipConnection * con)
 {
-    ChipMessageLayer::GetPeerDescription(buf, (size_t) bufSize, nodeId, addr, port, INET_NULL_INTERFACEID, con);
+    ChipMessageLayer::GetPeerDescription(buf, static_cast<size_t>(bufSize), nodeId, addr, port, INET_NULL_INTERFACEID, con);
 }
 
 /**
@@ -984,7 +984,7 @@ inline void ChipNodeAddrToStr(char * buf, uint32_t bufSize, uint64_t nodeId, con
  */
 inline void ChipMessageSourceToStr(char * buf, uint32_t bufSize, const ChipMessageInfo * msgInfo)
 {
-    ChipMessageLayer::GetPeerDescription(buf, (size_t) bufSize, msgInfo);
+    ChipMessageLayer::GetPeerDescription(buf, static_cast<size_t>(bufSize), msgInfo);
 }
 
 extern CHIP_ERROR GenerateChipNodeId(uint64_t & nodeId);

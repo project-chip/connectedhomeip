@@ -1489,8 +1489,9 @@ dns_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_addr_t *addr, 
               return;
             }
             /* skip this answer */
-            if ((int)(res_idx + lwip_htons(ans.len)) > 0xFFFF) {
-              goto memerr; /* ignore this packet */
+            if ((res_idx + lwip_htons(ans.len)) > 0xFFFF)
+            {
+                goto memerr; /* ignore this packet */
             }
             res_idx += lwip_htons(ans.len);
             --nanswers;

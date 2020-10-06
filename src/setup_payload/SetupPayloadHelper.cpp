@@ -20,6 +20,7 @@
 #include "QRCodeSetupPayloadGenerator.h"
 #include "SetupPayload.h"
 #include <fstream>
+#include <utility>
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -46,7 +47,8 @@ struct SetupPayloadParameter
     uint64_t uintValue;
 };
 
-static CHIP_ERROR resolveSetupPayloadParameter(SetupPayloadParameter & parameter, std::string key, std::string value)
+static CHIP_ERROR resolveSetupPayloadParameter(SetupPayloadParameter & parameter, const std::string & key,
+                                               const std::string & value)
 {
     bool isUnsignedInt   = true;
     bool shouldHaveValue = true;
@@ -101,21 +103,21 @@ static CHIP_ERROR resolveSetupPayloadParameter(SetupPayloadParameter & parameter
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR addParameter(SetupPayload & setupPayload, SetupPayloadParameter parameter)
+static CHIP_ERROR addParameter(SetupPayload & setupPayload, const SetupPayloadParameter & parameter)
 {
     switch (parameter.key)
     {
     case SetupPayloadKey_Version:
         ChipLogDetail(SetupPayload, "Loaded version: %u", (uint8_t) parameter.uintValue);
-        setupPayload.version = (uint8_t) parameter.uintValue;
+        setupPayload.version = static_cast<uint8_t>(parameter.uintValue);
         break;
     case SetupPayloadKey_VendorID:
         ChipLogDetail(SetupPayload, "Loaded vendorID: %u", (uint16_t) parameter.uintValue);
-        setupPayload.vendorID = (uint16_t) parameter.uintValue;
+        setupPayload.vendorID = static_cast<uint16_t>(parameter.uintValue);
         break;
     case SetupPayloadKey_ProductID:
         ChipLogDetail(SetupPayload, "Loaded productID: %u", (uint16_t) parameter.uintValue);
-        setupPayload.productID = (uint16_t) parameter.uintValue;
+        setupPayload.productID = static_cast<uint16_t>(parameter.uintValue);
         break;
     case SetupPayloadKey_RequiresCustomFlowTrue:
         ChipLogDetail(SetupPayload, "Requires custom flow was set to true");
@@ -127,11 +129,11 @@ static CHIP_ERROR addParameter(SetupPayload & setupPayload, SetupPayloadParamete
         break;
     case SetupPayloadKey_Discriminator:
         ChipLogDetail(SetupPayload, "Loaded discriminator: %u", (uint16_t) parameter.uintValue);
-        setupPayload.discriminator = (uint16_t) parameter.uintValue;
+        setupPayload.discriminator = static_cast<uint16_t>(parameter.uintValue);
         break;
     case SetupPayloadKey_SetupPINCode:
         ChipLogDetail(SetupPayload, "Loaded setupPinCode: %lu", (unsigned long) parameter.uintValue);
-        setupPayload.setUpPINCode = (uint32_t) parameter.uintValue;
+        setupPayload.setUpPINCode = static_cast<uint32_t>(parameter.uintValue);
         break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -139,7 +141,7 @@ static CHIP_ERROR addParameter(SetupPayload & setupPayload, SetupPayloadParamete
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR loadPayloadFromFile(SetupPayload & setupPayload, std::string filePath)
+CHIP_ERROR loadPayloadFromFile(SetupPayload & setupPayload, const std::string & filePath)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     std::ifstream fileStream(filePath);
@@ -172,7 +174,7 @@ exit:
 CHIP_ERROR generateQRCodeFromFilePath(std::string filePath, std::string & outCode)
 {
     SetupPayload setupPayload;
-    CHIP_ERROR err = loadPayloadFromFile(setupPayload, filePath);
+    CHIP_ERROR err = loadPayloadFromFile(setupPayload, std::move(filePath));
     if (err != CHIP_NO_ERROR)
     {
         return err;
@@ -185,7 +187,7 @@ CHIP_ERROR generateQRCodeFromFilePath(std::string filePath, std::string & outCod
 CHIP_ERROR generateManualCodeFromFilePath(std::string filePath, std::string & outCode)
 {
     SetupPayload setupPayload;
-    CHIP_ERROR err = loadPayloadFromFile(setupPayload, filePath);
+    CHIP_ERROR err = loadPayloadFromFile(setupPayload, std::move(filePath));
     if (err != CHIP_NO_ERROR)
     {
         return err;

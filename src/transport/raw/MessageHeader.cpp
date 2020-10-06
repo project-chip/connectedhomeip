@@ -148,7 +148,7 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, size_t size, uint16_
     version = ((header & kVersionMask) >> kVersionShift);
     VerifyOrExit(version == kHeaderVersion, err = CHIP_ERROR_VERSION_MISMATCH);
 
-    mEncryptionType = (Header::EncryptionType)((header & kEncryptionTypeMask) >> kEncryptionTypeShift);
+    mEncryptionType = static_cast<Header::EncryptionType>((header & kEncryptionTypeMask) >> kEncryptionTypeShift);
     mFlags.SetRaw(header & Header::kFlagsMask);
 
     mMessageId = LittleEndian::Read32(p);
@@ -238,7 +238,7 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, size_t size, uint16_t * encode_s
         header = header | encodeFlags.Raw();
     }
 
-    header |= (static_cast<uint16_t>((uint16_t) mEncryptionType << kEncryptionTypeShift) & kEncryptionTypeMask);
+    header |= (static_cast<uint16_t>(static_cast<uint16_t>(mEncryptionType) << kEncryptionTypeShift) & kEncryptionTypeMask);
 
     LittleEndian::Write16(p, header);
     LittleEndian::Write32(p, mMessageId);

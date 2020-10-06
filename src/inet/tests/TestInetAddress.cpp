@@ -669,7 +669,7 @@ void CheckAddressQuartet(nlTestSuite * inSuite, const uint32_t & inFirstAddressQ
 
     NL_TEST_ASSERT(inSuite, lResult == true);
 
-    if (lResult != true)
+    if (!lResult)
     {
         fprintf(stdout, "Address quartet %zu mismatch: actual 0x%08x, expected: 0x%08x\n", inWhich, inFirstAddressQuartet,
                 inSecondAddressQuartet);
@@ -733,7 +733,7 @@ void CheckAddress(nlTestSuite * inSuite, const IPAddressContext & inContext, con
 
     lResult = (inAddress == lParsedAddress);
 
-    if (lResult != true)
+    if (!static_cast<bool>(lResult))
     {
         fprintf(stdout, "Address parse mismatch for %s\n", inContext.mAddrString);
     }
@@ -1016,7 +1016,7 @@ void CheckToIPv6(nlTestSuite * inSuite, void * inContext)
         ip_addr_1 = *(ip6_addr_t *) addr;
 #else
         struct in6_addr ip_addr_1, ip_addr_2;
-        ip_addr_1 = *(struct in6_addr *) addr;
+        ip_addr_1 = *reinterpret_cast<struct in6_addr *>(addr);
 #endif
         ip_addr_2 = test_addr.ToIPv6();
 
@@ -1053,7 +1053,7 @@ void CheckFromIPv6(nlTestSuite * inSuite, void * inContext)
         ip_addr = *(ip6_addr_t *) addr;
 #else
         struct in6_addr ip_addr;
-        ip_addr = *(struct in6_addr *) addr;
+        ip_addr = *reinterpret_cast<struct in6_addr *>(addr);
 #endif
         test_addr_2 = IPAddress::FromIPv6(ip_addr);
 
@@ -1428,7 +1428,7 @@ void CheckDecoding(nlTestSuite * inSuite, void * inContext)
 
         for (b = 0; b < NUM_BYTES_IN_IPV6; b++)
         {
-            buffer[b] = (uint8_t)(lCurrent->mAddr.mAddrQuartets[b / 4] >> ((3 - b % 4) * 8));
+            buffer[b] = static_cast<uint8_t>(lCurrent->mAddr.mAddrQuartets[b / 4] >> ((3 - b % 4) * 8));
         }
 
         // Call ReadAddress function that we test.
