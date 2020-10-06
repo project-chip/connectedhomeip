@@ -12,11 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-print("#######################################################################################")
-print("# Warning! This platform is deprecated.                                               #")
-print("# To develop CHIP applications on Nordic Semiconductor devices such as nRF52840       #")
-print("# use the platform based on the nRF Connect SDK, located in the nrfconnect directory. #")
-print("#######################################################################################")
+print(
+    "#######################################################################################")
+print(
+    "# Warning! This platform is deprecated.                                               #")
+print(
+    "# To develop CHIP applications on Nordic Semiconductor devices such as nRF52840       #")
+print(
+    "# use the platform based on the nRF Connect SDK, located in the nrfconnect directory. #")
+print(
+    "#######################################################################################")
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/nrf5_sdk.gni")
