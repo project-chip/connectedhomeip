@@ -277,7 +277,7 @@ public:
 
     void Abort();
 
-    void SetConnectTimeout(const uint32_t connTimeoutMsecs);
+    void SetConnectTimeout(uint32_t connTimeoutMsecs);
 
     CHIP_ERROR SetIdleTimeout(uint32_t timeoutMS);
 

@@ -55,7 +55,7 @@ public:
      * @return CHIP_ERROR        The result of key derivation
      */
     CHIP_ERROR Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
-                    const uint8_t * salt, const size_t salt_length, const uint8_t * info, const size_t info_length);
+                    const uint8_t * salt, size_t salt_length, const uint8_t * info, size_t info_length);
 
     /**
      * @brief
@@ -70,8 +70,8 @@ public:
      * @param info_length        Length of the initial info
      * @return CHIP_ERROR        The result of key derivation
      */
-    CHIP_ERROR InitFromSecret(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
-                              const uint8_t * info, const size_t info_length);
+    CHIP_ERROR InitFromSecret(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length,
+                              const uint8_t * info, size_t info_length);
 
     /**
      * @brief
@@ -129,7 +129,7 @@ private:
     // Use unencrypted header as additional authenticated data (AAD) during encryption and decryption.
     // The encryption operations includes AAD when message authentication tag is generated. This tag
     // is used at the time of decryption to integrity check the received data.
-    static CHIP_ERROR GetAdditionalAuthData(const PacketHeader & header, const Header::Flags payloadEncodeFlags, uint8_t * aad,
+    static CHIP_ERROR GetAdditionalAuthData(const PacketHeader & header, Header::Flags payloadEncodeFlags, uint8_t * aad,
                                             size_t & len);
 };
 
