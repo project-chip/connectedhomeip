@@ -43,6 +43,7 @@ source_set("chip_version_header") {
 
 support_headers = [
   "Base64.h",
+  "BitFlags.h",
   "BufBound.h",
   "CHIPCounter.h",
   "CodeUtils.h",

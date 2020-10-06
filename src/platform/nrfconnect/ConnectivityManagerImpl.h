@@ -31,7 +31,6 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
-#include <support/FlagUtils.hpp>
 
 #include <support/logging/CHIPLogging.h>
 

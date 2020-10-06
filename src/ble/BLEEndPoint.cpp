@@ -36,9 +36,9 @@
 #if CONFIG_NETWORK_LAYER_BLE
 #include <core/CHIPConfig.h>
 
+#include <support/BitFlags.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
-#include <support/FlagUtils.hpp>
 #include <support/logging/CHIPLogging.h>
 
 #include <ble/BLEEndPoint.h>

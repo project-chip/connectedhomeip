@@ -149,11 +149,11 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, size_t size, uint16_
     VerifyOrExit(version == kHeaderVersion, err = CHIP_ERROR_VERSION_MISMATCH);
 
     mEncryptionType = (Header::EncryptionType)((header & kEncryptionTypeMask) >> kEncryptionTypeShift);
-    mFlags.value    = header & Header::Flags::kMask;
+    mFlags.SetRaw(header & Header::kFlagsMask);
 
     mMessageId = LittleEndian::Read32(p);
 
-    if (mFlags.value & Header::Flags::kSourceNodeIdPresent)
+    if (mFlags.Get(Header::FlagValues::kSourceNodeIdPresent))
     {
         static_assert(kNodeIdSizeBytes == 8, "Read64 might read more bytes than we have in the buffer");
         VerifyOrExit(size >= static_cast<size_t>(p - data) + kNodeIdSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -164,7 +164,7 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, size_t size, uint16_
         mSourceNodeId.ClearValue();
     }
 
-    if (mFlags.value & Header::Flags::kDestinationNodeIdPresent)
+    if (mFlags.Get(Header::FlagValues::kDestinationNodeIdPresent))
     {
         VerifyOrExit(size >= static_cast<size_t>(p - data) + kNodeIdSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
         mDestinationNodeId.SetValue(LittleEndian::Read64(p));
@@ -197,7 +197,7 @@ CHIP_ERROR PayloadHeader::Decode(Header::Flags flags, const uint8_t * const data
     mMessageType    = Read8(p);
     mExchangeID     = LittleEndian::Read16(p);
 
-    if (flags.value & Header::Flags::kVendorIdPresent)
+    if (flags.Get(Header::FlagValues::kVendorIdPresent))
     {
         VerifyOrExit(size >= static_cast<size_t>(p - data) + kVendorIdSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
         mVendorId.SetValue(LittleEndian::Read16(p));
@@ -226,19 +226,16 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, size_t size, uint16_t * encode_s
 
     VerifyOrExit(size >= EncodeSizeBytes(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    // Payload flags are restricted.
-    VerifyOrExit((payloadFlags.value & Header::Flags::kValidPayloadFlags) == payloadFlags.value, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    header |= mFlags.value;
-    header |= payloadFlags.value;
-
-    if (mSourceNodeId.HasValue())
     {
-        header |= Header::Flags::kSourceNodeIdPresent;
-    }
-    if (mDestinationNodeId.HasValue())
-    {
-        header |= Header::Flags::kDestinationNodeIdPresent;
+        // Payload flags are restricted.
+        VerifyOrExit((payloadFlags.Raw() & Header::kValidPayloadFlags) == payloadFlags.Raw(), err = CHIP_ERROR_INVALID_ARGUMENT);
+
+        Header::Flags encodeFlags = mFlags;
+        encodeFlags.Set(payloadFlags)
+            .Set(Header::FlagValues::kSourceNodeIdPresent, mSourceNodeId.HasValue())
+            .Set(Header::FlagValues::kDestinationNodeIdPresent, mDestinationNodeId.HasValue());
+
+        header = header | encodeFlags.Raw();
     }
 
     header |= (static_cast<uint16_t>((uint16_t) mEncryptionType << kEncryptionTypeShift) & kEncryptionTypeMask);
@@ -290,12 +287,7 @@ exit:
 
 Header::Flags PayloadHeader::GetEncodePacketFlags() const
 {
-    Header::Flags result;
-    if (mVendorId.HasValue())
-    {
-        result.value |= Header::Flags::kVendorIdPresent;
-    }
-    return result;
+    return Header::Flags().Set(Header::FlagValues::kVendorIdPresent, mVendorId.HasValue());
 }
 
 CHIP_ERROR MessageAuthenticationCode::Decode(const PacketHeader & packetHeader, const uint8_t * const data, size_t size,

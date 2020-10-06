@@ -39,9 +39,9 @@
 
 #include <core/CHIPKeyIds.h>
 #include <protocols/security/CHIPApplicationKeys.h>
+#include <support/BitFlags.h>
 #include <support/CHIPCounter.h>
 #include <support/DLLUtil.h>
-#include <support/FlagUtils.hpp>
 #include <support/PersistedCounter.h>
 
 namespace chip {

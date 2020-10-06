@@ -29,6 +29,7 @@
 
 #include <core/CHIPError.h>
 #include <core/Optional.h>
+#include <support/BitFlags.h>
 
 namespace chip {
 
@@ -49,33 +50,32 @@ enum class EncryptionType
     kAESCCMTagLen16 = 2,
 };
 
-struct Flags
+enum class FlagValues : uint16_t
 {
-    uint16_t value = 0;
-
-    static constexpr Flags None() { return Flags(); }
-
     /// Header flag specifying that a destination node id is included in the header.
-    static constexpr uint16_t kDestinationNodeIdPresent = 0x0100;
+    kDestinationNodeIdPresent = 0x0100,
 
     /// Header flag specifying that a source node id is included in the header.
-    static constexpr uint16_t kSourceNodeIdPresent = 0x0200;
+    kSourceNodeIdPresent = 0x0200,
 
     /// Header flag specifying that a source vendor id is included in the header.
-    static constexpr uint16_t kVendorIdPresent = 0x0400;
+    kVendorIdPresent = 0x0400,
 
     /// Header flag specifying that it is a control message for secure session.
-    static constexpr uint16_t kSecureSessionControlMessage = 0x0800;
+    kSecureSessionControlMessage = 0x0800,
 
-    // Header is a 16-bit value of the form
-    //  |  4 bit  | 4 bit |  4 bit  |  4 bit   |
-    //  +---------+-------+---------+----------|
-    //  | version | Flags | encType | reserved |
-    static constexpr uint16_t kMask = 0x0F00;
-
-    // Flags of what is in a payload are restricted.
-    static constexpr uint16_t kValidPayloadFlags = kVendorIdPresent;
 };
+
+using Flags = BitFlags<uint16_t, FlagValues>;
+
+// Header is a 16-bit value of the form
+//  |  4 bit  | 4 bit |  4 bit  |  4 bit   |
+//  +---------+-------+---------+----------|
+//  | version | Flags | encType | reserved |
+static constexpr uint16_t kFlagsMask = 0x0F00;
+
+// Flags of what is in a payload are restricted.
+static constexpr uint16_t kValidPayloadFlags = static_cast<uint16_t>(FlagValues::kVendorIdPresent);
 
 } // namespace Header
 
@@ -115,50 +115,38 @@ public:
     /** Get the length of encrypted payload. */
     uint16_t GetPayloadLength() const { return mPayloadLength; }
 
+    Header::Flags & GetFlags() { return mFlags; }
     const Header::Flags & GetFlags() const { return mFlags; }
 
-    /** Sets the given flag bit(s). */
-    inline PacketHeader & AddFlag(uint16_t flag)
-    {
-        mFlags.value |= flag;
-        return *this;
-    }
-
-    /** Clears the given flag bit(s). */
-    inline PacketHeader & RemoveFlag(uint16_t flag)
-    {
-        mFlags.value = static_cast<uint16_t>(mFlags.value & ~flag);
-        return *this;
-    }
-
-    /** Sets or clears the specified flag bit(s) depending in the 'value' argument. */
-    inline PacketHeader & SetFlag(uint16_t flag, bool value) { return value ? AddFlag(flag) : RemoveFlag(flag); }
-
     /** Check if it's a secure session control message. */
-    bool IsSecureSessionControlMsg() const { return (mFlags.value & Header::Flags::kSecureSessionControlMessage) != 0; }
+    bool IsSecureSessionControlMsg() const { return mFlags.Get(Header::FlagValues::kSecureSessionControlMessage); }
 
     Header::EncryptionType GetEncryptionType() const { return mEncryptionType; }
 
-    PacketHeader & SetSecureSessionControlMsg(bool value) { return SetFlag(Header::Flags::kSecureSessionControlMessage, value); }
+    PacketHeader & SetSecureSessionControlMsg(bool value)
+    {
+        mFlags.Set(Header::FlagValues::kSecureSessionControlMessage, value);
+        return *this;
+    }
 
     PacketHeader & SetSourceNodeId(NodeId id)
     {
         mSourceNodeId.SetValue(id);
-        mFlags.value |= Header::Flags::kSourceNodeIdPresent;
+        mFlags.Set(Header::FlagValues::kSourceNodeIdPresent);
         return *this;
     }
 
     PacketHeader & SetSourceNodeId(Optional<NodeId> id)
     {
         mSourceNodeId = id;
-        SetFlag(Header::Flags::kSourceNodeIdPresent, id.HasValue());
+        mFlags.Set(Header::FlagValues::kSourceNodeIdPresent, id.HasValue());
         return *this;
     }
 
     PacketHeader & ClearSourceNodeId()
     {
-        RemoveFlag(Header::Flags::kSourceNodeIdPresent);
         mSourceNodeId.ClearValue();
+        mFlags.Clear(Header::FlagValues::kSourceNodeIdPresent);
         return *this;
     }
 
@@ -171,22 +159,22 @@ public:
 
     PacketHeader & SetDestinationNodeId(NodeId id)
     {
-        mFlags.value |= Header::Flags::kDestinationNodeIdPresent;
         mDestinationNodeId.SetValue(id);
+        mFlags.Set(Header::FlagValues::kDestinationNodeIdPresent);
         return *this;
     }
 
     PacketHeader & SetDestinationNodeId(Optional<NodeId> id)
     {
         mDestinationNodeId = id;
-        SetFlag(Header::Flags::kDestinationNodeIdPresent, id.HasValue());
+        mFlags.Set(Header::FlagValues::kDestinationNodeIdPresent, id.HasValue());
         return *this;
     }
 
     PacketHeader & ClearDestinationNodeId()
     {
-        RemoveFlag(Header::Flags::kDestinationNodeIdPresent);
         mDestinationNodeId.ClearValue();
+        mFlags.Clear(Header::FlagValues::kDestinationNodeIdPresent);
         return *this;
     }
 

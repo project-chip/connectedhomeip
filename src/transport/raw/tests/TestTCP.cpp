@@ -124,7 +124,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
 
     // Should be able to send a message to itself by just calling send.
-    err = tcp.SendMessage(header, Header::Flags::None(), Transport::PeerAddress::TCP(addr), buffer);
+    err = tcp.SendMessage(header, Header::Flags(), Transport::PeerAddress::TCP(addr), buffer);
     if (err == System::MapErrorPOSIX(EADDRNOTAVAIL))
     {
         // TODO(#2698): the underlying system does not support IPV6. This early return
