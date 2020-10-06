@@ -72,7 +72,7 @@ private:
     std::bitset<kMaxPayloadValue> mAquired;
 };
 
-static IntPayloadTracker gPayloadTracker;
+IntPayloadTracker gPayloadTracker;
 
 /**
  * Helper class defining a matches method for things divisible by a
