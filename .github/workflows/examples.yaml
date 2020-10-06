@@ -258,10 +258,10 @@ jobs:
                       ${{ env.BUILD_TYPE }}-example-build-${{
                       steps.outsuffix.outputs.value }}
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
-            - name: Remove third_party binaries for CodeQL Analysis
-              run: find . -type d -name "third_party" -exec rm -rf {} +
-            - name: Remove nrfxlib binaries for CodeQL Analysis
-              run: find . -type d -name "nrfxlib" -exec rm -rf {} +
+            # - name: Remove third_party binaries for CodeQL Analysis
+            #   run: find . -type d -name "third_party" -exec rm -rf {} +
+            # - name: Remove nrfxlib binaries for CodeQL Analysis
+            #   run: find . -type d -name "nrfxlib" -exec rm -rf {} +
             - name: Perform CodeQL Analysis
               if: ${{ github.event_name == 'push' }}
               uses: github/codeql-action/analyze@v1
