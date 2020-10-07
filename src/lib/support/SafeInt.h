@@ -25,8 +25,8 @@
 #define SAFEINT_H_
 
 #include <limits>
-#include <type_traits>
 #include <stdint.h>
+#include <type_traits>
 
 namespace chip {
 

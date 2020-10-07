@@ -353,7 +353,9 @@ static void TestCastToSigned(nlTestSuite * inSuite, void * inContext)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestCanCastTo_Int8), NL_TEST_DEF_FN(TestCanCastTo_Int16), NL_TEST_DEF_FN(TestCanCastTo_Int32), NL_TEST_DEF_FN(TestCanCastTo_Int64), NL_TEST_DEF_FN(TestCastToSigned), NL_TEST_SENTINEL() };
+static const nlTest sTests[] = { NL_TEST_DEF_FN(TestCanCastTo_Int8),  NL_TEST_DEF_FN(TestCanCastTo_Int16),
+                                 NL_TEST_DEF_FN(TestCanCastTo_Int32), NL_TEST_DEF_FN(TestCanCastTo_Int64),
+                                 NL_TEST_DEF_FN(TestCastToSigned),    NL_TEST_SENTINEL() };
 
 int TestSafeInt(void)
 {
