@@ -111,7 +111,7 @@ fix_cflags = $(filter-out -DHAVE_CONFIG_H,\
 CHIP_CFLAGS = $(call fix_cflags,$(CFLAGS) $(CPPFLAGS))
 CHIP_CXXFLAGS = $(call fix_cflags,$(CXXFLAGS) $(CPPFLAGS))
 
-install : $(OUTPUT_DIR)
+install-chip : $(OUTPUT_DIR)
 	echo "INSTALL CHIP..."
 	echo                                   > $(OUTPUT_DIR)/args.gn
 	echo "import(\"//args.gni\")"          >> $(OUTPUT_DIR)/args.gn
