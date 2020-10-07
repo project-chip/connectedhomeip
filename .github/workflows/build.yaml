@@ -82,6 +82,8 @@ jobs:
             #   run: find . -type d -name "dbus" -exec rm -rf {} +
             # - name: Remove nrfxlib binaries for CodeQL Analysis
             #   run: find . -type d -name "nrfxlib" -exec rm -rf {} +
+            - name: Show tree
+              run: find .
             - name: Perform CodeQL Analysis
               if: ${{ github.event_name == 'push' }}
               uses: github/codeql-action/analyze@v1
