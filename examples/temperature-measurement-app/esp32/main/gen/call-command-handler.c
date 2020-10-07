@@ -38,7 +38,6 @@
 // This is a set of generated functions that parse the
 // the incomming message, and call appropriate command handler.
 
-// #include PLATFORM_HEADER
 #ifdef EZSP_HOST
 // Includes needed for ember related functions for the EZSP host
 #include "app/util/ezsp/ezsp-protocol.h"

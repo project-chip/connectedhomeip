@@ -64,7 +64,7 @@ void HandleDataModelMessage(const PacketHeader & header, System::PacketBuffer * 
                                0, // type
                                message, messageLen,
                                header.GetSourceNodeId().Value(), // source identifier
-                               NULL);
+                               nullptr);
 
     System::PacketBuffer::Free(buffer);
 
