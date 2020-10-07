@@ -345,7 +345,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
        allocated as an inline buffer to PacketBuffer structure */
     origMsg = msgBuf;
     msgBuf  = PacketBuffer::NewWithAvailableSize(len);
-    VerifyOrExit(msgBuf != nullptr, err n CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     msgBuf->SetDataLength(len, msgBuf);
 #endif
