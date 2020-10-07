@@ -3036,7 +3036,7 @@ void TestCHIPTLVReaderErrorHandling(nlTestSuite * inSuite)
     const uint8_t * data = static_cast<uint8_t *>(malloc(16));
     err                  = reader.GetDataPtr(data);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
-    free(const_cast<void *>(reinterpret_cast<const void *>(data)));
+    free(const_cast<uint8_t *>(data));
 }
 /**
  *  Test CHIP TLV Reader in a use case
