@@ -30,7 +30,7 @@
 
     titleLabel.translatesAutoresizingMaskIntoConstraints = false;
     [titleLabel.centerXAnchor constraintEqualToAnchor:view.centerXAnchor].active = YES;
-    [titleLabel.topAnchor constraintEqualToAnchor:view.topAnchor constant:100].active = YES;
+    [titleLabel.topAnchor constraintEqualToAnchor:view.topAnchor constant:110].active = YES;
 
     return titleLabel;
 }

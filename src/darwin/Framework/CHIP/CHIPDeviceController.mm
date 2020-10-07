@@ -304,6 +304,14 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     return YES;
 }
 
+- (BOOL)sendReadTemperatureMeasurementCommand
+{
+    return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
+        // Hardcode endpoint to 1 for now
+        return encodeReadCurrentTemperatureCommand(buffer->Start(), bufferSize, 1);
+    }];
+}
+
 - (BOOL)sendOnCommand
 {
     return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {

@@ -18,6 +18,7 @@
 		B243A6692513A73600E56FEA /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B243A6682513A73600E56FEA /* RootViewController.m */; };
 		B2946A4224C99D53005C87D0 /* WifiViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2946A4124C99D53005C87D0 /* WifiViewController.m */; };
 		B2946A9B24C9A7BF005C87D0 /* DefaultsUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */; };
+		B2F51E99252DCDC000911FA5 /* TemperatureSensorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2F51E98252DCDC000911FA5 /* TemperatureSensorViewController.m */; };
 		B2F53AEB245B0D140010745E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B2F53AE9245B0D140010745E /* LaunchScreen.storyboard */; };
 		B2F53AEF245B0D910010745E /* CHIP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2E0D7BE245B0C59003C5B48 /* CHIP.framework */; };
 		B2F53AF0245B0D910010745E /* CHIP.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B2E0D7BE245B0C59003C5B48 /* CHIP.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -73,6 +74,8 @@
 		B2946A9924C9A7BF005C87D0 /* DefaultsUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DefaultsUtils.h; sourceTree = "<group>"; };
 		B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DefaultsUtils.m; sourceTree = "<group>"; };
 		B2E0D7BE245B0C59003C5B48 /* CHIP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CHIP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B2F51E97252DCDC000911FA5 /* TemperatureSensorViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TemperatureSensorViewController.h; sourceTree = "<group>"; };
+		B2F51E98252DCDC000911FA5 /* TemperatureSensorViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TemperatureSensorViewController.m; sourceTree = "<group>"; };
 		B2F53AEA245B0D140010745E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = UI/Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -189,6 +192,7 @@
 				B204A623244E1D0600C7C0E1 /* SceneDelegate.m */,
 				B243A6672513A73600E56FEA /* RootViewController.h */,
 				B243A6682513A73600E56FEA /* RootViewController.m */,
+				B2F51E93252DCC9E00911FA5 /* Temperature Sensor */,
 				B2946A3F24C99D21005C87D0 /* Wifi */,
 				0C79937824858B3B0047A373 /* QRCode */,
 				0C79937924858B4F0047A373 /* Echo client */,
@@ -213,6 +217,15 @@
 				B2946A4124C99D53005C87D0 /* WifiViewController.m */,
 			);
 			path = Wifi;
+			sourceTree = "<group>";
+		};
+		B2F51E93252DCC9E00911FA5 /* Temperature Sensor */ = {
+			isa = PBXGroup;
+			children = (
+				B2F51E97252DCDC000911FA5 /* TemperatureSensorViewController.h */,
+				B2F51E98252DCDC000911FA5 /* TemperatureSensorViewController.m */,
+			);
+			path = "Temperature Sensor";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -320,6 +333,7 @@
 				B2946A9B24C9A7BF005C87D0 /* DefaultsUtils.m in Sources */,
 				991DC091247747F500C13860 /* EchoViewController.m in Sources */,
 				B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */,
+				B2F51E99252DCDC000911FA5 /* TemperatureSensorViewController.m in Sources */,
 				B243A6692513A73600E56FEA /* RootViewController.m in Sources */,
 				B204A632244E1D0700C7C0E1 /* main.m in Sources */,
 				B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */,

@@ -20,6 +20,7 @@
 #import "OnOffViewController.h"
 #import "QRCodeViewController.h"
 #import "WifiViewController.h"
+#import "TemperatureSensorViewController.h"
 
 @implementation RootViewController
 
@@ -36,7 +37,7 @@
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     [self.view addSubview:self.tableView];
-    self.options = @[ @"QRCode scanner", @"Echo client", @"Light on / off cluster", @"Wifi Configuration" ];
+    self.options = @[ @"QRCode scanner", @"Echo client", @"Light on / off cluster", @"Temperature Sensor", @"Wifi Configuration" ];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -61,44 +62,53 @@
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     switch (indexPath.row) {
-    case 0:
-        [self pushQRCodeScanner];
-        break;
-    case 1:
-        [self pushEchoClient];
-        break;
-    case 2:
-        [self pushLightOnOffCluster];
-        break;
-    case 3:
-        [self pushNetworkConfiguration];
-        break;
-    default:
-        break;
+        case 0:
+            [self pushQRCodeScanner];
+            break;
+        case 1:
+            [self pushEchoClient];
+            break;
+        case 2:
+            [self pushLightOnOffCluster];
+            break;
+        case 3:
+            [self pushTemperatureSensor];
+            break;
+        case 4:
+            [self pushNetworkConfiguration];
+            break;
+        default:
+            break;
     }
+}
+
+- (void)pushTemperatureSensor
+{
+    TemperatureSensorViewController *controller = [TemperatureSensorViewController new];
+    [self.navigationController pushViewController:controller animated:YES];
 }
 
 - (void)pushNetworkConfiguration
 {
-    WifiViewController * controller = [WifiViewController new];
+    WifiViewController *controller = [WifiViewController new];
     [self.navigationController pushViewController:controller animated:YES];
 }
 
 - (void)pushQRCodeScanner
 {
-    QRCodeViewController * controller = [QRCodeViewController new];
+    QRCodeViewController *controller = [QRCodeViewController new];
     [self.navigationController pushViewController:controller animated:YES];
 }
 
 - (void)pushEchoClient
 {
-    EchoViewController * controller = [EchoViewController new];
+    EchoViewController *controller = [EchoViewController new];
     [self.navigationController pushViewController:controller animated:YES];
 }
 
 - (void)pushLightOnOffCluster
 {
-    OnOffViewController * controller = [OnOffViewController new];
+    OnOffViewController *controller = [OnOffViewController new];
     [self.navigationController pushViewController:controller animated:YES];
 }
 @end
