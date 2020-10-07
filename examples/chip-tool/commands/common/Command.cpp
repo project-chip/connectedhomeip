@@ -136,12 +136,12 @@ size_t Command::AddArgument(const char * name, AddressWithInterface * out)
     return mArgs.size();
 }
 
-size_t Command::AddArgument(const char * name, uint32_t min, uint32_t max, uint32_t * out)
+size_t Command::AddArgument(const char * name, int64_t min, int64_t max, void * out)
 {
     Argument arg;
     arg.type  = ArgumentType::Number;
     arg.name  = name;
-    arg.value = reinterpret_cast<void *>(out);
+    arg.value = out;
     arg.min   = min;
     arg.max   = max;
 
