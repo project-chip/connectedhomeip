@@ -106,7 +106,7 @@ int AppTask::Init()
 
 int AppTask::StartApp()
 {
-    int ret = Init();
+    int ret                            = Init();
     uint64_t mLastPublishServiceTimeUS = 0;
 
     if (ret)

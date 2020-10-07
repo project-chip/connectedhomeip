@@ -24,8 +24,8 @@
 
 #include <string.h>
 
-#include <platform/CHIPDeviceLayer.h>
 #include <logging/log.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <zephyr.h>
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -63,7 +63,8 @@ void PublishService()
     memset(&messageInfo, 0, sizeof(messageInfo));
 
     // Use mesh local EID by default, if we have GUA, use that IP address.
-    memcpy(&messageInfo.mSockAddr, otThreadGetMeshLocalEid(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance()), sizeof(messageInfo.mSockAddr));
+    memcpy(&messageInfo.mSockAddr, otThreadGetMeshLocalEid(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance()),
+           sizeof(messageInfo.mSockAddr));
 
     // Select a address to send
     const otNetifAddress * otAddrs = otIp6GetUnicastAddresses(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance());
