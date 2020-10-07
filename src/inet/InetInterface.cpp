@@ -925,13 +925,13 @@ uint8_t InterfaceAddressIterator::GetPrefixLength()
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
         if (mCurAddr->ifa_addr->sa_family == AF_INET6)
         {
-            struct sockaddr_in6 & netmask = *(struct sockaddr_in6 *) (mCurAddr->ifa_netmask);
+            struct sockaddr_in6 & netmask = *reinterpret_cast<struct sockaddr_in6 *>(mCurAddr->ifa_netmask);
             return NetmaskToPrefixLength(netmask.sin6_addr.s6_addr, 16);
         }
         if (mCurAddr->ifa_addr->sa_family == AF_INET)
         {
-            struct sockaddr_in & netmask = *(struct sockaddr_in *) (mCurAddr->ifa_netmask);
-            return NetmaskToPrefixLength((const uint8_t *) &netmask.sin_addr.s_addr, 4);
+            struct sockaddr_in & netmask = *reinterpret_cast<struct sockaddr_in *>(mCurAddr->ifa_netmask);
+            return NetmaskToPrefixLength(reinterpret_cast<const uint8_t *>(&netmask.sin_addr.s_addr), 4);
         }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 

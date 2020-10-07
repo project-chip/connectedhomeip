@@ -381,7 +381,7 @@ public:
      */
     bool IsConnected() const;
 
-    void SetConnectTimeout(const uint32_t connTimeoutMsecs);
+    void SetConnectTimeout(uint32_t connTimeoutMsecs);
 
 #if INET_TCP_IDLE_CHECK_INTERVAL > 0
     /**

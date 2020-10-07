@@ -49,17 +49,16 @@ namespace Utilities {
 typedef CHIP_ERROR (*IterateHandler)(const TLVReader & aReader, size_t aDepth, void * aContext);
 
 extern CHIP_ERROR Iterate(const TLVReader & aReader, IterateHandler aHandler, void * aContext);
-extern CHIP_ERROR Iterate(const TLVReader & aReader, IterateHandler aHandler, void * aContext, const bool aRecurse);
+extern CHIP_ERROR Iterate(const TLVReader & aReader, IterateHandler aHandler, void * aContext, bool aRecurse);
 
 extern CHIP_ERROR Count(const TLVReader & aReader, size_t & aCount);
-extern CHIP_ERROR Count(const TLVReader & aReader, size_t & aCount, const bool aRecurse);
+extern CHIP_ERROR Count(const TLVReader & aReader, size_t & aCount, bool aRecurse);
 
 extern CHIP_ERROR Find(const TLVReader & aReader, const uint64_t & aTag, TLVReader & aResult);
-extern CHIP_ERROR Find(const TLVReader & aReader, const uint64_t & aTag, TLVReader & aResult, const bool aRecurse);
+extern CHIP_ERROR Find(const TLVReader & aReader, const uint64_t & aTag, TLVReader & aResult, bool aRecurse);
 
 extern CHIP_ERROR Find(const TLVReader & aReader, IterateHandler aHandler, void * aContext, TLVReader & aResult);
-extern CHIP_ERROR Find(const TLVReader & aReader, IterateHandler aHandler, void * aContext, TLVReader & aResult,
-                       const bool aRecurse);
+extern CHIP_ERROR Find(const TLVReader & aReader, IterateHandler aHandler, void * aContext, TLVReader & aResult, bool aRecurse);
 } // namespace Utilities
 
 } // namespace TLV

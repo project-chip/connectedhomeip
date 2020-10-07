@@ -223,7 +223,7 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
             sa.sin6_addr     = addr.ToIPv6();
             sa.sin6_scope_id = 0;
 
-            if (bind(mSocket, (const sockaddr *) &sa, (unsigned) sizeof(sa)) != 0)
+            if (bind(mSocket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
                 res = chip::System::MapErrorPOSIX(errno);
         }
 #if INET_CONFIG_ENABLE_IPV4
@@ -235,7 +235,7 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
             sa.sin_port   = htons(port);
             sa.sin_addr   = addr.ToIPv4();
 
-            if (bind(mSocket, (const sockaddr *) &sa, (unsigned) sizeof(sa)) != 0)
+            if (bind(mSocket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
                 res = chip::System::MapErrorPOSIX(errno);
         }
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -463,7 +463,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intfI
         sa.in6.sin6_addr     = addr.ToIPv6();
         sa.in6.sin6_scope_id = intfId;
         sockaddrsize         = sizeof(sockaddr_in6);
-        sockaddrptr          = (const sockaddr *) &sa.in6;
+        sockaddrptr          = reinterpret_cast<const sockaddr *>(&sa.in6);
     }
 #if INET_CONFIG_ENABLE_IPV4
     else if (addrType == kIPAddressType_IPv4)
@@ -472,7 +472,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intfI
         sa.in.sin_port   = htons(port);
         sa.in.sin_addr   = addr.ToIPv4();
         sockaddrsize     = sizeof(sockaddr_in);
-        sockaddrptr      = (const sockaddr *) &sa.in;
+        sockaddrptr      = reinterpret_cast<const sockaddr *>(&sa.in);
     }
 #endif // INET_CONFIG_ENABLE_IPV4
     else

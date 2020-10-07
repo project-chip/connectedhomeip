@@ -501,7 +501,7 @@ private:
     void InitBindingPool();
     Binding * AllocBinding();
     void FreeBinding(Binding * binding);
-    uint16_t GetBindingLogId(const Binding * const binding) const;
+    uint16_t GetBindingLogId(const Binding * binding) const;
 
     void NotifySecurityManagerAvailable();
     void NotifyKeyFailed(uint64_t peerNodeId, uint16_t keyId, CHIP_ERROR keyErr);

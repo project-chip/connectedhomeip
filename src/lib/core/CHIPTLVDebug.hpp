@@ -54,9 +54,9 @@ struct DumpContext
     void * mContext;
 };
 
-extern const char * DecodeType(const TLVType aType);
+extern const char * DecodeType(TLVType aType);
 
-extern const char * DecodeTagControl(const TLVTagControl aTagControl);
+extern const char * DecodeTagControl(TLVTagControl aTagControl);
 
 extern CHIP_ERROR DumpIterator(DumpWriter aWriter, const TLVReader & aReader);
 

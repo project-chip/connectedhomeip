@@ -149,7 +149,7 @@ private:
 
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
-    void NewConnection(BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator) override;
+    void NewConnection(BleLayer * bleLayer, void * appState, uint16_t connDiscriminator) override;
 
     // ===== Members for internal use by the following friends.
 

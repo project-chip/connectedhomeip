@@ -189,7 +189,7 @@ PacketBuffer * PrepareTestBuffer(struct TestContext * theContext)
  */
 void CheckStart(nlTestSuite * inSuite, void * inContext)
 {
-    struct TestContext * theContext = (struct TestContext *) (inContext);
+    struct TestContext * theContext = static_cast<struct TestContext *>(inContext);
 
     for (size_t ith = 0; ith < kTestElements; ith++)
     {
@@ -214,7 +214,7 @@ void CheckStart(nlTestSuite * inSuite, void * inContext)
  */
 void CheckSetStart(nlTestSuite * inSuite, void * inContext)
 {
-    struct TestContext * theContext          = (struct TestContext *) (inContext);
+    struct TestContext * theContext          = static_cast<struct TestContext *>(inContext);
     static const ptrdiff_t sSizePacketBuffer = CHIP_SYSTEM_PACKETBUFFER_SIZE;
 
     for (size_t ith = 0; ith < kTestElements; ith++)
@@ -275,7 +275,7 @@ void CheckSetStart(nlTestSuite * inSuite, void * inContext)
  */
 void CheckDataLength(nlTestSuite * inSuite, void * inContext)
 {
-    struct TestContext * theContext = (struct TestContext *) (inContext);
+    struct TestContext * theContext = static_cast<struct TestContext *>(inContext);
 
     for (size_t ith = 0; ith < kTestElements; ith++)
     {
@@ -382,7 +382,7 @@ void CheckSetDataLength(nlTestSuite * inSuite, void * inContext)
  */
 void CheckTotalLength(nlTestSuite * inSuite, void * inContext)
 {
-    struct TestContext * theContext = (struct TestContext *) (inContext);
+    struct TestContext * theContext = static_cast<struct TestContext *>(inContext);
 
     for (size_t ith = 0; ith < kTestElements; ith++)
     {
@@ -399,7 +399,7 @@ void CheckTotalLength(nlTestSuite * inSuite, void * inContext)
  */
 void CheckMaxDataLength(nlTestSuite * inSuite, void * inContext)
 {
-    struct TestContext * theContext = (struct TestContext *) (inContext);
+    struct TestContext * theContext = static_cast<struct TestContext *>(inContext);
 
     for (size_t ith = 0; ith < kTestElements; ith++)
     {
@@ -416,7 +416,7 @@ void CheckMaxDataLength(nlTestSuite * inSuite, void * inContext)
  */
 void CheckAvailableDataLength(nlTestSuite * inSuite, void * inContext)
 {
-    struct TestContext * theContext = (struct TestContext *) (inContext);
+    struct TestContext * theContext = static_cast<struct TestContext *>(inContext);
 
     for (size_t ith = 0; ith < kTestElements; ith++)
     {
@@ -434,7 +434,7 @@ void CheckAvailableDataLength(nlTestSuite * inSuite, void * inContext)
  */
 void CheckReservedSize(nlTestSuite * inSuite, void * inContext)
 {
-    struct TestContext * theContext = (struct TestContext *) (inContext);
+    struct TestContext * theContext = static_cast<struct TestContext *>(inContext);
 
     for (size_t ith = 0; ith < kTestElements; ith++)
     {
@@ -665,7 +665,7 @@ void CheckCompactHead(nlTestSuite * inSuite, void * inContext)
  */
 void CheckConsumeHead(nlTestSuite * inSuite, void * inContext)
 {
-    struct TestContext * theContext = (struct TestContext *) (inContext);
+    struct TestContext * theContext = static_cast<struct TestContext *>(inContext);
 
     for (size_t ith = 0; ith < kTestElements; ith++)
     {
@@ -799,7 +799,7 @@ void CheckConsume(nlTestSuite * inSuite, void * inContext)
  */
 void CheckEnsureReservedSize(nlTestSuite * inSuite, void * inContext)
 {
-    struct TestContext * theContext = (struct TestContext *) (inContext);
+    struct TestContext * theContext = static_cast<struct TestContext *>(inContext);
 
     for (size_t ith = 0; ith < kTestElements; ith++)
     {
@@ -845,7 +845,7 @@ void CheckEnsureReservedSize(nlTestSuite * inSuite, void * inContext)
  */
 void CheckAlignPayload(nlTestSuite * inSuite, void * inContext)
 {
-    struct TestContext * theContext = (struct TestContext *) (inContext);
+    struct TestContext * theContext = static_cast<struct TestContext *>(inContext);
 
     for (size_t ith = 0; ith < kTestElements; ith++)
     {
@@ -926,7 +926,7 @@ void CheckNext(nlTestSuite * inSuite, void * inContext)
  */
 void CheckAddRef(nlTestSuite * inSuite, void * inContext)
 {
-    struct TestContext * theContext = (struct TestContext *) (inContext);
+    struct TestContext * theContext = static_cast<struct TestContext *>(inContext);
 
     for (size_t ith = 0; ith < kTestElements; ith++)
     {
@@ -951,7 +951,7 @@ void CheckAddRef(nlTestSuite * inSuite, void * inContext)
  */
 void CheckNewWithAvailableSizeAndFree(nlTestSuite * inSuite, void * inContext)
 {
-    struct TestContext * theContext = (struct TestContext *) (inContext);
+    struct TestContext * theContext = static_cast<struct TestContext *>(inContext);
     PacketBuffer * buffer;
 
     for (size_t ith = 0; ith < kTestElements; ith++)
