@@ -649,7 +649,7 @@ public:
 
     void * M;
     void * N;
-    void * G;
+    const void * G;
     void * X;
     void * Y;
     void * L;

@@ -1103,7 +1103,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal()
     context->curve = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
     VerifyOrExit(context->curve != nullptr, error = CHIP_ERROR_INTERNAL);
 
-    G = const_cast<void *>(reinterpret_cast<const void *>(EC_GROUP_get0_generator(context->curve)));
+    G = EC_GROUP_get0_generator(context->curve);
     VerifyOrExit(G != nullptr, error = CHIP_ERROR_INTERNAL);
 
     context->bn_ctx = BN_CTX_secure_new();
