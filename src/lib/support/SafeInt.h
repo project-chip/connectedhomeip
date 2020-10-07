@@ -25,6 +25,7 @@
 #define SAFEINT_H_
 
 #include <limits>
+#include <stdint.h>
 #include <type_traits>
 
 namespace chip {
@@ -103,6 +104,42 @@ bool CanCastTo(U arg)
     }
 
     return 0 <= arg && static_cast<uintmax_t>(arg) <= static_cast<uintmax_t>(numeric_limits<T>::max());
+}
+
+/**
+ * A function to reverse the effects of a signed-to-unsigned integer cast.
+ *
+ * If the argument is small enough to be representable as a positive signed
+ * integer, returns that integer.  Otherwise, returns a negative integer which
+ * would, if cast to the type of the argument, produce the given value.
+ *
+ * So for example, if a uint8_t with value 254 is passed in this function will
+ * return an int8_t with value -2.
+ *
+ * @note This function might become unnecessary if C++20 standardizes
+ * 2s-complement signed integers and defines casting of out-of-range values to
+ * signed types.
+ */
+template <typename T>
+typename std::enable_if<std::is_unsigned<T>::value, typename std::make_signed<T>::type>::type CastToSigned(T arg)
+{
+    using namespace std;
+    typedef typename make_signed<T>::type signed_type;
+
+    if (arg <= static_cast<T>(numeric_limits<signed_type>::max()))
+    {
+        return static_cast<signed_type>(arg);
+    }
+
+    // We want to return arg - (numeric_limits<T>::max() + 1), but do it without
+    // hitting overflow.  We do this by rewriting it as:
+    //
+    // -(numeric_limits<T>::max() - arg) - 1
+    //
+    // then noting that both (numeric_limits<T>::max() - arg) and its negation
+    // are guaranteed to fit in signed_type.
+    signed_type diff = static_cast<signed_type>(numeric_limits<T>::max() - arg);
+    return -diff - 1;
 }
 
 } // namespace chip
