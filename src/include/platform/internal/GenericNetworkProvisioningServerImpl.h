@@ -126,4 +126,4 @@ inline bool GenericNetworkProvisioningServerImpl<ImplClass>::_ScanInProgress(voi
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // NETWORK_PROVISIONING_SERVER_H
+#endif // GENERIC_NETWORK_PROVISIONING_SERVER_IMPL_H

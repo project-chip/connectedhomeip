@@ -147,4 +147,4 @@ void emberAfPluginIasZoneServerPrintQueue(void);
  */
 void emberAfPluginIasZoneServerPrintQueueConfig(void);
 
-#endif //__IAS_ZONE_SERVER_H__
+#endif // SILABS_IAS_ZONE_SERVER_H

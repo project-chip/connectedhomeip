@@ -150,4 +150,4 @@ public:
 
 } // namespace chip
 
-#endif /* CHIP_BUFBOUND */
+#endif /* CHIP_BUFBOUND_H */
