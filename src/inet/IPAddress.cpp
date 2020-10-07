@@ -149,7 +149,10 @@ lwip_ip_addr_type IPAddress::ToLwIPAddrType(IPAddressType typ)
 #if INET_CONFIG_ENABLE_IPV4
 ip4_addr_t IPAddress::ToIPv4() const
 {
-    return *reinterpret_cast<const ip4_addr_t *>(&Addr[3]);
+    ip4_addr_t addr;
+    static_assert(sizeof(addr) == sizeof(mAddr), "ip4_addr_t size mismatch")
+    memcpy(&addr, mAddr, sizeof(addr));
+    return addr;
 }
 
 IPAddress IPAddress::FromIPv4(const ip4_addr_t & ipv4Addr)
@@ -165,16 +168,17 @@ IPAddress IPAddress::FromIPv4(const ip4_addr_t & ipv4Addr)
 
 ip6_addr_t IPAddress::ToIPv6() const
 {
-    return *(ip6_addr_t *) Addr;
+    ip6_addr_t addr;
+    static_assert(sizeof(addr) == sizeof(Addr), "ip6_addr_t size mismatch");
+    memcpy(&addr, Addr, sizeof(addr));
+    return addr;
 }
 
 IPAddress IPAddress::FromIPv6(const ip6_addr_t & ipv6Addr)
 {
     IPAddress ipAddr;
-    ipAddr.Addr[0] = ipv6Addr.addr[0];
-    ipAddr.Addr[1] = ipv6Addr.addr[1];
-    ipAddr.Addr[2] = ipv6Addr.addr[2];
-    ipAddr.Addr[3] = ipv6Addr.addr[3];
+    static_assert(sizeof(ipAddr) == sizeof(Addr), "ip6_addr_t size mismatch");
+    memcpy(ipAddr.Addr, &ipv6Addr, sizeof(ipv6Addr));
     return ipAddr;
 }
 
@@ -203,24 +207,17 @@ IPAddress IPAddress::FromIPv4(const struct in_addr & ipv4Addr)
 
 struct in6_addr IPAddress::ToIPv6() const
 {
-    in6_addr addr;
-    static_assert(sizeof(addr) == sizeof(Addr), "in6_addr size mismatch");
-    memcpy(&addr, Addr, sizeof(addr));
-    return addr;
+    in6_addr ipAddr;
+    static_assert(sizeof(ipAddr) == sizeof(Addr), "in6_addr size mismatch");
+    memcpy(&ipAddr, Addr, sizeof(ipAddr));
+    return ipAddr;
 }
 
 IPAddress IPAddress::FromIPv6(const struct in6_addr & ipv6Addr)
 {
     IPAddress ipAddr;
-    ipAddr.Addr[0] = htonl((static_cast<uint32_t>(ipv6Addr.s6_addr[0])) << 24 | (static_cast<uint32_t>(ipv6Addr.s6_addr[1])) << 16 |
-                           (static_cast<uint32_t>(ipv6Addr.s6_addr[2])) << 8 | (static_cast<uint32_t>(ipv6Addr.s6_addr[3])));
-    ipAddr.Addr[1] = htonl((static_cast<uint32_t>(ipv6Addr.s6_addr[4])) << 24 | (static_cast<uint32_t>(ipv6Addr.s6_addr[5])) << 16 |
-                           (static_cast<uint32_t>(ipv6Addr.s6_addr[6])) << 8 | (static_cast<uint32_t>(ipv6Addr.s6_addr[7])));
-    ipAddr.Addr[2] = htonl((static_cast<uint32_t>(ipv6Addr.s6_addr[8])) << 24 | (static_cast<uint32_t>(ipv6Addr.s6_addr[9])) << 16 |
-                           (static_cast<uint32_t>(ipv6Addr.s6_addr[10])) << 8 | (static_cast<uint32_t>(ipv6Addr.s6_addr[11])));
-    ipAddr.Addr[3] =
-        htonl((static_cast<uint32_t>(ipv6Addr.s6_addr[12])) << 24 | (static_cast<uint32_t>(ipv6Addr.s6_addr[13])) << 16 |
-              (static_cast<uint32_t>(ipv6Addr.s6_addr[14])) << 8 | (static_cast<uint32_t>(ipv6Addr.s6_addr[15])));
+    static_assert(sizeof(ipAddr) == sizeof(ipv6Addr), "in6_addr size mismatch");
+    memcpy(ipAddr.Addr, &ipv6Addr, sizeof(ipv6Addr));
     return ipAddr;
 }
 
