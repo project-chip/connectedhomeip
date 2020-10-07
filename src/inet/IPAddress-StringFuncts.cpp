@@ -69,16 +69,16 @@ char * IPAddress::ToString(char * buf, uint32_t bufSize) const
 #if INET_CONFIG_ENABLE_IPV4
     if (IsIPv4())
     {
-        const void *addr = &Addr[3];
-        const char *s = inet_ntop(AF_INET, addr, buf, static_cast<socklen_t>(bufSize));
+        const void * addr = &Addr[3];
+        const char * s    = inet_ntop(AF_INET, addr, buf, static_cast<socklen_t>(bufSize));
         // This cast is safe because |s| points into |buf| which is not const.
         buf = const_cast<char *>(s);
     }
     else
 #endif // INET_CONFIG_ENABLE_IPV4
     {
-        const void *addr = &Addr[0];
-        const char *s = inet_ntop(AF_INET6, addr, buf, static_cast<socklen_t>(bufSize));
+        const void * addr = &Addr[0];
+        const char * s    = inet_ntop(AF_INET6, addr, buf, static_cast<socklen_t>(bufSize));
         // This cast is safe because |s| points into |buf| which is not const.
         buf = const_cast<char *>(s);
     }
