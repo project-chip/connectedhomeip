@@ -216,8 +216,8 @@ protected:
 class SecurePairingUsingTestSecret : public SecurePairingSession
 {
 public:
-    SecurePairingUsingTestSecret() : SecurePairingSession() {}
-    SecurePairingUsingTestSecret(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId) : SecurePairingSession()
+    SecurePairingUsingTestSecret() {}
+    SecurePairingUsingTestSecret(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId)
     {
         mPeerNodeId = peerNodeId;
         mPeerKeyId  = peerKeyId;

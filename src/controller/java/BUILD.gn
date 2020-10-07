@@ -13,8 +13,9 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//gn/build/config/android_abi.gni")
-import("//gn/chip/java/rules.gni")
+
+import("//build/config/android_abi.gni")
+import("${chip_root}/build/chip/java/rules.gni")
 
 shared_library("jni") {
   output_name = "libCHIPController"

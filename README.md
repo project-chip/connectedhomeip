@@ -151,8 +151,6 @@ The Connected Home over IP repository is structured as follows:
 | File / Folder                        | Contents                                                                                                             |
 | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
 | `.default-version`                   | Default Project CHIP version if none is available via source code control tags, `.dist-version`, or `.local-version` |
-| `bootstrap`                          | GNU autotools bootstrap script for the Project CHIP build system                                                     |
-| `bootstrap-configure`                | Convenience script that will bootstrap the Project CHIP build system, via `bootstrap`, and invoke `configure`        |
 | `build/`                             | Build system support content and build output directories                                                            |
 | [BUILDING.md](./docs/BUILDING.md)    | More detailed information on configuring and building Project CHIP for different targets                             |
 | `CODE_OF_CONDUCT.md`                 | Code of Conduct for Project CHIP, and contributions to it                                                            |

@@ -62,6 +62,14 @@ public:
 
     /**
      * @brief
+     *   Called when the ResetToFactoryDefaults method of the Basic cluster object has been called
+     *
+     * @param endpoint           endpoint id
+     */
+    virtual void PluginBasicResetToFactoryDefaultsCallback(uint8_t endpointId);
+
+    /**
+     * @brief
      *   Called after an attribute has been changed
      *
      * @param endpoint           endpoint id

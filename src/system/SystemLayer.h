@@ -140,7 +140,7 @@ public:
     Error NewTimer(Timer *& aTimerPtr);
 
     void StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCallback);
-    void DispatchTimerCallbacks(const uint64_t kCurrentEpoch);
+    void DispatchTimerCallbacks(uint64_t kCurrentEpoch);
 
     typedef void (*TimerCompleteFunct)(Layer * aLayer, void * aAppState, Error aError);
     Error StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aComplete, void * aAppState);

@@ -295,12 +295,12 @@ public:
     CHIP_ERROR CheckNow();
     CHIP_ERROR ImageInstallComplete(CHIP_ERROR aError);
     CHIP_ERROR PrepareImageStorageComplete(CHIP_ERROR aError);
-    CHIP_ERROR SetEventCallback(void * const aAppState, const EventCallback aEventCallback);
+    CHIP_ERROR SetEventCallback(void * aAppState, EventCallback aEventCallback);
     CHIP_ERROR SetQueryIntervalWindow(uint32_t aMinWaitTimeMs, uint32_t aMaxWaitTimeMs);
 
     bool IsInProgress();
 
-    void SetRetryPolicyCallback(const RetryPolicyCallback aRetryPolicyCallback);
+    void SetRetryPolicyCallback(RetryPolicyCallback aRetryPolicyCallback);
 
     State GetState();
 

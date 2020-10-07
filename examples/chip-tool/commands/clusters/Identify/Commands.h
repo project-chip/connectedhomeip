@@ -24,12 +24,18 @@
 class Identify : public ModelCommand
 {
 public:
-    Identify(const uint16_t clusterId) : ModelCommand("identify", clusterId) {}
+    Identify(const uint16_t clusterId) : ModelCommand("identify", clusterId)
+    {
+        AddArgument("identifyTime", 0, UINT16_MAX, &mIdentifyTime);
+    }
+
     size_t EncodeCommand(chip::System::PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) override
     {
-        uint16_t duration = 10;
-        return encodeIdentifyCommand(buffer->Start(), bufferSize, endPointId, duration);
+        return encodeIdentifyCommand(buffer->Start(), bufferSize, endPointId, mIdentifyTime);
     }
+
+private:
+    uint16_t mIdentifyTime;
 };
 
 class IdentifyQuery : public ModelCommand
