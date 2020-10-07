@@ -132,22 +132,6 @@ inline void Put8(uint8_t * p, uint8_t v)
  * from the specified pointer address and increment the pointer by
  * 8-bits (1 byte).
  *
- * @param[in,out] p   A reference to a pointer address, potentially
- *                    unaligned, to read the 8-bit value from and to
- *                    then increment by 8-bits (1 byte).
- *
- * @return The 8-bit value at the specified pointer address.
- */
-inline uint8_t Read8(uint8_t *& p)
-{
-    return nl::IO::Read8((const void *&) p);
-}
-
-/**
- * Perform a, potentially unaligned, memory read of the 8-bit value
- * from the specified pointer address and increment the pointer by
- * 8-bits (1 byte).
- *
  * @param[in,out] p   A reference to a constant pointer address,
  *                    potentially unaligned, to read the 8-bit value
  *                    from and to then increment by 8-bits (1 byte).
@@ -156,7 +140,23 @@ inline uint8_t Read8(uint8_t *& p)
  */
 inline uint8_t Read8(const uint8_t *& p)
 {
-    return nl::IO::Read8((const void *&) p);
+    return nl::IO::Read8(reinterpret_cast<const void *&>(p));
+}
+
+/**
+ * Perform a, potentially unaligned, memory read of the 8-bit value
+ * from the specified pointer address and increment the pointer by
+ * 8-bits (1 byte).
+ *
+ * @param[in,out] p   A reference to a pointer address, potentially
+ *                    unaligned, to read the 8-bit value from and to
+ *                    then increment by 8-bits (1 byte).
+ *
+ * @return The 8-bit value at the specified pointer address.
+ */
+inline uint8_t Read8(uint8_t *& p)
+{
+    return Read8(const_cast<const uint8_t *&>(p));
 }
 
 /**
@@ -365,66 +365,6 @@ inline void Put64(uint8_t * p, uint64_t v)
  * the value in target system byte ordering, and increment the pointer
  * by 16-bits (2 bytes).
  *
- * @param[in,out] p   A reference to a pointer address, potentially
- *                    unaligned, to read the 16-bit little endian byte
- *                    ordered value from and to then increment by 16-
- *                    bits (2 bytes).
- *
- * @return The 16-bit value at the specified pointer address, if necessary,
- *         byte order swapped.
- */
-inline uint16_t Read16(uint8_t *& p)
-{
-    return nl::IO::LittleEndian::ReadUnaligned16((const void *&) p);
-}
-
-/**
- * Perform a, potentially unaligned, memory read of the little endian
- * byte ordered 32-bit value from the specified pointer address,
- * perform byte reordering, as necessary, for the target system to put
- * the value in target system byte ordering, and increment the pointer
- * by 32-bits (4 bytes).
- *
- * @param[in,out] p   A reference to a pointer address, potentially
- *                    unaligned, to read the 32-bit little endian byte
- *                    ordered value from and to then increment by 32-
- *                    bits (4 bytes).
- *
- * @return The 32-bit value at the specified pointer address, if necessary,
- *         byte order swapped.
- */
-inline uint32_t Read32(uint8_t *& p)
-{
-    return nl::IO::LittleEndian::ReadUnaligned32((const void *&) p);
-}
-
-/**
- * Perform a, potentially unaligned, memory read of the little endian
- * byte ordered 64-bit value from the specified pointer address,
- * perform byte reordering, as necessary, for the target system to put
- * the value in target system byte ordering, and increment the pointer
- * by 64-bits (8 bytes).
- *
- * @param[in,out] p   A reference to a pointer address, potentially
- *                    unaligned, to read the 64-bit little endian byte
- *                    ordered value from and to then increment by 64-
- *                    bits (8 bytes).
- *
- * @return The 64-bit value at the specified pointer address, if necessary,
- *         byte order swapped.
- */
-inline uint64_t Read64(uint8_t *& p)
-{
-    return nl::IO::LittleEndian::ReadUnaligned64((const void *&) p);
-}
-
-/**
- * Perform a, potentially unaligned, memory read of the little endian
- * byte ordered 16-bit value from the specified pointer address,
- * perform byte reordering, as necessary, for the target system to put
- * the value in target system byte ordering, and increment the pointer
- * by 16-bits (2 bytes).
- *
  * @param[in,out] p   A reference to a constant pointer address, potentially
  *                    unaligned, to read the 16-bit little endian byte
  *                    ordered value from and to then increment by 16-
@@ -435,7 +375,27 @@ inline uint64_t Read64(uint8_t *& p)
  */
 inline uint16_t Read16(const uint8_t *& p)
 {
-    return nl::IO::LittleEndian::ReadUnaligned16((const void *&) p);
+    return nl::IO::LittleEndian::ReadUnaligned16(reinterpret_cast<const void *&>(p));
+}
+
+/**
+ * Perform a, potentially unaligned, memory read of the little endian
+ * byte ordered 16-bit value from the specified pointer address,
+ * perform byte reordering, as necessary, for the target system to put
+ * the value in target system byte ordering, and increment the pointer
+ * by 16-bits (2 bytes).
+ *
+ * @param[in,out] p   A reference to a pointer address, potentially
+ *                    unaligned, to read the 16-bit little endian byte
+ *                    ordered value from and to then increment by 16-
+ *                    bits (2 bytes).
+ *
+ * @return The 16-bit value at the specified pointer address, if necessary,
+ *         byte order swapped.
+ */
+inline uint16_t Read16(uint8_t *& p)
+{
+    return Read16(const_cast<const uint8_t *&>(p));
 }
 
 /**
@@ -455,7 +415,27 @@ inline uint16_t Read16(const uint8_t *& p)
  */
 inline uint32_t Read32(const uint8_t *& p)
 {
-    return nl::IO::LittleEndian::ReadUnaligned32((const void *&) p);
+    return nl::IO::LittleEndian::ReadUnaligned32(reinterpret_cast<const void *&>(p));
+}
+
+/**
+ * Perform a, potentially unaligned, memory read of the little endian
+ * byte ordered 32-bit value from the specified pointer address,
+ * perform byte reordering, as necessary, for the target system to put
+ * the value in target system byte ordering, and increment the pointer
+ * by 32-bits (4 bytes).
+ *
+ * @param[in,out] p   A reference to a pointer address, potentially
+ *                    unaligned, to read the 32-bit little endian byte
+ *                    ordered value from and to then increment by 32-
+ *                    bits (4 bytes).
+ *
+ * @return The 32-bit value at the specified pointer address, if necessary,
+ *         byte order swapped.
+ */
+inline uint32_t Read32(uint8_t *& p)
+{
+    return Read32(const_cast<const uint8_t *&>(p));
 }
 
 /**
@@ -475,7 +455,27 @@ inline uint32_t Read32(const uint8_t *& p)
  */
 inline uint64_t Read64(const uint8_t *& p)
 {
-    return nl::IO::LittleEndian::ReadUnaligned64((const void *&) p);
+    return nl::IO::LittleEndian::ReadUnaligned64(reinterpret_cast<const void *&>(p));
+}
+
+/**
+ * Perform a, potentially unaligned, memory read of the little endian
+ * byte ordered 64-bit value from the specified pointer address,
+ * perform byte reordering, as necessary, for the target system to put
+ * the value in target system byte ordering, and increment the pointer
+ * by 64-bits (8 bytes).
+ *
+ * @param[in,out] p   A reference to a pointer address, potentially
+ *                    unaligned, to read the 64-bit little endian byte
+ *                    ordered value from and to then increment by 64-
+ *                    bits (8 bytes).
+ *
+ * @return The 64-bit value at the specified pointer address, if necessary,
+ *         byte order swapped.
+ */
+inline uint64_t Read64(uint8_t *& p)
+{
+    return Read64(const_cast<const uint8_t *&>(p));
 }
 
 /**
@@ -738,66 +738,6 @@ inline void Put64(uint8_t * p, uint64_t v)
  * the value in target system byte ordering, and increment the pointer
  * by 16-bits (2 bytes).
  *
- * @param[in,out] p   A reference to a pointer address, potentially
- *                    unaligned, to read the 16-bit big endian byte
- *                    ordered value from and to then increment by 16-
- *                    bits (2 bytes).
- *
- * @return The 16-bit value at the specified pointer address, if necessary,
- *         byte order swapped.
- */
-inline uint16_t Read16(uint8_t *& p)
-{
-    return nl::IO::BigEndian::ReadUnaligned16((const void *&) p);
-}
-
-/**
- * Perform a, potentially unaligned, memory read of the big endian
- * byte ordered 32-bit value from the specified pointer address,
- * perform byte reordering, as necessary, for the target system to put
- * the value in target system byte ordering, and increment the pointer
- * by 32-bits (4 bytes).
- *
- * @param[in,out] p   A reference to a pointer address, potentially
- *                    unaligned, to read the 32-bit big endian byte
- *                    ordered value from and to then increment by 32-
- *                    bits (4 bytes).
- *
- * @return The 32-bit value at the specified pointer address, if necessary,
- *         byte order swapped.
- */
-inline uint32_t Read32(uint8_t *& p)
-{
-    return nl::IO::BigEndian::ReadUnaligned32((const void *&) p);
-}
-
-/**
- * Perform a, potentially unaligned, memory read of the big endian
- * byte ordered 64-bit value from the specified pointer address,
- * perform byte reordering, as necessary, for the target system to put
- * the value in target system byte ordering, and increment the pointer
- * by 64-bits (8 bytes).
- *
- * @param[in,out] p   A reference to a pointer address, potentially
- *                    unaligned, to read the 64-bit big endian byte
- *                    ordered value from and to then increment by 64-
- *                    bits (8 bytes).
- *
- * @return The 64-bit value at the specified pointer address, if necessary,
- *         byte order swapped.
- */
-inline uint64_t Read64(uint8_t *& p)
-{
-    return nl::IO::BigEndian::ReadUnaligned64((const void *&) p);
-}
-
-/**
- * Perform a, potentially unaligned, memory read of the big endian
- * byte ordered 16-bit value from the specified pointer address,
- * perform byte reordering, as necessary, for the target system to put
- * the value in target system byte ordering, and increment the pointer
- * by 16-bits (2 bytes).
- *
  * @param[in,out] p   A reference to a constant pointer address, potentially
  *                    unaligned, to read the 16-bit big endian byte
  *                    ordered value from and to then increment by 16-
@@ -808,7 +748,27 @@ inline uint64_t Read64(uint8_t *& p)
  */
 inline uint16_t Read16(const uint8_t *& p)
 {
-    return nl::IO::BigEndian::ReadUnaligned16((const void *&) p);
+    return nl::IO::BigEndian::ReadUnaligned16(reinterpret_cast<const void *&>(p));
+}
+
+/**
+ * Perform a, potentially unaligned, memory read of the big endian
+ * byte ordered 16-bit value from the specified pointer address,
+ * perform byte reordering, as necessary, for the target system to put
+ * the value in target system byte ordering, and increment the pointer
+ * by 16-bits (2 bytes).
+ *
+ * @param[in,out] p   A reference to a pointer address, potentially
+ *                    unaligned, to read the 16-bit big endian byte
+ *                    ordered value from and to then increment by 16-
+ *                    bits (2 bytes).
+ *
+ * @return The 16-bit value at the specified pointer address, if necessary,
+ *         byte order swapped.
+ */
+inline uint16_t Read16(uint8_t *& p)
+{
+    return Read16(const_cast<const uint8_t *&>(p));
 }
 
 /**
@@ -828,7 +788,27 @@ inline uint16_t Read16(const uint8_t *& p)
  */
 inline uint32_t Read32(const uint8_t *& p)
 {
-    return nl::IO::BigEndian::ReadUnaligned32((const void *&) p);
+    return nl::IO::BigEndian::ReadUnaligned32(reinterpret_cast<const void *&>(p));
+}
+
+/**
+ * Perform a, potentially unaligned, memory read of the big endian
+ * byte ordered 32-bit value from the specified pointer address,
+ * perform byte reordering, as necessary, for the target system to put
+ * the value in target system byte ordering, and increment the pointer
+ * by 32-bits (4 bytes).
+ *
+ * @param[in,out] p   A reference to a pointer address, potentially
+ *                    unaligned, to read the 32-bit big endian byte
+ *                    ordered value from and to then increment by 32-
+ *                    bits (4 bytes).
+ *
+ * @return The 32-bit value at the specified pointer address, if necessary,
+ *         byte order swapped.
+ */
+inline uint32_t Read32(uint8_t *& p)
+{
+    return Read32(const_cast<const uint8_t *&>(p));
 }
 
 /**
@@ -848,7 +828,27 @@ inline uint32_t Read32(const uint8_t *& p)
  */
 inline uint64_t Read64(const uint8_t *& p)
 {
-    return nl::IO::BigEndian::ReadUnaligned64((const void *&) p);
+    return nl::IO::BigEndian::ReadUnaligned64(reinterpret_cast<const void *&>(p));
+}
+
+/**
+ * Perform a, potentially unaligned, memory read of the big endian
+ * byte ordered 64-bit value from the specified pointer address,
+ * perform byte reordering, as necessary, for the target system to put
+ * the value in target system byte ordering, and increment the pointer
+ * by 64-bits (8 bytes).
+ *
+ * @param[in,out] p   A reference to a pointer address, potentially
+ *                    unaligned, to read the 64-bit big endian byte
+ *                    ordered value from and to then increment by 64-
+ *                    bits (8 bytes).
+ *
+ * @return The 64-bit value at the specified pointer address, if necessary,
+ *         byte order swapped.
+ */
+inline uint64_t Read64(uint8_t *& p)
+{
+    return Read64(const_cast<const uint8_t *&>(p));
 }
 
 /**

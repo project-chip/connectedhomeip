@@ -38,7 +38,7 @@ bool DeviceController_BlePlatformDelegate::SubscribeCharacteristic(BLE_CONNECTIO
 
     if (subscribeCB && svcId && charId)
     {
-        return subscribeCB(connObj, (void *) svcId->bytes, (void *) charId->bytes, subscribe);
+        return subscribeCB(connObj, static_cast<const void *>(svcId->bytes), static_cast<const void *>(charId->bytes), subscribe);
     }
 
     return false;
@@ -52,7 +52,7 @@ bool DeviceController_BlePlatformDelegate::UnsubscribeCharacteristic(BLE_CONNECT
 
     if (subscribeCB && svcId && charId)
     {
-        return subscribeCB(connObj, (void *) svcId->bytes, (void *) charId->bytes, !subscribe);
+        return subscribeCB(connObj, static_cast<const void *>(svcId->bytes), static_cast<const void *>(charId->bytes), !subscribe);
     }
 
     return false;
@@ -94,7 +94,8 @@ bool DeviceController_BlePlatformDelegate::SendWriteRequest(BLE_CONNECTION_OBJEC
 
     if (writeCB && svcId && charId && pBuf)
     {
-        ret = writeCB(connObj, (void *) svcId->bytes, (void *) charId->bytes, (void *) pBuf->Start(), pBuf->DataLength());
+        ret = writeCB(connObj, static_cast<const void *>(svcId->bytes), static_cast<const void *>(charId->bytes),
+                      static_cast<void *>(pBuf->Start()), pBuf->DataLength());
     }
 
     // Release delegate's reference to pBuf. pBuf will be freed when both platform delegate and Chip stack free their references to

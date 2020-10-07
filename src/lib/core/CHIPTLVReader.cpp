@@ -173,7 +173,7 @@ void TLVReader::Init(const uint8_t * data, uint32_t dataLen)
  */
 void TLVReader::Init(PacketBuffer * buf, uint32_t maxLen)
 {
-    mBufHandle = (uintptr_t) buf;
+    mBufHandle = reinterpret_cast<uintptr_t>(buf);
     mReadPoint = buf->Start();
     mBufEnd    = mReadPoint + buf->DataLength();
     mLenRead   = 0;
@@ -205,7 +205,7 @@ void TLVReader::Init(PacketBuffer * buf, uint32_t maxLen)
  */
 void TLVReader::Init(PacketBuffer * buf, uint32_t maxLen, bool allowDiscontiguousBuffers)
 {
-    mBufHandle = (uintptr_t) buf;
+    mBufHandle = reinterpret_cast<uintptr_t>(buf);
     mReadPoint = buf->Start();
     mBufEnd    = mReadPoint + buf->DataLength();
     mLenRead   = 0;
@@ -1558,7 +1558,7 @@ TLVElementType TLVReader::ElementType() const
 
 CHIP_ERROR TLVReader::GetNextPacketBuffer(TLVReader & reader, uintptr_t & bufHandle, const uint8_t *& bufStart, uint32_t & bufLen)
 {
-    PacketBuffer *& buf = (PacketBuffer *&) bufHandle;
+    PacketBuffer *& buf = reinterpret_cast<PacketBuffer *&>(bufHandle);
 
     if (buf != nullptr)
         buf = buf->Next();

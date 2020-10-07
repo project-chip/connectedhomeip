@@ -551,7 +551,7 @@ BLE_ERROR BLEEndPoint::Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj, 
     //
     // Beware this line should we ever use virtuals in this class or its
     // super(s). See similar lines in chip::System::Layer end points.
-    memset((void *) this, 0, sizeof(*this));
+    memset(this, 0, sizeof(*this));
 
     // If end point plays peripheral role, expect ack for indication sent as last step of BTP handshake.
     // If central, periperal's handshake indication 'ack's write sent by central to kick off the BTP handshake.

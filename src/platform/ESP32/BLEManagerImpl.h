@@ -86,7 +86,7 @@ class BLEManagerImpl final : public BLEManager,
     CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
-    ::chip::Ble::BleLayer * _GetBleLayer(void) const;
+    ::chip::Ble::BleLayer * _GetBleLayer(void);
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
@@ -236,9 +236,9 @@ inline BLEManagerImpl & BLEMgrImpl(void)
     return BLEManagerImpl::sInstance;
 }
 
-inline ::chip::Ble::BleLayer * BLEManagerImpl::_GetBleLayer() const
+inline ::chip::Ble::BleLayer * BLEManagerImpl::_GetBleLayer()
 {
-    return (BleLayer *) (this);
+    return this;
 }
 
 inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
