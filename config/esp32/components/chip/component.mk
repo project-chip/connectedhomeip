@@ -111,7 +111,7 @@ fix_cflags = $(filter-out -DHAVE_CONFIG_H,\
 CHIP_CFLAGS = $(call fix_cflags,$(CFLAGS) $(CPPFLAGS))
 CHIP_CXXFLAGS = $(call fix_cflags,$(CXXFLAGS) $(CPPFLAGS))
 
-install-chip-with-gn : $(OUTPUT_DIR)
+install : $(OUTPUT_DIR)
 	echo "INSTALL CHIP..."
 	echo                                   > $(OUTPUT_DIR)/args.gn
 	echo "import(\"//args.gni\")"          >> $(OUTPUT_DIR)/args.gn
@@ -125,8 +125,6 @@ install-chip-with-gn : $(OUTPUT_DIR)
 	cd $(CHIP_ROOT) && PW_ENVSETUP_QUIET=1 . scripts/activate.sh && cd $(COMPONENT_PATH) && gn gen $(OUTPUT_DIR)
 	cd $(COMPONENT_PATH); ninja $(subst 1,-v,$(filter 1,$(V))) -C $(OUTPUT_DIR) esp32
 
-
-install-chip: install-chip-with-gn
 
 build : install-chip
 	echo "CHIP built and installed..."
