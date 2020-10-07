@@ -28,7 +28,6 @@
 #include <lib/support/CHIPMem.h>
 
 #include <type_traits>
-#include <utility>
 
 namespace chip {
 namespace Platform {
@@ -50,20 +49,6 @@ public:
     ScopedMemoryBufferBase() {}
     ScopedMemoryBufferBase(const ScopedMemoryBufferBase &) = delete;
     ScopedMemoryBufferBase & operator=(const ScopedMemoryBufferBase & other) = delete;
-
-    ScopedMemoryBufferBase(ScopedMemoryBufferBase && other)
-    {
-        if (this == &other)
-            return;
-        *this = std::move(other);
-    }
-
-    ScopedMemoryBufferBase & operator=(ScopedMemoryBufferBase && other)
-    {
-        mBuffer       = other.mBuffer;
-        other.mBuffer = nullptr;
-        return *this;
-    }
 
     ~ScopedMemoryBufferBase() { Free(); }
 
