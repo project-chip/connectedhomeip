@@ -92,11 +92,12 @@ public:
     typedef uint32_t Timeout; /**< Type used to express the timeout in this ExchangeContext, in milliseconds */
 
     ExchangeManager * ExchangeMgr; /**< [READ ONLY] Owning exchange manager. */
-    uint16_t mMsgProtocolVersion;      /**< Message Protocol version for the ExchangeContext. */
-    PeerConnectionState * Con;         /**< [READ ONLY] Associated CHIP connection. */
-    uint64_t PeerNodeId;               /**< [READ ONLY] Node ID of peer node. */
-    Inet::IPAddress PeerAddr;          /**< [READ ONLY] IP address of peer node. */
-    Inet::InterfaceId PeerIntf; /**< [READ ONLY] Outbound interface to be used when sending messages to the peer. (Only meaningful for UDP.) */
+    uint16_t mMsgProtocolVersion;  /**< Message Protocol version for the ExchangeContext. */
+    PeerConnectionState * Con;     /**< [READ ONLY] Associated CHIP connection. */
+    uint64_t PeerNodeId;           /**< [READ ONLY] Node ID of peer node. */
+    Inet::IPAddress PeerAddr;      /**< [READ ONLY] IP address of peer node. */
+    Inet::InterfaceId
+        PeerIntf; /**< [READ ONLY] Outbound interface to be used when sending messages to the peer. (Only meaningful for UDP.) */
     uint16_t PeerPort;        /**< [READ ONLY] Port of peer node. */
     uint16_t ExchangeId;      /**< [READ ONLY] Assigned exchange ID. */
     void * AppState;          /**< Pointer to application-specific state object. */
@@ -259,9 +260,10 @@ private:
 
     uint32_t mPendingPeerAckId;
     void DoClose(bool clearRetransTable);
-    CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const ChipExchangeHeader * exchHeader, System::PacketBuffer * msgBuf);
-    CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const ChipExchangeHeader * exchHeader, System::PacketBuffer * msgBuf,
-                             ExchangeContext::MessageReceiveFunct umhandler);
+    CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const ChipExchangeHeader * exchHeader,
+                             System::PacketBuffer * msgBuf);
+    CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const ChipExchangeHeader * exchHeader,
+                             System::PacketBuffer * msgBuf, ExchangeContext::MessageReceiveFunct umhandler);
     void HandleConnectionClosed(CHIP_ERROR conErr);
 
     uint8_t mRefCount;
@@ -292,7 +294,7 @@ public:
     ExchangeManager operator=(const ExchangeManager &) = delete;
 
     SecureSessionMgrBase * MessageLayer; /**< [READ ONLY] The associated SecureSessionMgrBase object. */
-    uint8_t State;                   /**< [READ ONLY] The state of the ExchangeManager object. */
+    uint8_t State;                       /**< [READ ONLY] The state of the ExchangeManager object. */
 
     CHIP_ERROR Init(SecureSessionMgrBase * msgLayer);
     CHIP_ERROR Shutdown();
@@ -332,7 +334,7 @@ private:
         void * AppState;
         uint32_t ProfileId;
         PeerConnectionState * Con; // NULL means any connection, or no connection (i.e. UDP)
-        int16_t MessageType;  // -1 represents any message type
+        int16_t MessageType;       // -1 represents any message type
         bool AllowDuplicateMsgs;
     };
 
@@ -352,10 +354,12 @@ private:
     CHIP_ERROR UnregisterUMH(uint32_t profileId, int16_t msgType, PeerConnectionState * con);
 
     static void HandleAcceptError(SecureSessionMgrBase * msgLayer, CHIP_ERROR err);
-    static void HandleMessageReceived(SecureSessionMgrBase * msgLayer, const PacketHeader & packetHeader, System::PacketBuffer * msgBuf);
+    static void HandleMessageReceived(SecureSessionMgrBase * msgLayer, const PacketHeader & packetHeader,
+                                      System::PacketBuffer * msgBuf);
     static void HandleMessageReceived(PeerConnectionState * con, const PacketHeader & packetHeader, System::PacketBuffer * msgBuf);
     static CHIP_ERROR PrependHeader(ChipExchangeHeader * exchangeHeader, System::PacketBuffer * buf);
-    static CHIP_ERROR DecodeHeader(ChipExchangeHeader * exchangeHeader, const PacketHeader & packetHeader, System::PacketBuffer * buf);
+    static CHIP_ERROR DecodeHeader(ChipExchangeHeader * exchangeHeader, const PacketHeader & packetHeader,
+                                   System::PacketBuffer * buf);
     void NotifyKeyFailed(uint64_t peerNodeId, uint16_t keyId, CHIP_ERROR keyErr);
 };
 } // namespace chip
