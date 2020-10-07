@@ -150,8 +150,7 @@ lwip_ip_addr_type IPAddress::ToLwIPAddrType(IPAddressType typ)
 ip4_addr_t IPAddress::ToIPv4() const
 {
     ip4_addr_t addr;
-    static_assert(sizeof(addr) == sizeof(mAddr), "ip4_addr_t size mismatch")
-    memcpy(&addr, mAddr, sizeof(addr));
+    static_assert(sizeof(addr) == sizeof(mAddr), "ip4_addr_t size mismatch") memcpy(&addr, mAddr, sizeof(addr));
     return addr;
 }
 
