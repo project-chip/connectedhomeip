@@ -90,7 +90,6 @@ public:
     static const uint16_t sDefaultFragmentSize;
     static const uint16_t sMaxFragmentSize;
 
-public:
     // Public functions:
     BtpEngine() {}
     ~BtpEngine() {}
@@ -183,7 +182,6 @@ private:
     uint16_t mTxCharCount;
     uint16_t mTxPacketCount;
 
-private:
     // Private functions:
     bool IsValidAck(SequenceNumber_t ack_num) const;
     BLE_ERROR HandleAckReceived(SequenceNumber_t ack_num);
