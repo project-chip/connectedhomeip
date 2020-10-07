@@ -28,6 +28,7 @@
 #include <core/CHIPEncoding.h>
 #include <core/CHIPTLV.h>
 #include <support/CodeUtils.h>
+#include <support/SafeInt.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -370,7 +371,7 @@ CHIP_ERROR TLVReader::Get(int8_t & v)
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
-    v              = v64;
+    v              = CastToSigned(static_cast<uint8_t>(v64));
     return err;
 }
 
@@ -391,7 +392,7 @@ CHIP_ERROR TLVReader::Get(int16_t & v)
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
-    v              = v64;
+    v              = CastToSigned(static_cast<uint16_t>(v64));
     return err;
 }
 
@@ -412,7 +413,7 @@ CHIP_ERROR TLVReader::Get(int32_t & v)
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
-    v              = v64;
+    v              = CastToSigned(static_cast<uint32_t>(v64));
     return err;
 }
 
@@ -433,7 +434,7 @@ CHIP_ERROR TLVReader::Get(int64_t & v)
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
-    v              = v64;
+    v              = CastToSigned(v64);
     return err;
 }
 
@@ -520,13 +521,13 @@ CHIP_ERROR TLVReader::Get(uint64_t & v)
     switch (ElementType())
     {
     case kTLVElementType_Int8:
-        v = static_cast<int64_t>(static_cast<int8_t>(mElemLenOrVal));
+        v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint8_t>(mElemLenOrVal))));
         break;
     case kTLVElementType_Int16:
-        v = static_cast<int64_t>(static_cast<int16_t>(mElemLenOrVal));
+        v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint16_t>(mElemLenOrVal))));
         break;
     case kTLVElementType_Int32:
-        v = static_cast<int64_t>(static_cast<int32_t>(mElemLenOrVal));
+        v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint32_t>(mElemLenOrVal))));
         break;
     case kTLVElementType_Int64:
     case kTLVElementType_UInt8:
