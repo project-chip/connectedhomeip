@@ -299,9 +299,16 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong deviceContr
     pthread_mutex_lock(&sStackLock);
 
     auto * buffer = System::PacketBuffer::NewWithAvailableSize(messageLen);
-    memcpy(buffer->Start(), messageStr, messageLen);
-    buffer->SetDataLength(messageLen);
-    err = deviceController->SendMessage((void *) "SendMessage", buffer);
+    if (buffer == nullptr)
+    {
+        err = CHIP_ERROR_NO_MEMORY;
+    }
+    else
+    {
+        memcpy(buffer->Start(), messageStr, messageLen);
+        buffer->SetDataLength(messageLen);
+        err = deviceController->SendMessage((void *) "SendMessage", buffer);
+    }
 
     pthread_mutex_unlock(&sStackLock);
 
@@ -331,32 +338,41 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong deviceContr
     static const size_t bufferSize = 1024;
     auto * buffer                  = System::PacketBuffer::NewWithAvailableSize(bufferSize);
 
-    // Hardcode endpoint to 1 for now
-    uint8_t endpoint = 1;
-
-    uint16_t dataLength = 0;
-    switch (commandID)
+    if (buffer == nullptr)
     {
-    case 0:
-        dataLength = encodeOffCommand(buffer->Start(), bufferSize, endpoint);
-        break;
-    case 1:
-        dataLength = encodeOnCommand(buffer->Start(), bufferSize, endpoint);
-        break;
-    case 2:
-        dataLength = encodeToggleCommand(buffer->Start(), bufferSize, endpoint);
-        break;
-    default:
-        ChipLogError(Controller, "Unknown command: %d", commandID);
-        return;
+        err = CHIP_ERROR_NO_MEMORY;
+        pthread_mutex_unlock(&sStackLock);
     }
+    else
+    {
 
-    buffer->SetDataLength(dataLength);
+        // Hardcode endpoint to 1 for now
+        uint8_t endpoint = 1;
 
-    // Hardcode endpoint to 1 for now
-    err = deviceController->SendMessage((void *) "SendMessage", buffer);
+        uint16_t dataLength = 0;
+        switch (commandID)
+        {
+        case 0:
+            dataLength = encodeOffCommand(buffer->Start(), bufferSize, endpoint);
+            break;
+        case 1:
+            dataLength = encodeOnCommand(buffer->Start(), bufferSize, endpoint);
+            break;
+        case 2:
+            dataLength = encodeToggleCommand(buffer->Start(), bufferSize, endpoint);
+            break;
+        default:
+            ChipLogError(Controller, "Unknown command: %d", commandID);
+            return;
+        }
 
-    pthread_mutex_unlock(&sStackLock);
+        buffer->SetDataLength(dataLength);
+
+        // Hardcode endpoint to 1 for now
+        err = deviceController->SendMessage((void *) "SendMessage", buffer);
+
+        pthread_mutex_unlock(&sStackLock);
+    }
 
     if (err != CHIP_NO_ERROR)
     {

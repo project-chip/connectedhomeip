@@ -83,7 +83,14 @@ void ModelCommand::SendCommand(ChipDeviceController * dc)
     // Make sure our buffer is big enough, but this will need a better setup!
     static const size_t bufferSize = 1024;
     auto * buffer                  = PacketBuffer::NewWithAvailableSize(bufferSize);
-    uint16_t dataLength            = EncodeCommand(buffer, bufferSize, mEndPointId);
+
+    if (buffer == nullptr)
+    {
+        ChipLogError(chipTool, "Failed to allocate memory for packet data.");
+        return;
+    }
+
+    uint16_t dataLength = EncodeCommand(buffer, bufferSize, mEndPointId);
     buffer->SetDataLength(dataLength);
     ChipLogProgress(chipTool, "Encoded data of length %d", dataLength);
 
