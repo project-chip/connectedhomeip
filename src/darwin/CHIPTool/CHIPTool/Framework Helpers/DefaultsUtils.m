@@ -20,7 +20,6 @@
 NSString * const kCHIPToolDefaultsDomain = @"com.apple.chiptool";
 NSString * const kNetworkSSIDDefaultsKey = @"networkSSID";
 NSString * const kNetworkPasswordDefaultsKey = @"networkPassword";
-NSString * const kIPKey = @"ipk";
 
 id CHIPGetDomainValueForKey(NSString * domain, NSString * key)
 {
