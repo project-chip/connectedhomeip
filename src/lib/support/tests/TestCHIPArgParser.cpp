@@ -27,6 +27,7 @@
 #include <core/CHIPCore.h>
 
 #include <support/CHIPArgParser.hpp>
+#include <support/ScopedBuffer.h>
 
 #if CHIP_CONFIG_ENABLE_ARG_PARSER
 
@@ -170,6 +171,44 @@ static OptionSet sOptionSetB =
 };
 // clang-format on
 
+namespace {
+
+struct TestArgv
+{
+    chip::Platform::ScopedMemoryBuffer<char> strings;
+    chip::Platform::ScopedMemoryBuffer<char *> argv;
+};
+
+// Duplicate arguments since tests use string constants and argv is not
+// defined const.
+TestArgv DupeArgs(const char * argv[], int argc)
+{
+    TestArgv ret;
+    ret.argv.Alloc(argc + 1);
+
+    size_t len = 0;
+    for (int i = 0; i < argc; ++i)
+    {
+        len += strlen(argv[i]) + 1;
+    }
+
+    ret.strings.Alloc(len);
+
+    size_t offset = 0;
+    for (int i = 0; i < argc; ++i)
+    {
+        ret.argv[i] = &ret.strings[offset];
+        memcpy(ret.argv[i], argv[i], strlen(argv[i]) + 1);
+        offset += strlen(argv[i]) + 1;
+    }
+
+    ret.argv[argc] = nullptr;
+
+    return ret;
+}
+
+} // namespace
+
 static void SimpleParseTest_SingleLongOption()
 {
     bool res;
@@ -188,7 +227,8 @@ static void SimpleParseTest_SingleLongOption()
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
+    TestArgv argsDup = DupeArgs(argv, argc);
+    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
     VerifyOrQuit(sCallbackRecordCount == 2, "Invalid value returned for sCallbackRecordCount");
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
@@ -213,7 +253,8 @@ static void SimpleParseTest_SingleShortOption()
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
+    TestArgv argsDup = DupeArgs(argv, argc);
+    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
     VerifyOrQuit(sCallbackRecordCount == 2, "Invalid value returned for sCallbackRecordCount");
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetB, 's', "-s", nullptr);
@@ -238,7 +279,8 @@ static void SimpleParseTest_SingleLongOptionWithValue()
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
+    TestArgv argsDup = DupeArgs(argv, argc);
+    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
     VerifyOrQuit(sCallbackRecordCount == 2, "Invalid value returned for sCallbackRecordCount");
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetB, 1000, "--run", "run-value");
@@ -263,7 +305,8 @@ static void SimpleParseTest_SingleShortOptionWithValue()
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
+    TestArgv argsDup = DupeArgs(argv, argc);
+    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
     VerifyOrQuit(sCallbackRecordCount == 2, "Invalid value returned for sCallbackRecordCount");
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, 'Z', "-Z", "baz-value");
@@ -297,7 +340,8 @@ static void SimpleParseTest_VariousShortAndLongWithArgs()
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
+    TestArgv argsDup = DupeArgs(argv, argc);
+    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
     VerifyOrQuit(sCallbackRecordCount == 12, "Invalid value returned for sCallbackRecordCount");
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
@@ -336,7 +380,8 @@ static void UnknownOptionTest_UnknownShortOption()
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
+    TestArgv argsDup = DupeArgs(argv, argc);
+    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 3, "Invalid value returned for sCallbackRecordCount");
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
@@ -368,7 +413,8 @@ static void UnknownOptionTest_UnknownLongOption()
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
+    TestArgv argsDup = DupeArgs(argv, argc);
+    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 3, "Invalid value returned for sCallbackRecordCount");
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
@@ -400,7 +446,8 @@ static void UnknownOptionTest_UnknownShortOptionAfterKnown()
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
+    TestArgv argsDup = DupeArgs(argv, argc);
+    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 4, "Invalid value returned for sCallbackRecordCount");
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
@@ -429,7 +476,8 @@ static void UnknownOptionTest_UnknownShortOptionBeforeKnown()
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
+    TestArgv argsDup = DupeArgs(argv, argc);
+    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
     VerifyPrintArgErrorCallback(0);
@@ -457,7 +505,8 @@ static void UnknownOptionTest_UnknownShortOptionAfterArgs()
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
+    TestArgv argsDup = DupeArgs(argv, argc);
+    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
     VerifyPrintArgErrorCallback(0);
@@ -485,7 +534,8 @@ static void UnknownOptionTest_UnknownLongOptionAfterArgs()
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
+    TestArgv argsDup = DupeArgs(argv, argc);
+    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
     VerifyPrintArgErrorCallback(0);
@@ -514,7 +564,8 @@ static void UnknownOptionTest_IgnoreUnknownLongOption()
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs, true);
+    TestArgv argsDup = DupeArgs(argv, argc);
+    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs, true);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
 
     VerifyOrQuit(sCallbackRecordCount == 4, "Invalid value returned for sCallbackRecordCount");
@@ -546,7 +597,8 @@ static void UnknownOptionTest_IgnoreUnknownShortOption()
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs, true);
+    TestArgv argsDup = DupeArgs(argv, argc);
+    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs, true);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
 
     VerifyOrQuit(sCallbackRecordCount == 5, "Invalid value returned for sCallbackRecordCount");
@@ -576,7 +628,8 @@ static void MissingValueTest_MissingShortOptionValue()
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs, true);
+    TestArgv argsDup = DupeArgs(argv, argc);
+    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs, true);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
     VerifyPrintArgErrorCallback(0);
@@ -602,7 +655,8 @@ static void MissingValueTest_MissingLongOptionValue()
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs, true);
+    TestArgv argsDup = DupeArgs(argv, argc);
+    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs, true);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
     VerifyPrintArgErrorCallback(0);
