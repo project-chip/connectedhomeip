@@ -31,26 +31,20 @@ get_submodule_config() {
     git config --file "$toplevel/.gitmodules" "submodule.$name.$1"
 }
 
-set_submodule_config() {
-    git config --file "$toplevel/.gitmodules" "submodule.$name.$1" "$2"
-}
-
 SUBMODULE_URL=$(get_submodule_config url)
 SUBMODULE_BRANCH=$(get_submodule_config branch)
 SUBMODULE_PATH=$(get_submodule_config path)
 
 git fetch --quiet "$SUBMODULE_URL" "$SUBMODULE_BRANCH"
 
-REPOS_COMMIT=$(get_submodule_config commit)
 HEAD_COMMIT=$(git -C "$toplevel" rev-parse HEAD:"$SUBMODULE_PATH")
 FETCH_COMMIT="$(git rev-parse FETCH_HEAD)"
 
-if [[ "$HEAD_COMMIT" == "$FETCH_COMMIT" && "$REPOS_COMMIT" == "$FETCH_COMMIT" ]]; then
+if [[ "$HEAD_COMMIT" == "$FETCH_COMMIT" ]]; then
     exit 0
 fi
 
 git checkout --quiet "$FETCH_COMMIT"
 git -C "$toplevel" add "$SUBMODULE_PATH"
-set_submodule_config commit "$FETCH_COMMIT"
 
 echo "    git -C $SUBMODULE_PATH log $(git rev-parse --short "$HEAD_COMMIT")..$(git rev-parse --short "$FETCH_COMMIT")"
