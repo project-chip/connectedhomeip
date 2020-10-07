@@ -14,7 +14,7 @@
 
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/gn/chip/tests.gni")
+import("${chip_root}/build/chip/tests.gni")
 
 template("chip_build") {
   _build_name = target_name
