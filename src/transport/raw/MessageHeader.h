@@ -238,7 +238,7 @@ public:
      *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
      *    CHIP_ERROR_VERSION_MISMATCH if header version is not supported.
      */
-    CHIP_ERROR Decode(const uint8_t * const data, size_t size, uint16_t * decode_size);
+    CHIP_ERROR Decode(const uint8_t * data, size_t size, uint16_t * decode_size);
 
     /**
      * Encodes a header into the given buffer.
@@ -374,7 +374,7 @@ public:
      *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
      *    CHIP_ERROR_VERSION_MISMATCH if header version is not supported.
      */
-    CHIP_ERROR Decode(Header::Flags flags, const uint8_t * const data, size_t size, uint16_t * decode_size);
+    CHIP_ERROR Decode(Header::Flags flags, const uint8_t * data, size_t size, uint16_t * decode_size);
 
     /**
      * Encodes the encrypted part of the header into the given buffer.
@@ -445,7 +445,7 @@ public:
      *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
      *    CHIP_ERROR_VERSION_MISMATCH if header version is not supported.
      */
-    CHIP_ERROR Decode(const PacketHeader & packetHeader, const uint8_t * const data, size_t size, uint16_t * decode_size);
+    CHIP_ERROR Decode(const PacketHeader & packetHeader, const uint8_t * data, size_t size, uint16_t * decode_size);
 
     /**
      * Encodes the Messae Authentication Tag into the given buffer.

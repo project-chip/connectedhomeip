@@ -110,7 +110,7 @@ public:
 
         if (i < BLE_LAYER_NUM_BLE_ENDPOINTS)
         {
-            return (BLEEndPoint *) (sEndPointPool.Pool + (sizeof(BLEEndPoint) * i));
+            return reinterpret_cast<BLEEndPoint *>(sEndPointPool.Pool + (sizeof(BLEEndPoint) * i));
         }
 
         return nullptr;

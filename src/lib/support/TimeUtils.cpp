@@ -481,11 +481,11 @@ void SecondsSinceEpochToCalendarTime(uint32_t secondsSinceEpoch, uint16_t & year
 
     DaysSinceEpochToCalendarDate(daysSinceEpoch, year, month, dayOfMonth);
 
-    hour = (uint8_t)(timeOfDay / kSecondsPerHour);
+    hour = static_cast<uint8_t>(timeOfDay / kSecondsPerHour);
     timeOfDay -= (hour * kSecondsPerHour);
-    minute = (uint8_t)(timeOfDay / kSecondsPerMinute);
+    minute = static_cast<uint8_t>(timeOfDay / kSecondsPerMinute);
     timeOfDay -= (minute * kSecondsPerMinute);
-    second = (uint8_t) timeOfDay;
+    second = static_cast<uint8_t>(timeOfDay);
 }
 
 } // namespace chip

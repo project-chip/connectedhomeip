@@ -802,8 +802,8 @@ etharp_output(struct netif *netif, struct pbuf *q, const ip4_addr_t *ipaddr)
   /* broadcast destination IP address? */
   if (ip4_addr_isbroadcast(ipaddr, netif)) {
     /* broadcast on Ethernet also */
-    dest = (const struct eth_addr *)&ethbroadcast;
-  /* multicast destination IP address? */
+    dest = &ethbroadcast;
+    /* multicast destination IP address? */
   } else if (ip4_addr_ismulticast(ipaddr)) {
     /* Hash IP multicast address to MAC address.*/
     mcastaddr.addr[0] = LL_IP4_MULTICAST_ADDR_0;

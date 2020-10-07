@@ -25,8 +25,9 @@
 #include <stdlib.h>
 
 #include "CHIPDeviceManager.h"
-#include <lib/support/CodeUtils.h>
 #include <setup_payload/SetupPayload.h>
+#include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 
 namespace chip {
@@ -76,6 +77,9 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     default:
         break;
     }
+
+    err = Platform::MemoryInit();
+    SuccessOrExit(err);
 
     // Register a function to receive events from the CHIP device layer.  Note that calls to
     // this function will happen on the CHIP event loop thread, not the app_main thread.

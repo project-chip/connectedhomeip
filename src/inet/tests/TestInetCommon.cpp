@@ -644,7 +644,7 @@ void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix, uint32_t
             printf("   ");
 
         for (j = i; j < rowEnd && j < len; j++)
-            if (isprint((char) mem[j]))
+            if (isprint(static_cast<char>(mem[j])))
                 printf("%c", mem[j]);
             else
                 printf(".");
