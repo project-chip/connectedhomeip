@@ -228,7 +228,7 @@ static void SimpleParseTest_SingleLongOption()
     PrintArgError = HandleArgError;
 
     TestArgv argsDup = DupeArgs(argv, argc);
-    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
+    res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
     VerifyOrQuit(sCallbackRecordCount == 2, "Invalid value returned for sCallbackRecordCount");
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
@@ -254,7 +254,7 @@ static void SimpleParseTest_SingleShortOption()
     PrintArgError = HandleArgError;
 
     TestArgv argsDup = DupeArgs(argv, argc);
-    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
+    res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
     VerifyOrQuit(sCallbackRecordCount == 2, "Invalid value returned for sCallbackRecordCount");
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetB, 's', "-s", nullptr);
@@ -280,7 +280,7 @@ static void SimpleParseTest_SingleLongOptionWithValue()
     PrintArgError = HandleArgError;
 
     TestArgv argsDup = DupeArgs(argv, argc);
-    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
+    res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
     VerifyOrQuit(sCallbackRecordCount == 2, "Invalid value returned for sCallbackRecordCount");
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetB, 1000, "--run", "run-value");
@@ -306,7 +306,7 @@ static void SimpleParseTest_SingleShortOptionWithValue()
     PrintArgError = HandleArgError;
 
     TestArgv argsDup = DupeArgs(argv, argc);
-    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
+    res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
     VerifyOrQuit(sCallbackRecordCount == 2, "Invalid value returned for sCallbackRecordCount");
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, 'Z', "-Z", "baz-value");
@@ -341,7 +341,7 @@ static void SimpleParseTest_VariousShortAndLongWithArgs()
     PrintArgError = HandleArgError;
 
     TestArgv argsDup = DupeArgs(argv, argc);
-    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
+    res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
     VerifyOrQuit(sCallbackRecordCount == 12, "Invalid value returned for sCallbackRecordCount");
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
@@ -381,7 +381,7 @@ static void UnknownOptionTest_UnknownShortOption()
     PrintArgError = HandleArgError;
 
     TestArgv argsDup = DupeArgs(argv, argc);
-    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
+    res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 3, "Invalid value returned for sCallbackRecordCount");
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
@@ -414,7 +414,7 @@ static void UnknownOptionTest_UnknownLongOption()
     PrintArgError = HandleArgError;
 
     TestArgv argsDup = DupeArgs(argv, argc);
-    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
+    res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 3, "Invalid value returned for sCallbackRecordCount");
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
@@ -447,7 +447,7 @@ static void UnknownOptionTest_UnknownShortOptionAfterKnown()
     PrintArgError = HandleArgError;
 
     TestArgv argsDup = DupeArgs(argv, argc);
-    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
+    res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 4, "Invalid value returned for sCallbackRecordCount");
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
@@ -477,7 +477,7 @@ static void UnknownOptionTest_UnknownShortOptionBeforeKnown()
     PrintArgError = HandleArgError;
 
     TestArgv argsDup = DupeArgs(argv, argc);
-    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
+    res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
     VerifyPrintArgErrorCallback(0);
@@ -506,7 +506,7 @@ static void UnknownOptionTest_UnknownShortOptionAfterArgs()
     PrintArgError = HandleArgError;
 
     TestArgv argsDup = DupeArgs(argv, argc);
-    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
+    res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
     VerifyPrintArgErrorCallback(0);
@@ -535,7 +535,7 @@ static void UnknownOptionTest_UnknownLongOptionAfterArgs()
     PrintArgError = HandleArgError;
 
     TestArgv argsDup = DupeArgs(argv, argc);
-    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
+    res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
     VerifyPrintArgErrorCallback(0);
@@ -565,7 +565,7 @@ static void UnknownOptionTest_IgnoreUnknownLongOption()
     PrintArgError = HandleArgError;
 
     TestArgv argsDup = DupeArgs(argv, argc);
-    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs, true);
+    res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs, true);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
 
     VerifyOrQuit(sCallbackRecordCount == 4, "Invalid value returned for sCallbackRecordCount");
@@ -598,7 +598,7 @@ static void UnknownOptionTest_IgnoreUnknownShortOption()
     PrintArgError = HandleArgError;
 
     TestArgv argsDup = DupeArgs(argv, argc);
-    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs, true);
+    res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs, true);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
 
     VerifyOrQuit(sCallbackRecordCount == 5, "Invalid value returned for sCallbackRecordCount");
@@ -629,7 +629,7 @@ static void MissingValueTest_MissingShortOptionValue()
     PrintArgError = HandleArgError;
 
     TestArgv argsDup = DupeArgs(argv, argc);
-    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs, true);
+    res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs, true);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
     VerifyPrintArgErrorCallback(0);
@@ -656,7 +656,7 @@ static void MissingValueTest_MissingLongOptionValue()
     PrintArgError = HandleArgError;
 
     TestArgv argsDup = DupeArgs(argv, argc);
-    res = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs, true);
+    res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs, true);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
     VerifyPrintArgErrorCallback(0);
