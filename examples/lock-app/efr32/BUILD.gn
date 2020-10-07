@@ -123,7 +123,7 @@ efr32_executable("lock_app") {
     ldscript = "${efr32_project_dir}/ldscripts/efr32-lock-example-MG21.ld"
   }
 
-  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+  ldflags = [ "-Wl,--print-memory-usage", "-fstack-usage", "-T" + rebase_path(ldscript, root_build_dir) ]
 }
 
 group("efr32") {
