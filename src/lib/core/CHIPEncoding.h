@@ -379,14 +379,14 @@ inline uint16_t Read16(const uint8_t *& p)
 }
 
 /**
- * Perform a, potentially unaligned, memory read of the big endian
+ * Perform a, potentially unaligned, memory read of the little endian
  * byte ordered 16-bit value from the specified pointer address,
  * perform byte reordering, as necessary, for the target system to put
  * the value in target system byte ordering, and increment the pointer
  * by 16-bits (2 bytes).
  *
  * @param[in,out] p   A reference to a pointer address, potentially
- *                    unaligned, to read the 16-bit big endian byte
+ *                    unaligned, to read the 16-bit little endian byte
  *                    ordered value from and to then increment by 16-
  *                    bits (2 bytes).
  *
