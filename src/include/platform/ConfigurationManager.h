@@ -197,6 +197,7 @@ extern ConfigurationManagerImpl & ConfigurationMgrImpl();
 #elif defined(CHIP_DEVICE_LAYER_TARGET)
 #define CONFIGURATIONMANAGERIMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/ConfigurationManagerImpl.h>
 #include CONFIGURATIONMANAGERIMPL_HEADER
+#endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
 namespace chip {
 namespace DeviceLayer {
@@ -540,7 +541,5 @@ inline void ConfigurationManager::UseManufacturerCredentialsAsOperational(bool v
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
 #endif // CONFIGURATION_MANAGER_H
