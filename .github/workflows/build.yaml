@@ -76,14 +76,14 @@ jobs:
             # - name: Upload Code Coverage
             #   if: ${{ contains('main', env.BUILD_TYPE) }}
             #   run: bash <(curl -s https://codecov.io/bash)
-            # - name: Remove third_party binaries for CodeQL Analysis
-            #   run: find . -type d -name "third_party" -exec rm -rf {} +
-            # - name: Remove dbus binaries for CodeQL Analysis
-            #   run: find . -type d -name "dbus" -exec rm -rf {} +
-            # - name: Remove nrfxlib binaries for CodeQL Analysis
-            #   run: find . -type d -name "nrfxlib" -exec rm -rf {} +
             - name: Show tree
               run: find .
+            - name: Remove third_party binaries for CodeQL Analysis
+              run: find out -type d -name "third_party" -exec rm -rf {} +
+            - name: Remove dbus binaries for CodeQL Analysis
+              run: find out -type d -name "dbus" -exec rm -rf {} +
+            # - name: Remove nrfxlib binaries for CodeQL Analysis
+            #   run: find . -type d -name "nrfxlib" -exec rm -rf {} +
             - name: Perform CodeQL Analysis
               if: ${{ github.event_name == 'push' }}
               uses: github/codeql-action/analyze@v1

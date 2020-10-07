@@ -77,10 +77,14 @@ jobs:
             # TODO: NRF Connect https://github.com/project-chip/connectedhomeip/issues/2225
             - name: Show tree
               run: find .
-            # - name: Remove third_party binaries for CodeQL Analysis
-            #   run: find . -type d -name "third_party" -exec rm -rf {} +
-            # - name: Remove nrfxlib binaries for CodeQL Analysis
-            #   run: find . -type d -name "nrfxlib" -exec rm -rf {} +
+            - name: Remove third_party binaries for CodeQL Analysis
+              run: find out -type d -name "third_party" -exec rm -rf {} +
+            - name: Remove nrfxlib binaries for CodeQL Analysis
+              run: find out -type d -name "nrfxlib" -exec rm -rf {} +
+            - name: Remove NordicSemiconductor binaries for CodeQL Analysis
+              run:
+                  find out -type d -name "NordicSemiconductor" -exec rm -rf {} +
+
             - name: Perform CodeQL Analysis
               if: ${{ github.event_name == 'push' }}
               uses: github/codeql-action/analyze@v1
@@ -141,10 +145,12 @@ jobs:
                       out/shell_debug/chip-shell
             - name: Show tree
               run: find .
-            # - name: Remove third_party binaries for CodeQL Analysis
-            #   run: find . -type d -name "third_party" -exec rm -rf {} +
-            # - name: Remove dbus binaries for CodeQL Analysis
-            #   run: find . -type d -name "dbus" -exec rm -rf {} +
+            - name: Remove third_party binaries for CodeQL Analysis
+              run: find out -type d -name "third_party" -exec rm -rf {} +
+            - name: Remove dbus binaries for CodeQL Analysis
+              run: find out -type d -name "dbus" -exec rm -rf {} +
+            - name: Remove gen binaries for CodeQL Analysis
+              run: find out -type d -name "gen" -exec rm -rf {} +
             - name: Perform CodeQL Analysis
               if: ${{ github.event_name == 'push' }}
               uses: github/codeql-action/analyze@v1
@@ -200,8 +206,10 @@ jobs:
                       out/lighting_app_debug/BRD4161A/chip-efr32-lighting-example.out
             - name: Show tree
               run: find .
-            # - name: Remove third_party binaries for CodeQL Analysis
-            #   run: find . -type d -name "third_party" -exec rm -rf {} +
+            - name: Remove third_party binaries for CodeQL Analysis
+              run: find out -type d -name "third_party" -exec rm -rf {} +
+            - name: Remove SiliconLabs binaries for CodeQL Analysis
+              run: find out -type d -name "SiliconLabs" -exec rm -rf {} +
             - name: Perform CodeQL Analysis
               if: ${{ github.event_name == 'push' }}
               uses: github/codeql-action/analyze@v1
@@ -265,10 +273,16 @@ jobs:
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
             - name: Show tree
               run: find .
-            # - name: Remove third_party binaries for CodeQL Analysis
-            #   run: find . -type d -name "third_party" -exec rm -rf {} +
-            # - name: Remove nrfxlib binaries for CodeQL Analysis
-            #   run: find . -type d -name "nrfxlib" -exec rm -rf {} +
+            - name: Remove third_party binaries for CodeQL Analysis
+              run: find examples -type d -name "third_party" -exec rm -rf {} +
+            - name: Remove nrfxlib binaries for CodeQL Analysis
+              run: find examples -type d -name "nrfxlib" -exec rm -rf {} +
+            - name: Remove zephyr binaries for CodeQL Analysis
+              run: find examples -type d -name "zephyr" -exec rm -rf {} +
+            - name: Remove nrf binaries for CodeQL Analysis
+              run: find examples -type d -name "nrf" -exec rm -rf {} +
+            - name: Remove modules binaries for CodeQL Analysis
+              run: find examples -type d -name "modules" -exec rm -rf {} +
             - name: Perform CodeQL Analysis
               if: ${{ github.event_name == 'push' }}
               uses: github/codeql-action/analyze@v1
