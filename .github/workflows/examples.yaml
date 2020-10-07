@@ -234,11 +234,12 @@ jobs:
               with:
                   fetch-depth: 0
                   submodules: true
-            - name: Initialize CodeQL
-              uses: github/codeql-action/init@v1
-              with:
-                  languages: "cpp, python"
-                  queries: +security-and-quality
+            # https://github.com/project-chip/connectedhomeip/issues/3100
+            # - name: Initialize CodeQL
+            #   uses: github/codeql-action/init@v1
+            #   with:
+            #       languages: "cpp, python"
+            #       queries: +security-and-quality
             - name: Build example nRF Connect SDK Lock App
               run: scripts/examples/nrfconnect_example.sh lock-app
             - name: Build example nRF Connect SDK Lighting App
@@ -271,18 +272,19 @@ jobs:
                       ${{ env.BUILD_TYPE }}-example-build-${{
                       steps.outsuffix.outputs.value }}
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
-            - name: Show tree
-              run: find .
-            - name: Remove third_party binaries for CodeQL Analysis
-              run: find examples -type d -name "third_party" -exec rm -rf {} +
-            - name: Remove nrfxlib binaries for CodeQL Analysis
-              run: find examples -type d -name "nrfxlib" -exec rm -rf {} +
-            - name: Remove zephyr binaries for CodeQL Analysis
-              run: find examples -type d -name "zephyr" -exec rm -rf {} +
-            - name: Remove nrf binaries for CodeQL Analysis
-              run: find examples -type d -name "nrf" -exec rm -rf {} +
-            - name: Remove modules binaries for CodeQL Analysis
-              run: find examples -type d -name "modules" -exec rm -rf {} +
-            - name: Perform CodeQL Analysis
-              if: ${{ github.event_name == 'push' }}
-              uses: github/codeql-action/analyze@v1
+            # https://github.com/project-chip/connectedhomeip/issues/3100
+            # - name: Show tree
+            #   run: find .
+            # - name: Remove third_party binaries for CodeQL Analysis
+            #   run: find examples -type d -name "third_party" -exec rm -rf {} +
+            # - name: Remove nrfxlib binaries for CodeQL Analysis
+            #   run: find examples -type d -name "nrfxlib" -exec rm -rf {} +
+            # - name: Remove zephyr binaries for CodeQL Analysis
+            #   run: find examples -type d -name "zephyr" -exec rm -rf {} +
+            # - name: Remove nrf binaries for CodeQL Analysis
+            #   run: find examples -type d -name "nrf" -exec rm -rf {} +
+            # - name: Remove modules binaries for CodeQL Analysis
+            #   run: find examples -type d -name "modules" -exec rm -rf {} +
+            # - name: Perform CodeQL Analysis
+            #   if: ${{ github.event_name == 'push' }}
+            #   uses: github/codeql-action/analyze@v1
