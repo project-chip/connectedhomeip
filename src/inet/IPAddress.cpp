@@ -149,10 +149,9 @@ lwip_ip_addr_type IPAddress::ToLwIPAddrType(IPAddressType typ)
 #if INET_CONFIG_ENABLE_IPV4
 ip4_addr_t IPAddress::ToIPv4() const
 {
-    ip4_addr_t addr;
-    static_assert(sizeof(addr) == sizeof(mAddr), "ip4_addr_t size mismatch");
-    memcpy(&addr, mAddr, sizeof(addr));
-    return addr;
+    ip4_addr_t ipAddr;
+    memcpy(&ipAddr, &Addr[3], sizeof(ipAddr));
+    return ipAddr;
 }
 
 IPAddress IPAddress::FromIPv4(const ip4_addr_t & ipv4Addr)
@@ -168,10 +167,10 @@ IPAddress IPAddress::FromIPv4(const ip4_addr_t & ipv4Addr)
 
 ip6_addr_t IPAddress::ToIPv6() const
 {
-    ip6_addr_t addr;
-    static_assert(sizeof(addr) == sizeof(Addr), "ip6_addr_t size mismatch");
-    memcpy(&addr, Addr, sizeof(addr));
-    return addr;
+    ip6_addr_t ipAddr;
+    static_assert(sizeof(ipAddr) == sizeof(Addr), "ip6_addr_t size mismatch");
+    memcpy(&ipAddr, Addr, sizeof(ipAddr));
+    return ipAddr;
 }
 
 IPAddress IPAddress::FromIPv6(const ip6_addr_t & ipv6Addr)
