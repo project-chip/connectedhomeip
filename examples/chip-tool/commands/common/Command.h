@@ -82,7 +82,7 @@ public:
     const char * GetArgumentName(size_t index) const;
     size_t GetArgumentsCount(void) const { return mArgs.size(); }
 
-    bool InitArguments(int argc, char * argv[]);
+    bool InitArguments(int argc, char ** argv);
     template <class T>
     size_t AddArgument(const char * name, int64_t min, int64_t max, T * out)
     {
