@@ -14,6 +14,7 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
+import chip.devicecontroller.AndroidChipStack
 import chip.devicecontroller.ChipDeviceController
 import java.util.UUID
 import kotlin.coroutines.resume
@@ -69,9 +70,9 @@ class BluetoothManager {
     /**
      * Connects to a [BluetoothDevice] and suspends until [BluetoothGattCallback.onServicesDiscovered]
      */
-    suspend fun connect(context: Context, device: BluetoothDevice, controller: ChipDeviceController): BluetoothGatt? {
+    suspend fun connect(context: Context, device: BluetoothDevice): BluetoothGatt? {
         return suspendCancellableCoroutine { continuation ->
-            val bluetoothGattCallback = object : BluetoothGattCallback() {
+            val bluetoothGattCallback = object : AndroidChipStack.ChipGattCallback() {
                 override fun onConnectionStateChange(
                   gatt: BluetoothGatt?,
                   status: Int,
@@ -92,24 +93,6 @@ class BluetoothManager {
                     if (continuation.isActive) {
                         continuation.resume(gatt)
                     }
-                }
-
-                override fun onCharacteristicWrite(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic, status: Int) {
-                    super.onCharacteristicWrite(gatt, characteristic, status)
-                    Log.i("$TAG|onCharacteristicWrite", "ACK received")
-                    controller.onCharacteristicWrite(gatt, characteristic.uuid.toString(), status)
-                }
-
-                override fun onDescriptorWrite(gatt: BluetoothGatt?, desc: BluetoothGattDescriptor, status: Int) {
-                    super.onDescriptorWrite(gatt, desc, status)
-                    Log.i("$TAG|onDescriptorWrite", if (desc.value == BluetoothGattDescriptor.ENABLE_INDICATION_VALUE) "Subscribed" else "Unsubscribed")
-                    controller.onDescriptorWrite(gatt, desc.characteristic.uuid.toString(), desc.value, status)
-                }
-
-                override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
-                    super.onCharacteristicChanged(gatt, characteristic)
-                    Log.i("$TAG|onCharacteristicChanged", "Indication Received")
-                    controller.onCharacteristicChanged(gatt, characteristic.uuid.toString(), characteristic.value)
                 }
             }
 

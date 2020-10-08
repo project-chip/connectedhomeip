@@ -97,7 +97,7 @@ class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionLis
                     return@launch
                 }
 
-                gatt = bluetoothManager.connect(requireContext(), device, deviceController)
+                gatt = bluetoothManager.connect(requireContext(), device)
                 deviceController.setCompletionListener(this@CHIPDeviceDetailsFragment)
                 deviceController.beginConnectDeviceBle(gatt, deviceInfo.setupPinCode);
             }
