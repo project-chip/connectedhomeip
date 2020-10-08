@@ -27,10 +27,10 @@
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
 
+#include "af.h"
 #include "attribute-storage.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
-#include "gen/znet-bookkeeping.h"
 #include "util.h"
 #include <app/chip-zcl-zpro-codec.h>
 
@@ -41,7 +41,7 @@ static const char * TAG = "data_model_server";
 void InitDataModelHandler()
 {
     emberAfEndpointConfigure();
-    emAfInit();
+    emberAfInit();
 }
 
 void HandleDataModelMessage(const PacketHeader & header, System::PacketBuffer * buffer, SecureSessionMgrBase * mgr)

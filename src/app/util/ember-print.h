@@ -17,6 +17,8 @@
 #ifndef EMBER_PRINT_H
 #define EMBER_PRINT_H 1
 
+#include "debug-printing.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 

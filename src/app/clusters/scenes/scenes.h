@@ -45,6 +45,7 @@
 
 EmberAfStatus emberAfScenesSetSceneCountAttribute(uint8_t endpoint, uint8_t newCount);
 EmberAfStatus emberAfScenesMakeValid(uint8_t endpoint, uint8_t sceneId, uint16_t groupId);
+EmberAfStatus emberAfScenesClusterMakeInvalidCallback(uint8_t endpoint);
 
 // DEPRECATED.
 #define emberAfScenesMakeInvalid emberAfScenesClusterMakeInvalidCallback

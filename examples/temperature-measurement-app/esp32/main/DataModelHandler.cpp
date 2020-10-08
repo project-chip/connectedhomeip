@@ -26,10 +26,10 @@
 
 #include "DataModelHandler.h"
 
+#include "af.h"
 #include "attribute-storage.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
-#include "gen/znet-bookkeeping.h"
 #include "util.h"
 #include <app/chip-zcl-zpro-codec.h>
 

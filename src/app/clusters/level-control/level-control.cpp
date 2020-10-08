@@ -41,6 +41,8 @@
 // clusters specific header
 #include "level-control.h"
 
+#include <app/clusters/on-off-server/on-off.h>
+
 // this file contains all the common includes for clusters in the util
 #include <app/util/af.h>
 

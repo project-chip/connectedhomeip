@@ -107,7 +107,7 @@ int main(void)
     efr32LogInit();
 #endif
 #endif
-
+    CHIPPlatformMemoryInit(0, 0);
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
     // Initialize mbedtls threading support on EFR32

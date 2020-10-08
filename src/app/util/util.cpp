@@ -40,14 +40,13 @@
  *******************************************************************************
  ******************************************************************************/
 
+#include "af-event.h"
 #include "af-main.h"
 #include "af.h"
 #include "common.h"
-//#include "../plugin/time-server/time-server.h"
-#include "af-event.h"
-//#include "app/framework/util/time-util.h"
-#include "gen/znet-bookkeeping.h"
-//#include "hal/micro/crc.h"
+#include "ember-print.h"
+#include <app/reporting/reporting.h>
+#include <gen/callback.h>
 
 //------------------------------------------------------------------------------
 // Forward Declarations
@@ -308,9 +307,6 @@ void emberAfStackDown(void)
         // if the table isnt cleared the device keeps trying to send messages.
         emberAfClearReportTableCallback();
     }
-
-    emberAfRegistrationAbortCallback();
-    emberAfTrustCenterKeepaliveAbortCallback();
 }
 
 // ****************************************
@@ -434,6 +430,7 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
         emberAfDebugPrintln("0x%02x", cmd->apsFrame->profileId);
         return false;
     }
+#ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
     else if ((cmd->type == EMBER_INCOMING_MULTICAST || cmd->type == EMBER_INCOMING_MULTICAST_LOOPBACK) &&
              !emberAfGroupsClusterEndpointInGroupCallback(cmd->apsFrame->destinationEndpoint, cmd->apsFrame->groupId))
     {
@@ -442,6 +439,7 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
         emberAfDebugPrintln("0x%02x", cmd->apsFrame->groupId);
         return false;
     }
+#endif // EMBER_AF_PLUGIN_GROUPS_SERVER
     else
     {
         return (cmd->clusterSpecific ? emAfProcessClusterSpecificCommand(cmd) : emAfProcessGlobalCommand(cmd));
@@ -515,11 +513,12 @@ bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType ty
     printIncomingZclMessage(&curCmd);
     prepareForResponse(&curCmd);
 
-    if (emAfPreCommandReceived(&curCmd))
-    {
-        msgHandled = true;
-        goto kickout;
-    }
+    // TODO emberAfPreCommandReceivedCallback not yet implemented
+    // if (emberAfPreCommandReceivedCallback(&curCmd))
+    // {
+    //     msgHandled = true;
+    //     goto kickout;
+    // }
 
     if (interPanHeader == NULL)
     {
@@ -739,13 +738,14 @@ EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback)
 
     // The manner in which the message is sent depends on the response flags and
     // the destination of the message.
-    if ((emberAfResponseType & ZCL_UTIL_RESP_INTERPAN) != 0U)
-    {
-        label  = 'I';
-        status = emberAfInterpanSendMessageCallback(&interpanResponseHeader, appResponseLength, appResponseData);
-        emberAfResponseType &= ~ZCL_UTIL_RESP_INTERPAN;
-    }
-    else if (!isBroadcastDestination(emberAfResponseDestination))
+    // if ((emberAfResponseType & ZCL_UTIL_RESP_INTERPAN) != 0U)
+    // {
+    //     label  = 'I';
+    //     status = emberAfInterpanSendMessageCallback(&interpanResponseHeader, appResponseLength, appResponseData);
+    //     emberAfResponseType &= ~ZCL_UTIL_RESP_INTERPAN;
+    // }
+    // else
+    if (!isBroadcastDestination(emberAfResponseDestination))
     {
         label  = 'U';
         status = emberAfSendUnicastWithCallback(EMBER_OUTGOING_DIRECT, emberAfResponseDestination, &emberAfResponseApsFrame,
@@ -946,11 +946,11 @@ bool emberAfDetermineIfLinkSecurityIsRequired(uint8_t commandId, bool incoming, 
     {
         return true;
     }
-
-    if (emberAfClusterSecurityCustomCallback(profileId, clusterId, incoming, commandId))
-    {
-        return true;
-    }
+    // TODO
+    // if (emberAfClusterSecurityCustomCallback(profileId, clusterId, incoming, commandId))
+    // {
+    //     return true;
+    // }
 
     // APS_TEST_SECURITY_DEFAULT at this point returns false.
     return false;
@@ -1001,7 +1001,8 @@ uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint64_t i
         break;
     }
 
-    max -= emberAfGetSourceRouteOverheadCallback(destination);
+    // TODO See if this is necessary
+    // max -= emberAfGetSourceRouteOverheadCallback(destination);
 
     return max;
 }
