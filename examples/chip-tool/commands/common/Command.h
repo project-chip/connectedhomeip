@@ -99,6 +99,7 @@ public:
      */
     size_t AddArgument(const char * name, char ** value);
     size_t AddArgument(const char * name, AddressWithInterface * out);
+    size_t AddArgument(const char * name, const void * value) { return 0; };
 
     virtual CHIP_ERROR Run(ChipDeviceController * dc, NodeId remoteId) = 0;
 
