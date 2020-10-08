@@ -177,7 +177,7 @@ void emAfPluginScenesServerPrintInfo(void)
 #endif
 #ifdef ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
             emberAfCorePrint(" color %2x %2x", entry.currentXValue, entry.currentYValue);
-            emberAfCorePrint(" %2x %x %x %x %2x", entry.enhancedCurrentHueValue, entry.currentSaturationValue,
+            emberAfCorePrint(" %2x %x %x %x %2x %2x", entry.enhancedCurrentHueValue, entry.currentSaturationValue,
                              entry.colorLoopActiveValue, entry.colorLoopDirectionValue, entry.colorLoopTimeValue,
                              entry.colorTemperatureMiredsValue);
             emberAfCoreFlush();
