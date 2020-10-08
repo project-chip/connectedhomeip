@@ -99,6 +99,16 @@ static jclass sAndroidChipStackCls              = NULL;
 static jclass sChipDeviceControllerCls          = NULL;
 static jclass sChipDeviceControllerExceptionCls = NULL;
 
+namespace {
+// Use StackUnlockGuard to temporarily unlock the CHIP BLE stack, e.g. when calling application
+// or Android BLE code as a result of a BLE event.
+struct StackUnlockGuard
+{
+    StackUnlockGuard() { pthread_mutex_unlock(&sStackLock); }
+    ~StackUnlockGuard() { pthread_mutex_lock(&sStackLock); }
+};
+} // namespace
+
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
 // knowing its id, because the ID can be learned on the first response that is received.
@@ -416,6 +426,7 @@ JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong devic
 
 void HandleSimpleOperationComplete(ChipDeviceController * deviceController, void * appReqState)
 {
+    StackUnlockGuard unlockGuard;
     JNIEnv * env;
     jclass deviceControllerCls;
     jmethodID methodID;
@@ -477,15 +488,12 @@ exit:
 
 void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState)
 {
-    JNIEnv * env;
-
-    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
-
     HandleSimpleOperationComplete(deviceController, appReqState);
 }
 
 void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload)
 {
+    StackUnlockGuard unlockGuard;
     JNIEnv * env;
     jclass deviceControllerCls;
     jmethodID methodID;
@@ -521,6 +529,7 @@ exit:
 
 void HandleNotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj)
 {
+    StackUnlockGuard unlockGuard;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env;
     jmethodID method;
@@ -551,6 +560,7 @@ exit:
 bool HandleSendCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId,
                               const uint8_t * characteristicData, uint32_t characteristicDataLen)
 {
+    StackUnlockGuard unlockGuard;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env;
     jbyteArray svcIdObj;
@@ -597,6 +607,7 @@ exit:
 
 bool HandleSubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId)
 {
+    StackUnlockGuard unlockGuard;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env;
     jbyteArray svcIdObj;
@@ -638,6 +649,7 @@ exit:
 
 bool HandleUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId)
 {
+    StackUnlockGuard unlockGuard;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env;
     jbyteArray svcIdObj;
@@ -679,6 +691,7 @@ exit:
 
 bool HandleCloseConnection(BLE_CONNECTION_OBJECT connObj)
 {
+    StackUnlockGuard unlockGuard;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env;
     jmethodID method;
@@ -711,6 +724,7 @@ exit:
 
 uint16_t HandleGetMTU(BLE_CONNECTION_OBJECT connObj)
 {
+    StackUnlockGuard unlockGuard;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env;
     jmethodID method;
@@ -744,6 +758,7 @@ exit:
 
 void HandleNewConnection(void * appState, const uint16_t discriminator)
 {
+    StackUnlockGuard unlockGuard;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env;
     jmethodID method;
@@ -776,6 +791,7 @@ exit:
 
 void HandleError(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err, const Inet::IPPacketInfo * pktInfo)
 {
+    StackUnlockGuard unlockGuard;
     JNIEnv * env;
     jclass cls;
     jmethodID method;
