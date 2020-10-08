@@ -31,6 +31,12 @@ void EchoCommand::SendEcho() const
     // Reallocate buffer on each run, as the secure transport encrypts and
     // overwrites the buffer from previous iteration.
     auto * buffer = PacketBuffer::NewWithAvailableSize(payload_len);
+    if (buffer == nullptr)
+    {
+        ChipLogError(chipTool, "Failed to allocate memory for packet data.");
+        return;
+    }
+
     memcpy(buffer->Start(), PAYLOAD, payload_len);
     buffer->SetDataLength(payload_len);
 
