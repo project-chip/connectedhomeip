@@ -34,7 +34,6 @@ target_sources(app PRIVATE
                main/ZclCallbacks.cpp
                ${LOCK_COMMON}/gen/call-command-handler.c
                ${LOCK_COMMON}/gen/callback-stub.c
-               ${LOCK_COMMON}/gen/znet-bookkeeping.c
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
                ${NRFCONNECT_COMMON}/app/Service.cpp
@@ -55,4 +54,6 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/util/process-cluster-message.c
                ${CHIP_ROOT}/src/app/util/process-global-message.cpp
                ${CHIP_ROOT}/src/app/util/util.cpp
+               ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
+               ${CHIP_ROOT}/src/app/reporting/reporting.cpp
                ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off.c)

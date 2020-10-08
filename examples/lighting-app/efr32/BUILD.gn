@@ -100,6 +100,8 @@ efr32_executable("lighting_app") {
     "${chip_root}/src/app/util/process-cluster-message.c",
     "${chip_root}/src/app/util/process-global-message.cpp",
     "${chip_root}/src/app/util/util.cpp",
+    "${chip_root}/src/app/reporting/reporting-default-configuration.cpp",
+    "${chip_root}/src/app/reporting/reporting.cpp",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/hal-config.h",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
@@ -112,7 +114,6 @@ efr32_executable("lighting_app") {
     "src/ZclCallbacks.cpp",
     "src/gen/call-command-handler.c",
     "src/gen/callback-stub.c",
-    "src/gen/znet-bookkeeping.c",
     "src/main.cpp",
   ]
 

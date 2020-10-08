@@ -18,9 +18,9 @@
 
 #include <support/logging/CHIPLogging.h>
 
+#include "af.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
-#include "gen/znet-bookkeeping.h"
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>

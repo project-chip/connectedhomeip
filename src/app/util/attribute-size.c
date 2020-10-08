@@ -42,10 +42,9 @@
 //#include PLATFORM_HEADER
 
 #include "af.h"
+#include "gen/attribute-type.h"
 
-static const uint8_t attributeSizes[] = {
-#include "gen/attribute-size.h"
-};
+static const uint8_t attributeSizes[] = ZAP_GENERATED_ATTRIBUTE_SIZES;
 
 uint8_t emberAfGetDataSize(uint8_t dataType)
 {

@@ -45,6 +45,7 @@
 #include "common.h"
 
 #include "attribute-storage.h"
+#include <app/reporting/reporting.h>
 
 // for pulling in defines dealing with EITHER server or client
 #include "af-main.h"
@@ -656,4 +657,55 @@ EmberAfStatus emAfReadAttribute(uint8_t endpoint, EmberAfClusterId cluster, Embe
     }
 
     return status;
+}
+
+EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(uint8_t endpoint, EmberAfClusterId clusterId,
+                                                                          EmberAfAttributeId attributeId, uint8_t mask,
+                                                                          uint16_t manufacturerCode, uint8_t * value, uint8_t type)
+{
+    return EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_NORMAL; // Default
+}
+
+EmberAfStatus emberAfPreAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
+                                                uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
+                                                uint8_t * value)
+{
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+bool emberAfAttributeWriteAccessCallback(uint8_t endpoint, EmberAfClusterId clusterId, uint16_t manufacturerCode,
+                                         uint16_t attributeId)
+{
+    return true;
+}
+
+bool emberAfAttributeReadAccessCallback(uint8_t endpoint, EmberAfClusterId clusterId, uint16_t manufacturerCode,
+                                        uint16_t attributeId)
+{
+    return true;
+}
+
+EmberAfStatus emberAfExternalAttributeWriteCallback(uint8_t endpoint, EmberAfClusterId clusterId,
+                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
+                                                    uint8_t * buffer)
+{
+    return EMBER_ZCL_STATUS_FAILURE;
+}
+
+EmberAfStatus emberAfExternalAttributeReadCallback(uint8_t endpoint, EmberAfClusterId clusterId,
+                                                   EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
+                                                   uint8_t * buffer, uint16_t maxReadLength)
+{
+    return EMBER_ZCL_STATUS_FAILURE;
+}
+
+bool emberAfWriteAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
+{
+    return false;
+}
+
+bool emberAfDiscoverAttributesResponseCallback(EmberAfClusterId clusterId, bool discoveryComplete, uint8_t * buffer,
+                                               uint16_t bufLen, bool extended)
+{
+    return false;
 }

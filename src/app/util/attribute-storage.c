@@ -43,8 +43,6 @@
 #include "af.h"
 #include "common.h"
 
-#include "gen/znet-bookkeeping.h"
-
 //------------------------------------------------------------------------------
 // Globals
 // This is not declared CONST in order to handle dynamic endpoint information
@@ -74,13 +72,13 @@ uint8_t emberEndpointCount = 0;
 const uint8_t generatedDefaults[] = GENERATED_DEFAULTS;
 #endif // GENERATED_DEFAULTS
 
+#ifdef GENERATED_FUNCTION_ARRAYS
+GENERATED_FUNCTION_ARRAYS
+#endif // GENERATED_FUNCTION_ARRAYS
+
 #ifdef GENERATED_MIN_MAX_DEFAULTS
 const EmberAfAttributeMinMaxValue minMaxDefaults[] = GENERATED_MIN_MAX_DEFAULTS;
 #endif // GENERATED_MIN_MAX_DEFAULTS
-
-#ifdef GENERATED_FUNCTION_ARRAYS
-GENERATED_FUNCTION_ARRAYS
-#endif
 
 #ifdef EMBER_AF_SUPPORT_COMMAND_DISCOVERY
 const EmberAfCommandMetadata generatedCommands[]              = GENERATED_COMMANDS;
@@ -91,7 +89,6 @@ const uint16_t commandManufacturerCodeCount                   = GENERATED_COMMAN
 const EmberAfAttributeMetadata generatedAttributes[]      = GENERATED_ATTRIBUTES;
 const EmberAfCluster generatedClusters[]                  = GENERATED_CLUSTERS;
 const EmberAfEndpointType generatedEmberAfEndpointTypes[] = GENERATED_ENDPOINT_TYPES;
-const EmAfZigbeeProNetwork emAfZigbeeProNetworks[]        = EM_AF_GENERATED_ZIGBEE_PRO_NETWORKS;
 
 const EmberAfManufacturerCodeEntry clusterManufacturerCodes[]   = GENERATED_CLUSTER_MANUFACTURER_CODES;
 const uint16_t clusterManufacturerCodeCount                     = GENERATED_CLUSTER_MANUFACTURER_CODE_COUNT;
@@ -1031,7 +1028,7 @@ void emberAfInitializeAttributes(uint8_t endpoint)
 void emberAfResetAttributes(uint8_t endpoint)
 {
     emAfLoadAttributeDefaults(endpoint, true);
-    emAfResetAttributes(endpoint);
+    // emAfResetAttributes(endpoint);
 }
 
 void emAfLoadAttributeDefaults(uint8_t endpoint, bool writeTokens)
@@ -1141,14 +1138,7 @@ void emAfLoadAttributeDefaults(uint8_t endpoint, bool writeTokens)
     }
 }
 
-void emAfLoadAttributesFromTokens(uint8_t endpoint)
-{
-    // On EZSP host we currently do not support this. We need to come up with some
-    // callbacks.
-#ifndef EZSP_HOST
-    GENERATED_TOKEN_LOADER(endpoint);
-#endif // EZSP_HOST
-}
+void emAfLoadAttributesFromTokens(uint8_t endpoint) {}
 
 // 'data' argument may be null, since we changed the ptrToDefaultValue
 // to be null instead of pointing to all zeroes.
@@ -1160,12 +1150,6 @@ void emAfSaveAttributeToToken(uint8_t * data, uint8_t endpoint, EmberAfClusterId
     {
         return;
     }
-
-// On EZSP host we currently do not support this. We need to come up with some
-// callbacks.
-#ifndef EZSP_HOST
-    GENERATED_TOKEN_SAVER;
-#endif // EZSP_HOST
 }
 
 // This function returns the actual function point from the array,

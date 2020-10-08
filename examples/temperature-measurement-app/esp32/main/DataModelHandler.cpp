@@ -20,38 +20,40 @@
  *   This file implements the handler for data model messages.
  */
 
-#include <lib/support/logging/CHIPLogging.h>
-#include <support/logging/CHIPLogging.h>
+#include "esp_log.h"
 #include <system/SystemPacketBuffer.h>
+#include <transport/raw/MessageHeader.h>
 
 #include "DataModelHandler.h"
 
+#include "af.h"
+#include "attribute-storage.h"
+#include "gen/attribute-id.h"
+#include "gen/cluster-id.h"
+#include "util.h"
 #include <app/chip-zcl-zpro-codec.h>
-#include <app/util/af-types.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/util.h>
 
 using namespace ::chip;
 
-extern "C" {
-/**
- * Handle a message that should be processed via our data model processing
- * codepath. This function will free the packet buffer.
- *
- * @param [in] buffer The buffer holding the message.  This function guarantees
- *                    that it will free the buffer before returning.
- */
+static const char * TAG = "data_model_server";
+
+void InitDataModelHandler()
+{
+    emberAfEndpointConfigure();
+    emAfInit();
+}
+
 void HandleDataModelMessage(const PacketHeader & header, System::PacketBuffer * buffer, SecureSessionMgrBase * mgr)
 {
     EmberApsFrame frame;
     bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) > 0;
     if (ok)
     {
-        ChipLogProgress(Zcl, "APS frame processing success!");
+        ESP_LOGI(TAG, "APS frame processing success!");
     }
     else
     {
-        ChipLogProgress(Zcl, "APS frame processing failure!");
+        ESP_LOGI(TAG, "APS frame processing failure");
         System::PacketBuffer::Free(buffer);
         return;
     }
@@ -62,23 +64,16 @@ void HandleDataModelMessage(const PacketHeader & header, System::PacketBuffer * 
                                0, // type
                                message, messageLen,
                                header.GetSourceNodeId().Value(), // source identifier
-                               NULL);
+                               nullptr);
 
     System::PacketBuffer::Free(buffer);
 
     if (ok)
     {
-        ChipLogProgress(Zcl, "Data model processing success!");
+        ESP_LOGI(TAG, "Data model processing success!");
     }
     else
     {
-        ChipLogProgress(Zcl, "Data model processing failure!");
+        ESP_LOGI(TAG, "Data model processing failure");
     }
-}
-
-void InitDataModelHandler()
-{
-    emberAfEndpointConfigure();
-    emberAfInit();
-}
 }

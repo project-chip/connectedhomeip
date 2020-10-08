@@ -171,7 +171,7 @@ extern EmberApsFrame * emAfCommandApsFrame;
 #endif
 
 // Generated macros.
-#include "gen/client-command-macro.h"
+//#include "gen/client-command-macro.h"
 
 #define emberAfAppendToExternalBuffer(...) emberAfPutBlockInResp(__VA_ARGS__)
 

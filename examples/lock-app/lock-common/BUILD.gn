@@ -39,9 +39,10 @@ source_set("lock-common") {
     "${chip_root}/src/app/util/process-cluster-message.c",
     "${chip_root}/src/app/util/process-global-message.cpp",
     "${chip_root}/src/app/util/util.cpp",
+    "${chip_root}/src/app/reporting/reporting-default-configuration.cpp",
+    "${chip_root}/src/app/reporting/reporting.cpp",
     "gen/call-command-handler.c",
     "gen/callback-stub.c",
-    "gen/znet-bookkeeping.c",
   ]
 
   deps = [

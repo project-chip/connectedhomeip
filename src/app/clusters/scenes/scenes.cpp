@@ -40,6 +40,7 @@
 
 #include "scenes.h"
 #include "app/util/common.h"
+#include <app/clusters/groups-server/groups-server.h>
 #include <app/util/af.h>
 
 #ifdef EMBER_AF_PLUGIN_ZLL_SCENES_SERVER
