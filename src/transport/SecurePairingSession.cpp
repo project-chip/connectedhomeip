@@ -32,6 +32,7 @@
 #include <protocols/CHIPProtocols.h>
 #include <support/BufBound.h>
 #include <support/CodeUtils.h>
+#include <support/SafeInt.h>
 #include <transport/SecurePairingSession.h>
 
 namespace chip {
