@@ -82,22 +82,39 @@ static CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx);
 static CHIP_ERROR N2J_NewStringUTF(JNIEnv * env, const char * inStr, jstring & outString);
 static CHIP_ERROR N2J_NewStringUTF(JNIEnv * env, const char * inStr, size_t inStrLen, jstring & outString);
 
-static JavaVM * sJVM;
-static System::Layer sSystemLayer;
-static Inet::InetLayer sInetLayer;
-#if CONFIG_NETWORK_LAYER_BLE
-static Ble::BleLayer sBleLayer;
-static AndroidBleApplicationDelegate sBleApplicationDelegate;
-static AndroidBlePlatformDelegate sBlePlatformDelegate;
-static AndroidBleConnectionDelegate sBleConnectionDelegate;
-#endif
-static pthread_mutex_t sStackLock = PTHREAD_MUTEX_INITIALIZER;
-static pthread_t sIOThread        = PTHREAD_NULL;
-static bool sShutdown             = false;
+namespace {
 
-static jclass sAndroidChipStackCls              = NULL;
-static jclass sChipDeviceControllerCls          = NULL;
-static jclass sChipDeviceControllerExceptionCls = NULL;
+JavaVM * sJVM;
+System::Layer sSystemLayer;
+Inet::InetLayer sInetLayer;
+
+#if CONFIG_NETWORK_LAYER_BLE
+Ble::BleLayer sBleLayer;
+AndroidBleApplicationDelegate sBleApplicationDelegate;
+AndroidBlePlatformDelegate sBlePlatformDelegate;
+AndroidBleConnectionDelegate sBleConnectionDelegate;
+#endif
+
+pthread_mutex_t sStackLock = PTHREAD_MUTEX_INITIALIZER;
+pthread_t sIOThread        = PTHREAD_NULL;
+bool sShutdown             = false;
+
+jclass sAndroidChipStackCls              = NULL;
+jclass sChipDeviceControllerCls          = NULL;
+jclass sChipDeviceControllerExceptionCls = NULL;
+
+/** A scoped lock/unlock around a mutex. */
+class ScopedPthreadLock
+{
+public:
+    ScopedPthreadLock(pthread_mutex_t * mutex) : mMutex(mutex) { pthread_mutex_lock(mMutex); }
+    ~ScopedPthreadLock() { pthread_mutex_unlock(mMutex); }
+
+private:
+    pthread_mutex_t * mMutex;
+};
+
+} // namespace
 
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
@@ -245,15 +262,16 @@ JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong deviceCon
 
     ChipLogProgress(Controller, "beginConnectDevice() called with connection object and pincode");
 
-    pthread_mutex_lock(&sStackLock);
-    sBleLayer.mAppState         = appReqState;
-    RendezvousParameters params = RendezvousParameters()
-                                      .SetSetupPINCode(pinCode)
-                                      .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
-                                      .SetBleLayer(&sBleLayer);
-    err = deviceController->ConnectDevice(kRemoteDeviceId, params, appReqState, HandleKeyExchange, HandleEchoResponse, HandleError);
-
-    pthread_mutex_unlock(&sStackLock);
+    {
+        ScopedPthreadLock lock(&sStackLock);
+        sBleLayer.mAppState         = appReqState;
+        RendezvousParameters params = RendezvousParameters()
+                                          .SetSetupPINCode(pinCode)
+                                          .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
+                                          .SetBleLayer(&sBleLayer);
+        err = deviceController->ConnectDevice(kRemoteDeviceId, params, appReqState, HandleKeyExchange, HandleEchoResponse,
+                                              HandleError);
+    }
 
     if (err != CHIP_NO_ERROR)
     {
@@ -274,10 +292,11 @@ JNI_METHOD(void, beginConnectDeviceIp)(JNIEnv * env, jobject self, jlong deviceC
     deviceIPAddr.FromString(deviceAddrStr, deviceIPAddr);
     env->ReleaseStringUTFChars(deviceAddr, deviceAddrStr);
 
-    pthread_mutex_lock(&sStackLock);
-    err = deviceController->ConnectDeviceWithoutSecurePairing(kRemoteDeviceId, deviceIPAddr, (void *) "ConnectDevice",
-                                                              HandleKeyExchange, HandleEchoResponse, HandleError, CHIP_PORT);
-    pthread_mutex_unlock(&sStackLock);
+    {
+        ScopedPthreadLock lock(&sStackLock);
+        err = deviceController->ConnectDeviceWithoutSecurePairing(kRemoteDeviceId, deviceIPAddr, (void *) "ConnectDevice",
+                                                                  HandleKeyExchange, HandleEchoResponse, HandleError, CHIP_PORT);
+    }
 
     if (err != CHIP_NO_ERROR)
     {
@@ -296,21 +315,21 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong deviceContr
     const char * messageStr = env->GetStringUTFChars(messageObj, 0);
     size_t messageLen       = strlen(messageStr);
 
-    pthread_mutex_lock(&sStackLock);
-
-    auto * buffer = System::PacketBuffer::NewWithAvailableSize(messageLen);
-    if (buffer == nullptr)
     {
-        err = CHIP_ERROR_NO_MEMORY;
-    }
-    else
-    {
-        memcpy(buffer->Start(), messageStr, messageLen);
-        buffer->SetDataLength(messageLen);
-        err = deviceController->SendMessage((void *) "SendMessage", buffer);
-    }
+        ScopedPthreadLock lock(&sStackLock);
 
-    pthread_mutex_unlock(&sStackLock);
+        auto * buffer = System::PacketBuffer::NewWithAvailableSize(messageLen);
+        if (buffer == nullptr)
+        {
+            err = CHIP_ERROR_NO_MEMORY;
+        }
+        else
+        {
+            memcpy(buffer->Start(), messageStr, messageLen);
+            buffer->SetDataLength(messageLen);
+            err = deviceController->SendMessage((void *) "SendMessage", buffer);
+        }
+    }
 
     env->ReleaseStringUTFChars(messageObj, messageStr);
 
@@ -332,46 +351,45 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong deviceContr
     jmethodID commandMethodID = env->GetMethodID(commandCls, "getValue", "()I");
     jint commandID            = env->CallIntMethod(commandObj, commandMethodID);
 
-    pthread_mutex_lock(&sStackLock);
-
-    // Make sure our buffer is big enough, but this will need a better setup!
-    static const size_t bufferSize = 1024;
-    auto * buffer                  = System::PacketBuffer::NewWithAvailableSize(bufferSize);
-
-    if (buffer == nullptr)
     {
-        err = CHIP_ERROR_NO_MEMORY;
-        pthread_mutex_unlock(&sStackLock);
-    }
-    else
-    {
+        ScopedPthreadLock lock(&sStackLock);
 
-        // Hardcode endpoint to 1 for now
-        uint8_t endpoint = 1;
+        // Make sure our buffer is big enough, but this will need a better setup!
+        static const size_t bufferSize = 1024;
+        auto * buffer                  = System::PacketBuffer::NewWithAvailableSize(bufferSize);
 
-        uint16_t dataLength = 0;
-        switch (commandID)
+        if (buffer == nullptr)
         {
-        case 0:
-            dataLength = encodeOffCommand(buffer->Start(), bufferSize, endpoint);
-            break;
-        case 1:
-            dataLength = encodeOnCommand(buffer->Start(), bufferSize, endpoint);
-            break;
-        case 2:
-            dataLength = encodeToggleCommand(buffer->Start(), bufferSize, endpoint);
-            break;
-        default:
-            ChipLogError(Controller, "Unknown command: %d", commandID);
-            return;
+            err = CHIP_ERROR_NO_MEMORY;
         }
+        else
+        {
 
-        buffer->SetDataLength(dataLength);
+            // Hardcode endpoint to 1 for now
+            uint8_t endpoint = 1;
 
-        // Hardcode endpoint to 1 for now
-        err = deviceController->SendMessage((void *) "SendMessage", buffer);
+            uint16_t dataLength = 0;
+            switch (commandID)
+            {
+            case 0:
+                dataLength = encodeOffCommand(buffer->Start(), bufferSize, endpoint);
+                break;
+            case 1:
+                dataLength = encodeOnCommand(buffer->Start(), bufferSize, endpoint);
+                break;
+            case 2:
+                dataLength = encodeToggleCommand(buffer->Start(), bufferSize, endpoint);
+                break;
+            default:
+                ChipLogError(Controller, "Unknown command: %d", commandID);
+                return;
+            }
 
-        pthread_mutex_unlock(&sStackLock);
+            buffer->SetDataLength(dataLength);
+
+            // Hardcode endpoint to 1 for now
+            err = deviceController->SendMessage((void *) "SendMessage", buffer);
+        }
     }
 
     if (err != CHIP_NO_ERROR)
@@ -400,9 +418,10 @@ JNI_METHOD(jboolean, disconnectDevice)(JNIEnv * env, jobject self, jlong deviceC
 
     ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
 
-    pthread_mutex_lock(&sStackLock);
-    err = deviceController->DisconnectDevice();
-    pthread_mutex_unlock(&sStackLock);
+    {
+        ScopedPthreadLock lock(&sStackLock);
+        err = deviceController->DisconnectDevice();
+    }
 
     if (err != CHIP_NO_ERROR)
     {
