@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef __TRANSPORT_BLE_H__
-#define __TRANSPORT_BLE_H__
+#pragma once
 
 #include <ble/BleConfig.h>
 
@@ -111,5 +110,3 @@ private:
 
 } // namespace Transport
 } // namespace chip
-
-#endif // __TRANSPORT_BLE_H__

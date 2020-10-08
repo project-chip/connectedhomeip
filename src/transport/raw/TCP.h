@@ -22,8 +22,7 @@
  *      It binds to any available local addr and port and begins listening.
  */
 
-#ifndef __TCPTRANSPORT_H__
-#define __TCPTRANSPORT_H__
+#pragma once
 
 #include <algorithm>
 #include <utility>
@@ -247,5 +246,3 @@ private:
 
 } // namespace Transport
 } // namespace chip
-
-#endif // __TCPTRANSPORT_H__

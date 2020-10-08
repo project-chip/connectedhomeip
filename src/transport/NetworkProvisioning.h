@@ -21,8 +21,7 @@
  *
  */
 
-#ifndef __CHIP_NETWORK_PROVISIONING_H__
-#define __CHIP_NETWORK_PROVISIONING_H__
+#pragma once
 
 #include <core/CHIPCore.h>
 #include <core/ReferenceCounted.h>
@@ -137,4 +136,3 @@ private:
 };
 
 } // namespace chip
-#endif // __CHIP_NETWORK_PROVISIONING_H__

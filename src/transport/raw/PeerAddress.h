@@ -21,8 +21,7 @@
  *
  */
 
-#ifndef PEER_ADDRESS_H_
-#define PEER_ADDRESS_H_
+#pragma once
 
 #include <stdio.h>
 
@@ -171,5 +170,3 @@ private:
 
 } // namespace Transport
 } // namespace chip
-
-#endif // PEER_ADDRESS_H_

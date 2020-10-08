@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef __TRANSPORT_RENDEZVOUSSESSIONCALLBACK_H__
-#define __TRANSPORT_RENDEZVOUSSESSIONCALLBACK_H__
+#pragma once
 
 #include <core/CHIPCore.h>
 
@@ -51,5 +50,3 @@ public:
 };
 
 } // namespace chip
-
-#endif // __TRANSPORT_RENDEZVOUSSESSIONCALLBACK_H__

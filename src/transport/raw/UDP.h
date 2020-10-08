@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef __UDPTRANSPORT_H__
-#define __UDPTRANSPORT_H__
+#pragma once
 
 #include <utility>
 
@@ -126,5 +125,3 @@ private:
 
 } // namespace Transport
 } // namespace chip
-
-#endif // __UDPTRANSPORT_H__
