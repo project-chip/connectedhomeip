@@ -107,8 +107,8 @@ function cirquetest_run_test() {
     if [ "x$CLEANUP_DOCKER_FOR_CI" = "x1" ]; then
         echo "Do docker container and network prune"
         # TODO: Filter cirque containers
-        IN_DOCKER=`cat /proc/1/cgroup | grep docker`
-        if [ -z $IN_DOCKER ]; then
+        IN_DOCKER=$(cat /proc/1/cgroup | grep docker)
+        if [ -z "$IN_DOCKER" ]; then
             docker ps -aq | xargs docker stop >/dev/null 2>&1
         fi
         docker container prune -f >/dev/null 2>&1

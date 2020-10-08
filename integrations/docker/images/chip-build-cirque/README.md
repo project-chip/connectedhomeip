@@ -1,8 +1,8 @@
 # Docker connectedhomeip:chip-build-cirque
 
-connectedhomeip/chip-build-cirque is the name of the Docker image used by CHIP for
-continuous integration and other builds when using Cirque.  It builds upon the
-chip-build image and adds system dependencies needed by Cirque.
+connectedhomeip/chip-build-cirque is the name of the Docker image used by CHIP
+for continuous integration and other builds when using Cirque. It builds upon
+the chip-build image and adds system dependencies needed by Cirque.
 
 Contents of this directory:
 
@@ -20,8 +20,8 @@ guidelines:
 -   Adding a tool? Increment minor version: e.g. 0.2.1 -> 0.3.0
 -   Removing a tool? Increment major version: e.g. 1.2 -> 2.0
 
-Note, you must have privileged access to the connectedhomeip area on
-Docker Hub to push the image.
+Note, you must have privileged access to the connectedhomeip area on Docker Hub
+to push the image.
 
 Typical use:
 
