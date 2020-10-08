@@ -18,11 +18,6 @@
 package chip.devicecontroller;
 
 import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattService;
-import android.bluetooth.BluetoothGattDescriptor;
-import java.util.UUID;
 import android.util.Log;
 
 /** Controller to interact with the CHIP device. */
@@ -120,8 +115,7 @@ public class ChipDeviceController {
 
   public native void handleWriteConfirmation(int connId, byte[] svcId, byte[] charId);
 
-  public native void handleIndicationReceived(
-      int connId, byte[] svcId, byte[] charId, byte[] data);
+  public native void handleIndicationReceived(int connId, byte[] svcId, byte[] charId, byte[] data);
 
   public native void handleSubscribeComplete(int connId, byte[] svcId, byte[] charId);
 
