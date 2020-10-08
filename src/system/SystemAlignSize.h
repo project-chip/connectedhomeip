@@ -23,9 +23,6 @@
  *      element with alignment padding.
  */
 
-#ifndef SYSTEMALIGNSIZE_H
-#define SYSTEMALIGNSIZE_H
+#pragma once
 
 #define CHIP_SYSTEM_ALIGN_SIZE(ELEMENT, ALIGNMENT) (((ELEMENT) + (ALIGNMENT) -1) & ~((ALIGNMENT) -1))
-
-#endif // defined(SYSTEMALIGNSIZE_H)

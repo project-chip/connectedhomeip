@@ -23,8 +23,7 @@
  *      functions.
  */
 
-#ifndef SYSTEMLAYER_H
-#define SYSTEMLAYER_H
+#pragma once
 
 // Include configuration headers
 #include <system/SystemConfig.h>
@@ -225,5 +224,3 @@ inline LayerState Layer::State() const
 
 } // namespace System
 } // namespace chip
-
-#endif // defined(SYSTEMLAYER_H)

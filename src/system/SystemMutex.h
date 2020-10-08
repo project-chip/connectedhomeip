@@ -22,8 +22,7 @@
  *      offered by the target platform.
  */
 
-#ifndef SYSTEMMUTEX_H
-#define SYSTEMMUTEX_H
+#pragma once
 
 // Include configuration headers
 #include <system/SystemConfig.h>
@@ -114,5 +113,3 @@ inline void Mutex::Unlock(void)
 } // namespace chip
 
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
-
-#endif // defined(SYSTEMMUTEX_H)

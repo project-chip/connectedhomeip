@@ -22,8 +22,7 @@
  *      function for retrieving the current system time.
  */
 
-#ifndef SYSTEMTIME_H
-#define SYSTEMTIME_H
+#pragma once
 
 // Include configuration headers
 #include <system/SystemConfig.h>
@@ -218,5 +217,3 @@ extern Error SetClock_RealTime(uint64_t newCurTime);
 } // namespace Platform
 } // namespace System
 } // namespace chip
-
-#endif // SYSTEMTIME_H

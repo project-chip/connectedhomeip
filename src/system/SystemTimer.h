@@ -23,8 +23,7 @@
  *      timer.
  */
 
-#ifndef SYSTEMTIMER_H
-#define SYSTEMTIMER_H
+#pragma once
 
 // Include configuration headers
 #include <system/SystemConfig.h>
@@ -101,5 +100,3 @@ inline void Timer::GetStatistics(chip::System::Stats::count_t & aNumInUse, chip:
 
 } // namespace System
 } // namespace chip
-
-#endif // defined(SYSTEMTIMER_H)
