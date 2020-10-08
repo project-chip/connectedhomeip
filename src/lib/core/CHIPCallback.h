@@ -247,10 +247,8 @@ public:
      * @brief Dequeue all, return in a stub. does not cancel the cas, as the list
      *   members are still in use
      */
-    Cancelable DequeueAll()
+    void DequeueAll(Cancelable & ready)
     {
-        Cancelable ready;
-
         if (mNext != this)
         {
             ready.mNext        = mNext;
@@ -260,7 +258,6 @@ public:
 
             mNext = mPrev = this;
         }
-        return ready;
     }
 
     /**

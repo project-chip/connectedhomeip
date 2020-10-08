@@ -52,7 +52,10 @@ public:
 
     void Dispatch()
     {
-        Cancelable ready = DequeueAll();
+        Cancelable ready;
+
+        DequeueAll(ready);
+
         // runs the ready list
         while (ready.mNext != &ready)
         {
