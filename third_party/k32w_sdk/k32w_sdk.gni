@@ -138,7 +138,8 @@ template("k32w_sdk") {
       "MBEDTLS_BASE64_C",
       "MBEDTLS_HKDF_C",
       "MBEDTLS_ERROR_C",
-      "OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1"
+      "OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1",
+      "SUPPORT_FOR_15_4=1"
     ]
     
     if (defined(invoker.defines)) {
