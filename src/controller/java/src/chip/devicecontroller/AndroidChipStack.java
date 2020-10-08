@@ -68,17 +68,20 @@ public final class AndroidChipStack {
   public static class ChipGattCallback extends BluetoothGattCallback {
     @Override
     public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-      if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-        int connId = getInstance().getConnId(gatt);
-        ChipDeviceController controller = getInstance().getConnection(connId);
-
-        if (controller == null) {
-          Log.e(TAG, "onConnectionStateChange disconnected: no active connection");
-          return;
-        }
-        Log.d(TAG, "onConnectionStateChange Disconnected");
-        controller.handleConnectionError(connId);
+      if (status != BluetoothGatt.GATT_SUCCESS || newState != BluetoothProfile.STATE_DISCONNECTED) {
+        return;
       }
+
+      int connId = getInstance().getConnId(gatt);
+      ChipDeviceController controller = getInstance().getConnection(connId);
+
+      if (controller == null) {
+        Log.e(TAG, "onConnectionStateChange disconnected: no active connection");
+        return;
+      }
+      
+      Log.d(TAG, "onConnectionStateChange Disconnected");
+      controller.handleConnectionError(connId);
     }
 
     @Override

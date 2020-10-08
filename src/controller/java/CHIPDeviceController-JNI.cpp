@@ -402,7 +402,9 @@ JNI_METHOD(void, handleIndicationReceived)
     memcpy(buffer->Start(), valueBegin, valueLength);
     buffer->SetDataLength(valueLength);
 
+    pthread_mutex_lock(&sStackLock);
     sBleLayer.HandleIndicationReceived(connObj, &svcUUID, &charUUID, buffer);
+    pthread_mutex_unlock(&sStackLock);
 exit:
     env->ReleaseByteArrayElements(value, valueBegin, 0);
 }
@@ -418,7 +420,9 @@ JNI_METHOD(void, handleWriteConfirmation)(JNIEnv * env, jobject self, jint conn,
     VerifyOrExit(JavaBytesToUUID(env, charId, charUUID),
                  ChipLogError(Controller, "handleWriteConfirmation() called with invalid characteristic ID"));
 
+    pthread_mutex_lock(&sStackLock);
     sBleLayer.HandleWriteConfirmation(connObj, &svcUUID, &charUUID);
+    pthread_mutex_unlock(&sStackLock);
 exit:
     return;
 }
@@ -434,7 +438,9 @@ JNI_METHOD(void, handleSubscribeComplete)(JNIEnv * env, jobject self, jint conn,
     VerifyOrExit(JavaBytesToUUID(env, charId, charUUID),
                  ChipLogError(Controller, "handleSubscribeComplete() called with invalid characteristic ID"));
 
+    pthread_mutex_lock(&sStackLock);
     sBleLayer.HandleSubscribeComplete(connObj, &svcUUID, &charUUID);
+    pthread_mutex_unlock(&sStackLock);
 exit:
     return;
 }
@@ -450,7 +456,9 @@ JNI_METHOD(void, handleUnsubscribeComplete)(JNIEnv * env, jobject self, jint con
     VerifyOrExit(JavaBytesToUUID(env, charId, charUUID),
                  ChipLogError(Controller, "handleUnsubscribeComplete() called with invalid characteristic ID"));
 
+    pthread_mutex_lock(&sStackLock);
     sBleLayer.HandleUnsubscribeComplete(connObj, &svcUUID, &charUUID);
+    pthread_mutex_unlock(&sStackLock);
 exit:
     return;
 }
@@ -458,7 +466,10 @@ exit:
 JNI_METHOD(void, handleConnectionError)(JNIEnv * env, jobject self, jint conn)
 {
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
+
+    pthread_mutex_lock(&sStackLock);
     sBleLayer.HandleConnectionError(connObj, BLE_ERROR_APP_CLOSED_CONNECTION);
+    pthread_mutex_unlock(&sStackLock);
 }
 
 JNI_METHOD(jboolean, isConnected)(JNIEnv * env, jobject self, jlong deviceControllerPtr)
