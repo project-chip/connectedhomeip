@@ -131,3 +131,7 @@ copy("support_headers") {
 
   outputs = [ "${root_gen_dir}/include/support/{{source_file_part}}" ]
 }
+
+config("c_includes") {
+  include_dirs = [ "c" ]
+}
