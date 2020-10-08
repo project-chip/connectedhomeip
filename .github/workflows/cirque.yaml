@@ -25,7 +25,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-cirque:0.4.9
+            image: connectedhomeip/chip-build-cirque:0.4.10
             volumes:
                 - "/tmp:/tmp"
                 - "/dev/pts:/dev/pts"

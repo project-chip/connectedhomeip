@@ -81,6 +81,7 @@ function cirquetest_bootstrap() {
     pip3 install pycodestyle==2.5.0 wheel
     make NO_GRPC=1 install -j
     ./dependency_modules.sh
+    pip3 install -r requirements_nogrpc.txt
 
     # Call activate here so the later tests can be faster
     # set -e will cause error if activate.sh is sourced twice
