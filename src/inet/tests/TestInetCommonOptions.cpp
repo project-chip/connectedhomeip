@@ -135,7 +135,7 @@ bool NetworkOptions::HandleOption(const char * progName, OptionSet * optSet, int
         {
             LocalIPv6Addr.push_back(localAddr);
         }
-#else // INET_CONFIG_ENABLE_IPV4
+#else  // INET_CONFIG_ENABLE_IPV4
         LocalIPv6Addr.push_back(localAddr);
 #endif // INET_CONFIG_ENABLE_IPV4
         break;

@@ -240,7 +240,7 @@ void PacketBuffer::AddToEnd(PacketBuffer * aPacket)
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     pbuf_cat(this, aPacket);
-#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
+#else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
     PacketBuffer * lCursor = this;
 
     while (true)
@@ -440,7 +440,7 @@ void PacketBuffer::AddRef()
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     pbuf_ref(this);
-#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
+#else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
     LOCK_BUF_POOL();
     ++this->ref;
     UNLOCK_BUF_POOL();
@@ -615,10 +615,10 @@ void PacketBuffer::Free(PacketBuffer * aPacket)
 #if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
             aPacket->next = sFreeList;
             sFreeList     = aPacket;
-#else // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#else  // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
             chip::Platform::MemoryFree(aPacket);
 #endif // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
-            aPacket = lNextPacket;
+            aPacket       = lNextPacket;
         }
         else
         {
