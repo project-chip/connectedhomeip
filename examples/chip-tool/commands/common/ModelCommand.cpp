@@ -23,6 +23,8 @@
 #include <sstream>
 #include <string>
 
+#include <support/SafeInt.h>
+
 using namespace ::chip;
 using namespace ::chip::DeviceController;
 
@@ -220,8 +222,8 @@ void ModelCommand::ParseReadAttributeResponseCommandSuccess(uint16_t attrId, uin
     case 0x29: { // "Int16"
         int16_t value;
         CHECK_MESSAGE_LENGTH(messageLen == 2);
-        value = chip::Encoding::LittleEndian::Read16(message);
-        ChipLogProgress(chipTool, "Attribute value: '0x%04x'", value);
+        value = CastToSigned(chip::Encoding::LittleEndian::Read16(message));
+        ChipLogProgress(chipTool, "Attribute value: '0x%d'", value);
         break;
     }
     }
