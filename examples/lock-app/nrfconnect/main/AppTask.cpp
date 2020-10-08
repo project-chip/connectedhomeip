@@ -25,6 +25,9 @@
 #include "Service.h"
 #include "ThreadUtil.h"
 
+#include "attribute-storage.h"
+#include "gen/cluster-id.h"
+
 #include <platform/CHIPDeviceLayer.h>
 
 #include <dk_buttons_and_leds.h>
@@ -367,6 +370,8 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
         LOG_INF("Unlock Action has been initiated");
     }
 
+    sAppTask.mButtonTriggeredActon = (aActor == AppEvent::kEventType_Button) ? true : false;
+
     sLockLED.Blink(50, 50);
 }
 
@@ -384,6 +389,12 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
     {
         LOG_INF("Unlock Action has been completed");
         sLockLED.Set(false);
+    }
+
+    if (sAppTask.mButtonTriggeredActon)
+    {
+        sAppTask.UpdateClusterState();
+        sAppTask.mButtonTriggeredActon = false;
     }
 }
 
@@ -415,4 +426,21 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     {
         LOG_INF("Event received with no handler. Dropping event.");
     }
+}
+
+void AppTask::UpdateClusterState()
+{
+    uint8_t newValue = !BoltLockMgr().IsUnlocked();
+
+    // write the new on/off value
+    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &newValue,
+                                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        LOG_ERR("Updating on/off %x", status);
+    }
+}
+
+void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint) {
+    GetAppTask().UpdateClusterState();
 }

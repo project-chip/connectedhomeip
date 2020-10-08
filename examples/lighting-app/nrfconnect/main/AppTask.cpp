@@ -27,6 +27,9 @@
 #include "Service.h"
 #include "ThreadUtil.h"
 
+#include "attribute-storage.h"
+#include "gen/cluster-id.h"
+
 #include <platform/CHIPDeviceLayer.h>
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -360,6 +363,8 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction)
     {
         LOG_INF("Turn Off Action has been initiated");
     }
+
+    sAppTask.mButtonTriggeredActon = (aActor == AppEvent::kEventType_Button) ? true : false;
 }
 
 void AppTask::ActionCompleted(LightingManager::Action_t aAction)
@@ -371,6 +376,12 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
     else if (aAction == LightingManager::OFF_ACTION)
     {
         LOG_INF("Turn Off Action has been completed");
+    }
+
+    if (sAppTask.mButtonTriggeredActon)
+    {
+        sAppTask.UpdateClusterState();
+        sAppTask.mButtonTriggeredActon = false;
     }
 }
 
@@ -401,4 +412,21 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     {
         LOG_INF("Event received with no handler. Dropping event.");
     }
+}
+
+void AppTask::UpdateClusterState()
+{
+    uint8_t newValue = LightingMgr().IsTurnedOn();
+
+    // write the new on/off value
+    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &newValue,
+                                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        LOG_ERR("Updating on/off %x", status);
+    }
+}
+
+void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint) {
+    GetAppTask().UpdateClusterState();
 }
