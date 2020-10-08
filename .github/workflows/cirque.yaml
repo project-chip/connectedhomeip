@@ -27,7 +27,7 @@ jobs:
         container:
             image: connectedhomeip/chip-build-cirque:0.4.9
             volumes:
-                - "/tmp/cirque_test_output:/tmp/cirque_test_output"
+                - "/tmp:/tmp"
                 - "/dev/pts:/dev/pts"
 
         env:
