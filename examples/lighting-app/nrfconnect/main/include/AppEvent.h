@@ -49,6 +49,7 @@ struct AppEvent
         struct
         {
             uint8_t Action;
+            int32_t Actor;
         } LightingEvent;
     };
 

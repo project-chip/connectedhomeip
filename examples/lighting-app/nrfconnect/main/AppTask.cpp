@@ -27,6 +27,9 @@
 #include "Service.h"
 #include "ThreadUtil.h"
 
+#include "attribute-storage.h"
+#include "gen/cluster-id.h"
+
 #include <platform/CHIPDeviceLayer.h>
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -197,17 +200,20 @@ int AppTask::StartApp()
 void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 {
     LightingManager::Action_t action = LightingManager::INVALID_ACTION;
+    int32_t actor                    = 0;
 
     if (aEvent->Type == AppEvent::kEventType_Lighting)
     {
         action = static_cast<LightingManager::Action_t>(aEvent->LightingEvent.Action);
+        actor  = aEvent->LightingEvent.Actor;
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
         action = LightingMgr().IsTurnedOn() ? LightingManager::OFF_ACTION : LightingManager::ON_ACTION;
+        actor = AppEvent::kEventType_Button;
     }
 
-    if (action != LightingManager::INVALID_ACTION && !LightingMgr().InitiateAction(action))
+    if (action != LightingManager::INVALID_ACTION && !LightingMgr().InitiateAction(action, actor))
         LOG_INF("Action is already in progress or active.");
 }
 
@@ -350,7 +356,7 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     mFunctionTimerActive = true;
 }
 
-void AppTask::ActionInitiated(LightingManager::Action_t aAction)
+void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {
     if (aAction == LightingManager::ON_ACTION)
     {
@@ -362,7 +368,7 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction)
     }
 }
 
-void AppTask::ActionCompleted(LightingManager::Action_t aAction)
+void AppTask::ActionCompleted(LightingManager::Action_t aAction, int32_t aActor)
 {
     if (aAction == LightingManager::ON_ACTION)
     {
@@ -371,6 +377,11 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
     else if (aAction == LightingManager::OFF_ACTION)
     {
         LOG_INF("Turn Off Action has been completed");
+    }
+
+    if (aActor == AppEvent::kEventType_Button)
+    {
+        sAppTask.UpdateClusterState();
     }
 }
 
@@ -400,5 +411,18 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     else
     {
         LOG_INF("Event received with no handler. Dropping event.");
+    }
+}
+
+void AppTask::UpdateClusterState()
+{
+    uint8_t newValue = LightingMgr().IsTurnedOn();
+
+    // write the new on/off value
+    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &newValue,
+                                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        LOG_ERR("Updating on/off %x", status);
     }
 }
