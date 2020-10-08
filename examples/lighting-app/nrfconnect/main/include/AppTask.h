@@ -45,6 +45,7 @@ private:
     void CancelTimer(void);
 
     void DispatchEvent(AppEvent * event);
+    void UpdateClusterState();
 
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
