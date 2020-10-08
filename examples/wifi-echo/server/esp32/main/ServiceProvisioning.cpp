@@ -23,7 +23,7 @@
 
 using namespace ::chip::DeviceLayer;
 
-CHIP_ERROR SetWiFiStationProvisioning(char * ssid, char * key)
+CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key)
 {
     ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled);
 

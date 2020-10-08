@@ -161,15 +161,6 @@ public:
 
     /**
      * @brief
-     *   Get the PeerAddress of a connected peer
-     *
-     * @param[in,out] peerAddress  The PeerAddress object which will be populated with the details of the connected peer
-     * @return CHIP_ERROR   An error if there's no active connection
-     */
-    CHIP_ERROR PopulatePeerAddress(Transport::PeerAddress & peerAddress);
-
-    /**
-     * @brief
      *   Disconnect from a connected device
      *
      * @return CHIP_ERROR   If the device was disconnected successfully

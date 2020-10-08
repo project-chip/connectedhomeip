@@ -17,6 +17,7 @@
 
 // pull together CHIP headers
 #import <CHIP/CHIPDeviceController.h>
+#import <CHIP/CHIPDevicePairingDelegate.h>
 #import <CHIP/CHIPError.h>
 #import <CHIP/CHIPManualSetupPayloadParser.h>
 #import <CHIP/CHIPOnOff.h>

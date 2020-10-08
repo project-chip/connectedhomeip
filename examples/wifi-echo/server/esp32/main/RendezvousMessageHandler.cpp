@@ -23,7 +23,7 @@
 
 using namespace ::chip;
 
-extern CHIP_ERROR SetWiFiStationProvisioning(char * ssid, char * key);
+extern CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key);
 
 CHIP_ERROR RendezvousMessageHandler::HandleMessageReceived(System::PacketBuffer * buffer)
 {

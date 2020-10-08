@@ -20,7 +20,8 @@
 
 using namespace ::chip;
 
-void ESP32NetworkProvisioningDelegate::ProvisionNetwork(const char * ssid, const char * passwd)
+extern CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key);
+void ESP32NetworkProvisioningDelegate::ProvisionNetwork(const char * ssid, const char * key)
 {
-    ChipLogProgress(NetworkProvisioning, "ESP32NetworkProvisioningDelegate: Received SSID and passwd\n");
+    ChipLogProgress(NetworkProvisioning, "ESP32NetworkProvisioningDelegate: SSID: %s, key: %s", ssid, key);
 }

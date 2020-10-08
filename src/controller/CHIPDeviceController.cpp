@@ -320,20 +320,6 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::PopulatePeerAddress(Transport::PeerAddress & peerAddress)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(IsSecurelyConnected(), err = CHIP_ERROR_INCORRECT_STATE);
-
-    peerAddress.SetIPAddress(mDeviceAddr);
-    peerAddress.SetPort(mDevicePort);
-    peerAddress.SetTransportType(Transport::Type::kUdp);
-
-exit:
-    return err;
-}
-
 bool ChipDeviceController::IsConnected()
 {
     return mState == kState_Initialized &&
