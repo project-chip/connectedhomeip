@@ -57,7 +57,7 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params)
 #endif // CONFIG_NETWORK_LAYER_BLE
     SuccessOrExit(err);
 
-    if (!mParams.HasDiscriminator() && !mParams.HasConnectionObject())
+    if (!mParams.IsController())
     {
         err = WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
         SuccessOrExit(err);
@@ -211,7 +211,7 @@ void RendezvousSession::OnNetworkProvisioningComplete()
 
 void RendezvousSession::OnRendezvousConnectionOpened()
 {
-    if (mParams.HasDiscriminator() || mParams.HasConnectionObject())
+    if (mParams.IsController())
     {
         CHIP_ERROR err = Pair(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
         VerifyOrExit(err == CHIP_NO_ERROR, OnPairingError(err));
@@ -223,7 +223,7 @@ exit:
 
 void RendezvousSession::OnRendezvousConnectionClosed()
 {
-    if (!mParams.HasDiscriminator() && !mParams.HasConnectionObject())
+    if (!mParams.IsController())
     {
         mSecureSession.Reset();
         CHIP_ERROR err = WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
