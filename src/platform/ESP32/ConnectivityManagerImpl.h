@@ -28,7 +28,6 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
 #endif
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
-#include <support/FlagUtils.hpp>
 
 #include "esp_event.h"
 

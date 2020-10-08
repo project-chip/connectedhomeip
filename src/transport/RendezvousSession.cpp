@@ -123,7 +123,7 @@ CHIP_ERROR RendezvousSession::SendPairingMessage(System::PacketBuffer * msgBuf)
     SuccessOrExit(err);
 
     msgBuf->ConsumeHead(headerSize);
-    err = mTransport->SendMessage(header, Header::Flags::None(), Transport::PeerAddress::BLE(), msgBuf);
+    err = mTransport->SendMessage(header, Header::Flags(), Transport::PeerAddress::BLE(), msgBuf);
     SuccessOrExit(err);
 
 exit:
