@@ -33,6 +33,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "CHIPPlatformMemory.h"
+
 #include "em_device.h"
 #include "em_se.h"
 
@@ -232,24 +234,16 @@ typedef void mbedtls_ecp_restart_ctx;
 #if OPENTHREAD_CONFIG_ECDSA_ENABLE
 #endif
 
-#define MBEDTLS_MPI_WINDOW_SIZE 1       /**< Maximum windows size used. */
-#define MBEDTLS_MPI_MAX_SIZE 32         /**< Maximum number of bytes for usable MPIs. */
-#define MBEDTLS_ECP_MAX_BITS 256        /**< Maximum bit size of groups */
-#define MBEDTLS_ECP_WINDOW_SIZE 2       /**< Maximum window size used */
+#define MBEDTLS_MPI_WINDOW_SIZE 1 /**< Maximum windows size used. */
+#define MBEDTLS_MPI_MAX_SIZE 32 /**< Maximum number of bytes for usable MPIs. */
+#define MBEDTLS_ECP_MAX_BITS 256 /**< Maximum bit size of groups */
+#define MBEDTLS_ECP_WINDOW_SIZE 2 /**< Maximum window size used */
 #define MBEDTLS_ECP_FIXED_POINT_OPTIM 0 /**< Enable fixed-point speed-up */
-#define MBEDTLS_ENTROPY_MAX_SOURCES 1   /**< Maximum number of sources supported */
+#define MBEDTLS_ENTROPY_MAX_SOURCES 1 /**< Maximum number of sources supported */
 
 // #if OPENTHREAD_CONFIG_MULTIPLE_INSTANCE_ENABLE
 #define MBEDTLS_PLATFORM_STD_CALLOC CHIPPlatformMemoryCalloc /**< Default allocator to use, can be undefined */
-#define MBEDTLS_PLATFORM_STD_FREE CHIPPlatformMemoryFree     /**< Default free to use, can be undefined */
-#ifdef __cplusplus
-extern "C" {
-#endif
-extern void * CHIPPlatformMemoryCalloc(size_t, size_t);
-extern void CHIPPlatformMemoryFree(void *);
-#ifdef __cplusplus
-} // extern "C"
-#endif
+#define MBEDTLS_PLATFORM_STD_FREE CHIPPlatformMemoryFree /**< Default free to use, can be undefined */
 // #else
 // #define MBEDTLS_MEMORY_BUFFER_ALLOC_C
 // #endif
