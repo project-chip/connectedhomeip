@@ -576,7 +576,6 @@ void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerC
     HandleSimpleOperationComplete(deviceController, "ConnectDevice");
 }
 
-
 void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload)
 {
     JNIEnv * env;
