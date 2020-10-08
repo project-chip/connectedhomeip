@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef CHIP_MEM_H
-#define CHIP_MEM_H
+#pragma once
 
 #include <core/CHIPError.h>
 #include <stdlib.h>
@@ -147,5 +146,3 @@ extern void MemoryFree(void * p);
 
 } // namespace Platform
 } // namespace chip
-
-#endif // CHIP_MEM_H

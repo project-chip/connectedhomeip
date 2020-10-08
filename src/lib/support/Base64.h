@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef BASE64_H_
-#define BASE64_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -80,5 +79,3 @@ extern uint32_t Base64Decode32(const char * in, uint32_t inLen, uint8_t * out, B
 #define BASE64_MAX_DECODED_LEN(LEN) ((LEN) *3 / 4)
 
 } // namespace chip
-
-#endif /* BASE64_H_ */

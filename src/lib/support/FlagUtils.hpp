@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef CHIP_CHIP_SUPPORT_FLAGUTILS_HPP
-#define CHIP_CHIP_SUPPORT_FLAGUTILS_HPP
+#pragma once
 
 #include <stdint.h>
 
@@ -62,5 +61,3 @@ inline void SetFlag(FlagsT & inFlags, const FlagT inFlag, const bool inValue)
 }
 
 } // namespace chip
-
-#endif // CHIP_CHIP_SUPPORT_FLAGUTILS_HPP

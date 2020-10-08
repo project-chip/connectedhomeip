@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef TIMEUTILS_H_
-#define TIMEUTILS_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -114,5 +113,3 @@ inline uint32_t secondsToMilliseconds(uint32_t seconds)
 }
 
 } // namespace chip
-
-#endif /* TIMEUTILS_H_ */

@@ -25,8 +25,7 @@
  *   saved in the platform's persistent storage.
  */
 
-#ifndef PERSISTED_COUNTER_H
-#define PERSISTED_COUNTER_H
+#pragma once
 
 #include <platform/PersistedStorage.h>
 #include <support/CHIPCounter.h>
@@ -112,5 +111,3 @@ private:
 };
 
 } // namespace chip
-
-#endif // PERSISTED_COUNTER_H

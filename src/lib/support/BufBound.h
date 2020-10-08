@@ -21,8 +21,7 @@
  *     of an object
  */
 
-#ifndef CHIP_BUFBOUND_H
-#define CHIP_BUFBOUND_H
+#pragma once
 
 #include <climits>
 #include <stdint.h>
@@ -149,5 +148,3 @@ public:
 };
 
 } // namespace chip
-
-#endif /* CHIP_BUFBOUND */
