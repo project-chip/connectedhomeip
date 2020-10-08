@@ -85,7 +85,9 @@ public final class AndroidChipStack {
     public void onCharacteristicWrite(
         BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
       if (status != BluetoothGatt.GATT_SUCCESS) {
-        Log.e(TAG, "onCharacteristicWrite for "
+        Log.e(
+            TAG,
+            "onCharacteristicWrite for "
                 + characteristic.getUuid().toString()
                 + " failed with status: "
                 + status);
@@ -118,12 +120,12 @@ public final class AndroidChipStack {
 
       byte[] svcIdBytes = convertUUIDToBytes(characteristic.getService().getUuid());
       byte[] charIdBytes = convertUUIDToBytes(characteristic.getUuid());
-      controller.handleIndicationReceived(connId, svcIdBytes, charIdBytes, characteristic.getValue());
+      controller.handleIndicationReceived(
+          connId, svcIdBytes, charIdBytes, characteristic.getValue());
     }
 
     @Override
-    public void onDescriptorWrite(
-        BluetoothGatt gatt, BluetoothGattDescriptor desc, int status) {
+    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor desc, int status) {
       BluetoothGattCharacteristic characteristic = desc.getCharacteristic();
       if (status != BluetoothGatt.GATT_SUCCESS) {
         Log.e(
