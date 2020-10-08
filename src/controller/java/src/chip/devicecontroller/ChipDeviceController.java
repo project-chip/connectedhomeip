@@ -46,10 +46,6 @@ public class ChipDeviceController {
     return bleGatt;
   }
 
-  public BluetoothGattCallback getCallback() {
-    return AndroidChipStack.getInstance().getCallback();
-  }
-
   public void beginConnectDeviceBle(BluetoothGatt bleServer, long setupPincode) {
     if (connectionId == 0) {
       bleGatt = bleServer;
@@ -97,47 +93,6 @@ public class ChipDeviceController {
     completionListener.onSendMessageComplete(message);
   }
 
-  public void onCharacteristicWrite(BluetoothGatt gatt, String charId, int status) {
-    int connId = AndroidChipStack.getInstance().getConnId(gatt);
-
-    if (connId <= 0) {
-      Log.e(TAG, "onCharacteristicWrite for non-active connection");
-      return;
-    }
-
-    if (status != BluetoothGatt.GATT_SUCCESS) {
-      return;
-    }
-
-    handleWriteConfirmation(connId, charId);
-  }
-
-  public void onDescriptorWrite(BluetoothGatt gatt, String charId, byte[] value, int status) {
-    int connId = AndroidChipStack.getInstance().getConnId(gatt);
-
-    if (connId <= 0) {
-      Log.e(TAG, "onCharacteristicWrite for non-active connection");
-      return;
-    }
-
-    if (status != BluetoothGatt.GATT_SUCCESS)
-      return;
-
-    if (value.equals(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE))
-      handleSubscribeComplete(connId, charId);
-  }
-
-  public void onCharacteristicChanged(BluetoothGatt gatt, String charId, byte[] value) {
-    int connId = AndroidChipStack.getInstance().getConnId(gatt);
-
-    if (connId <= 0) {
-      Log.e(TAG, "onCharacteristicChanged for non-active connection");
-      return;
-    }
-
-    handleIndicationReceived(connId, charId, value);
-  }
-
   public void onNotifyChipConnectionClosed(int connId) {
     // Clear connection state.
     AndroidChipStack.getInstance().removeConnection(connId);
@@ -160,6 +115,19 @@ public class ChipDeviceController {
   public void onError(Throwable error) {
     completionListener.onError(error);
   }
+
+  /* BluetoothGattCallback handlers */
+
+  public native void handleWriteConfirmation(int connId, byte[] svcId, byte[] charId);
+
+  public native void handleIndicationReceived(
+      int connId, byte[] svcId, byte[] charId, byte[] data);
+
+  public native void handleSubscribeComplete(int connId, byte[] svcId, byte[] charId);
+
+  public native void handleUnsubscribeComplete(int connId, byte[] svcId, byte[] charId);
+
+  public native void handleConnectionError(int connId);
 
   private boolean releaseBluetoothGatt(int connId) {
     if (connectionId == 0) {
@@ -189,12 +157,6 @@ public class ChipDeviceController {
   private native void beginSendMessage(long deviceControllerPtr, String message);
 
   private native void beginSendCommand(long deviceControllerPtr, ChipCommandType command);
-
-  private native void handleIndicationReceived(int conn, String charId, byte[] value);
-
-  private native void handleWriteConfirmation(int conn, String charId);
-
-  private native void handleSubscribeComplete(int conn, String charId);
 
   private native boolean disconnectDevice(long deviceControllerPtr);
 
