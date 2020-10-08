@@ -416,7 +416,7 @@ JNI_METHOD(void, handleWriteConfirmation)(JNIEnv * env, jobject self, jint conn,
                  ChipLogError(Controller, "handleWriteConfirmation() called with invalid service ID"));
     VerifyOrExit(JavaBytesToUUID(env, charId, charUUID),
                  ChipLogError(Controller, "handleWriteConfirmation() called with invalid characteristic ID"));
-                 
+
     sBleLayer.HandleWriteConfirmation(connObj, &svcUUID, &charUUID);
 exit:
     return;
