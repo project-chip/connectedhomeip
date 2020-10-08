@@ -79,7 +79,7 @@ public final class AndroidChipStack {
         Log.e(TAG, "onConnectionStateChange disconnected: no active connection");
         return;
       }
-      
+
       Log.d(TAG, "onConnectionStateChange Disconnected");
       controller.handleConnectionError(connId);
     }
