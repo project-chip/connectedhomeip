@@ -380,7 +380,8 @@ exit:
     return result;
 }
 
-JNI_METHOD(void, handleIndicationReceived)(JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId, jbyteArray value)
+JNI_METHOD(void, handleIndicationReceived)
+(JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId, jbyteArray value)
 {
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
     const auto valueBegin               = env->GetByteArrayElements(value, nullptr);
@@ -388,7 +389,7 @@ JNI_METHOD(void, handleIndicationReceived)(JNIEnv * env, jobject self, jint conn
 
     chip::Ble::ChipBleUUID svcUUID;
     chip::Ble::ChipBleUUID charUUID;
-    chip::System::PacketBuffer* buffer = nullptr;
+    chip::System::PacketBuffer * buffer = nullptr;
 
     VerifyOrExit(JavaBytesToUUID(env, svcId, svcUUID),
                  ChipLogError(Controller, "handleIndicationReceived() called with invalid service ID"));
@@ -459,7 +460,6 @@ JNI_METHOD(void, handleConnectionError)(JNIEnv * env, jobject self, jint conn)
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
     sBleLayer.HandleConnectionError(connObj, BLE_ERROR_APP_CLOSED_CONNECTION);
 }
-
 
 JNI_METHOD(jboolean, isConnected)(JNIEnv * env, jobject self, jlong deviceControllerPtr)
 {
