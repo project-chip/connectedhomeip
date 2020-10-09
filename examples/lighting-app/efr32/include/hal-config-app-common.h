@@ -32,8 +32,7 @@
  *
  ******************************************************************************/
 
-#ifndef HAL_CONFIG_APP_COMMON_H
-#define HAL_CONFIG_APP_COMMON_H
+#pragma once
 
 #include "em_device.h"
 #include "hal-config-types.h"
@@ -121,4 +120,3 @@
 
 #endif // FEATURE_EXP_HEADER_USART3
 
-#endif /* HAL_CONFIG_APP_COMMON_H */

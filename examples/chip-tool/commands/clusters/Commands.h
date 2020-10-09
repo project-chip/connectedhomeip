@@ -18,8 +18,7 @@
 //
 //
 
-#ifndef __CHIPTOOL_CLUSTERS_COMMANDS_H__
-#define __CHIPTOOL_CLUSTERS_COMMANDS_H__
+#pragma once
 
 #include "../common/ModelCommand.h"
 
@@ -3678,4 +3677,3 @@ void registerClusters(Commands & commands)
     registerClusterTemperatureMeasurement(commands);
 }
 
-#endif // __CHIPTOOL_CLUSTERS_COMMANDS_H__

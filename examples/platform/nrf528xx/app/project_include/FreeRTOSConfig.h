@@ -43,8 +43,7 @@
  * 1 tab == 4 spaces!
  */
 
-#ifndef FREERTOS_CONFIG_H
-#define FREERTOS_CONFIG_H
+#pragma once
 
 #include "sdk_config.h"
 #ifdef SOFTDEVICE_PRESENT
@@ -216,4 +215,3 @@ extern uint32_t SystemCoreClock;
  */
 #define configUSE_DISABLE_TICK_AUTO_CORRECTION_DEBUG 0
 
-#endif /* FREERTOS_CONFIG_H */

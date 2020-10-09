@@ -16,8 +16,7 @@
  *
  */
 
-#ifndef __CHIPTOOL_DOORLOCK_COMMANDS_H__
-#define __CHIPTOOL_DOORLOCK_COMMANDS_H__
+#pragma once
 
 #include "../../common/ModelCommand.h"
 
@@ -62,4 +61,3 @@ void registerClusterDoorLock(Commands & commands)
     commands.Register(clusterName, clusterCommands);
 }
 
-#endif // __CHIPTOOL_DOORLOCK_COMMANDS_H__

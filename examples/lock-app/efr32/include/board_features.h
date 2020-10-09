@@ -32,8 +32,7 @@
  *
  ******************************************************************************/
 
-#ifndef BOARD_FEATURES_H
-#define BOARD_FEATURES_H
+#pragma once
 
 #include "ble-configuration.h"
 
@@ -241,4 +240,3 @@
 // #define FEATURE_BOARD_DETECTED
 #endif
 
-#endif /* BOARD_FEATURES_H */

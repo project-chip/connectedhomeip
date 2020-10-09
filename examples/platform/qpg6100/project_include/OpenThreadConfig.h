@@ -26,8 +26,7 @@
 // TODO - enable full OpenThread integration
 // https://github.com/project-chip/connectedhomeip/issues/293
 
-#ifndef OPENTHREAD_PLATFORM_CONFIG_H
-#define OPENTHREAD_PLATFORM_CONFIG_H
+#pragma once
 
 // Disable the Qorvo-supplied OpenThread logging facilities and use
 // the facilities provided by the Device Layer (see
@@ -52,4 +51,3 @@
 //
 //#include "openthread-core-qpg6095-config.h"
 
-#endif // OPENTHREAD_PLATFORM_CONFIG_H

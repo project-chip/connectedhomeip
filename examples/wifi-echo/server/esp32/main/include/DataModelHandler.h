@@ -20,8 +20,7 @@
  *   This file defines the API for the handler for data model messages.
  */
 
-#ifndef DATA_MODEL_HANDLER_H
-#define DATA_MODEL_HANDLER_H
+#pragma once
 
 namespace chip {
 namespace System {
@@ -51,4 +50,3 @@ void InitDataModelHandler();
 void HandleDataModelMessage(const chip::PacketHeader & header, chip::System::PacketBuffer * buffer,
                             chip::SecureSessionMgrBase * mgr);
 
-#endif // DATA_MODEL_HANDLER_H

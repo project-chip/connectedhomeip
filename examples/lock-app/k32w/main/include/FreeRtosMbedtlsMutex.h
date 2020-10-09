@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef FREERTOS_MBEDTLS_MUTEX_H__
-#define FREERTOS_MBEDTLS_MUTEX_H__
+#pragma once
 
 typedef void * mbedtls_threading_mutex_t;
 
@@ -42,4 +41,3 @@ void freertos_mbedtls_mutex_free(void);
 }
 #endif
 
-#endif /* FREERTOS_MBEDTLS_MUTEX_H__ */

@@ -15,9 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef NRFCONNECT_COMMON_SERVICE_H
-#define NRFCONNECT_COMMON_SERVICE_H
+#pragma once
 
 void PublishService();
 
-#endif // NRFCONNECT_COMMON_SERVICE_H

@@ -32,8 +32,7 @@
  *
  ******************************************************************************/
 
-#ifndef INIT_MCU_H
-#define INIT_MCU_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,4 +69,3 @@ void initOtSysEFR(void);
 }
 #endif
 
-#endif // INIT_MCU_H

@@ -20,8 +20,7 @@
  *   This file defines the API for the handler for data model messages.
  */
 
-#ifndef DATA_MODEL_HANDLER_H
-#define DATA_MODEL_HANDLER_H
+#pragma once
 
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
@@ -40,4 +39,3 @@ void HandleDataModelMessage(const chip::PacketHeader & header, chip::System::Pac
 void InitDataModelHandler();
 }
 
-#endif // DATA_MODEL_HANDLER_H

@@ -24,8 +24,7 @@
  *
  */
 
-#ifndef DISPLAY_H
-#define DISPLAY_H
+#pragma once
 
 #include "esp_system.h"
 
@@ -99,4 +98,3 @@ extern bool WakeDisplay();
 
 #endif // #if CONFIG_HAVE_DISPLAY
 
-#endif // DISPLAY_H

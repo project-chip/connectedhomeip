@@ -32,8 +32,7 @@
  *
  */
 
-#ifndef __BOARD_CONFIG_H__
-#define __BOARD_CONFIG_H__
+#pragma once
 
 /// Dev board suppports OQPSK modulation in 2.4GHz band.
 #if (BRD4161A || BRD4163A || BRD4164A || BRD4166A || BRD4170A || BRD4304A || BRD4180A)
@@ -64,4 +63,3 @@
 #define RADIO_CONFIG_DMP_SUPPORT 0 /// Set to 1 to enable Dynamic Multi-Protocol support in radio.c
 #endif
 
-#endif // __BOARD_CONFIG_H__

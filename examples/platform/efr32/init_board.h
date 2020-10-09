@@ -32,8 +32,7 @@
  *
  ******************************************************************************/
 
-#ifndef INIT_BOARD_H
-#define INIT_BOARD_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,4 +47,3 @@ void initVcomEnable(void);
 }
 #endif
 
-#endif // INIT_BOARD_H

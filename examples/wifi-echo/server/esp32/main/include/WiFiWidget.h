@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef _WIFI_WIDGET_H
-#define _WIFI_WIDGET_H
+#pragma once
 
 #include "Display.h"
 
@@ -36,4 +35,3 @@ private:
     bool mState;
 };
 
-#endif // _WIFI_WIDGET_H

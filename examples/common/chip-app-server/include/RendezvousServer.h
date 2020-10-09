@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_APP_SERVER_RENDEZVOUS_DELEGATE_H_
-#define CHIP_APP_SERVER_RENDEZVOUS_DELEGATE_H_
+#pragma once
 
 #include <platform/CHIPDeviceLayer.h>
 #include <transport/RendezvousSession.h>
@@ -41,4 +40,3 @@ private:
 
 } // namespace chip
 
-#endif // CHIP_APP_SERVER_RENDEZVOUS_DELEGATE_H_

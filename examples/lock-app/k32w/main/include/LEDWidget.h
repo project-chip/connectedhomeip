@@ -18,8 +18,7 @@
 
 #include "LED.h"
 
-#ifndef LED_WIDGET_H
-#define LED_WIDGET_H
+#pragma once
 
 class LEDWidget
 {
@@ -41,4 +40,3 @@ private:
     void DoSet(bool state);
 };
 
-#endif // LED_WIDGET_H

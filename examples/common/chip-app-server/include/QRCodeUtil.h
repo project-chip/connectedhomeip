@@ -15,11 +15,9 @@
  *    limitations under the License.
  */
 
-#ifndef QR_CODE_UTIL_H
-#define QR_CODE_UTIL_H
+#pragma once
 
 #include <setup_payload/SetupPayload.h>
 
 void PrintQRCode(chip::RendezvousInformationFlags rendezvousFlags);
 
-#endif // QR_CODE_UTIL_H

@@ -15,10 +15,8 @@
  *    limitations under the License.
  */
 
-#ifndef EFR32_SERVICE_H
-#define EFR32_SERVICE_H
+#pragma once
 
 void SetDeviceName(const char * newDeviceName);
 void PublishService();
 
-#endif // EFR32_SERVICE_H

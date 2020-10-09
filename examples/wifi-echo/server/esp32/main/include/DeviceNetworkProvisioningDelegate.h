@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef _DEVICE_NETWORK_PROVISIONING_DELEGATE_H_
-#define _DEVICE_NETWORK_PROVISIONING_DELEGATE_H_
+#pragma once
 
 #include <core/CHIPError.h>
 #include <transport/NetworkProvisioning.h>
@@ -36,4 +35,3 @@ public:
     void ProvisionNetwork(const char * ssid, const char * passwd) override;
 };
 
-#endif // _DEVICE_NETWORK_PROVISIONING_DELEGATE_H_

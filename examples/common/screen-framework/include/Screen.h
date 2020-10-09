@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef SCREEN_H
-#define SCREEN_H
+#pragma once
 
 #include "Display.h"
 
@@ -67,4 +66,3 @@ public:
 
 #endif // CONFIG_HAVE_DISPLAY
 
-#endif // SCREEN_H

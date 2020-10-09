@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef _BLUETOOTH_WIDGET_H
-#define _BLUETOOTH_WIDGET_H
+#pragma once
 
 #include "Display.h"
 
@@ -36,4 +35,3 @@ private:
     bool mState;
 };
 
-#endif // _BLUETOOTH_WIDGET_H

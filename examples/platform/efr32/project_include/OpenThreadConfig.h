@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef OPENTHREAD_PLATFORM_CONFIG_H
-#define OPENTHREAD_PLATFORM_CONFIG_H
+#pragma once
 
 #include <em_device.h>
 
@@ -55,4 +54,3 @@
 //
 #include "openthread-core-efr32-config.h"
 
-#endif // OPENTHREAD_PLATFORM_CONFIG_H

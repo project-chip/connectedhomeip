@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef __RENDEZVOUSDEVICEDELEGATE_H__
-#define __RENDEZVOUSDEVICEDELEGATE_H__
+#pragma once
 
 #include "DeviceNetworkProvisioningDelegate.h"
 
@@ -37,4 +36,3 @@ private:
     ESP32NetworkProvisioningDelegate mDeviceNetworkProvisioningDelegate;
 };
 
-#endif // __RENDEZVOUSDEVICEDELEGATE_H__

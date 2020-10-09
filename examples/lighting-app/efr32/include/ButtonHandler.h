@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef BUTTON_HANDLER_H
-#define BUTTON_HANDLER_H
+#pragma once
 
 #include <stdint.h>
 
@@ -37,4 +36,3 @@ private:
     static void TimerCallback(TimerHandle_t xTimer);
 };
 
-#endif // BUTTON_HANDLER_H

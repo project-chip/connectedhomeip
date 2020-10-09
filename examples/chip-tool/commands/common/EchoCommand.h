@@ -16,8 +16,7 @@
  *
  */
 
-#ifndef __CHIPTOOL_COMMAND_ECHO_H__
-#define __CHIPTOOL_COMMAND_ECHO_H__
+#pragma once
 
 #include "NetworkCommand.h"
 
@@ -41,4 +40,3 @@ private:
     ChipDeviceController * mController = nullptr;
 };
 
-#endif // __CHIPTOOL_COMMAND_ECHO_H__
