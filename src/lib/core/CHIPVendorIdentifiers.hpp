@@ -24,8 +24,7 @@
  *
  */
 
-#ifndef CHIP_VENDOR_IDENTIFIERS_HPP
-#define CHIP_VENDOR_IDENTIFIERS_HPP
+#pragma once
 
 namespace chip {
 
@@ -41,5 +40,3 @@ enum ChipVendorId
 };
 
 } // namespace chip
-
-#endif // CHIP_VENDOR_IDENTIFIERS_HPP

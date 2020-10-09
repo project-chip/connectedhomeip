@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef CHIPTLVTAGS_H_
-#define CHIPTLVTAGS_H_
+#pragma once
 
 namespace chip {
 namespace TLV {
@@ -210,5 +209,3 @@ inline bool IsSpecialTag(uint64_t tag)
 
 } // namespace TLV
 } // namespace chip
-
-#endif /* CHIPTLVTAGS_H_ */

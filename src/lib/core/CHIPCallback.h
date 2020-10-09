@@ -21,8 +21,7 @@
  *     Clusters and the Device
  */
 
-#ifndef CHIP_CALLBACK_H_
-#define CHIP_CALLBACK_H_
+#pragma once
 
 #include <stddef.h>
 #include <stdint.h>
@@ -296,5 +295,3 @@ private:
 
 } // namespace Callback
 } // namespace chip
-
-#endif /* CHIP_CALLBACK_H_ */

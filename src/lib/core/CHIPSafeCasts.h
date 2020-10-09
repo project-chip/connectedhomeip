@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef _CHIPSAFECASTS_H
-#define _CHIPSAFECASTS_H
+#pragma once
 
 #include <limits.h>
 #include <nlassert.h>
@@ -172,5 +171,3 @@ inline const char * to_const_char(const uint8_t * in)
 
 } // namespace Uint8
 } // namespace chip
-
-#endif // _CHIPSAFECASTS_H

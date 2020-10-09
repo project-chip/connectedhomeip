@@ -33,8 +33,7 @@
  *
  */
 
-#ifndef CHIP_CONFIG_H_
-#define CHIP_CONFIG_H_
+#pragma once
 
 #if CHIP_SEPARATE_CONFIG_H
 #include <core/CHIPBuildConfig.h>
@@ -2305,5 +2304,3 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 // clang-format on
-
-#endif /* CHIP_CONFIG_H_ */
