@@ -24,9 +24,11 @@ import androidx.annotation.NonNull;
 
 public class ThreadNetworkInfo implements Parcelable {
 
-  @NonNull public String networkName;
+  @NonNull
+  private final String networkName;
 
-  @NonNull public byte[] extendedPanId;
+  @NonNull
+  private final byte[] extendedPanId;
 
   public ThreadNetworkInfo(@NonNull String networkName, @NonNull byte[] extendedPanId) {
     this.networkName = networkName;
@@ -36,6 +38,14 @@ public class ThreadNetworkInfo implements Parcelable {
   protected ThreadNetworkInfo(Parcel in) {
     networkName = in.readString();
     extendedPanId = in.createByteArray();
+  }
+
+  public String getNetworkName() {
+    return networkName;
+  }
+
+  public byte[] getExtendedPanId() {
+    return extendedPanId;
   }
 
   public static final Creator<ThreadNetworkInfo> CREATOR =

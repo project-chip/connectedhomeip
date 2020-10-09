@@ -150,8 +150,8 @@ public class SelectNetworkFragment extends Fragment
 
   @Override
   public void onPositiveClick(InputNetworkPasswordDialogFragment fragment, String password) {
-    BorderAgentInfo selectedBorderAgent = selectedNetwork.borderAgents.get(0);
-    userInputPskc = computePskc(selectedNetwork.networkInfo, password);
+    BorderAgentInfo selectedBorderAgent = selectedNetwork.getBorderAgents().get(0);
+    userInputPskc = computePskc(selectedNetwork.getNetworkInfo(), password);
     gotoFetchingCredential(selectedBorderAgent, userInputPskc);
   }
 
@@ -162,31 +162,31 @@ public class SelectNetworkFragment extends Fragment
   }
 
   private byte[] computePskc(ThreadNetworkInfo threadNetworkInfo, String password) {
-    short[] extendedPanId = new short[threadNetworkInfo.extendedPanId.length];
+    short[] extendedPanId = new short[threadNetworkInfo.getExtendedPanId().length];
     for (int i = 0; i < extendedPanId.length; ++i) {
-      extendedPanId[i] = (short) (((short) threadNetworkInfo.extendedPanId[i]) & 0xff);
+      extendedPanId[i] = (short) (((short) threadNetworkInfo.getExtendedPanId()[i]) & 0xff);
     }
 
     ByteArray pskc = new ByteArray();
     Error error =
         Commissioner.generatePSKc(
-            pskc, password, threadNetworkInfo.networkName, new ByteArray(extendedPanId));
+            pskc, password, threadNetworkInfo.getNetworkName(), new ByteArray(extendedPanId));
     if (error.getCode() != ErrorCode.kNone) {
       Log.e(
           TAG,
           String.format(
               "failed to generate PSKc: %s; network-name=%s, extended-pan-id=%s",
               error.toString(),
-              threadNetworkInfo.networkName,
-              CommissionerUtils.getHexString(threadNetworkInfo.extendedPanId)));
+              threadNetworkInfo.getNetworkName(),
+              CommissionerUtils.getHexString(threadNetworkInfo.getExtendedPanId())));
     } else {
       Log.d(
           TAG,
           String.format(
               "generated pskc=%s, network-name=%s, extended-pan-id=%s",
               CommissionerUtils.getHexString(pskc),
-              threadNetworkInfo.networkName,
-              CommissionerUtils.getHexString(threadNetworkInfo.extendedPanId)));
+              threadNetworkInfo.getNetworkName(),
+              CommissionerUtils.getHexString(threadNetworkInfo.getExtendedPanId())));
     }
 
     return CommissionerUtils.getByteArray(pskc);
@@ -200,7 +200,7 @@ public class SelectNetworkFragment extends Fragment
   @Override
   public void onClick(View view) {
     try {
-      BorderAgentInfo selectedBorderAgent = selectedNetwork.borderAgents.get(0);
+      BorderAgentInfo selectedBorderAgent = selectedNetwork.getBorderAgents().get(0);
       ThreadCommissionerServiceImpl commissionerService =
           new ThreadCommissionerServiceImpl(getContext());
       BorderAgentRecord borderAgentRecord =
@@ -238,7 +238,7 @@ public class SelectNetworkFragment extends Fragment
       try {
         commissionerService
             .addThreadNetworkCredential(
-                selectedNetwork.borderAgents.get(0), userInputPskc, credential)
+                selectedNetwork.getBorderAgents().get(0), userInputPskc, credential)
             .get();
       } catch (ExecutionException e) {
         e.printStackTrace();

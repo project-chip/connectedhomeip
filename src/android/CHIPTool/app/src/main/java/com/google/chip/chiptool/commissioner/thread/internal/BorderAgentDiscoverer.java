@@ -212,17 +212,15 @@ class BorderAgentDiscoverer implements NsdManager.DiscoveryListener {
   private String getBorderAgentDiscriminator(NsdServiceInfo serviceInfo) {
     Map<String, byte[]> attrs = serviceInfo.getAttributes();
 
-    // Use the host address as default discriminator.
-    String discriminator = null;
+    if (attrs.containsKey(KEY_DISCRIMINATOR)) {
+      return new String(attrs.get(KEY_DISCRIMINATOR));
+    }
 
     if (serviceInfo.getHost() != null) {
-      discriminator = serviceInfo.getHost().getHostAddress();
+      // Use the host address as default discriminator.
+      return serviceInfo.getHost().getHostAddress();
     }
 
-    if (attrs.containsKey(KEY_DISCRIMINATOR)) {
-      discriminator = new String(attrs.get(KEY_DISCRIMINATOR));
-    }
-
-    return discriminator;
+    return null;
   }
 }

@@ -45,10 +45,10 @@ class NetworkAdapter extends BaseAdapter implements BorderAgentListener {
   public void addBorderAgent(BorderAgentInfo borderAgent) {
     boolean hasExistingNetwork = false;
     for (ThreadNetworkInfoHolder networkInfoHolder : networks) {
-      if (networkInfoHolder.networkInfo.networkName.equals(borderAgent.networkName)
+      if (networkInfoHolder.getNetworkInfo().getNetworkName().equals(borderAgent.networkName)
           && Arrays.equals(
-              networkInfoHolder.networkInfo.extendedPanId, borderAgent.extendedPanId)) {
-        networkInfoHolder.borderAgents.add(borderAgent);
+              networkInfoHolder.getNetworkInfo().getExtendedPanId(), borderAgent.extendedPanId)) {
+        networkInfoHolder.getBorderAgents().add(borderAgent);
         hasExistingNetwork = true;
       }
     }
@@ -62,10 +62,10 @@ class NetworkAdapter extends BaseAdapter implements BorderAgentListener {
 
   public void removeBorderAgent(String lostBorderAgentDisciminator) {
     for (ThreadNetworkInfoHolder networkInfoHolder : networks) {
-      for (BorderAgentInfo borderAgent : networkInfoHolder.borderAgents) {
+      for (BorderAgentInfo borderAgent : networkInfoHolder.getBorderAgents()) {
         if (borderAgent.discriminator.equals(lostBorderAgentDisciminator)) {
-          networkInfoHolder.borderAgents.remove(borderAgent);
-          if (networkInfoHolder.borderAgents.isEmpty()) {
+          networkInfoHolder.getBorderAgents().remove(borderAgent);
+          if (networkInfoHolder.getBorderAgents().isEmpty()) {
             networks.remove(networkInfoHolder);
           }
 
@@ -97,7 +97,7 @@ class NetworkAdapter extends BaseAdapter implements BorderAgentListener {
       convertView = inflater.inflate(R.layout.commissioner_network_list_item, container, false);
     }
     TextView networkNameText = convertView.findViewById(R.id.network_name);
-    networkNameText.setText(networks.get(position).networkInfo.networkName);
+    networkNameText.setText(networks.get(position).getNetworkInfo().getNetworkName());
     return convertView;
   }
 
