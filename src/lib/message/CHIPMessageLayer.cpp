@@ -1915,7 +1915,7 @@ exit:
 }
 
 CHIP_ERROR ChipMessageLayer::RefreshEndpoint(TCPEndPoint *& endPoint, bool enable, const char * name, IPAddressType addrType,
-                                             IPAddress addr, uint16_t port)
+                                             const IPAddress & addr, uint16_t port)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -1967,7 +1967,7 @@ exit:
 }
 
 CHIP_ERROR ChipMessageLayer::RefreshEndpoint(UDPEndPoint *& endPoint, bool enable, const char * name, IPAddressType addrType,
-                                             IPAddress addr, uint16_t port, InterfaceId intfId)
+                                             const IPAddress & addr, uint16_t port, InterfaceId intfId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

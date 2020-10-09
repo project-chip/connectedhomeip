@@ -216,8 +216,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
-                                                                   NewConnectionHandler onConnected,
+CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, const IPAddress & deviceAddr,
+                                                                   void * appReqState, NewConnectionHandler onConnected,
                                                                    MessageReceiveHandler onMessageReceived, ErrorHandler onError,
                                                                    uint16_t devicePort, Inet::InterfaceId interfaceId)
 {
