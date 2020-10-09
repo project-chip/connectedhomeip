@@ -41,7 +41,7 @@ jobs:
                   submodules: true
             - name: Bootstrap
               run: |
-                  scripts/tests/cirque_tests.sh bootstrap
+                  bash -x scripts/tests/cirque_tests.sh bootstrap
             - name: Artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
@@ -52,7 +52,7 @@ jobs:
             - name: Run Tests
               run: |
                   mkdir -p /tmp/cirque_test_output
-                  scripts/tests/cirque_tests.sh run_all_tests
+                  bash -x scripts/tests/cirque_tests.sh run_all_tests
             - name: Uploading Binaries
               uses: actions/upload-artifact@v1
               if: ${{ always() }}
