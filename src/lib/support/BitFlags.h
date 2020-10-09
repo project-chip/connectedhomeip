@@ -140,4 +140,3 @@ inline void SetFlag(FlagsT & inFlags, const FlagT inFlag, const bool inValue)
 }
 
 } // namespace chip
-
