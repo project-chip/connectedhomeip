@@ -22,10 +22,8 @@
  *
  */
 
-#ifndef TESTBLELAYER_H
-#define TESTBLELAYER_H
+#pragma once
 
 int TestBleErrorStr();
 int TestBleUUID();
 
-#endif // TESTBLELAYER_H

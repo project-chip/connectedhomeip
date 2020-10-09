@@ -15,8 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#ifndef BLEUUID_H_
-#define BLEUUID_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -41,4 +40,3 @@ bool StringToUUID(const char * str, ChipBleUUID & uuid);
 } /* namespace Ble */
 } /* namespace chip */
 
-#endif /* BLEUUID_H_ */

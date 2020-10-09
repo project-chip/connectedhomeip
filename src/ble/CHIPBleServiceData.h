@@ -21,8 +21,7 @@
  *          Definitions for chip BLE service advertisement data.
  */
 
-#ifndef CHIP_BLE_SERVICE_DATA_H
-#define CHIP_BLE_SERVICE_DATA_H
+#pragma once
 
 #include <core/CHIPEncoding.h>
 
@@ -86,4 +85,3 @@ struct ChipBLEDeviceIdentificationInfo
 } /* namespace Ble */
 } /* namespace chip */
 
-#endif // CHIP_BLE_SERVICE_DATA_H

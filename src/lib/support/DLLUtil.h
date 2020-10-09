@@ -26,8 +26,7 @@
  *
  */
 
-#ifndef DLLEXPORT_H_
-#define DLLEXPORT_H_
+#pragma once
 
 #if defined _WIN32 || defined __CYGWIN__
 #define DLL_IMPORT __declspec(dllimport)
@@ -45,4 +44,3 @@
 #endif
 #endif
 
-#endif /* DLLEXPORT_H_ */

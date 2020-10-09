@@ -21,8 +21,7 @@
  *      to BleLayer.
  */
 
-#ifndef BLE_CONNECTION_DELEGATE_H_
-#define BLE_CONNECTION_DELEGATE_H_
+#pragma once
 
 #include <ble/BleConfig.h>
 #include <ble/BleError.h>
@@ -57,4 +56,3 @@ public:
 } /* namespace Ble */
 } /* namespace chip */
 
-#endif /* BLE_CONNECTION_DELEGATE_H_ */

@@ -33,8 +33,7 @@
  *
  */
 
-#ifndef BLECONFIG_H_
-#define BLECONFIG_H_
+#pragma once
 
 #if CHIP_SEPARATE_CONFIG_H
 #include <ble/BleBuildConfig.h>
@@ -235,4 +234,3 @@
 
 #include <core/CHIPConfig.h>
 
-#endif /* BLECONFIG_H_ */

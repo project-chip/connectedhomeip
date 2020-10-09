@@ -22,8 +22,7 @@
  *      to a client application.
  */
 
-#ifndef BLEAPPLICATIONDELEGATE_H_
-#define BLEAPPLICATIONDELEGATE_H_
+#pragma once
 
 #include <ble/BleConfig.h>
 
@@ -46,4 +45,3 @@ public:
 } /* namespace Ble */
 } /* namespace chip */
 
-#endif /* BLEAPPLICATIONDELEGATE_H_ */
