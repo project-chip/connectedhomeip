@@ -138,7 +138,7 @@ extern void * MemoryRealloc(void * p, size_t size);
 
 /**
  * This function is called by the Chip layer to release a memory block allocated by
- * the MemeoryAlloc(), MemoryCalloc or MemoryRealloc.
+ * the MemoryAlloc(), MemoryCalloc or MemoryRealloc.
  * @param[in]  p                Pointer to a memory block that should be released.
  *
  */

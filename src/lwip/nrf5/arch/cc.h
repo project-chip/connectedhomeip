@@ -28,11 +28,14 @@
 #define CHIP_LWIP_FREERTOS_ARCH_CC_H
 
 #include <errno.h>
-#include <malloc.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#if CHIP_CONFIG_MEMORY_MGMT_MALLOC
+#include <malloc.h>
+#endif
 
 #include <sys/time.h>
 

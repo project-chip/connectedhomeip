@@ -22,12 +22,15 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <malloc.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+
+#if CHIP_CONFIG_MEMORY_MGMT_MALLOC
+#include <malloc.h>
+#endif
 
 #if __cplusplus
 extern "C" {

@@ -48,6 +48,7 @@
 
 #include <inet/InetFaultInjection.h>
 #include <support/CHIPFaultInjection.h>
+#include <support/CHIPMem.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemTimer.h>
 
@@ -154,7 +155,12 @@ static void UseStdoutLineBuffering()
 {
     // Set stdout to be line buffered with a buffer of 512 (will flush on new line
     // or when the buffer of 512 is exceeded).
-    setvbuf(stdout, nullptr, _IOLBF, 512);
+#if CHIP_CONFIG_MEMORY_MGMT_MALLOC
+    constexpr char * buf = nullptr;
+#else
+    static char buf[512];
+#endif // CHIP_CONFIG_MEMORY_MGMT_MALLOC
+    setvbuf(stdout, buf, _IOLBF, 512);
 }
 
 void InitTestInetCommon()
@@ -282,7 +288,7 @@ void InitNetwork()
         for (size_t j = 0; j < gNetworkOptions.LocalIPv6Addr.size(); j++)
         {
             uint64_t iid    = gNetworkOptions.LocalIPv6Addr[j].InterfaceId();
-            char * tap_name = (char *) malloc(sizeof(gDefaultTapDeviceName));
+            char * tap_name = (char *) chip::Platform::MemoryAlloc(sizeof(gDefaultTapDeviceName));
             snprintf(tap_name, sizeof(gDefaultTapDeviceName), "chip-dev-%" PRIx64, iid & 0xFFFF);
             tap_name[sizeof(gDefaultTapDeviceName) - 1] = 0;
             gNetworkOptions.TapDeviceName.push_back(tap_name);

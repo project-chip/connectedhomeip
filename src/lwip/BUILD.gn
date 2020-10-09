@@ -111,6 +111,8 @@ if (current_os == "zephyr") {
       public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
     } else if (lwip_platform == "qpg6100") {
       public_deps += [ "${qpg6100_sdk_build_root}:qpg6100_sdk" ]
+    } else if (lwip_platform == "standalone") {
+      public_deps += [ "${chip_root}/src/lib/support" ]
     }
 
     public_configs = [

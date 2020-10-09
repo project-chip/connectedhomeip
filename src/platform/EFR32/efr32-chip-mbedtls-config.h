@@ -35,7 +35,6 @@
 
 #include "em_device.h"
 #include "em_se.h"
-#include <limits.h>
 
 /**
  * Enable FreeRTOS threading support
