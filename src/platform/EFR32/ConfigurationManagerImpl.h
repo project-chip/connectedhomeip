@@ -22,8 +22,7 @@
  *          for EFR32 platforms using the Silicon Labs SDK.
  */
 
-#ifndef CONFIGURATION_MANAGER_IMPL_H
-#define CONFIGURATION_MANAGER_IMPL_H
+#pragma once
 
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
@@ -108,4 +107,3 @@ inline CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * 
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // CONFIGURATION_MANAGER_IMPL_H

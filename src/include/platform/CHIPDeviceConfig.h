@@ -22,8 +22,7 @@
  *          Defines compile-time configuration values for the chip Device Layer.
  */
 
-#ifndef CHIP_DEVICE_CONFIG_H
-#define CHIP_DEVICE_CONFIG_H
+#pragma once
 
 #if CHIP_SEPARATE_CONFIG_H
 #include <platform/CHIPDeviceBuildConfig.h>
@@ -913,4 +912,3 @@
 #define CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME __TIME__
 #endif
 
-#endif // CHIP_DEVICE_CONFIG_H

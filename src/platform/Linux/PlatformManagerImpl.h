@@ -21,8 +21,7 @@
  *          Provides an implementation of the PlatformManager object.
  */
 
-#ifndef PLATFORM_MANAGER_IMPL_H
-#define PLATFORM_MANAGER_IMPL_H
+#pragma once
 
 #include <memory>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
@@ -103,4 +102,3 @@ inline PlatformManagerImpl & PlatformMgrImpl()
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // PLATFORM_MANAGER_IMPL_H

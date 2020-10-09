@@ -21,8 +21,7 @@
  *          for the Darwin platforms.
  */
 
-#ifndef BLE_MANAGER_IMPL_H
-#define BLE_MANAGER_IMPL_H
+#pragma once
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
@@ -94,4 +93,3 @@ inline BLEManagerImpl & BLEMgrImpl(void)
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#endif // BLE_MANAGER_IMPL_H

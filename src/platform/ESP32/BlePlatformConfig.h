@@ -24,8 +24,7 @@
  *
  */
 
-#ifndef BLE_PLATFORM_CONFIG_H
-#define BLE_PLATFORM_CONFIG_H
+#pragma once
 
 #include "esp_err.h"
 
@@ -41,4 +40,3 @@
 #define BLE_CONFIG_ERROR_MAX 6000999
 #define _BLE_CONFIG_ERROR(e) (BLE_CONFIG_ERROR_MIN + (e))
 
-#endif // BLE_PLATFORM_CONFIG_H

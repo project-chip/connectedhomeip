@@ -22,8 +22,7 @@
  *          Utility functions for working with OpenThread.
  */
 
-#ifndef OPENTHREAD_UTILS_H
-#define OPENTHREAD_UTILS_H
+#pragma once
 
 #include <string.h>
 
@@ -92,4 +91,3 @@ inline Inet::IPPrefix ToIPPrefix(const otIp6Prefix & otPrefix)
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // OPENTHREAD_UTILS_H

@@ -22,8 +22,7 @@
  *          for the Silicon Labs EFR32 platforms.
  */
 
-#ifndef BLE_MANAGER_IMPL_H
-#define BLE_MANAGER_IMPL_H
+#pragma once
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
@@ -196,4 +195,3 @@ inline bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#endif // BLE_MANAGER_IMPL_H

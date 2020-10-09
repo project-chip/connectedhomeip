@@ -23,8 +23,7 @@
  *          for K32W platforms using the NXP SDK.
  */
 
-#ifndef CONFIGURATION_MANAGER_IMPL_H
-#define CONFIGURATION_MANAGER_IMPL_H
+#pragma once
 
 #include "K32WConfig.h"
 #include <platform/internal/GenericConfigurationManagerImpl.h>
@@ -108,4 +107,3 @@ inline CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * 
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // CONFIGURATION_MANAGER_IMPL_H

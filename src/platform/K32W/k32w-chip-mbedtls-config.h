@@ -27,8 +27,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef K32W061_MBEDTLS_CONFIG_H
-#define K32W061_MBEDTLS_CONFIG_H
+#pragma once
 
 #if defined(MBEDTLS_ECP_WINDOW_SIZE)
 #undef MBEDTLS_ECP_WINDOW_SIZE
@@ -246,4 +245,3 @@ void * pvPortCalloc(size_t num, size_t size); /*Calloc for HEAP3.*/
 /**************************** KSDK end ****************************************/
 #endif /* MBEDTLS_AES_ALT || MBEDTLS_SHA256_ALT */
 
-#endif // K32W061_MBEDTLS_CONFIG_H

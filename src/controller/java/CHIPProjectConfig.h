@@ -23,8 +23,7 @@
  *      Project-specific configuration file for Android builds.
  *
  */
-#ifndef CHIPPROJECTCONFIG_H
-#define CHIPPROJECTCONFIG_H
+#pragma once
 
 // Enable use of an ephemeral UDP source port for locally initiated CHIP exchanges.
 #define CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT 1
@@ -52,4 +51,3 @@
 
 #define CHIP_CONFIG_MAX_SOFTWARE_VERSION_LENGTH 128
 
-#endif /* CHIPPROJECTCONFIG_H */

@@ -17,8 +17,7 @@
  *    limitations under the License.
  */
 
-#ifndef FREERTOS_BLUETOOTH_H
-#define FREERTOS_BLUETOOTH_H
+#pragma once
 
 #if __cplusplus
 extern "C" {
@@ -80,4 +79,3 @@ BaseType_t vSendToQueueBasedOnContext(QueueHandle_t xQueue, void * xItemToQueue,
 }
 #endif
 
-#endif // FREERTOS_BLUETOOTH_H

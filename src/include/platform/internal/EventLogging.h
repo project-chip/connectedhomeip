@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef EVENT_LOGGING_H
-#define EVENT_LOGGING_H
+#pragma once
 
 namespace chip {
 namespace DeviceLayer {
@@ -38,4 +37,3 @@ extern CHIP_ERROR InitChipEventLogging();
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // EVENT_LOGGING_H

@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef TIME_SYNC_MANAGER_H
-#define TIME_SYNC_MANAGER_H
+#pragma once
 
 namespace chip {
 namespace Profiles {
@@ -139,4 +138,3 @@ inline TimeSyncManager & TimeSyncMgr()
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // TIME_SYNC_MANAGER_H

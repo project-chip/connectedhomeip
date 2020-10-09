@@ -17,8 +17,7 @@
  *    limitations under the License.
  */
 
-#ifndef ESP_UTILS_H
-#define ESP_UTILS_H
+#pragma once
 
 #include "platform/internal/DeviceNetworkInfo.h"
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -52,4 +51,3 @@ public:
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // ESP_UTILS_H

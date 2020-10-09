@@ -21,9 +21,7 @@
  *
  */
 
-#ifndef TESTPLATFORMTIME_H
-#define TESTPLATFORMTIME_H
+#pragma once
 
 int TestPlatformTime();
 
-#endif // TESTPLATFORMTIME_H

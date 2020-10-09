@@ -24,8 +24,7 @@
  *
  */
 
-#ifndef INET_PLATFORM_CONFIG_H
-#define INET_PLATFORM_CONFIG_H
+#pragma once
 
 #include "esp_err.h"
 
@@ -48,4 +47,3 @@
 #define INET_CONFIG_NUM_UDP_ENDPOINTS CONFIG_NUM_UDP_ENDPOINTS
 #endif // INET_CONFIG_NUM_UDP_ENDPOINTS
 
-#endif // INET_PLATFORM_CONFIG_H

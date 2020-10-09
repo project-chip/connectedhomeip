@@ -21,8 +21,7 @@
  *          for use on platforms that support WiFi.
  */
 
-#ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_WIFI_H
-#define GENERIC_CONNECTIVITY_MANAGER_IMPL_WIFI_H
+#pragma once
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
@@ -190,4 +189,3 @@ inline const char * GenericConnectivityManagerImpl_WiFi<ImplClass>::_WiFiAPModeT
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_WIFI_H

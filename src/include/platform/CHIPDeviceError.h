@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_DEVICE_ERROR_H
-#define CHIP_DEVICE_ERROR_H
+#pragma once
 
 #define CHIP_DEVICE_ERROR_MIN 11000000
 #define CHIP_DEVICE_ERROR_MAX 11000999
@@ -59,4 +58,3 @@
  */
 #define CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_IGNORED _CHIP_DEVICE_ERROR(4)
 
-#endif // CHIP_DEVICE_ERROR_H

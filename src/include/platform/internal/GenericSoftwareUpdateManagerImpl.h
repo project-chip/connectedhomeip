@@ -22,8 +22,7 @@
  *          for use on various platforms.
  */
 
-#ifndef GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_H
-#define GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_H
+#pragma once
 
 // #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
@@ -134,4 +133,3 @@ extern template class Internal::GenericSoftwareUpdateManagerImpl<SoftwareUpdateM
 } // namespace chip
 
 // #endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
-#endif // GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_H

@@ -17,8 +17,7 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_DEVICE_INTERNAL_H
-#define CHIP_DEVICE_INTERNAL_H
+#pragma once
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -42,4 +41,3 @@ extern const uint16_t TestDevicePrivateKeyLength;
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // CHIP_DEVICE_INTERNAL_H

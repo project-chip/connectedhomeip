@@ -22,8 +22,7 @@
  *          for use on Zephyr platforms.
  */
 
-#ifndef GENERIC_THREAD_STACK_MANAGER_IMPL_ZEPHYR_H
-#define GENERIC_THREAD_STACK_MANAGER_IMPL_ZEPHYR_H
+#pragma once
 
 #include <net/openthread.h>
 #include <zephyr.h>
@@ -144,4 +143,3 @@ void GenericThreadStackManagerImpl_Zephyr<ImplClass>::_OnCHIPoBLEAdvertisingStop
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // GENERIC_THREAD_STACK_MANAGER_IMPL_ZEPHYR_H

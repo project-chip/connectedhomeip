@@ -21,8 +21,7 @@
  *          Darwin platforms.
  */
 
-#ifndef POSIX_CONFIG_H
-#define POSIX_CONFIG_H
+#pragma once
 
 #include <functional>
 #include <inttypes.h>
@@ -121,4 +120,3 @@ inline bool PosixConfig::Key::operator==(const Key & other) const
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // POSIX_CONFIG_H

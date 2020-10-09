@@ -21,8 +21,7 @@
  *          for use on Zephyr RTOS platforms.
  */
 
-#ifndef GENERIC_PLATFORM_MANAGER_IMPL_ZEPHYR_H
-#define GENERIC_PLATFORM_MANAGER_IMPL_ZEPHYR_H
+#pragma once
 
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
@@ -100,4 +99,3 @@ extern template class GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>;
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // GENERIC_PLATFORM_MANAGER_IMPL_ZEPHYR_H

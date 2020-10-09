@@ -22,8 +22,7 @@
  *          for use on Linux platforms.
  */
 
-#ifndef GENERIC_PLATFORM_MANAGER_IMPL_POSIX_H
-#define GENERIC_PLATFORM_MANAGER_IMPL_POSIX_H
+#pragma once
 
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
@@ -105,4 +104,3 @@ extern template class GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>;
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // GENERIC_PLATFORM_MANAGER_IMPL_POSIX_H

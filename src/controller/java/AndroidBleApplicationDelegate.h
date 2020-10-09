@@ -16,8 +16,7 @@
  *
  */
 
-#ifndef ANDROID_BLE_APPLICATION_DELEGATE_H
-#define ANDROID_BLE_APPLICATION_DELEGATE_H
+#pragma once
 
 #include <ble/BleApplicationDelegate.h>
 
@@ -35,4 +34,3 @@ public:
     void SetNotifyChipConnectionClosedCallback(NotifyChipConnectionClosedCallback cb);
 };
 
-#endif /* ANDROID_BLE_APPLICATION_DELEGATE_H */

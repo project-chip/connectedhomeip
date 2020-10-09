@@ -23,8 +23,7 @@
  *          for K32W platforms using the NXP SDK and the OpenThread stack.
  */
 
-#ifndef THREAD_STACK_MANAGER_IMPL_H
-#define THREAD_STACK_MANAGER_IMPL_H
+#pragma once
 
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
@@ -120,4 +119,3 @@ inline ThreadStackManagerImpl & ThreadStackMgrImpl(void)
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // THREAD_STACK_MANAGER_IMPL_H

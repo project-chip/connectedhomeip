@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_DEVICE_H
-#define CHIP_DEVICE_H
+#pragma once
 
 #include <platform/CHIPDeviceConfig.h>
 
@@ -46,4 +45,3 @@ extern Inet::InetLayer InetLayer;
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // CHIP_DEVICE_H

@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef BLE_PLATFORM_CONFIG_H
-#define BLE_PLATFORM_CONFIG_H
+#pragma once
 
 #include <ble_types.h>
 
@@ -44,4 +43,3 @@
 
 /* none so far */
 
-#endif // BLE_PLATFORM_CONFIG_H

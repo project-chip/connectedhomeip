@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef CONNECTIVITY_MANAGER_IMPL_H
-#define CONNECTIVITY_MANAGER_IMPL_H
+#pragma once
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
@@ -120,4 +119,3 @@ inline ConnectivityManagerImpl & ConnectivityMgrImpl(void)
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // CONNECTIVITY_MANAGER_IMPL_H

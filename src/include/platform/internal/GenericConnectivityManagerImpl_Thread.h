@@ -22,8 +22,7 @@
  *          for use on platforms that support Thread.
  */
 
-#ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_H
-#define GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_H
+#pragma once
 
 #include <platform/ThreadStackManager.h>
 
@@ -158,4 +157,3 @@ inline bool GenericConnectivityManagerImpl_Thread<ImplClass>::_HaveServiceConnec
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_H

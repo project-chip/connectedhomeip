@@ -21,8 +21,7 @@
  *          Defines the Device Layer DeviceDescriptionServer object.
  */
 
-#ifndef DEVICE_DESCRIPTION_SERVER_H
-#define DEVICE_DESCRIPTION_SERVER_H
+#pragma once
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <profiles/device-description/DeviceDescription.h>
@@ -94,4 +93,3 @@ inline DeviceDescriptionServer & DeviceDescriptionSvr(void)
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // DEVICE_DESCRIPTION_SERVER_H

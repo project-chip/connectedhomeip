@@ -22,8 +22,7 @@
  *          for use on platforms that support BLE.
  */
 
-#ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_BLE_H
-#define GENERIC_CONNECTIVITY_MANAGER_IMPL_BLE_H
+#pragma once
 
 #include <platform/internal/BLEManager.h>
 
@@ -160,4 +159,3 @@ inline uint16_t GenericConnectivityManagerImpl_BLE<ImplClass>::_NumBLEConnection
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_BLE_H

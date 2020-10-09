@@ -22,8 +22,7 @@
  *          on EFR32 platforms using the Silicon Labs SDK.
  */
 
-#ifndef CHIP_DEVICE_PLATFORM_CONFIG_H
-#define CHIP_DEVICE_PLATFORM_CONFIG_H
+#pragma once
 
 // ==================== Platform Adaptations ====================
 
@@ -133,4 +132,3 @@
 #endif // CHIP_DEVICE_CONFIG_BLE_APP_TASK_NAME
 #define CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH 0
 
-#endif // CHIP_DEVICE_PLATFORM_CONFIG_H

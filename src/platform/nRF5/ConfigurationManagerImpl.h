@@ -22,8 +22,7 @@
  *          for nRF52 platforms using the Nordic nRF5 SDK.
  */
 
-#ifndef CONFIGURATION_MANAGER_IMPL_H
-#define CONFIGURATION_MANAGER_IMPL_H
+#pragma once
 
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <platform/nRF5/nRF5Config.h>
@@ -102,4 +101,3 @@ inline CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * 
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // CONFIGURATION_MANAGER_IMPL_H

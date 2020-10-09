@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef NETWORK_PROVISIONING_SERVER_IMPL_H
-#define NETWORK_PROVISIONING_SERVER_IMPL_H
+#pragma once
 
 #include <platform/internal/GenericNetworkProvisioningServerImpl.h>
 
@@ -79,4 +78,3 @@ inline NetworkProvisioningServerImpl & NetworkProvisioningSvrImpl(void)
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // NETWORK_PROVISIONING_SERVER_IMPL_H

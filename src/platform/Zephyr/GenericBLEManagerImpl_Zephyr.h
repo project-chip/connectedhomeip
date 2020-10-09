@@ -21,8 +21,7 @@
  *          for the Zephyr platforms.
  */
 
-#ifndef GENERIC_BLE_MANAGER_IMPL_ZEPHYR_H
-#define GENERIC_BLE_MANAGER_IMPL_ZEPHYR_H
+#pragma once
 
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/conn.h>
@@ -165,4 +164,3 @@ inline bool GenericBLEManagerImpl_Zephyr<ImplClass>::_IsAdvertising(void)
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // GENERIC_BLE_MANAGER_IMPL_ZEPHYR_H

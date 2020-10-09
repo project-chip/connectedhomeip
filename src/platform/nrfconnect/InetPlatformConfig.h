@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef INET_PLATFORM_CONFIG_H
-#define INET_PLATFORM_CONFIG_H
+#pragma once
 
 // ==================== Platform Adaptations ====================
 
@@ -50,4 +49,3 @@
 #undef HAVE_SO_BINDTODEVICE
 #endif // HAVE_SO_BINDTODEVICE
 
-#endif // INET_PLATFORM_CONFIG_H

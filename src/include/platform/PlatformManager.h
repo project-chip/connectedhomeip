@@ -21,8 +21,7 @@
  *          Defines the public interface for the Device Layer PlatformManager object.
  */
 
-#ifndef PLATFORM_MANAGER_H
-#define PLATFORM_MANAGER_H
+#pragma once
 
 #include <platform/CHIPDeviceEvent.h>
 
@@ -252,4 +251,3 @@ inline CHIP_ERROR PlatformManager::Shutdown()
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // PLATFORM_MANAGER_H

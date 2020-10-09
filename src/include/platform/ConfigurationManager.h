@@ -22,8 +22,7 @@
  *          Defines the public interface for the Device Layer ConfigurationManager object.
  */
 
-#ifndef CONFIGURATION_MANAGER_H
-#define CONFIGURATION_MANAGER_H
+#pragma once
 
 #include <cstdint>
 
@@ -542,4 +541,3 @@ inline void ConfigurationManager::UseManufacturerCredentialsAsOperational(bool v
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // CONFIGURATION_MANAGER_H

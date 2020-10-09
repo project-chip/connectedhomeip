@@ -17,8 +17,7 @@
  *    limitations under the License.
  */
 
-#ifndef NETWORK_PROVISIONING_SERVER_H
-#define NETWORK_PROVISIONING_SERVER_H
+#pragma once
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -105,4 +104,3 @@ inline void NetworkProvisioningServer::OnPlatformEvent(const CHIPDeviceEvent * e
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // NETWORK_PROVISIONING_SERVER_H

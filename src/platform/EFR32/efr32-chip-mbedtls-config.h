@@ -26,8 +26,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef EFR32_MBEDTLS_CONFIG_H
-#define EFR32_MBEDTLS_CONFIG_H
+#pragma once
 
 #include <limits.h>
 #include <stdio.h>
@@ -261,4 +260,3 @@ typedef void mbedtls_ecp_restart_ctx;
 #include MBEDTLS_USER_CONFIG_FILE
 #endif
 
-#endif // EFR32_MBEDTLS_CONFIG_H

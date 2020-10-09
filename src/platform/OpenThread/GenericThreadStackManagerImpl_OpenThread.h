@@ -23,8 +23,7 @@
  *          for use on platforms that use OpenThread.
  */
 
-#ifndef GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_H
-#define GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_H
+#pragma once
 
 #include <openthread/instance.h>
 
@@ -133,4 +132,3 @@ inline void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnWoBLEAdverti
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_H

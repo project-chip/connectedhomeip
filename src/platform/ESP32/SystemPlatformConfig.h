@@ -24,8 +24,7 @@
  *
  */
 
-#ifndef SYSTEM_PLATFORM_CONFIG_H
-#define SYSTEM_PLATFORM_CONFIG_H
+#pragma once
 
 #include <stdint.h>
 
@@ -63,4 +62,3 @@ struct ChipDeviceEvent;
 #define CHIP_SYSTEM_CONFIG_NUM_TIMERS CONFIG_NUM_TIMERS
 #endif // CHIP_SYSTEM_CONFIG_NUM_TIMERS
 
-#endif // SYSTEM_PLATFORM_CONFIG_H

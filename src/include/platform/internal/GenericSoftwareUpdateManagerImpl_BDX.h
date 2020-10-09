@@ -22,8 +22,7 @@
  *          for use on platforms that support BDX.
  */
 
-#ifndef GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_BDX_H
-#define GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_BDX_H
+#pragma once
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <profiles/bulk-data-transfer/Development/BulkDataTransfer.h>
@@ -94,4 +93,3 @@ extern template class GenericSoftwareUpdateManagerImpl_BDX<SoftwareUpdateManager
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_BDX_H

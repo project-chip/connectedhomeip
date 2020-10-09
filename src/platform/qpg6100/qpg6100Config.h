@@ -21,8 +21,7 @@
  *          platforms based on the Qorvo QPG6100 SDK.
  */
 
-#ifndef QPG6100_CONFIG_H
-#define QPG6100_CONFIG_H
+#pragma once
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -134,4 +133,3 @@ private:
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // QPG6100_CONFIG_H

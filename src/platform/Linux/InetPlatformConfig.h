@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef INET_PLATFORM_CONFIG_H
-#define INET_PLATFORM_CONFIG_H
+#pragma once
 
 // ==================== Platform Adaptations ====================
 
@@ -39,4 +38,3 @@
 #define INET_CONFIG_NUM_UDP_ENDPOINTS 4
 #endif // INET_CONFIG_NUM_UDP_ENDPOINTS
 
-#endif // INET_PLATFORM_CONFIG_H

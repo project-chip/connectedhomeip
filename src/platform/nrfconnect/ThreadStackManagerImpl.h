@@ -21,8 +21,7 @@
  *          nRF Connect SDK platforms.
  */
 
-#ifndef THREAD_STACK_MANAGER_IMPL_H
-#define THREAD_STACK_MANAGER_IMPL_H
+#pragma once
 
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/Zephyr/GenericThreadStackManagerImpl_Zephyr.h>
@@ -91,4 +90,3 @@ inline ThreadStackManagerImpl & ThreadStackMgrImpl(void)
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // THREAD_STACK_MANAGER_IMPL_H

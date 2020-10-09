@@ -16,8 +16,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#ifndef DEVICEMANAGER_BLEAPPLICATIONDELEGATE_H_
-#define DEVICEMANAGER_BLEAPPLICATIONDELEGATE_H_
+#pragma once
 
 #include <ble/BleApplicationDelegate.h>
 
@@ -26,4 +25,3 @@ class DeviceController_BleApplicationDelegate : public chip::Ble::BleApplication
     void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj);
 };
 
-#endif /* DEVICEMANAGER_BLEAPPLICATIONDELEGATE_H_ */

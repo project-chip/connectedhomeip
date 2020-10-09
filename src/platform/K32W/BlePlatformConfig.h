@@ -24,8 +24,7 @@
  *
  */
 
-#ifndef BLE_PLATFORM_CONFIG_H
-#define BLE_PLATFORM_CONFIG_H
+#pragma once
 
 // ==================== Platform Adaptations ====================
 
@@ -35,4 +34,3 @@
 
 /* none so far */
 
-#endif // BLE_PLATFORM_CONFIG_H

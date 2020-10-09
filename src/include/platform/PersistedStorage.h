@@ -24,8 +24,7 @@
  *   Platforms will be responsible for implementing the read/write details.
  */
 
-#ifndef PERSISTED_STORAGE_H
-#define PERSISTED_STORAGE_H
+#pragma once
 
 #include <core/CHIPConfig.h>
 #include <core/CHIPError.h>
@@ -92,4 +91,3 @@ CHIP_ERROR Write(Key aKey, uint32_t aValue);
 } // namespace Platform
 } // namespace chip
 
-#endif // PERSISTED_STORAGE_H

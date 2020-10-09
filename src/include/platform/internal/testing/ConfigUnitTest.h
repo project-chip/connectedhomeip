@@ -17,8 +17,7 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_DEVICE_CONFIG_UNIT_TEST_H
-#define CHIP_DEVICE_CONFIG_UNIT_TEST_H
+#pragma once
 
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
@@ -201,4 +200,3 @@ void RunConfigUnitTest()
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // CHIP_DEVICE_CONFIG_UNIT_TEST_H

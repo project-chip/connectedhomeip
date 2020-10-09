@@ -21,8 +21,7 @@
  *          Zephyr platforms.
  */
 
-#ifndef ZEPHYR_CONFIG_H
-#define ZEPHYR_CONFIG_H
+#pragma once
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -95,4 +94,3 @@ private:
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // ZEPHYR_CONFIG_H

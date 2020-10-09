@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef SOFTWARE_UPDATE_MANAGER_IMPL_H
-#define SOFTWARE_UPDATE_MANAGER_IMPL_H
+#pragma once
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
@@ -81,4 +80,3 @@ inline SoftwareUpdateManagerImpl & SoftwareUpdateMgrImpl()
 } // namespace chip
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
-#endif // SOFTWARE_UPDATE_MANAGER_IMPL_H

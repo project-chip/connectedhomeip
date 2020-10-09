@@ -22,8 +22,7 @@
  *          for use on platforms that do NOT support Thread.
  */
 
-#ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_THREAD_H
-#define GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_THREAD_H
+#pragma once
 
 namespace chip {
 namespace DeviceLayer {
@@ -136,4 +135,3 @@ inline bool GenericConnectivityManagerImpl_NoThread<ImplClass>::_HaveServiceConn
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_THREAD_H

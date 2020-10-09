@@ -22,8 +22,7 @@
  *          on nRF52 platforms using the Nordic nRF5 SDK.
  */
 
-#ifndef CHIP_DEVICE_PLATFORM_CONFIG_H
-#define CHIP_DEVICE_PLATFORM_CONFIG_H
+#pragma once
 
 // ==================== Platform Adaptations ====================
 
@@ -89,4 +88,3 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY_FULL 0
 #define CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH 0
 
-#endif // CHIP_DEVICE_PLATFORM_CONFIG_H

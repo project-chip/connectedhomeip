@@ -21,8 +21,7 @@
  *          Defines the public interface for the Device Layer ConnectivityManager object.
  */
 
-#ifndef CONNECTIVITY_MANAGER_H
-#define CONNECTIVITY_MANAGER_H
+#pragma once
 
 #include <support/CodeUtils.h>
 
@@ -551,4 +550,3 @@ inline void ConnectivityManager::OnWiFiStationProvisionChange()
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // CONNECTIVITY_MANAGER_H
