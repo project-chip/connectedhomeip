@@ -72,10 +72,10 @@ extern NetworkProvisioningServer & NetworkProvisioningSvr();
  */
 #ifdef EXTERNAL_NETWORKPROVISIONINGSERVERIMPL_HEADER
 #include EXTERNAL_NETWORKPROVISIONINGSERVERIMPL_HEADER
-#else
+#elif defined(CHIP_DEVICE_LAYER_TARGET)
 #define NETWORKPROVISIONINGSERVERIMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/NetworkProvisioningServerImpl.h>
 #include NETWORKPROVISIONINGSERVERIMPL_HEADER
-#endif
+#endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
 namespace chip {
 namespace DeviceLayer {

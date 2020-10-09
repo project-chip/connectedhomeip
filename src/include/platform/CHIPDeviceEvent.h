@@ -265,6 +265,7 @@ typedef void (*AsyncWorkFunct)(intptr_t arg);
 #elif defined(CHIP_DEVICE_LAYER_TARGET)
 #define CHIPDEVICEPLATFORMEVENT_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/CHIPDevicePlatformEvent.h>
 #include CHIPDEVICEPLATFORMEVENT_HEADER
+#endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
 #include <ble/BleConfig.h>
 #include <system/SystemPacketBuffer.h>
@@ -395,5 +396,4 @@ struct ChipDeviceEvent final
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // defined(CHIP_DEVICE_LAYER_TARGET)
 #endif // CHIP_DEVICE_EVENT_H
