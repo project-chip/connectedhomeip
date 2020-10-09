@@ -41,8 +41,7 @@
  *
  */
 
-#ifndef INETLAYER_H
-#define INETLAYER_H
+#pragma once
 
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
@@ -344,4 +343,3 @@ extern INET_ERROR ParseHostPortAndInterface(const char * aString, uint16_t aStri
 } // namespace Inet
 } // namespace chip
 
-#endif // !defined(INETLAYER_H)

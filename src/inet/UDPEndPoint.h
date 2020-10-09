@@ -26,8 +26,7 @@
  *      control blocks, as the system is configured accordingly.
  */
 
-#ifndef UDPENDPOINT_H
-#define UDPENDPOINT_H
+#pragma once
 
 #include "inet/IPEndPointBasis.h"
 #include <inet/IPAddress.h>
@@ -96,4 +95,3 @@ private:
 } // namespace Inet
 } // namespace chip
 
-#endif // !defined(UDPENDPOINT_H)

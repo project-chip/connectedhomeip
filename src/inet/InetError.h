@@ -28,8 +28,7 @@
  *
  */
 
-#ifndef INETERROR_H
-#define INETERROR_H
+#pragma once
 
 #include <inet/InetConfig.h>
 
@@ -378,4 +377,3 @@ extern bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err);
 } // namespace Inet
 } // namespace chip
 
-#endif // !defined(INETERROR_H)

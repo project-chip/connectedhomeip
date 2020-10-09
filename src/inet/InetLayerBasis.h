@@ -23,8 +23,7 @@
  *      the pending or resulting I/O events on a socket.
  */
 
-#ifndef INETLAYERBASIS_H
-#define INETLAYERBASIS_H
+#pragma once
 
 #include <inet/InetConfig.h>
 
@@ -223,4 +222,3 @@ public:
 } // namespace Inet
 } // namespace chip
 
-#endif // !defined(INETLAYERBASIS_H)

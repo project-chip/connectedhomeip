@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef ARPA_INET_COMPATIBILITY_H
-#define ARPA_INET_COMPATIBILITY_H
+#pragma once
 
 #include <system/SystemConfig.h>
 
@@ -42,4 +41,3 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 #endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#endif // !defined(ARPA_INET_COMPATIBILITY_H)

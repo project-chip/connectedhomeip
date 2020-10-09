@@ -24,8 +24,7 @@
  *
  */
 
-#ifndef IPENDPOINTBASIS_H
-#define IPENDPOINTBASIS_H
+#pragma once
 
 #include <inet/EndPointBasis.h>
 
@@ -205,4 +204,3 @@ inline struct netif * IPEndPointBasis::FindNetifFromInterfaceId(InterfaceId aInt
 } // namespace Inet
 } // namespace chip
 
-#endif // !defined(IPENDPOINTBASIS_H)

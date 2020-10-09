@@ -22,8 +22,7 @@
  *      Asynchronous Domain Name System (DNS) resolution in InetLayer.
  *
  */
-#ifndef _ASYNC_DNS_SOCKETS_H_
-#define _ASYNC_DNS_SOCKETS_H_
+#pragma once
 
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
@@ -101,4 +100,3 @@ private:
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#endif // !defined(_ASYNC_DNS_SOCKETS_H_)

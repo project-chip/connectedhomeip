@@ -25,8 +25,7 @@
  *      control blocks, as the system is configured accordingly.
  */
 
-#ifndef TCPENDPOINT_H
-#define TCPENDPOINT_H
+#pragma once
 
 #include <inet/EndPointBasis.h>
 #include <inet/IPAddress.h>
@@ -692,4 +691,3 @@ inline void TCPEndPoint::MarkActive()
 } // namespace Inet
 } // namespace chip
 
-#endif // !defined(TCPENDPOINT_H)
