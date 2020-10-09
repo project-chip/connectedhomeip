@@ -31,5 +31,5 @@ int main()
 {
     chip::Platform::MemoryInit();
 
-    return (TestCHIPArgParser());
+    return TestCHIPArgParser();
 }
