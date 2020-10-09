@@ -17,7 +17,7 @@
  *    limitations under the License.
  */
 
-#include <support/c/CHIPPlatformMemory.h>
+#include <support/CHIPPlatformMemory.h>
 
 #include <mbedtls/platform.h>
 #include <openthread/cli.h>

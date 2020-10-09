@@ -155,7 +155,12 @@ static void UseStdoutLineBuffering()
 {
     // Set stdout to be line buffered with a buffer of 512 (will flush on new line
     // or when the buffer of 512 is exceeded).
-    setvbuf(stdout, nullptr, _IOLBF, 512);
+#if CHIP_CONFIG_MEMORY_MGMT_MALLOC
+    constexpr char * buf = nullptr;
+#else
+    static char buf[512];
+#endif  // CHIP_CONFIG_MEMORY_MGMT_MALLOC
+    setvbuf(stdout, buf, _IOLBF, 512);
 }
 
 void InitTestInetCommon()

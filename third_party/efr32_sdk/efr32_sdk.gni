@@ -333,7 +333,6 @@ template("efr32_sdk") {
     }
 
     public_deps = [
-      "${chip_root}/src/lib/support:support_headers",
       "${segger_rtt_root}:segger_rtt",
       "${segger_rtt_root}:segger_rtt_printf",
       "${segger_rtt_root}:segger_rtt_syscalls",
@@ -343,9 +342,6 @@ template("efr32_sdk") {
       sources += invoker.sources
     }
 
-    public_configs = [
-      ":${sdk_target_name}_config",
-      "${chip_root}/src/lib/support:c_includes",
-    ]
+    public_configs = [ ":${sdk_target_name}_config" ]
   }
 }

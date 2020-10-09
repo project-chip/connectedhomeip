@@ -20,7 +20,7 @@
  */
 
 #include <support/CHIPMem.h>
-#include <support/c/CHIPPlatformMemory.h>
+#include <support/CHIPPlatformMemory.h>
 
 extern "C" {
 

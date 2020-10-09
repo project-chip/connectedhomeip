@@ -33,8 +33,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "CHIPPlatformMemory.h"
-
 #include "em_device.h"
 #include "em_se.h"
 
@@ -242,8 +240,8 @@ typedef void mbedtls_ecp_restart_ctx;
 #define MBEDTLS_ENTROPY_MAX_SOURCES 1   /**< Maximum number of sources supported */
 
 // #if OPENTHREAD_CONFIG_MULTIPLE_INSTANCE_ENABLE
-#define MBEDTLS_PLATFORM_STD_CALLOC CHIPPlatformMemoryCalloc /**< Default allocator to use, can be undefined */
-#define MBEDTLS_PLATFORM_STD_FREE CHIPPlatformMemoryFree     /**< Default free to use, can be undefined */
+#define MBEDTLS_PLATFORM_STD_CALLOC calloc /**< Default allocator to use, can be undefined */
+#define MBEDTLS_PLATFORM_STD_FREE free     /**< Default free to use, can be undefined */
 // #else
 // #define MBEDTLS_MEMORY_BUFFER_ALLOC_C
 // #endif

@@ -29,7 +29,7 @@
 #include <mbedtls/threading.h>
 
 #include <platform/CHIPDeviceLayer.h>
-#include <support/c/CHIPPlatformMemory.h>
+#include <support/CHIPPlatformMemory.h>
 
 #include <AppTask.h>
 

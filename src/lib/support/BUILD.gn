@@ -59,7 +59,7 @@ support_headers = [
   "verhoeff/Verhoeff.h",
   "CHIPMem.h",
   "CHIPMemString.h",
-  "c/CHIPPlatformMemory.h",
+  "CHIPPlatformMemory.h",
 ]
 
 static_library("support") {
@@ -76,7 +76,7 @@ static_library("support") {
     "RandUtils.cpp",
     "TestUtils.cpp",
     "TimeUtils.cpp",
-    "c/CHIPPlatformMemory.cpp",
+    "CHIPPlatformMemory.cpp",
     "logging/CHIPLogging.cpp",
     "logging/CHIPLoggingLogV.cpp",
     "verhoeff/Verhoeff.cpp",
@@ -131,8 +131,4 @@ copy("support_headers") {
   sources = support_headers
 
   outputs = [ "${root_gen_dir}/include/support/{{source_file_part}}" ]
-}
-
-config("c_includes") {
-  include_dirs = [ "c" ]
 }

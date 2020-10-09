@@ -73,7 +73,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <support/c/CHIPPlatformMemory.h>
+#include <support/CHIPPlatformMemory.h>
 
 #include "lwip/opt.h"
 #include "lwip/stats.h"
