@@ -50,13 +50,16 @@
     }
 
 // Cluster function static arrays
-#define GENERATED_FUNCTION_ARRAYS
+#define GENERATED_FUNCTION_ARRAYS                                                                                                  \
+    const EmberAfGenericClusterFunction emberAfFuncArrayOnOffClusterServer[] = { (                                                 \
+        EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback };
 
 // Clusters definitions
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         {                                                                                                                          \
-            0x0006, (EmberAfAttributeMetadata *) &(generatedAttributes[0]), 2, 3, (CLUSTER_MASK_SERVER), NULL,                     \
+            0x0006, (EmberAfAttributeMetadata *) &(generatedAttributes[0]), 2,                                                     \
+            3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),     emberAfFuncArrayOnOffClusterServer,                    \
         },                                                                                                                         \
     }
 
